@@ -77,6 +77,7 @@
 #include "platform/android/SurfacePresentationPolicy.h"
 #include "platform/android/GameplayEventMetadata.h"
 #include "platform/android/AndroidDebugRequestAdmission.h"
+#include "platform/android/AndroidOpeningBenchmarkOwner.h"
 #include "update/GitHubReleaseUpdater.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/PipelineCacheSeed.h"
@@ -575,6 +576,21 @@ PreviewControls gPreviewControls{};
 horde::graphics::EntryMenuControls gEntryControls{};
 std::array<jlong, 6u> gMenuAmbienceState{}; // Generation/reset/tick/creak/fade/presented.
 std::array<jlong, 5u> gEntryState{}; // Coherent generation/profile/phase/fade/presentation.
+std::mutex gOpeningBenchmarkMutex;
+horde::platform::android::AndroidOpeningBenchmarkOwner gOpeningBenchmarkOwner;
+horde::graphics::OpeningBenchmarkEligibility gOpeningBenchmarkEligibility;
+std::uint64_t gOpeningBenchmarkSerial=0,gOpeningBenchmarkGraphicsSerial=0;
+bool gOpeningBenchmarkOriginalRoute=false;
+std::optional<horde::graphics::GraphicsSettings> gOpeningBenchmarkOriginalSettings;
+bool OpeningBenchmarkResetAllowedOnOwner();
+bool OpeningBenchmarkBusy() {
+    std::lock_guard lock(gOpeningBenchmarkMutex);return gOpeningBenchmarkOwner.Busy() ||
+        gOpeningBenchmarkOwner.State()==horde::platform::android::AndroidOpeningBenchmarkOwner::Phase::Blocked;
+}
+void OpeningBenchmarkFinished(unsigned result) {
+    std::lock_guard lock(gOpeningBenchmarkMutex);
+    if(gOpeningBenchmarkOwner.Busy())gOpeningBenchmarkOwner.BeginReturn(result);
+}
 horde::graphics::GraphicsPreviewPerformanceSnapshot gPreviewPerformance{};
 std::uint64_t gPreviewPerformanceGeneration = 0u; // guarded by gGraphicsMutex.
 PreviewControls ReadPreviewControls() { std::lock_guard lock(gGraphicsMutex); return gPreviewControls; }
@@ -597,6 +613,11 @@ horde::vulkan::raytracing::RtSceneProfile DesiredProfile(
     const SwapchainContext& context, const PreviewControls& preview)
 {
     if(context.environmentSurvey)return horde::vulkan::raytracing::RtSceneProfile::Showcase;
+    {
+        std::lock_guard lock(gOpeningBenchmarkMutex);
+        if(gOpeningBenchmarkOwner.WantsShowcase())return horde::vulkan::raytracing::RtSceneProfile::Showcase;
+        if(gOpeningBenchmarkOwner.Returning())return horde::vulkan::raytracing::RtSceneProfile::EntryMenu;
+    }
     if (gCampaignShowcaseOverride.load(std::memory_order_acquire))
         return horde::vulkan::raytracing::RtSceneProfile::Showcase;
     const bool currentPreview = (preview.generation == 0u ||
@@ -808,6 +829,7 @@ horde::platform::android::DebugRequestAdmissionState ReadDebugRequestAdmissionSt
 
 bool CanQueueCompetingDebugRequestLocked()
 {
+    if(OpeningBenchmarkBusy())return false;
     if(EnvironmentSurveyPending())return false;
     if(gCampaignPauseGate.load(std::memory_order_acquire))return false;
     return horde::platform::android::CanRequestCompetingDebugMode(
@@ -1565,8 +1587,10 @@ void CancelActiveInAppBenchmark(SwapchainContext& context)
         // All active-context callers run on the owning render thread, including
         // surface teardown. Home can stop the loop before the queued cancel
         // command runs; restore the benchmark's temporary gameplay state here.
+        if(!OpeningBenchmarkResetAllowedOnOwner())return;
         ResetShowcaseSimulation();
         gInAppBenchmarkStatus.store(3, std::memory_order_release);
+        OpeningBenchmarkFinished(3);
     }
 }
 
@@ -1667,6 +1691,11 @@ void PublishBenchmarkProgress(const SwapchainContext& context)
 
 void StartInAppBenchmark(SwapchainContext& context)
 {
+    if(!OpeningBenchmarkResetAllowedOnOwner())return;
+    {
+        std::lock_guard lock(gOpeningBenchmarkMutex);
+        if(gOpeningBenchmarkOwner.Busy() && gOpeningBenchmarkOwner.Cancelled())return;
+    }
     const bool motionValidation =
 #if HORDE_RT_ANDROID_MOTION_VALIDATION
         gMotionValidationRequested.exchange(false, std::memory_order_acq_rel);
@@ -1767,11 +1796,13 @@ void FinishInAppBenchmark(SwapchainContext& context)
     }
     gInAppBenchmarkStatus.store(context.inAppBenchmark.Passed() && evidenceComplete ? 2 : 3,
                                 std::memory_order_release);
+    OpeningBenchmarkFinished(context.inAppBenchmark.Passed() && evidenceComplete?2:3);
     {
         std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
         gInputPublisherState.paused = true;
         PublishInputLocked();
     }
+    if(!OpeningBenchmarkResetAllowedOnOwner())return;
     ResetShowcaseSimulation();
     context.benchmarkExpectedFrame.reset();
     if (context.rtFrameEvidenceInitialised)
@@ -5210,6 +5241,7 @@ bool ApplySceneProfileOnOwner(SwapchainContext& context, const PreviewControls c
 }
 
 #include "android_campaign_bridge.inl"
+#include "android_opening_benchmark.inl"
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
 #include "android_keeper_mist_fixture.inl"
 #include "android_environment_survey.inl"
@@ -5294,6 +5326,7 @@ void SwapchainRenderLoop()
         const auto entryControls = ReadEntryControls();
         if (gSwapchainContext.entryHandoff.Observe(entryControls, gSwapchainContext.surfaceGeneration))
             gSwapchainContext.entrySession.Reset();
+        PrepareOpeningBenchmarkOnOwner(gSwapchainContext);
         bool sceneTransition = DesiredProfile(gSwapchainContext, previewControls) != gSwapchainContext.sceneProfile ||
             previewControls.resetSerial != gSwapchainContext.previewResetSerial;
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
@@ -5302,11 +5335,13 @@ void SwapchainRenderLoop()
 #endif
         if (!ApplySceneProfileOnOwner(gSwapchainContext, previewControls))
         {
+            {std::lock_guard lock(gOpeningBenchmarkMutex);if(gOpeningBenchmarkOwner.Busy())gOpeningBenchmarkOwner.Block();}
             gSwapchainContext.entryHandoff.FailLoad();
             PublishEntryState(gSwapchainContext, false);
             gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
             break;
         }
+        OpeningBenchmarkSceneReadyOnOwner(gSwapchainContext);
         if (gSwapchainContext.rtFrameEvidenceInitialised)
         {
             (void)gSwapchainContext.rtFrameEvidence.SetPaused(measurementPaused);
@@ -5500,6 +5535,7 @@ void SwapchainRenderLoop()
         if (!RenderFrame(gSwapchainContext, rtFramePresented, resourceRecreated))
         {
             if (!gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration)) break;
+            {std::lock_guard lock(gOpeningBenchmarkMutex);if(gOpeningBenchmarkOwner.Busy())gOpeningBenchmarkOwner.Block();}
             FailInAppBenchmarkAfterRenderFailure(gSwapchainContext);
             gSwapchainContext.entryHandoff.FailLoad();
             PublishEntryState(gSwapchainContext, false);
@@ -5544,6 +5580,7 @@ void SwapchainRenderLoop()
                 gSwapchainContext.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::EntryMenu &&
                     gSwapchainContext.entrySession.ReadyToPlay());
         PublishEntryState(gSwapchainContext, currentOutputPresented);
+        ObserveOpeningBenchmarkOnOwner(gSwapchainContext,currentOutputPresented);
         if (currentOutputPresented && gSwapchainContext.entryWarmFrames > 0u)
             --gSwapchainContext.entryWarmFrames;
         if (currentOutputPresented && !gSwapchainContext.capabilities.rtScene.presented)
@@ -5653,6 +5690,11 @@ void SwapchainRenderLoop()
     RestoreAndroidMotionEquipmentSeed(gSwapchainContext);
 #endif
     const bool retired = campaignRetired && DestroySwapchainContext(gSwapchainContext);
+    {
+        std::lock_guard lock(gOpeningBenchmarkMutex);
+        gOpeningBenchmarkOwner.SurfaceRetired(retiredGeneration,retired);
+        gOpeningBenchmarkEligibility={};
+    }
     gSurfaceRetirementBlocked.store(!retired, std::memory_order_release);
     if (!retired) gSurfaceSessions.Publish(retiredGeneration, 3);
 }
@@ -5843,14 +5885,23 @@ bool StartSurfaceInternal(ANativeWindow* window,
 
     if (!CreateSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))
     {
+        if(gSurfaceSessions.IsCurrent(generation)) {
+            std::lock_guard lock(gOpeningBenchmarkMutex);if(gOpeningBenchmarkOwner.Busy())gOpeningBenchmarkOwner.Block();
+        }
         DestroySwapchainContext(context);
         return false;
+    }
+    if(!context.environmentSurvey) {
+        std::lock_guard lock(gOpeningBenchmarkMutex);gOpeningBenchmarkOwner.BindSurface(generation);
     }
     if(!context.environmentSurvey)context.entryHandoff.Observe(ReadEntryControls(), generation);
     context.sceneProfile = DesiredProfile(context, ReadPreviewControls());
     if(!context.environmentSurvey){context.entryHandoff.BeginLoad();PublishEntryState(context, false);}
     if (!InitialiseRtSceneForSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))
     {
+        if(gSurfaceSessions.IsCurrent(generation)) {
+            std::lock_guard lock(gOpeningBenchmarkMutex);if(gOpeningBenchmarkOwner.Busy())gOpeningBenchmarkOwner.Block();
+        }
         if(!context.environmentSurvey){context.entryHandoff.FailLoad();PublishEntryState(context, false);}
         DestroySwapchainContext(context);
         return false;
@@ -6748,6 +6799,10 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_configureCampaign(JNIEnv* env,jclass
     const char* bytes=env->GetStringUTFChars(directory,nullptr);if(!bytes)return JNI_FALSE;
     std::string root(bytes);env->ReleaseStringUTFChars(directory,bytes);
     if(root.empty() || root.size()>1024)return JNI_FALSE;
+    std::lock_guard admission(gDebugRequestAdmissionMutex);
+    if(OpeningBenchmarkBusy()) {
+        std::lock_guard lock(gCampaignMutex);return root==gCampaignConfiguredRoot?JNI_TRUE:JNI_FALSE;
+    }
     std::lock_guard lock(gCampaignMutex);
     // A delayed Activity worker cannot redirect a running session to another
     // directory. A new namespace is admitted between surface sessions only.
@@ -6760,6 +6815,8 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestCampaign(
     JNIEnv*,jclass,jint action,jint slot,jint kind,jlong generation)
 {
+    std::lock_guard admissionLock(gDebugRequestAdmissionMutex);
+    if(OpeningBenchmarkBusy())return 0;
     if(action<1 || action>5 || slot<0 || slot>=3 || kind<0 || kind>1 || generation<=0)return 0;
     std::lock_guard inputLock(gInputPublisherMutex);
     std::lock_guard commandLock(gCampaignMutex);
@@ -6846,6 +6903,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setEntryMenu(
     if (generation < 0 || (generation != 0 &&
         !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)))) return;
     std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    if(OpeningBenchmarkBusy() && !(generation==0 && enabled==JNI_TRUE && play!=JNI_TRUE))return;
     const bool nextEnabled = enabled == JNI_TRUE;
     const bool nextPlay = nextEnabled && play == JNI_TRUE;
     std::lock_guard lock(gGraphicsMutex);
@@ -6911,6 +6969,8 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setGraphicsPreview(
     JNIEnv*, jclass, jboolean enabled, jboolean paused, jboolean motion, jint camera, jboolean reset, jlong generation)
 {
+    std::lock_guard admission(gDebugRequestAdmissionMutex);
+    if(OpeningBenchmarkBusy())return;
     if ((generation == 0 && enabled == JNI_TRUE) ||
         (generation != 0 && !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)))) return;
     std::lock_guard lock(gGraphicsMutex);
@@ -6960,6 +7020,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getKeeperRevealTitleOpacity(JNIEnv*,
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setGraphicsSettings(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist, jint dust)
 {
+    std::lock_guard admission(gDebugRequestAdmissionMutex);
+    if(OpeningBenchmarkBusy())return 0;
     const auto receivedNs = GraphicsSteadyNs();
     const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow, mist, dust);
     if (!horde::graphics::ValidGraphicsSettings(settings)) return 0;
@@ -6972,6 +7034,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setGraphicsSettings(JNIEnv*, jclass,
 extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_beginGraphicsEdit(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist, jint dust)
 {
+    std::lock_guard admission(gDebugRequestAdmissionMutex);
+    if(OpeningBenchmarkBusy())return;
     const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow, mist, dust);
     if (!horde::graphics::ValidGraphicsSettings(settings)) return;
     std::lock_guard lock(gGraphicsMutex);
@@ -6982,6 +7046,8 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_applyGraphicsSettings(
     JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist, jint dust, jlong generation)
 {
+    std::lock_guard admission(gDebugRequestAdmissionMutex);
+    if(OpeningBenchmarkBusy())return 0;
     const auto receivedNs = GraphicsSteadyNs();
     if (!gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation))) return 0;
     std::lock_guard lock(gGraphicsMutex);
@@ -6996,6 +7062,8 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_compareGraphicsPreview(
     JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist, jint dust, jlong generation)
 {
+    std::lock_guard admission(gDebugRequestAdmissionMutex);
+    if(OpeningBenchmarkBusy())return 0;
     const auto receivedNs = GraphicsSteadyNs();
     const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow, mist, dust);
     if (!horde::graphics::ValidGraphicsSettings(settings) ||
@@ -7017,6 +7085,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_compareGraphicsPreview(
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_revertGraphicsSettings(JNIEnv*, jclass, jlong generation)
 {
+    std::lock_guard admission(gDebugRequestAdmissionMutex);
+    if(OpeningBenchmarkBusy())return 0;
     const auto receivedNs = GraphicsSteadyNs();
     if (!gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation))) return 0;
     std::lock_guard lock(gGraphicsMutex);
@@ -7030,6 +7100,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_revertGraphicsSettings(JNIEnv*, jcla
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_confirmGraphicsSettings(JNIEnv*, jclass, jlong serial, jlong generation)
 {
+    std::lock_guard admission(gDebugRequestAdmissionMutex);
+    if(OpeningBenchmarkBusy())return JNI_FALSE;
     std::lock_guard lock(gGraphicsMutex);
     if (gSurfaceSessions.State(static_cast<std::uint64_t>(generation)) != 1) return JNI_FALSE;
     if (!gGraphicsEdit || !gAppliedGraphics.rtPresented || gAppliedGraphics.serial != static_cast<std::uint64_t>(serial) ||
@@ -7041,6 +7113,8 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_advanceGraphicsConfirmation(
     JNIEnv*, jclass, jdouble seconds, jboolean foreground, jlong generation)
 {
+    std::lock_guard admission(gDebugRequestAdmissionMutex);
+    if(OpeningBenchmarkBusy())return 0;
     const auto receivedNs = GraphicsSteadyNs();
     if (!gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation))) return 0;
     std::lock_guard lock(gGraphicsMutex);
@@ -7355,6 +7429,52 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugRouteReplay(JNIEnv*, jcl
 #else
     return JNI_FALSE;
 #endif
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestOpeningBenchmark(JNIEnv*,jclass,jlong generation)
+{
+    if(generation<=0 || !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)) ||
+       gSurfaceSessions.State()!=1)return 0;
+    std::lock_guard admission(gDebugRequestAdmissionMutex);
+    {std::lock_guard campaignLock(gCampaignMutex);if(gCampaignCommand)return 0;}
+    std::uint64_t serial=0;
+    {
+        std::lock_guard lock(gOpeningBenchmarkMutex);
+        if(gOpeningBenchmarkSerial==static_cast<std::uint64_t>(INT64_MAX) ||
+           !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)))return 0;
+        serial=gOpeningBenchmarkSerial+1;
+        if(!gOpeningBenchmarkOwner.Queue(serial,static_cast<std::uint64_t>(generation),gOpeningBenchmarkEligibility))return 0;
+        gOpeningBenchmarkSerial=serial;gOpeningBenchmarkOriginalSettings.reset();
+        gOpeningBenchmarkOriginalRoute=gRtLabBenchmarkRoute.load(std::memory_order_acquire);
+    }
+    {
+        std::lock_guard lock(gReportMutex);InvalidateBenchmarkSummaryLocked();
+        gRequestedBenchmarkRunId.clear();gRequestedBenchmarkWorkload=horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
+        gLatestBenchmarkReport.clear();gLatestBenchmarkProgress="CUSTOM BENCHMARK QUEUED";
+    }
+    return static_cast<jlong>(serial);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_cancelOpeningBenchmark(JNIEnv*,jclass,jlong request,jlong origin)
+{
+    std::lock_guard lock(gOpeningBenchmarkMutex);
+    if(request>0 && origin>0 && gOpeningBenchmarkOwner.Cancel(request,origin)) {
+        gInAppBenchmarkRequested.store(false,std::memory_order_release);
+        gInAppBenchmarkCancelRequested.store(true,std::memory_order_release);
+    }
+}
+
+extern "C" JNIEXPORT jlongArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getOpeningBenchmarkState(JNIEnv* env,jclass)
+{
+    std::array<std::int64_t,6> state;
+    {std::lock_guard lock(gOpeningBenchmarkMutex);state=gOpeningBenchmarkOwner.Snapshot();}
+    std::array<jlong,6> values{};std::copy(state.begin(),state.end(),values.begin());
+    const auto result=env->NewLongArray(static_cast<jsize>(values.size()));
+    if(result)env->SetLongArrayRegion(result,0,static_cast<jsize>(values.size()),values.data());
+    return result;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL

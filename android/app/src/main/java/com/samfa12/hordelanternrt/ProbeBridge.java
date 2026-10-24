@@ -143,6 +143,11 @@ public final class ProbeBridge {
     public static native int getDebugMotionEvidenceStatus();
     public static native boolean finishDebugMotionEvidence();
     public static native boolean requestBenchmark();
+    // Custom/unranked opening-menu owner. Course completion alone is not Entry restoration.
+    public static native long requestOpeningBenchmark(long surfaceGeneration);
+    public static native void cancelOpeningBenchmark(long requestSerial, long requestSurfaceGeneration);
+    // request, current generation, phase(0..6), result(0/2/3), Entry presented, origin generation.
+    public static native long[] getOpeningBenchmarkState();
     // UUID.randomUUID() and Build.MODEL supplied by ordinary UI. Legacy run ID stays empty.
     public static native boolean requestBenchmarkWithSummaryId(String summaryRunUuid, String rawModel);
     public static native String getReadyBenchmarkSummaryRunId();

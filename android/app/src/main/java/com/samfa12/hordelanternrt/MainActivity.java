@@ -387,6 +387,9 @@ public class MainActivity extends Activity {
     private int verticalProofFeedbackCheckpoint = -1;
     private int verticalProofFeedbackDiagnosticCount;
     private boolean benchmarkRunning;
+    private long openingBenchmarkRequest, openingBenchmarkRequestGeneration;
+    private boolean openingBenchmarkCancelRequested, openingBenchmarkBlocked;
+    private Button openingBenchmarkButton;
     private boolean benchmarkStatusExpanded;
     private boolean benchmarkReportVisible;
     private View.OnLayoutChangeListener configurationLayoutListener;
@@ -539,6 +542,7 @@ public class MainActivity extends Activity {
     private final Runnable refreshEntryMenu = new Runnable() {
         @Override public void run() {
             if (!entryMenuEnabled || !resumed || surfaceRequestGeneration == 0) return;
+            if (openingBenchmarkPending()) return; // The separate owner poll cannot complete campaign Play.
             if(campaignMenuVisible) { handler.postDelayed(this,200L); return; }
             final EntryMenuState state;
             try { state = EntryMenuState.decode(ProbeBridge.getEntryMenuState()); }
@@ -573,6 +577,14 @@ public class MainActivity extends Activity {
             }
             updateEntryMenuPresentation(state);
             handler.postDelayed(this, state.phase == EntryMenuState.PHASE_LOADING ? 100L : 200L);
+        }
+    };
+
+    private final Runnable refreshOpeningBenchmark = new Runnable() {
+        @Override public void run() {
+            if(!openingBenchmarkPending() || !resumed) return;
+            pollOpeningBenchmark();
+            if(openingBenchmarkPending()) handler.postDelayed(this,100L);
         }
     };
 
@@ -1043,6 +1055,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void surfaceDestroyed(final SurfaceHolder holder) {
+                cancelOpeningBenchmarkRequest();
                 surfaceAvailable = false;
                 currentSurface = null;
                 logSurfaceLifecycle("surfaceDestroyed");
@@ -1082,6 +1095,7 @@ public class MainActivity extends Activity {
     }
 
     private void stopSurface() {
+        cancelOpeningBenchmarkRequest();
         stopChapterAmbience();
         cancelCombatTeachingPromptPoll();
         clearCombatTeachingPrompt();
@@ -1112,7 +1126,7 @@ public class MainActivity extends Activity {
 
     private void configureTouchControls() {
         surfaceView.setOnTouchListener((view, event) -> {
-            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return true;
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible || benchmarkRunning || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return true;
             final int action = event.getActionMasked();
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 final int index = event.getActionIndex();
@@ -1180,6 +1194,7 @@ public class MainActivity extends Activity {
     }
 
     private void showMainMenu(final boolean firstLaunch) {
+        if(openingBenchmarkPending()) { showOpeningBenchmarkProgress(); return; }
         invalidateLookoutObjective();
         if (shouldUseEntryMenu(firstLaunch)) {
             entryMenuEnabled = true;
@@ -1248,7 +1263,6 @@ public class MainActivity extends Activity {
         if (rtLabUnlocked || debugRtLabAccess) {
             addMenuButton(panel, getString(R.string.rt_lab), () -> openRtLab(false));
         }
-        addMenuButton(panel, getString(R.string.run_benchmark), this::startBenchmark);
         addMenuButton(panel, getString(R.string.playtest_report), this::showPlaytestReport);
         addMenuButtonRow(panel,
                 getString(R.string.more_by_samfa12), this::openSamfa12Website,
@@ -1568,6 +1582,7 @@ public class MainActivity extends Activity {
     }
 
     private void showEntryMorePage() {
+        if(openingBenchmarkPending()) { showOpeningBenchmarkProgress(); return; }
         entryPlayButton = null;
         entrySettingsButton = null;
         entryMoreButton = null;
@@ -1579,6 +1594,8 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel("HORDE LANTERN", getString(R.string.entry_more_eyebrow));
         addBody(panel, getString(R.string.entry_more_description));
+        openingBenchmarkButton=addEntryMenuButton(panel,"Custom benchmark (unranked)",this::requestOpeningCustomBenchmark,false);
+        openingBenchmarkButton.setEnabled(canRequestOpeningBenchmark());
         addEntryMenuButton(panel, "Load checkpoint", () -> showCampaignMenu(CampaignMenuState.LOAD), false);
         addEntryMenuButton(panel, getString(R.string.controls), this::showControls, false);
         addEntryMenuButton(panel, getString(R.string.credits), this::showCredits, false);
@@ -1594,6 +1611,7 @@ public class MainActivity extends Activity {
     }
 
     private void showCampaignMenu(int action) {
+        if(openingBenchmarkPending()) return;
         if(campaignState!=null && campaignState.pending()) return;
         if(deathOverlayVisible && (action!=CampaignMenuState.LOAD || retryPending)) return;
         campaignFromDeath=deathOverlayVisible;
@@ -1907,12 +1925,12 @@ public class MainActivity extends Activity {
     }
 
     private void requestEntryPlay() {
-        if (!entryMenuEnabled || entryPlayRequested) return;
+        if (!entryMenuEnabled || entryPlayRequested || openingBenchmarkPending()) return;
         showCampaignMenu(CampaignMenuState.NEW_GAME);
     }
 
     private void beginPreparedEntryPlay() {
-        if (!entryMenuEnabled || entryPlayRequested) return;
+        if (!entryMenuEnabled || entryPlayRequested || openingBenchmarkPending()) return;
         playSound("ui_select", 0.18f);
         entryMenuSidePage = false;
         entryMenuFailed = false;
@@ -1992,10 +2010,11 @@ public class MainActivity extends Activity {
     }
 
     private void applyEntryMenuAvailability(EntryMenuState state) {
-        final boolean busy = entryPlayRequested;
+        final boolean busy = entryPlayRequested || openingBenchmarkPending();
         if (entryPlayButton != null) { entryPlayButton.setEnabled(!busy); entryPlayButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
         if (entrySettingsButton != null) { entrySettingsButton.setEnabled(!busy); entrySettingsButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
         if (entryMoreButton != null) { entryMoreButton.setEnabled(!busy); entryMoreButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
+        if(openingBenchmarkButton!=null) openingBenchmarkButton.setEnabled(!busy && canRequestOpeningBenchmark());
         if (entryPlayButton != null && state != null && state.phase != EntryMenuState.PHASE_FAILURE)
             entryPlayButton.setText(R.string.entry_play);
     }
@@ -2015,6 +2034,102 @@ public class MainActivity extends Activity {
             if (ProbeBridge.requestBenchmarkWithSummaryId(UUID.randomUUID().toString(), Build.MODEL)) return true;
         } catch (RuntimeException | LinkageError unavailable) { /* Optional statistics cannot block the run. */ }
         return ProbeBridge.requestBenchmark(); // Native readiness/busy guards still apply.
+    }
+
+    private boolean openingBenchmarkPending() { return openingBenchmarkRequest>0; }
+
+    private boolean canRequestOpeningBenchmark() {
+        if(!entryMenuEnabled || entryPlayRequested || openingBenchmarkPending() || benchmarkRunning || !resumed ||
+                surfaceRequestGeneration<=0 || benchmarkAutomationId!=null || campaignMenuVisible || campaignRequest!=0 ||
+                (campaignState!=null && (campaignState.activeSlot>=0 || campaignState.pending())) ||
+                graphicsVisible || graphicsSceneRestoring || diagnosticsVisible || playtestReportVisible || rtLabVisible) return false;
+        try {
+            final EntryMenuState state=EntryMenuState.decode(ProbeBridge.getEntryMenuState());
+            return state!=null && state.isEntryPresented(surfaceRequestGeneration);
+        } catch(RuntimeException | LinkageError unavailable) { return false; }
+    }
+
+    private void requestOpeningCustomBenchmark() {
+        if(!canRequestOpeningBenchmark()) return;
+        final long origin=surfaceRequestGeneration,request;
+        try { request=ProbeBridge.requestOpeningBenchmark(origin); }
+        catch(RuntimeException | LinkageError unavailable) {
+            Toast.makeText(this,R.string.benchmark_unavailable,Toast.LENGTH_LONG).show(); return;
+        }
+        if(request<=0) { Toast.makeText(this,R.string.benchmark_unavailable,Toast.LENGTH_LONG).show(); return; }
+        openingBenchmarkRequest=request; openingBenchmarkRequestGeneration=origin;
+        openingBenchmarkCancelRequested=openingBenchmarkBlocked=false;
+        benchmarkRunning=true; latestBenchmarkReport="";
+        entryPlayRequested=false; entryMenuFailed=false;
+        closeBenchmarkSummaryReview();
+        clearTouchState();
+        playSound("ui_select",.18f);
+        showOpeningBenchmarkProgress();
+        handler.removeCallbacks(refreshEntryMenu);
+        handler.removeCallbacks(refreshOpeningBenchmark);
+        handler.post(refreshOpeningBenchmark);
+    }
+
+    private void cancelOpeningBenchmarkRequest() {
+        if(!openingBenchmarkPending()) return;
+        openingBenchmarkCancelRequested=true;
+        try { ProbeBridge.cancelOpeningBenchmark(openingBenchmarkRequest,openingBenchmarkRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { /* Native surface retirement also cancels this owner. */ }
+    }
+
+    private void showOpeningBenchmarkProgress() {
+        if(!openingBenchmarkPending()) return;
+        menuVisible=false; benchmarkReportVisible=false; diagnosticsVisible=false;
+        entryPlayRequested=false;
+        if(menuScrim!=null) { menuScrim.removeAllViews(); menuScrim.setVisibility(View.GONE); }
+        for(View action:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,vitalityStatus,developerOverlay})
+            if(action!=null) action.setVisibility(View.GONE);
+        if(diagnosticsPanel!=null) diagnosticsPanel.setVisibility(View.GONE);
+        if(rtStatus!=null) {
+            rtStatus.setVisibility(View.VISIBLE);
+            rtStatus.setText(openingBenchmarkBlocked ? "Benchmark stopped. Could not return to the opening menu. Close and reopen The Horde." :
+                openingBenchmarkCancelRequested ? "Returning to opening menu..." : "Custom benchmark (unranked). Back cancels.");
+        }
+        // This leaves campaign Play disabled. The native benchmark owner alone
+        // advances Showcase and requires a fresh Entry frame before releasing UI.
+        if(resumed) setGameplayPaused(openingBenchmarkBlocked || openingBenchmarkCancelRequested);
+    }
+
+    private void pollOpeningBenchmark() {
+        if(!openingBenchmarkPending()) return;
+        final OpeningBenchmarkState state;
+        try { state=OpeningBenchmarkState.decode(ProbeBridge.getOpeningBenchmarkState()); }
+        catch(RuntimeException | LinkageError unavailable) { cancelOpeningBenchmarkRequest(); return; }
+        if(state==null || !state.matches(openingBenchmarkRequest,openingBenchmarkRequestGeneration)) return;
+        if(state.phase==OpeningBenchmarkState.BLOCKED) {
+            if(!openingBenchmarkBlocked) {
+                openingBenchmarkBlocked=true;
+                showOpeningBenchmarkProgress();
+            }
+            return; // Never present Entry as restored from an unproved owner.
+        }
+        if(!state.returnedToEntry(openingBenchmarkRequest,openingBenchmarkRequestGeneration,surfaceRequestGeneration)) {
+            if(rtStatus!=null && state.phase==OpeningBenchmarkState.RETURNING)
+                rtStatus.setText("Returning to opening menu...");
+            if(rtStatus!=null && !openingBenchmarkCancelRequested && state.phase==OpeningBenchmarkState.RUNNING) {
+                final String progress=ProbeBridge.getBenchmarkProgress();
+                if(!progress.isEmpty()) rtStatus.setText("Custom benchmark (unranked)\n"+progress);
+            }
+            return;
+        }
+        final boolean completed=state.result==OpeningBenchmarkState.SUCCEEDED;
+        openingBenchmarkRequest=openingBenchmarkRequestGeneration=0;
+        openingBenchmarkCancelRequested=openingBenchmarkBlocked=false;
+        benchmarkRunning=false; entryMenuEnabled=true; entryMenuSidePage=false; entryPlayRequested=false;
+        handler.removeCallbacks(refreshOpeningBenchmark);
+        if(completed) {
+            latestBenchmarkReport=ProbeBridge.getBenchmarkReport();
+            if(latestBenchmarkReport.isEmpty()) latestBenchmarkReport=getString(R.string.benchmark_interrupted);
+            showBenchmarkReport(true);
+        } else {
+            showMainMenu(false);
+            Toast.makeText(this,"Benchmark did not complete. Returned to opening menu.",Toast.LENGTH_LONG).show();
+        }
     }
 
     private void startBenchmark() {
@@ -3167,6 +3282,7 @@ public class MainActivity extends Activity {
     }
 
     private void hideMenu() {
+        if(openingBenchmarkPending()) return;
         invalidateLookoutObjective();
         if(campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier())) return;
         if (entryMenuEnabled) {
@@ -3710,6 +3826,7 @@ public class MainActivity extends Activity {
     }
 
     private void showSettings() {
+        if(openingBenchmarkPending()) return;
         interfaceVisible=false;
         entryMenuPanel = null;
         entryPlayButton = null; entrySettingsButton = null; entryMoreButton = null;
@@ -3955,6 +4072,7 @@ public class MainActivity extends Activity {
     }
 
     private void showGraphicsPage() {
+        if(openingBenchmarkPending()) return;
         if (graphicsPreviewWanted) { showGraphicsPreviewPage(); return; }
         final long uiBuildStartedNs = SystemClock.elapsedRealtimeNanos();
         entryMenuPanel = null; entryPlayButton = null; entrySettingsButton = null; entryMoreButton = null;
@@ -6013,7 +6131,7 @@ public class MainActivity extends Activity {
                         if (!benchmarkRunning) finishBenchmarkAutomation(3);
                     }
                 }
-                if (benchmarkRunning) {
+                if (benchmarkRunning && !openingBenchmarkPending()) {
                     final int benchmarkStatus = ProbeBridge.getBenchmarkStatus();
                     if (benchmarkStatus == 1) {
                         final String progress = ProbeBridge.getBenchmarkProgress();
@@ -7757,6 +7875,12 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
         if (environmentSurveyMode) { finishEnvironmentSurvey(3); return; }
+        if(openingBenchmarkPending()) {
+            cancelOpeningBenchmarkRequest(); showOpeningBenchmarkProgress(); return;
+        }
+        if(benchmarkReportVisible && entryMenuEnabled) {
+            playSound("ui_back",.18f); showMainMenu(false); return;
+        }
         if(campaignConfirmation!=null && campaignConfirmation.isShowing()) {
             dismissCampaignConfirmation(); return;
         }
@@ -7958,6 +8082,10 @@ public class MainActivity extends Activity {
             setGameplayPaused(menuVisible || diagnosticsVisible);
             if (entryMenuEnabled) publishEntryMenuState();
         }
+        if(openingBenchmarkPending()) {
+            showOpeningBenchmarkProgress();
+            handler.removeCallbacks(refreshOpeningBenchmark); handler.post(refreshOpeningBenchmark);
+        }
         if (rtLabVisible) handler.post(refreshRtLabTelemetry);
         graphicsPollTime = SystemClock.elapsedRealtime();
         if (graphicsRecovering) handler.post(refreshGraphics);
@@ -7975,6 +8103,11 @@ public class MainActivity extends Activity {
         super.onNewIntent(intent);
         if (environmentSurveyMode || EnvironmentSurveyRequest.isSurvey(intent)) {
             Log.w("HordeEnvironmentSurvey", "Survey intents require a fresh Activity; no live reconfiguration");
+            return;
+        }
+        if(openingBenchmarkPending()) {
+            cancelOpeningBenchmarkRequest();
+            Log.w(TAG,"New automation intent rejected while the opening benchmark owner is returning.");
             return;
         }
         setIntent(intent);
@@ -8000,6 +8133,8 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        cancelOpeningBenchmarkRequest();
+        handler.removeCallbacks(refreshOpeningBenchmark);
         if(lookoutObjectiveVisible)showMainMenu(false);
         if (environmentSurveyMode) {
             resumed = false;
@@ -8084,7 +8219,7 @@ public class MainActivity extends Activity {
             updateVitalityHud(3, 3);
             showMainMenu(false);
         }
-        if (benchmarkRunning) {
+        if (benchmarkRunning && !openingBenchmarkPending()) {
             ProbeBridge.cancelBenchmark();
             benchmarkRunning = false;
             showMainMenu(false);
@@ -8107,6 +8242,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        cancelOpeningBenchmarkRequest();
         invalidateLookoutObjective();
         if (environmentSurveyMode) {
             finishEnvironmentSurvey(3);

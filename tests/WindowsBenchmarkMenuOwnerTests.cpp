@@ -1,4 +1,5 @@
 #include "platform/windows/WindowsBenchmarkMenuOwner.h"
+#include "platform/android/AndroidOpeningBenchmarkOwner.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -111,6 +112,54 @@ void TestFailedProofs()
     Check(!wrongPresentation.EntryPresented(true) && wrongPresentation.Phase() == Phase::Blocked,
           "unmatched Entry completion cannot certify an ownership return");
 }
+void TestAndroidOpeningOwner()
+{
+    using Owner=horde::platform::android::AndroidOpeningBenchmarkOwner;
+    using AP=Owner::Phase;
+    Owner owner;
+    auto ineligible=Ready();ineligible.activeCampaign=true;
+    Check(!owner.Queue(1,7,ineligible) && !owner.Queue(0,7,Ready()) && !owner.Queue(1,0,Ready()),
+          "Android requires explicit identity and actual opening eligibility, never an active campaign");
+    Check(owner.Queue(1,7,Ready()) && !owner.Queue(2,7,Ready()) && owner.State()==AP::Queued,
+          "Android admits one generation-tagged Custom request and rejects duplication");
+    Check(!owner.TakeStart() && owner.Prepare(Ready()) && !owner.ShowcasePresented(7),
+          "queued and initialized state cannot manufacture Entry retirement or start measurement");
+    Check(owner.EntryRetired(true) && !owner.ShowcasePresented(6) && !owner.TakeStart(),
+          "retirement alone and stale surface presentation cannot admit Android measurement");
+    Check(owner.ShowcasePresented(7) && owner.TakeStart() && !owner.TakeStart(),
+          "only actual current Showcase presentation admits one benchmark start");
+    Check(!owner.Cancel(2,7) && !owner.Cancel(1,6),"stale request or origin cannot cancel the current benchmark");
+    owner.BeginReturn(2);
+    Check(!owner.EntryPresented(7,true) && owner.State()==AP::Blocked,
+          "fresh Entry cannot be claimed before benchmark retirement is proved");
+
+    Owner success;
+    Check(success.Queue(3,8,Ready()) && success.Prepare(Ready()) && success.EntryRetired(true) &&
+          success.ShowcasePresented(8) && success.TakeStart(),"Android success scenario owns one presented Showcase");
+    success.BeginReturn(2);
+    Check(success.ReturnRetired(true,true) && !success.EntryPresented(7,true) &&
+          success.State()==AP::Returning,"restoration/retirement still await the current Entry presentation");
+    Check(success.EntryPresented(8,true) && success.Snapshot()[3]==2 && success.Snapshot()[4]==1,
+          "terminal success is published only with fresh Entry presentation");
+
+    Owner queued;
+    Check(queued.Queue(4,9,Ready()) && queued.Cancel(4,9) && !queued.Prepare(Ready()) &&
+          !queued.WantsShowcase() && !queued.TakeStart(),"queued Back cancels before any benchmark scene or measurement");
+    Check(queued.ReturnRetired(true,true) && queued.EntryPresented(9,true) && queued.Snapshot()[3]==3,
+          "queued cancellation retains its Entry owner and yields a truthful cancelled result");
+
+    Owner suspended;
+    Check(suspended.Queue(5,10,Ready()) && suspended.Prepare(Ready()) && suspended.EntryRetired(true) &&
+          suspended.ShowcasePresented(10) && suspended.TakeStart(),"surface-loss case starts only after normal ownership proofs");
+    suspended.SurfaceRetired(10,true);suspended.BindSurface(11);
+    Check(suspended.Returning() && suspended.Cancelled() && !suspended.WantsShowcase() && !suspended.TakeStart() &&
+          !suspended.EntryPresented(10,true),"surface replacement makes cancellation sticky and cannot restart measurement");
+    Check(suspended.EntryPresented(11,true) && suspended.Snapshot()[3]==3 && suspended.Snapshot()[5]==10,
+          "replacement surface acknowledges fresh Entry while retaining original request identity");
+    Owner failed;
+    Check(failed.Queue(6,12,Ready()) && failed.Prepare(Ready()) && !failed.EntryRetired(false) &&
+          failed.State()==AP::Blocked && !failed.Queue(7,13,Ready()),"unproved GPU retirement blocks successor ownership and restart");
+}
 } // namespace
 
 int main()
@@ -118,6 +167,7 @@ int main()
     TestSequentialOwnership();
     TestEligibilityRaces();
     TestFailedProofs();
+    TestAndroidOpeningOwner();
     std::cout << checks << " opening benchmark ownership checks, " << failures << " failures\n";
     return failures == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }

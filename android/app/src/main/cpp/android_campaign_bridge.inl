@@ -323,6 +323,9 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
 
 void PumpCampaignOnOwner(SwapchainContext& context)
 {
+    // Keep the same unselected facade alive. Benchmark eligibility rejects an
+    // active/pending campaign; no command or boundary is consumed while owned.
+    if(OpeningBenchmarkBusy())return;
     try {PumpCampaignOnOwnerImpl(context);}
     catch(const std::exception& error) {
         __android_log_print(ANDROID_LOG_ERROR,kTag,"HORDE_CAMPAIGN_FAILURE diagnostic=%s",error.what());
