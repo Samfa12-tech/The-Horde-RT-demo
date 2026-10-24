@@ -1,7 +1,8 @@
 # Canopy direction: recorded authority and bounded proposal
 
-This reconciles available records; it does not change the canopy deferral or
-admit a new asset. The [shared64 proof](../evidence/2026-10-24-shared-forest-route/README.md)
+Current authority: Sam explicitly approved one owned editable pine/alder crown study on 24 October at 21:10:41 UTC, preserving trunks/roots/placements and requiring small-sample review before broad rollout. See the [selected direction](HORDE_1_7_OWNER_DECISIONS_2026_10_24.md#selected-direction). This permits the study, not the private Easy Tree prototype or production replacement. The historical reconciliation below explains the earlier hold; it is no longer a blocker to this specific study.
+
+The [shared64 proof](../evidence/2026-10-24-shared-forest-route/README.md)
 is a resource/correctness diagnostic. The [F01 twelve-root composition](../evidence/2026-10-24-f01-forest-sector/README.md)
 still fails visible woodland massing. Neither is normal gameplay adoption.
 

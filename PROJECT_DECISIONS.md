@@ -482,3 +482,10 @@ separate cue; tomb/dawn policy, sample-clock lifecycle and saved volume remain.
 No synth, new codec or disk-streaming path is introduced. Package source
 exclusion, download size, live PCM residency and loading peak are separate
 measurements. Listening with Kit and warmed-phone acceptance remain open.
+
+
+## Bounded crowns, flask proposal and effects scope — 2026-10-24
+
+Sam replied “Yes” directly to the three recommendations at 21:10:41 UTC (trusted parent delegation, `Sentinel_e4691101c80081919a5706c390214030`). Authorize one owned editable pine/alder crown study, preserving trunks, roots and placements, with small-sample review before broader replacement. This does not admit the private Easy Tree prototype. Keep the refillable/upgradeable flask in 1.7; its complete healing/refill/use/death/load/migration policy must be approved before implementation. Numeric parameters and new upgrade content remain recommendations.
+
+Prioritize measured chimney smoke with Windows High/mobile Low. Explicitly defer new outdoor participating mist, shafts, fireflies and visual wind for initial 1.7. Existing effects and explicit user preferences remain unchanged, with Android fresh/reset Mist OFF and desktop defaults preserved. No assumed extra GPU budget, paid generation, broad framework, phone use, merge or release. See the [current decision sheet](docs/design/HORDE_1_7_OWNER_DECISIONS_2026_10_24.md) and [flask proposal](docs/design/HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md).

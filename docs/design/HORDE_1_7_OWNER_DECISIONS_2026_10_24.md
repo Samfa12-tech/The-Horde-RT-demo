@@ -1,5 +1,21 @@
 # Horde 1.7: remaining owner decisions - 24 October 2026
 
+<a id="selected-direction"></a>
+
+## Selected direction — 24 October, 21:10:41 UTC
+
+Sam replied **“Yes”** directly to the parent's three recommendations (trusted delegation, message `Sentinel_e4691101c80081919a5706c390214030`). The approved scope is:
+
+1. One bounded editable pine/alder crown study using owned originals, preserving trunks, roots and placements; review a small sample before any broad replacement. This narrowly resolves the crown-study hold. It does not admit private Easy Tree, all replacements or a new renderer/generator.
+2. Keep the refillable/upgradeable flask in 1.7 and prepare one complete policy for approval **before implementation**. The [current proposal](HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md) supplies recommendations, not approved numbers/rewards/save rules.
+3. Prioritize cost-gated chimney smoke with attractive Windows High and recognizable mobile Low. Explicitly defer **new outdoor participating mist, shafts, fireflies and visual wind** for initial 1.7. Existing effects, saved preferences, Android fresh/reset Mist OFF and RT-only direction remain. No extra GPU budget or broad framework is assumed.
+
+Crown sample review, complete flask-policy approval, chimney visual/cost admission and physical gates remain. No merge, release, spending, phone use or broad canopy rollout follows from this reply.
+
+## Historical decision questions before the reply
+
+The remainder records the evidence and alternatives used to ask Sam. Pending/no-canopy-edit wording below describes that earlier state and is superseded only by the narrow selected direction above.
+
 Decision sheet for Sam; **no policy or release disposition is selected here**.
 Read against the [current implementation map](HORDE_1_7_IMPLEMENTATION_REMAINING_2026_10_24.md)
 and [accepted chapter plan](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md),
