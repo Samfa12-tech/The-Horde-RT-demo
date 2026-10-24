@@ -1,0 +1,12 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start  53: horde_rt_held_item_transition_tests
+1/3 Test  #53: horde_rt_held_item_transition_tests ...   Passed    0.05 sec
+    Start  56: horde_rt_held_item_clearance_tests
+2/3 Test  #56: horde_rt_held_item_clearance_tests ....   Passed    6.24 sec
+    Start 108: horde_rt_held_item_socket_tests
+3/3 Test #108: horde_rt_held_item_socket_tests .......   Passed   19.44 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  25.75 sec

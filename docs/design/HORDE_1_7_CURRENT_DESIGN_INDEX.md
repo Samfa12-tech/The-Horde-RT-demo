@@ -28,7 +28,16 @@ now has actual north/west and lookout comparisons. It adds visible depth at smal
 allocation cost but still fails the surrounding-forest goal; composition and
 collision remain unadmitted. Storage 104 is separate from ordinary live 28.
 The exact `8ddc08fd` hosted run failed its old storage/live witness alias in GCC/Clang;
-the runner/profile definition is corrected and needs new-head CI readback.
+the runner/profile definition is corrected. Exact `699340bd` run40102559328
+passed all six jobs; that does not admit the sparse composition or phone gates.
+
+The [compact-carry endpoint study](../evidence/2026-10-24-compact-carry-study/README.md)
+is rejected: wide hand pixels improve, but the full flame envelope crosses the
+wall, square framing fails and actual RT views are dominated by the torch head.
+Original runtime/source is restored and rebuilt; no transition or clip admitted.
+The [canopy authority review](HORDE_1_7_CANOPY_AUTHORITY_2026_10_24.md) recovers the
+earliest documentary deferral, explicitly not Sam's original message, and records
+the proposed crown study pending reconciliation. Deferred art remains unchanged.
 
 ## Archived checkpoint notes
 

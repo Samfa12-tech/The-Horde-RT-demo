@@ -1,0 +1,21 @@
+final-wall diag11 aspect=1 pitch=-0.32 phase=0 contained/hand/roof/coherent=0/1/1/1 headroom=0.202096 leftGauntlet/torchTriangles=0/2830 projectedAreaSum=0/5.07227 Grip/LightDepth=0.4/0.0896824
+final-wall diag11 aspect=1 pitch=-0.32 phase=0.7 contained/hand/roof/coherent=0/1/1/1 headroom=0.202095 leftGauntlet/torchTriangles=0/2830 projectedAreaSum=0/5.07227 Grip/LightDepth=0.4/0.0896818
+final-wall diag11 aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=0/1/1/1 headroom=0.198143 leftGauntlet/torchTriangles=0/2830 projectedAreaSum=0/5.07229 Grip/LightDepth=0.4/0.0896824
+final-wall diag11 aspect=1 pitch=-0.15 phase=0.7 contained/hand/roof/coherent=0/1/1/1 headroom=0.198143 leftGauntlet/torchTriangles=0/2830 projectedAreaSum=0/5.07226 Grip/LightDepth=0.4/0.089682
+final-wall diag11 aspect=1 pitch=0.28 phase=0 contained/hand/roof/coherent=0/0/1/1 headroom=0.242271 leftGauntlet/torchTriangles=0/2830 projectedAreaSum=0/5.07228 Grip/LightDepth=0.4/0.0896825
+final-wall diag11 aspect=1 pitch=0.28 phase=0.7 contained/hand/roof/coherent=0/0/1/1 headroom=0.242271 leftGauntlet/torchTriangles=0/2830 projectedAreaSum=0/5.07225 Grip/LightDepth=0.4/0.0896822
+final-wall diag11 aspect=1.77778 pitch=-0.32 phase=0 contained/hand/roof/coherent=0/1/1/1 headroom=0.202096 leftGauntlet/torchTriangles=2581/4612 projectedAreaSum=0.118062/7.65424 Grip/LightDepth=0.4/0.0896824
+final-wall diag11 aspect=1.77778 pitch=-0.32 phase=0.7 contained/hand/roof/coherent=0/1/1/1 headroom=0.202095 leftGauntlet/torchTriangles=2581/4612 projectedAreaSum=0.118062/7.65425 Grip/LightDepth=0.4/0.0896818
+final-wall diag11 aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=0/1/1/1 headroom=0.198143 leftGauntlet/torchTriangles=2581/4612 projectedAreaSum=0.118062/7.65424 Grip/LightDepth=0.4/0.0896824
+final-wall diag11 aspect=1.77778 pitch=-0.15 phase=0.7 contained/hand/roof/coherent=0/1/1/1 headroom=0.198143 leftGauntlet/torchTriangles=2581/4612 projectedAreaSum=0.118062/7.65425 Grip/LightDepth=0.4/0.089682
+final-wall diag11 aspect=1.77778 pitch=0.28 phase=0 contained/hand/roof/coherent=0/0/1/1 headroom=0.242271 leftGauntlet/torchTriangles=2581/4612 projectedAreaSum=0.118061/7.65423 Grip/LightDepth=0.4/0.0896825
+final-wall diag11 aspect=1.77778 pitch=0.28 phase=0.7 contained/hand/roof/coherent=0/0/1/1 headroom=0.242271 leftGauntlet/torchTriangles=2581/4612 projectedAreaSum=0.118062/7.65425 Grip/LightDepth=0.4/0.0896822
+final-wall diag13 aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=0/1/1/1 headroom=0.213744 leftGauntlet/torchTriangles=0/4502 projectedAreaSum=0/6.02574 Grip/LightDepth=0.4/0.10649
+final-wall diag13 aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=0/1/1/1 headroom=0.213744 leftGauntlet/torchTriangles=2488/4911 projectedAreaSum=0.103212/6.1124 Grip/LightDepth=0.4/0.10649
+final-wall diag21 aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=0/1/1/1 headroom=0.213744 leftGauntlet/torchTriangles=0/4502 projectedAreaSum=0/6.02573 Grip/LightDepth=0.4/0.10649
+final-wall diag21 aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=0/1/1/1 headroom=0.213744 leftGauntlet/torchTriangles=2488/4911 projectedAreaSum=0.103212/6.1124 Grip/LightDepth=0.4/0.10649
+final-wall bend aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=0/1/1/1 headroom=0.1109 leftGauntlet/torchTriangles=4273/5328 projectedAreaSum=0.0605901/0.444693 Grip/LightDepth=0.673538/0.650384
+final-wall bend aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=0/1/1/1 headroom=0.101094 leftGauntlet/torchTriangles=3822/5300 projectedAreaSum=0.0600304/0.527762 Grip/LightDepth=0.623539/0.600385
+final-wall centre aspect=1 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.163217 leftGauntlet/torchTriangles=2469/5261 projectedAreaSum=0.0302475/0.475692 Grip/LightDepth=0.643505/0.620351
+final-wall centre aspect=1.77778 pitch=-0.15 phase=0 contained/hand/roof/coherent=1/1/1/1 headroom=0.137907 leftGauntlet/torchTriangles=2310/5258 projectedAreaSum=0.0325903/0.549584 Grip/LightDepth=0.60651/0.583356
+final-wall actualRigCases=60 requiredFramingCases=10 minimumHeadroom=0.0294214 maxGripError=9.90227e-07 maxGripOrientationError=0.000488281 failures=52; projection only: native visibility/visual admission remains separate

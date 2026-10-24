@@ -635,3 +635,18 @@ ship. `tools/prepare-forest-foliage.py --verify` reproduces both without writing
 This is a labelled leaf-rustle candidate, not a certified natural wind recording;
 actual listening, character and in-game level remain unverified. No continuous
 wind bed, synthesis, provider generation or new audio layer is supplied.
+
+## Compact torch carry r1 - source-only rejected study, 24 October 2026
+
+`assets/models/player/source/compact-torch-carry-study-r1/` contains original
+pose-intent coordinates, an editable Blender reference and its construction
+recipe. It derives from the existing Gothic traveller/viewmodel and original
+assistant-authored player Rag torch recorded above; their provenance, CC BY
+attribution obligations where applicable, and user/service rights remain
+unchanged. No additional third-party or paid input and no blanket licence is
+assigned. The native-solved reference meshes do not replace those originals.
+
+This endpoint study is rejected, source-only and excluded from every runtime
+manifest/package. It supplies no admitted GLB or skeletal clip. Exact hashes and
+failed native evidence are in
+`docs/evidence/2026-10-24-compact-carry-study/receipt.json`.
