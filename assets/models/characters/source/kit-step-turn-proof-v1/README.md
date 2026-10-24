@@ -1,5 +1,32 @@
 # Kit same-rig step-turn authoring proof — unadmitted
 
+## Contact cleanup and native export follow-up
+
+`kit-step-turn-cleanup.blend` is the later separate take; the original
+`kit-step-turn-proof.blend` below is preserved. Use `--sole-cleanup` on the
+authoring recipe to reproduce the later take. Exactly two offline rigid sole-pose
+fits per foot reduce maximum reopened support drift from 12.125 to 6.856 mm.
+This is baked authoring, not a runtime solver or a claim of perfect contact.
+
+`native/kit-turn-proof.glb` appends two joint-only clips to the pinned original
+runtime GLB. Static data, binds, original clips and binary prefix are unchanged.
+Its separate `root-motion.json` curve must be applied once in asset-space Y;
+under `CompanionModelYaw`, logical yaw changes by its negative. These files are
+source-only and **not selected by production bindings or package rosters**.
+
+Reproduce the append-only export from a staged take:
+
+```powershell
+blender --background reports/kit-turn-cleanup/kit-step-turn-proof.blend --python assets/models/characters/source/kit-step-turn-proof-v1/export_native.py -- --output reports/kit-turn-native
+build/presets/windows-x64-debug/Debug/horde_rt_kit_source_intake_tests.exe --turn-proof reports/kit-turn-native/kit-turn-proof.glb reports/kit-turn-native/native-reference.bin
+```
+
+Create `reports/kit-turn-cleanup` first with the authoring command below plus
+`--sole-cleanup`. The exporter also stages the unchanged original manifest.
+See the [reviewed cleanup/native result](../../../../../docs/evidence/2026-10-23-kit-turn-native-export/README.md).
+
+## Preserved initial proof
+
 Editable `kit-step-turn-proof.blend` contains two independent named scenes:
 LEFT and RIGHT, each a 45-degree / 0.75-second candidate at 60 fps (frames 1–46).
 These are authoring choices, not fixed gameplay targets. The scene's paired

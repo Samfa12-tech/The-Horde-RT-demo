@@ -1,5 +1,6 @@
 # Keep high-resolution source art out of normal Git history.
 assets/models/characters/source/kit-step-turn-proof-v1/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/characters/source/kit-step-turn-proof-v1/native/*.bin -text
 # Retain exact audited Windows receipt/script bytes for this isolated study.
 docs/evidence/2026-10-23-kit-lod-candidate/** -text whitespace=cr-at-eol
 # Generated shader bounds are compared byte-for-byte with native LF output.

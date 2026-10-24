@@ -1,5 +1,10 @@
 # Kit authored step-turn proof — review only
 
+Later [bounded sole cleanup and native export](../2026-10-23-kit-turn-native-export/README.md)
+retains this first proof unchanged, adds a separate editable take and reduces
+support drift to 6.856 mm. This page/receipt/videos describe the original
+`0cf8829c` snapshot; the authoring recipe now additionally offers an opt-in cleanup.
+
 Base `f6eab6c20aa97ee0daff2789267393564bfb287f`, existing PR27 worktree.
 **Production motion/bindings are unchanged.** This is a separate editable motion
 study, not an admitted runtime asset or a completed planted-turn fix.

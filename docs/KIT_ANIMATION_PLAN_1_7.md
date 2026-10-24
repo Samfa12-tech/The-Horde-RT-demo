@@ -1,5 +1,14 @@
 # KIT ANIMATION PLAN 1 7 — WP0 custody and reconciliation
 
+## Reviewed cleanup and native export - 23 October 2026
+
+The separate [contact cleanup/native proof](evidence/2026-10-23-kit-turn-native-export/README.md)
+reduces support-sole drift to 6.856 mm after one bounded authoring cleanup.
+Native loader/PBR reference comparison confirms a single asset-space yaw
+application and rejects doubled yaw; original clips/static data remain unchanged.
+Production turn selection and natural turn-then-walk joins remain unimplemented.
+Preview/contact review and actual RT/lifecycle acceptance precede integration.
+
 ## Same-rig authoring proof - 23 October 2026
 
 Separate [left/right step-turn sources and offline previews](evidence/2026-10-23-kit-step-turn-proof/README.md)

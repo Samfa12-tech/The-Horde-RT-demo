@@ -3,6 +3,7 @@ import bpy, pathlib, hashlib, json, math, argparse, sys
 from mathutils import Vector,Matrix
 ROOT=next(p for p in pathlib.Path(__file__).resolve().parents if (p/'src/gameplay/dialogue/CompanionRouteFixture.h').is_file())
 parser=argparse.ArgumentParser();parser.add_argument('--output',type=pathlib.Path,required=True)
+parser.add_argument('--sole-cleanup',action='store_true',help='Bake two bounded sole-pose corrections; not a runtime solver')
 args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
 OUT=args.output.resolve();OUT.mkdir(parents=True,exist_ok=False)
 SOURCE=ROOT/'assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb'
@@ -103,6 +104,7 @@ for scene,a,m,r,sign in [(left,arm,mesh,root,1),(right,mapping[arm],mapping[mesh
   lateral=R.to_3x3()@Vector(((-1 if u<.5 else 1)*sign*.012*math.sin(2*math.pi*u)**2,0,0))
   hips=base['Hips'].copy();hips.translation+=drop+lateral
   a.pose.bones['Hips'].matrix=a.matrix_world.inverted()@hips;update()
+  foot_goals={}
   for side in ('Left','Right'):
    first=(side=='Left')==(sign==1)
    begin,end=(.08,.47) if first else (.53,.92)
@@ -110,7 +112,28 @@ for scene,a,m,r,sign in [(left,arm,mesh,root,1),(right,mapping[arm],mapping[mesh
    initial=base_world[side+'Foot'].translation
    final=rot(sign*ANGLE)@initial
    target=initial.lerp(final,travel);target.z+=.055*math.sin(math.pi*phase)**2
+   foot_goals[side]=(target.copy(),sign*ANGLE*travel,initial.copy())
    max_stretch=max(max_stretch,leg(a,base,side,target,sign*ANGLE*travel-yaw,drop,lateral))
+  if args.sole_cleanup:
+   # One authoring refinement, exactly two rigid sole-pose fits per foot.
+   # Apply continuously through swing/stance; never jump at a contact boundary.
+   for side,(goal,heading,initial) in foot_goals.items():
+    target=goal.copy();adjusted_heading=heading
+    desired=[rot(heading)@(base_mesh[i]-initial)+goal for i in boot[side]['vertices']]
+    for iteration in range(2):
+     actual=mesh_points(m);positions=[actual[i] for i in boot[side]['vertices']]
+     centre=sum((Vector((p.x,p.y)) for p in positions),Vector((0.,0.)))/len(positions)
+     wanted=sum((Vector((p.x,p.y)) for p in desired),Vector((0.,0.)))/len(desired)
+     cross=dot=0.
+     for p,q in zip(positions,desired):
+      v=Vector((p.x,p.y))-centre;w=Vector((q.x,q.y))-wanted
+      cross+=v.x*w.y-v.y*w.x;dot+=v.dot(w)
+     angle=max(-math.radians(5),min(math.radians(5),math.atan2(cross,dot)))
+     turn=Matrix.Rotation(angle,2);moved=turn@(Vector((target.x,target.y))-centre)+wanted
+     delta=moved-Vector((target.x,target.y))
+     if delta.length>.015:delta*=.015/delta.length
+     target.x+=delta.x;target.y+=delta.y;adjusted_heading+=angle
+     max_stretch=max(max_stretch,leg(a,base,side,target,adjusted_heading-yaw,drop,lateral))
   update()
   for p in a.pose.bones:
    p.keyframe_insert('location',frame=frame);p.keyframe_insert('rotation_quaternion',frame=frame);p.keyframe_insert('scale',frame=frame)
@@ -163,7 +186,7 @@ for scene,a,m,r,sign in [(left,arm,mesh,root,1),(right,mapping[arm],mapping[mesh
  scene['source_sha256']='47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e'
 activate(left);left.frame_set(1)
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'kit-step-turn-proof.blend'),compress=True)
-result={'schema':1,'evidenceClass':'Offline Blender authored same-rig mesh/contact preview; not native RT or runtime acceptance',
+result={'schema':1,'evidenceClass':'Offline Blender authored same-rig mesh/contact preview; not native RT or runtime acceptance','soleCleanupEnabled':args.sole_cleanup,
  'sourceSha256':hashlib.sha256(SOURCE.read_bytes()).hexdigest(),'originalGeometryWeightsDigest':original_geometry,
  'sourceRestBindUnchanged':all(x['bindUnchanged'] for x in records),'directions':records}
 (OUT/'authoring-contact.json').write_text(json.dumps(result,indent=2)+'\n')
