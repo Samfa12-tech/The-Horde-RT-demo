@@ -7,10 +7,11 @@
     static float HeadingError(float target,float current) {
         return std::remainder(target-current,6.28318530718f);
     }
-    void BeginTurn(float difference) {
+    void BeginTurn(float difference,bool travelIntent) {
         auto& m=state_.motion;
         m.mode=CompanionMotionMode::Turning;m.speed=0;m.turnPhase=0;
         m.turnAngleRadians=std::clamp(difference,-companion_turn::maxAngle,companion_turn::maxAngle);
+        m.turnPlaybackSeconds=travelIntent?companion_turn::playbackDuration:companion_turn::relaxedPlaybackDuration;
         turnStartYaw_=state_.yaw;turnElapsed_=entryElapsed_=0;
         entryStartWeight_=m.idleZeroWeight;m.entryWeight=entryStartWeight_;
     }
@@ -52,7 +53,8 @@
         dt=std::min(dt,.05f);state_.animationSeconds+=dt;state_.walking=false;
         auto& m=state_.motion;
         const float playerDistance=std::hypot(playerX-state_.x,playerZ-state_.z);
-        bool lead=proof&&playerDistance<=6.f&&state_.waypoint<simulation::kWorldRoutePoints.size();
+        const bool travelIntent=proof&&state_.waypoint<simulation::kWorldRoutePoints.size();
+        bool lead=travelIntent&&playerDistance<=6.f;
         state_.wait=!proof?CompanionWait::Reunion:playerDistance>6.f?CompanionWait::PlayerLagging:
             state_.waypoint>=simulation::kWorldRoutePoints.size()?CompanionWait::Lookout:CompanionWait::Reunion;
         float dx=0,dz=0,distance=0;
@@ -81,21 +83,21 @@
                 return;
             }
             if(std::abs(m.turnAngleRadians)>departureBand) {
-                turnElapsed_+=dt;m.turnPhase=std::min(float(turnElapsed_/companion_turn::playbackDuration),1.f);
+                turnElapsed_+=dt;m.turnPhase=std::min(float(turnElapsed_/m.turnPlaybackSeconds),1.f);
                 state_.yaw=turnStartYaw_-companion_turn::ModelYaw(m.turnAngleRadians>0,m.turnPhase)*
                     (std::abs(m.turnAngleRadians)/companion_turn::maxAngle);
                 if(m.turnPhase<1)return;
             }
             m.idleZeroWeight=1;
             const float latest=HeadingError(target,state_.yaw);
-            if(std::abs(latest)>(lead?departureBand:idleBand)) {BeginTurn(latest);return;}
+            if(std::abs(latest)>(lead?departureBand:idleBand)) {BeginTurn(latest,travelIntent);return;}
             m.mode=lead?CompanionMotionMode::Starting:CompanionMotionMode::Idle;m.speed=0;
             return;
         }
         if(m.mode==CompanionMotionMode::Idle) {
             locomotion_.StepWeighted(dt,0,0);state_.locomotion=locomotion_.State();
             if(state_.locomotion.walkWeight>0)return;
-            if(std::abs(error)>(lead?departureBand:idleBand)) {BeginTurn(error);return;}
+            if(std::abs(error)>(lead?departureBand:idleBand)) {BeginTurn(error,travelIntent);return;}
             if(lead) {
                 // Already aligned while stopped: use the ordinary Idle/Walk
                 // blend, without inventing a zero-angle foot exchange.

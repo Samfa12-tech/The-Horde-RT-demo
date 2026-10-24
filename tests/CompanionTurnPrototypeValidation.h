@@ -116,6 +116,38 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
         check(completed && held,"opposite intent waits for the latched planted endpoint before a new signed cycle");
     }
 
+    // Context changes take effect at the next supported exchange, never by
+    // speeding/slowing a foot already in flight. No translation is permitted.
+    for(const bool initiallyTravelling:{false,true}) {
+        CompanionRouteFixture turn(true);const auto root=turn.State();
+        const float angle=pi/9,range=initiallyTravelling?7.f:3.f;
+        const float first=initiallyTravelling?companion_turn::playbackDuration:companion_turn::relaxedPlaybackDuration;
+        const float next=initiallyTravelling?companion_turn::relaxedPlaybackDuration:companion_turn::playbackDuration;
+        for(unsigned tick=0;tick<90 && turn.State().motion.turnPhase<.2f;++tick)
+            turn.Step(dt,root.x+range*std::sin(angle),root.z-range*std::cos(angle),true,initiallyTravelling,false,terrain.get(),true);
+        const auto latched=turn.State();
+        check(latched.motion.mode==CompanionMotionMode::Turning && latched.motion.turnPlaybackSeconds==first,
+            "existing reunion versus travel intent selects the supported exchange duration");
+        const float request=initiallyTravelling?-angle:angle;
+        bool boundary=false,stable=true;
+        for(unsigned tick=0;tick<90 && !boundary;++tick) {
+            turn.Step(dt,root.x+range*std::sin(request),root.z-range*std::cos(request),true,!initiallyTravelling,false,terrain.get(),true);
+            const auto& now=turn.State();
+            stable&=now.x==root.x && now.z==root.z && !now.walking;
+            boundary=now.motion.turnPlaybackSeconds==next;
+            if(boundary)stable&=now.motion.turnPhase==0 && Error(now.yaw,angle)<1e-5f;
+            else stable&=now.motion.turnPlaybackSeconds==first && now.motion.turnPhase>=latched.motion.turnPhase;
+        }
+        check(boundary && stable,"changed context keeps the current timing until its complete supported yaw endpoint");
+        const auto frozen=turn.State();
+        turn.Step(dt,root.x,root.z,true,!initiallyTravelling,true,terrain.get(),true);
+        check(SameFrozenPose(frozen,turn.State()),"pause freezes the latched context duration along with the supported pose");
+        turn.Step(dt,root.x+range*std::sin(request),root.z-range*std::cos(request),true,!initiallyTravelling,false,terrain.get(),true);
+        check(turn.State().motion.turnPlaybackSeconds==next && std::abs(turn.State().motion.turnPhase-dt/next)<1e-6f,
+            "resume advances one step at the next exchange's latched duration without timing debt");
+        turn.Reset();check(turn.State().motion.turnPlaybackSeconds==0,"reset revokes the transient context duration");
+    }
+
     // Freeze each phase independently so one missing-readiness publication
     // cannot accidentally reset a turn before the later pause test observes it.
     const std::array<Terrain::Triangle,2> farLand{{
@@ -349,7 +381,7 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
     check(recipe.seconds==0 && recipe.blend.clip==horde::scene::SkinnedClip::Walking && recipe.blend.weight==.7f,
         "starting recipe joins Idle zero to the retained actual-distance walking phase");
 
-    // Retiming changes only the shared phase clock. Both signs and partial/full
+    // Relaxed non-travel turns retain the original authored phase clock. Both signs and partial/full
     // exchanges must still sample the entire original take and its matched yaw.
     for(float angle:{-pi/4,-pi/9,pi/9,pi/4}) {
         CompanionRouteFixture turn(true);const auto origin=turn.State();
@@ -362,8 +394,9 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
         while(activeSteps<60 && turn.State().motion.mode==CompanionMotionMode::Turning) {
             turn.Step(dt,px,pz,true,false,false,terrain.get(),true);++activeSteps;
             const auto& s=turn.State();const auto& m=s.motion;
-            const float phase=std::min(activeSteps*dt/companion_turn::playbackDuration,1.f);
+            const float phase=std::min(activeSteps*dt/companion_turn::relaxedPlaybackDuration,1.f);
             coherent&=s.x==origin.x && s.z==origin.z && !s.walking && s.locomotion.walkPhase==0 &&
+                m.turnPlaybackSeconds==companion_turn::relaxedPlaybackDuration &&
                 std::abs(m.turnPhase-phase)<1e-6f &&
                 Error(s.yaw,entry.yaw-companion_turn::ModelYaw(angle>0,phase)*
                     (std::abs(entry.motion.turnAngleRadians)/companion_turn::maxAngle))<1e-6f;
@@ -373,7 +406,7 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
                     selected.blend.timeSeconds==m.turnPhase*companion_turn::duration;
             }
         }
-        check(coherent && activeSteps==static_cast<unsigned>(std::ceil(companion_turn::playbackDuration/dt-1e-5f)) &&
+        check(coherent && activeSteps==static_cast<unsigned>(std::ceil(companion_turn::relaxedPlaybackDuration/dt-1e-5f)) &&
             turn.State().motion.mode==CompanionMotionMode::Idle && turn.State().motion.turnPhase==1 &&
             Error(turn.State().yaw,angle)<1e-5f,
             "retimed signed full/partial exchange keeps shared joint/yaw phase, supported root and complete authored endpoint");

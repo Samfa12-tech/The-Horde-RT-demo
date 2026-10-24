@@ -1,0 +1,44 @@
+[
+  {
+    "new": "ordinary-partial-0009",
+    "old": "ordinary-partial-0008",
+    "phase": 0.13333334,
+    "identical": true
+  },
+  {
+    "new": "ordinary-partial-0012",
+    "old": "ordinary-partial-0010",
+    "phase": 0.266666681,
+    "identical": true
+  },
+  {
+    "new": "ordinary-partial-0015",
+    "old": "ordinary-partial-0012",
+    "phase": 0.400000036,
+    "identical": true
+  },
+  {
+    "new": "ordinary-partial-0018",
+    "old": "ordinary-partial-0014",
+    "phase": 0.533333361,
+    "identical": true
+  },
+  {
+    "new": "ordinary-partial-0021",
+    "old": "ordinary-partial-0016",
+    "phase": 0.666666687,
+    "identical": true
+  },
+  {
+    "new": "ordinary-partial-0024",
+    "old": "ordinary-partial-0018",
+    "phase": 0.800000072,
+    "identical": true
+  },
+  {
+    "new": "ordinary-partial-0027",
+    "old": "ordinary-partial-0020",
+    "phase": 0.933333397,
+    "identical": true
+  }
+]

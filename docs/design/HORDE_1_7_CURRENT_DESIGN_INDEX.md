@@ -5,7 +5,8 @@ Continuous bends retain legacy movement; stopped misaligned departures retain
 authored turns. The natural RT route now passes without added waiting guidance.
 Phone acceptance remains open. The [bounded Debug journey partition](../evidence/2026-10-24-campaign-journey-partition/README.md)
 now passes local Debug/Release coverage with unchanged 30-second deadlines;
-casual/urgent timing context selection remains pending.
+[existing-context casual/urgent timing](../evidence/2026-10-24-kit-context-timing/README.md)
+is now implemented and latched per supported exchange (0.75s non-travel, 0.50s travel).
 
 Latest admission verdict: the [visible-corner natural-walk pair](../evidence/2026-10-24-kit-natural-corner/README.md)
 confirms a pacing regression: legacy finishes without tether waits, turn/start

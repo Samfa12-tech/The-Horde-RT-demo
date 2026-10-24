@@ -448,6 +448,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         dialogue::Snapshot inspectionSpeech;
         float playerX=route.State().x-7,playerZ=route.State().z;
         float cameraAzimuth=0;
+        bool controllerProof=true;
         std::uint64_t previousSubmission=0;
         const auto sameImage=[](const Image& a,const Image& b){return a.width==b.width && a.height==b.height && a.rgba==b.rgba;};
         const auto heading=[](const dialogue::CompanionSnapshot& pose) {
@@ -458,7 +459,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         const auto step=[&](bool paused=false) {
             if(!terrain || !safe("shared-controller-fixed-step",false))return false;
             ++controllerCalls;
-            route.Step(1.f/60,playerX,playerZ,true,true,paused,terrain.get(),true,true);
+            route.Step(1.f/60,playerX,playerZ,true,controllerProof,paused,terrain.get(),true,true);
             if(!paused) {++controllerTicks;route.AdvanceActing(1.f/60,inspectionSpeech,true,true,false);}
             const auto& p=route.State();const auto& m=p.motion;
             return p.grounded && m.turnStartEnabled && std::isfinite(p.yaw) &&
@@ -498,10 +499,10 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
                 <<",\"root\":["<<pose.x<<','<<pose.y<<','<<pose.z<<"],\"logicalYaw\":"<<pose.yaw
                 <<",\"walking\":"<<(pose.walking?"true":"false")<<",\"waypoint\":"<<pose.waypoint
                 <<",\"wait\":"<<static_cast<unsigned>(pose.wait)<<",\"playerIntent\":["<<playerX<<','<<playerZ<<"]"
-                <<",\"proofInput\":true,\"idleSeconds\":"<<pose.animationSeconds<<",\"walkPhase\":"<<pose.locomotion.walkPhase
+                <<",\"proofInput\":"<<(controllerProof?"true":"false")<<",\"idleSeconds\":"<<pose.animationSeconds<<",\"walkPhase\":"<<pose.locomotion.walkPhase
                 <<",\"walkWeight\":"<<pose.locomotion.walkWeight<<",\"motion\":{\"turnStartEnabled\":"<<(m.turnStartEnabled?"true":"false")
                 <<",\"mode\":"<<static_cast<unsigned>(m.mode)<<",\"speed\":"<<m.speed<<",\"turnPhase\":"<<m.turnPhase
-                <<",\"signedTurnAngleRadians\":"<<m.turnAngleRadians<<",\"entryWeight\":"<<m.entryWeight
+                <<",\"turnPlaybackSeconds\":"<<m.turnPlaybackSeconds<<",\"signedTurnAngleRadians\":"<<m.turnAngleRadians<<",\"entryWeight\":"<<m.entryWeight
                 <<",\"idleZeroWeight\":"<<m.idleZeroWeight<<"},\"speechMetadataLine\":"<<static_cast<unsigned>(inspectionSpeech.line)
                 <<",\"acting\":["<<pose.acting.headPitch<<','<<pose.acting.headYaw<<','<<pose.acting.chestPitch
                 <<"],\"camera\":["<<cameraX<<','<<cameraGround.worldY<<','<<cameraZ<<','<<cameraAzimuth+3.14159265359f<<','<<pitch
@@ -606,6 +607,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         if(proceed) {
             // One uninterrupted ordinary partial, sampled on its real shared
             // fixed-step clock. The later opposite-intent witness stays intact.
+            controllerProof=false; // Existing non-travel conversational facing context.
             const auto base=route.State();cameraAzimuth=base.yaw+.6f;
             setBearing(base.yaw+.3490658504f);
             unsigned frames=1;bool finished=false;
@@ -661,6 +663,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             // Continue the actual local route to its first corner; no pose or
             // waypoint import. This is a controller snapshot fixture, not a
             // second campaign/rope/save journey or an earned speech assertion.
+            controllerProof=true; // Resume the existing travel intent at its next exchange.
             cameraAzimuth=heading(route.State())+.6f;unsigned ticks=0;bool slope=false;
             const auto target=simulation::kWorldRoutePoints[4];
             while(proceed && route.State().waypoint==4 && std::hypot(route.State().x-target.x-1,route.State().z-target.z)>=.06f && ticks++<1200) {
