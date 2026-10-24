@@ -1,0 +1,2576 @@
+{
+  "schema": 1,
+  "source": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+  "originalGeometryWeightsDigest": "3e28917ab04941ea052da9fe87266a85d2a240273309f56ff15dc88a9e4c6301",
+  "evidenceClass": "offline candidate only",
+  "directions": [
+    {
+      "direction": "right",
+      "durationSeconds": 0.6666666666666666,
+      "declaredSpeed": 1.9,
+      "stride": 1.2666666666666666,
+      "geometryWeightsUnchanged": true,
+      "bindUnchanged": true,
+      "maximumLegStretch": 0,
+      "maximumAdjacentStanceSoleDrift": 0.005064049144102644,
+      "minimumSoleZ": -0.005736560095101595,
+      "frames": [
+        {
+          "frame": 1,
+          "seconds": 0.0,
+          "rootDistance": 0.0,
+          "feet": {
+            "Left": {
+              "phase": 0.5,
+              "stance": true,
+              "soleMinimumZ": 0.0017644875915721059,
+              "soleMaximumZ": 0.03241364285349846,
+              "worldSoleCentroid": [
+                -0.20236210525035858,
+                0.09287434071302414,
+                0.018103476613759995
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.0,
+              "stance": true,
+              "soleMinimumZ": 0.0014338829787448049,
+              "soleMaximumZ": 0.01754167675971985,
+              "worldSoleCentroid": [
+                0.3037550151348114,
+                0.25207433104515076,
+                0.009449685923755169
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 2,
+          "seconds": 0.016666666666666666,
+          "rootDistance": 0.03166666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.525,
+              "stance": true,
+              "soleMinimumZ": 0.0017516699153929949,
+              "soleMaximumZ": 0.03287115693092346,
+              "worldSoleCentroid": [
+                -0.20301377773284912,
+                0.09204310923814774,
+                0.018320633098483086
+              ],
+              "adjacentStanceDrift": 0.0010562304443221665
+            },
+            "Right": {
+              "phase": 0.025,
+              "stance": true,
+              "soleMinimumZ": 0.0017238184809684753,
+              "soleMaximumZ": 0.01933286525309086,
+              "worldSoleCentroid": [
+                0.3038983941078186,
+                0.2528897821903229,
+                0.010326331481337547
+              ],
+              "adjacentStanceDrift": 0.0008279602017139643
+            }
+          }
+        },
+        {
+          "frame": 3,
+          "seconds": 0.03333333333333333,
+          "rootDistance": 0.06333333333333332,
+          "feet": {
+            "Left": {
+              "phase": 0.55,
+              "stance": true,
+              "soleMinimumZ": 0.0016741541912779212,
+              "soleMaximumZ": 0.033083200454711914,
+              "worldSoleCentroid": [
+                -0.2035752534866333,
+                0.09106557816267014,
+                0.0183738823980093
+              ],
+              "adjacentStanceDrift": 0.0011273074101451441
+            },
+            "Right": {
+              "phase": 0.05,
+              "stance": true,
+              "soleMinimumZ": 0.001926564029417932,
+              "soleMaximumZ": 0.020439226180315018,
+              "worldSoleCentroid": [
+                0.30388134717941284,
+                0.253470242023468,
+                0.01087263971567154
+              ],
+              "adjacentStanceDrift": 0.0005807101014105108
+            }
+          }
+        },
+        {
+          "frame": 4,
+          "seconds": 0.05,
+          "rootDistance": 0.09499999999999999,
+          "feet": {
+            "Left": {
+              "phase": 0.575,
+              "stance": true,
+              "soleMinimumZ": 0.0015120666939765215,
+              "soleMaximumZ": 0.03298015147447586,
+              "worldSoleCentroid": [
+                -0.2040288746356964,
+                0.0898837074637413,
+                0.018215646967291832
+              ],
+              "adjacentStanceDrift": 0.001265934629821809
+            },
+            "Right": {
+              "phase": 0.075,
+              "stance": true,
+              "soleMinimumZ": 0.0020745338406413794,
+              "soleMaximumZ": 0.02115510031580925,
+              "worldSoleCentroid": [
+                0.3037821650505066,
+                0.2539285123348236,
+                0.011227731592953205
+              ],
+              "adjacentStanceDrift": 0.0004688803387604856
+            }
+          }
+        },
+        {
+          "frame": 5,
+          "seconds": 0.06666666666666667,
+          "rootDistance": 0.12666666666666665,
+          "feet": {
+            "Left": {
+              "phase": 0.6,
+              "stance": true,
+              "soleMinimumZ": 0.0012344602728262544,
+              "soleMaximumZ": 0.032432861626148224,
+              "worldSoleCentroid": [
+                -0.2043313980102539,
+                0.08839205652475357,
+                0.01776035875082016
+              ],
+              "adjacentStanceDrift": 0.0015220193881337748
+            },
+            "Right": {
+              "phase": 0.1,
+              "stance": true,
+              "soleMinimumZ": 0.0021799427922815084,
+              "soleMaximumZ": 0.021584616973996162,
+              "worldSoleCentroid": [
+                0.3036251962184906,
+                0.25430771708488464,
+                0.011440967209637165
+              ],
+              "adjacentStanceDrift": 0.00041040888855522876
+            }
+          }
+        },
+        {
+          "frame": 6,
+          "seconds": 0.08333333333333333,
+          "rootDistance": 0.15833333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.625,
+              "stance": false,
+              "soleMinimumZ": 0.004121107514947653,
+              "soleMaximumZ": 0.035555146634578705,
+              "worldSoleCentroid": [
+                -0.19045588374137878,
+                0.08782389760017395,
+                0.020757175981998444
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.125,
+              "stance": true,
+              "soleMinimumZ": 0.0022485104855149984,
+              "soleMaximumZ": 0.021773656830191612,
+              "worldSoleCentroid": [
+                0.3034181296825409,
+                0.25462982058525085,
+                0.011534025892615318
+              ],
+              "adjacentStanceDrift": 0.00038291933257329406
+            }
+          }
+        },
+        {
+          "frame": 7,
+          "seconds": 0.1,
+          "rootDistance": 0.18999999999999997,
+          "feet": {
+            "Left": {
+              "phase": 0.65,
+              "stance": false,
+              "soleMinimumZ": 0.013056883588433266,
+              "soleMaximumZ": 0.046135563403367996,
+              "worldSoleCentroid": [
+                -0.15088298916816711,
+                0.08942503482103348,
+                0.030597129836678505
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.15,
+              "stance": true,
+              "soleMinimumZ": 0.002283856039866805,
+              "soleMaximumZ": 0.021744543686509132,
+              "worldSoleCentroid": [
+                0.3031617999076843,
+                0.25490716099739075,
+                0.011517697013914585
+              ],
+              "adjacentStanceDrift": 0.00037765414500975876
+            }
+          }
+        },
+        {
+          "frame": 8,
+          "seconds": 0.11666666666666667,
+          "rootDistance": 0.22166666666666665,
+          "feet": {
+            "Left": {
+              "phase": 0.675,
+              "stance": false,
+              "soleMinimumZ": 0.026463475078344345,
+              "soleMaximumZ": 0.06146731227636337,
+              "worldSoleCentroid": [
+                -0.08880534768104553,
+                0.0920024886727333,
+                0.04507439211010933
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.175,
+              "stance": true,
+              "soleMinimumZ": 0.0022890171967446804,
+              "soleMaximumZ": 0.021510107442736626,
+              "worldSoleCentroid": [
+                0.30285313725471497,
+                0.25514793395996094,
+                0.011398549191653728
+              ],
+              "adjacentStanceDrift": 0.0003914642398311157
+            }
+          }
+        },
+        {
+          "frame": 9,
+          "seconds": 0.13333333333333333,
+          "rootDistance": 0.2533333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.7,
+              "stance": false,
+              "soleMinimumZ": 0.04200555384159088,
+              "soleMaximumZ": 0.07826796174049377,
+              "worldSoleCentroid": [
+                -0.007612049579620361,
+                0.0945570170879364,
+                0.06133114546537399
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.2,
+              "stance": true,
+              "soleMinimumZ": 0.0022676396183669567,
+              "soleMaximumZ": 0.021080683916807175,
+              "worldSoleCentroid": [
+                0.3024870753288269,
+                0.2553570568561554,
+                0.01118247490376234
+              ],
+              "adjacentStanceDrift": 0.00042158477750827913
+            }
+          }
+        },
+        {
+          "frame": 10,
+          "seconds": 0.15,
+          "rootDistance": 0.285,
+          "feet": {
+            "Left": {
+              "phase": 0.725,
+              "stance": false,
+              "soleMinimumZ": 0.05705694854259491,
+              "soleMaximumZ": 0.09343921393156052,
+              "worldSoleCentroid": [
+                0.08905749022960663,
+                0.09666074812412262,
+                0.07648683339357376
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.225,
+              "stance": true,
+              "soleMinimumZ": 0.002224238123744726,
+              "soleMaximumZ": 0.020467862486839294,
+              "worldSoleCentroid": [
+                0.3020577132701874,
+                0.2555374205112457,
+                0.010876412503421307
+              ],
+              "adjacentStanceDrift": 0.00046570680109757676
+            }
+          }
+        },
+        {
+          "frame": 11,
+          "seconds": 0.16666666666666666,
+          "rootDistance": 0.31666666666666665,
+          "feet": {
+            "Left": {
+              "phase": 0.75,
+              "stance": false,
+              "soleMinimumZ": 0.06912854313850403,
+              "soleMaximumZ": 0.10453812032938004,
+              "worldSoleCentroid": [
+                0.19759929180145264,
+                0.09819713979959488,
+                0.08788102120161057
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.25,
+              "stance": true,
+              "soleMinimumZ": 0.002164798090234399,
+              "soleMaximumZ": 0.019687281921505928,
+              "worldSoleCentroid": [
+                0.3015592098236084,
+                0.25569048523902893,
+                0.0104898726567626
+              ],
+              "adjacentStanceDrift": 0.0005214734034110884
+            }
+          }
+        },
+        {
+          "frame": 12,
+          "seconds": 0.18333333333333332,
+          "rootDistance": 0.34833333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.775,
+              "stance": false,
+              "soleMinimumZ": 0.07636462152004242,
+              "soleMaximumZ": 0.10901126265525818,
+              "worldSoleCentroid": [
+                0.3145886957645416,
+                0.09919490665197372,
+                0.09350478649139404
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.275,
+              "stance": true,
+              "soleMinimumZ": 0.002096069511026144,
+              "soleMaximumZ": 0.01875866949558258,
+              "worldSoleCentroid": [
+                0.30098649859428406,
+                0.25581634044647217,
+                0.010034576058387756
+              ],
+              "adjacentStanceDrift": 0.0005863767420851727
+            }
+          }
+        },
+        {
+          "frame": 13,
+          "seconds": 0.2,
+          "rootDistance": 0.37999999999999995,
+          "feet": {
+            "Left": {
+              "phase": 0.8,
+              "stance": false,
+              "soleMinimumZ": 0.0779503583908081,
+              "soleMaximumZ": 0.10589198023080826,
+              "worldSoleCentroid": [
+                0.43668296933174133,
+                0.09970760345458984,
+                0.09248167276382446
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.3,
+              "stance": true,
+              "soleMinimumZ": 0.0020257500000298023,
+              "soleMaximumZ": 0.017706025391817093,
+              "worldSoleCentroid": [
+                0.3003358840942383,
+                0.25591418147087097,
+                0.009524654597043991
+              ],
+              "adjacentStanceDrift": 0.0006579301688233327
+            }
+          }
+        },
+        {
+          "frame": 14,
+          "seconds": 0.21666666666666667,
+          "rootDistance": 0.4116666666666667,
+          "feet": {
+            "Left": {
+              "phase": 0.825,
+              "stance": false,
+              "soleMinimumZ": 0.0741417333483696,
+              "soleMaximumZ": 0.09587302058935165,
+              "worldSoleCentroid": [
+                0.560292661190033,
+                0.0997062474489212,
+                0.08521917462348938
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.325,
+              "stance": true,
+              "soleMinimumZ": 0.0019620137754827738,
+              "soleMaximumZ": 0.016556642949581146,
+              "worldSoleCentroid": [
+                0.2996056377887726,
+                0.25598233938217163,
+                0.008975986391305923
+              ],
+              "adjacentStanceDrift": 0.0007334201745385364
+            }
+          }
+        },
+        {
+          "frame": 15,
+          "seconds": 0.23333333333333334,
+          "rootDistance": 0.4433333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.85,
+              "stance": false,
+              "soleMinimumZ": 0.06590911000967026,
+              "soleMaximumZ": 0.08121374249458313,
+              "worldSoleCentroid": [
+                0.6813559532165527,
+                0.09904418885707855,
+                0.07304130494594574
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.35,
+              "stance": true,
+              "soleMinimumZ": 0.0019125124672427773,
+              "soleMaximumZ": 0.01533910445868969,
+              "worldSoleCentroid": [
+                0.298795610666275,
+                0.25601887702941895,
+                0.00840478390455246
+              ],
+              "adjacentStanceDrift": 0.0008108507412817659
+            }
+          }
+        },
+        {
+          "frame": 16,
+          "seconds": 0.25,
+          "rootDistance": 0.475,
+          "feet": {
+            "Left": {
+              "phase": 0.875,
+              "stance": false,
+              "soleMinimumZ": 0.051592372357845306,
+              "soleMaximumZ": 0.06366385519504547,
+              "worldSoleCentroid": [
+                0.7955069541931152,
+                0.09753549844026566,
+                0.05770036205649376
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.375,
+              "stance": true,
+              "soleMinimumZ": 0.001884598983451724,
+              "soleMaximumZ": 0.014395395293831825,
+              "worldSoleCentroid": [
+                0.29790765047073364,
+                0.2560214400291443,
+                0.007827116176486015
+              ],
+              "adjacentStanceDrift": 0.0008879638899414071
+            }
+          }
+        },
+        {
+          "frame": 17,
+          "seconds": 0.26666666666666666,
+          "rootDistance": 0.5066666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.9,
+              "stance": false,
+              "soleMinimumZ": 0.03595340624451637,
+              "soleMaximumZ": 0.04611269012093544,
+              "worldSoleCentroid": [
+                0.8983879089355469,
+                0.09507712721824646,
+                0.04116297513246536
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.4,
+              "stance": true,
+              "soleMinimumZ": 0.0018847623141482472,
+              "soleMaximumZ": 0.013561689294874668,
+              "worldSoleCentroid": [
+                0.29694437980651855,
+                0.25598734617233276,
+                0.0072578927502036095
+              ],
+              "adjacentStanceDrift": 0.0009638738299471293
+            }
+          }
+        },
+        {
+          "frame": 18,
+          "seconds": 0.2833333333333333,
+          "rootDistance": 0.5383333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.925,
+              "stance": false,
+              "soleMinimumZ": 0.01965973898768425,
+              "soleMaximumZ": 0.03219718858599663,
+              "worldSoleCentroid": [
+                0.9857585430145264,
+                0.09174844622612,
+                0.025530260056257248
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.425,
+              "stance": true,
+              "soleMinimumZ": 0.0019185561686754227,
+              "soleMaximumZ": 0.01275823824107647,
+              "worldSoleCentroid": [
+                0.29590871930122375,
+                0.25591370463371277,
+                0.006710143759846687
+              ],
+              "adjacentStanceDrift": 0.0010382753765497965
+            }
+          }
+        },
+        {
+          "frame": 19,
+          "seconds": 0.3,
+          "rootDistance": 0.57,
+          "feet": {
+            "Left": {
+              "phase": 0.95,
+              "stance": false,
+              "soleMinimumZ": 0.005588409956544638,
+              "soleMaximumZ": 0.022300591692328453,
+              "worldSoleCentroid": [
+                1.0533324480056763,
+                0.08799156546592712,
+                0.012827648781239986
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.45,
+              "stance": true,
+              "soleMinimumZ": 0.001640987116843462,
+              "soleMaximumZ": 0.012001097202301025,
+              "worldSoleCentroid": [
+                0.29480335116386414,
+                0.2557963728904724,
+                0.006194536108523607
+              ],
+              "adjacentStanceDrift": 0.0011115779115783927
+            }
+          }
+        },
+        {
+          "frame": 20,
+          "seconds": 0.31666666666666665,
+          "rootDistance": 0.6016666666666667,
+          "feet": {
+            "Left": {
+              "phase": 0.975,
+              "stance": false,
+              "soleMinimumZ": -0.003432254074141383,
+              "soleMaximumZ": 0.01549138966947794,
+              "worldSoleCentroid": [
+                1.096085786819458,
+                0.08539328724145889,
+                0.004570039454847574
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.475,
+              "stance": true,
+              "soleMinimumZ": 0.001384643604978919,
+              "soleMaximumZ": 0.011301705613732338,
+              "worldSoleCentroid": [
+                0.2936288118362427,
+                0.2556295394897461,
+                0.005719325039535761
+              ],
+              "adjacentStanceDrift": 0.0011863287821308494
+            }
+          }
+        },
+        {
+          "frame": 21,
+          "seconds": 0.3333333333333333,
+          "rootDistance": 0.6333333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.0,
+              "stance": true,
+              "soleMinimumZ": -0.005736560095101595,
+              "soleMaximumZ": 0.01130613498389721,
+              "worldSoleCentroid": [
+                1.107972264289856,
+                0.08680117130279541,
+                0.0015180420596152544
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.5,
+              "stance": true,
+              "soleMinimumZ": 0.0011753822909668088,
+              "soleMaximumZ": 0.01066637597978115,
+              "worldSoleCentroid": [
+                0.29238268733024597,
+                0.255403995513916,
+                0.005290220957249403
+              ],
+              "adjacentStanceDrift": 0.0012663713195001688
+            }
+          }
+        },
+        {
+          "frame": 22,
+          "seconds": 0.35,
+          "rootDistance": 0.6649999999999999,
+          "feet": {
+            "Left": {
+              "phase": 0.02499999999999991,
+              "stance": true,
+              "soleMinimumZ": -0.004511626437306404,
+              "soleMaximumZ": 0.009153896011412144,
+              "worldSoleCentroid": [
+                1.1036244630813599,
+                0.08939755707979202,
+                0.0015865606255829334
+              ],
+              "adjacentStanceDrift": 0.005064049144102644
+            },
+            "Right": {
+              "phase": 0.525,
+              "stance": true,
+              "soleMinimumZ": 0.0010206986917182803,
+              "soleMaximumZ": 0.010096198879182339,
+              "worldSoleCentroid": [
+                0.29105690121650696,
+                0.25510460138320923,
+                0.004910808987915516
+              ],
+              "adjacentStanceDrift": 0.00135917093456185
+            }
+          }
+        },
+        {
+          "frame": 23,
+          "seconds": 0.36666666666666664,
+          "rootDistance": 0.6966666666666667,
+          "feet": {
+            "Left": {
+              "phase": 0.050000000000000044,
+              "stance": true,
+              "soleMinimumZ": -0.003049054415896535,
+              "soleMaximumZ": 0.007524422835558653,
+              "worldSoleCentroid": [
+                1.0997990369796753,
+                0.09122484177350998,
+                0.0019377091666683555
+              ],
+              "adjacentStanceDrift": 0.004239440378273753
+            },
+            "Right": {
+              "phase": 0.55,
+              "stance": true,
+              "soleMinimumZ": 0.0006139922770671546,
+              "soleMaximumZ": 0.009586193598806858,
+              "worldSoleCentroid": [
+                0.2896331250667572,
+                0.25470560789108276,
+                0.004582792054861784
+              ],
+              "adjacentStanceDrift": 0.0014786258625797246
+            }
+          }
+        },
+        {
+          "frame": 24,
+          "seconds": 0.38333333333333336,
+          "rootDistance": 0.7283333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.07499999999999996,
+              "stance": true,
+              "soleMinimumZ": -0.001424595364369452,
+              "soleMaximumZ": 0.006228195503354073,
+              "worldSoleCentroid": [
+                1.0962750911712646,
+                0.09261743724346161,
+                0.002497495850548148
+              ],
+              "adjacentStanceDrift": 0.003789131354308633
+            },
+            "Right": {
+              "phase": 0.575,
+              "stance": true,
+              "soleMinimumZ": 7.304660539375618e-05,
+              "soleMaximumZ": 0.009123151190578938,
+              "worldSoleCentroid": [
+                0.2880725860595703,
+                0.2541576623916626,
+                0.004306654911488295
+              ],
+              "adjacentStanceDrift": 0.0016539426085158929
+            }
+          }
+        },
+        {
+          "frame": 25,
+          "seconds": 0.4,
+          "rootDistance": 0.7599999999999999,
+          "feet": {
+            "Left": {
+              "phase": 0.10000000000000009,
+              "stance": true,
+              "soleMinimumZ": -0.0010081263026222587,
+              "soleMaximumZ": 0.006782298907637596,
+              "worldSoleCentroid": [
+                1.0929746627807617,
+                0.0937095433473587,
+                0.003229352179914713
+              ],
+              "adjacentStanceDrift": 0.003476423986735499
+            },
+            "Right": {
+              "phase": 0.6,
+              "stance": true,
+              "soleMinimumZ": -0.00036859288229607046,
+              "soleMaximumZ": 0.008676666766405106,
+              "worldSoleCentroid": [
+                0.286274790763855,
+                0.25334617495536804,
+                0.004083130042999983
+              ],
+              "adjacentStanceDrift": 0.001972455262447194
+            }
+          }
+        },
+        {
+          "frame": 26,
+          "seconds": 0.4166666666666667,
+          "rootDistance": 0.7916666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.125,
+              "stance": true,
+              "soleMinimumZ": -0.000408126856200397,
+              "soleMaximumZ": 0.008259654976427555,
+              "worldSoleCentroid": [
+                1.0898669958114624,
+                0.09457036107778549,
+                0.004107056651264429
+              ],
+              "adjacentStanceDrift": 0.0032246862268817205
+            },
+            "Right": {
+              "phase": 0.625,
+              "stance": false,
+              "soleMinimumZ": 0.0023865061812102795,
+              "soleMaximumZ": 0.011509541422128677,
+              "worldSoleCentroid": [
+                0.2996077835559845,
+                0.25298193097114563,
+                0.006935654673725367
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 27,
+          "seconds": 0.43333333333333335,
+          "rootDistance": 0.8233333333333334,
+          "feet": {
+            "Left": {
+              "phase": 0.1499999999999999,
+              "stance": true,
+              "soleMinimumZ": 0.0003424344176892191,
+              "soleMaximumZ": 0.00988861545920372,
+              "worldSoleCentroid": [
+                1.0869405269622803,
+                0.09524066746234894,
+                0.005106313619762659
+              ],
+              "adjacentStanceDrift": 0.003002254189324524
+            },
+            "Right": {
+              "phase": 0.65,
+              "stance": false,
+              "soleMinimumZ": 0.010866140015423298,
+              "soleMaximumZ": 0.02039528638124466,
+              "worldSoleCentroid": [
+                0.3410112261772156,
+                0.25394701957702637,
+                0.015383904799818993
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 28,
+          "seconds": 0.45,
+          "rootDistance": 0.855,
+          "feet": {
+            "Left": {
+              "phase": 0.17500000000000004,
+              "stance": true,
+              "soleMinimumZ": 0.0010330112418159842,
+              "soleMaximumZ": 0.01189476903527975,
+              "worldSoleCentroid": [
+                1.0841948986053467,
+                0.09574750065803528,
+                0.006202328484505415
+              ],
+              "adjacentStanceDrift": 0.002792016292011912
+            },
+            "Right": {
+              "phase": 0.675,
+              "stance": false,
+              "soleMinimumZ": 0.023891814053058624,
+              "soleMaximumZ": 0.03380852937698364,
+              "worldSoleCentroid": [
+                0.40572115778923035,
+                0.2552448809146881,
+                0.028166774660348892
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 29,
+          "seconds": 0.4666666666666667,
+          "rootDistance": 0.8866666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.19999999999999996,
+              "stance": true,
+              "soleMinimumZ": 0.0007624994032084942,
+              "soleMaximumZ": 0.013917907141149044,
+              "worldSoleCentroid": [
+                1.0816333293914795,
+                0.09611044079065323,
+                0.007368524558842182
+              ],
+              "adjacentStanceDrift": 0.0025871533352134195
+            },
+            "Right": {
+              "phase": 0.7,
+              "stance": false,
+              "soleMinimumZ": 0.03868342190980911,
+              "soleMaximumZ": 0.04979667067527771,
+              "worldSoleCentroid": [
+                0.4894436001777649,
+                0.25633010268211365,
+                0.043453965336084366
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 30,
+          "seconds": 0.48333333333333334,
+          "rootDistance": 0.9183333333333332,
+          "feet": {
+            "Left": {
+              "phase": 0.2250000000000001,
+              "stance": true,
+              "soleMinimumZ": 0.000620446924585849,
+              "soleMaximumZ": 0.0159249659627676,
+              "worldSoleCentroid": [
+                1.079261064529419,
+                0.09634481370449066,
+                0.008576638996601105
+              ],
+              "adjacentStanceDrift": 0.00238381438268138
+            },
+            "Right": {
+              "phase": 0.725,
+              "stance": false,
+              "soleMinimumZ": 0.05361112579703331,
+              "soleMaximumZ": 0.06617835909128189,
+              "worldSoleCentroid": [
+                0.5881984233856201,
+                0.2570338845252991,
+                0.05908203125
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 31,
+          "seconds": 0.5,
+          "rootDistance": 0.95,
+          "feet": {
+            "Left": {
+              "phase": 0.25,
+              "stance": true,
+              "soleMinimumZ": 0.0005850467132404447,
+              "soleMaximumZ": 0.017956439405679703,
+              "worldSoleCentroid": [
+                1.0770816802978516,
+                0.09646342694759369,
+                0.009797541424632072
+              ],
+              "adjacentStanceDrift": 0.002182609601692559
+            },
+            "Right": {
+              "phase": 0.75,
+              "stance": false,
+              "soleMinimumZ": 0.06643831729888916,
+              "soleMaximumZ": 0.08076892048120499,
+              "worldSoleCentroid": [
+                0.6980375051498413,
+                0.2573220133781433,
+                0.07285616546869278
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 32,
+          "seconds": 0.5166666666666667,
+          "rootDistance": 0.9816666666666667,
+          "feet": {
+            "Left": {
+              "phase": 0.2749999999999999,
+              "stance": true,
+              "soleMinimumZ": 0.0006334592471830547,
+              "soleMaximumZ": 0.020038777962327003,
+              "worldSoleCentroid": [
+                1.0750958919525146,
+                0.09647706151008606,
+                0.011002193205058575
+              ],
+              "adjacentStanceDrift": 0.0019858351384057183
+            },
+            "Right": {
+              "phase": 0.775,
+              "stance": false,
+              "soleMinimumZ": 0.0747399628162384,
+              "soleMaximumZ": 0.0920649990439415,
+              "worldSoleCentroid": [
+                0.8149896264076233,
+                0.25724509358406067,
+                0.08282147347927094
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 33,
+          "seconds": 0.5333333333333333,
+          "rootDistance": 1.0133333333333332,
+          "feet": {
+            "Left": {
+              "phase": 0.30000000000000004,
+              "stance": true,
+              "soleMinimumZ": 0.0007428539101965725,
+              "soleMaximumZ": 0.021989552304148674,
+              "worldSoleCentroid": [
+                1.0733003616333008,
+                0.09639494121074677,
+                0.012163633480668068
+              ],
+              "adjacentStanceDrift": 0.001797407247597039
+            },
+            "Right": {
+              "phase": 0.8,
+              "stance": false,
+              "soleMinimumZ": 0.0779241994023323,
+              "soleMaximumZ": 0.0985758826136589,
+              "worldSoleCentroid": [
+                0.9351149797439575,
+                0.25691673159599304,
+                0.08748199790716171
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 34,
+          "seconds": 0.55,
+          "rootDistance": 1.045,
+          "feet": {
+            "Left": {
+              "phase": 0.32499999999999996,
+              "stance": true,
+              "soleMinimumZ": 0.0008913966012187302,
+              "soleMaximumZ": 0.023919953033328056,
+              "worldSoleCentroid": [
+                1.0716869831085205,
+                0.09622497111558914,
+                0.013258567079901695
+              ],
+              "adjacentStanceDrift": 0.0016223070116741295
+            },
+            "Right": {
+              "phase": 0.825,
+              "stance": false,
+              "soleMinimumZ": 0.07539224624633789,
+              "soleMaximumZ": 0.09846310317516327,
+              "worldSoleCentroid": [
+                1.0546202659606934,
+                0.25645825266838074,
+                0.08602795749902725
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 35,
+          "seconds": 0.5666666666666667,
+          "rootDistance": 1.0766666666666667,
+          "feet": {
+            "Left": {
+              "phase": 0.3500000000000001,
+              "stance": true,
+              "soleMinimumZ": 0.0010595506755635142,
+              "soleMaximumZ": 0.02568005584180355,
+              "worldSoleCentroid": [
+                1.070244312286377,
+                0.09597349166870117,
+                0.014268756844103336
+              ],
+              "adjacentStanceDrift": 0.0014644251285950702
+            },
+            "Right": {
+              "phase": 0.85,
+              "stance": false,
+              "soleMinimumZ": 0.06739751994609833,
+              "soleMaximumZ": 0.09163074195384979,
+              "worldSoleCentroid": [
+                1.1698893308639526,
+                0.2559281289577484,
+                0.07857441157102585
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 36,
+          "seconds": 0.5833333333333334,
+          "rootDistance": 1.1083333333333334,
+          "feet": {
+            "Left": {
+              "phase": 0.375,
+              "stance": true,
+              "soleMinimumZ": 0.001230713096447289,
+              "soleMaximumZ": 0.027259323745965958,
+              "worldSoleCentroid": [
+                1.068956971168518,
+                0.09564527124166489,
+                0.015181377530097961
+              ],
+              "adjacentStanceDrift": 0.0013285239121216671
+            },
+            "Right": {
+              "phase": 0.875,
+              "stance": false,
+              "soleMinimumZ": 0.055084142833948135,
+              "soleMaximumZ": 0.07914808392524719,
+              "worldSoleCentroid": [
+                1.277367353439331,
+                0.25530052185058594,
+                0.06624500453472137
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 37,
+          "seconds": 0.6,
+          "rootDistance": 1.14,
+          "feet": {
+            "Left": {
+              "phase": 0.3999999999999999,
+              "stance": true,
+              "soleMinimumZ": 0.0013919317862018943,
+              "soleMaximumZ": 0.02865443006157875,
+              "worldSoleCentroid": [
+                1.0678085088729858,
+                0.09524361789226532,
+                0.01598900742828846
+              ],
+              "adjacentStanceDrift": 0.0012166721022695123
+            },
+            "Right": {
+              "phase": 0.9,
+              "stance": false,
+              "soleMinimumZ": 0.04032672941684723,
+              "soleMaximumZ": 0.06303082406520844,
+              "worldSoleCentroid": [
+                1.3734337091445923,
+                0.254512220621109,
+                0.05097881332039833
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 38,
+          "seconds": 0.6166666666666667,
+          "rootDistance": 1.1716666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.42500000000000004,
+              "stance": true,
+              "soleMinimumZ": 0.0015332050388678908,
+              "soleMaximumZ": 0.029866503551602364,
+              "worldSoleCentroid": [
+                1.0667825937271118,
+                0.0947696790099144,
+                0.016687866300344467
+              ],
+              "adjacentStanceDrift": 0.0011300972933807787
+            },
+            "Right": {
+              "phase": 0.925,
+              "stance": false,
+              "soleMinimumZ": 0.025410298258066177,
+              "soleMaximumZ": 0.04581934213638306,
+              "worldSoleCentroid": [
+                1.4543733596801758,
+                0.25352874398231506,
+                0.03516482561826706
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 39,
+          "seconds": 0.6333333333333333,
+          "rootDistance": 1.2033333333333334,
+          "feet": {
+            "Left": {
+              "phase": 0.44999999999999996,
+              "stance": true,
+              "soleMinimumZ": 0.0016469185939058661,
+              "soleMaximumZ": 0.03089819848537445,
+              "worldSoleCentroid": [
+                1.0658642053604126,
+                0.09422159940004349,
+                0.017275964841246605
+              ],
+              "adjacentStanceDrift": 0.0010694991612674291
+            },
+            "Right": {
+              "phase": 0.95,
+              "stance": false,
+              "soleMinimumZ": 0.012662657536566257,
+              "soleMaximumZ": 0.030248692259192467,
+              "worldSoleCentroid": [
+                1.516445279121399,
+                0.252420574426651,
+                0.021291200071573257
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 40,
+          "seconds": 0.65,
+          "rootDistance": 1.2349999999999999,
+          "feet": {
+            "Left": {
+              "phase": 0.4750000000000001,
+              "stance": true,
+              "soleMinimumZ": 0.0017264352645725012,
+              "soleMaximumZ": 0.03174956142902374,
+              "worldSoleCentroid": [
+                1.0650408267974854,
+                0.09359366446733475,
+                0.017750246450304985
+              ],
+              "adjacentStanceDrift": 0.0010354972331399533
+            },
+            "Right": {
+              "phase": 0.975,
+              "stance": false,
+              "soleMinimumZ": 0.004157594405114651,
+              "soleMaximumZ": 0.01954174041748047,
+              "worldSoleCentroid": [
+                1.5561389923095703,
+                0.2516188621520996,
+                0.011893422342836857
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 41,
+          "seconds": 0.6666666666666666,
+          "rootDistance": 1.2666666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.5,
+              "stance": true,
+              "soleMinimumZ": 0.0017644875915721059,
+              "soleMaximumZ": 0.03241364285349846,
+              "worldSoleCentroid": [
+                1.0643045902252197,
+                0.09287434071302414,
+                0.018103476613759995
+              ],
+              "adjacentStanceDrift": 0.001029306050953492
+            },
+            "Right": {
+              "phase": 0.0,
+              "stance": true,
+              "soleMinimumZ": 0.0014338829787448049,
+              "soleMaximumZ": 0.01754167675971985,
+              "worldSoleCentroid": [
+                1.5704216957092285,
+                0.25207433104515076,
+                0.009449685923755169
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "direction": "left",
+      "durationSeconds": 0.6666666666666666,
+      "declaredSpeed": 1.9,
+      "stride": 1.2666666666666666,
+      "geometryWeightsUnchanged": true,
+      "bindUnchanged": true,
+      "maximumLegStretch": 0,
+      "maximumAdjacentStanceSoleDrift": 0.004563161494035132,
+      "minimumSoleZ": -0.005511895753443241,
+      "frames": [
+        {
+          "frame": 1,
+          "seconds": 0.0,
+          "rootDistance": -0.0,
+          "feet": {
+            "Left": {
+              "phase": 0.5,
+              "stance": true,
+              "soleMinimumZ": -0.001038157963193953,
+              "soleMaximumZ": 0.006472418084740639,
+              "worldSoleCentroid": [
+                0.3332552909851074,
+                0.09336800128221512,
+                0.0030397551599889994
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.0,
+              "stance": true,
+              "soleMinimumZ": -0.0004751521337311715,
+              "soleMaximumZ": 0.00840887613594532,
+              "worldSoleCentroid": [
+                -0.4740220904350281,
+                0.2530479431152344,
+                0.003970623016357422
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 2,
+          "seconds": 0.016666666666666666,
+          "rootDistance": -0.03166666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.525,
+              "stance": true,
+              "soleMinimumZ": -0.001536745112389326,
+              "soleMaximumZ": 0.006253019906580448,
+              "worldSoleCentroid": [
+                0.3364352285861969,
+                0.09241647273302078,
+                0.002404698170721531
+              ],
+              "adjacentStanceDrift": 0.003319248362256019
+            },
+            "Right": {
+              "phase": 0.025,
+              "stance": true,
+              "soleMinimumZ": 1.0332762940379325e-05,
+              "soleMaximumZ": 0.008992655202746391,
+              "worldSoleCentroid": [
+                -0.47203898429870605,
+                0.2540476322174072,
+                0.004246349446475506
+              ],
+              "adjacentStanceDrift": 0.0022208305561333
+            }
+          }
+        },
+        {
+          "frame": 3,
+          "seconds": 0.03333333333333333,
+          "rootDistance": -0.06333333333333332,
+          "feet": {
+            "Left": {
+              "phase": 0.55,
+              "stance": true,
+              "soleMinimumZ": -0.003049054415896535,
+              "soleMaximumZ": 0.007524422835558653,
+              "worldSoleCentroid": [
+                0.33979904651641846,
+                0.09122484177350998,
+                0.0019377091666683555
+              ],
+              "adjacentStanceDrift": 0.0035686489415640075
+            },
+            "Right": {
+              "phase": 0.05,
+              "stance": true,
+              "soleMinimumZ": 0.0006139922770671546,
+              "soleMaximumZ": 0.009586193598806858,
+              "worldSoleCentroid": [
+                -0.47036686539649963,
+                0.25470560789108276,
+                0.004582792054861784
+              ],
+              "adjacentStanceDrift": 0.0017969177933578094
+            }
+          }
+        },
+        {
+          "frame": 4,
+          "seconds": 0.05,
+          "rootDistance": -0.09499999999999999,
+          "feet": {
+            "Left": {
+              "phase": 0.575,
+              "stance": true,
+              "soleMinimumZ": -0.004383310209959745,
+              "soleMaximumZ": 0.009082998149096966,
+              "worldSoleCentroid": [
+                0.34341171383857727,
+                0.08967733383178711,
+                0.0016602394171059132
+              ],
+              "adjacentStanceDrift": 0.003930158534707423
+            },
+            "Right": {
+              "phase": 0.075,
+              "stance": true,
+              "soleMinimumZ": 0.0010318048298358917,
+              "soleMaximumZ": 0.010222588665783405,
+              "worldSoleCentroid": [
+                -0.46886223554611206,
+                0.2551806569099426,
+                0.00497408676892519
+              ],
+              "adjacentStanceDrift": 0.0015778411196129462
+            }
+          }
+        },
+        {
+          "frame": 5,
+          "seconds": 0.06666666666666667,
+          "rootDistance": -0.12666666666666665,
+          "feet": {
+            "Left": {
+              "phase": 0.6,
+              "stance": true,
+              "soleMinimumZ": -0.005511895753443241,
+              "soleMaximumZ": 0.01106227282434702,
+              "worldSoleCentroid": [
+                0.34743306040763855,
+                0.08752066642045975,
+                0.001619501388631761
+              ],
+              "adjacentStanceDrift": 0.004563161494035132
+            },
+            "Right": {
+              "phase": 0.1,
+              "stance": true,
+              "soleMinimumZ": 0.0012045622570440173,
+              "soleMaximumZ": 0.01090800017118454,
+              "worldSoleCentroid": [
+                -0.46747761964797974,
+                0.2555312514305115,
+                0.005414210259914398
+              ],
+              "adjacentStanceDrift": 0.0014283128820404961
+            }
+          }
+        },
+        {
+          "frame": 6,
+          "seconds": 0.08333333333333333,
+          "rootDistance": -0.15833333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.625,
+              "stance": false,
+              "soleMinimumZ": -0.002981742611154914,
+              "soleMaximumZ": 0.015044379979372025,
+              "worldSoleCentroid": [
+                0.33521246910095215,
+                0.08657480031251907,
+                0.004666270688176155
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.125,
+              "stance": true,
+              "soleMinimumZ": 0.001434165402315557,
+              "soleMaximumZ": 0.011638369411230087,
+              "worldSoleCentroid": [
+                -0.4661926031112671,
+                0.25578683614730835,
+                0.005895456299185753
+              ],
+              "adjacentStanceDrift": 0.001310187429483205
+            }
+          }
+        },
+        {
+          "frame": 7,
+          "seconds": 0.1,
+          "rootDistance": -0.18999999999999997,
+          "feet": {
+            "Left": {
+              "phase": 0.65,
+              "stance": false,
+              "soleMinimumZ": 0.005935488734394312,
+              "soleMaximumZ": 0.022010650485754013,
+              "worldSoleCentroid": [
+                0.29262199997901917,
+                0.08897729963064194,
+                0.013008461333811283
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.15,
+              "stance": true,
+              "soleMinimumZ": 0.0017092757625505328,
+              "soleMaximumZ": 0.012404188513755798,
+              "worldSoleCentroid": [
+                -0.46499887108802795,
+                0.2559644877910614,
+                0.006408859975636005
+              ],
+              "adjacentStanceDrift": 0.0012068787390168778
+            }
+          }
+        },
+        {
+          "frame": 8,
+          "seconds": 0.11666666666666667,
+          "rootDistance": -0.22166666666666665,
+          "feet": {
+            "Left": {
+              "phase": 0.675,
+              "stance": false,
+              "soleMinimumZ": 0.020040085539221764,
+              "soleMaximumZ": 0.03208548575639725,
+              "worldSoleCentroid": [
+                0.22526755928993225,
+                0.0924491137266159,
+                0.02577740140259266
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.175,
+              "stance": true,
+              "soleMinimumZ": 0.0019593313336372375,
+              "soleMaximumZ": 0.013192095793783665,
+              "worldSoleCentroid": [
+                -0.4638932943344116,
+                0.25607600808143616,
+                0.006943990476429462
+              ],
+              "adjacentStanceDrift": 0.0011111870761501264
+            }
+          }
+        },
+        {
+          "frame": 9,
+          "seconds": 0.13333333333333333,
+          "rootDistance": -0.2533333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.7,
+              "stance": false,
+              "soleMinimumZ": 0.03598611056804657,
+              "soleMaximumZ": 0.04656267911195755,
+              "worldSoleCentroid": [
+                0.13804736733436584,
+                0.09556597471237183,
+                0.041428253054618835
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.2,
+              "stance": true,
+              "soleMinimumZ": 0.0019308137707412243,
+              "soleMaximumZ": 0.013985957019031048,
+              "worldSoleCentroid": [
+                -0.4628751277923584,
+                0.2561303675174713,
+                0.0074892109259963036
+              ],
+              "adjacentStanceDrift": 0.0010196166149253464
+            }
+          }
+        },
+        {
+          "frame": 10,
+          "seconds": 0.15,
+          "rootDistance": -0.285,
+          "feet": {
+            "Left": {
+              "phase": 0.725,
+              "stance": false,
+              "soleMinimumZ": 0.051666129380464554,
+              "soleMaximumZ": 0.06412486732006073,
+              "worldSoleCentroid": [
+                0.03526917099952698,
+                0.09786061197519302,
+                0.05794689431786537
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.225,
+              "stance": true,
+              "soleMinimumZ": 0.0019298222614452243,
+              "soleMaximumZ": 0.014767886139452457,
+              "worldSoleCentroid": [
+                -0.4619443416595459,
+                0.25613507628440857,
+                0.00803215429186821
+              ],
+              "adjacentStanceDrift": 0.0009307980433596315
+            }
+          }
+        },
+        {
+          "frame": 11,
+          "seconds": 0.16666666666666666,
+          "rootDistance": -0.31666666666666665,
+          "feet": {
+            "Left": {
+              "phase": 0.75,
+              "stance": false,
+              "soleMinimumZ": 0.06597018241882324,
+              "soleMaximumZ": 0.08157676458358765,
+              "worldSoleCentroid": [
+                -0.07880249619483948,
+                0.09923727810382843,
+                0.07324200123548508
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.25,
+              "stance": true,
+              "soleMinimumZ": 0.0019497525645419955,
+              "soleMaximumZ": 0.01566062681376934,
+              "worldSoleCentroid": [
+                -0.4611002206802368,
+                0.2560967803001404,
+                0.008560257032513618
+              ],
+              "adjacentStanceDrift": 0.0008449892282804192
+            }
+          }
+        },
+        {
+          "frame": 12,
+          "seconds": 0.18333333333333332,
+          "rootDistance": -0.34833333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.775,
+              "stance": false,
+              "soleMinimumZ": 0.07419008016586304,
+              "soleMaximumZ": 0.09608304500579834,
+              "worldSoleCentroid": [
+                -0.19978883862495422,
+                0.09979314357042313,
+                0.08534295856952667
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.275,
+              "stance": true,
+              "soleMinimumZ": 0.0019838372245430946,
+              "soleMaximumZ": 0.016731372103095055,
+              "worldSoleCentroid": [
+                -0.46034127473831177,
+                0.25602126121520996,
+                0.009061349555850029
+              ],
+              "adjacentStanceDrift": 0.0007626939752103875
+            }
+          }
+        },
+        {
+          "frame": 13,
+          "seconds": 0.2,
+          "rootDistance": -0.37999999999999995,
+          "feet": {
+            "Left": {
+              "phase": 0.8,
+              "stance": false,
+              "soleMinimumZ": 0.0779503583908081,
+              "soleMaximumZ": 0.10589198023080826,
+              "worldSoleCentroid": [
+                -0.3233170211315155,
+                0.09970760345458984,
+                0.09248167276382446
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.3,
+              "stance": true,
+              "soleMinimumZ": 0.0020257500000298023,
+              "soleMaximumZ": 0.017706025391817093,
+              "worldSoleCentroid": [
+                -0.45966410636901855,
+                0.25591418147087097,
+                0.009524654597043991
+              ],
+              "adjacentStanceDrift": 0.0006855822842418105
+            }
+          }
+        },
+        {
+          "frame": 14,
+          "seconds": 0.21666666666666667,
+          "rootDistance": -0.4116666666666667,
+          "feet": {
+            "Left": {
+              "phase": 0.825,
+              "stance": false,
+              "soleMinimumZ": 0.07627326995134354,
+              "soleMaximumZ": 0.10873427987098694,
+              "worldSoleCentroid": [
+                -0.4453375041484833,
+                0.09911514073610306,
+                0.09332933276891708
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.325,
+              "stance": true,
+              "soleMinimumZ": 0.0020695305429399014,
+              "soleMaximumZ": 0.01857093535363674,
+              "worldSoleCentroid": [
+                -0.4590640068054199,
+                0.2557796239852905,
+                0.00994119793176651
+              ],
+              "adjacentStanceDrift": 0.0006150001644461753
+            }
+          }
+        },
+        {
+          "frame": 15,
+          "seconds": 0.23333333333333334,
+          "rootDistance": -0.4433333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.85,
+              "stance": false,
+              "soleMinimumZ": 0.06891882419586182,
+              "soleMaximumZ": 0.10394972562789917,
+              "worldSoleCentroid": [
+                -0.5622709393501282,
+                0.0980309545993805,
+                0.08750314265489578
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.35,
+              "stance": true,
+              "soleMinimumZ": 0.002109980210661888,
+              "soleMaximumZ": 0.019316570833325386,
+              "worldSoleCentroid": [
+                -0.4585348963737488,
+                0.2556212246417999,
+                0.010304253548383713
+              ],
+              "adjacentStanceDrift": 0.0005523116841789462
+            }
+          }
+        },
+        {
+          "frame": 16,
+          "seconds": 0.25,
+          "rootDistance": -0.475,
+          "feet": {
+            "Left": {
+              "phase": 0.875,
+              "stance": false,
+              "soleMinimumZ": 0.05673417076468468,
+              "soleMaximumZ": 0.09265083819627762,
+              "worldSoleCentroid": [
+                -0.6707656383514404,
+                0.09639163315296173,
+                0.07591499388217926
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.375,
+              "stance": true,
+              "soleMinimumZ": 0.0021429958287626505,
+              "soleMaximumZ": 0.01993761956691742,
+              "worldSoleCentroid": [
+                -0.45806965231895447,
+                0.25544142723083496,
+                0.010609520599246025
+              ],
+              "adjacentStanceDrift": 0.0004987776507024223
+            }
+          }
+        },
+        {
+          "frame": 17,
+          "seconds": 0.26666666666666666,
+          "rootDistance": -0.5066666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.9,
+              "stance": false,
+              "soleMinimumZ": 0.0416000634431839,
+              "soleMaximumZ": 0.07724613696336746,
+              "worldSoleCentroid": [
+                -0.7673773765563965,
+                0.09416364878416061,
+                0.060594502836465836
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.4,
+              "stance": true,
+              "soleMinimumZ": 0.0021653296425938606,
+              "soleMaximumZ": 0.02043192647397518,
+              "worldSoleCentroid": [
+                -0.457660973072052,
+                0.2552414536476135,
+                0.010854565538465977
+              ],
+              "adjacentStanceDrift": 0.00045498149407092217
+            }
+          }
+        },
+        {
+          "frame": 18,
+          "seconds": 0.2833333333333333,
+          "rootDistance": -0.5383333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.925,
+              "stance": false,
+              "soleMinimumZ": 0.026015862822532654,
+              "soleMaximumZ": 0.060245029628276825,
+              "worldSoleCentroid": [
+                -0.8484891653060913,
+                0.09146272391080856,
+                0.04420802742242813
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.425,
+              "stance": true,
+              "soleMinimumZ": 0.0021745103877037764,
+              "soleMaximumZ": 0.020798955112695694,
+              "worldSoleCentroid": [
+                -0.4573019742965698,
+                0.2550213634967804,
+                0.011038096621632576
+              ],
+              "adjacentStanceDrift": 0.00042109356543476275
+            }
+          }
+        },
+        {
+          "frame": 19,
+          "seconds": 0.3,
+          "rootDistance": -0.57,
+          "feet": {
+            "Left": {
+              "phase": 0.95,
+              "stance": false,
+              "soleMinimumZ": 0.012610897421836853,
+              "soleMaximumZ": 0.04476678743958473,
+              "worldSoleCentroid": [
+                -0.9104706048965454,
+                0.08873632550239563,
+                0.02964923530817032
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.45,
+              "stance": true,
+              "soleMinimumZ": 0.002168314764276147,
+              "soleMaximumZ": 0.021037230268120766,
+              "worldSoleCentroid": [
+                -0.456986665725708,
+                0.2547794580459595,
+                0.011158587411046028
+              ],
+              "adjacentStanceDrift": 0.0003974138159495925
+            }
+          }
+        },
+        {
+          "frame": 20,
+          "seconds": 0.31666666666666665,
+          "rootDistance": -0.6016666666666667,
+          "feet": {
+            "Left": {
+              "phase": 0.975,
+              "stance": false,
+              "soleMinimumZ": 0.0037311005871742964,
+              "soleMaximumZ": 0.03423318266868591,
+              "worldSoleCentroid": [
+                -0.9500117301940918,
+                0.08710438013076782,
+                0.0198583472520113
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.475,
+              "stance": true,
+              "soleMinimumZ": 0.0021445739548653364,
+              "soleMaximumZ": 0.021141601726412773,
+              "worldSoleCentroid": [
+                -0.4567107558250427,
+                0.2545124590396881,
+                0.011213023215532303
+              ],
+              "adjacentStanceDrift": 0.0003839462699312618
+            }
+          }
+        },
+        {
+          "frame": 21,
+          "seconds": 0.3333333333333333,
+          "rootDistance": -0.6333333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.0,
+              "stance": true,
+              "soleMinimumZ": 0.0009628873667679727,
+              "soleMaximumZ": 0.03152366727590561,
+              "worldSoleCentroid": [
+                -0.9640263319015503,
+                0.08791107684373856,
+                0.017141057178378105
+              ],
+              "adjacentStanceDrift": null
+            },
+            "Right": {
+              "phase": 0.5,
+              "stance": true,
+              "soleMinimumZ": 0.002100065117701888,
+              "soleMaximumZ": 0.021098637953400612,
+              "worldSoleCentroid": [
+                -0.45647209882736206,
+                0.2542138993740082,
+                0.011194395832717419
+              ],
+              "adjacentStanceDrift": 0.00038222379957316544
+            }
+          }
+        },
+        {
+          "frame": 22,
+          "seconds": 0.35,
+          "rootDistance": -0.6649999999999999,
+          "feet": {
+            "Left": {
+              "phase": 0.02499999999999991,
+              "stance": true,
+              "soleMinimumZ": 0.0013782947789877653,
+              "soleMaximumZ": 0.03255479410290718,
+              "worldSoleCentroid": [
+                -0.9638915061950684,
+                0.08967418223619461,
+                0.017923342064023018
+              ],
+              "adjacentStanceDrift": 0.0017682529624441611
+            },
+            "Right": {
+              "phase": 0.525,
+              "stance": true,
+              "soleMinimumZ": 0.002029980765655637,
+              "soleMaximumZ": 0.020881416276097298,
+              "worldSoleCentroid": [
+                -0.4562724232673645,
+                0.2538727819919586,
+                0.011089236475527287
+              ],
+              "adjacentStanceDrift": 0.0003952611719407445
+            }
+          }
+        },
+        {
+          "frame": 23,
+          "seconds": 0.36666666666666664,
+          "rootDistance": -0.6966666666666667,
+          "feet": {
+            "Left": {
+              "phase": 0.050000000000000044,
+              "stance": true,
+              "soleMinimumZ": 0.0016741541912779212,
+              "soleMaximumZ": 0.033083200454711914,
+              "worldSoleCentroid": [
+                -0.9635752439498901,
+                0.09106557816267014,
+                0.0183738823980093
+              ],
+              "adjacentStanceDrift": 0.0014268863013502295
+            },
+            "Right": {
+              "phase": 0.55,
+              "stance": true,
+              "soleMinimumZ": 0.001926564029417932,
+              "soleMaximumZ": 0.020439226180315018,
+              "worldSoleCentroid": [
+                -0.456118643283844,
+                0.253470242023468,
+                0.01087263971567154
+              ],
+              "adjacentStanceDrift": 0.0004309138147950589
+            }
+          }
+        },
+        {
+          "frame": 24,
+          "seconds": 0.38333333333333336,
+          "rootDistance": -0.7283333333333333,
+          "feet": {
+            "Left": {
+              "phase": 0.07499999999999996,
+              "stance": true,
+              "soleMinimumZ": 0.0018721824744716287,
+              "soleMaximumZ": 0.03323950245976448,
+              "worldSoleCentroid": [
+                -0.9631311893463135,
+                0.09220752865076065,
+                0.018575394526124
+              ],
+              "adjacentStanceDrift": 0.0012252491128116848
+            },
+            "Right": {
+              "phase": 0.575,
+              "stance": true,
+              "soleMinimumZ": 0.0017763134092092514,
+              "soleMaximumZ": 0.019673917442560196,
+              "worldSoleCentroid": [
+                -0.456030011177063,
+                0.2529706358909607,
+                0.010496954433619976
+              ],
+              "adjacentStanceDrift": 0.0005074070592537228
+            }
+          }
+        },
+        {
+          "frame": 25,
+          "seconds": 0.4,
+          "rootDistance": -0.7599999999999999,
+          "feet": {
+            "Left": {
+              "phase": 0.10000000000000009,
+              "stance": true,
+              "soleMinimumZ": 0.001982179470360279,
+              "soleMaximumZ": 0.03307841345667839,
+              "worldSoleCentroid": [
+                -0.9625771641731262,
+                0.0931612029671669,
+                0.018563080579042435
+              ],
+              "adjacentStanceDrift": 0.0011029227492192657
+            },
+            "Right": {
+              "phase": 0.6,
+              "stance": true,
+              "soleMinimumZ": 0.0015513410326093435,
+              "soleMaximumZ": 0.018361343070864677,
+              "worldSoleCentroid": [
+                -0.4560590088367462,
+                0.252292275428772,
+                0.009854601696133614
+              ],
+              "adjacentStanceDrift": 0.0006789799535886795
+            }
+          }
+        },
+        {
+          "frame": 26,
+          "seconds": 0.4166666666666667,
+          "rootDistance": -0.7916666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.125,
+              "stance": true,
+              "soleMinimumZ": 0.002009967342019081,
+              "soleMaximumZ": 0.032622795552015305,
+              "worldSoleCentroid": [
+                -0.9619155526161194,
+                0.0939611867070198,
+                0.01835266500711441
+              ],
+              "adjacentStanceDrift": 0.001038125143799913
+            },
+            "Right": {
+              "phase": 0.625,
+              "stance": false,
+              "soleMinimumZ": 0.004340458661317825,
+              "soleMaximumZ": 0.02085847407579422,
+              "worldSoleCentroid": [
+                -0.47022107243537903,
+                0.25198817253112793,
+                0.01254026684910059
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 27,
+          "seconds": 0.43333333333333335,
+          "rootDistance": -0.8233333333333334,
+          "feet": {
+            "Left": {
+              "phase": 0.1499999999999999,
+              "stance": true,
+              "soleMinimumZ": 0.0019606593996286392,
+              "soleMaximumZ": 0.03188110142946243,
+              "worldSoleCentroid": [
+                -0.9611396193504333,
+                0.09462881088256836,
+                0.017951486632227898
+              ],
+              "adjacentStanceDrift": 0.001023618315410671
+            },
+            "Right": {
+              "phase": 0.65,
+              "stance": false,
+              "soleMinimumZ": 0.012843371368944645,
+              "soleMaximumZ": 0.03140563517808914,
+              "worldSoleCentroid": [
+                -0.5099921822547913,
+                0.25270500779151917,
+                0.02187046967446804
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 28,
+          "seconds": 0.45,
+          "rootDistance": -0.855,
+          "feet": {
+            "Left": {
+              "phase": 0.17500000000000004,
+              "stance": true,
+              "soleMinimumZ": 0.0018415763042867184,
+              "soleMaximumZ": 0.030857622623443604,
+              "worldSoleCentroid": [
+                -0.960237979888916,
+                0.09517771750688553,
+                0.017365437000989914
+              ],
+              "adjacentStanceDrift": 0.0010555814510689585
+            },
+            "Right": {
+              "phase": 0.675,
+              "stance": false,
+              "soleMinimumZ": 0.02557476982474327,
+              "soleMaximumZ": 0.046749260276556015,
+              "worldSoleCentroid": [
+                -0.5721457004547119,
+                0.25371527671813965,
+                0.035641126334667206
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 29,
+          "seconds": 0.4666666666666667,
+          "rootDistance": -0.8866666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.19999999999999996,
+              "stance": true,
+              "soleMinimumZ": 0.0016637665685266256,
+              "soleMaximumZ": 0.029558788985013962,
+              "worldSoleCentroid": [
+                -0.959196150302887,
+                0.09561754763126373,
+                0.016603080555796623
+              ],
+              "adjacentStanceDrift": 0.0011308666904874152
+            },
+            "Right": {
+              "phase": 0.7,
+              "stance": false,
+              "soleMinimumZ": 0.04047009348869324,
+              "soleMaximumZ": 0.06377570331096649,
+              "worldSoleCentroid": [
+                -0.6531345844268799,
+                0.2546319365501404,
+                0.05136704817414284
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 30,
+          "seconds": 0.48333333333333334,
+          "rootDistance": -0.9183333333333332,
+          "feet": {
+            "Left": {
+              "phase": 0.2250000000000001,
+              "stance": true,
+              "soleMinimumZ": 0.0014428866561502218,
+              "soleMaximumZ": 0.027997149154543877,
+              "worldSoleCentroid": [
+                -0.9579999446868896,
+                0.09595496207475662,
+                0.01567823998630047
+              ],
+              "adjacentStanceDrift": 0.0012428822985797142
+            },
+            "Right": {
+              "phase": 0.725,
+              "stance": false,
+              "soleMinimumZ": 0.05519755557179451,
+              "soleMaximumZ": 0.07971366494894028,
+              "worldSoleCentroid": [
+                -0.7492296695709229,
+                0.2553737163543701,
+                0.06654282659292221
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 31,
+          "seconds": 0.5,
+          "rootDistance": -0.95,
+          "feet": {
+            "Left": {
+              "phase": 0.25,
+              "stance": true,
+              "soleMinimumZ": 0.0011992843355983496,
+              "soleMaximumZ": 0.02619369700551033,
+              "worldSoleCentroid": [
+                -0.9566356539726257,
+                0.09619490802288055,
+                0.014611278660595417
+              ],
+              "adjacentStanceDrift": 0.0013852304016355188
+            },
+            "Right": {
+              "phase": 0.75,
+              "stance": false,
+              "soleMinimumZ": 0.06747255474328995,
+              "soleMaximumZ": 0.09200652688741684,
+              "worldSoleCentroid": [
+                -0.8567266464233398,
+                0.2559698820114136,
+                0.07877255976200104
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 32,
+          "seconds": 0.5166666666666667,
+          "rootDistance": -0.9816666666666667,
+          "feet": {
+            "Left": {
+              "phase": 0.2749999999999999,
+              "stance": true,
+              "soleMinimumZ": 0.0009571100817993283,
+              "soleMaximumZ": 0.02417851611971855,
+              "worldSoleCentroid": [
+                -0.9550932049751282,
+                0.09634086489677429,
+                0.013429054990410805
+              ],
+              "adjacentStanceDrift": 0.0015493393489394098
+            },
+            "Right": {
+              "phase": 0.775,
+              "stance": false,
+              "soleMinimumZ": 0.0754263624548912,
+              "soleMaximumZ": 0.09864344447851181,
+              "worldSoleCentroid": [
+                -0.972016453742981,
+                0.25647833943367004,
+                0.08612225204706192
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 33,
+          "seconds": 0.5333333333333333,
+          "rootDistance": -1.0133333333333332,
+          "feet": {
+            "Left": {
+              "phase": 0.30000000000000004,
+              "stance": true,
+              "soleMinimumZ": 0.0007428539101965725,
+              "soleMaximumZ": 0.021989552304148674,
+              "worldSoleCentroid": [
+                -0.9533663392066956,
+                0.09639494121074677,
+                0.012163633480668068
+              ],
+              "adjacentStanceDrift": 0.0017277122367668188
+            },
+            "Right": {
+              "phase": 0.8,
+              "stance": false,
+              "soleMinimumZ": 0.0779241994023323,
+              "soleMaximumZ": 0.0985758826136589,
+              "worldSoleCentroid": [
+                -1.091551661491394,
+                0.25691673159599304,
+                0.08748199790716171
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 34,
+          "seconds": 0.55,
+          "rootDistance": -1.045,
+          "feet": {
+            "Left": {
+              "phase": 0.32499999999999996,
+              "stance": true,
+              "soleMinimumZ": 0.000583406537771225,
+              "soleMaximumZ": 0.019771825522184372,
+              "worldSoleCentroid": [
+                -0.951453685760498,
+                0.09635836631059647,
+                0.01085018552839756
+              ],
+              "adjacentStanceDrift": 0.0019130031316773658
+            },
+            "Right": {
+              "phase": 0.825,
+              "stance": false,
+              "soleMinimumZ": 0.07471838593482971,
+              "soleMaximumZ": 0.09191881120204926,
+              "worldSoleCentroid": [
+                -1.211714506149292,
+                0.25721773505210876,
+                0.08274831622838974
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 35,
+          "seconds": 0.5666666666666667,
+          "rootDistance": -1.0766666666666667,
+          "feet": {
+            "Left": {
+              "phase": 0.3500000000000001,
+              "stance": true,
+              "soleMinimumZ": 0.0005048466846346855,
+              "soleMaximumZ": 0.0174685288220644,
+              "worldSoleCentroid": [
+                -0.9493585824966431,
+                0.09623141586780548,
+                0.009525185450911522
+              ],
+              "adjacentStanceDrift": 0.002098946000793715
+            },
+            "Right": {
+              "phase": 0.85,
+              "stance": false,
+              "soleMinimumZ": 0.06640738248825073,
+              "soleMaximumZ": 0.08054247498512268,
+              "worldSoleCentroid": [
+                -1.328706979751587,
+                0.25725558400154114,
+                0.07273214310407639
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 36,
+          "seconds": 0.5833333333333334,
+          "rootDistance": -1.1083333333333334,
+          "feet": {
+            "Left": {
+              "phase": 0.375,
+              "stance": true,
+              "soleMinimumZ": 0.0005304906517267227,
+              "soleMaximumZ": 0.0152841592207551,
+              "worldSoleCentroid": [
+                -0.9470878839492798,
+                0.09601302444934845,
+                0.008223525248467922
+              ],
+              "adjacentStanceDrift": 0.002281176605318709
+            },
+            "Right": {
+              "phase": 0.875,
+              "stance": false,
+              "soleMinimumZ": 0.0535598024725914,
+              "soleMaximumZ": 0.06588029116392136,
+              "worldSoleCentroid": [
+                -1.4385899305343628,
+                0.2569162845611572,
+                0.05892437323927879
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 37,
+          "seconds": 0.6,
+          "rootDistance": -1.14,
+          "feet": {
+            "Left": {
+              "phase": 0.3999999999999999,
+              "stance": true,
+              "soleMinimumZ": 0.0006808041362091899,
+              "soleMaximumZ": 0.013188941404223442,
+              "worldSoleCentroid": [
+                -0.9446513056755066,
+                0.09570110589265823,
+                0.0069774179719388485
+              ],
+              "adjacentStanceDrift": 0.0024564622438785285
+            },
+            "Right": {
+              "phase": 0.9,
+              "stance": false,
+              "soleMinimumZ": 0.03864295035600662,
+              "soleMaximumZ": 0.04944746941328049,
+              "worldSoleCentroid": [
+                -1.537400245666504,
+                0.2561478316783905,
+                0.043276794254779816
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 38,
+          "seconds": 0.6166666666666667,
+          "rootDistance": -1.1716666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.42500000000000004,
+              "stance": true,
+              "soleMinimumZ": 0.0009729918674565852,
+              "soleMaximumZ": 0.011149471625685692,
+              "worldSoleCentroid": [
+                -0.9420584440231323,
+                0.09529125690460205,
+                0.005814798176288605
+              ],
+              "adjacentStanceDrift": 0.002625053871175468
+            },
+            "Right": {
+              "phase": 0.925,
+              "stance": false,
+              "soleMinimumZ": 0.02369992621243,
+              "soleMaximumZ": 0.03342752531170845,
+              "worldSoleCentroid": [
+                -1.6212024688720703,
+                0.25497668981552124,
+                0.027984265238046646
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 39,
+          "seconds": 0.6333333333333333,
+          "rootDistance": -1.2033333333333334,
+          "feet": {
+            "Left": {
+              "phase": 0.44999999999999996,
+              "stance": true,
+              "soleMinimumZ": 0.00023381851497106254,
+              "soleMaximumZ": 0.00919547863304615,
+              "worldSoleCentroid": [
+                -0.9393186569213867,
+                0.09477604180574417,
+                0.004759000614285469
+              ],
+              "adjacentStanceDrift": 0.0027878092075396305
+            },
+            "Right": {
+              "phase": 0.95,
+              "stance": false,
+              "soleMinimumZ": 0.010698514059185982,
+              "soleMaximumZ": 0.01999755948781967,
+              "worldSoleCentroid": [
+                -1.686037540435791,
+                0.25355225801467896,
+                0.015210621058940887
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 40,
+          "seconds": 0.65,
+          "rootDistance": -1.2349999999999999,
+          "feet": {
+            "Left": {
+              "phase": 0.4750000000000001,
+              "stance": true,
+              "soleMinimumZ": -0.0004764030745718628,
+              "soleMaximumZ": 0.007715979591012001,
+              "worldSoleCentroid": [
+                -0.9364365339279175,
+                0.09414225071668625,
+                0.0038289506919682026
+              ],
+              "adjacentStanceDrift": 0.002950987045591618
+            },
+            "Right": {
+              "phase": 0.975,
+              "stance": false,
+              "soleMinimumZ": 0.0022564607206732035,
+              "soleMaximumZ": 0.011372102424502373,
+              "worldSoleCentroid": [
+                -1.7275640964508057,
+                0.25246790051460266,
+                0.006784279830753803
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        },
+        {
+          "frame": 41,
+          "seconds": 0.6666666666666666,
+          "rootDistance": -1.2666666666666666,
+          "feet": {
+            "Left": {
+              "phase": 0.5,
+              "stance": true,
+              "soleMinimumZ": -0.001038157963193953,
+              "soleMaximumZ": 0.006472418084740639,
+              "worldSoleCentroid": [
+                -0.9334113597869873,
+                0.09336800128221512,
+                0.0030397551599889994
+              ],
+              "adjacentStanceDrift": 0.003122681658052102
+            },
+            "Right": {
+              "phase": 0.0,
+              "stance": true,
+              "soleMinimumZ": -0.0004751521337311715,
+              "soleMaximumZ": 0.00840887613594532,
+              "worldSoleCentroid": [
+                -1.7406888008117676,
+                0.2530479431152344,
+                0.003970623016357422
+              ],
+              "adjacentStanceDrift": null
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
