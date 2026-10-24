@@ -1121,9 +1121,11 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     if(options.error.empty() && options.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled) {
         const auto* checkpoint=horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
+        const bool normalRoute=options.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::NormalShared64 &&
+            options.developmentCheckpoint=="chapter-kit-reunion";
         if(!options.requested || !options.captureHidden || !checkpoint ||
            !horde::gameplay::DevelopmentCheckpointRequiresAuthoredChapter(*checkpoint) || options.environmentSurvey.requested ||
-           options.validateStaticZoneCutover || options.validateChapterRoundTrip || !options.inspectStaticWorldMaterial.empty())
+           options.validateStaticZoneCutover || (options.validateChapterRoundTrip && !normalRoute) || !options.inspectStaticWorldMaterial.empty())
             options.error="Forest route proof requires an unfiltered hidden authored-chapter capture.";
     }
     if(options.error.empty() && options.validateStaticTriangleCutover && !options.staticTriangleOmissions.empty())
@@ -6112,7 +6114,12 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
 #if defined(_DEBUG)
     if(ctx.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled) {
         using Mode=horde::vulkan::raytracing::PresentableTinyRtScene::ForestRouteProofMode;
-        const auto mode=ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedExisting64?
+        const bool normalShared=ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::NormalShared64;
+        if(normalShared && !ctx.rtScene.SetSharedForestGeometryEnabled(true)) {
+            ctx.lastRtFrameError="Normal shared forest must be selected before scene creation.";return false;
+        }
+        const auto mode=normalShared?Mode::Disabled:
+            ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedExisting64?
             Mode::SharedExisting64:
             ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedRetention64?
             Mode::SharedRetention64:
@@ -8481,7 +8488,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         if(!WriteReportFile(outputDirectory/"forest-route-recreate.json",proof.str()) || !complete)
             return fail("Forest proof recreation changed its frozen pixels/resources or lacked a fresh scene epoch; evidence retained.");
     }
-    if(context.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedRetention64 &&
+    if((context.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedRetention64 ||
+        context.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::NormalShared64) &&
        context.developmentCheckpoint.starts_with("chapter-forest-retention-")) {
         // Bounded coherent restaging, not natural traversal. The existing
         // checkpoint path resolves camera, hands and lights together; an unsafe

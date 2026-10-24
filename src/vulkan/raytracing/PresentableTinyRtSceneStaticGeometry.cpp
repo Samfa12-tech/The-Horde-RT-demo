@@ -45,6 +45,7 @@ bool LanternTransportBoundsAdmitted(const horde::scene::assets::StaticMeshAsset&
 void PresentableTinyRtScene::AdmitOrdinaryStaticDetail()
 {
     ordinaryStaticOmissions_.reset();
+    if(UsesSharedForestGeometry())return; // Whole-instance policy owns shared masters; never baked triangle IDs.
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled)return; // Explicit fully resident A/B; no old world-ID certificate.
 #endif
@@ -123,11 +124,10 @@ bool CorridorFrameSourcesInside(const RtSceneFrameInputs& f) {
 }
 }
 
-#if defined(_DEBUG)
 bool PresentableTinyRtScene::ForestRetentionIdentityMatches() const
 {
     const auto& proof=forestRetentionProof_;
-    if(!proof.admitted || forestRouteProofMode_!=ForestRouteProofMode::SharedRetention64 ||
+    if(!proof.admitted || !UsesSharedForestRetention() ||
        !proof.source || proof.source!=fullStaticGeometrySource_ || !proof.prepared ||
        proof.prepared!=forestSharedLayout_.prepared || !forestSharedLayout_.supplementalPlacements.empty() ||
        !proof.generation || proof.generation!=staticGeometryGeneration_)return false;
@@ -143,7 +143,7 @@ void PresentableTinyRtScene::AdmitSharedForestRetentionProof()
 {
     forestRetentionProof_={};forestRetentionLastOmitted_={};
     forestRetentionFrameEligible_=false;forestRetentionFrameGeneration_=0;forestRetentionOmittedCount_=0;
-    if(forestRouteProofMode_!=ForestRouteProofMode::SharedRetention64 || !fullStaticGeometrySource_ ||
+    if(!UsesSharedForestRetention() || !fullStaticGeometrySource_ ||
        !forestSharedLayout_.prepared || !forestSharedLayout_.supplementalPlacements.empty() ||
        !developmentRescueJourney_ || sceneProfile_!=RtSceneProfile::Showcase || !staticGeometryGeneration_ ||
        staticGeometryGeneration_==UINT64_MAX || !LanternTransportBoundsAdmitted(rewardLanternRingAsset_,rewardLanternBodyAsset_))return;
@@ -235,7 +235,6 @@ void PresentableTinyRtScene::ApplySharedForestRetentionProof(
         instances[28u+i].mask=0u;forestRetentionLastOmitted_[i]=true;++forestRetentionOmittedCount_;
     }
 }
-#endif
 
 bool PresentableTinyRtScene::RecoverOrdinaryStaticPreparation(bool safe,StaticDetailFrame& decision,std::string& diagnostic)
 {
@@ -264,6 +263,10 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
     if(!ordinaryStaticReduced_ && !ordinaryStaticCandidate_ && StaticGeometryHasCompleteContributors() &&
        simulation.Snapshot().staticDetailLease.resourceGeneration)
         simulation.ReleaseStaticDetailLease(simulation.Snapshot().staticDetailLease.resourceGeneration);
+    // The shared representation keeps every payload resident and restores masks
+    // in this frame's TLAS record. No combined baked-owner transaction or spatial
+    // eviction lease is required; preserve the completed old-lease release above.
+    if(UsesSharedForestGeometry()){diagnostic.clear();return true;}
     const auto snapshot=simulation.Snapshot();
     constexpr float identity[3][4]={{1,0,0,0},{0,1,0,0},{0,0,1,0}};
     const bool safe=ordinaryStaticFacesVerified_ && ordinaryStaticOmissions_ &&
@@ -328,6 +331,7 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
 
 void PresentableTinyRtScene::FinishOrdinaryStaticDetail(horde::gameplay::simulation::GameSimulation& simulation)
 {
+    if(UsesSharedForestGeometry())return;
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled)return;
 #endif
@@ -360,6 +364,10 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic,
     const std::uint8_t retainedTriangleRegions)
 {
+    if(UsesSharedForestGeometry() && (!retainedWorldFamilies.empty() ||
+       retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions)) {
+        diagnostic="Shared forest filtered packing requires a separate ownership proof.";return false;
+    }
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled &&
        (!retainedWorldFamilies.empty() || retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions)) {
@@ -423,8 +431,7 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
             row.primitiveSelection = retainedWorldFamilies;
             if(retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions)row.asset=&regionSelectedWorld;
         }
-#if defined(_DEBUG)
-    if(UsesSharedForestRouteProof()) {
+    if(UsesSharedForestGeometry()) {
         if(!forestSharedLayout_.prepared || !forestSharedLayout_.commonPrimitiveCount ||
            forestSharedLayout_.masters[0].primitiveCount!=3u || forestSharedLayout_.masters[1].primitiveCount!=3u ||
            forestSharedLayout_.masters[0].primitiveOffset!=forestSharedLayout_.commonPrimitiveCount ||
@@ -441,7 +448,6 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
             row.primitiveCount=3u;registrations.push_back(row);
         }
     }
-#endif
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)
@@ -517,6 +523,7 @@ std::shared_ptr<const RtStaticTriangleOmissions> PresentableTinyRtScene::CreateS
     std::uint64_t expectedGeneration, std::span<const std::uint32_t> triangles,
     std::string& diagnostic) const
 {
+    if(UsesSharedForestGeometry()){diagnostic="Shared forest cannot create baked world-triangle omissions.";return {};}
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled) {
         diagnostic="Forest route proof cannot reuse or create the ordinary world-triangle omission certificate.";return {};
@@ -575,6 +582,7 @@ bool PresentableTinyRtScene::BeginStaticGeometryReplacement(
     std::string& diagnostic, const std::uint8_t retainedTriangleRegions,
     std::shared_ptr<const RtStaticTriangleOmissions> omissions)
 {
+    if(UsesSharedForestGeometry()){diagnostic="Shared forest retains both masters; combined owner replacement is unadmitted.";return false;}
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled) {
         diagnostic="Fully resident forest route proof does not admit static cutover.";return false;
@@ -878,6 +886,7 @@ bool PresentableTinyRtScene::AdvanceStaticGeometryReplacement(
 bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t expectedGeneration,
     const StaticCutoverApi& api, std::string& diagnostic)
 {
+    if(UsesSharedForestGeometry()){diagnostic="Shared forest cannot publish a combined baked-owner cutover.";return false;}
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled) {
         diagnostic="Fully resident forest route proof does not admit static cutover.";return false;

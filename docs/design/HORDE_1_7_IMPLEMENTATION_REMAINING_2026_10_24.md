@@ -27,7 +27,7 @@ Sam's latest direction is to keep implementing agreed work until only actual pla
 
 | Item | Required next work / boundary |
 | --- | --- |
-| Shared forest/world depth | [Canonical CPU preparation](../evidence/2026-10-24-shared-forest-preparation/README.md) and the [full-size Windows RT proof](../evidence/2026-10-24-shared-forest-route/README.md) now share two masters across all 64 placements in an explicit diagnostic. High capacities, legacy roles, partial reflection and frozen recreation pass; tracked device-local allocations fall 45,372,864 B. Normal forest still uses the compatibility bake. Timing gains, production omission/cutover and Android are unadmitted. The [actual-view sheet](../evidence/2026-10-23-forest-view-sheet/README.md) still fails surrounding depth. The [F01 twelve-root trial](../evidence/2026-10-24-f01-forest-sector/README.md) now passes native grounding/capacity/recreation and is measured, but still fails forest massing; collision remains unadmitted. Prepare the next coherent massing/enclosure choice before wider integration. Preserve topo, route/F04 vista, original masters and explicit omission provenance. |
+| Shared forest/world depth | [Normal-owner integration](../evidence/2026-10-24-normal-shared-forest/README.md) now compiles the existing-master owner and whole-instance retention in common Debug/Release/Android source. Explicit pre-init selection preserves all64 placements and both resident masters; the normal-controller Windows route/reset/recreation passes. Default remains baked/OFF because the landing sweep costs11.58ms GPU versus7.98/8.12ms controls, despite45,372,864B lower tracked device-local allocation. No gain or phone admission is claimed. Legacy baked fallback now passes its unchanged unload/restore gate after correcting certificate admission order. The [actual-view sheet](../evidence/2026-10-23-forest-view-sheet/README.md) and [F01 twelve-root trial](../evidence/2026-10-24-f01-forest-sector/README.md) still fail surrounding massing; extra-trunk collision remains unadmitted. Preserve topo, route/F04 vista, original masters and explicit omission provenance. |
 | Tree-generator/replacement canopy | Specific owner deferral remains. The private Easy Tree study is unadmitted, not a production shared-BLAS implementation, and failed the original production index budget. Separate existing-master engine reuse from replacement art; neither is completed by the rejected one-pine LOD2 study. Keep LOD1 and original masters. |
 | Torch clearance/framing | The defect is real and prior runtime trials remain withdrawn. One [authored cross-chest endpoint](../evidence/2026-10-24-compact-carry-study/README.md) is now rejected: complete flame containment, square hand framing and readable native close views fail. Editable source/evidence is retained; runtime is restored. A genuinely different pose/geometry feasibility choice is still required before a transition; no general solver or repeated family tuning. The reported phone black-world cause remains unknown. |
 | Chimney smoke / outdoor effects | Shared bounded High/Low volumetric direction is planned, not admitted. Parked B01/v5 prototype is not accepted runtime. Participating mist, fireflies, foliage wind and representative LOD transitions need explicit retained/omitted/deferred release disposition and measured combined-scene cost. Mobile Mist OFF and saved preferences remain. No new expensive effect is authorized by a missing phone. |
@@ -48,12 +48,14 @@ Phone acceptance remains for the current HUD, earned equipment rotation, natural
 
 ## Execution queue
 
-The [whole-instance retention checkpoint](../evidence/2026-10-24-shared-forest-retention/README.md)
-proves a separate Debug-only mask seam:13 eligible whole trees, actual unsafe-frame
-all64 restoration, identical matched RT images and unchanged resident resources.
-No baked master-triangle omissions or production cutover guards were reused.
-Normal shared adoption, visible world depth, canopy decision and physical cost
-remain unfinished; this engine proof does not change their release status.
+The [normal-owner checkpoint](../evidence/2026-10-24-normal-shared-forest/README.md)
+extends the bounded mask seam to common source, with default OFF and legacy
+cutover guards preserved. It validates1484 normal route/reset frames and same-owner
+recreation. Cost admission remains blocked by the landing regression; a further
+unbounded A/B loop is not selected. Visible world depth, canopy decision and
+physical cost remain unfinished. The [owner decision sheet](HORDE_1_7_OWNER_DECISIONS_2026_10_24.md)
+consolidates flask policies, effects disposition and canopy authority, distinguishing
+original quotations from later documentary notes.
 
 1. Review the [actual F01 twelve-root trial](../evidence/2026-10-24-f01-forest-sector/README.md) and prepare one coherent woodland massing/terrain-enclosure choice. It renders, grounds and recreates correctly at small allocation cost, but remains visually sparse; do not call it finished or build wider collision integration before retaining a composition. Revisit replacement-canopy deferral explicitly if that path is selected. Normal adoption still needs generation-matched extra collision, omission/cutover and physical performance evidence.
 2. On the next authorized phone window, validate the implemented Android benchmark sizing/rollback and current touch controls. Desktop/source success is not device acceptance.

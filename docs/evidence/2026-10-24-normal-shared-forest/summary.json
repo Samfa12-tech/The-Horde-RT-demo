@@ -1,0 +1,4590 @@
+{
+  "schema": 1,
+  "baseCommit": "7a31db97b2197988ecccdb0684ab4d2caa75ce57",
+  "defaultEnabled": false,
+  "normalGameplayAdmission": "blocked: landing GPU cost regression; retain baked default",
+  "phoneUsed": false,
+  "foregroundActivated": false,
+  "sourceFiles": {
+    "docs/design/HORDE_1_7_CURRENT_DESIGN_INDEX.md": "25400f250c085f0a3205b432f06576f849b3b212825f6281fea190b451838f2d",
+    "docs/design/HORDE_1_7_IMPLEMENTATION_REMAINING_2026_10_24.md": "bd728f13120286ac25a95cff2ef897a402d55e117e77befdb73258a73b068f56",
+    "docs/design/HORDE_1_7_OWNER_DECISIONS_2026_10_24.md": "6d7659e26fb2a048280b8621aa5dc1b2125b4bcd4ddccf353f239f180ac5270d",
+    "src/platform/windows/DiagnosticWindow.cpp": "fa2dfdd1b3a965c28c1febf08287f214cb7b6b4565132a1e0ac0ee821d5f17e2",
+    "src/platform/windows/WindowsChapterRoundTripCapture.inl": "11c34acadfe2edd1a155693cf0e340060cb1a9adaa9ee1e4b069d5ed0a06479a",
+    "src/platform/windows/WindowsForestRouteProofLaunch.h": "41e6d5a9e2087c908ae8e1867a186ddb7f9f68371aac2569fe78f6d23cb4d434",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "d6f219d280e3d6e095ad36327a3c13d456a40db0e59c809e8ebd3524741f546e",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "5d26e8e791bc5c61f3802f66716c415a6c5720f9a0cd3fe9956b77d04702a737",
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": "ed1383ffb527e655f8ec4bbe72c4d785c103b69dd8b60892b2610ee867e75cfa",
+    "tests/GraphicsPreviewTests.cpp": "f42a1b62079f21933acdd7c260f9e20e7d2bbdcbda43762a72dc355bcc2a59b8",
+    "tests/StaticGeometryCutoverTests.cpp": "9400b54be4b6634dff73c052cc6e88f71425bfdd1c68cc967f2b3f18dc70a94d",
+    "docs/evidence/2026-10-24-normal-shared-forest/README.md": "56a9dcd1f4f358ad50aafd41551a11aaf5c70bee4e6f10d48bdf152bed59e171"
+  },
+  "views": [
+    {
+      "label": "f01-baked-r1",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\f01-baked-r1",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-forest-first-bend",
+          "--forest-route-proof",
+          "baked-resident"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 14643200,
+          "sha256": "04075bd68720fe2fc3b850d8575e4b07de11325f3f51f13f69b6c8c1b6417274"
+        },
+        "pid": 32204,
+        "exitCode": 0,
+        "seconds": 20.797000000005937,
+        "pending": false,
+        "gpuBefore": {
+          "exitCode": 0,
+          "values": "42, 180, 405, P8, 4.10"
+        },
+        "gpuAfter": {
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 4.83"
+        },
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 39974720,
+        "indexBytes": 6379020,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.6052,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.9142,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.691,
+        "productionPropBlasBytes": 27319040,
+        "productionPropBlasBuildMilliseconds": 19.1721
+      },
+      "proof": {
+        "mode": "baked-resident",
+        "defaultEnabled": false,
+        "requestedSharedGeometry": false,
+        "activeSharedGeometry": false,
+        "proofOverride": true,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "forestOrPerformanceAdmitted": false,
+        "physicalDefinitions": 28,
+        "physicalStorageCapacity": 104,
+        "primitiveRows": 32,
+        "primitiveCapacity": 36,
+        "packedMaterialRows": 30,
+        "finalMaterialRows": 32,
+        "materialCapacity": 32,
+        "metadataCapacity": 28,
+        "staticRegistrations": 13,
+        "uniqueStaticAssets": 13,
+        "staticAssetCapacity": 13,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 11,
+        "blasCount": 20,
+        "masterRanges": [
+          {
+            "offset": 0,
+            "count": 0,
+            "allocationBytes": 0
+          },
+          {
+            "offset": 0,
+            "count": 0,
+            "allocationBytes": 0
+          }
+        ],
+        "legacyDefinitionCount": 28,
+        "placementsCount": 64,
+        "placementEvidenceSha256": "cbae1d728f8976e8602eeab7c1a63dbd08a68b90f54dda603ee236b885ed74bf",
+        "legacyDefinitionEvidenceSha256": "4ea4261c5b31d11660b6479cef5659e070bdf0703855aef8c1481db0d2f8c6a3",
+        "wholeInstanceRetention": {
+          "eligibleIds": [],
+          "omittedIds": [],
+          "boundsEvidenceSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "recreation": {
+        "complete": true,
+        "sameRendererObject": true,
+        "initialPausedInputBarrier": true,
+        "sceneEpochBefore": 2,
+        "sceneEpochAfter": 3,
+        "resourcesMatch": true,
+        "simulationTickBefore": 1720,
+        "simulationTickAfter": 1720,
+        "storageImageSha256Matches": true
+      },
+      "frames": [
+        {
+          "file": "201-chapter-forest-first-bend.png",
+          "pngSha256": "a3aa2f57586e81e8c1922471346660b24059f2a30f7e87e62e508141d2ba6a97",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 10.73415,
+            "meanMs": 57.595667
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 2,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 12,
+              "recordSerial": 12,
+              "submissionSerial": 12,
+              "completionSerial": 12,
+              "simulationTick": 1720,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 51,
+              "memoryAllocationCount": 60,
+              "bottomLevelAccelerationStructureCount": 20,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 28,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 48298944,
+              "deviceLocalBytes": 372464608
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 12,
+              "wholeRtGpuMs": 3.011232,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 12,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 1,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 22394,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 12,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0116,
+              "blasRefitRecordCpuMs": 0.0304,
+              "tlasUpdateRecordCpuMs": 0.0087,
+              "traceCopyRecordCpuMs": 0.0306,
+              "frameFenceWaitCpuMs": 0.679,
+              "imageAcquireCpuMs": 0.0065,
+              "queueSubmitCpuMs": 0.057,
+              "presentCallCpuMs": 3.827,
+              "wholeFrameCycleCpuMs": 6.1267,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        },
+        {
+          "file": "201-chapter-forest-first-bend-recreated.png",
+          "pngSha256": "a3aa2f57586e81e8c1922471346660b24059f2a30f7e87e62e508141d2ba6a97",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 7.01715,
+            "meanMs": 19.369267
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 3,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 24,
+              "recordSerial": 24,
+              "submissionSerial": 24,
+              "completionSerial": 24,
+              "simulationTick": 1720,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 51,
+              "memoryAllocationCount": 60,
+              "bottomLevelAccelerationStructureCount": 20,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 28,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 48298944,
+              "deviceLocalBytes": 372464608
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 24,
+              "wholeRtGpuMs": 4.405312,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 24,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 2,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 22394,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 24,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0368,
+              "blasRefitRecordCpuMs": 0.0285,
+              "tlasUpdateRecordCpuMs": 0.0083,
+              "traceCopyRecordCpuMs": 0.0413,
+              "frameFenceWaitCpuMs": 3.8645,
+              "imageAcquireCpuMs": 0.0037,
+              "queueSubmitCpuMs": 0.0298,
+              "presentCallCpuMs": 0.1037,
+              "wholeFrameCycleCpuMs": 5.6042,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "f01-shared-r1",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\f01-shared-r1",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-forest-first-bend",
+          "--forest-route-proof",
+          "normal-shared64"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 14643200,
+          "sha256": "04075bd68720fe2fc3b850d8575e4b07de11325f3f51f13f69b6c8c1b6417274"
+        },
+        "pid": 16568,
+        "exitCode": 0,
+        "seconds": 19.796999999991385,
+        "pending": false,
+        "gpuBefore": {
+          "exitCode": 0,
+          "values": "43, 1890, 9001, P4, 7.23"
+        },
+        "gpuAfter": {
+          "exitCode": 0,
+          "values": "44, 172, 405, P8, 4.06"
+        },
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 17686464,
+        "indexBytes": 2621076,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 576,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.8265,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 1.0206,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.8059,
+        "productionPropBlasBytes": 7964672,
+        "productionPropBlasBuildMilliseconds": 12.6485
+      },
+      "proof": {
+        "mode": "normal-shared64",
+        "defaultEnabled": false,
+        "requestedSharedGeometry": true,
+        "activeSharedGeometry": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "forestOrPerformanceAdmitted": false,
+        "physicalDefinitions": 92,
+        "physicalStorageCapacity": 104,
+        "primitiveRows": 36,
+        "primitiveCapacity": 36,
+        "packedMaterialRows": 30,
+        "finalMaterialRows": 32,
+        "materialCapacity": 32,
+        "metadataCapacity": 28,
+        "staticRegistrations": 15,
+        "uniqueStaticAssets": 13,
+        "staticAssetCapacity": 13,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 9,
+        "blasCount": 22,
+        "masterRanges": [
+          {
+            "offset": 9,
+            "count": 3,
+            "allocationBytes": 314880
+          },
+          {
+            "offset": 12,
+            "count": 3,
+            "allocationBytes": 321792
+          }
+        ],
+        "legacyDefinitionCount": 28,
+        "placementsCount": 64,
+        "placementEvidenceSha256": "b7da16588456c0043c39a2f22c727ca473e9977195d96eec3961762d85d340f5",
+        "legacyDefinitionEvidenceSha256": "4ea4261c5b31d11660b6479cef5659e070bdf0703855aef8c1481db0d2f8c6a3",
+        "wholeInstanceRetention": {
+          "admitted": true,
+          "boundToCurrentOwners": true,
+          "certificateGeneration": 1,
+          "currentGeneration": 1,
+          "frameEligible": false,
+          "frameGeneration": 0,
+          "eligibleWholeInstances": 13,
+          "omittedWholeInstances": 0,
+          "retainedWholeInstances": 64,
+          "bothMastersResident": true,
+          "bakedTriangleCertificateApplied": false,
+          "residencySavingClaimed": false,
+          "eligibleIds": [
+            11,
+            18,
+            19,
+            22,
+            26,
+            29,
+            31,
+            36,
+            42,
+            51,
+            55,
+            56,
+            58
+          ],
+          "omittedIds": [],
+          "boundsEvidenceSha256": "f9f7e91b48843a6f00d7010100b5ecf5e839e0c60c15a2568019dc2795fa92ab"
+        }
+      },
+      "recreation": {
+        "complete": true,
+        "sameRendererObject": true,
+        "initialPausedInputBarrier": true,
+        "sceneEpochBefore": 2,
+        "sceneEpochAfter": 3,
+        "resourcesMatch": true,
+        "simulationTickBefore": 1720,
+        "simulationTickAfter": 1720,
+        "storageImageSha256Matches": true
+      },
+      "frames": [
+        {
+          "file": "201-chapter-forest-first-bend.png",
+          "pngSha256": "635d85c5a89e634fd804f19d402579d93ed63b19185fe3a1bc53a09a6e644afb",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 10.55565,
+            "meanMs": 60.798975
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 2,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 12,
+              "recordSerial": 12,
+              "submissionSerial": 12,
+              "completionSerial": 12,
+              "simulationTick": 1720,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 53,
+              "memoryAllocationCount": 62,
+              "bottomLevelAccelerationStructureCount": 22,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 92,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 22256896,
+              "deviceLocalBytes": 327091744
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 12,
+              "wholeRtGpuMs": 6.37856,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 12,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 1,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 22394,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 12,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0713,
+              "blasRefitRecordCpuMs": 0.034,
+              "tlasUpdateRecordCpuMs": 0.0137,
+              "traceCopyRecordCpuMs": 0.0457,
+              "frameFenceWaitCpuMs": 7.4735,
+              "imageAcquireCpuMs": 0.007,
+              "queueSubmitCpuMs": 0.1198,
+              "presentCallCpuMs": 0.1696,
+              "wholeFrameCycleCpuMs": 10.3397,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        },
+        {
+          "file": "201-chapter-forest-first-bend-recreated.png",
+          "pngSha256": "635d85c5a89e634fd804f19d402579d93ed63b19185fe3a1bc53a09a6e644afb",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 6.98655,
+            "meanMs": 12.428858
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 3,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 24,
+              "recordSerial": 24,
+              "submissionSerial": 24,
+              "completionSerial": 24,
+              "simulationTick": 1720,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 53,
+              "memoryAllocationCount": 62,
+              "bottomLevelAccelerationStructureCount": 22,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 92,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 22256896,
+              "deviceLocalBytes": 327091744
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 24,
+              "wholeRtGpuMs": 4.152224,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 24,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 2,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 22394,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 24,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0346,
+              "blasRefitRecordCpuMs": 0.0252,
+              "tlasUpdateRecordCpuMs": 0.2021,
+              "traceCopyRecordCpuMs": 0.0533,
+              "frameFenceWaitCpuMs": 4.4158,
+              "imageAcquireCpuMs": 0.005,
+              "queueSubmitCpuMs": 0.052,
+              "presentCallCpuMs": 0.3638,
+              "wholeFrameCycleCpuMs": 7.1385,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "f04-baked-r1",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\f04-baked-r1",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-forest-lookout",
+          "--forest-route-proof",
+          "baked-resident"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 14643200,
+          "sha256": "04075bd68720fe2fc3b850d8575e4b07de11325f3f51f13f69b6c8c1b6417274"
+        },
+        "pid": 21156,
+        "exitCode": 0,
+        "seconds": 22.546999999991385,
+        "pending": false,
+        "gpuBefore": {
+          "exitCode": 0,
+          "values": "44, 0, 9001, P4, 8.17"
+        },
+        "gpuAfter": {
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 3.89"
+        },
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 39974720,
+        "indexBytes": 6379020,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.4837,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.6821,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.8016,
+        "productionPropBlasBytes": 27319040,
+        "productionPropBlasBuildMilliseconds": 17.5993
+      },
+      "proof": {
+        "mode": "baked-resident",
+        "defaultEnabled": false,
+        "requestedSharedGeometry": false,
+        "activeSharedGeometry": false,
+        "proofOverride": true,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "forestOrPerformanceAdmitted": false,
+        "physicalDefinitions": 28,
+        "physicalStorageCapacity": 104,
+        "primitiveRows": 32,
+        "primitiveCapacity": 36,
+        "packedMaterialRows": 30,
+        "finalMaterialRows": 32,
+        "materialCapacity": 32,
+        "metadataCapacity": 28,
+        "staticRegistrations": 13,
+        "uniqueStaticAssets": 13,
+        "staticAssetCapacity": 13,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 11,
+        "blasCount": 20,
+        "masterRanges": [
+          {
+            "offset": 0,
+            "count": 0,
+            "allocationBytes": 0
+          },
+          {
+            "offset": 0,
+            "count": 0,
+            "allocationBytes": 0
+          }
+        ],
+        "legacyDefinitionCount": 28,
+        "placementsCount": 64,
+        "placementEvidenceSha256": "cbae1d728f8976e8602eeab7c1a63dbd08a68b90f54dda603ee236b885ed74bf",
+        "legacyDefinitionEvidenceSha256": "edd32bf13af0155f5f3f643f5f21c2da645d2b55db37feac0b0b63e9b19e7509",
+        "wholeInstanceRetention": {
+          "eligibleIds": [],
+          "omittedIds": [],
+          "boundsEvidenceSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "recreation": {
+        "complete": true,
+        "sameRendererObject": true,
+        "initialPausedInputBarrier": true,
+        "sceneEpochBefore": 2,
+        "sceneEpochAfter": 3,
+        "resourcesMatch": true,
+        "simulationTickBefore": 2757,
+        "simulationTickAfter": 2757,
+        "storageImageSha256Matches": true
+      },
+      "frames": [
+        {
+          "file": "203-chapter-forest-lookout.png",
+          "pngSha256": "795375c17297497bbd165d178b886ab0d68090ac7121e0462a7d098dae9a5ef9",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 6.55285,
+            "meanMs": 53.059567
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 2,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 12,
+              "recordSerial": 12,
+              "submissionSerial": 12,
+              "completionSerial": 12,
+              "simulationTick": 2757,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 51,
+              "memoryAllocationCount": 60,
+              "bottomLevelAccelerationStructureCount": 20,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 28,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 48298944,
+              "deviceLocalBytes": 372464608
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 12,
+              "wholeRtGpuMs": 3.469184,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 12,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 1,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 22399,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 12,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0369,
+              "blasRefitRecordCpuMs": 0.0277,
+              "tlasUpdateRecordCpuMs": 0.0072,
+              "traceCopyRecordCpuMs": 0.0272,
+              "frameFenceWaitCpuMs": 1.5863,
+              "imageAcquireCpuMs": 0.0056,
+              "queueSubmitCpuMs": 0.0433,
+              "presentCallCpuMs": 2.7784,
+              "wholeFrameCycleCpuMs": 6.0417,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        },
+        {
+          "file": "203-chapter-forest-lookout-recreated.png",
+          "pngSha256": "795375c17297497bbd165d178b886ab0d68090ac7121e0462a7d098dae9a5ef9",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 6.05945,
+            "meanMs": 10.281542
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 3,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 24,
+              "recordSerial": 24,
+              "submissionSerial": 24,
+              "completionSerial": 24,
+              "simulationTick": 2757,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 51,
+              "memoryAllocationCount": 60,
+              "bottomLevelAccelerationStructureCount": 20,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 28,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 48298944,
+              "deviceLocalBytes": 372464608
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 24,
+              "wholeRtGpuMs": 2.11728,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 24,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 2,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 22399,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 24,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0383,
+              "blasRefitRecordCpuMs": 0.0206,
+              "tlasUpdateRecordCpuMs": 0.0072,
+              "traceCopyRecordCpuMs": 0.0311,
+              "frameFenceWaitCpuMs": 2.4563,
+              "imageAcquireCpuMs": 0.0041,
+              "queueSubmitCpuMs": 0.0437,
+              "presentCallCpuMs": 1.2153,
+              "wholeFrameCycleCpuMs": 5.1602,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "f04-shared-r1",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\f04-shared-r1",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-forest-lookout",
+          "--forest-route-proof",
+          "normal-shared64"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 14643200,
+          "sha256": "04075bd68720fe2fc3b850d8575e4b07de11325f3f51f13f69b6c8c1b6417274"
+        },
+        "pid": 24288,
+        "exitCode": 0,
+        "seconds": 21.297000000005937,
+        "pending": false,
+        "gpuBefore": {
+          "exitCode": 0,
+          "values": "43, 1890, 9001, P4, 7.24"
+        },
+        "gpuAfter": {
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 5.09"
+        },
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 17686464,
+        "indexBytes": 2621076,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 576,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.5658,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7147,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.8511,
+        "productionPropBlasBytes": 7964672,
+        "productionPropBlasBuildMilliseconds": 19.9637
+      },
+      "proof": {
+        "mode": "normal-shared64",
+        "defaultEnabled": false,
+        "requestedSharedGeometry": true,
+        "activeSharedGeometry": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "forestOrPerformanceAdmitted": false,
+        "physicalDefinitions": 92,
+        "physicalStorageCapacity": 104,
+        "primitiveRows": 36,
+        "primitiveCapacity": 36,
+        "packedMaterialRows": 30,
+        "finalMaterialRows": 32,
+        "materialCapacity": 32,
+        "metadataCapacity": 28,
+        "staticRegistrations": 15,
+        "uniqueStaticAssets": 13,
+        "staticAssetCapacity": 13,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 9,
+        "blasCount": 22,
+        "masterRanges": [
+          {
+            "offset": 9,
+            "count": 3,
+            "allocationBytes": 314880
+          },
+          {
+            "offset": 12,
+            "count": 3,
+            "allocationBytes": 321792
+          }
+        ],
+        "legacyDefinitionCount": 28,
+        "placementsCount": 64,
+        "placementEvidenceSha256": "b7da16588456c0043c39a2f22c727ca473e9977195d96eec3961762d85d340f5",
+        "legacyDefinitionEvidenceSha256": "edd32bf13af0155f5f3f643f5f21c2da645d2b55db37feac0b0b63e9b19e7509",
+        "wholeInstanceRetention": {
+          "admitted": true,
+          "boundToCurrentOwners": true,
+          "certificateGeneration": 1,
+          "currentGeneration": 1,
+          "frameEligible": false,
+          "frameGeneration": 0,
+          "eligibleWholeInstances": 13,
+          "omittedWholeInstances": 0,
+          "retainedWholeInstances": 64,
+          "bothMastersResident": true,
+          "bakedTriangleCertificateApplied": false,
+          "residencySavingClaimed": false,
+          "eligibleIds": [
+            11,
+            18,
+            19,
+            22,
+            26,
+            29,
+            31,
+            36,
+            42,
+            51,
+            55,
+            56,
+            58
+          ],
+          "omittedIds": [],
+          "boundsEvidenceSha256": "f9f7e91b48843a6f00d7010100b5ecf5e839e0c60c15a2568019dc2795fa92ab"
+        }
+      },
+      "recreation": {
+        "complete": true,
+        "sameRendererObject": true,
+        "initialPausedInputBarrier": true,
+        "sceneEpochBefore": 2,
+        "sceneEpochAfter": 3,
+        "resourcesMatch": true,
+        "simulationTickBefore": 2757,
+        "simulationTickAfter": 2757,
+        "storageImageSha256Matches": true
+      },
+      "frames": [
+        {
+          "file": "203-chapter-forest-lookout.png",
+          "pngSha256": "795375c17297497bbd165d178b886ab0d68090ac7121e0462a7d098dae9a5ef9",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 8.9468,
+            "meanMs": 58.57795
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 2,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 12,
+              "recordSerial": 12,
+              "submissionSerial": 12,
+              "completionSerial": 12,
+              "simulationTick": 2757,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 53,
+              "memoryAllocationCount": 62,
+              "bottomLevelAccelerationStructureCount": 22,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 92,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 22256896,
+              "deviceLocalBytes": 327091744
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 12,
+              "wholeRtGpuMs": 5.002304,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 12,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 1,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 22399,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 12,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.07,
+              "blasRefitRecordCpuMs": 0.0294,
+              "tlasUpdateRecordCpuMs": 0.0086,
+              "traceCopyRecordCpuMs": 0.0329,
+              "frameFenceWaitCpuMs": 6.5546,
+              "imageAcquireCpuMs": 0.0069,
+              "queueSubmitCpuMs": 0.0442,
+              "presentCallCpuMs": 0.1824,
+              "wholeFrameCycleCpuMs": 8.5092,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        },
+        {
+          "file": "203-chapter-forest-lookout-recreated.png",
+          "pngSha256": "795375c17297497bbd165d178b886ab0d68090ac7121e0462a7d098dae9a5ef9",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 6.0612,
+            "meanMs": 11.751375
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 3,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 24,
+              "recordSerial": 24,
+              "submissionSerial": 24,
+              "completionSerial": 24,
+              "simulationTick": 2757,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 53,
+              "memoryAllocationCount": 62,
+              "bottomLevelAccelerationStructureCount": 22,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 92,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 22256896,
+              "deviceLocalBytes": 327091744
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 24,
+              "wholeRtGpuMs": 3.339808,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 24,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 2,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 22399,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 24,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.1679,
+              "blasRefitRecordCpuMs": 0.0271,
+              "tlasUpdateRecordCpuMs": 0.0091,
+              "traceCopyRecordCpuMs": 0.0315,
+              "frameFenceWaitCpuMs": 0.0036,
+              "imageAcquireCpuMs": 0.0043,
+              "queueSubmitCpuMs": 0.0403,
+              "presentCallCpuMs": 4.3155,
+              "wholeFrameCycleCpuMs": 6.0348,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "corridor-normal-r1",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\corridor-normal-r1",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-forest-retention-west",
+          "--forest-route-proof",
+          "normal-shared64"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 14643200,
+          "sha256": "9d39428561f832c348de68ceb6b42e91700b7c72b3684002bea0ced4ffb9be8c"
+        },
+        "pid": 32060,
+        "exitCode": 0,
+        "seconds": 21.31199999999808,
+        "pending": false,
+        "gpuBefore": null,
+        "gpuAfter": null,
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 17686464,
+        "indexBytes": 2621076,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 576,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 2.0102,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 1.0511,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.9591,
+        "productionPropBlasBytes": 7964672,
+        "productionPropBlasBuildMilliseconds": 13.7188
+      },
+      "proof": {
+        "mode": "normal-shared64",
+        "defaultEnabled": false,
+        "requestedSharedGeometry": true,
+        "activeSharedGeometry": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "forestOrPerformanceAdmitted": false,
+        "physicalDefinitions": 92,
+        "physicalStorageCapacity": 104,
+        "primitiveRows": 36,
+        "primitiveCapacity": 36,
+        "packedMaterialRows": 30,
+        "finalMaterialRows": 32,
+        "materialCapacity": 32,
+        "metadataCapacity": 28,
+        "staticRegistrations": 15,
+        "uniqueStaticAssets": 13,
+        "staticAssetCapacity": 13,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 9,
+        "blasCount": 22,
+        "masterRanges": [
+          {
+            "offset": 9,
+            "count": 3,
+            "allocationBytes": 314880
+          },
+          {
+            "offset": 12,
+            "count": 3,
+            "allocationBytes": 321792
+          }
+        ],
+        "legacyDefinitionCount": 28,
+        "placementsCount": 64,
+        "placementEvidenceSha256": "7a55d0efadc3c77fcfd01751ba7dc381fe33708c7aa2a5c7c8581d721bec550b",
+        "legacyDefinitionEvidenceSha256": "0e8ab6cc512c9665116ae3d0037ccf36bb82ffb6f112e9e612be9d0e47542562",
+        "wholeInstanceRetention": {
+          "admitted": true,
+          "boundToCurrentOwners": true,
+          "certificateGeneration": 1,
+          "currentGeneration": 1,
+          "frameEligible": true,
+          "frameGeneration": 1,
+          "eligibleWholeInstances": 13,
+          "omittedWholeInstances": 13,
+          "retainedWholeInstances": 51,
+          "bothMastersResident": true,
+          "bakedTriangleCertificateApplied": false,
+          "residencySavingClaimed": false,
+          "eligibleIds": [
+            11,
+            18,
+            19,
+            22,
+            26,
+            29,
+            31,
+            36,
+            42,
+            51,
+            55,
+            56,
+            58
+          ],
+          "omittedIds": [
+            11,
+            18,
+            19,
+            22,
+            26,
+            29,
+            31,
+            36,
+            42,
+            51,
+            55,
+            56,
+            58
+          ],
+          "boundsEvidenceSha256": "566f7fdceb5e5ad3c89e6a1d0f8f18db225cdceb6dfc9033dbed7cf02d6b7e2a"
+        }
+      },
+      "recreation": {
+        "complete": true,
+        "sameRendererObject": true,
+        "initialPausedInputBarrier": true,
+        "sceneEpochBefore": 2,
+        "sceneEpochAfter": 3,
+        "resourcesMatch": true,
+        "simulationTickBefore": 241,
+        "simulationTickAfter": 241,
+        "storageImageSha256Matches": true
+      },
+      "frames": [
+        {
+          "file": "230-chapter-forest-retention-west.png",
+          "pngSha256": "299a325c87bfc1fbdd99e95bc762fd93c4dae45a712ddbce2bd0a85752ce1c83",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 6.4978,
+            "meanMs": 51.901792
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 2,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 12,
+              "recordSerial": 12,
+              "submissionSerial": 12,
+              "completionSerial": 12,
+              "simulationTick": 241,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 54,
+              "memoryAllocationCount": 65,
+              "bottomLevelAccelerationStructureCount": 22,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 92,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 23580160,
+              "deviceLocalBytes": 360646176
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 12,
+              "wholeRtGpuMs": 4.218976,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 12,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 1,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 55001,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 12,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0366,
+              "blasRefitRecordCpuMs": 0.025,
+              "tlasUpdateRecordCpuMs": 0.0084,
+              "traceCopyRecordCpuMs": 0.0252,
+              "frameFenceWaitCpuMs": 4.2404,
+              "imageAcquireCpuMs": 0.0043,
+              "queueSubmitCpuMs": 0.0949,
+              "presentCallCpuMs": 0.0901,
+              "wholeFrameCycleCpuMs": 6.0104,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        },
+        {
+          "file": "230-chapter-forest-retention-west-recreated.png",
+          "pngSha256": "299a325c87bfc1fbdd99e95bc762fd93c4dae45a712ddbce2bd0a85752ce1c83",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 7.39835,
+            "meanMs": 10.811475
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 3,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 24,
+              "recordSerial": 24,
+              "submissionSerial": 24,
+              "completionSerial": 24,
+              "simulationTick": 241,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 54,
+              "memoryAllocationCount": 65,
+              "bottomLevelAccelerationStructureCount": 22,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 92,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 23580160,
+              "deviceLocalBytes": 360646176
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 24,
+              "wholeRtGpuMs": 4.28304,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 24,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 2,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 55001,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 24,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0355,
+              "blasRefitRecordCpuMs": 0.0283,
+              "tlasUpdateRecordCpuMs": 0.0087,
+              "traceCopyRecordCpuMs": 0.1736,
+              "frameFenceWaitCpuMs": 4.8738,
+              "imageAcquireCpuMs": 0.0071,
+              "queueSubmitCpuMs": 0.0629,
+              "presentCallCpuMs": 0.4948,
+              "wholeFrameCycleCpuMs": 7.3457,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "corridor-baked-query-r1",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\corridor-baked-query-r1",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-forest-retention-west",
+          "--forest-route-proof",
+          "baked-resident",
+          "--require-rayquery-compute"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 14643200,
+          "sha256": "04075bd68720fe2fc3b850d8575e4b07de11325f3f51f13f69b6c8c1b6417274"
+        },
+        "pid": 28292,
+        "exitCode": 0,
+        "seconds": 30.546999999991385,
+        "pending": false,
+        "gpuBefore": {
+          "exitCode": 0,
+          "values": "43, 1890, 9001, P4, 8.13"
+        },
+        "gpuAfter": {
+          "exitCode": 0,
+          "values": "49, 435, 810, P5, 13.20"
+        },
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 39974720,
+        "indexBytes": 6379020,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.8387,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 1.1805,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6582,
+        "productionPropBlasBytes": 27319040,
+        "productionPropBlasBuildMilliseconds": 8.7532
+      },
+      "proof": {
+        "mode": "baked-resident",
+        "defaultEnabled": false,
+        "requestedSharedGeometry": false,
+        "activeSharedGeometry": false,
+        "proofOverride": true,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "forestOrPerformanceAdmitted": false,
+        "physicalDefinitions": 28,
+        "physicalStorageCapacity": 104,
+        "primitiveRows": 32,
+        "primitiveCapacity": 36,
+        "packedMaterialRows": 30,
+        "finalMaterialRows": 32,
+        "materialCapacity": 32,
+        "metadataCapacity": 28,
+        "staticRegistrations": 13,
+        "uniqueStaticAssets": 13,
+        "staticAssetCapacity": 13,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 11,
+        "blasCount": 20,
+        "masterRanges": [
+          {
+            "offset": 0,
+            "count": 0,
+            "allocationBytes": 0
+          },
+          {
+            "offset": 0,
+            "count": 0,
+            "allocationBytes": 0
+          }
+        ],
+        "legacyDefinitionCount": 28,
+        "placementsCount": 64,
+        "placementEvidenceSha256": "cbae1d728f8976e8602eeab7c1a63dbd08a68b90f54dda603ee236b885ed74bf",
+        "legacyDefinitionEvidenceSha256": "0e8ab6cc512c9665116ae3d0037ccf36bb82ffb6f112e9e612be9d0e47542562",
+        "wholeInstanceRetention": {
+          "eligibleIds": [],
+          "omittedIds": [],
+          "boundsEvidenceSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "recreation": {
+        "complete": true,
+        "sameRendererObject": true,
+        "initialPausedInputBarrier": true,
+        "sceneEpochBefore": 2,
+        "sceneEpochAfter": 3,
+        "resourcesMatch": true,
+        "simulationTickBefore": 241,
+        "simulationTickAfter": 241,
+        "storageImageSha256Matches": true
+      },
+      "frames": [
+        {
+          "file": "230-chapter-forest-retention-west.png",
+          "pngSha256": "f4268cab6663cbe4d9260031b2f74aec7a28b032ef53a36a2b3272bcc41c42ff",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 6.42885,
+            "meanMs": 50.359933
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 2,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 12,
+              "recordSerial": 12,
+              "submissionSerial": 12,
+              "completionSerial": 12,
+              "simulationTick": 241,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayQueryCompute",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "rayquery_compute_diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "rayquery_compute_diagnostic_high_opaque_fast",
+                "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+              },
+              "genericDielectric": {
+                "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+                "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "rayquery_compute_diagnostic_high_generic_dielectric",
+              "activeSha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 50,
+              "memoryAllocationCount": 61,
+              "bottomLevelAccelerationStructureCount": 20,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 28,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 0,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 49621696,
+              "deviceLocalBytes": 406019040
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 12,
+              "wholeRtGpuMs": 4.166848,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 12,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 1,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 55001,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 12,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0111,
+              "blasRefitRecordCpuMs": 0.0351,
+              "tlasUpdateRecordCpuMs": 0.013,
+              "traceCopyRecordCpuMs": 0.0264,
+              "frameFenceWaitCpuMs": 4.2462,
+              "imageAcquireCpuMs": 0.0133,
+              "queueSubmitCpuMs": 0.0628,
+              "presentCallCpuMs": 0.1113,
+              "wholeFrameCycleCpuMs": 6.3635,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        },
+        {
+          "file": "230-chapter-forest-retention-west-recreated.png",
+          "pngSha256": "f4268cab6663cbe4d9260031b2f74aec7a28b032ef53a36a2b3272bcc41c42ff",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 7.18415,
+            "meanMs": 9.565917
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 3,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 24,
+              "recordSerial": 24,
+              "submissionSerial": 24,
+              "completionSerial": 24,
+              "simulationTick": 241,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayQueryCompute",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "rayquery_compute_diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "rayquery_compute_diagnostic_high_opaque_fast",
+                "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+              },
+              "genericDielectric": {
+                "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+                "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "rayquery_compute_diagnostic_high_generic_dielectric",
+              "activeSha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 50,
+              "memoryAllocationCount": 61,
+              "bottomLevelAccelerationStructureCount": 20,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 28,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 0,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 49621696,
+              "deviceLocalBytes": 406019040
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 24,
+              "wholeRtGpuMs": 5.150144,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 24,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 2,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 55001,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 24,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0458,
+              "blasRefitRecordCpuMs": 0.0406,
+              "tlasUpdateRecordCpuMs": 0.0091,
+              "traceCopyRecordCpuMs": 0.0289,
+              "frameFenceWaitCpuMs": 5.0761,
+              "imageAcquireCpuMs": 0.0087,
+              "queueSubmitCpuMs": 0.0564,
+              "presentCallCpuMs": 0.1016,
+              "wholeFrameCycleCpuMs": 6.9765,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "corridor-shared-query-r1",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\corridor-shared-query-r1",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-forest-retention-west",
+          "--forest-route-proof",
+          "normal-shared64",
+          "--require-rayquery-compute"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 14643200,
+          "sha256": "04075bd68720fe2fc3b850d8575e4b07de11325f3f51f13f69b6c8c1b6417274"
+        },
+        "pid": 33164,
+        "exitCode": 0,
+        "seconds": 27.046999999991385,
+        "pending": false,
+        "gpuBefore": {
+          "exitCode": 0,
+          "values": "46, 180, 405, P8, 3.40"
+        },
+        "gpuAfter": {
+          "exitCode": 0,
+          "values": "46, 180, 405, P8, 4.61"
+        },
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 17686464,
+        "indexBytes": 2621076,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 576,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.4145,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7912,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6233,
+        "productionPropBlasBytes": 7964672,
+        "productionPropBlasBuildMilliseconds": 14.8618
+      },
+      "proof": {
+        "mode": "normal-shared64",
+        "defaultEnabled": false,
+        "requestedSharedGeometry": true,
+        "activeSharedGeometry": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "forestOrPerformanceAdmitted": false,
+        "physicalDefinitions": 92,
+        "physicalStorageCapacity": 104,
+        "primitiveRows": 36,
+        "primitiveCapacity": 36,
+        "packedMaterialRows": 30,
+        "finalMaterialRows": 32,
+        "materialCapacity": 32,
+        "metadataCapacity": 28,
+        "staticRegistrations": 15,
+        "uniqueStaticAssets": 13,
+        "staticAssetCapacity": 13,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 9,
+        "blasCount": 22,
+        "masterRanges": [
+          {
+            "offset": 9,
+            "count": 3,
+            "allocationBytes": 314880
+          },
+          {
+            "offset": 12,
+            "count": 3,
+            "allocationBytes": 321792
+          }
+        ],
+        "legacyDefinitionCount": 28,
+        "placementsCount": 64,
+        "placementEvidenceSha256": "7a55d0efadc3c77fcfd01751ba7dc381fe33708c7aa2a5c7c8581d721bec550b",
+        "legacyDefinitionEvidenceSha256": "0e8ab6cc512c9665116ae3d0037ccf36bb82ffb6f112e9e612be9d0e47542562",
+        "wholeInstanceRetention": {
+          "admitted": true,
+          "boundToCurrentOwners": true,
+          "certificateGeneration": 1,
+          "currentGeneration": 1,
+          "frameEligible": true,
+          "frameGeneration": 1,
+          "eligibleWholeInstances": 13,
+          "omittedWholeInstances": 13,
+          "retainedWholeInstances": 51,
+          "bothMastersResident": true,
+          "bakedTriangleCertificateApplied": false,
+          "residencySavingClaimed": false,
+          "eligibleIds": [
+            11,
+            18,
+            19,
+            22,
+            26,
+            29,
+            31,
+            36,
+            42,
+            51,
+            55,
+            56,
+            58
+          ],
+          "omittedIds": [
+            11,
+            18,
+            19,
+            22,
+            26,
+            29,
+            31,
+            36,
+            42,
+            51,
+            55,
+            56,
+            58
+          ],
+          "boundsEvidenceSha256": "566f7fdceb5e5ad3c89e6a1d0f8f18db225cdceb6dfc9033dbed7cf02d6b7e2a"
+        }
+      },
+      "recreation": {
+        "complete": true,
+        "sameRendererObject": true,
+        "initialPausedInputBarrier": true,
+        "sceneEpochBefore": 2,
+        "sceneEpochAfter": 3,
+        "resourcesMatch": true,
+        "simulationTickBefore": 241,
+        "simulationTickAfter": 241,
+        "storageImageSha256Matches": true
+      },
+      "frames": [
+        {
+          "file": "230-chapter-forest-retention-west.png",
+          "pngSha256": "f4268cab6663cbe4d9260031b2f74aec7a28b032ef53a36a2b3272bcc41c42ff",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 6.7728,
+            "meanMs": 50.81585
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 2,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 12,
+              "recordSerial": 12,
+              "submissionSerial": 12,
+              "completionSerial": 12,
+              "simulationTick": 241,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayQueryCompute",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "rayquery_compute_diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "rayquery_compute_diagnostic_high_opaque_fast",
+                "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+              },
+              "genericDielectric": {
+                "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+                "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "rayquery_compute_diagnostic_high_generic_dielectric",
+              "activeSha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 52,
+              "memoryAllocationCount": 63,
+              "bottomLevelAccelerationStructureCount": 22,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 92,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 0,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 23579648,
+              "deviceLocalBytes": 360646176
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 12,
+              "wholeRtGpuMs": 4.089248,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 12,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 1,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 55001,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 12,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0367,
+              "blasRefitRecordCpuMs": 0.0323,
+              "tlasUpdateRecordCpuMs": 0.0109,
+              "traceCopyRecordCpuMs": 0.0258,
+              "frameFenceWaitCpuMs": 4.4198,
+              "imageAcquireCpuMs": 0.0089,
+              "queueSubmitCpuMs": 0.0623,
+              "presentCallCpuMs": 0.1066,
+              "wholeFrameCycleCpuMs": 6.1914,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        },
+        {
+          "file": "230-chapter-forest-retention-west-recreated.png",
+          "pngSha256": "f4268cab6663cbe4d9260031b2f74aec7a28b032ef53a36a2b3272bcc41c42ff",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 6.85705,
+            "meanMs": 10.027275
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 3,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 24,
+              "recordSerial": 24,
+              "submissionSerial": 24,
+              "completionSerial": 24,
+              "simulationTick": 241,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayQueryCompute",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "rayquery_compute_diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "rayquery_compute_diagnostic_high_opaque_fast",
+                "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+              },
+              "genericDielectric": {
+                "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+                "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "rayquery_compute_diagnostic_high_generic_dielectric",
+              "activeSha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 52,
+              "memoryAllocationCount": 63,
+              "bottomLevelAccelerationStructureCount": 22,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 92,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 0,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 23579648,
+              "deviceLocalBytes": 360646176
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 24,
+              "wholeRtGpuMs": 4.255968,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 24,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 2,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 55001,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 24,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.04,
+              "blasRefitRecordCpuMs": 0.0366,
+              "tlasUpdateRecordCpuMs": 0.0139,
+              "traceCopyRecordCpuMs": 0.0454,
+              "frameFenceWaitCpuMs": 4.411,
+              "imageAcquireCpuMs": 0.0066,
+              "queueSubmitCpuMs": 0.0761,
+              "presentCallCpuMs": 0.1236,
+              "wholeFrameCycleCpuMs": 6.3271,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "corridor-normal-final-r1",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\corridor-normal-final-r1",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-forest-retention-west",
+          "--forest-route-proof",
+          "normal-shared64"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 14645760,
+          "sha256": "0484c2e62abdc4056eb95205dcd53cf2785c969bbe40750f618e32e4ffcdce18"
+        },
+        "pid": 32820,
+        "exitCode": 0,
+        "seconds": 22.343999999997322,
+        "pending": false,
+        "gpuBefore": {
+          "exitCode": 0,
+          "values": "46, 0, 9001, P4, 8.11"
+        },
+        "gpuAfter": {
+          "exitCode": 0,
+          "values": "46, 187, 405, P8, 4.24"
+        },
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 17686464,
+        "indexBytes": 2621076,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 576,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.7028,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.8593,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.8435,
+        "productionPropBlasBytes": 7964672,
+        "productionPropBlasBuildMilliseconds": 10.8096
+      },
+      "proof": {
+        "mode": "normal-shared64",
+        "defaultEnabled": false,
+        "requestedSharedGeometry": true,
+        "activeSharedGeometry": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "forestOrPerformanceAdmitted": false,
+        "physicalDefinitions": 92,
+        "physicalStorageCapacity": 104,
+        "primitiveRows": 36,
+        "primitiveCapacity": 36,
+        "packedMaterialRows": 30,
+        "finalMaterialRows": 32,
+        "materialCapacity": 32,
+        "metadataCapacity": 28,
+        "staticRegistrations": 15,
+        "uniqueStaticAssets": 13,
+        "staticAssetCapacity": 13,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 9,
+        "blasCount": 22,
+        "masterRanges": [
+          {
+            "offset": 9,
+            "count": 3,
+            "allocationBytes": 314880
+          },
+          {
+            "offset": 12,
+            "count": 3,
+            "allocationBytes": 321792
+          }
+        ],
+        "legacyDefinitionCount": 28,
+        "placementsCount": 64,
+        "placementEvidenceSha256": "7a55d0efadc3c77fcfd01751ba7dc381fe33708c7aa2a5c7c8581d721bec550b",
+        "legacyDefinitionEvidenceSha256": "0e8ab6cc512c9665116ae3d0037ccf36bb82ffb6f112e9e612be9d0e47542562",
+        "wholeInstanceRetention": {
+          "admitted": true,
+          "boundToCurrentOwners": true,
+          "certificateGeneration": 1,
+          "currentGeneration": 1,
+          "frameEligible": true,
+          "frameGeneration": 1,
+          "eligibleWholeInstances": 13,
+          "omittedWholeInstances": 13,
+          "retainedWholeInstances": 51,
+          "bothMastersResident": true,
+          "bakedTriangleCertificateApplied": false,
+          "residencySavingClaimed": false,
+          "eligibleIds": [
+            11,
+            18,
+            19,
+            22,
+            26,
+            29,
+            31,
+            36,
+            42,
+            51,
+            55,
+            56,
+            58
+          ],
+          "omittedIds": [
+            11,
+            18,
+            19,
+            22,
+            26,
+            29,
+            31,
+            36,
+            42,
+            51,
+            55,
+            56,
+            58
+          ],
+          "boundsEvidenceSha256": "566f7fdceb5e5ad3c89e6a1d0f8f18db225cdceb6dfc9033dbed7cf02d6b7e2a"
+        }
+      },
+      "recreation": {
+        "complete": true,
+        "sameRendererObject": true,
+        "initialPausedInputBarrier": true,
+        "sceneEpochBefore": 2,
+        "sceneEpochAfter": 3,
+        "resourcesMatch": true,
+        "simulationTickBefore": 241,
+        "simulationTickAfter": 241,
+        "storageImageSha256Matches": true
+      },
+      "frames": [
+        {
+          "file": "230-chapter-forest-retention-west.png",
+          "pngSha256": "299a325c87bfc1fbdd99e95bc762fd93c4dae45a712ddbce2bd0a85752ce1c83",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 7.26935,
+            "meanMs": 67.244067
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 2,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 12,
+              "recordSerial": 12,
+              "submissionSerial": 12,
+              "completionSerial": 12,
+              "simulationTick": 241,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 54,
+              "memoryAllocationCount": 65,
+              "bottomLevelAccelerationStructureCount": 22,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 92,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 23580160,
+              "deviceLocalBytes": 360646176
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 12,
+              "wholeRtGpuMs": 4.23552,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 12,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 1,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 55001,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 12,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0383,
+              "blasRefitRecordCpuMs": 0.0763,
+              "tlasUpdateRecordCpuMs": 0.0092,
+              "traceCopyRecordCpuMs": 0.0272,
+              "frameFenceWaitCpuMs": 4.1061,
+              "imageAcquireCpuMs": 0.0064,
+              "queueSubmitCpuMs": 0.0404,
+              "presentCallCpuMs": 0.1116,
+              "wholeFrameCycleCpuMs": 5.9504,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        },
+        {
+          "file": "230-chapter-forest-retention-west-recreated.png",
+          "pngSha256": "299a325c87bfc1fbdd99e95bc762fd93c4dae45a712ddbce2bd0a85752ce1c83",
+          "timing": {
+            "sampleCount": 12,
+            "medianMs": 6.89175,
+            "meanMs": 10.152667
+          },
+          "completedFrame": {
+            "identity": {
+              "sceneEpoch": 3,
+              "measurementGeneration": 1,
+              "recordAttemptSerial": 24,
+              "recordSerial": 24,
+              "submissionSerial": 24,
+              "completionSerial": 24,
+              "simulationTick": 241,
+              "frameSlot": 0
+            },
+            "pipeline": {
+              "executionBackend": "RayTracingPipeline",
+              "instrumentation": "diagnostic",
+              "dielectricQuality": "high",
+              "bundleKey": "diagnostic_high_pair",
+              "opaqueFast": {
+                "key": "diagnostic_high_opaque_fast",
+                "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+              },
+              "genericDielectric": {
+                "key": "diagnostic_high_generic_dielectric",
+                "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+              },
+              "activeStrategy": "generic-dielectric",
+              "activeKey": "diagnostic_high_generic_dielectric",
+              "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+              "waterQuality": "high"
+            },
+            "submittedDimensions": {
+              "internalExtent": [
+                960,
+                540
+              ],
+              "outputExtent": [
+                960,
+                540
+              ],
+              "cameraAspect": 1.77777779,
+              "presentationTransform": 0,
+              "dynamicResolutionEnabled": false,
+              "linearBlit": false,
+              "aspectPreserved": true
+            },
+            "resources": {
+              "bufferCount": 54,
+              "memoryAllocationCount": 65,
+              "bottomLevelAccelerationStructureCount": 22,
+              "topLevelAccelerationStructureCount": 1,
+              "tlasInstanceCount": 92,
+              "pipelineCount": 2,
+              "shaderBindingTableCount": 2,
+              "descriptorSetCount": 1,
+              "hostVisibleBytes": 23580160,
+              "deviceLocalBytes": 360646176
+            },
+            "gpu": {
+              "status": "valid",
+              "available": true,
+              "completedSubmissionSerial": 24,
+              "wholeRtGpuMs": 4.83104,
+              "timestampValidBits": 64,
+              "timestampPeriodPicoseconds": 1000,
+              "sampleCount": 24,
+              "unavailableResultCount": 0,
+              "errorCount": 0,
+              "detail": "GPU RT command-buffer timing is available."
+            },
+            "player": {
+              "skinCadenceHz": 60,
+              "skinUpdateCount": 2,
+              "maximumSocketErrorMicrometres": 10,
+              "primaryPixelCountAvailable": true,
+              "primaryPixelCount": 55001,
+              "primaryVisible": true
+            },
+            "presentation": {
+              "outcome": "presented",
+              "presented": true,
+              "lastSuccessfulPresentSubmissionSerial": 24,
+              "finalIdleCompletion": true
+            },
+            "stages": {
+              "status": "valid",
+              "simulationStepCpuMs": 0.0,
+              "skinCpuMs": 0.0,
+              "playerSkinCpuMs": 0.0,
+              "characterSkinCpuMs": 0.0,
+              "dynamicUploadCpuMs": 0.0334,
+              "blasRefitRecordCpuMs": 0.1696,
+              "tlasUpdateRecordCpuMs": 0.0097,
+              "traceCopyRecordCpuMs": 0.0363,
+              "frameFenceWaitCpuMs": 4.5563,
+              "imageAcquireCpuMs": 0.0058,
+              "queueSubmitCpuMs": 0.0368,
+              "presentCallCpuMs": 0.0768,
+              "wholeFrameCycleCpuMs": 6.7288,
+              "poseCopyCpuMs": 0.0,
+              "playerPoseCpuMs": 0.0,
+              "playerVerticesCpuMs": 0.0,
+              "viewmodelVerticesCpuMs": 0.0,
+              "characterAnimationCpuMs": 0.0,
+              "characterVerticesCpuMs": 0.0,
+              "characterCopyCpuMs": 0.0
+            },
+            "quality": {
+              "shadowQuality": {
+                "mode": "higher",
+                "localPrimarySamples": 4,
+                "skyPrimarySamples": 2,
+                "reserved": 0
+              },
+              "fireQuality": {
+                "quality": "High",
+                "volumeSteps": 10,
+                "reflectionSamples": 2,
+                "reflectedVolumeSteps": 8
+              },
+              "actualUploadedMistEnabled": true,
+              "actualUploadedDustQuality": 2
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "imageDeltas": [
+    {
+      "control": "f01-baked-r1",
+      "shared": "f01-shared-r1",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 72,
+        "maximumChannelDifference": 21,
+        "meanAbsoluteChannelDifference": 0.00010095164609053498
+      }
+    },
+    {
+      "control": "f04-baked-r1",
+      "shared": "f04-shared-r1",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "corridor-baked-query-r1",
+      "shared": "corridor-shared-query-r1",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    }
+  ],
+  "routes": {
+    "scope": "Debug CPU / Diagnostic High hidden RT, 960x540, scripted up to four simulation ticks per render. Not Shipping gameplay or phone performance. GPU timing belongs to completed_tick, not submitted_tick; groups below follow the current probe phase and are not exact same-frame pose matches. Before/after sensors do not establish in-run clocks or utilization.",
+    "runs": {
+      "baked-route-order-fixed": {
+        "process": {
+          "arguments": [
+            "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+            "--development-rescue-journey",
+            "--capture-showcase",
+            "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\baked-route-order-fixed",
+            "--capture-hidden",
+            "--development-checkpoint",
+            "chapter-kit-reunion",
+            "--validate-chapter-roundtrip"
+          ],
+          "executable": {
+            "exists": true,
+            "bytes": 14643200,
+            "sha256": "04075bd68720fe2fc3b850d8575e4b07de11325f3f51f13f69b6c8c1b6417274"
+          },
+          "settingsBefore": {
+            "exists": true,
+            "bytes": 471,
+            "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+          },
+          "campaignBefore": {
+            "exists": false,
+            "files": {}
+          },
+          "foregroundBefore": 132058,
+          "gpuBefore": {
+            "exitCode": 0,
+            "values": "42, 180, 405, P8, 3.58"
+          },
+          "pid": 17112,
+          "exitCode": 0,
+          "seconds": 132.18699999999808,
+          "pending": false,
+          "gpuAfter": {
+            "exitCode": 0,
+            "values": "46, 210, 405, P8, 8.42"
+          },
+          "settingsAfter": {
+            "exists": true,
+            "bytes": 471,
+            "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+          },
+          "campaignAfter": {
+            "exists": false,
+            "files": {}
+          },
+          "foregroundUnchanged": true,
+          "settingsUnchanged": true,
+          "campaignUnchanged": true
+        },
+        "summary": {
+          "schema": 2,
+          "scope": "moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance",
+          "maximumSimulationTicksPerRender": 4,
+          "simulationHz": 60,
+          "frames": 1524,
+          "sharedForestResident": false,
+          "sharedForestValidatedFrames": 0,
+          "maximumSharedForestMaskedInstances": 0,
+          "maximumNormalStaticOwnerSavingBytes": 6216192,
+          "staticDetailUnloads": 1,
+          "staticDetailRestores": 1,
+          "keeperVertexLifetime": {
+            "retiredAllocationBytes": 1323264,
+            "retiredMemoryFlags": 6,
+            "retirements": 1,
+            "restorations": 1,
+            "resetRestored": true
+          },
+          "keeperTextureLifetime": {
+            "retiredDeviceLocalBytes": 33554432,
+            "retiredHostVisibleBytes": 0,
+            "baseMemoryFlags": 1,
+            "emissiveMemoryFlags": 1,
+            "retirements": 1,
+            "restorations": 1,
+            "resetRestored": true
+          },
+          "complete": true
+        },
+        "firstCompletedFrame": {
+          "identity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 12,
+            "recordSerial": 12,
+            "submissionSerial": 12,
+            "completionSerial": 12,
+            "simulationTick": 1436,
+            "frameSlot": 0
+          },
+          "pipeline": {
+            "executionBackend": "RayTracingPipeline",
+            "instrumentation": "diagnostic",
+            "dielectricQuality": "high",
+            "bundleKey": "diagnostic_high_pair",
+            "opaqueFast": {
+              "key": "diagnostic_high_opaque_fast",
+              "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+            },
+            "genericDielectric": {
+              "key": "diagnostic_high_generic_dielectric",
+              "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+            },
+            "activeStrategy": "generic-dielectric",
+            "activeKey": "diagnostic_high_generic_dielectric",
+            "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+            "waterQuality": "high"
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              960,
+              540
+            ],
+            "outputExtent": [
+              960,
+              540
+            ],
+            "cameraAspect": 1.77777779,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": false,
+            "aspectPreserved": true
+          },
+          "resources": {
+            "bufferCount": 51,
+            "memoryAllocationCount": 60,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48298944,
+            "deviceLocalBytes": 372464608
+          },
+          "gpu": {
+            "status": "valid",
+            "available": true,
+            "completedSubmissionSerial": 12,
+            "wholeRtGpuMs": 3.075136,
+            "timestampValidBits": 64,
+            "timestampPeriodPicoseconds": 1000,
+            "sampleCount": 12,
+            "unavailableResultCount": 0,
+            "errorCount": 0,
+            "detail": "GPU RT command-buffer timing is available."
+          },
+          "player": {
+            "skinCadenceHz": 60,
+            "skinUpdateCount": 1,
+            "maximumSocketErrorMicrometres": 10,
+            "primaryPixelCountAvailable": true,
+            "primaryPixelCount": 22518,
+            "primaryVisible": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 12,
+            "finalIdleCompletion": true
+          },
+          "stages": {
+            "status": "valid",
+            "simulationStepCpuMs": 0.0,
+            "skinCpuMs": 0.0,
+            "playerSkinCpuMs": 0.0,
+            "characterSkinCpuMs": 0.0,
+            "dynamicUploadCpuMs": 0.0208,
+            "blasRefitRecordCpuMs": 0.0375,
+            "tlasUpdateRecordCpuMs": 0.0089,
+            "traceCopyRecordCpuMs": 0.0376,
+            "frameFenceWaitCpuMs": 9.9505,
+            "imageAcquireCpuMs": 0.0068,
+            "queueSubmitCpuMs": 0.0466,
+            "presentCallCpuMs": 0.0888,
+            "wholeFrameCycleCpuMs": 12.0055,
+            "poseCopyCpuMs": 0.0,
+            "playerPoseCpuMs": 0.0,
+            "playerVerticesCpuMs": 0.0,
+            "viewmodelVerticesCpuMs": 0.0,
+            "characterAnimationCpuMs": 0.0,
+            "characterVerticesCpuMs": 0.0,
+            "characterCopyCpuMs": 0.0
+          },
+          "quality": {
+            "shadowQuality": {
+              "mode": "higher",
+              "localPrimarySamples": 4,
+              "skyPrimarySamples": 2,
+              "reserved": 0
+            },
+            "fireQuality": {
+              "quality": "High",
+              "volumeSteps": 10,
+              "reflectionSamples": 2,
+              "reflectedVolumeSteps": 8
+            },
+            "actualUploadedMistEnabled": true,
+            "actualUploadedDustQuality": 2
+          }
+        }
+      },
+      "shared-normal-route-r1": {
+        "process": {
+          "arguments": [
+            "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+            "--development-rescue-journey",
+            "--capture-showcase",
+            "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\shared-normal-route-r1",
+            "--capture-hidden",
+            "--development-checkpoint",
+            "chapter-kit-reunion",
+            "--forest-route-proof",
+            "normal-shared64",
+            "--validate-chapter-roundtrip"
+          ],
+          "executable": {
+            "exists": true,
+            "bytes": 14643200,
+            "sha256": "04075bd68720fe2fc3b850d8575e4b07de11325f3f51f13f69b6c8c1b6417274"
+          },
+          "settingsBefore": {
+            "exists": true,
+            "bytes": 471,
+            "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+          },
+          "campaignBefore": {
+            "exists": false,
+            "files": {}
+          },
+          "foregroundBefore": 132058,
+          "gpuBefore": {
+            "exitCode": 0,
+            "values": "42, 1890, 9001, P4, 7.20"
+          },
+          "pid": 23252,
+          "exitCode": 0,
+          "seconds": 132.46899999999732,
+          "pending": false,
+          "gpuAfter": {
+            "exitCode": 0,
+            "values": "46, 195, 405, P8, 6.23"
+          },
+          "settingsAfter": {
+            "exists": true,
+            "bytes": 471,
+            "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+          },
+          "campaignAfter": {
+            "exists": false,
+            "files": {}
+          },
+          "foregroundUnchanged": true,
+          "settingsUnchanged": true,
+          "campaignUnchanged": true
+        },
+        "summary": {
+          "schema": 2,
+          "scope": "moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance",
+          "maximumSimulationTicksPerRender": 4,
+          "simulationHz": 60,
+          "frames": 1483,
+          "sharedForestResident": true,
+          "sharedForestValidatedFrames": 1484,
+          "maximumSharedForestMaskedInstances": 13,
+          "maximumNormalStaticOwnerSavingBytes": 0,
+          "staticDetailUnloads": 0,
+          "staticDetailRestores": 0,
+          "keeperVertexLifetime": {
+            "retiredAllocationBytes": 1323264,
+            "retiredMemoryFlags": 6,
+            "retirements": 1,
+            "restorations": 1,
+            "resetRestored": true
+          },
+          "keeperTextureLifetime": {
+            "retiredDeviceLocalBytes": 33554432,
+            "retiredHostVisibleBytes": 0,
+            "baseMemoryFlags": 1,
+            "emissiveMemoryFlags": 1,
+            "retirements": 1,
+            "restorations": 1,
+            "resetRestored": true
+          },
+          "complete": true
+        },
+        "firstCompletedFrame": {
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 24,
+            "recordSerial": 24,
+            "submissionSerial": 24,
+            "completionSerial": 24,
+            "simulationTick": 1436,
+            "frameSlot": 0
+          },
+          "pipeline": {
+            "executionBackend": "RayTracingPipeline",
+            "instrumentation": "diagnostic",
+            "dielectricQuality": "high",
+            "bundleKey": "diagnostic_high_pair",
+            "opaqueFast": {
+              "key": "diagnostic_high_opaque_fast",
+              "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+            },
+            "genericDielectric": {
+              "key": "diagnostic_high_generic_dielectric",
+              "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+            },
+            "activeStrategy": "generic-dielectric",
+            "activeKey": "diagnostic_high_generic_dielectric",
+            "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+            "waterQuality": "high"
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              960,
+              540
+            ],
+            "outputExtent": [
+              960,
+              540
+            ],
+            "cameraAspect": 1.77777779,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": false,
+            "aspectPreserved": true
+          },
+          "resources": {
+            "bufferCount": 53,
+            "memoryAllocationCount": 62,
+            "bottomLevelAccelerationStructureCount": 22,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 92,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 22256896,
+            "deviceLocalBytes": 327091744
+          },
+          "gpu": {
+            "status": "valid",
+            "available": true,
+            "completedSubmissionSerial": 24,
+            "wholeRtGpuMs": 6.056,
+            "timestampValidBits": 64,
+            "timestampPeriodPicoseconds": 1000,
+            "sampleCount": 24,
+            "unavailableResultCount": 0,
+            "errorCount": 0,
+            "detail": "GPU RT command-buffer timing is available."
+          },
+          "player": {
+            "skinCadenceHz": 60,
+            "skinUpdateCount": 2,
+            "maximumSocketErrorMicrometres": 10,
+            "primaryPixelCountAvailable": true,
+            "primaryPixelCount": 22517,
+            "primaryVisible": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 24,
+            "finalIdleCompletion": true
+          },
+          "stages": {
+            "status": "valid",
+            "simulationStepCpuMs": 0.0,
+            "skinCpuMs": 0.0,
+            "playerSkinCpuMs": 0.0,
+            "characterSkinCpuMs": 0.0,
+            "dynamicUploadCpuMs": 0.0348,
+            "blasRefitRecordCpuMs": 0.0298,
+            "tlasUpdateRecordCpuMs": 0.0089,
+            "traceCopyRecordCpuMs": 0.0302,
+            "frameFenceWaitCpuMs": 2.0063,
+            "imageAcquireCpuMs": 0.0037,
+            "queueSubmitCpuMs": 0.0271,
+            "presentCallCpuMs": 2.1812,
+            "wholeFrameCycleCpuMs": 6.1625,
+            "poseCopyCpuMs": 0.0,
+            "playerPoseCpuMs": 0.0,
+            "playerVerticesCpuMs": 0.0,
+            "viewmodelVerticesCpuMs": 0.0,
+            "characterAnimationCpuMs": 0.0,
+            "characterVerticesCpuMs": 0.0,
+            "characterCopyCpuMs": 0.0
+          },
+          "quality": {
+            "shadowQuality": {
+              "mode": "higher",
+              "localPrimarySamples": 4,
+              "skyPrimarySamples": 2,
+              "reserved": 0
+            },
+            "fireQuality": {
+              "quality": "High",
+              "volumeSteps": 10,
+              "reflectionSamples": 2,
+              "reflectedVolumeSteps": 8
+            },
+            "actualUploadedMistEnabled": true,
+            "actualUploadedDustQuality": 2
+          }
+        }
+      },
+      "baked-route-closing": {
+        "process": {
+          "arguments": [
+            "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+            "--development-rescue-journey",
+            "--capture-showcase",
+            "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\baked-route-closing",
+            "--capture-hidden",
+            "--development-checkpoint",
+            "chapter-kit-reunion",
+            "--validate-chapter-roundtrip"
+          ],
+          "executable": {
+            "exists": true,
+            "bytes": 14643200,
+            "sha256": "04075bd68720fe2fc3b850d8575e4b07de11325f3f51f13f69b6c8c1b6417274"
+          },
+          "settingsBefore": {
+            "exists": true,
+            "bytes": 471,
+            "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+          },
+          "campaignBefore": {
+            "exists": false,
+            "files": {}
+          },
+          "foregroundBefore": 132058,
+          "gpuBefore": {
+            "exitCode": 0,
+            "values": "42, 0, 9001, P4, 7.93"
+          },
+          "pid": 12368,
+          "exitCode": 0,
+          "seconds": 126.71900000001187,
+          "pending": false,
+          "gpuAfter": {
+            "exitCode": 0,
+            "values": "48, 210, 9001, P4, 6.77"
+          },
+          "settingsAfter": {
+            "exists": true,
+            "bytes": 471,
+            "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+          },
+          "campaignAfter": {
+            "exists": false,
+            "files": {}
+          },
+          "foregroundUnchanged": true,
+          "settingsUnchanged": true,
+          "campaignUnchanged": true
+        },
+        "summary": {
+          "schema": 2,
+          "scope": "moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance",
+          "maximumSimulationTicksPerRender": 4,
+          "simulationHz": 60,
+          "frames": 1524,
+          "sharedForestResident": false,
+          "sharedForestValidatedFrames": 0,
+          "maximumSharedForestMaskedInstances": 0,
+          "maximumNormalStaticOwnerSavingBytes": 6216192,
+          "staticDetailUnloads": 1,
+          "staticDetailRestores": 1,
+          "keeperVertexLifetime": {
+            "retiredAllocationBytes": 1323264,
+            "retiredMemoryFlags": 6,
+            "retirements": 1,
+            "restorations": 1,
+            "resetRestored": true
+          },
+          "keeperTextureLifetime": {
+            "retiredDeviceLocalBytes": 33554432,
+            "retiredHostVisibleBytes": 0,
+            "baseMemoryFlags": 1,
+            "emissiveMemoryFlags": 1,
+            "retirements": 1,
+            "restorations": 1,
+            "resetRestored": true
+          },
+          "complete": true
+        },
+        "firstCompletedFrame": {
+          "identity": {
+            "sceneEpoch": 2,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 12,
+            "recordSerial": 12,
+            "submissionSerial": 12,
+            "completionSerial": 12,
+            "simulationTick": 1436,
+            "frameSlot": 0
+          },
+          "pipeline": {
+            "executionBackend": "RayTracingPipeline",
+            "instrumentation": "diagnostic",
+            "dielectricQuality": "high",
+            "bundleKey": "diagnostic_high_pair",
+            "opaqueFast": {
+              "key": "diagnostic_high_opaque_fast",
+              "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+            },
+            "genericDielectric": {
+              "key": "diagnostic_high_generic_dielectric",
+              "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+            },
+            "activeStrategy": "generic-dielectric",
+            "activeKey": "diagnostic_high_generic_dielectric",
+            "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+            "waterQuality": "high"
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              960,
+              540
+            ],
+            "outputExtent": [
+              960,
+              540
+            ],
+            "cameraAspect": 1.77777779,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": false,
+            "aspectPreserved": true
+          },
+          "resources": {
+            "bufferCount": 51,
+            "memoryAllocationCount": 60,
+            "bottomLevelAccelerationStructureCount": 20,
+            "topLevelAccelerationStructureCount": 1,
+            "tlasInstanceCount": 28,
+            "pipelineCount": 2,
+            "shaderBindingTableCount": 2,
+            "descriptorSetCount": 1,
+            "hostVisibleBytes": 48298944,
+            "deviceLocalBytes": 372464608
+          },
+          "gpu": {
+            "status": "valid",
+            "available": true,
+            "completedSubmissionSerial": 12,
+            "wholeRtGpuMs": 3.08624,
+            "timestampValidBits": 64,
+            "timestampPeriodPicoseconds": 1000,
+            "sampleCount": 12,
+            "unavailableResultCount": 0,
+            "errorCount": 0,
+            "detail": "GPU RT command-buffer timing is available."
+          },
+          "player": {
+            "skinCadenceHz": 60,
+            "skinUpdateCount": 1,
+            "maximumSocketErrorMicrometres": 10,
+            "primaryPixelCountAvailable": true,
+            "primaryPixelCount": 22518,
+            "primaryVisible": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 12,
+            "finalIdleCompletion": true
+          },
+          "stages": {
+            "status": "valid",
+            "simulationStepCpuMs": 0.0,
+            "skinCpuMs": 0.0,
+            "playerSkinCpuMs": 0.0,
+            "characterSkinCpuMs": 0.0,
+            "dynamicUploadCpuMs": 0.0394,
+            "blasRefitRecordCpuMs": 0.0253,
+            "tlasUpdateRecordCpuMs": 0.0078,
+            "traceCopyRecordCpuMs": 0.0274,
+            "frameFenceWaitCpuMs": 0.0037,
+            "imageAcquireCpuMs": 0.0039,
+            "queueSubmitCpuMs": 0.0431,
+            "presentCallCpuMs": 4.5174,
+            "wholeFrameCycleCpuMs": 6.0098,
+            "poseCopyCpuMs": 0.0,
+            "playerPoseCpuMs": 0.0,
+            "playerVerticesCpuMs": 0.0,
+            "viewmodelVerticesCpuMs": 0.0,
+            "characterAnimationCpuMs": 0.0,
+            "characterVerticesCpuMs": 0.0,
+            "characterCopyCpuMs": 0.0
+          },
+          "quality": {
+            "shadowQuality": {
+              "mode": "higher",
+              "localPrimarySamples": 4,
+              "skyPrimarySamples": 2,
+              "reserved": 0
+            },
+            "fireQuality": {
+              "quality": "High",
+              "volumeSteps": 10,
+              "reflectionSamples": 2,
+              "reflectedVolumeSteps": 8
+            },
+            "actualUploadedMistEnabled": true,
+            "actualUploadedDustQuality": 2
+          }
+        }
+      }
+    },
+    "phases": [
+      {
+        "phase": "landing-sweep",
+        "runs": {
+          "baked-route-order-fixed": {
+            "samples": 128,
+            "validGpuSamples": 128,
+            "gpuMedianMs": 7.975887999999999,
+            "gpuP95Ms": 13.44736,
+            "renderCycleMedianMs": 52.43875,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          },
+          "shared-normal-route-r1": {
+            "samples": 128,
+            "validGpuSamples": 128,
+            "gpuMedianMs": 11.576032,
+            "gpuP95Ms": 13.781568,
+            "renderCycleMedianMs": 54.64205,
+            "deviceLocalBytes": [
+              327091744
+            ],
+            "hostVisibleBytes": [
+              22256896
+            ]
+          },
+          "baked-route-closing": {
+            "samples": 128,
+            "validGpuSamples": 128,
+            "gpuMedianMs": 8.12016,
+            "gpuP95Ms": 15.208,
+            "renderCycleMedianMs": 52.557199999999995,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          }
+        }
+      },
+      {
+        "phase": "fresh-raise",
+        "runs": {
+          "baked-route-order-fixed": {
+            "samples": 105,
+            "validGpuSamples": 105,
+            "gpuMedianMs": 8.271904,
+            "gpuP95Ms": 15.47296,
+            "renderCycleMedianMs": 52.4469,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          },
+          "shared-normal-route-r1": {
+            "samples": 105,
+            "validGpuSamples": 105,
+            "gpuMedianMs": 7.764064,
+            "gpuP95Ms": 14.158752,
+            "renderCycleMedianMs": 53.6324,
+            "deviceLocalBytes": [
+              327091744
+            ],
+            "hostVisibleBytes": [
+              22256896
+            ]
+          },
+          "baked-route-closing": {
+            "samples": 105,
+            "validGpuSamples": 105,
+            "gpuMedianMs": 8.291488,
+            "gpuP95Ms": 15.233408,
+            "renderCycleMedianMs": 51.8617,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          }
+        }
+      },
+      {
+        "phase": "outbound",
+        "runs": {
+          "baked-route-order-fixed": {
+            "samples": 322,
+            "validGpuSamples": 322,
+            "gpuMedianMs": 7.708368,
+            "gpuP95Ms": 13.208768,
+            "renderCycleMedianMs": 52.53985,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          },
+          "shared-normal-route-r1": {
+            "samples": 322,
+            "validGpuSamples": 322,
+            "gpuMedianMs": 7.527952,
+            "gpuP95Ms": 12.849632,
+            "renderCycleMedianMs": 54.223749999999995,
+            "deviceLocalBytes": [
+              327091744
+            ],
+            "hostVisibleBytes": [
+              22256896
+            ]
+          },
+          "baked-route-closing": {
+            "samples": 322,
+            "validGpuSamples": 322,
+            "gpuMedianMs": 7.7269120000000004,
+            "gpuP95Ms": 13.629664,
+            "renderCycleMedianMs": 52.7055,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          }
+        }
+      },
+      {
+        "phase": "lookout-sweep",
+        "runs": {
+          "baked-route-order-fixed": {
+            "samples": 61,
+            "validGpuSamples": 61,
+            "gpuMedianMs": 7.340928,
+            "gpuP95Ms": 12.239744,
+            "renderCycleMedianMs": 51.607,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          },
+          "shared-normal-route-r1": {
+            "samples": 61,
+            "validGpuSamples": 61,
+            "gpuMedianMs": 7.828448,
+            "gpuP95Ms": 12.600928,
+            "renderCycleMedianMs": 55.4812,
+            "deviceLocalBytes": [
+              327091744
+            ],
+            "hostVisibleBytes": [
+              22256896
+            ]
+          },
+          "baked-route-closing": {
+            "samples": 61,
+            "validGpuSamples": 61,
+            "gpuMedianMs": 7.486048,
+            "gpuP95Ms": 12.521696,
+            "renderCycleMedianMs": 51.9619,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          }
+        }
+      },
+      {
+        "phase": "return",
+        "runs": {
+          "baked-route-order-fixed": {
+            "samples": 363,
+            "validGpuSamples": 363,
+            "gpuMedianMs": 7.622144,
+            "gpuP95Ms": 13.59776,
+            "renderCycleMedianMs": 51.3508,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          },
+          "shared-normal-route-r1": {
+            "samples": 363,
+            "validGpuSamples": 363,
+            "gpuMedianMs": 7.77536,
+            "gpuP95Ms": 13.47344,
+            "renderCycleMedianMs": 53.9078,
+            "deviceLocalBytes": [
+              327091744
+            ],
+            "hostVisibleBytes": [
+              22256896
+            ]
+          },
+          "baked-route-closing": {
+            "samples": 363,
+            "validGpuSamples": 363,
+            "gpuMedianMs": 7.641984,
+            "gpuP95Ms": 13.866592,
+            "renderCycleMedianMs": 51.3837,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          }
+        }
+      },
+      {
+        "phase": "descent",
+        "runs": {
+          "baked-route-order-fixed": {
+            "samples": 149,
+            "validGpuSamples": 149,
+            "gpuMedianMs": 7.243328,
+            "gpuP95Ms": 13.679136,
+            "renderCycleMedianMs": 35.3037,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          },
+          "shared-normal-route-r1": {
+            "samples": 149,
+            "validGpuSamples": 149,
+            "gpuMedianMs": 6.580992,
+            "gpuP95Ms": 12.4016,
+            "renderCycleMedianMs": 36.6019,
+            "deviceLocalBytes": [
+              327091744
+            ],
+            "hostVisibleBytes": [
+              22256896
+            ]
+          },
+          "baked-route-closing": {
+            "samples": 149,
+            "validGpuSamples": 149,
+            "gpuMedianMs": 7.211616,
+            "gpuP95Ms": 13.648832,
+            "renderCycleMedianMs": 34.7634,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          }
+        }
+      },
+      {
+        "phase": "lower-sweep",
+        "runs": {
+          "baked-route-order-fixed": {
+            "samples": 31,
+            "validGpuSamples": 31,
+            "gpuMedianMs": 6.065632,
+            "gpuP95Ms": 8.911808,
+            "renderCycleMedianMs": 35.1274,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          },
+          "shared-normal-route-r1": {
+            "samples": 31,
+            "validGpuSamples": 31,
+            "gpuMedianMs": 5.78592,
+            "gpuP95Ms": 6.177344,
+            "renderCycleMedianMs": 36.134,
+            "deviceLocalBytes": [
+              327091744
+            ],
+            "hostVisibleBytes": [
+              22256896
+            ]
+          },
+          "baked-route-closing": {
+            "samples": 31,
+            "validGpuSamples": 31,
+            "gpuMedianMs": 5.866272,
+            "gpuP95Ms": 6.294368,
+            "renderCycleMedianMs": 34.4031,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          }
+        }
+      },
+      {
+        "phase": "tomb-backtrack",
+        "runs": {
+          "baked-route-order-fixed": {
+            "samples": 58,
+            "validGpuSamples": 58,
+            "gpuMedianMs": 6.109552000000001,
+            "gpuP95Ms": 9.766368,
+            "renderCycleMedianMs": 36.78725,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          },
+          "shared-normal-route-r1": {
+            "samples": 58,
+            "validGpuSamples": 58,
+            "gpuMedianMs": 6.682784,
+            "gpuP95Ms": 6.934848,
+            "renderCycleMedianMs": 36.725449999999995,
+            "deviceLocalBytes": [
+              327091744
+            ],
+            "hostVisibleBytes": [
+              22256896
+            ]
+          },
+          "baked-route-closing": {
+            "samples": 58,
+            "validGpuSamples": 58,
+            "gpuMedianMs": 6.76096,
+            "gpuP95Ms": 9.916224,
+            "renderCycleMedianMs": 35.7534,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48298944
+            ]
+          }
+        }
+      },
+      {
+        "phase": "passage-sweep",
+        "runs": {
+          "baked-route-order-fixed": {
+            "samples": 90,
+            "validGpuSamples": 90,
+            "gpuMedianMs": 6.8368,
+            "gpuP95Ms": 9.984096,
+            "renderCycleMedianMs": 36.387100000000004,
+            "deviceLocalBytes": [
+              366243552,
+              372464608,
+              377833184,
+              377834720,
+              377835232,
+              399275488,
+              399291104,
+              416783712
+            ],
+            "hostVisibleBytes": [
+              47293120,
+              48298944,
+              53667520,
+              53669056,
+              53669952,
+              53670464,
+              53677120
+            ]
+          },
+          "shared-normal-route-r1": {
+            "samples": 90,
+            "validGpuSamples": 90,
+            "gpuMedianMs": 6.69168,
+            "gpuP95Ms": 6.9256,
+            "renderCycleMedianMs": 36.887299999999996,
+            "deviceLocalBytes": [
+              327091744
+            ],
+            "hostVisibleBytes": [
+              22256896
+            ]
+          },
+          "baked-route-closing": {
+            "samples": 90,
+            "validGpuSamples": 90,
+            "gpuMedianMs": 5.920736,
+            "gpuP95Ms": 11.50976,
+            "renderCycleMedianMs": 37.1917,
+            "deviceLocalBytes": [
+              366243552,
+              372464608,
+              377833184,
+              377834720,
+              377835232,
+              399275488,
+              399291104,
+              416783712
+            ],
+            "hostVisibleBytes": [
+              47293120,
+              48298944,
+              53667520,
+              53669056,
+              53669952,
+              53670464,
+              53677120
+            ]
+          }
+        }
+      },
+      {
+        "phase": "rope-return",
+        "runs": {
+          "baked-route-order-fixed": {
+            "samples": 99,
+            "validGpuSamples": 99,
+            "gpuMedianMs": 6.950592,
+            "gpuP95Ms": 10.047584,
+            "renderCycleMedianMs": 36.5815,
+            "deviceLocalBytes": [
+              366243552,
+              372464608,
+              372622816,
+              372624352,
+              372624864,
+              399275488,
+              399291104,
+              421036768
+            ],
+            "hostVisibleBytes": [
+              47293120,
+              48303808,
+              53672384,
+              53673920,
+              53674816,
+              53675328,
+              53681984
+            ]
+          },
+          "shared-normal-route-r1": {
+            "samples": 58,
+            "validGpuSamples": 58,
+            "gpuMedianMs": 6.839536000000001,
+            "gpuP95Ms": 7.19696,
+            "renderCycleMedianMs": 36.71815,
+            "deviceLocalBytes": [
+              327091744
+            ],
+            "hostVisibleBytes": [
+              22256896
+            ]
+          },
+          "baked-route-closing": {
+            "samples": 99,
+            "validGpuSamples": 99,
+            "gpuMedianMs": 6.355008,
+            "gpuP95Ms": 10.416608,
+            "renderCycleMedianMs": 36.1062,
+            "deviceLocalBytes": [
+              366243552,
+              372464608,
+              372622816,
+              372624352,
+              372624864,
+              399275488,
+              399291104,
+              421036768
+            ],
+            "hostVisibleBytes": [
+              47293120,
+              48303808,
+              53672384,
+              53673920,
+              53674816,
+              53675328,
+              53681984
+            ]
+          }
+        }
+      },
+      {
+        "phase": "repeat-ascent",
+        "runs": {
+          "baked-route-order-fixed": {
+            "samples": 118,
+            "validGpuSamples": 118,
+            "gpuMedianMs": 7.193472,
+            "gpuP95Ms": 13.304672,
+            "renderCycleMedianMs": 36.5437,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48303808
+            ]
+          },
+          "shared-normal-route-r1": {
+            "samples": 118,
+            "validGpuSamples": 118,
+            "gpuMedianMs": 6.775584,
+            "gpuP95Ms": 6.970112,
+            "renderCycleMedianMs": 37.18375,
+            "deviceLocalBytes": [
+              327091744
+            ],
+            "hostVisibleBytes": [
+              22256896
+            ]
+          },
+          "baked-route-closing": {
+            "samples": 118,
+            "validGpuSamples": 118,
+            "gpuMedianMs": 4.656143999999999,
+            "gpuP95Ms": 6.88624,
+            "renderCycleMedianMs": 34.74275,
+            "deviceLocalBytes": [
+              372464608
+            ],
+            "hostVisibleBytes": [
+              48303808
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "failedBakedBeforeAdmissionOrderFix": {
+    "arguments": [
+      "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+      "--development-rescue-journey",
+      "--capture-showcase",
+      "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-normal-20261024\\baked-route-pre-order",
+      "--capture-hidden",
+      "--development-checkpoint",
+      "chapter-kit-reunion",
+      "--validate-chapter-roundtrip"
+    ],
+    "executable": {
+      "exists": true,
+      "bytes": 14643200,
+      "sha256": "f21e5ace6b873bee6efad97d1ed721394e64da0d7572ab4bd267512f775c58ef"
+    },
+    "pid": 28576,
+    "exitCode": 1,
+    "seconds": 126.07800000000134,
+    "pending": false,
+    "gpuBefore": null,
+    "gpuAfter": null,
+    "foregroundUnchanged": true,
+    "settingsUnchanged": true,
+    "campaignUnchanged": true,
+    "stderrTail": "Chapter two-way capture failed: Two-way capture lacks automatic static-detail unload and complete restoration."
+  },
+  "finalRebuildPixelParity": {
+    "compared": "corridor-normal-r1 versus corridor-normal-final-r1",
+    "changedRgbPixels": 0
+  },
+  "android": {
+    "arguments": [
+      "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\gradlew.bat",
+      "assembleDebug",
+      "testDebugUnitTest",
+      "lintDebug",
+      "--console=plain",
+      "--no-daemon"
+    ],
+    "exitCode": 0,
+    "seconds": 211.125,
+    "phoneUsed": false,
+    "installed": false,
+    "apk": {
+      "bytes": 200663360,
+      "sha256": "639c12aed0cba2131a1053535706937091b927462dfcb6b6a4da738548877b72"
+    },
+    "units": {
+      "tests": 447,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6,
+      "skippedCases": [
+        {
+          "class": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+          "name": "actualExistingAndDanglingOutputLinksAreNotReplacedWhereHostSupportsLinks[24]"
+        },
+        {
+          "class": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+          "name": "actualExistingAndDanglingOutputLinksAreNotReplacedWhereHostSupportsLinks"
+        },
+        {
+          "class": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+          "name": "actualSymbolicExternalRootIsRejectedWhereHostSupportsLinks[24]"
+        },
+        {
+          "class": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+          "name": "actualSymbolicExternalRootIsRejectedWhereHostSupportsLinks"
+        },
+        {
+          "class": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+          "name": "actualSameParentSourceLinkIsRejectedWhereHostSupportsLinks[24]"
+        },
+        {
+          "class": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+          "name": "actualSameParentSourceLinkIsRejectedWhereHostSupportsLinks"
+        }
+      ]
+    },
+    "rawBuildLogSha256": "ce2219052398d306de7ce8bc67b2ed474a2c41268b844c117dfe3dc06957b3cb"
+  },
+  "debug-final-r1": [
+    {
+      "kind": "build",
+      "arguments": [
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+        "--build",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug",
+        "--config",
+        "Debug",
+        "--target",
+        "horde_rt_diagnostic_window",
+        "horde_rt_static_geometry_cutover_tests",
+        "horde_rt_graphics_preview_tests",
+        "horde_rt_scene_initialise_preflight_tests",
+        "horde_rt_scene_resource_inventory_tests",
+        "horde_rt_graphics_preview_frame_adapter_tests",
+        "--parallel",
+        "2"
+      ],
+      "exitCode": 0,
+      "seconds": 32.34399999999732,
+      "log": "build-debug-final-r1.log"
+    },
+    {
+      "kind": "test",
+      "arguments": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--test-dir",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug",
+        "-C",
+        "Debug",
+        "-R",
+        "^horde_rt_(static_geometry_cutover|graphics_preview|scene_initialise_preflight|scene_resource_inventory|graphics_preview_frame_adapter)_tests$",
+        "--output-on-failure"
+      ],
+      "exitCode": 0,
+      "seconds": 42.34299999999348,
+      "log": "test-debug-final-r1.log"
+    }
+  ],
+  "release-final-r1": [
+    {
+      "kind": "build",
+      "arguments": [
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+        "--build",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release",
+        "--config",
+        "Release",
+        "--target",
+        "horde_rt_diagnostic_window",
+        "horde_rt_static_geometry_cutover_tests",
+        "horde_rt_graphics_preview_tests",
+        "horde_rt_scene_initialise_preflight_tests",
+        "horde_rt_scene_resource_inventory_tests",
+        "horde_rt_graphics_preview_frame_adapter_tests",
+        "--parallel",
+        "2"
+      ],
+      "exitCode": 0,
+      "seconds": 52.96899999999732,
+      "log": "build-release-final-r1.log"
+    },
+    {
+      "kind": "test",
+      "arguments": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--test-dir",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release",
+        "-C",
+        "Release",
+        "-R",
+        "^horde_rt_(static_geometry_cutover|graphics_preview|scene_initialise_preflight|scene_resource_inventory|graphics_preview_frame_adapter)_tests$",
+        "--output-on-failure"
+      ],
+      "exitCode": 0,
+      "seconds": 10.047000000005937,
+      "log": "test-release-final-r1.log"
+    }
+  ],
+  "ownerCustody": {
+    "parkedFiles": 151,
+    "changed": []
+  }
+}

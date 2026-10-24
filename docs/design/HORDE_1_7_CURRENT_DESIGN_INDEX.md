@@ -2,12 +2,15 @@
 
 ## Current authority - 24 October 2026
 
-The [whole-instance shared64 retention proof](../evidence/2026-10-24-shared-forest-retention/README.md)
-now certifies13 complete placements in the bounded corridor, keeps both master
-BLAS resident, restores all64 for an unsafe current frame and matches actual RT
-controls/recreation. It remains Debug-only/default OFF. It does not reuse baked
-triangle certificates, evict memory, admit normal shared gameplay or close forest
-depth/phone gates. Original failed fixtures and corrected receipts are retained.
+The [normal shared64 ownership checkpoint](../evidence/2026-10-24-normal-shared-forest/README.md)
+moves the existing-master owner and whole-instance retention into common Debug,
+Release and Android source, preserving the original64 placements and both master
+BLAS. It remains explicitly opt-in/default OFF. The normal-controller Windows RT
+route and recreation pass, but the landing sweep costs11.58ms GPU versus7.98/8.12ms
+for baked controls. Default admission is blocked, not inferred from allocation
+savings. The earlier [retention proof](../evidence/2026-10-24-shared-forest-retention/README.md)
+and its rejected fixtures remain. No baked triangle certificate is reused and
+forest depth/phone gates are still open.
 
 Use [the current implementation/acceptance map](HORDE_1_7_IMPLEMENTATION_REMAINING_2026_10_24.md),
 before choosing work. Forest preparation `3108cffc`, the bounded shared-BLAS

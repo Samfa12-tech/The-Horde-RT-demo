@@ -316,8 +316,13 @@ public:
     enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64 };
     bool SetForestRouteProofMode(ForestRouteProofMode mode, std::string& diagnostic);
     [[nodiscard]] std::string ForestRouteProofJson() const;
+#endif
+    // Validation only: compare the last successfully submitted definitions with
+    // their current shared owners. No gameplay state or resource is changed.
     bool ValidateForestRouteProof(std::string& diagnostic,
         std::optional<bool> expectedRetentionFrame = std::nullopt) const;
+    [[nodiscard]] std::uint32_t SharedForestMaskedInstanceCount() const noexcept { return forestRetentionOmittedCount_; }
+#if defined(_DEBUG)
     // Explicit isolated GraphicsPreview proof only. Configuration survives
     // Initialise's initial Destroy; the aliasing handle owns the admitted master.
     bool SetDiagnosticPreviewMeshPair(std::shared_ptr<const horde::scene::assets::StaticMeshAsset> master,
@@ -348,6 +353,13 @@ public:
     // Set before Initialise; geometry admission is explicit and development-only.
     void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
     void SetDevelopmentRescueJourney(bool enabled) { developmentRescueJourney_=enabled; }
+    // Explicit representation fallback; select before initialisation. This does
+    // not change settings, geometry quality, placement, collision or save state.
+    bool SetSharedForestGeometryEnabled(bool enabled) {
+        if((ready_ || device_!=VK_NULL_HANDLE) && enabled!=sharedForestGeometryEnabled_)return false;
+        sharedForestGeometryEnabled_=enabled;return true;
+    }
+    [[nodiscard]] bool SharedForestGeometryActive() const noexcept { return sharedForestGeometryActive_; }
 #ifndef NDEBUG
     // Survey A/B only; call before initialization. Does not change settings.
     bool SetRegionalWaterDiagnosticEnabled(bool enabled) {
@@ -1046,6 +1058,7 @@ private:
         VkPipelineCache pipelineCache = VK_NULL_HANDLE,
         RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr);
     void ApplyGlassFixtureVisibility(std::span<VkAccelerationStructureInstanceKHR> instances) const;
+    void CleanupFailedInitialisation();
     bool ContinueInitialiseAfterPreflight(
         VkFormat presentationFormat,
         const std::string& skeletonAssetPath,
@@ -1295,11 +1308,15 @@ private:
     std::array<horde::gameplay::effects::FireEmitterFixedStepInput, 2u> previewFireInputs_{};
 #if defined(_DEBUG)
     ForestRouteProofMode forestRouteProofMode_ = ForestRouteProofMode::Disabled;
-    bool UsesSharedForestRouteProof() const noexcept {
-        return forestRouteProofMode_==ForestRouteProofMode::SharedExisting64 ||
-               forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76 ||
-               forestRouteProofMode_==ForestRouteProofMode::SharedRetention64;
-    }
+#endif
+    // Candidate remains opt-in until normal-path validation admits it.
+    static constexpr bool kDefaultSharedForestGeometryEnabled=false;
+    bool sharedForestGeometryEnabled_=kDefaultSharedForestGeometryEnabled;
+    bool sharedForestGeometryActive_=false;
+    bool SelectSharedForestGeometry() const noexcept;
+    bool UsesSharedForestGeometry() const noexcept { return sharedForestGeometryActive_; }
+    bool UsesSharedForestRetention() const noexcept;
+    bool UsesSupplementalForestProof() const noexcept;
     void AdmitSharedForestRetentionProof();
     void ApplySharedForestRetentionProof(std::span<VkAccelerationStructureInstanceKHR>, const RtSceneFrameInputs&);
     bool ForestRetentionIdentityMatches() const;
@@ -1321,6 +1338,7 @@ private:
     std::array<AccelerationStructure, 2u> forestMasterBlas_{};
     Buffer forestMasterBuildScratch_{};
     RtGpuWorkLease forestMasterBuildWork_{};
+#if defined(_DEBUG)
     static constexpr std::uint32_t kDiagnosticPreviewPairMetadataIndex = 3u;
     std::shared_ptr<const horde::scene::assets::StaticMeshAsset> diagnosticPreviewPairMaster_;
     std::array<horde::gameplay::items::HeldItemTransform,2> diagnosticPreviewPairTransforms_{};

@@ -4,6 +4,7 @@
 #include "platform/windows/WindowsHiddenCaptureLaunch.h"
 #include "platform/windows/WindowsForestRouteProofLaunch.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -36,6 +37,16 @@ int main()
     Check(ParseForestRouteProofLaunch(retentionArgs,true).mode==ForestRouteCaptureMode::SharedRetention64 &&
           ParseForestRouteProofLaunch(retentionArgs,true).error.empty(),"whole-instance retention requires its own explicit proof selection");
     Check(!ParseForestRouteProofLaunch(retentionArgs,false).error.empty(),"Release rejects whole-instance retention proof");
+    auto normalForestArgs=forestArgs;normalForestArgs[1]=L"normal-shared64";
+    Check(ParseForestRouteProofLaunch(normalForestArgs,true).mode==ForestRouteCaptureMode::NormalShared64 &&
+          ParseForestRouteProofLaunch(normalForestArgs,true).error.empty(),"normal shared ownership uses a distinct explicit validation selection");
+    Check(!ParseForestRouteProofLaunch(normalForestArgs,false).error.empty(),"normal-owner validation launcher remains Debug-only");
+    std::array<std::wstring_view,8> normalRouteArgs{};
+    std::copy(normalForestArgs.begin(),normalForestArgs.end(),normalRouteArgs.begin());
+    normalRouteArgs[6]=L"chapter-kit-reunion";normalRouteArgs[7]=L"--validate-chapter-roundtrip";
+    Check(ParseForestRouteProofLaunch(normalRouteArgs,true).error.empty(),"normal shared ownership may use the existing reunion roundtrip gate");
+    normalRouteArgs[1]=L"shared64";
+    Check(!ParseForestRouteProofLaunch(normalRouteArgs,true).error.empty(),"isolated proof mode cannot bypass normal route ownership");
     auto mixedRetention=retentionArgs;mixedRetention[2]=L"--validate-static-zone-cutover";
     Check(!ParseForestRouteProofLaunch(mixedRetention,true).error.empty(),"whole-instance proof cannot reuse common-owner cutover");
     auto unsafeSector=sectorArgs;unsafeSector[2]=L"--validate-static-zone-cutover";

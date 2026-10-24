@@ -848,6 +848,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     diagnosticPreviewPairScratchPeak_=std::exchange(other.diagnosticPreviewPairScratchPeak_,0);
     diagnosticPreviewPairBuildMilliseconds_=std::exchange(other.diagnosticPreviewPairBuildMilliseconds_,0.);
     forestRouteProofMode_=std::exchange(other.forestRouteProofMode_,ForestRouteProofMode::Disabled);
+#endif
+    sharedForestGeometryEnabled_=std::exchange(other.sharedForestGeometryEnabled_,kDefaultSharedForestGeometryEnabled);
+    sharedForestGeometryActive_=std::exchange(other.sharedForestGeometryActive_,false);
     forestSharedLayout_=std::move(other.forestSharedLayout_);other.forestSharedLayout_={};
     forestMasterBlas_=std::exchange(other.forestMasterBlas_,{});
     forestMasterBuildScratch_=std::exchange(other.forestMasterBuildScratch_,{});
@@ -857,14 +860,12 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     forestRetentionFrameEligible_=std::exchange(other.forestRetentionFrameEligible_,false);
     forestRetentionFrameGeneration_=std::exchange(other.forestRetentionFrameGeneration_,0u);
     forestRetentionOmittedCount_=std::exchange(other.forestRetentionOmittedCount_,0u);
-#endif
     other.gpuResources_.Reset();
     ready_ = std::exchange(other.ready_, false);
 
     return *this;
 }
 
-#if defined(_DEBUG)
 namespace {
 bool ApplyExistingForestInstances(std::span<VkAccelerationStructureInstanceKHR> instances,
     const horde::scene::ForestDressingSharedLayout& layout,bool f01Sector,
@@ -897,6 +898,36 @@ bool ApplyExistingForestInstances(std::span<VkAccelerationStructureInstanceKHR> 
 }
 }
 
+bool PresentableTinyRtScene::SelectSharedForestGeometry() const noexcept
+{
+    if(sceneProfile_!=RtSceneProfile::Showcase || !developmentRescueJourney_)return false;
+#if defined(_DEBUG)
+    if(forestRouteProofMode_!=ForestRouteProofMode::Disabled)
+        return forestRouteProofMode_!=ForestRouteProofMode::BakedResident;
+#endif
+    return sharedForestGeometryEnabled_;
+}
+
+bool PresentableTinyRtScene::UsesSharedForestRetention() const noexcept
+{
+    if(!UsesSharedForestGeometry())return false;
+#if defined(_DEBUG)
+    if(forestRouteProofMode_!=ForestRouteProofMode::Disabled)
+        return forestRouteProofMode_==ForestRouteProofMode::SharedRetention64;
+#endif
+    return true;
+}
+
+bool PresentableTinyRtScene::UsesSupplementalForestProof() const noexcept
+{
+#if defined(_DEBUG)
+    return forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76;
+#else
+    return false;
+#endif
+}
+
+#if defined(_DEBUG)
 bool PresentableTinyRtScene::SetForestRouteProofMode(ForestRouteProofMode mode,std::string& diagnostic)
 {
     if(mode!=ForestRouteProofMode::Disabled && mode!=ForestRouteProofMode::BakedResident &&
@@ -915,10 +946,10 @@ bool PresentableTinyRtScene::SetForestRouteProofMode(ForestRouteProofMode mode,s
 
 std::string PresentableTinyRtScene::ForestRouteProofJson() const
 {
-    if(forestRouteProofMode_==ForestRouteProofMode::Disabled)return "null";
-    const bool shared=UsesSharedForestRouteProof();
+    if(forestRouteProofMode_==ForestRouteProofMode::Disabled && !UsesSharedForestGeometry())return "null";
+    const bool shared=UsesSharedForestGeometry();
     const bool sector=forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76;
-    const bool retention=forestRouteProofMode_==ForestRouteProofMode::SharedRetention64;
+    const bool retention=UsesSharedForestRetention();
     std::ostringstream out;out.imbue(std::locale::classic());out<<std::fixed<<std::setprecision(8);
     const auto resources=ResourceInventory();
     std::array<bool,kRtStaticAssetCapacity> assetUsed{};std::size_t registrations=0;
@@ -928,8 +959,11 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
         ++registrations;if(row.assetIndex>=assetUsed.size())fits=false;else assetUsed[row.assetIndex]=true;
     }
     const auto assetCount=std::count(assetUsed.begin(),assetUsed.end(),true);
-    out<<"{\"mode\":\""<<(retention?"shared-retention64":sector?"shared-f01-sector76":shared?"shared-existing64":"baked-resident")
-       <<"\",\"defaultEnabled\":false,\"fullyResident\":"<<(!ordinaryStaticOmissions_ && !ordinaryStaticReduced_?"true":"false")
+    out<<"{\"mode\":\""<<(forestRouteProofMode_==ForestRouteProofMode::Disabled?"normal-shared64":retention?"shared-retention64":sector?"shared-f01-sector76":shared?"shared-existing64":"baked-resident")
+       <<"\",\"defaultEnabled\":"<<(kDefaultSharedForestGeometryEnabled?"true":"false")
+       <<",\"requestedSharedGeometry\":"<<(sharedForestGeometryEnabled_?"true":"false")
+       <<",\"activeSharedGeometry\":"<<(sharedForestGeometryActive_?"true":"false")
+       <<",\"proofOverride\":"<<(forestRouteProofMode_!=ForestRouteProofMode::Disabled?"true":"false")<<",\"fullyResident\":"<<(!ordinaryStaticOmissions_ && !ordinaryStaticReduced_?"true":"false")
        <<",\"ordinaryOmissionCertificateReused\":false,\"forestOrPerformanceAdmitted\":false"
        <<",\"physicalDefinitions\":"<<tlasInstanceCount_<<",\"physicalStorageCapacity\":"<<kTlasInstanceCount
        <<",\"primitiveRows\":"<<staticMeshSlot_.PrimitiveMetadata().size()<<",\"primitiveCapacity\":"<<kRtPrimitiveMetadataCapacity
@@ -1034,18 +1068,23 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
     out<<'}';return out.str();
 }
 
+#endif
 bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
     std::optional<bool> expectedRetentionFrame) const
 {
     const auto fail=[&](const char* error){diagnostic=error;return false;};
-    const bool shared=UsesSharedForestRouteProof();
-    const bool sector=forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76;
-    const bool retention=forestRouteProofMode_==ForestRouteProofMode::SharedRetention64;
+    const bool shared=UsesSharedForestGeometry();
+    const bool sector=UsesSupplementalForestProof();
+    const bool retention=UsesSharedForestRetention();
     if(expectedRetentionFrame && (!retention || forestRetentionFrameEligible_!=*expectedRetentionFrame ||
        (*expectedRetentionFrame && !forestRetentionOmittedCount_)))
         return fail("Forest retention frame did not make the explicitly expected nonempty/retained decision.");
     const std::size_t supplementalCount=sector?12u:0u;
-    if(forestRouteProofMode_==ForestRouteProofMode::Disabled || !ready_ || !tlasInstanceDefinitionsValid_ ||
+    bool bakedProof=false;
+#if defined(_DEBUG)
+    bakedProof=forestRouteProofMode_==ForestRouteProofMode::BakedResident;
+#endif
+    if((!shared && !bakedProof) || !ready_ || !tlasInstanceDefinitionsValid_ ||
        !forestSharedLayout_.prepared || forestSharedLayout_.prepared->placements.size()!=64u ||
        sceneProfile_!=RtSceneProfile::Showcase || !developmentRescueJourney_ || ordinaryStaticOmissions_ ||
        ordinaryStaticReduced_ || preparedStaticGeometry_)return fail("Forest proof lacks its complete fully resident owner.");
@@ -1108,6 +1147,7 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
     diagnostic.clear();return true;
 }
 
+#if defined(_DEBUG)
 bool PresentableTinyRtScene::SetDiagnosticPreviewMeshPair(
     std::shared_ptr<const horde::scene::assets::StaticMeshAsset> master,
     const std::array<horde::gameplay::items::HeldItemTransform,2>& transforms,
@@ -1351,6 +1391,25 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
     return initialised;
 }
 
+void PresentableTinyRtScene::CleanupFailedInitialisation()
+{
+#if defined(_DEBUG)
+    if(diagnosticPreviewPairBuild_.submitted)return;
+#endif
+    // Normal shared masters exist in Release and Android too. A failed wait
+    // is not completion proof: retain their owners for platform retirement.
+    if(forestMasterBuildWork_.submitted || forestMasterBuildWork_.completionUnproved)return;
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(regionPagePreparation_) {
+        const auto phase=regionPagePreparation_->Status();
+        if(phase==RtRegionGeometryPreparation::Phase::BuildWait ||
+           phase==RtRegionGeometryPreparation::Phase::CancelPending ||
+           phase==RtRegionGeometryPreparation::Phase::Quarantined)return;
+    }
+#endif
+    Destroy();
+}
+
 bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
     VkFormat presentationFormat,
     const std::string& skeletonAssetPath,
@@ -1432,19 +1491,7 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
             return CreateSelectedPipelineBundle(diagnostic);
         }))
     {
-#if defined(_DEBUG)
-        if(diagnosticPreviewPairBuild_.submitted || forestMasterBuildWork_.submitted)return false; // Retain until platform proves successful device idle.
-#endif
-#if HORDE_RT_REGION_PAGE_PROTOTYPE
-        if(regionPagePreparation_) {
-            const auto phase=regionPagePreparation_->Status();
-            if(phase==RtRegionGeometryPreparation::Phase::BuildWait ||
-               phase==RtRegionGeometryPreparation::Phase::CancelPending ||
-               phase==RtRegionGeometryPreparation::Phase::Quarantined)
-                return false; // Platform retains context until successful idle proof.
-        }
-#endif
-        Destroy();
+        CleanupFailedInitialisation();
         return false;
     }
 
@@ -1529,12 +1576,12 @@ void PresentableTinyRtScene::Destroy()
     else diagnosticPreviewPairBuild_={};
     diagnosticPreviewPairActive_=false;diagnosticPreviewPairBaked_={};
     diagnosticPreviewPairScratchPeak_=0;diagnosticPreviewPairBuildMilliseconds_=0.;
+#endif
     if(device_!=VK_NULL_HANDLE)RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},forestMasterBuildWork_);
     else forestMasterBuildWork_={};
     forestRetentionProof_={};forestRetentionLastOmitted_={};forestRetentionFrameEligible_=false;
     forestRetentionFrameGeneration_=0;forestRetentionOmittedCount_=0;
-    forestSharedLayout_={};
-#endif
+    forestSharedLayout_={};sharedForestGeometryActive_=false;
     DestroyBuffer(keeperTextureUploadRecovery_.staging);
     for (auto& texture : keeperTextureRestoreQuarantine_) DestroyTextureArray(texture);
     keeperTextureLifetime_ = {};
@@ -1601,9 +1648,9 @@ void PresentableTinyRtScene::Destroy()
 #if defined(_DEBUG)
     DestroyAccelerationStructure(diagnosticPreviewPairBlas_);
     DestroyBuffer(diagnosticPreviewPairScratch_);
+#endif
     for(auto& master:forestMasterBlas_)DestroyAccelerationStructure(master);
     DestroyBuffer(forestMasterBuildScratch_);
-#endif
     DestroyBuffer(tlasUpdateScratch_);
     DestroyBuffer(rescueWorldUpdateScratch_);
     DestroyBuffer(waterDropletBlasUpdateScratch_);
@@ -1819,8 +1866,8 @@ PresentableTinyRtScene::CaptureResourceHandles() const
     append(result.topLevelAccelerationStructures, tlas_.handle);
 #if defined(_DEBUG)
     append(result.bottomLevelAccelerationStructures,diagnosticPreviewPairBlas_.handle);
-    for(const auto& master:forestMasterBlas_)append(result.bottomLevelAccelerationStructures,master.handle);
 #endif
+    for(const auto& master:forestMasterBlas_)append(result.bottomLevelAccelerationStructures,master.handle);
     for (const auto strategy : {RtMaterialStrategy::OpaqueFast,
                                RtMaterialStrategy::GenericDielectric})
     {
@@ -1885,9 +1932,9 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
 #if defined(_DEBUG)
     accumulateBlas(diagnosticPreviewPairBlas_);
     AccumulateRtGpuBuffer(inventory,diagnosticPreviewPairScratch_);
+#endif
     for(const auto& master:forestMasterBlas_)accumulateBlas(master);
     AccumulateRtGpuBuffer(inventory,forestMasterBuildScratch_);
-#endif
     if (preparedStaticGeometry_) {
         const auto& candidate = *preparedStaticGeometry_;
         if (candidate.uploads) candidate.uploads->AccumulateResourceInventory(inventory);
@@ -3128,18 +3175,25 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             return false;
         if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, diagnostic)) return false;
         horde::scene::ForestDressingBuildReport forest;
-#if defined(_DEBUG)
-        if(forestRouteProofMode_!=ForestRouteProofMode::Disabled) {
+        if(SelectSharedForestGeometry()) {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+            diagnostic="Shared forest cannot combine an independent region-page owner.";return false;
+#endif
             std::shared_ptr<const horde::scene::PreparedForestDressing> prepared;
             if(!horde::scene::PrepareForestDressing(root,prepared,diagnostic,chapterTerrainSurface_.get()))return false;
             forestSharedLayout_.prepared=std::move(prepared);
-            if(UsesSharedForestRouteProof()) {
-                if(!horde::scene::SeedPreparedForestMaterialFamilies(*forestSharedLayout_.prepared,collapseStaticAsset_,diagnostic))return false;
-            }else if(!horde::scene::AppendPreparedForestDressing(*forestSharedLayout_.prepared,collapseStaticAsset_,forest,diagnostic))return false;
-        }else
+            if(!horde::scene::SeedPreparedForestMaterialFamilies(*forestSharedLayout_.prepared,collapseStaticAsset_,diagnostic))return false;
+        }else {
+#if defined(_DEBUG)
+            if(forestRouteProofMode_==ForestRouteProofMode::BakedResident) {
+                std::shared_ptr<const horde::scene::PreparedForestDressing> prepared;
+                if(!horde::scene::PrepareForestDressing(root,prepared,diagnostic,chapterTerrainSurface_.get()))return false;
+                forestSharedLayout_.prepared=std::move(prepared);
+                if(!horde::scene::AppendPreparedForestDressing(*forestSharedLayout_.prepared,collapseStaticAsset_,forest,diagnostic))return false;
+            }else
 #endif
-        if (!horde::scene::AppendPreparedForestDressing(root, collapseStaticAsset_, forest, diagnostic, chapterTerrainSurface_.get()))
-            return false;
+            if(!horde::scene::AppendPreparedForestDressing(root,collapseStaticAsset_,forest,diagnostic,chapterTerrainSurface_.get()))return false;
+        }
         horde::scene::ForestUnderstoryReport understory;
         if (!horde::scene::AppendPreparedForestUnderstory(root, collapseStaticAsset_, *chapterTerrainSurface_, understory, diagnostic))
             return false;
@@ -3163,12 +3217,16 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             !horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(gothicChestBaseAsset_, diagnostic) ||
             !horde::scene::assets::CoalesceAdjacentWorldBakedPrimitives(rewardLanternRingAsset_, diagnostic))
             return false;
-#if defined(_DEBUG)
-        if(UsesSharedForestRouteProof()) {
+        if(SelectSharedForestGeometry()) {
             if(!horde::scene::AppendPreparedForestMasters(forestSharedLayout_.prepared,collapseStaticAsset_,forestSharedLayout_,diagnostic))return false;
-            if(forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76 &&
+#if defined(_DEBUG)
+            if(UsesSupplementalForestProof() &&
                !horde::scene::PrepareF01BackgroundForestDressing(forestSharedLayout_,*chapterTerrainSurface_,diagnostic))return false;
-        }else if(forestRouteProofMode_==ForestRouteProofMode::BakedResident)
+#endif
+            sharedForestGeometryActive_=true;
+        }
+#if defined(_DEBUG)
+        else if(forestRouteProofMode_==ForestRouteProofMode::BakedResident)
             forestSharedLayout_.commonPrimitiveCount=collapseStaticAsset_.primitives.size();
 #endif
     }
@@ -3210,7 +3268,6 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     // on the normal application thread. This adds CPU payload, not GPU rows.
     if (developmentRescueJourney_)
         fullStaticGeometrySource_ = std::make_shared<const RtStaticMeshSlot>(staticMeshSlot_);
-    AdmitOrdinaryStaticDetail();
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(!PrepareRegionPageSource(diagnostic))return false;
 #endif
@@ -4694,11 +4751,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             }
             regionalWaterFaces_.push_back(actual);
         }
-#if defined(_DEBUG)
-        // The instance certificate needs the actual regional-water BLAS
-        // inputs, which do not exist at the earlier packed-source pin.
+        // Both certificates need the actual regional-water BLAS inputs, which
+        // do not exist at the earlier packed-source pin. Shared ownership still
+        // refuses the baked certificate; the legacy fallback retains its guards.
+        AdmitOrdinaryStaticDetail();
         AdmitSharedForestRetentionProof();
-#endif
         rescueRopeVertexOffset_=vertices.size();
         horde::gameplay::traversal::RescueTraversal initial;
         const auto rope=horde::scene::RescueRopeTriangleVertices(initial.Snapshot());
@@ -5460,8 +5517,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
              kWaterDropletMetadataIndex, "runtime water contact droplets",
              waterDropletBlas_, false, &waterDropletBlasUpdateScratch_)))
         return false;
-#if defined(_DEBUG)
-    if(UsesSharedForestRouteProof()) {
+    if(UsesSharedForestGeometry()) {
         for(unsigned m=0;m<2;++m) {
             std::vector<VkAccelerationStructureGeometryKHR> geometries;
             std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
@@ -5483,7 +5539,6 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             productionPropBlasBuildMilliseconds_+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
         }
     }
-#endif
 
     VkAccelerationStructureBuildRangeInfoKHR playerBodyRange{};
     playerBodyRange.primitiveCount = playerBodyPrimitiveCount;
@@ -5943,15 +5998,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // reference is an inactive instance, but would force a needless definition
     // change before the first live snapshot even while the Keeper stays hidden.
     instances[kKeeperInstanceIndex] = characterSlot_.BuildActiveInstances()[2];
-#if defined(_DEBUG)
-    if(UsesSharedForestRouteProof()) {
+    if(UsesSharedForestGeometry()) {
         if(!ApplyExistingForestInstances(instances,forestSharedLayout_,
-            forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76,
+            UsesSupplementalForestProof(),
             {forestMasterBlas_[0].address,forestMasterBlas_[1].address},diagnostic))return false;
         tlasInstanceCount_=kOrdinaryTlasInstanceCount+64u+
             static_cast<std::uint32_t>(forestSharedLayout_.supplementalPlacements.size());
     }else
-#endif
         tlasInstanceCount_=kOrdinaryTlasInstanceCount;
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(!viewmodelAvailable_ || kProductionPlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel){
@@ -8189,14 +8242,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
     ApplyGlassFixtureVisibility(instances);
     const auto contactRipple = MakeWaterContactRippleGpu(frame.waterContact);
-#if defined(_DEBUG)
-    if(UsesSharedForestRouteProof() &&
+    if(UsesSharedForestGeometry() &&
        !ApplyExistingForestInstances(instances,forestSharedLayout_,
-           forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76,
+           UsesSupplementalForestProof(),
            {forestMasterBlas_[0].address,forestMasterBlas_[1].address},diagnostic))return false;
-    if(forestRouteProofMode_==ForestRouteProofMode::SharedRetention64)
+    if(UsesSharedForestRetention())
         ApplySharedForestRetentionProof(instances,frame);
-#endif
     lastInstanceMasks_={};
     for(std::size_t i=0;i<tlasInstanceCount_;++i)lastInstanceMasks_[i]=instances[i].mask;
     if (!WriteDustQuality(*quality, frame, diagnostic, observation) ||

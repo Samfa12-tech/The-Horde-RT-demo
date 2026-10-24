@@ -3,6 +3,15 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
     std::string& error)
 {
     using namespace horde::gameplay::validation;
+    const bool sharedForest=context.rtScene.SharedForestGeometryActive();
+    unsigned sharedValidatedFrames=0,maximumSharedMasked=0;
+    const auto validateShared=[&] {
+        if(!sharedForest)return true;
+        if(!context.rtScene.SharedForestGeometryActive() || !context.rtScene.ValidateForestRouteProof(error))return false;
+        ++sharedValidatedFrames;
+        maximumSharedMasked=std::max(maximumSharedMasked,context.rtScene.SharedForestMaskedInstanceCount());
+        return true;
+    };
     ChapterRoundTripProbe probe;
     if(!probe.Start(context.simulation.Snapshot())) {
         error="Two-way capture requires the admitted, low-lantern reunion.";return false;
@@ -14,7 +23,7 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
     }
     std::ofstream rows(directory/"frames.csv"),manifest(directory/"gallery.json");
     if(!rows||!manifest) {error="Two-way evidence files could not open.";return false;}
-    rows<<"frame,phase,station,submitted_tick,simulation_ms,render_cycle_ms,completed_tick,completed_serial,gpu_status,gpu_ns,device_local_bytes,host_visible_bytes,keeper_retired_bytes,keeper_retired_memory_flags,keeper_texture_retired_device_local_bytes,keeper_texture_retired_host_visible_bytes,static_omitted_triangles,static_unloads,static_restores,static_saved_owner_bytes,static_peak_owner_overlap_bytes,static_wait_frames\n";
+    rows<<"frame,phase,station,submitted_tick,simulation_ms,render_cycle_ms,completed_tick,completed_serial,gpu_status,gpu_ns,device_local_bytes,host_visible_bytes,keeper_retired_bytes,keeper_retired_memory_flags,keeper_texture_retired_device_local_bytes,keeper_texture_retired_host_visible_bytes,static_omitted_triangles,static_unloads,static_restores,static_saved_owner_bytes,static_peak_owner_overlap_bytes,static_wait_frames,shared_forest_instances,shared_forest_masked\n";
     manifest<<"{\"schema\":2,\"scope\":\"moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance\",\"maximumSimulationTicksPerRender\":4,\"simulationHz\":60,\"captures\":[\n";
     struct Restore {
         VulkanSurfaceContext& ctx;bool paused,active;int sfx,voice,music;
@@ -96,6 +105,7 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
             error="Two-way moving frame failed stable RT presentation: "+context.lastRtFrameError;return false;
         }
         const auto rendered=std::chrono::steady_clock::now();
+        if(!validateShared())return false;
         if(context.simulation.Snapshot().tickIndex!=beforeTick+steps) {
             error="Platform rendering advanced the probe's already-owned simulation tick.";return false;
         }
@@ -115,7 +125,8 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
             <<keeper.retiredAllocationBytes<<','<<keeper.retiredMemoryFlags<<','
             <<keeperTextures.retiredDeviceLocalBytes<<','<<keeperTextures.retiredHostVisibleBytes<<','
             <<detail.omittedTriangles<<','<<detail.unloads<<','<<detail.restores<<','<<detail.savedOwnerBytes<<','
-            <<detail.peakOverlapOwnerBytes<<','<<detail.waitFrames<<'\n';
+            <<detail.peakOverlapOwnerBytes<<','<<detail.waitFrames<<','<<(sharedForest?64u:0u)<<','
+            <<context.rtScene.SharedForestMaskedInstanceCount()<<'\n';
         if(frames%120==0)rows.flush();
         const bool transition=phase!=probe.Phase() || station!=probe.Station();
         const bool quadrant=(phase==ChapterProbePhase::Landing || phase==ChapterProbePhase::Lookout ||
@@ -147,7 +158,7 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
     context.simulationInput=reset;
     context.simulation.StepFixed(reset,1.f/60.f,context.simulation.Snapshot().inputPublicationSequence+1);
     bool resetPresented=false;
-    if(!RenderFrame(context,clear,resetPresented)||!resetPresented||
+    if(!RenderFrame(context,clear,resetPresented)||!resetPresented||!validateShared()||
        !capture("reset-opening")) {
         error="Chapter reset failed current-pose RT restoration: "+context.lastRtFrameError;return false;
     }
@@ -161,11 +172,23 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
         error="Ordinary reset left stale companion or retired Keeper storage.";return false;
     }
     const auto detail=context.rtScene.OrdinaryStaticDetailEvidence();
-    if(!detail.unloads || detail.restores!=detail.unloads || detail.savedOwnerBytes ||
-       !context.rtScene.StaticGeometryHasCompleteContributors()) {
+    if(sharedForest) {
+        // Resident shared masters use whole-instance decisions, not the baked
+        // owner's eviction transaction. Keep the legacy assertion below intact.
+        // Every route frame and reset above validates exact submitted owners and
+        // masks; an alive Keeper at reset must retain every original placement.
+        if(!sharedValidatedFrames || !context.rtScene.ValidateForestRouteProof(error,false) ||
+           !context.rtScene.StaticGeometryHasCompleteContributors() ||
+           context.simulation.Snapshot().staticDetailLease.resourceGeneration)return false;
+    }else if(!detail.unloads || detail.restores!=detail.unloads || detail.savedOwnerBytes ||
+             !context.rtScene.StaticGeometryHasCompleteContributors()) {
         error="Two-way capture lacks automatic static-detail unload and complete restoration.";return false;
     }
-    manifest<<"\n],\"frames\":"<<frames-1<<",\"maximumNormalStaticOwnerSavingBytes\":"<<detail.peakSavedOwnerBytes
+    manifest<<"\n],\"frames\":"<<frames-1
+        <<",\"sharedForestResident\":"<<(sharedForest?"true":"false")
+        <<",\"sharedForestValidatedFrames\":"<<sharedValidatedFrames
+        <<",\"maximumSharedForestMaskedInstances\":"<<maximumSharedMasked
+        <<",\"maximumNormalStaticOwnerSavingBytes\":"<<detail.peakSavedOwnerBytes
         <<",\"staticDetailUnloads\":"<<detail.unloads<<",\"staticDetailRestores\":"<<detail.restores<<','
         <<"\"keeperVertexLifetime\":{\"retiredAllocationBytes\":"<<retired.retiredAllocationBytes
         <<",\"retiredMemoryFlags\":"<<retired.retiredMemoryFlags

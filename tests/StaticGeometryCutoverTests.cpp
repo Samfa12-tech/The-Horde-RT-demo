@@ -396,7 +396,6 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         }
         return failures;
     }
-#if defined(_DEBUG)
     static int ForestRetentionChecks() {
 
         // Synthetic CPU policy/packing fixtures only. No imported asset, RT
@@ -435,7 +434,10 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             placement.yawRadians=contract.yawRadians;placement.supportY=0;
         }
         StaticMeshAsset owner;owner.vertices.assign(prepared->masters[0].vertices.begin(),prepared->masters[0].vertices.begin()+3);
-        owner.indices={0,1,2};owner.primitives.push_back({0,0,3,0,0});
+        // Three classified common triangles make a one-triangle certificate
+        // structurally valid; shared policy must still reject that old route.
+        owner.indices={0,1,2,0,1,2,0,1,2};owner.primitives.push_back({0,0,9,0,0});
+        owner.triangleRegions.assign(3u,StaticTriangleRegion::ExteriorDressing);
         owner.materials.push_back({});owner.materials[0].name="synthetic common";
         owner.nodeTransforms.push_back({"synthetic-world",identity});owner.bounds=prepared->masters[0].bounds;
         ForestDressingSharedLayout layout;
@@ -463,7 +465,10 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         const auto source=pack(owner);
         if(!source){Check(false,"synthetic source packs without GPU work");std::cerr<<error<<'\n';return 1;}
         const auto seed=[&](Scene& s) {
-            s.forestRouteProofMode_=Scene::ForestRouteProofMode::SharedRetention64;
+#if defined(_DEBUG)
+            s.forestRouteProofMode_=Scene::ForestRouteProofMode::Disabled;
+#endif
+            s.sharedForestGeometryEnabled_=s.sharedForestGeometryActive_=true;
             s.fullStaticGeometrySource_=source;s.forestSharedLayout_=layout;s.collapseStaticAsset_=owner;
             s.staticGeometryGeneration_=41;s.developmentRescueJourney_=true;s.sceneProfile_=RtSceneProfile::Showcase;
             // Explicit CPU closure inputs; the synthetic world is not evidence
@@ -530,7 +535,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         constexpr std::array<const char*,21> runtimeFaults{{"different source owner","different prepared owner","stale generation",
             "changed primitive range","changed local bounds","unverified retained faces","nonidentity current root",
             "wrong master reference","wrong placement transform","wrong metadata index","incomplete live population",
-            "unpublished definitions","pending definitions","different proof mode","supplemental placements",
+            "unpublished definitions","pending definitions","retention-suppressing override or inactive owner","supplemental placements",
             "changed common prefix","active water droplet","exterior frame","visible glass fixture",
             "wrong submitted root reference","missing master address"}};
         for(unsigned fault=0;fault<runtimeFaults.size();++fault) {
@@ -549,7 +554,13 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             if(fault==10)s.tlasInstanceCount_=28u;
             if(fault==11)s.tlasInstanceDefinitionsValid_=false;
             if(fault==12)s.tlasPendingDefinitionsValid_=true;
-            if(fault==13)s.forestRouteProofMode_=Scene::ForestRouteProofMode::SharedExisting64;
+            if(fault==13) {
+#if defined(_DEBUG)
+                s.forestRouteProofMode_=Scene::ForestRouteProofMode::SharedExisting64;
+#else
+                s.sharedForestGeometryActive_=false;
+#endif
+            }
             if(fault==14)s.forestSharedLayout_.supplementalPlacements.push_back({});
             if(fault==15)++s.forestSharedLayout_.commonPrimitiveCount;
             if(fault==16)unsafe.waterContact.droplets[0].active=true;
@@ -583,9 +594,134 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             failures+=!Check(s.forestRetentionProof_.eligibleCount==0u && allRetained(instances) &&
                 s.forestRetentionOmittedCount_==0u,"missing actual-water inputs cannot certify any omitted tree");
         }
+        {
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;
+            failures+=!Check(s.sharedForestGeometryEnabled_==Scene::kDefaultSharedForestGeometryEnabled &&
+                !s.SharedForestGeometryActive() && !s.SelectSharedForestGeometry(),
+                "the configured normal default does not invent an active non-chapter owner");
+            failures+=!Check(s.SetSharedForestGeometryEnabled(true) && !s.SelectSharedForestGeometry() &&
+                !s.UsesSharedForestGeometry(),"a pre-init request does not invent an active owner or non-chapter profile");
+            s.SetDevelopmentRescueJourney(true);
+            failures+=!Check(s.SelectSharedForestGeometry() && !s.UsesSharedForestRetention(),
+                "chapter selection consumes the request only after separate ownership admission");
+            s.sceneProfile_=RtSceneProfile::GraphicsPreview;
+            failures+=!Check(!s.SelectSharedForestGeometry(),"normal shared request does not enter unrelated preview scenes");
+            s.sceneProfile_=RtSceneProfile::Showcase;
+#if defined(_DEBUG)
+            s.forestRouteProofMode_=Scene::ForestRouteProofMode::BakedResident;
+            failures+=!Check(!s.SelectSharedForestGeometry(),"explicit baked control overrides the normal shared request");
+            s.forestRouteProofMode_=Scene::ForestRouteProofMode::SharedExisting64;s.sharedForestGeometryActive_=true;
+            failures+=!Check(s.SelectSharedForestGeometry() && !s.UsesSharedForestRetention(),
+                "explicit shared64 control suppresses normal retention");
+            s.forestRouteProofMode_=Scene::ForestRouteProofMode::SharedF01Sector76;
+            failures+=!Check(!s.UsesSharedForestRetention(),"supplemental composition never inherits normal retention");
+            s.forestRouteProofMode_=Scene::ForestRouteProofMode::Disabled;s.sharedForestGeometryActive_=false;
+#endif
+            s.ready_=true;
+            failures+=!Check(!s.SetSharedForestGeometryEnabled(false) && s.SetSharedForestGeometryEnabled(true) &&
+                s.sharedForestGeometryEnabled_,"a live scene rejects changed requests while accepting an unchanged recreation request");
+            s.ready_=false;s.device_=Handle<VkDevice>(99);
+            const bool deviceLocked=!s.SetSharedForestGeometryEnabled(false) && s.sharedForestGeometryEnabled_;
+            s.device_=VK_NULL_HANDLE; // synthetic guard input; never a Vulkan device
+            failures+=!Check(deviceLocked,"a retained device identity also locks representation selection");
+        }
+        {
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);
+            auto instances=s.tlasBuiltInstances_;s.ApplySharedForestRetentionProof(instances,frame);
+            const auto omitted=s.forestRetentionLastOmitted_;const auto count=s.forestRetentionOmittedCount_;
+            auto movedOwner=std::make_unique<Scene>(std::move(s));auto& moved=*movedOwner;
+            failures+=!Check(moved.sharedForestGeometryEnabled_ && moved.SharedForestGeometryActive() &&
+                moved.UsesSharedForestRetention() && moved.ForestRetentionIdentityMatches() &&
+                moved.forestRetentionProof_.source==source && moved.forestSharedLayout_.prepared==prepared &&
+                moved.forestMasterBlas_[0].address==501u*4096u && moved.forestMasterBlas_[1].address==502u*4096u &&
+                moved.forestRetentionLastOmitted_==omitted && moved.forestRetentionOmittedCount_==count &&
+                moved.forestRetentionFrameEligible_ && moved.forestRetentionFrameGeneration_==41u &&
+                s.sharedForestGeometryEnabled_==Scene::kDefaultSharedForestGeometryEnabled &&
+                !s.SharedForestGeometryActive() && !s.forestRetentionProof_.source &&
+                !s.forestSharedLayout_.prepared && !s.forestMasterBlas_[0].address && !s.forestMasterBlas_[1].address,
+                "move transfers normal shared source/master/retention custody and clears the moved-from owner");
+            moved.Destroy();
+            failures+=!Check(moved.sharedForestGeometryEnabled_ && !moved.SharedForestGeometryActive() &&
+                !moved.UsesSharedForestRetention() && !moved.forestRetentionProof_.source &&
+                !moved.forestSharedLayout_.prepared &&
+                !moved.forestRetentionFrameEligible_ && !moved.forestRetentionFrameGeneration_ &&
+                !moved.forestRetentionOmittedCount_ &&
+                std::none_of(moved.forestRetentionLastOmitted_.begin(),moved.forestRetentionLastOmitted_.end(),[](bool b){return b;}),
+                "device-null teardown clears CPU shared ownership while preserving the recreate request");
+            // These handles are synthetic, with no device or GPU allocation.
+            // Real BLAS destruction/recreation belongs to native RT validation.
+            moved.forestMasterBlas_={};
+        }
+        {
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);
+            const std::array<std::uint32_t,1> triangles{{0u}},families{{0u}};
+            failures+=!Check(bool(RtStaticTriangleOmissions::Create(source,21u,triangles,error)),
+                "synthetic common-triangle selection is structurally valid before scene-policy rejection");
+            failures+=!Check(!s.CreateStaticGeometryTriangleOmissions(41u,triangles,error) &&
+                error.find("Shared forest")!=std::string::npos,
+                "normal shared ownership refuses legacy world-triangle certificates");
+            RtStaticMeshSlot unchanged=*source;
+            failures+=!Check(!s.PackLoadedStaticAssets(unchanged,families,error) &&
+                error.find("Shared forest filtered packing")!=std::string::npos &&
+                unchanged.PayloadBytes()==source->PayloadBytes(),
+                "normal shared ownership refuses old family-filter packing before changing output");
+            failures+=!Check(!s.PackLoadedStaticAssets(unchanged,{},error,
+                static_cast<std::uint8_t>(StaticTriangleRegion::TombDressing)) &&
+                error.find("Shared forest filtered packing")!=std::string::npos,
+                "normal shared ownership refuses old triangle-region filtering");
+            failures+=!Check(!s.BeginStaticGeometryReplacement(41u,{},error) && !s.preparedStaticGeometry_,
+                "normal shared ownership cannot begin a combined baked-owner replacement");
+            int oldMap=3,newMap=4;Seed(s,oldMap,newMap);const auto* candidate=s.preparedStaticGeometry_.get();
+            Proof proof{&s};const auto api=Api(proof);
+            failures+=!Check(!s.CommitStaticGeometryWithApi(41u,api,error) && !proof.proof && !proof.publish && !proof.retire &&
+                s.preparedStaticGeometry_.get()==candidate && s.staticGeometryGeneration_==41u,
+                "normal shared ownership rejects old combined cutover before external retirement or publication");
+        }
+        constexpr std::array<const char*,4> failureStates{{"submitted only","completion unproved only",
+            "submitted and completion unproved","no owning work"}};
+        for(unsigned state=0;state<failureStates.size();++state) {
+            auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);
+            // Execute the actual initialization-failure finalizer with a null
+            // device. These are synthetic custody tokens, not submitted GPU
+            // work; clearing them below never invokes a Vulkan API.
+            s.ready_=false;
+            s.forestMasterBuildScratch_=Buffer(503);
+            s.forestMasterBuildWork_.command=Handle<VkCommandBuffer>(504);
+            s.forestMasterBuildWork_.fence=Handle<VkFence>(505);
+            const bool submitted=state==0u || state==2u;
+            const bool unproved=state==1u || state==2u;
+            s.forestMasterBuildWork_.submitted=submitted;
+            s.forestMasterBuildWork_.completionUnproved=unproved;
+            const auto scratch=s.forestMasterBuildScratch_.buffer;
+            const auto master0=s.forestMasterBlas_[0].handle,master1=s.forestMasterBlas_[1].handle;
+            const auto message=std::string("initialization-failure cleanup: ")+failureStates[state];
+            s.CleanupFailedInitialisation();
+            if(submitted || unproved) {
+                failures+=!Check(s.forestMasterBuildWork_.submitted==submitted &&
+                    s.forestMasterBuildWork_.completionUnproved==unproved &&
+                    s.forestMasterBuildWork_.command==Handle<VkCommandBuffer>(504) &&
+                    s.forestMasterBuildWork_.fence==Handle<VkFence>(505) &&
+                    s.forestMasterBuildScratch_.buffer==scratch &&
+                    s.forestMasterBlas_[0].handle==master0 && s.forestMasterBlas_[1].handle==master1 &&
+                    s.fullStaticGeometrySource_==source && s.forestSharedLayout_.prepared==prepared &&
+                    s.forestRetentionProof_.source==source && s.forestRetentionProof_.admitted &&
+                    s.SharedForestGeometryActive() && s.sharedForestGeometryEnabled_ &&
+                    s.staticGeometryGeneration_==41u && s.tlasInstanceCount_==92u,
+                    message.c_str());
+            }else {
+                failures+=!Check(!s.forestMasterBuildWork_.command && !s.forestMasterBuildWork_.fence &&
+                    !s.forestMasterBuildWork_.submitted && !s.forestMasterBuildWork_.completionUnproved &&
+                    !s.SharedForestGeometryActive() && !s.forestRetentionProof_.source &&
+                    !s.forestSharedLayout_.prepared && s.sharedForestGeometryEnabled_,
+                    message.c_str());
+            }
+            // Device-null destruction cannot free fake Vulkan allocations.
+            // Remove every synthetic GPU token before ordinary RAII teardown.
+            s.forestMasterBuildWork_={};s.forestMasterBuildScratch_={};s.forestMasterBlas_={};s.blas_={};
+            s.tlasBuiltInstances_={};s.tlasInstanceDefinitionsValid_=false;
+        }
         return failures;
     }
-#endif
     static int Run() {
         int failures=0,oldMap=3,newMap=4; std::string error;
         {
@@ -634,10 +770,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         }
         failures+=KeeperVertexLifetimeChecks();
         failures+=KeeperTextureLifetimeChecks();
-#if defined(_DEBUG)
-
         failures+=ForestRetentionChecks();
-#endif
         {
             auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;Seed(s,oldMap,newMap);
             horde::gameplay::simulation::GameSimulation simulation;
