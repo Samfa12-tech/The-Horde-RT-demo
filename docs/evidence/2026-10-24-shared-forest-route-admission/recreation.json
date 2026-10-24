@@ -1,0 +1,158 @@
+[
+  {
+    "label": "recreate-pipeline",
+    "complete": true,
+    "sameRendererObject": true,
+    "initialPausedInputBarrier": true,
+    "sceneEpochBefore": 2,
+    "sceneEpochAfter": 3,
+    "resourcesMatch": true,
+    "simulationTickBefore": 241,
+    "simulationTickAfter": 241,
+    "storageImageSha256Matches": true,
+    "capacities": {
+      "physicalDefinitions": 92,
+      "physicalStorageCapacity": 104,
+      "primitiveRows": 36,
+      "primitiveCapacity": 36,
+      "finalMaterialRows": 32,
+      "materialCapacity": 32,
+      "metadataCapacity": 28,
+      "staticRegistrations": 15,
+      "uniqueStaticAssets": 13,
+      "staticAssetCapacity": 13,
+      "fitsCapacities": true,
+      "blasCount": 22
+    },
+    "masterRanges": [
+      {
+        "offset": 9,
+        "count": 3,
+        "allocationBytes": 314880
+      },
+      {
+        "offset": 12,
+        "count": 3,
+        "allocationBytes": 321792
+      }
+    ],
+    "transition": [
+      {
+        "phase": "unsafe-retained",
+        "eligible": 13,
+        "omitted": 0,
+        "bothMastersResident": true,
+        "bakedTriangleCertificateApplied": false,
+        "omittedPlacementIds": []
+      },
+      {
+        "phase": "restored-safe",
+        "eligible": 13,
+        "omitted": 13,
+        "bothMastersResident": true,
+        "bakedTriangleCertificateApplied": false,
+        "omittedPlacementIds": [
+          11,
+          18,
+          19,
+          22,
+          26,
+          29,
+          31,
+          36,
+          42,
+          51,
+          55,
+          56,
+          58
+        ]
+      }
+    ],
+    "restoredPixelsMatch": true,
+    "originalReceiptSha256": "6f5cfb1d2ed2c44adf25aacdd7eb558f5fa0507f7494619c18b6e8e872e7e9ff",
+    "originalTransitionSha256": "4087e914bac17315b3eb9b73530d0e523f74a984f632f4316c31868534c057da",
+    "images": {
+      "230-chapter-forest-retention-west-recreated.png": "299a325c87bfc1fbdd99e95bc762fd93c4dae45a712ddbce2bd0a85752ce1c83",
+      "230-chapter-forest-retention-west.png": "299a325c87bfc1fbdd99e95bc762fd93c4dae45a712ddbce2bd0a85752ce1c83",
+      "forest-retention-restored.png": "299a325c87bfc1fbdd99e95bc762fd93c4dae45a712ddbce2bd0a85752ce1c83"
+    }
+  },
+  {
+    "label": "recreate-query",
+    "complete": true,
+    "sameRendererObject": true,
+    "initialPausedInputBarrier": true,
+    "sceneEpochBefore": 2,
+    "sceneEpochAfter": 3,
+    "resourcesMatch": true,
+    "simulationTickBefore": 241,
+    "simulationTickAfter": 241,
+    "storageImageSha256Matches": true,
+    "capacities": {
+      "physicalDefinitions": 92,
+      "physicalStorageCapacity": 104,
+      "primitiveRows": 36,
+      "primitiveCapacity": 36,
+      "finalMaterialRows": 32,
+      "materialCapacity": 32,
+      "metadataCapacity": 28,
+      "staticRegistrations": 15,
+      "uniqueStaticAssets": 13,
+      "staticAssetCapacity": 13,
+      "fitsCapacities": true,
+      "blasCount": 22
+    },
+    "masterRanges": [
+      {
+        "offset": 9,
+        "count": 3,
+        "allocationBytes": 314880
+      },
+      {
+        "offset": 12,
+        "count": 3,
+        "allocationBytes": 321792
+      }
+    ],
+    "transition": [
+      {
+        "phase": "unsafe-retained",
+        "eligible": 13,
+        "omitted": 0,
+        "bothMastersResident": true,
+        "bakedTriangleCertificateApplied": false,
+        "omittedPlacementIds": []
+      },
+      {
+        "phase": "restored-safe",
+        "eligible": 13,
+        "omitted": 13,
+        "bothMastersResident": true,
+        "bakedTriangleCertificateApplied": false,
+        "omittedPlacementIds": [
+          11,
+          18,
+          19,
+          22,
+          26,
+          29,
+          31,
+          36,
+          42,
+          51,
+          55,
+          56,
+          58
+        ]
+      }
+    ],
+    "restoredPixelsMatch": true,
+    "originalReceiptSha256": "6f5cfb1d2ed2c44adf25aacdd7eb558f5fa0507f7494619c18b6e8e872e7e9ff",
+    "originalTransitionSha256": "24886c2099dabc22e9d58eb8a98db048e8f9e3c84d6751dc8ef37ede360f0431",
+    "images": {
+      "230-chapter-forest-retention-west-recreated.png": "f4268cab6663cbe4d9260031b2f74aec7a28b032ef53a36a2b3272bcc41c42ff",
+      "230-chapter-forest-retention-west.png": "f4268cab6663cbe4d9260031b2f74aec7a28b032ef53a36a2b3272bcc41c42ff",
+      "forest-retention-restored.png": "f4268cab6663cbe4d9260031b2f74aec7a28b032ef53a36a2b3272bcc41c42ff"
+    }
+  }
+]

@@ -1055,6 +1055,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
             continue;
         }
         if(argument==L"--capture-chapter-landing") {++index;continue;} // Validated by the bounded launch parser above.
+        if(argument==L"--capture-chapter-route-stages")continue; // Same full-route gate, optional observation only.
         if(argument==L"--validate-chapter-roundtrip") {
 #if defined(_DEBUG)
             options.validateChapterRoundTrip=true;
@@ -8061,10 +8062,10 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         }
     }
 #if defined(_DEBUG)
-    // The partial attribution prefix uses identical ordinary staging/warmup for
-    // both representations. Existing frozen/full-route recreation trials remain.
+    // Moving routes use identical ordinary staging for both representations.
+    // Frozen captures retain the separate same-owner recreation gate.
     const bool forestProof=context.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled &&
-        !ParseCaptureLaunchOptions().chapterLandingOnly;
+        !ParseCaptureLaunchOptions().chapterLandingOnly && !ParseCaptureLaunchOptions().validateChapterRoundTrip;
     bool forestRecreated=false;
     std::uint64_t forestEpochBefore=0;
     std::uint64_t forestTickBefore=0;

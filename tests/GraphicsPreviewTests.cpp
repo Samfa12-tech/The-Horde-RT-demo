@@ -47,6 +47,17 @@ int main()
     Check(ParseForestRouteProofLaunch(normalRouteArgs,true).error.empty(),"normal shared ownership may use the existing reunion roundtrip gate");
     normalRouteArgs[1]=L"shared64";
     Check(!ParseForestRouteProofLaunch(normalRouteArgs,true).error.empty(),"isolated proof mode cannot bypass normal route ownership");
+    const std::array<std::wstring_view,8> routeStages{L"--capture-showcase",L"C:\\captures\\route",L"--capture-hidden",
+        L"--development-checkpoint",L"chapter-kit-reunion",L"--validate-chapter-roundtrip",
+        L"--capture-chapter-route-stages",L"--development-rescue-journey"};
+    const auto observedRoute=ParseForestRouteProofLaunch(routeStages,true);
+    Check(observedRoute.error.empty() && observedRoute.gpuStages && !observedRoute.landingOnly &&
+        observedRoute.mode==ForestRouteCaptureMode::Disabled,"GPU observation preserves the complete ordinary baked route gate");
+    Check(!ParseForestRouteProofLaunch(routeStages,false).error.empty(),"Release rejects full-route GPU observation");
+    auto invalidRouteStages=routeStages;invalidRouteStages[5]=L"--other";
+    Check(!ParseForestRouteProofLaunch(invalidRouteStages,true).error.empty(),"GPU observation cannot replace full-route validation");
+    invalidRouteStages=routeStages;invalidRouteStages[2]=L"--other";
+    Check(!ParseForestRouteProofLaunch(invalidRouteStages,true).error.empty(),"full-route GPU observation requires hidden operation");
     const std::array<std::wstring_view,7> landingArgs{L"--capture-chapter-landing",L"stages",L"--capture-hidden",
         L"--capture-showcase",L"C:\\captures\\landing",L"--development-checkpoint",L"chapter-kit-reunion"};
     const auto landing=ParseForestRouteProofLaunch(landingArgs,true);

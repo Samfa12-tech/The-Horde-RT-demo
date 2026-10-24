@@ -16,7 +16,7 @@ struct ForestRouteProofLaunch {
 inline ForestRouteProofLaunch ParseForestRouteProofLaunch(
     std::span<const std::wstring_view> arguments,bool debugBuild) {
     ForestRouteProofLaunch result;
-    bool requested=false,hidden=false,capture=false,chapter=false,conflict=false,roundtrip=false,reunion=false;
+    bool requested=false,hidden=false,capture=false,chapter=false,conflict=false,roundtrip=false,reunion=false,routeStages=false;
     for(std::size_t i=0;i<arguments.size();++i) {
         const auto a=arguments[i];
         if(a==L"--forest-route-proof") {
@@ -39,6 +39,10 @@ inline ForestRouteProofLaunch ParseForestRouteProofLaunch(
             if(value==L"stages")result.gpuStages=true;
             else if(value!=L"control") {result.error="Unknown landing observation mode.";return result;}
         }
+        else if(a==L"--capture-chapter-route-stages") {
+            if(!debugBuild || routeStages) {result.error="Route GPU stages require one Debug selection.";return result;}
+            routeStages=true;result.gpuStages=true;
+        }
         else if(a==L"--capture-hidden")hidden=true;
         else if(a==L"--capture-showcase") {
             capture=i+1<arguments.size() && !arguments[i+1].starts_with(L"--");
@@ -54,7 +58,10 @@ inline ForestRouteProofLaunch ParseForestRouteProofLaunch(
                 a==L"--capture-graphics-preview" || a==L"--capture-hidden-preview-pair" ||
                 a==L"--entry-menu-slice" || a==L"--inspect-static-world-source" || a==L"--anatomical-player-mount")conflict=true;
     }
-    if(roundtrip && (result.mode!=ForestRouteCaptureMode::NormalShared64 || !reunion))conflict=true;
+    if(roundtrip && ((result.mode!=ForestRouteCaptureMode::NormalShared64 &&
+       result.mode!=ForestRouteCaptureMode::Disabled) || !reunion))conflict=true;
+    if(routeStages && (!roundtrip || result.landingOnly || !hidden || !capture || !reunion || conflict))
+        result.error="Route GPU stages require only the complete hidden normal-owner reunion roundtrip.";
     if(result.landingOnly && (!hidden || !capture || !reunion || conflict || roundtrip ||
        (result.mode!=ForestRouteCaptureMode::Disabled && result.mode!=ForestRouteCaptureMode::NormalShared64)))
         result.error="Landing observation requires only a hidden normal-owner reunion capture, separate from full-route validation.";

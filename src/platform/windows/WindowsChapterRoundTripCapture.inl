@@ -24,7 +24,7 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
     std::ofstream rows(directory/"frames.csv"),manifest(directory/"gallery.json");
     if(!rows||!manifest) {error="Two-way evidence files could not open.";return false;}
     rows<<"frame,phase,station,submitted_tick,simulation_ms,render_cycle_ms,completed_tick,completed_serial,gpu_status,gpu_ns,device_local_bytes,host_visible_bytes,keeper_retired_bytes,keeper_retired_memory_flags,keeper_texture_retired_device_local_bytes,keeper_texture_retired_host_visible_bytes,static_omitted_triangles,static_unloads,static_restores,static_saved_owner_bytes,static_peak_owner_overlap_bytes,static_wait_frames,shared_forest_instances,shared_forest_masked";
-    if(landingOnly)rows<<",submitted_x,submitted_y,submitted_z,submitted_yaw,submitted_pitch,stage_owner_match,stage_scene_epoch,stage_measurement_generation,stage_record_attempt_serial,stage_record_serial,stage_simulation_tick,stage_submission_serial,stage_frame_slot,gpu_as_status,gpu_as_serial,gpu_as_ns,gpu_dispatch_status,gpu_dispatch_serial,gpu_dispatch_ns,gpu_transfer_status,gpu_transfer_serial,gpu_transfer_ns";
+    rows<<",submitted_x,submitted_y,submitted_z,submitted_yaw,submitted_pitch,stage_owner_match,stage_scene_epoch,stage_measurement_generation,stage_record_attempt_serial,stage_record_serial,stage_simulation_tick,stage_submission_serial,stage_frame_slot,gpu_as_status,gpu_as_serial,gpu_as_ns,gpu_dispatch_status,gpu_dispatch_serial,gpu_dispatch_ns,gpu_transfer_status,gpu_transfer_serial,gpu_transfer_ns";
     rows<<'\n';
     manifest<<"{\"schema\":2,\"scope\":\""<<(landingOnly?
         "landing-prefix attribution only; staged post-Keeper start; not full-route, owner, Shipping or phone acceptance":
@@ -78,7 +78,7 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
             <<",\"completedFrame\":"<<evidence<<'}';
         hadCapture=true;manifest.flush();rows.flush();return bool(manifest)&&bool(rows);
     };
-    if(landingOnly) {
+    {
         // Same fixed-pose warmup for control and candidate. Rendering owns no
         // gameplay ticks here; the existing probe below remains the only stepper.
         const auto tick=context.simulation.Snapshot().tickIndex;
@@ -87,7 +87,7 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
             if(!RenderFrame(context,clear,presented) || !presented ||
                context.lastFramePresentation!=horde::telemetry::RtPresentationOutcome::Presented ||
                context.simulation.Snapshot().tickIndex!=tick) {
-                error="Landing warmup lost stable RT presentation or advanced gameplay.";return false;
+                error="Chapter warmup lost stable RT presentation or advanced gameplay.";return false;
             }
         }
     }
@@ -147,7 +147,7 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
             <<detail.omittedTriangles<<','<<detail.unloads<<','<<detail.restores<<','<<detail.savedOwnerBytes<<','
             <<detail.peakOverlapOwnerBytes<<','<<detail.waitFrames<<','<<(sharedForest?64u:0u)<<','
             <<context.rtScene.SharedForestMaskedInstanceCount();
-        if(landingOnly) {
+        {
             const auto& state=context.simulation.Snapshot();
             rows<<','<<state.playerX<<','<<state.playerSupportWorldY<<','<<state.playerZ<<','
                 <<state.playerYawRadians<<','<<state.playerPitchRadians;
@@ -221,6 +221,7 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
         error="Two-way capture lacks automatic static-detail unload and complete restoration.";return false;
     }
     manifest<<"\n],\"frames\":"<<frames-1
+        <<",\"warmupFrames\":64,\"fullRouteValidated\":true,\"recreationTestRequiredSeparately\":true"
         <<",\"sharedForestResident\":"<<(sharedForest?"true":"false")
         <<",\"sharedForestValidatedFrames\":"<<sharedValidatedFrames
         <<",\"maximumSharedForestMaskedInstances\":"<<maximumSharedMasked
