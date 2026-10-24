@@ -33,4 +33,12 @@ public final class OpeningBenchmarkStateTest {
         assertFalse(returned.returnedToEntry(7,30,42));
         assertFalse(returned.returnedToEntry(7,31,0));
     }
+    @Test public void unavailableIsDistinctAndStillRequiresFreshReturnedEntry() {
+        OpeningBenchmarkState returning=OpeningBenchmarkState.decode(new long[]{7,42,4,4,0,31});
+        assertNotNull(returning);assertEquals(OpeningBenchmarkState.UNAVAILABLE,returning.result);
+        assertFalse(returning.returnedToEntry(7,31,42));
+        OpeningBenchmarkState complete=OpeningBenchmarkState.decode(new long[]{7,42,5,4,1,31});
+        assertTrue(complete.returnedToEntry(7,31,42));
+        assertFalse(complete.returnedToEntry(7,31,31));
+    }
 }

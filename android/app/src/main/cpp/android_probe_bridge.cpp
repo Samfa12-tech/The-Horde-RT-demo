@@ -78,6 +78,8 @@
 #include "platform/android/GameplayEventMetadata.h"
 #include "platform/android/AndroidDebugRequestAdmission.h"
 #include "platform/android/AndroidOpeningBenchmarkOwner.h"
+#include "platform/android/AndroidBenchmarkOutputTransaction.h"
+#include "telemetry/RtFrameDimensionsEvidence.h"
 #include "update/GitHubReleaseUpdater.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/PipelineCacheSeed.h"
@@ -582,14 +584,22 @@ horde::graphics::OpeningBenchmarkEligibility gOpeningBenchmarkEligibility;
 std::uint64_t gOpeningBenchmarkSerial=0,gOpeningBenchmarkGraphicsSerial=0;
 bool gOpeningBenchmarkOriginalRoute=false;
 std::optional<horde::graphics::GraphicsSettings> gOpeningBenchmarkOriginalSettings;
+bool gOpeningBenchmarkProvisional=false;
+horde::platform::android::AndroidBenchmarkOutputTransaction gOpeningBenchmarkOutput;
+unsigned gOpeningBenchmarkOutputFrameAttempts=0;
+std::string gOpeningBenchmarkProfileJson,gOpeningBenchmarkAppliedFrameJson,gOpeningBenchmarkRestoredFrameJson;
 bool OpeningBenchmarkResetAllowedOnOwner();
+void AnnotateOpeningBenchmarkReport(std::string& text,std::string& json);
 bool OpeningBenchmarkBusy() {
     std::lock_guard lock(gOpeningBenchmarkMutex);return gOpeningBenchmarkOwner.Busy() ||
         gOpeningBenchmarkOwner.State()==horde::platform::android::AndroidOpeningBenchmarkOwner::Phase::Blocked;
 }
 void OpeningBenchmarkFinished(unsigned result) {
     std::lock_guard lock(gOpeningBenchmarkMutex);
-    if(gOpeningBenchmarkOwner.Busy())gOpeningBenchmarkOwner.BeginReturn(result);
+    if(gOpeningBenchmarkOwner.Busy()) {
+        gOpeningBenchmarkOwner.BeginReturn(result);
+        if(gOpeningBenchmarkProvisional)gOpeningBenchmarkOutput.Restore(result!=2);
+    }
 }
 horde::graphics::GraphicsPreviewPerformanceSnapshot gPreviewPerformance{};
 std::uint64_t gPreviewPerformanceGeneration = 0u; // guarded by gGraphicsMutex.
@@ -1768,6 +1778,7 @@ void FinishInAppBenchmark(SwapchainContext& context)
         context.benchmarkEvidence.ExpectedCount() == context.inAppBenchmark.Frames().size();
     std::string text = context.inAppBenchmark.BuildTextReport(metadata, &context.benchmarkEvidence);
     std::string json = context.inAppBenchmark.BuildJsonReport(metadata, &context.benchmarkEvidence);
+    AnnotateOpeningBenchmarkReport(text,json);
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     json = horde::vulkan::raytracing::experimental::AttachStagedPrimaryProfile(std::move(json),
         context.stagedPassProfile.Json(context.benchmarkEvidence.ExpectedCount(), context.stagedPassTimer,
@@ -1781,6 +1792,7 @@ void FinishInAppBenchmark(SwapchainContext& context)
 #endif
     const std::string textPath = context.reportDirectory + "/HordeLanternRT-benchmark-latest.txt";
     const std::string jsonPath = context.reportDirectory + "/HordeLanternRT-benchmark-latest.json";
+    {std::lock_guard lock(gOpeningBenchmarkMutex);if(gOpeningBenchmarkProvisional)gOpeningBenchmarkProfileJson=json;}
     const bool jsonSaved = WriteTextFile(jsonPath, json);
     text += "\nPrivate JSON copy: " + std::string(jsonSaved ? "saved" : "save failed") +
             "\nUse COPY REPORT or SAVE REPORT to export this result.\n";
@@ -5327,6 +5339,12 @@ void SwapchainRenderLoop()
         if (gSwapchainContext.entryHandoff.Observe(entryControls, gSwapchainContext.surfaceGeneration))
             gSwapchainContext.entrySession.Reset();
         PrepareOpeningBenchmarkOnOwner(gSwapchainContext);
+        if(!ProcessOpeningBenchmarkOutputOnOwner(gSwapchainContext)) {
+            previousFrameStart=std::chrono::steady_clock::now();
+            gSwapchainContext.lastInputOwnerSteadyNs=GraphicsSteadyNs();
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            continue; // No acquire, simulation or submission while the UI buffer transaction is pending.
+        }
         bool sceneTransition = DesiredProfile(gSwapchainContext, previewControls) != gSwapchainContext.sceneProfile ||
             previewControls.resetSerial != gSwapchainContext.previewResetSerial;
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
@@ -5693,6 +5711,10 @@ void SwapchainRenderLoop()
     {
         std::lock_guard lock(gOpeningBenchmarkMutex);
         gOpeningBenchmarkOwner.SurfaceRetired(retiredGeneration,retired);
+        if(gOpeningBenchmarkProvisional) {
+            if(retired)gOpeningBenchmarkOutput.SurfaceLost(retiredGeneration);
+            else gOpeningBenchmarkOutput.Fail();
+        }
         gOpeningBenchmarkEligibility={};
     }
     gSurfaceRetirementBlocked.store(!retired, std::memory_order_release);
@@ -5893,6 +5915,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
     }
     if(!context.environmentSurvey) {
         std::lock_guard lock(gOpeningBenchmarkMutex);gOpeningBenchmarkOwner.BindSurface(generation);
+        if(gOpeningBenchmarkProvisional)gOpeningBenchmarkOutput.BindSurface(generation);
     }
     if(!context.environmentSurvey)context.entryHandoff.Observe(ReadEntryControls(), generation);
     context.sceneProfile = DesiredProfile(context, ReadPreviewControls());
@@ -7431,8 +7454,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugRouteReplay(JNIEnv*, jcl
 #endif
 }
 
-extern "C" JNIEXPORT jlong JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_requestOpeningBenchmark(JNIEnv*,jclass,jlong generation)
+static jlong QueueOpeningBenchmark(jlong generation,bool provisional)
 {
     if(generation<=0 || !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)) ||
        gSurfaceSessions.State()!=1)return 0;
@@ -7447,13 +7469,45 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestOpeningBenchmark(JNIEnv*,jcla
         if(!gOpeningBenchmarkOwner.Queue(serial,static_cast<std::uint64_t>(generation),gOpeningBenchmarkEligibility))return 0;
         gOpeningBenchmarkSerial=serial;gOpeningBenchmarkOriginalSettings.reset();
         gOpeningBenchmarkOriginalRoute=gRtLabBenchmarkRoute.load(std::memory_order_acquire);
+        gOpeningBenchmarkProvisional=provisional;gOpeningBenchmarkOutput={};gOpeningBenchmarkOutputFrameAttempts=0;
+        gOpeningBenchmarkProfileJson.clear();gOpeningBenchmarkAppliedFrameJson.clear();gOpeningBenchmarkRestoredFrameJson.clear();
     }
     {
         std::lock_guard lock(gReportMutex);InvalidateBenchmarkSummaryLocked();
         gRequestedBenchmarkRunId.clear();gRequestedBenchmarkWorkload=horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
-        gLatestBenchmarkReport.clear();gLatestBenchmarkProgress="CUSTOM BENCHMARK QUEUED";
+        gLatestBenchmarkReport.clear();gLatestBenchmarkProgress=provisional?"PROVISIONAL BENCHMARK QUEUED":"CUSTOM BENCHMARK QUEUED";
     }
     return static_cast<jlong>(serial);
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestOpeningBenchmark(JNIEnv*,jclass,jlong generation)
+{ return QueueOpeningBenchmark(generation,false); }
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestOpeningProvisionalBenchmark(JNIEnv*,jclass,jlong generation)
+{ return QueueOpeningBenchmark(generation,true); }
+
+extern "C" JNIEXPORT jlongArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getOpeningBenchmarkOutputState(JNIEnv* env,jclass)
+{
+    std::array<std::int64_t,8> state;
+    {std::lock_guard lock(gOpeningBenchmarkMutex);state=gOpeningBenchmarkOutput.Snapshot();}
+    std::array<jlong,8> values{};std::copy(state.begin(),state.end(),values.begin());
+    const auto result=env->NewLongArray(static_cast<jsize>(values.size()));
+    if(result)env->SetLongArrayRegion(result,0,static_cast<jsize>(values.size()),values.data());
+    return result;
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_ackOpeningBenchmarkOutput(JNIEnv*,jclass,jlong request,jlong origin,
+    jlong generation,jlong sequence,jboolean success,jint width,jint height,jboolean layoutProof)
+{
+    if(request<=0 || origin<=0 || generation<=0 || sequence<=0)return;
+    std::lock_guard lock(gOpeningBenchmarkMutex);
+    if(!gOpeningBenchmarkProvisional || !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)))return;
+    gOpeningBenchmarkOutput.Acknowledge(request,origin,generation,sequence,success==JNI_TRUE,
+        width>0?static_cast<std::uint32_t>(width):0,height>0?static_cast<std::uint32_t>(height):0,layoutProof==JNI_TRUE);
 }
 
 extern "C" JNIEXPORT void JNICALL

@@ -390,6 +390,15 @@ public class MainActivity extends Activity {
     private long openingBenchmarkRequest, openingBenchmarkRequestGeneration;
     private boolean openingBenchmarkCancelRequested, openingBenchmarkBlocked;
     private Button openingBenchmarkButton;
+    private Button openingBenchmarkProvisionalButton;
+    private boolean openingBenchmarkProvisional;
+    private OpeningBenchmarkOutput openingBenchmarkOutput;
+    // Process lifetime fallback covers finish/swipe without onSaveInstanceState.
+    // This immutable DTO contains no View, Context, renderer or mutable phase.
+    private static OpeningBenchmarkClient openingBenchmarkClientFallback;
+    private OpeningBenchmarkClient openingBenchmarkRecoveryClient;
+    private boolean openingBenchmarkRecovered, openingBenchmarkRecoveredComplete;
+    private boolean openingBenchmarkRecoveryRejected, openingBenchmarkRecoveryLaunch, openingBenchmarkRecoveryStoragePending;
     private boolean benchmarkStatusExpanded;
     private boolean benchmarkReportVisible;
     private View.OnLayoutChangeListener configurationLayoutListener;
@@ -598,6 +607,7 @@ public class MainActivity extends Activity {
             createEnvironmentSurvey(savedInstanceState);
             return;
         }
+        selectOpeningBenchmarkRecovery(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
@@ -612,20 +622,22 @@ public class MainActivity extends Activity {
         hudRoot.requestApplyInsets();
         lastAppliedConfiguration = new Configuration(getResources().getConfiguration());
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
-        applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
+        if(!openingBenchmarkRecoveryLaunch)applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
         rtLabUnlocked = preferences.getBoolean(PREF_RT_LAB_UNLOCKED, false);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        ProbeBridge.resetRtSceneTuning();
+        if(!openingBenchmarkRecoveryLaunch)ProbeBridge.resetRtSceneTuning();
         graphicsConfirmed = GraphicsPreferences.confirmed(preferences);
-        graphicsRecovering = GraphicsPreferences.hasPending(preferences);
+        graphicsRecovering = !openingBenchmarkRecoveryLaunch && GraphicsPreferences.hasPending(preferences);
         if (graphicsRecovering) {
             final GraphicsPreferences.Values retained = GraphicsPreferences.retainedCandidate(preferences);
             graphicsRecoveryNotice = "An unconfirmed graphics change was interrupted. Restoring " + graphicsConfirmed.scale +
                     "% / water " + waterName(graphicsConfirmed.water) + ". Retained request: " + retained.scale +
                     "% / water " + waterName(retained.water) + "; it has not been confirmed.";
         }
-        setNativeGraphics(graphicsConfirmed);
-        if (!consumeBenchmarkAutomationIntent(getIntent(), true)) consumeDebugAutomationIntent(getIntent());
+        if(!openingBenchmarkRecoveryLaunch) {
+            setNativeGraphics(graphicsConfirmed);
+            if (!consumeBenchmarkAutomationIntent(getIntent(), true)) consumeDebugAutomationIntent(getIntent());
+        }
 
         surfaceView = findViewById(R.id.scene_surface);
         surfaceView.setHapticFeedbackEnabled(true);
@@ -687,15 +699,17 @@ public class MainActivity extends Activity {
             registerDebugRetryReceiver();
         }
 
-        initialiseAudio();
-        musicPlayback = new HordeMusicPlayback(this, musicVolumePercent());
-        musicPlayback.setOnFocusChanged(() -> {
+        if(!openingBenchmarkRecoveryRejected) {
+            initialiseAudio();
+            musicPlayback = new HordeMusicPlayback(this, musicVolumePercent());
+            musicPlayback.setOnFocusChanged(() -> {
             if (!isMusicAudioFocusGranted()) {
                 if (menuAmbience != null) menuAmbience.stop();
                 stopChapterAmbience();
             }
-        });
-        handler.post(menuAmbienceFrame);
+            });
+            handler.post(menuAmbienceFrame);
+        }
         menuButton.setOnClickListener(view -> {
             playSound("menu_toggle", 0.20f);
             showMainMenu(false);
@@ -709,15 +723,17 @@ public class MainActivity extends Activity {
         });
 
         configureTouchControls();
-        entryMenuEnabled = shouldUseEntryMenu(true);
-        if (entryMenuEnabled) {
+        recoverOpeningBenchmarkClient(); // Views exist; decide identity before any holder/start mutation.
+        entryMenuEnabled = openingBenchmarkRecoveryLaunch || shouldUseEntryMenu(true);
+        if (entryMenuEnabled && !openingBenchmarkRecoveryRejected) {
             entryMenuSidePage = false;
             try { ProbeBridge.setEntryMenu(true, false, isReducedMotionEnabled(), false, 0); }
             catch (RuntimeException | LinkageError unavailable) { /* Report through the entry screen after views exist. */ }
         }
         configureSurface();
-        configureCampaignStorage();
-        collectInitialDiagnostics();
+        openingBenchmarkRecoveryStoragePending=openingBenchmarkPending();
+        if(!openingBenchmarkPending() && !openingBenchmarkRecoveryRejected)configureCampaignStorage();
+        if(!openingBenchmarkRecoveryLaunch)collectInitialDiagnostics();
         showMainMenu(true);
         handler.post(runtimePoll);
         scheduleStartupUpdateCheck();
@@ -1040,6 +1056,8 @@ public class MainActivity extends Activity {
 
     private void configureSurface() {
         surfaceView.setClickable(true);
+        surfaceView.addOnLayoutChangeListener((view,left,top,right,bottom,oldLeft,oldTop,oldRight,oldBottom) ->
+            observeOpeningBenchmarkOutput(openingBenchmarkOutput==null?null:openingBenchmarkOutput.current(),true));
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(final SurfaceHolder holder) {
@@ -1051,6 +1069,7 @@ public class MainActivity extends Activity {
             @Override
             public void surfaceChanged(final SurfaceHolder holder, final int format, final int width, final int height) {
                 currentSurface = holder.getSurface();
+                observeOpeningBenchmarkOutput(openingBenchmarkOutput==null?null:openingBenchmarkOutput.current(),true);
             }
 
             @Override
@@ -1065,7 +1084,7 @@ public class MainActivity extends Activity {
     }
 
     private void startSurfaceIfReady() {
-        if (!resumed || !surfaceAvailable || surfaceRequestGeneration != 0 || currentSurface == null) return;
+        if (openingBenchmarkRecoveryRejected || !resumed || !surfaceAvailable || surfaceRequestGeneration != 0 || currentSurface == null) return;
         try {
             if (entryMenuEnabled) {
                 entryPlayRequested = false;
@@ -1073,7 +1092,7 @@ public class MainActivity extends Activity {
             }
             surfaceRequestGeneration = ProbeBridge.startDiagnosticSurface(currentSurface, getFilesDir().getAbsolutePath());
             surfaceStarted = false; // Accepted/pending is distinct from an RT-presented frame.
-            setGameplayPaused(menuVisible || diagnosticsVisible);
+            setGameplayPaused(menuVisible || diagnosticsVisible || openingBenchmarkCancelRequested);
             if (entryMenuEnabled) publishEntryMenuState();
             if (surfaceRequestGeneration == 0) {
                 reportTextView.append("\n\nRenderer surface failed to start.");
@@ -1194,6 +1213,7 @@ public class MainActivity extends Activity {
     }
 
     private void showMainMenu(final boolean firstLaunch) {
+        if(openingBenchmarkRecoveryRejected) { showOpeningBenchmarkRecoveryBlocked();return; }
         if(openingBenchmarkPending()) { showOpeningBenchmarkProgress(); return; }
         invalidateLookoutObjective();
         if (shouldUseEntryMenu(firstLaunch)) {
@@ -1337,7 +1357,7 @@ public class MainActivity extends Activity {
     }
 
     private void publishEntryMenuState() {
-        if (!entryMenuEnabled || surfaceRequestGeneration <= 0) return;
+        if (openingBenchmarkRecoveryRejected || !entryMenuEnabled || surfaceRequestGeneration <= 0) return;
         try {
             ProbeBridge.setEntryMenu(true, entryMenuSidePage, isReducedMotionEnabled(),
                     entryPlayRequested, surfaceRequestGeneration);
@@ -1596,6 +1616,8 @@ public class MainActivity extends Activity {
         addBody(panel, getString(R.string.entry_more_description));
         openingBenchmarkButton=addEntryMenuButton(panel,"Custom benchmark (unranked)",this::requestOpeningCustomBenchmark,false);
         openingBenchmarkButton.setEnabled(canRequestOpeningBenchmark());
+        openingBenchmarkProvisionalButton=addEntryMenuButton(panel,"Mobile provisional benchmark (unranked)",this::requestOpeningProvisionalBenchmark,false);
+        openingBenchmarkProvisionalButton.setEnabled(canRequestOpeningBenchmark());
         addEntryMenuButton(panel, "Load checkpoint", () -> showCampaignMenu(CampaignMenuState.LOAD), false);
         addEntryMenuButton(panel, getString(R.string.controls), this::showControls, false);
         addEntryMenuButton(panel, getString(R.string.credits), this::showCredits, false);
@@ -2015,6 +2037,7 @@ public class MainActivity extends Activity {
         if (entrySettingsButton != null) { entrySettingsButton.setEnabled(!busy); entrySettingsButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
         if (entryMoreButton != null) { entryMoreButton.setEnabled(!busy); entryMoreButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
         if(openingBenchmarkButton!=null) openingBenchmarkButton.setEnabled(!busy && canRequestOpeningBenchmark());
+        if(openingBenchmarkProvisionalButton!=null) openingBenchmarkProvisionalButton.setEnabled(!busy && canRequestOpeningBenchmark());
         if (entryPlayButton != null && state != null && state.phase != EntryMenuState.PHASE_FAILURE)
             entryPlayButton.setText(R.string.entry_play);
     }
@@ -2036,10 +2059,101 @@ public class MainActivity extends Activity {
         return ProbeBridge.requestBenchmark(); // Native readiness/busy guards still apply.
     }
 
+    private static OpeningBenchmarkState readOpeningBenchmarkOwner() {
+        try { return OpeningBenchmarkState.decode(ProbeBridge.getOpeningBenchmarkState()); }
+        catch(RuntimeException | LinkageError unavailable) { return null; }
+    }
+
+    private void selectOpeningBenchmarkRecovery(Bundle saved) {
+        final OpeningBenchmarkClient bundled=OpeningBenchmarkClient.restore(saved),fallback=openingBenchmarkClientFallback;
+        openingBenchmarkRecoveryLaunch=OpeningBenchmarkClient.saved(saved) || fallback!=null;
+        if(!openingBenchmarkRecoveryLaunch)return;
+        final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+        // Prefer the exact in-process LayoutParams copy; a stale/reconstituted
+        // Bundle must not hide a matching same-process checkpoint.
+        openingBenchmarkRecoveryClient=fallback!=null && fallback.matches(owner)?fallback:
+            bundled!=null && bundled.matches(owner)?bundled:bundled!=null?bundled:fallback;
+        openingBenchmarkRecoveryRejected=openingBenchmarkRecoveryClient==null || owner==null ||
+            (!openingBenchmarkRecoveryClient.matches(owner) && owner.phase!=OpeningBenchmarkState.IDLE);
+    }
+
+    private void retainOpeningBenchmarkClient() {
+        if(!openingBenchmarkPending())return;
+        if(openingBenchmarkProvisional && openingBenchmarkOutput==null && openingBenchmarkRecoveryClient==null)return;
+        openingBenchmarkRecoveryClient=new OpeningBenchmarkClient(openingBenchmarkRequest,openingBenchmarkRequestGeneration,
+            openingBenchmarkProvisional,openingBenchmarkOutput!=null?openingBenchmarkOutput.originalLayout():
+                openingBenchmarkRecoveryClient==null?null:openingBenchmarkRecoveryClient.originalLayout());
+        if(openingBenchmarkRecoveryClient.matches(readOpeningBenchmarkOwner()))openingBenchmarkClientFallback=openingBenchmarkRecoveryClient;
+    }
+
+    private void clearOpeningBenchmarkClient() {
+        final OpeningBenchmarkClient stale=openingBenchmarkRecoveryClient;
+        if(stale!=null && openingBenchmarkClientFallback!=null &&
+                stale.request==openingBenchmarkClientFallback.request && stale.origin==openingBenchmarkClientFallback.origin)
+            openingBenchmarkClientFallback=null;
+        openingBenchmarkRecoveryClient=null;
+    }
+
+    private void restoreOpeningBenchmarkLayout() {
+        final FrameLayout.LayoutParams original=openingBenchmarkRecoveryClient==null?null:openingBenchmarkRecoveryClient.originalLayout();
+        if(original!=null) { surfaceView.setLayoutParams(original);surfaceView.getHolder().setSizeFromLayout(); }
+    }
+
+    private void rejectOpeningBenchmarkRecovery() {
+        openingBenchmarkRecoveryRejected=true;
+        openingBenchmarkRequest=openingBenchmarkRequestGeneration=0;
+        openingBenchmarkOutput=null;benchmarkRunning=false;entryPlayRequested=false;
+        handler.removeCallbacks(refreshOpeningBenchmark);
+        showOpeningBenchmarkRecoveryBlocked();
+    }
+
+    private void recoverOpeningBenchmarkClient() {
+        if(!openingBenchmarkRecoveryLaunch)return;
+        if(resumed || surfaceRequestGeneration!=0){rejectOpeningBenchmarkRecovery();return;}
+        final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+        if(openingBenchmarkRecoveryClient==null || owner==null ||
+                (!openingBenchmarkRecoveryClient.matches(owner) && owner.phase!=OpeningBenchmarkState.IDLE)) {
+            rejectOpeningBenchmarkRecovery();return; // Never resize/cancel/start a different live owner.
+        }
+        openingBenchmarkRecoveryRejected=false;
+        if(owner.phase==OpeningBenchmarkState.IDLE) {
+            restoreOpeningBenchmarkLayout();clearOpeningBenchmarkClient();
+            // Fresh-process startup uses confirmed preferences as usual, after
+            // the stale client is discarded. Nothing is written to preferences.
+            applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
+            ProbeBridge.resetRtSceneTuning();setNativeGraphics(graphicsConfirmed);
+            return;
+        }
+        final OpeningBenchmarkClient client=openingBenchmarkRecoveryClient;
+        openingBenchmarkRequest=client.request;openingBenchmarkRequestGeneration=client.origin;
+        openingBenchmarkProvisional=client.provisional;
+        openingBenchmarkRecovered=true;openingBenchmarkCancelRequested=true;
+        openingBenchmarkRecoveredComplete=owner.phase==OpeningBenchmarkState.COMPLETE;
+        benchmarkRunning=true;entryMenuEnabled=true;entryPlayRequested=false;
+        // Cancellation is issued before any lifecycle start/resume; recovery
+        // never resumes measurement, even if the saved run had been running.
+        cancelOpeningBenchmarkRequest();
+        // This Activity's recreated holder has no native owner yet. Establish
+        // the original layout before first start, including a completion race.
+        // Later polls may only observe it or execute the drained native command.
+        restoreOpeningBenchmarkLayout();
+        if(!openingBenchmarkRecoveredComplete && client.provisional)
+            openingBenchmarkOutput=new OpeningBenchmarkOutput(client.request,client.origin,client.originalLayout(),true);
+    }
+
+    private void showOpeningBenchmarkRecoveryBlocked() {
+        menuVisible=true;entryPlayRequested=false;
+        if(menuScrim!=null){menuScrim.removeAllViews();menuScrim.setVisibility(View.GONE);}
+        for(View view:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,interactButton,
+                toggleHeldLightPoseButton,vitalityStatus,developerOverlay,diagnosticsPanel})if(view!=null)view.setVisibility(View.GONE);
+        if(rtStatus!=null){rtStatus.setVisibility(View.VISIBLE);rtStatus.setText(
+            "Benchmark recovery could not identify its renderer owner. No surface or other run was changed. Close this screen and reopen after that run ends.");}
+    }
+
     private boolean openingBenchmarkPending() { return openingBenchmarkRequest>0; }
 
     private boolean canRequestOpeningBenchmark() {
-        if(!entryMenuEnabled || entryPlayRequested || openingBenchmarkPending() || benchmarkRunning || !resumed ||
+        if(openingBenchmarkRecoveryRejected || !entryMenuEnabled || entryPlayRequested || openingBenchmarkPending() || benchmarkRunning || !resumed ||
                 surfaceRequestGeneration<=0 || benchmarkAutomationId!=null || campaignMenuVisible || campaignRequest!=0 ||
                 (campaignState!=null && (campaignState.activeSlot>=0 || campaignState.pending())) ||
                 graphicsVisible || graphicsSceneRestoring || diagnosticsVisible || playtestReportVisible || rtLabVisible) return false;
@@ -2050,14 +2164,30 @@ public class MainActivity extends Activity {
     }
 
     private void requestOpeningCustomBenchmark() {
+        requestOpeningBenchmark(false);
+    }
+
+    private void requestOpeningProvisionalBenchmark() {
+        requestOpeningBenchmark(true);
+    }
+
+    private void requestOpeningBenchmark(boolean provisional) {
         if(!canRequestOpeningBenchmark()) return;
-        final long origin=surfaceRequestGeneration,request;
-        try { request=ProbeBridge.requestOpeningBenchmark(origin); }
-        catch(RuntimeException | LinkageError unavailable) {
-            Toast.makeText(this,R.string.benchmark_unavailable,Toast.LENGTH_LONG).show(); return;
+        final FrameLayout.LayoutParams original=provisional?OpeningBenchmarkOutput.snapshot(surfaceView):null;
+        if(provisional && original==null) {
+            Toast.makeText(this,"Provisional unavailable; choose Custom.",Toast.LENGTH_LONG).show(); return;
         }
-        if(request<=0) { Toast.makeText(this,R.string.benchmark_unavailable,Toast.LENGTH_LONG).show(); return; }
+        final long origin=surfaceRequestGeneration,request;
+        try { request=provisional?ProbeBridge.requestOpeningProvisionalBenchmark(origin):ProbeBridge.requestOpeningBenchmark(origin); }
+        catch(RuntimeException | LinkageError unavailable) {
+            Toast.makeText(this,provisional?"Provisional unavailable; choose Custom.":getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return;
+        }
+        if(request<=0) { Toast.makeText(this,provisional?"Provisional unavailable; choose Custom.":getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return; }
         openingBenchmarkRequest=request; openingBenchmarkRequestGeneration=origin;
+        openingBenchmarkProvisional=provisional;
+        openingBenchmarkOutput=provisional?new OpeningBenchmarkOutput(request,origin,original):null;
+        openingBenchmarkRecovered=openingBenchmarkRecoveredComplete=false;
+        retainOpeningBenchmarkClient();
         openingBenchmarkCancelRequested=openingBenchmarkBlocked=false;
         benchmarkRunning=true; latestBenchmarkReport="";
         entryPlayRequested=false; entryMenuFailed=false;
@@ -2071,10 +2201,73 @@ public class MainActivity extends Activity {
     }
 
     private void cancelOpeningBenchmarkRequest() {
-        if(!openingBenchmarkPending()) return;
+        if(openingBenchmarkRecoveryRejected || !openingBenchmarkPending()) return;
         openingBenchmarkCancelRequested=true;
+        final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+        if(owner==null || !owner.matches(openingBenchmarkRequest,openingBenchmarkRequestGeneration))return;
         try { ProbeBridge.cancelOpeningBenchmark(openingBenchmarkRequest,openingBenchmarkRequestGeneration); }
         catch(RuntimeException | LinkageError unavailable) { /* Native surface retirement also cancels this owner. */ }
+        // The owner may already have replaced apply with restore; observing the
+        // current command prevents an old callback from acknowledging either.
+        observeOpeningBenchmarkOutput(openingBenchmarkOutput==null?null:openingBenchmarkOutput.current());
+    }
+
+    private void pollOpeningBenchmarkOutput() {
+        if(openingBenchmarkOutput==null || !openingBenchmarkPending())return;
+        final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+        if(owner==null || !owner.matches(openingBenchmarkRequest,openingBenchmarkRequestGeneration))return;
+        final OpeningBenchmarkOutput.Command command;
+        try { command=OpeningBenchmarkOutput.Command.decode(ProbeBridge.getOpeningBenchmarkOutputState()); }
+        catch(RuntimeException | LinkageError unavailable) { cancelOpeningBenchmarkRequest();return; }
+        if(command==null)return;
+        if(openingBenchmarkOutput.begin(command,surfaceRequestGeneration,openingBenchmarkCancelRequested,surfaceView)) {
+            // A holder already at the requested dimensions may emit no resize
+            // callback. This posted check still observes real layout and buffer.
+            surfaceView.post(() -> observeOpeningBenchmarkOutput(command,true));
+        }
+        observeOpeningBenchmarkOutput(command);
+    }
+
+    private void observeOpeningBenchmarkOutput(OpeningBenchmarkOutput.Command expected) {
+        observeOpeningBenchmarkOutput(expected,false);
+    }
+
+    private void observeOpeningBenchmarkOutput(OpeningBenchmarkOutput.Command expected,boolean layoutOrPosted) {
+        if(expected==null || openingBenchmarkOutput==null || !openingBenchmarkPending() || surfaceView==null)return;
+        try {
+            final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+            if(owner==null || !owner.matches(openingBenchmarkRequest,openingBenchmarkRequestGeneration))return;
+            final OpeningBenchmarkOutput.Command current=OpeningBenchmarkOutput.Command.decode(ProbeBridge.getOpeningBenchmarkOutputState());
+            if(!expected.same(current))return; // Stale posted work/callback/command cannot ACK a successor.
+            if(layoutOrPosted)openingBenchmarkOutput.observedLayoutOrPost(current);
+            final SurfaceHolder holder=surfaceView.getHolder();
+            final Rect frame=holder.getSurfaceFrame();
+            final int width=frame==null?0:frame.width(),height=frame==null?0:frame.height();
+            final Surface surface=holder.getSurface();
+            final OpeningBenchmarkOutput.Ack ack=openingBenchmarkOutput.observe(current,surfaceRequestGeneration,
+                openingBenchmarkCancelRequested || !resumed,surfaceView,surface!=null && surface.isValid(),width,height);
+            if(ack==null)return;
+            final OpeningBenchmarkState ackOwner=readOpeningBenchmarkOwner();
+            if(ackOwner==null || !ackOwner.matches(current.request,current.origin))return;
+            ProbeBridge.ackOpeningBenchmarkOutput(current.request,current.origin,current.generation,current.sequence,
+                ack.success,ack.width,ack.height,ack.layoutRestoredOrAspectPreserved);
+            openingBenchmarkOutput.acknowledged(ack);
+        } catch(RuntimeException | LinkageError unavailable) {
+            // Keep the layout snapshot and existing cancellation until a native
+            // restore command can be acknowledged on a current surface.
+            openingBenchmarkCancelRequested=true;
+            try {
+                final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+                if(owner!=null && owner.matches(openingBenchmarkRequest,openingBenchmarkRequestGeneration)) {
+                    ProbeBridge.cancelOpeningBenchmark(openingBenchmarkRequest,openingBenchmarkRequestGeneration);
+                }
+            }
+            catch(RuntimeException | LinkageError ignored) { /* Native retirement also cancels the request. */ }
+        }
+    }
+
+    private String openingBenchmarkLabel() {
+        return openingBenchmarkProvisional?"Mobile provisional benchmark (unranked)":"Custom benchmark (unranked)";
     }
 
     private void showOpeningBenchmarkProgress() {
@@ -2088,7 +2281,7 @@ public class MainActivity extends Activity {
         if(rtStatus!=null) {
             rtStatus.setVisibility(View.VISIBLE);
             rtStatus.setText(openingBenchmarkBlocked ? "Benchmark stopped. Could not return to the opening menu. Close and reopen The Horde." :
-                openingBenchmarkCancelRequested ? "Returning to opening menu..." : "Custom benchmark (unranked). Back cancels.");
+                openingBenchmarkCancelRequested ? "Returning to opening menu..." : openingBenchmarkLabel()+". Back cancels.");
         }
         // This leaves campaign Play disabled. The native benchmark owner alone
         // advances Showcase and requires a fresh Entry frame before releasing UI.
@@ -2097,6 +2290,7 @@ public class MainActivity extends Activity {
 
     private void pollOpeningBenchmark() {
         if(!openingBenchmarkPending()) return;
+        pollOpeningBenchmarkOutput(); // Restore commands must also run during RETURNING.
         final OpeningBenchmarkState state;
         try { state=OpeningBenchmarkState.decode(ProbeBridge.getOpeningBenchmarkState()); }
         catch(RuntimeException | LinkageError unavailable) { cancelOpeningBenchmarkRequest(); return; }
@@ -2108,28 +2302,56 @@ public class MainActivity extends Activity {
             }
             return; // Never present Entry as restored from an unproved owner.
         }
-        if(!state.returnedToEntry(openingBenchmarkRequest,openingBenchmarkRequestGeneration,surfaceRequestGeneration)) {
+        if(openingBenchmarkRecovered && !openingBenchmarkRecoveredComplete && state.phase==OpeningBenchmarkState.COMPLETE &&
+                state.entryPresented && state.surfaceGeneration!=surfaceRequestGeneration) {
+            // Completion may race Activity replacement before its new surface
+            // binds. Native Complete cannot issue a new-generation output ACK.
+            openingBenchmarkRecoveredComplete=true;openingBenchmarkOutput=null;
+        }
+        boolean returned=state.returnedToEntry(openingBenchmarkRequest,openingBenchmarkRequestGeneration,surfaceRequestGeneration);
+        if(openingBenchmarkRecoveredComplete && state.phase==OpeningBenchmarkState.COMPLETE && state.entryPresented) {
+            // Complete's old native generation is deliberately left untouched.
+            // This is a new, separate current Entry witness after local policy restore.
+            final EntryMenuState entry=EntryMenuState.decode(ProbeBridge.getEntryMenuState());
+            returned=entry!=null && entry.isEntryPresented(surfaceRequestGeneration) && recoveredOpeningLayoutPresented();
+        }
+        if(!returned) {
             if(rtStatus!=null && state.phase==OpeningBenchmarkState.RETURNING)
                 rtStatus.setText("Returning to opening menu...");
             if(rtStatus!=null && !openingBenchmarkCancelRequested && state.phase==OpeningBenchmarkState.RUNNING) {
                 final String progress=ProbeBridge.getBenchmarkProgress();
-                if(!progress.isEmpty()) rtStatus.setText("Custom benchmark (unranked)\n"+progress);
+                if(!progress.isEmpty()) rtStatus.setText(openingBenchmarkLabel()+"\n"+progress);
             }
             return;
         }
-        final boolean completed=state.result==OpeningBenchmarkState.SUCCEEDED;
+        if(openingBenchmarkOutput!=null && !openingBenchmarkOutput.canRelease())return;
+        final boolean completed=!openingBenchmarkRecovered && state.result==OpeningBenchmarkState.SUCCEEDED;
+        final boolean unavailable=state.result==OpeningBenchmarkState.UNAVAILABLE;
         openingBenchmarkRequest=openingBenchmarkRequestGeneration=0;
         openingBenchmarkCancelRequested=openingBenchmarkBlocked=false;
+        openingBenchmarkOutput=null; openingBenchmarkProvisional=false;
+        clearOpeningBenchmarkClient();openingBenchmarkRecovered=openingBenchmarkRecoveredComplete=false;
         benchmarkRunning=false; entryMenuEnabled=true; entryMenuSidePage=false; entryPlayRequested=false;
         handler.removeCallbacks(refreshOpeningBenchmark);
+        if(openingBenchmarkRecoveryStoragePending){openingBenchmarkRecoveryStoragePending=false;configureCampaignStorage();}
         if(completed) {
             latestBenchmarkReport=ProbeBridge.getBenchmarkReport();
             if(latestBenchmarkReport.isEmpty()) latestBenchmarkReport=getString(R.string.benchmark_interrupted);
             showBenchmarkReport(true);
         } else {
             showMainMenu(false);
-            Toast.makeText(this,"Benchmark did not complete. Returned to opening menu.",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,unavailable?"Provisional unavailable; choose Custom.":
+                "Benchmark did not complete. Returned to opening menu.",Toast.LENGTH_LONG).show();
         }
+    }
+
+    private boolean recoveredOpeningLayoutPresented() {
+        if(!openingBenchmarkProvisional)return true;
+        if(openingBenchmarkRecoveryClient==null || surfaceView==null || !surfaceView.isLaidOut() || surfaceView.isLayoutRequested())return false;
+        final SurfaceHolder holder=surfaceView.getHolder();final Surface surface=holder.getSurface();final Rect frame=holder.getSurfaceFrame();
+        return surface!=null && surface.isValid() && frame!=null &&
+            OpeningBenchmarkOutput.sameLayout(surfaceView.getLayoutParams(),openingBenchmarkRecoveryClient.originalLayout()) &&
+            frame.width()==surfaceView.getWidth() && frame.height()==surfaceView.getHeight() && frame.width()>0 && frame.height()>0;
     }
 
     private void startBenchmark() {
@@ -5323,6 +5545,7 @@ public class MainActivity extends Activity {
     }
 
     private void setGameplayPaused(boolean paused) {
+        if(openingBenchmarkRecoveryRejected)return;
         if (paused) stopChapterAmbience();
         if(!paused && (campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier()))) paused=true;
         if (paused) { clearRunIntent(); clearCrouchIntent(); }
@@ -5959,6 +6182,7 @@ public class MainActivity extends Activity {
     private final Runnable runtimePoll = new Runnable() {
         @Override
         public void run() {
+            if(openingBenchmarkRecoveryRejected)return;
             try {
                 if (benchmarkAutomationId != null && !benchmarkAutomationFinishing &&
                         SystemClock.elapsedRealtime() - benchmarkAutomationStartedAt >=
@@ -7320,6 +7544,7 @@ public class MainActivity extends Activity {
     }
 
     private void pushViewControls() {
+        if(openingBenchmarkRecoveryRejected)return;
         final boolean analogue = canSendGameplayAction() && (viewControls[7] != 0 || viewControls[8] != 0);
         ProbeBridge.setViewControls(viewControls[0], viewControls[1], viewControls[2], viewControls[7], viewControls[8],
                 false, analogue);
@@ -7874,6 +8099,7 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if(openingBenchmarkRecoveryRejected){finish();return;}
         if (environmentSurveyMode) { finishEnvironmentSurvey(3); return; }
         if(openingBenchmarkPending()) {
             cancelOpeningBenchmarkRequest(); showOpeningBenchmarkProgress(); return;
@@ -8020,6 +8246,7 @@ public class MainActivity extends Activity {
         // menu focus, and any acknowledged graphics trial intact.
         clearTouchState();
         if (!viewportChanged) return;
+        if(openingBenchmarkPending() && openingBenchmarkProvisional)cancelOpeningBenchmarkRequest();
         applyInterfacePresentation();
         if (menuScrim == null) return;
         if (configurationLayoutListener != null) {
@@ -8066,6 +8293,8 @@ public class MainActivity extends Activity {
         logSurfaceLifecycle("resume");
         if (musicPlayback != null) musicPlayback.setSuspended(true); // Wait for a ready new surface.
         resumed = true;
+        if(openingBenchmarkRecoveryRejected){showOpeningBenchmarkRecoveryBlocked();return;}
+        if(openingBenchmarkRecovered)cancelOpeningBenchmarkRequest(); // Before resume/start can advance a frame.
         if(campaignMenuVisible || campaignRequest!=0) {
             handler.removeCallbacks(refreshCampaignMenu);
             handler.post(refreshCampaignMenu);
@@ -8079,7 +8308,7 @@ public class MainActivity extends Activity {
         resumeSurfaceForLifecycle();
         startSurfaceIfReady();
         if (hadSurfaceGeneration && surfaceRequestGeneration != 0) {
-            setGameplayPaused(menuVisible || diagnosticsVisible);
+            setGameplayPaused(menuVisible || diagnosticsVisible || openingBenchmarkCancelRequested);
             if (entryMenuEnabled) publishEntryMenuState();
         }
         if(openingBenchmarkPending()) {
@@ -8101,6 +8330,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
+        if(openingBenchmarkRecoveryRejected)return;
         if (environmentSurveyMode || EnvironmentSurveyRequest.isSurvey(intent)) {
             Log.w("HordeEnvironmentSurvey", "Survey intents require a fresh Activity; no live reconfiguration");
             return;
@@ -8133,6 +8363,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        if(openingBenchmarkRecoveryRejected){resumed=false;super.onPause();return;}
         cancelOpeningBenchmarkRequest();
         handler.removeCallbacks(refreshOpeningBenchmark);
         if(lookoutObjectiveVisible)showMainMenu(false);
@@ -8234,6 +8465,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onStop() {
+        if(openingBenchmarkRecoveryRejected){super.onStop();return;}
         if (environmentSurveyMode) { stopEnvironmentSurveySurface(); super.onStop(); return; }
         logSurfaceLifecycle("stop");
         stopSurface();
@@ -8241,7 +8473,24 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle state) {
+        retainOpeningBenchmarkClient();
+        if(openingBenchmarkRecoveryClient!=null)openingBenchmarkRecoveryClient.save(state);
+        super.onSaveInstanceState(state);
+    }
+
+    @Override
     protected void onDestroy() {
+        retainOpeningBenchmarkClient(); // Includes finish/swipe paths with no Bundle callback.
+        if(openingBenchmarkRecoveryRejected) {
+            handler.removeCallbacksAndMessages(null);
+            if(inputManager!=null)inputManager.unregisterInputDeviceListener(controllerDevices);
+            if(debugRetryReceiver!=null)unregisterReceiver(debugRetryReceiver);
+            reportExecutor.shutdownNow();updateExecutor.shutdownNow();
+            if(musicPlayback!=null){musicPlayback.close();musicPlayback=null;}
+            if(soundPool!=null)soundPool.release();
+            super.onDestroy();return;
+        }
         cancelOpeningBenchmarkRequest();
         invalidateLookoutObjective();
         if (environmentSurveyMode) {
