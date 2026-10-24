@@ -16,6 +16,12 @@ pause/reset/first-corner joins; the large departure still takes 3.217 seconds.
 Pacing/owner review and broader motion/cost acceptance remain. The original
 runtime/assets, prior failures and deferrals below are preserved.
 
+The subsequent [one-rate coupled retiming comparison](../evidence/2026-10-24-kit-turn-retiming/README.md)
+retains a 0.50-second diagnostic exchange and 2.217-second large departure;
+ordinary partial 0.95 -> 0.70 seconds. Both builds preserve sampled contact poses
+and pass lifecycle checks. Normal gameplay remains OFF/unadmitted; owner pacing
+and broader acceptance remain open. No further rate/asset loop is selected.
+
 Working folder:
 `C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof`.
 Branch: `codex/horde-1.7-wp2-vertical-proof`. No new checkout, feature, asset,

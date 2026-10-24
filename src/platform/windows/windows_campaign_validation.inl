@@ -103,6 +103,8 @@ bool HiddenLookoutFilesAllowed(const std::filesystem::path& directory,bool after
             bool allowed=false;
             for(unsigned frame=0;frame<=121;++frame)
                 allowed|=name=="windows-kit-controller-depart-"+std::to_string(10000+frame).substr(1)+".png";
+            for(unsigned frame=0;frame<=32;++frame)
+                allowed|=name=="windows-kit-controller-ordinary-partial-"+std::to_string(10000+frame).substr(1)+".png";
             for(const char* stage:{"control","pause-a","pause-b","resume","stop","partial-begin","partial-mid",
                 "opposite-request","opposite-mid","opposite-end","speech","speech-restored","slope",
                 "corner-before","corner-at","corner-after","corner-turn-begin","corner-turn-mid",
@@ -514,10 +516,9 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             const auto& pose=route.State();
             if(!proceed || (pose.motion.mode==Mode::Idle && std::abs(headingError(-1.57079632679f,pose.yaw))<.01745329252f))break;
         }
-        // Finish the existing return to ordinary nonzero-time Idle. Departing
-        // at the first completed turn would retain idleZeroWeight=1 and omit
-        // the controller's real 0.18-second entry on the next departure.
-        for(unsigned tick=0;tick<12 && proceed;++tick)proceed=step();
+        // Matched timing cohorts start from the same active clock, heading and
+        // ordinary Idle. Advance naturally; never seed yaw or a pose clock.
+        for(unsigned tick=0;tick<240 && controllerTicks<240 && proceed;++tick)proceed=step();
         proceed=proceed && check(waiting<=240 && route.State().grounded && !route.State().walking &&
             route.State().wait==dialogue::CompanionWait::PlayerLagging && route.State().motion.mode==Mode::Idle &&
             route.State().motion.idleZeroWeight==0 && route.State().animationSeconds>0 &&
@@ -595,6 +596,37 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         if(proceed) {
             setBearing(route.State().yaw);
             proceed=check(settle(90),"tether stop settles the same controller without root relocation") && capture("stop",route.State());
+        }
+        if(proceed) {
+            // Retiming shortens the earlier departure. Equalize ordinary Idle
+            // naturally so the partial's initial pose clock matches both builds.
+            for(unsigned tick=0;tick<600 && controllerTicks<600 && proceed;++tick)proceed=step();
+            proceed=proceed && check(controllerTicks==600 && route.State().motion.mode==Mode::Idle &&
+                route.State().motion.idleZeroWeight==0 && route.State().locomotion.walkWeight==0,
+                "ordinary partial starts from the matched six-hundred-tick Idle clock");
+        }
+        if(proceed) {
+            // One uninterrupted ordinary partial, sampled on its real shared
+            // fixed-step clock. The later opposite-intent witness stays intact.
+            const auto base=route.State();cameraAzimuth=base.yaw+.6f;
+            setBearing(base.yaw+.3490658504f);
+            unsigned frames=1;bool finished=false;
+            proceed=capture("ordinary-partial-0000",base);
+            for(unsigned tick=1;tick<=90 && proceed;++tick) {
+                proceed=step();const auto& pose=route.State();
+                finished=tick>1 && pose.motion.mode==Mode::Idle;
+                proceed=proceed && check(pose.x==base.x && pose.z==base.z && !pose.walking &&
+                    pose.locomotion.walkPhase==base.locomotion.walkPhase,
+                    "ordinary partial retains its supported root and accepted gait phase");
+                if(proceed && (tick%2==0 || finished)) {
+                    proceed=check(frames<=32,"ordinary partial stays within its finite image roster") &&
+                        capture("ordinary-partial-"+std::to_string(10000+frames).substr(1),pose);
+                    ++frames;
+                }
+                if(finished)break;
+            }
+            proceed=proceed && check(finished && std::abs(headingError(base.yaw+.3490658504f,route.State().yaw))<.01745329252f,
+                "ordinary twenty-degree turn completes its full supported exchange before returning to Idle");
         }
         if(proceed) {
             const auto base=route.State();cameraAzimuth=base.yaw+.6f;
@@ -943,6 +975,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         <<",\"largeSequenceAuthoredHz\":"<<(gLookoutInspectKitPartials && !gLookoutInspectKitPartialsDense?24:0)
         <<",\"evidenceClass\":\"isolated Debug candidate playback and RT joins; not gameplay turn-state or owner acceptance\",\"frames\":["<<turnEvidence.str()<<"]}"
         <<",\"kitControllerInspection\":{\"requested\":"<<(gLookoutInspectKitController?"true":"false")
+        <<",\"authoredTurnSeconds\":"<<dialogue::companion_turn::duration<<",\"playbackTurnSeconds\":"<<dialogue::companion_turn::playbackDuration
         <<",\"evidenceClass\":\"isolated shared diagnostic controller snapshots on actual terrain; not earned journey or owner contact acceptance\""
         <<",\"departureNominalAuthoredHz\":30,\"cameraPolicy\":\"fixed world azimuth per case; three-metre translated offset on queried terrain\""
         <<",\"speechMetadataOnly\":true,\"actualRtCornerCoverage\":\"first route corner only\",\"fixedStepCalls\":"<<controllerCalls

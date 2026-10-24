@@ -220,5 +220,35 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
     pose.motion.mode=CompanionMotionMode::Starting;recipe=horde::scene::CompanionAnimation(pose,5.f/6);
     check(recipe.seconds==0 && recipe.blend.clip==horde::scene::SkinnedClip::Walking && recipe.blend.weight==.7f,
         "starting recipe joins Idle zero to the retained actual-distance walking phase");
+
+    // Retiming changes only the shared phase clock. Both signs and partial/full
+    // exchanges must still sample the entire original take and its matched yaw.
+    for(float angle:{-pi/4,-pi/9,pi/9,pi/4}) {
+        CompanionRouteFixture turn(true);const auto origin=turn.State();
+        const float px=origin.x+3*std::sin(angle),pz=origin.z-3*std::cos(angle);
+        for(unsigned i=0;i<30 && turn.State().motion.entryWeight<1;++i)
+            turn.Step(dt,px,pz,true,false,false,terrain.get(),true);
+        const auto entry=turn.State();bool coherent=entry.motion.mode==CompanionMotionMode::Turning &&
+            entry.motion.entryWeight==1 && entry.motion.turnPhase==0;
+        unsigned activeSteps=0;
+        while(activeSteps<60 && turn.State().motion.mode==CompanionMotionMode::Turning) {
+            turn.Step(dt,px,pz,true,false,false,terrain.get(),true);++activeSteps;
+            const auto& s=turn.State();const auto& m=s.motion;
+            const float phase=std::min(activeSteps*dt/companion_turn::playbackDuration,1.f);
+            coherent&=s.x==origin.x && s.z==origin.z && !s.walking && s.locomotion.walkPhase==0 &&
+                std::abs(m.turnPhase-phase)<1e-6f &&
+                Error(s.yaw,entry.yaw-companion_turn::ModelYaw(angle>0,phase)*
+                    (std::abs(entry.motion.turnAngleRadians)/companion_turn::maxAngle))<1e-6f;
+            if(m.mode==CompanionMotionMode::Turning) {
+                const auto selected=horde::scene::CompanionAnimation(s,5.f/6);
+                coherent&=selected.blend.clip==(angle>0?horde::scene::SkinnedClip::TurnRight:horde::scene::SkinnedClip::TurnLeft) &&
+                    selected.blend.timeSeconds==m.turnPhase*companion_turn::duration;
+            }
+        }
+        check(coherent && activeSteps==static_cast<unsigned>(std::ceil(companion_turn::playbackDuration/dt-1e-5f)) &&
+            turn.State().motion.mode==CompanionMotionMode::Idle && turn.State().motion.turnPhase==1 &&
+            Error(turn.State().yaw,angle)<1e-5f,
+            "retimed signed full/partial exchange keeps shared joint/yaw phase, supported root and complete authored endpoint");
+    }
 }
 } // namespace companion_turn_validation

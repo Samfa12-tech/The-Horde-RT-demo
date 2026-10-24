@@ -1,5 +1,9 @@
 # Opt-in shared Kit turn/start prototype
 
+Follow-up: the [single coupled retiming comparison](../2026-10-24-kit-turn-retiming/README.md)
+retains a 0.50-second diagnostic candidate with a 2.217-second large departure.
+Normal gameplay remains OFF; this original 0.75-second result stays preserved.
+
 24 October 2026. **Implemented for isolated diagnostics; OFF in normal gameplay,
 unadmitted.** The actual route-context trial removes the retained departure
 alignment defect, but its **3.217-second large-turn delay is too deliberate to

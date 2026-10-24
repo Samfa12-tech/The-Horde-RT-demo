@@ -1,0 +1,380 @@
+{
+  "schema": 1,
+  "sealedAtUtc": "2026-10-24T04:44:14.619479+00:00",
+  "baseCommit": "018fdf9c0f8d55f74072f94764e1a210179030ee",
+  "disposition": "Retain one .50s diagnostic retiming candidate for review; normal gameplay OFF/unadmitted. No further rate or asset loop. Human pacing/comfort and phone acceptance pending.",
+  "singleRuntimeInputDifference": "playbackDuration=.75f -> .5f; authored .75s clips and normalized root yaw remain unchanged",
+  "cohorts": {
+    "control": {
+      "playbackCycleSeconds": 0.75,
+      "authoredCycleSeconds": 0.75,
+      "executable": {
+        "bytes": 14384640,
+        "sha256": "03e259ee514d2f4fb338e4025f97861c0e518248e803c8a4c5e3d64bf903b213"
+      },
+      "settings": {
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "nativeChecks": 696,
+      "failures": 0,
+      "renderCalls": 168,
+      "images": 161,
+      "runtimeSeconds": 37.81199999999808,
+      "firstWalkDelaySeconds": 3.216666666666667,
+      "ordinaryPartialSeconds": 0.95,
+      "headingErrorDegrees": 2.7320747615679636e-05,
+      "pauseImagesIdentical": true,
+      "resetOrdinaryImageIdentical": true,
+      "inspectionActorReleased": true,
+      "foregroundUnchanged": true,
+      "custodyUnchanged": true,
+      "rawReceiptSha256": "e4ef40bfbc89dd11b72cb12b96781aed5bb7a4aa436669b4845cc720e8344939",
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+        "waterQuality": "high"
+      },
+      "submittedDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "driver": "610.47",
+      "inputFileIdentities": {
+        "save": {
+          "bytes": 162,
+          "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+        },
+        "manifest": {
+          "bytes": 166,
+          "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+        },
+        "kit": {
+          "bytes": 2151672,
+          "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+        },
+        "kitSource": {
+          "bytes": 7034964,
+          "sha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e"
+        },
+        "candidate": {
+          "bytes": 2272652,
+          "sha256": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11"
+        },
+        "rootMotion": {
+          "bytes": 7855,
+          "sha256": "7a4928d4dfec5184071c96a4c8e1f25e07d7ce7c87545324450e75b0c29061d9"
+        },
+        "src/platform/windows/DiagnosticWindow.cpp": {
+          "bytes": 636910,
+          "sha256": "7070ddf2b8e5fb5729e8af65219250e3e08c76a1639e0dd936a6f6451c8cc4b4"
+        },
+        "src/platform/windows/windows_campaign_validation.inl": {
+          "bytes": 93068,
+          "sha256": "8c6754791a7e98ccd1c68568bc98ff1d64415376543b4ecc4179d434cfbcfdb4"
+        },
+        "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+          "bytes": 501980,
+          "sha256": "2af7b242bdaac39bcce49ca155bacfb8e5ff5e2f44d6b54b788bbc59f52fd616"
+        },
+        "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+          "bytes": 71167,
+          "sha256": "3386aad095f21c47b91a200be723109fd53b3a975eeb420befaf14f2027b711d"
+        },
+        "src/gameplay/dialogue/CompanionRouteFixture.h": {
+          "bytes": 7795,
+          "sha256": "928fc47c2b2212341224b9f732113986ea116438001eb1cf25c52493ad92d4ca"
+        },
+        "src/gameplay/dialogue/CompanionTurnPrototype.inl": {
+          "bytes": 7198,
+          "sha256": "20d9b6a0dfa7aff59fec13bf39aa6a1812ffd7cfe2b4996422d503e50456affe"
+        },
+        "src/gameplay/dialogue/CompanionTurnProfile.h": {
+          "bytes": 2565,
+          "sha256": "a072c4b96247038e1a6a36d4e745699c34f45e21de6689bb5331dd3a6a4f0860"
+        },
+        "src/gameplay/dialogue/CompanionLocomotion.h": {
+          "bytes": 1233,
+          "sha256": "4b66a795026d1d2c05013917c04062086e76f546c8697ae8545bc0fdf6eeebbc"
+        },
+        "src/gameplay/simulation/GameSimulation.h": {
+          "bytes": 22417,
+          "sha256": "d6e551e553ed5bc63a693340badc3b2f59dd8fd86a088051ab56357a2245b4f2"
+        },
+        "src/gameplay/simulation/GameSimulation.cpp": {
+          "bytes": 138423,
+          "sha256": "f5d2f0c74ff0209458036bd3497e082dfb7a20ce479f1c8c6959e8143e5cc032"
+        },
+        "src/gameplay/simulation/GameSimulationDialogue.cpp": {
+          "bytes": 3534,
+          "sha256": "54b2d12c90160a5e007af63fe491e50f7cc573e41646b99b417aeff7d6682e05"
+        },
+        "src/scene/CompanionPose.h": {
+          "bytes": 2344,
+          "sha256": "39e56f75943f6c4c2bae3caa563dc760bc4584986a438081f1cf719c763b25a5"
+        },
+        "src/scene/assets/SkinnedMeshAsset.h": {
+          "bytes": 13671,
+          "sha256": "0db8e87d27e2f3b43db097b4a3afd63ab63e5ad87777a6eca38817eb4943f547"
+        },
+        "src/scene/assets/SkinnedMeshAsset.cpp": {
+          "bytes": 102574,
+          "sha256": "ae63c9a7843047c33578715901a9cc686a49a79267d407997a7feacb7a203331"
+        },
+        "src/scene/assets/SkinnedPbrActor.h": {
+          "bytes": 3381,
+          "sha256": "141989d0cbcd95e45f552db5972e49b15738a1325bb63e1efb5e3b3113235bd1"
+        }
+      },
+      "allCapturedSubmissionsCurrentUniqueCompletedAndPresented": true
+    },
+    "candidate": {
+      "playbackCycleSeconds": 0.5,
+      "authoredCycleSeconds": 0.75,
+      "executable": {
+        "bytes": 14385664,
+        "sha256": "58f6dec248e4b4f20dd76dac477c10fae57c47cddb98ce00f7ec30edd122ef27"
+      },
+      "settings": {
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "nativeChecks": 515,
+      "failures": 0,
+      "renderCalls": 130,
+      "images": 123,
+      "runtimeSeconds": 33.54699999999866,
+      "firstWalkDelaySeconds": 2.216666666666667,
+      "ordinaryPartialSeconds": 0.7,
+      "headingErrorDegrees": 2.7320747615679636e-05,
+      "pauseImagesIdentical": true,
+      "resetOrdinaryImageIdentical": true,
+      "inspectionActorReleased": true,
+      "foregroundUnchanged": true,
+      "custodyUnchanged": true,
+      "rawReceiptSha256": "7cec7e83b64a5935ad9e420cbc86fd4420db65f190e4153263cc0ed1a08eed49",
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+        "waterQuality": "high"
+      },
+      "submittedDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "driver": "610.47",
+      "inputFileIdentities": {
+        "save": {
+          "bytes": 162,
+          "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+        },
+        "manifest": {
+          "bytes": 166,
+          "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+        },
+        "kit": {
+          "bytes": 2151672,
+          "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+        },
+        "kitSource": {
+          "bytes": 7034964,
+          "sha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e"
+        },
+        "candidate": {
+          "bytes": 2272652,
+          "sha256": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11"
+        },
+        "rootMotion": {
+          "bytes": 7855,
+          "sha256": "7a4928d4dfec5184071c96a4c8e1f25e07d7ce7c87545324450e75b0c29061d9"
+        },
+        "src/platform/windows/DiagnosticWindow.cpp": {
+          "bytes": 636910,
+          "sha256": "7070ddf2b8e5fb5729e8af65219250e3e08c76a1639e0dd936a6f6451c8cc4b4"
+        },
+        "src/platform/windows/windows_campaign_validation.inl": {
+          "bytes": 93068,
+          "sha256": "8c6754791a7e98ccd1c68568bc98ff1d64415376543b4ecc4179d434cfbcfdb4"
+        },
+        "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+          "bytes": 501980,
+          "sha256": "2af7b242bdaac39bcce49ca155bacfb8e5ff5e2f44d6b54b788bbc59f52fd616"
+        },
+        "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+          "bytes": 71167,
+          "sha256": "3386aad095f21c47b91a200be723109fd53b3a975eeb420befaf14f2027b711d"
+        },
+        "src/gameplay/dialogue/CompanionRouteFixture.h": {
+          "bytes": 7795,
+          "sha256": "928fc47c2b2212341224b9f732113986ea116438001eb1cf25c52493ad92d4ca"
+        },
+        "src/gameplay/dialogue/CompanionTurnPrototype.inl": {
+          "bytes": 7198,
+          "sha256": "20d9b6a0dfa7aff59fec13bf39aa6a1812ffd7cfe2b4996422d503e50456affe"
+        },
+        "src/gameplay/dialogue/CompanionTurnProfile.h": {
+          "bytes": 2564,
+          "sha256": "1d81025c10f804d9953b3a2afd04dd147f3a57d2d6f62d2b702c50774bdf5a43"
+        },
+        "src/gameplay/dialogue/CompanionLocomotion.h": {
+          "bytes": 1233,
+          "sha256": "4b66a795026d1d2c05013917c04062086e76f546c8697ae8545bc0fdf6eeebbc"
+        },
+        "src/gameplay/simulation/GameSimulation.h": {
+          "bytes": 22417,
+          "sha256": "d6e551e553ed5bc63a693340badc3b2f59dd8fd86a088051ab56357a2245b4f2"
+        },
+        "src/gameplay/simulation/GameSimulation.cpp": {
+          "bytes": 138423,
+          "sha256": "f5d2f0c74ff0209458036bd3497e082dfb7a20ce479f1c8c6959e8143e5cc032"
+        },
+        "src/gameplay/simulation/GameSimulationDialogue.cpp": {
+          "bytes": 3534,
+          "sha256": "54b2d12c90160a5e007af63fe491e50f7cc573e41646b99b417aeff7d6682e05"
+        },
+        "src/scene/CompanionPose.h": {
+          "bytes": 2344,
+          "sha256": "39e56f75943f6c4c2bae3caa563dc760bc4584986a438081f1cf719c763b25a5"
+        },
+        "src/scene/assets/SkinnedMeshAsset.h": {
+          "bytes": 13671,
+          "sha256": "0db8e87d27e2f3b43db097b4a3afd63ab63e5ad87777a6eca38817eb4943f547"
+        },
+        "src/scene/assets/SkinnedMeshAsset.cpp": {
+          "bytes": 102574,
+          "sha256": "ae63c9a7843047c33578715901a9cc686a49a79267d407997a7feacb7a203331"
+        },
+        "src/scene/assets/SkinnedPbrActor.h": {
+          "bytes": 3381,
+          "sha256": "141989d0cbcd95e45f552db5972e49b15738a1325bb63e1efb5e3b3113235bd1"
+        }
+      },
+      "allCapturedSubmissionsCurrentUniqueCompletedAndPresented": true
+    }
+  },
+  "changedCaptureInputIdentities": [
+    "exe",
+    "sourceExe",
+    "src/gameplay/dialogue/CompanionTurnProfile.h"
+  ],
+  "samePipelineDimensionsAndSettings": true,
+  "sameInitialOriginalAndDepartureAndPartialImages": true,
+  "matchedActiveEndpointPartialRgbParity": {
+    "samples": 9,
+    "allIdentical": true
+  },
+  "host": {
+    "selectedCtestsPassed": 3,
+    "totalSeconds": 24.69,
+    "locomotionChecks": 2336,
+    "campaignCheckpointChecks": 1058,
+    "newSignedFullPartialTimingCases": 4,
+    "deadlinesUnchanged": true
+  },
+  "ownerFilesChecked": 151,
+  "ownerFilesUnchanged": true,
+  "noPhone": true,
+  "noForegroundActivation": true,
+  "productionGateDefault": false,
+  "workerDefault": "OFF",
+  "linearSpeedCeilingUnchangedMetresPerSecond": 1.8,
+  "tetherUnchangedMetres": 6,
+  "sourceAtReview": {
+    "src/gameplay/dialogue/CompanionTurnProfile.h": {
+      "sha256": "1d81025c10f804d9953b3a2afd04dd147f3a57d2d6f62d2b702c50774bdf5a43",
+      "gitBlobIdentity": "6fbc7605ee0ca109cbdd2ebbdd35c1cb17c52dad"
+    },
+    "src/gameplay/dialogue/CompanionTurnPrototype.inl": {
+      "sha256": "20d9b6a0dfa7aff59fec13bf39aa6a1812ffd7cfe2b4996422d503e50456affe",
+      "gitBlobIdentity": "f491834b88324281cc7f1561b99a7c11b6852db3"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "sha256": "8c6754791a7e98ccd1c68568bc98ff1d64415376543b4ecc4179d434cfbcfdb4",
+      "gitBlobIdentity": "813c8350b667e86179719998a812dea180eff928"
+    },
+    "tests/CompanionTurnPrototypeValidation.h": {
+      "sha256": "e3c39738e30183e0fe02439492010325b0911d35b056cfe6b942816285265346",
+      "gitBlobIdentity": "ee4bbf3c36d857428c17223dcb62e4b5722b9998"
+    }
+  },
+  "reviewArtifacts": {
+    "case-timelines.json": {
+      "bytes": 243571,
+      "sha256": "c8c7d49638f0ebad7c9afcf9ee061803633e4fbe05fff5b448c5acd4cf116a21"
+    },
+    "comparison.json": {
+      "bytes": 3152,
+      "sha256": "7311d90848800e55c1074114da066e1e647f0d7c79943cb54a5d481b37458663"
+    },
+    "departure-before-after-1x.mp4": {
+      "bytes": 934557,
+      "sha256": "76b079b7ba5b5b9a3b3dbbbd1985da57c0f5c7da24ade97b5ad2cdd9c988bf3a"
+    },
+    "elapsed-time-comparison.jpg": {
+      "bytes": 366727,
+      "sha256": "e0b12e4d6562ba650cc6b701b117e2beffd6d8f94a4a6e574680850fc1c85907"
+    },
+    "matched-contact-poses.jpg": {
+      "bytes": 214489,
+      "sha256": "954955dc0e1f32ca58670d7b6e594c29d17fd6d21aa6a8640c4812095178fb40"
+    },
+    "ordinary-partial-before-after-1x.mp4": {
+      "bytes": 220169,
+      "sha256": "70a33c7f10ea74003cf96777ad50112efb32b29bf728fa05dc1537320ee12e2b"
+    },
+    "partial-elapsed-comparison.jpg": {
+      "bytes": 247597,
+      "sha256": "195110d5222ded13dc48ccf34953ad14555bb8739cf215c236dafda8010fa62f"
+    }
+  }
+}

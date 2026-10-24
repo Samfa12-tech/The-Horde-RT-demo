@@ -1,0 +1,103 @@
+{
+  "media": {
+    "departure": {
+      "encodedFrames": 278,
+      "encodedHz": 60,
+      "durationSeconds": 4.633333333333334,
+      "capturedCoverageSeconds": {
+        "control": 3.6166666666666667,
+        "candidate": 2.6166666666666667
+      },
+      "leadHoldSeconds": 0.5,
+      "endHoldSeconds": 0.5,
+      "policy": "original native crops, last captured sample held until next fixed-step timestamp; shorter panel labelled held after capture ends"
+    },
+    "ordinary-partial": {
+      "encodedFrames": 118,
+      "encodedHz": 60,
+      "durationSeconds": 1.9666666666666666,
+      "capturedCoverageSeconds": {
+        "control": 0.95,
+        "candidate": 0.7
+      },
+      "leadHoldSeconds": 0.5,
+      "endHoldSeconds": 0.5,
+      "policy": "original native crops, last captured sample held until next fixed-step timestamp; shorter panel labelled held after capture ends"
+    }
+  },
+  "matchedActivePartialPoses": [
+    {
+      "phase": 0,
+      "controlStage": "ordinary-partial-0006",
+      "candidateStage": "ordinary-partial-0006",
+      "controlTick": 612,
+      "candidateTick": 612,
+      "identicalRgbBytes": true
+    },
+    {
+      "phase": 0.13333334,
+      "controlStage": "ordinary-partial-0009",
+      "candidateStage": "ordinary-partial-0008",
+      "controlTick": 618,
+      "candidateTick": 616,
+      "identicalRgbBytes": true
+    },
+    {
+      "phase": 0.266666681,
+      "controlStage": "ordinary-partial-0012",
+      "candidateStage": "ordinary-partial-0010",
+      "controlTick": 624,
+      "candidateTick": 620,
+      "identicalRgbBytes": true
+    },
+    {
+      "phase": 0.400000036,
+      "controlStage": "ordinary-partial-0015",
+      "candidateStage": "ordinary-partial-0012",
+      "controlTick": 630,
+      "candidateTick": 624,
+      "identicalRgbBytes": true
+    },
+    {
+      "phase": 0.533333361,
+      "controlStage": "ordinary-partial-0018",
+      "candidateStage": "ordinary-partial-0014",
+      "controlTick": 636,
+      "candidateTick": 628,
+      "identicalRgbBytes": true
+    },
+    {
+      "phase": 0.666666687,
+      "controlStage": "ordinary-partial-0021",
+      "candidateStage": "ordinary-partial-0016",
+      "controlTick": 642,
+      "candidateTick": 632,
+      "identicalRgbBytes": true
+    },
+    {
+      "phase": 0.800000072,
+      "controlStage": "ordinary-partial-0024",
+      "candidateStage": "ordinary-partial-0018",
+      "controlTick": 648,
+      "candidateTick": 636,
+      "identicalRgbBytes": true
+    },
+    {
+      "phase": 0.933333397,
+      "controlStage": "ordinary-partial-0027",
+      "candidateStage": "ordinary-partial-0020",
+      "controlTick": 654,
+      "candidateTick": 640,
+      "identicalRgbBytes": true
+    },
+    {
+      "phase": 1,
+      "controlStage": "ordinary-partial-0029",
+      "candidateStage": "ordinary-partial-0021",
+      "controlTick": 657,
+      "candidateTick": 642,
+      "identicalRgbBytes": true
+    }
+  ],
+  "method": "All RGB bytes at nine matched active/end partial recipes, not a new slip tolerance or continuous-contact proof."
+}

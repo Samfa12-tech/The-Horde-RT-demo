@@ -59,7 +59,7 @@
                 return;
             }
             if(std::abs(m.turnAngleRadians)>departureBand) {
-                turnElapsed_+=dt;m.turnPhase=std::min(float(turnElapsed_/companion_turn::duration),1.f);
+                turnElapsed_+=dt;m.turnPhase=std::min(float(turnElapsed_/companion_turn::playbackDuration),1.f);
                 state_.yaw=turnStartYaw_-companion_turn::ModelYaw(m.turnAngleRadians>0,m.turnPhase)*
                     (std::abs(m.turnAngleRadians)/companion_turn::maxAngle);
                 if(m.turnPhase<1)return;
