@@ -210,6 +210,26 @@ void LanternPendulum::Reset(const HeldItemTransform& worldFromHinge,
     snapshot_.initialized = true;
 }
 
+void LanternPendulum::RebindHinge(const HeldItemTransform& worldFromHinge,
+                                 const float presentationYawRadians)
+{
+    if (!FiniteTransform(worldFromHinge) || !std::isfinite(presentationYawRadians)) return;
+    if (!snapshot_.initialized)
+    {
+        Reset(worldFromHinge, presentationYawRadians);
+        return;
+    }
+    // Geometry readiness changes the solved grip at the same simulation time.
+    // Rebase its derivative origin so the next physics tick does not interpret
+    // that correction as a hand impulse; retain all physical phase/velocity.
+    snapshot_.previousPivotPosition = {{worldFromHinge[12], worldFromHinge[13],
+                                        worldFromHinge[14]}};
+    snapshot_.previousHandForward = HorizontalForward(worldFromHinge);
+    snapshot_.worldFromBody = ComposeLanternPendulumBodyTransform(
+        worldFromHinge, snapshot_.forwardAngleRadians, snapshot_.strafeAngleRadians,
+        snapshot_.torsionAngleRadians, presentationYawRadians);
+}
+
 void LanternPendulum::Import(const LanternPendulumSnapshot& snapshot)
 {
     snapshot_ = snapshot;

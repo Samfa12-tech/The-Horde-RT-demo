@@ -1,0 +1,36 @@
+{
+  "phoneUsed": false,
+  "sourceBasis": "be717e996a5a76b88228819836de1ecda8601d5d",
+  "scope": "Zero-time terrain/aspect held-pose correction; synthetic CPU fixture and actual Windows hidden RT control, not phone or natural journey evidence",
+  "debugDefaultMovementTimeoutStillOpen": true,
+  "native": {
+    "sameTick": [
+      922,
+      922
+    ],
+    "samePixels": true,
+    "sameResources": true,
+    "executableSha256": "d0ad001e96864c56cdf6c400060173c17975a9d0d5e0b64eeb65472bf4ec61e5",
+    "ownerSettingsUnchanged": true,
+    "foregroundUnchanged": true,
+    "campaignUnchanged": true,
+    "complete": true,
+    "freshSceneEpoch": [
+      2,
+      3
+    ],
+    "armPixels": [
+      36229,
+      36229
+    ]
+  },
+  "manualAudioHapticRevalidationRequired": false,
+  "releaseAppCompiled": true,
+  "releaseTests": {
+    "movementSeconds": 4.12,
+    "deadlineSeconds": 30,
+    "pendulumSeconds": 1.28,
+    "rebindSeconds": 0.14,
+    "allPassed": true
+  }
+}

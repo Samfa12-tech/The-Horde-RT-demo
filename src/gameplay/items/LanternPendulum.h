@@ -43,6 +43,10 @@ class LanternPendulum
 public:
     void Reset(const horde::gameplay::items::HeldItemTransform& worldFromHinge,
                float presentationYawRadians = 0.0f);
+    // Re-anchor an accepted zero-time geometry rebind without integrating or
+    // resetting swing. The new anchor is not physical movement/turn input.
+    void RebindHinge(const horde::gameplay::items::HeldItemTransform& worldFromHinge,
+                     float presentationYawRadians = 0.0f);
     void Import(const LanternPendulumSnapshot& snapshot);
     const LanternPendulumSnapshot& StepFixed(
         const horde::gameplay::items::HeldItemTransform& worldFromHinge,

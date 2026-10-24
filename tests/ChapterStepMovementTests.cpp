@@ -4,6 +4,8 @@
 #include "scene/assets/AssetManifest.h"
 #include <filesystem>
 #include <iostream>
+#include <memory>
+#include <string_view>
 
 namespace sim=horde::gameplay::simulation;
 namespace tr=horde::gameplay::traversal;
@@ -33,8 +35,127 @@ bool WalkTo(sim::GameSimulation& game,float x,float z,bool crouch=false) {
     std::cerr<<"movement deadline at "<<game.Snapshot().playerX<<','<<game.Snapshot().playerZ
              <<" paused="<<game.Snapshot().paused<<'\n';return false;
 }
+void TestPausedTerrainRebind(const std::shared_ptr<const Surface>& ground,
+                            const std::shared_ptr<const Surface>& otherTerrain) {
+    auto owned=std::make_unique<sim::GameSimulation>(sim::ProductionGameSimulationConfig());
+    auto& game=*owned;
+    // Isolate readiness/pose publication at the real F01 anchor. The ordinary
+    // save admission supplies this state without replaying the whole ascent;
+    // this regression is not evidence of a naturally completed journey.
+    horde::gameplay::campaign::Checkpoint checkpoint;
+    checkpoint.id=horde::gameplay::campaign::CheckpointId::SafeExit;
+    checkpoint.zone=sim::WorldZoneId::TombExterior;checkpoint.position=tr::kExteriorLanding;
+    checkpoint.yaw=0;checkpoint.pitch=-.15f;checkpoint.firstAscentCompleted=true;
+    checkpoint.dialogue.grateConsumed=checkpoint.dialogue.rescueConsumed=
+        checkpoint.dialogue.reunionStarted=checkpoint.dialogue.waitingForRaise=true;
+    const auto restore=game.BeginCampaignRestore(checkpoint);
+    const bool restored=restore && game.CommitCampaignRestore(*restore,
+        {restore->worldGeneration,checkpoint.zone},ground,{});
+    Check(restored,"rebind regression admits actual F01 terrain/held pose through the existing safe-side restore");
+    if(!restored)return;
+    sim::InputSnapshot paused;paused.paused=true;paused.yawRadians=game.Snapshot().playerYawRadians;
+    paused.pitchRadians=game.Snapshot().playerPitchRadians;
+    game.SynchronizePausedInput(paused,game.Snapshot().inputPublicationSequence);
+    const auto reference=game.Snapshot();const auto oldGeneration=reference.worldRoute.generation;
+    game.InvalidateWorldZoneReadiness();
+    const auto missing=game.Snapshot();
+    Check(missing.heldItemKinematics.leftHandLocal!=reference.heldItemKinematics.leftHandLocal,
+          "missing authored terrain reproduces the historical exterior carry fallback at F01");
+    const auto eventCount=game.Events().Size();const auto eventSequence=game.Events().NextSequence();
+    const auto sameClockAndInput=[&](const auto& s) {
+        return s.tickIndex==missing.tickIndex && s.inputPublicationSequence==missing.inputPublicationSequence &&
+            s.paused==missing.paused && s.inputMoveForward==missing.inputMoveForward && s.inputMoveStrafe==missing.inputMoveStrafe &&
+            s.lastConsumedAttackSequence==missing.lastConsumedAttackSequence &&
+            s.lastConsumedParrySequence==missing.lastConsumedParrySequence &&
+            s.lastConsumedDodgeSequence==missing.lastConsumedDodgeSequence &&
+            s.lastConsumedRouteResetSequence==missing.lastConsumedRouteResetSequence &&
+            s.lastConsumedRetrySequence==missing.lastConsumedRetrySequence &&
+            s.lastConsumedInteractSequence==missing.lastConsumedInteractSequence &&
+            s.lastConsumedToggleHeldLightPoseSequence==missing.lastConsumedToggleHeldLightPoseSequence &&
+            s.lastConsumedRunToggleSequence==missing.lastConsumedRunToggleSequence &&
+            s.lastConsumedClearRunIntentSequence==missing.lastConsumedClearRunIntentSequence &&
+            s.lastConsumedCrouchToggleSequence==missing.lastConsumedCrouchToggleSequence &&
+            s.lastConsumedClearCrouchIntentSequence==missing.lastConsumedClearCrouchIntentSequence &&
+            s.worldRoute.generation==missing.worldRoute.generation &&
+            s.playerX==missing.playerX && s.playerZ==missing.playerZ &&
+            s.playerYawRadians==missing.playerYawRadians && s.playerPitchRadians==missing.playerPitchRadians &&
+            game.Events().Size()==eventCount && game.Events().NextSequence()==eventSequence;
+    };
+    Check(!game.PublishChapterTerrain({oldGeneration,sim::WorldZoneId::TombExterior},ground) &&
+          game.Snapshot().heldItemKinematics.leftHandLocal==missing.heldItemKinematics.leftHandLocal && sameClockAndInput(game.Snapshot()),
+          "stale terrain publication neither repairs nor changes authoritative state");
+    const sim::WorldZoneToken fresh{missing.worldRoute.generation,sim::WorldZoneId::TombExterior};
+    Check(game.PublishChapterTerrain(fresh,ground),"actual new terrain generation rebind is accepted while paused");
+    const auto rebound=game.Snapshot();
+    Check(rebound.heldItemKinematics.leftHandLocal==reference.heldItemKinematics.leftHandLocal &&
+          rebound.heldItemKinematics.rightHandLocal==reference.heldItemKinematics.rightHandLocal &&
+          rebound.rewardLanternWorldFromHinge==reference.rewardLanternWorldFromHinge &&
+          rebound.playerAnimation==reference.playerAnimation,
+          "fresh terrain immediately republishes coherent held hands and player animation without a gameplay tick");
+    Check(rebound.lanternPendulum.worldFromBody==reference.lanternPendulum.worldFromBody,
+          "fresh terrain rebinds the lantern body to its corrected hinge without a physics tick");
+    for(std::size_t i=0;i<rebound.fireEmitterCount;++i) {
+        const auto& before=missing.fireEmitters[i];const auto& after=rebound.fireEmitters[i];
+        Check(after.worldFromFlame==reference.fireEmitters[i].worldFromFlame &&
+              after.worldFromLight==reference.fireEmitters[i].worldFromLight &&
+              after.phase==before.phase && after.lowPassNoise==before.lowPassNoise &&
+              after.leanX==before.leanX && after.leanZ==before.leanZ &&
+              after.motionTurbulence==before.motionTurbulence,
+              "zero-time terrain rebind refreshes fire anchors without advancing visual phase or motion");
+    }
+    Check(rebound.lanternPendulum.forwardAngleRadians==missing.lanternPendulum.forwardAngleRadians &&
+          rebound.lanternPendulum.strafeAngleRadians==missing.lanternPendulum.strafeAngleRadians &&
+          rebound.lanternPendulum.torsionAngleRadians==missing.lanternPendulum.torsionAngleRadians &&
+          rebound.lanternPendulum.forwardAngularVelocity==missing.lanternPendulum.forwardAngularVelocity &&
+          rebound.lanternPendulum.strafeAngularVelocity==missing.lanternPendulum.strafeAngularVelocity &&
+          rebound.lanternPendulum.torsionAngularVelocity==missing.lanternPendulum.torsionAngularVelocity && sameClockAndInput(rebound),
+          "terrain rebind preserves angular state, fixed tick, input counters and ordered feedback");
+    Check(game.PublishChapterTerrain(fresh,ground) && game.Snapshot().playerAnimation==rebound.playerAnimation &&
+          game.Snapshot().lanternPendulum==rebound.lanternPendulum && sameClockAndInput(game.Snapshot()),
+          "same-pointer same-generation publication remains idempotent");
+    Check(!game.PublishChapterTerrain(fresh,otherTerrain) && game.Snapshot().playerAnimation==rebound.playerAnimation &&
+          game.Snapshot().lanternPendulum==rebound.lanternPendulum && sameClockAndInput(game.Snapshot()),
+          "different terrain cannot replace the current admitted generation");
+    constexpr float wideAspect=16.0f/9.0f;
+    game.SetPresentationAspect(wideAspect);
+    const auto wide=game.Snapshot();
+    Check(wide.rewardLanternWorldFromHinge!=rebound.rewardLanternWorldFromHinge &&
+          wide.playerAnimation.leftIk.target==wide.heldItemKinematics.leftHandLocal &&
+          wide.playerAnimation.rightIk.target==wide.heldItemKinematics.rightHandLocal,
+          "actual viewport aspect change immediately republishes its changed hand/animation targets");
+    Check(wide.lanternPendulum.worldFromBody==
+          horde::gameplay::interactions::ComposeLanternPendulumBodyTransform(
+              wide.rewardLanternWorldFromHinge,wide.lanternPendulum.forwardAngleRadians,
+              wide.lanternPendulum.strafeAngleRadians,wide.lanternPendulum.torsionAngleRadians,
+              wide.heldItemKinematics.rewardLanternPresentationYawRadians),
+          "aspect change reanchors the lantern body to the same newly solved hand immediately");
+    Check(wide.lanternPendulum.forwardAngleRadians==rebound.lanternPendulum.forwardAngleRadians &&
+          wide.lanternPendulum.strafeAngleRadians==rebound.lanternPendulum.strafeAngleRadians &&
+          wide.lanternPendulum.torsionAngleRadians==rebound.lanternPendulum.torsionAngleRadians &&
+          wide.lanternPendulum.forwardAngularVelocity==rebound.lanternPendulum.forwardAngularVelocity &&
+          wide.lanternPendulum.strafeAngularVelocity==rebound.lanternPendulum.strafeAngularVelocity &&
+          wide.lanternPendulum.torsionAngularVelocity==rebound.lanternPendulum.torsionAngularVelocity &&
+          sameClockAndInput(wide),
+          "aspect rebind preserves swing phase/velocity, tick, input and event order");
+    for(std::size_t i=0;i<wide.fireEmitterCount;++i) {
+        const auto& before=rebound.fireEmitters[i];const auto& after=wide.fireEmitters[i];
+        Check(after.phase==before.phase && after.lowPassNoise==before.lowPassNoise &&
+              after.leanX==before.leanX && after.leanZ==before.leanZ && after.motionTurbulence==before.motionTurbulence &&
+              (i!=0 || (after.worldFromFlame==wide.heldLight.worldFromFlame &&
+                        after.worldFromLight==wide.heldLight.worldFromLight)),
+              "aspect change keeps fire/light anchors coherent without advancing phase or motion");
+    }
+    game.SetPresentationAspect(wideAspect);
+    Check(game.Snapshot().playerAnimation==wide.playerAnimation &&
+          game.Snapshot().lanternPendulum==wide.lanternPendulum &&
+          game.Snapshot().heldLight.worldFromFlame==wide.heldLight.worldFromFlame &&
+          game.Snapshot().heldLight.worldFromLight==wide.heldLight.worldFromLight && sameClockAndInput(game.Snapshot()),
+          "repeated identical aspect remains a zero-time no-op");
 }
-int main() {
+}
+int main(int argc,char** argv) {
+    const bool rebindOnly=argc==2 && std::string_view(argv[1])=="--paused-terrain-rebind-only";
+    if(argc>1 && !rebindOnly){std::cerr<<"unknown chapter step test selection\n";return 2;}
     const auto directory=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json",manifest,error)||
@@ -48,6 +169,11 @@ int main() {
     const auto root=Box(x,z,base.worldY,.12f);
     const auto terrain=Surface::WithStepGeometry(*ground,root,error);
     Check(bool(terrain),"disposable root attaches to actual imported terrain");if(!terrain)return 1;
+    if(rebindOnly) {
+        TestPausedTerrainRebind(ground,terrain);
+        std::cout<<checks<<" paused terrain rebind checks, "<<failures<<" failures\n";
+        return failures?1:0;
+    }
     const auto from=tr::ChapterExteriorStepSupport(*terrain,x-.5f,z,radius);
     const auto onto=tr::ResolveChapterStepMovement(*terrain,x-.5f,z,x,z,from.worldY,radius);
     Check(onto.accepted && onto.support.surface==sim::SupportSurface::Wood &&

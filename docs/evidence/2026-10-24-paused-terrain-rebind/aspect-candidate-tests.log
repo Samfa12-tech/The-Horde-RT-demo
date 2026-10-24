@@ -1,0 +1,9 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start  42: horde_rt_paused_terrain_rebind_tests
+1/2 Test  #42: horde_rt_paused_terrain_rebind_tests ...   Passed    3.62 sec
+    Start 185: horde_rt_lantern_pendulum_tests
+2/2 Test #185: horde_rt_lantern_pendulum_tests ........   Passed    2.98 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   6.63 sec

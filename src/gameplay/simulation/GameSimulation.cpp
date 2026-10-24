@@ -535,7 +535,10 @@ void GameSimulation::SetPresentationAspect(const float logicalViewAspect)
     // imported-checkpoint frames publish a coherent pose without advancing
     // simulation time or any gameplay authority.
     ResolveHeldItems();
+    lanternPendulum_.RebindHinge(RescueLanternHinge(),
+        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     ResolvePlayerAnimation(0.0f);
+    ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
 }
 
@@ -704,8 +707,20 @@ bool GameSimulation::PublishChapterTerrain(WorldZoneToken token, std::shared_ptr
        !terrain->TriangleCount() || token.zone==WorldZoneId::Dungeon ||
        (chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation && chapterTerrain_!=terrain) ||
        !worldRoute_.Publish(token,ZoneReadiness::Ready)) return false;
+    const bool bindingChanged=chapterTerrain_!=terrain || chapterTerrainGeneration_!=token.generation;
     chapterTerrain_=std::move(terrain);
     chapterTerrainGeneration_=token.generation;
+    if(bindingChanged) {
+        // Recovery can solve the paused carry against the temporary no-terrain
+        // fallback. Publish a coherent pose as soon as its actual geometry is
+        // admitted, without a gameplay/physics tick or another input barrier.
+        // Other zones and repeated renderer readiness polls reuse this binding.
+        ResolveHeldItems();
+        lanternPendulum_.RebindHinge(RescueLanternHinge(),
+            heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
+        ResolvePlayerAnimation(0.0f);
+        ResolveFireEmitters(0.0f);
+    }
     RefreshSnapshot(lastInput_);return true;
 }
 void GameSimulation::InvalidateWorldZoneReadiness()
