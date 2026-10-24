@@ -1,5 +1,9 @@
 # Kit admission review — keep normal motion OFF
 
+Superseded admission recommendation: the [matched natural-walk follow-up](../2026-10-24-kit-natural-corner/README.md)
+records the visible corner and confirms a turn-delay regression. The hint-first
+proposal below is withdrawn; its original measurements remain preserved.
+
 The shared normal-actor candidate functions through a bounded actual RT journey, but is not ready for ordinary players: the preserved six-metre escort rule has no adequate waiting/rejoin cue. The first-corner route screenshots also leave Kit outside the unchanged camera view, so those cannot establish a visible join. No gameplay motion, speed, tether, collision, checkpoint or timing policy was changed.
 
 ## What passed

@@ -171,6 +171,7 @@ bool gOpeningBenchmarkDetachedCancelInjected=false;
 bool gLookoutHiddenValidation=false;
 bool gRouteHiddenValidation=false;
 bool gRouteKitTurnStartValidation=false;
+bool gRouteNaturalWalkValidation=false;
 bool gRouteReturnRecovery=false;
 bool gLookoutInspectKit=false;
 bool gLookoutInspectKitMotion=false;

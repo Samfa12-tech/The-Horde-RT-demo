@@ -1,5 +1,16 @@
 # KIT ANIMATION PLAN 1 7 — WP0 custody and reconciliation
 
+## Natural-walk pacing rejection — 24 October 2026
+
+The [single matched natural-walk pair](evidence/2026-10-24-kit-natural-corner/README.md)
+now includes the actual normal actor in view. Legacy completes with no tether
+wait; turn/start fails the unchanged endpoint gate. Visual alignment improves,
+but its added corner stops impose a new waiting requirement. Keep normal OFF
+and withdraw the waiting-UI-first proposal. Owner-approved unseen orientation
+snapping lacks a safe production visibility fact; no snap, hint, new clip or
+casual/urgent policy is implemented. Scope history explains the still-open Debug
+30-second gate without deleting waits or raising its deadline.
+
 ## RT route review — admission held, 24 October 2026
 
 The [bounded normal-actor review](evidence/2026-10-24-kit-route-admission-review/README.md)

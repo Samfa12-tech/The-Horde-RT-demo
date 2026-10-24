@@ -14,7 +14,7 @@ bool HiddenRouteFilesAllowed(const std::filesystem::path& directory,bool after)
         if(after && (name=="slot-1-auto.hrd" || name=="slot-2-manual.hrd" || name==kTextReportFilename ||
             name==kJsonReportFilename || name=="windows-route-validation.json" || name=="route-frames.csv" ||
             name=="route-lower.png" || name=="route-lookout.png" || name=="route-return.png" || name=="route-recovered.png"))continue;
-        if(after && gRouteKitTurnStartValidation && (name=="route-kit-depart-turn.png" || name=="route-kit-depart-walk.png" ||
+        if(after && (gRouteKitTurnStartValidation || gRouteNaturalWalkValidation) && (name=="route-kit-depart-turn.png" || name=="route-kit-depart-walk.png" ||
             name=="route-kit-corner-turn.png" || name=="route-kit-corner-walk.png"))continue;
         return false;
     }
@@ -79,7 +79,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     struct Restore {VulkanSurfaceContext& c;bool active;~Restore(){c.chapterRoundTripCaptureActive=active;}} restore{ctx,ctx.chapterRoundTripCaptureActive};
     ctx.chapterRoundTripCaptureActive=true;
     std::ofstream rows(gCampaignValidationDirectory/"route-frames.csv");
-    rows<<"frame,tick,world_generation,x,y,z,grounded,modern_rules,rope_phase,exterior,stowed,proof,line,kit_grounded,kit_waypoint,boundary,boundary_revision,operation_revision,outcome,kit_x,kit_z,kit_wait,forest_night,forest_waystone,forest_clue,forest_village,hearts,lantern_high,saw_ascent,saw_pull_up,kit_turn_start,kit_motion_mode,kit_turn_phase,kit_walk_weight\n";
+    rows<<"frame,tick,world_generation,x,y,z,grounded,modern_rules,rope_phase,exterior,stowed,proof,line,kit_grounded,kit_waypoint,boundary,boundary_revision,operation_revision,outcome,kit_x,kit_z,kit_wait,forest_night,forest_waystone,forest_clue,forest_village,hearts,lantern_high,saw_ascent,saw_pull_up,kit_turn_start,kit_motion_mode,kit_turn_phase,kit_walk_weight,player_yaw,kit_yaw\n";
     const auto render=[&]{
         if(++frames>6000 || !safe("route-before-frame",false))return false;
         const auto tick=ctx.simulation.Snapshot().tickIndex;
@@ -97,7 +97,8 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             <<','<<s.chapterDialogue.forestClueConsumed<<','<<s.chapterDialogue.forestVillageConsumed<<','<<s.playerVitals.vitality
             <<','<<(s.interaction.heldLightPose==interactions::HeldLightPose::High)<<','<<s.rescue.sawAscent<<','<<s.rescue.sawPullUp
             <<','<<s.chapterCompanion.motion.turnStartEnabled<<','<<unsigned(s.chapterCompanion.motion.mode)
-            <<','<<s.chapterCompanion.motion.turnPhase<<','<<s.chapterCompanion.locomotion.walkWeight<<'\n';
+            <<','<<s.chapterCompanion.motion.turnPhase<<','<<s.chapterCompanion.locomotion.walkWeight
+            <<','<<s.playerYawRadians<<','<<s.chapterCompanion.yaw<<'\n';
         if(frames%120==0)rows.flush();
         return presented && ctx.lastFramePresentation==horde::telemetry::RtPresentationOutcome::Presented &&
             (!gRouteKitTurnStartValidation || (s.chapterCompanion.motion.turnStartEnabled &&
@@ -223,7 +224,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     while(proceed && probe.Phase()!=ChapterProbePhase::Lower) {
         for(unsigned n=0;n<4 && probe.Phase()!=ChapterProbePhase::Lower;++n){
             auto input=neutral();
-            const bool quietOutbound=probe.Phase()==ChapterProbePhase::Outbound && ctx.simulation.Snapshot().chapterDialogue.line!=dialogue::Line::None;
+            const bool quietOutbound=!gRouteNaturalWalkValidation && probe.Phase()==ChapterProbePhase::Outbound && ctx.simulation.Snapshot().chapterDialogue.line!=dialogue::Line::None;
             const auto& boundary=ctx.simulation.LatestCampaignBoundary();
             endpoint=boundary && boundary->id==campaign::CheckpointId::ForestEndpoint;
             const bool waitEndpoint=probe.Phase()==ChapterProbePhase::Lookout && !endpoint;
@@ -235,7 +236,19 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
                 const auto& s=ctx.simulation.Snapshot();
                 const float dx=s.chapterCompanion.x-s.playerX,dz=s.chapterCompanion.z-s.playerZ;
                 input.runHeld=false;
-                if(std::hypot(dx,dz)>3.f && dx*std::sin(input.yawRadians)-dz*std::cos(input.yawRadians)<0)
+                if(gRouteNaturalWalkValidation) {
+                    // Ordinary look input, preserving requested WORLD movement
+                    // through the same forward/strafe publication. No pose rebase.
+                    const float oldYaw=input.yawRadians;
+                    const float worldX=input.moveForward*std::sin(oldYaw)+input.moveStrafe*std::cos(oldYaw);
+                    const float worldZ=-input.moveForward*std::cos(oldYaw)+input.moveStrafe*std::sin(oldYaw);
+                    input.yawRadians=std::atan2(dx,-dz);
+                    input.pitchRadians=std::clamp(std::atan2(s.chapterCompanion.y+.9f-
+                        simulation::PlayerEyeWorldY(s.playerSupportWorldY),std::max(std::hypot(dx,dz),.01f)),-.55f,.25f);
+                    input.moveForward=worldX*std::sin(input.yawRadians)-worldZ*std::cos(input.yawRadians);
+                    input.moveStrafe=worldX*std::cos(input.yawRadians)+worldZ*std::sin(input.yawRadians);
+                }
+                if(!gRouteNaturalWalkValidation && std::hypot(dx,dz)>3.f && dx*std::sin(input.yawRadians)-dz*std::cos(input.yawRadians)<0)
                     input.moveForward=input.moveStrafe=0;
             }
             if(probe.Phase()==ChapterProbePhase::Failed || !step(input)){proceed=false;break;}
@@ -243,11 +256,13 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             if(endpoint && !endpointSaved)break;
         }
         if(proceed)proceed=render();
-        if(proceed && gRouteKitTurnStartValidation && ctx.simulation.Snapshot().chapterDialogue.proofAccepted) {
+        if(proceed && (gRouteKitTurnStartValidation || gRouteNaturalWalkValidation) && ctx.simulation.Snapshot().chapterDialogue.proofAccepted) {
             const auto& k=ctx.simulation.Snapshot().chapterCompanion;
             const bool turn=k.motion.mode==dialogue::CompanionMotionMode::Turning && k.motion.turnPhase>=.4f;
             const bool walk=k.walking && k.locomotion.walkWeight>=.5f;
-            const unsigned view=k.waypoint==4?(turn?0u:walk?1u:4u):k.waypoint==5?(turn?2u:walk?3u:4u):4u;
+            const unsigned view=(!gRouteKitTurnStartValidation && gRouteNaturalWalkValidation)?
+                (k.waypoint==5 && k.walking?(!kitViews[2]?2u:!kitViews[3]?3u:4u):4u):
+                k.waypoint==4?(turn?0u:walk?1u:4u):k.waypoint==5?(turn?2u:walk?3u:4u):4u;
             constexpr std::array<const char*,4> names{{"route-kit-depart-turn.png","route-kit-depart-walk.png",
                 "route-kit-corner-turn.png","route-kit-corner-walk.png"}};
             if(view<4 && !kitViews[view]) {proceed=check(capture(names[view]),"actual route turn/walk normal-actor RT witness");kitViews[view]=proceed;}
@@ -304,9 +319,12 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     if(!proceed && !failures)check(false,"bounded route stopped before completing all stages");
     if(gRouteKitTurnStartValidation)check(std::all_of(kitViews.begin(),kitViews.end(),[](bool v){return v;}),
         "actual normal actor captures both departure and first corner joins");
+    else if(gRouteNaturalWalkValidation)check(kitViews[2] && kitViews[3],"legacy natural walk records the visible first-corner stages");
     rows.flush();check(bool(rows),"bounded per-frame route receipt written");
     receipt<<"],\"milestones\":{"<<milestones.str()<<"},\"count\":"<<checks<<",\"failures\":"<<failures<<",\"frames\":"<<frames
         <<",\"stagesComplete\":"<<(!failures?"true":"false")<<",\"kitTurnStartOptIn\":"<<(gRouteKitTurnStartValidation?"true":"false")
+        <<",\"naturalWalkWithoutScriptedEscortOrSpeechStops\":"<<(gRouteNaturalWalkValidation?"true":"false")
+        <<",\"ordinaryLookAtKitPreservingWorldWalk\":"<<(gRouteNaturalWalkValidation?"true":"false")
         <<",\"deathRecoveryTested\":false,\"physicalPlayTested\":false,\"audioListened\":false";
     return failures?1:0;
 }

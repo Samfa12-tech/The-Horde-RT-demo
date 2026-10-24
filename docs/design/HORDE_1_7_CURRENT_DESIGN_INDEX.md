@@ -1,6 +1,13 @@
 # Horde 1.7 current design index
 
-Latest review: [normal-actor RT journey and waiting-guidance verdict](../evidence/2026-10-24-kit-route-admission-review/README.md).
+Latest admission verdict: the [visible-corner natural-walk pair](../evidence/2026-10-24-kit-natural-corner/README.md)
+confirms a pacing regression: legacy finishes without tether waits, turn/start
+strands Kit at waypoint 7. Normal motion remains OFF; the hint-first recommendation
+is withdrawn. Orientation-only unseen snapping is owner-approved in principle,
+but current production evidence cannot prove all-ray invisibility, so no snap or
+new visibility system was added. The missing visible corner witness is now recorded.
+
+Previous review: [normal-actor RT journey and waiting-guidance verdict](../evidence/2026-10-24-kit-route-admission-review/README.md).
 Normal motion stays OFF: 515 join checks/123 reference-identical images and the
 17-check RT journey pass, but no adequate escort cue exists and the first-corner
 camera excludes Kit. The unchanged Debug campaign gate is a measured 37-second

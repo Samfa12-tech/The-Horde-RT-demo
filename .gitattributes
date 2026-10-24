@@ -1,3 +1,4 @@
+docs/evidence/2026-10-24-kit-natural-corner/*.log -text whitespace=cr-at-eol
 docs/evidence/2026-10-24-kit-route-admission-review/*.log -text whitespace=cr-at-eol
 docs/evidence/2026-10-24-kit-turn-admission/*.log -text whitespace=cr-at-eol
 # Keep high-resolution source art out of normal Git history.

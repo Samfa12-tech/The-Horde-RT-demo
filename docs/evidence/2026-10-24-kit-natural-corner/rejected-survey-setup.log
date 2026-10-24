@@ -1,0 +1,25 @@
+HORDE_LOOKOUT_FOREGROUND stage=route-fixture-admitted sample=1 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000000000 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=owner-created sample=2 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+HORDE_LOOKOUT_FOREGROUND stage=route-entered sample=3 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_ROUTE_CHECK isolated exported seed and hidden nonactivating native owner pass=1
+HORDE_LOOKOUT_FOREGROUND stage=route-before-command sample=4 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-command sample=5 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-before-command sample=6 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-command sample=7 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-before-command sample=31 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-command sample=32 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_WINDOWS_CAMPAIGN prepare ready=1 previous_scene_retained=1 diagnostic=
+HORDE_ROUTE_CHECK admitted record loads through ordinary native commands input rebase and fresh RT barrier pass=1
+HORDE_LOOKOUT_FOREGROUND stage=route-before-readback sample=42 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-readback sample=43 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-before-command sample=44 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-after-command sample=45 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_ROUTE_CHECK current rules two hearts and genuinely unset post-seed progression pass=1
+HORDE_ROUTE_CHECK ordinary context interaction and current fixed steps finish first rope ascent pass=1
+HORDE_ROUTE_CHECK existing input-only route driver admits the actually reached low-lantern upper state pass=1
+HORDE_ROUTE_CHECK actual route turn/walk normal-actor RT witness pass=0
+HORDE_ROUTE_CHECK legacy natural walk records the visible first-corner stages pass=0
+HORDE_ROUTE_CHECK bounded per-frame route receipt written pass=1
+HORDE_LOOKOUT_FOREGROUND stage=before-owner-destroy sample=779 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
+HORDE_LOOKOUT_FOREGROUND stage=route-owner-destroyed sample=780 initial=00000000000203DA previous=00000000000203DA current=00000000000203DA owner=0000000000980976 ours=0 shown=0
