@@ -47,6 +47,28 @@ int main()
     Check(ParseForestRouteProofLaunch(normalRouteArgs,true).error.empty(),"normal shared ownership may use the existing reunion roundtrip gate");
     normalRouteArgs[1]=L"shared64";
     Check(!ParseForestRouteProofLaunch(normalRouteArgs,true).error.empty(),"isolated proof mode cannot bypass normal route ownership");
+    const std::array<std::wstring_view,7> landingArgs{L"--capture-chapter-landing",L"stages",L"--capture-hidden",
+        L"--capture-showcase",L"C:\\captures\\landing",L"--development-checkpoint",L"chapter-kit-reunion"};
+    const auto landing=ParseForestRouteProofLaunch(landingArgs,true);
+    Check(landing.error.empty() && landing.landingOnly && landing.gpuStages && landing.mode==ForestRouteCaptureMode::Disabled,
+          "landing attribution selects the ordinary baked owner and explicit stage capture");
+    auto landingControl=landingArgs;landingControl[1]=L"control";
+    Check(ParseForestRouteProofLaunch(landingControl,true).error.empty() &&
+          !ParseForestRouteProofLaunch(landingControl,true).gpuStages,"uninstrumented landing control is explicit");
+    Check(!ParseForestRouteProofLaunch(landingArgs,false).error.empty(),"Release rejects partial landing observation");
+    std::array<std::wstring_view,8> mixedLanding{};
+    std::copy(landingArgs.begin(),landingArgs.end(),mixedLanding.begin());mixedLanding[7]=L"--validate-chapter-roundtrip";
+    Check(!ParseForestRouteProofLaunch(mixedLanding,true).error.empty(),"partial attribution cannot replace full route validation");
+    std::array<std::wstring_view,9> sharedLanding{};
+    std::copy(landingArgs.begin(),landingArgs.end(),sharedLanding.begin());
+    sharedLanding[7]=L"--forest-route-proof";sharedLanding[8]=L"normal-shared64";
+    Check(ParseForestRouteProofLaunch(sharedLanding,true).error.empty(),"normal shared owner supports the same bounded landing workload");
+    sharedLanding[8]=L"shared64";
+    Check(!ParseForestRouteProofLaunch(sharedLanding,true).error.empty(),"isolated shared proof cannot substitute for normal-owner attribution");
+    auto badLanding=landingArgs;badLanding[2]=L"--validate-chapter-roundtrip";
+    Check(!ParseForestRouteProofLaunch(badLanding,true).error.empty(),"landing observation cannot acquire foreground");
+    badLanding=landingArgs;badLanding[6]=L"chapter-forest-lookout";
+    Check(!ParseForestRouteProofLaunch(badLanding,true).error.empty(),"partial observation is restricted to its original prefix start");
     auto mixedRetention=retentionArgs;mixedRetention[2]=L"--validate-static-zone-cutover";
     Check(!ParseForestRouteProofLaunch(mixedRetention,true).error.empty(),"whole-instance proof cannot reuse common-owner cutover");
     auto unsafeSector=sectorArgs;unsafeSector[2]=L"--validate-static-zone-cutover";

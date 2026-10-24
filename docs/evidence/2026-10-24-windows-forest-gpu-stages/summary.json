@@ -1,0 +1,4067 @@
+{
+  "schema": 1,
+  "baseCommit": "0fbeb8b87e82104c644520e711bf26b376f515b8",
+  "scope": "Debug CPU, Diagnostic High RT pipeline, 960x540 internal/output, DRS off; fixed post-Keeper landing prefix with 64 fixed-pose warmup frames, four60Hz ticks per render. No full-route, Shipping, phone or scanout-FPS acceptance.",
+  "executableSha256": "38bc40d6e37b261063477f71f3219a3d70a925f1c25fb594b2992f211eb3a7ab",
+  "runs": [
+    {
+      "label": "a-control-open",
+      "shared": false,
+      "stageTimers": false,
+      "frames": 128,
+      "completedTicks": {
+        "first": 1436,
+        "last": 1944
+      },
+      "gpuWholeMs": {
+        "samples": 128,
+        "median": 6.937104,
+        "p95NearestLower": 12.904064,
+        "minimum": 3.1024,
+        "maximum": 15.856192
+      },
+      "renderCycleCpuMs": {
+        "samples": 128,
+        "median": 51.0867,
+        "p95NearestLower": 153.199,
+        "minimum": 48.2806,
+        "maximum": 394.238
+      },
+      "simulationCpuMs": {
+        "samples": 128,
+        "median": 7.9116,
+        "p95NearestLower": 163.534,
+        "minimum": 7.0646,
+        "maximum": 181.533
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+        "waterQuality": "high"
+      },
+      "quality": {
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedMistEnabled": true,
+        "actualUploadedDustQuality": 2
+      },
+      "resources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298944,
+        "deviceLocalBytes": 372464608
+      },
+      "processSeconds": 30.375,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "foregroundUnchanged": true,
+      "gpuContextSamples": [
+        {
+          "elapsedSeconds": 0.07799999999406282,
+          "exitCode": 0,
+          "values": "42, 1890, 9001, P4, 7.24, 0"
+        },
+        {
+          "elapsedSeconds": 1.1560000000026776,
+          "exitCode": 0,
+          "values": "42, 1890, 9001, P4, 7.23, 0"
+        },
+        {
+          "elapsedSeconds": 2.2339999999967404,
+          "exitCode": 0,
+          "values": "42, 1890, 9001, P4, 7.25, 0"
+        },
+        {
+          "elapsedSeconds": 3.311999999990803,
+          "exitCode": 0,
+          "values": "42, 1890, 9001, P4, 7.24, 0"
+        },
+        {
+          "elapsedSeconds": 4.389999999999418,
+          "exitCode": 0,
+          "values": "42, 1897, 9001, P4, 7.40, 0"
+        },
+        {
+          "elapsedSeconds": 5.4689999999973224,
+          "exitCode": 0,
+          "values": "42, 1890, 9001, P4, 7.91, 0"
+        },
+        {
+          "elapsedSeconds": 6.546999999991385,
+          "exitCode": 0,
+          "values": "43, 1890, 9001, P4, 7.23, 0"
+        },
+        {
+          "elapsedSeconds": 7.625,
+          "exitCode": 0,
+          "values": "43, 1890, 9001, P4, 7.30, 0"
+        },
+        {
+          "elapsedSeconds": 8.686999999990803,
+          "exitCode": 0,
+          "values": "42, 180, 405, P8, 3.36, 0"
+        },
+        {
+          "elapsedSeconds": 9.811999999990803,
+          "exitCode": 0,
+          "values": "42, 180, 405, P8, 6.68, 35"
+        },
+        {
+          "elapsedSeconds": 10.889999999999418,
+          "exitCode": 0,
+          "values": "43, 187, 810, P5, 6.55, 22"
+        },
+        {
+          "elapsedSeconds": 11.968999999997322,
+          "exitCode": 0,
+          "values": "43, 180, 810, P5, 6.72, 0"
+        },
+        {
+          "elapsedSeconds": 13.046999999991385,
+          "exitCode": 0,
+          "values": "43, 180, 810, P8, 6.64, 0"
+        },
+        {
+          "elapsedSeconds": 14.10899999999674,
+          "exitCode": 0,
+          "values": "43, 217, 9001, P4, 6.62, 0"
+        },
+        {
+          "elapsedSeconds": 15.186999999990803,
+          "exitCode": 0,
+          "values": "43, 187, 810, P5, 5.51, 0"
+        },
+        {
+          "elapsedSeconds": 16.281000000002678,
+          "exitCode": 0,
+          "values": "51, 2625, 9001, P4, 39.62, 48"
+        },
+        {
+          "elapsedSeconds": 17.35899999999674,
+          "exitCode": 0,
+          "values": "44, 435, 9001, P4, 6.71, 4"
+        },
+        {
+          "elapsedSeconds": 18.436999999990803,
+          "exitCode": 0,
+          "values": "45, 375, 9001, P4, 8.77, 4"
+        },
+        {
+          "elapsedSeconds": 19.531000000002678,
+          "exitCode": 0,
+          "values": "44, 247, 9001, P4, 7.58, 0"
+        },
+        {
+          "elapsedSeconds": 20.60899999999674,
+          "exitCode": 0,
+          "values": "44, 240, 9001, P4, 9.32, 5"
+        },
+        {
+          "elapsedSeconds": 21.686999999990803,
+          "exitCode": 0,
+          "values": "44, 277, 810, P5, 7.97, 8"
+        },
+        {
+          "elapsedSeconds": 22.764999999999418,
+          "exitCode": 0,
+          "values": "45, 585, 405, P8, 9.31, 28"
+        },
+        {
+          "elapsedSeconds": 23.843999999997322,
+          "exitCode": 0,
+          "values": "45, 180, 405, P8, 7.94, 24"
+        },
+        {
+          "elapsedSeconds": 24.906000000002678,
+          "exitCode": 0,
+          "values": "45, 285, 405, P8, 5.65, 15"
+        },
+        {
+          "elapsedSeconds": 26.014999999999418,
+          "exitCode": 0,
+          "values": "44, 472, 405, P8, 7.09, 7"
+        },
+        {
+          "elapsedSeconds": 27.093999999997322,
+          "exitCode": 0,
+          "values": "45, 420, 405, P8, 5.42, 6"
+        },
+        {
+          "elapsedSeconds": 28.171999999991385,
+          "exitCode": 0,
+          "values": "45, 705, 405, P8, 8.31, 10"
+        },
+        {
+          "elapsedSeconds": 29.25,
+          "exitCode": 0,
+          "values": "45, 630, 810, P5, 12.10, 20"
+        },
+        {
+          "elapsedSeconds": 30.311999999990803,
+          "exitCode": 0,
+          "values": "44, 487, 405, P8, 5.70, 0"
+        }
+      ],
+      "firstLight": {
+        "count": 1,
+        "emitters": [
+          {
+            "stableId": 1279348308,
+            "positionStrength": [
+              -28.1300201,
+              2.60213232,
+              -5.983634,
+              0.686399996
+            ],
+            "colourIntensity": [
+              1,
+              0.426759988,
+              0.0815246254,
+              0.686399996
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "camera": [
+        -28.7023,
+        1.4512,
+        -5.80325,
+        1.5708,
+        -0.1
+      ],
+      "gpuContextScope": "Samples after landing CSV creation, includes warmup and measurement; GPU utilization>=10%. Not per-frame clocks/utilization.",
+      "activeGpuContext": {
+        "temperatureC": {
+          "samples": 6,
+          "median": 45.0,
+          "p95NearestLower": 45.0,
+          "minimum": 45.0,
+          "maximum": 51.0
+        },
+        "graphicsClockMHz": {
+          "samples": 6,
+          "median": 607.5,
+          "p95NearestLower": 705.0,
+          "minimum": 180.0,
+          "maximum": 2625.0
+        },
+        "memoryClockMHz": {
+          "samples": 6,
+          "median": 405.0,
+          "p95NearestLower": 810.0,
+          "minimum": 405.0,
+          "maximum": 9001.0
+        },
+        "powerW": {
+          "samples": 6,
+          "median": 8.81,
+          "p95NearestLower": 12.1,
+          "minimum": 5.65,
+          "maximum": 39.62
+        },
+        "gpuUtilizationPercent": {
+          "samples": 6,
+          "median": 22.0,
+          "p95NearestLower": 28.0,
+          "minimum": 10.0,
+          "maximum": 48.0
+        }
+      },
+      "initialAssetMeasurements": {
+        "enabled": true,
+        "vertexBytes": 39974720,
+        "indexBytes": 6379020,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.6221,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.8675,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7546,
+        "productionPropBlasBytes": 27319040,
+        "productionPropBlasBuildMilliseconds": 16.613
+      },
+      "initialOwner": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 76,
+        "recordSerial": 76,
+        "submissionSerial": 76,
+        "completionSerial": 76,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "commandArguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-gpu-stages-20261024\\a-control-open",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-kit-reunion",
+        "--capture-chapter-landing",
+        "control"
+      ],
+      "csvSha256": "1bd032d6932b88f5116a10c122cead1fde0deed87699e97e9e17f16e82141b3f"
+    },
+    {
+      "label": "b-control-open",
+      "shared": true,
+      "stageTimers": false,
+      "frames": 128,
+      "completedTicks": {
+        "first": 1436,
+        "last": 1944
+      },
+      "gpuWholeMs": {
+        "samples": 128,
+        "median": 7.10144,
+        "p95NearestLower": 13.142112,
+        "minimum": 3.176288,
+        "maximum": 14.304064
+      },
+      "renderCycleCpuMs": {
+        "samples": 128,
+        "median": 51.66355,
+        "p95NearestLower": 164.24,
+        "minimum": 47.559,
+        "maximum": 374.126
+      },
+      "simulationCpuMs": {
+        "samples": 128,
+        "median": 8.12105,
+        "p95NearestLower": 167.417,
+        "minimum": 7.1046,
+        "maximum": 187.213
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+        "waterQuality": "high"
+      },
+      "quality": {
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedMistEnabled": true,
+        "actualUploadedDustQuality": 2
+      },
+      "resources": {
+        "bufferCount": 53,
+        "memoryAllocationCount": 62,
+        "bottomLevelAccelerationStructureCount": 22,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 92,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 22256896,
+        "deviceLocalBytes": 327091744
+      },
+      "processSeconds": 25.311999999990803,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "foregroundUnchanged": true,
+      "gpuContextSamples": [
+        {
+          "elapsedSeconds": 0.06199999999080319,
+          "exitCode": 0,
+          "values": "44, 487, 405, P8, 5.70, 0"
+        },
+        {
+          "elapsedSeconds": 1.139999999999418,
+          "exitCode": 0,
+          "values": "45, 1845, 9001, P4, 7.43, 0"
+        },
+        {
+          "elapsedSeconds": 2.202999999994063,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P4, 7.39, 0"
+        },
+        {
+          "elapsedSeconds": 3.2810000000026776,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P5, 7.44, 0"
+        },
+        {
+          "elapsedSeconds": 4.35899999999674,
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 3.52, 0"
+        },
+        {
+          "elapsedSeconds": 5.452999999994063,
+          "exitCode": 0,
+          "values": "44, 300, 810, P5, 8.73, 76"
+        },
+        {
+          "elapsedSeconds": 6.514999999999418,
+          "exitCode": 0,
+          "values": "44, 735, 810, P5, 6.76, 0"
+        },
+        {
+          "elapsedSeconds": 7.60899999999674,
+          "exitCode": 0,
+          "values": "44, 217, 810, P5, 6.71, 0"
+        },
+        {
+          "elapsedSeconds": 8.671999999991385,
+          "exitCode": 0,
+          "values": "44, 217, 810, P5, 12.18, 0"
+        },
+        {
+          "elapsedSeconds": 9.75,
+          "exitCode": 0,
+          "values": "44, 217, 810, P5, 6.62, 0"
+        },
+        {
+          "elapsedSeconds": 10.827999999994063,
+          "exitCode": 0,
+          "values": "46, 2400, 9001, P4, 12.81, 9"
+        },
+        {
+          "elapsedSeconds": 11.906000000002678,
+          "exitCode": 0,
+          "values": "45, 472, 9001, P4, 11.04, 9"
+        },
+        {
+          "elapsedSeconds": 12.98399999999674,
+          "exitCode": 0,
+          "values": "45, 247, 9001, P4, 7.71, 5"
+        },
+        {
+          "elapsedSeconds": 14.061999999990803,
+          "exitCode": 0,
+          "values": "44, 240, 810, P5, 8.27, 0"
+        },
+        {
+          "elapsedSeconds": 15.139999999999418,
+          "exitCode": 0,
+          "values": "44, 277, 810, P5, 7.93, 8"
+        },
+        {
+          "elapsedSeconds": 16.218999999997322,
+          "exitCode": 0,
+          "values": "46, 360, 405, P8, 6.88, 14"
+        },
+        {
+          "elapsedSeconds": 17.296999999991385,
+          "exitCode": 0,
+          "values": "45, 405, 810, P5, 9.82, 10"
+        },
+        {
+          "elapsedSeconds": 18.389999999999418,
+          "exitCode": 0,
+          "values": "45, 405, 810, P5, 10.73, 20"
+        },
+        {
+          "elapsedSeconds": 19.452999999994063,
+          "exitCode": 0,
+          "values": "45, 240, 810, P5, 10.77, 16"
+        },
+        {
+          "elapsedSeconds": 20.531000000002678,
+          "exitCode": 0,
+          "values": "45, 292, 405, P8, 9.52, 29"
+        },
+        {
+          "elapsedSeconds": 21.60899999999674,
+          "exitCode": 0,
+          "values": "45, 337, 405, P8, 6.78, 15"
+        },
+        {
+          "elapsedSeconds": 22.702999999994063,
+          "exitCode": 0,
+          "values": "45, 330, 405, P8, 8.64, 16"
+        },
+        {
+          "elapsedSeconds": 23.781000000002678,
+          "exitCode": 0,
+          "values": "45, 390, 810, P5, 10.31, 21"
+        },
+        {
+          "elapsedSeconds": 24.843999999997322,
+          "exitCode": 0,
+          "values": "44, 225, 405, P8, 4.09, 0"
+        }
+      ],
+      "firstLight": {
+        "count": 1,
+        "emitters": [
+          {
+            "stableId": 1279348308,
+            "positionStrength": [
+              -28.1300201,
+              2.60213232,
+              -5.983634,
+              0.686399996
+            ],
+            "colourIntensity": [
+              1,
+              0.426759988,
+              0.0815246254,
+              0.686399996
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "camera": [
+        -28.7023,
+        1.4512,
+        -5.80325,
+        1.5708,
+        -0.1
+      ],
+      "gpuContextScope": "Samples after landing CSV creation, includes warmup and measurement; GPU utilization>=10%. Not per-frame clocks/utilization.",
+      "activeGpuContext": {
+        "temperatureC": {
+          "samples": 8,
+          "median": 45.0,
+          "p95NearestLower": 45.0,
+          "minimum": 45.0,
+          "maximum": 46.0
+        },
+        "graphicsClockMHz": {
+          "samples": 8,
+          "median": 348.5,
+          "p95NearestLower": 405.0,
+          "minimum": 240.0,
+          "maximum": 405.0
+        },
+        "memoryClockMHz": {
+          "samples": 8,
+          "median": 607.5,
+          "p95NearestLower": 810.0,
+          "minimum": 405.0,
+          "maximum": 810.0
+        },
+        "powerW": {
+          "samples": 8,
+          "median": 9.67,
+          "p95NearestLower": 10.73,
+          "minimum": 6.78,
+          "maximum": 10.77
+        },
+        "gpuUtilizationPercent": {
+          "samples": 8,
+          "median": 16.0,
+          "p95NearestLower": 21.0,
+          "minimum": 10.0,
+          "maximum": 29.0
+        }
+      },
+      "initialAssetMeasurements": {
+        "enabled": true,
+        "vertexBytes": 17686464,
+        "indexBytes": 2621076,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 576,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.5429,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7637,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7792,
+        "productionPropBlasBytes": 7964672,
+        "productionPropBlasBuildMilliseconds": 12.8591
+      },
+      "initialOwner": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 76,
+        "recordSerial": 76,
+        "submissionSerial": 76,
+        "completionSerial": 76,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "commandArguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-gpu-stages-20261024\\b-control-open",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-kit-reunion",
+        "--capture-chapter-landing",
+        "control",
+        "--forest-route-proof",
+        "normal-shared64"
+      ],
+      "csvSha256": "d6cf3fd96479d56d5758d914bbd015965dc7fd8f2913e00945a77a638b2e4544"
+    },
+    {
+      "label": "a-stages-1",
+      "shared": false,
+      "stageTimers": true,
+      "frames": 128,
+      "completedTicks": {
+        "first": 1436,
+        "last": 1944
+      },
+      "gpuWholeMs": {
+        "samples": 128,
+        "median": 7.316288,
+        "p95NearestLower": 15.119712,
+        "minimum": 3.097728,
+        "maximum": 15.778464
+      },
+      "renderCycleCpuMs": {
+        "samples": 128,
+        "median": 52.92945,
+        "p95NearestLower": 88.7883,
+        "minimum": 49.1764,
+        "maximum": 352.675
+      },
+      "simulationCpuMs": {
+        "samples": 128,
+        "median": 8.17025,
+        "p95NearestLower": 163.848,
+        "minimum": 7.2046,
+        "maximum": 183.431
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+        "waterQuality": "high"
+      },
+      "quality": {
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedMistEnabled": true,
+        "actualUploadedDustQuality": 2
+      },
+      "resources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298944,
+        "deviceLocalBytes": 372464608
+      },
+      "processSeconds": 26.062000000005355,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "foregroundUnchanged": true,
+      "gpuContextSamples": [
+        {
+          "elapsedSeconds": 0.062000000005355105,
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 4.15, 0"
+        },
+        {
+          "elapsedSeconds": 1.1410000000032596,
+          "exitCode": 0,
+          "values": "44, 1897, 9001, P4, 9.10, 0"
+        },
+        {
+          "elapsedSeconds": 2.2339999999967404,
+          "exitCode": 0,
+          "values": "44, 1890, 9001, P4, 7.39, 0"
+        },
+        {
+          "elapsedSeconds": 3.297000000005937,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P5, 7.40, 0"
+        },
+        {
+          "elapsedSeconds": 4.375,
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 3.47, 0"
+        },
+        {
+          "elapsedSeconds": 5.453000000008615,
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 3.42, 0"
+        },
+        {
+          "elapsedSeconds": 6.5310000000026776,
+          "exitCode": 0,
+          "values": "44, 180, 810, P5, 4.96, 100"
+        },
+        {
+          "elapsedSeconds": 7.60899999999674,
+          "exitCode": 0,
+          "values": "44, 202, 810, P5, 6.62, 0"
+        },
+        {
+          "elapsedSeconds": 8.687000000005355,
+          "exitCode": 0,
+          "values": "44, 202, 810, P8, 6.68, 0"
+        },
+        {
+          "elapsedSeconds": 9.76600000000326,
+          "exitCode": 0,
+          "values": "44, 217, 9001, P4, 6.68, 0"
+        },
+        {
+          "elapsedSeconds": 10.843999999997322,
+          "exitCode": 0,
+          "values": "44, 225, 810, P5, 6.60, 0"
+        },
+        {
+          "elapsedSeconds": 11.922000000005937,
+          "exitCode": 0,
+          "values": "49, 352, 9001, P4, 40.85, 86"
+        },
+        {
+          "elapsedSeconds": 12.98399999999674,
+          "exitCode": 0,
+          "values": "45, 457, 9001, P4, 9.20, 4"
+        },
+        {
+          "elapsedSeconds": 14.078000000008615,
+          "exitCode": 0,
+          "values": "45, 457, 810, P5, 9.32, 9"
+        },
+        {
+          "elapsedSeconds": 15.156000000002678,
+          "exitCode": 0,
+          "values": "45, 270, 810, P5, 7.89, 9"
+        },
+        {
+          "elapsedSeconds": 16.23399999999674,
+          "exitCode": 0,
+          "values": "45, 510, 405, P8, 6.53, 16"
+        },
+        {
+          "elapsedSeconds": 17.281000000002678,
+          "exitCode": 0,
+          "values": "45, 345, 405, P8, 6.12, 0"
+        },
+        {
+          "elapsedSeconds": 18.35899999999674,
+          "exitCode": 0,
+          "values": "45, 727, 405, P8, 10.49, 17"
+        },
+        {
+          "elapsedSeconds": 19.437000000005355,
+          "exitCode": 0,
+          "values": "46, 570, 810, P5, 7.46, 18"
+        },
+        {
+          "elapsedSeconds": 20.51600000000326,
+          "exitCode": 0,
+          "values": "45, 615, 405, P8, 10.62, 9"
+        },
+        {
+          "elapsedSeconds": 21.578000000008615,
+          "exitCode": 0,
+          "values": "46, 255, 810, P5, 10.67, 25"
+        },
+        {
+          "elapsedSeconds": 22.656000000002678,
+          "exitCode": 0,
+          "values": "45, 315, 405, P8, 4.23, 0"
+        },
+        {
+          "elapsedSeconds": 23.73399999999674,
+          "exitCode": 0,
+          "values": "45, 285, 810, P5, 8.74, 33"
+        },
+        {
+          "elapsedSeconds": 24.812000000005355,
+          "exitCode": 0,
+          "values": "45, 397, 9001, P4, 7.53, 24"
+        },
+        {
+          "elapsedSeconds": 25.89100000000326,
+          "exitCode": 0,
+          "values": "45, 367, 810, P5, 9.47, 3"
+        }
+      ],
+      "firstLight": {
+        "count": 1,
+        "emitters": [
+          {
+            "stableId": 1279348308,
+            "positionStrength": [
+              -28.1300201,
+              2.60213232,
+              -5.983634,
+              0.686399996
+            ],
+            "colourIntensity": [
+              1,
+              0.426759988,
+              0.0815246254,
+              0.686399996
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "camera": [
+        -28.7023,
+        1.4512,
+        -5.80325,
+        1.5708,
+        -0.1
+      ],
+      "gpuStagesMs": {
+        "as": {
+          "samples": 128,
+          "median": 2.941408,
+          "p95NearestLower": 5.848064,
+          "minimum": 0.097376,
+          "maximum": 5.908032
+        },
+        "dispatch": {
+          "samples": 128,
+          "median": 4.303888,
+          "p95NearestLower": 9.268096,
+          "minimum": 2.399168,
+          "maximum": 9.819776
+        },
+        "transfer": {
+          "samples": 128,
+          "median": 0.062864,
+          "p95NearestLower": 0.129568,
+          "minimum": 0.010976,
+          "maximum": 0.133632
+        }
+      },
+      "gpuContextScope": "Samples after landing CSV creation, includes warmup and measurement; GPU utilization>=10%. Not per-frame clocks/utilization.",
+      "activeGpuContext": {
+        "temperatureC": {
+          "samples": 7,
+          "median": 45.0,
+          "p95NearestLower": 46.0,
+          "minimum": 45.0,
+          "maximum": 49.0
+        },
+        "graphicsClockMHz": {
+          "samples": 7,
+          "median": 397.0,
+          "p95NearestLower": 570.0,
+          "minimum": 255.0,
+          "maximum": 727.0
+        },
+        "memoryClockMHz": {
+          "samples": 7,
+          "median": 810.0,
+          "p95NearestLower": 9001.0,
+          "minimum": 405.0,
+          "maximum": 9001.0
+        },
+        "powerW": {
+          "samples": 7,
+          "median": 8.74,
+          "p95NearestLower": 10.67,
+          "minimum": 6.53,
+          "maximum": 40.85
+        },
+        "gpuUtilizationPercent": {
+          "samples": 7,
+          "median": 24.0,
+          "p95NearestLower": 33.0,
+          "minimum": 16.0,
+          "maximum": 86.0
+        }
+      },
+      "initialAssetMeasurements": {
+        "enabled": true,
+        "vertexBytes": 39974720,
+        "indexBytes": 6379020,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.5517,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.8475,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7042,
+        "productionPropBlasBytes": 27319040,
+        "productionPropBlasBuildMilliseconds": 17.698
+      },
+      "initialOwner": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 76,
+        "recordSerial": 76,
+        "submissionSerial": 76,
+        "completionSerial": 76,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "commandArguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-gpu-stages-20261024\\a-stages-1",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-kit-reunion",
+        "--capture-chapter-landing",
+        "stages"
+      ],
+      "csvSha256": "1965e5f62555c9f5488a1d0b3e8255f541d992879815c092f74a4aa7f4e1dc04"
+    },
+    {
+      "label": "b-stages-1",
+      "shared": true,
+      "stageTimers": true,
+      "frames": 128,
+      "completedTicks": {
+        "first": 1436,
+        "last": 1944
+      },
+      "gpuWholeMs": {
+        "samples": 128,
+        "median": 7.0647199999999994,
+        "p95NearestLower": 13.74416,
+        "minimum": 3.179808,
+        "maximum": 14.38816
+      },
+      "renderCycleCpuMs": {
+        "samples": 128,
+        "median": 51.3454,
+        "p95NearestLower": 99.7299,
+        "minimum": 48.3473,
+        "maximum": 379.633
+      },
+      "simulationCpuMs": {
+        "samples": 128,
+        "median": 8.2869,
+        "p95NearestLower": 168.17,
+        "minimum": 7.2,
+        "maximum": 190.507
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+        "waterQuality": "high"
+      },
+      "quality": {
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedMistEnabled": true,
+        "actualUploadedDustQuality": 2
+      },
+      "resources": {
+        "bufferCount": 53,
+        "memoryAllocationCount": 62,
+        "bottomLevelAccelerationStructureCount": 22,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 92,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 22256896,
+        "deviceLocalBytes": 327091744
+      },
+      "processSeconds": 25.546999999991385,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "foregroundUnchanged": true,
+      "gpuContextSamples": [
+        {
+          "elapsedSeconds": 0.0629999999946449,
+          "exitCode": 0,
+          "values": "45, 217, 810, P5, 6.93, 0"
+        },
+        {
+          "elapsedSeconds": 1.1409999999887077,
+          "exitCode": 0,
+          "values": "45, 1785, 9001, P4, 7.37, 0"
+        },
+        {
+          "elapsedSeconds": 2.2189999999973224,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P4, 7.40, 0"
+        },
+        {
+          "elapsedSeconds": 3.2969999999913853,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P4, 7.34, 0"
+        },
+        {
+          "elapsedSeconds": 4.375,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P5, 7.35, 0"
+        },
+        {
+          "elapsedSeconds": 5.452999999994063,
+          "exitCode": 0,
+          "values": "44, 307, 405, P8, 6.05, 68"
+        },
+        {
+          "elapsedSeconds": 6.546999999991385,
+          "exitCode": 0,
+          "values": "44, 667, 810, P5, 8.20, 1"
+        },
+        {
+          "elapsedSeconds": 7.60899999999674,
+          "exitCode": 0,
+          "values": "44, 217, 810, P5, 6.65, 0"
+        },
+        {
+          "elapsedSeconds": 8.687999999994645,
+          "exitCode": 0,
+          "values": "45, 892, 810, P5, 6.96, 0"
+        },
+        {
+          "elapsedSeconds": 9.780999999988126,
+          "exitCode": 0,
+          "values": "44, 180, 810, P5, 6.65, 0"
+        },
+        {
+          "elapsedSeconds": 10.85899999999674,
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 3.47, 0"
+        },
+        {
+          "elapsedSeconds": 11.937999999994645,
+          "exitCode": 0,
+          "values": "46, 1365, 9001, P4, 10.66, 10"
+        },
+        {
+          "elapsedSeconds": 13.015999999988708,
+          "exitCode": 0,
+          "values": "45, 465, 9001, P4, 9.21, 9"
+        },
+        {
+          "elapsedSeconds": 14.093999999997322,
+          "exitCode": 0,
+          "values": "45, 240, 810, P5, 7.50, 0"
+        },
+        {
+          "elapsedSeconds": 15.171999999991385,
+          "exitCode": 0,
+          "values": "44, 352, 810, P5, 7.32, 2"
+        },
+        {
+          "elapsedSeconds": 16.25,
+          "exitCode": 0,
+          "values": "45, 270, 405, P8, 6.09, 0"
+        },
+        {
+          "elapsedSeconds": 17.327999999994063,
+          "exitCode": 0,
+          "values": "45, 345, 405, P8, 6.74, 16"
+        },
+        {
+          "elapsedSeconds": 18.405999999988126,
+          "exitCode": 0,
+          "values": "45, 585, 405, P8, 10.98, 9"
+        },
+        {
+          "elapsedSeconds": 19.48399999999674,
+          "exitCode": 0,
+          "values": "45, 787, 405, P8, 7.50, 0"
+        },
+        {
+          "elapsedSeconds": 20.577999999994063,
+          "exitCode": 0,
+          "values": "45, 562, 405, P8, 8.10, 0"
+        },
+        {
+          "elapsedSeconds": 21.640999999988708,
+          "exitCode": 0,
+          "values": "45, 577, 405, P8, 9.74, 0"
+        },
+        {
+          "elapsedSeconds": 22.718999999997322,
+          "exitCode": 0,
+          "values": "45, 345, 405, P8, 7.53, 15"
+        },
+        {
+          "elapsedSeconds": 23.796999999991385,
+          "exitCode": 0,
+          "values": "45, 487, 405, P8, 8.76, 17"
+        },
+        {
+          "elapsedSeconds": 24.890999999988708,
+          "exitCode": 0,
+          "values": "45, 750, 810, P5, 9.67, 10"
+        }
+      ],
+      "firstLight": {
+        "count": 1,
+        "emitters": [
+          {
+            "stableId": 1279348308,
+            "positionStrength": [
+              -28.1300201,
+              2.60213232,
+              -5.983634,
+              0.686399996
+            ],
+            "colourIntensity": [
+              1,
+              0.426759988,
+              0.0815246254,
+              0.686399996
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "camera": [
+        -28.7023,
+        1.4512,
+        -5.80325,
+        1.5708,
+        -0.1
+      ],
+      "gpuStagesMs": {
+        "as": {
+          "samples": 128,
+          "median": 2.9034880000000003,
+          "p95NearestLower": 5.876768,
+          "minimum": 0.0976,
+          "maximum": 6.029056
+        },
+        "dispatch": {
+          "samples": 128,
+          "median": 4.037648,
+          "p95NearestLower": 7.783584,
+          "minimum": 2.557216,
+          "maximum": 8.449664
+        },
+        "transfer": {
+          "samples": 128,
+          "median": 0.05928,
+          "p95NearestLower": 0.125312,
+          "minimum": 0.010848,
+          "maximum": 0.135648
+        }
+      },
+      "gpuContextScope": "Samples after landing CSV creation, includes warmup and measurement; GPU utilization>=10%. Not per-frame clocks/utilization.",
+      "activeGpuContext": {
+        "temperatureC": {
+          "samples": 5,
+          "median": 45.0,
+          "p95NearestLower": 45.0,
+          "minimum": 45.0,
+          "maximum": 46.0
+        },
+        "graphicsClockMHz": {
+          "samples": 5,
+          "median": 487.0,
+          "p95NearestLower": 750.0,
+          "minimum": 345.0,
+          "maximum": 1365.0
+        },
+        "memoryClockMHz": {
+          "samples": 5,
+          "median": 405.0,
+          "p95NearestLower": 810.0,
+          "minimum": 405.0,
+          "maximum": 9001.0
+        },
+        "powerW": {
+          "samples": 5,
+          "median": 8.76,
+          "p95NearestLower": 9.67,
+          "minimum": 6.74,
+          "maximum": 10.66
+        },
+        "gpuUtilizationPercent": {
+          "samples": 5,
+          "median": 15.0,
+          "p95NearestLower": 16.0,
+          "minimum": 10.0,
+          "maximum": 17.0
+        }
+      },
+      "initialAssetMeasurements": {
+        "enabled": true,
+        "vertexBytes": 17686464,
+        "indexBytes": 2621076,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 576,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.4137,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7664,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6473,
+        "productionPropBlasBytes": 7964672,
+        "productionPropBlasBuildMilliseconds": 12.2184
+      },
+      "initialOwner": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 76,
+        "recordSerial": 76,
+        "submissionSerial": 76,
+        "completionSerial": 76,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "commandArguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-gpu-stages-20261024\\b-stages-1",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-kit-reunion",
+        "--capture-chapter-landing",
+        "stages",
+        "--forest-route-proof",
+        "normal-shared64"
+      ],
+      "csvSha256": "7bbfadb68389b02a9c681cdf2f01c4c3a50c2583357ed6f85e3a1666c55dbf00"
+    },
+    {
+      "label": "b-stages-2",
+      "shared": true,
+      "stageTimers": true,
+      "frames": 128,
+      "completedTicks": {
+        "first": 1436,
+        "last": 1944
+      },
+      "gpuWholeMs": {
+        "samples": 128,
+        "median": 7.168832,
+        "p95NearestLower": 13.125344,
+        "minimum": 3.445024,
+        "maximum": 14.551168
+      },
+      "renderCycleCpuMs": {
+        "samples": 128,
+        "median": 51.3468,
+        "p95NearestLower": 60.4047,
+        "minimum": 48.4166,
+        "maximum": 360.667
+      },
+      "simulationCpuMs": {
+        "samples": 128,
+        "median": 8.2549,
+        "p95NearestLower": 166.818,
+        "minimum": 7.2447,
+        "maximum": 189.024
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+        "waterQuality": "high"
+      },
+      "quality": {
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedMistEnabled": true,
+        "actualUploadedDustQuality": 2
+      },
+      "resources": {
+        "bufferCount": 53,
+        "memoryAllocationCount": 62,
+        "bottomLevelAccelerationStructureCount": 22,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 92,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 22256896,
+        "deviceLocalBytes": 327091744
+      },
+      "processSeconds": 24.797000000005937,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "foregroundUnchanged": true,
+      "gpuContextSamples": [
+        {
+          "elapsedSeconds": 0.0629999999946449,
+          "exitCode": 0,
+          "values": "45, 615, 405, P8, 4.10, 1"
+        },
+        {
+          "elapsedSeconds": 1.1410000000032596,
+          "exitCode": 0,
+          "values": "45, 1905, 9001, P4, 7.62, 0"
+        },
+        {
+          "elapsedSeconds": 2.2189999999973224,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P4, 7.43, 0"
+        },
+        {
+          "elapsedSeconds": 3.297000000005937,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P4, 7.39, 0"
+        },
+        {
+          "elapsedSeconds": 4.375,
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 3.46, 0"
+        },
+        {
+          "elapsedSeconds": 5.452999999994063,
+          "exitCode": 0,
+          "values": "44, 277, 810, P5, 7.69, 77"
+        },
+        {
+          "elapsedSeconds": 6.5310000000026776,
+          "exitCode": 0,
+          "values": "44, 720, 810, P5, 6.64, 0"
+        },
+        {
+          "elapsedSeconds": 7.610000000000582,
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 4.29, 0"
+        },
+        {
+          "elapsedSeconds": 8.687999999994645,
+          "exitCode": 0,
+          "values": "45, 735, 810, P5, 7.22, 0"
+        },
+        {
+          "elapsedSeconds": 9.75,
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 4.20, 0"
+        },
+        {
+          "elapsedSeconds": 10.827999999994063,
+          "exitCode": 0,
+          "values": "45, 1665, 810, P5, 7.04, 0"
+        },
+        {
+          "elapsedSeconds": 11.906000000002678,
+          "exitCode": 0,
+          "values": "46, 487, 9001, P4, 11.34, 8"
+        },
+        {
+          "elapsedSeconds": 12.985000000000582,
+          "exitCode": 0,
+          "values": "46, 517, 9001, P4, 11.42, 9"
+        },
+        {
+          "elapsedSeconds": 14.062999999994645,
+          "exitCode": 0,
+          "values": "45, 277, 810, P5, 8.30, 8"
+        },
+        {
+          "elapsedSeconds": 15.14100000000326,
+          "exitCode": 0,
+          "values": "45, 277, 810, P5, 7.98, 1"
+        },
+        {
+          "elapsedSeconds": 16.202999999994063,
+          "exitCode": 0,
+          "values": "45, 337, 405, P8, 8.51, 16"
+        },
+        {
+          "elapsedSeconds": 17.297000000005937,
+          "exitCode": 0,
+          "values": "45, 472, 405, P8, 4.63, 0"
+        },
+        {
+          "elapsedSeconds": 18.360000000000582,
+          "exitCode": 0,
+          "values": "45, 735, 810, P5, 9.50, 9"
+        },
+        {
+          "elapsedSeconds": 19.437999999994645,
+          "exitCode": 0,
+          "values": "46, 652, 810, P5, 11.58, 17"
+        },
+        {
+          "elapsedSeconds": 20.51600000000326,
+          "exitCode": 0,
+          "values": "45, 487, 810, P5, 8.91, 14"
+        },
+        {
+          "elapsedSeconds": 21.593999999997322,
+          "exitCode": 0,
+          "values": "45, 682, 810, P5, 7.62, 0"
+        },
+        {
+          "elapsedSeconds": 22.672000000005937,
+          "exitCode": 0,
+          "values": "46, 495, 810, P5, 10.97, 18"
+        },
+        {
+          "elapsedSeconds": 23.75,
+          "exitCode": 0,
+          "values": "45, 390, 810, P5, 9.49, 20"
+        },
+        {
+          "elapsedSeconds": 24.827999999994063,
+          "exitCode": 0,
+          "values": "45, 240, 405, P8, 4.09, 0"
+        }
+      ],
+      "firstLight": {
+        "count": 1,
+        "emitters": [
+          {
+            "stableId": 1279348308,
+            "positionStrength": [
+              -28.1300201,
+              2.60213232,
+              -5.983634,
+              0.686399996
+            ],
+            "colourIntensity": [
+              1,
+              0.426759988,
+              0.0815246254,
+              0.686399996
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "camera": [
+        -28.7023,
+        1.4512,
+        -5.80325,
+        1.5708,
+        -0.1
+      ],
+      "gpuStagesMs": {
+        "as": {
+          "samples": 128,
+          "median": 2.9237599999999997,
+          "p95NearestLower": 5.90208,
+          "minimum": 0.099584,
+          "maximum": 5.998784
+        },
+        "dispatch": {
+          "samples": 128,
+          "median": 4.145104,
+          "p95NearestLower": 7.1984,
+          "minimum": 2.54304,
+          "maximum": 8.51632
+        },
+        "transfer": {
+          "samples": 128,
+          "median": 0.061984,
+          "p95NearestLower": 0.123168,
+          "minimum": 0.01072,
+          "maximum": 0.131008
+        }
+      },
+      "gpuContextScope": "Samples after landing CSV creation, includes warmup and measurement; GPU utilization>=10%. Not per-frame clocks/utilization.",
+      "activeGpuContext": {
+        "temperatureC": {
+          "samples": 5,
+          "median": 45.0,
+          "p95NearestLower": 46.0,
+          "minimum": 45.0,
+          "maximum": 46.0
+        },
+        "graphicsClockMHz": {
+          "samples": 5,
+          "median": 487.0,
+          "p95NearestLower": 495.0,
+          "minimum": 337.0,
+          "maximum": 652.0
+        },
+        "memoryClockMHz": {
+          "samples": 5,
+          "median": 810.0,
+          "p95NearestLower": 810.0,
+          "minimum": 405.0,
+          "maximum": 810.0
+        },
+        "powerW": {
+          "samples": 5,
+          "median": 9.49,
+          "p95NearestLower": 10.97,
+          "minimum": 8.51,
+          "maximum": 11.58
+        },
+        "gpuUtilizationPercent": {
+          "samples": 5,
+          "median": 17.0,
+          "p95NearestLower": 18.0,
+          "minimum": 14.0,
+          "maximum": 20.0
+        }
+      },
+      "initialAssetMeasurements": {
+        "enabled": true,
+        "vertexBytes": 17686464,
+        "indexBytes": 2621076,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 576,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.9991,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.9342,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 1.0649,
+        "productionPropBlasBytes": 7964672,
+        "productionPropBlasBuildMilliseconds": 12.7285
+      },
+      "initialOwner": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 76,
+        "recordSerial": 76,
+        "submissionSerial": 76,
+        "completionSerial": 76,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "commandArguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-gpu-stages-20261024\\b-stages-2",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-kit-reunion",
+        "--capture-chapter-landing",
+        "stages",
+        "--forest-route-proof",
+        "normal-shared64"
+      ],
+      "csvSha256": "8176e6eae5351a5a2c78252ad44aeb64d8438c0a75f97571033cf3d2effbfcfc"
+    },
+    {
+      "label": "a-stages-2",
+      "shared": false,
+      "stageTimers": true,
+      "frames": 128,
+      "completedTicks": {
+        "first": 1436,
+        "last": 1944
+      },
+      "gpuWholeMs": {
+        "samples": 128,
+        "median": 7.49968,
+        "p95NearestLower": 14.887104,
+        "minimum": 3.089472,
+        "maximum": 15.584544
+      },
+      "renderCycleCpuMs": {
+        "samples": 128,
+        "median": 51.977050000000006,
+        "p95NearestLower": 185.21,
+        "minimum": 48.8242,
+        "maximum": 367.947
+      },
+      "simulationCpuMs": {
+        "samples": 128,
+        "median": 8.27995,
+        "p95NearestLower": 166.801,
+        "minimum": 7.2926,
+        "maximum": 185.463
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+        "waterQuality": "high"
+      },
+      "quality": {
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedMistEnabled": true,
+        "actualUploadedDustQuality": 2
+      },
+      "resources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298944,
+        "deviceLocalBytes": 372464608
+      },
+      "processSeconds": 26.313000000009197,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "foregroundUnchanged": true,
+      "gpuContextSamples": [
+        {
+          "elapsedSeconds": 0.07800000000861473,
+          "exitCode": 0,
+          "values": "45, 240, 405, P8, 4.09, 0"
+        },
+        {
+          "elapsedSeconds": 1.1570000000065193,
+          "exitCode": 0,
+          "values": "45, 1897, 9001, P4, 7.37, 0"
+        },
+        {
+          "elapsedSeconds": 2.235000000000582,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P4, 7.42, 0"
+        },
+        {
+          "elapsedSeconds": 3.313000000009197,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P4, 7.35, 0"
+        },
+        {
+          "elapsedSeconds": 4.39100000000326,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P5, 7.34, 0"
+        },
+        {
+          "elapsedSeconds": 5.469000000011874,
+          "exitCode": 0,
+          "values": "44, 172, 405, P8, 3.46, 0"
+        },
+        {
+          "elapsedSeconds": 6.547000000005937,
+          "exitCode": 0,
+          "values": "44, 225, 810, P5, 7.04, 0"
+        },
+        {
+          "elapsedSeconds": 7.625,
+          "exitCode": 0,
+          "values": "44, 195, 810, P5, 6.65, 0"
+        },
+        {
+          "elapsedSeconds": 8.703000000008615,
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 11.72, 1"
+        },
+        {
+          "elapsedSeconds": 9.78200000000652,
+          "exitCode": 0,
+          "values": "44, 217, 810, P5, 6.85, 0"
+        },
+        {
+          "elapsedSeconds": 10.860000000000582,
+          "exitCode": 0,
+          "values": "44, 217, 810, P5, 6.95, 0"
+        },
+        {
+          "elapsedSeconds": 11.922000000005937,
+          "exitCode": 0,
+          "values": "51, 937, 9001, P4, 43.91, 66"
+        },
+        {
+          "elapsedSeconds": 12.985000000000582,
+          "exitCode": 0,
+          "values": "46, 502, 9001, P4, 10.40, 9"
+        },
+        {
+          "elapsedSeconds": 14.078000000008615,
+          "exitCode": 0,
+          "values": "45, 270, 810, P5, 8.36, 0"
+        },
+        {
+          "elapsedSeconds": 15.14100000000326,
+          "exitCode": 0,
+          "values": "45, 397, 405, P8, 7.73, 0"
+        },
+        {
+          "elapsedSeconds": 16.219000000011874,
+          "exitCode": 0,
+          "values": "45, 345, 405, P8, 6.26, 0"
+        },
+        {
+          "elapsedSeconds": 17.297000000005937,
+          "exitCode": 0,
+          "values": "45, 352, 405, P8, 6.75, 16"
+        },
+        {
+          "elapsedSeconds": 18.375,
+          "exitCode": 0,
+          "values": "46, 690, 405, P8, 10.91, 17"
+        },
+        {
+          "elapsedSeconds": 19.453000000008615,
+          "exitCode": 0,
+          "values": "46, 750, 405, P8, 11.94, 17"
+        },
+        {
+          "elapsedSeconds": 20.53200000000652,
+          "exitCode": 0,
+          "values": "45, 352, 405, P8, 10.05, 0"
+        },
+        {
+          "elapsedSeconds": 21.594000000011874,
+          "exitCode": 0,
+          "values": "45, 390, 810, P5, 10.12, 2"
+        },
+        {
+          "elapsedSeconds": 22.65700000000652,
+          "exitCode": 0,
+          "values": "45, 390, 810, P5, 8.64, 0"
+        },
+        {
+          "elapsedSeconds": 23.735000000000582,
+          "exitCode": 0,
+          "values": "45, 607, 810, P5, 11.49, 15"
+        },
+        {
+          "elapsedSeconds": 24.813000000009197,
+          "exitCode": 0,
+          "values": "46, 757, 405, P8, 11.16, 31"
+        },
+        {
+          "elapsedSeconds": 25.875,
+          "exitCode": 0,
+          "values": "46, 645, 810, P5, 11.93, 19"
+        }
+      ],
+      "firstLight": {
+        "count": 1,
+        "emitters": [
+          {
+            "stableId": 1279348308,
+            "positionStrength": [
+              -28.1300201,
+              2.60213232,
+              -5.983634,
+              0.686399996
+            ],
+            "colourIntensity": [
+              1,
+              0.426759988,
+              0.0815246254,
+              0.686399996
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "camera": [
+        -28.7023,
+        1.4512,
+        -5.80325,
+        1.5708,
+        -0.1
+      ],
+      "gpuStagesMs": {
+        "as": {
+          "samples": 128,
+          "median": 2.873936,
+          "p95NearestLower": 5.840416,
+          "minimum": 0.09088,
+          "maximum": 6.055488
+        },
+        "dispatch": {
+          "samples": 128,
+          "median": 4.543952,
+          "p95NearestLower": 9.208864,
+          "minimum": 2.397472,
+          "maximum": 9.831648
+        },
+        "transfer": {
+          "samples": 128,
+          "median": 0.06340799999999999,
+          "p95NearestLower": 0.128608,
+          "minimum": 0.01104,
+          "maximum": 0.141536
+        }
+      },
+      "gpuContextScope": "Samples after landing CSV creation, includes warmup and measurement; GPU utilization>=10%. Not per-frame clocks/utilization.",
+      "activeGpuContext": {
+        "temperatureC": {
+          "samples": 7,
+          "median": 46.0,
+          "p95NearestLower": 46.0,
+          "minimum": 45.0,
+          "maximum": 51.0
+        },
+        "graphicsClockMHz": {
+          "samples": 7,
+          "median": 690.0,
+          "p95NearestLower": 757.0,
+          "minimum": 352.0,
+          "maximum": 937.0
+        },
+        "memoryClockMHz": {
+          "samples": 7,
+          "median": 405.0,
+          "p95NearestLower": 810.0,
+          "minimum": 405.0,
+          "maximum": 9001.0
+        },
+        "powerW": {
+          "samples": 7,
+          "median": 11.49,
+          "p95NearestLower": 11.94,
+          "minimum": 6.75,
+          "maximum": 43.91
+        },
+        "gpuUtilizationPercent": {
+          "samples": 7,
+          "median": 17.0,
+          "p95NearestLower": 31.0,
+          "minimum": 15.0,
+          "maximum": 66.0
+        }
+      },
+      "initialAssetMeasurements": {
+        "enabled": true,
+        "vertexBytes": 39974720,
+        "indexBytes": 6379020,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.511,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.8156,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6954,
+        "productionPropBlasBytes": 27319040,
+        "productionPropBlasBuildMilliseconds": 17.4982
+      },
+      "initialOwner": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 76,
+        "recordSerial": 76,
+        "submissionSerial": 76,
+        "completionSerial": 76,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "commandArguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-gpu-stages-20261024\\a-stages-2",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-kit-reunion",
+        "--capture-chapter-landing",
+        "stages"
+      ],
+      "csvSha256": "2de6d5dcd43d66fa097cdf8f0556e88adf11bcdd47fca0568d854ca59b67b672"
+    },
+    {
+      "label": "b-control-close",
+      "shared": true,
+      "stageTimers": false,
+      "frames": 128,
+      "completedTicks": {
+        "first": 1436,
+        "last": 1944
+      },
+      "gpuWholeMs": {
+        "samples": 128,
+        "median": 6.89528,
+        "p95NearestLower": 13.918464,
+        "minimum": 3.176576,
+        "maximum": 17.5568
+      },
+      "renderCycleCpuMs": {
+        "samples": 128,
+        "median": 51.21745,
+        "p95NearestLower": 88.3602,
+        "minimum": 48.36,
+        "maximum": 378.205
+      },
+      "simulationCpuMs": {
+        "samples": 128,
+        "median": 8.02355,
+        "p95NearestLower": 165.584,
+        "minimum": 7.0319,
+        "maximum": 179.744
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+        "waterQuality": "high"
+      },
+      "quality": {
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedMistEnabled": true,
+        "actualUploadedDustQuality": 2
+      },
+      "resources": {
+        "bufferCount": 53,
+        "memoryAllocationCount": 62,
+        "bottomLevelAccelerationStructureCount": 22,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 92,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 22256896,
+        "deviceLocalBytes": 327091744
+      },
+      "processSeconds": 25.312999999994645,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "foregroundUnchanged": true,
+      "gpuContextSamples": [
+        {
+          "elapsedSeconds": 0.07899999999790452,
+          "exitCode": 0,
+          "values": "45, 180, 405, P8, 4.54, 2"
+        },
+        {
+          "elapsedSeconds": 1.1569999999919673,
+          "exitCode": 0,
+          "values": "45, 397, 9001, P4, 4.08, 0"
+        },
+        {
+          "elapsedSeconds": 2.235000000000582,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P4, 7.35, 0"
+        },
+        {
+          "elapsedSeconds": 3.2969999999913853,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P5, 7.39, 0"
+        },
+        {
+          "elapsedSeconds": 4.375,
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 3.49, 0"
+        },
+        {
+          "elapsedSeconds": 5.4539999999979045,
+          "exitCode": 0,
+          "values": "44, 262, 405, P8, 3.55, 0"
+        },
+        {
+          "elapsedSeconds": 6.531999999991967,
+          "exitCode": 0,
+          "values": "45, 202, 405, P8, 5.18, 44"
+        },
+        {
+          "elapsedSeconds": 7.610000000000582,
+          "exitCode": 0,
+          "values": "45, 217, 810, P5, 6.69, 0"
+        },
+        {
+          "elapsedSeconds": 8.687999999994645,
+          "exitCode": 0,
+          "values": "45, 217, 810, P5, 17.23, 0"
+        },
+        {
+          "elapsedSeconds": 9.76600000000326,
+          "exitCode": 0,
+          "values": "45, 217, 810, P5, 6.70, 0"
+        },
+        {
+          "elapsedSeconds": 10.843999999997322,
+          "exitCode": 0,
+          "values": "44, 217, 405, P8, 3.45, 0"
+        },
+        {
+          "elapsedSeconds": 11.921999999991385,
+          "exitCode": 0,
+          "values": "46, 495, 9001, P4, 11.65, 9"
+        },
+        {
+          "elapsedSeconds": 13.0,
+          "exitCode": 0,
+          "values": "46, 465, 9001, P4, 6.64, 5"
+        },
+        {
+          "elapsedSeconds": 14.078999999997905,
+          "exitCode": 0,
+          "values": "45, 240, 9001, P4, 7.43, 0"
+        },
+        {
+          "elapsedSeconds": 15.14100000000326,
+          "exitCode": 0,
+          "values": "45, 232, 9001, P4, 7.75, 5"
+        },
+        {
+          "elapsedSeconds": 16.218999999997322,
+          "exitCode": 0,
+          "values": "45, 292, 810, P5, 8.54, 9"
+        },
+        {
+          "elapsedSeconds": 17.296999999991385,
+          "exitCode": 0,
+          "values": "45, 330, 810, P5, 7.73, 3"
+        },
+        {
+          "elapsedSeconds": 18.360000000000582,
+          "exitCode": 0,
+          "values": "45, 255, 405, P8, 8.23, 0"
+        },
+        {
+          "elapsedSeconds": 19.437999999994645,
+          "exitCode": 0,
+          "values": "45, 187, 405, P8, 4.43, 0"
+        },
+        {
+          "elapsedSeconds": 20.51600000000326,
+          "exitCode": 0,
+          "values": "45, 180, 405, P8, 4.16, 0"
+        },
+        {
+          "elapsedSeconds": 21.593999999997322,
+          "exitCode": 0,
+          "values": "45, 277, 405, P8, 9.43, 0"
+        },
+        {
+          "elapsedSeconds": 22.671999999991385,
+          "exitCode": 0,
+          "values": "45, 330, 405, P8, 4.24, 15"
+        },
+        {
+          "elapsedSeconds": 23.75,
+          "exitCode": 0,
+          "values": "45, 390, 405, P8, 4.24, 20"
+        },
+        {
+          "elapsedSeconds": 24.828999999997905,
+          "exitCode": 0,
+          "values": "46, 832, 810, P5, 10.62, 23"
+        }
+      ],
+      "firstLight": {
+        "count": 1,
+        "emitters": [
+          {
+            "stableId": 1279348308,
+            "positionStrength": [
+              -28.1300201,
+              2.60213232,
+              -5.983634,
+              0.686399996
+            ],
+            "colourIntensity": [
+              1,
+              0.426759988,
+              0.0815246254,
+              0.686399996
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "camera": [
+        -28.7023,
+        1.4512,
+        -5.80325,
+        1.5708,
+        -0.1
+      ],
+      "gpuContextScope": "Samples after landing CSV creation, includes warmup and measurement; GPU utilization>=10%. Not per-frame clocks/utilization.",
+      "activeGpuContext": {
+        "temperatureC": {
+          "samples": 3,
+          "median": 45.0,
+          "p95NearestLower": 45.0,
+          "minimum": 45.0,
+          "maximum": 46.0
+        },
+        "graphicsClockMHz": {
+          "samples": 3,
+          "median": 390.0,
+          "p95NearestLower": 390.0,
+          "minimum": 330.0,
+          "maximum": 832.0
+        },
+        "memoryClockMHz": {
+          "samples": 3,
+          "median": 405.0,
+          "p95NearestLower": 405.0,
+          "minimum": 405.0,
+          "maximum": 810.0
+        },
+        "powerW": {
+          "samples": 3,
+          "median": 4.24,
+          "p95NearestLower": 4.24,
+          "minimum": 4.24,
+          "maximum": 10.62
+        },
+        "gpuUtilizationPercent": {
+          "samples": 3,
+          "median": 20.0,
+          "p95NearestLower": 20.0,
+          "minimum": 15.0,
+          "maximum": 23.0
+        }
+      },
+      "initialAssetMeasurements": {
+        "enabled": true,
+        "vertexBytes": 17686464,
+        "indexBytes": 2621076,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 576,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.3112,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.6549,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6563,
+        "productionPropBlasBytes": 7964672,
+        "productionPropBlasBuildMilliseconds": 11.9249
+      },
+      "initialOwner": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 76,
+        "recordSerial": 76,
+        "submissionSerial": 76,
+        "completionSerial": 76,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "commandArguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-gpu-stages-20261024\\b-control-close",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-kit-reunion",
+        "--capture-chapter-landing",
+        "control",
+        "--forest-route-proof",
+        "normal-shared64"
+      ],
+      "csvSha256": "241b71143cbaaa001bf818fd3f404bef8c703fff9e789aaee7afae6791c7a918"
+    },
+    {
+      "label": "a-control-close",
+      "shared": false,
+      "stageTimers": false,
+      "frames": 128,
+      "completedTicks": {
+        "first": 1436,
+        "last": 1944
+      },
+      "gpuWholeMs": {
+        "samples": 128,
+        "median": 7.132992,
+        "p95NearestLower": 14.856352,
+        "minimum": 3.08176,
+        "maximum": 15.684512
+      },
+      "renderCycleCpuMs": {
+        "samples": 128,
+        "median": 51.751149999999996,
+        "p95NearestLower": 134.147,
+        "minimum": 48.6121,
+        "maximum": 385.781
+      },
+      "simulationCpuMs": {
+        "samples": 128,
+        "median": 8.1267,
+        "p95NearestLower": 165.746,
+        "minimum": 7.2664,
+        "maximum": 186.929
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+        "waterQuality": "high"
+      },
+      "quality": {
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedMistEnabled": true,
+        "actualUploadedDustQuality": 2
+      },
+      "resources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298944,
+        "deviceLocalBytes": 372464608
+      },
+      "processSeconds": 26.046000000002095,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "foregroundUnchanged": true,
+      "gpuContextSamples": [
+        {
+          "elapsedSeconds": 0.062000000005355105,
+          "exitCode": 0,
+          "values": "45, 225, 405, P8, 4.78, 2"
+        },
+        {
+          "elapsedSeconds": 1.139999999999418,
+          "exitCode": 0,
+          "values": "45, 1305, 9001, P4, 6.91, 12"
+        },
+        {
+          "elapsedSeconds": 2.2179999999934807,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P4, 7.45, 0"
+        },
+        {
+          "elapsedSeconds": 3.2960000000020955,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P4, 7.38, 0"
+        },
+        {
+          "elapsedSeconds": 4.375,
+          "exitCode": 0,
+          "values": "45, 1890, 9001, P8, 7.39, 0"
+        },
+        {
+          "elapsedSeconds": 5.452999999994063,
+          "exitCode": 0,
+          "values": "45, 180, 405, P8, 3.44, 0"
+        },
+        {
+          "elapsedSeconds": 6.5310000000026776,
+          "exitCode": 0,
+          "values": "45, 225, 810, P5, 5.13, 0"
+        },
+        {
+          "elapsedSeconds": 7.625,
+          "exitCode": 0,
+          "values": "45, 217, 810, P5, 9.20, 6"
+        },
+        {
+          "elapsedSeconds": 8.702999999994063,
+          "exitCode": 0,
+          "values": "44, 187, 405, P8, 4.13, 0"
+        },
+        {
+          "elapsedSeconds": 9.781000000002678,
+          "exitCode": 0,
+          "values": "45, 217, 810, P5, 14.82, 0"
+        },
+        {
+          "elapsedSeconds": 10.85899999999674,
+          "exitCode": 0,
+          "values": "44, 217, 810, P8, 6.64, 0"
+        },
+        {
+          "elapsedSeconds": 11.921000000002095,
+          "exitCode": 0,
+          "values": "48, 2265, 9001, P4, 45.76, 59"
+        },
+        {
+          "elapsedSeconds": 12.98399999999674,
+          "exitCode": 0,
+          "values": "46, 465, 9001, P4, 9.28, 9"
+        },
+        {
+          "elapsedSeconds": 14.062000000005355,
+          "exitCode": 0,
+          "values": "45, 427, 9001, P4, 9.10, 4"
+        },
+        {
+          "elapsedSeconds": 15.156000000002678,
+          "exitCode": 0,
+          "values": "45, 240, 9001, P4, 8.74, 4"
+        },
+        {
+          "elapsedSeconds": 16.21799999999348,
+          "exitCode": 0,
+          "values": "45, 315, 9001, P4, 7.43, 0"
+        },
+        {
+          "elapsedSeconds": 17.296000000002095,
+          "exitCode": 0,
+          "values": "46, 292, 810, P5, 8.10, 0"
+        },
+        {
+          "elapsedSeconds": 18.375,
+          "exitCode": 0,
+          "values": "45, 615, 810, P5, 12.48, 17"
+        },
+        {
+          "elapsedSeconds": 19.452999999994063,
+          "exitCode": 0,
+          "values": "46, 765, 810, P5, 10.54, 20"
+        },
+        {
+          "elapsedSeconds": 20.514999999999418,
+          "exitCode": 0,
+          "values": "46, 600, 810, P5, 10.52, 16"
+        },
+        {
+          "elapsedSeconds": 21.59299999999348,
+          "exitCode": 0,
+          "values": "45, 682, 405, P8, 9.89, 0"
+        },
+        {
+          "elapsedSeconds": 22.687000000005355,
+          "exitCode": 0,
+          "values": "45, 675, 810, P5, 10.40, 16"
+        },
+        {
+          "elapsedSeconds": 23.764999999999418,
+          "exitCode": 0,
+          "values": "46, 840, 810, P5, 8.02, 16"
+        },
+        {
+          "elapsedSeconds": 24.827999999994063,
+          "exitCode": 0,
+          "values": "45, 397, 405, P8, 12.26, 21"
+        },
+        {
+          "elapsedSeconds": 25.906000000002678,
+          "exitCode": 0,
+          "values": "45, 352, 405, P8, 9.20, 2"
+        }
+      ],
+      "firstLight": {
+        "count": 1,
+        "emitters": [
+          {
+            "stableId": 1279348308,
+            "positionStrength": [
+              -28.1300201,
+              2.60213232,
+              -5.983634,
+              0.686399996
+            ],
+            "colourIntensity": [
+              1,
+              0.426759988,
+              0.0815246254,
+              0.686399996
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "camera": [
+        -28.7023,
+        1.4512,
+        -5.80325,
+        1.5708,
+        -0.1
+      ],
+      "gpuContextScope": "Samples after landing CSV creation, includes warmup and measurement; GPU utilization>=10%. Not per-frame clocks/utilization.",
+      "activeGpuContext": {
+        "temperatureC": {
+          "samples": 7,
+          "median": 46.0,
+          "p95NearestLower": 46.0,
+          "minimum": 45.0,
+          "maximum": 48.0
+        },
+        "graphicsClockMHz": {
+          "samples": 7,
+          "median": 675.0,
+          "p95NearestLower": 840.0,
+          "minimum": 397.0,
+          "maximum": 2265.0
+        },
+        "memoryClockMHz": {
+          "samples": 7,
+          "median": 810.0,
+          "p95NearestLower": 810.0,
+          "minimum": 405.0,
+          "maximum": 9001.0
+        },
+        "powerW": {
+          "samples": 7,
+          "median": 10.54,
+          "p95NearestLower": 12.48,
+          "minimum": 8.02,
+          "maximum": 45.76
+        },
+        "gpuUtilizationPercent": {
+          "samples": 7,
+          "median": 17.0,
+          "p95NearestLower": 21.0,
+          "minimum": 16.0,
+          "maximum": 59.0
+        }
+      },
+      "initialAssetMeasurements": {
+        "enabled": true,
+        "vertexBytes": 39974720,
+        "indexBytes": 6379020,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 896,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.2738,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.5883,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6855,
+        "productionPropBlasBytes": 27319040,
+        "productionPropBlasBuildMilliseconds": 15.4749
+      },
+      "initialOwner": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 76,
+        "recordSerial": 76,
+        "submissionSerial": 76,
+        "completionSerial": 76,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "commandArguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-gpu-stages-20261024\\a-control-close",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-kit-reunion",
+        "--capture-chapter-landing",
+        "control"
+      ],
+      "csvSha256": "bc9d6a5332fd1413e7e52a02141c391b9ce9b8e4daa6d47158f6d5e9dee18f9f"
+    }
+  ],
+  "imageComparisons": [
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-open",
+      "file": "1-initial-reunion.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-open",
+      "file": "2-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-open",
+      "file": "3-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-open",
+      "file": "4-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-open",
+      "file": "5-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-open",
+      "file": "6-landing-complete.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-open",
+      "file": "1-initial-reunion.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-open",
+      "file": "2-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-open",
+      "file": "3-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-open",
+      "file": "4-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-open",
+      "file": "5-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-open",
+      "file": "6-landing-complete.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-1",
+      "file": "1-initial-reunion.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-1",
+      "file": "2-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-1",
+      "file": "3-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-1",
+      "file": "4-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-1",
+      "file": "5-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-1",
+      "file": "6-landing-complete.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-1",
+      "file": "1-initial-reunion.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-1",
+      "file": "2-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-1",
+      "file": "3-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-1",
+      "file": "4-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-1",
+      "file": "5-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-1",
+      "file": "6-landing-complete.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-2",
+      "file": "1-initial-reunion.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-2",
+      "file": "2-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-2",
+      "file": "3-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-2",
+      "file": "4-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-2",
+      "file": "5-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-stages-2",
+      "file": "6-landing-complete.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-2",
+      "file": "1-initial-reunion.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-2",
+      "file": "2-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-2",
+      "file": "3-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-2",
+      "file": "4-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-2",
+      "file": "5-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-stages-2",
+      "file": "6-landing-complete.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-close",
+      "file": "1-initial-reunion.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-close",
+      "file": "2-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-close",
+      "file": "3-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-close",
+      "file": "4-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-close",
+      "file": "5-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "b-control-open",
+      "candidate": "b-control-close",
+      "file": "6-landing-complete.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-close",
+      "file": "1-initial-reunion.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-close",
+      "file": "2-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-close",
+      "file": "3-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-close",
+      "file": "4-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-close",
+      "file": "5-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-control-open",
+      "candidate": "a-control-close",
+      "file": "6-landing-complete.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "control": "a-stages-1",
+      "candidate": "b-stages-1",
+      "file": "1-initial-reunion.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 141,
+        "maximumChannelDifference": 1,
+        "meanAbsoluteChannelDifference": 9.902263374485597e-05
+      }
+    },
+    {
+      "control": "a-stages-1",
+      "candidate": "b-stages-1",
+      "file": "2-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 75,
+        "maximumChannelDifference": 9,
+        "meanAbsoluteChannelDifference": 8.42335390946502e-05
+      }
+    },
+    {
+      "control": "a-stages-1",
+      "candidate": "b-stages-1",
+      "file": "3-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 53,
+        "maximumChannelDifference": 26,
+        "meanAbsoluteChannelDifference": 8.294753086419753e-05
+      }
+    },
+    {
+      "control": "a-stages-1",
+      "candidate": "b-stages-1",
+      "file": "4-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 138,
+        "maximumChannelDifference": 11,
+        "meanAbsoluteChannelDifference": 0.00011381172839506173
+      }
+    },
+    {
+      "control": "a-stages-1",
+      "candidate": "b-stages-1",
+      "file": "5-landing-sweep-2.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 196,
+        "maximumChannelDifference": 8,
+        "meanAbsoluteChannelDifference": 0.00014531893004115227
+      }
+    },
+    {
+      "control": "a-stages-1",
+      "candidate": "b-stages-1",
+      "file": "6-landing-complete.png",
+      "comparison": {
+        "pixels": 518400,
+        "changedPixels": 196,
+        "maximumChannelDifference": 8,
+        "meanAbsoluteChannelDifference": 0.00014531893004115227
+      }
+    }
+  ],
+  "equivalentCameraTicks": true,
+  "initialLightingEquivalent": true,
+  "pairPercentMedianChanges": {
+    "a-stages-1 -> b-stages-1": {
+      "gpu_ns": {
+        "samples": 128,
+        "median": -1.1018598300202687,
+        "p95NearestLower": 80.95979601171766,
+        "minimum": -51.76329784466161,
+        "maximum": 234.02116442138228
+      },
+      "gpu_as_ns": {
+        "samples": 128,
+        "median": 0.02247990427106661,
+        "p95NearestLower": 100.27051295166002,
+        "minimum": -52.226057132933924,
+        "maximum": 291.7717474652807
+      },
+      "gpu_dispatch_ns": {
+        "samples": 128,
+        "median": -2.997410475981488,
+        "p95NearestLower": 68.61378135735112,
+        "minimum": -53.29324817697827,
+        "maximum": 205.7659126899714
+      },
+      "gpu_transfer_ns": {
+        "samples": 128,
+        "median": -4.3009396912526805,
+        "p95NearestLower": 114.95943204868153,
+        "minimum": -81.4615797958087,
+        "maximum": 966.951566951567
+      }
+    },
+    "a-stages-2 -> b-stages-2": {
+      "gpu_ns": {
+        "samples": 128,
+        "median": -0.7044633552973134,
+        "p95NearestLower": 77.28938394263996,
+        "minimum": -50.45532810810697,
+        "maximum": 91.30513579062392
+      },
+      "gpu_as_ns": {
+        "samples": 128,
+        "median": 0.7457692211963463,
+        "p95NearestLower": 99.67050163096182,
+        "minimum": -52.55073818078313,
+        "maximum": 109.0047070833097
+      },
+      "gpu_dispatch_ns": {
+        "samples": 128,
+        "median": -2.6194814182035175,
+        "p95NearestLower": 63.184757909456394,
+        "minimum": -51.21647647621419,
+        "maximum": 79.62802371017273
+      },
+      "gpu_transfer_ns": {
+        "samples": 128,
+        "median": -1.982598422289772,
+        "p95NearestLower": 85.38295577130528,
+        "minimum": -82.27390180878554,
+        "maximum": 117.63140385894877
+      }
+    }
+  },
+  "ownerCustody": {
+    "parkedFiles": 151,
+    "changed": 0,
+    "phoneUsed": false
+  },
+  "hardware": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672
+  },
+  "sourceDigests": {
+    "CMakeLists.txt": "3fcdb5c2c19cf8cf10bb7628ec7f938d9e15429921a38f09f3889752f730ea96",
+    "src/platform/windows/DiagnosticWindow.cpp": "b69853d6f852d6c05070fff62fa22f66af8b1532fb3c54055d9b015b786f5b2d",
+    "src/platform/windows/WindowsChapterRoundTripCapture.inl": "45ed0063a6f2eeb91e7896a1ed68a15bdfef44a6957cb93f726028373592e5fa",
+    "src/platform/windows/WindowsForestRouteProofLaunch.h": "b57b09a8e48eac11d4309be08998419d7381c44aac6aa06c18da1cb5f5d3dfde",
+    "src/platform/windows/WindowsGpuStageObservation.inl": "d909d401ce8afa47087f35ab7dd5377e1e6cf2aab4b4afc6627b7f4c806fba0d",
+    "src/vulkan/raytracing/RtSceneGpuStageProbe.h": "943b95092b77160ac2fee069e6901edbf6134ed9f14ba9e417ac31ff8c65f443",
+    "tests/GpuFrameTimerCollectionTests.cpp": "35bf2f6f2cabc4534fff9df4b9d399ec3face20c48a8c4dd99ccd01acd168a68",
+    "tests/GraphicsPreviewTests.cpp": "04d84c84e6f204f81e33b07bba59de0fda658e89a2e863046a6adcf818ee2578"
+  },
+  "configuration": {
+    "probeOptionDefault": "OFF",
+    "probeBuild": "cmake --preset windows-x64-debug -DHORDE_RT_FRAME_STAGE_PROBE=ON",
+    "runtimeStages": "--capture-chapter-landing stages",
+    "runtimeControl": "--capture-chapter-landing control",
+    "sharedCandidate": "--forest-route-proof normal-shared64",
+    "normalBakedControl": "no forest-route-proof flag",
+    "sharedDefaultEnabled": false,
+    "currentDebugCache": "OFF",
+    "phoneUsed": false
+  },
+  "originalComparison": {
+    "scope": "Retained original full-route A/B/A; not re-run or erased. Candidate-only recreation, shorter warmup and no in-run clocks confound attribution.",
+    "gpuLandingMedianMs": [
+      7.975888,
+      11.576032,
+      8.12016
+    ],
+    "initialState": [
+      {
+        "label": "baked-route-order-fixed",
+        "owner": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 12,
+          "recordSerial": 12,
+          "submissionSerial": 12,
+          "completionSerial": 12,
+          "simulationTick": 1436,
+          "frameSlot": 0
+        },
+        "camera": [
+          -28.7023,
+          1.4512,
+          -5.80325,
+          1.5708,
+          -0.1
+        ],
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                -28.1300201,
+                2.60213232,
+                -5.983634,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "label": "shared-normal-route-r1",
+        "owner": {
+          "sceneEpoch": 3,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 24,
+          "recordSerial": 24,
+          "submissionSerial": 24,
+          "completionSerial": 24,
+          "simulationTick": 1436,
+          "frameSlot": 0
+        },
+        "camera": [
+          -28.7023,
+          1.4512,
+          -5.80325,
+          1.5708,
+          -0.1
+        ],
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                -28.1300201,
+                2.6021266,
+                -5.98202467,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "label": "baked-route-closing",
+        "owner": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 12,
+          "recordSerial": 12,
+          "submissionSerial": 12,
+          "completionSerial": 12,
+          "simulationTick": 1436,
+          "frameSlot": 0
+        },
+        "camera": [
+          -28.7023,
+          1.4512,
+          -5.80325,
+          1.5708,
+          -0.1
+        ],
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                -28.1300201,
+                2.60213232,
+                -5.983634,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "defaultOffSmoke": {
+    "executable": {
+      "exists": true,
+      "bytes": 14652416,
+      "sha256": "ae5fa237e46a2c183dcaddeeac112da6695a4dcb64b818658c2a44b9b53a7348"
+    },
+    "exitCode": 0,
+    "seconds": 15.375,
+    "foregroundUnchanged": true,
+    "settingsUnchanged": true,
+    "campaignUnchanged": true,
+    "pixelComparison": {
+      "pixels": 518400,
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "meanAbsoluteChannelDifference": 0.0
+    }
+  },
+  "result": "No persistent shared64 AS/dispatch median penalty in this equalized warmed prefix. Large tails and unaligned variable clocks prevent a causal gain/overhead claim; original45% signal remains unattributed. Default remainsOFF."
+}

@@ -367,6 +367,8 @@ struct CaptureLaunchOptions
     std::vector<std::uint32_t> staticTriangleOmissions;
     std::string inspectStaticWorldMaterial;
     bool validateChapterRoundTrip = false;
+    bool chapterLandingOnly = false;
+    bool captureGpuStages = false;
     bool measureChapterShippingRoute = false;
     bool measureChapterForeground = false;
     std::filesystem::path outputDirectory;
@@ -499,6 +501,12 @@ struct VulkanSurfaceContext
     std::vector<VkFence> inFlightFences;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
     horde::vulkan::GpuFrameTimer gpuFrameTimer;
+#if HORDE_RT_FRAME_STAGE_PROBE
+    bool captureGpuStages=false;
+    std::array<horde::vulkan::GpuFrameTimer,3> frameStageTimers;
+    std::array<horde::vulkan::raytracing::RtSceneGpuStageCompletedObservation,kMaxFramesInFlight> pendingStageOwners{};
+    horde::vulkan::raytracing::RtSceneGpuStageCompletedObservation completedStageObservation{};
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     horde::vulkan::raytracing::experimental::StagedPrimaryTiming stagedPassTimer;
     horde::vulkan::raytracing::experimental::StagedPrimaryProfile stagedPassProfile;
@@ -862,6 +870,14 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     );
     if(!forestProof.error.empty()){options.error=forestProof.error;LocalFree(arguments);return options;}
     options.forestRouteProof=forestProof.mode;
+    options.chapterLandingOnly=forestProof.landingOnly;
+    options.captureGpuStages=forestProof.gpuStages;
+#if !HORDE_RT_FRAME_STAGE_PROBE
+    if(options.captureGpuStages) {
+        options.error="GPU stage capture requires the explicit HORDE_RT_FRAME_STAGE_PROBE build.";
+        LocalFree(arguments);return options;
+    }
+#endif
     const auto previewPair=horde::platform::windows::ParsePreviewMeshPairCaptureLaunch(argumentViews,
 #if defined(_DEBUG)
         true
@@ -1038,6 +1054,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
+        if(argument==L"--capture-chapter-landing") {++index;continue;} // Validated by the bounded launch parser above.
         if(argument==L"--validate-chapter-roundtrip") {
 #if defined(_DEBUG)
             options.validateChapterRoundTrip=true;
@@ -5849,6 +5866,8 @@ void CollectStagedPassTiming(VulkanSurfaceContext& ctx, std::uint32_t frameSlot,
 }
 #endif
 
+#include "WindowsGpuStageObservation.inl"
+
 bool CompleteRtEvidenceAfterDeviceIdle(
     VulkanSurfaceContext& ctx,
     const VkResult idleResult)
@@ -5874,6 +5893,9 @@ bool CompleteRtEvidenceAfterDeviceIdle(
         horde::telemetry::RtPerformanceEvidenceSnapshot snapshot{};
         const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult result =
             ctx.rtFrameEvidence.CompleteFinalIdle(frameSlot, gpuIo, diagnosticIo, &snapshot);
+#if HORDE_RT_FRAME_STAGE_PROBE
+        CollectWindowsGpuStages(ctx,frameSlot,result,snapshot);
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
         CollectStagedPassTiming(ctx, frameSlot, result, snapshot);
 #endif
@@ -5945,6 +5967,9 @@ bool ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
             horde::telemetry::RtResourceResetReason::SwapchainRecreate,
             CurrentInitialGpuEvidenceStatus(ctx));
     ctx.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_FRAME_STAGE_PROBE
+    ResetWindowsGpuStagesAfterIdle(ctx);
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     if (idleResult == VK_SUCCESS) ctx.stagedPassTimer.ResetAfterDeviceIdle();
 #endif
@@ -6196,6 +6221,11 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         ctx.gpuFrameTimer.Initialise(
             ctx.physicalDevice, ctx.device, ctx.graphicsQueueFamilyIndex, kMaxFramesInFlight);
     }
+#if HORDE_RT_FRAME_STAGE_PROBE
+    if(ctx.captureGpuStages)for(auto& timer:ctx.frameStageTimers)
+        if(timer.Telemetry().status==horde::vulkan::GpuFrameTimerStatus::Uninitialised)
+            timer.Initialise(ctx.physicalDevice,ctx.device,ctx.graphicsQueueFamilyIndex,kMaxFramesInFlight);
+#endif
     ctx.appliedRenderScale = ctx.renderScale;
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     if (ctx.stagedPassTimer.Status() == horde::vulkan::raytracing::experimental::StagedPrimaryTimingInitStatus::Uninitialised)
@@ -6353,6 +6383,10 @@ bool DestroyRenderContext(VulkanSurfaceContext& ctx)
         ctx.pipelineCache = VK_NULL_HANDLE;
     }
     ctx.gpuFrameTimer.Destroy();
+#if HORDE_RT_FRAME_STAGE_PROBE
+    for(auto& timer:ctx.frameStageTimers)timer.Destroy();
+    ctx.pendingStageOwners={};ctx.completedStageObservation={};
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     ctx.stagedPassTimer.Destroy();
 #endif
@@ -6443,6 +6477,9 @@ bool ApplyPendingSceneReplacement(VulkanSurfaceContext& context,
         for (const auto commandBuffer : context.commandBuffers)
             if (vkResetCommandBuffer(commandBuffer, 0u) != VK_SUCCESS) return false;
         context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_FRAME_STAGE_PROBE
+        ResetWindowsGpuStagesAfterIdle(context);
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
         context.stagedPassTimer.ResetAfterDeviceIdle();
 #endif
@@ -6603,6 +6640,9 @@ bool ApplyPendingOutputResize(VulkanSurfaceContext& context,
                     horde::telemetry::RtResourceResetReason::RenderScaleChange,
                     CurrentInitialGpuEvidenceStatus(context));
             context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_FRAME_STAGE_PROBE
+            ResetWindowsGpuStagesAfterIdle(context);
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
             if (idleResult == VK_SUCCESS) context.stagedPassTimer.ResetAfterDeviceIdle();
 #endif
@@ -6713,6 +6753,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             if (vkResetCommandBuffer(command,0u)!=VK_SUCCESS)
             { ctx.lastRtFrameError="Moving-frame prior command references could not be reset."; return false; }
         ctx.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_FRAME_STAGE_PROBE
+        ResetWindowsGpuStagesAfterIdle(ctx);
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
         ctx.stagedPassTimer.ResetAfterDeviceIdle();
 #endif
@@ -6763,6 +6806,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                 ctx.currentFrame,
                 horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer),
                 horde::vulkan::raytracing::MakeRtDiagnosticFrameIo(ctx.rtScene), &snapshot);
+#if HORDE_RT_FRAME_STAGE_PROBE
+        CollectWindowsGpuStages(ctx,ctx.currentFrame,completion,snapshot);
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
         CollectStagedPassTiming(ctx, ctx.currentFrame, completion, snapshot);
 #endif
@@ -6832,6 +6878,12 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     }
 
     bool gpuTimingRecording = false;
+#if HORDE_RT_FRAME_STAGE_PROBE
+    horde::vulkan::raytracing::RtSceneGpuStageProbe frameStageProbe(
+        {{ctx.captureGpuStages?&ctx.frameStageTimers[0]:nullptr,
+          ctx.captureGpuStages?&ctx.frameStageTimers[1]:nullptr,
+          ctx.captureGpuStages?&ctx.frameStageTimers[2]:nullptr}},ctx.currentFrame);
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     horde::vulkan::raytracing::experimental::StagedPrimaryRecordingGuard stagedRecordingGuard(ctx.stagedPassTimer, ctx.currentFrame);
 #endif
@@ -7057,6 +7109,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                 ,gpuTimingRecording?&ctx.stagedPassTimer:nullptr,ctx.currentFrame
 #endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                ,gpuTimingRecording && ctx.captureGpuStages?&frameStageProbe:nullptr
+#endif
             );
             if(recorded && !ctx.environmentSurveyActive)ctx.rtScene.FinishOrdinaryStaticDetail(ctx.simulation);
         }else {
@@ -7076,12 +7131,18 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                 , gpuTimingRecording ? &ctx.stagedPassTimer : nullptr,ctx.currentFrame
 #endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                ,gpuTimingRecording && ctx.captureGpuStages?&frameStageProbe:nullptr
+#endif
               )
             : ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],ctx.swapchainImages[imageIndex],
                 ctx.swapchainImageLayouts[imageIndex],ctx.swapchainExtent,frameInputs,diagnostic,
                 evidenceFrame ? &observation : nullptr
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                 , gpuTimingRecording ? &ctx.stagedPassTimer : nullptr,ctx.currentFrame
+#endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                ,gpuTimingRecording && ctx.captureGpuStages?&frameStageProbe:nullptr
 #endif
               );
         if (recorded && ctx.staticReplacementFrameRequested)
@@ -7096,6 +7157,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                                            evidenceFrame ? &observation : nullptr
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                                            , gpuTimingRecording ? &ctx.stagedPassTimer : nullptr, ctx.currentFrame
+#endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                ,gpuTimingRecording && ctx.captureGpuStages?&frameStageProbe:nullptr
 #endif
                                            );
 #endif
@@ -7224,6 +7288,15 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             true,
             gpuTimingRecording,
             horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer));
+#if HORDE_RT_FRAME_STAGE_PROBE
+        if(gpuTimingRecording && ctx.captureGpuStages) {
+            auto& pending=ctx.pendingStageOwners[ctx.currentFrame];pending={};
+            if(ctx.rtFrameEvidence.TryGetCommittedIdentity(ctx.currentFrame,pending.submitted))
+                for(unsigned i=0;i<ctx.frameStageTimers.size();++i)
+                    if(frameStageProbe.recorded[i])
+                        (void)ctx.frameStageTimers[i].MarkSubmitted(ctx.currentFrame,pending.submitted.submissionSerial);
+        }
+#endif
 #if defined(_DEBUG)
         if (ctx.nativeMotionValidation)
         {
@@ -7988,7 +8061,10 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         }
     }
 #if defined(_DEBUG)
-    const bool forestProof=context.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled;
+    // The partial attribution prefix uses identical ordinary staging/warmup for
+    // both representations. Existing frozen/full-route recreation trials remain.
+    const bool forestProof=context.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled &&
+        !ParseCaptureLaunchOptions().chapterLandingOnly;
     bool forestRecreated=false;
     std::uint64_t forestEpochBefore=0;
     std::uint64_t forestTickBefore=0;
@@ -8933,6 +9009,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     context.previewMeshPair=ParseCaptureLaunchOptions().previewMeshPair;
     context.forestRouteProof=ParseCaptureLaunchOptions().forestRouteProof;
+#if HORDE_RT_FRAME_STAGE_PROBE
+    context.captureGpuStages=ParseCaptureLaunchOptions().captureGpuStages;
+#endif
 #endif
     context.outputResizeValidation = outputResizeValidation;
     context.nativeMotionValidation = !nativeMotionScenario.empty();
@@ -9246,9 +9325,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 :
 #endif
                 RunShowcaseCapture(context, capabilities, *captureDirectory);
-        if(captureResult==0 && ParseCaptureLaunchOptions().validateChapterRoundTrip) {
+        if(captureResult==0 && (ParseCaptureLaunchOptions().validateChapterRoundTrip || ParseCaptureLaunchOptions().chapterLandingOnly)) {
             std::string journeyError;
-            if(!RunChapterRoundTripCapture(context,*captureDirectory,journeyError)) {
+            if(!RunChapterRoundTripCapture(context,*captureDirectory,journeyError,ParseCaptureLaunchOptions().chapterLandingOnly)) {
                 std::cerr<<"Chapter two-way capture failed: "<<journeyError<<'\n';captureResult=1;
             }
         }

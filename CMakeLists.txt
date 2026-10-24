@@ -30,6 +30,7 @@ option(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW "Build the Win32 diagnostic shel
 option(HORDE_RT_BUILD_VULKAN_TARGETS "Build targets that require a Vulkan SDK" ON)
 option(HORDE_RT_CHAPTER_MEASUREMENT "Enable the bounded chapter Shipping route in an optimized Windows development build" OFF)
 option(HORDE_RT_ACTOR_WORKER_EXPERIMENT "Opt-in exclusive CPU actor preparation experiment; not admitted for shipping" OFF)
+option(HORDE_RT_FRAME_STAGE_PROBE "Opt-in GPU AS/dispatch/transfer observation; no shader changes" OFF)
 
 include(CTest)
 if(WIN32 AND (BUILD_TESTING OR (HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW)))
@@ -395,7 +396,8 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS)
         ${HORDE_RT_SOURCE_FILES}
     )
     target_compile_definitions(horde_rt_probe_core PUBLIC
-        HORDE_RT_ACTOR_WORKER_EXPERIMENT=$<BOOL:${HORDE_RT_ACTOR_WORKER_EXPERIMENT}>)
+        HORDE_RT_ACTOR_WORKER_EXPERIMENT=$<BOOL:${HORDE_RT_ACTOR_WORKER_EXPERIMENT}>
+        HORDE_RT_FRAME_STAGE_PROBE=$<BOOL:${HORDE_RT_FRAME_STAGE_PROBE}>)
 
     target_include_directories(horde_rt_probe_core
         PUBLIC

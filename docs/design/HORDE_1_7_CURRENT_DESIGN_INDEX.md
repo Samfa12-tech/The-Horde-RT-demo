@@ -6,9 +6,12 @@ The [normal shared64 ownership checkpoint](../evidence/2026-10-24-normal-shared-
 moves the existing-master owner and whole-instance retention into common Debug,
 Release and Android source, preserving the original64 placements and both master
 BLAS. It remains explicitly opt-in/default OFF. The normal-controller Windows RT
-route and recreation pass, but the landing sweep costs11.58ms GPU versus7.98/8.12ms
-for baked controls. Default admission is blocked, not inferred from allocation
-savings. The earlier [retention proof](../evidence/2026-10-24-shared-forest-retention/README.md)
+route and recreation pass. The original landing11.58ms versus7.98/8.12ms signal is
+retained. A [balanced GPU-stage follow-up](../evidence/2026-10-24-windows-forest-gpu-stages/README.md)
+with identical staging/warmup does not repeat a persistent AS/dispatch median
+penalty; variable clocks/tails leave its exact cause and gameplay cost unresolved.
+Default admission remains blocked, not inferred from allocation savings. The earlier
+[retention proof](../evidence/2026-10-24-shared-forest-retention/README.md)
 and its rejected fixtures remain. No baked triangle certificate is reused and
 forest depth/phone gates are still open.
 

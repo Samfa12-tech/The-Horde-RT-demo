@@ -1,6 +1,6 @@
 // Debug-only scoped RT capture; no foreground input or saved-setting writes.
 bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesystem::path& output,
-    std::string& error)
+    std::string& error,bool landingOnly=false)
 {
     using namespace horde::gameplay::validation;
     const bool sharedForest=context.rtScene.SharedForestGeometryActive();
@@ -16,15 +16,20 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
     if(!probe.Start(context.simulation.Snapshot())) {
         error="Two-way capture requires the admitted, low-lantern reunion.";return false;
     }
-    const auto directory=output/"roundtrip";
+    const auto directory=output/(landingOnly?"landing":"roundtrip");
     std::error_code pathError;
     if(!std::filesystem::create_directory(directory,pathError)||pathError) {
         error="Two-way output directory must be new and writable.";return false;
     }
     std::ofstream rows(directory/"frames.csv"),manifest(directory/"gallery.json");
     if(!rows||!manifest) {error="Two-way evidence files could not open.";return false;}
-    rows<<"frame,phase,station,submitted_tick,simulation_ms,render_cycle_ms,completed_tick,completed_serial,gpu_status,gpu_ns,device_local_bytes,host_visible_bytes,keeper_retired_bytes,keeper_retired_memory_flags,keeper_texture_retired_device_local_bytes,keeper_texture_retired_host_visible_bytes,static_omitted_triangles,static_unloads,static_restores,static_saved_owner_bytes,static_peak_owner_overlap_bytes,static_wait_frames,shared_forest_instances,shared_forest_masked\n";
-    manifest<<"{\"schema\":2,\"scope\":\"moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance\",\"maximumSimulationTicksPerRender\":4,\"simulationHz\":60,\"captures\":[\n";
+    rows<<"frame,phase,station,submitted_tick,simulation_ms,render_cycle_ms,completed_tick,completed_serial,gpu_status,gpu_ns,device_local_bytes,host_visible_bytes,keeper_retired_bytes,keeper_retired_memory_flags,keeper_texture_retired_device_local_bytes,keeper_texture_retired_host_visible_bytes,static_omitted_triangles,static_unloads,static_restores,static_saved_owner_bytes,static_peak_owner_overlap_bytes,static_wait_frames,shared_forest_instances,shared_forest_masked";
+    if(landingOnly)rows<<",submitted_x,submitted_y,submitted_z,submitted_yaw,submitted_pitch,stage_owner_match,stage_scene_epoch,stage_measurement_generation,stage_record_attempt_serial,stage_record_serial,stage_simulation_tick,stage_submission_serial,stage_frame_slot,gpu_as_status,gpu_as_serial,gpu_as_ns,gpu_dispatch_status,gpu_dispatch_serial,gpu_dispatch_ns,gpu_transfer_status,gpu_transfer_serial,gpu_transfer_ns";
+    rows<<'\n';
+    manifest<<"{\"schema\":2,\"scope\":\""<<(landingOnly?
+        "landing-prefix attribution only; staged post-Keeper start; not full-route, owner, Shipping or phone acceptance":
+        "moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance")
+        <<"\",\"maximumSimulationTicksPerRender\":4,\"simulationHz\":60,\"captures\":[\n";
     struct Restore {
         VulkanSurfaceContext& ctx;bool paused,active;int sfx,voice,music;
         ~Restore() {ctx.simulationPaused=paused;ctx.sfxVolumePercent=sfx;ctx.voiceVolumePercent=voice;ctx.musicVolumePercent=music;
@@ -73,11 +78,26 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
             <<",\"completedFrame\":"<<evidence<<'}';
         hadCapture=true;manifest.flush();rows.flush();return bool(manifest)&&bool(rows);
     };
+    if(landingOnly) {
+        // Same fixed-pose warmup for control and candidate. Rendering owns no
+        // gameplay ticks here; the existing probe below remains the only stepper.
+        const auto tick=context.simulation.Snapshot().tickIndex;
+        for(unsigned warm=0;warm<64;++warm) {
+            bool presented=false;
+            if(!RenderFrame(context,clear,presented) || !presented ||
+               context.lastFramePresentation!=horde::telemetry::RtPresentationOutcome::Presented ||
+               context.simulation.Snapshot().tickIndex!=tick) {
+                error="Landing warmup lost stable RT presentation or advanced gameplay.";return false;
+            }
+        }
+    }
     if(!capture("initial-reunion"))return false;
     const auto start=std::chrono::steady_clock::now();
-    while(frames++<10000 && probe.Phase()!=ChapterProbePhase::Complete) {
-        if(std::chrono::steady_clock::now()-start>std::chrono::seconds(150)) {
-            error="Two-way capture exceeded its bounded 150-second run.";return false;
+    while(frames++<(landingOnly?256u:10000u) && probe.Phase()!=ChapterProbePhase::Complete &&
+          (!landingOnly || probe.Phase()==ChapterProbePhase::Landing)) {
+        if(std::chrono::steady_clock::now()-start>std::chrono::seconds(landingOnly?30:150)) {
+            error=landingOnly?"Landing observation exceeded its bounded 30-second run.":
+                "Two-way capture exceeded its bounded 150-second run.";return false;
         }
         const auto phase=probe.Phase();const auto station=probe.Station();
         const auto quarter=probe.SweepQuarter();
@@ -126,7 +146,14 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
             <<keeperTextures.retiredDeviceLocalBytes<<','<<keeperTextures.retiredHostVisibleBytes<<','
             <<detail.omittedTriangles<<','<<detail.unloads<<','<<detail.restores<<','<<detail.savedOwnerBytes<<','
             <<detail.peakOverlapOwnerBytes<<','<<detail.waitFrames<<','<<(sharedForest?64u:0u)<<','
-            <<context.rtScene.SharedForestMaskedInstanceCount()<<'\n';
+            <<context.rtScene.SharedForestMaskedInstanceCount();
+        if(landingOnly) {
+            const auto& state=context.simulation.Snapshot();
+            rows<<','<<state.playerX<<','<<state.playerSupportWorldY<<','<<state.playerZ<<','
+                <<state.playerYawRadians<<','<<state.playerPitchRadians;
+            WriteWindowsGpuStageCsv(rows,context,completed.completedEvidence.identity.submitted);
+        }
+        rows<<'\n';
         if(frames%120==0)rows.flush();
         const bool transition=phase!=probe.Phase() || station!=probe.Station();
         const bool quadrant=(phase==ChapterProbePhase::Landing || phase==ChapterProbePhase::Lookout ||
@@ -137,6 +164,15 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
             kitWalkCaptured=true;
         }
         if((transition||quadrant) && !capture(std::string(ChapterProbePhaseName(phase))+"-"+std::to_string(station)))return false;
+    }
+    if(landingOnly) {
+        if(probe.Phase()!=ChapterProbePhase::Raise || !capture("landing-complete")) {
+            error="Landing observation did not finish the original landing prefix: "+error;return false;
+        }
+        manifest<<"\n],\"frames\":"<<frames-1<<",\"warmupFrames\":64,\"fullRouteValidated\":false,\"complete\":true}\n";
+        rows.flush();manifest.flush();
+        if(!rows||!manifest) {error="Landing evidence write failed.";return false;}
+        error.clear();return true;
     }
     if(probe.Phase()!=ChapterProbePhase::Complete) {error="Two-way capture exhausted its finite frame roster.";return false;}
     const auto& last=context.simulation.Snapshot();

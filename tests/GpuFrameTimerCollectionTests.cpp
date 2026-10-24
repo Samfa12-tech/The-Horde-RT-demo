@@ -232,6 +232,58 @@ int main()
     checkRepeatDrainWithoutQueryIo(
         "a consumed duration conversion failure must leave no query work for a repeat drain");
 
+    {
+        using namespace horde::vulkan::raytracing;
+        using horde::telemetry::RtSubmittedFrameIdentity;
+        // Synthetic attribution joins reuse one already validated timer sample;
+        // they do not claim that three physical GPU intervals were measured.
+        const RtSubmittedFrameIdentity owner{{7u,11u,13u,17u,19u,0u},43u};
+        const RtSceneGpuStageCompletedObservation observation{owner,{valid,valid,valid}};
+        const auto readsBeforeJoin=gQueryReadCount;
+        context.Check(RtSceneGpuStagesMatchCompletedFrame(observation,owner),
+            "three valid consumed stage samples join only their exact completed submitted owner");
+        auto zeroTick=observation;zeroTick.submitted.frame.simulationTick=0u;
+        context.Check(RtSceneGpuStagesMatchCompletedFrame(zeroTick,zeroTick.submitted),
+            "a legitimate zero simulation tick and frame slot remain valid identities");
+        for(unsigned field=0;field<7u;++field) {
+            auto wrong=owner;
+            if(field==0)++wrong.frame.sceneEpoch;
+            if(field==1)++wrong.frame.measurementGeneration;
+            if(field==2)++wrong.frame.recordAttemptSerial;
+            if(field==3)++wrong.frame.recordSerial;
+            if(field==4)++wrong.frame.simulationTick;
+            if(field==5)++wrong.frame.frameSlot;
+            if(field==6)++wrong.submissionSerial;
+            context.Check(!RtSceneGpuStagesMatchCompletedFrame(observation,wrong),
+                "epoch/generation/attempt/record/tick/slot/submission differences cannot join a newer completed owner");
+        }
+        for(unsigned stage=0;stage<3u;++stage)for(unsigned fault=0;fault<10u;++fault) {
+            auto rejected=observation;auto& collection=rejected.collections[stage];
+            if(fault==0)collection.consumed=false;
+            if(fault==1)collection.status=GpuFrameTimingCollectionStatus::NoSubmittedWork;
+            if(fault==2)collection.status=GpuFrameTimingCollectionStatus::Unavailable;
+            if(fault==3)collection.status=GpuFrameTimingCollectionStatus::Error;
+            if(fault==4)collection.hasSample=false;
+            if(fault==5)++collection.frameSlot;
+            if(fault==6)++collection.submissionSequence;
+            if(fault==7)++collection.sample.frameSlot;
+            if(fault==8)++collection.sample.submissionSequence;
+            if(fault==9)collection.result=VK_ERROR_DEVICE_LOST;
+            context.Check(!RtSceneGpuStagesMatchCompletedFrame(rejected,owner),
+                "each stage rejects unavailable/error/no-work, missing samples and stale collection/sample slots or serials");
+        }
+        auto absent=observation;absent.submitted={};
+        for(auto& collection:absent.collections) {
+            collection.frameSlot=collection.sample.frameSlot=0;
+            collection.submissionSequence=collection.sample.submissionSequence=0;
+        }
+        context.Check(!RtSceneGpuStagesMatchCompletedFrame(absent,absent.submitted),
+            "matching zero-initialized values are not an owned submitted observation");
+        context.Check(gQueryReadCount==readsBeforeJoin && observation.collections[0].consumed &&
+            observation.collections[0].submissionSequence==43u,
+            "identity joining performs no query IO and leaves consumed receipts unchanged");
+    }
+
     for(const auto stage: {VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
         VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,VK_PIPELINE_STAGE_TRANSFER_BIT}) {
         context.Check(timer.RecordBegin(commandBuffer,0,stage) && timer.RecordEnd(commandBuffer,0,stage) &&

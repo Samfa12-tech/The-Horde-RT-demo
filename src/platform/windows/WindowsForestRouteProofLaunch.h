@@ -7,6 +7,8 @@ namespace horde::platform::windows {
 enum class ForestRouteCaptureMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64, NormalShared64 };
 struct ForestRouteProofLaunch {
     ForestRouteCaptureMode mode=ForestRouteCaptureMode::Disabled;
+    bool landingOnly=false;
+    bool gpuStages=false;
     std::string error;
 };
 // Representation A/B plus a separately selected frozen F01 composition proof.
@@ -29,6 +31,14 @@ inline ForestRouteProofLaunch ParseForestRouteProofLaunch(
             else if(value==L"normal-shared64")result.mode=ForestRouteCaptureMode::NormalShared64;
             else {result.error="Unknown forest route proof mode.";return result;}
         }
+        else if(a==L"--capture-chapter-landing") {
+            if(result.landingOnly || !debugBuild || i+1>=arguments.size()) {
+                result.error="Landing observation requires one Debug control/stages selection.";return result;
+            }
+            result.landingOnly=true;const auto value=arguments[++i];
+            if(value==L"stages")result.gpuStages=true;
+            else if(value!=L"control") {result.error="Unknown landing observation mode.";return result;}
+        }
         else if(a==L"--capture-hidden")hidden=true;
         else if(a==L"--capture-showcase") {
             capture=i+1<arguments.size() && !arguments[i+1].starts_with(L"--");
@@ -45,6 +55,9 @@ inline ForestRouteProofLaunch ParseForestRouteProofLaunch(
                 a==L"--entry-menu-slice" || a==L"--inspect-static-world-source" || a==L"--anatomical-player-mount")conflict=true;
     }
     if(roundtrip && (result.mode!=ForestRouteCaptureMode::NormalShared64 || !reunion))conflict=true;
+    if(result.landingOnly && (!hidden || !capture || !reunion || conflict || roundtrip ||
+       (result.mode!=ForestRouteCaptureMode::Disabled && result.mode!=ForestRouteCaptureMode::NormalShared64)))
+        result.error="Landing observation requires only a hidden normal-owner reunion capture, separate from full-route validation.";
     if(requested && (!hidden || !capture || !chapter || conflict))
         result.error="Forest route proof requires only a hidden authored-chapter showcase capture; no benchmark or cutover validation.";
     return result;
