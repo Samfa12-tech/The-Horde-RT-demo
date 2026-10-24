@@ -114,15 +114,8 @@ assets::StaticMaterial MakeFamilyMaterial(const assets::StaticMaterial& source,
     return material;
 }
 
-} // namespace
-
-bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
-                                  assets::StaticMeshAsset& existingOwner,
-                                  ForestDressingBuildReport& report,
-                                  std::string& diagnostic,
-                                  const gameplay::simulation::TriangleSupportSurface* terrain)
+bool CanAppendForest(const assets::StaticMeshAsset& existingOwner,std::string& diagnostic)
 {
-    report = {};
     if (!existingOwner.HasValidTriangleProvenance() || existingOwner.vertices.empty() || existingOwner.indices.empty() ||
         existingOwner.primitives.empty() || existingOwner.materials.empty() ||
         existingOwner.nodeTransforms.empty())
@@ -145,7 +138,18 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
         return false;
     }
 
-    std::array<assets::StaticMeshAsset, static_cast<std::size_t>(TreeId::Count)> sources{};
+    return true;
+}
+
+} // namespace
+
+bool PrepareForestDressing(const std::filesystem::path& assetRoot,
+                          std::shared_ptr<const PreparedForestDressing>& prepared,
+                          std::string& diagnostic,
+                          const gameplay::simulation::TriangleSupportSurface* terrain)
+{
+    auto candidate = std::make_shared<PreparedForestDressing>();
+    auto& sources = candidate->masters;
     for (std::size_t tree = 0u; tree < kAssets.size(); ++tree)
     {
         const auto& spec = kAssets[tree];
@@ -182,7 +186,7 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
         }
     }
 
-    std::array<assets::StaticMaterial, static_cast<std::size_t>(MaterialFamily::Count)> familyMaterials{};
+    auto& familyMaterials = candidate->materialFamilies;
     std::array<bool, static_cast<std::size_t>(MaterialFamily::Count)> hasMaterial{};
     for (const auto& source : sources)
     {
@@ -204,20 +208,23 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
         return false;
     }
 
-    assets::StaticMeshAsset staged = existingOwner;
-    std::array<std::uint32_t, static_cast<std::size_t>(MaterialFamily::Count)> materialIndices{};
-    for (std::size_t family = 0u; family < familyMaterials.size(); ++family)
-    {
-        materialIndices[family] = static_cast<std::uint32_t>(staged.materials.size());
-        staged.materials.push_back(familyMaterials[family]);
+    for (std::size_t tree=0;tree<sources.size();++tree) {
+        auto& source=sources[tree];
+        for(std::size_t index=0;index<source.primitives.size();++index) {
+            const auto& primitive=source.primitives[index];
+            if(primitive.materialIndex>=source.materials.size() || primitive.nodeTransformIndex>=source.nodeTransforms.size()) {
+                diagnostic="Forest native primitive references invalid material/transform data.";return false;
+            }
+            const auto family=ClassifyMaterial(source.materials[primitive.materialIndex],diagnostic);
+            if(family==MaterialFamily::Count)return false;
+            candidate->primitiveFamilies[tree][index]=static_cast<std::uint8_t>(family);
+        }
+        for(auto& material:source.materials) {
+            const auto family=ClassifyMaterial(material,diagnostic);
+            if(family==MaterialFamily::Count)return false;
+            material=familyMaterials[static_cast<std::size_t>(family)];
+        }
     }
-
-    std::array<std::vector<assets::StaticRtVertex>, static_cast<std::size_t>(MaterialFamily::Count)> groupedVertices;
-    std::array<std::vector<std::uint32_t>, static_cast<std::size_t>(MaterialFamily::Count)> groupedIndices;
-    ForestDressingBuildReport candidate{};
-    candidate.addedBounds.minimum.fill(std::numeric_limits<float>::max());
-    candidate.addedBounds.maximum.fill(std::numeric_limits<float>::lowest());
-
     for (std::size_t placementIndex = 0u;
          placementIndex < gameplay::simulation::kForestTreePlacementContract.size();
          ++placementIndex)
@@ -237,7 +244,6 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
             ? TreeId::Pine : TreeId::Alder;
         const std::size_t treeIndex = static_cast<std::size_t>(treeId);
         const auto& source = sources[treeIndex];
-        const AssetSpec& spec = kAssets[treeIndex];
         const float yaw = contract.yawRadians;
         float originY = support.worldY - source.bounds.minimum[1] - contract.rootBurialMetres;
         if (terrain) {
@@ -269,27 +275,85 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
             // Use the same measured transform as the shared collision bounds;
             // native recomputation above rejects a stale placement receipt.
         }
+        auto& placement=candidate->placements[placementIndex];
+        placement.masterIndex=treeIndex;
+        placement.origin={{contract.x,originY,contract.z}};
+        placement.yawRadians=yaw;
+        placement.supportY=support.worldY;
+    }
+    prepared=std::move(candidate);
+    diagnostic.clear();
+    return true;
+}
+
+bool AppendPreparedForestDressing(const PreparedForestDressing& prepared,
+                                 assets::StaticMeshAsset& existingOwner,
+                                 ForestDressingBuildReport& report,
+                                 std::string& diagnostic)
+{
+    report={};
+    if(!CanAppendForest(existingOwner,diagnostic))return false;
+    const auto& sources=prepared.masters;
+    const auto& familyMaterials=prepared.materialFamilies;
+    for(std::size_t tree=0;tree<sources.size();++tree) {
+        const auto& source=sources[tree];
+        if(source.vertices.empty() || source.indices.empty() || !source.HasValidTriangleProvenance() ||
+           source.primitives.size()!=kAssets[tree].expectedMaterials || source.materials.size()!=kAssets[tree].expectedMaterials) {
+            diagnostic="Prepared forest master is empty or violates its admitted primitive/material contract.";return false;
+        }
+    }
+    assets::StaticMeshAsset staged = existingOwner;
+    std::array<std::uint32_t, static_cast<std::size_t>(MaterialFamily::Count)> materialIndices{};
+    for (std::size_t family = 0u; family < familyMaterials.size(); ++family)
+    {
+        materialIndices[family] = static_cast<std::uint32_t>(staged.materials.size());
+        staged.materials.push_back(familyMaterials[family]);
+    }
+
+    std::array<std::vector<assets::StaticRtVertex>, static_cast<std::size_t>(MaterialFamily::Count)> groupedVertices;
+    std::array<std::vector<std::uint32_t>, static_cast<std::size_t>(MaterialFamily::Count)> groupedIndices;
+    ForestDressingBuildReport candidate{};
+    candidate.addedBounds.minimum.fill(std::numeric_limits<float>::max());
+    candidate.addedBounds.maximum.fill(std::numeric_limits<float>::lowest());
+
+    for (std::size_t placementIndex=0;placementIndex<prepared.placements.size();++placementIndex)
+    {
+        const auto& contract=gameplay::simulation::kForestTreePlacementContract[placementIndex];
+        const auto& rigid=prepared.placements[placementIndex];
+        const auto treeIndex=rigid.masterIndex;
+        const auto expected=contract.species==gameplay::simulation::ForestTreeSpecies::Pine?0u:1u;
+        if(treeIndex>=sources.size() || treeIndex!=expected || rigid.origin[0]!=contract.x || rigid.origin[2]!=contract.z ||
+           rigid.yawRadians!=contract.yawRadians || !std::isfinite(rigid.supportY) ||
+           rigid.origin[1]!=rigid.supportY-sources[treeIndex].bounds.minimum[1]-contract.rootBurialMetres) {
+            diagnostic="Prepared forest placement is not the admitted rigid root transform.";return false;
+        }
+        const auto& source=sources[treeIndex];const auto& spec=kAssets[treeIndex];
+        const float yaw=rigid.yawRadians;
         ForestDressingPlacement& placement = candidate.placements[placementIndex];
         placement.asset = spec.name;
-        placement.origin = {{contract.x, originY, contract.z}};
+        placement.origin = rigid.origin;
         placement.yawRadians = yaw;
-        placement.supportY = support.worldY;
+        placement.supportY = rigid.supportY;
         placement.worldBounds.minimum.fill(std::numeric_limits<float>::max());
         placement.worldBounds.maximum.fill(std::numeric_limits<float>::lowest());
         placement.trunkBounds.minimum.fill(std::numeric_limits<float>::max());
         placement.trunkBounds.maximum.fill(std::numeric_limits<float>::lowest());
 
-            for (const auto& primitive : source.primitives)
+            for (std::size_t primitiveIndex=0;primitiveIndex<source.primitives.size();++primitiveIndex)
             {
+                const auto& primitive=source.primitives[primitiveIndex];
                 if (primitive.materialIndex >= source.materials.size() ||
                     primitive.nodeTransformIndex >= source.nodeTransforms.size())
                 {
                     diagnostic = "Forest native primitive references invalid material/transform data.";
                     return false;
                 }
-                const MaterialFamily family = ClassifyMaterial(source.materials[primitive.materialIndex], diagnostic);
-                if (family == MaterialFamily::Count) return false;
-                const std::size_t familyIndex = static_cast<std::size_t>(family);
+                const auto familyIndex=prepared.primitiveFamilies[treeIndex][primitiveIndex];
+                if(familyIndex>=familyMaterials.size() || source.materials[primitive.materialIndex].name!=familyMaterials[familyIndex].name ||
+                   familyMaterials[familyIndex].name!=kFamilyNames[familyIndex]) {
+                    diagnostic="Prepared forest material family mapping is invalid.";return false;
+                }
+                const auto family=static_cast<MaterialFamily>(familyIndex);
                 auto& vertices = groupedVertices[familyIndex];
                 auto& indices = groupedIndices[familyIndex];
                 const std::size_t vertexBase = vertices.size();
@@ -298,7 +362,8 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
                 for (const auto& next : source.primitives)
                     if (next.vertexOffset > primitive.vertexOffset)
                         vertexEnd = std::min(vertexEnd, static_cast<std::size_t>(next.vertexOffset));
-                if (vertexEnd <= primitive.vertexOffset || vertexEnd > source.vertices.size() ||
+                if (primitive.indexCount == 0 || primitive.indexCount % 3u != 0 ||
+                    vertexEnd <= primitive.vertexOffset || vertexEnd > source.vertices.size() ||
                     primitive.indexOffset > source.indices.size() ||
                     primitive.indexCount > source.indices.size() - primitive.indexOffset)
                 {
@@ -348,7 +413,7 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
                             const auto& p=vertices[indices[i+corner]].position;
                             triangle.push_back({p[0],p[1],p[2]});
                         }
-                        IncludeTrunkTriangle(placement.trunkBounds,std::move(triangle),support.worldY);
+                        IncludeTrunkTriangle(placement.trunkBounds,std::move(triangle),placement.supportY);
                     }
                 }
                 if (vertices.size() - vertexBase != vertexEnd - primitive.vertexOffset ||
@@ -358,7 +423,7 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
                     return false;
                 }
             }
-            if (std::abs(placement.worldBounds.minimum[1] + contract.rootBurialMetres - support.worldY) > 0.0001f)
+            if (std::abs(placement.worldBounds.minimum[1] + contract.rootBurialMetres - placement.supportY) > 0.0001f)
             {
                 diagnostic = "Forest tree root does not meet the resolved route support height.";
                 return false;
@@ -424,6 +489,19 @@ bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
     report = candidate;
     diagnostic.clear();
     return true;
+}
+
+bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,
+                                 assets::StaticMeshAsset& existingOwner,
+                                 ForestDressingBuildReport& report,
+                                 std::string& diagnostic,
+                                 const gameplay::simulation::TriangleSupportSurface* terrain)
+{
+    report={};
+    if(!CanAppendForest(existingOwner,diagnostic))return false;
+    std::shared_ptr<const PreparedForestDressing> prepared;
+    return PrepareForestDressing(assetRoot,prepared,diagnostic,terrain) &&
+        AppendPreparedForestDressing(*prepared,existingOwner,report,diagnostic);
 }
 
 } // namespace horde::scene

@@ -80,6 +80,43 @@ bool OverlapXZ(const ForestDressingBounds& left, const ForestDressingBounds& rig
            left.minimum[2] < right.maximum[2] && right.minimum[2] < left.maximum[2];
 }
 
+// Stable semantic receipt for matched same-toolchain control/candidate runs.
+// No pointer values, std::string storage or struct padding enters this digest.
+std::uint64_t ForestRepresentationDigest(const StaticMeshAsset& mesh,const ForestDressingBuildReport& report) {
+    std::uint64_t hash=14695981039346656037ull;
+    const auto bytes=[&](const auto* data,std::size_t count) {
+        const auto* p=reinterpret_cast<const unsigned char*>(data);
+        for(std::size_t i=0;i<count*sizeof(*data);++i){hash^=p[i];hash*=1099511628211ull;}
+    };
+    const auto scalar=[&](const auto& v){bytes(&v,1);};
+    const auto text=[&](std::string_view v){scalar(std::uint64_t(v.size()));bytes(v.data(),v.size());};
+    scalar(std::uint64_t(mesh.vertices.size()));
+    for(const auto& v:mesh.vertices){bytes(v.position.data(),4);bytes(v.normal.data(),4);bytes(v.tangent.data(),4);bytes(v.uv0.data(),4);}
+    scalar(std::uint64_t(mesh.indices.size()));bytes(mesh.indices.data(),mesh.indices.size());
+    scalar(std::uint64_t(mesh.triangleRegions.size()));bytes(mesh.triangleRegions.data(),mesh.triangleRegions.size());
+    for(const auto& v:mesh.primitives){scalar(v.vertexOffset);scalar(v.indexOffset);scalar(v.indexCount);scalar(v.materialIndex);scalar(v.nodeTransformIndex);}
+    for(const auto& v:mesh.nodeTransforms){text(v.name);bytes(v.world.data(),16);}
+    for(const auto& v:mesh.materials) {
+        text(v.name);bytes(v.baseColorFactor.data(),4);bytes(v.emissiveFactor.data(),3);bytes(v.attenuationColor.data(),3);
+        scalar(v.emissiveStrength);scalar(v.metallicFactor);scalar(v.roughnessFactor);scalar(v.occlusionStrength);scalar(v.normalScale);
+        bytes(v.textureScale.data(),2);scalar(v.transmissionFactor);scalar(v.ior);scalar(v.thicknessFactor);scalar(v.attenuationDistance);
+        scalar(v.numericalSpawnMinimumWidth);scalar(v.numericalSpawnGeometryError);scalar(v.baseColorTexture);scalar(v.normalTexture);
+        scalar(v.ormTexture);scalar(v.emissiveTexture);scalar(v.textureGroup);scalar(v.deferTextureAllocation);scalar(v.flags);
+    }
+    for(const auto& v:mesh.sockets){text(v.name);scalar(v.nodeTransformIndex);bytes(v.world.data(),16);}
+    bytes(mesh.bounds.minimum.data(),3);bytes(mesh.bounds.maximum.data(),3);
+    scalar(std::uint64_t(report.addedVertices));scalar(std::uint64_t(report.addedIndices));scalar(std::uint64_t(report.addedTriangles));
+    scalar(std::uint64_t(report.addedPrimitives));scalar(std::uint64_t(report.addedMaterials));scalar(std::uint64_t(report.placedInstances));
+    bytes(report.addedBounds.minimum.data(),3);bytes(report.addedBounds.maximum.data(),3);
+    for(const auto& v:report.placements){text(v.asset?v.asset:"");bytes(v.origin.data(),3);scalar(v.yawRadians);scalar(v.supportY);
+        bytes(v.worldBounds.minimum.data(),3);bytes(v.worldBounds.maximum.data(),3);bytes(v.trunkBounds.minimum.data(),3);bytes(v.trunkBounds.maximum.data(),3);}
+    return hash;
+}
+void PrintForestDigest(const char* label,const StaticMeshAsset& mesh,const ForestDressingBuildReport& report) {
+    std::cout<<"FOREST_REPRESENTATION "<<label<<" fnv1a64="<<ForestRepresentationDigest(mesh,report)
+        <<" vertices="<<mesh.vertices.size()<<" indices="<<mesh.indices.size()<<" placements="<<report.placedInstances<<'\n';
+}
+
 void TestNativeTreePairAndAppend()
 {
     Check(gameplay::simulation::kForestTreePlacementContract.size() >= 64u,
@@ -102,6 +139,7 @@ void TestNativeTreePairAndAppend()
                 std::cerr << "Unbacked placement: " << tree.x << ", " << tree.z << '\n';
         return;
     }
+    PrintForestDigest("ribbon",owner,report);
     Check(report.addedTriangles == 323264u && report.addedIndices == 323264u * 3u,
           "64 authored-scale instances contribute 32 LOD1 pine and 32 LOD1 alder triangle costs");
     Check(report.placedInstances == 64u && report.addedPrimitives == 4u && report.addedMaterials == 4u,
@@ -253,6 +291,51 @@ void TestCleanFailures()
           "four-group admission fails before geometry mutation when the shared 32-material cap would overflow");
 }
 
+void TestPreparedMasterOwnership()
+{
+    std::string diagnostic;
+    std::shared_ptr<const PreparedForestDressing> prepared;
+    Check(PrepareForestDressing(kRoot/"assets",prepared,diagnostic),
+          "canonical preparation admits the existing masters and rigid placements");
+    if(!prepared)return;
+    std::size_t triangles=0,pines=0,alders=0;
+    for(const auto& master:prepared->masters)triangles+=master.indices.size()/3u;
+    for(const auto& placement:prepared->placements) {
+        Check(placement.masterIndex<prepared->masters.size(),"each rigid placement references an owned canonical master");
+        if(placement.masterIndex==0)++pines;else if(placement.masterIndex==1)++alders;
+    }
+    Check(triangles==10102 && pines==32 && alders==32,
+          "preparation owns only two local payloads while retaining all 64 placement records");
+    const auto retained=prepared;
+    Check(!PrepareForestDressing(kRoot/"missing-forest-root",prepared,diagnostic) && prepared==retained,
+          "failed preparation preserves the prior immutable owned handle");
+    prepared.reset();
+    auto explicitOwner=LoadCollapse(diagnostic),wrappedOwner=explicitOwner;
+    ForestDressingBuildReport explicitReport,wrappedReport;
+    Check(AppendPreparedForestDressing(*retained,explicitOwner,explicitReport,diagnostic) &&
+          AppendPreparedForestDressing(kRoot/"assets",wrappedOwner,wrappedReport,diagnostic) &&
+          ForestRepresentationDigest(explicitOwner,explicitReport)==ForestRepresentationDigest(wrappedOwner,wrappedReport),
+          "retained canonical handle outlives its original reference and reproduces the complete compatibility bake");
+    for(unsigned mutation=0;mutation<7;++mutation) {
+        auto invalid=*retained;
+        if(mutation==0)invalid.placements[0].masterIndex=invalid.masters.size();
+        if(mutation==1)invalid.placements[0].origin[1]+=.1f;
+        if(mutation==2)invalid.primitiveFamilies[0][0]=255;
+        if(mutation==3)invalid.masters[0].indices[0]=UINT32_MAX;
+        if(mutation==4)invalid.masters[0].primitives[0].indexCount=0;
+        if(mutation==5)invalid.masters[0].primitives[0].indexCount=1;
+        if(mutation==6)invalid.masters[0].primitives[0].indexCount=2;
+        auto owner=LoadCollapse(diagnostic);ForestDressingBuildReport report;
+        const auto indices=owner.indices;
+        const auto vertices=owner.vertices;
+        Check(!AppendPreparedForestDressing(invalid,owner,report,diagnostic) && owner.indices==indices &&
+              owner.vertices.size()==vertices.size() &&
+              std::memcmp(owner.vertices.data(),vertices.data(),vertices.size()*sizeof(vertices.front()))==0 &&
+              report.addedVertices==0 && report.placedInstances==0,
+              "invalid canonical master/transform/mapping fails without mutating the existing owner or publishing a report");
+    }
+}
+
 template<class Append>
 void CheckCorruptForestProvenance(const StaticMeshAsset& owner, Append append)
 {
@@ -323,6 +406,7 @@ void TestNativeTerrainAndTrailClearance()
     const bool appended = AppendPreparedForestDressing(kRoot / "assets", owner, report, diagnostic, surface.get());
     Check(appended, diagnostic.empty() ? "woodland appends on actual terrain" : diagnostic);
     if (!appended) return;
+    PrintForestDigest("native-terrain",owner,report);
     std::array<StaticMeshAsset,2> rootSources;
     for (std::size_t i=0;i<rootSources.size();++i) {
         const auto sourceDirectory=kRoot/"assets/models/world/runtime/forest-tree-pair-v1";
@@ -972,6 +1056,7 @@ int main()
 {
     TestNativeTreePairAndAppend();
     TestCleanFailures();
+    TestPreparedMasterOwnership();
     TestNativeTerrainAndTrailClearance();
     TestUnsafeRootFootprintsFailAtomically();
     TestNativeChapterPrimitiveOwnership();

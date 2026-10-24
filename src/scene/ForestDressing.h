@@ -6,7 +6,9 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <filesystem>
+#include <memory>
 #include <string>
 
 namespace horde::scene
@@ -39,6 +41,39 @@ struct ForestDressingBuildReport
     ForestDressingBounds addedBounds{};
     std::array<ForestDressingPlacement, gameplay::simulation::kForestTreePlacementContract.size()> placements{};
 };
+
+struct ForestDressingRigidPlacement
+{
+    std::size_t masterIndex = 0u;
+    std::array<float, 3u> origin{};
+    float yawRadians = 0.0f;
+    float supportY = 0.0f;
+};
+
+// Own each admitted asset-local metre-space payload once (source node transforms
+// are already baked by the shared GLB loader). Preparation publishes a const
+// handle only after material/root admission succeeds. This is a snapshot of
+// the supplied support surface: reprepare when its resource generation changes.
+// It does not itself create a Vulkan instance or certify region retirement.
+struct PreparedForestDressing
+{
+    std::array<assets::StaticMeshAsset, 2u> masters;
+    std::array<assets::StaticMaterial, 4u> materialFamilies;
+    std::array<std::array<std::uint8_t, 3u>, 2u> primitiveFamilies{};
+    std::array<ForestDressingRigidPlacement, gameplay::simulation::kForestTreePlacementContract.size()> placements{};
+};
+
+bool PrepareForestDressing(const std::filesystem::path& assetRoot,
+                          std::shared_ptr<const PreparedForestDressing>& prepared,
+                          std::string& diagnostic,
+                          const gameplay::simulation::TriangleSupportSurface* terrain = nullptr);
+
+// Compatibility bake from the same canonical masters/transforms. Production
+// remains world-baked until a separate RT ownership/capacity proof is admitted.
+bool AppendPreparedForestDressing(const PreparedForestDressing& prepared,
+                                 assets::StaticMeshAsset& existingOwner,
+                                 ForestDressingBuildReport& report,
+                                 std::string& diagnostic);
 
 // Imports the admitted LOD1 pine and alder, bakes the authored grounded world
 // placements into the existing static owner, and groups them into four
