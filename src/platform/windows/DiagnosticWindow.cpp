@@ -105,6 +105,10 @@
 #include "platform/windows/DesktopControllerInput.h"
 #include "platform/windows/WindowsCaptureContracts.h"
 #include "platform/windows/WindowsGraphicsPreviewCapture.h"
+#include "platform/windows/WindowsPreviewMeshPairCapture.h"
+#if defined(_DEBUG)
+#include "scene/ForestDressing.h"
+#endif
 #include "platform/windows/WindowsOutputResizeLaunch.h"
 #include "platform/windows/WindowsMotionEvidenceLaunch.h"
 #include "platform/windows/WindowsMotionEvidenceCapture.h"
@@ -344,6 +348,8 @@ struct CaptureLaunchOptions
     bool captureHidden = false;
     horde::platform::windows::WindowsEnvironmentSurveyLaunch environmentSurvey;
     bool graphicsPreview = false;
+    horde::platform::windows::PreviewMeshPairCaptureMode previewMeshPair =
+        horde::platform::windows::PreviewMeshPairCaptureMode::None;
     bool mistOff = false;
     std::optional<horde::graphics::DustQuality> captureDustQuality;
     bool outputResizeValidation = false;
@@ -542,6 +548,12 @@ struct VulkanSurfaceContext
     horde::vulkan::raytracing::RtSceneProfile graphicsReturnProfile =
         horde::vulkan::raytracing::RtSceneProfile::Showcase;
     bool graphicsPreviewCapture = false;
+#if defined(_DEBUG)
+    horde::platform::windows::PreviewMeshPairCaptureMode previewMeshPair =
+        horde::platform::windows::PreviewMeshPairCaptureMode::None;
+    std::shared_ptr<const horde::scene::assets::StaticMeshAsset> previewMeshPairMaster;
+    std::optional<horde::graphics::PreviewCameraPose> previewMeshPairCamera;
+#endif
     bool outputResizeValidation = false;
     bool nativeMotionValidation = false;
     bool chapterRoundTripCaptureActive = false;
@@ -836,6 +848,18 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     std::vector<std::wstring_view> argumentViews;
     for (int index = 1; index < argumentCount; ++index) argumentViews.emplace_back(arguments[index]);
+    const auto previewPair=horde::platform::windows::ParsePreviewMeshPairCaptureLaunch(argumentViews,
+#if defined(_DEBUG)
+        true
+#else
+        false
+#endif
+    );
+    if(!previewPair.error.empty()){options.error=previewPair.error;LocalFree(arguments);return options;}
+    options.previewMeshPair=previewPair.mode;
+    if(previewPair.mode!=horde::platform::windows::PreviewMeshPairCaptureMode::None) {
+        options.requested=true;options.graphicsPreview=true;options.outputDirectory=previewPair.outputDirectory;
+    }
     const auto hiddenCapture=horde::platform::windows::ParseWindowsHiddenCaptureLaunch(argumentViews,
 #if defined(_DEBUG)
         true
@@ -844,7 +868,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
     );
     if(!hiddenCapture.error.empty()) {options.error=hiddenCapture.error;LocalFree(arguments);return options;}
-    options.captureHidden=hiddenCapture.hidden;
+    options.captureHidden=hiddenCapture.hidden || previewPair.mode!=horde::platform::windows::PreviewMeshPairCaptureMode::None;
     options.environmentSurvey=horde::platform::windows::ParseWindowsEnvironmentSurveyLaunch(argumentViews,
 #if defined(_DEBUG)
         true
@@ -945,6 +969,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
             argument == L"--motion-rt-workload") { ++index; continue; }
         if (argument == L"--validate-output-resize") { ++index; continue; }
         if (argument == L"--capture-graphics-preview") { ++index; continue; }
+        if (argument == L"--capture-hidden-preview-pair") { index+=2; continue; }
         if (argument == L"--development-vertical-proof")
         {
 #if !defined(_DEBUG)
@@ -6062,6 +6087,29 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     ctx.rtScene.SetDevelopmentRescueJourney(rescueJourney);
     ctx.rtScene.SetDevelopmentSupportFixture(ctx.developmentVerticalProof &&
         ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase);
+#if defined(_DEBUG)
+    if(ctx.previewMeshPair!=horde::platform::windows::PreviewMeshPairCaptureMode::None) {
+        if(!ctx.previewMeshPairMaster) {
+            std::shared_ptr<const horde::scene::PreparedForestDressing> prepared;
+            if(!horde::scene::PrepareForestDressing(assetRoot,prepared,diagnostic)) {
+                ctx.lastRtFrameError=diagnostic;return false;
+            }
+            ctx.previewMeshPairMaster=std::shared_ptr<const horde::scene::assets::StaticMeshAsset>(prepared,&prepared->masters[0]);
+        }
+        std::array<horde::gameplay::items::HeldItemTransform,2> transforms;
+        constexpr std::array<float,2> yaw{{.42f,-.63f}};
+        for(unsigned i=0;i<2;++i) {
+            auto& m=transforms[i];m=horde::gameplay::items::IdentityHeldItemTransform();
+            m[0]=m[10]=.25f*std::cos(yaw[i]);m[2]=-.25f*std::sin(yaw[i]);m[8]=-m[2];m[5]=.25f;
+            m[12]=-1.35f;m[14]=i==0?-14.8f:-16.1f;
+            m[13]=horde::gameplay::kRouteFloorWorldY-.25f*ctx.previewMeshPairMaster->bounds.minimum[1]-.01f;
+        }
+        if(!ctx.rtScene.SetDiagnosticPreviewMeshPair(ctx.previewMeshPairMaster,transforms,
+            ctx.previewMeshPair==horde::platform::windows::PreviewMeshPairCaptureMode::Shared,diagnostic)) {
+            ctx.lastRtFrameError=diagnostic;return false;
+        }
+    }
+#endif
     if (!ctx.rtScene.Initialise(ctx.instance,
                                 ctx.physicalDevice,
                                 ctx.device,
@@ -6817,6 +6865,12 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             frameInputs = horde::vulkan::raytracing::BuildGraphicsPreviewFrameInputs(
                 ctx.graphicsPreview, ctx.outputExposure, ctx.waterQuality,
                 horde::vulkan::raytracing::ResolveFireEmitterQuality(ctx.fireDetail));
+#if defined(_DEBUG)
+            if(ctx.previewMeshPairCamera) {
+                frameInputs.cameraX=ctx.previewMeshPairCamera->x;frameInputs.cameraZ=ctx.previewMeshPairCamera->z;
+                frameInputs.cameraYaw=ctx.previewMeshPairCamera->yaw;frameInputs.cameraPitch=ctx.previewMeshPairCamera->pitch;
+            }
+#endif
         }
         if(!ctx.environmentSurveyActive)UpdateMenuAmbience(ctx);
         frameInputs.shadowQuality = ctx.shadowQuality;
@@ -8628,6 +8682,7 @@ int RunEntryMenuCapture(VulkanSurfaceContext &context,
 
 #include "platform/windows/WindowsGraphicsPreviewCapture.inl"
 #if defined(_DEBUG)
+#include "platform/windows/WindowsPreviewMeshPairCapture.inl"
 #include "platform/windows/WindowsOutputResizeValidation.inl"
 #include "platform/windows/WindowsMotionEvidenceValidation.inl"
 #include "platform/windows/WindowsPlayerDodgeCapture.inl"
@@ -8705,6 +8760,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.entryMenu.SetReducedMotion(context.reducedMotionEnabled);
     }
     context.graphicsPreviewCapture = graphicsPreviewCapture;
+#if defined(_DEBUG)
+    context.previewMeshPair=ParseCaptureLaunchOptions().previewMeshPair;
+#endif
     context.outputResizeValidation = outputResizeValidation;
     context.nativeMotionValidation = !nativeMotionScenario.empty();
     context.environmentSurveyActive=ParseCaptureLaunchOptions().environmentSurvey.requested;
@@ -9011,7 +9069,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             : outputResizeValidation
                 ? RunOutputResizeValidation(context, capabilities, *captureDirectory)
             : graphicsPreviewCapture
-                ? RunGraphicsPreviewCapture(context, capabilities, *captureDirectory)
+                ? (context.previewMeshPair!=horde::platform::windows::PreviewMeshPairCaptureMode::None
+                    ? RunPreviewMeshPairCapture(context,capabilities,*captureDirectory)
+                    : RunGraphicsPreviewCapture(context, capabilities, *captureDirectory))
                 :
 #endif
                 RunShowcaseCapture(context, capabilities, *captureDirectory);

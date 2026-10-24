@@ -833,11 +833,97 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     tlasInstanceCount_ = std::exchange(other.tlasInstanceCount_, kTlasInstanceCount);
     previewTransforms_ = std::exchange(other.previewTransforms_, {});
     previewFireInputs_ = std::exchange(other.previewFireInputs_, {});
+#if defined(_DEBUG)
+    diagnosticPreviewPairMaster_=std::move(other.diagnosticPreviewPairMaster_);
+    diagnosticPreviewPairTransforms_=std::exchange(other.diagnosticPreviewPairTransforms_,{});
+    diagnosticPreviewPairShared_=std::exchange(other.diagnosticPreviewPairShared_,false);
+    diagnosticPreviewPairActive_=std::exchange(other.diagnosticPreviewPairActive_,false);
+    diagnosticPreviewPairBaked_=std::move(other.diagnosticPreviewPairBaked_);
+    diagnosticPreviewPairBlas_=std::exchange(other.diagnosticPreviewPairBlas_,{});
+    diagnosticPreviewPairScratch_=std::exchange(other.diagnosticPreviewPairScratch_,{});
+    diagnosticPreviewPairBuild_=std::exchange(other.diagnosticPreviewPairBuild_,{});
+    diagnosticPreviewPairScratchPeak_=std::exchange(other.diagnosticPreviewPairScratchPeak_,0);
+    diagnosticPreviewPairBuildMilliseconds_=std::exchange(other.diagnosticPreviewPairBuildMilliseconds_,0.);
+#endif
     other.gpuResources_.Reset();
     ready_ = std::exchange(other.ready_, false);
 
     return *this;
 }
+
+#if defined(_DEBUG)
+bool PresentableTinyRtScene::SetDiagnosticPreviewMeshPair(
+    std::shared_ptr<const horde::scene::assets::StaticMeshAsset> master,
+    const std::array<horde::gameplay::items::HeldItemTransform,2>& transforms,
+    bool sharedInstances,std::string& diagnostic)
+{
+    // Destroy retains the device identity and this immutable request so the
+    // ordinary swapchain recreation can reinitialise it. Repeating the exact
+    // admitted request changes no live GPU owner; different requests still
+    // require a fresh, uninitialised scene.
+    if(master && master==diagnosticPreviewPairMaster_ &&
+       transforms==diagnosticPreviewPairTransforms_ && sharedInstances==diagnosticPreviewPairShared_) {
+        diagnostic.clear();return true;
+    }
+    if(ready_ || device_!=VK_NULL_HANDLE || !master || master->primitives.size()!=3u ||
+       master->materials.size()!=3u || master->indices.size()!=15000u || master->vertices.empty() ||
+       !master->sockets.empty() || !master->HasValidTriangleProvenance()) {
+        diagnostic="Diagnostic preview pair requires the admitted immutable three-family pine before initialization.";return false;
+    }
+    std::array<bool,3> families{};
+    for(const auto& m:master->materials) {
+        const auto family=m.name=="ForestBark"?0:m.name=="ForestPine"?1:m.name=="ForestMoss"?2:-1;
+        if(family<0 || families[family] || m.textureGroup!=family || !m.deferTextureAllocation ||
+           m.baseColorTexture<0 || (family==0)!=(m.normalTexture>=0) ||
+           (family==0)!=(m.ormTexture>=0) || m.emissiveTexture>=0) {
+            diagnostic="Diagnostic preview pair requires canonical Bark/Pine/Moss texture semantics.";return false;
+        }
+        families[family]=true;
+    }
+    for(const auto& m:transforms) {
+        if(std::any_of(m.begin(),m.end(),[](float v){return !std::isfinite(v);}) ||
+           m[3]!=0.f || m[7]!=0.f || m[11]!=0.f || m[15]!=1.f ||
+           m[1]!=0.f || m[4]!=0.f || m[6]!=0.f || m[9]!=0.f ||
+           m[5]!=.25f || std::abs(m[0]-m[10])>1e-6f || std::abs(m[2]+m[8])>1e-6f ||
+           std::abs(m[0]*m[0]+m[8]*m[8]-.0625f)>1e-6f) {
+            diagnostic="Diagnostic pair supports only finite quarter-scale yaw/translation transforms.";return false;
+        }
+    }
+    if(transforms[0]==transforms[1] || transforms[0][8]==0.f || transforms[1][8]==0.f) {
+        diagnostic="Diagnostic pair requires two distinct nonidentity yaw/translation placements.";return false;
+    }
+    diagnosticPreviewPairMaster_=std::move(master);diagnosticPreviewPairTransforms_=transforms;
+    diagnosticPreviewPairShared_=sharedInstances;diagnostic.clear();return true;
+}
+
+PresentableTinyRtScene::DiagnosticPreviewMeshPairEvidence PresentableTinyRtScene::DiagnosticPreviewMeshPair() const
+{
+    DiagnosticPreviewMeshPairEvidence out{};
+    out.active=diagnosticPreviewPairActive_;out.sharedInstances=diagnosticPreviewPairShared_;
+    out.authoredTransforms=diagnosticPreviewPairTransforms_;
+    if(!out.active)return out;
+    const auto& asset=diagnosticPreviewPairShared_?*diagnosticPreviewPairMaster_:diagnosticPreviewPairBaked_;
+    out.vertexBytes=asset.vertices.size()*sizeof(horde::scene::assets::StaticRtVertex);
+    out.indexBytes=asset.indices.size()*sizeof(std::uint32_t);
+    out.blasBytes=diagnosticPreviewPairBlas_.backing.allocationSize;
+    out.buildScratchAllocationBytes=diagnosticPreviewPairScratchPeak_;
+    out.buildMilliseconds=diagnosticPreviewPairBuildMilliseconds_;
+    const auto& metadata=staticMeshSlot_.InstanceMetadata()[kDiagnosticPreviewPairMetadataIndex];
+    out.primitiveCount=metadata.primitiveCount;out.physicalCount=diagnosticPreviewPairShared_?2u:1u;
+    out.definitionsValid=tlasInstanceDefinitionsValid_;
+    for(unsigned i=0;i<out.physicalCount;++i) {
+        const auto& instance=tlasBuiltInstances_[7u+i];
+        out.transforms[i]=instance.transform;
+        out.referencesOwnedBlas[i]=instance.accelerationStructureReference==diagnosticPreviewPairBlas_.address &&
+            diagnosticPreviewPairBlas_.address!=0 && instance.instanceCustomIndex==kDiagnosticPreviewPairMetadataIndex && instance.mask==1u;
+    }
+    for(unsigned i=0;i<std::min(metadata.primitiveCount,3u);++i) {
+        const auto& p=staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase+i];
+        out.textureLayers[i]=staticMeshSlot_.Materials()[p.materialIndex].textureLayers;
+    }
+    return out;
+}
+#endif
 
 bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         VkPhysicalDevice physicalDevice,
@@ -909,6 +995,11 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
     initialiseMeasurements_ = {};
     InitialiseAttemptTimer totalAttemptTimer(initialiseMeasurements_);
     sceneProfile_ = sceneProfile;
+#if defined(_DEBUG)
+    if(diagnosticPreviewPairMaster_ && sceneProfile_!=RtSceneProfile::GraphicsPreview) {
+        diagnostic="Diagnostic preview pair cannot initialize a gameplay or entry scene.";return false;
+    }
+#endif
     glassEnabled_ = glassEnabled;
     instance_ = instance;
     physicalDevice_ = physicalDevice;
@@ -1081,6 +1172,9 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
             return CreateSelectedPipelineBundle(diagnostic);
         }))
     {
+#if defined(_DEBUG)
+        if(diagnosticPreviewPairBuild_.submitted)return false; // Retain until platform proves successful device idle.
+#endif
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
         if(regionPagePreparation_) {
             const auto phase=regionPagePreparation_->Status();
@@ -1170,6 +1264,12 @@ void PresentableTinyRtScene::Destroy()
     if (device_ != VK_NULL_HANDLE)
         RetireRtGpuWorkAfterIdle({device_, queue_, commandPool_}, keeperTextureUploadRecovery_.work);
     else keeperTextureUploadRecovery_.work = {};
+#if defined(_DEBUG)
+    if(device_!=VK_NULL_HANDLE)RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},diagnosticPreviewPairBuild_);
+    else diagnosticPreviewPairBuild_={};
+    diagnosticPreviewPairActive_=false;diagnosticPreviewPairBaked_={};
+    diagnosticPreviewPairScratchPeak_=0;diagnosticPreviewPairBuildMilliseconds_=0.;
+#endif
     DestroyBuffer(keeperTextureUploadRecovery_.staging);
     for (auto& texture : keeperTextureRestoreQuarantine_) DestroyTextureArray(texture);
     keeperTextureLifetime_ = {};
@@ -1233,6 +1333,10 @@ void PresentableTinyRtScene::Destroy()
     pipelineBundle_.Reset();
     compiledPipelineCache_ = nullptr;
     DestroyAccelerationStructure(tlas_);
+#if defined(_DEBUG)
+    DestroyAccelerationStructure(diagnosticPreviewPairBlas_);
+    DestroyBuffer(diagnosticPreviewPairScratch_);
+#endif
     DestroyBuffer(tlasUpdateScratch_);
     DestroyBuffer(rescueWorldUpdateScratch_);
     DestroyBuffer(waterDropletBlasUpdateScratch_);
@@ -1446,6 +1550,9 @@ PresentableTinyRtScene::CaptureResourceHandles() const
     append(result.bottomLevelAccelerationStructures,
            characterSlot_.LichGpu().accelerationStructure.handle);
     append(result.topLevelAccelerationStructures, tlas_.handle);
+#if defined(_DEBUG)
+    append(result.bottomLevelAccelerationStructures,diagnosticPreviewPairBlas_.handle);
+#endif
     for (const auto strategy : {RtMaterialStrategy::OpaqueFast,
                                RtMaterialStrategy::GenericDielectric})
     {
@@ -1507,6 +1614,10 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
         AccumulateRtResourceCount(inventory.topLevelAccelerationStructureCount);
         inventory.tlasInstanceCount = tlasInstanceCount_;
     }
+#if defined(_DEBUG)
+    accumulateBlas(diagnosticPreviewPairBlas_);
+    AccumulateRtGpuBuffer(inventory,diagnosticPreviewPairScratch_);
+#endif
     if (preparedStaticGeometry_) {
         const auto& candidate = *preparedStaticGeometry_;
         if (candidate.uploads) candidate.uploads->AccumulateResourceInventory(inventory);
@@ -2882,14 +2993,75 @@ bool PresentableTinyRtScene::LoadPreviewStaticAssets(const std::string& producti
     viewmodelAvailable_ = false;
     playerBodyRemainderAvailable_ = false;
     staticTextureDirectory_ = (root / "textures/props/runtime").string();
-    const std::array<StaticRtAssetRegistration, 4u> registrations{{
+    std::vector<StaticRtAssetRegistration> registrations{
         {1u, 0x544f5243u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &productionTorchAsset_},
         {9u, 0x474c4153u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
             static_cast<std::uint32_t>(RtInstanceFlag::Transmissive), 0u, &productionDielectricFixtureAsset_},
         {7u, 0x4c4e5247u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &rewardLanternRingAsset_},
         {8u, 0x4c4e4244u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
             static_cast<std::uint32_t>(RtInstanceFlag::Transmissive), 1u, &rewardLanternBodyAsset_},
-    }};
+    };
+#if defined(_DEBUG)
+    if(diagnosticPreviewPairMaster_ && !entry) {
+        const auto& source=*diagnosticPreviewPairMaster_;
+        if(!diagnosticPreviewPairShared_) {
+            auto& baked=diagnosticPreviewPairBaked_;
+            baked=source;baked.vertices.clear();baked.indices.clear();baked.triangleRegions.clear();
+            baked.primitives.clear();baked.nodeTransforms.clear();baked.sockets.clear();
+            baked.bounds.minimum.fill(std::numeric_limits<float>::max());
+            baked.bounds.maximum.fill(std::numeric_limits<float>::lowest());
+            for(const auto& primitive:source.primitives) {
+                auto end=source.vertices.size();
+                for(const auto& next:source.primitives)if(next.vertexOffset>primitive.vertexOffset)end=std::min(end,std::size_t(next.vertexOffset));
+                if(primitive.vertexOffset>=end || end>source.vertices.size() || !primitive.indexCount || primitive.indexCount%3u ||
+                   primitive.indexOffset>source.indices.size() || primitive.indexCount>source.indices.size()-primitive.indexOffset ||
+                   primitive.materialIndex>=source.materials.size()) {
+                    diagnostic="Diagnostic pair master has an invalid primitive span.";return false;
+                }
+                auto out=primitive;out.vertexOffset=static_cast<std::uint32_t>(baked.vertices.size());
+                out.indexOffset=static_cast<std::uint32_t>(baked.indices.size());out.indexCount=primitive.indexCount*2u;
+                out.nodeTransformIndex=static_cast<std::uint32_t>(baked.nodeTransforms.size());
+                for(const auto& transform:diagnosticPreviewPairTransforms_) {
+                    const auto localBase=static_cast<std::uint32_t>(baked.vertices.size())-out.vertexOffset;
+                    for(auto i=std::size_t(primitive.vertexOffset);i<end;++i) {
+                        auto vertex=source.vertices[i];
+                        const auto apply=[&](const auto& value,bool position) {
+                            std::array<float,3> result{};
+                            for(unsigned axis=0;axis<3;++axis)result[axis]=
+                                (transform[axis]*value[0]+transform[4+axis]*value[1]+transform[8+axis]*value[2])/(position?1.f:.25f)+
+                                (position?transform[12+axis]:0.f);
+                            return result;
+                        };
+                        const auto p=apply(vertex.position,true),n=apply(vertex.normal,false),t=apply(vertex.tangent,false);
+                        for(unsigned axis=0;axis<3;++axis) {
+                            vertex.position[axis]=p[axis];vertex.normal[axis]=n[axis];vertex.tangent[axis]=t[axis];
+                            baked.bounds.minimum[axis]=std::min(baked.bounds.minimum[axis],p[axis]);
+                            baked.bounds.maximum[axis]=std::max(baked.bounds.maximum[axis],p[axis]);
+                        }
+                        baked.vertices.push_back(vertex);
+                    }
+                    for(std::size_t i=primitive.indexOffset;i<primitive.indexOffset+primitive.indexCount;++i) {
+                        if(source.indices[i]>=end-primitive.vertexOffset){diagnostic="Diagnostic pair master index is out of range.";return false;}
+                        baked.indices.push_back(localBase+source.indices[i]);
+                    }
+                    // Unclassified source suffixes are Shared by the existing
+                    // mesh contract; the admitted GLB may have no region array.
+                    for(std::size_t triangle=primitive.indexOffset/3u;
+                        triangle<(primitive.indexOffset+primitive.indexCount)/3u;++triangle)
+                        baked.triangleRegions.push_back(triangle<source.triangleRegions.size()
+                            ?source.triangleRegions[triangle]
+                            :horde::scene::assets::StaticTriangleRegion::Shared);
+                }
+                baked.primitives.push_back(out);
+                baked.nodeTransforms.push_back({"diagnostic-preview-pair-baked",horde::gameplay::items::IdentityHeldItemTransform()});
+            }
+        }
+        registrations.push_back({kDiagnosticPreviewPairMetadataIndex,0x50504149u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0u,
+            diagnosticPreviewPairShared_?diagnosticPreviewPairMaster_.get():&diagnosticPreviewPairBaked_});
+        diagnosticPreviewPairActive_=true;
+    }
+#endif
     const std::array<StaticRtAssetRegistration, 2u> entryRegistrations{
         {registrations[2], registrations[3]}};
     if (!staticMeshSlot_.Initialize(
@@ -3111,7 +3283,11 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     if (!genericStaticAssetEnabled_) return true;
     const RtTextureArrayCounts textureCounts = staticMeshSlot_.TextureArrayCounts();
     const auto selection = SelectRtStaticTextureLayers(
-        sceneProfile_, productionHeldItemAssetsEnabled_, developmentRescueJourney_);
+        sceneProfile_, productionHeldItemAssetsEnabled_, developmentRescueJourney_
+#if defined(_DEBUG)
+        ,diagnosticPreviewPairActive_
+#endif
+        );
     const bool chapterLayout = selection.appendTerrain;
     const auto baseLayers = selection.baseColor;
     const auto normalOrmLayers = selection.normalOrm;
@@ -3378,7 +3554,8 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
                       {&world, 1u}, {&range, 1u}, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
                       fast, waterfallBlas_, nullptr, diagnostic))
         return false;
-    const auto buildStatic = [this, fast, &diagnostic](std::uint32_t id, AccelerationStructure& target) {
+    const auto buildStatic = [this, fast, &diagnostic](std::uint32_t id, AccelerationStructure& target,
+        Buffer* scratch=nullptr,RtGpuWorkLease* work=nullptr) {
         const auto instance = staticMeshSlot_.InstanceMetadata()[id];
         std::vector<VkAccelerationStructureGeometryKHR> geometries;
         std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
@@ -3405,7 +3582,7 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
             ranges.push_back(range);
         }
         return BuildProfileAccelerationStructure(geometries, ranges, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
-                                                  fast, target, nullptr, diagnostic);
+                                                  fast, target, scratch, diagnostic,nullptr,work);
     };
     if ((!entry && !buildStatic(1u, torchBlas_)) || !buildStatic(7u, rewardLanternRingBlas_) ||
         !buildStatic(8u, rewardLanternBodyBlas_) ||
@@ -3440,7 +3617,28 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
                 updatable, skeleton.accelerationStructure, &skeleton.updateScratch, diagnostic))
             return false;
     }
+#if defined(_DEBUG)
+    if(diagnosticPreviewPairActive_) {
+        // Reuse the same generic three-geometry PBR builder, with owned scratch
+        // and command/fence lease retained if submission completion is uncertain.
+        const auto start=std::chrono::steady_clock::now();
+        const bool built=buildStatic(kDiagnosticPreviewPairMetadataIndex,diagnosticPreviewPairBlas_,
+            &diagnosticPreviewPairScratch_,&diagnosticPreviewPairBuild_);
+        diagnosticPreviewPairScratchPeak_=diagnosticPreviewPairScratch_.allocationSize;
+        if(!built)return false;
+        if(vkQueueWaitIdle(queue_)!=VK_SUCCESS) {
+            diagnosticPreviewPairBuild_.completionUnproved=true;
+            diagnostic="Diagnostic pair BLAS has unproved GPU completion; platform retirement is required.";return false;
+        }
+        RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},diagnosticPreviewPairBuild_);
+        DestroyBuffer(diagnosticPreviewPairScratch_);
+        diagnosticPreviewPairBuildMilliseconds_=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
+    }
+#endif
     tlasInstanceCount_ = entry ? 3u : 7u;
+#if defined(_DEBUG)
+    if(diagnosticPreviewPairActive_)tlasInstanceCount_+=diagnosticPreviewPairShared_?2u:1u;
+#endif
     auto& instances = tlasBuiltInstances_;
     instances = {};
     const auto identity = horde::gameplay::items::IdentityHeldItemTransform();
@@ -3475,6 +3673,14 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
         instances[6] = instance(19u, waterfallBlas_.address, previewTransforms_[4]);
         ApplyGlassFixtureVisibility(std::span(instances).first(tlasInstanceCount_));
     }
+#if defined(_DEBUG)
+    if(diagnosticPreviewPairActive_) {
+        instances[7]=instance(kDiagnosticPreviewPairMetadataIndex,diagnosticPreviewPairBlas_.address,
+            diagnosticPreviewPairShared_?diagnosticPreviewPairTransforms_[0]:identity);
+        if(diagnosticPreviewPairShared_)instances[8]=instance(kDiagnosticPreviewPairMetadataIndex,
+            diagnosticPreviewPairBlas_.address,diagnosticPreviewPairTransforms_[1]);
+    }
+#endif
     if (!upload(instances.data(), tlasInstanceCount_ * sizeof(instances[0]),
                 VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
                 true, "preview TLAS instances", instanceBuffer_, true)) return false;
@@ -6252,7 +6458,11 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
     uploadedQualityControlsValid_ = false;
     uploadedFireEmittersValid_ = false;
     const bool entry = sceneProfile_ == RtSceneProfile::EntryMenu;
-    if (tlasInstanceCount_ != (entry ? 3u : 7u) || tlas_.handle == VK_NULL_HANDLE ||
+    auto expectedInstances=entry?3u:7u;
+#if defined(_DEBUG)
+    if(diagnosticPreviewPairActive_)expectedInstances+=diagnosticPreviewPairShared_?2u:1u;
+#endif
+    if (tlasInstanceCount_ != expectedInstances || tlas_.handle == VK_NULL_HANDLE ||
         (!entry &&
          (frame.skeletonEnemyCount != 1u ||
           frame.roster.selectedEnemy != horde::gameplay::EnemyKind::Skeleton ||

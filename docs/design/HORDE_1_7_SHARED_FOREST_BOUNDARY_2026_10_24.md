@@ -10,7 +10,9 @@ The new `PreparedForestDressing` separates two immutable asset-local payloads, c
 
 Normal gameplay continues through the same four-group bake. The ribbon and native-terrain semantic receipts match the sealed control. This is CPU ownership/preparation evidence only; no VRAM reduction, RT speedup, surrounding forest completion or streaming acceptance follows from it.
 
-## Small next RT proof
+## Bounded RT proof now implemented
+
+The [actual pair checkpoint](../evidence/2026-10-24-shared-blas-pair/README.md) now demonstrates shared resources, direct-view equivalence, frozen/reset consistency and same-owner recreation. It establishes no speed gain. Room props/foreground trees prevent a clear isolated reflection witness, so full secondary appearance, unit-scale route use and Android remain open. The explicit proof below remains separate from production forest adoption.
 
 Use a named diagnostic-only generic static-mesh pair in the existing preview room. Retain all seven ordinary roles and keep ordinary preview behavior unchanged. One pine master can be held through an aliasing immutable prepared-owner handle. Use identical canonical materials, texture subsets and two nonidentity transforms in both variants:
 
@@ -29,7 +31,9 @@ Measure actual allocation bytes, immutable BLAS ownership, TLAS overhead, comple
 
 ## Boundary before full production adoption
 
-Production currently uses all 13 unique static-asset owner slots. Full 64-placement TLAS use also exceeds the current 28-definition storage capacity. These are explicit engine storage/ABI capacities, not evidence of a hardware limit or acceptable frame cost. Reuse packed owner payloads and shared metadata where appropriate; do not add 64 material/metadata rows unnecessarily.
+Production currently uses all 13 unique static-asset owner slots, 31 packed primitive rows and 30 packed materials; Showcase appends two world-material records, filling the final 32-material budget. Full 64-placement TLAS use also exceeds the current 28-definition storage capacity. ForestBark includes deadwood and ForestAlder includes understory, so replacing trees cannot simply remove all four groups. Retaining those two non-tree groups and appending six master primitive mappings yields 35 rows (31 minus two plus six), above the current 32-row capacity. Reusing the existing four canonical material rows can avoid material growth.
+
+These are explicit engine storage/ABI capacities, not evidence of a hardware limit or acceptable frame cost. Existing per-owner primitive ranges can reuse one aggregate asset pointer without adding unique asset owners. Reuse packed payloads and shared metadata where appropriate; do not add 64 material/metadata rows unnecessarily. No production capacity change is admitted by the room proof.
 
 Before changing those capacities or the normal forest route, account for primitive/material headroom, immutable BLAS lifetime, per-frame transform ownership, selected-region publication and recreation failure. Reprove ordinary-static omission provenance: its existing baked-forest certificate must never be bypassed. A hidden tree can still contribute RT shadows and reflections; visual terrain occlusion alone does not remove CPU/GPU/residency work.
 

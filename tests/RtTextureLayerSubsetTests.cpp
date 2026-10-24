@@ -4,6 +4,7 @@
 #include "vulkan/raytracing/RtStaticTextureSelection.h"
 
 #include <array>
+#include <algorithm>
 #include <iostream>
 #include <limits>
 #include <cstring>
@@ -35,6 +36,16 @@ int main(int argc,char** argv)
     const auto chapter=SelectRtStaticTextureLayers(RtSceneProfile::Showcase,true,true);
     check(chapter.baseColor.size()==15 && chapter.normalOrm.size()==12 && chapter.appendTerrain &&
           chapter.aliases.size()==3,"chapter keeps deduplicated layers and terrain addition");
+    const auto pair=SelectRtStaticTextureLayers(RtSceneProfile::GraphicsPreview,true,false,true);
+    const std::array<std::uint32_t,6> pairBase{1,8,9,14,15,16};
+    const std::array<std::uint32_t,4> pairNormal{1,8,9,14};
+    check(pair.baseColor.size()==pairBase.size() && pair.normalOrm.size()==pairNormal.size() &&
+          std::equal(pair.baseColor.begin(),pair.baseColor.end(),pairBase.begin()) &&
+          std::equal(pair.normalOrm.begin(),pair.normalOrm.end(),pairNormal.begin()) &&
+          !pair.appendTerrain && pair.aliases.empty(),"explicit pine pair reuses exact packaged Bark/Pine/Moss atlas rows");
+    check(SelectRtStaticTextureLayers(RtSceneProfile::Showcase,true,false,true).baseColor.size()==14 &&
+          SelectRtStaticTextureLayers(RtSceneProfile::EntryMenu,true,false,true).baseColor.size()==2,
+          "pair flag cannot change normal Showcase or entry texture routing");
     const std::array<std::uint8_t, 12> source{10,11,12,13,20,21,22,23,30,31,32,33};
     const std::array<std::uint32_t, 3> reorder{2,0,2};
     std::vector<std::uint8_t> destination{99};

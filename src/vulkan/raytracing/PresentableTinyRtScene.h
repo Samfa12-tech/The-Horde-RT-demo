@@ -305,6 +305,25 @@ public:
                     RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr);
 
     void Destroy();
+#if defined(_DEBUG)
+    // Explicit isolated GraphicsPreview proof only. Configuration survives
+    // Initialise's initial Destroy; the aliasing handle owns the admitted master.
+    bool SetDiagnosticPreviewMeshPair(std::shared_ptr<const horde::scene::assets::StaticMeshAsset> master,
+        const std::array<horde::gameplay::items::HeldItemTransform,2>& transforms,
+        bool sharedInstances, std::string& diagnostic);
+    struct DiagnosticPreviewMeshPairEvidence {
+        bool active=false, sharedInstances=false, definitionsValid=false;
+        std::uint32_t physicalCount=0, primitiveCount=0;
+        std::uint64_t vertexBytes=0,indexBytes=0,blasBytes=0;
+        std::uint64_t buildScratchAllocationBytes=0;
+        double buildMilliseconds=0.;
+        std::array<VkTransformMatrixKHR,2> transforms{};
+        std::array<horde::gameplay::items::HeldItemTransform,2> authoredTransforms{};
+        std::array<bool,2> referencesOwnedBlas{};
+        std::array<std::array<std::uint32_t,4>,3> textureLayers{};
+    };
+    DiagnosticPreviewMeshPairEvidence DiagnosticPreviewMeshPair() const;
+#endif
     std::optional<horde::gameplay::dialogue::CompanionMotionPose> ChapterCompanionPublishedMotion() const {
         return thirdActorIsCompanion_?chapterActorMotion_:std::nullopt;
     }
@@ -1262,6 +1281,18 @@ private:
     std::uint32_t tlasInstanceCount_ = kTlasInstanceCount;
     std::array<horde::gameplay::items::HeldItemTransform, 5u> previewTransforms_{};
     std::array<horde::gameplay::effects::FireEmitterFixedStepInput, 2u> previewFireInputs_{};
+#if defined(_DEBUG)
+    static constexpr std::uint32_t kDiagnosticPreviewPairMetadataIndex = 3u;
+    std::shared_ptr<const horde::scene::assets::StaticMeshAsset> diagnosticPreviewPairMaster_;
+    std::array<horde::gameplay::items::HeldItemTransform,2> diagnosticPreviewPairTransforms_{};
+    bool diagnosticPreviewPairShared_=false,diagnosticPreviewPairActive_=false;
+    horde::scene::assets::StaticMeshAsset diagnosticPreviewPairBaked_;
+    AccelerationStructure diagnosticPreviewPairBlas_{};
+    Buffer diagnosticPreviewPairScratch_{};
+    RtGpuWorkLease diagnosticPreviewPairBuild_{};
+    VkDeviceSize diagnosticPreviewPairScratchPeak_=0;
+    double diagnosticPreviewPairBuildMilliseconds_=0.;
+#endif
     VkDeviceSize scratchAddressAlignment_ = 0u;
     CharacterRenderSlot characterSlot_;
     horde::scene::assets::SkinnedPbrActor chapterActor_;

@@ -1,6 +1,6 @@
 # Horde 1.7 implementation remaining - 24 October 2026
 
-Current implementation checkpoints: forest preparation `3108cffc` and Android Custom ownership `9ab88eb0`. Last verified green hosted basis: `6797e9d3c6ca06fafeb456d44a109e6db6ff1f7a`, all six jobs in [40078168270](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40078168270). New-head CI must be checked separately. This is the current implementation map; earlier dated checkpoints retain their failures and their own acceptance boundaries. It does not declare 1.7 finished or ready for release.
+Current implementation checkpoints: forest preparation `3108cffc` and Android Custom ownership `9ab88eb0`. The reconciled head `09c629cf0b120fe61b9144f0d3e29cd53f3458e0` passed all six jobs in [40089409465](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40089409465). The later shared-pair proof has its own local evidence; new-head CI must be checked separately. This is the current implementation map; earlier dated checkpoints retain their failures and their own acceptance boundaries. It does not declare 1.7 finished or ready for release.
 
 Working folder: `C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof`, existing draft PR27 branch. The 151 parked owner files, owner saves/settings and unrelated work remain separate. Phone is away. No merge, release, deployment, spending or security changes are authorized.
 
@@ -48,7 +48,7 @@ Phone acceptance remains for the current HUD, earned equipment rotation, natural
 
 ## Execution queue
 
-1. Establish a bounded existing-master forest ownership design and its exact budget/deferral boundary; do not confuse current material batching with completion.
+1. Continue from the [actual shared-pair proof](../evidence/2026-10-24-shared-blas-pair/README.md) into the concrete packed-range/capacity design, preserving non-tree Bark/Alder geometry; then full-size route proof and one F01 background sector. Do not confuse the room's resource-sharing result with the visible forest-depth goal.
 2. In parallel, finish the Android opening-menu benchmark ownership/profile seam using existing lifecycle APIs, with focused contracts/builds and phone acceptance explicitly pending.
 3. Author one separate compact-carry feasibility proof if existing rig/tools support it, before any further torch runtime candidate.
 4. Carry owner/design decisions and physical acceptance as explicit blockers, while continuing independent source work. Do not stop solely because an earlier checkpoint is clean.

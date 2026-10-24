@@ -1,5 +1,7 @@
 #include "graphics/GraphicsPreviewSession.h"
 #include "platform/windows/WindowsGraphicsPreviewCapture.h"
+#include "platform/windows/WindowsPreviewMeshPairCapture.h"
+#include "platform/windows/WindowsHiddenCaptureLaunch.h"
 
 #include <cmath>
 #include <iostream>
@@ -17,6 +19,21 @@ void Check(const bool condition, const char* message)
 int main()
 {
     using namespace horde::platform::windows;
+    const std::array<std::wstring_view,3> pairArgs{L"--capture-hidden-preview-pair",L"shared",L"C:\\captures\\pair"};
+    Check(ParsePreviewMeshPairCaptureLaunch(pairArgs,true).mode==PreviewMeshPairCaptureMode::Shared &&
+          ParsePreviewMeshPairCaptureLaunch(pairArgs,true).error.empty(),"explicit Debug hidden shared pair parses");
+    Check(!ParsePreviewMeshPairCaptureLaunch(pairArgs,false).error.empty(),"Release rejects hidden pair");
+    auto invalidPair=pairArgs;invalidPair[1]=L"other";
+    Check(!ParsePreviewMeshPairCaptureLaunch(invalidPair,true).error.empty(),"unknown pair mode rejected");
+    invalidPair=pairArgs;invalidPair[2]=L"relative";
+    Check(!ParsePreviewMeshPairCaptureLaunch(invalidPair,true).error.empty(),"relative pair output rejected");
+    const std::array<std::wstring_view,4> mixedPair{pairArgs[0],pairArgs[1],pairArgs[2],L"--capture-hidden"};
+    Check(!ParsePreviewMeshPairCaptureLaunch(mixedPair,true).error.empty(),"pair cannot weaken generic hidden guard");
+    const std::array<std::wstring_view,3> oldHiddenPreview{L"--capture-hidden",L"--capture-graphics-preview",L"C:\\captures\\preview"};
+    Check(!ParseWindowsHiddenCaptureLaunch(oldHiddenPreview,true).error.empty(),"ordinary hidden-preview incompatibility remains");
+    const std::array<std::wstring_view,6> repeatedPair{pairArgs[0],pairArgs[1],pairArgs[2],pairArgs[0],L"baked",pairArgs[2]};
+    Check(!ParsePreviewMeshPairCaptureLaunch(repeatedPair,true).error.empty(),"duplicate pair request rejected");
+    Check(!ParsePreviewMeshPairCaptureLaunch(std::span(pairArgs).first(2),true).error.empty(),"missing pair output rejected");
     const std::array<std::wstring_view, 2u> captureArguments{L"--capture-graphics-preview", L"C:\\captures\\preview"};
     Check(ParseGraphicsPreviewCaptureLaunch(captureArguments).requested &&
           ParseGraphicsPreviewCaptureLaunch(captureArguments).error.empty(), "absolute isolated Debug capture arguments parse");
