@@ -1710,7 +1710,8 @@ public class MainActivity extends Activity {
         for(int i=0;i<3;i++) {
             final int slot=i;
             TextView slotTitle=new TextView(this);
-            slotTitle.setText("Slot "+(slot+1)+(shown!=null && shown.activeSlot==slot ? " · Current game" : ""));
+            slotTitle.setText(getString(shown!=null && shown.activeSlot==slot ?
+                    R.string.campaign_slot_current_title : R.string.campaign_slot_title,slot+1));
             slotTitle.setTextSize(17);slotTitle.setTypeface(Typeface.SANS_SERIF,Typeface.BOLD);
             slotTitle.setTextColor(HordeUiTokens.PARCHMENT);slotTitle.setPadding(0,dp(14),0,dp(4));
             panel.addView(slotTitle,matchWrap());

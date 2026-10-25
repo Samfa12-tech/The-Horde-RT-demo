@@ -234,6 +234,8 @@
     <string name="controller_play_prompts">Swing: RT / X · Parry / hold guard: LT · Dodge red attacks: B · Menu: Start</string>
     <string name="controller_flask_drink">D-pad Up: Drink %1$d / %2$d</string>
     <string name="controller_flask_rest">D-pad Down: Rest (2 sec)</string>
+    <string name="campaign_slot_title">Slot %1$d</string>
+    <string name="campaign_slot_current_title">Slot %1$d · Current game</string>
     <string name="crouch">Crouch</string>
     <string name="stand">Stand</string>
     <string name="crouching_blocked">Crouching (ceiling)</string>
