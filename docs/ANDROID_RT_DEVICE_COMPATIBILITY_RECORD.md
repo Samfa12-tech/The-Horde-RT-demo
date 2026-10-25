@@ -3653,3 +3653,21 @@ Swing/Parry prominence after comparative mobile-game research; no redesign yet.
 Released19:27:12UTC: both original APK hashes,18 prior save/lock files, preference
 bytes and original system settings verified restored; zero new save paths; no
 owned app renderer, installation, capture or transfer. No phone calls afterwards.
+
+
+### 25 October 2026: current combat HUD and handled rotation
+
+SM-S948B Android17/API37; ordinary Diagnostic/Mobile Debug build from
+`9d799fd1`, APK `82cbfad2c2374127455edbb45d4554991515a2acad00c4f037596a7b22a9a625`.
+Bounded actual RT equipment-fixture/HUD evidence: new sword/shield controls
+visible in portrait and landscape; enabled lantern retained through handled
+portrait→landscape→portrait, with one observed Lower tap and lowered pose/label
+retained on return. Same surfaceGeneration1; not full surface recreation or
+naturally earned progression. No combat/look inputs or multi-touch were issued.
+Thumb feel, simultaneous input, Kit route/save and performance remain untested.
+[Captures, exact build and limitations](evidence/2026-10-25-combat-hud-phone/README.md).
+
+Phone released04:07:35UTC: both original APK hashes,18prior save/lock files,
+preference bytes and system settings verified restored; zero new save paths,
+no owned app PID/rendering surface/install/capture/transfer. Development paused;
+no subsequent phone operations. Existing compatibility/evidence classes remain.
