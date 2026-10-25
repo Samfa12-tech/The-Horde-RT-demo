@@ -7,8 +7,9 @@ The local build passed. Prepared APK: `reports/phone-preparation-20261025/Horde-
 `82cbfad2c2374127455edbb45d4554991515a2acad00c4f037596a7b22a9a625`.
 All four ABI ELF identities, packaged production GLBs, manifest and public Debug
 certificate checks pass. Windows restoration build and focused ABI test pass.
-No renderer was launched. Fresh assembly reproduced the existing ordinary Debug
-APK byte-for-byte; this preparation adds no runtime change.
+No renderer was launched. Fresh assembly produced a different APK hash from the
+previous local artifact; its manifest and certificate match. This preparation
+adds no runtime source change, and no byte-for-byte reproducibility is claimed.
 
 All six exact-head CI jobs passed in
 [40140416126](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40140416126).
