@@ -143,8 +143,11 @@ public:
     }
     void Update(bool enabled, bool optionalSlowdown, bool suspended,
                 const CombatSnapshot& combat, const LichSnapshot& keeper,
-                EnemyKind selectedEnemy)
+                EnemyKind selectedEnemy, bool rulesActive = true)
     {
+        // A legacy/frozen rule profile is eligibility, not a user exit. Keep
+        // learned progress, requested preference and explicit pending Skip.
+        if (!rulesActive) { CancelTransient(); return; }
         // Turning teaching off is also a deliberate exit, committed at the same
         // safe boundary. Keep the protection label until that acknowledgement.
         if (!enabled && snapshot_.enabled && Learning()) snapshot_.exitPending = true;

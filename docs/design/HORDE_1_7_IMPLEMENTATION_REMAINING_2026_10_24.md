@@ -11,6 +11,12 @@ scream/revival bridge is still unfinished, both failed joins stay disabled, and
 the exact ring-capacity decision remains pending. This is a source checkpoint,
 not physical-phone, audio/balance or natural-journey acceptance.
 
+Exact a2bc755a hosted CI later failed the motion retry/reward gate in all three
+compilers. The [eligibility correction](../evidence/2026-10-25-practice-eligibility-fix/README.md)
+preserves practice intent through legacy capture eligibility and ordinary Retry;
+all six affected local gates pass, with replacement exact-head CI still required.
+The post-retry motion fixture is practice-protected, not live balance acceptance.
+
 This update supersedes older device/guard acceptance wording below, without
 turning the historical checkpoints into newer evidence. Sam accepts the held
 guard and attack-return animation on installed `f27982cd`; broader damage,

@@ -1,5 +1,10 @@
 # Four-skill practice and shared attack authority
 
+Later exact-head CI found an eligibility/intent regression in the motion
+retry/reward fixture. Its [narrow correction and retained failure](../2026-10-25-practice-eligibility-fix/README.md)
+separate an inactive rule profile from a human Skip, without changing the scenario
+or its gates. This local checkpoint's five passing tests were not full CI.
+
 Base `51af5c26e14700574b2217d36324c547a6b5d9d4` passed all six hosted checks
 in [40193192999](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40193192999).
 This checkpoint implements the approved rule/teaching slice independently of the

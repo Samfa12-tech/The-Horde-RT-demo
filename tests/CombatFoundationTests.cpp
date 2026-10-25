@@ -1678,7 +1678,58 @@ void RouteMeleeOcclusion() {
                      clearMoving.Snapshot().combatants[0].z+5.60f)>.01f,
           "clear moving target advances and receives exactly one forgiving hit");
 }
+void RulesEligibilityDoesNotChoosePracticeExit() {
+    // A frozen/legacy checkpoint can suppress current mechanics without the
+    // human choosing Skip. Its subsequent ordinary Retry returns to the same
+    // still-requested lesson; it does not invent any completed skills.
+    GameSimulation sim(Rules()); InputSnapshot input;
+    Check(sim.ApplyShowcaseCheckpoint(0),"eligibility fixture imports the existing legacy checkpoint");
+    sim.StepFixed(input);
+    const auto inactive=sim.Snapshot().combatTeaching;
+    Check(!sim.Snapshot().modernCombatRules && !inactive.safePractice && !inactive.exitPending &&
+          inactive.stage==TutorialStage::Block && !inactive.blockLearned && !inactive.parryLearned,
+          "inactive rules suppress practice without recording a user exit or invented skills");
+    sim.RetryEncounter(); sim.StepFixed(input);
+    Check(sim.Snapshot().modernCombatRules && sim.Snapshot().combatTeaching.enabled &&
+          sim.Snapshot().combatTeaching.safePractice && sim.Snapshot().combatTeaching.stage==TutorialStage::Block,
+          "ordinary retry reactivates the unchanged requested four-skill practice");
+    input.tutorialEnabled=false; sim.StepFixed(input);
+    Check(sim.Snapshot().combatTeaching.stage==TutorialStage::Skipped && !sim.Snapshot().combatTeaching.safePractice,
+          "an actual user disable still commits its safe exit under active rules");
+    input.tutorialEnabled=true;
+    Check(sim.ApplyShowcaseCheckpoint(0),"explicit-skip persistence fixture imports legacy eligibility");
+    sim.StepFixed(input); sim.RetryEncounter(); sim.StepFixed(input);
+    Check(sim.Snapshot().combatTeaching.stage==TutorialStage::Skipped && !sim.Snapshot().combatTeaching.safePractice,
+          "eligibility changes cannot undo an actual user Skip or grant new immunity");
+
+    auto config=Rules();config.waterfallSkeletonEncounter=false;config.playerStartX=0;config.playerStartZ=-3.75f;
+    GameSimulation learned(config);InputSnapshot learning;
+    Check(LearnBlockFromRealContact(learned,learning),"progress preservation begins with an actual blocked contact");
+    learning.guardHeld=false; learned.StepFixed(learning);
+    Check(learned.ApplyShowcaseCheckpoint(0),"learned-progress fixture imports a legacy checkpoint");
+    learned.StepFixed(learning);
+    Check(learned.Snapshot().combatTeaching.blockLearned && learned.Snapshot().combatTeaching.stage==TutorialStage::Parry &&
+          !learned.Snapshot().combatTeaching.safePractice && !learned.Snapshot().combatTeaching.exitPending,
+          "ineligible rules retain actual learned progress without choosing Skip");
+    learned.RetryEncounter();learned.StepFixed(learning);
+    Check(learned.Snapshot().combatTeaching.blockLearned && learned.Snapshot().combatTeaching.stage==TutorialStage::Parry &&
+          learned.Snapshot().combatTeaching.safePractice,
+          "retry resumes the next genuine lesson rather than resetting or fabricating flags");
+
+    CombatTeaching teaching;teaching.Reset(true);CombatSnapshot combat;LichSnapshot keeper;
+    teaching.Skip();teaching.Update(true,false,false,combat,keeper,EnemyKind::Skeleton,false);
+    Check(teaching.Snapshot().exitPending && teaching.Snapshot().stage==TutorialStage::Block && !teaching.Snapshot().safePractice,
+          "an explicit pending Skip survives inactive rules without acknowledging them as safe gameplay");
+    teaching.Update(true,false,false,combat,keeper,EnemyKind::Skeleton,true);
+    Check(teaching.Snapshot().stage==TutorialStage::Skipped && !teaching.Snapshot().safePractice,
+          "pending human Skip commits at the next active safe boundary");
+    teaching.Reset(true);teaching.Update(true,false,false,combat,keeper,EnemyKind::Skeleton,false);
+    teaching.Update(false,false,false,combat,keeper,EnemyKind::Skeleton,true);
+    Check(teaching.Snapshot().stage==TutorialStage::Skipped && !teaching.Snapshot().safePractice,
+          "a raw user disable on reactivation is not lost by changing eligibility");
+}
 int main() {
+    RulesEligibilityDoesNotChoosePracticeExit();
     WindowAndLifecycle(); TeachingContract(); AttackReadabilityContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();
     HeldGuardDamageContract(); GuardAttackAndReleaseAtContact(); GuardInterruptionRearm();
     YellowGuardBreakAndDefences(); FourSkillPracticeAndExit();

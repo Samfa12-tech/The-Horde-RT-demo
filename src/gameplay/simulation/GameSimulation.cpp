@@ -259,11 +259,11 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         return;
     }
 
-    combatTeaching_.Update(CurrentCombatRules() && input.tutorialEnabled,
+    combatTeaching_.Update(input.tutorialEnabled,
         input.tutorialSlowdownEnabled, input.paused ||
             playerVitals_.Snapshot().phase != PlayerLifePhase::Alive ||
             IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase),
-        combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_);
+        combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_, CurrentCombatRules());
     gameplayTimeScale_ = combatTeaching_.Snapshot().simulationTimeScale;
     fixedDeltaSeconds *= gameplayTimeScale_;
     const bool wasAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
@@ -2788,11 +2788,11 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         playerVitals_.Snapshot().phase != PlayerLifePhase::Alive || !SwordDefenseReady() ||
         dodgeRemainingSeconds_ > 0.0f || playerVitals_.Snapshot().invulnerabilityRemaining > 0.00001f,
         swordHitTargetThisTick_ != EntityId::Invalid);
-    combatTeaching_.Update(CurrentCombatRules() && input.tutorialEnabled,
+    combatTeaching_.Update(input.tutorialEnabled,
         input.tutorialSlowdownEnabled, input.paused ||
             playerVitals_.Snapshot().phase != PlayerLifePhase::Alive ||
             IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase),
-        combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_);
+        combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_, CurrentCombatRules());
     if (activeEnemyKind_ == EnemyKind::Lich && lichEncounter_.Snapshot().deathAnimationComplete)
     {
         enemyDirector_.MarkSelectedDead();
