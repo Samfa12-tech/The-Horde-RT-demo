@@ -207,3 +207,34 @@ unchanged-custody check. No phone or X posting was used. Library upload succeede
 the unchanged official local metadata helper failed because native Windows Python
 lacks `os.setxattr`. The returned Library identity is retained in the receipt,
 but local extended attributes were not applied or bypassed.
+
+## Latest phone candidate: partial acceptance, restored and released
+
+Frozen source `6dbc43fd` built a four-ABI debug APK with469 passing Android tests
+(six existing skips), assembly/lint success, the expected compatible certificate,
+and no new runtime asset or source/save entries. The exact
+[phone receipt](phone-6dbc43fd-receipt.json) pins its hash and scope.
+
+The first finite attempt reached the actual PLAY menu, while the old harness
+waited for ENTER THE RUIN; no gameplay input was issued and originals were
+restored. The failure remains in ignored `reports/guard-phone-6dbc43fd-r1/`.
+One corrected attempt used observed PLAY and Begin in Slot1 in a fresh supported
+isolated namespace, with no seeded completion flags or checkpoint. It completed
+in90.812seconds. Actual RT images show the sword raised during a shield touch
+hold and returning to its original rest pose after release. The new pause icon
+is visible at its portrait anchor. Raw full-resolution captures and input logs
+remain under `reports/guard-phone-6dbc43fd-r2/phone/`.
+
+The additional mixed keyboard/touch trial does **not** establish held return:
+Android's saved input log has key-up events before Swing, despite the intended
+duration argument and a still-running shell child. Its return image is Idle.
+This is an unadmitted held-input witness, not proof of a production regression
+or a two-thumb test. No multipointer injector was introduced, and screenshot
+completion is not used as acceptance. Damage/balance, true simultaneous touch,
+landscape and owner comfort remain open; no performance claim is made.
+
+At **09:29:31.855UTC** both original installed APK hashes,18 save/lock files,
+preference bytes and system settings were verified restored; no added save paths,
+owned renderer or transfer remained. Horde released the phone. The candidate was
+not left installed or described as ready for recording. Spin Vector's subsequent
+slot is respected; later menu wording work is offline and not part of this APK.

@@ -72,4 +72,30 @@ capture, transfer or forwarding, and an explicit phone release.
 
 The old frozen69e46426 driver is not silently relabelled: a new candidate needs
 its own pinned hash/receipt identity and offline startup/restore preflight before
-device execution. No such device execution has occurred for this candidate.
+device execution. The actual bounded outcome is recorded below.
+
+## Actual bounded outcome and next handover
+
+The [6dbc43fd phone receipt](phone-6dbc43fd-receipt.json) supersedes the original
+preparation-only status above. Touch guard/release has a physical pose witness;
+the attempted mixed keyboard/touch held-return gate is inconclusive. Its input
+log contains key-up events before Swing, so a live shell child did not prove a
+held key. Do not repeat that automation or present it as a game defect.
+
+At the next explicit allocation, use the pinned APK above or a newly verified
+successor, with fresh compatible-install/data custody. Ask the owner to:
+
+1. Hold the shield continuously with one finger until the sword is raised.
+2. Keep that finger down and tap the sword once with a second finger.
+3. Continue holding through the complete attack recovery. The sword should
+   return to guard without another press or a fresh parry window.
+4. Release the shield: the sword should return naturally to rest. Then try a
+   fresh press and a pause/release/resume to check cancellation separately.
+
+Inspect actual motion and absence of stuck input, then check portrait/landscape
+target reach and move/look/action combinations. Damage reduction and red-attack
+authority remain separate combat acceptance; a pose test cannot close them.
+Only after that direct check should the candidate deliberately remain installed
+for Sam's recording. Until then it is a prepared development APK, not declared
+ready for public footage. New save-screen wording is a later source checkpoint,
+not silently part of the frozen6dbc43fd APK. No phone calls after release.

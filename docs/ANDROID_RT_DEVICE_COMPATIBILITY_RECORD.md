@@ -3702,3 +3702,28 @@ Phone released **07:28:34 UTC**: both original installed APK hashes, all 18 prio
 save/lock files, preference bytes and system settings verified restored, zero
 added save paths and no owned renderer/transfer. Setup failures are retained;
 the next attempt requires an offline preflight and a new allocated device slot.
+
+### 25 October 2026: 6dbc43fd physical guard pose, partial acceptance
+
+SM-S948B; exact source `6dbc43fd3f1359ba5b2abc8fc99eb5f47b94bff3`, Debug package
+`com.samfa12.hordelanternrt.debug`, versionCode10 / versionName1.6.2-debug. APK
+SHA256 `e1b4ff57fd61f38e1be92bf388e181db5a23642c40ea43fc5c606df59a820ee2`;
+arm64 native library `61943ba8d7c2f32dbfe5fab9f797033ba39b27a95087a3c123e519cca484eedd`.
+This is normal isolated New Game entry and physical RT screenshot evidence,
+not Shipping performance, hardware-family certification or a full gameplay pass.
+
+Observed PLAY and an empty isolated slot led to normal ready gameplay, one sword
+draw, touch-held guard and release. Full-resolution images show the raised
+hand/sword and return to rest; the same-anchor portrait pause icon is present.
+The mixed keyboard/touch held-return trial remains unadmitted: saved key-up events
+precede Swing, so its intended continuous hold was not established. This does
+not demonstrate a production held-return defect. True two-finger guard/attack,
+landscape/pause interaction, damage/balance and natural earned progression remain
+open. No thermal or performance comparison was performed. Flask/shared64 and the
+heavier Keeper candidate remain disabled; owner preferences are unchanged.
+
+The preceding old-selector attempt is retained as a setup failure, not erased.
+At09:29:31.855UTC both original APK hashes,18 save/lock files, preferences and
+system settings were verified restored, with no added save paths or owned
+renderer/transfer. Candidate was not retained. Horde released the phone to Spin.
+See [exact receipt](evidence/2026-10-25-held-guard/phone-6dbc43fd-receipt.json).

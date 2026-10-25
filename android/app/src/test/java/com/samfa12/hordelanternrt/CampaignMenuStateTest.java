@@ -28,8 +28,8 @@ public final class CampaignMenuStateTest {
         long[] v=ready(); v[12]=3; v[13]=1; v[14]=2; v[15]=3; v[16]=2; v[17]=3;
         CampaignMenuState s=CampaignMenuState.decode(v); assertNotNull(s);
         v[12]=2; assertEquals(3,s.status(0,0));
-        assertEquals("Manual: Lower chamber · 2 / 3 hearts",s.description(0,0));
-        assertEquals("Latest autosave: Safe exit · 3 / 3 hearts",s.description(0,1));
+        assertEquals("Manual save: Lower chamber · 2 / 3 hearts",s.description(0,0));
+        assertEquals("Autosave: Safe exit · 3 / 3 hearts",s.description(0,1));
         assertTrue(s.occupied(0)); assertFalse(s.occupied(1));
     }
     @Test public void onlyMatchingRequestSurfaceAndPresentedLoadCanComplete() {
@@ -40,18 +40,18 @@ public final class CampaignMenuStateTest {
         assertTrue(s.completes(42,3,31)); assertFalse(s.completes(41,3,31));
         assertFalse(s.completes(42,5,31)); assertFalse(s.completes(42,3,32));
         v[5]=10; s=CampaignMenuState.decode(v); assertFalse(s.completes(42,3,31));
-        assertFalse(s.message().contains("saved")); assertTrue(s.message().contains("uncertain"));
+        assertFalse(s.message().contains("saved")); assertTrue(s.message().contains("could not confirm"));
     }
     @Test public void forestEndpointIsNamedAndUnknownCheckpointIsRejected() {
         long[] v=ready();v[15]=CampaignMenuState.VALID;v[16]=3;v[17]=2;
         CampaignMenuState s=CampaignMenuState.decode(v);assertNotNull(s);
-        assertEquals("Latest autosave: Forest lookout · 2 / 3 hearts",s.description(0,1));
+        assertEquals("Autosave: Forest lookout · 2 / 3 hearts",s.description(0,1));
         v[16]=4;assertNull(CampaignMenuState.decode(v));
     }
     @Test public void unknownErrorNeverBecomesSuccessOrSpecificCorruptionClaim() {
         long[] v=ready(); v[4]=8; v[5]=99;
         CampaignMenuState s=CampaignMenuState.decode(v); assertNotNull(s);
-        assertTrue(s.message().contains("Refresh")); assertFalse(s.message().contains("saved"));
+        assertTrue(s.message().contains("Check your saves")); assertFalse(s.message().contains("saved"));
     }
     @Test public void signedAndUnsignedFloatBitsRemainExact() {
         long[] v=ready(); v[9]=Integer.toUnsignedLong(Float.floatToIntBits(-12.5f));
@@ -68,9 +68,9 @@ public final class CampaignMenuStateTest {
     }
     @Test public void autosaveAndManualTerminalReceiptsHaveDistinctMessages() {
         long[] v=ready();v[4]=7;v[30]=0;
-        assertEquals("Latest autosave saved.",CampaignMenuState.decode(v).message());
-        v[30]=2;assertEquals("Manual checkpoint saved.",CampaignMenuState.decode(v).message());
-        v[30]=0;v[5]=10;assertTrue(CampaignMenuState.decode(v).message().contains("uncertain"));
+        assertEquals("Autosave saved.",CampaignMenuState.decode(v).message());
+        v[30]=2;assertEquals("Manual save saved.",CampaignMenuState.decode(v).message());
+        v[30]=0;v[5]=10;assertTrue(CampaignMenuState.decode(v).message().contains("could not confirm"));
         assertFalse(CampaignMenuState.decode(v).message().contains("saved"));
     }
     @Test public void confirmedRetryExtensionIsOptionalAndStrictlyBoolean() {
@@ -78,6 +78,19 @@ public final class CampaignMenuStateTest {
         long[] v=java.util.Arrays.copyOf(ready(),34);v[33]=1;
         assertTrue(CampaignMenuState.decode(v).confirmedRetry);
         v[33]=2;assertNull(CampaignMenuState.decode(v));
+    }
+
+    @Test public void playerProgressAndErrorLanguageHidesImplementationWithoutClaimingSuccess() {
+        for(int phase:new int[]{CampaignMenuState.READING,CampaignMenuState.PREPARING,CampaignMenuState.REBASE,CampaignMenuState.PRESENTING}) {
+            long[] v=ready();v[4]=phase;if(phase==CampaignMenuState.REBASE)v[8]=1;
+            String text=CampaignMenuState.decode(v).message();
+            for(String internal:new String[]{"record", "private", "RT", "resource", "rebase"})assertFalse(text.contains(internal));
+            assertFalse(text.contains("Loaded."));
+        }
+        long[] v=ready();v[5]=10;
+        assertTrue(CampaignMenuState.decode(v).message().contains("could not confirm the save"));
+        v[5]=5;assertTrue(CampaignMenuState.decode(v).message().contains("kept"));
+        v[5]=7;assertTrue(CampaignMenuState.decode(v).message().contains("still paused"));
     }
 
 }
