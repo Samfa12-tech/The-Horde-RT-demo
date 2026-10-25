@@ -2416,6 +2416,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             swordCombat_.RequestParry();
             parrySourceCommandSequence_ = lastConsumedParrySequence_;
         }
+        swordCombat_.ConsumeGuardPress();
     }
 
     const auto previousSkeletons = combatSnapshot_.combatants;

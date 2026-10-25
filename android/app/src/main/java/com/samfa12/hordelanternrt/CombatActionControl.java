@@ -12,7 +12,7 @@ final class CombatActionControl {
         int padding=Math.max(0,(side-icon)/2);
         button.setPadding(padding,padding,padding,padding);
         button.setGravity(Gravity.CENTER);button.setText("");
-        button.setContentDescription(button.getContext().getString(sword?R.string.swing:R.string.parry));
+        button.setContentDescription(button.getContext().getString(sword?R.string.swing:R.string.parry_accessibility));
         int resource=sword?R.drawable.ic_combat_sword:R.drawable.ic_combat_shield;
         Drawable current=button.getCompoundDrawables()[0];
         if(!(button.getTag(R.id.combat_action_icon_state) instanceof Integer) ||
@@ -25,6 +25,7 @@ final class CombatActionControl {
         }
     }
     static void preview(Button button,boolean sword) {
+        button.setContentDescription(button.getContext().getString(sword?R.string.swing:R.string.parry_accessibility));
         Drawable glyph=button.getContext().getDrawable(sword?R.drawable.ic_combat_sword:R.drawable.ic_combat_shield);
         int size=HordeUiTokens.dp(button.getContext(),24);
         if(glyph!=null)glyph.setBounds(0,0,size,size);

@@ -1,0 +1,49 @@
+{
+  "model": "SM-S948B",
+  "implementationCheckpoint": "6c5e2fb9",
+  "apkSha256": "a2c9602d4d01627fd655b3a3b57029e30197a04e2dfc96c1fe34935867c98f9e",
+  "setup": "fresh isolated namespace, normal EnterTheRuin, no checkpoint/reward/progression seeding",
+  "actions": [
+    {
+      "action": "single observed Swing press to draw; no movement or timed enemy sequence",
+      "bounds": [
+        2644,
+        1104,
+        2924,
+        1384
+      ]
+    },
+    {
+      "action": "stationary held guard touch then release",
+      "bounds": [
+        2350,
+        1076,
+        2616,
+        1342
+      ],
+      "holdMs": 2500
+    }
+  ],
+  "heldPoseAccepted": false,
+  "verdict": "screen shows pressedshield but doesnotestablish heldguardpose; retain asunverified, source timingpath underinvestigation",
+  "damageOrNaturalJourneyAccepted": false,
+  "multitouchOrControllerAccepted": false,
+  "phoneReleasedUtc": "2026-10-25T06:45:57.294000+00:00",
+  "closure": {
+    "utcUnixMs": 1792910757294,
+    "safeToDisconnect": true,
+    "phoneReleased": true,
+    "bothOriginalInstalledHashesRestored": true,
+    "priorSaveAndLockFiles": 18,
+    "priorSaveBytesUnchanged": true,
+    "preferenceBytesUnchanged": true,
+    "systemSettingsRestored": true,
+    "onlyAddedIsolatedTestPaths": [],
+    "ownedRendererOrTransferRemaining": false,
+    "remainingTaskOrInputMetadata": []
+  },
+  "captures": {
+    "phone-held-unverified.png": "3efff8c59817a230fc46e3c5f2936875d5b6216dfdf59f170069e95e572232ad",
+    "phone-release-unverified.png": "893a21f2eb4fb6bd0ec1163526378d717bcb5f09b2c520266297a51ff705abf1"
+  }
+}

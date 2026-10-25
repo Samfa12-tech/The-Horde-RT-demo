@@ -226,7 +226,11 @@ public:
 
     void SetGuardHeld(bool held)
     {
-        guardFreshPress_ = held && !guardHeld_;
+        // Continuous intent may precede its timestamped command by several
+        // catch-up ticks. Keep this one press until that command is consumed,
+        // rather than expiring it at the first unrelated fixed step.
+        if (held && !guardHeld_) guardFreshPress_ = true;
+        if (!held) guardFreshPress_ = false;
         guardHeld_ = held;
         if (!held && player_.action == PlayerCombatAction::Guard)
         {
@@ -236,6 +240,10 @@ public:
             snapshot_.activePlayerAttackId = 0u;
         }
     }
+
+    // The simulation calls this even when a fresh command was rejected while
+    // busy. A rejected press must not become a delayed parry after recovery.
+    void ConsumeGuardPress() { guardFreshPress_ = false; }
 
     // Presentation holds cancel the player's current and buffered actions
     // without resetting enemy health, attack ownership or encounter progress.
@@ -359,7 +367,6 @@ public:
         parryQueued_ = false;
         UpdatePlayerAction(deltaSeconds, playerX, playerZ, playerYaw,
                            !contactEvaluator);
-        guardFreshPress_ = false;
 
         const ShowcaseZone playerZone = QueryShowcaseZone(playerX, playerZ);
         const bool playerInsideEnemyArena = useExplicitArenaGate

@@ -48,7 +48,7 @@ public final class CompactHudLayoutTest {
                     assertTrue(context+" stays inside parent",target.getTop()>=0 && target.getRight()<=size[0] && target.getBottom()<=size[1]);
                     if(i<2) {
                         assertEquals(context,"",target.getText().toString());
-                        assertEquals(i==0?a.getString(R.string.swing):a.getString(R.string.parry),target.getContentDescription());
+                        assertEquals(i==0?a.getString(R.string.swing):a.getString(R.string.parry_accessibility),target.getContentDescription());
                         assertNotNull(context,target.getCompoundDrawables()[0]);
                         assertEquals(context,target.getWidth(),target.getHeight());
                         assertTrue(context+" primary larger than utility",target.getWidth()>b[4].getWidth());

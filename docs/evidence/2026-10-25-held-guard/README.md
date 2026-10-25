@@ -103,3 +103,57 @@ guard/input check with custody/restore. Owner balance/two-thumb feel and natural
 earned journey remain explicit. Continue the approved flask after this coherent
 checkpoint; pre-flask schema2 must preserve half health and receive the same
 approved empty base flask as other older records, never an automatic refill.
+
+
+## First physical guard attempt — held pose not accepted
+
+The compatible APK above was temporarily installed on SM-S948B with fresh original
+APK/save/settings/rotation custody. A fresh isolated namespace entered through
+normal Enter the Ruin, without a checkpoint or completion flags. One observed
+Swing press drew the sword; a stationary2.5second shield touch and release were
+captured. The shield visibly pressed, but the [held capture](phone-held-unverified.png)
+and [release](phone-release-unverified.png) did not establish the raised held pose.
+This is retained as unverified evidence, not a device pass. Legacy constructor
+rules were checked and do not explain it; timestamped input consumption versus
+continuous held intent is now being tested separately. No speculative runtime
+change or repeated phone sequence is justified by images alone.
+
+Both original APKs,18owner save/lock files, preferences and system settings were
+verified restored, zero new save paths and no renderer/transfer remaining. The
+receipt records exact release time; no phone calls followed release. Two-thumb
+attack/guard, damage/balance, earned progression and broader lifecycle remain open.
+
+Full Android testing additionally exposed two genuine overlong visible-label
+layouts (453tests,2failed,6pre-existing skips). Compact PARRY text is restored;
+full semantics stay in accessibility/teaching. Both unchanged layout suites now
+pass. Original failed XML and full-roster failure remain retained locally; the
+corrected full roster and new exact-head CI still need completion.
+
+
+## Timestamped input correction and complete Android roster
+
+The real phone attempt remains unverified; its exact cause is not asserted from
+images. A separate shared regression reproduced a real timestamped-input defect:
+continuous held intent can arrive on catch-up tick 1 while its85ms parry command
+correctly targets tick 6. The old fresh-held token expired on an earlier tick,
+so telemetry reported the command consumed without an actual parry action.
+
+The token now survives until that command is consumed, not until the next
+unrelated fixed step. Both accepted and busy-rejected commands consume it; release,
+interruptions and reset still clear it. Corrected tests preserve targetTick=actualTick
+and prove guard entry, no repeated held windows and release/repress rearming.
+A second real timestamped attack case rejects the busy press at tick7, retains
+full recovery, then rejects three further held commands without a fresh window.
+Timing, foundation and direct combat pass3/3; the final busy-case target passes.
+Original failing-first receipt is retained, not weakened or hidden.
+
+The full Android roster now passes453tests with the same6pre-existing skips.
+The compact visible label fixes both hosted layout failures. One additional stale
+accessibility assertion was updated to require the new dedicated guard description;
+no layout bounds, line counts, input assertions or test roster were removed.
+Exact corrected-head CI remains separate. Previous6c5e2fb9CI had five successes
+(including hosted Windows native tests) and the two known Android layout failures;
+this does not retroactively validate its timestamped input behavior.
+
+A corrected APK must be built from the new source before a phone retest. The
+first phone APK/receipt stays pinned to the earlier checkpoint; do not relabel it.

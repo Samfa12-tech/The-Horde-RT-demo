@@ -38,7 +38,8 @@
     <string name="back">BACK</string>
     <string name="swing">SWING</string>
     <string name="vitality_half_accessibility">Vitality %1$d and a half of %2$d</string>
-    <string name="parry">PARRY / HOLD GUARD</string>
+    <string name="parry">PARRY</string>
+    <string name="parry_accessibility">Parry / hold guard</string>
     <string name="dodge">DODGE</string>
     <string name="combat_teaching">Optional parry and dodge lesson</string>
     <string name="combat_teaching_slowdown">Ease time during the lesson</string>

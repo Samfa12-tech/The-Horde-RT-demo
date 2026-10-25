@@ -688,7 +688,7 @@ public class MainActivity extends Activity {
         styleActionButton(diagnosticsBack, 0xCC211B15, 0xFFFFD28A);
         menuButton.setContentDescription(getString(R.string.menu));
         attackButton.setContentDescription(getString(R.string.swing));
-        parryButton.setContentDescription(getString(R.string.parry));
+        parryButton.setContentDescription(getString(R.string.parry_accessibility));
         dodgeButton.setContentDescription(getString(R.string.dodge));
         interactButton.setContentDescription(getString(R.string.interact));
         toggleHeldLightPoseButton.setContentDescription(getString(R.string.lower_lantern));
