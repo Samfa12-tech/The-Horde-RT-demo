@@ -140,7 +140,8 @@ public:
             else if (enemy.action == EnemyCombatAction::AttackActive ||
                      enemy.action == EnemyCombatAction::AttackRecovery)
                 snapshot_.cue = CombatTeachingCue::ParryRecovery;
-            else if (enemy.action == EnemyCombatAction::Staggered)
+            else if (enemy.action == EnemyCombatAction::Staggered &&
+                     enemy.reaction == CombatReaction::Parried)
                 snapshot_.cue = CombatTeachingCue::Learned;
             if (combat.player.action == PlayerCombatAction::ParryActive)
                 snapshot_.cue = CombatTeachingCue::ParryActive;
@@ -166,8 +167,13 @@ public:
         const bool relevantUnlearnedCue =
             (selectedEnemy == EnemyKind::Skeleton && !snapshot_.parryLearned) ||
             (selectedEnemy == EnemyKind::Lich && !snapshot_.dodgeLearned);
-        snapshot_.promptOpacity = practicing && relevantUnlearnedCue &&
-            snapshot_.cue != CombatTeachingCue::None ? 1.0f : 0.0f;
+        // A real parry sets parryLearned before this publication. Retain its
+        // success feedback for the existing parried stagger, without treating
+        // an ordinary sword-hit stagger as a parry or adding a second timer.
+        const bool parrySuccessCue = enabled && snapshot_.stage != TutorialStage::Skipped &&
+            snapshot_.cue == CombatTeachingCue::Learned;
+        snapshot_.promptOpacity = parrySuccessCue || (practicing && relevantUnlearnedCue &&
+            snapshot_.cue != CombatTeachingCue::None) ? 1.0f : 0.0f;
     }
     const CombatTeachingSnapshot& Snapshot() const { return snapshot_; }
 private:

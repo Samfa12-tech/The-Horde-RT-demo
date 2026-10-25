@@ -107,6 +107,58 @@ void TeachingContract() {
     input.commands.tutorialReplay=1; sim.StepFixed(input);
     Check(sim.Snapshot().playerVitals.vitality==3&&sim.Snapshot().combatTeaching.stage==TutorialStage::Parry,
           "replay explicitly resets opening and restores teachable state");
+
+    auto hitConfig=Rules(); hitConfig.waterfallSkeletonEncounter=false;
+    hitConfig.playerStartX=0; hitConfig.playerStartZ=-3.75f;
+    GameSimulation hit(hitConfig); InputSnapshot hitInput;
+    hitInput.commands.attack=1;
+    bool ordinaryHit=false;
+    for(int tick=0;tick<40 && !ordinaryHit;++tick) {
+        hit.StepFixed(hitInput);
+        const auto state=hit.Snapshot();
+        const auto owner=state.swordCombat.attackerIndex;
+        if(owner<0) continue;
+        const auto& actor=state.swordCombat.combatants[owner];
+        ordinaryHit=actor.health==1 && actor.action==EnemyCombatAction::Staggered &&
+            actor.reaction==CombatReaction::Hit;
+        if(ordinaryHit)
+            Check(state.combatTeaching.cue!=CombatTeachingCue::Learned &&
+                  !state.combatTeaching.parryLearned,
+                  "an ordinary sword-hit stagger never claims a successful parry");
+    }
+    Check(ordinaryHit,"feedback regression observes a real nonfatal sword-hit stagger on the current attacker");
+
+    CombatTeaching feedback; feedback.Reset(true);
+    combat.attackerIndex=0; combat.player.action=PlayerCombatAction::Idle;
+    combat.combatants[0].action=EnemyCombatAction::Staggered;
+    combat.combatants[0].reaction=CombatReaction::Parried;
+    feedback.ParrySucceeded();
+    for(float elapsed:{0.f,.25f,.50f,.75f}) {
+        combat.combatants[0].actionTime=elapsed;
+        feedback.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+        Check(feedback.Snapshot().cue==CombatTeachingCue::Learned &&
+              feedback.Snapshot().promptOpacity==1.f && feedback.Snapshot().parryLearned,
+              "actual parry success remains readable through its existing parried stagger without a new timer");
+    }
+    combat.combatants[0].action=EnemyCombatAction::Locomotion;
+    combat.combatants[0].reaction=CombatReaction::None;
+    feedback.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+    Check(feedback.Snapshot().cue!=CombatTeachingCue::Learned &&
+          feedback.Snapshot().promptOpacity==0.f,
+          "success feedback ends with its actual stagger rather than surviving as a stale lesson result");
+    combat.combatants[0].action=EnemyCombatAction::Staggered;
+    combat.combatants[0].reaction=CombatReaction::Hit;
+    feedback.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+    Check(feedback.Snapshot().cue!=CombatTeachingCue::Learned,
+          "a later ordinary hit cannot reuse an earlier learned parry as success feedback");
+    combat.combatants[0].reaction=CombatReaction::Parried;
+    feedback.DodgeSucceeded(); feedback.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+    Check(feedback.Snapshot().stage==TutorialStage::Complete && !feedback.Snapshot().safePractice &&
+          feedback.Snapshot().cue==CombatTeachingCue::Learned && feedback.Snapshot().promptOpacity==1.f,
+          "finishing the lessons does not hide the final actual parry result or extend practice protection");
+    feedback.Skip(); feedback.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+    Check(feedback.Snapshot().promptOpacity==0.f,
+          "skip suppresses lesson success copy while retaining ordinary attack readability");
 }
 void AttackReadabilityContract() {
     Check(CombatTeachingSnapshot{}.attackReadability==AttackReadability::Neutral,
@@ -731,6 +783,9 @@ void LiveParryAndRiposte() {
     Check(succeeded&&sim.Snapshot().combatTeaching.parryLearned&&
           sim.Snapshot().playerVitals.vitality==3,
           "actual successful parry teaches without health loss and retains its semantic result");
+    Check(sim.Snapshot().combatTeaching.cue==CombatTeachingCue::Learned &&
+          sim.Snapshot().combatTeaching.promptOpacity==1.f,
+          "the actual parry result publishes visible success feedback after the learned flag changes");
     input.commands.attack=1; sim.StepFixed(input);
     Check(sim.Snapshot().playerCombat.action==PlayerCombatAction::SwingWindup&&
           sim.Snapshot().combatPresentation.parrySuccessActive,

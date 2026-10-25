@@ -1,0 +1,22 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 56: horde_rt_combat_foundation_tests
+1/1 Test #56: horde_rt_combat_foundation_tests ...***Failed    7.75 sec
+FAIL: an ordinary sword-hit stagger never claims a successful parry
+FAIL: actual parry success remains readable through its existing parried stagger without a new timer
+FAIL: actual parry success remains readable through its existing parried stagger without a new timer
+FAIL: actual parry success remains readable through its existing parried stagger without a new timer
+FAIL: actual parry success remains readable through its existing parried stagger without a new timer
+FAIL: a later ordinary hit cannot reuse an earlier learned parry as success feedback
+Waterfall room-edge contacts=2 killed-A-position=(-7.98,-15.2) guard-health-after-cuts=0,2 B-windup=1 B-practice-contact=1 skipped-health=2
+FAIL: the actual parry result publishes visible success feedback after the learned flag changes
+combat foundation checks=764 failures=7
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   7.77 sec
+
+The following tests FAILED:
+	 56 - horde_rt_combat_foundation_tests (Failed)
+Errors while running CTest
