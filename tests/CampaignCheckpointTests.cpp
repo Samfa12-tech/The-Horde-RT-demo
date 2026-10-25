@@ -82,6 +82,11 @@ bool Restore(GameSimulation& sim,const cp::Checkpoint& c,
     return token && sim.CommitCampaignRestore(*token,{token->worldGeneration,c.zone},terrain,input);
 }
 void CheckClean(const SimulationSnapshot& s) {
+    Check(s.combatTeaching.stage==TutorialStage::Skipped && !s.combatTeaching.safePractice &&
+        !s.combatTeaching.exitPending && !s.combatTeaching.blockLearned &&
+        !s.combatTeaching.parryLearned && !s.combatTeaching.dodgeLearned &&
+        !s.combatTeaching.attackFromGuardLearned,
+        "confirmed earned restore ends practice immediately without inventing learned skills");
     Check(s.playerAlive && s.playerGrounded && s.playerVitals.phase==PlayerLifePhase::Alive &&
         s.playerVitals.invulnerabilityRemaining==0 && s.playerVitals.deathHoldRemaining==0,"restore is alive on grounded support");
     Check(s.playerCombat.action==PlayerCombatAction::Idle && !s.dodgeActive && !s.dodgeInvulnerable &&

@@ -72,6 +72,8 @@ struct GameSimulationConfig
     // Current development gameplay; legacy constructor/capture fixtures retain
     // their authored rules unless the live application profile selects this.
     bool combatFoundation1_7 = false;
+    // Isolated validation only until the enemy-anchored RT warning is admitted.
+    bool specialSkeletonAttacks1_7 = false;
     // Shared chapter presentation; historical constructor fixtures stay explicit.
     bool companionTurnStart = false;
     // Diagnostic owner slice only. UI/hand/save admission is still separate.

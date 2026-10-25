@@ -37,6 +37,11 @@ public class AndroidControllerIntegrationTest {
     @Implements(value=ProbeBridge.class,isInAndroidSdk=false)
     public static class Bridge {
         static float x,z,yaw,pitch; static int attacks,parries,dodges,interacts,lanterns,runToggles,runClears;
+        static long teachingState;static int teachingSkips,teachingReplays;
+        @Implementation protected static long getCombatTeachingState(){return teachingState;}
+        @Implementation protected static void requestCombatTeachingSkip(){teachingSkips++;}
+        @Implementation protected static void requestCombatTeachingReplay(){teachingReplays++;}
+        @Implementation protected static void setCombatTeachingOptions(boolean enabled,boolean slowdown){}
         static boolean paused,crouchHeld,analogue; static float dodgeX,dodgeZ; static boolean dodgeAnalogue; static int context,retries,crouchToggles,crouchClears;
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static int getSurfaceRuntimeState(long generation){return 1;}
@@ -79,6 +84,7 @@ public class AndroidControllerIntegrationTest {
     private Button button(String name)throws Exception{return (Button)field(name).get(a);}
     @Before public void setup()throws Exception {
         Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=Bridge.runToggles=Bridge.runClears=Bridge.context=0;
+        Bridge.teachingState=0;Bridge.teachingSkips=Bridge.teachingReplays=0;
         Bridge.x=Bridge.z=Bridge.yaw=Bridge.pitch=0;Bridge.guardHeld=false;Bridge.flask=null;Bridge.drinks=Bridge.rests=0;
         Bridge.crouchHeld=Bridge.analogue=Bridge.dodgeAnalogue=false;Bridge.crouchToggles=Bridge.crouchClears=0;
         a=Robolectric.buildActivity(MainActivity.class).get();
@@ -301,6 +307,20 @@ public class AndroidControllerIntegrationTest {
     private void confirmLabel(String text)throws Exception {
         View root=(View)field("menuScrim").get(a);Button b=findButton(root,text);assertNotNull(text,b);
         b.setFocusableInTouchMode(true);assertTrue(b.requestFocus());press(KeyEvent.KEYCODE_BUTTON_A);
+    }
+    @Test public void settingsFinishPracticeKeepsExistingExplicitExitAndReplayCommandsWithoutCombatLeak()throws Exception {
+        set("menuVisible",true);call("setGameplayPaused",new Class<?>[]{boolean.class},true);
+        Bridge.teachingState=4L|(1L<<13);call("showSettings",new Class<?>[]{});
+        View root=(View)field("menuScrim").get(a);
+        assertNull(findButton(root,"Finish practice"));Button skip=findButton(root,"Skip practice");assertNotNull(skip);
+        skip.performClick();assertEquals(1,Bridge.teachingSkips);
+        long ready=6L|(1L<<10)|(1L<<11)|(1L<<12)|(1L<<13)|(1L<<15)|(1L<<32);
+        Bridge.teachingState=ready;call("showSettings",new Class<?>[]{});
+        assertNull(findButton(root,"Skip practice"));Button finish=findButton(root,"Finish practice");assertNotNull(finish);
+        finish.performClick();assertEquals(2,Bridge.teachingSkips);assertEquals("UI never forges completed skills or a live exit",ready,Bridge.teachingState);
+        Button replay=findButton(root,"Replay opening practice");assertNotNull(replay);replay.performClick();assertEquals(1,Bridge.teachingReplays);
+        assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.parries);assertEquals(0,Bridge.dodges);assertEquals(0,Bridge.interacts);
+        assertTrue(Bridge.paused);
     }
     @Test public void backAtFirstMenuRequiresExplicitExitConfirmation()throws Exception {
         set("menuVisible",true);set("firstMenu",true);

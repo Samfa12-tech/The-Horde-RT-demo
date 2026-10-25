@@ -19,6 +19,19 @@ bool Near(float a,float b,float epsilon=.0001f) { return std::abs(a-b)<=epsilon;
 GameSimulationConfig Rules() {
     auto c=ProductionGameSimulationConfig(); c.swordStartsStowed=false; return c;
 }
+bool LearnBlockFromRealContact(GameSimulation& sim,InputSnapshot& input) {
+    input.tutorialEnabled=true; input.guardHeld=true; ++input.commands.parry;
+    bool learned=false;
+    for(int tick=0;tick<600 && !learned;++tick) {
+        sim.StepFixed(input);
+        const auto& state=sim.Snapshot(); const auto& trace=state.combatContactTrace;
+        learned=state.combatTeaching.blockLearned && state.swordCombat.playerHitPulse && trace.count>0 &&
+            trace.samples[(trace.nextIndex+trace.kCapacity-1)%trace.kCapacity].outcome==CombatContactOutcome::GuardBlocked;
+        sim.ClearEvents();
+    }
+    input.guardHeld=false; sim.StepFixed(input); sim.ClearEvents();
+    return learned;
+}
 void WindowAndLifecycle() {
     for (int tick=0;tick<=13;++tick)
         Check(DodgeProtectionWindow::Contains(tick/60.0f,true)==(tick>=2&&tick<10),
@@ -54,6 +67,10 @@ void TeachingContract() {
     combat.combatants[0].action=EnemyCombatAction::AttackWindup;
     combat.combatants[0].actionTime=.4f;
     teaching.Reset(true); teaching.Update(true,true,false,combat,keeper,EnemyKind::Skeleton);
+    Check(teaching.Snapshot().stage==TutorialStage::Block && teaching.Snapshot().safePractice &&
+          teaching.Snapshot().cue==CombatTeachingCue::Block,
+          "opening lesson first explains held block with explicit practice protection");
+    teaching.BlockSucceeded(); teaching.Update(true,true,false,combat,keeper,EnemyKind::Skeleton);
     Check(teaching.Snapshot().cue==CombatTeachingCue::ParryWindup&&
           !teaching.Snapshot().slowdownActive,"wind-up is distinct from anticipatory parry input cue");
     combat.combatants[0].actionTime=.90f;
@@ -75,18 +92,33 @@ void TeachingContract() {
           "slowdown expires as the real parry window opens");
     combat.player.action=PlayerCombatAction::Idle;
     teaching.ParrySucceeded(); teaching.Update(true,true,false,combat,keeper,EnemyKind::Skeleton);
-    Check(!teaching.Snapshot().slowdownActive&&teaching.Snapshot().promptOpacity==0&&
+    Check(!teaching.Snapshot().slowdownActive&&teaching.Snapshot().promptOpacity==1&&
+          teaching.Snapshot().stage==TutorialStage::Dodge && teaching.Snapshot().safePractice &&
           Near(teaching.Snapshot().simulationTimeScale,1.0f),
-          "understood parry stops teaching prompts and dilation");
+          "understood parry advances to visible dodge teaching without continuing parry dilation");
     keeper.phase=LichPhase::Charging; keeper.phaseTime=1.10f;
     teaching.Update(true,true,false,combat,keeper,EnemyKind::Lich);
     Check(teaching.Snapshot().cue==CombatTeachingCue::DodgeNow&&teaching.Snapshot().safePractice&&
           Near(teaching.Snapshot().simulationTimeScale,.25f),
           "Keeper teaches the actual short dodge interval at optional quarter speed");
     teaching.DodgeSucceeded(); teaching.Update(true,true,false,combat,keeper,EnemyKind::Lich);
-    Check(teaching.Snapshot().stage==TutorialStage::Complete&&!teaching.Snapshot().safePractice&&
-          teaching.Snapshot().promptOpacity==0&&Near(teaching.Snapshot().simulationTimeScale,1.0f),
-          "completed lesson cannot keep immunity, prompts or eased time");
+    Check(teaching.Snapshot().stage==TutorialStage::AttackFromGuard && teaching.Snapshot().safePractice,
+          "block, parry and dodge cannot falsely complete the outstanding guard attack lesson");
+    teaching.BeginGuardAttack(); combat.activePlayerAttackId=1;
+    combat.player.action=PlayerCombatAction::SwingActive;
+    teaching.ObserveGuardAttack(combat,true,false,true);
+    combat.activePlayerAttackId=0; combat.player.action=PlayerCombatAction::Guard;
+    teaching.ObserveGuardAttack(combat,true,false,false);
+    teaching.Update(true,true,false,combat,keeper,EnemyKind::Lich);
+    Check(teaching.Snapshot().stage==TutorialStage::Ready && teaching.Snapshot().safePractice &&
+          teaching.Snapshot().cue==CombatTeachingCue::Ready && !teaching.Snapshot().slowdownActive,
+          "all four actual skill witnesses become ready while protection awaits an explicit exit");
+    teaching.Skip(); combat.combatants[0].action=EnemyCombatAction::Locomotion;
+    keeper.phase=LichPhase::MaintainingRange;
+    teaching.Update(true,true,false,combat,keeper,EnemyKind::Lich);
+    Check(teaching.Snapshot().stage==TutorialStage::Complete && !teaching.Snapshot().safePractice &&
+          teaching.Snapshot().promptOpacity==0 && Near(teaching.Snapshot().simulationTimeScale,1.f),
+          "explicit ready exit at a safe boundary restores ordinary clocks and damage");
     teaching.Update(false,true,false,combat,keeper,EnemyKind::Lich);
     Check(!teaching.Snapshot().enabled&&!teaching.Snapshot().slowdownActive&&
           Near(teaching.Snapshot().simulationTimeScale,1.0f),
@@ -105,7 +137,7 @@ void TeachingContract() {
     }
     Check(sim.Snapshot().playerVitals.phase!=PlayerLifePhase::Alive,"skip removes safe-practice damage suppression");
     input.commands.tutorialReplay=1; sim.StepFixed(input);
-    Check(sim.Snapshot().playerVitals.vitality==3&&sim.Snapshot().combatTeaching.stage==TutorialStage::Parry,
+    Check(sim.Snapshot().playerVitals.vitality==3&&sim.Snapshot().combatTeaching.stage==TutorialStage::Block,
           "replay explicitly resets opening and restores teachable state");
 
     auto hitConfig=Rules(); hitConfig.waterfallSkeletonEncounter=false;
@@ -143,9 +175,9 @@ void TeachingContract() {
     combat.combatants[0].action=EnemyCombatAction::Locomotion;
     combat.combatants[0].reaction=CombatReaction::None;
     feedback.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
-    Check(feedback.Snapshot().cue!=CombatTeachingCue::Learned &&
-          feedback.Snapshot().promptOpacity==0.f,
-          "success feedback ends with its actual stagger rather than surviving as a stale lesson result");
+    Check(feedback.Snapshot().cue==CombatTeachingCue::Block &&
+          feedback.Snapshot().promptOpacity==1.f && feedback.Snapshot().safePractice,
+          "success feedback ends with its stagger and returns to the genuinely unfinished block lesson");
     combat.combatants[0].action=EnemyCombatAction::Staggered;
     combat.combatants[0].reaction=CombatReaction::Hit;
     feedback.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
@@ -153,9 +185,9 @@ void TeachingContract() {
           "a later ordinary hit cannot reuse an earlier learned parry as success feedback");
     combat.combatants[0].reaction=CombatReaction::Parried;
     feedback.DodgeSucceeded(); feedback.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
-    Check(feedback.Snapshot().stage==TutorialStage::Complete && !feedback.Snapshot().safePractice &&
+    Check(feedback.Snapshot().stage==TutorialStage::Block && feedback.Snapshot().safePractice &&
           feedback.Snapshot().cue==CombatTeachingCue::Learned && feedback.Snapshot().promptOpacity==1.f,
-          "finishing the lessons does not hide the final actual parry result or extend practice protection");
+          "parry and dodge alone retain the real parry result without faking the missing two skills");
     feedback.Skip(); feedback.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
     Check(feedback.Snapshot().promptOpacity==0.f,
           "skip suppresses lesson success copy while retaining ordinary attack readability");
@@ -167,6 +199,9 @@ void AttackReadabilityContract() {
     combat.attackerIndex=0;
     combat.combatants[0].action=EnemyCombatAction::AttackWindup;
     combat.combatants[0].actionTime=0.0f;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Skeleton,true)==AttackReadability::Neutral,
+          "ordinary normal skeleton attacks do not falsely display a yellow guard-break warning");
+    combat.combatants[0].attackKind=EnemyAttackKind::GuardBreak;
     Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Skeleton,true)==AttackReadability::Parryable,
           "yellow classification starts at the existing skeleton wind-up, not the later parry-now lesson");
     combat.combatants[0].action=EnemyCombatAction::AttackActive;
@@ -219,9 +254,20 @@ void AttackReadabilityContract() {
           "ineligible paused, dead or legacy presentation cannot publish attack warnings");
 
     for(int lesson=0;lesson<3;++lesson) {
-        CombatTeaching teaching; teaching.Reset(true);
-        if(lesson==1) { teaching.ParrySucceeded(); teaching.DodgeSucceeded(); }
-        if(lesson==2) teaching.Skip();
+        CombatTeaching teaching; teaching.Reset(lesson!=0);
+        combat.combatants[0].action=EnemyCombatAction::Locomotion;
+        if(lesson==1) {
+            teaching.BlockSucceeded(); teaching.ParrySucceeded(); teaching.DodgeSucceeded();
+            teaching.BeginGuardAttack(); combat.activePlayerAttackId=1;
+            combat.player.action=PlayerCombatAction::SwingActive;
+            teaching.ObserveGuardAttack(combat,true,false,true);
+            combat.activePlayerAttackId=0; combat.player.action=PlayerCombatAction::Guard;
+            teaching.ObserveGuardAttack(combat,true,false,false);
+        }
+        if(lesson!=0) {
+            teaching.Skip(); teaching.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+        }
+        combat.combatants[0].action=EnemyCombatAction::AttackWindup;
         teaching.Update(lesson!=0,false,false,combat,keeper,EnemyKind::Skeleton);
         Check(teaching.Snapshot().attackReadability==AttackReadability::Parryable &&
               !teaching.Snapshot().safePractice && !teaching.Snapshot().slowdownActive &&
@@ -238,6 +284,7 @@ void AttackReadabilityContract() {
     // Shared snapshot publication must use the phase advanced this tick, not
     // CombatTeaching::Update's deliberately pre-step lesson state.
     auto config=Rules(); config.waterfallSkeletonEncounter=false;
+    config.specialSkeletonAttacks1_7=true;
     config.playerStartX=0; config.playerStartZ=-3.75f;
     GameSimulation sim(config); InputSnapshot input;
     input.tutorialEnabled=false; input.damageEnabled=false;
@@ -248,7 +295,8 @@ void AttackReadabilityContract() {
         const auto index=state.swordCombat.attackerIndex;
         if(index>=0) {
             const auto phase=state.swordCombat.combatants[index].action;
-            if(!windup && phase==EnemyCombatAction::AttackWindup) {
+            const bool yellow=state.swordCombat.combatants[index].attackKind==EnemyAttackKind::GuardBreak;
+            if(!windup && yellow && phase==EnemyCombatAction::AttackWindup) {
                 windup=true;
                 Check(state.combatTeaching.attackReadability==AttackReadability::Parryable &&
                       !state.combatTeaching.enabled,
@@ -260,12 +308,12 @@ void AttackReadabilityContract() {
                 Check(sim.Snapshot().combatTeaching.attackReadability==AttackReadability::Parryable,
                       "resuming publishes the still-current phase without advancing a cue timer");
             }
-            if(!active && phase==EnemyCombatAction::AttackActive) {
+            if(!active && yellow && phase==EnemyCombatAction::AttackActive) {
                 active=true;
                 Check(state.combatTeaching.attackReadability==AttackReadability::Parryable,
                       "same-tick active publication retains the existing yellow attack category");
             }
-            if(phase==EnemyCombatAction::AttackRecovery) {
+            if(yellow && phase==EnemyCombatAction::AttackRecovery) {
                 recovery=true;
                 Check(state.combatTeaching.attackReadability==AttackReadability::Neutral,
                       "same-tick recovery publication clears yellow despite the previous lesson cue");
@@ -490,7 +538,7 @@ void ActualIncomingHits() {
 }
 void HeldGuardDamageContract() {
     // The ordinary encounter starts a real skeleton wind-up. The deliberately
-    // early fresh parry expires before contact; only held guard may mitigate it.
+    // early fresh parry expires before contact; only held guard may block it.
     for(bool frontal:{true,false}) {
         auto config=Rules(); config.waterfallSkeletonEncounter=false;
         config.playerStartX=0; config.playerStartZ=-3.75f;
@@ -498,9 +546,9 @@ void HeldGuardDamageContract() {
         GameSimulation sim(config); InputSnapshot input;
         input.tutorialEnabled=false; input.yawRadians=config.playerStartYawRadians;
         input.guardHeld=true; input.commands.parry=1;
-        int acceptedHits=0, successfulParries=0; bool sawGuard=false;
+        int contacts=0, damageEvents=0, successfulParries=0; bool sawGuard=false;
         const int desiredHits=frontal?2:1;
-        for(int tick=0;tick<900 && acceptedHits<desiredHits;++tick) {
+        for(int tick=0;tick<900 && contacts<desiredHits;++tick) {
             // A malicious/repeated command stream must not turn a held input
             // into periodic free parry windows or erase the incoming contacts.
             if(tick>0) ++input.commands.parry;
@@ -509,23 +557,28 @@ void HeldGuardDamageContract() {
             sawGuard=sawGuard || state.playerCombat.action==PlayerCombatAction::Guard;
             for(const auto& event:sim.Events().Events()) {
                 if(event.type==GameplayEventType::PlayerParrySucceeded) ++successfulParries;
-                if(event.type==GameplayEventType::PlayerDamaged) {
-                    ++acceptedHits;
-                    if(frontal && acceptedHits==1)
-                        Check(state.playerVitals.vitality==3 && state.playerVitals.halfHeart,
-                              "first actual frontal guarded hit removes exactly half a heart");
-                    else
-                        Check(state.playerVitals.vitality==2 && !state.playerVitals.halfHeart,
-                              frontal?"two actual guarded contacts remove exactly one heart":
-                                      "rear melee is not protected by the forward guard pose");
-                    Check(Near(state.playerVitals.invulnerabilityRemaining,1.0f),
-                          "guarded damage still owns one normal post-hit invulnerability interval");
-                }
+                if(event.type==GameplayEventType::PlayerDamaged) ++damageEvents;
+            }
+            if(state.swordCombat.playerHitPulse) {
+                ++contacts;
+                const auto& trace=state.combatContactTrace;
+                const auto& sample=trace.samples[(trace.nextIndex+trace.kCapacity-1)%trace.kCapacity];
+                if(frontal)
+                    Check(state.playerVitals.vitality==3 && !state.playerVitals.halfHeart &&
+                          state.playerVitals.invulnerabilityRemaining==0.f &&
+                          sample.outcome==CombatContactOutcome::GuardBlocked,
+                          "each actual normal frontal guard contact fully blocks without granting post-hit immunity");
+                else
+                    Check(state.playerVitals.vitality==2 && !state.playerVitals.halfHeart &&
+                          Near(state.playerVitals.invulnerabilityRemaining,1.f) &&
+                          sample.outcome==CombatContactOutcome::DamageAccepted,
+                          "rear melee stays full damage with its ordinary post-hit protection");
             }
             sim.ClearEvents();
         }
-        Check(sawGuard && acceptedHits==desiredHits && successfulParries==0,
-              "held guard reaches actual contact without edge-spam parries or rounded-away damage");
+        Check(sawGuard && contacts==desiredHits && successfulParries==0 &&
+              damageEvents==(frontal?0:1),
+              "held guard blocks real normal contacts without edge-spam parries or fake damage feedback");
     }
 
     GameSimulation red(Rules()); InputSnapshot redInput; redInput.tutorialEnabled=false;
@@ -565,6 +618,205 @@ void HeldGuardDamageContract() {
     }
     Check(sawLegacyActive && !sawLegacyGuard && legacy.Snapshot().playerCombat.action==PlayerCombatAction::Idle,
           "historical configuration keeps the original one-shot parry despite a held field");
+}
+
+void YellowGuardBreakAndDefences() {
+    auto config=Rules(); config.waterfallSkeletonEncounter=false;
+    config.specialSkeletonAttacks1_7=true; // Diagnostic only; production default stays OFF.
+    config.playerStartX=0; config.playerStartZ=-3.75f;
+    const auto reachYellow=[](GameSimulation& sim,InputSnapshot& input,float lead) {
+        for(int tick=0;tick<700;++tick) {
+            const auto& state=sim.Snapshot(); const auto owner=state.swordCombat.attackerIndex;
+            if(owner>=0) {
+                const auto& actor=state.swordCombat.combatants[owner];
+                if(actor.action==EnemyCombatAction::AttackWindup && actor.attackKind==EnemyAttackKind::GuardBreak &&
+                   actor.actionTime+.00001f>=CombatTimeline::kSkeletonAttackWindupSeconds-lead) return true;
+            }
+            sim.StepFixed(input); sim.ClearEvents();
+        }
+        return false;
+    };
+    GameSimulation held(config); InputSnapshot input;
+    input.tutorialEnabled=false; input.guardHeld=true; input.commands.parry=1;
+    Check(reachYellow(held,input,.02f),"held guard fixture reaches a real opted-in yellow attack after normal blocks");
+    Check(held.Snapshot().playerVitals.vitality==3 && !held.Snapshot().playerVitals.halfHeart,
+          "the earlier normal attacks were fully blocked before the yellow attempt");
+    bool broke=false;
+    for(int tick=0;tick<5 && !broke;++tick) {
+        held.StepFixed(input); const auto& state=held.Snapshot();
+        if(state.swordCombat.playerHitPulse) {
+            const auto& trace=state.combatContactTrace;
+            const auto& sample=trace.samples[(trace.nextIndex+trace.kCapacity-1)%trace.kCapacity];
+            broke=sample.guardBroken && sample.incomingAttackKind==EnemyAttackKind::GuardBreak &&
+                sample.outcome==CombatContactOutcome::DamageAccepted;
+        }
+        held.ClearEvents();
+    }
+    Check(broke && held.Snapshot().playerVitals.vitality==2 && !held.Snapshot().playerVitals.halfHeart &&
+          held.Snapshot().playerCombat.action!=PlayerCombatAction::Guard,
+          "actual yellow contact breaks held guard and deals exactly one full heart");
+    bool freeRearm=false;
+    for(int tick=0;tick<35;++tick) {
+        ++input.commands.parry; held.StepFixed(input);
+        const auto action=held.Snapshot().playerCombat.action;
+        freeRearm=freeRearm || action==PlayerCombatAction::Guard ||
+            action==PlayerCombatAction::ParryStartup || action==PlayerCombatAction::ParryActive;
+        held.ClearEvents();
+    }
+    Check(!freeRearm,"yellow guard break requires physical release even with fresh command spam while held");
+    input.guardHeld=false; held.StepFixed(input);
+    input.guardHeld=true; ++input.commands.parry; bool rearmed=false;
+    for(int tick=0;tick<40;++tick) {
+        held.StepFixed(input); rearmed=rearmed || held.Snapshot().playerCombat.action==PlayerCombatAction::Guard;
+        held.ClearEvents();
+    }
+    Check(rearmed,"release then a genuine fresh press can re-enter held guard after a yellow break");
+
+    GameSimulation parry(config); InputSnapshot parryInput;
+    parryInput.tutorialEnabled=false; parryInput.damageEnabled=false;
+    Check(reachYellow(parry,parryInput,.10f),"yellow parry fixture reaches the unchanged real defense deadline");
+    parryInput.damageEnabled=true; parryInput.guardHeld=true; parryInput.commands.parry=1;
+    bool succeeded=false;
+    for(int tick=0;tick<20 && !succeeded;++tick) {
+        parry.StepFixed(parryInput);
+        for(const auto& event:parry.Events().Events())
+            succeeded=succeeded || event.type==GameplayEventType::PlayerParrySucceeded;
+        parry.ClearEvents();
+    }
+    Check(succeeded && parry.Snapshot().playerVitals.vitality==3,
+          "a real timed parry still defeats yellow without damage or a guard break");
+
+    GameSimulation dodge(config); InputSnapshot dodgeInput;
+    dodgeInput.damageEnabled=false;
+    Check(reachYellow(dodge,dodgeInput,5.f/60),"yellow dodge fixture reaches a real incoming threat");
+    dodgeInput.damageEnabled=true; dodgeInput.moveStrafe=1; dodgeInput.commands.dodge=1;
+    bool protectedContact=false;
+    for(int tick=0;tick<30;++tick) {
+        if(tick==12) dodgeInput.moveStrafe=0;
+        dodge.StepFixed(dodgeInput); const auto& state=dodge.Snapshot();
+        if(state.swordCombat.playerHitPulse) {
+            const auto& trace=state.combatContactTrace;
+            const auto& sample=trace.samples[(trace.nextIndex+trace.kCapacity-1)%trace.kCapacity];
+            protectedContact=sample.incomingAttackKind==EnemyAttackKind::GuardBreak &&
+                sample.outcome==CombatContactOutcome::DodgeProtected && !sample.guardBroken;
+        }
+        dodge.ClearEvents();
+    }
+    Check(protectedContact && dodge.Snapshot().combatTeaching.dodgeLearned && dodge.Snapshot().playerVitals.vitality==3,
+          "an actual outward dodge of yellow keeps the shared protection window and teaches from its real threat");
+    std::cout<<"Yellow outward dodge protected-contact="<<protectedContact
+             <<" learned="<<dodge.Snapshot().combatTeaching.dodgeLearned<<'\n';
+}
+
+void FourSkillPracticeAndExit() {
+    auto config=Rules(); config.waterfallSkeletonEncounter=false;
+    config.playerStartX=0; config.playerStartZ=-3.75f;
+    GameSimulation sim(config); InputSnapshot input;
+    Check(LearnBlockFromRealContact(sim,input) && sim.Snapshot().combatTeaching.stage==TutorialStage::Parry,
+          "four-skill practice advances only after a real guarded normal contact");
+    const auto reachTell=[&](float lead) {
+        for(int tick=0;tick<600;++tick) {
+            const auto& state=sim.Snapshot(); const auto owner=state.swordCombat.attackerIndex;
+            if(owner>=0 && state.swordCombat.combatants[owner].action==EnemyCombatAction::AttackWindup &&
+               state.swordCombat.combatants[owner].actionTime+.00001f>=CombatTimeline::kSkeletonAttackWindupSeconds-lead)
+                return true;
+            sim.StepFixed(input); sim.ClearEvents();
+        }
+        return false;
+    };
+    Check(reachTell(.10f),"four-skill practice reaches actual parry timing after learning block");
+    ++input.commands.parry;
+    for(int tick=0;tick<20 && !sim.Snapshot().combatTeaching.parryLearned;++tick) {
+        sim.StepFixed(input); sim.ClearEvents();
+    }
+    Check(sim.Snapshot().combatTeaching.parryLearned && sim.Snapshot().combatTeaching.stage==TutorialStage::Dodge,
+          "real successful parry advances the protected lesson to dodge");
+    Check(reachTell(5.f/60),"four-skill practice waits for the next real attack before its outward dodge");
+    input.moveStrafe=1; ++input.commands.dodge;
+    for(int tick=0;tick<30;++tick) {
+        if(tick==12) input.moveStrafe=0;
+        sim.StepFixed(input); sim.ClearEvents();
+    }
+    input.moveStrafe=0;
+    Check(sim.Snapshot().combatTeaching.dodgeLearned && sim.Snapshot().combatTeaching.stage==TutorialStage::AttackFromGuard,
+          "an actual protected sideways dodge advances to the guard-attack lesson");
+    input.guardHeld=false; sim.StepFixed(input);
+    input.guardHeld=true; ++input.commands.parry;
+    for(int tick=0;tick<45;++tick) { sim.StepFixed(input); sim.ClearEvents(); }
+    const auto before=sim.Snapshot(); const auto owner=before.swordCombat.attackerIndex;
+    Check(owner>=0 && before.playerCombat.action==PlayerCombatAction::Guard,
+          "guard-attack practice starts in a real held pose after dodge recovery and release");
+    if(owner>=0)
+        input.yawRadians=std::atan2(before.swordCombat.combatants[owner].x-before.playerX,
+                                   before.playerZ-before.swordCombat.combatants[owner].z);
+    ++input.commands.attack; bool actualHit=false;
+    for(int tick=0;tick<100 && !sim.Snapshot().combatTeaching.attackFromGuardLearned;++tick) {
+        sim.StepFixed(input);
+        for(const auto& event:sim.Events().Events()) actualHit=actualHit || event.type==GameplayEventType::EnemyHit;
+        sim.ClearEvents();
+    }
+    const auto ready=sim.Snapshot().combatTeaching;
+    std::cout<<"Four-skill actual flags="<<ready.blockLearned<<ready.parryLearned<<ready.dodgeLearned
+             <<ready.attackFromGuardLearned<<" hit="<<actualHit<<" stage="<<int(ready.stage)
+             <<" protected-contacts="<<sim.Snapshot().dodgeProtectedHitCount<<'\n';
+    Check(actualHit && ready.blockLearned && ready.parryLearned && ready.dodgeLearned &&
+          ready.attackFromGuardLearned && ready.stage==TutorialStage::Ready && ready.safePractice &&
+          sim.Snapshot().playerCombat.action==PlayerCombatAction::Guard,
+          "all four skills require actual outcomes and legitimate held-guard return before protected Ready");
+    Check(reachTell(.30f),"ready practice still has a live threat for safe-exit validation");
+    ++input.commands.tutorialSkip; sim.StepFixed(input);
+    Check(sim.Snapshot().combatTeaching.exitPending && sim.Snapshot().combatTeaching.safePractice &&
+          sim.Snapshot().combatTeaching.stage==TutorialStage::Ready,
+          "explicit finish during an enemy windup keeps protection until a safe attack boundary");
+    input.paused=true; sim.AdvanceFrame(input,.20);
+    Check(sim.Snapshot().combatTeaching.exitPending && sim.Snapshot().combatTeaching.stage==TutorialStage::Ready,
+          "pause cannot acknowledge or advance a pending practice exit");
+    input.paused=false;
+    for(int tick=0;tick<300 && sim.Snapshot().combatTeaching.stage!=TutorialStage::Complete;++tick) {
+        sim.StepFixed(input); sim.ClearEvents();
+    }
+    Check(sim.Snapshot().combatTeaching.stage==TutorialStage::Complete && !sim.Snapshot().combatTeaching.safePractice,
+          "finish acknowledges only after the live windup and contact have completed safely");
+    sim.RetryEncounter();
+    Check(sim.Snapshot().combatTeaching.stage==TutorialStage::Complete &&
+          sim.Snapshot().combatTeaching.attackFromGuardLearned,
+          "ordinary retry retains genuinely learned skills and does not silently re-enter protection");
+    ++input.commands.tutorialReplay; sim.StepFixed(input);
+    const auto replay=sim.Snapshot().combatTeaching;
+    Check(replay.stage==TutorialStage::Block && !replay.blockLearned && !replay.parryLearned &&
+          !replay.dodgeLearned && !replay.attackFromGuardLearned,
+          "explicit replay resets all four learning witnesses for actual repeated practice");
+
+    // The small observer must reject button presses, whiffs, release,
+    // interruption and changing attack identity rather than manufacture credit.
+    for(int failure=0;failure<5;++failure) {
+        CombatTeaching teaching; teaching.Reset(true); CombatSnapshot combat;
+        if(failure!=0) teaching.BeginGuardAttack();
+        combat.activePlayerAttackId=10; combat.player.action=PlayerCombatAction::SwingActive;
+        teaching.ObserveGuardAttack(combat,true,false,failure!=1);
+        if(failure==2) teaching.ObserveGuardAttack(combat,false,false,false);
+        if(failure==3) teaching.ObserveGuardAttack(combat,true,true,false);
+        if(failure==4) { combat.activePlayerAttackId=11; teaching.ObserveGuardAttack(combat,true,false,true); }
+        combat.activePlayerAttackId=0; combat.player.action=PlayerCombatAction::Guard;
+        teaching.ObserveGuardAttack(combat,true,false,false);
+        Check(!teaching.Snapshot().attackFromGuardLearned,
+              "guard attack cannot be learned without origin, actual contact, held continuity and matching recovery identity");
+    }
+    CombatTeaching empty; empty.Reset(true); CombatSnapshot defeated; LichSnapshot keeper;
+    defeated.aliveCount=0;
+    for(auto& actor:defeated.combatants) { actor.health=0; actor.action=EnemyCombatAction::Dead; }
+    empty.Update(true,false,false,defeated,keeper,EnemyKind::Skeleton);
+    Check(empty.Snapshot().cue==CombatTeachingCue::Replay && empty.Snapshot().safePractice &&
+          !empty.Snapshot().blockLearned && !empty.Snapshot().parryLearned,
+          "all guards dead before lessons offers explicit replay without fake learning or automatic revival");
+    empty.Skip(); empty.Update(true,false,false,defeated,keeper,EnemyKind::Skeleton);
+    Check(empty.Snapshot().stage==TutorialStage::Skipped && !empty.Snapshot().safePractice,
+          "a safely defeated practice pair still permits an explicit unearned skip");
+    empty.Reset(true); empty.RestoreEnded(); empty.Update(true,false,true,defeated,keeper,EnemyKind::Lich);
+    Check(empty.Snapshot().stage==TutorialStage::Skipped && !empty.Snapshot().safePractice &&
+          !empty.Snapshot().blockLearned && !empty.Snapshot().parryLearned && !empty.Snapshot().dodgeLearned &&
+          !empty.Snapshot().attackFromGuardLearned,
+          "earned restore is terminal even when paused and never invents four learned flags");
 }
 
 void GuardAttackAndReleaseAtContact() {
@@ -694,6 +946,7 @@ void CoherentSlowdown() {
     auto config=Rules(); config.waterfallSkeletonEncounter=false;
     config.playerStartX=0; config.playerStartZ=-3.75f;
     GameSimulation sim(config); InputSnapshot input; input.tutorialSlowdownEnabled=true;
+    Check(LearnBlockFromRealContact(sim,input),"slowdown fixture earns the prerequisite block from actual normal contact");
     int ticks=0;
     while(ticks++<600 && sim.Snapshot().combatTeaching.cue!=CombatTeachingCue::ParryNow) {
         sim.StepFixed(input); sim.ClearEvents();
@@ -712,6 +965,7 @@ void CoherentSlowdown() {
     // the default spawn has no enemy in range to teach a defensive window.
     GameSimulation retryProbe(config); InputSnapshot retryInput;
     retryInput.tutorialSlowdownEnabled=true;
+    Check(LearnBlockFromRealContact(retryProbe,retryInput),"retry slowdown fixture also earns its block without seeding progress");
     int retryTicks=0;
     while(retryTicks++<600&&retryProbe.Snapshot().combatTeaching.cue!=CombatTeachingCue::ParryNow)
         retryProbe.StepFixed(retryInput);
@@ -727,7 +981,7 @@ void CoherentSlowdown() {
           "retry reconstruction immediately restores normal gameplay speed");
     sim.StepFixed(input); sim.ClearEvents();
     const auto before=sim.Snapshot();
-    input.commands.attack=1; input.commands.parry=1; input.commands.dodge=1;
+    input.commands.attack=1; ++input.commands.parry; input.commands.dodge=1;
     input.moveStrafe=1;
     sim.StepFixed(input);
     const auto after=sim.Snapshot();
@@ -737,7 +991,7 @@ void CoherentSlowdown() {
           "movement and dodge protection use the same scaled gameplay delta");
     Check(after.playerCombat.action==PlayerCombatAction::SwingWindup &&
           Near(after.playerCombat.actionTime,.25f/60) && after.lastConsumedAttackSequence==1 &&
-          after.lastConsumedParrySequence==1 && after.lastConsumedDodgeSequence==1,
+          after.lastConsumedParrySequence==2 && after.lastConsumedDodgeSequence==1,
           "attack wins simultaneous parry; all input edges remain responsive during slowdown");
     const auto attacker=before.swordCombat.attackerIndex;
     Check(attacker>=0 && Near(after.swordCombat.combatants[attacker].actionTime-
@@ -751,8 +1005,12 @@ void CoherentSlowdown() {
     input.paused=false;
     input.commands.tutorialSkip=1;
     sim.StepFixed(input);
-    Check(sim.Snapshot().combatTeaching.stage==TutorialStage::Skipped &&
-          !sim.Snapshot().combatTeaching.slowdownActive,"skip exits teaching slowdown through the owner command path");
+    Check((sim.Snapshot().combatTeaching.stage==TutorialStage::Skipped || sim.Snapshot().combatTeaching.exitPending) &&
+          !sim.Snapshot().combatTeaching.slowdownActive,"skip request exits slowdown without dropping protection in a live attack");
+    for(int tick=0;tick<300 && sim.Snapshot().combatTeaching.stage!=TutorialStage::Skipped;++tick)
+        sim.StepFixed(input);
+    Check(sim.Snapshot().combatTeaching.stage==TutorialStage::Skipped,
+          "requested skip reaches the unchanged safe combat boundary before ordinary damage resumes");
     const auto skipped=sim.Snapshot(); sim.StepFixed(input);
     Check(Near(sim.Snapshot().walkTime-skipped.walkTime,1.0f/60) &&
           sim.Snapshot().gameplayTimeScale==1,"ordinary clock resumes without double stepping");
@@ -897,6 +1155,115 @@ void OutgoingTraceContract() {
     sim.SynchronizePausedInput(input,2,PausedInputPolicy::DiscardAllCommands);
     Check(sim.Snapshot().combatContactTrace.count==0,
           "lifecycle cancellation cannot replay old contact observations");
+}
+void EnemyAttackKindAuthority() {
+    RoutePosition player{0.f,-3.37f}; float yaw=0.f; bool waterfall=false;
+    const auto step=[&](SwordCombat& combat)->const CombatSnapshot& {
+        return combat.Update(1.f/60,player.x,player.z,yaw,true,true,waterfall);
+    };
+    const auto nextWindup=[&](SwordCombat& combat,std::size_t actor) {
+        for(int tick=0;tick<300;++tick) {
+            const auto previous=combat.Snapshot().combatants[actor].action;
+            if(step(combat).combatants[actor].action==EnemyCombatAction::AttackWindup &&
+               previous!=EnemyCombatAction::AttackWindup) return true;
+        }
+        return false;
+    };
+    const auto nextContact=[&](SwordCombat& combat,std::size_t actor) {
+        for(int tick=0;tick<160;++tick)
+            if(step(combat).combatants[actor].playerHitPulse) return true;
+        return false;
+    };
+    SwordCombat combat; combat.Reset(1u,{0.f,-4.65f},nullptr,2);
+    for(int ordinal=1;ordinal<=6;++ordinal) {
+        Check(nextWindup(combat,0),"category fixture reaches each actual skeleton windup");
+        const auto expected=ordinal==3 || ordinal==6
+            ? EnemyAttackKind::GuardBreak : EnemyAttackKind::Normal;
+        Check(combat.Snapshot().combatants[0].attackKind==expected,
+              "specials are default off and follow each actor's deterministic third-attempt policy");
+        // Enable during attack one, disable during the first yellow, and
+        // enable during attack five. No visible windup may change category.
+        if(ordinal==1 || ordinal==5) combat.SetSpecialAttacksEnabled(true);
+        if(ordinal==3) combat.SetSpecialAttacksEnabled(false);
+        step(combat);
+        Check(combat.Snapshot().combatants[0].attackKind==expected,
+              "a mid-windup policy toggle cannot recolor the already latched attack");
+        Check(nextContact(combat,0) &&
+              combat.Snapshot().combatants[0].playerHitKind==expected &&
+              combat.Snapshot().combatants[0].attackKind==expected,
+              "incoming contact carries its actual windup category even after a policy toggle");
+        step(combat);
+        Check(!combat.Snapshot().combatants[0].playerHitPulse &&
+              combat.Snapshot().combatants[0].playerHitKind==EnemyAttackKind::Normal,
+              "hit category is a one-tick contact value, never stale damage authority");
+    }
+    combat.Reset(1u,{0.f,-4.65f},nullptr,2);
+    for(int ordinal=1;ordinal<=3;++ordinal) {
+        Check(nextWindup(combat,0) &&
+              combat.Snapshot().combatants[0].attackKind==EnemyAttackKind::Normal,
+              "reset restores default-off attacks including the third attempt");
+        Check(nextContact(combat,0),"default-off reset preserves ordinary incoming contact");
+    }
+
+    // Normal and opted-in yellow retain the same actual timed parry, source
+    // identity and successful no-incoming-hit result.
+    for(int parryOrdinal:{1,3}) {
+        combat.Reset(1u,{0.f,-4.65f},nullptr,2);
+        combat.SetSpecialAttacksEnabled(true);
+        for(int ordinal=1;ordinal<parryOrdinal;++ordinal) {
+            Check(nextWindup(combat,0) && nextContact(combat,0),
+                  "parry category fixture advances only real preceding attacks");
+        }
+        Check(nextWindup(combat,0),"parry category fixture acquires its intended windup");
+        const auto expected=parryOrdinal==3 ? EnemyAttackKind::GuardBreak : EnemyAttackKind::Normal;
+        for(int tick=0;tick<90 &&
+              combat.Snapshot().combatants[0].action==EnemyCombatAction::AttackWindup &&
+              combat.Snapshot().combatants[0].actionTime<CombatTimeline::kSkeletonAttackWindupSeconds-.10f;++tick)
+            step(combat);
+        Check(combat.Snapshot().combatants[0].action==EnemyCombatAction::AttackWindup &&
+              combat.Snapshot().combatants[0].actionTime>=CombatTimeline::kSkeletonAttackWindupSeconds-.10f,
+              "normal and yellow use the unchanged authored windup deadline before the parry edge");
+        combat.RequestParry(); bool parried=false;
+        for(int tick=0;tick<20 && !parried;++tick)
+            parried=step(combat).combatants[0].parrySuccessPulse;
+        Check(parried && combat.Snapshot().combatants[0].attackKind==expected &&
+              combat.Snapshot().parriedAttackerIndex==0 && !combat.Snapshot().combatants[0].playerHitPulse,
+              "normal and yellow attacks remain timed-parryable without changing contact timing");
+    }
+
+    player={-4.5f,-15.3f}; waterfall=true;
+    const std::array<SkeletonSpawnPose,kSkeletonCombatantCapacity> spawns{{
+        {{-5.5f,-15.95f},0.f,0.f}, {{-5.5f,-14.45f},0.f,0.f},
+    }};
+    for(std::size_t killed:{0u,1u}) {
+        combat.Reset(kSkeletonCombatantCapacity,kWaterfallSkeletonPairCenter,&spawns,1);
+        combat.SetSpecialAttacksEnabled(true);
+        yaw=killed==0 ? -.994421107f : -2.275290391f;
+        for(int tick=0;tick<6;++tick) step(combat);
+        combat.RequestAttack();
+        for(int tick=0;tick<40 && combat.Snapshot().combatants[killed].health>0;++tick) step(combat);
+        const std::size_t survivor=1u-killed;
+        Check(combat.Snapshot().combatants[killed].health==0 &&
+              combat.Snapshot().combatants[survivor].health==1 &&
+              combat.Snapshot().attackerIndex==static_cast<std::int32_t>(survivor),
+              "either kill order leaves the single living actor owning its own attack attempt");
+        Check(combat.Snapshot().combatants[survivor].action==EnemyCombatAction::AttackWindup &&
+              combat.Snapshot().combatants[survivor].attackKind==EnemyAttackKind::Normal &&
+              nextContact(combat,survivor),
+              "surviving A or B keeps its first normal attack independent of the dead actor");
+        for(int ordinal=2;ordinal<=3;++ordinal) {
+            Check(nextWindup(combat,survivor) &&
+                  combat.Snapshot().combatants[survivor].attackKind==
+                      (ordinal==3 ? EnemyAttackKind::GuardBreak : EnemyAttackKind::Normal) &&
+                  nextContact(combat,survivor),
+                  "survivor's third attack is yellow regardless of which stable actor died first");
+        }
+    }
+    combat.RestoreCampaignDefeated(spawns);
+    Check(combat.Snapshot().aliveCount==0 && combat.Snapshot().attackerIndex==-1 &&
+          combat.Snapshot().combatants[0].attackKind==EnemyAttackKind::Normal &&
+          combat.Snapshot().combatants[1].attackKind==EnemyAttackKind::Normal,
+          "earned defeated restore has no retained special attack or attacker debt");
 }
 void NonfatalPairHitPreservesIndependentActions() {
     constexpr float playerStartX=-4.5f, playerStartZ=-15.3f;
@@ -1314,8 +1681,10 @@ void RouteMeleeOcclusion() {
 int main() {
     WindowAndLifecycle(); TeachingContract(); AttackReadabilityContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();
     HeldGuardDamageContract(); GuardAttackAndReleaseAtContact(); GuardInterruptionRearm();
+    YellowGuardBreakAndDefences(); FourSkillPracticeAndExit();
     IntegratedKeeperRepelAndReward();
     OutgoingTraceContract();
+    EnemyAttackKindAuthority();
     NonfatalPairHitPreservesIndependentActions();
     WaterfallRoomEngagementAndTeaching();
     RouteMeleeOcclusion();

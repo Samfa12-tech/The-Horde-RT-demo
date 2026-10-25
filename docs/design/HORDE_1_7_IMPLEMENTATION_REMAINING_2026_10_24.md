@@ -2,6 +2,15 @@
 
 ## Latest owner-playtest follow-up, 25 October
 
+The subsequent [shared rules/four-skill checkpoint](../evidence/2026-10-25-four-skill-practice/README.md)
+now implements ordinary full block and actual block/parry/dodge/guard-attack
+practice, protected Ready and safe explicit exit on both platforms. New yellow
+guard-break authority is tested opt-in but remains OFF until the in-world ring
+is admitted. Prior half-damage/two-skill wording below is historical. The one-time
+scream/revival bridge is still unfinished, both failed joins stay disabled, and
+the exact ring-capacity decision remains pending. This is a source checkpoint,
+not physical-phone, audio/balance or natural-journey acceptance.
+
 This update supersedes older device/guard acceptance wording below, without
 turning the historical checkpoints into newer evidence. Sam accepts the held
 guard and attack-return animation on installed `f27982cd`; broader damage,
@@ -12,8 +21,9 @@ at 10:37:25.915 UTC after private recording retrieval; no further device calls.
   RT/readiness-gated Android entry with responsive loading/retry/cancel
   `ca1826d9`, and actual-outcome parry teaching feedback `9dfc319c`.
   [Evidence and limits](../evidence/2026-10-25-owner-playtest/README.md).
-- Next source work: approved full normal block/yellow guard-break direction,
-  actual four-skill practice and one-time two-skeleton revival before Keeper.
+- Next source work: one-time two-skeleton revival before Keeper and admission
+  of the enemy-anchored special-attack warning. Shared attack categories and
+  four-skill practice now have the checkpoint above; special attacks stay OFF.
   [Chronology and minimal plan](HORDE_1_7_COMBAT_PRACTICE_BRIDGE_2026_10_25.md)
   records the Skip/revival pacing choice before broad integration. The
   [reverse-Dead RT proof](../evidence/2026-10-25-skeleton-revive/README.md) retains
@@ -23,8 +33,8 @@ at 10:37:25.915 UTC after private recording retrieval; no further device calls.
   A contact-preserving authored stand transition remains unfinished; neither
   proof is an admitted animation or real revival.
 - In-world special-attack rings need an explicit measured RT owner seam; no
-  capacity was increased or screen-space substitute added. Current half-damage
-  guard rules remain until the new combat-rule slice is implemented/tested.
+  capacity was increased or screen-space substitute added. Ordinary full block
+  is implemented; special yellow admission remains separate from its tested rules.
 - Scream transfer/identity and private PCM conversion are complete; listening,
   one-time event/spatial mix and game-integrated asset admission are unfinished.
   The original and isolated draft are not publicly vendored.
@@ -66,7 +76,7 @@ Sam's latest direction is to keep implementing agreed work until only actual pla
 
 | Area | Current implementation/evidence | Actual remaining gap |
 | --- | --- | --- |
-| Held guard and attack transition | [Current development implementation](../evidence/2026-10-25-held-guard/README.md) preserves fresh timed parry; held frontal blockable hits lose half a heart, red/rear hits stay full. Attack ends mitigation, retains full recovery, then held guard returns without re-parry. Shared pose/half-heart HUD, exact legacy-compatible saves and platform cancel/rearm are implemented. Focused checks and202actual hidden RT frames pass. | Local Windows atomic storage execution is access-denied, not silently retried; exact-head CI and bounded phone checks remain. Physical two-thumb feel, broader lantern/framing/lifecycle and combat balance need playtesting. No stabs/new combos/progression added. |
+| Held guard and attack transition | [Current shared rules](../evidence/2026-10-25-four-skill-practice/README.md) fully block eligible normal frontal hits, retain fresh timed parry and full red/rear damage. Yellow guard-break is tested opt-in but OFF pending in-world warning admission. Attack ends mitigation, retains full recovery, then held guard returns without re-parry. Sam accepted these animation joins on f27982cd; the newer hidden RT run matches202pose records/60images. Half-heart legacy save/HUD support remains. | New-rule phone balance/feedback and broad natural-play/lifecycle acceptance remain; the earlier local atomic-storage denial is not silently retried. No stabs/new combos/progression added. |
 | Combat, teaching, lantern, rescue/rope, trail and saves | Shared mechanics, hearts, tutorial/parry/dodge, three manual/auto slots, grounded ascent/descent, presented-lantern lesson, Kit trail, endpoint and return/load exist. CPU input-driven victory-to-earned-record recovery and Windows RT post-Keeper continuations are distinct evidence. | Natural human Keeper victory through the whole journey/death recovery, teaching/contact clarity, controller/touch and platform lifecycle acceptance. A seeded native start is not natural victory. |
 | Kit following and turning | [Stationary-only eligibility](../evidence/2026-10-24-kit-stationary-eligibility/README.md) is admitted in the development profile; routine bends keep continuous legacy walking. [Context timing](../evidence/2026-10-24-kit-context-timing/README.md) now latches 0.75 s non-travel versus 0.50 s travel exchanges. Natural host route/save and actual normal-actor RT joins pass; 79 urgent frames remain identical. | Final phone/human feel and broader natural-play acceptance. Old OFF/stranding/hint-first paragraphs are rejected historical states, not current behavior. No new catch-up speed, tether expansion, unseen snap or culling was added. |
 | Movement/body presentation | Auto head-clearance crouch, stick-deflection speed, keyboard run key, backwards phase and directional dodge exist with host/native evidence. | Physical low-clearance/rope/input feel; backward-run/strafe art quality where no suitable authored clip exists. The [one lateral authoring study](../evidence/2026-10-24-player-lateral-study/README.md) preserves the rig but remains unadmitted after a cramped crossover and one knee correction; no native clip/binding changed. Do not relabel reversed/procedural motion as new imported animation. The [owned Run retarget](../evidence/2026-10-24-player-run-retarget/README.md) is also unadmitted: its existing3.2m/s cadence is calibrated, but Run flight exceeds the walk-only grounding envelope and causes a44mm root fallback change. RT hands/presentation pass; intended look-down and body-reflection coverage remain incomplete. No production clip/binding changed. |

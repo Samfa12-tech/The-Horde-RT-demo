@@ -538,6 +538,7 @@ struct VulkanSurfaceContext
     bool reducedMotionEnabled = false;
     std::string combatTeachingFadeText;
     bool combatAttackCueVisible = false;
+    bool combatPracticeCueVisible = false;
     unsigned char combatTeachingFadeOpacity = 0u;
     std::uint64_t combatTeachingFadeStartedAtMs = 0u;
     std::uint64_t combatTeachingSkipSequence = 0u;
@@ -3090,13 +3091,14 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     if (!prompt) return;
     const auto& teaching = context.simulation.Snapshot().combatTeaching;
     const bool attackCue = horde::platform::windows::HasAttackReadabilityCue(teaching);
-    if (context.combatAttackCueVisible && !attackCue)
+    if ((context.combatAttackCueVisible && !attackCue) || (context.combatPracticeCueVisible && !teaching.safePractice))
     {
         context.combatTeachingFadeText.clear();
         context.combatTeachingFadeOpacity = 0u;
         context.combatTeachingFadeStartedAtMs = 0u;
     }
     context.combatAttackCueVisible = attackCue;
+    context.combatPracticeCueVisible = teaching.safePractice;
     const std::string text = horde::platform::windows::CombatTeachingPromptText(teaching, context.teachingControllerGlyphs);
     const bool eligible = context.controlsEnabled && !MeasurementPausedByUi(context) &&
         !context.benchmarkReportVisible && !context.benchmark.IsRunning() &&
@@ -3115,7 +3117,7 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     if (!text.empty())
     {
         context.combatTeachingFadeText = text;
-        context.combatTeachingFadeOpacity = attackCue ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
+        context.combatTeachingFadeOpacity = attackCue || teaching.safePractice ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
             teaching.promptOpacity, context.reducedMotionEnabled);
         context.combatTeachingFadeStartedAtMs = 0u;
         SetWindowTextA(prompt, text.c_str());
@@ -3285,6 +3287,8 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                               MF_BYCOMMAND | (context.combatTeachingEnabled ? MF_CHECKED : MF_UNCHECKED));
                 CheckMenuItem(teaching, kMenuTeachingSlowdownId,
                               MF_BYCOMMAND | (context.combatTeachingSlowdown ? MF_CHECKED : MF_UNCHECKED));
+                ModifyMenuA(teaching,kMenuTeachingSkipId,MF_BYCOMMAND | MF_STRING,kMenuTeachingSkipId,
+                    horde::platform::windows::CombatPracticeActionLabel(context.simulation.Snapshot().combatTeaching));
             }
     }
 #if defined(_DEBUG)
@@ -12404,9 +12408,9 @@ HMENU CreateApplicationMenu()
     AppendMenuA(teaching, MF_STRING | MF_CHECKED, kMenuTeachingEnabledId, "Optional combat lesson");
     AppendMenuA(teaching, MF_STRING, kMenuTeachingSlowdownId, "Ease time during lesson");
     AppendMenuA(teaching, MF_SEPARATOR, 0, nullptr);
-    AppendMenuA(teaching, MF_STRING, kMenuTeachingSkipId, "Skip this lesson");
-    AppendMenuA(teaching, MF_STRING, kMenuTeachingReplayId, "Replay opening lesson");
-    AppendMenuA(demo, MF_POPUP, reinterpret_cast<UINT_PTR>(teaching), "Combat &lesson");
+    AppendMenuA(teaching, MF_STRING, kMenuTeachingSkipId, "Skip practice");
+    AppendMenuA(teaching, MF_STRING, kMenuTeachingReplayId, "Replay opening practice");
+    AppendMenuA(demo, MF_POPUP, reinterpret_cast<UINT_PTR>(teaching), "Combat &practice");
     AppendMenuA(demo, MF_SEPARATOR, 0, nullptr);
     AppendMenuA(demo, MF_STRING, kMenuExitId, "E&xit");
     AppendMenuA(bar, MF_POPUP, reinterpret_cast<UINT_PTR>(demo), "&Demo");

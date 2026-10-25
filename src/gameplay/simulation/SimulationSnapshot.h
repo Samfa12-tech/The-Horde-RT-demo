@@ -52,6 +52,8 @@ struct SkeletonEnemySnapshot
     bool dead = false;
     bool playerHitPulse = false;
     bool parrySuccessPulse = false;
+    EnemyAttackKind attackKind = EnemyAttackKind::Normal;
+    EnemyAttackKind playerHitKind = EnemyAttackKind::Normal;
     // Contact/readability proofs must skin the exact published combat pose.
     // Ordinary locomotion and frozen evidence retain the existing 30Hz policy.
     bool forceCurrentCombatPose = false;

@@ -31,25 +31,28 @@ final class CombatTeachingPreferences {
         catch (ClassCastException invalid) { return fallback; }
     }
 
+    static int stage(long state) { return (int)(state & 0x7L); }
+    static boolean safePractice(long state) { return (state & (1L << 13)) != 0; }
+    static boolean exitPending(long state) { return (state & (1L << 33)) != 0; }
+    static boolean blockLearned(long state) { return (state & (1L << 15)) != 0; }
+    static boolean attackFromGuardLearned(long state) { return (state & (1L << 32)) != 0; }
+    static int practiceActionLabelResource(long state) { return stage(state)==6 ? R.string.combat_teaching_finish : R.string.combat_teaching_skip; }
+
     static String prompt(long state) { return prompt(state, false); }
 
     static String prompt(long state, boolean controller) {
-        final int attack = attackReadability(state);
-        // Current attack information is gameplay readability, independent of the optional lesson.
-        if (attack == 1) return "\u25c7 YELLOW: PARRY";
-        if (attack == 2) return "\u2715 RED: DODGE";
-        final boolean enabled = (state & (1L << 10)) != 0;
-        final int opacity = (int) ((state >>> 40) & 0xffL);
-        if (!enabled || opacity == 0) return "";
-        final int stage = (int) (state & 0x7L);
-        final int cue = (int) ((state >>> 3) & 0xfL);
-        final int source = (int) ((state >>> 7) & 0x7L);
-        final boolean parryLearned = (state & (1L << 11)) != 0;
-        final boolean dodgeLearned = (state & (1L << 12)) != 0;
-        final String lesson = cueText(cue, stage, source, parryLearned, dodgeLearned);
-        if (lesson.isEmpty()) return "";
-        return lesson + (controller ? "\n[LT] Parry  ·  [B] + stick: Dodge"
-                : "\n[Parry] Guard  ·  [Dodge] + move: Evade");
+        final boolean protectedPractice=safePractice(state);
+        final boolean enabled=(state & (1L << 10)) != 0;
+        final int opacity=(int)((state >>> 40) & 0xffL);
+        String text=protectedPractice ? "Practice: no damage" : "";
+        if(protectedPractice || enabled && opacity>0) {
+            String lesson=lessonText(state,controller);
+            if(!lesson.isEmpty())text+=(text.isEmpty()?"":"\n")+lesson;
+        }
+        final int attack=attackReadability(state);
+        if(attack!=0)text+=(text.isEmpty()?"":"\n")+(attack==1
+            ? "\u25c7 YELLOW guard-break: parry/dodge" : "\u2715 RED: unblockable - DODGE");
+        return text;
     }
 
     static int attackReadability(long state) {
@@ -61,21 +64,46 @@ final class CombatTeachingPreferences {
         return attack == 1 ? 0xFFFFD266 : attack == 2 ? 0xFFFF6B6B : HordeUiTokens.PARCHMENT;
     }
     static int promptOpacity(long state) {
-        return attackReadability(state) != 0 ? 255 : (int) ((state >>> 40) & 0xffL);
+        return safePractice(state) || attackReadability(state) != 0 ? 255 : (int) ((state >>> 40) & 0xffL);
     }
     static String description(long state, String visibleText) {
-        final int attack = attackReadability(state);
-        if (attack == 1) return "Yellow parryable attack. Press to parry; hold guard to halve blockable damage.";
-        if (attack == 2) return "Red unblockable attack. Dodge.";
-        return visibleText.replace('\n', ' ');
+        String text=visibleText.replace('\n',' ');
+        if(attackReadability(state)==1)text+=" Yellow guard-break attack: parry or dodge; holding guard cannot block it.";
+        if(attackReadability(state)==2)text+=" Red unblockable attack: dodge.";
+        if(stage(state)==5)text+=" Attacking ends guard protection. Keep guard held to guard again after recovery, without another parry.";
+        return text;
     }
 
     static boolean needsTimelyRefresh(long state) {
-        if (attackReadability(state) != 0) return true;
+        if (safePractice(state) || attackReadability(state) != 0) return true;
         final boolean enabled = (state & (1L << 10)) != 0;
         final int opacity = (int) ((state >>> 40) & 0xffL);
         final int cue = (int) ((state >>> 3) & 0xfL);
         return enabled && opacity > 0 && ((cue >= 1 && cue <= 6) || cue == 8);
+    }
+
+    private static String lessonText(long state,boolean controller) {
+        final int stage=stage(state),cue=(int)((state >>> 3) & 0xfL),source=(int)((state >>> 7) & 0x7L);
+        final String guard=controller?"[LT]":"[Parry]",swing=controller?"[RT]":"[Swing]";
+        final String dodge=controller?"[B] + stick":"[Dodge] + move";
+        if(exitPending(state) || cue==13)return "Leaving practice safely...";
+        if(cue==12)return "Settings: Replay opening practice";
+        if(stage==2 || stage==3)return "";
+        if(stage==6 || cue==11)return "Settings: Finish practice";
+        if(cue==7)return "Well parried - strike back";
+        if(stage==4 || cue==9)return "Hold "+guard+": block normal hits";
+        if(stage==5 || cue==10)return "Hold "+guard+" + "+swing+"; keep held";
+        if(stage==1) {
+            if(cue==5)return "DODGE NOW - "+dodge;
+            return (source==3?"Keeper lightning":source==2 || source==4?"Skeleton attack":"Attacker")+" - "+dodge;
+        }
+        switch(cue) {
+            case 1: return "Watch the raised arm - fresh "+guard+" press";
+            case 2: return "PARRY NOW - fresh "+guard+" press";
+            case 8: return "Timed parry active - face the attacker";
+            case 3: return "Release, then press "+guard+" to parry";
+            default:return "Fresh "+guard+" press: timed parry";
+        }
     }
 
     static float alpha(int opacity, boolean reducedMotion) {
@@ -90,24 +118,6 @@ final class CombatTeachingPreferences {
         final long elapsed = Math.max(0L, elapsedMilliseconds);
         return Math.max(0, Math.min(255, Math.round(opacity *
                 (PROMPT_FADE_MILLISECONDS - elapsed) / (float) PROMPT_FADE_MILLISECONDS)));
-    }
-
-    private static String cueText(int cue, int stage, int source, boolean parryLearned, boolean dodgeLearned) {
-        // Source identity stays in diagnostics; the lesson names the visible action.
-        switch (cue) {
-            case 1: return "○ Watch the raised arm / attacker";
-            case 2: return "○ PARRY NOW — fresh press to parry";
-            case 8: return "● Guard up — timed parry; face the attacker";
-            case 3: return "↩ Hold: half damage; release to rearm parry";
-            case 4: return "○ The Keeper gathers lightning — watch the staff";
-            case 5: return "← DODGE NOW → — step sideways";
-            case 6: return "↩ Close in before the next charge";
-            case 7: return "● Well parried — strike back";
-            default:
-                if (stage == 2 || stage == 3) return "";
-                if (parryLearned && !dodgeLearned) return "○ Dodge the Keeper's lightning";
-                return "○ Watch the attacker";
-        }
     }
 
     private CombatTeachingPreferences() { }

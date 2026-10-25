@@ -1,5 +1,12 @@
 # Attacker-ring scope before implementation
 
+Later owner approval authorizes normal/full block, yellow/guard break and
+red/avoid. The [shared rule/practice checkpoint](../evidence/2026-10-25-four-skill-practice/README.md)
+implements the authority independently; new yellow attacks remain OFF pending
+the ring. Earlier proposal wording below describes this note's original state.
+The specific owner/TLAS/static/primitive/material capacity question is still
+pending and no bounds or rendering path were changed.
+
 Sam's 25 October follow-up selects an in-world animated ring associated with the
 attacking enemy, rather than a text-led HUD alert. Explanatory teaching/settings
 text remains accessible. Existing normal/yellow/red gameplay authority and the

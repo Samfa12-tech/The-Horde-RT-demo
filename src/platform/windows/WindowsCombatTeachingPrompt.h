@@ -45,38 +45,56 @@ inline constexpr std::uint32_t AttackReadabilityColourRgb(
            value == AttackReadability::Unblockable ? 0xFF6B6Bu : 0xF2E9D8u;
 }
 
-inline std::string CombatTeachingPromptText(
-    const gameplay::simulation::CombatTeachingSnapshot& teaching, const bool controller = false)
+inline const char* CombatPracticeActionLabel(const gameplay::simulation::CombatTeachingSnapshot& teaching)
+{
+    return teaching.stage == gameplay::simulation::TutorialStage::Ready ? "Finish practice" : "Skip practice";
+}
+
+inline std::string CombatTeachingLessonText(
+    const gameplay::simulation::CombatTeachingSnapshot& teaching, const bool controller)
 {
     using gameplay::simulation::CombatTeachingCue;
     using gameplay::simulation::TutorialStage;
-    using gameplay::simulation::AttackReadability;
-    if (teaching.attackReadability == AttackReadability::Parryable) return "<> YELLOW: PARRY";
-    if (teaching.attackReadability == AttackReadability::Unblockable) return "[X] RED: DODGE";
-    if (!teaching.enabled || !std::isfinite(teaching.promptOpacity) || teaching.promptOpacity <= 0.0f)
-        return {};
-    const char* lesson = "O Watch the attacker";
-    switch (teaching.cue)
+    const std::string guard=controller?"[LT]":"[Q]", swing=controller?"[RT]":"[LMB]";
+    const std::string dodge=controller?"[B] + stick":"[Space] + move";
+    if(teaching.exitPending || teaching.cue==CombatTeachingCue::ExitPending)return "Leaving practice safely...";
+    if(teaching.cue==CombatTeachingCue::Replay)return "Menu: Replay opening practice";
+    if(teaching.stage==TutorialStage::Complete || teaching.stage==TutorialStage::Skipped)return {};
+    if(teaching.stage==TutorialStage::Ready || teaching.cue==CombatTeachingCue::Ready)return "Menu: Finish practice";
+    if(teaching.cue==CombatTeachingCue::Learned)return "Well parried - strike back";
+    if(teaching.stage==TutorialStage::Block || teaching.cue==CombatTeachingCue::Block)return "Hold "+guard+": block normal hits";
+    if(teaching.stage==TutorialStage::AttackFromGuard || teaching.cue==CombatTeachingCue::AttackFromGuard)return "Hold "+guard+" + "+swing+"; keep held";
+    if(teaching.stage==TutorialStage::Dodge)
     {
-    case CombatTeachingCue::ParryWindup:
-        lesson = "O Watch the raised arm / attacker";
-        break;
-    case CombatTeachingCue::ParryNow: lesson = "o PARRY NOW - fresh press to parry"; break;
-    case CombatTeachingCue::ParryActive: lesson = "(*) Guard up - timed parry; face the attacker"; break;
-    case CombatTeachingCue::ParryRecovery: lesson = "-> Hold: half damage; release to rearm parry"; break;
-    case CombatTeachingCue::DodgeWindup: lesson = "O The Keeper gathers lightning - watch the staff"; break;
-    case CombatTeachingCue::DodgeNow: lesson = "<-- DODGE NOW --> - step sideways"; break;
-    case CombatTeachingCue::Recovery: lesson = "-> Close in before the next charge"; break;
-    case CombatTeachingCue::Learned: lesson = "(*) Well parried - strike back"; break;
-    case CombatTeachingCue::None:
-        if (teaching.stage == TutorialStage::Complete || teaching.stage == TutorialStage::Skipped)
-            return {};
-        if (teaching.parryLearned) lesson = "O Dodge the Keeper's lightning";
-        break;
+        if(teaching.cue==CombatTeachingCue::DodgeNow)return "DODGE NOW - "+dodge;
+        return (teaching.source==gameplay::simulation::EntityId::Lich?"Keeper lightning - ":
+            teaching.source==gameplay::simulation::EntityId::SkeletonA || teaching.source==gameplay::simulation::EntityId::SkeletonB?
+                "Skeleton attack - ":"Attacker - ")+dodge;
     }
-    std::string text = lesson;
-    text += controller ? "\r\n[LT] Press: Parry / Hold: Guard  |  [B] + left stick: Dodge red attacks"
-                       : "\r\n[Q] Press: Parry / Hold: Guard  |  [Space] + A/D: Dodge red attacks";
+    switch(teaching.cue)
+    {
+    case CombatTeachingCue::ParryWindup:return "Watch raised arm - fresh "+guard+" press";
+    case CombatTeachingCue::ParryNow:return "PARRY NOW - fresh "+guard+" press";
+    case CombatTeachingCue::ParryActive:return "Timed parry active - face attacker";
+    case CombatTeachingCue::ParryRecovery:return "Release, then press "+guard+" to parry";
+    default:return "Fresh "+guard+" press: timed parry";
+    }
+}
+
+inline std::string CombatTeachingPromptText(
+    const gameplay::simulation::CombatTeachingSnapshot& teaching, const bool controller = false)
+{
+    using gameplay::simulation::AttackReadability;
+    std::string text=teaching.safePractice?"Practice: no damage":"";
+    if(teaching.safePractice || (teaching.enabled && std::isfinite(teaching.promptOpacity) && teaching.promptOpacity>0.0f))
+    {
+        const auto lesson=CombatTeachingLessonText(teaching,controller);
+        if(!lesson.empty())text+=(text.empty()?"":"\r\n")+lesson;
+    }
+    if(teaching.attackReadability==AttackReadability::Parryable)
+        text+=(text.empty()?"":"\r\n")+std::string("<> YELLOW guard-break: parry/dodge");
+    else if(teaching.attackReadability==AttackReadability::Unblockable)
+        text+=(text.empty()?"":"\r\n")+std::string("[X] RED: unblockable - DODGE");
     return text;
 }
 } // namespace horde::platform::windows

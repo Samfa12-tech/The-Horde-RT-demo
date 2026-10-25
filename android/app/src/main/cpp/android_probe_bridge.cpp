@@ -1032,8 +1032,11 @@ void PublishSimulationUiState()
         (static_cast<std::uint64_t>(teaching.dodgeLearned) << 12u) |
         (static_cast<std::uint64_t>(teaching.safePractice) << 13u) |
         (static_cast<std::uint64_t>(teaching.slowdownActive) << 14u) |
+        (static_cast<std::uint64_t>(teaching.blockLearned) << 15u) |
         (clampByte(teaching.cueProgress) << 16u) |
         ((static_cast<std::uint64_t>(teaching.practiceMisses) & 0xffu) << 24u) |
+        (static_cast<std::uint64_t>(teaching.attackFromGuardLearned) << 32u) |
+        (static_cast<std::uint64_t>(teaching.exitPending) << 33u) |
         (clampByte(teaching.promptOpacity) << 40u) |
         ((static_cast<std::uint64_t>(teaching.attackReadability) & 0x3u) << 48u);
     gCombatTeachingUiState.store(teachingState, std::memory_order_release);

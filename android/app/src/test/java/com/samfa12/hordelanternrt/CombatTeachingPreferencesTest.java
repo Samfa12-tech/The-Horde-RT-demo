@@ -41,31 +41,31 @@ public final class CombatTeachingPreferencesTest {
     }
 
     @Test public void promptsUseShortShapeAndMotionCuesWithTouchAndControllerControls() {
-        long parryNow = 2L | (2L << 3) | (1L << 10) | (0xffL << 16) | (0xffL << 40);
+        long parryNow = 0L | (2L << 3) | (1L << 10) | (0xffL << 16) | (0xffL << 40);
         String prompt = CombatTeachingPreferences.prompt(parryNow);
         assertTrue(prompt.contains("PARRY NOW"));
-        assertTrue(prompt.contains("fresh press to parry"));
+        assertTrue(prompt.contains("fresh [Parry] press"));
         assertTrue(prompt.contains("[Parry]"));
-        assertTrue(prompt.contains("[Dodge]"));
+        assertFalse("parry stage avoids an unrelated dodge legend",prompt.contains("[Dodge]"));
         assertFalse(prompt.contains("COMBAT TEACHING"));
         assertFalse(prompt.contains("######"));
         assertFalse(prompt.contains("Retry safe"));
-        long parryActive = 2L | (8L << 3) | (1L << 10) | (0xffL << 40);
+        long parryActive = 0L | (8L << 3) | (1L << 10) | (0xffL << 40);
         prompt = CombatTeachingPreferences.prompt(parryActive);
-        assertTrue(prompt.contains("● Guard up"));
+        assertTrue(prompt.contains("Timed parry active"));
         assertTrue(prompt.contains("face the attacker"));
         assertFalse(prompt.contains("PARRY NOW"));
 
         long dodgeNow = 1L | (5L << 3) | (1L << 10) | (1L << 14) | (0xffL << 16) | (0xffL << 40);
         prompt = CombatTeachingPreferences.prompt(dodgeNow);
-        assertTrue(prompt.contains("← DODGE NOW →"));
+        assertTrue(prompt.contains("DODGE NOW"));
         assertFalse(prompt.contains("TIME EASED"));
         assertFalse(prompt.contains("######"));
 
-        long keeperWindup = 1L | (4L << 3) | (1L << 10) | (0xffL << 40);
+        long keeperWindup = 1L | (3L << 7) | (4L << 3) | (1L << 10) | (0xffL << 40);
         prompt = CombatTeachingPreferences.prompt(keeperWindup);
-        assertTrue(prompt.contains("The Keeper gathers lightning"));
-        assertTrue(prompt.contains("watch the staff"));
+        assertTrue(prompt.contains("Keeper lightning"));
+        assertTrue(prompt.contains("[Dodge] + move"));
         assertFalse(prompt.contains("draw back"));
     }
 
@@ -73,7 +73,7 @@ public final class CombatTeachingPreferencesTest {
         android.text.TextPaint paint = new android.text.TextPaint();
         paint.setTextSize(28f); // 14sp at an explicit 2x host font scale.
         for (int width : new int[]{240, 480}) for (boolean controller : new boolean[]{false, true}) {
-            for (int cue : new int[]{1,2,4,5,8}) {
+            for (int cue : new int[]{1,2,4,5,8,9,10,11,12,13}) {
                 String text=CombatTeachingPreferences.prompt((cue<<3)|(1L<<10)|(0xffL<<40),controller);
                 android.text.StaticLayout layout=android.text.StaticLayout.Builder.obtain(text,0,text.length(),paint,width)
                     .setAlignment(android.text.Layout.Alignment.ALIGN_CENTER).setIncludePad(true).build();
@@ -85,9 +85,11 @@ public final class CombatTeachingPreferencesTest {
     }
 
     @Test public void activeControllerGlyphsReplaceTouchActions() {
-        long state = (5L << 3) | (1L << 10) | (0xffL << 40);
+        long state = 1L | (5L << 3) | (1L << 10) | (0xffL << 40);
         String controller = CombatTeachingPreferences.prompt(state, true);
-        assertTrue(controller.contains("[LT]") && controller.contains("[B] + stick"));
+        assertTrue(controller.contains("[B] + stick"));
+        assertFalse("dodge stage avoids an unrelated guard legend",controller.contains("[LT]"));
+        assertTrue(CombatTeachingPreferences.prompt(4L | (1L<<10) | (0xffL<<40),true).contains("[LT]"));
         assertFalse(controller.contains("[Parry]"));
         assertFalse(CombatTeachingPreferences.prompt(state, false).contains("[LT]"));
     }
@@ -100,7 +102,7 @@ public final class CombatTeachingPreferencesTest {
                     ((long) nativeBytes[i] << 16) | (0xffL << 40);
             String prompt = CombatTeachingPreferences.prompt(packed);
             assertTrue("native normalized byte " + nativeBytes[i], !prompt.contains(expectedBars[i]));
-            assertTrue(prompt.contains("[Parry]") && prompt.contains("[Dodge]"));
+            assertTrue(prompt.contains("[Dodge] + move"));
         }
     }
 
@@ -120,15 +122,15 @@ public final class CombatTeachingPreferencesTest {
     @Test public void currentAttackCueSurvivesDisabledSkippedAndCompletedTeachingWithoutLessonSpam() {
         for (long lesson : new long[]{0L, 3L | (1L << 10), 2L | (1L << 10)}) {
             long yellow = lesson | (1L << 48), red = lesson | (2L << 48);
-            assertEquals("\u25c7 YELLOW: PARRY", CombatTeachingPreferences.prompt(yellow));
-            assertEquals("\u2715 RED: DODGE", CombatTeachingPreferences.prompt(red,true));
+            assertEquals("\u25c7 YELLOW guard-break: parry/dodge", CombatTeachingPreferences.prompt(yellow));
+            assertEquals("\u2715 RED: unblockable - DODGE", CombatTeachingPreferences.prompt(red,true));
             assertEquals(0xFFFFD266, CombatTeachingPreferences.promptColor(yellow));
             assertEquals(0xFFFF6B6B, CombatTeachingPreferences.promptColor(red));
             assertEquals(255, CombatTeachingPreferences.promptOpacity(yellow));
             assertEquals(255, CombatTeachingPreferences.promptOpacity(red));
             assertEquals(1f,CombatTeachingPreferences.alpha(CombatTeachingPreferences.promptOpacity(red),true),0f);
             assertTrue(CombatTeachingPreferences.description(red,"").contains("unblockable"));
-            assertTrue(CombatTeachingPreferences.description(yellow,"").contains("parryable"));
+            assertTrue(CombatTeachingPreferences.description(yellow,"").contains("guard-break"));
             assertTrue(CombatTeachingPreferences.needsTimelyRefresh(red));
             assertFalse(CombatTeachingPreferences.prompt(yellow).contains("[LT]"));
             assertFalse(CombatTeachingPreferences.prompt(red).contains("[Parry]"));
@@ -141,6 +143,57 @@ public final class CombatTeachingPreferencesTest {
         assertEquals("", CombatTeachingPreferences.prompt(2L));
         assertEquals("", CombatTeachingPreferences.prompt(3L | (1L << 10) | (0xffL << 40)));
         assertEquals("", CombatTeachingPreferences.prompt(2L | (1L << 10) | (0xffL << 40)));
+    }
+
+    @Test public void fourSkillsAndFinishUseTheirPublishedStageWithoutInventingSuccess() {
+        long practice=(1L<<10)|(1L<<13)|(0xffL<<40);
+        for(int stage:new int[]{4,0,1,5,6}) {
+            String text=CombatTeachingPreferences.prompt(practice|stage);
+            assertTrue(text.startsWith("Practice: no damage\n"));
+            assertEquals(stage==6?"Finish practice":"Skip practice",RuntimeEnvironment.getApplication().getString(CombatTeachingPreferences.practiceActionLabelResource(practice|stage)));
+            assertFalse(CombatTeachingPreferences.blockLearned(practice|stage));
+            assertFalse(CombatTeachingPreferences.attackFromGuardLearned(practice|stage));
+        }
+        assertTrue(CombatTeachingPreferences.prompt(practice|4).contains("block normal hits"));
+        assertTrue(CombatTeachingPreferences.prompt(practice|5,true).contains("Hold [LT] + [RT]"));
+        assertTrue(CombatTeachingPreferences.description(practice|5,"").contains("Attacking ends guard protection"));
+        assertTrue(CombatTeachingPreferences.prompt(practice|6).contains("Settings: Finish practice"));
+        assertTrue(CombatTeachingPreferences.blockLearned(practice|(1L<<15)));
+        assertTrue(CombatTeachingPreferences.attackFromGuardLearned(practice|(1L<<32)));
+        assertFalse(CombatTeachingPreferences.attackFromGuardLearned(practice|(1L<<15)));
+        assertTrue(CombatTeachingPreferences.exitPending(practice|(1L<<33)));
+        assertTrue(CombatTeachingPreferences.prompt(practice|(1L<<33)).contains("Leaving practice safely"));
+    }
+    @Test public void actualParrySuccessPrecedesCurrentSkillWithoutInventingSuccessFromAnOrdinaryHit() {
+        long blockPractice=4L|(1L<<10)|(1L<<13)|(0xffL<<40);
+        String parried=CombatTeachingPreferences.prompt(blockPractice|(7L<<3));
+        assertTrue(parried.startsWith("Practice: no damage\n"));
+        assertTrue(parried.contains("Well parried"));assertFalse(parried.contains("block normal hits"));
+        assertFalse(CombatTeachingPreferences.prompt(blockPractice|(9L<<3)).contains("Well parried"));
+    }
+    @Test public void protectionAndCurrentSkillRemainDuringWarningsEvenWithNoLessonOpacity() {
+        for(int stage:new int[]{4,0,1,5,6})for(int attack:new int[]{0,1,2}) {
+            long state=(1L<<13)|stage|((long)attack<<48); // Protection publication is authoritative.
+            String text=CombatTeachingPreferences.prompt(state);
+            assertTrue(text.startsWith("Practice: no damage\n"));
+            assertTrue(text.split("\n").length>=2);
+            if(attack==1) {
+                assertTrue(text.contains("YELLOW guard-break: parry/dodge"));
+                assertTrue(CombatTeachingPreferences.description(state,text).contains("holding guard cannot block"));
+                assertFalse(text.contains("half damage"));
+            }
+            if(attack==2)assertTrue(text.contains("RED: unblockable - DODGE"));
+            assertEquals(255,CombatTeachingPreferences.promptOpacity(state));
+            assertTrue(CombatTeachingPreferences.needsTimelyRefresh(state));
+        }
+    }
+    @Test public void dodgeNamesOnlyTheActualPublishedAttackerAndReplayDoesNotClaimSuccess() {
+        long practice=1L|(1L<<10)|(1L<<13)|(4L<<3);
+        for(int source:new int[]{0,2,4})assertFalse(CombatTeachingPreferences.prompt(practice|((long)source<<7)).contains("Keeper"));
+        assertTrue(CombatTeachingPreferences.prompt(practice|(2L<<7)).contains("Skeleton attack"));
+        assertTrue(CombatTeachingPreferences.prompt(practice|(3L<<7)).contains("Keeper lightning"));
+        assertTrue(CombatTeachingPreferences.prompt((12L<<3)|(1L<<13)).contains("Replay opening practice"));
+        assertFalse(CombatTeachingPreferences.prompt((12L<<3)|(1L<<13)).contains("Finish practice"));
     }
 
     @Test public void debugPracticeCheckpointNamesSelectTheSameOwnerRoutedPracticeKinds() {

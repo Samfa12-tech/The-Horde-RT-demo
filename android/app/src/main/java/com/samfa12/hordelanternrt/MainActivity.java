@@ -295,6 +295,7 @@ public class MainActivity extends Activity {
     private boolean chapterSubtitleOverflowReported;
     private String combatTeachingFadeText = "";
     private boolean combatAttackCueVisible;
+    private boolean combatPracticeCueVisible;
     private int combatTeachingFadeOpacity;
     private long combatTeachingFadeStartedAtMs;
     private final InputManager.InputDeviceListener controllerDevices = new InputManager.InputDeviceListener() {
@@ -3758,13 +3759,15 @@ public class MainActivity extends Activity {
         final long packed = ProbeBridge.getCombatTeachingState();
         final String text = CombatTeachingPreferences.prompt(packed, controllerMode);
         final boolean attackCue = CombatTeachingPreferences.attackReadability(packed) != 0;
-        if (combatAttackCueVisible && !attackCue) {
-            // A completed attack is Neutral immediately; never fade a stale warning.
+        final boolean practiceCue=CombatTeachingPreferences.safePractice(packed);
+        if (combatAttackCueVisible && !attackCue || combatPracticeCueVisible && !practiceCue) {
+            // Never fade stale attack warnings or advertise protection after it ends.
             combatTeachingFadeText = "";
             combatTeachingFadeOpacity = 0;
             combatTeachingFadeStartedAtMs = 0L;
         }
         combatAttackCueVisible = attackCue;
+        combatPracticeCueVisible = practiceCue;
         final boolean allowed = resumed && surfaceStarted && surfaceState == 1 &&
                 preferences.getBoolean("show_hud", true) &&
                 !menuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
@@ -4233,6 +4236,7 @@ public class MainActivity extends Activity {
 
     private void clearCombatTeachingPrompt() {
         combatAttackCueVisible = false;
+        combatPracticeCueVisible = false;
         combatTeachingFadeText = "";
         combatTeachingFadeOpacity = 0;
         combatTeachingFadeStartedAtMs = 0L;
@@ -4370,7 +4374,10 @@ public class MainActivity extends Activity {
             applyCombatTeachingOptions(next);
         });
         panel.addView(teachingSlowdown, matchWrap());
-        addMenuButtonRow(panel, getString(R.string.combat_teaching_skip),
+        long teachingState=0;
+        try {teachingState=ProbeBridge.getCombatTeachingState();}
+        catch(RuntimeException | LinkageError unavailable) { /* Unavailable publication cannot claim Ready. */ }
+        addMenuButtonRow(panel, getString(CombatTeachingPreferences.practiceActionLabelResource(teachingState)),
                 ProbeBridge::requestCombatTeachingSkip,
                 getString(R.string.combat_teaching_replay), () -> {
                     final CombatTeachingPreferences.Values current = CombatTeachingPreferences.read(preferences);

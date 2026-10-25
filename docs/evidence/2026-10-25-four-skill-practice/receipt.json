@@ -1,0 +1,112 @@
+{
+  "scope": "Approved shared normal/full-block and four-outcome practice. Special yellow attacks are tested opt-in only; no ring, revival, phone or FPS claim.",
+  "sourceBaseCommit": "51af5c26e14700574b2217d36324c547a6b5d9d4",
+  "changedSourceSha256": {
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "2d51aa785a5d6411e23bb4123f1d20a55e50e543b20aae61b5aa71f729ad4e7e",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/CombatTeachingPreferences.java": "3102a3c93c1b67c1b99039e5b3586eff0aaf3c9f8a0a7c27e1244c7e098d7592",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "3a00e6c80fb479b07d1c8dd878e5789624b3a4b1b3667ffbe55bb0ea18398114",
+    "android/app/src/main/res/values/strings.xml": "2b3183c5a0e00e464024cae0e2f8521a434d6b47d60d2f76043c72ca15e64632",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java": "6476ee1b79cf424b2d29ab30d31bc649c631d82ba17a9b541d785fffe96c5965",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingPreferencesTest.java": "5ebc91fab0d08bde901c3c06fbdbc7a49f2c78487de2795712998d2585cdc703",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingUiSchedulingTest.java": "3c902a9326ef57cabcb59c02a73e41ede2eaa23ff35e5ef99e64371b94a3934b",
+    "src/gameplay/SwordCombat.h": "b3ac997e1f4eb6280059ee0e140f27f5bddb835074bb8b014457262644d24e34",
+    "src/gameplay/simulation/CombatContactTrace.h": "a19260c0a8586d79f022e0ca57f8631d7243722444a3c5c9a19dc2edb34573bd",
+    "src/gameplay/simulation/CombatTeaching.h": "e4539b62a9c0231934f8ac1637056c64855dfc787bd89a1fb1b5b6e060a58f2c",
+    "src/gameplay/simulation/GameSimulation.cpp": "dad4ba1fecfcee1f20efe35cb97e8c262ff6f13a81b68fb1d679598c2d412527",
+    "src/gameplay/simulation/GameSimulation.h": "0ce13f580be0ea5db1757a56503b5ef3f89efa18c845572e2a6facd2fbeadba2",
+    "src/gameplay/simulation/GameSimulationCampaign.cpp": "22780b45c163eba528a4bfe76284685b50a1477e986d83b0204518168196aab1",
+    "src/gameplay/simulation/SimulationSnapshot.h": "51b7d8e0bab12261be0d33553f8b3fd2c72f22e0df4e445dbc6a3c24e62a6026",
+    "src/platform/windows/DiagnosticWindow.cpp": "78c5346089370107aab63188650bea096ed4a97c38e3d3c6b6cb1ede6ae2ca69",
+    "src/platform/windows/WindowsCombatTeachingPrompt.h": "c0924b0c64af25328712c15867a97d0f3406cabb6898f322bae5a38d7d2ffc56",
+    "tests/CampaignCheckpointTests.cpp": "4bab25525232336d0e98a4f6a6f8e026dd376a84b37cce907885f1e9077f1126",
+    "tests/CombatFoundationTests.cpp": "7b9a19c7ce57b8b0ad652fe2387058ed0511a77a18d0ee0b94bdebfce46abaf4",
+    "tests/WindowsCombatPracticeLaunchTests.cpp": "9f92a5c077f1a18679bb4590345e803e840fb50ed2cda3a20b32e321dc62c47f"
+  },
+  "native": {
+    "focusedCtestsPassed": 5,
+    "combatFoundationAssertions": 853,
+    "combatFoundationFailures": 0,
+    "campaignFinalExtraRestoreAssertion": "PASS,20.26s",
+    "originalExpectations": "815 checks,34 failures retained before approved-policy fixture corrections and one real success-cue fix",
+    "windowsTeachingSourceContract": "PASS"
+  },
+  "android": {
+    "sha256": "84df18dd59e7b89bab38d4c1c123231b924aa09d40c8fd5482dd271cb5e22e32",
+    "bytes": 206293691,
+    "package": "com.samfa12.hordelanternrt.debug",
+    "versionCode": 10,
+    "versionName": "1.6.2-debug",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "runtimeAssets": 185,
+    "allRuntimeAssetsIdenticalToFrozenF27982cd": true,
+    "nativeLibrariesIdenticalToR4": true,
+    "installed": false,
+    "tests": {
+      "tests": 490,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    },
+    "lint": {
+      "Error": 0,
+      "Fatal": 0,
+      "Warning": 83
+    }
+  },
+  "actualRtGuardRegression": {
+    "executableSha256": "6219f7491e87ed47415a64f1d61d249d82aaa4d7eeababb9616b6200ab419f6a",
+    "completedPresentedFrames": 202,
+    "matchingPoseRecords": 202,
+    "matchingPngHashes": 60,
+    "comparedPngHashes": 60,
+    "parryWindows": 1,
+    "returnedGuard": true,
+    "released": true,
+    "unpaced": true,
+    "fixedSimulationHz": 60,
+    "scope": "Existing fixed-input original-torch pose proof; not natural combat, damage, pacing, performance or phone acceptance."
+  },
+  "custody": {
+    "ownerFilesUnchanged": 151,
+    "campaignSettingsForegroundUnchanged": true,
+    "phoneAccess": false,
+    "ownedCaptureExited": true
+  },
+  "hostWidgetCheck": {
+    "cases": 8,
+    "viewports": [
+      [
+        320,
+        568
+      ],
+      [
+        640,
+        320
+      ]
+    ],
+    "fontScales": [
+      1,
+      2
+    ],
+    "runtimeLayoutChangedForGlyphFailure": false,
+    "retainedR3FullAdvance": 229.58203,
+    "verifiedVisibleExtent": 225.58203,
+    "verifiedInkWidth": 226,
+    "availableWidth": 226,
+    "proof": "Only excluded suffix whitespace; unchanged font, text, viewport, ellipsis and rounding gates."
+  },
+  "defaults": {
+    "specialSkeletonAttacks": false,
+    "shared64": false,
+    "healingFlask": false,
+    "revivalBlend": false,
+    "revivalBridge": false
+  },
+  "audioHapticManualRevalidationRequired": true,
+  "audioHapticReason": "Normal blocked hits no longer emit player-damage feedback; safe-practice exit and optional yellow guard break affect actual damage/feedback semantics. No listening or phone haptic acceptance."
+}

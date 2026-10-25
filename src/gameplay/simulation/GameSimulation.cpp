@@ -867,6 +867,8 @@ void GameSimulation::BeginCombatPractice(EnemyKind encounter)
 {
     legacyCombatCheckpoint_ = false;
     combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
+    if (encounter == EnemyKind::Lich)
+        combatTeaching_.ResetForKeeperPractice(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
     ApplyCheckpoint(encounter == EnemyKind::Lich ? 9 : 12,
                     encounter == EnemyKind::Lich);
     RefreshSnapshot(lastInput_);
@@ -2364,11 +2366,13 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     {
         if (!SwordDefenseReady())
             return false;
+        const bool fromGuard = swordCombat_.Snapshot().player.action == PlayerCombatAction::Guard;
         const PlayerAttackCut acceptedCut = swordCombat_.RequestAttack();
         if (acceptedCut == PlayerAttackCut::None)
             return false;
         if (acceptedCut == PlayerAttackCut::DownwardCut)
         {
+            if (CurrentCombatRules() && fromGuard) combatTeaching_.BeginGuardAttack();
             currentCutCommandSequence_ = commandSequence;
             currentCutConsumedTick_ = tickIndex_;
             queuedUpCutCommandSequence_ = queuedUpCutConsumedTick_ = 0;
@@ -2456,6 +2460,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     const auto previousSkeletons = combatSnapshot_.combatants;
     swordHitTargetThisTick_ = EntityId::Invalid;
     swordHitEventThisTick_ = 0;
+    swordCombat_.SetSpecialAttacksEnabled(CurrentCombatRules() && config_.specialSkeletonAttacks1_7);
     combatSnapshot_ = swordCombat_.Update(deltaSeconds,
                                            playerX_,
                                            playerZ_,
@@ -2465,6 +2470,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                                                IsWaterfallSkeletonArena(playerX_, playerZ_),
                                            config_.waterfallSkeletonEncounter);
     EntityId skeletonDamageSource = EntityId::Invalid;
+    EnemyAttackKind incomingAttackKind = EnemyAttackKind::Unblockable;
     if (queuedUpCutCommandSequence_ != 0 &&
         (combatSnapshot_.player.action == PlayerCombatAction::UpwardSliceWindup ||
          combatSnapshot_.player.action == PlayerCombatAction::UpwardSliceActive ||
@@ -2510,6 +2516,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         }
         if (CurrentCombatRules() && activeEnemyKind_ == EnemyKind::Skeleton &&
             current.action == EnemyCombatAction::AttackWindup &&
+            current.attackKind == EnemyAttackKind::GuardBreak &&
             previous.actionTime < CombatTimeline::kSkeletonAttackWindupSeconds - 0.26f &&
             current.actionTime >= CombatTimeline::kSkeletonAttackWindupSeconds - 0.26f)
             Emit(GameplayEventType::ParryPrepareCue, entity, EntityId::Player,
@@ -2517,6 +2524,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         if (current.playerHitPulse)
         {
             skeletonDamageSource = entity;
+            incomingAttackKind = current.playerHitKind;
         }
         if (current.parrySuccessPulse)
         {
@@ -2690,6 +2698,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             damageSample.commandSequence = acceptedDodgeSequence_;
             damageSample.consumedTick = acceptedDodgeConsumedTick_;
         }
+        damageSample.incomingAttackKind = incomingAttackKind;
         damageSample.phase = combatSnapshot_.player.action;
         damageSample.phaseSeconds = combatSnapshot_.player.actionTime;
         damageSample.target = activeEnemyKind_ == EnemyKind::Skeleton
@@ -2709,6 +2718,11 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             damageSample.targetZ = combatSnapshot_.combatants[index].z;
         }
         damageSample.outcome = CombatContactOutcome::PostHitProtected;
+        const bool frontalGuard = CurrentCombatRules() && input.guardHeld && !guardReleaseRequired_ &&
+            combatSnapshot_.player.action == PlayerCombatAction::Guard &&
+            activeEnemyKind_ == EnemyKind::Skeleton &&
+            SwordCombat::IsPlayerTargetInRangeCone(playerX_, playerZ_, playerYawRadians_,
+                damageSample.targetX, damageSample.targetZ);
         if (dodgeProtected)
         {
             damageSample.outcome = CombatContactOutcome::DodgeProtected;
@@ -2716,21 +2730,31 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             if (playerVitals_.Snapshot().invulnerabilityRemaining <= 0.00001f)
                 combatTeaching_.DodgeSucceeded();
         }
-        else if (CurrentCombatRules() && combatTeaching_.Snapshot().safePractice)
+        else if (frontalGuard && incomingAttackKind == EnemyAttackKind::Normal)
         {
-            damageSample.outcome = CombatContactOutcome::PracticeMiss;
-            combatTeaching_.PracticeMiss();
+            // An actual eligible ordinary contact is blocked, not reduced damage
+            // or a practice-suppressed miss. It consumes no health/invulnerability.
+            damageSample.outcome = CombatContactOutcome::GuardBlocked;
+            if (playerVitals_.Snapshot().invulnerabilityRemaining <= 0.00001f)
+                combatTeaching_.BlockSucceeded();
         }
         else
         {
-            // Only the existing blockable frontal skeleton contact is reduced.
-            // Keeper/red attacks, rear hits and every attacking phase stay full.
-            const bool guarded = CurrentCombatRules() && input.guardHeld && !guardReleaseRequired_ &&
-                combatSnapshot_.player.action == PlayerCombatAction::Guard &&
-                activeEnemyKind_ == EnemyKind::Skeleton &&
-                SwordCombat::IsPlayerTargetInRangeCone(playerX_, playerZ_, playerYawRadians_,
-                    damageSample.targetX, damageSample.targetZ);
-            damageResult = playerVitals_.TryApplyDamage(guarded);
+            if (frontalGuard && incomingAttackKind == EnemyAttackKind::GuardBreak)
+            {
+                // End mitigation immediately and require a physical release.
+                // Existing release pose blending remains intact; no free parry.
+                guardReleaseRequired_ = true;
+                swordCombat_.SetGuardHeld(false);
+                combatSnapshot_.player = swordCombat_.Snapshot().player;
+                damageSample.guardBroken = true;
+            }
+            if (CurrentCombatRules() && combatTeaching_.Snapshot().safePractice)
+            {
+                damageSample.outcome = CombatContactOutcome::PracticeMiss;
+                combatTeaching_.PracticeMiss();
+            }
+            else damageResult = playerVitals_.TryApplyDamage(false);
         }
         if (damageResult == PlayerDamageResult::Damaged)
         {
@@ -2760,6 +2784,10 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         if (CurrentCombatRules()) combatContactTrace_.Push(damageSample);
     }
 
+    combatTeaching_.ObserveGuardAttack(combatSnapshot_, input.guardHeld && !guardReleaseRequired_,
+        playerVitals_.Snapshot().phase != PlayerLifePhase::Alive || !SwordDefenseReady() ||
+        dodgeRemainingSeconds_ > 0.0f || playerVitals_.Snapshot().invulnerabilityRemaining > 0.00001f,
+        swordHitTargetThisTick_ != EntityId::Invalid);
     combatTeaching_.Update(CurrentCombatRules() && input.tutorialEnabled,
         input.tutorialSlowdownEnabled, input.paused ||
             playerVitals_.Snapshot().phase != PlayerLifePhase::Alive ||
@@ -3007,6 +3035,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         target.dead = source.health <= 0;
         target.playerHitPulse = source.playerHitPulse;
         target.parrySuccessPulse = source.parrySuccessPulse;
+        target.attackKind = source.attackKind;
+        target.playerHitKind = source.playerHitKind;
         target.forceCurrentCombatPose = CurrentCombatRules() &&
             ((source.action != EnemyCombatAction::Locomotion && source.action != EnemyCombatAction::Dead) ||
              combatSnapshot_.player.action == PlayerCombatAction::SwingActive ||

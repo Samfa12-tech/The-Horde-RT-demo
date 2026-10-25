@@ -55,6 +55,15 @@ enum class EnemyCombatAction : std::uint8_t
     Dead,
 };
 
+// Contact and warning presentation consume the same latched attack category.
+// Skeletons currently assign only Normal and explicitly opted-in GuardBreak.
+enum class EnemyAttackKind : std::uint8_t
+{
+    Normal = 0,
+    GuardBreak = 1,
+    Unblockable = 2,
+};
+
 enum class CombatReaction : std::uint8_t
 {
     None,
@@ -89,6 +98,9 @@ struct SkeletonCombatantSnapshot
     float reactionTime = 0.0f;
     bool playerHitPulse = false;
     bool parrySuccessPulse = false;
+    EnemyAttackKind attackKind = EnemyAttackKind::Normal;
+    // Valid only on playerHitPulse; never infer a hit kind from a later owner.
+    EnemyAttackKind playerHitKind = EnemyAttackKind::Normal;
 };
 
 struct CombatSnapshot
@@ -184,8 +196,13 @@ public:
         contactResolvedAttackId_ = 0u;
         attackerIndex_ = -1;
         waterfallRoomEngaged_ = false;
+        specialAttacksEnabled_ = false;
         PublishSnapshot();
     }
+
+    // Owner-thread policy. A change is sampled at the next actual windup only,
+    // so an already visible warning and its eventual contact cannot disagree.
+    void SetSpecialAttacksEnabled(bool enabled) { specialAttacksEnabled_ = enabled; }
 
     // Validated campaign restore only: settled corpses, no combat/input debt.
     void RestoreCampaignDefeated(const std::array<SkeletonSpawnPose, kSkeletonCombatantCapacity>& poses)
@@ -345,6 +362,7 @@ public:
         for (Combatant& combatant : combatants_)
         {
             combatant.playerHitPulse = false;
+            combatant.playerHitKind = EnemyAttackKind::Normal;
             combatant.parrySuccessPulse = false;
             combatant.damageFlash = std::max(0.0f, combatant.damageFlash - deltaSeconds * 2.8f);
             combatant.walkAnimationHold = std::max(0.0f, combatant.walkAnimationHold - deltaSeconds);
@@ -480,6 +498,9 @@ private:
         EnemyAnimation animation = EnemyAnimation::Walking;
         bool playerHitPulse = false;
         bool parrySuccessPulse = false;
+        EnemyAttackKind attackKind = EnemyAttackKind::Normal;
+        EnemyAttackKind playerHitKind = EnemyAttackKind::Normal;
+        std::uint8_t attackCyclePhase = 0u;
     };
 
     void FinishPlayerAction()
@@ -760,6 +781,7 @@ private:
         target.reactionTime = 1.0f;
         // A contact is the player's hit edge, never an incoming enemy hit.
         target.playerHitPulse = false;
+        target.playerHitKind = EnemyAttackKind::Normal;
         if (target.health == 0)
         {
             target.action = EnemyCombatAction::Dead;
@@ -826,6 +848,12 @@ private:
         {
             if (ownsAttackToken && distance <= kEnemyAttackEnterRange)
             {
+                // Per-actor attempts, independent of token order and policy
+                // toggles. A bounded modulo avoids overflow and random state.
+                combatant.attackCyclePhase = static_cast<std::uint8_t>(
+                    (combatant.attackCyclePhase + 1u) % 3u);
+                combatant.attackKind = specialAttacksEnabled_ && combatant.attackCyclePhase == 0u
+                    ? EnemyAttackKind::GuardBreak : EnemyAttackKind::Normal;
                 combatant.walkAnimationHold = 0.0f;
                 combatant.action = EnemyCombatAction::AttackWindup;
                 combatant.phaseTime = 0.0f;
@@ -885,7 +913,8 @@ private:
             combatant.phaseTime -= kEnemyAttackWindupDuration;
             const bool inRange = distance <= kEnemyDamageRange &&
                 !IsRouteAudioObstructed(playerX, playerZ, combatant.x, combatant.z);
-            if (inRange && player_.action == PlayerCombatAction::ParryActive &&
+            if (inRange && combatant.attackKind != EnemyAttackKind::Unblockable &&
+                player_.action == PlayerCombatAction::ParryActive &&
                 IsPlayerTargetInRangeCone(playerX, playerZ, playerYaw, combatant.x, combatant.z))
             {
                 combatant.action = EnemyCombatAction::Staggered;
@@ -905,6 +934,7 @@ private:
             {
                 combatant.damageFlash = 1.0f;
                 combatant.playerHitPulse = true;
+                combatant.playerHitKind = combatant.attackKind;
             }
         }
         if (combatant.action == EnemyCombatAction::AttackActive &&
@@ -1088,6 +1118,8 @@ private:
             target.reactionTime = source.reactionTime;
             target.playerHitPulse = source.playerHitPulse;
             target.parrySuccessPulse = source.parrySuccessPulse;
+            target.attackKind = source.attackKind;
+            target.playerHitKind = source.playerHitKind;
             if (source.health > 0)
             {
                 ++snapshot_.aliveCount;
@@ -1161,6 +1193,7 @@ private:
     std::uint64_t contactResolvedAttackId_ = 0u;
     std::int32_t attackerIndex_ = -1;
     bool waterfallRoomEngaged_ = false;
+    bool specialAttacksEnabled_ = false;
 };
 
 } // namespace horde::gameplay

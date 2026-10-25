@@ -219,7 +219,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     // lower restores still enter the original lowered-lantern teaching path.
     next.chapterFirstExterior_=upper || completedForest;
     next.lichEncounter_.RestoreCampaignDefeated();
-    next.combatTeaching_.Skip();
+    next.combatTeaching_.RestoreEnded();
     next.waterfallWarningEmitted_=true;
     std::array<SkeletonSpawnPose,kSkeletonCombatantCapacity> guards{};
     for(std::size_t i=0;i<guards.size();++i) guards[i]={{c.guards[i].x,c.guards[i].z},c.guards[i].yaw,0};

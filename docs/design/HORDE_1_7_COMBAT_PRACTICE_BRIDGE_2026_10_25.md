@@ -1,5 +1,12 @@
 # Four-skill practice and one-time revival: bounded implementation plan
 
+The [shared rules/four-skill checkpoint](../evidence/2026-10-25-four-skill-practice/README.md)
+now implements the contact outcomes, normal full block, protected Ready and
+safe explicit Finish/Skip portions below. Yellow guard-break is tested opt-in
+but OFF pending in-world warning admission. Replay retains its existing opening
+reset; it is not an automatic revive. The one-time scream/rise/live bridge and
+its Skip exception below remain unimplemented; no rejected join is enabled.
+
 Owner direction now includes normal/full block, yellow/guard-break but parryable,
 red/avoid; a protected chance to practise block, timed parry, dodge and attacking
 from guard; then the same two skeletons raised once by the lich before real
@@ -8,19 +15,17 @@ This note records the next implementation, not a claim that it is present.
 
 ## Actual chronology and smallest rule change
 
-Current skeletons have one attack kind; every current windup is labelled yellow.
-The Keeper is the only red attack source. Introduce an attack kind latched at
-windup, shared by contact and presentation, rather than recolouring all swings.
-Ordinary skeleton swings remain the uncluttered baseline; explicitly selected
-yellow attacks are special. Keep existing red Keeper authority.
+Normal gameplay now uses neutral ordinary skeleton swings. A shared attack kind
+is latched at windup and carried to contact/presentation; the isolated every-third
+GuardBreak policy is tested but OFF until in-world warning admission. Keeper
+remains the only red attack source. Do not recolour every normal swing yellow.
 
-Recommended yellow-break consequence is the existing unblocked one-heart hit
-and existing hit recovery, with no new stamina meter, extra stun system or
-additional damage. Normal eligible frontal guard blocks fully. Fresh timed parry
-and dodge keep their current timing/benefit; attack still ends guard mitigation
-immediately and never cancels recovery. This is the narrow interpretation to
-review before broader balancing. Current code still uses the prior half-damage
-guard until the new rule slice is implemented and checked.
+The tested yellow-break consequence is the existing unblocked one-heart hit and
+feedback/protection, with no new stamina meter, extra stun system or additional
+damage. It ends held guard and requires physical release to rearm. Normal
+eligible frontal guard now blocks fully. Fresh timed parry and dodge keep their
+current timing/benefit; attack still ends guard mitigation immediately and never
+cancels recovery. Physical balance remains open; the special policy stays OFF.
 
 ## Authoritative learning, not button presses
 

@@ -10,7 +10,7 @@ namespace horde::gameplay::simulation
 {
 enum class CombatContactOutcome : std::uint8_t
 {
-    NoContact, AcceptedSwordContact, DodgeProtected, PracticeMiss, DamageAccepted, PostHitProtected
+    NoContact, AcceptedSwordContact, DodgeProtected, PracticeMiss, DamageAccepted, PostHitProtected, GuardBlocked
 };
 struct CombatContactSample
 {
@@ -22,6 +22,8 @@ struct CombatContactSample
     CombatContactOutcome outcome = CombatContactOutcome::NoContact;
     float phaseSeconds = 0, separationMetres = 0, supportWorldY = kRouteFloorWorldY;
     float dodgeElapsedSeconds = 0;
+    EnemyAttackKind incomingAttackKind = EnemyAttackKind::Normal;
+    bool guardBroken = false;
     bool hasSeparation = false, hasBlade = false;
     std::array<float,3> bladeStart{}, bladeEnd{};
     // The actual fixed-step attachment transform, not a synthetic blade or

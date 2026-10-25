@@ -213,6 +213,18 @@ The automated `SM-S948B` requirements passed on 2026-08-12 for exact clean commi
 
 ## Animation-owned combat and timed-parry decision - 2026-08-13
 
+25 October later owner approval supersedes the initial 1.7 half-damage guard
+rule below: eligible normal frontal attacks are fully blockable, yellow special
+attacks break held guard but remain parryable, and red attacks require avoidance.
+The [shared rule/four-skill checkpoint](docs/evidence/2026-10-25-four-skill-practice/README.md)
+implements normal full block and tests the special policy, but new yellow
+attacks stay OFF until their required enemy-anchored RT warning is admitted.
+Four actual practice outcomes lead to protected Ready and an explicit safe
+Finish/Skip boundary; a confirmed earned restore grants no pretend skills.
+Timed-parry/dodge windows, accepted guard/attack joins, health maximum and old
+fractional-save support remain unchanged. Audio/haptic and phone balance
+acceptance remain open. The earlier paragraph retains its historical snapshot.
+
 The25October2026approved1.7 [held-guard extension](docs/evidence/2026-10-25-held-guard/README.md)
 adds a continuous defensive hold after the existing timed window. It does not
 replace the historical parry timing or successful benefit below. Guard halves
