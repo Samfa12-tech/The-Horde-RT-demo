@@ -1,0 +1,18 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 56: horde_rt_combat_foundation_tests
+1/1 Test #56: horde_rt_combat_foundation_tests ...***Failed    7.57 sec
+FAIL: finishing a recovery outside activation retains room engagement for the next attack
+FAIL: living B inherits ownership, approaches and contacts after A dies at the room edge
+FAIL: skipping teaching lets the same surviving B contact deal ordinary full-heart damage
+Waterfall room-edge contacts=0 killed-A-position=(-7.98,-15.2) guard-health-after-cuts=0,2 B-windup=0 B-practice-contact=0 skipped-health=3
+combat foundation checks=755 failures=3
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   7.60 sec
+
+The following tests FAILED:
+	 56 - horde_rt_combat_foundation_tests (Failed)
+Errors while running CTest

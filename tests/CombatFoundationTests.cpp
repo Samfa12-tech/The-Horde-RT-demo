@@ -1008,6 +1008,112 @@ void NonfatalPairHitPreservesIndependentActions() {
     runCase(false);
     runCase(true);
 }
+void WaterfallRoomEngagementAndTeaching() {
+    constexpr float yawEast=1.57079632679f;
+    constexpr float startX=-7.6f, startZ=-15.2f, edgeX=-7.9f;
+    Check(IsWaterfallSkeletonArena(startX,startZ) &&
+          IsWaterfallSkeletonRoom(edgeX,startZ) &&
+          !IsWaterfallSkeletonArena(edgeX,startZ),
+          "room-edge regression begins inside activation and retreats within the actual room");
+
+    // Exercise a completed attack at the same room edge, independently of
+    // teaching and outgoing damage. An attack token is temporary ownership,
+    // not the lifetime of the already engaged encounter.
+    SwordCombat combat;
+    combat.Reset(kSkeletonCombatantCapacity,kWaterfallSkeletonPairCenter,
+                 &kWaterfallSkeletonGuardSpawns,2);
+    for(int tick=0;tick<200 &&
+        combat.Snapshot().combatants[0].action!=EnemyCombatAction::AttackWindup;++tick)
+        combat.Update(1.f/60,startX,startZ,yawEast,true,true,true);
+    Check(combat.Snapshot().attackerIndex==0 &&
+          combat.Snapshot().combatants[0].action==EnemyCombatAction::AttackWindup,
+          "room-edge recovery fixture acquires the nearer guard before retreat");
+    int contacts=0;
+    for(int tick=0;tick<420;++tick) {
+        const auto& state=combat.Update(1.f/60,edgeX,startZ,yawEast,true,false,true);
+        for(const auto& actor:state.combatants)
+            contacts+=actor.playerHitPulse ? 1 : 0;
+    }
+    Check(contacts>=2,"finishing a recovery outside activation retains room engagement for the next attack");
+    combat.Update(1.f/60,-8.6f,startZ,yawEast,true,false,true);
+    Check(combat.Snapshot().attackerIndex==-1,
+          "leaving the actual Waterfall room releases its attack ownership");
+    for(int tick=0;tick<30;++tick)
+        combat.Update(1.f/60,edgeX,startZ,yawEast,true,false,true);
+    Check(combat.Snapshot().attackerIndex==-1,
+          "re-entry outside activation cannot engage without crossing the original arena");
+    combat.Update(1.f/60,startX,startZ,yawEast,true,true,true);
+    Check(combat.Snapshot().attackerIndex>=0,"crossing the original arena re-engages the living pair");
+    combat.Reset(kSkeletonCombatantCapacity,kWaterfallSkeletonPairCenter,
+                 &kWaterfallSkeletonGuardSpawns,2);
+    combat.Update(1.f/60,edgeX,startZ,yawEast,true,false,true);
+    Check(combat.Snapshot().attackerIndex==-1,
+          "reset clears encounter engagement as well as temporary attack ownership");
+
+    // Real shared input and hit resolution: kill A with the ordinary two-cut
+    // sequence before either lesson has been learned, after walking backwards
+    // outside the activation circle. B must still take its turn.
+    auto config=Rules();
+    config.playerStartX=startX; config.playerStartZ=startZ;
+    config.playerStartYawRadians=yawEast;
+    GameSimulation sim(config); InputSnapshot input;
+    input.yawRadians=yawEast; input.tutorialSlowdownEnabled=false;
+    for(int tick=0;tick<200 &&
+        sim.Snapshot().swordCombat.combatants[0].action!=EnemyCombatAction::AttackWindup;++tick)
+        sim.StepFixed(input);
+    Check(sim.Snapshot().swordCombat.attackerIndex==0,
+          "live teaching encounter begins with A owning the attack token");
+    input.moveForward=-1.f;
+    for(int tick=0;tick<12;++tick) sim.StepFixed(input);
+    input.moveForward=0.f;
+    Check(IsWaterfallSkeletonRoom(sim.Snapshot().playerX,sim.Snapshot().playerZ) &&
+          !IsWaterfallSkeletonArena(sim.Snapshot().playerX,sim.Snapshot().playerZ),
+          "ordinary backwards movement reaches the room-edge handoff witness");
+    const auto& beforeCut=sim.Snapshot();
+    // Aim toward A's side of the broad forgiving cone so B walking closer
+    // during A's stagger cannot change the second cut's intended target.
+    input.yawRadians=std::atan2(beforeCut.swordCombat.combatants[0].x-beforeCut.playerX,
+        beforeCut.playerZ-beforeCut.swordCombat.combatants[0].z)-.65f;
+    input.commands.attack=1; sim.StepFixed(input);
+    input.commands.attack=2;
+    for(int tick=0;tick<120 && sim.Snapshot().swordCombat.combatants[0].health>0;++tick)
+        sim.StepFixed(input);
+    const auto killed=sim.Snapshot();
+    Check(killed.swordCombat.combatants[0].health==0 &&
+          killed.swordCombat.combatants[1].health==2 &&
+          !killed.combatTeaching.parryLearned && !killed.combatTeaching.dodgeLearned,
+          "ordinary two-cut attack kills token owner A before the teaching lessons complete");
+    bool bWindup=false,bPracticeContact=false;
+    for(int tick=0;tick<500 && !bPracticeContact;++tick) {
+        sim.StepFixed(input);
+        const auto state=sim.Snapshot();
+        bWindup=bWindup || (state.swordCombat.attackerIndex==1 &&
+            state.swordCombat.combatants[1].action==EnemyCombatAction::AttackWindup);
+        bPracticeContact=state.swordCombat.combatants[1].playerHitPulse &&
+            state.combatTeaching.practiceMisses>0;
+        sim.ClearEvents();
+    }
+    Check(bWindup && bPracticeContact,
+          "living B inherits ownership, approaches and contacts after A dies at the room edge");
+    Check(sim.Snapshot().combatTeaching.safePractice &&
+          sim.Snapshot().playerVitals.vitality==3 && !sim.Snapshot().playerVitals.halfHeart &&
+          sim.Snapshot().playerVitals.invulnerabilityRemaining==0,
+          "unlearned safe practice suppresses actual B health loss without granting post-hit immunity");
+    input.commands.tutorialSkip=1; sim.StepFixed(input);
+    for(int tick=0;tick<500 && sim.Snapshot().playerVitals.vitality==3;++tick) {
+        sim.StepFixed(input); sim.ClearEvents();
+    }
+    Check(sim.Snapshot().combatTeaching.stage==TutorialStage::Skipped &&
+          !sim.Snapshot().combatTeaching.safePractice &&
+          sim.Snapshot().playerVitals.vitality==2 && !sim.Snapshot().playerVitals.halfHeart,
+          "skipping teaching lets the same surviving B contact deal ordinary full-heart damage");
+    std::cout<<"Waterfall room-edge contacts="<<contacts
+             <<" killed-A-position=("<<killed.playerX<<','<<killed.playerZ<<')'
+             <<" guard-health-after-cuts="<<killed.swordCombat.combatants[0].health
+             <<','<<killed.swordCombat.combatants[1].health
+             <<" B-windup="<<bWindup<<" B-practice-contact="<<bPracticeContact
+             <<" skipped-health="<<sim.Snapshot().playerVitals.vitality<<'\n';
+}
 void RouteMeleeOcclusion() {
     auto config=Rules(); config.waterfallSkeletonEncounter=false;
     config.playerStartX=.40f; config.playerStartZ=-6.20f;
@@ -1156,6 +1262,7 @@ int main() {
     IntegratedKeeperRepelAndReward();
     OutgoingTraceContract();
     NonfatalPairHitPreservesIndependentActions();
+    WaterfallRoomEngagementAndTeaching();
     RouteMeleeOcclusion();
     LiveParryAndRiposte();
     std::cout<<"combat foundation checks="<<checks<<" failures="<<failures<<'\n';

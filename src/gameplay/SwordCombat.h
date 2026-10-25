@@ -183,6 +183,7 @@ public:
         activePlayerAttackId_ = 0u;
         contactResolvedAttackId_ = 0u;
         attackerIndex_ = -1;
+        waterfallRoomEngaged_ = false;
         PublishSnapshot();
     }
 
@@ -375,11 +376,15 @@ public:
                playerZone == ShowcaseZone::SkeletonRoom);
         const bool playerWithinLeash = waterfallNav &&
             IsWaterfallSkeletonRoom(playerX, playerZ);
-        // Once a Waterfall attacker is engaged, retreat within the room does
-        // not erase its windup or aggro token. Leaving the room ends pursuit;
-        // its nav boundary still prevents a pull back across the wetline.
+        // Encounter engagement outlives the temporary one-attacker token:
+        // recovery or a killed holder must still allow a living guard to take
+        // its next turn after retreat within the room. Only crossing the
+        // original arena engages; leaving the actual room or reset clears it.
+        // The existing nav boundary still prevents pursuit across the wetline.
+        waterfallRoomEngaged_ = playerWithinLeash &&
+            (playerInsideEnemyArena || waterfallRoomEngaged_);
         const bool combatArenaActive = playerInsideEnemyArena ||
-            (playerWithinLeash && attackerIndex_ >= 0);
+            waterfallRoomEngaged_;
 
         std::array<float, kSkeletonCombatantCapacity> distances{};
         const std::array<RoutePosition, kSkeletonCombatantCapacity> previousPositions{{
@@ -1155,6 +1160,7 @@ private:
     std::uint64_t activePlayerAttackId_ = 0u;
     std::uint64_t contactResolvedAttackId_ = 0u;
     std::int32_t attackerIndex_ = -1;
+    bool waterfallRoomEngaged_ = false;
 };
 
 } // namespace horde::gameplay
