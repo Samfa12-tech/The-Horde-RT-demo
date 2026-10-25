@@ -32,3 +32,24 @@ The owned build exec session ended after interrupt. A narrowly filtered CIM read
 for that cmake command was denied: “Access to a CIM resource was not available
 to the client.” It was not retried; descendant process absence is not independently
 verified. All known renderer/capture/shader/Blender sessions had completed.
+
+## Approved next pass: held guard — not implemented
+
+Sam approved this after reviewing the shield icon on25October. Keep that icon.
+A fresh guard press opens the existing normal parry window and preserves the
+existing successful-parry benefit. Continued hold after that window retains the
+raised sword pose at the end of the existing parry animation, before its return
+to rest, and halves otherwise blockable damage. Holding must never repeatedly
+open parry windows. Release returns to rest. Red/unblockable attacks still require
+dodge and receive no guard reduction.
+
+Next implementation must verify touch/controller/keyboard press, release and
+cancel ownership; interruptions/lifecycle/menu handling; damage arithmetic and
+health representation; coordinated animation joins; and tutorial language that
+distinguishes timed parry from held guard. Half-damage rounding/representation
+must be made explicit against current vitality code, not silently discard damage.
+This is an approved next-pass requirement, not implemented or balanced behavior.
+Do not rebuild or resume device work for it during the current pause.
+
+Authority: Sam proposed holding for half-damage protection, then explicitly said
+“let's do it” and requested retaining the sword-over pose before returning to rest.
