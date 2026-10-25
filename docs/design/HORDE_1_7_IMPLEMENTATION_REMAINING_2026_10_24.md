@@ -17,8 +17,18 @@ preserves practice intent through legacy capture eligibility and ordinary Retry;
 its first replacement cleared those compiler lanes but exposed a separate frozen
 published-flag requirement in Vulkan-host. The follow-up separates private intent
 from active publication; all eight expanded local gates pass, with new exact-head
-CI still required.
+CI [40199859776](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40199859776)
+passing all six jobs on `eead168b`. Both prior Vulkan journey failures now pass;
+their original evidence remains retained.
 The post-retry motion fixture is practice-protected, not live balance acceptance.
+
+The next [stand/controller checkpoint](../evidence/2026-10-25-skeleton-stand-authored/README.md)
+adds only an unwired, default-disabled one-time bridge controller (918 focused
+assertions) and one offline authored stand preview. Sampled steps/joins support
+isolated native validation, but continuous motion, export/import and actual RT
+joins remain unaccepted; initial corpse extremities clip the preview edge. No
+actor, save, audio or production animation hook is enabled. This later head's CI
+is distinct from the green runtime correction above.
 
 This update supersedes older device/guard acceptance wording below, without
 turning the historical checkpoints into newer evidence. Sam accepts the held
@@ -39,8 +49,9 @@ at 10:37:25.915 UTC after private recording retrieval; no further device calls.
   the rise but rejects the visible direct-Idle snap. The subsequent
   [single blend proof](../evidence/2026-10-25-skeleton-revive-blend/README.md)
   tests the shared default-empty seam but rejects the visible foot slide.
-  A contact-preserving authored stand transition remains unfinished; neither
-  proof is an admitted animation or real revival.
+  The contact-preserving stand now has the isolated authoring proof above;
+  native export/RT joins and bridge integration remain unfinished. Neither
+  earlier rejected proof is an admitted animation or real revival.
 - In-world special-attack rings need an explicit measured RT owner seam; no
   capacity was increased or screen-space substitute added. Ordinary full block
   is implemented; special yellow admission remains separate from its tested rules.

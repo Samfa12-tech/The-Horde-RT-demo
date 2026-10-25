@@ -84,6 +84,14 @@ honest RT ownership route. Primitive/material headroom must be established befor
 any further change. The question does not authorise broader effects, extra
 enemies, a quality reduction or admission without evidence. Independent startup,
 encounter and tutorial work continues while that decision is pending.
+
+Refinement of that original question: the validated 64-placement route proof
+uses 92 TLAS instances, so one ring would be 93 and fits the existing 104 limit.
+The 105 request is needed only to retain simultaneous support for the unadmitted
+76-tree sector study already using 104. It is not required merely to test a ring
+on the 64-placement route. Metadata/static ownership and the full primitive/
+material roster remain separate unresolved bounds; this count is not a measured
+GPU cost or permission to change any limit.
 If a dedicated ring primitive/material is required, the concrete additional
 bounds would be37/33; they are not approved merely by authorising an owner slot.
 Do not disguise format conversion, material aliasing or an inactive instance as

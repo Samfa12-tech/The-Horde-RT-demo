@@ -1,0 +1,74 @@
+{
+  "baseRuntimeHead": "eead168b27304975af634cf7bf5f868f536f788d",
+  "baseRuntimeCi": {
+    "run": 40199859776,
+    "terminal": "all six success",
+    "vulkanTests": "76/76 including both prior failures"
+  },
+  "controller": {
+    "defaultEnabled": false,
+    "integrated": false,
+    "localFoundationAssertions": 918,
+    "localFailures": 0,
+    "testSeconds": 8.48,
+    "deadlineSeconds": 30,
+    "initialRunAssertions": 916,
+    "initialRunPreserved": true,
+    "reviewCorrection": "explicit same-two-actor bothAlive witness; !bothDead alone is insufficient",
+    "runtimeOrSaveHooksChanged": false,
+    "newHeadCi": "required, not inferred from base runtime CI"
+  },
+  "sources": {
+    "src/gameplay/simulation/SkeletonRevivalBridge.h": "7b907d957a0889c9fa434c7262096a80846a14c92c94c8d09c3d30505d8bd7b2",
+    "tests/CombatFoundationTests.cpp": "2f3d63a7a1dccf092f1fd3e778df033418f6b789e7fbc818a6b7b462bc2e4a5c"
+  },
+  "preview": {
+    "evidenceClass": "Blender Workbench authoring, sampled-frame review; not native RT, continuous playback, measured FPS or gameplay acceptance",
+    "framesPerView": 195,
+    "sampleHz": 30,
+    "secondsPerView": 6.5,
+    "batches": 1,
+    "limitations": [
+      "initial far-corpse extremities clipped",
+      "native export/import/RT joins not run",
+      "no production animation or resurrection binding"
+    ]
+  },
+  "files": {
+    "author_stand.py.gz": {
+      "bytes": 3452,
+      "sha256": "91fa8608dc193e0ff84f43a93349c82fcdc29e14167ccd0e086981b0352dc6ba"
+    },
+    "authoring-quarter.mp4": {
+      "bytes": 975297,
+      "sha256": "43162181d8cdd1e4b8be2fff9f69257fb22a4821c41b76d1c77f4e8d9aea3aed"
+    },
+    "authoring-side.mp4": {
+      "bytes": 662256,
+      "sha256": "1dba8958564a2ec5d64aaba4ecb33d698ebedf1323beb771816defc89eda379d"
+    },
+    "join-step-contact-sheet.png": {
+      "bytes": 508614,
+      "sha256": "824908b0d99766289e8d945475774c3e1b3f894eb2b60bd83e20f179d4c0fc5c"
+    },
+    "preview-review.json": {
+      "bytes": 2494,
+      "sha256": "5a63a62b8de5f5f30d9219ac466b320cb6287d2a0daebca7511fcef955cae646"
+    },
+    "render_preview.py.gz": {
+      "bytes": 3155,
+      "sha256": "e65cc8ad0f8962d3bf62dbd422dd591151ed41882ae13cee3fc931bf4e17d1d4"
+    }
+  },
+  "ownerFilesChecked": 151,
+  "ownerFilesChanged": [],
+  "sourceGlbAndSavedBlendUnchanged": true,
+  "phoneAccess": false,
+  "foregroundAccess": false,
+  "ownedBuildRenderOrTransferRemaining": false,
+  "newRuntimeAssets": 0,
+  "newRendererCapacity": false,
+  "screamIntegrated": false,
+  "yellowPolicyEnabled": false,
+  "sourceHashClass": "Local Windows build-input bytes; Git checkout line endings may differ. Source revision and named changes remain authoritative."
+}

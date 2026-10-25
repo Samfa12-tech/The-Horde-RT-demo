@@ -5,7 +5,12 @@ now implements the contact outcomes, normal full block, protected Ready and
 safe explicit Finish/Skip portions below. Yellow guard-break is tested opt-in
 but OFF pending in-world warning admission. Replay retains its existing opening
 reset; it is not an automatic revive. The one-time scream/rise/live bridge and
-its Skip exception below remain unimplemented; no rejected join is enabled.
+its Skip exception below are not wired into the encounter; no rejected join is enabled.
+
+A later [isolated controller/authoring proof](../evidence/2026-10-25-skeleton-stand-authored/README.md)
+tests the proposed state machine without wiring it into `GameSimulation`.
+One contact-aware stand has sampled Blender previews, not native export/RT
+acceptance. Production behavior and the original assets remain unchanged.
 
 Owner direction now includes normal/full block, yellow/guard-break but parryable,
 red/avoid; a protected chance to practise block, timed parry, dodge and attacking

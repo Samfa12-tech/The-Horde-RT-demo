@@ -1,10 +1,12 @@
 #include "gameplay/effects/KeeperCastPresentation.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/simulation/SkeletonRevivalBridge.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/SpatialAudio.h"
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <vector>
 
 using namespace horde::gameplay;
@@ -31,6 +33,142 @@ bool LearnBlockFromRealContact(GameSimulation& sim,InputSnapshot& input) {
     }
     input.guardHeld=false; sim.StepFixed(input); sim.ClearEvents();
     return learned;
+}
+void SkeletonRevivalBridgeContract() {
+    using Phase=SkeletonRevivalPhase;
+    SkeletonRevivalBridge bridge; SkeletonRevivalInput input;
+    input.playerAlive=true; input.bothDead=true; input.presentationReady=true;
+    input.actorClearance=true; input.riseDurationSeconds=.20f;
+    bridge.Step(.05f,input);
+    Check(!bridge.Snapshot().enabled && bridge.Snapshot().phase==Phase::Disabled && !bridge.Snapshot().consumed,
+          "revival controller defaults disabled even when supplied ready/dead fixture values");
+    bridge.Reset(true); const auto firstGeneration=bridge.Snapshot().generation;
+    for(int tick=0;tick<10;++tick) bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Practice && !bridge.Snapshot().consumed &&
+          !bridge.Snapshot().signalPulse && !bridge.Snapshot().revivePulse,
+          "premature deaths cannot fake finished practice or automatically revive the pair");
+    input.practiceFinished=true; input.paused=true; bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Practice,"paused lesson completion cannot advance bridge state");
+    input.paused=false; input.playerAlive=false; bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Practice,"dead player cannot consume a bridge through lesson input");
+    input.playerAlive=true; input.presentationReady=false; bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::FirstFight && !bridge.Snapshot().consumed,
+          "real practice exit is logical even while an unadmitted presentation cannot signal");
+    input.presentationReady=true;
+    for(float duration:{0.f,-.1f,std::numeric_limits<float>::quiet_NaN(),std::numeric_limits<float>::infinity()}) {
+        input.riseDurationSeconds=duration; bridge.Step(.05f,input);
+        Check(bridge.Snapshot().phase==Phase::FirstFight && !bridge.Snapshot().consumed && !bridge.Snapshot().signalPulse,
+              "readiness alone cannot authorize an invalid or absent reviewed rise duration");
+    }
+    input.riseDurationSeconds=.20f; bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Signal && bridge.Snapshot().consumed && bridge.Snapshot().signalPulse &&
+          bridge.Snapshot().phaseSeconds==0.f && bridge.Snapshot().SuppressesActors(),
+          "the bridge consumes once before publishing its signal and suppressed presentation phase");
+    bridge.CancelTransient();
+    Check(bridge.Snapshot().consumed && bridge.Snapshot().phase==Phase::Signal && !bridge.Snapshot().signalPulse &&
+          bridge.Snapshot().generation==firstGeneration,
+          "transient cancellation clears pulses without rearming consumption or changing phase identity");
+    for(float delta:{0.f,-.1f,std::numeric_limits<float>::quiet_NaN(),std::numeric_limits<float>::infinity()}) {
+        bridge.Step(delta,input);
+        Check(bridge.Snapshot().phase==Phase::Signal && bridge.Snapshot().phaseSeconds==0.f &&
+              bridge.Snapshot().consumed && !bridge.Snapshot().signalPulse && !bridge.Snapshot().revivePulse,
+              "nonpositive or nonfinite delta cannot advance clocks or replay bridge pulses");
+    }
+    input.presentationReady=false; bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phaseSeconds==0.f && bridge.Snapshot().consumed,
+          "readiness loss freezes an already consumed signal rather than silently replaying it");
+    input.presentationReady=true; bridge.Step(100.f,input);
+    Check(Near(bridge.Snapshot().phaseSeconds,.05f) && bridge.Snapshot().phase==Phase::Signal,
+          "a long positive frame advances at most one bounded gameplay step");
+    for(int tick=0;tick<12 && bridge.Snapshot().phase==Phase::Signal;++tick) bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Rising && bridge.Snapshot().SuppressesActors(),
+          "the authored signal lead reaches a nonattacking nontargetable rising phase");
+    const float risingTime=bridge.Snapshot().phaseSeconds;
+    input.paused=true; bridge.Step(.05f,input); input.paused=false;
+    input.playerAlive=false; bridge.Step(.05f,input); input.playerAlive=true;
+    input.presentationReady=false; bridge.Step(.05f,input); input.presentationReady=true;
+    Check(bridge.Snapshot().phase==Phase::Rising && bridge.Snapshot().phaseSeconds==risingTime &&
+          !bridge.Snapshot().signalPulse && !bridge.Snapshot().revivePulse,
+          "pause death and unready output cannot progress or republish the rising action");
+    input.riseDurationSeconds=.001f; bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Rising,
+          "caller duration changes cannot shorten the already admitted latched rise");
+    for(int tick=0;tick<10 && bridge.Snapshot().phase==Phase::Rising;++tick) bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Rearming && bridge.Snapshot().SuppressesActors(),
+          "finished rise still suppresses actors through the fair rearming interval");
+    input.actorClearance=false;
+    for(int tick=0;tick<30;++tick) bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Rearming && bridge.Snapshot().waitingForClearance &&
+          Near(bridge.Snapshot().phaseSeconds,SkeletonRevivalBridge::kRearmingSeconds) && !bridge.Snapshot().revivePulse,
+          "blocked actor clearance holds bounded rearm state instead of spawning a collider inside the player");
+    input.actorClearance=true; input.paused=true; bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Rearming && !bridge.Snapshot().revivePulse,
+          "clearing actor space while paused cannot trigger revival");
+    input.paused=false; bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Live && bridge.Snapshot().revivePulse && bridge.Snapshot().consumed &&
+          !bridge.Snapshot().SuppressesActors(),
+          "admitted presentation and clear space publish exactly one live revival after rearm");
+    for(int tick=0;tick<3;++tick) bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Live && !bridge.Snapshot().revivePulse && !bridge.Snapshot().signalPulse,
+          "stale pre-revive both-dead snapshots cannot manufacture final completion");
+    input.bothDead=false; bridge.Step(.05f,input); // One alive is not a full-pair acknowledgement.
+    input.bothDead=true; bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Live,
+          "one living actor followed by both dead cannot fake a fully revived pair's final defeat");
+    input.bothAlive=true; bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Live,"contradictory alive/dead input cannot acknowledge or finish revival");
+    input.bothDead=false; bridge.Step(.05f,input);
+    input.bothDead=true; input.bothAlive=false; bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Complete && bridge.Snapshot().consumed,
+          "final defeat requires observed live actor state after genuine revival handoff");
+    for(int tick=0;tick<10;++tick) bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Complete && !bridge.Snapshot().signalPulse && !bridge.Snapshot().revivePulse,
+          "completed bridge never duplicates its signal or revival");
+
+    for(Phase retryPhase:{Phase::Signal,Phase::Rising,Phase::Live}) {
+        SkeletonRevivalBridge retry; retry.Reset(true);
+        input={}; input.playerAlive=true; input.practiceFinished=true; input.bothDead=true;
+        input.presentationReady=input.actorClearance=true; input.riseDurationSeconds=.1f;
+        retry.Step(.05f,input);
+        for(int tick=0;tick<40 && retry.Snapshot().phase!=retryPhase;++tick) retry.Step(.05f,input);
+        Check(retry.Snapshot().phase==retryPhase,"retry fixture reaches the intended consumed bridge phase");
+        const auto generation=retry.Snapshot().generation;
+        retry.Retry(true,false);
+        Check(retry.Snapshot().phase==Phase::Live && retry.Snapshot().consumed &&
+              retry.Snapshot().generation>generation && !retry.Snapshot().signalPulse && !retry.Snapshot().revivePulse,
+              "retry after signal rising or live retains consumption and requests no scream or second rise");
+        retry.Step(.05f,input);
+        Check(retry.Snapshot().phase==Phase::Live,"retry also rejects a stale all-dead publication until ordinary standing initialization");
+        input.bothDead=false; input.bothAlive=true; retry.Step(.05f,input);
+        input.bothDead=true; input.bothAlive=false; retry.Step(.05f,input);
+        Check(retry.Snapshot().phase==Phase::Complete,"ordinary post-retry live pair still permits its real final defeat");
+    }
+    bridge.Reset(true); bridge.Retry(false,false);
+    Check(bridge.Snapshot().phase==Phase::Practice && !bridge.Snapshot().consumed,
+          "retry before consumption preserves unfinished practice instead of inventing completion");
+    bridge.Retry(true,false);
+    Check(bridge.Snapshot().phase==Phase::FirstFight && !bridge.Snapshot().consumed,
+          "finished pre-signal retry preserves the real first fight without consuming unavailable presentation");
+    bridge.Reset(true); input={}; input.playerAlive=true; input.practiceSkipped=true; input.bothDead=true;
+    bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Live && bridge.Snapshot().consumed &&
+          !bridge.Snapshot().signalPulse && !bridge.Snapshot().revivePulse,
+          "explicit skip opts out even without a ready presentation and never forces a second fight");
+    bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Complete,"skip of an already defeated first pair can finish without resurrection");
+    const auto consumedGeneration=bridge.Snapshot().generation;
+    bridge.Reset(true);
+    Check(bridge.Snapshot().phase==Phase::Practice && !bridge.Snapshot().consumed &&
+          bridge.Snapshot().generation>consumedGeneration,
+          "explicit replay or new game alone resets the consumed bridge and invalidates stale phase identity");
+    bridge.RestoreCompleted(); const auto restoredGeneration=bridge.Snapshot().generation;
+    bridge.Retry(true,false); bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Complete && bridge.Snapshot().consumed &&
+          bridge.Snapshot().generation>restoredGeneration && !bridge.Snapshot().signalPulse && !bridge.Snapshot().revivePulse,
+          "validated earned-load restoration remains terminal even across retry with no sound or resurrection");
+    bridge.Reset(false); bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::Disabled && !bridge.Snapshot().consumed,
+          "disabled new game cannot accidentally admit a previously restored revival");
 }
 void WindowAndLifecycle() {
     for (int tick=0;tick<=13;++tick)
@@ -1745,6 +1883,7 @@ void RulesEligibilityDoesNotChoosePracticeExit() {
           "the remembered exit still ends at the unchanged safe recovery boundary");
 }
 int main() {
+    SkeletonRevivalBridgeContract();
     RulesEligibilityDoesNotChoosePracticeExit();
     WindowAndLifecycle(); TeachingContract(); AttackReadabilityContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();
     HeldGuardDamageContract(); GuardAttackAndReleaseAtContact(); GuardInterruptionRearm();
