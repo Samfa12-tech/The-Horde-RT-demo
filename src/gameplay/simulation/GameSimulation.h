@@ -298,6 +298,7 @@ private:
     std::uint64_t swordHitEventThisTick_ = 0;
     bool legacyCombatCheckpoint_ = false;
     bool dodgeProtectionAccepted_ = false;
+    bool guardReleaseRequired_ = false;
     float gameplayTimeScale_ = 1.0f;
     std::uint64_t acceptedDodgeSequence_ = 0u;
     std::uint64_t acceptedDodgeConsumedTick_ = 0u;

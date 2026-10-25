@@ -19,6 +19,12 @@ Player-facing recommendation: start with two drinks, each restoring one of your 
 
 ## Implementation boundary after approval
 
+The subsequent held-guard prerequisite adds pre-flask schema2 records containing
+exact half-heart health. Apply the approved older-save empty-capacity2 policy to
+both schema1and2, preserving fractional health/progress without free charges.
+Read-only restore review found no accepted-anchor counterexample; actual Rest
+predicate/restore-to-Rest tests are still required before migration admission.
+
 Use one shared simulation action/resource owner, coherent command sequence consumption, ordered feedback and immutable snapshots on both platforms. Add a versioned bounded campaign payload/codec with validation, exact restore and duplicate-entitlement tests; preserve current load barriers/retirement. Do not repurpose victory, lantern, dialogue or checkpoint flags as flask ownership. Keep original save bytes and settings untouched during isolated tests.
 
 Meaningful gates: rejected/complete/interrupted use and damage ties; empty/full states; simultaneous movement/defence and stale input; death/retry versus exact load; every old checkpoint migration; independent slots and atomic-write failure; repeated upgrade/Rest and reload; native hand/light/sword continuity and touch/controller/menu ownership. Actual combat balance, thumb use, drinking audio/animation and recovery clarity still require playtesting. Approval of this document would authorize a bounded implementation, not release, new maximum health, paid assets or a wider healing economy.

@@ -2,6 +2,15 @@
 
 ## Current authority - 24 October 2026
 
+25October: [held guard and guard-to-attack](../evidence/2026-10-25-held-guard/README.md)
+are implemented in the current development combat profile, preserving timed parry,
+red dodge and full attack recovery. Exact half-heart health/HUD and a minimal
+schema2save extension retain legacy schema1bytes. Focused host/Android and hidden
+RT joins pass; local Windows storage publication is access-denied and remains
+open pending independent exact-head CI. New phone/two-thumb/balance acceptance is
+not inferred from the earlier staged lantern-only session. Flask is next; no
+flask code or rejected asset/effect rollout is included in this checkpoint.
+
 The [bounded chimney study](../evidence/2026-10-24-chimney-smoke-gate/README.md)
 retains a verified open-flue source derivative but rejects the shared per-path
 smoke expansion at unchanged static shader gates. Opaque remains fully inlined;

@@ -58,6 +58,22 @@ struct ControllerActionEdges
     }
 };
 
+// A resumed/reconnected held trigger is not a fresh guard press. Require neutral.
+struct GuardHoldLatch
+{
+    bool held = false;
+    bool blockedUntilRelease = false;
+    void Reseed(bool down) { held = false; blockedUntilRelease = down; }
+    void Cancel() { blockedUntilRelease = blockedUntilRelease || held; held = false; }
+    bool Observe(bool down, bool allowed)
+    {
+        if (!down) { held = false; blockedUntilRelease = false; }
+        else if (!allowed) { held = false; blockedUntilRelease = true; }
+        else held = !blockedUntilRelease;
+        return held;
+    }
+};
+
 struct ControllerTriggerLatch
 {
     bool leftHeld = false;
@@ -259,6 +275,11 @@ inline bool XInputRunTogglePressed(std::uint16_t current, std::uint16_t previous
 {
     // XINPUT_GAMEPAD_LEFT_THUMB; preserve this SDK-independent host helper.
     return ((current & ~previous) & 0x0040u) != 0u;
+}
+
+inline bool LegacyGuardHeld(std::uint32_t buttons, const LegacyControllerIdentity& identity)
+{
+    return IsCapturedBackboneOne(identity) && (buttons & 0x100u) != 0u;
 }
 
 inline ControllerActionEdges MapLegacyControllerEdges(

@@ -59,7 +59,7 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    const auto bytes=Encode(c);Check(bytes.size()==162 && bytes.size()<=codec::kMaxFileBytes,"canonical format has a fixed bounded length");
+    const auto bytes=Encode(c);Check(bytes.size()==(c.schema==2?163u:162u) && bytes.size()<=codec::kMaxFileBytes,"canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
     auto output=Upper();output.vitality=2;codec::Error error=codec::Error::Malformed;
     Check(codec::Decode(bytes,output,error) && error==codec::Error::None,"encoded checkpoint decodes successfully");
@@ -81,6 +81,33 @@ int main() {
     Check(baseline==golden && golden.size()==162,"default checkpoint exactly matches golden bytes and checksum");
     Check(ReferenceCrc(std::span<const std::byte>(golden).subspan(20))==0x01703382u,"golden payload checksum is fixed independently");
     RoundTrip(cp::Checkpoint{});
+    for(int health:{1,2,3}) for(bool half:{false,true}) {
+        for(auto c:{cp::Checkpoint{},Upper(),Endpoint()}) {
+            c.schema=2;c.vitality=health;c.halfHeart=half;RoundTrip(c);
+            const auto bytes=Encode(c);codec::Error error{};cp::Checkpoint loaded;
+            Check(codec::Decode(bytes,loaded,error) && loaded.schema==2 &&
+                  loaded.vitality==health && loaded.halfHeart==half,
+                  "schema2 preserves every half-heart health and boundary exactly");
+        }
+    }
+    {
+        auto c=cp::Checkpoint{};c.schema=2;c.vitality=1;c.halfHeart=true;
+        auto bytes=Encode(c);bytes.back()=std::byte{2};Rechecksum(bytes);
+        Reject(bytes,codec::Error::Malformed);
+        bytes=Encode(c);bytes.pop_back();Put(bytes,12,142);Rechecksum(bytes);
+        Reject(bytes,codec::Error::Malformed);
+        bytes=baseline;bytes.push_back(std::byte{0});Put(bytes,12,143);Rechecksum(bytes);
+        Reject(bytes,codec::Error::Malformed);
+        auto legacy=cp::Checkpoint{};legacy.halfHeart=true;codec::Error error{};
+        std::vector<std::byte> sentinel{std::byte{55}};
+        Check(!codec::Encode(legacy,sentinel,error) && error==codec::Error::InvalidCheckpoint &&
+              sentinel==std::vector<std::byte>{std::byte{55}},
+              "schema1 cannot silently discard half health and failure preserves output");
+        cp::Checkpoint old;old.schema=2;old.halfHeart=true;
+        Check(codec::Decode(golden,old,error) && !old.halfHeart && old.schema==1 &&
+              Encode(old)==golden,"legacy decode clears stale fractions and keeps original bytes");
+    }
+
     // The new logical content uses the same envelope/payload; historical lower
     // and summit bytes retain revision 1 and require no rewrite or migration.
     Check(cp::Checkpoint{}.contentRevision==1 && Upper().contentRevision==1,
@@ -153,7 +180,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,2u,0xffffffffu}) {
+    for(std::uint32_t version:{0u,3u,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,3u,0xffffffffu}) {
@@ -198,7 +225,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=2;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=3;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     invalid=cp::Checkpoint{};invalid.contentRevision=3;invalidEncode(invalid,codec::Error::UnsupportedContent);
     invalid=cp::Checkpoint{};invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=Upper();invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);

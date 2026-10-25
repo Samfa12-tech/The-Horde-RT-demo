@@ -113,6 +113,15 @@ final class AndroidControllerInput {
     float lookY() { return lookY; }
     boolean runHeld() { return runHeld; }
     boolean crouchHeld() { return crouchHeld; }
+    boolean guardHeld() {
+        return !suspended && (leftTriggerKeyDown || (leftTriggerArmed && leftTriggerAnalogDown));
+    }
+    void clearGuardHold() {
+        blockedUntilUp[4] |= keyDown[4];
+        keyDown[4] = false;
+        leftTriggerKeyDown = leftTriggerAnalogDown = false;
+        leftTriggerSeeded = leftTriggerArmed = false;
+    }
     void clearCrouchHold() {
         blockedUntilUp[13] |= keyDown[13];
         keyDown[13] = false;
@@ -192,6 +201,7 @@ final class AndroidControllerInput {
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
             if (deviceId == activeDeviceId) {
                 neutralizeAxes(true);
+                clearGuardHold();
                 hatNavX = hatNavY = 0;
                 hatSeeded = hatArmed = false;
             }

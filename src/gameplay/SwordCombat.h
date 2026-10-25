@@ -35,6 +35,7 @@ enum class PlayerCombatAction : std::uint8_t
     ParryStartup,
     ParryActive,
     ParryRecovery,
+    Guard,
 };
 
 enum class PlayerAttackCut : std::uint8_t
@@ -68,6 +69,7 @@ struct PlayerCombatSnapshot
     float actionTime = 0.0f;
     float reactionTime = 0.0f;
     bool comboQueued = false;
+    float guardPoseWeight = 0.0f;
 };
 
 inline constexpr std::size_t kSkeletonCombatantCapacity = 2u;
@@ -175,6 +177,7 @@ public:
         attackQueued_ = false;
         parryQueued_ = false;
         player_ = {};
+        guardHeld_ = guardFreshPress_ = false;
         successfulParryEndsNextTick_ = false;
         nextPlayerAttackId_ = 1u;
         activePlayerAttackId_ = 0u;
@@ -205,7 +208,8 @@ public:
             player_.comboQueued = true;
             return PlayerAttackCut::UpwardSlice;
         }
-        if (player_.action == PlayerCombatAction::Idle || successfulParryEndsNextTick_)
+        if (player_.action == PlayerCombatAction::Idle || player_.action == PlayerCombatAction::Guard ||
+            successfulParryEndsNextTick_)
         {
             attackQueued_ = true;
             return PlayerAttackCut::DownwardCut;
@@ -215,7 +219,22 @@ public:
 
     void RequestParry()
     {
+        if (guardHeld_ && !guardFreshPress_) return;
         parryQueued_ = true;
+        guardFreshPress_ = false;
+    }
+
+    void SetGuardHeld(bool held)
+    {
+        guardFreshPress_ = held && !guardHeld_;
+        guardHeld_ = held;
+        if (!held && player_.action == PlayerCombatAction::Guard)
+        {
+            player_.action = PlayerCombatAction::Idle;
+            player_.actionTime = 0.0f;
+            snapshot_.player = player_;
+            snapshot_.activePlayerAttackId = 0u;
+        }
     }
 
     // Presentation holds cancel the player's current and buffered actions
@@ -225,6 +244,7 @@ public:
         attackQueued_ = false;
         parryQueued_ = false;
         successfulParryEndsNextTick_ = false;
+        guardHeld_ = guardFreshPress_ = false;
         player_ = {};
         snapshot_.player = player_;
         snapshot_.playerAttackPulse = false;
@@ -234,7 +254,8 @@ public:
 
     bool CanAcceptPlayerAction() const
     {
-        return player_.action == PlayerCombatAction::Idle || successfulParryEndsNextTick_;
+        return player_.action == PlayerCombatAction::Idle ||
+            player_.action == PlayerCombatAction::Guard || successfulParryEndsNextTick_;
     }
 
     bool CanAcceptAttack() const
@@ -244,7 +265,7 @@ public:
 
     bool CanAcceptParry() const
     {
-        return CanAcceptPlayerAction();
+        return CanAcceptPlayerAction() && (!guardHeld_ || guardFreshPress_);
     }
 
     static bool IsPlayerTargetInRangeCone(float playerX,
@@ -309,7 +330,7 @@ public:
         snapshot_.parriedAttackerIndex = -1;
         if (successfulParryEndsNextTick_)
         {
-            player_ = {};
+            FinishPlayerAction();
             successfulParryEndsNextTick_ = false;
         }
         for (Combatant& combatant : combatants_)
@@ -320,7 +341,7 @@ public:
             combatant.walkAnimationHold = std::max(0.0f, combatant.walkAnimationHold - deltaSeconds);
         }
 
-        if (player_.action == PlayerCombatAction::Idle)
+        if (player_.action == PlayerCombatAction::Idle || player_.action == PlayerCombatAction::Guard)
         {
             if (attackQueued_)
             {
@@ -338,6 +359,7 @@ public:
         parryQueued_ = false;
         UpdatePlayerAction(deltaSeconds, playerX, playerZ, playerYaw,
                            !contactEvaluator);
+        guardFreshPress_ = false;
 
         const ShowcaseZone playerZone = QueryShowcaseZone(playerX, playerZ);
         const bool playerInsideEnemyArena = useExplicitArenaGate
@@ -448,6 +470,14 @@ private:
         bool parrySuccessPulse = false;
     };
 
+    void FinishPlayerAction()
+    {
+        const float weight = player_.guardPoseWeight;
+        player_ = {};
+        player_.guardPoseWeight = guardHeld_ ? 1.0f : weight;
+        if (guardHeld_) player_.action = PlayerCombatAction::Guard;
+    }
+
     void UpdatePlayerAction(float deltaSeconds, float playerX, float playerZ, float playerYaw,
                             const bool allowLegacySwordHit)
     {
@@ -496,7 +526,7 @@ private:
         case PlayerCombatAction::SwingRecovery:
             if (player_.actionTime >= kSwingRecoveryDuration)
             {
-                player_ = {};
+                FinishPlayerAction();
             }
             break;
         case PlayerCombatAction::UpwardSliceWindup:
@@ -523,7 +553,7 @@ private:
         case PlayerCombatAction::UpwardSliceRecovery:
             if (player_.actionTime >= kUpwardSliceRecoveryDuration)
             {
-                player_ = {};
+                FinishPlayerAction();
             }
             break;
         case PlayerCombatAction::ParryStartup:
@@ -536,20 +566,44 @@ private:
         case PlayerCombatAction::ParryActive:
             if (player_.actionTime >= kParryActiveDuration)
             {
-                player_.action = PlayerCombatAction::ParryRecovery;
-                player_.actionTime -= kParryActiveDuration;
+                if (guardHeld_) FinishPlayerAction();
+                else
+                {
+                    player_.action = PlayerCombatAction::ParryRecovery;
+                    player_.actionTime -= kParryActiveDuration;
+                }
             }
             break;
         case PlayerCombatAction::ParryRecovery:
             if (player_.actionTime >= kParryRecoveryDuration)
             {
-                player_ = {};
+                FinishPlayerAction();
             }
+            break;
+        case PlayerCombatAction::Guard:
+            player_.actionTime = 0.0f;
             break;
         case PlayerCombatAction::Idle:
             player_.actionTime = 0.0f;
             break;
         }
+
+        // This is pose blending only. Guard damage protection belongs solely to
+        // the Guard action, never windup/active/recovery or this visual tail.
+        constexpr float guardJoinSeconds = 0.12f;
+        if (player_.action == PlayerCombatAction::Guard)
+            player_.guardPoseWeight = 1.0f;
+        else if (guardHeld_ && (player_.action == PlayerCombatAction::SwingRecovery ||
+                              player_.action == PlayerCombatAction::UpwardSliceRecovery))
+        {
+            const float duration = player_.action == PlayerCombatAction::SwingRecovery
+                ? kSwingRecoveryDuration : kUpwardSliceRecoveryDuration;
+            player_.guardPoseWeight = std::clamp(
+                (player_.actionTime - duration + guardJoinSeconds) / guardJoinSeconds, 0.0f, 1.0f);
+        }
+        else
+            player_.guardPoseWeight = std::max(0.0f,
+                player_.guardPoseWeight - deltaSeconds / guardJoinSeconds);
 
         float swingElapsed = 0.0f;
         if (player_.action == PlayerCombatAction::SwingWindup)
@@ -992,6 +1046,7 @@ private:
         case PlayerCombatAction::ParryStartup:
         case PlayerCombatAction::ParryActive:
         case PlayerCombatAction::ParryRecovery:
+        case PlayerCombatAction::Guard:
             snapshot_.activePlayerAttackId = 0u;
             break;
         }
@@ -1085,6 +1140,8 @@ private:
     std::size_t combatantCount_ = kSkeletonCombatantCapacity;
     bool attackQueued_ = false;
     bool parryQueued_ = false;
+    bool guardHeld_ = false;
+    bool guardFreshPress_ = false;
     bool successfulParryEndsNextTick_ = false;
     PlayerCombatSnapshot player_{};
     std::uint64_t nextPlayerAttackId_ = 1u;

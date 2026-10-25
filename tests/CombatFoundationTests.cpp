@@ -313,6 +313,164 @@ void ActualIncomingHits() {
         Check(hit,"melee boundary fixture retains actual incoming contact coverage");
     }
 }
+void HeldGuardDamageContract() {
+    // The ordinary encounter starts a real skeleton wind-up. The deliberately
+    // early fresh parry expires before contact; only held guard may mitigate it.
+    for(bool frontal:{true,false}) {
+        auto config=Rules(); config.waterfallSkeletonEncounter=false;
+        config.playerStartX=0; config.playerStartZ=-3.75f;
+        config.playerStartYawRadians=frontal?0.0f:3.14159265359f;
+        GameSimulation sim(config); InputSnapshot input;
+        input.tutorialEnabled=false; input.yawRadians=config.playerStartYawRadians;
+        input.guardHeld=true; input.commands.parry=1;
+        int acceptedHits=0, successfulParries=0; bool sawGuard=false;
+        const int desiredHits=frontal?2:1;
+        for(int tick=0;tick<900 && acceptedHits<desiredHits;++tick) {
+            // A malicious/repeated command stream must not turn a held input
+            // into periodic free parry windows or erase the incoming contacts.
+            if(tick>0) ++input.commands.parry;
+            sim.StepFixed(input);
+            const auto& state=sim.Snapshot();
+            sawGuard=sawGuard || state.playerCombat.action==PlayerCombatAction::Guard;
+            for(const auto& event:sim.Events().Events()) {
+                if(event.type==GameplayEventType::PlayerParrySucceeded) ++successfulParries;
+                if(event.type==GameplayEventType::PlayerDamaged) {
+                    ++acceptedHits;
+                    if(frontal && acceptedHits==1)
+                        Check(state.playerVitals.vitality==3 && state.playerVitals.halfHeart,
+                              "first actual frontal guarded hit removes exactly half a heart");
+                    else
+                        Check(state.playerVitals.vitality==2 && !state.playerVitals.halfHeart,
+                              frontal?"two actual guarded contacts remove exactly one heart":
+                                      "rear melee is not protected by the forward guard pose");
+                    Check(Near(state.playerVitals.invulnerabilityRemaining,1.0f),
+                          "guarded damage still owns one normal post-hit invulnerability interval");
+                }
+            }
+            sim.ClearEvents();
+        }
+        Check(sawGuard && acceptedHits==desiredHits && successfulParries==0,
+              "held guard reaches actual contact without edge-spam parries or rounded-away damage");
+    }
+
+    GameSimulation red(Rules()); InputSnapshot redInput; redInput.tutorialEnabled=false;
+    red.BeginCombatPractice(EnemyKind::Lich);
+    int ticks=0;
+    while(ticks++<600 && !red.Snapshot().lich.revealComplete) {
+        red.StepFixed(redInput); red.ClearEvents();
+    }
+    Check(ticks<600,"held-guard red-attack fixture completes real Keeper recognition");
+    redInput.guardHeld=true; redInput.commands.parry=1;
+    bool sawGuard=false, sawRedHit=false; int redParries=0;
+    for(int tick=0;tick<600 && !sawRedHit;++tick) {
+        red.StepFixed(redInput);
+        const auto& state=red.Snapshot();
+        sawGuard=sawGuard || state.playerCombat.action==PlayerCombatAction::Guard;
+        for(const auto& event:red.Events().Events())
+            if(event.type==GameplayEventType::PlayerParrySucceeded) ++redParries;
+        if(state.lich.damagePulse) {
+            sawRedHit=true;
+            Check(state.playerVitals.vitality==2 && !state.playerVitals.halfHeart,
+                  "real red Keeper discharge bypasses guard and deals the unchanged full heart");
+        }
+        red.ClearEvents();
+    }
+    Check(sawGuard && sawRedHit && redParries==0,
+          "red-attack rejection is witnessed while guard has actually been active");
+
+    auto legacyConfig=Rules(); legacyConfig.combatFoundation1_7=false;
+    GameSimulation legacy(legacyConfig); InputSnapshot legacyInput;
+    legacyInput.tutorialEnabled=false; legacyInput.damageEnabled=false;
+    legacyInput.guardHeld=true; legacyInput.commands.parry=1;
+    bool sawLegacyActive=false, sawLegacyGuard=false;
+    for(int tick=0;tick<90;++tick) {
+        legacy.StepFixed(legacyInput);
+        sawLegacyActive=sawLegacyActive || legacy.Snapshot().playerCombat.action==PlayerCombatAction::ParryActive;
+        sawLegacyGuard=sawLegacyGuard || legacy.Snapshot().playerCombat.action==PlayerCombatAction::Guard;
+    }
+    Check(sawLegacyActive && !sawLegacyGuard && legacy.Snapshot().playerCombat.action==PlayerCombatAction::Idle,
+          "historical configuration keeps the original one-shot parry despite a held field");
+}
+
+void GuardAttackAndReleaseAtContact() {
+    for(bool attack:{false,true}) {
+        auto config=Rules(); config.waterfallSkeletonEncounter=false;
+        config.playerStartX=0; config.playerStartZ=-3.75f;
+        GameSimulation sim(config); InputSnapshot input; input.tutorialEnabled=false;
+        input.guardHeld=true; input.commands.parry=1;
+        int ticks=0;
+        while(ticks++<600) {
+            const auto& state=sim.Snapshot();
+            const auto index=state.swordCombat.attackerIndex;
+            if(index>=0 && state.swordCombat.combatants[index].action==EnemyCombatAction::AttackWindup &&
+               state.swordCombat.combatants[index].actionTime+.00001f>=
+                   CombatTimeline::kSkeletonAttackWindupSeconds-1.0f/120.0f) break;
+            sim.StepFixed(input); sim.ClearEvents();
+        }
+        Check(ticks<600 && sim.Snapshot().playerCombat.action==PlayerCombatAction::Guard,
+              "same-tick guard fixture reaches the final real melee wind-up while guarding");
+        if(attack) ++input.commands.attack;
+        else input.guardHeld=false;
+        bool actualHit=false;
+        for(int tick=0;tick<4 && !actualHit;++tick) {
+            sim.StepFixed(input);
+            for(const auto& event:sim.Events().Events())
+                if(event.type==GameplayEventType::PlayerDamaged) actualHit=true;
+            sim.ClearEvents();
+        }
+        Check(actualHit && sim.Snapshot().playerVitals.vitality==2 &&
+              !sim.Snapshot().playerVitals.halfHeart,
+              attack?"attack starts before contact and immediately ends guard mitigation":
+                     "release before contact immediately ends guard mitigation");
+        if(attack)
+            Check(sim.Snapshot().playerCombat.action==PlayerCombatAction::SwingWindup,
+                  "damage fixture attacks from guard without an intervening idle action");
+    }
+}
+
+void GuardInterruptionRearm() {
+    GameSimulation sim(Rules()); InputSnapshot input;
+    input.tutorialEnabled=false; input.damageEnabled=false;
+    const auto enterGuard=[&]() {
+        input.guardHeld=false; sim.StepFixed(input);
+        input.guardHeld=true; ++input.commands.parry;
+        bool entered=false;
+        for(int tick=0;tick<45;++tick) {
+            sim.StepFixed(input);
+            entered=entered || sim.Snapshot().playerCombat.action==PlayerCombatAction::Guard;
+        }
+        Check(entered,"fresh post-release guard fixture reaches held state");
+    };
+    const auto cannotRearmWhileHeld=[&](const char* message) {
+        bool rearmed=false;
+        for(int tick=0;tick<40;++tick) {
+            sim.StepFixed(input);
+            const auto action=sim.Snapshot().playerCombat.action;
+            rearmed=rearmed || action==PlayerCombatAction::Guard ||
+                    action==PlayerCombatAction::ParryStartup || action==PlayerCombatAction::ParryActive;
+        }
+        Check(!rearmed,message);
+    };
+    enterGuard();
+    input.paused=true; sim.AdvanceFrame(input,1.0/60.0);
+    Check(sim.Snapshot().playerCombat.action!=PlayerCombatAction::Guard,
+          "pause cancels logical guard without waiting for a fixed gameplay tick");
+    input.paused=false;
+    cannotRearmWhileHeld("resuming with old held input cannot regain guard or a free parry");
+    enterGuard();
+    ++input.commands.dodge; input.moveStrafe=1.0f; sim.StepFixed(input); input.moveStrafe=0.0f;
+    Check(sim.Snapshot().dodgeActive && sim.Snapshot().playerCombat.action!=PlayerCombatAction::Guard,
+          "accepted dodge interrupts guard immediately");
+    cannotRearmWhileHeld("holding through dodge expiry cannot silently restore guard");
+    enterGuard();
+    sim.ResetRoute();
+    cannotRearmWhileHeld("route reset discards held guard until a real release");
+    enterGuard();
+    sim.SynchronizePausedInput(input,2,PausedInputPolicy::DiscardAllCommands);
+    input.paused=false;
+    cannotRearmWhileHeld("lifecycle synchronization cannot replay held guard into a new owner interval");
+}
+
 void DeliveryRates() {
     std::vector<std::vector<double>> deliveries;
     for(int fps:{15,30,60,120}) deliveries.push_back(std::vector<double>(fps,1.0/fps));
@@ -871,6 +1029,7 @@ void RouteMeleeOcclusion() {
 }
 int main() {
     WindowAndLifecycle(); TeachingContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();
+    HeldGuardDamageContract(); GuardAttackAndReleaseAtContact(); GuardInterruptionRearm();
     IntegratedKeeperRepelAndReward();
     OutgoingTraceContract();
     NonfatalPairHitPreservesIndependentActions();

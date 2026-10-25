@@ -73,9 +73,9 @@ final class CombatTeachingPreferences {
         // Source identity stays in diagnostics; the lesson names the visible action.
         switch (cue) {
             case 1: return "○ Watch the raised blade";
-            case 2: return "○ PARRY NOW — raise your guard";
-            case 8: return "● Guard up — face the blade";
-            case 3: return "↩ Ready for the next strike";
+            case 2: return "○ PARRY NOW — fresh press to parry";
+            case 8: return "● Guard up — timed parry; face the blade";
+            case 3: return "↩ Hold: half damage; release to rearm parry";
             case 4: return "○ The Keeper gathers lightning — watch the staff";
             case 5: return "← DODGE NOW → — step sideways";
             case 6: return "↩ Close in before the next charge";

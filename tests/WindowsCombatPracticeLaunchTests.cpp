@@ -70,7 +70,7 @@ int main()
     teaching.cue = CombatTeachingCue::ParryNow;
     const auto press = CombatTeachingPromptText(teaching);
     check(press.find("o PARRY NOW") != std::string::npos &&
-              press.find("raise your guard") != std::string::npos &&
+              press.find("fresh press to parry") != std::string::npos &&
               press.find("O Watch the raised blade") == std::string::npos,
           "anticipatory press and live blade-window prompts stay distinct");
     teaching.cue = CombatTeachingCue::ParryActive;

@@ -458,6 +458,15 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         break;
     }
     parryBlend = parryBlend * parryBlend * (3.0f - 2.0f * parryBlend);
+    // Keep guard, the solved hand/arm and the rigid sword in one pose authority.
+    // The fixed-step owner blends this weight out directly into the running
+    // attack curve, and into its legitimate recovery tail before returning to
+    // guard. Never insert the rest pose or a renderer-only sword correction.
+    // Leave zero-weight legacy samples byte-for-byte unchanged.
+    const float guardPoseWeight = std::isfinite(playerCombat.guardPoseWeight)
+        ? std::clamp(playerCombat.guardPoseWeight, 0.0f, 1.0f) : 0.0f;
+    if (guardPoseWeight > 0.0f)
+        parryBlend += (1.0f - parryBlend) * guardPoseWeight;
     const float successJolt = playerCombat.reaction == CombatReaction::Parried
         ? std::clamp(playerCombat.reactionTime / 0.12f, 0.0f, 1.0f)
         : 0.0f;

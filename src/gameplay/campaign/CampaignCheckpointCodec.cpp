@@ -9,9 +9,12 @@ namespace {
 static_assert(sizeof(float)==4 && std::numeric_limits<float>::is_iec559);
 constexpr std::array<std::byte,8> kMagic{std::byte{'H'},std::byte{'R'},std::byte{'D'},
     std::byte{'C'},std::byte{'P'},std::byte{'K'},std::byte{'T'},std::byte{0}};
-constexpr std::uint32_t kFormat=1,kPayloadBytes=142;
+constexpr std::uint32_t kFormat=1,kLegacyPayloadBytes=142,kHalfHeartPayloadBytes=143;
 constexpr std::size_t kHeaderBytes=20;
-static_assert(kHeaderBytes+kPayloadBytes<=kMaxFileBytes);
+static_assert(kHeaderBytes+kHalfHeartPayloadBytes<=kMaxFileBytes);
+constexpr std::uint32_t PayloadBytes(std::uint32_t schema) {
+    return schema==2?kHalfHeartPayloadBytes:kLegacyPayloadBytes;
+}
 std::uint32_t Crc32(std::span<const std::byte> bytes) {
     std::uint32_t crc=0xffffffffu;
     for(auto b:bytes) {
@@ -44,7 +47,7 @@ private:
     std::span<const std::byte> bytes_;std::size_t offset_=0;bool valid_=true;
 };
 Error VersionError(const Checkpoint& c) {
-    if(c.schema!=1) return Error::UnsupportedSchema;
+    if(c.schema!=1 && c.schema!=2) return Error::UnsupportedSchema;
     if(c.contentRevision!=1 && c.contentRevision!=2) return Error::UnsupportedContent;
     return Error::None;
 }
@@ -53,7 +56,8 @@ bool Encode(const Checkpoint& c,std::vector<std::byte>& out,Error& error) {
     error=VersionError(c);
     if(error!=Error::None) return false;
     if(!Validate(c)) {error=Error::InvalidCheckpoint;return false;}
-    std::vector<std::byte> payload;payload.reserve(kPayloadBytes);
+    const auto payloadBytes=PayloadBytes(c.schema);
+    std::vector<std::byte> payload;payload.reserve(payloadBytes);
     U32(payload,c.schema);U32(payload,c.contentRevision);
     U32(payload,static_cast<std::uint32_t>(c.id));U32(payload,static_cast<std::uint32_t>(c.zone));
     Float(payload,c.position.x);Float(payload,c.position.y);Float(payload,c.position.z);
@@ -72,9 +76,10 @@ bool Encode(const Checkpoint& c,std::vector<std::byte>& out,Error& error) {
     Bool(payload,p.waitingForRaise);Bool(payload,p.proofAccepted);Bool(payload,p.reminderConsumed);
     Bool(payload,p.forestNightConsumed);Bool(payload,p.forestWaystoneConsumed);
     Bool(payload,p.forestClueConsumed);Bool(payload,p.forestVillageConsumed);
-    std::vector<std::byte> encoded;encoded.reserve(kHeaderBytes+kPayloadBytes);
+    if(c.schema==2) Bool(payload,c.halfHeart);
+    std::vector<std::byte> encoded;encoded.reserve(kHeaderBytes+payloadBytes);
     encoded.insert(encoded.end(),kMagic.begin(),kMagic.end());
-    U32(encoded,kFormat);U32(encoded,kPayloadBytes);U32(encoded,Crc32(payload));
+    U32(encoded,kFormat);U32(encoded,payloadBytes);U32(encoded,Crc32(payload));
     encoded.insert(encoded.end(),payload.begin(),payload.end());
     out=std::move(encoded);error=Error::None;return true;
 }
@@ -87,12 +92,14 @@ bool Decode(std::span<const std::byte> bytes,Checkpoint& out,Error& error) {
     if(header.U32()!=kFormat) {error=Error::UnsupportedFormat;return false;}
     const auto length=header.U32(),crc=header.U32();
     if(length>kMaxFileBytes-kHeaderBytes) {error=Error::TooLarge;return false;}
-    if(length!=kPayloadBytes || bytes.size()!=kHeaderBytes+length) {error=Error::Malformed;return false;}
+    if((length!=kLegacyPayloadBytes && length!=kHalfHeartPayloadBytes) ||
+       bytes.size()!=kHeaderBytes+length) {error=Error::Malformed;return false;}
     const auto payload=bytes.subspan(kHeaderBytes);
     if(Crc32(payload)!=crc) {error=Error::Corrupt;return false;}
     Reader r(payload);Checkpoint c;
     c.schema=r.U32();c.contentRevision=r.U32();
     error=VersionError(c);if(error!=Error::None) return false;
+    if(length!=PayloadBytes(c.schema)) {error=Error::Malformed;return false;}
     c.id=static_cast<CheckpointId>(r.U32());c.zone=static_cast<simulation::WorldZoneId>(r.U32());
     c.position={r.Float(),r.Float(),r.Float()};c.yaw=r.Float();c.pitch=r.Float();
     c.vitality=std::bit_cast<std::int32_t>(r.U32());c.defeatedGuards=r.U32();
@@ -107,6 +114,7 @@ bool Decode(std::span<const std::byte> bytes,Checkpoint& out,Error& error) {
     p.waitingForRaise=r.Bool();p.proofAccepted=r.Bool();p.reminderConsumed=r.Bool();
     p.forestNightConsumed=r.Bool();p.forestWaystoneConsumed=r.Bool();
     p.forestClueConsumed=r.Bool();p.forestVillageConsumed=r.Bool();
+    if(c.schema==2) c.halfHeart=r.Bool();
     if(!r.Valid()) {error=Error::Malformed;return false;}
     if(!Validate(c)) {error=Error::InvalidCheckpoint;return false;}
     out=std::move(c);error=Error::None;return true;

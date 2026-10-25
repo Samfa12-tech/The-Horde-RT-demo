@@ -37,7 +37,8 @@
     <string name="quit">QUIT DEMO</string>
     <string name="back">BACK</string>
     <string name="swing">SWING</string>
-    <string name="parry">PARRY</string>
+    <string name="vitality_half_accessibility">Vitality %1$d and a half of %2$d</string>
+    <string name="parry">PARRY / HOLD GUARD</string>
     <string name="dodge">DODGE</string>
     <string name="combat_teaching">Optional parry and dodge lesson</string>
     <string name="combat_teaching_slowdown">Ease time during the lesson</string>
@@ -117,7 +118,7 @@
     <string name="report_copy_failed">The benchmark report could not be copied.</string>
     <string name="report_saved">Benchmark report saved.</string>
     <string name="report_save_failed">The benchmark report could not be saved.</string>
-    <string name="controls_help">LEFT HALF\nDrag gently to walk and strafe; farther to run\n\nRIGHT HALF\nDrag for 360° camera look\n\nSPEED\nMovement follows your drag distance, up to running pace.\n\nLOW OPENINGS\nCrouch automatically when needed and stand when there is headroom.\n\nSWING\nPress Swing to attack\n\nPARRY\nPress Parry to deflect a skeleton strike\n\nDODGE\nPress to evade in your movement direction; standing still dodges forward\n\nINTERACT\nUse the nearby chest or rope action when enabled. Follow Climb or Descend; equipment stows automatically on the rope.\n\nLANTERN ICON\nTap to raise or lower the reward lantern while carrying it.\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
+    <string name="controls_help">LEFT HALF\nDrag gently to walk and strafe; farther to run\n\nRIGHT HALF\nDrag for 360° camera look\n\nSPEED\nMovement follows your drag distance, up to running pace.\n\nLOW OPENINGS\nCrouch automatically when needed and stand when there is headroom.\n\nSWING\nPress Swing to attack\n\nPARRY\nPress just before a strike to parry. Keep holding to guard against half of blockable damage. Release to lower your sword. Keyboard: hold Q. Attacking ends protection until recovery; holding never repeats the parry window. Release and press again for a new timed parry. Red attacks cannot be blocked: dodge.\n\nDODGE\nPress to evade in your movement direction; standing still dodges forward\n\nINTERACT\nUse the nearby chest or rope action when enabled. Follow Climb or Descend; equipment stows automatically on the rope.\n\nLANTERN ICON\nTap to raise or lower the reward lantern while carrying it.\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
     <string name="sfx_enabled">Sound effects</string>
     <string name="haptics_enabled">Vibration / haptics</string>
     <string name="sfx_volume">SFX volume</string>
@@ -228,7 +229,7 @@
     <string name="controller_help">Controller: deflect the left stick gently to walk, farther to run; right stick looks. Right trigger or X swings; left trigger parries; B dodges; crouch is automatic under low openings; A uses the nearby chest or rope action; Y raises or lowers the lantern; Start opens the menu. In menus, D-pad or left stick selects, A confirms, B goes back, and left/right adjusts a focused slider. These are Android button names; physical labels vary by controller. Touch restores touch controls. Unplugging the active controller pauses play.</string>
     <string name="run">RUN</string>
     <string name="running">RUNNING</string>
-    <string name="controller_play_prompts">Swing: RT / X · Parry: LT · Dodge: B · Menu: Start</string>
+    <string name="controller_play_prompts">Swing: RT / X · Parry / hold guard: LT · Dodge red attacks: B · Menu: Start</string>
     <string name="crouch">Crouch</string>
     <string name="stand">Stand</string>
     <string name="crouching_blocked">Crouching (ceiling)</string>

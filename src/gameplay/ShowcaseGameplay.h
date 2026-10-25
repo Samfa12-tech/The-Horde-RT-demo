@@ -72,6 +72,9 @@ struct PlayerVitalsSnapshot
 {
     PlayerLifePhase phase = PlayerLifePhase::Alive;
     int vitality = 3;
+    // vitality is the number of occupied hearts, rounded up. A missing half
+    // is explicit so guarded damage never rounds to zero or grants health.
+    bool halfHeart = false;
     int maxVitality = 3;
     float invulnerabilityRemaining = 0.0f;
     float damageFlash = 0.0f;
@@ -98,7 +101,7 @@ public:
         return snapshot_;
     }
 
-    PlayerDamageResult TryApplyDamage()
+    PlayerDamageResult TryApplyDamage(bool halfDamage = false)
     {
         if (snapshot_.phase != PlayerLifePhase::Alive ||
             snapshot_.invulnerabilityRemaining > 0.00001f)
@@ -106,7 +109,10 @@ public:
             return PlayerDamageResult::Ignored;
         }
 
-        snapshot_.vitality = std::max(0, snapshot_.vitality - 1);
+        const int halfUnits = std::max(0, snapshot_.vitality * 2 -
+            (snapshot_.halfHeart ? 1 : 0) - (halfDamage ? 1 : 2));
+        snapshot_.vitality = (halfUnits + 1) / 2;
+        snapshot_.halfHeart = (halfUnits & 1) != 0;
         snapshot_.invulnerabilityRemaining = kInvulnerabilityDuration;
         snapshot_.damageFlash = 1.0f;
         if (snapshot_.vitality == 0)
@@ -123,11 +129,12 @@ public:
         snapshot_ = {};
     }
 
-    bool RestoreCampaignVitality(int vitality)
+    bool RestoreCampaignVitality(int vitality, bool halfHeart = false)
     {
         if (vitality < 1 || vitality > kMaxVitality) return false;
         snapshot_ = {};
         snapshot_.vitality = vitality;
+        snapshot_.halfHeart = halfHeart;
         return true;
     }
 

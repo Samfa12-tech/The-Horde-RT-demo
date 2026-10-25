@@ -2191,6 +2191,9 @@ bool GameSimulation::CurrentCombatRules() const
 
 void GameSimulation::CancelCombatTransients()
 {
+    guardReleaseRequired_ = guardReleaseRequired_ || lastInput_.guardHeld;
+    swordCombat_.SetGuardHeld(false);
+    combatSnapshot_.player = swordCombat_.Snapshot().player;
     waterContact_.Reset();
     dodgeProtectionAccepted_ = false;
     keeperRepelRemainingSeconds_ = 0.0f;
@@ -2314,7 +2317,14 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         lichAttackEligible_ = false;
         lichRevealAttackSequenceFloor_ = latestAttackSequence_;
     }
-    const bool parryAvailable = SwordDefenseReady() && swordCombat_.CanAcceptParry();
+    if (!input.guardHeld) guardReleaseRequired_ = false;
+    const bool guardReady = CurrentCombatRules() && SwordDefenseReady() && !keeperHoldsActions &&
+        dodgeRemainingSeconds_ <= 0.0f && !rescueMovementSuppressedThisTick_ &&
+        !rescueTraversal_.IsActive();
+    if (input.guardHeld && !guardReady) guardReleaseRequired_ = true;
+    swordCombat_.SetGuardHeld(guardReady && !guardReleaseRequired_ && input.guardHeld);
+    const bool parryAvailable = SwordDefenseReady() && swordCombat_.CanAcceptParry() &&
+        (!CurrentCombatRules() || !input.guardHeld || !guardReleaseRequired_);
     bool playerActionAccepted = false;
     const auto acceptAttack = [&](const std::uint64_t commandSequence)
     {
@@ -2677,7 +2687,16 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             combatTeaching_.PracticeMiss();
         }
         else
-            damageResult = playerVitals_.TryApplyDamage();
+        {
+            // Only the existing blockable frontal skeleton contact is reduced.
+            // Keeper/red attacks, rear hits and every attacking phase stay full.
+            const bool guarded = CurrentCombatRules() && input.guardHeld && !guardReleaseRequired_ &&
+                combatSnapshot_.player.action == PlayerCombatAction::Guard &&
+                activeEnemyKind_ == EnemyKind::Skeleton &&
+                SwordCombat::IsPlayerTargetInRangeCone(playerX_, playerZ_, playerYawRadians_,
+                    damageSample.targetX, damageSample.targetZ);
+            damageResult = playerVitals_.TryApplyDamage(guarded);
+        }
         if (damageResult == PlayerDamageResult::Damaged)
         {
             damageSample.outcome = CombatContactOutcome::DamageAccepted;

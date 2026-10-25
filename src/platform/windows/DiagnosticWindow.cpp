@@ -697,6 +697,9 @@ struct VulkanSurfaceContext
     float controllerLookHorizontal = 0.0f;
     float controllerLookVertical = 0.0f;
     bool teachingControllerGlyphs = false;
+    bool keyboardGuardHeld = false;
+    bool guardHeld = false;
+    horde::platform::windows::GuardHoldLatch controllerGuardHold;
     WORD previousControllerButtons = 0u;
     WORD previousXInputUiButtons = 0u;
     horde::platform::windows::ControllerFocusLatch controllerFocusLatch;
@@ -2947,8 +2950,9 @@ void UpdateVitalityHud(VulkanSurfaceContext& context)
 {
     const horde::gameplay::PlayerVitalsSnapshot& vitals = context.simulation.Snapshot().playerVitals;
     // Native accessible name is retained; the owner-drawn HUD only paints hearts.
-    const std::string text = "Vitality " + std::to_string(vitals.vitality) + " of " +
-                             std::to_string(vitals.maxVitality);
+    const std::string current = vitals.halfHeart
+        ? std::to_string(vitals.vitality - 1) + ".5" : std::to_string(vitals.vitality);
+    const std::string text = "Vitality " + current + " of " + std::to_string(vitals.maxVitality);
     if (HWND hud = GetDlgItem(context.windowHandle, kVitalityHudControlId))
     {
         SetWindowTextA(hud, text.c_str());
@@ -4461,6 +4465,9 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
     context.runHeld = false;
     context.controllerRunHeld = false;
     context.runToggleKeyDown = false;
+    context.keyboardGuardHeld = context.guardHeld = false;
+    context.controllerGuardHold.Cancel();
+    context.simulationInput.guardHeld = false;
     context.forwardHeld = false;
     context.backwardHeld = false;
     context.leftHeld = false;
@@ -4502,6 +4509,7 @@ void DiscardDesktopPendingCommands(VulkanSurfaceContext& context)
     input.runHeld = false;
     input.analogueMovement = false;
     input.crouchHeld = false;
+    input.guardHeld = false;
     input.commands.crouchToggle = context.crouchToggleSequence;
     input.commands.clearCrouchIntent = context.clearCrouchIntentSequence;
     input.moveForward = input.moveStrafe = 0.0f;
@@ -4908,6 +4916,17 @@ void PublishDesktopCombatEdge(VulkanSurfaceContext& context,
         horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr));
 }
 
+void PublishDesktopGuardHold(VulkanSurfaceContext& context)
+{
+    const bool allowed = IsDesktopGameplayAvailable(context) &&
+        GetForegroundWindow() == context.windowHandle && GetFocus() == context.windowHandle;
+    const bool next = allowed && (context.keyboardGuardHeld || context.controllerGuardHold.held);
+    const bool fresh = next && !context.guardHeld;
+    context.guardHeld = next;
+    context.simulationInput.guardHeld = next;
+    if (fresh) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
+}
+
 void PollDesktopController(VulkanSurfaceContext& context)
 {
     const horde::platform::windows::ControllerPollDisposition pollDisposition =
@@ -4917,6 +4936,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
         context.controllerCrouchHeld = false;
         context.controllerCrouchBlockedUntilRelease = true;
         context.controllerRunHeld = false;
+        context.controllerGuardHold.Cancel();
+        PublishDesktopGuardHold(context);
         context.controllerForward = 0.0f;
         context.controllerStrafe = 0.0f;
         context.controllerLookHorizontal = 0.0f;
@@ -4989,6 +5010,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
         }
         if (!joystick.has_value())
         {
+            context.controllerGuardHold.Cancel();
+            PublishDesktopGuardHold(context);
             context.controllerStrafe = 0.0f;
             context.controllerForward = 0.0f;
             context.controllerLookHorizontal = 0.0f;
@@ -5003,6 +5026,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
         JOYCAPSA caps{};
         if (joyGetDevCapsA(*joystick, &caps, sizeof(caps)) != JOYERR_NOERROR)
         {
+            context.controllerGuardHold.Cancel();
+            PublishDesktopGuardHold(context);
             return;
         }
         const auto normaliseRaw = [](const DWORD value, const UINT minimum, const UINT maximum)
@@ -5040,6 +5065,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
             context.previousLegacyControllerButtons = legacy.dwButtons;
             context.previousLegacyUiButtons = legacy.dwButtons;
             context.previousLegacyPov = legacy.dwPOV;
+            context.controllerGuardHold.Reseed(horde::platform::windows::LegacyGuardHeld(legacy.dwButtons, identity));
+            PublishDesktopGuardHold(context);
             context.controllerStrafe = 0.0f;
             context.controllerForward = 0.0f;
             context.controllerLookHorizontal = 0.0f;
@@ -5063,6 +5090,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
             context.previousLegacyUiButtons = legacy.dwButtons;
             context.previousLegacyPov = legacy.dwPOV;
             context.controllerTriggerLatch = {};
+            context.controllerGuardHold.Reseed(horde::platform::windows::LegacyGuardHeld(legacy.dwButtons, identity));
+            PublishDesktopGuardHold(context);
             std::ostringstream controllerDiagnostic;
             controllerDiagnostic << "WinMM controller connected: id=" << *joystick
                                  << ", vendor=0x" << std::hex << caps.wMid
@@ -5086,10 +5115,12 @@ void PollDesktopController(VulkanSurfaceContext& context)
             std::abs(context.controllerForward) > 0.0f || std::abs(context.controllerStrafe) > 0.0f ||
             std::abs(context.controllerLookHorizontal) > 0.0f || std::abs(context.controllerLookVertical) > 0.0f)
             context.teachingControllerGlyphs = true;
+        context.controllerGuardHold.Observe(horde::platform::windows::LegacyGuardHeld(legacy.dwButtons, identity),
+            !context.simulationPaused);
+        PublishDesktopGuardHold(context);
         if (!context.simulationPaused)
         {
             if (edges.attackPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
-            if (edges.parryPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
             if (edges.dodgePressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Dodge);
             if (edges.interactPressed) ++context.interactSequence;
             if (edges.toggleHeldLightPosePressed) ++context.toggleHeldLightPoseSequence;
@@ -5114,6 +5145,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
         horde::platform::windows::SeedXInputTriggerLatch(
             state.Gamepad.bLeftTrigger, state.Gamepad.bRightTrigger,
             context.controllerTriggerLatch);
+        context.controllerGuardHold.Reseed(context.controllerTriggerLatch.leftHeld);
+        PublishDesktopGuardHold(context);
     }
     context.xInputUserIndex = xinputUser;
     context.legacyJoystickId.reset();
@@ -5128,6 +5161,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
         horde::platform::windows::SeedXInputTriggerLatch(
             state.Gamepad.bLeftTrigger, state.Gamepad.bRightTrigger,
             context.controllerTriggerLatch);
+        context.controllerGuardHold.Reseed(context.controllerTriggerLatch.leftHeld);
+        PublishDesktopGuardHold(context);
         context.controllerStrafe = 0.0f;
         context.controllerForward = 0.0f;
         context.controllerLookHorizontal = 0.0f;
@@ -5154,10 +5189,11 @@ void PollDesktopController(VulkanSurfaceContext& context)
         std::abs(context.controllerForward) > 0.0f || std::abs(context.controllerStrafe) > 0.0f ||
         std::abs(context.controllerLookHorizontal) > 0.0f || std::abs(context.controllerLookVertical) > 0.0f)
         context.teachingControllerGlyphs = true;
+    context.controllerGuardHold.Observe(context.controllerTriggerLatch.leftHeld, !context.simulationPaused);
+    PublishDesktopGuardHold(context);
     if (!context.simulationPaused)
     {
         if (triggerEdges.attackPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
-        if (triggerEdges.parryPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
         if ((pressed & XINPUT_GAMEPAD_B) != 0u) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Dodge);
         if ((pressed & XINPUT_GAMEPAD_A) != 0u) ++context.interactSequence;
         if ((pressed & XINPUT_GAMEPAD_X) != 0u &&
@@ -5197,6 +5233,7 @@ void UpdateDesktopSceneControls(
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const int previousVitality = context.simulation.Snapshot().playerVitals.vitality;
+    const bool previousHalfHeart = context.simulation.Snapshot().playerVitals.halfHeart;
     const horde::gameplay::PlayerLifePhase previousLifePhase =
         context.simulation.Snapshot().playerVitals.phase;
     const std::uint64_t ownerAdvanceSteadyNs = horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
@@ -5258,6 +5295,7 @@ void UpdateDesktopSceneControls(
     input.dialogueCompletionGeneration = context.dialogueCompletionGeneration;
     input.runHeld = context.runHeld;
     input.crouchHeld = false;
+    input.guardHeld = context.guardHeld && !context.simulationPaused;
     input.waterfallWidthScale = horde::vulkan::raytracing::ClampRtSceneTuning(
         context.rtSceneTuning).waterfallWidthScale;
     input.hasAuthoritativePlayerPose = false;
@@ -5404,6 +5442,7 @@ void UpdateDesktopSceneControls(
     // between ticks. Reset/checkpoint paths still request a full view mirror.
     MirrorSimulationSnapshot(context, false);
     if (context.simulation.Snapshot().playerVitals.vitality != previousVitality ||
+        context.simulation.Snapshot().playerVitals.halfHeart != previousHalfHeart ||
         context.simulation.Snapshot().playerVitals.phase != previousLifePhase)
     {
         UpdateVitalityHud(context);
@@ -8165,6 +8204,14 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             context.simulation.SynchronizePausedInput(context.simulationInput,
                 context.simulation.Snapshot().inputPublicationSequence);
             MirrorSimulationSnapshot(context);
+        }
+#endif
+#if defined(_DEBUG)
+        if (const char* guardSequence = std::getenv("HORDE_GUARD_TRANSITION_CAPTURE"))
+        {
+            if (std::string_view(guardSequence) != "1")
+                return fail("Guard transition fixture accepts only explicit value 1.");
+#include "platform/windows/WindowsGuardTransitionCapture.inl"
         }
 #endif
         std::vector<double> frameTimesMs;
@@ -11765,9 +11812,12 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     horde::gameplay::interactions::ChestRewardPhase::LanternClaimed);
             if (keyAction == DesktopKeyAction::Dodge || keyAction == DesktopKeyAction::Parry)
             {
-                PublishDesktopCombatEdge(*sceneContext, keyAction == DesktopKeyAction::Dodge
-                    ? horde::gameplay::simulation::CombatInputEdgeKind::Dodge
-                    : horde::gameplay::simulation::CombatInputEdgeKind::Parry);
+                if (keyAction == DesktopKeyAction::Parry)
+                {
+                    sceneContext->keyboardGuardHeld = true;
+                    PublishDesktopGuardHold(*sceneContext);
+                }
+                else PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Dodge);
                 return 0;
             }
             if (keyAction == DesktopKeyAction::ToggleLantern)
@@ -11793,6 +11843,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         break;
     case WM_KEYUP:
     case WM_SYSKEYUP:
+        if (sceneContext && wParam == 'Q')
+        {
+            sceneContext->keyboardGuardHeld = false;
+            PublishDesktopGuardHold(*sceneContext);
+        }
         if (sceneContext && wParam == VK_CAPITAL)
             sceneContext->runToggleKeyDown = false;
         if (sceneContext && sceneContext->controlsEnabled && SetDesktopMovementKey(*sceneContext, wParam, false))
@@ -12077,7 +12132,20 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 MoveToEx(item->hDC, points[0].x, points[0].y, nullptr);
                 PolyBezierTo(item->hDC, points.data() + 1u, 12u);
                 CloseFigure(item->hDC); EndPath(item->hDC);
-                if (index < vitals.vitality) StrokeAndFillPath(item->hDC);
+                const bool half = vitals.halfHeart && index == vitals.vitality - 1;
+                if (half)
+                {
+                    const int saved = SaveDC(item->hDC);
+                    IntersectClipRect(item->hDC, x, y, x + heartWidth / 2, y + heartHeight);
+                    StrokeAndFillPath(item->hDC);
+                    RestoreDC(item->hDC, saved);
+                    BeginPath(item->hDC);
+                    MoveToEx(item->hDC, points[0].x, points[0].y, nullptr);
+                    PolyBezierTo(item->hDC, points.data() + 1u, 12u);
+                    CloseFigure(item->hDC); EndPath(item->hDC);
+                    StrokePath(item->hDC);
+                }
+                else if (index < vitals.vitality) StrokeAndFillPath(item->hDC);
                 else StrokePath(item->hDC);
             }
             if (previousPen && previousPen != HGDI_ERROR) SelectObject(item->hDC, previousPen);

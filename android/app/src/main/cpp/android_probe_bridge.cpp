@@ -182,6 +182,7 @@ const char* DebugPlayerCombatActionName(const horde::gameplay::PlayerCombatActio
     case PlayerCombatAction::ParryStartup: return "parry-startup";
     case PlayerCombatAction::ParryActive: return "parry-active";
     case PlayerCombatAction::ParryRecovery: return "parry-recovery";
+    case PlayerCombatAction::Guard: return "guard";
     case PlayerCombatAction::Idle: return "idle";
     }
     return "unknown";
@@ -873,6 +874,7 @@ void RequestLifecyclePauseSynchronizationLocked(const bool resumeAfterAcknowledg
     const horde::gameplay::simulation::PausedInputPolicy policy =
         horde::gameplay::simulation::PausedInputPolicy::DiscardAllCommands)
 {
+    gInputPublisherState.guardHeld = false;
     gInputPublisherState.paused = true;
     gLifecyclePausedPublicationSequence = PublishInputLocked();
     gLifecyclePausedInput = gInputPublisherState;
@@ -1053,7 +1055,8 @@ void PublishSimulationUiState()
     gKeeperTitleOpacity.store(std::clamp(simulation.lich.titleOpacity, 0.0f, 1.0f), std::memory_order_release);
     gPlayerVitalityState.store(
         (static_cast<std::uint64_t>(static_cast<std::uint32_t>(vitals.maxVitality)) << 32u) |
-        static_cast<std::uint32_t>(vitals.vitality), std::memory_order_release);
+        static_cast<std::uint32_t>(vitals.vitality) |
+        (vitals.halfHeart ? (std::uint64_t{1} << 63u) : 0u), std::memory_order_release);
     gPlayerLifePhase.store(static_cast<int>(vitals.phase), std::memory_order_release);
     gPlayerRetryCheckpoint.store(simulation.retryCheckpoint, std::memory_order_release);
     gFinaleEndingPhase.store(
@@ -1811,6 +1814,7 @@ void FinishInAppBenchmark(SwapchainContext& context)
     OpeningBenchmarkFinished(context.inAppBenchmark.Passed() && evidenceComplete?2:3);
     {
         std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
+        gInputPublisherState.guardHeld = false;
         gInputPublisherState.paused = true;
         PublishInputLocked();
     }
@@ -2034,6 +2038,7 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"player\": {\"x\": " << simulation.playerX << ", \"z\": " << simulation.playerZ
          << ", \"yaw\": " << simulation.playerYawRadians << ", \"pitch\": " << simulation.playerPitchRadians
          << ", \"vitality\": " << playerVitals.vitality
+         << ", \"halfHeart\": " << (playerVitals.halfHeart ? "true" : "false")
          << ", \"maxVitality\": " << playerVitals.maxVitality
          << ", \"lifePhase\": \"" << horde::gameplay::PlayerLifePhaseName(playerVitals.phase) << "\""
          << ", \"damageEnabled\": " << (playerDamageEnabled ? "true" : "false")
@@ -6578,6 +6583,22 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestAttack(JNIEnv*, jclass)
             horde::gameplay::simulation::CombatInputEdgeKind::Attack,
             horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr));
     }
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setGuardHeld(JNIEnv*, jclass, jboolean held)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    const bool next = held == JNI_TRUE && !gInputPublisherState.paused;
+    if (next && !gInputPublisherState.guardHeld && gInputPublisherState.commands.parry != UINT64_MAX)
+    {
+        ++gInputPublisherState.commands.parry;
+        horde::gameplay::simulation::RecordCombatInputEdge(gInputPublisherState,
+            horde::gameplay::simulation::CombatInputEdgeKind::Parry,
+            horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr));
+    }
+    gInputPublisherState.guardHeld = next;
     PublishInputLocked();
 }
 

@@ -52,6 +52,11 @@ public final class LookoutObjectiveMenuTest {
         @Implementation protected static boolean setDiagnosticSurfaceSuspended(long generation,boolean suspended){return true;}
         @Implementation protected static void requestAttack(){attacks++;}
         @Implementation protected static void requestParry(){parries++;}
+        static boolean guardHeld;
+        @Implementation protected static void setGuardHeld(boolean held) {
+            if (held && !guardHeld) ++parries;
+            guardHeld = held;
+        }
         @Implementation protected static void requestDodge(){dodges++;}
         @Implementation protected static void requestInteract(){interacts++;}
         @Implementation protected static void requestToggleHeldLightPose(){lanterns++;}

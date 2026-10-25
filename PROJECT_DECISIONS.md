@@ -213,6 +213,15 @@ The automated `SM-S948B` requirements passed on 2026-08-12 for exact clean commi
 
 ## Animation-owned combat and timed-parry decision - 2026-08-13
 
+The25October2026approved1.7 [held-guard extension](docs/evidence/2026-10-25-held-guard/README.md)
+adds a continuous defensive hold after the existing timed window. It does not
+replace the historical parry timing or successful benefit below. Guard halves
+frontal blockable skeleton damage exactly, red/rear contacts remain full, attack
+ends protection and retains recovery before held return. No held repeat creates
+a parry window. Half-heart HUD/save representation preserves maximum3hearts and
+schema1bytes; schema2carries a canonical fractional flag. Physical feel/balance,
+the local storage-execution blocker and exact-head CI remain separate gates.
+
 Player swing, parry, skeleton strike, and stagger timing belong to the shared fixed-step gameplay authority. Player swing uses wind-up/active/recovery boundaries `0-0.18 / 0.18-0.34 / 0.34-0.56 s`; skeleton melee uses `0-1.12 / 1.12-1.30 / 1.30-2.80 s`. Damage resolves once at visible active contact. The lich consumes the same player active-window range/cone contact pulse while retaining three health, its two-second accepted-hit lockout, recoil, cries, death, and finale.
 
 Parry is a separate monotonic edge command and a skeleton-only timed action: 40 ms startup, 220 ms active, and 240 ms failed recovery. Android publishes that edge on `PARRY` touch-down, while retaining click activation for accessibility without republishing on release; Windows continues to use non-repeating `Q` key-down. A real in-range frontal skeleton contact during the active phase emits one entity-aware success event, suppresses damage, and holds that token holder stationary for 800 ms. Successful recovery ends on the next fixed tick so a normal unassisted riposte may begin immediately. Unavailable inputs are consumed without buffering; parry never affects the lich.

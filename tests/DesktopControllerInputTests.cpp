@@ -722,6 +722,22 @@ int main()
             windowsSource.find("(wParam == VK_RETURN || wParam == VK_SPACE)")!=std::string::npos,
             "native owner wires tested admission, reserved right mouse, cancellation and menu Space");
 
+    horde::platform::windows::GuardHoldLatch guardHold;
+    guardHold.Reseed(true);
+    Require(!guardHold.Observe(true,true), "connecting with LT held must wait for release");
+    Require(!guardHold.Observe(false,true) && guardHold.Observe(true,true),
+            "neutral then fresh LT press enables continuous guard");
+    Require(guardHold.Observe(true,true), "ordinary held samples keep guard without another edge");
+    guardHold.Cancel();
+    Require(!guardHold.Observe(true,true), "focus/menu cancellation blocks a still-held trigger");
+    guardHold.Observe(false,true);
+    Require(guardHold.Observe(true,true), "fresh press restores guard after cancellation");
+    Require(!guardHold.Observe(true,false), "menu ownership cancels guard");
+    Require(!guardHold.Observe(true,true), "leaving menu cannot revive held protection");
+    Require(horde::platform::windows::LegacyGuardHeld(0x100u,capturedBackbone) &&
+            !horde::platform::windows::LegacyGuardHeld(0u,capturedBackbone),
+            "only the captured legacy LT field owns held guard");
+
     ControllerTriggerLatch triggerLatch{};
     const ControllerActionEdges firstTriggers = UpdateXInputTriggerEdges(0u, 255u, triggerLatch);
     Require(firstTriggers.attackPressed && !firstTriggers.parryPressed,

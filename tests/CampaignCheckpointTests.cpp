@@ -55,7 +55,7 @@ bool SameProgress(const dlg::Progress& a,const dlg::Progress& b) {
 bool SameRecord(const cp::Checkpoint& a,const cp::Checkpoint& b) {
     return a.schema==b.schema && a.contentRevision==b.contentRevision && a.id==b.id &&
         a.zone==b.zone && a.position==b.position && a.yaw==b.yaw && a.pitch==b.pitch &&
-        a.vitality==b.vitality && a.defeatedGuards==b.defeatedGuards &&
+        a.vitality==b.vitality && a.halfHeart==b.halfHeart && a.defeatedGuards==b.defeatedGuards &&
         a.keeperDefeated==b.keeperDefeated && a.lanternClaimed==b.lanternClaimed &&
         a.lidOpen==b.lidOpen && a.ropeReady==b.ropeReady && a.night==b.night &&
         a.firstAscentCompleted==b.firstAscentCompleted && a.swordStowed==b.swordStowed &&
@@ -67,6 +67,7 @@ bool SameSession(const SimulationSnapshot& a,const SimulationSnapshot& b) {
     return a.tickIndex==b.tickIndex && a.worldRoute.generation==b.worldRoute.generation &&
         a.worldRoute.current==b.worldRoute.current && a.playerX==b.playerX && a.playerZ==b.playerZ &&
         a.playerSupportWorldY==b.playerSupportWorldY && a.playerVitals.vitality==b.playerVitals.vitality &&
+        a.playerVitals.halfHeart==b.playerVitals.halfHeart &&
         a.playerAlive==b.playerAlive && a.rescue.generation==b.rescue.generation &&
         a.rescue.phase==b.rescue.phase && a.chapterDialogue.generation==b.chapterDialogue.generation &&
         a.chapterDialogue.line==b.chapterDialogue.line && a.chapterCompanion.generation==b.chapterCompanion.generation &&
@@ -113,6 +114,16 @@ int main() {
     if(!terrain) {std::cerr<<"real chapter support preparation failed: "<<error<<'\n';return 1;}
     // The initial records are ordinary validated logical values. Neither side
     // of these round trips imports a development/debug capture checkpoint.
+    for(bool upper:{false,true}) for(int vitality:{1,2,3}) for(bool half:{false,true}) {
+        auto c=Record(upper);c.schema=2;c.vitality=vitality;c.halfHeart=half;
+        GameSimulation game(ProductionGameSimulationConfig());
+        Check(Restore(game,c,terrain),"schema2 health restores at both earned safe anchors");
+        Check(game.Snapshot().playerVitals.vitality==vitality &&
+              game.Snapshot().playerVitals.halfHeart==half,"restore preserves exact fractional health");
+        const auto captured=game.CaptureCampaignCheckpoint(c.id);
+        Check(captured && captured->vitality==vitality && captured->halfHeart==half &&
+              captured->schema==(half?2u:1u),"capture preserves half health and uses legacy schema only when lossless");
+    }
     for(bool upper:{false,true}) for(int vitality:{1,2,3}) for(bool stowed:{false,true}) for(bool high:{false,true}) {
         auto c=Record(upper);c.vitality=vitality;c.swordStowed=stowed;c.lanternHigh=high;
         c.yaw=.37f;c.pitch=-.12f;
@@ -234,10 +245,13 @@ int main() {
         neutral.hasAuthoritativePlayerPose=false;neutral.yawRadians=c.yaw;neutral.pitchRadians=c.pitch;
         sim.AdvanceFrame(neutral,.02,100);
         Check(sim.Snapshot().paused,"neutral controls cannot borrow the stale publication identity");
-        sim.AdvanceFrame(neutral,.02,101);
+        auto heldGuard=neutral;heldGuard.guardHeld=true;
+        sim.AdvanceFrame(heldGuard,.02,101);
+        Check(sim.Snapshot().paused,"fresh held guard cannot release campaign load or grant a buffered defense");
+        sim.AdvanceFrame(neutral,.02,102);
         Check(!sim.Snapshot().paused && sim.Snapshot().playerX==c.position.x && sim.Snapshot().playerZ==c.position.z,
             "fresh neutral rebased publication resumes without movement debt");
-        neutral.moveForward=.2f;sim.StepFixed(neutral,static_cast<float>(FixedStepRunner::kFixedDeltaSeconds),102);
+        neutral.moveForward=.2f;sim.StepFixed(neutral,static_cast<float>(FixedStepRunner::kFixedDeltaSeconds),103);
         Check(sim.Snapshot().playerMovementSpeedMetresPerSecond>0,"new controls work after the restore input barrier");
     }
     {
@@ -310,7 +324,7 @@ int main() {
             Check(!cp::Validate(bad) && !sim.BeginCampaignRestore(bad),"malformed record is rejected before preparation");
             Check(SameSession(before,sim.Snapshot()),"malformed record does not mutate live state");
         };
-        auto bad=good;bad.schema=2;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
+        auto bad=good;bad.schema=3;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
         bad=good;bad.id=static_cast<cp::CheckpointId>(9);reject(bad);
         bad=good;bad.zone=WorldZoneId::ForestApproach;reject(bad);
         for(int vitality:{0,4,-1}) {bad=good;bad.vitality=vitality;reject(bad);}

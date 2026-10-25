@@ -25,7 +25,7 @@ bool SafeSupport(const campaign::Checkpoint& c, const TriangleSupportSurface& te
 }
 bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
     const auto facts=[](const campaign::Checkpoint& c){return std::tie(c.schema,c.contentRevision,c.id,c.zone,
-        c.position.x,c.position.y,c.position.z,c.yaw,c.pitch,c.vitality,c.defeatedGuards,c.keeperDefeated,
+        c.position.x,c.position.y,c.position.z,c.yaw,c.pitch,c.vitality,c.halfHeart,c.defeatedGuards,c.keeperDefeated,
         c.lanternClaimed,c.lidOpen,c.ropeReady,c.night,c.firstAscentCompleted,c.swordStowed,c.lanternHigh,
         c.torchDropX,c.torchDropZ,c.torchDropYaw,c.torchDropPitch,c.guards,
         c.dialogue.activeLine,c.dialogue.continuations,c.dialogue.continuationCount,
@@ -91,6 +91,7 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     c.contentRevision=forest || (campaignBoundary_ && campaignBoundary_->contentRevision==2)?2u:1u;
     c.id=id;c.zone=zone;c.position={s.playerX,s.playerSupportWorldY,s.playerZ};
     c.yaw=s.playerYawRadians;c.pitch=s.playerPitchRadians;c.vitality=s.playerVitals.vitality;
+    c.halfHeart=s.playerVitals.halfHeart;c.schema=c.halfHeart?2u:1u;
     if(canonical) {
         c.position=upper?traversal::kExteriorLanding:traversal::kLowerLanding;
         c.yaw=upper?0.0f:-1.57079632679f;c.pitch=0.0f;
@@ -208,7 +209,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.enemyDirector_.MarkSelectedDead();
     next.enemyDirector_.Update(c.position.x,c.position.z,EnemyKind::Lich);next.enemyDirector_.MarkSelectedDead();
     next.activeEnemyKind_=EnemyKind::Lich;
-    next.playerVitals_.RestoreCampaignVitality(c.vitality);
+    next.playerVitals_.RestoreCampaignVitality(c.vitality,c.halfHeart);
     interactions::ChestRewardSnapshot chest;
     chest.phase=interactions::ChestRewardPhase::LanternClaimed;chest.lidOpenProgress=1;
     next.chestRewardSequence_.Import(chest);
@@ -234,7 +235,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.SynchronizePausedInput(currentInput,currentInputPublicationSequence);
     next.campaignInputPublicationFloor_=std::max(inputPublicationSequence_,currentInputPublicationSequence);
     InputSnapshot neutral=next.lastInput_;
-    neutral.moveForward=neutral.moveStrafe=0;neutral.runHeld=false;neutral.crouchHeld=false;neutral.hasAuthoritativePlayerPose=false;
+    neutral.moveForward=neutral.moveStrafe=0;neutral.runHeld=false;neutral.crouchHeld=false;neutral.guardHeld=false;neutral.hasAuthoritativePlayerPose=false;
     neutral.authoritativePlayerX=neutral.authoritativePlayerZ=0;
     neutral.yawRadians=c.yaw;neutral.pitchRadians=c.pitch;
     neutral.dialogueCompletionLine=0;neutral.dialogueCompletionGeneration=0;neutral.combatEdgeHistory={};
@@ -268,7 +269,7 @@ InputSnapshot GameSimulation::FilterCampaignInput(const InputSnapshot& input, st
     // a replay-only authoritative pose, must never move a freshly loaded player.
     const bool fresh=publicationSequence>*campaignInputPublicationFloor_ ||
         (publicationSequence==0 && *campaignInputPublicationFloor_==0);
-    const bool neutral=input.moveForward==0 && input.moveStrafe==0 && !input.runHeld && !input.crouchHeld &&
+    const bool neutral=input.moveForward==0 && input.moveStrafe==0 && !input.runHeld && !input.crouchHeld && !input.guardHeld &&
         !input.hasAuthoritativePlayerPose && input.yawRadians==playerYawRadians_ &&
         input.pitchRadians==playerPitchRadians_;
     if(fresh && neutral) {
@@ -276,7 +277,7 @@ InputSnapshot GameSimulation::FilterCampaignInput(const InputSnapshot& input, st
         return input;
     }
     auto blocked=input;
-    blocked.paused=true;blocked.moveForward=blocked.moveStrafe=0;blocked.runHeld=false;blocked.crouchHeld=false;
+    blocked.paused=true;blocked.moveForward=blocked.moveStrafe=0;blocked.runHeld=false;blocked.crouchHeld=false;blocked.guardHeld=false;
     blocked.hasAuthoritativePlayerPose=false;
     blocked.yawRadians=playerYawRadians_;blocked.pitchRadians=playerPitchRadians_;
     blocked.dialogueCompletionLine=0;blocked.dialogueCompletionGeneration=0;

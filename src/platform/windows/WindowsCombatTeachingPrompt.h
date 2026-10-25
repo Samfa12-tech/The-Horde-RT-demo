@@ -42,9 +42,9 @@ inline std::string CombatTeachingPromptText(
     case CombatTeachingCue::ParryWindup:
         lesson = "O Watch the raised blade";
         break;
-    case CombatTeachingCue::ParryNow: lesson = "o PARRY NOW - raise your guard"; break;
-    case CombatTeachingCue::ParryActive: lesson = "(*) Guard up - face the blade"; break;
-    case CombatTeachingCue::ParryRecovery: lesson = "-> Ready for the next strike"; break;
+    case CombatTeachingCue::ParryNow: lesson = "o PARRY NOW - fresh press to parry"; break;
+    case CombatTeachingCue::ParryActive: lesson = "(*) Guard up - timed parry; face the blade"; break;
+    case CombatTeachingCue::ParryRecovery: lesson = "-> Hold: half damage; release to rearm parry"; break;
     case CombatTeachingCue::DodgeWindup: lesson = "O The Keeper gathers lightning - watch the staff"; break;
     case CombatTeachingCue::DodgeNow: lesson = "<-- DODGE NOW --> - step sideways"; break;
     case CombatTeachingCue::Recovery: lesson = "-> Close in before the next charge"; break;
@@ -56,8 +56,8 @@ inline std::string CombatTeachingPromptText(
         break;
     }
     std::string text = lesson;
-    text += controller ? "\r\n[LT] Parry  |  [B] + left stick: Dodge"
-                       : "\r\n[Q] Parry  |  [Space] + A/D: Dodge";
+    text += controller ? "\r\n[LT] Press: Parry / Hold: Guard  |  [B] + left stick: Dodge red attacks"
+                       : "\r\n[Q] Press: Parry / Hold: Guard  |  [Space] + A/D: Dodge red attacks";
     return text;
 }
 } // namespace horde::platform::windows

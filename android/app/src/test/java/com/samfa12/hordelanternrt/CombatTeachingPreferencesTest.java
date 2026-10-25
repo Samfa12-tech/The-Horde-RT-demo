@@ -44,7 +44,7 @@ public final class CombatTeachingPreferencesTest {
         long parryNow = 2L | (2L << 3) | (1L << 10) | (0xffL << 16) | (0xffL << 40);
         String prompt = CombatTeachingPreferences.prompt(parryNow);
         assertTrue(prompt.contains("PARRY NOW"));
-        assertTrue(prompt.contains("raise your guard"));
+        assertTrue(prompt.contains("fresh press to parry"));
         assertTrue(prompt.contains("[Parry]"));
         assertTrue(prompt.contains("[Dodge]"));
         assertFalse(prompt.contains("COMBAT TEACHING"));

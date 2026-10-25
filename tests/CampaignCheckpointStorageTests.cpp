@@ -135,6 +135,36 @@ int main(int argc,char** argv) {
     if(argc!=1) return 78;
     TempDirectory temporary;const auto root=temporary.path;const auto exe=fs::absolute(argv[0]);
     cp::Checkpoint initial,changed;changed.vitality=2;changed.swordStowed=true;
+    {
+        // Versioned fractional records use the same atomic adapter and cannot
+        // rewrite an old record just by reading or updating another slot.
+        const auto legacyBytes=Encode(initial);
+        Raw(root/"legacy-whole.sav",legacyBytes);
+        const auto legacy=Read(root,"legacy-whole.sav");
+        Check(legacy.checkpoint.schema==1 && !legacy.checkpoint.halfHeart &&
+              legacy.encoded==legacyBytes,"schema1 storage read preserves exact original bytes");
+        for(int slot=0;slot<3;++slot) {
+            auto half=initial;half.schema=2;half.vitality=slot+1;half.halfHeart=true;
+            const auto name="half-slot"+std::to_string(slot)+".sav";
+            Check(store::Write(root,name,half).status==store::Status::Committed,
+                  "fractional health saves atomically in each independent slot");
+        }
+        for(int slot=0;slot<3;++slot) {
+            const auto saved=Read(root,"half-slot"+std::to_string(slot)+".sav");
+            Check(saved.checkpoint.schema==2 && saved.checkpoint.halfHeart &&
+                  saved.checkpoint.vitality==slot+1 && saved.encoded.size()==163,
+                  "fresh slot reads restore exact half health without cross-slot grants");
+        }
+        const auto expected=Read(root,"half-slot0.sav");
+        auto whole=expected.checkpoint;whole.schema=1;whole.halfHeart=false;
+        Check(store::Write(root,"half-slot0.sav",whole,expected).status==store::Status::Committed &&
+              !Read(root,"half-slot0.sav").checkpoint.halfHeart,
+              "explicit exact-expectation replacement alone can change stored health");
+        Check(Read(root,"half-slot1.sav").checkpoint.halfHeart &&
+              Bytes(root/"legacy-whole.sav")==legacyBytes,
+              "replacing one slot preserves other fractions and legacy original bytes");
+    }
+
     const auto initialBytes=Encode(initial),changedBytes=Encode(changed);
     store::StoredCheckpoint untouched;untouched.target="sentinel";untouched.encoded={std::byte{90}};
     const auto sentinel=untouched;

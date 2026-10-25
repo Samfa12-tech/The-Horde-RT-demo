@@ -38,6 +38,11 @@ public final class GameplayTouchCancellationTest {
         @Implementation protected static void setSimulationPaused(boolean paused) {}
         @Implementation protected static void requestAttack() { ++attacks; }
         @Implementation protected static void requestParry() { ++parries; }
+        static boolean guardHeld;
+        @Implementation protected static void setGuardHeld(boolean held) {
+            if (held && !guardHeld) ++parries;
+            guardHeld = held;
+        }
         @Implementation protected static void requestDodge() { ++dodges; }
         @Implementation protected static void requestToggleRun() { ++runToggles; }
         @Implementation protected static void clearRunIntent() { ++runClears; }
@@ -62,11 +67,15 @@ public final class GameplayTouchCancellationTest {
         return MotionEvent.obtain(1,10,action,count,pp,pc,0,0,1,1,0,0,0,0);
     }
     private static MainActivity prepare() throws Exception {
-        Bridge.runToggles=Bridge.runClears=0;
+        Bridge.runToggles=Bridge.runClears=0;Bridge.guardHeld=false;
         Bridge.runtimeState=1;
         MainActivity a=Robolectric.buildActivity(MainActivity.class).get();
         SurfaceView surface=new SurfaceView(a); surface.layout(0,0,360,640);
         field("surfaceView").set(a,surface); field("menuVisible").setBoolean(a,false);
+        // This fixture models active gameplay, not Robolectric's unresumed .get() activity.
+        // Held guard intentionally rejects lifecycle/focus-stale input.
+        field("resumed").setBoolean(a,true);
+        field("controllerWindowFocused").setBoolean(a,true);
         field("preferences").set(a,a.getSharedPreferences("touch-fixture",Context.MODE_PRIVATE));
         for(String button:new String[]{"attackButton","parryButton","dodgeButton","runButton","interactButton","toggleHeldLightPoseButton"}) field(button).set(a,new Button(a));
         ((Button)field("runButton").get(a)).setText(R.string.run);
@@ -156,6 +165,25 @@ public final class GameplayTouchCancellationTest {
         }
         assertEquals(2,Bridge.attacks); assertEquals(2,Bridge.parries); assertEquals(2,Bridge.dodges);
     }
+    @Test public void guardPressRequiresResumedFocusedAndReadyGameplay() throws Exception {
+        MainActivity a=prepare(); Bridge.parries=0;
+        Button guard=(Button)field("parryButton").get(a);
+        field("resumed").setBoolean(a,false);
+        buttonEvent(guard,MotionEvent.ACTION_DOWN);buttonEvent(guard,MotionEvent.ACTION_UP);
+        assertEquals(0,Bridge.parries);assertFalse(Bridge.guardHeld);
+        field("resumed").setBoolean(a,true);field("controllerWindowFocused").setBoolean(a,false);
+        buttonEvent(guard,MotionEvent.ACTION_DOWN);buttonEvent(guard,MotionEvent.ACTION_UP);
+        assertEquals(0,Bridge.parries);assertFalse(Bridge.guardHeld);
+        field("controllerWindowFocused").setBoolean(a,true);Bridge.runtimeState=0;
+        buttonEvent(guard,MotionEvent.ACTION_DOWN);buttonEvent(guard,MotionEvent.ACTION_UP);
+        assertEquals(0,Bridge.parries);assertFalse(Bridge.guardHeld);
+        Bridge.runtimeState=1;
+        buttonEvent(guard,MotionEvent.ACTION_DOWN);
+        assertEquals(1,Bridge.parries);assertTrue(Bridge.guardHeld);
+        buttonEvent(guard,MotionEvent.ACTION_UP);
+        assertEquals(1,Bridge.parries);assertFalse(Bridge.guardHeld);
+    }
+
     @Test public void menuEndingAndCancelledReleaseCannotPublishExtraActions() throws Exception {
         MainActivity a=prepare(); Bridge.attacks=Bridge.parries=Bridge.dodges=0;
         for(String name:new String[]{"attackButton","parryButton","dodgeButton"}) {

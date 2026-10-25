@@ -52,6 +52,11 @@ public class AndroidControllerIntegrationTest {
         @Implementation protected static void setEntryMenu(boolean enabled,boolean side,boolean reduced,boolean play,long generation){}
         @Implementation protected static void requestAttack(){attacks++;}
         @Implementation protected static void requestParry(){parries++;}
+        static boolean guardHeld;
+        @Implementation protected static void setGuardHeld(boolean held) {
+            if (held && !guardHeld) ++parries;
+            guardHeld = held;
+        }
         @Implementation protected static void requestDodge(){dodges++;dodgeX=x;dodgeZ=z;dodgeAnalogue=analogue;}
         @Implementation protected static void requestInteract(){interacts++;}
         @Implementation protected static void requestToggleHeldLightPose(){lanterns++;}
@@ -68,7 +73,7 @@ public class AndroidControllerIntegrationTest {
     private Button button(String name)throws Exception{return (Button)field(name).get(a);}
     @Before public void setup()throws Exception {
         Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=Bridge.runToggles=Bridge.runClears=Bridge.context=0;
-        Bridge.x=Bridge.z=Bridge.yaw=Bridge.pitch=0;
+        Bridge.x=Bridge.z=Bridge.yaw=Bridge.pitch=0;Bridge.guardHeld=false;
         Bridge.crouchHeld=Bridge.analogue=Bridge.dodgeAnalogue=false;Bridge.crouchToggles=Bridge.crouchClears=0;
         a=Robolectric.buildActivity(MainActivity.class).get();
         a.setContentView(R.layout.activity_main);
@@ -135,6 +140,52 @@ public class AndroidControllerIntegrationTest {
                 new MotionEvent.PointerProperties[]{prop},new MotionEvent.PointerCoords[]{coords},0,0,1,1,9,0,InputDevice.SOURCE_JOYSTICK,0);
         a.dispatchGenericMotionEvent(e);e.recycle();
     }
+    @Test public void controllerGuardHoldReleasesWithoutMeaningfulMotionAndClearsOnFocusLoss() throws Exception {
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L2,0));
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L2,1));
+        press(KeyEvent.KEYCODE_BUTTON_X);
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);assertEquals(1,Bridge.attacks);
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_L2,0));
+        assertFalse(Bridge.guardHeld);
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L2,0));
+        assertEquals(2,Bridge.parries);assertTrue(Bridge.guardHeld);
+        a.onWindowFocusChanged(false);
+        assertFalse(Bridge.guardHeld);
+    }
+    @Test public void keyboardAndControllerGuardReleaseCannotCancelAnotherHeldSource() throws Exception {
+        long now=SystemClock.uptimeMillis();
+        a.dispatchKeyEvent(new KeyEvent(now,now,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L2,0));
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        a.dispatchKeyEvent(new KeyEvent(now,SystemClock.uptimeMillis(),KeyEvent.ACTION_UP,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        assertTrue("LT remains physically held",Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_L2,0));
+        assertFalse(Bridge.guardHeld);
+    }
+
+    @Test public void touchGuardAttackAndReleaseRemainIndependent() throws Exception {
+        Button guard=button("parryButton"),attack=button("attackButton");
+        MotionEvent down=MotionEvent.obtain(1,1,MotionEvent.ACTION_DOWN,10,10,0);
+        guard.dispatchTouchEvent(down);down.recycle();
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        down=MotionEvent.obtain(2,2,MotionEvent.ACTION_DOWN,10,10,0);
+        attack.dispatchTouchEvent(down);down.recycle();
+        assertEquals(1,Bridge.attacks);assertTrue(Bridge.guardHeld);
+        MotionEvent up=MotionEvent.obtain(1,3,MotionEvent.ACTION_UP,10,10,0);
+        guard.dispatchTouchEvent(up);up.recycle();
+        assertFalse(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        MotionEvent cancel=MotionEvent.obtain(2,4,MotionEvent.ACTION_CANCEL,10,10,0);
+        attack.dispatchTouchEvent(cancel);cancel.recycle();
+        down=MotionEvent.obtain(5,5,MotionEvent.ACTION_DOWN,10,10,0);
+        guard.dispatchTouchEvent(down);down.recycle();
+        assertEquals(2,Bridge.parries);assertTrue(Bridge.guardHeld);
+        cancel=MotionEvent.obtain(5,6,MotionEvent.ACTION_CANCEL,10,10,0);
+        guard.dispatchTouchEvent(cancel);cancel.recycle();
+        assertFalse(Bridge.guardHeld);
+    }
+
     @Test public void pressDownActionsRemainIndependentWithoutDuplicateReleases()throws Exception {
         for(int code:new int[]{KeyEvent.KEYCODE_BUTTON_R2,KeyEvent.KEYCODE_BUTTON_L2,KeyEvent.KEYCODE_BUTTON_B,KeyEvent.KEYCODE_BUTTON_A,KeyEvent.KEYCODE_BUTTON_Y}){
             a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,code,0));a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,code,1));a.dispatchKeyEvent(key(KeyEvent.ACTION_UP,code,0));

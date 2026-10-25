@@ -1,0 +1,44 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start  46: horde_rt_campaign_codec_tests
+1/7 Test  #46: horde_rt_campaign_codec_tests ........   Passed    4.10 sec
+    Start  47: horde_rt_campaign_storage_tests
+2/7 Test  #47: horde_rt_campaign_storage_tests ......***Failed    4.69 sec
+fractional health saves atomically in each independent slot
+fractional health saves atomically in each independent slot
+fractional health saves atomically in each independent slot
+fresh adapter reads a complete typed record
+fresh slot reads restore exact half health without cross-slot grants
+fresh adapter reads a complete typed record
+fresh slot reads restore exact half health without cross-slot grants
+fresh adapter reads a complete typed record
+fresh slot reads restore exact half health without cross-slot grants
+fresh adapter reads a complete typed record
+explicit exact-expectation replacement alone can change stored health
+fresh adapter reads a complete typed record
+replacing one slot preserves other fractions and legacy original bytes
+create-only storage publishes complete checkpoint
+initial publication status=15 native=5
+
+    Start  51: horde_rt_campaign_checkpoint_tests
+3/7 Test  #51: horde_rt_campaign_checkpoint_tests ...   Passed   18.57 sec
+    Start  53: horde_rt_combat_foundation_tests
+4/7 Test  #53: horde_rt_combat_foundation_tests .....***Failed    7.02 sec
+FAIL: pause cancels logical guard without waiting for a fixed gameplay tick
+combat foundation checks=710 failures=1
+
+    Start 106: horde_rt_player_animation_tests
+5/7 Test #106: horde_rt_player_animation_tests ......   Passed    5.49 sec
+    Start 191: horde_rt_combat_smoke
+6/7 Test #191: horde_rt_combat_smoke ................   Passed    3.64 sec
+    Start 193: horde_rt_showcase_gameplay_smoke
+7/7 Test #193: horde_rt_showcase_gameplay_smoke .....   Passed    3.58 sec
+
+71% tests passed, 2 tests failed out of 7
+
+Total Test time (real) =  47.13 sec
+
+The following tests FAILED:
+	 47 - horde_rt_campaign_storage_tests (Failed)
+	 53 - horde_rt_combat_foundation_tests (Failed)
+Errors while running CTest

@@ -21,6 +21,11 @@ inline constexpr float kPlayerUpwardSliceRecoverySeconds =
 inline constexpr float kPlayerParryStartupSeconds = SwordCombat::kParryStartupDuration;
 inline constexpr float kPlayerParryActiveSeconds = SwordCombat::kParryActiveDuration;
 inline constexpr float kPlayerParryRecoverySeconds = SwordCombat::kParryRecoveryDuration;
+// Freeze the authored raised pose at active-parry completion, immediately
+// before its recovery lowers the sword. Gameplay still owns guard eligibility.
+inline constexpr float kPlayerGuardNormalizedParryTime =
+    (kPlayerParryStartupSeconds + kPlayerParryActiveSeconds) /
+    (kPlayerParryStartupSeconds + kPlayerParryActiveSeconds + kPlayerParryRecoverySeconds);
 inline constexpr float kLanternPoseBlendRatePerSecond = 1.0f / 0.65f;
 
 enum class PlayerLocomotionClip : std::uint8_t
@@ -42,6 +47,9 @@ struct PlayerCombatLayer
     PlayerUpperBodyAction action = PlayerUpperBodyAction::None;
     float normalizedActionTime = 0.0f;
     float weight = 0.0f;
+    // Snapshot metadata for the same shared hand/item blend. A nonzero weight
+    // during an attack is presentation only and does not grant mitigation.
+    float guardPoseWeight = 0.0f;
 
     bool operator==(const PlayerCombatLayer&) const = default;
 };

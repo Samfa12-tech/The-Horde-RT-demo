@@ -26,6 +26,7 @@ const char* PlayerCombatActionName(const gameplay::PlayerCombatAction action)
     case gameplay::PlayerCombatAction::ParryStartup: return "parry-startup";
     case gameplay::PlayerCombatAction::ParryActive: return "parry-active";
     case gameplay::PlayerCombatAction::ParryRecovery: return "parry-recovery";
+    case gameplay::PlayerCombatAction::Guard: return "guard";
     }
     return "unknown";
 }

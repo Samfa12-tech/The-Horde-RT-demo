@@ -138,9 +138,14 @@ PlayerCombatLayer EvaluatePlayerCombatLayer(
                  Normalized(kPlayerParryStartupSeconds + kPlayerParryActiveSeconds + time,
                             parryTotal), 1.0f};
         break;
+    case horde::gameplay::PlayerCombatAction::Guard:
+        layer = {PlayerUpperBodyAction::Parry, kPlayerGuardNormalizedParryTime,
+                 std::clamp(FiniteOr(combat.guardPoseWeight, 0.0f), 0.0f, 1.0f)};
+        break;
     default:
         break;
     }
+    layer.guardPoseWeight = std::clamp(FiniteOr(combat.guardPoseWeight, 0.0f), 0.0f, 1.0f);
     return layer;
 }
 

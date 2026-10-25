@@ -22,6 +22,7 @@ struct Checkpoint {
     traversal::Vec3 position = traversal::kLowerLanding;
     float yaw = -1.57079632679f, pitch = 0.0f;
     std::int32_t vitality = 3;
+    bool halfHeart = false; // schema2; schema1 retains exact whole-heart meaning.
     std::uint32_t defeatedGuards = 3;
     bool keeperDefeated = true, lanternClaimed = true, lidOpen = true;
     bool ropeReady = true, night = true, firstAscentCompleted = false;
@@ -47,7 +48,8 @@ inline bool Validate(const Checkpoint& c) {
     // retains completed forest progress at the lookout and later safe-side
     // returns, with the same logical payload. Old executables reject revision 2.
     const bool completedForest = c.contentRevision == 2;
-    if (c.schema != 1 || (c.contentRevision != 1 && !completedForest) ||
+    if ((c.schema != 1 && c.schema != 2) || (c.schema == 1 && c.halfHeart) ||
+        (c.contentRevision != 1 && !completedForest) ||
         (forest && !completedForest) ||
         (c.id != CheckpointId::LowerClaimed && c.id != CheckpointId::SafeExit && !forest) ||
         c.zone != Destination(c.id) || c.vitality < 1 || c.vitality > 3 ||

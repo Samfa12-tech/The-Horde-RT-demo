@@ -80,6 +80,9 @@ struct InputSnapshot
     bool analogueMovement = false;
     // Keyboard hold; diagnostic callers may still publish legacy run edges.
     bool runHeld = false;
+    // Continuous guard ownership accompanies the fresh commands.parry edge.
+    // A held value never synthesizes another timed parry window.
+    bool guardHeld = false;
     // Retained for deterministic posture fixtures. Ordinary controls use head clearance.
     bool crouchHeld = false;
     bool tutorialEnabled = true;

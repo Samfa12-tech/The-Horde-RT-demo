@@ -1,0 +1,10 @@
+{
+  "exeSha256": "d5ddefc39298098bee142c643838d6e42260fd99e3c9078807969b25dcea0909",
+  "tier": "candidate",
+  "scope": "isolated unpaced fixed60Hz live combat guard joins; actual RT; not natural journey/phone/performance",
+  "started": 1792910001.8541098,
+  "exit": 0,
+  "timeout": false,
+  "elapsed": 17.342138528823853,
+  "custodyUnchanged": true
+}

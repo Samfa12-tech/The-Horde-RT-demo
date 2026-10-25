@@ -342,6 +342,9 @@ public class MainActivity extends Activity {
     private Button toggleHeldLightPoseButton;
     private boolean parryRequestedOnTouchDown;
     private boolean parryTouchActive;
+    private int parryTouchPointerId = -1;
+    private boolean publishedGuardHeld;
+    private boolean keyboardGuardHeld;
     private SoundPool soundPool;
     private HordeAmbiencePlayback waterfallPlayback;
     private MenuAmbiencePlayback menuAmbience;
@@ -486,6 +489,7 @@ public class MainActivity extends Activity {
     private int lastPlayerLifePhase = PLAYER_ALIVE;
     private int lastPlayerVitality = 3;
     private int lastPlayerMaxVitality = 3;
+    private boolean lastPlayerHalfHeart;
     private long delayedGameplayFeedbackGeneration;
     static int renderScalePercent(final SharedPreferences preferences) {
         return preferences.getInt(PREF_RENDER_SCALE,
@@ -1191,6 +1195,7 @@ public class MainActivity extends Activity {
                 if (dodgeTouch != null) dodgeTouch.cancel();
                 TouchControlState.cancelGesture(activePointers, viewControls);
                 parryTouchActive = false;
+                parryTouchPointerId = -1;
                 parryRequestedOnTouchDown = false;
                 if (parryButton != null) parryButton.setPressed(false);
                 pushViewControls();
@@ -1922,7 +1927,7 @@ public class MainActivity extends Activity {
             final long vitality;
             try { life=ProbeBridge.getPlayerLifePhase(); vitality=ProbeBridge.getPlayerVitalityState(); }
             catch(RuntimeException | LinkageError unavailable) { return; }
-            final int current=(int)vitality, maximum=(int)(vitality>>>32);
+            final int current=(int)vitality, maximum=(int)((vitality>>>32)&0x7fffffffL);
             if(life!=PLAYER_ALIVE || current<=0 || maximum<=0 || current>maximum) {
                 campaignLocalMessage="Waiting for the restored living player. The game remains paused.";
                 renderCampaignMenu();
@@ -1932,7 +1937,7 @@ public class MainActivity extends Activity {
             deathOverlayVisible=false;
             retryPending=false;
             lastPlayerLifePhase=life;
-            updateVitalityHud(current,maximum);
+            updateVitalityHud(current,maximum,vitality<0);
             campaignFromDeath=false;
             campaignDeathLoadCommitted=false;
             campaignDeathMessage=null;
@@ -5309,7 +5314,7 @@ public class MainActivity extends Activity {
             p.height=FrameLayout.LayoutParams.WRAP_CONTENT; vitalityStatus.setLayoutParams(p);
             vitalityStatus.setPadding(dp(10),dp(8),dp(10),dp(8)); vitalityStatus.setTextSize(12);
             vitalityStatus.setMaxWidth(Math.max(dp(42),width-safeLeft-safeRight-dp(128)));
-            updateVitalityHud(lastPlayerVitality, lastPlayerMaxVitality);
+            updateVitalityHud(lastPlayerVitality, lastPlayerMaxVitality, lastPlayerHalfHeart);
             vitalityStatus.setBackground(HordeUiTokens.plate(this,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
         }
     }
@@ -5630,19 +5635,25 @@ public class MainActivity extends Activity {
     }
 
     private void updateVitalityHud(final int vitality, final int maximum) {
+        updateVitalityHud(vitality, maximum, false);
+    }
+    private void updateVitalityHud(final int vitality, final int maximum, final boolean halfHeart) {
         if (vitality <= 0) clearRunIntent();
         final int safeMaximum = Math.max(0, maximum);
         final int safeVitality = Math.max(0, Math.min(safeMaximum, vitality));
         lastPlayerVitality = safeVitality;
         lastPlayerMaxVitality = safeMaximum;
+        lastPlayerHalfHeart = halfHeart && safeVitality > 0;
         final int available = Math.max(dp(22), Math.min(vitalityStatus.getMaxWidth()
                 - vitalityStatus.getPaddingLeft() - vitalityStatus.getPaddingRight(),
                 getResources().getDisplayMetrics().widthPixels - dp(148)));
         vitalityStatus.setText("");
-        vitalityStatus.setCompoundDrawables(new VitalityHeartsDrawable(this, safeVitality, safeMaximum, available),
+        vitalityStatus.setCompoundDrawables(new VitalityHeartsDrawable(this, safeVitality, safeMaximum, available, lastPlayerHalfHeart),
                 null, null, null);
         vitalityStatus.setCompoundDrawablePadding(0);
-        vitalityStatus.setContentDescription(getString(R.string.vitality_accessibility, safeVitality, safeMaximum));
+        vitalityStatus.setContentDescription(lastPlayerHalfHeart
+                ? getString(R.string.vitality_half_accessibility, safeVitality - 1, safeMaximum)
+                : getString(R.string.vitality_accessibility, safeVitality, safeMaximum));
     }
 
     private void showDeathOverlay() {
@@ -6223,11 +6234,12 @@ public class MainActivity extends Activity {
                     // Both values come from one immutable simulation publication.
                     final long vitalityState = ProbeBridge.getPlayerVitalityState();
                     final int vitality = (int) vitalityState;
-                    final int maximumVitality = (int) (vitalityState >>> 32);
+                    final int maximumVitality = (int) ((vitalityState >>> 32) & 0x7fffffffL);
+                    final boolean halfHeart = vitalityState < 0;
                     final int lifePhase = ProbeBridge.getPlayerLifePhase();
                     final int finaleEndingPhase = ProbeBridge.getFinaleEndingPhase();
-                    if (vitality != lastPlayerVitality || maximumVitality != lastPlayerMaxVitality)
-                        updateVitalityHud(vitality, maximumVitality);
+                    if (vitality != lastPlayerVitality || maximumVitality != lastPlayerMaxVitality || halfHeart != lastPlayerHalfHeart)
+                        updateVitalityHud(vitality, maximumVitality, halfHeart);
                     updateDeathRecoveryPresentation(lifePhase);
                     final boolean showHud = preferences.getBoolean("show_hud", true);
                     if (!menuVisible && !benchmarkRunning && !debugCaptureUiSuppressed)
@@ -7552,6 +7564,22 @@ public class MainActivity extends Activity {
         final boolean analogue = canSendGameplayAction() && (viewControls[7] != 0 || viewControls[8] != 0);
         ProbeBridge.setViewControls(viewControls[0], viewControls[1], viewControls[2], viewControls[7], viewControls[8],
                 false, analogue);
+        pushGuardHold();
+    }
+
+    private void pushGuardHold() {
+        final boolean allowed = canSendGameplayAction() && resumed && controllerHasFocusedWindow();
+        if (!allowed) {
+            keyboardGuardHeld = false;
+            parryTouchActive = false;
+            parryTouchPointerId = -1;
+            controllerInput.clearGuardHold();
+            if (parryButton != null) parryButton.setPressed(false);
+        }
+        final boolean held = allowed && (parryTouchActive || keyboardGuardHeld || controllerInput.guardHeld());
+        if (held == publishedGuardHeld) return;
+        ProbeBridge.setGuardHeld(held);
+        publishedGuardHeld = held;
     }
 
     private void configureGameplayActionButtons() {
@@ -7588,23 +7616,33 @@ public class MainActivity extends Activity {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     if (parryTouchActive) return true;
-                    parryTouchActive = true;
                     parryRequestedOnTouchDown = true;
-                    view.setPressed(true);
                     if (canSendGameplayAction()) {
+                        parryTouchActive = true;
+                        parryTouchPointerId = event.getPointerId(event.getActionIndex());
+                        view.setPressed(true);
                         clearRunIntent();
-                        ProbeBridge.requestParry();
+                        pushGuardHold();
                     }
                     return true;
+                case MotionEvent.ACTION_POINTER_UP:
+                    if (event.getPointerId(event.getActionIndex()) != parryTouchPointerId) return true;
+                    // The owning finger released even when another finger remains down.
                 case MotionEvent.ACTION_UP:
                     view.setPressed(false);
-                    if (parryTouchActive) view.performClick();
+                    final boolean wasActive = parryTouchActive;
                     parryTouchActive = false;
+                    parryTouchPointerId = -1;
+                    pushGuardHold();
+                    if (wasActive) view.performClick();
+                    parryRequestedOnTouchDown = false;
                     return true;
                 case MotionEvent.ACTION_CANCEL:
                     parryTouchActive = false;
+                    parryTouchPointerId = -1;
                     parryRequestedOnTouchDown = false;
                     view.setPressed(false);
+                    pushGuardHold();
                     return true;
                 default:
                     return true;
@@ -7625,6 +7663,21 @@ public class MainActivity extends Activity {
             return true;
         }
         if (!AndroidControllerInput.isControllerKey(event)) {
+            if (event != null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) && event.getKeyCode() == KeyEvent.KEYCODE_Q) {
+                if (event.getAction() == KeyEvent.ACTION_UP && (keyboardGuardHeld || canSendGameplayAction())) {
+                    keyboardGuardHeld = false;
+                    pushGuardHold();
+                    return true;
+                }
+                if (event.getAction() == KeyEvent.ACTION_DOWN && canSendGameplayAction()) {
+                    if (event.getRepeatCount() == 0) {
+                        keyboardGuardHeld = true;
+                        clearRunIntent();
+                        pushGuardHold();
+                    }
+                    return true;
+                }
+            }
             if (event != null && event.getAction() == KeyEvent.ACTION_DOWN &&
                     event.getRepeatCount() == 0 && event.isFromSource(InputDevice.SOURCE_KEYBOARD))
                 observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
@@ -7674,6 +7727,7 @@ public class MainActivity extends Activity {
         if (environmentSurveyMode) return;
         logSurfaceLifecycle(focused ? "focusGain" : "focusLoss");
         controllerWindowFocused=focused;
+        if (!focused) keyboardGuardHeld = false;
         currentControllerDialog();
         if (!focused) {
             if(lookoutObjectiveVisible)showMainMenu(false);
@@ -7776,6 +7830,8 @@ public class MainActivity extends Activity {
         if(!controllerMode)return;
         View ui=controllerUiRoot();
         if(ui!=null) {
+            controllerInput.clearGuardHold();
+            pushGuardHold();
             controllerInput.clearCrouchHold(); // Menu/dialog presses require release before gameplay.
             ControllerNavigation.ensureFocus(ui);
             if ((result.actions & AndroidControllerInput.CANCEL)!=0 ||
@@ -7793,11 +7849,12 @@ public class MainActivity extends Activity {
             if((result.actions & (AndroidControllerInput.SWING | AndroidControllerInput.PARRY |
                     AndroidControllerInput.DODGE))!=0)clearRunIntent();
             if((result.actions & AndroidControllerInput.SWING)!=0)ProbeBridge.requestAttack();
-            if((result.actions & AndroidControllerInput.PARRY)!=0)ProbeBridge.requestParry();
+            pushGuardHold(); // LT hold and its fresh edge publish coherently in JNI.
             if((result.actions & AndroidControllerInput.DODGE)!=0)ProbeBridge.requestDodge();
             if((result.actions & AndroidControllerInput.INTERACT)!=0)ProbeBridge.requestInteract();
             if((result.actions & AndroidControllerInput.LANTERN)!=0)ProbeBridge.requestToggleHeldLightPose();
         }
+        pushGuardHold();
         requestControllerFrame();
     }
 
@@ -7871,6 +7928,9 @@ public class MainActivity extends Activity {
                 !benchmarkRunning && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
     }
     private void clearTouchState() {
+        keyboardGuardHeld = false;
+        parryTouchActive = false;
+        parryTouchPointerId = -1;
         suspendControllerInput(false);
         clearTouchGesture();
         requestControllerFrame();
@@ -7887,6 +7947,7 @@ public class MainActivity extends Activity {
         TouchControlState.clear(activePointers, viewControls);
         clearCrouchIntent(preserveFreshControllerHold);
         parryTouchActive = false;
+        parryTouchPointerId = -1;
         parryRequestedOnTouchDown = false;
         if (parryButton != null) parryButton.setPressed(false);
         pushViewControls();
