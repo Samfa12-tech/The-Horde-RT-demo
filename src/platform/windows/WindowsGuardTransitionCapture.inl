@@ -11,6 +11,24 @@ if (!gShowcaseCaptureHidden || IsWindowVisible(context.windowHandle) ||
 // Legacy checkpoint imports deliberately disable current combat. ResetRoute is
 // the existing New Game path: no private phase/health/progression mutation.
 context.simulation.ResetRoute();
+bool mediaPreview = false;
+if (const char* media = std::getenv("HORDE_GUARD_MEDIA_CAPTURE"))
+{
+    if (std::string_view(media) != "1") return fail("Guard media preview accepts only explicit value 1.");
+    mediaPreview = true;
+    // Existing large-skylight staging, through the supported diagnostic pose
+    // input. No imported combat phase, progression, lighting or quality change.
+    InputSnapshot staging;
+    staging.damageEnabled = false; staging.tutorialEnabled = false;
+    staging.hasAuthoritativePlayerPose = true;
+    staging.authoritativePlayerX = -6.50f; staging.authoritativePlayerZ = -15.20f;
+    staging.yawRadians = 1.57079632679f; staging.pitchRadians = -0.05f;
+    context.simulation.StepFixed(staging);
+    const auto& positioned = context.simulation.Snapshot();
+    if (std::hypot(positioned.playerX + 6.50f, positioned.playerZ + 15.20f) > 0.001f ||
+        positioned.healingFlaskEnabled)
+        return fail("Guard media preview could not stage its accepted source view without flask experimentation.");
+}
 SynchronizeSimulationViewportAspect(context);
 context.simulation.ClearEvents();
 context.simulation.ResetTiming();
@@ -30,7 +48,7 @@ InputSnapshot input;
 input.damageEnabled = false;
 input.tutorialEnabled = false;
 input.yawRadians = start.playerYawRadians;
-input.pitchRadians = -0.10f;
+input.pitchRadians = mediaPreview ? -0.05f : -0.10f;
 input.commands.attack = std::max(start.lastConsumedAttackSequence, context.simulationInput.commands.attack);
 input.commands.parry = std::max(start.lastConsumedParrySequence, context.simulationInput.commands.parry);
 const auto attackFloor = input.commands.attack;
@@ -47,11 +65,13 @@ const auto began = std::chrono::steady_clock::now();
 std::ofstream rows(outputDirectory / "guard-transition.jsonstream", std::ios::binary);
 if (!rows) return fail("Cannot open bounded guard transition receipt.");
 rows.precision(10);
-for (unsigned tick = 0; tick < 240 && !released; ++tick)
+const unsigned imageStride = mediaPreview ? 2u : 4u;
+for (unsigned tick = 0; tick < (mediaPreview ? 720u : 240u) && !released; ++tick)
 {
     if (std::chrono::steady_clock::now() - began > std::chrono::seconds(90))
         return fail("Guard transition exceeded its finite 90-second capture budget.");
     input.guardHeld = phase != GuardPhase::Draw && phase != GuardPhase::Release;
+    if (mediaPreview) input.yawRadians = start.playerYawRadians + 0.10f * std::sin(float(tick) * 0.01f);
     if (phaseTicks == 0)
     {
         if (phase == GuardPhase::Draw || phase == GuardPhase::Attack) ++input.commands.attack;
@@ -89,7 +109,7 @@ for (unsigned tick = 0; tick < 240 && !released; ++tick)
         identity.submissionSerial != complete.presentation.lastSuccessfulPresentSubmissionSerial)
         return fail("Guard frame evidence does not own its actual presented submission.");
     std::string imageFile, hash, error, evidence;
-    if (tick % 4 == 0 || action != previousAction)
+    if (tick % imageStride == 0 || action != previousAction)
     {
         horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture pixels;
         imageFile = "guard-" + std::to_string(tick) + ".png";
@@ -112,6 +132,7 @@ for (unsigned tick = 0; tick < 240 && !released; ++tick)
     rows << "{\"motorTick\":" << tick << ",\"phase\":" << static_cast<unsigned>(phase)
          << ",\"simulationTick\":" << before.tickIndex << ",\"action\":" << static_cast<unsigned>(action)
          << ",\"actionTime\":" << before.playerCombat.actionTime
+         << ",\"yaw\":" << before.playerYawRadians << ",\"pitch\":" << before.playerPitchRadians
          << ",\"guardPoseWeight\":" << before.playerCombat.guardPoseWeight
          << ",\"guardHeld\":" << input.guardHeld << ",\"attackSequence\":" << before.lastConsumedAttackSequence
          << ",\"parrySequence\":" << before.lastConsumedParrySequence
@@ -135,7 +156,7 @@ for (unsigned tick = 0; tick < 240 && !released; ++tick)
     else if (phase == GuardPhase::Hold)
     {
         guardSeen = guardSeen || action == PlayerCombatAction::Guard;
-        if (guardSeen && phaseTicks >= 42) {phase = GuardPhase::Attack; phaseTicks = 0;}
+        if (guardSeen && phaseTicks >= (mediaPreview ? 240u : 42u)) {phase = GuardPhase::Attack; phaseTicks = 0;}
     }
     else if (phase == GuardPhase::Attack)
     {
@@ -145,9 +166,9 @@ for (unsigned tick = 0; tick < 240 && !released; ++tick)
         if (startupSeen && activeSeen && recoverySeen && action == PlayerCombatAction::Guard)
         {returnedGuard = true; phase = GuardPhase::Return; phaseTicks = 0;}
     }
-    else if (phase == GuardPhase::Return && phaseTicks >= 12)
+    else if (phase == GuardPhase::Return && phaseTicks >= (mediaPreview ? 240u : 12u))
     {phase = GuardPhase::Release; phaseTicks = 0;}
-    else if (phase == GuardPhase::Release && phaseTicks >= 24 && action == PlayerCombatAction::Idle &&
+    else if (phase == GuardPhase::Release && phaseTicks >= (mediaPreview ? 90u : 24u) && action == PlayerCombatAction::Idle &&
              before.playerCombat.guardPoseWeight == 0.0f) released = true;
     previousAction = action;
 }
@@ -159,6 +180,7 @@ if (!released || !returnedGuard || parryWindows != 1 ||
 std::ostringstream summary;
 summary << "{\"complete\":true,\"evidenceClass\":\"Debug hidden fixed-input production-combat original-torch joins; not natural progression, damage, pacing, performance or phone acceptance\","
         << "\"frames\":" << frames << ",\"images\":" << images
-        << ",\"fixedSimulationHz\":60,\"imageStrideTicks\":4,\"unpaced\":true,"
+        << ",\"fixedSimulationHz\":60,\"imageStrideTicks\":" << imageStride
+        << ",\"mediaPreview\":" << mediaPreview << ",\"unpaced\":true,"
         << "\"parryWindows\":" << parryWindows << ",\"returnedGuard\":true,\"released\":true}\n";
 return WriteReportFile(outputDirectory / "guard-transition.json", summary.str()) ? 0 : 1;
