@@ -1,0 +1,98 @@
+{
+  "sourceCommit": "9d799fd1adb7856942ca15bb16b1a0026f433c31",
+  "artifact": "reports/phone-preparation-20261025/Horde-1.7-dev-9d799fd1-debug.apk",
+  "artifactSha256": "82cbfad2c2374127455edbb45d4554991515a2acad00c4f037596a7b22a9a625",
+  "artifactBytes": 200663360,
+  "applicationId": "com.samfa12.hordelanternrt.debug",
+  "versionName": "1.6.2-debug",
+  "versionCode": 10,
+  "minSdk": 24,
+  "targetSdk": 34,
+  "build": "assembleDebug SUCCESSFUL, 2m52s, 42 tasks:13 executed/29 up-to-date",
+  "signerCertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "signerMatchesPreviousLocalApk": true,
+  "installedPhoneCertificate": "not accessed; must verify before update",
+  "nativeLibraries": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": {
+      "bytes": 5291104,
+      "sha256": "3e06fdb85f5051a7633969c71486e33b18bb52b0eb0adf62499b93f820a88de0",
+      "elfClass": 2,
+      "machine": 183
+    },
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": {
+      "bytes": 4570464,
+      "sha256": "5fbe6a53f8a3b47119b22b8ce29b722102687edd005ceb1317c293107b3fe414",
+      "elfClass": 1,
+      "machine": 40
+    },
+    "lib/x86/libhorde_rt_probe_android.so": {
+      "bytes": 5930700,
+      "sha256": "15f3157fc4f68018ce602f20f4a831c5430774b6eb01ab3059c8af30140dc7fe",
+      "elfClass": 1,
+      "machine": 3
+    },
+    "lib/x86_64/libhorde_rt_probe_android.so": {
+      "bytes": 5567728,
+      "sha256": "6f44012653b1b3f1e656147c67c76f778795d50d5938f9be560090640164cfe7",
+      "elfClass": 2,
+      "machine": 62
+    }
+  },
+  "productionAssetsVerified": {
+    "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+    "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+    "assets/models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb": "66058108eee9e014acfa10086b9da81e577d40d9f88a3a6d7c2131388eea06ba",
+    "assets/models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+    "assets/models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb": "f545d7e08370b5e451597c3fd903d8d93b6703d11c75039181a04f7f5312e0bb",
+    "assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11"
+  },
+  "rejectedSourceOrMasterAssetsInApk": [],
+  "nativePolicy": {
+    "configuration": "5q2u2n17",
+    "configureCommandSha256": "53283c4cd16d364e2b664f20637c6e75f50a2c895b29eccbdd1a4acfbcb098b6",
+    "flags": {
+      "HORDE_RT_ANDROID_BENCHMARK_VALIDATION": "OFF",
+      "HORDE_RT_MIN_RENDER_SCALE_PERCENT": "33",
+      "HORDE_RT_DEBUG_CHECKPOINTS": "ON",
+      "HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING": "OFF",
+      "HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE": "OFF",
+      "HORDE_RT_FRAME_STAGE_PROBE": "OFF",
+      "HORDE_RT_DISPATCH_CLOCK_PROBE": "OFF",
+      "HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE": "OFF",
+      "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Diagnostic",
+      "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile",
+      "HORDE_RT_STAGED_PRIMARY_DEFAULT": "OFF",
+      "HORDE_RT_STAGED_PRIMARY_TIMING": "OFF",
+      "HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION": "OFF"
+    },
+    "actorWorker": "no opt-in define; preprocessor OFF",
+    "shared64": "source default false, no Android setter call",
+    "viewmodelCandidate": false,
+    "privateShaderRoot": false
+  },
+  "windowsRestoration": {
+    "build": "passed",
+    "abiTest": "1/1 passed, 2.82seconds",
+    "exeSha256": "95b466ec2270f2522c830854bf37c2b5ac7b596027bfa0d7a77fc173be05c363",
+    "nativeRuntimeLaunched": false,
+    "flags": {
+      "HORDE_RT_ACTOR_WORKER_EXPERIMENT": "OFF",
+      "HORDE_RT_FRAME_STAGE_PROBE": "OFF",
+      "HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT": "",
+      "HORDE_RT_STAGED_PRIMARY_DEFAULT": "OFF"
+    },
+    "note": "Initial silent sandbox build interrupted; normal compiler-access retry with node reuse disabled passed. No source change."
+  },
+  "ownerFilesPreserved": 151,
+  "phoneAccess": false,
+  "settingsAndSaveSchemaChanges": false,
+  "phoneAcceptance": "pending",
+  "ciSourceRun": 40140416126,
+  "ciSourceConclusion": "all six success",
+  "knownBuildWarnings": [
+    "SDK XML tools mismatch warning CXX5304; build succeeded, no SDK changes"
+  ],
+  "manifestVerifiedFromApk": true,
+  "sameHashAsPreviousLocalApk": false,
+  "artifactNote": "Fresh successful ordinary Debug build."
+}
