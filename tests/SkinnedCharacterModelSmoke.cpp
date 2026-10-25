@@ -1607,6 +1607,43 @@ int main(int argc, char** argv)
     if (!Require(skeleton.SkinTextured(SkinnedClip::Idle, 0.25f, skeletonTextured, diagnostic), diagnostic.c_str())) return 1;
     if (!Require(skeletonPlain.size() == skeletonTextured.size(), "textured skinning changed skeleton vertex count")) return 1;
     if (!Require(FiniteTexturedVertices(skeletonTextured), "skeleton textured vertices are invalid")) return 1;
+    {
+        std::vector<SkinnedRtVertex> dead, idle, candidate;
+        if (!Require(skeleton.Skin(SkinnedClip::Dead, 0.f, dead, diagnostic) &&
+                     skeleton.Skin(SkinnedClip::Idle, 0.f, idle, diagnostic), diagnostic.c_str())) return 1;
+        const auto exact = [](const auto& a, const auto& b) {
+            return a.size() == b.size() && std::memcmp(a.data(), b.data(), a.size()*sizeof(a.front())) == 0;
+        };
+        SkinnedClipBlend blend{SkinnedClip::Idle, 0.f, 0.f};
+        if (!Require(skeleton.Skin(SkinnedClip::Dead, 0.f, candidate, diagnostic, {}, nullptr, nullptr) &&
+                     exact(dead, candidate) &&
+                     skeleton.Skin(SkinnedClip::Dead, 0.f, candidate, diagnostic, {}, nullptr, &blend) &&
+                     exact(dead, candidate), "null/zero expanded blend must preserve exact source bytes")) return 1;
+        blend.weight = 1.f;
+        if (!Require(skeleton.Skin(SkinnedClip::Dead, 0.f, candidate, diagnostic, {}, nullptr, &blend) &&
+                     exact(idle, candidate), "weight-one expanded blend must preserve exact target bytes")) return 1;
+        blend.weight = .5f;
+        if (!Require(skeleton.Skin(SkinnedClip::Dead, 0.f, candidate, diagnostic, {}, nullptr, &blend) &&
+                     !exact(dead, candidate) && !exact(idle, candidate), "midpoint needs a distinct native blended pose")) return 1;
+        for (const auto& vertex : candidate) {
+            for (float value : vertex.position)
+                if (!Require(std::isfinite(value), "expanded blend position must be finite")) return 1;
+            for (float value : vertex.normal)
+                if (!Require(std::isfinite(value), "expanded blend normal must be finite")) return 1;
+        }
+        for (float invalid : {-1.f, 1.01f, std::numeric_limits<float>::infinity(),
+                              std::numeric_limits<float>::quiet_NaN()}) {
+            blend.weight = invalid;
+            if (!Require(!skeleton.Skin(SkinnedClip::Dead, 0.f, candidate, diagnostic, {}, nullptr, &blend),
+                         "expanded blend must reject invalid weight")) return 1;
+        }
+        blend = {SkinnedClip::Idle, std::numeric_limits<float>::infinity(), .5f};
+        if (!Require(!skeleton.Skin(SkinnedClip::Dead, 0.f, candidate, diagnostic, {}, nullptr, &blend),
+                     "expanded blend must reject nonfinite target time")) return 1;
+        blend = {SkinnedClip::TurnLeft, 0.f, .5f};
+        if (!Require(!skeleton.Skin(SkinnedClip::Dead, 0.f, candidate, diagnostic, {}, nullptr, &blend),
+                     "expanded blend must reject an unmapped target clip")) return 1;
+    }
 
     SkinnedCharacterModel player;
     const auto playerPath = root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb";

@@ -5,9 +5,13 @@ using namespace horde::gameplay::simulation;
 if (!gShowcaseCaptureHidden || IsWindowVisible(context.windowHandle) ||
     GetForegroundWindow() == context.windowHandle || GetFocus() == context.windowHandle ||
     checkpoints.size() != 1u || context.developmentCheckpoint.empty() || forestProof ||
-    context.playerDodgeInspectionSnapshot || context.simulation.Events().Size() != 0u ||
+    context.playerDodgeInspectionSnapshot || context.inspectionSkeletonBlends || context.simulation.Events().Size() != 0u ||
     context.simulation.Snapshot().playerMountProfile != items::PlayerMountProfile::AnatomicalBody)
     return fail("Skeleton revival preview needs one unshown production-body pose owner and an empty event queue.");
+const char* blendOption = std::getenv("HORDE_SKELETON_REVIVE_BLEND_CAPTURE");
+if (blendOption && std::string_view(blendOption) != "1")
+    return fail("Skeleton revival blend preview accepts only explicit value 1.");
+const bool blendCandidate = blendOption != nullptr;
 
 SynchronizeSimulationViewportAspect(context);
 context.simulationPaused = true;
@@ -18,7 +22,10 @@ std::memcpy(applicationBytes.data(), &context.simulation.Snapshot(), application
 const auto eventSequence = context.simulation.Events().NextSequence();
 struct ResetReviveInspection {
     VulkanSurfaceContext& context;
-    ~ResetReviveInspection() { context.playerDodgeInspectionSnapshot.reset(); }
+    ~ResetReviveInspection() {
+        context.inspectionSkeletonBlends.reset();
+        context.playerDodgeInspectionSnapshot.reset();
+    }
 } resetReviveInspection{context};
 
 // A separate ordinary fixture constructs coherent camera/arm/torch transforms.
@@ -42,7 +49,8 @@ if (!source.LoadCombatClips(assetPath, diagnostic) || !Sha256File(assetPath, ass
     return fail("Skeleton preview source identity/loader failed: " + diagnostic);
 const float duration = source.ClipDuration(horde::scene::SkeletonClip::Dead);
 if (!(duration > 0 && std::isfinite(duration))) return fail("Skeleton Dead duration is unavailable.");
-constexpr unsigned frameCount = 150u;
+const unsigned frameCount = blendCandidate ? 165u : 150u;
+const unsigned idleStart = blendCandidate ? 135u : 120u;
 unsigned completedFrames = 0;
 std::uint64_t previousSerial = 0;
 std::string previewError;
@@ -55,7 +63,10 @@ const auto writeSummary = [&]() {
     summary << "{\"complete\":" << (previewError.empty() && completedFrames == frameCount ? "true" : "false")
         << ",\"evidenceClass\":\"Debug immutable health-zero render-pose preview; not encounter revival, targetability, events, saves, natural play or performance acceptance\""
         << ",\"sourceSha256\":\"" << assetHash << "\",\"deadDurationSeconds\":" << duration
-        << ",\"frames\":" << completedFrames << ",\"sampleHz\":30,\"unpaced\":true,\"directIdleJoinFrame\":120"
+        << ",\"frames\":" << completedFrames << ",\"sampleHz\":30,\"unpaced\":true,\"directIdleJoinFrame\":"
+        << (blendCandidate ? "null" : "120") << ",\"blendCandidate\":" << (blendCandidate ? "true" : "false")
+        << ",\"blendDurationSeconds\":" << (blendCandidate ? .5f : 0.f)
+        << ",\"ordinaryIdleStartFrame\":" << idleStart
         << ",\"applicationSnapshotUnchanged\":"
         << (std::memcmp(applicationBytes.data(), &context.simulation.Snapshot(), applicationBytes.size()) == 0 ? "true" : "false")
         << ",\"error\":\"" << JsonEscape(previewError) << "\"}\n";
@@ -71,9 +82,14 @@ for (unsigned frame = 0; frame < frameCount; ++frame)
         GetFocus() == context.windowHandle)
         return previewFail("Skeleton preview lost its finite hidden owner.");
     // 0.5s corpse hold, all 90 authored samples backwards, 0.5s upright
-    // Dead0 hold, then 1s genuine Idle. Do not conceal the direct join.
-    const bool idle = frame >= 120u;
-    const float sample = idle ? float(frame - 120u) / 30.f :
+    // Dead0 hold, then either the retained direct join or one explicit 0.5s
+    // local-joint blend to Idle0, followed by the same 1s ordinary Idle.
+    const bool idle = frame >= idleStart;
+    const bool blending = blendCandidate && frame >= 120u && frame < idleStart;
+    std::optional<horde::scene::SkinnedClipBlend> blend;
+    if (blending) blend = horde::scene::SkinnedClipBlend{
+        horde::scene::SkeletonClip::Idle, 0.f, float(frame - 119u) / 15.f};
+    const float sample = idle ? float(frame - idleStart) / 30.f :
         frame < 15u ? duration : frame <= 104u ? std::max(0.f, duration - float(frame - 15u) / 30.f) : 0.f;
     auto pose = base;
     pose.tickIndex = context.simulation.Snapshot().tickIndex + frame + 1u;
@@ -88,6 +104,12 @@ for (unsigned frame = 0; frame < frameCount; ++frame)
         actor.idlePhaseSeconds = 0;
     }
     context.playerDodgeInspectionSnapshot = pose;
+    context.inspectionSkeletonBlends.reset();
+    if (blend) {
+        horde::vulkan::raytracing::SkeletonPoseBlendRequests requests{};
+        for (auto& request : requests) request = blend;
+        context.inspectionSkeletonBlends = requests;
+    }
     bool presented = false;
     if (!RenderFrame(context, clearColor, presented) || !presented ||
         !CompleteRtEvidenceAfterDeviceIdle(context, vkDeviceWaitIdle(context.device)))
@@ -127,6 +149,7 @@ for (unsigned frame = 0; frame < frameCount; ++frame)
         return previewFail("Skeleton preview readback/evidence failed: " + diagnostic);
     rows << "{\"frame\":" << frame << ",\"seconds\":" << float(frame) / 30.f
         << ",\"clip\":\"" << (idle ? "Idle_5" : "Dead") << "\",\"sampleSeconds\":" << sample
+        << ",\"blendWeight\":" << (blend ? blend->weight : 0.f)
         << ",\"file\":\"" << file << "\",\"sha256\":\"" << hash << "\",\"armPixels\":" << arms
         << ",\"actors\":[";
     for (std::size_t i = 0; i < pose.skeletonEnemyCount; ++i) {
@@ -135,15 +158,17 @@ for (unsigned frame = 0; frame < frameCount; ++frame)
             << a.x << ',' << a.worldY << ',' << a.z << "],\"yaw\":" << a.facingRadians << '}';
     }
     rows << ']';
-    if (frame == 0 || frame == 45 || frame == 75 || frame == 104 || frame == 119 || frame == 120 || frame == 149) {
+    if (frame == 0 || frame == 45 || frame == 75 || frame == 104 || frame == 119 || frame == 120 ||
+        (blending && (frame == 124 || frame == 127 || frame == 130 || frame == 134)) ||
+        frame == idleStart || frame == frameCount - 1u) {
         // Native loader witnesses, not contact thresholds or a second gameplay
         // pose. World Y is this local skin value plus each retained root Y.
         const auto clip = idle ? horde::scene::SkeletonClip::Idle : horde::scene::SkeletonClip::Dead;
         std::vector<horde::scene::SkinnedRtVertex> vertices;
         constexpr std::array<std::string_view, 5> names{{"Hips", "LeftFoot", "RightFoot", "LeftToeBase", "RightToeBase"}};
         std::array<horde::scene::SkinnedNodeTransform, names.size()> nodes;
-        if (!source.Skin(clip, sample, vertices, diagnostic) || vertices.empty() ||
-            !source.NodeTransforms(clip, sample, names, nodes, diagnostic))
+        if (!source.Skin(clip, sample, vertices, diagnostic, {}, nullptr, blend ? &*blend : nullptr) || vertices.empty() ||
+            (!blending && !source.NodeTransforms(clip, sample, names, nodes, diagnostic)))
             return previewFail("Native skeleton endpoint witness failed: " + diagnostic);
         float minimumY = vertices.front().position[1];
         for (const auto& vertex : vertices) {
@@ -151,12 +176,15 @@ for (unsigned frame = 0; frame < frameCount; ++frame)
                 if (!std::isfinite(vertex.position[axis])) return previewFail("Skeleton native skin is nonfinite.");
             minimumY = std::min(minimumY, vertex.position[1]);
         }
-        rows << ",\"nativeSkinMinimumLocalY\":" << minimumY << ",\"nativeNodes\":{";
-        for (unsigned i = 0; i < names.size(); ++i) {
-            if (i) rows << ',';
-            rows << '\"' << names[i] << "\":[" << nodes[i][12] << ',' << nodes[i][13] << ',' << nodes[i][14] << ']';
+        rows << ",\"nativeSkinMinimumLocalY\":" << minimumY;
+        if (!blending) {
+            rows << ",\"nativeNodes\":{";
+            for (unsigned i = 0; i < names.size(); ++i) {
+                if (i) rows << ',';
+                rows << '\"' << names[i] << "\":[" << nodes[i][12] << ',' << nodes[i][13] << ',' << nodes[i][14] << ']';
+            }
+            rows << '}';
         }
-        rows << '}';
     }
     rows << ",\"completedFrame\":" << evidence << "}\n";
     rows.flush(); if (!rows) return previewFail("Skeleton preview receipt write failed.");

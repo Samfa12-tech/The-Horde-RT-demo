@@ -17,8 +17,11 @@ at 10:37:25.915 UTC after private recording retrieval; no further device calls.
   [Chronology and minimal plan](HORDE_1_7_COMBAT_PRACTICE_BRIDGE_2026_10_25.md)
   records the Skip/revival pacing choice before broad integration. The
   [reverse-Dead RT proof](../evidence/2026-10-25-skeleton-revive/README.md) retains
-  the rise but rejects the visible direct-Idle snap; a bounded shared blend
-  seam is the next authoring gate, not an admitted animation or real revival.
+  the rise but rejects the visible direct-Idle snap. The subsequent
+  [single blend proof](../evidence/2026-10-25-skeleton-revive-blend/README.md)
+  tests the shared default-empty seam but rejects the visible foot slide.
+  A contact-preserving authored stand transition remains unfinished; neither
+  proof is an admitted animation or real revival.
 - In-world special-attack rings need an explicit measured RT owner seam; no
   capacity was increased or screen-space substitute added. Current half-damage
   guard rules remain until the new combat-rule slice is implemented/tested.

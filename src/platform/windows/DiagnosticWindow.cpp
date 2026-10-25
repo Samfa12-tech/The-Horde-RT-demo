@@ -688,6 +688,7 @@ struct VulkanSurfaceContext
     std::string environmentSurveyProfile;
 #if defined(_DEBUG)
     std::optional<horde::gameplay::simulation::SimulationSnapshot> playerDodgeInspectionSnapshot;
+    std::optional<horde::vulkan::raytracing::SkeletonPoseBlendRequests> inspectionSkeletonBlends;
     bool playerDodgeInspectionDisabled=false;
 #endif
     float environmentSurveyTime=0;
@@ -7031,6 +7032,18 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning,
                 horde::vulkan::raytracing::ResolveFireEmitterQuality(ctx.fireDetail));
+#if defined(_DEBUG)
+        if (ctx.inspectionSkeletonBlends) {
+            if (!ctx.playerDodgeInspectionSnapshot || !frozenDevelopmentCheckpoint ||
+                !gShowcaseCaptureHidden || IsWindowVisible(ctx.windowHandle) ||
+                GetForegroundWindow() == ctx.windowHandle || GetFocus() == ctx.windowHandle) {
+                ctx.lastRtFrameError = "Skeleton clip blend requires the immutable hidden pose fixture.";
+                if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
+                return false;
+            }
+            frameInputs.skeletonPoseBlends = *ctx.inspectionSkeletonBlends;
+        }
+#endif
         if (entryFrame)
         {
             ctx.entryMenu.Advance(ctx.graphicsPreviewDelta);

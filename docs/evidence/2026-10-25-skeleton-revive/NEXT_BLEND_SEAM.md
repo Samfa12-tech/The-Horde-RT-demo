@@ -1,4 +1,13 @@
-# Next bounded blend proposal, not implemented
+# Bounded blend seam: implemented, candidate join rejected
+
+The proposal below was implemented and tested in the
+[single blend proof](../2026-10-25-skeleton-revive-blend/README.md). The ordinary
+adapter remains empty and gameplay revival is unchanged. Exact endpoints and
+cache/lifecycle checks pass, but the 0.5-second join visibly slides the feet and
+is unadmitted. This is retained history, not a request to repeat the experiment.
+Next requires an authored contact-preserving stand transition on the existing rig.
+
+## Original bounded proposal
 
 Actual reverse sampling works, but Dead0 is a different crouched pose from
 Idle0. A direct join visibly snaps. The generic loader already supports local-

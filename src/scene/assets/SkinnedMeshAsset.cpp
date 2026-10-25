@@ -1362,10 +1362,11 @@ bool SkinnedMeshAsset::NodeTransform(const SkinnedClip clipId,
 bool SkinnedMeshAsset::Skin(
     SkinnedClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output,
     std::string& diagnostic,
-    const std::span<const SkinnedNodeRotation> additiveNodeRotations, SkinWorkMetrics* work) const
+    const std::span<const SkinnedNodeRotation> additiveNodeRotations, SkinWorkMetrics* work,
+    const SkinnedClipBlend* blend) const
 {
     if(work)*work={};
-    if (!SkinUniqueGeometry(clipId, timeSeconds, diagnostic, additiveNodeRotations, nullptr, nullptr, work)) return false;
+    if (!SkinUniqueGeometry(clipId, timeSeconds, diagnostic, additiveNodeRotations, nullptr, blend, work)) return false;
     SkinWorkScope copyScope(work?&work->copyNanoseconds:nullptr);
     output.resize(expandedIndices_.size());
     for (std::size_t index = 0u; index < expandedIndices_.size(); ++index)

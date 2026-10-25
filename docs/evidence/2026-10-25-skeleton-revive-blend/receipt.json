@@ -1,0 +1,121 @@
+{
+  "scope": "One default-off hidden Windows RT pose comparison; failed contact join; no gameplay revival or FPS/phone claim.",
+  "baseCommit": "c26a9f6538afa621da3268c8042d6b38cdb6fb9d",
+  "changedSourceSha256": {
+    "src/platform/windows/DiagnosticWindow.cpp": "1ea7d4f57108ed272af2e90db1264596037ec0e7f00009c1597eaa7ba81a9382",
+    "src/platform/windows/WindowsSkeletonReviveCapture.inl": "75bdcf6943b9c803345396900313ddfc76b7317d16ccb54926304d1795a85a9d",
+    "src/scene/assets/SkinnedMeshAsset.cpp": "de652a80f0eaa10b86756109625bde1bce126b32997c617a4dafd5c6275d9e76",
+    "src/scene/assets/SkinnedMeshAsset.h": "0317d922d67abb08ab9a38002d39f242155807b1096cfc71edbc1d5deec04f5f",
+    "src/vulkan/raytracing/CharacterRenderSlot.cpp": "9c7a4703386d63a5b5bf1ac03678ebf788e7d781e421c850a6e92ac0e666a53f",
+    "src/vulkan/raytracing/CharacterRenderSlot.h": "999fe7002c453f8d56b444d4a1fef3b464d84b25d4c1951ca721a46d8e9eec54",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "eb046f3da5624d385f29ab2dee3c2f3e7a45ef2252194d045ecb638f31c45d17",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "29aee9fc06d9439e38009c681e9289922d059d9fa878ad040f23a097cf0a5fbb",
+    "tests/CharacterRenderSlotSmoke.cpp": "e68863e79e48125fa74cf5ef23e01f88344bb6af9a00a4e0835727bac467fbec",
+    "tests/SkinnedCharacterModelSmoke.cpp": "5bfefd4f1431d8dcb2ab59a732bab20d815628b5f82865fdb151c66b35b13b8d"
+  },
+  "windowsExecutableSha256": "cdffc6be3c6ae54c3ead0a9ffd5d7550ada301d3286638465034b80bddca50b8",
+  "renderedFrames": 165,
+  "authoredSampleHz": 30,
+  "unpaced": true,
+  "candidateJoinSeconds": 0.5,
+  "defaultAdapterBlendRequests": "empty; verified by existing native smoke",
+  "exactOutputControls": {
+    "preBlendMatches": 120,
+    "preBlendCompared": 120,
+    "ordinaryIdleMatches": 30,
+    "ordinaryIdleCompared": 30,
+    "weightOneMatchesOrdinaryIdle": true
+  },
+  "visualVerdict": "Unadmitted/rejected join: snap removed, but feet visibly sweep/slide over floor; native intermediate skin descends to -0.0288043m localY. No new numerical tolerance is imposed.",
+  "minimumLocalYMetres": {
+    "originalCorpse": -0.00525,
+    "candidateIntermediate": -0.0288043
+  },
+  "workIn15SampleBlocks": {
+    "controlOrdinaryIdle": {
+      "renderedFrames": 15,
+      "CharacterSkin": {
+        "invocations": 9,
+        "operations": 0,
+        "bytes": 0
+      },
+      "CharacterVertices": {
+        "invocations": 9,
+        "operations": 88686,
+        "bytes": 0
+      },
+      "CharacterCopy": {
+        "invocations": 9,
+        "operations": 0,
+        "bytes": 8123328
+      },
+      "BlasRefitRecord": {
+        "invocations": 39,
+        "operations": 0,
+        "bytes": 0
+      },
+      "DynamicUpload": {
+        "invocations": 144,
+        "operations": 144,
+        "bytes": 56374848
+      }
+    },
+    "candidateBlend": {
+      "renderedFrames": 15,
+      "CharacterSkin": {
+        "invocations": 15,
+        "operations": 0,
+        "bytes": 0
+      },
+      "CharacterVertices": {
+        "invocations": 15,
+        "operations": 147810,
+        "bytes": 0
+      },
+      "CharacterCopy": {
+        "invocations": 15,
+        "operations": 0,
+        "bytes": 13538880
+      },
+      "BlasRefitRecord": {
+        "invocations": 45,
+        "operations": 0,
+        "bytes": 0
+      },
+      "DynamicUpload": {
+        "invocations": 150,
+        "operations": 150,
+        "bytes": 61790400
+      }
+    },
+    "note": "Includes unrelated baseline actors. Different poses and one unpaced trial; not causal timing/FPS evidence. Raw timing including the original 94.66ms control outlier is retained privately."
+  },
+  "checks": {
+    "debugLoaderSmoke": "PASS, 40.53s",
+    "debugCharacterSlotSmoke": "PASS, 5.76s",
+    "androidFourAbiAssembly": "PASS, 1m25s",
+    "ownerFilesUnchanged": 151,
+    "campaignSettingsForegroundUnchanged": true,
+    "applicationSnapshotEventsUnchanged": true
+  },
+  "androidArtifact": {
+    "sha256": "73a3b0cf180e5e48ebf86d5d27c8948651577fb5ba2d3be5d848413932cb2189",
+    "bytes": 206291259,
+    "package": "com.samfa12.hordelanternrt.debug",
+    "versionCode": 10,
+    "versionName": "1.6.2-debug",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "assetCount": 185,
+    "allAssetsByteIdenticalToFrozenF27982cd": true,
+    "installed": false
+  },
+  "publicFrameSha256": {
+    "blend-124.png": "0657b66d2bc3b74f17ab2ee2546a152b5d7b4832fa61e492253c86afa11e3fb0",
+    "blend-130.png": "cd14d98515e19f00c02114d93b6ad87f3e5103e6fdff09ccec2484f76852ddfa"
+  }
+}

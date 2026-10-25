@@ -228,7 +228,8 @@ public:
                        std::string& diagnostic) const;
     bool Skin(SkinnedClip clip, float timeSeconds, std::vector<SkinnedRtVertex>& output,
               std::string& diagnostic,
-              std::span<const SkinnedNodeRotation> additiveNodeRotations = {}, SkinWorkMetrics* work = nullptr) const;
+              std::span<const SkinnedNodeRotation> additiveNodeRotations = {}, SkinWorkMetrics* work = nullptr,
+              const SkinnedClipBlend* blend = nullptr) const;
     bool SkinTextured(SkinnedClip clip, float timeSeconds,
                       std::vector<TexturedSkinnedRtVertex>& output, std::string& diagnostic,
                       std::span<const SkinnedNodeRotation> additiveNodeRotations = {}, SkinWorkMetrics* work = nullptr) const;

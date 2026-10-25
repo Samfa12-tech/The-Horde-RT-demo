@@ -58,8 +58,10 @@ Existing rig: `assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.
 Its roughly 2.967-second Dead clip has no separately authored get-up clip.
 The [actual RT pose study](../evidence/2026-10-25-skeleton-revive/README.md) now
 shows a plausible reverse rise but rejects its direct Idle join: both stances
-visibly snap. A narrow existing-loader local-joint blend seam is proposed before
-another candidate; no production revival or blend is implemented. During rise
+visibly snap. The subsequent [single local-joint blend proof](../evidence/2026-10-25-skeleton-revive-blend/README.md)
+removes the snap but visibly slides the feet and is also unadmitted. Its tested
+shared request/cache seam is default-empty; no production revival is implemented.
+An authored contact-preserving stand transition is still needed. During rise
 both actors must be non-attacking and
 non-targetable; a fair existing recovery boundary precedes real attacks. Camera
 tremor is optional and reduced-motion-safe, with no forced turn. It must not

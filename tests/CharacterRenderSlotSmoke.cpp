@@ -18,6 +18,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -417,6 +418,9 @@ int main()
     simulationSnapshot.waterContact.ripples[1].active = true;
     simulationSnapshot.waterContact.ripples[1].strength = 0.72f;
     const RtSceneFrameInputs adaptedFrame = BuildRtSceneFrameInputs(simulationSnapshot, 0.75f);
+    ok &= Require(std::none_of(adaptedFrame.skeletonPoseBlends.begin(), adaptedFrame.skeletonPoseBlends.end(),
+                              [](const auto& blend) { return blend.has_value(); }),
+                  "ordinary shared adapter must not enable skeleton clip blending");
     auto rescueExteriorSnapshot = simulationSnapshot;
     rescueExteriorSnapshot.developmentRescueJourney = true;
     rescueExteriorSnapshot.rescue.exteriorSide = true;
@@ -2385,6 +2389,86 @@ int main()
                       Near(tilted.lichTransform.matrix[1][3], -0.52f) &&
                       std::abs(tilted.lichTransform.matrix[1][2]) > 0.1f,
                       "bounded keeper presentation tilt stays invertible and preserves its raised root");
+
+        {
+            // Native skin/upload cache with CPU-backed coherent memory, not a
+            // Vulkan presentation claim. Both actors retain the shared bucket.
+            auto corpses = skeletons;
+            for (auto& actor : corpses) {
+                actor.health=0;actor.dead=true;actor.animation=EnemyAnimation::Dead;
+                actor.action=EnemyCombatAction::Dead;actor.animationTime=0;actor.forceCurrentCombatPose=false;
+            }
+            LichSnapshot dormant;
+            SkeletonPoseBlendRequests blends{};
+            for (auto& blend : blends) blend=horde::scene::SkinnedClipBlend{horde::scene::SkinnedClip::Idle,0.f,.5f};
+            const auto owned = EvaluateCharacterFramePlan(corpses,2,spareCapacityRoster,dormant,deadDuration,blends);
+            blends[0]->weight=.75f;
+            ok &= Require(owned.skeletons[0].blend && owned.skeletons[0].blend->weight==.5f &&
+                          owned.skeletonPoseBucketCount==1u &&
+                          EvaluateCharacterFramePlan(corpses,2,spareCapacityRoster,dormant,deadDuration,blends).skeletonPoseBucketCount==2u,
+                          "blend plans must own values and split different weights");
+            blends[0]=blends[1];blends[0]->timeSeconds=.1f;
+            ok &= Require(EvaluateCharacterFramePlan(corpses,2,spareCapacityRoster,dormant,deadDuration,blends).skeletonPoseBucketCount==2u,
+                          "different blend target times cannot share a skin bucket");
+            blends[0]=blends[1];blends[0]->clip=horde::scene::SkinnedClip::Walking;
+            ok &= Require(EvaluateCharacterFramePlan(corpses,2,spareCapacityRoster,dormant,deadDuration,blends).skeletonPoseBucketCount==2u,
+                          "different blend target clips cannot share a skin bucket");
+            blends[0]=blends[1];
+            std::array<std::vector<std::byte>,2> memory;
+            const auto bind = [&] {
+                for(unsigned bucket=0;bucket<2;++bucket) {
+                    memory[bucket].resize(slot.SkeletonVertices(bucket).size()*sizeof(horde::scene::SkinnedRtVertex));
+                    auto& buffer=slot.SkeletonGpu(bucket).vertices;
+                    buffer.memory=(VkDeviceMemory)1;buffer.size=memory[bucket].size();buffer.mappedWriteData=memory[bucket].data();
+                }
+            };
+            bind();slot.NotifyFrameSubmitted();
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          slot.SkeletonPoseBucketCount()==1u &&
+                          slot.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "matching blended actors require one skin/upload/refit bucket");
+            const auto half=memory[0];slot.NotifyFrameSubmitted();
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          memory[0]==half && slot.PendingRefit()==CharacterBlasRefit::None,
+                          "unchanged blend should preserve submitted skin without redundant refit");
+            for(auto& blend:blends)blend->weight=.75f;
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          memory[0]!=half && slot.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "weight-only changes at fixed Dead0 must upload and refit");
+            const auto threeQuarters=memory[0];
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          memory[0]==threeQuarters && slot.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "abandoned blended upload must retain its pending refit");
+            for(float invalid:{-1.f,1.01f,std::numeric_limits<float>::infinity(),std::numeric_limits<float>::quiet_NaN()}) {
+                auto bad=blends;bad[0]->weight=invalid;
+                ok &= Require(!slot.CacheFramePlan(corpses,2,spareCapacityRoster,dormant,diagnostic,bad),
+                              "frame cache must reject invalid blend weights before upload");
+            }
+            auto bad=blends;bad[0]->timeSeconds=std::numeric_limits<float>::quiet_NaN();
+            ok &= Require(!slot.CacheFramePlan(corpses,2,spareCapacityRoster,dormant,diagnostic,bad),
+                          "frame cache must reject nonfinite blend target time");
+            bad=blends;bad[0]->clip=horde::scene::SkinnedClip::TurnLeft;
+            ok &= Require(!slot.CacheFramePlan(corpses,2,spareCapacityRoster,dormant,diagnostic,bad) &&
+                          !slot.CacheFramePlan(corpses,1,spareCapacityRoster,dormant,diagnostic,blends),
+                          "frame cache rejects unmapped clips or requests for absent actors");
+            slot.NotifyFrameSubmitted();
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic),diagnostic.c_str());
+            const auto plain=memory[0];slot.NotifyFrameSubmitted();
+            for(auto& blend:blends)blend->weight=0;
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          memory[0]==plain && slot.PendingRefit()==CharacterBlasRefit::None,
+                          "validated zero blend must share the ordinary null-request cache identity");
+            ok &= Require(slot.PrepareInitialGeometry(diagnostic),diagnostic.c_str());
+            std::fill(memory[0].begin(),memory[0].end(),std::byte{0x7f});
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic) &&
+                          memory[0]==plain && slot.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "initial/recreated geometry must invalidate the old blend/clip upload identity");
+            slot.DestroyGpuResources(unboundResources);bind();
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          slot.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "destroyed/rebound owner must not retain stale submitted blend identity");
+            for(unsigned bucket=0;bucket<2;++bucket)slot.SkeletonGpu(bucket).vertices={};
+        }
 
         CharacterRenderSlot previewSlot;
         diagnostic.clear();

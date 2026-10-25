@@ -23,9 +23,10 @@ skin minimum is about 5.25 mm below local floor, and Dead0/Idle0 are about 13.92
 10.81 mm above; those source values alone do not reject the rise.
 
 **Direct reverse-Dead-to-Idle is unadmitted.** No blend candidate is stacked onto
-this pass. The [next narrow seam](NEXT_BLEND_SEAM.md) exposes an existing local-
-joint blend through the expanded skeleton/cache path, before another actual RT
-comparison. Do not disguise the join with root/yaw snapping or silently enable it.
+this retained pass. The later [single blend proof](../2026-10-25-skeleton-revive-blend/README.md)
+implements the [narrow seam](NEXT_BLEND_SEAM.md), but rejects the visible foot
+slide. Both failures remain; an authored contact-preserving transition is the
+next requirement. Do not disguise the join with root/yaw snapping or enable it.
 
 The follow-up used a reports-only executable/settings copy; assets resolve from
 the same compiled Debug source root. Capture mode skips campaign construction.

@@ -6854,7 +6854,7 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
     }
     if (!entry &&
         !characterSlot_.PrepareFrame(frame.skeletonEnemies, frame.skeletonEnemyCount, frame.roster,
-                                     frame.lich, gpuResources_, diagnostic, observation))
+                                     frame.lich, gpuResources_, diagnostic, observation, frame.skeletonPoseBlends))
         return false;
     auto instances = tlasBuiltInstances_;
     if (!entry)
@@ -7689,7 +7689,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                      lich,
                                      gpuResources_,
                                      diagnostic,
-                                     observation))
+                                     observation,
+                                     frame.skeletonPoseBlends))
     {
         return false;
     }

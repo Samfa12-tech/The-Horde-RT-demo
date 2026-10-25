@@ -164,6 +164,8 @@ struct RtSceneFrameInputs
     std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                horde::gameplay::simulation::kSkeletonEnemyCapacity> skeletonEnemies{};
     std::size_t skeletonEnemyCount = 0u;
+    // CPU-only optional local-joint clip transition; ordinary adapter stays empty.
+    SkeletonPoseBlendRequests skeletonPoseBlends{};
     horde::gameplay::TorchFailureSnapshot torchFailure{};
     horde::gameplay::items::HeldItemStates heldItems{};
     horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};
