@@ -182,3 +182,28 @@ zero added save paths, no owned renderer or transfer. Horde released its device
 reservation. No new phone access is authorised until another slot is allocated.
 Before requesting it, the host driver needs an offline startup/receipt dry run
 and a realistic setup/test/restore budget.
+
+## Clearer devlog animation preview
+
+The source-pinned `11c13659` hidden Windows RT capture produced an 11.55-second,
+960x540 silent MP4, now delivered through Library as
+`libfile_1d733e64d39081919fa7c8a70124ab57`. The compact
+[video receipt](devlog-video-receipt.json) retains its exact source/executable,
+hash, timing, Library identity and limitations; the video and raw frames remain
+outside Git. Its brighter existing skylight view shows one fresh parry, sustained
+guard, attack directly from guard, held return and release. Encoded key frames
+were inspected for the action order and readable hand/weapon presentation.
+
+This is explicitly labelled **RT animation preview / simulation-timed / silent**.
+The 354 actual RT images retain their original 60Hz simulation timestamps, with
+no interpolation, artificial speedup or repeated padding. Rendering was unpaced
+and took 105.9 wall seconds; it is not an 11.55-second real-time recording or FPS
+claim. Incoming damage is disabled in this staged diagnostic encounter. Lighting,
+materials, exposure, projection and the production guard pose are unchanged;
+the raised blade tip can naturally leave the original first-person frame.
+
+Save/settings/foreground and the 151 parked owner files passed the capture's
+unchanged-custody check. No phone or X posting was used. Library upload succeeded;
+the unchanged official local metadata helper failed because native Windows Python
+lacks `os.setxattr`. The returned Library identity is retained in the receipt,
+but local extended attributes were not applied or bypassed.
