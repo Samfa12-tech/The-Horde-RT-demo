@@ -3752,3 +3752,25 @@ then release in both orientations. No further device calls follow the handover.
 Private custody receipts remain under ignored
 `reports/guard-phone-f27982cd-owner-r1/` and `-r2/`; no private save/settings bytes
 are published. The frozen APK remains separate from later source work.
+
+### 25 October 2026: owner guard feedback and private recording review
+
+On the retained SM-S948B `f27982cd` APK identified above, Sam reports that the
+held block animation and attacking while held, followed by return to block,
+look good. This is owner-observed acceptance of those transitions in that
+session. It does not establish both-orientation coverage, mitigation arithmetic,
+red-attack handling, combat balance or the full journey/save/death acceptance.
+
+Sam also reports that the second skeleton stopped after the first died, that
+neither damaged him, and that the yellow parry prompt needs a stronger visual
+warning. The authorised private recording was copied locally, verified against
+the original hash and reviewed for gameplay only. It shows full hearts, a dark
+encounter and a largely text-led yellow warning; it cannot establish the exact
+teaching stage or authoritative hit/token state. No listening or performance
+claim is made, and neither the video nor unrelated phone content is published.
+
+The original recording remains on the phone. Retrieval used no gameplay input,
+installation or save/settings writes. Device access was released at
+**10:37:25.915 UTC**, with the same frozen candidate retained for Sam. No owned
+transfer or automated interaction remains. Subsequent startup, encounter and
+warning investigations are offline; the phone is free to disconnect.

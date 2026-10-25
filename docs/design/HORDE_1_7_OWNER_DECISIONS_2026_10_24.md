@@ -157,3 +157,29 @@ This document changes no health/save fields, asset binding, graphics preference,
 performance budget or current deferral. Existing physical/listening/release gates
 remain separate. Audio/haptic manual revalidation required for this document:
 **NO**; it changes documentation only.
+
+## 25 October: combat/practice follow-up direction
+
+Sam accepts the actual held block and guard-to-attack-to-held-block animation on
+the installed development candidate. Keep those joins. He now endorses normal
+full blocking, special yellow guard-break/parryable attacks and red avoidance as
+the next combat direction, replacing the prior half-damage balance only when the
+new shared authority is implemented/tested. No extra stamina/damage/stun system
+is implied. Rings must be enemy-anchored in the RT world, animated by actual
+attack phases, reserved for special attacks and legible beyond colour alone.
+The reference does not establish a universal ring-close/parry-frame rule.
+
+Teach block, timed parry, dodge and attacking from guard through actual practice,
+with clear protection and Replay/Skip. Sam proposes the lich's waterfall-direction
+scream and one-time reassembly of the same two skeletons after practice, before
+real combat/Keeper, and explicitly suggests reverse death-pose playback. These
+are approved bounded development directions, not extra enemies or a reverse of
+simulation/events. A suitable source scream is supplied and verified privately;
+no paid/substitute sound is authorized. Actual reverse-pose visuals, fair rise
+activation, one-time ownership and save/retry semantics still need proof.
+
+The [concrete plan](HORDE_1_7_COMBAT_PRACTICE_BRIDGE_2026_10_25.md) calls out the
+Skip/revival pacing tradeoff. The [ring seam](HORDE_1_7_ATTACK_RING_SEAM_2026_10_25.md)
+records the pending explicit capacity decision. No capacity, new combat balance,
+wave trigger or production ring changes merely because this decision note exists.
+Earlier canopy/flask/effects decisions and all RT/owner-data restrictions remain.

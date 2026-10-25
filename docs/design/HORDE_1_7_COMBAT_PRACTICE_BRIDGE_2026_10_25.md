@@ -1,0 +1,93 @@
+# Four-skill practice and one-time revival: bounded implementation plan
+
+Owner direction now includes normal/full block, yellow/guard-break but parryable,
+red/avoid; a protected chance to practise block, timed parry, dodge and attacking
+from guard; then the same two skeletons raised once by the lich before real
+combat. Preserve accepted guard animation and attack/recovery/held-return joins.
+This note records the next implementation, not a claim that it is present.
+
+## Actual chronology and smallest rule change
+
+Current skeletons have one attack kind; every current windup is labelled yellow.
+The Keeper is the only red attack source. Introduce an attack kind latched at
+windup, shared by contact and presentation, rather than recolouring all swings.
+Ordinary skeleton swings remain the uncluttered baseline; explicitly selected
+yellow attacks are special. Keep existing red Keeper authority.
+
+Recommended yellow-break consequence is the existing unblocked one-heart hit
+and existing hit recovery, with no new stamina meter, extra stun system or
+additional damage. Normal eligible frontal guard blocks fully. Fresh timed parry
+and dodge keep their current timing/benefit; attack still ends guard mitigation
+immediately and never cancels recovery. This is the narrow interpretation to
+review before broader balancing. Current code still uses the prior half-damage
+guard until the new rule slice is implemented and checked.
+
+## Authoritative learning, not button presses
+
+Keep four actual outcome witnesses, accepting valid successes out of order while
+showing one concise instruction:
+
+1. A real eligible incoming contact is resolved as blocked before practice
+   suppresses health loss. Holding Guard alone does not teach it.
+2. Existing `parrySuccessPulse` teaches timed parry.
+3. Existing `DodgeSucceeded` from a real protected skeleton contact teaches dodge;
+   reinforce red/avoid at the Keeper. Requiring a Keeper hit before this earlier
+   bridge would deadlock chronology; do not invent a red skeleton just for that.
+4. An accepted attack begins from Guard, actually hits, completes legitimate
+   recovery and returns to still-held Guard. Miss, release, interruption or input
+   alone cannot award attack-from-guard.
+
+Keep protection clearly labelled. Neither an attack classification nor a ring
+may replace the current instruction/protection status. Actual outcomes drive
+success text; ordinary stagger is not a parry. Require an explicit safe-boundary
+exit from practice, so completing a lesson cannot unexpectedly enable damage in
+the middle of an attack. Provide clear Replay/Skip, without granting missing
+skills. If the pair falls too early, explicit Replay retains useful learned
+progress; do not automatically revive them forever.
+
+## One simulation-owned bridge
+
+Use a small practice / pending / rising / live / complete state in the current
+encounter owner. After practice exit and first pair defeat, emit one spatial
+waterfall-direction event and assess reverse `Dead` pose playback for the same
+two stable IDs at their real corpse transforms. Defer the existing
+`EnemyDirector::MarkSelectedDead` until final real defeat. Never reverse events,
+simulation, rewards or save writes. No additional actors/boss/assets are needed.
+
+Existing rig: `assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb`.
+Its roughly 2.967-second Dead clip has no separately authored get-up clip.
+Reversing it is an owner-approved **candidate**, requiring actual floor/foot,
+weapon/bone and idle-join review. During rise both actors are non-attacking and
+non-targetable; a fair existing recovery boundary precedes real attacks. Camera
+tremor is optional and reduced-motion-safe, with no forced turn. It must not
+reuse player damage as a fake event.
+
+Retain bridge consumption through pre-claim Retry: the real fight restarts with
+standing guards and no repeated scream/revival. Explicit New Game/Replay resets
+the intended practice flow. All current earned campaign records already require
+both guards defeated, Keeper defeated and lantern claimed; restore can set bridge
+terminal directly, with no new save schema. Capture must reject temporary
+practice/rising zero-health states rather than recording fake completion.
+
+One pacing choice needs a coherent review before wiring the whole bridge:
+recommend that explicit Skip is a real opt-out, entering the existing live
+encounter at a safe boundary and consuming the bridge, rather than forcing a
+second fight or keeping damage protection after a control labelled Skip. The
+normal practice path gets the one-time revival. If a mandatory revival is desired
+even after Skip, its reset/protection wording must be specified first. No such
+exception is silently implemented by this note.
+
+## Assets and admission
+
+The supplied scream is now privately materialized, verified and converted;
+see [intake evidence](../evidence/2026-10-25-owner-playtest/scream-intake.md).
+It is not auditioned or integrated. Add its game event, event-time spatial source,
+ducking/lifecycle and game-integrated derivative/licence together; no standalone
+source upload. In-world rings require the separately documented explicit RT
+owner/budget seam; there is no HUD-ring substitute.
+
+Validate lessons with actual contact, early deaths/Replay/Skip, one-time event,
+rise interruption, death/Retry, pause/reset, terminal earned-load and normal
+route/checkpoint ownership. Review actual RT reverse-death and combat motion,
+not only numeric gates. Phone balance/thumb feel, listening and sustained cost
+remain physical acceptance; no phone is available tonight.

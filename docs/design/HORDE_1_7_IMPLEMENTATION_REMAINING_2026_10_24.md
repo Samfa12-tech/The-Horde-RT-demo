@@ -1,5 +1,36 @@
 # Horde 1.7 implementation remaining - 24 October 2026
 
+## Latest owner-playtest follow-up, 25 October
+
+This update supersedes older device/guard acceptance wording below, without
+turning the historical checkpoints into newer evidence. Sam accepts the held
+guard and attack-return animation on installed `f27982cd`; broader damage,
+orientation and journey acceptance remains separate. Phone access was released
+at10:37:25.915UTC after private recording retrieval; no further device calls.
+
+- Implemented/tested: Waterfall surviving-attacker ownership `bf2dee1c`, current
+  RT/readiness-gated Android entry with responsive loading/retry/cancel
+  `ca1826d9`, and actual-outcome parry teaching feedback `9dfc319c`.
+  [Evidence and limits](../evidence/2026-10-25-owner-playtest/README.md).
+- Next source work: approved full normal block/yellow guard-break direction,
+  actual four-skill practice and one-time two-skeleton revival before Keeper.
+  [Chronology and minimal plan](HORDE_1_7_COMBAT_PRACTICE_BRIDGE_2026_10_25.md)
+  records the Skip/revival pacing choice before broad integration. Reverse-Dead
+  is an approved visual candidate, not an admitted animation yet.
+- In-world special-attack rings need an explicit measured RT owner seam; no
+  capacity was increased or screen-space substitute added. Current half-damage
+  guard rules remain until the new combat-rule slice is implemented/tested.
+- Scream transfer/identity and private PCM conversion are complete; listening,
+  one-time event/spatial mix and game-integrated asset admission are unfinished.
+  The original and isolated draft are not publicly vendored.
+- Still unfinished: flask prop/touch/upgrade presentation (backend remains OFF),
+  visible forest depth/crown admission, admitted chimney/carry/run solutions and
+  the existing physical/foreground/audio/performance gates. Prior rejections,
+  shared64 OFF and outdoor-effects deferrals remain in force. Passing CI or these
+  defect fixes does not make1.7 implementation-complete or release-ready.
+
+## Earlier checkpoint detail
+
 25 October update: backed up through `2f461da4`. The
 [guard/readability/pause checkpoint](../evidence/2026-10-25-combat-readability/README.md)
 passes seven affected native checks, 458 Android unit tests (six existing skips),
