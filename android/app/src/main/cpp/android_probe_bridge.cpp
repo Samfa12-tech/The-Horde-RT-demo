@@ -1031,7 +1031,8 @@ void PublishSimulationUiState()
         (static_cast<std::uint64_t>(teaching.slowdownActive) << 14u) |
         (clampByte(teaching.cueProgress) << 16u) |
         ((static_cast<std::uint64_t>(teaching.practiceMisses) & 0xffu) << 24u) |
-        (clampByte(teaching.promptOpacity) << 40u);
+        (clampByte(teaching.promptOpacity) << 40u) |
+        ((static_cast<std::uint64_t>(teaching.attackReadability) & 0x3u) << 48u);
     gCombatTeachingUiState.store(teachingState, std::memory_order_release);
     {
         std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);

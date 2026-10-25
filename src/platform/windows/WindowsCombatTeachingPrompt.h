@@ -29,21 +29,40 @@ inline unsigned char CombatTeachingPromptFadeAlpha(
         kCombatTeachingPromptFadeMilliseconds);
 }
 
+inline bool HasAttackReadabilityCue(const gameplay::simulation::CombatTeachingSnapshot& teaching)
+{
+    using gameplay::simulation::AttackReadability;
+    return teaching.attackReadability == AttackReadability::Parryable ||
+           teaching.attackReadability == AttackReadability::Unblockable;
+}
+
+// RGB channels only; the native presenter preserves OS high-contrast colors.
+inline constexpr std::uint32_t AttackReadabilityColourRgb(
+    const gameplay::simulation::AttackReadability value)
+{
+    using gameplay::simulation::AttackReadability;
+    return value == AttackReadability::Parryable ? 0xFFD266u :
+           value == AttackReadability::Unblockable ? 0xFF6B6Bu : 0xF2E9D8u;
+}
+
 inline std::string CombatTeachingPromptText(
     const gameplay::simulation::CombatTeachingSnapshot& teaching, const bool controller = false)
 {
     using gameplay::simulation::CombatTeachingCue;
     using gameplay::simulation::TutorialStage;
+    using gameplay::simulation::AttackReadability;
+    if (teaching.attackReadability == AttackReadability::Parryable) return "<> YELLOW: PARRY";
+    if (teaching.attackReadability == AttackReadability::Unblockable) return "[X] RED: DODGE";
     if (!teaching.enabled || !std::isfinite(teaching.promptOpacity) || teaching.promptOpacity <= 0.0f)
         return {};
     const char* lesson = "O Watch the attacker";
     switch (teaching.cue)
     {
     case CombatTeachingCue::ParryWindup:
-        lesson = "O Watch the raised blade";
+        lesson = "O Watch the raised arm / attacker";
         break;
     case CombatTeachingCue::ParryNow: lesson = "o PARRY NOW - fresh press to parry"; break;
-    case CombatTeachingCue::ParryActive: lesson = "(*) Guard up - timed parry; face the blade"; break;
+    case CombatTeachingCue::ParryActive: lesson = "(*) Guard up - timed parry; face the attacker"; break;
     case CombatTeachingCue::ParryRecovery: lesson = "-> Hold: half damage; release to rearm parry"; break;
     case CombatTeachingCue::DodgeWindup: lesson = "O The Keeper gathers lightning - watch the staff"; break;
     case CombatTeachingCue::DodgeNow: lesson = "<-- DODGE NOW --> - step sideways"; break;

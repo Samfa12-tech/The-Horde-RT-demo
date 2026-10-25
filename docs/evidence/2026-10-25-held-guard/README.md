@@ -157,3 +157,28 @@ this does not retroactively validate its timestamped input behavior.
 
 A corrected APK must be built from the new source before a phone retest. The
 first phone APK/receipt stays pinned to the earlier checkpoint; do not relabel it.
+
+## Corrected build and second allocated phone attempt
+
+The corrected frozen APK was built from `69e46426`, with assemble/lint passing
+and the complete Java roster passing (453 tests, six existing skips). Its exact
+[artifact receipt](apk-timing-correction-receipt.json) describes the build-time
+state before installation. All six jobs in
+[exact-head CI 40171242117](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40171242117)
+subsequently completed successfully, including Android and MSVC. This supersedes
+the pending build/CI statements above; it does not close physical guard acceptance.
+
+A second allocated device attempt installed that exact compatible APK, entered
+the normal isolated route and observed gameplay readiness. It **did not issue
+Swing or guard input**: an initial startup focus observation race and a duplicate
+receipt filename consumed the action budget. The 267-second safety check then
+stopped input rather than rush the test. Original failures remain under ignored
+`reports/guard-phone-69e46426-r2/phone/`; no staged checkpoint or progression flags
+were used. This is setup/custody evidence, not a guard retest pass.
+
+Restoration completed **07:28:34 UTC**: both original installed APK hashes,
+18 prior save/lock files, preference bytes and system settings verified exact;
+zero added save paths, no owned renderer or transfer. Horde released its device
+reservation. No new phone access is authorised until another slot is allocated.
+Before requesting it, the host driver needs an offline startup/receipt dry run
+and a realistic setup/test/restore budget.

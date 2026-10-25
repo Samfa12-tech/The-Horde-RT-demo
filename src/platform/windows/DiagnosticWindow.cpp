@@ -7,6 +7,7 @@
 #include "platform/windows/WindowsEnvironmentSurveyLaunch.h"
 #if defined(_DEBUG)
 #include "gameplay/validation/PlayerDodgePoseFixture.h"
+#include "gameplay/effects/KeeperCastPresentation.h"
 #include "../../../tests/KitTurnContactData.h"
 #endif
 #include "vulkan/raytracing/EnvironmentSurveyFrame.h"
@@ -536,6 +537,7 @@ struct VulkanSurfaceContext
     bool combatTeachingSlowdown = false;
     bool reducedMotionEnabled = false;
     std::string combatTeachingFadeText;
+    bool combatAttackCueVisible = false;
     unsigned char combatTeachingFadeOpacity = 0u;
     std::uint64_t combatTeachingFadeStartedAtMs = 0u;
     std::uint64_t combatTeachingSkipSequence = 0u;
@@ -3084,6 +3086,14 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     HWND prompt = GetDlgItem(context.windowHandle, kCombatTeachingPromptId);
     if (!prompt) return;
     const auto& teaching = context.simulation.Snapshot().combatTeaching;
+    const bool attackCue = horde::platform::windows::HasAttackReadabilityCue(teaching);
+    if (context.combatAttackCueVisible && !attackCue)
+    {
+        context.combatTeachingFadeText.clear();
+        context.combatTeachingFadeOpacity = 0u;
+        context.combatTeachingFadeStartedAtMs = 0u;
+    }
+    context.combatAttackCueVisible = attackCue;
     const std::string text = horde::platform::windows::CombatTeachingPromptText(teaching, context.teachingControllerGlyphs);
     const bool eligible = context.controlsEnabled && !MeasurementPausedByUi(context) &&
         !context.benchmarkReportVisible && !context.benchmark.IsRunning() &&
@@ -3102,7 +3112,7 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     if (!text.empty())
     {
         context.combatTeachingFadeText = text;
-        context.combatTeachingFadeOpacity = horde::platform::windows::CombatTeachingPromptAlpha(
+        context.combatTeachingFadeOpacity = attackCue ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
             teaching.promptOpacity, context.reducedMotionEnabled);
         context.combatTeachingFadeStartedAtMs = 0u;
         SetWindowTextA(prompt, text.c_str());
@@ -8209,9 +8219,17 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
 #if defined(_DEBUG)
         if (const char* guardSequence = std::getenv("HORDE_GUARD_TRANSITION_CAPTURE"))
         {
+            if (std::getenv("HORDE_KEEPER_CAST_CAPTURE"))
+                return fail("Guard and Keeper fixtures must run in separate processes.");
             if (std::string_view(guardSequence) != "1")
                 return fail("Guard transition fixture accepts only explicit value 1.");
 #include "platform/windows/WindowsGuardTransitionCapture.inl"
+        }
+        if (const char* keeperSequence = std::getenv("HORDE_KEEPER_CAST_CAPTURE"))
+        {
+            if (std::string_view(keeperSequence) != "1")
+                return fail("Keeper cast fixture accepts only explicit value 1.");
+#include "platform/windows/WindowsKeeperCastCapture.inl"
         }
 #endif
         std::vector<double> frameTimesMs;
@@ -12033,7 +12051,12 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         if (item && item->CtlID == kCombatTeachingPromptId)
         {
             const bool highContrast = NativeUiUsesHighContrast();
-            const COLORREF text = highContrast ? GetSysColor(COLOR_WINDOWTEXT) : RGB(242, 233, 216);
+            const auto classification = sceneContext
+                ? sceneContext->simulation.Snapshot().combatTeaching.attackReadability
+                : horde::gameplay::simulation::AttackReadability::Neutral;
+            const std::uint32_t cueRgb = horde::platform::windows::AttackReadabilityColourRgb(classification);
+            const COLORREF text = highContrast ? GetSysColor(COLOR_WINDOWTEXT)
+                : RGB((cueRgb >> 16u) & 0xffu, (cueRgb >> 8u) & 0xffu, cueRgb & 0xffu);
             static HBRUSH slatePanel = CreateSolidBrush(RGB(24, 25, 27));
             static HBRUSH brassFrame = CreateSolidBrush(RGB(157, 124, 72));
             static HBRUSH ironInset = CreateSolidBrush(RGB(77, 68, 53));

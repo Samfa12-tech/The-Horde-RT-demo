@@ -2,7 +2,7 @@ package com.samfa12.hordelanternrt;
 
 import android.content.SharedPreferences;
 
-/** Device-local presentation choices for the optional combat teaching overlay. */
+/** Existing combat prompt: optional lesson plus authoritative current-attack readability. */
 final class CombatTeachingPreferences {
     static final String ENABLED = "combat_teaching_enabled";
     static final String SLOWDOWN = "combat_teaching_slowdown";
@@ -34,6 +34,10 @@ final class CombatTeachingPreferences {
     static String prompt(long state) { return prompt(state, false); }
 
     static String prompt(long state, boolean controller) {
+        final int attack = attackReadability(state);
+        // Current attack information is gameplay readability, independent of the optional lesson.
+        if (attack == 1) return "\u25c7 YELLOW: PARRY";
+        if (attack == 2) return "\u2715 RED: DODGE";
         final boolean enabled = (state & (1L << 10)) != 0;
         final int opacity = (int) ((state >>> 40) & 0xffL);
         if (!enabled || opacity == 0) return "";
@@ -48,7 +52,26 @@ final class CombatTeachingPreferences {
                 : "\n[Parry] Guard  ·  [Dodge] + move: Evade");
     }
 
+    static int attackReadability(long state) {
+        final int value = (int) ((state >>> 48) & 0x3L);
+        return value == 1 || value == 2 ? value : 0;
+    }
+    static int promptColor(long state) {
+        final int attack = attackReadability(state);
+        return attack == 1 ? 0xFFFFD266 : attack == 2 ? 0xFFFF6B6B : HordeUiTokens.PARCHMENT;
+    }
+    static int promptOpacity(long state) {
+        return attackReadability(state) != 0 ? 255 : (int) ((state >>> 40) & 0xffL);
+    }
+    static String description(long state, String visibleText) {
+        final int attack = attackReadability(state);
+        if (attack == 1) return "Yellow parryable attack. Press to parry; hold guard to halve blockable damage.";
+        if (attack == 2) return "Red unblockable attack. Dodge.";
+        return visibleText.replace('\n', ' ');
+    }
+
     static boolean needsTimelyRefresh(long state) {
+        if (attackReadability(state) != 0) return true;
         final boolean enabled = (state & (1L << 10)) != 0;
         final int opacity = (int) ((state >>> 40) & 0xffL);
         final int cue = (int) ((state >>> 3) & 0xfL);
@@ -72,9 +95,9 @@ final class CombatTeachingPreferences {
     private static String cueText(int cue, int stage, int source, boolean parryLearned, boolean dodgeLearned) {
         // Source identity stays in diagnostics; the lesson names the visible action.
         switch (cue) {
-            case 1: return "○ Watch the raised blade";
+            case 1: return "○ Watch the raised arm / attacker";
             case 2: return "○ PARRY NOW — fresh press to parry";
-            case 8: return "● Guard up — timed parry; face the blade";
+            case 8: return "● Guard up — timed parry; face the attacker";
             case 3: return "↩ Hold: half damage; release to rearm parry";
             case 4: return "○ The Keeper gathers lightning — watch the staff";
             case 5: return "← DODGE NOW → — step sideways";

@@ -6,6 +6,7 @@
 #include "gameplay/CombatTimeline.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SwordCombat.h"
+#include "gameplay/effects/KeeperCastPresentation.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
 namespace horde::gameplay::simulation
@@ -26,6 +27,39 @@ struct DodgeProtectionWindow
 };
 
 enum class TutorialStage : std::uint8_t { Parry, Dodge, Complete, Skipped };
+// Attack category, not a widened defense window or lesson state. The presentation
+// owner maps these semantic values to neutral/yellow/red and readable text.
+enum class AttackReadability : std::uint8_t { Neutral = 0, Parryable = 1, Unblockable = 2 };
+
+inline AttackReadability EvaluateAttackReadability(const CombatSnapshot& combat,
+    const LichSnapshot& keeper, EnemyKind selectedEnemy, bool eligible)
+{
+    if (!eligible) return AttackReadability::Neutral;
+    if (selectedEnemy == EnemyKind::Skeleton)
+    {
+        if (combat.aliveCount == 0 || combat.attackerIndex < 0)
+            return AttackReadability::Neutral;
+        const auto index = static_cast<std::size_t>(combat.attackerIndex);
+        if (index >= combat.combatantCount || index >= combat.combatants.size())
+            return AttackReadability::Neutral;
+        const auto& attacker = combat.combatants[index];
+        return attacker.health > 0 &&
+            (attacker.action == EnemyCombatAction::AttackWindup ||
+             attacker.action == EnemyCombatAction::AttackActive)
+            ? AttackReadability::Parryable : AttackReadability::Neutral;
+    }
+    if (selectedEnemy != EnemyKind::Lich || keeper.health <= 0 ||
+        !keeper.revealComplete || IsKeeperRevealing(keeper.revealPhase))
+        return AttackReadability::Neutral;
+    if (keeper.phase == LichPhase::Charging)
+        return AttackReadability::Unblockable;
+    // Reuse the actual discharge presentation discriminator instead of owning
+    // another burst timer. The remainder of the existing recovery is neutral.
+    return keeper.phase == LichPhase::Recovering && keeper.readableCastPresentation &&
+        effects::KeeperShaderPresentationKind(true, keeper) == 2.0f
+        ? AttackReadability::Unblockable : AttackReadability::Neutral;
+}
+
 enum class CombatTeachingCue : std::uint8_t
 {
     None, ParryWindup, ParryNow, ParryRecovery, DodgeWindup, DodgeNow, Recovery, Learned,
@@ -40,6 +74,7 @@ struct CombatTeachingSnapshot
     bool slowdownActive = false;
     TutorialStage stage = TutorialStage::Parry;
     CombatTeachingCue cue = CombatTeachingCue::None;
+    AttackReadability attackReadability = AttackReadability::Neutral;
     EntityId source = EntityId::Invalid;
     float cueProgress = 0.0f;
     float simulationTimeScale = 1.0f;
@@ -70,6 +105,7 @@ public:
     void CancelTransient()
     {
         snapshot_.cue = CombatTeachingCue::None; snapshot_.source = EntityId::Invalid;
+        snapshot_.attackReadability = AttackReadability::Neutral;
         snapshot_.slowdownActive = false; snapshot_.simulationTimeScale = 1.0f;
         snapshot_.safePractice = false; snapshot_.promptOpacity = 0.0f;
     }
@@ -78,6 +114,7 @@ public:
                 EnemyKind selectedEnemy)
     {
         snapshot_.enabled = enabled;
+        snapshot_.attackReadability = EvaluateAttackReadability(combat, keeper, selectedEnemy, !suspended);
         snapshot_.cue = CombatTeachingCue::None; snapshot_.source = EntityId::Invalid;
         snapshot_.cueProgress = 0.0f;
         snapshot_.simulationTimeScale = 1.0f;

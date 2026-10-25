@@ -3671,3 +3671,34 @@ Phone released04:07:35UTC: both original APK hashes,18prior save/lock files,
 preference bytes and system settings verified restored; zero new save paths,
 no owned app PID/rendering surface/install/capture/transfer. Development paused;
 no subsequent phone operations. Existing compatibility/evidence classes remain.
+
+### 25 October 2026: first held-guard attempt — not accepted
+
+SM-S948B Android17/API37, source6c5e2fb9 ordinary Debug APK
+`a2c9602d4d01627fd655b3a3b57029e30197a04e2dfc96c1fe34935867c98f9e`.
+Normal isolated entry used no imported checkpoint/progression flags. An observed
+Swing press drew the sword; one stationary2.5second shield hold/release visibly
+pressed the control but did not establish the raised held pose. This is retained
+as unverified physical evidence, not guard/damage/feel/performance acceptance.
+[Exact captures and scope](evidence/2026-10-25-held-guard/README.md#first-physical-guard-attempt--held-pose-not-accepted).
+
+Independent shared tests then reproduced a timestamped catch-up defect and the
+69e46426 correction; that is not a retrospectively proven cause of these images.
+Corrected APK needs a new allocated device slot. Phone released06:45:57UTC with
+both original APKs,18save/lock files, preferences and system settings restored,
+zero new save paths and no owned renderer/transfer. No device calls after release.
+
+### 25 October 2026: corrected guard APK — setup only, guard still unverified
+
+SM-S948B, Android 17/API 37; source `69e46426`, ordinary Diagnostic Debug APK
+`1444b50824ee23ea0099559365a58d5bd304b2e27ddf58c6a3714f8725043a8d`.
+The allocated retest installed the compatible build and observed normal isolated
+gameplay readiness, but startup-observation and receipt-name errors exhausted
+the action margin before any Swing/guard input. No physical guard, damage,
+multi-touch or performance pass is claimed. The independent exact-head hosted
+CI completed all six jobs successfully.
+
+Phone released **07:28:34 UTC**: both original installed APK hashes, all 18 prior
+save/lock files, preference bytes and system settings verified restored, zero
+added save paths and no owned renderer/transfer. Setup failures are retained;
+the next attempt requires an offline preflight and a new allocated device slot.

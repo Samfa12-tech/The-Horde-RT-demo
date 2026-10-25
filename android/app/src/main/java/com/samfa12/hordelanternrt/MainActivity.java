@@ -294,6 +294,7 @@ public class MainActivity extends Activity {
     private boolean chapterVoicePaused;
     private boolean chapterSubtitleOverflowReported;
     private String combatTeachingFadeText = "";
+    private boolean combatAttackCueVisible;
     private int combatTeachingFadeOpacity;
     private long combatTeachingFadeStartedAtMs;
     private final InputManager.InputDeviceListener controllerDevices = new InputManager.InputDeviceListener() {
@@ -686,7 +687,7 @@ public class MainActivity extends Activity {
         appRoot.addOnLayoutChangeListener((view, left, top, right, bottom,
                 oldLeft, oldTop, oldRight, oldBottom) -> reflowChapterDialoguePlacement());
         styleActionButton(diagnosticsBack, 0xCC211B15, 0xFFFFD28A);
-        menuButton.setContentDescription(getString(R.string.menu));
+        menuButton.setContentDescription(getString(R.string.pause_menu));
         attackButton.setContentDescription(getString(R.string.swing));
         parryButton.setContentDescription(getString(R.string.parry_accessibility));
         dodgeButton.setContentDescription(getString(R.string.dodge));
@@ -3579,6 +3580,14 @@ public class MainActivity extends Activity {
         if (combatTeachingPrompt == null) return false;
         final long packed = ProbeBridge.getCombatTeachingState();
         final String text = CombatTeachingPreferences.prompt(packed, controllerMode);
+        final boolean attackCue = CombatTeachingPreferences.attackReadability(packed) != 0;
+        if (combatAttackCueVisible && !attackCue) {
+            // A completed attack is Neutral immediately; never fade a stale warning.
+            combatTeachingFadeText = "";
+            combatTeachingFadeOpacity = 0;
+            combatTeachingFadeStartedAtMs = 0L;
+        }
+        combatAttackCueVisible = attackCue;
         final boolean allowed = resumed && surfaceStarted && surfaceState == 1 &&
                 preferences.getBoolean("show_hud", true) &&
                 !menuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
@@ -3591,16 +3600,19 @@ public class MainActivity extends Activity {
         }
         if (!text.isEmpty()) {
             combatTeachingFadeText = text;
-            combatTeachingFadeOpacity = (int) ((packed >>> 40) & 0xffL);
+            combatTeachingFadeOpacity = CombatTeachingPreferences.promptOpacity(packed);
             combatTeachingFadeStartedAtMs = 0L;
             combatTeachingPrompt.setText(text);
-            combatTeachingPrompt.setContentDescription(text.replace('\n', ' '));
+            combatTeachingPrompt.setContentDescription(CombatTeachingPreferences.description(packed, text));
+            combatTeachingPrompt.setTextColor(CombatTeachingPreferences.promptColor(packed));
             combatTeachingPrompt.setAlpha(CombatTeachingPreferences.alpha(
                     combatTeachingFadeOpacity, reducedMotion));
             combatTeachingPrompt.setVisibility(View.VISIBLE);
             return CombatTeachingPreferences.needsTimelyRefresh(packed);
         }
         if (combatTeachingFadeText.isEmpty()) {
+            combatTeachingPrompt.setText("");
+            combatTeachingPrompt.setContentDescription("");
             combatTeachingPrompt.setVisibility(View.GONE);
             return false;
         }
@@ -4043,6 +4055,7 @@ public class MainActivity extends Activity {
     }
 
     private void clearCombatTeachingPrompt() {
+        combatAttackCueVisible = false;
         combatTeachingFadeText = "";
         combatTeachingFadeOpacity = 0;
         combatTeachingFadeStartedAtMs = 0L;
@@ -5304,9 +5317,8 @@ public class MainActivity extends Activity {
             if(b!=null) styleGameplayActionButton(b,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,false);
         styleGameplayActionButton(toggleHeldLightPoseButton,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,true);
         if(menuButton!=null) {
-            styleActionButton(menuButton,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT);
-            FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)menuButton.getLayoutParams();
-            p.setMarginEnd(dp(16)+safeRight); p.topMargin=dp(16)+safeTop; menuButton.setLayoutParams(p);
+            styleGameplayActionButton(menuButton,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,true);
+            PauseControl.apply(menuButton,safeRight,safeTop);
         }
         if(vitalityStatus!=null) {
             FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)vitalityStatus.getLayoutParams();

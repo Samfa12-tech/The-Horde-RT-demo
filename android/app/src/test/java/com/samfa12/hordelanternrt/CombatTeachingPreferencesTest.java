@@ -53,7 +53,7 @@ public final class CombatTeachingPreferencesTest {
         long parryActive = 2L | (8L << 3) | (1L << 10) | (0xffL << 40);
         prompt = CombatTeachingPreferences.prompt(parryActive);
         assertTrue(prompt.contains("● Guard up"));
-        assertTrue(prompt.contains("face the blade"));
+        assertTrue(prompt.contains("face the attacker"));
         assertFalse(prompt.contains("PARRY NOW"));
 
         long dodgeNow = 1L | (5L << 3) | (1L << 10) | (1L << 14) | (0xffL << 16) | (0xffL << 40);
@@ -115,6 +115,26 @@ public final class CombatTeachingPreferencesTest {
                 (5L << 3) | (0xffL << 40)));
         assertFalse(CombatTeachingPreferences.needsTimelyRefresh(
                 (5L << 3) | (1L << 10)));
+    }
+
+    @Test public void currentAttackCueSurvivesDisabledSkippedAndCompletedTeachingWithoutLessonSpam() {
+        for (long lesson : new long[]{0L, 3L | (1L << 10), 2L | (1L << 10)}) {
+            long yellow = lesson | (1L << 48), red = lesson | (2L << 48);
+            assertEquals("\u25c7 YELLOW: PARRY", CombatTeachingPreferences.prompt(yellow));
+            assertEquals("\u2715 RED: DODGE", CombatTeachingPreferences.prompt(red,true));
+            assertEquals(0xFFFFD266, CombatTeachingPreferences.promptColor(yellow));
+            assertEquals(0xFFFF6B6B, CombatTeachingPreferences.promptColor(red));
+            assertEquals(255, CombatTeachingPreferences.promptOpacity(yellow));
+            assertEquals(255, CombatTeachingPreferences.promptOpacity(red));
+            assertEquals(1f,CombatTeachingPreferences.alpha(CombatTeachingPreferences.promptOpacity(red),true),0f);
+            assertTrue(CombatTeachingPreferences.description(red,"").contains("unblockable"));
+            assertTrue(CombatTeachingPreferences.description(yellow,"").contains("parryable"));
+            assertTrue(CombatTeachingPreferences.needsTimelyRefresh(red));
+            assertFalse(CombatTeachingPreferences.prompt(yellow).contains("[LT]"));
+            assertFalse(CombatTeachingPreferences.prompt(red).contains("[Parry]"));
+            assertEquals("",CombatTeachingPreferences.prompt(lesson));
+        }
+        assertEquals(0,CombatTeachingPreferences.attackReadability(3L << 48));
     }
 
     @Test public void disabledAndSkippedStatesHaveNoActiveCuePrompt() {

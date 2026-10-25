@@ -445,6 +445,28 @@ public class AndroidControllerIntegrationTest {
         press(KeyEvent.KEYCODE_BUTTON_R2);assertEquals(0,Bridge.attacks);
         a.onWindowFocusChanged(true);confirmLabel(a.getString(R.string.resume_demo));assertFalse(field("menuVisible").getBoolean(a));
     }
+    @Test public void pauseMenuOpenCloseCancelsHeldGuardMovementAndLookWithoutRearming() throws Exception {
+        set("firstMenu",false);
+        int[] pointers=(int[])field("activePointers").get(a);pointers[0]=3;pointers[1]=7;
+        float[] controls=(float[])field("viewControls").get(a);controls[7]=.4f;controls[8]=.6f;
+        call("pushViewControls",new Class<?>[]{});
+        long now=SystemClock.uptimeMillis();
+        a.dispatchKeyEvent(new KeyEvent(now,now,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);assertTrue(Bridge.analogue);
+        call("showMainMenu",new Class<?>[]{boolean.class},false);
+        assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
+        assertFalse(Bridge.guardHeld);assertArrayEquals(new int[]{-1,-1},pointers);
+        assertEquals(0,Bridge.x,0);assertEquals(0,Bridge.z,0);assertFalse(Bridge.analogue);
+        confirmLabel(a.getString(R.string.resume_demo));
+        assertFalse(field("menuVisible").getBoolean(a));assertFalse(Bridge.paused);
+        assertFalse(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        a.dispatchKeyEvent(new KeyEvent(now,SystemClock.uptimeMillis(),KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_Q,1,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        assertFalse("held key repeat after Resume cannot restore guard",Bridge.guardHeld);
+        a.dispatchKeyEvent(new KeyEvent(now,SystemClock.uptimeMillis(),KeyEvent.ACTION_UP,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        a.dispatchKeyEvent(new KeyEvent(now,SystemClock.uptimeMillis(),KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        assertTrue(Bridge.guardHeld);assertEquals(2,Bridge.parries);
+    }
+
     @Test public void rapidDpadPressNavigatesBeforeItsRelease()throws Exception {
         set("menuVisible",true);FrameLayout root=(FrameLayout)field("menuScrim").get(a);root.setVisibility(View.VISIBLE);
         LinearLayout panel=new LinearLayout(a);panel.setOrientation(LinearLayout.VERTICAL);root.addView(panel);

@@ -27,11 +27,13 @@ public final class CombatTeachingUiSchedulingTest {
         static long chargeStartedAtMs;
         static int reads;
         static int surfaceState = 1;
+        static long overrideState = Long.MIN_VALUE;
 
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static int getSurfaceRuntimeState(long generation) { return surfaceState; }
         @Implementation protected static long getCombatTeachingState() {
             ++reads;
+            if (overrideState != Long.MIN_VALUE) return overrideState;
             final long elapsedMs = SystemClock.uptimeMillis() - chargeStartedAtMs;
             final double remainingMs = 1200.0 - elapsedMs;
             final int cue = elapsedMs >= 1320 ? 0 : elapsedMs >= 1200 ? 6 :
@@ -67,6 +69,7 @@ public final class CombatTeachingUiSchedulingTest {
         field("interactButton").set(activity, new android.widget.Button(activity));
         field("toggleHeldLightPoseButton").set(activity, new android.widget.Button(activity));
         NativeTeaching.surfaceState = 1;
+        NativeTeaching.overrideState = Long.MIN_VALUE;
         return activity;
     }
 
@@ -113,6 +116,34 @@ public final class CombatTeachingUiSchedulingTest {
         }
         assertTrue("32 ms prompt refresh failed cue timing across initial poll phases: " +
                 missedOffsets, missedOffsets.length() == 0);
+    }
+
+    @Test public void currentAttackPresentationSurvivesDisabledLessonAndClearsWithoutAStaleFade() throws Exception {
+        final MainActivity activity=activeActivity();
+        final TextView prompt=(TextView)field("combatTeachingPrompt").get(activity);
+        final java.lang.reflect.Method update=MainActivity.class.getDeclaredMethod("updateCombatTeachingPrompt",int.class);
+        update.setAccessible(true);
+        NativeTeaching.overrideState=2L << 48; // Lesson disabled, no old opacity.
+        assertTrue((Boolean)update.invoke(activity,1));
+        assertEquals(View.VISIBLE,prompt.getVisibility());
+        assertEquals("\u2715 RED: DODGE",prompt.getText().toString());
+        assertEquals(0xFFFF6B6B,prompt.getCurrentTextColor());
+        assertEquals(1f,prompt.getAlpha(),0f);
+        assertTrue(prompt.getContentDescription().toString().contains("unblockable"));
+        NativeTeaching.overrideState=(1L << 48) | 2L | (1L << 10); // Lesson already complete.
+        assertTrue((Boolean)update.invoke(activity,1));
+        assertEquals("\u25c7 YELLOW: PARRY",prompt.getText().toString());
+        assertEquals(0xFFFFD266,prompt.getCurrentTextColor());
+        NativeTeaching.overrideState=2L | (1L << 10); // Current attack is neutral.
+        assertFalse((Boolean)update.invoke(activity,1));
+        assertEquals(View.GONE,prompt.getVisibility());
+        assertEquals("",prompt.getText().toString());
+        assertEquals("",prompt.getContentDescription().toString());
+        assertEquals("",field("combatTeachingFadeText").get(activity));
+        NativeTeaching.overrideState=2L << 48;
+        field("menuVisible").setBoolean(activity,true);
+        assertFalse((Boolean)update.invoke(activity,1));
+        assertEquals(View.GONE,prompt.getVisibility());
     }
 
     @Test public void pauseAndSurfaceDetachCancelTheTimelyPollAndClearTheCue() throws Exception {

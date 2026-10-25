@@ -135,11 +135,15 @@
 
     <Button
         android:id="@+id/menu_button"
-        android:layout_width="72dp"
+        android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="top|end"
         android:layout_margin="16dp"
-        android:text="@string/menu"
+        android:text=""
+        android:drawableLeft="@drawable/ic_pause"
+        android:drawablePadding="0dp"
+        android:gravity="center"
+        android:contentDescription="@string/pause_menu"
         android:textSize="12sp" />
 
     <Button

@@ -2,6 +2,7 @@
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "scene/SkeletonRenderPose.h"
 #include "scene/TriangleDissolve.h"
+#include "gameplay/effects/KeeperCastPresentation.h"
 
 #include <algorithm>
 #include <cmath>
@@ -54,12 +55,6 @@ std::array<float, 4u> RotationAroundX(const float radians)
     return {{std::sin(halfAngle), 0.0f, 0.0f, std::cos(halfAngle)}};
 }
 
-float SmoothStep01(const float value)
-{
-    const float clamped = std::clamp(value, 0.0f, 1.0f);
-    return clamped * clamped * (3.0f - 2.0f * clamped);
-}
-
 } // namespace
 
 CharacterFramePlan EvaluateCharacterFramePlan(
@@ -84,21 +79,9 @@ CharacterFramePlan EvaluateCharacterFramePlan(
         ? horde::scene::SkinnedClip::Dead
         : horde::scene::SkinnedClip::Idle;
     plan.lichTime = lich.animationTime;
-    if (lich.readableCastPresentation && lich.phase == horde::gameplay::LichPhase::Charging)
-    {
-        const float chargeFraction = std::clamp(
-            lich.phaseTime / horde::gameplay::LichEncounter::kChargeDuration, 0.0f, 1.0f);
-        // Reach the held anticipation pose before discharge and keep it through
-        // the final fifth of the authoritative 1.20 second charge.
-        plan.lichStaffLiftRadians = 0.58f * SmoothStep01(chargeFraction / 0.80f);
-    }
-    else if (lich.readableCastPresentation && lich.phase == horde::gameplay::LichPhase::Recovering)
-    {
-        const float castFade = 1.0f - SmoothStep01(
-            lich.phaseTime / horde::gameplay::LichEncounter::kDischargeVisibleBurstDuration);
-        plan.lichStaffLiftRadians = 0.58f * castFade;
-        plan.lichStaffCastRadians = 0.46f * castFade;
-    }
+    const auto castPose = horde::gameplay::effects::EvaluateKeeperCastPose(lich);
+    plan.lichStaffLiftRadians = castPose.staffLiftRadians;
+    plan.lichStaffCastRadians = castPose.staffCastRadians;
     plan.lichTransform = LichInstanceTransform(lich);
     plan.skeletonCount = std::min<std::size_t>(skeletonCount, plan.skeletons.size());
     for (std::size_t skeletonIndex = 0u; skeletonIndex < plan.skeletonCount; ++skeletonIndex)
@@ -337,12 +320,16 @@ bool CharacterRenderSlot::PrepareFrame(
             }
             else
             {
-                const std::array<horde::scene::SkinnedNodeRotation, 2u> castPose{{
+                const float upperBodyPitch = horde::gameplay::effects::KeeperCastUpperBodyPitch(
+                    framePlan.lichStaffLiftRadians, framePlan.lichStaffCastRadians);
+                const std::array<horde::scene::SkinnedNodeRotation, 3u> castPose{{
                     {"LeftArm", RotationAroundX(-framePlan.lichStaffLiftRadians -
                                                   framePlan.lichStaffCastRadians)},
-                    {"LeftForeArm", RotationAroundX(-0.72f * framePlan.lichStaffLiftRadians)}}};
+                    {"LeftForeArm", RotationAroundX(-0.72f * framePlan.lichStaffLiftRadians)},
+                    {"Spine", RotationAroundX(upperBodyPitch)}}};
                 skinned = lichModel_.SkinTextured(framePlan.lichClip, framePlan.lichTime,
-                                                  lichSkinnedVertices_, diagnostic, castPose,
+                                                  lichSkinnedVertices_, diagnostic,
+                                                  std::span(castPose).first(upperBodyPitch == 0.0f ? 2u : 3u),
                                                   WantsSkinWorkMetrics(observation)?&work:nullptr);
             }
             if (!skinned)

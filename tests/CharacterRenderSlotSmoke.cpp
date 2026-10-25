@@ -10,6 +10,7 @@
 #include "KeeperLowerBodyWitnesses.h"
 #include "scene/TriangleDissolve.h"
 #include "CompiledShaderContracts.h"
+#include "gameplay/effects/KeeperCastPresentation.h"
 
 #include <cmath>
 #include <atomic>
@@ -2070,15 +2071,51 @@ int main()
         const auto recoveryBoundary = EvaluateCharacterFramePlan(
             skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
         castSnapshot.phaseTime = 0.18f;
+        const auto visibleBurstEnd = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phaseTime = 0.60f;
         const auto recoveryEnd = EvaluateCharacterFramePlan(
             skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        const bool weightedSelected = horde::gameplay::effects::kKeeperCastPoseStyle ==
+            horde::gameplay::effects::KeeperCastPoseStyle::WeightedCandidate;
+        const bool selectedDischargeJoin = weightedSelected
+            ? Near(recoveryBoundary.lichStaffCastRadians, 0.0f) && visibleBurstEnd.lichStaffCastRadians > 0.0f
+            : recoveryBoundary.lichStaffCastRadians > 0.0f && Near(visibleBurstEnd.lichStaffCastRadians, 0.0f);
         ok &= Require(earlyCast.lichStaffLiftRadians < lateCast.lichStaffLiftRadians &&
                       Near(lateCast.lichStaffLiftRadians, chargeBoundary.lichStaffLiftRadians) &&
                       Near(chargeBoundary.lichStaffLiftRadians, recoveryBoundary.lichStaffLiftRadians) &&
-                      recoveryBoundary.lichStaffCastRadians > 0.0f &&
+                      selectedDischargeJoin &&
                       Near(recoveryEnd.lichStaffLiftRadians, 0.0f) &&
                       Near(recoveryEnd.lichStaffCastRadians, 0.0f),
-                      "readable keeper staff pose must lift into a held anticipation, continue across discharge, and blend out over the visible recovery burst");
+                      "weighted keeper pose must join discharge continuously and settle after, without extending, the actual visible light burst");
+        using horde::gameplay::effects::EvaluateKeeperCastPose;
+        using horde::gameplay::effects::KeeperCastPoseStyle;
+        LichSnapshot controlSnapshot = castSnapshot;
+        controlSnapshot.phase = LichPhase::Charging;
+        controlSnapshot.phaseTime = 0.96f;
+        const auto existingLift = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::ExistingControl);
+        const auto weightedLift = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::WeightedCandidate);
+        controlSnapshot.phaseTime = 0.36f;
+        const auto weightedBrace = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::WeightedCandidate);
+        controlSnapshot.phase = LichPhase::Recovering;
+        controlSnapshot.phaseTime = 0.0f;
+        const auto existingRelease = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::ExistingControl);
+        controlSnapshot.phaseTime = 0.18f;
+        const auto existingSettled = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::ExistingControl);
+        controlSnapshot.phaseTime = 0.10f;
+        const auto weightedRelease = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::WeightedCandidate);
+        controlSnapshot.phaseTime = 0.35f;
+        const auto weightedSettling = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::WeightedCandidate);
+        ok &= Require(Near(existingLift.staffLiftRadians, 0.58f) &&
+                      Near(existingRelease.staffLiftRadians, 0.58f) &&
+                      Near(existingRelease.staffCastRadians, 0.46f) &&
+                      existingRelease.upperBodyPitchRadians == 0.0f &&
+                      existingSettled.staffLiftRadians == 0.0f && existingSettled.staffCastRadians == 0.0f &&
+                      Near(weightedBrace.staffLiftRadians, 0.22f) &&
+                      Near(weightedLift.staffLiftRadians, 0.72f) &&
+                      Near(weightedRelease.staffCastRadians, 0.50f) &&
+                      weightedLift.upperBodyPitchRadians < 0.0f && weightedRelease.upperBodyPitchRadians > 0.0f,
+                      "original control curve must remain exact alongside the bounded upper-body brace and release candidate");
         castSnapshot.phase = LichPhase::Dormant;
         const auto castReset = EvaluateCharacterFramePlan(
             skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
@@ -2120,6 +2157,39 @@ int main()
                                                 liftedSkin, diagnostic, liftedPose), diagnostic.c_str());
             ok &= Require(castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
                                                 forwardSkin, diagnostic, forwardPose), diagnostic.c_str());
+            // Spine was verified in the actual 24-joint source, above the
+            // independent Hips/leg chains. Pin every existing lower-body skin
+            // witness for the strongest brace/release and a settling sample.
+            for (const auto pose : {weightedLift, weightedRelease, weightedSettling})
+            {
+                const auto rotationX = [](float value) -> std::array<float, 4u> {
+                    return {{std::sin(value * 0.5f), 0.0f, 0.0f, std::cos(value * 0.5f)}};
+                };
+                const std::array<horde::scene::SkinnedNodeRotation, 3u> weightedPose{{
+                    {"LeftArm", rotationX(-pose.staffLiftRadians - pose.staffCastRadians)},
+                    {"LeftForeArm", rotationX(-0.72f * pose.staffLiftRadians)},
+                    {"Spine", rotationX(pose.upperBodyPitchRadians)}}};
+                std::vector<horde::scene::TexturedSkinnedRtVertex> weightedSkin;
+                ok &= Require(castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                   weightedSkin, diagnostic, weightedPose), diagnostic.c_str());
+                bool finite = !weightedSkin.empty() && weightedSkin.size() == neutralSkin.size();
+                for (const auto& vertex : weightedSkin)
+                {
+                    for (float value : vertex.position) finite &= std::isfinite(value);
+                    for (float value : vertex.normal) finite &= std::isfinite(value);
+                }
+                bool lowerBodyExact = finite;
+                for (const auto& witness : horde::tests::keeper_lower_body_witnesses::kWitnesses)
+                {
+                    if (witness.outputIndex >= weightedSkin.size() || witness.outputIndex >= neutralSkin.size())
+                    { lowerBodyExact = false; continue; }
+                    for (std::size_t axis = 0; axis < 3u; ++axis)
+                        lowerBodyExact &= weightedSkin[witness.outputIndex].position[axis] ==
+                                          neutralSkin[witness.outputIndex].position[axis];
+                }
+                ok &= Require(finite && lowerBodyExact,
+                              "weighted upper-body cast must keep all audited lower-body vertices exactly fixed with finite skin");
+            }
         }
         std::vector<horde::scene::TexturedSkinnedRtVertex> identitySkin;
         if (castSkin.IsLoaded())

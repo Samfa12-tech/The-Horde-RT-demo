@@ -108,6 +108,129 @@ void TeachingContract() {
     Check(sim.Snapshot().playerVitals.vitality==3&&sim.Snapshot().combatTeaching.stage==TutorialStage::Parry,
           "replay explicitly resets opening and restores teachable state");
 }
+void AttackReadabilityContract() {
+    Check(CombatTeachingSnapshot{}.attackReadability==AttackReadability::Neutral,
+          "readability defaults to neutral before any live attack");
+    CombatSnapshot combat; LichSnapshot keeper;
+    combat.attackerIndex=0;
+    combat.combatants[0].action=EnemyCombatAction::AttackWindup;
+    combat.combatants[0].actionTime=0.0f;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Skeleton,true)==AttackReadability::Parryable,
+          "yellow classification starts at the existing skeleton wind-up, not the later parry-now lesson");
+    combat.combatants[0].action=EnemyCombatAction::AttackActive;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Skeleton,true)==AttackReadability::Parryable,
+          "existing skeleton active phase retains its parryable attack category");
+    combat.combatants[0].action=EnemyCombatAction::AttackRecovery;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Skeleton,true)==AttackReadability::Neutral,
+          "skeleton recovery returns immediately to neutral rather than retaining a yellow cue");
+    combat.combatants[0].action=EnemyCombatAction::AttackWindup;
+    combat.combatants[0].health=0;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Skeleton,true)==AttackReadability::Neutral,
+          "a dead skeleton cannot publish a stale attack category");
+    combat.combatants[0].health=1; combat.attackerIndex=-1;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Skeleton,true)==AttackReadability::Neutral,
+          "an absent attack token is neutral");
+    combat.attackerIndex=static_cast<std::int32_t>(combat.combatants.size());
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Skeleton,true)==AttackReadability::Neutral,
+          "an out-of-range attack token cannot read an unrelated combatant");
+    combat.attackerIndex=0; combat.aliveCount=0;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Skeleton,true)==AttackReadability::Neutral,
+          "an empty live roster is neutral even if an old token remains");
+    combat.aliveCount=1;
+
+    keeper.revealComplete=true; keeper.revealPhase=KeeperRevealPhase::Combat;
+    keeper.readableCastPresentation=true; keeper.phase=LichPhase::Charging; keeper.phaseTime=0.0f;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Lich,true)==AttackReadability::Unblockable,
+          "red classification starts at real charge onset, before the narrow dodge-now lesson");
+    keeper.phase=LichPhase::Recovering; keeper.phaseTime=0.0f;
+    keeper.staffLightStrength=LichEncounter::kStaffLightPeak;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Lich,true)==AttackReadability::Unblockable,
+          "the existing visible discharge remains red at the charge-to-recovery boundary");
+    keeper.phaseTime=LichEncounter::kDischargeVisibleBurstDuration;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Lich,true)==AttackReadability::Neutral,
+          "red leaves at the existing half-open discharge endpoint, not the end of all recovery");
+    keeper.phase=LichPhase::MaintainingRange;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Lich,true)==AttackReadability::Neutral,
+          "Keeper rest and positioning keep the neutral baseline");
+    keeper.phase=LichPhase::Charging; keeper.revealComplete=false;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Lich,true)==AttackReadability::Neutral,
+          "uncompleted reveal never displays a premature live attack");
+    keeper.revealComplete=true; keeper.revealPhase=KeeperRevealPhase::Warning;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Lich,true)==AttackReadability::Neutral,
+          "reveal presentation is neutral even for an inconsistent stale charge phase");
+    keeper.revealPhase=KeeperRevealPhase::Combat; keeper.health=0;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Lich,true)==AttackReadability::Neutral,
+          "death suppresses a stale red charge");
+    keeper.health=3;
+    Check(EvaluateAttackReadability(combat,keeper,EnemyKind::Lich,false)==AttackReadability::Neutral &&
+          EvaluateAttackReadability(combat,keeper,EnemyKind::Skeleton,false)==AttackReadability::Neutral,
+          "ineligible paused, dead or legacy presentation cannot publish attack warnings");
+
+    for(int lesson=0;lesson<3;++lesson) {
+        CombatTeaching teaching; teaching.Reset(true);
+        if(lesson==1) { teaching.ParrySucceeded(); teaching.DodgeSucceeded(); }
+        if(lesson==2) teaching.Skip();
+        teaching.Update(lesson!=0,false,false,combat,keeper,EnemyKind::Skeleton);
+        Check(teaching.Snapshot().attackReadability==AttackReadability::Parryable &&
+              !teaching.Snapshot().safePractice && !teaching.Snapshot().slowdownActive &&
+              teaching.Snapshot().promptOpacity==0,
+              "disabled, completed and skipped lessons retain early classification without practice or tutorial opacity");
+        teaching.Update(lesson!=0,false,false,combat,keeper,EnemyKind::Lich);
+        Check(teaching.Snapshot().attackReadability==AttackReadability::Unblockable,
+              "red attack classification also survives disabled/completed/skipped lessons");
+        teaching.Update(lesson!=0,false,true,combat,keeper,EnemyKind::Lich);
+        Check(teaching.Snapshot().attackReadability==AttackReadability::Neutral,
+              "suspension clears category without advancing an independent warning clock");
+    }
+
+    // Shared snapshot publication must use the phase advanced this tick, not
+    // CombatTeaching::Update's deliberately pre-step lesson state.
+    auto config=Rules(); config.waterfallSkeletonEncounter=false;
+    config.playerStartX=0; config.playerStartZ=-3.75f;
+    GameSimulation sim(config); InputSnapshot input;
+    input.tutorialEnabled=false; input.damageEnabled=false;
+    bool windup=false, active=false, recovery=false;
+    for(int tick=0;tick<500 && !recovery;++tick) {
+        sim.StepFixed(input);
+        const auto state=sim.Snapshot();
+        const auto index=state.swordCombat.attackerIndex;
+        if(index>=0) {
+            const auto phase=state.swordCombat.combatants[index].action;
+            if(!windup && phase==EnemyCombatAction::AttackWindup) {
+                windup=true;
+                Check(state.combatTeaching.attackReadability==AttackReadability::Parryable &&
+                      !state.combatTeaching.enabled,
+                      "latest live wind-up is yellow in the same snapshot with teaching disabled");
+                input.paused=true; sim.AdvanceFrame(input,0.0);
+                Check(sim.Snapshot().combatTeaching.attackReadability==AttackReadability::Neutral,
+                      "pause publishes neutral without waiting for a gameplay step");
+                input.paused=false; sim.AdvanceFrame(input,0.0);
+                Check(sim.Snapshot().combatTeaching.attackReadability==AttackReadability::Parryable,
+                      "resuming publishes the still-current phase without advancing a cue timer");
+            }
+            if(!active && phase==EnemyCombatAction::AttackActive) {
+                active=true;
+                Check(state.combatTeaching.attackReadability==AttackReadability::Parryable,
+                      "same-tick active publication retains the existing yellow attack category");
+            }
+            if(phase==EnemyCombatAction::AttackRecovery) {
+                recovery=true;
+                Check(state.combatTeaching.attackReadability==AttackReadability::Neutral,
+                      "same-tick recovery publication clears yellow despite the previous lesson cue");
+            }
+        }
+        sim.ClearEvents();
+    }
+    Check(windup && active && recovery,"readability fixture witnesses actual attack phase progression");
+    input.damageEnabled=true;
+    for(int tick=0;tick<1200 && sim.Snapshot().playerAlive;++tick) {
+        sim.StepFixed(input); sim.ClearEvents();
+    }
+    Check(!sim.Snapshot().playerAlive &&
+          sim.Snapshot().combatTeaching.attackReadability==AttackReadability::Neutral,
+          "the real lethal damage snapshot suppresses attack classification immediately");
+}
+
 void KeeperContract() {
     LichEncounter keeper; keeper.SetReadableCombat(true); keeper.BeginRetryRecognition();
     for(int i=0;i<60;++i) keeper.Update(1.0f/60,kKeeperRetryPosition.x,kKeeperRetryPosition.z,true,true);
@@ -1028,7 +1151,7 @@ void RouteMeleeOcclusion() {
           "clear moving target advances and receives exactly one forgiving hit");
 }
 int main() {
-    WindowAndLifecycle(); TeachingContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();
+    WindowAndLifecycle(); TeachingContract(); AttackReadabilityContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();
     HeldGuardDamageContract(); GuardAttackAndReleaseAtContact(); GuardInterruptionRearm();
     IntegratedKeeperRepelAndReward();
     OutgoingTraceContract();

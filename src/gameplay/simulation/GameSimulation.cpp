@@ -2816,6 +2816,12 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.acceptedDodgeSequence = acceptedDodgeSequence_;
     snapshot_.dodgeProtectedHitCount = dodgeProtectedHitCount_;
     snapshot_.combatTeaching = combatTeaching_.Snapshot();
+    // Recompute from the phases just advanced on this authoritative tick, not
+    // the pre-step teaching cue. Readability survives disabled/completed lessons.
+    snapshot_.combatTeaching.attackReadability = EvaluateAttackReadability(
+        combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_,
+        CurrentCombatRules() && !input.paused &&
+            playerVitals_.Snapshot().phase == PlayerLifePhase::Alive);
     snapshot_.keeperRepelRemainingSeconds = keeperRepelRemainingSeconds_;
     snapshot_.keeperRepelTravelledMetres = keeperRepelTravelledMetres_;
     snapshot_.gameplayTimeScale = gameplayTimeScale_;

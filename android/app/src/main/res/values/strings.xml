@@ -99,6 +99,7 @@
     <string name="retry_encounter">RETRY ENCOUNTER</string>
     <string name="retry_unavailable">The encounter cannot be restored yet.</string>
     <string name="retrying_encounter">Restoring encounter…</string>
+    <string name="pause_menu">Pause / menu</string>
     <string name="menu">MENU</string>
     <string name="rt_starting">VULKAN RT STARTING…</string>
     <string name="rt_active">NATIVE VULKAN RT ACTIVE</string>

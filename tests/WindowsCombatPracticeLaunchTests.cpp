@@ -53,6 +53,29 @@ int main()
     check(ParseWindowsCombatPracticeLaunch({L"--unrelated"}).error.empty() &&
               ParseWindowsCombatPracticeLaunch({L"--unrelated"}).practice == WindowsCombatPractice::None,
           "unrelated ordinary arguments remain ignored");
+    using horde::gameplay::simulation::AttackReadability;
+    horde::gameplay::simulation::CombatTeachingSnapshot persistent;
+    persistent.enabled = false;
+    persistent.stage = horde::gameplay::simulation::TutorialStage::Skipped;
+    persistent.promptOpacity = 0.0f;
+    persistent.attackReadability = AttackReadability::Parryable;
+    check(CombatTeachingPromptText(persistent) == "<> YELLOW: PARRY" &&
+              horde::platform::windows::HasAttackReadabilityCue(persistent) &&
+              horde::platform::windows::AttackReadabilityColourRgb(persistent.attackReadability) == 0xFFD266u,
+          "yellow parryable attack has a diamond/text/color cue after the lesson is skipped or disabled");
+    persistent.attackReadability = AttackReadability::Unblockable;
+    check(CombatTeachingPromptText(persistent) == "[X] RED: DODGE" &&
+              horde::platform::windows::AttackReadabilityColourRgb(persistent.attackReadability) == 0xFF6B6Bu,
+          "red unblockable attack has a distinct cross/text/color dodge cue without lesson spam");
+    persistent.enabled = true;
+    persistent.stage = horde::gameplay::simulation::TutorialStage::Complete;
+    check(CombatTeachingPromptText(persistent, true) == "[X] RED: DODGE",
+          "completed teaching does not suppress or append a lesson to current attack readability");
+    persistent.attackReadability = AttackReadability::Neutral;
+    check(CombatTeachingPromptText(persistent).empty() &&
+              !horde::platform::windows::HasAttackReadabilityCue(persistent),
+          "neutral returns to no persistent warning after the lesson");
+
     using horde::gameplay::simulation::CombatTeachingCue;
     using horde::gameplay::simulation::TutorialStage;
     horde::gameplay::simulation::CombatTeachingSnapshot teaching;
@@ -61,7 +84,7 @@ int main()
     teaching.cue = CombatTeachingCue::ParryWindup;
     teaching.cueProgress = 0.5f;
     const auto windup = CombatTeachingPromptText(teaching);
-    check(windup.find("O Watch the raised blade") != std::string::npos &&
+    check(windup.find("O Watch the raised arm / attacker") != std::string::npos &&
               windup.find("COMBAT LESSON") == std::string::npos &&
               windup.find("###") == std::string::npos &&
               windup.find("[Q]") != std::string::npos &&
@@ -71,12 +94,12 @@ int main()
     const auto press = CombatTeachingPromptText(teaching);
     check(press.find("o PARRY NOW") != std::string::npos &&
               press.find("fresh press to parry") != std::string::npos &&
-              press.find("O Watch the raised blade") == std::string::npos,
+              press.find("O Watch the raised arm / attacker") == std::string::npos,
           "anticipatory press and live blade-window prompts stay distinct");
     teaching.cue = CombatTeachingCue::ParryActive;
     const auto active = CombatTeachingPromptText(teaching);
     check(active.find("(*) Guard up") != std::string::npos &&
-              active.find("face the blade") != std::string::npos &&
+              active.find("face the attacker") != std::string::npos &&
               active.find("PARRY NOW") == std::string::npos,
           "filled shape is reserved for the live blade window");
     teaching.cue = CombatTeachingCue::DodgeNow;
