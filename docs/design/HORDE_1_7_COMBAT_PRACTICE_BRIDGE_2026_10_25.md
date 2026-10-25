@@ -12,6 +12,13 @@ tests the proposed state machine without wiring it into `GameSimulation`.
 One contact-aware stand has sampled Blender previews, not native export/RT
 acceptance. Production behavior and the original assets remain unchanged.
 
+The later [native pose proof](../evidence/2026-10-25-skeleton-stand-native/README.md)
+now passes actual import and hidden RT joins/contact inspection in one view.
+Gameplay wiring is still next, including both death animations settling before
+Signal and coherent revived Idle clocks (the asset fixture joins Idle0, while
+normal Skeleton B starts with a0.73-second phase offset). No actual resurrection
+or scream is enabled by that pose evidence.
+
 Owner direction now includes normal/full block, yellow/guard-break but parryable,
 red/avoid; a protected chance to practise block, timed parry, dodge and attacking
 from guard; then the same two skeletons raised once by the lich before real

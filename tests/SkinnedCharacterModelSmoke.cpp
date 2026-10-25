@@ -17,6 +17,7 @@
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <iterator>
 #include <limits>
 #include <string>
 #include <string_view>
@@ -1256,10 +1257,268 @@ GripSurfaceMetrics MeasureGripSurface(
     return metrics;
 }
 
+// Isolated private-asset gate. It does not register a production clip binding.
+constexpr std::size_t kStandReferenceSampleCount = 36u;
+constexpr std::size_t kStandReferenceVertexCount = 66u;
+constexpr std::array<std::string_view, 12u> kStandReferenceJointNames{{
+    "Hips", "LeftUpLeg", "LeftLeg", "LeftFoot", "LeftToeBase",
+    "RightUpLeg", "RightLeg", "RightFoot", "RightToeBase", "Head",
+    "LeftHand", "RightHand"}};
+
+struct StandReferenceVertex
+{
+    std::uint32_t uniqueIndex = 0u;
+    std::uint32_t expandedIndex = 0u;
+    std::uint32_t soleFlags = 0u;
+};
+
+struct StandReferenceSample
+{
+    float timeSeconds = 0.0f;
+    std::array<Vec3, kStandReferenceVertexCount> vertices{};
+    std::array<horde::scene::SkinnedNodeTransform, kStandReferenceJointNames.size()> joints{};
+};
+
+struct StandReference
+{
+    std::array<StandReferenceVertex, kStandReferenceVertexCount> map{};
+    std::array<StandReferenceSample, kStandReferenceSampleCount> samples{};
+};
+
+StandReference ReadStandReference(const std::filesystem::path& path,
+                                 const std::size_t uniqueCount,
+                                 const std::size_t expandedCount)
+{
+    std::ifstream input(path, std::ios::binary | std::ios::ate);
+    const auto size = input.tellg();
+    if (!input || size <= 0 || size > 64 * 1024)
+        throw std::runtime_error("SSP1 reference is unavailable or exceeds its bounded size.");
+    std::vector<unsigned char> bytes(static_cast<std::size_t>(size));
+    input.seekg(0);
+    input.read(reinterpret_cast<char*>(bytes.data()), static_cast<std::streamsize>(bytes.size()));
+    if (!input || input.gcount() != static_cast<std::streamsize>(bytes.size()))
+        throw std::runtime_error("SSP1 reference read was incomplete.");
+    std::size_t offset = 0u;
+    const auto readU32 = [&]() {
+        if (bytes.size() - offset < 4u) throw std::runtime_error("Truncated SSP1 scalar.");
+        const std::uint32_t value = static_cast<std::uint32_t>(bytes[offset]) |
+            (static_cast<std::uint32_t>(bytes[offset + 1u]) << 8u) |
+            (static_cast<std::uint32_t>(bytes[offset + 2u]) << 16u) |
+            (static_cast<std::uint32_t>(bytes[offset + 3u]) << 24u);
+        offset += 4u;
+        return value;
+    };
+    const auto readFloat = [&]() {
+        const auto bits = readU32();
+        float value = 0.0f;
+        static_assert(sizeof(value) == sizeof(bits) && std::numeric_limits<float>::is_iec559);
+        std::memcpy(&value, &bits, sizeof(value));
+        if (!std::isfinite(value)) throw std::runtime_error("Non-finite SSP1 value.");
+        return value;
+    };
+    if (readU32() != 0x31505353u || readU32() != kStandReferenceSampleCount ||
+        readU32() != kStandReferenceVertexCount || readU32() != kStandReferenceJointNames.size() ||
+        readFloat() != 1.5f)
+        throw std::runtime_error("SSP1 header/count/duration does not match this stand proof.");
+    StandReference reference;
+    std::array<std::size_t, 2u> soleCounts{};
+    for (std::size_t i = 0u; i < reference.map.size(); ++i)
+    {
+        auto& vertex = reference.map[i];
+        vertex.uniqueIndex = readU32();
+        vertex.expandedIndex = readU32();
+        vertex.soleFlags = readU32();
+        if (vertex.uniqueIndex >= uniqueCount || vertex.expandedIndex >= expandedCount ||
+            vertex.soleFlags > 3u ||
+            (i > 0u && vertex.uniqueIndex <= reference.map[i - 1u].uniqueIndex))
+            throw std::runtime_error("SSP1 vertex map has invalid bounds, flags or unique ordering.");
+        for (std::size_t previous = 0u; previous < i; ++previous)
+            if (reference.map[previous].expandedIndex == vertex.expandedIndex)
+                throw std::runtime_error("SSP1 expanded vertex map contains duplicates.");
+        for (std::size_t foot = 0u; foot < soleCounts.size(); ++foot)
+            if (vertex.soleFlags & (1u << foot)) ++soleCounts[foot];
+    }
+    if (soleCounts[0] == 0u || soleCounts[1] == 0u)
+        throw std::runtime_error("SSP1 must include both support-sole sets.");
+    for (const auto expected : kStandReferenceJointNames)
+    {
+        const auto length = readU32();
+        if (length != expected.size() || length > bytes.size() - offset ||
+            std::memcmp(bytes.data() + offset, expected.data(), length) != 0)
+            throw std::runtime_error("SSP1 joint roster differs from the authored proof.");
+        offset += length;
+    }
+    std::vector<float> expectedTimes;
+    for (unsigned k = 0u; k <= 30u; ++k)
+        expectedTimes.push_back(static_cast<float>(static_cast<double>(k) / 20.0));
+    for (const double key : {0.5, 21.5, 43.5, 67.5, 89.5})
+        expectedTimes.push_back(static_cast<float>(key / 60.0));
+    std::sort(expectedTimes.begin(), expectedTimes.end());
+    for (std::size_t i = 0u; i < reference.samples.size(); ++i)
+    {
+        auto& sample = reference.samples[i];
+        sample.timeSeconds = readFloat();
+        if (sample.timeSeconds != expectedTimes[i] ||
+            (i > 0u && sample.timeSeconds <= reference.samples[i - 1u].timeSeconds))
+            throw std::runtime_error("SSP1 sample time/order differs from the 36-time proof roster.");
+        for (auto& point : sample.vertices)
+            for (auto& component : point) component = readFloat();
+        for (auto& joint : sample.joints)
+            for (auto& component : joint) component = readFloat();
+    }
+    if (offset != bytes.size()) throw std::runtime_error("SSP1 has trailing/unconsumed data.");
+    return reference;
+}
+
+bool RunSkeletonStandProof(const char* originalPath, const char* candidatePath,
+                           const char* referencePath)
+{
+    using namespace horde::scene;
+    try
+    {
+        std::string diagnostic;
+        const auto nativeSucceeded = [&diagnostic](const bool succeeded) {
+            return Require(succeeded, diagnostic.c_str());
+        };
+        SkinnedMeshAsset original, candidate;
+        std::array<SkinnedClipBinding, 5u> bindings{};
+        std::copy(SkeletonCombatClipSet().clips.begin(), SkeletonCombatClipSet().clips.end(),
+                  bindings.begin());
+        bindings[4] = {"SkeletonProof|StandDead0ToIdle", false, true};
+        if (!nativeSucceeded(original.LoadCombatClips(originalPath, diagnostic)) ||
+            !nativeSucceeded(candidate.LoadClips(candidatePath, bindings, diagnostic))) return false;
+        constexpr auto standClip = static_cast<SkinnedClip>(4u); // caller-selected diagnostic slot only
+        if (!Require(original.UniqueVertexCount() == 9854u &&
+                     original.ExpandedVertexCount() == 28206u &&
+                     candidate.UniqueVertexCount() == original.UniqueVertexCount() &&
+                     candidate.ExpandedVertexCount() == original.ExpandedVertexCount() &&
+                     candidate.ClipDuration(standClip) == 1.5f,
+                     "stand candidate layout or appended duration differs from the pinned skeleton")) return false;
+        const auto reference = ReadStandReference(referencePath, candidate.UniqueVertexCount(),
+                                                   candidate.ExpandedVertexCount());
+        const auto finite = [](const std::vector<SkinnedRtVertex>& vertices) {
+            return !vertices.empty() && std::all_of(vertices.begin(), vertices.end(), [](const auto& vertex) {
+                return std::all_of(std::begin(vertex.position), std::end(vertex.position),
+                                  [](float value) { return std::isfinite(value); }) &&
+                       std::all_of(std::begin(vertex.normal), std::end(vertex.normal),
+                                  [](float value) { return std::isfinite(value); });
+            });
+        };
+        const auto distance = [](const float* a, const float* b) {
+            return std::hypot(std::hypot(a[0] - b[0], a[1] - b[1]), a[2] - b[2]);
+        };
+        std::vector<SkinnedRtVertex> before, after;
+        std::size_t exactOriginalSamples = 0u;
+        for (const auto clip : {SkinnedClip::Idle, SkinnedClip::Walking,
+                                SkinnedClip::Attack, SkinnedClip::Dead})
+        {
+            if (!Require(original.ClipDuration(clip) == candidate.ClipDuration(clip),
+                         "an original clip duration changed")) return false;
+            for (const float fraction : {0.0f, 0.25f, 0.5f, 0.75f, 1.0f})
+            {
+                const float time = original.ClipDuration(clip) * fraction;
+                if (!nativeSucceeded(original.Skin(clip, time, before, diagnostic) &&
+                                     candidate.Skin(clip, time, after, diagnostic)) ||
+                    !Require(finite(before) && finite(after) && before.size() == after.size() &&
+                             std::memcmp(before.data(), after.data(), before.size() * sizeof(SkinnedRtVertex)) == 0,
+                             "original clip skin output changed after append-only export")) return false;
+                std::array<SkinnedNodeTransform, kStandReferenceJointNames.size()> oldJoints{}, newJoints{};
+                if (!nativeSucceeded(original.NodeTransforms(clip, time, kStandReferenceJointNames, oldJoints, diagnostic) &&
+                                     candidate.NodeTransforms(clip, time, kStandReferenceJointNames, newJoints, diagnostic)) ||
+                    !Require(oldJoints == newJoints, "original clip joint transforms changed")) return false;
+                ++exactOriginalSamples;
+            }
+        }
+        // Same 0.1 mm cross-tool export-correspondence guard used in the recipe;
+        // this is not a new visual skating/contact threshold.
+        constexpr float crossToolGuard = 0.0001f;
+        std::array<float, 2u> endpointErrors{};
+        for (std::size_t endpoint = 0u; endpoint < endpointErrors.size(); ++endpoint)
+        {
+            if (!nativeSucceeded(original.Skin(endpoint == 0u ? SkinnedClip::Dead : SkinnedClip::Idle,
+                                               0.0f, before, diagnostic) &&
+                                 candidate.Skin(standClip, endpoint == 0u ? 0.0f : 1.5f, after, diagnostic)) ||
+                !Require(finite(before) && finite(after) && before.size() == after.size(),
+                         "stand endpoint skin output is invalid")) return false;
+            for (std::size_t vertex = 0u; vertex < before.size(); ++vertex)
+                endpointErrors[endpoint] = std::max(endpointErrors[endpoint],
+                    distance(before[vertex].position, after[vertex].position));
+            if (!Require(endpointErrors[endpoint] < crossToolGuard,
+                         "stand endpoint differs from original Dead0/Idle0 beyond the unchanged cross-tool guard")) return false;
+        }
+        float maximumVertexError = 0.0f, maximumJointElementError = 0.0f;
+        float maximumJointOriginError = 0.0f;
+        std::vector<TexturedSkinnedRtVertex> unique;
+        for (const auto& sample : reference.samples)
+        {
+            std::array<SkinnedNodeTransform, kStandReferenceJointNames.size()> joints{};
+            if (!nativeSucceeded(candidate.Skin(standClip, sample.timeSeconds, after, diagnostic) &&
+                                 candidate.SkinUniqueTextured(standClip, sample.timeSeconds, unique, diagnostic) &&
+                                 candidate.NodeTransforms(standClip, sample.timeSeconds,
+                                     kStandReferenceJointNames, joints, diagnostic)) ||
+                !Require(finite(after) && FiniteTexturedVertices(unique) &&
+                         after.size() == candidate.ExpandedVertexCount() &&
+                         unique.size() == candidate.UniqueVertexCount(),
+                         "stand reference sample has non-finite or incomplete native geometry")) return false;
+            for (std::size_t vertex = 0u; vertex < reference.map.size(); ++vertex)
+            {
+                const auto& mapped = reference.map[vertex];
+                const auto* expandedPoint = after[mapped.expandedIndex].position;
+                const auto* uniquePoint = unique[mapped.uniqueIndex].position;
+                if (!Require(std::memcmp(expandedPoint, uniquePoint, sizeof(after.front().position)) == 0,
+                             "SSP1 unique-to-expanded map does not address the same native skinned vertex")) return false;
+                maximumVertexError = std::max(maximumVertexError,
+                    distance(expandedPoint, sample.vertices[vertex].data()));
+            }
+            for (std::size_t joint = 0u; joint < joints.size(); ++joint)
+            {
+                for (std::size_t element = 0u; element < joints[joint].size(); ++element)
+                {
+                    if (!Require(std::isfinite(joints[joint][element]),
+                                 "native stand joint matrix is non-finite")) return false;
+                    maximumJointElementError = std::max(maximumJointElementError,
+                        std::abs(joints[joint][element] - sample.joints[joint][element]));
+                }
+                maximumJointOriginError = std::max(maximumJointOriginError,
+                    distance(joints[joint].data() + 12u, sample.joints[joint].data() + 12u));
+            }
+        }
+        std::cout.precision(9);
+        std::cout << "Skeleton stand native loader proof: original_exact_samples=" << exactOriginalSamples
+                  << " reference_samples=" << reference.samples.size()
+                  << " selected_vertices=" << reference.map.size()
+                  << " joints=" << kStandReferenceJointNames.size()
+                  << " dead0_endpoint_max_m=" << endpointErrors[0]
+                  << " idle0_endpoint_max_m=" << endpointErrors[1]
+                  << " reference_vertex_max_m=" << maximumVertexError
+                  << " reference_joint_origin_max_m=" << maximumJointOriginError
+                  << " reference_joint_element_max_abs=" << maximumJointElementError
+                  << " cross_tool_guard=" << crossToolGuard
+                  << "; RT/contact/naturalness/gameplay acceptance not established.\n";
+        return Require(maximumVertexError < crossToolGuard && maximumJointOriginError < crossToolGuard &&
+                       maximumJointElementError < crossToolGuard,
+                       "native stand output differs from SSP1 beyond the unchanged cross-tool guard");
+    }
+    catch (const std::exception& error)
+    {
+        std::cerr << "FAIL: skeleton stand proof: " << error.what() << '\n';
+        return false;
+    }
+}
+
 } // namespace
 
 int main(int argc, char** argv)
 {
+    if (argc > 1 && std::string_view(argv[1]) == "--skeleton-stand-proof")
+    {
+        if (argc != 5)
+        {
+            std::cerr << "Usage: --skeleton-stand-proof <original-glb> <candidate-glb> <stand-reference.bin>\n";
+            return 2;
+        }
+        return RunSkeletonStandProof(argv[2], argv[3], argv[4]) ? 0 : 1;
+    }
     if (argc == 2 && std::string(argv[1]) == "--diagnose-walking-arm-stability")
         return RunWalkingArmStabilityDiagnostic() ? 0 : 1;
     if (argc == 2 && std::string(argv[1]) == "--diagnose-walking-arm-flexion")

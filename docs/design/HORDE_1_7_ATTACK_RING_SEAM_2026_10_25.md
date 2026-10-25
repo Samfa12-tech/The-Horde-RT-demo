@@ -77,22 +77,76 @@ draft was superseded and retained only under ignored reports; it is absent from
 the production and test source trees. Artwork is original, not copied from the
 reference game. No phone operation is needed for this source assessment.
 
-The concrete capacity question is pending: authorise a measured opt-in single
-ring owner (ordinary/metadata 28 to 29, TLAS capacity 104 to 105, static assets 13
-to 14, one additional immutable BLAS), or keep current bounds and assess another
-honest RT ownership route. Primitive/material headroom must be established before
-any further change. The question does not authorise broader effects, extra
-enemies, a quality reduction or admission without evidence. Independent startup,
-encounter and tutorial work continues while that decision is pending.
+## Exact pending capacity proposal (25 October follow-up)
 
-Refinement of that original question: the validated 64-placement route proof
-uses 92 TLAS instances, so one ring would be 93 and fits the existing 104 limit.
-The 105 request is needed only to retain simultaneous support for the unadmitted
-76-tree sector study already using 104. It is not required merely to test a ring
-on the 64-placement route. Metadata/static ownership and the full primitive/
-material roster remain separate unresolved bounds; this count is not a measured
-GPU cost or permission to change any limit.
-If a dedicated ring primitive/material is required, the concrete additional
-bounds would be37/33; they are not approved merely by authorising an owner slot.
-Do not disguise format conversion, material aliasing or an inactive instance as
-free capacity. The later flask prop must still have honest simultaneous ownership.
+Request one additional reusable warning owner, one immutable annulus asset/range
+and one independently mutable material, preserving all current scene profiles:
+
+| Bound | Existing | Proposed |
+| --- | ---: | ---: |
+| Instance metadata | 28 | 29 |
+| Unique static assets | 13 | 14 |
+| Primitive rows | 36 | 37 |
+| Material rows | 32 | 33 |
+| TLAS definition capacity | 104 | 105 |
+| Ordinary/shared BLAS owner maxima | 21/23 | 22/24 |
+
+**This whole proposal remains pending; no bound is changed.** The primitive
+and material increments are explicit, not implied by approving an owner slot.
+The later flask still needs honest simultaneous ownership of its own.
+
+### Actual combat and multiple attackers
+
+One owner is sufficient for TODAY'S authoritative combat, not a general promise
+about multiple attackers. `SwordCombat.h::SelectAttacker` retains one living
+non-Locomotion token through windup, active, recovery and stagger. Non-owner
+attack phases are reset; death releases the token. `GameSimulation` selects
+Skeleton versus Keeper exclusively, and inactive Keeper combat becomes Dormant.
+Thus the two current skeletons cannot require two simultaneous special warnings.
+The opt-in every-third-attempt yellow policy stays OFF pending ring admission.
+
+Clear/rebind the ring atomically using the immutable warning source and its
+phase/generation. Interruption, death, parry and neutral recovery clear it;
+held guard cannot restart it. A future coordinator that permits simultaneous
+warnings needs a separately measured pool/capacity revision and coverage for
+both sources. Validation must detect that changed contract, not silently drop
+the second warning or borrow a live actor/prop owner.
+
+There is no existing instance tint. A dedicated global ring material can switch
+its own yellow/red factors because the normal shared path already uploads
+`frameMaterials` each frame (`PresentableTinyRtScene.cpp`). This reuses ordinary
+emissive material shading, not an extra light/fire slot or a shader object branch.
+Two simultaneous differently coloured owners could not share that mutable row
+without another reviewed material/ownership arrangement.
+
+### Source roster, actual allocation and proposed cost are different
+
+The normal scene source uses 28 TLAS definitions; shared64 is 28+64=92, and the
+retained76 study is 28+76=104. Adding the owner gives 29, 93 and 105. One ring on
+shared64 therefore fits the current 104 TLAS capacity, but that does NOT preserve
+the full retained76 profile. The 105 request avoids silently dropping placements
+or aliasing a masked owner. Normal geometry uses 32 primitive rows; the tested
+shared roster uses36. Final material rows are already32 (30 packed plus2 world),
+and ordinary unique static assets are13. Shared instancing does not free these
+metadata/material requirements.
+
+The current actual RT two-skeleton-room pose control at 960x540/High reports
+21 allocated BLAS, one TLAS, 28 TLAS definitions, 52 buffers and63 allocations.
+This is genuine renderer inventory in an immutable pose fixture, NOT a live
+multi-attacker fight or a measurement of an unbuilt ring. Earlier shared-route
+receipts have different own-build live counts; neither those nor source owner
+maxima are a new ring allocation query.
+
+A 16-segment annulus prototype would contain32 vertices/32 triangles: 2,048
+vertex bytes and384 index bytes, plus known payload rows of16 primitive,
+128 material,32 metadata and64 TLAS-instance bytes. These are proposed payloads,
+not driver allocation/peak residency or frame-time deltas. BLAS/TLAS backing,
+scratch, alignment, update work and RT screen-coverage cost require real queries
+and paired captures after approval. Geometry/shape/readability is still a visual
+gate; the proposal does not admit a faceted or inaccessible final warning.
+
+No new texture, light, emitter, shader path or reduced rendering quality is
+assumed. Required ABI/bank regeneration, full actor/effect preservation, dark-room
+and overlap legibility, actual phase timing, Windows cost and later authorized
+Android warm-device evidence remain admission gates. The fresh pose control and
+its limits are recorded in the [native stand gate](../evidence/2026-10-25-skeleton-stand-native/README.md).

@@ -98,7 +98,8 @@ public:
     bool LoadAssets(const std::string& skeletonAssetPath,
                     const std::string& lichAssetPath,
                     std::string& diagnostic,
-                    bool skeletonOnly = false);
+                    bool skeletonOnly = false,
+                    std::span<const horde::scene::SkinnedClipBinding> skeletonClipBindings = {});
     bool PrepareInitialGeometry(std::string& diagnostic);
     bool CacheFramePlan(const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                                          horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,

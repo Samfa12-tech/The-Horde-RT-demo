@@ -311,7 +311,8 @@ public:
                     RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
                     bool glassEnabled = true,
                     VkPipelineCache pipelineCache = VK_NULL_HANDLE,
-                    RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr);
+                    RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr,
+                    std::span<const horde::scene::SkinnedClipBinding> skeletonClipBindings = {});
 
     void Destroy();
 #if defined(_DEBUG)
@@ -1069,7 +1070,8 @@ private:
         const std::string& lichTextureDirectory,
         const std::string& developmentStaticAssetDirectory,
         const std::string& productionAssetRoot,
-        std::string& diagnostic);
+        std::string& diagnostic,
+        std::span<const horde::scene::SkinnedClipBinding> skeletonClipBindings = {});
 
     bool LoadEntryPoints(std::string& diagnostic);
     bool CreateBuffer(VkDeviceSize size,

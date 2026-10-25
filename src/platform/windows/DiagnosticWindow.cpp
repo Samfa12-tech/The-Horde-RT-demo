@@ -6268,6 +6268,29 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         }
     }
 #endif
+    std::string selectedSkeletonAssetPath =
+        (assetRoot / "models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();
+    std::vector<horde::scene::SkinnedClipBinding> selectedSkeletonBindings;
+#if defined(_DEBUG)
+    if (const char* standPath = std::getenv("HORDE_SKELETON_STAND_CAPTURE_ASSET"))
+    {
+        const char* capture = std::getenv("HORDE_SKELETON_REVIVE_CAPTURE");
+        std::string candidateHash;
+        if (!gShowcaseCaptureHidden || ctx.sceneProfile != horde::vulkan::raytracing::RtSceneProfile::Showcase ||
+            !capture || std::string_view(capture) != "1" || ctx.developmentCheckpoint.empty() ||
+            std::getenv("HORDE_SKELETON_REVIVE_BLEND_CAPTURE") || !*standPath ||
+            !Sha256File(standPath, candidateHash, diagnostic) ||
+            candidateHash != "800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259")
+        {
+            ctx.lastRtFrameError = "Authored stand asset requires its exact isolated hidden revival capture.";
+            return false;
+        }
+        selectedSkeletonAssetPath = standPath;
+        const auto& ordinary = horde::scene::SkeletonCombatClipSet().clips;
+        selectedSkeletonBindings.assign(ordinary.begin(), ordinary.end());
+        selectedSkeletonBindings.push_back({"SkeletonProof|StandDead0ToIdle", false, true});
+    }
+#endif
     if (!ctx.rtScene.Initialise(ctx.instance,
                                 ctx.physicalDevice,
                                 ctx.device,
@@ -6275,7 +6298,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
                                 ctx.commandPool,
                                 renderExtent,
                                 ctx.swapchainFormat,
-                                (assetRoot / "models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
+                                selectedSkeletonAssetPath,
                                 (assetRoot / "models/enemies/meshy/lich_placeholder_merged_animations_v01.glb").string(),
                                 (assetRoot / "textures/polyhaven/mobile_1k").string(),
                                 (assetRoot / "textures/meshy/lich_placeholder_v01").string(),
@@ -6283,7 +6306,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
                                 developmentStaticAssetDirectory,
                                 assetRoot.string(),
                                 ctx.executionBackend, ctx.sceneProfile, ctx.requestedGlassEnabled,
-                                ctx.pipelineCache))
+                                ctx.pipelineCache, nullptr, selectedSkeletonBindings))
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
         ctx.lastRtFrameError = diagnostic;

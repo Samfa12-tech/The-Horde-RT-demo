@@ -2016,6 +2016,96 @@ int main()
                       diagnostic.c_str());
         ok &= Require(slot.PrepareInitialGeometry(diagnostic), diagnostic.c_str());
         {
+            // Exercise the optional loader seam using only original clips.
+            // CPU-backed coherent uploads/cache checks are not Vulkan presentation.
+            const auto skeletonPath=(root / "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();
+            const auto lichPath=(root / "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb").string();
+            const auto ordinaryBindings=horde::scene::SkeletonCombatClipSet().clips;
+            const auto sameSkin=[](const auto& a,const auto& b) {
+                return !a.empty() && a.size()==b.size() &&
+                    std::memcmp(a.data(),b.data(),a.size()*sizeof(horde::scene::SkinnedRtVertex))==0;
+            };
+            CharacterRenderSlot explicitFour;
+            ok &= Require(explicitFour.LoadAssets(skeletonPath,lichPath,diagnostic,false,ordinaryBindings) &&
+                          explicitFour.PrepareInitialGeometry(diagnostic) &&
+                          Near(explicitFour.SkeletonDeadClipDuration(),slot.SkeletonDeadClipDuration()) &&
+                          sameSkin(explicitFour.SkeletonVertices(0),slot.SkeletonVertices(0)) &&
+                          sameSkin(explicitFour.SkeletonVertices(1),slot.SkeletonVertices(1)) &&
+                          explicitFour.LichVertices().size()==slot.LichVertices().size() &&
+                          !slot.LichVertices().empty() &&
+                          std::memcmp(explicitFour.LichVertices().data(),slot.LichVertices().data(),
+                              slot.LichVertices().size()*sizeof(horde::scene::TexturedSkinnedRtVertex))==0,
+                          "explicit ordinary four bindings must preserve default initial skeleton and lich output");
+            const auto bind=[](CharacterRenderSlot& owner,std::vector<std::byte>& memory) {
+                memory.resize(owner.SkeletonVertices(0).size()*sizeof(horde::scene::SkinnedRtVertex));
+                auto& buffer=owner.SkeletonGpu(0).vertices;
+                buffer.memory=(VkDeviceMemory)1; buffer.size=memory.size(); buffer.mappedWriteData=memory.data();
+            };
+            std::vector<std::byte> defaultMemory,explicitMemory;
+            bind(slot,defaultMemory); bind(explicitFour,explicitMemory);
+            RtGpuResources resources;
+            EnemyRosterSnapshot originalRoster;
+            originalRoster.selectedEnemy=EnemyKind::Skeleton;
+            originalRoster.renderedEnemyCount=1u; originalRoster.renderedEnemies[0]=EnemyKind::Skeleton;
+            LichSnapshot dormant; dormant.phase=LichPhase::Dormant;
+            std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,2> actors{};
+            actors[0].id=horde::gameplay::simulation::EntityId::SkeletonA;
+            struct OrdinarySample { EnemyAnimation animation; EnemyCombatAction action; float time; };
+            const std::array<OrdinarySample,4> samples{{
+                {EnemyAnimation::Idle,EnemyCombatAction::Locomotion,.21f},
+                {EnemyAnimation::Walking,EnemyCombatAction::Locomotion,.42f},
+                {EnemyAnimation::Attack,EnemyCombatAction::AttackWindup,.35f},
+                {EnemyAnimation::Dead,EnemyCombatAction::Dead,.70f},
+            }};
+            for(const auto& sample:samples) {
+                actors[0].animation=sample.animation; actors[0].action=sample.action;
+                actors[0].animationTime=actors[0].actionTime=sample.time;
+                actors[0].dead=sample.action==EnemyCombatAction::Dead;
+                actors[0].health=actors[0].dead?0:1;
+                ok &= Require(slot.PrepareFrame(actors,1u,originalRoster,dormant,resources,diagnostic) &&
+                              explicitFour.PrepareFrame(actors,1u,originalRoster,dormant,resources,diagnostic) &&
+                              sameSkin(slot.SkeletonVertices(0),explicitFour.SkeletonVertices(0)) &&
+                              defaultMemory==explicitMemory && explicitFour.SkeletonPoseBucketCount()==1u,
+                              "explicit four-binding native skins/uploads must be byte-identical for every ordinary clip");
+                slot.NotifyFrameSubmitted(); explicitFour.NotifyFrameSubmitted();
+            }
+            slot.SkeletonGpu(0).vertices={}; explicitFour.SkeletonGpu(0).vertices={};
+            ok &= Require(slot.PrepareInitialGeometry(diagnostic),diagnostic.c_str());
+
+            std::array<horde::scene::SkinnedClipBinding,5> extraBindings{};
+            std::copy(ordinaryBindings.begin(),ordinaryBindings.end(),extraBindings.begin());
+            extraBindings[4]={"Idle_5",true,false}; // Existing optional slot, not a new capacity or candidate asset.
+            CharacterRenderSlot extra;
+            ok &= Require(extra.LoadAssets(skeletonPath,lichPath,diagnostic,true,extraBindings) &&
+                          extra.PrepareInitialGeometry(diagnostic),diagnostic.c_str());
+            const auto plainIdle=extra.SkeletonVertices(0);
+            std::vector<std::byte> extraMemory; bind(extra,extraMemory);
+            actors[0].animation=EnemyAnimation::Dead; actors[0].action=EnemyCombatAction::Dead;
+            actors[0].dead=true; actors[0].health=0; actors[0].animationTime=.70f;
+            SkeletonPoseBlendRequests extraBlend{};
+            extraBlend[0]=horde::scene::SkinnedClipBlend{horde::scene::SkinnedClip::TurnLeft,0.f,1.f};
+            ok &= Require(extra.PrepareFrame(actors,1u,originalRoster,dormant,resources,diagnostic,nullptr,extraBlend) &&
+                          sameSkin(extra.SkeletonVertices(0),plainIdle) && extra.SkeletonPoseBucketCount()==1u &&
+                          extra.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "mapped optional slot4 must feed a weight-one blend with exact original Idle output in one bucket");
+            const auto written=extraMemory; extra.NotifyFrameSubmitted();
+            ok &= Require(extra.PrepareFrame(actors,1u,originalRoster,dormant,resources,diagnostic,nullptr,extraBlend) &&
+                          extraMemory==written && extra.PendingRefit()==CharacterBlasRefit::None,
+                          "submitted optional-slot blend must retain its exact ordinary cache identity without another refit");
+            extra.SkeletonGpu(0).vertices={};
+
+            auto badBindings=ordinaryBindings; badBindings[2].name="missing-required-attack";
+            CharacterRenderSlot badRequired; diagnostic.clear();
+            ok &= Require(!badRequired.LoadAssets(skeletonPath,lichPath,diagnostic,true,badBindings) &&
+                          diagnostic.find("missing required clip")!=std::string::npos,
+                          "explicit bindings cannot silently omit a named required attack clip");
+            CharacterRenderSlot missingDead; diagnostic.clear();
+            ok &= Require(!missingDead.LoadAssets(skeletonPath,lichPath,diagnostic,true,
+                              std::span<const horde::scene::SkinnedClipBinding>(ordinaryBindings).first(3u)) &&
+                          diagnostic.find("Dead clip has no usable duration")!=std::string::npos,
+                          "an explicit span missing the required Dead slot must fail rather than admit an incomplete owner");
+        }
+        {
             // Real native skinning/host upload with CPU-backed coherent memory;
             // no Vulkan submission is claimed by this failed-record regression.
             std::vector<std::byte> memory(slot.LichVertices().size()*sizeof(horde::scene::TexturedSkinnedRtVertex));

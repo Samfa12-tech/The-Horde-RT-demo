@@ -1239,24 +1239,32 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         RtSceneProfile sceneProfile,
                                         bool glassEnabled,
                                         VkPipelineCache pipelineCache,
-                                        RtBundleCompiledPipelineCache* compiledPipelineCache)
+                                        RtBundleCompiledPipelineCache* compiledPipelineCache,
+                                        const std::span<const horde::scene::SkinnedClipBinding> skeletonClipBindings)
 {
+    // Both callbacks are synchronous during this call. The importer owns its
+    // copied bindings after asset load, so this request has no async lifetime.
+    struct InitialisationInputs {
+        RtExecutionBackend backend;
+        std::span<const horde::scene::SkinnedClipBinding> skeletonBindings;
+    } inputs{executionBackend, skeletonClipBindings};
     InitialiseOrchestrationApi api{};
-    api.user = &executionBackend;
+    api.user = &inputs;
     api.resolvePreflight = [](void* user, RtPipelineBundlePreflight& preflight,
                               std::string& failureKey) {
         return ResolveCompiledRtPipelineBundlePreflight(
-            preflight, failureKey, *static_cast<RtExecutionBackend*>(user));
+            preflight, failureKey, static_cast<InitialisationInputs*>(user)->backend);
     };
     api.continueAfterPreflight = [](
-        void*, PresentableTinyRtScene& scene, VkFormat format,
+        void* user, PresentableTinyRtScene& scene, VkFormat format,
         const std::string& skeletonPath, const std::string& lichPath,
         const std::string& materialDirectory, const std::string& lichDirectory,
         const std::string& developmentDirectory, const std::string& productionRoot,
         std::string& error) {
         return scene.ContinueInitialiseAfterPreflight(
             format, skeletonPath, lichPath, materialDirectory, lichDirectory,
-            developmentDirectory, productionRoot, error);
+            developmentDirectory, productionRoot, error,
+            static_cast<InitialisationInputs*>(user)->skeletonBindings);
     };
     return InitialiseWithOrchestration(
         instance, physicalDevice, device, queue, commandPool, dispatchExtent,
@@ -1418,7 +1426,8 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
     const std::string& lichTextureDirectory,
     const std::string& developmentStaticAssetDirectory,
     const std::string& productionAssetRoot,
-    std::string& diagnostic)
+    std::string& diagnostic,
+    const std::span<const horde::scene::SkinnedClipBinding> skeletonClipBindings)
 {
     if (!MeasureInitialisationStage(initialiseMeasurements_, "device-capability-preflight", [&] {
             if (ExecutionBackend() == RtExecutionBackend::RayQueryCompute)
@@ -1450,7 +1459,8 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
     if (sceneProfile_ != RtSceneProfile::EntryMenu &&
         !MeasureInitialisationStage(initialiseMeasurements_, "character-assets", [&] {
             return characterSlot_.LoadAssets(skeletonAssetPath, lichAssetPath, diagnostic,
-                                             sceneProfile_ == RtSceneProfile::GraphicsPreview);
+                                             sceneProfile_ == RtSceneProfile::GraphicsPreview,
+                                             skeletonClipBindings);
         }))
     {
         Destroy();

@@ -30,6 +30,16 @@ joins remain unaccepted; initial corpse extremities clip the preview edge. No
 actor, save, audio or production animation hook is enabled. This later head's CI
 is distinct from the green runtime correction above.
 
+The subsequent [native stand gate](../evidence/2026-10-25-skeleton-stand-native/README.md)
+passes the actual loader, two affected native CTests and paired hidden RT pose
+captures. Original 120-frame prefix/30-frame Idle controls and all45 stand-repeat
+images match; one view's steps/joins are visually credible. Normal revival is
+still OFF: actual encounter, death-settled timing, in-place full-pair revival,
+Skeleton B's revived Idle clock, save/Retry and scream wiring remain next.
+This is not gameplay lifecycle or physical-phone acceptance. The exact ring
+capacity proposal now includes the actual combat token and normal-room inventory,
+not just shared64 arithmetic; its limits remain unchanged and pending approval.
+
 This update supersedes older device/guard acceptance wording below, without
 turning the historical checkpoints into newer evidence. Sam accepts the held
 guard and attack-return animation on installed `f27982cd`; broader damage,
@@ -49,8 +59,8 @@ at 10:37:25.915 UTC after private recording retrieval; no further device calls.
   the rise but rejects the visible direct-Idle snap. The subsequent
   [single blend proof](../evidence/2026-10-25-skeleton-revive-blend/README.md)
   tests the shared default-empty seam but rejects the visible foot slide.
-  The contact-preserving stand now has the isolated authoring proof above;
-  native export/RT joins and bridge integration remain unfinished. Neither
+  The contact-preserving stand now has the isolated native pose proof above;
+  actual encounter/adapter and bridge integration remain unfinished. Neither
   earlier rejected proof is an admitted animation or real revival.
 - In-world special-attack rings need an explicit measured RT owner seam; no
   capacity was increased or screen-space substitute added. Ordinary full block

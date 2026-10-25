@@ -148,9 +148,15 @@ bool CharacterPoseNeedsRefresh(const int requestedClip,
 bool CharacterRenderSlot::LoadAssets(const std::string& skeletonAssetPath,
                                      const std::string& lichAssetPath,
                                      std::string& diagnostic,
-                                     const bool skeletonOnly)
+                                     const bool skeletonOnly,
+                                     const std::span<const horde::scene::SkinnedClipBinding> skeletonClipBindings)
 {
-    if (!skeletonModel_.LoadCombatClips(skeletonAssetPath, diagnostic))
+    // Empty bindings retain the exact ordinary four-clip path. Explicit caller
+    // bindings are copied by the shared importer; no borrowed span survives.
+    const bool loaded = skeletonClipBindings.empty()
+        ? skeletonModel_.LoadCombatClips(skeletonAssetPath, diagnostic)
+        : skeletonModel_.LoadClips(skeletonAssetPath, skeletonClipBindings, diagnostic);
+    if (!loaded)
     {
         return false;
     }
