@@ -308,6 +308,23 @@ public class AndroidControllerIntegrationTest {
         View root=(View)field("menuScrim").get(a);Button b=findButton(root,text);assertNotNull(text,b);
         b.setFocusableInTouchMode(true);assertTrue(b.requestFocus());press(KeyEvent.KEYCODE_BUTTON_A);
     }
+    @Test public void pauseAndActualFocusLossCancelPrivateCryButUnrelatedVoiceSuspensionDoesNot()throws Exception {
+        int[] stopped={0};PrivateLichRevivalAudio cue=new PrivateLichRevivalAudio(new PrivateLichRevivalAudio.Sink(){
+            public int start(float left,float right){return 11;}public void gain(int stream,float left,float right){}
+            public void stop(int stream){stopped[0]++;}
+        });
+        set("privateLichRevivalAudio",cue);
+        android.content.SharedPreferences preferences=a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE);
+        preferences.edit().putInt("sfx_volume",20).putInt("chapter_voice_volume",100).commit();
+        java.util.Map<String,?> before=preferences.getAll();
+        long metadata=36L|(3L<<8)|(1L<<16)|(1L<<32),stereo=(Float.floatToRawIntBits(.8f)&0xffffffffL)|((long)Float.floatToRawIntBits(.3f)<<32);
+        assertTrue(cue.start(metadata,stereo,0,true,.2f,1));
+        call("setGameplayPaused",new Class<?>[]{boolean.class},true);assertEquals(1,stopped[0]);
+        assertTrue(cue.start(metadata+(1L<<32),stereo,0,true,.2f,1));
+        call("pauseChapterVoice",new Class<?>[]{boolean.class},true);assertEquals("caption/voice packet suspension is unrelated",1,stopped[0]);
+        a.onWindowFocusChanged(false);assertEquals("actual focus ownership loss cancels the cue",2,stopped[0]);
+        assertEquals(before,preferences.getAll());assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.interacts);
+    }
     @Test public void settingsFinishPracticeKeepsExistingExplicitExitAndReplayCommandsWithoutCombatLeak()throws Exception {
         set("menuVisible",true);call("setGameplayPaused",new Class<?>[]{boolean.class},true);
         Bridge.teachingState=4L|(1L<<13);call("showSettings",new Class<?>[]{});

@@ -81,6 +81,13 @@ public final class CombatTeachingPreferencesTest {
                 for(int line=0;line<layout.getLineCount();++line)
                     assertTrue("glyph line fits finite portrait/landscape host width",layout.getLineWidth(line)<=width+1);
             }
+            String clearance=CombatTeachingPreferences.prompt(2L|(1L<<34),controller);
+            android.text.StaticLayout layout=android.text.StaticLayout.Builder.obtain(clearance,0,clearance.length(),paint,width)
+                    .setAlignment(android.text.Layout.Alignment.ALIGN_CENTER).setIncludePad(true).build();
+            assertEquals(clearance.length(),layout.getLineEnd(layout.getLineCount()-1));
+            for(int line=0;line<layout.getLineCount();++line)
+                assertTrue("clearance hint remains complete at the existing portrait/landscape host widths",
+                        layout.getLineWidth(line)<=width+1);
         }
     }
 
@@ -158,6 +165,7 @@ public final class CombatTeachingPreferencesTest {
         assertTrue(CombatTeachingPreferences.prompt(practice|5,true).contains("Hold [LT] + [RT]"));
         assertTrue(CombatTeachingPreferences.description(practice|5,"").contains("Attacking ends guard protection"));
         assertTrue(CombatTeachingPreferences.prompt(practice|6).contains("Settings: Finish practice"));
+        assertTrue(CombatTeachingPreferences.prompt(practice|6).contains("enemies can hurt you"));
         assertTrue(CombatTeachingPreferences.blockLearned(practice|(1L<<15)));
         assertTrue(CombatTeachingPreferences.attackFromGuardLearned(practice|(1L<<32)));
         assertFalse(CombatTeachingPreferences.attackFromGuardLearned(practice|(1L<<15)));
@@ -193,7 +201,31 @@ public final class CombatTeachingPreferencesTest {
         assertTrue(CombatTeachingPreferences.prompt(practice|(2L<<7)).contains("Skeleton attack"));
         assertTrue(CombatTeachingPreferences.prompt(practice|(3L<<7)).contains("Keeper lightning"));
         assertTrue(CombatTeachingPreferences.prompt((12L<<3)|(1L<<13)).contains("Replay opening practice"));
+        assertTrue(CombatTeachingPreferences.prompt((12L<<3)|(1L<<13)).contains("or Skip to continue"));
         assertFalse(CombatTeachingPreferences.prompt((12L<<3)|(1L<<13)).contains("Finish practice"));
+    }
+
+    @Test public void revivalClearanceUsesOnlyBit34WithoutClaimingProtectionOrNewLessonStages() {
+        long completed=2L|(1L<<10),clearance=completed|(1L<<34);
+        assertEquals("",CombatTeachingPreferences.prompt(completed));
+        assertFalse(CombatTeachingPreferences.waitingForRevivalClearance(completed));
+        assertTrue(CombatTeachingPreferences.waitingForRevivalClearance(clearance));
+        assertEquals(2,CombatTeachingPreferences.stage(clearance));
+        assertFalse(CombatTeachingPreferences.exitPending(clearance));
+        assertFalse(CombatTeachingPreferences.blockLearned(clearance));
+        assertFalse(CombatTeachingPreferences.attackFromGuardLearned(clearance));
+        assertEquals("Step back from the skeletons.",CombatTeachingPreferences.prompt(clearance));
+        assertEquals(255,CombatTeachingPreferences.promptOpacity(clearance));
+        assertTrue(CombatTeachingPreferences.needsTimelyRefresh(clearance));
+        assertTrue(CombatTeachingPreferences.description(clearance,CombatTeachingPreferences.prompt(clearance))
+                .contains("Step back from the skeletons."));
+        assertFalse(CombatTeachingPreferences.prompt(clearance).contains("Practice: no damage"));
+        for(int adjacent:new int[]{32,33,35,39,40,48,49})
+            assertFalse("neighboring fields must not alias clearance",CombatTeachingPreferences.waitingForRevivalClearance(1L<<adjacent));
+        String withAttack=CombatTeachingPreferences.prompt(clearance|(2L<<48));
+        assertTrue(withAttack.contains("Step back from the skeletons."));
+        assertTrue(withAttack.contains("RED: unblockable - DODGE"));
+        assertEquals(0xFFFF6B6B,CombatTeachingPreferences.promptColor(clearance|(2L<<48)));
     }
 
     @Test public void debugPracticeCheckpointNamesSelectTheSameOwnerRoutedPracticeKinds() {

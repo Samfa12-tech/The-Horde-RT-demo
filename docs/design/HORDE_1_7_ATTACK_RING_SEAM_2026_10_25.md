@@ -15,8 +15,10 @@ research supports enemy rings but did not verify a universal 2018 ring-closure
 equals parry-frame contract. Competitor timing does not define Horde's impact or
 parry window, and colour does not introduce guard-breaking or other unapproved
 mechanics. Sam's latest direction reserves coloured rings for special attacks;
-ordinary attacks need a distinct, uncluttered baseline. Full normal blocking and
-yellow guard-break remain a balance proposal, not an implemented rule change.
+ordinary attacks need a distinct, uncluttered baseline. The later approved rule
+checkpoint implements full normal blocking and tests yellow guard-break behind
+an explicit diagnostic option; normal gameplay keeps yellow OFF until its ring
+is admitted. This note does not enable that option or alter the attack rules.
 
 ## Current source constraints
 

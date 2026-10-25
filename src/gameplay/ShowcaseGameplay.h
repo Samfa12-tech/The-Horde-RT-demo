@@ -450,7 +450,12 @@ public:
 
     void MarkSelectedDead()
     {
-        if (auto* encounter = Find(snapshot_.selectedEnemy))
+        MarkDead(snapshot_.selectedEnemy);
+    }
+    // Completion belongs to the actual encounter, even after a route selection.
+    void MarkDead(EnemyKind kind)
+    {
+        if (auto* encounter = Find(kind))
         {
             encounter->status = EncounterStatus::Dead;
         }

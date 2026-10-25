@@ -155,6 +155,7 @@ public:
                const std::int32_t initialHealth = 1)
     {
         combatantCount_ = std::clamp<std::size_t>(combatantCount, 1u, kSkeletonCombatantCapacity);
+        startingEnemyHealth_ = std::max(1, initialHealth);
         combatants_ = {};
         for (Combatant& combatant : combatants_)
         {
@@ -181,7 +182,7 @@ public:
                 combatant.hasAuthoredWalkingPhase = true;
             }
             combatant.action = EnemyCombatAction::Locomotion;
-            combatant.health = std::max(1, initialHealth);
+            combatant.health = startingEnemyHealth_;
             combatant.walkAnimationHold = kWalkAnimationHold;
             combatant.animation = EnemyAnimation::Walking;
         }
@@ -217,6 +218,51 @@ public:
             combatant.walkAnimationHold = 0.0f;
         }
         PublishSnapshot();
+    }
+
+    // The owner supplies the admitted, non-looping death clip duration. Both
+    // records must have reached its terminal pose; health zero alone can still
+    // describe a falling actor. This predicate never changes combat state.
+    bool DefeatedPairReadyToRevive(const float deadClipDurationSeconds) const
+    {
+        if (combatantCount_ != kSkeletonCombatantCapacity ||
+            !std::isfinite(deadClipDurationSeconds) || deadClipDurationSeconds <= 0.0f)
+            return false;
+        for (const Combatant& combatant : combatants_)
+        {
+            if (combatant.health != 0 || combatant.action != EnemyCombatAction::Dead ||
+                combatant.animation != EnemyAnimation::Dead ||
+                !std::isfinite(combatant.x) || !std::isfinite(combatant.z) ||
+                !std::isfinite(combatant.facing) || !std::isfinite(combatant.phaseTime) ||
+                !std::isfinite(combatant.animationTime) ||
+                combatant.phaseTime < 0.0f || combatant.animationTime < deadClipDurationSeconds)
+                return false;
+        }
+        return true;
+    }
+
+    // One atomic enemy-only handoff after the owner's rise/rearm/clearance
+    // gates. Do not Reset: player input, guard/parry, active/buffered attacks,
+    // timing identities and the existing room engagement all remain owned.
+    bool ReviveDefeatedPairInPlace(const float deadClipDurationSeconds)
+    {
+        if (!DefeatedPairReadyToRevive(deadClipDurationSeconds)) return false;
+        for (Combatant& combatant : combatants_)
+        {
+            Combatant revived;
+            revived.x = combatant.x;
+            revived.z = combatant.z;
+            revived.facing = combatant.facing;
+            revived.walkingAnimationPhaseSeconds = combatant.walkingAnimationPhaseSeconds;
+            revived.hasAuthoredWalkingPhase = combatant.hasAuthoredWalkingPhase;
+            revived.health = startingEnemyHealth_;
+            revived.animation = EnemyAnimation::Idle;
+            revived.walkAnimationHold = 0.0f;
+            combatant = revived;
+        }
+        attackerIndex_ = -1;
+        PublishSnapshot();
+        return true;
     }
 
     PlayerAttackCut RequestAttack()
@@ -1182,6 +1228,7 @@ private:
     CombatSnapshot snapshot_{};
     std::array<Combatant, kSkeletonCombatantCapacity> combatants_{};
     std::size_t combatantCount_ = kSkeletonCombatantCapacity;
+    std::int32_t startingEnemyHealth_ = 1;
     bool attackQueued_ = false;
     bool parryQueued_ = false;
     bool guardHeld_ = false;

@@ -2,9 +2,77 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace horde::vulkan::raytracing
 {
+namespace
+{
+float RevivalPresentationTime(const float seconds, const float duration)
+{
+    if (seconds >= duration) return duration; // Preserve the exact authored endpoint.
+    if (seconds <= 0.0f) return 0.0f;
+    // The authoritative phase clock remains 60 Hz. Pair its fixed ticks for
+    // the existing 30 Hz skin/upload policy, including decreasing Dead time
+    // and the exact-identity optional stand request. Rounding to a fixed tick
+    // only absorbs float accumulation at tick boundaries, not gameplay time.
+    const double fixedTicks = std::round(static_cast<double>(seconds) * 60.0);
+    return std::min(duration, static_cast<float>(std::floor(fixedTicks / 2.0) / 30.0));
+}
+
+void ApplySkeletonRevivalPresentation(
+    const horde::gameplay::simulation::SimulationSnapshot& simulation,
+    RtSceneFrameInputs& frame)
+{
+    const auto& revival = simulation.skeletonRevival;
+    if (!revival.enabled || !revival.SuppressesActors()) return;
+    constexpr auto standClip = static_cast<horde::scene::SkinnedClip>(4u);
+    const float deadDuration = simulation.skeletonRevivalDeadDurationSeconds;
+    const float standDuration = simulation.skeletonRevivalStandDurationSeconds;
+    if (!simulation.skeletonRevivalPresentationReady ||
+        !std::isfinite(deadDuration) || deadDuration <= 0.0f ||
+        !std::isfinite(standDuration) || standDuration <= 0.0f ||
+        !std::isfinite(revival.phaseSeconds) || revival.phaseSeconds < 0.0f)
+    {
+        // An interrupted/unadmitted presentation cannot silently become a
+        // completed corpse render. Reuse the existing finite-blend rejection
+        // before upload/presentation; do not mutate the frozen source phase.
+        for (auto& request : frame.skeletonPoseBlends)
+            request = horde::scene::SkinnedClipBlend{
+                standClip, std::numeric_limits<float>::quiet_NaN(), 1.0f};
+        return;
+    }
+    using Phase = horde::gameplay::simulation::SkeletonRevivalPhase;
+    for (std::size_t i = 0u; i < std::min(frame.skeletonEnemyCount, frame.skeletonEnemies.size()); ++i)
+    {
+        auto& actor = frame.skeletonEnemies[i];
+        // Render-copy pose only: retained health/dead flags, IDs, roots,
+        // facing, targetability and all player/gear authority stay untouched.
+        actor.forceCurrentCombatPose = false;
+        actor.animation = horde::gameplay::EnemyAnimation::Dead;
+        actor.action = horde::gameplay::EnemyCombatAction::Dead;
+        actor.animationTime = deadDuration;
+        if (revival.phase == Phase::Rising)
+        {
+            if (revival.phaseSeconds < deadDuration)
+                actor.animationTime = deadDuration - RevivalPresentationTime(revival.phaseSeconds, deadDuration);
+            else
+            {
+                actor.animationTime = 0.0f;
+                frame.skeletonPoseBlends[i] = horde::scene::SkinnedClipBlend{standClip,
+                    RevivalPresentationTime(revival.phaseSeconds - deadDuration, standDuration), 1.0f};
+            }
+        }
+        else if (revival.phase == Phase::Rearming)
+        {
+            actor.animation = horde::gameplay::EnemyAnimation::Idle;
+            actor.action = horde::gameplay::EnemyCombatAction::Locomotion;
+            actor.animationTime = actor.idlePhaseSeconds = 0.0f;
+        }
+    }
+}
+} // namespace
+
 RtSceneFrameInputs BuildEntryMenuFrameInputs(const horde::graphics::EntryMenuSession &session,
                                              const float outputExposure,
                                              const FireEmitterQuality fireDetail,
@@ -179,6 +247,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
         : ResolveRtFinaleRoofOpen(simulation.lich.finaleSkylightOpenProgress, frame.tuning);
     frame.lich.finaleDawnRevealProgress = simulation.developmentRescueJourney
         ? 0.0f : ResolveRtFinaleDawnReveal(simulation.lich.finaleDawnRevealProgress, frame.tuning);
+    ApplySkeletonRevivalPresentation(simulation, frame);
     return frame;
 }
 

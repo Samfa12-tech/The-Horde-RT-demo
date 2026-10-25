@@ -2,6 +2,15 @@
 
 ## Latest owner-playtest follow-up, 25 October
 
+The later [gated revival integration](../evidence/2026-10-25-skeleton-revival-owner/README.md)
+now covers actual settled deaths, one cry, atomic same-root revival, Idle0 for
+both actors, final-opening/Keeper eligibility, consumed Retry and terminal
+earned restores. A167-frame actual-owner RT trial and focused host/Android
+checks pass. It stays OFF in normal gameplay: private clip/audio distribution
+and actual platform readiness admission, natural play and listening remain.
+Thus historical unwired/native-only wording below does not describe this newer
+diagnostic integration. Ring bounds and yellow rollout remain pending.
+
 The subsequent [shared rules/four-skill checkpoint](../evidence/2026-10-25-four-skill-practice/README.md)
 now implements ordinary full block and actual block/parry/dodge/guard-attack
 practice, protected Ready and safe explicit exit on both platforms. New yellow

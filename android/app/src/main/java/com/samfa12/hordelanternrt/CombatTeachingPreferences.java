@@ -34,6 +34,7 @@ final class CombatTeachingPreferences {
     static int stage(long state) { return (int)(state & 0x7L); }
     static boolean safePractice(long state) { return (state & (1L << 13)) != 0; }
     static boolean exitPending(long state) { return (state & (1L << 33)) != 0; }
+    static boolean waitingForRevivalClearance(long state) { return (state & (1L << 34)) != 0; }
     static boolean blockLearned(long state) { return (state & (1L << 15)) != 0; }
     static boolean attackFromGuardLearned(long state) { return (state & (1L << 32)) != 0; }
     static int practiceActionLabelResource(long state) { return stage(state)==6 ? R.string.combat_teaching_finish : R.string.combat_teaching_skip; }
@@ -49,6 +50,8 @@ final class CombatTeachingPreferences {
             String lesson=lessonText(state,controller);
             if(!lesson.isEmpty())text+=(text.isEmpty()?"":"\n")+lesson;
         }
+        if(waitingForRevivalClearance(state))
+            text+=(text.isEmpty()?"":"\n")+"Step back from the skeletons.";
         final int attack=attackReadability(state);
         if(attack!=0)text+=(text.isEmpty()?"":"\n")+(attack==1
             ? "\u25c7 YELLOW guard-break: parry/dodge" : "\u2715 RED: unblockable - DODGE");
@@ -64,7 +67,8 @@ final class CombatTeachingPreferences {
         return attack == 1 ? 0xFFFFD266 : attack == 2 ? 0xFFFF6B6B : HordeUiTokens.PARCHMENT;
     }
     static int promptOpacity(long state) {
-        return safePractice(state) || attackReadability(state) != 0 ? 255 : (int) ((state >>> 40) & 0xffL);
+        return safePractice(state) || waitingForRevivalClearance(state) || attackReadability(state) != 0
+                ? 255 : (int) ((state >>> 40) & 0xffL);
     }
     static String description(long state, String visibleText) {
         String text=visibleText.replace('\n',' ');
@@ -75,7 +79,7 @@ final class CombatTeachingPreferences {
     }
 
     static boolean needsTimelyRefresh(long state) {
-        if (safePractice(state) || attackReadability(state) != 0) return true;
+        if (safePractice(state) || waitingForRevivalClearance(state) || attackReadability(state) != 0) return true;
         final boolean enabled = (state & (1L << 10)) != 0;
         final int opacity = (int) ((state >>> 40) & 0xffL);
         final int cue = (int) ((state >>> 3) & 0xfL);
@@ -87,9 +91,9 @@ final class CombatTeachingPreferences {
         final String guard=controller?"[LT]":"[Parry]",swing=controller?"[RT]":"[Swing]";
         final String dodge=controller?"[B] + stick":"[Dodge] + move";
         if(exitPending(state) || cue==13)return "Leaving practice safely...";
-        if(cue==12)return "Settings: Replay opening practice";
+        if(cue==12)return "Settings: Replay opening practice or Skip to continue";
         if(stage==2 || stage==3)return "";
-        if(stage==6 || cue==11)return "Settings: Finish practice";
+        if(stage==6 || cue==11)return "Settings: Finish practice - enemies can hurt you";
         if(cue==7)return "Well parried - strike back";
         if(stage==4 || cue==9)return "Hold "+guard+": block normal hits";
         if(stage==5 || cue==10)return "Hold "+guard+" + "+swing+"; keep held";

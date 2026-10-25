@@ -17,6 +17,7 @@ struct SkeletonRevivalInput
     bool practiceSkipped = false;
     bool bothDead = false; // Actual two-actor owner state, never a lesson award.
     bool bothAlive = false; // Both same stable actor records, not merely !bothDead.
+    bool bothDeathAnimationsComplete = false; // Actual settled corpse poses, not merely zero health.
     bool playerAlive = false;
     bool paused = false;
     bool presentationReady = false;
@@ -83,6 +84,18 @@ public:
     }
     void CancelTransient() { snapshot_.signalPulse = snapshot_.revivePulse = false; }
 
+    // The owner acknowledges the actual atomic revive/retry publication before
+    // another combat tick may defeat either actor. This is not a second Step:
+    // clocks and one-shot pulses stay unchanged, and no actor state is created.
+    bool AcknowledgeLivePair(std::uint64_t expectedGeneration, bool bothAlive, bool bothDead = false)
+    {
+        if (!snapshot_.enabled || !snapshot_.consumed || snapshot_.phase != SkeletonRevivalPhase::Live ||
+            expectedGeneration != snapshot_.generation || !bothAlive || bothDead)
+            return false;
+        livePairSeen_ = true;
+        return true;
+    }
+
     const SkeletonRevivalSnapshot& Step(float deltaSeconds, const SkeletonRevivalInput& input)
     {
         CancelTransient();
@@ -102,7 +115,7 @@ public:
                 if (!input.practiceFinished) return snapshot_;
                 Enter(SkeletonRevivalPhase::FirstFight);
             }
-            if (input.bothDead && input.presentationReady &&
+            if (input.bothDead && input.bothDeathAnimationsComplete && input.presentationReady &&
                 std::isfinite(input.riseDurationSeconds) && input.riseDurationSeconds > 0.0f)
             {
                 // Commit consumption before publishing the one-shot signal.

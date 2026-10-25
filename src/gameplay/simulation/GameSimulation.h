@@ -74,6 +74,8 @@ struct GameSimulationConfig
     bool combatFoundation1_7 = false;
     // Isolated validation only until the enemy-anchored RT warning is admitted.
     bool specialSkeletonAttacks1_7 = false;
+    // Remains explicit until the authored clip/private cue package is admitted.
+    bool skeletonRevival1_7 = false;
     // Shared chapter presentation; historical constructor fixtures stay explicit.
     bool companionTurnStart = false;
     // Diagnostic owner slice only. UI/hand/save admission is still separate.
@@ -109,6 +111,10 @@ public:
     // Supply the current logical render-view aspect from the surface owner.
     // Call on the simulation owner thread before advancing fixed steps.
     void SetPresentationAspect(float logicalViewAspect);
+    // Owner-thread asset receipt; missing/recreated presentation freezes a rise.
+    // It does not enable the feature or award gameplay/checkpoint progress.
+    bool ConfigureSkeletonRevivalPresentation(std::uint64_t resourceGeneration,
+        float deadDurationSeconds, float standDurationSeconds, bool ready = true);
 
     std::uint32_t AdvanceFrame(const InputSnapshot& input,
                                double frameDeltaSeconds,
@@ -250,6 +256,9 @@ private:
     void UpdatePosture(const InputSnapshot& input,float seconds);
     bool BodyHeightClear(float height) const;
     bool CurrentCombatRules() const;
+    bool UsesSkeletonRevival() const;
+    bool OpeningEncounterComplete() const;
+    void UpdateSkeletonRevival(const InputSnapshot& input, float deltaSeconds);
     void CancelCombatTransients();
     void BeginKeeperRepel();
     void ApplyKeeperRepel(float deltaSeconds);
@@ -301,6 +310,13 @@ private:
     BoundedGameplayEventQueue events_{};
     CombatPresentationTimeline combatPresentation_{};
     CombatTeaching combatTeaching_{};
+    SkeletonRevivalBridge skeletonRevival_{};
+    std::uint64_t skeletonRevivalResourceGeneration_ = 0;
+    float skeletonRevivalDeadDurationSeconds_ = 0.0f;
+    float skeletonRevivalStandDurationSeconds_ = 0.0f;
+    bool skeletonRevivalPresentationReady_ = false;
+    bool skeletonRevivalWorkshopBypass_ = false;
+    bool revivedIdlePhaseZero_ = false;
     CombatContactTraceSnapshot combatContactTrace_{};
     std::uint64_t currentCutCommandSequence_ = 0, currentCutConsumedTick_ = 0;
     std::uint64_t queuedUpCutCommandSequence_ = 0, queuedUpCutConsumedTick_ = 0;

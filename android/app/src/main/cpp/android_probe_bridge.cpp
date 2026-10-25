@@ -804,6 +804,7 @@ std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndi
 std::atomic<int> gContextualControlState{0};
 std::atomic<std::uint64_t> gWaterfallStereoGains{0u};
 std::atomic<std::uint64_t> gCombatTeachingUiState{0u};
+std::atomic<float> gSfxDialogueBedGain{1.f};
 std::mutex gChapterDialogueUiMutex;
 horde::gameplay::dialogue::Snapshot gChapterDialogueUiSnapshot{};
 horde::gameplay::SpatialAudioDomain gChapterDialogueUiAudioDomain =
@@ -1017,7 +1018,11 @@ void PublishSimulationUiState()
 {
     const horde::gameplay::simulation::SimulationSnapshot& simulation = gGameSimulation.Snapshot();
     const horde::gameplay::PlayerVitalsSnapshot& vitals = simulation.playerVitals;
+    gSfxDialogueBedGain.store(horde::audio::DialogueBedGain(simulation),std::memory_order_release);
     const auto& teaching = simulation.combatTeaching;
+    const bool revivalClearance = simulation.skeletonRevival.enabled &&
+        simulation.skeletonRevival.phase == horde::gameplay::simulation::SkeletonRevivalPhase::Rearming &&
+        simulation.skeletonRevival.waitingForClearance && simulation.skeletonRevivalPresentationReady;
     const auto clampByte = [](const float value) -> std::uint64_t
     {
         if (!std::isfinite(value)) return 0u;
@@ -1037,6 +1042,7 @@ void PublishSimulationUiState()
         ((static_cast<std::uint64_t>(teaching.practiceMisses) & 0xffu) << 24u) |
         (static_cast<std::uint64_t>(teaching.attackFromGuardLearned) << 32u) |
         (static_cast<std::uint64_t>(teaching.exitPending) << 33u) |
+        (static_cast<std::uint64_t>(revivalClearance) << 34u) |
         (clampByte(teaching.promptOpacity) << 40u) |
         ((static_cast<std::uint64_t>(teaching.attackReadability) & 0x3u) << 48u);
     gCombatTeachingUiState.store(teachingState, std::memory_order_release);
@@ -6677,6 +6683,12 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestCombatTeachingReplay(JNIEnv*,
     if (gInputPublisherState.commands.tutorialReplay != UINT64_MAX)
         ++gInputPublisherState.commands.tutorialReplay;
     PublishInputLocked();
+}
+
+extern "C" JNIEXPORT jfloat JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getSfxDialogueBedGain(JNIEnv*, jclass)
+{
+    return gSfxDialogueBedGain.load(std::memory_order_acquire);
 }
 
 extern "C" JNIEXPORT jlong JNICALL

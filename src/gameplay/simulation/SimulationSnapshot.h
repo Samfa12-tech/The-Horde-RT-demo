@@ -24,6 +24,7 @@
 #include "gameplay/items/LanternPendulum.h"
 #include "gameplay/simulation/CombatPresentation.h"
 #include "gameplay/simulation/CombatTeaching.h"
+#include "gameplay/simulation/SkeletonRevivalBridge.h"
 #include "gameplay/simulation/CombatContactTrace.h"
 #include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/GameplayEvent.h"
@@ -116,6 +117,10 @@ struct SimulationSnapshot
     std::uint64_t acceptedDodgeSequence = 0u;
     std::uint64_t dodgeProtectedHitCount = 0u;
     CombatTeachingSnapshot combatTeaching{};
+    SkeletonRevivalSnapshot skeletonRevival{};
+    bool skeletonRevivalPresentationReady = false;
+    float skeletonRevivalDeadDurationSeconds = 0.0f;
+    float skeletonRevivalStandDurationSeconds = 0.0f;
     float keeperRepelRemainingSeconds = 0.0f;
     float keeperRepelTravelledMetres = 0.0f;
     float gameplayTimeScale = 1.0f;

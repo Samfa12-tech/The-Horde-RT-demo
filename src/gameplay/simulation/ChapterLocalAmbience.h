@@ -2,6 +2,7 @@
 #include "gameplay/simulation/SimulationSnapshot.h"
 #include "gameplay/simulation/ForestBirdAmbience.h"
 #include "gameplay/SpatialAudio.h"
+#include "audio/LichRevivalAudio.h"
 #include <algorithm>
 #include <cmath>
 
@@ -99,6 +100,7 @@ inline bool IsChapterAmbienceEvent(GameplayEventType type) {
 // Both platform transports use one event-time source/gain calculation. Other
 // semantic events retain their existing 1/14 metre emitter contract.
 inline SpatialAudioEmitter ChapterAmbienceEmitter(const GameplayEvent& event) {
+    if(event.type==GameplayEventType::LichRevivalCry)return audio::LichRevivalEmitter(event);
     const bool foliage=event.type==GameplayEventType::ForestFoliage;
     return {event.worldX,event.worldZ,std::max(0.f,event.intensity),
         foliage?ForestBirdAmbience::kFoliageReferenceDistance:1.f,

@@ -173,5 +173,24 @@ int main()
           "pending safe exit retains actual protection status");
     teaching.exitPending=false;teaching.safePractice=false;teaching.stage=TutorialStage::Skipped;
     check(CombatTeachingPromptText(teaching).empty(),"completed safe exit has no stale protected caption");
+    teaching.enabled=true;teaching.safePractice=true;teaching.stage=TutorialStage::Ready;
+    teaching.cue=CombatTeachingCue::Ready;
+    check(CombatTeachingPromptText(teaching).find("Finish practice - enemies can hurt you")!=std::string::npos &&
+          CombatTeachingPromptText(teaching).find("Practice: no damage")==0,
+          "Ready explains that finishing ends protection while remaining truthful about current safety");
+    teaching.stage=TutorialStage::Block;teaching.cue=CombatTeachingCue::Replay;
+    check(CombatTeachingPromptText(teaching).find("Replay opening practice or Skip to continue")!=std::string::npos &&
+          CombatTeachingPromptText(teaching).find("Finish practice")==std::string::npos,
+          "prematurely defeated practice actors offer replay or explicit skip without inventing completion");
+    teaching={};teaching.stage=TutorialStage::Complete;
+    check(CombatTeachingPromptText(teaching).empty() &&
+          CombatTeachingPromptText(teaching,false,true)=="Step back from the skeletons.",
+          "authoritative revival clearance uses the existing prompt without restarting a completed lesson");
+    teaching.attackReadability=AttackReadability::Unblockable;
+    const auto clearanceAndAttack=CombatTeachingPromptText(teaching,true,true);
+    check(clearanceAndAttack.find("Step back from the skeletons.")!=std::string::npos &&
+          clearanceAndAttack.find("RED: unblockable - DODGE")!=std::string::npos &&
+          clearanceAndAttack.find("Practice: no damage")==std::string::npos,
+          "clearance hint preserves current attack warnings and never claims protected practice");
     return passed ? 0 : 1;
 }

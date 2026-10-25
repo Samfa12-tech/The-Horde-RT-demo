@@ -1,5 +1,5 @@
-// Explicit Debug-only immutable pose preview. No gameplay clock, health,
-// encounter, targetability, semantic event or save is changed by these samples.
+// Explicit Debug-only hidden proofs: immutable pose samples by default, or
+// public inputs to an isolated owner. The application owner/save stays intact.
 using namespace horde::gameplay;
 using namespace horde::gameplay::simulation;
 if (!gShowcaseCaptureHidden || IsWindowVisible(context.windowHandle) ||
@@ -15,6 +15,9 @@ const bool blendCandidate = blendOption != nullptr;
 const char* standPath = std::getenv("HORDE_SKELETON_STAND_CAPTURE_ASSET");
 const bool standCandidate = standPath != nullptr;
 if (standCandidate && blendCandidate) return fail("Authored stand and rejected blend are separate candidates.");
+const char* ownerOption = std::getenv("HORDE_SKELETON_REVIVE_OWNER_CAPTURE");
+if (ownerOption && (std::string_view(ownerOption) != "1" || !standCandidate))
+    return fail("Owner revival capture requires explicit value 1 and the verified private stand asset.");
 constexpr auto standClip = static_cast<horde::scene::SkinnedClip>(4u); // explicit caller-selected diagnostic slot
 
 SynchronizeSimulationViewportAspect(context);
@@ -65,6 +68,250 @@ if (!(duration > 0 && std::isfinite(duration))) return fail("Skeleton Dead durat
 if (standCandidate && (assetHash != "800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259" ||
                       source.ClipDuration(standClip) != 1.5f))
     return fail("Authored stand capture does not own the verified private export identity/duration.");
+if (ownerOption)
+{
+    // Same public-input driver as RevivalIntegrationFixture. Unit-staged
+    // player positions are explicit; no lesson, health or phase is assigned.
+    auto ownerConfig = ProductionGameSimulationConfig();
+    ownerConfig.swordStartsStowed = false; // The validated CPU driver starts ready-handed.
+    ownerConfig.skeletonRevival1_7 = true;
+    ownerConfig.playerStartX = -7.6f; ownerConfig.playerStartZ = -15.2f;
+    ownerConfig.playerStartYawRadians = 1.57079632679f;
+    GameSimulation owner(ownerConfig);
+    owner.SetPresentationAspect(horde::graphics::RtViewAspectFromImageExtent(
+        context.swapchainExtent.width, context.swapchainExtent.height,
+        horde::graphics::RtPresentationTransform::Identity));
+    const float standDuration = source.ClipDuration(standClip);
+    InputSnapshot input;
+    input.yawRadians = 1.57079632679f; input.tutorialSlowdownEnabled = false;
+    unsigned cpuTicks = 0, cryCount = 0, defeatCount = 0, ownerFrames = 0, pauseImageCount = 0;
+    std::string ownerError;
+    std::ofstream ownerRows(outputDirectory / "skeleton-revive-owner.jsonstream", std::ios::binary);
+    if (!ownerRows) return fail("Cannot open actual-owner revival receipt.");
+    ownerRows.precision(10);
+    const auto ownerSummary = [&]() {
+        std::ostringstream text;
+        text << "{\"complete\":" << (ownerError.empty() ? "true" : "false")
+             << ",\"evidenceClass\":\"Debug public-input GameSimulation to normal adapter; unit-staged player positions, no natural play, audio playback, performance or phone acceptance\""
+             << ",\"sourceSha256\":\"" << assetHash << "\",\"cpuTicks\":" << cpuTicks
+             << ",\"frames\":" << ownerFrames << ",\"crySemanticCount\":" << cryCount
+             << ",\"heldPauseFrames\":" << pauseImageCount
+             << ",\"enemyDefeats\":" << defeatCount << ",\"simulationHz\":60,\"unpaced\":true"
+             << ",\"poseAuthority\":\"unedited actual local GameSimulation snapshot through normal adapter\""
+             << ",\"unitStagedPlayerPositions\":true,\"readyHandedDriver\":true,\"audioPlayback\":false"
+             << ",\"deadDurationSeconds\":" << duration << ",\"standDurationSeconds\":" << standDuration
+             << ",\"finalPhase\":" << unsigned(owner.Snapshot().skeletonRevival.phase)
+             << ",\"applicationSnapshotUnchanged\":"
+             << (std::memcmp(applicationBytes.data(), &context.simulation.Snapshot(), applicationBytes.size()) == 0 ? "true" : "false")
+             << ",\"error\":\"" << JsonEscape(ownerError) << "\"}\n";
+        return WriteReportFile(outputDirectory / "skeleton-revive-owner.json", text.str());
+    };
+    const auto ownerFail = [&](const std::string& why) {
+        ownerError = why; (void)ownerSummary(); return fail(why);
+    };
+    const auto step = [&](int count = 1) {
+        for (int tick = 0; tick < count; ++tick) {
+            if (++cpuTicks > 6000u) return false;
+            owner.StepFixed(input);
+            for (const auto& event : owner.Events().Events()) {
+                if (event.type == GameplayEventType::LichRevivalCry) {
+                    if (event.source != EntityId::Lich || event.target != EntityId::Player) return false;
+                    ++cryCount;
+                }
+                if (event.type == GameplayEventType::EnemyDefeated) ++defeatCount;
+            }
+            owner.ClearEvents();
+        }
+        return true;
+    };
+    const auto until = [&](auto predicate, int maximum = 600) {
+        for (int tick = 0; tick < maximum && !predicate(); ++tick) if (!step()) return false;
+        return predicate();
+    };
+    const auto stage = [&](float x, float z, float yaw) {
+        input.guardHeld = false; input.moveForward = input.moveStrafe = 0;
+        input.hasAuthoritativePlayerPose = true;
+        input.authoritativePlayerX = x; input.authoritativePlayerZ = z; input.yawRadians = yaw;
+        if (!step()) return false;
+        input.hasAuthoritativePlayerPose = false;
+        return step(); // Staging never cancels accepted attacks/recovery.
+    };
+    const auto nearActor = [&](std::size_t index, float distance = 1.15f) {
+        const auto actor = owner.Snapshot().swordCombat.combatants[index];
+        return stage(actor.x - distance, actor.z, 1.57079632679f);
+    };
+    const auto aim = [&](std::size_t index) {
+        const auto& state = owner.Snapshot(); const auto& actor = state.swordCombat.combatants[index];
+        input.yawRadians = std::atan2(actor.x - state.playerX, state.playerZ - actor.z);
+    };
+    const auto tell = [&](float lead) {
+        return until([&] {
+            const auto& combat = owner.Snapshot().swordCombat; const int index = combat.attackerIndex;
+            return index >= 0 && combat.combatants[index].action == EnemyCombatAction::AttackWindup &&
+                combat.combatants[index].actionTime + .00001f >= CombatTimeline::kSkeletonAttackWindupSeconds - lead;
+        });
+    };
+    if (!owner.ConfigureSkeletonRevivalPresentation(1u, duration, standDuration) || !nearActor(0))
+        return ownerFail("Actual owner could not admit loader durations or stage its validated encounter.");
+    input.guardHeld = true; ++input.commands.parry;
+    if (!until([&] { return owner.Snapshot().combatTeaching.blockLearned; })) return ownerFail("Actual block was not learned.");
+    input.guardHeld = false;
+    if (!step() || !tell(.10f)) return ownerFail("Actual parry tell was not reached.");
+    ++input.commands.parry;
+    if (!until([&] { return owner.Snapshot().combatTeaching.parryLearned; }, 30) || !tell(5.f / 60.f))
+        return ownerFail("Actual parry/dodge tell was not reached.");
+    input.moveStrafe = 1; ++input.commands.dodge;
+    if (!step(12)) return ownerFail("Actual dodge exceeded its bounded owner.");
+    input.moveStrafe = 0;
+    if (!step(18) || !owner.Snapshot().combatTeaching.dodgeLearned) return ownerFail("Actual dodge was not learned.");
+    const int attacker = owner.Snapshot().swordCombat.attackerIndex;
+    if (attacker < 0 || !nearActor(static_cast<std::size_t>(attacker), 1.f)) return ownerFail("Actual guard-attack target is unavailable.");
+    input.guardHeld = true; ++input.commands.parry;
+    if (!step(45) || owner.Snapshot().playerCombat.action != PlayerCombatAction::Guard) return ownerFail("Actual guard was not recovered.");
+    aim(static_cast<std::size_t>(attacker)); ++input.commands.attack;
+    if (!until([&] { return owner.Snapshot().combatTeaching.attackFromGuardLearned; }, 100))
+        return ownerFail("Actual guard-attack was not learned.");
+    const auto learned = owner.Snapshot().combatTeaching;
+    if (!learned.blockLearned || !learned.parryLearned || !learned.dodgeLearned ||
+        !learned.attackFromGuardLearned || learned.stage != TutorialStage::Ready || !learned.safePractice || !tell(.30f))
+        return ownerFail("Actual four-skill Ready and safe Finish boundary were not established.");
+    ++input.commands.tutorialSkip;
+    if (!step() || !owner.Snapshot().combatTeaching.exitPending || !owner.Snapshot().combatTeaching.safePractice ||
+        !until([&] { return owner.Snapshot().combatTeaching.stage == TutorialStage::Complete; }, 300))
+        return ownerFail("Actual safe Finish was not acknowledged.");
+    input.damageEnabled = false; // Isolated outgoing-contact/pose proof, not damage acceptance.
+    for (std::size_t target = 0; target < 2; ++target) {
+        if (owner.Snapshot().swordCombat.combatants[target].health <= 0) continue;
+        input.guardHeld = false;
+        if (!until([&] { return owner.Snapshot().playerCombat.action == PlayerCombatAction::Idle; }, 180) ||
+            !nearActor(target, 1.f)) return ownerFail("Independent kill did not reach its legitimate idle/target boundary.");
+        aim(target); ++input.commands.attack;
+        if (!step()) return ownerFail("First cut was not stepped.");
+        ++input.commands.attack;
+        if (!until([&] { return owner.Snapshot().swordCombat.combatants[target].health == 0; }, 120))
+            return ownerFail("Actual sword contacts did not defeat both observed actors.");
+    }
+    if (owner.Snapshot().swordCombat.aliveCount != 0 || defeatCount != 2u || cryCount != 0u)
+        return ownerFail("Actual first pair defeat was not isolated before the one-shot signal.");
+    input.pitchRadians = -.22f;
+    if (!stage(-3.f, -12.8f, -1.f) ||
+        !until([&] { return owner.Snapshot().skeletonRevival.phase == SkeletonRevivalPhase::Signal; }, 240) || cryCount != 1u)
+        return ownerFail("Settled actual deaths did not produce exactly one signal.");
+    const auto corpse = owner.Snapshot().skeletonEnemies;
+    const auto initialGear = owner.Snapshot().heldItems;
+    const auto beganOwnerFrames = std::chrono::steady_clock::now();
+    std::uint64_t previousOwnerSerial = 0;
+    auto lastPhase = SkeletonRevivalPhase::Disabled;
+    bool lastStand = false, pauseStarted = false, pauseComplete = false;
+    unsigned pauseTicks = 0;
+    float heldPhaseSeconds = 0;
+    bool sawReverse = false, sawStand = false, sawRearm = false, sawLiveIdle = false;
+    for (unsigned tick = 0; tick < 480u && !sawLiveIdle; ++tick) {
+        const auto actual = owner.Snapshot();
+        const auto phase = actual.skeletonRevival.phase;
+        const bool inStand = phase == SkeletonRevivalPhase::Rising && actual.skeletonRevival.phaseSeconds >= duration;
+        if (std::chrono::steady_clock::now() - beganOwnerFrames > std::chrono::seconds(90) ||
+            IsWindowVisible(context.windowHandle) || GetForegroundWindow() == context.windowHandle || GetFocus() == context.windowHandle)
+            return ownerFail("Actual-owner capture lost its finite hidden owner.");
+        if (!pauseStarted && inStand && actual.skeletonRevival.phaseSeconds >= duration + .7f) {
+            pauseStarted = true; input.paused = true; heldPhaseSeconds = actual.skeletonRevival.phaseSeconds;
+        }
+        if (input.paused && (phase != SkeletonRevivalPhase::Rising || actual.skeletonRevival.phaseSeconds != heldPhaseSeconds))
+            return ownerFail("Actual pause advanced the source rise phase.");
+        const bool transition = phase != lastPhase || inStand != lastStand || actual.skeletonRevival.revivePulse;
+        if ((tick % 2u) == 0u || transition) {
+            if (!actual.playerAlive || actual.skeletonEnemyCount != 2u || cryCount != 1u || actual.openingEncounterComplete)
+                return ownerFail("Actual source lost player/pair ownership or replayed its cry/progression.");
+            for (std::size_t i = 0; i < 2; ++i) {
+                const auto& actor = actual.skeletonEnemies[i]; const auto& retained = corpse[i];
+                if (actor.id != retained.id || actor.x != retained.x || actor.z != retained.z || actor.worldY != retained.worldY ||
+                    actor.facingRadians != retained.facingRadians ||
+                    (phase != SkeletonRevivalPhase::Live && (actor.health != 0 || !actor.dead)))
+                    return ownerFail("Actual source changed corpse roots/IDs or revived before the handoff.");
+                if (actual.heldItems[i].id != initialGear[i].id || actual.heldItems[i].parentMode != initialGear[i].parentMode)
+                    return ownerFail("Actual source changed retained gear ownership during the rise.");
+            }
+            context.playerDodgeInspectionSnapshot = actual; // Unedited actual owner snapshot, not a phase seed.
+            context.inspectionSkeletonBlends.reset(); // The normal shared adapter alone selects the pose.
+            std::array<unsigned char, sizeof(SimulationSnapshot)> ownerBytes{};
+            std::memcpy(ownerBytes.data(), &owner.Snapshot(), ownerBytes.size());
+            bool presented = false;
+            if (!RenderFrame(context, clearColor, presented) || !presented ||
+                !CompleteRtEvidenceAfterDeviceIdle(context, vkDeviceWaitIdle(context.device)))
+                return ownerFail("Actual-owner RT present/completion failed: " + context.lastRtFrameError);
+            const auto publication = context.rtFrameEvidence.PublishedStateByValue();
+            const auto& complete = publication.completedEvidence; const auto& identity = complete.identity.submitted;
+            const auto arms = context.rtScene.PrimaryPlayerPixelCount();
+            const bool dedicated = horde::vulkan::raytracing::HasDedicatedPlayerPrimaryOwnership(
+                context.rtScene.LastInstanceMasks(), context.rtScene.LastPlayerWorldBodyInstanceFlags());
+            const bool counters = context.rtScene.DiagnosticsAvailability() == horde::vulkan::raytracing::RtDiagnosticAvailability::Available;
+            if (!publication.presented || !publication.hasCompletedEvidence || identity.submissionSerial <= previousOwnerSerial ||
+                identity.frame.simulationTick != actual.tickIndex || identity.frame.sceneEpoch != publication.sceneEpoch ||
+                identity.frame.measurementGeneration != publication.measurementGeneration || !complete.scene.dispatch.sceneReady ||
+                !complete.scene.dispatch.rtDispatchRecorded || !complete.scene.dispatch.swapchainCopyRecorded ||
+                complete.presentation.outcome != horde::telemetry::RtPresentationOutcome::Presented ||
+                identity.submissionSerial != complete.presentation.lastSuccessfulPresentSubmissionSerial || !dedicated || !counters || !arms ||
+                !horde::platform::windows::HasExpectedPlayerCaptureVisibility(dedicated, context.rtScene.LastPlayerPrimaryVisible(), counters, arms, false, nullptr) ||
+                std::memcmp(ownerBytes.data(), &owner.Snapshot(), ownerBytes.size()) != 0 ||
+                std::memcmp(applicationBytes.data(), &context.simulation.Snapshot(), applicationBytes.size()) != 0 ||
+                context.simulation.Events().Size() != 0u || context.simulation.Events().NextSequence() != eventSequence)
+                return ownerFail("Actual-owner capture lost matching RT identity, arms or immutable ownership.");
+            horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture pixels;
+            std::string hash, evidence;
+            const std::string file = "owner-" + std::to_string(ownerFrames) + ".png";
+            horde::telemetry::RtEvidenceValidationError validation{};
+            if (!context.rtScene.CaptureStorageImage(pixels, diagnostic) || !WriteRgbaPng(outputDirectory / file, pixels, diagnostic) ||
+                !Sha256File(outputDirectory / file, hash, diagnostic) ||
+                !horde::telemetry::SerializeRtPerformanceEvidenceJson(complete, evidence, validation))
+                return ownerFail("Actual-owner capture readback/evidence failed: " + diagnostic);
+            const auto adapted = horde::vulkan::raytracing::BuildRtSceneFrameInputs(actual, context.outputExposure);
+            ownerRows << "{\"frame\":" << ownerFrames << ",\"tick\":" << actual.tickIndex << ",\"phase\":" << unsigned(phase)
+                << ",\"phaseSeconds\":" << actual.skeletonRevival.phaseSeconds << ",\"paused\":" << (input.paused ? "true" : "false")
+                << ",\"stand\":" << (inStand ? "true" : "false") << ",\"cryCount\":" << cryCount
+                << ",\"file\":\"" << file << "\",\"sha256\":\"" << hash << "\",\"armPixels\":" << arms
+                << ",\"player\":{\"position\":[" << actual.playerX << ',' << actual.playerSupportWorldY << ',' << actual.playerZ
+                << "],\"yaw\":" << actual.playerYawRadians << ",\"pitch\":" << actual.playerPitchRadians
+                << ",\"action\":" << unsigned(actual.playerCombat.action) << "},\"gear\":[";
+            for (std::size_t i = 0; i < actual.heldItems.size(); ++i) {
+                const auto& item = actual.heldItems[i]; if (i) ownerRows << ',';
+                ownerRows << "{\"id\":" << unsigned(item.id) << ",\"parent\":" << unsigned(item.parentMode)
+                    << ",\"stow\":" << item.visualStowBlend << ",\"grip\":" << item.visualGripBlend << ",\"world\":[";
+                for (std::size_t element = 0; element < item.worldFromItem.size(); ++element) {
+                    if (element) ownerRows << ','; ownerRows << item.worldFromItem[element];
+                }
+                ownerRows << "]}";
+            }
+            ownerRows << "],\"actors\":[";
+            for (std::size_t i = 0; i < 2; ++i) {
+                const auto& actor = actual.skeletonEnemies[i]; if (i) ownerRows << ',';
+                ownerRows << "{\"id\":" << unsigned(actor.id) << ",\"health\":" << actor.health << ",\"dead\":" << (actor.dead ? "true" : "false")
+                    << ",\"root\":[" << actor.x << ',' << actor.worldY << ',' << actor.z << "],\"yaw\":" << actor.facingRadians
+                    << ",\"animationTime\":" << actor.animationTime << ",\"idlePhase\":" << actor.idlePhaseSeconds
+                    << ",\"renderTime\":" << adapted.skeletonEnemies[i].animationTime << ",\"standTime\":"
+                    << (adapted.skeletonPoseBlends[i] ? adapted.skeletonPoseBlends[i]->timeSeconds : -1.f) << '}';
+            }
+            ownerRows << "],\"completedFrame\":" << evidence << "}\n"; ownerRows.flush();
+            if (!ownerRows) return ownerFail("Actual-owner receipt write failed.");
+            ++ownerFrames; if (input.paused) ++pauseImageCount;
+            previousOwnerSerial = identity.submissionSerial;
+            sawReverse = sawReverse || (phase == SkeletonRevivalPhase::Rising && !inStand);
+            sawStand = sawStand || inStand; sawRearm = sawRearm || phase == SkeletonRevivalPhase::Rearming;
+            if (phase == SkeletonRevivalPhase::Live) {
+                sawLiveIdle = actual.skeletonRevival.revivePulse && actual.swordCombat.aliveCount == 2u;
+                for (const auto& actor : actual.skeletonEnemies)
+                    sawLiveIdle = sawLiveIdle && actor.health == 2 && !actor.dead && actor.animation == EnemyAnimation::Idle &&
+                        actor.action == EnemyCombatAction::Locomotion && actor.animationTime == 0.f && actor.idlePhaseSeconds == 0.f;
+                if (!sawLiveIdle) return ownerFail("Actual live handoff did not retain the exact two-actor Idle0 join.");
+            }
+        }
+        lastPhase = phase; lastStand = inStand;
+        if (input.paused && ++pauseTicks >= 12u) { input.paused = false; pauseComplete = true; }
+        if (!sawLiveIdle && !step()) return ownerFail("Actual-owner step exceeded its bounded tick budget.");
+    }
+    if (!sawReverse || !sawStand || !sawRearm || !sawLiveIdle || !pauseComplete || cryCount != 1u || defeatCount != 2u)
+        return ownerFail("Actual-owner sequence did not witness all phases, one cry, held pause and live Idle0.");
+    return ownerSummary() ? 0 : 1;
+}
 const unsigned frameCount = standCandidate ? 251u : blendCandidate ? 165u : 150u;
 const unsigned idleStart = standCandidate ? 165u : blendCandidate ? 135u : 120u;
 unsigned completedFrames = 0;

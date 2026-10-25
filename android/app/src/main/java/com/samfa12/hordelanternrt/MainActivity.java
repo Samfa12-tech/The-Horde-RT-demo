@@ -289,6 +289,7 @@ public class MainActivity extends Activity {
     private int latestSubtitleInputMode = SUBTITLE_INPUT_TOUCH;
     private long chapterVoiceGeneration = Long.MIN_VALUE;
     private int chapterVoiceStream;
+    private PrivateLichRevivalAudio privateLichRevivalAudio;
     private int chapterAmbienceStream;
     private boolean chapterAmbienceDialogueActive;
     private boolean chapterVoicePaused;
@@ -721,6 +722,7 @@ public class MainActivity extends Activity {
             if (!isMusicAudioFocusGranted()) {
                 if (menuAmbience != null) menuAmbience.stop();
                 stopChapterAmbience();
+                stopPrivateLichRevivalAudio();
             }
             });
             handler.post(menuAmbienceFrame);
@@ -1224,6 +1226,7 @@ public class MainActivity extends Activity {
     }
 
     private void stopSurface() {
+        stopPrivateLichRevivalAudio();
         cancelOpeningBenchmarkRequest();
         stopChapterAmbience();
         cancelCombatTeachingPromptPoll();
@@ -2047,6 +2050,7 @@ public class MainActivity extends Activity {
         clearTouchState();
         stopChapterAmbience();
         ++delayedGameplayFeedbackGeneration;
+        stopPrivateLichRevivalAudio();
         clearVerticalProofFeedbackSelection();
         suspendAndResetWaterfall();
         stopChapterVoice();
@@ -4079,7 +4083,7 @@ public class MainActivity extends Activity {
     }
 
     private void pauseChapterVoice(boolean paused) {
-        if (paused) stopChapterAmbience();
+        if (paused) stopChapterAmbience(); // A transient caption/voice publication is not a cue lifetime change.
         if (chapterVoiceStream == 0 || soundPool == null || chapterVoicePaused == paused) return;
         if (paused) soundPool.pause(chapterVoiceStream);
         else soundPool.resume(chapterVoiceStream);
@@ -5747,7 +5751,7 @@ public class MainActivity extends Activity {
 
     private void setGameplayPaused(boolean paused) {
         if(openingBenchmarkRecoveryRejected)return;
-        if (paused) stopChapterAmbience();
+        if (paused) {stopChapterAmbience();stopPrivateLichRevivalAudio();}
         if(!paused && (campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier()))) paused=true;
         if (paused) { clearRunIntent(); clearCrouchIntent(); }
         if (paused) suspendAndResetWaterfall(); // Same generation retains the Core cursor.
@@ -5816,6 +5820,7 @@ public class MainActivity extends Activity {
         clearRunIntent();
         stopChapterAmbience();
         ++delayedGameplayFeedbackGeneration;
+        stopPrivateLichRevivalAudio();
         clearVerticalProofFeedbackSelection();
         suspendAndResetWaterfall();
         endingOverlayVisible = false;
@@ -6378,6 +6383,7 @@ public class MainActivity extends Activity {
         }
         stopChapterAmbience();
         ++delayedGameplayFeedbackGeneration;
+        stopPrivateLichRevivalAudio();
         campaignFromDeath=confirmed;
         campaignDeathMessage=null;
         retryPending = true;
@@ -6644,6 +6650,7 @@ public class MainActivity extends Activity {
                 // active. Native teardown discards its pending transport queue, so a
                 // pre-Home event can neither play in the background nor replay after
                 // the new surface resumes.
+                updatePrivateLichRevivalAudio(state);
                 if (resumed && surfaceStarted && state == 1) {
                     final long[] platformEvents = ProbeBridge.drainPlatformEvents();
                     final int latestAmbienceSignal=ChapterAmbienceFeedback.latestSignalIndex(platformEvents);
@@ -6656,6 +6663,11 @@ public class MainActivity extends Activity {
                     final int eventAudioCue = (int) ((metadata >>> 24) & 0xffL);
                     final long eventSequence = (metadata >>> 32) & 0xffffffffL;
                     switch (eventType) {
+                        case PrivateLichRevivalAudio.EVENT_TYPE: // LichRevivalCry; no damage/haptic mapping.
+                            if(privateLichRevivalAudio!=null)privateLichRevivalAudio.start(metadata,stereoGains,
+                                delayedGameplayFeedbackGeneration,privateRevivalAudible(state),
+                                preferences.getInt("sfx_volume",70)/100.f,privateRevivalDuck());
+                            break;
                         case PLATFORM_EVENT_FOREST_BIRD:
                         case PLATFORM_EVENT_FOREST_CRICKETS:
                         case PLATFORM_EVENT_POND_FROGS:
@@ -7425,6 +7437,7 @@ public class MainActivity extends Activity {
                 if (BuildConfig.DEBUG) Log.i("HordeMenuAmbience", "stop stream=" + stream);
             }
         });
+        initialisePrivateLichRevivalAudio();
         initialiseWaterfallLoop();
         if (BuildConfig.DEBUG) {
             menuAmbienceTuningPreferences = getSharedPreferences("horde_menu_ambience_tuning", MODE_PRIVATE);
@@ -7501,6 +7514,38 @@ public class MainActivity extends Activity {
                 clamp(userGain * leftScale, 0.0f, 1.0f),
                 clamp(userGain * rightScale, 0.0f, 1.0f), delayedGameplayFeedbackGeneration);
     }
+
+    private void initialisePrivateLichRevivalAudio() {
+        if(!PrivateLichRevivalAudio.enabled(BuildConfig.DEBUG,getIntent()!=null &&
+                getIntent().getBooleanExtra(PrivateLichRevivalAudio.INTENT_OPT_IN,false)))return;
+        String error=PrivateLichRevivalAudio.validate(getFilesDir());
+        if(error!=null){Log.e(TAG,error);return;}
+        final int id=soundPool.load(PrivateLichRevivalAudio.file(getFilesDir()).getAbsolutePath(),1);
+        if(id==0){Log.e(TAG,"SoundPool rejected the verified private revival WAV.");return;}
+        privateLichRevivalAudio=new PrivateLichRevivalAudio(new PrivateLichRevivalAudio.Sink() {
+            public int start(float left,float right) {
+                synchronized(loadedSounds){if(!loadedSounds.contains(id)){Log.e(TAG,"Private revival WAV is not ready.");return 0;}}
+                return soundPool==null?0:soundPool.play(id,left,right,1,0,1.f);
+            }
+            public void gain(int stream,float left,float right){if(soundPool!=null)soundPool.setVolume(stream,left,right);}
+            public void stop(int stream){if(soundPool!=null)soundPool.stop(stream);}
+        });
+    }
+    private boolean privateRevivalAudible(int state) {
+        return resumed && surfaceStarted && state==1 && hasWindowFocus() && isMusicAudioFocusGranted() &&
+            !menuVisible && !campaignMenuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
+            !playtestReportVisible && !benchmarkRunning && !debugMotionActive && !deathOverlayVisible && !endingOverlayVisible &&
+            preferences.getBoolean("sfx_enabled",true);
+    }
+    private float privateRevivalDuck() {
+        try{return ProbeBridge.getSfxDialogueBedGain();}
+        catch(RuntimeException | LinkageError unavailable){return 0.f;}
+    }
+    private void updatePrivateLichRevivalAudio(int state) {
+        if(privateLichRevivalAudio!=null)privateLichRevivalAudio.update(delayedGameplayFeedbackGeneration,
+            privateRevivalAudible(state),preferences.getInt("sfx_volume",70)/100.f,privateRevivalDuck());
+    }
+    private void stopPrivateLichRevivalAudio(){if(privateLichRevivalAudio!=null)privateLichRevivalAudio.stop();}
 
     private void loadSound(final String key, final String assetPath) {
         final File audioDirectory = new File(getCacheDir(), "alpha_sfx");
@@ -7977,6 +8022,7 @@ public class MainActivity extends Activity {
         if (!focused) {
             if(lookoutObjectiveVisible)showMainMenu(false);
             stopChapterAmbience();
+            stopPrivateLichRevivalAudio();
             clearRunIntent();
             clearCrouchIntent();
             stopMenuAmbience();
@@ -8774,6 +8820,7 @@ public class MainActivity extends Activity {
         handler.removeCallbacks(refreshRtLabTelemetry);
         stopChapterAmbience();
         ++delayedGameplayFeedbackGeneration;
+        stopPrivateLichRevivalAudio();
         suspendAndResetWaterfall();
         if (vibrator != null) vibrator.cancel();
         if (!campaignFromDeath && (deathOverlayVisible || retryPending || endingOverlayVisible)) {

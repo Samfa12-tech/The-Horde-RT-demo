@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <iostream>
 #include <limits>
+#include <string_view>
 
 using namespace horde::gameplay;
 using namespace horde::gameplay::simulation;
@@ -107,8 +108,122 @@ void CheckClean(const SimulationSnapshot& s) {
         s.finale.dawnRevealProgress==0 && s.EndingPhaseForUi()==interactions::FinaleEndingPhase::Inactive,
         "logical chapter restore does not replay the legacy dawn ending");
 }
+void RevivalRestoreProfile(const std::shared_ptr<const TriangleSupportSurface>& terrain) {
+    // Valid logical earned-record fixtures on actual terrain. This is not a
+    // natural combat victory, a stored-record acknowledgement or slot IO proof.
+    constexpr float deadSeconds=89.f/30.f, standSeconds=1.5f;
+    auto config=ProductionGameSimulationConfig();config.skeletonRevival1_7=true;config.healingFlask1_7=true;
+    std::array<cp::Checkpoint,3> records{{Record(),Record(true),Endpoint(*terrain)}};
+    records[0].vitality=1;
+    records[1].schema=2;records[1].vitality=2;records[1].halfHeart=true;
+    records[2].schema=3;records[2].vitality=1;records[2].halfHeart=true;records[2].flask={true,1};
+    const auto originals=records;
+    const auto noCry=[](const GameSimulation& game) {
+        for(const auto& event:game.Events().Events())if(event.type==GameplayEventType::LichRevivalCry)return false;
+        return true;
+    };
+    const auto sameRevival=[](const SimulationSnapshot& a,const SimulationSnapshot& b) {
+        return a.skeletonRevival.enabled==b.skeletonRevival.enabled &&
+            a.skeletonRevival.consumed==b.skeletonRevival.consumed && a.skeletonRevival.phase==b.skeletonRevival.phase &&
+            a.skeletonRevival.phaseSeconds==b.skeletonRevival.phaseSeconds && a.skeletonRevival.generation==b.skeletonRevival.generation &&
+            a.skeletonRevival.signalPulse==b.skeletonRevival.signalPulse && a.skeletonRevival.revivePulse==b.skeletonRevival.revivePulse &&
+            a.skeletonRevival.waitingForClearance==b.skeletonRevival.waitingForClearance &&
+            a.skeletonRevivalPresentationReady==b.skeletonRevivalPresentationReady &&
+            a.skeletonRevivalDeadDurationSeconds==b.skeletonRevivalDeadDurationSeconds &&
+            a.skeletonRevivalStandDurationSeconds==b.skeletonRevivalStandDurationSeconds;
+    };
+    const auto terminal=[&](const GameSimulation& game,const cp::Checkpoint& record,bool ready) {
+        const auto& s=game.Snapshot();
+        Check(s.skeletonRevival.enabled && s.skeletonRevival.phase==SkeletonRevivalPhase::Complete &&
+              s.skeletonRevival.consumed && s.skeletonRevival.phaseSeconds==0 &&
+              !s.skeletonRevival.signalPulse && !s.skeletonRevival.revivePulse && s.openingEncounterComplete && noCry(game),
+              "earned restore is immediately terminal with no cry rising action or fresh revival pulse");
+        Check(s.skeletonRevivalPresentationReady==ready && s.skeletonRevivalDeadDurationSeconds==deadSeconds &&
+              s.skeletonRevivalStandDurationSeconds==standSeconds,
+              "restore retains the current owner's admitted presentation receipt and readiness instead of replaying it");
+        Check(s.playerVitals.vitality==record.vitality && s.playerVitals.halfHeart==record.halfHeart &&
+              s.healingFlask.resources==record.flask,"revival restoration preserves exact saved half health and flask resources");
+        for(std::size_t i=0;i<2;++i) {
+            const auto& actor=s.skeletonEnemies[i];const auto& pose=record.guards[i];
+            Check(actor.id==(i==0?EntityId::SkeletonA:EntityId::SkeletonB) && actor.dead && actor.health==0 &&
+                  actor.action==EnemyCombatAction::Dead && actor.animation==EnemyAnimation::Dead &&
+                  actor.animationTime>=deadSeconds && actor.x==pose.x && actor.z==pose.z && actor.facingRadians==pose.yaw,
+                  "each stable guard restores its recorded settled corpse rather than standing or a replacement spawn");
+        }
+    };
+    for(const auto& record:records) {
+        Check(cp::Validate(record),"legacy or resource-bearing earned fixture validates before revival restore");
+        GameSimulation game(config);
+        Check(game.ConfigureSkeletonRevivalPresentation(2,deadSeconds,standSeconds),"restore profile registers reviewed native clip durations");
+        const bool ready=record.schema!=2;
+        if(!ready)Check(game.ConfigureSkeletonRevivalPresentation(2,deadSeconds,standSeconds,false),
+                        "one legacy load begins during an explicitly unavailable presentation");
+        if(!Restore(game,record,terrain)){Check(false,"earned revival fixture restores on actual chapter support");continue;}
+        CheckClean(game.Snapshot());terminal(game,record,ready);
+        Check(!game.ConfigureSkeletonRevivalPresentation(1,deadSeconds,standSeconds),
+              "a pre-load resource generation cannot replace the copied presentation receipt");
+        const auto captured=game.CaptureCampaignCheckpoint(record.id);
+        auto expected=record;expected.schema=3;
+        Check(captured && SameRecord(*captured,expected) && captured->flask==expected.flask,
+              "explicit capture preserves every earned value including old empty-flask interpretation without write-on-read");
+        if(captured) {
+            GameSimulation another(config);
+            const bool configured=another.ConfigureSkeletonRevivalPresentation(2,deadSeconds,standSeconds) &&
+                (ready || another.ConfigureSkeletonRevivalPresentation(2,deadSeconds,standSeconds,false));
+            Check(configured && Restore(another,*captured,terrain),
+                  "a fresh simulation restores the captured value with its own current presentation receipt");
+            terminal(another,*captured,ready);
+        }
+        InputSnapshot neutral;neutral.damageEnabled=false;neutral.yawRadians=record.yaw;neutral.pitchRadians=record.pitch;
+        for(std::uint64_t publication=1;publication<=12;++publication)game.StepFixed(neutral,1.f/60.f,publication);
+        Check(game.Snapshot().skeletonRevival.phase==SkeletonRevivalPhase::Complete &&
+              game.Snapshot().skeletonEnemyCount==2 && game.Snapshot().activeSkeletonCount==0 && noCry(game),
+              "fresh neutral input cannot rearm or replay an earned encounter even while presentation is unavailable");
+        const auto before=game.Snapshot();game.RetryEncounter();
+        Check(game.Snapshot().campaignRetryRequestGeneration==before.campaignRetryRequestGeneration+1 &&
+              SameSession(before,game.Snapshot()) && sameRevival(before,game.Snapshot()) &&
+              game.Snapshot().healingFlask.resources==before.healingFlask.resources && noCry(game),
+              "postclaim Retry only publishes a confirmed-owner request and cannot substitute live health resources or resurrection state");
+    }
+    {
+        GameSimulation game(config);const auto& record=records[2];
+        Check(game.ConfigureSkeletonRevivalPresentation(2,deadSeconds,standSeconds) && Restore(game,record,terrain),
+              "pending readiness and cancellation fixture starts from an earned terminal encounter");
+        const auto before=game.Snapshot();const auto pending=game.BeginCampaignRestore(records[1]);
+        Check(pending && !game.CaptureCampaignCheckpoint(record.id) && SameSession(before,game.Snapshot()) && sameRevival(before,game.Snapshot()),
+              "preparing another load does not prematurely change the live terminal bridge or publish a new save");
+        if(pending) {
+            Check(!game.CommitCampaignRestore(*pending,{pending->worldGeneration-1,records[1].zone},terrain,{}) &&
+                  SameSession(before,game.Snapshot()) && sameRevival(before,game.Snapshot()) &&
+                  game.Snapshot().healingFlask.resources==record.flask && noCry(game),
+                  "wrong terrain readiness preserves the exact live resources and terminal bridge");
+            game.CancelCampaignRestore();
+            Check(!game.CommitCampaignRestore(*pending,{pending->worldGeneration,records[1].zone},terrain,{}) &&
+                  SameSession(before,game.Snapshot()) && sameRevival(before,game.Snapshot()) && noCry(game),
+                  "cancelled pending load cannot later apply a different corpse or revival state");
+        }
+        const auto retained=game.CaptureCampaignCheckpoint(record.id);
+        Check(retained && SameRecord(*retained,record) && retained->flask==record.flask,
+              "failed and cancelled loads retain the exact original earned record values");
+    }
+    {
+        // Negative pre-wave fixture: multiple ordinary eligibility conditions
+        // are absent, so rejection alone is not a unique bridge-gate proof.
+        GameSimulation fresh(config);Check(fresh.ConfigureSkeletonRevivalPresentation(1,deadSeconds,standSeconds),
+                                          "negative pre-wave fixture has real presentation metadata but no earned progression");
+        Check(fresh.Snapshot().skeletonRevival.phase==SkeletonRevivalPhase::Practice && !fresh.Snapshot().openingEncounterComplete &&
+              !fresh.CaptureCampaignCheckpoint(cp::CheckpointId::LowerClaimed) &&
+              !fresh.CaptureCampaignCheckpoint(cp::CheckpointId::SafeExit) &&
+              !fresh.CaptureCampaignCheckpoint(cp::CheckpointId::ForestEndpoint) && noCry(fresh),
+              "unearned pre-wave fixture cannot manufacture any campaign boundary or cry");
+    }
+    for(std::size_t i=0;i<records.size();++i)
+        Check(SameRecord(records[i],originals[i]) && records[i].flask==originals[i].flask,
+              "independent input record values remain untouched by restore cancel and retry requests");
+    std::cout<<checks<<" revival restore checks, "<<failures<<" failures\n";
 }
-int main() {
+}
+int main(int argc,char** argv) {
     const auto directory=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json",manifest,error) ||
@@ -117,6 +232,9 @@ int main() {
     }
     const auto terrain=horde::scene::PrepareChapterTerrainSurface(mesh,error);
     if(!terrain) {std::cerr<<"real chapter support preparation failed: "<<error<<'\n';return 1;}
+    if(argc==2 && std::string_view(argv[1])=="--revival-restore") {
+        RevivalRestoreProfile(terrain);return failures?1:0;
+    }
     // The initial records are ordinary validated logical values. Neither side
     // of these round trips imports a development/debug capture checkpoint.
     for(bool upper:{false,true}) for(int vitality:{1,2,3}) for(bool half:{false,true}) {

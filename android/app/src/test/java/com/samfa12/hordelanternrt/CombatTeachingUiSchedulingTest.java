@@ -172,6 +172,34 @@ public final class CombatTeachingUiSchedulingTest {
         assertEquals("",prompt.getText().toString());assertEquals("",field("combatTeachingFadeText").get(activity));
     }
 
+    @Test public void actualExistingWidgetShowsAndClearsRevivalClearanceWithoutRestartingLesson()throws Exception {
+        MainActivity activity=activeActivity();TextView prompt=(TextView)field("combatTeachingPrompt").get(activity);
+        java.lang.reflect.Method update=MainActivity.class.getDeclaredMethod("updateCombatTeachingPrompt",int.class);
+        update.setAccessible(true);
+        NativeTeaching.overrideState=2L|(1L<<34); // Complete lesson; authoritative clearance only.
+        assertTrue((Boolean)update.invoke(activity,1));
+        assertEquals(View.VISIBLE,prompt.getVisibility());
+        assertEquals("Step back from the skeletons.",prompt.getText().toString());
+        assertEquals(1f,prompt.getAlpha(),0f);
+        assertEquals("Step back from the skeletons.",prompt.getContentDescription().toString());
+        field("menuVisible").setBoolean(activity,true);
+        assertFalse((Boolean)update.invoke(activity,1));
+        assertEquals(View.GONE,prompt.getVisibility());
+        field("menuVisible").setBoolean(activity,false);
+        assertTrue((Boolean)update.invoke(activity,1));
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(1));
+        NativeTeaching.overrideState=2L;
+        assertTrue("the existing fade keeps timely polling until its final clear",
+                (Boolean)update.invoke(activity,1));
+        assertEquals("the non-protection hint may use the existing 120 ms fade",View.VISIBLE,prompt.getVisibility());
+        assertEquals("Step back from the skeletons.",prompt.getText().toString());
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(121));
+        assertFalse((Boolean)update.invoke(activity,1));
+        assertEquals(View.GONE,prompt.getVisibility());
+        assertEquals("",prompt.getText().toString());
+        assertEquals("",prompt.getContentDescription().toString());
+    }
+
     @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
     public void actualPracticeWidgetKeepsProtectionSkillAndWarningReadableInBothOrientations()throws Exception {
         String originalQualifiers=RuntimeEnvironment.getQualifiers();

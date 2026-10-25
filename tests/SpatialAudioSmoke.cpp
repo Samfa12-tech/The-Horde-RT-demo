@@ -12,6 +12,8 @@
 #include "gameplay/EquipmentFeedback.h"
 #include "platform/android/GameplayEventMetadata.h"
 #include "gameplay/SpatialAudio.h"
+#include "audio/LichRevivalAudio.h"
+#include <limits>
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
@@ -673,6 +675,30 @@ int main()
           !travelFootsteps.Update(0.0f, false) &&
           !travelFootsteps.Update(TravelFootstepCadence::kInitialStepDistanceMetres * 0.5f, true),
           "travel cadence must emit from real distance and reset while stationary");
+
+    {
+        using namespace horde::gameplay::simulation;
+        GameplayEvent cry;cry.type=GameplayEventType::LichRevivalCry;cry.source=EntityId::Lich;cry.target=EntityId::Player;
+        cry.worldX=-32.2f;cry.worldZ=-13.1f;cry.listenerX=-5.5f;cry.listenerZ=-15.2f;
+        check(static_cast<unsigned>(cry.type)==36u && kGameplayEventTypeCount==37u && horde::audio::IsLichRevivalCry(cry),
+              "revival appends ID36/count37 without reusing damage or reveal IDs");
+        const auto emitted=horde::audio::LichRevivalEmitter(cry);
+        const auto routed=CalculateSpatialAudio(emitted,{cry.listenerX,cry.listenerZ,0.f,cry.listenerY});
+        check(emitted.x==cry.worldX && emitted.z==cry.worldZ && emitted.referenceDistance==24.f && emitted.maximumDistance==48.f &&
+              routed.distance>26.f && routed.distance<28.f && (routed.left>0.f || routed.right>0.f),
+              "cry retains actual distant Keeper source and bounded provisional audibility, not a phantom player source");
+        cry.source=EntityId::SkeletonA;check(!horde::audio::IsLichRevivalCry(cry),"another actor cannot own the Keeper cry");
+        check(horde::audio::OwnedCueGain(std::numeric_limits<float>::quiet_NaN(),1.f)==0.f &&
+              horde::audio::OwnedCueGain(.2f,.65f)>.129f && horde::audio::OwnedCueGain(.2f,.65f)<.131f,
+              "owned cue uses finite saved-volume and shared-duck scalars without a new envelope");
+        horde::audio::OwnedSpatialOneShot voice;voice.ObserveLifetime(2);
+        check(voice.Begin(7,.8f,.2f,true) && !voice.Begin(7,.2f,.8f,true) && voice.left==.8f,
+              "one original sequence latches pan and rejects duplicate playback");
+        voice.Cancel();check(!voice.Begin(7,.8f,.2f,true),"cancel does not replay the same packet");
+        voice.ObserveLifetime(3);check(voice.Begin(1,.4f,.6f,true),"a fresh owning lifetime can use a new sequence domain");
+        voice.ObserveLifetime(2);check(voice.active && voice.lastSequence==1 && voice.lifetime==3,"stale lifetime cannot replace the new owner");
+        voice.Cancel();check(!voice.Begin(2,std::numeric_limits<float>::quiet_NaN(),.5f,true),"nonfinite panning is rejected");
+    }
 
     if (!passed)
     {

@@ -421,6 +421,185 @@ int main()
     ok &= Require(std::none_of(adaptedFrame.skeletonPoseBlends.begin(), adaptedFrame.skeletonPoseBlends.end(),
                               [](const auto& blend) { return blend.has_value(); }),
                   "ordinary shared adapter must not enable skeleton clip blending");
+    {
+        using RevivalPhase = simulation::SkeletonRevivalPhase;
+        constexpr float deadDuration = 2.9666666984558105f;
+        constexpr float standDuration = 1.5f;
+        constexpr auto standClip = static_cast<horde::scene::SkinnedClip>(4u);
+        auto source = simulationSnapshot;
+        source.enemyRoster.selectedEnemy = EnemyKind::Lich;
+        source.enemyRoster.renderedEnemyCount = source.enemyRoster.renderedEnemyCapacity = 1u;
+        source.enemyRoster.renderedEnemies[0] = EnemyKind::Lich;
+        source.skeletonRevivalDeadDurationSeconds = deadDuration;
+        source.skeletonRevivalStandDurationSeconds = standDuration;
+        source.skeletonRevival.phase = RevivalPhase::Signal;
+        for (auto& actor : source.skeletonEnemies) {
+            actor.health = 0; actor.dead = true;
+            actor.animation = EnemyAnimation::Dead; actor.action = EnemyCombatAction::Dead;
+            actor.animationTime = 7.f; actor.idlePhaseSeconds = .73f;
+            actor.forceCurrentCombatPose = true;
+        }
+        const auto noBlend = [](const RtSceneFrameInputs& frame) {
+            return std::none_of(frame.skeletonPoseBlends.begin(), frame.skeletonPoseBlends.end(),
+                                [](const auto& request) { return request.has_value(); });
+        };
+        const auto adapt = [&] {
+            std::array<std::byte, sizeof(source)> retained{};
+            std::memcpy(retained.data(), &source, sizeof(source));
+            const auto frame = BuildRtSceneFrameInputs(source, .75f);
+            ok &= Require(std::memcmp(retained.data(), &source, sizeof(source)) == 0,
+                          "revival presentation must not mutate the authoritative snapshot");
+            ok &= Require(frame.skeletonEnemyCount == source.skeletonEnemyCount &&
+                          frame.roster.selectedEnemy == source.enemyRoster.selectedEnemy &&
+                          frame.roster.renderedEnemyCount == source.enemyRoster.renderedEnemyCount &&
+                          frame.roster.renderedEnemyCapacity == source.enemyRoster.renderedEnemyCapacity &&
+                          frame.roster.renderedEnemies == source.enemyRoster.renderedEnemies &&
+                          frame.cameraX == source.playerX && frame.cameraZ == source.playerZ &&
+                          frame.cameraYaw == source.playerYawRadians && frame.cameraPitch == source.playerPitchRadians &&
+                          frame.playerAnimation == source.playerAnimation,
+                          "revival presentation must preserve actor count, roster and player ownership");
+            for (std::size_t i = 0; i < source.skeletonEnemies.size(); ++i) {
+                const auto& a = source.skeletonEnemies[i]; const auto& b = frame.skeletonEnemies[i];
+                ok &= Require(a.id == b.id && a.x == b.x && a.z == b.z && a.worldY == b.worldY &&
+                              a.facingRadians == b.facingRadians && a.health == b.health && a.dead == b.dead,
+                              "revival render copy must retain stable IDs, roots, facing and dead/health authority");
+            }
+            for (std::size_t i = 0; i < source.heldItems.size(); ++i) {
+                const auto& a = source.heldItems[i]; const auto& b = frame.heldItems[i];
+                ok &= Require(a.id == b.id && a.hand == b.hand && a.parentMode == b.parentMode &&
+                              a.worldFromItem == b.worldFromItem && a.worldFromDetach == b.worldFromDetach &&
+                              a.visualStowBlend == b.visualStowBlend && a.visualGripBlend == b.visualGripBlend &&
+                              a.detachTick == b.detachTick && a.detached == b.detached,
+                              "revival presentation must not change retained player gear");
+            }
+            return frame;
+        };
+        const auto disabled = adapt();
+        ok &= Require(noBlend(disabled) &&
+                      std::memcmp(disabled.skeletonEnemies.data(), source.skeletonEnemies.data(),
+                                  sizeof(source.skeletonEnemies)) == 0,
+                      "disabled revival must retain the exact original actor render inputs");
+        source.skeletonRevival.enabled = true;
+        source.skeletonRevival.phase = RevivalPhase::Practice;
+        const auto notAdmittedPractice = adapt();
+        ok &= Require(noBlend(notAdmittedPractice) &&
+                      std::memcmp(notAdmittedPractice.skeletonEnemies.data(), source.skeletonEnemies.data(),
+                                  sizeof(source.skeletonEnemies)) == 0,
+                      "not-ready practice must remain the ordinary presentation");
+        source.skeletonRevival.phase = RevivalPhase::Signal;
+        const auto notReady = adapt();
+        CharacterRenderSlot admissionGate;
+        std::string admissionError;
+        ok &= Require(notReady.skeletonPoseBlends[0] &&
+                      !std::isfinite(notReady.skeletonPoseBlends[0]->timeSeconds) &&
+                      !admissionGate.CacheFramePlan(notReady.skeletonEnemies, notReady.skeletonEnemyCount,
+                          notReady.roster, notReady.lich, admissionError, notReady.skeletonPoseBlends) &&
+                      admissionError.find("finite") != std::string::npos,
+                      "active not-ready revival must reject before upload rather than drop to an ordinary corpse");
+        source.skeletonRevivalPresentationReady = true;
+        const auto signal = adapt();
+        ok &= Require(noBlend(signal) && signal.skeletonEnemies[0].animationTime == deadDuration &&
+                      signal.skeletonEnemies[1].animationTime == deadDuration &&
+                      !signal.skeletonEnemies[0].forceCurrentCombatPose,
+                      "signal must hold the exact settled Dead endpoint without a force-refresh pulse");
+        source.skeletonRevival.phase = RevivalPhase::Rising;
+        source.skeletonRevival.phaseSeconds = 0.f;
+        const auto risingStart = adapt();
+        ok &= Require(noBlend(risingStart) && risingStart.skeletonEnemies[0].animationTime == deadDuration,
+                      "reverse Dead must begin at its exact authored endpoint");
+        auto previous = risingStart;
+        unsigned reverseRefreshes = 1u;
+        for (unsigned tick = 1u; tick < 178u; ++tick) {
+            source.skeletonRevival.phaseSeconds = float(tick) / 60.f;
+            const auto current = adapt();
+            const float requested = current.skeletonEnemies[0].animationTime;
+            const float last = previous.skeletonEnemies[0].animationTime;
+            const bool refresh = CharacterPoseNeedsRefresh(
+                int(horde::scene::SkinnedClip::Dead), requested,
+                int(horde::scene::SkinnedClip::Dead), last, 1.f / 30.f);
+            ok &= Require(noBlend(current) && refresh == ((tick % 2u) == 0u),
+                          "60 Hz reverse clock must preserve paired 30 Hz render-cache times");
+            reverseRefreshes += refresh ? 1u : 0u;
+            previous = current;
+        }
+        ok &= Require(reverseRefreshes == 89u, "reverse Dead unexpectedly doubled pose work to 60 Hz");
+        source.skeletonRevival.phaseSeconds = deadDuration;
+        const auto standStart = adapt();
+        ok &= Require(standStart.skeletonPoseBlends[0] &&
+                      standStart.skeletonPoseBlends[0]->clip == standClip &&
+                      standStart.skeletonPoseBlends[0]->timeSeconds == 0.f &&
+                      standStart.skeletonPoseBlends[0]->weight == 1.f &&
+                      standStart.skeletonEnemies[0].animationTime == 0.f,
+                      "Dead0 must join the existing explicit stand binding at its exact start");
+        previous = standStart;
+        unsigned standRefreshes = 1u;
+        for (unsigned tick = 1u; tick <= 90u; ++tick) {
+            source.skeletonRevival.phaseSeconds = deadDuration + float(tick) / 60.f;
+            const auto current = adapt();
+            const auto& requested = current.skeletonPoseBlends[0];
+            const auto& last = previous.skeletonPoseBlends[0];
+            const bool refresh = requested && last && CharacterPoseNeedsRefresh(
+                int(horde::scene::SkinnedClip::Dead), 0.f,
+                int(horde::scene::SkinnedClip::Dead), 0.f, 1.f / 30.f, false, &*requested, &*last);
+            ok &= Require(requested && current.skeletonPoseBlends[1] &&
+                          requested->timeSeconds == current.skeletonPoseBlends[1]->timeSeconds &&
+                          refresh == ((tick % 2u) == 0u),
+                          "60 Hz stand clock must retain shared paired 30 Hz blend identities");
+            standRefreshes += refresh ? 1u : 0u;
+            previous = current;
+        }
+        ok &= Require(standRefreshes == 46u && previous.skeletonPoseBlends[0] &&
+                      previous.skeletonPoseBlends[0]->timeSeconds == standDuration,
+                      "stand rendering must retain its exact endpoint without 60 Hz refresh identities");
+        const auto frozen = adapt();
+        ok &= Require(frozen.skeletonPoseBlends[0] && previous.skeletonPoseBlends[0] &&
+                      frozen.skeletonPoseBlends[0]->timeSeconds == previous.skeletonPoseBlends[0]->timeSeconds,
+                      "a frozen source phase must preserve the same render request");
+        source.skeletonRevival.phase = RevivalPhase::Rearming;
+        source.skeletonRevival.phaseSeconds = .25f;
+        const auto rearming = adapt();
+        const auto rearmPlan = EvaluateCharacterFramePlan(rearming.skeletonEnemies,
+            rearming.skeletonEnemyCount, rearming.roster, rearming.lich, deadDuration,
+            rearming.skeletonPoseBlends);
+        ok &= Require(noBlend(rearming) && rearmPlan.skeletonCount == 2u && rearmPlan.lichVisible &&
+                      rearmPlan.skeletons[0].clip == horde::scene::SkinnedClip::Idle &&
+                      rearmPlan.skeletons[1].clip == horde::scene::SkinnedClip::Idle &&
+                      rearmPlan.skeletons[0].time == 0.f && rearmPlan.skeletons[1].time == 0.f,
+                      "rearming must show both dead actors at Idle0 without B's inherited phase seed, even with Keeper selected");
+        for (const float bad : {0.f, -1.f, std::numeric_limits<float>::quiet_NaN(),
+                                std::numeric_limits<float>::infinity()}) {
+            source.skeletonRevivalStandDurationSeconds = bad;
+            const auto malformed = adapt();
+            ok &= Require(!admissionGate.CacheFramePlan(malformed.skeletonEnemies, malformed.skeletonEnemyCount,
+                              malformed.roster, malformed.lich, admissionError, malformed.skeletonPoseBlends),
+                          "malformed admitted timing must reuse finite-blend rejection, not silently render a fallback");
+        }
+        source.skeletonRevivalStandDurationSeconds = standDuration;
+        for (const float bad : {0.f, -1.f, std::numeric_limits<float>::quiet_NaN(),
+                                std::numeric_limits<float>::infinity()}) {
+            source.skeletonRevivalDeadDurationSeconds = bad;
+            const auto malformed = adapt();
+            ok &= Require(!admissionGate.CacheFramePlan(malformed.skeletonEnemies, malformed.skeletonEnemyCount,
+                              malformed.roster, malformed.lich, admissionError, malformed.skeletonPoseBlends),
+                          "malformed Dead duration must reject before any skin/upload");
+        }
+        source.skeletonRevivalDeadDurationSeconds = deadDuration;
+        for (const float bad : {-1.f, std::numeric_limits<float>::quiet_NaN(),
+                                std::numeric_limits<float>::infinity()}) {
+            source.skeletonRevival.phaseSeconds = bad;
+            const auto malformed = adapt();
+            ok &= Require(!admissionGate.CacheFramePlan(malformed.skeletonEnemies, malformed.skeletonEnemyCount,
+                              malformed.roster, malformed.lich, admissionError, malformed.skeletonPoseBlends),
+                          "malformed active phase clock must reject rather than silently clamp");
+        }
+        source.skeletonRevival.phaseSeconds = 0.f;
+        source.skeletonRevival.phase = RevivalPhase::Live;
+        const auto live = adapt();
+        ok &= Require(noBlend(live) &&
+                      std::memcmp(live.skeletonEnemies.data(), source.skeletonEnemies.data(),
+                                  sizeof(source.skeletonEnemies)) == 0,
+                      "live/default rendering must return to the exact authoritative actor inputs");
+    }
     auto rescueExteriorSnapshot = simulationSnapshot;
     rescueExteriorSnapshot.developmentRescueJourney = true;
     rescueExteriorSnapshot.rescue.exteriorSide = true;

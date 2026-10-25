@@ -5,6 +5,7 @@
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/SpatialAudio.h"
 #include <cmath>
+#include <cstring>
 #include <iostream>
 #include <limits>
 #include <vector>
@@ -37,12 +38,14 @@ bool LearnBlockFromRealContact(GameSimulation& sim,InputSnapshot& input) {
 void SkeletonRevivalBridgeContract() {
     using Phase=SkeletonRevivalPhase;
     SkeletonRevivalBridge bridge; SkeletonRevivalInput input;
-    input.playerAlive=true; input.bothDead=true; input.presentationReady=true;
+    input.playerAlive=true; input.bothDead=true; input.bothDeathAnimationsComplete=true; input.presentationReady=true;
     input.actorClearance=true; input.riseDurationSeconds=.20f;
     bridge.Step(.05f,input);
     Check(!bridge.Snapshot().enabled && bridge.Snapshot().phase==Phase::Disabled && !bridge.Snapshot().consumed,
           "revival controller defaults disabled even when supplied ready/dead fixture values");
     bridge.Reset(true); const auto firstGeneration=bridge.Snapshot().generation;
+    Check(!bridge.AcknowledgeLivePair(firstGeneration,true),
+          "a claimed live pair cannot arm final completion during unconsumed practice");
     for(int tick=0;tick<10;++tick) bridge.Step(.05f,input);
     Check(bridge.Snapshot().phase==Phase::Practice && !bridge.Snapshot().consumed &&
           !bridge.Snapshot().signalPulse && !bridge.Snapshot().revivePulse,
@@ -60,10 +63,16 @@ void SkeletonRevivalBridgeContract() {
         Check(bridge.Snapshot().phase==Phase::FirstFight && !bridge.Snapshot().consumed && !bridge.Snapshot().signalPulse,
               "readiness alone cannot authorize an invalid or absent reviewed rise duration");
     }
-    input.riseDurationSeconds=.20f; bridge.Step(.05f,input);
+    input.riseDurationSeconds=.20f; input.bothDeathAnimationsComplete=false;
+    bridge.Step(.05f,input);
+    Check(bridge.Snapshot().phase==Phase::FirstFight && !bridge.Snapshot().consumed && !bridge.Snapshot().signalPulse,
+          "zero-health guards still collapsing cannot consume the signal or start the stand pose");
+    input.bothDeathAnimationsComplete=true; bridge.Step(.05f,input);
     Check(bridge.Snapshot().phase==Phase::Signal && bridge.Snapshot().consumed && bridge.Snapshot().signalPulse &&
           bridge.Snapshot().phaseSeconds==0.f && bridge.Snapshot().SuppressesActors(),
           "the bridge consumes once before publishing its signal and suppressed presentation phase");
+    Check(!bridge.AcknowledgeLivePair(firstGeneration,true) && bridge.Snapshot().signalPulse,
+          "live acknowledgement refuses a consumed non-Live phase without clearing its signal pulse");
     bridge.CancelTransient();
     Check(bridge.Snapshot().consumed && bridge.Snapshot().phase==Phase::Signal && !bridge.Snapshot().signalPulse &&
           bridge.Snapshot().generation==firstGeneration,
@@ -128,6 +137,7 @@ void SkeletonRevivalBridgeContract() {
     for(Phase retryPhase:{Phase::Signal,Phase::Rising,Phase::Live}) {
         SkeletonRevivalBridge retry; retry.Reset(true);
         input={}; input.playerAlive=true; input.practiceFinished=true; input.bothDead=true;
+        input.bothDeathAnimationsComplete=true;
         input.presentationReady=input.actorClearance=true; input.riseDurationSeconds=.1f;
         retry.Step(.05f,input);
         for(int tick=0;tick<40 && retry.Snapshot().phase!=retryPhase;++tick) retry.Step(.05f,input);
@@ -169,6 +179,144 @@ void SkeletonRevivalBridgeContract() {
     bridge.Reset(false); bridge.Step(.05f,input);
     Check(bridge.Snapshot().phase==Phase::Disabled && !bridge.Snapshot().consumed,
           "disabled new game cannot accidentally admit a previously restored revival");
+}
+void InPlacePairRevivalContract() {
+    // Explicit unit contacts, not a natural route or renderer acceptance claim.
+    constexpr float dt=1.f/60.f, deathDuration=1.f;
+    const std::array<SkeletonSpawnPose,kSkeletonCombatantCapacity> roots{{
+        {{-5.5f,-15.95f},.31f,.17f}, {{-5.5f,-14.45f},-.42f,.63f},
+    }};
+    SwordCombat combat; combat.Reset(2,kWaterfallSkeletonPairCenter,&roots,2);
+    const auto step=[&](SwordCombat& owner, const PlayerSwordContactEvaluator& contact=PlayerSwordContactEvaluator{}) -> const CombatSnapshot& {
+        return owner.Update(dt,-4.5f,-15.3f,0.f,true,false,false,contact);
+    };
+    const auto strike=[&](std::int32_t target) {
+        const int health=combat.Snapshot().combatants[target].health;
+        if(combat.RequestAttack()==PlayerAttackCut::None)return false;
+        bool hit=false;
+        for(int tick=0;tick<90;++tick) {
+            const auto& state=step(combat,[target](const auto&,auto,auto,const auto&) { return std::optional<std::int32_t>{target}; });
+            hit=hit || state.combatants[target].health<health;
+            if(hit && state.player.action==PlayerCombatAction::Idle)return true;
+        }
+        return false;
+    };
+    const auto rejectedUnchanged=[&](SwordCombat& owner,float duration) {
+        const auto before=owner.Snapshot();
+        return !owner.ReviveDefeatedPairInPlace(duration) &&
+            std::memcmp(&before,&owner.Snapshot(),sizeof(before))==0;
+    };
+    Check(rejectedUnchanged(combat,deathDuration),"revival rejects a living pair without mutating either actor or player");
+    Check(strike(0) && strike(0),"unit contacts actually defeat the first two-health actor");
+    Check(rejectedUnchanged(combat,deathDuration),"one corpse and one survivor cannot be partially revived");
+    Check(strike(1) && strike(1),"unit contacts actually defeat the second two-health actor");
+    Check(combat.Snapshot().encounterComplete && !combat.DefeatedPairReadyToRevive(deathDuration) &&
+          rejectedUnchanged(combat,deathDuration),"both defeated actors remain ineligible while the last death animation is falling");
+    for(int tick=0;tick<90;++tick)step(combat);
+    Check(combat.DefeatedPairReadyToRevive(deathDuration),"two actual settled unit corpses satisfy the verified-duration predicate");
+    for(float duration:{0.f,-1.f,std::numeric_limits<float>::quiet_NaN(),std::numeric_limits<float>::infinity()})
+        Check(!combat.DefeatedPairReadyToRevive(duration) && rejectedUnchanged(combat,duration),
+              "invalid death duration cannot revive or partially mutate the pair");
+    auto invalidRoots=roots; invalidRoots[1].facingRadians=std::numeric_limits<float>::quiet_NaN();
+    SwordCombat invalid; invalid.RestoreCampaignDefeated(invalidRoots);
+    Check(rejectedUnchanged(invalid,deathDuration),"nonfinite corpse transform rejects the entire pair before mutation");
+    SwordCombat incomplete; incomplete.Reset(1,kWaterfallSkeletonPairCenter,&roots,2);
+    Check(rejectedUnchanged(incomplete,deathDuration),"a single-actor encounter cannot use the two-record revival operation");
+
+    const auto settled=combat.Snapshot();
+    // Queue state is deliberately not exposed. Compare its future output with
+    // a copied control while enemy AI is outside its explicit arena.
+    const auto samePlayer=[](const CombatSnapshot& a,const CombatSnapshot& b) {
+        return a.player.action==b.player.action && a.player.reaction==b.player.reaction &&
+            a.player.actionTime==b.player.actionTime && a.player.reactionTime==b.player.reactionTime &&
+            a.player.comboQueued==b.player.comboQueued && a.player.guardPoseWeight==b.player.guardPoseWeight &&
+            a.swordSwingRadians==b.swordSwingRadians && a.activePlayerAttackId==b.activePlayerAttackId &&
+            a.playerAttackPulse==b.playerAttackPulse && a.playerAttackCut==b.playerAttackCut &&
+            a.playerContactPulse==b.playerContactPulse && a.playerContactCut==b.playerContactCut &&
+            a.playerContactAttackId==b.playerContactAttackId && a.playerContactTargetId==b.playerContactTargetId &&
+            a.parriedAttackerIndex==b.parriedAttackerIndex;
+    };
+    for(int intent=0;intent<3;++intent) {
+        auto candidate=combat;
+        candidate.SetGuardHeld(true);
+        if(intent==0)candidate.RequestParry(); // Queued fresh parry remains queued.
+        else {
+            candidate.RequestParry();for(int tick=0;tick<30;++tick)step(candidate);
+            if(intent==1)candidate.RequestAttack(); // Queued guard-to-attack.
+            else {
+                candidate.RequestAttack();for(int tick=0;tick<13;++tick)step(candidate);
+                Check(candidate.RequestAttack()==PlayerAttackCut::UpwardSlice,
+                      "revival combo fixture queues a real accepted upward continuation");
+                // RequestAttack changes authoritative player_.comboQueued,
+                // while Snapshot still describes the previous publication.
+                // Publish the accepted intent without advancing its clock so
+                // the before/after comparison observes the same owner state.
+                const auto beforePublish=candidate.Snapshot();
+                candidate.Update(0.f,-4.5f,-15.3f,0.f,true,false,false);
+                Check(candidate.Snapshot().player.comboQueued &&
+                      candidate.Snapshot().player.action==beforePublish.player.action &&
+                      candidate.Snapshot().player.actionTime==beforePublish.player.actionTime &&
+                      candidate.Snapshot().activePlayerAttackId==beforePublish.activePlayerAttackId,
+                      "zero-delta combo publication keeps its current action clock and attack identity");
+            }
+        }
+        auto control=candidate;const auto playerBefore=candidate.Snapshot();
+        Check(candidate.ReviveDefeatedPairInPlace(deathDuration) && samePlayer(playerBefore,candidate.Snapshot()),
+              "enemy-only revival preserves every published player pose field pulses and active attack identity");
+        const auto revived=candidate.Snapshot();
+        for(std::size_t index=0;index<2;++index) {
+            const auto& actor=revived.combatants[index];const auto& corpse=settled.combatants[index];
+            Check(actor.x==corpse.x && actor.z==corpse.z && actor.facingRadians==corpse.facingRadians &&
+                  actor.health==2 && actor.action==EnemyCombatAction::Locomotion && actor.animation==EnemyAnimation::Idle &&
+                  actor.animationTime==0 && actor.actionTime==0 && actor.reaction==CombatReaction::None &&
+                  actor.reactionTime==0 && actor.damageFlash==0 && !actor.playerHitPulse && !actor.parrySuccessPulse,
+                  "both same-index actors revive at exact corpse roots/facing with original health and no stale enemy contact debt");
+        }
+        Check(revived.aliveCount==2 && !revived.encounterComplete && revived.attackerIndex==-1 &&
+              rejectedUnchanged(candidate,deathDuration),"live pair is acknowledged atomically and a duplicate revival is an unchanged refusal");
+        bool preserved=true,sawGuard=false;
+        for(int tick=0;tick<100;++tick) {
+            const auto& actual=step(candidate);const auto& expected=step(control);
+            preserved=preserved && samePlayer(actual,expected);
+            sawGuard=sawGuard || actual.player.action==PlayerCombatAction::Guard;
+        }
+        candidate.RequestAttack();control.RequestAttack();
+        preserved=preserved && samePlayer(step(candidate),step(control));
+        Check(preserved && sawGuard,"revival preserves queued parry/guard attack/combo, recovery, held return and subsequent attack serials");
+    }
+    auto engaged=combat;
+    engaged.Update(dt,-4.5f,-15.3f,0.f,true,true,true); // Real room engagement while corpses remain settled.
+    Check(engaged.ReviveDefeatedPairInPlace(deathDuration),"engaged corpse pair can revive without an encounter Reset");
+    const auto rearmed=engaged.Snapshot();
+    const auto& resumed=engaged.Update(dt,-7.98f,-15.2f,0.f,true,false,true);
+    Check((resumed.combatants[0].x!=rearmed.combatants[0].x || resumed.combatants[0].z!=rearmed.combatants[0].z) &&
+          (resumed.combatants[1].x!=rearmed.combatants[1].x || resumed.combatants[1].z!=rearmed.combatants[1].z),
+          "in-place revival retains room engagement so both guards can resume toward the legal room edge");
+    SkeletonRevivalBridge bridge;bridge.Reset(true);SkeletonRevivalInput input;
+    input.playerAlive=input.practiceFinished=input.bothDead=input.bothDeathAnimationsComplete=true;
+    input.presentationReady=input.actorClearance=true;input.riseDurationSeconds=.1f;
+    bridge.Step(.05f,input);
+    for(int tick=0;tick<30 && !bridge.Snapshot().revivePulse;++tick)bridge.Step(.05f,input);
+    Check(bridge.Snapshot().revivePulse && combat.ReviveDefeatedPairInPlace(deathDuration),
+          "one bridge pulse can hand off the actual two settled actor records in place");
+    input.bothDead=combat.Snapshot().encounterComplete;input.bothAlive=combat.Snapshot().aliveCount==2;
+    const auto publication=bridge.Snapshot();
+    Check(!bridge.AcknowledgeLivePair(publication.generation-1,true) &&
+          !bridge.AcknowledgeLivePair(publication.generation,false) &&
+          !bridge.AcknowledgeLivePair(publication.generation,true,true),
+          "stale generation partial pair and contradictory death claims cannot acknowledge a revival");
+    Check(bridge.AcknowledgeLivePair(publication.generation,input.bothAlive,input.bothDead) &&
+          bridge.Snapshot().phase==SkeletonRevivalPhase::Live &&
+          bridge.Snapshot().phaseSeconds==publication.phaseSeconds &&
+          bridge.Snapshot().generation==publication.generation &&
+          bridge.Snapshot().signalPulse==publication.signalPulse && bridge.Snapshot().revivePulse==publication.revivePulse,
+          "actual atomic pair acknowledgement preserves phase clocks generation and the current revive pulse without a second Step");
+    Check(strike(0) && strike(0) && strike(1) && strike(1),
+          "the acknowledged same pair is genuinely defeated again by explicit unit contacts");
+    input.bothDead=combat.Snapshot().encounterComplete;input.bothAlive=combat.Snapshot().aliveCount==2;
+    bridge.Step(dt,input);
+    Check(bridge.Snapshot().phase==SkeletonRevivalPhase::Complete && !bridge.Snapshot().revivePulse,
+          "immediate actual-pair acknowledgement permits final defeat before any subsequent live-pair Step observer");
 }
 void WindowAndLifecycle() {
     for (int tick=0;tick<=13;++tick)
@@ -1882,8 +2030,333 @@ void RulesEligibilityDoesNotChoosePracticeExit() {
     Check(!teaching.Snapshot().enabled && !teaching.Snapshot().safePractice && teaching.Snapshot().stage==TutorialStage::Skipped,
           "the remembered exit still ends at the unchanged safe recovery boundary");
 }
-int main() {
+
+namespace {
+// This profile uses shared simulation contacts and real lesson/kill outcomes.
+// Authoritative player-pose staging isolates legal encounter positions; it is
+// NOT a natural route/playthrough, renderer, clip-admission or listening proof.
+constexpr float kRevivalDeadSeconds=89.f/30.f;
+constexpr float kRevivalStandSeconds=1.5f;
+struct RevivalIntegrationFixture {
+    static GameSimulationConfig Config() {
+        auto config=Rules(); config.skeletonRevival1_7=true;
+        config.playerStartX=-7.6f; config.playerStartZ=-15.2f;
+        config.playerStartYawRadians=1.57079632679f;
+        return config;
+    }
+    GameSimulation sim{Config()};
+    InputSnapshot input{};
+    int cries=0, defeats=0;
+    RevivalIntegrationFixture() {
+        input.yawRadians=1.57079632679f; input.tutorialSlowdownEnabled=false;
+        Check(sim.ConfigureSkeletonRevivalPresentation(1,kRevivalDeadSeconds,kRevivalStandSeconds),
+              "revival integration admits the exact Dead89/30 and Stand1.5 owner receipt");
+    }
+    void Step(int ticks=1) {
+        for(int tick=0;tick<ticks;++tick) {
+            sim.StepFixed(input);
+            for(const auto& event:sim.Events().Events()) {
+                cries+=event.type==GameplayEventType::LichRevivalCry ? 1 : 0;
+                defeats+=event.type==GameplayEventType::EnemyDefeated ? 1 : 0;
+            }
+            sim.ClearEvents();
+        }
+    }
+    template<class Predicate> bool Until(Predicate predicate,int maximumTicks=600) {
+        for(int tick=0;tick<maximumTicks && !predicate();++tick) Step();
+        return predicate();
+    }
+    void Stage(float x,float z,float yaw) {
+        input.guardHeld=false; input.moveForward=input.moveStrafe=0;
+        input.hasAuthoritativePlayerPose=true;
+        input.authoritativePlayerX=x; input.authoritativePlayerZ=z; input.yawRadians=yaw;
+        Step();
+        input.hasAuthoritativePlayerPose=false;
+        Step(); // Real false guard input clears the lifecycle rearm requirement.
+    }
+    void NearActor(std::size_t index,float distance=1.15f) {
+        const auto actor=sim.Snapshot().swordCombat.combatants[index];
+        Stage(actor.x-distance,actor.z,1.57079632679f);
+    }
+    void AimAt(std::size_t index) {
+        const auto& state=sim.Snapshot(); const auto& actor=state.swordCombat.combatants[index];
+        input.yawRadians=std::atan2(actor.x-state.playerX,state.playerZ-actor.z);
+    }
+    bool Tell(float lead) {
+        return Until([&] {
+            const auto& state=sim.Snapshot();const auto owner=state.swordCombat.attackerIndex;
+            return owner>=0 && state.swordCombat.combatants[owner].action==EnemyCombatAction::AttackWindup &&
+                state.swordCombat.combatants[owner].actionTime+.00001f>=
+                    CombatTimeline::kSkeletonAttackWindupSeconds-lead;
+        });
+    }
+    bool LearnAndFinish() {
+        NearActor(0);
+        input.guardHeld=true; ++input.commands.parry;
+        if(!Until([&]{return sim.Snapshot().combatTeaching.blockLearned;})) return false;
+        input.guardHeld=false; Step();
+        if(!Tell(.10f)) return false;
+        ++input.commands.parry;
+        if(!Until([&]{return sim.Snapshot().combatTeaching.parryLearned;},30)) return false;
+        if(!Tell(5.f/60.f)) return false;
+        input.moveStrafe=1; ++input.commands.dodge;
+        Step(12); input.moveStrafe=0; Step(18);
+        if(!sim.Snapshot().combatTeaching.dodgeLearned) return false;
+        const auto owner=sim.Snapshot().swordCombat.attackerIndex;
+        if(owner<0) return false;
+        NearActor(static_cast<std::size_t>(owner),1.f);
+        input.guardHeld=true; ++input.commands.parry; Step(45);
+        if(sim.Snapshot().playerCombat.action!=PlayerCombatAction::Guard) return false;
+        AimAt(static_cast<std::size_t>(owner)); ++input.commands.attack;
+        if(!Until([&]{return sim.Snapshot().combatTeaching.attackFromGuardLearned;},100)) return false;
+        const auto learned=sim.Snapshot().combatTeaching;
+        Check(learned.blockLearned && learned.parryLearned && learned.dodgeLearned &&
+              learned.attackFromGuardLearned && learned.stage==TutorialStage::Ready && learned.safePractice,
+              "revival integration earns all four lessons through actual contacts and guard-attack recovery");
+        if(!Tell(.30f)) return false;
+        ++input.commands.tutorialSkip; Step();
+        Check(sim.Snapshot().combatTeaching.exitPending && sim.Snapshot().combatTeaching.safePractice,
+              "revival lesson Finish waits protected at a real live windup");
+        input.paused=true; const auto tick=sim.Snapshot().tickIndex;
+        sim.AdvanceFrame(input,.2);
+        Check(sim.Snapshot().tickIndex==tick && sim.Snapshot().combatTeaching.exitPending &&
+              sim.Snapshot().skeletonRevival.phase==SkeletonRevivalPhase::Practice,
+              "pause cannot finish practice or consume a revival");
+        input.paused=false;
+        return Until([&]{return sim.Snapshot().combatTeaching.stage==TutorialStage::Complete;},300);
+    }
+    bool Kill(std::size_t index) {
+        if(sim.Snapshot().swordCombat.combatants[index].health<=0) return true;
+        // A lethal downward contact may leave a legitimately queued upward
+        // continuation/recovery. Wait for its real completion before treating
+        // the next stable actor as an independent two-cut request; staging is
+        // not a recovery cancel and rejected busy commands must not be retried.
+        input.guardHeld=false; input.moveForward=input.moveStrafe=0;
+        const bool ready=Until([&]{return sim.Snapshot().playerCombat.action==PlayerCombatAction::Idle;},180);
+        Check(ready,"independent next-target cuts wait for all accepted attack/recovery ownership to finish");
+        if(!ready) return false;
+        NearActor(index,1.f); AimAt(index);
+        const auto before=sim.Snapshot();
+        ++input.commands.attack; Step(); const auto first=sim.Snapshot(); ++input.commands.attack;
+        const bool killed=Until([&]{return sim.Snapshot().swordCombat.combatants[index].health==0;},120);
+        if(!killed) {
+            const auto& state=sim.Snapshot();
+            std::cerr<<"revival Kill target="<<index<<" player=("<<state.playerX<<','<<state.playerZ
+                <<") yaw="<<state.playerYawRadians<<" life="<<int(state.playerVitals.phase)
+                <<" vitality="<<state.playerVitals.vitality<<" action="<<int(state.playerCombat.action)
+                <<" before-action="<<int(before.playerCombat.action)<<" first-action="<<int(first.playerCombat.action)
+                <<" attack-command="<<input.commands.attack<<" consumed="<<state.lastConsumedAttackSequence
+                <<" cut="<<int(state.swordCombat.playerAttackCut)<<" active-id="<<state.swordCombat.activePlayerAttackId
+                <<" trace-count="<<state.combatContactTrace.count<<'\n';
+            for(std::size_t actor=0;actor<2;++actor) {
+                const auto& a=state.swordCombat.combatants[actor];
+                std::cerr<<" actor="<<actor<<" health="<<a.health<<" before-health="
+                    <<before.swordCombat.combatants[actor].health<<" action="<<int(a.action)
+                    <<" root=("<<a.x<<','<<a.z<<") facing="<<a.facingRadians<<'\n';
+            }
+        }
+        Check(killed,"revival integration defeats the observed stable actor using actual sword contacts");
+        return killed;
+    }
+    bool KillPair() { return Kill(0) && Kill(1); }
+};
+void RevivalRetryKeepsConsumed(const RevivalIntegrationFixture& source) {
+    auto retry=source; const auto before=retry.sim.Snapshot().skeletonRevival;
+    retry.sim.RetryEncounter();
+    const auto& state=retry.sim.Snapshot();
+    Check(before.consumed && state.skeletonRevival.consumed &&
+          state.skeletonRevival.generation>before.generation && state.skeletonRevival.phase==SkeletonRevivalPhase::Live &&
+          state.swordCombat.aliveCount==2 && !state.swordCombat.encounterComplete && !state.openingEncounterComplete,
+          "ordinary Retry at a consumed phase restores the actual final pair without replaying rise or granting completion");
+    const int cries=retry.cries; retry.input.damageEnabled=false; retry.input.guardHeld=false; retry.Step(90);
+    Check(retry.cries==cries && !retry.sim.Snapshot().skeletonRevival.signalPulse &&
+          !retry.sim.Snapshot().skeletonRevival.revivePulse,
+          "a consumed Retry never replays cry or revival after its atomic live-pair acknowledgement");
+}
+void RevivalIntegrationEarnedPath() {
+    using Phase=SkeletonRevivalPhase;
+    RevivalIntegrationFixture f;
+    Check(f.sim.Snapshot().skeletonRevival.enabled && f.sim.Snapshot().skeletonRevival.phase==Phase::Practice &&
+          f.sim.Snapshot().skeletonRevivalPresentationReady &&
+          Near(f.sim.Snapshot().skeletonRevivalDeadDurationSeconds,kRevivalDeadSeconds) &&
+          Near(f.sim.Snapshot().skeletonRevivalStandDurationSeconds,kRevivalStandSeconds),
+          "opt-in shared revival publishes the admitted asset durations without awarding practice or kills");
+    const bool finished=f.LearnAndFinish();
+    Check(finished && !f.sim.Snapshot().combatTeaching.safePractice &&
+          f.sim.Snapshot().skeletonRevival.phase==Phase::FirstFight && f.cries==0 &&
+          !f.sim.Snapshot().openingEncounterComplete,
+          "real safe Finish arms only the first fight; it does not defeat actors or signal the Keeper");
+    if(!finished) return;
+    f.input.damageEnabled=false;
+    if(!f.KillPair()) return;
+    const auto dead=f.sim.Snapshot();
+    Check(dead.swordCombat.aliveCount==0 && dead.swordCombat.encounterComplete &&
+          dead.skeletonRevival.phase==Phase::FirstFight && f.cries==0 && !dead.openingEncounterComplete,
+          "the actual first pair's last hit waits for settled death clips without opening Keeper progression");
+    int unsettledTicks=0;
+    while(f.sim.Snapshot().skeletonRevival.phase==Phase::FirstFight && unsettledTicks<240) {
+        const auto& pair=f.sim.Snapshot().swordCombat.combatants;
+        if(pair[0].animationTime<kRevivalDeadSeconds || pair[1].animationTime<kRevivalDeadSeconds)
+            Check(f.cries==0,"unsettled actual corpse poses cannot emit a revival cry");
+        f.Step(); ++unsettledTicks;
+    }
+    Check(f.sim.Snapshot().skeletonRevival.phase==Phase::Signal && f.cries==1 &&
+          f.sim.Snapshot().skeletonRevival.consumed && f.sim.Snapshot().swordCombat.aliveCount==0,
+          "only two settled corpses consume the bridge and emit exactly one semantic Keeper cry");
+    if(f.sim.Snapshot().skeletonRevival.phase!=Phase::Signal) return;
+    RevivalRetryKeepsConsumed(f);
+    const auto corpse=f.sim.Snapshot().swordCombat.combatants;
+    Check(f.Until([&]{return f.sim.Snapshot().skeletonRevival.phase==Phase::Rising;},30),
+          "the single cry leads into the authored rise after the bounded signal lead");
+    const auto frozen=f.sim.Snapshot().skeletonRevival;
+    f.input.paused=true; f.sim.AdvanceFrame(f.input,.3);
+    Check(f.sim.Snapshot().skeletonRevival.phase==frozen.phase &&
+          Near(f.sim.Snapshot().skeletonRevival.phaseSeconds,frozen.phaseSeconds) && f.cries==1,
+          "pause freezes the current rise and cannot replay its signal");
+    f.input.paused=false;
+    Check(f.sim.ConfigureSkeletonRevivalPresentation(2,kRevivalDeadSeconds,kRevivalStandSeconds,false),
+          "resource invalidation is an explicit admitted owner update");
+    f.Step(30);
+    Check(!f.sim.Snapshot().skeletonRevivalPresentationReady &&
+          f.sim.Snapshot().skeletonRevival.phase==frozen.phase &&
+          Near(f.sim.Snapshot().skeletonRevival.phaseSeconds,frozen.phaseSeconds) && f.cries==1 &&
+          f.sim.Snapshot().swordCombat.aliveCount==0,
+          "invalidated presentation freezes rise ownership without reviving, damaging or replaying the cry");
+    Check(!f.sim.ConfigureSkeletonRevivalPresentation(1,kRevivalDeadSeconds,kRevivalStandSeconds) &&
+          !f.sim.ConfigureSkeletonRevivalPresentation(3,kRevivalDeadSeconds,.5f),
+          "stale generation and changed in-flight clip duration cannot admit a different rise");
+    Check(f.sim.ConfigureSkeletonRevivalPresentation(3,kRevivalDeadSeconds,kRevivalStandSeconds),
+          "fresh matching presentation resumes the same consumed rise");
+    RevivalRetryKeepsConsumed(f);
+    // Stage onto an actual corpse before rearm, then leave through ordinary
+    // movement with guard held: no root relocation or fake clearance flag.
+    f.Stage(corpse[0].x,corpse[0].z,1.57079632679f);
+    f.input.guardHeld=true; ++f.input.commands.parry; f.Step(45);
+    Check(f.Until([&]{return f.sim.Snapshot().skeletonRevival.phase==Phase::Rearming;},330),
+          "the admitted Dead-plus-Stand duration reaches rearm with actors still defeated");
+    Check(f.Until([&]{return f.sim.Snapshot().skeletonRevival.waitingForClearance;},60),
+          "a player occupying the actual corpse root holds rearm after its normal grace duration");
+    Check(f.sim.Snapshot().swordCombat.aliveCount==0 && !f.sim.Snapshot().openingEncounterComplete && f.cries==1,
+          "clearance waiting cannot create a partial live actor or unlock the Keeper");
+    RevivalRetryKeepsConsumed(f);
+    f.input.moveForward=-1.f;
+    Check(f.Until([&]{return f.sim.Snapshot().skeletonRevival.phase==Phase::Live;},120),
+          "ordinary player movement out of both corpse margins permits atomic rearm");
+    f.input.moveForward=0;
+    const auto live=f.sim.Snapshot();
+    Check(live.swordCombat.aliveCount==2 && !live.swordCombat.encounterComplete &&
+          live.skeletonRevival.revivePulse && live.skeletonRevival.consumed &&
+          !live.openingEncounterComplete && f.cries==1,
+          "the owner publishes exactly one full live pair without checkpoint or final-defeat credit");
+    for(std::size_t i=0;i<2;++i) {
+        const auto& actor=live.swordCombat.combatants[i];
+        Check(actor.health==2 && actor.animation==EnemyAnimation::Idle && actor.action==EnemyCombatAction::Locomotion &&
+              actor.animationTime==0 && actor.actionTime==0 && !actor.playerHitPulse &&
+              Near(actor.x,corpse[i].x) && Near(actor.z,corpse[i].z) &&
+              Near(actor.facingRadians,corpse[i].facingRadians) && live.skeletonEnemies[i].idlePhaseSeconds==0,
+              "same-index new life starts at exact corpse root/facing and Idle0, including actor B without its old offset");
+    }
+    Check(live.playerCombat.action==PlayerCombatAction::Guard && live.playerCombat.guardPoseWeight>.99f,
+          "enemy-only atomic revival preserves the player's actual continuously held guard");
+    RevivalRetryKeepsConsumed(f);
+    // A copied owner branch retains the actual earned provenance, not seeded
+    // completion flags. Prove ordinary death and Retry cannot replay the bridge.
+    auto death=f; death.NearActor(0); death.input.damageEnabled=true;
+    Check(death.Until([&]{return !death.sim.Snapshot().playerAlive;},1800),
+          "the genuinely revived pair regains actual full lethal damage authority");
+    Check(death.sim.Snapshot().skeletonRevival.consumed && death.cries==1 &&
+          !death.sim.Snapshot().openingEncounterComplete,
+          "real live-pair death preserves consumed revival without granting final defeat");
+    death.sim.RetryEncounter();
+    Check(death.sim.Snapshot().playerAlive && death.sim.Snapshot().skeletonRevival.phase==Phase::Live &&
+          death.sim.Snapshot().swordCombat.aliveCount==2 && death.cries==1,
+          "Retry after a real final-pair death restores the final fight with no second cry");
+    const auto keeperArrival=[](RevivalIntegrationFixture& owner) {
+        // Arrival does not retroactively trigger a missed upstream event.
+        // Visit the existing failure strip and observe its real clock; never
+        // import a settled torch or bypass the opening/reveal admission rules.
+        owner.Stage(-2.1f,-15.2f,-1.57079632679f);
+        const bool settled=owner.Until([&]{return owner.sim.Snapshot().torchFailure.phase==TorchFailurePhase::Settled;},360);
+        Check(settled,"Keeper fixture visits the real upstream torch trigger and waits for actual settled state");
+        owner.Stage(kKeeperRetryPosition.x,kKeeperRetryPosition.z,-1.57079632679f);
+        return settled;
+    };
+    const auto printKeeperGate=[](const RevivalIntegrationFixture& owner) {
+        const auto& state=owner.sim.Snapshot();
+        std::cout<<"revival Keeper gate player=("<<state.playerX<<','<<state.playerZ<<") zone="
+            <<int(state.zone)<<" active-enemy="<<int(state.activeEnemyKind)<<" rules="<<state.modernCombatRules
+            <<" opening-complete="<<state.openingEncounterComplete<<" bridge="<<int(state.skeletonRevival.phase)
+            <<" alive-guards="<<state.swordCombat.aliveCount<<" torch-phase="<<int(state.torchFailure.phase)
+            <<" torch-triggered="<<state.torchFailure.triggered<<" held="<<state.torchFailure.heldByPlayer
+            <<" arrival-threshold="<<HasReachedKeeperArrivalThreshold(state.playerX,state.playerZ)
+            <<" lich-phase="<<int(state.lich.phase)<<" reveal-phase="<<int(state.lich.revealPhase)
+            <<" reveal-started="<<state.lich.revealStarted<<" reveal-complete="<<state.lich.revealComplete<<'\n';
+    };
+    auto keeperBefore=f;
+    keeperArrival(keeperBefore); keeperBefore.Step(720); printKeeperGate(keeperBefore);
+    Check(!keeperBefore.sim.Snapshot().lich.revealStarted && !keeperBefore.sim.Snapshot().openingEncounterComplete,
+          "actual settled-torch arrival cannot trigger Keeper reveal while either revived guard remains alive");
+    if(!f.KillPair()) return;
+    Check(f.Until([&]{return f.sim.Snapshot().skeletonRevival.phase==Phase::Complete;},10) &&
+          f.sim.Snapshot().openingEncounterComplete && f.cries==1 && f.defeats==4,
+          "actual fully acknowledged final-pair deaths alone complete the opening after four real defeat events");
+    keeperArrival(f);
+    const bool revealed=f.Until([&]{return f.sim.Snapshot().lich.revealStarted;},720);
+    printKeeperGate(f);
+    Check(revealed,"the same real settled-torch Keeper arrival gate becomes eligible only after actual final-pair defeat");
+    std::cout<<"revival integration actual outcomes: cry="<<f.cries<<" enemy-defeats="<<f.defeats
+             <<" settled-wait-ticks="<<unsettledTicks<<" final-phase="<<int(f.sim.Snapshot().skeletonRevival.phase)<<'\n';
+}
+void RevivalIntegrationReplayAndOptOut() {
+    using Phase=SkeletonRevivalPhase;
+    // Initial tutorial OFF is an explicit preference opt-out, not an earned
+    // completion: the ordinary first pair remains the only required pair.
+    RevivalIntegrationFixture off; off.input.tutorialEnabled=false; off.input.damageEnabled=false; off.Step();
+    Check(off.sim.Snapshot().skeletonRevival.phase==Phase::Live && off.sim.Snapshot().skeletonRevival.consumed &&
+          !off.sim.Snapshot().combatTeaching.blockLearned && off.cries==0,
+          "initial tutorial OFF opts out without inventing lesson witnesses or a revival");
+    if(off.KillPair()) {
+        off.Step();
+        Check(off.sim.Snapshot().openingEncounterComplete && off.cries==0,
+              "tutorial-OFF's actual ordinary pair defeat completes without a forced second fight");
+    }
+    RevivalIntegrationFixture early; early.input.damageEnabled=false;
+    if(!early.KillPair()) return;
+    early.Step(240);
+    Check(early.sim.Snapshot().skeletonRevival.phase==Phase::Practice && !early.sim.Snapshot().skeletonRevival.consumed &&
+          !early.sim.Snapshot().openingEncounterComplete && early.cries==0 &&
+          !early.sim.Snapshot().combatTeaching.blockLearned && !early.sim.Snapshot().combatTeaching.parryLearned &&
+          !early.sim.Snapshot().combatTeaching.dodgeLearned && !early.sim.Snapshot().combatTeaching.attackFromGuardLearned,
+          "early real kills cannot manufacture four learned skills or consume the revival");
+    auto skip=early; ++skip.input.commands.tutorialSkip; skip.Step(2);
+    Check(skip.sim.Snapshot().combatTeaching.stage==TutorialStage::Skipped &&
+          skip.sim.Snapshot().openingEncounterComplete && skip.cries==0,
+          "explicit Skip after early kills retains the existing opt-out rather than auto-reviving corpses");
+    ++early.input.commands.tutorialReplay; early.Step();
+    Check(early.sim.Snapshot().skeletonRevival.phase==Phase::Practice && !early.sim.Snapshot().skeletonRevival.consumed &&
+          early.sim.Snapshot().swordCombat.aliveCount==2 && !early.sim.Snapshot().openingEncounterComplete &&
+          early.sim.Snapshot().combatTeaching.stage==TutorialStage::Block && early.cries==0,
+          "explicit Replay restarts real actors and unearned practice without retaining corpse/rise debt");
+    GameSimulation disabled(Rules());
+    Check(!disabled.Snapshot().skeletonRevival.enabled &&
+          !disabled.ConfigureSkeletonRevivalPresentation(1,kRevivalDeadSeconds,kRevivalStandSeconds),
+          "the normal default remains revival-OFF even if a presentation receipt is offered");
+}
+void RevivalIntegrationProfile() {
+    std::cout<<"revival integration: actual outcomes with unit-staged player poses; not a natural playthrough\n";
+    RevivalIntegrationEarnedPath(); RevivalIntegrationReplayAndOptOut();
+}
+} // namespace
+
+int main(int argc,char** argv) {
+    if(argc==2 && std::strcmp(argv[1],"--revival-integration")==0) {
+        RevivalIntegrationProfile();
+        std::cout<<"revival integration checks="<<checks<<" failures="<<failures<<'\n';
+        return failures?1:0;
+    }
+    if(argc!=1) { std::cerr<<"unknown combat foundation profile\n"; return 2; }
     SkeletonRevivalBridgeContract();
+    InPlacePairRevivalContract();
     RulesEligibilityDoesNotChoosePracticeExit();
     WindowAndLifecycle(); TeachingContract(); AttackReadabilityContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();
     HeldGuardDamageContract(); GuardAttackAndReleaseAtContact(); GuardInterruptionRearm();

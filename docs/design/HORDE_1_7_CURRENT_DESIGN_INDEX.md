@@ -2,6 +2,16 @@
 
 ## Current authority - 25 October 2026
 
+Latest: the [gated one-time revival owner](../evidence/2026-10-25-skeleton-revival-owner/README.md)
+wires shared encounter/Retry/earned-restore semantics and actual-phase RT
+presentation. The new contact profile earns four skills, one cry and four actual
+defeats; a hidden167-frame run checks the real owner-to-adapter rise/Idle0/pause.
+Normal revival remains **OFF** pending distributable asset/platform admission,
+natural play and listening. The supplied scream stays private and Debug opt-in;
+497 Android tests (six skips), four ABI build/lint and focused Windows checks
+pass. No phone result or performance gain is claimed. The exact ring-capacity
+proposal remains pending; new yellow attacks remain OFF.
+
 Backed-up checkpoint `2f461da4` includes the tested pure flask backend and dormant
 exact schema3 codec; the player-facing flask is **not enabled**. Runtime restore
 rejects schema3 until its resource owner is integrated, avoiding silent loss.

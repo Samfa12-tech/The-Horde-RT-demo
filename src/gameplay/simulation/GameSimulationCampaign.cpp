@@ -45,6 +45,7 @@ std::optional<campaign::Checkpoint> GameSimulation::CaptureAuthoredCampaignBound
 std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(campaign::CheckpointId id,bool canonical,bool allowFlaskAction) const {
     using namespace interactions;
     const auto& s=snapshot_;
+    if (UsesSkeletonRevival() && !OpeningEncounterComplete()) return std::nullopt;
     if(config_.healingFlask1_7 && !allowFlaskAction &&
        (healingFlask_.Snapshot().action!=healing::FlaskAction::Idle ||
         pendingDrinkFlaskCommands_ || pendingRestCommands_))return std::nullopt;
@@ -220,6 +221,13 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.chapterFirstExterior_=upper || completedForest;
     next.lichEncounter_.RestoreCampaignDefeated();
     next.combatTeaching_.RestoreEnded();
+    next.skeletonRevival_.RestoreCompleted();
+    next.skeletonRevivalResourceGeneration_ = skeletonRevivalResourceGeneration_;
+    next.skeletonRevivalDeadDurationSeconds_ = skeletonRevivalDeadDurationSeconds_;
+    next.skeletonRevivalStandDurationSeconds_ = skeletonRevivalStandDurationSeconds_;
+    next.skeletonRevivalPresentationReady_ = skeletonRevivalPresentationReady_;
+    next.skeletonRevivalWorkshopBypass_ = false;
+    next.revivedIdlePhaseZero_ = false;
     next.waterfallWarningEmitted_=true;
     std::array<SkeletonSpawnPose,kSkeletonCombatantCapacity> guards{};
     for(std::size_t i=0;i<guards.size();++i) guards[i]={{c.guards[i].x,c.guards[i].z},c.guards[i].yaw,0};

@@ -86,6 +86,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
         fireEmitters_[index + 1u] = effects::MakeWorldTorchFireEmitter(anchor.stableId, anchor.seed);
     }
     combatTeaching_.Reset(config_.combatFoundation1_7);
+    skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
+                          config_.waterfallSkeletonEncounter);
     lichEncounter_.SetReadableCombat(CurrentCombatRules());
     lichEncounter_.SetChapterDeathPresentation(config_.developmentRescueJourney && CurrentCombatRules());
     enemyDirector_.Reset();
@@ -769,6 +771,8 @@ void GameSimulation::ResetRoute()
     if(staticDetailLease_.resourceGeneration) {
         staticDetailLease_.restoreRequested=true;deferredStaticDetailReset_=true;RefreshSnapshot(lastInput_);return;
     }
+    skeletonRevivalWorkshopBypass_ = false; revivedIdlePhaseZero_ = false;
+    skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 && config_.waterfallSkeletonEncounter);
     if(config_.healingFlask1_7){healingFlask_.ResetNewGame();flaskCompletionTick_=0;}
     DiscardFlaskRequests();
     campaignInputPublicationFloor_.reset();
@@ -850,8 +854,33 @@ void GameSimulation::RetryEncounter()
         auto resources=healingFlask_.Snapshot().resources;resources.charges=resources.Capacity();
         (void)healingFlask_.Restore(resources);
     }
+    const bool retainFinalOpening = config_.skeletonRevival1_7 && !skeletonRevivalWorkshopBypass_ &&
+        (skeletonRevival_.Snapshot().phase == SkeletonRevivalPhase::Complete ||
+         (legacyCombatCheckpoint_ && retryCheckpoint_ == 9)); // Explicit authored past-opening fixture.
+    const auto lesson = combatTeaching_.Snapshot();
+    std::array<SkeletonSpawnPose, kSkeletonCombatantCapacity> settledGuards{};
+    for (std::size_t i = 0; i < settledGuards.size(); ++i) {
+        const auto& actor = combatSnapshot_.combatants[i];
+        settledGuards[i] = {{actor.x, actor.z}, actor.facingRadians, 0};
+    }
     legacyCombatCheckpoint_ = false;
-    ApplyCheckpoint(retryCheckpoint_, true);
+    if (!ApplyCheckpoint(retryCheckpoint_, true)) return;
+    revivedIdlePhaseZero_ = false; // Retry is an explicit whole-scene restart, not an Idle join.
+    if (config_.skeletonRevival1_7 && !skeletonRevivalWorkshopBypass_) {
+        if (retainFinalOpening) {
+            swordCombat_.RestoreCampaignDefeated(settledGuards);
+            combatSnapshot_ = swordCombat_.Snapshot();
+            skeletonRevival_.RestoreCompleted();
+            enemyDirector_.MarkDead(EnemyKind::Skeleton);
+        } else {
+            const bool skipped = lesson.stage == TutorialStage::Skipped ||
+                (!lastInput_.tutorialEnabled && !lesson.exitPending && !lesson.safePractice);
+            skeletonRevival_.Retry(lesson.stage == TutorialStage::Complete, skipped);
+            (void)skeletonRevival_.AcknowledgeLivePair(skeletonRevival_.Snapshot().generation,
+                combatSnapshot_.aliveCount == kSkeletonEnemyCapacity, combatSnapshot_.encounterComplete);
+        }
+        RefreshSnapshot(lastInput_);
+    }
 }
 
 bool GameSimulation::ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool countAsRetry)
@@ -866,6 +895,10 @@ bool GameSimulation::ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool cou
 void GameSimulation::BeginCombatPractice(EnemyKind encounter)
 {
     legacyCombatCheckpoint_ = false;
+    skeletonRevivalWorkshopBypass_ = encounter == EnemyKind::Lich;
+    revivedIdlePhaseZero_ = false;
+    skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
+        config_.waterfallSkeletonEncounter && !skeletonRevivalWorkshopBypass_);
     combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
     if (encounter == EnemyKind::Lich)
         combatTeaching_.ResetForKeeperPractice(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
@@ -2225,6 +2258,85 @@ bool GameSimulation::CurrentCombatRules() const
     return config_.combatFoundation1_7 && !legacyCombatCheckpoint_;
 }
 
+bool GameSimulation::UsesSkeletonRevival() const
+{
+    return config_.skeletonRevival1_7 && config_.waterfallSkeletonEncounter &&
+        CurrentCombatRules() && !skeletonRevivalWorkshopBypass_;
+}
+
+bool GameSimulation::OpeningEncounterComplete() const
+{
+    return UsesSkeletonRevival()
+        ? skeletonRevival_.Snapshot().phase == SkeletonRevivalPhase::Complete
+        : combatSnapshot_.encounterComplete;
+}
+
+bool GameSimulation::ConfigureSkeletonRevivalPresentation(std::uint64_t generation,
+    float deadSeconds, float standSeconds, bool ready)
+{
+    if (!config_.skeletonRevival1_7 || !generation || generation < skeletonRevivalResourceGeneration_)
+        return false;
+    if (ready && (!std::isfinite(deadSeconds) || deadSeconds <= 0.f ||
+                  !std::isfinite(standSeconds) || standSeconds <= 0.f)) return false;
+    if (ready && skeletonRevival_.Snapshot().SuppressesActors() &&
+        (deadSeconds != skeletonRevivalDeadDurationSeconds_ || standSeconds != skeletonRevivalStandDurationSeconds_))
+        return false;
+    skeletonRevivalResourceGeneration_ = generation;
+    skeletonRevivalPresentationReady_ = ready;
+    if (ready) {
+        skeletonRevivalDeadDurationSeconds_ = deadSeconds;
+        skeletonRevivalStandDurationSeconds_ = standSeconds;
+    } else skeletonRevival_.CancelTransient();
+    RefreshSnapshot(lastInput_);
+    return true;
+}
+
+void GameSimulation::UpdateSkeletonRevival(const InputSnapshot& input, float deltaSeconds)
+{
+    if (!UsesSkeletonRevival()) { skeletonRevival_.CancelTransient(); return; }
+    const auto& teaching = combatTeaching_.Snapshot();
+    SkeletonRevivalInput bridge;
+    bridge.practiceFinished = teaching.stage == TutorialStage::Complete;
+    // Initial tutorial OFF is an actual opt-out too. Eligibility/pause alone is
+    // never Skip, and a deliberate disable must finish its protected safe exit.
+    bridge.practiceSkipped = teaching.stage == TutorialStage::Skipped ||
+        (!input.tutorialEnabled && !teaching.exitPending && !teaching.safePractice);
+    bridge.bothDead = combatSnapshot_.combatantCount == kSkeletonEnemyCapacity && combatSnapshot_.encounterComplete;
+    bridge.bothAlive = combatSnapshot_.combatantCount == kSkeletonEnemyCapacity &&
+                       combatSnapshot_.aliveCount == kSkeletonEnemyCapacity;
+    bridge.bothDeathAnimationsComplete = swordCombat_.DefeatedPairReadyToRevive(skeletonRevivalDeadDurationSeconds_);
+    bridge.playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
+    bridge.paused = input.paused;
+    bridge.presentationReady = skeletonRevivalPresentationReady_;
+    bridge.riseDurationSeconds = skeletonRevivalDeadDurationSeconds_ + skeletonRevivalStandDurationSeconds_;
+    // This is an in-place rearm safety margin, not a new movement collider or a
+    // request to relocate a corpse. The player can always step out of the area.
+    constexpr float rearmSeparationMetres = .75f;
+    bridge.actorClearance = std::all_of(combatSnapshot_.combatants.begin(),
+        combatSnapshot_.combatants.begin() + combatSnapshot_.combatantCount, [&](const auto& actor) {
+            return std::hypot(playerX_ - actor.x, playerZ_ - actor.z) >= rearmSeparationMetres;
+        });
+    const auto& state = skeletonRevival_.Step(deltaSeconds, bridge);
+    if (state.signalPulse) {
+        const auto& keeper = lichEncounter_.Snapshot();
+        Emit(GameplayEventType::LichRevivalCry, EntityId::Lich, EntityId::Player, keeper.x, keeper.z);
+    }
+    if (state.revivePulse) {
+        if (swordCombat_.ReviveDefeatedPairInPlace(skeletonRevivalDeadDurationSeconds_)) {
+            combatSnapshot_ = swordCombat_.Snapshot();
+            revivedIdlePhaseZero_ = true; // Both new-life clocks start at the admitted Idle0 join.
+            (void)skeletonRevival_.AcknowledgeLivePair(state.generation,
+                combatSnapshot_.aliveCount == kSkeletonEnemyCapacity, combatSnapshot_.encounterComplete);
+        } else {
+            // Keep progress blocked rather than fake a successful revival.
+            // The ordinary explicit Retry remains available and retains consumption.
+            skeletonRevivalPresentationReady_ = false;
+        }
+    }
+    if (skeletonRevival_.Snapshot().phase == SkeletonRevivalPhase::Complete)
+        enemyDirector_.MarkDead(EnemyKind::Skeleton);
+}
+
 void GameSimulation::CancelCombatTransients()
 {
     guardReleaseRequired_ = guardReleaseRequired_ || lastInput_.guardHeld;
@@ -2235,6 +2347,7 @@ void GameSimulation::CancelCombatTransients()
     keeperRepelRemainingSeconds_ = 0.0f;
     gameplayTimeScale_ = 1.0f;
     combatTeaching_.CancelTransient();
+    skeletonRevival_.CancelTransient();
     currentCutCommandSequence_ = currentCutConsumedTick_ = 0;
     queuedUpCutCommandSequence_ = queuedUpCutConsumedTick_ = 0;
     swordHitTargetThisTick_ = EntityId::Invalid;
@@ -2291,9 +2404,10 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     if (selectedEnemy != activeEnemyKind_)
     {
         activeEnemyKind_ = selectedEnemy;
-        if (!lichEncounter_.Snapshot().revealStarted)
+        if (!lichEncounter_.Snapshot().revealStarted && (!UsesSkeletonRevival() || OpeningEncounterComplete()))
             playerVitals_.ResetForEncounter();
-        retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
+        retryCheckpoint_ = UsesSkeletonRevival() && !OpeningEncounterComplete()
+            ? 0 : activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
         // Opening enemies and the keeper persist through route selection.
         // Only explicit reset/retry/checkpoint import may initialise them.
     }
@@ -2328,9 +2442,10 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     }
 
     const bool finaleActive = QueryShowcaseZone(playerX_, playerZ_) == ShowcaseZone::Finale;
+    const bool openingAllowsKeeper = !UsesSkeletonRevival() || OpeningEncounterComplete();
     const auto& keeperBeforeActions = lichEncounter_.Snapshot();
     const bool keeperHoldsActions = IsKeeperRevealing(keeperBeforeActions.revealPhase) ||
-        (!keeperBeforeActions.revealStarted && activeEnemyKind_ == EnemyKind::Lich &&
+        (!keeperBeforeActions.revealStarted && openingAllowsKeeper && activeEnemyKind_ == EnemyKind::Lich &&
          finaleActive && torchFailureSnapshot_.phase == TorchFailurePhase::Settled &&
          HasReachedKeeperArrivalThreshold(playerX_, playerZ_));
     if (keeperHoldsActions)
@@ -2572,7 +2687,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             }
         }
     }
-    if (activeEnemyKind_ == EnemyKind::Skeleton && combatSnapshot_.encounterComplete)
+    if (!UsesSkeletonRevival() && activeEnemyKind_ == EnemyKind::Skeleton && combatSnapshot_.encounterComplete)
     {
         enemyDirector_.MarkSelectedDead();
     }
@@ -2594,7 +2709,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         playerX_,
         playerZ_,
         lineOfSight,
-        activeEnemyKind_ == EnemyKind::Lich && finaleActive,
+        activeEnemyKind_ == EnemyKind::Lich && finaleActive && openingAllowsKeeper,
         torchFailureSnapshot_.phase == TorchFailurePhase::Settled &&
             HasReachedKeeperArrivalThreshold(playerX_, playerZ_));
 
@@ -2793,6 +2908,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             playerVitals_.Snapshot().phase != PlayerLifePhase::Alive ||
             IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase),
         combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_, CurrentCombatRules());
+    UpdateSkeletonRevival(input, deltaSeconds);
     if (activeEnemyKind_ == EnemyKind::Lich && lichEncounter_.Snapshot().deathAnimationComplete)
     {
         enemyDirector_.MarkSelectedDead();
@@ -2986,6 +3102,10 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.acceptedDodgeSequence = acceptedDodgeSequence_;
     snapshot_.dodgeProtectedHitCount = dodgeProtectedHitCount_;
     snapshot_.combatTeaching = combatTeaching_.Snapshot();
+    snapshot_.skeletonRevival = UsesSkeletonRevival() ? skeletonRevival_.Snapshot() : SkeletonRevivalSnapshot{};
+    snapshot_.skeletonRevivalPresentationReady = UsesSkeletonRevival() && skeletonRevivalPresentationReady_;
+    snapshot_.skeletonRevivalDeadDurationSeconds = UsesSkeletonRevival() ? skeletonRevivalDeadDurationSeconds_ : 0.f;
+    snapshot_.skeletonRevivalStandDurationSeconds = UsesSkeletonRevival() ? skeletonRevivalStandDurationSeconds_ : 0.f;
     const auto recovery=FlaskContextFor(input,false,false);
     snapshot_.flaskDrinkEligible=recovery.drinkEligible && recovery.healthHalfUnits<6 &&
         healingFlask_.Snapshot().resources.charges>0;
@@ -3014,7 +3134,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.skeletonAttackerId = combatSnapshot_.attackerIndex >= 0
         ? SkeletonEntity(static_cast<std::size_t>(combatSnapshot_.attackerIndex))
         : EntityId::Invalid;
-    snapshot_.openingEncounterComplete = combatSnapshot_.encounterComplete;
+    snapshot_.openingEncounterComplete = OpeningEncounterComplete();
     for (std::size_t index = 0u; index < combatSnapshot_.combatants.size(); ++index)
     {
         const SkeletonCombatantSnapshot& source = combatSnapshot_.combatants[index];
@@ -3024,7 +3144,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         target.z = source.z;
         target.facingRadians = source.facingRadians;
         target.animationTime = source.animationTime;
-        target.idlePhaseSeconds = skeletonIdlePhasesEnabled_ && index == 1u ? 0.73f : 0.0f;
+        target.idlePhaseSeconds = skeletonIdlePhasesEnabled_ && !revivedIdlePhaseZero_ && index == 1u ? 0.73f : 0.0f;
         target.damageFlash = source.damageFlash;
         target.health = source.health;
         target.animation = source.animation;

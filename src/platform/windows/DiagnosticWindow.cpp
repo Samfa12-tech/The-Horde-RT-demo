@@ -116,6 +116,7 @@
 #include "platform/windows/WindowsMotionEvidenceCapture.h"
 #include "platform/windows/WindowsCombatPracticeLaunch.h"
 #include "platform/windows/WindowsCombatTeachingPrompt.h"
+#include "platform/windows/WindowsPrivateLichRevivalAudio.h"
 #if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 #include "gameplay/validation/MotionEvidenceScenario.h"
 #include "gameplay/validation/ChapterRoundTripProbe.h"
@@ -666,6 +667,7 @@ struct VulkanSurfaceContext
     std::unique_ptr<horde::platform::windows::WindowsMusicPlayback> musicPlayback;
     std::uint64_t musicEventLifetimeToken = 1u;
     std::uint64_t musicResetToken = 0u;
+    horde::platform::windows::PrivateLichRevivalAudioState privateRevivalAudio;
     int musicLastLoggedGate = -1;
     bool fullscreen = false;
     bool forwardHeld = false;
@@ -1844,6 +1846,15 @@ public:
             if (active.loopKey == key) SetVoiceMatrix(active.voice, gain, gain, active.filename);
     }
 
+    bool PreloadMonoPcm48k16(const std::filesystem::path& path) {
+        const auto wave=Load(path);
+        return wave && wave->format.nChannels==1u && wave->format.nSamplesPerSec==48000u && wave->format.wBitsPerSample==16u;
+    }
+    void SetOwnedVolume(const std::string_view key,float gain) {
+        for(auto& voice:activeVoices_)if(voice.loopKey==key)
+            (void)voice.voice->SetVolume(std::isfinite(gain)?std::clamp(gain,0.f,1.f):0.f);
+    }
+
     void SetDialogueVolume(const int percent)
     {
         const float gain = horde::platform::windows::WindowsDialogueSourceGain(percent);
@@ -2116,9 +2127,12 @@ bool PlayXAudioFile(const std::filesystem::path& path,
                        horde::platform::windows::WindowsSfxSourceGain(1.0f, sfxVolumePercent));
 }
 
+#include "windows_private_lich_revival_audio.inl"
+
 void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
 {
     if(gCampaignHiddenValidation)return;
+    UpdatePrivateLichRevivalAudio(context);
     if((!horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot()) &&
         !horde::gameplay::simulation::ForestBirdAmbience::PondEligible(context.simulation.Snapshot()) &&
         !horde::gameplay::simulation::ChapterLocalAmbience::Eligible(context.simulation.Snapshot())) ||
@@ -2563,6 +2577,9 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             {
                 LogWindowsAudio("delayed enemy-fall feedback queue overflowed; newest cue was dropped");
             }
+            break;
+        case GameplayEventType::LichRevivalCry:
+            PlayPrivateLichRevivalAudio(context,event);
             break;
         case GameplayEventType::LichChargeStarted:
             PlayPositionalSoundEffect(context, "lich_charge.wav", 0.42f, event);
@@ -3089,7 +3106,11 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
 {
     HWND prompt = GetDlgItem(context.windowHandle, kCombatTeachingPromptId);
     if (!prompt) return;
-    const auto& teaching = context.simulation.Snapshot().combatTeaching;
+    const auto& snapshot = context.simulation.Snapshot();
+    const auto& teaching = snapshot.combatTeaching;
+    const bool revivalClearance = snapshot.skeletonRevival.enabled &&
+        snapshot.skeletonRevival.phase == horde::gameplay::simulation::SkeletonRevivalPhase::Rearming &&
+        snapshot.skeletonRevival.waitingForClearance && snapshot.skeletonRevivalPresentationReady;
     const bool attackCue = horde::platform::windows::HasAttackReadabilityCue(teaching);
     if ((context.combatAttackCueVisible && !attackCue) || (context.combatPracticeCueVisible && !teaching.safePractice))
     {
@@ -3099,7 +3120,7 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     }
     context.combatAttackCueVisible = attackCue;
     context.combatPracticeCueVisible = teaching.safePractice;
-    const std::string text = horde::platform::windows::CombatTeachingPromptText(teaching, context.teachingControllerGlyphs);
+    const std::string text = horde::platform::windows::CombatTeachingPromptText(teaching, context.teachingControllerGlyphs, revivalClearance);
     const bool eligible = context.controlsEnabled && !MeasurementPausedByUi(context) &&
         !context.benchmarkReportVisible && !context.benchmark.IsRunning() &&
         !context.deathOverlayVisible && !context.endingOverlayVisible && !context.rtLabVisible;
@@ -3117,7 +3138,7 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     if (!text.empty())
     {
         context.combatTeachingFadeText = text;
-        context.combatTeachingFadeOpacity = attackCue || teaching.safePractice ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
+        context.combatTeachingFadeOpacity = attackCue || teaching.safePractice || revivalClearance ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
             teaching.promptOpacity, context.reducedMotionEnabled);
         context.combatTeachingFadeStartedAtMs = 0u;
         SetWindowTextA(prompt, text.c_str());
@@ -3788,6 +3809,7 @@ void ResetRoute(VulkanSurfaceContext& context, const bool preserveBenchmark = fa
     context.rtLabOpenedFromEnding = false;
     context.rtLabJustUnlocked = false;
     context.rtLabRouteTainted = false;
+    StopPrivateLichRevivalAudio(context);
     context.delayedFeedback.Clear();
     context.simulation.ResetRoute();
     if (context.rtFrameEvidenceInitialised)
@@ -3882,6 +3904,7 @@ bool ApplyPlayerRetryCheckpoint(VulkanSurfaceContext& context, const std::int32_
     const auto& beforeRetry=context.simulation.Snapshot();
     const bool confirmedRetry=beforeRetry.healingFlaskEnabled &&
         beforeRetry.developmentRescueJourney && beforeRetry.rescue.claimCount!=0;
+    StopPrivateLichRevivalAudio(context);
     context.delayedFeedback.Clear();
     context.simulation.RetryEncounter();
     if(confirmedRetry) {
@@ -4476,6 +4499,7 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
 
 void ClearDesktopInput(VulkanSurfaceContext& context)
 {
+    StopPrivateLichRevivalAudio(context);
     if(!gCampaignHiddenValidation)SpatialAudioEngine().StopLoop("chapter_ambience");
     if (context.crouchHeld) context.crouchKeyBlockedUntilRelease = true;
     context.crouchHeld = false;
@@ -12404,7 +12428,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         return reinterpret_cast<LRESULT>(brush);
     }
     case WM_DESTROY:
-        if (sceneContext) StopMenuAmbience(*sceneContext);
+        if (sceneContext) {StopPrivateLichRevivalAudio(*sceneContext);StopMenuAmbience(*sceneContext);}
         horde::platform::windows::CancelGitHubReleaseUpdateCheck(hWnd);
         if (sceneContext && sceneContext->controlsEnabled)
         {

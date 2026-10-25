@@ -1,5 +1,11 @@
 # Four-skill practice and one-time revival: bounded implementation plan
 
+Later implementation: [the gated shared owner checkpoint](../evidence/2026-10-25-skeleton-revival-owner/README.md)
+now exercises this chronology through actual contacts, Retry/restore and an
+actual-owner RT capture. It remains explicitly OFF in normal gameplay. The
+unwired/native-only descriptions below retain their earlier planning context;
+private asset/platform admission, natural play and listening are still open.
+
 The [shared rules/four-skill checkpoint](../evidence/2026-10-25-four-skill-practice/README.md)
 now implements the contact outcomes, normal full block, protected Ready and
 safe explicit Finish/Skip portions below. Yellow guard-break is tested opt-in

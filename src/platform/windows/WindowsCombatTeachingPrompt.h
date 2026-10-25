@@ -58,9 +58,10 @@ inline std::string CombatTeachingLessonText(
     const std::string guard=controller?"[LT]":"[Q]", swing=controller?"[RT]":"[LMB]";
     const std::string dodge=controller?"[B] + stick":"[Space] + move";
     if(teaching.exitPending || teaching.cue==CombatTeachingCue::ExitPending)return "Leaving practice safely...";
-    if(teaching.cue==CombatTeachingCue::Replay)return "Menu: Replay opening practice";
+    if(teaching.cue==CombatTeachingCue::Replay)return "Menu: Replay opening practice or Skip to continue";
     if(teaching.stage==TutorialStage::Complete || teaching.stage==TutorialStage::Skipped)return {};
-    if(teaching.stage==TutorialStage::Ready || teaching.cue==CombatTeachingCue::Ready)return "Menu: Finish practice";
+    if(teaching.stage==TutorialStage::Ready || teaching.cue==CombatTeachingCue::Ready)
+        return "Menu: Finish practice - enemies can hurt you";
     if(teaching.cue==CombatTeachingCue::Learned)return "Well parried - strike back";
     if(teaching.stage==TutorialStage::Block || teaching.cue==CombatTeachingCue::Block)return "Hold "+guard+": block normal hits";
     if(teaching.stage==TutorialStage::AttackFromGuard || teaching.cue==CombatTeachingCue::AttackFromGuard)return "Hold "+guard+" + "+swing+"; keep held";
@@ -82,7 +83,8 @@ inline std::string CombatTeachingLessonText(
 }
 
 inline std::string CombatTeachingPromptText(
-    const gameplay::simulation::CombatTeachingSnapshot& teaching, const bool controller = false)
+    const gameplay::simulation::CombatTeachingSnapshot& teaching, const bool controller = false,
+    const bool waitingForRevivalClearance = false)
 {
     using gameplay::simulation::AttackReadability;
     std::string text=teaching.safePractice?"Practice: no damage":"";
@@ -91,6 +93,8 @@ inline std::string CombatTeachingPromptText(
         const auto lesson=CombatTeachingLessonText(teaching,controller);
         if(!lesson.empty())text+=(text.empty()?"":"\r\n")+lesson;
     }
+    if(waitingForRevivalClearance)
+        text+=(text.empty()?"":"\r\n")+std::string("Step back from the skeletons.");
     if(teaching.attackReadability==AttackReadability::Parryable)
         text+=(text.empty()?"":"\r\n")+std::string("<> YELLOW guard-break: parry/dodge");
     else if(teaching.attackReadability==AttackReadability::Unblockable)

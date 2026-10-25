@@ -661,3 +661,28 @@ This endpoint study is rejected, source-only and excluded from every runtime
 manifest/package. It supplies no admitted GLB or skeletal clip. Exact hashes and
 failed native evidence are in
 `docs/evidence/2026-10-24-compact-carry-study/receipt.json`.
+
+
+## Private unshipped Keeper revival audition (2026-10-25)
+
+"Short Monster Scream" by djani00 (Freesound), distributed by freesound_community
+on [Pixabay](https://pixabay.com/sound-effects/horror-short-monster-scream-105026/),
+was supplied privately by the owner. It is retained under the
+[Pixabay Content License](https://pixabay.com/service/terms/), not relabelled CC0.
+The owner MP3 SHA-256 is
+`31509a2a1b39b488603f17f3ab92c3c1000e8cdf49733c7a337d7d482f84ae5f`.
+A private full-duration mono 48 kHz PCM16 draft is 175,104 frames / 3.648 seconds,
+350,252 file bytes (350,208 PCM bytes), SHA-256
+`1e1891010f4c89e6f20ec5fba90191aa0f0999c0bd95a4df3fe36659beb9e521`.
+Its conversion is an equal L/2+R/2 downmix, without amplification, trimming,
+pitch or timing change. Conversion alone does not grant standalone redistribution.
+
+Neither source nor draft is in public assets, runtime manifests, or packages.
+Only an explicit Debug local-file audition can load the exact pinned draft from
+`debug_audio/lich_revival.wav` within the isolated Windows application directory
+or Android app-private files directory. Missing or changed files are diagnosed;
+no other clip is substituted. Normal and Release behavior remains unchanged.
+Actual listening, mix, encounter admission and any game-distribution decision are
+still pending. Current terms (checked 2026-10-25) distinguish an integrated new
+creative work from standalone content distribution; this note does not admit the
+standalone audio to the public repository.
