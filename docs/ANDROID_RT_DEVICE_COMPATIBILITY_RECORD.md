@@ -3727,3 +3727,28 @@ At09:29:31.855UTC both original APK hashes,18 save/lock files, preferences and
 system settings were verified restored, with no added save paths or owned
 renderer/transfer. Candidate was not retained. Horde released the phone to Spin.
 See [exact receipt](evidence/2026-10-25-held-guard/phone-6dbc43fd-receipt.json).
+
+### 25 October 2026: frozen f27982cd installed for owner input acceptance
+
+SM-S948B; frozen source `f27982cd1b03a2cab9dc822d39b8ea038c721d9e`, Debug package
+`com.samfa12.hordelanternrt.debug`, code 10 / 1.6.2-debug. Installed APK SHA-256
+`53af984fe8ce7fe275e2ea523c9fe7e2ccc7c433997c6ff708635f1cafa8224e`.
+All six exact-source CI jobs passed in run 40183128749. This is compatible
+installation and normal title-screen RT presentation evidence, not completed
+guard, save-screen, audio, progression or performance acceptance.
+
+The first start command used an unsupported option and did not launch the app.
+The verified recovery update restored the original APK and unchanged owner data.
+One corrected attempt used the phone's supported Intent flags. At
+**10:15:35.146 UTC** the exact candidate hash and normal RT title presentation
+were verified; all 18 prior save/lock files, preference bytes and system settings
+were unchanged, as was the separate release package. No gameplay input or save
+slot selection was automated. No test-namespace/fixture extras were passed.
+
+The candidate is deliberately retained and open for Sam's real two-finger check.
+Automation has ended; the running title is intentional. Owner acceptance still
+requires hold Shield, tap Sword with another finger, keep holding through recovery,
+then release in both orientations. No further device calls follow the handover.
+Private custody receipts remain under ignored
+`reports/guard-phone-f27982cd-owner-r1/` and `-r2/`; no private save/settings bytes
+are published. The frozen APK remains separate from later source work.
