@@ -133,6 +133,33 @@ int main()
           guarded.Snapshot().vitality==0 && !guarded.Snapshot().halfHeart,
           "a full hit kills a remaining half heart without underflow");
 
+    PlayerVitals healing;
+    healing.TryApplyDamage(true);
+    const auto damaged=healing.Snapshot();
+    check(healing.TryHealHalfUnits(1) && healing.Snapshot().vitality==3 &&
+          !healing.Snapshot().halfHeart &&
+          healing.Snapshot().invulnerabilityRemaining==damaged.invulnerabilityRemaining &&
+          healing.Snapshot().damageFlash==damaged.damageFlash &&
+          healing.Snapshot().deathHoldRemaining==damaged.deathHoldRemaining &&
+          healing.Snapshot().phase==damaged.phase,
+          "healing changes health without resetting damage timers or phase");
+    check(!healing.TryHealHalfUnits(2),"full health rejects a redundant heal");
+    healing.RestoreCampaignVitality(1,true);
+    for(int invalid:{-1,0,7,2147483647})
+        check(!healing.TryHealHalfUnits(invalid) && healing.Snapshot().vitality==1 &&
+              healing.Snapshot().halfHeart,"invalid healing cannot mutate half health");
+    check(healing.TryHealHalfUnits(2) && healing.Snapshot().vitality==2 && healing.Snapshot().halfHeart,
+          "one-heart heal preserves an existing half heart exactly");
+    healing.RestoreCampaignVitality(3,true);
+    check(healing.TryHealHalfUnits(2) && healing.Snapshot().vitality==3 && !healing.Snapshot().halfHeart,
+          "healing clamps to three hearts rather than increasing maximum health");
+    healing.RestoreCampaignVitality(1,true);healing.TryApplyDamage();
+    check(!healing.TryHealHalfUnits(2) && healing.Snapshot().phase==PlayerLifePhase::Dying,
+          "healing cannot resurrect during fatal hold");
+    for(int tick=0;tick<20;++tick)healing.Update(.05f);
+    check(!healing.TryHealHalfUnits(2) && healing.Snapshot().phase==PlayerLifePhase::Dead,
+          "healing cannot resurrect a dead player");
+
     const ShowcaseCheckpoint* skeletonRetry = FindShowcaseCheckpoint(0);
     const ShowcaseCheckpoint* lichRetry = FindShowcaseCheckpoint(9);
     const ShowcaseCheckpoint* twoEnemyCombat = FindShowcaseCheckpoint("two-enemy-combat");

@@ -129,6 +129,20 @@ public:
         snapshot_ = {};
     }
 
+    // Recovery changes health only. Damage immunity/feedback/death timing and
+    // phase are not reset, and invalid requests cannot resurrect a player.
+    bool TryHealHalfUnits(int halfUnits)
+    {
+        if (snapshot_.phase != PlayerLifePhase::Alive || halfUnits <= 0 ||
+            halfUnits > kMaxVitality * 2) return false;
+        const int before = snapshot_.vitality * 2 - (snapshot_.halfHeart ? 1 : 0);
+        if (before <= 0 || before >= kMaxVitality * 2) return false;
+        const int healed = std::min(kMaxVitality * 2, before + halfUnits);
+        snapshot_.vitality = (healed + 1) / 2;
+        snapshot_.halfHeart = (healed & 1) != 0;
+        return true;
+    }
+
     bool RestoreCampaignVitality(int vitality, bool halfHeart = false)
     {
         if (vitality < 1 || vitality > kMaxVitality) return false;
