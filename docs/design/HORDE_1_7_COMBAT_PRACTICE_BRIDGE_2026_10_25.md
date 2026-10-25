@@ -56,8 +56,11 @@ simulation, rewards or save writes. No additional actors/boss/assets are needed.
 
 Existing rig: `assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb`.
 Its roughly 2.967-second Dead clip has no separately authored get-up clip.
-Reversing it is an owner-approved **candidate**, requiring actual floor/foot,
-weapon/bone and idle-join review. During rise both actors are non-attacking and
+The [actual RT pose study](../evidence/2026-10-25-skeleton-revive/README.md) now
+shows a plausible reverse rise but rejects its direct Idle join: both stances
+visibly snap. A narrow existing-loader local-joint blend seam is proposed before
+another candidate; no production revival or blend is implemented. During rise
+both actors must be non-attacking and
 non-targetable; a fair existing recovery boundary precedes real attacks. Camera
 tremor is optional and reduced-motion-safe, with no forced turn. It must not
 reuse player damage as a fake event.

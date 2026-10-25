@@ -1,0 +1,333 @@
+{
+  "scope": "Unadmitted, actual Windows RT immutable health-zero pose preview. 30 authored samples/s, unpaced; not measured FPS, actual encounter revival, natural gameplay, save or phone acceptance.",
+  "baseCommit": "3546471815607f5487773b4f196864673cd46c7b",
+  "deadDurationSeconds": 2.966666698,
+  "capture": {
+    "complete": true,
+    "evidenceClass": "Debug immutable health-zero render-pose preview; not encounter revival, targetability, events, saves, natural play or performance acceptance",
+    "sourceSha256": "340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db",
+    "deadDurationSeconds": 2.96667,
+    "frames": 150,
+    "sampleHz": 30,
+    "unpaced": true,
+    "directIdleJoinFrame": 120,
+    "applicationSnapshotUnchanged": true,
+    "error": ""
+  },
+  "applicationSnapshotAndEventsUnchanged": true,
+  "ownerCustodyUnchanged": true,
+  "ownerFilesChecked": 151,
+  "campaignConstruction": "Existing captureDirectory guard skips campaign creation; isolated LOCALAPPDATA alone does not redirect SHGetKnownFolderPath.",
+  "exeSha256": "cf327df46bf7da4170309670ed25801b53c42b1c75a88534f221e83091d7d869",
+  "sourceRoster": {
+    "src\\platform\\windows\\WindowsSkeletonReviveCapture.inl": "f4c0cd029b62fb28df84124909f78bc1bdc22bacd319b1bd9bcc64669c89f823",
+    "src\\platform\\windows\\DiagnosticWindow.cpp": "0ee942c19a7e84161a28a4ba06183d2ae339c360fae9c42c57250bb35fe61cc6",
+    "src\\scene\\SkeletonRenderPose.h": "d372866b12e145b19becb464065399fe9622d90f007619a5db6837dfecb83426",
+    "src\\vulkan\\raytracing\\CharacterRenderSlot.cpp": "b6d99cf8343c93e0e7fc4bf3d2970425f30051c3e54a866e97c177604c7ca465",
+    "assets\\models\\enemies\\meshy\\skeleton_biped_merged_animations_v01.glb": "340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db"
+  },
+  "camera": {
+    "x": -3,
+    "z": -12.8,
+    "yaw": -1,
+    "pitch": -0.22
+  },
+  "video": {
+    "file": "skeleton-reverse-direct-join-rt-preview.mp4",
+    "sha256": "9963627abed986e04773457c73f19abe60ca3b3438cdfa7735a4e671bf395711",
+    "bytes": 389272,
+    "durationSeconds": 5.0,
+    "width": 960,
+    "height": 540,
+    "frames": 150,
+    "sampleHz": 30,
+    "frameInterpolation": false,
+    "audio": false,
+    "publiclyUploaded": false
+  },
+  "directJoin": {
+    "beforeFrame": 119,
+    "afterFrame": 120,
+    "timeSeconds": 4,
+    "nativeJointTranslationDeltaMetres": {
+      "Hips": 0.13190536090606658,
+      "LeftFoot": 0.6556398834133275,
+      "RightFoot": 0.6285343198978448,
+      "LeftToeBase": 0.7496443954939642,
+      "RightToeBase": 0.6748059972635007
+    },
+    "visualVerdict": "Visible foot/torso/hand snap; direct Idle join rejected. Reverse rise remains candidate only."
+  },
+  "nativeWitnesses": [
+    {
+      "frame": 0,
+      "seconds": 0,
+      "clip": "Dead",
+      "sampleSeconds": 2.966666698,
+      "nativeSkinMinimumLocalY": -0.005248427391,
+      "nativeNodes": {
+        "Hips": [
+          0.1324392408,
+          0.1732478142,
+          0.651546061
+        ],
+        "LeftFoot": [
+          0.2531414032,
+          0.1285299063,
+          -0.1311017275
+        ],
+        "RightFoot": [
+          0.006599202752,
+          0.06583379954,
+          -0.005471736193
+        ],
+        "LeftToeBase": [
+          0.2967803776,
+          0.1357085109,
+          -0.2439251393
+        ],
+        "RightToeBase": [
+          0.002094903961,
+          0.09384067357,
+          -0.123278752
+        ]
+      }
+    },
+    {
+      "frame": 45,
+      "seconds": 1.5,
+      "clip": "Dead",
+      "sampleSeconds": 1.966666698,
+      "nativeSkinMinimumLocalY": 0.002034205478,
+      "nativeNodes": {
+        "Hips": [
+          0.1427319944,
+          0.3367299438,
+          0.4211890996
+        ],
+        "LeftFoot": [
+          0.2795470357,
+          0.2032707483,
+          -0.1760028303
+        ],
+        "RightFoot": [
+          0.008489891887,
+          0.1418750286,
+          -0.1470707059
+        ],
+        "LeftToeBase": [
+          0.3210962117,
+          0.1638850868,
+          -0.2828084826
+        ],
+        "RightToeBase": [
+          -0.06780331582,
+          0.1642641276,
+          -0.2385104895
+        ]
+      }
+    },
+    {
+      "frame": 75,
+      "seconds": 2.5,
+      "clip": "Dead",
+      "sampleSeconds": 0.9666666985,
+      "nativeSkinMinimumLocalY": 0.003553244751,
+      "nativeNodes": {
+        "Hips": [
+          0.09933363646,
+          0.8335134983,
+          -0.1722573787
+        ],
+        "LeftFoot": [
+          0.2093541622,
+          0.1278643906,
+          -0.3928324878
+        ],
+        "RightFoot": [
+          -0.1936236322,
+          0.1262271106,
+          -0.1582119316
+        ],
+        "LeftToeBase": [
+          0.2788566649,
+          0.03567346931,
+          -0.3560187221
+        ],
+        "RightToeBase": [
+          -0.2575834095,
+          0.04367379844,
+          -0.09675237536
+        ]
+      }
+    },
+    {
+      "frame": 104,
+      "seconds": 3.466666698,
+      "clip": "Dead",
+      "sampleSeconds": 0,
+      "nativeSkinMinimumLocalY": 0.01391734742,
+      "nativeNodes": {
+        "Hips": [
+          -0.04386691377,
+          0.6642996073,
+          -0.04958598688
+        ],
+        "LeftFoot": [
+          0.1936357766,
+          0.1270024776,
+          -0.2920885682
+        ],
+        "RightFoot": [
+          -0.4391659498,
+          0.1199539602,
+          0.2980631292
+        ],
+        "LeftToeBase": [
+          0.2891761065,
+          0.052489914,
+          -0.2943106592
+        ],
+        "RightToeBase": [
+          -0.4928152263,
+          0.0446542874,
+          0.376388669
+        ]
+      }
+    },
+    {
+      "frame": 119,
+      "seconds": 3.966666698,
+      "clip": "Dead",
+      "sampleSeconds": 0,
+      "nativeSkinMinimumLocalY": 0.01391734742,
+      "nativeNodes": {
+        "Hips": [
+          -0.04386691377,
+          0.6642996073,
+          -0.04958598688
+        ],
+        "LeftFoot": [
+          0.1936357766,
+          0.1270024776,
+          -0.2920885682
+        ],
+        "RightFoot": [
+          -0.4391659498,
+          0.1199539602,
+          0.2980631292
+        ],
+        "LeftToeBase": [
+          0.2891761065,
+          0.052489914,
+          -0.2943106592
+        ],
+        "RightToeBase": [
+          -0.4928152263,
+          0.0446542874,
+          0.376388669
+        ]
+      }
+    },
+    {
+      "frame": 120,
+      "seconds": 4,
+      "clip": "Idle_5",
+      "sampleSeconds": 0,
+      "nativeSkinMinimumLocalY": 0.01080686226,
+      "nativeNodes": {
+        "Hips": [
+          0.03098302707,
+          0.768873632,
+          -0.02024686709
+        ],
+        "LeftFoot": [
+          0.1982255131,
+          0.1158048809,
+          0.3634396195
+        ],
+        "RightFoot": [
+          -0.1225374937,
+          0.1235722303,
+          -0.2448813617
+        ],
+        "LeftToeBase": [
+          0.2306836545,
+          0.0408513397,
+          0.4529576302
+        ],
+        "RightToeBase": [
+          -0.2162497044,
+          0.04696820676,
+          -0.2391349226
+        ]
+      }
+    },
+    {
+      "frame": 149,
+      "seconds": 4.966666698,
+      "clip": "Idle_5",
+      "sampleSeconds": 0.9666666389,
+      "nativeSkinMinimumLocalY": 0.009799173102,
+      "nativeNodes": {
+        "Hips": [
+          0.03120223992,
+          0.8001095653,
+          -0.01112161577
+        ],
+        "LeftFoot": [
+          0.1987927109,
+          0.1146176755,
+          0.3674661517
+        ],
+        "RightFoot": [
+          -0.1237358153,
+          0.1218906343,
+          -0.2455199361
+        ],
+        "LeftToeBase": [
+          0.2310351729,
+          0.03978415579,
+          0.4571623802
+        ],
+        "RightToeBase": [
+          -0.2172274143,
+          0.04500562698,
+          -0.2399326712
+        ]
+      }
+    }
+  ],
+  "rootsIdsYawHealth": [
+    {
+      "id": 2,
+      "health": 0,
+      "dead": true,
+      "root": [
+        -5.5,
+        -0.9499999881,
+        -15.94999981
+      ],
+      "yaw": 1.570796371
+    },
+    {
+      "id": 4,
+      "health": 0,
+      "dead": true,
+      "root": [
+        -5.5,
+        -0.9499999881,
+        -14.44999981
+      ],
+      "yaw": 1.570796371
+    }
+  ],
+  "actorRecordsUnique": 1,
+  "armPixelRange": [
+    6393,
+    6393
+  ],
+  "followup": "One reviewed narrow shared expanded-Skin blend seam is needed before a smooth reverse-to-idle candidate; none implemented. Future gameplay revival must preserve room engagement and same actor identities/roots, never SwordCombat.Reset.",
+  "visualAdmitted": false,
+  "artifactPolicy": "Only selected technical screenshots and this sanitized receipt are backed up. Video, raw frames, private settings and custody maps remain under ignored reports."
+}

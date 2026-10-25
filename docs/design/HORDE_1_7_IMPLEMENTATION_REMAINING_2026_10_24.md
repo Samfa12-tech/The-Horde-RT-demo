@@ -6,7 +6,7 @@ This update supersedes older device/guard acceptance wording below, without
 turning the historical checkpoints into newer evidence. Sam accepts the held
 guard and attack-return animation on installed `f27982cd`; broader damage,
 orientation and journey acceptance remains separate. Phone access was released
-at10:37:25.915UTC after private recording retrieval; no further device calls.
+at 10:37:25.915 UTC after private recording retrieval; no further device calls.
 
 - Implemented/tested: Waterfall surviving-attacker ownership `bf2dee1c`, current
   RT/readiness-gated Android entry with responsive loading/retry/cancel
@@ -15,8 +15,10 @@ at10:37:25.915UTC after private recording retrieval; no further device calls.
 - Next source work: approved full normal block/yellow guard-break direction,
   actual four-skill practice and one-time two-skeleton revival before Keeper.
   [Chronology and minimal plan](HORDE_1_7_COMBAT_PRACTICE_BRIDGE_2026_10_25.md)
-  records the Skip/revival pacing choice before broad integration. Reverse-Dead
-  is an approved visual candidate, not an admitted animation yet.
+  records the Skip/revival pacing choice before broad integration. The
+  [reverse-Dead RT proof](../evidence/2026-10-25-skeleton-revive/README.md) retains
+  the rise but rejects the visible direct-Idle snap; a bounded shared blend
+  seam is the next authoring gate, not an admitted animation or real revival.
 - In-world special-attack rings need an explicit measured RT owner seam; no
   capacity was increased or screen-space substitute added. Current half-damage
   guard rules remain until the new combat-rule slice is implemented/tested.
@@ -27,7 +29,7 @@ at10:37:25.915UTC after private recording retrieval; no further device calls.
   visible forest depth/crown admission, admitted chimney/carry/run solutions and
   the existing physical/foreground/audio/performance gates. Prior rejections,
   shared64 OFF and outdoor-effects deferrals remain in force. Passing CI or these
-  defect fixes does not make1.7 implementation-complete or release-ready.
+  defect fixes does not make 1.7 implementation-complete or release-ready.
 
 ## Earlier checkpoint detail
 

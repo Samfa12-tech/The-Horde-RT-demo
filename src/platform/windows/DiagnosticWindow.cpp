@@ -8256,6 +8256,13 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         }
 #endif
 #if defined(_DEBUG)
+        if (const char* reviveSequence = std::getenv("HORDE_SKELETON_REVIVE_CAPTURE"))
+        {
+            if (std::string_view(reviveSequence) != "1" ||
+                std::getenv("HORDE_GUARD_TRANSITION_CAPTURE") || std::getenv("HORDE_KEEPER_CAST_CAPTURE"))
+                return fail("Skeleton revival pose preview requires value 1 and a separate capture process.");
+#include "platform/windows/WindowsSkeletonReviveCapture.inl"
+        }
         if (const char* guardSequence = std::getenv("HORDE_GUARD_TRANSITION_CAPTURE"))
         {
             if (std::getenv("HORDE_KEEPER_CAST_CAPTURE"))
