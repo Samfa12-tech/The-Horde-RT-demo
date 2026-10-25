@@ -51,5 +51,14 @@ must be made explicit against current vitality code, not silently discard damage
 This is an approved next-pass requirement, not implemented or balanced behavior.
 Do not rebuild or resume device work for it during the current pause.
 
+Guard-to-attack must blend smoothly from the held sword pose without snapping
+through rest. Guard mitigation ends when the attack starts: attacking and blocking
+must never apply simultaneously. If guard is still physically held after legitimate
+attack recovery, return to guard without opening a fresh parry window. Do not
+cancel or shorten attack recovery to regain protection. Verify rapid switching,
+two-thumb held guard plus attack, guard release during the swing, equivalent
+controller/keyboard input, cancellation and absence of stuck input. Sam explicitly
+added: “have to make sure that attack from block is handled well, too”.
+
 Authority: Sam proposed holding for half-damage protection, then explicitly said
 “let's do it” and requested retaining the sword-over pose before returning to rest.
