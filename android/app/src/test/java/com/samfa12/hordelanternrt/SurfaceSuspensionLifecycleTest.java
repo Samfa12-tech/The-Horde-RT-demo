@@ -63,6 +63,7 @@ public final class SurfaceSuspensionLifecycleTest {
         a.setContentView(LayoutInflater.from(a).inflate(R.layout.activity_main,null));
         set("preferences",a.getSharedPreferences("surface-lifecycle",Context.MODE_PRIVATE));
         set("resumed",true); set("menuVisible",false); set("startupUpdateCheckCompleted",true);
+        set("startupAssetsPrepared",true); // This fixture begins with an already-prepared live session.
         set("surfaceAvailable",true); set("surfaceStarted",true); set("surfaceRequestGeneration",31L);
         set("currentSurface",new Surface(new SurfaceTexture(0)));
         String[] names={"rtStatus","interactButton","toggleHeldLightPoseButton","parryButton"};

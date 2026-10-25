@@ -77,7 +77,7 @@ public final class OpeningBenchmarkMenuLifecycleTest {
         activity=Robolectric.buildActivity(MainActivity.class).get();
         activity.setContentView(LayoutInflater.from(activity).inflate(R.layout.activity_main,null));
         set("preferences",activity.getSharedPreferences("opening-benchmark-menu",Context.MODE_PRIVATE));
-        set("graphicsConfirmed",GraphicsPreferences.mobileDefaults());
+        set("graphicsConfirmed",GraphicsPreferences.mobileDefaults());set("startupAssetsPrepared",true);
         set("entryMenuEnabled",true);set("entryMenuSidePage",true);set("menuVisible",true);set("resumed",true);
         set("surfaceRequestGeneration",31L);set("surfaceStarted",true);set("startupUpdateCheckCompleted",true);
         String[] names={"surfaceView","menuScrim","menuButton","attackButton","parryButton","dodgeButton","runButton","crouchButton",

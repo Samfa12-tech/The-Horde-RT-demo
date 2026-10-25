@@ -1,0 +1,60 @@
+{
+  "baseCommit": "bf2dee1cfbab4201ed6d5b139f161c4c6c8bf408",
+  "scope": "startup patch source closure; APK predates separate CombatTeaching outcome correction",
+  "files": [
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "bytes": 514998,
+      "sha256": "0fc01f02e52626ad6533b64877d8bdf398cfd272b8c0733597f15e076220abb0",
+      "gitBlob": "ec38c827e4fc801808948f4e66b61a40668c806a"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/StartupAssetWork.java",
+      "bytes": 532,
+      "sha256": "a248ec7ebb33844229f3c9e1b08e24c9856f03ac60acdad402cbb8c924b48b4c",
+      "gitBlob": "b6a6e3c27a96ac56713e1e04b0ac22f6a179ed21"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java",
+      "bytes": 49215,
+      "sha256": "c6e66835aa3d88b4bd33e2bc901cc0e11d976c0595596cd586f19af4813f78cc",
+      "gitBlob": "db728c2e15cbbb5a4740d2d16fb5b9c3a1a8df55"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuIntegrationTest.java",
+      "bytes": 62626,
+      "sha256": "62bf60c4c2dded4b97b47b7c4d852740fa254998df1027fbd55d1fd667140777",
+      "gitBlob": "0dc045a379932abc62ac0d80237003a8284e3257"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/LookoutObjectiveMenuTest.java",
+      "bytes": 13789,
+      "sha256": "24aeae87bcaaf0fb1e5cdb54cb54e31cf323345f3a4975bb27b371c75016e1a1",
+      "gitBlob": "54313bf5626375b2f8fa2a153151528dc827a7c7"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/OpeningBenchmarkMenuLifecycleTest.java",
+      "bytes": 20168,
+      "sha256": "6ef42243c59f132d1f99c898ec27bde5ce205fd4121f77c28a22c035f499ae51",
+      "gitBlob": "00457722e99b4a23b3707db6333c855388cb9a70"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/SurfaceSuspensionLifecycleTest.java",
+      "bytes": 10503,
+      "sha256": "2fd9f4d6615d62cab82ddfdf53db60ffc27cabf64e43a7ba0060cf255fb3b5c3",
+      "gitBlob": "26878e35827fdf440d5cb5ed412caa6b78cf51bc"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/WorldAssetStagingTest.java",
+      "bytes": 3053,
+      "sha256": "7d4b736b09f2353fcca2b35aabd446dc3970a5c14bfa34fcc50fa0bbbaff27b7",
+      "gitBlob": "a0494dc4a391f34461d0f6a0b65dec5cce8eb0b2"
+    },
+    {
+      "path": "tests/Horde162AssetPolicyTests.ps1",
+      "bytes": 51755,
+      "sha256": "62b5dc6fec10d9ec64edd8dd60d4278cfe19ba75708daa9f0e4a63854cbe4301",
+      "gitBlob": "b9d8f06d2fbca75dd27208a33c336d285f090b97"
+    }
+  ]
+}

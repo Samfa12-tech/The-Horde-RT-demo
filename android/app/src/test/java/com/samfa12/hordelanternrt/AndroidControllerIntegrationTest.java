@@ -40,6 +40,7 @@ public class AndroidControllerIntegrationTest {
         static boolean paused,crouchHeld,analogue; static float dodgeX,dodgeZ; static boolean dodgeAnalogue; static int context,retries,crouchToggles,crouchClears;
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static int getSurfaceRuntimeState(long generation){return 1;}
+        @Implementation protected static long[] getEntryMenuState(){return new long[]{31,2,0,0,1};}
         @Implementation protected static int getContextualControlState(){return context;}
         @Implementation protected static void setViewControls(float y,float p,float light,float strafe,float forward,boolean crouch,boolean analogueMovement){yaw=y;pitch=p;x=strafe;z=forward;crouchHeld=crouch;analogue=analogueMovement;}
         @Implementation protected static void requestToggleCrouch(){crouchToggles++;}
@@ -86,6 +87,7 @@ public class AndroidControllerIntegrationTest {
         set("preferences",a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE));
         a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE).edit().clear().apply();
         set("resumed",true);set("menuVisible",false);
+        set("startupAssetsPrepared",true);set("surfaceRequestGeneration",31L);set("surfaceStarted",true);
         String[] names={"menuButton","attackButton","parryButton","dodgeButton","runButton","interactButton","toggleHeldLightPoseButton"};
         int[] ids={R.id.menu_button,R.id.attack_button,R.id.parry_button,R.id.dodge_button,R.id.run_button,R.id.interact_button,R.id.toggle_held_light_pose_button};
         for(int i=0;i<names.length;i++)set(names[i],a.findViewById(ids[i]));

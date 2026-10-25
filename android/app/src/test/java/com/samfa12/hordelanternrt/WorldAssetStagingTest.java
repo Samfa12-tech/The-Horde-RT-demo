@@ -21,9 +21,11 @@ public final class WorldAssetStagingTest {
         final String gradle = new String(Files.readAllBytes(root.resolve("build.gradle")), StandardCharsets.UTF_8);
         final String activity = new String(Files.readAllBytes(root.resolve(
                 "src/main/java/com/samfa12/hordelanternrt/MainActivity.java")), StandardCharsets.UTF_8);
-        final int start = activity.indexOf("private void collectInitialDiagnostics()");
-        final int publish = activity.indexOf("final boolean written = ProbeBridge.writeReports(filesRoot);", start);
-        assertTrue("Native startup publication must follow asset staging", start >= 0 && publish > start);
+        final int start = activity.indexOf("StartupDiagnostics prepareInitialDiagnostics()");
+        final int stagedAt = activity.indexOf("final boolean[] staged = stageRuntimeAssetCache();", start);
+        final int publish = activity.indexOf("ProbeBridge.writeReports(filesRoot)", start);
+        assertTrue("Worker report publication must follow the required asset staging",
+                start >= 0 && stagedAt > start && publish > stagedAt);
         final String startup = activity.substring(start, publish);
         assertTrue("Normal startup must invoke the shared cache roster before publication",
                 startup.contains("final boolean[] staged = stageRuntimeAssetCache();"));

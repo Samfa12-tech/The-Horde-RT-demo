@@ -1,0 +1,5 @@
+Original asset-policy run against the startup patch: FAIL
+Assertion: Android runtime-cache staging must run once before native report-root publication.
+Location: Horde162AssetPolicyTests.ps1 Require assertion at line 11.
+Cause: source-text fixture still located collectInitialDiagnostics and the former final-boolean report call.
+This is a compact transcription of the original command's error output, not a full stdout log.

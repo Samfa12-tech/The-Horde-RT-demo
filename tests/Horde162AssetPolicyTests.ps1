@@ -77,12 +77,12 @@ function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
                        $_ -like 'textures/characters/runtime/kit-warden-v1/*.android.ktx2' })
     Require ($required.Count -eq 18) 'Android equipment, entry and terrain staging require the closed eighteen-file package roster.'
     $startup=@([regex]::Matches($Activity,
-        '(?ms)^    private void collectInitialDiagnostics\(\)\s*\{(.*?)^    \}'))
+        '(?ms)^    StartupDiagnostics prepareInitialDiagnostics\(\)\s*\{(.*?)^    \}'))
     $helper=@([regex]::Matches($Activity,
         '(?ms)^    private boolean\[\] stageRuntimeAssetCache\(\)\s*\{(.*?)^    \}'))
     Require ($startup.Count -eq 1 -and $helper.Count -eq 1) 'Android equipment staging requires unique startup and runtime-cache methods.'
     $body=$startup[0].Groups[1].Value
-    $publication=[regex]::Match($body, 'final boolean written = ProbeBridge[.]writeReports\(filesRoot\);')
+    $publication=[regex]::Match($body, 'ProbeBridge[.]writeReports\(filesRoot\)')
     $invocations=@([regex]::Matches($body, 'stageRuntimeAssetCache\(\)'))
     Require ($publication.Success -and $invocations.Count -eq 1 -and
              $invocations[0].Index -lt $publication.Index) 'Android runtime-cache staging must run once before native report-root publication.'
@@ -239,7 +239,7 @@ try {
         Expect-Failure {Assert-EquipmentAndroidStaging $gradle ([regex]::Replace($activity,$call,'stageAsset("'+$path+'", "wrong-native-path")'))} 'exact native path'
     }
     $startupCall='final boolean[] staged = stageRuntimeAssetCache();'
-    $publicationCall='final boolean written = ProbeBridge.writeReports(filesRoot);'
+    $publicationCall='written=ProbeBridge.writeReports(filesRoot);'
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,'final boolean[] staged = new boolean[4];'))} 'once before native report-root publication'
     $late=$activity.Replace($startupCall,'final boolean[] staged = new boolean[4];').Replace($publicationCall,$publicationCall+' stageRuntimeAssetCache();')
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle $late} 'once before native report-root publication'

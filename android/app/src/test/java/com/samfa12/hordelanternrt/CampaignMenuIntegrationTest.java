@@ -12,6 +12,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import android.view.View;
+import android.view.WindowInsets;
+import android.graphics.Insets;
+import android.widget.FrameLayout;
+import android.widget.ScrollView;
+import android.view.Surface;
+import android.graphics.SurfaceTexture;
+import android.os.Looper;
+import android.widget.ProgressBar;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.robolectric.Shadows;
+import org.robolectric.RuntimeEnvironment;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
@@ -43,6 +56,8 @@ public final class CampaignMenuIntegrationTest {
         static long vitality;
         static String configuredPath;
         static boolean paused, acceptAck;
+        static int runtime,starts,textReportCalls;static long[] entry;
+        static long startResult;static boolean failStart;
         static float yaw,pitch,x,z;
         static final List<Integer> actions=new ArrayList<>();
         static final List<String> order=new ArrayList<>();
@@ -54,7 +69,11 @@ public final class CampaignMenuIntegrationTest {
         @Implementation protected static void setSimulationPaused(boolean p){paused=p;order.add(p?"paused":"unpaused");}
         @Implementation protected static void setViewControls(float y,float p,float light,float xx,float zz,boolean c,boolean analogueMovement){yaw=y;pitch=p;x=xx;z=zz;order.add("input");}
         @Implementation protected static void setEntryMenu(boolean e,boolean s,boolean r,boolean p,long g){if(p)order.add("play");}
-        @Implementation protected static int getSurfaceRuntimeState(long g){return 1;}
+        @Implementation protected static int getSurfaceRuntimeState(long g){return runtime;}
+        @Implementation protected static long[] getEntryMenuState(){return entry==null?null:entry.clone();}
+        @Implementation protected static long startDiagnosticSurface(Surface surface,String directory){starts++;if(failStart)throw new IllegalStateException("fixture start failure");return startResult;}
+        @Implementation protected static void stopDiagnosticSurface(long generation){}
+        @Implementation protected static String getTextReport(){textReportCalls++;return "fixture report";}
         @Implementation protected static int getPlayerLifePhase(){return lifePhase;}
         @Implementation protected static long getPlayerVitalityState(){return vitality;}
         static boolean confirmedRetryMode;
@@ -67,6 +86,21 @@ public final class CampaignMenuIntegrationTest {
         @Implementation protected static void clearCrouchIntent(){}
         @Implementation protected static void setRunHeld(boolean h){}
         @Implementation protected static boolean isRtLabUnlockEligible(){return false;}
+    }
+    public static class HeldStartupActivity extends MainActivity {
+        volatile CountDownLatch entered=new CountDownLatch(1),release=new CountDownLatch(1),finished=new CountDownLatch(1);
+        volatile boolean prepared=true,ranOnUi;
+        final AtomicInteger calls=new AtomicInteger();
+        @Override StartupDiagnostics prepareInitialDiagnostics() {
+            final CountDownLatch ownRelease=release,ownFinished=finished;
+            final boolean result=prepared;
+            calls.incrementAndGet();ranOnUi=Thread.currentThread()==Looper.getMainLooper().getThread();entered.countDown();
+            try {
+                if(!ownRelease.await(5,TimeUnit.SECONDS))return new StartupDiagnostics(false,"Fixture release did not arrive");
+                return new StartupDiagnostics(result,result?"Fixture assets prepared":"Fixture asset failure");
+            } catch(InterruptedException interrupted) {Thread.currentThread().interrupt();return new StartupDiagnostics(false,"Fixture interrupted");}
+            finally {ownFinished.countDown();}
+        }
     }
     private MainActivity a;
     private static Field field(String n)throws Exception {Field f=MainActivity.class.getDeclaredField(n);f.setAccessible(true);return f;}
@@ -106,13 +140,19 @@ public final class CampaignMenuIntegrationTest {
         Bridge.state=CampaignMenuStateTest.ready(); Bridge.state[7]=1;
         Bridge.next=Bridge.ackToken=Bridge.ackGeneration=0; Bridge.paused=false; Bridge.acceptAck=true;Bridge.ackCalls=Bridge.configurations=0;Bridge.configuredPath=null;
         Bridge.actions.clear();Bridge.order.clear();Bridge.yaw=Bridge.pitch=Bridge.x=Bridge.z=0;
-        Bridge.confirmedRetryMode=false;
+        Bridge.confirmedRetryMode=false;Bridge.runtime=1;Bridge.starts=Bridge.textReportCalls=0;Bridge.entry=new long[]{31,2,0,0,1};
+        Bridge.startResult=31;Bridge.failStart=false;
         Bridge.loadSlot=Bridge.loadKind=-1;
         Bridge.lifePhase=Bridge.retries=Bridge.resets=0;Bridge.vitality=(3L<<32)|3;
-        a=Robolectric.buildActivity(MainActivity.class).get();a.setContentView(R.layout.activity_main);
+        a=Robolectric.buildActivity(MainActivity.class).get();
+        wireActivityViews();
+    }
+    private void wireActivityViews()throws Exception {
+        a.setContentView(R.layout.activity_main);
         set("preferences",a.getSharedPreferences("campaign-menu",Context.MODE_PRIVATE));
+        a.getSharedPreferences("campaign-menu",Context.MODE_PRIVATE).edit().clear().apply();
         set("resumed",true);set("firstMenu",false);set("surfaceStarted",true);set("surfaceRequestGeneration",31L);
-        set("campaignConfigured",true);
+        set("campaignConfigured",true);set("startupAssetsPrepared",true);
         String[] names={"surfaceView","menuScrim","menuButton","attackButton","parryButton","dodgeButton","runButton","crouchButton",
                 "interactButton","toggleHeldLightPoseButton","diagnosticsPanel","developerOverlay","vitalityStatus","rtStatus","controllerPrompt"};
         int[] ids={R.id.scene_surface,R.id.menu_scrim,R.id.menu_button,R.id.attack_button,R.id.parry_button,R.id.dodge_button,R.id.run_button,R.id.crouch_button,
@@ -557,6 +597,222 @@ public final class CampaignMenuIntegrationTest {
         assertTrue(message.getText().toString().contains("Your manual save stays"));
         assertTrue(message.getText().toString().contains("autosave will be replaced by your new game"));
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).performClick();assertEquals(List.of(1),Bridge.actions);
+    }
+
+    @Test public void coldEntryPlayCannotOpenSaveChooserBeforeOwningPresentation()throws Exception {
+        Bridge.runtime=0;Bridge.entry=new long[]{31,2,0,0,0};
+        set("surfaceStarted",false);set("entryMenuEnabled",true);
+        call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        Button play=(Button)field("entryPlayButton").get(a);
+        if(play!=null)play.performClick();
+        call("requestEntryPlay"); // A detached/programmatic callback cannot bypass hidden controls.
+        assertFalse("accepted surface without RT Entry output cannot open slots",field("campaignMenuVisible").getBoolean(a));
+        assertTrue("early tap cannot enqueue a save/load/new-game operation",Bridge.actions.isEmpty());
+        assertTrue(Bridge.paused);
+    }
+    @Test public void stalePresentedEntryCannotUnlockReplacementSurface()throws Exception {
+        set("entryMenuEnabled",true);set("surfaceStarted",false);Bridge.entry=new long[]{30,2,0,0,1};
+        call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        call("applyEntryMenuAvailability",new Class<?>[]{EntryMenuState.class},EntryMenuState.decode(new long[]{30,2,0,0,1}));
+        for(String name:new String[]{"entryPlayButton","entrySettingsButton","entryMoreButton"}) {
+            Button button=(Button)field(name).get(a);assertTrue(button==null || !button.isEnabled());
+        }
+        call("requestEntryPlay");assertFalse(field("campaignMenuVisible").getBoolean(a));
+    }
+    @Test public void coldPauseResumeAndLoadCannotBypassPendingSurface()throws Exception {
+        set("entryMenuEnabled",false);
+        call("showMainMenu",new Class<?>[]{boolean.class},false);
+        Button detachedResume=find(a.getString(R.string.resume_demo));
+        Button detachedLoad=find("Load checkpoint");assertNotNull(detachedResume);assertNotNull(detachedLoad);
+        Bridge.runtime=0;set("surfaceStarted",false);
+        call("showMainMenu",new Class<?>[]{boolean.class},false);
+        assertNull(find(a.getString(R.string.resume_demo)));assertNull(find("Load checkpoint"));
+        detachedResume.performClick();
+        assertTrue("Resume must retain pause before actual ready output",Bridge.paused);
+        assertTrue(field("menuVisible").getBoolean(a));
+        detachedLoad.performClick();
+        assertFalse(field("campaignMenuVisible").getBoolean(a));assertTrue(Bridge.actions.isEmpty());
+    }
+
+    private HeldStartupActivity heldStartup(boolean surfaceAvailable)throws Exception {
+        HeldStartupActivity held=Robolectric.buildActivity(HeldStartupActivity.class).get();a=held;wireActivityViews();
+        set("startupAssetsPrepared",false);set("surfaceRequestGeneration",0L);set("surfaceStarted",false);
+        set("entryMenuEnabled",true);set("startupUpdateCheckCompleted",true);
+        set("surfaceAvailable",surfaceAvailable);
+        if(surfaceAvailable)set("currentSurface",new Surface(new SurfaceTexture(0)));
+        Bridge.runtime=0;Bridge.entry=new long[]{31,2,0,0,0};
+        call("showMainMenu",new Class<?>[]{boolean.class},true);return held;
+    }
+    private void awaitStartupResult(MainActivity activity)throws Exception {
+        long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(3);
+        while(field("startupAssetsPending").getBoolean(activity) && System.nanoTime()<deadline) {
+            Shadows.shadowOf(Looper.getMainLooper()).idle();Thread.sleep(1);
+        }
+        assertFalse("worker result must be handled within fixture deadline",field("startupAssetsPending").getBoolean(activity));
+    }
+    private int countProgress(View view) {
+        int count=view instanceof ProgressBar?1:0;
+        if(view instanceof ViewGroup)for(int i=0;i<((ViewGroup)view).getChildCount();++i)count+=countProgress(((ViewGroup)view).getChildAt(i));
+        return count;
+    }
+    @Test public void heldStartupWriterLeavesLocalCancelResponsiveAndOnlyRealCurrentPresentationUnlocks()throws Exception {
+        HeldStartupActivity held=heldStartup(true);
+        try {
+            call("collectInitialDiagnostics");assertTrue(held.entered.await(1,TimeUnit.SECONDS));assertFalse(held.ranOnUi);
+            assertEquals(0,Bridge.starts);call("startSurfaceIfReady");assertEquals(0,Bridge.starts);
+            AtomicInteger uiEvent=new AtomicInteger();new android.os.Handler(Looper.getMainLooper()).post(uiEvent::incrementAndGet);
+            Shadows.shadowOf(Looper.getMainLooper()).idle();assertEquals(1,uiEvent.get());
+            assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("Loading"));
+            find("Cancel").performClick();AlertDialog confirmation=(AlertDialog)field("backExitDialog").get(a);assertNotNull(confirmation);
+            a.onBackPressed();Shadows.shadowOf(Looper.getMainLooper()).idle();
+            assertFalse("Back dismisses the actual loading exit dialog",confirmation.isShowing());
+            assertNull("Back revokes loading exit confirmation ownership",field("backExitDialog").get(a));
+            assertTrue(Bridge.actions.isEmpty());
+            held.release.countDown();awaitStartupResult(held);assertTrue(field("startupAssetsPrepared").getBoolean(a));
+            assertEquals(1,Bridge.starts);assertNull(field("entryPlayButton").get(a));
+            Bridge.runtime=1;Bridge.entry=new long[]{30,2,0,0,1};
+            call("showMainMenu",new Class<?>[]{boolean.class},false);assertTrue(field("startupUiVisible").getBoolean(a));
+            Bridge.entry=new long[]{31,2,0,0,1};call("showMainMenu",new Class<?>[]{boolean.class},false);
+            assertFalse(field("startupUiVisible").getBoolean(a));assertNotNull(field("entryPlayButton").get(a));
+            ((Button)field("entryPlayButton").get(a)).performClick();assertTrue(field("campaignMenuVisible").getBoolean(a));
+        } finally {held.release.countDown();}
+    }
+    @Test public void startupFailureRetryCannotOverlapWriterAndReducedMotionRemainsStatic()throws Exception {
+        HeldStartupActivity held=heldStartup(false);held.prepared=false;
+        try {
+            call("collectInitialDiagnostics");assertTrue(held.entered.await(1,TimeUnit.SECONDS));held.release.countDown();awaitStartupResult(held);
+            assertTrue(field("startupAssetsFailed").getBoolean(a));assertEquals(0,Bridge.starts);
+            Button oldRetry=find("Retry");assertNotNull(oldRetry);
+            held.prepared=true;held.entered=new CountDownLatch(1);held.release=new CountDownLatch(1);held.finished=new CountDownLatch(1);
+            oldRetry.performClick();assertTrue(held.entered.await(1,TimeUnit.SECONDS));oldRetry.performClick();
+            assertEquals(2,held.calls.get());assertEquals(0,Bridge.starts);
+            a.getSharedPreferences("campaign-menu",Context.MODE_PRIVATE).edit().putBoolean(InterfacePreferences.REDUCED_MOTION,true).apply();
+            call("showStartupLoading");assertEquals(0,countProgress(a.findViewById(R.id.menu_scrim)));
+            held.release.countDown();awaitStartupResult(held);oldRetry.performClick();assertEquals(2,held.calls.get());
+            assertTrue(field("startupAssetsPrepared").getBoolean(a));assertTrue(field("startupUiVisible").getBoolean(a));
+        } finally {held.release.countDown();}
+    }
+    @Test public void replacementActivitiesSerializeStartupWritersAndRejectOldCompletion()throws Exception {
+        HeldStartupActivity first=heldStartup(false),second=null;
+        try {
+            call("collectInitialDiagnostics");assertTrue(first.entered.await(1,TimeUnit.SECONDS));
+            second=heldStartup(false);call("collectInitialDiagnostics");
+            assertFalse("replacement waits behind running cache writer",second.entered.await(50,TimeUnit.MILLISECONDS));
+            first.release.countDown();assertTrue(second.entered.await(1,TimeUnit.SECONDS));
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            assertFalse("old Activity result cannot admit its startup",field("startupAssetsPrepared").getBoolean(first));
+            second.release.countDown();awaitStartupResult(second);
+            assertTrue(field("startupAssetsPrepared").getBoolean(second));assertEquals(0,Bridge.starts);
+        } finally {first.release.countDown();if(second!=null)second.release.countDown();}
+    }
+    @Test public void backgroundStartupCompletionCannotStartSurfaceAndDestroyedResultCannotReopenUi()throws Exception {
+        HeldStartupActivity held=heldStartup(true);
+        try {
+            call("collectInitialDiagnostics");assertTrue(held.entered.await(1,TimeUnit.SECONDS));
+            a.onPause();held.release.countDown();awaitStartupResult(held);
+            assertTrue(field("startupAssetsPrepared").getBoolean(a));assertEquals(0,Bridge.starts);
+            a.onResume();assertEquals(1,Bridge.starts);assertTrue(field("startupUiVisible").getBoolean(a));
+            long epoch=field("campaignConfigurationEpoch").getLong(a),attempt=field("startupAssetsAttempt").getLong(a);
+            set("campaignDestroyed",true);set("startupAssetsPrepared",false);
+            call("completeInitialDiagnostics",new Class<?>[]{long.class,long.class,MainActivity.StartupDiagnostics.class},
+                epoch,attempt,new MainActivity.StartupDiagnostics(true,"late"));
+            assertFalse(field("startupAssetsPrepared").getBoolean(a));assertEquals(1,Bridge.starts);
+        } finally {held.release.countDown();}
+    }
+
+    @Test public void nativeReadyCannotUnlockMenusWhenRequiredAssetsFailedOrAreStillPreparing()throws Exception {
+        set("startupAssetsPrepared",false);set("entryMenuEnabled",true);
+        call("showEntryMenu",new Class<?>[]{boolean.class},false);call("requestEntryPlay");
+        assertTrue(field("startupUiVisible").getBoolean(a));assertFalse(field("campaignMenuVisible").getBoolean(a));
+        assertTrue(Bridge.actions.isEmpty());assertNull(field("entryPlayButton").get(a));
+    }
+
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    public void startupLoadingAndErrorCardsKeepLargeTextActionsReachableWithinSafeInsets()throws Exception {
+        final String originalQualifiers=RuntimeEnvironment.getQualifiers();
+        final String evidence=System.getenv("HORDE_STARTUP_UI_EVIDENCE_DIR");
+        try {
+            for(int[] size:new int[][]{{320,568},{640,320}}) {
+                RuntimeEnvironment.setQualifiers("w"+size[0]+"dp-h"+size[1]+"dp-"+(size[0]>size[1]?"land":"port")+"-mdpi");
+                a=Robolectric.buildActivity(MainActivity.class).get();wireActivityViews();
+                Configuration c=new Configuration(a.getResources().getConfiguration());c.fontScale=2;
+                a.getResources().updateConfiguration(c,a.getResources().getDisplayMetrics());
+                final WindowInsets safe=new WindowInsets.Builder().setStableInsets(Insets.of(12,24,12,24)).build();
+                // Exercise the existing attachPanel inset API with explicit synthetic host insets.
+                FrameLayout scrim=new FrameLayout(a){@Override public WindowInsets getRootWindowInsets(){return safe;}};
+                scrim.setId(R.id.menu_scrim);
+                View old=a.findViewById(R.id.menu_scrim);ViewGroup parent=(ViewGroup)old.getParent();
+                ViewGroup.LayoutParams params=old.getLayoutParams();parent.removeView(old);parent.addView(scrim,params);set("menuScrim",scrim);
+                set("entryMenuEnabled",true);set("startupAssetsPrepared",false);
+                for(boolean failed:new boolean[]{false,true}) {
+                    Bridge.runtime=failed?3:0;call("showStartupLoading");
+                    scrim.measure(View.MeasureSpec.makeMeasureSpec(size[0],View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(size[1],View.MeasureSpec.EXACTLY));
+                    scrim.layout(0,0,size[0],size[1]);
+                    ScrollView scroller=(ScrollView)scrim.getChildAt(0);
+                    assertTrue(scroller.getLeft()>=20 && scroller.getRight()<=size[0]-20);
+                    assertTrue(scroller.getTop()>=32 && scroller.getBottom()<=size[1]-32);
+                    assertEquals(2,a.getResources().getConfiguration().fontScale,0);
+                    Button cancel=find("Cancel"),retry=find("Retry");assertNotNull(cancel);
+                    assertEquals(failed,retry!=null);
+                    final String scenario=(failed?"error":"loading")+"-"+size[0]+"x"+size[1]+"-font200";
+                    writeStartupWidgetEvidence(evidence,scenario+"-top",scrim,scroller);
+                    // A short landscape card may scroll, but neither action may be clipped or unreachable.
+                    scroller.scrollTo(0,scroller.getChildAt(0).getHeight());
+                    for(Button action:new Button[]{cancel,retry})if(action!=null) {
+                        Rect bounds=new Rect(0,0,action.getWidth(),action.getHeight());scrim.offsetDescendantRectToMyCoords(action,bounds);
+                        assertTrue(scenario+" complete action target "+bounds,action.isEnabled() && bounds.width()>=48 && bounds.height()>=48 &&
+                            bounds.left>=scroller.getLeft() && bounds.right<=scroller.getRight() &&
+                            bounds.top>=scroller.getTop() && bounds.bottom<=scroller.getBottom());
+                        assertNotNull(action.getLayout());assertEquals(0,action.getLayout().getEllipsisCount(0));
+                    }
+                    writeStartupWidgetEvidence(evidence,scenario+"-actions",scrim,scroller);
+                }
+            }
+        } finally {RuntimeEnvironment.setQualifiers(originalQualifiers);}
+    }
+    private void writeStartupWidgetEvidence(String directory,String scenario,ViewGroup root,ScrollView scroller)throws Exception {
+        if(directory==null || directory.isEmpty())return;
+        Bitmap image=Bitmap.createBitmap(root.getWidth(),root.getHeight(),Bitmap.Config.ARGB_8888);root.draw(new Canvas(image));
+        File file=new File(directory,"android-widget-fixture-startup-"+scenario+".png");
+        assertTrue(file.getParentFile().isDirectory() || file.getParentFile().mkdirs());
+        try(FileOutputStream stream=new FileOutputStream(file)){assertTrue(image.compress(Bitmap.CompressFormat.PNG,100,stream));}
+        StringBuilder metrics=new StringBuilder("HOST ANDROID WIDGET FIXTURE ONLY; no phone, RT world, native readiness or touch evidence.\n");
+        metrics.append("viewport=").append(root.getWidth()).append('x').append(root.getHeight()).append(" syntheticStableInsets=12,24,12,24 fontScale=")
+            .append(a.getResources().getConfiguration().fontScale).append(" actualDisplay=")
+            .append(a.getResources().getDisplayMetrics().widthPixels).append('x').append(a.getResources().getDisplayMetrics().heightPixels)
+            .append(" scroller=").append(scroller.getLeft()).append(',').append(scroller.getTop()).append(',').append(scroller.getRight()).append(',').append(scroller.getBottom())
+            .append(" scrollY=").append(scroller.getScrollY()).append('\n');
+        for(String label:new String[]{"Cancel","Retry"}) {
+            Button action=find(label);if(action==null)continue;
+            Rect bounds=new Rect(0,0,action.getWidth(),action.getHeight());root.offsetDescendantRectToMyCoords(action,bounds);
+            metrics.append(label).append('=').append(bounds).append('\n');
+        }
+        Files.write(new File(directory,file.getName()+".txt").toPath(),(metrics.toString()+menuText(root)).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+    @Test public void rejectedStartupSurfaceKeepsLocalRecoveryWithoutAutomaticUiThreadReprobe()throws Exception {
+        set("surfaceAvailable",true);set("currentSurface",new Surface(new SurfaceTexture(0)));
+        set("entryMenuEnabled",true);Bridge.runtime=0;
+        for(boolean thrown:new boolean[]{false,true}) {
+            set("surfaceRequestGeneration",0L);set("startupEntryFailed",false);
+            Bridge.startResult=0;Bridge.failStart=thrown;call("showStartupLoading");call("startSurfaceIfReady");
+            assertTrue(field("startupEntryFailed").getBoolean(a));assertFalse(field("diagnosticsVisible").getBoolean(a));
+            assertNotNull(find("Retry"));assertNotNull(find("Cancel"));assertEquals(0,Bridge.textReportCalls);
+        }
+        assertEquals(2,Bridge.starts);
+    }
+
+    @Test public void startupNativeFailureKeepsRetryAndCancelWithoutAutomaticUiThreadReprobe()throws Exception {
+        set("entryMenuEnabled",true);Bridge.runtime=0;call("showStartupLoading");
+        assertNull(find("Retry"));
+        Runnable poll=(Runnable)field("runtimePoll").get(a);
+        for(int error:new int[]{2,3}) {
+            Bridge.runtime=error;poll.run();
+            assertTrue(field("startupUiVisible").getBoolean(a));assertFalse(field("diagnosticsVisible").getBoolean(a));
+            assertNotNull(find("Retry"));assertNotNull(find("Cancel"));
+            assertEquals("startup polling never invokes synchronous diagnostic probe",0,Bridge.textReportCalls);
+            if(error==2)assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("hardware ray tracing"));
+        }
     }
 
 }

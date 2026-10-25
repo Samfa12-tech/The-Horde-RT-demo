@@ -32,6 +32,7 @@ public final class LookoutObjectiveMenuTest {
     @Implements(value=ProbeBridge.class,isInAndroidSdk=false)
     public static final class Bridge {
         static long[] objective;
+        static long[] entryState;
         static boolean paused,entry,crouch;
         static float strafe,forward;
         static int resets,campaignRequests,attacks,parries,dodges,interacts,lanterns;
@@ -39,6 +40,7 @@ public final class LookoutObjectiveMenuTest {
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static long[] getLookoutObjectiveState(long generation){return objective==null?null:objective.clone();}
         @Implementation protected static int getSurfaceRuntimeState(long generation){return 1;}
+        @Implementation protected static long[] getEntryMenuState(){return entryState==null?null:entryState.clone();}
         @Implementation protected static int getContextualControlState(){return 0;}
         @Implementation protected static void setSimulationPaused(boolean value){paused=value;order.add(value?"pause":"resume");}
         @Implementation protected static void setViewControls(float y,float p,float light,float x,float z,boolean c,boolean analogueMovement){strafe=x;forward=z;crouch=c;order.add("input");}
@@ -46,7 +48,11 @@ public final class LookoutObjectiveMenuTest {
         @Implementation protected static void clearRunIntent(){}
         @Implementation protected static void clearCrouchIntent(){crouch=false;}
         @Implementation protected static boolean isRtLabUnlockEligible(){return false;}
-        @Implementation protected static void setEntryMenu(boolean enabled,boolean side,boolean reduced,boolean play,long generation){entry=enabled;order.add("entry");}
+        @Implementation protected static void setEntryMenu(boolean enabled,boolean side,boolean reduced,boolean play,long generation){
+            // The native owner invalidates prior presentation synchronously on a profile-enable change.
+            if(enabled!=entry && entryState!=null)entryState[4]=0;
+            entry=enabled;order.add("entry");
+        }
         @Implementation protected static long requestCampaign(int action,int slot,int kind,long generation){campaignRequests++;return 1;}
         @Implementation protected static void requestRouteReset(){resets++;}
         @Implementation protected static boolean setDiagnosticSurfaceSuspended(long generation,boolean suspended){return true;}
@@ -86,13 +92,14 @@ public final class LookoutObjectiveMenuTest {
     private void open()throws Exception {pause();assertNotNull(find("Lookout objective"));find("Lookout objective").performClick();}
     private int actionCount(){return Bridge.attacks+Bridge.parries+Bridge.dodges+Bridge.interacts+Bridge.lanterns;}
     @Before public void setup()throws Exception {
-        Bridge.objective=new long[]{1,31,81,1};Bridge.paused=Bridge.entry=Bridge.crouch=false;
+        Bridge.objective=new long[]{1,31,81,1};Bridge.entryState=null;Bridge.guardHeld=false;
+        Bridge.paused=Bridge.entry=Bridge.crouch=false;
         Bridge.strafe=Bridge.forward=0;Bridge.order.clear();
         Bridge.resets=Bridge.campaignRequests=Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=0;
         a=Robolectric.buildActivity(MainActivity.class).get();a.setContentView(R.layout.activity_main);
         set("preferences",a.getSharedPreferences("lookout-menu",Context.MODE_PRIVATE));
         a.getSharedPreferences("lookout-menu",Context.MODE_PRIVATE).edit().clear().putBoolean("graphics_mist_enabled",false).putInt("owner_marker",17).commit();
-        set("resumed",true);set("firstMenu",false);set("surfaceStarted",true);set("surfaceRequestGeneration",31L);
+        set("resumed",true);set("firstMenu",false);set("startupAssetsPrepared",true);set("surfaceStarted",true);set("surfaceRequestGeneration",31L);
         String[] names={"surfaceView","menuScrim","menuButton","attackButton","parryButton","dodgeButton","runButton","crouchButton",
                 "interactButton","toggleHeldLightPoseButton","diagnosticsPanel","developerOverlay","vitalityStatus","rtStatus","controllerPrompt"};
         int[] ids={R.id.scene_surface,R.id.menu_scrim,R.id.menu_button,R.id.attack_button,R.id.parry_button,R.id.dodge_button,R.id.run_button,R.id.crouch_button,
@@ -151,10 +158,17 @@ public final class LookoutObjectiveMenuTest {
     }
     @Test public void returnToBrandedMenuDoesNotResetWriteSaveOrChangePreferences()throws Exception {
         Map<String,?> before=a.getSharedPreferences("lookout-menu",Context.MODE_PRIVATE).getAll();
+        Bridge.entryState=new long[]{31,2,0,0,1}; // Retained old Entry publication cannot certify a new request.
         open();find("Return to menu").performClick();
         assertTrue(Bridge.paused);assertTrue(Bridge.entry);assertTrue(field("entryMenuEnabled").getBoolean(a));
         assertEquals(0,Bridge.resets);assertEquals(0,Bridge.campaignRequests);assertEquals(0,actionCount());
         assertEquals(before,a.getSharedPreferences("lookout-menu",Context.MODE_PRIVATE).getAll());
+        assertEquals("request invalidates old same-generation presentation",0,Bridge.entryState[4]);
+        assertTrue("return publishes the request but waits for the Entry frame",field("startupUiVisible").getBoolean(a));
+        assertNull(find(a.getString(R.string.entry_play)));
+        Bridge.entryState=new long[]{31,2,0,0,1};
+        call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        assertFalse(field("startupUiVisible").getBoolean(a));
     }
     @Test public void keyboardEscapeClosesOnlyThePlayerOpenedPanel()throws Exception {
         open();long now=SystemClock.uptimeMillis();

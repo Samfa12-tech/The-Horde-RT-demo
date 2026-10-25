@@ -481,6 +481,9 @@ public class MainActivity extends Activity {
     private final int[] rtLightIntensityPercent = {100, 100, 100, 100};
     private int rtWorkloadPreset = 1;
     private int keyboardFlaskHeld,keyboardFlaskBlocked;
+    private boolean startupAssetsPrepared,startupAssetsPending,startupAssetsFailed,startupUiVisible,startupEntryFailed;
+    private long startupAssetsAttempt,entryMenuAdmittedGeneration;
+    private int startupShownRuntime=-1;
     private boolean retryPending, confirmedRetryPending;
     private long confirmedRetryRequestFloor, confirmedRetryStarted;
     private boolean updateCheckInFlight;
@@ -590,6 +593,10 @@ public class MainActivity extends Activity {
                 try { ProbeBridge.setEntryMenu(true, entryMenuSidePage, isReducedMotionEnabled(), false,
                         surfaceRequestGeneration); }
                 catch (RuntimeException | LinkageError ignored) { /* Keep the failure visible for manual recovery. */ }
+            }
+            if(startupUiVisible) {
+                if(isMenuRuntimeReady()) {showMainMenu(false);return;}
+                if(state.phase==EntryMenuState.PHASE_FAILURE) {startupEntryFailed=true;showStartupLoading();}
             }
             updateEntryMenuPresentation(state);
             handler.postDelayed(this, state.phase == EntryMenuState.PHASE_LOADING ? 100L : 200L);
@@ -1029,7 +1036,44 @@ public class MainActivity extends Activity {
         return new boolean[]{skeletonStaged, lichStaged, materialsStaged, heldItemsStaged};
     }
 
+    static final class StartupDiagnostics {
+        final boolean assetsPrepared;
+        final String text;
+        StartupDiagnostics(boolean assetsPrepared,String text) {this.assetsPrepared=assetsPrepared;this.text=text;}
+    }
+
     private void collectInitialDiagnostics() {
+        if(startupAssetsPending || campaignDestroyed || openingBenchmarkRecoveryLaunch)return;
+        if(startupAssetsAttempt==Long.MAX_VALUE) {startupAssetsFailed=true;showStartupLoading();return;}
+        final long attempt=++startupAssetsAttempt,epoch=campaignConfigurationEpoch;
+        startupAssetsPending=true;startupAssetsPrepared=false;startupAssetsFailed=false;
+        StartupAssetWork.execute(() -> {
+            // A queued obsolete Activity never starts a second writer. An already
+            // running writer finishes before the single queue starts its successor.
+            if(campaignDestroyed || campaignActivityEpochs.get()!=epoch)return;
+            StartupDiagnostics prepared;
+            try {prepared=prepareInitialDiagnostics();}
+            catch(Throwable unavailable) {prepared=new StartupDiagnostics(false,"Startup preparation failed: "+unavailable.getMessage());}
+            final StartupDiagnostics result=prepared;
+            handler.post(() -> completeInitialDiagnostics(epoch,attempt,result));
+        });
+    }
+
+    private void completeInitialDiagnostics(long epoch,long attempt,StartupDiagnostics result) {
+        if(campaignDestroyed || isFinishing() || isDestroyed() || campaignActivityEpochs.get()!=epoch || epoch!=campaignConfigurationEpoch ||
+           attempt!=startupAssetsAttempt)return;
+        startupAssetsPending=false;startupAssetsPrepared=result.assetsPrepared;
+        startupAssetsFailed=!result.assetsPrepared;reportText=result.text;
+        if(reportTextView!=null)reportTextView.setText(reportText);
+        if(!resumed)return; // Resume observes the retained result; never opens UI in background.
+        if(startupAssetsPrepared)startSurfaceIfReady();
+        if(startupUiVisible)showStartupLoading();
+    }
+
+    // Native probe/cache/report work only. No UI, surface/lifecycle calls or gameplay.
+    StartupDiagnostics prepareInitialDiagnostics() {
+        boolean assetsPrepared=false;
+        String preparedText;
         try {
             final String textReport = ProbeBridge.getTextReport();
             final String jsonReport = ProbeBridge.getJsonReport();
@@ -1041,11 +1085,12 @@ public class MainActivity extends Activity {
             final boolean[] staged = stageRuntimeAssetCache();
             final boolean skeletonStaged = staged[0], lichStaged = staged[1];
             final boolean materialsStaged = staged[2], heldItemsStaged = staged[3];
-            final boolean written = ProbeBridge.writeReports(filesRoot);
+            assetsPrepared=skeletonStaged && lichStaged && materialsStaged && heldItemsStaged;
+            boolean written=false;
+            try {written=ProbeBridge.writeReports(filesRoot);}
+            catch(Throwable reportUnavailable) { /* Optional report IO cannot invalidate prepared runtime assets. */ }
             final StringBuilder output = new StringBuilder(textReport).append('\n');
-            if (textReport.contains("RT mode: Unsupported")) {
-                output.append("Unsupported: fake RT fallback is disabled.\n\n");
-            }
+            if (textReport.contains("RT mode: Unsupported")) output.append("Unsupported: fake RT fallback is disabled.\n\n");
             output.append("Reports written: ").append(written ? "yes" : "no").append('\n');
             output.append("Animated skeleton staged: ").append(skeletonStaged ? "yes" : "no").append('\n');
             output.append("Animated lich placeholder staged: ").append(lichStaged ? "yes" : "no").append('\n');
@@ -1053,12 +1098,68 @@ public class MainActivity extends Activity {
             output.append("Production PBR held items/player staged: ").append(heldItemsStaged ? "yes" : "no").append('\n');
             output.append("Report directory: ").append(filesRoot).append('/').append(REPORT_DIRECTORY).append('\n');
             output.append("Report files: ").append(TEXT_REPORT_FILE).append(", ").append(JSON_REPORT_FILE).append('\n');
-            output.append("JSON sample:\n").append(jsonReport);
-            reportText = output.toString();
-        } catch (final Throwable error) {
-            reportText = "Unable to load the native Vulkan RT renderer.\n\n" + error.getMessage();
+            output.append("JSON sample:\n").append(jsonReport);preparedText=output.toString();
+        } catch(Throwable error) {preparedText="Unable to prepare the native Vulkan RT renderer.\n\n"+error.getMessage();}
+        return new StartupDiagnostics(assetsPrepared,preparedText);
+    }
+
+    private boolean isMenuRuntimeReady() {
+        if(!resumed || surfaceRequestGeneration<=0 || (!startupAssetsPrepared && !openingBenchmarkRecoveryLaunch))return false;
+        try {
+            if(ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration)!=1)return false;
+            if(!entryMenuEnabled || entryMenuAdmittedGeneration==surfaceRequestGeneration)return true;
+            EntryMenuState entry=EntryMenuState.decode(ProbeBridge.getEntryMenuState());
+            if(entry!=null && entry.isEntryPresented(surfaceRequestGeneration) && entry.phase==EntryMenuState.PHASE_IDLE) {
+                entryMenuAdmittedGeneration=surfaceRequestGeneration;return true;
+            }
+        } catch(RuntimeException | LinkageError unavailable) { /* No assumed readiness. */ }
+        return false;
+    }
+
+    private void showStartupLoading() {
+        startupUiVisible=true;menuVisible=true;interfaceVisible=false;diagnosticsVisible=false;
+        setGameplayPaused(true);clearTouchState();
+        entryPlayButton=entrySettingsButton=entryMoreButton=null;
+        entryMenuPanel=null;entryMenuStatus=null;entryMenuProgress=null;
+        menuScrim.setVisibility(View.VISIBLE);menuScrim.removeAllViews();
+        menuScrim.setBackgroundColor(0xFF050403);
+        diagnosticsPanel.setVisibility(View.GONE);
+        for(View control:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,
+                interactButton,toggleHeldLightPoseButton,rtStatus,vitalityStatus,developerOverlay})
+            if(control!=null)control.setVisibility(View.GONE);
+        int runtime=0;
+        try {if(surfaceRequestGeneration>0)runtime=ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);}
+        catch(RuntimeException | LinkageError unavailable) {runtime=3;}
+        startupShownRuntime=runtime;
+        final boolean failed=startupAssetsFailed || startupEntryFailed || runtime==2 || runtime==3;
+        LinearLayout panel=createPanel(getString(R.string.entry_menu_brand),failed?"COULD NOT LOAD":"LOADING");
+        addBody(panel,runtime==2 ? "This device cannot run Horde’s required hardware ray tracing." :
+                failed?"Horde could not finish loading. You can retry or leave.":"Loading…");
+        if(!failed && !isReducedMotionEnabled()) {
+            ProgressBar spinner=new ProgressBar(this,null,android.R.attr.progressBarStyleSmall);
+            spinner.setIndeterminate(true);spinner.setContentDescription("Loading");
+            LinearLayout.LayoutParams spin=new LinearLayout.LayoutParams(dp(32),dp(32));spin.gravity=Gravity.CENTER_HORIZONTAL;
+            panel.addView(spinner,spin);
         }
-        reportTextView.setText(reportText);
+        if(failed) {
+            Button retry=addEntryMenuButton(panel,"Retry",this::retryStartupLoading,true);
+            retry.setEnabled(!startupAssetsPending);
+        }
+        addEntryMenuButton(panel,"Cancel",() -> {if(startupUiVisible)showBackExitConfirmation();},false);
+        attachPanel(panel);
+        menuScrim.setBackgroundColor(0xFF050403); // attachPanel normally selects a translucent menu.
+    }
+
+    private void retryStartupLoading() {
+        if(!startupUiVisible || startupAssetsPending || campaignDestroyed || !resumed)return;
+        int runtime=0;
+        try {if(surfaceRequestGeneration>0)runtime=ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);}
+        catch(RuntimeException | LinkageError unavailable) {runtime=3;}
+        if(!startupAssetsFailed && !startupEntryFailed && runtime!=2 && runtime!=3)return; // Detached old Retry cannot restart a healthy/pending owner.
+        startupEntryFailed=false;
+        if(!startupAssetsPrepared)collectInitialDiagnostics();
+        else {stopSurface();entryMenuAdmittedGeneration=0;startSurfaceIfReady();}
+        showStartupLoading();
     }
 
     private void configureSurface() {
@@ -1092,6 +1193,7 @@ public class MainActivity extends Activity {
 
     private void startSurfaceIfReady() {
         if (openingBenchmarkRecoveryRejected || !resumed || !surfaceAvailable || surfaceRequestGeneration != 0 || currentSurface == null) return;
+        if(!startupAssetsPrepared && !openingBenchmarkRecoveryLaunch)return;
         try {
             if (entryMenuEnabled) {
                 entryPlayRequested = false;
@@ -1102,12 +1204,12 @@ public class MainActivity extends Activity {
             setGameplayPaused(menuVisible || diagnosticsVisible || openingBenchmarkCancelRequested);
             if (entryMenuEnabled) publishEntryMenuState();
             if (surfaceRequestGeneration == 0) {
-                reportTextView.append("\n\nRenderer surface failed to start.");
-                showDiagnostics(true);
+                if(startupUiVisible) {startupEntryFailed=true;showStartupLoading();}
+                else {reportTextView.append("\n\nRenderer surface failed to start.");showDiagnostics(true);}
             }
         } catch (final Throwable error) {
-            reportTextView.append("\n\nRenderer surface failure: " + error.getMessage());
-            showDiagnostics(true);
+            if(startupUiVisible) {startupEntryFailed=true;showStartupLoading();}
+            else {reportTextView.append("\n\nRenderer surface failure: " + error.getMessage());showDiagnostics(true);}
         }
     }
 
@@ -1224,6 +1326,8 @@ public class MainActivity extends Activity {
         if(openingBenchmarkRecoveryRejected) { showOpeningBenchmarkRecoveryBlocked();return; }
         if(openingBenchmarkPending()) { showOpeningBenchmarkProgress(); return; }
         invalidateLookoutObjective();
+        if(!isMenuRuntimeReady()) {showStartupLoading();return;}
+        startupUiVisible=false;
         if (shouldUseEntryMenu(firstLaunch)) {
             entryMenuEnabled = true;
             entryMenuSidePage = false;
@@ -1345,7 +1449,9 @@ public class MainActivity extends Activity {
         }
         invalidateLookoutObjective();clearTouchState();
         if(returnToMenu) {
+            entryMenuAdmittedGeneration=0; // Showcase output cannot certify a newly requested Entry scene.
             entryMenuEnabled=true;entryMenuSidePage=false;entryPlayRequested=false;entryMenuFailed=false;
+            publishEntryMenuState(); // Native synchronously invalidates the prior scene's presented flag.
             showEntryMenu(false);
         } else hideMenu();
     }
@@ -1377,6 +1483,12 @@ public class MainActivity extends Activity {
     }
 
     private void showEntryMenu(final boolean sidePage) {
+        if(!isMenuRuntimeReady()) {
+            showStartupLoading();
+            publishEntryMenuState(); // Request the profile before waiting for its owning presentation.
+            return;
+        }
+        startupUiVisible=false;
         invalidateLookoutObjective();
         closeBenchmarkSummaryReview();
         interfaceVisible = false;
@@ -1490,9 +1602,11 @@ public class MainActivity extends Activity {
 
         entryPlayButton = createEntryPlaque(getString(R.string.entry_play), this::requestEntryPlay, true);
         entrySettingsButton = createEntryPlaque(getString(R.string.settings), () -> {
+            if(!isMenuRuntimeReady())return;
             entryMenuSidePage = true; publishEntryMenuState(); showSettings();
         }, false);
         entryMoreButton = createEntryPlaque(getString(R.string.entry_more), () -> {
+            if(!isMenuRuntimeReady())return;
             entryMenuSidePage = true; publishEntryMenuState(); showEntryMorePage();
         }, false);
 
@@ -1641,7 +1755,7 @@ public class MainActivity extends Activity {
     }
 
     private void showCampaignMenu(int action) {
-        if(openingBenchmarkPending()) return;
+        if(openingBenchmarkPending() || !isMenuRuntimeReady()) return;
         if(campaignState!=null && campaignState.pending()) return;
         if(deathOverlayVisible && (action!=CampaignMenuState.LOAD || retryPending)) return;
         campaignFromDeath=deathOverlayVisible;
@@ -1753,7 +1867,7 @@ public class MainActivity extends Activity {
     }
 
     private void chooseCampaignRecord(int action,int slot,int kind,CampaignMenuState shown) {
-        if(!campaignMenuVisible || action!=campaignMenuAction || !campaignPublicationValid || shown==null || shown!=campaignState || campaignBusy() || shown.pending() ||
+        if(!isMenuRuntimeReady() || !campaignMenuVisible || action!=campaignMenuAction || !campaignPublicationValid || shown==null || shown!=campaignState || campaignBusy() || shown.pending() ||
                 !shown.current(surfaceRequestGeneration)) return;
         if(shown.error!=0 || slot<0 || slot>2 || kind<0 || kind>1) return;
         if(action==CampaignMenuState.LOAD && shown.status(slot,kind)!=CampaignMenuState.VALID) return;
@@ -2014,7 +2128,7 @@ public class MainActivity extends Activity {
     }
 
     private void requestEntryPlay() {
-        if (!entryMenuEnabled || entryPlayRequested || openingBenchmarkPending()) return;
+        if (!entryMenuEnabled || entryPlayRequested || openingBenchmarkPending() || !isMenuRuntimeReady()) return;
         showCampaignMenu(CampaignMenuState.NEW_GAME);
     }
 
@@ -2099,7 +2213,9 @@ public class MainActivity extends Activity {
     }
 
     private void applyEntryMenuAvailability(EntryMenuState state) {
-        final boolean busy = entryPlayRequested || openingBenchmarkPending();
+        if(state!=null && state.isEntryPresented(surfaceRequestGeneration) && state.phase==EntryMenuState.PHASE_IDLE)
+            entryMenuAdmittedGeneration=surfaceRequestGeneration;
+        final boolean busy = entryPlayRequested || openingBenchmarkPending() || !isMenuRuntimeReady();
         if (entryPlayButton != null) { entryPlayButton.setEnabled(!busy); entryPlayButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
         if (entrySettingsButton != null) { entrySettingsButton.setEnabled(!busy); entrySettingsButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
         if (entryMoreButton != null) { entryMoreButton.setEnabled(!busy); entryMoreButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
@@ -3571,7 +3687,7 @@ public class MainActivity extends Activity {
     }
 
     private void hideMenu() {
-        if(openingBenchmarkPending()) return;
+        if(openingBenchmarkPending() || !isMenuRuntimeReady()) return;
         invalidateLookoutObjective();
         if(campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier())) return;
         if (entryMenuEnabled) {
@@ -6324,6 +6440,10 @@ public class MainActivity extends Activity {
                     }
                 }
                 surfaceStarted = resumed && surfaceAvailable && surfaceRequestGeneration != 0 && state == 1;
+                if(startupUiVisible) {
+                    if(isMenuRuntimeReady())showMainMenu(false);
+                    else if((state==2 || state==3) && startupShownRuntime!=state)showStartupLoading();
+                }
                 updateChapterDialoguePresentation(state);
                 if (updateCombatTeachingPrompt(state)) scheduleCombatTeachingPromptPoll();
                 else cancelCombatTeachingPromptPoll();
@@ -6439,7 +6559,7 @@ public class MainActivity extends Activity {
                     rtStatus.setText(R.string.rt_unsupported);
                     rtStatus.setContentDescription(getString(R.string.rt_unsupported));
                     rtStatus.setTextColor(0xFFFF8A7A);
-                    if (!autoDiagnosticsShown) {
+                    if (!autoDiagnosticsShown && !startupUiVisible) {
                         autoDiagnosticsShown = true;
                         showDiagnostics(false);
                     }
@@ -6451,7 +6571,7 @@ public class MainActivity extends Activity {
                     rtStatus.setText(R.string.rt_error);
                     rtStatus.setContentDescription(getString(R.string.rt_error));
                     rtStatus.setTextColor(0xFFFF8A7A);
-                    if (!autoDiagnosticsShown) {
+                    if (!autoDiagnosticsShown && !startupUiVisible) {
                         autoDiagnosticsShown = true;
                         showDiagnostics(true);
                     }
@@ -8258,7 +8378,7 @@ public class MainActivity extends Activity {
     }
 
     private boolean isBackExitBoundary() {
-        return menuVisible && (entryMenuEnabled || firstMenu) && !entryMenuSidePage &&
+        return menuVisible && (startupUiVisible || entryMenuEnabled || firstMenu) && (startupUiVisible || !entryMenuSidePage) &&
                 !entryPlayRequested && !interfaceVisible && !graphicsVisible && !graphicsSceneRestoring &&
                 !playtestReportVisible && !diagnosticsVisible && !rtLabVisible &&
                 !benchmarkSummaryVisible && !benchmarkReportVisible && !benchmarkRunning &&
@@ -8303,6 +8423,11 @@ public class MainActivity extends Activity {
     public void onBackPressed() {
         if (environmentSurveyMode) { finishEnvironmentSurvey(3); return; }
         if(openingBenchmarkRecoveryRejected){finish();return;}
+        if(startupUiVisible) {
+            if(backExitDialog!=null && backExitDialog.isShowing())dismissBackExitConfirmation();
+            else showBackExitConfirmation();
+            return;
+        }
         if(openingBenchmarkPending()) {
             cancelOpeningBenchmarkRequest(); showOpeningBenchmarkProgress(); return;
         }
@@ -8496,6 +8621,7 @@ public class MainActivity extends Activity {
         if (musicPlayback != null) musicPlayback.setSuspended(true); // Wait for a ready new surface.
         resumed = true;
         if(openingBenchmarkRecoveryRejected){showOpeningBenchmarkRecoveryBlocked();return;}
+        if(startupUiVisible)showStartupLoading();
         if(openingBenchmarkRecovered)cancelOpeningBenchmarkRequest(); // Before resume/start can advance a frame.
         if(campaignMenuVisible || campaignRequest!=0 || confirmedRetryPending) {
             handler.removeCallbacks(refreshCampaignMenu);
