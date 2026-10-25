@@ -745,6 +745,7 @@ struct VulkanSurfaceContext
     std::uint64_t routeResetSequence = 0u;
     std::uint64_t retrySequence = 0u;
     std::uint64_t interactSequence = 0u;
+    std::uint64_t drinkFlaskSequence=0,restSequence=0;
     std::uint64_t toggleHeldLightPoseSequence = 0u;
     std::uint64_t runToggleSequence = 0u;
     std::uint64_t clearRunIntentSequence = 0u;
@@ -4535,6 +4536,7 @@ void DiscardDesktopPendingCommands(VulkanSurfaceContext& context)
     input.guardHeld = false;
     input.commands.crouchToggle = context.crouchToggleSequence;
     input.commands.clearCrouchIntent = context.clearCrouchIntentSequence;
+    input.commands.drinkFlask=context.drinkFlaskSequence;input.commands.rest=context.restSequence;
     input.moveForward = input.moveStrafe = 0.0f;
     context.simulation.SynchronizePausedInput(input, 0u,
         horde::gameplay::simulation::PausedInputPolicy::PreserveWorldCommands);
@@ -4950,6 +4952,17 @@ void PublishDesktopGuardHold(VulkanSurfaceContext& context)
     if (fresh) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
 }
 
+void PublishDesktopHealingFlaskAction(VulkanSurfaceContext& context,bool rest)
+{
+    const auto& state=context.simulation.Snapshot();
+    if(!IsDesktopGameplayAvailable(context) || GetForegroundWindow()!=context.windowHandle ||
+       GetFocus()!=context.windowHandle || !state.healingFlaskEnabled ||
+       state.healingFlask.action!=horde::gameplay::healing::FlaskAction::Idle ||
+       !(rest?state.flaskRestAnchor!=0:state.flaskDrinkEligible))return;
+    auto& sequence=rest?context.restSequence:context.drinkFlaskSequence;
+    if(sequence!=UINT64_MAX)++sequence; // Named command; simulation owns time and eligibility.
+}
+
 void PollDesktopController(VulkanSurfaceContext& context)
 {
     const horde::platform::windows::ControllerPollDisposition pollDisposition =
@@ -5152,6 +5165,12 @@ void PollDesktopController(VulkanSurfaceContext& context)
             horde::platform::windows::MapLegacyControllerMenuEdges(
                 legacy.dwButtons, context.previousLegacyUiButtons,
                 legacy.dwPOV, context.previousLegacyPov, identity);
+        if(!context.simulationPaused) {
+            const auto flask=horde::platform::windows::ResolveControllerFlaskEdges(menuEdges.previous,menuEdges.next,
+                context.simulation.Snapshot().healingFlaskEnabled);
+            if(flask.drink)PublishDesktopHealingFlaskAction(context,false);
+            if(flask.rest)PublishDesktopHealingFlaskAction(context,true);
+        }
         context.previousLegacyControllerButtons = legacy.dwButtons;
         context.previousLegacyUiButtons = legacy.dwButtons;
         context.previousLegacyPov = legacy.dwPOV;
@@ -5224,6 +5243,11 @@ void PollDesktopController(VulkanSurfaceContext& context)
             context.dialogueSkipSequence != UINT64_MAX)
             ++context.dialogueSkipSequence;
         if ((pressed & XINPUT_GAMEPAD_Y) != 0u) ++context.toggleHeldLightPoseSequence;
+        const auto flask=horde::platform::windows::ResolveControllerFlaskEdges(
+            (pressed & XINPUT_GAMEPAD_DPAD_UP)!=0u,(pressed & XINPUT_GAMEPAD_DPAD_DOWN)!=0u,
+            context.simulation.Snapshot().healingFlaskEnabled);
+        if(flask.drink)PublishDesktopHealingFlaskAction(context,false);
+        if(flask.rest)PublishDesktopHealingFlaskAction(context,true);
     }
     const WORD uiPressed = state.Gamepad.wButtons & ~context.previousXInputUiButtons;
     const horde::platform::windows::ControllerMenuEdges menuEdges{
@@ -5300,6 +5324,7 @@ void UpdateDesktopSceneControls(
     input.damageEnabled = IsPlayerDamageEnabled(context);
     input.commands.attack = context.attackSequence;
     input.commands.parry = context.parrySequence;
+    input.commands.drinkFlask=context.drinkFlaskSequence;input.commands.rest=context.restSequence;
     input.commands.dodge = context.dodgeSequence;
     input.commands.routeReset = context.routeResetSequence;
     input.commands.retry = context.retrySequence;
@@ -5390,6 +5415,7 @@ void UpdateDesktopSceneControls(
         input.torchLightStrength = context.torchLightStrength;
         input.commands.attack = context.attackSequence;
         input.commands.parry = context.parrySequence;
+        input.commands.drinkFlask=context.drinkFlaskSequence;input.commands.rest=context.restSequence;
         input.commands.dodge = context.dodgeSequence;
         input.commands.routeReset = context.routeResetSequence;
         input.commands.retry = context.retrySequence;
@@ -11840,7 +11866,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     (GetKeyState(VK_MENU) & 0x8000) == 0,
                 (lParam & (1ll << 30)) != 0,
                 sceneContext->simulation.Snapshot().chestReward.phase ==
-                    horde::gameplay::interactions::ChestRewardPhase::LanternClaimed);
+                    horde::gameplay::interactions::ChestRewardPhase::LanternClaimed,
+                sceneContext->simulation.Snapshot().healingFlaskEnabled);
+            if(keyAction==DesktopKeyAction::DrinkFlask || keyAction==DesktopKeyAction::Rest) {
+                PublishDesktopHealingFlaskAction(*sceneContext,keyAction==DesktopKeyAction::Rest);return 0;
+            }
             if (keyAction == DesktopKeyAction::Dodge || keyAction == DesktopKeyAction::Parry)
             {
                 if (keyAction == DesktopKeyAction::Parry)

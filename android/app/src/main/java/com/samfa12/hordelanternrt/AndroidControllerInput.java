@@ -17,6 +17,8 @@ final class AndroidControllerInput {
     static final int PAUSE = 1 << 5;
     static final int CONFIRM = 1 << 6;
     static final int CANCEL = 1 << 7;
+    static final int DRINK_FLASK = 1 << 8;
+    static final int REST = 1 << 9;
 
     private static final float TRIGGER_PRESS = 0.50f;
     private static final float TRIGGER_RELEASE = 0.35f;
@@ -184,8 +186,11 @@ final class AndroidControllerInput {
         final int keyCode = event.getKeyCode();
         // Shoulder presses no longer change locomotion or posture. Stick
         // deflection owns speed; shared head clearance owns automatic crouch.
+        final boolean drinkBefore=dpadUp || hatNavY<0,restBefore=dpadDown || hatNavY>0;
         updateDpad(keyCode, true);
-        final int actions = updateDigitalTrigger(keyCode, true) | actionForKey(keyCode);
+        final int actions = updateDigitalTrigger(keyCode, true) | actionForKey(keyCode) |
+            (!drinkBefore && (dpadUp || hatNavY<0)?DRINK_FLASK:0) |
+            (!restBefore && (dpadDown || hatNavY>0)?REST:0);
         return result(true, true, actions, 0, 0);
     }
 
@@ -274,6 +279,7 @@ final class AndroidControllerInput {
         stickNavX = hysteresisDirection(moveStrafe, stickNavX);
         // MotionEvent Y grows downward; keep navigation's negative=up convention.
         stickNavY = hysteresisDirection(left[1], stickNavY);
+        final boolean drinkBefore=dpadUp || hatNavY<0,restBefore=dpadDown || hatNavY>0;
         final float rawHatX = event.getAxisValue(MotionEvent.AXIS_HAT_X);
         final float rawHatY = event.getAxisValue(MotionEvent.AXIS_HAT_Y);
         if (!hatSeeded) {
@@ -288,7 +294,8 @@ final class AndroidControllerInput {
             hatNavY = hatDirection(rawHatY, hatNavY);
         }
 
-        int actions = 0;
+        int actions = (!drinkBefore && (dpadUp || hatNavY<0)?DRINK_FLASK:0) |
+            (!restBefore && (dpadDown || hatNavY>0)?REST:0);
         final float leftTrigger = trigger(event, device, true);
         final float rightTrigger = trigger(event, device, false);
         if (!leftTriggerSeeded) {

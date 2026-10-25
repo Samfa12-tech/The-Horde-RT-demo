@@ -232,6 +232,26 @@ public final class AndroidControllerInputTest {
         assertFalse(input.guardHeld());
     }
 
+    @Test public void flaskDpadEdgesDoNotUseStickNavigationOrRepeatAndCoalesceHatKeys() {
+        AndroidControllerInput input=new AndroidControllerInput();
+        input.motion(motionAxes(4,1,0,0,0,0,0,0,0,0,0,0),1);
+        assertEquals(0,input.motion(motionAxes(4,2,0,-1,0,0,0,0,0,0,0,0),2).actions);
+        assertEquals(AndroidControllerInput.DRINK_FLASK,input.key(key(4,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_UP,0,3),3).actions);
+        assertEquals(0,input.key(key(4,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_UP,1,4),4).actions);
+        assertEquals(0,input.motion(motionAxes(4,5,0,0,0,0,0,0,0,0,0,-1),5).actions);
+        input.key(key(4,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_DPAD_UP,0,6),6);
+        assertEquals(0,input.motion(motionAxes(4,7,0,0,0,0,0,0,0,0,0,-1),7).actions);
+        input.motion(motionAxes(4,8,0,0,0,0,0,0,0,0,0,0),8);
+        assertEquals(AndroidControllerInput.REST,input.motion(motionAxes(4,9,0,0,0,0,0,0,0,0,0,1),9).actions);
+        assertEquals(0,input.key(key(4,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_DOWN,0,10),10).actions);
+        input.suspend(11);
+        assertEquals(0,input.key(key(4,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_DOWN,1,12),12).actions);
+        assertEquals(0,input.motion(motionAxes(4,13,0,0,0,0,0,0,0,0,0,1),13).actions);
+        input.key(key(4,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_DPAD_DOWN,0,14),14);
+        input.motion(motionAxes(4,15,0,0,0,0,0,0,0,0,0,0),15);
+        assertEquals(AndroidControllerInput.REST,input.motion(motionAxes(4,16,0,0,0,0,0,0,0,0,0,1),16).actions);
+    }
+
     private static KeyEvent key(int deviceId, int action, int keyCode, int repeat, long time) {
         return key(deviceId, action, keyCode, repeat, time, KEY_SOURCE);
     }

@@ -39,14 +39,17 @@ constexpr DesktopClickAction ResolveDesktopLeftClick(
     return DesktopClickAction::Ignore;
 }
 
-enum class DesktopKeyAction { None, Dodge, Parry, ToggleLantern };
+enum class DesktopKeyAction { None, Dodge, Parry, ToggleLantern, DrinkFlask, Rest };
 constexpr DesktopKeyAction ResolveDesktopGameplayKey(
-    const unsigned key, const bool gameplayAvailable, const bool repeated, const bool lanternClaimed)
+    const unsigned key, const bool gameplayAvailable, const bool repeated, const bool lanternClaimed,
+    const bool healingFlaskEnabled=false)
 {
     if (!gameplayAvailable || repeated) return DesktopKeyAction::None;
     if (key == 0x20u) return DesktopKeyAction::Dodge; // VK_SPACE
     if (key == 'Q') return DesktopKeyAction::Parry;
     if (key == 'E' && lanternClaimed) return DesktopKeyAction::ToggleLantern;
+    if (healingFlaskEnabled && key == 'H') return DesktopKeyAction::DrinkFlask;
+    if (healingFlaskEnabled && key == 'J') return DesktopKeyAction::Rest;
     return DesktopKeyAction::None;
 }
 } // namespace horde::platform::windows

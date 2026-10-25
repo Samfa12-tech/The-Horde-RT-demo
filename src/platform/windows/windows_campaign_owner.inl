@@ -111,6 +111,7 @@ void RebaseCampaignInput(VulkanSurfaceContext& ctx)
         ctx.clearRunIntentSequence,ctx.combatTeachingSkipSequence,ctx.combatTeachingReplaySequence,ctx.dialogueSkipSequence};
     input.commands.crouchToggle=ctx.crouchToggleSequence;
     input.commands.clearCrouchIntent=ctx.clearCrouchIntentSequence;
+    input.commands.drinkFlask=ctx.drinkFlaskSequence;input.commands.rest=ctx.restSequence;
     input.combatEdgeHistory={};input.dialogueCompletionLine=0;input.dialogueCompletionGeneration=0;
     input.paused=true;input.hasAuthoritativePlayerPose=false;
     input.moveForward=input.moveStrafe=0;input.runHeld=input.crouchHeld=input.guardHeld=false;

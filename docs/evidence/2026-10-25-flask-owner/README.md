@@ -82,3 +82,33 @@ The [concrete presentation seam](../../design/HORDE_1_7_FLASK_PRESENTATION_SEAM_
 needs review before capacity/mesh integration. Platform controls/HUD, right-hand
 stow/drink/reacquire joins, the F03 upgrade and physical/balance acceptance remain
 unfinished. This checkpoint is not a player-ready flask feature.
+
+## Hosted confirmation after the initial checkpoint
+
+Exact source `11c136590ba0db2261e62409e2c693eb7699d537` completed all six jobs in
+[CI40178298329](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40178298329).
+The MSVC log explicitly records `horde_rt_flask_confirmed_retry_tests` passing
+in0.37seconds and `horde_rt_flask_simulation_tests` in0.75seconds, with all158
+selected Windows tests passing. The real-file confirmed-record fixture above
+therefore has hosted execution evidence; it is no longer merely compiled.
+The local ERROR_ACCESS_DENIED remains a local environment boundary and was not
+retried or bypassed. Hosted file/owner checks do not establish actual RT return,
+phone lifecycle, flask presentation or balance acceptance. The feature stays OFF.
+
+## Named keyboard/controller inputs, still disabled
+
+H / D-pad Up requests Drink; J / D-pad Down requests Rest. R remains the existing
+route reset. Both actions require the current owner's explicit eligibility,
+distinct monotonic sequences and a live/focused surface; menu navigation keeps
+its original Up/Down behavior. Native simulation still owns all timers, resources
+and consumption-time checks. Repeats, release/cancellation, hat/key coalescing and
+stale/malformed publication are covered by the focused fixtures. Windows input
+and load-barrier tests pass2/2; the three relevant Android suites pass55tests.
+These are input/host checks, not flask animation or device admission.
+
+No new touch targets were placed: the accepted compact portrait action dock has
+no proven room for two additional utilities without moving combat controls or
+intercepting steering. The required flask prop/upgrade/presentation seam also
+remains open. `healingFlask1_7` stays false and the new controls remain invisible
+and inactive in the normal phone candidate. Phone preparation/acceptance is a
+separate bounded task; no new device pass is inferred here.

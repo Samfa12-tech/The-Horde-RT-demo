@@ -794,6 +794,8 @@ std::atomic<std::uint64_t> gPlayerVitalityState{
 std::atomic<int> gPlayerLifePhase{static_cast<int>(horde::gameplay::PlayerLifePhase::Alive)};
 std::atomic<std::int32_t> gPlayerRetryCheckpoint{0};
 std::atomic<bool> gPlayerConfirmedRetryMode{false};
+std::mutex gHealingFlaskUiMutex;
+std::array<jlong,8> gHealingFlaskUiState{1,0,0,0,0,0,2,0};
 std::atomic<float> gKeeperTitleOpacity{0.0f};
 std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive)};
 // Bit 0: INTERACT, bit 1: RAISE, bit 2: LOWER. Bits 3..5 carry the shared
@@ -1064,6 +1066,15 @@ void PublishSimulationUiState()
     gPlayerConfirmedRetryMode.store(simulation.healingFlaskEnabled &&
         simulation.developmentRescueJourney && simulation.rescue.claimCount!=0, std::memory_order_release);
     gPlayerRetryCheckpoint.store(simulation.retryCheckpoint, std::memory_order_release);
+    {
+        std::lock_guard lock(gHealingFlaskUiMutex);
+        gHealingFlaskUiState={1,static_cast<jlong>(gSwapchainContext.surfaceGeneration),
+            simulation.healingFlaskEnabled?1:0,simulation.flaskDrinkEligible?1:0,
+            static_cast<jlong>(simulation.flaskRestAnchor),
+            static_cast<jlong>(simulation.healingFlask.resources.charges),
+            static_cast<jlong>(simulation.healingFlask.resources.Capacity()),
+            static_cast<jlong>(simulation.healingFlask.action)};
+    }
     gPlayerLifePhase.store(static_cast<int>(vitals.phase), std::memory_order_release);
     gFinaleEndingPhase.store(
         static_cast<int>(simulation.EndingPhaseForUi()),
@@ -6806,6 +6817,35 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getContextualControlState(JNIEnv*, j
 {
     return static_cast<jint>(gContextualControlState.load(std::memory_order_acquire));
 }
+namespace {
+void RequestHealingFlaskSemantic(bool rest)
+{
+    std::lock_guard inputLock(gInputPublisherMutex);
+    std::lock_guard uiLock(gHealingFlaskUiMutex);
+    const auto& state=gHealingFlaskUiState;
+    if(state[2]!=1 || state[7]!=0 || !(rest?state[4]!=0:state[3]==1) ||
+       !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(state[1])) ||
+       gSurfaceSessions.IsSuspended(static_cast<std::uint64_t>(state[1])) ||
+       gInputPublisherState.paused || gCampaignPauseGate.load(std::memory_order_acquire))return;
+    auto& sequence=rest?gInputPublisherState.commands.rest:gInputPublisherState.commands.drinkFlask;
+    if(sequence==UINT64_MAX)return;
+    ++sequence;PublishInputLocked(); // Simulation revalidates named eligibility at consumption.
+}
+}
+extern "C" JNIEXPORT jlongArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getHealingFlaskState(JNIEnv* env,jclass)
+{
+    std::array<jlong,8> state;
+    {std::lock_guard lock(gHealingFlaskUiMutex);state=gHealingFlaskUiState;}
+    auto result=env->NewLongArray(static_cast<jsize>(state.size()));
+    if(result)env->SetLongArrayRegion(result,0,static_cast<jsize>(state.size()),state.data());
+    return result;
+}
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestDrinkFlask(JNIEnv*,jclass){RequestHealingFlaskSemantic(false);}
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestRest(JNIEnv*,jclass){RequestHealingFlaskSemantic(true);}
+
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getConfirmedRetryMode(JNIEnv*, jclass)
 {

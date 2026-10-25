@@ -43,6 +43,12 @@ struct LegacyControllerIdentity
     std::string_view productName;
 };
 
+struct ControllerFlaskEdges {bool drink=false,rest=false;};
+constexpr ControllerFlaskEdges ResolveControllerFlaskEdges(bool up,bool down,bool enabled)
+{
+    return enabled && up!=down?ControllerFlaskEdges{up,down}:ControllerFlaskEdges{};
+}
+
 struct ControllerActionEdges
 {
     bool attackPressed = false;

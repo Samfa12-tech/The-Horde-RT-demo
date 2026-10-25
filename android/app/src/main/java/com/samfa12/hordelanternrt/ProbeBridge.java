@@ -86,6 +86,10 @@ public final class ProbeBridge {
     public static native int getContextualControlState();
     /** Owner-published: earned 1.7 recovery uses confirmed campaign state, not a legacy camera. */
     public static native boolean getConfirmedRetryMode();
+    /** Version1, eight words; exact current-surface owner state. */
+    public static native long[] getHealingFlaskState();
+    public static native void requestDrinkFlask();
+    public static native void requestRest();
     public static native int retryEncounter();
     public static native void setSimulationPaused(boolean paused);
     public static native long setGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality);

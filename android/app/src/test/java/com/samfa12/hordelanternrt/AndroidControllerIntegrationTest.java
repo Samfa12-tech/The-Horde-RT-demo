@@ -53,6 +53,10 @@ public class AndroidControllerIntegrationTest {
         @Implementation protected static void setEntryMenu(boolean enabled,boolean side,boolean reduced,boolean play,long generation){}
         @Implementation protected static void requestAttack(){attacks++;}
         @Implementation protected static void requestParry(){parries++;}
+        static long[] flask;static int drinks,rests;
+        @Implementation protected static long[] getHealingFlaskState(){return flask==null?null:flask.clone();}
+        @Implementation protected static void requestDrinkFlask(){drinks++;}
+        @Implementation protected static void requestRest(){rests++;}
         static boolean guardHeld;
         @Implementation protected static void setGuardHeld(boolean held) {
             if (held && !guardHeld) ++parries;
@@ -74,7 +78,7 @@ public class AndroidControllerIntegrationTest {
     private Button button(String name)throws Exception{return (Button)field(name).get(a);}
     @Before public void setup()throws Exception {
         Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=Bridge.runToggles=Bridge.runClears=Bridge.context=0;
-        Bridge.x=Bridge.z=Bridge.yaw=Bridge.pitch=0;Bridge.guardHeld=false;
+        Bridge.x=Bridge.z=Bridge.yaw=Bridge.pitch=0;Bridge.guardHeld=false;Bridge.flask=null;Bridge.drinks=Bridge.rests=0;
         Bridge.crouchHeld=Bridge.analogue=Bridge.dodgeAnalogue=false;Bridge.crouchToggles=Bridge.crouchClears=0;
         a=Robolectric.buildActivity(MainActivity.class).get();
         a.setContentView(R.layout.activity_main);
@@ -466,6 +470,36 @@ public class AndroidControllerIntegrationTest {
         a.dispatchKeyEvent(new KeyEvent(now,SystemClock.uptimeMillis(),KeyEvent.ACTION_UP,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
         a.dispatchKeyEvent(new KeyEvent(now,SystemClock.uptimeMillis(),KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
         assertTrue(Bridge.guardHeld);assertEquals(2,Bridge.parries);
+    }
+
+    private void keyboardFlask(int code,int action,int repeat) {
+        long now=SystemClock.uptimeMillis();
+        a.dispatchKeyEvent(new KeyEvent(now,now,action,code,repeat,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+    }
+    @Test public void ownerFlaskFlagGatesNamedKeyboardAndDpadWithoutChangingMenuNavigation()throws Exception {
+        set("surfaceRequestGeneration",31L);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,0);assertEquals(0,Bridge.drinks);
+        Bridge.flask=new long[]{1,31,1,1,1,2,2,0};
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,0);assertEquals(1,Bridge.drinks);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,1);assertEquals(1,Bridge.drinks);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_UP,0);
+        keyboardFlask(KeyEvent.KEYCODE_J,KeyEvent.ACTION_DOWN,0);assertEquals(1,Bridge.rests);
+        keyboardFlask(KeyEvent.KEYCODE_J,KeyEvent.ACTION_UP,0);
+        press(KeyEvent.KEYCODE_DPAD_UP);assertEquals(2,Bridge.drinks);assertEquals(1,Bridge.rests);
+        press(KeyEvent.KEYCODE_DPAD_DOWN);assertEquals(2,Bridge.rests);
+        set("menuVisible",true);press(KeyEvent.KEYCODE_DPAD_UP);press(KeyEvent.KEYCODE_DPAD_DOWN);
+        assertEquals(2,Bridge.drinks);assertEquals(2,Bridge.rests);
+        set("menuVisible",false);Bridge.flask[4]=0;press(KeyEvent.KEYCODE_DPAD_DOWN);
+        assertEquals("Down cannot become Drink when Rest is unavailable",2,Bridge.drinks);assertEquals(2,Bridge.rests);
+        Bridge.flask[1]=30;press(KeyEvent.KEYCODE_DPAD_UP);assertEquals(2,Bridge.drinks);
+    }
+    @Test public void flaskHeldKeyboardMustReleaseAfterFocusCancellation()throws Exception {
+        set("surfaceRequestGeneration",31L);Bridge.flask=new long[]{1,31,1,1,1,2,2,0};
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,0);assertEquals(1,Bridge.drinks);
+        a.onWindowFocusChanged(false);a.onWindowFocusChanged(true);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,1);assertEquals(1,Bridge.drinks);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_UP,0);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,0);assertEquals(2,Bridge.drinks);
     }
 
     @Test public void rapidDpadPressNavigatesBeforeItsRelease()throws Exception {

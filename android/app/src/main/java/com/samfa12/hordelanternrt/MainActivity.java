@@ -480,6 +480,7 @@ public class MainActivity extends Activity {
     private final int[] rtLightHueDegrees = {0, 0, 0, 0};
     private final int[] rtLightIntensityPercent = {100, 100, 100, 100};
     private int rtWorkloadPreset = 1;
+    private int keyboardFlaskHeld,keyboardFlaskBlocked;
     private boolean retryPending, confirmedRetryPending;
     private long confirmedRetryRequestFloor, confirmedRetryStarted;
     private boolean updateCheckInFlight;
@@ -7737,6 +7738,21 @@ public class MainActivity extends Activity {
             return true;
         }
         if (!AndroidControllerInput.isControllerKey(event)) {
+            if(event!=null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) &&
+               (event.getKeyCode()==KeyEvent.KEYCODE_H || event.getKeyCode()==KeyEvent.KEYCODE_J)) {
+                final int bit=event.getKeyCode()==KeyEvent.KEYCODE_H?1:2;
+                if(event.getAction()==KeyEvent.ACTION_UP && ((keyboardFlaskHeld|keyboardFlaskBlocked)&bit)!=0) {
+                    keyboardFlaskHeld&=~bit;keyboardFlaskBlocked&=~bit;return true;
+                }
+                HealingFlaskUiState flask=readHealingFlaskState();
+                if(flask!=null && flask.enabled && canSendGameplayAction()) {
+                    if(event.getAction()==KeyEvent.ACTION_DOWN && event.getRepeatCount()==0 &&
+                       ((keyboardFlaskHeld|keyboardFlaskBlocked)&bit)==0) {
+                        keyboardFlaskHeld|=bit;requestHealingFlaskAction(bit==2);
+                    }
+                    return true;
+                }
+            }
             if (event != null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) && event.getKeyCode() == KeyEvent.KEYCODE_Q) {
                 if (event.getAction() == KeyEvent.ACTION_UP && (keyboardGuardHeld || canSendGameplayAction())) {
                     keyboardGuardHeld = false;
@@ -7927,6 +7943,8 @@ public class MainActivity extends Activity {
             if((result.actions & AndroidControllerInput.DODGE)!=0)ProbeBridge.requestDodge();
             if((result.actions & AndroidControllerInput.INTERACT)!=0)ProbeBridge.requestInteract();
             if((result.actions & AndroidControllerInput.LANTERN)!=0)ProbeBridge.requestToggleHeldLightPose();
+            if((result.actions & AndroidControllerInput.DRINK_FLASK)!=0)requestHealingFlaskAction(false);
+            if((result.actions & AndroidControllerInput.REST)!=0)requestHealingFlaskAction(true);
         }
         pushGuardHold();
         requestControllerFrame();
@@ -7993,8 +8011,24 @@ public class MainActivity extends Activity {
         String prompt=getString(R.string.controller_play_prompts);
         if(interactLabel!=0)prompt+="\n"+(interactEnabled?"A: ":"")+getString(interactLabel);
         if(raise || lower)prompt+="\nY: "+getString(raise?R.string.raise_lantern:R.string.lower_lantern);
+        HealingFlaskUiState flask=readHealingFlaskState();
+        if(flask!=null && flask.enabled) {
+            prompt+="\n"+getString(R.string.controller_flask_drink,flask.charges,flask.capacity);
+            if(flask.restAnchor!=0)prompt+="\n"+getString(R.string.controller_flask_rest);
+        }
         controllerPrompt.setText(prompt); controllerPrompt.setContentDescription(prompt);
         controllerPrompt.setVisibility(View.VISIBLE);
+    }
+
+    private HealingFlaskUiState readHealingFlaskState() {
+        try {return HealingFlaskUiState.decode(ProbeBridge.getHealingFlaskState(),surfaceRequestGeneration);}
+        catch(RuntimeException | LinkageError unavailable) {return null;}
+    }
+    private void requestHealingFlaskAction(boolean rest) {
+        if(!resumed || !controllerHasFocusedWindow() || !canSendGameplayAction())return;
+        final HealingFlaskUiState state=readHealingFlaskState();
+        if(state==null || !state.allows(rest))return;
+        if(rest)ProbeBridge.requestRest();else ProbeBridge.requestDrinkFlask();
     }
 
     private boolean canSendGameplayAction() {
@@ -8002,6 +8036,7 @@ public class MainActivity extends Activity {
                 !benchmarkRunning && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
     }
     private void clearTouchState() {
+        keyboardFlaskBlocked|=keyboardFlaskHeld;keyboardFlaskHeld=0;
         keyboardGuardHeld = false;
         parryTouchActive = false;
         parryTouchPointerId = -1;

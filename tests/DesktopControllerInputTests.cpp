@@ -678,6 +678,24 @@ int main()
                 ResolveDesktopGameplayKey(key,true,true,true)==DesktopKeyAction::None,
                 "menu Space and auto-repeated gameplay keys do not generate edges");
 
+    Require(ResolveDesktopGameplayKey('H',true,false,false)==DesktopKeyAction::None &&
+            ResolveDesktopGameplayKey('J',true,false,false)==DesktopKeyAction::None,
+            "flask bindings are absent by default");
+    Require(ResolveDesktopGameplayKey('H',true,false,false,true)==DesktopKeyAction::DrinkFlask &&
+            ResolveDesktopGameplayKey('J',true,false,false,true)==DesktopKeyAction::Rest &&
+            ResolveDesktopGameplayKey('R',true,false,false,true)==DesktopKeyAction::None,
+            "enabled H and J are distinct; R is not stolen from route reset");
+    Require(ResolveDesktopGameplayKey('H',false,false,false,true)==DesktopKeyAction::None &&
+            ResolveDesktopGameplayKey('J',true,true,false,true)==DesktopKeyAction::None,
+            "paused and held-repeat flask input cannot generate a fresh command");
+    const auto flaskUp=horde::platform::windows::ResolveControllerFlaskEdges(true,false,true);
+    const auto flaskDown=horde::platform::windows::ResolveControllerFlaskEdges(false,true,true);
+    const auto flaskOff=horde::platform::windows::ResolveControllerFlaskEdges(true,false,false);
+    const auto flaskConflict=horde::platform::windows::ResolveControllerFlaskEdges(true,true,true);
+    Require(flaskUp.drink && !flaskUp.rest && flaskDown.rest && !flaskDown.drink &&
+            !flaskOff.drink && !flaskOff.rest && !flaskConflict.drink && !flaskConflict.rest,
+            "gameplay D-pad Up drinks, Down rests; off/conflicting directions do neither");
+
     // Route the native click decision into the real authoritative consumer.
     // Eligibility can change after the snapshot used to select the intent.
     using namespace horde::gameplay::simulation;
