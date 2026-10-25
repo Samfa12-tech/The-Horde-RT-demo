@@ -147,6 +147,18 @@ void SuspendedPendingInput(bool acknowledged)
         "fresh acknowledgement and loaded output finish same-surface recovery");
     Check(!barrier.InputSuspended(40), "completed loads do not bind ordinary Home suspension");
 }
+void NeutralRebaseOwnsReleasedInputs()
+{
+    Barrier barrier;Check(barrier.Begin(8,50) && barrier.CommitLoaded(8,50,.4f,-.1f,2,3),"confirmed retry uses normal barrier");
+    horde::gameplay::simulation::InputSnapshot input;input.paused=true;input.yawRadians=.4f;input.pitchRadians=-.1f;
+    const auto neutral=[&]{return horde::platform::android::IsNeutralCampaignRebaseInput(input,barrier.State());};
+    Check(neutral(),"fresh paused neutral input with exact loaded pose qualifies");
+    input.guardHeld=true;Check(!neutral(),"held guard cannot acknowledge retry restore");input.guardHeld=false;
+    input.analogueMovement=true;Check(!neutral(),"live analogue ownership cannot acknowledge retry restore");input.analogueMovement=false;
+    input.moveStrafe=.1f;Check(!neutral(),"held movement cannot acknowledge retry restore");input.moveStrafe=0;
+    input.hasAuthoritativePlayerPose=true;Check(!neutral(),"external pose ownership cannot acknowledge retry restore");input.hasAuthoritativePlayerPose=false;
+    input.paused=false;Check(!neutral(),"unpaused input cannot acknowledge retry restore");
+}
 void CancelAndFailure()
 {
     Barrier barrier;
@@ -176,6 +188,7 @@ int main()
     RecreatedPendingResources(true);
     SuspendedPendingInput(false);
     SuspendedPendingInput(true);
+    NeutralRebaseOwnsReleasedInputs();
     CancelAndFailure();
     if (passed) std::cout << "Android campaign load barrier tests passed\n";
     return passed ? 0 : 1;

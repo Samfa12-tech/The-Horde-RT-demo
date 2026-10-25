@@ -822,8 +822,9 @@ struct VulkanSurfaceContext
     std::string campaignMessage,campaignStorageWarning;
     std::uint64_t campaignSerial=0,campaignSurfaceGeneration=1,campaignFrameTick=0,campaignFrameWorld=0;
     std::uint64_t campaignUncertaintyRecheck=0,campaignVerifiedUncertainty=0;
+    std::uint64_t campaignRetryOperationRevision=0;
     std::chrono::steady_clock::time_point campaignStarted{};
-    bool campaignPause=false,campaignIsolated=false,campaignRetirementUnproved=false,campaignNewGame=false;
+    bool campaignPause=false,campaignIsolated=false,campaignRetirementUnproved=false,campaignNewGame=false,campaignConfirmedRetry=false;
     uint32_t currentFrame = 0u;
 };
 
@@ -3871,8 +3872,20 @@ bool ApplyPlayerRetryCheckpoint(VulkanSurfaceContext& context, const std::int32_
     {
         return false;
     }
+    if(context.campaignConfirmedRetry && context.campaignPause)return false;
+    const auto& beforeRetry=context.simulation.Snapshot();
+    const bool confirmedRetry=beforeRetry.healingFlaskEnabled &&
+        beforeRetry.developmentRescueJourney && beforeRetry.rescue.claimCount!=0;
     context.delayedFeedback.Clear();
     context.simulation.RetryEncounter();
+    if(confirmedRetry) {
+        // The campaign owner activates the confirmed-record barrier next pump.
+        // Alive alone must not close the death pause or install a legacy camera.
+        ClearDesktopInput(context);
+        context.campaignPause=true;context.pauseMenuVisible=true;
+        context.simulationInput.paused=true;ApplyOverlayState(context);
+        return true;
+    }
     context.benchmarkEvidence.Cancel();
     if (context.rtFrameEvidenceInitialised)
     {

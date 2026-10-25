@@ -1,4 +1,5 @@
 #include "gameplay/campaign/CampaignSaveCoordinator.h"
+#include "gameplay/campaign/CampaignSession.h"
 #include <atomic>
 #include <chrono>
 #include <future>
@@ -347,6 +348,40 @@ void TestPublicationRevocation() {
 }
 }
 int main() {
+    {
+        FakeBackend backend;save::Coordinator owner;
+        auto old=Checkpoint(1);old.schema=3;old.halfHeart=true;old.flask={true,1};
+        backend.stored=Stored(old,backend.path);
+        Check(owner.OpenSession(2),"confirmed recovery opens an independent actual coordinator");
+        Prepare(owner,backend.ReadNow(),true);
+        const auto acknowledged=cp::ConfirmedCampaignRecordFrom(owner.State());
+        Check(acknowledged && acknowledged->stored.encoded==backend.stored->encoded &&
+            acknowledged->stored.checkpoint.halfHeart && acknowledged->stored.checkpoint.flask.charges==1,
+            "adopted exact half health/resources form a confirmed retry record");
+        auto live=old;live.vitality=3;live.halfHeart=false;live.flask.charges=3;
+        Check(owner.NoteCheckpoint(live) && !cp::ConfirmedCampaignRecordFrom(owner.State()),
+            "new logical health/resources are not acknowledged recovery data");
+        Prepare(owner,backend.ReadNow());
+        const auto write=owner.BeginWrite();
+        Check(write && !cp::ConfirmedCampaignRecordFrom(owner.State()),
+            "in-flight save cannot promote its logical candidate to recovery");
+        Check(write && write->CompleteWriteFailure(Failure(backend.path)) && owner.Poll() &&
+            !cp::ConfirmedCampaignRecordFrom(owner.State()) && acknowledged &&
+            acknowledged->stored.encoded==backend.stored->encoded,
+            "write failure cannot fabricate saved resources or damage the prior confirmed record");
+        Prepare(owner,backend.ReadNow());
+        const auto next=owner.BeginWrite();
+        Check(next && next->PublishWrite([&]{return backend.Publish(*next);}) &&
+            !cp::ConfirmedCampaignRecordFrom(owner.State()),
+            "worker publication alone still cannot update owner recovery state");
+        Check(owner.Poll(),"owner consumes the successful publication receipt");
+        const auto updated=cp::ConfirmedCampaignRecordFrom(owner.State());
+        Check(updated && updated->stored.checkpoint.flask.charges==3 &&
+            !updated->stored.checkpoint.halfHeart && updated->stored.encoded==backend.stored->encoded,
+            "only owner-acknowledged publication advances exact recovery state");
+        owner.Close();
+        Check(!cp::ConfirmedCampaignRecordFrom(owner.State()),"closed ownership cannot supply another game's recovery");
+    }
     TestReadDecisions();TestWriteRevisions();TestReadRevocation();TestFailures();
     TestMalformedReceipts();TestExternalConflict();TestWorkerConcurrency();TestPublicationRevocation();
     std::cout<<checks<<" campaign coordinator checks, "<<failures<<" failures\n";

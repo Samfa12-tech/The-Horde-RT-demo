@@ -54,6 +54,8 @@ InputSnapshot MakeSnapshot(std::uint64_t sequence)
     input.commands.tutorialReplay = sequence + 53u;
     input.commands.crouchToggle = sequence + 59u;
     input.commands.clearCrouchIntent = sequence + 61u;
+    input.commands.drinkFlask = sequence + 67u;
+    input.commands.rest = sequence + 71u;
     return input;
 }
 
@@ -94,6 +96,8 @@ bool MatchesSequence(const PublishedInput& published)
            actual.commands.clearRunIntent == expected.commands.clearRunIntent &&
            actual.commands.crouchToggle == expected.commands.crouchToggle &&
            actual.commands.clearCrouchIntent == expected.commands.clearCrouchIntent &&
+           actual.commands.drinkFlask == expected.commands.drinkFlask &&
+           actual.commands.rest == expected.commands.rest &&
            actual.commands.tutorialSkip == expected.commands.tutorialSkip &&
            actual.commands.tutorialReplay == expected.commands.tutorialReplay;
 }

@@ -14,7 +14,17 @@ struct LoadPreparation {
     async::Token read;
     RestoreToken restore;
     simulation::WorldZoneToken destination;
+    bool fromConfirmedRecord=false;
 };
+struct ConfirmedCampaignRecord {
+    storage::StoredCheckpoint stored;
+    storage::Result acknowledgement;
+};
+inline std::optional<ConfirmedCampaignRecord> ConfirmedCampaignRecordFrom(const async::Snapshot& c) {
+    if(c.phase!=async::Phase::Ready || c.error!=async::Error::None ||
+       !c.currentCheckpointStored || !c.confirmed)return {};
+    return ConfirmedCampaignRecord{*c.confirmed,c.lastResult};
+}
 // Owner-thread controller with one bounded IO worker. The simulation must
 // outlive this controller. No default save directory, menus or renderer access.
 // Platform adapters must release/rebase their upstream camera/input owners
@@ -41,7 +51,12 @@ public:
     void Cancel();
     void Close();
     SessionState State() const {return state_;}
+    // Actual adopted/read-back coordinator record, never its logical candidate.
+    // No IO or new durability claim; an uncertain/failed write is not confirmed.
+    std::optional<ConfirmedCampaignRecord> ConfirmedRecord() const;
 private:
+    friend class PlaySession;
+    bool BeginConfirmedRetry(const ConfirmedCampaignRecord&,SaveKind);
     async::Coordinator& Current();
     bool Submit(std::optional<async::Request> request);
     void CancelPreparation();
@@ -50,5 +65,6 @@ private:
     async::Worker worker_;
     SessionState state_;
     std::optional<LoadPreparation> preparation_;
+    std::optional<ConfirmedCampaignRecord> confirmedRetry_;
 };
 } // namespace horde::gameplay::campaign

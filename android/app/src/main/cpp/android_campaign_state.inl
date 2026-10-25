@@ -9,8 +9,8 @@ struct CampaignCommand {
 std::mutex gCampaignMutex;
 std::optional<CampaignCommand> gCampaignCommand;
 std::string gCampaignConfiguredRoot;
-std::array<jlong,33> gCampaignUi = [] {
-    std::array<jlong,33> state{};state[0]=1;state[6]=-1;return state;
+std::array<jlong,34> gCampaignUi = [] {
+    std::array<jlong,34> state{};state[0]=1;state[6]=-1;return state;
 }();
 std::uint64_t gCampaignRequestSerial=0;
 std::atomic<bool> gCampaignPauseGate{false},gCampaignShowcaseOverride{false};
@@ -20,7 +20,8 @@ std::optional<campaign::LoadPreparation> gCampaignPreparation;
 std::unique_ptr<horde::vulkan::raytracing::PresentableTinyRtScene> gCampaignPreparedScene;
 std::uint64_t gCampaignOwnerRequest=0,gCampaignOwnerGeneration=0,gCampaignPublishedRevision=0;
 int gCampaignPhase=0,gCampaignError=0,gCampaignLastAction=0;
-bool gCampaignIsolated=false;
+bool gCampaignIsolated=false,gCampaignConfirmedRetry=false;
+std::uint64_t gCampaignRetryOperationRevision=0;
 bool gCampaignRetirementUnproved=false;
 horde::platform::android::AndroidCampaignLoadBarrier gCampaignBarrier;
 std::uint64_t gCampaignAckToken=0,gCampaignAckGeneration=0;

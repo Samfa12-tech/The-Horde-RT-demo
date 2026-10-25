@@ -1,6 +1,37 @@
 # Horde 1.7 current design index
 
-## Current authority - 24 October 2026
+## Current authority - 25 October 2026
+
+Backed-up checkpoint `2f461da4` includes the tested pure flask backend and dormant
+exact schema3 codec; the player-facing flask is **not enabled**. Runtime restore
+rejects schema3 until its resource owner is integrated, avoiding silent loss.
+The [flask checkpoint](../evidence/2026-10-25-flask-backend/README.md) identifies
+the remaining action/input/hand/save and safe-Rest gates. The owner-requested
+development pause has been superseded by the 25 October resume.
+
+The [readability/pause checkpoint](../evidence/2026-10-25-combat-readability/README.md)
+adds actual-phase yellow/diamond parry and red/cross dodge cues independent of
+lesson completion, plus a circular pause icon at the existing MENU anchor.
+The heavier Keeper cast remains unadmitted/default OFF after extra refresh work
+and inconclusive paired timing; the exact original pose stays active. Swipe-dodge
+is a proposal only. The seven affected native checks, 458 Android unit tests
+(six existing skips), four ABI Debug build and lint pass. Exact-head hosted
+run40174689046 passed all six jobs, as did the earlier `69e46426`.
+
+The next [gated flask owner](../evidence/2026-10-25-flask-owner/README.md) adds
+simulation actions, exact resources, qualified F04 refresh and confirmed-record
+retry ownership with platform load/rebase/presentation adapters. It remains
+default OFF, not player-ready: real-file tests and exact-head CI are separate,
+and controls/upgrade/hand-prop integration is unfinished. Its
+[concrete +1 utility-owner proposal](HORDE_1_7_FLASK_PRESENTATION_SEAM_2026_10_25.md)
+identifies the occupied renderer capacity before any budget/ABI change.
+
+The corrected guard phone retest reached normal isolated gameplay readiness but
+no guard input before its safety margin. Phone restored/released 07:28:34 UTC,
+with original APKs, saves and settings exact. Offline orchestration now passes
+eight mocked cases; another device slot remains required. This closes neither
+physical held guard nor multi-thumb/earned-state acceptance. All 151 owner files
+remain unchanged; PR27 is still draft/conflicting, with no merge or release.
 
 25October: [held guard and guard-to-attack](../evidence/2026-10-25-held-guard/README.md)
 are implemented in the current development combat profile, preserving timed parry,
@@ -8,8 +39,9 @@ red dodge and full attack recovery. Exact half-heart health/HUD and a minimal
 schema2save extension retain legacy schema1bytes. Focused host/Android and hidden
 RT joins pass; local Windows storage publication is access-denied and remains
 open pending independent exact-head CI. New phone/two-thumb/balance acceptance is
-not inferred from the earlier staged lantern-only session. Flask is next; no
-flask code or rejected asset/effect rollout is included in this checkpoint.
+not inferred from the earlier staged lantern-only session. The dated guard-only
+checkpoint did not include flask code; the newer backend status above supersedes
+that statement. No rejected asset/effect rollout is admitted.
 
 The [bounded chimney study](../evidence/2026-10-24-chimney-smoke-gate/README.md)
 retains a verified open-flue source derivative but rejects the shared per-path
@@ -19,7 +51,7 @@ loaded; High/Low image/cost acceptance is absent, not a pass. Normal source,
 generated bank/ABI and v4 geometry are restored. A separate live-RT lighting
 preparation proposal needs review before another material renderer change.
 
-Sam’s 21:10:41 UTC reply approves a bounded owned crown study (small-sample review before rollout), retains the refillable/upgradeable flask in 1.7; its implementation was approved at22:49:26UTC but has not started under the subsequent pause, and prioritizes gated chimney High/Low. New outdoor mist/shafts/fireflies/visual wind are explicitly deferred; existing effects/preferences remain. See [selected decisions](HORDE_1_7_OWNER_DECISIONS_2026_10_24.md#selected-direction) and [flask proposal](HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md). The [first source crown sample](../../assets/models/world/source/forest-crown-study-r1/README.md) remains too sparse; production is unchanged and export is blocked by an OS temporary-image denial. The [owned Run study](../evidence/2026-10-24-player-run-retarget/README.md) is unadmitted after a walk-only grounding mismatch, with limited RT coverage.
+Sam's 21:10:41 UTC reply approves a bounded owned crown study (small-sample review before rollout), retains the refillable/upgradeable flask in 1.7 and prioritizes gated chimney High/Low. He approved the complete flask policy at22:49:26UTC; partial backend work resumed25October as described above. New outdoor mist/shafts/fireflies/visual wind are explicitly deferred; existing effects/preferences remain. See [selected decisions](HORDE_1_7_OWNER_DECISIONS_2026_10_24.md#selected-direction) and [flask policy](HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md). The [first source crown sample](../../assets/models/world/source/forest-crown-study-r1/README.md) remains too sparse; production is unchanged and export is blocked by an OS temporary-image denial. The [owned Run study](../evidence/2026-10-24-player-run-retarget/README.md) is unadmitted after a walk-only grounding mismatch, with limited RT coverage.
 
 The [normal shared64 ownership checkpoint](../evidence/2026-10-24-normal-shared-forest/README.md)
 moves the existing-master owner and whole-instance retention into common Debug,

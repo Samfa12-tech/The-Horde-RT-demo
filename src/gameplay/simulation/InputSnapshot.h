@@ -24,6 +24,9 @@ struct SimulationCommandSequences
     std::uint64_t dialogueSkip = 0;
     std::uint64_t crouchToggle = 0;
     std::uint64_t clearCrouchIntent = 0;
+    // Explicit utility choices; a stale Rest request must never become Drink.
+    std::uint64_t drinkFlask = 0;
+    std::uint64_t rest = 0;
 };
 
 enum class CombatInputEdgeKind : std::uint8_t

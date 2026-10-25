@@ -793,6 +793,7 @@ std::atomic<std::uint64_t> gPlayerVitalityState{
     static_cast<std::uint32_t>(horde::gameplay::PlayerVitals::kMaxVitality)};
 std::atomic<int> gPlayerLifePhase{static_cast<int>(horde::gameplay::PlayerLifePhase::Alive)};
 std::atomic<std::int32_t> gPlayerRetryCheckpoint{0};
+std::atomic<bool> gPlayerConfirmedRetryMode{false};
 std::atomic<float> gKeeperTitleOpacity{0.0f};
 std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive)};
 // Bit 0: INTERACT, bit 1: RAISE, bit 2: LOWER. Bits 3..5 carry the shared
@@ -1058,8 +1059,12 @@ void PublishSimulationUiState()
         (static_cast<std::uint64_t>(static_cast<std::uint32_t>(vitals.maxVitality)) << 32u) |
         static_cast<std::uint32_t>(vitals.vitality) |
         (vitals.halfHeart ? (std::uint64_t{1} << 63u) : 0u), std::memory_order_release);
-    gPlayerLifePhase.store(static_cast<int>(vitals.phase), std::memory_order_release);
+    // Publish routing before life: an acquired death publication must not
+    // expose retry controls with the preceding phase's recovery mode.
+    gPlayerConfirmedRetryMode.store(simulation.healingFlaskEnabled &&
+        simulation.developmentRescueJourney && simulation.rescue.claimCount!=0, std::memory_order_release);
     gPlayerRetryCheckpoint.store(simulation.retryCheckpoint, std::memory_order_release);
+    gPlayerLifePhase.store(static_cast<int>(vitals.phase), std::memory_order_release);
     gFinaleEndingPhase.store(
         static_cast<int>(simulation.EndingPhaseForUi()),
         std::memory_order_release);
@@ -6801,6 +6806,12 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getContextualControlState(JNIEnv*, j
 {
     return static_cast<jint>(gContextualControlState.load(std::memory_order_acquire));
 }
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getConfirmedRetryMode(JNIEnv*, jclass)
+{
+    return gPlayerConfirmedRetryMode.load(std::memory_order_acquire)?JNI_TRUE:JNI_FALSE;
+}
+
 extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_retryEncounter(JNIEnv*, jclass)
 {
@@ -6885,7 +6896,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestCampaign(
 extern "C" JNIEXPORT jlongArray JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getCampaignState(JNIEnv* env,jclass)
 {
-    std::array<jlong,33> state;
+    std::array<jlong,34> state;
     {std::lock_guard lock(gCampaignMutex);state=gCampaignUi;}
     auto result=env->NewLongArray(static_cast<jsize>(state.size()));
     if(result)env->SetLongArrayRegion(result,0,static_cast<jsize>(state.size()),state.data());

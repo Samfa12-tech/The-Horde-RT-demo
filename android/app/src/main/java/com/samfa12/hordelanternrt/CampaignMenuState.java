@@ -9,7 +9,7 @@ final class CampaignMenuState {
     static final int UNKNOWN=0, CHECKING=1, EMPTY=2, VALID=3, INVALID=4, READ_ERROR=5;
     final long surfaceGeneration, revision, ackRequest, rebaseToken;
     final int phase, error, activeSlot, lastOperation, durability;
-    final boolean canSaveLatest, presented, isolatedNamespace;
+    final boolean canSaveLatest, presented, isolatedNamespace, confirmedRetry;
     final float yaw, pitch;
     private final int[] entries;
 
@@ -18,6 +18,7 @@ final class CampaignMenuState {
         error=(int)v[5]; activeSlot=(int)v[6]; canSaveLatest=v[7]==1; rebaseToken=v[8];
         yaw=Float.intBitsToFloat((int)v[9]); pitch=Float.intBitsToFloat((int)v[10]);
         presented=v[11]==1; lastOperation=(int)v[30]; durability=(int)v[31]; isolatedNamespace=v[32]==1;
+        confirmedRetry=v.length>33 && v[33]==1;
         entries=new int[18];
         for(int i=0;i<18;i++) entries[i]=(int)v[12+i];
     }
@@ -26,6 +27,7 @@ final class CampaignMenuState {
                 v[4]<0 || v[4]>FAILED || v[5]<0 || v[5]>Integer.MAX_VALUE ||
                 v[6]<-1 || v[6]>2 || !bit(v[7]) || v[8]<0 || !bit(v[11]) ||
                 v[30]<0 || v[30]>NEW_GAME || v[31]<0 || v[31]>2 || !bit(v[32])) return null;
+        if(v.length>33 && !bit(v[33]))return null;
         for(int i=0;i<6;i++) {
             int p=12+3*i;
             if(v[p]<UNKNOWN || v[p]>READ_ERROR || v[p+1]<0 || v[p+1]>3 || v[p+2]<0 || v[p+2]>3) return null;

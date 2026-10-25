@@ -8,7 +8,7 @@ Session::Session(simulation::GameSimulation& simulation,std::filesystem::path di
     :simulation_(simulation),worker_(std::move(directory),faults){}
 Session::~Session(){Close();worker_.Stop();}
 async::Coordinator& Session::Current(){return coordinators_[state_.kind==SaveKind::Manual?0:1];}
-void Session::CancelPreparation(){if(preparation_) simulation_.CancelCampaignRestore(preparation_->restore);preparation_.reset();}
+void Session::CancelPreparation(){if(preparation_) simulation_.CancelCampaignRestore(preparation_->restore);preparation_.reset();confirmedRetry_.reset();}
 void Session::Close(){CancelPreparation();for(auto& c:coordinators_)c.Close();state_.phase=SessionPhase::Closed;}
 void Session::Cancel(){CancelPreparation();for(auto& c:coordinators_)c.Cancel();if(state_.phase!=SessionPhase::Closed)state_.phase=SessionPhase::Idle;}
 bool Session::SelectSlot(unsigned slot) {
@@ -45,6 +45,24 @@ bool Session::Load(SaveKind kind) {
     state_.kind=kind;if(!Submit(Current().BeginRead()))return false;
     state_.phase=SessionPhase::ReadingLoad;return true;
 }
+std::optional<ConfirmedCampaignRecord> Session::ConfirmedRecord() const {
+    if(state_.phase!=SessionPhase::Idle)return {};
+    const auto c=coordinators_[state_.kind==SaveKind::Manual?0:1].State();
+    return ConfirmedCampaignRecordFrom(c);
+}
+bool Session::BeginConfirmedRetry(const ConfirmedCampaignRecord& record,SaveKind kind) {
+    const auto target=SaveTarget(state_.slot,kind);
+    if(!target || (state_.phase!=SessionPhase::Idle && state_.phase!=SessionPhase::Failed) ||
+       !Validate(record.stored.checkpoint) ||
+       record.stored.target.filename().string()!=SaveBasename(*target))return false;
+    std::vector<std::byte> canonical;codec::Error error{};
+    if(!codec::Encode(record.stored.checkpoint,canonical,error) || canonical!=record.stored.encoded)return false;
+    // PlaySession retains this immutable record only after a successful actual
+    // publication or adopted load for this game/slot. Retry restores those exact
+    // bytes through the normal resource/terrain gate; it performs no write/read.
+    confirmedRetry_=record;state_.kind=kind;state_.lastResult=record.acknowledgement;
+    state_.phase=SessionPhase::LoadReady;return true;
+}
 bool Session::Poll() {
     if(!Current().Poll())return false;
     const auto c=Current().State();state_.lastResult=c.lastResult;
@@ -62,6 +80,12 @@ bool Session::Poll() {
 }
 std::optional<LoadPreparation> Session::PrepareLoad() {
     if(state_.phase!=SessionPhase::LoadReady)return {};
+    if(confirmedRetry_) {
+        const auto& checkpoint=confirmedRetry_->stored.checkpoint;
+        const auto restore=simulation_.BeginCampaignRestore(checkpoint);if(!restore)return {};
+        preparation_=LoadPreparation{{},*restore,{restore->worldGeneration,checkpoint.zone},true};
+        state_.phase=SessionPhase::PreparingLoad;return preparation_;
+    }
     const auto read=Current().State().preparedRead;if(!read)return {};
     const auto candidate=Current().ReadCandidate(*read);if(!candidate)return {};
     const auto restore=simulation_.BeginCampaignRestore(candidate->checkpoint);if(!restore)return {};
@@ -73,7 +97,9 @@ bool Session::CommitLoad(const LoadPreparation& preparation,simulation::WorldZon
     std::uint64_t publicationSequence) {
     if(state_.phase!=SessionPhase::PreparingLoad || !preparation_ || preparation.read!=preparation_->read ||
         preparation.restore!=preparation_->restore || ready.generation!=preparation.destination.generation ||
-        ready.zone!=preparation.destination.zone || !Current().ReadCandidate(preparation.read))return false;
+        ready.zone!=preparation.destination.zone ||
+        preparation.fromConfirmedRecord!=preparation_->fromConfirmedRecord ||
+        (preparation.fromConfirmedRecord ? !confirmedRetry_.has_value() : !Current().ReadCandidate(preparation.read)))return false;
     // Copy the CURRENT live session at final apply, never a snapshot retained
     // across resource/worker delay. Failure leaves simulation/camera/input live.
     auto candidate=std::make_unique<simulation::GameSimulation>(simulation_);
@@ -85,8 +111,8 @@ bool Session::CommitLoad(const LoadPreparation& preparation,simulation::WorldZon
     rebased.combatEdgeHistory={};rebased.dialogueCompletionLine=0;rebased.dialogueCompletionGeneration=0;
     // Adoption allocates offside and has a no-throw commit. No owner methods can
     // interleave here; worker callbacks only deposit immutable ticket receipts.
-    if(!Current().AdoptRead(preparation.read))return false;
+    if(!preparation.fromConfirmedRecord && !Current().AdoptRead(preparation.read))return false;
     simulation_=std::move(*candidate);ownerInput=rebased;
-    preparation_.reset();state_.phase=SessionPhase::Idle;return true;
+    preparation_.reset();confirmedRetry_.reset();state_.phase=SessionPhase::Idle;return true;
 }
 } // namespace horde::gameplay::campaign

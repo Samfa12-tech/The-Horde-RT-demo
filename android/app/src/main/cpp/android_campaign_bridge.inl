@@ -4,9 +4,7 @@ using CampaignBarrier=horde::platform::android::AndroidCampaignLoadBarrier;
 bool CampaignNeutralInput(const horde::gameplay::simulation::InputSnapshot& input,
     const CampaignBarrier::Status& barrier)
 {
-    return input.paused && input.moveForward==0 && input.moveStrafe==0 &&
-        !input.runHeld && !input.crouchHeld && !input.hasAuthoritativePlayerPose &&
-        barrier.MatchesRebasePose(input.yawRadians,input.pitchRadians);
+    return horde::platform::android::IsNeutralCampaignRebaseInput(input,barrier);
 }
 
 int CampaignStorageError(const campaign::storage::Result& result)
@@ -23,7 +21,7 @@ int CampaignStorageError(const campaign::storage::Result& result)
 
 void PublishCampaignOnOwner(const SwapchainContext& context)
 {
-    std::array<jlong,33> ui{};ui[0]=1;ui[1]=context.surfaceGeneration;
+    std::array<jlong,34> ui{};ui[0]=1;ui[1]=context.surfaceGeneration;
     ui[3]=gCampaignOwnerRequest;ui[4]=gCampaignPhase;ui[5]=gCampaignError;ui[6]=-1;
     if(gCampaignSession) {
         const auto state=gCampaignSession->State();
@@ -49,6 +47,7 @@ void PublishCampaignOnOwner(const SwapchainContext& context)
     }
     ui[11]=barrier.phase==CampaignBarrier::Phase::Complete;
     ui[30]=gCampaignLastAction;ui[32]=gCampaignIsolated?1:0;
+    ui[33]=gCampaignConfirmedRetry?1:0;
     std::lock_guard lock(gCampaignMutex);
     ui[2]=gCampaignUi[2];
     if(ui!=gCampaignUi) {
@@ -142,6 +141,7 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
         // No owner directory is scanned, migrated, removed or created here.
         gCampaignSession=std::make_unique<campaign::PlaySession>(gGameSimulation,configured);
         gCampaignOwnerRoot=configured;gCampaignPhase=1;gCampaignError=0;
+        gCampaignRetryOperationRevision=0;gCampaignConfirmedRetry=false;
         gCampaignIsolated=std::filesystem::path(configured).parent_path().filename()=="campaign-tests";
     }
     if(!gCampaignSession){PublishCampaignOnOwner(context);return;}
@@ -156,10 +156,14 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
     }
     if(command) {
         gCampaignOwnerRequest=command->serial;gCampaignOwnerGeneration=command->generation;
+        if(command->action!=4)gCampaignConfirmedRetry=false;
         if(command->generation!=context.surfaceGeneration || !gSurfaceSessions.IsCurrent(command->generation)) {
             gCampaignError=8;
         } else if(command->action==4) {
             if(!gCampaignBarrier.State().loaded || !gCampaignBarrier.KeepsPaused()) {
+                // Consume an already-published retry before cancelling, even if
+                // this command beat its automatic operation activation.
+                if(gGameSimulation.Snapshot().healingFlaskEnabled)gCampaignSession->ObserveSafeBoundary();
                 gCampaignSession->Cancel();gCampaignPreparation.reset();
                 gCampaignBarrier.Cancel(gCampaignBarrier.State().request);
                 if(gCampaignPreparedScene && DrainCampaignResources(context))gCampaignPreparedScene.reset();
@@ -224,6 +228,31 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
     }
     gCampaignSession->Poll();
     auto state=gCampaignSession->State();
+    // The shared owner may start an exact cached retry without a Java Load command.
+    // Admit its operation once to the SAME resource/rebase/presentation barrier.
+    if(state.fromConfirmedRecord && state.operation==campaign::PlayOperation::Load &&
+       state.operationRevision!=gCampaignRetryOperationRevision) {
+        gCampaignRetryOperationRevision=state.operationRevision;
+        gCampaignConfirmedRetry=true;gCampaignLastAction=3;gCampaignError=0;
+        bool admitted=false;
+        {
+            std::lock_guard inputLock(gInputPublisherMutex);
+            std::lock_guard commandLock(gCampaignMutex);
+            if(gCampaignRequestSerial<static_cast<std::uint64_t>(INT64_MAX) &&
+               gSurfaceSessions.IsCurrent(context.surfaceGeneration) &&
+               !gSurfaceSessions.IsSuspended(context.surfaceGeneration) && !gCampaignCommand) {
+                gCampaignOwnerRequest=++gCampaignRequestSerial;
+                gCampaignOwnerGeneration=context.surfaceGeneration;
+                admitted=state.outcome==campaign::PlayOutcome::Pending &&
+                    gCampaignBarrier.Begin(gCampaignOwnerRequest,context.surfaceGeneration);
+            }
+        }
+        if(admitted) {
+            gCampaignPhase=3;gCampaignStartedNs=GraphicsSteadyNs();
+            gCampaignPauseGate.store(true,std::memory_order_release);
+        } else FailCampaignOnOwner(state.outcome==campaign::PlayOutcome::Failed?
+            CampaignStorageError(state.result):8);
+    }
     const auto completion=gCampaignSession->TakeCompletion();
     if(state.operation==campaign::PlayOperation::Autosave && state.outcome==campaign::PlayOutcome::Pending) {
         gCampaignLastAction=0;gCampaignPhase=2;
@@ -381,7 +410,10 @@ bool RetireCampaignOnOwner(std::uint64_t generation)
     const bool loaded=gCampaignBarrier.State().loaded && gCampaignBarrier.KeepsPaused();
     gCampaignBarrier.SurfaceRetired(generation);
     if(!loaded) {
-        if(gCampaignSession)gCampaignSession->Cancel();
+        if(gCampaignSession) {
+            if(gGameSimulation.Snapshot().healingFlaskEnabled)gCampaignSession->ObserveSafeBoundary();
+            gCampaignSession->Cancel();
+        }
         gCampaignPreparation.reset();gCampaignPauseGate.store(false,std::memory_order_release);
         if(gCampaignPhase>=3 && gCampaignPhase<=6){gCampaignPhase=8;gCampaignError=8;}
     }

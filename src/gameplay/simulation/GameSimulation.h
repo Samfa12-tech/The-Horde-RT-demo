@@ -74,6 +74,8 @@ struct GameSimulationConfig
     bool combatFoundation1_7 = false;
     // Shared chapter presentation; historical constructor fixtures stay explicit.
     bool companionTurnStart = false;
+    // Diagnostic owner slice only. UI/hand/save admission is still separate.
+    bool healingFlask1_7 = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -181,7 +183,7 @@ private:
     std::optional<PendingCampaignRestore> pendingCampaignRestore_;
     std::optional<campaign::Checkpoint> campaignBoundary_;
     std::uint64_t campaignBoundaryRevision_=0;
-    std::optional<campaign::Checkpoint> BuildCampaignCheckpoint(campaign::CheckpointId,bool canonical) const;
+    std::optional<campaign::Checkpoint> BuildCampaignCheckpoint(campaign::CheckpointId,bool canonical, bool allowFlaskAction = false) const;
     void LatchCampaignBoundary();
     void ClearCampaignBoundary();
     std::uint64_t campaignRequestSequence_ = 0;
@@ -278,6 +280,12 @@ private:
                        float intensity = 1.0f,
                          std::int32_t payload = 0,
                          float worldY = 0.0f);
+    void DiscardFlaskRequests();
+    bool FlaskCompetingIntent(const InputSnapshot& input) const;
+    std::optional<campaign::CheckpointId> EligibleFlaskRestAnchor() const;
+    healing::FlaskContext FlaskContextFor(const InputSnapshot&, bool cancel, bool acceptedDamage) const;
+    void StepHealingFlask(const InputSnapshot& input, float gameplaySeconds,
+                          bool competingIntent, int healthBeforeEncounter);
     void RefreshSnapshot(const InputSnapshot& input);
     void UpdateChapterDialogue(const InputSnapshot& input,float fixedSeconds);
 
@@ -330,6 +338,9 @@ private:
     horde::gameplay::interactions::InteractionState interactionState_{};
     horde::gameplay::interactions::LanternPendulum lanternPendulum_{};
     PlayerVitals playerVitals_{};
+    healing::HealingFlask healingFlask_{};
+    std::uint64_t flaskCompletionTick_=0;
+    std::uint64_t campaignRetryRequestGeneration_=0,completedRestGeneration_=0;
     TravelFootstepCadence playerFootsteps_{};
     DryFootstepSequence dryFootstepCues_{};
     horde::gameplay::effects::WaterContact waterContact_{};
@@ -409,6 +420,9 @@ private:
     std::uint64_t pendingToggleHeldLightPoseCommands_ = 0u;
     std::uint64_t pendingRunToggleCommands_ = 0u;
     std::uint64_t pendingClearRunIntentCommands_ = 0u;
+    std::uint64_t latestDrinkFlaskSequence_=0,latestRestSequence_=0;
+    std::uint64_t lastConsumedDrinkFlaskSequence_=0,lastConsumedRestSequence_=0;
+    std::uint64_t pendingDrinkFlaskCommands_=0,pendingRestCommands_=0;
     float pendingDodgeForward_ = 0.0f;
     float pendingDodgeStrafe_ = 0.0f;
     float dodgeDirectionX_ = 0.0f;

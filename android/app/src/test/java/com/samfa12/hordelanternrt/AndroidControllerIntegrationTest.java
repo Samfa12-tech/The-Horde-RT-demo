@@ -45,6 +45,7 @@ public class AndroidControllerIntegrationTest {
         @Implementation protected static void requestToggleCrouch(){crouchToggles++;}
         @Implementation protected static void clearCrouchIntent(){crouchClears++;crouchHeld=false;}
         @Implementation protected static void setSimulationPaused(boolean p){paused=p;}
+        @Implementation protected static boolean getConfirmedRetryMode(){return false;}
         @Implementation protected static int retryEncounter(){retries++;return 2;}
         @Implementation protected static long setGraphicsSettings(int scale,int water,int fire,int cap,boolean glass,int shadow,boolean mist,int dust){return 43;}
         @Implementation protected static void setGraphicsPreview(boolean enabled,boolean paused,boolean motion,int camera,boolean reset,long generation){}

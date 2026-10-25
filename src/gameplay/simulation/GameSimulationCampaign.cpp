@@ -25,7 +25,7 @@ bool SafeSupport(const campaign::Checkpoint& c, const TriangleSupportSurface& te
 }
 bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
     const auto facts=[](const campaign::Checkpoint& c){return std::tie(c.schema,c.contentRevision,c.id,c.zone,
-        c.position.x,c.position.y,c.position.z,c.yaw,c.pitch,c.vitality,c.halfHeart,c.defeatedGuards,c.keeperDefeated,
+        c.position.x,c.position.y,c.position.z,c.yaw,c.pitch,c.vitality,c.halfHeart,c.flask.upgraded,c.flask.charges,c.defeatedGuards,c.keeperDefeated,
         c.lanternClaimed,c.lidOpen,c.ropeReady,c.night,c.firstAscentCompleted,c.swordStowed,c.lanternHigh,
         c.torchDropX,c.torchDropZ,c.torchDropYaw,c.torchDropPitch,c.guards,
         c.dialogue.activeLine,c.dialogue.continuations,c.dialogue.continuationCount,
@@ -42,9 +42,12 @@ std::optional<campaign::Checkpoint> GameSimulation::CaptureCampaignCheckpoint(ca
 std::optional<campaign::Checkpoint> GameSimulation::CaptureAuthoredCampaignBoundary(campaign::CheckpointId id) const {
     return BuildCampaignCheckpoint(id,true);
 }
-std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(campaign::CheckpointId id,bool canonical) const {
+std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(campaign::CheckpointId id,bool canonical,bool allowFlaskAction) const {
     using namespace interactions;
     const auto& s=snapshot_;
+    if(config_.healingFlask1_7 && !allowFlaskAction &&
+       (healingFlask_.Snapshot().action!=healing::FlaskAction::Idle ||
+        pendingDrinkFlaskCommands_ || pendingRestCommands_))return std::nullopt;
     const bool forest=id==campaign::CheckpointId::ForestEndpoint;
     const bool upper=id==campaign::CheckpointId::SafeExit || forest;
     if (!config_.combatFoundation1_7 || !config_.waterfallSkeletonEncounter ||
@@ -92,6 +95,7 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     c.id=id;c.zone=zone;c.position={s.playerX,s.playerSupportWorldY,s.playerZ};
     c.yaw=s.playerYawRadians;c.pitch=s.playerPitchRadians;c.vitality=s.playerVitals.vitality;
     c.halfHeart=s.playerVitals.halfHeart;c.schema=c.halfHeart?2u:1u;
+    if(config_.healingFlask1_7){c.schema=3;c.flask=healingFlask_.Snapshot().resources;}
     if(canonical) {
         c.position=upper?traversal::kExteriorLanding:traversal::kLowerLanding;
         c.yaw=upper?0.0f:-1.57079632679f;c.pitch=0.0f;
@@ -132,7 +136,17 @@ void GameSimulation::LatchCampaignBoundary() {
     // The last earned exterior boundary survives exploration away from its
     // arrival radius. A completed return descent may still earn the lower side.
     if(snapshot_.rescue.exteriorSide) {
-        if(campaignBoundary_ && campaignBoundary_->id==campaign::CheckpointId::ForestEndpoint)return;
+        if(campaignBoundary_ && campaignBoundary_->id==campaign::CheckpointId::ForestEndpoint) {
+            // Preserve endpoint ownership away from it, but an eligible Rest or
+            // resource change at that earned anchor must refresh logical state.
+            if(config_.healingFlask1_7) {
+                const auto refreshed=CaptureAuthoredCampaignBoundary(campaign::CheckpointId::ForestEndpoint);
+                if(refreshed && !SameBoundary(*refreshed,*campaignBoundary_)) {
+                    campaignBoundary_=*refreshed;++campaignBoundaryRevision_;
+                }
+            }
+            return;
+        }
         const auto endpoint=CaptureAuthoredCampaignBoundary(campaign::CheckpointId::ForestEndpoint);
         if(endpoint) {
             if(!campaignBoundary_ || !SameBoundary(*endpoint,*campaignBoundary_)) {
@@ -150,9 +164,9 @@ void GameSimulation::LatchCampaignBoundary() {
 
 std::optional<campaign::RestoreToken> GameSimulation::BeginCampaignRestore(const campaign::Checkpoint& c) {
     // An invalid request does not cancel an already validated pending request.
-    // Schema3's codec is prepared, but this owner does not restore flask
-    // resources yet. Reject rather than silently discard them on a later save.
-    if(!campaign::Validate(c) || c.schema>=3 || !config_.combatFoundation1_7 || !config_.waterfallSkeletonEncounter ||
+    // Normal gameplay keeps schema3 unavailable until admission. The explicit
+    // diagnostic owner restores resources exactly instead of dropping them.
+    if(!campaign::Validate(c) || (c.schema>=3 && !config_.healingFlask1_7) || !config_.combatFoundation1_7 || !config_.waterfallSkeletonEncounter ||
        config_.playerMountProfile!=items::PlayerMountProfile::AnatomicalBody ||
        staticDetailLease_.resourceGeneration || campaignRequestSequence_==UINT64_MAX ||
        std::max(worldRoute_.generation,campaignDestinationGeneration_)==UINT64_MAX)
@@ -175,7 +189,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
        chapterCompanion_.State().generation==UINT64_MAX || rescueTraversal_.Snapshot().generation==UINT64_MAX)
         return false;
     const auto c=pendingCampaignRestore_->checkpoint;
-    if(!campaign::Validate(c) || c.schema>=3 || !SafeSupport(c,*terrain)) return false;
+    if(!campaign::Validate(c) || (c.schema>=3 && !config_.healingFlask1_7) || !SafeSupport(c,*terrain)) return false;
     const bool completedForest=c.contentRevision==2;
     const bool upper=c.id==campaign::CheckpointId::SafeExit || c.id==campaign::CheckpointId::ForestEndpoint;
     auto config=config_;
@@ -196,6 +210,8 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.presentationAspect_=presentationAspect_;
     next.campaignRequestSequence_=campaignRequestSequence_;
     next.campaignDestinationGeneration_=campaignDestinationGeneration_;
+    next.campaignRetryRequestGeneration_=campaignRetryRequestGeneration_;
+    next.completedRestGeneration_=completedRestGeneration_;
     next.rescueTraversal_.RestoreCampaignSafeSide(upper,c.firstAscentCompleted,rescueTraversal_.Snapshot().generation);
     next.rescueOpeningSeconds_=1.0f;
     // Completed-forest returns have already passed the first-arrival lesson.
@@ -212,6 +228,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.enemyDirector_.Update(c.position.x,c.position.z,EnemyKind::Lich);next.enemyDirector_.MarkSelectedDead();
     next.activeEnemyKind_=EnemyKind::Lich;
     next.playerVitals_.RestoreCampaignVitality(c.vitality,c.halfHeart);
+    if(config_.healingFlask1_7 && !next.healingFlask_.Restore(c.flask))return false;
     interactions::ChestRewardSnapshot chest;
     chest.phase=interactions::ChestRewardPhase::LanternClaimed;chest.lidOpenProgress=1;
     next.chestRewardSequence_.Import(chest);

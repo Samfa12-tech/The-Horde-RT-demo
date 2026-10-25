@@ -708,6 +708,127 @@ void EndpointWriteFailure(const std::shared_ptr<const sim::TriangleSupportSurfac
         Check(!fs::exists(Path(directory,slot,kind)),"endpoint write failure/retry cannot create records in other slots");
 }
 }
+int FlaskConfirmedRetry(const std::shared_ptr<const sim::TriangleSupportSurface>& terrain) {
+    // Isolated logical/IO recovery coverage, not natural combat completion.
+    Directory directory;Faults faults;
+    auto config=sim::ProductionGameSimulationConfig();config.healingFlask1_7=true;
+    sim::GameSimulation game(config);cp::PlaySession play(game,directory.path,&faults);
+    Check(play.BeginNewGame(0),"flask recovery selects only the first independent slot");
+    auto saved=Record(1);saved.schema=3;saved.halfHeart=true;saved.flask={true,1};
+    if(!Seed(game,saved,terrain)){Check(false,"exact half-heart flask record restores on actual support");return 1;}
+    Check(play.ObserveSafeBoundary() && Until(play,[&]{return play.State().outcome==cp::PlayOutcome::Succeeded;}),
+        "actual first checkpoint publication is acknowledged before retry admission");
+    const auto original=Read(directory,0,cp::SaveKind::Autosave);
+    Check(original.checkpoint.halfHeart && original.checkpoint.flask==saved.flask,
+        "confirmed record contains exact half health, entitlement and charges");
+    auto live=saved;live.vitality=3;live.halfHeart=false;live.flask.charges=3;
+    Check(Seed(game,live,terrain) && play.ObserveSafeBoundary(),"live logical resources can diverge from the stored baseline");
+    Check(play.SaveManual(1) && Done(play) && play.State().outcome==cp::PlayOutcome::Succeeded,
+        "manual save to another slot completes without retargeting the active game");
+    const auto other=Raw(Path(directory,1,cp::SaveKind::Manual));
+    faults.failWrite=true;
+    Check(play.SaveManual(0) && Done(play) && play.State().outcome==cp::PlayOutcome::Failed,
+        "current-slot write failure remains visible and is not acknowledged as saved state");
+    faults.failWrite=false;
+    Check(Raw(Path(directory,0,cp::SaveKind::Autosave))==original.encoded,
+        "write failure preserves the prior confirmed record bytes");
+    const auto before=game.Snapshot();game.RetryEncounter();
+    Check(game.Snapshot().playerVitals.vitality==before.playerVitals.vitality &&
+          game.Snapshot().healingFlask.resources==before.healingFlask.resources,
+          "post-claim retry request cannot heal or refill live state before confirmed restore");
+    play.ObserveSafeBoundary();play.Poll();
+    Check(play.State().fromConfirmedRecord && play.State().operation==cp::PlayOperation::Load &&
+          play.State().operationSlot==0,"retry owns only the active game's confirmed first-slot record");
+    auto preparation=play.PrepareLoad();sim::InputSnapshot input;input.damageEnabled=false;input.tutorialEnabled=false;
+    Check(preparation && preparation->fromConfirmedRecord &&
+          play.CommitLoad(*preparation,preparation->destination,terrain,input,100),
+          "confirmed retry uses the normal terrain/resource and immutable apply gates");
+    if(!preparation || play.State().outcome!=cp::PlayOutcome::Succeeded)return 1;
+    Check(game.Snapshot().playerVitals.vitality==1 && game.Snapshot().playerVitals.halfHeart &&
+          game.Snapshot().healingFlask.resources==saved.flask,
+          "retry restores only confirmed half health and charges, not newer live or other-slot resources");
+    Check(Raw(Path(directory,1,cp::SaveKind::Manual))==other &&
+          Raw(Path(directory,0,cp::SaveKind::Autosave))==original.encoded,
+          "cached confirmed retry performs no record rewrite and preserves independent slots");
+    std::uint64_t publication=100;
+    const auto step=[&] {
+        input.yawRadians=game.Snapshot().playerYawRadians;input.pitchRadians=game.Snapshot().playerPitchRadians;
+        game.StepFixed(input,1.f/60.f,++publication);
+    };
+    // Publication identities belong to the owner, not elapsed test ticks.
+    for(int i=0;i<600 && !game.Snapshot().flaskRestAnchor;++i)step();
+    Check(game.Snapshot().flaskRestAnchor==static_cast<unsigned>(saved.id),
+        "restored lower checkpoint has an actual eligible recovery point");
+    const auto revision=game.CampaignBoundaryRevision(),rest=game.Snapshot().completedRestGeneration;
+    ++input.commands.rest;for(int i=0;i<130;++i)step();
+    Check(game.Snapshot().completedRestGeneration==rest+1 &&
+          game.Snapshot().playerVitals.vitality==3 && !game.Snapshot().playerVitals.halfHeart &&
+          game.Snapshot().healingFlask.resources.charges==3 && game.CampaignBoundaryRevision()>revision,
+          "explicit Rest updates the same retained checkpoint's health and resources");
+    const auto operation=play.State().operationRevision;
+    Check(play.ObserveSafeBoundary() && Until(play,[&]{return play.State().operationRevision>operation &&
+          play.State().outcome==cp::PlayOutcome::Succeeded;}),
+          "one successful Rest saves its new revision even when checkpoint ID did not change");
+    const auto refilled=Read(directory,0,cp::SaveKind::Autosave);
+    Check(refilled.checkpoint.vitality==3 && !refilled.checkpoint.halfHeart && refilled.checkpoint.flask.charges==3,
+          "Rest's confirmed record contains the completed exact refill");
+    const auto noRepeat=play.State().operationRevision;
+    for(int i=0;i<10;++i){play.ObserveSafeBoundary();play.Poll();}
+    Check(play.State().operationRevision==noRepeat,"a completed Rest does not cause repeated automatic saves");
+    Check(Until(play,[&]{return CatalogueDone(play);}),
+          "read-only catalogue work settles before the independent legacy-load case");
+    auto legacy=Record(2);legacy.schema=2;legacy.halfHeart=true;
+    Check(io::Write(directory.path,cp::SaveBasename(*cp::SaveTarget(2,cp::SaveKind::Manual)),legacy).status==io::Status::Committed,
+          "isolated old half-heart record is seeded without an implicit resource grant");
+    const auto legacyBytes=Raw(Path(directory,2,cp::SaveKind::Manual));
+    Check(play.Load(2,cp::SaveKind::Manual) && Until(play,[&]{return play.State().phase==cp::SessionPhase::LoadReady;}),
+          "old record reaches the existing explicit load decision");
+    preparation=play.PrepareLoad();
+    Check(preparation && !preparation->fromConfirmedRecord &&
+          play.CommitLoad(*preparation,preparation->destination,terrain,input,200),"old record adopts through the normal read owner");
+    Check(play.State().activeSlot==2 && game.Snapshot().playerVitals.vitality==2 &&
+          game.Snapshot().playerVitals.halfHeart && game.Snapshot().healingFlask.resources.charges==0 &&
+          !game.Snapshot().healingFlask.resources.upgraded &&
+          Raw(Path(directory,2,cp::SaveKind::Manual))==legacyBytes,
+          "legacy load preserves half health, independent active slot and original bytes with empty base flask");
+    Check(play.RetryConfirmedCheckpoint(),"adopted old record becomes this game's confirmed retry source");
+    preparation=play.PrepareLoad();
+    Check(preparation && play.CommitLoad(*preparation,preparation->destination,terrain,input,201) &&
+          game.Snapshot().healingFlask.resources.charges==0,"legacy retry does not borrow another game's refill");
+    game.ResetRoute();play.ObserveSafeBoundary();
+    Check(!play.RetryConfirmedCheckpoint() && play.State().result.status==io::Status::NotFound,
+          "explicit route reset cannot borrow a confirmed record from the previous game");
+    Check(play.BeginNewGame(1) && !play.RetryConfirmedCheckpoint() &&
+          play.State().outcome==cp::PlayOutcome::Failed && play.State().result.status==io::Status::NotFound,
+          "New Game clears prior confirmed recovery ownership rather than importing another slot");
+    auto endpoint=Record(1,true);endpoint.schema=3;endpoint.halfHeart=true;endpoint.flask={false,0};
+    endpoint.contentRevision=2;endpoint.id=cp::CheckpointId::ForestEndpoint;endpoint.zone=sim::WorldZoneId::Lookout;
+    const auto routeEnd=sim::kWorldRoutePoints.back();const auto ground=terrain->Query(routeEnd.x,routeEnd.z);
+    Check(ground.found && ground.walkable,"F04 Rest persistence uses actual terrain support");
+    if(!ground.found || !ground.walkable)return 1;
+    endpoint.position={routeEnd.x,ground.worldY,routeEnd.z};endpoint.yaw=2.51f;endpoint.pitch=-.15f;
+    endpoint.dialogue.waitingForRaise=false;endpoint.dialogue.proofAccepted=true;
+    endpoint.dialogue.forestNightConsumed=endpoint.dialogue.forestWaystoneConsumed=true;
+    endpoint.dialogue.forestClueConsumed=endpoint.dialogue.forestVillageConsumed=true;
+    Check(Seed(game,endpoint,terrain) && play.ObserveSafeBoundary() &&
+          Until(play,[&]{return play.State().outcome==cp::PlayOutcome::Succeeded;}),
+          "isolated F04 initial saved state is actually confirmed before Rest");
+    input={};input.damageEnabled=false;input.tutorialEnabled=false;publication=300;
+    for(int i=0;i<600 && !game.Snapshot().flaskRestAnchor;++i)step();
+    const auto endpointOperation=play.State().operationRevision;
+    input.commands.rest=game.Snapshot().lastConsumedRestSequence+1;
+    for(int i=0;i<130;++i)step();
+    Check(play.ObserveSafeBoundary() && Until(play,[&]{return play.State().operationRevision>endpointOperation &&
+          play.State().outcome==cp::PlayOutcome::Succeeded;}),
+          "Rest refreshes and saves the retained F04 record without a checkpoint-ID transition");
+    const auto endpointSaved=Read(directory,1,cp::SaveKind::Autosave);
+    Check(endpointSaved.checkpoint.id==cp::CheckpointId::ForestEndpoint && endpointSaved.checkpoint.vitality==3 &&
+          !endpointSaved.checkpoint.halfHeart && endpointSaved.checkpoint.flask.charges==2 &&
+          Raw(Path(directory,1,cp::SaveKind::Manual))==other,
+          "F04 confirmed refill preserves its endpoint and independent manual bytes");
+    std::cout<<checks<<" confirmed flask retry checks, "<<failures<<" failures\n";
+    return failures?1:0;
+}
 int main(int argc,char** argv){
     MarkElapsed("suite-start");
     if(argc==3 && std::string_view(argv[1])=="--export-fixtures")return ExportFixtures(argv[2]);
@@ -718,13 +839,14 @@ int main(int argc,char** argv){
     const bool producer=argc==2 && std::string_view(argv[1])=="--produce-earned-fixture";
     const bool consumer=argc==2 && std::string_view(argv[1])=="--consume-earned-fixture";
     const bool cleanup=argc==2 && std::string_view(argv[1])=="--cleanup-earned-fixture";
+    const bool flaskRetry=argc==2 && std::string_view(argv[1])=="--flask-confirmed-retry";
     if(cleanup)return CleanupFixture();
     if(producer && !CreateFixture()){std::cerr<<"Fresh exclusive CTest fixture ownership required.\n";return 1;}
     io::StoredCheckpoint crossProcessEndpoint;
     if(consumer && !ReadEarnedFixture(crossProcessEndpoint)){
         std::cerr<<"Missing, stale, already consumed, tampered or mismatched earned fixture.\n";return 1;
     }
-    if(argc!=1 && !exportLookout && !actualReturn && !turnDiagnosis && !producer && !consumer)return 2;
+    if(argc!=1 && !exportLookout && !actualReturn && !turnDiagnosis && !producer && !consumer && !flaskRetry)return 2;
     const auto assets=fs::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(assets/"asset.manifest.json",manifest,error) ||
@@ -732,6 +854,7 @@ int main(int argc,char** argv){
         std::cerr<<error;return 1;}
     const auto terrain=horde::scene::PrepareChapterTerrainSurface(mesh,error);if(!terrain){std::cerr<<error;return 1;}
     MarkElapsed("terrain-ready");
+    if(flaskRetry)return FlaskConfirmedRetry(terrain);
     if(exportLookout)return ExportFixtures(argv[2],terrain);
     if(actualReturn)return CheckActualReturnRecovery(argv[2],terrain);
     if(consumer) {

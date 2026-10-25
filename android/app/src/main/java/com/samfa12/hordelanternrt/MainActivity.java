@@ -480,7 +480,8 @@ public class MainActivity extends Activity {
     private final int[] rtLightHueDegrees = {0, 0, 0, 0};
     private final int[] rtLightIntensityPercent = {100, 100, 100, 100};
     private int rtWorkloadPreset = 1;
-    private boolean retryPending;
+    private boolean retryPending, confirmedRetryPending;
+    private long confirmedRetryRequestFloor, confirmedRetryStarted;
     private boolean updateCheckInFlight;
     private boolean updatePromptShown;
     private boolean startupUpdateCheckScheduled;
@@ -547,7 +548,7 @@ public class MainActivity extends Activity {
     private LinearLayout lookoutObjectivePanel;
     private final Runnable refreshCampaignMenu = new Runnable() {
         @Override public void run() {
-            if(campaignDestroyed || !resumed || (!campaignMenuVisible && campaignRequest==0)) return;
+            if(campaignDestroyed || !resumed || (!campaignMenuVisible && campaignRequest==0 && !confirmedRetryPending)) return;
             pollCampaignMenu();
             handler.postDelayed(this, 150L);
         }
@@ -1789,6 +1790,10 @@ public class MainActivity extends Activity {
         try { state=CampaignMenuState.decode(ProbeBridge.getCampaignState()); }
         catch(RuntimeException | LinkageError unavailable) { /* Native API absent: visible unavailable, never success. */ }
         if(state==null || !state.current(surfaceRequestGeneration)) {
+            if(confirmedRetryPending) {
+                failConfirmedRetry(CAMPAIGN_SURFACE_UNAVAILABLE);
+                return;
+            }
             boolean wasValid=campaignPublicationValid;
             campaignPublicationValid=false;
             campaignLoadedReady=false;
@@ -1805,6 +1810,25 @@ public class MainActivity extends Activity {
         if(!changed) state=campaignState;
         campaignPublicationValid=true;
         campaignState=state;
+        if(confirmedRetryPending) {
+            if(campaignAction==CampaignMenuState.CANCEL && campaignRequest>confirmedRetryRequestFloor &&
+               state.ackRequest==campaignRequest && !state.pending() && !state.presented) {
+                failConfirmedRetry(state.message());return;
+            }
+            if(state.confirmedRetry && state.ackRequest>confirmedRetryRequestFloor &&
+               state.lastOperation==CampaignMenuState.LOAD) {
+                campaignRequest=state.ackRequest;campaignAction=CampaignMenuState.LOAD;
+                campaignDeathLoadRequest=state.ackRequest;
+                if(state.error!=0 || state.phase==CampaignMenuState.FAILED ||
+                   state.phase==CampaignMenuState.READY || state.phase==CampaignMenuState.UNAVAILABLE) {
+                    failConfirmedRetry(state.message());return;
+                }
+            } else {
+                if(SystemClock.uptimeMillis()-confirmedRetryStarted>=60000L)
+                    failConfirmedRetry("Checkpoint retry did not become ready. The game remains paused.");
+                return; // An older load/Alive publication cannot complete this retry.
+            }
+        }
         if(campaignFromDeath && campaignDeathLoadRequest>0 && state.ackRequest>=campaignDeathLoadRequest &&
                 state.lastOperation==CampaignMenuState.LOAD &&
                 (state.phase==CampaignMenuState.REBASE || state.phase==CampaignMenuState.PRESENTING ||
@@ -1862,6 +1886,13 @@ public class MainActivity extends Activity {
                 (campaignRequest==0 || state.ackRequest==campaignRequest)) {
             campaignLoadedReady=true;
             campaignLocalMessage=null;
+        }
+        if(confirmedRetryPending && campaignLoadedReady &&
+           campaignAcknowledgedGeneration==state.surfaceGeneration && campaignAcknowledgedToken!=0 &&
+           state.rebaseToken==campaignAcknowledgedToken) {
+            // resumeLoadedCampaign also verifies a living restored player. Only
+            // this owner-started confirmed retry auto-resumes; manual Load does not.
+            resumeLoadedCampaign();
         }
         if(changed) { if(!state.pending()) dismissCampaignConfirmation(); renderCampaignMenu(); }
     }
@@ -1943,6 +1974,7 @@ public class MainActivity extends Activity {
             campaignDeathLoadCommitted=false;
             campaignDeathMessage=null;
         }
+        confirmedRetryPending=false;
         campaignMenuVisible=false; campaignRequest=0; campaignLoadedReady=false;
         entryPlayRequested=false; entryMenuEnabled=false; entryMenuSidePage=false; firstMenu=false;
         handler.removeCallbacks(refreshEntryMenu);
@@ -6161,7 +6193,7 @@ public class MainActivity extends Activity {
 
     private void updateDeathRecoveryPresentation(int lifePhase) {
         lastPlayerLifePhase=lifePhase;
-        if(deathOverlayVisible && lifePhase==PLAYER_ALIVE && !campaignFromDeath) {
+        if(deathOverlayVisible && lifePhase==PLAYER_ALIVE && !campaignFromDeath && !confirmedRetryPending) {
             deathOverlayVisible=false;
             if(retryPending) { retryPending=false; firstMenu=false; hideMenu(); }
             else showMainMenu(false);
@@ -6172,6 +6204,20 @@ public class MainActivity extends Activity {
         if (retryPending || (campaignFromDeath && campaignMenuVisible)) {
             return;
         }
+        final boolean confirmed;
+        try { confirmed=ProbeBridge.getConfirmedRetryMode(); }
+        catch(RuntimeException | LinkageError unavailable) {
+            Toast.makeText(this,R.string.retry_unavailable,Toast.LENGTH_LONG).show();return;
+        }
+        if(confirmed) {
+            CampaignMenuState before=null;
+            try { before=CampaignMenuState.decode(ProbeBridge.getCampaignState()); }
+            catch(RuntimeException | LinkageError unavailable) { /* No legacy substitution. */ }
+            if(!campaignConfigured || before==null || !before.current(surfaceRequestGeneration) || before.pending()) {
+                campaignDeathMessage=CAMPAIGN_SURFACE_UNAVAILABLE;renderDeathOverlay();return;
+            }
+            confirmedRetryRequestFloor=before.ackRequest;
+        }
         clearVerticalProofFeedbackSelection();
         final int checkpoint = ProbeBridge.retryEncounter();
         if (checkpoint < 0) {
@@ -6180,14 +6226,30 @@ public class MainActivity extends Activity {
         }
         stopChapterAmbience();
         ++delayedGameplayFeedbackGeneration;
-        campaignFromDeath=false;
+        campaignFromDeath=confirmed;
         campaignDeathMessage=null;
         retryPending = true;
+        confirmedRetryPending=confirmed;
+        confirmedRetryStarted=SystemClock.uptimeMillis();
+        if(confirmed) {
+            campaignDeathLoadRequest=0;campaignDeathLoadCommitted=false;
+            campaignRequest=0;campaignLoadedReady=false;
+            handler.removeCallbacks(refreshCampaignMenu);handler.post(refreshCampaignMenu);
+        }
         suspendAndResetWaterfall();
-        applyCheckpointViewPose(checkpoint);
+        if(!confirmed)applyCheckpointViewPose(checkpoint);
         clearTouchState();
         pushViewControls();
         Toast.makeText(this, R.string.retrying_encounter, Toast.LENGTH_SHORT).show();
+    }
+
+    private void failConfirmedRetry(String message) {
+        confirmedRetryPending=false;retryPending=false;
+        campaignDeathMessage=message;campaignFromDeath=true;
+        // Keep failed/unavailable recovery visibly paused; never heal/reset or
+        // close on an Alive publication which lacks its owning RT presentation.
+        setGameplayPaused(true);clearTouchState();
+        returnToDeathFromCampaign();
     }
 
     private void restartAfterDeath() {
@@ -8372,7 +8434,7 @@ public class MainActivity extends Activity {
         resumed = true;
         if(openingBenchmarkRecoveryRejected){showOpeningBenchmarkRecoveryBlocked();return;}
         if(openingBenchmarkRecovered)cancelOpeningBenchmarkRequest(); // Before resume/start can advance a frame.
-        if(campaignMenuVisible || campaignRequest!=0) {
+        if(campaignMenuVisible || campaignRequest!=0 || confirmedRetryPending) {
             handler.removeCallbacks(refreshCampaignMenu);
             handler.post(refreshCampaignMenu);
         }
@@ -8460,7 +8522,7 @@ public class MainActivity extends Activity {
         campaignAcknowledgedToken=campaignAcknowledgedGeneration=0;
         campaignRebaseAttemptToken=campaignRebaseAttemptGeneration=campaignRebaseAttemptRevision=0;
         dismissCampaignConfirmation();
-        if(campaignRequest!=0 || (campaignState!=null && campaignState.pending())) {
+        if(campaignRequest!=0 || confirmedRetryPending || (campaignState!=null && campaignState.pending())) {
             long cancellation=0;
             try { cancellation=ProbeBridge.requestCampaign(CampaignMenuState.CANCEL,0,0,surfaceRequestGeneration); }
             catch(RuntimeException | LinkageError ignored) { /* Native lifecycle also revokes stale work. */ }

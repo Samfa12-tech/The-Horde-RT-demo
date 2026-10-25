@@ -12,6 +12,7 @@
 #include <cstdint>
 
 #include "gameplay/ShowcaseGameplay.h"
+#include "gameplay/healing/HealingFlask.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/effects/FireEmitterState.h"
 #include "gameplay/animation/PlayerAnimationState.h"
@@ -158,6 +159,15 @@ struct SimulationSnapshot
     CombatInputTimingSnapshot combatInputTiming{};
     LichSnapshot lich{};
     PlayerVitalsSnapshot playerVitals{};
+    bool healingFlaskEnabled = false;
+    healing::FlaskSnapshot healingFlask{};
+    bool flaskDrinkEligible = false;
+    // Zero means unavailable; otherwise the existing earned checkpoint ID.
+    std::uint32_t flaskRestAnchor = 0;
+    std::uint64_t lastConsumedDrinkFlaskSequence = 0,lastConsumedRestSequence = 0;
+    std::uint64_t flaskCompletionTick = 0;
+    // Owner handoffs, not persisted progress or filesystem acknowledgements.
+    std::uint64_t campaignRetryRequestGeneration = 0,completedRestGeneration = 0;
 
     std::array<horde::gameplay::effects::FireEmitterState,
                horde::gameplay::effects::kFireEmitterCapacity> fireEmitters{};

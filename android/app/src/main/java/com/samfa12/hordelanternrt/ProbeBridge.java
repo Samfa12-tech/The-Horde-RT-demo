@@ -84,6 +84,8 @@ public final class ProbeBridge {
     public static native int getFinaleEndingPhase();
     public static native float getKeeperRevealTitleOpacity();
     public static native int getContextualControlState();
+    /** Owner-published: earned 1.7 recovery uses confirmed campaign state, not a legacy camera. */
+    public static native boolean getConfirmedRetryMode();
     public static native int retryEncounter();
     public static native void setSimulationPaused(boolean paused);
     public static native long setGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality);
@@ -109,7 +111,7 @@ public final class ProbeBridge {
     public static native boolean configureCampaign(String privateRoot);
     /** Admission only: actions Refresh=1, SaveManual=2, Load=3, Cancel=4, NewGame=5. */
     public static native long requestCampaign(int action, int slot, int kind, long lifecycleGeneration);
-    /** Version 1, 33 words; decoded only by CampaignMenuState. */
+    /** Version 1, 34 words (33-word legacy accepted); decoded only by CampaignMenuState. */
     public static native long[] getCampaignState();
     /** Admit the paused neutral Java input/camera rebase; owner completion is asynchronous. */
     public static native boolean acknowledgeCampaignInput(long token, long surfaceGeneration);

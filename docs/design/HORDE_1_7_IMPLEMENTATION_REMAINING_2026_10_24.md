@@ -1,8 +1,24 @@
 # Horde 1.7 implementation remaining - 24 October 2026
 
+25 October update: backed up through `2f461da4`. The
+[guard/readability/pause checkpoint](../evidence/2026-10-25-combat-readability/README.md)
+passes seven affected native checks, 458 Android unit tests (six existing skips),
+four-ABI assembly and lint. The original69 exact CI passed all six; new-head
+run40174689046 passed all six jobs. The pure flask backend and dormant codec are tested,
+not an enabled player feature. The heavier Keeper pose remains off/unadmitted.
+The phone was restored/released07:28:34UTC with no guard retest input; its offline
+preflight now passes, but Horde has no current device allocation.
+
+The following gated [flask owner/confirmed retry slice](../evidence/2026-10-25-flask-owner/README.md)
+has focused local evidence and platform adapters, but stays OFF until its
+remaining actual-path, input, upgrade and hand/prop gates pass. The
+[utility-prop capacity proposal](HORDE_1_7_FLASK_PRESENTATION_SEAM_2026_10_25.md)
+is explicit and not implemented. This is continued source progress, not a
+completed player-facing flask or proof of natural recovery.
+
 Current implementation checkpoints: forest preparation `3108cffc`, bounded shared-pair proof `3898bcee`, Android Custom ownership `9ab88eb0` and provisional output/rollback `bf181643`. The reconciled basis `09c629cf0b120fe61b9144f0d3e29cd53f3458e0` passed all six jobs in [40089409465](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40089409465). Later checkpoints have their own local evidence; new-head CI must be checked separately. This is the current implementation map; earlier dated checkpoints retain their failures and their own acceptance boundaries. It does not declare 1.7 finished or ready for release.
 
-Working folder: `C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof`, existing draft PR27 branch. The 151 parked owner files, owner saves/settings and unrelated work remain separate. Phone is away. No merge, release, deployment, spending or security changes are authorized.
+Working folder: `C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof`, existing draft PR27 branch. The 151 parked owner files, owner saves/settings and unrelated work remain separate. Device allocation is coordinated with the parent; Horde has no current lease. No merge, release, deployment, spending or security changes are authorized.
 
 ## Scope and authority
 
@@ -32,7 +48,7 @@ Sam's latest direction is to keep implementing agreed work until only actual pla
 | Tree-generator/replacement canopy | The bounded owned crown study is now explicitly approved; small-sample review precedes broader rollout. The [first editable pair](../../assets/models/world/source/forest-crown-study-r1/README.md) keeps wood/roots, topology, UVs and referenced textures exact, but leaf enlargement remains visibly sparse and is not recommended for rollout. No RT cost is established; GLB export hit an OS temporary-image write denial and was stopped. The historical deferral remains relevant to the unadmitted private Easy Tree prototype. The private Easy Tree study is unadmitted, not a production shared-BLAS implementation, and failed the original production index budget. Separate existing-master engine reuse from replacement art; neither is completed by the rejected one-pine LOD2 study. Keep LOD1 and original masters. |
 | Torch clearance/framing | The defect is real and prior runtime trials remain withdrawn. One [authored cross-chest endpoint](../evidence/2026-10-24-compact-carry-study/README.md) is now rejected: complete flame containment, square hand framing and readable native close views fail. Editable source/evidence is retained; runtime is restored. The [specific proposed tradeoff](HORDE_1_7_COMPACT_CARRY_TRADEOFF_2026_10_24.md) is a temporary offhand framing exception at extreme clearance, preserving full physical containment, or a separately approved compact-geometry study. Neither is adopted. No general solver or repeated family tuning. The reported phone black-world cause remains unknown. |
 | Chimney smoke / outdoor effects | The [shared High/Low study](../evidence/2026-10-24-chimney-smoke-gate/README.md) compiled but is rejected at unchanged shader gates: Opaque stays fully inlined yet grows29→39query sites and564,208→799,624bytes. No smoke bank loaded or candidate GPU cost established. Normal runtime/ABI/bank restored. The separate owned open-flue source passes geometry/native-control import but is not promoted; parked owner B01/v5 is untouched. Live-RT incident-light preparation is a proposed next material renderer change for review, not implemented. Required chimney smoke is still unfinished. New outdoor participating mist/shafts, fireflies and visual wind are explicitly deferred for initial1.7. Existing effects, mobile Mist OFF and saved preferences remain. |
-| Refillable upgradeable flask | [Policy implementation approved](HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md) at22:49:26UTC: two one-heart drinks, deliberate Rest, one capacity upgrade, exact death/load and empty-flask older-save migration. Not started; Sam paused development at22:49:54UTC. On resume verify every old checkpoint has an eligible safe recovery route before migration code; preserve originals/independent slots and report counterexamples. Balance/phone feel remains pending. The older one-charge/landing example was never approved. |
+| Refillable upgradeable flask | [Policy implementation approved](HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md): two one-heart drinks, deliberate Rest, one capacity upgrade, exact death/load and empty-flask older-save migration. [Pure backend and dormant codec](../evidence/2026-10-25-flask-backend/README.md) pass affected checks; normal gameplay is not enabled and rejects schema3 restore until resources are owned. Simulation actions, committed-state retry, controls, hand/prop presentation, upgrade and actual restore-to-Rest admission remain unfinished. Preserve originals/slots and left light. Balance/phone feel remains pending. The older one-charge/landing example was never approved. |
 | Conditional/future details | Debris kicking/toggle, cutout experiments and reactive vines are conditional, not hidden mandatory progression requirements. Companion combat, free jump/slide, full healing economy and playable town are outside this completion slice. |
 
 ## Preserved performance evidence and rejected work
@@ -86,7 +102,8 @@ original quotations from later documentary notes.
   needed before native integration; the original Idle/Walking assets stay active.
 - **Current owner decisions:** the owned crown sample and prioritized High/Low
   chimney smoke may proceed; new outdoor mist/shafts/fireflies/visual wind are
-  explicitly deferred. The complete flask policy is approved; code waits for the owner-requested resume. The compact-carry tradeoff above is recorded
+  explicitly deferred. The complete flask policy is approved; its tested backend
+  is partial and disabled pending the owner/input/presentation/save integration. The compact-carry tradeoff above is recorded
   separately; no new runtime pose is justified before that choice or a distinct
   demonstrated feasible endpoint. Conditional debris/vines are not substitutes
   for these required gaps.

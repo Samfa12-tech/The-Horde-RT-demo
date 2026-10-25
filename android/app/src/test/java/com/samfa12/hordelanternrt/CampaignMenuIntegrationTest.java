@@ -48,6 +48,8 @@ public final class CampaignMenuIntegrationTest {
         @Implementation protected static int getSurfaceRuntimeState(long g){return 1;}
         @Implementation protected static int getPlayerLifePhase(){return lifePhase;}
         @Implementation protected static long getPlayerVitalityState(){return vitality;}
+        static boolean confirmedRetryMode;
+        @Implementation protected static boolean getConfirmedRetryMode(){return confirmedRetryMode;}
         @Implementation protected static int retryEncounter(){retries++;return 2;}
         @Implementation protected static void requestRouteReset(){resets++;}
         @Implementation protected static boolean setDiagnosticSurfaceSuspended(long generation,boolean suspended){return true;}
@@ -95,6 +97,7 @@ public final class CampaignMenuIntegrationTest {
         Bridge.state=CampaignMenuStateTest.ready(); Bridge.state[7]=1;
         Bridge.next=Bridge.ackToken=Bridge.ackGeneration=0; Bridge.paused=false; Bridge.acceptAck=true;Bridge.ackCalls=Bridge.configurations=0;Bridge.configuredPath=null;
         Bridge.actions.clear();Bridge.order.clear();Bridge.yaw=Bridge.pitch=Bridge.x=Bridge.z=0;
+        Bridge.confirmedRetryMode=false;
         Bridge.lifePhase=Bridge.retries=Bridge.resets=0;Bridge.vitality=(3L<<32)|3;
         a=Robolectric.buildActivity(MainActivity.class).get();a.setContentView(R.layout.activity_main);
         set("preferences",a.getSharedPreferences("campaign-menu",Context.MODE_PRIVATE));
@@ -387,4 +390,80 @@ public final class CampaignMenuIntegrationTest {
         call("updateDeathRecoveryPresentation",new Class<?>[]{int.class},0);
         assertFalse(field("deathOverlayVisible").getBoolean(a));assertFalse(Bridge.paused);
     }
+    private void beginConfirmedRetry()throws Exception {
+        Bridge.confirmedRetryMode=true;
+        Bridge.state=java.util.Arrays.copyOf(Bridge.state,34);
+        Bridge.lifePhase=2;Bridge.vitality=3L<<32;
+        set("lastPlayerLifePhase",2);call("showDeathOverlay");
+        float[] controls=(float[])field("viewControls").get(a);controls[0]=.67f;controls[1]=-.11f;
+        call("retryEncounter");
+        assertEquals(1,Bridge.retries);assertTrue(field("confirmedRetryPending").getBoolean(a));
+        assertTrue(field("retryPending").getBoolean(a));assertTrue(Bridge.paused);
+        assertEquals("confirmed retry never applies the legacy checkpoint camera",.67f,controls[0],0);
+        assertEquals(-.11f,controls[1],0);
+    }
+    private void publishConfirmedRetry(int phase,int error,boolean presented)throws Exception {
+        Bridge.state[2]++;Bridge.state[3]=7;Bridge.state[4]=phase;Bridge.state[5]=error;
+        Bridge.state[8]=95;Bridge.state[9]=Float.floatToIntBits(2.5f);
+        Bridge.state[10]=Float.floatToIntBits(-.15f);Bridge.state[11]=presented?1:0;
+        Bridge.state[30]=CampaignMenuState.LOAD;Bridge.state[33]=1;
+        call("pollCampaignMenu");
+    }
+    @Test public void confirmedRetryUsesFreshOwnerLoadNeutralAckAliveAndActualPresentation()throws Exception {
+        beginConfirmedRetry();
+        Bridge.lifePhase=0;Bridge.vitality=(3L<<32)|1;
+        call("updateDeathRecoveryPresentation",new Class<?>[]{int.class},0);
+        call("pollCampaignMenu"); // Old ready publication is not this retry's completion.
+        assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(Bridge.paused);
+        publishConfirmedRetry(CampaignMenuState.REBASE,0,false);
+        assertEquals(95,Bridge.ackToken);assertEquals(31,Bridge.ackGeneration);
+        assertEquals(2.5f,Bridge.yaw,0);assertEquals(0,Bridge.x,0);assertEquals(0,Bridge.z,0);
+        publishConfirmedRetry(CampaignMenuState.PRESENTING,0,false);assertTrue(Bridge.paused);
+        publishConfirmedRetry(CampaignMenuState.SUCCESS,0,false);assertTrue(Bridge.paused);
+        // Merely publishing the exact saved hearts cannot close the pending barrier.
+        Bridge.lifePhase=2;Bridge.vitality=3L<<32;
+        publishConfirmedRetry(CampaignMenuState.SUCCESS,0,true);assertTrue(Bridge.paused);
+        Bridge.lifePhase=0;Bridge.vitality=(3L<<32)|1;call("pollCampaignMenu");
+        assertFalse(Bridge.paused);assertFalse(field("deathOverlayVisible").getBoolean(a));
+        assertFalse(field("confirmedRetryPending").getBoolean(a));
+        assertEquals(1,field("lastPlayerVitality").getInt(a));
+        assertEquals(0,Bridge.resets);assertTrue(Bridge.actions.isEmpty());
+    }
+    @Test public void confirmedRetryFailedOrUnavailableNeverResetsOrDismissesOnAlive()throws Exception {
+        beginConfirmedRetry();
+        publishConfirmedRetry(CampaignMenuState.FAILED,4,false);
+        assertFalse(field("retryPending").getBoolean(a));assertTrue(Bridge.paused);
+        assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("record is empty"));
+        Bridge.lifePhase=0;Bridge.vitality=(3L<<32)|1;
+        call("updateDeathRecoveryPresentation",new Class<?>[]{int.class},0);
+        assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(Bridge.paused);
+        assertEquals(1,Bridge.retries);assertEquals(0,Bridge.resets);
+    }
+    @Test public void confirmedRetryRequiresAcknowledgedNeutralRebaseEvenIfPresentedAndAlive()throws Exception {
+        beginConfirmedRetry();Bridge.acceptAck=false;Bridge.lifePhase=0;Bridge.vitality=(3L<<32)|1;
+        publishConfirmedRetry(CampaignMenuState.REBASE,0,false);assertEquals(1,Bridge.ackCalls);
+        publishConfirmedRetry(CampaignMenuState.SUCCESS,0,true);
+        assertTrue(field("confirmedRetryPending").getBoolean(a));assertTrue(Bridge.paused);
+        assertTrue(field("deathOverlayVisible").getBoolean(a));
+    }
+    @Test public void confirmedRetryHomeBeforeCommitReturnsDeathOnFreshCancellation()throws Exception {
+        beginConfirmedRetry();publishConfirmedRetry(CampaignMenuState.PREPARING,0,false);
+        Bridge.next=7;a.onPause();assertTrue(Bridge.paused);
+        assertEquals(List.of(CampaignMenuState.CANCEL),Bridge.actions);
+        set("resumed",true);Bridge.state[3]=8;Bridge.state[2]++;Bridge.state[4]=CampaignMenuState.READY;Bridge.state[5]=8;
+        call("pollCampaignMenu");
+        assertFalse(field("confirmedRetryPending").getBoolean(a));assertTrue(field("deathOverlayVisible").getBoolean(a));
+        assertTrue(Bridge.paused);assertEquals(0,Bridge.resets);
+    }
+
+    @Test public void confirmedRetryHomeBeforeOwnerActivationConsumesExactUnmarkedCancel()throws Exception {
+        beginConfirmedRetry();a.onPause();
+        assertEquals(List.of(CampaignMenuState.CANCEL),Bridge.actions);
+        Bridge.state[3]=Bridge.next;Bridge.state[2]++;Bridge.state[4]=CampaignMenuState.READY;Bridge.state[5]=8;
+        // Cancellation beat automatic activation: no confirmed word and no Load operation yet.
+        set("resumed",true);call("pollCampaignMenu");
+        assertFalse(field("confirmedRetryPending").getBoolean(a));assertFalse(field("retryPending").getBoolean(a));
+        assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(Bridge.paused);assertEquals(0,Bridge.resets);
+    }
+
 }

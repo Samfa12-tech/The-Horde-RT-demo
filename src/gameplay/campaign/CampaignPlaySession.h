@@ -20,6 +20,7 @@ struct PlayState {
     storage::Result result;
     SessionPhase phase=SessionPhase::Closed;
     bool hasLatestCheckpoint=false;
+    bool fromConfirmedRecord=false;
 };
 // Owner/render-thread facade shared by Android and Windows. No filesystem IO,
 // directory creation, platform controls, GPU readiness claims or UI policy here.
@@ -47,6 +48,9 @@ public:
     bool SaveManual(unsigned slot);
     // Target becomes active only after successful CommitLoad.
     bool Load(unsigned slot,SaveKind kind);
+    // Exact last acknowledged record for this active game/slot. Does not save
+    // live state, refill, or read another slot. Busy IO is allowed to finish first.
+    bool RetryConfirmedCheckpoint();
     bool Poll();
     std::optional<LoadPreparation> PrepareLoad();
     bool CommitLoad(const LoadPreparation&,simulation::WorldZoneToken ready,
@@ -55,6 +59,7 @@ public:
     void Cancel();
 private:
     struct PendingAuto {Checkpoint checkpoint;std::uint64_t revision;unsigned slot;};
+    struct RetryRecord {ConfirmedCampaignRecord confirmed;unsigned slot;SaveKind kind;};
     bool Busy() const;
     bool Select(unsigned slot);
     void SuspendCatalogue();
@@ -74,6 +79,9 @@ private:
     std::uint64_t observedBoundaryRevision_=0;
     std::uint64_t consumedCompletionRevision_=0;
     std::optional<PendingAuto> pendingAuto_;
+    std::optional<RetryRecord> retryRecord_;
+    bool pendingRetry_=false;
+    std::uint64_t observedRetryGeneration_=0,observedRestGeneration_=0;
     PlayState state_;
 };
 } // namespace horde::gameplay::campaign

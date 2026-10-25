@@ -113,7 +113,8 @@ void RebaseCampaignInput(VulkanSurfaceContext& ctx)
     input.commands.clearCrouchIntent=ctx.clearCrouchIntentSequence;
     input.combatEdgeHistory={};input.dialogueCompletionLine=0;input.dialogueCompletionGeneration=0;
     input.paused=true;input.hasAuthoritativePlayerPose=false;
-    input.moveForward=input.moveStrafe=0;input.runHeld=input.crouchHeld=false;
+    input.moveForward=input.moveStrafe=0;input.runHeld=input.crouchHeld=input.guardHeld=false;
+    input.analogueMovement=false;
     input.authoritativePlayerX=input.authoritativePlayerZ=0;
     input.yawRadians=ctx.simulation.Snapshot().playerYawRadians;
     input.pitchRadians=ctx.simulation.Snapshot().playerPitchRadians;
@@ -178,6 +179,7 @@ void PumpCampaign(VulkanSurfaceContext& ctx)
             const auto command=*ctx.campaignCommand;ctx.campaignCommand.reset();
             if(command.action==CampaignMenu::Action::Cancel || command.action==CampaignMenu::Action::Close){
                 if(!ctx.campaignBarrier.HasPendingCommittedLoad()){
+                    if(ctx.simulation.Snapshot().healingFlaskEnabled)ctx.campaign->ObserveSafeBoundary();
                     ctx.campaign->Cancel();ctx.campaignPreparation.reset();
                     ctx.campaignBarrier.Cancel(ctx.campaignBarrier.State().request);
                     if(ctx.campaignPreparedScene && !DrainCampaignResources(ctx)){fail("GPU retirement failed; game remains paused.");return;}
@@ -192,6 +194,7 @@ void PumpCampaign(VulkanSurfaceContext& ctx)
                     ShowPauseMenu(ctx,false);
                 }
             } else if(!ctx.campaignBarrier.HasPendingCommittedLoad()) {
+                ctx.campaignConfirmedRetry=false;
                 if(command.action==CampaignMenu::Action::Refresh){ctx.campaign->RefreshCatalogue();ctx.campaignUncertaintyRecheck=ctx.campaign->State().operationRevision;ctx.campaignPhase=CampaignMenu::Phase::Ready;}
                 else if(command.action==CampaignMenu::Action::SaveManual){
                     if(ctx.campaign->SaveManual(command.slot)){ctx.campaignPhase=CampaignMenu::Phase::Saving;ctx.campaignMessage.clear();}
@@ -213,7 +216,28 @@ void PumpCampaign(VulkanSurfaceContext& ctx)
                 }
             }
         }
+        // RetryEncounter publishes its shared request while the death overlay is
+        // paused. Observe it without pretending a new manual Load was requested.
+        if(ctx.campaignPause && ctx.deathOverlayVisible && !ctx.campaignConfirmedRetry)
+            ctx.campaign->ObserveSafeBoundary();
         ctx.campaign->Poll();
+        const auto retryState=ctx.campaign->State();
+        if(retryState.fromConfirmedRecord && retryState.operation==campaign::PlayOperation::Load &&
+           retryState.operationRevision!=ctx.campaignRetryOperationRevision) {
+            ctx.campaignRetryOperationRevision=retryState.operationRevision;
+            ctx.campaignConfirmedRetry=true;ctx.campaignNewGame=false;
+            ctx.campaignPause=true;ctx.pauseMenuVisible=true;
+            if(ctx.campaignSerial==UINT64_MAX || !ctx.campaignSurfaceGeneration ||
+               retryState.outcome!=campaign::PlayOutcome::Pending ||
+               !ctx.campaignBarrier.Begin(++ctx.campaignSerial,ctx.campaignSurfaceGeneration)) {
+                fail("Confirmed checkpoint retry could not start. Current game retained.");
+                if(ctx.campaignMenu)ctx.campaignMenu->Open(CampaignMenu::Page::Load,CampaignMenu::Origin::Death);
+            } else {
+                ctx.campaignPhase=CampaignMenu::Phase::Preparing;
+                ctx.campaignStarted=std::chrono::steady_clock::now();ctx.campaignMessage.clear();
+            }
+            ApplyOverlayState(ctx);
+        }
         if(const auto completion=ctx.campaign->TakeCompletion()){
             if(completion->outcome==campaign::PlayOutcome::Failed)fail("Storage operation failed. Recheck slots before another write.");
             else if(completion->operation!=campaign::PlayOperation::Load){ctx.campaignPhase=CampaignMenu::Phase::Succeeded;ctx.campaignMessage="Checkpoint saved.";}
@@ -258,6 +282,9 @@ void ObserveCampaignPresentation(VulkanSurfaceContext& ctx,bool presented)
         ctx.campaignPhase=CampaignMenu::Phase::Succeeded;
         ctx.campaignMessage="Loaded game presented by hardware RT. Resume when ready.";
         RefreshCampaignMenu(ctx);
-        if(ctx.campaignNewGame){ctx.campaignNewGame=false;ctx.campaignMenu->Close();ctx.campaignPause=false;ShowPauseMenu(ctx,false);}
+        const auto& player=ctx.simulation.Snapshot().playerVitals;
+        const bool retryReady=ctx.campaignConfirmedRetry &&
+            player.phase==horde::gameplay::PlayerLifePhase::Alive && player.vitality>0;
+        if(ctx.campaignNewGame || retryReady){ctx.campaignNewGame=false;ctx.campaignConfirmedRetry=false;ctx.campaignMenu->Close();ctx.campaignPause=false;ShowPauseMenu(ctx,false);}
     }
 }

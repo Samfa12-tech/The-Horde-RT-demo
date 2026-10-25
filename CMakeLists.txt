@@ -276,6 +276,9 @@ if(BUILD_TESTING)
     target_compile_definitions(horde_rt_campaign_play_session_tests PRIVATE
         HORDE_RT_PLAY_SESSION_FIXTURE_BASE="${CMAKE_CURRENT_BINARY_DIR}/Testing/horde-earned-journey-$<CONFIG>")
     add_test(NAME horde_rt_campaign_play_session_tests COMMAND horde_rt_campaign_play_session_tests --produce-earned-fixture)
+    add_test(NAME horde_rt_flask_confirmed_retry_tests
+        COMMAND horde_rt_campaign_play_session_tests --flask-confirmed-retry)
+    set_tests_properties(horde_rt_flask_confirmed_retry_tests PROPERTIES TIMEOUT 30)
     add_test(NAME horde_rt_campaign_earned_return_tests COMMAND horde_rt_campaign_play_session_tests --consume-earned-fixture)
     add_test(NAME horde_rt_campaign_earned_fixture_cleanup COMMAND horde_rt_campaign_play_session_tests --cleanup-earned-fixture)
     set_tests_properties(horde_rt_campaign_play_session_tests PROPERTIES FIXTURES_SETUP HordeEarnedEndpoint)
@@ -345,6 +348,14 @@ set(ENV{HORDE_RT_EARNED_JOURNEY_RUN} "${_horde_earned_run}")
     target_link_libraries(horde_rt_companion_locomotion_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_companion_locomotion_tests COMMAND horde_rt_companion_locomotion_tests)
     set_tests_properties(horde_rt_companion_locomotion_tests PROPERTIES TIMEOUT 10)
+    add_executable(horde_rt_flask_simulation_tests tests/FlaskSimulationTests.cpp
+        src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)
+    target_link_libraries(horde_rt_flask_simulation_tests PRIVATE horde_gameplay_simulation)
+    target_include_directories(horde_rt_flask_simulation_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+    target_compile_definitions(horde_rt_flask_simulation_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_flask_simulation_tests COMMAND horde_rt_flask_simulation_tests)
+    set_tests_properties(horde_rt_flask_simulation_tests PROPERTIES TIMEOUT 30)
     add_executable(horde_rt_campaign_checkpoint_tests tests/CampaignCheckpointTests.cpp
         src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)

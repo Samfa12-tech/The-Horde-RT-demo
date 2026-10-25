@@ -157,6 +157,7 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
     }
     if (input.paused)
     {
+        DiscardFlaskRequests();
         forestBird_.Reset();localAmbience_.Reset();
         ClearCrouchIntent();
         combatContactTrace_.Clear();
@@ -247,6 +248,10 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     IngestCommands(input);
     if (activateTimestampedEdges)
         ActivateScheduledCombatEdges();
+    const bool flaskCompeting=FlaskCompetingIntent(input);
+    if(config_.healingFlask1_7 && flaskCompeting)healingFlask_.Cancel();
+    const auto& beforeFlaskHealth=playerVitals_.Snapshot();
+    const int healthBeforeEncounter=beforeFlaskHealth.vitality*2-(beforeFlaskHealth.halfHeart?1:0);
     if (ConsumeWorldCommand())
     {
         RefreshSnapshot(input);
@@ -266,6 +271,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     const bool playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     if (input.paused || !playerAlive)
     {
+        DiscardFlaskRequests();
         ClearCrouchIntent();
         ClearQueuedDrawAttack();
         if (!playerAlive && heldItems_[1].transition.active)
@@ -391,6 +397,9 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     else if(!input.paused)
         dialogueDucking_.Step(chapterDialogue_.State().line!=dialogue::Line::None,dialogueDeltaSeconds);
     RefreshSnapshot(input);
+    // Revalidate after damage, death and newly-started dialogue. No further
+    // health/action mutation can intervene before this owner snapshot is used.
+    StepHealingFlask(input,fixedDeltaSeconds,flaskCompeting,healthBeforeEncounter);
     if(dialogueDeltaSeconds>0) {
         const auto bird=forestBird_.Step(snapshot_);
         // Preserve a centred ambient
@@ -426,6 +435,7 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     combatContactTrace_.Clear();
     ClearQueuedDrawAttack();
     combatPresentation_.Reset();
+    healingFlask_.Cancel();
     chapterDialogue_.Pause();
     chapterSkipFloor_=std::max(chapterSkipFloor_,input.commands.dialogueSkip);
     ClearScheduledCombatEdges(false);
@@ -469,6 +479,9 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     }
     latestTutorialSkipSequence_ = std::max(latestTutorialSkipSequence_, input.commands.tutorialSkip);
     latestTutorialReplaySequence_ = std::max(latestTutorialReplaySequence_, input.commands.tutorialReplay);
+    synchronize(input.commands.drinkFlask,latestDrinkFlaskSequence_,lastConsumedDrinkFlaskSequence_);
+    synchronize(input.commands.rest,latestRestSequence_,lastConsumedRestSequence_);
+    pendingDrinkFlaskCommands_=pendingRestCommands_=0;
     synchronize(input.commands.interact, latestInteractSequence_,
                 lastConsumedInteractSequence_);
     synchronize(input.commands.toggleHeldLightPose,
@@ -756,6 +769,8 @@ void GameSimulation::ResetRoute()
     if(staticDetailLease_.resourceGeneration) {
         staticDetailLease_.restoreRequested=true;deferredStaticDetailReset_=true;RefreshSnapshot(lastInput_);return;
     }
+    if(config_.healingFlask1_7){healingFlask_.ResetNewGame();flaskCompletionTick_=0;}
+    DiscardFlaskRequests();
     campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
     chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();chapterFirstExterior_=false;chapterVisibleRaise_=0;
@@ -821,7 +836,20 @@ void GameSimulation::RetryEncounter()
     if(staticDetailLease_.resourceGeneration) {
         staticDetailLease_.restoreRequested=true;deferredStaticDetailRetry_=true;RefreshSnapshot(lastInput_);return;
     }
-    if(config_.developmentRescueJourney && rescueTraversal_.Snapshot().claimCount) { RecoverRescueJourney();return; }
+    if(config_.developmentRescueJourney && rescueTraversal_.Snapshot().claimCount) {
+        if(config_.healingFlask1_7) {
+            // A logical boundary is not proof of a committed save. The shared
+            // campaign owner consumes this request and uses its confirmed record.
+            DiscardFlaskRequests();
+            if(campaignRetryRequestGeneration_!=UINT64_MAX)++campaignRetryRequestGeneration_;
+            RefreshSnapshot(lastInput_);return;
+        }
+        RecoverRescueJourney();return;
+    }
+    if(config_.healingFlask1_7){
+        auto resources=healingFlask_.Snapshot().resources;resources.charges=resources.Capacity();
+        (void)healingFlask_.Restore(resources);
+    }
     legacyCombatCheckpoint_ = false;
     ApplyCheckpoint(retryCheckpoint_, true);
 }
@@ -952,6 +980,7 @@ void GameSimulation::ImportRewardCheckpointState(
 
 void GameSimulation::ResetTiming()
 {
+    DiscardFlaskRequests();
     ClearScheduledCombatEdges(true);
     previousOwnerAdvanceSteadyNs_ = 0u;
     pendingAttackCommands_ = 0u;
@@ -1000,6 +1029,8 @@ void GameSimulation::IngestCommands(const InputSnapshot& input, const bool inges
     }
     pendingRouteResetCommands_ = SaturatingAdd(pendingRouteResetCommands_, SequenceDelta(input.commands.routeReset, latestRouteResetSequence_));
     pendingRetryCommands_ = SaturatingAdd(pendingRetryCommands_, SequenceDelta(input.commands.retry, latestRetrySequence_));
+    pendingDrinkFlaskCommands_=SaturatingAdd(pendingDrinkFlaskCommands_,SequenceDelta(input.commands.drinkFlask,latestDrinkFlaskSequence_));
+    pendingRestCommands_=SaturatingAdd(pendingRestCommands_,SequenceDelta(input.commands.rest,latestRestSequence_));
     pendingInteractCommands_ = SaturatingAdd(pendingInteractCommands_, SequenceDelta(input.commands.interact, latestInteractSequence_));
     pendingToggleHeldLightPoseCommands_ = SaturatingAdd(pendingToggleHeldLightPoseCommands_, SequenceDelta(
         input.commands.toggleHeldLightPose, latestToggleHeldLightPoseSequence_));
@@ -1020,6 +1051,8 @@ void GameSimulation::IngestCommands(const InputSnapshot& input, const bool inges
     latestDodgeSequence_ = std::max(latestDodgeSequence_, input.commands.dodge);
     latestRouteResetSequence_ = std::max(latestRouteResetSequence_, input.commands.routeReset);
     latestRetrySequence_ = std::max(latestRetrySequence_, input.commands.retry);
+    latestDrinkFlaskSequence_=std::max(latestDrinkFlaskSequence_,input.commands.drinkFlask);
+    latestRestSequence_=std::max(latestRestSequence_,input.commands.rest);
     latestInteractSequence_ = std::max(latestInteractSequence_, input.commands.interact);
     latestToggleHeldLightPoseSequence_ = std::max(
         latestToggleHeldLightPoseSequence_, input.commands.toggleHeldLightPose);
@@ -1453,6 +1486,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         return false;
     }
 
+    DiscardFlaskRequests();
     CancelCampaignRestore();
     ClearCampaignBoundary();
     // An accepted explicit checkpoint replaces the loaded session's pose.
@@ -2765,6 +2799,114 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
     return events_.Push(event) ? sequence : 0u;
 }
 
+void GameSimulation::DiscardFlaskRequests()
+{
+    healingFlask_.Cancel();
+    lastConsumedDrinkFlaskSequence_=std::max(lastConsumedDrinkFlaskSequence_,latestDrinkFlaskSequence_);
+    lastConsumedRestSequence_=std::max(lastConsumedRestSequence_,latestRestSequence_);
+    pendingDrinkFlaskCommands_=pendingRestCommands_=0;
+    snapshot_.healingFlask=healingFlask_.Snapshot();
+    snapshot_.lastConsumedDrinkFlaskSequence=lastConsumedDrinkFlaskSequence_;
+    snapshot_.lastConsumedRestSequence=lastConsumedRestSequence_;
+    snapshot_.flaskDrinkEligible=false;snapshot_.flaskRestAnchor=0;
+}
+
+bool GameSimulation::FlaskCompetingIntent(const InputSnapshot& input) const
+{
+    return input.paused || std::abs(input.moveForward)>.0001f || std::abs(input.moveStrafe)>.0001f ||
+        input.guardHeld || pendingAttackCommands_ || pendingParryCommands_ || pendingDodgeCommands_ ||
+        pendingInteractCommands_ || pendingToggleHeldLightPoseCommands_ ||
+        pendingRouteResetCommands_ || pendingRetryCommands_;
+}
+
+std::optional<campaign::CheckpointId> GameSimulation::EligibleFlaskRestAnchor() const
+{
+    if(!config_.healingFlask1_7 || !config_.developmentRescueJourney || !chapterTerrain_)return std::nullopt;
+    const auto endpoint=kWorldRoutePoints.back();
+    const auto id=!rescueTraversal_.Snapshot().exteriorSide?campaign::CheckpointId::LowerClaimed:
+        (std::hypot(playerX_-traversal::kExteriorLanding.x,playerZ_-traversal::kExteriorLanding.z)<=1.f?
+         campaign::CheckpointId::SafeExit:campaign::CheckpointId::ForestEndpoint);
+    const auto x=id==campaign::CheckpointId::LowerClaimed?traversal::kLowerLanding.x:
+        id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.x:endpoint.x;
+    const auto z=id==campaign::CheckpointId::LowerClaimed?traversal::kLowerLanding.z:
+        id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.z:endpoint.z;
+    if(std::hypot(playerX_-x,playerZ_-z)>1.f)return std::nullopt;
+    // Reuse the earned boundary's actual terrain/story/contact predicates;
+    // only our own transient recovery action is excluded from serialization.
+    const auto earned=BuildCampaignCheckpoint(id,true,true);
+    if(!earned)return std::nullopt;
+    const double dy=double(playerSupport_.worldY)-earned->position.y;
+    if(std::hypot(std::hypot(double(playerX_)-x,double(playerZ_)-z),dy)>1.0)return std::nullopt;
+    return id;
+}
+
+healing::FlaskContext GameSimulation::FlaskContextFor(const InputSnapshot& input,
+                                                    bool cancel,bool acceptedDamage) const
+{
+    const auto& health=playerVitals_.Snapshot();
+    const bool ready=!config_.developmentWorldRoute && !config_.developmentRescueJourney && !config_.authoredChapterTerrain?
+        true:chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation &&
+             worldRoute_.readiness[static_cast<std::size_t>(worldRoute_.current)]==ZoneReadiness::Ready;
+    const bool available=config_.healingFlask1_7 && !input.paused && health.phase==PlayerLifePhase::Alive &&
+        ready && playerSupport_.grounded && !rescueTraversal_.IsActive() && !rescueMovementSuppressedThisTick_ &&
+        !staticDetailLease_.resourceGeneration && !pendingCampaignRestore_ &&
+        !IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase);
+    const bool stationary=std::abs(input.moveForward)<=.0001f && std::abs(input.moveStrafe)<=.0001f &&
+        playerMovementSpeed_<=.0001f && snapshot_.playerTravelledThisTick<=.0001f;
+    const bool freeHands=combatSnapshot_.player.action==PlayerCombatAction::Idle &&
+        dodgeRemainingSeconds_<=0.0f && !input.guardHeld && !heldItems_[1].transition.active;
+    const bool drink=available && stationary && freeHands;
+    const bool fight=combatSnapshot_.attackerIndex>=0 || lichEncounter_.Snapshot().phase==LichPhase::Charging;
+    return {health.vitality*2-(health.halfHeart?1:0),drink,
+        drink && !fight && completedRestGeneration_!=UINT64_MAX &&
+        chapterDialogue_.State().line==dialogue::Line::None && EligibleFlaskRestAnchor().has_value(),
+        cancel,acceptedDamage};
+}
+
+void GameSimulation::StepHealingFlask(const InputSnapshot& input,float gameplaySeconds,
+                                     bool competingIntent,int healthBeforeEncounter)
+{
+    if(!config_.healingFlask1_7 || input.paused){
+        DiscardFlaskRequests();
+        snapshot_.healingFlask=healingFlask_.Snapshot();
+        snapshot_.lastConsumedDrinkFlaskSequence=lastConsumedDrinkFlaskSequence_;
+        snapshot_.lastConsumedRestSequence=lastConsumedRestSequence_;
+        snapshot_.flaskDrinkEligible=false;snapshot_.flaskRestAnchor=0;
+        return;
+    }
+    const auto& health=playerVitals_.Snapshot();
+    const int currentHealth=health.vitality*2-(health.halfHeart?1:0);
+    const auto context=FlaskContextFor(input,competingIntent,currentHealth<healthBeforeEncounter);
+    const bool drink=pendingDrinkFlaskCommands_>0,rest=pendingRestCommands_>0;
+    lastConsumedDrinkFlaskSequence_=std::max(lastConsumedDrinkFlaskSequence_,latestDrinkFlaskSequence_);
+    lastConsumedRestSequence_=std::max(lastConsumedRestSequence_,latestRestSequence_);
+    pendingDrinkFlaskCommands_=pendingRestCommands_=0;
+    // Exactly one fresh displayed action can begin. Never reinterpret Rest.
+    if(drink!=rest) {
+        if(drink)(void)healingFlask_.BeginDrink(context);
+        else (void)healingFlask_.BeginRest(context);
+    }
+    const auto completion=healingFlask_.Step(gameplaySeconds,context);
+    if(completion.completed) {
+        if(completion.healHalfUnits>0)(void)playerVitals_.TryHealHalfUnits(completion.healHalfUnits);
+        flaskCompletionTick_=tickIndex_;
+        if(completion.action==healing::FlaskAction::Resting && completedRestGeneration_!=UINT64_MAX)
+            ++completedRestGeneration_;
+    }
+    snapshot_.healingFlask=healingFlask_.Snapshot();
+    snapshot_.playerVitals=playerVitals_.Snapshot();
+    snapshot_.lastConsumedDrinkFlaskSequence=lastConsumedDrinkFlaskSequence_;
+    snapshot_.lastConsumedRestSequence=lastConsumedRestSequence_;
+    snapshot_.flaskCompletionTick=flaskCompletionTick_;
+    snapshot_.campaignRetryRequestGeneration=campaignRetryRequestGeneration_;
+    snapshot_.completedRestGeneration=completedRestGeneration_;
+    snapshot_.flaskDrinkEligible=context.drinkEligible &&
+        snapshot_.playerVitals.vitality*2-(snapshot_.playerVitals.halfHeart?1:0)<6 &&
+        snapshot_.healingFlask.resources.charges>0;
+    const auto anchor=context.restEligible?EligibleFlaskRestAnchor():std::nullopt;
+    snapshot_.flaskRestAnchor=anchor?static_cast<std::uint32_t>(*anchor):0u;
+}
+
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
 {
     snapshot_.chapterDialogue=chapterDialogue_.State();
@@ -2816,6 +2958,11 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.acceptedDodgeSequence = acceptedDodgeSequence_;
     snapshot_.dodgeProtectedHitCount = dodgeProtectedHitCount_;
     snapshot_.combatTeaching = combatTeaching_.Snapshot();
+    const auto recovery=FlaskContextFor(input,false,false);
+    snapshot_.flaskDrinkEligible=recovery.drinkEligible && recovery.healthHalfUnits<6 &&
+        healingFlask_.Snapshot().resources.charges>0;
+    const auto rest=recovery.restEligible?EligibleFlaskRestAnchor():std::nullopt;
+    snapshot_.flaskRestAnchor=rest?static_cast<std::uint32_t>(*rest):0u;
     // Recompute from the phases just advanced on this authoritative tick, not
     // the pre-step teaching cue. Readability survives disabled/completed lessons.
     snapshot_.combatTeaching.attackReadability = EvaluateAttackReadability(
@@ -2914,6 +3061,13 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.lich.finaleEndingPhase = static_cast<FinaleEndingPhase>(
         snapshot_.finale.endingPhase);
     snapshot_.playerVitals = playerVitals_.Snapshot();
+    snapshot_.healingFlaskEnabled=config_.healingFlask1_7;
+    snapshot_.healingFlask=healingFlask_.Snapshot();
+    snapshot_.lastConsumedDrinkFlaskSequence=lastConsumedDrinkFlaskSequence_;
+    snapshot_.lastConsumedRestSequence=lastConsumedRestSequence_;
+    snapshot_.flaskCompletionTick=flaskCompletionTick_;
+    snapshot_.campaignRetryRequestGeneration=campaignRetryRequestGeneration_;
+    snapshot_.completedRestGeneration=completedRestGeneration_;
     snapshot_.fireEmitters = fireEmitters_;
     snapshot_.fireEmitterCount = fireEmitterCount_;
     snapshot_.playerMountProfile = config_.playerMountProfile;

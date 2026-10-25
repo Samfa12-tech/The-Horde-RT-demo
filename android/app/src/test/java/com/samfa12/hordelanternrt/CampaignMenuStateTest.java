@@ -73,4 +73,11 @@ public final class CampaignMenuStateTest {
         v[30]=0;v[5]=10;assertTrue(CampaignMenuState.decode(v).message().contains("uncertain"));
         assertFalse(CampaignMenuState.decode(v).message().contains("saved"));
     }
+    @Test public void confirmedRetryExtensionIsOptionalAndStrictlyBoolean() {
+        assertFalse(CampaignMenuState.decode(ready()).confirmedRetry);
+        long[] v=java.util.Arrays.copyOf(ready(),34);v[33]=1;
+        assertTrue(CampaignMenuState.decode(v).confirmedRetry);
+        v[33]=2;assertNull(CampaignMenuState.decode(v));
+    }
+
 }
