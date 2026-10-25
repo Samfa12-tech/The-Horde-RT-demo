@@ -102,6 +102,24 @@
       "bytes": 1199,
       "sha256": "13f4c56f5c4886cbb4c0683dcae92c1886556423e98682b23d158c8714f4b95d",
       "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-final-tests.log"
+    },
+    {
+      "name": "event-roster-build.log",
+      "bytes": 1775,
+      "sha256": "2b39920e38343c1c73b96d4d550f7c78c462fcc36cdc57cd6910baa3522fbe1e",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/event-roster-build.log"
+    },
+    {
+      "name": "event-roster-tests.log",
+      "bytes": 481,
+      "sha256": "d0b2f401e3112371b37f6642821ed082f99d09e825a16a7aa51d5e2fa864fc83",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/event-roster-tests.log"
+    },
+    {
+      "name": "ci-7813e709.json",
+      "bytes": 6428,
+      "sha256": "35cefedd0a22661b14ab5ddb7caa51946bf4bfd68f89f64cad1977b709c022f4",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/ci-7813e709.json"
     }
   ],
   "evidenceClass": "gated shared-simulation, pure restore, platform unit/build and actual RT validation; no natural-play, phone, listening or performance claim",
@@ -356,5 +374,28 @@
   "build": {
     "windowsExeSha256": "8c11e055a65e90cab9199dc1d536a57cd7753a8506b9b938a7359c3473c8d3eb",
     "androidSourceDifferenceAfterBuild": "Only Windows-only hidden capture and evidence/docs; Android code unchanged after recorded APK build."
+  },
+  "originalCheckpointCi": {
+    "head": "7813e709fcb1f646c96300a32b8fa54e2c5c42a9",
+    "runId": 40211424566,
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40211424566",
+    "checkedUtc": "2026-10-25T16:33:28Z",
+    "terminal": false,
+    "jobs": {
+      "Android": "success",
+      "ASan/UBSan": "success",
+      "Clang": "build failure: stale ForestFoliageAmbienceTests count36",
+      "GCC": "build failure: stale ForestFoliageAmbienceTests count36",
+      "Vulkan": "build failure: stale ForestBirdAmbienceTests count36",
+      "MSVC": "still compiling; terminal unknown"
+    },
+    "newIntegrationRestoreCompilerCases": "Not executed in the failed builds; finite sanitizer roster does not select them"
+  },
+  "eventRosterCorrection": {
+    "scope": "tests/docs only; runtime and captured artifacts unchanged",
+    "preserved": "all original event IDs0..35 and original pre-foliage spatial assertions0..34",
+    "added": "Cry ID36/count37 and explicit new cry spatial/non-ambience assertions",
+    "localTests": "2/2 pass; foliage5.38s, bird56.40s; unchanged30/120second deadlines",
+    "replacementCi": "pending after routine correction backup; exact head/run reported in pause handoff"
   }
 }

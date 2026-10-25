@@ -162,7 +162,8 @@ void GainAndTransport() {
     static_assert(static_cast<unsigned>(GameplayEventType::TombDrip)==32);
     static_assert(static_cast<unsigned>(GameplayEventType::RopeContact)==33);
     static_assert(static_cast<unsigned>(GameplayEventType::ChapterLocalAmbienceStopped)==34);
-    static_assert(static_cast<unsigned>(GameplayEventType::ForestFoliage)==35 && kGameplayEventTypeCount==36);
+    static_assert(static_cast<unsigned>(GameplayEventType::ForestFoliage)==35);
+    static_assert(static_cast<unsigned>(GameplayEventType::LichRevivalCry)==36 && kGameplayEventTypeCount==37);
     GameplayEvent event;event.type=GameplayEventType::ForestFoliage;
     event.sequence=0x12345678u;event.tickIndex=98765;
     event.worldX=Ambience::kFoliagePosition.x;event.worldZ=Ambience::kFoliagePosition.z;
@@ -198,13 +199,21 @@ void GainAndTransport() {
     const auto samePlanar=CalculateSpatialAudio(high,{event.worldX-4.f,event.worldZ,0.f,-500.f});
     Check(samePlanar.left==right.left && samePlanar.right==right.right,
           "height remains metadata; this change cannot claim a new elevation mixer");
-    for(unsigned type=0;type<kGameplayEventTypeCount;++type) {
-        if(type==35)continue;
+    // Preserve every original pre-foliage event's contract. Later appended
+    // event families have explicit routing assertions rather than inheriting
+    // the historical default merely because the total count grew.
+    for(unsigned type=0;type<static_cast<unsigned>(GameplayEventType::ForestFoliage);++type) {
         event.type=static_cast<GameplayEventType>(type);
         const auto prior=ChapterAmbienceEmitter(event);
         Check(prior.referenceDistance==1.f && prior.maximumDistance==14.f && prior.gain==event.intensity,
               "every prior semantic event retains its original spatial distances and single source intensity");
     }
+    event.type=GameplayEventType::LichRevivalCry;
+    const auto revival=ChapterAmbienceEmitter(event);
+    Check(revival.referenceDistance==horde::audio::kLichRevivalReferenceMetres &&
+          revival.maximumDistance==horde::audio::kLichRevivalMaximumMetres && revival.gain==event.intensity &&
+          !IsChapterAmbienceEvent(event.type),
+          "new cry uses its explicit spatial preset without joining or restarting finite forest ambience");
     event.type=GameplayEventType::ForestFoliage;event.intensity=-1.f;
     Check(ChapterAmbienceEmitter(event).gain==0,"negative incidental intensity cannot create output");
 }

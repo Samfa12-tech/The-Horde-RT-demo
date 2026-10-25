@@ -24,7 +24,8 @@ int main() {
     static_assert(static_cast<unsigned>(GameplayEventType::ForestCrickets)==30);
     static_assert(static_cast<unsigned>(GameplayEventType::PondFrogs)==31);
     static_assert(static_cast<unsigned>(GameplayEventType::ForestFoliage)==35);
-    static_assert(kGameplayEventTypeCount==36);
+    static_assert(static_cast<unsigned>(GameplayEventType::LichRevivalCry)==36);
+    static_assert(kGameplayEventTypeCount==37);
     auto s=Exterior();Check(ForestBirdAmbience::Eligible(s),"ready grounded same-night forest admitted");
     for(unsigned mode=0;mode<9;++mode) {
         auto bad=s;

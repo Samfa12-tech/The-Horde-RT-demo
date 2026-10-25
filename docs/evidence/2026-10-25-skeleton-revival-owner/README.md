@@ -114,6 +114,18 @@ gameplay/phone acceptance. The private fixed-file diagnostic route is not that
 distribution solution. Original source redistribution and standalone audio rights
 are not bypassed by conversion or embedding.
 
+The next concrete source seam is platform admission, rather than another stand
+variation: derive the visual receipt from successful current-scene optional-clip
+loading, invalidate it before resource retirement, and combine it with verified
+cue decode/readiness before starting the one-shot sequence. In particular, Android
+SoundPool loading is asynchronous; the current Debug helper diagnoses an unready
+event and does not replay it later. No current caller proves that aggregate
+readiness or enables the bridge in normal gameplay. Audio readiness must not be
+confused with the owner's volume or require the owner to unmute. Android must
+publish such readiness coherently to the simulation owner, not mutate gameplay
+from a Java callback. The existing explicit owner receipt is the bounded seam;
+no new renderer capacity or generic animation framework is needed for that work.
+
 The [exact ring proposal](../../design/HORDE_1_7_ATTACK_RING_SEAM_2026_10_25.md#exact-pending-capacity-proposal-25-october-follow-up)
 remains pending: metadata28→29, static13→14, primitives36→37, materials32→33,
 TLAS104→105 and ordinary/shared BLAS21/23→22/24. One warning owner fits the
@@ -122,3 +134,20 @@ contract. No ring, yellow rollout, capacity or quality change is made here.
 
 No phone, foreground activation, merge, main integration, release or report
 transmission. Owner saves/settings and all 151 parked files are preserved.
+
+## Hosted contract correction and owner-requested pause
+
+The first integration head `7813e709` reached
+[CI40211424566](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40211424566).
+At16:33:28UTC Android and ASan/UBSan passed; Clang/GCC stopped at the old foliage
+count36 assertion and Vulkan stopped at the equivalent bird assertion. MSVC was
+still compiling, so no terminal result is claimed. The new integration/restore
+cases did not execute in the failed builds; the finite sanitizer roster does
+not select them. This was a compile contract failure, not a runtime test pass.
+
+The follow-up changes tests only: retain every original event ID0..35, append
+Cry36/count37, preserve all old0..34 spatial checks and explicitly check the new
+cry's preset/non-ambience routing. Both affected local tests pass (5.38s/56.40s)
+under unchanged30/120-second deadlines. No runtime, imagery or APK changed.
+Replacement exact-head CI remains separate and must be checked on resume.
+Sam requested a pause to reserve usage; no further feature work starts here.
