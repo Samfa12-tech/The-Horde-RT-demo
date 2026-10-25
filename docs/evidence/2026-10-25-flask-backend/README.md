@@ -28,3 +28,25 @@ Next: integrate simulation-owned eligibility/cancellation and exact resources,
 then versioned slot persistence/migration and the approved contextual Drink/Rest
 input. Preserve rope interaction priority and left-hand light ownership. Verify
 old-save recovery at each earned safe anchor before admitting migration.
+
+## Dormant schema3 prerequisite
+
+The codec now supports an exact 148-byte payload / 168-byte file containing
+fractional health, upgrade entitlement and charges. Schemas1/2 retain their literal
+golden bytes and decode missing resources as empty, unupgraded capacity2; no
+write-on-read or automatic fill is added. Malformed booleans, excessive charges,
+schema/length mismatch, truncation and unknown newer schemas reject without
+mutating the caller's value or encoded output.
+
+**Runtime admission remains blocked:** Begin/Commit restore explicitly reject
+schema3 until the simulation owns and restores flask resources. Normal capture
+still emits schema1/2. A focused test proves rejection preserves a pre-existing
+valid pending restore and the live session, preventing silent resource loss.
+This is not an implemented migration or player-facing flask feature.
+
+The seven affected native CTests passed, including codec and actual-terrain
+campaign restore. The campaign fixture took30.50s under its existing deadline;
+no timeout or storage publication behavior changed. Local storage execution
+remains blocked by the previously retained FileRenameInfoEx access denial and
+was not retried. The next step is simulation-owned actions/resources, then
+removal of this temporary schema3 guard only when exact restoration is covered.

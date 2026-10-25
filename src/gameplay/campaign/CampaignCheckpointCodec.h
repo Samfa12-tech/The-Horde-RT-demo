@@ -14,7 +14,10 @@ enum class Error {
 // Format 1: 8-byte magic "HRDCPKT\0", then LE u32 format version,
 // payload byte count and IEEE CRC32 of the payload (20-byte envelope).
 // Schema1 keeps its exact 142-byte payload. Schema2 appends one canonical bool
-// halfHeart (143 bytes); legacy decode supplies false without rewriting originals.
+// halfHeart (143 bytes). Schema3 retains that half-heart byte and appends one
+// canonical upgraded bool and LE32 charge count (148 bytes). Schemas1/2 decode
+// an empty base-capacity flask; no health/progress mutation or write-on-read.
+// The capture owner must explicitly select3 only when it owns actual resources.
 // Schema and payload length must agree. The payload encodes logical values;
 // integers are LE32, floats IEEE754 binary32, bools a single 0/1 byte.
 // No padding, runtime identities, filesystem access or migration-on-read.

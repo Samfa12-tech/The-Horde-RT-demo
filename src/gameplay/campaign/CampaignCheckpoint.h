@@ -3,6 +3,7 @@
 #include "gameplay/dialogue/ChapterDialogue.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/traversal/RescueTraversal.h"
+#include "gameplay/healing/HealingFlask.h"
 #include <array>
 #include <cmath>
 #include <cstdint>
@@ -22,7 +23,10 @@ struct Checkpoint {
     traversal::Vec3 position = traversal::kLowerLanding;
     float yaw = -1.57079632679f, pitch = 0.0f;
     std::int32_t vitality = 3;
-    bool halfHeart = false; // schema2; schema1 retains exact whole-heart meaning.
+    bool halfHeart = false; // schema2+; schema1 retains exact whole-heart meaning.
+    // Schema3 stores exact resources. Absent legacy resources mean an empty
+    // base flask, not a new-game refill; schema1/2 bytes remain unchanged.
+    healing::FlaskResources flask{false,0};
     std::uint32_t defeatedGuards = 3;
     bool keeperDefeated = true, lanternClaimed = true, lidOpen = true;
     bool ropeReady = true, night = true, firstAscentCompleted = false;
@@ -48,7 +52,9 @@ inline bool Validate(const Checkpoint& c) {
     // retains completed forest progress at the lookout and later safe-side
     // returns, with the same logical payload. Old executables reject revision 2.
     const bool completedForest = c.contentRevision == 2;
-    if ((c.schema != 1 && c.schema != 2) || (c.schema == 1 && c.halfHeart) ||
+    if ((c.schema != 1 && c.schema != 2 && c.schema != 3) ||
+        (c.schema == 1 && c.halfHeart) || !c.flask.Valid() ||
+        (c.schema < 3 && c.flask != healing::FlaskResources{false,0}) ||
         (c.contentRevision != 1 && !completedForest) ||
         (forest && !completedForest) ||
         (c.id != CheckpointId::LowerClaimed && c.id != CheckpointId::SafeExit && !forest) ||

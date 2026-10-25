@@ -320,11 +320,15 @@ int main() {
     {
         GameSimulation sim(ProductionGameSimulationConfig());const auto good=Record();
         const auto pending=sim.BeginCampaignRestore(good);const auto before=sim.Snapshot();
+        auto future=good;future.schema=3;future.halfHeart=true;future.flask={true,2};
+        Check(cp::Validate(future),"schema3 is a valid codec value with exact flask resources");
+        Check(!sim.BeginCampaignRestore(future) && SameSession(before,sim.Snapshot()),
+            "runtime without flask ownership rejects schema3 without losing resources or mutating session");
         const auto reject=[&](const cp::Checkpoint& bad) {
             Check(!cp::Validate(bad) && !sim.BeginCampaignRestore(bad),"malformed record is rejected before preparation");
             Check(SameSession(before,sim.Snapshot()),"malformed record does not mutate live state");
         };
-        auto bad=good;bad.schema=3;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
+        auto bad=good;bad.schema=4;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
         bad=good;bad.id=static_cast<cp::CheckpointId>(9);reject(bad);
         bad=good;bad.zone=WorldZoneId::ForestApproach;reject(bad);
         for(int vitality:{0,4,-1}) {bad=good;bad.vitality=vitality;reject(bad);}

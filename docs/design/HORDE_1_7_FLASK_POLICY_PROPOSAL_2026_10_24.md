@@ -1,6 +1,6 @@
-# Approved 1.7 flask policy — implementation not started
+# Approved 1.7 flask policy - partial backend implementation
 
-Sam explicitly approved implementation of the summarized policy at 22:49:26 UTC on 24 October, replying “Yes” to the two-charge/one-heart drink, deliberate earned Rest, one waystone upgrade, exact save/death restore and empty-flask older-save migration proposal. Controls remain subject to conflict checks; balance and physical feel remain playtesting gates. Implementation has not started: his subsequent 22:49:54 UTC pause instruction takes priority. The first resume check must verify that every migrated older checkpoint has an eligible safe recovery route; preserve progress and report counterexamples before changing policy.
+Sam explicitly approved implementation of the summarized policy at 22:49:26 UTC on 24 October, replying "Yes" to the two-charge/one-heart drink, deliberate earned Rest, one waystone upgrade, exact save/death restore and empty-flask older-save migration proposal. His subsequent pause was superseded by the 25 October development resume. The pure recovery backend is implemented and tested; gameplay, presentation, inputs and migration admission remain unfinished. Controls remain subject to conflict checks; balance and physical feel remain playtesting gates. Verify that every migrated older checkpoint has an eligible safe recovery route; preserve progress and report counterexamples before changing policy.
 
 Player-facing recommendation: start with two drinks, each restoring one of your three hearts. Drinking takes a short stationary moment and can be interrupted. Deliberately rest at the existing earned safe checkpoints to recover and refill. Find one capacity upgrade beside the old treasury waystone; it adds one slot. Loading a save restores what that save actually contained.
 
@@ -25,8 +25,15 @@ both schema1and2, preserving fractional health/progress without free charges.
 Read-only restore review found no accepted-anchor counterexample; actual Rest
 predicate/restore-to-Rest tests are still required before migration admission.
 
+The current rope Interact action owns both safe landing anchors. Preserve that
+action: a contextual Drink / Rest flask utility can carry distinct semantic
+requests through H / gameplay D-pad Up / touch. A stale Rest request must reject,
+never silently become Drink. This avoids stealing rope interaction or requiring
+the player to find an artificial annulus around its endpoint. The waystone
+upgrade remains a separate eligible contextual pickup; it does not add a quest.
+
 Use one shared simulation action/resource owner, coherent command sequence consumption, ordered feedback and immutable snapshots on both platforms. Add a versioned bounded campaign payload/codec with validation, exact restore and duplicate-entitlement tests; preserve current load barriers/retirement. Do not repurpose victory, lantern, dialogue or checkpoint flags as flask ownership. Keep original save bytes and settings untouched during isolated tests.
 
 Meaningful gates: rejected/complete/interrupted use and damage ties; empty/full states; simultaneous movement/defence and stale input; death/retry versus exact load; every old checkpoint migration; independent slots and atomic-write failure; repeated upgrade/Rest and reload; native hand/light/sword continuity and touch/controller/menu ownership. Actual combat balance, thumb use, drinking audio/animation and recovery clarity still require playtesting. Approval of this document would authorize a bounded implementation, not release, new maximum health, paid assets or a wider healing economy.
 
-Current code basis: `PlayerVitals` in `src/gameplay/ShowcaseGameplay.h`, shared `GameSimulation`, `CampaignCheckpoint.h`, codec/storage and the existing three checkpoint IDs. The [recovery decision record](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md) preserves prior behavior and unapproved history. No numeric proposal in this document is an established owner preference.
+Current code basis: `PlayerVitals` in `src/gameplay/ShowcaseGameplay.h`, shared `GameSimulation`, `CampaignCheckpoint.h`, codec/storage and the existing three checkpoint IDs. The [recovery decision record](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md) preserves prior behavior and unapproved history. The values above are the approved implementation policy; their combat balance remains subject to playtesting.

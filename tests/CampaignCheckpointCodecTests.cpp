@@ -53,13 +53,13 @@ std::vector<std::byte> Encode(const cp::Checkpoint& c) {
     return bytes;
 }
 void Reject(std::span<const std::byte> bytes,codec::Error expected) {
-    auto output=Upper();output.vitality=2;output.yaw=.33f;output.swordStowed=true;
+    auto output=Upper();output.schema=3;output.flask={true,3};output.vitality=2;output.yaw=.33f;output.swordStowed=true;
     const auto original=Encode(output);codec::Error error=codec::Error::None;
     Check(!codec::Decode(bytes,output,error) && error==expected,"invalid bytes reject with the expected typed error");
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    const auto bytes=Encode(c);Check(bytes.size()==(c.schema==2?163u:162u) && bytes.size()<=codec::kMaxFileBytes,"canonical format has a fixed bounded length");
+    const auto bytes=Encode(c);Check(bytes.size()==(c.schema==3?168u:(c.schema==2?163u:162u)) && bytes.size()<=codec::kMaxFileBytes,"canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
     auto output=Upper();output.vitality=2;codec::Error error=codec::Error::Malformed;
     Check(codec::Decode(bytes,output,error) && error==codec::Error::None,"encoded checkpoint decodes successfully");
@@ -81,6 +81,69 @@ int main() {
     Check(baseline==golden && golden.size()==162,"default checkpoint exactly matches golden bytes and checksum");
     Check(ReferenceCrc(std::span<const std::byte>(golden).subspan(20))==0x01703382u,"golden payload checksum is fixed independently");
     RoundTrip(cp::Checkpoint{});
+    // Literal pre-flask schema2 pins the half-heart byte/CRC independently.
+    const auto goldenHalf=FromHex(
+        "48524443504b5400010000008f00000000eac598020000000100000001000000"
+        "00000000cdcc06c2333373bf333373c1db0fc9bf000000000100000003000000"
+        "01010101010000006666e6bf333373c1db0fc9bf0ad7a3bd000080c0333373c1"
+        "00000000000080c0333373c10000000000000000000000000000000000000000"
+        "0000000000000000000000000000000000000000000000000000000000000000"
+        "000001");
+    auto pinnedHalf=cp::Checkpoint{};pinnedHalf.schema=2;pinnedHalf.vitality=1;pinnedHalf.halfHeart=true;
+    Check(Encode(pinnedHalf)==goldenHalf && goldenHalf.size()==163,
+        "existing schema2 half-heart record keeps its exact golden bytes");
+    for(const auto& oldBytes:{golden,goldenHalf}) {
+        auto loaded=Endpoint();loaded.schema=3;loaded.flask={true,3};codec::Error error{};
+        Check(codec::Decode(oldBytes,loaded,error) && loaded.flask==horde::gameplay::healing::FlaskResources{false,0} &&
+              loaded.flask.Capacity()==2 && Encode(loaded)==oldBytes,
+              "old schema1/2 decode empty base resources without rewriting health/progress bytes");
+    }
+    for(int health:{1,2,3}) for(bool half:{false,true}) for(bool upgraded:{false,true})
+        for(unsigned charges=0;charges<=(upgraded?3u:2u);++charges)
+            for(auto c:{cp::Checkpoint{},Upper(),Endpoint()}) {
+                c.schema=3;c.vitality=health;c.halfHeart=half;c.flask={upgraded,charges};RoundTrip(c);
+                const auto bytes=Encode(c);cp::Checkpoint loaded;codec::Error error{};
+                Check(codec::Decode(bytes,loaded,error) && loaded.schema==3 &&
+                      loaded.vitality==health && loaded.halfHeart==half && loaded.flask==c.flask,
+                      "schema3 independently preserves exact resources and half health at every boundary");
+            }
+    {
+        auto c=Endpoint();c.schema=3;c.vitality=1;c.halfHeart=true;c.flask={true,3};
+        const auto bytes=Encode(c);
+        // The historical142-byte prefix is followed by halfHeart, upgraded,
+        // then a canonical LE32 charge count. No padding/timer is admitted.
+        Check(bytes.size()==168 && bytes[162]==std::byte{1} && bytes[163]==std::byte{1} &&
+              bytes[164]==std::byte{3} && bytes[165]==std::byte{0} &&
+              bytes[166]==std::byte{0} && bytes[167]==std::byte{0},
+              "schema3 extension has exact documented byte order and size");
+        for(std::size_t offset:{162u,163u}) {
+            auto bad=bytes;bad[offset]=std::byte{2};Rechecksum(bad);Reject(bad,codec::Error::Malformed);
+        }
+        for(auto invalidCount:{4u,0xffffffffu}) {
+            auto bad=bytes;Put(bad,164,invalidCount);Rechecksum(bad);Reject(bad,codec::Error::InvalidCheckpoint);
+        }
+        auto base=bytes;base[163]=std::byte{0};Rechecksum(base);Reject(base,codec::Error::InvalidCheckpoint);
+        for(std::uint32_t schema:{1u,2u}) {
+            auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
+        }
+        auto future=bytes;Put(future,20,4);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        for(std::uint32_t shortLength:{142u,143u,147u}) {
+            auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
+            Reject(bad,codec::Error::Malformed);
+        }
+        auto extra=bytes;extra.push_back(std::byte{0});Put(extra,12,149);Rechecksum(extra);
+        Reject(extra,codec::Error::Malformed);
+        for(std::size_t length=0;length<bytes.size();++length)
+            Reject(std::span<const std::byte>(bytes).first(length),codec::Error::Malformed);
+    }
+    for(std::uint32_t schema:{1u,2u}) for(bool upgraded:{false,true}) {
+        auto invalid=cp::Checkpoint{};invalid.schema=schema;invalid.flask={upgraded,1};
+        codec::Error error{};std::vector<std::byte> untouched{std::byte{66}};
+        Check(!codec::Encode(invalid,untouched,error) && error==codec::Error::InvalidCheckpoint &&
+              untouched==std::vector<std::byte>{std::byte{66}},
+              "legacy encode cannot silently discard nonempty or upgraded resources");
+    }
+
     for(int health:{1,2,3}) for(bool half:{false,true}) {
         for(auto c:{cp::Checkpoint{},Upper(),Endpoint()}) {
             c.schema=2;c.vitality=health;c.halfHeart=half;RoundTrip(c);
@@ -180,7 +243,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,3u,0xffffffffu}) {
+    for(std::uint32_t version:{0u,4u,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,3u,0xffffffffu}) {
@@ -225,7 +288,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=3;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=4;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     invalid=cp::Checkpoint{};invalid.contentRevision=3;invalidEncode(invalid,codec::Error::UnsupportedContent);
     invalid=cp::Checkpoint{};invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=Upper();invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
