@@ -14,7 +14,10 @@ not physical-phone, audio/balance or natural-journey acceptance.
 Exact a2bc755a hosted CI later failed the motion retry/reward gate in all three
 compilers. The [eligibility correction](../evidence/2026-10-25-practice-eligibility-fix/README.md)
 preserves practice intent through legacy capture eligibility and ordinary Retry;
-all six affected local gates pass, with replacement exact-head CI still required.
+its first replacement cleared those compiler lanes but exposed a separate frozen
+published-flag requirement in Vulkan-host. The follow-up separates private intent
+from active publication; all eight expanded local gates pass, with new exact-head
+CI still required.
 The post-retry motion fixture is practice-protected, not live balance acceptance.
 
 This update supersedes older device/guard acceptance wording below, without

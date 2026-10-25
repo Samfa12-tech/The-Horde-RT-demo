@@ -98,15 +98,21 @@ public:
     {
         const auto generation = snapshot_.generation + 1u;
         snapshot_ = {}; snapshot_.enabled = enabled; snapshot_.generation = generation;
-        ClearGuardAttack(); dodgeOnly_=false;
+        ClearGuardAttack(); dodgeOnly_=false; requestedEnabled_=enabled; exitProtection_=false;
     }
     void ResetForKeeperPractice(bool enabled) { Reset(enabled); dodgeOnly_=true; snapshot_.stage=TutorialStage::Dodge; }
     // The existing explicit Skip/Finish command requests an exit. Damage may
     // resume only at a safe attack boundary, never in a protected windup/contact.
-    void Skip() { snapshot_.exitPending = true; ClearGuardAttack(); }
+    void Skip()
+    {
+        ClearGuardAttack();
+        if (!LearningStage()) { snapshot_.stage=TutorialStage::Skipped; snapshot_.exitPending=false; exitProtection_=false; return; }
+        snapshot_.exitPending = true;
+        exitProtection_ = exitProtection_ || snapshot_.enabled || requestedEnabled_;
+    }
     // Validated earned records are already past this encounter. Do not invent
     // learned flags or show practice protection while their first frame is paused.
-    void RestoreEnded() { snapshot_.stage=TutorialStage::Skipped; snapshot_.exitPending=false; CancelTransient(); }
+    void RestoreEnded() { snapshot_.stage=TutorialStage::Skipped; snapshot_.exitPending=false; exitProtection_=false; CancelTransient(); }
     void BlockSucceeded() { if (Learning()) { snapshot_.blockLearned=true; SelectStage(); } }
     void ParrySucceeded() { if (Learning()) { snapshot_.parryLearned=true; SelectStage(); } }
     void DodgeSucceeded() { if (Learning()) { snapshot_.dodgeLearned=true; SelectStage(); } }
@@ -147,15 +153,17 @@ public:
     {
         // A legacy/frozen rule profile is eligibility, not a user exit. Keep
         // learned progress, requested preference and explicit pending Skip.
-        if (!rulesActive) { CancelTransient(); return; }
+        if (!rulesActive) { snapshot_.enabled=false; CancelTransient(); return; }
         // Turning teaching off is also a deliberate exit, committed at the same
         // safe boundary. Keep the protection label until that acknowledgement.
-        if (!enabled && snapshot_.enabled && Learning()) snapshot_.exitPending = true;
-        snapshot_.enabled = enabled || (snapshot_.exitPending && snapshot_.enabled);
+        if (!enabled && requestedEnabled_ && LearningStage())
+        { snapshot_.exitPending = true; exitProtection_=true; }
+        requestedEnabled_=enabled;
+        snapshot_.enabled = enabled || (snapshot_.exitPending && exitProtection_);
         if (snapshot_.exitPending && !suspended && SafeExit(combat, keeper, selectedEnemy))
         {
             snapshot_.stage = snapshot_.stage == TutorialStage::Ready ? TutorialStage::Complete : TutorialStage::Skipped;
-            snapshot_.exitPending = false;
+            snapshot_.exitPending = false; exitProtection_=false;
             snapshot_.enabled = enabled;
         }
         snapshot_.attackReadability = EvaluateAttackReadability(combat, keeper, selectedEnemy, !suspended);
@@ -237,10 +245,9 @@ public:
     }
     const CombatTeachingSnapshot& Snapshot() const { return snapshot_; }
 private:
-    bool Learning() const
-    {
-        return snapshot_.enabled && snapshot_.stage != TutorialStage::Complete && snapshot_.stage != TutorialStage::Skipped;
-    }
+    bool LearningStage() const
+    { return snapshot_.stage != TutorialStage::Complete && snapshot_.stage != TutorialStage::Skipped; }
+    bool Learning() const { return snapshot_.enabled && LearningStage(); }
     void SelectStage()
     {
         if (dodgeOnly_) { snapshot_.stage=snapshot_.dodgeLearned ? TutorialStage::Ready : TutorialStage::Dodge; return; }
@@ -259,6 +266,9 @@ private:
               effects::KeeperShaderPresentationKind(true, keeper) == 2.0f));
     }
     void ClearGuardAttack() { guardAttackPending_=guardAttackHit_=false; guardAttackId_=0; }
+    // User intent and a protected pending exit survive inactive rule profiles;
+    // neither is the published active-teaching flag used by frozen captures.
+    bool requestedEnabled_=false, exitProtection_=false;
     bool dodgeOnly_=false; // Existing explicit Keeper practice, not story progress.
     bool guardAttackPending_=false, guardAttackHit_=false;
     std::uint64_t guardAttackId_=0;

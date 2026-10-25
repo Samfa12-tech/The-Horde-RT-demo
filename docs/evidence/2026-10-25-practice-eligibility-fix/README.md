@@ -1,5 +1,38 @@
 # Preserve practice intent across inactive rule profiles
 
+## Published flag follow-up
+
+The first correction `f9537a1d7a844b52d18264dae563c52b4e0fa107` passed five hosted
+jobs, including all three formerly failing compiler lanes, but
+[40197851693](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40197851693)
+failed Vulkan-host: rescue and authored-terrain journey variants require the
+published teaching `enabled` flag to be false in historical frozen captures.
+That snapshot flag cannot also serve as the remembered user preference.
+
+The follow-up stores requested preference and protected-exit intent privately,
+while publishing `enabled=false` and no transient teaching under inactive rules.
+Reactivation still honors the real preference, learned progress and pending safe
+exit. Actual Skip cannot be undone by an eligibility change, and a disable during
+a windup does not lose its protection if an inactive profile intervenes.
+The original frozen-capture assertion and all earlier checks remain unchanged.
+
+The expanded original CTest run passes **8/8** in 254.57 s, including rescue
+integration (10.88 s) and the authored-terrain journey (187.86 s in Debug).
+All four Android ABIs build. The completion reached the tool late; an unnecessary
+direct repeat hit its separate 180-second observation bound and is retained as
+unadmitted, without another rerun or changed gate. A CTest metadata query also
+disturbed its temporary log; acceptance uses the original completed stdout and
+zero exit, not that log. These are test-runner observations, not game frame times.
+
+Latest preserved Debug APK: 206,294,155 bytes, SHA256
+`bc6273fbd06212516c1c81c1bbbd2d861b4d695d1b0539db342169a724a91803`.
+Its 185 assets remain unchanged; it is not installed. No feature/animation,
+renderer capacity, quality, save rule or audio path is enabled by this correction.
+Replacement exact-head CI remains required.
+[Follow-up source, test and artifact receipt](published-flag-receipt.json).
+
+## Original eligibility correction and retained failure
+
 Exact `a2bc755ac99b604b8f7cb40e6f9eeac77f9d2ba7` failed
 [40195872478](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40195872478):
 GCC, Clang and MSVC each failed only `horde_rt_motion_evidence_scenario_tests`.

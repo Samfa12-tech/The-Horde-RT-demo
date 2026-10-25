@@ -1686,7 +1686,7 @@ void RulesEligibilityDoesNotChoosePracticeExit() {
     Check(sim.ApplyShowcaseCheckpoint(0),"eligibility fixture imports the existing legacy checkpoint");
     sim.StepFixed(input);
     const auto inactive=sim.Snapshot().combatTeaching;
-    Check(!sim.Snapshot().modernCombatRules && !inactive.safePractice && !inactive.exitPending &&
+    Check(!sim.Snapshot().modernCombatRules && !inactive.enabled && !inactive.safePractice && !inactive.exitPending &&
           inactive.stage==TutorialStage::Block && !inactive.blockLearned && !inactive.parryLearned,
           "inactive rules suppress practice without recording a user exit or invented skills");
     sim.RetryEncounter(); sim.StepFixed(input);
@@ -1709,7 +1709,7 @@ void RulesEligibilityDoesNotChoosePracticeExit() {
     Check(learned.ApplyShowcaseCheckpoint(0),"learned-progress fixture imports a legacy checkpoint");
     learned.StepFixed(learning);
     Check(learned.Snapshot().combatTeaching.blockLearned && learned.Snapshot().combatTeaching.stage==TutorialStage::Parry &&
-          !learned.Snapshot().combatTeaching.safePractice && !learned.Snapshot().combatTeaching.exitPending,
+          !learned.Snapshot().combatTeaching.enabled && !learned.Snapshot().combatTeaching.safePractice && !learned.Snapshot().combatTeaching.exitPending,
           "ineligible rules retain actual learned progress without choosing Skip");
     learned.RetryEncounter();learned.StepFixed(learning);
     Check(learned.Snapshot().combatTeaching.blockLearned && learned.Snapshot().combatTeaching.stage==TutorialStage::Parry &&
@@ -1718,7 +1718,7 @@ void RulesEligibilityDoesNotChoosePracticeExit() {
 
     CombatTeaching teaching;teaching.Reset(true);CombatSnapshot combat;LichSnapshot keeper;
     teaching.Skip();teaching.Update(true,false,false,combat,keeper,EnemyKind::Skeleton,false);
-    Check(teaching.Snapshot().exitPending && teaching.Snapshot().stage==TutorialStage::Block && !teaching.Snapshot().safePractice,
+    Check(teaching.Snapshot().exitPending && teaching.Snapshot().stage==TutorialStage::Block && !teaching.Snapshot().enabled && !teaching.Snapshot().safePractice,
           "an explicit pending Skip survives inactive rules without acknowledging them as safe gameplay");
     teaching.Update(true,false,false,combat,keeper,EnemyKind::Skeleton,true);
     Check(teaching.Snapshot().stage==TutorialStage::Skipped && !teaching.Snapshot().safePractice,
@@ -1727,6 +1727,22 @@ void RulesEligibilityDoesNotChoosePracticeExit() {
     teaching.Update(false,false,false,combat,keeper,EnemyKind::Skeleton,true);
     Check(teaching.Snapshot().stage==TutorialStage::Skipped && !teaching.Snapshot().safePractice,
           "a raw user disable on reactivation is not lost by changing eligibility");
+    // A pending exit must remember protection even if its public enabled flag
+    // was suppressed by an intervening inactive profile.
+    teaching.Reset(true);combat.combatants[0].action=EnemyCombatAction::AttackWindup;
+    teaching.Update(false,false,false,combat,keeper,EnemyKind::Skeleton,true);
+    Check(teaching.Snapshot().enabled && teaching.Snapshot().exitPending && teaching.Snapshot().safePractice,
+          "a real disable during a windup retains active protection until its safe boundary");
+    teaching.Update(false,false,false,combat,keeper,EnemyKind::Skeleton,false);
+    Check(!teaching.Snapshot().enabled && !teaching.Snapshot().safePractice && teaching.Snapshot().exitPending,
+          "inactive profiles publish no teaching while retaining the deliberate protected exit");
+    teaching.Update(false,false,false,combat,keeper,EnemyKind::Skeleton,true);
+    Check(teaching.Snapshot().enabled && teaching.Snapshot().safePractice && teaching.Snapshot().exitPending,
+          "reactivation restores only the pending exit protection rather than dropping it mid-windup");
+    combat.combatants[0].action=EnemyCombatAction::AttackRecovery;
+    teaching.Update(false,false,false,combat,keeper,EnemyKind::Skeleton,true);
+    Check(!teaching.Snapshot().enabled && !teaching.Snapshot().safePractice && teaching.Snapshot().stage==TutorialStage::Skipped,
+          "the remembered exit still ends at the unchanged safe recovery boundary");
 }
 int main() {
     RulesEligibilityDoesNotChoosePracticeExit();

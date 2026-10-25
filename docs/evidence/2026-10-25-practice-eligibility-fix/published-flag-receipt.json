@@ -1,0 +1,44 @@
+{
+  "baseCommit": "f9537a1d7a844b52d18264dae563c52b4e0fa107",
+  "changedSourceSha256": {
+    "src/gameplay/simulation/CombatTeaching.h": "571c9174e421398e98a609063f77334849a94189abaa4ab3defd054ed0e2ad43",
+    "tests/CombatFoundationTests.cpp": "866f6d7fd8ca1eed8730ac28242d7ba7085b51c007df7375a28a72118676c8af"
+  },
+  "failedReplacementRun": 40197851693,
+  "replacementOutcome": "Five jobs success, Vulkan-host failed74/76 on the historical frozen teaching enabled assertion in rescue and authored-terrain journey variants.",
+  "fix": "Private requested preference/protected exit latch survive inactive profiles; published enabled flag is false there. Active disable/Skip still commits only at a safe boundary.",
+  "nativeLocalGates": {
+    "passed": 8,
+    "failed": 0,
+    "seconds": 254.57,
+    "campaignCheckpoint": 19.21,
+    "combatFoundation": 7.24,
+    "combatTiming": 6.11,
+    "windowsPractice": 2.24,
+    "motionEvidence": 11.42,
+    "sharedSimulation": 9.59,
+    "rescueJourney": 10.88,
+    "authoredTerrainJourney": 187.86,
+    "source": "Completed CTest stdout published-flag-tests.log and exec exit0. Temporary LastTest.log was disturbed by a concurrent metadata query and is not used."
+  },
+  "unnecessaryRepeat": {
+    "accepted": false,
+    "observationBoundSeconds": 180,
+    "timedOut": true,
+    "retained": true,
+    "furtherRepeat": false,
+    "gateOrDeadlineChanged": false
+  },
+  "androidArtifact": {
+    "sha256": "bc6273fbd06212516c1c81c1bbbd2d861b4d695d1b0539db342169a724a91803",
+    "bytes": 206294155,
+    "runtimeAssets": 185,
+    "assetsUnchanged": true,
+    "installed": false,
+    "androidFourAbiBuild": "PASS1m44s"
+  },
+  "normalGameplay": "No new attack/warning/revival/audio enabled; no capacity, quality, save or guard animation changes.",
+  "phoneAccess": false,
+  "ownerFilesPreserved": 151,
+  "replacementHeadCi": "Required; not inferred from local passes."
+}
