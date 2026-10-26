@@ -99,7 +99,10 @@ void GameSimulation::StepRescueJourney(bool paused) {
     }
 }
 bool GameSimulation::TryRescueInteraction() {
-    if(posture_.Active())return false;
+    // A utility's temporary stow is not a traversal-owned starting parent.
+    // Interact already cancels drinking; finish that owned hand/equipment
+    // return before a fresh interaction can capture the ordinary sword state.
+    if(posture_.Active() || FlaskUtilityBusy())return false;
     const auto& s=rescueTraversal_.Snapshot();
     const Vec3 player{playerX_,playerSupport_.worldY,playerZ_};
     if(rescueTraversal_.IsActive() || !AtRopeEndpoint(playerX_,playerZ_,s.exteriorSide) ||

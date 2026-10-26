@@ -17,6 +17,7 @@
 #include "gameplay/effects/FireEmitterState.h"
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/items/UtilityHandReturn.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
@@ -170,6 +171,8 @@ struct SimulationSnapshot
     PlayerVitalsSnapshot playerVitals{};
     bool healingFlaskEnabled = false;
     healing::FlaskSnapshot healingFlask{};
+    bool flaskUtilityCandidate = false;
+    items::UtilityHandReturnSnapshot flaskHandReturn{};
     bool flaskDrinkEligible = false;
     // Zero means unavailable; otherwise the existing earned checkpoint ID.
     std::uint32_t flaskRestAnchor = 0;

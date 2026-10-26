@@ -84,3 +84,7 @@ flask release. This is a proposed path, not implemented or visually accepted.
 Do not snap every cancellation to the fixed0.60s Cancel, restart an existing
 Restore, advance equipment twice, or rearm guard/parry from the return. Actual
 join/contact/cadence, interruption/save/load/reset and RT gates remain.
+
+The subsequent [live owner checkpoint](live-owner.md) implements the bounded
+phase-aware simulation/equipment seam behind a separate default-OFF gate. It
+does not admit native scene joins or platform play.

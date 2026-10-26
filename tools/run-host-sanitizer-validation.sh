@@ -22,6 +22,8 @@ hordeTargets=(
   horde_rt_character_step_geometry_tests
   horde_rt_chapter_step_movement_tests
   horde_rt_player_animation_tests
+  horde_rt_utility_hand_return_tests
+  horde_rt_flask_simulation_tests
   horde_rt_held_item_socket_tests
   horde_rt_dielectric_math_tests
   horde_rt_music_director_tests
@@ -57,3 +59,5 @@ done
 # rejection fixtures under the original sanitizer coverage after partitioning.
 ctest --test-dir "$hordeBuild" --output-on-failure --no-tests=error \
   -R '^horde_rt_chapter_posture_rejection_tests$'
+ctest --test-dir "$hordeBuild" --output-on-failure --no-tests=error \
+  -R '^horde_rt_flask_utility_owner_tests$'

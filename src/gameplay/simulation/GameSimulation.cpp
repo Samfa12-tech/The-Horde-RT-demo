@@ -251,7 +251,10 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     if (activateTimestampedEdges)
         ActivateScheduledCombatEdges();
     const bool flaskCompeting=FlaskCompetingIntent(input);
-    if(config_.healingFlask1_7 && flaskCompeting)healingFlask_.Cancel();
+    if(config_.healingFlask1_7 && flaskCompeting) {
+        CancelFlaskUtility();
+        healingFlask_.Cancel();
+    }
     const auto& beforeFlaskHealth=playerVitals_.Snapshot();
     const int healthBeforeEncounter=beforeFlaskHealth.vitality*2-(beforeFlaskHealth.halfHeart?1:0);
     if (ConsumeWorldCommand())
@@ -281,6 +284,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
             horde::gameplay::items::InterruptHeldItemTransition(heldItems_[1], tickIndex_);
             automaticSwordDrawBlocksDefense_ = false;
         }
+        if (!playerAlive) ResetFlaskUtility();
         ClearScheduledCombatEdges(true);
         lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
         pendingAttackCommands_ = 0u;
@@ -310,7 +314,10 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         StepRescueJourney(fixedDeltaSeconds<=0);
         if (!rescueMovementSuppressedThisTick_)
             UpdateMovement(input, fixedDeltaSeconds, previousWalkCycleTime);
+        PrepareFlaskUtility(input, flaskCompeting);
+        if (FlaskUtilityBusy()) DiscardUtilityCombatCommands();
         AdvanceSwordEquipment(fixedDeltaSeconds);
+        AdvanceFlaskUtility(fixedDeltaSeconds);
         const bool torchWasTriggered = torchFailureSnapshot_.triggered;
         torchFailureSnapshot_ = torchFailure_.Update(fixedDeltaSeconds,
                                            playerX_,
@@ -374,6 +381,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
 
     if (wasAlive && playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
     {
+        ResetFlaskUtility();
         ClearRunIntent();
         ClearQueuedDrawAttack();
         if (heldItems_[1].transition.active)
@@ -437,6 +445,7 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     combatContactTrace_.Clear();
     ClearQueuedDrawAttack();
     combatPresentation_.Reset();
+    CancelFlaskUtility();
     healingFlask_.Cancel();
     chapterDialogue_.Pause();
     chapterSkipFloor_=std::max(chapterSkipFloor_,input.commands.dialogueSkip);
@@ -1751,7 +1760,7 @@ void GameSimulation::RecordSwordContactTrace()
 bool GameSimulation::SwordDefenseReady() const
 {
     const horde::gameplay::items::HeldItemState& sword = heldItems_[1];
-    return sword.id == horde::gameplay::items::HeldItemId::Sword &&
+    return !FlaskUtilityBusy() && sword.id == horde::gameplay::items::HeldItemId::Sword &&
            !sword.detached &&
            sword.parentMode == horde::gameplay::items::HeldItemParentMode::HandSocket &&
            !sword.transition.active;
@@ -1768,7 +1777,7 @@ bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
                                      const bool blocksDefenseDuringDraw)
 {
     using namespace horde::gameplay::items;
-    if (!config_.swordStartsStowed || SwordDefenseReady())
+    if (FlaskUtilityBusy() || !config_.swordStartsStowed || SwordDefenseReady())
         return false;
 
     HeldItemState& sword = heldItems_[1];
@@ -1792,6 +1801,7 @@ bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
 
 void GameSimulation::ResetSwordEquipment()
 {
+    ResetFlaskUtility();
     using namespace horde::gameplay::items;
     HeldItemState& sword = heldItems_[1];
     const std::uint64_t sequence = sword.transition.semanticEdgeSequence;
@@ -2943,13 +2953,129 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
     return events_.Push(event) ? sequence : 0u;
 }
 
+bool GameSimulation::UsesFlaskUtility() const
+{
+    return config_.healingFlask1_7 && config_.flaskUtilityCandidate;
+}
+
+bool GameSimulation::FlaskUtilityBusy() const
+{
+    return UsesFlaskUtility() && flaskHandReturn_.Snapshot().phase != items::UtilityHandPhase::Idle;
+}
+
+void GameSimulation::CancelFlaskUtility()
+{
+    if (FlaskUtilityBusy()) flaskHandReturn_.Cancel();
+}
+
+void GameSimulation::ResetFlaskUtility()
+{
+    flaskHandReturn_.Reset();
+    flaskEquipmentLease_.Reset();
+}
+
+void GameSimulation::PrepareFlaskUtility(const InputSnapshot& input, const bool competingIntent)
+{
+    if (!UsesFlaskUtility()) return;
+    auto& sword = heldItems_[1];
+    flaskEquipmentLease_.Observe(sword);
+    if (FlaskUtilityBusy())
+    {
+        if (!flaskEquipmentLease_.AllowsUtilityProgress(sword))
+        {
+            // A foreign transition is never adopted, interrupted or made ready.
+            healingFlask_.Cancel();
+            ResetFlaskUtility();
+            return;
+        }
+        if (healingFlask_.Snapshot().action != healing::FlaskAction::Drinking)
+            flaskHandReturn_.Cancel();
+        if (flaskHandReturn_.EquipmentReleaseReady() &&
+            !flaskEquipmentLease_.RequestReturn(sword, tickIndex_, true))
+        {
+            healingFlask_.Cancel();
+            ResetFlaskUtility();
+        }
+        return;
+    }
+    const bool drink = pendingDrinkFlaskCommands_ > 0;
+    const bool rest = pendingRestCommands_ > 0;
+    if (!drink || rest || competingIntent || queuedDrawAttack_ ||
+        healingFlask_.Snapshot().action != healing::FlaskAction::Idle) return;
+    const auto context = FlaskContextFor(input, false, false);
+    if (!context.drinkEligible) return;
+    // Admission is atomic. Probe the token/counter before publishing Stow; a
+    // failed medical/action admission cannot leave a partially owned sword.
+    auto proposedSword = sword;
+    auto proposedLease = flaskEquipmentLease_;
+    auto proposedHand = flaskHandReturn_;
+    if (!proposedLease.Begin(proposedSword, tickIndex_) || !proposedHand.Begin() ||
+        !healingFlask_.BeginDrink(context)) return;
+    sword = proposedSword;
+    flaskEquipmentLease_ = proposedLease;
+    flaskHandReturn_ = proposedHand;
+    lastConsumedDrinkFlaskSequence_ = std::max(lastConsumedDrinkFlaskSequence_, latestDrinkFlaskSequence_);
+    pendingDrinkFlaskCommands_ = 0;
+}
+
+void GameSimulation::AdvanceFlaskUtility(const float gameplaySeconds)
+{
+    if (!FlaskUtilityBusy()) return;
+    flaskEquipmentLease_.Observe(heldItems_[1]);
+    if (!flaskEquipmentLease_.AllowsUtilityProgress(heldItems_[1]))
+    {
+        healingFlask_.Cancel();
+        ResetFlaskUtility();
+        return;
+    }
+    // Using is synchronized only from the medical owner's post-damage result.
+    // Only a cancelled return consumes this same bounded gameplay delta here.
+    flaskHandReturn_.Step(std::min(double(gameplaySeconds), healing::HealingFlask::kMaximumStepSeconds));
+    if (flaskHandReturn_.Snapshot().cancelled &&
+        flaskHandReturn_.EquipmentReleaseReady() && flaskEquipmentLease_.ReturnedFor(heldItems_[1]))
+        ResetFlaskUtility();
+}
+
+void GameSimulation::DiscardUtilityCombatCommands()
+{
+    ClearQueuedDrawAttack();
+    parrySourceCommandSequence_ = 0;
+    lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
+    lastConsumedParrySequence_ = std::max(lastConsumedParrySequence_, latestParrySequence_);
+    pendingAttackCommands_ = pendingParryCommands_ = 0;
+    // Keep dodge scheduling and ordinary movement live. Attack/parry presses
+    // during the occupied return cannot become delayed free actions afterwards.
+    std::uint32_t retained = 0;
+    for (std::uint32_t i=0; i<scheduledCombatEdgeCount_; ++i)
+        if (scheduledCombatEdges_[i].edge.kind == CombatInputEdgeKind::Dodge)
+            scheduledCombatEdges_[retained++] = scheduledCombatEdges_[i];
+    std::fill(scheduledCombatEdges_.begin()+retained, scheduledCombatEdges_.end(), ScheduledCombatEdge{});
+    scheduledCombatEdgeCount_ = retained;
+    snapshot_.combatInputTiming.scheduledEdgeCount = retained;
+    for (unsigned i=0; i<2; ++i) {
+        overflowCombatCommandCounts_[i] = 0;
+        overflowCombatTargetTicks_[i] = 0;
+    }
+    for (std::uint32_t i=0; i<snapshot_.combatInputTiming.traceCount; ++i) {
+        const auto index=(snapshot_.combatInputTiming.nextTraceIndex+
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity)-snapshot_.combatInputTiming.traceCount+i)%
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity);
+        auto& trace=snapshot_.combatInputTiming.traces[index];
+        if (trace.kind != CombatInputEdgeKind::Dodge && trace.status == CombatInputTimingStatus::Scheduled)
+            trace.status = CombatInputTimingStatus::Discarded;
+    }
+}
+
 void GameSimulation::DiscardFlaskRequests()
 {
+    CancelFlaskUtility();
     healingFlask_.Cancel();
     lastConsumedDrinkFlaskSequence_=std::max(lastConsumedDrinkFlaskSequence_,latestDrinkFlaskSequence_);
     lastConsumedRestSequence_=std::max(lastConsumedRestSequence_,latestRestSequence_);
     pendingDrinkFlaskCommands_=pendingRestCommands_=0;
     snapshot_.healingFlask=healingFlask_.Snapshot();
+    snapshot_.flaskUtilityCandidate=UsesFlaskUtility();
+    snapshot_.flaskHandReturn=flaskHandReturn_.Snapshot();
     snapshot_.lastConsumedDrinkFlaskSequence=lastConsumedDrinkFlaskSequence_;
     snapshot_.lastConsumedRestSequence=lastConsumedRestSequence_;
     snapshot_.flaskDrinkEligible=false;snapshot_.flaskRestAnchor=0;
@@ -2997,8 +3123,12 @@ healing::FlaskContext GameSimulation::FlaskContextFor(const InputSnapshot& input
         !IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase);
     const bool stationary=std::abs(input.moveForward)<=.0001f && std::abs(input.moveStrafe)<=.0001f &&
         playerMovementSpeed_<=.0001f && snapshot_.playerTravelledThisTick<=.0001f;
+    const bool utilityBusy=FlaskUtilityBusy();
+    const bool equipmentFree=utilityBusy ? flaskEquipmentLease_.AllowsUtilityProgress(heldItems_[1]) :
+        !heldItems_[1].transition.active;
     const bool freeHands=combatSnapshot_.player.action==PlayerCombatAction::Idle &&
-        dodgeRemainingSeconds_<=0.0f && !input.guardHeld && !heldItems_[1].transition.active;
+        dodgeRemainingSeconds_<=0.0f && !input.guardHeld && !queuedDrawAttack_ && equipmentFree &&
+        (!utilityBusy || flaskHandReturn_.Snapshot().phase==items::UtilityHandPhase::Using);
     const bool drink=available && stationary && freeHands;
     const bool fight=combatSnapshot_.attackerIndex>=0 || lichEncounter_.Snapshot().phase==LichPhase::Charging;
     return {health.vitality*2-(health.halfHeart?1:0),drink,
@@ -3020,17 +3150,41 @@ void GameSimulation::StepHealingFlask(const InputSnapshot& input,float gameplayS
     }
     const auto& health=playerVitals_.Snapshot();
     const int currentHealth=health.vitality*2-(health.halfHeart?1:0);
-    const auto context=FlaskContextFor(input,competingIntent,currentHealth<healthBeforeEncounter);
+    auto context=FlaskContextFor(input,competingIntent,currentHealth<healthBeforeEncounter);
+    const auto before=healingFlask_.Snapshot();
+    auto proposedHand=flaskHandReturn_;
+    const bool utilityDrink=UsesFlaskUtility() && before.action==healing::FlaskAction::Drinking;
+    if(utilityDrink) {
+        const double next=std::min(healing::HealingFlask::kDrinkSeconds,
+            before.elapsedSeconds+std::min(double(gameplaySeconds),healing::HealingFlask::kMaximumStepSeconds));
+        const bool clockMatches=flaskHandReturn_.Snapshot().phase==items::UtilityHandPhase::Using &&
+            !flaskHandReturn_.Snapshot().cancelled &&
+            flaskHandReturn_.Snapshot().usingElapsedSeconds==before.elapsedSeconds;
+        const bool finalReady=next+1e-9<healing::HealingFlask::kDrinkSeconds ||
+            flaskEquipmentLease_.ReturnedFor(heldItems_[1]);
+        if(!clockMatches || !finalReady || !proposedHand.SynchronizeUsing(next))context.drinkEligible=false;
+    }
     const bool drink=pendingDrinkFlaskCommands_>0,rest=pendingRestCommands_>0;
     lastConsumedDrinkFlaskSequence_=std::max(lastConsumedDrinkFlaskSequence_,latestDrinkFlaskSequence_);
     lastConsumedRestSequence_=std::max(lastConsumedRestSequence_,latestRestSequence_);
     pendingDrinkFlaskCommands_=pendingRestCommands_=0;
     // Exactly one fresh displayed action can begin. Never reinterpret Rest.
     if(drink!=rest) {
-        if(drink)(void)healingFlask_.BeginDrink(context);
+        if(drink) {
+            if(!UsesFlaskUtility())(void)healingFlask_.BeginDrink(context);
+        }
         else (void)healingFlask_.BeginRest(context);
     }
     const auto completion=healingFlask_.Step(gameplaySeconds,context);
+    if(utilityDrink) {
+        if(completion.completed) {
+            flaskHandReturn_=proposedHand;
+            ResetFlaskUtility();
+        }
+        else if(healingFlask_.Snapshot().action==healing::FlaskAction::Drinking)
+            flaskHandReturn_=proposedHand;
+        else CancelFlaskUtility();
+    }
     if(completion.completed) {
         if(completion.healHalfUnits>0)(void)playerVitals_.TryHealHalfUnits(completion.healHalfUnits);
         flaskCompletionTick_=tickIndex_;
@@ -3038,13 +3192,15 @@ void GameSimulation::StepHealingFlask(const InputSnapshot& input,float gameplayS
             ++completedRestGeneration_;
     }
     snapshot_.healingFlask=healingFlask_.Snapshot();
+    snapshot_.flaskUtilityCandidate=UsesFlaskUtility();
+    snapshot_.flaskHandReturn=flaskHandReturn_.Snapshot();
     snapshot_.playerVitals=playerVitals_.Snapshot();
     snapshot_.lastConsumedDrinkFlaskSequence=lastConsumedDrinkFlaskSequence_;
     snapshot_.lastConsumedRestSequence=lastConsumedRestSequence_;
     snapshot_.flaskCompletionTick=flaskCompletionTick_;
     snapshot_.campaignRetryRequestGeneration=campaignRetryRequestGeneration_;
     snapshot_.completedRestGeneration=completedRestGeneration_;
-    snapshot_.flaskDrinkEligible=context.drinkEligible &&
+    snapshot_.flaskDrinkEligible=context.drinkEligible && !FlaskUtilityBusy() &&
         snapshot_.playerVitals.vitality*2-(snapshot_.playerVitals.halfHeart?1:0)<6 &&
         snapshot_.healingFlask.resources.charges>0;
     const auto anchor=context.restEligible?EligibleFlaskRestAnchor():std::nullopt;
@@ -3212,6 +3368,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         snapshot_.finale.endingPhase);
     snapshot_.playerVitals = playerVitals_.Snapshot();
     snapshot_.healingFlaskEnabled=config_.healingFlask1_7;
+    snapshot_.flaskUtilityCandidate=UsesFlaskUtility();
+    snapshot_.flaskHandReturn=flaskHandReturn_.Snapshot();
     snapshot_.healingFlask=healingFlask_.Snapshot();
     snapshot_.lastConsumedDrinkFlaskSequence=lastConsumedDrinkFlaskSequence_;
     snapshot_.lastConsumedRestSequence=lastConsumedRestSequence_;

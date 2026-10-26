@@ -47,7 +47,7 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     const auto& s=snapshot_;
     if (UsesSkeletonRevival() && !OpeningEncounterComplete()) return std::nullopt;
     if(config_.healingFlask1_7 && !allowFlaskAction &&
-       (healingFlask_.Snapshot().action!=healing::FlaskAction::Idle ||
+        (healingFlask_.Snapshot().action!=healing::FlaskAction::Idle || FlaskUtilityBusy() ||
         pendingDrinkFlaskCommands_ || pendingRestCommands_))return std::nullopt;
     const bool forest=id==campaign::CheckpointId::ForestEndpoint;
     const bool upper=id==campaign::CheckpointId::SafeExit || forest;
@@ -213,6 +213,8 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.campaignDestinationGeneration_=campaignDestinationGeneration_;
     next.campaignRetryRequestGeneration_=campaignRetryRequestGeneration_;
     next.completedRestGeneration_=completedRestGeneration_;
+    next.flaskHandReturn_=flaskHandReturn_;
+    next.ResetFlaskUtility(); // Drop transient pose/token; retain its generation floor.
     next.rescueTraversal_.RestoreCampaignSafeSide(upper,c.firstAscentCompleted,rescueTraversal_.Snapshot().generation);
     next.rescueOpeningSeconds_=1.0f;
     // Completed-forest returns have already passed the first-arrival lesson.

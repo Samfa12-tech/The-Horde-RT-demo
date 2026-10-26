@@ -13,6 +13,8 @@
 #include "gameplay/effects/WaterContact.h"
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/items/UtilityEquipmentLease.h"
+#include "gameplay/items/UtilityHandReturn.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
@@ -80,6 +82,8 @@ struct GameSimulationConfig
     bool companionTurnStart = false;
     // Diagnostic owner slice only. UI/hand/save admission is still separate.
     bool healingFlask1_7 = false;
+    // Explicit source/native integration trial; normal platform callers stay OFF.
+    bool flaskUtilityCandidate = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -292,6 +296,13 @@ private:
                          std::int32_t payload = 0,
                          float worldY = 0.0f);
     void DiscardFlaskRequests();
+    bool UsesFlaskUtility() const;
+    bool FlaskUtilityBusy() const;
+    void CancelFlaskUtility();
+    void ResetFlaskUtility();
+    void PrepareFlaskUtility(const InputSnapshot&, bool competingIntent);
+    void AdvanceFlaskUtility(float gameplaySeconds);
+    void DiscardUtilityCombatCommands();
     bool FlaskCompetingIntent(const InputSnapshot& input) const;
     std::optional<campaign::CheckpointId> EligibleFlaskRestAnchor() const;
     healing::FlaskContext FlaskContextFor(const InputSnapshot&, bool cancel, bool acceptedDamage) const;
@@ -357,6 +368,8 @@ private:
     horde::gameplay::interactions::LanternPendulum lanternPendulum_{};
     PlayerVitals playerVitals_{};
     healing::HealingFlask healingFlask_{};
+    items::UtilityEquipmentLease flaskEquipmentLease_{};
+    items::UtilityHandReturn flaskHandReturn_{};
     std::uint64_t flaskCompletionTick_=0;
     std::uint64_t campaignRetryRequestGeneration_=0,completedRestGeneration_=0;
     TravelFootstepCadence playerFootsteps_{};

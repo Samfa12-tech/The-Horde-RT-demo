@@ -14,7 +14,7 @@ enum class UtilityEquipmentPhase : std::uint8_t
     Invalidated,
 };
 
-// Source-stage preparation only: no production caller or asset binding yet.
+// A transient simulation-owned equipment token, independent of visual clocks.
 // The simulation remains the sole clock and advances HeldItemState once. A
 // caller starts the lease BEFORE that tick's equipment advance, observes the
 // result afterwards, and requests return only once its hand profile has actually
@@ -54,13 +54,19 @@ public:
 
     bool AllowsUtilityProgress(const HeldItemState& sword) const
     {
-        return HasLease() && Matches(sword);
+        return (HasLease() || phase_ == UtilityEquipmentPhase::Returned) && Matches(sword);
+    }
+
+    bool ReturnedFor(const HeldItemState& sword) const
+    {
+        return phase_ == UtilityEquipmentPhase::Returned && Matches(sword);
     }
 
     bool RequestReturn(HeldItemState& sword, const std::uint64_t tick,
                        const bool handProfileReleasedUtility)
     {
         Observe(sword);
+        if (ReturnedFor(sword)) return handProfileReleasedUtility;
         if (!HasLease() || !handProfileReleasedUtility)
             return false;
         if (phase_ == UtilityEquipmentPhase::Returning)
@@ -90,7 +96,7 @@ public:
 
     void Observe(const HeldItemState& sword)
     {
-        if (!HasLease())
+        if (!HasLease() && phase_ != UtilityEquipmentPhase::Returned)
             return;
         if (!Matches(sword))
             phase_ = UtilityEquipmentPhase::Invalidated;
@@ -132,7 +138,7 @@ private:
         if (sword.transition.active)
             return transitionOwned_ && sword.transition.kind == kind_ &&
                 sword.transition.startedTick == startedTick_;
-        return StableAt(sword, phase_ == UtilityEquipmentPhase::Returning
+        return StableAt(sword, phase_ == UtilityEquipmentPhase::Returning || phase_ == UtilityEquipmentPhase::Returned
             ? originalParent_ : HeldItemParentMode::BodyStow);
     }
 

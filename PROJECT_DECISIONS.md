@@ -13,8 +13,12 @@ resident is a measured resource question, not a presumed streaming requirement
 or approval to enlarge budgets.
 
 The common coordinate plan already informs r23 terrain and the current v4
-nine-mass distant shell. That is not proof of congruence with a final1.8 master:
-the master must be identified and compared before new town/terrain edits. Local
+nine-mass distant shell. The coordinated R2 sheets/register are a proposed metric
+blockout under the approved regional topology, not a final production master.
+R17 is the best identified editable assembly checkpoint, with four refined
+buildings and unfinished roofs, terrain, LOD and collision. Compare those sources
+with normal v4 and settle the remaining layout details before town/terrain edits;
+do not search for or imply an already finished1.8 master. Local
 v3/v5 shell studies are not that authority (rejected footing and isolated chimney
 outlet respectively). The full low-detail world with accurately placed major
 locations remains1.7 scope; playable town/Foundry gameplay remains later work.

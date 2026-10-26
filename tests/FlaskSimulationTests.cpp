@@ -54,8 +54,147 @@ bool Restore(GameSimulation& game,const cp::Checkpoint& c,
     Check(bool(token),"valid diagnostic restore begins");
     return token && game.CommitCampaignRestore(*token,{token->worldGeneration,c.zone},terrain,input);
 }
+
+void TestUtilityOwner(const std::shared_ptr<const TriangleSupportSurface>& terrain)
+{
+    namespace it=horde::gameplay::items;
+    auto config=Config();config.flaskUtilityCandidate=true;
+    Check(!ProductionGameSimulationConfig().flaskUtilityCandidate,"normal hand/controller trial stays OFF");
+    for(bool stowed:{false,true}) {
+        auto c=Record(cp::CheckpointId::ForestEndpoint,*terrain);
+        c.schema=3;c.flask={false,2};c.swordStowed=stowed;
+        GameSimulation game(config);Check(Restore(game,c,terrain),"utility completion uses actual earned terrain fixture");
+        auto input=Neutral(game);Tick(game,input);
+        const auto light=game.Snapshot().interaction.heldLightKind;
+        const auto parent=game.Snapshot().heldItems[1].parentMode;
+        const int health=Health(game);const auto start=game.Snapshot().tickIndex;
+        ++input.commands.drinkFlask;Tick(game,input,74);
+        Check(game.Snapshot().flaskUtilityCandidate && Health(game)==health &&
+              game.Snapshot().healingFlask.resources==c.flask &&
+              game.Snapshot().flaskHandReturn.phase==it::UtilityHandPhase::Using,
+              "live utility consumes no resource before the existing75-step completion");
+        Check(!game.CaptureCampaignCheckpoint(c.id),"active utility cannot become an earned saved transient");
+        Tick(game,input);
+        const auto& s=game.Snapshot();
+        Check(Health(game)==health+2 && s.healingFlask.resources.charges==1 &&
+              s.flaskCompletionTick==start+75 && s.flaskHandReturn.phase==it::UtilityHandPhase::Idle &&
+              s.flaskHandReturn.generation==1 && s.heldItems[1].parentMode==parent && !s.heldItems[1].transition.active,
+              "live completion and actual original equipment readiness meet tick75 without moving the deadline");
+        Check(s.interaction.heldLightKind==light,"utility never takes left-light ownership");
+        const auto generation=s.flaskHandReturn.generation;Tick(game,input,10);
+        Check(game.Snapshot().flaskHandReturn.generation==generation &&
+              game.Snapshot().healingFlask.resources.charges==1,"unchanged drink edge cannot repeat after hand return");
+        if(stowed) {
+            const auto gearSequence=game.Snapshot().heldItems[1].transition.semanticEdgeSequence;
+            ++input.commands.rest;Tick(game,input,120);
+            Check(Health(game)==6 && game.Snapshot().healingFlask.resources==c.flask &&
+                  game.Snapshot().flaskHandReturn.generation==generation &&
+                  game.Snapshot().heldItems[1].transition.semanticEdgeSequence==gearSequence,
+                  "deliberate Rest retains exact recovery policy without inventing another hand or weapon transition");
+        }
+    }
+    for(int cancelTick:{1,24,36,48,60,74}) {
+        auto c=Record(cp::CheckpointId::ForestEndpoint,*terrain);c.schema=3;c.flask={false,2};
+        GameSimulation game(config);Check(Restore(game,c,terrain),"phase cancellation restores independent actual fixture");
+        auto input=Neutral(game);Tick(game,input);const auto parent=game.Snapshot().heldItems[1].parentMode;
+        const int health=Health(game);++input.commands.drinkFlask;Tick(game,input,cancelTick);
+        const auto previous=game.Snapshot().flaskHandReturn;
+        input.moveStrafe=.2f;Tick(game,input);
+        Check(game.Snapshot().healingFlask.action==heal::FlaskAction::Idle &&
+              Health(game)==health && game.Snapshot().healingFlask.resources==c.flask,
+              "movement cancels actual healing immediately at early/lift/hold/return/completion phases");
+        Check(game.Snapshot().playerTravelledThisTick>0,"moving cancellation keeps the existing movement motor live");
+        if(previous.profileSeconds>.30 && previous.profileSeconds<.55)
+            Check(game.Snapshot().flaskHandReturn.profileSeconds<previous.profileSeconds,
+                  "live lift cancellation reverses the actual sample instead of jumping toUse.60");
+        if(game.Snapshot().flaskHandReturn.phase!=it::UtilityHandPhase::Idle)
+            Check(!game.CaptureCampaignCheckpoint(c.id),"cancelled returning equipment cannot leak into save capture");
+        input.moveStrafe=0;
+        // A late cancellation can settle on that same equipment tick. A new
+        // press afterwards is valid; only an actually occupied return rejects it.
+        if(game.Snapshot().flaskHandReturn.phase!=it::UtilityHandPhase::Idle)++input.commands.drinkFlask;
+        Tick(game,input,100);
+        const bool settled=game.Snapshot().flaskHandReturn.phase==it::UtilityHandPhase::Idle &&
+              game.Snapshot().heldItems[1].parentMode==parent && !game.Snapshot().heldItems[1].transition.active &&
+              Health(game)==health && game.Snapshot().healingFlask.resources==c.flask;
+        if(!settled)std::cerr<<"cancelTick="<<cancelTick<<" gen="<<game.Snapshot().flaskHandReturn.generation
+            <<" phase="<<int(game.Snapshot().flaskHandReturn.phase)<<" health="<<Health(game)
+            <<" charges="<<game.Snapshot().healingFlask.resources.charges<<" parent="<<int(game.Snapshot().heldItems[1].parentMode)
+            <<" transition="<<game.Snapshot().heldItems[1].transition.active<<'\n';
+        Check(settled,
+              "return settles original equipment without repeating a rejected drink or charge commit");
+    }
+    {
+        auto c=Record(cp::CheckpointId::ForestEndpoint,*terrain);c.schema=3;c.flask={false,2};
+        GameSimulation game(config);Check(Restore(game,c,terrain),"occupied-input fixture restores");
+        auto input=Neutral(game);Tick(game,input);++input.commands.drinkFlask;Tick(game,input,36);
+        input.guardHeld=true;input.commands.attack+=3;input.commands.parry+=2;Tick(game,input);
+        Check(game.Snapshot().lastConsumedAttackSequence==input.commands.attack &&
+              game.Snapshot().lastConsumedParrySequence==input.commands.parry &&
+              game.Snapshot().playerCombat.action==PlayerCombatAction::Idle,
+              "occupied return discards all attack/parry edges instead of buffering later actions");
+        Tick(game,input,100);
+        Check(game.Snapshot().playerCombat.action==PlayerCombatAction::Idle &&
+              game.Snapshot().healingFlask.resources==c.flask,
+              "held guard and stale counters grant no free attack/parry after equipment return");
+        input.guardHeld=false;Tick(game,input);++input.commands.drinkFlask;Tick(game,input,24);
+        const auto active=game.Snapshot().flaskHandReturn;
+        input.paused=true;game.AdvanceFrame(input,0);
+        const auto paused=game.Snapshot().flaskHandReturn;
+        Tick(game,input,8);
+        Check(game.Snapshot().flaskHandReturn==paused && paused.cancelled &&
+              paused.profileSeconds==active.profileSeconds && game.Snapshot().healingFlask.resources==c.flask,
+              "zero-frame pause cancels mechanics but freezes the retained hand/equipment return");
+        input.paused=false;Tick(game,input,100);
+        Check(game.Snapshot().flaskHandReturn.phase==it::UtilityHandPhase::Idle,"resume finishes owned return without restarting drink");
+        ++input.commands.drinkFlask;Tick(game,input,36);const auto floor=game.Snapshot().flaskHandReturn.generation;
+        const auto retry=game.Snapshot();const int retryHealth=Health(game);game.RetryEncounter();
+        Check(game.Snapshot().campaignRetryRequestGeneration==retry.campaignRetryRequestGeneration+1 &&
+              Health(game)==retryHealth && game.Snapshot().healingFlask.resources==retry.healingFlask.resources,
+              "Retry during utility requests only confirmed saved recovery, never a live-state refill");
+        Check(Restore(game,c,terrain),"load can atomically replace a live diagnostic utility");
+        Check(game.Snapshot().flaskHandReturn.phase==it::UtilityHandPhase::Idle &&
+              game.Snapshot().flaskHandReturn.generation>=floor && game.Snapshot().healingFlask.resources==c.flask,
+              "load drops transient pose/lease while preserving exact saved resources and generation floor");
+    }
+    {
+        auto c=Record(cp::CheckpointId::LowerClaimed,*terrain);c.schema=3;c.flask={false,2};
+        GameSimulation game(config);Check(Restore(game,c,terrain),"rope ownership fixture restores");
+        Check(game.PublishChapterTerrain({game.Snapshot().worldRoute.generation,WorldZoneId::TombExterior},terrain),
+              "rope fixture publishes actual destination terrain before testing ownership");
+        auto input=Neutral(game);Tick(game,input,65);
+        Check(game.Snapshot().rescuePrompt==tr::RescuePrompt::Climb,"actual rope endpoint is ready before the utility");
+        const auto parent=game.Snapshot().heldItems[1].parentMode;
+        ++input.commands.drinkFlask;Tick(game,input,36);
+        ++input.commands.interact;Tick(game,input);
+        Check(!game.Snapshot().rescue.equipmentStowed && game.Snapshot().flaskHandReturn.cancelled &&
+              game.Snapshot().healingFlask.resources==c.flask,
+              "rope cannot adopt an occupied utility's temporary sword stow");
+        Tick(game,input,100);
+        Check(game.Snapshot().flaskHandReturn.phase==it::UtilityHandPhase::Idle &&
+              game.Snapshot().heldItems[1].parentMode==parent && !game.Snapshot().heldItems[1].transition.active,
+              "interact cancellation settles original equipment without a delayed rope grab");
+        ++input.commands.interact;Tick(game,input);
+        Check(game.Snapshot().rescue.equipmentStowed,"a fresh interaction can start traversal after the owned return");
+    }
+    {
+        // Same real melee fixture as the backend gate; both health and pose
+        // authority remain shared simulation, never a fabricated damage pulse.
+        auto combat=config;combat.waterfallSkeletonEncounter=false;combat.swordStartsStowed=false;
+        combat.playerStartX=0;combat.playerStartZ=-3.75f;GameSimulation forecast(combat);
+        auto input=Neutral(forecast);std::vector<int> contacts;
+        for(int t=1;t<=500 && contacts.size()<3;++t){Tick(forecast,input);if(forecast.Snapshot().swordCombat.playerHitPulse)contacts.push_back(t);}
+        int target=0;if(!contacts.empty())for(int t:contacts)if(t-contacts.front()>75){target=t;break;}
+        Check(target>0,"utility damage fixture establishes a real later contact");
+        if(target){GameSimulation game(combat);input=Neutral(game);
+            for(int t=1;t<=target;++t){input.damageEnabled=t==contacts.front()||t==target;if(t==target-74)++input.commands.drinkFlask;Tick(game,input);}
+            Check(Health(game)==2 && game.Snapshot().healingFlask.resources.charges==2 &&
+                  game.Snapshot().flaskCompletionTick==0,
+                  "real accepted damage on utility completion tick wins without a heal/charge commit");}
+    }
 }
-int main() {
+}
+int main(int argc,char** argv) {
     const auto root=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(root/"asset.manifest.json",manifest,error) ||
@@ -64,6 +203,10 @@ int main() {
     }
     const auto terrain=horde::scene::PrepareChapterTerrainSurface(mesh,error);
     if(!terrain){std::cerr<<error<<'\n';return 1;}
+    if(argc==2 && std::string_view(argv[1])=="--utility") {
+        TestUtilityOwner(terrain);std::cout<<"flask utility checks="<<checks<<" failures="<<failures<<'\n';return failures?1:0;
+    }
+    if(argc!=1)return 2;
     Check(!ProductionGameSimulationConfig().healingFlask1_7,"normal gameplay does not admit the diagnostic flask");
     for(auto id:{cp::CheckpointId::LowerClaimed,cp::CheckpointId::SafeExit,cp::CheckpointId::ForestEndpoint}) {
         GameSimulation game(Config());const auto old=Record(id,*terrain);
