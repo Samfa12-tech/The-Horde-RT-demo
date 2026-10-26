@@ -1,0 +1,213 @@
+{
+  "schema": 1,
+  "status": "source-only-unadmitted",
+  "normalEnablement": false,
+  "productionBindingsChanged": false,
+  "androidPackagingChanged": false,
+  "sources": {
+    "assets/models/player/source/flask-use-tick-aligned-r2/flask-use-tick-aligned-r2.blend": "1dee0e3e9d5b2c072117d70c36b0accca7dc91d14a3981c34b0d6f442515d699",
+    "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+    "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488"
+  },
+  "outputs": [
+    {
+      "file": "export_native.py",
+      "sha256": "bf928433c7a3b39e1199cd27c896466763b2a84e7a4a88b882af009e5aebb0ce",
+      "bytes": 23969
+    },
+    {
+      "file": "flask-native-linear-candidate.blend",
+      "sha256": "28920affcbadaa622c61cc31a7908615b94fc57afaf5115ff66fcb5d7be486c4",
+      "bytes": 3024756
+    },
+    {
+      "file": "gothic-traveller-flask-candidate.runtime.glb",
+      "sha256": "56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014",
+      "bytes": 2719368
+    }
+  ],
+  "appendOnly": {
+    "role": "body",
+    "file": "reports/flask-native-binding-20261026/candidates-r2/body/gothic-traveller-flask-candidate.runtime.glb",
+    "sha256": "56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014",
+    "bytes": 2719368,
+    "sourceSha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+    "oldBinaryPrefixBytes": 2516028,
+    "oldBinaryPrefixSha256": "ce1b1a2d89314932371c60ecbee7e6a38b14a4150aa9f55c1deabaa5016d2ee6",
+    "oldAnimations": 2,
+    "newAnimations": 4,
+    "oldAccessors": 194,
+    "newAccessors": 352,
+    "oldBufferViews": 200,
+    "newBufferViews": 358
+  },
+  "staticAndOriginalIdleWalkingParity": {
+    "source": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+    "candidate": "reports/flask-native-binding-20261026/candidates-r2/body/gothic-traveller-flask-candidate.runtime.glb",
+    "sourceSha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+    "candidateSha256": "56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014",
+    "originalBinaryPrefixPreserved": true,
+    "staticJsonAndOriginalClipsPreserved": true,
+    "oldClips": [
+      "Idle",
+      "Walking"
+    ],
+    "newClips": [
+      "Idle",
+      "Walking",
+      "FlaskUse",
+      "FlaskCancel"
+    ]
+  },
+  "clips": [
+    {
+      "name": "FlaskUse",
+      "durationSeconds": 1.25,
+      "keys": 76,
+      "channels": 78,
+      "sourceOffsetSeconds": 0.0,
+      "animatedLocalJoints": [
+        "RightArm",
+        "RightForeArm",
+        "RightHand"
+      ],
+      "allOtherJointsUseExactNativeIdleValues": true,
+      "arbitraryPhaseCancelSupported": false
+    },
+    {
+      "name": "FlaskCancel",
+      "durationSeconds": 0.5666666666666667,
+      "keys": 35,
+      "channels": 78,
+      "sourceOffsetSeconds": 0.6,
+      "animatedLocalJoints": [
+        "RightArm",
+        "RightForeArm",
+        "RightHand"
+      ],
+      "allOtherJointsUseExactNativeIdleValues": true,
+      "arbitraryPhaseCancelSupported": false
+    }
+  ],
+  "sourceInterpolationCorrection": [
+    {
+      "action": "Armature_FlaskUseStudy_ONLY",
+      "quaternionKeysNegated": 44,
+      "authoredKeyPoseMatrixMaxError": 0.0,
+      "changedLocalJoints": [
+        "RightArm",
+        "RightForeArm",
+        "RightHand"
+      ],
+      "interpolation": "LINEAR component TRS with continuous quaternion hemisphere; matches native normalized shortest-path Nlerp",
+      "originalSourceWritten": false
+    },
+    {
+      "action": "Armature_FlaskCancelStudy_ONLY",
+      "quaternionKeysNegated": 33,
+      "authoredKeyPoseMatrixMaxError": 0.0,
+      "changedLocalJoints": [
+        "RightArm",
+        "RightForeArm",
+        "RightHand"
+      ],
+      "interpolation": "LINEAR component TRS with continuous quaternion hemisphere; matches native normalized shortest-path Nlerp",
+      "originalSourceWritten": false
+    }
+  ],
+  "nativeCpuChecks": {
+    "actualNativeLoader": true,
+    "records": 220,
+    "useRecords": 151,
+    "cancelRecords": 69,
+    "useDurationSeconds": 1.25,
+    "cancelDurationSeconds": 0.5666666627,
+    "keyJointPositionMaxErrorM": 4.814712611e-07,
+    "midpointJointPositionMaxErrorM": 9.990725403e-07,
+    "maximumMatrixComponentError": 8.344650269e-07,
+    "untouchedHipsLeftHandLeftGripVsOriginalIdleMaxError": 0,
+    "authoredSolvedGripVsNamedNodeMaxComponentError": 0,
+    "authoredRightAndLeftPoseWeights": [
+      0,
+      0
+    ],
+    "sharedPaletteWithUnchangedOriginalViewmodel": true,
+    "sourceReferenceParityWithinPointOneMillimetre": true,
+    "hardwareRtAcceptance": false
+  },
+  "sharedViewmodelSkinEndpointChecks": 2,
+  "originalSourceMidpointFailureM": 0.4689137638,
+  "transformConvention": {
+    "space": "+Y up/+Z forward native player model; no world placement",
+    "layout": "column-major float[16]",
+    "translationUnits": "metres",
+    "jointBasisScale": "original centimetre scale; rigidize for item attachment",
+    "nodes": {
+      "RightArm": 20,
+      "RightForeArm": 19,
+      "RightHand": 18,
+      "RightGrip": 17
+    },
+    "flaskLocalGripTranslation": [
+      0,
+      0.065,
+      0
+    ]
+  },
+  "independentFlaskRootCaveat": [
+    {
+      "clip": "FlaskUse",
+      "heldPhaseRootMountTranslationDriftAtKeysM": 7.40962320541048e-07,
+      "heldPhaseRootMountTranslationDriftIncludingMidpointsM": 0.026768589916426434
+    },
+    {
+      "clip": "FlaskCancel",
+      "heldPhaseRootMountTranslationDriftAtKeysM": 6.652370506135845e-07,
+      "heldPhaseRootMountTranslationDriftIncludingMidpointsM": 0.022181570999030058
+    }
+  ],
+  "carriedAttachment": "Use solved RightGrip * inverse(native flask Grip); do not independently play source prop-root Bezier curve",
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "errors": 0,
+    "warnings": 1,
+    "warning": "NODE_SKINNED_MESH_NON_ROOT /nodes/26, identical to original body/viewmodel"
+  },
+  "supportingEvidence": [
+    {
+      "path": "reports/flask-native-binding-20261026/candidates-r2/export-receipt.json",
+      "sha256": "42829c8e7909e8311587e26b4aa3d2160936d87477ab2a4e3641c29378a338ea"
+    },
+    {
+      "path": "reports/flask-native-binding-20261026/candidates-r2/native-cpu-rig-probe.json",
+      "sha256": "53dafc325e0afc58f97f675f1553c990c9a11cf4afd831edbc602fbd26a95284"
+    },
+    {
+      "path": "reports/flask-native-binding-20261026/candidates-r2/static-preservation.json",
+      "sha256": "bd6f7acc2e24ae99a5f19ff744d97f3f30609afeccb2d1318a9dd0ef1a9c1f11"
+    },
+    {
+      "path": "reports/flask-native-binding-20261026/candidates-r2/native-socket-curves.json",
+      "sha256": "a497ed6ecef7798ea2418061026bee55ed6664bed5e7deaf59e033625015ceff"
+    },
+    {
+      "path": "reports/flask-native-binding-20261026/interpolation-diagnosis.json",
+      "sha256": "6cd992d07a9684d076bedfd1797e508e2de3e106f3e22ab76fbf9dc444896cfd"
+    },
+    {
+      "path": "reports/flask-native-binding-20261026/candidates-r1/native-cpu-rig-probe.json",
+      "sha256": "4d1edfb4e10537928149b8baacd99bf49df10de8f4977695dcd5289892e9996d"
+    },
+    {
+      "path": "reports/flask-native-binding-20261026/export_native-r1-used.py",
+      "sha256": "5236ff166a503f9dab59ec7bf050c1813aed03f6aa748a39241f36ad37033a9e"
+    }
+  ],
+  "rights": "Existing player/viewmodel/sword provenance and user/service rights unchanged. No new third-party or paid input.",
+  "remainingGates": [
+    "Nonzero native left-light IK with this authored right arm",
+    "Native carried-flask contact and framing",
+    "Arbitrary-phase cancellation and gear ownership",
+    "Real RT/device/lifecycle/owner acceptance"
+  ]
+}

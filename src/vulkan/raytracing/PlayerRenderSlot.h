@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <initializer_list>
 #include <limits>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -201,16 +202,33 @@ bool PlayerPoseNeedsRefresh(std::uint64_t tickIndex,
                             std::uint64_t lastSkinnedTick,
                             PlayerCpuSkinCadence cadence);
 
+// Explicit diagnostic asset binding only. The caller supplies an authoritative
+// sample, never a renderer timer. Cancel is the authored .60s branch, not a
+// general cancellation transition from arbitrary Use poses.
+enum class PlayerUtilityClip : std::uint8_t { Use, Cancel };
+struct PlayerUtilitySample
+{
+    PlayerUtilityClip clip = PlayerUtilityClip::Use;
+    float seconds = 0.0f;
+    bool operator==(const PlayerUtilitySample&) const = default;
+};
+
 class PlayerRenderSlot
 {
 public:
     bool LoadAsset(const std::string& runtimeGlbPath, std::string& diagnostic);
+    // Appended FlaskUse/FlaskCancel clips are not admitted production bindings.
+    bool LoadUtilityCandidateAsset(const std::string& runtimeGlbPath, std::string& diagnostic);
     bool PreparePose(const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
                      std::uint64_t tickIndex,
                      PlayerCpuSkinCadence cadence,
                      bool& poseUpdated,
                      std::string& diagnostic,
                      RtSceneRecordObservation* observation = nullptr);
+    bool PrepareUtilityCandidatePose(
+        const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
+        PlayerUtilitySample sample, std::uint64_t tickIndex,
+        PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic);
     bool ShoulderCenter(const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
                         std::array<float, 3u>& center,
                         std::string& diagnostic) const;
@@ -267,6 +285,13 @@ public:
     }
 
 private:
+    bool LoadBoundAsset(const std::string& runtimeGlbPath, bool utilityCandidate,
+                        std::string& diagnostic);
+    bool PrepareBoundPose(
+        const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
+        std::optional<PlayerUtilitySample> utility, std::uint64_t tickIndex,
+        PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic,
+        RtSceneRecordObservation* observation);
     bool DeriveAssetGripSockets(std::string& diagnostic);
     bool BuildBootGroundingProfiles(std::string& diagnostic);
 
@@ -278,6 +303,8 @@ private:
     std::uint64_t lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
     horde::gameplay::animation::PlayerAnimationSnapshot lastPreparedAnimation_{};
     bool hasLastPreparedAnimation_ = false;
+    bool utilityCandidateReady_ = false;
+    std::optional<PlayerUtilitySample> lastUtilitySample_;
     float leftSocketErrorMetres_ = 0.0f;
     float rightSocketErrorMetres_ = 0.0f;
     horde::gameplay::items::HeldItemTransform leftHandFromGripSocket_ =

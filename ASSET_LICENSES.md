@@ -752,3 +752,20 @@ for the approved joint resource test. Source folders, recipes and validation
 receipts are not runtime package inputs. These assets and their gameplay
 presentation remain unadmitted for normal play or release until native visual,
 lifecycle and gameplay gates pass. Resource approval is not visual acceptance.
+
+## Flask native binding source candidate - 26 October 2026
+
+`assets/models/player/source/flask-native-binding-r1/` is a separate derivative
+of the owned tick-aligned source study and existing Gothic Traveller body above.
+It preserves original geometry, binds, scales and Idle/Walking, appending only
+the project-authored FlaskUse/FlaskCancel tracks. The editable Blend corrects
+right-arm quaternion interpolation while preserving authored keys. Existing
+player/gauntlet/sword attribution and user/service rights remain unchanged; no
+new third-party, provider or paid input is used and no blanket MIT/CC0 is assigned.
+
+Candidate GLB SHA256 is
+`56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014`.
+This source-folder candidate is excluded from Android/runtime packages and is
+not normal-play or release admission. Its explicit native CPU binding, exact
+receipt and remaining cancellation/RT gates are recorded in
+`docs/evidence/2026-10-26-flask-native-binding/README.md`.

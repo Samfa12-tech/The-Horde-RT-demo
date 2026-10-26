@@ -581,6 +581,18 @@ bool PlayerPoseNeedsRefresh(const std::uint64_t tickIndex,
 bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
                                  std::string& diagnostic)
 {
+    return LoadBoundAsset(runtimeGlbPath, false, diagnostic);
+}
+
+bool PlayerRenderSlot::LoadUtilityCandidateAsset(const std::string& runtimeGlbPath,
+                                                 std::string& diagnostic)
+{
+    return LoadBoundAsset(runtimeGlbPath, true, diagnostic);
+}
+
+bool PlayerRenderSlot::LoadBoundAsset(const std::string& runtimeGlbPath,
+                                     const bool utilityCandidate, std::string& diagnostic)
+{
     uniqueVertices_.clear();
     uniqueTangents_.clear();
     solvedPose_ = {};
@@ -588,6 +600,8 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
     lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
     lastPreparedAnimation_ = {};
     hasLastPreparedAnimation_ = false;
+    utilityCandidateReady_ = false;
+    lastUtilitySample_.reset();
     leftSocketErrorMetres_ = 0.0f;
     rightSocketErrorMetres_ = 0.0f;
     leftGripAgreement_ = {};
@@ -597,7 +611,11 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
     rightHandFromGripSocket_ = horde::gameplay::items::IdentityHeldItemTransform();
     stableGripBasesReady_ = false;
     bootGroundingProfilesReady_ = false;
-    if (!asset_.LoadClips(runtimeGlbPath, horde::scene::PlayerLocomotionClipSet(), diagnostic))
+    const horde::scene::SkinnedClipSet utilityBindings{{{
+        {"Idle", true, true}, {"Walking", true, true},
+        {"FlaskUse", false, true}, {"FlaskCancel", false, true}}}};
+    if (!asset_.LoadClips(runtimeGlbPath, utilityCandidate ? utilityBindings :
+                         horde::scene::PlayerLocomotionClipSet(), diagnostic))
         return false;
     std::vector<std::string_view> primitiveNames;
     primitiveNames.reserve(asset_.PrimitiveRanges().size());
@@ -608,8 +626,9 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
         asset_ = {};
         return false;
     }
-    return DeriveAssetGripSockets(diagnostic) &&
-           BuildBootGroundingProfiles(diagnostic);
+    if (!DeriveAssetGripSockets(diagnostic) || !BuildBootGroundingProfiles(diagnostic)) return false;
+    utilityCandidateReady_ = utilityCandidate;
+    return true;
 }
 
 bool PlayerRenderSlot::BuildBootGroundingProfiles(std::string& diagnostic)
@@ -791,11 +810,80 @@ bool PlayerRenderSlot::PreparePose(
     std::string& diagnostic,
     RtSceneRecordObservation* observation)
 {
+    return PrepareBoundPose(animation, std::nullopt, tickIndex, cadence,
+                            poseUpdated, diagnostic, observation);
+}
+
+bool PlayerRenderSlot::PrepareUtilityCandidatePose(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
+    const PlayerUtilitySample sample, const std::uint64_t tickIndex,
+    const PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic)
+{
+    return PrepareBoundPose(animation, sample, tickIndex, cadence,
+                            poseUpdated, diagnostic, nullptr);
+}
+
+bool PlayerRenderSlot::PrepareBoundPose(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& requestedAnimation,
+    const std::optional<PlayerUtilitySample> utility, const std::uint64_t tickIndex,
+    const PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic,
+    RtSceneRecordObservation* observation)
+{
+    // Preserve the ordinary no-copy input path. Only the explicit utility
+    // candidate needs a local right-arm target override.
+    std::optional<horde::gameplay::animation::PlayerAnimationSnapshot> utilityAnimation;
+    if (utility) utilityAnimation = requestedAnimation;
+    const auto& animation = utility ? *utilityAnimation : requestedAnimation;
     poseUpdated = false;
     if (!asset_.IsLoaded())
     {
         diagnostic = "Skinned player render slot has no loaded asset.";
         return false;
+    }
+    const auto rejectUtility = [&] {
+        solvedPose_ = {}; sockets_ = {}; hasLastPreparedAnimation_ = false;
+        lastUtilitySample_.reset(); lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
+        return false;
+    };
+    horde::scene::SkinnedClip clip = animation.locomotionClip ==
+        horde::gameplay::animation::PlayerLocomotionClip::Walk
+        ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle;
+    if (utility)
+    {
+        using namespace horde::gameplay::animation;
+        if (!utilityCandidateReady_ ||
+            (utility->clip != PlayerUtilityClip::Use && utility->clip != PlayerUtilityClip::Cancel) ||
+            !std::isfinite(utility->seconds) || utility->seconds < 0.f ||
+            animation.locomotionClip != PlayerLocomotionClip::Idle ||
+            animation.locomotionBlend != 0.f || animation.plantedPelvisDropMetres != 0.f ||
+            animation.crouchPelvisDropMetres != 0.f || animation.dodge.weight != 0.f ||
+            animation.combatLayer.action != PlayerUpperBodyAction::None ||
+            animation.combatLayer.weight != 0.f || animation.combatLayer.guardPoseWeight != 0.f ||
+            animation.reaction != horde::gameplay::CombatReaction::None)
+        {
+            diagnostic = "Utility candidate requires explicit bindings, a finite sample and unoccupied stationary pose.";
+            return rejectUtility();
+        }
+        // Slots are caller-selected semantic bindings, not a combat action.
+        clip = utility->clip == PlayerUtilityClip::Use ? horde::scene::SkinnedClip::Attack :
+                                                       horde::scene::SkinnedClip::Dead;
+        if (utility->seconds > asset_.ClipDuration(clip))
+        {
+            diagnostic = "Utility candidate sample exceeds its non-looping clip.";
+            return rejectUtility();
+        }
+        horde::scene::SkinnedNodeTransform authoredGrip{};
+        if (!asset_.NodeTransform(clip, utility->seconds, "RightGrip", authoredGrip, diagnostic))
+            return rejectUtility();
+        const auto grip = RigidPlayerBoneInModel(authoredGrip);
+        if (!horde::gameplay::items::ValidateHeldItemSocketTransform(grip, diagnostic))
+            return rejectUtility();
+        auto& right = utilityAnimation->rightIk;
+        right.target = {{grip[12], grip[13], grip[14]}};
+        right.gripX = {{grip[0], grip[1], grip[2]}};
+        right.gripY = {{grip[4], grip[5], grip[6]}};
+        right.gripZ = {{grip[8], grip[9], grip[10]}};
+        right.poseWeight = 0.f; // Preserve the authored right chain; left light IK remains active.
     }
     // Validate before cadence reuse: an invalid request cannot return a stale
     // valid palette at the same tick or within the 30 Hz interval.
@@ -809,8 +897,9 @@ bool PlayerRenderSlot::PreparePose(
     }
     const bool importedPoseAtSameTick = hasLastPreparedAnimation_ &&
         tickIndex == lastSkinnedTick_ && animation != lastPreparedAnimation_;
+    const bool utilityChanged = utility != lastUtilitySample_;
     if (!PlayerPoseNeedsRefresh(tickIndex, lastSkinnedTick_, cadence) &&
-        !importedPoseAtSameTick)
+        !importedPoseAtSameTick && !utilityChanged)
     {
         diagnostic.clear();
         return true;
@@ -821,10 +910,6 @@ bool PlayerRenderSlot::PreparePose(
         return false;
     }
 
-    const horde::scene::SkinnedClip clip =
-        animation.locomotionClip == horde::gameplay::animation::PlayerLocomotionClip::Walk
-        ? horde::scene::SkinnedClip::Walking
-        : horde::scene::SkinnedClip::Idle;
     // The renderer adapter supplies gameplay-owned grip targets transformed
     // into the player's +Z-forward model space. The rig solves to those exact
     // points; imported clips never dictate item or damage timing.
@@ -877,9 +962,10 @@ bool PlayerRenderSlot::PreparePose(
     }
     RtSceneStageScope skinScope(observation, horde::telemetry::RtStage::PlayerSkin);
     RtSceneStageScope poseScope(observation, horde::telemetry::RtStage::PlayerPose);
+    const float sampleTime = utility ? utility->seconds :
+        horde::gameplay::animation::PlayerLocomotionSampleTime(animation, asset_.ClipDuration(clip));
     if (!asset_.EvaluatePlayerPose(
-            clip, horde::gameplay::animation::PlayerLocomotionSampleTime(
-                animation, asset_.ClipDuration(clip)), left, right, solvedPose_, diagnostic,
+            clip, sampleTime, left, right, solvedPose_, diagnostic,
             animation.plantedPelvisDropMetres, animation.crouchPelvisDropMetres,
             DodgePose(animation)))
     {
@@ -903,6 +989,11 @@ bool PlayerRenderSlot::PreparePose(
     };
     leftSocketErrorMetres_ = socketError(sockets_.leftGrip, animation.leftIk);
     rightSocketErrorMetres_ = socketError(sockets_.rightGrip, animation.rightIk);
+    if (utility && rightSocketErrorMetres_ > kPlayerGripSocketToleranceMetres)
+    {
+        diagnostic = "Authored utility right Grip does not match the native solved pose.";
+        return rejectUtility();
+    }
     // The right arm stays solved while its target moves between empty carry
     // and the item Grip. Partial diagnostic IK weights still permit an
     // intentionally unsolved pose; production targets keep the strict bound.
@@ -936,6 +1027,7 @@ bool PlayerRenderSlot::PreparePose(
     }
     lastSkinnedTick_ = tickIndex;
     lastPreparedAnimation_ = animation;
+    lastUtilitySample_ = utility;
     hasLastPreparedAnimation_ = true;
     poseUpdated = true;
     diagnostic.clear();
