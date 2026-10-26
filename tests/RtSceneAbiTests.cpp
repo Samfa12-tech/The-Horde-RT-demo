@@ -213,9 +213,9 @@ void TestGeneratedConstants()
           "rectangular geometry certification has a distinct append-only material flag");
     Check(kRtInstanceMetadataCapacity == 30u,
           "joint ring28/flask29 append after unchanged metadata0..27");
-    Check(kRtTlasInstanceCapacity == 106u,
-          "storage fits 30 ordinary roles, 64 route trees and the bounded 12-tree F01 candidate");
-    Check(kRtOrdinaryShowcaseInstanceCount == 30u,
+    Check(kRtTlasInstanceCapacity == 107u,
+          "storage fits 31 ordinary physical instances, 64 route trees and the bounded 12-tree F01 candidate");
+    Check(kRtOrdinaryShowcaseInstanceCount == 31u,
           "ordinary live count is independent of diagnostic storage and metadata aliases");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");

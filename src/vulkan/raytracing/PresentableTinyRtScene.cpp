@@ -878,7 +878,7 @@ bool ApplyExistingForestInstances(std::span<VkAccelerationStructureInstanceKHR> 
     const std::array<VkDeviceAddress,2>& addresses,std::string& diagnostic)
 {
     constexpr auto first=PresentableTinyRtScene::kOrdinaryTlasInstanceCount;
-    static_assert(first==30u);
+    static_assert(first==31u);
     const std::size_t additional=f01Sector?12u:0u;
     if(!layout.prepared || layout.prepared->placements.size()!=64u ||
        layout.supplementalPlacements.size()!=additional || instances.size()<first+64u+additional ||
@@ -6079,10 +6079,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[kAttackWarningInstanceIndex].instanceCustomIndex = kAttackWarningMetadataIndex;
     instances[kAttackWarningInstanceIndex].mask = 0u;
     instances[kAttackWarningInstanceIndex].accelerationStructureReference = attackWarningRingBlas_.address;
-    instances[kHealingFlaskInstanceIndex] = instances[0];
-    instances[kHealingFlaskInstanceIndex].instanceCustomIndex = kHealingFlaskMetadataIndex;
-    instances[kHealingFlaskInstanceIndex].mask = 0u;
-    instances[kHealingFlaskInstanceIndex].accelerationStructureReference = healingFlaskBlas_.address;
+    if(!ApplyHealingFlaskInstances(instances,RtSceneFrameInputs{},
+        horde::gameplay::items::IdentityHeldItemTransform(),diagnostic))return false;
     if(UsesSharedForestGeometry()) {
         if(!ApplyExistingForestInstances(instances,forestSharedLayout_,
             UsesSupplementalForestProof(),
@@ -7200,13 +7198,45 @@ bool PresentableTinyRtScene::PackPlayerWorldBodyPoseUpload(
     return true;
 }
 
+bool PresentableTinyRtScene::ApplyHealingFlaskInstances(
+    std::span<VkAccelerationStructureInstanceKHR> instances,const RtSceneFrameInputs& frame,
+    const horde::gameplay::items::HeldItemTransform& carriedWorldFromItem,std::string& diagnostic) const
+{
+    if(instances.size()<=kHealingFlaskUpgradeInstanceIndex ||
+       (sceneProfile_==RtSceneProfile::Showcase && !healingFlaskBlas_.address) ||
+       (sceneProfile_!=RtSceneProfile::Showcase && (frame.healingFlaskVisible || frame.healingFlaskUpgradeVisible))) {
+        diagnostic="Both flask instances require their one current Showcase BLAS and complete physical storage.";return false;
+    }
+    const auto finite=[](const auto& transform) {
+        return std::all_of(transform.begin(),transform.end(),[](float v){return std::isfinite(v);});
+    };
+    if(!finite(carriedWorldFromItem) || !finite(frame.healingFlaskUpgradeWorldFromItem)) {
+        diagnostic="Both flask instance transforms must be finite before publication.";return false;
+    }
+    if(!horde::gameplay::items::ValidateHeldItemSocketTransform(carriedWorldFromItem,diagnostic) ||
+       !horde::gameplay::items::ValidateHeldItemSocketTransform(frame.healingFlaskUpgradeWorldFromItem,diagnostic))return false;
+    const auto make=[&](const auto& transform,bool visible) {
+        auto instance=instances[0];instance.instanceCustomIndex=kHealingFlaskMetadataIndex;
+        instance.accelerationStructureReference=healingFlaskBlas_.address;instance.mask=visible?0x01u:0u;
+        for(unsigned row=0;row<3;++row)for(unsigned column=0;column<4;++column)
+            instance.transform.matrix[row][column]=transform[column*4+row];
+        return instance;
+    };
+    // Validate both before publishing either; no hidden-item borrowing and no
+    // duplicate BLAS/material owner. Pickup and hand retain independent poses.
+    const auto carried=make(carriedWorldFromItem,frame.healingFlaskVisible);
+    const auto pickup=make(frame.healingFlaskUpgradeWorldFromItem,frame.healingFlaskUpgradeVisible);
+    instances[kHealingFlaskInstanceIndex]=carried;instances[kHealingFlaskUpgradeInstanceIndex]=pickup;
+    diagnostic.clear();return true;
+}
+
 bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                                      const RtSceneFrameInputs& frame,
                                                      std::string& diagnostic,
                                                      RtSceneRecordObservation* observation)
 {
     jointPropPresentationActive_ = sceneProfile_ == RtSceneProfile::Showcase &&
-        (frame.attackWarningRingVisible || frame.healingFlaskVisible || frame.playerUtilityHand.has_value());
+        (frame.attackWarningRingVisible || frame.healingFlaskVisible || frame.healingFlaskUpgradeVisible || frame.playerUtilityHand.has_value());
     uploadedQualityControlsValid_ = false;
     uploadedFireEmittersValid_ = false;
     if (sceneProfile_ != RtSceneProfile::Showcase)
@@ -7881,12 +7911,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[kAttackWarningInstanceIndex].accelerationStructureReference = attackWarningRingBlas_.address;
     instances[kAttackWarningInstanceIndex].transform =
         heldTransformToInstanceTransform(frame.attackWarningRingWorldFromItem);
-    instances[kHealingFlaskInstanceIndex] = instances[0];
-    instances[kHealingFlaskInstanceIndex].instanceCustomIndex = kHealingFlaskMetadataIndex;
-    instances[kHealingFlaskInstanceIndex].mask = frame.healingFlaskVisible ? 0x01u : 0u;
-    instances[kHealingFlaskInstanceIndex].accelerationStructureReference = healingFlaskBlas_.address;
-    instances[kHealingFlaskInstanceIndex].transform =
-        heldTransformToInstanceTransform(healingFlaskWorldFromItem);
+    if(!ApplyHealingFlaskInstances(instances,frame,healingFlaskWorldFromItem,diagnostic))return false;
     const auto characterInstances = characterSlot_.BuildActiveInstances();
     instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];
     instances[kKeeperInstanceIndex] = characterInstances[2];
@@ -9155,7 +9180,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 )
 {
     jointPropPresentationActive_ = sceneProfile_ == RtSceneProfile::Showcase &&
-        (frame.attackWarningRingVisible || frame.healingFlaskVisible || frame.playerUtilityHand.has_value());
+        (frame.attackWarningRingVisible || frame.healingFlaskVisible || frame.healingFlaskUpgradeVisible || frame.playerUtilityHand.has_value());
     // A prior unsubmitted recording must not advance the GPU definition cache.
     tlasPendingDefinitionsValid_ = false;
     uploadedFireEmittersValid_ = false;

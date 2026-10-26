@@ -478,23 +478,24 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             s.rewardLanternRingAsset_.sockets={{"GripRing",0u,identity},{"Hinge",0u,identity}};
             s.rewardLanternBodyAsset_.sockets={{"Light",0u,identity}};
             s.ready_=s.ordinaryStaticFacesVerified_=s.tlasInstanceDefinitionsValid_=true;
-            s.tlasInstanceCount_=94u;s.playerCpuSkinCadence_=PlayerCpuSkinCadence::Hz60;
+            s.tlasInstanceCount_=Scene::kOrdinaryTlasInstanceCount+64u;s.playerCpuSkinCadence_=PlayerCpuSkinCadence::Hz60;
             s.blas_=As(500);s.forestMasterBlas_={{As(501),As(502)}};
-            for(unsigned i=0;i<30u;++i) {
+            for(unsigned i=0;i<Scene::kOrdinaryTlasInstanceCount;++i) {
                 auto& instance=s.tlasBuiltInstances_[i];instance.instanceCustomIndex=i;instance.mask=0x3fu;
                 instance.accelerationStructureReference=(600u+i)*4096u;
                 instance.transform={{{1,0,0,float(i)},{0,1,0,0},{0,0,1,0}}};
             }
             // Dormant props keep independent valid references in the full
-            // ordinary prefix; retention may change only forest masks30..93.
+            // ordinary prefix; retention may change only forest masks31..94.
             s.attackWarningRingBlas_=As(628);s.healingFlaskBlas_=As(629);
             s.tlasBuiltInstances_[28].mask=s.tlasBuiltInstances_[29].mask=0u;
             s.tlasBuiltInstances_[28].accelerationStructureReference=s.attackWarningRingBlas_.address;
             s.tlasBuiltInstances_[29].accelerationStructureReference=s.healingFlaskBlas_.address;
+            s.tlasBuiltInstances_[Scene::kHealingFlaskUpgradeInstanceIndex]=s.tlasBuiltInstances_[29];
             s.tlasBuiltInstances_[0].accelerationStructureReference=s.blas_.address;
             s.tlasBuiltInstances_[0].transform.matrix[0][3]=0;
             for(std::size_t i=0;i<64u;++i) {
-                const auto& p=prepared->placements[i];auto& instance=s.tlasBuiltInstances_[30u+i];
+                const auto& p=prepared->placements[i];auto& instance=s.tlasBuiltInstances_[Scene::kOrdinaryTlasInstanceCount+i];
                 const float c=std::cos(p.yawRadians),t=std::sin(p.yawRadians);
                 instance.transform={{{c,0,t,p.origin[0]},{0,1,0,p.origin[1]},{-t,0,c,p.origin[2]}}};
                 instance.instanceCustomIndex=26u+static_cast<unsigned>(p.masterIndex);instance.mask=1u;
@@ -513,7 +514,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
         frame.cameraX=-22;frame.cameraZ=-15.2f;frame.rewardLanternWorldFromHinge=identity;
         frame.rewardLanternWorldFromHinge[12]=-22;frame.rewardLanternWorldFromHinge[13]=.6f;frame.rewardLanternWorldFromHinge[14]=-15.2f;
         const auto allRetained=[](const auto& instances) {
-            for(unsigned i=30u;i<94u;++i)if(instances[i].mask!=1u)return false;return true;
+            for(unsigned i=Scene::kOrdinaryTlasInstanceCount;i<Scene::kOrdinaryTlasInstanceCount+64u;++i)if(instances[i].mask!=1u)return false;return true;
         };
         {
             auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);auto instances=s.tlasBuiltInstances_;const auto before=instances;
@@ -524,10 +525,10 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             s.ApplySharedForestRetentionProof(instances,frame);
             bool masks=s.forestRetentionFrameEligible_ && s.forestRetentionFrameGeneration_==41u &&
                 s.forestRetentionOmittedCount_==s.forestRetentionProof_.eligibleCount;
-            for(unsigned i=0;i<64u;++i)masks&=instances[30u+i].mask==(s.forestRetentionProof_.eligible[i]?0u:1u);
-            failures+=!Check(masks && std::memcmp(instances.data(),before.data(),30u*sizeof(instances[0]))==0 &&
+            for(unsigned i=0;i<64u;++i)masks&=instances[Scene::kOrdinaryTlasInstanceCount+i].mask==(s.forestRetentionProof_.eligible[i]?0u:1u);
+            failures+=!Check(masks && std::memcmp(instances.data(),before.data(),Scene::kOrdinaryTlasInstanceCount*sizeof(instances[0]))==0 &&
                 s.forestMasterBlas_[0].address==501u*4096u && s.forestMasterBlas_[1].address==502u*4096u,
-                "safe CPU policy changes certified masks only, retaining uncertified roots, all30 ordinary roles and both masters");
+                "safe CPU policy changes certified masks only, retaining uncertified roots, all31 ordinary roles and both masters");
             auto outside=frame;outside.cameraX=-40;
             s.ApplySharedForestRetentionProof(instances,outside);
             failures+=!Check(allRetained(instances) && !s.forestRetentionFrameEligible_ && s.forestRetentionOmittedCount_==0 &&
@@ -538,15 +539,15 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 s.forestRetentionOmittedCount_==s.forestRetentionProof_.eligibleCount,
                 "returning to the same safe current owner reuses only its certified instance decisions");
         }
-        constexpr std::array<const char*,24> runtimeFaults{{"different source owner","different prepared owner","stale generation",
+        constexpr std::array<const char*,25> runtimeFaults{{"different source owner","different prepared owner","stale generation",
             "changed primitive range","changed local bounds","unverified retained faces","nonidentity current root",
             "wrong master reference","wrong placement transform","wrong metadata index","incomplete live population",
             "unpublished definitions","pending definitions","retention-suppressing override or inactive owner","supplemental placements",
             "changed common prefix","active water droplet","exterior frame","visible glass fixture",
-            "wrong submitted root reference","missing master address","visible attack warning","visible healing flask","occupied utility return"}};
+            "wrong submitted root reference","missing master address","visible attack warning","visible healing flask","occupied utility return","visible flask upgrade"}};
         for(unsigned fault=0;fault<runtimeFaults.size();++fault) {
             auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);auto instances=s.tlasBuiltInstances_;auto unsafe=frame;
-            for(unsigned i=30u;i<94u;++i)instances[i].mask=0u;
+            for(unsigned i=Scene::kOrdinaryTlasInstanceCount;i<Scene::kOrdinaryTlasInstanceCount+64u;++i)instances[i].mask=0u;
             if(fault==0)s.fullStaticGeometrySource_=std::make_shared<const RtStaticMeshSlot>(*source);
             if(fault==1)s.forestSharedLayout_.prepared=std::make_shared<const PreparedForestDressing>(*prepared);
             if(fault==2)++s.staticGeometryGeneration_;
@@ -554,10 +555,10 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             if(fault==4)s.forestSharedLayout_.masters[0].localBounds.maximum[0]+=1.f;
             if(fault==5)s.ordinaryStaticFacesVerified_=false;
             if(fault==6)instances[0].transform.matrix[0][3]=.01f;
-            if(fault==7)++instances[30].accelerationStructureReference;
-            if(fault==8)instances[30].transform.matrix[0][3]+=.01f;
-            if(fault==9)instances[30].instanceCustomIndex=27u;
-            if(fault==10)s.tlasInstanceCount_=30u;
+            if(fault==7)++instances[Scene::kOrdinaryTlasInstanceCount].accelerationStructureReference;
+            if(fault==8)instances[Scene::kOrdinaryTlasInstanceCount].transform.matrix[0][3]+=.01f;
+            if(fault==9)instances[Scene::kOrdinaryTlasInstanceCount].instanceCustomIndex=27u;
+            if(fault==10)s.tlasInstanceCount_=Scene::kOrdinaryTlasInstanceCount;
             if(fault==11)s.tlasInstanceDefinitionsValid_=false;
             if(fault==12)s.tlasPendingDefinitionsValid_=true;
             if(fault==13) {
@@ -577,11 +578,12 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             if(fault==21)unsafe.attackWarningRingVisible=true;
             if(fault==22)unsafe.healingFlaskVisible=true;
             if(fault==23)unsafe.playerUtilityHand.emplace();
+            if(fault==24)unsafe.healingFlaskUpgradeVisible=true;
             const auto legacy=instances;
             s.ApplySharedForestRetentionProof(instances,unsafe);
             const auto message=std::string("CPU retention fallback: ")+runtimeFaults[fault];
             failures+=!Check(allRetained(instances) && !s.forestRetentionFrameEligible_ && !s.forestRetentionOmittedCount_ &&
-                std::memcmp(instances.data(),legacy.data(),30u*sizeof(instances[0]))==0,
+                std::memcmp(instances.data(),legacy.data(),Scene::kOrdinaryTlasInstanceCount*sizeof(instances[0]))==0,
                 message.c_str());
         }
         constexpr std::array<const char*,4> admissionFaults{{"changed packed master vertices","changed packed master indices",
@@ -715,7 +717,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                     s.fullStaticGeometrySource_==source && s.forestSharedLayout_.prepared==prepared &&
                     s.forestRetentionProof_.source==source && s.forestRetentionProof_.admitted &&
                     s.SharedForestGeometryActive() && s.sharedForestGeometryEnabled_ &&
-                    s.staticGeometryGeneration_==41u && s.tlasInstanceCount_==94u,
+                    s.staticGeometryGeneration_==41u && s.tlasInstanceCount_==Scene::kOrdinaryTlasInstanceCount+64u,
                     message.c_str());
             }else {
                 failures+=!Check(!s.forestMasterBuildWork_.command && !s.forestMasterBuildWork_.fence &&

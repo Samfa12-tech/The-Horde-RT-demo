@@ -363,6 +363,49 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static bool CheckFlaskPhysicalAliases()
+    {
+        PresentableTinyRtScene scene;scene.healingFlaskBlas_.address=0x129000u;
+        std::array<VkAccelerationStructureInstanceKHR,PresentableTinyRtScene::kTlasInstanceCount> instances{};
+        instances[0].mask=1u;instances[0].accelerationStructureReference=0x100000u;
+        const auto original=instances;
+        RtSceneFrameInputs frame;auto hand=horde::gameplay::items::IdentityHeldItemTransform();
+        hand[12]=1.f;hand[13]=2.f;
+        frame.healingFlaskUpgradeWorldFromItem=horde::gameplay::items::IdentityHeldItemTransform();
+        frame.healingFlaskUpgradeWorldFromItem[12]=6.f;frame.healingFlaskUpgradeWorldFromItem[14]=-4.f;
+        std::string error;
+        const auto fail=[&](const char* stage){std::cerr<<"Flask alias fixture: "<<stage<<" diagnostic="<<error<<'\n';return false;};
+        for(bool carried:{false,true})for(bool pickup:{false,true}) {
+            frame.healingFlaskVisible=carried;frame.healingFlaskUpgradeVisible=pickup;
+            if(!scene.ApplyHealingFlaskInstances(instances,frame,hand,error))return fail("valid pair rejected");
+            const auto& a=instances[PresentableTinyRtScene::kHealingFlaskInstanceIndex];
+            const auto& b=instances[PresentableTinyRtScene::kHealingFlaskUpgradeInstanceIndex];
+            if(a.instanceCustomIndex!=29u || b.instanceCustomIndex!=29u ||
+               a.accelerationStructureReference!=scene.healingFlaskBlas_.address ||
+               b.accelerationStructureReference!=a.accelerationStructureReference ||
+               a.mask!=(carried?1u:0u) || b.mask!=(pickup?1u:0u) ||
+               a.transform.matrix[0][3]!=1.f || a.transform.matrix[1][3]!=2.f ||
+               b.transform.matrix[0][3]!=6.f || b.transform.matrix[2][3]!=-4.f)return fail("pair identity/pose mismatch");
+            for(std::size_t i=0;i<instances.size();++i)
+                if(i!=PresentableTinyRtScene::kHealingFlaskInstanceIndex &&
+                   i!=PresentableTinyRtScene::kHealingFlaskUpgradeInstanceIndex &&
+                   std::memcmp(&instances[i],&original[i],sizeof(instances[i]))!=0)return fail("unrelated physical role changed");
+        }
+        // Pickup removal and reset restoration never steal the in-use hand.
+        frame.healingFlaskUpgradeVisible=false;
+        if(!scene.ApplyHealingFlaskInstances(instances,frame,hand,error) || instances[29].mask!=1u || instances[30].mask!=0u)return fail("pickup removal");
+        frame.healingFlaskUpgradeVisible=true;
+        if(!scene.ApplyHealingFlaskInstances(instances,frame,hand,error) || instances[29].mask!=1u || instances[30].mask!=1u)return fail("pickup restoration");
+        const auto before=instances;
+        auto bad=frame;bad.healingFlaskUpgradeWorldFromItem[12]=std::numeric_limits<float>::quiet_NaN();
+        if(scene.ApplyHealingFlaskInstances(instances,bad,hand,error) ||
+           std::memcmp(instances.data(),before.data(),sizeof(instances))!=0)return fail("invalid transform publication");
+        if(scene.ApplyHealingFlaskInstances(std::span(instances).first(30),frame,hand,error) ||
+           std::memcmp(instances.data(),before.data(),sizeof(instances))!=0)return fail("short storage publication");
+        scene.healingFlaskBlas_.address=0;
+        return !scene.ApplyHealingFlaskInstances(instances,frame,hand,error) &&
+            std::memcmp(instances.data(),before.data(),sizeof(instances))==0;
+    }
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     static bool CheckActorWorkerRetirement()
     {
@@ -1836,6 +1879,8 @@ int main(int argc, char** argv)
         "player upload must preserve exact pose bytes and asset lifetime across reload/move/failure");
     std::cerr << "Resource integration: existing readback/mist/torch contracts\n";
     bool ok = playerUploadOk;
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckFlaskPhysicalAliases(),
+        "carried flask and world pickup share one valid immutable owner with independent poses, masks and atomic restoration");
     ok &= PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckProceduralSurfaceReadiness(),
                   "chapter readiness must admit the complete world/lid code buffer and reject missing/misaligned ranges");
@@ -2209,7 +2254,7 @@ int main(int argc, char** argv)
                       diagnostic.bottomLevelAccelerationStructureCount == 23u &&
                       scene.BlasCount() == 23u &&
                       diagnostic.topLevelAccelerationStructureCount == 1u &&
-                      diagnostic.tlasInstanceCount == 30u &&
+                      diagnostic.tlasInstanceCount == PresentableTinyRtScene::kOrdinaryTlasInstanceCount &&
                       diagnostic.pipelineCount == 2u &&
                       diagnostic.shaderBindingTableCount == 2u &&
                       diagnostic.descriptorSetCount == 1u,

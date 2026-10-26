@@ -2,6 +2,18 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## Resource sizing within approved features - 2026-10-26
+
+Sam approved the separate world flask-upgrade instance at TLAS107, reusing the
+existing flask mesh/material/BLAS; metadata30 and the other current ceilings stay
+unchanged in this patch. The normal feature remains gated by real acceptance.
+He also clarified that routine technical capacity sizing within approved features
+is an engineering decision, supported by bounded invariants and honest memory/
+performance measurements, rather than repeated owner questions about slot numbers.
+Surface meaningful gameplay, download/memory/performance or platform trade-offs
+and genuinely new scope. This grants no spending, security change, unconstrained
+feature expansion, publication or release. Counts alone are not allocation or FPS.
+
 ## Congruent distant town and future hub - 2026-10-26
 
 Sam requires the low-cost or preloaded Bellwether visible from the1.7 vantage

@@ -92,3 +92,7 @@ does not admit native scene joins or platform play.
 The [explicit native frame consumer](native-frame.md) subsequently connects that
 immutable profile to the existing skin/Grip and scene ownership paths. It remains
 opt-in and CPU-tested; actual RT joins and normal gameplay are not admitted.
+
+The [world-upgrade physical alias](upgrade-alias.md) supplies a separate pickup
+instance sharing the carried flask's immutable resources. It does not yet supply
+the gameplay placement/interaction or admit either presentation path.

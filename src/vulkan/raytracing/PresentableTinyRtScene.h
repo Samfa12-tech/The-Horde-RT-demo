@@ -183,6 +183,7 @@ struct RtSceneFrameInputs
     // Presentation-only inputs; gameplay admission remains with the snapshot owner.
     bool attackWarningRingVisible = false;
     bool healingFlaskVisible = false;
+    bool healingFlaskUpgradeVisible = false;
     // Explicit immutable utility trial; ordinary adapters leave this empty.
     std::optional<horde::gameplay::items::UtilityHandReturnSnapshot> playerUtilityHand;
     std::array<float, 4u> attackWarningRingBaseColour{{0.72f,0.09f,0.015f,1.f}};
@@ -190,6 +191,8 @@ struct RtSceneFrameInputs
     horde::gameplay::items::HeldItemTransform attackWarningRingWorldFromItem =
         horde::gameplay::items::IdentityHeldItemTransform();
     horde::gameplay::items::HeldItemTransform healingFlaskWorldFromItem =
+        horde::gameplay::items::IdentityHeldItemTransform();
+    horde::gameplay::items::HeldItemTransform healingFlaskUpgradeWorldFromItem =
         horde::gameplay::items::IdentityHeldItemTransform();
     horde::gameplay::EnemyRosterSnapshot roster{};
     horde::gameplay::LichSnapshot lich{};
@@ -283,6 +286,8 @@ public:
     static constexpr std::uint32_t kAttackWarningInstanceIndex = 28u;
     static constexpr std::uint32_t kHealingFlaskMetadataIndex = 29u;
     static constexpr std::uint32_t kHealingFlaskInstanceIndex = 29u;
+    // Separate physical pickup, shared immutable metadata/mesh/material/BLAS.
+    static constexpr std::uint32_t kHealingFlaskUpgradeInstanceIndex = 30u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kRtOrdinaryShowcaseInstanceCount;
     // Storage capacity; builds and updates use the separate live count.
@@ -300,8 +305,9 @@ public:
     static_assert(kHealingFlaskMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kAttackWarningInstanceIndex == kKeeperInstanceIndex + 1u);
     static_assert(kHealingFlaskInstanceIndex == kAttackWarningInstanceIndex + 1u);
-    static_assert(kOrdinaryTlasInstanceCount == 30u);
-    static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskInstanceIndex + 1u);
+    static_assert(kHealingFlaskUpgradeInstanceIndex == kHealingFlaskInstanceIndex + 1u);
+    static_assert(kOrdinaryTlasInstanceCount == 31u);
+    static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskUpgradeInstanceIndex + 1u);
     static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
                   horde::gameplay::simulation::kForestTreePlacementContract.size() + 12u);
 
@@ -1187,6 +1193,10 @@ private:
                                 const RtSceneFrameInputs& frame,
                                 std::string& diagnostic,
                                 RtSceneRecordObservation* observation);
+    bool ApplyHealingFlaskInstances(std::span<VkAccelerationStructureInstanceKHR> instances,
+        const RtSceneFrameInputs& frame,
+        const horde::gameplay::items::HeldItemTransform& carriedWorldFromItem,
+        std::string& diagnostic) const;
     const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateScratchBuffer(VkDeviceSize usableSize, Buffer& out,
