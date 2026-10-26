@@ -1,5 +1,56 @@
 # Windows execution block: Smart App Control confirmed
 
+## Later owner launch and Computer Use observation
+
+The enforced automated launch failure below remains valid for its recorded
+time and context. It does **not** establish that this executable cannot run in
+every context. Sam subsequently opened the exact `candidate-grouped` executable
+manually through Explorer and reported that it was running. No protection
+change was reported or performed by this task.
+
+The supported Computer Use inventory independently returned one running Horde
+window, titled `Horde Lantern RT - Showcase Alpha 1.6.2`, whose process-backed
+application identifier names the exact original `candidate-grouped` executable
+path. A read-only hash check still matched the original flat SHA256 below.
+This is running-window/path evidence, not a screenshot, verified loaded-module
+hash, RT presentation receipt, candidate visual acceptance or automated
+recreation pass.
+
+Selecting that existing window for read-only inspection timed out with
+`Computer Use app approval timed out`. Sam reported repeated approvals and
+explicitly authorized Computer Use of Horde. Checking the existing JavaScript
+binding then showed that it had not been created. No duplicate app request,
+input, screenshot, alternate process-inspection route or launch followed.
+The owner-launched process was left untouched. The current visual-review
+blocker is therefore the Computer Use approval/binding failure; the earlier
+automated launch remains unretired and must not be retried without its own
+authorization.
+
+The earlier Markdown `/C:/Users/...` link is not a literal Windows Explorer
+path. Sam's successful Explorer path resolution is separate from the recorded
+`CreateProcess` failure and correlated Code Integrity event. Do not use the
+link-format mistake to erase that event, or infer from the manual success that
+Smart App Control switched off, a policy changed, or cloud reputation changed.
+The original approved event query covered ten minutes around the failure and
+contained no policy-activation event. It cannot date an Evaluation-to-On
+transition or establish a Windows-update cause. No broader event query was run.
+
+A read-only version query reported kernel `10.0.26300.0`, registry build/UBR
+`26300.9711` and display version `26H2`; the registry ProductName still says
+`Windows 10 Home`, so that label alone is not used to identify the installed
+release. These values do not date a policy or update transition. Microsoft's
+current FAQ describes re-enabling on some recent updates, but Sam's actual
+Smart App Control page warned that Off cannot be reversed without reinstalling
+Windows. Treat the machine-visible warning as binding here; reversibility on
+this installation was not established and no toggle was tested.
+
+The available evidence establishes SAC trust enforcement against an unsigned
+binary, not an antivirus/malware verdict. Unknown unsigned code can be blocked
+under Microsoft's documented rules. Neither universal install failure for all
+players nor a guarantee of safety follows. Windows distribution/signing remains
+an open release consideration; no external scanning upload, signing setup,
+purchase, exemption, security change or public distribution occurred.
+
 ## Approved administrator result
 
 Sam approved the narrow read-only administrator collection and then approved its

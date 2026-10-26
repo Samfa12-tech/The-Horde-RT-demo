@@ -6,6 +6,11 @@ Original body/viewmodel/sword bytes, bind matrices and guard/combat source hashe
 are retained. The original Idle/Walking assets stay intact. Production flask is
 OFF; no gameplay, native binding, cap, texture, save or phone state changed.
 
+The exact source checkpoint `d51c815e07aee70609180a4c2c8acb90b4ea569c`
+completed [CI run 40309715446](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40309715446)
+with all six jobs successful. This covers the hosted checks for that source
+head; it does not close the native flask presentation or device gates below.
+
 ## What was checked
 
 - A complete 1.25-second source action: sword stow, flask pickup/lift, brief swig,
@@ -80,6 +85,12 @@ Keep original callers/poses. Reuse the existing immutable snapshot boundary:
    Native world/viewmodel joins, actual camera aspects, wall/ceiling sweep,
    reflection/shadow, pause/death/load/reset and input cancellation gates remain.
 
-Windows native visual execution remains blocked and deferred by the owner; no
-retry/security change occurred. Phone stays with Reef. This checkpoint does not
-complete flask controls/upgrade presentation, recovery-path or owner playtesting.
+At this source checkpoint, automated Windows visual execution was blocked and
+phone custody remained with Reef. Later, Sam manually opened the unchanged
+forest candidate; the running-window inventory confirmed its exact path, while
+Computer Use window selection timed out without producing a screenshot or app
+binding. See the [updated launch evidence](../2026-10-26-windows-app-control/README.md).
+That manual forest launch does not validate this source-only flask candidate.
+Reef subsequently released the phone to Horde, but this follow-up made no
+device calls. No retry/security change occurred. Flask controls/upgrade
+presentation, native recovery-path and owner playtesting remain incomplete.

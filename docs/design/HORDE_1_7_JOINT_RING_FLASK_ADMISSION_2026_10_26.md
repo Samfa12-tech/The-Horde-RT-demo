@@ -89,9 +89,13 @@ still need actual queries and paired observations. Keep all current gates.
    remains measured optimisation, not an FPS veto on approved scope. Normal
    enablement and release require their separate decisions/evidence.
 
-The current [Application Control diagnosis](../evidence/2026-10-26-windows-app-control/README.md)
-blocks new native visual trials. This proposal does not authorize a retry or
-security change, nor does it admit the private revival audio/stand assets.
+The [Application Control evidence](../evidence/2026-10-26-windows-app-control/README.md)
+retains the blocked automated launch and later successful owner launch of the
+same forest executable. Its existing-window visual inspection then stalled at
+Computer Use approval, without a capture. Neither observation admits this
+joint layout or proves automated recreation. This proposal does not authorize
+a blocked-launch retry or security change, nor does it admit the private
+revival audio/stand assets.
 
 **Bounded decision requested:** approve implementation/evaluation of this joint
 two-owner layout and the exact ceilings above, preserving all stated validation
