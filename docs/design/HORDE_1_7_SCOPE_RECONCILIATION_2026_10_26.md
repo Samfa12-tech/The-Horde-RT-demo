@@ -1,0 +1,108 @@
+# Horde 1.7: full scope and remaining delivery
+
+Reconciled at `8814e866e63e54c91a2fdd0b8be3b3bfdd5c512d`, 26 October.
+Exact [CI40212337980](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40212337980)
+finished with all six jobs successful. That is source validation, not chapter,
+visual, phone or release acceptance. Work remains in the existing WP2 worktree
+and draft PR27; its directory name does not limit the full 1.7 obligation.
+
+## Authority and chapter boundary
+
+Read the complete scope through the [accepted plan](../references/horde-1.7/d37f1638/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md),
+especially sections3/4/8/10/12/13.1 and WP0–10, together with the later
+[selected owner decisions](HORDE_1_7_OWNER_DECISIONS_2026_10_24.md#selected-direction),
+the approved flask policy and current implementation evidence. Older plan/status
+paragraphs do not override later decisions or prove integration.
+
+1.7 delivers a coherent tomb → earned lantern → rope rescue and return → Kit
+reunion/lantern lesson → moonlit forest → lookout chapter. Its modest playable
+trail must sit convincingly within the wider world. It is not sufficient to
+have a traversable strip with scattered trees. The regional/topographic layout,
+silhouettes, route enclosure and lookout vista remain part of 1.7 presentation.
+
+The lookout reveals a low-detail Bellwether exterior in its fixed location.
+The dry northwest-to-southeast approach stays west of the river, without a new
+crossing. Playable town streets/interiors, villagers/services, forge/foundry
+gameplay and hub quests belong to 1.8 or later. Parked source assets for that work
+are not integrated 1.7 content and must not be counted as completed scenery.
+
+## Current inventory
+
+| Area | Implemented/tested evidence | Still required or explicitly held |
+| --- | --- | --- |
+| **Forest and wider landscape** | r23 local/macro terrain, route, grounded original 64 trees, understory/deadwood/rocks, F03 kerbs/waystone and distant village shell exist. | **Major visible gap:** surrounding woodland mass, fuller crowns, middle/far depth, region silhouettes and controlled lookout reveal. Actual F01/F03/F04 views fail the intended woodland impression. Traversal and topo import do not close this. Near/mid/far representation and combined cost/visibility need admission. |
+| Shared/batched trees | Two source masters are reused in authoring; normal gameplay still world-bakes64 placements into four material groups (323,264 duplicated triangles). The new shared-master/BLAS owner, whole-instance retention and Windows route/recreation proof exist. | Shared64 stays OFF pending Android correctness/cost; Windows allocation savings are not phone/FPS gains. The extra 12-tree trial remains sparse and collision-unadmitted. Private Easy Tree and rejected pineLOD2 are not production solutions. |
+| Crowns/forest art | One owned editable pine/alder study preserves trunks/roots/placements and original sources. | Enlarging existing leaves still leaves open crowns; no broad rollout. A useful upper-crown distribution/volume sample and actual-view review remain. Its exporter hit an OS temporary-image denial; do not retry/redirect it without new relevant authorization. |
+| Atmosphere and story smoke | Shared night/moon environment and existing effects remain; outdoor music/ambience are integrated. | Chimney smoke is approved unfinished work: the High/Low renderer trial failed unchanged shader gates and remains withdrawn. New outdoor mist/shafts, fireflies and visual wind were explicitly deferred on 24 October, not implemented or completed. Latest owner feedback raises whether to revisit that disposition; this review does not silently reinstate them. |
+| Combat/teaching | Guard→attack→guard is implemented and owner-approved on the recorded build. Current source fully blocks eligible normal attacks, retains timed parry/red avoidance and teaches four actual outcomes with protected practice/explicit safe exit. | Enemy-anchored animated special-attack rings and heavier readable red motion remain. Ring capacity approval is pending; yellow policy stays OFF. New-rule balance/phone feedback and full natural encounter acceptance remain. |
+| Revival/cry | Private append-only stand passed native import/RT; gated shared owner passes real-outcome and restore tests plus167 actual-owner RT frames. | Normal revival remains OFF. Platform current-resource clip/cue readiness, private game asset admission and natural/listening acceptance remain. The private scream is not publicly shipped; a diagnostic pose/record is not a normal playable feature. |
+| Rescue, lantern and campaign | Claim/opening, physical rope/ascent/descent, stowed owned equipment, Kit reunion/lantern lesson, forest endpoint/backtracking, hearts/subtitles/VO, three slots and checkpoint/recovery mechanisms exist. | Full natural human Keeper victory→claim→journey→earned save/load/death recovery, device lifecycle and combined residency/pacing acceptance. Seeded post-Keeper fixtures do not close the preceding journey. |
+| Flask | Complete two-drink/Rest/upgrade/death/load/migration policy is approved. Pure backend, exact resources/schema3, confirmed-record recovery and gated owner tests exist. | OFF in gameplay: flask prop/right-hand transitions, deliberate touch control, physical upgrade presentation and renderer-owner admission are unfinished. The policy itself is no longer awaiting approval. Balance and physical feel remain. |
+| Character/held-item presentation | Auto head-clearance crouch, stick speed, keyboard run, backward phase/dodge, Kit follow and stationary casual/travel turns are implemented with host/native evidence. | Useful lateral/run art and native joins remain where studies failed. Close-wall/ceiling torch containment **and** visible hand/torch framing remain a real defect/tradeoff; rejected carry trials stay withdrawn. The reported phone dark-world cause is unproven. |
+| UI/menus | Subtitle repair, clearer save-slot copy, compact lantern, translucent sword/shield hierarchy, pause symbol and boot-readiness/cancel protection are implemented. | Owner-requested title/button cohesion and equal More/Settings weight; physical thumb reach, simultaneous move/look/action, rotation/earned-state continuity and accessibility acceptance. Visual polish must follow inspection of the supplied screenshot. |
+| Audio/benchmark/release acceptance | Outdoor main uses the shared Pocket Audio route; owner liked that track in one phone session. Fixed-profile benchmark/rollback implementations and local reports exist. | Kit mix, movement/loop/ducking/transition listening; Windows visible/DPI/controller and Android actual benchmark sizing/return; sustained warmed production-phone performance. Reports remain provisional/custom-unranked/local. PR conflicts, source-redistribution/signing and final release gates remain separate. No leaderboard/report transmission or release is authorized. |
+
+The initial plan described four varied tree archetypes; only two source masters
+currently supply the route. Variety must be judged with silhouette and grouping,
+not satisfied by downloading a quota of unrelated models.
+
+This inventory separates unfinished implementation from missing acceptance and
+explicit deferral. It does not call 1.7 ready or turn rejected work into completion.
+
+## Forest evidence and the next bounded work
+
+The [actual-view sheet](../evidence/2026-10-23-forest-view-sheet/README.md),
+[12-root comparison](../evidence/2026-10-24-f01-forest-sector/README.md) and
+[equalized shared-route proof](../evidence/2026-10-24-shared-forest-route-admission/README.md)
+remain distinct. Reviewed the original forest-track map and actual north before/
+after pixels again for this reconciliation. Extra thin open-crown trees do not
+create convincing forest mass. No fresh renderer/device run was needed to repeat
+that observation; source screenshots are dated exact-build evidence, not a new
+cohort. Regional terrain is present; sparse vegetation must not be diagnosed as
+an entirely missing topo import or hidden short primary draw distance.
+
+Next select **one F01/F04 near/mid/far composition**, preserving route, clearing,
+landmarks and lighting, with a small owned fuller-crown/cluster sample before
+another population rollout. Keep crown art and instance-count changes separately
+reviewable. Respect the current export denial; source-only authoring may continue,
+but runtime validation cannot be claimed until that boundary is legitimately
+resolved. No new quotas, map-wide scatter, terrain wall or mist concealment.
+
+| Distance role | Practical candidate | Evidence needed before adoption |
+| --- | --- | --- |
+| Near/reachable | Real3D grounded trunks, branches/canopy, original physical root contact and matching collision; shared archetypes. | Look-up/look-down/turn/backtrack, path/Kit/held-item clearance, shadows/reflections and root support. No billboard replacement. |
+| Middle/enclosure | Fuller lower-detail 3D crowns/clusters, shared masters/BLAS with variation and explicit LOD boundaries. | Moving-camera parallax/overlap and transitions; actual population/metadata/material/BLAS allocation, startup overlap and paired RT cost. Sharing data does not remove traversal cost. |
+| Far regional vista | First compare very simple world-fixed3D woodland masses/clumps using ordinary opaque materials and a few reusable regional references. | F04 panorama/side views, landmark gaps and terrain integration, silhouette changes under translation, secondary visibility/relevance and actual cost. Nonplayable scenery is not new playable town. |
+| Far cutout cards/impostors | A bounded optional study, **not a ready drop-in or adopted plan change**. Keep nearby forest 3D. | Existing importer accepts only OPAQUE; alpha-masked foliage needs a real shared material/traversal extension and consistent primary/shadow/reflected/transmitted rejection. Avoid camera-facing shadow rotation, flat side views and duplicated imagery. Compare overlap/candidate filtering/texture/mip/BLAS/TLAS cost against simple 3D, not triangle count alone. |
+
+Distant cards can still be genuine RT geometry; they are not inherently a raster
+fallback. However a transparent PNG on an opaque quad is not supported cutout
+foliage, and a painted forest skybox would not satisfy the accepted 3D contract.
+Khronos describes explicit acceptance/rejection of non-opaque ray candidates in
+the [traversal specification](https://docs.vulkan.org/spec/latest/chapters/raytraversal.html)
+and [alpha-masked foliage guidance](https://docs.vulkan.org/tutorial/latest/Building_a_Simple_Engine/Advanced_Topics/Ray_Query_Reflections_and_Transparency.html).
+No claim that cards are faster on this phone follows from those APIs.
+
+Terrain-led sightlines are approved: ridges/bends/rock faces can limit the views
+that must be convincing while preserving the topo and bounded lookout reveal.
+Visual hiding alone saves neither residency nor RT shadow/reflection work.
+Separate primary visibility, secondary reach, moon/local-light influence and
+resource retention; prove turning/backtracking/transition recovery. Current104
+TLAS storage already fits exactly the 76-tree trial, not arbitrary extra trees.
+Grouped opaque far geometry may offer a different cost tradeoff, but neither
+that nor any capacity increase is admitted by this review.
+
+## Current access/coordination boundary
+
+Reef owns the laptop foreground/controller; no Horde phone lease. No foreground,
+controller, ADB or device action was used for this review.151 parked files and
+campaign/settings remain separate.
+
+The menu screenshot `libfile_ffcd448368e48191936b8eed98dd8568` could not be
+materialized through the unchanged required Library helper: the scoped network
+attempt failed before a file existed; the authorized network attempt then reached
+metadata application and failed because native Windows Python lacks
+`os.setxattr`. No final image exists at the requested destination. No metadata
+helper bypass, alternate transfer or visual edit was attempted. Menu visual work
+needs a supported image handoff; source inspection alone does not count as having
+seen the screenshot. This blocker does not prevent the scope/forest assessment.

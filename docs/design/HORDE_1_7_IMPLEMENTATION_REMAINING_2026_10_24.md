@@ -1,5 +1,14 @@
 # Horde 1.7 implementation remaining - 24 October 2026
 
+## Current full-scope inventory - 26 October
+
+Use the [reconciliation and near/mid/far forest assessment](HORDE_1_7_SCOPE_RECONCILIATION_2026_10_26.md)
+for the current delivery list. Wider landscape and convincing forest mass remain
+major visual/implementation gaps. Later owner-approved effects deferrals and
+flask policy supersede older provisional wording below; no deferred or rejected
+item is marked complete. Source validation at `8814e866` is green across all six
+jobs, while the chapter is not yet ready for release or blanket playtest signoff.
+
 ## Latest owner-playtest follow-up, 25 October
 
 The later [gated revival integration](../evidence/2026-10-25-skeleton-revival-owner/README.md)

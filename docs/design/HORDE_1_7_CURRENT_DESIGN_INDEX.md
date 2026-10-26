@@ -1,5 +1,15 @@
 # Horde 1.7 current design index
 
+## Full-scope reconciliation - 26 October 2026
+
+[Current remaining delivery and forest assessment](HORDE_1_7_SCOPE_RECONCILIATION_2026_10_26.md)
+puts the unfinished surrounding landscape/forest depth first, separates real
+implementation from acceptance/deferral, and retains the 1.7 lookout versus 1.8
+playable-town boundary. Shared64 remains OFF; traversal is not landscape
+completion. Fireflies were explicitly deferred 24 October, not delivered. New
+owner feedback raises that disposition without silently changing it. All six
+jobs for `8814e866` pass; no release/phone/visual completion follows from CI.
+
 ## Current authority - 25 October 2026
 
 Latest: the [gated one-time revival owner](../evidence/2026-10-25-skeleton-revival-owner/README.md)
