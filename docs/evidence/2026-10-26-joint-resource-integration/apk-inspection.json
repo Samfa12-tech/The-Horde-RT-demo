@@ -40,5 +40,6 @@
   ],
   "jointRuntimeUncompressedBytes": 15394,
   "jointRuntimeCompressedEntryBytes": 7023,
-  "sourceOrBlendPayloads": []
+  "sourceOrBlendPayloads": [],
+  "sourceBuildContext": "Built from dirty d89189cb with the joint resource implementation subsequently committed as522a1763. This is not a clean post-commit rebuild; exact APK hash and file-entry hashes are retained."
 }

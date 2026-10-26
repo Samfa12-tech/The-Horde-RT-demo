@@ -327,5 +327,11 @@
     "No source animation/utility caller or attack-phase integration admission",
     "Diagnostic terminal-material mask retains its existing modulo32 semantics; not unique coverage of34rows",
     "151 parked owner paths remain present/untracked; saved roster has no original content hashes"
-  ]
+  ],
+  "checkoutByteContract": {
+    "before": "actual git core.autocrlf=true filter changed pinned authoring script and manifest bytes",
+    "fix": "scoped text eol=lf for authorer and new JSON/README outputs; GLB LFS rules unchanged",
+    "verifiedFilteredTextFiles": 11,
+    "passed": true
+  }
 }
