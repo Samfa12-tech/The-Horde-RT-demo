@@ -1,5 +1,11 @@
 # Attacker-ring scope before implementation
 
+26 October reconciliation: consult the [joint ring/flask admission queue](HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md#ring-and-flask-proposals-must-be-reviewed-together).
+The +1 request below describes this feature alone. The two features cannot both
+claim owner28 or assume one +1 increase covers simultaneous ownership. No bounds
+are changed or approved. Existing immutable material sharing is a possible proof
+path, not an established flask saving.
+
 Later owner approval authorizes normal/full block, yellow/guard break and
 red/avoid. The [shared rule/practice checkpoint](../evidence/2026-10-25-four-skill-practice/README.md)
 implements the authority independently; new yellow attacks remain OFF pending

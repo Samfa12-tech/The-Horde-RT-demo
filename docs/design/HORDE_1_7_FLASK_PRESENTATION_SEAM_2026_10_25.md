@@ -1,5 +1,11 @@
 # Flask presentation: bounded renderer proposal, not implemented
 
+26 October reconciliation: consult the [joint ring/flask admission queue](HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md#ring-and-flask-proposals-must-be-reviewed-together).
+The +1 request below describes this feature alone. The two features cannot both
+claim owner28 or assume one +1 increase covers simultaneous ownership. No bounds
+are changed or approved. Existing immutable material sharing is a possible proof
+path, not an established flask saving.
+
 The approved policy requires a simple opaque flask in the right hand, the sword
 temporarily stowed/reacquired, and unchanged left-hand light ownership. No tracked
 flask/bottle/jug is available. Owned T03 offering vessels are wide/open or broken;

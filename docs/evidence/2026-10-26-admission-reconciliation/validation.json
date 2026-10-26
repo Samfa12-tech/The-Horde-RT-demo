@@ -1,0 +1,33 @@
+{
+  "scope": "documentation-only; no game execution, capacity or default change",
+  "sourceHead": "e4de5a5ef7620c9013a29d357ebc2668be19887d",
+  "markdownFiles": 7,
+  "localLinksChecked": 263,
+  "brokenLinks": [],
+  "sourceBoundsVerified": true,
+  "combinedEnvelopeIsProposalOnly": true,
+  "runtimeFilesChanged": false,
+  "parkedOwnerFiles": 151,
+  "parkedOwnerRosterUnchanged": true,
+  "requestedCi": [
+    {
+      "run": 40289767534,
+      "head": "aa57a9273ed92fa60af2c7392bcb9d35ac787254",
+      "allSixTerminalSuccess": true
+    },
+    {
+      "run": 40290900971,
+      "head": "e4de5a5ef7620c9013a29d357ebc2668be19887d",
+      "allSixTerminalSuccess": true
+    }
+  ],
+  "documentationSha256": {
+    "docs/design/HORDE_1_7_ATTACK_RING_SEAM_2026_10_25.md": "268446d16da8280d4fd573d820dab90cadf30beaf80e61b8ef35eadf45283973",
+    "docs/design/HORDE_1_7_CURRENT_DESIGN_INDEX.md": "2a946c31d4791fe83be96a857f704ed428b44fe6ecbf9e63c025dc9368ec15fa",
+    "docs/design/HORDE_1_7_FLASK_PRESENTATION_SEAM_2026_10_25.md": "52b1196cf860eef3baccc2ba556b792f5dacc5a681313e3e25a6b3674e916d2e",
+    "docs/design/HORDE_1_7_IMPLEMENTATION_REMAINING_2026_10_24.md": "8b48bc1820b93b8a0296b6d4d6d5b37c4290ea453735980ae99135cd1418c52c",
+    "docs/design/HORDE_1_7_SCOPE_RECONCILIATION_2026_10_26.md": "f95b616396b932c8d95d7f6a1cde2be249a5d26a87f88ad6da23ff22f901c486",
+    "docs/design/HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md": "89dd20dc75a43af20cb63373579abb94922d86815cd49c865201cdc48c8a75cf",
+    "docs/evidence/2026-10-26-admission-reconciliation/README.md": "f4da1c50ce2fcca3d9e629f2d33ab89a698ac3396444899915b1823fc06db816"
+  }
+}

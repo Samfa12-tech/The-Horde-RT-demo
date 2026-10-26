@@ -1,152 +1,75 @@
 # Horde 1.7 current design index
 
-26 October [grouped F01 R4 source checkpoint](../evidence/2026-10-26-f01-grouped-r4/README.md):
-three twelve-reference stands pass host grounding/build, but Windows Application
-Control denied the new capture executable before start. No visual admission or
-production change; no retry or security workaround.
-
-26 October [branch-supported pine R4 proof](../evidence/2026-10-26-forest-branch-crown-r4/README.md):
-private geometry-specific ordinary retention/recreation and staged route pass.
-Production unchanged; bare middle distance remains and grouped F01 is next.
-
-Latest26 October [clustered-crown/F01 study](../evidence/2026-10-26-forest-crown-clusters-r3/README.md):
-more silhouette volume, but coarse near art/open middle distance; ordinary
-restoration still fails its unchanged content guard. Production unchanged.
-Next needs credible branching plus grouped background/lower-layer ownership,
-not another global leaf or lobe scale.
-
-26 October follow-up: [same-topology crown RT study](../evidence/2026-10-26-forest-crown-r2/README.md)
-rejected for flat near sprays/bare middle distance and unchanged retention gate.
-Production trees remain intact. [Owner performance policy](../../PROJECT_DECISIONS.md#phone-performance-and-17-scope---2026-10-26):
-no sustained-phone target blocks release or reduces approved1.7 scope.
-
 ## Full-scope reconciliation - 26 October 2026
 
-[Current remaining delivery and forest assessment](HORDE_1_7_SCOPE_RECONCILIATION_2026_10_26.md)
-puts the unfinished surrounding landscape/forest depth first, separates real
-implementation from acceptance/deferral, and retains the 1.7 lookout versus 1.8
-playable-town boundary. Shared64 remains OFF; traversal is not landscape
-completion. Fireflies were explicitly deferred 24 October, not delivered. New
-owner feedback raises that disposition without silently changing it. All six
-jobs for `8814e866` pass; no release/phone/visual completion follows from CI.
+Use the [delivery inventory](HORDE_1_7_SCOPE_RECONCILIATION_2026_10_26.md),
+[current remaining implementation](HORDE_1_7_IMPLEMENTATION_REMAINING_2026_10_24.md)
+and [admission queue](HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md) before selecting
+work. Their implemented / gated / unfinished / physical distinctions take
+precedence over the dated milestones below. No CI result declares1.7 finished.
+
+**Forest is still a major visible gap.** Two source masters and original64 roots
+exist; the world must read as surrounding woodland with coherent middle/far
+landscape, not a sparse route. Shared64 ownership/retention exists but defaults
+OFF. [Branch-supported R4](../evidence/2026-10-26-forest-branch-crown-r4/README.md)
+passes its independently frozen ordinary eviction/restoration, exact recreation
+pixels and staged route. Production assets are unchanged. The longer route's
+foreground-window custody is inconclusive, explicitly retained.
+
+[Grouped F01 R4](../evidence/2026-10-26-f01-grouped-r4/README.md) preserves the
+original sparse control and original64, and groups twelve references into three
+stands. Build/actual-terrain host grounding pass. Windows Application Control4551
+blocked its first new native launch before process creation. No retries, copied
+or renamed executable alternatives, security change or visual acceptance.
+
+The 1.7 endpoint is the forest/lookout and fixed distant Bellwether cue; playable
+town/interiors/services/forge remain1.8. New outdoor mist/shafts/fireflies/visual
+wind were explicitly deferred24October, not delivered. [Owner performance policy](../../PROJECT_DECISIONS.md#phone-performance-and-17-scope---2026-10-26):
+sustained phone performance is ongoing optimisation, not a release-FPS gate or
+reason to limit approved scope. RT-only, quality preferences, save integrity and
+actual resource correctness remain required; release itself is not authorized.
 
 ## Current authority - 25 October 2026
 
-Latest: the [gated one-time revival owner](../evidence/2026-10-25-skeleton-revival-owner/README.md)
-wires shared encounter/Retry/earned-restore semantics and actual-phase RT
-presentation. The new contact profile earns four skills, one cry and four actual
-defeats; a hidden167-frame run checks the real owner-to-adapter rise/Idle0/pause.
-Normal revival remains **OFF** pending distributable asset/platform admission,
-natural play and listening. The supplied scream stays private and Debug opt-in;
-497 Android tests (six skips), four ABI build/lint and focused Windows checks
-pass. No phone result or performance gain is claimed. The exact ring-capacity
-proposal remains pending; new yellow attacks remain OFF.
+Updated26October against source `e4de5a5e`; this heading retains its existing link.
 
-Backed-up checkpoint `2f461da4` includes the tested pure flask backend and dormant
-exact schema3 codec; the player-facing flask is **not enabled**. Runtime restore
-rejects schema3 until its resource owner is integrated, avoiding silent loss.
-The [flask checkpoint](../evidence/2026-10-25-flask-backend/README.md) identifies
-the remaining action/input/hand/save and safe-Rest gates. The owner-requested
-development pause has been superseded by the 25 October resume.
+- **Combat:** owner accepts block→attack→held return on installed `f27982cd`.
+  Current source implements normal full frontal block, timed parry, red avoidance
+  and [actual four-skill protected practice](../evidence/2026-10-25-four-skill-practice/README.md),
+  with safe deliberate Finish/Skip. New yellow guard-break authority is tested
+  opt-in, OFF until the enemy-anchored special ring is admitted. Heavier red pose
+  and ring visual/readability gates remain. Do not infer damage/orientation
+  acceptance from the owner's animation feedback.
+- **Startup/menus:** [readiness and survivor corrections](../evidence/2026-10-25-owner-playtest/README.md)
+  exist. Android startup is asynchronous and gated on current RT presentation,
+  with responsive Retry/Cancel; its placeholder Loading/spinner is not the final
+  illustrated map. Slot wording, touch hierarchy and pause symbol are implemented;
+  current physical usability, requested title/buttons and Library screenshot
+  review remain. No duplicate chooser or loading architecture is needed.
+- **Revival:** the [gated shared owner](../evidence/2026-10-25-skeleton-revival-owner/README.md)
+  is wired, including actual settled deaths, one cry, atomic same-root pair,
+  Idle0, Retry/terminal restore and167 simulation-to-RT frames. OFF in normal
+  gameplay pending distributable private assets, actual platform readiness and
+  recreation, natural play and listening. Earlier unwired notes are history.
+- **Flask:** complete policy was approved24October22:49UTC. [Backend/codec](../evidence/2026-10-25-flask-backend/README.md)
+  and [gated action/confirmed-record owner](../evidence/2026-10-25-flask-owner/README.md)
+  exist; presentation/controls/upgrade and actual-path admission remain. Normal
+  enablement is OFF. The two ring/flask proposals need a [joint owner review](HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md#ring-and-flask-proposals-must-be-reviewed-together),
+  not two independent claims on owner28. No limits are approved by this index.
+- **Other presentation:** torch close-clearance containment plus hand framing,
+  useful residual gait art and chimney smoke remain unfinished. Rejected carry,
+  Run/body/crown and per-path smoke studies remain rejected. Prioritized Windows
+  High/mobile Low smoke is approved scope, not a successful renderer candidate.
+- **Acceptance:** fixed benchmark/rollback mechanisms remain provisional and
+  local; visible/DPI/controller and Android real sizing/return are distinct.
+  Phone/foreground/natural journey, private audio listening and owner comfort
+  remain where their evidence is missing. The owner liked the forest music in
+  one phone session; this does not establish Kit mix or every transition.
 
-The [readability/pause checkpoint](../evidence/2026-10-25-combat-readability/README.md)
-adds actual-phase yellow/diamond parry and red/cross dodge cues independent of
-lesson completion, plus a circular pause icon at the existing MENU anchor.
-The heavier Keeper cast remains unadmitted/default OFF after extra refresh work
-and inconclusive paired timing; the exact original pose stays active. Swipe-dodge
-is a proposal only. The seven affected native checks, 458 Android unit tests
-(six existing skips), four ABI Debug build and lint pass. Exact-head hosted
-run40174689046 passed all six jobs, as did the earlier `69e46426`.
-
-The next [gated flask owner](../evidence/2026-10-25-flask-owner/README.md) adds
-simulation actions, exact resources, qualified F04 refresh and confirmed-record
-retry ownership with platform load/rebase/presentation adapters. It remains
-default OFF, not player-ready: real-file tests and exact-head CI are separate,
-and controls/upgrade/hand-prop integration is unfinished. Its
-[concrete +1 utility-owner proposal](HORDE_1_7_FLASK_PRESENTATION_SEAM_2026_10_25.md)
-identifies the occupied renderer capacity before any budget/ABI change.
-
-The corrected guard phone retest reached normal isolated gameplay readiness but
-no guard input before its safety margin. Phone restored/released 07:28:34 UTC,
-with original APKs, saves and settings exact. Offline orchestration now passes
-eight mocked cases; another device slot remains required. This closes neither
-physical held guard nor multi-thumb/earned-state acceptance. All 151 owner files
-remain unchanged; PR27 is still draft/conflicting, with no merge or release.
-
-25October: [held guard and guard-to-attack](../evidence/2026-10-25-held-guard/README.md)
-are implemented in the current development combat profile, preserving timed parry,
-red dodge and full attack recovery. Exact half-heart health/HUD and a minimal
-schema2save extension retain legacy schema1bytes. Focused host/Android and hidden
-RT joins pass; local Windows storage publication is access-denied and remains
-open pending independent exact-head CI. New phone/two-thumb/balance acceptance is
-not inferred from the earlier staged lantern-only session. The dated guard-only
-checkpoint did not include flask code; the newer backend status above supersedes
-that statement. No rejected asset/effect rollout is admitted.
-
-The [bounded chimney study](../evidence/2026-10-24-chimney-smoke-gate/README.md)
-retains a verified open-flue source derivative but rejects the shared per-path
-smoke expansion at unchanged static shader gates. Opaque remains fully inlined;
-query sites rise29→39 and code564,208→799,624bytes. No smoke bank was published or
-loaded; High/Low image/cost acceptance is absent, not a pass. Normal source,
-generated bank/ABI and v4 geometry are restored. A separate live-RT lighting
-preparation proposal needs review before another material renderer change.
-
-Sam's 21:10:41 UTC reply approves a bounded owned crown study (small-sample review before rollout), retains the refillable/upgradeable flask in 1.7 and prioritizes gated chimney High/Low. He approved the complete flask policy at22:49:26UTC; partial backend work resumed25October as described above. New outdoor mist/shafts/fireflies/visual wind are explicitly deferred; existing effects/preferences remain. See [selected decisions](HORDE_1_7_OWNER_DECISIONS_2026_10_24.md#selected-direction) and [flask policy](HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md). The [first source crown sample](../../assets/models/world/source/forest-crown-study-r1/README.md) remains too sparse; production is unchanged and export is blocked by an OS temporary-image denial. The [owned Run study](../evidence/2026-10-24-player-run-retarget/README.md) is unadmitted after a walk-only grounding mismatch, with limited RT coverage.
-
-The [normal shared64 ownership checkpoint](../evidence/2026-10-24-normal-shared-forest/README.md)
-moves the existing-master owner and whole-instance retention into common Debug,
-Release and Android source, preserving the original64 placements and both master
-BLAS. It remains explicitly opt-in/default OFF. The normal-controller Windows RT
-route and recreation pass. The original landing11.58ms versus7.98/8.12ms signal is
-retained. A [balanced GPU-stage follow-up](../evidence/2026-10-24-windows-forest-gpu-stages/README.md)
-with identical staging/warmup does not repeat a persistent AS/dispatch median
-penalty; variable clocks/tails leave its exact cause and gameplay cost unresolved.
-Default admission remains blocked, not inferred from allocation savings. The earlier
-[retention proof](../evidence/2026-10-24-shared-forest-retention/README.md)
-and its rejected fixtures remain. No baked triangle certificate is reused and
-forest depth/phone gates are still open.
-
-Use [the current implementation/acceptance map](HORDE_1_7_IMPLEMENTATION_REMAINING_2026_10_24.md),
-before choosing work. Forest preparation `3108cffc`, the bounded shared-BLAS
-pair `3898bcee`, Android Custom ownership `9ab88eb0` and provisional output/
-rollback `bf181643` have focused evidence. All six hosted jobs passed at
-`09c629cf`; later exact-head CI remains a separate check.
-Kit stationary turns and casual/travel timing are implemented; the registered
-Debug journey gate is fixed without raising its deadline. The forest/shared-tree
-world-depth gap and torch compact-carry prerequisite remain unfinished.
-Android provisional output and current touch controls need physical acceptance;
-Windows benchmark needs its remaining foreground/controller/listening gates.
-Specific owner decisions/deferrals and the 1.8 boundary remain explicit.
-
-The [full-size existing-master route proof](../evidence/2026-10-24-shared-forest-route/README.md)
-now validates shared BLAS resources, actual High capacities, partial reflection
-and frozen recreation at F01/F03/F04. Normal forest remains world-baked;
-timing gains, production omission/cutover, Android and visible forest depth
-are not admitted. The [bounded F01 sector](HORDE_1_7_F01_BACKGROUND_SECTOR_2026_10_24.md)
-is the next content proof. The same work fixed zero-time terrain/aspect held-pose
-rebinding. The separate [Debug movement organization](../evidence/2026-10-24-step-movement-partition/README.md)
-now preserves the complete live-root prefix in two bounded selections, each at
-30 seconds; local Debug/Release and combined Release pass. Its original 73-check
-combined Debug observation completes in 31.610 s and remains retained, not a
-claim that its unchanged 30-second invocation passed. Exact new-head CI is separate
-from this local result and from the already-closed Debug campaign journey gate.
-
-The [twelve-root F01 trial](../evidence/2026-10-24-f01-forest-sector/README.md)
-now has actual north/west and lookout comparisons. It adds visible depth at small
-allocation cost but still fails the surrounding-forest goal; composition and
-collision remain unadmitted. Storage 104 is separate from ordinary live 28.
-The exact `8ddc08fd` hosted run failed its old storage/live witness alias in GCC/Clang;
-the runner/profile definition is corrected. Exact `699340bd` run40102559328
-passed all six jobs; that does not admit the sparse composition or phone gates.
-
-The [compact-carry endpoint study](../evidence/2026-10-24-compact-carry-study/README.md)
-is rejected: wide hand pixels improve, but the full flame envelope crosses the
-wall, square framing fails and actual RT views are dominated by the torch head.
-Original runtime/source is restored and rebuilt; no transition or clip admitted.
-Exact `b7231e1e` run40105479691 passed all six hosted jobs.
-The [canopy authority review](HORDE_1_7_CANOPY_AUTHORITY_2026_10_24.md) recovers the
-earliest documentary deferral, explicitly not Sam's original message, and records
-the earlier hold. Sam has since explicitly approved only the bounded owned crown sample above; the private Easy Tree trial and production replacement remain unadmitted.
+Preserve the151 parked owner files, current assets and saves/settings. Routine
+non-forced draft-PR27 backup is authorized; no merge, public release, publication,
+phone allocation or security change follows from this index. Exact-build CI and
+local evidence must name their own head and limitations.
 
 ## Archived checkpoint notes
 

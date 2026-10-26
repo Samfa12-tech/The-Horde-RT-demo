@@ -1,8 +1,9 @@
 # Horde 1.7: full scope and remaining delivery
 
-Reconciled at `8814e866e63e54c91a2fdd0b8be3b3bfdd5c512d`, 26 October.
-Exact [CI40212337980](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40212337980)
-finished with all six jobs successful. That is source validation, not chapter,
+Current inventory reconciled against `e4de5a5ef7620c9013a29d357ebc2668be19887d`.
+The original `8814e866` baseline passed all six jobs in
+[CI40212337980](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40212337980);
+later checkpoints retain their own exact-head results. That is source validation, not chapter,
 visual, phone or release acceptance. Work remains in the existing WP2 worktree
 and draft PR27; its directory name does not limit the full 1.7 obligation.
 
@@ -32,12 +33,12 @@ are not integrated 1.7 content and must not be counted as completed scenery.
 | --- | --- | --- |
 | **Forest and wider landscape** | r23 local/macro terrain, route, grounded original 64 trees, understory/deadwood/rocks, F03 kerbs/waystone and distant village shell exist. | **Major visible gap:** surrounding woodland mass, fuller crowns, middle/far depth, region silhouettes and controlled lookout reveal. Actual F01/F03/F04 views fail the intended woodland impression. Traversal and topo import do not close this. Near/mid/far representation and combined cost/visibility need admission. |
 | Shared/batched trees | Two source masters are reused in authoring; normal gameplay still world-bakes64 placements into four material groups (323,264 duplicated triangles). The new shared-master/BLAS owner, whole-instance retention and Windows route/recreation proof exist. | Shared64 stays OFF pending Android correctness review; cost measurements guide optimisation, not a release FPS target; Windows allocation savings are not phone/FPS gains. The extra 12-tree trial remains sparse and collision-unadmitted. Private Easy Tree and rejected pineLOD2 are not production solutions. |
-| Crowns/forest art | One owned editable pine/alder study preserves trunks/roots/placements and original sources. | Enlarging existing leaves still leaves open crowns; no broad rollout. A useful upper-crown distribution/volume sample and actual-view review remain. Its exporter hit an OS temporary-image denial; do not retry/redirect it without new relevant authorization. |
+| Crowns/forest art | Original masters and protected roots/wood remain. Branch-supported R4 has an independently frozen private ordinary retention/recreation and staged-route proof. | Forest mass remains unfinished; R2/R3 stay rejected and no broad rollout is admitted. Grouped F01 is source/grounding-ready but native launch is blocked by Application Control4551. The earlier exporter denial is separate; neither may be bypassed. |
 | Atmosphere and story smoke | Shared night/moon environment and existing effects remain; outdoor music/ambience are integrated. | Chimney smoke is approved unfinished work: the High/Low renderer trial failed unchanged shader gates and remains withdrawn. New outdoor mist/shafts, fireflies and visual wind were explicitly deferred on 24 October, not implemented or completed. Latest owner feedback raises whether to revisit that disposition; this review does not silently reinstate them. |
 | Combat/teaching | Guard→attack→guard is implemented and owner-approved on the recorded build. Current source fully blocks eligible normal attacks, retains timed parry/red avoidance and teaches four actual outcomes with protected practice/explicit safe exit. | Enemy-anchored animated special-attack rings and heavier readable red motion remain. Ring capacity approval is pending; yellow policy stays OFF. New-rule balance/phone feedback and full natural encounter acceptance remain. |
 | Revival/cry | Private append-only stand passed native import/RT; gated shared owner passes real-outcome and restore tests plus167 actual-owner RT frames. | Normal revival remains OFF. Platform current-resource clip/cue readiness, private game asset admission and natural/listening acceptance remain. The private scream is not publicly shipped; a diagnostic pose/record is not a normal playable feature. |
 | Rescue, lantern and campaign | Claim/opening, physical rope/ascent/descent, stowed owned equipment, Kit reunion/lantern lesson, forest endpoint/backtracking, hearts/subtitles/VO, three slots and checkpoint/recovery mechanisms exist. | Full natural human Keeper victory→claim→journey→earned save/load/death recovery, device lifecycle and combined residency/pacing acceptance. Seeded post-Keeper fixtures do not close the preceding journey. |
-| Flask | Complete two-drink/Rest/upgrade/death/load/migration policy is approved. Pure backend, exact resources/schema3, confirmed-record recovery and gated owner tests exist. | OFF in gameplay: flask prop/right-hand transitions, deliberate touch control, physical upgrade presentation and renderer-owner admission are unfinished. The policy itself is no longer awaiting approval. Balance and physical feel remain. |
+| Flask | Complete two-drink/Rest/upgrade/death/load/migration policy is approved. Backend, exact resources/schema3, gated actions and confirmed-record recovery owner/tests exist. | OFF in gameplay: flask prop/right-hand transitions, deliberate touch control, physical upgrade presentation and renderer-owner admission are unfinished. The policy itself is no longer awaiting approval. Balance and physical feel remain. |
 | Character/held-item presentation | Auto head-clearance crouch, stick speed, keyboard run, backward phase/dodge, Kit follow and stationary casual/travel turns are implemented with host/native evidence. | Useful lateral/run art and native joins remain where studies failed. Close-wall/ceiling torch containment **and** visible hand/torch framing remain a real defect/tradeoff; rejected carry trials stay withdrawn. The reported phone dark-world cause is unproven. |
 | UI/menus | Subtitle repair, clearer save-slot copy, compact lantern, translucent sword/shield hierarchy, pause symbol and boot-readiness/cancel protection are implemented. | Owner-requested title/button cohesion and equal More/Settings weight; physical thumb reach, simultaneous move/look/action, rotation/earned-state continuity and accessibility acceptance. Visual polish must follow inspection of the supplied screenshot. |
 | Audio/benchmark/release acceptance | Outdoor main uses the shared Pocket Audio route; owner liked that track in one phone session. Fixed-profile benchmark/rollback implementations and local reports exist. | Kit mix, movement/loop/ducking/transition listening; Windows visible/DPI/controller and Android actual benchmark sizing/return; ongoing warmed production-phone performance measurements (not a release blocker). Reports remain provisional/custom-unranked/local. PR conflicts, source-redistribution/signing and final release gates remain separate. No leaderboard/report transmission or release is authorized. |
@@ -55,6 +56,14 @@ separate requirements; this does not claim performance solved or authorise relea
 
 This inventory separates unfinished implementation from missing acceptance and
 explicit deferral. It does not call 1.7 ready or turn rejected work into completion.
+
+## Current readiness and admission decisions
+
+The [current admission queue](HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md) separates
+implemented boot/four-skill/revival/flask mechanisms from their actual admission
+gates. It also reconciles the separate ring and flask +1 proposals: both cannot
+claim the same future owner28. A joint two-owner roster/material-packing review
+is needed before a capacity decision; no limit change is approved by this note.
 
 ## Grouped F01 follow-up
 
@@ -74,7 +83,7 @@ full route pass. Production is unchanged. The foreground-window wrapper caveat
 is explicit, and actual F01 still lacks woodland mass. Grouped background content
 is next; this does not close forest presentation or phone acceptance.
 
-## Latest clustered crown/F01 result
+## Retained R3 clustered crown/F01 result
 
 [The clustered r3 sample](../evidence/2026-10-26-forest-crown-clusters-r3/README.md)
 adds real3D canopy volume within unchanged triangle/material limits. It remains
@@ -91,7 +100,7 @@ work is branch-supported crown detail and grouped background/lower-layer content
 with shared collision/lifecycle ownership; a larger canopy or12 placements alone
 is insufficient. Performance remains optimisation, not a release target gate.
 
-## Latest bounded crown result
+## Retained R2 bounded crown result
 
 [The same-topology r2 study](../evidence/2026-10-26-forest-crown-r2/README.md)
 was rejected: fuller but flat near sprays, unchanged bare middle distance, and
