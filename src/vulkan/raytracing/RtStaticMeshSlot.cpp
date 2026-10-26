@@ -656,7 +656,8 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         }
         if (materials_.size() + asset.materials.size() > kRtMaterialCapacity)
         {
-            diagnostic = "RtStaticMeshSlot capacity overflow: materials exceed 32.";
+            diagnostic = "RtStaticMeshSlot capacity overflow: materials exceed " +
+                         std::to_string(kRtMaterialCapacity) + ".";
             return false;
         }
         if (roleVertices->size() + asset.vertices.size() > std::numeric_limits<std::uint32_t>::max() ||

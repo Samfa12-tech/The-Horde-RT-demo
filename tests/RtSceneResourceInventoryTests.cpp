@@ -115,6 +115,28 @@ bool CheckTlasInstanceRefresh()
     ok &= Require(RequiresTlasInstanceRebuild(built, next), "instance-flag change must rebuild");
     ok &= Require(RequiresTlasInstanceRebuild(built, std::span(next).first(20u)),
                   "instance-count change must rebuild");
+    // Both dormant props have valid independent references. Visibility toggles
+    // change definitions; rigid movement after BUILD retains UPDATE eligibility.
+    built[28].mask = built[29].mask = 0u;
+    built[28].accelerationStructureReference = 0x128u;
+    built[29].accelerationStructureReference = 0x129u;
+    next = built;
+    ok &= Require(!RequiresTlasInstanceRebuild(built, next),
+                  "simultaneously hidden ring/flask retain valid stable definitions");
+    next[28].mask = next[29].mask = 1u;
+    ok &= Require(RequiresTlasInstanceRebuild(built, next),
+                  "simultaneous ring/flask activation requires one TLAS BUILD");
+    built = next;
+    next[28].transform.matrix[0][3] += 2.0f;
+    next[29].transform.matrix[1][3] += 0.1f;
+    ok &= Require(!RequiresTlasInstanceRebuild(built, next),
+                  "simultaneous rigid ring/flask movement retains UPDATE after activation");
+    built = next;
+    next[28].mask = next[29].mask = 0u;
+    ok &= Require(RequiresTlasInstanceRebuild(built, next) &&
+                      next[28].accelerationStructureReference == 0x128u &&
+                      next[29].accelerationStructureReference == 0x129u,
+                  "hiding both props rebuilds masks without discarding either BLAS reference");
     return ok;
 }
 
@@ -626,11 +648,22 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==30u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?32u:31u);
+        ok &= materials.size()==32u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?34u:33u);
         ok &= scene.chapterTerrainSurface_ && scene.chapterTerrainSurface_->TriangleCount()==37846u;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
         ok &= instances[9u].primitiveCount==0u && instances[25u].primitiveCount==1u;
+        const auto& ring=instances[PresentableTinyRtScene::kAttackWarningMetadataIndex];
+        const auto& flask=instances[PresentableTinyRtScene::kHealingFlaskMetadataIndex];
+        ok &= ring.primitiveCount==1u && flask.primitiveCount==1u && ring.assetIndex!=flask.assetIndex &&
+              ring.primitiveBase!=flask.primitiveBase &&
+              scene.attackWarningRingAsset_.vertices.size()==32u && scene.attackWarningRingAsset_.indices.size()==96u &&
+              scene.healingFlaskAsset_.vertices.size()==242u && scene.healingFlaskAsset_.indices.size()==1152u;
+        if(ring.primitiveBase<primitives.size() && flask.primitiveBase<primitives.size()) {
+            const auto ringMaterial=primitives[ring.primitiveBase].materialIndex;
+            const auto flaskMaterial=primitives[flask.primitiveBase].materialIndex;
+            ok &= ringMaterial!=flaskMaterial && ringMaterial<materials.size() && flaskMaterial<materials.size();
+        } else ok=false;
         const auto kitMaterial=primitives[instances[25u].primitiveBase].materialIndex;
         std::size_t emissiveOwners=0u;
         for(std::size_t i=0;i<materials.size();++i) {
@@ -1063,7 +1096,7 @@ struct PresentableTinyRtSceneObservationTestAccess
                  &scene.rewardLanternBodyBlas_, &scene.dielectricFixtureBlas_,
                  &scene.playerBodyBlas_, &scene.playerLimbBlas_,
                  &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.collapseBlas_,
-                 &scene.waterDropletBlas_})
+                 &scene.waterDropletBlas_, &scene.attackWarningRingBlas_, &scene.healingFlaskBlas_})
         {
             populateBlas(*accelerationStructure);
         }
@@ -1071,6 +1104,10 @@ struct PresentableTinyRtSceneObservationTestAccess
         populateBuffer(scene.viewmodelBlasUpdateScratch_);
         populateBuffer(scene.waterDropletBlasUpdateScratch_);
         scene.waterDropletAsset_ = MakeWaterDropletStaticAsset();
+        scene.attackWarningRingAsset_.vertices.resize(32u);
+        scene.attackWarningRingAsset_.indices.resize(96u);
+        scene.healingFlaskAsset_.vertices.resize(242u);
+        scene.healingFlaskAsset_.indices.resize(1152u);
         scene.waterDropletGeometryVisible_ = true;
         scene.ready_ = true;
         scene.uploadedQualityControls_ = {{2u, 4u, 2u, 0u}};
@@ -1189,10 +1226,10 @@ struct PresentableTinyRtSceneObservationTestAccess
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 31u &&
-                  tomb.staticMeshSlot_.Materials().size() == 30u &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 32u &&
-                  tomb.staticMeshSlot_.Materials().size() <= 32u;
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 33u &&
+                  tomb.staticMeshSlot_.Materials().size() == 32u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 38u &&
+                  tomb.staticMeshSlot_.Materials().size() <= 34u;
         if (!ok)
             std::cerr << "Integrated intake invariants: baseline indices=" << oldIndices
                       << " expected=" << 8422u*3u
@@ -1211,6 +1248,48 @@ struct PresentableTinyRtSceneObservationTestAccess
                   << " / " << tomb.staticMeshSlot_.Measurements().indexBytes - baseline.staticMeshSlot_.Measurements().indexBytes
                   << "; no GPU allocation, AS build or presentation measurement\n";
         return ok;
+    }
+
+    static bool CheckJointPresentationOwnerLifetime()
+    {
+        PresentableTinyRtScene source;
+        Populate(source);
+        source.jointPropPresentationActive_ = true;
+        const auto ringHandle = source.attackWarningRingBlas_.handle;
+        const auto flaskHandle = source.healingFlaskBlas_.handle;
+        const auto ownsBoth = [&](const PresentableTinyRtScene& scene) {
+            return scene.attackWarningRingBlas_.handle == ringHandle &&
+                scene.healingFlaskBlas_.handle == flaskHandle && ringHandle != flaskHandle &&
+                scene.attackWarningRingBlas_.address != 0u && scene.healingFlaskBlas_.address != 0u &&
+                scene.attackWarningRingAsset_.vertices.size() == 32u &&
+                scene.healingFlaskAsset_.vertices.size() == 242u && scene.jointPropPresentationActive_;
+        };
+        const auto cleared = [](const PresentableTinyRtScene& scene) {
+            return scene.attackWarningRingBlas_.handle == VK_NULL_HANDLE &&
+                scene.healingFlaskBlas_.handle == VK_NULL_HANDLE &&
+                scene.attackWarningRingBlas_.address == 0u && scene.healingFlaskBlas_.address == 0u &&
+                scene.attackWarningRingAsset_.vertices.empty() && scene.healingFlaskAsset_.vertices.empty() &&
+                !scene.jointPropPresentationActive_;
+        };
+        bool ok = ownsBoth(source);
+        PresentableTinyRtScene moved(std::move(source));
+        ok &= ownsBoth(moved) && cleared(source);
+        PresentableTinyRtScene assigned;
+        Populate(assigned);
+        assigned = std::move(moved);
+        ok &= ownsBoth(assigned) && cleared(moved);
+        assigned.Destroy();
+        ok &= cleared(assigned);
+        // A failed/partial CPU owner still clears both resources on the
+        // no-device path. Fake handles are custody tokens, not GPU allocations.
+        PresentableTinyRtScene partial;
+        partial.attackWarningRingBlas_.handle = ringHandle;
+        partial.healingFlaskBlas_.handle = flaskHandle;
+        partial.attackWarningRingAsset_.vertices.resize(1u);
+        partial.healingFlaskAsset_.vertices.resize(1u);
+        partial.jointPropPresentationActive_ = true;
+        partial.Destroy();
+        return ok && cleared(partial);
     }
 
     static bool CheckWaterDropletOwnerLifetime()
@@ -1467,7 +1546,8 @@ struct PresentableTinyRtSceneOutputResizeTestAccess
                  &scene.gothicChestLidBlas_, &scene.rewardLanternRingBlas_,
                  &scene.rewardLanternBodyBlas_, &scene.dielectricFixtureBlas_,
                  &scene.playerBodyBlas_, &scene.playerLimbBlas_,
-                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.collapseBlas_, &scene.tlas_})
+                  &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.collapseBlas_,
+                  &scene.attackWarningRingBlas_, &scene.healingFlaskBlas_, &scene.tlas_})
         {
             addAs(*as);
         }
@@ -1810,6 +1890,8 @@ int main(int argc, char** argv)
     std::cerr << "Resource integration: water owner lifetime\n";
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckWaterDropletOwnerLifetime(),
                   "water droplet CPU/GPU owner must transfer and clear through scene move/destroy");
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckJointPresentationOwnerLifetime(),
+                  "simultaneous independent ring/flask owners survive move/assignment and clear on full or partial destruction");
     std::cerr << "Resource integration: resize contracts\n";
     ok &= PresentableTinyRtSceneOutputResizeTestAccess::RunTests();
     std::cerr << "Resource integration: command/resource observations\n";
@@ -2099,7 +2181,7 @@ int main(int argc, char** argv)
 #ifndef NDEBUG
     const auto originalHandles = scene.CaptureResourceHandles();
     ok &= Require(originalHandles.ready &&
-                      originalHandles.bottomLevelAccelerationStructures.size() == 21u &&
+                      originalHandles.bottomLevelAccelerationStructures.size() == 23u &&
                       originalHandles.topLevelAccelerationStructures.size() == 1u &&
                       originalHandles.pipelines.size() == 2u &&
                       originalHandles.shaderBindingTableBuffers.size() == 2u &&
@@ -2122,26 +2204,26 @@ int main(int argc, char** argv)
                       scene.PrimaryRewardBodyPixelCount() == 41u,
                   "legacy getters must project one explicitly published completed record");
     const auto diagnostic = scene.ResourceInventory();
-    ok &= Require(diagnostic.bufferCount == 52u &&
-                      diagnostic.memoryAllocationCount == 62u &&
-                      diagnostic.bottomLevelAccelerationStructureCount == 21u &&
-                      scene.BlasCount() == 21u &&
+    ok &= Require(diagnostic.bufferCount == 54u &&
+                      diagnostic.memoryAllocationCount == 64u &&
+                      diagnostic.bottomLevelAccelerationStructureCount == 23u &&
+                      scene.BlasCount() == 23u &&
                       diagnostic.topLevelAccelerationStructureCount == 1u &&
-                      diagnostic.tlasInstanceCount == 28u &&
+                      diagnostic.tlasInstanceCount == 30u &&
                       diagnostic.pipelineCount == 2u &&
                       diagnostic.shaderBindingTableCount == 2u &&
                       diagnostic.descriptorSetCount == 1u,
                   "live inventory must include direct, character, image, and both SBT owners");
-    ok &= Require(diagnostic.hostVisibleBytes == 3456u &&
-                      diagnostic.deviceLocalBytes == 4608u,
+    ok &= Require(diagnostic.hostVisibleBytes == 3584u &&
+                      diagnostic.deviceLocalBytes == 4736u,
                   "host-visible and device-local bytes must use inclusive allocation classes");
 
     PresentableTinyRtSceneObservationTestAccess::RemoveDiagnosticBuffer(scene);
     const auto shipping = scene.ResourceInventory();
-    ok &= Require(shipping.bufferCount == 51u &&
-                      shipping.memoryAllocationCount == 61u &&
-                      shipping.hostVisibleBytes == 3392u &&
-                      shipping.deviceLocalBytes == 4544u,
+    ok &= Require(shipping.bufferCount == 53u &&
+                      shipping.memoryAllocationCount == 63u &&
+                      shipping.hostVisibleBytes == 3520u &&
+                      shipping.deviceLocalBytes == 4672u,
                   "inventory must count only a genuinely live Diagnostic buffer");
 
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(scene);
@@ -2197,7 +2279,7 @@ int main(int argc, char** argv)
                       moved.QualityControls().controls == std::array<std::uint32_t, 4u>{{2u, 4u, 2u, 0u}} &&
                       moved.UploadedFireQuality() == horde::vulkan::raytracing::FireEmitterQuality::Low,
                   "actual uploaded policy must transfer to exactly one owner with its buffer");
-    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 21u &&
+    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 23u &&
                       movedFrom.bufferCount == 0u &&
                       movedFrom.memoryAllocationCount == 0u &&
                       movedFrom.hostVisibleBytes == 0u &&

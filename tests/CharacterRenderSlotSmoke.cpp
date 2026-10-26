@@ -252,12 +252,13 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 21u &&
-                      PresentableTinyRtScene::kBlasCount == 23u &&
-                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 28u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 104u &&
-                      kRtInstanceMetadataCapacity == 28u &&
-                      kRtStaticAssetCapacity == 13u &&
+    ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 23u &&
+                      PresentableTinyRtScene::kBlasCount == 25u &&
+                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 30u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 106u &&
+                      kRtInstanceMetadataCapacity == 30u &&
+                      kRtStaticAssetCapacity == 15u &&
+                      kRtPrimitiveMetadataCapacity == 38u && kRtMaterialCapacity == 34u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&
@@ -269,8 +270,15 @@ int main()
                       PresentableTinyRtScene::kWaterDropletMetadataIndex == 24u &&
                       PresentableTinyRtScene::kWaterDropletInstanceIndex == 26u &&
                       PresentableTinyRtScene::kKeeperMetadataIndex == 25u &&
-                      PresentableTinyRtScene::kKeeperInstanceIndex == 27u,
-                  "Keeper metadata25/TLAS27 appends after the existing waterfall skeleton, torches, scabbard, viewmodel, and water owners");
+                      PresentableTinyRtScene::kKeeperInstanceIndex == 27u &&
+                      PresentableTinyRtScene::kAttackWarningMetadataIndex == 28u &&
+                      PresentableTinyRtScene::kAttackWarningInstanceIndex == 28u &&
+                      PresentableTinyRtScene::kHealingFlaskMetadataIndex == 29u &&
+                      PresentableTinyRtScene::kHealingFlaskInstanceIndex == 29u,
+                  "joint ring28/flask29 append after unchanged Keeper27 and every previous metadata/TLAS owner");
+    ok &= Require(PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 64u == 94u &&
+                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 76u == 106u,
+                  "forest placement definitions begin after the thirty-role prefix and fit both bounded populations");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =

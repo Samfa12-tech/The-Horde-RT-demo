@@ -521,3 +521,20 @@ measurements. Listening with Kit and warmed-phone acceptance remain open.
 Sam replied “Yes” directly to the three recommendations at 21:10:41 UTC (trusted parent delegation, `Sentinel_e4691101c80081919a5706c390214030`). Authorize one owned editable pine/alder crown study, preserving trunks, roots and placements, with small-sample review before broader replacement. This does not admit the private Easy Tree prototype. Keep the refillable/upgradeable flask in 1.7; its complete healing/refill/use/death/load/migration policy must be approved before implementation. Numeric parameters and new upgrade content remain recommendations.
 
 Prioritize measured chimney smoke with Windows High/mobile Low. Explicitly defer new outdoor participating mist, shafts, fireflies and visual wind for initial 1.7. Existing effects and explicit user preferences remain unchanged, with Android fresh/reset Mist OFF and desktop defaults preserved. No assumed extra GPU budget, paid generation, broad framework, phone use, merge or release. See the [current decision sheet](docs/design/HORDE_1_7_OWNER_DECISIONS_2026_10_24.md) and [flask proposal](docs/design/HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md).
+
+## Joint attack-ring and flask resource implementation - 2026-10-26
+
+Sam replied "yes" (`Sentinel_d422ddba5e2c8191bb230909a3cd7e7f`) to the bounded
+joint implementation/evaluation recommendation (`Sentinel_24da819eed7c819185d572948660b6d7`),
+as relayed by the trusted parent delegation. Append ring owner28 and flask29;
+preserve owners0-27 and forest metadata26/27. Approved ceilings are ordinary
+definitions/metadata28→30, static assets13→15, primitives36→38, materials32→34,
+TLAS104→106, and ordinary/shared BLAS21/23→23/25.
+
+Implement and test the [joint layout](docs/design/HORDE_1_7_JOINT_RING_FLASK_ADMISSION_2026_10_26.md)
+within the existing shared RT/static-PBR architecture. Preserve record layouts,
+bindings, texture layers18, lights, fire4, one frame in flight and approved
+gameplay rules. Both features stay gated/OFF in normal play until asset, visual,
+lifecycle and gameplay checks pass. Resource counts are not measured GPU
+allocation or FPS evidence. No wider capacity increase, paid signing, security
+change, publication, merge or release follows from this approval.

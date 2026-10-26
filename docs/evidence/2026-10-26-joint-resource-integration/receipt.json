@@ -1,0 +1,331 @@
+{
+  "schema": 1,
+  "scope": "Approved joint resource implementation; normal gameplay and RT visual admission remain OFF/pending",
+  "baseCommit": "d89189cb",
+  "approval": "Sentinel_d422ddba5e2c8191bb230909a3cd7e7f",
+  "capacities": {
+    "ordinaryDefinitions": 30,
+    "metadata": 30,
+    "staticAssets": 15,
+    "primitives": 38,
+    "materials": 34,
+    "tlas": 106,
+    "ordinaryBlas": 23,
+    "sharedBlas": 25
+  },
+  "preserved": {
+    "owners0to27": true,
+    "textures": 18,
+    "fireEmitters": 4,
+    "framesInFlight": 1,
+    "recordLayoutsUnchanged": true,
+    "descriptorBindingsUnchanged": true,
+    "frozenShaderBudgetsUnchanged": true
+  },
+  "geometry": {
+    "ringVertices": 32,
+    "ringTriangles": 32,
+    "flaskVertices": 242,
+    "flaskTriangles": 384,
+    "vertexStride": 64,
+    "indexStride": 4,
+    "addedVertexIndexPayloadBytes": 22528,
+    "addedFixedArrayPayloadBytes": 576,
+    "driverAllocationScratchAndGpuCost": "not measured"
+  },
+  "normalEnabled": {
+    "ring": false,
+    "flask": false,
+    "yellowAttackPolicy": false
+  },
+  "tests": {
+    "debugBuild": "passed",
+    "androidDebugAssembleLint": "passed;4m14s;no install",
+    "cpuTargetsInitial": {
+      "passed": 5,
+      "failed": 1,
+      "failure": "expanded synthetic asset roster collided with hardcoded alias14"
+    },
+    "assetAliasCorrection": "derive free owner from actual roster; all original byte/pointer packing assertions preserved",
+    "assetTargetRerun": "passed1/1,2.36s",
+    "abiGenerator": "passed,including stale/negative cases",
+    "androidWitness": "passed92assertions;injected transport only",
+    "shaderGates": {
+      "raygenArtifactCompatibilityMutationFreshness": "passed",
+      "raygenManifestEightKeyMatrix": "passed",
+      "computeEightModeConformanceFreshness": "passed",
+      "frozenCostBudgets": "unchanged"
+    },
+    "cpuTargetsFinal": {
+      "passed": 6,
+      "failed": 0,
+      "evidence": "five unchanged passes from initial six-target selection plus corrected asset target rerun; initial failed receipt preserved"
+    },
+    "shaderPinFailures": "two earlier retained receipts identify stale canonical/opaque and raw compatibility pins; all updated explicitly for approved ABI, no assertions removed"
+  },
+  "shaderDelta": [
+    {
+      "key": "diagnostic_high_generic_dielectric",
+      "spirvSha256": "95c244f6201434fad2abebd1dbf1dcd0466b2d35ba9d92c03e90883b838c97b3",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "diagnostic_high_opaque_fast",
+      "spirvSha256": "c1368e40cd4817345f4fc789d80bee78a0773b4ba64c9710043809bcef085fc9",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "spirvSha256": "e6ab8d02ffb8e999478f9db0605fa9a3085a37652b29647ef6c562d7e7b99e9d",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "spirvSha256": "2c88cf86fc57b362fe7e30c317832c68975e8bbe9aeea1faa84876881318d4d6",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "shipping_high_generic_dielectric",
+      "spirvSha256": "107192675313ed016163cd621aedeac078bad92bacceadf437847356360f8cd2",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "shipping_high_opaque_fast",
+      "spirvSha256": "df4ecc79c51b9887ec6b66d3e27bccb90850bfa13763cb36978f43ea25b551b8",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "spirvSha256": "58295240796fdf06e17143f33c4e665f05f86b378394fb13fc9f8a54249c2f25",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "spirvSha256": "34083b41ae9238827d547ae0c5a0d72acac096ba23e3bd42f19276b9b950a204",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+      "spirvSha256": "28c0480803943a88ee0f749ef37542ca6fe32648390ac36f017debec5f0b6bb8",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_opaque_fast",
+      "spirvSha256": "de6ecf397cde0789d47db1b7083e7f73eca3b15fef80366cafc72857f721764a",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+      "spirvSha256": "ba3b7bcf44ea1c7a5e597493afde31741cc68f51dd1028efd86482e431bc043f",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+      "spirvSha256": "cbe1a2814e3a88c1caca17893cf35f5cc6a8035813648b84f2838c84d32a47ec",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "rayquery_compute_shipping_high_generic_dielectric",
+      "spirvSha256": "c736a9ad0de0b574a5bc7bc66ca735cfc2eea69cbfb3e6035979065ba7bf6619",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "rayquery_compute_shipping_high_opaque_fast",
+      "spirvSha256": "d66fbe4320b9aa8320215c35368921b2ade52ade1cbf59ba0b6edb66f46c6732",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "spirvSha256": "c4bd1216d9c5720188f7e26044bd602164b0a21e22c31205b008d0f843aba8c7",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "spirvSha256": "16180a0ea7161524ca3623d6a085b9a41443e60a91abb996691aff7bac77d96c",
+      "metricDelta": {
+        "bytes": 16,
+        "words": 4,
+        "instructions": 1,
+        "branchOperations": 0,
+        "loops": 0,
+        "selectionMerges": 0,
+        "functions": 0,
+        "functionCalls": 0,
+        "rayQueryInitializations": 0,
+        "atomicInstructions": 0
+      }
+    }
+  ],
+  "limitations": [
+    "No game executable launch or native RT/GPU presentation",
+    "No phone, input, lifecycle or listening evidence",
+    "No source animation/utility caller or attack-phase integration admission",
+    "Diagnostic terminal-material mask retains its existing modulo32 semantics; not unique coverage of34rows",
+    "151 parked owner paths remain present/untracked; saved roster has no original content hashes"
+  ]
+}

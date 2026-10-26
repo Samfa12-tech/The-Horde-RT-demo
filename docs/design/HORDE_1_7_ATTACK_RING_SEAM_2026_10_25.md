@@ -1,3 +1,8 @@
+> Current authority, 26 October: Sam approved the exact JOINT warning28/flask29
+> layout for implementation/evaluation. Normal enablement remains OFF. The
+> standalone +1 figures and pending language below retain their historical
+> context and do not override the [joint decision](HORDE_1_7_JOINT_RING_FLASK_ADMISSION_2026_10_26.md).
+
 # Attacker-ring scope before implementation
 
 **Combined request supersedes the standalone roster below:** use the

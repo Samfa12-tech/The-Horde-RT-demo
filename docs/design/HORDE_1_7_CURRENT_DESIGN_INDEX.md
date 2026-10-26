@@ -1,11 +1,16 @@
 # Horde 1.7 current design index
 
-26 October: [security diagnosis](../evidence/2026-10-26-windows-app-control/README.md)
-confirms the exact unsigned file but cannot attribute policy because event/policy
-reads are denied. No retry/security change. [Benchmark-send status](../evidence/2026-10-26-benchmark-delivery-status/README.md):
+26 October: the owner-approved [security diagnosis](../evidence/2026-10-26-windows-app-control/README.md)
+identified the recorded automated Smart App Control trust rejection. Sam later
+manually opened the exact candidate path and its running-window path was verified;
+this does not establish automated recreation or captured visuals. Computer Use
+binding timed out, so visual review remains held without new prompts or security
+changes. [Benchmark-send status](../evidence/2026-10-26-benchmark-delivery-status/README.md):
 benchmark statistics remain local; earlier playtest email delivery is distinct.
-The [joint warning/flask proposal](HORDE_1_7_JOINT_RING_FLASK_ADMISSION_2026_10_26.md)
-now fixes two owners and exact packing/profile counts, pending specific approval.
+Sam approved the [exact joint ring/flask resource layout](HORDE_1_7_JOINT_RING_FLASK_ADMISSION_2026_10_26.md)
+for implementation/evaluation. [Resource integration](../evidence/2026-10-26-joint-resource-integration/README.md)
+now passes the affected CPU/ABI/shader gates and Android build/lint; both normal-play
+defaults stay OFF pending hand/phase, actual RT, lifecycle and gameplay admission.
 
 ## Full-scope reconciliation - 26 October 2026
 
@@ -27,7 +32,8 @@ foreground-window custody is inconclusive, explicitly retained.
 original sparse control and original64, and groups twelve references into three
 stands. Build/actual-terrain host grounding pass. Windows Application Control4551
 blocked its first new native launch before process creation. No retries, copied
-or renamed executable alternatives, security change or visual acceptance.
+or renamed executable alternatives or security change. Later manual launch is
+verified, but actual grouped-F01 visual acceptance is still pending.
 
 The 1.7 endpoint is the forest/lookout and fixed distant Bellwether cue; playable
 town/interiors/services/forge remain1.8. New outdoor mist/shafts/fireflies/visual
@@ -51,8 +57,9 @@ Updated26October against source `e4de5a5e`; this heading retains its existing li
   exist. Android startup is asynchronous and gated on current RT presentation,
   with responsive Retry/Cancel; its placeholder Loading/spinner is not the final
   illustrated map. Slot wording, touch hierarchy and pause symbol are implemented;
-  current physical usability, requested title/buttons and Library screenshot
-  review remain. No duplicate chooser or loading architecture is needed.
+  equal secondary widths/safe-area anchors now pass Android host-widget tests.
+  Full title/surface design, Library screenshot inspection and physical usability
+  remain; widget captures are geometry evidence, not final game appearance. No duplicate chooser or loading architecture is needed.
 - **Revival:** the [gated shared owner](../evidence/2026-10-25-skeleton-revival-owner/README.md)
   is wired, including actual settled deaths, one cry, atomic same-root pair,
   Idle0, Retry/terminal restore and167 simulation-to-RT frames. OFF in normal
@@ -61,8 +68,9 @@ Updated26October against source `e4de5a5e`; this heading retains its existing li
 - **Flask:** complete policy was approved24October22:49UTC. [Backend/codec](../evidence/2026-10-25-flask-backend/README.md)
   and [gated action/confirmed-record owner](../evidence/2026-10-25-flask-owner/README.md)
   exist. An [original flask source study](../evidence/2026-10-26-flask-source-study/README.md)
-  passes static/glTF checks with editable Blender previews; it is not imported
-  or admitted. Presentation/controls/upgrade and actual-path admission remain.
+  passes static/glTF checks with editable Blender previews; it is not itself
+  the runtime import. The joint runtime derivative now passes native static intake
+  and resource tests; hand/use bindings and normal admission remain unfinished. Presentation/controls/upgrade and actual-path admission remain.
   A [same-rig use/return source candidate](../evidence/2026-10-26-flask-motion-study/README.md)
   now includes completed/cancelled actions and a gauntlet-fit neck derivative;
   292 discrete head/flask and head/gauntlet observations across both actions
@@ -72,8 +80,9 @@ Updated26October against source `e4de5a5e`; this heading retains its existing li
   validates transition provenance; its retained0.89s source cue misses sword
   readiness by one tick. A separate tick-aligned source derivative passes sampled
   contact/playback while preserving r1; actual owner/native integration remains.
-  The two ring/flask proposals need a [joint owner review](HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md#ring-and-flask-proposals-must-be-reviewed-together),
-  not two independent claims on owner28. No limits are approved by this index.
+  The [joint resource decision](HORDE_1_7_JOINT_RING_FLASK_ADMISSION_2026_10_26.md)
+  is approved for bounded implementation/evaluation: warning28/flask29. Native
+  hand/phase integration, visuals and normal enablement remain unadmitted.
 - **Other presentation:** torch close-clearance containment plus hand framing,
   useful residual gait art and chimney smoke remain unfinished. Rejected carry,
   Run/body/crown and per-path smoke studies remain rejected. Prioritized Windows

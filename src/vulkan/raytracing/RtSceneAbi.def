@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "sceneCounts": { "ordinaryShowcaseTlasInstances": 28 },
+  "sceneCounts": { "ordinaryShowcaseTlasInstances": 30 },
   "capacities": {
-    "instanceMetadata": 28,
-    "tlasInstances": 104,
-    "staticAssets": 13,
-    "primitives": 36,
-    "materials": 32,
+    "instanceMetadata": 30,
+    "tlasInstances": 106,
+    "staticAssets": 15,
+    "primitives": 38,
+    "materials": 34,
     "textureLayers": 18,
     "fireEmitters": 4,
     "activeFireEmitters": 4,

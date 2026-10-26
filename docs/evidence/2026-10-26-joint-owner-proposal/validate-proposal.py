@@ -12,7 +12,10 @@ def validate(p, baseline):
     def require(condition, reason):
         if not condition:
             raise ValueError(reason)
-    require(p['status'] == 'pending-owner-approval' and not p['runtimeEnabled'], 'not an admission')
+    require(p['status'] == 'approved-for-implementation-evaluation' and not p['runtimeEnabled'], 'not normal admission')
+    require(p['approval']['messageId'] == 'Sentinel_d422ddba5e2c8191bb230909a3cd7e7f' and
+            not p['approval']['normalEnablementApproved'] and not p['approval']['releaseApproved'],
+            'bounded implementation approval only')
     require(p['preservedMetadataIndices'] == list(range(28)), 'existing owners must remain')
     require(p['forestMasterMetadataIndices'] == [26, 27], 'master metadata must remain')
     roles = p['roles']; limits = p['requestedLimits']; materials = p['materialPacking']
@@ -61,9 +64,12 @@ def validate(p, baseline):
 def main():
     p = json.loads(PLAN.read_text()); baseline = json.loads((HERE/'baseline.json').read_text())
     abi = json.loads((ROOT/'src/vulkan/raytracing/RtSceneAbi.def').read_text())
-    for name in ['instanceMetadata', 'staticAssets', 'primitives', 'materials', 'tlasInstances']:
-        assert p['currentLimits'][name] == abi['capacities'][name]
-    assert p['currentLimits']['ordinaryDefinitions'] == abi['sceneCounts']['ordinaryShowcaseTlasInstances']
+    names=['instanceMetadata', 'staticAssets', 'primitives', 'materials', 'tlasInstances']
+    observed={name:abi['capacities'][name] for name in names}
+    observed['ordinaryDefinitions']=abi['sceneCounts']['ordinaryShowcaseTlasInstances']
+    before={name:p['currentLimits'][name] for name in observed}
+    approved={name:p['requestedLimits'][name] for name in observed}
+    assert observed in (before,approved), 'ABI must be one coherent baseline or approved layout, not mixed bounds'
     validate(p, baseline)
     mutations = [
         ('same metadata owner', lambda x: x['roles'][1].update(metadataIndex=28)),
@@ -80,6 +86,8 @@ def main():
         ('incomplete asset bypass', lambda x: x.update(loadedOwnedBlasRequiredBeforeAnyVisibility=False)),
         ('retention assumption', lambda x: x.update(ordinaryRetentionMustRevalidateNewQuerySources=False)),
         ('silent admission', lambda x: x.update(runtimeEnabled=True)),
+        ('unreviewed enablement approval', lambda x: x['approval'].update(normalEnablementApproved=True)),
+        ('missing owner approval', lambda x: x['approval'].update(messageId='unconfirmed')),
     ]
     for name, mutate in mutations:
         changed = copy.deepcopy(p); mutate(changed)
@@ -90,7 +98,8 @@ def main():
         raise AssertionError('negative proposal accepted: ' + name)
     print(json.dumps({'scope': 'offline proposal arithmetic; not runtime admission',
                       'positiveProposalPassed': True, 'negativeCasesRejected': len(mutations),
-                      'currentAbiUnchanged': True, 'ownerApprovalPending': True}, indent=2))
+                      'abiState': 'baseline' if observed==before else 'approved layout',
+                      'ownerApprovalPending': False, 'normalEnablementApproved': False}, indent=2))
 
 
 if __name__ == '__main__':

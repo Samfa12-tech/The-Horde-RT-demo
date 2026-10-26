@@ -16,15 +16,15 @@ $script:witnessChecks=0
 function Check([bool]$condition,[string]$message){if(-not $condition){throw $message};$script:witnessChecks++}
 function Reject([scriptblock]$action){$failed=$false;try{& $action}catch{$failed=$true};Check $failed 'Invalid witness policy must fail closed.'}
 $repository=Split-Path -Parent $PSScriptRoot
-Check ((Get-ExpectedShowcaseInstanceCapacity $repository) -eq 28) 'Ordinary live TLAS count28 preserves Keeper27 and every legacy role despite larger diagnostic storage.'
+Check ((Get-ExpectedShowcaseInstanceCapacity $repository) -eq 30) 'Ordinary live TLAS count30 appends ring28/flask29 after unchanged Keeper27 and every legacy role.'
 $fixture=Join-Path ([IO.Path]::GetTempPath()) ('horde-witness-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path (Join-Path $fixture 'src/vulkan/raytracing') -Force | Out-Null
 try{
     $abiPath=Join-Path $fixture 'src/vulkan/raytracing/RtSceneAbi.def'
     '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":21},"capacities":{"instanceMetadata":21,"tlasInstances":21}}' | Set-Content -LiteralPath $abiPath
     Check ((Get-ExpectedShowcaseInstanceCapacity $fixture) -eq 21) 'Equal metadata/TLAS fixtures retain their exact physical count.'
-    '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":28},"capacities":{"instanceMetadata":22,"tlasInstances":104}}' | Set-Content -LiteralPath $abiPath
-    Check ((Get-ExpectedShowcaseInstanceCapacity $fixture) -eq 28) 'The live profile count is independent of aliased metadata22 and spare physical storage104.'
+    '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":30},"capacities":{"instanceMetadata":22,"tlasInstances":106}}' | Set-Content -LiteralPath $abiPath
+    Check ((Get-ExpectedShowcaseInstanceCapacity $fixture) -eq 30) 'The live profile count is independent of aliased metadata22 and spare physical storage106.'
     foreach($invalid in @(
         '{"schema":1,"capacities":{"instanceMetadata":22}}',
         '{"schema":1,"capacities":{"instanceMetadata":0,"tlasInstances":24}}',
@@ -32,11 +32,11 @@ try{
         '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":257}}',
         '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":24.5}}',
         '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":"24"}}',
-        '{"schema":1,"capacities":{"instanceMetadata":28,"tlasInstances":104}}',
-        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":0},"capacities":{"instanceMetadata":28,"tlasInstances":104}}',
-        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":105},"capacities":{"instanceMetadata":28,"tlasInstances":104}}',
-        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":28.5},"capacities":{"instanceMetadata":28,"tlasInstances":104}}',
-        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":"28"},"capacities":{"instanceMetadata":28,"tlasInstances":104}}'
+        '{"schema":1,"capacities":{"instanceMetadata":30,"tlasInstances":106}}',
+        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":0},"capacities":{"instanceMetadata":30,"tlasInstances":106}}',
+        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":107},"capacities":{"instanceMetadata":30,"tlasInstances":106}}',
+        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":30.5},"capacities":{"instanceMetadata":30,"tlasInstances":106}}',
+        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":"30"},"capacities":{"instanceMetadata":30,"tlasInstances":106}}'
     )) {
         $invalid | Set-Content -LiteralPath $abiPath
         Reject {Get-ExpectedShowcaseInstanceCapacity $fixture}

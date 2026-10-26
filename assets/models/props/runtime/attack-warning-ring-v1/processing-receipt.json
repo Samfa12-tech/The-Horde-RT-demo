@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "authoringScript": "tools/author-joint-presentation-assets.py",
+  "authoringScriptSha256": "39a99e5a93ddc53ebb61d8f1da55a9a09271d7e1ffa2ccd80a7d1ef4ef5344ee",
+  "validationClass": "Focused offline stdlib GLB/accessor/geometry checks; native import and hardware RT not run",
+  "acceptance": "Candidate only. Native importer/capacity integration, real RT presentation, lifecycle and owner visual acceptance remain pending; normal enablement stays OFF.",
+  "provenance": "Original project-authored geometry supplied for Horde; no third-party mesh, image, texture, provider or paid generation. Applicable user/service rights remain unchanged; no blanket MIT, CC0, Meshy or other licence is assigned.",
+  "sourceRecipeSha256": "f225c552687f92d608b065a688b89ef9ebdffb348068238cef32a5f80b9aec4d",
+  "sourceGlbSha256": "15befb04ac511128714249c27b09a3ba96ea0c847edfbd91e80b14ef1eb7ed85",
+  "runtime": {
+    "sha256": "15befb04ac511128714249c27b09a3ba96ea0c847edfbd91e80b14ef1eb7ed85",
+    "bytes": 2388,
+    "vertices": 32,
+    "indices": 96,
+    "triangles": 32,
+    "primitives": 1,
+    "materials": 1,
+    "texturePayloads": 0,
+    "lights": 0,
+    "minimumMetres": [
+      -1.0,
+      -1.0,
+      0.0
+    ],
+    "maximumMetres": [
+      1.0,
+      1.0,
+      0.0
+    ],
+    "dimensionsMetres": [
+      2.0,
+      2.0,
+      0.0
+    ],
+    "finiteAttributes": true,
+    "unitNormals": true,
+    "finiteUv0": true,
+    "boundsMatchStoredFloat32": true,
+    "windingMatchesNormals": true,
+    "minimumTriangleAreaM2": 0.02020568312436488,
+    "boundaryEdgesAfterExactPositionWeld": 32
+  },
+  "derivation": "Source and runtime GLBs are byte-identical; original code-authored planar annulus",
+  "material": {
+    "name": "AttackWarningAmber",
+    "pbrMetallicRoughness": {
+      "baseColorFactor": [
+        0.72,
+        0.09,
+        0.015,
+        1.0
+      ],
+      "metallicFactor": 0.0,
+      "roughnessFactor": 1.0
+    },
+    "alphaMode": "OPAQUE",
+    "doubleSided": true,
+    "emissiveFactor": [
+      1.0,
+      0.16,
+      0.015
+    ]
+  },
+  "closedSurface": false,
+  "annulus": {
+    "segments": 16,
+    "innerRadius": 0.88,
+    "outerRadius": 1.0,
+    "plane": "local XY",
+    "normal": [
+      0,
+      0,
+      1
+    ],
+    "vertices": 32,
+    "triangles": 32,
+    "topology": "Two vertices per segment, shared seam, two CCW triangles per segment"
+  },
+  "newTextureLayers": 0,
+  "newLights": 0
+}

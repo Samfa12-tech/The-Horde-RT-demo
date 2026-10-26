@@ -1,10 +1,18 @@
-# Joint warning/flask admission proposal — pending owner approval
+# Joint warning/flask layout - approved for implementation/evaluation
 
 This supersedes the two standalone +1 requests for a combined1.7 decision.
-No runtime, ABI, shader, default or asset is changed. The machine-readable
+The approved implementation is in progress; normal feature defaults stay OFF.
+The machine-readable
 [proposal](data/horde-1.7-ring-flask-owner-proposal.json) and
 [offline validation](../evidence/2026-10-26-joint-owner-proposal/README.md) pin one
-internally consistent request, not an admitted resource layout.
+internally consistent layout, not normal gameplay admission.
+
+Sam explicitly approved the bounded combined implementation/evaluation on
+26 October, replying "yes" to the recommendation to add both owners while
+keeping them disabled in normal play until visual/lifecycle checks pass. See
+[the decision record](../../PROJECT_DECISIONS.md#joint-attack-ring-and-flask-resource-implementation---2026-10-26).
+Only the exact ceilings below are authorized. This clears the resource decision;
+it does not claim that code, assets, native visuals or normal enablement passed.
 
 ## One roster, both roles present
 
@@ -22,7 +30,7 @@ instance transforms, not a new object shader branch or light. Today's singular
 attack coordinator needs one warning owner. A future simultaneous-warning pool
 is outside this request and must not silently drop extra sources.
 
-| Bound | Current | Requested ceiling |
+| Bound | Previous | Approved ceiling |
 | --- | ---: | ---: |
 | Ordinary definitions / metadata | 28 / 28 | 30 / 30 |
 | Unique static assets | 13 | 15 |
@@ -62,7 +70,7 @@ payload growth is not a driver allocation, shader-cost or timing measurement.
 BLAS/TLAS backing/scratch, startup overlap, generated bank size and frame costs
 still need actual queries and paired observations. Keep all current gates.
 
-## Admission sequence, after specific approval
+## Implementation sequence under the bounded approval
 
 1. Produce/validate original bounded ring/flask assets, grip and source provenance.
    Each joint candidate role must own a valid imported mesh, BLAS and material
@@ -97,7 +105,7 @@ joint layout or proves automated recreation. This proposal does not authorize
 a blocked-launch retry or security change, nor does it admit the private
 revival audio/stand assets.
 
-**Bounded decision requested:** approve implementation/evaluation of this joint
-two-owner layout and the exact ceilings above, preserving all stated validation
-gates. This is not approval to enable unfinished features, ship assets, merge,
-publish, spend, change security or start a phone session.
+**Bounded decision received:** implementation/evaluation of this joint two-owner
+layout and the exact ceilings above, preserving all stated validation gates.
+This is not approval to enable unfinished features, ship assets, merge, publish,
+spend, change security or start a phone session.

@@ -1,0 +1,5 @@
+<user>\AppData\Local\Temp\horde-raygen-variants-2236a7caa21945eb9cf455f55b33131c\lf-variant-output\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 240136 bytes; functions=83; calls=260; ray-query sites=2; dependency SHA-256=e2b03dd497baf3f8c83f0a75fcbc31176b5efb2479125243ab9d413e53cfc16b
+<user>\AppData\Local\Temp\horde-raygen-variants-2236a7caa21945eb9cf455f55b33131c\crlf-variant-output\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 240136 bytes; functions=83; calls=260; ray-query sites=2; dependency SHA-256=e2b03dd497baf3f8c83f0a75fcbc31176b5efb2479125243ab9d413e53cfc16b
+Raygen variant manifest and temporary compiler matrix passed.

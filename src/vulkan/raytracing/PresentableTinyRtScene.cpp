@@ -620,6 +620,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     viewmodelBlas_ = std::exchange(other.viewmodelBlas_, AccelerationStructure{});
     collapseBlas_ = std::exchange(other.collapseBlas_, AccelerationStructure{});
     waterDropletBlas_ = std::exchange(other.waterDropletBlas_, AccelerationStructure{});
+    attackWarningRingBlas_ = std::exchange(other.attackWarningRingBlas_, AccelerationStructure{});
+    healingFlaskBlas_ = std::exchange(other.healingFlaskBlas_, AccelerationStructure{});
     waterDropletBlasUpdateScratch_ = std::exchange(other.waterDropletBlasUpdateScratch_, Buffer{});
     viewmodelBlasUpdateScratch_ = std::exchange(other.viewmodelBlasUpdateScratch_, Buffer{});
     skinnedPlayerBlasUpdateScratch_ =
@@ -662,6 +664,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
         std::move(other.productionDielectricFixtureAsset_);
     waterDropletAsset_ = std::move(other.waterDropletAsset_);
     waterDropletGeometryVisible_ = std::exchange(other.waterDropletGeometryVisible_, false);
+    attackWarningRingAsset_ = std::move(other.attackWarningRingAsset_);
+    healingFlaskAsset_ = std::move(other.healingFlaskAsset_);
+    jointPropPresentationActive_ = std::exchange(other.jointPropPresentationActive_, false);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
     viewmodelAsset_ = std::move(other.viewmodelAsset_);
     viewmodelSkin_ = std::move(other.viewmodelSkin_);
@@ -872,7 +877,7 @@ bool ApplyExistingForestInstances(std::span<VkAccelerationStructureInstanceKHR> 
     const std::array<VkDeviceAddress,2>& addresses,std::string& diagnostic)
 {
     constexpr auto first=PresentableTinyRtScene::kOrdinaryTlasInstanceCount;
-    static_assert(first==28u);
+    static_assert(first==30u);
     const std::size_t additional=f01Sector?12u:0u;
     if(!layout.prepared || layout.prepared->placements.size()!=64u ||
        layout.supplementalPlacements.size()!=additional || instances.size()<first+64u+additional ||
@@ -987,7 +992,8 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
         gothicChestLidBlas_.address,rewardLanternRingBlas_.address,rewardLanternBodyBlas_.address,dielectricFixtureBlas_.address,
         playerBodyBlas_.address,playerLimbBlas_.address,skinnedPlayerBlas_.address,viewmodelBlas_.address,
         collapseBlas_.address,waterDropletBlas_.address,characterSlot_.SkeletonGpu(0).accelerationStructure.address,
-        characterSlot_.SkeletonGpu(1).accelerationStructure.address,characterSlot_.LichGpu().accelerationStructure.address};
+        characterSlot_.SkeletonGpu(1).accelerationStructure.address,characterSlot_.LichGpu().accelerationStructure.address,
+        attackWarningRingBlas_.address,healingFlaskBlas_.address};
     for(unsigned i=0;i<kOrdinaryTlasInstanceCount;++i) {
         if(i)out<<',';const auto& actual=tlasBuiltInstances_[i];
         const auto found=std::find(owned.begin(),owned.end(),actual.accelerationStructureReference);
@@ -1091,14 +1097,15 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
        sceneProfile_!=RtSceneProfile::Showcase || !developmentRescueJourney_ || ordinaryStaticOmissions_ ||
        ordinaryStaticReduced_ || preparedStaticGeometry_)return fail("Forest proof lacks its complete fully resident owner.");
     if(forestSharedLayout_.supplementalPlacements.size()!=supplementalCount ||
-       tlasInstanceCount_!=(sector?104u:shared?92u:28u) || staticMeshSlot_.PrimitiveMetadata().size()>kRtPrimitiveMetadataCapacity ||
+       tlasInstanceCount_!=kOrdinaryTlasInstanceCount+(shared?64u:0u)+(sector?12u:0u) ||
+       staticMeshSlot_.PrimitiveMetadata().size()>kRtPrimitiveMetadataCapacity ||
        sceneMaterials_.size()>kRtMaterialCapacity)return fail("Forest proof exceeds or changes its admitted active capacities.");
     std::array<bool,kRtStaticAssetCapacity> assets{};
     for(const auto& row:staticMeshSlot_.InstanceMetadata())if(row.primitiveCount) {
         if(row.assetIndex>=assets.size())return fail("Forest proof has an unadmitted static asset owner.");
         assets[row.assetIndex]=true;
     }
-    if(std::count(assets.begin(),assets.end(),true)!=13)return fail("Forest proof did not preserve exactly thirteen unique static assets.");
+    if(std::count(assets.begin(),assets.end(),true)!=15)return fail("Forest proof did not preserve exactly fifteen unique static assets.");
     if(retention) {
         const auto omitted=std::count(forestRetentionLastOmitted_.begin(),forestRetentionLastOmitted_.end(),true);
         if(omitted!=forestRetentionOmittedCount_ || (!forestRetentionFrameEligible_ && omitted))
@@ -1631,6 +1638,7 @@ void PresentableTinyRtScene::Destroy()
     tlasPendingInstances_ = {};
     tlasPendingDefinitionsValid_ = false;
     thirdActorSubmittedCompanion_ = false;
+    jointPropPresentationActive_ = false;
     keeperVertexLifetime_ = {};
     executionPolicy_ = {};
     computeDispatchGroups_ = {};
@@ -1643,6 +1651,10 @@ void PresentableTinyRtScene::Destroy()
         waterDropletBlasUpdateScratch_ = {};
         waterDropletAsset_ = {};
         waterDropletGeometryVisible_ = false;
+        attackWarningRingBlas_ = {};
+        healingFlaskBlas_ = {};
+        attackWarningRingAsset_ = {};
+        healingFlaskAsset_ = {};
         pipelineEvidenceIdentity_ = {};
         pipelineEvidenceIdentityValid_ = false;
         framePipelineEvidence_ = {};
@@ -1684,6 +1696,8 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(viewmodelBlas_);
     DestroyAccelerationStructure(collapseBlas_);
     DestroyAccelerationStructure(waterDropletBlas_);
+    DestroyAccelerationStructure(attackWarningRingBlas_);
+    DestroyAccelerationStructure(healingFlaskBlas_);
     DestroyAccelerationStructure(skinnedPlayerBlas_);
     DestroyAccelerationStructure(playerLimbBlas_);
     DestroyAccelerationStructure(playerBodyBlas_);
@@ -1752,6 +1766,8 @@ void PresentableTinyRtScene::Destroy()
     productionDielectricFixtureAsset_ = {};
     waterDropletAsset_ = {};
     waterDropletGeometryVisible_ = false;
+    attackWarningRingAsset_ = {};
+    healingFlaskAsset_ = {};
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
     viewmodelAsset_ = {};
@@ -1867,7 +1883,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
     for (std::size_t bucket = 0u;
          bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
@@ -1932,7 +1948,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_})
     {
         accumulateBlas(*blas);
     }
@@ -3066,6 +3082,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     rewardLanternRingAsset_ = {};
     rewardLanternBodyAsset_ = {};
     productionDielectricFixtureAsset_ = {};
+    attackWarningRingAsset_ = {};
+    healingFlaskAsset_ = {};
+    jointPropPresentationActive_ = false;
     if (!productionHeldItemAssetsEnabled_)
     {
         diagnostic = "Production held-item asset root is required; procedural sword/torch bodies are retired.";
@@ -3092,6 +3111,8 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         root / "models/props/runtime/reward-lantern-ring";
     const auto lanternBodyDirectory =
         root / "models/props/runtime/reward-lantern-body";
+    const auto attackWarningDirectory = root / "models/props/runtime/attack-warning-ring-v1";
+    const auto healingFlaskDirectory = root / "models/props/runtime/healing-flask-v1";
     // Separate development derivative: the original accepted tomb stays immutable.
     const auto collapseDirectory = root / (sceneProfile_ == RtSceneProfile::Showcase &&
         developmentRescueJourney_ ? "models/world/runtime/chapter-entry-return-v1" :
@@ -3107,6 +3128,10 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     horde::scene::assets::AssetManifest lanternRingManifest;
     horde::scene::assets::AssetManifest lanternBodyManifest;
     horde::scene::assets::AssetManifest collapseManifest;
+    horde::scene::assets::AssetManifest attackWarningManifest;
+    horde::scene::assets::AssetManifest healingFlaskManifest;
+    horde::scene::assets::StaticMeshAsset attackWarningCandidate;
+    horde::scene::assets::StaticMeshAsset healingFlaskCandidate;
     if (!horde::scene::assets::AssetManifest::Load(
             swordDirectory / "asset.manifest.json", swordManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
@@ -3171,8 +3196,34 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             collapseDirectory / "asset.manifest.json", collapseManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
             collapseDirectory / "collapsed-entry-lod0.runtime.glb",
-            collapseManifest, collapseStaticAsset_, diagnostic))
+            collapseManifest, collapseStaticAsset_, diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            attackWarningDirectory / "asset.manifest.json", attackWarningManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            attackWarningDirectory / "attack-warning-ring-v1.runtime.glb",
+            attackWarningManifest, attackWarningCandidate, diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            healingFlaskDirectory / "asset.manifest.json", healingFlaskManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            healingFlaskDirectory / "healing-flask-v1.runtime.glb",
+            healingFlaskManifest, healingFlaskCandidate, diagnostic))
         return false;
+    const auto jointPropAssetAdmitted = [](const horde::scene::assets::StaticMeshAsset& asset) {
+        if (asset.primitives.size() != 1u || asset.materials.size() != 1u) return false;
+        const auto& material = asset.materials.front();
+        return material.baseColorTexture < 0 && material.normalTexture < 0 &&
+            material.ormTexture < 0 && material.emissiveTexture < 0 &&
+            material.transmissionFactor == 0.0f &&
+            (material.flags & (static_cast<std::uint32_t>(RtMaterialFlag::Alpha) |
+                static_cast<std::uint32_t>(RtMaterialFlag::Transmission))) == 0u;
+    };
+    if (!jointPropAssetAdmitted(attackWarningCandidate) || !jointPropAssetAdmitted(healingFlaskCandidate)) {
+        diagnostic = "Joint warning/flask assets require one opaque untextured primitive and independently owned material each.";
+        return false;
+    }
+    // Publish the pair only after both real imports satisfy the reviewed profile.
+    attackWarningRingAsset_ = std::move(attackWarningCandidate);
+    healingFlaskAsset_ = std::move(healingFlaskCandidate);
     if (sceneProfile_ == RtSceneProfile::Showcase && developmentRescueJourney_)
     {
         if (!ConfigureChapterTextureAliases(gothicChestBaseAsset_, gothicChestLidAsset_,
@@ -5529,8 +5580,17 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         (sceneProfile_ == RtSceneProfile::Showcase &&
          !buildRegisteredStaticBlas(
              kWaterDropletMetadataIndex, "runtime water contact droplets",
-             waterDropletBlas_, false, &waterDropletBlasUpdateScratch_)))
+             waterDropletBlas_, false, &waterDropletBlasUpdateScratch_)) ||
+        !buildRegisteredStaticBlas(kAttackWarningMetadataIndex,
+            "attack warning ring", attackWarningRingBlas_, true) ||
+        !buildRegisteredStaticBlas(kHealingFlaskMetadataIndex,
+            "healing flask", healingFlaskBlas_, true))
         return false;
+    if (attackWarningRingBlas_.handle == VK_NULL_HANDLE || attackWarningRingBlas_.address == 0u ||
+        healingFlaskBlas_.handle == VK_NULL_HANDLE || healingFlaskBlas_.address == 0u) {
+        diagnostic = "Joint warning/flask BLAS owners are unavailable before TLAS construction.";
+        return false;
+    }
     if(UsesSharedForestGeometry()) {
         for(unsigned m=0;m<2;++m) {
             std::vector<VkAccelerationStructureGeometryKHR> geometries;
@@ -6012,6 +6072,15 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // reference is an inactive instance, but would force a needless definition
     // change before the first live snapshot even while the Keeper stays hidden.
     instances[kKeeperInstanceIndex] = characterSlot_.BuildActiveInstances()[2];
+    // Both appended owners remain valid even before presentation is admitted.
+    instances[kAttackWarningInstanceIndex] = instances[0];
+    instances[kAttackWarningInstanceIndex].instanceCustomIndex = kAttackWarningMetadataIndex;
+    instances[kAttackWarningInstanceIndex].mask = 0u;
+    instances[kAttackWarningInstanceIndex].accelerationStructureReference = attackWarningRingBlas_.address;
+    instances[kHealingFlaskInstanceIndex] = instances[0];
+    instances[kHealingFlaskInstanceIndex].instanceCustomIndex = kHealingFlaskMetadataIndex;
+    instances[kHealingFlaskInstanceIndex].mask = 0u;
+    instances[kHealingFlaskInstanceIndex].accelerationStructureReference = healingFlaskBlas_.address;
     if(UsesSharedForestGeometry()) {
         if(!ApplyExistingForestInstances(instances,forestSharedLayout_,
             UsesSupplementalForestProof(),
@@ -7134,10 +7203,18 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                                      std::string& diagnostic,
                                                      RtSceneRecordObservation* observation)
 {
+    jointPropPresentationActive_ = sceneProfile_ == RtSceneProfile::Showcase &&
+        (frame.attackWarningRingVisible || frame.healingFlaskVisible);
     uploadedQualityControlsValid_ = false;
     uploadedFireEmittersValid_ = false;
     if (sceneProfile_ != RtSceneProfile::Showcase)
         return UpdatePreviewInstances(commandBuffer, frame, diagnostic, observation);
+    // Direct recorders must obey the same contributor closure as the ordinary
+    // restoration owner. A complete restore publishes these flags before recording.
+    if (jointPropPresentationActive_ && !StaticGeometryHasCompleteContributors()) {
+        diagnostic = "Joint warning/flask presentation requires complete resident contributors before recording.";
+        return false;
+    }
     const bool waterDropletsVisible = genericStaticAssetEnabled_ &&
         frame.waterQuality != WaterQuality::Off &&
         std::any_of(frame.waterContact.droplets.begin(), frame.waterContact.droplets.end(),
@@ -7208,6 +7285,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         finaleRoofBlas_.handle == VK_NULL_HANDLE || waterfallBlas_.handle == VK_NULL_HANDLE ||
         swordBlas_.handle == VK_NULL_HANDLE ||
         playerSwordScabbardBlas_.handle == VK_NULL_HANDLE ||
+        attackWarningRingBlas_.handle == VK_NULL_HANDLE || attackWarningRingBlas_.address == 0u ||
+        healingFlaskBlas_.handle == VK_NULL_HANDLE || healingFlaskBlas_.address == 0u ||
         gothicChestBaseBlas_.handle == VK_NULL_HANDLE ||
         gothicChestLidBlas_.handle == VK_NULL_HANDLE ||
         rewardLanternRingBlas_.handle == VK_NULL_HANDLE ||
@@ -7767,6 +7846,18 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         playerSwordScabbardBlas_.address;
     instances[kPlayerSwordScabbardInstanceIndex].transform =
         heldTransformToInstanceTransform(worldFromBodyStow);
+    instances[kAttackWarningInstanceIndex] = instances[0];
+    instances[kAttackWarningInstanceIndex].instanceCustomIndex = kAttackWarningMetadataIndex;
+    instances[kAttackWarningInstanceIndex].mask = frame.attackWarningRingVisible ? 0x01u : 0u;
+    instances[kAttackWarningInstanceIndex].accelerationStructureReference = attackWarningRingBlas_.address;
+    instances[kAttackWarningInstanceIndex].transform =
+        heldTransformToInstanceTransform(frame.attackWarningRingWorldFromItem);
+    instances[kHealingFlaskInstanceIndex] = instances[0];
+    instances[kHealingFlaskInstanceIndex].instanceCustomIndex = kHealingFlaskMetadataIndex;
+    instances[kHealingFlaskInstanceIndex].mask = frame.healingFlaskVisible ? 0x01u : 0u;
+    instances[kHealingFlaskInstanceIndex].accelerationStructureReference = healingFlaskBlas_.address;
+    instances[kHealingFlaskInstanceIndex].transform =
+        heldTransformToInstanceTransform(frame.healingFlaskWorldFromItem);
     const auto characterInstances = characterSlot_.BuildActiveInstances();
     instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];
     instances[kKeeperInstanceIndex] = characterInstances[2];
@@ -9031,6 +9122,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
 #endif
                                                 )
 {
+    jointPropPresentationActive_ = sceneProfile_ == RtSceneProfile::Showcase &&
+        (frame.attackWarningRingVisible || frame.healingFlaskVisible);
     // A prior unsubmitted recording must not advance the GPU definition cache.
     tlasPendingDefinitionsValid_ = false;
     uploadedFireEmittersValid_ = false;

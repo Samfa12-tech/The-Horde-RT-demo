@@ -180,6 +180,13 @@ struct RtSceneFrameInputs
     horde::gameplay::interactions::FinaleSequenceSnapshot finale{};
     horde::gameplay::interactions::LanternPendulumSnapshot lanternPendulum{};
     horde::gameplay::items::HeldItemTransform rewardLanternWorldFromHinge{};
+    // Presentation-only inputs; gameplay admission remains with the snapshot owner.
+    bool attackWarningRingVisible = false;
+    bool healingFlaskVisible = false;
+    horde::gameplay::items::HeldItemTransform attackWarningRingWorldFromItem =
+        horde::gameplay::items::IdentityHeldItemTransform();
+    horde::gameplay::items::HeldItemTransform healingFlaskWorldFromItem =
+        horde::gameplay::items::IdentityHeldItemTransform();
     horde::gameplay::EnemyRosterSnapshot roster{};
     horde::gameplay::LichSnapshot lich{};
     horde::gameplay::ShowcaseZone zone = horde::gameplay::ShowcaseZone::Opening;
@@ -258,7 +265,7 @@ public:
     };
 
     // Owner maxima, not live counts. The explicit forest proof adds two masters.
-    static constexpr std::uint32_t kOrdinaryBlasCount = 21u;
+    static constexpr std::uint32_t kOrdinaryBlasCount = 23u;
     static constexpr std::uint32_t kBlasCount = kOrdinaryBlasCount + 2u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
@@ -268,6 +275,10 @@ public:
     static constexpr std::uint32_t kWaterDropletInstanceIndex = 26u;
     static constexpr std::uint32_t kKeeperMetadataIndex = CharacterRenderSlot::kKeeperMetadataIndex;
     static constexpr std::uint32_t kKeeperInstanceIndex = CharacterRenderSlot::kKeeperTlasInstanceIndex;
+    static constexpr std::uint32_t kAttackWarningMetadataIndex = 28u;
+    static constexpr std::uint32_t kAttackWarningInstanceIndex = 28u;
+    static constexpr std::uint32_t kHealingFlaskMetadataIndex = 29u;
+    static constexpr std::uint32_t kHealingFlaskInstanceIndex = 29u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kRtOrdinaryShowcaseInstanceCount;
     // Storage capacity; builds and updates use the separate live count.
@@ -281,8 +292,12 @@ public:
     static_assert(kPlayerSwordScabbardMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kWaterDropletMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kKeeperMetadataIndex < kRtInstanceMetadataCapacity);
-    static_assert(kOrdinaryTlasInstanceCount == 28u);
-    static_assert(kOrdinaryTlasInstanceCount == kKeeperInstanceIndex + 1u);
+    static_assert(kAttackWarningMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kHealingFlaskMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kAttackWarningInstanceIndex == kKeeperInstanceIndex + 1u);
+    static_assert(kHealingFlaskInstanceIndex == kAttackWarningInstanceIndex + 1u);
+    static_assert(kOrdinaryTlasInstanceCount == 30u);
+    static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskInstanceIndex + 1u);
     static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
                   horde::gameplay::simulation::kForestTreePlacementContract.size() + 12u);
 
@@ -1299,6 +1314,8 @@ private:
     AccelerationStructure dielectricFixtureBlas_;
     AccelerationStructure collapseBlas_;
     AccelerationStructure waterDropletBlas_;
+    AccelerationStructure attackWarningRingBlas_;
+    AccelerationStructure healingFlaskBlas_;
     Buffer waterDropletBlasUpdateScratch_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
@@ -1313,6 +1330,7 @@ private:
     bool developmentWorldRoute_ = false;
     bool stagedWorldPreparation_ = false;
     bool developmentRescueJourney_ = false;
+    bool jointPropPresentationActive_ = false;
     bool regionalWaterDiagnosticEnabled_ = true;
     bool floorDebrisEnabled_ = true;
     std::vector<horde::scene::ChapterWaterTriangle> regionalWaterFaces_;
@@ -1432,6 +1450,8 @@ private:
     horde::scene::assets::StaticMeshAsset rewardLanternBodyAsset_;
     horde::scene::assets::StaticMeshAsset productionDielectricFixtureAsset_;
     horde::scene::assets::StaticMeshAsset waterDropletAsset_;
+    horde::scene::assets::StaticMeshAsset attackWarningRingAsset_;
+    horde::scene::assets::StaticMeshAsset healingFlaskAsset_;
     bool waterDropletGeometryVisible_ = false;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;
     std::uint32_t playerStaticVertexBase_ = 0u;

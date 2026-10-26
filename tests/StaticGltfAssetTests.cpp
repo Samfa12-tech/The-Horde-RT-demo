@@ -1,6 +1,7 @@
 #include "scene/assets/AssetManifest.h"
 #include "scene/assets/AssetValidation.h"
 #include "scene/assets/DielectricTopologyMath.h"
+#include "scene/assets/GltfDocument.h"
 #include "scene/assets/StaticMeshAsset.h"
 #include "scene/assets/PlayerPrimitiveContract.h"
 #include "scene/ChapterTerrainSurface.h"
@@ -1464,7 +1465,8 @@ void TestStaticPrimitiveRangeOwnership()
     Check(fullBaseline.Initialize(fullOwners, diagnostic),
           "unchanged full static-asset ceiling initializes for ownership proof");
     for (std::uint32_t i = 0; i < 3; ++i)
-        fullOwners.push_back({14+i, 200+i, pbr, 0, &fullAssets[0], nullptr,
+        fullOwners.push_back({static_cast<std::uint32_t>(fullAssets.size())+1u+i,
+                             200+i, pbr, 0, &fullAssets[0], nullptr,
                              RtGeometryRole::Static, i, 1});
     RtStaticMeshSlot fullPartition;
     Check(fullPartition.Initialize(fullOwners, diagnostic) &&
@@ -1472,7 +1474,7 @@ void TestStaticPrimitiveRangeOwnership()
           fullBaseline.Indices() == fullPartition.Indices() &&
           equalBytes(fullBaseline.Materials(), fullPartition.Materials()) &&
           equalBytes(fullBaseline.PrimitiveMetadata(), fullPartition.PrimitiveMetadata()),
-          "three range aliases fit the saturated thirteen-asset ceiling without extra packed rows/bytes");
+          "three range aliases fit the saturated asset ceiling without extra packed rows/bytes");
 
     auto provider = asset;
     auto consumer = asset;
@@ -2998,6 +3000,196 @@ void TestTombDressingCandidates()
     }
 }
 
+void TestJointPresentationAssetCandidates(const std::filesystem::path& temporaryRoot)
+{
+    using namespace horde::scene::assets;
+    const auto runtimeRoot = kDielectricFixtureRoot.parent_path();
+    const auto sourceRoot = runtimeRoot.parent_path() / "source";
+    struct Candidate
+    {
+        const char* id;
+        std::size_t vertices;
+        std::size_t triangles;
+    };
+    const Candidate candidates[] = {
+        {"attack-warning-ring-v1", 32u, 32u},
+        {"healing-flask-v1", 242u, 384u},
+    };
+    for (const auto& candidate : candidates)
+    {
+        const std::string label = candidate.id;
+        const bool isRing = label == "attack-warning-ring-v1";
+        const auto directory = runtimeRoot / candidate.id;
+        const auto glb = directory / (label + ".runtime.glb");
+        AssetManifest manifest;
+        StaticMeshAsset asset;
+        std::string diagnostic;
+        const bool manifestLoaded = AssetManifest::Load(directory / "asset.manifest.json", manifest, diagnostic);
+        Check(manifestLoaded, label + " standard manifest loads: " + diagnostic);
+        if (!manifestLoaded) continue;
+        Check(manifest.assetName == label && manifest.metresPerUnit == 1.0f &&
+                  manifest.budgets.maxVertices == candidate.vertices &&
+                  manifest.budgets.maxIndices == candidate.triangles * 3u &&
+                  manifest.budgets.maxPrimitives == 1u && manifest.budgets.maxMaterials == 1u &&
+                  manifest.budgets.maxTextureLayersPerKind == 1u &&
+                  manifest.lods.size() == 1u && manifest.lods[0].maxTriangles == candidate.triangles &&
+                  manifest.materialOverrides.empty(),
+              label + " manifest pins measured geometry and ordinary shared PBR intake");
+        const bool loaded = StaticMeshAsset::Load(glb, manifest, asset, diagnostic);
+        Check(loaded, label + " actual native StaticMeshAsset loader accepts candidate: " + diagnostic);
+        if (!loaded) continue;
+        Check(asset.vertices.size() == candidate.vertices && asset.indices.size() == candidate.triangles * 3u &&
+                  asset.primitives.size() == 1u && asset.materials.size() == 1u,
+              label + " native counts match the bounded candidate");
+        if (asset.materials.size() != 1u || asset.primitives.size() != 1u ||
+            asset.vertices.size() != candidate.vertices || asset.indices.size() != candidate.triangles * 3u)
+            continue;
+        GltfDocument candidateDocument;
+        const bool candidateParsed = GltfDocument::Load(glb, candidateDocument, diagnostic);
+        Check(candidateParsed, label + " candidate document parses: " + diagnostic);
+        if (!candidateParsed) continue;
+        Check(candidateDocument.Data()->textures_count == 0u && candidateDocument.Data()->images_count == 0u &&
+                  candidateDocument.Data()->lights_count == 0u && candidateDocument.Data()->animations_count == 0u &&
+                  candidateDocument.Data()->skins_count == 0u,
+              label + " contains no texture, image, light, skin or animation payload");
+        const auto& material = asset.materials[0];
+        Check(material.baseColorTexture == -1 && material.normalTexture == -1 &&
+                  material.ormTexture == -1 && material.emissiveTexture == -1 &&
+                  material.transmissionFactor == 0.0f && (material.flags & (4u | 512u)) == 0u,
+              label + " retains texture-free opaque PBR with no dielectric route");
+        Check(std::all_of(asset.vertices.begin(), asset.vertices.end(), [](const StaticRtVertex& vertex) {
+                  return std::all_of(vertex.position.begin(), vertex.position.end(), [](float v) { return std::isfinite(v); }) &&
+                         std::all_of(vertex.normal.begin(), vertex.normal.end(), [](float v) { return std::isfinite(v); }) &&
+                         std::all_of(vertex.tangent.begin(), vertex.tangent.end(), [](float v) { return std::isfinite(v); }) &&
+                         std::isfinite(vertex.uv0[0]) && std::isfinite(vertex.uv0[1]) &&
+                         vertex.uv0[0] >= 0.0f && vertex.uv0[0] <= 1.0f &&
+                         vertex.uv0[1] >= 0.0f && vertex.uv0[1] <= 1.0f;
+              }), label + " imports finite geometry, fallback tangents and unit-range UV0");
+
+        const auto missing = temporaryRoot / (label + "-missing.glb");
+        ExpectAssetFailure(missing, manifest, "Could not read static GLB: " + missing.string());
+        auto corruptBytes = ReadBytes(glb);
+        Check(!corruptBytes.empty(), label + " candidate bytes are available for a corruption fixture");
+        if (!corruptBytes.empty())
+        {
+            corruptBytes.pop_back();
+            const auto corrupt = temporaryRoot / (label + "-truncated.glb");
+            WriteBytes(corrupt, corruptBytes);
+            ExpectAssetFailure(corrupt, manifest, "Static GLB chunks are malformed or truncated.");
+        }
+        auto tooSmall = manifest;
+        --tooSmall.budgets.maxVertices;
+        ExpectAssetFailure(glb, tooSmall, "Static GLB exceeds manifest maxVertices capacity.");
+        const auto missingManifest = temporaryRoot / (label + "-missing.manifest.json");
+        ExpectManifestFailure(missingManifest, "Could not read asset manifest: " + missingManifest.string());
+        const auto corruptManifest = temporaryRoot / (label + "-corrupt.manifest.json");
+        WriteText(corruptManifest, "{");
+        ExpectManifestFailure(corruptManifest, "Asset manifest JSON is invalid.");
+
+        if (isRing)
+        {
+            Check(ReadBytes(glb) == ReadBytes(sourceRoot / label / (label + ".glb")),
+                  "annulus runtime is byte-identical to its original project-authored source");
+            Check(manifest.requiredSockets.empty() && asset.sockets.empty() && asset.nodeTransforms.size() == 1u,
+                  "annulus has one ordinary mesh node and no socket/light node");
+            Check(material.name == "AttackWarningAmber" && (material.flags & 1u) != 0u &&
+                      material.baseColorFactor == std::array<float, 4u>{{0.72f, 0.09f, 0.015f, 1.0f}} &&
+                      material.emissiveFactor == std::array<float, 3u>{{1.0f, 0.16f, 0.015f}} &&
+                      material.emissiveStrength == 1.0f && material.metallicFactor == 0.0f &&
+                      material.roughnessFactor == 1.0f,
+                  "annulus constant amber emission and double-sided flag survive native material conversion");
+            Check(asset.bounds.minimum == std::array<float, 3u>{{-1.0f, -1.0f, 0.0f}} &&
+                      asset.bounds.maximum == std::array<float, 3u>{{1.0f, 1.0f, 0.0f}},
+                  "annulus imports in local XY without adding thickness or changing unit bounds");
+            bool radiiAndNormals = true;
+            for (std::size_t i = 0u; i < asset.vertices.size(); ++i)
+            {
+                const auto& vertex = asset.vertices[i];
+                radiiAndNormals = radiiAndNormals && vertex.position[2] == 0.0f &&
+                    NearlyEqual(std::hypot(vertex.position[0], vertex.position[1]), i % 2u == 0u ? 0.88f : 1.0f) &&
+                    vertex.normal == std::array<float, 4u>{{0.0f, 0.0f, 1.0f, 0.0f}};
+            }
+            Check(radiiAndNormals, "annulus retains 16 inner/outer vertex pairs with +Z normals");
+            bool positiveWinding = true;
+            for (std::size_t i = 0u; i < asset.indices.size(); i += 3u)
+            {
+                const auto a = asset.vertices[asset.indices[i]].position;
+                const auto b = asset.vertices[asset.indices[i + 1u]].position;
+                const auto c = asset.vertices[asset.indices[i + 2u]].position;
+                positiveWinding = positiveWinding &&
+                    (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]) > 0.0f;
+            }
+            Check(positiveWinding, "all native annulus triangles wind toward the authored +Z normal");
+            continue;
+        }
+
+        const auto original = sourceRoot / "healing-flask-neck-fit-r2/healing-flask-neck-fit-r2.glb";
+        Check(ReadBytes(original).size() == 9292u, "owned flask r2 source retains its exact byte count");
+        ExpectAssetFailure(original, manifest, "Static GLB primitive 0 is missing TEXCOORD_0.");
+        Check(manifest.requiredSockets == std::vector<std::string>{"Grip"} &&
+                  asset.sockets.size() == 1u && asset.sockets[0].name == "Grip" &&
+                  asset.sockets[0].world == std::array<float, 16u>{{
+                      1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0.065f, 0, 1}},
+              "flask preserves exact case-sensitive Grip and its source transform");
+        Check(material.name == "HealingFlaskPewter" && (material.flags & 1u) == 0u &&
+                  material.baseColorFactor == std::array<float, 4u>{{0.28f, 0.25f, 0.19f, 1.0f}} &&
+                  material.emissiveFactor == std::array<float, 3u>{{0, 0, 0}} &&
+                  material.metallicFactor == 0.8f && material.roughnessFactor == 0.43f,
+              "flask preserves the source opaque pewter PBR factors");
+        GltfDocument sourceDocument;
+        const bool sourceParsed = GltfDocument::Load(original, sourceDocument, diagnostic);
+        Check(sourceParsed, "owned source flask parses through native cgltf: " + diagnostic);
+        if (!sourceParsed) continue;
+        const auto& source = *sourceDocument.Data();
+        const auto& runtime = *candidateDocument.Data();
+        const bool expectedLayout = source.meshes_count == 1u && source.meshes[0].primitives_count == 1u &&
+            source.buffer_views_count == 3u && source.accessors_count == 3u &&
+            runtime.buffer_views_count == 4u && runtime.accessors_count == 4u;
+        Check(expectedLayout, "flask derivative appends exactly one UV0 view/accessor");
+        if (!expectedLayout) continue;
+        bool preservedViews = true;
+        for (std::size_t i = 0u; i < source.buffer_views_count; ++i)
+        {
+            const auto& before = source.buffer_views[i];
+            const auto& after = runtime.buffer_views[i];
+            const auto* beforeData = cgltf_buffer_view_data(&before);
+            const auto* afterData = cgltf_buffer_view_data(&after);
+            preservedViews = preservedViews && before.offset == after.offset && before.size == after.size &&
+                beforeData != nullptr && afterData != nullptr &&
+                std::memcmp(beforeData, afterData, before.size) == 0;
+        }
+        Check(preservedViews, "UV-only flask preserves every existing source buffer-view byte and offset");
+        const auto& primitive = source.meshes[0].primitives[0];
+        const cgltf_accessor* positions = nullptr;
+        const cgltf_accessor* normals = nullptr;
+        for (std::size_t i = 0u; i < primitive.attributes_count; ++i)
+        {
+            if (primitive.attributes[i].type == cgltf_attribute_type_position) positions = primitive.attributes[i].data;
+            if (primitive.attributes[i].type == cgltf_attribute_type_normal) normals = primitive.attributes[i].data;
+        }
+        Check(positions != nullptr && normals != nullptr && positions->count == asset.vertices.size() &&
+                  normals->count == asset.vertices.size() && primitive.indices != nullptr &&
+                  primitive.indices->count == asset.indices.size(),
+              "flask source exposes the preserved POSITION/NORMAL/index layout");
+        if (positions == nullptr || normals == nullptr || primitive.indices == nullptr ||
+            positions->count != asset.vertices.size() || normals->count != asset.vertices.size() ||
+            primitive.indices->count != asset.indices.size()) continue;
+        bool preservedGeometry = true;
+        for (std::size_t i = 0u; i < asset.vertices.size(); ++i)
+        {
+            std::array<float, 3u> position{}, normal{};
+            preservedGeometry = preservedGeometry && cgltf_accessor_read_float(positions, i, position.data(), 3u) &&
+                cgltf_accessor_read_float(normals, i, normal.data(), 3u);
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+                preservedGeometry = preservedGeometry && position[axis] == asset.vertices[i].position[axis] &&
+                    NearlyEqual(normal[axis], asset.vertices[i].normal[axis], 0.000001f);
+        }
+        for (std::size_t i = 0u; i < asset.indices.size(); ++i)
+            preservedGeometry = preservedGeometry && cgltf_accessor_read_index(primitive.indices, i) == asset.indices[i];
+        Check(preservedGeometry, "native flask positions, normals and every triangle preserve the source geometry");
+    }
+}
+
 void TestPreparedFunerarySourceAssets(const std::filesystem::path& temporaryRoot)
 {
     using namespace horde::scene::assets;
@@ -3246,6 +3438,7 @@ int main(int argc, char** argv)
     TestLanternGeometryQualityProfile();
     TestRuntimeOfflineDielectricComponentParity();
     TestTombDressingCandidates();
+    TestJointPresentationAssetCandidates(temporaryRoot);
     TestPreparedFunerarySourceAssets(temporaryRoot);
     TestChapterTerrainSupportIntake();
 

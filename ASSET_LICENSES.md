@@ -730,3 +730,25 @@ Silent source previews and compact provenance/validation receipts are retained
 in `docs/evidence/2026-10-26-flask-motion-study/`. They contain project assets in
 an authoring scene, not captured game footage, RT/performance evidence or an
 approved public demonstration. All native/physical and resource gates remain.
+
+## Joint warning/flask runtime candidates - 26 October 2026
+
+`assets/models/props/runtime/attack-warning-ring-v1/` is original project-authored
+annulus geometry and scalar emissive PBR material. Its deterministic recipe and
+source GLB are under `assets/models/props/source/attack-warning-ring-v1/`.
+`assets/models/props/runtime/healing-flask-v1/` derives from the original owned
+neck-fit r2 flask above, adding only required UV0 data; original geometry, material
+and exact Grip are preserved. The untouched source remains under
+`assets/models/props/source/healing-flask-neck-fit-r2/`; the new runtime recipe
+and preservation receipt are under `assets/models/props/source/healing-flask-v1/`.
+
+No third-party mesh, texture, audio, paid generation or provider input is used.
+Applicable user/service rights remain unchanged; no blanket MIT/CC0 is assigned.
+Runtime hashes are respectively
+`15befb04ac511128714249c27b09a3ba96ea0c847edfbd91e80b14ef1eb7ed85` and
+`e7571eb7b56b78ebe0a43946e16979f66b3b0b1f9a82613912e193300358341d`.
+The two explicitly selected runtime GLBs/manifests may enter development packages
+for the approved joint resource test. Source folders, recipes and validation
+receipts are not runtime package inputs. These assets and their gameplay
+presentation remain unadmitted for normal play or release until native visual,
+lifecycle and gameplay gates pass. Resource approval is not visual acceptance.

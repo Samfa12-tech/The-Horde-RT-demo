@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "authoringScript": "tools/author-joint-presentation-assets.py",
+  "authoringScriptSha256": "39a99e5a93ddc53ebb61d8f1da55a9a09271d7e1ffa2ccd80a7d1ef4ef5344ee",
+  "validationClass": "Focused offline stdlib GLB/accessor/geometry checks; native import and hardware RT not run",
+  "acceptance": "Candidate only. Native importer/capacity integration, real RT presentation, lifecycle and owner visual acceptance remain pending; normal enablement stays OFF.",
+  "provenance": "Original project-authored geometry supplied for Horde; no third-party mesh, image, texture, provider or paid generation. Applicable user/service rights remain unchanged; no blanket MIT, CC0, Meshy or other licence is assigned.",
+  "sourceRecipeSha256": "f85d79192226cbc5493df6f6ab9ef7a58c4bad21a4b2374ea73f47a6e9e71895",
+  "source": "assets/models/props/source/healing-flask-neck-fit-r2/healing-flask-neck-fit-r2.glb",
+  "sourceMeasurement": {
+    "sha256": "4a4337e81d98065c050ab896b8b0b61563feeedac55806665d2727ad14555cfa",
+    "bytes": 9292,
+    "vertices": 242,
+    "triangles": 384,
+    "primitives": 1,
+    "materials": 1,
+    "texturePayloads": 0,
+    "minimumMetres": [
+      -0.05700000002980232,
+      -0.07500000298023224,
+      -0.02800000086426735
+    ],
+    "maximumMetres": [
+      0.05700000002980232,
+      0.12399999797344208,
+      0.02800000086426735
+    ],
+    "dimensionsMetres": [
+      0.11400000005960464,
+      0.19900000095367432,
+      0.0560000017285347
+    ],
+    "closedAndConsistentlyWound": true,
+    "signedVolumeM3": 0.0005066483857473665,
+    "minimumTriangleAreaM2": 5.740251120461891e-06,
+    "grip": [
+      0.0,
+      0.065,
+      0.0
+    ],
+    "mouthRecessMetres": 0.014,
+    "scope": "Static bytes/topology only; native import, hand fit, animation and RT acceptance pending"
+  },
+  "runtime": {
+    "sha256": "e7571eb7b56b78ebe0a43946e16979f66b3b0b1f9a82613912e193300358341d",
+    "bytes": 11372,
+    "vertices": 242,
+    "indices": 1152,
+    "triangles": 384,
+    "primitives": 1,
+    "materials": 1,
+    "texturePayloads": 0,
+    "lights": 0,
+    "minimumMetres": [
+      -0.05700000002980232,
+      -0.07500000298023224,
+      -0.02800000086426735
+    ],
+    "maximumMetres": [
+      0.05700000002980232,
+      0.12399999797344208,
+      0.02800000086426735
+    ],
+    "dimensionsMetres": [
+      0.11400000005960464,
+      0.19900000095367432,
+      0.0560000017285347
+    ],
+    "finiteAttributes": true,
+    "unitNormals": true,
+    "finiteUv0": true,
+    "boundsMatchStoredFloat32": true,
+    "windingMatchesNormals": true,
+    "minimumTriangleAreaM2": 5.740251120461891e-06,
+    "boundaryEdgesAfterExactPositionWeld": 0
+  },
+  "preservedSourceBufferViews": [
+    {
+      "bufferView": 0,
+      "bytes": 2904,
+      "sha256": "1f1a3e67dcc909112693d663d104338cc9704e0b99830d50312b35ca20de15ad"
+    },
+    {
+      "bufferView": 1,
+      "bytes": 2904,
+      "sha256": "7c5ca6dd5965c940be784e7fdb8dd0a6ffaea24c750ad21898ff24516fb9d5ef"
+    },
+    {
+      "bufferView": 2,
+      "bytes": 2304,
+      "sha256": "7df3dc73d3aa72accb0f4e2cba00eb1843a18b263e862fc4636aada233f35bed"
+    }
+  ],
+  "preservedMaterial": {
+    "name": "HealingFlaskPewter",
+    "pbrMetallicRoughness": {
+      "baseColorFactor": [
+        0.28,
+        0.25,
+        0.19,
+        1.0
+      ],
+      "metallicFactor": 0.8,
+      "roughnessFactor": 0.43
+    },
+    "alphaMode": "OPAQUE",
+    "doubleSided": false,
+    "emissiveFactor": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "preservedGrip": [
+    0.0,
+    0.065,
+    0.0
+  ],
+  "closedSurface": true,
+  "addedUv0Bytes": 1936,
+  "derivation": "Append one FLOAT VEC2 TEXCOORD_0 accessor; no other JSON semantics or existing buffer-view bytes change",
+  "newTextureLayers": 0,
+  "newLights": 0
+}

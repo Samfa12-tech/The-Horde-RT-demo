@@ -206,7 +206,8 @@ bool CorridorFrameSourcesInside(const RtSceneFrameInputs& f) {
        f.interaction.heldLightKind!=interactions::HeldLightKind::RewardLantern ||
        f.chestReward.phase!=interactions::ChestRewardPhase::LanternClaimed ||
        f.lich.deathDissolveProgress!=1.f || f.lich.staffLightStrength!=0.f ||
-       f.tuning.glassFixtureVisible || f.tuning.productionRewardPropsVisible || f.previewMotion)return false;
+       f.tuning.glassFixtureVisible || f.tuning.productionRewardPropsVisible || f.previewMotion ||
+       f.attackWarningRingVisible || f.healingFlaskVisible)return false;
     // Moving transmissive drops are not part of this first static certificate.
     // Keep the full owner until they expire; never delete or mute the effect.
     if(std::any_of(f.waterContact.droplets.begin(),f.waterContact.droplets.end(),[](const auto& d){return d.active;}))return false;
@@ -317,8 +318,10 @@ void PresentableTinyRtScene::ApplySharedForestRetentionProof(
     forestRetentionFrameGeneration_=0;forestRetentionOmittedCount_=0;
     // Restore first, including unsafe/stale frames. No other instance field,
     // legacy role, BLAS lifetime or collision state belongs to this policy.
-    for(std::size_t i=28u;i<92u && i<instances.size();++i)instances[i].mask=1u;
-    if(instances.size()<92u || tlasInstanceCount_!=92u || !ready_ ||
+    constexpr std::size_t forestBegin=kOrdinaryTlasInstanceCount;
+    constexpr std::size_t forestEnd=forestBegin+64u;
+    for(std::size_t i=forestBegin;i<forestEnd && i<instances.size();++i)instances[i].mask=1u;
+    if(instances.size()<forestEnd || tlasInstanceCount_!=forestEnd || !ready_ ||
        !ForestRetentionIdentityMatches() || !ordinaryStaticFacesVerified_ ||
        !StaticGeometryHasCompleteContributors() || ordinaryStaticReduced_ || ordinaryStaticOmissions_ || preparedStaticGeometry_ ||
        !tlasInstanceDefinitionsValid_ || tlasPendingDefinitionsValid_ ||
@@ -329,7 +332,7 @@ void PresentableTinyRtScene::ApplySharedForestRetentionProof(
        tlasBuiltInstances_[0].accelerationStructureReference!=blas_.address || !(tlasBuiltInstances_[0].mask&1u) ||
        std::memcmp(tlasBuiltInstances_[0].transform.matrix,identity,sizeof(identity))!=0)return;
     for(std::size_t i=0;i<64u;++i) {
-        const auto& p=forestRetentionProof_.prepared->placements[i];const auto& actual=instances[28u+i];
+        const auto& p=forestRetentionProof_.prepared->placements[i];const auto& actual=instances[forestBegin+i];
         if(p.masterIndex>=2u || !forestMasterBlas_[p.masterIndex].address ||
            actual.accelerationStructureReference!=forestMasterBlas_[p.masterIndex].address ||
            actual.instanceCustomIndex!=26u+p.masterIndex ||
@@ -340,7 +343,7 @@ void PresentableTinyRtScene::ApplySharedForestRetentionProof(
     }
     forestRetentionFrameEligible_=true;forestRetentionFrameGeneration_=staticGeometryGeneration_;
     for(std::size_t i=0;i<64u;++i)if(forestRetentionProof_.eligible[i]) {
-        instances[28u+i].mask=0u;forestRetentionLastOmitted_[i]=true;++forestRetentionOmittedCount_;
+        instances[forestBegin+i].mask=0u;forestRetentionLastOmitted_[i]=true;++forestRetentionOmittedCount_;
     }
 }
 
@@ -364,6 +367,9 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
     horde::gameplay::simulation::GameSimulation& simulation,const RtSceneFrameInputs& frame,
     bool allowEviction,StaticDetailFrame& decision,std::string& diagnostic)
 {
+    // These added query sources were not in the retained-forest certificate.
+    // Current input must force full restoration before any new presentation.
+    jointPropPresentationActive_=frame.attackWarningRingVisible || frame.healingFlaskVisible;
     decision=StaticDetailFrame::Render;
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled){diagnostic.clear();return true;}
@@ -556,6 +562,12 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
             row.primitiveCount=3u;registrations.push_back(row);
         }
     }
+    // Append after every existing owner so assets 0..12, including the chapter
+    // actor and shared forest providers, preserve their packing identities.
+    registrations.push_back({kAttackWarningMetadataIndex, 0x52494e47u,
+        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &attackWarningRingAsset_});
+    registrations.push_back({kHealingFlaskMetadataIndex, 0x464c4153u,
+        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &healingFlaskAsset_});
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)
@@ -1016,6 +1028,13 @@ bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t exp
                 (preparedStaticGeometry_->sharedVertexAddress == staticVertexBuffer_.address &&
                  !preparedStaticGeometry_->vertices.buffer));
         if (!owned) return false;
+        // A previously prepared omission certificate does not cover either
+        // newly presented prop. Complete restores remain allowed.
+        if (jointPropPresentationActive_ &&
+            (!preparedStaticGeometry_->retainedAllFamilies ||
+             !preparedStaticGeometry_->retainedAllTriangles ||
+             preparedStaticGeometry_->retainedTriangleRegions !=
+                 horde::scene::assets::kAllStaticTriangleRegions)) return false;
         // A moving first frame cannot use a preparation-time pose as its
         // displayed TLAS. The separate recorder path must stage that frame's
         // complete dynamic definitions before tracing or retiring old owners.
@@ -1122,6 +1141,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopyWithStaticReplacement(
 #endif
     )
 {
+    jointPropPresentationActive_=frame.attackWarningRingVisible || frame.healingFlaskVisible;
     if (!retireReferences || commandBuffer == VK_NULL_HANDLE || swapchainImage == VK_NULL_HANDLE ||
         swapchainExtent.width == 0 || swapchainExtent.height == 0) {
         diagnostic = "Static replacement requires an actual first-frame command, output and retirement proof.";

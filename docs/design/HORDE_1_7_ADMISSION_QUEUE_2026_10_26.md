@@ -30,12 +30,14 @@ material cannot borrow an immutable flask material. No inactive-but-owned actor,
 light or sword slot is free merely because it is masked in one capture.
 
 The [single exact joint proposal](HORDE_1_7_JOINT_RING_FLASK_ADMISSION_2026_10_26.md)
-now assigns warning28/flask29 and fixes the following pending ceilings. Its
-[offline check](../evidence/2026-10-26-joint-owner-proposal/README.md) passes one
-positive case and rejects14 inconsistent cases. It is not an approved allocation
-or instruction to change limits; both roles have their own asset/range/material.
+assigns warning28/flask29. Sam approved these exact ceilings for implementation
+and evaluation, keeping both normal-play features OFF until their visual, lifecycle
+and gameplay gates pass. Its [offline check](../evidence/2026-10-26-joint-owner-proposal/README.md)
+passes the proposal and rejects16 inconsistent/unauthorized mutations. This is
+resource authorization, not completed asset or runtime acceptance; both roles
+retain their own asset/range/material.
 
-| Bound | Current source | Combined planning envelope |
+| Bound | Previous source | Approved joint ceiling |
 | --- | ---: | ---: |
 | Ordinary definitions / metadata | 28 / 28 | 30 / 30 |
 | Static assets | 13 | 15 |
@@ -44,7 +46,7 @@ or instruction to change limits; both roles have their own asset/range/material.
 | TLAS capacity | 104 = 28+64+12 | 106 = 30+64+12 |
 | Ordinary / shared BLAS maxima | 21 / 23 | 23 / 25 |
 
-Current values come from `RtSceneAbi.def`, `PresentableTinyRtScene.h` and existing
+Baseline values come from `RtSceneAbi.def`, `PresentableTinyRtScene.h` and existing
 native inventories. `RtStaticMeshSlot::ShareImmutableMaterialRows` already exists:
 it requires every converted GPU field/texture route to match, earlier providers,
 no alias chains and valid primitive remaps before publication. The actual packing order is34 before the existing two chest aliases,32 after
@@ -62,10 +64,11 @@ ownership, lifecycle and actual RT readability checks remain. No new texture,
 light, fire capacity, record layout, binding, frame-in-flight or quality change
 is assumed. New yellow attacks remain OFF pending their in-world cue.
 
-**Next owner/architecture decision:** approve or revise the exact joint
-two-owner implementation/evaluation request, not two old +1 rosters claiming
-the same slot. Asset/native/phone and normal-enable gates remain separate.
-This reconciliation does not grant that decision.
+**Resource decision received:** exact two-owner implementation/evaluation is
+approved (owner reply `Sentinel_d422ddba5e2c8191bb230909a3cd7e7f`). No wider budget,
+normal enablement, release or security change follows. Implementation and actual
+platform acceptance remain required; there is no remaining capacity approval
+request for this exact layout.
 
 ## Visual execution boundary
 
@@ -73,14 +76,15 @@ The [grouped F01 receipt](../evidence/2026-10-26-f01-grouped-r4/README.md) recor
 Windows Application Control4551 denying `CreateProcess` for
 `reports/forest-branch-crown-r4-20261026/candidate-grouped/HordeLanternRT.exe`,
 SHA256 `95e95e681a21e4a2da352a30cd6c6ddbaefeca875a23cf2accdf972de8fa8eac`.
-No application process started. No retry, renamed/copied executable, alternate
-execution route or security change is authorized. The owner/parent must establish
-the policy through the [read-only diagnostic handoff](../evidence/2026-10-26-windows-app-control/README.md).
-The file is unsigned/no MOTW, but both the current-token event read and CiTool
-inventory were denied. Specific approval for owner/admin read-only collection
-is the next step, not an allow rule or security-setting change. A general keep-going message
-does not itself remove the boundary. Earlier successful R4 evidence remains valid
-for its own executable, not a substitute for grouped F01 captures.
+No process started in that recorded attempt. The later narrowly approved
+administrator read identified the SAC trust policy. Sam subsequently opened the
+same path himself; the running-window path was verified. This is distinct from
+the malformed `/C:/` Markdown link and does not prove an automated launch retry
+will work. Computer Use app binding timed out after the owner granted permission;
+no native screenshot/interaction or visual acceptance followed. Preserve the
+owner-running process and security settings. No launch retry, copied/renamed
+binary, repeated Computer Use prompt or security change is authorized.
+Earlier successful R4 evidence applies only to its own executable.
 
 The menu screenshot still requires supported Library metadata materialization;
 the Windows `os.setxattr` blocker is separate. Do not use an unverified substitute

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "pending-owner-approval",
+  "status": "approved-for-implementation-evaluation",
   "runtimeEnabled": false,
   "basisSource": "51d6f0102d85b83216f3cad2558adbc4406588f8",
   "roles": [
@@ -129,5 +129,11 @@
   "framesInFlight": 1,
   "loadedOwnedBlasRequiredBeforeAnyVisibility": true,
   "normalFeatureEnablementChanged": false,
-  "ordinaryRetentionMustRevalidateNewQuerySources": true
+  "ordinaryRetentionMustRevalidateNewQuerySources": true,
+  "approval": {
+    "messageId": "Sentinel_d422ddba5e2c8191bb230909a3cd7e7f",
+    "scope": "exact joint layout implementation/evaluation",
+    "normalEnablementApproved": false,
+    "releaseApproved": false
+  }
 }
