@@ -118,7 +118,7 @@ def encode(recipe):
             accessor["min"] = [min(stored[a::width]) for a in range(width)]
             accessor["max"] = [max(stored[a::width]) for a in range(width)]
         accessors.append(accessor)
-    document = {"asset": {"version": "2.0", "generator": "Horde original healing-flask study r1"},
+    document = {"asset": {"version": "2.0", "generator": recipe.get("generatorLabel", "Horde original healing-flask study r1")},
                 "scene": 0, "scenes": [{"nodes": [0, 1]}],
                 "nodes": [{"name": "HealingFlaskStudy", "mesh": 0},
                           {"name": "Grip", "translation": recipe["grip"]}],
@@ -197,9 +197,10 @@ def inspect(data, recipe):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=SOURCE/"healing-flask-study-r1.glb")
+    parser.add_argument("--recipe", type=Path, default=SOURCE/"recipe.json")
     parser.add_argument("--verify", action="store_true")
     args = parser.parse_args()
-    recipe = json.loads((SOURCE/"recipe.json").read_text(encoding="utf-8"))
+    recipe = json.loads(args.recipe.read_text(encoding="utf-8"))
     require(recipe["status"] == "source-only-unadmitted" and recipe["metresPerUnit"] == 1,
             "Source-only convention changed")
     data = encode(recipe)

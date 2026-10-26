@@ -62,7 +62,10 @@ Updated26October against source `e4de5a5e`; this heading retains its existing li
   and [gated action/confirmed-record owner](../evidence/2026-10-25-flask-owner/README.md)
   exist. An [original flask source study](../evidence/2026-10-26-flask-source-study/README.md)
   passes static/glTF checks with editable Blender previews; it is not imported
-  or admitted. Presentation/controls/upgrade and actual-path admission remain. Normal
+  or admitted. Presentation/controls/upgrade and actual-path admission remain.
+  A [same-rig use/return source candidate](../evidence/2026-10-26-flask-motion-study/README.md)
+  now includes completed/cancelled actions and a gauntlet-fit neck derivative;
+  source playback/contact evidence does not admit native bindings. Normal
   enablement is OFF. The two ring/flask proposals need a [joint owner review](HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md#ring-and-flask-proposals-must-be-reviewed-together),
   not two independent claims on owner28. No limits are approved by this index.
 - **Other presentation:** torch close-clearance containment plus hand framing,

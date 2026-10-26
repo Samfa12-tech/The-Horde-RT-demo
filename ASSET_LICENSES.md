@@ -704,3 +704,23 @@ Source files and previews are excluded from runtime manifests/packages. Static
 validation and authoring previews are recorded in
 `docs/evidence/2026-10-26-flask-source-study/README.md`; native hand/RT admission
 and the pending joint resource decision remain open.
+
+## Flask use/neck fit - source-only derivative, 26 October 2026
+
+`assets/models/player/source/flask-use-study-r1/` is an editable source animation
+study using the existing Gothic Traveller body/viewmodel, original admitted
+sword and project-authored flask. Existing player/gauntlet/sword provenance,
+attribution and user/service rights remain unchanged. No new provider, paid
+generation or third-party input is used, and no blanket MIT/CC0 is assigned.
+
+`assets/models/props/source/healing-flask-neck-fit-r2/` derives from the original
+r1 flask above. It lengthens the neck for the unchanged gauntlet while retaining
+the body/Grip positions, radii, material and primitive/triangle/vertex counts.
+GLB SHA256 is `4a4337e81d98065c050ab896b8b0b61563feeedac55806665d2727ad14555cfa`.
+The r1 source is preserved. Its editable derivative is in the separate study
+Blend; no modelled asset or clip is admitted to runtime/package inventories.
+
+Silent source previews and compact provenance/validation receipts are retained
+in `docs/evidence/2026-10-26-flask-motion-study/`. They contain project assets in
+an authoring scene, not captured game footage, RT/performance evidence or an
+approved public demonstration. All native/physical and resource gates remain.

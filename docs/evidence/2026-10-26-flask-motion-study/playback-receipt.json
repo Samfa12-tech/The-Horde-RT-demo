@@ -1,0 +1,34 @@
+{
+  "scope": "Source-only Blender action playback; no native, RT or gameplay acceptance",
+  "blendSha256": "68984209d475e2e40a79868851abc575dc2bbe098f97d3ceb338c34e631a86e6",
+  "sourceBytesUnchanged": true,
+  "engine": "Blender Workbench",
+  "resolution": [
+    960,
+    540
+  ],
+  "sequences": {
+    "complete": {
+      "renderedFrames": 76,
+      "sourceHz": 60,
+      "lastSampleSeconds": 1.25,
+      "maximumSavedPlaybackGripErrorMetres": 3.7814907850174666e-07,
+      "maximumPropMatrixDifference": 4.172325134277344e-07,
+      "maximumLeftMatrixDifference": 0.0,
+      "startEndRightBasisDifference": 0.0
+    },
+    "cancel": {
+      "renderedFrames": 71,
+      "sourceHz": 60,
+      "lastSampleSeconds": 1.1666666666666667,
+      "maximumSavedPlaybackGripErrorMetres": 3.2544627290728025e-07,
+      "maximumPropMatrixDifference": 4.172325134277344e-07,
+      "maximumLeftMatrixDifference": 0.0,
+      "startEndRightBasisDifference": 0.0
+    }
+  },
+  "renderingPacedInRealTime": false,
+  "videoMustUseSourceHz": 60,
+  "leftLightOrCombatChanged": false,
+  "runtimeExported": false
+}

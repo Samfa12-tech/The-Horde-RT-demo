@@ -1,0 +1,37 @@
+{
+  "scope": "Silent unpaced Blender Workbench authoring, not game/RT/FPS evidence",
+  "sourceBlendSha256": "68984209d475e2e40a79868851abc575dc2bbe098f97d3ceb338c34e631a86e6",
+  "videos": [
+    {
+      "file": "complete-source-preview.mp4",
+      "bytes": 98633,
+      "sha256": "222d8c8423d61f4fb56104641e884a05b56c669bf57534fd7b016a224c581a6c",
+      "probe": {
+        "codec_type": "video",
+        "width": 960,
+        "height": 540,
+        "r_frame_rate": "60/1",
+        "duration": "1.266667",
+        "nb_frames": "76"
+      },
+      "lastSourceSampleSeconds": 1.25,
+      "fullDecodePassed": true
+    },
+    {
+      "file": "cancel-source-preview.mp4",
+      "bytes": 98427,
+      "sha256": "32084b4591af43b7d01fe4988172b3eb6ce30bd24cce3dae9f4e2c9400d6223a",
+      "probe": {
+        "codec_type": "video",
+        "width": 960,
+        "height": 540,
+        "r_frame_rate": "60/1",
+        "duration": "1.183333",
+        "nb_frames": "71"
+      },
+      "lastSourceSampleSeconds": 1.1666666666666667,
+      "fullDecodePassed": true
+    }
+  ],
+  "noVideoFrameInterpolationOrPlaybackRetiming": true
+}

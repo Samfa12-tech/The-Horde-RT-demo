@@ -1,0 +1,29 @@
+{
+  "scope": "Four source samples of selected head materials only; not full swept/native collision or acceptance",
+  "samples": [
+    {
+      "frame": 31,
+      "headFlaskTriangleOverlaps": 0,
+      "headGauntletTriangleOverlaps": 0,
+      "lipNearestHeadDistanceMetres": 0.009578031487762928
+    },
+    {
+      "frame": 34,
+      "headFlaskTriangleOverlaps": 0,
+      "headGauntletTriangleOverlaps": 0,
+      "lipNearestHeadDistanceMetres": 0.005999994929879904
+    },
+    {
+      "frame": 37,
+      "headFlaskTriangleOverlaps": 0,
+      "headGauntletTriangleOverlaps": 0,
+      "lipNearestHeadDistanceMetres": 0.005999994929879904
+    },
+    {
+      "frame": 43,
+      "headFlaskTriangleOverlaps": 0,
+      "headGauntletTriangleOverlaps": 0,
+      "lipNearestHeadDistanceMetres": 0.005999994929879904
+    }
+  ]
+}
