@@ -3242,6 +3242,13 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
             dodgeDirectionX_, dodgeDirectionZ_, snapshot_.playerYawRadians,
             lowerBody.torsoTwistRadians);
     }
+    // Snapshot-derived presentation only, after all state/capture overrides.
+    // No second clock, incoming-damage pulse, renderer roster or lesson cue
+    // may choose this source or restart its authoritative windup.
+    snapshot_.attackWarning = BuildAttackWarningPresentation(
+        snapshot_.swordCombat, snapshot_.lich, snapshot_.activeEnemyKind,
+        snapshot_.skeletonAttackerId,
+        snapshot_.modernCombatRules && snapshot_.playerAlive && !snapshot_.paused);
 }
 
 } // namespace horde::gameplay::simulation

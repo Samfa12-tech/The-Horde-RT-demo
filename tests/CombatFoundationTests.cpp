@@ -1,5 +1,6 @@
 #include "gameplay/effects/KeeperCastPresentation.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/simulation/AttackWarningPresentation.h"
 #include "gameplay/simulation/SkeletonRevivalBridge.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/CorridorCollision.h"
@@ -478,6 +479,128 @@ void TeachingContract() {
     Check(feedback.Snapshot().promptOpacity==0.f,
           "skip suppresses lesson success copy while retaining ordinary attack readability");
 }
+void AttackWarningPresentationContract() {
+    const AttackWarningPresentation empty;
+    Check(empty.source==EntityId::Invalid && empty.kind==EnemyAttackKind::Normal &&
+          empty.phase==AttackWarningPhase::None && empty.phaseElapsedSeconds==0.f &&
+          empty.phaseDurationSeconds==0.f && empty.contactBoundarySeconds==0.f,
+          "absent warning clears source kind phase and all clock data together");
+    Check(!ProductionGameSimulationConfig().specialSkeletonAttacks1_7,
+          "warning description does not enable the normal yellow attack policy");
+    CombatSnapshot combat; LichSnapshot keeper;
+    combat.attackerIndex=0;
+    auto& first=combat.combatants[0];
+    first.action=EnemyCombatAction::AttackWindup;
+    first.attackKind=EnemyAttackKind::GuardBreak;
+    first.actionTime=.42f;
+    const auto build=[&](EntityId source=EntityId::SkeletonA,bool eligible=true) {
+        return BuildAttackWarningPresentation(combat,keeper,EnemyKind::Skeleton,source,eligible);
+    };
+    const auto windup=build();
+    Check(windup.source==EntityId::SkeletonA && windup.kind==EnemyAttackKind::GuardBreak &&
+          windup.phase==AttackWarningPhase::Windup && windup.phaseElapsedSeconds==first.actionTime &&
+          windup.phaseDurationSeconds==CombatTimeline::kSkeletonAttackWindupSeconds &&
+          windup.contactBoundarySeconds==CombatTimeline::kSkeletonAttackWindupSeconds,
+          "yellow warning describes the actual token's unchanged windup clock and contact boundary");
+    Check(build(EntityId::SkeletonA,false)==empty && build()==windup && first.actionTime==.42f,
+          "pause eligibility suppresses the record and resume derives the retained clock without advancing or restarting it");
+    for(EntityId wrong:{EntityId::Invalid,EntityId::Player,EntityId::Lich,EntityId::SkeletonB})
+        Check(build(wrong)==empty,"stale or unrelated source cannot borrow the current skeleton token");
+    first.attackKind=EnemyAttackKind::Normal;
+    Check(build()==empty,"normal swings retain the uncluttered no-ring baseline");
+    first.attackKind=EnemyAttackKind::Unblockable;
+    Check(build().kind==EnemyAttackKind::Unblockable,
+          "an authoritative red skeleton kind is described without assigning a new attack policy");
+    first.attackKind=EnemyAttackKind::GuardBreak;
+    for(auto action:{EnemyCombatAction::Locomotion,EnemyCombatAction::AttackRecovery,
+                     EnemyCombatAction::Staggered,EnemyCombatAction::Dead}) {
+        first.action=action;
+        Check(build()==empty,"recovery stagger interruption and death immediately clear the whole warning");
+    }
+    first.action=EnemyCombatAction::AttackWindup; first.health=0;
+    Check(build()==empty,"zero health clears a stale windup even before its action field changes");
+    first.health=1;
+    for(float invalid:{-.01f,std::numeric_limits<float>::quiet_NaN(),
+                       std::numeric_limits<float>::infinity(),CombatTimeline::kSkeletonAttackWindupSeconds+1.f}) {
+        first.actionTime=invalid;
+        Check(build()==empty,"negative nonfinite and inconsistent windup clocks cannot manufacture a warning");
+    }
+    first.actionTime=CombatTimeline::kSkeletonAttackWindupSeconds;
+    Check(build().phase==AttackWarningPhase::Windup &&
+          build().phaseElapsedSeconds==CombatTimeline::kSkeletonAttackWindupSeconds,
+          "an exact frozen windup endpoint stays Windup until the authoritative action changes");
+    first.action=EnemyCombatAction::AttackActive; first.actionTime=0.f;
+    Check(build().phase==AttackWarningPhase::Contact && build().phaseElapsedSeconds==0.f &&
+          build().phaseDurationSeconds==CombatTimeline::kSkeletonAttackActiveSeconds &&
+          build().contactBoundarySeconds==CombatTimeline::kSkeletonAttackWindupSeconds && !first.playerHitPulse,
+          "actual Active begins the contact phase even for a whiff and does not claim a hit pulse");
+    first.actionTime=CombatTimeline::kSkeletonAttackActiveSeconds;
+    Check(build().phase==AttackWarningPhase::Contact,"a frozen active endpoint retains its actual source phase");
+    first.actionTime=CombatTimeline::kSkeletonAttackActiveSeconds+1.f;
+    Check(build()==empty,"an inconsistent active clock cannot prolong the contact description");
+    first.action=EnemyCombatAction::AttackWindup; first.actionTime=.72f;
+    auto& second=combat.combatants[1]; second=first; second.actionTime=.15f;
+    combat.attackerIndex=1;
+    const auto handed=build(EntityId::SkeletonB);
+    Check(build()==empty && handed.source==EntityId::SkeletonB && handed.phaseElapsedSeconds==.15f,
+          "token handoff rebinds source and time atomically rather than retaining A's clock on B");
+    CombatTeaching teaching; teaching.Reset(false);
+    teaching.Update(false,false,false,combat,keeper,EnemyKind::Skeleton);
+    Check(!teaching.Snapshot().enabled && handed==build(EntityId::SkeletonB),
+          "disabled teaching leaves the independent authoritative warning unchanged");
+    combat.attackerIndex=-1;
+    Check(build(EntityId::SkeletonB)==empty,"released attack token clears any previous warning identity");
+    combat.attackerIndex=static_cast<std::int32_t>(combat.combatants.size());
+    Check(build(EntityId::SkeletonB)==empty,"an out-of-range token never reads another actor");
+    combat={};
+    Check(build()==empty,"reset combat carries neither a warning nor an old source clock");
+
+    keeper.revealComplete=true; keeper.revealPhase=KeeperRevealPhase::Combat;
+    keeper.readableCastPresentation=true; keeper.phase=LichPhase::Charging;
+    const auto keeperBuild=[&](bool eligible=true) {
+        return BuildAttackWarningPresentation(combat,keeper,EnemyKind::Lich,EntityId::Invalid,eligible);
+    };
+    keeper.phaseTime=LichEncounter::kChargeDuration;
+    const auto charge=keeperBuild();
+    Check(charge.source==EntityId::Lich && charge.kind==EnemyAttackKind::Unblockable &&
+          charge.phase==AttackWarningPhase::Windup && charge.phaseElapsedSeconds==LichEncounter::kChargeDuration &&
+          charge.phaseDurationSeconds==LichEncounter::kChargeDuration &&
+          charge.contactBoundarySeconds==LichEncounter::kChargeDuration,
+          "Keeper uses the existing charge duration and never infers discharge from a frozen endpoint");
+    Check(keeperBuild(false)==empty && keeperBuild()==charge,
+          "Keeper pause suppresses presentation while resume retains its unchanged authoritative charge");
+    for(float invalid:{-.01f,std::numeric_limits<float>::quiet_NaN(),
+                       std::numeric_limits<float>::infinity(),LichEncounter::kChargeDuration+1.f}) {
+        keeper.phaseTime=invalid;
+        Check(keeperBuild()==empty,"Keeper invalid charge clocks fail closed without a replacement timer");
+    }
+    keeper.phase=LichPhase::Recovering; keeper.phaseTime=0.f;
+    keeper.staffLightStrength=LichEncounter::kStaffLightPeak; keeper.damagePulse=false;
+    const auto contact=keeperBuild();
+    Check(contact.phase==AttackWarningPhase::Contact && contact.phaseElapsedSeconds==0.f &&
+          contact.phaseDurationSeconds==LichEncounter::kDischargeVisibleBurstDuration &&
+          contact.contactBoundarySeconds==LichEncounter::kChargeDuration && !keeper.damagePulse,
+          "actual Keeper recovery entry describes the visible contact burst without claiming damage");
+    keeper.phaseTime=std::nextafter(LichEncounter::kDischargeVisibleBurstDuration,0.f);
+    Check(keeperBuild().phase==AttackWarningPhase::Contact,"existing discharge remains described just before its half-open endpoint");
+    keeper.phaseTime=LichEncounter::kDischargeVisibleBurstDuration;
+    Check(keeperBuild()==empty,"Keeper warning clears at the existing burst endpoint rather than full recovery");
+    keeper.phaseTime=0.f; keeper.staffLightStrength=0.f;
+    Check(keeperBuild()==empty,"a recovery phase without the actual discharge discriminator stays neutral");
+    keeper.staffLightStrength=LichEncounter::kStaffLightPeak;
+    for(auto phase:{LichPhase::Dormant,LichPhase::MaintainingRange,LichPhase::Repelling,LichPhase::Dead}) {
+        keeper.phase=phase;
+        Check(keeperBuild()==empty,"Keeper interruption rest and death clear the source and clock");
+    }
+    keeper.phase=LichPhase::Charging; keeper.health=0;
+    Check(keeperBuild()==empty,"zero-health Keeper cannot preserve a charging warning");
+    keeper.health=3; keeper.revealComplete=false;
+    Check(keeperBuild()==empty,"unrevealed Keeper cannot publish an early attack warning");
+    keeper.revealComplete=true; keeper.revealPhase=KeeperRevealPhase::Warning;
+    Check(keeperBuild()==empty,"reveal animation is not a live attack phase");
+    Check(BuildAttackWarningPresentation(combat,keeper,EnemyKind::None,EntityId::Invalid,true)==empty,
+          "no selected encounter cannot inherit either owner's warning");
+}
 void AttackReadabilityContract() {
     Check(CombatTeachingSnapshot{}.attackReadability==AttackReadability::Neutral,
           "readability defaults to neutral before any live attack");
@@ -574,7 +697,7 @@ void AttackReadabilityContract() {
     config.playerStartX=0; config.playerStartZ=-3.75f;
     GameSimulation sim(config); InputSnapshot input;
     input.tutorialEnabled=false; input.damageEnabled=false;
-    bool windup=false, active=false, recovery=false;
+    bool windup=false, active=false, recovery=false, normal=false;
     for(int tick=0;tick<500 && !recovery;++tick) {
         sim.StepFixed(input);
         const auto state=sim.Snapshot();
@@ -582,32 +705,55 @@ void AttackReadabilityContract() {
         if(index>=0) {
             const auto phase=state.swordCombat.combatants[index].action;
             const bool yellow=state.swordCombat.combatants[index].attackKind==EnemyAttackKind::GuardBreak;
+            if(!normal && !yellow && phase==EnemyCombatAction::AttackWindup) {
+                normal=true;
+                Check(state.attackWarning==AttackWarningPresentation{},
+                      "actual normal swing snapshot leaves the ring record empty under the diagnostic special policy");
+            }
             if(!windup && yellow && phase==EnemyCombatAction::AttackWindup) {
                 windup=true;
                 Check(state.combatTeaching.attackReadability==AttackReadability::Parryable &&
                       !state.combatTeaching.enabled,
                       "latest live wind-up is yellow in the same snapshot with teaching disabled");
+                Check(state.attackWarning.source==state.skeletonAttackerId &&
+                      state.attackWarning.kind==EnemyAttackKind::GuardBreak &&
+                      state.attackWarning.phase==AttackWarningPhase::Windup &&
+                      state.attackWarning.phaseElapsedSeconds==state.swordCombat.combatants[index].actionTime &&
+                      state.attackWarning.phaseDurationSeconds==CombatTimeline::kSkeletonAttackWindupSeconds &&
+                      state.attackWarning.contactBoundarySeconds==CombatTimeline::kSkeletonAttackWindupSeconds,
+                      "same real fixed-step snapshot publishes the final token phase and authored clock with teaching disabled");
                 input.paused=true; sim.AdvanceFrame(input,0.0);
                 Check(sim.Snapshot().combatTeaching.attackReadability==AttackReadability::Neutral,
                       "pause publishes neutral without waiting for a gameplay step");
+                Check(sim.Snapshot().attackWarning==AttackWarningPresentation{},
+                      "zero-tick pause clears the entire attack warning record immediately");
                 input.paused=false; sim.AdvanceFrame(input,0.0);
                 Check(sim.Snapshot().combatTeaching.attackReadability==AttackReadability::Parryable,
                       "resuming publishes the still-current phase without advancing a cue timer");
+                Check(sim.Snapshot().attackWarning==state.attackWarning,
+                      "zero-tick resume republishes the retained source clock rather than restarting the ring");
             }
             if(!active && yellow && phase==EnemyCombatAction::AttackActive) {
                 active=true;
                 Check(state.combatTeaching.attackReadability==AttackReadability::Parryable,
                       "same-tick active publication retains the existing yellow attack category");
+                Check(state.attackWarning.source==state.skeletonAttackerId &&
+                      state.attackWarning.phase==AttackWarningPhase::Contact &&
+                      state.attackWarning.phaseElapsedSeconds==state.swordCombat.combatants[index].actionTime &&
+                      state.attackWarning.phaseDurationSeconds==CombatTimeline::kSkeletonAttackActiveSeconds,
+                      "real contact phase publication uses the just-advanced actor clock and unchanged active duration");
             }
             if(yellow && phase==EnemyCombatAction::AttackRecovery) {
                 recovery=true;
                 Check(state.combatTeaching.attackReadability==AttackReadability::Neutral,
                       "same-tick recovery publication clears yellow despite the previous lesson cue");
+                Check(state.attackWarning==AttackWarningPresentation{},
+                      "real recovery snapshot removes the previous warning source kind and time together");
             }
         }
         sim.ClearEvents();
     }
-    Check(windup && active && recovery,"readability fixture witnesses actual attack phase progression");
+    Check(normal && windup && active && recovery,"readability fixture witnesses actual normal and special attack phase progression");
     input.damageEnabled=true;
     for(int tick=0;tick<1200 && sim.Snapshot().playerAlive;++tick) {
         sim.StepFixed(input); sim.ClearEvents();
@@ -615,6 +761,8 @@ void AttackReadabilityContract() {
     Check(!sim.Snapshot().playerAlive &&
           sim.Snapshot().combatTeaching.attackReadability==AttackReadability::Neutral,
           "the real lethal damage snapshot suppresses attack classification immediately");
+    Check(sim.Snapshot().attackWarning==AttackWarningPresentation{},
+          "actual player death publishes no retained enemy warning even if its attack phase remains frozen");
 }
 
 void KeeperContract() {
@@ -2358,7 +2506,7 @@ int main(int argc,char** argv) {
     SkeletonRevivalBridgeContract();
     InPlacePairRevivalContract();
     RulesEligibilityDoesNotChoosePracticeExit();
-    WindowAndLifecycle(); TeachingContract(); AttackReadabilityContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();
+    WindowAndLifecycle(); TeachingContract(); AttackWarningPresentationContract(); AttackReadabilityContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();
     HeldGuardDamageContract(); GuardAttackAndReleaseAtContact(); GuardInterruptionRearm();
     YellowGuardBreakAndDefences(); FourSkillPracticeAndExit();
     IntegratedKeeperRepelAndReward();

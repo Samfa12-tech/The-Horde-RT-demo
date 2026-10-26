@@ -51,7 +51,9 @@ Updated26October against source `e4de5a5e`; this heading retains its existing li
   and [actual four-skill protected practice](../evidence/2026-10-25-four-skill-practice/README.md),
   with safe deliberate Finish/Skip. New yellow guard-break authority is tested
   opt-in, OFF until the enemy-anchored special ring is admitted. Heavier red pose
-  and ring visual/readability gates remain. Do not infer damage/orientation
+  and ring visual/readability gates remain. The [stateless warning record](../evidence/2026-10-26-attack-warning-record/README.md)
+  now publishes real source/phase clocks with CPU lifecycle tests; the adapter
+  still does not enable or render it. Do not infer damage/orientation
   acceptance from the owner's animation feedback.
 - **Startup/menus:** [readiness and survivor corrections](../evidence/2026-10-25-owner-playtest/README.md)
   exist. Android startup is asynchronous and gated on current RT presentation,
