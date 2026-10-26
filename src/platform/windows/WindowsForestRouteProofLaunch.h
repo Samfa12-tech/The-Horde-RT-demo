@@ -4,7 +4,7 @@
 #include <string_view>
 
 namespace horde::platform::windows {
-enum class ForestRouteCaptureMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64, NormalShared64 };
+enum class ForestRouteCaptureMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64, NormalShared64, SharedF01Grouped76 };
 struct ForestRouteProofLaunch {
     ForestRouteCaptureMode mode=ForestRouteCaptureMode::Disabled;
     bool landingOnly=false;
@@ -27,6 +27,7 @@ inline ForestRouteProofLaunch ParseForestRouteProofLaunch(
             if(value==L"baked-resident")result.mode=ForestRouteCaptureMode::BakedResident;
             else if(value==L"shared64")result.mode=ForestRouteCaptureMode::SharedExisting64;
             else if(value==L"f01-sector")result.mode=ForestRouteCaptureMode::SharedF01Sector76;
+            else if(value==L"f01-grouped-r4")result.mode=ForestRouteCaptureMode::SharedF01Grouped76;
             else if(value==L"shared64-retention")result.mode=ForestRouteCaptureMode::SharedRetention64;
             else if(value==L"normal-shared64")result.mode=ForestRouteCaptureMode::NormalShared64;
             else {result.error="Unknown forest route proof mode.";return result;}

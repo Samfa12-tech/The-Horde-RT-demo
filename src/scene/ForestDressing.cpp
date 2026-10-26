@@ -59,6 +59,14 @@ constexpr std::array<F01AuthoringRoot,12u> kF01BackgroundRoots{{
     {1,-58,-17,2.5f},{0,-57,-8,1.7f},{0,-42,-45,1.4f},{0,-29,-44,2.9f},
     {1,-55,-39,.4f},{0,-64,-30,2.4f},{0,-67,-17,1.f},{1,-66,-5,3.1f},
 }};
+// Separate bounded composition study: same twelve references/species budget,
+// grouped into three stands rather than the retained sparse arc above. This
+// does not move any original64 root or claim supplemental collision admission.
+constexpr std::array<F01AuthoringRoot,12u> kF01GroupedRootsR4{{
+    {0,-39,-34,.2f},{1,-42,-36,1.1f},{0,-37,-39,2.f},{0,-43,-41,.8f},
+    {1,-54,-17,2.5f},{0,-57,-20,1.7f},{0,-58,-14,1.4f},{0,-61,-18,2.9f},
+    {1,-53,-32,.4f},{0,-57,-34,2.4f},{0,-58,-30,1.f},{1,-60,-36,3.1f},
+}};
 
 bool SameForestMaterial(const assets::StaticMaterial& a,const assets::StaticMaterial& b)
 {
@@ -591,8 +599,11 @@ bool AppendPreparedForestMasters(std::shared_ptr<const PreparedForestDressing> p
 
 bool PrepareF01BackgroundForestDressing(ForestDressingSharedLayout& layout,
                                        const gameplay::simulation::TriangleSupportSurface& terrain,
-                                       std::string& diagnostic)
+                                        std::string& diagnostic,F01BackgroundLayout composition)
 {
+    if(composition!=F01BackgroundLayout::OriginalArc && composition!=F01BackgroundLayout::GroupedR4) {
+        diagnostic="Unknown bounded F01 composition.";return false;
+    }
     if(!layout.prepared || !layout.supplementalPlacements.empty() || !layout.commonPrimitiveCount ||
        layout.masters[0].primitiveCount!=3u || layout.masters[1].primitiveCount!=3u ||
        layout.masters[0].primitiveOffset!=layout.commonPrimitiveCount ||
@@ -600,10 +611,11 @@ bool PrepareF01BackgroundForestDressing(ForestDressingSharedLayout& layout,
         diagnostic="F01 authoring supplement requires fresh disjoint shared-master ownership.";return false;
     }
     if(!ValidSharedForestPrepared(*layout.prepared,diagnostic))return false;
+    const auto& roots=composition==F01BackgroundLayout::GroupedR4?kF01GroupedRootsR4:kF01BackgroundRoots;
     std::vector<ForestDressingSupplementalPlacement> staged;
-    staged.reserve(kF01BackgroundRoots.size());
-    for(std::size_t index=0;index<kF01BackgroundRoots.size();++index) {
-        const auto& root=kF01BackgroundRoots[index];const auto& source=layout.prepared->masters[root.master];
+    staged.reserve(roots.size());
+    for(std::size_t index=0;index<roots.size();++index) {
+        const auto& root=roots[index];const auto& source=layout.prepared->masters[root.master];
         const auto support=terrain.Query(root.x,root.z);
         if(!support.found || !std::isfinite(support.worldY)) {
             diagnostic="F01 authoring root has missing or non-finite centre support at "+std::to_string(index)+".";return false;

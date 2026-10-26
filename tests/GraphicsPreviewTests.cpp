@@ -48,6 +48,10 @@ int main()
     Check(ParseForestRouteProofLaunch(sectorArgs,true).mode==ForestRouteCaptureMode::SharedF01Sector76 &&
           ParseForestRouteProofLaunch(sectorArgs,true).error.empty(),"F01 sector is a separate explicit hidden composition proof");
     Check(!ParseForestRouteProofLaunch(sectorArgs,false).error.empty(),"Release rejects F01 sector composition");
+    auto groupedArgs=sectorArgs;groupedArgs[1]=L"f01-grouped-r4";
+    Check(ParseForestRouteProofLaunch(groupedArgs,true).mode==ForestRouteCaptureMode::SharedF01Grouped76 &&
+          ParseForestRouteProofLaunch(groupedArgs,true).error.empty(),"grouped F01 is a separate hidden candidate, not a replacement of the sparse control");
+    Check(!ParseForestRouteProofLaunch(groupedArgs,false).error.empty(),"Release rejects grouped F01 composition");
     auto retentionArgs=forestArgs;retentionArgs[1]=L"shared64-retention";
     Check(ParseForestRouteProofLaunch(retentionArgs,true).mode==ForestRouteCaptureMode::SharedRetention64 &&
           ParseForestRouteProofLaunch(retentionArgs,true).error.empty(),"whole-instance retention requires its own explicit proof selection");

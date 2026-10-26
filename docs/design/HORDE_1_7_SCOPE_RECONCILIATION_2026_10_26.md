@@ -56,6 +56,15 @@ separate requirements; this does not claim performance solved or authorise relea
 This inventory separates unfinished implementation from missing acceptance and
 explicit deferral. It does not call 1.7 ready or turn rejected work into completion.
 
+## Grouped F01 follow-up
+
+[Three-stand R4 source candidate](../evidence/2026-10-26-f01-grouped-r4/README.md)
+keeps the original64 and original twelve-root sparse control intact. Build and
+actual-terrain host grounding pass. Windows Application Control4551 blocked the
+new executable before any capture; visual/moving-camera, reflection, recreation
+and supplemental collision acceptance remain open. No denied-path retry, global
+shared enablement or capacity increase was made.
+
 ## Branch-supported R4 prerequisite
 
 [Native R4 proof](../evidence/2026-10-26-forest-branch-crown-r4/README.md) resolves

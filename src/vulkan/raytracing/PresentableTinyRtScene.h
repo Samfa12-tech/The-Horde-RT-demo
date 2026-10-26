@@ -317,7 +317,7 @@ public:
 
     void Destroy();
 #if defined(_DEBUG)
-    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64 };
+    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64, SharedF01Grouped76 };
     bool SetForestRouteProofMode(ForestRouteProofMode mode, std::string& diagnostic);
     [[nodiscard]] std::string ForestRouteProofJson() const;
 #endif

@@ -921,7 +921,8 @@ bool PresentableTinyRtScene::UsesSharedForestRetention() const noexcept
 bool PresentableTinyRtScene::UsesSupplementalForestProof() const noexcept
 {
 #if defined(_DEBUG)
-    return forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76;
+    return forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76 ||
+        forestRouteProofMode_==ForestRouteProofMode::SharedF01Grouped76;
 #else
     return false;
 #endif
@@ -932,7 +933,7 @@ bool PresentableTinyRtScene::SetForestRouteProofMode(ForestRouteProofMode mode,s
 {
     if(mode!=ForestRouteProofMode::Disabled && mode!=ForestRouteProofMode::BakedResident &&
        mode!=ForestRouteProofMode::SharedExisting64 && mode!=ForestRouteProofMode::SharedF01Sector76 &&
-       mode!=ForestRouteProofMode::SharedRetention64) {
+       mode!=ForestRouteProofMode::SharedRetention64 && mode!=ForestRouteProofMode::SharedF01Grouped76) {
         diagnostic="Unknown forest route proof mode.";return false;
     }
     if((ready_ || device_!=VK_NULL_HANDLE) && mode!=forestRouteProofMode_) {
@@ -948,7 +949,8 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
 {
     if(forestRouteProofMode_==ForestRouteProofMode::Disabled && !UsesSharedForestGeometry())return "null";
     const bool shared=UsesSharedForestGeometry();
-    const bool sector=forestRouteProofMode_==ForestRouteProofMode::SharedF01Sector76;
+    const bool sector=UsesSupplementalForestProof();
+    const bool grouped=forestRouteProofMode_==ForestRouteProofMode::SharedF01Grouped76;
     const bool retention=UsesSharedForestRetention();
     std::ostringstream out;out.imbue(std::locale::classic());out<<std::fixed<<std::setprecision(8);
     const auto resources=ResourceInventory();
@@ -959,7 +961,7 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
         ++registrations;if(row.assetIndex>=assetUsed.size())fits=false;else assetUsed[row.assetIndex]=true;
     }
     const auto assetCount=std::count(assetUsed.begin(),assetUsed.end(),true);
-    out<<"{\"mode\":\""<<(forestRouteProofMode_==ForestRouteProofMode::Disabled?"normal-shared64":retention?"shared-retention64":sector?"shared-f01-sector76":shared?"shared-existing64":"baked-resident")
+    out<<"{\"mode\":\""<<(forestRouteProofMode_==ForestRouteProofMode::Disabled?"normal-shared64":retention?"shared-retention64":grouped?"shared-f01-grouped-r4-76":sector?"shared-f01-sector76":shared?"shared-existing64":"baked-resident")
        <<"\",\"defaultEnabled\":"<<(kDefaultSharedForestGeometryEnabled?"true":"false")
        <<",\"requestedSharedGeometry\":"<<(sharedForestGeometryEnabled_?"true":"false")
        <<",\"activeSharedGeometry\":"<<(sharedForestGeometryActive_?"true":"false")
@@ -3231,7 +3233,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             if(!horde::scene::AppendPreparedForestMasters(forestSharedLayout_.prepared,collapseStaticAsset_,forestSharedLayout_,diagnostic))return false;
 #if defined(_DEBUG)
             if(UsesSupplementalForestProof() &&
-               !horde::scene::PrepareF01BackgroundForestDressing(forestSharedLayout_,*chapterTerrainSurface_,diagnostic))return false;
+               !horde::scene::PrepareF01BackgroundForestDressing(forestSharedLayout_,*chapterTerrainSurface_,diagnostic,
+                   forestRouteProofMode_==ForestRouteProofMode::SharedF01Grouped76?
+                       horde::scene::F01BackgroundLayout::GroupedR4:horde::scene::F01BackgroundLayout::OriginalArc))return false;
 #endif
             sharedForestGeometryActive_=true;
         }

@@ -6310,6 +6310,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
             Mode::SharedExisting64:
             ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedRetention64?
             Mode::SharedRetention64:
+            ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedF01Grouped76?
+            Mode::SharedF01Grouped76:
             ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedF01Sector76?
             Mode::SharedF01Sector76:Mode::BakedResident;
         if(!ctx.rtScene.SetForestRouteProofMode(mode,diagnostic)){ctx.lastRtFrameError=diagnostic;return false;}

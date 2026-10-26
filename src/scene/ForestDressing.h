@@ -126,9 +126,11 @@ bool AppendPreparedForestMasters(std::shared_ptr<const PreparedForestDressing> p
 // masters/ranges, stages all twelve receipts, and publishes only the supplement.
 // The original64/root collision receipts, geometry, materials and ranges remain
 // unchanged; failure preserves any earlier publication.
+enum class F01BackgroundLayout { OriginalArc, GroupedR4 };
 bool PrepareF01BackgroundForestDressing(ForestDressingSharedLayout& layout,
                                        const gameplay::simulation::TriangleSupportSurface& terrain,
-                                       std::string& diagnostic);
+                                        std::string& diagnostic,
+                                        F01BackgroundLayout composition=F01BackgroundLayout::OriginalArc);
 
 // Compatibility bake from the same canonical masters/transforms. Production
 // remains world-baked until a separate RT ownership/capacity proof is admitted.

@@ -515,6 +515,29 @@ void TestF01Supplement(ForestDressingSharedLayout layout,
     std::cout<<"F01_SUPPLEMENT_CPU roots="<<layout.supplementalPlacements.size()<<" pine="<<pines<<" alder="<<alders
         <<" rootTipSamples="<<samples<<" exposed="<<exposed<<" maximumBurial="<<maximumBurial<<" maximumGap="<<worstGap
         <<"; diagnostic composition only, collision/adoption unadmitted\n";
+    auto grouped=control;
+    Check(PrepareF01BackgroundForestDressing(grouped,terrain,diagnostic,F01BackgroundLayout::GroupedR4),
+          diagnostic.empty()?"three bounded F01 stands ground against actual terrain":diagnostic);
+    const std::array<Expected,12> clustered{{
+        {0,-39,-34,.2f},{1,-42,-36,1.1f},{0,-37,-39,2.f},{0,-43,-41,.8f},
+        {1,-54,-17,2.5f},{0,-57,-20,1.7f},{0,-58,-14,1.4f},{0,-61,-18,2.9f},
+        {1,-53,-32,.4f},{0,-57,-34,2.4f},{0,-58,-30,1.f},{1,-60,-36,3.1f}}};
+    Check(grouped.supplementalPlacements.size()==clustered.size() && grouped.prepared==control.prepared,
+          "grouping retains twelve references and immutable original64/master ownership");
+    float groupedBurial=0;std::size_t groupedTips=0;
+    for(std::size_t i=0;i<grouped.supplementalPlacements.size() && i<clustered.size();++i) {
+        const auto& r=grouped.supplementalPlacements[i];const auto& e=clustered[i];
+        Check(r.placement.masterIndex==e.master && r.placement.origin[0]==e.x && r.placement.origin[2]==e.z &&
+              r.placement.yawRadians==e.yaw && r.rootTipSamples>=18 && r.rootBurialMetres>=0 &&
+              r.rootBurialMetres<=.65f && FiniteBounds(r.worldBounds) && FiniteBounds(r.trunkBounds),
+              "each grouped stand has its exact root and measured bounded footprint");
+        groupedBurial=std::max(groupedBurial,r.rootBurialMetres);groupedTips+=r.rootTipSamples;
+    }
+    std::cout<<"F01_GROUPED_R4 roots="<<grouped.supplementalPlacements.size()<<" rootTipSamples="<<groupedTips
+        <<" maximumBurial="<<groupedBurial<<"; collision/adoption unadmitted\n";
+    auto invalid=control;
+    Check(!PrepareF01BackgroundForestDressing(invalid,terrain,diagnostic,static_cast<F01BackgroundLayout>(99)) &&
+          invalid.supplementalPlacements.empty(),"unknown composition cannot silently publish/truncate roots");
 }
 
 void TestSharedMasterPacking()

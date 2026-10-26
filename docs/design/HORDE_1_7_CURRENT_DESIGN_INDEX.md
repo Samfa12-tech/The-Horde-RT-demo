@@ -1,5 +1,10 @@
 # Horde 1.7 current design index
 
+26 October [grouped F01 R4 source checkpoint](../evidence/2026-10-26-f01-grouped-r4/README.md):
+three twelve-reference stands pass host grounding/build, but Windows Application
+Control denied the new capture executable before start. No visual admission or
+production change; no retry or security workaround.
+
 26 October [branch-supported pine R4 proof](../evidence/2026-10-26-forest-branch-crown-r4/README.md):
 private geometry-specific ordinary retention/recreation and staged route pass.
 Production unchanged; bare middle distance remains and grouped F01 is next.

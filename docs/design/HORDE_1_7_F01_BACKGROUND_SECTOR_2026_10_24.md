@@ -1,5 +1,10 @@
 # F01 background sector: next bounded visible-world proof
 
+26 October update: a separately named [three-stand R4 composition](../evidence/2026-10-26-f01-grouped-r4/README.md)
+retains the original arc below as control. Source build and actual-terrain host
+grounding pass; native capture is blocked before process creation by Windows
+Application Control4551. It is not normal scenery or visual acceptance.
+
 Trial status: the [actual north/west comparison](../evidence/2026-10-24-f01-forest-sector/README.md)
 is implemented and measured as a separate Debug selection. Grounding/capacity/
 recreation pass; the twelve open-crown placements still fail the intended forest
