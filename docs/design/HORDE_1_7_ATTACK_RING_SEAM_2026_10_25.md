@@ -1,5 +1,11 @@
 # Attacker-ring scope before implementation
 
+**Combined request supersedes the standalone roster below:** use the
+[joint warning28/flask29 proposal](HORDE_1_7_JOINT_RING_FLASK_ADMISSION_2026_10_26.md).
+Its exact counts/packing sequence and14 rejected offline cases are recorded;
+no capacity or normal enablement is approved. Older +1 figures remain history
+for the single-feature discussion, not a simultaneous implementation request.
+
 26 October reconciliation: consult the [joint ring/flask admission queue](HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md#ring-and-flask-proposals-must-be-reviewed-together).
 The +1 request below describes this feature alone. The two features cannot both
 claim owner28 or assume one +1 increase covers simultaneous ownership. No bounds

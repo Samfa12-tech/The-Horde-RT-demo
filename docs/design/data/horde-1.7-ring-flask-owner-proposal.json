@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "status": "pending-owner-approval",
+  "runtimeEnabled": false,
+  "basisSource": "51d6f0102d85b83216f3cad2558adbc4406588f8",
+  "roles": [
+    {
+      "role": "specialWarning",
+      "metadataIndex": 28,
+      "ordinaryPhysicalSlot": 28,
+      "assetIndex": 13,
+      "primitiveCount": 1,
+      "sourceMaterials": 1,
+      "mutableMaterial": true
+    },
+    {
+      "role": "rightHandFlask",
+      "metadataIndex": 29,
+      "ordinaryPhysicalSlot": 29,
+      "assetIndex": 14,
+      "primitiveCount": 1,
+      "sourceMaterials": 1,
+      "mutableMaterial": false
+    }
+  ],
+  "preservedMetadataIndices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27
+  ],
+  "forestMasterMetadataIndices": [
+    26,
+    27
+  ],
+  "currentLimits": {
+    "ordinaryDefinitions": 28,
+    "instanceMetadata": 28,
+    "staticAssets": 13,
+    "primitives": 36,
+    "materials": 32,
+    "tlasInstances": 104,
+    "ordinaryBlasMax": 21,
+    "sharedBlasMax": 23
+  },
+  "requestedLimits": {
+    "ordinaryDefinitions": 30,
+    "instanceMetadata": 30,
+    "staticAssets": 15,
+    "primitives": 38,
+    "materials": 34,
+    "tlasInstances": 106,
+    "ordinaryBlasMax": 23,
+    "sharedBlasMax": 25
+  },
+  "materialPacking": {
+    "baselinePreAlias": 32,
+    "baselineAfterExistingAliases": 30,
+    "existingChestAliases": 2,
+    "showcaseWorldPalette": 2,
+    "newSourceMaterials": 2,
+    "newFlaskAliasAssumed": 0,
+    "candidatePreAlias": 34,
+    "candidateAfterExistingAliases": 32,
+    "candidateFinal": 34
+  },
+  "profiles": [
+    {
+      "name": "baked",
+      "trees": 0,
+      "ordinaryBase": 30,
+      "physicalDefinitions": 30,
+      "primitiveRows": 34,
+      "uniqueAssets": 15,
+      "finalMaterials": 34,
+      "blasMaximum": 23
+    },
+    {
+      "name": "shared64",
+      "trees": 64,
+      "ordinaryBase": 30,
+      "physicalDefinitions": 94,
+      "primitiveRows": 38,
+      "uniqueAssets": 15,
+      "finalMaterials": 34,
+      "blasMaximum": 25
+    },
+    {
+      "name": "shared76Diagnostic",
+      "trees": 76,
+      "ordinaryBase": 30,
+      "physicalDefinitions": 106,
+      "primitiveRows": 38,
+      "uniqueAssets": 15,
+      "finalMaterials": 34,
+      "blasMaximum": 25
+    }
+  ],
+  "concurrentSpecialWarnings": 1,
+  "newTextureLayers": 0,
+  "newLights": 0,
+  "newFireEmitters": 0,
+  "recordLayoutsChanged": false,
+  "descriptorBindingsChanged": false,
+  "framesInFlight": 1,
+  "loadedOwnedBlasRequiredBeforeAnyVisibility": true,
+  "normalFeatureEnablementChanged": false,
+  "ordinaryRetentionMustRevalidateNewQuerySources": true
+}

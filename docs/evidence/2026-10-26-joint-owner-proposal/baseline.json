@@ -1,0 +1,23 @@
+{
+  "scope": "retained native inventory observations; no new proposed-owner runtime claim",
+  "ordinary": {
+    "primitiveRows": 32,
+    "packedMaterialRows": 30,
+    "sourceExportSha256": "7ea09395f9b2512e10bdc29c9c65bc28bb4a6b68e2f5d1de01cf43985f958de6"
+  },
+  "shared76": {
+    "mode": "shared-f01-sector76",
+    "physicalDefinitions": 104,
+    "primitiveRows": 36,
+    "packedMaterialRows": 30,
+    "finalMaterialRows": 32,
+    "uniqueStaticAssets": 13
+  },
+  "shared76ManifestSha256": "3169163fa2e6a035fa8686c8d340068c82f74ff85aa05f022508cbe52a43185b",
+  "sourceFacts": {
+    "existingChestAliasRows": 2,
+    "showcaseWorldPaletteRows": 2,
+    "baselinePreAliasMaterialRows": 32
+  },
+  "baselinePreAliasIsSourceDerivedNotNewGpuObservation": true
+}

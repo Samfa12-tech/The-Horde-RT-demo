@@ -29,27 +29,30 @@ stowed sword/light/current effects still contribute to RT. A mutable warning
 material cannot borrow an immutable flask material. No inactive-but-owned actor,
 light or sword slot is free merely because it is masked in one capture.
 
-The following is arithmetic for a joint review, **not an approved allocation or
-instruction to change limits**. It assumes one asset, primitive and independently
-owned material per feature, preserving the existing76-tree diagnostic profile.
+The [single exact joint proposal](HORDE_1_7_JOINT_RING_FLASK_ADMISSION_2026_10_26.md)
+now assigns warning28/flask29 and fixes the following pending ceilings. Its
+[offline check](../evidence/2026-10-26-joint-owner-proposal/README.md) passes one
+positive case and rejects14 inconsistent cases. It is not an approved allocation
+or instruction to change limits; both roles have their own asset/range/material.
 
 | Bound | Current source | Combined planning envelope |
 | --- | ---: | ---: |
 | Ordinary definitions / metadata | 28 / 28 | 30 / 30 |
 | Static assets | 13 | 15 |
 | Primitive capacity | 36 | 38 |
-| Material capacity | 32 | 34 before any proved immutable alias |
+| Material capacity | 32 | 34 including the pre-alias intake peak |
 | TLAS capacity | 104 = 28+64+12 | 106 = 30+64+12 |
 | Ordinary / shared BLAS maxima | 21 / 23 | 23 / 25 |
 
 Current values come from `RtSceneAbi.def`, `PresentableTinyRtScene.h` and existing
 native inventories. `RtStaticMeshSlot::ShareImmutableMaterialRows` already exists:
 it requires every converted GPU field/texture route to match, earlier providers,
-no alias chains and valid primitive remaps before publication. A suitable flask
-may reduce the final material requirement to33, **only after an actual asset and
-packing proof**; that saving is not established here. `Prepare` also checks the
-intermediate packed count, so a post-pack alias alone does not authorize overflowing
-the intake. No new material-sharing framework is proposed or needed.
+no alias chains and valid primitive remaps before publication. The actual packing order is34 before the existing two chest aliases,32 after
+them, then34 with the two world-palette rows. A proven later flask alias may
+reduce final active records but does not remove the earlier34-row intake peak.
+The selected proposal therefore fixes34 and assumes no new flask alias. A
+33-cap/pre-pack alternative is outside this request. No new material-sharing
+framework is proposed or needed.
 
 One ring still matches today's singular authoritative attacker token. Future
 simultaneous warnings need a separate reviewed pool, not silent dropping. The
@@ -59,9 +62,10 @@ ownership, lifecycle and actual RT readability checks remain. No new texture,
 light, fire capacity, record layout, binding, frame-in-flight or quality change
 is assumed. New yellow attacks remain OFF pending their in-world cue.
 
-**Next owner/architecture decision:** review a joint two-owner seam and its
-measured primitive/material plan, rather than approving the two old +1 rosters
-as though they shared a free slot. This reconciliation does not grant that decision.
+**Next owner/architecture decision:** approve or revise the exact joint
+two-owner implementation/evaluation request, not two old +1 rosters claiming
+the same slot. Asset/native/phone and normal-enable gates remain separate.
+This reconciliation does not grant that decision.
 
 ## Visual execution boundary
 
@@ -71,8 +75,10 @@ Windows Application Control4551 denying `CreateProcess` for
 SHA256 `95e95e681a21e4a2da352a30cd6c6ddbaefeca875a23cf2accdf972de8fa8eac`.
 No application process started. No retry, renamed/copied executable, alternate
 execution route or security change is authorized. The owner/parent must establish
-whether the normal managed Windows approval process can permit that exact app;
-its policy mechanism is not inferred from the error. A general keep-going message
+the policy through the [read-only diagnostic handoff](../evidence/2026-10-26-windows-app-control/README.md).
+The file is unsigned/no MOTW, but both the current-token event read and CiTool
+inventory were denied. Specific approval for owner/admin read-only collection
+is the next step, not an allow rule or security-setting change. A general keep-going message
 does not itself remove the boundary. Earlier successful R4 evidence remains valid
 for its own executable, not a substitute for grouped F01 captures.
 

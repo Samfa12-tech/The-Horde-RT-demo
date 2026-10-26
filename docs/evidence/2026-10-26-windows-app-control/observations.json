@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "scope": "read-only diagnostic; enforcement cause not established",
+  "target": "reports/forest-branch-crown-r4-20261026/candidate-grouped/HordeLanternRT.exe",
+  "sha256": "95e95e681a21e4a2da352a30cd6c6ddbaefeca875a23cf2accdf972de8fa8eac",
+  "bytes": 14986752,
+  "fileCreatedUtc": "2026-10-26T08:08:38.3610821Z",
+  "failedLaunchLogCreatedUtc": "2026-10-26T08:09:52.1872317Z",
+  "signatureStatus": "NotSigned",
+  "alternateStreams": [
+    ":$DATA"
+  ],
+  "markOfTheWebStreamPresent": false,
+  "administratorToken": false,
+  "powerShellLanguageMode": "FullLanguage",
+  "eventQuery": {
+    "log": "Microsoft-Windows-CodeIntegrity/Operational",
+    "startUtc": "2026-10-26T08:04:52.1872317Z",
+    "endUtc": "2026-10-26T08:14:52.1872317Z",
+    "maxEvents": 256,
+    "fileFilter": "exact candidate path suffix or SHA256",
+    "result": "denied",
+    "error": "Attempted to perform an unauthorized operation.",
+    "eventContentsRead": false,
+    "emptyEventsDoesNotMeanNoEvents": true
+  },
+  "policyInventory": {
+    "tool": "Windows System32/CiTool.exe",
+    "arguments": [
+      "-lp",
+      "-json"
+    ],
+    "signatureStatus": "Valid",
+    "signer": "Microsoft Windows / Microsoft Corporation",
+    "version": "10.0.26100.1000",
+    "result": "denied",
+    "operationResult": -2147024891,
+    "hresultHex": "0x80070005",
+    "policiesRead": false
+  },
+  "attribution": {
+    "smartAppControl": "unconfirmed",
+    "organizationManagedPolicy": "unconfirmed",
+    "executionEnvironmentRestriction": "unconfirmed",
+    "policyId": null,
+    "policyName": null,
+    "blockEventStatus": null
+  },
+  "blockedLaunchRetried": false,
+  "securityChanged": false,
+  "privilegedDiagnosticRetried": false,
+  "signingPerformed": false,
+  "phoneAccessed": false,
+  "nextStep": "specific owner approval for read-only administrator event/policy collection, not application execution or policy modification"
+}

@@ -1,0 +1,32 @@
+{
+  "scope": "offline proposal arithmetic; not runtime admission",
+  "positiveProposalPassed": true,
+  "negativeCasesRejected": 14,
+  "currentAbiUnchanged": true,
+  "ownerApprovalPending": true,
+  "markdownFiles": 10,
+  "localLinksChecked": 269,
+  "brokenLinks": [],
+  "sourceRuntimeTestFilesChanged": false,
+  "parkedOwnerFiles": 151,
+  "parkedOwnerRosterUnchanged": true,
+  "securityCommandsSyntaxErrors": 0,
+  "securityCommandsExecuted": false,
+  "sourceCi": {
+    "run": 40293048498,
+    "head": "51d6f0102d85b83216f3cad2558adbc4406588f8",
+    "allSixTerminalSuccess": true
+  },
+  "artifactHashes": {
+    "docs/design/HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md": "fc26bc7d7b9c0c8855168af0d72dffcb8c245b73f6d88c8a91979b993eea036b",
+    "docs/design/HORDE_1_7_ATTACK_RING_SEAM_2026_10_25.md": "a60ed50b0d42a1731d40c0da29c5ecd9d279ef0f4f09767ee9f692ac8ddd0da3",
+    "docs/design/HORDE_1_7_CURRENT_DESIGN_INDEX.md": "da5740abc6319a2c399d4c6f70576e78bc34dc5abe151038eee1af56439d1c7d",
+    "docs/design/HORDE_1_7_FLASK_PRESENTATION_SEAM_2026_10_25.md": "8a6dfb19266654ead7879f2a6b4e1cdcd453b34982a90bdd7a35ea404f12cb09",
+    "docs/design/HORDE_1_7_IMPLEMENTATION_REMAINING_2026_10_24.md": "fa7e8cf0c0920cccf433b79ac98d68d1bb1fdd26fb18af8eda43cbc350f3ae91",
+    "docs/design/HORDE_1_7_JOINT_RING_FLASK_ADMISSION_2026_10_26.md": "dc8f2f9da4b06966864f8f61cc6c009ce5f853d6fe34dd4c3189f710c3fad7d5",
+    "docs/evidence/2026-10-26-benchmark-delivery-status/README.md": "e5fedab6d5d982b34f48db0c45dfb6f5c26de77ae2b3106da4f5ff3349432e7a",
+    "docs/evidence/2026-10-26-joint-owner-proposal/README.md": "6ddc8b023643d222936ed12d4793e3552602f6ae03b3791e0aff334fc3639cd6",
+    "docs/evidence/2026-10-26-windows-app-control/owner-read-only-commands.md": "177a62a44b610bf1dfe727687c740fc9e66e9c4d96fb72bafbd0992673a6eaba",
+    "docs/evidence/2026-10-26-windows-app-control/README.md": "f0f7d14fedd2af71a32ae477872058881e036d5a0720f378d2f014939b1d46b2"
+  }
+}

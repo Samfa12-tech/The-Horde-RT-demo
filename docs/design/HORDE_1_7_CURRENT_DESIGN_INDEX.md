@@ -1,5 +1,12 @@
 # Horde 1.7 current design index
 
+26 October: [security diagnosis](../evidence/2026-10-26-windows-app-control/README.md)
+confirms the exact unsigned file but cannot attribute policy because event/policy
+reads are denied. No retry/security change. [Benchmark-send status](../evidence/2026-10-26-benchmark-delivery-status/README.md):
+benchmark statistics remain local; earlier playtest email delivery is distinct.
+The [joint warning/flask proposal](HORDE_1_7_JOINT_RING_FLASK_ADMISSION_2026_10_26.md)
+now fixes two owners and exact packing/profile counts, pending specific approval.
+
 ## Full-scope reconciliation - 26 October 2026
 
 Use the [delivery inventory](HORDE_1_7_SCOPE_RECONCILIATION_2026_10_26.md),
