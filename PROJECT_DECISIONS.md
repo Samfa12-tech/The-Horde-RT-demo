@@ -2,6 +2,25 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## Congruent distant town and future hub - 2026-10-26
+
+Sam requires the low-cost or preloaded Bellwether visible from the1.7 vantage
+to represent the actual1.8 town, with minimal shell/layout change between
+versions. Use one authoritative placement, scale, building/landmark arrangement
+and roofline/silhouette layout; derive the distant representation from it rather
+than authoring an unrelated disposable skyline. Whether the full shell can stay
+resident is a measured resource question, not a presumed streaming requirement
+or approval to enlarge budgets.
+
+The common coordinate plan already informs r23 terrain and the current v4
+nine-mass distant shell. That is not proof of congruence with a final1.8 master:
+the master must be identified and compared before new town/terrain edits. Local
+v3/v5 shell studies are not that authority (rejected footing and isolated chimney
+outlet respectively). The full low-detail world with accurately placed major
+locations remains1.7 scope; playable town/Foundry gameplay remains later work.
+Map arrows are not accepted3D sightlines. This decision does not freeze every
+terrain detail or authorize broad1.8 implementation.
+
 ## Phone performance and 1.7 scope - 2026-10-26
 
 Sam explicitly clarified: sustained phone performance is ongoing measured

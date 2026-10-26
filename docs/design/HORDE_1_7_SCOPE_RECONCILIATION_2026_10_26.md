@@ -27,11 +27,22 @@ crossing. Playable town streets/interiors, villagers/services, forge/foundry
 gameplay and hub quests belong to 1.8 or later. Parked source assets for that work
 are not integrated 1.7 content and must not be counted as completed scenery.
 
+26October owner clarification: the1.7 low-cost/preloaded town must represent
+the actual1.8 town with minimal shell/layout change. One authoritative placement,
+scale, roofline and landmark layout must drive both representations. Identify
+that1.8 master and compare it with current v4 before town/terrain edits; sharing
+the nine mapped footprints alone is not full silhouette congruence. Full residency
+versus a derived distant shell/streaming is a measured choice within approved
+bounds, not an assumed architecture or new budget grant. The full low-detail
+world and accurate major-location presentation remain required for1.7; separate
+playable1.8 content does not close a missing distant landmark.
+
 ## Current inventory
 
 | Area | Implemented/tested evidence | Still required or explicitly held |
 | --- | --- | --- |
 | **Forest and wider landscape** | r23 local/macro terrain, route, grounded original 64 trees, understory/deadwood/rocks, F03 kerbs/waystone and distant village shell exist. | **Major visible gap:** surrounding woodland mass, fuller crowns, middle/far depth, region silhouettes and controlled lookout reveal. Actual F01/F03/F04 views fail the intended woodland impression. Traversal and topo import do not close this. Near/mid/far representation and combined cost/visibility need admission. |
+| Cross-version town/landmarks | Normal production selects v4:966 triangles/two reused materials, eight village masses plus shrine from the common coordinate register. Existing F04 RT views show church/roofs. B06 Smith at engineX107.3/Z155.2 is a town mass. | Final1.8 master/congruence comparison is unverified. Smith is not the regional Foundry across the eastern gorge; no production Foundry shell or accepted player-height reveal is established. Local v3 is a rejected footing study and v5 a chimney-outlet prototype, not1.8 master admission. Preserve mapped geography/protected interfaces; wider terrain, woodland, shorelines and skyline remain versioned/revisable rather than wholly locked. |
 | Shared/batched trees | Two source masters are reused in authoring; normal gameplay still world-bakes64 placements into four material groups (323,264 duplicated triangles). The new shared-master/BLAS owner, whole-instance retention and Windows route/recreation proof exist. | Shared64 stays OFF pending Android correctness review; cost measurements guide optimisation, not a release FPS target; Windows allocation savings are not phone/FPS gains. The extra 12-tree trial remains sparse and collision-unadmitted. Private Easy Tree and rejected pineLOD2 are not production solutions. |
 | Crowns/forest art | Original masters and protected roots/wood remain. Branch-supported R4 has an independently frozen private ordinary retention/recreation and staged-route proof. | Forest mass remains unfinished; R2/R3 stay rejected and no broad rollout is admitted. Grouped F01 is source/grounding-ready but native launch is blocked by Application Control4551. The earlier exporter denial is separate; neither may be bypassed. |
 | Atmosphere and story smoke | Shared night/moon environment and existing effects remain; outdoor music/ambience are integrated. | Chimney smoke is approved unfinished work: the High/Low renderer trial failed unchanged shader gates and remains withdrawn. New outdoor mist/shafts, fireflies and visual wind were explicitly deferred on 24 October, not implemented or completed. Latest owner feedback raises whether to revisit that disposition; this review does not silently reinstate them. |
