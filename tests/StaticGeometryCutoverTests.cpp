@@ -538,12 +538,12 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 s.forestRetentionOmittedCount_==s.forestRetentionProof_.eligibleCount,
                 "returning to the same safe current owner reuses only its certified instance decisions");
         }
-        constexpr std::array<const char*,23> runtimeFaults{{"different source owner","different prepared owner","stale generation",
+        constexpr std::array<const char*,24> runtimeFaults{{"different source owner","different prepared owner","stale generation",
             "changed primitive range","changed local bounds","unverified retained faces","nonidentity current root",
             "wrong master reference","wrong placement transform","wrong metadata index","incomplete live population",
             "unpublished definitions","pending definitions","retention-suppressing override or inactive owner","supplemental placements",
             "changed common prefix","active water droplet","exterior frame","visible glass fixture",
-            "wrong submitted root reference","missing master address","visible attack warning","visible healing flask"}};
+            "wrong submitted root reference","missing master address","visible attack warning","visible healing flask","occupied utility return"}};
         for(unsigned fault=0;fault<runtimeFaults.size();++fault) {
             auto sceneOwner=std::make_unique<Scene>();auto& s=*sceneOwner;seed(s);auto instances=s.tlasBuiltInstances_;auto unsafe=frame;
             for(unsigned i=30u;i<94u;++i)instances[i].mask=0u;
@@ -576,6 +576,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             if(fault==20)s.forestMasterBlas_[0].address=0;
             if(fault==21)unsafe.attackWarningRingVisible=true;
             if(fault==22)unsafe.healingFlaskVisible=true;
+            if(fault==23)unsafe.playerUtilityHand.emplace();
             const auto legacy=instances;
             s.ApplySharedForestRetentionProof(instances,unsafe);
             const auto message=std::string("CPU retention fallback: ")+runtimeFaults[fault];

@@ -131,25 +131,29 @@ public:
         return true;
     }
 
-    bool FlaskHeld() const
+    bool FlaskHeld() const { return FlaskHeld(snapshot_); }
+
+    static bool FlaskHeld(const UtilityHandReturnSnapshot& state)
     {
-        return (snapshot_.phase == UtilityHandPhase::Using ||
-                snapshot_.phase == UtilityHandPhase::ReverseLift ||
-                snapshot_.phase == UtilityHandPhase::ForwardReturn) &&
-            snapshot_.profileSeconds >= kGripAcquireSeconds &&
-            snapshot_.profileSeconds < kEquipmentReleaseSeconds;
+        return (state.phase == UtilityHandPhase::Using ||
+                state.phase == UtilityHandPhase::ReverseLift ||
+                state.phase == UtilityHandPhase::ForwardReturn) &&
+            state.profileSeconds >= kGripAcquireSeconds &&
+            state.profileSeconds < kEquipmentReleaseSeconds;
     }
 
-    float GripWeight() const
+    float GripWeight() const { return GripWeight(snapshot_); }
+
+    static float GripWeight(const UtilityHandReturnSnapshot& state)
     {
-        if (!FlaskHeld())
+        if (!FlaskHeld(state))
             return 0.0f;
         const auto smooth = [](const double value) {
             const double t = std::clamp(value, 0.0, 1.0);
             return t * t * (3.0 - 2.0 * t);
         };
-        const double rise = smooth((snapshot_.profileSeconds - kGripAcquireSeconds) / kGripBlendSeconds);
-        const double fall = smooth((kEquipmentReleaseSeconds - snapshot_.profileSeconds) / kGripBlendSeconds);
+        const double rise = smooth((state.profileSeconds - kGripAcquireSeconds) / kGripBlendSeconds);
+        const double fall = smooth((kEquipmentReleaseSeconds - state.profileSeconds) / kGripBlendSeconds);
         return static_cast<float>(std::min(rise, fall));
     }
 

@@ -207,7 +207,7 @@ bool CorridorFrameSourcesInside(const RtSceneFrameInputs& f) {
        f.chestReward.phase!=interactions::ChestRewardPhase::LanternClaimed ||
        f.lich.deathDissolveProgress!=1.f || f.lich.staffLightStrength!=0.f ||
        f.tuning.glassFixtureVisible || f.tuning.productionRewardPropsVisible || f.previewMotion ||
-       f.attackWarningRingVisible || f.healingFlaskVisible)return false;
+       f.attackWarningRingVisible || f.healingFlaskVisible || f.playerUtilityHand.has_value())return false;
     // Moving transmissive drops are not part of this first static certificate.
     // Keep the full owner until they expire; never delete or mute the effect.
     if(std::any_of(f.waterContact.droplets.begin(),f.waterContact.droplets.end(),[](const auto& d){return d.active;}))return false;
@@ -369,7 +369,7 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
 {
     // These added query sources were not in the retained-forest certificate.
     // Current input must force full restoration before any new presentation.
-    jointPropPresentationActive_=frame.attackWarningRingVisible || frame.healingFlaskVisible;
+    jointPropPresentationActive_=frame.attackWarningRingVisible || frame.healingFlaskVisible || frame.playerUtilityHand.has_value();
     decision=StaticDetailFrame::Render;
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled){diagnostic.clear();return true;}
@@ -1141,7 +1141,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopyWithStaticReplacement(
 #endif
     )
 {
-    jointPropPresentationActive_=frame.attackWarningRingVisible || frame.healingFlaskVisible;
+    jointPropPresentationActive_=frame.attackWarningRingVisible || frame.healingFlaskVisible || frame.playerUtilityHand.has_value();
     if (!retireReferences || commandBuffer == VK_NULL_HANDLE || swapchainImage == VK_NULL_HANDLE ||
         swapchainExtent.width == 0 || swapchainExtent.height == 0) {
         diagnostic = "Static replacement requires an actual first-frame command, output and retirement proof.";

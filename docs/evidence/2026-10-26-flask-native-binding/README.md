@@ -88,3 +88,7 @@ join/contact/cadence, interruption/save/load/reset and RT gates remain.
 The subsequent [live owner checkpoint](live-owner.md) implements the bounded
 phase-aware simulation/equipment seam behind a separate default-OFF gate. It
 does not admit native scene joins or platform play.
+
+The [explicit native frame consumer](native-frame.md) subsequently connects that
+immutable profile to the existing skin/Grip and scene ownership paths. It remains
+opt-in and CPU-tested; actual RT joins and normal gameplay are not admitted.

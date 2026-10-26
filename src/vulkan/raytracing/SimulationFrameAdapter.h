@@ -15,6 +15,12 @@ struct RtAttackWarningOptions
     bool reducedMotion = false;
 };
 
+// Opt-in source/native trial on an already adapted frame. Validation is atomic;
+// it grants no gameplay action and leaves normal platform callers unchanged.
+bool ApplyFlaskUtilityCandidateFrame(
+    const horde::gameplay::simulation::SimulationSnapshot& simulation,
+    RtSceneFrameInputs& frame, std::string& diagnostic);
+
 RtSceneFrameInputs BuildEntryMenuFrameInputs(const horde::graphics::EntryMenuSession &session,
                                              float outputExposure, FireEmitterQuality fireDetail,
                                              horde::graphics::ShadowQuality shadowQuality);

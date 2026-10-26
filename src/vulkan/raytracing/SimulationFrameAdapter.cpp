@@ -228,6 +228,24 @@ RtSceneFrameInputs BuildGraphicsPreviewFrameInputs(
     return frame;
 }
 
+bool ApplyFlaskUtilityCandidateFrame(
+    const horde::gameplay::simulation::SimulationSnapshot& simulation,
+    RtSceneFrameInputs& frame, std::string& diagnostic)
+{
+    std::optional<PlayerUtilitySample> sample;
+    bool held=false;
+    if(!simulation.healingFlaskEnabled || !simulation.flaskUtilityCandidate || frame.tickIndex!=simulation.tickIndex) {
+        diagnostic="Flask presentation requires the explicitly enabled current simulation trial.";
+        return false;
+    }
+    if(!ResolvePlayerUtilitySample(simulation.flaskHandReturn,sample,held,diagnostic))return false;
+    frame.playerUtilityHand=simulation.flaskHandReturn.phase==horde::gameplay::items::UtilityHandPhase::Idle?
+        std::nullopt:std::optional{simulation.flaskHandReturn};
+    frame.healingFlaskVisible=held;
+    frame.healingFlaskWorldFromItem=horde::gameplay::items::IdentityHeldItemTransform();
+    diagnostic.clear();return true;
+}
+
 RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
     const float outputExposure,

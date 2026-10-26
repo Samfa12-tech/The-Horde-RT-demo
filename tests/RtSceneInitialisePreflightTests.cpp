@@ -12,6 +12,21 @@
 namespace horde::vulkan::raytracing {
 
 struct PresentableTinyRtScenePreflightTestAccess {
+    static bool UtilityCandidateConfiguration(std::string& diagnostic) {
+        PresentableTinyRtScene source;
+        const auto path=std::string(HORDE_RT_SOURCE_DIR)+
+            "/assets/models/player/source/flask-native-binding-r1/gothic-traveller-flask-candidate.runtime.glb";
+        if(!source.playerUtilityCandidateAsset_.empty() || !source.SetPlayerUtilityCandidateAsset(path))return false;
+        source.ready_=true;
+        const bool rejected=!source.SetPlayerUtilityCandidateAsset({});source.ready_=false;
+        if(!rejected)return false;
+        PresentableTinyRtScene moved(std::move(source));
+        if(moved.playerUtilityCandidateAsset_!=path || !source.playerUtilityCandidateAsset_.empty())return false;
+        moved.Destroy();
+        // Configuration survives resource recreation; a moved-from scene does
+        // not retain the candidate. Load the real full roster without a device.
+        return moved.playerUtilityCandidateAsset_==path && AdmitChapter(moved,diagnostic);
+    }
     struct Ledger {
         std::size_t resolverCalls = 0u;
         std::size_t ownershipCalls = 0u;
@@ -136,6 +151,10 @@ int main()
 {
     bool ok = true;
     PresentableTinyRtScene observedScene;
+    std::string utilityDiagnostic;
+    ok &= Require(PresentableTinyRtScenePreflightTestAccess::UtilityCandidateConfiguration(utilityDiagnostic),
+                  "explicit utility binding must survive move/recreation and the real native static roster");
+    if(!utilityDiagnostic.empty())std::cerr<<utilityDiagnostic<<'\n';
     ok &= Require(observedScene.SelectedDielectricQualityName().empty(),
                   "unselected scene must report no dielectric quality");
     ok &= Require(observedScene.GlassEnabled(), "default scene preserves Glass On");

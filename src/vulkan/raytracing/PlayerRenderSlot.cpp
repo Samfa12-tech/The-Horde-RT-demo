@@ -814,13 +814,53 @@ bool PlayerRenderSlot::PreparePose(
                             poseUpdated, diagnostic, observation);
 }
 
+bool ResolvePlayerUtilitySample(
+    const horde::gameplay::items::UtilityHandReturnSnapshot& hand,
+    std::optional<PlayerUtilitySample>& sample, bool& flaskHeld, std::string& diagnostic)
+{
+    using namespace horde::gameplay::items;
+    using Phase = UtilityHandPhase;
+    using Hand = UtilityHandReturn;
+    sample.reset(); flaskHeld = false;
+    const double t=hand.profileSeconds, elapsed=hand.usingElapsedSeconds;
+    bool valid=std::isfinite(t) && std::isfinite(elapsed) && t>=0.0 && elapsed>=0.0 &&
+        t<=Hand::kUseDurationSeconds && elapsed<=Hand::kUseDurationSeconds;
+    switch(hand.phase) {
+    case Phase::Idle: valid=valid && t==0.0 && elapsed==0.0 && !hand.cancelled; break;
+    case Phase::Using: valid=valid && !hand.cancelled && t==elapsed; break;
+    case Phase::ReverseLift:
+        valid=valid && hand.cancelled && t>Hand::kGripAcquireSeconds && t<Hand::kLiftEndSeconds &&
+            elapsed>=t && elapsed<Hand::kLiftEndSeconds; break;
+    case Phase::ForwardReturn:
+        valid=valid && hand.cancelled && t>=Hand::kHoldEndSeconds && t<Hand::kEquipmentReleaseSeconds &&
+            elapsed>=Hand::kLiftEndSeconds && elapsed<=t; break;
+    case Phase::Released:
+        valid=valid && hand.cancelled &&
+            ((t<=Hand::kGripAcquireSeconds && elapsed==t) ||
+             (t==Hand::kGripAcquireSeconds && elapsed>t && elapsed<Hand::kLiftEndSeconds) ||
+             (t==Hand::kEquipmentReleaseSeconds && elapsed>=Hand::kLiftEndSeconds && elapsed<t) ||
+             (t>=Hand::kEquipmentReleaseSeconds && elapsed==t)); break;
+    default: valid=false; break;
+    }
+    if(!valid || (hand.phase!=Phase::Idle && !hand.generation)) {
+        diagnostic="Utility presentation requires a coherent finite simulation hand profile.";
+        return false;
+    }
+    if(hand.phase!=Phase::Idle && hand.phase!=Phase::Released) {
+        sample=PlayerUtilitySample{PlayerUtilityClip::Use,static_cast<float>(t),Hand::GripWeight(hand)};
+        flaskHeld=Hand::FlaskHeld(hand);
+    }
+    diagnostic.clear(); return true;
+}
+
 bool PlayerRenderSlot::PrepareUtilityCandidatePose(
     const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
     const PlayerUtilitySample sample, const std::uint64_t tickIndex,
-    const PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic)
+    const PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic,
+    RtSceneRecordObservation* observation)
 {
     return PrepareBoundPose(animation, sample, tickIndex, cadence,
-                            poseUpdated, diagnostic, nullptr);
+                            poseUpdated, diagnostic, observation);
 }
 
 bool PlayerRenderSlot::PrepareBoundPose(
@@ -854,14 +894,13 @@ bool PlayerRenderSlot::PrepareBoundPose(
         if (!utilityCandidateReady_ ||
             (utility->clip != PlayerUtilityClip::Use && utility->clip != PlayerUtilityClip::Cancel) ||
             !std::isfinite(utility->seconds) || utility->seconds < 0.f ||
+            !std::isfinite(utility->weight) || utility->weight < 0.f || utility->weight > 1.f ||
             (animation.locomotionClip != PlayerLocomotionClip::Idle &&
              animation.locomotionClip != PlayerLocomotionClip::Walk) ||
             !std::isfinite(animation.locomotionBlend) || animation.locomotionBlend < 0.f ||
-            animation.locomotionBlend > 1.f || animation.plantedPelvisDropMetres != 0.f ||
-            animation.crouchPelvisDropMetres != 0.f || animation.dodge.weight != 0.f ||
+            animation.locomotionBlend > 1.f ||
             animation.combatLayer.action != PlayerUpperBodyAction::None ||
-            animation.combatLayer.weight != 0.f || animation.combatLayer.guardPoseWeight != 0.f ||
-            animation.reaction != horde::gameplay::CombatReaction::None)
+            animation.combatLayer.weight != 0.f || animation.combatLayer.guardPoseWeight != 0.f)
         {
             diagnostic = "Utility candidate requires explicit bindings, a finite sample and unoccupied Idle/Walk pose.";
             return rejectUtility();
@@ -887,27 +926,34 @@ bool PlayerRenderSlot::PrepareBoundPose(
         // and the base pose; only the existing right-arm solve receives goals.
         const auto anchor = horde::gameplay::items::MultiplyHeldItemTransforms(
             RigidPlayerBoneInModel(base[0]), InverseRigid(RigidPlayerBoneInModel(source[0])));
-        const auto grip = horde::gameplay::items::MultiplyHeldItemTransforms(
+        auto grip = horde::gameplay::items::MultiplyHeldItemTransforms(
             anchor, RigidPlayerBoneInModel(source[2]));
+        std::array<float,3> shiftedGrip{{grip[12],grip[13],grip[14]}};
+        ApplyPlantedTorsoTranslation(shiftedGrip,animation);
+        for(unsigned axis=0;axis<3;++axis)grip[12+axis]=shiftedGrip[axis];
         if (!horde::gameplay::items::ValidateHeldItemSocketTransform(grip, diagnostic))
             return rejectUtility();
         auto& right = utilityAnimation->rightIk;
-        right.target = {{grip[12], grip[13], grip[14]}};
-        right.gripX = {{grip[0], grip[1], grip[2]}};
-        right.gripY = {{grip[4], grip[5], grip[6]}};
-        right.gripZ = {{grip[8], grip[9], grip[10]}};
+        const auto ordinaryRight=right;
+        if(utility->weight>0.f)right=BlendPlayerArmGripTarget(ordinaryRight,grip,utility->weight);
         const auto desiredHand = horde::gameplay::items::MultiplyHeldItemTransforms(
             grip, InverseRigid(rightHandFromGripSocket_));
         Vec3 elbow{};
         for (unsigned axis=0; axis<3; ++axis)
             elbow[axis] = anchor[12+axis] + anchor[axis]*source[1][12] +
                 anchor[4+axis]*source[1][13] + anchor[8+axis]*source[1][14];
-        const Vec3 shoulder{{base[1][12], base[1][13], base[1][14]}};
+        ApplyPlantedTorsoTranslation(elbow,animation);
+        Vec3 shoulder{{base[1][12], base[1][13], base[1][14]}};
+        ApplyPlantedTorsoTranslation(shoulder,animation);
         const auto direction = Normalise(Subtract({{desiredHand[12], desiredHand[13], desiredHand[14]}}, shoulder));
         const auto toElbow = Subtract(elbow, shoulder);
-        right.pole = Normalise(Subtract(toElbow, Scale(direction, Dot(toElbow, direction))));
-        right.preferredElbowFlexionRadians = 0.f;
-        right.poseWeight = 1.f;
+        if(utility->weight>0.f) {
+            const auto sourcePole=Normalise(Subtract(toElbow, Scale(direction, Dot(toElbow, direction))));
+            const auto pole=Add(Scale(ordinaryRight.pole,1.f-utility->weight),Scale(sourcePole,utility->weight));
+            right.pole=Dot(pole,pole)>1e-12f?Normalise(pole):sourcePole;
+            right.preferredElbowFlexionRadians=ordinaryRight.preferredElbowFlexionRadians*(1.f-utility->weight);
+            right.poseWeight=ordinaryRight.poseWeight+(1.f-ordinaryRight.poseWeight)*utility->weight;
+        }
     }
     // Validate before cadence reuse: an invalid request cannot return a stale
     // valid palette at the same tick or within the 30 Hz interval.

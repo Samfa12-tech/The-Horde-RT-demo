@@ -185,7 +185,53 @@ int main(int argc,char** argv) {
     Check(bound.PreparePose(animation,101,PlayerCpuSkinCadence::Hz30,updated,error) && updated &&
           Exact(bound.UniqueVertices(),baseline.UniqueVertices()),
           "leaving the utility at the same tick restores the original pose instead of stale candidate data");
-    for(int failure=0;failure<9;++failure) {
+    // Entry/exit weight belongs to the same immutable hand profile. Zero must
+    // retain the ordinary palette exactly, including its pole and hand solve.
+    SkinnedNodeTransform useHold{};
+    if(!reference.NodeTransform(SkinnedClip::Attack,.6f,"RightGrip",useHold,error))return 1;
+    for(float weight:{0.f,.25f,.5f,1.f}) {
+        const auto expected=BlendPlayerArmGripTarget(animation.rightIk,Rigid(useHold),weight);
+        if(!bound.PrepareUtilityCandidatePose(animation,{PlayerUtilityClip::Use,.6f,weight},201,
+                PlayerCpuSkinCadence::Hz30,updated,error)){std::cerr<<error<<'\n';return 1;}
+        HeldItemTransform expectedGrip=IdentityHeldItemTransform();
+        for(unsigned axis=0;axis<3;++axis){expectedGrip[axis]=expected.gripX[axis];expectedGrip[4+axis]=expected.gripY[axis];
+            expectedGrip[8+axis]=expected.gripZ[axis];expectedGrip[12+axis]=expected.target[axis];}
+        const auto agreement=MeasureTransformAgreement(Rigid(bound.BoneSockets().rightGrip),expectedGrip);
+        Check(agreement.positionErrorMetres<=kPlayerGripSocketToleranceMetres &&
+              agreement.orientationErrorRadians<=kPlayerGripOrientationToleranceRadians,
+              "native hand follows the existing blended rigid Grip target");
+        if(weight==0.f)Check(Exact(bound.UniqueVertices(),baseline.UniqueVertices()),
+              "zero utility weight preserves exact ordinary entry/exit pose bytes");
+    }
+    // A cancelled hand return coexists with ordinary crouch/dodge/reaction;
+    // it must not stop the movement motor or drag the other hand/hips/feet.
+    for(int stance=0;stance<3;++stance) {
+        auto pose=animation;
+        if(stance==0)pose.crouchPelvisDropMetres=.25f;
+        if(stance==1)pose.dodge={.5f,0,1};
+        if(stance==2)pose.reaction=horde::gameplay::CombatReaction::Hit;
+        if(!baseline.PreparePose(pose,202,PlayerCpuSkinCadence::Hz60,updated,error) ||
+           !bound.PrepareUtilityCandidatePose(pose,{PlayerUtilityClip::Use,.4f,.5f},202,
+                PlayerCpuSkinCadence::Hz30,updated,error)){std::cerr<<error<<'\n';return 1;}
+        bool exact=baseline.BoneSockets().leftGrip==bound.BoneSockets().leftGrip &&
+            baseline.BoneSockets().hips==bound.BoneSockets().hips;
+        for(auto i:unaffected)exact=exact && std::memcmp(&baseline.UniqueVertices()[i],&bound.UniqueVertices()[i],sizeof(TexturedSkinnedRtVertex))==0;
+        Check(exact,"return overlay preserves actual non-right crouch/dodge/reaction base geometry and left solve");
+    }
+    {
+        UtilityHandReturn hand;std::optional<PlayerUtilitySample> sample;bool held=false;
+        Check(hand.Begin() && hand.SynchronizeUsing(.4) && hand.Cancel(),"native mapping uses a real cancelled hand owner");
+        for(int tick=0;tick<12;++tick) {
+            Check(ResolvePlayerUtilitySample(hand.Snapshot(),sample,held,error),"actual cancellation profile maps without an independent clock");
+            if(sample)Check(sample->clip==PlayerUtilityClip::Use && sample->seconds==float(hand.Snapshot().profileSeconds) &&
+                sample->weight==hand.GripWeight() && held==hand.FlaskHeld(),"mapping preserves phase, weight and visibility exactly");
+            hand.Step(1.0/60.0);
+        }
+        auto invalid=hand.Snapshot();invalid.generation=0;
+        Check(!ResolvePlayerUtilitySample(invalid,sample,held,error) && !sample && !held,
+              "invalid owner fails closed instead of returning stale pose authority");
+    }
+    for(int failure=0;failure<11;++failure) {
         auto invalid=animation;PlayerUtilitySample sample{};
         if(failure==0)sample.seconds=std::numeric_limits<float>::quiet_NaN();
         if(failure==1)sample.seconds=-.01f;
@@ -194,8 +240,10 @@ int main(int argc,char** argv) {
         if(failure==4)invalid.locomotionClip=static_cast<PlayerLocomotionClip>(255);
         if(failure==5)invalid.combatLayer.guardPoseWeight=1.f;
         if(failure==6)invalid.combatLayer.action=PlayerUpperBodyAction::Sword;
-        if(failure==7)invalid.dodge.weight=1.f;
-        if(failure==8)invalid.crouchPelvisDropMetres=.1f;
+        if(failure==7)invalid.dodge.weight=2.f;
+        if(failure==8)invalid.crouchPelvisDropMetres=1.f;
+        if(failure==9)sample.weight=std::numeric_limits<float>::quiet_NaN();
+        if(failure==10)sample.weight=1.01f;
         Check(!bound.PrepareUtilityCandidatePose(invalid,sample,101,PlayerCpuSkinCadence::Hz30,updated,error) &&
               !updated && !bound.SolvedPose().IsValid(),
               "invalid/conflicting utility requests invalidate retained pose before cadence reuse");
@@ -205,6 +253,6 @@ int main(int argc,char** argv) {
           "reloading normal asset drops diagnostic bindings and retained sample");
     std::cout<<"utility_native_samples="<<samples<<" right_max_m="<<maximumRightError
              <<" left_max_component="<<maximumLeftDifference<<" failures="<<failures
-             <<"; CPU-only, no arbitrary cancellation or RT joins admission\n";
+             <<"; CPU-only source/owner mapping, no RT joins admission\n";
     return failures?1:0;
 }

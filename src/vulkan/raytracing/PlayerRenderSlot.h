@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "gameplay/animation/PlayerAnimationState.h"
+#include "gameplay/items/UtilityHandReturn.h"
 #include "scene/assets/SkinnedMeshAsset.h"
 #include "scene/assets/PlayerPrimitiveContract.h"
 #include "vulkan/raytracing/RtSceneAbi.generated.h"
@@ -210,8 +211,15 @@ struct PlayerUtilitySample
 {
     PlayerUtilityClip clip = PlayerUtilityClip::Use;
     float seconds = 0.0f;
+    float weight = 1.0f;
     bool operator==(const PlayerUtilitySample&) const = default;
 };
+
+// Validate immutable simulation authority, then select the existing Use clip.
+// This does not advance time or use the fixed-seed Cancel as a general return.
+bool ResolvePlayerUtilitySample(
+    const horde::gameplay::items::UtilityHandReturnSnapshot& hand,
+    std::optional<PlayerUtilitySample>& sample, bool& flaskHeld, std::string& diagnostic);
 
 class PlayerRenderSlot
 {
@@ -228,7 +236,8 @@ public:
     bool PrepareUtilityCandidatePose(
         const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
         PlayerUtilitySample sample, std::uint64_t tickIndex,
-        PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic);
+        PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic,
+        RtSceneRecordObservation* observation = nullptr);
     bool ShoulderCenter(const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
                         std::array<float, 3u>& center,
                         std::string& diagnostic) const;

@@ -183,6 +183,8 @@ struct RtSceneFrameInputs
     // Presentation-only inputs; gameplay admission remains with the snapshot owner.
     bool attackWarningRingVisible = false;
     bool healingFlaskVisible = false;
+    // Explicit immutable utility trial; ordinary adapters leave this empty.
+    std::optional<horde::gameplay::items::UtilityHandReturnSnapshot> playerUtilityHand;
     std::array<float, 4u> attackWarningRingBaseColour{{0.72f,0.09f,0.015f,1.f}};
     std::array<float, 4u> attackWarningRingEmission{{1.f,0.16f,0.015f,1.f}};
     horde::gameplay::items::HeldItemTransform attackWarningRingWorldFromItem =
@@ -374,6 +376,12 @@ public:
     // Set before Initialise; geometry admission is explicit and development-only.
     void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
     void SetDevelopmentRescueJourney(bool enabled) { developmentRescueJourney_=enabled; }
+    // Candidate source binding only, chosen before resource creation. Empty
+    // retains the original runtime asset; no platform selects this normally.
+    bool SetPlayerUtilityCandidateAsset(std::string path) {
+        if(ready_ || device_!=VK_NULL_HANDLE)return false;
+        playerUtilityCandidateAsset_=std::move(path);return true;
+    }
     // Explicit representation fallback; select before initialisation. This does
     // not change settings, geometry quality, placement, collision or save state.
     bool SetSharedForestGeometryEnabled(bool enabled) {
@@ -1332,6 +1340,7 @@ private:
     bool developmentWorldRoute_ = false;
     bool stagedWorldPreparation_ = false;
     bool developmentRescueJourney_ = false;
+    std::string playerUtilityCandidateAsset_;
     bool jointPropPresentationActive_ = false;
     bool regionalWaterDiagnosticEnabled_ = true;
     bool floorDebrisEnabled_ = true;

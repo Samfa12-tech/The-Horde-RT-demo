@@ -816,6 +816,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     developmentSupportFixture_ = std::exchange(other.developmentSupportFixture_, false);
     developmentWorldRoute_=std::exchange(other.developmentWorldRoute_,false);
     developmentRescueJourney_=std::exchange(other.developmentRescueJourney_,false);
+    playerUtilityCandidateAsset_=std::exchange(other.playerUtilityCandidateAsset_,{});
     regionalWaterDiagnosticEnabled_=std::exchange(other.regionalWaterDiagnosticEnabled_,true);
     floorDebrisEnabled_=std::exchange(other.floorDebrisEnabled_,true);
     regionalWaterFaces_=std::move(other.regionalWaterFaces_);
@@ -3164,8 +3165,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         !horde::scene::assets::StaticMeshAsset::Load(
             playerDirectory / "gothic-traveller-lod0.runtime.glb",
             playerManifest, productionPlayerAsset_, diagnostic) ||
-        !playerRenderSlot_.LoadAsset(
-            (playerDirectory / "gothic-traveller-lod0.runtime.glb").string(), diagnostic) ||
+        !(playerUtilityCandidateAsset_.empty() ? playerRenderSlot_.LoadAsset(
+            (playerDirectory / "gothic-traveller-lod0.runtime.glb").string(), diagnostic) :
+            playerRenderSlot_.LoadUtilityCandidateAsset(playerUtilityCandidateAsset_,diagnostic)) ||
         !horde::scene::assets::AssetManifest::Load(
             dielectricDirectory / "asset.manifest.json",
             dielectricManifest, diagnostic) ||
@@ -7204,11 +7206,23 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                                      RtSceneRecordObservation* observation)
 {
     jointPropPresentationActive_ = sceneProfile_ == RtSceneProfile::Showcase &&
-        (frame.attackWarningRingVisible || frame.healingFlaskVisible);
+        (frame.attackWarningRingVisible || frame.healingFlaskVisible || frame.playerUtilityHand.has_value());
     uploadedQualityControlsValid_ = false;
     uploadedFireEmittersValid_ = false;
     if (sceneProfile_ != RtSceneProfile::Showcase)
         return UpdatePreviewInstances(commandBuffer, frame, diagnostic, observation);
+    std::optional<PlayerUtilitySample> utilitySample;
+    auto healingFlaskWorldFromItem=frame.healingFlaskWorldFromItem;
+    if(frame.playerUtilityHand) {
+        bool held=false;
+        if(playerUtilityCandidateAsset_.empty()) {
+            diagnostic="Utility hand trial requires its explicit current native clip binding.";return false;
+        }
+        if(!ResolvePlayerUtilitySample(*frame.playerUtilityHand,utilitySample,held,diagnostic))return false;
+        if(held!=frame.healingFlaskVisible) {
+            diagnostic="Utility flask visibility disagrees with its current simulation hand profile.";return false;
+        }
+    }
     // Direct recorders must obey the same contributor closure as the ordinary
     // restoration owner. A complete restore publishes these flags before recording.
     if (jointPropPresentationActive_ && !StaticGeometryHasCompleteContributors()) {
@@ -7250,6 +7264,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         productionVisibility.rewardWorldVisible;
     const PlayerRenderRoute effectivePlayerRenderRoute =
         productionVisibility.playerRoute;
+    if(frame.playerUtilityHand && effectivePlayerRenderRoute!=kProductionPlayerRenderRoute) {
+        diagnostic="Utility hand trial requires the admitted modelled player route.";return false;
+    }
     if (effectivePlayerRenderRoute != measuredPlayerRoute_)
     {
         measuredPlayerRoute_ = effectivePlayerRenderRoute;
@@ -7602,9 +7619,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             !ApplyRescueRopeRigTargets(rigAnimation,frame.rescue,playerModelBasis,skinnedPlayerRootWorld,eye)) {
             diagnostic="Rescue rope rig mapping rejected nonfinite authority.";return false;
         }
-        if (!playerRenderSlot_.PreparePose(rigAnimation, frame.tickIndex,
+        if (!(utilitySample ? playerRenderSlot_.PrepareUtilityCandidatePose(rigAnimation,*utilitySample,frame.tickIndex,
+                                           playerCpuSkinCadence_,updateSkinnedPlayer,diagnostic,observation) :
+              playerRenderSlot_.PreparePose(rigAnimation, frame.tickIndex,
                                            playerCpuSkinCadence_, updateSkinnedPlayer,
-                                           diagnostic, observation))
+                                           diagnostic, observation)))
             return false;
         if (updateSkinnedPlayer)
         {
@@ -7701,6 +7720,16 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             return result;
         };
         const auto& boneSockets = playerRenderSlot_.BoneSockets();
+        if(frame.playerUtilityHand && frame.healingFlaskVisible) {
+            const auto socket=std::find_if(healingFlaskAsset_.sockets.begin(),healingFlaskAsset_.sockets.end(),
+                [](const auto& s){return s.name=="Grip";});
+            if(socket==healingFlaskAsset_.sockets.end() ||
+               !horde::gameplay::items::ValidateHeldItemSocketTransform(socket->world,diagnostic)) {
+                diagnostic="Utility flask lacks its finite native Grip socket.";return false;
+            }
+            healingFlaskWorldFromItem=horde::gameplay::items::MultiplyHeldItemTransforms(
+                rigidWorldFromBone(boneSockets.rightGrip),InverseRigidHeldItemTransform(socket->world));
+        }
         if (!playerRenderSlot_.ResolveHeldItemVisuals(
                 frame.heldItems,
                 rigidWorldFromBone(boneSockets.leftGrip),
@@ -7857,7 +7886,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[kHealingFlaskInstanceIndex].mask = frame.healingFlaskVisible ? 0x01u : 0u;
     instances[kHealingFlaskInstanceIndex].accelerationStructureReference = healingFlaskBlas_.address;
     instances[kHealingFlaskInstanceIndex].transform =
-        heldTransformToInstanceTransform(frame.healingFlaskWorldFromItem);
+        heldTransformToInstanceTransform(healingFlaskWorldFromItem);
     const auto characterInstances = characterSlot_.BuildActiveInstances();
     instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];
     instances[kKeeperInstanceIndex] = characterInstances[2];
@@ -9126,7 +9155,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 )
 {
     jointPropPresentationActive_ = sceneProfile_ == RtSceneProfile::Showcase &&
-        (frame.attackWarningRingVisible || frame.healingFlaskVisible);
+        (frame.attackWarningRingVisible || frame.healingFlaskVisible || frame.playerUtilityHand.has_value());
     // A prior unsubmitted recording must not advance the GPU definition cache.
     tlasPendingDefinitionsValid_ = false;
     uploadedFireEmittersValid_ = false;

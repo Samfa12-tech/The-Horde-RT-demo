@@ -264,6 +264,35 @@ int main()
         if (!condition) { std::cerr << label << "\n"; passed = false; }
     };
     AttackWarningAdapterContracts(check);
+    {
+        using namespace horde::gameplay::items;
+        horde::gameplay::simulation::SimulationSnapshot source{};source.tickIndex=908;
+        auto frame=BuildRtSceneFrameInputs(source,1.f);std::string error;
+        check(!frame.playerUtilityHand && !frame.healingFlaskVisible,
+              "ordinary frame adaptation leaves flask hand and prop OFF");
+        check(!ApplyFlaskUtilityCandidateFrame(source,frame,error) && !frame.playerUtilityHand,
+              "flask frame trial requires both explicit simulation gates");
+        source.healingFlaskEnabled=source.flaskUtilityCandidate=true;
+        UtilityHandReturn hand;check(hand.Begin() && hand.SynchronizeUsing(.4),"real hand owner supplies the trial sample");
+        source.flaskHandReturn=hand.Snapshot();const auto before=source.flaskHandReturn;
+        check(ApplyFlaskUtilityCandidateFrame(source,frame,error) && frame.playerUtilityHand==source.flaskHandReturn &&
+              frame.healingFlaskVisible && source.flaskHandReturn==before,
+              "explicit adaptation copies immutable owner time without a renderer clock or prop trajectory");
+        auto stale=frame;--stale.tickIndex;
+        check(!ApplyFlaskUtilityCandidateFrame(source,stale,error) && stale.playerUtilityHand==frame.playerUtilityHand,
+              "stale frame cannot receive a newer hand owner");
+        auto invalid=source;invalid.flaskHandReturn.profileSeconds=std::numeric_limits<double>::quiet_NaN();
+        check(!ApplyFlaskUtilityCandidateFrame(invalid,frame,error) && frame.playerUtilityHand==source.flaskHandReturn,
+              "corrupt hand profile rejects before mutating the prior coherent frame");
+        check(hand.Cancel() && hand.Step(.05),"cancelled owner returns from its actual lift sample");
+        source.flaskHandReturn=hand.Snapshot();
+        check(ApplyFlaskUtilityCandidateFrame(source,frame,error) && frame.playerUtilityHand->profileSeconds<.4 &&
+              frame.playerUtilityHand->cancelled && frame.healingFlaskVisible,
+              "cancelled return stays simulation-owned in the frame");
+        hand.Reset();source.flaskHandReturn=hand.Snapshot();
+        check(ApplyFlaskUtilityCandidateFrame(source,frame,error) && !frame.playerUtilityHand && !frame.healingFlaskVisible,
+              "reset/Idle clears the trial hand and prop while preserving ordinary rendering");
+    }
     horde::gameplay::simulation::SimulationSnapshot game{};
     game.tickIndex = 417;
     game.playerX = 0.31f;
