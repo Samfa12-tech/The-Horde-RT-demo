@@ -36,6 +36,20 @@ pass. Release passes all five affected tests in12.57s (native binding, ABI,
 real-asset preflight, static cutover and inventory). The two source generator/
 artifact CTests pass in96.83s. Exact-head hosted CI is a separate handoff result.
 
+Run40418093623 at4cd5a5e4 found one missed affected smoke fixture:76/77 Vulkan-host
+tests passed, but `CharacterRenderSlotSmoke` retained physical30/TLAS106 and
+forest totals94/106. Its correction pins31/107 and95/107 plus explicit pickup30,
+preserving metadata30 and every previous role assertion. No production behavior,
+check selection, timeout or budget changed to make that gate pass. The original
+job log is retained at `reports/ci-40418093623-vulkan-job.log`.
+Clang/GCC each passed169/170 shared checks but the offline Android-witness policy
+fixture also pinned the old ordinary30. Its current-source assertion is31, with
+an added31-physical/30-metadata/107-storage positive case; all prior synthetic
+counts and malformed/overflow rejection cases remain. This test extracts mocked
+functions only, never invoking the device runner, ADB, install or app data.
+Corrected character smoke passes Debug9.27s/Release4.23s; offline witness policy
+passes1.26s. The replacement head's hosted CI remains the final platform gate.
+
 This is physical-owner integration, not completed gameplay pickup. Actual F03
 item placement/readiness, deliberate contact/interaction, entitlement-to-visible
 removal/load restoration and player prompts still need their source/caller slice.

@@ -254,8 +254,8 @@ int main()
 
     ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 23u &&
                       PresentableTinyRtScene::kBlasCount == 25u &&
-                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 30u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 106u &&
+                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 31u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 107u &&
                       kRtInstanceMetadataCapacity == 30u &&
                       kRtStaticAssetCapacity == 15u &&
                       kRtPrimitiveMetadataCapacity == 38u && kRtMaterialCapacity == 34u &&
@@ -274,11 +274,12 @@ int main()
                       PresentableTinyRtScene::kAttackWarningMetadataIndex == 28u &&
                       PresentableTinyRtScene::kAttackWarningInstanceIndex == 28u &&
                       PresentableTinyRtScene::kHealingFlaskMetadataIndex == 29u &&
-                      PresentableTinyRtScene::kHealingFlaskInstanceIndex == 29u,
-                  "joint ring28/flask29 append after unchanged Keeper27 and every previous metadata/TLAS owner");
-    ok &= Require(PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 64u == 94u &&
-                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 76u == 106u,
-                  "forest placement definitions begin after the thirty-role prefix and fit both bounded populations");
+                      PresentableTinyRtScene::kHealingFlaskInstanceIndex == 29u &&
+                      PresentableTinyRtScene::kHealingFlaskUpgradeInstanceIndex == 30u,
+                  "joint ring28/flask29 plus physical pickup30 preserve Keeper27 and every previous metadata/TLAS owner");
+    ok &= Require(PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 64u == 95u &&
+                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 76u == 107u,
+                  "forest placement definitions follow the thirty-one-role physical prefix and fit both bounded populations");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =
