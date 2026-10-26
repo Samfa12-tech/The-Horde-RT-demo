@@ -159,6 +159,95 @@ public final class CampaignMenuIntegrationTest {
                 R.id.interact_button,R.id.toggle_held_light_pose_button,R.id.diagnostics_panel,R.id.developer_overlay,R.id.vitality_status,R.id.rt_status,R.id.controller_prompt};
         for(int i=0;i<names.length;i++)set(names[i],a.findViewById(ids[i]));
     }
+    private FrameLayout entryCompositionFixture(int width,int height,float density,float fontScale,
+                                                int direction,int insetLeft,int insetRight)throws Exception {
+        Configuration config=new Configuration(a.getResources().getConfiguration());
+        config.fontScale=fontScale;config.densityDpi=Math.round(density*160);
+        config.screenWidthDp=Math.round(width/density);config.screenHeightDp=Math.round(height/density);
+        config.orientation=width>height?Configuration.ORIENTATION_LANDSCAPE:Configuration.ORIENTATION_PORTRAIT;
+        DisplayMetrics metrics=new DisplayMetrics();metrics.setTo(a.getResources().getDisplayMetrics());
+        metrics.widthPixels=width;metrics.heightPixels=height;metrics.density=density;
+        metrics.densityDpi=config.densityDpi;metrics.scaledDensity=density*fontScale;
+        org.robolectric.shadows.ShadowDisplay display=Shadows.shadowOf(a.getWindowManager().getDefaultDisplay());
+        display.setWidth(width);display.setHeight(height);
+        display.setRealWidth(width);display.setRealHeight(height);display.setDensity(density);
+        a.getResources().updateConfiguration(config,metrics);
+        // Resource configuration can recalculate host display metrics. Keep the
+        // app's physical viewport and the explicitly measured root coherent.
+        a.getResources().getDisplayMetrics().setTo(metrics);
+        assertEquals(width,a.getResources().getDisplayMetrics().widthPixels);
+        assertEquals(height,a.getResources().getDisplayMetrics().heightPixels);
+        final WindowInsets insets=new WindowInsets.Builder().setStableInsets(
+            Insets.of(insetLeft,Math.round(24*density),insetRight,Math.round(24*density))).build();
+        FrameLayout root=new FrameLayout(a) {
+            @Override public WindowInsets getRootWindowInsets(){return insets;}
+        };
+        root.setId(R.id.menu_scrim);root.setLayoutDirection(direction);
+        View old=a.findViewById(R.id.menu_scrim);ViewGroup parent=(ViewGroup)old.getParent();
+        int index=parent.indexOfChild(old);ViewGroup.LayoutParams params=old.getLayoutParams();
+        parent.removeView(old);parent.addView(root,index,params);set("menuScrim",root);
+        set("entryMenuEnabled",true);call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        root.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),
+                     View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.EXACTLY));
+        root.layout(0,0,width,height);
+        root.getViewTreeObserver().dispatchOnPreDraw();
+        return root;
+    }
+    private Rect entryBounds(FrameLayout root,String name)throws Exception {
+        View button=(View)field(name).get(a);
+        Rect rect=new Rect(0,0,button.getWidth(),button.getHeight());
+        root.offsetDescendantRectToMyCoords(button,rect);return rect;
+    }
+    private void captureEntryGeometry(FrameLayout root,String scenario)throws Exception {
+        final String directory=System.getenv("HORDE_ENTRY_LAYOUT_EVIDENCE_DIR");
+        if(directory==null || directory.isEmpty())return;
+        File output=new File(directory,"host-entry-widgets-"+scenario+".png");
+        assertFalse("preserve prior layout evidence",output.exists());
+        assertTrue(output.getParentFile().isDirectory() || output.getParentFile().mkdirs());
+        Bitmap image=Bitmap.createBitmap(root.getWidth(),root.getHeight(),Bitmap.Config.ARGB_8888);
+        root.draw(new Canvas(image));
+        try(FileOutputStream stream=new FileOutputStream(output)){assertTrue(image.compress(Bitmap.CompressFormat.PNG,100,stream));}
+        String text="ANDROID HOST WIDGETS ONLY; transparent world, synthetic insets, no phone or RT acceptance.\n"+
+            "viewport="+root.getWidth()+"x"+root.getHeight()+" density="+a.getResources().getDisplayMetrics().density+
+            " fontScale="+a.getResources().getConfiguration().fontScale+" direction="+root.getLayoutDirection()+
+            " actualDisplay="+a.getResources().getDisplayMetrics().widthPixels+"x"+a.getResources().getDisplayMetrics().heightPixels+"\n";
+        for(String name:new String[]{"entryPlayButton","entryMoreButton","entrySettingsButton"})
+            text+=name+"="+entryBounds(root,name)+"\n";
+        Files.write(new File(directory,output.getName()+".txt").toPath(),text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    public void entrySecondaryPlaquesHaveEqualSizeAndBalancedAnchors()throws Exception {
+        for(int[] size:new int[][]{{411,801},{804,381}})for(float scale:new float[]{1,2}) {
+            FrameLayout root=entryCompositionFixture(size[0],size[1],1,scale,View.LAYOUT_DIRECTION_LTR,0,0);
+            captureEntryGeometry(root,size[0]+"x"+size[1]+"-font"+scale);
+            Rect more=entryBounds(root,"entryMoreButton"),settings=entryBounds(root,"entrySettingsButton");
+            Rect play=entryBounds(root,"entryPlayButton");
+            assertEquals("secondary actions need equal visual and touch width",more.width(),settings.width());
+            assertEquals("secondary actions share a baseline",more.bottom,settings.bottom);
+            assertEquals("outer spacing must balance",more.left,root.getWidth()-settings.right);
+            assertTrue("secondary targets retain Android48dp minimum",more.height()>=48 && settings.height()>=48);
+            assertFalse("primary and secondary targets remain separate",Rect.intersects(play,more)||Rect.intersects(play,settings));
+            assertTrue("no unexpected campaign action",Bridge.actions.isEmpty());
+        }
+    }
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    public void entryCompositionPreservesAsymmetricSafeInsetsAndRtl()throws Exception {
+        for(int direction:new int[]{View.LAYOUT_DIRECTION_LTR,View.LAYOUT_DIRECTION_RTL}) {
+            FrameLayout root=entryCompositionFixture(1080,2340,2.625f,1.3f,direction,40,100);
+            captureEntryGeometry(root,"1080x2340-safe-"+direction);
+            Rect more=entryBounds(root,"entryMoreButton"),settings=entryBounds(root,"entrySettingsButton");
+            Rect play=entryBounds(root,"entryPlayButton");
+            int safeLeft=Math.max(Math.round(16*2.625f),40+Math.round(8*2.625f));
+            int safeRight=root.getWidth()-Math.max(Math.round(16*2.625f),100+Math.round(8*2.625f));
+            for(Rect rect:new Rect[]{more,settings,play})
+                assertTrue("all entry actions stay inside physical safe insets",rect.left>=safeLeft && rect.right<=safeRight);
+            assertTrue("Play centres within the safe area rather than shifting by full inset delta",
+                Math.abs(play.left+play.right-safeLeft-safeRight)<=1);
+            assertEquals("secondary widths stay equal at physical phone density",more.width(),settings.width());
+            assertTrue("secondary actions mirror within the same safe area",
+                Math.abs(more.left+more.right+settings.left+settings.right-2*(safeLeft+safeRight))<=2);
+        }
+    }
     @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
     public void entryPlaySelectsSlotBeforeRequestingNativePlay()throws Exception {
         set("entryMenuEnabled",true);

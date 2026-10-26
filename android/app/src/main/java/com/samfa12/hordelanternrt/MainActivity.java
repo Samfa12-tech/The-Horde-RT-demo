@@ -1615,16 +1615,19 @@ public class MainActivity extends Activity {
         }, false);
 
         final int bottomPlaqueLimit = Math.max(dp(48), (availableWidth - dp(20)) / 2);
+        final int secondaryPlaqueWidth = Math.max(
+                entryPlaqueWidth(entryMoreButton, bottomPlaqueLimit),
+                entryPlaqueWidth(entrySettingsButton, bottomPlaqueLimit));
         final int bottomPlaqueMargin = bottom + (portrait ? dp(72) : dp(12));
         final FrameLayout.LayoutParams moreLayout = new FrameLayout.LayoutParams(
-                entryPlaqueWidth(entryMoreButton, bottomPlaqueLimit), -2);
+                secondaryPlaqueWidth, -2);
         moreLayout.gravity = Gravity.BOTTOM | Gravity.START;
-        moreLayout.setMargins(left, 0, 0, bottomPlaqueMargin);
+        moreLayout.setMargins(left, 0, right, bottomPlaqueMargin);
         composition.addView(entryMoreButton, moreLayout);
         final FrameLayout.LayoutParams settingsLayout = new FrameLayout.LayoutParams(
-                entryPlaqueWidth(entrySettingsButton, bottomPlaqueLimit), -2);
+                secondaryPlaqueWidth, -2);
         settingsLayout.gravity = Gravity.BOTTOM | Gravity.END;
-        settingsLayout.setMargins(0, 0, right, bottomPlaqueMargin);
+        settingsLayout.setMargins(left, 0, right, bottomPlaqueMargin);
         composition.addView(entrySettingsButton, settingsLayout);
         entryMoreButton.measure(View.MeasureSpec.makeMeasureSpec(moreLayout.width, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.UNSPECIFIED));
@@ -1633,8 +1636,12 @@ public class MainActivity extends Activity {
         final int bottomPlaqueHeight = Math.max(entryMoreButton.getMeasuredHeight(), entrySettingsButton.getMeasuredHeight());
         final FrameLayout.LayoutParams playLayout = new FrameLayout.LayoutParams(
                 entryPlaqueWidth(entryPlayButton, availableWidth), -2);
-        playLayout.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-        playLayout.setMargins(left, 0, right, bottomPlaqueMargin + bottomPlaqueHeight + dp(16));
+        // FrameLayout CENTER_HORIZONTAL applies the full left-right margin
+        // difference. Centre in the physical safe span instead, including RTL.
+        playLayout.gravity = Gravity.BOTTOM | Gravity.START;
+        final int playSideSpace = (availableWidth - playLayout.width) / 2;
+        playLayout.setMargins(left + playSideSpace, 0, right + playSideSpace,
+                bottomPlaqueMargin + bottomPlaqueHeight + dp(16));
         // First controller/keyboard selection is Play; geometry still owns arrows.
         composition.addView(entryPlayButton, 1, playLayout);
 

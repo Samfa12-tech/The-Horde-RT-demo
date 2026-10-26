@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "scope": "Android host widget geometry and mocked-native campaign/menu ownership only",
+  "baseCommit": "e16eb4977343e551c909d4faff4223694ed0f0f0",
+  "before": {
+    "tests": 2,
+    "failures": 2,
+    "messages": [
+      "java.lang.AssertionError: Play centres within the safe area rather than shifting by full inset delta",
+      "java.lang.AssertionError: secondary actions need equal visual and touch width expected:<112> but was:<127>"
+    ]
+  },
+  "after": {
+    "tests": 47,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "lintDebug": "passed",
+    "changedMenuRegionLintIssues": 0
+  },
+  "fixtures": {
+    "host-entry-widgets-1080x2340-safe-0.png.txt": "ANDROID HOST WIDGETS ONLY; transparent world, synthetic insets, no phone or RT acceptance.\nviewport=1080x2340 density=2.625 fontScale=1.3 direction=0 actualDisplay=1080x2340\nentryPlayButton=Rect(347, 1707 - 673, 1875)\nentryMoreButton=Rect(61, 1917 - 463, 2056)\nentrySettingsButton=Rect(557, 1917 - 959, 2056)\n",
+    "host-entry-widgets-1080x2340-safe-1.png.txt": "ANDROID HOST WIDGETS ONLY; transparent world, synthetic insets, no phone or RT acceptance.\nviewport=1080x2340 density=2.625 fontScale=1.3 direction=1 actualDisplay=1080x2340\nentryPlayButton=Rect(347, 1707 - 673, 1875)\nentryMoreButton=Rect(557, 1917 - 959, 2056)\nentrySettingsButton=Rect(61, 1917 - 463, 2056)\n",
+    "host-entry-widgets-411x801-font1.0.png.txt": "ANDROID HOST WIDGETS ONLY; transparent world, synthetic insets, no phone or RT acceptance.\nviewport=411x801 density=1.0 fontScale=1.0 direction=0 actualDisplay=411x801\nentryPlayButton=Rect(149, 561 - 261, 625)\nentryMoreButton=Rect(16, 641 - 143, 693)\nentrySettingsButton=Rect(268, 641 - 395, 693)\n",
+    "host-entry-widgets-411x801-font2.0.png.txt": "ANDROID HOST WIDGETS ONLY; transparent world, synthetic insets, no phone or RT acceptance.\nviewport=411x801 density=1.0 fontScale=2.0 direction=0 actualDisplay=411x801\nentryPlayButton=Rect(123, 525 - 288, 609)\nentryMoreButton=Rect(16, 625 - 195, 693)\nentrySettingsButton=Rect(216, 625 - 395, 693)\n",
+    "host-entry-widgets-804x381-font1.0.png.txt": "ANDROID HOST WIDGETS ONLY; transparent world, synthetic insets, no phone or RT acceptance.\nviewport=804x381 density=1.0 fontScale=1.0 direction=0 actualDisplay=804x381\nentryPlayButton=Rect(346, 201 - 458, 265)\nentryMoreButton=Rect(16, 281 - 143, 333)\nentrySettingsButton=Rect(661, 281 - 788, 333)\n",
+    "host-entry-widgets-804x381-font2.0.png.txt": "ANDROID HOST WIDGETS ONLY; transparent world, synthetic insets, no phone or RT acceptance.\nviewport=804x381 density=1.0 fontScale=2.0 direction=0 actualDisplay=804x381\nentryPlayButton=Rect(319, 165 - 484, 249)\nentryMoreButton=Rect(16, 265 - 228, 333)\nentrySettingsButton=Rect(576, 265 - 788, 333)\n"
+  },
+  "sourceHashes": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "3eff0d011b04c5d37ac3fe5ab3e58acb09bea9b71be6122179894586df8c1b9a",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuIntegrationTest.java": "e718b8d252f1ac311a2276686792252d0f23364544e4e856a0f78adfe1a44af7"
+  },
+  "styleAndCallbacksUnchanged": true,
+  "sourceViewportCoherent": true,
+  "initialIncoherentDensityFixtureFailureRetained": true,
+  "libraryReferencePixelsNotInspected": true,
+  "hostButtonGlyphRenderingLimited": true,
+  "rtWorldOrPhoneAcceptance": false,
+  "phoneOrDesktopGameAccessed": false
+}
