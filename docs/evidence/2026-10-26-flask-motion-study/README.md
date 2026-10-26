@@ -87,6 +87,13 @@ gameplay feature or public showcase clip.
 
 ## Smallest integration seam, after resource approval
 
+The subsequent [source-only utility lease/clock proof](../2026-10-26-flask-utility-preparation/README.md)
+preserves production bindings and confirms that the retained0.89s return cue
+misses sword readiness by one60Hz tick in the explicit caller composition.
+The proposed53/60s cue meets tick75 only if separately retimed hand art actually
+releases the flask then. Current art remains unchanged; do not treat that test
+cue or the lease as admitted native integration.
+
 The GLBs supply Idle/Walking, while accepted attack/parry/guard hands are solved
 by shared runtime IK. Appending a Blender action cannot replace that authority.
 Keep original callers/poses. Reuse the existing immutable snapshot boundary:

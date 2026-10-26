@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "scope": "Source-stage utility equipment ownership and caller-order timing; no production integration",
+  "baseCommit": "d8f793dca97923345d3e00baf4ced8058e68cff6",
+  "normalFlaskEnabled": false,
+  "rendererCapacitiesChanged": false,
+  "productionCallers": false,
+  "oldBodyViewmodelSwordGuardInputsUnchanged": true,
+  "sourceHashes": {
+    "src/gameplay/items/UtilityEquipmentLease.h": "f304b69e1224e6919415952cefec74c246c6b59aaa6ae7a2c026fcaf491d4329",
+    "tests/HeldItemTransitionTests.cpp": "8edd514f9e96efbee7d189bdccf85e4b51f561d1f7e68c0a21bfa0be4e660573"
+  },
+  "localWindowsTests": {
+    "Debug": {
+      "target": "horde_rt_held_item_transition_tests",
+      "result": "passed",
+      "exeSha256": "59f4e0c3a1b58a63d20357b35672c9d760a7e99d40332db6c4c9e87dda231bff"
+    },
+    "Release": {
+      "target": "horde_rt_held_item_transition_tests",
+      "result": "passed",
+      "exeSha256": "fc5ffd7d688b3e8412127734843fa7646a2d470db24543e6937130c3f27689b4"
+    }
+  },
+  "clockCases": [
+    {
+      "handReturnCueSeconds": 0.89,
+      "completionReadinessGuard": false,
+      "swordReadyTick": 76,
+      "healTick": 75,
+      "remainingCharges": 1
+    },
+    {
+      "handReturnCueSeconds": 0.89,
+      "completionReadinessGuard": true,
+      "swordReadyTick": 76,
+      "healTick": null,
+      "remainingCharges": 2
+    },
+    {
+      "handReturnCueSeconds": 0.8833333333333333,
+      "completionReadinessGuard": true,
+      "swordReadyTick": 75,
+      "healTick": 75,
+      "remainingCharges": 1,
+      "cueStillRequiresRetimedArt": true
+    }
+  ],
+  "cancellationPositions": [
+    0,
+    1,
+    9,
+    18,
+    36,
+    54,
+    74
+  ],
+  "actualGameLifecycleOrInputAcceptance": false,
+  "phoneAccessed": false,
+  "desktopGameTouched": false,
+  "initialSandboxBuildStoppedWithoutTestResult": true
+}
