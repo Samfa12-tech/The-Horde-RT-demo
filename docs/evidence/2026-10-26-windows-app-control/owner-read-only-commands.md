@@ -1,7 +1,11 @@
-# Proposed owner/admin read-only collection
+# Owner/admin read-only collection - completed once with approval
 
-**Not executed by the agent. Requires specific owner approval first.** Use an
-administrator's normal approved Windows PowerShell or Event Viewer session.
+Sam approved this scope and the original Windows UAC prompt. The single approved
+collection completed at09:18:20UTC on2026-10-26; see the matching sanitized result
+and current diagnosis in [README.md](README.md). These retained commands are the
+reviewed scope, not an instruction to repeat collection. Any new collection
+needs its own justification/authorization. Use an administrator's normal
+approved Windows PowerShell or Event Viewer session.
 Do not change execution policy or use a bypass switch if a tool is refused.
 These commands neither launch Horde nor change protection. They emit diagnostic
 text only; review it privately before sharing relevant fields.

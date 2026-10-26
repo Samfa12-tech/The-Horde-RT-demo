@@ -1,6 +1,6 @@
 {
-  "schema": 1,
-  "scope": "read-only diagnostic; enforcement cause not established",
+  "schema": 2,
+  "scope": "original ordinary-token denials retained; later owner-approved administrator collection confirms Smart App Control",
   "target": "reports/forest-branch-crown-r4-20261026/candidate-grouped/HordeLanternRT.exe",
   "sha256": "95e95e681a21e4a2da352a30cd6c6ddbaefeca875a23cf2accdf972de8fa8eac",
   "bytes": 14986752,
@@ -12,6 +12,7 @@
   ],
   "markOfTheWebStreamPresent": false,
   "administratorToken": false,
+  "tokenMetadataAppliesTo": "original ordinary-token diagnostic, before approved UAC collection",
   "powerShellLanguageMode": "FullLanguage",
   "eventQuery": {
     "log": "Microsoft-Windows-CodeIntegrity/Operational",
@@ -39,17 +40,20 @@
     "policiesRead": false
   },
   "attribution": {
-    "smartAppControl": "unconfirmed",
-    "organizationManagedPolicy": "unconfirmed",
-    "executionEnvironmentRestriction": "unconfirmed",
-    "policyId": null,
-    "policyName": null,
-    "blockEventStatus": null
+    "smartAppControl": "confirmed from matching 3077 event and enforced inventory policy",
+    "organizationManagedPolicy": "not the policy named by this block; unrelated management not assessed",
+    "executionEnvironmentRestriction": "not the policy named by this block; other restrictions not assessed",
+    "policyId": "0283ac0f-fff1-49ae-ada1-8a933130cad6",
+    "policyName": "VerifiedAndReputableDesktop",
+    "blockEventStatus": "0xc0e90002"
   },
   "blockedLaunchRetried": false,
   "securityChanged": false,
-  "privilegedDiagnosticRetried": false,
+  "privilegedDiagnosticRetried": true,
+  "privilegedRetryScope": "one specifically owner-approved normal UAC collection; no further elevation",
+  "approvedAdministratorResult": "approved-administrator-result.json",
+  "privateRawResultCommitted": false,
   "signingPerformed": false,
   "phoneAccessed": false,
-  "nextStep": "specific owner approval for read-only administrator event/policy collection, not application execution or policy modification"
+  "nextStep": "separate owner decision on a trusted Windows signing route; no per-app SAC exception, no signing/account/spending/protection change or blocked launch authorized"
 }
