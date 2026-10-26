@@ -16,6 +16,13 @@ feature expansion, publication or release. Counts alone are not allocation or FP
 
 ## Congruent distant town and future hub - 2026-10-26
 
+Sam subsequently approved keeping a representative low-detail town resident and
+measuring detailed areas and transition peaks before deciding what to stream.
+Use the same authoritative placement/scale/silhouette across1.7/1.8. Initial
+10-30k distant,+100-250k near,+60-150k interior unique-triangle targets remain
+measurement hypotheses, not guaranteed capacity, final asset freeze or permission
+to load every detailed area/actor concurrently. No scope/engine rewrite or release.
+
 Sam requires the low-cost or preloaded Bellwether visible from the1.7 vantage
 to represent the actual1.8 town, with minimal shell/layout change between
 versions. Use one authoritative placement, scale, building/landmark arrangement

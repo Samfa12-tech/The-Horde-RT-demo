@@ -6,6 +6,13 @@ The concurrent approved flask/TLAS106 -> 107 change is outside this assessment.
 Baseline ABI counts below deliberately refer to f442e333; that change raises
 ordinary physical instances30 -> 31, keeping metadata and other ceilings unchanged.
 
+Sam subsequently approved the strategy: keep a representative low-detail town
+resident, then measure detailed areas and transition peaks before deciding what
+to stream. Preserve one authoritative layout/scale/silhouette across1.7/1.8.
+The ranges below remain initial targets, not guaranteed capacity or a final
+asset freeze. This does not authorize every interior/actor/detail concurrently,
+scope expansion, an engine rewrite or publication.
+
 ## Scope and geographical authority
 
 Use one representative world across 1.7/1.8: same town centres/footprints,
