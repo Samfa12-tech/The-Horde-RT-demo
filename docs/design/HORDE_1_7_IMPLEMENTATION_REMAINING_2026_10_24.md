@@ -1,5 +1,10 @@
 # Horde 1.7 implementation remaining - 24 October 2026
 
+26 October follow-up: [same-topology crown RT study](../evidence/2026-10-26-forest-crown-r2/README.md)
+rejected for flat near sprays/bare middle distance and unchanged retention gate.
+Production trees remain intact. [Owner performance policy](../../PROJECT_DECISIONS.md#phone-performance-and-17-scope---2026-10-26):
+no sustained-phone target blocks release or reduces approved1.7 scope.
+
 ## Current full-scope inventory - 26 October
 
 Use the [reconciliation and near/mid/far forest assessment](HORDE_1_7_SCOPE_RECONCILIATION_2026_10_26.md)

@@ -1,0 +1,724 @@
+{
+  "sourceHead": "7659c6f429014163e5788c4f906ca7d2055407e9",
+  "executableSha256": "8c11e055a65e90cab9199dc1d536a57cd7753a8506b9b938a7359c3473c8d3eb",
+  "verdict": "REJECTED: flat oversized near sprays; bare regional middle distance remains; candidate fails unchanged static-detail restoration gate",
+  "productionRuntimeOrAssetsChanged": false,
+  "sharedForestDefault": "OFF",
+  "phoneUsed": false,
+  "performanceReleasePolicy": "sustained phone performance is ongoing optimisation, not release blocker or scope reduction",
+  "geometry": {
+    "sourceCommit": "7659c6f4",
+    "records": [
+      {
+        "species": "pine",
+        "source": "assets/models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb",
+        "sourceSha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+        "candidateSha256": "29140e3054316e76f50f4aa9a494d92727f9178162153c20747444502eb305c4",
+        "sourceBytes": 1402952,
+        "candidateBytes": 1402948,
+        "foliageComponents": 366,
+        "triangles": 5000,
+        "vertices": 5602,
+        "materials": 3,
+        "boundsBefore": [
+          [
+            -1.8599222898483276,
+            3.422983407974243,
+            -1.8350584506988525
+          ],
+          [
+            1.8909538984298706,
+            8.686391830444336,
+            1.5585356950759888
+          ]
+        ],
+        "boundsAfter": [
+          [
+            -2.159921884536743,
+            3.3915719985961914,
+            -2.20198655128479
+          ],
+          [
+            2.3197567462921143,
+            8.830819129943848,
+            1.8861706256866455
+          ]
+        ],
+        "maximumAttachmentDisplacement": 0.0,
+        "minimumPositiveDeterminant": 17.251662293094707,
+        "minimumTriangleArea": 0.021112313635906713,
+        "unchangedBufferViews": [
+          {
+            "view": 0,
+            "sha256": "a2eb9a4668bde864567d240e4e57a17a2b25088c69da0f12e3806ded73141cf7"
+          },
+          {
+            "view": 1,
+            "sha256": "d971f9c286bc6a48e9005e3c286a4f37634501133407205e1aeb140e9813882e"
+          },
+          {
+            "view": 2,
+            "sha256": "cc19998326951e2c932e21465bccf38fecdc5751be23297556818c8e4b55a411"
+          },
+          {
+            "view": 3,
+            "sha256": "76dd0d57c8ece9d35388f41a0405ea14a94625f130f957ae3d7073c90ddffc7e"
+          },
+          {
+            "view": 4,
+            "sha256": "46a3635c701598963da6e531d44e585de7ffe97a3f2e4b97f19403d8ba6cd0d4"
+          },
+          {
+            "view": 5,
+            "sha256": "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822"
+          },
+          {
+            "view": 8,
+            "sha256": "64adbc2290d9203a48e8daac741d692541d7e8c60325f1d5d0a3d42a32fcedc2"
+          },
+          {
+            "view": 10,
+            "sha256": "4433451387e6508b61dade0885367b8dfed5c6a78b6c62d686849ce506bedaa8"
+          },
+          {
+            "view": 11,
+            "sha256": "6fdeb17cd4ff08e25396926b42827dcd9ab88945d03a604da0a74d762ecd28b7"
+          },
+          {
+            "view": 12,
+            "sha256": "0d9590e271f1d23236e201672a013e4fa3b2e644b9a67cc6a0aebd7d1efa31dd"
+          },
+          {
+            "view": 13,
+            "sha256": "e616908ced85844f5477337d248433e922b735e481cfa589794fe6ff9140aeb9"
+          },
+          {
+            "view": 14,
+            "sha256": "e2ba25907f3101f2341c88bb066b337a76f85c75b2f64655d6d2f94d6baa920c"
+          },
+          {
+            "view": 15,
+            "sha256": "aefbaa576ceb9acafdb1657c26bac8cd36113e76df712504b0c4b5c5d7e3488f"
+          },
+          {
+            "view": 16,
+            "sha256": "ad6dba1d9b674086c1788cd7cec091ded95cd0aa9273c2b9e9c2db5897081cde"
+          },
+          {
+            "view": 17,
+            "sha256": "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06"
+          },
+          {
+            "view": 18,
+            "sha256": "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b"
+          },
+          {
+            "view": 19,
+            "sha256": "bab9da5a1d72edcb5949fafeb1be5963fc73b457230fbb1f055cb09e52fcd66e"
+          }
+        ],
+        "imagesWoodMossIndicesUvsUnchanged": true,
+        "runtimeAdmitted": false
+      },
+      {
+        "species": "alder",
+        "source": "assets/models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb",
+        "sourceSha256": "f545d7e08370b5e451597c3fd903d8d93b6703d11c75039181a04f7f5312e0bb",
+        "candidateSha256": "736d7198545f3eb7d66c3e63639d4c8cc87d295ddd8908b0724f4aa9dcc65bab",
+        "sourceBytes": 1436640,
+        "candidateBytes": 1436640,
+        "foliageComponents": 330,
+        "triangles": 5102,
+        "vertices": 5632,
+        "materials": 3,
+        "boundsBefore": [
+          [
+            -1.6800742149353027,
+            4.614206314086914,
+            -1.3665071725845337
+          ],
+          [
+            1.6727383136749268,
+            8.474547386169434,
+            1.7183218002319336
+          ]
+        ],
+        "boundsAfter": [
+          [
+            -1.9206061363220215,
+            4.620575428009033,
+            -1.6084245443344116
+          ],
+          [
+            1.9019569158554077,
+            8.707193374633789,
+            1.9217020273208618
+          ]
+        ],
+        "maximumAttachmentDisplacement": 0.0,
+        "minimumPositiveDeterminant": 8.744999999999996,
+        "minimumTriangleArea": 0.016779510654733567,
+        "unchangedBufferViews": [
+          {
+            "view": 0,
+            "sha256": "b7f1209d4c42d830a3dad56420f69615c0266b7166b2a5972b8483f9f234341b"
+          },
+          {
+            "view": 1,
+            "sha256": "a60e833fd0a1e171c4d2d4b5e50f36228d84210806147217a33b50bd83cd8a81"
+          },
+          {
+            "view": 2,
+            "sha256": "2653b85e50c98a58f7c99bc2ca9f9c48d82a2e7fb8819de66e55cb9424d37d51"
+          },
+          {
+            "view": 3,
+            "sha256": "0daf815086d7e918d1a0c2af6c0dc0e37e13e5fd159f234adfd460c3295a141b"
+          },
+          {
+            "view": 4,
+            "sha256": "46a3635c701598963da6e531d44e585de7ffe97a3f2e4b97f19403d8ba6cd0d4"
+          },
+          {
+            "view": 5,
+            "sha256": "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822"
+          },
+          {
+            "view": 6,
+            "sha256": "f78d8582801e2b188f39c04b4a13134f0aed822b7707e04b8a1b68acbbf2cc3d"
+          },
+          {
+            "view": 7,
+            "sha256": "b5cb9ed88b5339c1ebfaa77ce3ed949d7bb56ac9cd241584fc1fe55a458e6c72"
+          },
+          {
+            "view": 8,
+            "sha256": "f3836ecff1774b7d818c6de3f82663ed55b364c1485140a592c2d530852b8320"
+          },
+          {
+            "view": 9,
+            "sha256": "66a6e8f0665b989e9004280be3eaa3dab26fd92561c14ebaab2d2182ffd522a2"
+          },
+          {
+            "view": 10,
+            "sha256": "9c58f03e4b0255949329a01a1ba2a831e86b2e23e7d13b260c063c7eda6d6cbd"
+          },
+          {
+            "view": 11,
+            "sha256": "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06"
+          },
+          {
+            "view": 12,
+            "sha256": "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b"
+          },
+          {
+            "view": 13,
+            "sha256": "bab9da5a1d72edcb5949fafeb1be5963fc73b457230fbb1f055cb09e52fcd66e"
+          },
+          {
+            "view": 16,
+            "sha256": "4a6ab3c0a9483c1e97c08f39d5935ca178bc040b129725836ccc32e2a7c12319"
+          },
+          {
+            "view": 18,
+            "sha256": "c8b5238c225a9936ef05f7eb03100b04e376ddd531d608efacabd85775c2eeb7"
+          },
+          {
+            "view": 19,
+            "sha256": "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44"
+          }
+        ],
+        "imagesWoodMossIndicesUvsUnchanged": true,
+        "runtimeAdmitted": false
+      }
+    ],
+    "scope": "same topology owned crown study; no production assets, placement, limits, textures or shader changes",
+    "canonicalGameDevCli": "unavailable; not a verified canonical package"
+  },
+  "runs": {
+    "control": {
+      "exitCode": 0,
+      "pending": false,
+      "wallSeconds": 108.43799999999464,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "foregroundUnchanged": true,
+      "frames": 1524,
+      "completedCaptures": 33,
+      "completeGalleryJson": true,
+      "staticUnloads": 1,
+      "staticRestores": 1,
+      "maximumOmittedTriangles": 84219,
+      "initialResources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298944,
+        "deviceLocalBytes": 372464608
+      },
+      "rawGallerySha256": "0a606a6c1e7ea6d22b97c51f2d15e93df5474a667519b32f1a2c7f025f64cb54",
+      "rawFramesCsvSha256": "18d54cb9d84eb32df115c355059c9b0125d44037ed1ead1511ba7d378d733465",
+      "processOutcomeSha256": "0c42ca27b0aa51a034293a93a856e9be010a3d5a4530d0cf7fdb5eed1da760a3",
+      "stderrSha256": "a60eb0b2dce2ce256cb57f52e6c2cc78fc8e09dabfe5c9cfbddbfb6765a48175"
+    },
+    "candidate": {
+      "exitCode": 1,
+      "pending": false,
+      "wallSeconds": 117.6710000000021,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "foregroundUnchanged": true,
+      "frames": 1483,
+      "completedCaptures": 33,
+      "completeGalleryJson": false,
+      "staticUnloads": 0,
+      "staticRestores": 0,
+      "maximumOmittedTriangles": 0,
+      "initialResources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298944,
+        "deviceLocalBytes": 372464608
+      },
+      "rawGallerySha256": "dc5d06d1b90f3c965ec2f302380f8027f59bde2c63a87a2cacc86fb1d7360e58",
+      "rawFramesCsvSha256": "3c2c18b2cd76b1a734b6d0cb9af1a89ada187f45c5175a3d58b54cc52ad215b5",
+      "processOutcomeSha256": "18a4a8ec0305e0353fe840812cfe0cdde2c071b7c6bcabd49ba5841e36a6553d",
+      "stderrSha256": "6d9e67b1c1c0c000d4c8dd7014419e86d2f933ea1ca8ad8a005956e8b9067d58"
+    }
+  },
+  "witnesses": [
+    {
+      "variant": "control",
+      "preview": "control-3-landing-sweep-2.webp",
+      "rawPngSha256": "4e093d04c3e00fd3abef5a78325e660805945889424f2d397880537634e38e73",
+      "rawDimensions": [
+        960,
+        540
+      ],
+      "camera": [
+        -33.6881,
+        2.05,
+        -12.7833,
+        6.28319,
+        -0.15
+      ],
+      "frame": 98,
+      "identity": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 174,
+        "recordSerial": 174,
+        "submissionSerial": 174,
+        "completionSerial": 174,
+        "simulationTick": 1828,
+        "frameSlot": 0
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "presentation": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 174,
+        "finalIdleCompletion": true
+      },
+      "activeShaderSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+    },
+    {
+      "variant": "control",
+      "preview": "control-8-outbound-4.webp",
+      "rawPngSha256": "ab20ce6264b153a2e991518654c3884e68113d69d852ba93ea0196efb58a798a",
+      "rawDimensions": [
+        960,
+        540
+      ],
+      "camera": [
+        -15.704,
+        0.551638,
+        0.198127,
+        2.00371,
+        -0.15
+      ],
+      "frame": 303,
+      "identity": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 379,
+        "recordSerial": 379,
+        "submissionSerial": 379,
+        "completionSerial": 379,
+        "simulationTick": 2648,
+        "frameSlot": 0
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "presentation": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 379,
+        "finalIdleCompletion": true
+      },
+      "activeShaderSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+    },
+    {
+      "variant": "control",
+      "preview": "control-13-lookout-sweep-7.webp",
+      "rawPngSha256": "34a1d7b7ceeea209d4efc26ce0f5a3d347fe3da316cc2f076f97356299b75cbb",
+      "rawDimensions": [
+        960,
+        540
+      ],
+      "camera": [
+        13.3101,
+        -1.14046,
+        36.2095,
+        5.73013,
+        -0.15
+      ],
+      "frame": 586,
+      "identity": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 662,
+        "recordSerial": 662,
+        "submissionSerial": 662,
+        "completionSerial": 662,
+        "simulationTick": 3780,
+        "frameSlot": 0
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "presentation": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 662,
+        "finalIdleCompletion": true
+      },
+      "activeShaderSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+    },
+    {
+      "variant": "control",
+      "preview": "control-15-lookout-sweep-7.webp",
+      "rawPngSha256": "ec5700c70a37660f82130962cc470d8e4bf1873c7f9ad767a66e5943d2c7b5e4",
+      "rawDimensions": [
+        960,
+        540
+      ],
+      "camera": [
+        13.3004,
+        -1.14033,
+        36.2004,
+        -0.815692,
+        -0.15
+      ],
+      "frame": 616,
+      "identity": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 692,
+        "recordSerial": 692,
+        "submissionSerial": 692,
+        "completionSerial": 692,
+        "simulationTick": 3900,
+        "frameSlot": 0
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "presentation": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 692,
+        "finalIdleCompletion": true
+      },
+      "activeShaderSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+    },
+    {
+      "variant": "candidate",
+      "preview": "candidate-3-landing-sweep-2.webp",
+      "rawPngSha256": "2b00e18291f0a788a6295dc049ad1b1ad64920179f01ee412dab25326a5381b2",
+      "rawDimensions": [
+        960,
+        540
+      ],
+      "camera": [
+        -33.6881,
+        2.05,
+        -12.7833,
+        6.28319,
+        -0.15
+      ],
+      "frame": 98,
+      "identity": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 174,
+        "recordSerial": 174,
+        "submissionSerial": 174,
+        "completionSerial": 174,
+        "simulationTick": 1828,
+        "frameSlot": 0
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "presentation": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 174,
+        "finalIdleCompletion": true
+      },
+      "activeShaderSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+    },
+    {
+      "variant": "candidate",
+      "preview": "candidate-8-outbound-4.webp",
+      "rawPngSha256": "e8bfaf1a7255929665a8f6aaf87ea72f464a7c3dc3be98aef5acf244aaa9fa83",
+      "rawDimensions": [
+        960,
+        540
+      ],
+      "camera": [
+        -15.704,
+        0.551638,
+        0.198127,
+        2.00371,
+        -0.15
+      ],
+      "frame": 303,
+      "identity": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 379,
+        "recordSerial": 379,
+        "submissionSerial": 379,
+        "completionSerial": 379,
+        "simulationTick": 2648,
+        "frameSlot": 0
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "presentation": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 379,
+        "finalIdleCompletion": true
+      },
+      "activeShaderSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+    },
+    {
+      "variant": "candidate",
+      "preview": "candidate-13-lookout-sweep-7.webp",
+      "rawPngSha256": "2474db71a0304fd4d09975109ecad70f0ac7e51204475900f0998ab43cdfd5a8",
+      "rawDimensions": [
+        960,
+        540
+      ],
+      "camera": [
+        13.3101,
+        -1.14046,
+        36.2095,
+        5.73013,
+        -0.15
+      ],
+      "frame": 586,
+      "identity": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 662,
+        "recordSerial": 662,
+        "submissionSerial": 662,
+        "completionSerial": 662,
+        "simulationTick": 3780,
+        "frameSlot": 0
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "presentation": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 662,
+        "finalIdleCompletion": true
+      },
+      "activeShaderSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+    },
+    {
+      "variant": "candidate",
+      "preview": "candidate-15-lookout-sweep-7.webp",
+      "rawPngSha256": "60add77b385b6864cba41b2ec6a1b82a788fe5bb962ab775bc8a60129bd220bd",
+      "rawDimensions": [
+        960,
+        540
+      ],
+      "camera": [
+        13.3004,
+        -1.14033,
+        36.2004,
+        -0.815692,
+        -0.15
+      ],
+      "frame": 616,
+      "identity": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 692,
+        "recordSerial": 692,
+        "submissionSerial": 692,
+        "completionSerial": 692,
+        "simulationTick": 3900,
+        "frameSlot": 0
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "presentation": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 692,
+        "finalIdleCompletion": true
+      },
+      "activeShaderSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+    }
+  ],
+  "matchedGalleryCameraPairs": 32,
+  "recipeSha256": "e9ae5ffe5f4a2a8b27eef468ddd4cc5567fd438912a4d0aee1d1b974c303ba49",
+  "omissionSubset": {
+    "scope": "offline original64-tree subset predicate count; other unchanged contributors are not enumerated; not a native count or regenerated certificate",
+    "nativeFullOwnerExpectedCount": 84219,
+    "originalTreeSubsetDelta": -50,
+    "predictedFullOwnerCountFromUnchangedOtherContributors": 84169,
+    "records": {
+      "control": {
+        "allVerticesBeyondWorldZ24": 80285,
+        "species": {
+          "Pine": 45248,
+          "Alder": 35037
+        }
+      },
+      "candidate": {
+        "allVerticesBeyondWorldZ24": 80235,
+        "species": {
+          "Pine": 45377,
+          "Alder": 34858
+        }
+      }
+    },
+    "rendererSourceChanged": false
+  },
+  "custody": {
+    "parkedFilesChecked": 151,
+    "parkedFilesChanged": 0,
+    "originalSettingsMatchSavedBaseline": true
+  }
+}

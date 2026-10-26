@@ -31,7 +31,7 @@ are not integrated 1.7 content and must not be counted as completed scenery.
 | Area | Implemented/tested evidence | Still required or explicitly held |
 | --- | --- | --- |
 | **Forest and wider landscape** | r23 local/macro terrain, route, grounded original 64 trees, understory/deadwood/rocks, F03 kerbs/waystone and distant village shell exist. | **Major visible gap:** surrounding woodland mass, fuller crowns, middle/far depth, region silhouettes and controlled lookout reveal. Actual F01/F03/F04 views fail the intended woodland impression. Traversal and topo import do not close this. Near/mid/far representation and combined cost/visibility need admission. |
-| Shared/batched trees | Two source masters are reused in authoring; normal gameplay still world-bakes64 placements into four material groups (323,264 duplicated triangles). The new shared-master/BLAS owner, whole-instance retention and Windows route/recreation proof exist. | Shared64 stays OFF pending Android correctness/cost; Windows allocation savings are not phone/FPS gains. The extra 12-tree trial remains sparse and collision-unadmitted. Private Easy Tree and rejected pineLOD2 are not production solutions. |
+| Shared/batched trees | Two source masters are reused in authoring; normal gameplay still world-bakes64 placements into four material groups (323,264 duplicated triangles). The new shared-master/BLAS owner, whole-instance retention and Windows route/recreation proof exist. | Shared64 stays OFF pending Android correctness review; cost measurements guide optimisation, not a release FPS target; Windows allocation savings are not phone/FPS gains. The extra 12-tree trial remains sparse and collision-unadmitted. Private Easy Tree and rejected pineLOD2 are not production solutions. |
 | Crowns/forest art | One owned editable pine/alder study preserves trunks/roots/placements and original sources. | Enlarging existing leaves still leaves open crowns; no broad rollout. A useful upper-crown distribution/volume sample and actual-view review remain. Its exporter hit an OS temporary-image denial; do not retry/redirect it without new relevant authorization. |
 | Atmosphere and story smoke | Shared night/moon environment and existing effects remain; outdoor music/ambience are integrated. | Chimney smoke is approved unfinished work: the High/Low renderer trial failed unchanged shader gates and remains withdrawn. New outdoor mist/shafts, fireflies and visual wind were explicitly deferred on 24 October, not implemented or completed. Latest owner feedback raises whether to revisit that disposition; this review does not silently reinstate them. |
 | Combat/teaching | Guard→attack→guard is implemented and owner-approved on the recorded build. Current source fully blocks eligible normal attacks, retains timed parry/red avoidance and teaches four actual outcomes with protected practice/explicit safe exit. | Enemy-anchored animated special-attack rings and heavier readable red motion remain. Ring capacity approval is pending; yellow policy stays OFF. New-rule balance/phone feedback and full natural encounter acceptance remain. |
@@ -40,14 +40,30 @@ are not integrated 1.7 content and must not be counted as completed scenery.
 | Flask | Complete two-drink/Rest/upgrade/death/load/migration policy is approved. Pure backend, exact resources/schema3, confirmed-record recovery and gated owner tests exist. | OFF in gameplay: flask prop/right-hand transitions, deliberate touch control, physical upgrade presentation and renderer-owner admission are unfinished. The policy itself is no longer awaiting approval. Balance and physical feel remain. |
 | Character/held-item presentation | Auto head-clearance crouch, stick speed, keyboard run, backward phase/dodge, Kit follow and stationary casual/travel turns are implemented with host/native evidence. | Useful lateral/run art and native joins remain where studies failed. Close-wall/ceiling torch containment **and** visible hand/torch framing remain a real defect/tradeoff; rejected carry trials stay withdrawn. The reported phone dark-world cause is unproven. |
 | UI/menus | Subtitle repair, clearer save-slot copy, compact lantern, translucent sword/shield hierarchy, pause symbol and boot-readiness/cancel protection are implemented. | Owner-requested title/button cohesion and equal More/Settings weight; physical thumb reach, simultaneous move/look/action, rotation/earned-state continuity and accessibility acceptance. Visual polish must follow inspection of the supplied screenshot. |
-| Audio/benchmark/release acceptance | Outdoor main uses the shared Pocket Audio route; owner liked that track in one phone session. Fixed-profile benchmark/rollback implementations and local reports exist. | Kit mix, movement/loop/ducking/transition listening; Windows visible/DPI/controller and Android actual benchmark sizing/return; sustained warmed production-phone performance. Reports remain provisional/custom-unranked/local. PR conflicts, source-redistribution/signing and final release gates remain separate. No leaderboard/report transmission or release is authorized. |
+| Audio/benchmark/release acceptance | Outdoor main uses the shared Pocket Audio route; owner liked that track in one phone session. Fixed-profile benchmark/rollback implementations and local reports exist. | Kit mix, movement/loop/ducking/transition listening; Windows visible/DPI/controller and Android actual benchmark sizing/return; ongoing warmed production-phone performance measurements (not a release blocker). Reports remain provisional/custom-unranked/local. PR conflicts, source-redistribution/signing and final release gates remain separate. No leaderboard/report transmission or release is authorized. |
 
 The initial plan described four varied tree archetypes; only two source masters
 currently supply the route. Variety must be judged with silhouette and grouping,
 not satisfied by downloading a quota of unrelated models.
 
+Owner clarification, 26 October: sustained phone performance is ongoing measured
+optimisation, **not a release blocker and not a reason to reduce approved1.7
+scope**. No target frame rate is required before release. Continue intended
+forest/world/visual features with honest costs and quality options. Correctness,
+save integrity, crashes, asset readiness and explicit publication approval remain
+separate requirements; this does not claim performance solved or authorise release.
+
 This inventory separates unfinished implementation from missing acceptance and
 explicit deferral. It does not call 1.7 ready or turn rejected work into completion.
+
+## Latest bounded crown result
+
+[The same-topology r2 study](../evidence/2026-10-26-forest-crown-r2/README.md)
+was rejected: fuller but flat near sprays, unchanged bare middle distance, and
+no automatic static-detail unload/restoration under the unchanged safety gate.
+Both isolated native runs and failures are retained; production assets remain
+unchanged. Next needs genuine clustered crown/background structure, not another
+leaf-enlargement or tree-quota pass. No phone target holds back that content work.
 
 ## Forest evidence and the next bounded work
 

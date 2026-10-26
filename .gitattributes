@@ -1,3 +1,5 @@
+assets/models/world/source/forest-crown-study-r2/*.py text eol=lf
+docs/evidence/2026-10-26-forest-crown-r2/*.log -text whitespace=cr-at-eol
 docs/evidence/2026-10-24-kit-stationary-eligibility/*.log -text whitespace=cr-at-eol
 docs/evidence/2026-10-24-kit-natural-corner/*.log -text whitespace=cr-at-eol
 docs/evidence/2026-10-24-kit-route-admission-review/*.log -text whitespace=cr-at-eol

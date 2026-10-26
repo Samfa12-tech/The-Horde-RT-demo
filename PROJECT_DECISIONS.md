@@ -2,6 +2,17 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## Phone performance and 1.7 scope - 2026-10-26
+
+Sam explicitly clarified: sustained phone performance is ongoing measured
+optimisation, **not a release blocker and not a reason to reduce approved1.7
+scope**. Continue the intended forest, world and visual features; measure their
+cost honestly and keep experimenting with optimisations and quality options.
+There is no required sustained frame-rate target before release. This does not
+waive correctness, save integrity, crash handling, asset readiness, existing
+unapproved capacity changes or explicit publication approval. It does not claim
+performance solved or authorise a release.
+
 ## Forest endpoint and completed return recovery - 2026-10-20
 
 The approved forest endpoint now uses stable checkpoint ID 3 (Forest lookout),
