@@ -952,6 +952,42 @@ void TestNativeChapterPrimitiveOwnership()
                 <<" indexBytes="<<roadClue.indexBytes<<" minimumTrailClearance="<<roadClue.minimumTrailClearance
                 <<" minimumBottomGap="<<roadClue.minimumBottomGap<<" maximumBottomGap="<<roadClue.maximumBottomGap
                 <<" stepTriangles="<<terrain->StepTriangleCount()<<'\n';
+            const auto flaskDirectory=kRoot/"assets/models/props/runtime/healing-flask-v1";
+            AssetManifest flaskManifest;StaticMeshAsset flask;
+            const bool flaskLoaded=AssetManifest::Load(flaskDirectory/"asset.manifest.json",flaskManifest,diagnostic) &&
+                StaticMeshAsset::Load(flaskDirectory/"healing-flask-v1.runtime.glb",flaskManifest,flask,diagnostic);
+            Check(flaskLoaded,"actual upgrade reuses the existing native flask import");
+            if(flaskLoaded) {
+                ForestFlaskUpgradePlacement placed;
+                const auto beforeVertices=owner.vertices.size(),beforeContact=terrain->NonWalkableTriangleCount();
+                const bool fitted=PrepareForestFlaskUpgrade(roadClue,flask,*terrain,placed,diagnostic);
+                Check(fitted,diagnostic.empty()?"actual F03 flask fits unchanged dry terrain":diagnostic.c_str());
+                if(fitted) {
+                    Check(placed.minimumTrailClearance>=1.44f && placed.minimumBottomGap>=-.00001f &&
+                          placed.maximumBottomGap<=.03f && owner.vertices.size()==beforeVertices &&
+                          terrain->NonWalkableTriangleCount()==beforeContact,
+                          "source pickup grounding preserves native scale, trail, terrain and existing contacts");
+                    ForestFlaskUpgradePlacement repeat;
+                    Check(PrepareForestFlaskUpgrade(roadClue,flask,*terrain,repeat,diagnostic) &&
+                          repeat.worldFromItem==placed.worldFromItem && repeat.supportPoint==placed.supportPoint,
+                          "source pickup placement is deterministic and does not duplicate runtime geometry");
+                    const auto reject=[&](auto road,auto mesh,const char* message) {
+                        auto retained=placed;
+                        Check(!PrepareForestFlaskUpgrade(road,mesh,*terrain,retained,diagnostic) &&
+                              retained.worldFromItem==placed.worldFromItem && retained.supportPoint==placed.supportPoint,message);
+                    };
+                    auto missing=roadClue;missing.placements.pop_back();reject(missing,flask,"missing waystone rejects atomically");
+                    auto doubled=roadClue;doubled.placements.push_back(doubled.placements.back());
+                    reject(doubled,flask,"ambiguous waystones cannot select a silent new location");
+                    auto malformed=flask;malformed.vertices[0].position[0]=std::numeric_limits<float>::quiet_NaN();
+                    reject(roadClue,malformed,"invalid native flask rejects without replacing prior placement");
+                    auto unsupported=roadClue;unsupported.placements.back().origin[0]=10000;
+                    reject(unsupported,flask,"unsupported world location cannot admit a floating pickup");
+                    std::cout<<"F03 flask source: x="<<placed.worldFromItem[12]<<" y="<<placed.worldFromItem[13]
+                        <<" z="<<placed.worldFromItem[14]<<" bottomGap="<<placed.minimumBottomGap<<','<<placed.maximumBottomGap
+                        <<" trailClearance="<<placed.minimumTrailClearance<<" no gameplay or RT admission\n";
+                }
+            }
             return true;}() &&
         ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);
     Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);

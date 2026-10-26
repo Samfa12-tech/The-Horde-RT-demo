@@ -96,3 +96,7 @@ opt-in and CPU-tested; actual RT joins and normal gameplay are not admitted.
 The [world-upgrade physical alias](upgrade-alias.md) supplies a separate pickup
 instance sharing the carried flask's immutable resources. It does not yet supply
 the gameplay placement/interaction or admit either presentation path.
+
+A [grounded F03 source placement](upgrade-placement.md) now reuses the actual
+waystone/native flask/terrain in the existing CPU forest fixture. It remains an
+unused candidate until live readiness/interaction and native presentation pass.

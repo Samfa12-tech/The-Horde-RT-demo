@@ -1,6 +1,7 @@
 #pragma once
 #include "scene/assets/StaticMeshAsset.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
+#include "gameplay/items/HeldItemState.h"
 #include <filesystem>
 #include <vector>
 
@@ -20,4 +21,16 @@ struct ForestRoadClueReport {
 bool AppendForestRoadClue(const std::filesystem::path& assetRoot,assets::StaticMeshAsset& owner,
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& support,
     ForestRoadClueReport& report,std::string& diagnostic);
+
+struct ForestFlaskUpgradePlacement {
+    gameplay::items::HeldItemTransform worldFromItem{};
+    std::array<float,3> supportPoint{};
+    float minimumBottomGap=0,maximumBottomGap=0,minimumTrailClearance=0;
+};
+// Source candidate only: derives a rigid placement from the actual waystone,
+// native flask and final immutable ground/contact. No mesh append, collision
+// change, resource readiness, entitlement or automatic gameplay admission.
+bool PrepareForestFlaskUpgrade(const ForestRoadClueReport& road,
+    const assets::StaticMeshAsset& flask,const gameplay::simulation::TriangleSupportSurface& terrain,
+    ForestFlaskUpgradePlacement& placement,std::string& diagnostic);
 }

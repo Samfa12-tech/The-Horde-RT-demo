@@ -158,4 +158,63 @@ bool AppendForestRoadClue(const std::filesystem::path& root,assets::StaticMeshAs
     candidate.indexBytes=indices.size()*sizeof(std::uint32_t);
     owner=std::move(staged);support=std::move(prepared);report=std::move(candidate);diagnostic.clear();return true;
 }
+
+bool PrepareForestFlaskUpgrade(const ForestRoadClueReport& road,
+    const assets::StaticMeshAsset& flask,const gameplay::simulation::TriangleSupportSurface& terrain,
+    ForestFlaskUpgradePlacement& placement,std::string& diagnostic) {
+    const auto fail=[&](const char* reason){diagnostic=reason;return false;};
+    const auto stone=std::find_if(road.placements.begin(),road.placements.end(),
+        [](const auto& p){return p.source==1;});
+    if(stone==road.placements.end() ||
+       std::count_if(road.placements.begin(),road.placements.end(),[](const auto& p){return p.source==1;})!=1 ||
+       flask.vertices.empty() || flask.indices.empty() || flask.primitives.size()!=1 || flask.materials.size()!=1)
+        return fail("Flask placement requires one actual F03 waystone and the imported opaque flask.");
+    for(unsigned a=0;a<3;++a)
+        if(!std::isfinite(stone->origin[a]) || !std::isfinite(flask.bounds.minimum[a]) ||
+           !std::isfinite(flask.bounds.maximum[a]) || flask.bounds.minimum[a]>flask.bounds.maximum[a])
+            return fail("Flask placement source bounds or waystone position are invalid.");
+    const auto clue=gameplay::simulation::kWorldRoutePoints[6];
+    const float dx=clue.x-stone->origin[0],dz=clue.z-stone->origin[2],length=std::hypot(dx,dz);
+    if(!std::isfinite(length) || length<1.f || length>4.f)
+        return fail("Flask placement requires the actual bounded F03 waystone site.");
+    const float s=dx/length,c=dz/length;
+    // Beside the stone, toward its existing dry approach; never change the
+    // stone, trail or flask scale to make an unsuitable site pass.
+    const float x=stone->origin[0]+s*.85f,z=stone->origin[2]+c*.85f;
+    const auto centre=terrain.Query(x,z);
+    if(!centre.found || !centre.walkable)return fail("Flask upgrade leaves the admitted dry ground.");
+    float fittedY=-std::numeric_limits<float>::infinity();unsigned contacts=0;
+    for(const auto& vertex:flask.vertices) {
+        const auto& p=vertex.position;
+        if(!std::isfinite(p[0]) || !std::isfinite(p[1]) || !std::isfinite(p[2]))
+            return fail("Flask upgrade contains nonfinite native vertices.");
+        if(p[1]>flask.bounds.minimum[1]+.00001f)continue;
+        const auto under=terrain.Query(x+c*p[0]+s*p[2],z-s*p[0]+c*p[2]);
+        if(!under.found || !under.walkable)return fail("Flask footprint leaves actual walkable terrain.");
+        fittedY=std::max(fittedY,under.worldY-p[1]);++contacts;
+    }
+    if(!contacts || !std::isfinite(fittedY))return fail("Flask upgrade has no native bottom footprint.");
+    ForestFlaskUpgradePlacement candidate;
+    candidate.worldFromItem={c,0,-s,0, 0,1,0,0, s,0,c,0, x,fittedY,z,1};
+    candidate.supportPoint={x,centre.worldY,z};
+    candidate.minimumBottomGap=std::numeric_limits<float>::max();
+    candidate.minimumTrailClearance=std::numeric_limits<float>::max();
+    float radius=0;
+    for(const auto& vertex:flask.vertices) {
+        const auto& p=vertex.position;const float wx=x+c*p[0]+s*p[2],wz=z-s*p[0]+c*p[2];
+        radius=std::max(radius,std::hypot(p[0],p[2]));
+        candidate.minimumTrailClearance=std::min(candidate.minimumTrailClearance,
+            gameplay::simulation::ProjectWorldRoute(wx,wz).distance);
+        if(p[1]>flask.bounds.minimum[1]+.00001f)continue;
+        const auto under=terrain.Query(wx,wz);
+        const float gap=fittedY+p[1]-under.worldY;
+        candidate.minimumBottomGap=std::min(candidate.minimumBottomGap,gap);
+        candidate.maximumBottomGap=std::max(candidate.maximumBottomGap,gap);
+    }
+    if(candidate.minimumTrailClearance<1.44f || candidate.maximumBottomGap>.03f ||
+       !terrain.NonWalkableVolumeClear(x,z,x,z,fittedY+flask.bounds.minimum[1]+.001f,
+            fittedY+flask.bounds.maximum[1],radius+.01f))
+        return fail("Flask upgrade conflicts with the dry trail, ground contact or existing solid dressing.");
+    placement=candidate;diagnostic.clear();return true;
+}
 }
