@@ -915,6 +915,48 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     return true;
 }
 
+bool RtStaticMeshSlot::ApplyFrameMaterialAppearance(std::span<RtMaterialGpu> frameMaterials,
+    const std::uint32_t metadataIndex, const RtMaterialAppearance& appearance,
+    std::string& diagnostic) const
+{
+    const auto reject=[&](const char* message){diagnostic=message;return false;};
+    if(metadataIndex>=instanceMetadata_.size() || frameMaterials.size()<materials_.size() ||
+       frameMaterials.size()>kRtMaterialCapacity)
+        return reject("Frame material appearance has unavailable owner/material storage.");
+    const auto& owner=instanceMetadata_[metadataIndex];
+    if(owner.primitiveCount!=1u || owner.primitiveBase>=primitiveMetadata_.size() ||
+       !(owner.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) ||
+       owner.geometryRole!=static_cast<std::uint32_t>(RtGeometryRole::Static))
+        return reject("Frame material appearance requires one static-PBR primitive.");
+    const auto row=primitiveMetadata_[owner.primitiveBase].materialIndex;
+    if(row>=materials_.size() || row>=frameMaterials.size() ||
+       (frameMaterials[row].materialFlags[0]&
+        (static_cast<std::uint32_t>(RtMaterialFlag::Alpha)|static_cast<std::uint32_t>(RtMaterialFlag::Transmission))))
+        return reject("Frame material appearance requires an available opaque row.");
+    for(std::size_t i=0;i<instanceMetadata_.size();++i) {
+        if(i==metadataIndex)continue;
+        const auto& other=instanceMetadata_[i];
+        if(other.primitiveCount && owner.primitiveBase>=other.primitiveBase &&
+           owner.primitiveBase-other.primitiveBase<other.primitiveCount)
+            return reject("Frame material appearance cannot mutate shared geometry ownership.");
+    }
+    for(std::size_t i=0;i<primitiveMetadata_.size();++i)
+        if(i!=owner.primitiveBase && primitiveMetadata_[i].materialIndex==row)
+            return reject("Frame material appearance cannot mutate a shared material row.");
+    for(unsigned i=0;i<4u;++i)
+        if(!std::isfinite(appearance.baseColour[i]) || appearance.baseColour[i]<0.f ||
+           appearance.baseColour[i]>1.f || !std::isfinite(appearance.emission[i]) || appearance.emission[i]<0.f)
+            return reject("Frame material appearance factors must be finite and nonnegative.");
+    if(appearance.baseColour[3]!=1.f)
+        return reject("Frame material appearance cannot change opaque coverage.");
+    for(unsigned i=0;i<3u;++i)
+        if(double(appearance.emission[i])*appearance.emission[3]>std::numeric_limits<float>::max())
+            return reject("Frame material appearance emission product is nonfinite.");
+    frameMaterials[row].baseColorFactor=appearance.baseColour;
+    frameMaterials[row].emissiveFactorStrength=appearance.emission;
+    diagnostic.clear();return true;
+}
+
 bool RtStaticMeshSlot::ShareImmutableMaterialRows(
     std::span<const RtImmutableMaterialAlias> aliases, std::string& diagnostic)
 {

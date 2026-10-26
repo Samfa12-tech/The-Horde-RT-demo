@@ -8,6 +8,97 @@ namespace horde::vulkan::raytracing
 {
 namespace
 {
+void ApplyAttackWarningPresentation(
+    const horde::gameplay::simulation::SimulationSnapshot& simulation,
+    const RtAttackWarningOptions options, RtSceneFrameInputs& frame)
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::simulation;
+    frame.attackWarningRingVisible = false;
+    frame.attackWarningRingWorldFromItem = items::IdentityHeldItemTransform();
+    if (!options.enabled || !simulation.modernCombatRules || simulation.paused || !simulation.playerAlive)
+        return;
+    const auto& warning = simulation.attackWarning;
+    if (warning.phase == AttackWarningPhase::None ||
+        warning != BuildAttackWarningPresentation(simulation.swordCombat, simulation.lich,
+            simulation.activeEnemyKind, simulation.skeletonAttackerId, true)) return;
+
+    // Provisional source-space chest heights and ring dimensions. These are
+    // actual world geometry, with native framing/occlusion/legibility still open.
+    std::array<float, 3u> centre{};
+    if (warning.source == EntityId::SkeletonA || warning.source == EntityId::SkeletonB)
+    {
+        if (simulation.skeletonEnemyCount > simulation.skeletonEnemies.size() ||
+            simulation.skeletonRevival.SuppressesActors()) return;
+        const SkeletonEnemySnapshot* source = nullptr;
+        for (std::size_t i = 0; i < simulation.skeletonEnemyCount; ++i)
+            if (simulation.skeletonEnemies[i].id == warning.source) {
+                if (source != nullptr) return; // Duplicate identity is not a second warning owner.
+                source = &simulation.skeletonEnemies[i];
+            }
+        if (source == nullptr || source->dead || source->health <= 0 ||
+            source->attackKind != warning.kind || source->actionTime != warning.phaseElapsedSeconds ||
+            source->action != (warning.phase == AttackWarningPhase::Windup
+                ? EnemyCombatAction::AttackWindup : EnemyCombatAction::AttackActive)) return;
+        centre = {source->x, source->worldY + 0.95f, source->z};
+    }
+    else if (warning.source == EntityId::Lich)
+        centre = {simulation.lich.x, simulation.lich.y + 0.85f, simulation.lich.z};
+    else return;
+
+    const auto torso = horde::gameplay::traversal::RescueTorsoOffset(simulation.rescue);
+    // Same published walking camera offsets as rt_frame.glsl and dust culling;
+    // this is view orientation only, never a separate warning countdown.
+    const float step=simulation.walkTime*6.2f;
+    const std::array<float, 3u> eye{simulation.playerX + torso.x + std::sin(step*.5f)*.035f*simulation.walkAmount,
+        PlayerEyeWorldY(simulation.playerSupportWorldY) + torso.y - simulation.playerCrouchDropMetres +
+            std::abs(std::sin(step))*.035f*simulation.walkAmount,
+        simulation.playerZ + torso.z};
+    for (std::size_t axis = 0; axis < 3u; ++axis)
+        if (!std::isfinite(centre[axis]) || !std::isfinite(eye[axis])) return;
+    std::array<float, 3u> normal{eye[0]-centre[0], eye[1]-centre[1], eye[2]-centre[2]};
+    const float distanceSquared = normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2];
+    if (!std::isfinite(distanceSquared) || distanceSquared < 0.000001f) return;
+    const float inverseDistance = 1.0f / std::sqrt(distanceSquared);
+    for (auto& value : normal) value *= inverseDistance;
+    const float horizontalLength = std::hypot(normal[0], normal[2]);
+    const std::array<float, 3u> right = horizontalLength > 0.0001f
+        ? std::array<float, 3u>{normal[2]/horizontalLength, 0.0f, -normal[0]/horizontalLength}
+        : std::array<float, 3u>{normal[1]/std::hypot(normal[0],normal[1]),
+            -normal[0]/std::hypot(normal[0],normal[1]), 0.0f};
+    const std::array<float, 3u> up{normal[1]*right[2]-normal[2]*right[1],
+        normal[2]*right[0]-normal[0]*right[2], normal[0]*right[1]-normal[1]*right[0]};
+
+    const bool red = warning.kind == EnemyAttackKind::Unblockable;
+    const bool contact = warning.phase == AttackWarningPhase::Contact;
+    const float progress = warning.phaseElapsedSeconds / warning.phaseDurationSeconds;
+    const float contraction = red ? progress*progress : progress*progress*(3.0f-2.0f*progress);
+    // Windup can approach closure but never manufactures Contact from a clock.
+    // Reduced motion is static within each actual phase, without a countdown.
+    float radius = contact ? 0.34f : options.reducedMotion ? 0.58f : 0.76f-0.34f*contraction;
+    if (red && !contact && !options.reducedMotion) {
+        const float pulse = std::sin(progress * 12.5663706144f);
+        radius *= 1.0f + 0.10f*pulse*pulse;
+    }
+    const float width = radius * (red ? 0.80f : 1.0f);
+    const float height = radius * (red ? 1.20f : 1.0f);
+    auto transform = items::IdentityHeldItemTransform();
+    for (std::size_t axis = 0; axis < 3u; ++axis) {
+        transform[axis] = right[axis]*width;
+        transform[4u+axis] = up[axis]*height;
+        transform[8u+axis] = normal[axis];
+        transform[12u+axis] = centre[axis];
+    }
+    frame.attackWarningRingWorldFromItem = transform;
+    frame.attackWarningRingBaseColour = red
+        ? std::array<float, 4u>{0.70f, 0.02f, 0.015f, 1.0f}
+        : std::array<float, 4u>{0.95f, 0.52f, 0.02f, 1.0f};
+    frame.attackWarningRingEmission = red
+        ? std::array<float, 4u>{1.0f, 0.035f, 0.02f, 2.0f}
+        : std::array<float, 4u>{1.0f, 0.62f, 0.025f, 1.4f};
+    frame.attackWarningRingVisible = true;
+}
+
 float RevivalPresentationTime(const float seconds, const float duration)
 {
     if (seconds >= duration) return duration; // Preserve the exact authored endpoint.
@@ -140,9 +231,11 @@ RtSceneFrameInputs BuildGraphicsPreviewFrameInputs(
 RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
     const float outputExposure,
-    const WaterQuality waterQuality)
+    const WaterQuality waterQuality,
+    const RtAttackWarningOptions attackWarning)
 {
-    return BuildRtSceneFrameInputs(simulation, outputExposure, waterQuality, RtSceneTuning{}, std::nullopt);
+    return BuildRtSceneFrameInputs(simulation, outputExposure, waterQuality,
+        RtSceneTuning{}, std::nullopt, std::nullopt, attackWarning);
 }
 
 RtSceneFrameInputs BuildRtSceneFrameInputs(
@@ -151,9 +244,10 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     const RtSceneTuning& tuning,
     const WaterQuality waterQuality,
     const std::optional<FireEmitterQuality> fireDetail,
-    const std::optional<horde::graphics::ShadowQuality> shadowQuality)
+    const std::optional<horde::graphics::ShadowQuality> shadowQuality,
+    const RtAttackWarningOptions attackWarning)
 {
-    return BuildRtSceneFrameInputs(simulation, outputExposure, waterQuality, tuning, fireDetail, shadowQuality);
+    return BuildRtSceneFrameInputs(simulation, outputExposure, waterQuality, tuning, fireDetail, shadowQuality, attackWarning);
 }
 
 RtSceneFrameInputs BuildRtSceneFrameInputs(
@@ -162,7 +256,8 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     const WaterQuality waterQuality,
     const RtSceneTuning& tuning,
     const std::optional<FireEmitterQuality> fireDetail,
-    const std::optional<horde::graphics::ShadowQuality> shadowQuality)
+    const std::optional<horde::graphics::ShadowQuality> shadowQuality,
+    const RtAttackWarningOptions attackWarning)
 {
     RtSceneFrameInputs frame;
     frame.playerRenderRoute = kProductionPlayerRenderRoute;
@@ -248,6 +343,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.lich.finaleDawnRevealProgress = simulation.developmentRescueJourney
         ? 0.0f : ResolveRtFinaleDawnReveal(simulation.lich.finaleDawnRevealProgress, frame.tuning);
     ApplySkeletonRevivalPresentation(simulation, frame);
+    ApplyAttackWarningPresentation(simulation, attackWarning, frame);
     return frame;
 }
 

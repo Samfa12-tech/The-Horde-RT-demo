@@ -183,6 +183,8 @@ struct RtSceneFrameInputs
     // Presentation-only inputs; gameplay admission remains with the snapshot owner.
     bool attackWarningRingVisible = false;
     bool healingFlaskVisible = false;
+    std::array<float, 4u> attackWarningRingBaseColour{{0.72f,0.09f,0.015f,1.f}};
+    std::array<float, 4u> attackWarningRingEmission{{1.f,0.16f,0.015f,1.f}};
     horde::gameplay::items::HeldItemTransform attackWarningRingWorldFromItem =
         horde::gameplay::items::IdentityHeldItemTransform();
     horde::gameplay::items::HeldItemTransform healingFlaskWorldFromItem =

@@ -8303,6 +8303,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
        !ApplyRegionPage(instances,frameInstanceMetadata,framePageTable,diagnostic))return false;
 #endif
     auto frameMaterials = sceneMaterials_;
+    if(frame.attackWarningRingVisible && !staticMeshSlot_.ApplyFrameMaterialAppearance(
+        frameMaterials,kAttackWarningMetadataIndex,
+        {frame.attackWarningRingBaseColour,frame.attackWarningRingEmission},diagnostic))return false;
     if (!chapterActorReady_) {
     if (dielectricFixtureMaterialIndex_ >= frameMaterials.size())
     {

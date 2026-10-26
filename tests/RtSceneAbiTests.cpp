@@ -482,6 +482,50 @@ void TestJointPresentationCapacity()
           "constant joint emission needs no new texture family or descriptor");
 }
 
+void TestFrameMaterialAppearance()
+{
+    using namespace horde::vulkan::raytracing;
+    auto a=MakeAsset(1u,1u),b=a,ring=a,flask=a;
+    std::vector<StaticRtAssetRegistration> registrations{
+        {5u,105u,1u,0u,&a},{6u,106u,1u,0u,&b},
+        {28u,128u,1u,0u,&ring},{29u,129u,1u,0u,&flask}};
+    RtStaticMeshSlot slot;std::string diagnostic;
+    Check(slot.Initialize(registrations,diagnostic),"appearance fixture packs independent owners");
+    const std::array<RtImmutableMaterialAlias,1u> aliases{{{1u,0u}}};
+    Check(slot.ShareImmutableMaterialRows(aliases,diagnostic),"appearance resolves after immutable chest alias remapping");
+    const auto source=slot.Materials();auto frame=source;
+    frame.resize(frame.size()+2u);const auto before=frame;
+    const auto row=slot.PrimitiveMetadata()[slot.InstanceMetadata()[28].primitiveBase].materialIndex;
+    RtMaterialAppearance yellow{{{1.f,.78f,.04f,1.f}},{{1.f,.6f,.02f,2.f}}};
+    Check(row==1u && slot.ApplyFrameMaterialAppearance(frame,28u,yellow,diagnostic),
+          "exclusive owner appearance resolves its remapped row rather than a hardcoded material index");
+    auto expected=before;expected[row].baseColorFactor=yellow.baseColour;expected[row].emissiveFactorStrength=yellow.emission;
+    Check(std::memcmp(frame.data(),expected.data(),frame.size()*sizeof(RtMaterialGpu))==0 &&
+          std::memcmp(source.data(),slot.Materials().data(),source.size()*sizeof(RtMaterialGpu))==0,
+          "appearance changes only two frame-local factors; source, flask, aliases, textures and world palette remain exact");
+    const auto reject=[&](std::uint32_t owner,RtMaterialAppearance value,std::vector<RtMaterialGpu> data) {
+        const auto saved=data;
+        Check(!slot.ApplyFrameMaterialAppearance(data,owner,value,diagnostic) &&
+              data.size()==saved.size() && std::memcmp(data.data(),saved.data(),data.size()*sizeof(RtMaterialGpu))==0,
+              "invalid or shared appearance input rejects atomically");
+    };
+    reject(5u,yellow,frame); // Chest A shares its material with B.
+    reject(0u,yellow,frame);reject(kRtInstanceMetadataCapacity,yellow,frame);
+    auto bad=yellow;bad.baseColour[0]=std::numeric_limits<float>::quiet_NaN();reject(28u,bad,frame);
+    bad=yellow;bad.baseColour[3]=.5f;reject(28u,bad,frame);
+    bad=yellow;bad.emission[3]=-1.f;reject(28u,bad,frame);
+    bad=yellow;bad.emission[0]=std::numeric_limits<float>::max();reject(28u,bad,frame);
+    auto shortFrame=source;shortFrame.pop_back();reject(28u,yellow,shortFrame);
+    auto transparent=frame;transparent[row].materialFlags[0]|=static_cast<std::uint32_t>(RtMaterialFlag::Transmission);
+    reject(28u,yellow,transparent);
+    registrations.push_back({27u,127u,1u,0u,&ring});
+    RtStaticMeshSlot geometryAlias;Check(geometryAlias.Initialize(registrations,diagnostic),"geometry-alias fixture packs");
+    auto aliasFrame=geometryAlias.Materials();const auto aliasSaved=aliasFrame;
+    Check(!geometryAlias.ApplyFrameMaterialAppearance(aliasFrame,28u,yellow,diagnostic) &&
+          std::memcmp(aliasFrame.data(),aliasSaved.data(),aliasFrame.size()*sizeof(RtMaterialGpu))==0,
+          "a second metadata owner of the same primitive cannot silently share a mutable appearance");
+}
+
 void TestMaterialAuthoringValidation()
 {
     using namespace horde::vulkan::raytracing;
@@ -706,6 +750,7 @@ int main()
     TestDeferredTextureGroups();
     TestNamedCapacityFailures();
     TestJointPresentationCapacity();
+    TestFrameMaterialAppearance();
     TestMaterialAuthoringValidation();
     TestTextureArrayCapacities();
     TestPrimaryShadowPolicy();

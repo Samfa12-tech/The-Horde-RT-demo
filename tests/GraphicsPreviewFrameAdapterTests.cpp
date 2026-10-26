@@ -50,6 +50,210 @@ bool FramesWater(const horde::graphics::GraphicsPreviewDescription& scene,
                                   scene.waterOrigin[2]+stream.centreZ+sideZ*stream.radiusZ},false)) return false;
     return true;
 }
+
+template <typename Check>
+void AttackWarningAdapterContracts(const Check& check)
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::simulation;
+    using namespace horde::vulkan::raytracing;
+    SimulationSnapshot source{};
+    source.modernCombatRules=true; source.tickIndex=782;
+    source.playerX=4.f; source.playerZ=6.f; source.playerSupportWorldY=2.f;
+    source.activeEnemyKind=EnemyKind::Skeleton; source.skeletonAttackerId=EntityId::SkeletonA;
+    source.swordCombat.attackerIndex=0;
+    source.skeletonEnemyCount=2;
+    source.skeletonEnemies[0].id=EntityId::SkeletonA;
+    source.skeletonEnemies[0].x=2.f; source.skeletonEnemies[0].z=-4.f;
+    source.skeletonEnemies[0].worldY=1.f;
+    source.skeletonEnemies[1].id=EntityId::SkeletonB;
+    source.skeletonEnemies[1].x=-3.f; source.skeletonEnemies[1].z=-9.f;
+    source.skeletonEnemies[1].worldY=2.f;
+    const auto setPhase=[](SimulationSnapshot& state,EnemyAttackKind kind,
+                           EnemyCombatAction action,float seconds) {
+        const auto index=static_cast<std::size_t>(state.swordCombat.attackerIndex);
+        auto& combat=state.swordCombat.combatants[index];
+        combat.attackKind=kind; combat.action=action; combat.actionTime=seconds;
+        auto& actor=state.skeletonEnemies[index];
+        actor.attackKind=kind; actor.action=action; actor.actionTime=seconds;
+        state.attackWarning=BuildAttackWarningPresentation(state.swordCombat,state.lich,
+            state.activeEnemyKind,state.skeletonAttackerId,true);
+    };
+    setPhase(source,EnemyAttackKind::GuardBreak,EnemyCombatAction::AttackWindup,0.f);
+    const RtAttackWarningOptions enabled{true,false}, reduced{true,true};
+    const auto build=[&](const SimulationSnapshot& value,RtAttackWarningOptions option=RtAttackWarningOptions{true,false}) {
+        return BuildRtSceneFrameInputs(value,1.f,WaterQuality::High,option);
+    };
+    const auto near=[](float a,float b) { return std::abs(a-b)<.00001f; };
+    const auto axisLength=[](const RtSceneFrameInputs& value,std::size_t column) {
+        const auto& m=value.attackWarningRingWorldFromItem;
+        return std::sqrt(m[column*4]*m[column*4]+m[column*4+1]*m[column*4+1]+m[column*4+2]*m[column*4+2]);
+    };
+    const auto valid=[](const RtSceneFrameInputs& value) {
+        const auto& m=value.attackWarningRingWorldFromItem;
+        const float determinant=m[0]*(m[5]*m[10]-m[9]*m[6])-
+            m[4]*(m[1]*m[10]-m[9]*m[2])+m[8]*(m[1]*m[6]-m[5]*m[2]);
+        return std::all_of(m.begin(),m.end(),[](float v){return std::isfinite(v);}) && determinant>0.f;
+    };
+    check(!BuildRtSceneFrameInputs(source,1.f).attackWarningRingVisible &&
+          !BuildRtSceneFrameInputs(source,1.f,WaterQuality::High).attackWarningRingVisible &&
+          !BuildRtSceneFrameInputs(source,1.f,RtSceneTuning{}).attackWarningRingVisible &&
+          !BuildRtSceneFrameInputs(source,1.f,WaterQuality::High,RtSceneTuning{}).attackWarningRingVisible &&
+          !BuildRtSceneFrameInputs(source,1.f,RtSceneTuning{},WaterQuality::High,
+              FireEmitterQuality::High,horde::graphics::ShadowQuality::Higher).attackWarningRingVisible &&
+          !BuildRtSceneFrameInputs(source,1.f,WaterQuality::High,RtSceneTuning{},
+              FireEmitterQuality::High,horde::graphics::ShadowQuality::Higher).attackWarningRingVisible &&
+          !build(source,{false,true}).attackWarningRingVisible,
+          "every established gameplay overload and disabled reduced-motion option keeps the warning OFF");
+    const auto open=build(source);
+    const auto tuningFirst=BuildRtSceneFrameInputs(source,1.f,RtSceneTuning{},WaterQuality::High,
+        std::nullopt,std::nullopt,enabled);
+    const auto waterFirst=BuildRtSceneFrameInputs(source,1.f,WaterQuality::High,RtSceneTuning{},
+        std::nullopt,std::nullopt,enabled);
+    check(open.attackWarningRingVisible && tuningFirst.attackWarningRingWorldFromItem==open.attackWarningRingWorldFromItem &&
+          waterFirst.attackWarningRingWorldFromItem==open.attackWarningRingWorldFromItem &&
+          valid(open) && near(axisLength(open,0),axisLength(open,1)),
+          "explicit options forward consistently to one finite round yellow world-geometry presentation");
+    const auto centre=open.attackWarningRingWorldFromItem;
+    check(centre[12]==source.skeletonEnemies[0].x && centre[14]==source.skeletonEnemies[0].z &&
+          centre[13]>source.skeletonEnemies[0].worldY &&
+          centre[12]!=source.swordCombat.combatants[0].x,
+          "ring uses the identified actual actor root and support height rather than a combat compatibility root");
+    const float eyeY=PlayerEyeWorldY(source.playerSupportWorldY);
+    const std::array<float,3> delta{source.playerX-centre[12],eyeY-centre[13],source.playerZ-centre[14]};
+    const float facing=centre[8]*delta[0]+centre[9]*delta[1]+centre[10]*delta[2];
+    check(facing>0.f && near(centre[8]*delta[1]-centre[9]*delta[0],0.f) &&
+          near(centre[9]*delta[2]-centre[10]*delta[1],0.f),
+          "annulus local XY faces the actual supported-height camera from its world-space source centre");
+    auto movedCamera=source; movedCamera.playerX=-8.f; movedCamera.playerZ=3.f;
+    const auto changedView=build(movedCamera);
+    check(changedView.attackWarningRingVisible && valid(changedView) &&
+          changedView.attackWarningRingWorldFromItem[12]==centre[12] &&
+          changedView.attackWarningRingWorldFromItem[13]==centre[13] &&
+          changedView.attackWarningRingWorldFromItem[14]==centre[14] &&
+          changedView.attackWarningRingWorldFromItem[8]!=centre[8],
+          "moving camera changes the facing basis while the ring stays on the enemy instead of following the screen");
+    auto walkingCamera=source;
+    walkingCamera.walkTime=.23f; walkingCamera.walkAmount=.8f;
+    walkingCamera.playerCrouchDropMetres=.31f;
+    const auto walkingFrame=build(walkingCamera);
+    const auto& walkingRing=walkingFrame.attackWarningRingWorldFromItem;
+    const float step=walkingCamera.walkTime*6.2f;
+    const std::array<float,3> walkingDelta{
+        walkingCamera.playerX+std::sin(step*.5f)*.035f*walkingCamera.walkAmount-centre[12],
+        eyeY-walkingCamera.playerCrouchDropMetres+
+            std::abs(std::sin(step))*.035f*walkingCamera.walkAmount-centre[13],
+        walkingCamera.playerZ-centre[14]};
+    check(walkingFrame.attackWarningRingVisible && valid(walkingFrame) &&
+          near(walkingRing[8]*walkingDelta[1]-walkingRing[9]*walkingDelta[0],0.f) &&
+          near(walkingRing[9]*walkingDelta[2]-walkingRing[10]*walkingDelta[1],0.f) &&
+          walkingRing[12]==centre[12] && walkingRing[13]==centre[13] && walkingRing[14]==centre[14],
+          "walking bob and crouched camera orient the ring without moving its enemy anchor or phase");
+    auto exterior=source; exterior.developmentRescueJourney=true; exterior.rescue.exteriorSide=true;
+    const auto exteriorFrame=build(exterior);
+    check(exteriorFrame.roster.selectedEnemy==EnemyKind::Lich && exteriorFrame.attackWarningRingVisible &&
+          exteriorFrame.attackWarningRingWorldFromItem[12]==centre[12],
+          "exterior render-roster override cannot replace the authoritative skeleton warning source");
+    auto middle=source;
+    setPhase(middle,EnemyAttackKind::GuardBreak,EnemyCombatAction::AttackWindup,
+        CombatTimeline::kSkeletonAttackWindupSeconds*.5f);
+    auto endpoint=source;
+    setPhase(endpoint,EnemyAttackKind::GuardBreak,EnemyCombatAction::AttackWindup,
+        CombatTimeline::kSkeletonAttackWindupSeconds);
+    auto contact=source;
+    setPhase(contact,EnemyAttackKind::GuardBreak,EnemyCombatAction::AttackActive,0.f);
+    const auto midFrame=build(middle), endFrame=build(endpoint), contactFrame=build(contact);
+    check(axisLength(open,0)>axisLength(midFrame,0) && axisLength(midFrame,0)>axisLength(endFrame,0) &&
+          axisLength(endFrame,0)>axisLength(contactFrame,0),
+          "yellow contracts through actual windup and closes only when the source changes to Contact");
+    auto laterContact=contact;
+    setPhase(laterContact,EnemyAttackKind::GuardBreak,EnemyCombatAction::AttackActive,
+        CombatTimeline::kSkeletonAttackActiveSeconds);
+    check(build(laterContact).attackWarningRingWorldFromItem==contactFrame.attackWarningRingWorldFromItem,
+          "contact geometry stays closed without a second active-phase countdown or timer");
+    auto recovered=contact;
+    setPhase(recovered,EnemyAttackKind::GuardBreak,EnemyCombatAction::AttackRecovery,0.f);
+    check(!build(recovered).attackWarningRingVisible && !build(SimulationSnapshot{}).attackWarningRingVisible,
+          "actual recovery and reset remove the prior source warning instead of holding a closed ring");
+    check(build(source,reduced).attackWarningRingWorldFromItem==build(middle,reduced).attackWarningRingWorldFromItem &&
+          build(middle,reduced).attackWarningRingWorldFromItem==build(endpoint,reduced).attackWarningRingWorldFromItem &&
+          axisLength(build(contact,reduced),0)<axisLength(build(endpoint,reduced),0),
+          "reduced motion is static throughout windup and changes closure only at the authoritative contact phase");
+    auto red=source;
+    setPhase(red,EnemyAttackKind::Unblockable,EnemyCombatAction::AttackWindup,0.f);
+    const auto redStart=build(red);
+    setPhase(red,EnemyAttackKind::Unblockable,EnemyCombatAction::AttackWindup,
+        CombatTimeline::kSkeletonAttackWindupSeconds/16.f);
+    const auto redPulse=build(red);
+    check(axisLength(redStart,1)>axisLength(redStart,0)*1.4f && axisLength(redPulse,0)>axisLength(redStart,0) &&
+          redStart.attackWarningRingBaseColour!=open.attackWarningRingBaseColour &&
+          redStart.attackWarningRingEmission!=open.attackWarningRingEmission,
+          "red has an ellipse and a bounded expansion pulse as non-colour distinctions from smooth round yellow");
+    const auto reducedRed=build(red,reduced);
+    setPhase(red,EnemyAttackKind::Unblockable,EnemyCombatAction::AttackWindup,
+        CombatTimeline::kSkeletonAttackWindupSeconds*.75f);
+    check(reducedRed.attackWarningRingWorldFromItem==build(red,reduced).attackWarningRingWorldFromItem &&
+          axisLength(reducedRed,1)>axisLength(reducedRed,0)*1.4f &&
+          near(axisLength(build(source,reduced),0),axisLength(build(source,reduced),1)),
+          "reduced motion preserves static red ellipse versus yellow circle without pulsing or countdown");
+    for(int failure=0;failure<15;++failure) {
+        auto invalid=source;
+        if(failure==0)invalid.swordCombat.combatants[0].attackKind=EnemyAttackKind::Normal;
+        if(failure==1)invalid.attackWarning.source=EntityId::SkeletonB;
+        if(failure==2)invalid.skeletonEnemyCount=0;
+        if(failure==3)invalid.skeletonEnemies[0].id=EntityId::Invalid;
+        if(failure==4)invalid.skeletonEnemies[0].dead=true;
+        if(failure==5)invalid.skeletonEnemies[0].action=EnemyCombatAction::AttackRecovery;
+        if(failure==6)invalid.skeletonEnemies[1].id=EntityId::SkeletonA;
+        if(failure==7)invalid.attackWarning.phaseElapsedSeconds=std::numeric_limits<float>::quiet_NaN();
+        if(failure==8)invalid.skeletonEnemies[0].worldY=std::numeric_limits<float>::quiet_NaN();
+        if(failure==9)invalid.playerX=std::numeric_limits<float>::quiet_NaN();
+        if(failure==10)invalid.swordCombat.combatants[0].actionTime=.2f;
+        if(failure==11)invalid.paused=true;
+        if(failure==12)invalid.playerAlive=false;
+        if(failure==13)invalid.modernCombatRules=false;
+        if(failure==14)invalid.skeletonEnemyCount=invalid.skeletonEnemies.size()+1;
+        const auto hidden=build(invalid);
+        check(!hidden.attackWarningRingVisible &&
+              hidden.attackWarningRingWorldFromItem==items::IdentityHeldItemTransform(),
+              "normal stale missing duplicate dead paused or malformed source clears visibility and its old transform");
+    }
+    auto handed=source; handed.swordCombat.attackerIndex=1; handed.skeletonAttackerId=EntityId::SkeletonB;
+    handed.skeletonEnemies[0].dead=true; handed.swordCombat.combatants[0].health=0;
+    setPhase(handed,EnemyAttackKind::GuardBreak,EnemyCombatAction::AttackWindup,.2f);
+    const auto second=build(handed);
+    check(second.attackWarningRingVisible && second.attackWarningRingWorldFromItem[12]==handed.skeletonEnemies[1].x &&
+          second.attackWarningRingWorldFromItem[14]==handed.skeletonEnemies[1].z,
+          "attacker handoff replaces the previous actor's root and clock with the actual surviving source");
+    auto keeper=source; keeper.activeEnemyKind=EnemyKind::Lich;
+    keeper.lich.revealComplete=true; keeper.lich.revealPhase=KeeperRevealPhase::Combat;
+    keeper.lich.readableCastPresentation=true; keeper.lich.phase=LichPhase::Charging;
+    keeper.lich.phaseTime=.3f; keeper.lich.x=-12.f; keeper.lich.y=3.f; keeper.lich.z=-16.f;
+    const auto keeperRecord=[](SimulationSnapshot& state) {
+        state.attackWarning=BuildAttackWarningPresentation(state.swordCombat,state.lich,
+            state.activeEnemyKind,state.skeletonAttackerId,true);
+    };
+    keeperRecord(keeper);
+    const auto keeperFrame=build(keeper);
+    check(keeperFrame.attackWarningRingVisible && keeperFrame.attackWarningRingWorldFromItem[12]==keeper.lich.x &&
+          keeperFrame.attackWarningRingWorldFromItem[14]==keeper.lich.z &&
+          keeperFrame.attackWarningRingWorldFromItem[13]>keeper.lich.y,
+          "Keeper ring follows its actual floating root rather than either skeleton or compatibility actor");
+    keeper.lich.phase=LichPhase::Recovering; keeper.lich.phaseTime=0.f;
+    keeper.lich.staffLightStrength=LichEncounter::kStaffLightPeak; keeperRecord(keeper);
+    check(build(keeper).attackWarningRingVisible,"Keeper actual discharge uses its existing Contact window");
+    keeper.lich.phaseTime=LichEncounter::kDischargeVisibleBurstDuration; keeperRecord(keeper);
+    check(!build(keeper).attackWarningRingVisible,"Keeper recovery clears at the actual discharge endpoint");
+    const auto before=source; (void)build(source);
+    check(source.attackWarning==before.attackWarning && source.tickIndex==before.tickIndex &&
+          source.playerX==before.playerX && source.playerSupportWorldY==before.playerSupportWorldY &&
+          source.skeletonEnemies[0].x==before.skeletonEnemies[0].x &&
+          source.skeletonEnemies[0].actionTime==before.skeletonEnemies[0].actionTime &&
+          source.swordCombat.combatants[0].actionTime==before.swordCombat.combatants[0].actionTime &&
+          source.heldItems[0].worldFromItem==before.heldItems[0].worldFromItem &&
+          source.fireEmitterCount==before.fireEmitterCount,
+          "ring adaptation consumes immutable snapshot inputs without advancing combat equipment or effects");
+}
 }
 
 int main()
@@ -59,6 +263,7 @@ int main()
     const auto check = [&passed](bool condition, const char* label) {
         if (!condition) { std::cerr << label << "\n"; passed = false; }
     };
+    AttackWarningAdapterContracts(check);
     horde::gameplay::simulation::SimulationSnapshot game{};
     game.tickIndex = 417;
     game.playerX = 0.31f;
@@ -92,6 +297,7 @@ int main()
           frame.fireEmitters[0].worldFromLight == torch.worldFromLight, "actual socket matrices reach preview fire inputs");
     check(frame.fireDetail == FireEmitterQuality::High && frame.waterQuality == WaterQuality::Mobile, "preview explicit fire split");
     check(frame.lich.staffLightStrength == 0.0f, "unadmitted lich has no light");
+    check(!frame.attackWarningRingVisible,"ordinary graphics preview has no opted-in attack warning");
     session.Pause(true); session.Advance(0.1);
     const auto paused = BuildGraphicsPreviewFrameInputs(session, 1.2f, WaterQuality::Off, FireEmitterQuality::Mobile);
     check(paused.tickIndex == frame.tickIndex && paused.skeletonEnemies[0].animationTime == frame.skeletonEnemies[0].animationTime,
@@ -127,6 +333,7 @@ int main()
           entryFrame.fireEmitterCount==1 && entryFrame.waterQuality==WaterQuality::Off &&
           entryFrame.lich.staffLightStrength==0 && entryFrame.torchLightStrength==0,
           "entry admits one socket-bound flame without gameplay actors or duplicate torch light");
+    check(!entryFrame.attackWarningRingVisible,"ordinary entry menu has no opted-in attack warning");
     entry.Play();entry.Advance(.25);entry.Advance(.10);
     const auto black=BuildEntryMenuFrameInputs(entry,.92f,FireEmitterQuality::High,
         horde::graphics::ShadowQuality::Current);

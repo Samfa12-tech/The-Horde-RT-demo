@@ -45,6 +45,13 @@ struct RtImmutableMaterialAlias
     std::uint32_t provider = 0u;
 };
 
+// CPU frame-local factors only; no material/texture/descriptor ownership change.
+struct RtMaterialAppearance
+{
+    std::array<float, 4u> baseColour{{1.f,1.f,1.f,1.f}};
+    std::array<float, 4u> emission{{0.f,0.f,0.f,1.f}};
+};
+
 struct RtStaticMeshMeasurements
 {
     std::uint64_t vertexBytes = 0u;
@@ -74,6 +81,12 @@ public:
     // Requires exact converted GPU records, and atomically remaps every primitive.
     bool ShareImmutableMaterialRows(std::span<const RtImmutableMaterialAlias> aliases,
                                     std::string& diagnostic);
+
+    // Resolve after packing/aliasing. Only an exclusive single-primitive opaque
+    // owner may change its frame-local factors. Failure changes no bytes.
+    bool ApplyFrameMaterialAppearance(std::span<RtMaterialGpu> frameMaterials,
+        std::uint32_t metadataIndex, const RtMaterialAppearance& appearance,
+        std::string& diagnostic) const;
 
     const std::array<RtInstanceMetadata, kRtInstanceMetadataCapacity>& InstanceMetadata() const
     {

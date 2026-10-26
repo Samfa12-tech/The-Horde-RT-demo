@@ -8,6 +8,13 @@
 
 namespace horde::vulkan::raytracing
 {
+// Explicit presentation trial only; existing callers preserve normal OFF.
+struct RtAttackWarningOptions
+{
+    bool enabled = false;
+    bool reducedMotion = false;
+};
+
 RtSceneFrameInputs BuildEntryMenuFrameInputs(const horde::graphics::EntryMenuSession &session,
                                              float outputExposure, FireEmitterQuality fireDetail,
                                              horde::graphics::ShadowQuality shadowQuality);
@@ -23,7 +30,8 @@ RtSceneFrameInputs BuildGraphicsPreviewFrameInputs(
 RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
     float outputExposure,
-    WaterQuality waterQuality = WaterQuality::High);
+    WaterQuality waterQuality = WaterQuality::High,
+    RtAttackWarningOptions attackWarning = {});
 
 RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
@@ -31,7 +39,8 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     const RtSceneTuning& tuning,
     WaterQuality waterQuality = WaterQuality::High,
     std::optional<FireEmitterQuality> fireDetail = std::nullopt,
-    std::optional<horde::graphics::ShadowQuality> shadowQuality = std::nullopt);
+    std::optional<horde::graphics::ShadowQuality> shadowQuality = std::nullopt,
+    RtAttackWarningOptions attackWarning = {});
 
 RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
@@ -39,6 +48,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     WaterQuality waterQuality,
     const RtSceneTuning& tuning,
     std::optional<FireEmitterQuality> fireDetail = std::nullopt,
-    std::optional<horde::graphics::ShadowQuality> shadowQuality = std::nullopt);
+    std::optional<horde::graphics::ShadowQuality> shadowQuality = std::nullopt,
+    RtAttackWarningOptions attackWarning = {});
 
 } // namespace horde::vulkan::raytracing
