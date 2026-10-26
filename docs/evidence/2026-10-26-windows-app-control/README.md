@@ -30,6 +30,12 @@ decision, or the absence of unrelated policies on the device.
 
 ## Supported remedy - separate owner decision required
 
+**Owner disposition after diagnosis:** Sam has no existing Windows signing
+certificate/service and asked to leave this issue aside. Stop pursuing signing
+or setup for now. Keep the blocked native visual check pending and its candidate
+unadmitted; continue independent permitted development. This is not permission
+to ignore enforcement, change protection or retry via another executable path.
+
 The recommended developer route is valid Authenticode signing with a certificate
 from a trusted provider, keeping Smart App Control enabled. Microsoft's current
 [FAQ](https://support.microsoft.com/en-us/windows/security/threat-malware-protection/smart-app-control-frequently-asked-questions)
@@ -39,7 +45,7 @@ requires a trusted provider and recommends Artifact Signing. An exact-file hash
 allow rule is therefore not the supported per-app remedy for this confirmed SAC
 policy. Self-signing or installing a new trusted root is not an approved substitute.
 
-**Next bounded decision:** choose an owner-controlled trusted Windows signing
+**If the owner reopens this dependency:** choose a trusted Windows signing
 identity, if one exists, or separately approve an eligible provider and cost.
 The proposed eventual operation is to sign the exact reviewed development
 artifact and required dependencies with that identity, retaining SAC and the

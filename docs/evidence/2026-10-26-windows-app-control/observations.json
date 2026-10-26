@@ -55,5 +55,6 @@
   "privateRawResultCommitted": false,
   "signingPerformed": false,
   "phoneAccessed": false,
-  "nextStep": "separate owner decision on a trusted Windows signing route; no per-app SAC exception, no signing/account/spending/protection change or blocked launch authorized"
+  "ownerDisposition": "No Windows signing certificate/service; owner deferred pursuing this issue, not enforcement",
+  "nextStep": "leave native visual check pending and candidate unadmitted; continue permitted independent work; no signing/setup, protection change, diagnostic repeat or blocked-launch workaround"
 }

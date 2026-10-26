@@ -686,3 +686,21 @@ Actual listening, mix, encounter admission and any game-distribution decision ar
 still pending. Current terms (checked 2026-10-25) distinguish an integrated new
 creative work from standalone content distribution; this note does not admit the
 standalone audio to the public repository.
+
+## Healing flask r1 - original source-only study, 26 October 2026
+
+`assets/models/props/source/healing-flask-study-r1/` contains original
+project-authored profile geometry, uniform opaque PBR factors, an exact `Grip`
+marker, deterministic source GLB, editable Blender source and authoring recipe.
+No third-party mesh/image/texture, paid generation or provider input is used.
+Applicable user/service rights remain unchanged; no blanket MIT, CC0, Meshy or
+other third-party licence is assigned.
+
+The GLB SHA256 is
+`ba93fd1a0242fb806c8be3972a1db1371e1aee3cd7ee4e22be447dbb7d8e95dd`.
+This is an unadmitted source study, not a runtime import or a completed healing
+feature. Blender studio lights/floor are preview-only and absent from the GLB.
+Source files and previews are excluded from runtime manifests/packages. Static
+validation and authoring previews are recorded in
+`docs/evidence/2026-10-26-flask-source-study/README.md`; native hand/RT admission
+and the pending joint resource decision remain open.

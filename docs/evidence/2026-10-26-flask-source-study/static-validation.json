@@ -1,0 +1,35 @@
+{
+  "sha256": "ba93fd1a0242fb806c8be3972a1db1371e1aee3cd7ee4e22be447dbb7d8e95dd",
+  "bytes": 9292,
+  "vertices": 242,
+  "triangles": 384,
+  "primitives": 1,
+  "materials": 1,
+  "texturePayloads": 0,
+  "minimumMetres": [
+    -0.05700000002980232,
+    -0.07500000298023224,
+    -0.02800000086426735
+  ],
+  "maximumMetres": [
+    0.05700000002980232,
+    0.08900000154972076,
+    0.02800000086426735
+  ],
+  "dimensionsMetres": [
+    0.11400000005960464,
+    0.164000004529953,
+    0.0560000017285347
+  ],
+  "closedAndConsistentlyWound": true,
+  "signedVolumeM3": 0.0004912364503511556,
+  "minimumTriangleAreaM2": 5.740251120461891e-06,
+  "grip": [
+    0.0,
+    0.065,
+    0.0
+  ],
+  "mouthRecessMetres": 0.014,
+  "scope": "Static bytes/topology only; native import, hand fit, animation and RT acceptance pending",
+  "operation": "new-only-author"
+}

@@ -8,6 +8,7 @@ docs/evidence/2026-10-24-kit-natural-corner/*.log -text whitespace=cr-at-eol
 docs/evidence/2026-10-24-kit-route-admission-review/*.log -text whitespace=cr-at-eol
 docs/evidence/2026-10-24-kit-turn-admission/*.log -text whitespace=cr-at-eol
 # Keep high-resolution source art out of normal Git history.
+assets/models/props/source/healing-flask-study-r1/*.blend filter=lfs diff=lfs merge=lfs -text
 docs/evidence/2026-10-25-held-guard/*.log -text -whitespace
 assets/models/world/source/chimney-smoke-study-r1/source/*.blend filter=lfs diff=lfs merge=lfs -text
 docs/evidence/2026-10-24-chimney-smoke-gate/*.patch -text -whitespace
