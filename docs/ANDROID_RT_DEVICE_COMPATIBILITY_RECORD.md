@@ -3774,3 +3774,21 @@ installation or save/settings writes. Device access was released at
 **10:37:25.915 UTC**, with the same frozen candidate retained for Sam. No owned
 transfer or automated interaction remains. Subsequent startup, encounter and
 warning investigations are offline; the phone is free to disconnect.
+
+### 26 October 2026: startup acceptance preflight, no app changes
+
+An authorized read-only connection/custody check identified the connected
+**SM-S948B**. The phone was awake and unlocked with its launcher foreground,
+while `com.samfa12.hordelanternrt.debug` already had a background process.
+No safe stopped-app baseline was available for the prepared startup candidate
+update/restart. The owner was asleep, so the existing process and any unsaved
+progress were left untouched; no button press was requested.
+
+This is **connection/custody preflight only**, not RT presentation, installed
+build verification, startup Load/Resume/Cancel acceptance or performance
+evidence. The current installed APK hash/version was not queried; do not attach
+the earlier f27982cd identity to this observation. No APK installation, launch,
+force-stop, input, capture, save/settings write or forwarding was performed.
+The sandboxed ADB client initially could not connect to its daemon; the normal
+host-access read-only check succeeded. No security setting changed. Device
+access was released after preflight, with no owned device operation remaining.
