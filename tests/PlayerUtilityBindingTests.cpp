@@ -219,6 +219,21 @@ int main(int argc,char** argv) {
         Check(exact,"return overlay preserves actual non-right crouch/dodge/reaction base geometry and left solve");
     }
     {
+        // Guard release has an Idle action with a0.12s visual tail. Before
+        // flask acquisition the utility has no right-arm weight; keep that
+        // ordinary target and metadata rather than rejecting a valid frame.
+        auto tail=animation;tail.combatLayer.guardPoseWeight=.4f;
+        tail.rightIk.target[1]+=.02f;
+        if(!baseline.PreparePose(tail,203,PlayerCpuSkinCadence::Hz60,updated,error) ||
+           !bound.PrepareUtilityCandidatePose(tail,{PlayerUtilityClip::Use,.1f,0.f},203,
+                PlayerCpuSkinCadence::Hz30,updated,error)){std::cerr<<error<<'\n';return 1;}
+        Check(Exact(baseline.UniqueVertices(),bound.UniqueVertices()),
+              "pre-acquisition zero weight preserves a fading guard's exact ordinary pose");
+        Check(!bound.PrepareUtilityCandidatePose(tail,{PlayerUtilityClip::Use,.4f,.5f},203,
+                PlayerCpuSkinCadence::Hz30,updated,error) && !bound.SolvedPose().IsValid(),
+              "nonzero utility still rejects a conflicting guard tail before cadence reuse");
+    }
+    {
         UtilityHandReturn hand;std::optional<PlayerUtilitySample> sample;bool held=false;
         Check(hand.Begin() && hand.SynchronizeUsing(.4) && hand.Cancel(),"native mapping uses a real cancelled hand owner");
         for(int tick=0;tick<12;++tick) {

@@ -23,8 +23,15 @@ the ordinary pose bytes/pole; weight1 retains the source target. Intermediate
 weights use the existing solver. Crouch/dodge pelvis translations are applied to
 the authored target, elbow and shoulder consistently with native pose evaluation;
 the independent left solve, hips and non-right geometry remain the ordinary base.
-Conflicting attacks/guard and invalid stance/clock/weight still reject before
+Nonzero utility weight with conflicting attacks/guard, and invalid stance/clock/weight, reject before
 cadence reuse. The accepted normal block–attack–block route is unchanged.
+
+A subsequent source review found that guard release keeps an Idle action with a
+0.12s visual tail. Before acquisition, utility weight is0 and must preserve that
+ordinary pose rather than reject it. The bounded correction keeps the exact
+ordinary vertices at weight0 while still rejecting a nonzero utility overlap.
+The affected native gate passes Debug3.48s and Release1.33s. This is not a new
+combat timing, a guard cancellation or an observed physical-phone defect.
 
 The scene consumes that sample through its one existing solved palette/skin
 pass. Carried placement is final world RightGrip times inverse native flask Grip

@@ -899,8 +899,8 @@ bool PlayerRenderSlot::PrepareBoundPose(
              animation.locomotionClip != PlayerLocomotionClip::Walk) ||
             !std::isfinite(animation.locomotionBlend) || animation.locomotionBlend < 0.f ||
             animation.locomotionBlend > 1.f ||
-            animation.combatLayer.action != PlayerUpperBodyAction::None ||
-            animation.combatLayer.weight != 0.f || animation.combatLayer.guardPoseWeight != 0.f)
+            (utility->weight > 0.f && (animation.combatLayer.action != PlayerUpperBodyAction::None ||
+             animation.combatLayer.weight != 0.f || animation.combatLayer.guardPoseWeight != 0.f)))
         {
             diagnostic = "Utility candidate requires explicit bindings, a finite sample and unoccupied Idle/Walk pose.";
             return rejectUtility();
