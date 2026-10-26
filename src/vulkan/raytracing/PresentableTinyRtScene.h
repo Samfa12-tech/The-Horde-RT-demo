@@ -71,6 +71,7 @@
 
 namespace horde::graphics { class GraphicsPreviewSession; class EntryMenuSession; }
 namespace horde::gameplay::simulation { class GameSimulation; }
+namespace horde::scene { struct DetailBox; }
 
 namespace horde::vulkan::raytracing
 {
@@ -382,6 +383,32 @@ public:
     std::shared_ptr<const horde::gameplay::simulation::TriangleSupportSurface> ChapterTerrainSurface() const { return chapterTerrainSurface_; }
     bool IsReady() const { return ready_; }
 #if defined(_DEBUG)
+    struct ForestDetailClosureObservation {
+        bool ready = false;
+        bool fullSourceAvailable = false;
+        bool completeContributors = false;
+        bool transmissionOwnersWithin = false;
+        bool faceCoverageVerified = false;
+        bool receiverEnvelopeBlocked = false;
+        bool regionalWaterEnabled = false;
+        bool regionalWaterCheckPerformed = false;
+        bool regionalWaterSeparated = false;
+        bool lanternTransportBounded = false;
+        std::size_t regionalWaterFaceCount = 0;
+        std::uint64_t sourceGeneration = 0;
+    };
+    // Read-only static closure observation, not admission or a current-frame
+    // camera/light proof. The caller must retain those distinct live guards.
+    ForestDetailClosureObservation DebugForestDetailClosure(
+        const horde::scene::DetailBox& measuredSelectionBounds) const;
+    // Explicit hidden-capture candidate only. Caller must first match an
+    // independently frozen content fingerprint; this method independently
+    // reselects the exact source IDs/bounds and retains every native closure
+    // and ordinary per-frame/lease guard. No GPU mutation or default admission.
+    bool DebugAdmitOrdinaryForestCandidate(std::uint64_t expectedGeneration,
+        const std::shared_ptr<const RtStaticMeshSlot>& expectedSource,
+        std::span<const std::uint32_t> expectedIds, std::uint64_t expectedCount,
+        const horde::scene::DetailBox& expectedBounds, std::string& diagnostic);
     // Inspection only: the pinned complete CPU source, never the mutable active
     // GPU candidate. No mutable aliases or ownership operations cross this seam.
     std::shared_ptr<const RtStaticMeshSlot> DebugCachedCompleteStaticWorldSource() const noexcept {

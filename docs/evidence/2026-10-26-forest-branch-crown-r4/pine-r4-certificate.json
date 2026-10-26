@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "candidateName": "pine-branch-r4",
+  "scope": "independently reviewed MSVC Debug native static-source candidate; not normal gameplay admission or current-frame proof",
+  "sourceCaptureJsonSha256": "3efcd347476e29181ad17a62471963521ec5e70dc39ada66322a359835ea78b9",
+  "inputFingerprint": "96247d7f072d460d0b80559ab82cfcf38333f9ae95e3b23f5765fabc336be903",
+  "selectedCount": 83553,
+  "selectedIdsSha256": "d181586495bae9b6070b1716fbcd3fc5501b889ceb5223b7d88a04ef32a536df",
+  "bounds": {
+    "minimum": [
+      -23.172739028930664,
+      -1.1625369787216187,
+      24.000186920166016
+    ],
+    "maximum": [
+      19.97237205505371,
+      10.642754554748535,
+      44.17018127441406
+    ],
+    "float64HexMinThenMax": [
+      "c0372c38a0000000",
+      "bff299c060000000",
+      "4038000c40000000",
+      "4033f8ed60000000",
+      "4025491720000000",
+      "404615c880000000"
+    ]
+  },
+  "ownerSha256": "55bd7e66a2bed083c509fc26831999662aae2c89421de3ddfc22102a19f23e5d",
+  "payloadSha256": "ff6d5bbd2de19c72a53ea7ad6aea090a3304d2449f8ba85695ea7b82c6104068",
+  "staticClosure": {
+    "legacyCount": {
+      "status": "measured",
+      "expected": 84219,
+      "matches": false
+    },
+    "targetBehindCoveredFaces": {
+      "status": "evaluated",
+      "value": true
+    },
+    "receiverEnvelopeBlocked": {
+      "status": "evaluated",
+      "value": true
+    },
+    "transmissionOwnerRoster": {
+      "status": "evaluated",
+      "value": true
+    },
+    "actualSceneClosureObservation": {
+      "status": "observed",
+      "sourceGeneration": 1,
+      "fullSourceAvailable": true,
+      "completeContributors": true,
+      "receiverEnvelopeBlocked": true,
+      "transmissionOwnersWithin": true
+    },
+    "actualRetainedOpaqueFaces": {
+      "status": "evaluated",
+      "value": true
+    },
+    "actualRegionalWaterClosure": {
+      "status": "evaluated",
+      "enabled": true,
+      "performed": true,
+      "actualFaceCount": 42,
+      "value": true
+    },
+    "actualLanternTransportBounds": {
+      "status": "evaluated",
+      "value": true
+    },
+    "currentFrameEligibility": {
+      "status": "not-evaluated",
+      "value": null,
+      "reason": "export is not ordinary lease scheduling, current-frame TLAS or source-prism validation"
+    }
+  },
+  "sourceHead": "e039005518d176b028eae7b2a46478c2c2724c88",
+  "geometryReceiptSha256": "113fdd15a9152d27ec88b32491332498e3096b772ef051a96210f0880ebbc63f",
+  "inspectorExecutableSha256": "aeba4f24b329b77d510043b7bfb823e6e2c24c42ba8121c63889fe10a5794e94"
+}

@@ -108,8 +108,11 @@
 #include "platform/windows/WindowsGraphicsPreviewCapture.h"
 #include "platform/windows/WindowsPreviewMeshPairCapture.h"
 #include "platform/windows/WindowsForestRouteProofLaunch.h"
+#include "platform/windows/WindowsForestContentCandidate.h"
 #if defined(_DEBUG)
 #include "scene/ForestDressing.h"
+#include "scene/CorridorStaticDetail.h"
+#include "scene/CorridorRegionalWaterClosure.h"
 #endif
 #include "platform/windows/WindowsOutputResizeLaunch.h"
 #include "platform/windows/WindowsMotionEvidenceLaunch.h"
@@ -368,6 +371,8 @@ struct CaptureLaunchOptions
     bool validateStaticTriangleCutover = false;
     std::vector<std::uint32_t> staticTriangleOmissions;
     std::string inspectStaticWorldMaterial;
+    std::string forestContentCandidate;
+    bool validateForestContentCandidate = false;
     bool validateChapterRoundTrip = false;
     bool chapterLandingOnly = false;
     bool captureGpuStages = false;
@@ -834,6 +839,9 @@ struct VulkanSurfaceContext
 };
 
 bool WriteReportFile(const std::filesystem::path& path, const std::string& data);
+#if defined(_DEBUG)
+bool MaybeAdmitForestContentCandidate(VulkanSurfaceContext& context, std::string& error);
+#endif
 bool SaveGraphicsRecord(const VulkanSurfaceContext& context,
                         const horde::graphics::GraphicsPersistenceRecord& record);
 bool ObserveWindowsBenchmarkProfileMeasurement(VulkanSurfaceContext& context, bool requireCompleted);
@@ -1047,6 +1055,30 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
+        if(argument==L"--forest-content-candidate") {
+#if defined(_DEBUG)
+            if(!options.forestContentCandidate.empty() || index+1>=argumentCount) {
+                options.error="Forest content candidate requires one frozen name, once.";break;
+            }
+            const auto name=std::filesystem::path(arguments[++index]).u8string();
+            options.forestContentCandidate.assign(name.begin(),name.end());
+            if(!horde::platform::windows::IsKnownForestContentCandidate(options.forestContentCandidate)) {
+                options.error="Unknown frozen forest content candidate.";break;
+            }
+#else
+            options.error="Forest content candidates are Debug-only.";break;
+#endif
+            continue;
+        }
+        if(argument==L"--validate-forest-content-candidate") {
+#if defined(_DEBUG)
+            if(options.validateForestContentCandidate) {options.error="Duplicate forest content validation.";break;}
+            options.validateForestContentCandidate=true;
+#else
+            options.error="Forest content validation is Debug-only.";break;
+#endif
+            continue;
+        }
         if(argument==L"--inspect-static-world-source") {
 #if defined(_DEBUG)
             if(!options.inspectStaticWorldMaterial.empty() || index+1>=argumentCount ||
@@ -1147,6 +1179,18 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
            !horde::gameplay::DevelopmentCheckpointRequiresAuthoredChapter(*checkpoint) ||
            options.validateChapterRoundTrip)
             options.error="--inspect-static-world-source requires one hidden Debug authored-chapter showcase capture.";
+    }
+    if(options.error.empty() && (!options.forestContentCandidate.empty() || options.validateForestContentCandidate)) {
+        const auto* checkpoint=horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
+        if(options.forestContentCandidate.empty() || !options.requested || !options.captureHidden || !checkpoint ||
+           !horde::gameplay::DevelopmentCheckpointRequiresAuthoredChapter(*checkpoint) ||
+           options.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled ||
+           options.environmentSurvey.requested || options.graphicsPreview || options.outputResizeValidation ||
+           !options.nativeMotionScenario.empty() || options.benchmark.requested || options.validateStaticZoneCutover ||
+           !options.inspectStaticWorldMaterial.empty() || options.chapterLandingOnly ||
+           (options.validateForestContentCandidate && (options.developmentCheckpoint!="chapter-forest-retention-west" ||
+               options.validateChapterRoundTrip)))
+            options.error="Frozen forest content requires an isolated hidden authored-chapter capture; preflight starts at retention-west.";
     }
     if(options.error.empty() && options.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled) {
         const auto* checkpoint=horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
@@ -6342,6 +6386,10 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         return false;
     }
 #if defined(_DEBUG)
+    if(!MaybeAdmitForestContentCandidate(ctx,diagnostic)) {
+        ctx.lastRtFrameError=diagnostic;
+        return false;
+    }
     if(!ctx.developmentCheckpoint.empty())
         std::cerr << "HORDE_CHAPTER_INITIALISE scene-ready checkpoint=" << ctx.developmentCheckpoint << std::endl;
 #endif
@@ -7982,6 +8030,30 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
 #if defined(_DEBUG)
 #include "platform/windows/WindowsStaticGeometrySourceInspection.inl"
 #include "platform/windows/WindowsStaticGeometryComparison.inl"
+bool MaybeAdmitForestContentCandidate(VulkanSurfaceContext& context,std::string& error)
+{
+    const auto options=ParseCaptureLaunchOptions();
+    if(options.forestContentCandidate.empty())return true;
+    StaticWorldForestMeasurement measured;
+    if(!MeasureStaticWorldForestSource(context,measured,error))return false;
+    std::array<std::uint64_t,6> bits{};
+    for(unsigned i=0;i<3;++i) {
+        static_assert(sizeof(bits[i])==sizeof(measured.bounds.min[i]));
+        std::memcpy(&bits[i],&measured.bounds.min[i],sizeof(bits[i]));
+        std::memcpy(&bits[3+i],&measured.bounds.max[i],sizeof(bits[i]));
+    }
+    if(!horde::platform::windows::MatchesFrozenForestContentCandidate(options.forestContentCandidate,
+           measured.inputFingerprint,measured.count,bits,measured.structurallyValid)) {
+        error="Forest candidate does not match independently frozen source identity/count/bounds: "+measured.inputFingerprint;
+        return false;
+    }
+    if(!context.rtScene.DebugAdmitOrdinaryForestCandidate(measured.generation,measured.source,
+           measured.ids,measured.count,measured.bounds,error))return false;
+    std::cerr<<"HORDE_FOREST_CONTENT_ADMITTED name="<<options.forestContentCandidate
+             <<" fingerprint="<<measured.inputFingerprint<<" triangles="<<measured.count<<'\n';
+    return true;
+}
+#include "platform/windows/WindowsForestContentCapture.inl"
 bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
     const std::filesystem::path& directory, const VkClearColorValue& clear, std::string& error,
     bool triangleSubset = false, std::span<const std::uint32_t> omittedTriangles = {})
@@ -9501,6 +9573,14 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 :
 #endif
                 RunShowcaseCapture(context, capabilities, *captureDirectory);
+#if defined(_DEBUG)
+        if(captureResult==0 && ParseCaptureLaunchOptions().validateForestContentCandidate) {
+            std::string forestError;
+            if(!RunForestContentPreflight(context,*captureDirectory,forestError)) {
+                std::cerr<<"Forest content preflight failed: "<<forestError<<'\n';captureResult=1;
+            }
+        }
+#endif
         if(captureResult==0 && (ParseCaptureLaunchOptions().validateChapterRoundTrip || ParseCaptureLaunchOptions().chapterLandingOnly)) {
             std::string journeyError;
             if(!RunChapterRoundTripCapture(context,*captureDirectory,journeyError,ParseCaptureLaunchOptions().chapterLandingOnly)) {

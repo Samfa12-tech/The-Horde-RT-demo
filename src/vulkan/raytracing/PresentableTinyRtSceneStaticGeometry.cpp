@@ -42,6 +42,114 @@ bool LanternTransportBoundsAdmitted(const horde::scene::assets::StaticMeshAsset&
 }
 }
 
+#if defined(_DEBUG)
+PresentableTinyRtScene::ForestDetailClosureObservation
+PresentableTinyRtScene::DebugForestDetailClosure(const horde::scene::DetailBox& bounds) const
+{
+    ForestDetailClosureObservation result;
+    result.ready=ready_ && developmentRescueJourney_ && sceneProfile_==RtSceneProfile::Showcase;
+    result.sourceGeneration=staticGeometryGeneration_;
+    if(!result.ready)return result;
+    result.fullSourceAvailable=static_cast<bool>(fullStaticGeometrySource_);
+    result.completeContributors=StaticGeometryHasCompleteContributors();
+    constexpr std::array<std::uint32_t,2> allowedTransmission{{8u,kWaterDropletMetadataIndex}};
+    result.transmissionOwnersWithin=fullStaticGeometrySource_ &&
+        fullStaticGeometrySource_->TransmissionOwnersWithin(allowedTransmission);
+    result.faceCoverageVerified=ordinaryStaticFacesVerified_;
+    result.receiverEnvelopeBlocked=horde::scene::DetailForestReceiverEnvelopeBlocked(bounds);
+    result.regionalWaterEnabled=regionalWaterDiagnosticEnabled_;
+    result.regionalWaterFaceCount=regionalWaterFaces_.size();
+    result.regionalWaterCheckPerformed=regionalWaterDiagnosticEnabled_;
+    result.regionalWaterSeparated=regionalWaterDiagnosticEnabled_ &&
+        horde::scene::DetailRegionalWaterQueriesSeparated(bounds,regionalWaterFaces_);
+    result.lanternTransportBounded=LanternTransportBoundsAdmitted(rewardLanternRingAsset_,rewardLanternBodyAsset_);
+    return result;
+}
+
+bool PresentableTinyRtScene::DebugAdmitOrdinaryForestCandidate(std::uint64_t expectedGeneration,
+    const std::shared_ptr<const RtStaticMeshSlot>& expectedSource,
+    std::span<const std::uint32_t> expectedIds,std::uint64_t expectedCount,
+    const horde::scene::DetailBox& expectedBounds,std::string& diagnostic)
+{
+    const auto reject=[&](const char* reason){diagnostic=reason;return false;};
+    if(!ready_ || !developmentRescueJourney_ || sceneProfile_!=RtSceneProfile::Showcase ||
+       UsesSharedForestGeometry() || forestRouteProofMode_!=ForestRouteProofMode::Disabled ||
+       !expectedGeneration || expectedGeneration!=staticGeometryGeneration_ ||
+       !expectedSource || expectedSource!=fullStaticGeometrySource_ ||
+       !StaticGeometryHasCompleteContributors() || ordinaryStaticReduced_ || ordinaryStaticCandidate_ ||
+       preparedStaticGeometry_ || staticGeometryCompletionUnproved_)
+        return reject("Forest content candidate requires this ready complete source before any GPU transaction.");
+    if(!expectedCount || expectedCount!=expectedIds.size())
+        return reject("Forest content candidate has no exact frozen selection count.");
+    const auto& source=*fullStaticGeometrySource_;
+    const auto& owner=source.InstanceMetadata()[kCollapseInstanceIndex];
+    if(owner.primitiveCount!=collapseStaticAsset_.primitives.size() ||
+       owner.primitiveBase>source.PrimitiveMetadata().size() ||
+       owner.primitiveCount>source.PrimitiveMetadata().size()-owner.primitiveBase ||
+       source.TriangleRegions().size()!=source.Indices().size()/3u)
+        return reject("Forest content candidate source ownership differs.");
+    constexpr std::array<std::string_view,4> families{{"ForestBark","ForestPine","ForestMoss","ForestAlder"}};
+    std::array<unsigned,4> seen{};
+    constexpr std::array<float,12> identity{{1,0,0,0,0,1,0,0,0,0,1,0}};
+    std::vector<std::uint32_t> ids;
+    horde::scene::DetailBox bounds{{INFINITY,INFINITY,INFINITY},{-INFINITY,-INFINITY,-INFINITY}};
+    for(unsigned p=0;p<owner.primitiveCount;++p) {
+        const auto& local=collapseStaticAsset_.primitives[p];
+        if(local.materialIndex>=collapseStaticAsset_.materials.size())return reject("Forest candidate material is invalid.");
+        const auto name=collapseStaticAsset_.materials[local.materialIndex].name;
+        const auto family=std::find(families.begin(),families.end(),name);
+        if(family==families.end())continue;
+        if(++seen[static_cast<std::size_t>(family-families.begin())]!=1u)
+            return reject("Forest candidate families are ambiguous.");
+        const auto row=owner.primitiveBase+p;
+        if(row>=source.GeometryTransforms().size() || source.GeometryTransforms()[row]!=identity)
+            return reject("Forest candidate requires exact world-space geometry transforms.");
+        const auto& primitive=source.PrimitiveMetadata()[row];
+        if(primitive.indexOffset>source.Indices().size() || primitive.indexCount%3u ||
+           primitive.indexCount>source.Indices().size()-primitive.indexOffset)
+            return reject("Forest candidate primitive span is invalid.");
+        std::size_t selectedInPrimitive=0;
+        for(std::size_t i=primitive.indexOffset;i<primitive.indexOffset+primitive.indexCount;i+=3u) {
+            bool selected=true;
+            for(unsigned k=0;k<3u;++k) {
+                const auto index=std::uint64_t(primitive.vertexOffset)+source.Indices()[i+k];
+                if(index>=source.Vertices().size())return reject("Forest candidate vertex is out of range.");
+                const auto& v=source.Vertices()[static_cast<std::size_t>(index)].position;
+                for(unsigned axis=0;axis<3;++axis)if(!std::isfinite(v[axis]))return reject("Forest candidate vertex is nonfinite.");
+                selected &= v[2]>24.f;
+            }
+            if(!selected)continue;
+            if(source.TriangleRegions()[i/3u]!=horde::scene::assets::StaticTriangleRegion::ExteriorDressing)
+                return reject("Forest candidate selected a non-exterior contributor.");
+            ids.push_back(static_cast<std::uint32_t>(i/3u));++selectedInPrimitive;
+            for(unsigned k=0;k<3u;++k)for(unsigned axis=0;axis<3u;++axis) {
+                const double v=source.Vertices()[primitive.vertexOffset+source.Indices()[i+k]].position[axis];
+                bounds.min[axis]=std::min(bounds.min[axis],v);bounds.max[axis]=std::max(bounds.max[axis],v);
+            }
+        }
+        if(selectedInPrimitive*3u==primitive.indexCount)
+            return reject("Forest candidate would empty a required primitive.");
+    }
+    if(std::any_of(seen.begin(),seen.end(),[](unsigned n){return n!=1u;}))
+        return reject("Forest candidate is missing a canonical family.");
+    std::sort(ids.begin(),ids.end());
+    if(ids.size()!=expectedCount || std::adjacent_find(ids.begin(),ids.end())!=ids.end() ||
+       !std::equal(ids.begin(),ids.end(),expectedIds.begin(),expectedIds.end()) ||
+       bounds.min!=expectedBounds.min || bounds.max!=expectedBounds.max)
+        return reject("Forest candidate differs from the independently frozen IDs/count/bounds.");
+    const auto closure=DebugForestDetailClosure(bounds);
+    if(!closure.ready || !closure.fullSourceAvailable || !closure.completeContributors ||
+       !closure.transmissionOwnersWithin || !closure.faceCoverageVerified || !closure.receiverEnvelopeBlocked ||
+       (closure.regionalWaterEnabled && (!closure.regionalWaterCheckPerformed || !closure.regionalWaterSeparated)) ||
+       !closure.lanternTransportBounded || closure.sourceGeneration!=expectedGeneration)
+        return reject("Forest candidate failed an actual native closure predicate.");
+    auto candidate=RtStaticTriangleOmissions::Create(fullStaticGeometrySource_,kCollapseInstanceIndex,ids,diagnostic);
+    if(!candidate)return false;
+    ordinaryStaticOmissions_=std::move(candidate);
+    diagnostic.clear();return true;
+}
+#endif
+
 void PresentableTinyRtScene::AdmitOrdinaryStaticDetail()
 {
     ordinaryStaticOmissions_.reset();

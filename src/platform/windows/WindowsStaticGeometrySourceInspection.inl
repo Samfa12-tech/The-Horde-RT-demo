@@ -33,8 +33,38 @@ bool WriteStaticWorldInspectionFile(const std::filesystem::path& file,
     return true;
 }
 
-bool InspectStaticWorldSource(const VulkanSurfaceContext& context,const std::filesystem::path& directory,
-    const std::string& selectedMaterial,std::string& error)
+// Canonical export fingerprints contain named payload hashes and explicit
+// little-endian lengths, never pointer values, std::string storage or padding
+// from an inspection-only record. The underlying spans are native GPU records.
+void StaticWorldAppendU64(std::vector<std::byte>& bytes,std::uint64_t value)
+{
+    for(unsigned shift=0;shift<64u;shift+=8u)bytes.push_back(static_cast<std::byte>((value>>shift)&0xffu));
+}
+void StaticWorldAppendText(std::vector<std::byte>& bytes,std::string_view text)
+{
+    StaticWorldAppendU64(bytes,text.size());
+    for(const unsigned char value:text)bytes.push_back(static_cast<std::byte>(value));
+}
+std::string StaticWorldHexU64(std::uint64_t value)
+{
+    std::ostringstream text;text<<std::hex<<std::setfill('0')<<std::setw(16)<<value;return text.str();
+}
+
+// A pinned measurement only, never an omission/admission certificate. A true
+// structurallyValid reports the exact export fingerprint prerequisites; scene
+// closure and current-frame eligibility remain separate engine-owned gates.
+struct StaticWorldForestMeasurement {
+    std::shared_ptr<const horde::vulkan::raytracing::RtStaticMeshSlot> source;
+    std::uint64_t generation=0u;
+    std::vector<std::uint32_t> ids;
+    horde::scene::DetailBox bounds{};
+    std::uint64_t count=0u;
+    std::string inputFingerprint;
+    bool structurallyValid=false;
+};
+
+bool InspectStaticWorldSourceImpl(const VulkanSurfaceContext& context,const std::filesystem::path& directory,
+    const std::string& selectedMaterial,std::string& error,StaticWorldForestMeasurement* measurement)
 {
     using namespace horde::vulkan::raytracing;
     using Vertex=horde::scene::assets::StaticRtVertex;
@@ -43,23 +73,28 @@ bool InspectStaticWorldSource(const VulkanSurfaceContext& context,const std::fil
     const auto reject=[&](const char* reason){error=reason;return false;};
     const auto& launch=ParseCaptureLaunchOptions();
     const auto source=context.rtScene.DebugCachedCompleteStaticWorldSource();
+    const auto inspectedGeneration=context.rtScene.StaticGeometryGeneration();
     const auto* asset=context.rtScene.DebugCollapseStaticAsset();
     if(!launch.captureHidden || launch.developmentCheckpoint.empty() || !context.useRtPath || !source || !asset ||
        selectedMaterial.empty() || selectedMaterial.size()>128u || !context.rtScene.StaticGeometryHasCompleteContributors())
         return reject("Static inspection requires the hidden ready chapter's complete cached source.");
-    std::error_code pathError;
+    const bool writeOutput=measurement==nullptr;
+    std::filesystem::path output;
+    if(writeOutput) {
+        std::error_code pathError;
 #if defined(HORDE_RT_SOURCE_DIR)
-    const auto reports=std::filesystem::weakly_canonical(std::filesystem::path(HORDE_RT_SOURCE_DIR)/"reports",pathError);
+        const auto reports=std::filesystem::weakly_canonical(std::filesystem::path(HORDE_RT_SOURCE_DIR)/"reports",pathError);
 #else
-    return reject("Static inspection requires a bound source checkout for ignored output.");
-    const std::filesystem::path reports;
+        return reject("Static inspection requires a bound source checkout for ignored output.");
+        const std::filesystem::path reports;
 #endif
-    if(pathError)return reject("Static inspection could not resolve the ignored reports root.");
-    const auto output=std::filesystem::weakly_canonical(directory,pathError);
-    if(pathError)return reject("Static inspection could not resolve its output directory.");
-    const auto relative=output.lexically_relative(reports);
-    if(relative.empty() || relative.is_absolute() || output==reports || *relative.begin()=="..")
-        return reject("Static inspection output must be a child of this workspace's reports directory.");
+        if(pathError)return reject("Static inspection could not resolve the ignored reports root.");
+        output=std::filesystem::weakly_canonical(directory,pathError);
+        if(pathError)return reject("Static inspection could not resolve its output directory.");
+        const auto relative=output.lexically_relative(reports);
+        if(relative.empty() || relative.is_absolute() || output==reports || *relative.begin()=="..")
+            return reject("Static inspection output must be a child of this workspace's reports directory.");
+    }
     constexpr auto ownerIndex=PresentableTinyRtScene::kCollapseInstanceIndex;
     const auto& owner=source->InstanceMetadata()[ownerIndex];
     const auto& primitives=source->PrimitiveMetadata();const auto& vertexCounts=source->PrimitiveVertexCounts();
@@ -119,6 +154,138 @@ bool InspectStaticWorldSource(const VulkanSurfaceContext& context,const std::fil
     }
     if(consumed!=asset->indices.size() || selectedCount!=1u)
         return reject("Static inspection requires one uniquely named material primitive and fully owned indices.");
+
+    // This is measurement only. A later, independently reviewed descriptor may
+    // pin these values; exporting the current source never blesses it for use.
+    struct SourcePayloadHash { const char* name;std::size_t bytes;std::string sha;bool available; };
+    std::vector<SourcePayloadHash> sourceHashes;
+    bool sourceHashesAvailable=true;
+    std::vector<std::byte> sourceFingerprint;
+    StaticWorldAppendText(sourceFingerprint,"horde-cached-static-payloads-v1");
+    const auto hashSource=[&](const char* name,std::span<const std::byte> bytes) {
+        SourcePayloadHash row{name,bytes.size(),{},bytes.size()<=128u*1024u*1024u};
+        if(row.available && !StaticWorldSpanSha256(bytes,row.sha,error))return false;
+        sourceHashesAvailable&=row.available;
+        StaticWorldAppendText(sourceFingerprint,name);StaticWorldAppendU64(sourceFingerprint,bytes.size());
+        StaticWorldAppendText(sourceFingerprint,row.sha);sourceHashes.push_back(std::move(row));return true;
+    };
+    if(!hashSource("staticVertices",std::as_bytes(std::span{source->Vertices()})) ||
+       !hashSource("worldBodyVertices",std::as_bytes(std::span{source->Vertices(RtGeometryRole::PlayerWorldBody)})) ||
+       !hashSource("viewmodelVertices",std::as_bytes(std::span{source->Vertices(RtGeometryRole::PlayerViewmodel)})) ||
+       !hashSource("indices",std::as_bytes(std::span{source->Indices()})) ||
+       !hashSource("triangleRegions",std::as_bytes(std::span{source->TriangleRegions()})) ||
+       !hashSource("instanceMetadata",std::as_bytes(std::span{source->InstanceMetadata()})) ||
+       !hashSource("primitiveMetadata",std::as_bytes(std::span{source->PrimitiveMetadata()})) ||
+       !hashSource("primitiveVertexCounts",std::as_bytes(std::span{source->PrimitiveVertexCounts()})) ||
+       !hashSource("geometryTransforms",std::as_bytes(std::span{source->GeometryTransforms()})) ||
+       !hashSource("materials",std::as_bytes(std::span{source->Materials()})))return false;
+    std::string sourceSha,ownerSha;
+    if(sourceHashesAvailable && !StaticWorldSpanSha256(sourceFingerprint,sourceSha,error))return false;
+    std::vector<std::byte> ownerFingerprint;
+    StaticWorldAppendText(ownerFingerprint,"horde-complete-static-owner-v1");
+    for(const auto value:{ownerIndex,owner.stableObjectId,owner.primitiveBase,owner.primitiveCount,
+                          owner.assetIndex,owner.flags,owner.geometryRole})StaticWorldAppendU64(ownerFingerprint,value);
+    for(const auto& row:rows) {
+        StaticWorldAppendText(ownerFingerprint,row.material);
+        for(const auto value:{row.packedRow,row.vertexOffset,row.vertexCount,row.indexOffset,row.indexCount,
+                              row.assetVertexOffset,row.assetIndexOffset,row.materialRow,row.assetMaterialRow})
+            StaticWorldAppendU64(ownerFingerprint,value);
+        StaticWorldAppendText(ownerFingerprint,row.vertexSha);StaticWorldAppendText(ownerFingerprint,row.indexSha);
+        StaticWorldAppendText(ownerFingerprint,row.regionSha);
+    }
+    if(!StaticWorldSpanSha256(ownerFingerprint,ownerSha,error))return false;
+
+    constexpr std::array<std::string_view,4> forestNames{{"ForestBark","ForestPine","ForestMoss","ForestAlder"}};
+    std::array<unsigned,4> forestRowCounts{};
+    std::vector<std::uint32_t> forestIds;
+    std::array<double,3> forestMinimum{{INFINITY,INFINITY,INFINITY}},forestMaximum{{-INFINITY,-INFINITY,-INFINITY}};
+    bool forestFinite=true,forestExterior=true,forestTransformsIdentity=true,forestWouldEmptyPrimitive=false;
+    constexpr std::array<float,12> identity{{1,0,0,0,0,1,0,0,0,0,1,0}};
+    for(const auto& row:rows) {
+        const auto family=std::find(forestNames.begin(),forestNames.end(),row.material);
+        if(family==forestNames.end())continue;
+        ++forestRowCounts[static_cast<std::size_t>(family-forestNames.begin())];
+        forestTransformsIdentity &= row.packedRow<source->GeometryTransforms().size() &&
+            source->GeometryTransforms()[row.packedRow]==identity;
+        std::size_t removed=0;
+        for(std::size_t local=0;local<row.indexCount;local+=3u) {
+            bool selectedTriangle=true;
+            for(unsigned corner=0;corner<3u;++corner) {
+                const auto& point=vertices[row.vertexOffset+indices[row.indexOffset+local+corner]].position;
+                for(unsigned axis=0;axis<3u;++axis)forestFinite &= std::isfinite(point[axis]);
+                selectedTriangle &= std::isfinite(point[2]) && point[2]>24.f;
+            }
+            if(!selectedTriangle)continue;
+            const auto triangle=static_cast<std::uint32_t>((row.indexOffset+local)/3u);
+            forestIds.push_back(triangle);++removed;
+            forestExterior &= regions[triangle]==Region::ExteriorDressing;
+            for(unsigned corner=0;corner<3u;++corner) {
+                const auto& point=vertices[row.vertexOffset+indices[row.indexOffset+local+corner]].position;
+                for(unsigned axis=0;axis<3u;++axis) {
+                    forestMinimum[axis]=std::min(forestMinimum[axis],double(point[axis]));
+                    forestMaximum[axis]=std::max(forestMaximum[axis],double(point[axis]));
+                }
+            }
+        }
+        forestWouldEmptyPrimitive |= removed==row.indexCount/3u;
+    }
+    const bool forestFamiliesComplete=std::all_of(forestRowCounts.begin(),forestRowCounts.end(),[](unsigned n){return n==1u;});
+    const bool forestStrictlyOrdered=std::adjacent_find(forestIds.begin(),forestIds.end(),
+        [](std::uint32_t a,std::uint32_t b){return a>=b;})==forestIds.end();
+    const bool forestBoundsAvailable=forestFamiliesComplete && forestFinite && !forestIds.empty() && forestTransformsIdentity;
+    bool receiverEnvelope=false,targetBehindFaces=false;
+    if(forestBoundsAvailable) {
+        const horde::scene::DetailBox box{forestMinimum,forestMaximum};
+        targetBehindFaces=horde::scene::DetailTargetBehindCoveredFaces(box);
+        receiverEnvelope=horde::scene::DetailForestReceiverEnvelopeBlocked(box);
+    }
+    PresentableTinyRtScene::ForestDetailClosureObservation actualClosure{};
+    if(forestBoundsAvailable)
+        actualClosure=context.rtScene.DebugForestDetailClosure({forestMinimum,forestMaximum});
+    const bool actualClosureAvailable=forestBoundsAvailable && actualClosure.ready &&
+        actualClosure.sourceGeneration==inspectedGeneration;
+    std::vector<std::byte> forestIdBytes;
+    if(forestFamiliesComplete)for(const auto id:forestIds)
+        for(unsigned shift=0;shift<32u;shift+=8u)forestIdBytes.push_back(static_cast<std::byte>((id>>shift)&0xffu));
+    std::string forestIdsSha,forestExportSha;
+    constexpr const char* forestIdFilename="static-world-ordinary-forest.triangles.u32le.bin";
+    if(forestFamiliesComplete) {
+        if(!StaticWorldSpanSha256(forestIdBytes,forestIdsSha,error))return false;
+        if(writeOutput) {
+            if(!WriteStaticWorldInspectionFile(output/forestIdFilename,forestIdBytes,error))return false;
+            std::string writtenSha;
+            if(!Sha256File(output/forestIdFilename,writtenSha,error))return false;
+            if(writtenSha!=forestIdsSha)return reject("Forest selection export differs from its measured ID bytes.");
+        }
+    }
+    std::array<std::uint64_t,6> forestBoundsBits{};
+    if(forestBoundsAvailable)for(unsigned axis=0;axis<3u;++axis) {
+        static_assert(sizeof(double)==sizeof(std::uint64_t));
+        std::memcpy(&forestBoundsBits[axis],&forestMinimum[axis],sizeof(double));
+        std::memcpy(&forestBoundsBits[axis+3u],&forestMaximum[axis],sizeof(double));
+    }
+    if(sourceHashesAvailable && forestBoundsAvailable && forestStrictlyOrdered && forestExterior && !forestWouldEmptyPrimitive) {
+        std::vector<std::byte> measured;
+        StaticWorldAppendText(measured,"horde-ordinary-forest-export-v1");
+        StaticWorldAppendText(measured,sourceSha);StaticWorldAppendText(measured,ownerSha);
+        StaticWorldAppendText(measured,forestIdsSha);StaticWorldAppendU64(measured,forestIds.size());
+        StaticWorldAppendU64(measured,0x41c00000u); // Exact binary32 +24 source-Z plane.
+        for(const auto bits:forestBoundsBits)StaticWorldAppendU64(measured,bits);
+        if(!StaticWorldSpanSha256(measured,forestExportSha,error))return false;
+    }
+    if(measurement) {
+        if(context.rtScene.StaticGeometryGeneration()!=inspectedGeneration ||
+           context.rtScene.DebugCachedCompleteStaticWorldSource()!=source)
+            return reject("Static inspection source identity changed during measurement.");
+        measurement->source=source;
+        measurement->generation=inspectedGeneration;
+        measurement->count=forestIds.size();
+        measurement->ids=std::move(forestIds);
+        if(forestBoundsAvailable)measurement->bounds={forestMinimum,forestMaximum};
+        measurement->inputFingerprint=std::move(forestExportSha);
+        measurement->structurallyValid=!measurement->inputFingerprint.empty();
+        error.clear();return true;
+    }
     const auto& chosen=rows[selected];
     const auto vertexBytes=std::as_bytes(std::span<const Vertex>{vertices.data()+chosen.vertexOffset,chosen.vertexCount});
     const auto indexBytes=std::as_bytes(std::span<const std::uint32_t>{indices.data()+chosen.indexOffset,chosen.indexCount});
@@ -135,7 +302,7 @@ bool InspectStaticWorldSource(const VulkanSurfaceContext& context,const std::fil
     json<<"{\"schema\":1,\"scope\":\"Debug complete cached CPU world source; not GPU/visibility/LOD acceptance\","
         <<"\"assetRoot\":\""<<JsonEscape(ResolveAssetRoot().generic_string())<<"\","
         <<"\"checkpoint\":\""<<JsonEscape(launch.developmentCheckpoint)<<"\",\"staticGeometryGeneration\":"
-        <<context.rtScene.StaticGeometryGeneration()<<",\"completeContributors\":true,\"owner\":{\"instance\":"<<ownerIndex
+        <<inspectedGeneration<<",\"completeContributors\":true,\"owner\":{\"instance\":"<<ownerIndex
         <<",\"stableObjectId\":"<<owner.stableObjectId<<",\"primitiveBase\":"<<owner.primitiveBase
         <<",\"primitiveCount\":"<<owner.primitiveCount<<",\"assetIndex\":"<<owner.assetIndex
         <<",\"flags\":"<<owner.flags<<",\"geometryRole\":"<<owner.geometryRole<<"},"
@@ -158,9 +325,90 @@ bool InspectStaticWorldSource(const VulkanSurfaceContext& context,const std::fil
         <<",\"indicesArePrimitiveLocal\":true,\"cachedTriangleOffset\":"<<chosen.indexOffset/3u<<",\"files\":[";
     for(std::size_t i=0;i<names.size();++i)json<<(i?",":"")<<"{\"name\":\""<<names[i]
         <<"\",\"bytes\":"<<payloads[i].size()<<",\"sha256\":\""<<fileHashes[i]<<"\"}";
-    json<<"]}}\n";
+    json<<"]},\"cachedSourceIdentity\":{\"schema\":1,\"scope\":\"exact cached CPU payload bytes; no pointer, texture-image or GPU identity claim\","
+        <<"\"pointerIdentitySerialized\":false,\"textureImagePayloadsIncluded\":false,\"staticGeometryGeneration\":"
+        <<inspectedGeneration<<",\"payloadHashesAvailable\":"<<(sourceHashesAvailable?"true":"false")
+        <<",\"payloadSha256\":"<<(sourceHashesAvailable?"\""+sourceSha+"\"":"null")
+        <<",\"completeOwnerSha256\":\""<<ownerSha<<"\",\"fingerprintEncoding\":\"ordered length-prefixed names/hash text and u64le byte lengths; native GPU ABI spans\",\"payloads\":[";
+    for(std::size_t i=0;i<sourceHashes.size();++i) {
+        const auto& row=sourceHashes[i];
+        json<<(i?",":"")<<"{\"name\":\""<<row.name<<"\",\"bytes\":"<<row.bytes
+            <<",\"status\":\""<<(row.available?"measured":"unavailable-over128MiB")<<"\",\"sha256\":"
+            <<(row.available?"\""+row.sha+"\"":"null")<<'}';
+    }
+    json<<"]},\"ordinaryForestOmissionExport\":{\"schema\":1,\"scope\":\"measurement for independent review only; not a visibility certificate\","
+        <<"\"admissionGranted\":false,\"productionGuardChanged\":false,\"selectionRule\":\"all three source vertices strictly sourceZ>24 in four named forest families; world-space only with identity geometry transforms\","
+        <<"\"thresholdFloat32Hex\":\"41c00000\","
+        <<"\"families\":[";
+    for(std::size_t i=0;i<forestNames.size();++i)json<<(i?",":"")<<"{\"name\":\""<<forestNames[i]<<"\",\"matchingPrimitiveRows\":"<<forestRowCounts[i]<<'}';
+    json<<"],\"familiesCompleteAndUnique\":"<<(forestFamiliesComplete?"true":"false")
+        <<",\"measurementStatus\":\""<<(forestFamiliesComplete?"measured":"unavailable-family-roster")<<'"'
+        <<",\"allForestVerticesFinite\":"<<(forestFamiliesComplete?(forestFinite?"true":"false"):"null")
+        <<",\"forestGeometryTransformsIdentity\":"<<(forestFamiliesComplete?(forestTransformsIdentity?"true":"false"):"null")
+        <<",\"selectedCount\":"<<(forestFamiliesComplete?std::to_string(forestIds.size()):"null")
+        <<",\"strictlyIncreasingIds\":"<<(forestFamiliesComplete?(forestStrictlyOrdered?"true":"false"):"null")
+        <<",\"selectedProvenanceExteriorOnly\":"<<(forestFamiliesComplete?(forestExterior?"true":"false"):"null")
+        <<",\"wouldEmptyRequiredPrimitive\":"<<(forestFamiliesComplete?(forestWouldEmptyPrimitive?"true":"false"):"null")
+        <<",\"selectedIdsFile\":"<<(forestFamiliesComplete?"\""+std::string(forestIdFilename)+"\"":"null")
+        <<",\"selectedIdsBytes\":"<<forestIdBytes.size()<<",\"selectedIdsSha256\":"
+        <<(forestFamiliesComplete?"\""+forestIdsSha+"\"":"null")
+        <<",\"bounds\":";
+    if(forestBoundsAvailable) {
+        json<<std::setprecision(17)<<"{\"minimum\":["<<forestMinimum[0]<<','<<forestMinimum[1]<<','<<forestMinimum[2]
+            <<"],\"maximum\":["<<forestMaximum[0]<<','<<forestMaximum[1]<<','<<forestMaximum[2]<<"],\"float64HexMinThenMax\":[";
+        for(unsigned i=0;i<forestBoundsBits.size();++i)json<<(i?",":"")<<'"'<<StaticWorldHexU64(forestBoundsBits[i])<<'"';
+        json<<"]}";
+    }else json<<"null";
+    json<<",\"measuredInputFingerprintSha256\":"<<(forestExportSha.empty()?"null":"\""+forestExportSha+"\"")
+        <<",\"closurePredicates\":{\"legacyCount\":{\"status\":\""<<(forestFamiliesComplete?"measured":"unavailable-family-roster")
+        <<"\",\"expected\":84219,\"matches\":"<<(forestFamiliesComplete?(forestIds.size()==84219?"true":"false"):"null")<<"},"
+        <<"\"targetBehindCoveredFaces\":{\"status\":\""<<(forestBoundsAvailable?"evaluated":"unavailable-invalid-selection-bounds")
+        <<"\",\"value\":"<<(forestBoundsAvailable?(targetBehindFaces?"true":"false"):"null")<<"},"
+        <<"\"receiverEnvelopeBlocked\":{\"status\":\""<<(forestBoundsAvailable?"evaluated":"unavailable-invalid-selection-bounds")
+        <<"\",\"value\":"<<(forestBoundsAvailable?(receiverEnvelope?"true":"false"):"null")<<"},"
+        <<"\"transmissionOwnerRoster\":{\"status\":\"evaluated\",\"value\":"
+        <<(source->TransmissionOwnersWithin(std::array<std::uint32_t,2>{{8u,PresentableTinyRtScene::kWaterDropletMetadataIndex}})?"true":"false")<<"},"
+        <<"\"actualSceneClosureObservation\":{\"status\":\""<<(actualClosureAvailable?"observed":"unavailable")
+        <<"\",\"sourceGeneration\":"<<(actualClosureAvailable?std::to_string(actualClosure.sourceGeneration):"null")
+        <<",\"fullSourceAvailable\":"
+        <<(actualClosureAvailable?(actualClosure.fullSourceAvailable?"true":"false"):"null")
+        <<",\"completeContributors\":"<<(actualClosureAvailable?(actualClosure.completeContributors?"true":"false"):"null")
+        <<",\"receiverEnvelopeBlocked\":"<<(actualClosureAvailable?(actualClosure.receiverEnvelopeBlocked?"true":"false"):"null")
+        <<",\"transmissionOwnersWithin\":"<<(actualClosureAvailable?(actualClosure.transmissionOwnersWithin?"true":"false"):"null")<<"},"
+        <<"\"actualRetainedOpaqueFaces\":{\"status\":\""<<(actualClosureAvailable?"evaluated":"unavailable")
+        <<"\",\"value\":"<<(actualClosureAvailable?(actualClosure.faceCoverageVerified?"true":"false"):"null")<<"},"
+        <<"\"actualRegionalWaterClosure\":{\"status\":\""
+        <<(!actualClosureAvailable?"unavailable":!actualClosure.regionalWaterEnabled?"not-required-disabled":
+           actualClosure.regionalWaterCheckPerformed?"evaluated":"unavailable-not-performed")
+        <<"\",\"enabled\":"<<(actualClosureAvailable?(actualClosure.regionalWaterEnabled?"true":"false"):"null")
+        <<",\"performed\":"<<(actualClosureAvailable?(actualClosure.regionalWaterCheckPerformed?"true":"false"):"null")
+        <<",\"actualFaceCount\":"<<(actualClosureAvailable?std::to_string(actualClosure.regionalWaterFaceCount):"null")<<",\"value\":"
+        <<(actualClosureAvailable && actualClosure.regionalWaterCheckPerformed?(actualClosure.regionalWaterSeparated?"true":"false"):"null")<<"},"
+        <<"\"actualLanternTransportBounds\":{\"status\":\""<<(actualClosureAvailable?"evaluated":"unavailable")
+        <<"\",\"value\":"<<(actualClosureAvailable?(actualClosure.lanternTransportBounded?"true":"false"):"null")<<"},"
+        <<"\"currentFrameEligibility\":{\"status\":\"not-evaluated\",\"value\":null,\"reason\":\"export is not ordinary lease scheduling, current-frame TLAS or source-prism validation\"}}}}\n";
+    if(context.rtScene.StaticGeometryGeneration()!=inspectedGeneration ||
+       context.rtScene.DebugCachedCompleteStaticWorldSource()!=source)
+        return reject("Static inspection source identity changed during export.");
     const auto metadata=json.str();
     if(!WriteStaticWorldInspectionFile(output/"static-world-source.json",
         std::as_bytes(std::span<const char>{metadata.data(),metadata.size()}),error))return false;
     error.clear();return true;
+}
+
+bool InspectStaticWorldSource(const VulkanSurfaceContext& context,const std::filesystem::path& directory,
+    const std::string& selectedMaterial,std::string& error)
+{
+    return InspectStaticWorldSourceImpl(context,directory,selectedMaterial,error,nullptr);
+}
+
+// Runs the same immutable-source validation, selection and hashes as export,
+// without resolving output paths or touching files. On false, no result is
+// published. On true, callers must still check structurallyValid and compare
+// the fingerprint with an independently reviewed descriptor before engine gates.
+bool MeasureStaticWorldForestSource(const VulkanSurfaceContext& context,
+    StaticWorldForestMeasurement& measurement,std::string& error)
+{
+    measurement={};
+    return InspectStaticWorldSourceImpl(context,{},"ForestPine",error,&measurement);
 }

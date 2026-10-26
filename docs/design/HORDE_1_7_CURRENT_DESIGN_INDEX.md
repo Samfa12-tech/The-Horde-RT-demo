@@ -1,5 +1,9 @@
 # Horde 1.7 current design index
 
+26 October [branch-supported pine R4 proof](../evidence/2026-10-26-forest-branch-crown-r4/README.md):
+private geometry-specific ordinary retention/recreation and staged route pass.
+Production unchanged; bare middle distance remains and grouped F01 is next.
+
 Latest26 October [clustered-crown/F01 study](../evidence/2026-10-26-forest-crown-clusters-r3/README.md):
 more silhouette volume, but coarse near art/open middle distance; ordinary
 restoration still fails its unchanged content guard. Production unchanged.

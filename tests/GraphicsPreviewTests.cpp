@@ -3,6 +3,7 @@
 #include "platform/windows/WindowsPreviewMeshPairCapture.h"
 #include "platform/windows/WindowsHiddenCaptureLaunch.h"
 #include "platform/windows/WindowsForestRouteProofLaunch.h"
+#include "platform/windows/WindowsForestContentCandidate.h"
 
 #include <algorithm>
 #include <cmath>
@@ -21,6 +22,20 @@ void Check(const bool condition, const char* message)
 int main()
 {
     using namespace horde::platform::windows;
+    Check(MatchesFrozenForestContentCandidate(kForestContentCandidateName,
+        kForestContentCandidateFingerprint,kForestContentCandidateCount,kForestContentCandidateBounds,true),
+        "independently frozen forest content descriptor matches");
+    Check(!MatchesFrozenForestContentCandidate("other",kForestContentCandidateFingerprint,
+        kForestContentCandidateCount,kForestContentCandidateBounds,true),"unknown forest candidate rejected");
+    Check(!MatchesFrozenForestContentCandidate(kForestContentCandidateName,"different",
+        kForestContentCandidateCount,kForestContentCandidateBounds,true),"changed source identity rejected");
+    Check(!MatchesFrozenForestContentCandidate(kForestContentCandidateName,kForestContentCandidateFingerprint,
+        kForestContentCandidateCount+1,kForestContentCandidateBounds,true),"changed triangle count rejected");
+    auto changedBounds=kForestContentCandidateBounds;++changedBounds[0];
+    Check(!MatchesFrozenForestContentCandidate(kForestContentCandidateName,kForestContentCandidateFingerprint,
+        kForestContentCandidateCount,changedBounds,true),"changed bounds rejected without tolerance widening");
+    Check(!MatchesFrozenForestContentCandidate(kForestContentCandidateName,kForestContentCandidateFingerprint,
+        kForestContentCandidateCount,kForestContentCandidateBounds,false),"failed structural validation rejected");
     const std::array<std::wstring_view,7> forestArgs{L"--forest-route-proof",L"shared64",L"--capture-hidden",
         L"--capture-showcase",L"C:\\captures\\forest",L"--development-checkpoint",L"chapter-landing-north"};
     Check(ParseForestRouteProofLaunch(forestArgs,true).mode==ForestRouteCaptureMode::SharedExisting64 &&

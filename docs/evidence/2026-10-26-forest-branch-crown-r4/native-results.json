@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "sourceHead": "e039005518d176b028eae7b2a46478c2c2724c88",
+  "scope": "MSVC Debug private staged source experiment; no production admission, owner journey, phone or performance claim",
+  "geometry": {
+    "sourceHead": "e0390055",
+    "pine": {
+      "sourceSha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+      "candidateSha256": "b203a4d5971145d20e4c78bc3e1caa8ce5b171c896991e575459f6f68d887286",
+      "triangles": 5000,
+      "vertices": 5282,
+      "materials": 3,
+      "preservedWoodTriangles": 876,
+      "preservedWoodTriangleAttributeSha256": "26ada5d35f969bd9d16fe6cee4d66f6a51044aa5728d07d81dfafefd8c3cb70b",
+      "retainedPrimaryBoughs": 10,
+      "addedPrimaryBoughs": 20,
+      "newSupportedTwigs": 80,
+      "attachedNeedleSprays": 366,
+      "mossImagesMaterialsUnchanged": true,
+      "sourceTrunkRootsLowerStubsPreserved": true,
+      "runtimeAdmitted": false
+    },
+    "alder": "original byte-identical control",
+    "productionChanged": false
+  },
+  "ordinaryPreflight": {
+    "schema": 1,
+    "scope": "staged lower-corridor ordinary lease, movement exit and swapchain recreation; not an earned journey or performance result",
+    "complete": true,
+    "candidate": "pine-branch-r4",
+    "frames": 256,
+    "unpresentedRestoreFrames": 0,
+    "unloads": 1,
+    "restores": 1,
+    "savedOwnerBytesDuringReduction": 6167296,
+    "exitX": -28.9981422,
+    "fullReducedPixelsEqual": true,
+    "recreationPixelsEqual": true,
+    "sceneEpochBefore": 2,
+    "sceneEpochAfter": 3,
+    "error": null
+  },
+  "stagedRoute": {
+    "frames": 1524,
+    "warmupFrames": 64,
+    "fullRouteValidated": true,
+    "recreationTestRequiredSeparately": true,
+    "sharedForestResident": false,
+    "maximumNormalStaticOwnerSavingBytes": 6167296,
+    "staticDetailUnloads": 1,
+    "staticDetailRestores": 1,
+    "keeperVertexLifetime": {
+      "retiredAllocationBytes": 1323264,
+      "retiredMemoryFlags": 6,
+      "retirements": 1,
+      "restorations": 1,
+      "resetRestored": true
+    },
+    "keeperTextureLifetime": {
+      "retiredDeviceLocalBytes": 33554432,
+      "retiredHostVisibleBytes": 0,
+      "baseMemoryFlags": 1,
+      "emissiveMemoryFlags": 1,
+      "retirements": 1,
+      "restorations": 1,
+      "resetRestored": true
+    },
+    "complete": true
+  },
+  "processes": {
+    "source-control": {
+      "pid": 26112,
+      "exitCode": 0,
+      "seconds": 17.327999999994063,
+      "pending": false,
+      "foregroundUnchanged": true,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "executableSha256": "aeba4f24b329b77d510043b7bfb823e6e2c24c42ba8121c63889fe10a5794e94"
+    },
+    "source-pine-r4": {
+      "pid": 38084,
+      "exitCode": 0,
+      "seconds": 16.07800000000134,
+      "pending": false,
+      "foregroundUnchanged": true,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "executableSha256": "aeba4f24b329b77d510043b7bfb823e6e2c24c42ba8121c63889fe10a5794e94"
+    },
+    "ordinary-preflight-r4": {
+      "pid": 5048,
+      "exitCode": 0,
+      "seconds": 40.18699999999808,
+      "pending": false,
+      "foregroundUnchanged": true,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "executableSha256": "fcbab34730634b0f9d2f23b5f65cba40ad08b80b08706f0b04f8e3ae8ee83dd7"
+    },
+    "route-pine-r4": {
+      "pid": 35460,
+      "exitCode": 0,
+      "seconds": 143.25,
+      "pending": false,
+      "foregroundUnchanged": false,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true,
+      "executableSha256": "fcbab34730634b0f9d2f23b5f65cba40ad08b80b08706f0b04f8e3ae8ee83dd7"
+    }
+  },
+  "foregroundCaveat": "The long route wrapper saw a foreground HWND change and failed its custody assertion. It did not retain the changed HWND/process, so origin cannot be attributed. Native route returned0 and its complete receipt passed; no foreground preservation claim for that run. No focus commands were issued.",
+  "retainedHashes": {
+    "source-control/193-chapter-landing-north.png": "436a292b1f497471d77da3cac7f27e414d1eba783cd0f5a34ea499636c0700f4",
+    "source-pine-r4/193-chapter-landing-north.png": "4b132b49f9b6feec74dd41b89bceb1c8abef1bd92cdae24978ef57c60f140480",
+    "route-pine-r4/roundtrip/11-outbound-7.png": "d70a37d6985afd320e6998edf71d6b7d1da027d3542dd6b6c4454dd1bf44a33e"
+  },
+  "additionalHashes": {
+    "build-preflight-final.log": "bc6668edc54f924cc242fd0e571a06ea3a1cd201a3e3efcaea27458a3992821e",
+    "ordinary-preflight-r4/forest-content-preflight/00-full.png": "de33c3ed3234db71cef6e064056fb1352740c0f0b46cbb5fa299ac4aa18e8645",
+    "ordinary-preflight-r4/forest-content-preflight/01-reduced.png": "de33c3ed3234db71cef6e064056fb1352740c0f0b46cbb5fa299ac4aa18e8645",
+    "ordinary-preflight-r4/forest-content-preflight/02-before-recreate.png": "8664b7750a7cfa42b85df4ec14c8f780ee8c94dc2ae6d7bd8de7fe5d875db721",
+    "ordinary-preflight-r4/forest-content-preflight/03-after-recreate.png": "8664b7750a7cfa42b85df4ec14c8f780ee8c94dc2ae6d7bd8de7fe5d875db721",
+    "route-pine-r4/roundtrip/gallery.json": "4f87ec42cfd827e0cba534880f0f2cbcbc614da833e3ee94dee56a359a28201b",
+    "route-pine-r4/roundtrip/frames.csv": "3526dca4db0349e0973c9b16e7cb1655ef6a01f943ace85d51d6ac8b7bc70814"
+  },
+  "ciBaseline": {
+    "run": 40282028828,
+    "head": "e039005518d176b028eae7b2a46478c2c2724c88",
+    "result": "all six jobs success"
+  }
+}

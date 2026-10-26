@@ -56,6 +56,15 @@ separate requirements; this does not claim performance solved or authorise relea
 This inventory separates unfinished implementation from missing acceptance and
 explicit deferral. It does not call 1.7 ready or turn rejected work into completion.
 
+## Branch-supported R4 prerequisite
+
+[Native R4 proof](../evidence/2026-10-26-forest-branch-crown-r4/README.md) resolves
+the changed-geometry retention dependency for one independently frozen private
+pine candidate: ordinary eviction/restore, exact pixels, recreation and staged
+full route pass. Production is unchanged. The foreground-window wrapper caveat
+is explicit, and actual F01 still lacks woodland mass. Grouped background content
+is next; this does not close forest presentation or phone acceptance.
+
 ## Latest clustered crown/F01 result
 
 [The clustered r3 sample](../evidence/2026-10-26-forest-crown-clusters-r3/README.md)
