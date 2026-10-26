@@ -1,0 +1,18 @@
+{
+  "scope": "Exact two preservation inputs for portable native and Vulkan CPU-host lanes only; no runtime packaging source addition",
+  "inputs": [
+    {
+      "path": "assets/models/props/source/attack-warning-ring-v1/attack-warning-ring-v1.glb",
+      "unhydratedPointerBytes": 129,
+      "requiredBinaryBytes": 2388,
+      "sha256": "15befb04ac511128714249c27b09a3ba96ea0c847edfbd91e80b14ef1eb7ed85"
+    },
+    {
+      "path": "assets/models/props/source/healing-flask-neck-fit-r2/healing-flask-neck-fit-r2.glb",
+      "unhydratedPointerBytes": 129,
+      "requiredBinaryBytes": 9292,
+      "sha256": "4a4337e81d98065c050ab896b8b0b61563feeedac55806665d2727ad14555cfa"
+    }
+  ],
+  "permissionsTimeoutCoverageChanges": false
+}
