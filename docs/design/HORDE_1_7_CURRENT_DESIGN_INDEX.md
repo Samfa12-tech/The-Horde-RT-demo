@@ -92,6 +92,9 @@ Updated26October against source `e4de5a5e`; this heading retains its existing li
   authored right-arm motion and unchanged nonzero left-light IK in CPU tests.
   Its corrected editable curves preserve key poses; the fixed0.60s Cancel is
   not arbitrary cancellation. No simulation caller or normal binding is enabled.
+  The follow-up samples right Grip/elbow targets over the actual Idle/Walking
+  base through existing IK; CPU checks preserve walking feet and left-light
+  ownership. Phase-correct cancellation and actual RT joins still remain.
 - **Other presentation:** torch close-clearance containment plus hand framing,
   useful residual gait art and chimney smoke remain unfinished. Rejected carry,
   Run/body/crown and per-path smoke studies remain rejected. Prioritized Windows

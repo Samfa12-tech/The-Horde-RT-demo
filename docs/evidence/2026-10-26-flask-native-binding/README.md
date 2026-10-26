@@ -20,9 +20,10 @@ are exact original Idle. The source receipt preserves hashes and both outcomes.
 `PlayerRenderSlot::LoadUtilityCandidateAsset` explicitly binds the appended
 clips; existing `LoadAsset` and all production callers retain the original
 bindings. `PrepareUtilityCandidatePose` samples the supplied phase without a
-renderer timer, retains authored right-arm motion and applies the existing
-left-light IK to one shared solved palette. It rejects invalid clocks and
-conflicting movement, combat, dodge or grounded stance before cadence reuse.
+renderer timer and uses one shared solved palette. Its initial stationary
+whole-clip proof passed at `f1b029c7`; the right-arm-only follow-up below avoids
+that proof's frozen-Idle limitation. Invalid clocks and conflicting combat,
+dodge or grounded stance reject before cadence reuse.
 Changing or clearing the request invalidates stale same/odd-tick data. Normal
 requests preserve the existing no-copy input path and exact original vertices.
 
@@ -46,3 +47,40 @@ arbitrary cancellation and entry/exit joins, the existing equipment lease before
 equipment advance plus final post-damage readiness, actual RT hand/contact and
 simultaneous ring/flask lifecycle/restoration, platform controls and physical
 feel. No native game launch, Computer Use retry, phone access or security change.
+
+## Right-arm-only target follow-up
+
+Moving must cancel healing without freezing the player's walking body. A bounded
+12-case native probe showed the existing arm solver can reuse the source Grip
+and elbow targets over original Idle/Walking. It measured maximum Grip error
+0.00047 mm, unchanged left-light solve/hips/23,900 non-right vertices and both
+foot groups. Walking feet really moved relative to Idle. Observed chain stretch
+was 1.0; this is evidence, not a new exact-1 intake rule. The initial deeply nested
+MSVC configure failed with FileTracker FTK1011 before compiling; the unchanged
+probe passed from a short staging build path. No security denial was retried.
+
+The explicit candidate consumer now keeps actual Idle/Walking as its base.
+It samples utility RightShoulder/RightForeArm/RightGrip, rebases at the current
+locomotion RightShoulder, derives the elbow pole and supplies existing right IK
+at weight1. It does not rebase at animated RightArm or introduce a new solver,
+arm-length allowance, asset, second palette or skin pass. Normal production
+callers remain unchanged. This is presentation, not permission to keep drinking
+while moving.
+
+The existing consumer test adds nine walking samples, reading actual joint
+weights to identify every non-right vertex. Those bytes, hips and left solve
+must match the original walking base; an Idle sensitivity control rejects frozen
+legs. The unchanged viewmodel consumes the same solved pose. Debug passes in
+3.44 seconds and Release in1.26 seconds. The compact
+[probe receipt](right-arm-target-proof.json) retains exact inputs and all twelve
+case results. Exact-head CI remains a separate checkpoint result.
+
+The next small controller seam must retain the pre-cancellation Use sample before
+`HealingFlask::Cancel()` clears it, cancel healing immediately, and let normal
+movement continue while the right hand returns. A source-derived return can
+reverse the lift toward0.30s, leave the pose-identical mouth hold into0.70s,
+continue the existing belt return, and request owned sword Restore only after
+flask release. This is a proposed path, not implemented or visually accepted.
+Do not snap every cancellation to the fixed0.60s Cancel, restart an existing
+Restore, advance equipment twice, or rearm guard/parry from the return. Actual
+join/contact/cadence, interruption/save/load/reset and RT gates remain.

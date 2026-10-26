@@ -1,6 +1,8 @@
 #include "scene/assets/SkinnedMeshAsset.h"
 #include "scene/assets/StaticMeshAsset.h"
+#include "scene/assets/GltfDocument.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
+#include "cgltf/cgltf.h"
 
 #include <algorithm>
 #include <cmath>
@@ -114,6 +116,72 @@ int main(int argc,char** argv) {
         }
     }
     Check(maximumLeftDifference<.00001f,"right utility motion cannot move the accepted left-light solve");
+
+    // Read actual skin ownership rather than assuming a screen-space foot mask.
+    horde::scene::assets::GltfDocument document;
+    if(!document.Load(candidate,document,error))return 1;
+    const auto* data=document.Data();
+    std::vector<std::size_t> unaffected;
+    std::size_t offset=0;
+    for(std::size_t p=0;p<data->meshes[0].primitives_count;++p) {
+        const auto& primitive=data->meshes[0].primitives[p];
+        const auto* joints=cgltf_find_accessor(&primitive,cgltf_attribute_type_joints,0);
+        const auto* weights=cgltf_find_accessor(&primitive,cgltf_attribute_type_weights,0);
+        if(!joints || !weights || joints->count!=weights->count)return 1;
+        for(std::size_t v=0;v<joints->count;++v) {
+            cgltf_uint ids[4]{};cgltf_float values[4]{};
+            if(!cgltf_accessor_read_uint(joints,v,ids,4)||!cgltf_accessor_read_float(weights,v,values,4))return 1;
+            bool right=false;
+            for(unsigned w=0;w<4;++w)if(values[w]!=0.f) {
+                if(ids[w]>=data->skins[0].joints_count)return 1;
+                for(auto* node=data->skins[0].joints[ids[w]];node;node=node->parent)
+                    if(node->name && std::string_view(node->name)=="RightArm")right=true;
+            }
+            if(!right)unaffected.push_back(offset+v);
+        }
+        offset+=joints->count;
+    }
+    Check(!unaffected.empty() && offset==bound.UniqueVertices().size(),
+          "actual skin weights identify non-right geometry including the walking legs");
+    float walkingSensitivity=0.f;
+    const auto idleVertices=baseline.UniqueVertices();
+    for(float baseTime:{.08f,.35f,.72f}) {
+        auto walking=animation;walking.locomotionClip=PlayerLocomotionClip::Walk;
+        walking.locomotionBlend=1.f;walking.locomotionTime=baseTime;
+        SkinnedNodeTransform baseShoulder{};
+        if(!reference.NodeTransform(SkinnedClip::Walking,baseTime,"RightShoulder",baseShoulder,error)||
+           !reference.NodeTransform(SkinnedClip::Walking,baseTime,"LeftGrip",idle[0],error))return 1;
+        SetTarget(walking.leftIk,Rigid(idle[0]));walking.leftIk.target[2]+=.04f;walking.leftIk.target[1]-=.025f;
+        if(!baseline.PreparePose(walking,200,PlayerCpuSkinCadence::Hz60,updated,error))return 1;
+        const auto walkingVertices=baseline.UniqueVertices();const auto hips=baseline.BoneSockets().hips;
+        const auto walkingLeft=baseline.BoneSockets().leftGrip;
+        for(auto i:unaffected)for(unsigned axis=0;axis<3;++axis)
+            walkingSensitivity=std::max(walkingSensitivity,std::abs(walkingVertices[i].position[axis]-idleVertices[i].position[axis]));
+        for(float time:{.4f,.6f,.8f}) {
+            if(!bound.PrepareUtilityCandidatePose(walking,{PlayerUtilityClip::Use,time},200,PlayerCpuSkinCadence::Hz30,updated,error)) {
+                std::cerr<<error<<'\n';return 1;
+            }
+            SkinnedNodeTransform sourceShoulder{},sourceGrip{};
+            if(!reference.NodeTransform(SkinnedClip::Attack,time,"RightShoulder",sourceShoulder,error)||
+               !reference.NodeTransform(SkinnedClip::Attack,time,"RightGrip",sourceGrip,error))return 1;
+            const auto anchor=MultiplyHeldItemTransforms(Rigid(baseShoulder),InverseRigidHeldItemTransform(Rigid(sourceShoulder)));
+            const auto expected=MultiplyHeldItemTransforms(anchor,Rigid(sourceGrip));
+            const auto measured=MeasureTransformAgreement(expected,Rigid(bound.BoneSockets().rightGrip));
+            Check(measured.positionErrorMetres<=kPlayerGripSocketToleranceMetres &&
+                  measured.orientationErrorRadians<=kPlayerGripOrientationToleranceRadians,
+                  "right hand target rebases at locomotion shoulder without importing the source Idle body");
+            Check(hips==bound.BoneSockets().hips && walkingLeft==bound.BoneSockets().leftGrip,
+                  "walking hips and independent left-light solve retain exact base state");
+            bool exact=true;
+            for(auto i:unaffected)exact=exact && std::memcmp(&walkingVertices[i],&bound.UniqueVertices()[i],sizeof(TexturedSkinnedRtVertex))==0;
+            Check(exact,"all non-right vertices, including walking legs and feet, retain exact base bytes");
+            std::vector<TexturedSkinnedRtVertex> primary;std::vector<SkinnedPbrTangent> primaryTangents;
+            Check(view.SkinPlayerPoseUniqueTextured(bound.SolvedPose(),primary,primaryTangents,error),
+                  "walking return targets retain the same solved first-person palette");
+        }
+    }
+    Check(walkingSensitivity>.01f,"walking witness actually changes base geometry rather than accepting a frozen Idle body");
+    if(!baseline.PreparePose(animation,101,PlayerCpuSkinCadence::Hz60,updated,error))return 1;
     Check(bound.PreparePose(animation,101,PlayerCpuSkinCadence::Hz30,updated,error) && updated &&
           Exact(bound.UniqueVertices(),baseline.UniqueVertices()),
           "leaving the utility at the same tick restores the original pose instead of stale candidate data");
@@ -123,7 +191,7 @@ int main(int argc,char** argv) {
         if(failure==1)sample.seconds=-.01f;
         if(failure==2)sample.seconds=1.26f;
         if(failure==3)sample.clip=static_cast<PlayerUtilityClip>(255);
-        if(failure==4)invalid.locomotionClip=PlayerLocomotionClip::Walk;
+        if(failure==4)invalid.locomotionClip=static_cast<PlayerLocomotionClip>(255);
         if(failure==5)invalid.combatLayer.guardPoseWeight=1.f;
         if(failure==6)invalid.combatLayer.action=PlayerUpperBodyAction::Sword;
         if(failure==7)invalid.dodge.weight=1.f;

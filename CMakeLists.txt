@@ -664,6 +664,7 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_player_crouch_rig_tests COMMAND horde_rt_player_crouch_rig_tests ${CMAKE_CURRENT_SOURCE_DIR})
 
         add_executable(horde_rt_player_utility_binding_tests tests/PlayerUtilityBindingTests.cpp)
+        target_include_directories(horde_rt_player_utility_binding_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
         target_link_libraries(horde_rt_player_utility_binding_tests PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_player_utility_binding_tests
             COMMAND horde_rt_player_utility_binding_tests ${CMAKE_CURRENT_SOURCE_DIR})

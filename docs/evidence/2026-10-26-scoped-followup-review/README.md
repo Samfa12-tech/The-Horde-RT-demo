@@ -40,3 +40,8 @@ this 14m05 receipt. Propose any demonstrated duplication reduction separately;
 do not repeatedly run unchanged pipelines, raise caps or discard assertions.
 Large-module extraction and any reviewed integration/squash strategy remain
 future proposals after active player-facing work stabilises, not this task.
+
+Subsequent unchanged-cap run40398344369 at `af9113e7` passed all six jobs; MSVC
+took13m07s, with9m55s building and2m13s testing. Checkout plus LFS took28s and
+configure24s. This run points first toward compilation cost/variance; it does
+not establish a hang, justify deleting assertions or prove future headroom.
