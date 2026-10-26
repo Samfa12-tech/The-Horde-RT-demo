@@ -56,6 +56,23 @@ separate requirements; this does not claim performance solved or authorise relea
 This inventory separates unfinished implementation from missing acceptance and
 explicit deferral. It does not call 1.7 ready or turn rejected work into completion.
 
+## Latest clustered crown/F01 result
+
+[The clustered r3 sample](../evidence/2026-10-26-forest-crown-clusters-r3/README.md)
+adds real3D canopy volume within unchanged triangle/material limits. It remains
+unadmitted: bulky near lobes and sparse eye-level/middle distance fail the forest
+impression. Four frozen76 control/candidate recreation checks and a final tangent
+recheck pass; the separate moving baked64 route retains33 completed images but
+fails final unload/restoration. Exact prior-head CI is green across all six jobs.
+No production tree, setting, terrain, capacity or shared64 default changed.
+
+The failure is a content-proof dependency: changed crowns alter fully-beyond-Z24
+triangle membership. A new exact reviewed safety/retention proof is needed, not
+removal of its count/geometry checks. Preserve original near detail. Next useful
+work is branch-supported crown detail and grouped background/lower-layer content
+with shared collision/lifecycle ownership; a larger canopy or12 placements alone
+is insufficient. Performance remains optimisation, not a release target gate.
+
 ## Latest bounded crown result
 
 [The same-topology r2 study](../evidence/2026-10-26-forest-crown-r2/README.md)

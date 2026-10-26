@@ -1,5 +1,11 @@
 # Horde 1.7 implementation remaining - 24 October 2026
 
+Latest26 October [clustered-crown/F01 study](../evidence/2026-10-26-forest-crown-clusters-r3/README.md):
+more silhouette volume, but coarse near art/open middle distance; ordinary
+restoration still fails its unchanged content guard. Production unchanged.
+Next needs credible branching plus grouped background/lower-layer ownership,
+not another global leaf or lobe scale.
+
 26 October follow-up: [same-topology crown RT study](../evidence/2026-10-26-forest-crown-r2/README.md)
 rejected for flat near sprays/bare middle distance and unchanged retention gate.
 Production trees remain intact. [Owner performance policy](../../PROJECT_DECISIONS.md#phone-performance-and-17-scope---2026-10-26):

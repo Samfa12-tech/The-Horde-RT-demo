@@ -1,3 +1,6 @@
+assets/models/world/source/forest-crown-clusters-r3/*.py text eol=lf
+docs/evidence/2026-10-26-forest-crown-clusters-r3/*.log -text whitespace=cr-at-eol
+docs/evidence/2026-10-26-forest-crown-clusters-r3/*.patch -text whitespace=cr-at-eol
 assets/models/world/source/forest-crown-study-r2/*.py text eol=lf
 docs/evidence/2026-10-26-forest-crown-r2/*.log -text whitespace=cr-at-eol
 docs/evidence/2026-10-24-kit-stationary-eligibility/*.log -text whitespace=cr-at-eol

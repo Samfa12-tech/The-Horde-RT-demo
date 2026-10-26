@@ -1,0 +1,11 @@
+--- build-initial.py
++++ build.py
+@@ -57,7 +57,7 @@
+         c,s=math.cos(angle),math.sin(angle);rotation=np.array([[c,0,s],[0,1,0],[-s,0,c]])
+         p=(sphere*scales)@rotation.T+center
+         normal=(sphere/scales)@rotation.T;normal/=np.linalg.norm(normal,axis=1)[:,None]
+-        tangent=np.cross(np.tile([0.,1.,0.],(len(p),1)),normal)
++        tangent=np.column_stack((-sphere[:,2]*scales[0],np.zeros(len(p)),sphere[:,0]*scales[2]))@rotation.T
+         pole=np.linalg.norm(tangent,axis=1)<1e-8;tangent[pole]=[1.,0.,0.]
+         tangent-=normal*np.sum(normal*tangent,axis=1)[:,None];tangent/=np.linalg.norm(tangent,axis=1)[:,None]
+         # Closed components: two oppositely directed uses of every edge.
