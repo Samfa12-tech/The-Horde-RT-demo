@@ -26,14 +26,21 @@ approaches from the right. Source grip presence is not a skin-contact proof.
 `intent.json` records the fixed study timings/targets. `author.py` creates new
 source actions and evidence; `review.py` reads the saved actions, checks all
 sampled transforms and renders complete/cancel previews. `check-contact.py`
-observes four selected source head/contact witnesses; it is not a full swept
-collision test or a native acceptance gate.
+retains the original four witnesses by default. Its `--sweep` mode checks both
+saved actions at every 60 Hz source sample and halfway between them, with the
+matching authoring receipt and unchanged-input checks. The retained candidate
+has 151 complete and 141 cancellation observations without selected head/flask
+or head/gauntlet intersections. The rejected short-neck source still reproduces
+its old intersections as a sensitivity control; no new tolerance was invented.
+These are selected-region discrete observations, not continuous, whole-body,
+native IK or runtime collision acceptance. The saved Blend remains unchanged.
 
 For a fresh reproducible authoring workspace from the repository root:
 
 ```powershell
 blender --background --python-exit-code 1 --python assets/models/player/source/flask-use-study-r1/author.py -- --output-directory reports/flask-rebuild-new --editable-output reports/flask-rebuild-new.blend
 blender --background --python-exit-code 1 --python assets/models/player/source/flask-use-study-r1/review.py -- --output-directory reports/flask-review-new --motion-receipt reports/flask-rebuild-new/source-motion.json --blend reports/flask-rebuild-new.blend
+blender --background --python-exit-code 1 --python assets/models/player/source/flask-use-study-r1/check-contact.py -- --sweep --blend reports/flask-rebuild-new.blend --motion-receipt reports/flask-rebuild-new/source-motion.json --output reports/flask-contact-new.json
 ```
 
 All destinations must be absent. Open the retained Blend for ordinary editing;

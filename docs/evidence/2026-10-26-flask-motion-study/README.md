@@ -28,6 +28,33 @@ head; it does not close the native flask presentation or device gates below.
   the selected head surfaces and flask or gauntlet. This is limited source
   evidence, not cancellation contact or full swept/body/renderer collision acceptance.
 
+## Follow-up: complete and cancellation sampled contact
+
+The [expanded receipt](sampled-contact-sweep.json) covers both unchanged saved
+actions at every 60 Hz key sample and its midpoint: 151 complete observations
+from 0 through 1.25 seconds, and 141 cancellation observations from 0 through
+1.166667 seconds. All 292 observations show zero intersections of the 1,813
+selected head triangles with the flask or 8,838 selected gauntlet triangles.
+The original four witnesses reproduce exactly. Rechecking the retained rejected
+short-neck Blend reproduces its original overlap counts, including 16 flask
+and 120 gauntlet/head overlaps at the three mouth witnesses. This verifies that
+the expanded observer did not simply stop detecting the old failure. Its old
+lip distances are not compared with the newer r2 mouth reference.
+
+The local Blender 5.2 background runs completed successfully, without rendering
+new frames or writing source assets. Original body, viewmodel, sword, rig,
+combat and saved Blend hashes were checked unchanged. The existing cancellation
+body frames at 0.80 and 1.00 seconds were inspected for context; these are source
+Workbench views, not the native light/guard solve. No authored pose, input rule,
+gameplay timer, resource capacity or production default changed in this follow-up.
+
+This is discrete selected-region evidence, **not continuous collision detection
+or whole-body/prop contact**. It does not establish native first-person framing,
+left-light/sword joins, moving-camera/world clearance, reflection/shadow parity,
+or any device acceptance. The source mouth reference's nearest measured distance
+is reported as an observation, not promoted to a new clearance tolerance.
+Native integration and the specific joint resource decision remain open.
+
 The initial authoring assembly selected a glTF helper mesh instead of the
 skinned viewmodel; it was corrected before review. Blender display-bone axes
 also proved unsuitable for the body stow mount, so the original raw glTF Hips
