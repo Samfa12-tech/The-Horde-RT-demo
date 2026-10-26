@@ -1,0 +1,127 @@
+{
+  "scope": "Unadmitted source authoring; no native/RT/phone/behavior acceptance",
+  "effectiveIntentSha256": "ed4a452789c0d1d1bb44fbf10c0d618a70c3afd087012e4ffc8752ebe60ce0ab",
+  "handReturnCueSeconds": 0.8833333333333333,
+  "swordRestoreEndSeconds": 1.2433333333333332,
+  "sourceHashes": {
+    "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+    "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+    "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1",
+    "assets/models/props/source/healing-flask-neck-fit-r2/healing-flask-neck-fit-r2.glb": "4a4337e81d98065c050ab896b8b0b61563feeedac55806665d2727ad14555cfa",
+    "src/gameplay/items/HeldItemState.h": "f2d201f02abe1bdb6916c4e86680c3443a7067448ea06cfd567d032e59cf30ab",
+    "src/gameplay/items/HeldItemKinematics.cpp": "2dc18e260dd750e0d17b403ecc31be614333c04d71c17eef2d75be77d7d765a1",
+    "src/gameplay/animation/PlayerAnimationState.cpp": "5edc1e9c51ab8194538dee32230967c5a3a67637e3e228c5e7eee2cfb1efdb7e",
+    "src/gameplay/SwordCombat.h": "87ac6f9b73b6d0aeeed42a9fe532217cb6c3e7cf7076830b51571be2c3d9161f"
+  },
+  "sampleCount": 76,
+  "durationSeconds": 1.25,
+  "upperArmMetres": 0.27541026128265494,
+  "foreArmMetres": 0.20555923735685905,
+  "maximumRequestedWristReachMetres": 0.4682528641135041,
+  "maximumGripErrorMetres": 3.78442558622369e-07,
+  "maximumLeftMatrixError": 0.0,
+  "bindUnchanged": true,
+  "sourceBytesUnchanged": true,
+  "runtimeBindingChanged": false,
+  "stowMountSource": "Unchanged raw glTF Hips frame plus SwordBodyStowFromHips; Blender display axes not substituted",
+  "blendSha256": "1dee0e3e9d5b2c072117d70c36b0accca7dc91d14a3981c34b0d6f442515d699",
+  "schema": 1,
+  "status": "source-only-unadmitted",
+  "cancelSamples": 71,
+  "savedPlayback": {
+    "scope": "Source-only Blender action playback; no native, RT or gameplay acceptance",
+    "blendSha256": "1dee0e3e9d5b2c072117d70c36b0accca7dc91d14a3981c34b0d6f442515d699",
+    "sourceBytesUnchanged": true,
+    "engine": "Blender Workbench",
+    "resolution": [
+      960,
+      540
+    ],
+    "sequences": {
+      "complete": {
+        "renderedFrames": 76,
+        "sourceHz": 60,
+        "lastSampleSeconds": 1.25,
+        "maximumSavedPlaybackGripErrorMetres": 3.78442558622369e-07,
+        "maximumPropMatrixDifference": 4.172325134277344e-07,
+        "maximumLeftMatrixDifference": 0.0,
+        "startEndRightBasisDifference": 0.0
+      },
+      "cancel": {
+        "renderedFrames": 71,
+        "sourceHz": 60,
+        "lastSampleSeconds": 1.1666666666666667,
+        "maximumSavedPlaybackGripErrorMetres": 3.2544627290728025e-07,
+        "maximumPropMatrixDifference": 4.172325134277344e-07,
+        "maximumLeftMatrixDifference": 0.0,
+        "startEndRightBasisDifference": 0.0
+      }
+    },
+    "renderingPacedInRealTime": false,
+    "videoMustUseSourceHz": 60,
+    "leftLightOrCombatChanged": false,
+    "runtimeExported": false
+  },
+  "sampledContact": {
+    "scope": "Both saved source actions at 60 Hz samples and midpoints; selected head/gauntlet regions only",
+    "sampleHz": 120,
+    "continuousCollisionDetection": false,
+    "nativeCollisionAcceptance": false,
+    "allSelectedContactObservationsClear": true,
+    "blendSha256": "1dee0e3e9d5b2c072117d70c36b0accca7dc91d14a3981c34b0d6f442515d699",
+    "sourceBytesUnchanged": true,
+    "selectedHeadTriangles": 1813,
+    "selectedGauntletTriangles": 8838
+  },
+  "contactSequences": {
+    "complete": {
+      "observations": 151,
+      "overlapObservations": 0,
+      "firstOverlap": null,
+      "minimumLipNearestHeadDistanceMetres": 0.005999994929879904
+    },
+    "cancel": {
+      "observations": 141,
+      "overlapObservations": 0,
+      "firstOverlap": null,
+      "minimumLipNearestHeadDistanceMetres": 0.005999994929879904
+    }
+  },
+  "regression": {
+    "legacyDefaultCompleteRowsIdentical": true,
+    "legacyDefaultCancelRowsIdentical": true,
+    "newCancelRowsIdenticalToOriginal": true,
+    "sourceReleaseCueSeconds": 0.8833333333333333,
+    "flaskAtOriginalBeltRootAtCue": true,
+    "finalRightBasisReturnsExactly": true,
+    "originalBlendSha256": "68984209d475e2e40a79868851abc575dc2bbe098f97d3ceb338c34e631a86e6",
+    "originalBlendUnchanged": true
+  },
+  "media": {
+    "sha256": "91870fc4202310c807732abf790cd2046fe545eef5d50907dffd1fd27e314a67",
+    "bytes": 122897,
+    "format": "H264 MP4",
+    "resolution": [
+      960,
+      540
+    ],
+    "frames": 76,
+    "fps": 60,
+    "durationSeconds": 1.266667,
+    "silent": true,
+    "fullDecodePassed": true,
+    "renderingPacedInRealTime": false,
+    "gameplayOrFpsEvidence": false
+  },
+  "nativeBindingChanged": false,
+  "capacityChanged": false,
+  "phoneOrOwnerDesktopTouched": false,
+  "authorScriptSha256": "2f417b945e4c4cfc7b847c8665d48695ce5c4c38d6879f4c36c9c00cdc65ce51",
+  "contactScriptSha256": "ab74b7228cac6553b931bbbf5411140aad91a7037b78b13570fc22e96191f226",
+  "decodedVideoWitnessesInspected": [
+    33,
+    53,
+    75
+  ],
+  "nativeFramingEstablished": false
+}

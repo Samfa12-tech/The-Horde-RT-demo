@@ -21,13 +21,16 @@ SOURCE = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--output-directory", type=Path, required=True)
 parser.add_argument("--editable-output", type=Path, default=SOURCE/"flask-use-study-r1.blend")
+parser.add_argument("--restore-start-tick", type=int, choices=(53,),
+                    help="Separate tick-aligned source derivative; original intent/Blend stay untouched")
 args = parser.parse_args(sys.argv[sys.argv.index("--")+1:])
 OUT = args.output_directory.resolve()
 EDITABLE = args.editable_output.resolve()
 if EDITABLE.exists() or OUT.exists():
     raise RuntimeError("Preserve prior source/evidence; outputs must be new")
 OUT.mkdir(parents=True)
-spec = json.loads((SOURCE/"intent.json").read_text())
+base_intent_bytes = (SOURCE/"intent.json").read_bytes()
+spec = json.loads(base_intent_bytes)
 fixed_phases = [("SwordStow",0.,.30),("FlaskLift",.30,.55),("Drink",.55,.70),
                 ("FlaskReturn",.70,.89),("SwordRestore",.89,1.25)]
 if (spec["status"] != "source-only-unadmitted" or spec["durationSeconds"] != 1.25 or
@@ -36,6 +39,18 @@ if (spec["status"] != "source-only-unadmitted" or spec["durationSeconds"] != 1.2
         (spec["cancelSampleTime"],spec["cancelFlaskReturnSeconds"],spec["cancelSwordRestoreSeconds"]) != (.60,.20,.36) or
         (spec["swordReleaseTime"],spec["swordRegripTime"]) != (.20,1.00)):
     raise RuntimeError("Fixed source-study timing changed; review authorer and policy together, do not silently ignore intent edits")
+restore_start = .89 if args.restore_start_tick is None else args.restore_start_tick/60
+return_duration = .19 if args.restore_start_tick is None else restore_start-.70
+regrip_duration = .11 if args.restore_start_tick is None else spec["swordRegripTime"]-restore_start
+if args.restore_start_tick is not None:
+    spec["timingVariant"] = "tick-aligned-source-candidate"
+    spec["restoreStartTick"] = args.restore_start_tick
+    spec["phases"] = spec["phases"][:3]+[
+        {"name":"FlaskReturn","start":.70,"end":restore_start},
+        {"name":"SwordRestore","start":restore_start,"end":restore_start+.36},
+        {"name":"ReadyHold","start":restore_start+.36,"end":1.25}]
+effective_intent=base_intent_bytes if args.restore_start_tick is None else (json.dumps(spec,indent=2)+"\n").encode()
+(OUT/"effective-intent.json").write_bytes(effective_intent)
 paths = {
     "body": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
     "viewmodel": "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
@@ -171,16 +186,16 @@ def blend(a,b,x):
 
 def roots(t):
     sw = blend(rest_root,stow_root,t/.30) if t <= .30 else (
-         blend(stow_root,rest_root,(t-.89)/.36) if t >= .89 else stow_root.copy())
+         blend(stow_root,rest_root,(t-restore_start)/.36) if t >= restore_start else stow_root.copy())
     fl = blend(belt_root,drink_root,(t-.30)/.25) if .30 < t < .55 else (
          drink_root.copy() if .55 <= t <= .70 else (
-         blend(drink_root,belt_root,(t-.70)/.19) if .70 < t < .89 else belt_root.copy()))
+         blend(drink_root,belt_root,(t-.70)/return_duration) if .70 < t < restore_start else belt_root.copy()))
     # An authored outward carry arc keeps the wrist outside the original
     # arm's minimum folded reach; neither bone length nor the endpoint moves.
     if .30 < t < .55:
         fl.translation.x -= spec["outwardCarryArcMetres"]*math.sin(math.pi*(t-.30)/.25)**2
-    elif .70 < t < .89:
-        fl.translation.x -= spec["outwardCarryArcMetres"]*math.sin(math.pi*(t-.70)/.19)**2
+    elif .70 < t < restore_start:
+        fl.translation.x -= spec["outwardCarryArcMetres"]*math.sin(math.pi*(t-.70)/return_duration)**2
     return sw,fl
 
 
@@ -192,9 +207,9 @@ def target_grip(t,sw,fl):
     if t < .30:
         released = roots(spec["swordReleaseTime"])[0]@sword_marker@rot90
         return blend(released,belt_root@flask_marker@rot90,(t-.20)/.10)
-    if t <= .89:
+    if t <= restore_start:
         return flask_grip
-    return blend(belt_root@flask_marker@rot90,sword_grip,(t-.89)/.11)
+    return blend(belt_root@flask_marker@rot90,sword_grip,(t-restore_start)/regrip_duration)
 
 
 def solve_arm(desired_grip):
@@ -324,6 +339,8 @@ def camera_at(position,target,orthographic=None):
 
 scene["evidence_boundary"] = "Source authoring only; no native IK parity, gameplay timing authority or RT acceptance"
 scene["candidate_status"] = "Unadmitted; review motion, contact, native integration and interruptions"
+scene["utility_return_start_seconds"] = restore_start
+scene["sword_restore_duration_seconds"] = .36
 camera_at((2,-3,1.8),(0,0,1.15),2.6)
 scene.frame_set(1)
 bpy.ops.wm.save_as_mainfile(filepath=str(EDITABLE))
@@ -348,6 +365,8 @@ if bind != {b.name:[list(row) for row in b.matrix_local] for b in rig.data.bones
 if not all(hashlib.sha256((ROOT/p).read_bytes()).hexdigest()==sha for p,sha in hashes.items()):
     raise RuntimeError("Source bytes changed")
 result = {"scope":"Unadmitted source authoring; no native/RT/phone/behavior acceptance",
+          "effectiveIntentSha256":hashlib.sha256(effective_intent).hexdigest(),
+          "handReturnCueSeconds":restore_start,"swordRestoreEndSeconds":restore_start+.36,
           "sourceHashes":hashes,"sampleCount":len(samples),"durationSeconds":1.25,
           "upperArmMetres":upper_length,"foreArmMetres":lower_length,
           "maximumRequestedWristReachMetres":max(s["requestedWristReachMetres"] for s in samples),

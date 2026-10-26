@@ -55,6 +55,11 @@ Native world/viewmodel joins, wall/ceiling clearance, shadows/reflections, input
 interruptions, death/load/reset and phone feel remain open. Source authoring is
 not permission to increase the pending joint ring/flask resource bounds.
 
+The separate [tick-aligned r2 derivative](../flask-use-tick-aligned-r2/README.md)
+uses an explicit authorer option and matching effective intent. It preserves this
+original Blend/profile and the cancellation action. The default regeneration
+path still reproduces the original pose rows; it does not silently select r2.
+
 Existing player/viewmodel/sword provenance and rights remain unchanged. The
 flask derivative uses original project geometry/materials, no paid generation
 or new third-party input. See `ASSET_LICENSES.md`.

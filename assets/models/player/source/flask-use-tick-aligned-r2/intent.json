@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "status": "source-only-unadmitted",
+  "durationSeconds": 1.25,
+  "flaskSource": "assets/models/props/source/healing-flask-neck-fit-r2/healing-flask-neck-fit-r2.glb",
+  "flaskMouthHeightMetres": 0.124,
+  "sampleRateHz": 60,
+  "coordinates": "Blender metres: +Z up, -Y player forward, -X anatomical right; not direct native clip coordinates",
+  "phases": [
+    {
+      "name": "SwordStow",
+      "start": 0.0,
+      "end": 0.3
+    },
+    {
+      "name": "FlaskLift",
+      "start": 0.3,
+      "end": 0.55
+    },
+    {
+      "name": "Drink",
+      "start": 0.55,
+      "end": 0.7
+    },
+    {
+      "name": "FlaskReturn",
+      "start": 0.7,
+      "end": 0.8833333333333333
+    },
+    {
+      "name": "SwordRestore",
+      "start": 0.8833333333333333,
+      "end": 1.2433333333333332
+    },
+    {
+      "name": "ReadyHold",
+      "start": 1.2433333333333332,
+      "end": 1.25
+    }
+  ],
+  "swordReleaseTime": 0.2,
+  "swordRegripTime": 1.0,
+  "restGripPosition": [
+    -0.3,
+    -0.29,
+    1.26
+  ],
+  "restSwordEulerXYZ": [
+    0.14,
+    0.2,
+    0.0
+  ],
+  "flaskBeltOffsetFromSwordGrip": [
+    -0.055,
+    -0.06,
+    0.09
+  ],
+  "cancelSampleTime": 0.6,
+  "cancelFlaskReturnSeconds": 0.2,
+  "cancelSwordRestoreSeconds": 0.36,
+  "mouthTarget": [
+    -0.018067849799990654,
+    -0.005769213195890188,
+    1.5977472066879272
+  ],
+  "mouthContactReference": "Inspected original front lip region at Blender [-0.015,-0.001131013,1.60], with 6 mm outward source-preview offset; not a runtime collision tolerance",
+  "drinkTiltRadiansX": -1.7453292519943295,
+  "drinkYawRadiansZ": -0.5,
+  "rightElbowPole": [
+    -1.0,
+    -0.3,
+    -0.25
+  ],
+  "outwardCarryArcMetres": 0.1,
+  "leftHandPolicy": "Preserve original Idle pose exactly; no light/left-hand reauthoring",
+  "combatPolicy": "No gameplay, mitigation, healing, parry or input authority in this source candidate",
+  "originalClipPolicy": "Preserve original Idle/Walking and all runtime combat/guard source bytes",
+  "timingVariant": "tick-aligned-source-candidate",
+  "restoreStartTick": 53
+}

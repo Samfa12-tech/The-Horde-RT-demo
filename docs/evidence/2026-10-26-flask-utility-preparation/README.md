@@ -58,11 +58,39 @@ No gameplay duration, world speed, tether, parry window or accepted guard pose
 changed. The proof is not a measured wall-clock/FPS result or a slowed-gameplay
 claim. The [receipt](receipt.json) pins the source inputs and local test artifacts.
 
-## Next bounded source step and admission gates
+## Separate tick-aligned art derivative
 
-Retiming the source return edge by about6.667ms is independently authorable, but
-must preserve grip/prop continuity and pass its sampled contact/playback checks
-before using the earlier cue. The caller ordering must also be integrated
+A [separate editable r2 source](../../../assets/models/player/source/flask-use-tick-aligned-r2/README.md)
+now implements that source timing candidate. It returns the flask to the original
+belt root exactly at53/60s, restores over the unchanged0.36s and holds the final
+source pose through1.25s. Original r1 Blend bytes and its0.89s profile remain.
+Regenerating without the new explicit authorer option reproduces all original
+complete and cancellation pose rows exactly. The r2 cancellation rows also
+match the original exactly; its meshes, binds and original runtime/guard inputs
+are unchanged.
+
+Reloaded r2 actions pass76 complete/71 cancellation transform samples, exact
+start/end right-arm basis and unchanged left-arm matrix checks. All292 selected
+head/flask and head/gauntlet intersection observations remain zero. The
+[source receipt](retimed-source-receipt.json) pins those results and the new
+effective intent. These remain discrete selected-region checks, not continuous
+whole-body/prop collision detection.
+
+The body-view frames around the handoff were inspected. The source first-person
+belt witness has the hand/object outside its camera crop; it cannot establish
+native viewmodel visibility or comfort. The authoring body's final sword tip
+also exceeds its camera crop. This and the generic native IK/item
+profile still need actual aspect/light/weapon join review.
+
+[Complete r2 source animation preview](tick-aligned-complete.mp4): silent Blender
+Workbench,960x540,76 frames at60Hz,1.266667s including the endpoint sample.
+Rendering was unpaced. Full decode passed; no generated interpolation, repeated
+padding, artificial speedup, game RT frames or measured FPS are claimed. The
+unchanged cancellation action retains its [original source preview](../2026-10-26-flask-motion-study/cancel-source-preview.mp4).
+
+## Remaining admission gates
+
+The retimed art is still a source candidate. The caller ordering must be integrated
 deliberately: current GameSimulation does final flask admission/stepping after
 equipment advancement. Do not move methods wholesale, advance equipment twice,
 remove the unrelated-transition gate or postpone healing silently. Keep final

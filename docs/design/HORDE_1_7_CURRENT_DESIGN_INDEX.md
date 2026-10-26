@@ -70,7 +70,8 @@ Updated26October against source `e4de5a5e`; this heading retains its existing li
   This selected-region source evidence does not admit native bindings. Normal
   enablement is OFF. A [source-only equipment lease/clock proof](../evidence/2026-10-26-flask-utility-preparation/README.md)
   validates transition provenance; its retained0.89s source cue misses sword
-  readiness by one tick, so hand-art retiming and actual owner integration remain.
+  readiness by one tick. A separate tick-aligned source derivative passes sampled
+  contact/playback while preserving r1; actual owner/native integration remains.
   The two ring/flask proposals need a [joint owner review](HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md#ring-and-flask-proposals-must-be-reviewed-together),
   not two independent claims on owner28. No limits are approved by this index.
 - **Other presentation:** torch close-clearance containment plus hand framing,

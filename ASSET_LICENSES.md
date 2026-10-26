@@ -720,6 +720,12 @@ GLB SHA256 is `4a4337e81d98065c050ab896b8b0b61563feeedac55806665d2727ad14555cfa`
 The r1 source is preserved. Its editable derivative is in the separate study
 Blend; no modelled asset or clip is admitted to runtime/package inventories.
 
+`assets/models/player/source/flask-use-tick-aligned-r2/` is a separate timing
+derivative of that same owned source scene. It advances only the complete-use
+flask return/restore edge to53/60seconds, retaining original meshes, binds,
+materials, rights and cancellation action. The original r1 source remains.
+This source-only study is not a runtime/package asset or new third-party input.
+
 Silent source previews and compact provenance/validation receipts are retained
 in `docs/evidence/2026-10-26-flask-motion-study/`. They contain project assets in
 an authoring scene, not captured game footage, RT/performance evidence or an

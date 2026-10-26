@@ -19,6 +19,7 @@ from mathutils.bvhtree import BVHTree
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output',type=Path,required=True)
 parser.add_argument('--blend',type=Path,default=Path(__file__).resolve().parent/'flask-use-study-r1.blend')
+parser.add_argument('--intent',type=Path,default=Path(__file__).resolve().parent/'intent.json')
 parser.add_argument('--sweep',action='store_true')
 parser.add_argument('--motion-receipt',type=Path)
 args=parser.parse_args(sys.argv[sys.argv.index('--')+1:])
@@ -26,13 +27,16 @@ if args.output.exists():
     raise RuntimeError('Preserve prior source observation')
 source=args.blend.resolve()
 source_hash=hashlib.sha256(source.read_bytes()).hexdigest()
-spec=json.loads((Path(__file__).resolve().parent/'intent.json').read_text())
+intent_bytes=args.intent.read_bytes()
+spec=json.loads(intent_bytes)
 receipt=None
 if args.sweep:
     if args.motion_receipt is None:
         parser.error('--sweep requires the saved source --motion-receipt')
     receipt=json.loads(args.motion_receipt.read_text())
     assert receipt['blendSha256']==source_hash, 'Receipt must name this exact saved Blend'
+    if 'effectiveIntentSha256' in receipt:
+        assert hashlib.sha256(intent_bytes).hexdigest()==receipt['effectiveIntentSha256'], 'Use the matching effective intent'
     for path,digest in receipt['sourceHashes'].items():
         assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==digest, path
 bpy.ops.wm.open_mainfile(filepath=str(source))
