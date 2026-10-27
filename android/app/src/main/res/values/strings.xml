@@ -241,4 +241,5 @@
     <string name="crouch">Crouch</string>
     <string name="stand">Stand</string>
     <string name="crouching_blocked">Crouching (ceiling)</string>
+    <string name="compatibility_report">Report compatibility to developer</string>
 </resources>

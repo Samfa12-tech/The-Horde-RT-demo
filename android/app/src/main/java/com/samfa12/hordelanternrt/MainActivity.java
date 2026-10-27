@@ -166,6 +166,7 @@ public class MainActivity extends Activity {
     private static final int REQUEST_SAVE_PLAYTEST = 7102;
     private static final int REQUEST_SAVE_BENCHMARK_SUMMARY = 7103;
     private BenchmarkSummaryReview benchmarkSummaryReview;
+    private CompatibilityReportDialog compatibilityReportDialog;
     private boolean benchmarkSummaryVisible;
     private long benchmarkSummaryFormGeneration, benchmarkSummaryPickerToken, benchmarkSummaryPickerGeneration;
     private BenchmarkSummaryReview benchmarkSummaryPickerReview;
@@ -661,6 +662,7 @@ public class MainActivity extends Activity {
         menuScrim = findViewById(R.id.menu_scrim);
         diagnosticsPanel = findViewById(R.id.diagnostics_panel);
         reportTextView = findViewById(R.id.report_text);
+        findViewById(R.id.compatibility_report).setOnClickListener(view -> showCompatibilityReport());
         rtStatus = findViewById(R.id.rt_status);
         developerOverlay = findViewById(R.id.developer_overlay);
         menuButton = findViewById(R.id.menu_button);
@@ -1152,6 +1154,7 @@ public class MainActivity extends Activity {
         if(failed) {
             Button retry=addEntryMenuButton(panel,"Retry",this::retryStartupLoading,true);
             retry.setEnabled(!startupAssetsPending);
+            addEntryMenuButton(panel,getString(R.string.compatibility_report),this::showCompatibilityReport,false);
         }
         addEntryMenuButton(panel,"Cancel",() -> {if(startupUiVisible)showBackExitConfirmation();},false);
         attachPanel(panel);
@@ -1168,6 +1171,19 @@ public class MainActivity extends Activity {
         if(!startupAssetsPrepared)collectInitialDiagnostics();
         else {stopSurface();entryMenuAdmittedGeneration=0;startSurfaceIfReady();}
         showStartupLoading();
+    }
+
+    private void showCompatibilityReport() {
+        if(campaignDestroyed || isFinishing() || (!startupUiVisible && !diagnosticsVisible))return;
+        if(compatibilityReportDialog!=null && compatibilityReportDialog.pickerOutstanding()) {
+            Toast.makeText(this,"Finish the current file choice before opening another report.",Toast.LENGTH_LONG).show();return;
+        }
+        if(compatibilityReportDialog!=null)compatibilityReportDialog.close();
+        compatibilityReportDialog=new CompatibilityReportDialog(this,reportExecutor,
+            ProbeBridge::getCompatibilityReportRevision,
+            (revision,id,utc,consent)->ProbeBridge.prepareCompatibilityReport(revision,id,utc,consent,
+                Build.MODEL,"Android "+Build.VERSION.RELEASE+" (API "+Build.VERSION.SDK_INT+")"));
+        compatibilityReportDialog.show();
     }
 
     private void configureSurface() {
@@ -8411,6 +8427,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==CompatibilityReportDialog.SAVE_REQUEST) {
+            if(compatibilityReportDialog!=null)compatibilityReportDialog.finishPicker(resultCode,data);
+            return;
+        }
         if (requestCode == REQUEST_SAVE_BENCHMARK_SUMMARY) {
             finishBenchmarkSummaryPicker(resultCode, data);
             return;
@@ -8867,6 +8887,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if(compatibilityReportDialog!=null)compatibilityReportDialog.close();
         if (environmentSurveyMode) {
             finishEnvironmentSurvey(3);
             stopEnvironmentSurveySurface();

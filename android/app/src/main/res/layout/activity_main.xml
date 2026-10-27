@@ -41,6 +41,12 @@
                 android:textColor="#D8F0D0"
                 android:textIsSelectable="true"
                 android:textSize="12sp" />
+            <Button
+                android:id="@+id/compatibility_report"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/compatibility_report" />
         </LinearLayout>
     </ScrollView>
 

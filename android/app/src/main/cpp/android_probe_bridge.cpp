@@ -54,6 +54,7 @@
 #include "reporting/PlaytestReport.h"
 #include "reporting/PlaytestSubmission.h"
 #include "reporting/BenchmarkSummaryReport.h"
+#include "reporting/CompatibilityReport.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
@@ -493,6 +494,68 @@ std::string gLatestTextReport;
 std::string gLatestJsonReport;
 std::uint64_t gLatestReportSurfaceGeneration = 0u; // guarded by gReportMutex; zero is probe-only.
 horde::reporting::OwnedPlaytestReportContext gLatestPlaytestContext;
+// Independent of scene lifetime. UI preparation copies this owner and never
+// probes Vulkan, borrows renderer strings, or reads the diagnostic text dump.
+horde::reporting::CompatibilityReportSnapshot InitialCompatibilitySnapshot()
+{
+    horde::reporting::CompatibilityReportSnapshot snapshot;
+    snapshot.version=HORDE_RT_PACKAGE_VERSION;
+    snapshot.build=HORDE_RT_BUILD_ID;
+    snapshot.platform=horde::reporting::CompatibilityPlatform::Android;
+    return snapshot;
+}
+horde::reporting::CompatibilityReportSnapshot gLatestCompatibilitySnapshot=InitialCompatibilitySnapshot();
+std::uint64_t gCompatibilityRevision=1u; // guarded by gReportMutex; supports pre-probe asset failure review.
+std::uint64_t gCompatibilitySurfaceGeneration=0u;
+
+void AdvanceCompatibilityRevisionLocked()
+{
+    constexpr auto maximum=static_cast<std::uint64_t>(std::numeric_limits<jlong>::max());
+    if (gCompatibilityRevision<maximum) ++gCompatibilityRevision;
+    else gCompatibilityRevision=std::numeric_limits<std::uint64_t>::max(); // Unavailable, never wrap/reuse.
+}
+bool CompatibilityCurrentLocked()
+{
+    return gCompatibilityRevision<=static_cast<std::uint64_t>(std::numeric_limits<jlong>::max()) &&
+        (gCompatibilitySurfaceGeneration==0u || gSurfaceSessions.IsCurrent(gCompatibilitySurfaceGeneration));
+}
+void PublishCompatibilityProbe(horde::reporting::CompatibilityReportSnapshot snapshot,
+    const std::uint64_t generation)
+{
+    std::lock_guard lock(gReportMutex);
+    if (generation!=0u && !gSurfaceSessions.IsCurrent(generation)) return;
+    if (generation==0u && gCompatibilitySurfaceGeneration!=0u &&
+        gSurfaceSessions.IsCurrent(gCompatibilitySurfaceGeneration)) return;
+    gLatestCompatibilitySnapshot=std::move(snapshot);
+    gCompatibilitySurfaceGeneration=generation;
+    AdvanceCompatibilityRevisionLocked();
+}
+horde::reporting::CompatibilityBackend CompatibilityBackendFor(horde::vulkan::RtExecutionBackend backend)
+{
+    using Backend=horde::reporting::CompatibilityBackend;
+    return backend==horde::vulkan::RtExecutionBackend::RayTracingPipeline?Backend::RayTracingPipeline:
+        backend==horde::vulkan::RtExecutionBackend::RayQueryCompute?Backend::RayQueryCompute:Backend::NotSelected;
+}
+void PublishCompatibilityStage(const std::uint64_t generation,
+    horde::reporting::CompatibilityStage stage,horde::reporting::CompatibilityOutcome outcome,
+    const std::optional<horde::reporting::CompatibilityBackend> backend=std::nullopt,
+    const bool presented=false)
+{
+    using namespace horde::reporting;
+    std::lock_guard lock(gReportMutex);
+    if (generation==0u || !gSurfaceSessions.IsCurrent(generation) ||
+        generation!=gCompatibilitySurfaceGeneration) return;
+    auto& snapshot=gLatestCompatibilitySnapshot;
+    const auto selected=backend.value_or(snapshot.backend);
+    if (snapshot.probe!=CompatibilityProbe::DeviceChecked &&
+        (outcome!=CompatibilityOutcome::StartupFailure || selected!=CompatibilityBackend::NotSelected || presented)) return;
+    if (stage==CompatibilityStage::BackendSelection && selected==CompatibilityBackend::NotSelected &&
+        snapshot.outcome==CompatibilityOutcome::Unsupported) outcome=CompatibilityOutcome::Unsupported;
+    if (snapshot.lastStage==stage && snapshot.outcome==outcome && snapshot.backend==selected &&
+        snapshot.rtPresented==presented) return; // Stable reports do not invalidate an open review each frame.
+    snapshot.lastStage=stage; snapshot.outcome=outcome; snapshot.backend=selected; snapshot.rtPresented=presented;
+    AdvanceCompatibilityRevisionLocked();
+}
 // One consented foreground capture; only the render owner accesses rtScene.
 // JNI transfers owned pixels/context, never a live renderer pointer. Cancellation
 // invalidates the generation; it cannot undo a GPU readback already started.
@@ -1412,6 +1475,10 @@ void PublishRuntimeReports(const SwapchainContext& context,
         // report preparation never reads the live scene or private diagnostic JSON.
         gLatestPlaytestContext = PlaytestContextOnRenderOwner(context);
     }
+    if (context.capabilities.rtScene.presented)
+        PublishCompatibilityStage(context.surfaceGeneration,horde::reporting::CompatibilityStage::Presentation,
+            horde::reporting::CompatibilityOutcome::Presented,
+            CompatibilityBackendFor(context.capabilities.rtScene.executionBackend),true);
     WriteTextFile(context.reportDirectory + '/' + kTextReportFilename, text);
     WriteTextFile(context.reportDirectory + '/' + kJsonReportFilename, json);
 }
@@ -2480,11 +2547,68 @@ void RecordBenchmarkFrame(SwapchainContext& context,
     }
 }
 
-horde::vulkan::DeviceCapabilities RunProbe()
+horde::vulkan::DeviceCapabilities RunProbe(const std::uint64_t generation=0u,
+    const bool publishCompatibility=true)
 {
+    using namespace horde::reporting;
     horde::vulkan::VulkanContext context;
-    context.InitialiseForCapabilityProbe();
-    return context.QueryDeviceCapabilities();
+    const bool initialised=context.InitialiseForCapabilityProbe();
+    auto capabilities=context.QueryDeviceCapabilities();
+    if (!publishCompatibility) return capabilities;
+    auto snapshot=InitialCompatibilitySnapshot();
+    snapshot.lastStage=CompatibilityStage::CapabilityProbe;
+    snapshot.probe=initialised?CompatibilityProbe::NoDevice:CompatibilityProbe::Unavailable;
+    snapshot.outcome=initialised?CompatibilityOutcome::Unsupported:CompatibilityOutcome::ProbeUnavailable;
+    const auto physicalDevice=context.GetSelectedPhysicalDevice();
+    if (initialised && physicalDevice!=VK_NULL_HANDLE) {
+        snapshot.probe=CompatibilityProbe::DeviceChecked;
+        snapshot.outcome=CompatibilityOutcome::CapabilityOnly;
+        snapshot.gpu=capabilities.identity.gpuName;
+        snapshot.rawDriverVersion=capabilities.identity.driverVersion;
+        snapshot.vulkanApiVersion=capabilities.identity.vulkanApiVersion;
+        // Existing capability booleans have no "query completed" marker.
+        // Confirm extension enumeration before treating a false value as Absent.
+        std::uint32_t count=0u;
+        bool extensionsChecked=vkEnumerateDeviceExtensionProperties(physicalDevice,nullptr,&count,nullptr)==VK_SUCCESS;
+        std::vector<VkExtensionProperties> extensions;
+        if (extensionsChecked && count<=4096u) {
+            extensions.resize(count);
+            if (count!=0u) {
+                const auto capacity=count;
+                extensionsChecked=vkEnumerateDeviceExtensionProperties(physicalDevice,nullptr,&count,extensions.data())==VK_SUCCESS &&
+                    count<=capacity;
+                if (extensionsChecked) extensions.resize(count);
+            }
+        } else extensionsChecked=false;
+        const auto extension=[&](bool observed,const char* name) {
+            if (!extensionsChecked) return observed?CompatibilityCheck::Present:CompatibilityCheck::Unknown;
+            return std::any_of(extensions.begin(),extensions.end(),[name](const auto& item) {
+                return std::strncmp(item.extensionName,name,VK_MAX_EXTENSION_NAME_SIZE)==0;
+            })?CompatibilityCheck::Present:CompatibilityCheck::Absent;
+        };
+        const auto& e=capabilities.extensions;
+        snapshot.extensions={extension(e.accelerationStructure,VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME),
+            extension(e.rayTracingPipeline,VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME),
+            extension(e.rayQuery,VK_KHR_RAY_QUERY_EXTENSION_NAME),
+            extension(e.bufferDeviceAddress,VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME),
+            extension(e.deferredHostOperations,VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME)};
+        const auto feature=[](bool observed) { return observed?CompatibilityCheck::Present:CompatibilityCheck::Unknown; };
+        const auto& f=capabilities.features;
+        // Do not guess Absent when the original core/KHR Features2 entrypoint
+        // may have been unavailable. Positive queried values remain evidence.
+        snapshot.features={feature(f.accelerationStructure),feature(f.rayTracingPipeline),
+            feature(f.rayQuery),feature(f.bufferDeviceAddress)};
+        const auto& x=snapshot.extensions;
+        const bool commonBlocked=x.accelerationStructure==CompatibilityCheck::Absent ||
+            x.bufferDeviceAddress==CompatibilityCheck::Absent || x.deferredHostOperations==CompatibilityCheck::Absent;
+        const auto api=capabilities.identity.vulkanApiVersion;
+        const bool apiBlocked=api!=0u && api<VK_API_VERSION_1_2;
+        if (commonBlocked || apiBlocked ||
+            (x.rayTracingPipeline==CompatibilityCheck::Absent && x.rayQuery==CompatibilityCheck::Absent))
+            snapshot.outcome=CompatibilityOutcome::Unsupported;
+    }
+    PublishCompatibilityProbe(std::move(snapshot),generation);
+    return capabilities;
 }
 
 VkClearColorValue ClearColorForMode(const horde::vulkan::RtMode mode)
@@ -5831,12 +5955,16 @@ bool StartSurfaceInternal(ANativeWindow* window,
 
     if (!CreateInstance(context.instance, context.presentSurfaceSupport) || !gSurfaceSessions.IsCurrent(generation))
     {
+        if (!context.environmentSurvey) PublishCompatibilityStage(generation,
+            horde::reporting::CompatibilityStage::VulkanInstance,horde::reporting::CompatibilityOutcome::StartupFailure);
         DestroySwapchainContext(context);
         return false;
     }
 
     if (!CreateSurface(context.instance, context.window, context.surface) || !gSurfaceSessions.IsCurrent(generation))
     {
+        if (!context.environmentSurvey) PublishCompatibilityStage(generation,
+            horde::reporting::CompatibilityStage::Surface,horde::reporting::CompatibilityOutcome::StartupFailure);
         DestroySwapchainContext(context);
         return false;
     }
@@ -5844,6 +5972,8 @@ bool StartSurfaceInternal(ANativeWindow* window,
     context.physicalDevice = FindMatchingPhysicalDevice(context.instance, capabilities, context.surface);
     if (context.physicalDevice == VK_NULL_HANDLE || !gSurfaceSessions.IsCurrent(generation))
     {
+        if (!context.environmentSurvey) PublishCompatibilityStage(generation,
+            horde::reporting::CompatibilityStage::BackendSelection,horde::reporting::CompatibilityOutcome::StartupFailure);
         __android_log_print(ANDROID_LOG_ERROR, kTag, "No matching physical device found for Android diagnostic surface.");
         DestroySwapchainContext(context);
         return false;
@@ -5852,6 +5982,8 @@ bool StartSurfaceInternal(ANativeWindow* window,
     if (!FindGraphicsAndPresentQueueFamily(context.physicalDevice, context.surface, context.graphicsQueueFamilyIndex) ||
         !gSurfaceSessions.IsCurrent(generation))
     {
+        if (!context.environmentSurvey) PublishCompatibilityStage(generation,
+            horde::reporting::CompatibilityStage::BackendSelection,horde::reporting::CompatibilityOutcome::StartupFailure);
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Could not find graphics+compute+present queue family on Android.");
         DestroySwapchainContext(context);
         return false;
@@ -5861,10 +5993,17 @@ bool StartSurfaceInternal(ANativeWindow* window,
     context.executionBackend = horde::vulkan::raytracing::SelectRtExecutionBackend(
         capabilities, true, requireRayQueryCompute);
     horde::vulkan::BeginRtBackendSelection(context.capabilities.rtScene, context.executionBackend);
+    if (!context.environmentSurvey) PublishCompatibilityStage(generation,
+        horde::reporting::CompatibilityStage::BackendSelection,
+        context.executionBackend==horde::vulkan::RtExecutionBackend::Unsupported
+            ? horde::reporting::CompatibilityOutcome::StartupFailure:horde::reporting::CompatibilityOutcome::CapabilityOnly,
+        CompatibilityBackendFor(context.executionBackend));
     PublishRuntimeReports(context);
     if (requireRayQueryCompute &&
         context.executionBackend != horde::vulkan::RtExecutionBackend::RayQueryCompute)
     {
+        if (!context.environmentSurvey) PublishCompatibilityStage(generation,
+            horde::reporting::CompatibilityStage::BackendSelection,horde::reporting::CompatibilityOutcome::StartupFailure);
         __android_log_print(
             ANDROID_LOG_ERROR, kTag,
             "Required hardware RayQuery compute backend is unavailable; no alternate backend will be selected.");
@@ -5880,6 +6019,8 @@ bool StartSurfaceInternal(ANativeWindow* window,
         context.presentTimingExtensionEnabled) ||
         !gSurfaceSessions.IsCurrent(generation))
     {
+        if (!context.environmentSurvey) PublishCompatibilityStage(generation,
+            horde::reporting::CompatibilityStage::LogicalDevice,horde::reporting::CompatibilityOutcome::StartupFailure);
         DestroySwapchainContext(context);
         return false;
     }
@@ -5940,6 +6081,8 @@ bool StartSurfaceInternal(ANativeWindow* window,
 
     if (!CreateSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))
     {
+        if (!context.environmentSurvey) PublishCompatibilityStage(generation,
+            horde::reporting::CompatibilityStage::Swapchain,horde::reporting::CompatibilityOutcome::StartupFailure);
         if(gSurfaceSessions.IsCurrent(generation)) {
             std::lock_guard lock(gOpeningBenchmarkMutex);if(gOpeningBenchmarkOwner.Busy())gOpeningBenchmarkOwner.Block();
         }
@@ -5955,6 +6098,8 @@ bool StartSurfaceInternal(ANativeWindow* window,
     if(!context.environmentSurvey){context.entryHandoff.BeginLoad();PublishEntryState(context, false);}
     if (!InitialiseRtSceneForSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))
     {
+        if (!context.environmentSurvey) PublishCompatibilityStage(generation,
+            horde::reporting::CompatibilityStage::RtScene,horde::reporting::CompatibilityOutcome::StartupFailure);
         if(gSurfaceSessions.IsCurrent(generation)) {
             std::lock_guard lock(gOpeningBenchmarkMutex);if(gOpeningBenchmarkOwner.Busy())gOpeningBenchmarkOwner.Block();
         }
@@ -6057,10 +6202,12 @@ private:
             auto& request = *action->request;
             try
             {
-                const auto capabilities = RunProbe();
+                const auto capabilities = RunProbe(action->generation,!request.environmentSurvey);
                 if (!gSurfaceSessions.IsCurrent(action->generation)) continue;
                 if (!EnsureDirectoryExists(request.reportDirectory))
                 {
+                    if (!request.environmentSurvey) PublishCompatibilityStage(action->generation,
+                        horde::reporting::CompatibilityStage::AssetPreparation,horde::reporting::CompatibilityOutcome::StartupFailure);
                     if(request.environmentSurvey)FailEnvironmentSurvey(request.environmentSurveySerial,"request-report-directory-unavailable");
                     gSurfaceSessions.Publish(action->generation, 3);
                     continue;
@@ -7800,6 +7947,63 @@ bool ReadBenchmarkSummaryText(JNIEnv* env, jstring value, const std::size_t maxi
     return horde::reporting::EncodePlaytestReportUtf16(text, maximum, out) ==
         horde::reporting::PlaytestReportStatus::Ready;
 }
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getCompatibilityReportRevision(JNIEnv*,jclass)
+{
+    try {
+        std::lock_guard lock(gReportMutex);
+        return CompatibilityCurrentLocked()?static_cast<jlong>(gCompatibilityRevision):0;
+    } catch (...) { return 0; }
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_prepareCompatibilityReport(
+    JNIEnv* env,jclass,jlong expectedRevision,jstring reportUuid,jstring capturedAtUtc,
+    jboolean localConsent,jstring rawModel,jstring os)
+{
+    using namespace horde::reporting;
+    const auto reply=[env](CompatibilityReportStatus status,std::string_view text={}) {
+        std::string envelope(1u,static_cast<char>(status)); envelope.append(text);
+        return NewUtf8ByteArray(env,envelope);
+    };
+    try {
+        if (localConsent!=JNI_TRUE) return reply(CompatibilityReportStatus::ConsentRequired,
+            "Consent to prepare the local compatibility report is required.");
+        if (expectedRevision<=0) return reply(CompatibilityReportStatus::InvalidEvidence,
+            "Compatibility data is unavailable. Review it again before preparing.");
+        std::string id,utc,model,system;
+        if (!ReadBenchmarkSummaryText(env,reportUuid,36u,id))
+            return env->ExceptionCheck()?nullptr:reply(CompatibilityReportStatus::InvalidIdentity,"Invalid report identity.");
+        if (!ReadBenchmarkSummaryText(env,capturedAtUtc,30u,utc))
+            return env->ExceptionCheck()?nullptr:reply(CompatibilityReportStatus::InvalidTimestamp,"Invalid capture time.");
+        if (!ReadBenchmarkSummaryText(env,rawModel,kCompatibilityReportMaxLabelBytes,model) ||
+            !ReadBenchmarkSummaryText(env,os,kCompatibilityReportMaxLabelBytes,system))
+            return env->ExceptionCheck()?nullptr:reply(CompatibilityReportStatus::InvalidLabel,"Invalid model or OS label.");
+        CompatibilityReportSnapshot frozen;
+        std::uint64_t revision=0u,generation=0u;
+        {
+            std::lock_guard lock(gReportMutex);
+            if (!CompatibilityCurrentLocked() || gCompatibilityRevision!=static_cast<std::uint64_t>(expectedRevision))
+                return reply(CompatibilityReportStatus::InvalidEvidence,"Compatibility data changed. Review it again.");
+            frozen=gLatestCompatibilitySnapshot;
+            revision=gCompatibilityRevision; generation=gCompatibilitySurfaceGeneration;
+        }
+        frozen.model=std::move(model); frozen.os=std::move(system);
+        const auto prepared=PrepareCompatibilityReport(frozen,{true,id,utc});
+        if (!prepared.IsReady()) return reply(prepared.Status(),"The bounded compatibility report could not be prepared.");
+        {
+            std::lock_guard lock(gReportMutex);
+            if (!CompatibilityCurrentLocked() || revision!=gCompatibilityRevision ||
+                generation!=gCompatibilitySurfaceGeneration)
+                return reply(CompatibilityReportStatus::InvalidEvidence,"Compatibility data changed. Review it again.");
+        }
+        return reply(CompatibilityReportStatus::Ready,prepared.Json());
+    } catch (...) {
+        return env->ExceptionCheck()?nullptr:reply(CompatibilityReportStatus::InvalidEvidence,
+            "Compatibility report preparation is unavailable.");
+    }
 }
 
 extern "C" JNIEXPORT jboolean JNICALL

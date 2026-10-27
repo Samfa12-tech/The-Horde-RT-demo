@@ -1,4 +1,5 @@
 #include "reporting/BenchmarkSummaryReport.h"
+#include "reporting/DeveloperReportSubmission.h"
 #include "reporting/PlaytestReport.h"
 
 #include <iostream>
@@ -178,6 +179,15 @@ void TestCompletedFreezePrivacyAndPopulation()
     const auto prepared = PrepareBenchmarkSummaryReport(summary, Approval());
     Check(prepared.IsReady() && prepared.Json().size() <= kBenchmarkSummaryReportMaxBytes, "schema2 bounded local summary ready");
     const auto json = prepared.Json();
+    Check(!PreparePrivateDeveloperReport(prepared).IsReady(), "local benchmark approval is not private send consent");
+    const auto remote = PreparePrivateDeveloperReport(prepared, true);
+    Check(remote.IsReady() && remote.LocalJson() == json && remote.Kind() == DeveloperReportKind::Benchmark &&
+        remote.Json().find("\"publishToBoard\":false") != std::string_view::npos,
+        "typed private benchmark wrapper has no public-board authority");
+    Check(BuildDeveloperReportRequest(remote, "").empty() && BuildDeveloperReportRequest(remote, "bad\ntoken").empty() &&
+        !BuildDeveloperReportRequest(remote, "fresh-local-token").empty() &&
+        remote.Json().find("turnstileToken") == std::string_view::npos,
+        "one-time verification cannot mutate the reviewed benchmark or frozen private wrapper");
     Check(json.find("\"benchmarkProfile\":{\"id\":\"custom\",\"classification\":\"custom-unranked\",\"ranked\":false}") != std::string_view::npos &&
         json.find("provisional-v1") == std::string_view::npos,
         "current live report explicitly stays custom and unranked until fixed-surface observations exist");

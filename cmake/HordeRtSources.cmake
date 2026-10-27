@@ -18,6 +18,8 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     audio/MusicPcmAssetBank.cpp
     audio/MusicPlaybackSession.cpp
     reporting/PlaytestReport.cpp
+    reporting/CompatibilityReport.cpp
+    reporting/DeveloperReportSubmission.cpp
     reporting/BenchmarkSummaryReport.cpp
     reporting/BenchmarkSummarySubmission.cpp
     reporting/PlaytestSubmission.cpp

@@ -22,6 +22,11 @@ public final class ProbeBridge {
 
     public static native String getTextReport();
     public static native String getJsonReport();
+    /** Owned startup evidence revision; zero means unavailable/stale, never renderer readiness. */
+    public static native long getCompatibilityReportRevision();
+    /** Local review/export only: status0 then strict UTF-8 JSON. No probe or renderer access. */
+    public static native byte[] prepareCompatibilityReport(long expectedRevision, String reportId,
+            String capturedAtUtc, boolean localConsent, String rawModel, String os);
     // One status byte (0=ready), then strict UTF-8 JSON/error text. No modified UTF-8.
     public static native byte[] preparePlaytestReport(String reportId, String capturedAtUtc,
             int category, int impact, String note, boolean exportConsent,

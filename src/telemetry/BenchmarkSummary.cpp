@@ -1,4 +1,5 @@
 #include "telemetry/BenchmarkSummary.h"
+#include "reporting/ReportIdentity.h"
 
 #include <algorithm>
 #include <cmath>
@@ -131,14 +132,7 @@ bool CollectPopulation(const horde::gameplay::ShowcaseBenchmarkRun& benchmark,
 
 bool IsBenchmarkSummaryUuid(const std::string_view uuid) noexcept
 {
-    if (uuid.size() != 36u || uuid[14] != '4' ||
-        (uuid[19] != '8' && uuid[19] != '9' && uuid[19] != 'a' && uuid[19] != 'b')) return false;
-    for (std::size_t i = 0u; i < uuid.size(); ++i)
-    {
-        if (i == 8u || i == 13u || i == 18u || i == 23u) { if (uuid[i] != '-') return false; }
-        else if (!((uuid[i] >= '0' && uuid[i] <= '9') || (uuid[i] >= 'a' && uuid[i] <= 'f'))) return false;
-    }
-    return true;
+    return horde::reporting::IsReportUuidV4(uuid);
 }
 
 FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBenchmarkRun& benchmark,

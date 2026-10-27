@@ -52,6 +52,9 @@ final class PlaytestReportSubmission {
     /** May run on the worker or deadline thread; callers must post to UI and recheck attempt/state. */
     interface Callback { void completed(long attempt, Result result); }
     interface Transport {
+        // Explicit local/staged contract admission. Production HTTPS keeps the
+        // default false until a compatible deployment is separately verified.
+        default boolean admitsPrivateDeveloperReports() { return false; }
         /** Takes ownership of requestBody and must wipe it on completion or cancellation. */
         Call open(byte[] requestBody);
     }
@@ -82,6 +85,7 @@ final class PlaytestReportSubmission {
     private long generation;
     private ActiveCall active;
     private boolean benchmarkSummary;
+    private String developerKind = "";
 
     PlaytestReportSubmission(Executor executor, Transport transport) {
         this(executor, transport, REAL_TIMEOUTS, CLEANUP_EXECUTOR::execute);
@@ -154,6 +158,28 @@ final class PlaytestReportSubmission {
 
     boolean beginBenchmarkSummary(BenchmarkSummaryReview review) { return beginBenchmarkSummary(review, false); }
 
+    synchronized boolean beginPrivateBenchmarkSummary(BenchmarkSummaryReview review, boolean privateSendConsent) {
+        return review != null && review.isPrepared() && beginPrivateDeveloperReport(
+                review.reportId(), review.exactJsonBytes(), "benchmark-summary", privateSendConsent);
+    }
+
+    synchronized boolean beginPrivateCompatibility(CompatibilityReportReview review, boolean privateSendConsent) {
+        return review != null && review.isPrepared() && beginPrivateDeveloperReport(
+                review.reportId(), review.exactJsonBytes(), "compatibility", privateSendConsent);
+    }
+
+    private boolean beginPrivateDeveloperReport(String id, byte[] local, String kind, boolean consent) {
+        if (!consent || state != State.DRAFT || !BenchmarkSummaryReview.validUuid(id) || local == null ||
+                local.length < 2 || local.length > MAX_BENCHMARK_LOCAL_BYTES || local[0] != '{' || local[local.length-1] != '}') return false;
+        byte[] suffix = (",\"consentToSubmit\":true,\"delivery\":{\"destination\":\"developer-private\",\"publishToBoard\":false}}")
+                .getBytes(StandardCharsets.UTF_8);
+        if ((long)local.length - 1 + suffix.length > MAX_BENCHMARK_SUBMISSION_BYTES) return false;
+        frozenJson = Arrays.copyOf(local, local.length - 1 + suffix.length);
+        System.arraycopy(suffix, 0, frozenJson, local.length - 1, suffix.length);
+        reportId = id; developerKind = kind; ++generation; state = State.READY;
+        return true;
+    }
+
     /** Memory-only clone for offline review. This is not a transport capability. */
     synchronized byte[] benchmarkSummaryJsonForOfflineReview() {
         return benchmarkSummary && frozenJson != null ? frozenJson.clone() : null;
@@ -172,10 +198,11 @@ final class PlaytestReportSubmission {
         final byte[] body;
         final ActiveCall activeCall;
         synchronized (this) {
-            if (benchmarkSummary && !BENCHMARK_SUMMARY_LIVE_SEND_ENABLED) return false;
+            if ((!developerKind.isEmpty() && !transport.admitsPrivateDeveloperReports()) ||
+                    (benchmarkSummary && !BENCHMARK_SUMMARY_LIVE_SEND_ENABLED)) return false;
             if (state != State.READY || requestedAttempt != generation || !validToken(freshToken)) return false;
             body = buildRequest(frozenJson, freshToken,
-                    benchmarkSummary ? MAX_BENCHMARK_SUBMISSION_BYTES : MAX_SUBMISSION_BYTES);
+                    benchmarkSummary || !developerKind.isEmpty() ? MAX_BENCHMARK_SUBMISSION_BYTES : MAX_SUBMISSION_BYTES);
             if (body == null) return false;
             state = State.IN_FLIGHT;
             activeCall = new ActiveCall(requestedAttempt, body);
@@ -208,7 +235,7 @@ final class PlaytestReportSubmission {
             activeCall.register(call);
             if (!activeCall.isCurrent()) return;
             Response response = call.execute();
-            Result result = classify(response, reportId);
+            Result result = classify(response, reportId, developerKind);
             finish(requestedAttempt, activeCall, result, callback);
         } catch (IOException | RuntimeException failure) {
             finish(requestedAttempt, activeCall, new Result(ResultCode.UNCERTAIN), callback);
@@ -358,10 +385,10 @@ final class PlaytestReportSubmission {
         return request;
     }
 
-    private static Result classify(Response response, String reportId) {
+    private static Result classify(Response response, String reportId, String developerKind) {
         if (response == null || response.body.length > MAX_RESPONSE_BYTES) return new Result(ResultCode.UNCERTAIN);
         if (response.status == 200 || response.status == 202) {
-            Ack ack = parseAck(response.body);
+            Ack ack = parseAck(response.body, developerKind);
             if (ack == null || !reportId.equals(ack.id)) return new Result(ResultCode.UNCERTAIN);
             if (response.status == 202 && "accepted".equals(ack.status)) return new Result(ResultCode.QUEUED);
             if (response.status == 200 && "sent".equals(ack.status)) return new Result(ResultCode.SENT);
@@ -378,28 +405,30 @@ final class PlaytestReportSubmission {
     private static final class Ack {
         String id;
         String status;
+        String destination, reportKind;
     }
 
     // The relay acknowledgment has exactly three flat fields. A small strict reader
     // avoids Android-only JSON classes and rejects duplicate/unknown keys.
-    private static Ack parseAck(byte[] bytes) {
+    private static Ack parseAck(byte[] bytes, String developerKind) {
         if (bytes == null || bytes.length == 0 || bytes.length > MAX_RESPONSE_BYTES) return null;
         final String text;
         try {
             text = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
                     .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(bytes)).toString();
         } catch (Exception malformed) { return null; }
-        AckParser parser = new AckParser(text);
+        AckParser parser = new AckParser(text, developerKind);
         return parser.parse();
     }
 
     private static final class AckParser {
         final String text;
+        final String developerKind;
         int at;
         final Set<String> keys = new HashSet<>();
         Ack ack = new Ack();
         boolean ok;
-        AckParser(String text) { this.text = text; }
+        AckParser(String text, String developerKind) { this.text = text; this.developerKind = developerKind; }
         Ack parse() {
             ws(); if (!take('{')) return null; ws();
             if (take('}')) return null;
@@ -409,6 +438,8 @@ final class PlaytestReportSubmission {
                 if ("ok".equals(key)) { if (!literal("true")) return null; ok = true; }
                 else if ("id".equals(key)) { ack.id = string(); if (ack.id == null) return null; }
                 else if ("status".equals(key)) { ack.status = string(); if (ack.status == null) return null; }
+                else if (!developerKind.isEmpty() && "destination".equals(key)) { ack.destination = string(); if (ack.destination == null) return null; }
+                else if (!developerKind.isEmpty() && "reportKind".equals(key)) { ack.reportKind = string(); if (ack.reportKind == null) return null; }
                 else return null;
                 ws();
                 if (take('}')) break;
@@ -417,7 +448,8 @@ final class PlaytestReportSubmission {
                 if (at >= text.length() || text.charAt(at) == '}') return null;
             }
             ws();
-            if (at != text.length() || !ok || keys.size() != 3 || ack.id == null || ack.status == null ||
+            if (at != text.length() || !ok || keys.size() != (developerKind.isEmpty() ? 3 : 5) || ack.id == null || ack.status == null ||
+                    (!developerKind.isEmpty() && (!"developer-private".equals(ack.destination) || !developerKind.equals(ack.reportKind))) ||
                     !ack.id.matches("[A-Za-z0-9_-]{8,96}") ||
                     !("accepted".equals(ack.status) || "sent".equals(ack.status))) return null;
             return ack;

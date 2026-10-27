@@ -5,6 +5,10 @@ bounded flask checkpoint. This is unfinished work, not acceptance inferred from
 local review/export UI, proposed wire contracts or an earlier bug-report email.
 No public website/backend mutation or test submission occurred for this record.
 
+Implementation: [staged API/data model](HORDE_1_7_REPORTING_API_2026_10_27.md)
+and [bounded client/mock evidence](../evidence/2026-10-27-developer-reports/README.md).
+These remain source/local evidence, not live delivery or public-board completion.
+
 ## Required outcomes
 
 - Consented **private developer benchmark report** from Windows and Android,

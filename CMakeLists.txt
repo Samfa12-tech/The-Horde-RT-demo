@@ -200,6 +200,8 @@ add_library(horde_gameplay_simulation STATIC
     src/reporting/PlaytestReport.cpp
     src/reporting/PlaytestSubmission.cpp
     src/reporting/BenchmarkSummarySubmission.cpp
+    src/reporting/CompatibilityReport.cpp
+    src/reporting/DeveloperReportSubmission.cpp
     src/gameplay/simulation/GameSimulation.cpp
     src/gameplay/effects/WaterContact.cpp
     src/gameplay/simulation/GameSimulationRescue.cpp
@@ -588,6 +590,11 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_benchmark_summary_report_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_benchmark_summary_report_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_benchmark_summary_report_tests COMMAND horde_rt_benchmark_summary_report_tests)
+    add_executable(horde_rt_compatibility_report_tests tests/CompatibilityReportTests.cpp)
+    target_include_directories(horde_rt_compatibility_report_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_compatibility_report_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_compatibility_report_tests COMMAND horde_rt_compatibility_report_tests)
+    set_tests_properties(horde_rt_compatibility_report_tests PROPERTIES TIMEOUT 30)
     add_executable(horde_rt_staged_primary_contract_tests tests/StagedPrimaryContractTests.cpp)
     target_include_directories(horde_rt_staged_primary_contract_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_staged_primary_contract_tests COMMAND horde_rt_staged_primary_contract_tests)

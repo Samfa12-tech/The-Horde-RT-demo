@@ -9,6 +9,7 @@
 #include <windows.h>
 
 #include "reporting/PlaytestSubmission.h"
+#include "reporting/DeveloperReportSubmission.h"
 
 #include <chrono>
 #include <atomic>
@@ -133,6 +134,10 @@ public:
 
     [[nodiscard]] bool Begin(HWND window,
         const reporting::PreparedPlaytestSubmission& submission, std::string_view turnstileToken);
+    // Reuses the ordinary bounded worker/cancellation owner with an injected
+    // exchange only. Never falls through to the deployed schema1 bug endpoint.
+    [[nodiscard]] bool BeginDeveloperReportForLocalValidation(HWND window,
+        const reporting::PreparedDeveloperReportSubmission&, std::string_view freshToken);
     [[nodiscard]] bool Retry(HWND window, std::string_view turnstileToken);
     void CancelAttempt() noexcept;
     void Reset() noexcept;
@@ -147,6 +152,8 @@ public:
         WindowsPlaytestSubmissionResult& result) noexcept;
 
 private:
+    [[nodiscard]] bool BeginFrozen(HWND, const reporting::PreparedPlaytestSubmission&,
+        std::string_view, std::string developerKind = {});
     std::shared_ptr<State> state_;
 };
 } // namespace horde::platform::windows

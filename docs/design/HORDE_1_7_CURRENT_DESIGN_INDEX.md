@@ -1,5 +1,11 @@
 # Horde 1.7 current design index
 
+27October: [private-report and renderer-independent compatibility slice](../evidence/2026-10-27-developer-reports/README.md)
+adds typed local evidence and destination-bound mock delivery while production
+sending remains disabled. The [API/site handoff](HORDE_1_7_REPORTING_API_2026_10_27.md)
+keeps private delivery distinct from explicitly consented public statistics;
+backend/site implementation, real delivery and platform acceptance remain open.
+
 27October: [gated live flask pickup](../evidence/2026-10-26-flask-native-binding/runtime-pickup.md)
 now connects current scene/world readiness, actual grounded F03 site, fresh
 contextual interaction and exact saved entitlement/charge restoration. World and
