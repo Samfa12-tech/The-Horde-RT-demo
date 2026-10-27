@@ -213,6 +213,13 @@ int main()
     static_assert(std::is_same_v<decltype(std::declval<PreparedCompatibilityReport>().Json()),std::string_view>);
     static_assert(!std::is_constructible_v<PreparedCompatibilityReport,std::string>);
     MissingProbeAndUnsupported(); PresentationAndStartupEvidence(); ConsentPrivacyBoundsAndOwnership();
+    auto laterFailure=Presented();laterFailure.outcome=CompatibilityOutcome::RuntimeFailure;
+    laterFailure.lastStage=CompatibilityStage::Presentation;
+    const auto observedFailure=PrepareCompatibilityReport(laterFailure,Approval());
+    Check(observedFailure.IsReady() && Has(observedFailure,"runtime-failure") && Has(observedFailure,"\"rtPresented\":true"),
+        "later present failure retains a genuine earlier successful RT presentation");
+    laterFailure.rtPresented=false;
+    Check(!PrepareCompatibilityReport(laterFailure,Approval()).IsReady(),"runtime failure cannot invent prior presentation");
     const auto local=PrepareCompatibilityReport(Initial(),Approval());
     const auto privateReport=PreparePrivateDeveloperReport(local,true);
     Check(!PreparePrivateDeveloperReport(local).IsReady() && privateReport.IsReady() &&

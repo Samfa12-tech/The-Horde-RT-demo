@@ -19,11 +19,11 @@ enum class CompatibilityBackend : std::uint8_t { NotSelected, RayTracingPipeline
 enum class CompatibilityStage : std::uint8_t
 {
     None, CapabilityProbe, AssetPreparation, VulkanInstance, Surface,
-    BackendSelection, LogicalDevice, Swapchain, RtScene, Presentation,
+    BackendSelection, LogicalDevice, Swapchain, RtScene, Presentation, RenderLoop, DiagnosticStorage, WindowCreation,
 };
 enum class CompatibilityOutcome : std::uint8_t
 {
-    NotAttempted, ProbeUnavailable, CapabilityOnly, Unsupported, StartupFailure, Presented,
+    NotAttempted, ProbeUnavailable, CapabilityOnly, Unsupported, StartupFailure, Presented, RuntimeFailure,
 };
 
 struct CompatibilityExtensions

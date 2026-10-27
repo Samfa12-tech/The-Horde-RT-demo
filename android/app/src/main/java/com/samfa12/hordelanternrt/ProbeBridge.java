@@ -22,6 +22,10 @@ public final class ProbeBridge {
 
     public static native String getTextReport();
     public static native String getJsonReport();
+    /** Reset owned evidence before each Java asset attempt; no probe or renderer access. */
+    public static native long beginCompatibilityStartupAttempt();
+    /** Only the current pre-surface asset owner may publish its observed failure. */
+    public static native boolean failCompatibilityAssetPreparation(long attemptToken);
     /** Owned startup evidence revision; zero means unavailable/stale, never renderer readiness. */
     public static native long getCompatibilityReportRevision();
     /** Local review/export only: status0 then strict UTF-8 JSON. No probe or renderer access. */

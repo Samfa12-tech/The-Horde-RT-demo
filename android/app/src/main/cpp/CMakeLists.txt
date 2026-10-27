@@ -145,3 +145,5 @@ target_link_libraries(horde_rt_probe_android
     ${ANDROID_LOG_LIBRARY}
     ${ANDROID_LIBRARY}
 )
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtReportingIdentityInputs.cmake")
+horde_rt_attach_reporting_identity(horde_rt_probe_android "${HORDE_RT_REPO_ROOT}" Android "${ANDROID_ABI}")

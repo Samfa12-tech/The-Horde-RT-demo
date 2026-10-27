@@ -101,18 +101,25 @@ validators/storage/receipts/provider proof, public consent/projection/API, websi
 page/link and reviewed deployment remain genuine unfinished implementation. No
 new credentials, account setting, provider or live test send was attempted.
 
+## Follow-up and pause
+
+The [bounded follow-up checkpoint](pause-followup.md) adds Windows owned local
+review/failure wiring, Android asset/startup ownership, observed runtime-failure
+classification and native source/input provenance. It records the affected
+build/component checks, retained initial configure failure and current limits.
+It supersedes the earlier platform/build-identity gaps below; backend/live delivery,
+public board/site and native/device acceptance remain unfinished.
+
 ## Remaining acceptance and implementation
 
-- Complete remaining platform collection coverage; retain unsupported versus
-  unchecked/probe-unavailable distinction. Java asset failure before native probe
-  currently has no precise native asset-failure publication. Native-library
-  startup failure offers honest unavailable/Close, not fabricated export data.
-- Windows startup/unsupported UI collector/review wiring remains separate from
-  the implemented shared builder and injected Windows private transport proof.
-- Current `HORDE_RT_BUILD_ID` is the package-version authority, not an exact
-  source/artifact hash. It must not become a falsely unique comparison key.
-  Exact build/artifact provenance and complete comparable public buckets still
-  need their planned reporting/package integration.
+- Remaining platform coverage includes fatal termination, hangs and final teardown;
+  unknown feature-query results stay unknown. Real native/device lifecycle and
+  Windows appearance/input/export checks remain pending. Native-library startup
+  failure offers honest unavailable/Close, not fabricated export data.
+- Source/native-input provenance now complements package-version authority. It is
+  not an exact packaged-artifact hash or full comparison key: Java/assets/package,
+  shader/settings/profile and actual output evidence still need their respective
+  trustworthy fields and artifact receipts.
 - Backend staging and production admission are unimplemented. Do not enable
   live private send from mocks. Public board consent/storage/query and site are
   not implemented or published. Return exact deployment/config/rollback actions

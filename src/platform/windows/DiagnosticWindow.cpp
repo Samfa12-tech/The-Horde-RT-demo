@@ -20,6 +20,8 @@
 #include "gameplay/campaign/CampaignLoadBarrier.h"
 #include "platform/windows/GraphicsMenuNavigation.h"
 #include "platform/windows/WindowsPlaytestReport.h"
+#include "platform/windows/WindowsCompatibilityReport.h"
+#include "reporting/BuildIdentity.h"
 #include "platform/windows/WindowsRemotePlaytestReport.h"
 #include "audio/SfxVolume.h"
 #include "graphics/GraphicsSettings.h"
@@ -321,6 +323,79 @@ constexpr int kMenuCreditsId = 2023;
 constexpr int kMenuDeveloperOverlayId = 2024;
 constexpr int kMenuCheckUpdatesId = 2025;
 constexpr int kMenuReportProblemId = 2026;
+constexpr int kMenuCompatibilityReportId = 2027;
+constexpr wchar_t kCompatibilityProperty[]=L"HordeCompatibilityOwnerV1";
+struct CompatibilityWindowOwner
+{
+    horde::reporting::CompatibilityReportSnapshot snapshot;
+    horde::reporting::CompatibilityReportSnapshot probeSnapshot;
+    horde::reporting::CompatibilityStage stage=horde::reporting::CompatibilityStage::WindowCreation;
+    bool reviewOpen=false, failureCleanup=false;
+};
+CompatibilityWindowOwner* CompatibilityFor(HWND window)
+{return reinterpret_cast<CompatibilityWindowOwner*>(GetPropW(window,kCompatibilityProperty));}
+void SetCompatibilityAttemptStage(HWND window,horde::reporting::CompatibilityStage stage)
+{if(auto* owner=CompatibilityFor(window))owner->stage=stage;}
+void CompatibilityFailure(CompatibilityWindowOwner& owner)
+{
+    using namespace horde::reporting;
+    owner.snapshot.lastStage=owner.stage;
+    owner.snapshot.outcome=owner.snapshot.rtPresented?CompatibilityOutcome::RuntimeFailure:CompatibilityOutcome::StartupFailure;
+}
+void CompatibilityPresentation(HWND window,horde::vulkan::RtExecutionBackend backend)
+{
+    using namespace horde::reporting;
+    if(backend!=horde::vulkan::RtExecutionBackend::RayTracingPipeline && backend!=horde::vulkan::RtExecutionBackend::RayQueryCompute)return;
+    if(auto* owner=CompatibilityFor(window)) {
+        owner->snapshot.backend=backend==horde::vulkan::RtExecutionBackend::RayTracingPipeline?
+            CompatibilityBackend::RayTracingPipeline:CompatibilityBackend::RayQueryCompute;
+        owner->snapshot.rtPresented=true;owner->snapshot.outcome=CompatibilityOutcome::Presented;
+        owner->snapshot.lastStage=CompatibilityStage::Presentation;
+    }
+}
+CompatibilityWindowOwner CaptureWindowsCompatibilityProbe(const horde::vulkan::VulkanContext& probe,
+    const bool initialised,const horde::vulkan::DeviceCapabilities& capabilities)
+{
+    using namespace horde::reporting;
+    CompatibilityWindowOwner owner;auto& s=owner.snapshot;
+    s.version=HORDE_RT_PACKAGE_VERSION;s.build=CurrentBuildIdentity().ReportLabel();
+    s.platform=CompatibilityPlatform::Windows;s.lastStage=CompatibilityStage::CapabilityProbe;
+    s.probe=probe.HasConfirmedNoPhysicalDevices()?CompatibilityProbe::NoDevice:CompatibilityProbe::Unavailable;
+    s.outcome=probe.HasConfirmedNoPhysicalDevices()?CompatibilityOutcome::Unsupported:CompatibilityOutcome::ProbeUnavailable;
+    // The API-reported OS value can depend on the executable manifest or user
+    // compatibility mode. Preserve that caveat; never infer RT support from it.
+#pragma warning(push)
+#pragma warning(disable:4996)
+    OSVERSIONINFOW os{sizeof(OSVERSIONINFOW)};
+    if(GetVersionExW(&os))s.os="Windows API major "+std::to_string(os.dwMajorVersion)+" minor "+
+        std::to_string(os.dwMinorVersion)+" build "+std::to_string(os.dwBuildNumber)+" (manifest/compatibility dependent)";
+#pragma warning(pop)
+    const auto physical=probe.GetSelectedPhysicalDevice();
+    if(initialised && physical!=VK_NULL_HANDLE) {
+        s.probe=CompatibilityProbe::DeviceChecked;s.outcome=CompatibilityOutcome::CapabilityOnly;
+        s.gpu=capabilities.identity.gpuName;s.rawDriverVersion=capabilities.identity.driverVersion;s.vulkanApiVersion=capabilities.identity.vulkanApiVersion;
+        std::uint32_t count=0;bool checked=vkEnumerateDeviceExtensionProperties(physical,nullptr,&count,nullptr)==VK_SUCCESS;
+        std::vector<VkExtensionProperties> extensions;
+        if(checked && count<=4096u) {extensions.resize(count);const auto capacity=count;
+            if(count)checked=vkEnumerateDeviceExtensionProperties(physical,nullptr,&count,extensions.data())==VK_SUCCESS && count<=capacity;
+            if(checked)extensions.resize(count);
+        } else checked=false;
+        const auto extension=[&](bool observed,const char* name){
+            if(!checked)return observed?CompatibilityCheck::Present:CompatibilityCheck::Unknown;
+            return std::any_of(extensions.begin(),extensions.end(),[&](const auto& e){return std::strncmp(e.extensionName,name,VK_MAX_EXTENSION_NAME_SIZE)==0;})?
+                CompatibilityCheck::Present:CompatibilityCheck::Absent;};
+        const auto& e=capabilities.extensions;
+        s.extensions={extension(e.accelerationStructure,VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME),extension(e.rayTracingPipeline,VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME),
+            extension(e.rayQuery,VK_KHR_RAY_QUERY_EXTENSION_NAME),extension(e.bufferDeviceAddress,VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME),extension(e.deferredHostOperations,VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME)};
+        const auto feature=[](bool b){return b?CompatibilityCheck::Present:CompatibilityCheck::Unknown;};const auto& f=capabilities.features;
+        s.features={feature(f.accelerationStructure),feature(f.rayTracingPipeline),feature(f.rayQuery),feature(f.bufferDeviceAddress)};
+        const auto& x=s.extensions;
+        if((capabilities.identity.vulkanApiVersion!=0 && capabilities.identity.vulkanApiVersion<VK_API_VERSION_1_2) ||
+            x.accelerationStructure==CompatibilityCheck::Absent || x.bufferDeviceAddress==CompatibilityCheck::Absent || x.deferredHostOperations==CompatibilityCheck::Absent ||
+            (x.rayTracingPipeline==CompatibilityCheck::Absent && x.rayQuery==CompatibilityCheck::Absent))s.outcome=CompatibilityOutcome::Unsupported;
+    }
+    owner.probeSnapshot=s;return owner;
+}
 constexpr int kMenuTeachingEnabledId = 2030;
 constexpr int kMenuTeachingSlowdownId = 2031;
 constexpr int kMenuTeachingSkipId = 2032;
@@ -4015,7 +4090,7 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(
     horde::gameplay::ShowcaseBenchmarkMetadata metadata;
     metadata.legacyFrameTimingScope = "windows-render-plus-rtlab-telemetry";
     metadata.timestampUtc = UtcTimestamp("%Y-%m-%dT%H:%M:%SZ");
-    metadata.buildIdentity = HORDE_RT_BUILD_ID;
+    metadata.buildIdentity = horde::reporting::CurrentBuildIdentity().ReportLabel();
     metadata.shaderIdentity = context.rtScene.SelectedPipelineBundleIdentity();
     metadata.gpuName = capabilities.identity.gpuName;
     metadata.vulkanApi = std::to_string(VK_API_VERSION_MAJOR(capabilities.identity.vulkanApiVersion)) + "." +
@@ -9216,6 +9291,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     horde::vulkan::RetirementOwner<VulkanSurfaceContext> renderOwner(
         std::make_unique<VulkanSurfaceContext>(), DestroyRenderContext, DetachRenderContextHost);
     auto& context = *renderOwner.Get();
+    if(auto* compatibility=CompatibilityFor(hWnd))compatibility->snapshot=compatibility->probeSnapshot;
     context.openingBenchmark = openingBenchmark;
     context.openingBenchmarkOwner = openingBenchmark && openingBenchmark->owner.Phase()==OpeningBenchmarkOwnerPhase::Benchmark;
     context.openingBenchmarkReturnPending = openingBenchmark && openingBenchmark->owner.Phase()==OpeningBenchmarkOwnerPhase::ReturningEntry;
@@ -9394,17 +9470,20 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         // user focus arms the run. Native evidence starts no audio at any point.
     }
 #endif
+    SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::VulkanInstance);
     if (!CreateInstance(context.instance, context.presentSurfaceSupport))
     {
         return 1;
     }
 
+    SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::Surface);
     if (!CreateSurface(context.instance, hWnd, context.surface))
     {
         (void)renderOwner.Retire();
         return 1;
     }
 
+    SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::BackendSelection);
     uint32_t physicalDeviceCount = 0u;
     if (vkEnumeratePhysicalDevices(context.instance, &physicalDeviceCount, nullptr) != VK_SUCCESS || physicalDeviceCount == 0u)
     {
@@ -9446,6 +9525,16 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.executionBackend = horde::vulkan::raytracing::SelectRtExecutionBackend(
         capabilities, true, requireRayQueryCompute);
     horde::vulkan::BeginRtBackendSelection(capabilities.rtScene, context.executionBackend);
+    if(auto* owner=CompatibilityFor(hWnd)) {
+        using namespace horde::reporting;
+        owner->snapshot.rtPresented=false;
+        owner->snapshot.backend=context.executionBackend==horde::vulkan::RtExecutionBackend::RayTracingPipeline?CompatibilityBackend::RayTracingPipeline:
+            context.executionBackend==horde::vulkan::RtExecutionBackend::RayQueryCompute?CompatibilityBackend::RayQueryCompute:CompatibilityBackend::NotSelected;
+        owner->snapshot.lastStage=CompatibilityStage::BackendSelection;
+        if(owner->snapshot.backend==CompatibilityBackend::NotSelected && owner->snapshot.outcome!=CompatibilityOutcome::Unsupported)
+            owner->snapshot.outcome=CompatibilityOutcome::StartupFailure;
+        else if(owner->snapshot.backend!=CompatibilityBackend::NotSelected)owner->snapshot.outcome=CompatibilityOutcome::CapabilityOnly;
+    }
     const bool selectedTextWritten = WriteReportFile(
         textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
     const bool selectedJsonWritten = WriteReportFile(
@@ -9461,6 +9550,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         return 2;
     }
     context.useRtPath = context.executionBackend != horde::vulkan::RtExecutionBackend::Unsupported;
+    SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::LogicalDevice);
     if (!CreateLogicalDevice(context.physicalDevice, context.instance, context.graphicsQueueFamilyIndex, context.executionBackend,
         context.device, context.graphicsQueue, context.presentSurfaceSupport, context.presentCompletionMode))
     {
@@ -9477,6 +9567,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
               << " available=" << (context.pipelineCache != VK_NULL_HANDLE ? 1 : 0) << '\n';
     capabilities.diagnostics.push_back(horde::vulkan::PresentCompletionDiagnostic(context.presentCompletionMode));
 
+    SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::Swapchain);
     if (!CreateSwapchain(context, hWnd))
     {
         (void)renderOwner.Retire();
@@ -9488,6 +9579,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             !context.environmentSurveyWaterDisabled)))
     {std::cerr<<"Environment survey geometry selection was not admitted before scene initialization.\n";(void)renderOwner.Retire();return 1;}
     #endif
+    SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::RtScene);
     if (!InitialiseRtSceneForSwapchain(context))
     {
         (void)renderOwner.Retire();
@@ -9916,7 +10008,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         const auto frameStart = std::chrono::steady_clock::now();
         bool rtFramePresented = false;
         context.expectedBenchmarkFrame.reset();
+        SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::RenderLoop);
         const bool frameRendered = RenderFrame(context, clearColor, rtFramePresented);
+        if(rtFramePresented && (context.lastFramePresentation==horde::telemetry::RtPresentationOutcome::Presented ||
+            context.lastFramePresentation==horde::telemetry::RtPresentationOutcome::PresentedNeedsRecreate))
+            CompatibilityPresentation(hWnd,context.rtScene.ExecutionBackend());
         if (benchmarkFrame && context.benchmarkProfileActive &&
             !ObserveWindowsBenchmarkProfileMeasurement(context, false))
             CancelBenchmark(context, false, "profile-observed-state-changed");
@@ -11030,6 +11126,17 @@ bool NativeUiUsesHighContrast()
 LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
+    if(message==WM_COMMAND && LOWORD(wParam)==kMenuCompatibilityReportId) {
+        auto* owner=CompatibilityFor(hWnd);
+        if(!owner || owner->reviewOpen || (sceneContext && sceneContext->benchmark.IsRunning()))return 0;
+        if(sceneContext) {ShowPauseMenu(*sceneContext,true);ClearDesktopInput(*sceneContext);DiscardDesktopPendingCommands(*sceneContext);}
+        owner->reviewOpen=true;
+        horde::platform::windows::ShowWindowsCompatibilityReport(hWnd,owner->snapshot);
+        owner->reviewOpen=false;
+        if(IsWindow(hWnd) && reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd,GWLP_USERDATA))==sceneContext && sceneContext)
+            ClearDesktopInput(*sceneContext);
+        return 0;
+    }
 #if defined(_DEBUG)
     if(gOpeningBenchmarkMenuValidation && ((message==WM_KEYDOWN && wParam==VK_ESCAPE) || message==WM_CLOSE)) {
         const auto* transfer=sceneContext ? sceneContext->openingBenchmark :
@@ -12527,7 +12634,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         ReleaseDpiScaledFonts(hWnd);
         RemovePropA(hWnd, kCaptureModeProperty);
-        PostQuitMessage(0);
+        if(!CompatibilityFor(hWnd) || !CompatibilityFor(hWnd)->failureCleanup)PostQuitMessage(0);
         return 0;
     default:
         break;
@@ -12571,6 +12678,7 @@ HMENU CreateApplicationMenu()
     AppendMenuA(help, MF_SEPARATOR, 0, nullptr);
     AppendMenuA(help, MF_STRING, kMenuCheckUpdatesId, "Check for &updates...");
     AppendMenuA(help, MF_STRING, kMenuReportProblemId, "&Report a problem...");
+    AppendMenuA(help, MF_STRING, kMenuCompatibilityReportId, "Report &compatibility to developer...");
     AppendMenuA(help, MF_SEPARATOR, 0, nullptr);
     AppendMenuA(help, MF_STRING, kMenuCreditsId, "&Credits && licences");
     AppendMenuA(help, MF_STRING, kMenuAboutId, "&About");
@@ -12653,6 +12761,7 @@ void InstallControllerFocusOutline(HWND control)
 
 int CreateAndShowWindow(const std::string& diagnosticText,
                         horde::vulkan::DeviceCapabilities& capabilities,
+                        CompatibilityWindowOwner& compatibility,
                         const std::filesystem::path& textReportPath,
                         const std::filesystem::path& jsonReportPath,
                         const std::filesystem::path* captureDirectory,
@@ -12720,6 +12829,11 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         std::cerr << "Failed to create diagnostic window." << std::endl;
         return 1;
     }
+    if(!SetPropW(hWnd,kCompatibilityProperty,&compatibility)){DestroyWindow(hWnd);return 1;}
+    struct CompatibilityBinding {
+        HWND window;CompatibilityWindowOwner* owner;
+        ~CompatibilityBinding(){if(IsWindow(window) && CompatibilityFor(window)==owner)RemovePropW(window,kCompatibilityProperty);}
+    } compatibilityBinding{hWnd,&compatibility};
 #if defined(_DEBUG)
     if((gLookoutHiddenValidation || gRouteHiddenValidation) && !ObserveHiddenLookoutForeground(hWnd,"owner-created")) {
         DestroyWindow(hWnd);return 1;
@@ -12759,7 +12873,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     if (!edit)
     {
         std::cerr << "Failed to create diagnostic text area." << std::endl;
-        return 1;
+        compatibility.failureCleanup=true;DestroyWindow(hWnd);return 1;
     }
 
     auto createStatic = [&](const int id, const char* text, const DWORD style = SS_CENTER) {
@@ -13051,6 +13165,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     } while(openingBenchmark.owner.Phase()==OpeningBenchmarkOwnerPhase::Benchmark ||
             openingBenchmark.owner.Phase()==OpeningBenchmarkOwnerPhase::ReturningEntry);
     if(openingEligible && IsWindow(hWnd))RemovePropA(hWnd,kOpeningBenchmarkTransferProperty);
+    if(result!=0 && IsWindow(hWnd)){compatibility.failureCleanup=true;DestroyWindow(hWnd);}
     if ((gCampaignHiddenValidation || captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
 #if defined(_DEBUG)
@@ -13112,6 +13227,15 @@ int RunDiagnosticWindow(const int showCommand)
     horde::vulkan::VulkanContext context;
     const bool initialised = context.InitialiseForCapabilityProbe();
     horde::vulkan::DeviceCapabilities capabilities = context.QueryDeviceCapabilities();
+    auto compatibility=CaptureWindowsCompatibilityProbe(context,initialised,capabilities);
+    const bool reportInteractive=!launchOptions.requested && !launchOptions.benchmark.requested && !launchOptions.graphicsPreview &&
+        !launchOptions.outputResizeValidation && launchOptions.nativeMotionScenario.empty() && !launchOptions.environmentSurvey.requested &&
+        !gCampaignHiddenValidation && !gOpeningBenchmarkMenuValidation && !gShowcaseCaptureHidden;
+    const auto failure=[&](horde::reporting::CompatibilityStage stage){
+        compatibility.stage=stage;CompatibilityFailure(compatibility);
+        if(reportInteractive)ShowWindowsCompatibilityReport(nullptr,compatibility.snapshot,{},true);
+        return 1;
+    };
 
     const std::string diagnosticText = BuildDisplayText(capabilities);
     const std::string textReport = horde::vulkan::BuildCapabilityTextReport(capabilities);
@@ -13131,7 +13255,7 @@ int RunDiagnosticWindow(const int showCommand)
     if (error)
     {
         std::cerr << "Failed to create report directory '" << kReportDirectory << "': " << error.message() << '\n';
-        return 1;
+        return failure(horde::reporting::CompatibilityStage::DiagnosticStorage);
     }
 
     const std::filesystem::path textReportPath = reportDirectory / kTextReportFilename;
@@ -13140,13 +13264,13 @@ int RunDiagnosticWindow(const int showCommand)
     if (!WriteReportFile(textReportPath, textReport))
     {
         std::cerr << "Failed to write text report to " << textReportPath << '\n';
-        return 1;
+        return failure(horde::reporting::CompatibilityStage::DiagnosticStorage);
     }
 
     if (!WriteReportFile(jsonReportPath, jsonReport))
     {
         std::cerr << "Failed to write JSON report to " << jsonReportPath << '\n';
-        return 1;
+        return failure(horde::reporting::CompatibilityStage::DiagnosticStorage);
     }
 
     std::cout << "Stored report (text): " << textReportPath << '\n';
@@ -13158,7 +13282,7 @@ int RunDiagnosticWindow(const int showCommand)
     const std::string* developmentCheckpoint = launchOptions.developmentCheckpoint.empty()
         ? nullptr
         : &launchOptions.developmentCheckpoint;
-    return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath,
+    const auto result=CreateAndShowWindow(diagnosticText, capabilities, compatibility, textReportPath, jsonReportPath,
                                captureDirectory, developmentCheckpoint, launchOptions.portrait,
                                launchOptions.requireRayQueryCompute,
                                launchOptions.benchmark.requested, launchOptions.benchmark.workload,
@@ -13166,6 +13290,8 @@ int RunDiagnosticWindow(const int showCommand)
                                launchOptions.anatomicalPlayerMount, launchOptions.graphicsPreview, launchOptions.outputResizeValidation,
                                launchOptions.nativeMotionScenario, launchOptions.nativeMotionRtWorkloadPreset,
                                launchOptions.captureDustQuality);
+    if(result!=0 && reportInteractive){CompatibilityFailure(compatibility);ShowWindowsCompatibilityReport(nullptr,compatibility.snapshot,{},true);}
+    return result;
 }
 
 } // namespace horde::platform::windows

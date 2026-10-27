@@ -1,5 +1,6 @@
 #include "reporting/CompatibilityReport.h"
 #include "reporting/PlaytestReport.h"
+#include "reporting/BuildIdentity.h"
 #include "reporting/ReportIdentity.h"
 
 #include <algorithm>
@@ -63,8 +64,8 @@ bool RouteBlocked(const CompatibilityReportSnapshot& s, bool pipeline)
 bool ValidEvidence(const CompatibilityReportSnapshot& s)
 {
     if (s.platform>CompatibilityPlatform::Android || s.probe>CompatibilityProbe::DeviceChecked ||
-        s.backend>CompatibilityBackend::RayQueryCompute || s.lastStage>CompatibilityStage::Presentation ||
-        s.outcome>CompatibilityOutcome::Presented) return false;
+        s.backend>CompatibilityBackend::RayQueryCompute || s.lastStage>CompatibilityStage::WindowCreation ||
+        s.outcome>CompatibilityOutcome::RuntimeFailure) return false;
     const auto all=AllChecks(s);
     if (std::any_of(all.begin(),all.end(),[](Check c){return c>Check::Present;})) return false;
     if (s.vulkanApiVersion && !ValidApi(*s.vulkanApiVersion)) return false;
@@ -79,7 +80,7 @@ bool ValidEvidence(const CompatibilityReportSnapshot& s)
     }
     if (s.backend!=CompatibilityBackend::NotSelected &&
         !RouteSupported(s,s.backend==CompatibilityBackend::RayTracingPipeline)) return false;
-    if (s.rtPresented!=(s.outcome==CompatibilityOutcome::Presented)) return false;
+    if (s.rtPresented!=(s.outcome==CompatibilityOutcome::Presented || s.outcome==CompatibilityOutcome::RuntimeFailure)) return false;
     switch (s.outcome)
     {
     case CompatibilityOutcome::NotAttempted:
@@ -102,6 +103,10 @@ bool ValidEvidence(const CompatibilityReportSnapshot& s)
     case CompatibilityOutcome::Presented:
         return s.probe==CompatibilityProbe::DeviceChecked && s.lastStage==CompatibilityStage::Presentation &&
             s.backend!=CompatibilityBackend::NotSelected;
+    case CompatibilityOutcome::RuntimeFailure:
+        return s.probe==CompatibilityProbe::DeviceChecked && s.backend!=CompatibilityBackend::NotSelected &&
+            (s.lastStage==CompatibilityStage::RtScene || s.lastStage==CompatibilityStage::Presentation ||
+             s.lastStage==CompatibilityStage::RenderLoop);
     }
     return false;
 }
@@ -122,14 +127,14 @@ std::string_view Name(CompatibilityBackend v)
 }
 std::string_view Name(CompatibilityStage v)
 {
-    constexpr std::array<std::string_view,10> names{"not-started","capability-probe","asset-preparation",
-        "vulkan-instance","surface","backend-selection","logical-device","swapchain","rt-scene","presentation"};
+    constexpr std::array<std::string_view,13> names{"not-started","capability-probe","asset-preparation",
+        "vulkan-instance","surface","backend-selection","logical-device","swapchain","rt-scene","presentation","render-loop","diagnostic-storage","window-creation"};
     return names[static_cast<std::size_t>(v)];
 }
 std::string_view Name(CompatibilityOutcome v)
 {
-    constexpr std::array<std::string_view,6> names{"not-attempted","probe-unavailable","capability-only",
-        "unsupported","startup-failure","rt-presented"};
+    constexpr std::array<std::string_view,7> names{"not-attempted","probe-unavailable","capability-only",
+        "unsupported","startup-failure","rt-presented","runtime-failure"};
     return names[static_cast<std::size_t>(v)];
 }
 
@@ -173,7 +178,7 @@ PreparedCompatibilityReport PrepareCompatibilityReport(const CompatibilityReport
     for (std::size_t i=0;i<labels.size();++i) {
         const auto& value=*labels[i];
         if (value.size()>kCompatibilityReportMaxLabelBytes) { result.status_=CompatibilityReportStatus::TooLarge; return result; }
-        if ((value.empty() && i<3u) || (!value.empty() && !SafeLabel(value))) {
+        if ((value.empty() && i<3u) || (!value.empty() && !(i==2u && IsBuildIdentityReportLabel(value)) && !SafeLabel(value))) {
             result.status_=CompatibilityReportStatus::InvalidLabel; return result;
         }
     }

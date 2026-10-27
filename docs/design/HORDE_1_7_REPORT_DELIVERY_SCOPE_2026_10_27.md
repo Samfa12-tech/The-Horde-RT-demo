@@ -64,3 +64,11 @@ This scope does not certify any untested device (including the Pixel discussion
 that prompted it). Preserve exact-build evidence classes in the compatibility
 record and treat sustained phone performance as ongoing optimization, not a
 release-FPS veto or reason to reduce the approved world/content scope.
+
+## Owner pause checkpoint
+
+The [client follow-up receipt](../evidence/2026-10-27-developer-reports/pause-followup.md)
+records Windows local startup/failure review, Android startup ownership and native
+source/input identity. Owner requested a pause before new public projection,
+backend or website work. Required outcomes above remain unchanged and unfinished;
+resume only after an explicit owner request.

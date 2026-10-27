@@ -21,6 +21,7 @@ public:
 
     DeviceCapabilities QueryDeviceCapabilities() const;
     VkPhysicalDevice GetSelectedPhysicalDevice() const;
+    bool HasConfirmedNoPhysicalDevices() const noexcept { return confirmedNoPhysicalDevices_; }
     const std::vector<std::string>& GetDiagnosticLog() const { return startupDiagnostics_; }
 
 private:
@@ -29,6 +30,7 @@ private:
     std::vector<std::string> startupDiagnostics_;
     DeviceCapabilities selectedCapabilities_;
     bool initialised_ = false;
+    bool confirmedNoPhysicalDevices_ = false;
     VkInstance instance_ = VK_NULL_HANDLE;
     VkPhysicalDevice selectedPhysicalDevice_ = VK_NULL_HANDLE;
 };

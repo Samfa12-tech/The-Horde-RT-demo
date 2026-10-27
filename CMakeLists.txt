@@ -519,6 +519,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         src/platform/windows/DiagnosticWindow.cpp
         src/platform/windows/WindowsGitHubReleaseUpdate.cpp
         src/platform/windows/WindowsPlaytestReport.cpp
+        src/platform/windows/WindowsCompatibilityReport.cpp
         src/platform/windows/WindowsRemotePlaytestReport.cpp
         src/platform/windows/WindowsPlaytestScreenshot.cpp
         src/platform/windows/WindowsPlaytestSubmission.cpp
@@ -554,6 +555,8 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         HORDE_RT_BUILD_ID="${HORDE_RT_BUILD_ID}"
         $<$<CONFIG:Debug>:HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}">
     )
+    include(cmake/HordeRtReportingIdentityInputs.cmake)
+    horde_rt_attach_reporting_identity(horde_rt_diagnostic_window "${CMAKE_CURRENT_SOURCE_DIR}" Windows "${CMAKE_GENERATOR_PLATFORM}")
     if(HORDE_RT_CHAPTER_MEASUREMENT)
         target_compile_definitions(horde_rt_probe_core PUBLIC HORDE_RT_CHAPTER_MEASUREMENT=1)
         target_compile_definitions(horde_rt_diagnostic_window PRIVATE
@@ -595,6 +598,12 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_compatibility_report_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_compatibility_report_tests COMMAND horde_rt_compatibility_report_tests)
     set_tests_properties(horde_rt_compatibility_report_tests PROPERTIES TIMEOUT 30)
+    add_executable(horde_rt_compatibility_startup_ownership_tests tests/CompatibilityStartupOwnershipTests.cpp)
+    target_include_directories(horde_rt_compatibility_startup_ownership_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_compatibility_startup_ownership_tests COMMAND horde_rt_compatibility_startup_ownership_tests)
+    add_executable(horde_rt_build_identity_tests tools/build-identity/BuildIdentityTests.cpp)
+    target_include_directories(horde_rt_build_identity_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_build_identity_tests COMMAND horde_rt_build_identity_tests)
     add_executable(horde_rt_staged_primary_contract_tests tests/StagedPrimaryContractTests.cpp)
     target_include_directories(horde_rt_staged_primary_contract_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_staged_primary_contract_tests COMMAND horde_rt_staged_primary_contract_tests)
@@ -1289,6 +1298,12 @@ if(BUILD_TESTING)
 
     if(WIN32)
         add_executable(horde_rt_windows_subtitle_bitmap_tests tests/WindowsSubtitleBitmapTests.cpp)
+        add_executable(horde_rt_windows_compatibility_report_tests tests/WindowsCompatibilityReportTests.cpp
+            src/platform/windows/WindowsCompatibilityReport.cpp src/platform/windows/WindowsPlaytestReport.cpp)
+        target_include_directories(horde_rt_windows_compatibility_report_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_windows_compatibility_report_tests PRIVATE horde_gameplay_simulation comdlg32 bcrypt)
+        add_test(NAME horde_rt_windows_compatibility_report_tests COMMAND horde_rt_windows_compatibility_report_tests)
+        set_tests_properties(horde_rt_windows_compatibility_report_tests PROPERTIES TIMEOUT 30)
         target_include_directories(horde_rt_windows_subtitle_bitmap_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_sources(horde_rt_windows_subtitle_bitmap_tests PRIVATE
             "${HORDE_RT_WINDOWS_RESOURCE_DIRECTORY}/HordeLanternRT.manifest")

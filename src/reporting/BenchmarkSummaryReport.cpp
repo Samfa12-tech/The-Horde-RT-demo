@@ -1,5 +1,6 @@
 #include "reporting/BenchmarkSummaryReport.h"
 #include "reporting/PlaytestReport.h"
+#include "reporting/BuildIdentity.h"
 #include "gameplay/BenchmarkProfile.h"
 
 #include <algorithm>
@@ -108,7 +109,7 @@ PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(const FrozenBenchma
     { result.status_ = BenchmarkSummaryReportStatus::InvalidCooling; return result; }
     const auto& c = data.configuration;
     const auto& m = c.metadata;
-    if (!SafeLabel(m.buildIdentity) || !ValidShaderPair(m.shaderIdentity) || !SafeLabel(m.materialEncoding) ||
+    if ((!IsBuildIdentityReportLabel(m.buildIdentity) && !SafeLabel(m.buildIdentity)) || !ValidShaderPair(m.shaderIdentity) || !SafeLabel(m.materialEncoding) ||
         (approval.includeBasicHardware && (!SafeLabel(data.rawModel) || !SafeLabel(m.gpuName) || !SafeLabel(m.vulkanApi))))
     { result.status_ = BenchmarkSummaryReportStatus::InvalidLabel; return result; }
     std::ostringstream out;

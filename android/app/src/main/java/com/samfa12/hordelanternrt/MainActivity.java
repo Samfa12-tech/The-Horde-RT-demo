@@ -486,7 +486,7 @@ public class MainActivity extends Activity {
     private int rtWorkloadPreset = 1;
     private int keyboardFlaskHeld,keyboardFlaskBlocked;
     private boolean startupAssetsPrepared,startupAssetsPending,startupAssetsFailed,startupUiVisible,startupEntryFailed;
-    private long startupAssetsAttempt,entryMenuAdmittedGeneration;
+    private long startupAssetsAttempt,entryMenuAdmittedGeneration, startupCompatibilityAttempt;
     private int startupShownRuntime=-1;
     private boolean retryPending, confirmedRetryPending;
     private long confirmedRetryRequestFloor, confirmedRetryStarted;
@@ -1057,7 +1057,9 @@ public class MainActivity extends Activity {
         if(startupAssetsAttempt==Long.MAX_VALUE) {startupAssetsFailed=true;showStartupLoading();return;}
         final long attempt=++startupAssetsAttempt,epoch=campaignConfigurationEpoch;
         startupAssetsPending=true;startupAssetsPrepared=false;startupAssetsFailed=false;
-        StartupAssetWork.execute(() -> {
+        try {startupCompatibilityAttempt=ProbeBridge.beginCompatibilityStartupAttempt();}
+        catch(RuntimeException | LinkageError unavailable) {startupCompatibilityAttempt=0;}
+        try {StartupAssetWork.execute(() -> {
             // A queued obsolete Activity never starts a second writer. An already
             // running writer finishes before the single queue starts its successor.
             if(campaignDestroyed || campaignActivityEpochs.get()!=epoch)return;
@@ -1066,7 +1068,9 @@ public class MainActivity extends Activity {
             catch(Throwable unavailable) {prepared=new StartupDiagnostics(false,"Startup preparation failed: "+unavailable.getMessage());}
             final StartupDiagnostics result=prepared;
             handler.post(() -> completeInitialDiagnostics(epoch,attempt,result));
-        });
+        });}catch(RuntimeException unavailable) {
+            completeInitialDiagnostics(epoch,attempt,new StartupDiagnostics(false,"Startup work could not be queued."));
+        }
     }
 
     private void completeInitialDiagnostics(long epoch,long attempt,StartupDiagnostics result) {
@@ -1074,6 +1078,10 @@ public class MainActivity extends Activity {
            attempt!=startupAssetsAttempt)return;
         startupAssetsPending=false;startupAssetsPrepared=result.assetsPrepared;
         startupAssetsFailed=!result.assetsPrepared;reportText=result.text;
+        if(!result.assetsPrepared && startupCompatibilityAttempt>0) {
+            try {ProbeBridge.failCompatibilityAssetPreparation(startupCompatibilityAttempt);}
+            catch(RuntimeException | LinkageError unavailable) { /* Optional diagnostics cannot block Close/Retry. */ }
+        }
         if(reportTextView!=null)reportTextView.setText(reportText);
         if(!resumed)return; // Resume observes the retained result; never opens UI in background.
         if(startupAssetsPrepared)startSurfaceIfReady();

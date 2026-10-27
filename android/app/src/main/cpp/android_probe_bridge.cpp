@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
+#include <exception>
 #include <fstream>
 #include <iomanip>
 #include <locale>
@@ -55,6 +56,8 @@
 #include "reporting/PlaytestSubmission.h"
 #include "reporting/BenchmarkSummaryReport.h"
 #include "reporting/CompatibilityReport.h"
+#include "reporting/BuildIdentity.h"
+#include "reporting/CompatibilityStartupOwnership.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
@@ -486,6 +489,7 @@ struct SurfaceStartRequest
     std::string reportDirectory;
     bool environmentSurvey=false;
     std::uint64_t environmentSurveySerial=0;
+    std::uint64_t compatibilityStartupAttempt=0;
 };
 horde::platform::android::SurfaceSessionMailbox<SurfaceStartRequest> gSurfaceSessions;
 #include "android_environment_survey_state.inl"
@@ -500,13 +504,14 @@ horde::reporting::CompatibilityReportSnapshot InitialCompatibilitySnapshot()
 {
     horde::reporting::CompatibilityReportSnapshot snapshot;
     snapshot.version=HORDE_RT_PACKAGE_VERSION;
-    snapshot.build=HORDE_RT_BUILD_ID;
+    snapshot.build=horde::reporting::CurrentBuildIdentity().ReportLabel();
     snapshot.platform=horde::reporting::CompatibilityPlatform::Android;
     return snapshot;
 }
 horde::reporting::CompatibilityReportSnapshot gLatestCompatibilitySnapshot=InitialCompatibilitySnapshot();
 std::uint64_t gCompatibilityRevision=1u; // guarded by gReportMutex; supports pre-probe asset failure review.
 std::uint64_t gCompatibilitySurfaceGeneration=0u;
+horde::reporting::CompatibilityStartupOwnership gCompatibilityStartupOwnership;
 
 void AdvanceCompatibilityRevisionLocked()
 {
@@ -520,9 +525,10 @@ bool CompatibilityCurrentLocked()
         (gCompatibilitySurfaceGeneration==0u || gSurfaceSessions.IsCurrent(gCompatibilitySurfaceGeneration));
 }
 void PublishCompatibilityProbe(horde::reporting::CompatibilityReportSnapshot snapshot,
-    const std::uint64_t generation)
+    const std::uint64_t generation, const std::uint64_t startupAttempt=0u)
 {
     std::lock_guard lock(gReportMutex);
+    if (!gCompatibilityStartupOwnership.AcceptProbe(startupAttempt,generation!=0u)) return;
     if (generation!=0u && !gSurfaceSessions.IsCurrent(generation)) return;
     if (generation==0u && gCompatibilitySurfaceGeneration!=0u &&
         gSurfaceSessions.IsCurrent(gCompatibilitySurfaceGeneration)) return;
@@ -530,6 +536,43 @@ void PublishCompatibilityProbe(horde::reporting::CompatibilityReportSnapshot sna
     gCompatibilitySurfaceGeneration=generation;
     AdvanceCompatibilityRevisionLocked();
 }
+void PublishCompatibilityFailure(const std::uint64_t generation,
+    const horde::reporting::CompatibilityStage stage)
+{
+    using namespace horde::reporting;
+    std::lock_guard lock(gReportMutex);
+    if (generation==0u || generation!=gCompatibilitySurfaceGeneration || !gSurfaceSessions.IsCurrent(generation)) return;
+    auto& snapshot=gLatestCompatibilitySnapshot;
+    const auto outcome=snapshot.rtPresented?CompatibilityOutcome::RuntimeFailure:CompatibilityOutcome::StartupFailure;
+    if (snapshot.lastStage==stage && snapshot.outcome==outcome) return;
+    snapshot.lastStage=stage; snapshot.outcome=outcome;
+    AdvanceCompatibilityRevisionLocked();
+}
+void PublishCompatibilityUnboundFailure(const std::uint64_t startupAttempt)
+{
+    using namespace horde::reporting;
+    std::lock_guard lock(gReportMutex);
+    if (!gCompatibilityStartupOwnership.IsCurrent(startupAttempt) || gCompatibilitySurfaceGeneration!=0u) return;
+    auto& snapshot=gLatestCompatibilitySnapshot;
+    snapshot.lastStage=CompatibilityStage::RenderLoop;
+    snapshot.outcome=CompatibilityOutcome::StartupFailure;
+    AdvanceCompatibilityRevisionLocked();
+}
+// Preserve the exact typed stage already reached if native startup unwinds.
+// Thread creation has its own RenderLoop marker, without inferring a GPU cause.
+struct CompatibilityStartupFailureScope
+{
+    std::uint64_t generation;
+    bool enabled;
+    horde::reporting::CompatibilityStage stage=horde::reporting::CompatibilityStage::RenderLoop;
+    int exceptions=std::uncaught_exceptions();
+    ~CompatibilityStartupFailureScope()
+    {
+        if (enabled && std::uncaught_exceptions()>exceptions) {
+            try { PublishCompatibilityFailure(generation,stage); } catch (...) { }
+        }
+    }
+};
 horde::reporting::CompatibilityBackend CompatibilityBackendFor(horde::vulkan::RtExecutionBackend backend)
 {
     using Backend=horde::reporting::CompatibilityBackend;
@@ -1568,7 +1611,7 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(const Swapchai
     horde::gameplay::ShowcaseBenchmarkMetadata metadata;
     metadata.runId = context.benchmarkRunId;
     metadata.timestampUtc = UtcTimestamp();
-    metadata.buildIdentity = HORDE_RT_BUILD_ID;
+    metadata.buildIdentity = horde::reporting::CurrentBuildIdentity().ReportLabel();
     metadata.shaderIdentity = context.rtScene.SelectedPipelineBundleIdentity();
     metadata.gpuName = context.capabilities.identity.gpuName;
     metadata.vulkanApi = std::to_string(VK_API_VERSION_MAJOR(context.capabilities.identity.vulkanApiVersion)) + "." +
@@ -2548,7 +2591,7 @@ void RecordBenchmarkFrame(SwapchainContext& context,
 }
 
 horde::vulkan::DeviceCapabilities RunProbe(const std::uint64_t generation=0u,
-    const bool publishCompatibility=true)
+    const bool publishCompatibility=true, const std::uint64_t startupAttempt=0u)
 {
     using namespace horde::reporting;
     horde::vulkan::VulkanContext context;
@@ -2557,8 +2600,9 @@ horde::vulkan::DeviceCapabilities RunProbe(const std::uint64_t generation=0u,
     if (!publishCompatibility) return capabilities;
     auto snapshot=InitialCompatibilitySnapshot();
     snapshot.lastStage=CompatibilityStage::CapabilityProbe;
-    snapshot.probe=initialised?CompatibilityProbe::NoDevice:CompatibilityProbe::Unavailable;
-    snapshot.outcome=initialised?CompatibilityOutcome::Unsupported:CompatibilityOutcome::ProbeUnavailable;
+    const bool confirmedNoDevice=initialised && context.HasConfirmedNoPhysicalDevices();
+    snapshot.probe=confirmedNoDevice?CompatibilityProbe::NoDevice:CompatibilityProbe::Unavailable;
+    snapshot.outcome=confirmedNoDevice?CompatibilityOutcome::Unsupported:CompatibilityOutcome::ProbeUnavailable;
     const auto physicalDevice=context.GetSelectedPhysicalDevice();
     if (initialised && physicalDevice!=VK_NULL_HANDLE) {
         snapshot.probe=CompatibilityProbe::DeviceChecked;
@@ -2607,7 +2651,7 @@ horde::vulkan::DeviceCapabilities RunProbe(const std::uint64_t generation=0u,
             (x.rayTracingPipeline==CompatibilityCheck::Absent && x.rayQuery==CompatibilityCheck::Absent))
             snapshot.outcome=CompatibilityOutcome::Unsupported;
     }
-    PublishCompatibilityProbe(std::move(snapshot),generation);
+    PublishCompatibilityProbe(std::move(snapshot),generation,startupAttempt);
     return capabilities;
 }
 
@@ -4042,8 +4086,13 @@ bool DestroySwapchainContext(SwapchainContext& context)
     return true;
 }
 
-bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resourceRecreated)
+bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resourceRecreated,
+    horde::reporting::CompatibilityStage* failureStage=nullptr)
 {
+    const auto reached=[failureStage](horde::reporting::CompatibilityStage stage) {
+        if (failureStage) *failureStage=stage;
+    };
+    reached(horde::reporting::CompatibilityStage::RenderLoop);
     if(!context.environmentSurvey){gCampaignFrameTick=0;gCampaignFrameWorld=0;}
     const auto frameStart = std::chrono::steady_clock::now();
     const auto frameStartCount = std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -4196,6 +4245,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     const auto recordStart = std::chrono::steady_clock::now();
     if (useRtFrame)
     {
+        reached(horde::reporting::CompatibilityStage::RtScene);
         const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = context.environmentSurvey
             ? horde::vulkan::raytracing::RtSceneTuning{} : gRtLabState.Snapshot();
         if (!context.environmentSurvey && context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase)
@@ -4860,6 +4910,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         context.swapchainImageLayouts[imageIndex] = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
     }
 
+    reached(horde::reporting::CompatibilityStage::RenderLoop);
     if (vkEndCommandBuffer(context.commandBuffers[imageIndex]) != VK_SUCCESS)
     {
         if (evidenceFrame)
@@ -4992,6 +5043,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         }
     }
 
+    reached(horde::reporting::CompatibilityStage::Presentation);
     if (context.presentCompletionFences.Prepare(imageIndex) != VK_SUCCESS) return false;
     const VkFence presentFence = context.presentCompletionFences.Fence(imageIndex);
     VkSwapchainPresentFenceInfoEXT presentFenceInfo{VK_STRUCTURE_TYPE_SWAPCHAIN_PRESENT_FENCE_INFO_EXT};
@@ -5031,6 +5083,12 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         evidenceFrame ? &observation : nullptr,
         horde::telemetry::RtStage::PresentCall);
     const VkResult presentResult = vkQueuePresentKHR(context.graphicsQueue, &presentInfo);
+    // This observation precedes optional timing/reporting and recreation work:
+    // a later failure must retain an actually accepted RT-produced present.
+    if (!context.environmentSurvey && useRtFrame && !context.capabilities.rtScene.presented &&
+        (presentResult==VK_SUCCESS || presentResult==VK_SUBOPTIMAL_KHR))
+        PublishCompatibilityStage(context.surfaceGeneration,horde::reporting::CompatibilityStage::Presentation,
+            horde::reporting::CompatibilityOutcome::Presented,CompatibilityBackendFor(context.executionBackend),true);
 
     if (context.graphicsLatency.active && context.graphicsLatency.firstPresentedNs == 0u &&
         useRtFrame && presentResult == VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR)
@@ -5125,6 +5183,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             PublishBenchmarkProgress(context);
         }
         resourceRecreated = true;
+        reached(horde::reporting::CompatibilityStage::RenderLoop);
         const bool recreated = !context.environmentSurvey && RecreateSwapchain(context);
         return recreated;
     }
@@ -5431,6 +5490,8 @@ void SwapchainRenderLoop()
         return;
     }
 #endif
+    try
+    {
     auto previousFrameStart = std::chrono::steady_clock::now();
     horde::graphics::ForegroundPauseRenderCadence pausedRenderCadence;
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
@@ -5439,6 +5500,7 @@ void SwapchainRenderLoop()
     const bool initiallyPaused = SynchronizeLifecyclePauseOnOwnerThread();
     if (!InitialiseRtEvidenceOnOwnerThread(gSwapchainContext, initiallyPaused))
     {
+        PublishCompatibilityFailure(gSwapchainContext.surfaceGeneration,horde::reporting::CompatibilityStage::RenderLoop);
         gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
         gSwapchainRunning.store(false, std::memory_order_release);
         __android_log_print(
@@ -5457,6 +5519,7 @@ void SwapchainRenderLoop()
             (void)SynchronizeLifecyclePauseOnOwnerThread();
             if (!ConsumePendingImageAcquire(gSwapchainContext))
             {
+                PublishCompatibilityFailure(gSwapchainContext.surfaceGeneration,horde::reporting::CompatibilityStage::RenderLoop);
                 gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
                 break; // Retirement keeps ownership if the acquire drain failed.
             }
@@ -5468,6 +5531,7 @@ void SwapchainRenderLoop()
                 static_cast<int>(idleResult));
             if (idleResult != VK_SUCCESS)
             {
+                PublishCompatibilityFailure(gSwapchainContext.surfaceGeneration,horde::reporting::CompatibilityStage::RenderLoop);
                 gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
                 break; // Normal proved-retirement path still owns all resources.
             }
@@ -5510,6 +5574,7 @@ void SwapchainRenderLoop()
 #endif
         if (!ApplySceneProfileOnOwner(gSwapchainContext, previewControls))
         {
+            PublishCompatibilityFailure(gSwapchainContext.surfaceGeneration,horde::reporting::CompatibilityStage::RtScene);
             {std::lock_guard lock(gOpeningBenchmarkMutex);if(gOpeningBenchmarkOwner.Busy())gOpeningBenchmarkOwner.Block();}
             gSwapchainContext.entryHandoff.FailLoad();
             PublishEntryState(gSwapchainContext, false);
@@ -5559,6 +5624,7 @@ void SwapchainRenderLoop()
                 const auto result = ApplyGlassGeometryOnOwner(context, graphicsCommand.requested);
                 if (result == GlassGeometryApplyResult::Fatal)
                 {
+                    PublishCompatibilityFailure(context.surfaceGeneration,horde::reporting::CompatibilityStage::RtScene);
                     gSurfaceSessions.Publish(context.surfaceGeneration, 3);
                     __android_log_print(ANDROID_LOG_ERROR, kTag, "Glass Apply could not prove/rebuild its actual GPU ownership.");
                     break;
@@ -5571,6 +5637,7 @@ void SwapchainRenderLoop()
                 const VkResult idleResult = vkDeviceWaitIdle(context.device);
                 if (!CompleteRtEvidenceAfterDeviceIdle(context, idleResult))
                 {
+                    PublishCompatibilityFailure(context.surfaceGeneration,horde::reporting::CompatibilityStage::RtScene);
                     gSurfaceSessions.Publish(context.surfaceGeneration, 3);
                     __android_log_print(ANDROID_LOG_ERROR, kTag, "Cannot resize before owned GPU work completes.");
                     break; // Device/ownership failure remains a renderer failure.
@@ -5653,11 +5720,13 @@ void SwapchainRenderLoop()
 #endif
         PumpCampaignOnOwner(gSwapchainContext);
         if(gCampaignRetirementUnproved) {
+            PublishCompatibilityFailure(gSwapchainContext.surfaceGeneration,horde::reporting::CompatibilityStage::RenderLoop);
             gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration,3);
             break; // Retain both owners until genuine GPU retirement is proved.
         }
         if (!PrepareFixtureChangingCheckpointOnOwner(gSwapchainContext, sceneTransition))
         {
+            PublishCompatibilityFailure(gSwapchainContext.surfaceGeneration,horde::reporting::CompatibilityStage::RtScene);
             gSwapchainContext.entryHandoff.FailLoad();
             PublishEntryState(gSwapchainContext, false);
             gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
@@ -5705,11 +5774,13 @@ void SwapchainRenderLoop()
         previousFrameStart = frameStart;
         bool rtFramePresented = false;
         bool resourceRecreated = false;
+        auto failedStage=horde::reporting::CompatibilityStage::RenderLoop;
         if (gSwapchainContext.graphicsLatency.active && gSwapchainContext.graphicsLatency.firstRenderNs == 0u)
             gSwapchainContext.graphicsLatency.firstRenderNs = GraphicsSteadyNs();
-        if (!RenderFrame(gSwapchainContext, rtFramePresented, resourceRecreated))
+        if (!RenderFrame(gSwapchainContext, rtFramePresented, resourceRecreated,&failedStage))
         {
             if (!gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration)) break;
+            PublishCompatibilityFailure(gSwapchainContext.surfaceGeneration,failedStage);
             {std::lock_guard lock(gOpeningBenchmarkMutex);if(gOpeningBenchmarkOwner.Busy())gOpeningBenchmarkOwner.Block();}
             FailInAppBenchmarkAfterRenderFailure(gSwapchainContext);
             gSwapchainContext.entryHandoff.FailLoad();
@@ -5846,6 +5917,13 @@ void SwapchainRenderLoop()
 #endif
     }
 
+    }
+    catch (...)
+    {
+        PublishCompatibilityFailure(gSwapchainContext.surfaceGeneration,horde::reporting::CompatibilityStage::RenderLoop);
+        gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration,3);
+        __android_log_print(ANDROID_LOG_ERROR,kTag,"Native render owner ended with an exception.");
+    }
     gSwapchainRunning.store(false, std::memory_order_release);
 
     {
@@ -5875,7 +5953,10 @@ void SwapchainRenderLoop()
         gOpeningBenchmarkEligibility={};
     }
     gSurfaceRetirementBlocked.store(!retired, std::memory_order_release);
-    if (!retired) gSurfaceSessions.Publish(retiredGeneration, 3);
+    if (!retired) {
+        PublishCompatibilityFailure(retiredGeneration,horde::reporting::CompatibilityStage::RenderLoop);
+        gSurfaceSessions.Publish(retiredGeneration, 3);
+    }
 }
 
 bool StartSurfaceInternal(ANativeWindow* window,
@@ -5883,8 +5964,10 @@ bool StartSurfaceInternal(ANativeWindow* window,
                           const std::string& reportDirectory,
                           const std::uint64_t generation,bool environmentSurvey=false,std::uint64_t surveySerial=0)
 {
+    CompatibilityStartupFailureScope failure{generation,!environmentSurvey};
     if (window == nullptr)
     {
+        if (!environmentSurvey) PublishCompatibilityFailure(generation,horde::reporting::CompatibilityStage::RenderLoop);
         __android_log_print(ANDROID_LOG_ERROR, kTag, "startDiagnosticSurface called with null window.");
         return false;
     }
@@ -5892,6 +5975,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
     if (gSwapchainRunning.load(std::memory_order_acquire) ||
         gSurfaceRetirementBlocked.load(std::memory_order_acquire))
     {
+        if (!environmentSurvey) PublishCompatibilityFailure(generation,horde::reporting::CompatibilityStage::RenderLoop);
         __android_log_print(ANDROID_LOG_WARN, kTag, "Surface start refused while a renderer is active or retirement is unproved.");
         ANativeWindow_release(window);
         return false;
@@ -5953,6 +6037,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
             PublishInputLocked();}
     }
 
+    failure.stage=horde::reporting::CompatibilityStage::VulkanInstance;
     if (!CreateInstance(context.instance, context.presentSurfaceSupport) || !gSurfaceSessions.IsCurrent(generation))
     {
         if (!context.environmentSurvey) PublishCompatibilityStage(generation,
@@ -5961,6 +6046,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
         return false;
     }
 
+    failure.stage=horde::reporting::CompatibilityStage::Surface;
     if (!CreateSurface(context.instance, context.window, context.surface) || !gSurfaceSessions.IsCurrent(generation))
     {
         if (!context.environmentSurvey) PublishCompatibilityStage(generation,
@@ -5969,6 +6055,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
         return false;
     }
 
+    failure.stage=horde::reporting::CompatibilityStage::BackendSelection;
     context.physicalDevice = FindMatchingPhysicalDevice(context.instance, capabilities, context.surface);
     if (context.physicalDevice == VK_NULL_HANDLE || !gSurfaceSessions.IsCurrent(generation))
     {
@@ -6014,6 +6101,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
     context.useRtPath = context.executionBackend != horde::vulkan::RtExecutionBackend::Unsupported;
     gSurfaceSessions.Publish(generation, context.useRtPath ? 0 : 2);
 
+    failure.stage=horde::reporting::CompatibilityStage::LogicalDevice;
     if (!CreateLogicalDevice(context.physicalDevice, context.instance, context.graphicsQueueFamilyIndex, context.executionBackend,
         context.device, context.graphicsQueue, context.presentSurfaceSupport, context.presentCompletionMode,
         context.presentTimingExtensionEnabled) ||
@@ -6079,6 +6167,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
     }
     context.capabilities.diagnostics.push_back(horde::vulkan::PresentCompletionDiagnostic(context.presentCompletionMode));
 
+    failure.stage=horde::reporting::CompatibilityStage::Swapchain;
     if (!CreateSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))
     {
         if (!context.environmentSurvey) PublishCompatibilityStage(generation,
@@ -6096,6 +6185,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
     if(!context.environmentSurvey)context.entryHandoff.Observe(ReadEntryControls(), generation);
     context.sceneProfile = DesiredProfile(context, ReadPreviewControls());
     if(!context.environmentSurvey){context.entryHandoff.BeginLoad();PublishEntryState(context, false);}
+    failure.stage=horde::reporting::CompatibilityStage::RtScene;
     if (!InitialiseRtSceneForSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))
     {
         if (!context.environmentSurvey) PublishCompatibilityStage(generation,
@@ -6112,9 +6202,11 @@ bool StartSurfaceInternal(ANativeWindow* window,
     gSwapchainContext = std::move(context);
     cleanup.transferred = true;
     gSwapchainRunning.store(true, std::memory_order_release);
+    failure.stage=horde::reporting::CompatibilityStage::RenderLoop;
     try { gSwapchainThread = std::thread(SwapchainRenderLoop); }
     catch (...)
     {
+        if (!environmentSurvey) PublishCompatibilityFailure(generation,horde::reporting::CompatibilityStage::RenderLoop);
         gSwapchainRunning.store(false, std::memory_order_release);
         gSurfaceRetirementBlocked.store(!((gSwapchainContext.environmentSurvey || RetireCampaignOnOwner(gSwapchainContext.surfaceGeneration)) &&
             DestroySwapchainContext(gSwapchainContext)), std::memory_order_release);
@@ -6188,6 +6280,12 @@ private:
             {
                 if(action->request && action->request->environmentSurvey)
                     FailEnvironmentSurvey(action->request->environmentSurveySerial,"prior-GPU-retirement-unproved");
+                if(action->request && !action->request->environmentSurvey) {
+                    auto snapshot=InitialCompatibilitySnapshot();
+                    snapshot.lastStage=horde::reporting::CompatibilityStage::RenderLoop;
+                    snapshot.outcome=horde::reporting::CompatibilityOutcome::StartupFailure;
+                    PublishCompatibilityProbe(std::move(snapshot),action->generation,action->request->compatibilityStartupAttempt);
+                }
                 gSurfaceSessions.Publish(action->generation, 3);
                 __android_log_print(ANDROID_LOG_ERROR, kTag,
                     "Surface lifecycle blocked until retained presentation resources can be retired.");
@@ -6200,9 +6298,11 @@ private:
             gSurfaceSessions.WaitWhileSuspended(action->generation);
             if (!gSurfaceSessions.IsCurrent(action->generation)) continue;
             auto& request = *action->request;
+            bool probeCompleted=false, startingSurface=false;
             try
             {
-                const auto capabilities = RunProbe(action->generation,!request.environmentSurvey);
+                const auto capabilities = RunProbe(action->generation,!request.environmentSurvey,request.compatibilityStartupAttempt);
+                probeCompleted=true;
                 if (!gSurfaceSessions.IsCurrent(action->generation)) continue;
                 if (!EnsureDirectoryExists(request.reportDirectory))
                 {
@@ -6212,6 +6312,7 @@ private:
                     gSurfaceSessions.Publish(action->generation, 3);
                     continue;
                 }
+                startingSurface=true;
                 if (!StartSurfaceInternal(request.window.release(), capabilities,
                                           request.reportDirectory, action->generation,request.environmentSurvey,request.environmentSurveySerial))
                 {
@@ -6223,12 +6324,21 @@ private:
                 __android_log_print(ANDROID_LOG_INFO, kTag,
                     "HORDE_SURFACE_STARTED generation=%llu", static_cast<unsigned long long>(action->generation));
             }
-            catch (const std::exception& error)
+            catch (...)
             {
+                if (!request.environmentSurvey && !startingSurface) {
+                    if (!probeCompleted) {
+                        auto snapshot=InitialCompatibilitySnapshot();
+                        snapshot.lastStage=horde::reporting::CompatibilityStage::CapabilityProbe;
+                        snapshot.probe=horde::reporting::CompatibilityProbe::Unavailable;
+                        snapshot.outcome=horde::reporting::CompatibilityOutcome::ProbeUnavailable;
+                        PublishCompatibilityProbe(std::move(snapshot),action->generation,request.compatibilityStartupAttempt);
+                    } else PublishCompatibilityFailure(action->generation,horde::reporting::CompatibilityStage::AssetPreparation);
+                }
                 StopSurfaceInternal();
                 if(request.environmentSurvey)FailEnvironmentSurvey(request.environmentSurveySerial,"surface-owner-startup-exception");
                 gSurfaceSessions.Publish(action->generation, 3);
-                __android_log_print(ANDROID_LOG_ERROR, kTag, "Native surface startup failed: %s", error.what());
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Native surface startup ended with an exception.");
             }
         }
         StopSurfaceInternal();
@@ -6627,15 +6737,22 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, 
         return JNI_FALSE;
     }
 
+    std::uint64_t startupAttempt=0u;
     try
     {
+        {
+            std::lock_guard lock(gReportMutex);
+            startupAttempt=gCompatibilityStartupOwnership.Attempt();
+            if (!gCompatibilityStartupOwnership.RequestSurface(startupAttempt)) return 0;
+        }
         (void)SurfaceOwner();
         std::uint64_t generation = 0u;
         {
             std::lock_guard<std::mutex> lock(gInputPublisherMutex);
             RequestLifecyclePauseSynchronizationLocked(false);
-            generation = gSurfaceSessions.Start({std::move(window), reportDirectory});
+            generation = gSurfaceSessions.Start({std::move(window), reportDirectory,false,0u,startupAttempt});
         }
+        if (generation==0u) PublishCompatibilityUnboundFailure(startupAttempt);
         {
             std::lock_guard lock(gGraphicsMutex);
             gPreviewPerformance = {};
@@ -6645,9 +6762,10 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, 
                             static_cast<unsigned long long>(generation));
         return static_cast<jlong>(generation); // Accepted request, NOT presented/ready.
     }
-    catch (const std::exception& error)
+    catch (...)
     {
-        __android_log_print(ANDROID_LOG_ERROR, kTag, "Could not request native surface: %s", error.what());
+        PublishCompatibilityUnboundFailure(startupAttempt);
+        __android_log_print(ANDROID_LOG_ERROR, kTag, "Could not request native surface owner.");
         return 0;
     }
 }
@@ -7947,6 +8065,40 @@ bool ReadBenchmarkSummaryText(JNIEnv* env, jstring value, const std::size_t maxi
     return horde::reporting::EncodePlaytestReportUtf16(text, maximum, out) ==
         horde::reporting::PlaytestReportStatus::Ready;
 }
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_beginCompatibilityStartupAttempt(JNIEnv*,jclass)
+{
+    try {
+        auto fresh=InitialCompatibilitySnapshot();
+        std::lock_guard lock(gReportMutex);
+        const auto token=gCompatibilityStartupOwnership.Begin();
+        if (token==0u) {
+            gCompatibilityRevision=std::numeric_limits<std::uint64_t>::max();
+            return 0;
+        }
+        gLatestCompatibilitySnapshot=std::move(fresh);
+        gCompatibilitySurfaceGeneration=0u;
+        AdvanceCompatibilityRevisionLocked();
+        return static_cast<jlong>(token);
+    } catch (...) { return 0; }
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_failCompatibilityAssetPreparation(JNIEnv*,jclass,jlong attemptToken)
+{
+    using namespace horde::reporting;
+    try {
+        std::lock_guard lock(gReportMutex);
+        if (attemptToken<=0 || gCompatibilitySurfaceGeneration!=0u ||
+            !gCompatibilityStartupOwnership.FailAssets(static_cast<std::uint64_t>(attemptToken))) return JNI_FALSE;
+        auto& snapshot=gLatestCompatibilitySnapshot;
+        snapshot.lastStage=CompatibilityStage::AssetPreparation;
+        snapshot.outcome=CompatibilityOutcome::StartupFailure;
+        AdvanceCompatibilityRevisionLocked();
+        return JNI_TRUE;
+    } catch (...) { return JNI_FALSE; }
 }
 
 extern "C" JNIEXPORT jlong JNICALL
