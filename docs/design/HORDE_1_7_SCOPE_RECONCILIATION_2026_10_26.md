@@ -72,6 +72,22 @@ explicit deferral. It does not call 1.7 ready or turn rejected work into complet
 
 ## Current readiness and admission decisions
 
+27October additions: the [report-delivery scope](HORDE_1_7_REPORT_DELIVERY_SCOPE_2026_10_27.md)
+is explicitly required for1.7: actual Windows/Android private benchmark sharing,
+separately consented public board submission, a filtered/sortable same-site
+performance page linked as How does it perform?, and renderer-independent
+unsupported/startup compatibility reports with preview/consent/local export.
+These remain unfinished; no live send/receipt/destination or leaderboard website
+acceptance follows from current local UI/contracts. No persistent device tracking,
+credentials/security/spending change or public deployment is authorized.
+
+The later joint resource implementation and world-pickup alias are approved:
+ordinary physical31, metadata30, TLAS107; other current ceilings unchanged.
+Routine bounded sizing inside approved features is delegated engineering work,
+not a request to reapprove numeric slots. Native visual/input admission and
+normal OFF gates remain separate. The older proposal paragraph below records
+its prior snapshot, not an outstanding capacity request.
+
 The [current admission queue](HORDE_1_7_ADMISSION_QUEUE_2026_10_26.md) separates
 implemented boot/four-skill/revival/flask mechanisms from their actual admission
 gates. It also reconciles the separate ring and flask +1 proposals: both cannot

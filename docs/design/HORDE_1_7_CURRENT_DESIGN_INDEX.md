@@ -1,5 +1,19 @@
 # Horde 1.7 current design index
 
+27October: [gated live flask pickup](../evidence/2026-10-26-flask-native-binding/runtime-pickup.md)
+now connects current scene/world readiness, actual grounded F03 site, fresh
+contextual interaction and exact saved entitlement/charge restoration. World and
+hand instances share immutable resources. Host/asset/frame/lifecycle and Android
+widget/lint evidence is distinct from actual RT/physical admission; normal flask,
+ring/yellow/shared64 remain OFF. No further slot-number approval is pending.
+
+27October: Sam explicitly adds [benchmark sharing, public statistics and
+renderer-independent compatibility reporting](HORDE_1_7_REPORT_DELIVERY_SCOPE_2026_10_27.md)
+to1.7. Local export and earlier playtest email are not live benchmark or board
+delivery. Implement after the bounded flask slice; public deployment, credentials,
+security changes and spending remain separately controlled. No persistent device
+tracking IDs/fingerprints. This is unfinished release scope, not optional polish.
+
 26 October: the owner-approved [security diagnosis](../evidence/2026-10-26-windows-app-control/README.md)
 identified the recorded automated Smart App Control trust rejection. Sam later
 manually opened the exact candidate path and its running-window path was verified;
