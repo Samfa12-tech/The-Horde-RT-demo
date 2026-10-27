@@ -239,10 +239,19 @@ bool ApplyFlaskUtilityCandidateFrame(
         return false;
     }
     if(!ResolvePlayerUtilitySample(simulation.flaskHandReturn,sample,held,diagnostic))return false;
+    if(simulation.flaskUpgrade.site &&
+       (simulation.healingFlask.resources.upgraded || !simulation.flaskUpgrade.resourceGeneration ||
+        simulation.flaskUpgrade.worldGeneration!=simulation.worldRoute.generation ||
+        !horde::gameplay::healing::ValidateFlaskUpgradeSite(*simulation.flaskUpgrade.site,diagnostic))) {
+        diagnostic="Flask pickup presentation requires current coherent world/resource ownership.";return false;
+    }
     frame.playerUtilityHand=simulation.flaskHandReturn.phase==horde::gameplay::items::UtilityHandPhase::Idle?
         std::nullopt:std::optional{simulation.flaskHandReturn};
     frame.healingFlaskVisible=held;
     frame.healingFlaskWorldFromItem=horde::gameplay::items::IdentityHeldItemTransform();
+    frame.healingFlaskUpgradeVisible=simulation.flaskUpgrade.site.has_value();
+    frame.healingFlaskUpgradeWorldFromItem=simulation.flaskUpgrade.site?simulation.flaskUpgrade.site->worldFromItem:
+        horde::gameplay::items::IdentityHeldItemTransform();
     diagnostic.clear();return true;
 }
 

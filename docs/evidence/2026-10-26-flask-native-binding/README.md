@@ -98,5 +98,7 @@ instance sharing the carried flask's immutable resources. It does not yet supply
 the gameplay placement/interaction or admit either presentation path.
 
 A [grounded F03 source placement](upgrade-placement.md) now reuses the actual
-waystone/native flask/terrain in the existing CPU forest fixture. It remains an
-unused candidate until live readiness/interaction and native presentation pass.
+waystone/native flask/terrain. The later [gated live pickup](runtime-pickup.md)
+connects scene/world readiness, contact/input, exact entitlement and immutable
+world/hand presentation. Host/source proof passes; normal enablement and actual
+native visual/input admission remain separate.

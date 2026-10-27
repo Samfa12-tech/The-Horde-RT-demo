@@ -50,6 +50,7 @@
     <string name="interact">INTERACT</string>
     <string name="chest_locked_until_lich_defeated">LOCKED\nSLAY LICH</string>
     <string name="open_chest">OPEN CHEST</string>
+    <string name="take_flask_upgrade">Upgrade flask</string>
     <string name="chest_opening">OPENING…</string>
     <string name="take_lantern">TAKE LANTERN</string>
     <string name="chest_unlocking">SEAL BREAKING…</string>

@@ -278,6 +278,25 @@ int main()
         check(ApplyFlaskUtilityCandidateFrame(source,frame,error) && frame.playerUtilityHand==source.flaskHandReturn &&
               frame.healingFlaskVisible && source.flaskHandReturn==before,
               "explicit adaptation copies immutable owner time without a renderer clock or prop trajectory");
+        horde::gameplay::healing::FlaskUpgradeSite site;
+        site.worldFromItem[12]=site.supportPoint[0]=-3.27f;site.worldFromItem[14]=site.supportPoint[2]=22.85f;
+        source.flaskUpgrade={site,source.worldRoute.generation,7,true};
+        check(ApplyFlaskUtilityCandidateFrame(source,frame,error) && frame.healingFlaskVisible &&
+              frame.healingFlaskUpgradeVisible && frame.healingFlaskUpgradeWorldFromItem==site.worldFromItem,
+              "world pickup and carried flask coexist with independent immutable frame transforms");
+        for(int failure=0;failure<3;++failure) {
+            auto bad=source;
+            if(failure==0)++bad.flaskUpgrade.worldGeneration;
+            if(failure==1)bad.flaskUpgrade.resourceGeneration=0;
+            if(failure==2)bad.flaskUpgrade.site->worldFromItem[12]=std::numeric_limits<float>::quiet_NaN();
+            check(!ApplyFlaskUtilityCandidateFrame(bad,frame,error) && frame.healingFlaskUpgradeVisible &&
+                  frame.healingFlaskUpgradeWorldFromItem==site.worldFromItem && frame.playerUtilityHand==source.flaskHandReturn,
+                  "stale or corrupt world receipt cannot partially replace a coherent hand/world frame");
+        }
+        source.healingFlask.resources.upgraded=true;source.flaskUpgrade={};
+        check(ApplyFlaskUtilityCandidateFrame(source,frame,error) && !frame.healingFlaskUpgradeVisible && frame.healingFlaskVisible,
+              "upgrade entitlement removes only world pickup and never borrows the in-use hand instance");
+        source.healingFlask.resources.upgraded=false;
         auto stale=frame;--stale.tickIndex;
         check(!ApplyFlaskUtilityCandidateFrame(source,stale,error) && stale.playerUtilityHand==frame.playerUtilityHand,
               "stale frame cannot receive a newer hand owner");

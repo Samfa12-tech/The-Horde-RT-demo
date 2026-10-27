@@ -1,5 +1,8 @@
 # F03 upgrade placement source candidate
 
+The later [gated live pickup](runtime-pickup.md) supersedes this checkpoint's
+unused-caller status below. Its source proof is not normal gameplay admission.
+
 `PrepareForestFlaskUpgrade` consumes the actual F03 waystone report, unchanged
 native flask vertices/bounds and final r23 terrain/contact from the existing
 forest preparation. It places the flask0.85m toward the existing dry approach,

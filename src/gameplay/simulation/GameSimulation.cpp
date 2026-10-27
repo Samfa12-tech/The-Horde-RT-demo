@@ -1863,7 +1863,7 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
             continue;
         }
         if(config_.developmentRescueJourney && chestRewardSequence_.Snapshot().phase == ChestRewardPhase::LanternClaimed) {
-            (void)TryRescueInteraction(); continue;
+            if(!TryRescueInteraction())(void)TryFlaskUpgradeInteraction(); continue;
         }
         const ChestRewardAction action = chestRewardSequence_.TryInteract(query);
         if (action == ChestRewardAction::OpeningStarted)
@@ -2958,6 +2958,62 @@ bool GameSimulation::UsesFlaskUtility() const
     return config_.healingFlask1_7 && config_.flaskUtilityCandidate;
 }
 
+bool GameSimulation::PublishFlaskUpgradeReadiness(WorldZoneToken token,
+    const healing::FlaskUpgradeReadiness& readiness)
+{
+    if(!UsesFlaskUtility() || !config_.developmentRescueJourney || token.zone!=WorldZoneId::Lookout ||
+       !token.generation || token.generation!=worldRoute_.generation)return false;
+    const auto floor=flaskUpgradeWorldGeneration_==token.generation?flaskUpgradeResourceGeneration_:0;
+    if((!readiness.resourceGeneration && floor) || readiness.resourceGeneration<floor)return false;
+    if(readiness.site) {
+        std::string diagnostic;
+        if(!readiness.resourceGeneration || !chapterTerrain_ || chapterTerrainGeneration_!=token.generation ||
+           !healing::ValidateFlaskUpgradeSite(*readiness.site,diagnostic))return false;
+        const auto& p=readiness.site->supportPoint;const auto clue=kWorldRoutePoints[6];
+        const auto ground=chapterTerrain_->Query(p[0],p[2]);
+        if(std::hypot(p[0]-clue.x,p[2]-clue.z)>4.f || !ground.found || !ground.walkable ||
+           std::abs(ground.worldY-p[1])>.001f)return false;
+        if(flaskUpgradeWorldGeneration_==token.generation && flaskUpgradeSite_ &&
+           *flaskUpgradeSite_!=*readiness.site)return false;
+    }
+    if(flaskUpgradeWorldGeneration_!=token.generation)flaskUpgradeSite_.reset();
+    flaskUpgradeWorldGeneration_=token.generation;
+    flaskUpgradeResourceGeneration_=std::max(floor,readiness.resourceGeneration);
+    if(readiness.site)flaskUpgradeSite_=readiness.site;
+    flaskUpgradeReady_=readiness.site.has_value();
+    RefreshSnapshot(lastInput_);return true;
+}
+
+bool GameSimulation::FlaskUpgradeEligible(const InputSnapshot& input) const
+{
+    if(!UsesFlaskUtility() || !flaskUpgradeReady_ || !flaskUpgradeSite_ || flaskUpgradeWorldGeneration_!=worldRoute_.generation ||
+       !flaskUpgradeResourceGeneration_ || healingFlask_.Snapshot().resources.upgraded ||
+       healingFlask_.Snapshot().action!=healing::FlaskAction::Idle || FlaskUtilityBusy() ||
+       !UsesRescueExterior() || worldRoute_.current!=WorldZoneId::Lookout ||
+       worldRoute_.readiness[static_cast<std::size_t>(WorldZoneId::Lookout)]!=ZoneReadiness::Ready ||
+       !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation || !playerSupport_.grounded ||
+       input.paused || playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive || input.guardHeld ||
+       pendingAttackCommands_ || pendingParryCommands_ || pendingDodgeCommands_ ||
+       pendingDrinkFlaskCommands_ || pendingRestCommands_ || queuedDrawAttack_ ||
+       heldItems_[1].transition.active || combatSnapshot_.player.action!=PlayerCombatAction::Idle ||
+       combatSnapshot_.attackerIndex>=0 || dodgeRemainingSeconds_>0 || posture_.Active() ||
+       rescueTraversal_.IsActive() || rescueMovementSuppressedThisTick_ || staticDetailLease_.resourceGeneration ||
+       pendingCampaignRestore_ || input.hasAuthoritativePlayerPose || chapterDialogue_.State().line!=dialogue::Line::None)return false;
+    const auto& p=flaskUpgradeSite_->supportPoint;
+    const float dx=p[0]-playerX_,dz=p[2]-playerZ_,dy=p[1]-playerSupport_.worldY;
+    const float horizontal=std::hypot(dx,dz);
+    const float yaw=FiniteOr(input.yawRadians,playerYawRadians_);
+    if(std::hypot(horizontal,dy)>1.5f || std::abs(dy)>.35f ||
+       (horizontal>.0001f && (dx*std::sin(yaw)-dz*std::cos(yaw))<.5f*horizontal))return false;
+    return chapterTerrain_->NonWalkableVolumeClear(playerX_,playerZ_,p[0],p[2],
+        std::min(p[1],playerSupport_.worldY)+.1f,std::max(p[1],playerSupport_.worldY)+.8f,.03f);
+}
+
+bool GameSimulation::TryFlaskUpgradeInteraction()
+{
+    return FlaskUpgradeEligible(lastInput_) && healingFlask_.TryUpgrade();
+}
+
 bool GameSimulation::FlaskUtilityBusy() const
 {
     return UsesFlaskUtility() && flaskHandReturn_.Snapshot().phase != items::UtilityHandPhase::Idle;
@@ -3377,6 +3433,13 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.campaignRetryRequestGeneration=campaignRetryRequestGeneration_;
     snapshot_.completedRestGeneration=completedRestGeneration_;
     snapshot_.fireEmitters = fireEmitters_;
+    snapshot_.flaskUpgrade={};
+    if(UsesFlaskUtility() && flaskUpgradeReady_ && flaskUpgradeSite_ && flaskUpgradeWorldGeneration_==worldRoute_.generation &&
+       flaskUpgradeResourceGeneration_ && chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation &&
+       !healingFlask_.Snapshot().resources.upgraded) {
+        snapshot_.flaskUpgrade={flaskUpgradeSite_,flaskUpgradeWorldGeneration_,flaskUpgradeResourceGeneration_,
+            FlaskUpgradeEligible(input)};
+    }
     snapshot_.fireEmitterCount = fireEmitterCount_;
     snapshot_.playerMountProfile = config_.playerMountProfile;
     snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();

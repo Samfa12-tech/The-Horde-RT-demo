@@ -666,6 +666,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     waterDropletGeometryVisible_ = std::exchange(other.waterDropletGeometryVisible_, false);
     attackWarningRingAsset_ = std::move(other.attackWarningRingAsset_);
     healingFlaskAsset_ = std::move(other.healingFlaskAsset_);
+    healingFlaskUpgradeSite_ = std::exchange(other.healingFlaskUpgradeSite_,std::nullopt);
     jointPropPresentationActive_ = std::exchange(other.jointPropPresentationActive_, false);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
     viewmodelAsset_ = std::move(other.viewmodelAsset_);
@@ -1574,6 +1575,17 @@ horde::gameplay::simulation::ZoneReadiness PresentableTinyRtScene::WorldZoneRead
         return ZoneReadiness::Preparing;
     return ZoneReadiness::Ready;
 }
+horde::gameplay::healing::FlaskUpgradeReadiness PresentableTinyRtScene::FlaskUpgradeReadiness() const
+{
+    horde::gameplay::healing::FlaskUpgradeReadiness result{staticGeometryGeneration_,std::nullopt};
+    // Do not require complete contributors here: active item presentation must
+    // request the existing complete-geometry restoration before it can present.
+    if(ready_ && developmentRescueJourney_ && sceneProfile_==RtSceneProfile::Showcase &&
+       !playerUtilityCandidateAsset_.empty() && chapterTerrainSurface_ &&
+       healingFlaskBlas_.handle!=VK_NULL_HANDLE && healingFlaskBlas_.address && healingFlaskUpgradeSite_)
+        result.site=healingFlaskUpgradeSite_;
+    return result;
+}
 void PresentableTinyRtScene::Destroy()
 {
     chapterActorMotion_.reset();
@@ -1656,6 +1668,7 @@ void PresentableTinyRtScene::Destroy()
         healingFlaskBlas_ = {};
         attackWarningRingAsset_ = {};
         healingFlaskAsset_ = {};
+        healingFlaskUpgradeSite_.reset();
         pipelineEvidenceIdentity_ = {};
         pipelineEvidenceIdentityValid_ = false;
         framePipelineEvidence_ = {};
@@ -1769,6 +1782,7 @@ void PresentableTinyRtScene::Destroy()
     waterDropletGeometryVisible_ = false;
     attackWarningRingAsset_ = {};
     healingFlaskAsset_ = {};
+    healingFlaskUpgradeSite_.reset();
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
     viewmodelAsset_ = {};
@@ -3085,6 +3099,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     productionDielectricFixtureAsset_ = {};
     attackWarningRingAsset_ = {};
     healingFlaskAsset_ = {};
+    healingFlaskUpgradeSite_.reset();
     jointPropPresentationActive_ = false;
     if (!productionHeldItemAssetsEnabled_)
     {
@@ -3271,6 +3286,11 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         horde::scene::ForestRoadClueReport roadClue;
         if (!horde::scene::AppendForestRoadClue(root, collapseStaticAsset_, chapterTerrainSurface_, roadClue, diagnostic))
             return false;
+        if(!playerUtilityCandidateAsset_.empty()) {
+            horde::scene::ForestFlaskUpgradePlacement placement;
+            if(!horde::scene::PrepareForestFlaskUpgrade(roadClue,healingFlaskAsset_,*chapterTerrainSurface_,placement,diagnostic))return false;
+            healingFlaskUpgradeSite_=static_cast<const horde::gameplay::healing::FlaskUpgradeSite&>(placement);
+        }
         // The collapse's final masonry range and the first dressing range use
         // the same material. Keep every triangle while sharing one metadata row;
         // High's physical lantern panes must fit alongside this resident scene.

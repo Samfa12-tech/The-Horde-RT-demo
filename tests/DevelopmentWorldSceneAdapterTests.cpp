@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <iostream>
 #include <memory>
+#include <limits>
 #include <vector>
 
 namespace sim=horde::gameplay::simulation;
@@ -22,6 +23,8 @@ struct SceneFixture {
     mutable std::vector<sim::WorldZoneToken> queried;
     sim::GameSimulation* invalidateOnQuery=nullptr;
     mutable bool invalidated=false;
+    horde::gameplay::healing::FlaskUpgradeReadiness flask{1,std::nullopt};
+    auto FlaskUpgradeReadiness()const{return flask;}
     sim::ZoneReadiness WorldZoneReadiness(sim::WorldZoneToken token)const {
         queried.push_back(token);
         if(invalidateOnQuery && !invalidated){invalidated=true;invalidateOnQuery->InvalidateWorldZoneReadiness();}
@@ -29,8 +32,9 @@ struct SceneFixture {
     }
     auto ChapterTerrainSurface()const{return terrain;}
 };
-std::unique_ptr<sim::GameSimulation> RestoreUpper(const std::shared_ptr<const sim::TriangleSupportSurface>& terrain){
-    auto game=std::make_unique<sim::GameSimulation>(sim::ProductionGameSimulationConfig());
+std::unique_ptr<sim::GameSimulation> RestoreUpper(const std::shared_ptr<const sim::TriangleSupportSurface>& terrain,bool utility=false){
+    auto config=sim::ProductionGameSimulationConfig();config.healingFlask1_7=config.flaskUtilityCandidate=utility;
+    auto game=std::make_unique<sim::GameSimulation>(config);
     cp::Checkpoint checkpoint;checkpoint.id=cp::CheckpointId::SafeExit;
     checkpoint.zone=sim::WorldZoneId::TombExterior;checkpoint.position=tr::kExteriorLanding;
     checkpoint.firstAscentCompleted=true;checkpoint.dialogue.grateConsumed=checkpoint.dialogue.rescueConsumed=true;
@@ -109,6 +113,31 @@ int main(){
         PublishDevelopmentWorldReadiness(*game,notInitialised);
         Check(game->Snapshot().worldRoute.readiness[0]!=sim::ZoneReadiness::Ready,
               "real uninitialized renderer cannot certify dungeon readiness");
+    }
+    {
+        auto game=RestoreUpper(terrain,true);SceneFixture scene;scene.terrain=terrain;scene.responses.fill(sim::ZoneReadiness::Ready);
+        horde::gameplay::healing::FlaskUpgradeSite site;const auto point=sim::kWorldRoutePoints[6];
+        site.supportPoint={point.x,terrain->Query(point.x,point.z).worldY,point.z};
+        site.worldFromItem[12]=point.x;site.worldFromItem[13]=site.supportPoint[1]+.075f;site.worldFromItem[14]=point.z;
+        scene.flask={7,site};PublishDevelopmentWorldReadiness(*game,scene);
+        Check(game->Snapshot().flaskUpgrade.site.has_value(),"current CPU scene receipt publishes an item without awarding entitlement");
+        const auto queries=scene.queried.size();scene.flask={8,std::nullopt};PublishDevelopmentWorldReadiness(*game,scene);
+        Check(scene.queried.size()==queries && !game->Snapshot().flaskUpgrade.site,
+              "already-ready zones still receive current pickup resource withdrawal");
+        scene.flask={7,site};PublishDevelopmentWorldReadiness(*game,scene);
+        Check(!game->Snapshot().flaskUpgrade.site,"old resource response cannot resurrect withdrawn pickup");
+        scene.flask={8,site};PublishDevelopmentWorldReadiness(*game,scene);
+        Check(game->Snapshot().flaskUpgrade.site==site && !game->Snapshot().healingFlask.resources.upgraded,
+              "current resource receipt restores presentation only");
+        auto bad=site;bad.worldFromItem[12]=std::numeric_limits<float>::quiet_NaN();
+        const auto token=sim::WorldZoneToken{game->Snapshot().worldRoute.generation,sim::WorldZoneId::Lookout};
+        Check(!game->PublishFlaskUpgradeReadiness(token,{9,bad}) && game->Snapshot().flaskUpgrade.site==site,
+              "invalid receipt cannot overwrite a coherent current pickup");
+        game->InvalidateWorldZoneReadiness();scene.invalidateOnQuery=game.get();
+        PublishDevelopmentWorldReadiness(*game,scene);
+        Check(!game->Snapshot().flaskUpgrade.site,"same captured adapter token rejects pickup reply after mid-pass world invalidation");
+        horde::vulkan::raytracing::PresentableTinyRtScene notInitialised;
+        Check(!notInitialised.FlaskUpgradeReadiness().site,"real uninitialized native scene cannot manufacture item readiness");
     }
     std::cout<<checks<<" development world scene adapter checks, "<<failures<<" failures; CPU protocol/native motor only, no GPU presentation claim\n";
     return failures?1:0;

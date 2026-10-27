@@ -13,6 +13,7 @@
 
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/healing/HealingFlask.h"
+#include "gameplay/healing/FlaskUpgradeSite.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/effects/FireEmitterState.h"
 #include "gameplay/animation/PlayerAnimationState.h"
@@ -171,6 +172,7 @@ struct SimulationSnapshot
     PlayerVitalsSnapshot playerVitals{};
     bool healingFlaskEnabled = false;
     healing::FlaskSnapshot healingFlask{};
+    healing::FlaskUpgradeSnapshot flaskUpgrade{};
     bool flaskUtilityCandidate = false;
     items::UtilityHandReturnSnapshot flaskHandReturn{};
     bool flaskDrinkEligible = false;

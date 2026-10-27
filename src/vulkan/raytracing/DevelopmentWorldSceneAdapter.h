@@ -33,5 +33,12 @@ inline void PublishDevelopmentWorldReadiness(
             else simulation.PublishWorldZoneReadiness(token,actual);
         }
     }
+    if constexpr(requires {scene.FlaskUpgradeReadiness();}) {
+        // Unlike zone boot preparation this is polled even when zones were
+        // already Ready: current resource loss withdraws the pickup. The token
+        // is the same captured generation as this complete adapter pass.
+        simulation.PublishFlaskUpgradeReadiness(
+            {snapshot.worldRoute.generation,WorldZoneId::Lookout},scene.FlaskUpgradeReadiness());
+    }
 }
 } // namespace horde::vulkan::raytracing

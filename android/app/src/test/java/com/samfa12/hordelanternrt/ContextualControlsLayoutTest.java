@@ -32,6 +32,14 @@ import org.robolectric.annotation.GraphicsMode;
 @Config(sdk = 34)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 public final class ContextualControlsLayoutTest {
+    @Test
+    public void flaskPickupReusesContextActionAndRopeKeepsPriority() {
+        assertEquals(R.string.take_flask_upgrade, MainActivity.contextualInteractLabel((1 << 12) | 1));
+        assertEquals(0, MainActivity.contextualInteractLabel((1 << 12) | (1 << 9) | 1));
+        assertEquals(R.string.open_chest, MainActivity.contextualInteractLabel((2 << 3) | 1));
+        assertEquals(R.string.take_lantern, MainActivity.contextualInteractLabel((4 << 3) | 1));
+        assertEquals(0, MainActivity.contextualInteractLabel(0));
+    }
     private static Rect bounds(final View view) {
         return new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
     }

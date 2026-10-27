@@ -25,7 +25,14 @@ struct PresentableTinyRtScenePreflightTestAccess {
         moved.Destroy();
         // Configuration survives resource recreation; a moved-from scene does
         // not retain the candidate. Load the real full roster without a device.
-        return moved.playerUtilityCandidateAsset_==path && AdmitChapter(moved,diagnostic);
+        if(moved.playerUtilityCandidateAsset_!=path || !AdmitChapter(moved,diagnostic) ||
+           !moved.healingFlaskUpgradeSite_ || moved.FlaskUpgradeReadiness().site)return false;
+        const auto site=moved.healingFlaskUpgradeSite_;
+        PresentableTinyRtScene prepared(std::move(moved));
+        if(prepared.healingFlaskUpgradeSite_!=site || moved.healingFlaskUpgradeSite_)return false;
+        prepared.Destroy();
+        return !prepared.healingFlaskUpgradeSite_ && !prepared.FlaskUpgradeReadiness().site &&
+            prepared.playerUtilityCandidateAsset_==path;
     }
     struct Ledger {
         std::size_t resolverCalls = 0u;

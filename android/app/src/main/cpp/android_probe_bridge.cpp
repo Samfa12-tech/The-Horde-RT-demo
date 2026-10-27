@@ -1116,6 +1116,8 @@ void PublishSimulationUiState()
                 contextualControls |= 4;
         }
     }
+    if ((contextualControls & (1 << 9)) == 0 && simulation.flaskUpgrade.interactEligible)
+        contextualControls |= (1 << 12) | 1;
     if (simulation.crouchActive) contextualControls |= 1 << 10;
     if (simulation.crouchStandingBlocked) contextualControls |= 1 << 11;
     gContextualControlState.store(contextualControls, std::memory_order_release);

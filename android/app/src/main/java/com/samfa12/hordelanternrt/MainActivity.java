@@ -254,6 +254,7 @@ public class MainActivity extends Activity {
     private static final int RESCUE_PROMPT_SHIFT = 6;
     private static final int RESCUE_PROMPT_MASK = 7 << RESCUE_PROMPT_SHIFT;
     private static final int CONTEXTUAL_RESCUE_MODE = 1 << 9;
+    private static final int CONTEXTUAL_FLASK_UPGRADE = 1 << 12;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -8290,6 +8291,19 @@ public class MainActivity extends Activity {
         debugContextualGates = gates;
     }
 
+    static int contextualInteractLabel(final int state) {
+        if ((state & CONTEXTUAL_RESCUE_MODE) != 0) return 0; // Separate rope labels retain priority.
+        if ((state & CONTEXTUAL_FLASK_UPGRADE) != 0) return R.string.take_flask_upgrade;
+        switch ((state & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT) {
+            case CHEST_PROMPT_LOCKED: return R.string.chest_locked_until_lich_defeated;
+            case CHEST_PROMPT_OPEN: return R.string.open_chest;
+            case CHEST_PROMPT_OPENING: return R.string.chest_opening;
+            case CHEST_PROMPT_CLAIM: return R.string.take_lantern;
+            case CHEST_PROMPT_UNLOCKING: return R.string.chest_unlocking;
+            default: return 0;
+        }
+    }
+
     private void updateContextualControls(final boolean controlsAllowed) {
         if (controllerPrompt != null) controllerPrompt.setVisibility(View.GONE);
         if (!controlsAllowed) {
@@ -8339,30 +8353,8 @@ public class MainActivity extends Activity {
             toggleHeldLightPoseButton.setVisibility(View.GONE);
             return;
         }
-        final int chestPrompt = (contextualState & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT;
         final boolean interactEnabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
-        final int interactLabel;
-        switch (chestPrompt) {
-            case CHEST_PROMPT_LOCKED:
-                interactLabel = R.string.chest_locked_until_lich_defeated;
-                break;
-            case CHEST_PROMPT_OPEN:
-                interactLabel = R.string.open_chest;
-                break;
-            case CHEST_PROMPT_OPENING:
-                interactLabel = R.string.chest_opening;
-                break;
-            case CHEST_PROMPT_CLAIM:
-                interactLabel = R.string.take_lantern;
-                break;
-            case CHEST_PROMPT_UNLOCKING:
-                interactLabel = R.string.chest_unlocking;
-                break;
-            case CHEST_PROMPT_NONE:
-            default:
-                interactLabel = 0;
-                break;
-        }
+        final int interactLabel = contextualInteractLabel(contextualState);
         if (interactLabel == 0) {
             interactButton.setVisibility(View.GONE);
         } else {

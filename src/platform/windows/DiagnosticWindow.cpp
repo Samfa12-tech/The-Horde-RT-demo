@@ -691,6 +691,7 @@ struct VulkanSurfaceContext
     bool mouseLookActive = false;
     bool chestInteractionPromptPresented = false;
     bool rescueInteractionPromptPresented = false;
+    bool flaskUpgradeInteractionPromptPresented = false;
     bool mouseCursorHidden = false;
     bool environmentSurveyActive=false,environmentSurveyWaterDisabled=false,environmentSurveyDebrisDisabled=false;
     std::string environmentSurveyProfile;
@@ -3034,6 +3035,7 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
 {
     context.chestInteractionPromptPresented = false;
     context.rescueInteractionPromptPresented = false;
+    context.flaskUpgradeInteractionPromptPresented = false;
     HWND promptControl = GetDlgItem(context.windowHandle, kChestPromptControlId);
     if (promptControl == nullptr)
     {
@@ -3053,11 +3055,12 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
          .captureMode = GetPropA(context.windowHandle, kCaptureModeProperty) != nullptr};
     const bool rescueJourney = snapshot.developmentRescueJourney &&
         snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None;
-    const bool visible = rescueJourney
+    const bool flaskUpgrade = !rescueJourney && snapshot.flaskUpgrade.interactEligible;
+    const bool visible = (rescueJourney || flaskUpgrade)
         ? !visibility.simulationPaused && !visibility.pauseMenuVisible && !visibility.settingsVisible &&
           !visibility.diagnosticsVisible && !visibility.benchmarkReportVisible && !visibility.rtLabVisible &&
           !visibility.deathOverlayVisible && !visibility.endingOverlayVisible && !visibility.benchmarkRunning &&
-          !visibility.captureMode && snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None
+          !visibility.captureMode
         : horde::platform::windows::ShouldShowWindowsChestPrompt(snapshot.chestPrompt, visibility);
     std::string_view text;
     if (rescueJourney)
@@ -3073,6 +3076,10 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         }
         context.rescueInteractionPromptPresented = visible &&
             (snapshot.rescuePrompt == RescuePrompt::Climb || snapshot.rescuePrompt == RescuePrompt::Descend);
+    }
+    else if(flaskUpgrade) {
+        text = "FLASK UPGRADE | LEFT-CLICK / A TO TAKE";
+        context.flaskUpgradeInteractionPromptPresented=visible;
     }
     else
     {
@@ -12080,15 +12087,17 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             DesktopClickAction clickAction;
             if (snapshot.developmentRescueJourney &&
                 (snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None ||
-                 sceneContext->rescueInteractionPromptPresented))
+                 sceneContext->rescueInteractionPromptPresented || snapshot.flaskUpgrade.interactEligible ||
+                 sceneContext->flaskUpgradeInteractionPromptPresented))
             {
                 // Rescue mode owns every click. A stale/disabled rescue prompt
                 // is consumed without falling through to the attack action.
                 clickAction = !IsDesktopGameplayAvailable(*sceneContext) ? DesktopClickAction::Ignore :
                     !capturedAndFocused ? DesktopClickAction::AcquireCapture :
-                    sceneContext->rescueInteractionPromptPresented &&
-                    (snapshot.rescuePrompt == horde::gameplay::traversal::RescuePrompt::Climb ||
-                     snapshot.rescuePrompt == horde::gameplay::traversal::RescuePrompt::Descend)
+                    ((sceneContext->rescueInteractionPromptPresented &&
+                      (snapshot.rescuePrompt == horde::gameplay::traversal::RescuePrompt::Climb ||
+                       snapshot.rescuePrompt == horde::gameplay::traversal::RescuePrompt::Descend)) ||
+                     (sceneContext->flaskUpgradeInteractionPromptPresented && snapshot.flaskUpgrade.interactEligible))
                         ? DesktopClickAction::Interact : DesktopClickAction::Ignore;
             }
             else

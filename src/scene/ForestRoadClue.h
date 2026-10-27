@@ -1,7 +1,7 @@
 #pragma once
 #include "scene/assets/StaticMeshAsset.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
-#include "gameplay/items/HeldItemState.h"
+#include "gameplay/healing/FlaskUpgradeSite.h"
 #include <filesystem>
 #include <vector>
 
@@ -22,9 +22,7 @@ bool AppendForestRoadClue(const std::filesystem::path& assetRoot,assets::StaticM
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& support,
     ForestRoadClueReport& report,std::string& diagnostic);
 
-struct ForestFlaskUpgradePlacement {
-    gameplay::items::HeldItemTransform worldFromItem{};
-    std::array<float,3> supportPoint{};
+struct ForestFlaskUpgradePlacement : gameplay::healing::FlaskUpgradeSite {
     float minimumBottomGap=0,maximumBottomGap=0,minimumTrailClearance=0;
 };
 // Source candidate only: derives a rigid placement from the actual waystone,

@@ -142,6 +142,9 @@ public:
     void StartLiveDevelopmentRescueJourney(bool authoredTerrain = false);
     bool PublishChapterTerrain(WorldZoneToken token, std::shared_ptr<const TriangleSupportSurface> terrain);
     bool PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness);
+    // Current owner receipt only; never awards progress. Empty receipts
+    // withdraw presentation; stale world/resource responses reject.
+    bool PublishFlaskUpgradeReadiness(WorldZoneToken token,const healing::FlaskUpgradeReadiness& readiness);
     bool HoldStaticDetailLease(const StaticDetailLease& lease);
     bool ReleaseStaticDetailLease(std::uint64_t resourceGeneration);
     void InvalidateWorldZoneReadiness();
@@ -308,6 +311,8 @@ private:
     healing::FlaskContext FlaskContextFor(const InputSnapshot&, bool cancel, bool acceptedDamage) const;
     void StepHealingFlask(const InputSnapshot& input, float gameplaySeconds,
                           bool competingIntent, int healthBeforeEncounter);
+    bool FlaskUpgradeEligible(const InputSnapshot&) const;
+    bool TryFlaskUpgradeInteraction();
     void RefreshSnapshot(const InputSnapshot& input);
     void UpdateChapterDialogue(const InputSnapshot& input,float fixedSeconds);
 
@@ -395,6 +400,9 @@ private:
     WorldRouteState worldRoute_{};
     std::shared_ptr<const TriangleSupportSurface> chapterTerrain_;
     std::uint64_t chapterTerrainGeneration_=0;
+    std::optional<healing::FlaskUpgradeSite> flaskUpgradeSite_;
+    bool flaskUpgradeReady_=false;
+    std::uint64_t flaskUpgradeWorldGeneration_=0,flaskUpgradeResourceGeneration_=0;
     horde::gameplay::traversal::RescueTraversal rescueTraversal_{};
     float rescueOpeningSeconds_ = 0.0f;
     bool rescueMovementSuppressedThisTick_ = false;

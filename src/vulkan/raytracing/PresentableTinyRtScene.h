@@ -45,6 +45,7 @@
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/healing/FlaskUpgradeSite.h"
 #include "gameplay/items/HeldLightState.h"
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
@@ -412,6 +413,7 @@ public:
     horde::gameplay::simulation::ZoneReadiness WorldZoneReadiness(horde::gameplay::simulation::WorldZoneToken token) const;
     const horde::scene::DevelopmentWorldGeometry& WorldRouteGeometry() const { return worldRouteGeometry_; }
     std::shared_ptr<const horde::gameplay::simulation::TriangleSupportSurface> ChapterTerrainSurface() const { return chapterTerrainSurface_; }
+    horde::gameplay::healing::FlaskUpgradeReadiness FlaskUpgradeReadiness() const;
     bool IsReady() const { return ready_; }
 #if defined(_DEBUG)
     struct ForestDetailClosureObservation {
@@ -1473,6 +1475,7 @@ private:
     horde::scene::assets::StaticMeshAsset waterDropletAsset_;
     horde::scene::assets::StaticMeshAsset attackWarningRingAsset_;
     horde::scene::assets::StaticMeshAsset healingFlaskAsset_;
+    std::optional<horde::gameplay::healing::FlaskUpgradeSite> healingFlaskUpgradeSite_;
     bool waterDropletGeometryVisible_ = false;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;
     std::uint32_t playerStaticVertexBase_ = 0u;

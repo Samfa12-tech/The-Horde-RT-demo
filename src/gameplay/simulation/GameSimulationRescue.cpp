@@ -70,7 +70,7 @@ void GameSimulation::StepRescueJourney(bool paused) {
         // combat, so simultaneous edges cannot act before traversal ownership.
         while(pendingInteractCommands_>0) {
             --pendingInteractCommands_;++lastConsumedInteractSequence_;
-            TryRescueInteraction();
+            if(!TryRescueInteraction())(void)TryFlaskUpgradeInteraction();
         }
     }
     if(rescueTraversal_.IsActive() && !ValidRescueCapsulePath(rescueTraversal_.Snapshot()))

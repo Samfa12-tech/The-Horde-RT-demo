@@ -1,5 +1,6 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
+#include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
 #include "scene/CorridorRegionalWaterClosure.h"
@@ -116,6 +117,135 @@ std::uint64_t ForestRepresentationDigest(const StaticMeshAsset& mesh,const Fores
 void PrintForestDigest(const char* label,const StaticMeshAsset& mesh,const ForestDressingBuildReport& report) {
     std::cout<<"FOREST_REPRESENTATION "<<label<<" fnv1a64="<<ForestRepresentationDigest(mesh,report)
         <<" vertices="<<mesh.vertices.size()<<" indices="<<mesh.indices.size()<<" placements="<<report.placedInstances<<'\n';
+}
+
+void TestFlaskPickup(const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain,
+                     const gameplay::healing::FlaskUpgradeSite& site)
+{
+    namespace sim=gameplay::simulation;namespace cp=gameplay::campaign;
+    auto config=sim::ProductionGameSimulationConfig();config.healingFlask1_7=config.flaskUtilityCandidate=true;
+    sim::GameSimulation game(config);cp::Checkpoint original;
+    const auto end=sim::kWorldRoutePoints.back();const auto ground=terrain->Query(end.x,end.z);
+    original.schema=3;original.contentRevision=2;original.id=cp::CheckpointId::ForestEndpoint;
+    original.zone=sim::WorldZoneId::Lookout;original.position={end.x,ground.worldY,end.z};
+    original.vitality=2;original.halfHeart=true;original.flask={false,1};original.firstAscentCompleted=true;
+    original.swordStowed=true;original.dialogue.grateConsumed=original.dialogue.rescueConsumed=true;
+    original.dialogue.reunionStarted=original.dialogue.proofAccepted=true;
+    original.dialogue.forestNightConsumed=original.dialogue.forestWaystoneConsumed=true;
+    original.dialogue.forestClueConsumed=original.dialogue.forestVillageConsumed=true;
+    sim::InputSnapshot input;input.tutorialEnabled=input.damageEnabled=false;
+    const auto restore=[&](auto& target,const cp::Checkpoint& record) {
+        input.yawRadians=record.yaw;input.pitchRadians=record.pitch;input.moveForward=input.moveStrafe=0;
+        const auto token=target.BeginCampaignRestore(record);
+        return token && target.CommitCampaignRestore(*token,{token->worldGeneration,record.zone},terrain,input);
+    };
+    if(!restore(game,original)){Check(false,"pickup fixture restores an actual earned F04 record");return;}
+    const auto tick=[&](auto& target,auto& in,int count=1){for(int i=0;i<count;++i)target.StepFixed(in);};
+    tick(game,input);
+    const auto token=sim::WorldZoneToken{game.Snapshot().worldRoute.generation,sim::WorldZoneId::Lookout};
+    const bool published=game.PublishFlaskUpgradeReadiness(token,{7,site});
+    if(!published || !game.Snapshot().flaskUpgrade.site) {
+        std::string diagnostic;const auto under=terrain->Query(site.supportPoint[0],site.supportPoint[2]);
+        std::cerr<<"Pickup bind: accepted="<<published<<" enabled="<<game.Snapshot().healingFlaskEnabled
+            <<" candidate="<<game.Snapshot().flaskUtilityCandidate<<" world="<<token.generation
+            <<" supportGen="<<game.Snapshot().playerSupportGeneration<<" paused="<<game.Snapshot().paused
+            <<" rigid="<<gameplay::healing::ValidateFlaskUpgradeSite(site,diagnostic)<<" error="<<diagnostic
+            <<" ground="<<under.worldY<<" declared="<<site.supportPoint[1]<<'\n';
+    }
+    Check(published && game.Snapshot().flaskUpgrade.site &&
+          !game.Snapshot().flaskUpgrade.interactEligible,"actual imported F03 item is visible but cannot be reached from F04");
+    ++input.commands.interact;tick(game,input);
+    Check(!game.Snapshot().healingFlask.resources.upgraded,"far fresh interaction cannot collect a visible distant item");
+    const auto walk=[&](auto& target,auto& in,float x,float z) {
+        for(int step=0;step<1600;++step) {
+            const auto& s=target.Snapshot();const float dx=x-s.playerX,dz=z-s.playerZ;
+            if(std::hypot(dx,dz)<.07f){in.moveForward=0;tick(target,in);return true;}
+            in.yawRadians=std::atan2(dx,-dz);in.moveForward=1;tick(target,in);
+        }
+        std::cerr<<"Pickup walk stopped at "<<target.Snapshot().playerX<<','<<target.Snapshot().playerZ<<'\n';
+        in.moveForward=0;return false;
+    };
+    const auto clue=sim::kWorldRoutePoints[6];const auto p=site.supportPoint;
+    const float dx=clue.x-p[0],dz=clue.z-p[2],length=std::hypot(dx,dz);
+    if(!walk(game,input,p[0]+dx/length,p[2]+dz/length)){Check(false,"pickup is reachable through actual unchanged route/contact");return;}
+    input.yawRadians=std::atan2(p[0]-game.Snapshot().playerX,-(p[2]-game.Snapshot().playerZ));tick(game,input);
+    if(!game.Snapshot().flaskUpgrade.interactEligible) {
+        std::cerr<<"Pickup context: distance="<<std::hypot(p[0]-game.Snapshot().playerX,p[2]-game.Snapshot().playerZ)
+            <<" zone="<<unsigned(game.Snapshot().worldRoute.current)<<" line="<<unsigned(game.Snapshot().chapterDialogue.line)<<'\n';
+        Check(false,"reached dry approach offers actual facing/reach pickup");return;
+    }
+    for(int mode=0;mode<4;++mode) {
+        auto interrupted=game;auto trialInput=input;
+        if(mode==0)trialInput.guardHeld=true;
+        if(mode==1)trialInput.paused=true;
+        if(mode==2)trialInput.yawRadians+=3.14159265f;
+        if(mode==3)++trialInput.commands.attack;
+        ++trialInput.commands.interact;tick(interrupted,trialInput);
+        Check(!interrupted.Snapshot().healingFlask.resources.upgraded,
+              "guard/pause/looking away/attack rejects contextual pickup without consuming resources");
+        trialInput.guardHeld=trialInput.paused=false;trialInput.yawRadians=input.yawRadians;tick(interrupted,trialInput);
+        Check(!interrupted.Snapshot().healingFlask.resources.upgraded,"rejected or paused pickup never queues for later");
+    }
+    {
+        auto occupied=game;auto trialInput=input;++trialInput.commands.drinkFlask;tick(occupied,trialInput,25);
+        ++trialInput.commands.interact;tick(occupied,trialInput);
+        Check(!occupied.Snapshot().healingFlask.resources.upgraded && occupied.Snapshot().healingFlask.resources.charges==1,
+              "interact cancels drink without collecting through the occupied hand return or spending a charge");
+        tick(occupied,trialInput,100);
+        Check(!occupied.Snapshot().healingFlask.resources.upgraded,"settled hand return never replays rejected pickup");
+    }
+    {
+        auto unavailable=game;auto trialInput=input;
+        Check(unavailable.PublishFlaskUpgradeReadiness(token,{8,std::nullopt}) && !unavailable.Snapshot().flaskUpgrade.site,
+              "current resource loss withdraws world item and interaction immediately");
+        ++trialInput.commands.interact;tick(unavailable,trialInput);
+        Check(!unavailable.Snapshot().healingFlask.resources.upgraded &&
+              !unavailable.PublishFlaskUpgradeReadiness(token,{7,site}) &&
+              unavailable.PublishFlaskUpgradeReadiness(token,{8,site}),
+              "old resource callback cannot rearm withdrawn pickup; current receipt restores without awarding it");
+        tick(unavailable,trialInput);
+        Check(!unavailable.Snapshot().healingFlask.resources.upgraded,"restoration cannot replay the rejected pickup edge");
+    }
+    const auto before=game.Snapshot();const auto revision=game.CampaignBoundaryRevision();
+    ++input.commands.interact;tick(game,input);
+    Check(game.Snapshot().healingFlask.resources==gameplay::healing::FlaskResources{true,1} &&
+          !game.Snapshot().flaskUpgrade.site && game.Snapshot().playerVitals.vitality==before.playerVitals.vitality &&
+          game.Snapshot().playerVitals.halfHeart==before.playerVitals.halfHeart &&
+          game.Snapshot().flaskHandReturn==before.flaskHandReturn &&
+          game.Snapshot().heldItems[0].parentMode==before.heldItems[0].parentMode &&
+          game.Snapshot().interaction.heldLightKind==before.interaction.heldLightKind &&
+          game.CampaignBoundaryRevision()==revision,"fresh pickup removes only world entitlement with exact health/charges/light/hand and no eager saved-boundary rewrite");
+    ++input.commands.interact;tick(game,input,3);
+    Check(game.Snapshot().healingFlask.resources==gameplay::healing::FlaskResources{true,1},"repeated input cannot stack capacity or refill");
+    if(!walk(game,input,end.x,end.z)){Check(false,"pickup can return through unchanged contact to real F04 save anchor");return;}
+    input.yawRadians=original.yaw;tick(game,input,20);
+    const auto saved=game.CaptureAuthoredCampaignBoundary(cp::CheckpointId::ForestEndpoint);
+    if(!saved) {
+        const auto& s=game.Snapshot();
+        std::cerr<<"Pickup save: player="<<s.playerX<<','<<s.playerZ<<" speed="<<s.playerMovementSpeedMetresPerSecond
+            <<" kit="<<s.chapterCompanion.x<<','<<s.chapterCompanion.z<<" walking="<<s.chapterCompanion.walking
+            <<" waypoint="<<s.chapterCompanion.waypoint<<" line="<<unsigned(s.chapterDialogue.line)
+            <<" charges="<<s.healingFlask.resources.charges<<" upgraded="<<s.healingFlask.resources.upgraded<<'\n';
+    }
+    Check(saved && saved->flask==gameplay::healing::FlaskResources{true,1},"earned save captures actual acquired entitlement and exact charge count");
+    if(saved) {
+        Check(restore(game,*saved),"saved upgrade restores through existing campaign transaction");tick(game,input);
+        const auto current=sim::WorldZoneToken{game.Snapshot().worldRoute.generation,sim::WorldZoneId::Lookout};
+        Check(!game.PublishFlaskUpgradeReadiness(token,{7,site}) && game.PublishFlaskUpgradeReadiness(current,{1,site}) &&
+              !game.Snapshot().flaskUpgrade.site && game.Snapshot().healingFlask.resources==saved->flask,
+              "old-world receipts reject and upgraded exact load never resurrects pickup or refills");
+        sim::GameSimulation independent(config);Check(restore(independent,original),"separate campaign slot restores its own record");
+        const auto otherToken=sim::WorldZoneToken{independent.Snapshot().worldRoute.generation,sim::WorldZoneId::Lookout};
+        Check(independent.PublishFlaskUpgradeReadiness(otherToken,{1,site}) && independent.Snapshot().flaskUpgrade.site &&
+              independent.Snapshot().healingFlask.resources==original.flask && game.Snapshot().healingFlask.resources.upgraded,
+              "one slot's acquired upgrade never grants or removes another slot's item/resources");
+        ++input.commands.rest;tick(game,input,121);
+        Check(game.Snapshot().healingFlask.resources==gameplay::healing::FlaskResources{true,3},"only deliberate earned Rest fills third slot");
+    }
+    Check(restore(game,original),"older same-slot record may legitimately rewind upgrade");tick(game,input);
+    const auto rewind=sim::WorldZoneToken{game.Snapshot().worldRoute.generation,sim::WorldZoneId::Lookout};
+    Check(game.PublishFlaskUpgradeReadiness(rewind,{1,site}) && game.Snapshot().flaskUpgrade.site &&
+          game.Snapshot().healingFlask.resources==original.flask,"exact older load restores item and saved resources, without free charges");
 }
 
 void TestNativeTreePairAndAppend()
@@ -986,6 +1116,7 @@ void TestNativeChapterPrimitiveOwnership()
                     std::cout<<"F03 flask source: x="<<placed.worldFromItem[12]<<" y="<<placed.worldFromItem[13]
                         <<" z="<<placed.worldFromItem[14]<<" bottomGap="<<placed.minimumBottomGap<<','<<placed.maximumBottomGap
                         <<" trailClearance="<<placed.minimumTrailClearance<<" no gameplay or RT admission\n";
+                    TestFlaskPickup(terrain,placed);
                 }
             }
             return true;}() &&
