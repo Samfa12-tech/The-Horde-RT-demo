@@ -1,0 +1,39 @@
+{
+  "baseCommit": "d6ff2eb79cad5a4fec08529e09ffd13b7d3c74a8",
+  "phoneUsed": false,
+  "normalWorkerEnabled": false,
+  "hostTests": {
+    "selected": 3,
+    "passed": 3,
+    "seconds": 21.9,
+    "authoredCases": 48321,
+    "authoredFailures": 0
+  },
+  "androidNative": "passed all four ABIs, Shipping/Mobile actor experiment Debug, final source",
+  "privateEvidence": [
+    {
+      "path": "reports/start-state-reproduction.log",
+      "sha256": "afed3fcac7f1a58793694cafad5f0f038541282ce461f11d49903cef0e4d11fb"
+    },
+    {
+      "path": "reports/start-state-reproduction2.log",
+      "sha256": "7e6f929311192a0ebf407ff1f43c341f2c96e2a4005b12518a370df413c15b2b"
+    },
+    {
+      "path": "reports/start-state-reproduction3.log",
+      "sha256": "2fa83867a8076341590cb3e9b9b8741778f99c19115427f3408caaaae940985c"
+    },
+    {
+      "path": "reports/start-state-final-tests.log",
+      "sha256": "db48810c21703a8304bb5a1b8f0828f5254bfa36f13a0187807ac93faf219b48"
+    },
+    {
+      "path": "reports/start-state-android-build-fixed.log",
+      "sha256": "935618ef5f3cf70eb6141930ca16bdf5dfe8a4c0f0d65fbd1cb61c6ba42d4b80"
+    },
+    {
+      "path": "reports/start-state-android-final.log",
+      "sha256": "0029266996b3a4299a9b0e8ad9aa414e438ce24339d74a930cfbf51335a8ba3b"
+    }
+  ]
+}

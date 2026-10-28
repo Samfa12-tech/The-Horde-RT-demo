@@ -47,6 +47,7 @@
 #include "graphics/GraphicsPreviewPerformance.h"
 #if (defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)) || HORDE_RT_ANDROID_MOTION_VALIDATION
 #include "platform/android/AndroidMotionEvidencePolicy.h"
+#include "gameplay/validation/ChapterRoundTripProbe.h"
 #include "telemetry/MotionEvidenceLedger.h"
 #endif
 #if !defined(NDEBUG)
@@ -441,6 +442,7 @@ struct SwapchainContext
     std::array<float, 3u> glassAttenuationColor{{0.72f, 0.90f, 1.0f}};
     float glassAttenuationDistance = 2.4f;
     std::uint32_t benchmarkGeneration = 0u;
+    std::uint32_t chapterStartAcknowledgedGeneration = 0u;
     std::uint32_t benchmarkWarmupFrames = 0u;
     std::uint32_t benchmarkSampleFrames = 0u;
     std::uint32_t benchmarkWindow = 0u;
@@ -2362,6 +2364,33 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
     WriteTextFile(context.reportDirectory + '/' + kShowcaseDebugStateFilename, json.str());
 }
 
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+void WriteChapterStartAcknowledgement(
+    SwapchainContext& context,
+    const horde::telemetry::RtSubmittedFrameIdentity* presented = nullptr)
+{
+    const auto& state = gGameSimulation.Snapshot();
+    const auto failure = horde::gameplay::validation::ChapterRoundTripProbe::StartFailure(state);
+    const bool ready = presented != nullptr && failure.empty();
+    std::ostringstream json;
+    json << "{\"schema\":1,\"checkpoint\":207,\"checkpointGeneration\":" << context.benchmarkGeneration
+         << ",\"surfaceGeneration\":" << context.surfaceGeneration
+         << ",\"worldGeneration\":" << state.worldRoute.generation
+         << ",\"simulationTick\":" << state.tickIndex
+         << ",\"ready\":" << (ready ? "true" : "false")
+         << ",\"reason\":\"" << (!failure.empty() ? failure : ready ? "ready" : "awaiting-current-rt-present")
+         << "\",\"rtPresentAccepted\":" << (presented ? "true" : "false")
+         << ",\"gpuCompletionClaimed\":false,\"sceneEpoch\":" << (presented ? presented->frame.sceneEpoch : 0u)
+         << ",\"measurementGeneration\":" << (presented ? presented->frame.measurementGeneration : 0u)
+         << ",\"recordSerial\":" << (presented ? presented->frame.recordSerial : 0u)
+         << ",\"submissionSerial\":" << (presented ? presented->submissionSerial : 0u) << "}\n";
+    const auto path = context.reportDirectory + "/chapter-start-ack";
+    const bool saved = WriteTextFile(path + ".tmp", json.str()) &&
+        std::rename((path + ".tmp").c_str(), (path + ".json").c_str()) == 0;
+    __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_CHAPTER_START receipt_saved=%d %s", saved ? 1 : 0, json.str().c_str());
+}
+#endif
+
 bool ApplyBenchmarkCheckpoint(
     SwapchainContext& context,
     const DebugCheckpointSelection& selection,
@@ -2369,6 +2398,11 @@ bool ApplyBenchmarkCheckpoint(
 {
     const auto& checkpoint = selection.checkpoint;
     const bool liveJourney = selection.development != nullptr && selection.development->id == 192;
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+    // Retire the preceding receipt before trying a repeated import. A failed
+    // replacement must not retain a ready=true receipt from the prior run.
+    if (checkpoint.id == 207) WriteChapterStartAcknowledgement(context);
+#endif
     if (!ApplyDebugCheckpointSimulation(context, selection, observation, liveJourney))
     {
         WriteShowcaseDebugState(context, "checkpoint-failed");
@@ -2422,6 +2456,10 @@ bool ApplyBenchmarkCheckpoint(
     }
     ++context.benchmarkGeneration;
     ResetBenchmarkTiming(context);
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+    context.chapterStartAcknowledgedGeneration = 0u;
+    if (checkpoint.id == 207) WriteChapterStartAcknowledgement(context);
+#endif
     __android_log_print(ANDROID_LOG_INFO,
                         kTag,
                         "HORDE_BENCH begin generation=%u checkpoint=%s scale=%.0f warmup_frames=120 sample_frames=120 windows=3 zone=%s",
@@ -5233,6 +5271,26 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     }
 
     rtFramePresented = useRtFrame;
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+    // A queued intent or an old presented frame is not start readiness. Bind
+    // this acknowledgement to the new checkpoint's actual submitted pose and
+    // successful RT present. Motion still revalidates the immutable snapshot.
+    if (useRtFrame && evidenceFrame && context.benchmarkSampling &&
+        context.activeBenchmarkCheckpoint == 207 && context.benchmarkGeneration != 0u &&
+        context.chapterStartAcknowledgedGeneration != context.benchmarkGeneration &&
+        gSurfaceSessions.IsCurrent(context.surfaceGeneration) &&
+        horde::gameplay::validation::ChapterRoundTripProbe::StartFailure(gGameSimulation.Snapshot()).empty())
+    {
+        horde::telemetry::RtSubmittedFrameIdentity committed{};
+        if (context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, committed) &&
+            committed.frame.simulationTick == gGameSimulation.Snapshot().tickIndex &&
+            committed.submissionSerial != 0u && committed.frame.recordSerial != 0u)
+        {
+            WriteChapterStartAcknowledgement(context, &committed);
+            context.chapterStartAcknowledgedGeneration = context.benchmarkGeneration;
+        }
+    }
+#endif
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
     AfterAndroidMotionPresent(context);
 #endif

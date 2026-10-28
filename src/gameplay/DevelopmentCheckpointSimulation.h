@@ -163,6 +163,16 @@ inline bool StageDevelopmentCheckpointSimulation(
     };
 
     if(checkpoint.stagesRescueExterior) {
+        // A diagnostic exterior seed is a new authored chapter presentation,
+        // even in a process which has already walked this route. Retaining the
+        // first-arrival flag skips the genuine lowering step on repeated seeds;
+        // retaining Kit/proof would also borrow the preceding run's progression.
+        // Ordinary checkpoint/retry/save paths deliberately keep their policy.
+        gameSimulation.chapterDialogue_.Reset();
+        gameSimulation.dialogueDucking_.Reset();
+        gameSimulation.chapterCompanion_.Reset();
+        gameSimulation.chapterFirstExterior_=false;
+        gameSimulation.chapterVisibleRaise_=0;
         // Explicit companion evidence first executes the accepted-hit/death
         // seed, then the same rope/native-grounding path as ordinary captures.
         // Historical route captures retain their existing imported state.

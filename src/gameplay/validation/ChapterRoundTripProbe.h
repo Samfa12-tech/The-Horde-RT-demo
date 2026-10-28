@@ -32,19 +32,28 @@ inline constexpr std::string_view ChapterProbePhaseName(ChapterProbePhase phase)
 // raise only through the existing successful-presentation authority.
 class ChapterRoundTripProbe {
 public:
+    // Same authority for admission and diagnostic acknowledgement. Empty means
+    // eligible; observing it never seeds progression or changes the snapshot.
+    static constexpr std::string_view StartFailure(const simulation::SimulationSnapshot& s) {
+        for(unsigned zone=1;zone<4;++zone)
+            if(s.worldRoute.readiness[zone]!=simulation::ZoneReadiness::Ready)return "world-not-ready";
+        if(!s.developmentRescueJourney)return "not-chapter-journey";
+        if(!s.rescue.exteriorSide || s.rescue.equipmentStowed)return "not-grounded-exterior";
+        if(!s.rescue.firstAscentCompleted || !s.rescue.ropeReady || s.rescue.claimCount!=1 ||
+           s.rescue.deploymentCount!=1)return "rescue-start-not-ready";
+        if(!s.worldRoute.generation || !Finite(s))return "invalid-world-or-pose";
+        if(s.interaction.heldLightKind!=interactions::HeldLightKind::RewardLantern ||
+           s.interaction.heldLightPose!=interactions::HeldLightPose::Low)return "lantern-not-low";
+        if(s.lich.deathDissolveProgress!=1)return "keeper-not-retired";
+        if(s.chapterDialogue.proofAccepted)return "proof-already-accepted";
+        if(s.lastConsumedInteractSequence==UINT64_MAX ||
+           s.lastConsumedToggleHeldLightPoseSequence==UINT64_MAX ||
+           s.lastConsumedClearRunIntentSequence==UINT64_MAX)return "command-sequence-exhausted";
+        return {};
+    }
     bool Start(const simulation::SimulationSnapshot& s,bool regionCycle=false,bool matchedViews=false) {
         *this={};
-        for(unsigned zone=1;zone<4;++zone)
-            if(s.worldRoute.readiness[zone]!=simulation::ZoneReadiness::Ready)return false;
-        if(!s.developmentRescueJourney || !s.rescue.exteriorSide || s.rescue.equipmentStowed ||
-           !s.rescue.firstAscentCompleted || !s.rescue.ropeReady || s.rescue.claimCount!=1 ||
-           s.rescue.deploymentCount!=1 || !s.worldRoute.generation || !Finite(s) ||
-           s.interaction.heldLightKind!=interactions::HeldLightKind::RewardLantern ||
-           s.interaction.heldLightPose!=interactions::HeldLightPose::Low ||
-           s.lich.deathDissolveProgress!=1 || s.chapterDialogue.proofAccepted ||
-           s.lastConsumedInteractSequence==UINT64_MAX ||
-           s.lastConsumedToggleHeldLightPoseSequence==UINT64_MAX ||
-           s.lastConsumedClearRunIntentSequence==UINT64_MAX) return false;
+        if(!StartFailure(s).empty())return false;
         generation_=s.worldRoute.generation;lastTick_=phaseTick_=s.tickIndex;
         interact_=s.lastConsumedInteractSequence;raise_=s.lastConsumedToggleHeldLightPoseSequence;
         clearRun_=s.lastConsumedClearRunIntentSequence+1;

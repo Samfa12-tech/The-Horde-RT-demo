@@ -309,6 +309,47 @@ int main(int argc,char** argv) {
     if(trial>=5)for(const auto phase:{ChapterProbePhase::Landing,ChapterProbePhase::Lower,ChapterProbePhase::Passage,ChapterProbePhase::Ascent})
      check(viewSamples[static_cast<unsigned>(phase)]>=45,"comparison omitted a stable matched view");
     motion.End(phone);
+    if(trial==9) {
+     // Same-process Android A/B must restage the reunion after a completed
+     // route; a fresh-process-only fixture cannot prove that boundary.
+     DevelopmentCheckpointStageEvidence repeated;
+     const bool restaged=StageDevelopmentCheckpointForScene(phone,*reunion,[&]{
+      for(std::size_t zone=1;zone<kWorldZones.size();++zone)
+       phone.PublishChapterTerrain({phone.Snapshot().worldRoute.generation,static_cast<WorldZoneId>(zone)},terrain);
+     },false,&repeated);
+     ChapterRoundTripProbe next;
+     const bool ready=next.Start(phone.Snapshot(),true,true);
+     if(!ready) {
+      const auto& s=phone.Snapshot();
+      std::cout<<"repeat reunion staged="<<restaged<<" failure="<<DevelopmentCheckpointStageFailureName(repeated.failure)
+       <<" start_failure="<<ChapterRoundTripProbe::StartFailure(s)
+       <<" generation="<<s.worldRoute.generation<<" ready=";
+      for(unsigned zone=1;zone<4;++zone)std::cout<<static_cast<int>(s.worldRoute.readiness[zone])<<',';
+      std::cout<<" claim="<<s.rescue.claimCount<<" deploy="<<s.rescue.deploymentCount
+       <<" low="<<static_cast<int>(s.interaction.heldLightPose)<<" death="<<std::setprecision(10)<<s.lich.deathDissolveProgress
+       <<" proof="<<s.chapterDialogue.proofAccepted<<" development="<<s.developmentRescueJourney
+       <<" exterior="<<s.rescue.exteriorSide<<" stowed="<<s.rescue.equipmentStowed
+       <<" first="<<s.rescue.firstAscentCompleted<<" rope="<<s.rescue.ropeReady
+       <<" light="<<static_cast<int>(s.interaction.heldLightKind)
+       <<" position="<<s.playerX<<','<<s.playerZ<<','<<s.playerSupportWorldY<<','<<s.playerYawRadians
+       <<" commands="<<s.lastConsumedInteractSequence<<','<<s.lastConsumedToggleHeldLightPoseSequence<<','<<s.lastConsumedClearRunIntentSequence<<'\n';
+     }
+     check(restaged && ready,"same-process repeated reunion must establish the route's exact start state");
+     check(phone.Snapshot().worldRoute.generation>generation &&
+           phone.Snapshot().lastConsumedClearRunIntentSequence>=published.commands.clearRunIntent,
+           "restaging changes world generation without rolling back consumed input floors");
+     const auto* departure=FindDevelopmentCheckpoint("chapter-kit-departure");
+     const auto restage=[&](const DevelopmentCheckpoint& checkpoint) {
+      return StageDevelopmentCheckpointForScene(phone,checkpoint,[&]{
+       for(std::size_t zone=1;zone<kWorldZones.size();++zone)
+        phone.PublishChapterTerrain({phone.Snapshot().worldRoute.generation,static_cast<WorldZoneId>(zone)},terrain);
+      });
+     };
+     check(departure && restage(*departure) && phone.Snapshot().chapterDialogue.proofAccepted,
+           "explicit departure still performs a real fresh raised-pose proof");
+     check(restage(*reunion) && ChapterRoundTripProbe::StartFailure(phone.Snapshot()).empty(),
+           "reunion after an accepted proof must restore fresh lowering, Kit and dialogue state");
+    }
     MotionEvidenceScenario invalidMotion;
     GameSimulation wrong(captureConfig);
     check(!invalidMotion.Begin(MotionScenario::ChapterRoundTrip,wrong,now),"unready phone chapter cannot be fabricated by measurement");
@@ -317,7 +358,11 @@ int main(int argc,char** argv) {
    auto bad=state;bad.rescue.equipmentStowed=true;
    check(!invalid.Start(bad),"probe cannot start from a traversing or unready side");
    bad=state;bad.interaction.heldLightPose=interactions::HeldLightPose::High;
-   check(!invalid.Start(bad),"probe cannot count an already raised lantern as fresh input");
+   check(!invalid.Start(bad) && ChapterRoundTripProbe::StartFailure(bad)=="lantern-not-low",
+         "probe cannot count an already raised lantern as fresh input and must explain rejection");
+   bad=state;bad.chapterDialogue.proofAccepted=true;
+   check(!invalid.Start(bad) && ChapterRoundTripProbe::StartFailure(bad)=="proof-already-accepted",
+         "observing admission cannot borrow or clear the preceding proof");
    bad=state;bad.worldRoute.readiness[2]=ZoneReadiness::Failed;
    check(!invalid.Start(bad),"failed destination cannot start the moving probe");
    ChapterRoundTripProbe stale;

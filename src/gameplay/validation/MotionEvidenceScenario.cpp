@@ -122,7 +122,12 @@ bool MotionEvidenceScenario::Begin(MotionScenario scenario, GameSimulation& simu
             scenario == MotionScenario::TorchLowOpening ? 0 :
             (scenario == MotionScenario::ShaftUp || scenario == MotionScenario::TorchDrench) ? 2 : 8);
     if (!seeded)
-    { Fail("The accepted scenario checkpoint seed could not be applied."); return false; }
+    {
+        const auto chapterFailure=IsChapterMotionScenario(scenario)
+            ? ChapterRoundTripProbe::StartFailure(simulation.Snapshot()) : std::string_view{};
+        Fail(chapterFailure.empty() ? "The accepted scenario checkpoint seed could not be applied." : chapterFailure);
+        return false;
+    }
     equipmentSeedOwned_ = scenario == MotionScenario::WaterfallEquipment;
     startWall_ = latestWall_ = now;
     previousTick_ = simulation.Snapshot().tickIndex;
