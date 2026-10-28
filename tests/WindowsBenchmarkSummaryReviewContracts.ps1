@@ -2,6 +2,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $owner = Get-Content -LiteralPath (Join-Path $root 'src/platform/windows/DiagnosticWindow.cpp') -Raw
 $review = Get-Content -LiteralPath (Join-Path $root 'src/platform/windows/WindowsBenchmarkSummaryReview.inl') -Raw
+$review += "`n" + (Get-Content -LiteralPath (Join-Path $root 'src/platform/windows/WindowsBenchmarkSummaryReviewUi.inl') -Raw)
 $script:checks = 0
 function Check([bool]$condition, [string]$message) {
     if (-not $condition) { throw $message }

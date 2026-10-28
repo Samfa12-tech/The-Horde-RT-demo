@@ -9,7 +9,7 @@ function(horde_rt_attach_reporting_identity target root platform abi)
     # checkout/untracked inventory or parked owner inputs are scanned. The
     # concrete header/build/shader manifest is declared at configure time.
     file(GLOB_RECURSE headers CONFIGURE_DEPENDS LIST_DIRECTORIES FALSE
-        "${root}/src/*.h" "${root}/src/*.hpp"
+        "${root}/src/*.h" "${root}/src/*.hpp" "${root}/src/*.inl"
         "${root}/third_party/pocket-audio-core/include/*.h"
         "${root}/third_party/pocket-audio-core/src/*.h")
     file(GLOB_RECURSE build_shader_inputs CONFIGURE_DEPENDS LIST_DIRECTORIES FALSE

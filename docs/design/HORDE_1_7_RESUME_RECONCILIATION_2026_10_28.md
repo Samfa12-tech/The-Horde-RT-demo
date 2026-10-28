@@ -37,6 +37,13 @@ live private/public submission or the website. See the
 The [pre-fence read-only feasibility review](HORDE_1_7_PRE_FENCE_FEASIBILITY_2026_10_28.md)
 identifies the still-required independent CPU result and input-age contract.
 
+The subsequent [Windows native local-review interaction fixture](../evidence/2026-10-28-windows-summary-interaction/README.md)
+passes with synthetic data and injected Copy/Save destinations at 125% DPI,
+including a simulated small work area. It does not close real clipboard/picker,
+physical input, modal focus, RT gameplay or service-delivery acceptance.
+The [PR27 conflict diagnosis](../evidence/2026-10-28-windows-summary-interaction/pr27-conflicts.md)
+is read-only; resolution/merge remains unperformed.
+
 Android actor opt-in was added at958f5182; its phone comparison is inconclusive.
 The repeated diagnostic first-arrival reset/RT-presented ACK correction at
 fffd5ee6 passed six CI jobs. e2addc77 also passed six. Its subsequent phone

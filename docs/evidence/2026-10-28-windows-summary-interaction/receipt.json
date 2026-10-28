@@ -1,0 +1,105 @@
+{
+  "baseCommit": "469e0cc9885b0bed57fd2c2eb5318264d322a42e",
+  "checkedAtUtc": "2026-10-28T10:26:56.1731523Z",
+  "platform": "Windows MSVC Release",
+  "nativeForm": {
+    "result": "PASS",
+    "dpi": 120,
+    "normalWindowPixels": [
+      800,
+      850
+    ],
+    "simulatedSmallWorkAreaPixels": [
+      640,
+      480
+    ],
+    "clipboard": "injected owned memory",
+    "picker": "injected cancel/checked-write destination",
+    "physicalInput": "NOT_TESTED",
+    "foregroundActivated": false,
+    "gameLaunched": false
+  },
+  "focusedTests": {
+    "selected": 6,
+    "passed": 6,
+    "seconds": 3.2,
+    "sourceContracts": 40,
+    "nativeInteractionDeadlineSeconds": 30
+  },
+  "parkedOwnerFiles": {
+    "verified": 151,
+    "changed": 0
+  },
+  "nativeFragmentIdentityInputsVerified": true,
+  "phoneUsed": false,
+  "reportsSent": 0,
+  "published": false,
+  "audioHapticManualRevalidation": "NO",
+  "privateEvidence": [
+    {
+      "path": "reports/windows-summary-interaction-build.log",
+      "bytes": 15780,
+      "sha256": "3921ef6f170418beb45cc6611709388537e75f302a4671fcb71918917fe7739c"
+    },
+    {
+      "path": "reports/windows-summary-interaction-build-r2.log",
+      "bytes": 80,
+      "sha256": "4ff740136a21d868fd318f8eda58ad9d8e361d30e2ff58c8a0dfccabcf421a35"
+    },
+    {
+      "path": "reports/windows-summary-interaction-build-r3.log",
+      "bytes": 2673,
+      "sha256": "6e501e26ae550369dcfb5bb3f3bd4bd07f4f82158009a7d14819f811d3c98490"
+    },
+    {
+      "path": "reports/windows-summary-interaction-build-r4.log",
+      "bytes": 3488,
+      "sha256": "749095331479b5157307e3821f5d6cc01d185395f297bc89af1fd1ae5556cee5"
+    },
+    {
+      "path": "reports/windows-summary-interaction-final-tests.log",
+      "bytes": 6237,
+      "sha256": "0d293674588ce0e1b29d0ffc2ab1bebfbae0bfb3e2bdda2c19f7dbebcf5c4a1b"
+    },
+    {
+      "path": "reports/windows-summary-interaction-tests.log",
+      "bytes": 1326,
+      "sha256": "0fc91b61336d11c726d3b29766474f413ca46c23ec510ef7b46a79a07522852f"
+    },
+    {
+      "path": "reports/windows-summary-interaction-ready-build.log",
+      "bytes": 761,
+      "sha256": "d6bcc8b1cf2c9db72b92d27dd84c9165423f7689492b5f77434d313e4dc3564e"
+    },
+    {
+      "path": "reports/windows-summary-interaction-ready-tests.log",
+      "bytes": 5446,
+      "sha256": "8d15475bcb4378409879d8e30cb02cde1187c31bd9001ec199953e38a79cd53c"
+    },
+    {
+      "path": "reports/pr27-conflicts-20261028/conflict-evidence.json",
+      "bytes": 3646,
+      "sha256": "62e1d968d56251840c054147580f3eedc6f46b250afd0f8cc334a8ff4fc0dd4d"
+    },
+    {
+      "path": "docs/evidence/2026-10-28-windows-summary-interaction/public-native.png",
+      "bytes": 48381,
+      "sha256": "3a882c66313f534266edee14752ad86ccd2c9c0c0f7876a008cf7682b1f3ffd3"
+    },
+    {
+      "path": "docs/evidence/2026-10-28-windows-summary-interaction/private-small-workarea.png",
+      "bytes": 22178,
+      "sha256": "6bbb5a11db1ac8ae87e4c04029e78b1003de0b034a4c5ada545bd4f194801672"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Testing/summary-ui-evidence/run-71496/approved-2.json",
+      "bytes": 10183,
+      "sha256": "f3f8f5a8579af03657d68435b1964de9e3170c2f4def0a5840cbad6d7e720f52"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Testing/summary-ui-evidence/run-71496/approved-3.json",
+      "bytes": 8664,
+      "sha256": "4bd26ee9f6f790f17f807544dc19e2344746d7ac50668c10869913327c578453"
+    }
+  ]
+}
