@@ -64,3 +64,8 @@ a working-tree build, not an installed or frozen playtest candidate.
 See the [frozen PR27 gate assessment](../../design/HORDE_1_7_PR27_MERGE_GATES_2026_10_28.md)
 for source merge versus1.7 publication requirements. No conflict was resolved and
 no base merge, PR-body write, release or deployment was performed.
+
+The replacement e8ebe380 CI closed Android but hit the MSVC15-minute job cap.
+The [subsequent test-only build correction](transport-build.md) records the exact
+timeout and one bounded removal of duplicate transport compilation. Test coverage
+and timeouts remain unchanged; hosted acceptance is not inferred from local passes.

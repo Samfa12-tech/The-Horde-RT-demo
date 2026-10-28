@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "sourceBase": "e8ebe3807c47781f8a8a316c14ad19bdde6dbc17",
+  "originalCiRun": 40692998073,
+  "originalCiOutcome": "5success; MSVC cancelled by15m0s maximum execution time",
+  "msvcJob": 122832344779,
+  "msvcAnnotation": "The job has exceeded the maximum execution time of 15m0s",
+  "lastCompletedTest": 120,
+  "selectedWindowsTests": 167,
+  "coverage": {
+    "registeredBefore": 250,
+    "registeredAfter": 250,
+    "commandsAndPropertiesEqual": true,
+    "directConsumerCompileEntries": 0,
+    "sharedCompileEntries": 1,
+    "workflowChanged": 0
+  },
+  "compileContract": {
+    "language": "C++20",
+    "runtime": "MultiThreaded (/MT)",
+    "definitions": "WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=Release",
+    "perSourceOverride": false,
+    "remoteExtra": "unused WebView2 external include stays on its owner"
+  },
+  "fixtureCompilationsBefore": 4,
+  "fixtureCompilationsAfter": 1,
+  "productionAndAcceptanceSourceLists": "unchanged",
+  "local": {
+    "built": true,
+    "testsPassed": 6,
+    "testsFailed": 0,
+    "seconds": 7.28,
+    "testsLogSha256": "803b0f544698ef327c93190d42d7365a6107d9b3cbb432132cb7329012bbdf95",
+    "buildLogSha256": "75161e583b61905548dd3fe1c59ee2f4df410581ac8fd5a7799d188916d534aa"
+  },
+  "independentReview": "applied CMake patch read-only review; no actionable issue found",
+  "cmakeSha256": "d0b2d9bac039324ef2287298e435abc34ed3d892412d583dc9a7be09c1ed5bb9",
+  "hostedTimeSavings": "not established",
+  "phoneUsed": false,
+  "workflowRetried": false,
+  "workflowChanged": false,
+  "published": false,
+  "merged": false
+}

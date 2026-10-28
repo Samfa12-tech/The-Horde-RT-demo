@@ -594,9 +594,14 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_benchmark_summary_report_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_benchmark_summary_report_tests COMMAND horde_rt_benchmark_summary_report_tests)
     if(WIN32)
-        target_sources(horde_rt_benchmark_summary_report_tests PRIVATE tests/WindowsBenchmarkSummaryInteractionTests.cpp
-            src/platform/windows/WindowsPlaytestSubmission.cpp)
-        target_link_libraries(horde_rt_benchmark_summary_report_tests PRIVATE bcrypt comctl32 gdiplus winhttp)
+        # The four reporting fixtures use the same transport flags and source.
+        # Compile it once for tests; production/explicit acceptance owners stay separate.
+        add_library(horde_windows_report_test_transport STATIC src/platform/windows/WindowsPlaytestSubmission.cpp)
+        target_include_directories(horde_windows_report_test_transport PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_compile_features(horde_windows_report_test_transport PUBLIC cxx_std_20)
+        target_link_libraries(horde_windows_report_test_transport PUBLIC horde_gameplay_simulation winhttp)
+        target_sources(horde_rt_benchmark_summary_report_tests PRIVATE tests/WindowsBenchmarkSummaryInteractionTests.cpp)
+        target_link_libraries(horde_rt_benchmark_summary_report_tests PRIVATE horde_windows_report_test_transport bcrypt comctl32 gdiplus)
         add_test(NAME horde_rt_windows_benchmark_summary_interaction_tests
             COMMAND horde_rt_benchmark_summary_report_tests --windows-ui "${CMAKE_CURRENT_BINARY_DIR}/Testing/summary-ui-evidence")
         set_tests_properties(horde_rt_windows_benchmark_summary_interaction_tests PROPERTIES TIMEOUT 30)
@@ -1309,8 +1314,7 @@ if(BUILD_TESTING)
         add_executable(horde_rt_windows_compatibility_report_tests tests/WindowsCompatibilityReportTests.cpp
             src/platform/windows/WindowsCompatibilityReport.cpp src/platform/windows/WindowsPlaytestReport.cpp)
         target_include_directories(horde_rt_windows_compatibility_report_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-        target_sources(horde_rt_windows_compatibility_report_tests PRIVATE src/platform/windows/WindowsPlaytestSubmission.cpp)
-        target_link_libraries(horde_rt_windows_compatibility_report_tests PRIVATE horde_gameplay_simulation comdlg32 bcrypt winhttp)
+        target_link_libraries(horde_rt_windows_compatibility_report_tests PRIVATE horde_windows_report_test_transport comdlg32 bcrypt)
         add_test(NAME horde_rt_windows_compatibility_report_tests COMMAND horde_rt_windows_compatibility_report_tests)
         set_tests_properties(horde_rt_windows_compatibility_report_tests PROPERTIES TIMEOUT 30)
         target_include_directories(horde_rt_windows_subtitle_bitmap_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -1382,12 +1386,11 @@ if(BUILD_TESTING)
         set_tests_properties(horde_rt_windows_playtest_screenshot_tests PROPERTIES TIMEOUT 30)
 
         add_executable(horde_rt_windows_playtest_submission_tests
-            tests/WindowsPlaytestSubmissionTests.cpp
-            src/platform/windows/WindowsPlaytestSubmission.cpp)
+            tests/WindowsPlaytestSubmissionTests.cpp)
         target_include_directories(horde_rt_windows_playtest_submission_tests PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_windows_playtest_submission_tests PRIVATE
-            horde_gameplay_simulation winhttp)
+            horde_windows_report_test_transport)
         add_test(NAME horde_rt_windows_playtest_submission_tests
             COMMAND horde_rt_windows_playtest_submission_tests)
         set_tests_properties(horde_rt_windows_playtest_submission_tests PROPERTIES TIMEOUT 60)
@@ -1408,13 +1411,12 @@ if(BUILD_TESTING)
             src/platform/windows/WindowsRemotePlaytestReport.cpp
             src/platform/windows/WindowsPlaytestReport.cpp
             src/platform/windows/WindowsPlaytestScreenshot.cpp
-            src/platform/windows/WindowsPlaytestSubmission.cpp
             src/platform/windows/WindowsPlaytestVerification.cpp)
         target_include_directories(horde_rt_windows_remote_playtest_report_ui_tests PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_windows_remote_playtest_report_ui_tests PRIVATE
-            horde_gameplay_simulation horde_rt_report_webview2 comdlg32 comctl32 bcrypt
-            windowscodecs oleaut32 winhttp)
+            horde_windows_report_test_transport horde_rt_report_webview2 comdlg32 comctl32 bcrypt
+            windowscodecs oleaut32)
         add_test(NAME horde_rt_windows_remote_playtest_report_ui_tests
             COMMAND horde_rt_windows_remote_playtest_report_ui_tests)
         set_tests_properties(horde_rt_windows_remote_playtest_report_ui_tests PROPERTIES TIMEOUT 45)
