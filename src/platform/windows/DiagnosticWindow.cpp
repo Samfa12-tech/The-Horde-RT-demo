@@ -1,4 +1,8 @@
 #include "platform/windows/DiagnosticWindow.h"
+#include "platform/windows/WindowsAcceptanceProfile.h"
+#ifndef HORDE_RT_WINDOWS_ACCEPTANCE
+#define HORDE_RT_WINDOWS_ACCEPTANCE 0
+#endif
 #ifndef HORDE_RT_CHAPTER_MEASUREMENT
 #define HORDE_RT_CHAPTER_MEASUREMENT 0
 #endif
@@ -197,6 +201,7 @@ bool gLookoutInspectKitController=false;
 bool gShowcaseCaptureHidden=false;
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;
+horde::platform::windows::WindowsAcceptanceProfile gAcceptanceProfile;
 int GameMessageBoxA(HWND owner,const char* text,const char* title,UINT flags) {
     if(gCampaignHiddenValidation || gOpeningBenchmarkMenuValidation || gShowcaseCaptureHidden){std::cerr<<"Hidden validation suppressed dialog: "<<text<<'\n';return IDCANCEL;}
     return ::MessageBoxA(owner,text,title,flags);
@@ -204,7 +209,11 @@ int GameMessageBoxA(HWND owner,const char* text,const char* title,UINT flags) {
 void FocusGameControl(HWND control) {
     if(!gCampaignHiddenValidation && !gOpeningBenchmarkMenuValidation && !gShowcaseCaptureHidden && control) ::SetFocus(control);
 }
-constexpr char kWindowTitle[] = "Horde Lantern RT - Showcase Alpha " HORDE_RT_DISPLAY_VERSION;
+constexpr char kWindowTitle[] = "Horde Lantern RT - Showcase Alpha " HORDE_RT_DISPLAY_VERSION
+#if HORDE_RT_WINDOWS_ACCEPTANCE
+    " [isolated acceptance]"
+#endif
+    ;
 constexpr char kHudStartingText[] = "ALPHA " HORDE_RT_DISPLAY_VERSION "  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU";
 constexpr char kHudActiveText[] = "RT ACTIVE | DIAGNOSTICS";
 constexpr char kHudApplyingScaleText[] = "ALPHA " HORDE_RT_DISPLAY_VERSION "  |  APPLYING RT RENDER SCALE...";
@@ -1530,6 +1539,7 @@ std::filesystem::path ResolveAssetRoot()
 
 std::filesystem::path SettingsPath()
 {
+    if(gAcceptanceProfile.Active())return gAcceptanceProfile.SettingsPath();
     return ExecutableDirectory() / "HordeLanternRT.settings.ini";
 }
 
@@ -9610,7 +9620,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             if(!directory.empty())std::filesystem::create_directories(directory,campaignDirectoryError);
             if(directory.empty() || campaignDirectoryError)context.campaignStorageWarning="Campaign storage unavailable. New games can start, but saves cannot be guaranteed. Recheck records before writing.";
             {
-                context.campaignIsolated=gCampaignHiddenValidation;
+                context.campaignIsolated=gCampaignHiddenValidation || gAcceptanceProfile.Active();
                 horde::gameplay::campaign::storage::FaultInjector* campaignFaults=nullptr;
 #if defined(_DEBUG)
                 if(gCampaignHiddenValidation)campaignFaults=&gHiddenCampaignFaults;
@@ -13191,6 +13201,21 @@ int RunDiagnosticWindow(const int showCommand)
 {
     (void)showCommand;
     SetProcessDPIAware();
+
+    // This runs before any settings read, known-folder lookup or Vulkan startup.
+    int acceptanceArgc=0;
+    auto acceptanceArgv=CommandLineToArgvW(GetCommandLineW(),&acceptanceArgc);
+    if(!acceptanceArgv)return 2;
+    std::vector<std::wstring_view> acceptanceArgs;
+    for(int i=1;i<acceptanceArgc;++i)acceptanceArgs.emplace_back(acceptanceArgv[i]);
+    std::filesystem::path acceptanceReports;
+#if HORDE_RT_WINDOWS_ACCEPTANCE
+    acceptanceReports=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"reports";
+#endif
+    const bool acceptanceReady=gAcceptanceProfile.Configure(acceptanceArgs,HORDE_RT_WINDOWS_ACCEPTANCE!=0,
+        acceptanceReports,ExecutableDirectory());
+    LocalFree(acceptanceArgv);
+    if(!acceptanceReady){std::cerr<<gAcceptanceProfile.Error()<<'\n';return 2;}
 
     if(!ConfigureHiddenCampaignValidation())return 2;
     const CaptureLaunchOptions launchOptions = ParseCaptureLaunchOptions();

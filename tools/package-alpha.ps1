@@ -116,6 +116,9 @@ try {
     }
 }
 $windowsBinaryText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($windowsExe))
+if ($windowsBinaryText.Contains(' [isolated acceptance]')) {
+    throw 'Development-only isolated Windows acceptance builds cannot enter release packaging.'
+}
 foreach ($creditMarker in @(
     "credits and licences", "cgltf by Johannes Kuhlmann", "THIRD_PARTY_NOTICES/cgltf-LICENSE.txt", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",

@@ -102,6 +102,32 @@ ctest --preset windows-x64-debug
 
 The corresponding Release preset is `windows-x64-release`. Shader regeneration uses `tools/compile-raygen.ps1`. An Android build-only command, from `android/`, is `.\gradlew.bat assembleDebug --console=plain`; adding `installDebug` changes a device and is a separate action.
 
+### Isolated interactive Windows development acceptance
+
+`HORDE_RT_WINDOWS_ACCEPTANCE=ON` is an explicit development-only build option,
+default OFF. Stage that executable and verified copies of the existing runtime
+assets in a plain directory named `reports/horde-windows-acceptance-<suffix>`
+directly under the same checkout's `reports`. It still requires packaged assets;
+it does not enable source-asset fallback, capture fixtures or new gameplay.
+
+The executable accepts either no arguments (for supported desktop launch tools)
+or exactly `--acceptance-root <absolute-package-directory>/state`. Both paths
+require that same dedicated package and use only its `state/campaign-v1` and
+`state/settings.ini`. A fresh state must be empty; repeat launches require its
+exact ownership marker. Linked/nonregular contents, hardlinks, traversal,
+alternate roots and concurrent profile use fail closed before normal settings,
+known-folder or Vulkan startup. A build outside that package cannot fall back to
+owner careers. The exclusive marker lease lasts until process exit. This guards
+test isolation; it is not a security boundary against another same-user process
+mutating files during a run.
+
+Ordinary builds reject the acceptance option. Development acceptance windows are
+labelled `[isolated acceptance]`, their provenance includes the build flag, and
+release packaging rejects that marker. Keep source/package hashes and actual
+screen/input observations separate from CPU/fixture results. Do not seed earned
+progress and call it natural journey acceptance. Preserve the isolated state for
+same-package relaunch checks, and close owned processes after validation.
+
 For a requested broad candidate gate, `tools/run-foundation-validation.ps1 -Mode Host` runs the foundation's host-side programme; it is not the lightweight portable CI lane. `-Mode Full` includes device work. Inspect current parameters and choose the intended device explicitly rather than trusting a historical default serial. The runner writes evidence beneath ignored `reports/` and labels its staged artefacts as unpublishable/unsigned; its success does not authorise release publication.
 
 ## Android device evidence

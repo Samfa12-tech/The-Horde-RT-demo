@@ -29,6 +29,7 @@ option(HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE "Build the standalone command 
 option(HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW "Build the Win32 diagnostic shell" ON)
 option(HORDE_RT_BUILD_VULKAN_TARGETS "Build targets that require a Vulkan SDK" ON)
 option(HORDE_RT_CHAPTER_MEASUREMENT "Enable the bounded chapter Shipping route in an optimized Windows development build" OFF)
+option(HORDE_RT_WINDOWS_ACCEPTANCE "Require isolated state for an interactive Windows development acceptance package" OFF)
 option(HORDE_RT_ACTOR_WORKER_EXPERIMENT "Opt-in exclusive CPU actor preparation experiment; not admitted for shipping" OFF)
 option(HORDE_RT_FRAME_STAGE_PROBE "Opt-in GPU AS/dispatch/transfer observation; no shader changes" OFF)
 
@@ -517,6 +518,7 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
     add_executable(horde_rt_diagnostic_window WIN32
         src/platform/windows/DiagnosticWindowMain.cpp
         src/platform/windows/DiagnosticWindow.cpp
+        src/platform/windows/WindowsAcceptanceProfile.cpp
         src/platform/windows/WindowsGitHubReleaseUpdate.cpp
         src/platform/windows/WindowsPlaytestReport.cpp
         src/platform/windows/WindowsCompatibilityReport.cpp
@@ -557,6 +559,10 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
     )
     include(cmake/HordeRtReportingIdentityInputs.cmake)
     horde_rt_attach_reporting_identity(horde_rt_diagnostic_window "${CMAKE_CURRENT_SOURCE_DIR}" Windows "${CMAKE_GENERATOR_PLATFORM}")
+    if(HORDE_RT_WINDOWS_ACCEPTANCE)
+        target_compile_definitions(horde_rt_diagnostic_window PRIVATE
+            HORDE_RT_WINDOWS_ACCEPTANCE=1 HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    endif()
     if(HORDE_RT_CHAPTER_MEASUREMENT)
         target_compile_definitions(horde_rt_probe_core PUBLIC HORDE_RT_CHAPTER_MEASUREMENT=1)
         target_compile_definitions(horde_rt_diagnostic_window PRIVATE
@@ -594,6 +600,11 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_benchmark_summary_report_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_benchmark_summary_report_tests COMMAND horde_rt_benchmark_summary_report_tests)
     if(WIN32)
+        add_executable(horde_rt_windows_acceptance_profile_tests
+            tests/WindowsAcceptanceProfileTests.cpp src/platform/windows/WindowsAcceptanceProfile.cpp)
+        target_include_directories(horde_rt_windows_acceptance_profile_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        add_test(NAME horde_rt_windows_acceptance_profile_tests COMMAND horde_rt_windows_acceptance_profile_tests)
+        set_tests_properties(horde_rt_windows_acceptance_profile_tests PROPERTIES TIMEOUT 15)
         # The four reporting fixtures use the same transport flags and source.
         # Compile it once for tests; production/explicit acceptance owners stay separate.
         add_library(horde_windows_report_test_transport STATIC src/platform/windows/WindowsPlaytestSubmission.cpp)

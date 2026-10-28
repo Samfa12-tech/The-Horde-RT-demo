@@ -4,6 +4,7 @@ namespace campaign=horde::gameplay::campaign;
 
 std::filesystem::path WindowsCampaignDirectory()
 {
+    if(gAcceptanceProfile.Active())return gAcceptanceProfile.CampaignDirectory();
 #if defined(_DEBUG)
     if(gOpeningBenchmarkMenuValidation)return gCampaignValidationDirectory;
 #endif
