@@ -55,6 +55,11 @@ if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
 
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
 def validationUnsigned = System.getenv('HORDE_VALIDATION_UNSIGNED') == '1'
+def actorWorkerValue = providers.gradleProperty('hordeActorWorkerExperiment').orNull
+if (actorWorkerValue != null && !(actorWorkerValue in ['true', 'false'])) {
+    throw new GradleException('hordeActorWorkerExperiment must be true or false.')
+}
+def actorWorkerExperiment = actorWorkerValue == 'true'
 def hordeBenchmarkValidation = providers.gradleProperty('hordeBenchmarkValidation').orNull == 'true'
 def hordePresentTimingValidationProperty = providers.gradleProperty('hordePresentTimingValidation').orNull
 if (hordePresentTimingValidationProperty != null && !(hordePresentTimingValidationProperty in ['true', 'false'])) {
@@ -92,7 +97,7 @@ if (hordeStagedPrimaryDebugValidation && hordeBenchmarkValidation) {
 // Benchmark validation is an isolated, development-signed app. Do not even
 // read production signing environment variables for either investigation opt-in.
 def hordeRegionPagePrototypeRootProperty = providers.gradleProperty('hordeRegionPagePrototypeRoot').orNull
-def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation || hordeRegionPagePrototypeRootProperty != null
+def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation || hordeRegionPagePrototypeRootProperty != null || actorWorkerExperiment
 def releaseStoreFile = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
 def releaseStorePassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
 def releaseKeyAlias = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
@@ -204,6 +209,12 @@ if (outdoorScaleProbe && (!chapterRouteTiming || hordeBenchmarkValidation ||
         hordeRegionPagePrototypeRootProperty != null)) {
     throw new GradleException('Outdoor scale probe requires ordinary private Debug route timing without other renderer experiments.')
 }
+if (actorWorkerExperiment && (!chapterRouteTiming || outdoorScaleProbe || hordeBenchmarkValidation ||
+        hordeStagedPrimaryDebugValidation || providers.gradleProperty('hordeViewmodelCandidateDir').isPresent() ||
+        hordeRegionPagePrototypeRootProperty != null)) {
+    throw new GradleException('Actor worker requires separate Debug production route timing without shader, asset or scale experiments.')
+}
+
 def frameStageProbeValue = providers.gradleProperty('hordeFrameStageProbe').orNull
 if (frameStageProbeValue != null && !(frameStageProbeValue in ['true', 'false'])) {
     throw new GradleException('hordeFrameStageProbe must be true or false.')
@@ -250,7 +261,8 @@ def hordeRtDebugObservationArguments = [
     "-DHORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=${chapterRouteTiming ? 'ON' : 'OFF'}",
     "-DHORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE=${outdoorScaleProbe ? 'ON' : 'OFF'}",
     "-DHORDE_RT_FRAME_STAGE_PROBE=${frameStageProbe ? 'ON' : 'OFF'}",
-    "-DHORDE_RT_DISPATCH_CLOCK_PROBE=${dispatchClockProbe ? 'ON' : 'OFF'}"
+    "-DHORDE_RT_DISPATCH_CLOCK_PROBE=${dispatchClockProbe ? 'ON' : 'OFF'}",
+    "-DHORDE_RT_ACTOR_WORKER_EXPERIMENT=${actorWorkerExperiment ? 'ON' : 'OFF'}"
 ]
 def hordeRtBenchmarkStagedPrimaryArguments = [
     "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
@@ -627,6 +639,7 @@ android {
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
         buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', 'false'
+        buildConfigField 'boolean', 'ACTOR_WORKER_EXPERIMENT', 'false'
         buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', '33'
         resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
@@ -661,9 +674,11 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug')
+            applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
             buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', outdoorScaleProbe ? 'true' : 'false'
+            buildConfigField 'boolean', 'ACTOR_WORKER_EXPERIMENT', actorWorkerExperiment ? 'true' : 'false'
+            if (actorWorkerExperiment) resValue 'string', 'app_name', 'Horde RT Actor Worker Experiment'
             if (viewmodelCandidate) resValue 'string', 'app_name', 'Horde RT Viewmodel Candidate'
             if (hordeStagedPrimaryDebugValidation) resValue 'string', 'app_name', 'Horde RT Staged Investigation'
             versionNameSuffix '-debug'
@@ -684,6 +699,7 @@ android {
             externalNativeBuild {
                 cmake {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF',
+                        '-DHORDE_RT_ACTOR_WORKER_EXPERIMENT=OFF',
                         *hordeRtNativePolicyArguments('Shipping')
                 }
             }

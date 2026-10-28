@@ -115,6 +115,11 @@
 #endif
 namespace
 {
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+// One coherent mode+revision word; bit0 is worker, higher bits are request epoch.
+std::atomic<std::uint64_t> gActorWorkerExperimentRequested{0};
+#endif
+
 
 constexpr const char* kTag = "HordeRtProbeBridge";
 constexpr const char* kReportDirectory = "reports";
@@ -283,6 +288,9 @@ struct AndroidMotionRun
 #endif
     float chapterCameraYaw=0,chapterCameraPitch=0;
     std::ofstream chapterCsv;
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+    std::uint64_t actorCpuLoggedRequest=std::numeric_limits<std::uint64_t>::max();
+#endif
     std::uint64_t chapterLastReturnNs=0,chapterLastSerial=0;
     horde::gameplay::validation::MotionEvidenceScenario scenario;
     horde::gameplay::validation::MotionScenario selected{};
@@ -4765,6 +4773,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 context.productionLanternGlassOnly;
         }
         frameInputs.presentationTransform = context.rtPresentationTransform;
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+        const auto actorWorkerRequest=gActorWorkerExperimentRequested.load(std::memory_order_acquire);
+        frameInputs.actorWorkerExperiment=(actorWorkerRequest&1u)!=0u;
+#endif
         std::string diagnostic;
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
         if(context.environmentSurvey && !context.keeperMistSnapshot) {
@@ -4866,6 +4878,18 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                                                 ,gpuTimingRecording && context.motion && context.motion->armed && !context.motion->finished?&frameStageProbe:nullptr
 #endif
                                                 );
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+        if(recorded && context.motion && context.rtScene.LastActorPreparationPerformed() &&
+           context.motion->actorCpuLoggedRequest!=actorWorkerRequest) {
+            context.motion->actorCpuLoggedRequest=actorWorkerRequest;
+            __android_log_print(ANDROID_LOG_INFO,kTag,
+                "HORDE_ACTOR_CPU_PREPARED surface=%llu tick=%llu epoch=%llu mode=%s cpu_only=1",
+                static_cast<unsigned long long>(context.surfaceGeneration),
+                static_cast<unsigned long long>(frameInputs.tickIndex),
+                static_cast<unsigned long long>(actorWorkerRequest>>1),
+                context.rtScene.LastActorPreparationUsedWorker()?"worker":"serial");
+        }
+#endif
         if(recorded && detail==DetailFrame::Cutover)context.rtScene.FinishOrdinaryStaticDetail(gGameSimulation);
         if(!recorded)
         {
@@ -7662,6 +7686,24 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setGpuTimingEnabled(JNIEnv*, jclass,
 #else
     (void)enabled;
     gRequestedGpuFrameTimingEnabled.store(true, std::memory_order_release);
+#endif
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestActorWorkerExperiment(JNIEnv*,jclass,jboolean enabled)
+{
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+    auto old=gActorWorkerExperimentRequested.load(std::memory_order_acquire);
+    std::uint64_t next=0;
+    do {
+        if(old>std::numeric_limits<std::uint64_t>::max()-3u)return JNI_FALSE;
+        next=((old&~std::uint64_t{1})+2u)|(enabled==JNI_TRUE?1u:0u);
+    } while(!gActorWorkerExperimentRequested.compare_exchange_weak(old,next,std::memory_order_acq_rel));
+    __android_log_print(ANDROID_LOG_INFO,kTag,"HORDE_ACTOR_CPU_REQUEST epoch=%llu mode=%s",
+        static_cast<unsigned long long>(next>>1),enabled==JNI_TRUE?"worker":"serial");
+    return JNI_TRUE;
+#else
+    (void)enabled;return JNI_FALSE;
 #endif
 }
 

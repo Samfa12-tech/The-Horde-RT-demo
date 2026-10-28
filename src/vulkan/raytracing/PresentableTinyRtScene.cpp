@@ -501,6 +501,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     // A worker captures an actor address; never move that actor under a job.
     other.chapterPoseWorker_.reset();
+    other.lastActorPreparationPerformed_=other.lastActorPreparationUsedWorker_=false;
 #endif
     preparedStaticGeometry_ = std::move(other.preparedStaticGeometry_);
     fullStaticGeometrySource_ = std::move(other.fullStaticGeometrySource_);
@@ -1591,6 +1592,7 @@ void PresentableTinyRtScene::Destroy()
     chapterActorMotion_.reset();
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     chapterPoseWorker_.reset(); // Also required on the device-null early path.
+    lastActorPreparationPerformed_=lastActorPreparationUsedWorker_=false;
 #endif
 #if defined(_DEBUG)
     chapterInspectionActor_.reset();chapterInspectionLast_.reset();chapterWorkerUsesInspection_=false;
@@ -3074,6 +3076,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
 {
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     chapterPoseWorker_.reset();
+    lastActorPreparationPerformed_=lastActorPreparationUsedWorker_=false;
 #endif
 #if defined(_DEBUG)
     chapterInspectionActor_.reset();chapterInspectionLast_.reset();chapterWorkerUsesInspection_=false;
@@ -7415,6 +7418,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     // scratch asset from the player; only its exclusive worker may touch it
     // until chapterPoseJob joins. The guard joins on every intervening return.
     horde::scene::assets::SkinnedPbrActorWorker::Job chapterPoseJob;
+    lastActorPreparationPerformed_=lastActorPreparationUsedWorker_=false;
     const bool prepareCompanion = WantsChapterCompanion(frame) &&
         (!thirdActorIsCompanion_ || inspectionChanged || chapterActorPoseGeneration_ != frame.chapterCompanion.generation ||
          chapterActorPoseSeconds_ != frame.chapterCompanion.animationSeconds ||
@@ -7422,7 +7426,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
          chapterActorActing_ != frame.chapterCompanion.acting ||
          chapterActorLocomotion_ != frame.chapterCompanion.locomotion ||
          chapterActorMotion_ != frame.chapterCompanion.motion);
-    if (prepareCompanion) {
+    // Every previous frame's ticket joined before returning. Retire the CPU
+    // lane before serial actor access; GPU ownership and pose cadence do not move.
+    if (!frame.actorWorkerExperiment) chapterPoseWorker_.reset();
+    if (frame.actorWorkerExperiment && prepareCompanion) {
 #if defined(_DEBUG)
         if(chapterWorkerUsesInspection_!=inspectCompanion) {
             chapterPoseWorker_.reset();chapterWorkerUsesInspection_=inspectCompanion;
@@ -7809,6 +7816,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         chapterActorMotion_ != frame.chapterCompanion.motion)) {
         horde::scene::SkinWorkMetrics companionWork;
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+        if (frame.actorWorkerExperiment) {
         if (!chapterPoseJob.Active()) {
             diagnostic = "Current companion pose has no matching exclusive CPU job.";
             return false;
@@ -7820,12 +7828,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             return false;
         }
         companionWork = result.work;
+        lastActorPreparationUsedWorker_=true;
         // Worker elapsed time overlaps PlayerSkin. Publish only on the owner;
         // these work intervals are not additive critical-path durations.
         if (WantsSkinWorkMetrics(observation) && !observation->stages->Accumulate(
                 horde::telemetry::RtStage::CharacterSkin, result.poseNanoseconds, 1u, 0u, 0u))
             observation->healthy = false;
-#else
+        } else
+#endif
+        {
         // Pose owns clip skinning plus its inseparable floor/bounds/static-PBR
         // repack. CharacterSkin therefore includes that CPU preparation here.
         RtSceneStageScope companionSkinScope(observation, horde::telemetry::RtStage::CharacterSkin);
@@ -7836,6 +7847,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             return false;
         }
         companionSkinScope.Complete(1u);
+        }
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+        lastActorPreparationPerformed_=true;
 #endif
         ObserveSkinWork(observation,companionWork);
         const auto& metadata = staticMeshSlot_.InstanceMetadata()[CharacterRenderSlot::kKeeperMetadataIndex];

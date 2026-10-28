@@ -153,6 +153,7 @@ public final class ProbeBridge {
     public static native int getCurrentWaterQuality();
     public static native void setGpuTimingEnabled(boolean enabled);
     public static native void setRequiredRayQueryCompute(boolean required);
+    public static native boolean requestActorWorkerExperiment(boolean enabled);
     public static native boolean requestDebugCheckpoint(int checkpointId);
     /** Debug-only live practice request; applied on the simulation owner thread. 1=parry, 2=Keeper. */
     public static native boolean requestDebugCombatPractice(int enemyKind);

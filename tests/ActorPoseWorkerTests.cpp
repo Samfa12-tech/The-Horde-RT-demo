@@ -1,5 +1,6 @@
 #include "scene/assets/SkinnedPbrActorWorker.h"
 #include "scene/CompanionPose.h"
+#include "scene/CompanionAnimationAsset.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 #include <chrono>
 #include <cstring>
@@ -134,6 +135,46 @@ int Contracts()
     Check(failure.Start(failureWorker, request), "failure job admitted");
     const auto failed = failure.Wait();
     Check(!failed.success && !failed.diagnostic.empty(), "pose failure returned without owner diagnostic mutation");
+    // Same actor alternates lanes only after the previous owned ticket joins.
+    // Cover serial -> worker -> serial retirement/recreation with actual bytes.
+    SkinnedPbrActor switched;Load(switched);
+    std::unique_ptr<Worker> switchedWorker;
+    for(unsigned tick=0;tick<18;++tick) {
+        const auto r=Request(200+tick);
+        const bool useWorker=(tick/3)%2!=0;
+        if(useWorker) {
+            if(!switchedWorker)switchedWorker=std::make_unique<Worker>(switched);
+            Worker::Job job;
+            Check(job.Start(*switchedWorker,r),"mode switch admits one owned actor job");
+            Check(job.Wait().success,"mode switch joins before actor read");
+        } else {
+            switchedWorker.reset();
+            Check(Serial(switched,r,error),error.c_str());
+        }
+        Check(Serial(serial,r,error) && Same(serial,switched),"serial/worker switches preserve exact pose bytes and grounded bounds");
+    }
+    switchedWorker.reset();
+    // The production companion now has authored turns; old idle/walk parity
+    // alone does not certify the current accepted animation set.
+    SkinnedPbrActor turnSerial,turnThreaded;
+    const auto turnRoot=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/characters/runtime/kit-warden-v1";
+    const auto turnBindings=horde::scene::CompanionTurnClipBindings();
+    Check(turnSerial.Load(turnRoot,horde::scene::kCompanionTurnRuntimeFile,turnBindings,error),error.c_str());
+    Check(turnThreaded.Load(turnRoot,horde::scene::kCompanionTurnRuntimeFile,turnBindings,error),error.c_str());
+    Worker turnWorker(turnThreaded);
+    for(const auto clip:{SkinnedClip::TurnLeft,SkinnedClip::TurnRight})
+        for(const float fraction:{2.f/45.f,10.f/45.f,.5f,1.f})
+            for(const float phase:{0.f,.2f,.5f,.8f,1.f}) {
+                auto r=Request(400+unsigned(checks));
+                r.clip=SkinnedClip::Idle;r.time=0;r.hasBlend=true;
+                r.blend={clip,phase*turnSerial.Duration(clip),fraction};
+                Worker::Job job;
+                Check(job.Start(turnWorker,r),"current partial/directional turn request admitted");
+                Check(Serial(turnSerial,r,error),error.c_str());
+                const auto result=job.Wait();
+                Check(result.success && result.identity==r.identity && Same(turnSerial,turnThreaded),
+                    "current turn palette, vertices and grounded bounds match byte-for-byte after joining");
+            }
     std::cout << checks << " actor worker contracts passed\n";
     return 0;
 }

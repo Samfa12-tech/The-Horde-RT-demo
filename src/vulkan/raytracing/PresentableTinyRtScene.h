@@ -132,6 +132,10 @@ struct ChapterActorInspectionPose {
 #endif
 struct RtSceneFrameInputs
 {
+    // CPU experiment selection only; ignored when its compile gate is OFF.
+    // Default preserves existing opt-in desktop worker fixtures. Android
+    // experiment callers explicitly supply serial/worker per immutable frame.
+    bool actorWorkerExperiment = true;
 #if defined(_DEBUG)
     // Frozen Windows light attribution only. Physical roof/lid state, ordinary
     // gameplay and Shipping rendering continue to use the authoritative value.
@@ -814,6 +818,21 @@ public:
 #endif
         return "{\"organisation\":\"Monolithic\"}";
     }
+    // CPU preparation observations only, never submitted/presented GPU evidence.
+    bool LastActorPreparationPerformed() const noexcept {
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+        return lastActorPreparationPerformed_;
+#else
+        return false;
+#endif
+    }
+    bool LastActorPreparationUsedWorker() const noexcept {
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+        return lastActorPreparationUsedWorker_;
+#else
+        return false;
+#endif
+    }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
     VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }
@@ -1434,6 +1453,7 @@ private:
     // Retired before actor reload/move/destruction; every frame joins before
     // any actor asset read/upload. No GPU ownership crosses this CPU lane.
     std::unique_ptr<horde::scene::assets::SkinnedPbrActorWorker> chapterPoseWorker_;
+    bool lastActorPreparationPerformed_=false, lastActorPreparationUsedWorker_=false;
 #endif
     bool chapterActorReady_ = false;
     bool thirdActorIsCompanion_ = false;

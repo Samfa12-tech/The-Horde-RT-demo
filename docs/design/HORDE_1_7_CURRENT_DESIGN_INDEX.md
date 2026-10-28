@@ -1,5 +1,11 @@
 # Horde 1.7 current design index
 
+28October: the [Android actor-worker preparation](../evidence/2026-10-28-actor-worker-android/README.md)
+adds an isolated default-serial experiment APK and explicit same-APK mode selection.
+Normal builds remain OFF; host parity/build evidence is not phone utilization or
+performance acceptance. Request a device handover only after the exact package
+receipt; Reef retains the current allocation.
+
 28October resume: [current full-scope/acceptance reconciliation](HORDE_1_7_RESUME_RECONCILIATION_2026_10_28.md)
 verifies c1a4d16d all-six CI and unchanged PR conflicts. The separate
 [public benchmark preview](../evidence/2026-10-28-public-benchmark-preview/README.md)

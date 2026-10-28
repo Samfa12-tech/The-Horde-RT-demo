@@ -7099,6 +7099,15 @@ public class MainActivity extends Activity {
     }
 
     private void consumeDebugAutomationIntent(final Intent intent) {
+        final int actorMode=ActorWorkerIntent.mode(intent,isDebuggableApp(),BuildConfig.ACTOR_WORKER_EXPERIMENT);
+        if(actorMode>=0) {
+            try {
+                if(!ProbeBridge.requestActorWorkerExperiment(actorMode==1))
+                    Log.w(TAG,"Actor CPU experiment is unavailable; no mode changed.");
+            } catch(RuntimeException | LinkageError unavailable) {
+                Log.w(TAG,"Actor CPU experiment request unavailable.");
+            }
+        }
         final boolean requireRayQueryCompute =
                 shouldRequireRayQueryCompute(isDebuggableApp(), intent);
         ProbeBridge.setRequiredRayQueryCompute(requireRayQueryCompute);
