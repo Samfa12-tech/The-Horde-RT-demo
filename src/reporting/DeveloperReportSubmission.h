@@ -2,6 +2,7 @@
 
 #include "reporting/BenchmarkSummaryReport.h"
 #include "reporting/CompatibilityReport.h"
+#include "reporting/PublicBenchmarkReport.h"
 
 namespace horde::reporting
 {
@@ -38,4 +39,25 @@ private:
 // Token exists only in an attempt, never in local export or frozen approval.
 [[nodiscard]] std::string BuildDeveloperReportRequest(
     const PreparedDeveloperReportSubmission&, std::string_view freshVerificationToken);
+
+// A public preview is not publication consent. Only this separately approved,
+// typed projection can enter the public transport path; private reports cannot.
+class PreparedPublicBenchmarkSubmission
+{
+public:
+    [[nodiscard]] bool IsReady() const noexcept
+    { return status_ == DeveloperReportSubmissionStatus::Ready && !json_.empty(); }
+    [[nodiscard]] DeveloperReportSubmissionStatus Status() const noexcept { return status_; }
+    [[nodiscard]] std::string_view ResultId() const noexcept { return id_; }
+    [[nodiscard]] std::string_view LocalJson() const noexcept { return localJson_; }
+    [[nodiscard]] std::string_view Json() const noexcept { return json_; }
+private:
+    friend PreparedPublicBenchmarkSubmission PreparePublicBenchmarkSubmission(const PreparedPublicBenchmarkReport&, bool);
+    DeveloperReportSubmissionStatus status_ = DeveloperReportSubmissionStatus::ReportRejected;
+    std::string id_, localJson_, json_;
+};
+[[nodiscard]] PreparedPublicBenchmarkSubmission PreparePublicBenchmarkSubmission(
+    const PreparedPublicBenchmarkReport&, bool explicitPublishConsent = false);
+[[nodiscard]] std::string BuildPublicBenchmarkRequest(
+    const PreparedPublicBenchmarkSubmission&, std::string_view freshVerificationToken);
 } // namespace horde::reporting

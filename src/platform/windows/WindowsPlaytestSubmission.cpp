@@ -217,7 +217,8 @@ bool HasExactAck(std::string_view json, const std::string_view expectedId,
     const std::string_view expectedStatus, const std::string_view developerKind = {}) noexcept
 {
     // The acknowledgement grammar is intentionally narrower than general JSON:
-    // exactly one object, exactly three unique fields, no escapes or nested data.
+    // One object, exactly three legacy or five purpose-bound unique fields;
+    // no escapes or nested data.
     if (expectedId.size() < 8u || expectedId.size() > 96u ||
         !std::all_of(expectedId.begin(), expectedId.end(), [](const unsigned char ch) {
             return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') ||
@@ -300,7 +301,8 @@ bool HasExactAck(std::string_view json, const std::string_view expectedId,
     space();
     return at == json.size() && haveOk && haveId && haveStatus && ok &&
         id == expectedId && status == expectedStatus && (developerKind.empty() ||
-            (haveDestination && haveKind && destination == "developer-private" && kind == developerKind));
+            (haveDestination && haveKind && destination ==
+                (developerKind == "public-benchmark-result" ? "public-board" : "developer-private") && kind == developerKind));
 }
 
 class SingleWorker final
@@ -573,7 +575,8 @@ bool StartAttempt(const std::shared_ptr<WindowsPlaytestSubmission::State>& state
                 state->cancellation.reset();
                 state->retryAllowed = outcome == WindowsPlaytestSubmissionResult::VerificationExpired ||
                     outcome == WindowsPlaytestSubmissionResult::RateLimited ||
-                    outcome == WindowsPlaytestSubmissionResult::Uncertain;
+                    outcome == WindowsPlaytestSubmissionResult::Uncertain ||
+                    (state->developerKind == "public-benchmark-result" && outcome == WindowsPlaytestSubmissionResult::Queued);
                 if (window == nullptr || state->window != window) return;
                 completion = gNextCompletionToken.fetch_add(1u);
                 state->completionToken = completion;
@@ -593,10 +596,12 @@ bool StartAttempt(const std::shared_ptr<WindowsPlaytestSubmission::State>& state
             outcome = ClassifyWindowsPlaytestResponse(response.statusCode, response.body, reportId);
             if (!developerKind.empty() && (response.statusCode == 200 || response.statusCode == 202))
             {
-                const auto status = response.statusCode == 202 ? "accepted" : "sent";
+                const bool publicBoard = developerKind == "public-benchmark-result";
+                const auto status = response.statusCode == 202 ? "accepted" : (publicBoard ? "published" : "sent");
                 outcome = response.body.size() <= kMaxResponseBytes &&
                     HasExactAck(response.body, reportId, status, developerKind) ?
-                    (response.statusCode == 202 ? WindowsPlaytestSubmissionResult::Queued : WindowsPlaytestSubmissionResult::Sent) :
+                    (response.statusCode == 202 ? WindowsPlaytestSubmissionResult::Queued :
+                        (publicBoard ? WindowsPlaytestSubmissionResult::Published : WindowsPlaytestSubmissionResult::Sent)) :
                     WindowsPlaytestSubmissionResult::Uncertain;
             }
         }
@@ -641,6 +646,16 @@ bool WindowsPlaytestSubmission::BeginDeveloperReportForLocalValidation(const HWN
     frozen.reportId = submission.ReportId(); frozen.json = submission.Json();
     return BeginFrozen(window, frozen, token, submission.Kind() == reporting::DeveloperReportKind::Benchmark ?
         "benchmark-summary" : "compatibility");
+}
+
+bool WindowsPlaytestSubmission::BeginPublicBenchmarkForLocalValidation(const HWND window,
+    const reporting::PreparedPublicBenchmarkSubmission& submission, const std::string_view token)
+{
+    if (!submission.IsReady() || !state_->exchange) return false;
+    reporting::PreparedPlaytestSubmission frozen;
+    frozen.status = reporting::PlaytestSubmissionStatus::Ready;
+    frozen.reportId = submission.ResultId(); frozen.json = submission.Json();
+    return BeginFrozen(window, frozen, token, "public-benchmark-result");
 }
 
 bool WindowsPlaytestSubmission::BeginFrozen(const HWND window,

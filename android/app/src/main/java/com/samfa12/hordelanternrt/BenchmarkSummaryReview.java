@@ -62,6 +62,8 @@ final class BenchmarkSummaryReview {
             // Validate bridge identity only. Native typed capture/builder owns populations and scopes.
             // Parsing never replaces the exact native bytes reviewed, copied and exported below.
             final JSONObject root = new JSONObject(text);
+            if (root.has("consentToSubmit") || root.has("consentToPublish") ||
+                    root.has("delivery") || root.has("turnstileToken")) return false;
             if (publicPreview) {
                 final JSONObject result = root.getJSONObject("result");
                 final JSONObject device = result.getJSONObject("hardware");

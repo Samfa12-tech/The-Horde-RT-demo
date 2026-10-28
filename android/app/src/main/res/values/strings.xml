@@ -245,4 +245,24 @@
     <string name="stand">Stand</string>
     <string name="crouching_blocked">Crouching (ceiling)</string>
     <string name="compatibility_report">Report compatibility to developer</string>
+    <string name="statistics_private_send_consent">I agree to send this report privately to the developer.</string>
+    <string name="statistics_publish_consent">I agree to publish these reviewed statistics on the public board.</string>
+    <string name="statistics_review_private_submission">Review private submission</string>
+    <string name="statistics_review_public_submission">Review public submission</string>
+    <string name="statistics_submission_preview">Separate submission preview (verification token excluded)</string>
+    <string name="statistics_private_send">Send to developer</string>
+    <string name="statistics_publish_send">Submit to public board</string>
+    <string name="statistics_retry_send">Verify and retry</string>
+    <string name="statistics_check_publication">Check publication status</string>
+    <string name="statistics_send_unavailable">Sending is unavailable. You can still copy or save the local report.</string>
+    <string name="statistics_mock_ready">Local test: review this separate submission. Nothing will be sent to a live service.</string>
+    <string name="statistics_mock_verifying">Local test: requesting synthetic verification. Nothing is sent.</string>
+    <string name="statistics_mock_verification_cancelled">Local test: verification cancelled or unavailable. Choose Send to try again.</string>
+    <string name="statistics_mock_pending">Local test: accepted and awaiting moderation. Not published.</string>
+    <string name="statistics_mock_private_queued">Local test: private report accepted. No live email was sent.</string>
+    <string name="statistics_mock_sent">Local test: provider-handoff receipt verified. No live email was sent.</string>
+    <string name="statistics_mock_published">Local test: published receipt verified. No live result was published.</string>
+    <string name="statistics_mock_rejected">Local test: report rejected or its content conflicts. Nothing new was sent.</string>
+    <string name="statistics_mock_uncertain">Local test: no trustworthy receipt. Retry explicitly with fresh verification.</string>
+    <string name="statistics_mock_interrupted">Local test interrupted. No automatic retry; earlier acceptance is unknown.</string>
 </resources>

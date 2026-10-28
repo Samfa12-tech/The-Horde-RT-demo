@@ -1,5 +1,15 @@
 # Reporting completion: exact next interfaces and access boundary
 
+**Later source checkpoint:** the [native Send receipt](../evidence/2026-10-28-statistics-send/README.md)
+supersedes the implementation-status statements below. Private backend source
+`1904c89f33941af8106d523b39bda502ad87de98` implements staged private intake and
+public catalog/moderation/read contracts. Windows/Android now connect typed review
+to local/mock Send and strict private/public receipts, with live transport still
+unavailable. The website progresses in a separate authorized task; this worker
+has not reopened its denied checkout. The original proposal below remains
+historical context, not a claim that those source paths are still absent or that
+any service has been deployed. See the linked remaining acceptance table.
+
 This is a source/staging handoff, not deployed service configuration or proof of
 delivery. Base02ece650 follows the all-six-green e2addc77 runtime checkpoint.
 Current source adds Windows local public review alongside Android's existing

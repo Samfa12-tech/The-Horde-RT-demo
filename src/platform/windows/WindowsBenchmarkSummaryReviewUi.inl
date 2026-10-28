@@ -22,11 +22,14 @@ constexpr int kSummaryCoolingLabel = 103, kSummaryCooling = 104, kSummaryPrepare
 constexpr int kSummaryPreviewLabel = 106, kSummaryPreview = 107, kSummaryStatus = 108;
 constexpr int kSummaryCopy = 109, kSummarySave = 110, kSummaryClose = IDCANCEL;
 constexpr int kSummaryBodyPanel = 111, kSummaryAudience = 112;
+constexpr int kSummarySendConsent = 113, kSummarySendPreview = 114, kSummarySend = 115, kSummaryCancelSend = 116;
+constexpr UINT_PTR kSummarySendTimer = 444u;
 struct WindowsBenchmarkSummaryReviewState
 {
     // Owned copy: no render-owner pointers, mutable report files or post-reset state.
     horde::telemetry::FrozenBenchmarkSummary frozen;
     horde::platform::windows::WindowsBenchmarkReviewPayload prepared;
+    horde::platform::windows::WindowsStatisticsSubmission submission;
     std::wstring preview;
     HFONT font = nullptr;
     bool saved = false;
@@ -42,7 +45,7 @@ HWND SummaryReviewControl(HWND window, const int id)
 
 bool WindowsSummaryUtf8Preview(const std::string_view json, std::wstring& wide)
 {
-    if (json.empty() || json.size() > horde::reporting::kBenchmarkSummaryReportMaxBytes) return false;
+    if (json.empty() || json.size() > horde::reporting::kDeveloperReportSubmissionMaxBytes) return false;
     const int bytes = static_cast<int>(json.size());
     const int count = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, json.data(), bytes, nullptr, 0);
     if (count <= 0) return false;
@@ -89,6 +92,18 @@ int SummaryReviewScale(HWND window, int logical)
 void SetSummaryReviewStatus(HWND window, const wchar_t* text)
 { SetWindowTextW(SummaryReviewControl(window, kSummaryStatus), text); }
 
+void RefreshWindowsSummarySend(HWND window, WindowsBenchmarkSummaryReviewState& state)
+{
+    const bool available = state.submission.Available(state.prepared.IsPublicPreview());
+    SetWindowTextW(SummaryReviewControl(window, kSummarySend), available ?
+        L"Send / check receipt (local test only)" : L"Sending unavailable");
+    EnableWindow(SummaryReviewControl(window, kSummarySendConsent), available && state.prepared.IsReady() && !state.submission.Busy());
+    EnableWindow(SummaryReviewControl(window, kSummarySend), state.submission.CanSend());
+    EnableWindow(SummaryReviewControl(window, kSummaryCancelSend), state.submission.Busy());
+    if (state.submission.Busy()) SetTimer(window, kSummarySendTimer, 100u, nullptr);
+    else KillTimer(window, kSummarySendTimer);
+}
+
 void LayoutWindowsSummaryReview(HWND window)
 {
     RECT client{}; GetClientRect(window, &client);
@@ -100,7 +115,7 @@ void LayoutWindowsSummaryReview(HWND window)
     MoveWindow(SummaryReviewControl(window, kSummaryBodyPanel), margin, margin, width, viewport, TRUE);
     const int header = SummaryReviewScale(window, 72) + gap + button + gap + 4 * line + 3 * gap + button + gap + line;
     const int previewHeight = std::max(SummaryReviewScale(window, 100), viewport - header - gap - 2 * line);
-    const int contentHeight = header + previewHeight + gap + 2 * line;
+    const int contentHeight = header + previewHeight + gap + 5 * line + 2 * button + 4 * gap + SummaryReviewScale(window, 100);
     auto* state = reinterpret_cast<WindowsBenchmarkSummaryReviewState*>(GetWindowLongPtrW(window, GWLP_USERDATA));
     if (!state) return;
     state->scrollOffset = std::clamp(state->scrollOffset, 0, std::max(0, contentHeight - viewport));
@@ -120,7 +135,11 @@ void LayoutWindowsSummaryReview(HWND window)
     place(kSummaryPrepare, y, button); y += button + gap;
     place(kSummaryPreviewLabel, y, line); y += line;
     place(kSummaryPreview, y, previewHeight); y += previewHeight + gap;
-    place(kSummaryStatus, y, line * 2);
+    place(kSummaryStatus, y, line * 3); y += line * 3 + gap;
+    place(kSummarySendConsent, y, line * 2); y += line * 2 + gap;
+    place(kSummarySendPreview, y, SummaryReviewScale(window, 100)); y += SummaryReviewScale(window, 100) + gap;
+    place(kSummarySend, y, button); y += button + gap;
+    place(kSummaryCancelSend, y, button);
     int x = margin;
     for (const int id : {kSummaryCopy, kSummarySave, kSummaryClose})
     { MoveWindow(SummaryReviewControl(window, id), x, buttonY, buttonWidth, button, TRUE); x += buttonWidth + gap; }
@@ -164,6 +183,7 @@ void ApplyWindowsSummaryReviewFont(HWND window, WindowsBenchmarkSummaryReviewSta
 
 void SelectWindowsSummaryAudience(HWND window, WindowsBenchmarkSummaryReviewState& state, bool publicPreview)
 {
+    state.submission.Clear(); KillTimer(window, kSummarySendTimer);
     state.prepared.SelectPublic(publicPreview);
     state.preview.clear(); state.saved = false;
     SetWindowTextW(window, publicPreview ? L"Public statistics preview - local only" : L"Review statistics - local JSON");
@@ -175,12 +195,18 @@ void SelectWindowsSummaryAudience(HWND window, WindowsBenchmarkSummaryReviewStat
     SetWindowTextW(SummaryReviewControl(window, kSummaryConsent), publicPreview ?
         L"I consent to prepare a local public preview (does not publish)" : L"I consent to prepare this local statistics report");
     SetWindowTextW(SummaryReviewControl(window, kSummaryPreview), L"");
+    SetWindowTextW(SummaryReviewControl(window, kSummarySendPreview), L"");
+    SetWindowTextW(SummaryReviewControl(window, kSummarySendConsent), publicPreview ?
+        L"Separately approve this public projection for publication (Send payload below; token excluded)" :
+        L"Separately approve private developer delivery (Send payload below; never public)");
+    SendMessageW(SummaryReviewControl(window, kSummarySendConsent), BM_SETCHECK, BST_UNCHECKED, 0);
     SendMessageW(SummaryReviewControl(window, kSummaryConsent), BM_SETCHECK, BST_UNCHECKED, 0);
     SendMessageW(SummaryReviewControl(window, kSummaryHardware), BM_SETCHECK, BST_UNCHECKED, 0);
     SendMessageW(SummaryReviewControl(window, kSummaryCooling), CB_SETCURSEL, 0, 0);
     for (const int id : {kSummaryConsent, kSummaryHardware, kSummaryCooling}) EnableWindow(SummaryReviewControl(window, id), TRUE);
     for (const int id : {kSummaryPrepare, kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), FALSE);
     SetSummaryReviewStatus(window, L"Review type selected. Consent, hardware and cooling choices reset. Nothing was sent.");
+    RefreshWindowsSummarySend(window, state);
 }
 
 bool CreateWindowsSummaryReviewControls(HWND window, WindowsBenchmarkSummaryReviewState& state)
@@ -204,6 +230,10 @@ bool CreateWindowsSummaryReviewControls(HWND window, WindowsBenchmarkSummaryRevi
         !add(L"STATIC", L"Exact prepared JSON (read-only)", SS_LEFT, kSummaryPreviewLabel) ||
         !add(L"EDIT", L"", ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP, kSummaryPreview, WS_EX_CLIENTEDGE) ||
         !add(L"STATIC", L"Choose consent, then Prepare. Copy and Save remain separate explicit actions.", SS_LEFT | SS_NOPREFIX, kSummaryStatus) ||
+        !add(L"BUTTON", L"Separately approve private developer delivery (Send payload below; never public)", BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP, kSummarySendConsent) ||
+        !add(L"EDIT", L"", ES_READONLY | ES_MULTILINE | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP, kSummarySendPreview, WS_EX_CLIENTEDGE) ||
+        !add(L"BUTTON", L"Sending unavailable", BS_PUSHBUTTON | WS_TABSTOP, kSummarySend) ||
+        !add(L"BUTTON", L"Cancel send attempt", BS_PUSHBUTTON | WS_TABSTOP, kSummaryCancelSend) ||
         !add(L"BUTTON", L"Copy JSON", BS_PUSHBUTTON | WS_TABSTOP, kSummaryCopy) ||
         !add(L"BUTTON", L"Save JSON...", BS_PUSHBUTTON | WS_TABSTOP, kSummarySave) ||
         !add(L"BUTTON", L"Close", BS_PUSHBUTTON | WS_TABSTOP, kSummaryClose)) return false;
@@ -214,6 +244,8 @@ bool CreateWindowsSummaryReviewControls(HWND window, WindowsBenchmarkSummaryRevi
         SendMessageW(cooling, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(choice));
     SendMessageW(cooling, CB_SETCURSEL, 0, 0);
     for (const int id : {kSummaryPrepare, kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), FALSE);
+    if (state.submission.Available(false)) SetWindowTextW(SummaryReviewControl(window, kSummarySend), L"Send / check receipt (local test only)");
+    RefreshWindowsSummarySend(window, state);
     ApplyWindowsSummaryReviewFont(window, state); LayoutWindowsSummaryReview(window); return true;
 }
 
@@ -246,6 +278,7 @@ void PrepareWindowsSummaryReview(HWND window, WindowsBenchmarkSummaryReviewState
     for (const int id : {kSummaryConsent, kSummaryHardware, kSummaryCooling, kSummaryPrepare}) EnableWindow(SummaryReviewControl(window, id), FALSE);
     for (const int id : {kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), TRUE);
     SetSummaryReviewStatus(window, L"Review these fixed bytes. Copy or Save only when you choose; nothing is sent.");
+    RefreshWindowsSummarySend(window, state);
 }
 
 LRESULT CALLBACK WindowsSummaryReviewWindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
@@ -260,6 +293,12 @@ LRESULT CALLBACK WindowsSummaryReviewWindowProc(HWND window, UINT message, WPARA
     try
     {
         if (message == WM_CREATE) return state && CreateWindowsSummaryReviewControls(window, *state) ? 0 : -1;
+        if (state)
+        {
+            horde::platform::windows::WindowsPlaytestSubmissionResult result{};
+            if (state->submission.Handle(message, wParam, result) || (message == WM_TIMER && wParam == kSummarySendTimer))
+            { RefreshWindowsSummarySend(window, *state); SetSummaryReviewStatus(window, state->submission.StatusText()); return 0; }
+        }
         if (message == WM_SIZE) { LayoutWindowsSummaryReview(window); return 0; }
         if (message == WM_DPICHANGED && state)
         {
@@ -305,6 +344,23 @@ LRESULT CALLBACK WindowsSummaryReviewWindowProc(HWND window, UINT message, WPARA
             if (notification != BN_CLICKED) return 0; // Focus/selection is never consent, Prepare, Copy or Save.
             switch (LOWORD(wParam))
             {
+            case kSummarySendConsent:
+            {
+                if (!state->submission.Available(state->prepared.IsPublicPreview()) || !state->prepared.IsReady() || state->submission.Busy()) return 0;
+                state->submission.Clear();
+                const bool consent = SendMessageW(SummaryReviewControl(window, kSummarySendConsent), BM_GETCHECK, 0, 0) == BST_CHECKED;
+                std::wstring remote;
+                if (consent && state->prepared.PrepareSend(state->submission, true)) (void)WindowsSummaryUtf8Preview(state->submission.Json(), remote);
+                SetWindowTextW(SummaryReviewControl(window, kSummarySendPreview), remote.c_str());
+                RefreshWindowsSummarySend(window, *state); return 0;
+            }
+            case kSummarySend:
+                if (SendMessageW(SummaryReviewControl(window, kSummarySendConsent), BM_GETCHECK, 0, 0) == BST_CHECKED && state->submission.Send(window))
+                    SetSummaryReviewStatus(window, L"Local test request started. No real report is being sent.");
+                RefreshWindowsSummarySend(window, *state); return 0;
+            case kSummaryCancelSend:
+                state->submission.CancelAttempt(); RefreshWindowsSummarySend(window, *state);
+                SetSummaryReviewStatus(window, L"Attempt cancelled; acceptance may be unknown. Retry explicitly with the same payload."); return 0;
             case kSummaryAudience:
                 SelectWindowsSummaryAudience(window, *state, !state->prepared.IsPublicPreview()); return 0;
             case kSummaryConsent:
@@ -334,6 +390,7 @@ LRESULT CALLBACK WindowsSummaryReviewWindowProc(HWND window, UINT message, WPARA
         if (message == WM_CLOSE) { DestroyWindow(window); return 0; }
         if (message == WM_NCDESTROY && state)
         {
+            KillTimer(window, kSummarySendTimer); state->submission.Clear();
             if (state->font) { DeleteObject(state->font); state->font = nullptr; }
             SetWindowLongPtrW(window, GWLP_USERDATA, 0);
         }

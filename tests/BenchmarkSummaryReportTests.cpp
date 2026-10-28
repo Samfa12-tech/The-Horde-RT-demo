@@ -347,6 +347,16 @@ void TestPublicProjectionConsentPrivacyAndEvidence()
     approval.consentToPreparePublicPreview=true;
     const auto publicReport=PreparePublicBenchmarkReport(frozen,approval);
     const auto json=publicReport.Json();
+    Check(!PreparePublicBenchmarkSubmission(publicReport).IsReady(), "public preview consent is not publication consent");
+    const auto publish=PreparePublicBenchmarkSubmission(publicReport,true);
+    Check(publish.IsReady() && publish.ResultId()==publicId && publish.LocalJson()==json &&
+        publish.Json()==std::string(json.substr(0,json.size()-1))+",\"consentToPublish\":true}" &&
+        publish.Json().find("consentToSubmit")==json.npos && publish.Json().find("developer-private")==json.npos,
+        "public Send freezes exactly the reviewed projection plus independent publication consent");
+    Check(BuildPublicBenchmarkRequest(publish,"").empty() && BuildPublicBenchmarkRequest(publish,"bad\ntoken").empty() &&
+        !BuildPublicBenchmarkRequest(publish,"fresh-local-token").empty() && publish.Json().find("turnstileToken")==json.npos &&
+        !PreparePublicBenchmarkSubmission(PreparedPublicBenchmarkReport{},true).IsReady(),
+        "invalid public preparation/token fails closed and token never enters frozen public bytes");
     Check(publicReport.IsReady() && publicReport.ResultId()==publicId && json.size()<=kPublicBenchmarkReportMaxBytes,
         "typed public preview has separate bounded immutable identity");
     for (const auto privateValue : {kRunUuid,kReportUuid,std::string_view{"2026-10-03T12:34:56Z"},

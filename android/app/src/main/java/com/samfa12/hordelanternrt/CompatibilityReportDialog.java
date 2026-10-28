@@ -23,6 +23,8 @@ final class CompatibilityReportDialog {
     private final Executor worker;
     private final LongSupplier revision;
     private final CompatibilityReportReview.Preparer prepare;
+    private final StatisticsReportSendControls.Services sendServices;
+    private StatisticsReportSendControls sendControls;
     private final Handler ui = new Handler(Looper.getMainLooper());
     private CompatibilityReportReview review;
     private AlertDialog dialog;
@@ -33,7 +35,12 @@ final class CompatibilityReportDialog {
 
     CompatibilityReportDialog(Activity activity, Executor worker, LongSupplier revision,
             CompatibilityReportReview.Preparer prepare) {
+        this(activity, worker, revision, prepare, StatisticsReportSendControls.Services.unavailable());
+    }
+    CompatibilityReportDialog(Activity activity, Executor worker, LongSupplier revision,
+            CompatibilityReportReview.Preparer prepare, StatisticsReportSendControls.Services services) {
         this.activity=activity; this.worker=worker; this.revision=revision; this.prepare=prepare;
+        this.sendServices=services;
     }
     boolean pickerOutstanding() { return pickerOutstanding; }
     private int dp(int value) { return Math.round(activity.getResources().getDisplayMetrics().density*value); }
@@ -73,6 +80,7 @@ final class CompatibilityReportDialog {
             if(!ready) {status.setText("Details changed or could not be prepared. Close and reopen this report to try again.");return;}
             consent.setEnabled(false);prepareButton.setEnabled(false);json.setText(review.json());
             copy.setEnabled(true);save.setEnabled(true);status.setText("Review these exact details before copying or saving. Nothing has been sent.");
+            if(sendControls!=null)sendControls.refresh();
         });prepareButton.setEnabled(false);
         consent.setOnCheckedChangeListener((v,checked)->{if(!closed)prepareButton.setEnabled(checked&&!review.isPrepared());});
         json=body(panel,"");json.setTypeface(Typeface.MONOSPACE);json.setTextIsSelectable(true);
@@ -83,6 +91,7 @@ final class CompatibilityReportDialog {
             clipboard.setPrimaryClip(ClipData.newPlainText("Horde compatibility report",review.json()));status.setText("Report copied. Nothing has been sent.");
         });copy.setEnabled(false);
         save=button(panel,"Save report",this::chooseDestination);save.setEnabled(false);
+        sendControls=StatisticsReportSendControls.compatibility(activity,panel,worker,review,sendServices);
         ScrollView scroll=new ScrollView(activity);scroll.addView(panel);
         dialog=new AlertDialog.Builder(activity).setTitle("Report compatibility to developer").setView(scroll)
                 .setNegativeButton("Close",(d,w)->close()).create();
@@ -114,7 +123,9 @@ final class CompatibilityReportDialog {
         });}catch(RuntimeException unavailable) {owner.complete(attempt,false);saveFailed();}
     }
     void close() {
-        if(closed)return;closed=true;if(review!=null)review.close();
+        if(closed)return;closed=true;if(sendControls!=null)sendControls.close();if(review!=null)review.close();
         if(dialog!=null)dialog.dismiss();
     }
+    void interruptSubmission() { if(sendControls!=null)sendControls.interrupt(); }
+    void resumeSubmission() { if(sendControls!=null)sendControls.resume(); }
 }

@@ -91,7 +91,7 @@ private:
 
 enum class WindowsPlaytestSubmissionResult : unsigned char
 {
-    None, Queued, Sent, VerificationExpired, RateLimited, Conflict, Rejected, Uncertain,
+    None, Queued, Sent, Published, VerificationExpired, RateLimited, Conflict, Rejected, Uncertain,
 };
 
 struct WindowsPlaytestHttpResponse
@@ -138,6 +138,8 @@ public:
     // exchange only. Never falls through to the deployed schema1 bug endpoint.
     [[nodiscard]] bool BeginDeveloperReportForLocalValidation(HWND window,
         const reporting::PreparedDeveloperReportSubmission&, std::string_view freshToken);
+    [[nodiscard]] bool BeginPublicBenchmarkForLocalValidation(HWND window,
+        const reporting::PreparedPublicBenchmarkSubmission&, std::string_view freshToken);
     [[nodiscard]] bool Retry(HWND window, std::string_view turnstileToken);
     void CancelAttempt() noexcept;
     void Reset() noexcept;

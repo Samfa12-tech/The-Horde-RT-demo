@@ -37,4 +37,30 @@ std::string BuildDeveloperReportRequest(const PreparedDeveloperReportSubmission&
     if (request.size() > kDeveloperReportSubmissionMaxBytes) return {};
     return request;
 }
+
+PreparedPublicBenchmarkSubmission PreparePublicBenchmarkSubmission(
+    const PreparedPublicBenchmarkReport& local, const bool consent)
+{
+    PreparedPublicBenchmarkSubmission result;
+    if (!consent) { result.status_ = DeveloperReportSubmissionStatus::ConsentRequired; return result; }
+    if (!local.IsReady()) return result;
+    constexpr std::string_view suffix = ",\"consentToPublish\":true}";
+    if (local.Json().size() - 1u + suffix.size() > kDeveloperReportSubmissionMaxBytes)
+    { result.status_ = DeveloperReportSubmissionStatus::TooLarge; return result; }
+    result.id_ = local.ResultId(); result.localJson_ = local.Json();
+    result.json_.assign(local.Json().substr(0u, local.Json().size() - 1u)); result.json_.append(suffix);
+    result.status_ = DeveloperReportSubmissionStatus::Ready;
+    return result;
+}
+
+std::string BuildPublicBenchmarkRequest(const PreparedPublicBenchmarkSubmission& report, const std::string_view token)
+{
+    if (!report.IsReady()) return {};
+    PreparedPlaytestSubmission bridge;
+    bridge.status = PlaytestSubmissionStatus::Ready;
+    bridge.reportId = report.ResultId(); bridge.json = report.Json();
+    auto request = BuildPlaytestSubmissionRequest(bridge, token);
+    if (request.size() > kDeveloperReportSubmissionMaxBytes) return {};
+    return request;
+}
 } // namespace horde::reporting

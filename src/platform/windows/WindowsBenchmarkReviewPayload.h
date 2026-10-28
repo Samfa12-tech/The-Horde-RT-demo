@@ -17,6 +17,9 @@ public:
     { return publicPreview_ ? public_.IsReady() : private_.IsReady(); }
     [[nodiscard]] std::string_view Json() const noexcept
     { return publicPreview_ ? public_.Json() : private_.Json(); }
+    template<class SubmissionOwner>
+    [[nodiscard]] bool PrepareSend(SubmissionOwner& owner, bool consent) const
+    { return publicPreview_ ? owner.Prepare(public_, consent) : owner.Prepare(private_, consent); }
     void SelectPublic(bool selected)
     {
         private_ = {}; public_ = {};

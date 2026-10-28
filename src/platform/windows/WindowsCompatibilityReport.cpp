@@ -12,11 +12,13 @@ namespace
 {
 constexpr wchar_t kClass[]=L"HordeCompatibilityReviewV1";
 constexpr int kDisclosure=6108;
+constexpr UINT_PTR kSendTimer=445u;
 struct View
 {
     reporting::CompatibilityReportSnapshot snapshot;
     reporting::PreparedCompatibilityReport prepared;
     WindowsCompatibilityServices services;
+    WindowsStatisticsSubmission submission;
     HFONT font=nullptr;
     bool owned=false, failure=false;
     int scroll=0;
@@ -24,13 +26,20 @@ struct View
 int Dpi(HWND w,int n) {const auto dpi=GetDpiForWindow(w);return MulDiv(n,static_cast<int>(dpi?dpi:96u),96);}
 std::wstring Wide(std::string_view utf8)
 {
-    if(utf8.empty() || utf8.size()>reporting::kCompatibilityReportMaxBytes)return {};
+    if(utf8.empty() || utf8.size()>reporting::kDeveloperReportSubmissionMaxBytes)return {};
     const auto n=MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.data(),static_cast<int>(utf8.size()),nullptr,0);
     if(n<=0)return {};std::wstring wide(static_cast<std::size_t>(n),L'\0');
     if(MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.data(),static_cast<int>(utf8.size()),wide.data(),n)!=n)return {};
     return wide;
 }
 void Status(HWND w,const std::wstring& text) {SetWindowTextW(GetDlgItem(w,kCompatibilityStatus),text.c_str());}
+void RefreshSend(HWND w,View& state)
+{
+    EnableWindow(GetDlgItem(w,kCompatibilitySendConsent),state.prepared.IsReady() && state.submission.Available(false) && !state.submission.Busy());
+    EnableWindow(GetDlgItem(w,kCompatibilitySend),state.submission.CanSend());
+    EnableWindow(GetDlgItem(w,kCompatibilityCancelSend),state.submission.Busy());
+    if(state.submission.Busy())SetTimer(w,kSendTimer,100u,nullptr);else KillTimer(w,kSendTimer);
+}
 bool Copy(HWND w,const std::string& json,std::wstring& message)
 {
     const auto wide=Wide(json);if(wide.empty() || !OpenClipboard(w)){message=L"Could not copy. The reviewed report is still here.";return false;}
@@ -68,7 +77,8 @@ void Layout(HWND w)
         if(old)SelectObject(dc,old);ReleaseDC(w,dc);}
     const int disclosure=std::max(Dpi(w,90),line*5),consent=std::max(Dpi(w,56),line*3);
     const int button=std::max(Dpi(w,40),line+Dpi(w,12)),status=std::max(Dpi(w,40),line*3);
-    const int fixed=2*m+disclosure+consent+2*button+status+5*gap;
+    const int remote=std::max(Dpi(w,100),line*3);
+    const int fixed=2*m+disclosure+2*consent+4*button+status+remote+9*gap;
     const int preview=std::max(line*3,int(r.bottom)-fixed);
     const int height=fixed+preview;
     state->scroll=std::clamp(state->scroll,0,std::max(0,height-int(r.bottom)));
@@ -78,6 +88,8 @@ void Layout(HWND w)
     const auto place=[&](int id,int h){MoveWindow(GetDlgItem(w,id),m,y,width,h,TRUE);y+=h+gap;};
     place(kDisclosure,disclosure);place(kCompatibilityConsent,consent);place(kCompatibilityPrepare,button);
     place(kCompatibilityPreview,preview);place(kCompatibilityStatus,status);
+    place(kCompatibilitySendConsent,consent);place(kCompatibilitySendPreview,remote);
+    place(kCompatibilitySend,button);place(kCompatibilityCancelSend,button);
     const int bw=std::max(1,(width-2*gap)/3);
     for(int i=0;i<3;++i)MoveWindow(GetDlgItem(w,kCompatibilityCopy+i),m+i*(bw+gap),y,bw,button,TRUE);
 }
@@ -96,6 +108,10 @@ LRESULT CALLBACK Proc(HWND w,UINT message,WPARAM wp,LPARAM lp)
            !add(L"BUTTON",kCompatibilityPrepare,L"Prepare report",BS_PUSHBUTTON|WS_TABSTOP) ||
            !add(L"EDIT",kCompatibilityPreview,L"",ES_MULTILINE|ES_READONLY|WS_VSCROLL|WS_HSCROLL|WS_TABSTOP) ||
            !add(L"STATIC",kCompatibilityStatus,L"Review consent before preparing. Nothing has been sent.",SS_LEFT|SS_NOPREFIX) ||
+           !add(L"BUTTON",kCompatibilitySendConsent,L"Separately approve private developer delivery (Send payload below; never public)",BS_AUTOCHECKBOX|BS_MULTILINE|WS_TABSTOP) ||
+           !add(L"EDIT",kCompatibilitySendPreview,L"",ES_MULTILINE|ES_READONLY|WS_VSCROLL|WS_HSCROLL|WS_TABSTOP) ||
+           !add(L"BUTTON",kCompatibilitySend,state->submission.Available(false)?L"Send / retry (local test only)":L"Sending unavailable",BS_PUSHBUTTON|WS_TABSTOP) ||
+           !add(L"BUTTON",kCompatibilityCancelSend,L"Cancel send attempt",BS_PUSHBUTTON|WS_TABSTOP) ||
            !add(L"BUTTON",kCompatibilityCopy,L"Copy report",BS_PUSHBUTTON|WS_TABSTOP) ||
            !add(L"BUTTON",kCompatibilitySave,L"Save report…",BS_PUSHBUTTON|WS_TABSTOP) ||
            !add(L"BUTTON",kCompatibilityClose,L"Close",BS_PUSHBUTTON|WS_TABSTOP))return -1;
@@ -104,11 +120,27 @@ LRESULT CALLBACK Proc(HWND w,UINT message,WPARAM wp,LPARAM lp)
         const auto font=state->font?state->font:static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT));
         EnumChildWindows(w,[](HWND child,LPARAM f)->BOOL{SendMessageW(child,WM_SETFONT,WPARAM(f),TRUE);return TRUE;},reinterpret_cast<LPARAM>(font));
         for(int id:{kCompatibilityPrepare,kCompatibilityCopy,kCompatibilitySave})EnableWindow(GetDlgItem(w,id),FALSE);
-        Layout(w);return 0;
+        RefreshSend(w,*state);Layout(w);return 0;
+    }
+    if(state) {
+        WindowsPlaytestSubmissionResult result{};
+        if(state->submission.Handle(message,wp,result) || (message==WM_TIMER && wp==kSendTimer))
+        {RefreshSend(w,*state);Status(w,state->submission.StatusText());return 0;}
     }
     if(message==WM_COMMAND && state) {
+        if(HIWORD(wp)!=BN_CLICKED)return 0;
         const int id=LOWORD(wp);
         if(id==kCompatibilityClose){DestroyWindow(w);return 0;}
+        if(id==kCompatibilitySendConsent && state->prepared.IsReady() && state->submission.Available(false) && !state->submission.Busy()) {
+            state->submission.Clear();std::wstring remote;
+            if(SendDlgItemMessageW(w,id,BM_GETCHECK,0,0)==BST_CHECKED && state->submission.Prepare(state->prepared,true))remote=Wide(state->submission.Json());
+            SetWindowTextW(GetDlgItem(w,kCompatibilitySendPreview),remote.c_str());RefreshSend(w,*state);return 0;
+        }
+        if(id==kCompatibilitySend) {
+            if(SendDlgItemMessageW(w,kCompatibilitySendConsent,BM_GETCHECK,0,0)==BST_CHECKED && state->submission.Send(w))Status(w,L"Local test request started. No real report is being sent.");
+            RefreshSend(w,*state);return 0;
+        }
+        if(id==kCompatibilityCancelSend) {state->submission.CancelAttempt();RefreshSend(w,*state);Status(w,L"Attempt cancelled; acceptance may be unknown. Retry the same payload explicitly.");return 0;}
         if(id==kCompatibilityConsent && !state->prepared.IsReady()) {
             EnableWindow(GetDlgItem(w,kCompatibilityPrepare),SendDlgItemMessageW(w,kCompatibilityConsent,BM_GETCHECK,0,0)==BST_CHECKED);return 0;
         }
@@ -120,7 +152,7 @@ LRESULT CALLBACK Proc(HWND w,UINT message,WPARAM wp,LPARAM lp)
             const auto wide=Wide(state->prepared.Json());SetWindowTextW(GetDlgItem(w,kCompatibilityPreview),wide.c_str());
             EnableWindow(GetDlgItem(w,kCompatibilityConsent),FALSE);EnableWindow(GetDlgItem(w,kCompatibilityPrepare),FALSE);
             EnableWindow(GetDlgItem(w,kCompatibilityCopy),TRUE);EnableWindow(GetDlgItem(w,kCompatibilitySave),TRUE);
-            Status(w,L"Review these exact details before Copy or Save. Nothing has been sent.");return 0;
+            RefreshSend(w,*state);Status(w,L"Review these exact details before Copy or Save. Nothing has been sent.");return 0;
         }
         if((id==kCompatibilityCopy || id==kCompatibilitySave) && state->prepared.IsReady()) {
             std::wstring text;const std::string bytes(state->prepared.Json());
@@ -144,7 +176,7 @@ LRESULT CALLBACK Proc(HWND w,UINT message,WPARAM wp,LPARAM lp)
     if(message==WM_DPICHANGED){const auto* r=reinterpret_cast<RECT*>(lp);SetWindowPos(w,nullptr,r->left,r->top,r->right-r->left,r->bottom-r->top,SWP_NOACTIVATE|SWP_NOZORDER);return 0;}
     if(message==WM_GETMINMAXINFO){auto* r=reinterpret_cast<MINMAXINFO*>(lp);r->ptMinTrackSize={Dpi(w,470),Dpi(w,520)};return 0;}
     if(message==WM_CLOSE || (message==WM_KEYDOWN && wp==VK_ESCAPE)){DestroyWindow(w);return 0;}
-    if(message==WM_NCDESTROY && state){SetWindowLongPtrW(w,GWLP_USERDATA,0);if(state->font)DeleteObject(state->font);if(state->owned)delete state;}
+    if(message==WM_NCDESTROY && state){KillTimer(w,kSendTimer);state->submission.Clear();SetWindowLongPtrW(w,GWLP_USERDATA,0);if(state->font)DeleteObject(state->font);if(state->owned)delete state;}
     return DefWindowProcW(w,message,wp,lp);
 }
 }
@@ -154,7 +186,7 @@ HWND CreateWindowsCompatibilityReportView(HWND owner,reporting::CompatibilityRep
     WNDCLASSW cls{};cls.lpfnWndProc=Proc;cls.hInstance=GetModuleHandleW(nullptr);cls.lpszClassName=kClass;
     cls.hCursor=LoadCursorW(nullptr,MAKEINTRESOURCEW(32512));cls.hbrBackground=GetSysColorBrush(COLOR_BTNFACE);
     if(!RegisterClassW(&cls) && GetLastError()!=ERROR_CLASS_ALREADY_EXISTS)return nullptr;
-    auto state=std::make_unique<View>();state->snapshot=std::move(snapshot);state->services=services;state->failure=failure;
+    auto state=std::make_unique<View>();state->snapshot=std::move(snapshot);state->services=services;state->failure=failure;state->submission.services=services.send;
     HWND window=CreateWindowExW(WS_EX_DLGMODALFRAME|WS_EX_CONTROLPARENT,kClass,L"Report compatibility to developer",
         WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_THICKFRAME|WS_CLIPCHILDREN|WS_VSCROLL,CW_USEDEFAULT,CW_USEDEFAULT,720,720,
         owner,nullptr,GetModuleHandleW(nullptr),state.get());

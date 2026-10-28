@@ -166,6 +166,7 @@ public class MainActivity extends Activity {
     private static final int REQUEST_SAVE_PLAYTEST = 7102;
     private static final int REQUEST_SAVE_BENCHMARK_SUMMARY = 7103;
     private BenchmarkSummaryReview benchmarkSummaryReview;
+    private StatisticsReportSendControls benchmarkSummarySendControls;
     private CompatibilityReportDialog compatibilityReportDialog;
     private boolean benchmarkSummaryVisible;
     private long benchmarkSummaryFormGeneration, benchmarkSummaryPickerToken, benchmarkSummaryPickerGeneration;
@@ -2861,6 +2862,8 @@ public class MainActivity extends Activity {
             button.setVisibility(View.GONE);
             panel.addView(button, menuButtonLayoutParams());
         }
+        benchmarkSummarySendControls = StatisticsReportSendControls.benchmark(this, panel, reportExecutor,
+                owner, StatisticsReportSendControls.Services.unavailable());
         addMenuButton(panel, getString(R.string.back),
                 benchmarkSummaryAction(owner, generation, () -> showBenchmarkReport(true)));
         attachPanel(panel);
@@ -2896,6 +2899,7 @@ public class MainActivity extends Activity {
         benchmarkSummaryCopy.setVisibility(View.VISIBLE);
         benchmarkSummarySave.setVisibility(View.VISIBLE);
         benchmarkSummaryEdit.setVisibility(View.VISIBLE);
+        if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.refresh();
     }
 
     private void copyBenchmarkSummary() {
@@ -2993,6 +2997,8 @@ public class MainActivity extends Activity {
 
     private void closeBenchmarkSummaryReview() {
         ++benchmarkSummaryFormGeneration;
+        if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.close();
+        benchmarkSummarySendControls = null;
         if (benchmarkSummaryReview != null) benchmarkSummaryReview.close();
         benchmarkSummaryReview = null;
         benchmarkSummaryVisible = false;
@@ -8714,6 +8720,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.resume();
+        if (compatibilityReportDialog != null) compatibilityReportDialog.resumeSubmission();
         if (environmentSurveyMode) {
             resumed = true;
             enterImmersiveMode();
@@ -8794,6 +8802,8 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.interrupt();
+        if (compatibilityReportDialog != null) compatibilityReportDialog.interruptSubmission();
         if (environmentSurveyMode) {
             resumed = false;
             finishEnvironmentSurvey(3);
