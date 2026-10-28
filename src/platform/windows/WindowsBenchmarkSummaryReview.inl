@@ -115,12 +115,12 @@ constexpr int kSummaryIntro = 100, kSummaryConsent = 101, kSummaryHardware = 102
 constexpr int kSummaryCoolingLabel = 103, kSummaryCooling = 104, kSummaryPrepare = 105;
 constexpr int kSummaryPreviewLabel = 106, kSummaryPreview = 107, kSummaryStatus = 108;
 constexpr int kSummaryCopy = 109, kSummarySave = 110, kSummaryClose = IDCANCEL;
-constexpr int kSummaryBodyPanel = 111;
+constexpr int kSummaryBodyPanel = 111, kSummaryAudience = 112;
 struct WindowsBenchmarkSummaryReviewState
 {
     // Owned copy: no render-owner pointers, mutable report files or post-reset state.
     horde::telemetry::FrozenBenchmarkSummary frozen;
-    horde::reporting::PreparedBenchmarkSummaryReport prepared;
+    horde::platform::windows::WindowsBenchmarkReviewPayload prepared;
     std::wstring preview;
     HFONT font = nullptr;
     bool saved = false;
@@ -192,7 +192,7 @@ void LayoutWindowsSummaryReview(HWND window)
     const int buttonY = client.bottom - margin - button, buttonWidth = (width - gap * 2) / 3;
     const int viewport = std::max(1, buttonY - gap - margin);
     MoveWindow(SummaryReviewControl(window, kSummaryBodyPanel), margin, margin, width, viewport, TRUE);
-    const int header = SummaryReviewScale(window, 72) + gap + 4 * line + 3 * gap + button + gap + line;
+    const int header = SummaryReviewScale(window, 72) + gap + button + gap + 4 * line + 3 * gap + button + gap + line;
     const int previewHeight = std::max(SummaryReviewScale(window, 100), viewport - header - gap - 2 * line);
     const int contentHeight = header + previewHeight + gap + 2 * line;
     auto* state = reinterpret_cast<WindowsBenchmarkSummaryReviewState*>(GetWindowLongPtrW(window, GWLP_USERDATA));
@@ -206,6 +206,7 @@ void LayoutWindowsSummaryReview(HWND window)
     };
     int y = 0;
     place(kSummaryIntro, y, SummaryReviewScale(window, 72)); y += SummaryReviewScale(window, 72) + gap;
+    place(kSummaryAudience, y, button); y += button + gap;
     place(kSummaryConsent, y, line); y += line + gap;
     place(kSummaryHardware, y, line); y += line + gap;
     place(kSummaryCoolingLabel, y, line); y += line;
@@ -255,6 +256,27 @@ void ApplyWindowsSummaryReviewFont(HWND window, WindowsBenchmarkSummaryReviewSta
     state.font = font;
 }
 
+void SelectWindowsSummaryAudience(HWND window, WindowsBenchmarkSummaryReviewState& state, bool publicPreview)
+{
+    state.prepared.SelectPublic(publicPreview);
+    state.preview.clear(); state.saved = false;
+    SetWindowTextW(window, publicPreview ? L"Public statistics preview - local only" : L"Review statistics - local JSON");
+    SetWindowTextW(SummaryReviewControl(window, kSummaryIntro), publicPreview ?
+        L"Local preview of aggregate public statistics. Nothing is uploaded or published. Private IDs and raw frame rows are omitted. Results are unverified and unranked; measured thermals and display FPS are unavailable." :
+        L"Review a completed benchmark as local JSON. Nothing is sent. Prepare consent and hardware inclusion start OFF. Optional hardware contains only the Vulkan GPU/API; PC model is Unknown.");
+    SetWindowTextW(SummaryReviewControl(window, kSummaryAudience), publicPreview ?
+        L"Review private statistics instead" : L"Preview public statistics instead");
+    SetWindowTextW(SummaryReviewControl(window, kSummaryConsent), publicPreview ?
+        L"I consent to prepare a local public preview (does not publish)" : L"I consent to prepare this local statistics report");
+    SetWindowTextW(SummaryReviewControl(window, kSummaryPreview), L"");
+    SendMessageW(SummaryReviewControl(window, kSummaryConsent), BM_SETCHECK, BST_UNCHECKED, 0);
+    SendMessageW(SummaryReviewControl(window, kSummaryHardware), BM_SETCHECK, BST_UNCHECKED, 0);
+    SendMessageW(SummaryReviewControl(window, kSummaryCooling), CB_SETCURSEL, 0, 0);
+    for (const int id : {kSummaryConsent, kSummaryHardware, kSummaryCooling}) EnableWindow(SummaryReviewControl(window, id), TRUE);
+    for (const int id : {kSummaryPrepare, kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), FALSE);
+    SetSummaryReviewStatus(window, L"Review type selected. Consent, hardware and cooling choices reset. Nothing was sent.");
+}
+
 bool CreateWindowsSummaryReviewControls(HWND window, WindowsBenchmarkSummaryReviewState& state)
 {
     HWND body = CreateWindowExW(WS_EX_CONTROLPARENT, L"STATIC", L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
@@ -267,6 +289,7 @@ bool CreateWindowsSummaryReviewControls(HWND window, WindowsBenchmarkSummaryRevi
             reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), GetModuleHandleW(nullptr), nullptr) != nullptr;
     };
     if (!add(L"STATIC", L"Review a completed benchmark as local JSON. Nothing is sent. Prepare consent and hardware inclusion start OFF. Optional hardware contains only the Vulkan GPU/API; PC model is Unknown.", SS_LEFT | SS_NOPREFIX, kSummaryIntro) ||
+        !add(L"BUTTON", L"Preview public statistics instead", BS_PUSHBUTTON | WS_TABSTOP, kSummaryAudience) ||
         !add(L"BUTTON", L"I consent to prepare this local statistics report", BS_AUTOCHECKBOX | WS_TABSTOP, kSummaryConsent) ||
         !add(L"BUTTON", L"Include basic hardware labels (optional)", BS_AUTOCHECKBOX | WS_TABSTOP, kSummaryHardware) ||
         !add(L"STATIC", L"Cooling declaration (optional; not a sensor measurement)", SS_LEFT | SS_NOPREFIX, kSummaryCoolingLabel) ||
@@ -299,12 +322,20 @@ void PrepareWindowsSummaryReview(HWND window, WindowsBenchmarkSummaryReviewState
     if (!MakeWindowsBenchmarkUuid(reportUuid) || reportUuid == state.frozen.Data().runUuid)
     { SetSummaryReviewStatus(window, L"Could not create a distinct secure report ID. Nothing was prepared."); return; }
     const auto timestamp = UtcTimestamp("%Y-%m-%dT%H:%M:%SZ");
-    auto prepared = horde::reporting::PrepareBenchmarkSummaryReport(state.frozen,
-        {true, hardware, reportUuid, timestamp, static_cast<horde::telemetry::BenchmarkSummaryCooling>(cooling)});
-    std::wstring preview;
-    if (!prepared.IsReady() || !WindowsSummaryUtf8Preview(prepared.Json(), preview))
+    const auto accept = [&](auto prepared) {
+        std::wstring preview;
+        if (!prepared.IsReady() || !WindowsSummaryUtf8Preview(prepared.Json(), preview) ||
+            !state.prepared.Admit(std::move(prepared))) return false;
+        state.preview = std::move(preview); return true;
+    };
+    const auto declaredCooling = static_cast<horde::telemetry::BenchmarkSummaryCooling>(cooling);
+    const bool accepted = state.prepared.IsPublicPreview()
+        ? accept(horde::reporting::PreparePublicBenchmarkReport(state.frozen,
+            {true, hardware, reportUuid, timestamp, declaredCooling}))
+        : accept(horde::reporting::PrepareBenchmarkSummaryReport(state.frozen,
+            {true, hardware, reportUuid, timestamp, declaredCooling}));
+    if (!accepted)
     { SetSummaryReviewStatus(window, L"The bounded statistics report could not be prepared. Nothing was copied or saved."); return; }
-    state.prepared = std::move(prepared); state.preview = std::move(preview);
     SetWindowTextW(SummaryReviewControl(window, kSummaryPreview), state.preview.c_str());
     for (const int id : {kSummaryConsent, kSummaryHardware, kSummaryCooling, kSummaryPrepare}) EnableWindow(SummaryReviewControl(window, id), FALSE);
     for (const int id : {kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), TRUE);
@@ -368,6 +399,8 @@ LRESULT CALLBACK WindowsSummaryReviewWindowProc(HWND window, UINT message, WPARA
             if (notification != BN_CLICKED) return 0; // Focus/selection is never consent, Prepare, Copy or Save.
             switch (LOWORD(wParam))
             {
+            case kSummaryAudience:
+                SelectWindowsSummaryAudience(window, *state, !state->prepared.IsPublicPreview()); return 0;
             case kSummaryConsent:
                 if (!state->prepared.IsReady()) EnableWindow(SummaryReviewControl(window, kSummaryPrepare),
                     SendMessageW(SummaryReviewControl(window, kSummaryConsent), BM_GETCHECK, 0, 0) == BST_CHECKED);

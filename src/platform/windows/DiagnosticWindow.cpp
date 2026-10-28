@@ -20,6 +20,7 @@
 #include "gameplay/campaign/CampaignLoadBarrier.h"
 #include "platform/windows/GraphicsMenuNavigation.h"
 #include "platform/windows/WindowsPlaytestReport.h"
+#include "platform/windows/WindowsBenchmarkReviewPayload.h"
 #include "platform/windows/WindowsCompatibilityReport.h"
 #include "reporting/BuildIdentity.h"
 #include "platform/windows/WindowsRemotePlaytestReport.h"

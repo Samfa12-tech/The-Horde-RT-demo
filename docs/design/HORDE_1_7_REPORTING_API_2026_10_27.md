@@ -100,8 +100,9 @@ state rather than a fabricated GPU report.
 sanitized public preview from typed frozen benchmark evidence. It cannot take a
 private report/JSON body and cannot send or authorize publication. Private reports
 must never be copied wholesale to public storage. A separate public-consent
-control initially unchecked and a fresh public result UUID are still required in
-the platform review owner; private-send consent does not grant public consent.
+control initially unchecked and a fresh public result UUID are required in
+the platform review owner; current local forms implement those preparation
+boundaries. Private-send consent does not grant public preparation or publication consent.
 The builder rejects reuse of the measured run UUID. Suggested
 route in the same existing Worker: `POST /api/horde-benchmark-results`;
 `GET /api/horde-benchmark-stats` is public read-only. Private compatibility intake
@@ -148,7 +149,9 @@ deployment action, not authorized by this document.
 The local preview has schema1/product/reportKind `public-benchmark-result`,
 `destination:public-board`, `consentToPreparePublicPreview:true` and one `result`.
 This consent is local review only, not `consentToSubmit` or publication consent.
-No platform button, public transport, server acceptance or website is enabled.
+Android local review/Copy/Save was added at e2addc77. The Windows equivalent
+now has source/build/CPU evidence in the linked28October handoff. Neither adds
+public transport, server acceptance, publication consent or a website.
 
 Result allowlist: random resultId, coarse UTC date, community-client-reported
 classification, explicit false verification/ranking, workload/simulation policy,

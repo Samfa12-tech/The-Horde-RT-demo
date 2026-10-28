@@ -2,6 +2,7 @@
 #include "reporting/PublicBenchmarkReport.h"
 #include "reporting/DeveloperReportSubmission.h"
 #include "reporting/PlaytestReport.h"
+#include "platform/windows/WindowsBenchmarkReviewPayload.h"
 
 #include <iostream>
 #include <string>
@@ -533,6 +534,36 @@ void TestPublicProjectionConsentPrivacyAndEvidence()
     Check(publicReport.Json()==json && privateSend.LocalJson()==local.Json(),"owner reset does not mutate either separately approved destination");
 }
 
+void TestWindowsReviewAudienceOwnership()
+{
+    constexpr std::string_view publicId="33333333-3333-4333-a333-333333333333";
+    CompletedOwners owners; owners.Run();
+    const auto config=Configuration();
+    const auto frozen=CaptureBenchmarkSummary(owners.benchmark,owners.evidence,config,config,kRunUuid);
+    const auto privateReport=PrepareBenchmarkSummaryReport(frozen,Approval());
+    auto approval=PublicBenchmarkReportApproval{false,false,publicId,"2026-10-03T12:34:56Z"};
+    horde::platform::windows::WindowsBenchmarkReviewPayload review;
+    Check(!review.IsPublicPreview() && !review.IsReady() && review.Json().empty(),"Windows starts without prepared bytes or public consent");
+    Check(!review.Admit(PreparePublicBenchmarkReport(frozen,approval)),"private local consent cannot grant public admission");
+    Check(review.Admit(privateReport) && review.Json()==privateReport.Json(),"Windows private copy retains exact typed bytes");
+    const std::string savedPrivate(review.Json());
+    review.SelectPublic(true);
+    Check(review.IsPublicPreview() && !review.IsReady() && review.Json().empty(),"changing audience retires the preceding reviewed payload");
+    Check(!review.Admit(privateReport),"public review cannot borrow a ready private payload");
+    Check(!review.Admit(PreparePublicBenchmarkReport(frozen,approval)),"public review selection alone cannot prepare bytes");
+    approval.consentToPreparePublicPreview=true;
+    const auto publicReport=PreparePublicBenchmarkReport(frozen,approval);
+    Check(review.Admit(publicReport) && review.Json()==publicReport.Json(),"fresh public consent admits exact public projection");
+    Check(review.Json().find(kRunUuid)==std::string_view::npos && review.Json().find(kReportUuid)==std::string_view::npos,
+        "public review excludes private run/report identities");
+    Check(!review.Admit(publicReport) && review.Json()==publicReport.Json(),"prepared bytes cannot be replaced without an explicit new review");
+    const std::string savedPublic(review.Json());
+    review.SelectPublic(false);
+    Check(!review.IsPublicPreview() && !review.IsReady() && review.Json().empty(),"switching back does not restore earlier consent or bytes");
+    Check(!review.Admit(publicReport) && review.Admit(privateReport),"typed payload cannot cross into the other audience");
+    Check(savedPrivate==privateReport.Json() && savedPublic==publicReport.Json(),"explicit exported copies remain stable after review ownership changes");
+}
+
 void TestSubmittedDimensionsSummary()
 {
     const RtFrameDimensionsEvidence d{960,540,960,540,0,960.0f/540,false,false};
@@ -610,6 +641,7 @@ int main(const int argc, const char* const* const argv)
     TestOwningMistSummary();
     TestSubmittedDimensionsSummary();
     TestPublicProjectionConsentPrivacyAndEvidence();
+    TestWindowsReviewAudienceOwnership();
     TestUnavailableHardwarePrivacyAndIdentityRetry();
     return passed ? 0 : 1;
 }

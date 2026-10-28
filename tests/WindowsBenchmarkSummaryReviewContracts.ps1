@@ -39,6 +39,7 @@ $freeze = Section $review 'void FreezeWindowsBenchmarkSummary(' 'constexpr wchar
 $configuration = Section $review 'horde::telemetry::BenchmarkSummaryConfiguration WindowsBenchmarkSummaryConfiguration(' 'void ArmWindowsBenchmarkSummary('
 $prepare = Section $review 'void PrepareWindowsSummaryReview(' 'LRESULT CALLBACK WindowsSummaryReviewWindowProc('
 $controls = Section $review 'bool CreateWindowsSummaryReviewControls(' 'void PrepareWindowsSummaryReview('
+$audience = Section $review 'void SelectWindowsSummaryAudience(' 'bool CreateWindowsSummaryReviewControls('
 $windowProc = Section $review 'LRESULT CALLBACK WindowsSummaryReviewWindowProc(' 'void ShowWindowsBenchmarkSummaryReview('
 $clipboard = Section $review 'bool CopyWindowsSummaryJson(' 'int SummaryReviewScale('
 $utf8 = Section $review 'bool WindowsSummaryUtf8Preview(' 'bool CopyWindowsSummaryJson('
@@ -83,7 +84,7 @@ Check ($prepare.Contains('state.prepared.IsReady() || !state.frozen.IsReady()') 
     $prepare.Contains('BM_GETCHECK, 0, 0) != BST_CHECKED') -and
     $prepare.Contains('PrepareBenchmarkSummaryReport(state.frozen,') -and
     $prepare.Contains('WindowsSummaryUtf8Preview(prepared.Json(), preview)')) 'Prepare requires explicit consent and the immutable typed owner, then validates exact UTF-8 before enabling actions.'
-Check ($prepare.Contains('state.prepared = std::move(prepared); state.preview = std::move(preview)') -and
+Check ($prepare.Contains('!state.prepared.Admit(std::move(prepared))') -and $prepare.Contains('state.preview = std::move(preview)') -and
     $prepare.Contains('{kSummaryConsent, kSummaryHardware, kSummaryCooling, kSummaryPrepare}') -and
     -not $prepare.Contains('ExportWindowsPlaytestReportJson') -and -not $prepare.Contains('CopyWindowsSummaryJson')) 'Preparation freezes choices without copying or saving.'
 Check ($utf8.Contains('kBenchmarkSummaryReportMaxBytes') -and $utf8.Contains('CP_UTF8, MB_ERR_INVALID_CHARS') -and
@@ -110,6 +111,15 @@ Check ($review.Contains('WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLIN
     $windowProc.Contains('monitor.rcWork.bottom - monitor.rcWork.top')) 'Large-DPI review body scrolls within a clipped work-area-bounded panel; local action footer remains visible.'
 Check ($review.Contains('RevealWindowsSummaryReviewFocus(') -and $review.Contains('GetParent(control) != body') -and
     $windowProc.Contains('if (notification != BN_CLICKED) return 0')) 'Keyboard focus reveals offscreen body fields and cannot implicitly Prepare/Copy/Save.'
+Check ($audience.Contains('state.prepared.SelectPublic(publicPreview)') -and $audience.Contains('state.preview.clear(); state.saved = false') -and
+    $audience.Contains('kSummaryConsent), BM_SETCHECK, BST_UNCHECKED') -and
+    $audience.Contains('kSummaryHardware), BM_SETCHECK, BST_UNCHECKED') -and
+    $audience.Contains('kSummaryCooling), CB_SETCURSEL, 0, 0') -and
+    $audience.Contains('{kSummaryPrepare, kSummaryCopy, kSummarySave}') -and
+    $windowProc.Contains('case kSummaryAudience:') -and $windowProc.Contains('!state->prepared.IsPublicPreview()')) 'Explicit audience selection clears prior bytes, consent/hardware/cooling and disables exports until a new review.'
+Check ($prepare.Contains('state.prepared.IsPublicPreview()') -and $prepare.Contains('PreparePublicBenchmarkReport(state.frozen,') -and
+    $review.Contains('WindowsBenchmarkReviewPayload prepared;') -and
+    $audience.Contains('does not publish') -and $audience.Contains('unverified and unranked')) 'Public review uses the typed sanitized builder and discloses local-only, unverified status.'
 foreach ($forbidden in @('WinHttp', 'SendPlaytest', 'ShowWindowsRemote', 'WindowsPlaytestSubmission', 'ShellExecute',
     'HttpClient', 'SettingsPath(', 'WriteReportFile(', 'benchmarkJsonReport', 'simulation.')) {
     Check (-not $review.Contains($forbidden)) "Local review has no unrelated transport, settings, mutable report-file or gameplay boundary: $forbidden"

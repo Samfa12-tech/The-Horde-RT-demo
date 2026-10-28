@@ -28,15 +28,31 @@ feature is not automatically packaged, enabled or device-accepted.
 | Benchmark/reporting | Fixed-dimension/rollback and immutable local summaries exist; compatibility distinguishes unsupported/unchecked/failed startup/prior RT presentation. Private mocked transport has destination-bound receipts; exact native source/input provenance is implemented. | Android real fixed-size/return and Windows visible/controller acceptance; staged private backend support and actual authorized end-to-end delivery; separately reviewed public projection/consent and public stats API/page/filter/sort. Local export, mock receipts and bug-relay email do not close delivery. |
 | Packaging/integration | Current source passes six CI jobs. Normal flask/ring/yellow/shared64 remain OFF; selected private assets are not normal packaged content. | Asset distribution/licence/private intake, exact Windows/Android candidate packages, fixed-candidate journey/regression and explicit release/signing approval. PR conflict resolution requires a separate reviewed integration plan; no owner work may be discarded. |
 
+## Subsequent28October checkpoints
+
+Typed public projection exists at dabf7b4c, Android local review/Copy/Save at
+e2addc77, and Windows local review now has CPU/build evidence. These do not add
+live private/public submission or the website. See the
+[exact remaining reporting/access handoff](HORDE_1_7_REPORTING_NEXT_HANDOFF_2026_10_28.md).
+The [pre-fence read-only feasibility review](HORDE_1_7_PRE_FENCE_FEASIBILITY_2026_10_28.md)
+identifies the still-required independent CPU result and input-age contract.
+
+Android actor opt-in was added at958f5182; its phone comparison is inconclusive.
+The repeated diagnostic first-arrival reset/RT-presented ACK correction at
+fffd5ee6 passed six CI jobs. e2addc77 also passed six. Its subsequent phone
+preflight was interrupted before a valid ACK/timing run, then cleanup was verified
+at09:27:50UTC; see the [recovery receipt](../evidence/2026-10-28-chapter-start-ack/disconnect-followup.md).
+Normal worker remains OFF. Reef owns the phone during this desktop continuation.
+No further device activity is authorized without a new explicit grant.
+
 ## Execution and custody
 
 Phone is reserved to Reef. No ADB/device calls, installs, settings changes or
 monitors in this restart. Request handoff only when a bounded test is genuinely
 ready; preserve owner apps/saves/settings and close owned sessions at release.
-The actor-worker implementation remains a default-OFF desktop experiment. Resume
-inspection found the Android build does not yet define its opt-in macro, so an
-ordinary current APK cannot be labelled a worker A/B. Prepare that seam and a
-truthful fixed-build mode receipt before requesting the first S26 comparison.
+At the initial resume baseline the actor worker was desktop-only. The subsequent
+checkpoints above now provide its isolated Android opt-in and exact artifact
+receipts, with physical gain and repeated ACK acceptance still unverified.
 
 Use a matched warmed A/B or ABBA, unchanged shader/quality/dimensions, uncapped
 control to distinguish a30Hz cap, verified mode and actual critical-path samples.
