@@ -56,6 +56,7 @@
 #include "reporting/PlaytestReport.h"
 #include "reporting/PlaytestSubmission.h"
 #include "reporting/BenchmarkSummaryReport.h"
+#include "reporting/PublicBenchmarkReport.h"
 #include "reporting/CompatibilityReport.h"
 #include "reporting/BuildIdentity.h"
 #include "reporting/CompatibilityStartupOwnership.h"
@@ -8299,10 +8300,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getReadyBenchmarkSummaryRunId(JNIEnv
     catch (...) { return nullptr; }
 }
 
-extern "C" JNIEXPORT jbyteArray JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_prepareBenchmarkSummaryReport(
-    JNIEnv* env, jclass, jstring expectedRunUuid, jstring reportUuid, jstring capturedAtUtc,
-    jboolean consentToPrepare, jboolean includeBasicHardware, jint declaredCooling)
+static jbyteArray PrepareLocalBenchmarkReview(
+    JNIEnv* env, jstring expectedRunUuid, jstring reportUuid, jstring capturedAtUtc,
+    jboolean consentToPrepare, jboolean includeBasicHardware, jint declaredCooling, bool publicPreview)
 {
     using namespace horde::reporting;
     const auto reply = [env](const BenchmarkSummaryReportStatus status, const std::string_view json = {}) {
@@ -8328,18 +8328,48 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_prepareBenchmarkSummaryReport(
             frozen = gLatestBenchmarkSummary;
             revision = gBenchmarkSummaryRevision;
         }
-        const auto prepared = PrepareBenchmarkSummaryReport(frozen,
-            {true, includeBasicHardware == JNI_TRUE, id, utc,
-                static_cast<horde::telemetry::BenchmarkSummaryCooling>(declaredCooling)});
-        if (!prepared.IsReady()) return reply(prepared.Status());
+        BenchmarkSummaryReportStatus status;
+        std::string json;
+        if (publicPreview) {
+            const auto prepared = PreparePublicBenchmarkReport(frozen,
+                {true, includeBasicHardware == JNI_TRUE, id, utc,
+                    static_cast<horde::telemetry::BenchmarkSummaryCooling>(declaredCooling)});
+            status = prepared.Status();
+            if (prepared.IsReady()) json = prepared.Json();
+        } else {
+            const auto prepared = PrepareBenchmarkSummaryReport(frozen,
+                {true, includeBasicHardware == JNI_TRUE, id, utc,
+                    static_cast<horde::telemetry::BenchmarkSummaryCooling>(declaredCooling)});
+            status = prepared.Status();
+            if (prepared.IsReady()) json = prepared.Json();
+        }
+        if (status != BenchmarkSummaryReportStatus::Ready) return reply(status);
         // Never publish a copied old result after a newer accepted run invalidates it.
         std::lock_guard<std::mutex> lock(gReportMutex);
         if (revision != gBenchmarkSummaryRevision || !gLatestBenchmarkSummary.IsReady() ||
             gLatestBenchmarkSummary.Data().runUuid != expected)
             return reply(BenchmarkSummaryReportStatus::InvalidSummary);
-        return reply(BenchmarkSummaryReportStatus::Ready, prepared.Json());
+        return reply(BenchmarkSummaryReportStatus::Ready, json);
     }
     catch (...) { return nullptr; }
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_prepareBenchmarkSummaryReport(
+    JNIEnv* env, jclass, jstring expectedRunUuid, jstring reportUuid, jstring capturedAtUtc,
+    jboolean consentToPrepare, jboolean includeBasicHardware, jint declaredCooling)
+{
+    return PrepareLocalBenchmarkReview(env, expectedRunUuid, reportUuid, capturedAtUtc,
+        consentToPrepare, includeBasicHardware, declaredCooling, false);
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_preparePublicBenchmarkPreview(
+    JNIEnv* env, jclass, jstring expectedRunUuid, jstring resultUuid, jstring capturedAtUtc,
+    jboolean consentToPrepare, jboolean includeBasicHardware, jint declaredCooling)
+{
+    return PrepareLocalBenchmarkReview(env, expectedRunUuid, resultUuid, capturedAtUtc,
+        consentToPrepare, includeBasicHardware, declaredCooling, true);
 }
 
 extern "C" JNIEXPORT void JNICALL

@@ -1,0 +1,52 @@
+{
+  "baseCommit": "fffd5ee6ffecba6a95ba0ba8363346ddae00ae9c",
+  "phoneUsed": false,
+  "reportsSent": 0,
+  "published": false,
+  "nativeAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "nativeBuild": "passed",
+  "lint": "passed",
+  "javaTests": [
+    {
+      "class": "BenchmarkSummaryReviewTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "class": "BenchmarkSummaryUiTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "class": "DeveloperReportFlowTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "visualAcceptance": "not established: optional offscreen Canvas export blank; no phone or game/CUA launch",
+  "privateEvidence": [
+    {
+      "path": "reports/public-preview-android-checks.log",
+      "sha256": "2d628bd59d9a54fa60600bd90c52a2b91d72a6f0361f044f638488789ea83f67"
+    },
+    {
+      "path": "reports/public-preview-android-final.log",
+      "sha256": "ecdb48884c197503974a9fb8b0cd903445f4d9c984473c271c8a4b19711fd9d3"
+    },
+    {
+      "path": "reports/public-preview-widget-checks.log",
+      "sha256": "efcbd21ebe2248109598b4835c9fda8065ebd99762e3ccae3deef885b48f9126"
+    }
+  ]
+}

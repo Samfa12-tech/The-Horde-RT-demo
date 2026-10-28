@@ -176,6 +176,9 @@ public final class ProbeBridge {
     // UUID.randomUUID() and Build.MODEL supplied by ordinary UI. Legacy run ID stays empty.
     public static native boolean requestBenchmarkWithSummaryId(String summaryRunUuid, String rawModel);
     public static native String getReadyBenchmarkSummaryRunId();
+    // Local typed public projection only: no submission/publication capability.
+    public static native byte[] preparePublicBenchmarkPreview(String expectedRunUuid, String resultUuid,
+            String capturedAtUtc, boolean consentToPrepare, boolean includeBasicHardware, int declaredCooling);
     // Local preparation only: first status byte then exact bounded UTF8 JSON on Ready(0).
     // Cooling: 0 unknown, 1 none declared, 2 external declared; hardware defaults off.
     public static native byte[] prepareBenchmarkSummaryReport(String expectedRunUuid, String reportUuid,

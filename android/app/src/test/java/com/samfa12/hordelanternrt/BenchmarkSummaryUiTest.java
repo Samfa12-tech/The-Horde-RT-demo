@@ -34,6 +34,7 @@ public final class BenchmarkSummaryUiTest {
     public static final class SummaryBridgeShadow {
         static String runId;
         static int calls, legacyCalls;
+        static int publicCalls;
         static boolean summaryRequestReady;
         static byte[] lastPrepared;
         @Implementation protected static void __staticInitializer__() { }
@@ -48,6 +49,12 @@ public final class BenchmarkSummaryUiTest {
         @Implementation protected static boolean requestBenchmarkWithSummaryId(String run,String model) {
             assertTrue(BenchmarkSummaryReview.validUuid(run)); return summaryRequestReady;
         }
+        @Implementation protected static byte[] preparePublicBenchmarkPreview(String run,String id,String utc,
+                boolean consent,boolean hardware,int cooling) {
+            ++publicCalls;
+            if(!run.equals(runId))return new byte[]{2};
+            return lastPrepared=BenchmarkSummaryReviewTest.publicPrepared(id,hardware);
+        }
         @Implementation protected static boolean requestBenchmark() { ++legacyCalls; return true; }
     }
 
@@ -61,6 +68,7 @@ public final class BenchmarkSummaryUiTest {
         set("menuScrim",scrim);
         SummaryBridgeShadow.runId=BenchmarkSummaryReviewTest.RUN;
         SummaryBridgeShadow.calls=0; SummaryBridgeShadow.legacyCalls=0;
+        SummaryBridgeShadow.publicCalls=0;
         SummaryBridgeShadow.summaryRequestReady=true; SummaryBridgeShadow.lastPrepared=null;
     }
     @After public void tearDown() throws Exception {
@@ -80,6 +88,53 @@ public final class BenchmarkSummaryUiTest {
     private void prepare() throws Exception {
         get("benchmarkSummaryConsent",CheckBox.class).setChecked(true);
         get("benchmarkSummaryPrepare",Button.class).performClick();
+    }
+
+    @Test public void publicPreviewUsesIndependentChoicesExactBytesAndStaleControlCancellation() throws Exception {
+        Method open=MainActivity.class.getDeclaredMethod("showBenchmarkSummaryReview",boolean.class);open.setAccessible(true);
+        for(int[] size:new int[][]{{1080,1800},{1800,1080}}) {
+            Configuration config=new Configuration(activity.getResources().getConfiguration());config.fontScale=2f;
+            activity.getResources().updateConfiguration(config,activity.getResources().getDisplayMetrics());
+            open.invoke(activity,true);
+            assertFalse(get("benchmarkSummaryConsent",CheckBox.class).isChecked());
+            assertFalse(get("benchmarkSummaryHardware",CheckBox.class).isChecked());
+            assertFalse(get("benchmarkSummaryPrepare",Button.class).isEnabled());
+            scrim.measure(View.MeasureSpec.makeMeasureSpec(size[0],View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(size[1],View.MeasureSpec.EXACTLY));scrim.layout(0,0,size[0],size[1]);
+            assertTrue(get("benchmarkSummaryConsent",CheckBox.class).getMeasuredHeight()>=
+                    Math.round(48*activity.getResources().getDisplayMetrics().density));
+            prepare();
+            BenchmarkSummaryReview owner=get("benchmarkSummaryReview",BenchmarkSummaryReview.class);
+            assertTrue(owner.isPublicPreview());assertTrue(owner.isPrepared());
+            assertEquals(owner.json(),get("benchmarkSummaryJson",TextView.class).getText().toString());
+            assertFalse(owner.json().contains(BenchmarkSummaryReviewTest.RUN));assertFalse(hasSendButton(scrim));
+            get("benchmarkSummaryCopy",Button.class).performClick();
+            assertEquals(owner.json(),((ClipboardManager)activity.getSystemService(Context.CLIPBOARD_SERVICE))
+                    .getPrimaryClip().getItemAt(0).getText().toString());
+            String oldId=owner.reportId();Button oldCopy=get("benchmarkSummaryCopy",Button.class);
+            get("benchmarkSummaryEdit",Button.class).performClick();assertNull(owner.json());oldCopy.performClick();
+            BenchmarkSummaryReview replacement=get("benchmarkSummaryReview",BenchmarkSummaryReview.class);
+            assertTrue(replacement.isPublicPreview());assertFalse(replacement.isPrepared());
+            assertFalse(get("benchmarkSummaryConsent",CheckBox.class).isChecked());
+            prepare();assertNotEquals(oldId,replacement.reportId());
+            call("showBenchmarkSummaryReview"); // Private audience never inherits public consent/bytes.
+            assertFalse(get("benchmarkSummaryReview",BenchmarkSummaryReview.class).isPublicPreview());
+            assertFalse(get("benchmarkSummaryConsent",CheckBox.class).isChecked());
+        }
+        assertEquals(0,SummaryBridgeShadow.calls);assertEquals(4,SummaryBridgeShadow.publicCalls);
+        assertNull(get("playtestSubmission",PlaytestReportSubmission.class));
+    }
+
+    @Test public void replacementRunCannotPrepareTheOldPublicForm() throws Exception {
+        Method open=MainActivity.class.getDeclaredMethod("showBenchmarkSummaryReview",boolean.class);open.setAccessible(true);
+        open.invoke(activity,true);
+        SummaryBridgeShadow.runId=BenchmarkSummaryReviewTest.REPORT;
+        prepare();
+        assertFalse(get("benchmarkSummaryReview",BenchmarkSummaryReview.class).isPrepared());
+        assertEquals(View.GONE,get("benchmarkSummaryCopy",Button.class).getVisibility());
+        assertEquals(activity.getString(R.string.benchmark_summary_unavailable),
+                get("benchmarkSummaryStatus",TextView.class).getText().toString());
+        assertEquals(1,SummaryBridgeShadow.publicCalls);assertEquals(0,SummaryBridgeShadow.calls);
     }
 
     @Test public void nativeFormStartsWithoutConsentAndRemainsAccessibleAtLargeFonts() throws Exception {

@@ -213,6 +213,9 @@
     <string name="graphics_restored">Confirmed graphics settings restored after an interrupted change.</string>
     <string name="graphics_save_failed">Graphics could not be saved. Restoring the previous confirmed settings.</string>
     <string name="benchmark_summary_review">Review benchmark statistics</string>
+    <string name="benchmark_public_preview">Preview public statistics</string>
+    <string name="benchmark_public_scope">See the aggregate statistics that could be shared publicly. This local preview omits private report and run IDs, full timestamps and raw frame rows. Phone model, GPU and Vulkan version are optional. Results remain unverified and unranked; temperature and display scanout FPS were not measured. Nothing is uploaded or published. Public submission is unavailable in this build.</string>
+    <string name="benchmark_public_consent">Prepare a local public preview (does not publish)</string>
     <string name="benchmark_summary_local_only">Local review and export only</string>
     <string name="benchmark_summary_scope">Review a completed run before sharing. This report contains settings and owning frame, CPU and GPU timings. GPU duration is not FPS, and display scanout FPS was not measured. Temperature was not collected and thermal status is unknown. Statistics sending is unavailable in this build; nothing is sent automatically.</string>
     <string name="benchmark_summary_consent">Prepare a local statistics report for review</string>

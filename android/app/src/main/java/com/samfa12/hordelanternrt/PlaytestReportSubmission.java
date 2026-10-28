@@ -138,7 +138,8 @@ final class PlaytestReportSubmission {
      * that owns review must call this method before closing/editing its owner.
      */
     synchronized boolean beginBenchmarkSummary(BenchmarkSummaryReview review, boolean explicitRemoteConsent) {
-        if (!explicitRemoteConsent || state != State.DRAFT || review == null || !review.isPrepared()) return false;
+        if (!explicitRemoteConsent || state != State.DRAFT || review == null ||
+                review.isPublicPreview() || !review.isPrepared()) return false;
         final String id = review.reportId();
         final byte[] local = review.exactJsonBytes();
         if (!BenchmarkSummaryReview.validUuid(id) || local == null || local.length < 2 ||
@@ -159,7 +160,7 @@ final class PlaytestReportSubmission {
     boolean beginBenchmarkSummary(BenchmarkSummaryReview review) { return beginBenchmarkSummary(review, false); }
 
     synchronized boolean beginPrivateBenchmarkSummary(BenchmarkSummaryReview review, boolean privateSendConsent) {
-        return review != null && review.isPrepared() && beginPrivateDeveloperReport(
+        return review != null && !review.isPublicPreview() && review.isPrepared() && beginPrivateDeveloperReport(
                 review.reportId(), review.exactJsonBytes(), "benchmark-summary", privateSendConsent);
     }
 

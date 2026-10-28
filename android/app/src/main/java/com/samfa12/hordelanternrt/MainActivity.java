@@ -2770,6 +2770,7 @@ public class MainActivity extends Activity {
                 completed ? getString(R.string.benchmark_complete) : getString(R.string.benchmark_invalid));
         if (completed && BenchmarkSummaryReview.validUuid(readyBenchmarkSummaryRunId())) {
             addMenuButton(panel, getString(R.string.benchmark_summary_review), this::showBenchmarkSummaryReview);
+            addMenuButton(panel, getString(R.string.benchmark_public_preview), () -> showBenchmarkSummaryReview(true));
         }
         final TextView report = new TextView(this);
         report.setText(latestBenchmarkReport);
@@ -2792,13 +2793,17 @@ public class MainActivity extends Activity {
     }
 
     private void showBenchmarkSummaryReview() {
+        showBenchmarkSummaryReview(false);
+    }
+
+    private void showBenchmarkSummaryReview(boolean publicPreview) {
         final String runId = readyBenchmarkSummaryRunId();
         if (!BenchmarkSummaryReview.validUuid(runId)) {
             Toast.makeText(this, R.string.benchmark_summary_unavailable, Toast.LENGTH_LONG).show();
             return;
         }
         closeBenchmarkSummaryReview();
-        benchmarkSummaryReview = new BenchmarkSummaryReview(runId);
+        benchmarkSummaryReview = new BenchmarkSummaryReview(runId, publicPreview);
         benchmarkSummaryVisible = true;
         renderBenchmarkSummaryForm();
     }
@@ -2807,11 +2812,12 @@ public class MainActivity extends Activity {
         final BenchmarkSummaryReview owner = benchmarkSummaryReview;
         final long generation = benchmarkSummaryFormGeneration;
         menuScrim.removeAllViews();
-        final LinearLayout panel = createPanel(getString(R.string.benchmark_summary_review),
+        final LinearLayout panel = createPanel(getString(owner.isPublicPreview()
+                        ? R.string.benchmark_public_preview : R.string.benchmark_summary_review),
                 getString(R.string.benchmark_summary_local_only));
-        addBody(panel, getString(R.string.benchmark_summary_scope));
+        addBody(panel, getString(owner.isPublicPreview() ? R.string.benchmark_public_scope : R.string.benchmark_summary_scope));
         benchmarkSummaryConsent = new CheckBox(this);
-        benchmarkSummaryConsent.setText(R.string.benchmark_summary_consent);
+        benchmarkSummaryConsent.setText(owner.isPublicPreview() ? R.string.benchmark_public_consent : R.string.benchmark_summary_consent);
         stylePlaytestConsent(benchmarkSummaryConsent);
         benchmarkSummaryConsent.setMinHeight(dp(48));
         panel.addView(benchmarkSummaryConsent, matchWrap());
@@ -2874,8 +2880,10 @@ public class MainActivity extends Activity {
         if (!benchmarkSummaryVisible || owner == null || owner.isPrepared() || !benchmarkSummaryConsent.isChecked()) return;
         final SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ROOT);
         utc.setTimeZone(TimeZone.getTimeZone("UTC"));
+        final BenchmarkSummaryReview.Preparer preparer = owner.isPublicPreview()
+                ? ProbeBridge::preparePublicBenchmarkPreview : ProbeBridge::prepareBenchmarkSummaryReport;
         if (!owner.prepare(true, benchmarkSummaryHardware.isChecked(), benchmarkSummaryCooling.getSelectedItemPosition(),
-                UUID.randomUUID().toString(), utc.format(new Date()), ProbeBridge::prepareBenchmarkSummaryReport)) {
+                UUID.randomUUID().toString(), utc.format(new Date()), preparer)) {
             benchmarkSummaryStatus.setText(R.string.benchmark_summary_unavailable);
             return;
         }
@@ -2904,8 +2912,9 @@ public class MainActivity extends Activity {
         if (export != null && (export.state() == PlaytestReportExport.State.CHOOSING ||
                 export.state() == PlaytestReportExport.State.WRITING)) return;
         final String runId = benchmarkSummaryReview.runId();
+        final boolean publicPreview = benchmarkSummaryReview.isPublicPreview();
         closeBenchmarkSummaryReview();
-        benchmarkSummaryReview = new BenchmarkSummaryReview(runId);
+        benchmarkSummaryReview = new BenchmarkSummaryReview(runId, publicPreview);
         benchmarkSummaryVisible = true;
         renderBenchmarkSummaryForm(); // New preparation needs new UUID and fresh unchecked consent.
     }
@@ -2928,7 +2937,8 @@ public class MainActivity extends Activity {
         final Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("application/json");
-        intent.putExtra(Intent.EXTRA_TITLE, "HordeLanternRT-benchmark-statistics.json");
+        intent.putExtra(Intent.EXTRA_TITLE, benchmarkSummaryReview.isPublicPreview()
+                ? "HordeLanternRT-public-preview.json" : "HordeLanternRT-benchmark-statistics.json");
         try { startActivityForResult(intent, REQUEST_SAVE_BENCHMARK_SUMMARY); }
         catch (RuntimeException unavailable) {
             benchmarkSummaryPickerReview = null;
