@@ -113,4 +113,50 @@ public final class StatisticsReportSendControlsTest {
         assertEquals(activity.getString(R.string.statistics_mock_private_queued),controls.status.getText().toString());
         controls.close();activity.finish();
     }
+    @Test public void pendingAndPublishedReceiptsSurvivePauseAndLateUiCallback(){
+        Activity activity=Robolectric.buildActivity(Activity.class).setup().get();
+        PublicBenchmarkReportFlowTest.Worker worker=new PublicBenchmarkReportFlowTest.Worker();
+        PublicBenchmarkReportFlowTest.PublicRelay relay=new PublicBenchmarkReportFlowTest.PublicRelay();Verification verifier=new Verification();
+        StatisticsReportSendControls controls=StatisticsReportSendControls.benchmark(activity,panel(activity),worker::execute,
+            PublicBenchmarkReportFlowTest.review(),StatisticsReportSendControls.Services.localValidation(relay,verifier));
+        controls.consent.setChecked(true);controls.review.performClick();controls.send.performClick();verifier.complete();idle();worker.drain();idle();
+        controls.interrupt();controls.resume();idle();
+        assertEquals(PlaytestReportSubmission.State.QUEUED,controls.submission.state());
+        assertEquals(activity.getString(R.string.statistics_mock_pending),controls.status.getText().toString());
+        assertTrue(controls.send.isEnabled());assertEquals(1,relay.publicOpens);
+        relay.next=PublicBenchmarkReportFlowTest.ack(200,"published","public-board","public-benchmark-result",PublicBenchmarkReportFlowTest.ID);
+        controls.send.performClick();verifier.complete();idle();worker.drain(); // Receipt committed; main-loop notification has not run.
+        assertEquals(PlaytestReportSubmission.State.PUBLISHED,controls.submission.state());
+        controls.interrupt();controls.resume();idle();
+        assertEquals(activity.getString(R.string.statistics_mock_published),controls.status.getText().toString());
+        assertFalse(controls.send.isEnabled());assertEquals(2,relay.publicOpens);
+        controls.close();activity.finish();
+    }
+    @Test public void privateReceiptAndUncertaintySurvivePauseBeforeUiDelivery(){
+        int[] codes={202,200,409,422,503};
+        PlaytestReportSubmission.State[] states={PlaytestReportSubmission.State.QUEUED,PlaytestReportSubmission.State.SENT,
+            PlaytestReportSubmission.State.CONFLICT,PlaytestReportSubmission.State.REJECTED,PlaytestReportSubmission.State.RETRYABLE};
+        int[] messages={R.string.statistics_mock_private_queued,R.string.statistics_mock_sent,R.string.statistics_mock_rejected,
+            R.string.statistics_mock_rejected,R.string.statistics_mock_uncertain};
+        for(int i=0;i<codes.length;i++){
+            Activity activity=Robolectric.buildActivity(Activity.class).setup().get();final int code=codes[i];
+            PublicBenchmarkReportFlowTest.Worker worker=new PublicBenchmarkReportFlowTest.Worker();Verification verifier=new Verification();
+            PlaytestReportSubmission.Transport relay=new PlaytestReportSubmission.Transport(){
+                public boolean admitsPrivateDeveloperReports(){return true;}
+                public PlaytestReportSubmission.Call open(byte[] body){return new PlaytestReportSubmission.Call(){
+                    public PlaytestReportSubmission.Response execute(){return PublicBenchmarkReportFlowTest.ack(code,code==200?"sent":"accepted",
+                        "developer-private","compatibility",DeveloperReportFlowTest.ID);}
+                    public void cancel(){java.util.Arrays.fill(body,(byte)0);}
+                };}
+            };
+            StatisticsReportSendControls controls=StatisticsReportSendControls.compatibility(activity,panel(activity),worker::execute,
+                DeveloperReportFlowTest.review("Example model"),StatisticsReportSendControls.Services.localValidation(relay,verifier));
+            controls.consent.setChecked(true);controls.review.performClick();controls.send.performClick();verifier.complete();idle();worker.drain();
+            assertEquals(states[i],controls.submission.state());
+            controls.interrupt();controls.resume();idle();
+            assertEquals(activity.getString(messages[i]),controls.status.getText().toString());
+            assertEquals(code==503,controls.send.isEnabled());assertEquals(1,verifier.requests);
+            controls.close();activity.finish();
+        }
+    }
 }

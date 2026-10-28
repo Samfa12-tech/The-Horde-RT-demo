@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "sourceBase": "b17a8fb4db4d39463ea16e85f243b5751c077d70",
+  "source": "corrections in same checkpoint as this receipt; exact edited input bytes below",
+  "originalCi": {
+    "conclusion": "failure",
+    "headSha": "b17a8fb4db4d39463ea16e85f243b5751c077d70",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "databaseId": 122821303316,
+        "name": "Selected host contracts (Clang ASan/UBSan)",
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "databaseId": 122821303407,
+        "name": "Android Debug build, playback/report contracts and lint",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 122821303535,
+        "name": "Shared simulation host (GCC)",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 122821303543,
+        "name": "Shared simulation host (Clang)",
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "databaseId": 122821303650,
+        "name": "Shared simulation host (MSVC)",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 122821303804,
+        "name": "player-vulkan-host",
+        "status": "completed"
+      }
+    ],
+    "status": "completed"
+  },
+  "confirmedFindings": [
+    "Android source test still asserted no Send-labelled control exists",
+    "Android pause overwrote already verified receipt status, including completion-before-main-loop delivery",
+    "Windows local preview conversion had unnecessarily broadened its bound; source contract still prohibited new result enum text"
+  ],
+  "independentReview": "read-only review confirmed lifecycle and Windows bound corrections; no other actionable defect found in bounded scope",
+  "windows": {
+    "checks": 3,
+    "passed": 3,
+    "seconds": 3.41,
+    "applicationBuild": "passed; not launched",
+    "beforeLogSha256": "af5a92655b346b637eb1e6855907a11d06fe849b1fd8d4fcf42ee7ff16c65b13",
+    "afterLogSha256": "f0c8f20b16689db684e22d60633c8f6e5fa857f784e2a30abfb573c0fc8ca5e9",
+    "actualClipboardPickerPhysicalInput": "not exercised"
+  },
+  "android": {
+    "registered": 529,
+    "passed": 523,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6,
+    "skipClass": "unchanged EnvironmentSurveyExportTest host-link capability assumptions",
+    "lintErrors": 0,
+    "lintWarnings": 92,
+    "build": "testDebugUnitTest lintDebug assembleDebug; passed; 4m14s",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "apk": {
+      "applicationId": "com.samfa12.hordelanternrt.debug",
+      "versionCode": 10,
+      "versionName": "1.6.2-debug",
+      "apkBytes": 195679135,
+      "apkSha256": "22f8689eee0a45d26caa7f87577ab00baaa29bc9924855f9e3b8b1b1fd53232c",
+      "abis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86",
+        "x86_64"
+      ],
+      "installed": false,
+      "classification": "precommit working-tree build; not a device acceptance candidate"
+    },
+    "beforeUiXmlSha256": "ede69b362b4276876246ff458c1e71618cde8362eccf648edea0560282bc1b8b",
+    "beforeLifecycleXmlSha256": "043a994215b65a62e7af71fd0ad6a6f06d97d5ad4c0fa8265187220c33da2bbc",
+    "afterLogSha256": "923b8e5c47e622282ef6802486cfca1ca3d5fdc4a2121a7b7ab3a1f78119b262"
+  },
+  "mergeAssessment": {
+    "main": "e1b142c167d57530504af51b43fd89568da61bb9",
+    "base": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "mainPaths": 32,
+    "prPaths": 6952,
+    "overlap": [
+      ".gitattributes",
+      "PROJECT_DECISIONS.md",
+      "docs/ROADMAP.md"
+    ],
+    "overlapBlobsUnchangedSinceDiagnosis": true,
+    "conflictsResolved": false,
+    "bodyUpdated": false,
+    "merged": false
+  },
+  "ownerFiles": {
+    "checked": 151,
+    "changed": 0
+  },
+  "phoneUsed": false,
+  "liveSendEnabled": false,
+  "liveReportsSent": 0,
+  "inputs": [
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/StatisticsReportSendControls.java",
+      "sha256": "5f3f3d411b716e60aeb1d6208d816897159e2ed5f6358d85683372d2cbce3dd5"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/BenchmarkSummaryUiTest.java",
+      "sha256": "f28046defd7eba59490d4d7632be770d5db26326d3ebf361821706eb3f6bcd1f"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/StatisticsReportSendControlsTest.java",
+      "sha256": "343e0ea6c8013557e9ee1b72ecda4ea5e1e089f856fcb110808e8724ebd9221b"
+    },
+    {
+      "path": "src/platform/windows/WindowsBenchmarkSummaryReviewUi.inl",
+      "sha256": "259d39348dd0b26cb66bdd1ffc206f287be8e4effb0a28ab6a161632c09d6898"
+    },
+    {
+      "path": "tests/WindowsBenchmarkSummaryInteractionTests.cpp",
+      "sha256": "e3e5018c6e5b9bc3f20c06421c707c3dcddfd48269123d595a6cf311cc6461cc"
+    },
+    {
+      "path": "tests/WindowsBenchmarkSummaryReviewContracts.ps1",
+      "sha256": "37a9069cd7806c179bcad849c83ca8b167722fc6d156333cc3e1a67a097d064b"
+    }
+  ]
+}

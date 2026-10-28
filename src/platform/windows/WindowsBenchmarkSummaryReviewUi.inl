@@ -43,9 +43,11 @@ HWND SummaryReviewControl(HWND window, const int id)
     return GetDlgItem(GetDlgItem(window, kSummaryBodyPanel), id);
 }
 
-bool WindowsSummaryUtf8Preview(const std::string_view json, std::wstring& wide)
+bool WindowsSummaryUtf8Preview(const std::string_view json, std::wstring& wide, const bool submission = false)
 {
-    if (json.empty() || json.size() > horde::reporting::kDeveloperReportSubmissionMaxBytes) return false;
+    const auto maximum = submission ? horde::reporting::kDeveloperReportSubmissionMaxBytes :
+        horde::reporting::kBenchmarkSummaryReportMaxBytes;
+    if (json.empty() || json.size() > maximum) return false;
     const int bytes = static_cast<int>(json.size());
     const int count = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, json.data(), bytes, nullptr, 0);
     if (count <= 0) return false;
@@ -350,7 +352,7 @@ LRESULT CALLBACK WindowsSummaryReviewWindowProc(HWND window, UINT message, WPARA
                 state->submission.Clear();
                 const bool consent = SendMessageW(SummaryReviewControl(window, kSummarySendConsent), BM_GETCHECK, 0, 0) == BST_CHECKED;
                 std::wstring remote;
-                if (consent && state->prepared.PrepareSend(state->submission, true)) (void)WindowsSummaryUtf8Preview(state->submission.Json(), remote);
+                if (consent && state->prepared.PrepareSend(state->submission, true)) (void)WindowsSummaryUtf8Preview(state->submission.Json(), remote, true);
                 SetWindowTextW(SummaryReviewControl(window, kSummarySendPreview), remote.c_str());
                 RefreshWindowsSummarySend(window, *state); return 0;
             }

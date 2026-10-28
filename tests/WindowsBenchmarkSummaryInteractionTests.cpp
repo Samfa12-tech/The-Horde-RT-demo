@@ -160,6 +160,13 @@ void Prepare(HWND form)
 void TestStatisticsReceipts(const horde::telemetry::FrozenBenchmarkSummary& frozen)
 {
     using namespace horde::platform::windows;
+    std::wstring preview;
+    const std::string largerThanLocal(kBenchmarkSummaryReportMaxBytes+1u,'x');
+    Check(!WindowsSummaryUtf8Preview(largerThanLocal,preview)&&WindowsSummaryUtf8Preview(largerThanLocal,preview,true),
+        "local preview retains 16KiB bound; only an explicit Send preview may use 20KiB");
+    Check(!WindowsSummaryUtf8Preview(std::string(kDeveloperReportSubmissionMaxBytes+1u,'x'),preview,true)&&
+        !WindowsSummaryUtf8Preview(std::string("\xc3\x28",2),preview)&&!WindowsSummaryUtf8Preview(std::string("\xc3\x28",2),preview,true),
+        "both previews reject oversize or invalid UTF-8 without replacement");
     constexpr std::string_view id="33333333-3333-4333-a333-333333333333";
     const auto local=PreparePublicBenchmarkReport(frozen,{true,false,id,"2026-10-28T00:00:00Z"});
     Check(local.IsReady(),"public flow fixture needs a typed measured projection");
@@ -262,7 +269,7 @@ int RunWindowsBenchmarkSummaryInteractionTests(const char* directory)
     RefreshWindowsSummarySend(form,state);
     Click(form,kSummarySend);Check(requests.empty(),"Send command without separate remote consent reached transport");
     Send(SummaryReviewControl(form,kSummarySendConsent),BM_SETCHECK,BST_CHECKED);Click(form,kSummarySendConsent);
-    std::wstring sendPreview;Check(WindowsSummaryUtf8Preview(state.submission.Json(),sendPreview),"remote preview conversion");
+    std::wstring sendPreview;Check(WindowsSummaryUtf8Preview(state.submission.Json(),sendPreview,true),"remote preview conversion");
     Check(Text(SummaryReviewControl(form,kSummarySendPreview))==sendPreview&&state.submission.Json().find("consentToPublish")!=std::string_view::npos&&
         Text(SummaryReviewControl(form,kSummaryPreview))==state.preview,"remote preview must match approved wrapper without changing local export");
     Click(form,kSummarySend);Check(PumpStatistics(form,state.submission)&&publicRequests==1&&state.submission.CanSend()&&

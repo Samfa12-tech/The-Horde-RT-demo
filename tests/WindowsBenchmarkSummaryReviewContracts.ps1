@@ -121,7 +121,14 @@ Check ($audience.Contains('state.prepared.SelectPublic(publicPreview)') -and $au
 Check ($prepare.Contains('state.prepared.IsPublicPreview()') -and $prepare.Contains('PreparePublicBenchmarkReport(state.frozen,') -and
     $review.Contains('WindowsBenchmarkReviewPayload prepared;') -and
     $audience.Contains('does not publish') -and $audience.Contains('unverified and unranked')) 'Public review uses the typed sanitized builder and discloses local-only, unverified status.'
-foreach ($forbidden in @('WinHttp', 'SendPlaytest', 'ShowWindowsRemote', 'WindowsPlaytestSubmission', 'ShellExecute',
+Check ($utf8.Contains('const bool submission = false') -and $utf8.Contains('kDeveloperReportSubmissionMaxBytes') -and
+    $windowProc.Contains('WindowsSummaryUtf8Preview(state->submission.Json(), remote, true)')) 'Only the explicitly separate Send preview opts into the 20KiB bound; ordinary local previews retain 16KiB.'
+Check ($review.Contains('WindowsStatisticsSubmission submission;') -and
+    $windowProc.Contains('state->submission.Available(state->prepared.IsPublicPreview())') -and
+    $windowProc.Contains('state->prepared.PrepareSend(state->submission, true)') -and
+    $audience.Contains('state.submission.Clear()') -and
+    -not $review.Contains('services.privateExchange =') -and -not $review.Contains('services.publicExchange =')) 'Send uses the typed gated owner, separate consent and audience reset without installing live transport.'
+foreach ($forbidden in @('WinHttp', 'SendPlaytest', 'ShowWindowsRemote', 'WindowsPlaytestSubmission(', 'ExchangeWindowsPlaytestReport(', 'ShellExecute',
     'HttpClient', 'SettingsPath(', 'WriteReportFile(', 'benchmarkJsonReport', 'simulation.')) {
     Check (-not $review.Contains($forbidden)) "Local review has no unrelated transport, settings, mutable report-file or gameplay boundary: $forbidden"
 }

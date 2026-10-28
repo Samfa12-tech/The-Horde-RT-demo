@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
@@ -107,7 +106,7 @@ public final class BenchmarkSummaryUiTest {
             BenchmarkSummaryReview owner=get("benchmarkSummaryReview",BenchmarkSummaryReview.class);
             assertTrue(owner.isPublicPreview());assertTrue(owner.isPrepared());
             assertEquals(owner.json(),get("benchmarkSummaryJson",TextView.class).getText().toString());
-            assertFalse(owner.json().contains(BenchmarkSummaryReviewTest.RUN));assertFalse(hasSendButton(scrim));
+            assertFalse(owner.json().contains(BenchmarkSummaryReviewTest.RUN));assertLiveStatisticsSendUnavailable();
             get("benchmarkSummaryCopy",Button.class).performClick();
             assertEquals(owner.json(),((ClipboardManager)activity.getSystemService(Context.CLIPBOARD_SERVICE))
                     .getPrimaryClip().getItemAt(0).getText().toString());
@@ -157,7 +156,10 @@ public final class BenchmarkSummaryUiTest {
             assertTrue(get("benchmarkSummaryPrepare",Button.class).getMeasuredHeight()>=minimum);
             assertEquals(0,SummaryBridgeShadow.calls);
             assertNull(get("playtestSubmission",PlaytestReportSubmission.class));
-            assertFalse(hasSendButton(scrim));
+            StatisticsReportSendControls remote=assertLiveStatisticsSendUnavailable();
+            assertTrue(remote.consent.getMeasuredHeight()>=minimum);
+            assertTrue(remote.review.getMeasuredHeight()>=minimum);
+            assertTrue(remote.send.getMeasuredHeight()>=minimum);
         }
     }
 
@@ -238,12 +240,17 @@ public final class BenchmarkSummaryUiTest {
         assertEquals(1,SummaryBridgeShadow.legacyCalls);
     }
 
-    private static boolean hasSendButton(View view) {
-        if(view instanceof Button && ((Button)view).getText().toString().toLowerCase(java.util.Locale.ROOT).contains("send")) return true;
-        if(view instanceof ViewGroup) {
-            ViewGroup group=(ViewGroup)view;
-            for(int i=0;i<group.getChildCount();++i) if(hasSendButton(group.getChildAt(i))) return true;
-        }
-        return false;
+    private StatisticsReportSendControls assertLiveStatisticsSendUnavailable() throws Exception {
+        StatisticsReportSendControls remote=get("benchmarkSummarySendControls",StatisticsReportSendControls.class);
+        assertNotNull(remote);
+        assertFalse(remote.consent.isChecked());
+        assertFalse(remote.review.isEnabled());
+        assertFalse(remote.send.isEnabled());
+        assertFalse(remote.submission.statisticsSendAvailable());
+        assertEquals(PlaytestReportSubmission.State.DRAFT,remote.submission.state());
+        remote.send.performClick(); // Even a direct stale click cannot start verification or submission.
+        assertEquals(PlaytestReportSubmission.State.DRAFT,remote.submission.state());
+        assertNull(remote.submission.statisticsJsonForReview());
+        return remote;
     }
 }

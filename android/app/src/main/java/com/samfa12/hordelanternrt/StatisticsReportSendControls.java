@@ -94,6 +94,19 @@ final class StatisticsReportSendControls {
                 publicResult ? R.string.statistics_publish_send : R.string.statistics_private_send);
         send.setEnabled(foreground && !verifying && services.verification != null && submission.statisticsSendAvailable() &&
                 (state == PlaytestReportSubmission.State.READY || retry || pendingPublic));
+        if (services.synthetic && !verifying) renderReceiptState(state);
+    }
+    private void renderReceiptState(PlaytestReportSubmission.State state) {
+        // Receipt ownership can complete before its main-loop notification.
+        // Lifecycle cancellation revokes callbacks, not an already verified receipt.
+        switch (state) {
+            case QUEUED: status.setText(publicResult ? R.string.statistics_mock_pending : R.string.statistics_mock_private_queued); break;
+            case SENT: status.setText(R.string.statistics_mock_sent); break;
+            case PUBLISHED: status.setText(R.string.statistics_mock_published); break;
+            case REJECTED: case CONFLICT: status.setText(R.string.statistics_mock_rejected); break;
+            case RETRYABLE: status.setText(R.string.statistics_mock_uncertain); break;
+            default: break;
+        }
     }
     private void prepareSubmission() {
         if (closed || !foreground || !prepared.getAsBoolean() || !consent.isChecked() ||
@@ -117,13 +130,6 @@ final class StatisticsReportSendControls {
                 if (token == null || token.isEmpty()) { status.setText(R.string.statistics_mock_verification_cancelled); refresh(); return; }
                 final boolean started = submission.submit(attempt, token, (completed, result) -> ui.post(() -> {
                     if (closed || generation != current || submission.attempt() != completed) return;
-                    switch (result.code) {
-                        case QUEUED: status.setText(publicResult ? R.string.statistics_mock_pending : R.string.statistics_mock_private_queued); break;
-                        case SENT: status.setText(R.string.statistics_mock_sent); break;
-                        case PUBLISHED: status.setText(R.string.statistics_mock_published); break;
-                        case REJECTED: case CONTENT_CONFLICT: status.setText(R.string.statistics_mock_rejected); break;
-                        default: status.setText(R.string.statistics_mock_uncertain); break;
-                    }
                     refresh();
                 }));
                 if (!started) status.setText(R.string.statistics_send_unavailable);
@@ -133,10 +139,11 @@ final class StatisticsReportSendControls {
     }
     void interrupt() {
         if (closed) return;
+        final boolean revokedVerification = verifying;
         foreground = false; ++generation; verifying = false;
-        submission.interruptInFlight();
+        final boolean revokedAttempt = submission.interruptInFlight();
         cancelVerification();
-        if (services.synthetic) status.setText(R.string.statistics_mock_interrupted);
+        if (services.synthetic && (revokedVerification || revokedAttempt)) status.setText(R.string.statistics_mock_interrupted);
         refresh();
     }
     void resume() { if (!closed) { foreground = true; refresh(); } }

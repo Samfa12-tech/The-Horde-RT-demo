@@ -1,5 +1,10 @@
 # Native statistics Send: local contract checkpoint
 
+This is the original `b17a8fb4` checkpoint receipt. The subsequent
+[independent review and CI follow-up](review-followup.md) records its Android
+form-test correction and receipt-status lifecycle fix; the original hashes and
+results below remain evidence for their original source.
+
 This checkpoint continues Horde source `9d84eaac9d1b123ec8a6f2d4d16fd63f9a11af53`.
 Its source and tests are in the same commit as this receipt. The staged receiver
 is private relay source `1904c89f33941af8106d523b39bda502ad87de98`.
