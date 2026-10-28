@@ -1,5 +1,17 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-28 - isolated actor-worker route; no causal performance gain
+
+SM-S948B / Android17 API37, exact source958f5182 and isolated Debug APK
+`9466ba1a06437bfaa119cf19c457aa017fab2848e0dc910cb8ed8d95a9fa3296`.
+Real Pipeline RT presentation at720x1486/1440x2971; generated serial/worker routes
+complete with590/589 owning rows, zero pending submissions and actual CPU-mode
+witnesses. Thermal starts/process setup differ, no closing control or clock trace:
+no measured causal gain, normal worker admission or natural journey acceptance.
+Released08:36:55UTC with original APKs unchanged, no owned process/monitor/transfer.
+Original auto-brightness mode restored; readback73 versus initial94 is explicitly
+recorded. [Bounded evidence and limits](evidence/2026-10-28-actor-worker-phone/README.md).
+
 ## 2026-10-23 - touch HUD physical checks; rotation continuity unresolved
 
 Local ADB-injected input/screenshot inspection on Galaxy S26 Ultra **SM-S948B**,

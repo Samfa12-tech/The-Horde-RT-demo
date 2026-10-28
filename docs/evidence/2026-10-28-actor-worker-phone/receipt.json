@@ -1,0 +1,219 @@
+{
+  "sourceCommit": "958f5182c7b892f83af6b24be8468669e449d1f6",
+  "apkSha256": "9466ba1a06437bfaa119cf19c457aa017fab2848e0dc910cb8ed8d95a9fa3296",
+  "package": "com.samfa12.hordelanternrt.debug.actorworker",
+  "deviceModel": "SM-S948B",
+  "android": 17,
+  "api": 37,
+  "evidenceClass": "physical private Debug RT presentation and generated-input route;thermally unmatched exploratory timing",
+  "releaseUtc": "2026-10-28T08:36:55.1571033Z",
+  "serial": {
+    "run": "aw28-a2",
+    "rows": 590,
+    "landingRows": 110,
+    "activeKitRows": 109,
+    "phaseCounts": {
+      "landing-sweep": 110,
+      "return": 1,
+      "descent": 111,
+      "lower-sweep": 69,
+      "tomb-backtrack": 46,
+      "passage-sweep": 61,
+      "rope-return": 45,
+      "repeat-ascent": 146,
+      "complete": 1
+    },
+    "settings": {
+      "backend": "RayTracingPipeline",
+      "scale": 50,
+      "water": 1,
+      "fire": 0,
+      "cap": 30,
+      "glass": false,
+      "shadow": 1,
+      "mist": false,
+      "dust": 1,
+      "compiledQuality": "Mobile"
+    },
+    "pipelines": [
+      {
+        "executionMode": 0,
+        "activeKey": "shipping_mobile_opaque_fast",
+        "activeSha256": "34083b41ae9238827d547ae0c5a0d72acac096ba23e3bd42f19276b9b950a204",
+        "opaqueSha256": "34083b41ae9238827d547ae0c5a0d72acac096ba23e3bd42f19276b9b950a204",
+        "genericSha256": "58295240796fdf06e17143f33c4e665f05f86b378394fb13fc9f8a54249c2f25"
+      }
+    ],
+    "gpuMs": {
+      "n": 109,
+      "median": 198.328068,
+      "p95": 202.889474
+    },
+    "cpuMs": {
+      "skin_cpu_ns": {
+        "n": 109,
+        "median": 9.90927,
+        "p95": 11.373542
+      },
+      "player_skin_cpu_ns": {
+        "n": 109,
+        "median": 5.181198,
+        "p95": 6.714688
+      },
+      "character_skin_cpu_ns": {
+        "n": 109,
+        "median": 4.61323,
+        "p95": 5.065364
+      },
+      "whole_frame_cpu_ns": {
+        "n": 109,
+        "median": 213.035364,
+        "p95": 221.305417
+      },
+      "fence_wait_cpu_ns": {
+        "n": 109,
+        "median": 198.499532,
+        "p95": 203.445521
+      },
+      "dynamic_upload_cpu_ns": {
+        "n": 109,
+        "median": 0.419217,
+        "p95": 0.529791
+      }
+    },
+    "thermalStart": {
+      "AP": 43.1,
+      "BAT": 33.8,
+      "SKIN": 37.4
+    },
+    "thermalEnd": {
+      "AP": 40.0,
+      "BAT": 34.4,
+      "SKIN": 37.2
+    },
+    "pending": 0,
+    "status": "complete field observation;not causal gain",
+    "rawHashes": {
+      "ledger.json": "7b95dbee60ce12206099d9a7b89ac171715c49bced2e576ea37da7e3478c9d16",
+      "manifest.json": "a92c0ff600b847c3df65906343c6bf53c390018c37008e6658269793d255786b",
+      "present-timing.json": "3fd3f9c669f7000556b3293e6e3c9574bba2e93b092b56c0e13e9cd287dae646",
+      "resources.csv": "cd0fa616a2cbe7337e2e6c19a8d103a4f81762e8076e11e920489c7aba9628bf"
+    }
+  },
+  "worker": {
+    "run": "aw28-b2",
+    "rows": 589,
+    "landingRows": 110,
+    "activeKitRows": 109,
+    "phaseCounts": {
+      "landing-sweep": 110,
+      "return": 1,
+      "descent": 111,
+      "lower-sweep": 69,
+      "tomb-backtrack": 46,
+      "passage-sweep": 61,
+      "rope-return": 44,
+      "repeat-ascent": 146,
+      "complete": 1
+    },
+    "settings": {
+      "backend": "RayTracingPipeline",
+      "scale": 50,
+      "water": 1,
+      "fire": 0,
+      "cap": 30,
+      "glass": false,
+      "shadow": 1,
+      "mist": false,
+      "dust": 1,
+      "compiledQuality": "Mobile"
+    },
+    "pipelines": [
+      {
+        "executionMode": 0,
+        "activeKey": "shipping_mobile_opaque_fast",
+        "activeSha256": "34083b41ae9238827d547ae0c5a0d72acac096ba23e3bd42f19276b9b950a204",
+        "opaqueSha256": "34083b41ae9238827d547ae0c5a0d72acac096ba23e3bd42f19276b9b950a204",
+        "genericSha256": "58295240796fdf06e17143f33c4e665f05f86b378394fb13fc9f8a54249c2f25"
+      }
+    ],
+    "gpuMs": {
+      "n": 109,
+      "median": 198.842912,
+      "p95": 215.658588
+    },
+    "cpuMs": {
+      "skin_cpu_ns": {
+        "n": 109,
+        "median": 8.184896,
+        "p95": 13.209637
+      },
+      "player_skin_cpu_ns": {
+        "n": 109,
+        "median": 3.708646,
+        "p95": 6.053385
+      },
+      "character_skin_cpu_ns": {
+        "n": 109,
+        "median": 4.500781,
+        "p95": 7.08776
+      },
+      "whole_frame_cpu_ns": {
+        "n": 109,
+        "median": 208.710469,
+        "p95": 227.953281
+      },
+      "fence_wait_cpu_ns": {
+        "n": 109,
+        "median": 199.004271,
+        "p95": 216.674896
+      },
+      "dynamic_upload_cpu_ns": {
+        "n": 109,
+        "median": 0.411198,
+        "p95": 0.537448
+      }
+    },
+    "thermalStart": {
+      "AP": 47.2,
+      "BAT": 38.5,
+      "SKIN": 40.9
+    },
+    "thermalEnd": {
+      "AP": 44.2,
+      "BAT": 38.8,
+      "SKIN": 40.6
+    },
+    "pending": 0,
+    "status": "complete field observation;not causal gain",
+    "rawHashes": {
+      "ledger.json": "9116ceb0b18e50aa804ecfc8eb2d52c6e981e617d9e158d5cccd6cbc76adc793",
+      "manifest.json": "92aa7e9e1efce636f2c9a213fd38c9cd113e5b480f0213820bb14730d401571a",
+      "present-timing.json": "b248bd12d8808ab0f026dc5e9edb2508943704843ea6d9e7aa9595d60f8640ad",
+      "resources.csv": "6274f9fa7bc706261b0ba18b4d9ef652e4c4a53361a1558e117884be28e5f816"
+    }
+  },
+  "verdict": "Functionally observed real RT with actual serial and worker CPU preparation; causal performance comparison inconclusive because start thermal states differ, process/setup differ and no closing matched control. No gain admission.",
+  "release": {
+    "noFurtherPhoneOperations": true,
+    "releasedUtc": "2026-10-28T08:36:55.1571033Z",
+    "isolatedTestPackageLeftInstalled": true,
+    "originalApksUnchanged": true,
+    "deviceTransfersOrMonitors": false,
+    "ownedTestStopped": true,
+    "brightnessRestore": {
+      "requestedValue": "94",
+      "originalMode": "1",
+      "modeReadback": "1",
+      "brightnessReadback": "73",
+      "exactValueMatchesInitial": false,
+      "note": "Original brightness request was restored, then original automatic mode; controller readback differs. No exact numeric brightness restoration claim."
+    },
+    "rotationAndFontUnchanged": true
+  },
+  "ci": {
+    "sourceHead": "958f5182c7b892f83af6b24be8468669e449d1f6",
+    "run": 40654343098,
+    "conclusion": "all six passed"
+  }
+}
