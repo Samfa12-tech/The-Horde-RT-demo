@@ -1,0 +1,13 @@
+{
+  "sourceCommit": "e2addc7795dc3fc7d687b9fd0aa089fb2c4cd1b7",
+  "apkSha256": "5704832437d098211882e3a40a39a7940c37d78af02235a0ee4b7bb7f696b91f",
+  "deviceModel": "SM-S948B",
+  "evidenceClass": "compatible isolated installation and cleanup; interrupted start preflight; no fresh RT or performance acceptance",
+  "releasedUtc": "2026-10-28T09:27:50.091467+00:00",
+  "automaticBrightnessRestored": true,
+  "isolatedStopped": true,
+  "noTimingRunStarted": true,
+  "originalAckBytesCaptured": false,
+  "offlineSyntheticConsumerTests": 12,
+  "offlineDeviceCalls": 0
+}

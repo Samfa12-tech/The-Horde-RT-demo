@@ -1,5 +1,16 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-28 - e2addc77 installation/preflight interrupted; no new RT verdict
+
+SM-S948B / Android17 API37, isolated Debug sourcee2addc77, APK
+`5704832437d098211882e3a40a39a7940c37d78af02235a0ee4b7bb7f696b91f`.
+Compatible update verified; the first ACK read was inconclusive and the laptop
+transport disconnected before raw-byte inspection. No timing run or fresh
+RT-presented acknowledgement was established. Cleanup verified09:27:50UTC:
+owned test stopped, Home, original automatic brightness/rotation/font restored,
+owner APKs unchanged. Existing958f5182 evidence below remains separate.
+[Recovery and exact limits](evidence/2026-10-28-chapter-start-ack/disconnect-followup.md).
+
 ## 2026-10-28 - isolated actor-worker route; no causal performance gain
 
 SM-S948B / Android17 API37, exact source958f5182 and isolated Debug APK
