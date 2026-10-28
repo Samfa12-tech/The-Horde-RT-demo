@@ -1,5 +1,12 @@
 # Horde 1.7 current design index
 
+28October resume: [current full-scope/acceptance reconciliation](HORDE_1_7_RESUME_RECONCILIATION_2026_10_28.md)
+verifies c1a4d16d all-six CI and unchanged PR conflicts. The separate
+[public benchmark preview](../evidence/2026-10-28-public-benchmark-preview/README.md)
+adds a typed sanitized local projection with independent consent; production
+sending, platform public UI, backend and site remain unfinished. Phone belongs
+to Reef until explicit handover; no new device evidence is implied.
+
 27October: [private-report and renderer-independent compatibility slice](../evidence/2026-10-27-developer-reports/README.md)
 adds typed local evidence and destination-bound mock delivery while production
 sending remains disabled. The [API/site handoff](HORDE_1_7_REPORTING_API_2026_10_27.md)

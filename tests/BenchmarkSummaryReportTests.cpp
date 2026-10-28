@@ -1,4 +1,5 @@
 #include "reporting/BenchmarkSummaryReport.h"
+#include "reporting/PublicBenchmarkReport.h"
 #include "reporting/DeveloperReportSubmission.h"
 #include "reporting/PlaytestReport.h"
 
@@ -468,6 +469,70 @@ void TestOwningMistSummary()
         "historical summary absence remains absent without an inferred Mist On default");
 }
 
+void TestPublicProjectionConsentPrivacyAndEvidence()
+{
+    constexpr std::string_view publicId="33333333-3333-4333-a333-333333333333";
+    CompletedOwners owners;
+    owners.submittedDimensions=RtFrameDimensionsEvidence{960,540,960,540,0,960.0f/540,false,false};
+    owners.Run();
+    auto configuration=Configuration();
+    const auto frozen=CaptureBenchmarkSummary(owners.benchmark,owners.evidence,configuration,configuration,kRunUuid,"Reviewed model");
+    const auto local=PrepareBenchmarkSummaryReport(frozen,Approval(true));
+    const auto privateSend=PreparePrivateDeveloperReport(local,true);
+    Check(privateSend.IsReady(),"private sharing has independent approved content");
+    auto approval=PublicBenchmarkReportApproval{false,false,publicId,"2026-10-03T12:34:56Z"};
+    const auto declined=PreparePublicBenchmarkReport(frozen,approval);
+    Check(declined.Status()==BenchmarkSummaryReportStatus::ConsentRequired && declined.Json().empty() && declined.ResultId().empty(),
+        "private/local consent never authorizes public projection");
+    approval.consentToPreparePublicPreview=true;
+    const auto publicReport=PreparePublicBenchmarkReport(frozen,approval);
+    const auto json=publicReport.Json();
+    Check(publicReport.IsReady() && publicReport.ResultId()==publicId && json.size()<=kPublicBenchmarkReportMaxBytes,
+        "typed public preview has separate bounded immutable identity");
+    for (const auto privateValue : {kRunUuid,kReportUuid,std::string_view{"2026-10-03T12:34:56Z"},
+         std::string_view{"private-account"},std::string_view{"private-original"},std::string_view{"private-full"},
+         std::string_view{"runId"},std::string_view{"reportId"},std::string_view{"capturedAtUtc"},
+         std::string_view{"submissionSerial"},std::string_view{"sceneEpoch"},std::string_view{"turnstileToken"},
+         std::string_view{"consentToSubmit"},std::string_view{"Reviewed model"},std::string_view{"Test GPU"}})
+        Check(json.find(privateValue)==json.npos,"public projection must omit private identity, timing, raw fields and unapproved hardware");
+    Check(json.find("\"dateUtc\":\"2026-10-03\"")!=json.npos && json.find("\"model\":null")!=json.npos &&
+        json.find("community-client-reported")!=json.npos && json.find("\"deviceCompatibilityVerified\":false")!=json.npos &&
+        json.find("\"rankingEligible\":false")!=json.npos && json.find("custom-unranked")!=json.npos &&
+        json.find("\"courseRevision\":null")!=json.npos && json.find("\"packageArtifactSha256\":null")!=json.npos,
+        "public preview coarsens date and does not certify hardware, comparison buckets, profiles or artifact identity");
+    Check(json.find("\"submittedDimensions\":{\"internalExtent\":[960,540]")!=json.npos &&
+        json.find("\"dynamicResolutionEnabled\":false")!=json.npos &&
+        json.find("\"measuredFrames\":600")!=json.npos && json.find("\"gpuStatusCounts\":{\"denominator\":600,\"valid\":600")!=json.npos &&
+        json.find("\"scanoutFpsMeasured\":false")!=json.npos,
+        "public projection preserves actual submitted pixels, DRS, measured population and measurement limits");
+    approval.includeBasicHardware=true;
+    const auto withHardware=PreparePublicBenchmarkReport(frozen,approval);
+    Check(withHardware.IsReady() && withHardware.Json().find("Reviewed model")!=json.npos &&
+        withHardware.Json().find("Test GPU")!=json.npos && publicReport.Json()==json,
+        "optional reviewed hardware creates new public bytes without mutating earlier approval");
+    const auto retry=PreparePublicBenchmarkReport(frozen,approval);
+    Check(retry.Json()==withHardware.Json(),"same public approval/evidence retains exact review/retry bytes");
+    approval.declaredCooling=BenchmarkSummaryCooling::ExternalDeclared;
+    const auto cooling=PreparePublicBenchmarkReport(frozen,approval);
+    Check(cooling.IsReady() && cooling.Json().find("external-declared")!=json.npos &&
+        cooling.Json().find("\"temperatureC\":null")!=json.npos,"declared cooling remains separate from absent measured thermals");
+    approval.resultUuid=kRunUuid;
+    Check(PreparePublicBenchmarkReport(frozen,approval).Status()==BenchmarkSummaryReportStatus::InvalidIdentity,"a private measured run identity cannot be reused as a public result ID");
+    approval.resultUuid="bad";
+    Check(PreparePublicBenchmarkReport(frozen,approval).Status()==BenchmarkSummaryReportStatus::InvalidIdentity,"invalid public identity rejects");
+    approval.resultUuid=publicId;approval.capturedAtUtc="2026-02-30T00:00:00Z";
+    Check(PreparePublicBenchmarkReport(frozen,approval).Status()==BenchmarkSummaryReportStatus::InvalidTimestamp,"public coarse date requires a real validated calendar timestamp");
+    approval.capturedAtUtc="2026-10-03T12:34:56Z";
+    const auto unsafe=CaptureBenchmarkSummary(owners.benchmark,owners.evidence,configuration,configuration,kRunUuid,"person@example.com");
+    Check(PreparePublicBenchmarkReport(unsafe,approval).Status()==BenchmarkSummaryReportStatus::InvalidLabel,"hardware opt-in cannot admit private/contact labels");
+    approval.includeBasicHardware=false;
+    Check(PreparePublicBenchmarkReport(unsafe,approval).IsReady(),"omitted hardware does not leak or unnecessarily block aggregate projection");
+    Check(!PreparePublicBenchmarkReport(FrozenBenchmarkSummary{},approval).IsReady(),"incomplete benchmark cannot become a public result");
+    owners.benchmark.Start();Check(owners.evidence.Start(2u),"replace measured owners after approved public capture");
+    configuration.metadata.buildIdentity="later-build";
+    Check(publicReport.Json()==json && privateSend.LocalJson()==local.Json(),"owner reset does not mutate either separately approved destination");
+}
+
 void TestSubmittedDimensionsSummary()
 {
     const RtFrameDimensionsEvidence d{960,540,960,540,0,960.0f/540,false,false};
@@ -514,7 +579,7 @@ void TestSubmittedDimensionsSummary()
 
 int main(const int argc, const char* const* const argv)
 {
-    if (argc == 2 && std::string_view{argv[1]} == "--wire-fixture")
+    if (argc == 2 && (std::string_view{argv[1]} == "--wire-fixture" || std::string_view{argv[1]} == "--public-wire-fixture"))
     {
         // Synthetic owner evidence through the real immutable preparation API.
         // No device, personal labels or remote consent; optional hardware stays off.
@@ -523,6 +588,12 @@ int main(const int argc, const char* const* const argv)
         const auto configuration = Configuration();
         const auto frozen = CaptureBenchmarkSummary(owners.benchmark, owners.evidence,
             configuration, configuration, kRunUuid);
+        if (std::string_view{argv[1]} == "--public-wire-fixture") {
+            const auto prepared=PreparePublicBenchmarkReport(frozen,
+                {true,false,"33333333-3333-4333-a333-333333333333","2026-10-03T00:01:02.003Z"});
+            if (!passed || !prepared.IsReady()) return 1;
+            std::cout << prepared.Json() << '\n';return 0;
+        }
         const auto prepared = PrepareBenchmarkSummaryReport(frozen,
             {true, false, kReportUuid, "2026-10-03T00:01:02.003Z"});
         if (!passed || !prepared.IsReady()) return 1;
@@ -538,6 +609,7 @@ int main(const int argc, const char* const* const argv)
     TestOwningDustSummary();
     TestOwningMistSummary();
     TestSubmittedDimensionsSummary();
+    TestPublicProjectionConsentPrivacyAndEvidence();
     TestUnavailableHardwarePrivacyAndIdentityRetry();
     return passed ? 0 : 1;
 }

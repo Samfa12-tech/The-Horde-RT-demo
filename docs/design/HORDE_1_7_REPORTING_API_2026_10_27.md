@@ -96,10 +96,13 @@ state rather than a fabricated GPU report.
 
 ## Separately consented public results — API/data model handoff
 
-No public factory or transport is enabled in this client slice. Private reports
-must never be copied wholesale to public storage. Implement a separate reviewed
-**sanitized projection**, a separate public-consent control initially unchecked,
-and a separate report-scoped submission identity for public results. Suggested
+28October adds `PreparePublicBenchmarkReport`: a separately consented LOCAL
+sanitized public preview from typed frozen benchmark evidence. It cannot take a
+private report/JSON body and cannot send or authorize publication. Private reports
+must never be copied wholesale to public storage. A separate public-consent
+control initially unchecked and a fresh public result UUID are still required in
+the platform review owner; private-send consent does not grant public consent.
+The builder rejects reuse of the measured run UUID. Suggested
 route in the same existing Worker: `POST /api/horde-benchmark-results`;
 `GET /api/horde-benchmark-stats` is public read-only. Private compatibility intake
 does not authorize publication of models or aggregation of its private records.
@@ -140,6 +143,31 @@ private intake secret; read only the reviewed public API without credentials.
 Any new public route/CORS/storage/deployment configuration is a separate reviewed
 deployment action, not authorized by this document.
 
+### Current local public projection
+
+The local preview has schema1/product/reportKind `public-benchmark-result`,
+`destination:public-board`, `consentToPreparePublicPreview:true` and one `result`.
+This consent is local review only, not `consentToSubmit` or publication consent.
+No platform button, public transport, server acceptance or website is enabled.
+
+Result allowlist: random resultId, coarse UTC date, community-client-reported
+classification, explicit false verification/ranking, workload/simulation policy,
+shared measured configuration, warmup/measured laps, true owning-frame RT
+presentation and false scanout-FPS claim, timing scopes, unknown measured thermal
+state, separate declared cooling, aggregate overall/zones and optional reviewed
+model/GPU/Vulkan labels. OS-major/driver, course/profile revision, output policy
+and package-artifact hash remain null because this immutable source does not yet
+carry them. Exact comparison eligibility remains false; do not infer standards
+from matching dimensions. Missing optional actual quality/dimension evidence is
+not synthesized. No raw rows, run/private report ID, full capture timestamp,
+private note/log/path, token, personal/device ID or source-owner pointers enter.
+
+The existing configuration writer is shared by private and public builders;
+private fixture bytes remain identical. Current public data are custom/unranked,
+not accepted or ranked board rows. Client syntax/privacy/completion checks are
+not server validation, authentication, verified hardware or moderation evidence.
+See the [bounded projection receipt](../evidence/2026-10-28-public-benchmark-preview/README.md).
+
 ## Remaining implementation and admission
 
 1. Complete platform UI/collector wiring and isolated lifecycle/export tests,
@@ -147,8 +175,8 @@ deployment action, not authorized by this document.
    with permitted tooling; do not bypass held game/CUA or device restrictions.
 2. Implement strict server validators, private receipts/dedup/provider tests in
    the canonical private relay worktree after safe staging; test with mocks only.
-3. Implement the sanitized public projection/storage/query and explicit public
-   review/consent; stage the existing-site page and managed product link safely.
+3. Integrate the local sanitized projection with explicit platform public
+   review/consent, then implement server storage/query; stage the existing-site page and managed product link safely.
 4. Review exact code/config, secrets already available versus missing, retention,
    abuse controls and rollback. Return the precise deployment target/diff and
    action for approval. No production send follows from a successful build.
