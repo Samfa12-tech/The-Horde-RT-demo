@@ -42,23 +42,34 @@ bool WindowsAcceptanceProfile::Configure(std::span<const std::wstring_view> args
     // A no-argument launch still requires the same dedicated package and exact
     // state child below; it can never fall through to ordinary user data.
     const fs::path requestedRoot=args.empty()?executableDirectory/L"state":fs::path(args[1]);
-    const auto name = executableDirectory.filename().wstring();
     std::error_code ec;
-    if (!reports.is_absolute() || reports.lexically_normal() != reports || !PlainDirectory(reports) ||
-        fs::canonical(reports, ec) != reports || ec || !PlainDirectory(executableDirectory) ||
-        fs::canonical(executableDirectory, ec) != executableDirectory || ec || executableDirectory.parent_path() != reports ||
+    if (!reports.is_absolute() || reports.lexically_normal() != reports || !PlainDirectory(reports))
+        return fail("Acceptance reports base must be an absolute plain directory.");
+    const auto canonicalReports=fs::canonical(reports,ec);
+    if(ec)return fail("Cannot resolve acceptance reports base.");
+    if (!executableDirectory.is_absolute() || executableDirectory.lexically_normal() != executableDirectory ||
+        !PlainDirectory(executableDirectory))return fail("Acceptance package must be an absolute plain directory.");
+    const auto package=fs::canonical(executableDirectory,ec);
+    if(ec)return fail("Cannot resolve acceptance package.");
+    const auto name=package.filename().wstring();
+    // Windows TEMP and launch paths can use DOS short names or different drive
+    // letter case. Bind the actual canonical directories, not their spelling.
+    if (package.parent_path() != canonicalReports ||
         !name.starts_with(L"horde-windows-acceptance-") || name.size() > 96 ||
-        name.find_first_not_of(L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-") != name.npos ||
-        !requestedRoot.is_absolute() || requestedRoot.lexically_normal() != requestedRoot ||
-        requestedRoot != executableDirectory / L"state")
-        return fail("Acceptance state must be the state child of a plain, dedicated package directly under checkout reports.");
-    const bool exists = fs::exists(requestedRoot, ec);
-    if (ec || (exists && (!PlainDirectory(requestedRoot) || !PlainTree(requestedRoot))))
+        name.find_first_not_of(L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-") != name.npos)
+        return fail("Acceptance package must be a dedicated direct child of checkout reports.");
+    if (!requestedRoot.is_absolute() || requestedRoot.lexically_normal() != requestedRoot ||
+        requestedRoot.native().starts_with(L"\\\\") || requestedRoot.filename() != L"state" ||
+        !PlainDirectory(requestedRoot.parent_path()) || fs::canonical(requestedRoot.parent_path(),ec) != package || ec)
+        return fail("Acceptance state must be exactly the package's ordinary absolute state child.");
+    const auto root=package/L"state";
+    const bool exists = fs::exists(root, ec);
+    if (ec || (exists && (!PlainDirectory(root) || !PlainTree(root))))
         return fail("Acceptance state contains inaccessible, linked or nonregular content.");
-    if (!exists && !fs::create_directory(requestedRoot, ec)) return fail("Cannot create acceptance state directory.");
-    const bool empty = fs::is_empty(requestedRoot, ec);
+    if (!exists && !fs::create_directory(root, ec)) return fail("Cannot create acceptance state directory.");
+    const bool empty = fs::is_empty(root, ec);
     if (ec) return fail("Cannot inspect acceptance state directory.");
-    lease_ = CreateFileW((requestedRoot / L"profile.owner").c_str(), GENERIC_READ | (empty ? GENERIC_WRITE : 0),
+    lease_ = CreateFileW((root / L"profile.owner").c_str(), GENERIC_READ | (empty ? GENERIC_WRITE : 0),
         0, nullptr, empty ? CREATE_NEW : OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OPEN_REPARSE_POINT, nullptr);
     if (lease_ == INVALID_HANDLE_VALUE) return fail("Acceptance profile is not owned, inaccessible or already in use.");
     DWORD done = 0;
@@ -70,10 +81,10 @@ bool WindowsAcceptanceProfile::Configure(std::span<const std::wstring_view> args
         if (!ReadFile(lease_, bytes.data(), static_cast<DWORD>(bytes.size()), &done, nullptr) ||
             std::string_view(bytes.data(), done) != marker) return fail("Acceptance profile ownership marker is invalid.");
     }
-    const auto campaign = requestedRoot / L"campaign-v1";
+    const auto campaign = root / L"campaign-v1";
     if (!fs::exists(campaign, ec) && !fs::create_directory(campaign, ec)) return fail("Cannot create isolated campaign directory.");
     if (ec || !PlainDirectory(campaign)) return fail("Isolated campaign directory is not a plain directory.");
-    root_ = requestedRoot;
+    root_ = root;
     return true;
 }
 }

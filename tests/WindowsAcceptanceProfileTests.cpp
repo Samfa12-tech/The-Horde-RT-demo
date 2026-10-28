@@ -13,7 +13,9 @@ void Check(bool value,const char* message){++checks;if(!value){++failures;std::c
 std::string Read(const fs::path& path){std::ifstream file(path,std::ios::binary);return {std::istreambuf_iterator<char>(file),{}};}
 bool Open(Profile& profile,const fs::path& reports,const fs::path& package,const fs::path& root,bool enabled=true){
     const auto value=root.wstring();const std::wstring_view args[]={L"--acceptance-root",value};
-    return profile.Configure(args,enabled,reports,package);
+    const bool ready=profile.Configure(args,enabled,reports,package);
+    if(!ready)std::cerr<<"PROFILE_CONFIGURE_REJECTED: "<<profile.Error()<<'\n';
+    return ready;
 }
 }
 int main(){
@@ -23,9 +25,12 @@ int main(){
     std::ofstream(base/"fixture.owner")<<"disposable";
     const auto reports=base/"reports",package=reports/"horde-windows-acceptance-test",root=package/"state";
     fs::create_directories(package);
+    const auto canonicalRoot=fs::canonical(package)/"state";
+    std::cout<<"PROFILE_PATH_FACTS rawReportsMatchesCanonical="<<(reports==fs::canonical(reports))
+        <<" rawPackageMatchesCanonical="<<(package==fs::canonical(package))<<'\n';
     const auto owner=base/"owner-careers";fs::create_directory(owner);std::ofstream(owner/"slot-1-manual.hrd")<<"owner sentinel";
     {
-        Profile ordinary;Check(ordinary.Configure({},false,{},{} )&&!ordinary.Active(),"ordinary build does not require or activate test state");
+        Profile ordinary;Check(ordinary.Configure({},false,{},{} )&&!ordinary.Active()&&ordinary.CampaignDirectory().empty()&&ordinary.SettingsPath().empty(),"ordinary build does not activate test state or expose relative fallback paths");
         Profile shipping;Check(!Open(shipping,reports,package,root,false)&&!fs::exists(root),"ordinary build rejects acceptance flag before state access");
         Profile missing;Check(!missing.Configure({},true,reports,base),"development acceptance outside its dedicated package cannot fall back to owner state");
         Profile outside;Check(!Open(outside,reports,package,owner)&&Read(owner/"slot-1-manual.hrd")=="owner sentinel","owner-career path rejected without mutation");
@@ -36,15 +41,32 @@ int main(){
     }
     {
         Profile first;Check(Open(first,reports,package,root)&&first.Active(),"fresh dedicated root admitted");
-        Check(first.CampaignDirectory()==root/"campaign-v1"&&first.SettingsPath()==root/"settings.ini","all mutable game state has isolated paths");
-        std::ofstream(first.CampaignDirectory()/"slot-1-manual.hrd")<<"earned test record";
-        std::ofstream(first.SettingsPath())<<"[audio]\nsfxVolume=61\n";
-        Profile concurrent;Check(!Open(concurrent,reports,package,root)&&!concurrent.Active(),"exclusive process lease prevents concurrent acceptance owners");
+        Check(first.CampaignDirectory()==canonicalRoot/"campaign-v1"&&first.SettingsPath()==canonicalRoot/"settings.ini","all mutable game state has canonical isolated paths");
+        if(first.Active()){
+            std::ofstream(first.CampaignDirectory()/"slot-1-manual.hrd")<<"earned test record";
+            std::ofstream(first.SettingsPath())<<"[audio]\nsfxVolume=61\n";
+        }
+        Profile concurrent;Check(!Open(concurrent,reports,package,root)&&!concurrent.Active()&&
+            concurrent.CampaignDirectory().empty()&&concurrent.SettingsPath().empty(),"exclusive process lease prevents concurrent owners without exposing relative fallback paths");
     }
     {
         Profile restored;Check(restored.Configure({},true,reports,package),"no-argument desktop launch reopens only the dedicated package state after process lease release");
+        if(!restored.Active())std::cerr<<"PROFILE_RELAUNCH_REJECTED: "<<restored.Error()<<'\n';
         Check(Read(restored.CampaignDirectory()/"slot-1-manual.hrd")=="earned test record"&&Read(restored.SettingsPath()).find("61")!=std::string::npos,"relaunch preserves exact isolated save and settings");
     }
+    // Hosted Windows TEMP can contain a DOS short-name ancestor (RUNNER~1).
+    // Exercise a real filesystem alias, without changing any user environment.
+    std::wstring shortBase(32768,L'\0');
+    const DWORD shortSize=GetShortPathNameW(base.c_str(),shortBase.data(),static_cast<DWORD>(shortBase.size()));
+    if(shortSize>0&&shortSize<shortBase.size()){
+        shortBase.resize(shortSize);
+        if(fs::path(shortBase)!=base){
+            const auto aliasReports=fs::path(shortBase)/"reports",aliasPackage=aliasReports/package.filename();
+            Profile alias;Check(Open(alias,aliasReports,aliasPackage,aliasPackage/"state"),"canonical DOS ancestor alias admits only the same isolated profile");
+            Check(alias.CampaignDirectory()==canonicalRoot/"campaign-v1"&&Read(alias.SettingsPath()).find("61")!=std::string::npos,"DOS alias resolves to the exact retained state without an alternate save root");
+            Profile outsideAlias;Check(!Open(outsideAlias,aliasReports,aliasPackage,owner),"DOS alias does not admit an owner-career path");
+        }else std::cout<<"DOS short-name alias unchanged on this volume; alias regression NOT_RUN\n";
+    }else std::cout<<"DOS short-name alias unavailable on this volume; alias regression NOT_RUN\n";
     std::ofstream(root/"profile.owner",std::ios::trunc)<<"not our profile";
     {Profile corrupt;Check(!Open(corrupt,reports,package,root)&&!corrupt.Active(),"incorrect ownership marker fails closed");}
     const auto linkedPackage=reports/"horde-windows-acceptance-linked";fs::create_directory(linkedPackage);

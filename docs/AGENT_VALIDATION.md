@@ -117,7 +117,9 @@ require that same dedicated package and use only its `state/campaign-v1` and
 exact ownership marker. Linked/nonregular contents, hardlinks, traversal,
 alternate roots and concurrent profile use fail closed before normal settings,
 known-folder or Vulkan startup. A build outside that package cannot fall back to
-owner careers. The exclusive marker lease lasts until process exit. This guards
+owner careers. Valid Windows DOS short-name aliases resolve to that same
+canonical package/state; they do not authorize another state directory. Inactive
+profiles expose no save/settings paths. The exclusive marker lease lasts until process exit. This guards
 test isolation; it is not a security boundary against another same-user process
 mutating files during a run.
 

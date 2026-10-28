@@ -23,8 +23,8 @@ public:
     bool Configure(std::span<const std::wstring_view> args, bool developmentEnabled,
         const std::filesystem::path& reports, const std::filesystem::path& executableDirectory);
     bool Active() const { return !root_.empty(); }
-    std::filesystem::path CampaignDirectory() const { return root_ / L"campaign-v1"; }
-    std::filesystem::path SettingsPath() const { return root_ / L"settings.ini"; }
+    std::filesystem::path CampaignDirectory() const { return Active() ? root_ / L"campaign-v1" : std::filesystem::path{}; }
+    std::filesystem::path SettingsPath() const { return Active() ? root_ / L"settings.ini" : std::filesystem::path{}; }
     const std::string& Error() const { return error_; }
 private:
     HANDLE lease_ = INVALID_HANDLE_VALUE;
