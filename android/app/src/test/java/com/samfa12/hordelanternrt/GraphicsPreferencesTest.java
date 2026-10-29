@@ -114,10 +114,10 @@ public final class GraphicsPreferencesTest {
         a[20]=2; assertFalse(GraphicsPreferences.presented(a,7));
         a[20]=1; a[21]=-1; assertFalse(GraphicsPreferences.presented(a,7));
     }
-    @Test public void manualExperimentalScalesRequireExplicitSaveAndNeverBecomeFreshDefaults() {
+    @Test public void pendingScaleChoicesPreserveFresh33UntilExplicitlySaved() {
         assertEquals(33, BuildConfig.MIN_RENDER_SCALE_PERCENT);
         assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.mobileDefaults()));
-        assertEquals(50, GraphicsPreferences.mobileDefaults().scale);
+        assertEquals(33, GraphicsPreferences.mobileDefaults().scale);
         assertFalse(GraphicsPreferences.mobileDefaults().glassEnabled);
         for (int scale : new int[]{33,40}) {
             prefs.edit().clear().putInt("music_volume",43).commit();
@@ -126,7 +126,7 @@ public final class GraphicsPreferencesTest {
                     mobile.cap,mobile.glassEnabled,mobile.shadow,mobile.mistEnabled,mobile.dust);
             assertTrue(choice.valid());
             assertTrue(GraphicsPreferences.markPending(prefs,choice));
-            assertTrue("a draft experiment cannot replace fresh50",GraphicsPreferences.confirmed(prefs).same(mobile));
+            assertTrue("a pending choice cannot replace fresh33",GraphicsPreferences.confirmed(prefs).same(mobile));
             assertTrue(GraphicsPreferences.clearAfterRestore(prefs));
             assertTrue(GraphicsPreferences.confirmed(prefs).same(mobile));
             assertTrue(GraphicsPreferences.markPending(prefs,choice));
