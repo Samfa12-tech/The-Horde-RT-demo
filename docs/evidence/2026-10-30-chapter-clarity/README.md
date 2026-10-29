@@ -84,3 +84,40 @@ behavior or provisional design was admitted by receiving these files.
 Raw audio validation details are local in
 `reports/chapter-clarity-20261030/voice-inventory.json`; no audio bytes or private
 owner save material are included in this evidence receipt.
+
+## Coordinated Windows attempt (08:25–08:27 AEDT)
+
+Exact code checkpoint `55e435fa300aa69eea836de3b7e07f485f48e035` has all six
+hosted jobs green in run40951384146 (532 Android tests). This is independent of
+the following incomplete interaction attempt.
+
+Prepared executable SHA256:
+`c812c50187bc2bb06268b3ceb4a2e0eea3d6a3f107d087b4f02eca8c8804ba73`.
+Computer Use launched it once. The launch call initially said no targetable
+window; subsequent window inventory resolved the exact path and isolated title.
+Its owned process37672 was responsive. The AX tree eventually exposed THE HORDE,
+MORE, PLAY and SETTINGS, and the dedicated profile created only `profile.owner`.
+Thus process launch/profile isolation/menu-control creation occurred. This is
+not a main-menu image or RT-presentation acceptance: captures remained black.
+
+The single Play click returned **`failed to activate captured window`**. After
+fresh window inventory/binding, one exposed Raise recovery returned the same
+error. No input success or menu transition was observed. No further activation,
+launch, alternate input route or security change was attempted. This is an
+unresolved Computer Use activation boundary, not evidence that Play crashes.
+
+Initial capability data identifies RTX5050 Laptop / NVIDIA610.47 and selects
+RayTracingPipeline; it was written before scene presentation and cannot establish
+later render success/failure. The timing CSV has its header only. There is no
+render-failure receipt. No save/reload, tutorial-footer image or reunion prompt
+image can be claimed from this session.
+
+Cleanup verified the owned PID/path, stopped only that test process, verified
+PID/window absence and released foreground. No campaign save was created; no
+phone or owner career was used. Private process/capability/AX observations are
+retained under the local package/reports and chapter-clarity handoff.
+
+Next smallest acceptance step is an owner-assisted foreground session with this
+same isolated package, then menu→Play/save-reload and reunion prompt review.
+Diagnose the supported activation boundary separately if it persists; do not
+change gameplay or security to manufacture this acceptance.
