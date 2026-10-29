@@ -117,7 +117,7 @@ public class MainActivity extends Activity {
     static final int SUBTITLE_INPUT_TOUCH = 0;
     static final int SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER = 1;
     static final String PREF_RENDER_SCALE = "render_scale";
-    static final int DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT = 75;
+    static final int DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT = GraphicsPreferences.mobileDefaults().scale;
     private static final String PREF_RT_LAB_UNLOCKED = "rt_lab_unlocked";
     private static final String REPORT_DIRECTORY = "reports";
     private static final String ACTION_BENCHMARK = "com.samfa12.hordelanternrt.action.BENCHMARK";

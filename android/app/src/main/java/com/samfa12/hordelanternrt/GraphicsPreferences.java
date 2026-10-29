@@ -56,7 +56,8 @@ final class GraphicsPreferences {
     }
     static Values baseline() { return new Values(75, 1, 0, 30); }
     // Historical accepted appearance remains separate from the mobile startup/reset policy.
-    static Values mobileDefaults() { return new Values(50, 1, FIRE_MOBILE, 30, false, SHADOW_CURRENT, false, 1); }
+    static Values mobileDefaults() { return mobileDefaults(MIN_RENDER_SCALE_PERCENT); }
+    static Values mobileDefaults(int minimum) { return new Values(minimum == 33 ? 33 : 50, 1, FIRE_MOBILE, 30, false, SHADOW_CURRENT, false, 1); }
     static boolean hasGraphicsSettings(SharedPreferences prefs) {
         for (String key : prefs.getAll().keySet()) {
             if (key.equals("render_scale") || key.equals("water_quality") || key.equals(FIRE) ||
@@ -84,7 +85,7 @@ final class GraphicsPreferences {
         return confirmed(prefs, MIN_RENDER_SCALE_PERCENT);
     }
     static Values confirmed(SharedPreferences prefs, int minimum) {
-        if (!hasGraphicsSettings(prefs) || usesUnstoredMobileDefaults(prefs)) return mobileDefaults();
+        if (!hasGraphicsSettings(prefs) || usesUnstoredMobileDefaults(prefs)) return mobileDefaults(minimum);
         final int schema = integer(prefs, "graphics_schema", prefs.contains("graphics_schema") ? -1 : 1);
         if (schema < 1 || schema > SCHEMA) return baseline();
         final boolean glass;

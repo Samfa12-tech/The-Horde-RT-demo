@@ -281,7 +281,8 @@ public final class GraphicsPreferencesTest {
     }
     @Test public void noGraphicsKeysUseMobileDefaultsWithoutWritingOrChangingUnrelatedSettings() {
         GraphicsPreferences.Values mobile = GraphicsPreferences.mobileDefaults();
-        assertTrue(mobile.same(new GraphicsPreferences.Values(50,1,0,30,false,1,false,1)));
+        assertTrue(mobile.same(new GraphicsPreferences.Values(33,1,0,30,false,1,false,1)));
+        assertEquals(50, GraphicsPreferences.confirmed(prefs,50).scale);
         assertTrue(GraphicsPreferences.baseline().same(new GraphicsPreferences.Values(75,1,0,30,true,1,true)));
         assertFalse(GraphicsPreferences.hasGraphicsSettings(prefs));
         assertTrue(GraphicsPreferences.confirmed(prefs).same(mobile));
@@ -322,6 +323,19 @@ public final class GraphicsPreferencesTest {
             assertTrue(GraphicsPreferences.markPending(prefs,candidate)); // New schema must not reclassify old intent.
             assertTrue(GraphicsPreferences.clearAfterRestore(prefs));
             assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.baseline()));
+        }
+    }
+    @Test public void lowerFreshDefaultPreservesEveryConfirmedResolution() {
+        for (int scale : new int[]{33,40,50,68,75,92,100}) {
+            prefs.edit().clear().commit();
+            GraphicsPreferences.Values saved = new GraphicsPreferences.Values(scale,1,0,30);
+            assertTrue(GraphicsPreferences.confirm(prefs,saved));
+            java.util.Map<String,?> before = prefs.getAll();
+            assertEquals(scale,GraphicsPreferences.confirmed(prefs).scale);
+            assertEquals(before,prefs.getAll());
+            assertTrue(GraphicsPreferences.markPending(prefs,GraphicsPreferences.mobileDefaults()));
+            assertTrue(GraphicsPreferences.clearAfterRestore(prefs));
+            assertEquals(scale,GraphicsPreferences.confirmed(prefs).scale);
         }
     }
     @Test public void freshDustLowDoesNotOverwriteSavedOffOrCustomDust() {
