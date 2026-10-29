@@ -200,6 +200,16 @@ struct SimulationSnapshot
     // True only during the automatic pre-encounter draw's temporary defense lockout.
     bool automaticSwordDrawBlocksDefense = false;
 
+    // A reminder of the existing manual proof, never a completion or input event.
+    bool NeedsRaiseLanternPrompt() const
+    {
+        using namespace horde::gameplay::interactions;
+        return chapterDialogue.waitingForRaise && !chapterDialogue.proofAccepted &&
+            developmentRescueJourney && rescue.phase == horde::gameplay::traversal::Phase::UpperSafe &&
+            interaction.heldLightKind == HeldLightKind::RewardLantern &&
+            interaction.heldLightPose == HeldLightPose::Low;
+    }
+
     horde::gameplay::interactions::FinaleEndingPhase EndingPhaseForUi() const
     {
         return developmentRescueJourney

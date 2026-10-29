@@ -3143,7 +3143,8 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     const bool rescueJourney = snapshot.developmentRescueJourney &&
         snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None;
     const bool flaskUpgrade = !rescueJourney && snapshot.flaskUpgrade.interactEligible;
-    const bool visible = (rescueJourney || flaskUpgrade)
+    const bool raiseLantern = snapshot.NeedsRaiseLanternPrompt();
+    const bool visible = (rescueJourney || flaskUpgrade || raiseLantern)
         ? !visibility.simulationPaused && !visibility.pauseMenuVisible && !visibility.settingsVisible &&
           !visibility.diagnosticsVisible && !visibility.benchmarkReportVisible && !visibility.rtLabVisible &&
           !visibility.deathOverlayVisible && !visibility.endingOverlayVisible && !visibility.benchmarkRunning &&
@@ -3175,9 +3176,14 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
             (snapshot.chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::OpenChest ||
              snapshot.chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::ClaimLantern);
     }
+    std::string contextualText(text);
+    if (raiseLantern) {
+        if (!contextualText.empty()) contextualText += " | ";
+        contextualText += context.teachingControllerGlyphs ? "Y: RAISE LANTERN" : "E: RAISE LANTERN";
+    }
     if (visible)
     {
-        SetWindowTextA(promptControl, std::string(text).c_str());
+        SetWindowTextA(promptControl, contextualText.c_str());
         InvalidateRect(promptControl, nullptr, TRUE);
     }
     ShowWindow(promptControl, visible ? SW_SHOWNA : SW_HIDE);

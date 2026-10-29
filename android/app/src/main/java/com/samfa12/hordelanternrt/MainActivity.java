@@ -257,6 +257,7 @@ public class MainActivity extends Activity {
     private static final int RESCUE_PROMPT_MASK = 7 << RESCUE_PROMPT_SHIFT;
     private static final int CONTEXTUAL_RESCUE_MODE = 1 << 9;
     private static final int CONTEXTUAL_FLASK_UPGRADE = 1 << 12;
+    private static final int CONTEXTUAL_RAISE_OBJECTIVE = 1 << 13;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -8270,16 +8271,54 @@ public class MainActivity extends Activity {
 
     private void updateControllerPrompt(int interactLabel,boolean interactEnabled,boolean raise,boolean lower) {
         if(controllerPrompt==null || !controllerMode)return;
-        String prompt=getString(R.string.controller_play_prompts);
-        if(interactLabel!=0)prompt+="\n"+(interactEnabled?"A: ":"")+getString(interactLabel);
+        // Timed teaching has its own owner. This footer contains nearby actions only.
+        String prompt="";
+        if(interactLabel!=0)prompt+=(interactEnabled?"A: ":"")+getString(interactLabel);
         if(raise || lower)prompt+="\nY: "+getString(raise?R.string.raise_lantern:R.string.lower_lantern);
         HealingFlaskUiState flask=readHealingFlaskState();
         if(flask!=null && flask.enabled) {
             prompt+="\n"+getString(R.string.controller_flask_drink,flask.charges,flask.capacity);
             if(flask.restAnchor!=0)prompt+="\n"+getString(R.string.controller_flask_rest);
         }
+        prompt=prompt.trim();
         controllerPrompt.setText(prompt); controllerPrompt.setContentDescription(prompt);
+        controllerPrompt.setVisibility(prompt.isEmpty()?View.GONE:View.VISIBLE);
+    }
+
+    private void showRaiseLanternObjective(int contextualState) {
+        if (controllerPrompt == null || (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0) return;
+        final int label = controllerMode ? R.string.raise_lantern_controller_prompt :
+                latestSubtitleInputMode == SUBTITLE_INPUT_TOUCH ? R.string.raise_lantern_touch_prompt :
+                R.string.raise_lantern_keyboard_prompt;
+        String prompt = controllerMode && controllerPrompt.getVisibility() == View.VISIBLE
+                ? controllerPrompt.getText().toString() + "\n" : "";
+        prompt += getString(label);
+        controllerPrompt.setText(prompt);
+        controllerPrompt.setContentDescription(prompt);
         controllerPrompt.setVisibility(View.VISIBLE);
+        positionContextualPrompt(!controllerMode);
+    }
+
+    private void positionContextualPrompt(boolean aboveTouchControls) {
+        if (controllerPrompt == null) return;
+        FrameLayout.LayoutParams params=(FrameLayout.LayoutParams)controllerPrompt.getLayoutParams();
+        int bottom=dp(16)+HudSafeArea.read(findViewById(R.id.root)).bottom;
+        if (aboveTouchControls) for (View control:new View[]{attackButton,parryButton,dodgeButton,
+                interactButton,toggleHeldLightPoseButton}) {
+            if (control==null || control.getVisibility()!=View.VISIBLE) continue;
+            FrameLayout.LayoutParams target=(FrameLayout.LayoutParams)control.getLayoutParams();
+            bottom=Math.max(bottom,target.bottomMargin+Math.max(0,target.height)+dp(8));
+        }
+        if(params.bottomMargin!=bottom) {params.bottomMargin=bottom;controllerPrompt.setLayoutParams(params);}
+    }
+
+    private void updateLanternPoseControl(int state) {
+        final boolean raise = (state & CONTEXTUAL_RAISE) != 0;
+        final boolean lower = (state & CONTEXTUAL_LOWER) != 0;
+        if (!raise && !lower) { toggleHeldLightPoseButton.setVisibility(View.GONE); return; }
+        LanternPoseControl.apply(toggleHeldLightPoseButton, lower,
+                getString(raise ? R.string.raise_lantern : R.string.lower_lantern));
+        toggleHeldLightPoseButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
     }
 
     private HealingFlaskUiState readHealingFlaskState() {
@@ -8356,6 +8395,7 @@ public class MainActivity extends Activity {
     private void updateContextualControls(final boolean controlsAllowed) {
         if (controllerPrompt != null) controllerPrompt.setVisibility(View.GONE);
         if (!controlsAllowed) {
+            positionContextualPrompt(false);
             logDebugContextualControls(false, -1);
             if (crouchButton != null) crouchButton.setVisibility(View.GONE);
             interactButton.setVisibility(View.GONE);
@@ -8363,6 +8403,8 @@ public class MainActivity extends Activity {
             return;
         }
         final int contextualState = ProbeBridge.getContextualControlState();
+        if (controllerMode || (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0)
+            positionContextualPrompt(false);
         logDebugContextualControls(true, contextualState);
         final boolean traversalOwned = (contextualState & CONTEXTUAL_RESCUE_MODE) != 0 &&
                 ((contextualState & RESCUE_PROMPT_MASK) >> RESCUE_PROMPT_SHIFT) == 4;
@@ -8390,16 +8432,16 @@ public class MainActivity extends Activity {
             }
             if (controllerPrompt != null) {
                 if (controllerMode) {
-                    final String prompt = getString(R.string.controller_play_prompts) +
-                            (label.isEmpty() ? "" : "\n" + (enabled ? "A: " : "") + label);
+                    final String prompt = label.isEmpty() ? "" : (enabled ? "A: " : "") + label;
                     controllerPrompt.setText(prompt);
                     controllerPrompt.setContentDescription(prompt);
-                    controllerPrompt.setVisibility(View.VISIBLE);
+                    controllerPrompt.setVisibility(prompt.isEmpty() ? View.GONE : View.VISIBLE);
                 } else {
                     controllerPrompt.setVisibility(View.GONE);
                 }
             }
-            toggleHeldLightPoseButton.setVisibility(View.GONE);
+            updateLanternPoseControl(contextualState);
+            showRaiseLanternObjective(contextualState);
             return;
         }
         final boolean interactEnabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
@@ -8414,14 +8456,10 @@ public class MainActivity extends Activity {
         }
         final boolean showRaise = (contextualState & CONTEXTUAL_RAISE) != 0;
         final boolean showLower = (contextualState & CONTEXTUAL_LOWER) != 0;
-        updateControllerPrompt(interactLabel, interactEnabled, showRaise, showLower);
-        if (!showRaise && !showLower) {
-            toggleHeldLightPoseButton.setVisibility(View.GONE);
-            return;
-        }
-        final int label = showRaise ? R.string.raise_lantern : R.string.lower_lantern;
-        LanternPoseControl.apply(toggleHeldLightPoseButton, showLower, getString(label));
-        toggleHeldLightPoseButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
+        updateControllerPrompt(interactLabel, interactEnabled,
+                showRaise && (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0, showLower);
+        updateLanternPoseControl(contextualState);
+        showRaiseLanternObjective(contextualState);
     }
 
     private boolean stageAsset(final String assetPath, final String fileName) {

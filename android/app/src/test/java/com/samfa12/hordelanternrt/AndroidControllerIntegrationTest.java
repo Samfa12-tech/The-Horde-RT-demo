@@ -206,6 +206,48 @@ public class AndroidControllerIntegrationTest {
         assertEquals(1,Bridge.attacks);assertEquals(1,Bridge.parries);assertEquals(1,Bridge.dodges);assertEquals(1,Bridge.interacts);assertEquals(1,Bridge.lanterns);
         assertTrue(field("controllerMode").getBoolean(a));
     }
+    @Test public void contextualFooterDoesNotRepeatCombatHelpAfterTeaching()throws Exception {
+        set("controllerMode",true);
+        Bridge.context=0;
+        call("updateContextualControls",new Class<?>[]{boolean.class},true);
+        TextView prompt=(TextView)field("controllerPrompt").get(a);
+        assertEquals(View.GONE,prompt.getVisibility());
+        Bridge.context=(1<<9)|(2<<6)|1;
+        call("updateContextualControls",new Class<?>[]{boolean.class},true);
+        assertTrue(prompt.getText().toString().contains("Descend"));
+        assertFalse(prompt.getText().toString().contains("Swing:"));
+    }
+    @Test public void reunionRaisePromptCoexistsWithRopeAndFollowsInputAndCancellation()throws Exception {
+        Bridge.context=(1<<13)|2|(1<<9)|(2<<6)|1;
+        TextView prompt=(TextView)field("controllerPrompt").get(a);
+        for(int orientation:new int[]{Configuration.ORIENTATION_PORTRAIT,Configuration.ORIENTATION_LANDSCAPE}) {
+            a.getResources().getConfiguration().orientation=orientation;
+            set("controllerMode",false);set("latestSubtitleInputMode",0);
+            call("updateContextualControls",new Class<?>[]{boolean.class},true);
+            assertEquals(View.VISIBLE,button("toggleHeldLightPoseButton").getVisibility());
+            assertTrue(prompt.getText().toString().startsWith("Tap the lantern"));
+            FrameLayout.LayoutParams target=(FrameLayout.LayoutParams)button("attackButton").getLayoutParams();
+            assertTrue(((FrameLayout.LayoutParams)prompt.getLayoutParams()).bottomMargin>
+                    target.bottomMargin+target.height);
+            set("latestSubtitleInputMode",1);
+            call("updateContextualControls",new Class<?>[]{boolean.class},true);
+            assertTrue(prompt.getText().toString().startsWith("Select the lantern"));
+            set("controllerMode",true);
+            call("updateContextualControls",new Class<?>[]{boolean.class},true);
+            assertTrue(prompt.getText().toString().contains("Y: Raise"));
+            assertTrue(prompt.getText().toString().contains("A: Descend"));
+            assertEquals(View.GONE,button("toggleHeldLightPoseButton").getVisibility());
+            call("updateContextualControls",new Class<?>[]{boolean.class},false);
+            assertEquals(View.GONE,prompt.getVisibility());
+        }
+        set("controllerMode",true);Bridge.context=(1<<13)|2;
+        call("updateContextualControls",new Class<?>[]{boolean.class},true);
+        assertEquals("Y: Raise your lantern for Kit.",prompt.getText().toString());
+        set("controllerMode",false);Bridge.context=0;
+        call("updateContextualControls",new Class<?>[]{boolean.class},true);
+        assertEquals(View.GONE,prompt.getVisibility());
+        assertEquals(0,Bridge.lanterns);assertEquals(0,Bridge.interacts);
+    }
     @Test public void takeoverRetainsHealthAndContextWhileLeavingPreferencesUntouched()throws Exception {
         Bridge.context=1|(2<<3)|2;
         android.content.SharedPreferences p=a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE);

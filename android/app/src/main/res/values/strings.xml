@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="raise_lantern_touch_prompt">Tap the lantern icon to raise your lantern for Kit.</string>
+    <string name="raise_lantern_keyboard_prompt">Select the lantern icon to raise your lantern for Kit.</string>
+    <string name="raise_lantern_controller_prompt">Y: Raise your lantern for Kit.</string>
     <string name="app_name">Horde Lantern RT Alpha</string>
     <string name="start_demo">ENTER THE RUIN</string>
     <string name="resume_demo">RESUME</string>
@@ -122,7 +125,7 @@
     <string name="report_copy_failed">The benchmark report could not be copied.</string>
     <string name="report_saved">Benchmark report saved.</string>
     <string name="report_save_failed">The benchmark report could not be saved.</string>
-    <string name="controls_help">LEFT HALF\nDrag gently to walk and strafe; farther to run\n\nRIGHT HALF\nDrag for 360° camera look\n\nSPEED\nMovement follows your drag distance, up to running pace.\n\nLOW OPENINGS\nCrouch automatically when needed and stand when there is headroom.\n\nSWING\nPress Swing to attack\n\nPARRY\nPress just before a strike to parry. Keep holding to guard against half of blockable damage. Release to lower your sword. Keyboard: hold Q. Attacking ends protection until recovery; holding never repeats the parry window. Release and press again for a new timed parry. Red attacks cannot be blocked: dodge.\n\nDODGE\nPress to evade in your movement direction; standing still dodges forward\n\nINTERACT\nUse the nearby chest or rope action when enabled. Follow Climb or Descend; equipment stows automatically on the rope.\n\nLANTERN ICON\nTap to raise or lower the reward lantern while carrying it.\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
+    <string name="controls_help">LEFT HALF\nDrag gently to walk and strafe; farther to run\n\nRIGHT HALF\nDrag for 360° camera look\n\nSPEED\nMovement follows your drag distance, up to running pace.\n\nLOW OPENINGS\nCrouch automatically when needed and stand when there is headroom.\n\nSWING\nPress Swing to attack\n\nPARRY\nPress just before a strike to parry. Keep holding to fully block normal attacks. Yellow attacks break a held guard: parry or dodge. Release to lower your sword. Keyboard: hold Q. Attacking ends protection until recovery; holding never repeats the parry window. Release and press again for a new timed parry. Red attacks cannot be blocked: dodge.\n\nDODGE\nPress to evade in your movement direction; standing still dodges forward\n\nINTERACT\nUse the nearby chest or rope action when enabled. Follow Climb or Descend; equipment stows automatically on the rope.\n\nLANTERN ICON\nTap to raise or lower the reward lantern while carrying it.\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
     <string name="sfx_enabled">Sound effects</string>
     <string name="haptics_enabled">Vibration / haptics</string>
     <string name="sfx_volume">SFX volume</string>

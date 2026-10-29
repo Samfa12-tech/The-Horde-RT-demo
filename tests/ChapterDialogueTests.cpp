@@ -8,6 +8,28 @@ using namespace horde::gameplay;
 using namespace horde::gameplay::dialogue;
 void Check(bool value,const char* msg) { if(!value) {std::cerr<<msg<<'\n';std::exit(1);} }
 int main() {
+    simulation::SimulationSnapshot guidance;
+    guidance.developmentRescueJourney=true;
+    guidance.chapterDialogue.waitingForRaise=true;
+    guidance.interaction.heldLightKind=interactions::HeldLightKind::RewardLantern;
+    guidance.interaction.heldLightPose=interactions::HeldLightPose::Low;
+    guidance.rescue.phase=traversal::Phase::UpperSafe;
+    Check(guidance.NeedsRaiseLanternPrompt(),"grounded pending proof requests explicit raise guidance");
+    guidance.chapterDialogue.line=Line::None;
+    Check(guidance.NeedsRaiseLanternPrompt(),"objective survives the spoken question ending");
+    for(auto phase:{traversal::Phase::LowerSafe,traversal::Phase::Ascent,traversal::Phase::Descent}) {
+        guidance.rescue.phase=phase;
+        Check(!guidance.NeedsRaiseLanternPrompt(),"no raise instruction during rope traversal or below ground");
+    }
+    guidance.rescue.phase=traversal::Phase::UpperSafe;
+    guidance.interaction.heldLightPose=interactions::HeldLightPose::High;
+    Check(!guidance.NeedsRaiseLanternPrompt(),"raised pose removes the redundant raise instruction");
+    guidance.interaction.heldLightPose=interactions::HeldLightPose::Low;
+    guidance.chapterDialogue.proofAccepted=true;
+    Check(!guidance.NeedsRaiseLanternPrompt(),"accepted proof cannot return as an objective on lowering");
+    guidance.chapterDialogue.proofAccepted=false;
+    guidance.interaction.heldLightKind=interactions::HeldLightKind::Torch;
+    Check(!guidance.NeedsRaiseLanternPrompt(),"wrong equipment never offers reward-lantern proof");
     const std::filesystem::path assetRoot = std::filesystem::path(HORDE_RT_SOURCE_DIR) / "assets";
     for (const auto& spec : kLines) {
         if (spec.id == Line::None) continue;
