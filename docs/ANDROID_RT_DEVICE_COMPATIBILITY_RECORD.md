@@ -1,5 +1,23 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-30 AEDT - installed f27982cd normal UI and checkpoint round trip
+
+Local ADB-injected input and screenshot inspection on **SM-S948B**, Adreno840,
+Vulkan1.4.295 / driver2150932499. Installed Debug APK hash
+`53af984fe8ce7fe275e2ea523c9fe7e2ccc7c433997c6ff708635f1cafa8224e`
+matches frozen sourcef27982cd; no installation occurred. Existing saved33%
+presented Pipeline RT at475x980 internal /1440x2971 output. Normal Play/Continue
+loaded the existing Safe Exit autosave, Resume reached the outdoor scene, touch
+look/movement responded and an emulated gamepad-Y action raised the lantern.
+The actual Save UI wrote empty manual Slot2; a cold restart loaded that record
+and resumed Safe Exit with three hearts. This does not establish full-chapter,
+physical two-thumb/controller, current04dc8346, Windows or performance acceptance.
+
+Released20:21:08UTC October29 (07:21AEDT October30): app stopped, original three
+save/lock/preferences files restored byte-exact, only test Slot2/manual lock and
+owned temporary UI XML removed; original APK/system settings unchanged, launcher
+foreground. No owned monitor/transfer remains. [Scope and restoration receipt](evidence/2026-10-30-phone-check/README.md).
+
 ## 2026-10-28 - e2addc77 installation/preflight interrupted; no new RT verdict
 
 SM-S948B / Android17 API37, isolated Debug sourcee2addc77, APK
