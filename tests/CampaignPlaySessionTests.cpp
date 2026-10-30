@@ -84,6 +84,13 @@ std::vector<std::byte> Raw(const fs::path& path){std::ifstream f(path,std::ios::
     while(f.get(c))bytes.push_back(std::byte(static_cast<unsigned char>(c)));return bytes;}
 io::StoredCheckpoint Read(const Directory& d,unsigned slot,cp::SaveKind kind){io::StoredCheckpoint record;
     Check(io::Read(d.path,cp::SaveBasename(*cp::SaveTarget(slot,kind)),record).status==io::Status::Read,"saved target reads");return record;}
+bool SameCheckpointExceptSaveTime(cp::Checkpoint a,cp::Checkpoint b) {
+    // Save requests may straddle a UTC second. Keep schema, admission and EVERY
+    // gameplay field in the canonical byte comparison; only request time differs.
+    a.savedAtUnixSeconds=b.savedAtUnixSeconds=0;
+    std::vector<std::byte> left,right;cp::codec::Error error{};
+    return cp::codec::Encode(a,left,error) && cp::codec::Encode(b,right,error) && left==right;
+}
 // CTest supplies a fresh nonce for THIS invocation to setup/consumer/cleanup.
 // Build/configuration-specific roots and create-only ownership prevent an old
 // endpoint or a concurrent runner from standing in for this run's earned save.
@@ -497,7 +504,30 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
     Check(play.SaveManual(0) && Done(play) && play.State().outcome==cp::PlayOutcome::Succeeded,
           "chapter-earned lower manual checkpoint completes real disk publication");
     const auto retainedManual=Raw(Path(directory,0,cp::SaveKind::Manual));
-    Check(retainedManual==earnedLower.encoded,"earned lower manual and automatic records contain the same coherent checkpoint");
+    const auto manualLower=Read(directory,0,cp::SaveKind::Manual);
+    if(!SameCheckpointExceptSaveTime(manualLower.checkpoint,earnedLower.checkpoint))
+        std::cerr<<"LOWER_RECORD_MISMATCH manualTime="<<manualLower.checkpoint.savedAtUnixSeconds
+                 <<" automaticTime="<<earnedLower.checkpoint.savedAtUnixSeconds<<'\n';
+    Check(retainedManual==manualLower.encoded &&
+          SameCheckpointExceptSaveTime(manualLower.checkpoint,earnedLower.checkpoint),
+          "earned lower manual and automatic records contain the same coherent checkpoint apart from independent save times");
+    const auto nowSeconds=std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    Check(manualLower.checkpoint.schema==4 && earnedLower.checkpoint.schema==4 &&
+          manualLower.checkpoint.savedAtUnixSeconds>0 && earnedLower.checkpoint.savedAtUnixSeconds>0 &&
+          manualLower.checkpoint.savedAtUnixSeconds<=static_cast<std::uint64_t>(nowSeconds) &&
+          earnedLower.checkpoint.savedAtUnixSeconds<=static_cast<std::uint64_t>(nowSeconds),
+          "both independently published earned records retain valid actual request timestamps");
+    auto nextSecond=earnedLower.checkpoint;++nextSecond.savedAtUnixSeconds;
+    std::vector<std::byte> nextSecondBytes;cp::codec::Error nextSecondError{};
+    Check(cp::codec::Encode(nextSecond,nextSecondBytes,nextSecondError) &&
+          nextSecondBytes!=earnedLower.encoded && SameCheckpointExceptSaveTime(nextSecond,earnedLower.checkpoint),
+          "a deterministic UTC-second boundary changes saved bytes without changing checkpoint coherence");
+    --nextSecond.vitality;
+    Check(!SameCheckpointExceptSaveTime(nextSecond,earnedLower.checkpoint),
+          "timestamp normalization cannot conceal a different saved health value");
+    nextSecond=earnedLower.checkpoint;nextSecond.flaskRecorded=!nextSecond.flaskRecorded;
+    Check(!SameCheckpointExceptSaveTime(nextSecond,earnedLower.checkpoint),
+          "timestamp normalization cannot conceal a changed resource-admission flag");
     {
         sim::GameSimulation fresh(config);cp::PlaySession reloaded(fresh,directory.path);
         sim::InputSnapshot freshInput;std::uint64_t freshPublication=0;

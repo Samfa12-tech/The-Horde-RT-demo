@@ -2,6 +2,8 @@
 
 ## Current integration reconciliation - 30 October 2026
 
+**Latest evening acceptance:** the [owner follow-up](../evidence/2026-10-30-interactive-acceptance/README.md#owner-follow-up-and-source-correction-30-october-evening-utc) closes actual renamed benchmark picker writing and records physical Backbone USB-PC/keyboard and scoped touch feedback. It also records newly confirmed focus-order/resize symptoms and the unfinished explicit practice-exit journey boundary: protection remained through the lich, so damaging combat and death/retry remain unaccepted. R14 is a separate focus/resize candidate, not a combat fix. The subsequent historical paragraphs do not reopen the completed picker check. `7fc47e38` PR CI passed six jobs; its push CI failed a save-time-sensitive assertion, with a corrected focused test pending replacement-head CI.
+
 The owner authorized main-to-development integration, not merging PR27 into
 main or publishing. Development parent `201e2d60` had all six CI jobs green;
 main parent is `d7e6d401`. The five current conflicts and combined-tree checks

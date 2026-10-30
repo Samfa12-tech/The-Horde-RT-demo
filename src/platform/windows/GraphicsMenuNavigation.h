@@ -15,6 +15,13 @@ struct GraphicsMenuRect
     int bottom = 0;
 };
 
+// Linear Tab/D-pad traversal follows displayed rows, then left-to-right within
+// a row. Creation/command IDs are not layout order; equal bounds stay stable.
+inline bool MenuControlRectPrecedes(const GraphicsMenuRect& a, const GraphicsMenuRect& b)
+{
+    return a.top != b.top ? a.top < b.top : a.left < b.left;
+}
+
 enum class GraphicsMenuDirection
 {
     Up,

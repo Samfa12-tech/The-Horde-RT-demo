@@ -7,6 +7,7 @@
 #include "platform/windows/WindowsRtLabState.h"
 
 #include <cstdlib>
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -47,6 +48,7 @@ using horde::platform::windows::ClaimedTorchPrimaryOwnershipValid;
 using horde::platform::windows::FindGraphicsMenuNeighbor;
 using horde::platform::windows::GraphicsMenuDirection;
 using horde::platform::windows::GraphicsMenuRect;
+using horde::platform::windows::MenuControlRectPrecedes;
 
 void Require(const bool condition, const std::string_view message)
 {
@@ -90,6 +92,27 @@ std::string ReadWindowsSource()
 
 int main()
 {
+    // The pause menu creates Restart before Save/Load, but renders it below
+    // them. Command/creation order must never own linear keyboard/D-pad focus.
+    struct MenuItem { int id; GraphicsMenuRect bounds; };
+    std::vector<MenuItem> pauseOrder{
+        {1,{40,100,440,140}}, {4,{40,280,440,320}},
+        {2,{40,160,440,200}}, {3,{40,220,440,260}}, {5,{40,340,440,380}}};
+    const auto visualOrder=[](const MenuItem& a,const MenuItem& b) {
+        return MenuControlRectPrecedes(a.bounds,b.bounds);
+    };
+    std::stable_sort(pauseOrder.begin(),pauseOrder.end(),visualOrder);
+    for(std::size_t i=0;i<pauseOrder.size();++i)
+        Require(pauseOrder[i].id==static_cast<int>(i+1),
+            "pause traversal follows Resume, Save, Load, Restart, Controls as displayed");
+    Require(pauseOrder[WrapRtLabFocus(0,-1,pauseOrder.size())].id==5 &&
+            pauseOrder[WrapRtLabFocus(4,1,pauseOrder.size())].id==1,
+        "visual-order wrapping remains symmetric for Up and Down");
+    std::vector<MenuItem> grid{{3,{220,80,410,120}}, {4,{10,140,410,180}},
+                              {1,{10,80,100,120}}, {2,{10,80,100,120}}};
+    std::stable_sort(grid.begin(),grid.end(),visualOrder);
+    Require(grid[0].id==1 && grid[1].id==2 && grid[2].id==3 && grid[3].id==4,
+        "same-row actions traverse left-to-right and equal bounds retain stable order");
     using horde::platform::windows::ResolveDesktopMovementInput;
     const auto partialStick=ResolveDesktopMovementInput(false,false,false,false,.25f,-.5f);
     Require(partialStick.analogue && partialStick.forward==.25f && partialStick.strafe==-.5f,

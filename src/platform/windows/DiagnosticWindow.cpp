@@ -4872,6 +4872,14 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
             controls.push_back(control);
         }
     }
+    std::stable_sort(controls.begin(), controls.end(), [](HWND a, HWND b) {
+        RECT first{}, second{};
+        GetWindowRect(a, &first);
+        GetWindowRect(b, &second);
+        return horde::platform::windows::MenuControlRectPrecedes(
+            {first.left, first.top, first.right, first.bottom},
+            {second.left, second.top, second.right, second.bottom});
+    });
     return controls;
 }
 
@@ -12423,6 +12431,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             CancelBenchmark(*sceneContext, true, "window-size");
         }
         LayoutOverlayControls(hWnd, LOWORD(lParam), HIWORD(lParam));
+        // Moved owner-drawn children must repaint their complete client areas;
+        // preserving old window bits can otherwise leave stale button labels
+        // until focus happens to invalidate each individual control.
+        if (sceneContext && wParam != SIZE_MINIMIZED)
+            RedrawWindow(hWnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_UPDATENOW);
         return 0;
     case WM_TIMER:
         if (wParam == kEntryLoadingIndicatorId && sceneContext && sceneContext->entryLoadingVisible)
@@ -12458,6 +12471,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         RECT clientRect{};
         GetClientRect(hWnd, &clientRect);
         LayoutOverlayControls(hWnd, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+        RedrawWindow(hWnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_UPDATENOW);
         return 0;
     }
     case WM_DRAWITEM:
