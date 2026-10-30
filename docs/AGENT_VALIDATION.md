@@ -1,5 +1,7 @@
 # Validation and evidence guide
 
+For performance work, first consult the [current experiment ledger](PERFORMANCE_EXPERIMENT_LEDGER.md) for closed negatives, retained wins, exact-cohort limits and raw-artifact availability. Historical audit proposals do not automatically reopen rejected trials.
+
 Use the section relevant to the requested change. This guide is not a requirement to run every lane for every edit. Root [AGENTS.md](../AGENTS.md) defines working permissions; [engine contracts](AGENT_ENGINE_CONTRACTS.md) explain the subsystem invariants.
 
 ## Choose the smallest sufficient check
