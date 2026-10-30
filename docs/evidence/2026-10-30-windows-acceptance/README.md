@@ -105,4 +105,4 @@ documented1.7 scope. Normal experimental gates remain OFF. Hosted CI for the
 new source checkpoint is separate from these local/interactive results.
 
 
-Three-slot/date source follow-up: [2026-10-30 receipt](../2026-10-30-three-slot-saves/README.md). Its new Windows UI interaction is blocked on Computer Use activation; the earlier gameplay evidence above is not reused as a pass for that changed UI.
+Three-slot/date source follow-up: [2026-10-30 receipt](../2026-10-30-three-slot-saves/README.md). Its initial activation blocker was later recovered after the owner returned. The same frozen R7 passed mouse/save/cold-load checks; R8 passed the demonstrated keyboard-hook correction. The earlier gameplay evidence above is not reused as a pass for that changed UI.

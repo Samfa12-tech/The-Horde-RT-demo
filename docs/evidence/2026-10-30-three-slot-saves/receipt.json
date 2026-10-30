@@ -16,11 +16,17 @@
     "experimentalGates": "unchanged OFF",
     "profile": "own state child; four copied synthetic records, slot3 empty",
     "launched": true,
-    "uiAcceptance": "BLOCKED: first Computer Use activation failed to activate captured window",
-    "presented": false,
+    "uiAcceptance": "initial activation blocked; owner-return recovery passed on exact same frozen binary",
+    "presented": true,
     "ownedProcessStopped": true,
     "fixtureChanges": [],
-    "sourceCommitBackedUp": "7e0b166110bf0be40e75989779894be7e69cd67f"
+    "sourceCommitBackedUp": "7e0b166110bf0be40e75989779894be7e69cd67f",
+    "initialBlockedAttempt": {
+      "error": "failed to activate captured window",
+      "pid": 5440,
+      "presented": false,
+      "disposition": "owned process stopped; no input or writes; no cause established"
+    }
   },
   "android": {
     "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
@@ -66,7 +72,48 @@
     "parkedOwnerFiles": 151,
     "changed": 0,
     "phone": "not acquired or accessed",
-    "ownedProcess5440": "stopped after CUA activation failure; synthetic saves unchanged",
+    "ownedProcess5440": "initial blocked process stopped; later R7/R8 sessions closed through Computer Use Alt+F4; no Horde process left",
     "foreground": "released"
+  },
+  "windowsKeyboardFollowup": {
+    "sha256": "38144dd9d9176b2d4af16e9bf0e12034452438332231ff55eab803669c5c4e85",
+    "bytes": 4905472,
+    "labels": [
+      "g:3815ce2c8a77c444f2a82ceff322bf64504d3a65;i:f61a8f9d6713b359315c3fc8a1fe122a6a978d89b659749d9e07052e76fd6cef;c:R;s:D"
+    ],
+    "source": "3815ce2c plus narrow existing keyboard/focus hook for dynamic campaign buttons",
+    "assets": 184,
+    "profile": "copy of owned R7 synthetic and actually GUI-saved record; Slot3 mtime deliberately2030, embedded date2026",
+    "launched": true,
+    "ownedProcessStopped": true,
+    "uiAcceptance": "R7 mouse confirmation/save/overwrite/cold reload passed; R8 Tab/arrows/Enter/Escape and embedded-date selection passed",
+    "presented": true,
+    "initialBlockedAttempt": null,
+    "sourceCommitBackedUp": "bdb660c299b60ddaf1e1fb1b2e6c9b5809241518"
+  },
+  "intermediateCi": {
+    "head": "3815ce2c8a77c444f2a82ceff322bf64504d3a65",
+    "run": 41021067796,
+    "conclusion": "success, all six jobs"
+  },
+  "windowsObserved": {
+    "directLoad": "Slot1 auto and Slot3 actual manual reach gameplay without extra Resume",
+    "emptySave": "created Slot3 only",
+    "overwrite": "cancel preserved original four; explicit Replace saved Slot3 at18:43:15AEDT",
+    "coldLoad": "same R7 binary, exact dated Slot3, three hearts, actual RT presentation",
+    "r8Keyboard": "Tab Back->Slot1, Down twice->Slot3, Return->gameplay; Escape->pause; keyboard confirmation and Escape cancel",
+    "fileTimeWitness": "R8 copied Slot3 mtime2030-01-01 but displayed embedded30/10/2026 6:43:15PM",
+    "rtScene": {
+      "presented": true,
+      "dispatchWidth": 1232,
+      "dispatchHeight": 803
+    },
+    "dateRecordSha256": "a4dcd4ae4f7b8ff50858625360039f8fc7bff54f051a4d0864221969d07fd28c",
+    "originalFourChanged": [],
+    "limitations": [
+      "synthetic earned-state staging, not natural chapter completion",
+      "physical controller and Android touch/lifecycle not run",
+      "no FPS, sleep or lock-screen cause established"
+    ]
   }
 }

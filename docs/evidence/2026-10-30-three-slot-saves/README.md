@@ -1,6 +1,6 @@
 # Three campaign slots with local save dates — 2026-10-30
 
-Source checkpoint: `7e0b166110bf0be40e75989779894be7e69cd67f`. Prior checkpoint CI [41017548876](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/41017548876) completed successfully, all six jobs. This receipt is source/host evidence, **not current Windows/phone interaction acceptance or release approval**.
+Source checkpoint: `7e0b166110bf0be40e75989779894be7e69cd67f`. Prior checkpoint CI [41017548876](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/41017548876) completed successfully, all six jobs. The keyboard follow-up is `bdb660c299b60ddaf1e1fb1b2e6c9b5809241518`. Intermediate head3815ce2c CI [41021067796](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/41021067796) passed all six jobs. This receipt includes bounded actual Windows interaction; **phone acceptance, natural chapter completion and release approval remain open**.
 
 ## Result
 
@@ -20,17 +20,25 @@ The shared selector waits for both catalogue reads and uses the newest embedded 
 
 ![Landscape Android host widget fixture](android-host-load-804x381.png)
 
-## Windows interaction blocked, not passed
+## Windows interaction and recovery chronology
 
-The isolated R7 package launched through Computer Use, but its window stayed black and AX state was unavailable. Report remained `rtScene.presented=false`, dispatch 0×0. Read-only process inspection showed a responsive owned process (PID5440). The first coordinate activation returned **failed to activate captured window**. No further activation or alternate launch was attempted. This is not evidence of a menu/game crash or successful gameplay.
+The first isolated R7 launch stayed black, AX was unavailable and the report remained `rtScene.presented=false`, dispatch0x0. A responsive process (PID5440) was observed; the first Computer Use activation returned **failed to activate captured window**. No activation loop or alternate route followed. That exact owned process was stopped, with all four copied fixtures unchanged. This failure is preserved in the receipt/history; it is not evidence of a game crash.
 
-The exact owned R7 process was stopped after UI cleanup was unavailable. Its four copied synthetic save records are byte-identical to their baseline; Slot3 was intentionally left empty in a new profile. Existing R6 package and every original fixture remain. All 151 parked owner files hashed unchanged. No phone session/settings/install was started.
+After the owner returned and explicitly said the test window could come forward, the **same frozen R7 binary** launched and rendered. Mouse checks passed: three New Game/Load/Save slots, empty/undated labels, occupied New Game and Save confirmation/cancel, direct Slot1 Load into actual outdoor RT gameplay with three hearts, Save to empty Slot3, then explicit replacement of that new disposable save. The new date was30/10/2026 6:43:15PM local (+11); its schema4 bytes store07:43:15UTC. Closing and cold-reopening R7 retained that exact date, and Slot3 loaded directly into gameplay without an extra Resume. The original four synthetic records stayed byte-identical.
 
-Next Windows check requires a coordinated foreground window that Computer Use can actually activate: launch the frozen R7 package, inspect all three slots, use keyboard/mouse selection, cancel and confirm overwrite, verify newly saved local date and direct Continue, then cold reload the same record. Do not relabel earlier R6 gameplay/save acceptance as this UI's acceptance. Physical controller and current Android touch/orientation/lifecycle acceptance remain separate.
+Actual keyboard checking identified a pre-existing integration omission: campaign child buttons were created after the startup keyboard/controller-focus hook installation. The narrow follow-up applies that existing hook to those buttons; no new navigation framework. In separately frozen R8, Tab moved Back->Slot1, Down twice selected Slot3, Enter loaded it into real RT gameplay, Escape opened pause, and keyboard-selected overwrite confirmation could be cancelled with Escape without writing. Menu/controller host checks also passed. Physical controller feel was not exercised.
+
+R8 contains a disposable copy of the actual GUI-saved Slot3 record, with its filesystem mtime deliberately set to2030-01-01. The Load/Save card still displayed the embedded2026 time and loading left its177 bytes/hash unchanged. Both successful packages report real RT swapchain presentation at1232x803. These are functional observations, not FPS results, natural chapter completion or current-phone acceptance.
+
+All test sessions closed through Computer Use Alt+F4; no Horde process remains. Existing packages, original fixtures and151 parked owner files are preserved. Phone was not acquired/accessed or installed. Sleep is only the owner's suspected correlation: no locked session, sleep event or causal explanation was established, and no PIN or security/sleep setting was requested/used/changed.
+
+Remaining short acceptance: arrange installation of the frozen current Android APK with save/settings preservation, then test three slots, actual local date, touch selection/confirmation/cancel, orientation, direct Load and lifecycle. Current installed older builds cannot validate this change. An awake unlocked laptop with a foreground window is the demonstrated supported Computer Use arrangement; its documented API does not provide a Windows-unlock/PIN operation.
 
 ## Frozen artifacts (local, not published)
 
 - Windows: `reports/horde-windows-acceptance-20261030-r7-three-slots/HordeLanternRT.exe`, 4,905,472 bytes, SHA256 `412dd0367164995fed53249e2bb3dd92166e80957077c2fbdbd3abec8e0fcbdc`. 184 staged assets verified against current source. Live Send unavailable; ring/flask/yellow/shared64/worker normal gates remain OFF.
 - Android: `reports/three-slot-ui-20261030/horde-three-slots-debug.apk`, 201,720,323 bytes, SHA256 `88988a12f4f2642e5fb3e379d816f497624a0a955f0d3cbed03ea269a3e683b5`; `com.samfa12.hordelanternrt.debug`, versionCode10, `1.6.2-debug`, arm64-v8a/armeabi-v7a/x86/x86_64. **Uninstalled**; a save-safe, compatible installation must be arranged before current-device acceptance.
 
-Both binaries were built from the bounded dirty input based at9d7df2cc that is now committed as7e0b1661; they are not falsely labelled clean builds of the later commit. Embedded per-platform/per-ABI provenance labels and hashes are in [receipt.json](receipt.json). Raw local reports and APK remain ignored; only this compact receipt and two representative widget images are tracked. No merge, release, live report or deployment.
+R8 Windows artifact: `reports/horde-windows-acceptance-20261030-r8-keyboard/HordeLanternRT.exe`, SHA256 `38144dd9d9176b2d4af16e9bf0e12034452438332231ff55eab803669c5c4e85`,4,905,472bytes,184verified assets. It contains3815ce2c plus the now-committed bdb660c2 keyboard follow-up.
+
+The original R7 and Android binaries were built from the bounded dirty input based at9d7df2cc that is now committed as7e0b1661; they are not falsely labelled clean builds of the later commit. Embedded per-platform/per-ABI provenance labels and hashes are in [receipt.json](receipt.json). Raw local reports and APK remain ignored; only this compact receipt and two representative widget images are tracked. No merge, release, live report or deployment.
