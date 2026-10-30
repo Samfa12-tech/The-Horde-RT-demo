@@ -27,6 +27,10 @@ struct Checkpoint {
     // Schema3 stores exact resources. Absent legacy resources mean an empty
     // base flask, not a new-game refill; schema1/2 bytes remain unchanged.
     healing::FlaskResources flask{false,0};
+    // Schema4: UTC save-request time, stored atomically with the selected record.
+    // Zero means unavailable; never substitute filesystem modification time.
+    std::uint64_t savedAtUnixSeconds = 0;
+    bool flaskRecorded = false; // schema4 preserves the original resource-admission boundary.
     std::uint32_t defeatedGuards = 3;
     bool keeperDefeated = true, lanternClaimed = true, lidOpen = true;
     bool ropeReady = true, night = true, firstAscentCompleted = false;
@@ -36,6 +40,9 @@ struct Checkpoint {
     std::array<GuardPose, 2> guards{};
     dialogue::Progress dialogue{};
 };
+inline bool HasFlaskResources(const Checkpoint& c) {
+    return c.schema==3 || (c.schema==4 && c.flaskRecorded);
+}
 inline simulation::WorldZoneId Destination(CheckpointId id) {
     if (id == CheckpointId::ForestEndpoint) return simulation::WorldZoneId::Lookout;
     return id == CheckpointId::SafeExit ? simulation::WorldZoneId::TombExterior
@@ -52,7 +59,10 @@ inline bool Validate(const Checkpoint& c) {
     // retains completed forest progress at the lookout and later safe-side
     // returns, with the same logical payload. Old executables reject revision 2.
     const bool completedForest = c.contentRevision == 2;
-    if ((c.schema != 1 && c.schema != 2 && c.schema != 3) ||
+    if ((c.schema != 1 && c.schema != 2 && c.schema != 3 && c.schema != 4) ||
+        c.savedAtUnixSeconds > 253402300799ULL || (c.schema < 4 && c.savedAtUnixSeconds != 0) ||
+        (c.schema < 4 && c.flaskRecorded) ||
+        (c.schema == 4 && !c.flaskRecorded && c.flask != healing::FlaskResources{false,0}) ||
         (c.schema == 1 && c.halfHeart) || !c.flask.Valid() ||
         (c.schema < 3 && c.flask != healing::FlaskResources{false,0}) ||
         (c.contentRevision != 1 && !completedForest) ||

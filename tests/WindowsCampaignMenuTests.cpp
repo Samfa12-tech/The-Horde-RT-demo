@@ -1,5 +1,6 @@
 #include "platform/windows/WindowsCampaignMenu.h"
 #include <iostream>
+#include "platform/windows/WindowsSaveDate.h"
 #include <vector>
 
 namespace cp=horde::gameplay::campaign;
@@ -40,6 +41,10 @@ int main() {
     HWND parent=CreateWindowExA(0,klass.lpszClassName,"hidden campaign fixture",WS_OVERLAPPEDWINDOW,
         0,0,800,700,nullptr,nullptr,klass.hInstance,nullptr);
     if(!parent)return 1;
+    DYNAMIC_TIME_ZONE_INFORMATION utc{};wcscpy_s(utc.TimeZoneKeyName,L"UTC");
+    const auto date=horde::platform::windows::WindowsSaveDate(1767225600,&utc,L"en-US");
+    Check(date.find("2026")!=std::string::npos && date.find("12:00:00")!=std::string::npos,"saved instant formatted in injected timezone/locale");
+    Check(horde::platform::windows::WindowsSaveDate(0)=="Date unavailable","missing date stays honest");
     std::vector<Menu::Command> commands;
     {
         Menu menu([&](Menu::Command command){commands.push_back(command);});
@@ -61,15 +66,14 @@ int main() {
             "stable catalogue polling does not erase/repaint or re-enable identical slot controls");
         SetWindowLongPtrA(choice,GWLP_WNDPROC,reinterpret_cast<LONG_PTR>(originalChoiceProcedure));
         Check(!IsWindowVisible(parent) && menu.Visible(),"owner remains hidden while chooser is logically open");
-        Check(Text(parent,4110).find("Lower claimed | Hearts 2/3")!=std::string::npos,"real occupied label carries checkpoint and hearts");
-        Check(Text(parent,4111).find("Checking")!=std::string::npos && !Enabled(parent,4111),"checking load disabled");
-        Check(Text(parent,4112).find("Invalid - preserved")!=std::string::npos && !Enabled(parent,4112),"invalid record preserved");
-        Check(Text(parent,4113).find("Unreadable - preserved")!=std::string::npos && !Enabled(parent,4113),"read error preserved");
-        Check(Text(parent,4114).find("Empty")!=std::string::npos && !Enabled(parent,4114),"empty load disabled");
-        Check(Text(parent,4115).find("Safe exit | Hearts 1/3")!=std::string::npos,"upper latest auto label carries actual checkpoint facts");
-        Click(parent,4113);Check(commands.empty(),"programmatic invalid choice cannot dispatch");
-        Click(parent,4115);Check(commands.size()==1 && commands.back().action==Menu::Action::Load &&
-            commands.back().slot==2 && commands.back().kind==cp::SaveKind::Autosave,"sixth native command selects slot three latest auto");
+        Check(Text(parent,4110).find("Checking saves")!=std::string::npos && !Enabled(parent,4110),"slot waits for both reads");
+        Check(Text(parent,4111).find("Save unavailable")!=std::string::npos && !Enabled(parent,4111),"unreadable records stay preserved");
+        Check(Text(parent,4112).find("Safe exit | 1 / 3 hearts")!=std::string::npos && Text(parent,4112).find("Date unavailable")!=std::string::npos,"slot shows selected progress and honest missing date");
+        Check(!Shown(parent,4113) && !Shown(parent,4114) && !Shown(parent,4115),"exactly three primary choices; no separate auto rows");
+        Click(parent,4113);Check(commands.empty(),"hidden old choice cannot dispatch");
+        Click(parent,4112);Check(commands.size()==1 && commands.back().action==Menu::Action::Load && commands.back().slot==2 && commands.back().kind==cp::SaveKind::Autosave,"third slot loads the same selected record it displays");
+        Check(menu.ShouldContinueAfterPresentation(),"deliberate slot Load records direct-continue intent, not presentation success");
+        menu.HoldLoadedGame();Check(!menu.ShouldContinueAfterPresentation(),"app deactivation revokes automatic continuation");
         auto forest=Record(2,true);
         forest.checkpoint->id=cp::CheckpointId::ForestEndpoint;forest.checkpoint->contentRevision=2;
         forest.checkpoint->zone=horde::gameplay::simulation::WorldZoneId::Lookout;
@@ -79,11 +83,12 @@ int main() {
         story.rescueConsumed=story.reunionStarted=story.proofAccepted=true;
         story.forestNightConsumed=story.forestWaystoneConsumed=story.forestClueConsumed=story.forestVillageConsumed=true;
         view.catalogue[5]=forest;++view.catalogueRevision;menu.Refresh(view);commands.clear();
-        Check(Enabled(parent,4115) && Text(parent,4115).find("Forest lookout | Hearts 2/3")!=std::string::npos,
+        Check(Enabled(parent,4112) && Text(parent,4112).find("Forest lookout | 2 / 3 hearts")!=std::string::npos,
             "forest checkpoint is an independently named loadable autosave");
-        Click(parent,4115);Check(commands.size()==1 && commands.back().action==Menu::Action::Load &&
+        Click(parent,4112);Check(commands.size()==1 && commands.back().action==Menu::Action::Load &&
             commands.back().slot==2 && commands.back().kind==cp::SaveKind::Autosave,"forest choice retains exact slot and record kind");
         commands.clear();menu.Open(Menu::Page::Save,Menu::Origin::Pause);
+        view.catalogue[1].status=cp::CatalogueStatus::Empty;++view.catalogueRevision;menu.Refresh(view);
         Check(!Enabled(parent,4111) && Enabled(parent,4112),"manual invalid slot blocked; independent empty manual allowed");
         Click(parent,4110);Check(commands.empty() && Shown(parent,Menu::ConfirmId),"occupied manual requires explicit confirmation");
         Click(parent,Menu::BackId);Check(commands.empty() && !Shown(parent,Menu::ConfirmId),"cancel confirmation performs no save or owner cancel");
@@ -93,12 +98,13 @@ int main() {
         Check(commands.size()==1 && commands.back().action==Menu::Action::SaveManual && commands.back().slot==0,
             "confirmed manual action uses actual native command");
         commands.clear();Click(parent,4112);
-        Check(commands.size()==1 && commands.back().action==Menu::Action::SaveManual && commands.back().slot==2,
-            "empty manual slot dispatches directly without touching latest auto");
+        Check(commands.empty() && Shown(parent,Menu::ConfirmId),
+            "populated slot requires overwrite confirmation even when only auto exists");
         commands.clear();menu.Open(Menu::Page::NewGame,Menu::Origin::Entry);
+        view.catalogue[1].status=cp::CatalogueStatus::Checking;++view.catalogueRevision;menu.Refresh(view);
         Check(!Enabled(parent,4110),"new game waits for both record checks");
         view.catalogue[1].status=cp::CatalogueStatus::Empty;++view.catalogueRevision;menu.Refresh(view);
-        Click(parent,4110);Check(commands.empty() && Text(parent,Menu::StatusId).find("Manual saves are kept")!=std::string::npos,
+        Click(parent,4110);Check(commands.empty() && Text(parent,Menu::StatusId).find("New progress is saved")!=std::string::npos,
             "occupied new game explains manual preservation and latest auto replacement");
         Click(parent,Menu::ConfirmId);Check(commands.size()==1 && commands.back().action==Menu::Action::BeginNewGame,
             "new game requires explicit occupied confirmation");
@@ -108,11 +114,12 @@ int main() {
             Check(!Enabled(parent,4110) && !Enabled(parent,Menu::RefreshId),"pending phase disables record actions");
             Click(parent,4110);Click(parent,Menu::RefreshId);Check(commands.empty(),"pending synthetic clicks cannot bypass disabled controls");
             Click(parent,Menu::BackId);Check(commands.size()==1 && commands.back().action==Menu::Action::Cancel,"pending Back dispatches owner cancellation");commands.clear();
+            Check(!menu.ShouldContinueAfterPresentation(),"cancellation never leaves automatic continuation armed");
         }
         view.phase=Menu::Phase::Failed;view.message="Injected write failure";view.writeUncertain=true;
         menu.Refresh(view);menu.Open(Menu::Page::Save,Menu::Origin::Pause);
-        Check(Text(parent,Menu::StatusId).find("Injected write failure")!=std::string::npos &&
-            Text(parent,Menu::StatusId).find("uncertain")!=std::string::npos && !Enabled(parent,4110),"uncertain failure remains visible and forbids blind write");
+        Check(Text(parent,Menu::StatusId).find("Could not save")!=std::string::npos &&
+            Text(parent,Menu::StatusId).find("Could not confirm")!=std::string::npos && !Enabled(parent,4110),"uncertain failure remains visible and forbids blind write");
         Click(parent,Menu::RefreshId);Check(commands.size()==1 && commands.back().action==Menu::Action::Refresh,"read-only recheck dispatched after failure");
         commands.clear();Click(parent,Menu::BackId);Check(commands.size()==1 && commands.back().action==Menu::Action::Close,"precommit failure permits close");
         commands.clear();view.phase=Menu::Phase::Presenting;view.message.clear();view.writeUncertain=false;
@@ -125,7 +132,7 @@ int main() {
         Check(commands.size()==1 && commands.back().action==Menu::Action::Resume,"owner-confirmed frame enables explicit Resume only");
         menu.Close();Check(!menu.Visible() && !Shown(parent,4110) && !menu.HandleCommand(4110),"closed menu rejects command dispatch");
         view.phase=Menu::Phase::Ready;view.canResumeLoaded=false;menu.Refresh(view);
-        menu.Open(Menu::Page::Save,Menu::Origin::Pause);commands.clear();Click(parent,4112);
+        menu.Open(Menu::Page::Save,Menu::Origin::Pause);commands.clear();Click(parent,4112);Click(parent,Menu::ConfirmId);
         Check(commands.size()==1 && commands.back().action==Menu::Action::SaveManual && !Shown(parent,Menu::ResumeId),
             "historical load success cannot disable a later manual save chooser");
         Check(!IsWindowVisible(parent) && GetForegroundWindow()==foreground,"hidden fixture never changes foreground window");

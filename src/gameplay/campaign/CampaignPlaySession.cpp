@@ -1,4 +1,5 @@
 #include "gameplay/campaign/CampaignPlaySession.h"
+#include <chrono>
 
 namespace horde::gameplay::campaign {
 PlaySession::PlaySession(simulation::GameSimulation& simulation,std::filesystem::path directory,storage::FaultInjector* faults)
@@ -78,7 +79,10 @@ bool PlaySession::ObserveSafeBoundary() {
 bool PlaySession::StartSave(unsigned slot,SaveKind kind,const Checkpoint& checkpoint,std::uint64_t revision) {
     if(Busy() || slot>=3 || state_.operationRevision==UINT64_MAX)return false;
     SuspendCatalogue();
-    if(!Select(slot) || !session_.SaveCheckpoint(kind,checkpoint))return false;
+    auto dated=checkpoint;dated.flaskRecorded=HasFlaskResources(checkpoint);dated.schema=4;
+    const auto seconds=std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    dated.savedAtUnixSeconds=seconds>0 && seconds<=253402300799LL?static_cast<std::uint64_t>(seconds):0;
+    if(!Select(slot) || !session_.SaveCheckpoint(kind,dated))return false;
     state_.fromConfirmedRecord=false;
     state_.operation=kind==SaveKind::Manual?PlayOperation::ManualSave:PlayOperation::Autosave;
     state_.outcome=PlayOutcome::Pending;state_.operationSlot=slot;state_.operationKind=kind;

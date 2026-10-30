@@ -59,7 +59,7 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    const auto bytes=Encode(c);Check(bytes.size()==(c.schema==3?168u:(c.schema==2?163u:162u)) && bytes.size()<=codec::kMaxFileBytes,"canonical format has a fixed bounded length");
+    const auto bytes=Encode(c);Check(bytes.size()==(c.schema==4?177u:(c.schema==3?168u:(c.schema==2?163u:162u))) && bytes.size()<=codec::kMaxFileBytes,"canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
     auto output=Upper();output.vitality=2;codec::Error error=codec::Error::Malformed;
     Check(codec::Decode(bytes,output,error) && error==codec::Error::None,"encoded checkpoint decodes successfully");
@@ -67,6 +67,11 @@ void RoundTrip(const cp::Checkpoint& c) {
 }
 }
 int main() {
+    for(auto seconds:{0ULL,1793314800ULL,253402300799ULL}) {
+        auto dated=Upper();dated.schema=4;dated.flaskRecorded=true;dated.savedAtUnixSeconds=seconds;dated.halfHeart=true;dated.flask={true,2};RoundTrip(dated);
+    }
+    {auto bad=Upper();bad.schema=4;bad.savedAtUnixSeconds=253402300800ULL;
+     std::vector<std::byte> out;codec::Error error{};Check(!codec::Encode(bad,out,error),"out-of-range timestamp rejected without writing");}
     static_assert(codec::kMaxFileBytes<=4096);
     // Independent literal format fixture pins magic, field order, LE floats,
     // zero-filled continuations, payload length and IEEE CRC32 0x01703382.
@@ -126,7 +131,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,4);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,5);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -243,7 +248,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,4u,0xffffffffu}) {
+    for(std::uint32_t version:{0u,5u,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,3u,0xffffffffu}) {
@@ -288,7 +293,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=4;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=5;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     invalid=cp::Checkpoint{};invalid.contentRevision=3;invalidEncode(invalid,codec::Error::UnsupportedContent);
     invalid=cp::Checkpoint{};invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=Upper();invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);

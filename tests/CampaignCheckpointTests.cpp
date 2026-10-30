@@ -451,7 +451,13 @@ int main(int argc,char** argv) {
             Check(!cp::Validate(bad) && !sim.BeginCampaignRestore(bad),"malformed record is rejected before preparation");
             Check(SameSession(before,sim.Snapshot()),"malformed record does not mutate live state");
         };
-        auto bad=good;bad.schema=4;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
+        future.schema=4;future.flaskRecorded=true;future.savedAtUnixSeconds=1767225600;
+        Check(cp::Validate(future) && !sim.BeginCampaignRestore(future) && SameSession(before,sim.Snapshot()),
+            "dated resource records retain the unadmitted flask boundary");
+        auto dated=good;dated.schema=4;dated.savedAtUnixSeconds=1767225600;
+        GameSimulation datedGame(ProductionGameSimulationConfig());
+        Check(cp::Validate(dated) && Restore(datedGame,dated,terrain),"ordinary dated save restores without gated flask ownership");
+        auto bad=good;bad.schema=5;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
         bad=good;bad.id=static_cast<cp::CheckpointId>(9);reject(bad);
         bad=good;bad.zone=WorldZoneId::ForestApproach;reject(bad);
         for(int vitality:{0,4,-1}) {bad=good;bad.vitality=vitality;reject(bad);}

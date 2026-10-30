@@ -17,7 +17,9 @@ enum class Error {
 // halfHeart (143 bytes). Schema3 retains that half-heart byte and appends one
 // canonical upgraded bool and LE32 charge count (148 bytes). Schemas1/2 decode
 // an empty base-capacity flask; no health/progress mutation or write-on-read.
-// The capture owner must explicitly select3 only when it owns actual resources.
+// Schema4 appends LE64 UTC save-request seconds and a canonical resource-presence
+// bool (157 bytes); zero time is unavailable. Dates cannot enable flask ownership.
+// PlaySession dates a write once at request admission; reads never invent dates.
 // Schema and payload length must agree. The payload encodes logical values;
 // integers are LE32, floats IEEE754 binary32, bools a single 0/1 byte.
 // No padding, runtime identities, filesystem access or migration-on-read.

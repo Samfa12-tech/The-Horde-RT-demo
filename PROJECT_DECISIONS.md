@@ -105,6 +105,16 @@ Three slots each retain a separate manual save and one latest autosave. Autosavi
 must never replace the manual record; no indefinite history is requested. Manual
 Save uses the supported safe-checkpoint state, not arbitrary mid-rope/combat state.
 
+The owner-approved 2026-10-30 chooser presents three primary slots, with manual
+and autosave retention kept behind the scenes. Each slot displays and loads the
+same latest valid record by its embedded UTC save-request time, formatted in the
+player's local locale/timezone. A dated tie favours manual; undated local fixtures
+use autosave when both are valid and say "Date unavailable". New writes use the
+bounded schema4 metadata extension; no file-mtime fallback or rewrite-on-read.
+Populated slots require explicit overwrite/new-game confirmation. Normal Load
+enters gameplay only after existing neutral-input and real RT presentation gates;
+interrupted post-commit recovery retains an explicit Continue when necessary.
+
 The owner's reconciled [1.7 feature checklist](docs/design/HORDE_1_7_FEATURE_STATUS_2026_10_18.md)
 supersedes earlier exploratory exclusions where explicit: small-root stepping /
 mantle and crouching are agreed directions; free jump/slide remain deferred.

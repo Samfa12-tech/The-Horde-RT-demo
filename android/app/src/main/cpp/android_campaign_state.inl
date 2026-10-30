@@ -9,8 +9,8 @@ struct CampaignCommand {
 std::mutex gCampaignMutex;
 std::optional<CampaignCommand> gCampaignCommand;
 std::string gCampaignConfiguredRoot;
-std::array<jlong,34> gCampaignUi = [] {
-    std::array<jlong,34> state{};state[0]=1;state[6]=-1;return state;
+std::array<jlong,40> gCampaignUi = [] {
+    std::array<jlong,40> state{};state[0]=2;state[6]=-1;return state;
 }();
 std::uint64_t gCampaignRequestSerial=0;
 std::atomic<bool> gCampaignPauseGate{false},gCampaignShowcaseOverride{false};

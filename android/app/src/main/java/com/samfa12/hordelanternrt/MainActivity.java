@@ -1842,15 +1842,15 @@ public class MainActivity extends Activity {
         else if(shown==null) addBody(panel,"Checking your saves…");
         else if(shown.error!=0 || shown.phase!=CampaignMenuState.READY) addBody(panel,shown.message());
         final boolean ready=campaignConfigured && campaignPublicationValid && shown!=null && shown.current(surfaceRequestGeneration) &&
-                shown.phase!=CampaignMenuState.UNAVAILABLE && shown.error==0 && !campaignBusy() && !shown.pending();
+                shown.phase!=CampaignMenuState.UNAVAILABLE && shown.error==0 && !campaignBusy() && !shown.pending() &&
+                !campaignLoadedReady && !(shown.phase==CampaignMenuState.SUCCESS && shown.lastOperation==CampaignMenuState.LOAD);
         if(campaignMenuAction==CampaignMenuState.NEW_GAME && shown!=null) {
             boolean savedGame=false;
             for(int slot=0;slot<3;++slot)for(int kind=0;kind<2;++kind)
                 savedGame|=shown.status(slot,kind)==CampaignMenuState.VALID;
             if(savedGame) {
                 Button continueGame=addEntryMenuButton(panel,"Continue",() -> {
-                    // Navigation only. The player still chooses manual/autosave;
-                    // no timestamp or "newest" ordering exists in this publication.
+                    // Navigation only. Each slot selects its latest valid record.
                     if(campaignMenuVisible && campaignMenuAction==CampaignMenuState.NEW_GAME &&
                        campaignPublicationValid && campaignState==shown && shown.current(surfaceRequestGeneration) &&
                        shown.error==0 && !campaignBusy() && !shown.pending())showCampaignMenu(CampaignMenuState.LOAD);
@@ -1858,75 +1858,81 @@ public class MainActivity extends Activity {
                 continueGame.setEnabled(ready);
             }
         }
-        if(campaignLoadedReady) addEntryMenuButton(panel,"Resume",this::resumeLoadedCampaign,true);
+        if(campaignLoadedReady) addEntryMenuButton(panel,"Continue",this::resumeLoadedCampaign,true);
         if(campaignMenuAction==CampaignMenuState.SAVE_MANUAL) {
-            addBody(panel,"Save your latest checkpoint. Your autosave stays.");
+            addBody(panel,"Save at your latest checkpoint.");
             if(shown!=null && !shown.canSaveLatest) addBody(panel,"Reach a safe checkpoint before saving.");
+        }
+        final android.util.DisplayMetrics display=getResources().getDisplayMetrics();
+        final boolean wideSlots=display.widthPixels>display.heightPixels && display.widthPixels/display.density>=680 &&
+                getResources().getConfiguration().fontScale<=1.3f;
+        LinearLayout slotRow=null;
+        if(wideSlots) {
+            panel.setPadding(dp(20),dp(12),dp(20),dp(12));
+            slotRow=new LinearLayout(this);slotRow.setOrientation(LinearLayout.HORIZONTAL);
+            panel.addView(slotRow,matchWrap());
         }
         for(int i=0;i<3;i++) {
             final int slot=i;
+            final LinearLayout slotPanel;
+            if(wideSlots) {
+                slotPanel=new LinearLayout(this);slotPanel.setOrientation(LinearLayout.VERTICAL);
+                slotPanel.setPadding(dp(8),0,dp(8),dp(8));
+                final GradientDrawable surface=new GradientDrawable();surface.setColor(0xFF202427);
+                surface.setCornerRadius(dp(4));surface.setStroke(dp(1),0xFF484335);slotPanel.setBackground(surface);
+                LinearLayout.LayoutParams card=new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT,1);
+                card.setMargins(dp(4),0,dp(4),0);slotRow.addView(slotPanel,card);
+            } else slotPanel=panel;
             TextView slotTitle=new TextView(this);
             slotTitle.setText(getString(shown!=null && shown.activeSlot==slot ?
                     R.string.campaign_slot_current_title : R.string.campaign_slot_title,slot+1));
             slotTitle.setTextSize(17);slotTitle.setTypeface(Typeface.SANS_SERIF,Typeface.BOLD);
             slotTitle.setTextColor(HordeUiTokens.PARCHMENT);slotTitle.setPadding(0,dp(14),0,dp(4));
-            panel.addView(slotTitle,matchWrap());
-            final boolean empty=shown!=null && shown.status(slot,CampaignMenuState.MANUAL)==CampaignMenuState.EMPTY &&
-                    shown.status(slot,CampaignMenuState.AUTO)==CampaignMenuState.EMPTY;
-            if(empty && campaignMenuAction!=CampaignMenuState.LOAD) addBody(panel,"Empty");
-            else for(int kind=0;kind<2;kind++) {
-                final int recordKind=kind;
-                addBody(panel,shown==null ? (kind==0 ? "Manual save: Checking…" : "Autosave: Checking…") :
-                        shown.description(slot,kind));
-                if(campaignMenuAction==CampaignMenuState.LOAD) {
-                    Button load=addEntryMenuButton(panel,kind==0 ? "Load manual save" : "Load autosave",
-                            () -> chooseCampaignRecord(CampaignMenuState.LOAD,slot,recordKind,shown),false);
-                    load.setContentDescription((kind==0 ? "Load manual save from Slot " : "Load autosave from Slot ")+(slot+1));
-                    load.setEnabled(ready && shown.status(slot,kind)==CampaignMenuState.VALID);
-                }
-            }
-            if(campaignMenuAction!=CampaignMenuState.LOAD) {
-                final int chosenAction=campaignMenuAction;
-                Button choose=addEntryMenuButton(panel,
-                        campaignMenuAction==CampaignMenuState.NEW_GAME ? "New game" : "Save in Slot "+(slot+1),
-                        () -> chooseCampaignRecord(chosenAction,slot,CampaignMenuState.MANUAL,shown),false);
-                choose.setContentDescription((campaignMenuAction==CampaignMenuState.NEW_GAME ? "New game in Slot " : "Save in Slot ")+(slot+1));
-                boolean checked=shown!=null && shown.status(slot,0)>=CampaignMenuState.EMPTY &&
-                        shown.status(slot,1)>=CampaignMenuState.EMPTY;
-                // Invalid/unreadable files are retained; this UI never offers destructive repair.
-                boolean manualWritable=shown!=null && (shown.status(slot,0)==CampaignMenuState.EMPTY ||
-                        shown.status(slot,0)==CampaignMenuState.VALID);
-                choose.setEnabled(ready && checked && (campaignMenuAction==CampaignMenuState.NEW_GAME ||
-                        (shown.canSaveLatest && manualWritable)));
-            }
+            slotPanel.addView(slotTitle,matchWrap());
+            addBody(slotPanel,shown==null ? "Checking saves..." : shown.slotDescription(slot));
+            if(wideSlots)slotPanel.getChildAt(slotPanel.getChildCount()-1).setMinimumHeight(dp(64));
+            final int selectedKind=shown==null ? -1 : shown.selectedKind(slot);
+            final int chosenAction=campaignMenuAction;
+            final String action=chosenAction==CampaignMenuState.LOAD ? "Continue" :
+                    chosenAction==CampaignMenuState.NEW_GAME ? "New game" : "Save in Slot "+(slot+1);
+            Button choose=addEntryMenuButton(slotPanel,action,
+                    () -> chooseCampaignRecord(chosenAction,slot,chosenAction==CampaignMenuState.LOAD ? selectedKind : CampaignMenuState.MANUAL,shown),false);
+            choose.setContentDescription((chosenAction==CampaignMenuState.LOAD ? "Continue Slot " :
+                    chosenAction==CampaignMenuState.NEW_GAME ? "New game in Slot " : "Save in Slot ")+(slot+1));
+            boolean checked=shown!=null && shown.status(slot,0)>=CampaignMenuState.EMPTY && shown.status(slot,1)>=CampaignMenuState.EMPTY;
+            boolean writable=shown!=null && (shown.status(slot,0)==CampaignMenuState.EMPTY || shown.status(slot,0)==CampaignMenuState.VALID);
+            choose.setEnabled(ready && checked && (chosenAction==CampaignMenuState.LOAD ? selectedKind>=0 :
+                    chosenAction==CampaignMenuState.NEW_GAME || (shown.canSaveLatest && writable)));
         }
-        Button refresh=addEntryMenuButton(panel,"Check saves",
-                () -> sendCampaignRequest(CampaignMenuState.REFRESH,0,0),false);
-        refresh.setEnabled(campaignConfigured && !campaignLoadedReady && !campaignBusy() && (shown==null || !shown.pending()));
+        if(campaignLocalMessage!=null || (shown!=null && (shown.error!=0 || shown.phase==CampaignMenuState.FAILED || shown.hasUnreadable()))) {
+            Button refresh=addEntryMenuButton(panel,"Try again",
+                    () -> sendCampaignRequest(CampaignMenuState.REFRESH,0,0),false);
+            refresh.setEnabled(campaignConfigured && !campaignLoadedReady && !campaignBusy() && (shown==null || !shown.pending()));
+        }
         addEntryMenuButton(panel,campaignBusy() || (shown!=null && shown.pending()) ? "Cancel" : "Back",
                 this::backFromCampaignMenu,false);
-        attachPanel(panel);
+        attachPanel(panel,wideSlots?760:520);
     }
 
     private void chooseCampaignRecord(int action,int slot,int kind,CampaignMenuState shown) {
         if(!isMenuRuntimeReady() || !campaignMenuVisible || action!=campaignMenuAction || !campaignPublicationValid || shown==null || shown!=campaignState || campaignBusy() || shown.pending() ||
                 !shown.current(surfaceRequestGeneration)) return;
         if(shown.error!=0 || slot<0 || slot>2 || kind<0 || kind>1) return;
-        if(action==CampaignMenuState.LOAD && shown.status(slot,kind)!=CampaignMenuState.VALID) return;
+        if(action==CampaignMenuState.LOAD && (shown.status(slot,kind)!=CampaignMenuState.VALID || shown.selectedKind(slot)!=kind)) return;
         if(action==CampaignMenuState.SAVE_MANUAL && (!shown.canSaveLatest ||
                 (shown.status(slot,0)!=CampaignMenuState.EMPTY && shown.status(slot,0)!=CampaignMenuState.VALID))) return;
         boolean confirm=action==CampaignMenuState.NEW_GAME ? shown.occupied(slot) :
-                action==CampaignMenuState.SAVE_MANUAL && shown.status(slot,0)==CampaignMenuState.VALID;
+                action==CampaignMenuState.SAVE_MANUAL && shown.occupied(slot);
         if(!confirm) { sendCampaignRequest(action,slot,kind); return; }
         dismissCampaignConfirmation();
         final long generation=surfaceRequestGeneration;
         final AlertDialog dialog=new AlertDialog.Builder(this)
-                .setTitle(action==CampaignMenuState.NEW_GAME ? "New game in Slot "+(slot+1)+"?" : "Replace manual save?")
+                .setTitle(action==CampaignMenuState.NEW_GAME ? "New game in Slot "+(slot+1)+"?" : "Replace save in Slot "+(slot+1)+"?")
                 .setMessage(action==CampaignMenuState.NEW_GAME ?
-                        "Your manual save stays. As you play, this slot’s autosave will be replaced by your new game." :
-                        "Replace the manual save in Slot "+(slot+1)+"? Its autosave stays.")
-                .setNegativeButton("Keep existing saves",(d,w) -> {})
-                .setPositiveButton(action==CampaignMenuState.NEW_GAME ? "Start new game" : "Replace manual save",null).create();
+                        "New progress is saved at checkpoints. Your previous checkpoint is kept until then." :
+                        "Save your latest checkpoint in Slot "+(slot+1)+"?")
+                .setNegativeButton("Cancel",(d,w) -> {})
+                .setPositiveButton(action==CampaignMenuState.NEW_GAME ? "Start new game" : "Replace save",null).create();
         campaignConfirmation=dialog;
         dialog.setOnDismissListener(d -> { if(campaignConfirmation==d) campaignConfirmation=null; });
         dialog.show();
@@ -2060,8 +2066,18 @@ public class MainActivity extends Activity {
                 beginPreparedEntryPlay();
                 return;
             }
-            if(operation==CampaignMenuState.LOAD) campaignLoadedReady=true;
-        } else if(state.ackRequest==campaignRequest && !state.pending()) {
+            if(operation==CampaignMenuState.LOAD) {
+                campaignLoadedReady=true;
+                // Only the current deliberate Load auto-enters. Interrupted or
+                // cancelled post-commit recovery retains an explicit Continue.
+                if(campaignMenuVisible && resumed && campaignAcknowledgedGeneration==state.surfaceGeneration &&
+                   campaignAcknowledgedToken!=0 && campaignAcknowledgedToken==state.rebaseToken) {
+                    resumeLoadedCampaign();
+                    if(!campaignMenuVisible)return;
+                }
+            }
+        } else if(state.ackRequest==campaignRequest && !state.pending() &&
+                  !(campaignAction==CampaignMenuState.LOAD && state.phase==CampaignMenuState.SUCCESS && state.error==0 && !state.presented)) {
             campaignRequest=0;
         }
         // An interrupted post-commit load still needs an explicit Resume after native rebase/presentation.
@@ -7729,7 +7745,9 @@ public class MainActivity extends Activity {
         return panel;
     }
 
-    private void attachPanel(final LinearLayout panel) {
+    private void attachPanel(final LinearLayout panel) {attachPanel(panel,520);}
+
+    private void attachPanel(final LinearLayout panel,final int maximumWidthDp) {
         if(lookoutObjectiveVisible && panel!=lookoutObjectivePanel)invalidateLookoutObjective();
         if (entryMenuEnabled) ensureEntryMenuTargets(panel);
         menuScrim.setBackgroundColor(0xC7080706);
@@ -7749,7 +7767,7 @@ public class MainActivity extends Activity {
                 bottom=Math.max(bottom,insets.getDisplayCutout().getSafeInsetBottom()+dp(8));
             }
         }
-        final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(Math.min(dp(520), Math.max(dp(48),screenWidth-left-right)), FrameLayout.LayoutParams.MATCH_PARENT);
+        final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(Math.min(dp(maximumWidthDp), Math.max(dp(48),screenWidth-left-right)), FrameLayout.LayoutParams.MATCH_PARENT);
         params.gravity = Gravity.CENTER_HORIZONTAL;
         params.setMargins(left,top,right,bottom);
         menuScrim.addView(scroller, params);

@@ -93,4 +93,31 @@ public final class CampaignMenuStateTest {
         v[5]=7;assertTrue(CampaignMenuState.decode(v).message().contains("still paused"));
     }
 
+    @Test public void datedPublicationChoosesExactlyTheVisibleRecordAndRejectsBadMetadata() {
+        long[] v=java.util.Arrays.copyOf(ready(),40);v[0]=2;
+        v[12]=v[15]=3;v[13]=1;v[14]=2;v[16]=2;v[17]=3;
+        v[34]=1767225600L;v[35]=1767225660L;
+        CampaignMenuState state=CampaignMenuState.decode(v);assertNotNull(state);
+        assertEquals(CampaignMenuState.AUTO,state.selectedKind(0));
+        assertTrue(state.slotDescription(0).contains("Safe exit"));
+        v[34]+=120;state=CampaignMenuState.decode(v);
+        assertEquals(CampaignMenuState.MANUAL,state.selectedKind(0));
+        assertTrue(state.slotDescription(0).contains("Lower chamber"));
+        v[35]=v[34];assertEquals(CampaignMenuState.MANUAL,CampaignMenuState.decode(v).selectedKind(0));
+        v[34]=v[35]=0;state=CampaignMenuState.decode(v);
+        assertEquals(CampaignMenuState.AUTO,state.selectedKind(0));assertTrue(state.slotDescription(0).contains("Date unavailable"));
+        assertEquals("Empty",state.slotDescription(1));assertEquals(-1,state.selectedKind(1));
+        v[15]=CampaignMenuState.CHECKING;assertEquals(-1,CampaignMenuState.decode(v).selectedKind(0));
+        v[35]=-1;assertNull(CampaignMenuState.decode(v));v[35]=253402300800L;assertNull(CampaignMenuState.decode(v));
+        assertNull(CampaignMenuState.decode(java.util.Arrays.copyOf(v,39)));
+    }
+    @Test public void saveDateUsesTheSavedInstantAndPlayerLocaleAndTimezone() {
+        long utcNewYear=1767225600L;
+        String utc=CampaignMenuState.formatSavedTime(utcNewYear,java.util.Locale.US,java.util.TimeZone.getTimeZone("UTC"));
+        String west=CampaignMenuState.formatSavedTime(utcNewYear,java.util.Locale.US,java.util.TimeZone.getTimeZone("America/Los_Angeles"));
+        String east=CampaignMenuState.formatSavedTime(utcNewYear,java.util.Locale.FRANCE,java.util.TimeZone.getTimeZone("Australia/Sydney"));
+        assertTrue(utc.contains("2026"));assertTrue(west.contains("2025"));assertNotEquals(utc,west);assertNotEquals(utc,east);
+        assertEquals("Date unavailable",CampaignMenuState.formatSavedTime(0,java.util.Locale.US,java.util.TimeZone.getTimeZone("UTC")));
+    }
+
 }

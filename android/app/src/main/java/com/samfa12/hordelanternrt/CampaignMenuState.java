@@ -12,6 +12,7 @@ final class CampaignMenuState {
     final boolean canSaveLatest, presented, isolatedNamespace, confirmedRetry;
     final float yaw, pitch;
     private final int[] entries;
+    private final long[] savedTimes;
 
     private CampaignMenuState(long[] v) {
         surfaceGeneration=v[1]; revision=v[2]; ackRequest=v[3]; phase=(int)v[4];
@@ -21,13 +22,16 @@ final class CampaignMenuState {
         confirmedRetry=v.length>33 && v[33]==1;
         entries=new int[18];
         for(int i=0;i<18;i++) entries[i]=(int)v[12+i];
+        savedTimes=new long[6];
+        if(v[0]==2)for(int i=0;i<6;i++)savedTimes[i]=v[34+i];
     }
     static CampaignMenuState decode(long[] v) {
-        if(v==null || v.length<33 || v[0]!=1 || v[1]<0 || v[2]<0 || v[3]<0 ||
+        if(v==null || v.length<33 || !((v[0]==1 && (v.length==33 || v.length==34)) || (v[0]==2 && v.length==40)) || v[1]<0 || v[2]<0 || v[3]<0 ||
                 v[4]<0 || v[4]>FAILED || v[5]<0 || v[5]>Integer.MAX_VALUE ||
                 v[6]<-1 || v[6]>2 || !bit(v[7]) || v[8]<0 || !bit(v[11]) ||
                 v[30]<0 || v[30]>NEW_GAME || v[31]<0 || v[31]>2 || !bit(v[32])) return null;
         if(v.length>33 && !bit(v[33]))return null;
+        if(v[0]==2)for(int i=34;i<40;i++)if(v[i]<0 || v[i]>253402300799L)return null;
         for(int i=0;i<6;i++) {
             int p=12+3*i;
             if(v[p]<UNKNOWN || v[p]>READ_ERROR || v[p+1]<0 || v[p+1]>3 || v[p+2]<0 || v[p+2]>3) return null;
@@ -49,7 +53,39 @@ final class CampaignMenuState {
                 phase==SUCCESS && error==0 && (operation!=LOAD || presented);
     }
     int status(int slot,int kind) { return entries[(slot*2+kind)*3]; }
+    long savedTime(int slot,int kind) {return savedTimes[slot*2+kind];}
+    int selectedKind(int slot) {
+        if(slot<0 || slot>=3 || status(slot,MANUAL)<=CHECKING || status(slot,AUTO)<=CHECKING)return -1;
+        boolean m=status(slot,MANUAL)==VALID,a=status(slot,AUTO)==VALID;
+        if(!m && !a)return -1;
+        if(!m)return AUTO;
+        if(!a)return MANUAL;
+        long mt=savedTime(slot,MANUAL),at=savedTime(slot,AUTO);
+        return mt>at || (mt!=0 && mt==at) ? MANUAL : AUTO;
+    }
+    static String formatSavedTime(long seconds,java.util.Locale locale,java.util.TimeZone zone) {
+        if(seconds<=0 || seconds>253402300799L)return "Date unavailable";
+        java.text.DateFormat format=java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM,java.text.DateFormat.SHORT,locale);
+        format.setTimeZone(zone);
+        return format.format(new java.util.Date(seconds*1000L));
+    }
+    String slotDescription(int slot) {
+        int kind=selectedKind(slot);
+        if(kind<0) {
+            if(status(slot,MANUAL)<=CHECKING || status(slot,AUTO)<=CHECKING)return "Checking saves...";
+            if(status(slot,MANUAL)==EMPTY && status(slot,AUTO)==EMPTY)return "Empty";
+            return "Save unavailable. Your files have been kept.";
+        }
+        int p=(slot*2+kind)*3;
+        return (entries[p+1]==1?"Lower chamber":entries[p+1]==2?"Safe exit":"Forest lookout")+
+                " | "+entries[p+2]+" / 3 hearts\n"+formatSavedTime(savedTime(slot,kind),java.util.Locale.getDefault(),java.util.TimeZone.getDefault());
+    }
     boolean occupied(int slot) { return status(slot,MANUAL)!=EMPTY || status(slot,AUTO)!=EMPTY; }
+    boolean hasUnreadable() {
+        for(int slot=0;slot<3;slot++)for(int kind=0;kind<2;kind++)
+            if(status(slot,kind)==INVALID || status(slot,kind)==READ_ERROR)return true;
+        return false;
+    }
     String description(int slot,int kind) {
         int p=(slot*2+kind)*3;
         String prefix=kind==MANUAL ? "Manual save: " : "Autosave: ";
@@ -88,7 +124,7 @@ final class CampaignMenuState {
             case PRESENTING:return "Getting ready…";
             case SUCCESS:
                 if(lastOperation==0)return "Autosave saved.";
-                if(lastOperation==LOAD)return presented ? "Loaded. Choose Resume when you are ready." : "Getting ready…";
+                if(lastOperation==LOAD)return presented ? "Ready." : "Getting ready…";
                 if(lastOperation==SAVE_MANUAL)return "Manual save saved.";
                 if(lastOperation==NEW_GAME)return "Ready to begin.";
                 return "Saves checked.";

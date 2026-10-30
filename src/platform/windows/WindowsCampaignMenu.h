@@ -37,6 +37,8 @@ public:
     void Open(Page page,Origin origin);
     void Close();
     bool Visible() const {return visible_;}
+    bool ShouldContinueAfterPresentation() const {return visible_ && directLoadRequested_;}
+    void HoldLoadedGame() {directLoadRequested_=false;}
     bool HandleCommand(int commandId);
     void Layout(RECT bounds);
     void Refresh(const View& view);
@@ -58,6 +60,7 @@ private:
     Origin origin_=Origin::Entry;
     bool visible_=false;
     bool loadInMenu_=false;
+    bool directLoadRequested_=false;
     std::optional<unsigned> confirmation_;
 };
 } // namespace horde::platform::windows

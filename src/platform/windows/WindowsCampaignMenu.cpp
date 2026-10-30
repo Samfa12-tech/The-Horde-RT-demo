@@ -1,7 +1,10 @@
 #include "platform/windows/WindowsCampaignMenu.h"
 #include "platform/windows/WindowsControlPresentation.h"
+#include "platform/windows/WindowsSaveDate.h"
+#include "gameplay/campaign/CampaignSlotSelection.h"
 
 #include <utility>
+#include <algorithm>
 
 namespace horde::platform::windows {
 namespace {
@@ -13,14 +16,14 @@ std::string RecordLabel(const cp::CatalogueEntry& entry) {
     switch(entry.status) {
     case cp::CatalogueStatus::Checking:return "Checking";
     case cp::CatalogueStatus::Empty:return "Empty";
-    case cp::CatalogueStatus::Invalid:return "Invalid - preserved";
-    case cp::CatalogueStatus::ReadError:return "Unreadable - preserved";
+    case cp::CatalogueStatus::Invalid:return "Save unavailable";
+    case cp::CatalogueStatus::ReadError:return "Could not open save";
     case cp::CatalogueStatus::Valid:
         if(entry.checkpoint && cp::Validate(*entry.checkpoint))
             return std::string(entry.checkpoint->id==cp::CheckpointId::ForestEndpoint?"Forest lookout":
-                entry.checkpoint->id==cp::CheckpointId::SafeExit?"Safe exit":"Lower claimed")+
-                " | Hearts "+std::to_string(entry.checkpoint->vitality)+"/3";
-        return "Invalid - preserved";
+                entry.checkpoint->id==cp::CheckpointId::SafeExit?"Safe exit":"Lower chamber")+
+                " | "+std::to_string(entry.checkpoint->vitality)+" / 3 hearts\n"+WindowsSaveDate(entry.checkpoint->savedAtUnixSeconds);
+        return "Save unavailable";
     }
     return "Unavailable";
 }
@@ -36,9 +39,9 @@ bool WindowsCampaignMenu::Create(HWND parent) {
     parent_=parent;
     for(std::size_t i=0;i<controls_.size();++i) {
         const bool label=i<2;
-        controls_[i]=CreateWindowExA(0,label?"STATIC":"BUTTON","",
+        controls_[i]=CreateWindowExW(0,label?L"STATIC":L"BUTTON",L"",
             WS_CHILD|(label?SS_LEFT:BS_PUSHBUTTON|BS_MULTILINE|WS_TABSTOP),0,0,0,0,parent,
-            reinterpret_cast<HMENU>(static_cast<INT_PTR>(ids[i])),GetModuleHandleA(nullptr),nullptr);
+            reinterpret_cast<HMENU>(static_cast<INT_PTR>(ids[i])),GetModuleHandleW(nullptr),nullptr);
         if(!controls_[i]) {
             for(auto& control:controls_){if(control)DestroyWindow(control);control=nullptr;}
             parent_=nullptr;return false;
@@ -47,9 +50,9 @@ bool WindowsCampaignMenu::Create(HWND parent) {
     }
     Render();return true;
 }
-void WindowsCampaignMenu::Open(Page page,Origin origin){page_=page;origin_=origin;confirmation_.reset();
+void WindowsCampaignMenu::Open(Page page,Origin origin){page_=page;origin_=origin;confirmation_.reset();directLoadRequested_=false;
     loadInMenu_=view_.state.operation==cp::PlayOperation::Load && Pending();visible_=true;Render();}
-void WindowsCampaignMenu::Close(){visible_=false;loadInMenu_=false;confirmation_.reset();Render();}
+void WindowsCampaignMenu::Close(){visible_=false;loadInMenu_=false;directLoadRequested_=false;confirmation_.reset();Render();}
 bool WindowsCampaignMenu::Pending() const {
     return view_.state.outcome==cp::PlayOutcome::Pending || view_.phase==Phase::Saving || view_.phase==Phase::Reading ||
         view_.phase==Phase::Preparing || view_.phase==Phase::Rebase || view_.phase==Phase::Presenting;
@@ -60,15 +63,17 @@ bool WindowsCampaignMenu::CommittedLoad() const {
 bool WindowsCampaignMenu::CanChoose(unsigned index) const {
     if(!visible_ || Pending() || view_.phase==Phase::Unavailable || CommittedLoad())return false;
     if(view_.writeUncertain && page_!=Page::Load)return false;
-    if(page_==Page::Load)return index<6 && Valid(view_.catalogue[index]);
     if(index>=3)return false;
+    if(page_==Page::Load)return cp::SelectSlotRecord(view_.catalogue,index).has_value();
     if(page_==Page::NewGame) return view_.catalogue[index*2].status!=cp::CatalogueStatus::Checking &&
         view_.catalogue[index*2+1].status!=cp::CatalogueStatus::Checking;
     const auto& entry=view_.catalogue[index*2];
+    if(view_.catalogue[index*2+1].status==cp::CatalogueStatus::Checking)return false;
     return view_.state.hasLatestCheckpoint && (entry.status==cp::CatalogueStatus::Empty || Valid(entry));
 }
 bool WindowsCampaignMenu::NeedsConfirmation(unsigned index) const {
-    if(page_==Page::Save)return Valid(view_.catalogue[index*2]);
+    if(page_==Page::Save)return view_.catalogue[index*2].status!=cp::CatalogueStatus::Empty ||
+        view_.catalogue[index*2+1].status!=cp::CatalogueStatus::Empty;
     return page_==Page::NewGame && (view_.catalogue[index*2].status!=cp::CatalogueStatus::Empty ||
                                   view_.catalogue[index*2+1].status!=cp::CatalogueStatus::Empty);
 }
@@ -83,7 +88,7 @@ bool WindowsCampaignMenu::HandleCommand(int id) {
         if(!CanChoose(index))return true;
         if(NeedsConfirmation(index)){confirmation_=index;Render();return true;}
         confirmation_.reset();
-        if(page_==Page::Load)Send(Action::Load,index/2,index%2?cp::SaveKind::Autosave:cp::SaveKind::Manual);
+        if(page_==Page::Load){directLoadRequested_=true;Send(Action::Load,index,*cp::SelectSlotRecord(view_.catalogue,index));}
         else Send(page_==Page::Save?Action::SaveManual:Action::BeginNewGame,index);
         return true;
     }
@@ -95,6 +100,7 @@ bool WindowsCampaignMenu::HandleCommand(int id) {
         return true;
     }
     if(id==BackId) {
+        directLoadRequested_=false;
         if(confirmation_){confirmation_.reset();Render();}
         else if(Pending())Send(Action::Cancel);
         else if(!CommittedLoad())Send(Action::Close);
@@ -115,44 +121,47 @@ void WindowsCampaignMenu::Refresh(const View& view) {
 void WindowsCampaignMenu::Render() {
     if(!parent_)return;
     const auto set=[&](int id,const std::string& text,bool show,bool enable=true){
-        const auto control=GetDlgItem(parent_,id);SetNativeTextIfChanged(control,text);
+        const auto control=GetDlgItem(parent_,id);SetNativeUtf8TextIfChanged(control,text);
         if((IsWindowEnabled(control)!=FALSE)!=enable)EnableWindow(control,enable);
         SetNativeVisibilityIfChanged(control,show);};
-    set(TitleId,page_==Page::NewGame?"NEW GAME":page_==Page::Save?"SAVE AT LAST SAFE CHECKPOINT":"LOAD GAME",visible_);
-    std::string status=view_.message;
+    set(TitleId,page_==Page::NewGame?"NEW GAME":page_==Page::Save?"SAVE GAME":"LOAD GAME",visible_);
+    std::string status;
     if(status.empty()) {
         switch(view_.phase) {
-        case Phase::Unavailable:status="Campaign saves unavailable.";break;
-        case Phase::Saving:status="Saving checkpoint...";break;
-        case Phase::Reading:status="Reading checkpoint...";break;
-        case Phase::Preparing:status="Preparing rescue route...";break;
-        case Phase::Rebase:status="Resetting input for loaded checkpoint...";break;
-        case Phase::Presenting:status="Waiting for loaded RT frame...";break;
-        case Phase::Failed:status="Operation failed. Recheck records before retrying.";break;
+        case Phase::Unavailable:status="Your saves are unavailable.";break;
+        case Phase::Saving:status="Saving...";break;
+        case Phase::Reading:case Phase::Preparing:status="Loading...";break;
+        case Phase::Rebase:case Phase::Presenting:status="Getting ready...";break;
+        case Phase::Failed:status=page_==Page::Save?"Could not save. Your previous saves have been kept.":"Could not load this game. Your saves have been kept.";break;
         case Phase::Succeeded:status=view_.state.operation==cp::PlayOperation::Load && !view_.canResumeLoaded?
-            "Checkpoint loaded; waiting for render and input readiness.":"Operation completed.";break;
-        case Phase::Ready:status=page_==Page::Save?"Save the last reached safe checkpoint. Autosaves remain separate.":
-            page_==Page::NewGame?"Choose the active autosave slot. Existing manual records are kept.":"Choose a manual save or latest autosave.";break;
+            "Getting ready...":"Saved.";break;
+        case Phase::Ready:status=page_==Page::Save?(view_.state.hasLatestCheckpoint?"Save at your latest checkpoint.":"Reach a safe checkpoint before saving."):
+            page_==Page::NewGame?"Choose a slot to start a new game.":"Choose a game to continue.";break;
         }
     }
-    if(view_.writeUncertain)status+=" Write outcome uncertain. Recheck records before retrying.";
-    if(confirmation_)status=page_==Page::Save?"Replace this manual save? Its latest autosave stays separate.":
-        "Start a new game in this slot? Manual saves are kept; future checkpoints replace its latest autosave.";
+    if(view_.writeUncertain)status+=" Could not confirm saving. Check saves before trying again.";
+    if(confirmation_)status=page_==Page::Save?"Replace the save in Slot "+std::to_string(*confirmation_+1)+"?":
+        "Start again in Slot "+std::to_string(*confirmation_+1)+"? New progress is saved at checkpoints.";
     set(StatusId,status,visible_);
     for(unsigned i=0;i<6;++i) {
         std::string text;
-        if(page_==Page::Load)text="Slot "+std::to_string(i/2+1)+(i%2?" - Latest auto: ":" - Manual: ")+RecordLabel(view_.catalogue[i]);
-        else if(i<3) {
-            text="Slot "+std::to_string(i+1)+" - Manual: "+RecordLabel(view_.catalogue[i*2]);
-            if(page_==Page::NewGame)text+="\nLatest auto: "+RecordLabel(view_.catalogue[i*2+1]);
+        if(i<3) {
+            const auto selected=cp::SelectSlotRecord(view_.catalogue,i);
+            text="Slot "+std::to_string(i+1)+"  |  "+(page_==Page::Load?"Continue":page_==Page::Save?"Save":"New game")+"\n";
+            if(selected)text+=RecordLabel(view_.catalogue[i*2+(*selected==cp::SaveKind::Autosave?1:0)]);
+            else if(view_.catalogue[i*2].status==cp::CatalogueStatus::Checking || view_.catalogue[i*2+1].status==cp::CatalogueStatus::Checking)text+="Checking saves...";
+            else if(view_.catalogue[i*2].status==cp::CatalogueStatus::Empty && view_.catalogue[i*2+1].status==cp::CatalogueStatus::Empty)text+="Empty";
+            else text+="Save unavailable - your files have been kept";
         }
-        set(FirstChoiceId+i,text,visible_ && (page_==Page::Load || i<3),!confirmation_ && CanChoose(i));
+        set(FirstChoiceId+i,text,visible_ && i<3,!confirmation_ && CanChoose(i));
     }
-    set(ConfirmId,"CONFIRM",visible_ && confirmation_.has_value(),confirmation_ && CanChoose(*confirmation_));
+    set(ConfirmId,page_==Page::Save?"REPLACE SAVE":"START NEW GAME",visible_ && confirmation_.has_value(),confirmation_ && CanChoose(*confirmation_));
     const bool committed=CommittedLoad();
-    set(BackId,confirmation_?"CANCEL CONFIRMATION":Pending()?"CANCEL":"BACK",visible_,!committed || Pending());
-    set(RefreshId,"RECHECK RECORDS",visible_,!Pending() && !confirmation_);
-    set(ResumeId,"RESUME LOADED GAME",visible_ && committed && view_.canResumeLoaded,committed && view_.canResumeLoaded && !Pending());
+    set(BackId,confirmation_ || Pending()?"CANCEL":"BACK",visible_,!committed || Pending());
+    const bool unreadable=std::any_of(view_.catalogue.begin(),view_.catalogue.end(),[](const cp::CatalogueEntry& e){
+        return e.status==cp::CatalogueStatus::Invalid || e.status==cp::CatalogueStatus::ReadError;});
+    set(RefreshId,"TRY AGAIN",visible_ && (view_.phase==Phase::Failed || view_.writeUncertain || unreadable),!Pending() && !confirmation_);
+    set(ResumeId,"CONTINUE",visible_ && committed && view_.canResumeLoaded,committed && view_.canResumeLoaded && !Pending());
 }
 void WindowsCampaignMenu::Layout(RECT bounds) {
     if(!parent_)return;
@@ -160,8 +169,9 @@ void WindowsCampaignMenu::Layout(RECT bounds) {
     const int x=bounds.left+((bounds.right-bounds.left)-width)/2;
     int y=bounds.top+12;
     const auto place=[&](int id,int height){MoveWindow(GetDlgItem(parent_,id),x,y,width,height,TRUE);y+=height+6;};
-    place(TitleId,24);place(StatusId,64);
-    for(unsigned i=0;i<(page_==Page::Load?6u:3u);++i)place(FirstChoiceId+i,38);
+    place(TitleId,24);place(StatusId,48);
+    const int cardHeight=std::clamp<int>((bounds.bottom-y-152)/3,54,82);
+    for(unsigned i=0;i<3;++i)place(FirstChoiceId+i,cardHeight);
     place(ConfirmId,32);place(BackId,32);place(RefreshId,32);place(ResumeId,32);
 }
 } // namespace horde::platform::windows

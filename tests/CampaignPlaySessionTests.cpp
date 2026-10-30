@@ -1,4 +1,5 @@
 #include "gameplay/campaign/CampaignPlaySession.h"
+#include "gameplay/campaign/CampaignSlotSelection.h"
 #include "gameplay/validation/RecordedReturnCheckpoint.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
@@ -254,8 +255,11 @@ bool LoadEarnedBoundary(cp::PlaySession& play,sim::GameSimulation& game,cp::Save
     if(!committed)return false;
     const auto recaptured=game.CaptureCampaignCheckpoint(earned.checkpoint.id);
     std::vector<std::byte> encoded;cp::codec::Error error{};
-    Check(recaptured && cp::codec::Encode(*recaptured,encoded,error) && encoded==earned.encoded,
-          "fresh restored simulation round trips every earned schema-1 checkpoint byte");
+    auto logical=earned.checkpoint;
+    if(recaptured){logical.schema=recaptured->schema;logical.savedAtUnixSeconds=0;logical.flaskRecorded=false;}
+    std::vector<std::byte> expectedLogical;
+    Check(recaptured && cp::codec::Encode(*recaptured,encoded,error) && cp::codec::Encode(logical,expectedLogical,error) && encoded==expectedLogical,
+          "fresh restored simulation round trips every earned gameplay byte; save metadata remains in the record");
     const auto& restored=game.Snapshot();
     Check(restored.playerAlive && restored.playerGrounded && !restored.rescue.equipmentStowed &&
           restored.playerVitals.vitality==earned.checkpoint.vitality && restored.rescue.claimCount==1 &&
@@ -830,6 +834,25 @@ int FlaskConfirmedRetry(const std::shared_ptr<const sim::TriangleSupportSurface>
     return failures?1:0;
 }
 int main(int argc,char** argv){
+    {
+        std::array<cp::CatalogueEntry,6> slots{};
+        for(auto& e:slots)e.status=cp::CatalogueStatus::Empty;
+        auto c=Record(2);c.schema=4;c.savedAtUnixSeconds=1793314800;
+        slots[0]={cp::CatalogueStatus::Valid,c,{}};
+        c.savedAtUnixSeconds+=60;slots[1]={cp::CatalogueStatus::Valid,c,{}};
+        Check(cp::SelectSlotRecord(slots,0)==cp::SaveKind::Autosave,"newer auto is the one slot display/load selection");
+        slots[0].checkpoint->savedAtUnixSeconds+=120;
+        Check(cp::SelectSlotRecord(slots,0)==cp::SaveKind::Manual,"newer manual replaces the visible slot selection");
+        slots[1].checkpoint->savedAtUnixSeconds=slots[0].checkpoint->savedAtUnixSeconds;
+        Check(cp::SelectSlotRecord(slots,0)==cp::SaveKind::Manual,"dated tie selects deliberate manual");
+        slots[0].checkpoint->savedAtUnixSeconds=slots[1].checkpoint->savedAtUnixSeconds=0;
+        Check(cp::SelectSlotRecord(slots,0)==cp::SaveKind::Autosave,"untimed fixtures use deterministic latest checkpoint fallback");
+        slots[1].status=cp::CatalogueStatus::Invalid;
+        Check(cp::SelectSlotRecord(slots,0)==cp::SaveKind::Manual,"bad newer record cannot hide valid recovery");
+        slots[1].status=cp::CatalogueStatus::Checking;
+        Check(!cp::SelectSlotRecord(slots,0),"partial catalogue waits before selecting");
+        Check(!cp::SelectSlotRecord(slots,1) && !cp::SelectSlotRecord(slots,3),"empty and out-of-range slots have no invented record");
+    }
     MarkElapsed("suite-start");
     if(argc==3 && std::string_view(argv[1])=="--export-fixtures")return ExportFixtures(argv[2]);
     if(argc==3 && std::string_view(argv[1])=="--export-route-fixture")return ExportFixtures(argv[2],{},true);
@@ -925,6 +948,10 @@ int main(int argc,char** argv){
           play.State().outcome==cp::PlayOutcome::Succeeded,"manual can save latest boundary after moving/crouching");
     Check(Read(directory,0,cp::SaveKind::Manual).checkpoint.vitality==3 && play.State().activeSlot==2,
           "explicit manual choice does not retarget current game's autosave");
+    const auto datedManual=Read(directory,0,cp::SaveKind::Manual).checkpoint;
+    const auto nowSeconds=std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    Check(datedManual.schema==4 && datedManual.savedAtUnixSeconds>0 && datedManual.savedAtUnixSeconds<=static_cast<std::uint64_t>(nowSeconds) &&
+          !datedManual.flaskRecorded,"actual save atomically stores its request timestamp without enabling flask resources");
     const auto savedReceipt=play.TakeCompletion();
     Check(savedReceipt && savedReceipt->outcome==cp::PlayOutcome::Succeeded && !play.TakeCompletion(),
           "successful completion is delivered once while State retains success");

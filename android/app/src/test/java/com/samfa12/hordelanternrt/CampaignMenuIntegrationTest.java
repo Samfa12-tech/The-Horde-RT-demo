@@ -264,6 +264,31 @@ public final class CampaignMenuIntegrationTest {
             Bridge.state[2]++;call("pollCampaignMenu");captureCampaignWidgets(evidence,"occupied");
         }
     }
+    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    public void threeSlotLoadShowsSelectedDateAndOnlyOneActionPerSlot()throws Exception {
+        Bridge.state=java.util.Arrays.copyOf(Bridge.state,40);Bridge.state[0]=2;
+        Bridge.state[12]=Bridge.state[15]=CampaignMenuState.VALID;
+        Bridge.state[13]=1;Bridge.state[14]=1;Bridge.state[16]=2;Bridge.state[17]=2;
+        Bridge.state[34]=1767225600L;Bridge.state[35]=1767225660L;
+        open(CampaignMenuState.LOAD);
+        String text=menuText(a.findViewById(R.id.menu_scrim));
+        assertEquals(3,text.split("(?m)^Continue$",-1).length-1);
+        assertTrue(text.contains("Safe exit"));assertFalse(text.contains("Lower chamber"));
+        assertFalse(text.contains("Manual save"));assertFalse(text.contains("Autosave"));
+        assertFalse(text.contains("Recheck"));assertFalse(text.contains("Resume loaded"));
+        assertEquals("Continue Slot 1",find("Continue").getContentDescription());
+        assertTrue(find("Continue").getMinimumHeight()>=48);
+        final String evidence=System.getenv("HORDE_CAMPAIGN_UI_EVIDENCE_DIR");
+        if(evidence!=null && !evidence.isEmpty())captureCampaignWidgets(evidence,"load-dated");
+        Button first=find("Continue");first.performClick();
+        assertEquals(CampaignMenuState.AUTO,Bridge.loadKind);assertEquals(0,Bridge.loadSlot);
+        assertEquals(List.of(CampaignMenuState.REFRESH,CampaignMenuState.LOAD),Bridge.actions);
+    }
+    private void collectSlotActions(View view,List<Button> result) {
+        if(view instanceof Button && view.getContentDescription()!=null &&
+                view.getContentDescription().toString().matches("(Continue Slot |New game in Slot |Save in Slot )[123]"))result.add((Button)view);
+        if(view instanceof ViewGroup)for(int i=0;i<((ViewGroup)view).getChildCount();i++)collectSlotActions(((ViewGroup)view).getChildAt(i),result);
+    }
     private void captureCampaignWidgets(String directory,String scenario)throws Exception {
         Configuration original=new Configuration(a.getResources().getConfiguration());
         DisplayMetrics originalMetrics=new DisplayMetrics();originalMetrics.setTo(a.getResources().getDisplayMetrics());
@@ -274,7 +299,12 @@ public final class CampaignMenuIntegrationTest {
                 c.orientation=size[0]>size[1]?Configuration.ORIENTATION_LANDSCAPE:Configuration.ORIENTATION_PORTRAIT;
                 DisplayMetrics metrics=new DisplayMetrics();metrics.setTo(originalMetrics);
                 metrics.widthPixels=size[0];metrics.heightPixels=size[1];metrics.density=1;metrics.densityDpi=160;metrics.scaledDensity=1;
-                a.getResources().updateConfiguration(c,metrics);call("renderCampaignMenu");
+                org.robolectric.shadows.ShadowDisplay display=Shadows.shadowOf(a.getWindowManager().getDefaultDisplay());
+                display.setWidth(size[0]);display.setHeight(size[1]);display.setRealWidth(size[0]);display.setRealHeight(size[1]);display.setDensity(1);
+                a.getResources().updateConfiguration(c,metrics);a.getResources().getDisplayMetrics().setTo(metrics);
+                assertEquals(size[0],a.getResources().getDisplayMetrics().widthPixels);
+                assertEquals(size[1],a.getResources().getDisplayMetrics().heightPixels);
+                call("renderCampaignMenu");
                 View root=a.findViewById(R.id.menu_scrim);
                 ViewGroup scroller=(ViewGroup)((ViewGroup)root).getChildAt(0);
                 final int scrollBefore=scroller.getScrollY();
@@ -285,6 +315,17 @@ public final class CampaignMenuIntegrationTest {
                 ((ViewGroup)root).offsetDescendantRectToMyCoords(title,titleBounds);
                 assertTrue("host capture must show its actual top title: "+titleBounds,
                     titleBounds.top>=scroller.getTop() && titleBounds.bottom<=scroller.getBottom());
+                if(size[0]>size[1]) {
+                    List<Button> slotActions=new ArrayList<>();collectSlotActions(root,slotActions);
+                    assertEquals(3,slotActions.size());
+                    Rect previous=null;
+                    for(Button button:slotActions) {
+                        Rect rect=new Rect(0,0,button.getWidth(),button.getHeight());((ViewGroup)root).offsetDescendantRectToMyCoords(button,rect);
+                        assertTrue("landscape slot targets remain onscreen: "+rect,rect.left>=0 && rect.right<=size[0] && rect.top>=0 && rect.bottom<=size[1]);
+                        assertTrue(button.getHeight()>=48);
+                        if(previous!=null)assertFalse(Rect.intersects(previous,rect));previous=rect;
+                    }
+                }
                 View focused=root.findFocus();
                 String metricsText="viewport="+size[0]+"x"+size[1]+" actualDisplay="+
                     a.getResources().getDisplayMetrics().widthPixels+"x"+a.getResources().getDisplayMetrics().heightPixels+
@@ -303,7 +344,7 @@ public final class CampaignMenuIntegrationTest {
     @Test public void emptyAndInvalidRecordsCannotLoadAndManualSaveUsesNativeSafeGate()throws Exception {
         Bridge.state[12]=4;Bridge.state[15]=5;
         open(CampaignMenuState.LOAD);
-        assertFalse(find("Load manual save").isEnabled());assertFalse(find("Load autosave").isEnabled());
+        assertFalse(find("Continue").isEnabled());assertFalse(find("Continue").isEnabled());
         set("campaignMenuVisible",false);Bridge.state[7]=0;
         open(CampaignMenuState.SAVE_MANUAL);
         assertFalse(find("Save in Slot 1").isEnabled());
@@ -312,14 +353,14 @@ public final class CampaignMenuIntegrationTest {
         Bridge.state[15]=CampaignMenuState.VALID;Bridge.state[16]=3;Bridge.state[17]=2;
         open(CampaignMenuState.LOAD);
         assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("Forest lookout"));
-        assertTrue(find("Load autosave").isEnabled());
+        assertTrue(find("Continue").isEnabled());
         choose(CampaignMenuState.LOAD,0,CampaignMenuState.AUTO);
         assertEquals(List.of(CampaignMenuState.REFRESH,CampaignMenuState.LOAD),Bridge.actions);
         assertTrue(Bridge.paused);
         Bridge.state[3]=Bridge.next;Bridge.state[30]=CampaignMenuState.LOAD;
         Bridge.state[4]=CampaignMenuState.SUCCESS;Bridge.state[11]=0;Bridge.state[2]++;
         call("pollCampaignMenu");
-        assertNull(find("Resume"));assertTrue(Bridge.paused);
+        assertFalse(find("Continue").isEnabled());assertTrue(Bridge.paused);
     }
     @Test public void occupiedManualRequiresFreshExplicitConfirmationAndCancelledButtonCannotWrite()throws Exception {
         Bridge.state[12]=3;Bridge.state[13]=1;Bridge.state[14]=3;
@@ -353,12 +394,10 @@ public final class CampaignMenuIntegrationTest {
         assertEquals("ack",Bridge.order.get(Bridge.order.size()-1));assertFalse(Bridge.order.contains("unpaused"));
         assertEquals(12.3f,Bridge.yaw,0);assertEquals(-.2f,Bridge.pitch,0);assertEquals(0,Bridge.x,0);assertEquals(0,Bridge.z,0);
         assertArrayEquals(new int[]{-1,-1},pointers);assertFalse(field("parryTouchActive").getBoolean(a));
-        Bridge.state[2]++;Bridge.state[4]=6;call("pollCampaignMenu");assertNull(find("Resume"));
-        Bridge.state[2]++;Bridge.state[4]=7;call("pollCampaignMenu");assertNull(find("Resume"));
+        Bridge.state[2]++;Bridge.state[4]=6;call("pollCampaignMenu");assertFalse(find("Continue").isEnabled());
+        Bridge.state[2]++;Bridge.state[4]=7;call("pollCampaignMenu");assertFalse(find("Continue").isEnabled());
         Bridge.state[2]++;Bridge.state[11]=1;call("pollCampaignMenu");
-        assertNotNull(find("Resume"));assertTrue(Bridge.paused);
-        assertFalse(find("Check saves").isEnabled());
-        find("Resume").performClick();assertFalse(Bridge.paused);assertFalse(field("menuVisible").getBoolean(a));
+        assertFalse("exact presented Load enters directly",Bridge.paused);assertFalse(field("campaignMenuVisible").getBoolean(a));assertFalse(field("menuVisible").getBoolean(a));
     }
     @Test public void staleOrMalformedSnapshotCannotRebaseCameraOrAcknowledge()throws Exception {
         open(3);Bridge.state[1]=30;Bridge.state[4]=5;Bridge.state[8]=88;Bridge.state[9]=Float.floatToIntBits(9);
@@ -408,18 +447,18 @@ public final class CampaignMenuIntegrationTest {
     }
     @Test public void malformedReplacementSnapshotDisablesFormerlyValidLoadButton()throws Exception {
         Bridge.state[12]=3;Bridge.state[13]=1;Bridge.state[14]=3;open(3);
-        assertTrue(find("Load manual save").isEnabled());
-        Bridge.state[0]=99;call("pollCampaignMenu");assertFalse(find("Load manual save").isEnabled());
+        assertTrue(find("Continue").isEnabled());
+        Bridge.state[0]=99;call("pollCampaignMenu");assertFalse(find("Continue").isEnabled());
         choose(3,0,0);assertEquals(List.of(1),Bridge.actions);
-        Bridge.state[0]=1;call("pollCampaignMenu");assertTrue(find("Load manual save").isEnabled());
+        Bridge.state[0]=1;call("pollCampaignMenu");assertTrue(find("Continue").isEnabled());
     }
     @Test public void cancelAfterCommitRequiresExactRebaseTokenBeforeOfferingResume()throws Exception {
         Bridge.state[12]=3;Bridge.state[13]=1;Bridge.state[14]=3;open(3);choose(3,0,0);
         Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=5;Bridge.state[8]=71;Bridge.state[30]=3;
         call("pollCampaignMenu");a.onBackPressed();assertEquals(List.of(1,3,4),Bridge.actions);
         Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=7;Bridge.state[11]=1;Bridge.state[8]=70;
-        call("pollCampaignMenu");assertNull(find("Resume"));
-        Bridge.state[2]++;Bridge.state[8]=71;call("pollCampaignMenu");assertNotNull(find("Resume"));
+        call("pollCampaignMenu");assertFalse(find("Continue").isEnabled());
+        Bridge.state[2]++;Bridge.state[8]=71;call("pollCampaignMenu");assertNotNull(find("Continue"));
         a.onBackPressed();assertFalse(field("campaignMenuVisible").getBoolean(a));
         assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
     }
@@ -427,14 +466,14 @@ public final class CampaignMenuIntegrationTest {
         Bridge.state[12]=3;Bridge.state[13]=1;Bridge.state[14]=3;open(3);choose(3,0,0);
         Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=5;Bridge.state[8]=71;Bridge.state[30]=3;
         call("pollCampaignMenu");Bridge.state[2]++;Bridge.state[4]=7;Bridge.state[11]=1;call("pollCampaignMenu");
-        assertNotNull(find("Resume"));choose(3,0,0);
+        assertFalse(field("campaignMenuVisible").getBoolean(a));open(3);choose(3,0,0);
         call("pollCampaignMenu");assertFalse(field("campaignLoadedReady").getBoolean(a));
         call("resumeLoadedCampaign");assertTrue(Bridge.paused);assertTrue(field("campaignMenuVisible").getBoolean(a));
     }
     @Test public void invalidatedLoadedPublicationDoesNotTrapBackOrReuseResume()throws Exception {
         Bridge.state[12]=3;Bridge.state[13]=1;Bridge.state[14]=3;open(3);choose(3,0,0);
         Bridge.state[2]++;Bridge.state[3]=Bridge.next;Bridge.state[4]=5;Bridge.state[8]=71;Bridge.state[30]=3;
-        call("pollCampaignMenu");Bridge.state[2]++;Bridge.state[4]=7;Bridge.state[11]=1;call("pollCampaignMenu");
+        call("pollCampaignMenu");a.onBackPressed();Bridge.state[3]=Bridge.next;Bridge.state[2]++;Bridge.state[4]=7;Bridge.state[11]=1;call("pollCampaignMenu");
         assertTrue(field("campaignLoadedReady").getBoolean(a));
         Bridge.state[0]=99;call("pollCampaignMenu");assertFalse(field("campaignLoadedReady").getBoolean(a));
         a.onBackPressed();assertFalse(field("campaignMenuVisible").getBoolean(a));assertTrue(Bridge.paused);
@@ -495,7 +534,7 @@ public final class CampaignMenuIntegrationTest {
         float[] controls=(float[])field("viewControls").get(a);controls[7]=.5f;controls[8]=.6f;
         openDeathLoad();
         assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(field("campaignFromDeath").getBoolean(a));
-        assertTrue(find("Load manual save").isEnabled());assertTrue(find("Load autosave").isEnabled());
+        assertTrue(find("Continue").isEnabled());assertTrue(find("Continue").isEnabled());
         assertEquals(0,Bridge.x,0);assertEquals(0,Bridge.z,0);assertTrue(Bridge.paused);
         assertEquals(0,Bridge.retries);assertEquals(0,Bridge.resets);assertFalse(Bridge.order.contains("unpaused"));
     }
@@ -533,17 +572,17 @@ public final class CampaignMenuIntegrationTest {
         assertEquals(95,Bridge.ackToken);assertTrue(field("campaignMenuVisible").getBoolean(a));
         call("updateDeathRecoveryPresentation",new Class<?>[]{int.class},0);publishDeathLoadSuccess();
         a.onBackPressed();assertTrue(field("campaignMenuVisible").getBoolean(a));
-        assertTrue(field("deathOverlayVisible").getBoolean(a));assertNotNull(find("Resume"));assertTrue(Bridge.paused);
+        assertTrue(field("deathOverlayVisible").getBoolean(a));assertNotNull(find("Continue"));assertTrue(Bridge.paused);
         float[] controls=(float[])field("viewControls").get(a);controls[7]=.7f;controls[8]=.5f;
-        find("Resume").performClick();
+        find("Continue").performClick();
         assertFalse(field("deathOverlayVisible").getBoolean(a));assertFalse(field("campaignFromDeath").getBoolean(a));
         assertFalse(field("menuVisible").getBoolean(a));assertFalse(Bridge.paused);
         assertEquals(0,field("lastPlayerLifePhase").getInt(a));assertEquals(1,field("lastPlayerVitality").getInt(a));
         assertEquals(0,Bridge.x,0);assertEquals(0,Bridge.z,0);assertEquals(0,Bridge.retries);assertEquals(0,Bridge.resets);
     }
     @Test public void deathLoadCannotResumeIfNativeStillReportsDead()throws Exception {
-        validLowerManual();openDeathLoad();choose(3,0,0);publishDeathLoadRebase();publishDeathLoadSuccess();
-        Bridge.lifePhase=2;Bridge.vitality=3L<<32;find("Resume").performClick();
+        validLowerManual();openDeathLoad();choose(3,0,0);publishDeathLoadRebase();
+        Bridge.lifePhase=2;Bridge.vitality=3L<<32;publishDeathLoadSuccess();find("Continue").performClick();
         assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(field("campaignMenuVisible").getBoolean(a));assertTrue(Bridge.paused);
     }
     @Test public void returnedDeathCardRetryKeepsItsAliveAcknowledgementPolicy()throws Exception {
@@ -667,24 +706,24 @@ public final class CampaignMenuIntegrationTest {
         assertEquals(CampaignMenuState.LOAD,field("campaignMenuAction").getInt(a));
         detachedNewGame.performClick();assertEquals(List.of(1,1),Bridge.actions);
         Bridge.state[3]=Bridge.next;Bridge.state[2]++;call("pollCampaignMenu");
-        assertTrue(find("Load manual save").isEnabled());assertTrue(find("Load autosave").isEnabled());
-        assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("Manual save: Lower chamber"));
-        assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("Autosave: Forest lookout"));
-        find("Load manual save").performClick();assertEquals(List.of(1,1,3),Bridge.actions);
-        assertEquals(0,Bridge.loadSlot);assertEquals(CampaignMenuState.MANUAL,Bridge.loadKind);assertTrue(Bridge.paused);
+        assertTrue(find("Continue").isEnabled());assertTrue(find("Continue").isEnabled());
+        assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("Forest lookout"));
+        assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("Date unavailable"));
+        find("Continue").performClick();assertEquals(List.of(1,1,3),Bridge.actions);
+        assertEquals(0,Bridge.loadSlot);assertEquals(CampaignMenuState.AUTO,Bridge.loadKind);assertTrue(Bridge.paused);
     }
     @Test public void checkingAndUnreadableSlotsAreNotPresentedAsEmptyAndOverwriteStaysExplicit()throws Exception {
         Bridge.state[12]=CampaignMenuState.CHECKING;Bridge.state[15]=CampaignMenuState.READ_ERROR;
         open(CampaignMenuState.NEW_GAME);
         String text=menuText(a.findViewById(R.id.menu_scrim));
-        assertTrue(text.contains("Manual save: Checking"));assertTrue(text.contains("Autosave: Could not be opened"));
+        assertTrue(text.contains("Checking saves"));assertFalse(text.contains("Empty\nSlot 1"));
         assertFalse(find("New game").isEnabled());
         Bridge.state[12]=CampaignMenuState.VALID;Bridge.state[13]=1;Bridge.state[14]=1;
         Bridge.state[2]++;call("pollCampaignMenu");find("New game").performClick();
         AlertDialog dialog=(AlertDialog)field("campaignConfirmation").get(a);assertNotNull(dialog);
         TextView message=dialog.findViewById(android.R.id.message);assertNotNull(message);
-        assertTrue(message.getText().toString().contains("Your manual save stays"));
-        assertTrue(message.getText().toString().contains("autosave will be replaced by your new game"));
+        assertTrue(message.getText().toString().contains("previous checkpoint is kept"));
+        assertTrue(message.getText().toString().contains("New progress is saved at checkpoints"));
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).performClick();assertEquals(List.of(1),Bridge.actions);
     }
 

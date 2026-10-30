@@ -21,7 +21,7 @@ int CampaignStorageError(const campaign::storage::Result& result)
 
 void PublishCampaignOnOwner(const SwapchainContext& context)
 {
-    std::array<jlong,34> ui{};ui[0]=1;ui[1]=context.surfaceGeneration;
+    std::array<jlong,40> ui{};ui[0]=2;ui[1]=context.surfaceGeneration;
     ui[3]=gCampaignOwnerRequest;ui[4]=gCampaignPhase;ui[5]=gCampaignError;ui[6]=-1;
     if(gCampaignSession) {
         const auto state=gCampaignSession->State();
@@ -34,6 +34,7 @@ void PublishCampaignOnOwner(const SwapchainContext& context)
             if(entries[i].checkpoint) {
                 ui[13+i*3]=static_cast<int>(entries[i].checkpoint->id);
                 ui[14+i*3]=entries[i].checkpoint->vitality;
+                ui[34+i]=static_cast<jlong>(entries[i].checkpoint->savedAtUnixSeconds);
             }
         }
     }

@@ -12343,6 +12343,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         if (sceneContext)
         {
             sceneContext->lookoutAppActive=wParam!=FALSE;
+            if(wParam==FALSE && sceneContext->campaignMenu)sceneContext->campaignMenu->HoldLoadedGame();
             if(wParam==FALSE)RevokeLookoutObjective(*sceneContext);
             if (wParam == FALSE) { ClearDesktopInput(*sceneContext); DiscardDesktopPendingCommands(*sceneContext); sceneContext->controllerFocusLatch.LoseFocus(); StopMenuAmbience(*sceneContext); }
             PublishMusicPlayback(*sceneContext, wParam == FALSE);

@@ -167,7 +167,7 @@ std::optional<campaign::RestoreToken> GameSimulation::BeginCampaignRestore(const
     // An invalid request does not cancel an already validated pending request.
     // Normal gameplay keeps schema3 unavailable until admission. The explicit
     // diagnostic owner restores resources exactly instead of dropping them.
-    if(!campaign::Validate(c) || (c.schema>=3 && !config_.healingFlask1_7) || !config_.combatFoundation1_7 || !config_.waterfallSkeletonEncounter ||
+    if(!campaign::Validate(c) || (campaign::HasFlaskResources(c) && !config_.healingFlask1_7) || !config_.combatFoundation1_7 || !config_.waterfallSkeletonEncounter ||
        config_.playerMountProfile!=items::PlayerMountProfile::AnatomicalBody ||
        staticDetailLease_.resourceGeneration || campaignRequestSequence_==UINT64_MAX ||
        std::max(worldRoute_.generation,campaignDestinationGeneration_)==UINT64_MAX)
@@ -190,7 +190,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
        chapterCompanion_.State().generation==UINT64_MAX || rescueTraversal_.Snapshot().generation==UINT64_MAX)
         return false;
     const auto c=pendingCampaignRestore_->checkpoint;
-    if(!campaign::Validate(c) || (c.schema>=3 && !config_.healingFlask1_7) || !SafeSupport(c,*terrain)) return false;
+    if(!campaign::Validate(c) || (campaign::HasFlaskResources(c) && !config_.healingFlask1_7) || !SafeSupport(c,*terrain)) return false;
     const bool completedForest=c.contentRevision==2;
     const bool upper=c.id==campaign::CheckpointId::SafeExit || c.id==campaign::CheckpointId::ForestEndpoint;
     auto config=config_;

@@ -7303,7 +7303,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestCampaign(
 extern "C" JNIEXPORT jlongArray JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getCampaignState(JNIEnv* env,jclass)
 {
-    std::array<jlong,34> state;
+    std::array<jlong,40> state;
     {std::lock_guard lock(gCampaignMutex);state=gCampaignUi;}
     auto result=env->NewLongArray(static_cast<jsize>(state.size()));
     if(result)env->SetLongArrayRegion(result,0,static_cast<jsize>(state.size()),state.data());

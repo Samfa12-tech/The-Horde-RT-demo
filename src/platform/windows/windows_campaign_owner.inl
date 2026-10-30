@@ -307,11 +307,13 @@ void ObserveCampaignPresentation(VulkanSurfaceContext& ctx,bool presented)
     if(presented && ctx.lastFramePresentation==horde::telemetry::RtPresentationOutcome::Presented &&
        ctx.campaignBarrier.Presented(ctx.campaignSurfaceGeneration,ctx.campaignFrameTick,ctx.campaignFrameWorld)){
         ctx.campaignPhase=CampaignMenu::Phase::Succeeded;
-        ctx.campaignMessage="Loaded game presented by hardware RT. Resume when ready.";
+        ctx.campaignMessage.clear();
         RefreshCampaignMenu(ctx);
         const auto& player=ctx.simulation.Snapshot().playerVitals;
         const bool retryReady=ctx.campaignConfirmedRetry &&
             player.phase==horde::gameplay::PlayerLifePhase::Alive && player.vitality>0;
-        if(ctx.campaignNewGame || retryReady){ctx.campaignNewGame=false;ctx.campaignConfirmedRetry=false;ctx.campaignMenu->Close();ctx.campaignPause=false;ShowPauseMenu(ctx,false);}
+        const bool chosenLoadReady=ctx.campaignMenu->ShouldContinueAfterPresentation() &&
+            player.phase==horde::gameplay::PlayerLifePhase::Alive && player.vitality>0;
+        if(ctx.campaignNewGame || retryReady || chosenLoadReady){ctx.campaignNewGame=false;ctx.campaignConfirmedRetry=false;ctx.campaignMenu->Close();ctx.campaignPause=false;ShowPauseMenu(ctx,false);}
     }
 }
