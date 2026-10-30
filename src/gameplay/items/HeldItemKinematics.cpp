@@ -98,17 +98,6 @@ HeldItemTransform WorldFromAxes(const Vec3& x,
              translation[0], translation[1], translation[2], 1.0f}};
 }
 
-Vec3 TranslationOf(const HeldItemTransform& transform)
-{
-    return {{transform[12], transform[13], transform[14]}};
-}
-
-Vec3 ColumnOf(const HeldItemTransform& transform, const std::size_t column)
-{
-    return {{transform[column * 4u], transform[column * 4u + 1u],
-             transform[column * 4u + 2u]}};
-}
-
 float MapContinuousCarryDepth(const float forwardClearance,
                               const float openDepth)
 {
