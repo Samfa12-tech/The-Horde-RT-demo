@@ -6,6 +6,13 @@ namespace cp=horde::gameplay::campaign;
 using Menu=horde::platform::windows::WindowsCampaignMenu;
 namespace {
 int checks=0,failures=0;
+WNDPROC originalChoiceProcedure=nullptr;
+unsigned choiceTextChanges=0,choiceEnableChanges=0;
+LRESULT CALLBACK CountChoiceChanges(HWND window,UINT message,WPARAM w,LPARAM l) {
+    if(message==WM_SETTEXT)++choiceTextChanges;
+    if(message==WM_ENABLE)++choiceEnableChanges;
+    return CallWindowProcA(originalChoiceProcedure,window,message,w,l);
+}
 void Check(bool value,const char* message){++checks;if(!value){++failures;std::cerr<<"FAIL: "<<message<<'\n';}}
 LRESULT CALLBACK ParentProc(HWND window,UINT message,WPARAM w,LPARAM l) {
     auto menu=reinterpret_cast<Menu*>(GetWindowLongPtrA(window,GWLP_USERDATA));
@@ -46,6 +53,13 @@ int main() {
         view.catalogue[3].status=cp::CatalogueStatus::ReadError;
         view.catalogue[5]=Record(1,true);
         menu.Refresh(view);menu.Open(Menu::Page::Load,Menu::Origin::Entry);menu.Layout(bounds);
+        const auto choice=GetDlgItem(parent,4110);
+        originalChoiceProcedure=reinterpret_cast<WNDPROC>(SetWindowLongPtrA(choice,GWLP_WNDPROC,
+            reinterpret_cast<LONG_PTR>(CountChoiceChanges)));
+        for(unsigned frame=0;frame<120;++frame)menu.Refresh(view);
+        Check(choiceTextChanges==0 && choiceEnableChanges==0,
+            "stable catalogue polling does not erase/repaint or re-enable identical slot controls");
+        SetWindowLongPtrA(choice,GWLP_WNDPROC,reinterpret_cast<LONG_PTR>(originalChoiceProcedure));
         Check(!IsWindowVisible(parent) && menu.Visible(),"owner remains hidden while chooser is logically open");
         Check(Text(parent,4110).find("Lower claimed | Hearts 2/3")!=std::string::npos,"real occupied label carries checkpoint and hearts");
         Check(Text(parent,4111).find("Checking")!=std::string::npos && !Enabled(parent,4111),"checking load disabled");

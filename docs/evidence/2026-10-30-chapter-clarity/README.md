@@ -3,6 +3,10 @@
 This bounded source change follows Sam's chapter playtest; it is not a fresh
 Windows/phone gameplay pass. The phone was released before this work.
 
+The later [Windows interaction/text checkpoint](../2026-10-30-windows-acceptance/README.md)
+records recovered foreground access, actual gameplay and synthetic save/cold
+reload evidence; the morning limitations below retain their original scope.
+
 ## Confirmed fixes
 
 - Android's controller footer repeated generic combat instructions forever,

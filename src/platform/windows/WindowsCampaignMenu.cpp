@@ -1,4 +1,5 @@
 #include "platform/windows/WindowsCampaignMenu.h"
+#include "platform/windows/WindowsControlPresentation.h"
 
 #include <utility>
 
@@ -114,8 +115,9 @@ void WindowsCampaignMenu::Refresh(const View& view) {
 void WindowsCampaignMenu::Render() {
     if(!parent_)return;
     const auto set=[&](int id,const std::string& text,bool show,bool enable=true){
-        const auto control=GetDlgItem(parent_,id);SetWindowTextA(control,text.c_str());
-        EnableWindow(control,enable);ShowWindow(control,show?SW_SHOWNA:SW_HIDE);};
+        const auto control=GetDlgItem(parent_,id);SetNativeTextIfChanged(control,text);
+        if((IsWindowEnabled(control)!=FALSE)!=enable)EnableWindow(control,enable);
+        SetNativeVisibilityIfChanged(control,show);};
     set(TitleId,page_==Page::NewGame?"NEW GAME":page_==Page::Save?"SAVE AT LAST SAFE CHECKPOINT":"LOAD GAME",visible_);
     std::string status=view_.message;
     if(status.empty()) {

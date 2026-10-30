@@ -16,14 +16,34 @@ std::filesystem::path WindowsCampaignDirectory()
     return root;
 }
 
+bool CampaignPreparationFailure(VulkanSurfaceContext& ctx,const char* stage,const std::string& detail)
+{
+    // GUI launches have no readable stderr. Preserve the actual failed gate
+    // locally while retaining the previous scene and ordinary menu recovery.
+    std::ostringstream report;
+    report<<"Campaign preparation failed at "<<stage<<"\n"<<detail
+        <<"\nLast RT error: "<<ctx.lastRtFrameError
+        <<"\nRequest: "<<ctx.campaignSerial<<"\nSurface: "<<ctx.campaignSurfaceGeneration<<'\n';
+    const auto directory=gCampaignHiddenValidation?gCampaignValidationDirectory:ExecutableDirectory()/kReportDirectory;
+    (void)WriteReportFile(directory/"windows_campaign_preparation.txt",report.str());
+    return false;
+}
+
 bool DrainCampaignResources(VulkanSurfaceContext& ctx)
 {
-    if(!ConsumePendingImageAcquire(ctx)){ctx.campaignRetirementUnproved=true;return false;}
+    if(!ConsumePendingImageAcquire(ctx)){ctx.campaignRetirementUnproved=true;return CampaignPreparationFailure(ctx,"consume-image-acquire","Queue submission failed.");}
     const auto idle=vkDeviceWaitIdle(ctx.device);
-    bool ready=idle==VK_SUCCESS && CompleteRtEvidenceAfterDeviceIdle(ctx,idle) &&
-        ctx.presentCompletionFences.Drain()==VK_SUCCESS;
+    bool ready=idle==VK_SUCCESS;
+    if(!ready)CampaignPreparationFailure(ctx,"device-idle",std::to_string(idle));
+    if(ready && !CompleteRtEvidenceAfterDeviceIdle(ctx,idle)) {
+        CampaignPreparationFailure(ctx,"completed-frame-evidence",ctx.lastRtFrameError);ready=false;
+    }
+    if(ready) {
+        const auto present=ctx.presentCompletionFences.Drain();
+        if(present!=VK_SUCCESS){CampaignPreparationFailure(ctx,"present-fences",std::to_string(present));ready=false;}
+    }
     if(ready)for(auto buffer:ctx.commandBuffers)
-        if(vkResetCommandBuffer(buffer,0)!=VK_SUCCESS){ready=false;break;}
+        if(const auto reset=vkResetCommandBuffer(buffer,0);reset!=VK_SUCCESS){CampaignPreparationFailure(ctx,"command-buffer-reset",std::to_string(reset));ready=false;break;}
     ctx.campaignRetirementUnproved=!ready;
     return ready;
 }
@@ -34,7 +54,8 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     if(ctx.rtScene.Profile()==horde::vulkan::raytracing::RtSceneProfile::Showcase &&
        ctx.simulation.Snapshot().developmentRescueJourney && ctx.rtScene.IsReady() &&
        ctx.rtScene.StaticGeometryHasCompleteContributors())return true;
-    if(ctx.campaignPreparedScene)return ctx.campaignPreparedScene->IsReady();
+    if(ctx.campaignPreparedScene)return ctx.campaignPreparedScene->IsReady() ||
+        CampaignPreparationFailure(ctx,"retained-candidate","Previously prepared scene is not ready.");
     if(!DrainCampaignResources(ctx))return false;
     ctx.campaignPreparedScene=std::make_unique<Scene>();
     auto& scene=*ctx.campaignPreparedScene;
@@ -51,7 +72,7 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
         horde::vulkan::raytracing::RtSceneProfile::Showcase,ctx.requestedGlassEnabled,ctx.pipelineCache);
     std::cerr<<"HORDE_WINDOWS_CAMPAIGN prepare ready="<<ready<<" previous_scene_retained=1 diagnostic="<<diagnostic<<'\n';
     if(!DrainCampaignResources(ctx))return false;
-    if(!ready){ctx.campaignPreparedScene.reset();ctx.campaignMessage=diagnostic;return false;}
+    if(!ready){ctx.campaignPreparedScene.reset();ctx.campaignMessage=diagnostic;return CampaignPreparationFailure(ctx,"scene-initialise",diagnostic);}
     return true;
 }
 
@@ -208,7 +229,11 @@ void PumpCampaign(VulkanSurfaceContext& ctx)
                     } else fail("Load could not start. Current game retained.");
                 } else if(command.action==CampaignMenu::Action::BeginNewGame){
                     if(ctx.simulation.Snapshot().staticDetailLease.resourceGeneration){fail("World detail is restoring. Retry after it has completed.");}
-                    else if(!ctx.campaignBarrier.Begin(++ctx.campaignSerial,ctx.campaignSurfaceGeneration) || !PrepareCampaignResources(ctx))fail("New game resources could not prepare. Current game retained.");
+                    else if(!ctx.campaignBarrier.Begin(++ctx.campaignSerial,ctx.campaignSurfaceGeneration)) {
+                        CampaignPreparationFailure(ctx,"new-game-barrier","Request not admitted.");
+                        fail("New game resources could not prepare. Current game retained.");
+                    }
+                    else if(!PrepareCampaignResources(ctx))fail("New game resources could not prepare. Current game retained.");
                     else {
                         auto candidate=std::make_unique<horde::gameplay::simulation::GameSimulation>(horde::gameplay::simulation::ProductionGameSimulationConfig());
                         candidate->StartLiveDevelopmentRescueJourney(true);

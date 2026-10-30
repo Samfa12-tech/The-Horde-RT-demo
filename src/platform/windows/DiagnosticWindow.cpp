@@ -144,6 +144,7 @@
 #include "platform/windows/WindowsAssetRoot.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
+#include "platform/windows/WindowsControlPresentation.h"
 #include "platform/windows/WindowsGameplayInput.h"
 #include "platform/windows/WindowsChapterDialogue.h"
 #include "platform/windows/WindowsVitalityHudLayout.h"
@@ -2782,7 +2783,7 @@ void SetControlVisible(HWND window, const int id, const bool visible)
 {
     if (HWND control = GetDlgItem(window, id))
     {
-        ShowWindow(control, visible ? SW_SHOW : SW_HIDE);
+        horde::platform::windows::SetNativeVisibilityIfChanged(control,visible);
     }
 }
 
@@ -3110,12 +3111,41 @@ void UpdateVitalityHud(VulkanSurfaceContext& context)
     const std::string text = "Vitality " + current + " of " + std::to_string(vitals.maxVitality);
     if (HWND hud = GetDlgItem(context.windowHandle, kVitalityHudControlId))
     {
-        SetWindowTextA(hud, text.c_str());
+        if(!horde::platform::windows::SetNativeTextIfChanged(hud,text))return;
         RECT client{};
         GetClientRect(context.windowHandle, &client);
         LayoutVitalityHud(context.windowHandle, client.right, vitals.maxVitality);
-        InvalidateRect(hud, nullptr, TRUE);
+        InvalidateRect(hud, nullptr, FALSE);
     }
+}
+
+void RecordWindowsTextLayout(const VulkanSurfaceContext& context)
+{
+#if HORDE_RT_WINDOWS_ACCEPTANCE
+    RECT client{},outer{};
+    GetClientRect(context.windowHandle,&client);GetWindowRect(context.windowHandle,&outer);
+    std::ostringstream report;
+    report<<"DPI: "<<GetDpiForWindow(context.windowHandle)
+        <<"\nClient: "<<client.right<<'x'<<client.bottom
+        <<"\nWindow: "<<outer.right-outer.left<<'x'<<outer.bottom-outer.top
+        <<"\nSubtitle scale percent: "<<context.subtitleSizePercent
+        <<"\nConfigured render scale: "<<context.renderScale<<'\n';
+    for(int id:{kPauseTitleId,kChestPromptControlId,kCombatTeachingPromptId}) {
+        HWND control=GetDlgItem(context.windowHandle,id);if(!control)continue;
+        RECT bounds{};GetClientRect(control,&bounds);char text[1024]{};GetWindowTextA(control,text,sizeof(text));
+        HFONT font=reinterpret_cast<HFONT>(SendMessageA(control,WM_GETFONT,0,0));LOGFONTA face{};
+        if(font)GetObjectA(font,sizeof(face),&face);
+        HDC dc=GetDC(control);SIZE measured{};HGDIOBJ old=dc&&font?SelectObject(dc,font):nullptr;
+        if(dc)GetTextExtentPoint32A(dc,text,static_cast<int>(std::strlen(text)),&measured);
+        if(dc&&old&&old!=HGDI_ERROR)SelectObject(dc,old);if(dc)ReleaseDC(control,dc);
+        report<<"Control "<<id<<": "<<bounds.right<<'x'<<bounds.bottom
+            <<" font="<<face.lfFaceName<<" height="<<face.lfHeight
+            <<" textWidth="<<measured.cx<<" text="<<text<<'\n';
+    }
+    (void)WriteReportFile(ExecutableDirectory()/kReportDirectory/"windows_text_layout.txt",report.str());
+#else
+    (void)context;
+#endif
 }
 
 void UpdateChestPrompt(VulkanSurfaceContext& context)
@@ -3178,15 +3208,17 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     }
     std::string contextualText(text);
     if (raiseLantern) {
-        if (!contextualText.empty()) contextualText += " | ";
-        contextualText += context.teachingControllerGlyphs ? "Y: RAISE LANTERN" : "E: RAISE LANTERN";
+        contextualText=horde::platform::windows::WindowsRaiseLanternPromptText(context.teachingControllerGlyphs,
+            rescueJourney && snapshot.rescuePrompt==horde::gameplay::traversal::RescuePrompt::Descend);
     }
     if (visible)
     {
-        SetWindowTextA(promptControl, contextualText.c_str());
-        InvalidateRect(promptControl, nullptr, TRUE);
+        if(horde::platform::windows::SetNativeTextIfChanged(promptControl,contextualText)) {
+            InvalidateRect(promptControl, nullptr, FALSE);
+            RecordWindowsTextLayout(context);
+        }
     }
-    ShowWindow(promptControl, visible ? SW_SHOWNA : SW_HIDE);
+    horde::platform::windows::SetNativeVisibilityIfChanged(promptControl,visible);
 }
 
 bool IsDesktopGameplayAvailable(const VulkanSurfaceContext& context)
@@ -3233,6 +3265,9 @@ void MirrorSimulationSnapshot(VulkanSurfaceContext& context, const bool mirrorVi
     context.torchFailureSnapshot = snapshot.torchFailure;
     context.activeEnemyKind = snapshot.activeEnemyKind;
     context.playerRetryCheckpoint = snapshot.retryCheckpoint;
+    // Restore/load changes health without a damage event. Keep the accessible
+    // native caption synchronized with the same snapshot that paints hearts.
+    UpdateVitalityHud(context);
 }
 
 bool MeasurementPausedByUi(const VulkanSurfaceContext& context)
@@ -3273,7 +3308,7 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
         context.combatTeachingFadeText.clear();
         context.combatTeachingFadeOpacity = 0u;
         context.combatTeachingFadeStartedAtMs = 0u;
-        SetWindowTextA(prompt, "");
+        horde::platform::windows::SetNativeTextIfChanged(prompt, "");
         SetLayeredWindowAttributes(prompt, 0u, 0u, LWA_ALPHA);
         SetControlVisible(context.windowHandle, kCombatTeachingPromptId, false);
         return;
@@ -3285,7 +3320,7 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
         context.combatTeachingFadeOpacity = attackCue || teaching.safePractice || revivalClearance ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
             teaching.promptOpacity, context.reducedMotionEnabled);
         context.combatTeachingFadeStartedAtMs = 0u;
-        SetWindowTextA(prompt, text.c_str());
+        horde::platform::windows::SetNativeTextIfChanged(prompt, text);
         SetLayeredWindowAttributes(prompt, 0u, context.combatTeachingFadeOpacity, LWA_ALPHA);
         SetControlVisible(context.windowHandle, kCombatTeachingPromptId, true);
         return;
@@ -3296,7 +3331,7 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
         context.combatTeachingFadeText.clear();
         context.combatTeachingFadeOpacity = 0u;
         context.combatTeachingFadeStartedAtMs = 0u;
-        SetWindowTextA(prompt, "");
+        horde::platform::windows::SetNativeTextIfChanged(prompt, "");
         SetLayeredWindowAttributes(prompt, 0u, 0u, LWA_ALPHA);
         SetControlVisible(context.windowHandle, kCombatTeachingPromptId, false);
         return;
@@ -3313,12 +3348,12 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
         context.combatTeachingFadeText.clear();
         context.combatTeachingFadeOpacity = 0u;
         context.combatTeachingFadeStartedAtMs = 0u;
-        SetWindowTextA(prompt, "");
+        horde::platform::windows::SetNativeTextIfChanged(prompt, "");
         SetLayeredWindowAttributes(prompt, 0u, 0u, LWA_ALPHA);
         SetControlVisible(context.windowHandle, kCombatTeachingPromptId, false);
         return;
     }
-    SetWindowTextA(prompt, context.combatTeachingFadeText.c_str());
+    horde::platform::windows::SetNativeTextIfChanged(prompt, context.combatTeachingFadeText);
     SetLayeredWindowAttributes(prompt, 0u, alpha, LWA_ALPHA);
     SetControlVisible(context.windowHandle, kCombatTeachingPromptId, true);
 }
@@ -3503,7 +3538,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                        : (context.entryMenuVisible ?
                             (context.entryMoreVisible && context.openingBenchmark && !context.openingBenchmark->statusTitle.empty()
                                 ? context.openingBenchmark->statusTitle.c_str() : "THE HORDE")
-                            : "HORDE LANTERN RT  |  SHOWCASE ALPHA")));
+                            : "PAUSED")));
     }
     if (HWND resume = GetDlgItem(context.windowHandle, kResumeButtonId))
     {
@@ -10676,7 +10711,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         sceneContext->simulation.Snapshot().playerVitals.maxVitality : horde::gameplay::PlayerVitals::kMaxVitality);
     if (HWND prompt = GetDlgItem(window, kChestPromptControlId))
     {
-        const int promptWidth = std::min(ScaleForDpi(window, 390),
+        const int promptWidth = std::min(ScaleForDpi(window, 650),
                                          std::max(ScaleForDpi(window, 250),
                                                   width - ScaleForDpi(window, 48)));
         MoveWindow(prompt,

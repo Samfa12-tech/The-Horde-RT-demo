@@ -21,6 +21,12 @@ struct WindowsChestPromptVisibility
     bool captureMode = false;
 };
 
+constexpr std::string_view WindowsRaiseLanternPromptText(bool controller,bool descend)
+{
+    return controller ? (descend ? "Y: RAISE LANTERN | A: DESCEND" : "Y: RAISE LANTERN") :
+        (descend ? "E: RAISE LANTERN | CLICK: DESCEND" : "E: RAISE LANTERN");
+}
+
 constexpr std::string_view WindowsChestPromptText(
     const horde::gameplay::interactions::ChestRewardPrompt prompt)
 {
