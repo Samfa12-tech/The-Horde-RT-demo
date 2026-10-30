@@ -51,10 +51,11 @@ Check (-not $complete.Contains('ShowWindowsBenchmarkSummaryReview(') -and
     -not $complete.Contains('CopyWindowsSummaryJson(') -and -not $complete.Contains('ExportWindowsPlaytestReportJson(')) 'Completion cannot automatically open, copy or export a statistics review.'
 Check ($start.IndexOf('context.benchmarkSummary.reset()') -lt $start.IndexOf('ResetRoute(context)') -and
     $cancel.Contains('context.benchmarkSummaryArm.reset()') -and $cancel.Contains('context.benchmarkSummary.reset()')) 'Accepted new runs and cancellation invalidate prior summary owners.'
-Check ($review.Contains('!context.unattendedBenchmark && !context.graphicsPreviewCapture') -and
+Check ($review.Contains('(!context.unattendedBenchmark || context.openingBenchmarkOwner) && !context.graphicsPreviewCapture') -and
+    $owner.Contains('context.openingBenchmarkOwner = openingBenchmark && openingBenchmark->owner.Phase()==OpeningBenchmarkOwnerPhase::Benchmark') -and
     $review.Contains('!context.outputResizeValidation && !context.nativeMotionValidation') -and
     $arm.Contains('if (!WindowsBenchmarkSummaryInteractive(context)) return') -and
-    $freeze.Contains('!WindowsBenchmarkSummaryInteractive(context)')) 'Unattended observer/capture modes perform no optional summary snapshot or UI work.'
+    $freeze.Contains('!WindowsBenchmarkSummaryInteractive(context)')) 'CLI observer/capture modes perform no optional summary work; an explicit opening-menu benchmark retains its interactive review.'
 Check ($owner.IndexOf('ArmWindowsBenchmarkSummary(context)') -gt $owner.IndexOf('context.benchmarkEvidence.ArmMeasurement(state.sceneEpoch, state.measurementGeneration)') -and
     $arm.Contains('RtBenchmarkRunStatus::Measuring') -and $arm.Contains('arm.configuration.sceneEpoch != context.benchmarkEvidence.SceneEpoch()') -and
     $arm.Contains('arm.configuration.measurementGeneration != context.benchmarkEvidence.MeasurementGeneration()')) 'The arming snapshot must name the real successful measured scope rather than warm-up seeds.'

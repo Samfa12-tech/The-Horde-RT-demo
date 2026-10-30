@@ -11194,6 +11194,14 @@ void ToggleDiagnostics(VulkanSurfaceContext& context)
     context.settingsVisible = false;
     context.benchmarkReportVisible = false;
     context.pauseMenuVisible = context.diagnosticsVisible;
+    if (context.diagnosticsVisible && context.capabilitySnapshot)
+    {
+        const auto publication = context.rtFrameEvidence.PublishedStateByValue();
+        const auto* evidence = context.rtFrameEvidenceInitialised && context.rtFrameEvidence.ObserverAvailable()
+            ? &publication : nullptr;
+        SetWindowTextA(GetDlgItem(context.windowHandle, kEditControlId),
+            WindowSafeText(BuildDisplayText(*context.capabilitySnapshot, evidence)).c_str());
+    }
     ApplyOverlayState(context);
     PlaySoundEffect(context, context.diagnosticsVisible ? "ui_select.wav" : "ui_back.wav");
     FocusGameControl(context.diagnosticsVisible ? GetDlgItem(context.windowHandle, kEditControlId) : context.windowHandle);

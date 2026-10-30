@@ -31,9 +31,13 @@ Final R12 executable SHA256 `bf8bd9d045a4929d06275a18a7e5b691d241599dfca4e5cf59a
 
 Final R12 actual custom run completed2/2 laps and26/26 waypoints. The returned native edit retained the completed benchmark text through the first Entry RT frame (rather than capability diagnostics), Review Stats remained enabled, and Back returned to an unclipped **RUN COMPLETE** heading. The exact restoration receipt passed. All owned windows were closed and the screen released. Actual OS picker writing remains unverified as stated above.
 
+The final transition follow-up uses R13 SHA256 `3fa747b3c64b40d637e9c6266b397d02c3d038dab7d118951fe484692da40245`, source stamp `g:990974af3c8817f71afafb216085a63a89b8c216;i:d708eaf741e7150ef6f2daf4abeb6f6989600d31577381d92fe3e4b32abc66c0;c:R;s:D`. Diagnostics explicitly refreshes the shared edit when opened, so suppressing the first-frame report overwrite cannot leave benchmark text in Diagnostics. An actual completed custom run then report -> menu -> RT Diagnostics showed the expected distinct text in each state. The owned window was closed.
+
+Intermediate `990974af` CI runs41117288226 and41117298793 each passed five jobs but failed MSVC's source-review contract (167/168 tests passed). The old text assertion required every scripted owner to suppress optional review, including the now-supported explicit menu owner. This affected contract was missed in the first local selection. It now checks the explicit opening-owner phase exception while retaining all CLI/capture exclusions and every other assertion; final selection5/5 passes. This is an assertion mismatch, not a timeout or renderer failure. Replacement-head CI must be checked separately; these failed runs are not a green checkpoint.
+
 ## Checks and remaining acceptance
 
-Windows Release application build and four focused CTests passed (menu owner, launch, immutable summary report, native summary interaction). The first CTest attempt had one NOT RUN because its target executable had not yet been built; after building it, all4 passed. No assertion, deadline, capacity, shader, gameplay speed or quality default was weakened.
+Windows Release application build and the final five focused CTests passed (menu owner, launch, immutable summary report, native summary interaction, source review contract). The first CTest attempt had one NOT RUN because its target executable had not yet been built; after building it, all4 passed. No assertion, deadline, capacity, shader, gameplay speed or quality default was weakened.
 
 Private raw XML/screenshots, lifecycle receipts, settings comparison and custody hashes stay in ignored `reports/acceptance-20261030-evening/`; full raw benchmark reports are not duplicated into Git. These runs test UI/lifecycle correctness, not a performance comparison. No sustained/phone FPS claim follows.
 
