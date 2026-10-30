@@ -207,6 +207,7 @@ int GameMessageBoxA(HWND owner,const char* text,const char* title,UINT flags) {
     if(gCampaignHiddenValidation || gOpeningBenchmarkMenuValidation || gShowcaseCaptureHidden){std::cerr<<"Hidden validation suppressed dialog: "<<text<<'\n';return IDCANCEL;}
     return ::MessageBoxA(owner,text,title,flags);
 }
+void InstallControllerFocusOutline(HWND control);
 void FocusGameControl(HWND control) {
     if(!gCampaignHiddenValidation && !gOpeningBenchmarkMenuValidation && !gShowcaseCaptureHidden && control) ::SetFocus(control);
 }
@@ -9672,6 +9673,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 });
                 TraceOpeningMenuStage("campaign-controls-begin");
                 if(!context.campaignMenu->Create(hWnd)){(void)renderOwner.Retire();return 1;}
+                // These controls are created after the initial menu children.
+                // Reuse their keyboard forwarding and controller focus outline.
+                for(int id:{4110,4111,4112,4113,4114,4115,4120,4121,4122,4123})
+                    InstallControllerFocusOutline(GetDlgItem(hWnd,id));
                 TraceOpeningMenuStage("campaign-controls-end");
                 context.campaignPhase=horde::platform::windows::WindowsCampaignMenu::Phase::Ready;
             }
