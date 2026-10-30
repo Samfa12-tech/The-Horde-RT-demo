@@ -755,6 +755,8 @@ struct VulkanSurfaceContext
     bool subtitleBitmapCurrent = false;
     std::uint32_t playingDialogueLine = 0u;
     std::uint64_t playingDialogueGeneration = 0u;
+    std::uint64_t loggedDialogueAttemptGeneration = 0u;
+    bool loggedDialogueAttemptAccepted = false;
     std::uint64_t lastChapterPresentationAckTick = 0u;
     std::uint64_t lastChapterPresentationAckGeneration = 0u;
     std::unique_ptr<horde::platform::windows::WindowsMusicPlayback> musicPlayback;
@@ -2312,9 +2314,23 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
         return;
     }
     if (gains.left <= 0.0f && gains.right <= 0.0f) return;
-    if (SpatialAudioEngine().Play(path, gains.left, gains.right,
+    const float voiceGain = horde::platform::windows::WindowsDialogueSourceGain(context.voiceVolumePercent);
+    const bool accepted = SpatialAudioEngine().Play(path, gains.left, gains.right,
             "chapter_dialogue", lineId, dialogue.generation,
-            horde::platform::windows::WindowsDialogueSourceGain(context.voiceVolumePercent)))
+            voiceGain);
+    if (context.loggedDialogueAttemptGeneration != dialogue.generation ||
+        context.loggedDialogueAttemptAccepted != accepted)
+    {
+        // One failed attempt plus its eventual admission per generation, not
+        // one log row per retry frame. Admission is not proof of audibility.
+        LogWindowsAudio("chapter voice admission: line=" + std::to_string(lineId) +
+            " generation=" + std::to_string(dialogue.generation) + " accepted=" + (accepted ? "1" : "0") +
+            " left=" + std::to_string(gains.left) + " right=" + std::to_string(gains.right) +
+            " voiceGain=" + std::to_string(voiceGain));
+        context.loggedDialogueAttemptGeneration = dialogue.generation;
+        context.loggedDialogueAttemptAccepted = accepted;
+    }
+    if (accepted)
     {
         context.playingDialogueLine = lineId;
         context.playingDialogueGeneration = dialogue.generation;
@@ -3292,14 +3308,15 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
         snapshot.skeletonRevival.phase == horde::gameplay::simulation::SkeletonRevivalPhase::Rearming &&
         snapshot.skeletonRevival.waitingForClearance && snapshot.skeletonRevivalPresentationReady;
     const bool attackCue = horde::platform::windows::HasAttackReadabilityCue(teaching);
-    if ((context.combatAttackCueVisible && !attackCue) || (context.combatPracticeCueVisible && !teaching.safePractice))
+    const bool practiceCue = teaching.safePractice && !teaching.lessonSuppressed;
+    if ((context.combatAttackCueVisible && !attackCue) || (context.combatPracticeCueVisible && !practiceCue))
     {
         context.combatTeachingFadeText.clear();
         context.combatTeachingFadeOpacity = 0u;
         context.combatTeachingFadeStartedAtMs = 0u;
     }
     context.combatAttackCueVisible = attackCue;
-    context.combatPracticeCueVisible = teaching.safePractice;
+    context.combatPracticeCueVisible = practiceCue;
     const std::string text = horde::platform::windows::CombatTeachingPromptText(teaching, context.teachingControllerGlyphs, revivalClearance);
     const bool eligible = context.controlsEnabled && !MeasurementPausedByUi(context) &&
         !context.benchmarkReportVisible && !context.benchmark.IsRunning() &&

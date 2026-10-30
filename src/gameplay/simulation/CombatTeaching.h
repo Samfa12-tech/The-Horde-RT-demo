@@ -77,6 +77,8 @@ struct CombatTeachingSnapshot
     bool attackFromGuardLearned = false;
     bool exitPending = false;
     bool safePractice = false;
+    // Presentation only: practice protection/progress do not depend on a HUD.
+    bool lessonSuppressed = false;
     bool slowdownActive = false;
     TutorialStage stage = TutorialStage::Block;
     CombatTeachingCue cue = CombatTeachingCue::None;

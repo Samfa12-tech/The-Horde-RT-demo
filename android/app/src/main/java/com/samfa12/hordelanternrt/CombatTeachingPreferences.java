@@ -33,6 +33,7 @@ final class CombatTeachingPreferences {
 
     static int stage(long state) { return (int)(state & 0x7L); }
     static boolean safePractice(long state) { return (state & (1L << 13)) != 0; }
+    static boolean lessonSuppressed(long state) { return (state & (1L << 35)) != 0; }
     static boolean exitPending(long state) { return (state & (1L << 33)) != 0; }
     static boolean waitingForRevivalClearance(long state) { return (state & (1L << 34)) != 0; }
     static boolean blockLearned(long state) { return (state & (1L << 15)) != 0; }
@@ -42,11 +43,11 @@ final class CombatTeachingPreferences {
     static String prompt(long state) { return prompt(state, false); }
 
     static String prompt(long state, boolean controller) {
-        final boolean protectedPractice=safePractice(state);
+        final boolean protectedPractice=safePractice(state) && !lessonSuppressed(state);
         final boolean enabled=(state & (1L << 10)) != 0;
         final int opacity=(int)((state >>> 40) & 0xffL);
         String text=protectedPractice ? "Practice: no damage" : "";
-        if(protectedPractice || enabled && opacity>0) {
+        if(!lessonSuppressed(state) && (protectedPractice || enabled && opacity>0)) {
             String lesson=lessonText(state,controller);
             if(!lesson.isEmpty())text+=(text.isEmpty()?"":"\n")+lesson;
         }

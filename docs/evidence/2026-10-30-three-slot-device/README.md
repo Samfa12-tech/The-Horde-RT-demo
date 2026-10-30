@@ -95,3 +95,9 @@ original APK or owner saves are included in this receipt. Next acceptance is
 natural chapter/campaign progression and real input feel on a fixed build;
 the two original field crashes and other documented 1.7 gates remain open.
 No merge, publication, deployment or feature enablement occurred.
+
+Subsequent [owner observations](../2026-10-30-owner-teaching-followup/README.md)
+confirm real menu cursor visibility, Alt+Tab and Slot 3 save/load on the same
+R8 artifact. The earlier overlay limitation remains a limit of that automated
+attempt, not an unresolved absence of any owner cursor observation. Separate
+Keeper-audio and early-teaching findings are tracked in that follow-up.

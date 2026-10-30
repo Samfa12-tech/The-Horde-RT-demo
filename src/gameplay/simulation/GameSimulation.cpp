@@ -3314,6 +3314,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.acceptedDodgeSequence = acceptedDodgeSequence_;
     snapshot_.dodgeProtectedHitCount = dodgeProtectedHitCount_;
     snapshot_.combatTeaching = combatTeaching_.Snapshot();
+    snapshot_.combatTeaching.lessonSuppressed = !SwordDefenseReady();
     snapshot_.skeletonRevival = UsesSkeletonRevival() ? skeletonRevival_.Snapshot() : SkeletonRevivalSnapshot{};
     snapshot_.skeletonRevivalPresentationReady = UsesSkeletonRevival() && skeletonRevivalPresentationReady_;
     snapshot_.skeletonRevivalDeadDurationSeconds = UsesSkeletonRevival() ? skeletonRevivalDeadDurationSeconds_ : 0.f;

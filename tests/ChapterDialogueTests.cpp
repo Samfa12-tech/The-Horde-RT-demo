@@ -1,6 +1,7 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/dialogue/SubtitleLayout.h"
 #include "platform/windows/WindowsChapterDialogue.h"
+#include "gameplay/SpatialAudio.h"
 #include <cstdlib>
 #include <iostream>
 #include <limits>
@@ -8,6 +9,31 @@ using namespace horde::gameplay;
 using namespace horde::gameplay::dialogue;
 void Check(bool value,const char* msg) { if(!value) {std::cerr<<msg<<'\n';std::exit(1);} }
 int main() {
+    // Current-rule reveal, without the historical checkpoint import which
+    // deliberately selects legacy rules and cannot validate current speech.
+    auto keeperConfig=simulation::ProductionGameSimulationConfig();
+    keeperConfig.developmentRescueJourney=true;
+    keeperConfig.playerStartX=-2.1f;keeperConfig.playerStartZ=kKeeperRetryPosition.z;
+    simulation::GameSimulation keeperSpeech(keeperConfig);simulation::InputSnapshot keeperInput;
+    keeperInput.yawRadians=-1.57079632679f;
+    int senseFrames=0,closerFrames=0;
+    for(int tick=0;tick<1800;++tick) {
+        keeperInput.moveForward=keeperSpeech.Snapshot().playerX>kKeeperRetryPosition.x?1.f:0.f;
+        keeperSpeech.StepFixed(keeperInput);
+        const auto& speech=keeperSpeech.Snapshot().chapterDialogue;
+        if(speech.line==Line::KeeperSense || speech.line==Line::KeeperCloser) {
+            if(speech.line==Line::KeeperSense)++senseFrames;else ++closerFrames;
+            const auto gains=CalculateSpatialAudio({speech.source.x,speech.source.z,.36f,1.f,14.f,speech.source.y},
+                {speech.listener.x,speech.listener.z,speech.listenerYaw,speech.listener.y});
+            Check(gains.left+gains.right>0.f,"published Keeper speech retains a nonzero current spatial mix");
+        }
+        keeperSpeech.ClearEvents();
+    }
+    if(!senseFrames || !closerFrames)std::cerr<<"Keeper speech witness sense="<<senseFrames<<" closer="<<closerFrames
+        <<" reveal="<<keeperSpeech.Snapshot().lich.revealStarted<<" phase="<<static_cast<int>(keeperSpeech.Snapshot().lich.revealPhase)
+        <<" torch="<<static_cast<int>(keeperSpeech.Snapshot().torchFailure.phase)<<" modern="<<keeperSpeech.Snapshot().modernCombatRules
+        <<" player="<<keeperSpeech.Snapshot().playerX<<","<<keeperSpeech.Snapshot().playerZ<<'\n';
+    Check(senseFrames>0 && closerFrames>0,"current reveal publishes both Keeper voice identities without importing legacy state");
     simulation::SimulationSnapshot guidance;
     guidance.developmentRescueJourney=true;
     guidance.chapterDialogue.waitingForRaise=true;

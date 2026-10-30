@@ -5,6 +5,7 @@
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/SpatialAudio.h"
+#include "platform/windows/WindowsCombatTeachingPrompt.h"
 #include <cmath>
 #include <cstring>
 #include <iostream>
@@ -22,6 +23,29 @@ void Check(bool value,const char* message) {
 bool Near(float a,float b,float epsilon=.0001f) { return std::abs(a-b)<=epsilon; }
 GameSimulationConfig Rules() {
     auto c=ProductionGameSimulationConfig(); c.swordStartsStowed=false; return c;
+}
+void PracticePromptWaitsForSword() {
+    GameSimulation sim(ProductionGameSimulationConfig());
+    InputSnapshot input; input.tutorialEnabled=true;
+    sim.StepFixed(input);
+    Check(sim.Snapshot().combatTeaching.safePractice && sim.Snapshot().combatTeaching.lessonSuppressed &&
+          horde::platform::windows::CombatTeachingPromptText(sim.Snapshot().combatTeaching).empty(),
+          "new game protects practice without teaching block while the sword is stowed");
+    input.commands.parry=1; input.guardHeld=true;
+    sim.StepFixed(input);
+    Check(sim.Snapshot().heldItems[1].transition.active && sim.Snapshot().combatTeaching.lessonSuppressed,
+          "draw transition does not teach a defense that is not ready yet");
+    for(int tick=0;tick<120;++tick)sim.StepFixed(input);
+    const auto ready=sim.Snapshot().combatTeaching;
+    Check(!ready.lessonSuppressed && ready.safePractice &&
+          horde::platform::windows::CombatTeachingPromptText(ready).find("[Q]")!=std::string::npos &&
+          !ready.blockLearned,
+          "drawn sword reveals the lesson without manufacturing learned progress or removing protection");
+    auto warning=ready;warning.lessonSuppressed=true;warning.attackReadability=AttackReadability::Unblockable;
+    const auto warningText=horde::platform::windows::CombatTeachingPromptText(warning);
+    Check(warningText.find("RED")!=std::string::npos && warningText.find("[Q]")==std::string::npos &&
+          warningText.find("Practice:")==std::string::npos,
+          "weapon readiness suppresses lesson copy independently of authoritative attack warnings");
 }
 bool LearnBlockFromRealContact(GameSimulation& sim,InputSnapshot& input) {
     input.tutorialEnabled=true; input.guardHeld=true; ++input.commands.parry;
@@ -2504,6 +2528,7 @@ int main(int argc,char** argv) {
     }
     if(argc!=1) { std::cerr<<"unknown combat foundation profile\n"; return 2; }
     SkeletonRevivalBridgeContract();
+    PracticePromptWaitsForSword();
     InPlacePairRevivalContract();
     RulesEligibilityDoesNotChoosePracticeExit();
     WindowAndLifecycle(); TeachingContract(); AttackWarningPresentationContract(); AttackReadabilityContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();

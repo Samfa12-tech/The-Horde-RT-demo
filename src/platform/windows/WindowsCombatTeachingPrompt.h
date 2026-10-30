@@ -87,8 +87,8 @@ inline std::string CombatTeachingPromptText(
     const bool waitingForRevivalClearance = false)
 {
     using gameplay::simulation::AttackReadability;
-    std::string text=teaching.safePractice?"Practice: no damage":"";
-    if(teaching.safePractice || (teaching.enabled && std::isfinite(teaching.promptOpacity) && teaching.promptOpacity>0.0f))
+    std::string text=teaching.safePractice && !teaching.lessonSuppressed?"Practice: no damage":"";
+    if(!teaching.lessonSuppressed && (teaching.safePractice || (teaching.enabled && std::isfinite(teaching.promptOpacity) && teaching.promptOpacity>0.0f)))
     {
         const auto lesson=CombatTeachingLessonText(teaching,controller);
         if(!lesson.empty())text+=(text.empty()?"":"\r\n")+lesson;

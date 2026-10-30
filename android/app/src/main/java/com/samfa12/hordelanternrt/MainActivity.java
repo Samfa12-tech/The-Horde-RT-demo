@@ -3833,7 +3833,7 @@ public class MainActivity extends Activity {
         final long packed = ProbeBridge.getCombatTeachingState();
         final String text = CombatTeachingPreferences.prompt(packed, controllerMode);
         final boolean attackCue = CombatTeachingPreferences.attackReadability(packed) != 0;
-        final boolean practiceCue=CombatTeachingPreferences.safePractice(packed);
+        final boolean practiceCue=CombatTeachingPreferences.safePractice(packed) && !CombatTeachingPreferences.lessonSuppressed(packed);
         if (combatAttackCueVisible && !attackCue || combatPracticeCueVisible && !practiceCue) {
             // Never fade stale attack warnings or advertise protection after it ends.
             combatTeachingFadeText = "";

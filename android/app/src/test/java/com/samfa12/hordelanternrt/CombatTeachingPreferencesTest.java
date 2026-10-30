@@ -28,6 +28,19 @@ public final class CombatTeachingPreferencesTest {
         assertTrue(preferences.getAll().isEmpty());
     }
 
+    @Test public void stowedSwordHidesLessonButRetainsProtectionAndAttackWarnings() {
+        long ready=4L | (1L<<10) | (1L<<13) | (255L<<40);
+        long stowed=ready | (1L<<35);
+        assertTrue(CombatTeachingPreferences.safePractice(stowed));
+        assertEquals("",CombatTeachingPreferences.prompt(stowed));
+        assertTrue(CombatTeachingPreferences.prompt(ready).contains("Hold [Parry]"));
+        assertTrue(CombatTeachingPreferences.prompt(ready,true).contains("[LT]"));
+        String warning=CombatTeachingPreferences.prompt(stowed | (2L<<48));
+        assertTrue(warning.contains("RED"));
+        assertFalse(warning.contains("Practice:"));
+        assertFalse(warning.contains("Hold"));
+    }
+
     @Test public void savedSettingsRoundTripAndMalformedTypesUseSafeDefaults() {
         CombatTeachingPreferences.save(preferences, new CombatTeachingPreferences.Values(false, true));
         CombatTeachingPreferences.Values values = CombatTeachingPreferences.read(preferences);
