@@ -51,3 +51,11 @@ The original R7 and Android binaries were built from the bounded dirty input bas
 Windows Release compile and the existing shared simulation cadence/hitch/pause test passed for the source-only benchmark-copy addition. The [sanitized report/source-boundary comparison](../2026-10-30-benchmark-comparisons/README.md) separates successful RTX5050/Radeon840M benchmarks from unresolved field crashes. No simulation timing, benchmark course, renderer budget or quality change was made.
 
 Exact827e09f7 CI [41022958685](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/41022958685) passed all six jobs. Fresh CI is required for this later copy/documentation checkpoint. Computer Use was physically stopped before the subsequent mouse-capture check; no further Computer Use or alternate input route followed. That specific check and the fresh benchmark-copy visual review remain open, while the earlier R7/R8 save/menu/date/keyboard evidence is retained.
+
+Later exact `6078e191` CI41025879954 passed all six jobs. A separately authorized
+Windows mouse/menu retry and current Android installation/save/date/lifecycle
+check are now recorded in the [device acceptance receipt](../2026-10-30-three-slot-device/README.md).
+The dated earlier "uninstalled" and "no phone install" statements describe
+their original checkpoints; the verified `aeace11f…` debug APK is now retained
+on the SM-S948B by owner instruction. Full natural chapter/input acceptance and
+the original field crashes are not closed by these isolated tests.

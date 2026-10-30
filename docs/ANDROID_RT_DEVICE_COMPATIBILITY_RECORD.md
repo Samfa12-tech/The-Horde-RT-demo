@@ -1,5 +1,26 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-30 UTC - three-slot current debug candidate accepted in isolation
+
+**SM-S948B / Android 17**, debug APK SHA256
+`aeace11f5e0d07f2bf531a893fc54d543ce6676f0ba0a7d5e0ec3b276264d8fb`,
+versionCode10 / `1.6.2-debug`; frozen source includes `d618199f` and the
+three-slot/date implementation. Compatible in-place installation followed a
+matching-certificate check and private backup. Actual RT gameplay was observed
+after direct Load, cold restart and background/return, using staged checkpoint
+records in a dedicated test namespace. Three slots, actual localized embedded
+save dates, missing-date fallback, empty save, overwrite cancellation/hash
+preservation and confirmed overwrite passed the bounded injected-input checks.
+Portrait and landscape were inspected at the unchanged 150% system font;
+landscape actions remain reachable by scrolling.
+
+This is **current-build RT presentation and isolated save/UI/lifecycle evidence**,
+not natural chapter completion, physical two-thumb/controller, performance or
+experimental feature acceptance. At09:09:46UTC the app was stopped, rotation
+restored, default debug campaign files verified unchanged, and phone released.
+Production/actor-worker APK hashes are unchanged. The tested debug APK remains
+installed by owner instruction. [Exact scope, identity and limitations](evidence/2026-10-30-three-slot-device/README.md).
+
 ## 2026-10-30 AEDT - installed f27982cd normal UI and checkpoint round trip
 
 Local ADB-injected input and screenshot inspection on **SM-S948B**, Adreno840,
