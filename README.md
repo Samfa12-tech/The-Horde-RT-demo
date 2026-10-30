@@ -48,7 +48,7 @@ See the [validation guide](docs/AGENT_VALIDATION.md) for host-only CI commands, 
 | [Current 1.7 index](docs/design/HORDE_1_7_CURRENT_DESIGN_INDEX.md) | Implemented, gated and unfinished work; scoped acceptance |
 | [Project decisions](PROJECT_DECISIONS.md) / [agent instructions](AGENTS.md) | Product and engineering contracts |
 | [1.6.2 validation](docs/SHOWCASE_ALPHA_1_6_2_RELEASE_VALIDATION_2026-10-09.md) | Frozen public package evidence and limitations |
-| [Historical README archive](README_HISTORY_2026-10-30.md) | Complete pre-cleanup README: older controls, architecture, commands and release history, not current guidance |
+| [Historical README archive](README_HISTORY_2026-10-30.md) | Complete pre-cleanup README: older controls, architecture, commands and release history, not current guidance; [historical 1.6.0 release evidence](docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md) |
 
 ## Licence
 
