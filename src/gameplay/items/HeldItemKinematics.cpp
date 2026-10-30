@@ -1354,12 +1354,6 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
                                             Scale(releaseBodyForward, pitchSin)));
         const Vec3 restingZ = Normalize(Add(Scale(releaseBodyForward, pitchCos),
                                             Scale(worldUp, -pitchSin)));
-        const Vec3 fallingX = Normalize(Lerp(ColumnOf(items[0].worldFromDetach, 0u),
-                                             restingX, progress));
-        const Vec3 fallingY = Normalize(Lerp(ColumnOf(items[0].worldFromDetach, 1u),
-                                             restingY, progress));
-        const Vec3 fallingZ = Normalize(Lerp(ColumnOf(items[0].worldFromDetach, 2u),
-                                             Scale(restingZ, -1.0f), progress));
         Vec3 settledPosition = Add(
             Add(Vec3{{input.torchFailure.droppedX,
                       input.torchFailure.droppedY,
@@ -1369,9 +1363,14 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
                 Scale(releaseBodyForward, 0.78f)));
         settledPosition[0] = std::clamp(settledPosition[0], -2.28f, 4.58f);
         settledPosition[2] = std::clamp(settledPosition[2], -16.18f, -14.22f);
-        const HeldItemTransform worldFromTorch = WorldFromAxes(
-            fallingX, fallingY, fallingZ,
-            Lerp(TranslationOf(items[0].worldFromDetach), settledPosition, progress));
+        // Look may change on the release tick, so the retained last-held basis
+        // need not share the landing yaw. Independently lerping/normalizing its
+        // columns introduces shear and makes Flame/Light socket validation fail.
+        // Reuse rigid rotation interpolation; translation and timing are unchanged.
+        const HeldItemTransform worldFromRestingTorch = WorldFromAxes(
+            restingX, restingY, Scale(restingZ, -1.0f), settledPosition);
+        const HeldItemTransform worldFromTorch = BlendHeldItemTransforms(
+            items[0].worldFromDetach, worldFromRestingTorch, progress);
         UpdateHeldItemParent(items[0], HeldItemParentMode::AuthoredWorldTrajectory,
                              tick, worldFromTorch);
     }
