@@ -29,8 +29,8 @@
     }
   },
   "android": {
-    "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
-    "sha256": "88988a12f4f2642e5fb3e379d816f497624a0a955f0d3cbed03ea269a3e683b5",
+    "frozenPath": "reports\\three-slot-ui-20261030\\horde-three-slots-clarity-debug.apk",
+    "sha256": "aeace11f5e0d07f2bf531a893fc54d543ce6676f0ba0a7d5e0ec3b276264d8fb",
     "bytes": 201720323,
     "abis": [
       "arm64-v8a",
@@ -40,21 +40,24 @@
     ],
     "labels": {
       "arm64-v8a": [
-        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:55dd4f4d74ff959de0d5401d44cf8d819176368cd8f79c059143eebed73dbcc5;c:D;s:D"
+        "g:827e09f729e143ddfb36f11bb72267fc4f5341c0;i:c897bae330010b44cd79cb10f36d35861a933939ada59d798999144c2978d7af;c:D;s:D"
       ],
       "armeabi-v7a": [
-        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:43881e26c8c31e763b63c2efd05d8c7a17d353bfac6029f80809df61e35411a5;c:D;s:D"
+        "g:827e09f729e143ddfb36f11bb72267fc4f5341c0;i:e8d1df39837a00cb030e01640cb508e909d8ff43a75f4eea8236691b3ab1edb5;c:D;s:D"
       ],
       "x86": [
-        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:8aad0c3a1f869ca12fa52c5ed86445d9fbb85a58090a222ac104e6e80b5e1e99;c:D;s:D"
+        "g:827e09f729e143ddfb36f11bb72267fc4f5341c0;i:e35f092b6cc3b3cf9b435dac3423f8c6edf7706b2d523acdb189e4289acbcc90;c:D;s:D"
       ],
       "x86_64": [
-        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:495b2db089210a4cf95a720756b61d3e4c0b05abbcdc920ddf957de45605496c;c:D;s:D"
+        "g:827e09f729e143ddfb36f11bb72267fc4f5341c0;i:074cc9ab5209435afc1eae0a8c3de21291a1d0a4b4ff62d2c494bd835fc7b6ff;c:D;s:D"
       ]
     },
+    "source": "827e09f7 plus exact d618199f player-facing copy changes",
     "installed": false,
-    "sourceCommitBackedUp": "7e0b166110bf0be40e75989779894be7e69cd67f",
-    "frozenPath": "reports\\three-slot-ui-20261030\\horde-three-slots-debug.apk"
+    "sourceCommitBackedUp": "d618199f5e498609307db4f06d5d7e2c60f6ccfa",
+    "applicationId": "com.samfa12.hordelanternrt.debug",
+    "versionCode": 10,
+    "versionName": "1.6.2-debug"
   },
   "validation": {
     "nativeRelevantCTest": "13/13 passed; final menu delta rerun passed, 53 HWND checks",
@@ -115,5 +118,44 @@
       "physical controller and Android touch/lifecycle not run",
       "no FPS, sleep or lock-screen cause established"
     ]
+  },
+  "androidPrevious": {
+    "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "sha256": "88988a12f4f2642e5fb3e379d816f497624a0a955f0d3cbed03ea269a3e683b5",
+    "bytes": 201720323,
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "labels": {
+      "arm64-v8a": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:55dd4f4d74ff959de0d5401d44cf8d819176368cd8f79c059143eebed73dbcc5;c:D;s:D"
+      ],
+      "armeabi-v7a": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:43881e26c8c31e763b63c2efd05d8c7a17d353bfac6029f80809df61e35411a5;c:D;s:D"
+      ],
+      "x86": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:8aad0c3a1f869ca12fa52c5ed86445d9fbb85a58090a222ac104e6e80b5e1e99;c:D;s:D"
+      ],
+      "x86_64": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:495b2db089210a4cf95a720756b61d3e4c0b05abbcdc920ddf957de45605496c;c:D;s:D"
+      ]
+    },
+    "installed": false,
+    "sourceCommitBackedUp": "7e0b166110bf0be40e75989779894be7e69cd67f",
+    "frozenPath": "reports\\three-slot-ui-20261030\\horde-three-slots-debug.apk"
+  },
+  "copyFollowup": {
+    "sourceCommit": "d618199f5e498609307db4f06d5d7e2c60f6ccfa",
+    "changes": "plain Saved success message; benchmark pace explanation on opening choices",
+    "validation": "535registered/529pass/6unchanged skips; lint0errors92warnings; all4ABI assembly passed; Windows Release app compile and existing simulation timing CTest passed",
+    "nativeUi": "new benchmark-copy visual check and captured-look->menu check held after physical Computer Use stop; previous save UI acceptance remains scoped to frozen R7/R8"
+  },
+  "exactCheckpointCi": {
+    "head": "827e09f729e143ddfb36f11bb72267fc4f5341c0",
+    "run": 41022958685,
+    "conclusion": "success, all six jobs"
   }
 }
