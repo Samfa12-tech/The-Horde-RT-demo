@@ -1,0 +1,1 @@
+PowerShell version-contract and published-release policy tests passed.

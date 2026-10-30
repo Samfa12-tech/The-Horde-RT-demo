@@ -32,6 +32,9 @@ References to queued 1.6.2 guards, equipment, openings, base UI/hearts and graph
 The following retains the previous main document. Use the pinned source and WP0 reconciliation above for newer future decisions; this is not current runtime evidence or permission to start later work.
 
 # The Horde — Campaign, Characters and Progression
+
+> **Current scope navigation, 11 October 2026:** [ROADMAP.md](ROADMAP.md) consolidates the later approved names, Kit arc, dungeon items/boss use and update boundaries. The [source inventory](ROADMAP_SOURCES.md#18-bellwether-and-campaign-authoring) links the fuller pinned canon and English bank; conflicting candidate/undecided wording below preserves this older snapshot.
+
 **Owner-approved creative direction: 30 September 2026.** Planning, not implemented content or release authority. Read with [ROADMAP.md](ROADMAP.md). This document supersedes older statements that the Horde's nature, dungeon order and final mystery are entirely undecided. Concrete encounters, scripts, balance and technical solutions still require scoped design and testing.
 
 ## Identity and pillars

@@ -131,7 +131,19 @@ pending. Owner availability is not a blanket development stop. Exact-device,
 visual, audio and performance acceptance remain explicit gates; no release,
 public push or merge follows from this continuation authorization.
 
-## 1.6.2 defaults and release hold - 2026-10-05
+## Whole-world continuity and Bellwether capacity - 2026-10-12
+
+Sam requires 1.7 to ship the complete mapped low-detail authored world with accurately positioned major locations/objects/landmarks, continuous coarse terrain above ground and unobstructed distant landmarks including the forge. Playable scope remains tomb-to-lookout. [Canonical roadmap](docs/ROADMAP.md#17---beyond-the-tomb) and [current world/streaming/Bellwether decisions](docs/superpowers/plans/2026-10-12-horde-world-continuity-and-bellwether.md) own the requirement, open registration/roof/tomb/treasury and regional-water tasks, stable near/mid/far building contracts and safe resource lifetimes.
+
+Prove reusable three-character runtime capacity before increasing lanes from total village cast; current guard/Keeper/Kit lanes are specialised. NPC load/unload must preserve state and prepare before visibility, including street/doorway and human/animal overlap. Three enemies on screen is a current encounter-design target, not a permanent technical cap; combat feel and portrait/touch usability precede increases. Exact combined scene evidence and Sam's decision govern expansion. Implementation/acceptance remain pending; the existing Easy Tree ambition and deferred implementation slice stay separate.
+
+## 1.6.2 publication and release-documentation closeout - 2026-10-09
+
+The completed tomb goal was owner-accepted, PR18 merged, and stable-key signed Android/Windows 1.6.2/code10 published to itch. [Exact receipt](docs/evidence/2026-10-09-release-publication/README.md) records completed channels and matching actual downloads. The owner then explicitly approved reconciling release documentation and publishing GitHub `v1.6.2` as a non-draft prerelease using those exact existing APK/ZIP/checksum bytes, with no rebuild or new signing. [Canonical signed validation](docs/SHOWCASE_ALPHA_1_6_2_RELEASE_VALIDATION_2026-10-09.md) binds the tag to validated source `db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9`; [GitHub closeout](docs/evidence/2026-10-09-github-release/README.md) records the completed non-draft prerelease, exact public downloads and original 1.6.1 parser selection, with its physical-dialog limit. The published line is immutable; a later production package needs a new version and Android code greater than 10.
+
+Fresh/reset mobile remains 50% / Mobile water/fire / Glass Off / Current shadows / cap30 / Mist On / Dust Low; desktop remains 100% / High / Glass On with the other defaults unchanged. Saved choices survive. The owner defers precise combat contact, walking torch-arm wiggle, shafts, seamless music handover and sustained-phone programme. Eric's independent audit remains unperformed. Issue #19 is owner-closed as completed; this documentation task does not reproduce its fix. This supersedes old release holds only for the explicitly approved 1.6.2 closeout. Future 1.7 work remains separate.
+
+## Historical 1.6.2 defaults and release hold - 2026-10-05
 
 The owner selects fresh-install and staged Reset Defaults on Android at 50%
 resolution, Mobile water/fire, cap 30, Glass Off, Current shadows and Mist On.

@@ -81,3 +81,9 @@ production and actor-worker packages were not changed. Runtime visual review of
 the readiness correction and actual Keeper listening remain pending. Benchmark
 entry/return/cancel/settings/export and other documented merge/release gates
 are not closed by this source follow-up. No merge or publication occurred.
+
+Subsequent [owner review during main integration](../2026-10-30-main-integration/README.md)
+accepted both Keeper audio and the corrected prompt on the exact R9 artifact
+above. Sam then closed it. The earlier prepared/unlaunched and listening-pending
+statements retain their dated checkpoint scope; no new Android acceptance or
+reproduction of the earlier unheard-audio report follows from this owner pass.

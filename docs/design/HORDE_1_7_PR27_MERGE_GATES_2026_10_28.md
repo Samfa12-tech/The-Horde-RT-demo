@@ -1,5 +1,32 @@
 # PR27: frozen merge-readiness gates
 
+## Current integration reconciliation - 30 October 2026
+
+The owner authorized main-to-development integration, not merging PR27 into
+main or publishing. Development parent `201e2d60` had all six CI jobs green;
+main parent is `d7e6d401`. The five current conflicts and combined-tree checks
+are recorded in the [integration receipt](../evidence/2026-10-30-main-integration/README.md).
+The exact resulting merge commit/CI are recorded on PR27; older head/run and
+two-conflict counts below describe their original snapshot.
+
+Sam explicitly accepted R8 save/load, Slot 3, real menu cursor visibility and
+Alt+Tab. He subsequently accepted both Keeper lines and the sword-ready lesson
+on exact R9 SHA256 `9308472aebdd6a569fbf668670b3f0deb7403789d15649fe28c1bccb314fe3e9`,
+then closed it. These are scoped owner observations; his general positive
+play feedback does not invent separately recorded death/retry, individual Kit
+route, controller or Android checks. Current phone three-slot evidence still
+uses injected input/staged checkpoints. Its later replacement is uninstalled.
+
+Remaining source-merge gates are combined-tree CI/review, explicit approval to
+merge PR27, and the named exposed-core journey/input/benchmark gaps below.
+Verify fail-closed normal feature gates and final package identity on that
+candidate. The draft description must track current scope/evidence rather than
+the old checkpoint. Asset/runtime admissions and reporting/world completion
+remain additional 1.7 publication requirements. Sustained mobile performance
+is ongoing optimisation, not a fixed-FPS veto or reason to reduce scope.
+
+## Historical 28 October assessment
+
 Observed PR head `b17a8fb4db4d39463ea16e85f243b5751c077d70`, main
 `e1b142c167d57530504af51b43fd89568da61bb9`, common base
 `1c28d0563a897dc72d410bdb2b61723e66ed92af`. The Android corrections in this

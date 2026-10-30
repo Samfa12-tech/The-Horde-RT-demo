@@ -57,7 +57,9 @@ The independent whole-PR static review found no new actionable code defect. That
 
 The owner-approved controller/audio/haptic, touch-rotation, menu, dust appearance, waterfall appearance, and stand-collision decisions remain approvals, not new tests of every input/device combination. Current combat contact spacing remains a documented accepted limitation; precision correction is deferred. The long sustained-phone programme and the other deferred visual/audio items are not release-gating retests for this goal.
 
-## Remaining status and release boundary
+## Historical pre-publication status and release boundary
+
+The signed publication receipt at the top supersedes the then-pending status below; the original unsigned seal, failures and review limits remain unchanged.
 
 The root-owned final landscape/accessibility/Home route is complete within the receipt’s stated scope. The in-app reduced-motion preference toggle and a current automated pass in the opposite landscape direction remain outside that scope; earlier opposite-direction owner acceptance stays tied to its original runtime.
 

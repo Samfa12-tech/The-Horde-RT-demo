@@ -1,0 +1,14 @@
+{
+  "status": "pass",
+  "changedMarkdownLinksAndAnchorsChecked": 103,
+  "originalReleaseNoteHistoricalCheckpointsPreserved": true,
+  "retainedHistoricalLinkLimits": [
+    {
+      "path": "docs/ENGINEERING_1_6_2_RELEASE_NOTE_HISTORY_2026-10-09.md",
+      "link": "ENGINEERING_1_6_2_INDOOR_DUST_2026_10_08.md#smaller-subtler-immutable-follow-up",
+      "reason": "pre-existing archived anchor does not match heading"
+    }
+  ],
+  "runtimeBuildToolsTestsVersionAndAgentsUnchanged": true,
+  "scope": "Added/changed current documentation links and bounded diff; copied historical checkpoint links retain explicitly reported pre-existing limits. Standalone policy/version/preflight suites are separate"
+}

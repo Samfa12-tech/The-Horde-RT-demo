@@ -1,0 +1,36 @@
+{
+  "releaseSourceCommit": "a397757249871b6b64fe5b77fc14f24e8cfcbb2b",
+  "installedVersion": "1.6.1",
+  "actualReleasedParserSources": {
+    "src/update/GitHubReleaseUpdater.cpp": "4b45d3d5409ba5f37ac07e8ab763993c75fb0cf3cb94d178e271cb0a8e946511",
+    "src/update/GitHubReleaseUpdater.h": "13ac05a7d2a5401873f669f187ba2e8568c4b6ac22c51fadc3dfa6076537591a"
+  },
+  "platformChannelWiring": {
+    "android/app/src/main/cpp/android_probe_bridge.cpp": {
+      "sha256": "1d8003183c1c8155d26cbbde66f916753441295827d8a6c63283ade388de1ccd",
+      "channelReferences": [
+        {
+          "line": 3718,
+          "code": "horde::update::ReleaseChannel::IncludePrerelease,"
+        }
+      ]
+    },
+    "src/platform/windows/WindowsGitHubReleaseUpdate.cpp": {
+      "sha256": "96a868f30d24047eb80c7c5defca5b007b2a32d5e93fc71e80e12afe4cae8e39",
+      "channelReferences": [
+        {
+          "line": 214,
+          "code": "version, horde::update::ReleaseChannel::IncludePrerelease, FetchGitHubReleaseList);"
+        }
+      ]
+    }
+  },
+  "requestUrl": "https://api.github.com/repos/Samfa12-tech/The-Horde-RT-demo/releases?per_page=10",
+  "publicApiPayloadSha256": "39d661abedf6f374887bfec0e31db5a7a617f58c49672eb027d491e9ce13857b",
+  "publicApiPayloadBytes": 31071,
+  "selectedVersion": "1.6.2",
+  "selectedTag": "v1.6.2",
+  "selectedPrerelease": true,
+  "stableOnlyControlExcludesV162": true,
+  "scope": "Compiled original released shared parser with fetched unauthenticated API payload. Both original platform bridges pass IncludePrerelease; no installed-client dialog, real platform fetch, phone mutation or install was exercised."
+}

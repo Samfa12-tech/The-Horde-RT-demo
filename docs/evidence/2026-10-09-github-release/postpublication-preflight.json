@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "status": "pass",
+  "publicationReady": true,
+  "fixtureValidated": false,
+  "generatedAtUtc": "2026-10-09T03:35:29.9655049Z",
+  "recordPath": "C:\\Users\\sam_s\\Documents\\Codex\\2026-10-09\\task\\release-closeout\\release-provenance\\horde-lantern-rt-alpha-1.6.2.json",
+  "artifactDirectory": "C:\\Users\\sam_s\\Documents\\Codex\\2026-10-09\\task\\release-closeout\\releases\\candidates\\github-1.6.2",
+  "checks": [
+    {
+      "name": "record.schema",
+      "status": "pass",
+      "detail": "schema 1, 1.6.2, Android code 10"
+    },
+    {
+      "name": "source.commit",
+      "status": "pass",
+      "detail": "exact commit exists, is a commit, and is reachable from HEAD"
+    },
+    {
+      "name": "source.release-surfaces",
+      "status": "pass",
+      "detail": "source-time CMake, Gradle, and release notes match 1.6.2/code 10"
+    },
+    {
+      "name": "documentation.immutable-validation",
+      "status": "pass",
+      "detail": "current validation record and release notes agree with the provenance record"
+    },
+    {
+      "name": "artifacts.manifest",
+      "status": "pass",
+      "detail": "exact checksum manifest SHA256SUMS.txt verified"
+    },
+    {
+      "name": "artifacts.Horde-Lantern-RT-Alpha-1.6.2-Windows-x64.zip",
+      "status": "pass",
+      "detail": "exact size 145574438, SHA-256, and manifest entry verified"
+    },
+    {
+      "name": "artifacts.Horde-Lantern-RT-Alpha-1.6.2-Android.apk",
+      "status": "pass",
+      "detail": "exact size 121071933, SHA-256, and manifest entry verified"
+    },
+    {
+      "name": "tag.local",
+      "status": "absent",
+      "detail": "local tag v1.6.2 is absent (expected before publication)"
+    },
+    {
+      "name": "tag.origin",
+      "status": "present-matched",
+      "detail": "origin tag points to db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9"
+    },
+    {
+      "name": "github.release",
+      "status": "present-matched",
+      "detail": "existing GitHub Release has exactly the planned uploaded assets, sizes, and SHA-256 digests"
+    }
+  ]
+}

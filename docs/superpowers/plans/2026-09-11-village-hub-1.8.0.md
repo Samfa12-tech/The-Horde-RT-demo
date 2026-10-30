@@ -1,5 +1,7 @@
 # Village Hub — 1.8.0 Provisional Milestone Plan
 
+> **Current scope navigation, 11 October 2026:** [The shared roadmap](../../ROADMAP.md#18---bellwether-npcs-and-light-rpg-systems) and [full pinned plan](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/superpowers/plans/2026-09-11-village-hub-1.8.0.md) govern later Bellwether/NPC/light RPG direction. The blanket shops/economy exclusion and undecided mythology below are superseded by bounded services/spending/training and approved campaign canon; broad systems and detailed implementation remain uncommitted. This older plan is retained as history.
+
 **Owner:** Sam Small / Samfa12  
 **Prepared:** 11 September 2026  
 **Working release label:** Showcase Alpha 1.8.0 — Village Hub  

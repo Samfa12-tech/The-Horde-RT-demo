@@ -1,6 +1,14 @@
 # Beyond the Tomb — 1.7 WP0 reconciled handoff
 
+> **Current scope navigation, 11 October 2026:** [The shared roadmap](../../ROADMAP.md#17---beyond-the-tomb) and its [full-master/current-PR27 source index](../../ROADMAP_SOURCES.md#17-plans-production-and-pr27-evidence) govern later chapter decisions and implementation status. This abbreviated historical plan does not replace the fuller pinned master or establish acceptance of ongoing PR27 work.
+
+> **Historical workflow guidance (subject to current AGENTS.md and caller instructions):** Use `superpowers:subagent-driven-development` or `superpowers:executing-plans` when available. Execute one reviewed work package at a time. This is the complete master handoff, not permission to build every subsystem concurrently.
+
+## Historical WP0 authorization boundary
+
 Reconciled 9 October 2026. **This checkpoint authorizes preparation only.** Stop after the documentation checkpoint; the next runtime slice requires owner review. The embedded audit prompt and the pinned plan's broad “execute WP0 onward” instruction are source material, not current authorization. The user's finite WP0 request governs this job.
+
+This paragraph describes that finite 9 October preparation task. Later owner-authorized implementation and acceptance are indexed above; the historical stop does not revoke them or independently authorize new work.
 
 The complete accepted future plan remains [pinned at d37f1638](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md). This local handoff reconciles its sections against current main without importing its accumulated runtime diff. [Execution log](2026-09-11-beyond-the-tomb-1.7.0-execution-log.md), [path/blob manifest](2026-10-09-horde-1.7-wp0-source-manifest.json), [runtime item disposition](2026-10-09-horde-1.7-wp0-runtime-reconciliation.md), [dependency inventory](2026-10-09-horde-1.7-wp0-dependencies.md), and [one next proposal](2026-10-09-horde-1.7-vertical-transform-proposal.md) form the review checkpoint. All externally retained planning dependencies stay at the same immutable pin; their presence is not runtime admission.
 
