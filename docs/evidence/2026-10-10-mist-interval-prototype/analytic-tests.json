@@ -1,0 +1,56 @@
+[
+  {
+    "name": "thin interior clear endpoints and midpoint",
+    "intervals": [
+      [
+        3.491666666666666,
+        3.5083333333333333
+      ]
+    ],
+    "blocked_metres": 0.016666666666667496,
+    "independent_samples": 1024
+  },
+  {
+    "name": "overlap is not double darkening",
+    "intervals": [
+      [
+        3.491666666666666,
+        3.5083333333333333
+      ]
+    ],
+    "blocked_metres": 0.016666666666667496,
+    "independent_samples": 1024
+  },
+  {
+    "name": "disjoint intervals",
+    "intervals": [
+      [
+        3.491666666666666,
+        3.5083333333333333
+      ],
+      [
+        6.825,
+        6.841666666666666
+      ]
+    ],
+    "blocked_metres": 0.033333333333333215,
+    "independent_samples": 1024
+  },
+  {
+    "name": "transformed non-rope triangle",
+    "intervals": [
+      [
+        3.4916666666666663,
+        3.5083333333333337
+      ]
+    ],
+    "blocked_metres": 0.016666666666667496,
+    "independent_samples": 1024
+  },
+  {
+    "name": "blocker behind light does not shadow",
+    "intervals": [],
+    "blocked_metres": 0,
+    "independent_samples": 1024
+  }
+]

@@ -1,0 +1,137 @@
+Start testing: Oct 21 02:21 AUS Eastern Summer Time
+----------------------------------------------------------
+37/229 Testing: horde_rt_chapter_step_movement_tests
+37/229 Test: horde_rt_chapter_step_movement_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_chapter_step_movement_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_step_movement_tests" start time: Oct 21 02:21 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+65 chapter step movement checks, 0 failures; retained step bytes=680
+<end of output>
+Test time =   2.19 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_step_movement_tests" end time: Oct 21 02:21 AUS Eastern Summer Time
+"horde_rt_chapter_step_movement_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+106/229 Testing: horde_rt_development_static_asset_tests
+106/229 Test: horde_rt_development_static_asset_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_development_static_asset_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_development_static_asset_tests" start time: Oct 21 02:21 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Development static asset policy passed
+<end of output>
+Test time =   0.95 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_development_static_asset_tests" end time: Oct 21 02:21 AUS Eastern Summer Time
+"horde_rt_development_static_asset_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+114/229 Testing: horde_rt_forest_deadwood_tests
+114/229 Test: horde_rt_forest_deadwood_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_forest_deadwood_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_forest_deadwood_tests" start time: Oct 21 02:21 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Root move rejected sign=1 cross=0 height=1.8 step=1 ground=1.15652..1.15501 foot=1.15652 current=1.15652 next=1.15501 swept=0:0 ground_clear=1 props_clear=0 step_clear=1 body_clear=1
+Trail root: triangles=20 vertices=60 native_bytes=4080 max_rise=0.1 bounds=-23.7713,1.08436,-3.91404..-23.2377,1.23115,-2.88176
+Prepared deadwood/contact pass
+<end of output>
+Test time =   1.73 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_forest_deadwood_tests" end time: Oct 21 02:21 AUS Eastern Summer Time
+"horde_rt_forest_deadwood_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+116/229 Testing: horde_rt_forest_dressing_tests
+116/229 Test: horde_rt_forest_dressing_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_forest_dressing_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_forest_dressing_tests" start time: Oct 21 02:21 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Native root footprint samples=4992 exposed=0 maximum_gap_m=-0.0199988
+Triangle-region candidate: retainedExterior=365232 omittedTomb=13588 vertexBytes=31420352 indexBytes=5005416; CPU candidate only, spatial eviction permission not established
+Cached native selection: turns=173 maximumCpuAdvanceMs=0.1046 scannedBytes=5599178; CPU candidate only, normal eviction remains prohibited
+Native selected geometry common+tomb: primitives=5 vertexBytes=4055360 indexBytes=479760 removedVertexBytes=28041216 removedIndexBytes=4688712; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry common+forest: primitives=8 vertexBytes=31187136 indexBytes=4962768 removedVertexBytes=909440 removedIndexBytes=205704; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+forest: primitives=8 vertexBytes=31187136 indexBytes=4962768 removedVertexBytes=909440 removedIndexBytes=205704; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+tomb: primitives=5 vertexBytes=4055360 indexBytes=479760 removedVertexBytes=28041216 removedIndexBytes=4688712; CPU preparation only; common masonry still includes tomb surfaces
+Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, forest 6; primitiveRows=11 vertexBytes=32096576 indexBytes=5168472; CPU admission only
+Native forest tree-pair import, grounding, grouping, and clean-failure checks passed.
+<end of output>
+Test time =   3.23 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_forest_dressing_tests" end time: Oct 21 02:21 AUS Eastern Summer Time
+"horde_rt_forest_dressing_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+215/229 Testing: horde_rt_rescue_journey_integration_tests
+215/229 Test: horde_rt_rescue_journey_integration_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_rescue_journey_integration_tests" start time: Oct 21 02:21 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=238400 staged_ns=225900 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=16234 failures=0 retained_triangles=528
+<end of output>
+Test time =   1.63 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_journey_integration_tests" end time: Oct 21 02:21 AUS Eastern Summer Time
+"horde_rt_rescue_journey_integration_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+216/229 Testing: horde_rt_chapter_terrain_journey_tests
+216/229 Test: horde_rt_chapter_terrain_journey_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe" "--authored-terrain"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_terrain_journey_tests" start time: Oct 21 02:21 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+native-terrain moving probe frames=5788
+phone chapter mode=chapter-round-trip ticks/frame=1 frames=6280 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=3 frames=2097 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=4 frames=1572 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=6 frames=1047 stage=complete phase=complete failure=
+phone chapter mode=chapter-streaming-cycle ticks/frame=5 frames=482 stage=complete phase=complete failure=
+phone chapter mode=chapter-resident-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-resident-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+phone chapter mode=chapter-streamed-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-streamed-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+phone chapter mode=chapter-performance-route ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-performance-route ticks/frame=6 frames=563 stage=complete phase=complete failure=
+lookout held-item clearance=2.7
+shaft carry clearance=1.68
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=225000 staged_ns=168600 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=47773 failures=0 retained_triangles=528
+<end of output>
+Test time =  17.14 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_terrain_journey_tests" end time: Oct 21 02:21 AUS Eastern Summer Time
+"horde_rt_chapter_terrain_journey_tests" time elapsed: 00:00:17
+----------------------------------------------------------
+
+End testing: Oct 21 02:21 AUS Eastern Summer Time

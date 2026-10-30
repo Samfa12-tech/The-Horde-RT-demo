@@ -6,7 +6,7 @@ function(horde_rt_validate_pocket_audio_core repo_root)
         message(FATAL_ERROR "Pocket Audio Core manifest is missing or symlinked")
     endif()
     file(SHA256 "${manifest_path}" manifest_hash)
-    if(NOT manifest_hash STREQUAL "b0bda2ea83ef811cd19ac14ad76b5b8d36ddf8725d55031d2b22107a7c3d4f28")
+    if(NOT manifest_hash STREQUAL "d67dc2f01f9f010c2612e73d195774786c276ab23c737a4b6d4906d230b34da6")
         message(FATAL_ERROR "Pocket Audio Core manifest pin mismatch")
     endif()
     file(READ "${manifest_path}" manifest)
@@ -14,7 +14,7 @@ function(horde_rt_validate_pocket_audio_core repo_root)
     string(JSON commit GET "${manifest}" upstreamCommit)
     string(JSON component GET "${manifest}" component)
     if(NOT repository STREQUAL "https://github.com/Samfa12-tech/Pocket-Chordsmith"
-       OR NOT commit STREQUAL "534a6e6811ce653efd5422138c5772b967263ed0"
+       OR NOT commit STREQUAL "b77a9d0bfe3051c6e352815295164b9b80586f56"
        OR NOT component STREQUAL "packages/pocket-audio-core/native")
         message(FATAL_ERROR "Pocket Audio Core upstream identity mismatch")
     endif()

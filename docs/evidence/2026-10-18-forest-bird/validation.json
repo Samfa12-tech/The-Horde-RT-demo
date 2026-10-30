@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "date": "2026-10-18",
+  "sourceParent": "533a1776dda157cee05d94fcc6f3fcbedb7b1572",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "scope": "One sparse generic distant bird candidate; no save schema, RT geometry, lighting or quality changes",
+  "acceptance": {
+    "implementationAndHostChecks": "pass",
+    "listened": false,
+    "speciesIdentification": "pending",
+    "nightSuitability": "pending",
+    "nativeMix": "pending",
+    "forestDevicePlayback": "not tested",
+    "performance": "not measured",
+    "completeForestSpeciesBed": false
+  },
+  "asset": {
+    "creator": "FilmCow",
+    "sourceUrl": "https://filmcow.itch.io/filmcow-sfx",
+    "sourceFile": "FilmCow Recorded SFX/distand bird.wav",
+    "sourceSha256": "eeec1e8ebae3af6395640fb0086cb2ebf006724efbb4859e93fb9c5b4a9de8a4",
+    "sourceDisposition": "Private original preserved outside Git and game packages",
+    "license": "FilmCow custom royalty-free project-use terms; not CC0; see ASSET_LICENSES.md",
+    "runtimePath": "assets/audio/filmcow/forest_distant_bird.wav",
+    "runtimeSha256": "811c2a1d10a565615dd786ef4b99fda5dd0e4465aa121e36ad9158531d6902ff",
+    "runtimeBytes": 795740,
+    "frames": 397831,
+    "durationSeconds": 8.288145833333333,
+    "channels": 1,
+    "sampleRate": 48000,
+    "bitsPerSample": 16,
+    "meanDbfs": -49.4,
+    "peakDbfs": -28.6,
+    "recipe": "tools/prepare-forest-bird.py; pinned FFmpeg 9 PCM24 to PCM16 only, no gain/crop/filter/pitch/fade/loop",
+    "manifest": "assets/audio/filmcow/forest-distant-bird.manifest.json",
+    "canonicalGameDevCliAdmission": false
+  },
+  "policy": {
+    "owner": "shared GameSimulation fixed ticks",
+    "eventIds": {
+      "ForestBird": 28,
+      "ForestBirdStopped": 29
+    },
+    "initialQuietTicks": 720,
+    "intervalTicks": 2400,
+    "maximumVoices": 1,
+    "looped": false,
+    "saveFieldsAdded": false,
+    "geometryAdded": false,
+    "backlogReplay": false
+  },
+  "checks": [
+    {
+      "name": "horde_rt_forest_bird_ambience_tests",
+      "configuration": "Debug",
+      "result": "pass",
+      "checks": 45,
+      "seconds": 36.79,
+      "log": "reports/2026-10-18-forest-bird-debug-tests.log"
+    },
+    {
+      "name": "horde_rt_forest_bird_ambience_tests",
+      "configuration": "Release",
+      "result": "pass",
+      "checks": 45,
+      "seconds": 4.47,
+      "log": "reports/2026-10-18-forest-bird-release-tests.log"
+    },
+    {
+      "name": "test_forest_bird_audio.py",
+      "result": "pass",
+      "tests": 1,
+      "meaning": "actual WAV hash/format/decoded-size/provenance",
+      "log": "reports/2026-10-18-forest-bird-python-final.log"
+    },
+    {
+      "name": "Windows Debug app compilation",
+      "result": "pass",
+      "log": "reports/2026-10-18-forest-bird-windows-build.log"
+    },
+    {
+      "name": "Android Debug assembly",
+      "result": "pass",
+      "abis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86",
+        "x86_64"
+      ],
+      "seconds": 108,
+      "log": "reports/2026-10-18-forest-bird-android-build.log"
+    },
+    {
+      "name": "Affected Java CampaignMenuIntegrationTest / AndroidControllerIntegrationTest / SurfaceSuspensionLifecycleTest",
+      "result": "pass",
+      "meaning": "68/68 real Activity campaign 26, controller 35, surface suspension lifecycle 7; exact XML suites executed",
+      "log": "reports/2026-10-18-forest-bird-java-final.log"
+    }
+  ],
+  "preservedResults": [
+    {
+      "name": "First Debug CTest",
+      "result": "timeout",
+      "seconds": 30,
+      "log": "reports/2026-10-18-forest-bird-debug-first-timeout.log"
+    },
+    {
+      "name": "Debug direct diagnostic",
+      "result": "pass",
+      "checks": 45,
+      "seconds": 47.1095213,
+      "log": "reports/2026-10-18-forest-bird-debug-direct.log",
+      "consequence": "Target timeout raised to 120 seconds; assertions unchanged"
+    },
+    {
+      "name": "Historical Python source assertions",
+      "result": "historical only",
+      "tests": 3,
+      "log": "reports/2026-10-18-forest-bird-python-tests.log",
+      "meaning": "Two implementation mirrors subsequently removed; final actual-asset test count is one"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "4d2639afa1b002add111da6507b18a5e5f221d9cd04e8ba7c802030ec4f2c88b",
+      "evidence": "compilation only"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "00f196f24eb07cc4eacf4e096f05496912b069f79505f98350812ada657a42b1",
+      "evidence": "assembly; same-signer install used only for separate seeded lower storage-failure diagnostic"
+    }
+  ],
+  "deviceBoundary": {
+    "ownerReportedInstallPurpose": "Separate lower-checkpoint seeded storage-failure diagnostic only",
+    "additionalBuildDelta": "Minimal android_campaign_bridge.inl failure log; storage implementation unchanged",
+    "forestListeningOrPlaybackEvidence": false,
+    "forestMixOrPerformanceClaim": false
+  }
+}

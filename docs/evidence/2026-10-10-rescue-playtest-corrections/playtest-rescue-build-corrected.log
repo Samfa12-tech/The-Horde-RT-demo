@@ -1,0 +1,23 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  RescueTraversal.cpp
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  RescueTraversalTests.cpp
+  horde_rt_rescue_traversal_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_traversal_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  CharacterRenderSlot.cpp
+  PresentableTinyRtScene.cpp
+<repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3767,13): error C2664: 'void horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::<lambda_6>::operator ()(const horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::Vertex &,const horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::Vertex &,const horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::Vertex &,horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::SurfaceMaterial,horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::SurfaceNormal) const': cannot convert argument 5 from 'unsigned int' to 'horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::SurfaceNormal' [<repo>\build\presets\windows-x64-debug\horde_rt_probe_core.vcxproj]
+      <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3767,163):
+      Conversion to enumeration type requires an explicit cast (static_cast, C-style cast or parenthesized function-style cast)
+      <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3208,61):
+      see declaration of 'horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::<lambda_6>::operator ()'
+      <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3767,13):
+      while trying to match the argument list '(horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::Vertex, horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::Vertex, horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::Vertex, horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::SurfaceMaterial, unsigned int)'
+
+  SimulationFrameAdapter.cpp
+  Generating Code...

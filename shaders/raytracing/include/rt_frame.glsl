@@ -30,7 +30,7 @@ void main()
     if (rotation == 1u || rotation == 3u) aspect = 1.0 / aspect;
     float step = controls.time * 6.2;
     vec3 origin = vec3(controls.cameraX + sin(step * 0.5) * 0.035 * controls.walkAmount,
-                       0.70 + abs(sin(step)) * 0.035 * controls.walkAmount,
+                       0.70 + rtHeldLight.value.playerTransform.x + abs(sin(step)) * 0.035 * controls.walkAmount,
                        controls.cameraZ);
     float pitch = clamp(controls.pitch + sin(step) * 0.012 * controls.walkAmount, -0.32, 0.28);
     vec3 forward = normalize(vec3(sin(controls.yaw), -0.05 + pitch, -cos(controls.yaw)));

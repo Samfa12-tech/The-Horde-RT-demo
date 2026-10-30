@@ -1,0 +1,58 @@
+{
+  "asset": "horde-irregular-pine-v1-lod1",
+  "units": "meters",
+  "origin": [
+    0,
+    0,
+    0
+  ],
+  "bounds_blender_xyz": {
+    "min": [
+      -1.8599222898483276,
+      -1.5585356950759888,
+      -0.0037124399095773697
+    ],
+    "max": [
+      1.8909538984298706,
+      1.8350584506988525,
+      8.686391830444336
+    ]
+  },
+  "dimensions_m": [
+    3.7508761882781982,
+    3.3935941457748413,
+    8.690104270353913
+  ],
+  "triangles": 5000,
+  "meshes": [
+    {
+      "name": "Pine | closed trunk roots branches",
+      "vertices": 1076,
+      "triangles": 1916
+    },
+    {
+      "name": "Pine | closed needle-spray volumes",
+      "vertices": 2196,
+      "triangles": 2928
+    },
+    {
+      "name": "Pine | closed moss tendrils",
+      "vertices": 90,
+      "triangles": 156
+    }
+  ],
+  "materials": 3,
+  "texture_resolution": [
+    512,
+    512
+  ],
+  "opaque_only": true,
+  "closed_leaf_geometry": true,
+  "alpha_cards": false,
+  "degenerate_triangles": 0,
+  "nonfinite_vertices": 0,
+  "engine_import_tested": false,
+  "canonical_game_dev_validation": "CLI not installed; not run",
+  "lod_level": 1,
+  "source_seed": 4126
+}

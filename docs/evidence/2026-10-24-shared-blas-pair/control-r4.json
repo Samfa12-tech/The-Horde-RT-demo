@@ -1,0 +1,671 @@
+{
+  "schema": 1,
+  "complete": true,
+  "fixture": "Debug hidden quarter-scale pine pair",
+  "mode": "baked",
+  "fullSizeForestOrRootAcceptance": false,
+  "performanceAdmission": false,
+  "buildId": "1.6.2",
+  "executableSha256": "50ae51278b65db5c9e4fdbd85bb95b5752885ec9f3a9847c05633c66b98baf55",
+  "masterSha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+  "shaderBundleIdentity": "opaqueFast:diagnostic_high_opaque_fast@990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3|genericDielectric:diagnostic_high_generic_dielectric@938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+  "expectedTlasDefinitions": 8,
+  "isolation": {
+    "userPreferencesLoaded": false,
+    "userPreferencesWritten": false,
+    "audioStarted": false,
+    "gameplayAdvanced": false
+  },
+  "timingScope": "unpaced RenderFrame wall time and current completed GPU duration; not scanout FPS or phone evidence",
+  "allocationScope": "tracked Vulkan allocations; UMA host/device flags overlap and are not additive; pair scratch is not total startup peak or residency",
+  "sameOwnerRecreationProved": true,
+  "remainingGates": [
+    "matched control/candidate visual and timing review",
+    "process close readback",
+    "unit-scale outdoor proof",
+    "Android acceptance"
+  ],
+  "error": null,
+  "captures": [
+    {
+      "name": "direct",
+      "file": "direct.png",
+      "pngSha256": "b5b9abbe5745002defad1637bb2d067a321fefab80b843ceb8d6aa28b23c0025",
+      "internalWidth": 960,
+      "internalHeight": 540,
+      "outputWidth": 960,
+      "outputHeight": 540,
+      "renderScalePercent": 100,
+      "outputExposure": 0.62,
+      "glassEnabled": true,
+      "mistEnabled": true,
+      "shadowQuality": 1,
+      "waterQuality": 2,
+      "fireDetail": 1,
+      "dustQuality": 1,
+      "quality": "High",
+      "backend": "RayTracingPipeline",
+      "camera": [
+        -3.5999999,
+        -13.39999962,
+        0.80000001,
+        -0.1
+      ],
+      "tick": 120,
+      "sceneEpoch": 2,
+      "measurementGeneration": 1,
+      "submissionSerial": 12,
+      "completionSerial": 12,
+      "metadataRow": 3,
+      "primitiveCount": 3,
+      "pairVertexPayloadBytes": 717056,
+      "pairIndexPayloadBytes": 120000,
+      "pairBlasAllocationBytes": 622592,
+      "pairBuildScratchAllocationBytes": 508160,
+      "pairBuildWallMs": 1.0855,
+      "commonQuarterScalePlacementsColumnMajor": [
+        [
+          0.22827223,
+          0.0,
+          -0.10194011,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          0.10194011,
+          0.0,
+          0.22827223,
+          0.0,
+          -1.35000002,
+          -0.95907187,
+          -14.80000019,
+          1.0
+        ],
+        [
+          0.20200688,
+          0.0,
+          0.14728619,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          -0.14728619,
+          0.0,
+          0.20200688,
+          0.0,
+          -1.35000002,
+          -0.95907187,
+          -16.10000038,
+          1.0
+        ]
+      ],
+      "physicalInstances": [
+        {
+          "slot": 7,
+          "customIndex": 3,
+          "referencesSingleOwnedBlas": true,
+          "transform": [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      ],
+      "materialTextureLayers": [
+        [
+          5,
+          0,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          3,
+          3,
+          0
+        ]
+      ],
+      "resources": {
+        "blasCount": 8,
+        "tlasCount": 1,
+        "tlasDefinitions": 8,
+        "buffers": 29,
+        "allocations": 38,
+        "deviceLocalBytes": 107004032,
+        "hostVisibleBytes": 3150880
+      },
+      "renderCallSamples": 12,
+      "renderCallMedianMs": 6.0371,
+      "currentCompletedGpuMs": 1.961696
+    },
+    {
+      "name": "basis",
+      "file": "basis.png",
+      "pngSha256": "2ce4659b865bb521b8ec3ffe01d8a4ef10be7030d78ab9443a482b5a506146b2",
+      "internalWidth": 960,
+      "internalHeight": 540,
+      "outputWidth": 960,
+      "outputHeight": 540,
+      "renderScalePercent": 100,
+      "outputExposure": 0.62,
+      "glassEnabled": true,
+      "mistEnabled": true,
+      "shadowQuality": 1,
+      "waterQuality": 2,
+      "fireDetail": 1,
+      "dustQuality": 1,
+      "quality": "High",
+      "backend": "RayTracingPipeline",
+      "camera": [
+        -2.5,
+        -13.80000019,
+        0.64999998,
+        -0.27000001
+      ],
+      "tick": 120,
+      "sceneEpoch": 2,
+      "measurementGeneration": 1,
+      "submissionSerial": 24,
+      "completionSerial": 24,
+      "metadataRow": 3,
+      "primitiveCount": 3,
+      "pairVertexPayloadBytes": 717056,
+      "pairIndexPayloadBytes": 120000,
+      "pairBlasAllocationBytes": 622592,
+      "pairBuildScratchAllocationBytes": 508160,
+      "pairBuildWallMs": 1.0855,
+      "commonQuarterScalePlacementsColumnMajor": [
+        [
+          0.22827223,
+          0.0,
+          -0.10194011,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          0.10194011,
+          0.0,
+          0.22827223,
+          0.0,
+          -1.35000002,
+          -0.95907187,
+          -14.80000019,
+          1.0
+        ],
+        [
+          0.20200688,
+          0.0,
+          0.14728619,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          -0.14728619,
+          0.0,
+          0.20200688,
+          0.0,
+          -1.35000002,
+          -0.95907187,
+          -16.10000038,
+          1.0
+        ]
+      ],
+      "physicalInstances": [
+        {
+          "slot": 7,
+          "customIndex": 3,
+          "referencesSingleOwnedBlas": true,
+          "transform": [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      ],
+      "materialTextureLayers": [
+        [
+          5,
+          0,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          3,
+          3,
+          0
+        ]
+      ],
+      "resources": {
+        "blasCount": 8,
+        "tlasCount": 1,
+        "tlasDefinitions": 8,
+        "buffers": 29,
+        "allocations": 38,
+        "deviceLocalBytes": 107004032,
+        "hostVisibleBytes": 3150880
+      },
+      "renderCallSamples": 12,
+      "renderCallMedianMs": 6.0443,
+      "currentCompletedGpuMs": 1.770912
+    },
+    {
+      "name": "mirror",
+      "file": "mirror.png",
+      "pngSha256": "2ffc47a4b6e518b31c63a944601b6629ee5e9be2f27b63723060a9282002ff60",
+      "internalWidth": 960,
+      "internalHeight": 540,
+      "outputWidth": 960,
+      "outputHeight": 540,
+      "renderScalePercent": 100,
+      "outputExposure": 0.62,
+      "glassEnabled": true,
+      "mistEnabled": true,
+      "shadowQuality": 1,
+      "waterQuality": 2,
+      "fireDetail": 1,
+      "dustQuality": 1,
+      "quality": "High",
+      "backend": "RayTracingPipeline",
+      "camera": [
+        -1.0,
+        -16.5,
+        -1.80999994,
+        -0.1
+      ],
+      "tick": 120,
+      "sceneEpoch": 2,
+      "measurementGeneration": 1,
+      "submissionSerial": 36,
+      "completionSerial": 36,
+      "metadataRow": 3,
+      "primitiveCount": 3,
+      "pairVertexPayloadBytes": 717056,
+      "pairIndexPayloadBytes": 120000,
+      "pairBlasAllocationBytes": 622592,
+      "pairBuildScratchAllocationBytes": 508160,
+      "pairBuildWallMs": 1.0855,
+      "commonQuarterScalePlacementsColumnMajor": [
+        [
+          0.22827223,
+          0.0,
+          -0.10194011,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          0.10194011,
+          0.0,
+          0.22827223,
+          0.0,
+          -1.35000002,
+          -0.95907187,
+          -14.80000019,
+          1.0
+        ],
+        [
+          0.20200688,
+          0.0,
+          0.14728619,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          -0.14728619,
+          0.0,
+          0.20200688,
+          0.0,
+          -1.35000002,
+          -0.95907187,
+          -16.10000038,
+          1.0
+        ]
+      ],
+      "physicalInstances": [
+        {
+          "slot": 7,
+          "customIndex": 3,
+          "referencesSingleOwnedBlas": true,
+          "transform": [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      ],
+      "materialTextureLayers": [
+        [
+          5,
+          0,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          3,
+          3,
+          0
+        ]
+      ],
+      "resources": {
+        "blasCount": 8,
+        "tlasCount": 1,
+        "tlasDefinitions": 8,
+        "buffers": 29,
+        "allocations": 38,
+        "deviceLocalBytes": 107004032,
+        "hostVisibleBytes": 3150880
+      },
+      "renderCallSamples": 12,
+      "renderCallMedianMs": 6.05075,
+      "currentCompletedGpuMs": 1.885664
+    },
+    {
+      "name": "paused-direct",
+      "file": "paused-direct.png",
+      "pngSha256": "b5b9abbe5745002defad1637bb2d067a321fefab80b843ceb8d6aa28b23c0025",
+      "internalWidth": 960,
+      "internalHeight": 540,
+      "outputWidth": 960,
+      "outputHeight": 540,
+      "renderScalePercent": 100,
+      "outputExposure": 0.62,
+      "glassEnabled": true,
+      "mistEnabled": true,
+      "shadowQuality": 1,
+      "waterQuality": 2,
+      "fireDetail": 1,
+      "dustQuality": 1,
+      "quality": "High",
+      "backend": "RayTracingPipeline",
+      "camera": [
+        -3.5999999,
+        -13.39999962,
+        0.80000001,
+        -0.1
+      ],
+      "tick": 120,
+      "sceneEpoch": 2,
+      "measurementGeneration": 1,
+      "submissionSerial": 48,
+      "completionSerial": 48,
+      "metadataRow": 3,
+      "primitiveCount": 3,
+      "pairVertexPayloadBytes": 717056,
+      "pairIndexPayloadBytes": 120000,
+      "pairBlasAllocationBytes": 622592,
+      "pairBuildScratchAllocationBytes": 508160,
+      "pairBuildWallMs": 1.0855,
+      "commonQuarterScalePlacementsColumnMajor": [
+        [
+          0.22827223,
+          0.0,
+          -0.10194011,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          0.10194011,
+          0.0,
+          0.22827223,
+          0.0,
+          -1.35000002,
+          -0.95907187,
+          -14.80000019,
+          1.0
+        ],
+        [
+          0.20200688,
+          0.0,
+          0.14728619,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          -0.14728619,
+          0.0,
+          0.20200688,
+          0.0,
+          -1.35000002,
+          -0.95907187,
+          -16.10000038,
+          1.0
+        ]
+      ],
+      "physicalInstances": [
+        {
+          "slot": 7,
+          "customIndex": 3,
+          "referencesSingleOwnedBlas": true,
+          "transform": [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      ],
+      "materialTextureLayers": [
+        [
+          5,
+          0,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          3,
+          3,
+          0
+        ]
+      ],
+      "resources": {
+        "blasCount": 8,
+        "tlasCount": 1,
+        "tlasDefinitions": 8,
+        "buffers": 29,
+        "allocations": 38,
+        "deviceLocalBytes": 107004032,
+        "hostVisibleBytes": 3150880
+      },
+      "renderCallSamples": 12,
+      "renderCallMedianMs": 6.04875,
+      "currentCompletedGpuMs": 2.073824
+    },
+    {
+      "name": "reset-direct",
+      "file": "reset-direct.png",
+      "pngSha256": "b5b9abbe5745002defad1637bb2d067a321fefab80b843ceb8d6aa28b23c0025",
+      "internalWidth": 960,
+      "internalHeight": 540,
+      "outputWidth": 960,
+      "outputHeight": 540,
+      "renderScalePercent": 100,
+      "outputExposure": 0.62,
+      "glassEnabled": true,
+      "mistEnabled": true,
+      "shadowQuality": 1,
+      "waterQuality": 2,
+      "fireDetail": 1,
+      "dustQuality": 1,
+      "quality": "High",
+      "backend": "RayTracingPipeline",
+      "camera": [
+        -3.5999999,
+        -13.39999962,
+        0.80000001,
+        -0.1
+      ],
+      "tick": 120,
+      "sceneEpoch": 3,
+      "measurementGeneration": 1,
+      "submissionSerial": 60,
+      "completionSerial": 60,
+      "metadataRow": 3,
+      "primitiveCount": 3,
+      "pairVertexPayloadBytes": 717056,
+      "pairIndexPayloadBytes": 120000,
+      "pairBlasAllocationBytes": 622592,
+      "pairBuildScratchAllocationBytes": 508160,
+      "pairBuildWallMs": 1.1029,
+      "commonQuarterScalePlacementsColumnMajor": [
+        [
+          0.22827223,
+          0.0,
+          -0.10194011,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          0.10194011,
+          0.0,
+          0.22827223,
+          0.0,
+          -1.35000002,
+          -0.95907187,
+          -14.80000019,
+          1.0
+        ],
+        [
+          0.20200688,
+          0.0,
+          0.14728619,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          -0.14728619,
+          0.0,
+          0.20200688,
+          0.0,
+          -1.35000002,
+          -0.95907187,
+          -16.10000038,
+          1.0
+        ]
+      ],
+      "physicalInstances": [
+        {
+          "slot": 7,
+          "customIndex": 3,
+          "referencesSingleOwnedBlas": true,
+          "transform": [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      ],
+      "materialTextureLayers": [
+        [
+          5,
+          0,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          3,
+          3,
+          0
+        ]
+      ],
+      "resources": {
+        "blasCount": 8,
+        "tlasCount": 1,
+        "tlasDefinitions": 8,
+        "buffers": 29,
+        "allocations": 38,
+        "deviceLocalBytes": 107004032,
+        "hostVisibleBytes": 3150880
+      },
+      "renderCallSamples": 12,
+      "renderCallMedianMs": 6.054,
+      "currentCompletedGpuMs": 1.964864
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "asset": "generic distant forest bird candidate",
+  "creator": "FilmCow",
+  "sourceFile": "FilmCow Recorded SFX/distand bird.wav",
+  "sourceSha256": "eeec1e8ebae3af6395640fb0086cb2ebf006724efbb4859e93fb9c5b4a9de8a4",
+  "sourceUrl": "https://filmcow.itch.io/filmcow-sfx",
+  "license": "FilmCow custom royalty-free project-use terms; not CC0",
+  "terms": "Personal/commercial project use permitted; national-government, law-enforcement, SPLC/CAHN-designated hate-group uses prohibited. No authorship claim or standalone audio-library redistribution.",
+  "sourcePolicy": "Private original remains outside Git and game packages; runtime derivative only",
+  "runtimeFile": "forest_distant_bird.wav",
+  "runtimeSha256": "811c2a1d10a565615dd786ef4b99fda5dd0e4465aa121e36ad9158531d6902ff",
+  "runtimeBytes": 795740,
+  "channels": 1,
+  "sampleRate": 48000,
+  "bitsPerSample": 16,
+  "frames": 397831,
+  "durationSeconds": 8.288145833333333,
+  "processing": "FFmpeg 9 PCM24 to PCM16 only; no gain, pitch, filtering, crop, fade, looping or resampling",
+  "meanDbfs": -49.4,
+  "peakDbfs": -28.6,
+  "acceptance": "Candidate pending listening/species/night suitability and native mix acceptance; no device playback claim"
+}

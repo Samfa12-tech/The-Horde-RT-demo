@@ -20,7 +20,7 @@ public final class DeathRecoveryTest {
         @Implementation protected static void __staticInitializer__() { }
         @Implementation protected static void resetRtSceneTuning() { }
         @Implementation protected static void requestRouteReset() { ++resets; }
-        @Implementation protected static void setViewControls(float yaw,float pitch,float light,float strafe,float forward) { }
+        @Implementation protected static void setViewControls(float yaw,float pitch,float light,float strafe,float forward,boolean crouch,boolean analogueMovement) { }
         @Implementation protected static void setSimulationPaused(boolean paused) { if(!paused) ++unpauses; }
     }
     private static Field field(String name) throws Exception {

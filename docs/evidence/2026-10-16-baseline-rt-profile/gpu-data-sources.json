@@ -1,0 +1,8 @@
+{
+  "service": "Perfetto v54.0",
+  "advertisedGpuSources": [
+    "android.gpu.memory"
+  ],
+  "gpuHardwareCounterSourceAdvertised": false,
+  "scope": "Read-only service inventory after both timing runs; no GPU counter trace attempted. Not a vendor capability certification."
+}

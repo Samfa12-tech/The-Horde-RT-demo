@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "target": "Horde 1.7 local finite incidental cues",
+  "generator": "tools/prepare-chapter-local-ambience.py",
+  "sourceLibrary": "FilmCow Recorded SFX; local Possum Cafe archive, private originals excluded",
+  "licensor": "Jason Steele / FilmCow",
+  "sourceUrl": "https://filmcow.itch.io/filmcow-sfx",
+  "license": "FilmCow custom royalty-free project-use licence; not CC0",
+  "licenseEvidence": "docs/licenses/filmcow-sfx-license.pdf",
+  "licenseSha256": "bda56a077aa8ba8e053ae916dd4c19038baa12cd33d10209658646ac9351b73f",
+  "sourcePolicy": "Only these bounded game-integrated derivatives and manifest ship; originals remain private. Preserve FilmCow project-use restrictions documented in ASSET_LICENSES.md.",
+  "listeningAcceptance": false,
+  "selectionLimit": "Purpose-labelled sources and PCM activity only, not audition. Drip is an isolated 1s activity window, not verified one droplet or stone creak. Rope is the complete labelled tightening cue. No structural rumble or continuous bed.",
+  "assets": [
+    {
+      "id": "tomb_drip",
+      "runtimeFile": "runtime/tomb_drip.wav",
+      "sourceFile": "ambience - dripping water 1.wav",
+      "sourceSha256": "3ef75b5d3294dabf9d61077502303b6467523c4c6bbb31254c3c8031accf91ec",
+      "sourceBytes": 15888744,
+      "sourceFrames": 5296217,
+      "sourceCropFrames": [
+        5083200,
+        5131200
+      ],
+      "runtimeSha256": "9cff09fae048b84e60a03b5e7d546c8f1fe3e479bd1094ce4df17a3f628135c8",
+      "runtimeBytes": 96044,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 48000,
+      "durationSeconds": 1.0,
+      "peakDbfs": -21.468815516375315,
+      "rmsDbfs": -32.412439845494234,
+      "fullScaleSamples": 0,
+      "edgeFadeFrames": {
+        "in": 480,
+        "out": 3840
+      },
+      "processing": "Mono48k PCM24 to PCM16; nearest-even rounding, 10ms/80ms linear edge fades. No normalization, filter, pitch, time-stretch or synthesis."
+    },
+    {
+      "id": "rope_contact",
+      "runtimeFile": "runtime/rope_contact.wav",
+      "sourceFile": "rope tighten 1.wav",
+      "sourceSha256": "738d827dfe689b01fb9a6d18689a9b83127a5ef3612f0473e8f545fc659176bf",
+      "sourceBytes": 143002,
+      "sourceFrames": 47600,
+      "sourceCropFrames": [
+        0,
+        47600
+      ],
+      "runtimeSha256": "37948f94da011a1fdb41c8ae29ace65560bc9ee6e344bce49e718dd76303e303",
+      "runtimeBytes": 95244,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 47600,
+      "durationSeconds": 0.9916666666666667,
+      "peakDbfs": -12.996260945201785,
+      "rmsDbfs": -33.64686650534674,
+      "fullScaleSamples": 0,
+      "edgeFadeFrames": {
+        "in": 480,
+        "out": 3840
+      },
+      "processing": "Mono48k PCM24 to PCM16; nearest-even rounding, 10ms/80ms linear edge fades. No normalization, filter, pitch, time-stretch or synthesis."
+    }
+  ]
+}

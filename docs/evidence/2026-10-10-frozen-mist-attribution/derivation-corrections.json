@@ -1,0 +1,17 @@
+{
+  "corrections_before_publication": [
+    {
+      "error": "First derived driverSafeFullyInlined checked functions/calls but omitted <=29 query-site condition",
+      "correction": "Matched registered compiler guard, preserving raw modules/disassembly. Opaque rows fail the exact invariant."
+    },
+    {
+      "error": "First public byte check compared LF copies to native CRLF file hash",
+      "correction": "Kept native files untouched and recorded separate native/published byte hashes; no state fields changed."
+    },
+    {
+      "error": "First decoded float map asserted loss >=0 exactly; unchanged arithmetic produces approximately -5.2e-8 roundoff and up to 1.00000012.",
+      "correction": "Retained raw float32 maps and exact bit transport; documented roundoff and diagnostic-only comparison classification. No recapture or production assertion changed."
+    }
+  ],
+  "evidence_check_first_attempt": "FAIL on LF/raw hash comparison; not a game/test failure"
+}

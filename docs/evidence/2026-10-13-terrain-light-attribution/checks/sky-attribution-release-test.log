@@ -1,0 +1,18 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start   1: horde_rt_sky_attribution_launch_tests
+1/6 Test   #1: horde_rt_sky_attribution_launch_tests .......   Passed    1.17 sec
+    Start  76: horde_rt_opaque_segment_coverage_tests
+2/6 Test  #76: horde_rt_opaque_segment_coverage_tests ......   Passed    0.99 sec
+    Start  86: horde_rt_tomb_dressing_tests
+3/6 Test  #86: horde_rt_tomb_dressing_tests ................   Passed    1.11 sec
+    Start 166: horde_rt_scene_initialise_preflight_tests
+4/6 Test #166: horde_rt_scene_initialise_preflight_tests ...   Passed    1.74 sec
+    Start 167: horde_rt_static_geometry_cutover_tests
+5/6 Test #167: horde_rt_static_geometry_cutover_tests ......   Passed    1.23 sec
+    Start 168: horde_rt_scene_resource_inventory_tests
+6/6 Test #168: horde_rt_scene_resource_inventory_tests .....   Passed    3.23 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =   9.50 sec

@@ -1,0 +1,135 @@
+{
+  "source_commit": "53347791b0bd1331219651b01ea3012bafcab26d",
+  "packages": [
+    {
+      "configuration": "debug",
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "deb5f7a0dedc294bd00c7e08c6f9e928b27186baa8d4fa705d61df634bc28c30",
+      "bytes": 133692395,
+      "libraries": [
+        {
+          "abi": "arm64-v8a",
+          "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+          "bytes": 4665552,
+          "sha256": "d055dbffc814ab8901e0906c3be8987470c136b2553c186ad68abee5e639bd3a",
+          "packaged_matches_stripped": true,
+          "elf_class": "ELF64",
+          "machine": "AArch64",
+          "load_alignments": [
+            "0x4000",
+            "0x4000",
+            "0x4000"
+          ]
+        },
+        {
+          "abi": "armeabi-v7a",
+          "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+          "bytes": 4099224,
+          "sha256": "599f272f9a275042a24f1f27cd9820a2251b967ba25d770debe2ed0a411460bf",
+          "packaged_matches_stripped": true,
+          "elf_class": "ELF32",
+          "machine": "ARM",
+          "load_alignments": [
+            "0x4000",
+            "0x4000",
+            "0x4000"
+          ]
+        },
+        {
+          "abi": "x86",
+          "entry": "lib/x86/libhorde_rt_probe_android.so",
+          "bytes": 5090480,
+          "sha256": "7946283a21e753970eed067a70a6ab44afc13cd25269f23ae1e37a0a5e3e2fa2",
+          "packaged_matches_stripped": true,
+          "elf_class": "ELF32",
+          "machine": "Intel 80386",
+          "load_alignments": [
+            "0x4000",
+            "0x4000",
+            "0x4000"
+          ]
+        },
+        {
+          "abi": "x86_64",
+          "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+          "bytes": 4834048,
+          "sha256": "abb9d89aace76c98509a5589dc739ead75c8b1dd101cfbd4a8568f761f9bd546",
+          "packaged_matches_stripped": true,
+          "elf_class": "ELF64",
+          "machine": "Advanced Micro Devices X86-64",
+          "load_alignments": [
+            "0x4000",
+            "0x4000",
+            "0x4000"
+          ]
+        }
+      ]
+    },
+    {
+      "configuration": "release-unsigned",
+      "path": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "sha256": "79fe09f5482aba2814a5abbd7cf84b173f9adeaac9a89d983428fdc9f847fe80",
+      "bytes": 121490514,
+      "libraries": [
+        {
+          "abi": "arm64-v8a",
+          "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+          "bytes": 4471448,
+          "sha256": "dd7ab47c1d433b723da01c223510f1a1de637f0d05d26ce49943124e654215f9",
+          "packaged_matches_stripped": true,
+          "elf_class": "ELF64",
+          "machine": "AArch64",
+          "load_alignments": [
+            "0x4000",
+            "0x4000",
+            "0x4000"
+          ]
+        },
+        {
+          "abi": "armeabi-v7a",
+          "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+          "bytes": 3941380,
+          "sha256": "1c357ca25ab547464b8c7daa78258df24013465b94eea72d84b1100a1f09e84a",
+          "packaged_matches_stripped": true,
+          "elf_class": "ELF32",
+          "machine": "ARM",
+          "load_alignments": [
+            "0x4000",
+            "0x4000",
+            "0x4000"
+          ]
+        },
+        {
+          "abi": "x86",
+          "entry": "lib/x86/libhorde_rt_probe_android.so",
+          "bytes": 4850796,
+          "sha256": "5639358421a0f78da707cc4a87518088feb8d23e2d346be0b3e49aa6c7343199",
+          "packaged_matches_stripped": true,
+          "elf_class": "ELF32",
+          "machine": "Intel 80386",
+          "load_alignments": [
+            "0x4000",
+            "0x4000",
+            "0x4000"
+          ]
+        },
+        {
+          "abi": "x86_64",
+          "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+          "bytes": 4628984,
+          "sha256": "6c5c1167453af2c25a46d56474e6a3aca545242eb2ae4679bb2a7ead6a50e7b5",
+          "packaged_matches_stripped": true,
+          "elf_class": "ELF64",
+          "machine": "Advanced Micro Devices X86-64",
+          "load_alignments": [
+            "0x4000",
+            "0x4000",
+            "0x4000"
+          ]
+        }
+      ]
+    }
+  ],
+  "readelf_sha256": "9c48e71a399c83160d132cf68e3d98404a1aa9ac03d9dbfc2ba9d11bc8528723",
+  "scope": "All four ABIs: exact APK-entry/stripped-library identity, ELF class/machine and 16KiB LOAD alignment. This does not inspect all-ABI shader payloads; supported shader inspection is separately ARM64-only."
+}

@@ -15,14 +15,20 @@ final class BenchmarkSummaryReview {
     }
 
     private final String runId;
+    private final boolean publicPreview;
     private byte[] envelope;
     private String json, reportId;
     private PlaytestReportExport export;
     private boolean closed;
 
     BenchmarkSummaryReview(String runId) {
+        this(runId, false);
+    }
+
+    BenchmarkSummaryReview(String runId, boolean publicPreview) {
         if (!validUuid(runId)) throw new IllegalArgumentException("Invalid benchmark identity");
         this.runId = runId;
+        this.publicPreview = publicPreview;
     }
 
     static boolean validUuid(String value) {
@@ -35,6 +41,7 @@ final class BenchmarkSummaryReview {
     }
 
     String runId() { return runId; }
+    boolean isPublicPreview() { return publicPreview; }
     String reportId() { return reportId; }
     String json() { return json; }
     boolean isPrepared() { return !closed && envelope != null; }
@@ -42,7 +49,8 @@ final class BenchmarkSummaryReview {
 
     boolean prepare(boolean consent, boolean hardware, int cooling, String id, String utc,
             Preparer preparer) {
-        if (closed || isPrepared() || !consent || cooling < 0 || cooling > 2 || !validUuid(id)) return false;
+        if (closed || isPrepared() || !consent || cooling < 0 || cooling > 2 || !validUuid(id) ||
+                (publicPreview && id.equals(runId))) return false;
         try {
             final byte[] prepared = preparer.prepare(runId, id, utc, true, hardware, cooling);
             if (prepared == null || prepared.length < 3 || prepared[0] != 0 ||
@@ -54,8 +62,25 @@ final class BenchmarkSummaryReview {
             // Validate bridge identity only. Native typed capture/builder owns populations and scopes.
             // Parsing never replaces the exact native bytes reviewed, copied and exported below.
             final JSONObject root = new JSONObject(text);
-            final JSONObject report = root.getJSONObject("report");
-            if (root.getInt("schemaVersion") != 2 ||
+            if (root.has("consentToSubmit") || root.has("consentToPublish") ||
+                    root.has("delivery") || root.has("turnstileToken")) return false;
+            if (publicPreview) {
+                final JSONObject result = root.getJSONObject("result");
+                final JSONObject device = result.getJSONObject("hardware");
+                if (root.getInt("schemaVersion") != 1 ||
+                        !"horde-lantern-rt".equals(root.getString("product")) ||
+                        !"public-benchmark-result".equals(root.getString("reportKind")) ||
+                        !"public-board".equals(root.getString("destination")) ||
+                        !root.getBoolean("consentToPreparePublicPreview") ||
+                        root.has("report") || root.has("consentToSubmit") || root.has("delivery") ||
+                        result.getInt("schemaVersion") != 1 || !id.equals(result.getString("resultId")) ||
+                        result.has("runId") || result.has("reportId") || result.getBoolean("rankingEligible") ||
+                        result.getBoolean("deviceCompatibilityVerified") ||
+                        (!hardware && (!device.isNull("model") || !device.isNull("gpu") || !device.isNull("vulkanApi"))))
+                    return false;
+            } else {
+                final JSONObject report = root.getJSONObject("report");
+                if (root.getInt("schemaVersion") != 2 ||
                     !"horde-lantern-rt".equals(root.getString("product")) ||
                     !"benchmark-summary".equals(root.getString("reportKind")) ||
                     !root.getBoolean("consentToPrepare") ||
@@ -64,6 +89,7 @@ final class BenchmarkSummaryReview {
                     !id.equals(report.getString("reportId")) ||
                     !runId.equals(report.getString("runId")) ||
                     (!hardware && report.has("basicHardware"))) return false;
+            }
             envelope = prepared.clone();
             json = text;
             reportId = id;

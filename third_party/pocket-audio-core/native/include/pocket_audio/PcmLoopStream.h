@@ -11,9 +11,25 @@ namespace pocket_audio
 {
 
 inline constexpr std::size_t kPcmMaximumClipCount = 32u;
-inline constexpr std::uint64_t kPcmMaximumClipFrames = 576'000u;
+inline constexpr std::uint64_t kPcmMaximumClipFrames = kPcmDefaultMaximumFrames;
 inline constexpr std::uint64_t kPcmMaximumCrossfadeFrames = 48'000u;
 inline constexpr std::uint64_t kPcmDefaultCrossfadeFrames = 12'000u;
+
+// Bank counts all body and tail bytes, including repeated/aliased spans.
+// The default admits every bank accepted by the legacy per-span 12s limit.
+struct PcmBankLimits
+{
+    PcmClipLimits clip{};
+    std::uint64_t maximumPcmBytes =
+        (kPcmMaximumClipCount - 1u) * 2u * kPcmDefaultMaximumFrames * kPcmBytesPerFrame;
+
+    [[nodiscard]] constexpr bool IsValid() const noexcept
+    {
+        return clip.IsValid() && maximumPcmBytes > 0u &&
+               maximumPcmBytes % kPcmBytesPerFrame == 0u &&
+               maximumPcmBytes <= (kPcmMaximumClipCount - 1u) * 2u * kPcmHardMaximumBytes;
+    }
+};
 
 // Immutable, non-owning interleaved stereo PCM16. The caller keeps both spans
 // alive and unchanged until the PcmLoopStream is destroyed or no longer uses
@@ -60,6 +76,8 @@ class PcmLoopStream
 public:
     explicit PcmLoopStream(std::span<const PcmClip> clips,
                            std::uint64_t crossfadeFrames = kPcmDefaultCrossfadeFrames) noexcept;
+    PcmLoopStream(std::span<const PcmClip> clips, PcmBankLimits limits,
+                  std::uint64_t crossfadeFrames = kPcmDefaultCrossfadeFrames) noexcept;
 
     [[nodiscard]] bool IsValid() const noexcept { return clipsValid_; }
     [[nodiscard]] PcmStatus SetSelection(const PcmSelection& selection) noexcept;
@@ -77,7 +95,8 @@ private:
         bool tailOnly = false;
     };
 
-    [[nodiscard]] bool ValidateClips(std::span<const PcmClip> clips) noexcept;
+    [[nodiscard]] bool ValidateClips(std::span<const PcmClip> clips,
+                                   PcmBankLimits limits) noexcept;
     [[nodiscard]] bool ValidateSelection(const PcmSelection& selection) const noexcept;
     [[nodiscard]] StreamState MakeState(const PcmSelection& selection) const noexcept;
     [[nodiscard]] bool ReadFrame(StreamState& state, float& left, float& right) const noexcept;

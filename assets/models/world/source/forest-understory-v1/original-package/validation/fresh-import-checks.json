@@ -1,0 +1,107 @@
+[
+  {
+    "asset": "bh_rock_low_boulder.glb",
+    "fresh_glb_import": true,
+    "mesh_objects": 1,
+    "triangles": 378,
+    "finite_positions_normals_uvs": true,
+    "non_unit_vertex_normals": 0,
+    "degenerate_triangles": 0,
+    "blender_xyz_dimensions_m": [
+      1.65731,
+      1.24313,
+      0.83452
+    ],
+    "ground_min_z": 0.0
+  },
+  {
+    "asset": "bh_fern_open_clump.glb",
+    "fresh_glb_import": true,
+    "mesh_objects": 1,
+    "triangles": 1200,
+    "finite_positions_normals_uvs": true,
+    "non_unit_vertex_normals": 0,
+    "degenerate_triangles": 0,
+    "blender_xyz_dimensions_m": [
+      1.55744,
+      1.69854,
+      0.79879
+    ],
+    "ground_min_z": 0.0
+  },
+  {
+    "asset": "bh_fern_small_clump.glb",
+    "fresh_glb_import": true,
+    "mesh_objects": 1,
+    "triangles": 768,
+    "finite_positions_normals_uvs": true,
+    "non_unit_vertex_normals": 0,
+    "degenerate_triangles": 0,
+    "blender_xyz_dimensions_m": [
+      1.13615,
+      1.11205,
+      0.56224
+    ],
+    "ground_min_z": 0.0
+  },
+  {
+    "asset": "bh_rock_split_shelf.glb",
+    "fresh_glb_import": true,
+    "mesh_objects": 1,
+    "triangles": 788,
+    "finite_positions_normals_uvs": true,
+    "non_unit_vertex_normals": 0,
+    "degenerate_triangles": 0,
+    "blender_xyz_dimensions_m": [
+      1.98944,
+      1.09933,
+      0.52275
+    ],
+    "ground_min_z": 0.0
+  },
+  {
+    "asset": "bh_rock_upright_crag.glb",
+    "fresh_glb_import": true,
+    "mesh_objects": 1,
+    "triangles": 376,
+    "finite_positions_normals_uvs": true,
+    "non_unit_vertex_normals": 0,
+    "degenerate_triangles": 0,
+    "blender_xyz_dimensions_m": [
+      1.05814,
+      0.92018,
+      1.35135
+    ],
+    "ground_min_z": 0.0
+  },
+  {
+    "asset": "bh_log_fallen_trunk.glb",
+    "fresh_glb_import": true,
+    "mesh_objects": 1,
+    "triangles": 544,
+    "finite_positions_normals_uvs": true,
+    "non_unit_vertex_normals": 0,
+    "degenerate_triangles": 0,
+    "blender_xyz_dimensions_m": [
+      3.41466,
+      0.89278,
+      0.99889
+    ],
+    "ground_min_z": 0.0
+  },
+  {
+    "asset": "bh_root_branch_tangle.glb",
+    "fresh_glb_import": true,
+    "mesh_objects": 1,
+    "triangles": 548,
+    "finite_positions_normals_uvs": true,
+    "non_unit_vertex_normals": 0,
+    "degenerate_triangles": 0,
+    "blender_xyz_dimensions_m": [
+      2.1337,
+      1.55994,
+      0.75392
+    ],
+    "ground_min_z": 0.0
+  }
+]

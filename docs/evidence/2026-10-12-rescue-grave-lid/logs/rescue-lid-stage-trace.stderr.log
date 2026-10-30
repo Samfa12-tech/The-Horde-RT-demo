@@ -1,0 +1,2 @@
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+Showcase capture failed: Development checkpoint 'chapter-landing-west' could not stage its authoritative combat pose; player=(0,1.85), rescuePhase=0, stowed=0, ropeReady=0, exterior=0, worldGeneration=2, terrain=1,2,1,1,1

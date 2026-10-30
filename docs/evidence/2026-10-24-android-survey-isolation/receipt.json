@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "timestampUtc": "2026-10-24T12:13:47.758284+00:00",
+  "baseHead": "471afc92ca6bc87755d3edd8bb1bf87c5adfe56b",
+  "sourceStatus": "uncommitted Java callback-isolation correction",
+  "retainedHostedFailure": {
+    "head": "471afc92",
+    "job": "120867689277",
+    "tests": 447,
+    "failures": 1,
+    "test": "EnvironmentSurveyRequestTest.lifecycleAndInputReturnBeforeNormalHandlersAndAssetCacheIsShared",
+    "line": 90,
+    "log": "../android-benchmark-fixed-output-20261024/ci-471-android-job.log"
+  },
+  "cause": "New normal benchmark retain/cancel/recovery work preceded environment-survey early return; onDestroy guard moved beyond existing420-character admission gate. Source ordering corrected; test unchanged.",
+  "targeted": {
+    "log": "targeted-r1.log",
+    "exitCode": 0,
+    "tests": 33,
+    "failures": 0,
+    "seconds": 8
+  },
+  "final": {
+    "log": "full-java-r2.log",
+    "exitCode": 0,
+    "seconds": 47,
+    "junit": {
+      "tests": 447,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    },
+    "classes": 61,
+    "lint": {
+      "Warning": 80
+    },
+    "nativeCompilePerformed": false,
+    "nativeOutputsReused": true,
+    "nativeSourceHashesMatchOriginalReceipt": {
+      "android/app/src/main/cpp/android_probe_bridge.cpp": true,
+      "android/app/src/main/cpp/android_opening_benchmark.inl": true,
+      "src/platform/android/AndroidBenchmarkOutputTransaction.h": true
+    },
+    "skippedCases": [
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualExistingAndDanglingOutputLinksAreNotReplacedWhereHostSupportsLinks[24]",
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualExistingAndDanglingOutputLinksAreNotReplacedWhereHostSupportsLinks",
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualSymbolicExternalRootIsRejectedWhereHostSupportsLinks[24]",
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualSymbolicExternalRootIsRejectedWhereHostSupportsLinks",
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualSameParentSourceLinkIsRejectedWhereHostSupportsLinks[24]",
+      "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.actualSameParentSourceLinkIsRejectedWhereHostSupportsLinks"
+    ]
+  },
+  "sourceProof": [
+    {
+      "method": "protected void onPause()",
+      "line": 8365,
+      "priorSurveyOffsetLfNormalized": 274,
+      "correctedSurveyOffsetLfNormalized": 35
+    },
+    {
+      "method": "protected void onStop()",
+      "line": 8467,
+      "priorSurveyOffsetLfNormalized": 103,
+      "correctedSurveyOffsetLfNormalized": 34
+    },
+    {
+      "method": "protected void onSaveInstanceState(Bundle state)",
+      "line": 8476,
+      "priorSurveyOffsetLfNormalized": null,
+      "correctedSurveyOffsetLfNormalized": 59,
+      "priorGuardAbsentInCallback": true
+    },
+    {
+      "method": "protected void onDestroy()",
+      "line": 8484,
+      "priorSurveyOffsetLfNormalized": 740,
+      "correctedSurveyOffsetLfNormalized": 37
+    },
+    {
+      "method": "public void onBackPressed()",
+      "line": 8101,
+      "priorSurveyOffsetLfNormalized": 101,
+      "correctedSurveyOffsetLfNormalized": 38
+    }
+  ],
+  "mainActivitySha256": "8b8ed5603cc58b27c2f1d18b293f884d6109c0325a014c1dc116663d2bfc891b",
+  "surveyTestUnchanged": true,
+  "apk": {
+    "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "bytes": 206135428,
+    "sha256": "99f57593d782922e153d7839adc8f523db617d19504b96da3c1e6e008f18f419",
+    "modifiedUtc": "2026-10-24T12:13:02.653069+00:00"
+  },
+  "phoneUsed": false,
+  "installed": false,
+  "physicalAcceptance": false
+}

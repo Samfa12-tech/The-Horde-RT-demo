@@ -16,6 +16,55 @@ public final class BenchmarkSummaryReviewTest {
     static final String REPORT = "4c417431-ff25-4928-8d5c-35ceaf7af078";
     static final String UTC = "2026-10-03T12:00:00Z";
 
+    static byte[] publicPrepared(String id, boolean hardware) {
+        String json = "{\"schemaVersion\":1, \"product\":\"horde-lantern-rt\","
+                + "\"reportKind\":\"public-benchmark-result\",\"destination\":\"public-board\","
+                + "\"consentToPreparePublicPreview\":true,\"result\":{\"schemaVersion\":1,\"resultId\":\""+id+"\","
+                + "\"rankingEligible\":false,\"deviceCompatibilityVerified\":false,\"hardware\":{"
+                + "\"model\":"+(hardware?"\"example\"":"null")+",\"gpu\":"+(hardware?"\"example\"":"null")
+                + ",\"vulkanApi\":"+(hardware?"\"1.3\"":"null")+"}}}";
+        byte[] bytes=json.getBytes(StandardCharsets.UTF_8), envelope=new byte[bytes.length+1];
+        System.arraycopy(bytes,0,envelope,1,bytes.length); return envelope;
+    }
+
+    @Test public void publicPreviewNeedsIndependentConsentAndCannotEnterPrivateSubmission() {
+        BenchmarkSummaryReview owner=new BenchmarkSummaryReview(RUN,true);
+        final int[] calls={0};
+        BenchmarkSummaryReview.Preparer nativeCall=(run,id,time,c,h,k)->{++calls[0];return publicPrepared(id,h);};
+        assertFalse(owner.prepare(false,false,0,REPORT,UTC,nativeCall)); assertEquals(0,calls[0]);
+        assertFalse(owner.prepare(true,false,0,RUN,UTC,nativeCall)); assertEquals(0,calls[0]);
+        assertTrue(owner.prepare(true,false,0,REPORT,UTC,nativeCall));
+        assertTrue(owner.isPublicPreview()); assertFalse(owner.json().contains(RUN));
+        PlaytestReportSubmission remote=new PlaytestReportSubmission(work->fail("must not enqueue"),
+                bytes->{fail("must not send");return null;});
+        assertFalse(remote.beginBenchmarkSummary(owner,true));
+        assertFalse(remote.beginPrivateBenchmarkSummary(owner,true));
+        assertEquals(PlaytestReportSubmission.State.DRAFT,remote.state());
+        assertTrue(owner.beginSave());
+        assertArrayEquals(owner.exactJsonBytes(),owner.exportOwner().startWrite(owner.exportOwner().token()));
+        owner.close(); assertNull(owner.json()); assertFalse(owner.beginSave());
+    }
+
+    @Test public void publicAndPrivateBridgePayloadsCannotBeConfused() {
+        assertFalse(new BenchmarkSummaryReview(RUN,true).prepare(true,false,0,REPORT,UTC,
+                (r,id,t,c,h,k)->prepared(r,id,h,k)));
+        assertFalse(new BenchmarkSummaryReview(RUN).prepare(true,false,0,REPORT,UTC,
+                (r,id,t,c,h,k)->publicPrepared(id,h)));
+        assertFalse(new BenchmarkSummaryReview(RUN,true).prepare(true,false,0,REPORT,UTC,
+                (r,id,t,c,h,k)->publicPrepared(RUN,h)));
+        assertFalse(new BenchmarkSummaryReview(RUN,true).prepare(true,false,0,REPORT,UTC,
+                (r,id,t,c,h,k)->publicPrepared(id,true)));
+        assertTrue(new BenchmarkSummaryReview(RUN,true).prepare(true,true,0,REPORT,UTC,
+                (r,id,t,c,h,k)->publicPrepared(id,h)));
+        for(String replacement:new String[]{"developer-private","public-board\",\"consentToSubmit\":true,\"unused\":\"x"}) {
+            byte[] source=publicPrepared(REPORT,false);
+            String malformed=new String(source,1,source.length-1,StandardCharsets.UTF_8).replace("public-board",replacement);
+            byte[] bytes=malformed.getBytes(StandardCharsets.UTF_8), envelope=new byte[bytes.length+1];
+            System.arraycopy(bytes,0,envelope,1,bytes.length);
+            assertFalse(new BenchmarkSummaryReview(RUN,true).prepare(true,false,0,REPORT,UTC,(r,id,t,c,h,k)->envelope));
+        }
+    }
+
     static byte[] prepared(String run, String report, boolean hardware, int cooling) {
         // Deliberate spacing ensures Java exports the native bytes without canonicalizing JSON.
         String json = "{\"schemaVersion\":2, \"product\":\"horde-lantern-rt\","

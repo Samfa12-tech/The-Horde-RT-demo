@@ -1,0 +1,214 @@
+{
+  "schema": 1,
+  "verification": "passed",
+  "inputs": {
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\pine-lod2-20261020\\verify_native_mapping.py": {
+      "bytes": 23922,
+      "sha256": "1180999f34c38f70718f1d2c6c5c4185f2b61bd39df83eb35e5b482c80b6b782"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\pine-lod2-20261020\\derive_pine_lod2.py": {
+      "bytes": 21790,
+      "sha256": "a8945e481ea69160faef6ddf4d3e8141aec40ed10902e14bb37dd874599a7a65"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\pine-lod2-20261020\\reproducibility-receipt.json": {
+      "bytes": 705,
+      "sha256": "0c58650bd3cb838eb2ee06aa1428ab4b2a7c56878db99f162f1e0b126a2e1bff"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\pine-lod2-20261020\\candidate.glb": {
+      "bytes": 1352264,
+      "sha256": "181e8e447ea4994b0851bdc6706ba5eaf1d5ef7784fb88cdc0de48e43885cef0"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\pine-lod2-20261020\\omitted-needle-triangles.json": {
+      "bytes": 38375,
+      "sha256": "de845763c921f8d865eb8481609d3c8f18ef20db9119342020aa126aa7b6ed3e"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\pine-lod2-20261020\\derivation-receipt.json": {
+      "bytes": 23686,
+      "sha256": "929a512db2385ea3b930fca9935b4147f8d40d3459a1843f1392a4038d754cbe"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\pine-lod2-20261020\\cpu-projected-coverage.png": {
+      "bytes": 44564,
+      "sha256": "8eddfd0b8aaa4dd0c76d4adc949752f757ce73b2c89b271cd5cc8b3e8a6ccfaa"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\runtime\\forest-tree-pair-v1\\horde-irregular-pine-v1-lod1.glb": {
+      "bytes": 1402952,
+      "sha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\runtime\\forest-tree-pair-v1\\asset.manifest.json": {
+      "bytes": 896,
+      "sha256": "b244efaa09eb6851c276b0377d0069396812728a1644f14c4df400dfa0d310ab"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\gameplay\\simulation\\ForestTreePlacementContract.h": {
+      "bytes": 10495,
+      "sha256": "b56b76f7122361edfddbfa371e7096416bd74b7c160e9c7a66bc5f9fce4bc1d8"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\runtime\\chapter-terrain-v1\\chapter-terrain-lod0.runtime.glb": {
+      "bytes": 18441928,
+      "sha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\runtime\\chapter-terrain-v1\\asset.manifest.json": {
+      "bytes": 781,
+      "sha256": "da0762e1250e9586022c25e1d1600c5e246ca542524cde137185f98f1fe0de13"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\pine-lod2-20261020\\native-inspection\\static-world-source.json": {
+      "bytes": 7556,
+      "sha256": "2c632e2088fa4cf7e6c06dd00ab095022d09706c0555ef6d0616dcbe806d1c1e"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\pine-lod2-20261020\\native-inspection\\static-world-selected.vertices.bin": {
+      "bytes": 7495680,
+      "sha256": "c2c048a3078e29c0db5aa9e78797550b1875ad4c3786cf33b00d49d8a8c0e95f"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\pine-lod2-20261020\\native-inspection\\static-world-selected.indices.bin": {
+      "bytes": 1124352,
+      "sha256": "6924d697f2336586d62a33625654aeac76f8a66c302110eb71e2618ec9ee29e6"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\pine-lod2-20261020\\native-inspection\\static-world-selected.regions.bin": {
+      "bytes": 93696,
+      "sha256": "2c49a62d89f2b9265db0f1725122a1d6c14c97c1f1de5fb8419759e0cbbb9e0b"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\platform\\windows\\WindowsStaticGeometrySourceInspection.inl": {
+      "bytes": 13488,
+      "sha256": "f948dc53a4da011fa83b6354b46659a8bea247492cfbf1f1065e1e15b020af38"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\scene\\ForestDressing.cpp": {
+      "bytes": 22076,
+      "sha256": "846f4ce1d2b6f423d6ce5ee3260316118af13d108f79cec85b752f93889678ae"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\scene\\assets\\StaticMeshAsset.cpp": {
+      "bytes": 72254,
+      "sha256": "0f2427e6f96d8df11c87a9bb89a1e2bf217766836fe7cc7320fb1d146a733589"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\gameplay\\simulation\\TriangleSupportSurface.h": {
+      "bytes": 26783,
+      "sha256": "62e8a2c9f1a4713b96126ac9a3223fe134e19ab5bd28a974babcda72a676b2a6"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\vulkan\\raytracing\\RtSceneAbi.generated.h": {
+      "bytes": 16339,
+      "sha256": "e7f3a672fba1b59fecabcc70605f596228cef2df6d0928f896e1a36c57b4b59c"
+    }
+  },
+  "nativeOwner": {
+    "instance": 21,
+    "stableObjectId": 1129270348,
+    "primitiveBase": 17,
+    "primitiveCount": 11,
+    "assetIndex": 8,
+    "flags": 1,
+    "geometryRole": 0
+  },
+  "nativeCheckpoint": "chapter-pine-mid",
+  "nativeStaticGeometryGeneration": 1,
+  "selected": {
+    "ownerLocalRow": 8,
+    "cachedPrimitiveRow": 25,
+    "materialName": "ForestPine",
+    "cachedMaterialRow": 23,
+    "assetMaterialRow": 8,
+    "vertexOffset": 266147,
+    "vertexCount": 117120,
+    "indexOffset": 880959,
+    "indexCount": 281088,
+    "triangleOffset": 293653,
+    "triangleCount": 93696,
+    "assetVertexOffset": 225632,
+    "assetIndexOffset": 674502,
+    "regionCounts": [
+      0,
+      0,
+      93696
+    ],
+    "verticesSha256": "c2c048a3078e29c0db5aa9e78797550b1875ad4c3786cf33b00d49d8a8c0e95f",
+    "indicesSha256": "6924d697f2336586d62a33625654aeac76f8a66c302110eb71e2618ec9ee29e6",
+    "regionsSha256": "2c49a62d89f2b9265db0f1725122a1d6c14c97c1f1de5fb8419759e0cbbb9e0b"
+  },
+  "allSelectedRegionsExteriorDressing": true,
+  "grounding": {
+    "placementIndex": 7,
+    "pineOrdinal": 3,
+    "authoredX": -22.298101214,
+    "authoredZ": 17.699113131,
+    "authoredYawRadians": 0.628318531,
+    "float32X": -22.2981014251709,
+    "float32Z": 17.699113845825195,
+    "float32YawRadians": 0.6283185482025146,
+    "float32RootBurialMetres": 0.3820955753326416,
+    "sourceMetresPerUnit": 1,
+    "sourceAxes": "+Y up, +Z forward; no node transform",
+    "terrainSupport": {
+      "worldY": 1.4882293939590454,
+      "triangle": 10371,
+      "normal": [
+        0.10137292742729187,
+        0.9926839470863342,
+        -0.06559049338102341
+      ],
+      "walkable": true
+    },
+    "sourceMinimumY": -0.0037124399095773697,
+    "fixedOrigin": [
+      -22.2981014251709,
+      1.1098462343215942,
+      17.699113845825195
+    ],
+    "recomputedRootFitY": 1.1098473072052002,
+    "rootFitVsReceiptResidualM": 1.0728836059570312e-06,
+    "rootTipSamples": 78,
+    "rootTipSamplesOnSteepGround": 13,
+    "treeGroundingQueryPolicy": "Highest upward Query face found; walkability recorded, not required by ForestDressing",
+    "fitPolicy": "Contract x/z/yaw fixed. OriginY from Query-equivalent actual terrain and authored burial; no fitted correction used."
+  },
+  "mapping": {
+    "all32IndexRepetitionsExact": true,
+    "verifiedNativeIndices": 281088,
+    "all32Uv0BytesExact": true,
+    "all32NativeFourthChannelsExact": true,
+    "fourthPineVerticesVerified": 3660,
+    "fourthPineTrianglesVerified": 2928,
+    "fixedTransformMaximumResiduals": {
+      "positionComponentM": 1.069653311702723e-06,
+      "positionVectorM": 1.393129642845691e-06,
+      "normalComponent": 1.497199292321838e-07,
+      "normalVector": 1.6606001915815917e-07,
+      "tangentComponent": 1.429499608684992e-07,
+      "tangentVector": 1.668585497358571e-07
+    },
+    "strictResidualLimit": 1e-05,
+    "minimumNormalDirectionCosine": 0.9999999999999979,
+    "minimumTangentDirectionCosine": 0.9999999999999929,
+    "tangentHandednessExact": true,
+    "minimumFaceWindingCosine": 0.9999999994259556,
+    "diagnosticInferredOriginRanges": {
+      "min": [
+        -22.29810249482421,
+        1.1098461151123047,
+        17.69911280367489
+      ],
+      "max": [
+        -22.298100365969535,
+        1.109846591949463,
+        17.69911489776855
+      ]
+    },
+    "floatArithmeticClaim": "Quantified float residuals only; reconstructed transforms/bases are not claimed bit-exact"
+  },
+  "omissionClosedness": {
+    "sourceComponents": 366,
+    "omittedComponents": 96,
+    "omittedTriangles": 768,
+    "partialComponentsOmitted": 0
+  },
+  "globalFormula": "actual ForestPine indexOffset / 3 + 8784 + source needle local triangle ID",
+  "globalMinimum": 302445,
+  "globalMaximum": 305220,
+  "validationBoundary": "Actual complete cached CPU source mapping and original closed-component omission proof only; not GPU visibility, LOD cutover, performance or device acceptance",
+  "outputs": {
+    "global-omissions.json": {
+      "bytes": 17098,
+      "sha256": "1dec93a5f912105be664834619487c2db3841857692b2f0b428f6f4c94d9ef41"
+    },
+    "global-omissions.txt": {
+      "bytes": 5376,
+      "sha256": "494cc131b6fcc635ff9efc09d12f9a9cfb26ab486f6e662d2bd9ac15464942a9"
+    }
+  }
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "path": ".github/workflows/shared-simulation-host.yml",
+    "bytes": 36947,
+    "sha256": "2cad7cc86fd408c97c71ef90c9a4c8089b5a1db07c108754c4400fd5e4444777"
+  },
+  {
+    "path": "CMakeLists.txt",
+    "bytes": 103117,
+    "sha256": "79dda25bb5e5ee83e0efcb9c62ba470a507aa08f7b29335dbe8c94cfa318931e"
+  },
+  {
+    "path": "cmake/HordeRtSources.cmake",
+    "bytes": 3210,
+    "sha256": "b2af1be842d6a8b0b2cdf86632b37d0210a4a186acf69c40e879056de3c3fd33"
+  },
+  {
+    "path": "tools/run-host-sanitizer-validation.sh",
+    "bytes": 1887,
+    "sha256": "ebed333bbb5de7ca6d7a975df81f9a75033ae7d4c8edb87e6286bfe1953c8b76"
+  },
+  {
+    "path": "src/gameplay/campaign/CampaignCheckpoint.h",
+    "bytes": 3413,
+    "sha256": "579eccaca7732954d3feced657460b2761060a8a1f3ac6eb5e675dc73d2eeecf"
+  },
+  {
+    "path": "src/gameplay/campaign/CampaignCheckpointCodec.h",
+    "bytes": 1007,
+    "sha256": "f6f22d0c6ae76d5f7c3c6e0613efd05260c32d84f9edc1c2cfc053e4587a19ad"
+  },
+  {
+    "path": "src/gameplay/campaign/CampaignCheckpointCodec.cpp",
+    "bytes": 6400,
+    "sha256": "e6948976e9ac03b5c825cd7b564bebf4a1372c727a3d69c39aeae2047058a2e4"
+  },
+  {
+    "path": "src/gameplay/campaign/CampaignCheckpointStorage.h",
+    "bytes": 2626,
+    "sha256": "95e11d108dcb1d7242422b6893bf840f5d36b5f4dc8822b51a741ae7e453f380"
+  },
+  {
+    "path": "src/gameplay/campaign/CampaignCheckpointStorage.cpp",
+    "bytes": 15817,
+    "sha256": "c55ccdf954d7d8e1d8beabfc686450ec27ff3d82ed4df1f46b2f2f9a68857901"
+  },
+  {
+    "path": "tests/CampaignCheckpointCodecTests.cpp",
+    "bytes": 10257,
+    "sha256": "3943087f2d76f1320d009b982e54b0880288740accb7d40d468a79cba3248c65"
+  },
+  {
+    "path": "tests/CampaignCheckpointStorageTests.cpp",
+    "bytes": 20100,
+    "sha256": "ac11d7d65f3cbe2d9680d97f4ec4cab52bf57b8a01d33505fe0f58c2ae8a3dfd"
+  }
+]

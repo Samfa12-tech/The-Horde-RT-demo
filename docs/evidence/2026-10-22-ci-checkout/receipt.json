@@ -1,0 +1,113 @@
+{
+  "base": "93b49b018c1876b388582a7ba751023c20532285",
+  "evidenceClass": "local Windows Release CPU and checkout/asset contracts; retained hosted failures",
+  "sourceWorkingBytes": {
+    ".gitattributes": {
+      "bytes": 33060,
+      "sha256": "9e6972f8d213b545838e91270a0b82b03847c26ce4b1fab046b71ddf6d57e05c"
+    },
+    ".github/workflows/shared-simulation-host.yml": {
+      "bytes": 38271,
+      "sha256": "e72d0eb4453e1d48bff1b9e213d00456963fdea28303de3a421ad68b47f3e026"
+    },
+    "assets/models/world/source/forest-placement-v1/woodland-placements-v3.json": {
+      "bytes": 18392,
+      "sha256": "fd57843aa4b87671dd107627c8b586a67ddbe1a8c08b62705a920dbb11ea106b"
+    },
+    "tests/Horde162AssetPolicyTests.ps1": {
+      "bytes": 51013,
+      "sha256": "6c34f7e74f36e71406fcd8ac2a8e146d44354e5796ad07dba8188d2abd05ce9c"
+    },
+    "tests/RtSceneResourceInventoryTests.cpp": {
+      "bytes": 128723,
+      "sha256": "6b144b599bb6939acd02495de5df2c8426313d39e739235bb339b9cd39157055"
+    },
+    "tests/SkinnedCharacterModelSmoke.cpp": {
+      "bytes": 173832,
+      "sha256": "95feaf535f39a7a571a0ba90da95f7e5c45b5c94adb3a787ca1ec30886daea95"
+    },
+    "tests/test_chapter_local_audio.py": {
+      "bytes": 5491,
+      "sha256": "984dcf57525184a8a5000aaddfa6098f3ee78a5f5515273069e782d1d0586bbd"
+    },
+    "tools/horde-1.7-tomb-asset-policy.ps1": {
+      "bytes": 11030,
+      "sha256": "4b5095fc9f328a6b95c3c3e21fedf3bb39b5876751b21e6f45c08449bd25f08e"
+    }
+  },
+  "evidence": {
+    "audio-cp1252-baseline.txt": {
+      "bytes": 2143,
+      "sha256": "d2735b11be6d935f2358ee686551f598b5a7f97a6b643a13f1c0c4eebd137701"
+    },
+    "audio-cp1252-test.txt": {
+      "bytes": 865,
+      "sha256": "a3835b3e91b53bb1d9f9bfeecc94a12522e1134b0192d4e37ea0343591336c4f"
+    },
+    "audio-payloads.json": {
+      "bytes": 974,
+      "sha256": "f4eb48c12bd60dfd46c4958b8e27b96327c9ca6c406588f7ec54cd9c30226fb6"
+    },
+    "content-provenance.json": {
+      "bytes": 14023,
+      "sha256": "323708e41110415f0f47adfebe3a551bf5268d02f5a054352f74bf28fd7d3c16"
+    },
+    "current-head-vulkan-excerpts.txt": {
+      "bytes": 1319,
+      "sha256": "9728a81dbc97966a596ae46a60a3f22c0cfe1ad2dbbe4e92e9f06b37de52726d"
+    },
+    "hosted-baseline-excerpts.txt": {
+      "bytes": 10601,
+      "sha256": "f3708b7a482659317249ce63499f014ff101de49c6c0c8d818207a39f33a1551"
+    },
+    "inventory-test.txt": {
+      "bytes": 1119,
+      "sha256": "86f9fa7626b22780c1054826f4d991a45abc710003271ef0cf0314e3d81bbe80"
+    },
+    "lfs-fetch.txt": {
+      "bytes": 61,
+      "sha256": "1e1aa83671aa4bf47a0fbbe09a5773cd86b8a99dd1cb8183d1ad13f29342092a"
+    },
+    "native-build.txt": {
+      "bytes": 2423,
+      "sha256": "85bdaf4cec99239af20151eefee870b345612e87ff52fc78c8ff9ccb2efd3dbe"
+    },
+    "placement-test.txt": {
+      "bytes": 44,
+      "sha256": "23ef0d29e48452b2c2a86d3fcde1de4cddce38739c8045108c4168ead9d1ee57"
+    },
+    "README.md": {
+      "bytes": 5858,
+      "sha256": "ac6ceac6b4e0ca8689fba26c1f3aa87c3287aa18cd7b7fd72776ccf424a92ee5"
+    },
+    "root-test.txt": {
+      "bytes": 97,
+      "sha256": "4fc5d58c16b6a0247ed762152f616e605a26446d8bd3adf9bde929b725fbc91e"
+    },
+    "selected-ctest.txt": {
+      "bytes": 902,
+      "sha256": "71c96ac772483bdf72cc9c40d028fcc5e52e94fc3a3e9b603ef3f9f7a60bc825"
+    },
+    "skinned-test.txt": {
+      "bytes": 4477,
+      "sha256": "8ce736774d463bfb73b7eb9e8faacb0f17f5b20d06ece996d6516a927245188a"
+    },
+    "water-checkout.json": {
+      "bytes": 1072,
+      "sha256": "0df6b749a45fe4985e78a6a3fe542d9a2c75a635f56e81a927c8e704b0c763bc"
+    },
+    "workflow-scope.json": {
+      "bytes": 149,
+      "sha256": "edf80dd681b1d2bdbe23c6129d7564992147d82c814becec87cd6e7bd1a38d5d"
+    }
+  },
+  "results": {
+    "affectedCtestPassed": 4,
+    "archiveCases": 199,
+    "nativeExecutablesPassed": 2,
+    "pcmLocalTestsPassed": 4,
+    "resourceCapacitiesChanged": false,
+    "runtimePayloadChanged": false
+  },
+  "phoneAccessed": false
+}

@@ -1,0 +1,611 @@
+{
+  "schema": 1,
+  "featureStatus": "WIP-unadmitted",
+  "baseCommit": "3223f6ed96577f538e40fd9614af4f39851de7c2",
+  "demonstratedDefect": "Detached close was retained by the outer transfer but omitted from successor lifecycle flags/receipt.",
+  "focusedFix": "OR-import pending cancel and close before Apply, preserving intent already received by the successor.",
+  "sourceFileSha256": {
+    "src/platform/windows/DiagnosticWindow.cpp": "2ed7fc5527b18fb0b2aa0050633a439b729b12b29974095fa6061c50eccd25f9",
+    "src/platform/windows/windows_campaign_validation.inl": "e99b7c94ebf7f3d6ee1989339caa560efe010d1864d9e4b7def68f99935a3477",
+    "tools/validate-windows-benchmark-detached-cancel.py": "f2dc54a6cb3b374b0ceb8f5f474927b252f901f64e36abbbe24dfd78036c66c3"
+  },
+  "preFixIntentImport": "if(context.openingBenchmarkOwner && openingBenchmark->cancelPending) context.benchmarkProfileCancelRequested=true;",
+  "builds": {
+    "Debug": {
+      "exitCode": 0,
+      "exeSha256": "622861e8e0567123aa2d7a626979435fcc6fcfa1f8bbc5a4b96b707483c64e17",
+      "logSha256": "aad08357e8ec4b8898e1aee396fe68c8b81c1e7f491368bb841950ba366bbb68"
+    },
+    "Release": {
+      "exitCode": 0,
+      "exeSha256": "6cdfae8e4f90477e8ef07ea5d946a5e82b613f92e896611ccc00a6987cd967c4",
+      "logSha256": "ff7e216767294ca5d8586c0311b770369cefae835a4bcf6a7bed2b909efa7e42"
+    }
+  },
+  "focusedContracts": {
+    "passed": 5,
+    "failed": 0,
+    "seconds": 0.14,
+    "logSha256": "784b72afdb1aba53503b8686e7876421276f206c94df6afff7a4b0e5baa821b4"
+  },
+  "cases": {
+    "detached-close-first": {
+      "exitCode": 0,
+      "seconds": 12.125,
+      "error": "Close intent missing from successor lifecycle",
+      "action": "detached-close",
+      "events": [
+        {
+          "clicked": 208
+        },
+        {
+          "clicked": 119
+        },
+        {
+          "clicked": 231
+        },
+        {
+          "clicked": 232
+        }
+      ],
+      "custodyUnchanged": true,
+      "exeSha256": "2936df70e8d55c1fc3e03e1711a9c80782052048a2fc4032acf891dad146d1a2",
+      "isolatedFixtureFiles": [
+        "manifest.json"
+      ],
+      "harnessForegroundRequestAttempted": false,
+      "nativeForegroundRequestsSuppressed": true,
+      "screenshotsAttempted": false,
+      "evidenceClass": "isolated muted Debug native HWND cancellation and actual RT return; no physical input acceptance",
+      "rawResultSha256": "da15bd74730a8b04af80cd5a6b9294435d5b71bb82fdd8e32f1b9365abadf36b",
+      "rawLifecycleSha256": "4174acce41d864acdf38fe19569ef6348e3d8e6474002eba3d458f08c3556f67",
+      "rawStderrSha256": "6f051e4362544d6d03ba19299f85e4106da9d26ea6e66cb010a55cf576140d0b",
+      "stages": [
+        "HORDE_OPENING_MENU_STAGE isolated-window no-activate",
+        "HORDE_OPENING_MENU_STAGE detached-inject context-null=1 phase=queued pending-before=0",
+        "HORDE_OPENING_MENU_STAGE close-delivery context-attached=0 phase=1",
+        "HORDE_OPENING_MENU_STAGE detached-close",
+        "HORDE_OPENING_MENU_STAGE detached-inject-result pending-after=1",
+        "HORDE_OPENING_BENCHMARK entry-retired=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK entry-presented campaignAttached=1",
+        "HORDE_OPENING_MENU_STAGE close-delivery context-attached=1 phase=0",
+        "HORDE_OPENING_BENCHMARK final-entry-retired=1 window-alive=0"
+      ],
+      "lifecycle": {
+        "requestedProfile": "custom",
+        "classification": "custom-unranked",
+        "ranked": false,
+        "actualApplyAcknowledged": false,
+        "actualRestorationAcknowledged": false,
+        "measurementAndRestorationPassed": false,
+        "cancelRequested": true,
+        "closeRequested": false,
+        "settingsWritesPermitted": false,
+        "campaignAttached": false,
+        "confirmedTupleUnchanged": true,
+        "error": "Original state is pending, cancelled, or compiled optics do not support the provisional profile.",
+        "exactWindowStateRestored": false,
+        "original": {
+          "identity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 2,
+            "recordSerial": 2,
+            "submissionSerial": 2,
+            "completionSerial": 2,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 2,
+            "finalIdleCompletion": true
+          }
+        },
+        "applied": null,
+        "restored": null
+      }
+    },
+    "detached-close-fixed": {
+      "exitCode": 0,
+      "seconds": 10.952999999979511,
+      "error": null,
+      "action": "detached-close",
+      "events": [
+        {
+          "clicked": 208
+        },
+        {
+          "clicked": 119
+        },
+        {
+          "clicked": 231
+        },
+        {
+          "clicked": 232
+        },
+        {
+          "freshEntryPresentedThenRetired": true
+        }
+      ],
+      "custodyUnchanged": true,
+      "exeSha256": "622861e8e0567123aa2d7a626979435fcc6fcfa1f8bbc5a4b96b707483c64e17",
+      "isolatedFixtureFiles": [
+        "manifest.json"
+      ],
+      "harnessForegroundRequestAttempted": false,
+      "nativeForegroundRequestsSuppressed": true,
+      "screenshotsAttempted": false,
+      "evidenceClass": "isolated muted Debug native HWND cancellation and actual RT return; no physical input acceptance",
+      "rawResultSha256": "b9e050b5e9618117cca11127e70dcab44eecaab7ad6ac5ec80bf58daa77194c3",
+      "rawLifecycleSha256": "ea1c7e7304eefc979be20f8fc87745fff00d9d0bdfbce466aa589c4e4274b337",
+      "rawStderrSha256": "6f051e4362544d6d03ba19299f85e4106da9d26ea6e66cb010a55cf576140d0b",
+      "stages": [
+        "HORDE_OPENING_MENU_STAGE isolated-window no-activate",
+        "HORDE_OPENING_MENU_STAGE detached-inject context-null=1 phase=queued pending-before=0",
+        "HORDE_OPENING_MENU_STAGE close-delivery context-attached=0 phase=1",
+        "HORDE_OPENING_MENU_STAGE detached-close",
+        "HORDE_OPENING_MENU_STAGE detached-inject-result pending-after=1",
+        "HORDE_OPENING_BENCHMARK entry-retired=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK entry-presented campaignAttached=1",
+        "HORDE_OPENING_MENU_STAGE close-delivery context-attached=1 phase=0",
+        "HORDE_OPENING_BENCHMARK final-entry-retired=1 window-alive=0"
+      ],
+      "lifecycle": {
+        "requestedProfile": "custom",
+        "classification": "custom-unranked",
+        "ranked": false,
+        "actualApplyAcknowledged": false,
+        "actualRestorationAcknowledged": false,
+        "measurementAndRestorationPassed": false,
+        "cancelRequested": true,
+        "closeRequested": true,
+        "settingsWritesPermitted": false,
+        "campaignAttached": false,
+        "confirmedTupleUnchanged": true,
+        "error": "Original state is pending, cancelled, or compiled optics do not support the provisional profile.",
+        "exactWindowStateRestored": false,
+        "original": {
+          "identity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 2,
+            "recordSerial": 2,
+            "submissionSerial": 2,
+            "completionSerial": 2,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 2,
+            "finalIdleCompletion": true
+          }
+        },
+        "applied": null,
+        "restored": null
+      }
+    },
+    "standard-close-after-apply": {
+      "exitCode": 0,
+      "seconds": 11.827999999979511,
+      "error": null,
+      "action": "close-after-apply",
+      "events": [
+        {
+          "clicked": 208
+        },
+        {
+          "clicked": 119
+        },
+        {
+          "clicked": 230
+        },
+        {
+          "clicked": 232
+        },
+        {
+          "freshEntryPresentedThenRetired": true
+        }
+      ],
+      "custodyUnchanged": true,
+      "exeSha256": "622861e8e0567123aa2d7a626979435fcc6fcfa1f8bbc5a4b96b707483c64e17",
+      "isolatedFixtureFiles": [
+        "manifest.json"
+      ],
+      "harnessForegroundRequestAttempted": false,
+      "nativeForegroundRequestsSuppressed": true,
+      "screenshotsAttempted": false,
+      "evidenceClass": "isolated muted Debug native HWND cancellation and actual RT return; no physical input acceptance",
+      "rawResultSha256": "4e07891e8394715323797adb8f4f59de76a22596f450adb8ddb7077382aed90b",
+      "rawLifecycleSha256": "b9ab2ca8eeb2ef1d0f03c1c87b3156fc2f24f86cc57b0876fde63e81106c9a91",
+      "rawStderrSha256": "b95da05b29e9772b19b749aacc00bbf166feeb6664551b4555791d1b5479f7bc",
+      "stages": [
+        "HORDE_OPENING_MENU_STAGE isolated-window no-activate",
+        "HORDE_OPENING_BENCHMARK entry-retired=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK applied fixed=1 campaignAttached=0",
+        "HORDE_OPENING_MENU_STAGE close-delivery context-attached=1 phase=2",
+        "HORDE_OPENING_BENCHMARK benchmark-retired=1 restored=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK entry-presented campaignAttached=1",
+        "HORDE_OPENING_MENU_STAGE close-delivery context-attached=1 phase=0",
+        "HORDE_OPENING_BENCHMARK final-entry-retired=1 window-alive=0"
+      ],
+      "lifecycle": {
+        "requestedProfile": "windows-rt-provisional-v1",
+        "classification": "custom-unranked",
+        "ranked": false,
+        "actualApplyAcknowledged": true,
+        "actualRestorationAcknowledged": true,
+        "measurementAndRestorationPassed": false,
+        "cancelRequested": true,
+        "closeRequested": true,
+        "settingsWritesPermitted": false,
+        "campaignAttached": false,
+        "confirmedTupleUnchanged": true,
+        "error": "",
+        "exactWindowStateRestored": true,
+        "original": {
+          "identity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 2,
+            "recordSerial": 2,
+            "submissionSerial": 2,
+            "completionSerial": 2,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 2,
+            "finalIdleCompletion": true
+          }
+        },
+        "applied": {
+          "identity": {
+            "sceneEpoch": 5,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 3,
+            "recordSerial": 3,
+            "submissionSerial": 3,
+            "completionSerial": 3,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              1920,
+              1080
+            ],
+            "outputExtent": [
+              1920,
+              1080
+            ],
+            "cameraAspect": 1.77777779,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": false,
+            "aspectPreserved": true
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 3,
+            "finalIdleCompletion": true
+          }
+        },
+        "restored": {
+          "identity": {
+            "sceneEpoch": 6,
+            "measurementGeneration": 6,
+            "recordAttemptSerial": 5,
+            "recordSerial": 5,
+            "submissionSerial": 5,
+            "completionSerial": 5,
+            "simulationTick": 7,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 5,
+            "finalIdleCompletion": true
+          }
+        }
+      }
+    },
+    "detached-cancel-close-regression": {
+      "exitCode": 0,
+      "seconds": 8.625,
+      "error": null,
+      "action": "detached-cancel",
+      "events": [
+        {
+          "clicked": 208
+        },
+        {
+          "clicked": 119
+        },
+        {
+          "clicked": 231
+        },
+        {
+          "clicked": 232
+        },
+        {
+          "restored": true,
+          "resultCaption": "BENCHMARK CANCELLED"
+        }
+      ],
+      "custodyUnchanged": true,
+      "exeSha256": "622861e8e0567123aa2d7a626979435fcc6fcfa1f8bbc5a4b96b707483c64e17",
+      "isolatedFixtureFiles": [
+        "manifest.json"
+      ],
+      "harnessForegroundRequestAttempted": false,
+      "nativeForegroundRequestsSuppressed": true,
+      "screenshotsAttempted": false,
+      "evidenceClass": "isolated muted Debug native HWND cancellation and actual RT return; no physical input acceptance",
+      "rawResultSha256": "85ad299565d4fc0c80432d56c56372ad94a84deecdcae89763e8dacca382dbda",
+      "rawLifecycleSha256": "eb8612bd3b2ac2271ecde60eb5350b3181af370d88611d6857e5c981d7605b7f",
+      "rawStderrSha256": "6b205d377deeb1cf02b57f891227efb59ffb5f3057ae56c0ef305f410f77ea47",
+      "stages": [
+        "HORDE_OPENING_MENU_STAGE isolated-window no-activate",
+        "HORDE_OPENING_MENU_STAGE detached-inject context-null=1 phase=queued pending-before=0",
+        "HORDE_OPENING_MENU_STAGE escape-delivery context-attached=0 phase=1",
+        "HORDE_OPENING_MENU_STAGE detached-cancel",
+        "HORDE_OPENING_MENU_STAGE detached-inject-result pending-after=1",
+        "HORDE_OPENING_BENCHMARK entry-retired=1 successorAdmitted=1",
+        "HORDE_OPENING_BENCHMARK entry-presented campaignAttached=1",
+        "HORDE_OPENING_MENU_STAGE close-delivery context-attached=1 phase=0"
+      ],
+      "lifecycle": {
+        "requestedProfile": "custom",
+        "classification": "custom-unranked",
+        "ranked": false,
+        "actualApplyAcknowledged": false,
+        "actualRestorationAcknowledged": false,
+        "measurementAndRestorationPassed": false,
+        "cancelRequested": true,
+        "closeRequested": false,
+        "settingsWritesPermitted": false,
+        "campaignAttached": false,
+        "confirmedTupleUnchanged": true,
+        "error": "Original state is pending, cancelled, or compiled optics do not support the provisional profile.",
+        "exactWindowStateRestored": false,
+        "original": {
+          "identity": {
+            "sceneEpoch": 4,
+            "measurementGeneration": 2,
+            "recordAttemptSerial": 2,
+            "recordSerial": 2,
+            "submissionSerial": 2,
+            "completionSerial": 2,
+            "simulationTick": 0,
+            "frameSlot": 0
+          },
+          "submittedDimensions": {
+            "internalExtent": [
+              924,
+              602
+            ],
+            "outputExtent": [
+              1232,
+              803
+            ],
+            "cameraAspect": 1.53488374,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": true,
+            "aspectPreserved": false
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 2,
+            "finalIdleCompletion": true
+          }
+        },
+        "applied": null,
+        "restored": null
+      }
+    }
+  },
+  "startupGuards": {
+    "cases": [
+      {
+        "name": "close-requires-isolated-mode",
+        "exitCode": 2,
+        "stderr": "Detached benchmark input validation requires isolated --benchmark-menu-validate.",
+        "exeSha256": "622861e8e0567123aa2d7a626979435fcc6fcfa1f8bbc5a4b96b707483c64e17"
+      },
+      {
+        "name": "mutually-exclusive-injection",
+        "exitCode": 2,
+        "stderr": "Select one detached benchmark input validation action.",
+        "exeSha256": "622861e8e0567123aa2d7a626979435fcc6fcfa1f8bbc5a4b96b707483c64e17"
+      },
+      {
+        "name": "release-remains-debug-only",
+        "exitCode": 2,
+        "stderr": "Hidden campaign validation is Debug-only.",
+        "exeSha256": "6cdfae8e4f90477e8ef07ea5d946a5e82b613f92e896611ccc00a6987cd967c4"
+      }
+    ],
+    "settingsUnchanged": true,
+    "releaseInteractionAccepted": false
+  },
+  "earlierReceiptsUnchanged": {
+    "docs/evidence/2026-10-23-benchmark-menu-wip/receipt.json": "11098052bff0c8d9763b26dec6f90b7177ab956b0a0c6cdb114b5c40df17acb2",
+    "docs/evidence/2026-10-23-benchmark-detached-cancel/receipt.json": "e0ab7b4b0ad187421fbd1eb1e2459c9c4468d099ceb1c3ca0690ce6350a59bc1"
+  },
+  "correctionCi": {
+    "runId": 40024208451,
+    "headSha": "3223f6ed96577f538e40fd9614af4f39851de7c2",
+    "status": "completed",
+    "conclusion": "success",
+    "attempt": 1,
+    "updatedAt": "2026-10-23T21:15:18Z",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40024208451",
+    "jobs": [
+      {
+        "id": 120656150515,
+        "name": "Android Debug build, playback/report contracts and lint",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T21:05:45Z",
+        "completedAt": "2026-10-23T21:12:39Z",
+        "durationSeconds": 414.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40024208451/job/120656150515",
+        "activeSteps": [],
+        "failedSteps": []
+      },
+      {
+        "id": 120656150703,
+        "name": "Shared simulation host (Clang)",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T21:05:46Z",
+        "completedAt": "2026-10-23T21:15:17Z",
+        "durationSeconds": 571.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40024208451/job/120656150703",
+        "activeSteps": [],
+        "failedSteps": []
+      },
+      {
+        "id": 120656150744,
+        "name": "Shared simulation host (GCC)",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T21:05:45Z",
+        "completedAt": "2026-10-23T21:13:44Z",
+        "durationSeconds": 479.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40024208451/job/120656150744",
+        "activeSteps": [],
+        "failedSteps": []
+      },
+      {
+        "id": 120656150853,
+        "name": "Shared simulation host (MSVC)",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T21:05:46Z",
+        "completedAt": "2026-10-23T21:13:49Z",
+        "durationSeconds": 483.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40024208451/job/120656150853",
+        "activeSteps": [],
+        "failedSteps": []
+      },
+      {
+        "id": 120656150878,
+        "name": "Selected host contracts (Clang ASan/UBSan)",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T21:05:45Z",
+        "completedAt": "2026-10-23T21:11:26Z",
+        "durationSeconds": 341.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40024208451/job/120656150878",
+        "activeSteps": [],
+        "failedSteps": []
+      },
+      {
+        "id": 120656150892,
+        "name": "player-vulkan-host",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAt": "2026-10-23T21:05:46Z",
+        "completedAt": "2026-10-23T21:14:15Z",
+        "durationSeconds": 509.0,
+        "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40024208451/job/120656150892",
+        "activeSteps": [],
+        "failedSteps": []
+      }
+    ]
+  },
+  "remainingAcceptance": [
+    "visible Windows layout and DPI",
+    "physical keyboard/controller interaction",
+    "Entry/Showcase transition listening",
+    "Release menu runtime interaction",
+    "other message interleavings, physical Alt-F4/Exit and failure/fatal-retention boundaries",
+    "Android profile and physical acceptance",
+    "PR27 base conflict resolution/review"
+  ],
+  "releaseRuntime": {
+    "status": "pending",
+    "action": "Isolated Release opening-menu benchmark acceptance",
+    "target": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+    "reason": "Isolated menu adapter is Debug-only; normal Release activation and owner-state access are outside this test scope.",
+    "completed": "Release compilation and startup rejection guards; no interactive Release launch."
+  },
+  "foregroundRequests": 0,
+  "phoneOperations": 0,
+  "torchEdits": false,
+  "reportTransmission": false,
+  "mergeOrRelease": false,
+  "parkedOwnerFilesExcluded": 151,
+  "audioHapticManualRevalidationRequired": true
+}

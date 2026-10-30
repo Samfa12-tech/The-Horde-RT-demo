@@ -1,0 +1,328 @@
+{
+  "debug": {
+    "streams": [
+      {
+        "file": "0-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "2db32da2e8cf4fbf5e1d5ad8611a58d6a27ad2ef68602e504fd69d29a98e401b",
+        "after": "2db32da2e8cf4fbf5e1d5ad8611a58d6a27ad2ef68602e504fd69d29a98e401b",
+        "identical": true
+      },
+      {
+        "file": "0-world.bin",
+        "bytes": 2195456,
+        "before": "81fb608ae470291e5b613109d427aff2d77bffaa9f3c940190c49f00f101bc39",
+        "after": "81fb608ae470291e5b613109d427aff2d77bffaa9f3c940190c49f00f101bc39",
+        "identical": true
+      },
+      {
+        "file": "1-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "659dafb16537db4a3c52a235aa1e4aac680d223189602c8a23eea0a060eb1ba1",
+        "after": "659dafb16537db4a3c52a235aa1e4aac680d223189602c8a23eea0a060eb1ba1",
+        "identical": true
+      },
+      {
+        "file": "1-world.bin",
+        "bytes": 2195456,
+        "before": "97aad44d12f97537d58a1f9416e761138b309c02d262fc1c2fe95afde4dff7c4",
+        "after": "97aad44d12f97537d58a1f9416e761138b309c02d262fc1c2fe95afde4dff7c4",
+        "identical": true
+      },
+      {
+        "file": "2-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "90d55e9c41644c73105992f6b0468e91902bf21b19c6c17fe371ef14dd301d49",
+        "after": "90d55e9c41644c73105992f6b0468e91902bf21b19c6c17fe371ef14dd301d49",
+        "identical": true
+      },
+      {
+        "file": "2-world.bin",
+        "bytes": 2195456,
+        "before": "c8dec9818a7bf2a250f76d7449975fb75ea6f78687638a8f81c5dca85d0bce6c",
+        "after": "c8dec9818a7bf2a250f76d7449975fb75ea6f78687638a8f81c5dca85d0bce6c",
+        "identical": true
+      },
+      {
+        "file": "3-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "3cbe8ec9da223416e9f53bcfe6622e4a12d9452485bb43a527c9d6a722add590",
+        "after": "3cbe8ec9da223416e9f53bcfe6622e4a12d9452485bb43a527c9d6a722add590",
+        "identical": true
+      },
+      {
+        "file": "3-world.bin",
+        "bytes": 2195456,
+        "before": "37ff747d7a2dbb4c1728e3a1e32470aed647af8c12a522fc5432c51826e06acb",
+        "after": "37ff747d7a2dbb4c1728e3a1e32470aed647af8c12a522fc5432c51826e06acb",
+        "identical": true
+      },
+      {
+        "file": "4-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "2a93b22c1424ffdc7b93030d38408c76605866ace1b28a0e33660fac91fb711a",
+        "after": "2a93b22c1424ffdc7b93030d38408c76605866ace1b28a0e33660fac91fb711a",
+        "identical": true
+      },
+      {
+        "file": "4-world.bin",
+        "bytes": 2195456,
+        "before": "e52cb1f32257a860bac00bc8a1ed7fea287aafcb1a65d4c78ad0cecc2f71ed69",
+        "after": "e52cb1f32257a860bac00bc8a1ed7fea287aafcb1a65d4c78ad0cecc2f71ed69",
+        "identical": true
+      },
+      {
+        "file": "5-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "901bec3dd871c8d9d4dd5fbd3cd7d71b448dd422d28cbf7c10f5c4dadb03ab45",
+        "after": "901bec3dd871c8d9d4dd5fbd3cd7d71b448dd422d28cbf7c10f5c4dadb03ab45",
+        "identical": true
+      },
+      {
+        "file": "5-world.bin",
+        "bytes": 2195456,
+        "before": "34b55f4d04b139c2382734a53c76e6715c696d04c8fc19ff655f3fff57d9ccfd",
+        "after": "34b55f4d04b139c2382734a53c76e6715c696d04c8fc19ff655f3fff57d9ccfd",
+        "identical": true
+      },
+      {
+        "file": "6-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "7018540ff38eee04f5aaba39b663d878312145a28f5b0a3dc40f1c1801305d09",
+        "after": "7018540ff38eee04f5aaba39b663d878312145a28f5b0a3dc40f1c1801305d09",
+        "identical": true
+      },
+      {
+        "file": "6-world.bin",
+        "bytes": 2195456,
+        "before": "77b8a9de2351200222ba71fdbc89d301f4df1db21f2337430f079b1b8c8b0b63",
+        "after": "77b8a9de2351200222ba71fdbc89d301f4df1db21f2337430f079b1b8c8b0b63",
+        "identical": true
+      },
+      {
+        "file": "7-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "f601f244e1435f4d0c961ac9d152b1978cd25b063d3453914dc35fec35a9c140",
+        "after": "f601f244e1435f4d0c961ac9d152b1978cd25b063d3453914dc35fec35a9c140",
+        "identical": true
+      },
+      {
+        "file": "7-world.bin",
+        "bytes": 2195456,
+        "before": "7e7a516e679af4d29faa633d4d96ba86918acdbd51eed2043f088001fc9fe373",
+        "after": "7e7a516e679af4d29faa633d4d96ba86918acdbd51eed2043f088001fc9fe373",
+        "identical": true
+      }
+    ],
+    "allByteIdentical": true,
+    "metrics": {
+      "before": {
+        "samples": 96,
+        "evaluateUs": {
+          "mean": 327.51770833333336,
+          "median": 291.85,
+          "p95": 489.5,
+          "max": 1885.7
+        },
+        "worldSkinUs": {
+          "mean": 34411.71666666667,
+          "median": 34122.55,
+          "p95": 40272.4,
+          "max": 44797.3
+        },
+        "viewmodelSkinUs": {
+          "mean": 11832.6625,
+          "median": 11543.85,
+          "p95": 15442.7,
+          "max": 19582.0
+        },
+        "combinedSkinMedianUs": 46209.600000000006
+      },
+      "after": {
+        "samples": 96,
+        "evaluateUs": {
+          "mean": 187.12916666666666,
+          "median": 164.3,
+          "p95": 259.0,
+          "max": 1327.6
+        },
+        "worldSkinUs": {
+          "mean": 16794.953125,
+          "median": 16674.15,
+          "p95": 18740.9,
+          "max": 19835.9
+        },
+        "viewmodelSkinUs": {
+          "mean": 5837.7375,
+          "median": 5734.15,
+          "p95": 6689.0,
+          "max": 7510.7
+        },
+        "combinedSkinMedianUs": 22519.0
+      }
+    }
+  },
+  "release": {
+    "streams": [
+      {
+        "file": "0-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "2db32da2e8cf4fbf5e1d5ad8611a58d6a27ad2ef68602e504fd69d29a98e401b",
+        "after": "2db32da2e8cf4fbf5e1d5ad8611a58d6a27ad2ef68602e504fd69d29a98e401b",
+        "identical": true
+      },
+      {
+        "file": "0-world.bin",
+        "bytes": 2195456,
+        "before": "81fb608ae470291e5b613109d427aff2d77bffaa9f3c940190c49f00f101bc39",
+        "after": "81fb608ae470291e5b613109d427aff2d77bffaa9f3c940190c49f00f101bc39",
+        "identical": true
+      },
+      {
+        "file": "1-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "659dafb16537db4a3c52a235aa1e4aac680d223189602c8a23eea0a060eb1ba1",
+        "after": "659dafb16537db4a3c52a235aa1e4aac680d223189602c8a23eea0a060eb1ba1",
+        "identical": true
+      },
+      {
+        "file": "1-world.bin",
+        "bytes": 2195456,
+        "before": "97aad44d12f97537d58a1f9416e761138b309c02d262fc1c2fe95afde4dff7c4",
+        "after": "97aad44d12f97537d58a1f9416e761138b309c02d262fc1c2fe95afde4dff7c4",
+        "identical": true
+      },
+      {
+        "file": "2-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "90d55e9c41644c73105992f6b0468e91902bf21b19c6c17fe371ef14dd301d49",
+        "after": "90d55e9c41644c73105992f6b0468e91902bf21b19c6c17fe371ef14dd301d49",
+        "identical": true
+      },
+      {
+        "file": "2-world.bin",
+        "bytes": 2195456,
+        "before": "c8dec9818a7bf2a250f76d7449975fb75ea6f78687638a8f81c5dca85d0bce6c",
+        "after": "c8dec9818a7bf2a250f76d7449975fb75ea6f78687638a8f81c5dca85d0bce6c",
+        "identical": true
+      },
+      {
+        "file": "3-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "3cbe8ec9da223416e9f53bcfe6622e4a12d9452485bb43a527c9d6a722add590",
+        "after": "3cbe8ec9da223416e9f53bcfe6622e4a12d9452485bb43a527c9d6a722add590",
+        "identical": true
+      },
+      {
+        "file": "3-world.bin",
+        "bytes": 2195456,
+        "before": "37ff747d7a2dbb4c1728e3a1e32470aed647af8c12a522fc5432c51826e06acb",
+        "after": "37ff747d7a2dbb4c1728e3a1e32470aed647af8c12a522fc5432c51826e06acb",
+        "identical": true
+      },
+      {
+        "file": "4-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "2a93b22c1424ffdc7b93030d38408c76605866ace1b28a0e33660fac91fb711a",
+        "after": "2a93b22c1424ffdc7b93030d38408c76605866ace1b28a0e33660fac91fb711a",
+        "identical": true
+      },
+      {
+        "file": "4-world.bin",
+        "bytes": 2195456,
+        "before": "e52cb1f32257a860bac00bc8a1ed7fea287aafcb1a65d4c78ad0cecc2f71ed69",
+        "after": "e52cb1f32257a860bac00bc8a1ed7fea287aafcb1a65d4c78ad0cecc2f71ed69",
+        "identical": true
+      },
+      {
+        "file": "5-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "901bec3dd871c8d9d4dd5fbd3cd7d71b448dd422d28cbf7c10f5c4dadb03ab45",
+        "after": "901bec3dd871c8d9d4dd5fbd3cd7d71b448dd422d28cbf7c10f5c4dadb03ab45",
+        "identical": true
+      },
+      {
+        "file": "5-world.bin",
+        "bytes": 2195456,
+        "before": "34b55f4d04b139c2382734a53c76e6715c696d04c8fc19ff655f3fff57d9ccfd",
+        "after": "34b55f4d04b139c2382734a53c76e6715c696d04c8fc19ff655f3fff57d9ccfd",
+        "identical": true
+      },
+      {
+        "file": "6-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "7018540ff38eee04f5aaba39b663d878312145a28f5b0a3dc40f1c1801305d09",
+        "after": "7018540ff38eee04f5aaba39b663d878312145a28f5b0a3dc40f1c1801305d09",
+        "identical": true
+      },
+      {
+        "file": "6-world.bin",
+        "bytes": 2195456,
+        "before": "77b8a9de2351200222ba71fdbc89d301f4df1db21f2337430f079b1b8c8b0b63",
+        "after": "77b8a9de2351200222ba71fdbc89d301f4df1db21f2337430f079b1b8c8b0b63",
+        "identical": true
+      },
+      {
+        "file": "7-viewmodel.bin",
+        "bytes": 1014720,
+        "before": "f601f244e1435f4d0c961ac9d152b1978cd25b063d3453914dc35fec35a9c140",
+        "after": "f601f244e1435f4d0c961ac9d152b1978cd25b063d3453914dc35fec35a9c140",
+        "identical": true
+      },
+      {
+        "file": "7-world.bin",
+        "bytes": 2195456,
+        "before": "7e7a516e679af4d29faa633d4d96ba86918acdbd51eed2043f088001fc9fe373",
+        "after": "7e7a516e679af4d29faa633d4d96ba86918acdbd51eed2043f088001fc9fe373",
+        "identical": true
+      }
+    ],
+    "allByteIdentical": true,
+    "metrics": {
+      "before": {
+        "samples": 96,
+        "evaluateUs": {
+          "mean": 22.747916666666665,
+          "median": 18.7,
+          "p95": 32.2,
+          "max": 125.1
+        },
+        "worldSkinUs": {
+          "mean": 2924.0354166666666,
+          "median": 2741.8500000000004,
+          "p95": 4303.6,
+          "max": 5221.9
+        },
+        "viewmodelSkinUs": {
+          "mean": 1141.353125,
+          "median": 1139.45,
+          "p95": 1701.9,
+          "max": 2489.1
+        },
+        "combinedSkinMedianUs": 3769.8499999999995
+      },
+      "after": {
+        "samples": 96,
+        "evaluateUs": {
+          "mean": 12.009375,
+          "median": 11.2,
+          "p95": 22.2,
+          "max": 25.1
+        },
+        "worldSkinUs": {
+          "mean": 1473.6885416666667,
+          "median": 1374.15,
+          "p95": 1946.5,
+          "max": 2651.3
+        },
+        "viewmodelSkinUs": {
+          "mean": 577.853125,
+          "median": 537.45,
+          "p95": 860.7,
+          "max": 1150.9
+        },
+        "combinedSkinMedianUs": 1926.65
+      }
+    }
+  }
+}

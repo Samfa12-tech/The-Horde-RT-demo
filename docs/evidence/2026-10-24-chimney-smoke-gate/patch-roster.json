@@ -1,0 +1,58 @@
+[
+  {
+    "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+    "normalizedCandidateSha256": "f07f7d85d60260a88367d251d37a6f3eb65c47125c19e060b9f549ad2bf042ab"
+  },
+  {
+    "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+    "normalizedCandidateSha256": "fc2be2b0bbc973c6e52d7fc9c6c9e502cb55fcc81b4adfc565670a36e091c2ca"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtSceneAbi.def",
+    "normalizedCandidateSha256": "42224009853cb55f055cd3d25be5f36300b7657771d972c7ac100ac1a201d985"
+  },
+  {
+    "path": "tests/RtSceneAbiTests.cpp",
+    "normalizedCandidateSha256": "4252e677419b9ade726cc9f9f2b0add86ba715603f871454324c9e0a6d30c6b6"
+  },
+  {
+    "path": "tools/generate-rt-scene-abi.ps1",
+    "normalizedCandidateSha256": "c534f5fce9c2a42fa52e6501b9a3a30b439857b45efd251e31d4c0a657378bab"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+    "normalizedCandidateSha256": "ca4e6dbf463c92dbdcf0d8a5c69b8cb6465c258e676086d275b946bd8a56f908"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_frame.glsl",
+    "normalizedCandidateSha256": "6d55677b1a2f15385726ca8bff70baf8ff1746eb37bdeb6683127791cd8eb177"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_lighting.glsl",
+    "normalizedCandidateSha256": "08af7df2201c25ee9ed978a627736dca19ba69932904f2614b1f93a74b9bac7b"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+    "normalizedCandidateSha256": "2d28e476e2def45806f12454853e7f6a0add63767af28760ede7a4984f2e35ec"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+    "normalizedCandidateSha256": "20bd1b2dc88a53d762b51923c49ee251125fe86ed9ce5946ade2e4e48c4bd282"
+  },
+  {
+    "path": "src/vulkan/raytracing/SmokeMediumUpload.h",
+    "normalizedCandidateSha256": "569502b760bb54cf68555d8f7adbd3f2b28453dbbadaa1473ae39b7b8fb1c0f8"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_medium_common.glsl",
+    "normalizedCandidateSha256": "9e5eca3977a986ceecfd2a02b21cdc41cced0f44cddbf16217a94b9c1528a74c"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_smoke_density.glsl",
+    "normalizedCandidateSha256": "5850f032ba41e29427a9db00df901d36bab418733bb3e8a15a61e196cb036c3f"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_smoke_scattering.glsl",
+    "normalizedCandidateSha256": "46aa67193efe668d95fcbe2c12a5fa36f146ac6857f4bf937738011ae1dbdf10"
+  }
+]

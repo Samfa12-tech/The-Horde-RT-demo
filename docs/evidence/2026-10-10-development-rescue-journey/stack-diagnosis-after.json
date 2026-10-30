@@ -1,0 +1,23 @@
+{
+  "runtime_source_commit": "1a0205efcb423a3df527f617cf2fe48034116cb3",
+  "test_correction_commit": "f01d02dcc77efc27993b2c8b273915667993da57",
+  "msvc_debug_main_frame_bytes": 106840,
+  "previous_main_frame_bytes": 840776,
+  "exe_pe_stack_reserve_bytes": 1048576,
+  "main_prologue": [
+    "main:",
+    "  0000000000000740: push        rsi",
+    "  0000000000000742: push        rdi",
+    "  0000000000000743: mov         eax,1A158h",
+    "  0000000000000748: call        __chkstk",
+    "  000000000000074D: sub         rsp,rax",
+    "  0000000000000750: lea         rdi,[rsp+30h]",
+    "  0000000000000755: mov         ecx,684Ah",
+    "  000000000000075A: mov         eax,0CCCCCCCCh",
+    "  000000000000075F: rep stos    dword ptr [rdi]"
+  ],
+  "disassembly_raw_sha256": "6852a253e2e139f242afb1aec085df1c82a1b0b0c0a5d7739ab3f2f2092dca5e",
+  "debug_registered_result": "PASS 8.04 seconds",
+  "release_registered_result": "PASS; see exact run log",
+  "correction": "Test fixture heap ownership only; assertions, iteration counts, game source, stack policy and timeouts unchanged."
+}

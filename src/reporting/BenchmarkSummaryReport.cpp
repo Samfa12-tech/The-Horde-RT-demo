@@ -1,5 +1,8 @@
 #include "reporting/BenchmarkSummaryReport.h"
+#include "reporting/PublicBenchmarkReport.h"
 #include "reporting/PlaytestReport.h"
+#include "reporting/BuildIdentity.h"
+#include "gameplay/BenchmarkProfile.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -88,43 +91,22 @@ void Population(std::ostream& out, const BenchmarkSummaryPopulation& p, const bo
         ",\"valid\":" << p.gpuStatuses.valid << ",\"disabled\":" << p.gpuStatuses.disabled <<
         ",\"unsupported\":" << p.gpuStatuses.unsupported << ",\"compiledOut\":" << p.gpuStatuses.compiledOut << "}}";
 }
-} // namespace
-
-PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(const FrozenBenchmarkSummary& summary,
-    const BenchmarkSummaryReportApproval& approval)
+void Configuration(std::ostream& out, const BenchmarkSummaryData& data)
 {
-    PreparedBenchmarkSummaryReport result;
-    if (!approval.consentToPrepare) { result.status_ = BenchmarkSummaryReportStatus::ConsentRequired; return result; }
-    if (!summary.IsReady()) return result;
-    if (!IsBenchmarkSummaryUuid(approval.reportUuid)) { result.status_ = BenchmarkSummaryReportStatus::InvalidIdentity; return result; }
-    const PlaytestReportInput validation{approval.reportUuid, approval.capturedAtUtc,
-        PlaytestReportCategory::Performance, PlaytestReportImpact::Polish, "Benchmark summary", true};
-    if (!PreparePlaytestReport(validation).IsReady())
-    { result.status_ = BenchmarkSummaryReportStatus::InvalidTimestamp; return result; }
-    const auto& data = summary.Data();
-    const auto cooling = approval.declaredCooling.value_or(data.cooling);
-    if (cooling > BenchmarkSummaryCooling::ExternalDeclared)
-    { result.status_ = BenchmarkSummaryReportStatus::InvalidCooling; return result; }
-    const auto& c = data.configuration;
-    const auto& m = c.metadata;
-    if (!SafeLabel(m.buildIdentity) || !ValidShaderPair(m.shaderIdentity) || !SafeLabel(m.materialEncoding) ||
-        (approval.includeBasicHardware && (!SafeLabel(data.rawModel) || !SafeLabel(m.gpuName) || !SafeLabel(m.vulkanApi))))
-    { result.status_ = BenchmarkSummaryReportStatus::InvalidLabel; return result; }
-    std::ostringstream out;
-    out.imbue(std::locale::classic());
-    out << std::setprecision(8) << "{\"schemaVersion\":2,\"product\":\"horde-lantern-rt\",\"reportKind\":\"benchmark-summary\","
-        "\"consentToPrepare\":true,\"includeBasicHardware\":" << (approval.includeBasicHardware ? "true" : "false") <<
-        ",\"report\":{\"schemaVersion\":1,\"reportId\":";
-    Text(out, approval.reportUuid); out << ",\"capturedAtUtc\":"; Text(out, approval.capturedAtUtc);
-    out << ",\"runId\":"; Text(out, data.runUuid);
-    out << ",\"result\":\"complete\",\"workload\":"; Text(out, horde::gameplay::BenchmarkWorkloadName(data.workload));
-    out << ",\"simulationPolicy\":";
-    Text(out, horde::gameplay::IsFrozenBenchmark(data.workload) ? "frozen-authored-snapshot" : "fixed-step-60hz");
-    out << ",\"warmupLaps\":1,\"measuredLaps\":1,\"completedLaps\":" << data.laps <<
-        ",\"rtPresentedEveryMeasuredFrame\":true,\"scanoutFpsMeasured\":false,\"counts\":{\"expected\":" << data.overall.frames <<
-        ",\"completed\":" << data.overall.frames << ",\"cpuAccepted\":" << data.overall.frames <<
-        ",\"rejected\":0,\"cancelled\":0,\"cpuRejected\":0,\"outstanding\":0},\"configuration\":{\"platform\":";
+    const auto& c=data.configuration;
+    const auto& m=c.metadata;
+    out << "{\"platform\":";
     Text(out, c.platform == BenchmarkSummaryPlatform::Windows ? "Windows" : "Android");
+    // Live owners do not yet apply/observe fixed profile surfaces. Never infer
+    // a standard from coincidentally matching endpoints or pixel dimensions.
+    out << ",\"benchmarkProfile\":{\"id\":";
+    Text(out, horde::gameplay::BenchmarkProfileName(horde::gameplay::BenchmarkProfileId::Custom));
+    out << ",\"classification\":";
+    Text(out, horde::gameplay::BenchmarkProfileClassificationName(horde::gameplay::BenchmarkProfileId::Custom));
+    out << ",\"ranked\":false}";
+    out << ",\"submittedDimensions\":";
+    if (data.submittedDimensions) WriteRtFrameDimensionsEvidenceJson(out, *data.submittedDimensions);
+    else out << "null";
     out << ",\"build\":"; Text(out, m.buildIdentity); out << ",\"shaderPair\":"; Text(out, m.shaderIdentity);
     out << ",\"executionBackend\":"; Text(out, m.executionBackend);
     out << ",\"presentMode\":"; Text(out, m.presentMode);
@@ -152,7 +134,44 @@ PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(const FrozenBenchma
         out << ",\"actualUploadedMistEnabled\":" << (*c.actualUploadedMistEnabled ? "true" : "false");
     if (c.actualUploadedDustQuality.has_value())
         out << ",\"actualUploadedDustQuality\":" << static_cast<unsigned>(*c.actualUploadedDustQuality);
-    out << ",\"glassEnabled\":" << (c.glassEnabled ? "true" : "false") << "},\"legacyFrameTimingScope\":";
+    out << ",\"glassEnabled\":" << (c.glassEnabled ? "true" : "false") << '}';
+}
+} // namespace
+
+PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(const FrozenBenchmarkSummary& summary,
+    const BenchmarkSummaryReportApproval& approval)
+{
+    PreparedBenchmarkSummaryReport result;
+    if (!approval.consentToPrepare) { result.status_ = BenchmarkSummaryReportStatus::ConsentRequired; return result; }
+    if (!summary.IsReady()) return result;
+    if (!IsBenchmarkSummaryUuid(approval.reportUuid)) { result.status_ = BenchmarkSummaryReportStatus::InvalidIdentity; return result; }
+    const PlaytestReportInput validation{approval.reportUuid, approval.capturedAtUtc,
+        PlaytestReportCategory::Performance, PlaytestReportImpact::Polish, "Benchmark summary", true};
+    if (!PreparePlaytestReport(validation).IsReady())
+    { result.status_ = BenchmarkSummaryReportStatus::InvalidTimestamp; return result; }
+    const auto& data = summary.Data();
+    const auto cooling = approval.declaredCooling.value_or(data.cooling);
+    if (cooling > BenchmarkSummaryCooling::ExternalDeclared)
+    { result.status_ = BenchmarkSummaryReportStatus::InvalidCooling; return result; }
+    const auto& m = data.configuration.metadata;
+    if ((!IsBuildIdentityReportLabel(m.buildIdentity) && !SafeLabel(m.buildIdentity)) || !ValidShaderPair(m.shaderIdentity) || !SafeLabel(m.materialEncoding) ||
+        (approval.includeBasicHardware && (!SafeLabel(data.rawModel) || !SafeLabel(m.gpuName) || !SafeLabel(m.vulkanApi))))
+    { result.status_ = BenchmarkSummaryReportStatus::InvalidLabel; return result; }
+    std::ostringstream out;
+    out.imbue(std::locale::classic());
+    out << std::setprecision(8) << "{\"schemaVersion\":2,\"product\":\"horde-lantern-rt\",\"reportKind\":\"benchmark-summary\","
+        "\"consentToPrepare\":true,\"includeBasicHardware\":" << (approval.includeBasicHardware ? "true" : "false") <<
+        ",\"report\":{\"schemaVersion\":1,\"reportId\":";
+    Text(out, approval.reportUuid); out << ",\"capturedAtUtc\":"; Text(out, approval.capturedAtUtc);
+    out << ",\"runId\":"; Text(out, data.runUuid);
+    out << ",\"result\":\"complete\",\"workload\":"; Text(out, horde::gameplay::BenchmarkWorkloadName(data.workload));
+    out << ",\"simulationPolicy\":";
+    Text(out, horde::gameplay::IsFrozenBenchmark(data.workload) ? "frozen-authored-snapshot" : "fixed-step-60hz");
+    out << ",\"warmupLaps\":1,\"measuredLaps\":1,\"completedLaps\":" << data.laps <<
+        ",\"rtPresentedEveryMeasuredFrame\":true,\"scanoutFpsMeasured\":false,\"counts\":{\"expected\":" << data.overall.frames <<
+        ",\"completed\":" << data.overall.frames << ",\"cpuAccepted\":" << data.overall.frames <<
+        ",\"rejected\":0,\"cancelled\":0,\"cpuRejected\":0,\"outstanding\":0},\"configuration\":";
+    Configuration(out, data); out << ",\"legacyFrameTimingScope\":";
     Text(out, m.legacyFrameTimingScope);
     out << ",\"cpuTimingScope\":\"completed-owning-render-entry-through-present\",\"gpuTimingScope\":\"completed-owning-rt-duration\","
         "\"thermal\":{\"availability\":\"not-collected\",\"temperatureC\":null,\"status\":\"unknown\"},\"declaredCooling\":";
@@ -179,6 +198,70 @@ PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(const FrozenBenchma
     result.reportUuid_ = approval.reportUuid;
     result.json_ = std::move(json);
     result.status_ = BenchmarkSummaryReportStatus::Ready;
+    return result;
+}
+
+PreparedPublicBenchmarkReport PreparePublicBenchmarkReport(const FrozenBenchmarkSummary& summary,
+    const PublicBenchmarkReportApproval& approval)
+{
+    PreparedPublicBenchmarkReport result;
+    if (!approval.consentToPreparePublicPreview)
+    { result.status_ = BenchmarkSummaryReportStatus::ConsentRequired; return result; }
+    // Reuse all typed completion, UUID, calendar, privacy, shader and cooling
+    // validation. The temporary private/local bytes never enter the projection.
+    const auto validated = PrepareBenchmarkSummaryReport(summary,
+        {true, approval.includeBasicHardware, approval.resultUuid, approval.capturedAtUtc, approval.declaredCooling});
+    if (!validated.IsReady()) { result.status_ = validated.Status(); return result; }
+    if (approval.resultUuid == summary.Data().runUuid)
+    { result.status_ = BenchmarkSummaryReportStatus::InvalidIdentity; return result; }
+    const auto& data = summary.Data();
+    const auto& m = data.configuration.metadata;
+    const auto cooling = approval.declaredCooling.value_or(data.cooling);
+    std::ostringstream out;
+    out.imbue(std::locale::classic());
+    out << std::setprecision(8) << "{\"schemaVersion\":1,\"product\":\"horde-lantern-rt\","
+        "\"reportKind\":\"public-benchmark-result\",\"destination\":\"public-board\","
+        "\"consentToPreparePublicPreview\":true,\"result\":{\"schemaVersion\":1,\"resultId\":";
+    Text(out, approval.resultUuid);
+    out << ",\"dateUtc\":"; Text(out, approval.capturedAtUtc.substr(0u,10u));
+    out << ",\"evidenceClass\":\"community-client-reported\",\"deviceCompatibilityVerified\":false,"
+        "\"rankingEligible\":false,\"workload\":";
+    Text(out, horde::gameplay::BenchmarkWorkloadName(data.workload));
+    out << ",\"simulationPolicy\":";
+    Text(out, horde::gameplay::IsFrozenBenchmark(data.workload) ? "frozen-authored-snapshot" : "fixed-step-60hz");
+    // Missing version/policy/artifact evidence is not invented or promoted by
+    // matching pixels. Server comparison/admission must validate independently.
+    out << ",\"comparability\":{\"exactBucketEligible\":false,\"courseRevision\":null,"
+        "\"profileRevision\":null,\"outputPolicy\":null,\"packageArtifactSha256\":null},\"configuration\":";
+    Configuration(out, data);
+    out << ",\"warmupLaps\":1,\"measuredLaps\":1,\"completedLaps\":" << data.laps <<
+        ",\"rtPresentedEveryMeasuredFrame\":true,\"scanoutFpsMeasured\":false,\"legacyFrameTimingScope\":";
+    Text(out, m.legacyFrameTimingScope);
+    out << ",\"cpuTimingScope\":\"completed-owning-render-entry-through-present\","
+        "\"gpuTimingScope\":\"completed-owning-rt-duration\","
+        "\"thermal\":{\"availability\":\"not-collected\",\"temperatureC\":null,\"status\":\"unknown\"},"
+        "\"declaredCooling\":";
+    Text(out, cooling == BenchmarkSummaryCooling::Unknown ? "unknown" :
+        cooling == BenchmarkSummaryCooling::NoneDeclared ? "none-declared" : "external-declared");
+    out << ",\"overall\":"; Population(out, data.overall, false);
+    out << ",\"zones\":[";
+    for (std::size_t i=0u; i<data.zones.size(); ++i) {
+        if (i) out << ',';
+        out << "{\"name\":"; Text(out,horde::gameplay::ShowcaseZoneName(data.zones[i].zone));
+        out << ",\"statistics\":"; Population(out,data.zones[i].population,false); out << '}';
+    }
+    out << "],\"hardware\":{\"model\":";
+    if (approval.includeBasicHardware) Text(out,data.rawModel); else out << "null";
+    out << ",\"gpu\":";
+    if (approval.includeBasicHardware) Text(out,m.gpuName); else out << "null";
+    out << ",\"vulkanApi\":";
+    if (approval.includeBasicHardware) Text(out,m.vulkanApi); else out << "null";
+    out << ",\"osMajor\":null,\"rawDriverVersion\":null}}}";
+    auto json = out.str();
+    if (json.size() > kPublicBenchmarkReportMaxBytes)
+    { result.status_ = BenchmarkSummaryReportStatus::TooLarge; return result; }
+    result.resultId_=approval.resultUuid; result.json_=std::move(json);
+    result.status_=BenchmarkSummaryReportStatus::Ready;
     return result;
 }
 

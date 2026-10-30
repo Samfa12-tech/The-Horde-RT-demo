@@ -1,0 +1,39 @@
+# Approved 1.7 flask policy - partial backend implementation
+
+Sam explicitly approved implementation of the summarized policy at 22:49:26 UTC on 24 October, replying "Yes" to the two-charge/one-heart drink, deliberate earned Rest, one waystone upgrade, exact save/death restore and empty-flask older-save migration proposal. His subsequent pause was superseded by the 25 October development resume. The pure recovery backend is implemented and tested; gameplay, presentation, inputs and migration admission remain unfinished. Controls remain subject to conflict checks; balance and physical feel remain playtesting gates. Verify that every migrated older checkpoint has an eligible safe recovery route; preserve progress and report counterexamples before changing policy.
+
+Player-facing recommendation: start with two drinks, each restoring one of your three hearts. Drinking takes a short stationary moment and can be interrupted. Deliberately rest at the existing earned safe checkpoints to recover and refill. Find one capacity upgrade beside the old treasury waystone; it adds one slot. Loading a save restores what that save actually contained.
+
+| Rule | Single recommended policy |
+| --- | --- |
+| First ownership | New Game starts with one owned flask, capacity 2, two charges. Usable before Keeper. No pickup quest or automatic first-encounter regrant. Maximum health remains 3. |
+| Healing | One charge restores one heart, capped at 3. Empty, full-health, dead, unavailable-world or duplicate use is rejected with no charge/action. No passive healing or invulnerability. |
+| Use | A 1.25-second deliberate drink, grounded and stationary; camera look is allowed. Combat use is allowed at the player's risk. Movement, attack, parry, dodge, climb/rope, accepted damage, death, pause/menu or lifecycle suspension cancels it. No charge is consumed until successful completion. Existing defensive/action input takes priority rather than becoming a delayed action after drinking. |
+| Tick ordering | Accepted damage/death and cancellation are resolved before drink completion on a shared simulation tick. On completion, charge decrement and healing occur atomically exactly once. No buffered drink survives cancellation/load/reset. Visual hand occupation follows the same state, not an independent platform timer. |
+| Deliberate Rest | A 2-second stationary Rest at the existing `LowerClaimed`, `SafeExit` or `ForestEndpoint` anchor, within 1 m, only once that checkpoint's existing earned eligibility is met. Require grounded ready terrain, no active fight, climb, damage or dialogue. Movement/actions, damage, menus/pause/suspension or losing any prerequisite cancels Rest; damage/cancellation wins a completion-tick tie. Completion fully heals and fills the current flask capacity. It is free/repeatable, does not respawn enemies/replay rewards or reset dialogue, and is separate from checkpoint activation or walking past. These are proposed new interactions at existing anchors, not already-authored refill props. |
+| One actual capacity upgrade | A small owned upgrade item beside the existing F03 treasury-road waystone, reached on the accepted dry route. Explicit interaction raises capacity 2→3 once per campaign state; no new area/quest/skill tree. It leaves health/current charges unchanged; the next Rest fills the new slot. Store a stable upgrade entitlement so repeated interaction/recreation cannot stack it. This proposed new content is included for approval because an upgradeable API alone would not deliver an upgrade in 1.7. |
+| Death / Retry | Preserve current explicit pre-claim encounter Retry's full 3-heart reset and refill the flask to its current capacity for that restarted attempt. Mere encounter selection gives no refill. Post-claim Retry restores the selected last committed checkpoint's exact health, charges and entitlement; no automatic death refill is added there. A player can deliberately Rest at an eligible restored safe anchor. |
+| Manual / Auto load | All three independent slots retain separate manual/latest-auto records. Load restores exact saved health, capacity entitlement and charges; no free heal/refill and no global cross-slot grant. Loading an older campaign state may rewind the upgrade, as it rewinds other progress, but cannot add charges/capacity to the loaded record repeatedly. Never store an in-progress drink or timer. |
+| Older records / migration | Preserve exact health, location, story and slot identity; migrate old schema 1 records to owned base-capacity 2 with **zero charges**, not an additive starter fill. Existing records are post-claim at earned anchors, so deliberate Rest supplies recovery. Preserve originals until atomic replacement is verified, reject unknown newer formats, and distinguish invalid resources from a legitimate empty flask. New Game and explicit pre-claim Retry are separate creation/reset rules, not migration side effects. |
+| Presentation / controls | Keep the left light and its Grip authoritative; the right hand temporarily stows/reacquires the sword for the drink through existing equipment lifecycle. Use one simple opaque flask, restrained feedback and visible charges. Propose H / gameplay D-pad Up and a secondary touch utility action, disabled while menus own navigation. Final bindings/hit areas require the existing input conflict/layout checks; no new permanent overlay or customization system. Rest/upgrade use the existing contextual interaction approach. |
+
+## Implementation boundary after approval
+
+The subsequent held-guard prerequisite adds pre-flask schema2 records containing
+exact half-heart health. Apply the approved older-save empty-capacity2 policy to
+both schema1and2, preserving fractional health/progress without free charges.
+Read-only restore review found no accepted-anchor counterexample; actual Rest
+predicate/restore-to-Rest tests are still required before migration admission.
+
+The current rope Interact action owns both safe landing anchors. Preserve that
+action: a contextual Drink / Rest flask utility can carry distinct semantic
+requests through H / gameplay D-pad Up / touch. A stale Rest request must reject,
+never silently become Drink. This avoids stealing rope interaction or requiring
+the player to find an artificial annulus around its endpoint. The waystone
+upgrade remains a separate eligible contextual pickup; it does not add a quest.
+
+Use one shared simulation action/resource owner, coherent command sequence consumption, ordered feedback and immutable snapshots on both platforms. Add a versioned bounded campaign payload/codec with validation, exact restore and duplicate-entitlement tests; preserve current load barriers/retirement. Do not repurpose victory, lantern, dialogue or checkpoint flags as flask ownership. Keep original save bytes and settings untouched during isolated tests.
+
+Meaningful gates: rejected/complete/interrupted use and damage ties; empty/full states; simultaneous movement/defence and stale input; death/retry versus exact load; every old checkpoint migration; independent slots and atomic-write failure; repeated upgrade/Rest and reload; native hand/light/sword continuity and touch/controller/menu ownership. Actual combat balance, thumb use, drinking audio/animation and recovery clarity still require playtesting. Approval of this document would authorize a bounded implementation, not release, new maximum health, paid assets or a wider healing economy.
+
+Current code basis: `PlayerVitals` in `src/gameplay/ShowcaseGameplay.h`, shared `GameSimulation`, `CampaignCheckpoint.h`, codec/storage and the existing three checkpoint IDs. The [recovery decision record](HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md) preserves prior behavior and unapproved history. The values above are the approved implementation policy; their combat balance remains subject to playtesting.

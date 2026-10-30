@@ -17,6 +17,16 @@ struct SimulationCommandSequences
     std::uint64_t retry = 0;
     std::uint64_t interact = 0;
     std::uint64_t toggleHeldLightPose = 0;
+    std::uint64_t runToggle = 0;
+    std::uint64_t clearRunIntent = 0;
+    std::uint64_t tutorialSkip = 0;
+    std::uint64_t tutorialReplay = 0;
+    std::uint64_t dialogueSkip = 0;
+    std::uint64_t crouchToggle = 0;
+    std::uint64_t clearCrouchIntent = 0;
+    // Explicit utility choices; a stale Rest request must never become Drink.
+    std::uint64_t drinkFlask = 0;
+    std::uint64_t rest = 0;
 };
 
 enum class CombatInputEdgeKind : std::uint8_t
@@ -61,11 +71,27 @@ struct InputSnapshot
     float yawRadians = 0.0f;
     float pitchRadians = 0.0f;
     float torchLightStrength = 1.8f;
+    // Same clamped width used by the renderer-owned RT Lab stream transform.
+    float waterfallWidthScale = 1.0f;
     float authoritativePlayerX = 0.0f;
     float authoritativePlayerZ = 0.0f;
     bool paused = false;
     bool damageEnabled = true;
     bool hasAuthoritativePlayerPose = false;
+    // Ordinary touch/controller axes scale continuously up to the run cap.
+    // Default false preserves keyboard and deterministic replay timing.
+    bool analogueMovement = false;
+    // Keyboard hold; diagnostic callers may still publish legacy run edges.
+    bool runHeld = false;
+    // Continuous guard ownership accompanies the fresh commands.parry edge.
+    // A held value never synthesizes another timed parry window.
+    bool guardHeld = false;
+    // Retained for deterministic posture fixtures. Ordinary controls use head clearance.
+    bool crouchHeld = false;
+    bool tutorialEnabled = true;
+    bool tutorialSlowdownEnabled = false;
+    std::uint32_t dialogueCompletionLine = 0;
+    std::uint64_t dialogueCompletionGeneration = 0;
     SimulationCommandSequences commands{};
     CombatInputEdgeHistory combatEdgeHistory{};
 };

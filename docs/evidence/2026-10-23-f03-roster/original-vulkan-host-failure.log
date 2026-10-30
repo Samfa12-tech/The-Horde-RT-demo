@@ -1,0 +1,52 @@
+2026-10-23T04:21:13.9136717Z       Start 182: horde_rt_driver_capability_report_tests
+2026-10-23T04:21:13.9157523Z 65/72 Test #182: horde_rt_driver_capability_report_tests ..............   Passed    0.00 sec
+2026-10-23T04:21:13.9159083Z       Start 185: horde_rt_rescue_journey_integration_tests
+2026-10-23T04:21:14.1608479Z 66/72 Test #185: horde_rt_rescue_journey_integration_tests ............   Passed    0.24 sec
+2026-10-23T04:21:14.1610441Z       Start 186: horde_rt_chapter_terrain_journey_tests
+2026-10-23T04:21:31.2629952Z 67/72 Test #186: horde_rt_chapter_terrain_journey_tests ...............***Failed   17.10 sec
+2026-10-23T04:21:31.2631066Z live journey and all32 chapter views, including both mist states and the three pine views, retain authored-scene admission
+2026-10-23T04:21:31.2632071Z native-terrain moving probe frames=5788
+2026-10-23T04:21:31.2633203Z phone chapter mode=chapter-round-trip ticks/frame=1 frames=6280 stage=complete phase=complete failure=
+2026-10-23T04:21:31.2634491Z phone chapter mode=chapter-round-trip ticks/frame=3 frames=2097 stage=complete phase=complete failure=
+2026-10-23T04:21:31.2635682Z phone chapter mode=chapter-round-trip ticks/frame=4 frames=1572 stage=complete phase=complete failure=
+2026-10-23T04:21:31.2637149Z phone chapter mode=chapter-round-trip ticks/frame=6 frames=1047 stage=complete phase=complete failure=
+2026-10-23T04:21:31.2637947Z phone chapter mode=chapter-streaming-cycle ticks/frame=5 frames=482 stage=complete phase=complete failure=
+2026-10-23T04:21:31.2638707Z phone chapter mode=chapter-resident-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+2026-10-23T04:21:31.2639482Z phone chapter mode=chapter-resident-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+2026-10-23T04:21:31.2640242Z phone chapter mode=chapter-streamed-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+2026-10-23T04:21:31.2641022Z phone chapter mode=chapter-streamed-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+2026-10-23T04:21:31.2641809Z phone chapter mode=chapter-performance-route ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+2026-10-23T04:21:31.2642854Z phone chapter mode=chapter-performance-route ticks/frame=6 frames=563 stage=complete phase=complete failure=
+2026-10-23T04:21:31.2643373Z lookout held-item clearance=2.7
+2026-10-23T04:21:31.2643620Z shaft carry clearance=1.68
+2026-10-23T04:21:31.2644436Z opening projection-inputs path=generic tick=1 modern=0 yaw=3.14159274 pitch=-0.0500000007 supportY=-0.949999988 left=-0.184999987,-0.316208929,0.406987816 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+2026-10-23T04:21:31.2646026Z opening projection-inputs path=frozen-wrapper tick=0 modern=0 yaw=3.14159274 pitch=-0.0500000007 supportY=-0.949999988 left=-0.184999987,-0.316208929,0.406987816 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+2026-10-23T04:21:31.2647462Z opening projection-inputs path=configured-live tick=0 modern=1 yaw=3.14159274 pitch=0 supportY=-0.949999988 left=-0.184999987,-0.331811994,0.398269385 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+2026-10-23T04:21:31.2648345Z claim-site position=-34,-17.55 prompt=0 phase=4
+2026-10-23T04:21:31.2648678Z cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+2026-10-23T04:21:31.2648991Z upper lantern hand depth=0.69 localY=0.0511613
+2026-10-23T04:21:31.2649342Z unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+2026-10-23T04:21:31.2649694Z cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+2026-10-23T04:21:31.2649999Z upper lantern hand depth=0.69 localY=0.0511825
+2026-10-23T04:21:31.2650896Z Combined CPU preparation resident_ns=217621 staged_ns=183678 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=49920 staged_peak_capacity_bytes=49920 gpu_residency_comparison=NOT_MEASURED
+2026-10-23T04:21:31.2651876Z Rescue journey integration cases=47790 failures=1 retained_triangles=528
+2026-10-23T04:21:31.2652166Z 
+2026-10-23T04:21:31.2652298Z       Start 187: horde_rt_kit_source_intake_tests
+2026-10-23T04:21:32.0048657Z 68/72 Test #187: horde_rt_kit_source_intake_tests .....................   Passed    0.74 sec
+2026-10-23T04:21:32.0050756Z       Start 190: horde_rt_corridor_detail_certificate_tests
+2026-10-23T04:21:32.0596230Z 69/72 Test #190: horde_rt_corridor_detail_certificate_tests ...........   Passed    0.05 sec
+2026-10-23T04:21:32.0597768Z       Start 196: horde_rt_chapter_texture_alias_payload_tests
+2026-10-23T04:21:32.2716449Z 70/72 Test #196: horde_rt_chapter_texture_alias_payload_tests .........   Passed    0.21 sec
+2026-10-23T04:21:32.2718192Z       Start 197: horde_rt_rescue_rig_attachment_tests
+2026-10-23T04:21:35.1168045Z 71/72 Test #197: horde_rt_rescue_rig_attachment_tests .................   Passed    2.84 sec
+2026-10-23T04:21:35.1169965Z       Start 198: horde_rt_rescue_adversarial_regression_tests
+2026-10-23T04:21:37.9913466Z 72/72 Test #198: horde_rt_rescue_adversarial_regression_tests .........   Passed    2.87 sec
+2026-10-23T04:21:37.9919982Z 
+2026-10-23T04:21:37.9920864Z 99% tests passed, 1 tests failed out of 72
+2026-10-23T04:21:37.9921244Z 
+2026-10-23T04:21:37.9921414Z Total Test time (real) =  66.18 sec
+2026-10-23T04:21:37.9921716Z 
+2026-10-23T04:21:37.9922123Z The following tests FAILED:
+2026-10-23T04:21:37.9923397Z 	186 - horde_rt_chapter_terrain_journey_tests (Failed)
+2026-10-23T04:21:37.9924067Z Errors while running CTest
+2026-10-23T04:21:38.1756787Z ##[error]Process completed with exit code 8.

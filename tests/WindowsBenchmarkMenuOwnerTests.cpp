@@ -1,0 +1,237 @@
+#include "platform/windows/WindowsBenchmarkMenuOwner.h"
+#include "platform/android/AndroidOpeningBenchmarkOwner.h"
+#include "platform/android/AndroidBenchmarkOutputTransaction.h"
+
+#include <cstdlib>
+#include <iostream>
+
+namespace {
+using namespace horde::platform::windows;
+using Transfer = OpeningBenchmarkOwnerTransfer;
+using Phase = OpeningBenchmarkOwnerPhase;
+int failures = 0;
+int checks = 0;
+void Check(const bool passed, const char* message)
+{
+    ++checks;
+    if (!passed) { ++failures; std::cerr << "FAIL: " << message << '\n'; }
+}
+constexpr OpeningBenchmarkEligibility Ready() { return {true, true}; }
+
+void TestSequentialOwnership()
+{
+    for (const auto choice : {OpeningBenchmarkChoice::WindowsProvisional, OpeningBenchmarkChoice::Custom}) {
+        Transfer transfer;
+        unsigned liveRenderers = 1;
+        Check(transfer.Queue(choice, Ready()), "eligible opening menu admits an explicit choice");
+        Check(!transfer.Queue(choice, Ready()) && liveRenderers == 1,
+              "duplicate native command cannot allocate another owner");
+        --liveRenderers; // Actual native retirement completed before the policy proof.
+        Check(transfer.RecheckAndRetireEntry(Ready(), true) && liveRenderers == 0 &&
+              transfer.Phase() == Phase::Benchmark && transfer.Choice() == choice,
+              "only retired Entry admits benchmark ownership, preserving the explicit choice");
+        ++liveRenderers;
+        Check(!transfer.CancelQueued() && !transfer.Queue(choice, Ready()) && liveRenderers == 1,
+              "late cancellation or queued selection cannot re-enter an acquired benchmark owner");
+        --liveRenderers;
+        Check(transfer.BenchmarkRetired(true, true) && liveRenderers == 0 &&
+              transfer.Phase() == Phase::ReturningEntry,
+              "restoration and benchmark retirement jointly admit the new Entry owner");
+        ++liveRenderers;
+        Check(!transfer.Queue(choice, Ready()), "returning Entry cannot start another benchmark before RT presentation");
+        Check(transfer.EntryPresented(true) && transfer.Phase() == Phase::Entry &&
+              transfer.Choice() == OpeningBenchmarkChoice::None && liveRenderers == 1,
+              "acknowledged new Entry presentation completes the ownership cycle");
+        Check(transfer.Queue(choice, Ready()), "a completed return admits a subsequent independent run");
+    }
+}
+
+void TestEligibilityRaces()
+{
+    // Each represents a different native message winning before the queued
+    // owner's next frame: hiding Entry, loading/starting a game, or graphics IO.
+    for (unsigned blocker = 0; blocker < 7; ++blocker) {
+        auto changed = Ready();
+        switch (blocker) {
+        case 0: changed.entryVisible = false; break;
+        case 1: changed.entryScene = false; break;
+        case 2: changed.activeCampaign = true; break;
+        case 3: changed.pendingCampaign = true; break;
+        case 4: changed.graphicsTransition = true; break;
+        case 5: changed.playHandoff = true; break;
+        case 6: changed.benchmarkBusy = true; break;
+        }
+        Transfer direct, queued;
+        Check(!direct.Queue(OpeningBenchmarkChoice::Custom, changed) && direct.Phase() == Phase::Entry,
+              "non-opening or busy owner rejects direct/injected benchmark commands");
+        Check(queued.Queue(OpeningBenchmarkChoice::WindowsProvisional, Ready()) &&
+              !queued.RecheckAndRetireEntry(changed, false) && queued.Phase() == Phase::Entry &&
+              queued.Choice() == OpeningBenchmarkChoice::None,
+              "eligibility race cancels before retirement and leaves the existing Entry owner usable");
+        Check(queued.Queue(OpeningBenchmarkChoice::Custom, Ready()),
+              "cancelled pre-retirement request does not poison a later eligible choice");
+    }
+    Transfer cancelled;
+    Check(!cancelled.Queue(OpeningBenchmarkChoice::None, Ready()) &&
+          !cancelled.Queue(static_cast<OpeningBenchmarkChoice>(99), Ready()),
+          "absent and unknown choices cannot silently select a benchmark profile");
+    Check(cancelled.Queue(OpeningBenchmarkChoice::Custom, Ready()) && cancelled.CancelQueued() &&
+          !cancelled.CancelQueued() && !cancelled.RecheckAndRetireEntry(Ready(), true) &&
+          cancelled.Phase() == Phase::Entry,
+          "explicit cancellation consumes the queued request and prevents a stale retirement callback");
+}
+
+void TestFailedProofs()
+{
+    Transfer entryFailure;
+    Check(entryFailure.Queue(OpeningBenchmarkChoice::Custom, Ready()) &&
+          !entryFailure.RecheckAndRetireEntry(Ready(), false) && entryFailure.Phase() == Phase::Blocked,
+          "unproved Entry retirement forbids benchmark allocation");
+    Check(!entryFailure.Queue(OpeningBenchmarkChoice::Custom, Ready()) &&
+          !entryFailure.CancelQueued() && !entryFailure.RecheckAndRetireEntry(Ready(), true),
+          "retained resources cannot be recovered through a late success or another menu command");
+
+    for (const auto proofs : {0u, 1u, 2u}) {
+        Transfer failed;
+        (void)failed.Queue(OpeningBenchmarkChoice::Custom, Ready());
+        (void)failed.RecheckAndRetireEntry(Ready(), true);
+        Check(!failed.BenchmarkRetired((proofs & 1u) != 0, (proofs & 2u) != 0) &&
+              failed.Phase() == Phase::Blocked && !failed.EntryPresented(true),
+              "failed restoration or retirement forbids a new Entry renderer despite a late presentation");
+    }
+    Transfer presentationFailure;
+    (void)presentationFailure.Queue(OpeningBenchmarkChoice::WindowsProvisional, Ready());
+    (void)presentationFailure.RecheckAndRetireEntry(Ready(), true);
+    (void)presentationFailure.BenchmarkRetired(true, true);
+    Check(!presentationFailure.EntryPresented(false) && presentationFailure.Phase() == Phase::Blocked &&
+          !presentationFailure.EntryPresented(true),
+          "failed return presentation cannot be erased by a later unrelated completion");
+    Transfer wrongOwner;
+    Check(!wrongOwner.BenchmarkRetired(true, true) && wrongOwner.Phase() == Phase::Blocked,
+          "unmatched benchmark retirement cannot create an Entry successor");
+    Transfer wrongPresentation;
+    Check(!wrongPresentation.EntryPresented(true) && wrongPresentation.Phase() == Phase::Blocked,
+          "unmatched Entry completion cannot certify an ownership return");
+}
+void TestAndroidOpeningOwner()
+{
+    using Owner=horde::platform::android::AndroidOpeningBenchmarkOwner;
+    using AP=Owner::Phase;
+    Owner owner;
+    auto ineligible=Ready();ineligible.activeCampaign=true;
+    Check(!owner.Queue(1,7,ineligible) && !owner.Queue(0,7,Ready()) && !owner.Queue(1,0,Ready()),
+          "Android requires explicit identity and actual opening eligibility, never an active campaign");
+    Check(owner.Queue(1,7,Ready()) && !owner.Queue(2,7,Ready()) && owner.State()==AP::Queued,
+          "Android admits one generation-tagged Custom request and rejects duplication");
+    Check(!owner.TakeStart() && owner.Prepare(Ready()) && !owner.ShowcasePresented(7),
+          "queued and initialized state cannot manufacture Entry retirement or start measurement");
+    Check(owner.EntryRetired(true) && !owner.ShowcasePresented(6) && !owner.TakeStart(),
+          "retirement alone and stale surface presentation cannot admit Android measurement");
+    Check(owner.ShowcasePresented(7) && owner.TakeStart() && !owner.TakeStart(),
+          "only actual current Showcase presentation admits one benchmark start");
+    Check(!owner.Cancel(2,7) && !owner.Cancel(1,6),"stale request or origin cannot cancel the current benchmark");
+    owner.BeginReturn(2);
+    Check(!owner.EntryPresented(7,true) && owner.State()==AP::Blocked,
+          "fresh Entry cannot be claimed before benchmark retirement is proved");
+
+    Owner success;
+    Check(success.Queue(3,8,Ready()) && success.Prepare(Ready()) && success.EntryRetired(true) &&
+          success.ShowcasePresented(8) && success.TakeStart(),"Android success scenario owns one presented Showcase");
+    success.BeginReturn(2);
+    Check(success.ReturnRetired(true,true) && !success.EntryPresented(7,true) &&
+          success.State()==AP::Returning,"restoration/retirement still await the current Entry presentation");
+    Check(success.EntryPresented(8,true) && success.Snapshot()[3]==2 && success.Snapshot()[4]==1,
+          "terminal success is published only with fresh Entry presentation");
+
+    Owner queued;
+    Check(queued.Queue(4,9,Ready()) && queued.Cancel(4,9) && !queued.Prepare(Ready()) &&
+          !queued.WantsShowcase() && !queued.TakeStart(),"queued Back cancels before any benchmark scene or measurement");
+    Check(queued.ReturnRetired(true,true) && queued.EntryPresented(9,true) && queued.Snapshot()[3]==3,
+          "queued cancellation retains its Entry owner and yields a truthful cancelled result");
+
+    Owner suspended;
+    Check(suspended.Queue(5,10,Ready()) && suspended.Prepare(Ready()) && suspended.EntryRetired(true) &&
+          suspended.ShowcasePresented(10) && suspended.TakeStart(),"surface-loss case starts only after normal ownership proofs");
+    suspended.SurfaceRetired(10,true);suspended.BindSurface(11);
+    Check(suspended.Returning() && suspended.Cancelled() && !suspended.WantsShowcase() && !suspended.TakeStart() &&
+          !suspended.EntryPresented(10,true),"surface replacement makes cancellation sticky and cannot restart measurement");
+    Check(suspended.EntryPresented(11,true) && suspended.Snapshot()[3]==3 && suspended.Snapshot()[5]==10,
+          "replacement surface acknowledges fresh Entry while retaining original request identity");
+    Owner failed;
+    Check(failed.Queue(6,12,Ready()) && failed.Prepare(Ready()) && !failed.EntryRetired(false) &&
+          failed.State()==AP::Blocked && !failed.Queue(7,13,Ready()),"unproved GPU retirement blocks successor ownership and restart");
+}
+void TestAndroidFixedOutputTransaction()
+{
+    using T=horde::platform::android::AndroidBenchmarkOutputTransaction;
+    using P=T::Phase;
+    using namespace horde;
+    const auto spec=*gameplay::BenchmarkProfileSpecification(gameplay::BenchmarkProfileId::MobileProvisionalV1);
+    auto original=graphics::PlatformDefaultGraphicsSettings(graphics::GraphicsPlatform::Android);
+    original.previewFrameCap=45;
+    gameplay::BenchmarkProfileConfiguration actual;
+    actual.platform=graphics::GraphicsPlatform::Android;actual.optical=graphics::OpticalProfile::Mobile;
+    actual.backend=graphics::GraphicsBackend::RayTracingPipeline;actual.graphics=spec.graphics;
+    actual.graphics.previewFrameCap=45;actual.internal=spec.internal;actual.output=spec.output;
+    actual.cameraAspect=16.0/9;actual.outputPolicy=gameplay::BenchmarkOutputPolicy::FixedBufferPreserveAspect;
+    T transaction;
+    Check(transaction.Begin(1,9,original) && !transaction.Ready() && transaction.Snapshot()[4]==0,
+          "fixed output cannot command UI before native drain or measure from desired pixels");
+    Check(transaction.Drained(true) && transaction.Snapshot()[4]==1 &&
+          !transaction.Acknowledge(1,9,8,1,true,1280,720,true) &&
+          !transaction.Acknowledge(1,9,9,2,true,1280,720,true),
+          "only generation and resize-sequence matched UI acknowledgment is consumed");
+    Check(transaction.Acknowledge(1,9,9,1,true,1280,720,true) && transaction.Recreating() &&
+          !transaction.Observe(actual,2,3,4,5),"holder ACK alone never certifies RT resources or completed dimensions");
+    Check(transaction.Recreated(2,3,true) && !transaction.Observe(actual,1,3,4,5) &&
+          !transaction.Observe(actual,2,2,4,5) && !transaction.Observe(actual,2,3,0,5),
+          "applied frame requires current recreated owner and actual submission/completion identities");
+    auto wrong=actual;wrong.internal.width=639;
+    Check(!transaction.Observe(wrong,2,3,4,5) && !transaction.Ready(),"requested scale does not override a mismatched recorded extent");
+    wrong=actual;wrong.presentationTransform=1;wrong.cameraAspect=9.0/16;
+    Check(!transaction.Observe(wrong,2,3,4,5),"nonidentity output cannot silently become a provisional profile");
+    wrong=actual;wrong.dynamicResolutionEnabled=true;
+    Check(!transaction.Observe(wrong,2,3,4,5) && transaction.Observe(actual,2,3,4,5) && transaction.Ready(),
+          "exact completed dimensions, fixed aspect, quality and DRS-off jointly admit measurement");
+    transaction.Restore();
+    Check(transaction.Draining() && transaction.Drained(true) && transaction.Snapshot()[4]==2 &&
+          !transaction.Acknowledge(1,9,9,1,true,2400,1080,true),"restoration drains independently and rejects a late apply ACK");
+    Check(transaction.Acknowledge(1,9,9,2,true,2400,1080,true) && transaction.Recreated(4,5,true),
+          "restoration acknowledges actual current layout dimensions before explicit resource recreation");
+    actual.graphics=original;actual.output={2400,1080};actual.internal=graphics::ScaledGraphicsExtent(actual.output,original.renderScalePercent);
+    actual.cameraAspect=double(actual.internal.width)/actual.internal.height;actual.outputPolicy=gameplay::BenchmarkOutputPolicy::Native;
+    wrong=actual;wrong.graphics.mistEnabled=!original.mistEnabled;
+    auto staleOutput=actual;staleOutput.output={1280,720};staleOutput.internal=graphics::ScaledGraphicsExtent(staleOutput.output,original.renderScalePercent);
+    staleOutput.cameraAspect=double(staleOutput.internal.width)/staleOutput.internal.height;
+    Check(!transaction.Observe(wrong,4,5,6,7) && !transaction.Observe(staleOutput,4,5,6,7) && !transaction.Observe(actual,4,5,6,5) &&
+          transaction.Observe(actual,4,5,6,7) && transaction.Restored(),
+          "fresh restored RT owner must preserve exact original graphics and reject stale completion");
+    T failedApply;failedApply.Begin(2,10,original);failedApply.Drained(true);
+    Check(failedApply.Acknowledge(2,10,10,1,true,1279,720,true) && failedApply.Cancelled() && failedApply.Draining() &&
+          !failedApply.Acknowledge(2,10,10,1,true,1280,720,true),"failed fixed-size ACK is sticky and requires restoration, never late success");
+    T lost;lost.Begin(3,11,original);lost.Drained(true);lost.SurfaceLost(11);lost.BindSurface(12);
+    Check(lost.Cancelled() && lost.Draining() && lost.Drained(true) && lost.Snapshot()[2]==12 && lost.Snapshot()[4]==2 &&
+          !lost.Acknowledge(3,11,11,2,true,1280,720,true),"surface replacement only restores on the new generation and never resumes measurement");
+    actual.presentationTransform=1;actual.output={2400,1080};
+    actual.internal=graphics::ScaledGraphicsExtent(actual.output,original.renderScalePercent);
+    actual.cameraAspect=graphics::RtPresentationCameraAspect(actual.internal.width,actual.internal.height,
+        graphics::RtPresentationTransform::Rotate90);
+    Check(lost.Acknowledge(3,11,12,2,true,1080,2400,true) && lost.Recreated(8,9,true) &&
+          lost.Observe(actual,8,9,10,11) && lost.Restored(),
+          "cancelled rotation restores current layout with its actual axis mapping without forcing original orientation");
+    T unsafe;unsafe.Begin(4,13,original);
+    Check(!unsafe.Drained(false) && unsafe.State()==P::Failed && unsafe.Snapshot()[4]==0,
+          "unproved GPU drain cannot issue any buffer mutation command");
+}
+} // namespace
+
+int main()
+{
+    TestSequentialOwnership();
+    TestEligibilityRaces();
+    TestFailedProofs();
+    TestAndroidOpeningOwner();
+    TestAndroidFixedOutputTransaction();
+    std::cout << checks << " opening benchmark ownership checks, " << failures << " failures\n";
+    return failures == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+}

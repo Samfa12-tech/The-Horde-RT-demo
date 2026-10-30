@@ -1,0 +1,62 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 42
+    Start  42: horde_rt_chapter_dialogue_tests
+
+42: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_chapter_dialogue_tests.exe"
+42: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+42: Test timeout computed to be: 1500
+42: chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed
+1/4 Test  #42: horde_rt_chapter_dialogue_tests ......   Passed    0.03 sec
+test 45
+    Start  45: horde_rt_campaign_checkpoint_tests
+
+45: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_checkpoint_tests.exe"
+45: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+45: Test timeout computed to be: 60
+45: Kit reunion anchor: listener=(-33.7,-12.8) actor=(-27.7,-5.8) oldDistance=3.27567 newDistance=9.21955 oldLR=0.109187,0.012507 newLR=0.0383516,0.00733917
+45: Kit spatial fixture reaches actual reunion with ordinary collision-resolved movement
+45: actual logical reminder at reunion starts with current Kit/listener positions
+45: reunion reminder no longer attenuates a one-metre Kit as an obsolete five-metre point
+45: Kit nearby reminder: listener=(-32.8776,-11.9451) actor=(-27.7,-5.8) oldDistance=2.13387 newDistance=8.0355 oldLR=0.102104,0.134302 newLR=0.0341337,0.0290179
+45: 1053 campaign checkpoint checks, 3 failures
+2/4 Test  #45: horde_rt_campaign_checkpoint_tests ...***Failed    3.13 sec
+test 157
+    Start 157: horde_rt_dialogue_ducking_tests
+
+157: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_dialogue_ducking_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+157: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+157: Test timeout computed to be: 60
+157: 160 dialogue ducking host checks, 0 failures
+157: Synthetic PCM and logical terrain-backed restores use no output device or owner saves. Listening, physical lifecycle, voice intelligibility and perceived mix remain unaccepted.
+3/4 Test #157: horde_rt_dialogue_ducking_tests ......   Passed    0.17 sec
+test 188
+    Start 188: horde_rt_spatial_audio_smoke
+
+188: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_spatial_audio_smoke.exe"
+188: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+188: Test timeout computed to be: 1500
+188: Spatial audio smoke tests passed.
+4/4 Test #188: horde_rt_spatial_audio_smoke .........   Passed    0.04 sec
+
+The following tests passed:
+	horde_rt_chapter_dialogue_tests
+	horde_rt_dialogue_ducking_tests
+	horde_rt_spatial_audio_smoke
+
+75% tests passed, 1 tests failed out of 4
+
+Total Test time (real) =   3.39 sec
+
+The following tests FAILED:
+	 45 - horde_rt_campaign_checkpoint_tests (Failed)

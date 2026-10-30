@@ -1,0 +1,56 @@
+{
+  "run": {
+    "pid": 41180,
+    "exitCode": 0,
+    "seconds": 13.422,
+    "foregroundBefore": null,
+    "foregroundAfter": null,
+    "pending": false
+  },
+  "fixtureBefore": {
+    ".slot-1-auto.hrd.lock": {
+      "exists": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "manifest.json": {
+      "exists": true,
+      "bytes": 166,
+      "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+    },
+    "slot-1-auto.hrd": {
+      "exists": true,
+      "bytes": 162,
+      "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+    }
+  },
+  "fixtureAfter": {
+    ".slot-1-auto.hrd.lock": {
+      "exists": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "manifest.json": {
+      "exists": true,
+      "bytes": 166,
+      "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+    },
+    "slot-1-auto.hrd": {
+      "exists": true,
+      "bytes": 162,
+      "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+    }
+  },
+  "fixtureUnchanged": true,
+  "settingsBefore": {
+    "exists": true,
+    "bytes": 471,
+    "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+  },
+  "settingsAfter": {
+    "exists": true,
+    "bytes": 471,
+    "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+  },
+  "settingsUnchanged": true
+}

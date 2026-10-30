@@ -1,0 +1,233 @@
+[
+  {
+    "file": "meshes/femur.glb",
+    "bytes": 8804,
+    "sha256": "b00f2492791a3d2b6936d76fe689acea7a1d6c5820c40408fe4a76d71d827c6c",
+    "meshes": 1,
+    "primitives": 1,
+    "materials": 1,
+    "vertices": 200,
+    "triangles": 396,
+    "degenerate_triangles": 0,
+    "max_normal_squared_length_error": 2.0955868240690734e-07,
+    "bounds_min_gltf_m": [
+      -0.0528666228055954,
+      0.0,
+      -0.05150921642780304
+    ],
+    "bounds_max_gltf_m": [
+      0.0528666228055954,
+      0.4639294147491455,
+      0.05150921642780304
+    ],
+    "dimensions_gltf_m": [
+      0.1057332456111908,
+      0.4639294147491455,
+      0.10301843285560608
+    ],
+    "skins": 0,
+    "animations": 0,
+    "textures": 0,
+    "extensions_used": [],
+    "structural_checks": "PASS",
+    "topology_caveat": "See build-manifest and source-topology diagnostics. Structural checks do not imply manifold topology or engine admission."
+  },
+  {
+    "file": "meshes/femur_cage.glb",
+    "bytes": 3212,
+    "sha256": "3c967558b8abe4801cb2561de2ea68f6e6aceded38e5e920a304d3ab41e197d9",
+    "meshes": 1,
+    "primitives": 1,
+    "materials": 1,
+    "vertices": 50,
+    "triangles": 96,
+    "degenerate_triangles": 0,
+    "max_normal_squared_length_error": 1.6667218716293064e-07,
+    "bounds_min_gltf_m": [
+      -0.0528666228055954,
+      0.0,
+      -0.05150921642780304
+    ],
+    "bounds_max_gltf_m": [
+      0.0528666228055954,
+      0.4639294147491455,
+      0.05150921642780304
+    ],
+    "dimensions_gltf_m": [
+      0.1057332456111908,
+      0.4639294147491455,
+      0.10301843285560608
+    ],
+    "skins": 0,
+    "animations": 0,
+    "textures": 0,
+    "extensions_used": [],
+    "structural_checks": "PASS",
+    "topology_caveat": "See build-manifest and source-topology diagnostics. Structural checks do not imply manifold topology or engine admission."
+  },
+  {
+    "file": "meshes/humerus.glb",
+    "bytes": 7156,
+    "sha256": "3608f324e9f70ff73dba0fc9bc1a350a486c220a333114b43bfdde64369e4a99",
+    "meshes": 1,
+    "primitives": 1,
+    "materials": 1,
+    "vertices": 154,
+    "triangles": 304,
+    "degenerate_triangles": 0,
+    "max_normal_squared_length_error": 2.148766717890993e-07,
+    "bounds_min_gltf_m": [
+      -0.038072578608989716,
+      0.0,
+      -0.02227909117937088
+    ],
+    "bounds_max_gltf_m": [
+      0.038072578608989716,
+      0.3130432665348053,
+      0.02227909117937088
+    ],
+    "dimensions_gltf_m": [
+      0.07614515721797943,
+      0.3130432665348053,
+      0.04455818235874176
+    ],
+    "skins": 0,
+    "animations": 0,
+    "textures": 0,
+    "extensions_used": [],
+    "structural_checks": "PASS",
+    "topology_caveat": "See build-manifest and source-topology diagnostics. Structural checks do not imply manifold topology or engine admission."
+  },
+  {
+    "file": "meshes/humerus_cage.glb",
+    "bytes": 2860,
+    "sha256": "aec11cebb0ecb1db2de2b4e41fb51525f20a451863a2a65f2d583f8cde6b8831",
+    "meshes": 1,
+    "primitives": 1,
+    "materials": 1,
+    "vertices": 40,
+    "triangles": 76,
+    "degenerate_triangles": 0,
+    "max_normal_squared_length_error": 1.969334892937269e-07,
+    "bounds_min_gltf_m": [
+      -0.038072578608989716,
+      0.0,
+      -0.02227909117937088
+    ],
+    "bounds_max_gltf_m": [
+      0.038072578608989716,
+      0.3130432665348053,
+      0.02227909117937088
+    ],
+    "dimensions_gltf_m": [
+      0.07614515721797943,
+      0.3130432665348053,
+      0.04455818235874176
+    ],
+    "skins": 0,
+    "animations": 0,
+    "textures": 0,
+    "extensions_used": [],
+    "structural_checks": "PASS",
+    "topology_caveat": "See build-manifest and source-topology diagnostics. Structural checks do not imply manifold topology or engine admission."
+  },
+  {
+    "file": "meshes/skeletal_core_static.glb",
+    "bytes": 290384,
+    "sha256": "a8c045559768153f35945bcd0b0dbe96c93ee8a476837fe682c94d2cf89eedc5",
+    "meshes": 1,
+    "primitives": 1,
+    "materials": 1,
+    "vertices": 8128,
+    "triangles": 15585,
+    "degenerate_triangles": 0,
+    "max_normal_squared_length_error": 2.773889669072105e-07,
+    "bounds_min_gltf_m": [
+      -0.38615337014198303,
+      0.0,
+      -0.12753455340862274
+    ],
+    "bounds_max_gltf_m": [
+      0.38615337014198303,
+      1.7200000286102295,
+      0.12753455340862274
+    ],
+    "dimensions_gltf_m": [
+      0.7723067402839661,
+      1.7200000286102295,
+      0.2550691068172455
+    ],
+    "skins": 0,
+    "animations": 0,
+    "textures": 0,
+    "extensions_used": [],
+    "structural_checks": "PASS",
+    "topology_caveat": "See build-manifest and source-topology diagnostics. Structural checks do not imply manifold topology or engine admission."
+  },
+  {
+    "file": "meshes/skull_jaw.glb",
+    "bytes": 104032,
+    "sha256": "35b2643b2154afd5d0593e9048b0ec43cb5db09cdc3f4e5ca8b46dc0c3ff9aa3",
+    "meshes": 1,
+    "primitives": 1,
+    "materials": 1,
+    "vertices": 2875,
+    "triangles": 5564,
+    "degenerate_triangles": 0,
+    "max_normal_squared_length_error": 2.491342527832785e-07,
+    "bounds_min_gltf_m": [
+      -0.0736747607588768,
+      0.0,
+      -0.09789307415485382
+    ],
+    "bounds_max_gltf_m": [
+      0.0736747682094574,
+      0.2082327902317047,
+      0.0993751585483551
+    ],
+    "dimensions_gltf_m": [
+      0.1473495289683342,
+      0.2082327902317047,
+      0.19726823270320892
+    ],
+    "skins": 0,
+    "animations": 0,
+    "textures": 0,
+    "extensions_used": [],
+    "structural_checks": "PASS",
+    "topology_caveat": "See build-manifest and source-topology diagnostics. Structural checks do not imply manifold topology or engine admission."
+  },
+  {
+    "file": "meshes/skull_jaw_cage.glb",
+    "bytes": 47672,
+    "sha256": "14712039700e01c37f6fb4a82ce3a9d43ab724133171b822e8b11cf177e9e49e",
+    "meshes": 1,
+    "primitives": 1,
+    "materials": 1,
+    "vertices": 1309,
+    "triangles": 2466,
+    "degenerate_triangles": 0,
+    "max_normal_squared_length_error": 2.491342527832785e-07,
+    "bounds_min_gltf_m": [
+      -0.07985502481460571,
+      0.0,
+      -0.10296313464641571
+    ],
+    "bounds_max_gltf_m": [
+      0.07985502481460571,
+      0.2149118185043335,
+      0.10296313464641571
+    ],
+    "dimensions_gltf_m": [
+      0.15971004962921143,
+      0.2149118185043335,
+      0.20592626929283142
+    ],
+    "skins": 0,
+    "animations": 0,
+    "textures": 0,
+    "extensions_used": [],
+    "structural_checks": "PASS",
+    "topology_caveat": "See build-manifest and source-topology diagnostics. Structural checks do not imply manifold topology or engine admission."
+  }
+]

@@ -1,0 +1,26 @@
+Internal ctest changing into directory: <repo>/build/presets/windows-x64-debug
+Test project <repo>/build/presets/windows-x64-debug
+    Start 118: horde_rt_scene_abi_tests
+1/6 Test #118: horde_rt_scene_abi_tests ....................   Passed    2.50 sec
+    Start 132: horde_rt_static_gltf_asset_tests
+2/6 Test #132: horde_rt_static_gltf_asset_tests ............***Failed    2.72 sec
+Static GLB temporary root=horde-rt-static-gltf-tests-debug-pid-19892
+FAIL: three range aliases fit the saturated thirteen-asset ceiling without extra packed rows/bytes
+1 static glTF asset assertion(s) failed
+
+    Start 210: horde_rt_scene_initialise_preflight_tests
+3/6 Test #210: horde_rt_scene_initialise_preflight_tests ...   Passed    9.65 sec
+    Start 211: horde_rt_static_geometry_cutover_tests
+4/6 Test #211: horde_rt_static_geometry_cutover_tests ......   Passed    3.07 sec
+    Start 212: horde_rt_scene_resource_inventory_tests
+5/6 Test #212: horde_rt_scene_resource_inventory_tests .....   Passed   30.96 sec
+    Start 221: horde_rt_character_render_slot_smoke
+6/6 Test #221: horde_rt_character_render_slot_smoke ........   Passed    8.64 sec
+
+83% tests passed, 1 tests failed out of 6
+
+Total Test time (real) =  57.57 sec
+
+The following tests FAILED:
+	132 - horde_rt_static_gltf_asset_tests (Failed)
+Errors while running CTest

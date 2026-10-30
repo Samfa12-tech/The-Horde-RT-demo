@@ -1,0 +1,18 @@
+[
+  {
+    "path": "tools/raygen-variant-budgets.json",
+    "sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+  },
+  {
+    "path": "tools/raygen-variant-catalog.json",
+    "sha256": "03f75d2e907cb25a3acfc537e9976ceef44bf53f0b831959ea5f53207818b278"
+  },
+  {
+    "path": "tools/rayquery-variant-catalog.json",
+    "sha256": "a9b77a393f8b66c2c93738e2210e0896a8189b2f3ecc7c0ed912a221c79f10a2"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtSceneAbi.def",
+    "sha256": "f692bab518fdfdd700361a087a60248318b7ac8d46c1cab7fc5a520d09f45894"
+  }
+]

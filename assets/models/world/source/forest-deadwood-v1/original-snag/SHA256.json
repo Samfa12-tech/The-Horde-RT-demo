@@ -1,0 +1,92 @@
+[
+  {
+    "path": "README.md",
+    "bytes": 5849,
+    "sha256": "88055ff3996e2407b66e998828a862817d784efd21116583691b1ecca249aa84"
+  },
+  {
+    "path": "evidence/FREE_TREE_AUDIT_INITIAL.md",
+    "bytes": 9147,
+    "sha256": "6acb0e87a84b5a42f2efc733fd4f25869bbfd724c1efe9232cc1e8db42986448"
+  },
+  {
+    "path": "evidence/Horde_Dead_Snag_01_Review.png",
+    "bytes": 531567,
+    "sha256": "322e51e92a20f9c6c1e3b8c4a5c576c915f34ab6fe2099e900855e1efb444c57"
+  },
+  {
+    "path": "evidence/blender_build.log",
+    "bytes": 34100,
+    "sha256": "fc19bb13f8a463e5f6d93220c426bf446555b8181d77c7eb1150cc2c4f6927ea"
+  },
+  {
+    "path": "evidence/blender_build_first_attempt.log",
+    "bytes": 4103,
+    "sha256": "c505c9a39528e757dde28be796ad56386ee2bb8c046d6d761e8f8f796cf5b634"
+  },
+  {
+    "path": "evidence/geometry_report.json",
+    "bytes": 586,
+    "sha256": "b0b03e1579486ab12353e7be962ac1144daae4776a23dc59c7ad31da4d0848dd"
+  },
+  {
+    "path": "evidence/glb_static_inspection.json",
+    "bytes": 4536,
+    "sha256": "5de1a87729d2c38cc629edd028edbb54cd07a0ccac7730c4bbcef5208cf7b131"
+  },
+  {
+    "path": "evidence/texture_reproduction_check.json",
+    "bytes": 998,
+    "sha256": "cec4cc3687360eeba6f75ee9bb83dafc6f142e406529e477e210776035f0bb07"
+  },
+  {
+    "path": "models/Horde_Dead_Snag_01_LOD0.glb",
+    "bytes": 3801032,
+    "sha256": "f65183bd67a330c0afd0413e3f686f81c6286939f005b22d6e3540c82b0319de"
+  },
+  {
+    "path": "models/Horde_Dead_Snag_01_LOD1.glb",
+    "bytes": 3743832,
+    "sha256": "e7bd3645388036a5689974c917a45779437707a404ae9083aacc4d4c746da099"
+  },
+  {
+    "path": "models/Horde_Dead_Snag_01_LOD2.glb",
+    "bytes": 3713924,
+    "sha256": "f4245c9ee077411fcd77b6c611038ae4d958c80f76b26dde6af691092c285b63"
+  },
+  {
+    "path": "source/DeadTree_1.bin",
+    "bytes": 121712,
+    "sha256": "765717fbcd70023ff9aa9d65b7ddd5763738eb61ca0e15704e97de2024fc0d7c"
+  },
+  {
+    "path": "source/DeadTree_1.gltf",
+    "bytes": 2057,
+    "sha256": "e335f2ab60efcc30a02ce876582985426b45877ce390e6eec7460ddbfa2513ed"
+  },
+  {
+    "path": "source/Horde_Dead_Snag_01.blend",
+    "bytes": 4569296,
+    "sha256": "263dc4d35ec1f3738523943c2d6b6c089fb317c97688af8125f99740d923bfee"
+  },
+  {
+    "path": "source/QUATERNIUS_LICENSE.txt",
+    "bytes": 374,
+    "sha256": "de990ef6fc68cffd7fd1ae342c4d0c823b541b8848d8f76bca5d3339f4de6f6e"
+  },
+  {
+    "path": "source/build_snag.py",
+    "bytes": 4987,
+    "sha256": "5ac52e5ec97b34c14f709e1b3ce52f8974211504ea62675d5437368b48cc9c91"
+  },
+  {
+    "path": "source/generate_bark.py",
+    "bytes": 1335,
+    "sha256": "4b5e8bf05cbe0a758cdcf97ca6bbe465602b730dd36e5444f7776f5adf7989e1"
+  },
+  {
+    "path": "source/inspect_glbs.py",
+    "bytes": 2215,
+    "sha256": "96f43fae14b2da43fc4531188aef3d3df8fe313b8014ef7811cea325e41c6120"
+  }
+]

@@ -1,0 +1,246 @@
+{
+  "case": "query-candidate-02",
+  "result": "invalid",
+  "failure": "Chapter actual presentation tail exceeded the existing two-second drain.",
+  "completedSubmissions": 691,
+  "actualPresentationRows": 690,
+  "collectorStatus": {
+    "enabled": true,
+    "bound": true,
+    "surfaceGeneration": 1,
+    "swapchainSerial": 1,
+    "pendingCount": 1,
+    "lastQueryResult": 0
+  },
+  "unresolved": [
+    {
+      "surfaceGeneration": 1,
+      "swapchainSerial": 1,
+      "measurementGeneration": 5,
+      "sceneEpoch": 3,
+      "recordSerial": 11,
+      "submissionSerial": 11,
+      "simulationTick": 1436,
+      "queuedSteadyNs": 122431737384125,
+      "presentID": 1,
+      "actualPresentTime": 0,
+      "earliestPresentTime": 0,
+      "presentMargin": 0,
+      "scalePercent": 40,
+      "width": 1440,
+      "height": 2971,
+      "backend": "RayQueryCompute"
+    }
+  ],
+  "counters": {
+    "preparedPresents": 691,
+    "acceptedPresents": 691,
+    "rejectedPresents": 0,
+    "invalidRegistrations": 0,
+    "invalidMetadata": 0,
+    "pendingCapacityExhausted": 0,
+    "queryCalls": 1561,
+    "queryErrors": 0,
+    "incompleteQueries": 0,
+    "zeroPresentTimestamps": 0,
+    "zeroPresentIds": 0,
+    "unknownPresentIds": 0,
+    "duplicateTimings": 0,
+    "rowCapacityExhausted": 0,
+    "missingOnRebind": 0,
+    "missingOnUnbind": 0,
+    "abandonedPreparedPresents": 0
+  },
+  "thermals": [
+    {
+      "phase": "before-prepare",
+      "hostMonotonic": 244952.828,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 1,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 47.3,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 39.0,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 40.8,
+            "status": 1
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "before-route",
+      "hostMonotonic": 244965.609,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 2,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 51.6,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 39.4,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 42.3,
+            "status": 2
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "running",
+      "hostMonotonic": 244981.406,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 2,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 46.5,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 39.3,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 41.5,
+            "status": 2
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "running",
+      "hostMonotonic": 244997.109,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 2,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 48.4,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 39.4,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 41.5,
+            "status": 2
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "running",
+      "hostMonotonic": 245012.875,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 2,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 48.9,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 39.8,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 41.9,
+            "status": 2
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "running",
+      "hostMonotonic": 245028.593,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 2,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 48.8,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 40.0,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 41.9,
+            "status": 2
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "after-route",
+      "hostMonotonic": 245041.828,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 2,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 48.0,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 40.0,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 41.7,
+            "status": 2
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    }
+  ],
+  "reportSha256": "a0c788ae79441cedbbf01c4b7fd5c7e6eb1bc4a9102329686d5b6596a5d75b10"
+}

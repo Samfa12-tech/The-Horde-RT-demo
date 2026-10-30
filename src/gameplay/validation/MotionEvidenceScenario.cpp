@@ -30,7 +30,11 @@ bool ParseMotionScenario(std::string_view text, MotionScenario& scenario) noexce
 {
     for (auto candidate : {MotionScenario::TorchLowOpening, MotionScenario::ShaftUp,
                            MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward,
-                           MotionScenario::WaterfallEquipment, MotionScenario::TorchDrench})
+                           MotionScenario::WaterfallEquipment, MotionScenario::TorchDrench,
+                           MotionScenario::ChapterRoundTrip, MotionScenario::ChapterStreamingCycle,
+                           MotionScenario::ChapterResidentComparison, MotionScenario::ChapterStreamedComparison,
+                           MotionScenario::KeeperTorchTransition, MotionScenario::ChapterPerformanceRoute,
+                           MotionScenario::ChapterOutdoorScaleHold})
         if (text == MotionScenarioName(candidate)) { scenario = candidate; return true; }
     return false;
 }
@@ -44,6 +48,13 @@ const char* MotionScenarioName(MotionScenario scenario) noexcept
     case MotionScenario::KeeperRetryReward: return "keeper-retry-reward";
     case MotionScenario::WaterfallEquipment: return "waterfall-equipment";
     case MotionScenario::TorchDrench: return "torch-drench";
+    case MotionScenario::ChapterRoundTrip: return "chapter-round-trip";
+    case MotionScenario::ChapterStreamingCycle: return "chapter-streaming-cycle";
+    case MotionScenario::ChapterResidentComparison: return "chapter-resident-comparison";
+    case MotionScenario::ChapterStreamedComparison: return "chapter-streamed-comparison";
+    case MotionScenario::KeeperTorchTransition: return "keeper-torch-transition";
+    case MotionScenario::ChapterPerformanceRoute: return "chapter-performance-route";
+    case MotionScenario::ChapterOutdoorScaleHold: return "chapter-outdoor-scale-hold";
     default: return "invalid";
     }
 }
@@ -72,6 +83,9 @@ const char* MotionStageName(MotionStage stage) noexcept
     case MotionStage::TorchDrenchGuttering: return "torch-drench-guttering";
     case MotionStage::TorchDrenchFalling: return "torch-drench-falling";
     case MotionStage::TorchDrenchSettled: return "torch-drench-settled";
+    case MotionStage::TorchBaseline: return "torch-baseline";
+    case MotionStage::TorchActivation: return "torch-activation";
+    case MotionStage::TorchLit: return "torch-lit";
     default: return "invalid";
     }
 }
@@ -84,16 +98,44 @@ bool MotionEvidenceScenario::Begin(MotionScenario scenario, GameSimulation& simu
     if (std::string_view(MotionScenarioName(scenario)) == "invalid" || now == 0u ||
         simulation.Snapshot().playerMountProfile != items::PlayerMountProfile::AnatomicalBody)
     { Fail("Motion evidence requires an admitted scenario, clock and production simulation profile."); return false; }
-    const bool seeded = scenario == MotionScenario::WaterfallEquipment
+    // Chapter measurement observes an already rendered/admitted reunion. It
+    // neither fabricates readiness nor seeds progression inside the timed run.
+    const auto& initial = simulation.Snapshot();
+    const bool seeded = scenario==MotionScenario::ChapterOutdoorScaleHold
+        ? initial.developmentRescueJourney && initial.playerAlive && initial.rescue.exteriorSide &&
+          !initial.rescue.equipmentStowed && initial.worldRoute.generation &&
+          initial.worldRoute.current==WorldZoneId::Lookout &&
+          initial.worldRoute.readiness[static_cast<unsigned>(WorldZoneId::Lookout)]==ZoneReadiness::Ready &&
+          Distance(initial,kWorldRoutePoints[7].x,kWorldRoutePoints[7].z)<0.04f &&
+          std::isfinite(initial.playerSupportWorldY) && std::isfinite(initial.playerYawRadians) &&
+          std::isfinite(initial.playerPitchRadians)
+        : scenario==MotionScenario::KeeperTorchTransition
+        ? initial.developmentRescueJourney && !initial.lich.revealStarted &&
+          initial.playerAlive && Distance(initial,kPlayerSpawn.x,kPlayerSpawn.z)<0.01f
+        : IsChapterMotionScenario(scenario)
+        ? chapter_.Start(simulation.Snapshot(),scenario!=MotionScenario::ChapterRoundTrip,
+            scenario==MotionScenario::ChapterResidentComparison || scenario==MotionScenario::ChapterStreamedComparison ||
+            scenario==MotionScenario::ChapterPerformanceRoute)
+        : scenario == MotionScenario::WaterfallEquipment
         ? simulation.BeginMotionEvidenceEquipmentSeed()
         : simulation.ApplyShowcaseCheckpoint(
             scenario == MotionScenario::TorchLowOpening ? 0 :
             (scenario == MotionScenario::ShaftUp || scenario == MotionScenario::TorchDrench) ? 2 : 8);
     if (!seeded)
-    { Fail("The accepted scenario checkpoint seed could not be applied."); return false; }
+    {
+        const auto chapterFailure=IsChapterMotionScenario(scenario)
+            ? ChapterRoundTripProbe::StartFailure(simulation.Snapshot()) : std::string_view{};
+        Fail(chapterFailure.empty() ? "The accepted scenario checkpoint seed could not be applied." : chapterFailure);
+        return false;
+    }
     equipmentSeedOwned_ = scenario == MotionScenario::WaterfallEquipment;
     startWall_ = latestWall_ = now;
     previousTick_ = simulation.Snapshot().tickIndex;
+    if (scenario==MotionScenario::ChapterOutdoorScaleHold) {
+        outdoorGeneration_=initial.worldRoute.generation;outdoorInitialTick_=initial.tickIndex;
+        outdoorX_=initial.playerX;outdoorY_=initial.playerSupportWorldY;outdoorZ_=initial.playerZ;
+        outdoorYaw_=initial.playerYawRadians;outdoorPitch_=initial.playerPitchRadians;
+    }
     previousRevealElapsed_ = simulation.Snapshot().lich.revealElapsedSeconds;
     initialVitality_ = simulation.Snapshot().playerVitals.vitality;
     initialRetryGeneration_ = simulation.Snapshot().retryGeneration;
@@ -145,8 +187,11 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
     const InputSnapshot& published, std::uint64_t now, bool ready) noexcept
 {
     InputSnapshot input = published;
+    input.analogueMovement = false;
     input.moveForward = input.moveStrafe = 0.0f;
     input.hasAuthoritativePlayerPose = false;
+    input.runHeld = false;
+    input.crouchHeld = false;
     input.authoritativePlayerX = input.authoritativePlayerZ = 0.0f;
     input.damageEnabled = KeeperScenario(scenario_);
     input.torchLightStrength = 1.8f;
@@ -161,10 +206,80 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
     merge(commands_.retry, published.commands.retry, state.lastConsumedRetrySequence);
     merge(commands_.interact, published.commands.interact, state.lastConsumedInteractSequence);
     merge(commands_.toggleHeldLightPose, published.commands.toggleHeldLightPose, state.lastConsumedToggleHeldLightPoseSequence);
+    merge(commands_.runToggle, published.commands.runToggle, state.lastConsumedRunToggleSequence);
+    merge(commands_.clearRunIntent, published.commands.clearRunIntent,
+          state.lastConsumedClearRunIntentSequence);
+    if (scenario_==MotionScenario::KeeperTorchTransition) {
+        merge(commands_.crouchToggle,published.commands.crouchToggle,state.lastConsumedCrouchToggleSequence);
+        merge(commands_.clearCrouchIntent,published.commands.clearCrouchIntent,state.lastConsumedClearCrouchIntentSequence);
+    }
+    if (!runClearSent_)
+    {
+        const std::uint64_t runClearBase = std::max(
+            commands_.clearRunIntent, state.lastConsumedClearRunIntentSequence);
+        commands_.clearRunIntent = runClearBase == UINT64_MAX ? runClearBase : runClearBase + 1u;
+        if (scenario_==MotionScenario::KeeperTorchTransition) {
+            const auto floor=commands_.clearCrouchIntent;
+            commands_.clearCrouchIntent=floor==UINT64_MAX?floor:floor+1u;
+        }
+        runClearSent_ = true;
+    }
     if (now < latestWall_ || now < startWall_) Fail("Monotonic motion clock regressed.");
     else if (startWall_ != 0u && now - startWall_ > kMaximumWallNanoseconds) Fail("Motion evidence wall deadline exceeded.");
     latestWall_ = std::max(latestWall_, now);
     input.paused = published.paused || !ready || Failed() || Complete() || stage_ == MotionStage::NotStarted;
+    if (scenario_==MotionScenario::ChapterOutdoorScaleHold) {
+        input.tutorialEnabled=false;input.damageEnabled=false;
+        input.torchLightStrength=published.torchLightStrength;
+        input.yawRadians=outdoorYaw_;input.pitchRadians=outdoorPitch_;
+        input.commands=commands_;
+        return input;
+    }
+    if (IsChapterMotionScenario(scenario_)) {
+        const auto generated = chapter_.Next(state, input.paused,FixedStepRunner::kMaximumStepsPerAdvance);
+        input.moveForward=generated.moveForward;input.moveStrafe=generated.moveStrafe;
+        input.yawRadians=generated.yawRadians;input.pitchRadians=generated.pitchRadians;
+        input.runHeld=generated.runHeld;input.paused=generated.paused;
+        input.tutorialEnabled=false;
+        // Preserve consumed unrelated edges; only the probe owns these three.
+        commands_.interact=generated.commands.interact;
+        commands_.toggleHeldLightPose=generated.commands.toggleHeldLightPose;
+        commands_.clearRunIntent=generated.commands.clearRunIntent;
+        input.commands=commands_;
+        if(chapter_.Phase()==ChapterProbePhase::Failed)Fail("Chapter route lost readiness, generation or progress.");
+        if(Failed()){input.paused=true;input.moveForward=input.moveStrafe=0;}
+        return input;
+    }
+    if (scenario_==MotionScenario::KeeperTorchTransition) {
+        // Observe the live chapter, never import an encounter phase/light or
+        // override delta. Ordinary axes traverse the collision-resolved route.
+        input.tutorialEnabled=false;
+        input.damageEnabled=false; // transit probe, not a combat balance test
+        input.yawRadians=-kPi*0.5f;input.pitchRadians=0;
+        if (!input.paused) {
+            constexpr std::array<RoutePosition,6> route{{
+                {0,-9.5f},{4.2f,-9.5f},{4.2f,-15.2f},{-2,-15.2f},{-8,-15.2f},{-30.46f,-15.2f}}};
+            if (stage_==MotionStage::Approach) {
+                const auto target=route[torchRouteWaypoint_];
+                MoveTowards(input,state,target.x,target.z);
+                // The live opening now requires actual crouch input. Predict
+                // standing clearance through the shared authored body query;
+                // preserve the ordinary motor, collision and transition time.
+                const float dx=target.x-state.playerX,dz=target.z-state.playerZ;
+                const float distance=std::hypot(dx,dz);
+                const float scale=distance>.0001f?std::min(distance,.30f)/distance:0.f;
+                input.crouchHeld=!AuthoredBodySweepClear(state.playerX,state.playerZ,
+                    state.playerX+dx*scale,state.playerZ+dz*scale,state.playerSupportWorldY,
+                    kStandingBodyHeight,kPlayerCollisionRadius);
+                if (Distance(state,target.x,target.z)<0.035f) {
+                    if (++torchRouteWaypoint_==route.size()) Enter(MotionStage::TorchBaseline);
+                }
+            } else if (stage_==MotionStage::TorchActivation)
+                MoveTowards(input,state,kKeeperRetryPosition.x,kKeeperRetryPosition.z);
+        }
+        input.commands=commands_;
+        return input;
+    }
     if (!input.paused)
     {
         const float elapsed = static_cast<float>(simulationSeconds_ - stageStartSeconds_);
@@ -314,6 +429,38 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
     const bool advanced = state.tickIndex > previousTick_;
     simulationSeconds_ += static_cast<double>(state.tickIndex - previousTick_) * FixedStepRunner::kFixedDeltaSeconds;
     previousTick_ = state.tickIndex;
+    if (scenario_==MotionScenario::KeeperTorchTransition) {
+        for(const auto& event:events) {
+            if(event.sequence<=previousEventSequence_ || static_cast<std::size_t>(event.type)>=eventCounts_.size()) {
+                Fail("Torch probe event sequence/type is invalid.");return;
+            }
+            previousEventSequence_=event.sequence;
+            ++eventCounts_[static_cast<std::size_t>(event.type)];
+        }
+        const double elapsed=simulationSeconds_-stageStartSeconds_;
+        if(elapsed>45) {Fail("Torch transition stage made no bounded progress.");return;}
+        if(!state.developmentRescueJourney || state.eventQueueOverflowCount || !state.playerAlive || state.lich.health!=3 ||
+           state.lich.damagePulse || state.lich.staffLightStrength!=0 ||
+           eventCounts_[static_cast<std::size_t>(GameplayEventType::KeeperRevealStarted)]>1) {
+            Fail("Torch probe lost live chapter/reveal-only safety.");return;
+        }
+        if(stage_==MotionStage::Approach || stage_==MotionStage::TorchBaseline) {
+            if(state.lich.revealStarted) {Fail("Keeper activated before the measured arrival crossing.");return;}
+            if(stage_==MotionStage::TorchBaseline && elapsed>=6) Enter(MotionStage::TorchActivation);
+        } else if(stage_==MotionStage::TorchActivation && state.lich.revealStarted) {
+            revealHeldX_=state.playerX;revealHeldZ_=state.playerZ;Enter(MotionStage::TorchLit);
+        } else if(stage_==MotionStage::TorchLit) {
+            if(Distance(state,revealHeldX_,revealHeldZ_)>0.0001f) {
+                Fail("Torch probe moved during the held reveal view.");return;
+            }
+            if(state.lich.revealComplete) {
+                if(eventCounts_[static_cast<std::size_t>(GameplayEventType::KeeperRevealStarted)]!=1)
+                    Fail("Torch probe did not observe the authoritative reveal event.");
+                else Enter(MotionStage::Complete);
+            }
+        }
+        return;
+    }
     if (state.eventQueueOverflowCount != 0u) { Fail("Semantic gameplay event queue overflowed."); return; }
     bool impact = false;
     for (const auto& event : events)
@@ -341,6 +488,27 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
             torchExtinguishedSequence_ = event.sequence;
         }
         impact = impact || event.type == GameplayEventType::LichImpact;
+    }
+    if (IsChapterMotionScenario(scenario_)) {
+        if(chapter_.Phase()==ChapterProbePhase::Complete)Enter(MotionStage::Complete);
+        return;
+    }
+    if (scenario_==MotionScenario::ChapterOutdoorScaleHold) {
+        if (!state.developmentRescueJourney || !state.playerAlive || !state.rescue.exteriorSide ||
+            state.rescue.equipmentStowed || state.worldRoute.generation!=outdoorGeneration_ ||
+            state.worldRoute.current!=WorldZoneId::Lookout ||
+            state.worldRoute.readiness[static_cast<unsigned>(WorldZoneId::Lookout)]!=ZoneReadiness::Ready ||
+            Distance(state,outdoorX_,outdoorZ_)>0.001f ||
+            std::abs(state.playerSupportWorldY-outdoorY_)>0.001f ||
+            std::abs(state.playerYawRadians-outdoorYaw_)>0.0001f ||
+            std::abs(state.playerPitchRadians-outdoorPitch_)>0.0001f) {
+            Fail("Outdoor hold lost ready route ownership or its stationary camera/support.");return;
+        }
+        if (latestWall_-startWall_>=kOutdoorWarmupNanoseconds+kOutdoorSampleNanoseconds) {
+            if (previousTick_==outdoorInitialTick_)Fail("Outdoor hold did not advance the normal fixed-step simulation.");
+            else Enter(MotionStage::Complete);
+        }
+        return;
     }
     if (scenario_ == MotionScenario::TorchDrench)
     {

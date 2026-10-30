@@ -1,0 +1,59 @@
+{
+  "normalStaticResidencySavingBytes": 0,
+  "hostDebug": "6/6",
+  "schema": 1,
+  "scope": "Native anatomical carry unchanged; legacy fixture profile preserved; two Android capture registrations repaired",
+  "sourceParent": "1396670a0f54666a0c2963155a2f97bffca16bf9",
+  "artifacts": [
+    {
+      "bytes": 13203968,
+      "sha256": "2f1ce5e36a75ff225a5b1ab290818fcd13e665220cd1a248f08d4a576421f169",
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe"
+    },
+    {
+      "bytes": 4482048,
+      "sha256": "4308fb3a7dc4097099c4d689e834317d854106ffa2585637ea179a4249ec48c4",
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe"
+    },
+    {
+      "bytes": 183196634,
+      "sha256": "785570a51f8b9341ecda58aca3f9023d0c500b7fddb16965bd0730b430a4369b",
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk"
+    }
+  ],
+  "java": {
+    "tests": 286,
+    "skipped": 0,
+    "failed": 0
+  },
+  "nativeImageParity": [
+    {
+      "backend": "pipeline",
+      "changed_pixels": 0,
+      "max_channel_difference": 0
+    },
+    {
+      "backend": "query",
+      "changed_pixels": 0,
+      "max_channel_difference": 0
+    }
+  ],
+  "sources": [
+    {
+      "bytes": 70520,
+      "sha256": "dedb969f7a4a11e6ba1a42ac3b10be22e6c6f657c174e67a953f41986728d4cd",
+      "path": "src/gameplay/items/HeldItemKinematics.cpp"
+    },
+    {
+      "bytes": 42396,
+      "sha256": "a9a457f94ae78a456eb7834f4c7ae62523a587274041b4b9619255b165da2aa0",
+      "path": "tests/RescueJourneyIntegrationTests.cpp"
+    },
+    {
+      "bytes": 416983,
+      "sha256": "0ed780fa975a66ef1a86b25d596a4e76b75ac2b8aab594e752e9f3d14a45307e",
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java"
+    }
+  ],
+  "hostRelease": "6/6"
+}

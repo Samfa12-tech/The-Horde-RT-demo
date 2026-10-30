@@ -1,0 +1,16 @@
+[OUTPUT] 
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+
+[HANDLER_OUTPUT] 
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+
+    Start 200: horde_rt_static_geometry_cutover_tests
+1/3 Test #200: horde_rt_static_geometry_cutover_tests ....   Passed    1.36 sec
+    Start 201: horde_rt_scene_resource_inventory_tests
+2/3 Test #201: horde_rt_scene_resource_inventory_tests ...   Passed    1.77 sec
+    Start 206: horde_rt_skinned_character_smoke
+3/3 Test #206: horde_rt_skinned_character_smoke ..........   Passed    4.62 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   7.78 sec

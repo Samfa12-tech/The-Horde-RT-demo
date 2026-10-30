@@ -82,6 +82,52 @@ LanternPendulumSnapshot RunStartAndStop()
 int main()
 {
     constexpr float dt = 1.0f / 60.0f;
+    LanternPendulum rebind;
+    rebind.Reset(Hinge(0.0f, 1.0f, 0.0f));
+    auto movingAnchor = rebind.Snapshot();
+    movingAnchor.forwardAngleRadians = 0.20f;
+    movingAnchor.strafeAngleRadians = -0.15f;
+    movingAnchor.torsionAngleRadians = 0.10f;
+    movingAnchor.forwardAngularVelocity = 0.6f;
+    movingAnchor.strafeAngularVelocity = -0.4f;
+    movingAnchor.torsionAngularVelocity = 0.3f;
+    movingAnchor.previousPivotVelocity = {{0.2f, -0.1f, 0.4f}};
+    rebind.Import(movingAnchor);
+    const auto correctedHinge = Hinge(2.0f, 1.2f, -3.0f, 0.3f);
+    rebind.RebindHinge(correctedHinge, 0.6f);
+    auto expectedRebind = movingAnchor;
+    expectedRebind.previousPivotPosition = {{2.0f, 1.2f, -3.0f}};
+    expectedRebind.previousHandForward = {{std::sin(0.3f), 0.0f, std::cos(0.3f)}};
+    expectedRebind.worldFromBody = ComposeLanternPendulumBodyTransform(correctedHinge,
+        movingAnchor.forwardAngleRadians, movingAnchor.strafeAngleRadians,
+        movingAnchor.torsionAngleRadians, 0.6f);
+    Check(rebind.Snapshot() == expectedRebind,
+          "zero-time hinge rebind preserves every phase/velocity and recomposes the corrected anchor");
+    rebind.RebindHinge(correctedHinge, 0.6f);
+    Check(rebind.Snapshot() == expectedRebind, "repeated identical hinge rebind is idempotent");
+    auto invalidHinge = correctedHinge;
+    invalidHinge[12] = std::numeric_limits<float>::quiet_NaN();
+    rebind.RebindHinge(invalidHinge);
+    rebind.RebindHinge(correctedHinge, std::numeric_limits<float>::infinity());
+    Check(rebind.Snapshot() == expectedRebind, "invalid zero-time anchor cannot mutate physical state");
+
+    // A geometry-only translation must not create a teleport reset or an
+    // acceleration impulse on the next ordinary physics tick.
+    movingAnchor.previousPivotVelocity = {};
+    LanternPendulum stationary, translated;
+    stationary.Import(movingAnchor);translated.Import(movingAnchor);
+    translated.RebindHinge(Hinge(2.0f, 1.0f, -3.0f));
+    stationary.StepFixed(Hinge(0.0f, 1.0f, 0.0f), dt);
+    translated.StepFixed(Hinge(2.0f, 1.0f, -3.0f), dt);
+    const auto& unchanged = stationary.Snapshot();const auto& relocated = translated.Snapshot();
+    Check(unchanged.forwardAngleRadians == relocated.forwardAngleRadians &&
+          unchanged.strafeAngleRadians == relocated.strafeAngleRadians &&
+          unchanged.torsionAngleRadians == relocated.torsionAngleRadians &&
+          unchanged.forwardAngularVelocity == relocated.forwardAngularVelocity &&
+          unchanged.strafeAngularVelocity == relocated.strafeAngularVelocity &&
+          unchanged.torsionAngularVelocity == relocated.torsionAngularVelocity,
+          "rebound derivative origin prevents a false physics impulse after geometry readiness");
+
     LanternPendulum rest;
     rest.Reset(Hinge(0.0f, 1.0f, 0.0f));
     LanternPendulumSnapshot displaced = rest.Snapshot();

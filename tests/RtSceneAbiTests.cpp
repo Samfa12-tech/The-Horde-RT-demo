@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <limits>
 #include <span>
@@ -197,9 +198,10 @@ void TestAbiLayout()
     Check(sizeof(RtQualityControlsGpu) == 16u && alignof(RtQualityControlsGpu) == 16u &&
               offsetof(RtQualityControlsGpu, controls) == 0u,
           "typed quality record is exactly one aligned uint4 without push expansion");
-    Check(sizeof(RtHeldLightGpu) == 16u && alignof(RtHeldLightGpu) == 16u &&
-              offsetof(RtHeldLightGpu, positionStrength) == 0u,
-          "RtHeldLightGpu appends one exact world-position/strength vec4");
+    Check(sizeof(RtHeldLightGpu) == 32u && alignof(RtHeldLightGpu) == 16u &&
+              offsetof(RtHeldLightGpu, positionStrength) == 0u &&
+              offsetof(RtHeldLightGpu, playerTransform) == 16u,
+          "RtHeldLightGpu keeps physical light vec4 and appends player transform vec4");
 }
 
 void TestGeneratedConstants()
@@ -209,15 +211,18 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 24u, "instance metadata preserves viewmodel20/collapse21/player torch22 and appends player scabbard23");
-    Check(kRtTlasInstanceCapacity == 26u,
-          "player scabbard adds a metadata-backed owner while the two permanent Keeper torches retain physical indices23/24");
+    Check(kRtInstanceMetadataCapacity == 30u,
+          "joint ring28/flask29 append after unchanged metadata0..27");
+    Check(kRtTlasInstanceCapacity == 107u,
+          "storage fits 31 ordinary physical instances, 64 route trees and the bounded 12-tree F01 candidate");
+    Check(kRtOrdinaryShowcaseInstanceCount == 31u,
+          "ordinary live count is independent of diagnostic storage and metadata aliases");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
-    Check(kRtStaticAssetCapacity == 12u, "static asset capacity admits the original player sword scabbard without replacing old assets");
-    Check(kRtPrimitiveMetadataCapacity == 32u, "primitive capacity is 32");
-    Check(kRtMaterialCapacity == 32u, "material capacity is 32");
-    Check(kRtTextureLayerCapacity == 16u, "each PBR texture category has 16 layers");
+    Check(kRtStaticAssetCapacity == 15u, "static asset capacity admits both independent ring/flask assets while preserving all thirteen previous owners");
+    Check(kRtPrimitiveMetadataCapacity == 38u, "primitive storage fits the High route bank and both independent joint props");
+    Check(kRtMaterialCapacity == 34u, "material capacity is 34 for simultaneous joint props and the shared world palette");
+    Check(kRtTextureLayerCapacity == 18u, "each PBR texture category has 18 layers");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&
               kRtBindingStaticIndices == 15u && kRtBindingBaseColorTextures == 16u &&
@@ -225,8 +230,9 @@ void TestGeneratedConstants()
               kRtBindingEmissiveTextures == 19u && kRtBindingHeldLight == 20u &&
               kRtBindingFireEmitters == 21u && kRtBindingDielectricDiagnostics == 22u &&
               kRtBindingWorldPlayerVertices == 23u && kRtBindingViewmodelVertices == 24u &&
-              kRtBindingEnvironmentTexture == 25u && kRtBindingQualityControls == 26u,
-          "descriptor bindings preserve player streams23/24 and append environment25 and quality26");
+              kRtBindingEnvironmentTexture == 25u && kRtBindingQualityControls == 26u &&
+              kRtBindingWaterContactRipple == 27u,
+          "descriptor bindings preserve player streams23/24 and append environment25, quality26 and water ripple27");
     Check(static_cast<std::uint32_t>(RtGeometryRole::Static) == 0u &&
               static_cast<std::uint32_t>(RtGeometryRole::PlayerWorldBody) == 1u &&
               static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel) == 2u &&
@@ -307,7 +313,7 @@ void TestGenericRegistrationAndMeasurements()
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 128u &&
-               slot.Measurements().instanceMetadataBytes == 24u * 32u &&
+               slot.Measurements().instanceMetadataBytes == 30u * 32u &&
               slot.Measurements().primitiveMetadataBytes == 2u * 16u &&
               slot.Measurements().descriptorCount == 9u,
           "resource measurements use literal ABI sizes and descriptor count");
@@ -337,13 +343,52 @@ void TestExplicitTextureGroups()
               diagnostic == "RtStaticMeshSlot texture group has conflicting texture presence.",
           "grouped materials cannot silently disagree on texture presence");
     asset.materials[2].normalTexture = 6;
-    auto preceding = MakeAsset(1u, 15u);
+    auto preceding = MakeAsset(1u, 17u);
     for (std::size_t i = 0; i < preceding.materials.size(); ++i)
         preceding.materials[i].baseColorTexture = static_cast<std::int32_t>(i);
     const std::array<StaticRtAssetRegistration, 2> registrations{{{1u, 2u, 1u, 0u, &preceding}, request}};
     Check(!slot.Initialize(registrations, diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 16.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 18.",
           "canonical groups still enforce bounded texture capacity");
+}
+
+void TestDeferredTextureGroups()
+{
+    using namespace horde::vulkan::raytracing;
+    auto combined=MakeAsset(6u,6u);
+    for(std::size_t i=0;i<2;++i) combined.materials[i].baseColorTexture=static_cast<std::int32_t>(i);
+    for(std::size_t i=2;i<6;++i) {
+        auto& material=combined.materials[i];
+        material.baseColorTexture=static_cast<std::int32_t>(i);
+        material.textureGroup=static_cast<std::int32_t>(i-2);
+        material.deferTextureAllocation=true;
+    }
+    auto later=MakeAsset(1u,12u);
+    for(std::size_t i=0;i<12;++i) later.materials[i].baseColorTexture=static_cast<std::int32_t>(i);
+    const std::array<StaticRtAssetRegistration,2> registrations{{
+        {1u,1u,1u,0u,&combined},{3u,2u,1u,0u,&later}}};
+    RtStaticMeshSlot slot;std::string diagnostic;
+    Check(slot.Initialize(registrations,diagnostic),"deferred groups fit exactly at the18-layer boundary");
+    bool legacy=true,newGroups=true;
+    if(slot.Materials().size()==18) {
+        for(std::size_t i=0;i<2;++i) legacy&=slot.Materials()[i].textureLayers[0]==i;
+        for(std::size_t i=0;i<12;++i) legacy&=slot.Materials()[6+i].textureLayers[0]==i+2;
+        for(std::size_t i=0;i<4;++i) newGroups&=slot.Materials()[2+i].textureLayers[0]==14+i;
+    } else legacy=newGroups=false;
+    Check(legacy&&newGroups&&slot.TextureArrayCounts().baseColor==18,
+          "sharing geometry owner preserves all14 legacy layers and routes tail families14..17");
+    Check(slot.PrimitiveMetadata().size()==7&&slot.PrimitiveMetadata()[6].materialIndex==6,
+          "deferred textures do not reorder primitive/material geometry");
+    later.materials.push_back(later.materials.back());
+    later.materials.back().baseColorTexture=12;
+    Check(!slot.Initialize(registrations,diagnostic)&&diagnostic=="RtStaticMeshSlot deferred texture layers exceed capacity.",
+          "one extra actual layer rejects deferred admission");
+    later.materials.pop_back();
+    combined.materials[2].textureGroup=-1;
+    Check(!slot.Initialize(registrations,diagnostic),"ungrouped deferred material is rejected");
+    combined.materials[2].textureGroup=0;
+    combined.materials[3].textureGroup=0;combined.materials[3].deferTextureAllocation=false;
+    Check(!slot.Initialize(registrations,diagnostic),"conflicting deferred/ordinary group policy is rejected");
 }
 
 void TestNamedCapacityFailures()
@@ -376,25 +421,109 @@ void TestNamedCapacityFailures()
                   std::to_string(kRtStaticAssetCapacity) + ".",
           "static asset overflow fails initialization by name");
 
-    auto primitiveOverflow = MakeAsset(33u, 1u);
+    auto primitiveOverflow = MakeAsset(kRtPrimitiveMetadataCapacity + 1u, 1u);
     StaticRtAssetRegistration primitiveRequest{3u, 1u, 1u, 0u, &primitiveOverflow};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&primitiveRequest, 1u), diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: primitives exceed 32.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: primitives exceed " +
+                  std::to_string(kRtPrimitiveMetadataCapacity) + ".",
           "primitive overflow fails initialization by name");
 
-    auto materialOverflow = MakeAsset(1u, 33u);
+    auto materialOverflow = MakeAsset(1u, kRtMaterialCapacity + 1u);
     StaticRtAssetRegistration materialRequest{3u, 1u, 1u, 0u, &materialOverflow};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&materialRequest, 1u), diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: materials exceed 32.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: materials exceed " +
+                  std::to_string(kRtMaterialCapacity) + ".",
           "material overflow fails initialization by name");
 
-    auto textureOverflow = MakeAsset(1u, 17u);
+    auto textureOverflow = MakeAsset(1u, 19u);
     for (std::size_t materialIndex = 0u; materialIndex < textureOverflow.materials.size(); ++materialIndex)
         textureOverflow.materials[materialIndex].baseColorTexture = static_cast<std::int32_t>(materialIndex);
     StaticRtAssetRegistration textureRequest{3u, 1u, 1u, 0u, &textureOverflow};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&textureRequest, 1u), diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 16.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 18.",
           "metadata cannot assign a texture layer outside the fixed Vulkan array");
+}
+
+void TestJointPresentationCapacity()
+{
+    using namespace horde::vulkan::raytracing;
+    // Fill the previous 13-asset/36-primitive/32-material ceiling, then append
+    // both props together. This exercises real slot packing without a GPU.
+    std::array<horde::scene::assets::StaticMeshAsset, 15u> assets;
+    assets[0] = MakeAsset(24u, 20u);
+    for (std::size_t i = 1u; i < assets.size(); ++i) assets[i] = MakeAsset(1u, 1u);
+    assets[13].materials[0].flags = static_cast<std::uint32_t>(RtMaterialFlag::DoubleSided);
+    assets[13].materials[0].emissiveFactor = {{1.0f, 0.16f, 0.015f}};
+    constexpr std::array<std::uint32_t, 13u> previousOwners{{1u,3u,4u,5u,6u,7u,8u,9u,20u,21u,23u,24u,25u}};
+    std::vector<StaticRtAssetRegistration> registrations;
+    for (std::size_t i = 0u; i < previousOwners.size(); ++i)
+        registrations.push_back({previousOwners[i], static_cast<std::uint32_t>(100u+i), 1u, 0u, &assets[i]});
+    RtStaticMeshSlot slot;
+    std::string diagnostic;
+    const bool baseline = slot.Initialize(registrations, diagnostic);
+    Check(baseline, "previous static owner ceiling packs before joint append: " + diagnostic);
+    if (!baseline) return;
+    const auto previous = slot.InstanceMetadata();
+    registrations.push_back({28u, 128u, 1u, 0u, &assets[13]});
+    registrations.push_back({29u, 129u, 1u, 0u, &assets[14]});
+    const bool joint = slot.Initialize(registrations, diagnostic);
+    Check(joint, "both independent joint props pack simultaneously at the exact new ceilings: " + diagnostic);
+    if (!joint) return;
+    Check(slot.PrimitiveMetadata().size() == 38u && slot.Materials().size() == 34u &&
+              slot.InstanceMetadata()[28].primitiveBase == 36u && slot.InstanceMetadata()[29].primitiveBase == 37u &&
+              slot.InstanceMetadata()[28].assetIndex == 13u && slot.InstanceMetadata()[29].assetIndex == 14u &&
+              slot.PrimitiveMetadata()[36].materialIndex == 32u && slot.PrimitiveMetadata()[37].materialIndex == 33u,
+          "joint append retains independent primitive, material and asset identities at all exact ceilings");
+    Check(std::memcmp(previous.data(), slot.InstanceMetadata().data(), 28u*sizeof(RtInstanceMetadata)) == 0,
+          "joint append preserves every old metadata record0..27 byte for byte");
+    Check(slot.Materials()[32].emissiveFactorStrength == std::array<float,4u>{{1.0f,0.16f,0.015f,1.0f}} &&
+              slot.TextureArrayCounts().baseColor == 0u && slot.TextureArrayCounts().normal == 0u &&
+              slot.TextureArrayCounts().orm == 0u && slot.TextureArrayCounts().emissive == 0u,
+          "constant joint emission needs no new texture family or descriptor");
+}
+
+void TestFrameMaterialAppearance()
+{
+    using namespace horde::vulkan::raytracing;
+    auto a=MakeAsset(1u,1u),b=a,ring=a,flask=a;
+    std::vector<StaticRtAssetRegistration> registrations{
+        {5u,105u,1u,0u,&a},{6u,106u,1u,0u,&b},
+        {28u,128u,1u,0u,&ring},{29u,129u,1u,0u,&flask}};
+    RtStaticMeshSlot slot;std::string diagnostic;
+    Check(slot.Initialize(registrations,diagnostic),"appearance fixture packs independent owners");
+    const std::array<RtImmutableMaterialAlias,1u> aliases{{{1u,0u}}};
+    Check(slot.ShareImmutableMaterialRows(aliases,diagnostic),"appearance resolves after immutable chest alias remapping");
+    const auto source=slot.Materials();auto frame=source;
+    frame.resize(frame.size()+2u);const auto before=frame;
+    const auto row=slot.PrimitiveMetadata()[slot.InstanceMetadata()[28].primitiveBase].materialIndex;
+    RtMaterialAppearance yellow{{{1.f,.78f,.04f,1.f}},{{1.f,.6f,.02f,2.f}}};
+    Check(row==1u && slot.ApplyFrameMaterialAppearance(frame,28u,yellow,diagnostic),
+          "exclusive owner appearance resolves its remapped row rather than a hardcoded material index");
+    auto expected=before;expected[row].baseColorFactor=yellow.baseColour;expected[row].emissiveFactorStrength=yellow.emission;
+    Check(std::memcmp(frame.data(),expected.data(),frame.size()*sizeof(RtMaterialGpu))==0 &&
+          std::memcmp(source.data(),slot.Materials().data(),source.size()*sizeof(RtMaterialGpu))==0,
+          "appearance changes only two frame-local factors; source, flask, aliases, textures and world palette remain exact");
+    const auto reject=[&](std::uint32_t owner,RtMaterialAppearance value,std::vector<RtMaterialGpu> data) {
+        const auto saved=data;
+        Check(!slot.ApplyFrameMaterialAppearance(data,owner,value,diagnostic) &&
+              data.size()==saved.size() && std::memcmp(data.data(),saved.data(),data.size()*sizeof(RtMaterialGpu))==0,
+              "invalid or shared appearance input rejects atomically");
+    };
+    reject(5u,yellow,frame); // Chest A shares its material with B.
+    reject(0u,yellow,frame);reject(kRtInstanceMetadataCapacity,yellow,frame);
+    auto bad=yellow;bad.baseColour[0]=std::numeric_limits<float>::quiet_NaN();reject(28u,bad,frame);
+    bad=yellow;bad.baseColour[3]=.5f;reject(28u,bad,frame);
+    bad=yellow;bad.emission[3]=-1.f;reject(28u,bad,frame);
+    bad=yellow;bad.emission[0]=std::numeric_limits<float>::max();reject(28u,bad,frame);
+    auto shortFrame=source;shortFrame.pop_back();reject(28u,yellow,shortFrame);
+    auto transparent=frame;transparent[row].materialFlags[0]|=static_cast<std::uint32_t>(RtMaterialFlag::Transmission);
+    reject(28u,yellow,transparent);
+    registrations.push_back({27u,127u,1u,0u,&ring});
+    RtStaticMeshSlot geometryAlias;Check(geometryAlias.Initialize(registrations,diagnostic),"geometry-alias fixture packs");
+    auto aliasFrame=geometryAlias.Materials();const auto aliasSaved=aliasFrame;
+    Check(!geometryAlias.ApplyFrameMaterialAppearance(aliasFrame,28u,yellow,diagnostic) &&
+          std::memcmp(aliasFrame.data(),aliasSaved.data(),aliasFrame.size()*sizeof(RtMaterialGpu))==0,
+          "a second metadata owner of the same primitive cannot silently share a mutable appearance");
 }
 
 void TestMaterialAuthoringValidation()
@@ -422,19 +551,19 @@ void TestTextureArrayCapacities()
 {
     using namespace horde::vulkan::raytracing;
     std::string diagnostic;
-    Check(RtTextureArrays::Validate({16u, 16u, 16u, 16u}, diagnostic),
-          "all four arrays accept the exact 16-layer boundary");
-    Check(!RtTextureArrays::Validate({17u, 1u, 1u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: baseColor layers exceed 16.",
+    Check(RtTextureArrays::Validate({18u, 18u, 18u, 18u}, diagnostic),
+          "all four arrays accept the exact 18-layer boundary");
+    Check(!RtTextureArrays::Validate({19u, 1u, 1u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: baseColor layers exceed 18.",
           "base colour overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 17u, 1u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: normal layers exceed 16.",
+    Check(!RtTextureArrays::Validate({1u, 19u, 1u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: normal layers exceed 18.",
           "normal overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 1u, 17u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: ORM layers exceed 16.",
+    Check(!RtTextureArrays::Validate({1u, 1u, 19u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: ORM layers exceed 18.",
           "ORM overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 1u, 1u, 17u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: emissive layers exceed 16.",
+    Check(!RtTextureArrays::Validate({1u, 1u, 1u, 19u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: emissive layers exceed 18.",
           "emissive overflow is named");
 }
 
@@ -618,7 +747,10 @@ int main()
     TestGeneratedConstants();
     TestGenericRegistrationAndMeasurements();
     TestExplicitTextureGroups();
+    TestDeferredTextureGroups();
     TestNamedCapacityFailures();
+    TestJointPresentationCapacity();
+    TestFrameMaterialAppearance();
     TestMaterialAuthoringValidation();
     TestTextureArrayCapacities();
     TestPrimaryShadowPolicy();

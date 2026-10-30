@@ -4,6 +4,7 @@ set(HORDE_RT_MIN_RENDER_SCALE_PERCENT "33" CACHE STRING "Discrete33/40 graphics 
 option(HORDE_RT_ANDROID_BENCHMARK_VALIDATION "Isolated development benchmark package admission" OFF)
 option(HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION "Isolated benchmark actual image presentation evidence" OFF)
 option(HORDE_RT_ANDROID_MOTION_VALIDATION "Isolated benchmark shared-simulation motion evidence" OFF)
+option(HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE "Private Debug transient exact20 outdoor measurement; normal/UI minimum unchanged" OFF)
 if(NOT HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "50" AND
    NOT HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "33")
     message(FATAL_ERROR "Render scale minimum must be exactly 50 or 33.")

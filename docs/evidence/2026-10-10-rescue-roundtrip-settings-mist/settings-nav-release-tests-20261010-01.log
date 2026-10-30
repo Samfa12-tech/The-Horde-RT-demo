@@ -1,0 +1,161 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 4
+    Start   4: horde_rt_graphics_settings_tests
+
+4: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_settings_tests.exe"
+4: Working Directory: <repo>/build/presets/windows-x64-release
+4: Test timeout computed to be: 1500
+1/7 Test   #4: horde_rt_graphics_settings_tests .........................   Passed    2.17 sec
+test 5
+    Start   5: horde_rt_entry_menu_handoff_tests
+
+5: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_entry_menu_handoff_tests.exe"
+5: Working Directory: <repo>/build/presets/windows-x64-release
+5: Test timeout computed to be: 1500
+5: Entry generation, two-present Play handoff, loading, cancellation and retry pass
+2/7 Test   #5: horde_rt_entry_menu_handoff_tests ........................   Passed    1.33 sec
+test 6
+    Start   6: horde_rt_foreground_pause_render_cadence_tests
+
+6: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_foreground_pause_render_cadence_tests.exe"
+6: Working Directory: <repo>/build/presets/windows-x64-release
+6: Test timeout computed to be: 1500
+3/7 Test   #6: horde_rt_foreground_pause_render_cadence_tests ...........   Passed    1.27 sec
+test 126
+    Start 126: horde_rt_desktop_controller_input_tests
+
+126: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_desktop_controller_input_tests.exe"
+126: Working Directory: <repo>
+126: Test timeout computed to be: 1500
+126: Desktop controller input tests passed
+4/7 Test #126: horde_rt_desktop_controller_input_tests ..................   Passed    0.03 sec
+test 140
+    Start 140: horde_rt_final_windows_bundle_containment
+
+140: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tools/InspectRtPipelineBundleContainment.ps1" "-TargetPath" "<repo>/build/presets/windows-x64-release/Release/HordeLanternRT.exe" "-TargetPlatform" "Windows" "-Instrumentation" "Shipping" "-Quality" "High"
+140: Working Directory: <repo>/build/presets/windows-x64-release
+140: Test timeout computed to be: 300
+140: {"target":"<repo>\\build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe","targetPlatform":"Windows","instrumentation":"Shipping","quality":"High","targetSha256":"d4056b229f4a3b1886f9c51fbaa9d61f294221d927e93d02e3b0d84ab9461973","targetBytes":4174848,"semanticKeys":["shipping_high_generic_dielectric","shipping_high_opaque_fast","rayquery_compute_shipping_high_generic_dielectric","rayquery_compute_shipping_high_opaque_fast"],"modules":[{"offset":1871168,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"53c750339d09c6d86a962c0b6ee0a8b7d2fd3d2ecf964beeb8230e1a306f6c7f","words":147821,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":false,"atomicInstructions":0},{"offset":2462464,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"dcf4ae58c422c9c512a2f8d0fccffcbb03414058eb59367f3272aab145c2d809","words":71783,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":false,"atomicInstructions":0},{"offset":2749600,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"f21fb2fe7acf6991d43ba697cc40ca05460e844b0be5c6e5d1e0bd5dcc193ee5","words":148122,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":false,"atomicInstructions":0},{"offset":3342096,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"cf819ead8266e755bc3c783380f983a7a0d3e0e338834234cb643f78a65ef1bb","words":71845,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":false,"atomicInstructions":0}],"spirvVal":"passed","spirvDis":"passed"}
+5/7 Test #140: horde_rt_final_windows_bundle_containment ................   Passed   10.33 sec
+test 141
+    Start 141: horde_rt_final_windows_bundle_containment_controls
+
+141: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelineBundleContainmentTests.ps1" "-Scanner" "<repo>/tools/InspectRtPipelineBundleContainment.ps1" "-TargetPath" "<repo>/build/presets/windows-x64-release/Release/HordeLanternRT.exe" "-TargetPlatform" "Windows" "-Instrumentation" "Shipping" "-Quality" "High" "-PowerShellExecutable" "C:/Program Files/PowerShell/7/pwsh.exe"
+141: Working Directory: <repo>/build/presets/windows-x64-release
+141: Test timeout computed to be: 300
+141: Final-target containment scanner adversarial controls passed.
+6/7 Test #141: horde_rt_final_windows_bundle_containment_controls .......   Passed  116.75 sec
+test 142
+    Start 142: horde_rt_final_windows_bundle_containment_registration
+
+142: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelineBundleContainmentRegistrationTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe" "-ConfiguredCtestFile" "<repo>/build/presets/windows-x64-release/CTestTestfile.cmake" "-Configuration" "Release" "-Instrumentation" "Shipping" "-Quality" "High" "-Generator" "Visual Studio 17 2022" "-GeneratorPlatform" "x64"
+142: Working Directory: <repo>/build/presets/windows-x64-release
+142: Test timeout computed to be: 300
+142: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+142: -- The CXX compiler identification is MSVC 19.44.35227.0
+142: -- Detecting CXX compiler ABI info
+142: -- Detecting CXX compiler ABI info - done
+142: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+142: -- Detecting CXX compile features
+142: -- Detecting CXX compile features - done
+142: Generated RT catalog adapter is current.
+142: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+142: -- Found Vulkan: C:/VulkanSDK/1.4.350.0/Lib/vulkan-1.lib (found version "1.4.350") found components: glslc glslangValidator
+142: -- Vulkan SDK found: 1.4.350
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+142: -- Looking for pthread_create in pthreads
+142: -- Looking for pthread_create in pthreads - not found
+142: -- Looking for pthread_create in pthread
+142: -- Looking for pthread_create in pthread - not found
+142: -- Found Threads: TRUE
+142: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+142: -- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+142: -- Configuring done (19.2s)
+142: -- Generating done (1.4s)
+142: -- Build files have been written to: <repo>/build/rtm-s-137ebaf12c72
+142: MSBuild version 17.14.40+3e7442088 for .NET Framework
+142:
+142:   1>Checking Build System
+142:   Building Custom Rule <repo>/CMakeLists.txt
+142:   RtPipelineBundleLifetimeTests.cpp
+142:   RtPipelineBundle.cpp
+142:   RtPipelineBundleContracts.cpp
+142:   RtPipelineVariants.cpp
+142:   RtPipelineVariantProvider.cpp
+142:   Generating Code...
+142:   horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> <repo>\build\rtm-s-137ebaf12c72\Debug\horde_rt_pipeline_bundle_lifetime_tests.exe
+142: Internal ctest changing into directory: <repo>/build/rtm-s-137ebaf12c72
+142: Test project <repo>/build/rtm-s-137ebaf12c72
+142:     Start 137: horde_rt_pipeline_bundle_lifetime_tests
+142: 1/1 Test #137: horde_rt_pipeline_bundle_lifetime_tests ...   Passed    5.79 sec
+142:
+142: 100% tests passed, 0 tests failed out of 1
+142:
+142: Total Test time (real) =   5.81 sec
+142: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+142: -- The CXX compiler identification is MSVC 19.44.35227.0
+142: -- Detecting CXX compiler ABI info
+142: -- Detecting CXX compiler ABI info - done
+142: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+142: -- Detecting CXX compile features
+142: -- Detecting CXX compile features - done
+142: Generated RT catalog adapter is current.
+142: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+142: -- Found Vulkan: C:/VulkanSDK/1.4.350.0/Lib/vulkan-1.lib (found version "1.4.350") found components: glslc glslangValidator
+142: -- Vulkan SDK found: 1.4.350
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+142: -- Looking for pthread_create in pthreads
+142: -- Looking for pthread_create in pthreads - not found
+142: -- Looking for pthread_create in pthread
+142: -- Looking for pthread_create in pthread - not found
+142: -- Found Threads: TRUE
+142: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+142: -- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+142: -- Configuring done (17.7s)
+142: -- Generating done (1.4s)
+142: -- Build files have been written to: <repo>/build/rtm-d-13ac6583fbd2
+142: MSBuild version 17.14.40+3e7442088 for .NET Framework
+142:
+142:   1>Checking Build System
+142:   Building Custom Rule <repo>/CMakeLists.txt
+142:   RtPipelineBundleLifetimeTests.cpp
+142:   RtPipelineBundle.cpp
+142:   RtPipelineBundleContracts.cpp
+142:   RtPipelineVariants.cpp
+142:   RtPipelineVariantProvider.cpp
+142:   Generating Code...
+142:   horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> <repo>\build\rtm-d-13ac6583fbd2\Debug\horde_rt_pipeline_bundle_lifetime_tests.exe
+142: Internal ctest changing into directory: <repo>/build/rtm-d-13ac6583fbd2
+142: Test project <repo>/build/rtm-d-13ac6583fbd2
+142:     Start 137: horde_rt_pipeline_bundle_lifetime_tests
+142: 1/1 Test #137: horde_rt_pipeline_bundle_lifetime_tests ...   Passed    5.77 sec
+142:
+142: 100% tests passed, 0 tests failed out of 1
+142:
+142: Total Test time (real) =   5.78 sec
+142: Effective final-target containment registrations and Mobile lifetime policies passed.
+7/7 Test #142: horde_rt_final_windows_bundle_containment_registration ...   Passed   61.08 sec
+
+The following tests passed:
+	horde_rt_graphics_settings_tests
+	horde_rt_entry_menu_handoff_tests
+	horde_rt_foreground_pause_render_cadence_tests
+	horde_rt_desktop_controller_input_tests
+	horde_rt_final_windows_bundle_containment
+	horde_rt_final_windows_bundle_containment_controls
+	horde_rt_final_windows_bundle_containment_registration
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) = 192.98 sec

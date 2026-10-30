@@ -1,0 +1,5 @@
+Exception: <repo>\tools\InspectRtPipelineBundleContainment.ps1:21
+Line |
+  21 |      if (-not $condition) { throw $message }
+     |                             ~~~~~~~~~~~~~~
+     | Final target contains a non-selected raygen/compute module at offset 570312.

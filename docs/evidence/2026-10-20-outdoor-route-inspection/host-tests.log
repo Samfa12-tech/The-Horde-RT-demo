@@ -1,0 +1,22 @@
+[OUTPUT] 
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+
+[HANDLER_OUTPUT] 
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+
+    Start  37: horde_rt_chapter_step_movement_tests
+1/6 Test  #37: horde_rt_chapter_step_movement_tests ........   Passed    2.19 sec
+    Start 106: horde_rt_development_static_asset_tests
+2/6 Test #106: horde_rt_development_static_asset_tests .....   Passed    0.95 sec
+    Start 114: horde_rt_forest_deadwood_tests
+3/6 Test #114: horde_rt_forest_deadwood_tests ..............   Passed    1.73 sec
+    Start 116: horde_rt_forest_dressing_tests
+4/6 Test #116: horde_rt_forest_dressing_tests ..............   Passed    3.23 sec
+    Start 215: horde_rt_rescue_journey_integration_tests
+5/6 Test #215: horde_rt_rescue_journey_integration_tests ...   Passed    1.63 sec
+    Start 216: horde_rt_chapter_terrain_journey_tests
+6/6 Test #216: horde_rt_chapter_terrain_journey_tests ......   Passed   17.14 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  26.89 sec

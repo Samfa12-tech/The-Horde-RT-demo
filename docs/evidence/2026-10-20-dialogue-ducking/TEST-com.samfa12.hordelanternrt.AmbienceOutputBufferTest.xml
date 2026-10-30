@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.AmbienceOutputBufferTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-20T14:47:57" hostname="SAM_LAPPY" time="2.136">
+  <properties/>
+  <testcase name="spatialGainAndSuspendRestoreKeepIndependentChannels" classname="com.samfa12.hordelanternrt.AmbienceOutputBufferTest" time="2.01"/>
+  <testcase name="staleNativeControlCannotRestartSuspendedOrResetOutput" classname="com.samfa12.hordelanternrt.AmbienceOutputBufferTest" time="0.024"/>
+  <testcase name="platformMinimumAndStereoFloatFormatArePreserved" classname="com.samfa12.hordelanternrt.AmbienceOutputBufferTest" time="0.02"/>
+  <testcase name="smallMinimumKeepsThirtyMillisecondAllocation" classname="com.samfa12.hordelanternrt.AmbienceOutputBufferTest" time="0.023"/>
+  <testcase name="unavailableMinimumIsRejected" classname="com.samfa12.hordelanternrt.AmbienceOutputBufferTest" time="0.021"/>
+  <testcase name="excessiveMinimumIsRejectedWithoutShrinking" classname="com.samfa12.hordelanternrt.AmbienceOutputBufferTest" time="0.019"/>
+  <testcase name="insufficientEffectiveCapacityFails" classname="com.samfa12.hordelanternrt.AmbienceOutputBufferTest" time="0.018"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

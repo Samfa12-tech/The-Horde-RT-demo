@@ -1,0 +1,48 @@
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/DartConfiguration.tcl
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 55
+    Start 55: horde_rt_final_held_torch_clearance_tests
+
+55: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_rt_final_held_torch_clearance_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+55: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+55: Test timeout computed to be: 180
+55: underside selection exact full-scan comparisons=944 failures=0
+55: primary-arm portal poleY=nan bendDegrees=nan clippedLeftTriangles=2310 itemLightDelta=0 vertexDelta=0 target=-0.185,-0.350948,0.606509
+55: primary-arm portal poleY=nan bendDegrees=nan clippedLeftTriangles=0 itemLightDelta=0.109506 vertexDelta=0.105004 target=-0.185,-0.433164,0.530666
+55: primary-frustum witnesses=2; original sweep pose count remains separate
+55: worst-bend targetGripY=0.330294 finalGripY=0.330294 flameY=0.892789 lightY=0.870196 finalMainEnvelopeHeadroom=0.0494097 root=4.2,-0.949749,-10
+55: torch gate progress cases=256 elapsedMs=10244.4 poseWallMs=4483.36 oracleWallMs=5098.42 viewmodelWallMs=0
+55: torch gate progress cases=512 elapsedMs=19410.8 poseWallMs=8805.86 oracleWallMs=9938.61 viewmodelWallMs=0
+55: torch gate progress cases=768 elapsedMs=28431.6 poseWallMs=13089.4 oracleWallMs=14672.4 viewmodelWallMs=0
+55: torch gate progress cases=1024 elapsedMs=37150.9 poseWallMs=17265.9 oracleWallMs=19211.7 viewmodelWallMs=0
+55: torch gate progress cases=1280 elapsedMs=45843.9 poseWallMs=21443.9 oracleWallMs=23723.2 viewmodelWallMs=0
+55: clearance viewport aspect=1
+55: torch gate progress cases=1536 elapsedMs=55817.7 poseWallMs=25978.9 oracleWallMs=28628.2 viewmodelWallMs=529.067
+55: torch gate progress cases=1792 elapsedMs=66999.1 poseWallMs=30229.9 oracleWallMs=33452.8 viewmodelWallMs=2630.75
+55: torch gate progress cases=2048 elapsedMs=78880.7 poseWallMs=34693.5 oracleWallMs=38641.3 viewmodelWallMs=4855.82
+55: torch gate progress cases=2304 elapsedMs=90591.6 poseWallMs=39031 oracleWallMs=43847.3 viewmodelWallMs=7018.6
+55: torch gate progress cases=2560 elapsedMs=102177 poseWallMs=43333.6 oracleWallMs=48978.4 viewmodelWallMs=9166.15
+55: torch gate progress cases=2816 elapsedMs=116015 poseWallMs=48591 oracleWallMs=55126.6 viewmodelWallMs=11590.3
+55: torch gate progress cases=3072 elapsedMs=140102 poseWallMs=57452.3 oracleWallMs=66349 viewmodelWallMs=15585.4
+55: imported structural underside triangles=118 planeSamples=3178 diskSamples=57970
+55: new roof final rig cases=1812 actualViewmodelVerticesPerPose=15855 skinnedRoofCases=1812 worstHeadroom=0.0323757 worstPoseXZ=-0.58,-4.3 yaw/pitch=1.5708,0 walk=10.07 action=8 target/finalGripY=0.348713,0.348714
+55: limiting worldPoint=-0.0634497,1.31762,-4.33031 roofY=1.35 sharedY=1.35
+55: actual final rig cases=3287 worstHeadroom=0.0323757 maxGripError=0.0118211 failures=0
+55: underside broad-phase visits=15135254 original full-scan visits=1874944244
+55: torch gate stages poseWallMs=63538.4 oracleWallMs=73814.9 viewmodelWallMs=18483.4
+1/1 Test #55: horde_rt_final_held_torch_clearance_tests ...   Passed  158.07 sec
+
+The following tests passed:
+	horde_rt_final_held_torch_clearance_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) = 158.09 sec

@@ -1,6 +1,11 @@
 # Shared native renderer sources. Keep platform entry points and UI shells in
 # their platform-specific targets; this list is consumed by Windows and Android.
 set(HORDE_RT_CORE_RELATIVE_SOURCES
+    world/streaming/RegionStreaming.cpp
+    world/streaming/GeometryPartition.cpp
+    vulkan/raytracing/RtRegionGeometryPreparation.cpp
+    vulkan/raytracing/RtRegionGeometrySource.cpp
+    vulkan/raytracing/PresentableTinyRtSceneRegionPages.cpp
     telemetry/RtPerformanceEvidence.cpp
     telemetry/RtEvidencePublication.cpp
     telemetry/RtBenchmarkEvidenceRun.cpp
@@ -13,13 +18,26 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     audio/MusicPcmAssetBank.cpp
     audio/MusicPlaybackSession.cpp
     reporting/PlaytestReport.cpp
+    reporting/CompatibilityReport.cpp
+    reporting/DeveloperReportSubmission.cpp
     reporting/BenchmarkSummaryReport.cpp
     reporting/BenchmarkSummarySubmission.cpp
     reporting/PlaytestSubmission.cpp
     gameplay/simulation/GameSimulation.cpp
+    gameplay/simulation/GameSimulationRescue.cpp
+    gameplay/simulation/GameSimulationDialogue.cpp
+    gameplay/simulation/GameSimulationCampaign.cpp
+    gameplay/campaign/CampaignCheckpointCodec.cpp
+    gameplay/campaign/CampaignCheckpointStorage.cpp
+    gameplay/campaign/CampaignSaveCoordinator.cpp
+    gameplay/campaign/CampaignSaveWorker.cpp
+    gameplay/campaign/CampaignSession.cpp
+    gameplay/campaign/CampaignPlaySession.cpp
+    gameplay/traversal/RescueTraversal.cpp
     gameplay/animation/PlayerAnimationState.cpp
     gameplay/animation/PlayerIkTargets.cpp
     gameplay/effects/FireEmitterState.cpp
+    gameplay/effects/WaterContact.cpp
     gameplay/interactions/InteractionState.cpp
     gameplay/interactions/ChestRewardSequence.cpp
     gameplay/interactions/FinaleSequence.cpp
@@ -28,6 +46,14 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/items/HeldLightState.cpp
     gameplay/items/HeldItemKinematics.cpp
     gameplay/ShowcaseBenchmark.cpp
+    scene/ForestDressing.cpp
+    scene/ForestUnderstory.cpp
+    scene/ForestRockDressing.cpp
+    scene/ForestDeadwood.cpp
+    scene/ForestRoadClue.cpp
+    scene/BellwetherShell.cpp
+    scene/GraveyardDressing.cpp
+    scene/TombDressing.cpp
     scene/assets/AssetManifest.cpp
     scene/assets/AssetValidation.cpp
     scene/assets/GltfDocument.cpp
@@ -51,6 +77,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     vulkan/raytracing/RtPipelineBundle.cpp
     vulkan/raytracing/RtFrameEvidenceCoordinator.cpp
     vulkan/raytracing/PresentableTinyRtScene.cpp
+    vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp
     vulkan/raytracing/SimulationFrameAdapter.cpp
     scene/assets/SkinnedMeshAsset.cpp
 )

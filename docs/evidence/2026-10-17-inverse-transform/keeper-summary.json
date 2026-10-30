@@ -1,0 +1,610 @@
+[
+  {
+    "case": "pipeline-candidate",
+    "scope": "Existing frozen legacy lich maintaining-range checkpoint; not live combat or lightning; not authored chapter framing",
+    "checkpoint": "lich",
+    "player": {
+      "x": -33.25,
+      "z": -14.25,
+      "yaw": 2.52,
+      "pitch": 0.0,
+      "vitality": 3,
+      "maxVitality": 3,
+      "lifePhase": "alive",
+      "damageEnabled": false
+    },
+    "phase": {
+      "phase": "maintaining-range",
+      "health": 3,
+      "roofProgress": 0.0,
+      "ending": "inactive",
+      "dawnProgress": 0.0
+    },
+    "animationTime": 0.0,
+    "hostLoopWindowMeansMs": [
+      43.956,
+      43.821,
+      43.819
+    ],
+    "gpuPeriodicAggregateSnapshot": {
+      "status": "GPU RT command-buffer timing is available.",
+      "supported": true,
+      "valid": true,
+      "latestMs": 42.056561,
+      "averageMs": 42.246727,
+      "timestampPeriodNanoseconds": 52.0833,
+      "timestampValidBits": 48,
+      "sampleCount": 390,
+      "unavailableCount": 0,
+      "errorCount": 0
+    },
+    "gpuSnapshotLimit": "Periodic capability aggregate (390 samples), includes warmup; not final or phase-isolated per-frame data, median, actual display time or FPS",
+    "thermalBefore": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 44.8,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 35.7,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 38.8,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "thermalAfter": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 1,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 46.8,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 37.2,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 40.2,
+          "status": 1
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "fireLighting": {
+      "count": 2,
+      "emitters": [
+        {
+          "stableId": 3,
+          "positionStrength": [
+            -35.5,
+            0.99000001,
+            -16.3250008,
+            0.879999995
+          ],
+          "colourIntensity": [
+            1,
+            0.454959989,
+            0.0977689251,
+            0.879999995
+          ]
+        },
+        {
+          "stableId": 4,
+          "positionStrength": [
+            -35.5,
+            0.99000001,
+            -14.0250006,
+            0.879999995
+          ],
+          "colourIntensity": [
+            1,
+            0.454959989,
+            0.0977689251,
+            0.879999995
+          ]
+        },
+        {
+          "stableId": 0,
+          "positionStrength": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "colourIntensity": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "stableId": 0,
+          "positionStrength": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "colourIntensity": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "case": "pipeline-control",
+    "scope": "Existing frozen legacy lich maintaining-range checkpoint; not live combat or lightning; not authored chapter framing",
+    "checkpoint": "lich",
+    "player": {
+      "x": -33.25,
+      "z": -14.25,
+      "yaw": 2.52,
+      "pitch": 0.0,
+      "vitality": 3,
+      "maxVitality": 3,
+      "lifePhase": "alive",
+      "damageEnabled": false
+    },
+    "phase": {
+      "phase": "maintaining-range",
+      "health": 3,
+      "roofProgress": 0.0,
+      "ending": "inactive",
+      "dawnProgress": 0.0
+    },
+    "animationTime": 0.0,
+    "hostLoopWindowMeansMs": [
+      44.292,
+      44.205,
+      44.24
+    ],
+    "gpuPeriodicAggregateSnapshot": {
+      "status": "GPU RT command-buffer timing is available.",
+      "supported": true,
+      "valid": true,
+      "latestMs": 42.491978,
+      "averageMs": 42.613026,
+      "timestampPeriodNanoseconds": 52.0833,
+      "timestampValidBits": 48,
+      "sampleCount": 390,
+      "unavailableCount": 0,
+      "errorCount": 0
+    },
+    "gpuSnapshotLimit": "Periodic capability aggregate (390 samples), includes warmup; not final or phase-isolated per-frame data, median, actual display time or FPS",
+    "thermalBefore": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 40.8,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 35.3,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 37.3,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "thermalAfter": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 1,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 46.3,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 37.7,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 40.0,
+          "status": 1
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "fireLighting": {
+      "count": 2,
+      "emitters": [
+        {
+          "stableId": 3,
+          "positionStrength": [
+            -35.5,
+            0.99000001,
+            -16.3250008,
+            0.879999995
+          ],
+          "colourIntensity": [
+            1,
+            0.454959989,
+            0.0977689251,
+            0.879999995
+          ]
+        },
+        {
+          "stableId": 4,
+          "positionStrength": [
+            -35.5,
+            0.99000001,
+            -14.0250006,
+            0.879999995
+          ],
+          "colourIntensity": [
+            1,
+            0.454959989,
+            0.0977689251,
+            0.879999995
+          ]
+        },
+        {
+          "stableId": 0,
+          "positionStrength": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "colourIntensity": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "stableId": 0,
+          "positionStrength": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "colourIntensity": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "case": "query-candidate",
+    "scope": "Existing frozen legacy lich maintaining-range checkpoint; not live combat or lightning; not authored chapter framing",
+    "checkpoint": "lich",
+    "player": {
+      "x": -33.25,
+      "z": -14.25,
+      "yaw": 2.52,
+      "pitch": 0.0,
+      "vitality": 3,
+      "maxVitality": 3,
+      "lifePhase": "alive",
+      "damageEnabled": false
+    },
+    "phase": {
+      "phase": "maintaining-range",
+      "health": 3,
+      "roofProgress": 0.0,
+      "ending": "inactive",
+      "dawnProgress": 0.0
+    },
+    "animationTime": 0.0,
+    "hostLoopWindowMeansMs": [
+      44.698,
+      44.612,
+      44.627
+    ],
+    "gpuPeriodicAggregateSnapshot": {
+      "status": "GPU RT command-buffer timing is available.",
+      "supported": true,
+      "valid": true,
+      "latestMs": 43.087967,
+      "averageMs": 43.241165,
+      "timestampPeriodNanoseconds": 52.0833,
+      "timestampValidBits": 48,
+      "sampleCount": 390,
+      "unavailableCount": 0,
+      "errorCount": 0
+    },
+    "gpuSnapshotLimit": "Periodic capability aggregate (390 samples), includes warmup; not final or phase-isolated per-frame data, median, actual display time or FPS",
+    "thermalBefore": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 38.2,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 34.2,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 36.0,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "thermalAfter": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 44.8,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 35.7,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 38.8,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "fireLighting": {
+      "count": 2,
+      "emitters": [
+        {
+          "stableId": 3,
+          "positionStrength": [
+            -35.5,
+            0.99000001,
+            -16.3250008,
+            0.879999995
+          ],
+          "colourIntensity": [
+            1,
+            0.454959989,
+            0.0977689251,
+            0.879999995
+          ]
+        },
+        {
+          "stableId": 4,
+          "positionStrength": [
+            -35.5,
+            0.99000001,
+            -14.0250006,
+            0.879999995
+          ],
+          "colourIntensity": [
+            1,
+            0.454959989,
+            0.0977689251,
+            0.879999995
+          ]
+        },
+        {
+          "stableId": 0,
+          "positionStrength": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "colourIntensity": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "stableId": 0,
+          "positionStrength": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "colourIntensity": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "case": "query-control",
+    "scope": "Existing frozen legacy lich maintaining-range checkpoint; not live combat or lightning; not authored chapter framing",
+    "checkpoint": "lich",
+    "player": {
+      "x": -33.25,
+      "z": -14.25,
+      "yaw": 2.52,
+      "pitch": 0.0,
+      "vitality": 3,
+      "maxVitality": 3,
+      "lifePhase": "alive",
+      "damageEnabled": false
+    },
+    "phase": {
+      "phase": "maintaining-range",
+      "health": 3,
+      "roofProgress": 0.0,
+      "ending": "inactive",
+      "dawnProgress": 0.0
+    },
+    "animationTime": 0.0,
+    "hostLoopWindowMeansMs": [
+      63.425,
+      45.913,
+      44.958
+    ],
+    "gpuPeriodicAggregateSnapshot": {
+      "status": "GPU RT command-buffer timing is available.",
+      "supported": true,
+      "valid": true,
+      "latestMs": 43.527657,
+      "averageMs": 60.590218,
+      "timestampPeriodNanoseconds": 52.0833,
+      "timestampValidBits": 48,
+      "sampleCount": 390,
+      "unavailableCount": 0,
+      "errorCount": 0
+    },
+    "gpuSnapshotLimit": "Periodic capability aggregate (390 samples), includes warmup; not final or phase-isolated per-frame data, median, actual display time or FPS",
+    "thermalBefore": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 1,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 47.6,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 39.0,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 41.1,
+          "status": 1
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "thermalAfter": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 2,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 48.0,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 38.9,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 41.1,
+          "status": 2
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "fireLighting": {
+      "count": 2,
+      "emitters": [
+        {
+          "stableId": 3,
+          "positionStrength": [
+            -35.5,
+            0.99000001,
+            -16.3250008,
+            0.879999995
+          ],
+          "colourIntensity": [
+            1,
+            0.454959989,
+            0.0977689251,
+            0.879999995
+          ]
+        },
+        {
+          "stableId": 4,
+          "positionStrength": [
+            -35.5,
+            0.99000001,
+            -14.0250006,
+            0.879999995
+          ],
+          "colourIntensity": [
+            1,
+            0.454959989,
+            0.0977689251,
+            0.879999995
+          ]
+        },
+        {
+          "stableId": 0,
+          "positionStrength": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "colourIntensity": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "stableId": 0,
+          "positionStrength": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "colourIntensity": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  }
+]

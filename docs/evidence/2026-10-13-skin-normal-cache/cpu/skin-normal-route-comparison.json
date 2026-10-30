@@ -1,0 +1,327 @@
+{
+  "pipeline": {
+    "complete": true,
+    "frames": 1241,
+    "ticks": 4961,
+    "cpuRenderMs": {
+      "count": 1241,
+      "mean": 67.70212699435939,
+      "median": 62.1213,
+      "p95": 114.001,
+      "max": 253.41
+    },
+    "simulationBatchMs": {
+      "count": 1241,
+      "mean": 22.71720975020145,
+      "median": 10.6201,
+      "p95": 133.839,
+      "max": 330.395
+    },
+    "owningGpuMs": {
+      "count": 1241,
+      "mean": 5.858872805801773,
+      "median": 5.472544,
+      "p95": 11.093568,
+      "max": 23.860128
+    },
+    "deviceLocalBytes": [
+      405550288
+    ],
+    "hostVisibleBytes": [
+      49408256
+    ],
+    "beforeAfterPixels": [
+      {
+        "file": "1-initial-reunion.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "2-landing-sweep-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "3-landing-sweep-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "4-landing-sweep-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "5-landing-sweep-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "6-kit-walking.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "7-fresh-raise-3.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "8-outbound-4.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "9-outbound-5.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "10-outbound-6.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "11-outbound-7.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "12-lookout-sweep-7.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "13-lookout-sweep-7.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "14-lookout-sweep-7.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "15-lookout-sweep-7.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "16-return-6.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "17-return-5.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "18-return-4.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "19-return-3.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "20-return-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "21-descent-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "22-lower-sweep-0.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "23-lower-sweep-0.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "24-lower-sweep-0.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "25-lower-sweep-0.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "26-repeat-ascent-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      }
+    ],
+    "normalPlayResidencySavingBytes": 0
+  },
+  "query": {
+    "complete": true,
+    "frames": 1241,
+    "ticks": 4961,
+    "cpuRenderMs": {
+      "count": 1241,
+      "mean": 54.12178533440773,
+      "median": 54.9755,
+      "p95": 61.7266,
+      "max": 117.043
+    },
+    "simulationBatchMs": {
+      "count": 1241,
+      "mean": 18.115159548751006,
+      "median": 9.1066,
+      "p95": 112.644,
+      "max": 225.242
+    },
+    "owningGpuMs": {
+      "count": 1241,
+      "mean": 5.191579693795326,
+      "median": 5.060608,
+      "p95": 6.606752,
+      "max": 7.571936
+    },
+    "deviceLocalBytes": [
+      405550288
+    ],
+    "hostVisibleBytes": [
+      49407744
+    ],
+    "beforeAfterPixels": [
+      {
+        "file": "1-initial-reunion.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "2-landing-sweep-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "3-landing-sweep-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "4-landing-sweep-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "5-landing-sweep-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "6-kit-walking.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "7-fresh-raise-3.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "8-outbound-4.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "9-outbound-5.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "10-outbound-6.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "11-outbound-7.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "12-lookout-sweep-7.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "13-lookout-sweep-7.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "14-lookout-sweep-7.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "15-lookout-sweep-7.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "16-return-6.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "17-return-5.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "18-return-4.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "19-return-3.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "20-return-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "21-descent-2.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "22-lower-sweep-0.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "23-lower-sweep-0.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "24-lower-sweep-0.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      },
+      {
+        "file": "25-lower-sweep-0.png",
+        "identicalPixels": true,
+        "samePngBytes": true
+      }
+    ],
+    "normalPlayResidencySavingBytes": 0
+  }
+}

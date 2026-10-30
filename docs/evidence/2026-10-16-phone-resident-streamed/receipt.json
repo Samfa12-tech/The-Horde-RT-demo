@@ -1,0 +1,9 @@
+{
+  "archiveSha256": "905382f4e4062f7e709da3066bf415ef5d7d02f1c3815c75eb0e59db4e30e1f2",
+  "bytes": 2024951,
+  "apkSha256": "a42a0651dc9282eaceb13e1627b19e5348688127352c18f1b36be9f0c0414808",
+  "basedOn": "867b817555bae2ff18c3700cc34ab7c43197674f",
+  "scope": "Matched physical phone resident-versus-streamed comparisons; raw ledgers/timings/resource CSV and exact measured source; failed and interrupted attempts preserved. Excludes APKs, preference XML, full UI dumps and unfiltered device logs.",
+  "entries": 114,
+  "budgetSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+}

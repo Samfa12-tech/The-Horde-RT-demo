@@ -1,0 +1,70 @@
+[
+  {
+    "name": "midpoint-sky",
+    "source_head": "f2a095fcf85520d63aebc1a48547cf4a453e97ba",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\frozen-mist\\records\\captures\\midpoint-sky-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "mode": 0,
+    "elapsed_seconds": 6.645610899999156,
+    "exit_code": 1,
+    "exe_sha256": "45d3ab6494cc9b4938f36118c6bbaf36d397d1d5d095e9e758759766c51b3eb5",
+    "shader": {
+      "name": "midpoint-sky",
+      "source_sha256": "a8eb53dcc563b07cf3653e5f624c3bf595f7b34bec7a1f5ddab9a1b4a41c0144",
+      "spirv_sha256": "c8addfb814c07841a3504143dd60385bc768959fc0b328039b06dfe8494e20fa",
+      "include_sha256": "54890cf42b656b8b905da3eb246ceb2499567112aed6f0239609b8c5d3d6900f",
+      "bytes": 293424,
+      "words": 73356,
+      "instructions": 17487,
+      "branchOperations": 969,
+      "loops": 21,
+      "selectionMerges": 407,
+      "functions": 82,
+      "functionCalls": 257,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41,
+      "hasDiagnosticsBinding": true
+    }
+  },
+  {
+    "name": "midpoint-lantern",
+    "source_head": "f2a095fcf85520d63aebc1a48547cf4a453e97ba",
+    "argv": [
+      "frozen_mist.exe",
+      "--capture-showcase",
+      "<repo>\\reports\\frozen-mist\\records\\captures\\midpoint-lantern-2",
+      "--development-checkpoint",
+      "rescue-journey-start",
+      "--capture-dust",
+      "standard"
+    ],
+    "mode": 1,
+    "elapsed_seconds": 3.6473582000035094,
+    "exit_code": 1,
+    "exe_sha256": "45d3ab6494cc9b4938f36118c6bbaf36d397d1d5d095e9e758759766c51b3eb5",
+    "shader": {
+      "name": "midpoint-lantern",
+      "source_sha256": "ea2680ee586567ce4694e958aec3633c805036dc7dd70dbe0b96c997d57fae52",
+      "spirv_sha256": "ab53e3048df31c5cf0ee5f3bae359bc8bcfc48acd39c9baf5f3a08ea589a9568",
+      "include_sha256": "b8ab21db65ffadbbc968bbb14a367168e1e2086f5c55a4ba27cd832d0ea72b02",
+      "bytes": 295096,
+      "words": 73774,
+      "instructions": 17586,
+      "branchOperations": 975,
+      "loops": 21,
+      "selectionMerges": 411,
+      "functions": 83,
+      "functionCalls": 259,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41,
+      "hasDiagnosticsBinding": true
+    }
+  }
+]

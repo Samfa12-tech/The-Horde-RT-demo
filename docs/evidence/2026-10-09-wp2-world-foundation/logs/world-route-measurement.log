@@ -1,0 +1,25 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 42
+    Start 42: horde_rt_world_route_foundation_tests
+
+42: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_world_route_foundation_tests.exe"
+42: Working Directory: <repo>/build/presets/windows-x64-debug
+42: Test timeout computed to be: 1500
+42: World route checks=16388 failures=0 triangles=350 resident_cpu_ns=95500 staged_cpu_ns=109000 resident_retained_bytes=22752 staged_peak_cpu_bytes=32880 directions=2 GPU_cost=not-measured
+1/1 Test #42: horde_rt_world_route_foundation_tests ...   Passed    0.54 sec
+
+The following tests passed:
+	horde_rt_world_route_foundation_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.56 sec

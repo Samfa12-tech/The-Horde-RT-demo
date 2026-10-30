@@ -1,0 +1,13 @@
+import subprocess,sys,time,json,datetime,hashlib
+from pathlib import Path
+root=Path(__file__).resolve().parents[2]
+label=sys.argv[1]; cmd=sys.argv[2:]
+start=datetime.datetime.now(datetime.timezone.utc).isoformat(); clock=time.perf_counter()
+diff=subprocess.check_output(['git','-c','core.autocrlf=false','diff','--binary','2665ae99819f94f1138154c3547722bab12c3b9d'],cwd=root)
+log=root/'reports/vertical-proof'/f'{label}.log'
+with log.open('wb') as f:
+ p=subprocess.run(cmd,cwd=root,stdout=f,stderr=subprocess.STDOUT)
+r={'source_candidate_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'label':label,'command':cmd,'cwd':str(root),'started_utc':start,'wall_seconds':time.perf_counter()-clock,'exit_status':p.returncode,'source_base':'2665ae99819f94f1138154c3547722bab12c3b9d','tracked_candidate_diff_sha256':hashlib.sha256(diff).hexdigest(),'log':str(log.relative_to(root)),'log_sha256':hashlib.sha256(log.read_bytes()).hexdigest()}
+ledger=root/'reports/vertical-proof/runs.jsonl'
+with ledger.open('a') as f:f.write(json.dumps(r)+'\n')
+print(json.dumps(r));sys.exit(p.returncode)

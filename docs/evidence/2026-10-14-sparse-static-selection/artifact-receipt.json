@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "sourceBase": "597ad77591c480b1fd288bb4f67583f1d84c2fc3",
+  "sourceBinding": "Final tracked source hashes; no runtime source changed after these captures.",
+  "scope": "Private sparse CPU/GPU selection and safe completed-work transaction; no normal-play adoption",
+  "normalStaticRegionSavingsBytes": 0,
+  "wholeChapterAccepted": false,
+  "sourceHashes": {
+    "src/vulkan/raytracing/RtStaticMeshSlot.h": "0e3557d6bf355cbd4ac91f587e14e63e837b282d7feb1d22fa1fdea5a1eac1ea",
+    "src/vulkan/raytracing/RtStaticMeshSlot.cpp": "17acd3ef03d98ce3e729f6cb9e123d39a15e5968b8e3b7e94f80e56e515971a6",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "2bae2032385935cf4d7e314983cb42bea7f79754749e8b0a73848e485a245540",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "1a7433241c0f4f591546f842c8d954102972f5b19200b29e7bf43fa348cef1c5",
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": "6bb72220f8c1e50dc37aab6a96d124c2d66660b3cd7581b50d31fdc6bff3efd8",
+    "src/platform/windows/DiagnosticWindow.cpp": "1051da2a104d732ddf4135f2d10b57f551c5440bfe41cc1be0b7eea3180844ca",
+    "tools/capture-static-sparse-cutover.ps1": "65576cab0eaf3e3c3c693a025f548ef32a5c07dcb190e0e0df444c3b9ecc2af0",
+    "tests/StaticGltfAssetTests.cpp": "332d6f61a6c77616b02c90ff0226ff53d6c504c69f954d040e17dce806112f88",
+    "tests/StaticGeometryCutoverTests.cpp": "1adb34a4a5b772428c1b8338d6228d663c3065f22688cb6c806569e31c7ec320",
+    "tests/RtSceneResourceInventoryTests.cpp": "af29752236adbf200fcf538ada207a2368947be91e2c81f6deac09c098066e03"
+  },
+  "files": {
+    "image-comparison.json": {
+      "sha256": "9166fbdeb3e7cf018d44072050b4b95fb2b6a29f3eed04fd12a3fe6d0efc42e6",
+      "bytes": 8233
+    },
+    "pipeline-00-before.png": {
+      "sha256": "61681f66c5b1e3cb865136e8e6f9f3abd475d0602372b32c36ecc91d01d1fb82",
+      "bytes": 591803
+    },
+    "pipeline-01-selected.png": {
+      "sha256": "61681f66c5b1e3cb865136e8e6f9f3abd475d0602372b32c36ecc91d01d1fb82",
+      "bytes": 591803
+    },
+    "pipeline-02-restored.png": {
+      "sha256": "61681f66c5b1e3cb865136e8e6f9f3abd475d0602372b32c36ecc91d01d1fb82",
+      "bytes": 591803
+    },
+    "pipeline-candidate.json": {
+      "sha256": "ca759529f2e5c0ab6836d4cb0099e9e9aa146ac3f3e9b947c12ce49f06559232",
+      "bytes": 1121
+    },
+    "pipeline-capture-manifest.json": {
+      "sha256": "d1abaf0bf40e603fdfd9d899d73a1029e1733385b17b4c8d09f3229a24db1929",
+      "bytes": 10577
+    },
+    "pipeline-static-zone-cutover.json": {
+      "sha256": "f9361f5226d1d98bfde2b7ca2eaff1279c92f698abef51b83fd182026f197c60",
+      "bytes": 2371
+    },
+    "query-00-before.png": {
+      "sha256": "fc45cc319517e81393cb38dc6e8c4476656e822097365f0ea25671aa10a06187",
+      "bytes": 591894
+    },
+    "query-01-selected.png": {
+      "sha256": "fc45cc319517e81393cb38dc6e8c4476656e822097365f0ea25671aa10a06187",
+      "bytes": 591894
+    },
+    "query-02-restored.png": {
+      "sha256": "fc45cc319517e81393cb38dc6e8c4476656e822097365f0ea25671aa10a06187",
+      "bytes": 591894
+    },
+    "query-candidate.json": {
+      "sha256": "14bfcf0a856e967de9ed16c7af9ea458adf33221100af52b21c8d9f40a81fdce",
+      "bytes": 1118
+    },
+    "query-capture-manifest.json": {
+      "sha256": "b0ee2b679e84752a3a9c84f58fcad7c463cfa1d2e522398f1cb544148187e207",
+      "bytes": 10673
+    },
+    "query-static-zone-cutover.json": {
+      "sha256": "70c27e4a520460aeea0e4e27e775ed919ec5ed03f1e272f5f7ce6893461cff4f",
+      "bytes": 2370
+    }
+  },
+  "localArtifacts": {
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4483072,
+      "sha256": "a4a85bc43c0d1bc15a7ec816c24c273780d946f4363e7d67f3ebd9c277051754",
+      "installed": false
+    },
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 13260288,
+      "sha256": "25acda64dcf9828284cc79a4c1a9aa6a8489dfc3875fc5fb446315837ca60190",
+      "installed": false
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 183199546,
+      "sha256": "be0c45a0634348ccb9b6d22306d9eddc1a05644db7914f7c582b76b063f70899",
+      "installed": false
+    }
+  }
+}

@@ -1,0 +1,2 @@
+Backward phase pair index=3 pair=forward-after/reverse-before sampleTimes=0.166829422/0.166829586 legacyTimes=0.166829422/2.25016284 phaseOffsets=0/-2.08333325 maximum=1.11460686e-05 component=boot vertex element=18152 axis/component=1 errors root/foot/boot/itemPosition/itemBasis/lightPosition/lightBasis=1.78813934e-07/1.90734863e-06/1.11460686e-05/4.47034836e-08/2.38418579e-07/1.1920929e-07/1.28056826e-07/
+FAIL: reversed phase must revisit actual foot/toe/boot/Grip/grounding poses in the opposite order

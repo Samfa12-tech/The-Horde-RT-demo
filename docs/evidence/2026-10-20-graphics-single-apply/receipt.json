@@ -1,0 +1,58 @@
+{
+  "sourceBase": "a050d779033d4efa1c5ae18543d3040ea5c0f8f5",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "milestone": "approved Android single Apply/save graphics flow",
+  "sourceSha256": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "a869db464623965fcc0b0de31ecaaa74e25d34736497dd12975f6ad9ffa5f388",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/GraphicsPreviewOptionsTest.java": "8011a21419c8ffad78ddc2c1a41e2b15852d4dbbcd285fd71e78ae2fd1efaf44",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/GraphicsPreviewCompactLayoutTest.java": "593f5e9202400f11fd80792a43c9c08b85345f8cae94af39c325a8c85ef850e3",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/GraphicsViewportRecoveryTest.java": "139da4d83b6440d71e2bc0931dd6752970dd490b73cba15ca833e9887d6deaf8",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java": "b0ac6a071ce38a1d05f68b684a3cea7cac5e9e6af59a6e3769aa41cc75f7f195"
+  },
+  "checks": {
+    "androidAbisBuilt": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "suites": 51,
+    "tests": 369,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "focusedGraphicsPreferencesControllerTests": 90,
+    "finalLogSha256": "f41fbdb402e1f1bb37fd1e442666f9cc4df40895b86b0842b4d17cc316b26ffa",
+    "initialFailures": [
+      "focused51: one obsolete image-dock index expected fourth action",
+      "broader365: one controller route assertion expected Use/Keep; subsequent immutable-tuple and lifecycle cases added before final368 pass"
+    ],
+    "command": "./gradlew.bat :app:assembleDebug :app:testDebugUnitTest --offline --console=plain -PhordeRtInstrumentationOverride=Shipping -PhordeRtDielectricQualityOverride=Mobile -PhordeRtRouteTiming=true -PhordeFrameStageProbe=false -PhordeDispatchClockProbe=false",
+    "reviewCorrection": "retain positive fallback Restore serial and rebase edit session only after exact saved-settings RT receipt; covered in ordinary zero-Revert and storage-failure paths",
+    "readOnlyReview": "no further actionable defect after fallback correction; review performed without builds or device actions"
+  },
+  "compiledOnly": {
+    "apkPath": "android/app/build/outputs/apk/debug/app-debug.apk",
+    "apkBytes": 186146629,
+    "apkSha256": "e62249b98b5996c5dc74165475565db24accf3d6d89155214b339df14050b62d",
+    "installed": false,
+    "launched": false
+  },
+  "boundaries": {
+    "phoneOperations": 0,
+    "newDeviceEvidence": false,
+    "performanceClaim": false,
+    "nativeRendererOrShaderChanges": false,
+    "ownerSavesOrAssetsChanged": false,
+    "publicPushOrRelease": false,
+    "reefOperations": false,
+    "audioHapticManualRevalidationRequired": false
+  },
+  "remainingAcceptance": [
+    "exact APK physical touch/controller/large-font graphics flow",
+    "RT presentation then persistence on hardware",
+    "Back/Restore/Home-resume while Apply is outstanding",
+    "previous Keeper combat/progression and warm-performance gates remain open; denied action not retried"
+  ]
+}

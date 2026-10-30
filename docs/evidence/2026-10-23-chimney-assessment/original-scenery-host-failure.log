@@ -1,0 +1,29 @@
+2026-10-23T04:48:04.1940433Z       Start 173: horde_rt_scene_resource_inventory_tests
+2026-10-23T04:48:04.7715081Z 58/72 Test #173: horde_rt_scene_resource_inventory_tests ..............***Failed    0.58 sec
+2026-10-23T04:48:04.7715563Z Resource integration: existing readback/mist/torch contracts
+2026-10-23T04:48:04.7716276Z Actual development static admission materials=30 primitives=31 layers=18,15,15,1
+2026-10-23T04:48:04.7716641Z Native sparse fixture (Mobile) IDs: 75693 88061
+2026-10-23T04:48:04.7716984Z Actual development static admission materials=30 primitives=31 layers=18,15,15,1
+2026-10-23T04:48:04.7717353Z Native sparse fixture (High) IDs: 75693 88061
+2026-10-23T04:48:04.7717611Z Resource integration: descriptor contracts
+2026-10-23T04:48:04.7718009Z Resource integration: TLAS and water geometry
+2026-10-23T04:48:04.7718368Z Resource integration: actual tomb intake
+2026-10-23T04:48:04.7719215Z Integrated intake invariants: baseline indices=25266 expected=25266; baseline top=12.24; entry top=6 expected=6; chapter indices=1292550 expected=1292118
+2026-10-23T04:48:04.7719983Z Integrated native tomb static roster: 31 primitives, 30 materials
+2026-10-23T04:48:04.7720779Z Matched CPU intake only (baseline first; cache/order bias possible): 14.7942 / 170.86 ms; additional static vertices/indices bytes: 33041088 / 5380608; no GPU allocation, AS build or presentation measurement
+2026-10-23T04:48:04.7721436Z FAIL: actual combined native tomb asset intake retains the frozen primitive/material capacities
+2026-10-23T04:48:04.7721776Z Resource integration: water owner lifetime
+2026-10-23T04:48:04.7722065Z Water lifetime: populate
+2026-10-23T04:48:04.7722323Z Water lifetime: move
+2026-10-23T04:48:04.7722522Z Water lifetime: destroy
+2026-10-23T04:48:04.7722774Z Resource integration: resize contracts
+2026-10-23T04:48:25.6137862Z 72/72 Test #198: horde_rt_rescue_adversarial_regression_tests .........   Passed    1.67 sec
+2026-10-23T04:48:25.6143388Z 
+2026-10-23T04:48:25.6143504Z 99% tests passed, 1 tests failed out of 72
+2026-10-23T04:48:25.6143684Z 
+2026-10-23T04:48:25.6143744Z Total Test time (real) =  39.87 sec
+2026-10-23T04:48:25.6143928Z 
+2026-10-23T04:48:25.6144094Z The following tests FAILED:
+2026-10-23T04:48:25.6146550Z 	173 - horde_rt_scene_resource_inventory_tests (Failed)
+2026-10-23T04:48:25.6146896Z Errors while running CTest
+2026-10-23T04:48:25.7703633Z ##[error]Process completed with exit code 8.

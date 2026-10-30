@@ -1,0 +1,50 @@
+[
+  {
+    "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+    "prototype_sha256": "aee9dce7ef7a036a9d4688c54eaf72194028b12a68d185ee3193afd7ef79d6f0",
+    "restored_git_blob": "8dbe73e13aadb209aa7712f5cf41fc28fbc82673",
+    "restored_sha256": "06ededde2bb77fb15aea75747212f8579ef9027b8aaa972bab28b8b0c4d96fe3"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_frame.glsl",
+    "prototype_sha256": "a078d44a9d2c423983ca093af01b3937f9df1d34d5801fac7c061d8c8a8023c9",
+    "restored_git_blob": "c299a32452da9c24220f2aa13ed925cc43537c0f",
+    "restored_sha256": "dfb391706b461d2360d0a3937bc53cbdbcd66a62bebd57a4fc88ff516eecfaf6"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+    "prototype_sha256": "24a6d8820974638ab390eac80c10d07e9fc02b8dcbc51ea53dfaecc871e15b06",
+    "restored_git_blob": "3d5d90c4655187fdd5fbf9f058d9e03293d3c8f0",
+    "restored_sha256": "a4055dbfb32632d86e9ee6fd2596d1ce981bf021dc86961cb9cea82f75e98515"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+    "prototype_sha256": "20127246a9086f36afaa8e48800b8d8e16e011980a59335bec82eb086f079ff5",
+    "restored_git_blob": "7d3bf2ce830480836f808bc208cfb448ab7b5fcf",
+    "restored_sha256": "a8c1d283245009e72e8478a10baafbf5954b96d76ba57ef3580a645ed354adfb"
+  },
+  {
+    "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+    "prototype_sha256": "f0bded030122f2361437ea1296673b1da37d04c17e67952d1907ee7195002e81",
+    "restored_git_blob": "dbb52910819997e18e810b43ecd2a994a1b31346",
+    "restored_sha256": "f0bded030122f2361437ea1296673b1da37d04c17e67952d1907ee7195002e81"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtSceneAbi.def",
+    "prototype_sha256": "3761a8e2d44d537ca077254ad2efe0386fc3fc24490a3f2b94adcbf65538b602",
+    "restored_git_blob": "598563552deac9ebc35072d56689add211c7d212",
+    "restored_sha256": "28b93432456a17b0b700a64632113bd1692a1eccf3bf6a3d4d430d655c61cd2f"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtSceneAbi.generated.h",
+    "prototype_sha256": "603eec5186fb729387399d810002b1f2351167c53f845d5ba6d009687ad97359",
+    "restored_git_blob": "692ed6fe43ff1bd8c6b3713808ac4efae57a6ad5",
+    "restored_sha256": "a97aa2d124fd1e2a4249c85a4e4fc7851ce96e5c71ffc8306111e5328b735999"
+  },
+  {
+    "path": "src/vulkan/raytracing/SimulationFrameAdapter.h",
+    "prototype_sha256": "873912d38f8e1e8e07e3e8c347d0b93bed462cb4d1725958e9cd07bb82231ca7",
+    "restored_git_blob": "471b287b340a30539f380031968533ae509961bc",
+    "restored_sha256": "873912d38f8e1e8e07e3e8c347d0b93bed462cb4d1725958e9cd07bb82231ca7"
+  }
+]

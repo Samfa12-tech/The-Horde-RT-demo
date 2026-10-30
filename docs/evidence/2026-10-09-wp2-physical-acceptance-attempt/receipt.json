@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "task_start_local_remote_head": "9a7a9ce0b83a3a5d479cf9283fe75410442bcc57",
+  "source_generated_candidate": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "host_package_ready": "YES inherited immutable host/package checkpoint; no rebuild or source change here",
+  "device_verified": "NO full vertical-proof target/backend acceptance incomplete",
+  "owner_audio_haptic_acceptance": "PENDING; silence is not acceptance",
+  "status": "STOPPED_CONTROL_BLOCKER",
+  "targets": [
+    {
+      "target": "Windows RTX 5050 Laptop GPU",
+      "backend": "RayTracingPipeline",
+      "vertical_acceptance": "NOT RUN",
+      "presentation_diagnostics": "PASS",
+      "ground_static_visual": "PASS inspected app-only engine PNG",
+      "continuous_traversal": "NOT RUN: safe foreground unavailable",
+      "profile": "Debug Diagnostic/High",
+      "os": "Windows 11 Home 10.0.26300",
+      "driver": "610.47"
+    },
+    {
+      "target": "Windows RTX 5050 Laptop GPU",
+      "backend": "RayQueryCompute",
+      "vertical_acceptance": "NOT RUN",
+      "presentation": "NOT RUN; not attempted after stop",
+      "unsupported_backend_established": false
+    },
+    {
+      "target": "Android Samsung SM-S948B",
+      "backend": "RayTracingPipeline",
+      "vertical_acceptance": "NOT RUN",
+      "presentation_diagnostics": "PASS EntryMenu only",
+      "visual_evidence": "NOT RUN candidate foreground guard not satisfied",
+      "continuous_traversal": "NOT RUN",
+      "profile": "Debug Diagnostic/Mobile; entry-scene opaque-fast observed",
+      "os": "Android 16 API36",
+      "driver": "Qualcomm Adreno Vulkan Driver E031.50.19.18; Vulkan1.4.295"
+    },
+    {
+      "target": "Android Samsung SM-S948B",
+      "backend": "RayQueryCompute",
+      "vertical_acceptance": "NOT RUN",
+      "presentation": "NOT RUN; not attempted after stop",
+      "unsupported_backend_established": false
+    }
+  ],
+  "artifacts": {
+    "windows_debug_exe_sha256": "6cf04484c5711c822b173b9256173311928027f92b681104c456eca5d0da9e03",
+    "android_debug_apk_and_installed_pullback_sha256": "1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c"
+  },
+  "remaining_gates": [
+    "normal Windows no-fixture route and zero-height matched baseline",
+    "ground-to-ramp-to-plateau-to-ground with continuous looking on each target/backend",
+    "raised static checkpoint and Query static checkpoints",
+    "camera/body/both hands/sword/stow/torch/lantern/socket/flame/physical-light once-only transform",
+    "ceiling/wall retraction, clipping/floating/stale frames and off-camera secondary contributions",
+    "event-time height metadata, delayed playback ordering/cancellation on device",
+    "Windows focus/return/resize/restart and Android background/rotation/surface/process reconstruction",
+    "owner exact-candidate listening and haptic response"
+  ],
+  "policy": "Stop on missing supported control. No implementation fix, #23/#24 work, budgets/tests/shaders/ABI/assets/defaults changes, driver reset, downgrade, uninstall, data clear, release signing/merge or other work package. Existing app launch is not a full physical pass.",
+  "privacy": "Only sanitized selected metadata/logs and inspected app-only engine PNG published; device serials, installed filesystem paths, certificate subjects, private GUI/window content, pulled APKs and raw logs excluded. The initial unsuitable desktop crop is private and excluded.",
+  "files": {
+    "android-ordinary-launch.log": "7b78b1d95f6c124e978946073edecb45f03b422d17c460fb7ca0eb185cd9ffef",
+    "android-ordinary-presentation.json": "5d69bc5211971cd649f18859a51ccc6f162551c41b9b39db895110f4134ddf8e",
+    "approved-debug-install.log": "783b7a7fdad072e6a244f6d58dd270874ee84340c59c7d09f431ae59286dc7b1",
+    "commands-and-observations.json": "cc1bf3a185cf3a02d9204169c389deeab6b368148467ad8437a104954c865fd8",
+    "control-blocker.json": "22f4972270ee9db1582af60727148536034fcb2a6aae93c3719511b515f4679a",
+    "device-inventory-and-install.json": "d97949cc0abab7885c5b4dcc402b4120a2f4ce39f509faf384e55756c053cd6c",
+    "log-identities.json": "084a0b686e119dd1f983e2b7f386a7add0b44df41540f6d8836ebda8a68f1187",
+    "windows-default-ground.log": "52605228136af3e88a932ea987faef29d60f50fb10c23c81501ca093f946f0b3",
+    "windows-ground-capture-manifest.json": "b3f686e3d9736a79e03ab5b7c29f78c7ef451bbedc733463ff3de72213026887",
+    "windows-interactive-presentation.json": "e4ac90a0c77220628bc90691feb32a4a555854d966c1c91804d8df761a2edaa0",
+    "windows-pipeline-ground.png": "c98c411559e38314ccaf5941ac429016504c7d7419c7b4facf55a49465c02a43",
+    ".gitattributes": "c8be91ebdfd3a2b96b8f56e82fbba0f84642a33e0ea08052e5a381d1aac29e5b"
+  }
+}

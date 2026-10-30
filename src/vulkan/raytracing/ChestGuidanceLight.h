@@ -15,8 +15,8 @@ struct RtGuidanceLight
 };
 
 // The reward cue is renderer data derived from shared deterministic gameplay
-// state. Locked and seal-breaking frames remain genuinely dark; the same
-// phase transition that emits ChestUnlocked activates this world-space light.
+// state. Locked and seal-breaking frames remain dark. The unlock transition
+// activates this world-space light, and claiming the reward extinguishes it.
 inline constexpr RtGuidanceLight ResolveChestGuidanceLight(
     const horde::gameplay::interactions::ChestRewardSnapshot& chest)
 {
@@ -26,10 +26,11 @@ inline constexpr RtGuidanceLight ResolveChestGuidanceLight(
         1.02f,
         horde::gameplay::kRewardChestRoutePosition.z}};
     constexpr float kOverheadChestLampStrength = 1.65f;
+    const bool chestSpotlightActive =
+        chest.phase != ChestRewardPhase::Locked &&
+        chest.phase != ChestRewardPhase::LanternClaimed;
     return {kOverheadChestLampPosition,
-            chest.phase == ChestRewardPhase::Locked
-                ? 0.0f
-                : kOverheadChestLampStrength};
+            chestSpotlightActive ? kOverheadChestLampStrength : 0.0f};
 }
 
 } // namespace horde::vulkan::raytracing

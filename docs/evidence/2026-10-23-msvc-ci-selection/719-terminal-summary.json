@@ -1,0 +1,164 @@
+{
+  "workflow": {
+    "conclusion": "success",
+    "created_at": "2026-10-23T12:08:22Z",
+    "event": "push",
+    "head_branch": "codex/horde-1.7-wp2-vertical-proof",
+    "head_sha": "719b86aabd52cc024d74e92629b5de84c8d47136",
+    "html_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39951083061",
+    "id": 39951083061,
+    "name": "Shared simulation host tests",
+    "run_attempt": 1,
+    "run_started_at": "2026-10-23T12:08:22Z",
+    "status": "completed",
+    "updated_at": "2026-10-23T12:22:30Z"
+  },
+  "jobs": [
+    {
+      "id": 120405420685,
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:08:25Z",
+      "completedAtUtc": "2026-10-23T12:15:50Z",
+      "totalSeconds": 445.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39951083061/job/120405420685"
+    },
+    {
+      "id": 120405421090,
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:08:26Z",
+      "completedAtUtc": "2026-10-23T12:19:36Z",
+      "totalSeconds": 670.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39951083061/job/120405421090"
+    },
+    {
+      "id": 120405421232,
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:08:25Z",
+      "completedAtUtc": "2026-10-23T12:15:49Z",
+      "totalSeconds": 444.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39951083061/job/120405421232"
+    },
+    {
+      "id": 120405421248,
+      "name": "player-vulkan-host",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:08:25Z",
+      "completedAtUtc": "2026-10-23T12:16:14Z",
+      "totalSeconds": 469.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39951083061/job/120405421248"
+    },
+    {
+      "id": 120405421310,
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:08:25Z",
+      "completedAtUtc": "2026-10-23T12:11:40Z",
+      "totalSeconds": 195.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39951083061/job/120405421310"
+    },
+    {
+      "id": 120405421836,
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:08:26Z",
+      "completedAtUtc": "2026-10-23T12:22:30Z",
+      "totalSeconds": 844.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39951083061/job/120405421836"
+    }
+  ],
+  "msvc": {
+    "jobId": 120405421836,
+    "conclusion": "success",
+    "timeoutMinutes": 15,
+    "totalSeconds": 844.0,
+    "remainingToCapSeconds": 56.0,
+    "configureStepSeconds": 27.0,
+    "buildStepSeconds": 615.0,
+    "selectionStepSeconds": 153.0,
+    "ctestRealSeconds": 149.42,
+    "selectedCount": 149,
+    "completedPassedCount": 149,
+    "failedTestResultsObserved": 0,
+    "portableExcludedCount": 21,
+    "unchangedToolExcludedCount": 15,
+    "providerObjectWrappers": [
+      {
+        "name": "horde_rt_provider_shipping_mobile_fixture_evidence",
+        "result": "Passed",
+        "seconds": 23.33
+      },
+      {
+        "name": "horde_rt_provider_shipping_high_fixture_evidence",
+        "result": "Passed",
+        "seconds": 22.55
+      },
+      {
+        "name": "horde_rt_provider_diagnostic_mobile_fixture_evidence",
+        "result": "Passed",
+        "seconds": 22.97
+      },
+      {
+        "name": "horde_rt_provider_diagnostic_high_fixture_evidence",
+        "result": "Passed",
+        "seconds": 23.24
+      }
+    ],
+    "providerObjectWrapperSeconds": 92.09,
+    "nativeReportUiResults": [
+      {
+        "name": "horde_rt_windows_remote_playtest_report_ui_tests",
+        "result": "Passed",
+        "seconds": 0.85
+      },
+      {
+        "name": "horde_rt_windows_playtest_report_ui_tests",
+        "result": "Passed",
+        "seconds": 1.81
+      }
+    ],
+    "apkResolverStepConclusion": "success",
+    "apkResolverCasesPassed": 10,
+    "longestCompletedTests": [
+      {
+        "name": "horde_rt_provider_shipping_mobile_fixture_evidence",
+        "seconds": 23.33
+      },
+      {
+        "name": "horde_rt_provider_diagnostic_high_fixture_evidence",
+        "seconds": 23.24
+      },
+      {
+        "name": "horde_rt_provider_diagnostic_mobile_fixture_evidence",
+        "seconds": 22.97
+      },
+      {
+        "name": "horde_rt_provider_shipping_high_fixture_evidence",
+        "seconds": 22.55
+      },
+      {
+        "name": "horde_rt_windows_glass_graphics_contract_tests",
+        "seconds": 14.03
+      },
+      {
+        "name": "horde_rt_version_contract_incremental_configure_tests",
+        "seconds": 5.83
+      }
+    ],
+    "annotationCount": 0,
+    "annotations": []
+  },
+  "cancellationClassification": "None. All six jobs passed; the requested MSVC check annotation endpoint returned an empty list, with no timeout or supersession annotation.",
+  "limitations": [
+    "Job/phase timing uses API second resolution; CTest reports149.42s real time.",
+    "This exact719 checkpoint does not validate subsequently prepared provider-object reuse changes.",
+    "Hosted total timing does not isolate compiler cost or stable runner performance."
+  ],
+  "sourceReceipt": {
+    "path": "reports/msvc-ci-dedup-20261023/719-terminal-receipt.json",
+    "bytes": 27118,
+    "sha256": "b46a13795913a821a71d1b5f98b23ca7242de429f023d57f3c275751ef693146"
+  }
+}

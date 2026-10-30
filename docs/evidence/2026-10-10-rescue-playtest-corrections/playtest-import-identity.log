@@ -1,0 +1,24 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 153
+    Start 153: horde_rt_rescue_blockout_import_tests
+
+153: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_blockout_import_tests.exe"
+153: Working Directory: <repo>/build/presets/windows-x64-debug
+153: Test timeout computed to be: 1500
+1/1 Test #153: horde_rt_rescue_blockout_import_tests ...   Passed    2.42 sec
+
+The following tests passed:
+	horde_rt_rescue_blockout_import_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   2.44 sec

@@ -1,0 +1,12 @@
+[
+  {
+    "case": "control",
+    "exit": 0,
+    "log": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\player-run-retarget-20261024\\control-native-poses.log"
+  },
+  {
+    "case": "run",
+    "exit": 1,
+    "log": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\player-run-retarget-20261024\\run-native-poses.log"
+  }
+]

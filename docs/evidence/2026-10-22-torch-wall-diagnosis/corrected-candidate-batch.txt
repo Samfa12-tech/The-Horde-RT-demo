@@ -1,0 +1,31 @@
+Internal ctest changing into directory: <worktree>/build/presets/windows-x64-debug
+Test project <worktree>/build/presets/windows-x64-debug
+    Start  48: horde_rt_held_item_transition_tests
+Process not started
+ <worktree>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_transition_tests.exe
+[unknown error]
+1/9 Test  #48: horde_rt_held_item_transition_tests .............***Not Run   0.00 sec
+    Start  51: horde_rt_held_item_clearance_tests
+2/9 Test  #51: horde_rt_held_item_clearance_tests ..............   Passed    7.52 sec
+    Start  72: horde_rt_held_item_vertical_support_rig_tests
+3/9 Test  #72: horde_rt_held_item_vertical_support_rig_tests ...   Passed    4.21 sec
+    Start  77: horde_rt_final_held_torch_clearance_tests
+4/9 Test  #77: horde_rt_final_held_torch_clearance_tests .......   Passed  131.59 sec
+    Start 102: horde_rt_fire_emitter_tests
+5/9 Test #102: horde_rt_fire_emitter_tests .....................   Passed    7.71 sec
+    Start 103: horde_rt_held_item_socket_tests
+6/9 Test #103: horde_rt_held_item_socket_tests .................   Passed   27.81 sec
+    Start 104: horde_rt_skeleton_render_pose_contracts
+7/9 Test #104: horde_rt_skeleton_render_pose_contracts .........   Passed    0.03 sec
+    Start 105: horde_rt_combat_sword_authority_agreement
+8/9 Test #105: horde_rt_combat_sword_authority_agreement .......   Passed    0.74 sec
+    Start 148: horde_rt_simulation_gameplay_tests
+9/9 Test #148: horde_rt_simulation_gameplay_tests ..............   Passed    9.64 sec
+
+89% tests passed, 1 tests failed out of 9
+
+Total Test time (real) = 191.65 sec
+
+The following tests FAILED:
+	 48 - horde_rt_held_item_transition_tests (BAD_COMMAND)
+Errors while running CTest

@@ -17,9 +17,9 @@
     {
       "key": "diagnostic_high_generic_dielectric",
       "max": {
-        "bytes": 295636,
-        "words": 73909,
-        "instructions": 17638,
+        "bytes": 295960,
+        "words": 73990,
+        "instructions": 17649,
         "branchOperations": 986,
         "loops": 21,
         "selectionMerges": 416,
@@ -43,9 +43,9 @@
     {
       "key": "diagnostic_high_opaque_fast",
       "max": {
-        "bytes": 594956,
-        "words": 148739,
-        "instructions": 33038,
+        "bytes": 595520,
+        "words": 148880,
+        "instructions": 33067,
         "branchOperations": 4615,
         "loops": 84,
         "selectionMerges": 1860,
@@ -69,9 +69,9 @@
     {
       "key": "diagnostic_mobile_generic_dielectric",
       "max": {
-        "bytes": 294136,
-        "words": 73534,
-        "instructions": 17542,
+        "bytes": 294460,
+        "words": 73615,
+        "instructions": 17553,
         "branchOperations": 977,
         "loops": 20,
         "selectionMerges": 414,
@@ -95,9 +95,9 @@
     {
       "key": "diagnostic_mobile_opaque_fast",
       "max": {
-        "bytes": 591856,
-        "words": 147964,
-        "instructions": 32845,
+        "bytes": 592420,
+        "words": 148105,
+        "instructions": 32874,
         "branchOperations": 4579,
         "loops": 80,
         "selectionMerges": 1850,
@@ -121,9 +121,9 @@
     {
       "key": "shipping_high_generic_dielectric",
       "max": {
-        "bytes": 286808,
-        "words": 71702,
-        "instructions": 17214,
+        "bytes": 287132,
+        "words": 71783,
+        "instructions": 17225,
         "branchOperations": 939,
         "loops": 21,
         "selectionMerges": 388,
@@ -147,9 +147,9 @@
     {
       "key": "shipping_high_opaque_fast",
       "max": {
-        "bytes": 590720,
-        "words": 147680,
-        "instructions": 32859,
+        "bytes": 591284,
+        "words": 147821,
+        "instructions": 32888,
         "branchOperations": 4593,
         "loops": 84,
         "selectionMerges": 1851,
@@ -173,9 +173,9 @@
     {
       "key": "shipping_mobile_generic_dielectric",
       "max": {
-        "bytes": 285308,
-        "words": 71327,
-        "instructions": 17118,
+        "bytes": 285632,
+        "words": 71408,
+        "instructions": 17129,
         "branchOperations": 930,
         "loops": 20,
         "selectionMerges": 386,
@@ -199,9 +199,9 @@
     {
       "key": "shipping_mobile_opaque_fast",
       "max": {
-        "bytes": 587620,
-        "words": 146905,
-        "instructions": 32666,
+        "bytes": 588184,
+        "words": 147046,
+        "instructions": 32695,
         "branchOperations": 4557,
         "loops": 80,
         "selectionMerges": 1841,

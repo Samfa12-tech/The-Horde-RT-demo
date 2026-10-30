@@ -1,0 +1,28 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+      Start   1: horde_rt_triangle_support_surface_tests
+ 1/11 Test   #1: horde_rt_triangle_support_surface_tests ........   Passed    0.03 sec
+      Start  84: horde_rt_tomb_dressing_tests
+ 2/11 Test  #84: horde_rt_tomb_dressing_tests ...................   Passed    0.42 sec
+      Start  85: horde_rt_graveyard_dressing_tests
+ 3/11 Test  #85: horde_rt_graveyard_dressing_tests ..............   Passed    1.65 sec
+      Start  86: horde_rt_forest_dressing_tests
+ 4/11 Test  #86: horde_rt_forest_dressing_tests .................   Passed   10.68 sec
+      Start 158: horde_rt_scene_initialise_preflight_tests
+ 5/11 Test #158: horde_rt_scene_initialise_preflight_tests ......   Passed    3.51 sec
+      Start 159: horde_rt_static_geometry_cutover_tests
+ 6/11 Test #159: horde_rt_static_geometry_cutover_tests .........   Passed    0.03 sec
+      Start 160: horde_rt_scene_resource_inventory_tests
+ 7/11 Test #160: horde_rt_scene_resource_inventory_tests ........   Passed   18.18 sec
+      Start 175: horde_rt_rescue_journey_integration_tests
+ 8/11 Test #175: horde_rt_rescue_journey_integration_tests ......   Passed    3.60 sec
+      Start 176: horde_rt_chapter_terrain_journey_tests
+ 9/11 Test #176: horde_rt_chapter_terrain_journey_tests .........   Passed   29.99 sec
+      Start 183: horde_rt_rescue_rig_attachment_tests
+10/11 Test #183: horde_rt_rescue_rig_attachment_tests ...........   Passed   31.62 sec
+      Start 184: horde_rt_rescue_adversarial_regression_tests
+11/11 Test #184: horde_rt_rescue_adversarial_regression_tests ...   Passed   30.60 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Total Test time (real) = 130.35 sec

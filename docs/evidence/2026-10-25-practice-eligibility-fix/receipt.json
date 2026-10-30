@@ -1,0 +1,40 @@
+{
+  "baseCommit": "a2bc755ac99b604b8f7cb40e6f9eeac77f9d2ba7",
+  "changedSourceSha256": {
+    "src/gameplay/simulation/CombatTeaching.h": "610a38eacd1ee98d76780c2a3b589388fc09a5f458658b74e788ab52b65d1e99",
+    "src/gameplay/simulation/GameSimulation.cpp": "5f3504c56274c84665052992ad7af3551b946aa165281fc11b938c77c2bff661",
+    "tests/CombatFoundationTests.cpp": "b79ece8635805268ce1eae5b3aefd979a0871e6ba67f36591a015aba8136a82f"
+  },
+  "originalHostedRun": 40195872478,
+  "originalHostedFailure": "Only horde_rt_motion_evidence_scenario_tests failed in GCC,Clang,MSVC; Android,ASan/UBSan,Vulkan passed.",
+  "originalLocalReproduction": "FAIL at15/30/60/120Hz, Player died outside the intended actual death/retry stage;11.72s unchanged test",
+  "cause": "Rules eligibility was combined with the user tutorial preference and recorded a persistent Skip for the legacy seed. Ordinary Retry then unexpectedly lost the still-requested protection.",
+  "fix": "Separate raw preference from rulesActive; inactive eligibility only cancels transients and preserves stage,learned flags,preference and explicit pending exit.",
+  "localGates": {
+    "affectedCtestsPassed": 6,
+    "motionScenarioSeconds": 11.93,
+    "combatFoundationSeconds": 8.98,
+    "campaignCheckpointSeconds": 17.78,
+    "combatTimingSeconds": 6.01,
+    "windowsPracticeSeconds": 1.86,
+    "sharedSimulationSeconds": 9.8,
+    "unchangedDeadlines": true,
+    "fourAbiDebugAssembly": "PASS1m31s"
+  },
+  "motionScope": "Legacy initial death followed by default-enabled practice-protected retry/reward route. Not unprotected balance, human victory or phone acceptance.",
+  "artifact": {
+    "sha256": "6233d23b911063467e4bc0578864498c387e288e3ed658ce2177cb47b451012e",
+    "bytes": 206293867,
+    "runtimeAssets": 185,
+    "assetsByteIdenticalToA2bc755a": true,
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "installed": false
+  },
+  "newFeatureWork": "Frozen; no bridge/audio source edits. One ignored .blend authoring WIP saved, unpreviewed/unexported/unadmitted.",
+  "phoneAccess": false
+}

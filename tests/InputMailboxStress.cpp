@@ -35,6 +35,12 @@ InputSnapshot MakeSnapshot(std::uint64_t sequence)
     input.paused = (sequence & 1u) != 0u;
     input.damageEnabled = !input.paused;
     input.hasAuthoritativePlayerPose = (sequence & 2u) != 0u;
+    input.runHeld = (sequence & 4u) != 0u;
+    input.guardHeld = (sequence & 128u) != 0u;
+    input.crouchHeld = (sequence & 32u) != 0u;
+    input.analogueMovement = (sequence & 64u) != 0u;
+    input.tutorialEnabled = (sequence & 8u) != 0u;
+    input.tutorialSlowdownEnabled = (sequence & 16u) != 0u;
     input.commands.attack = sequence;
     input.commands.parry = sequence + 7u;
     input.commands.dodge = sequence + 9u;
@@ -42,6 +48,14 @@ InputSnapshot MakeSnapshot(std::uint64_t sequence)
     input.commands.retry = sequence + 29u;
     input.commands.interact = sequence + 31u;
     input.commands.toggleHeldLightPose = sequence + 37u;
+    input.commands.runToggle = sequence + 41u;
+    input.commands.clearRunIntent = sequence + 43u;
+    input.commands.tutorialSkip = sequence + 47u;
+    input.commands.tutorialReplay = sequence + 53u;
+    input.commands.crouchToggle = sequence + 59u;
+    input.commands.clearCrouchIntent = sequence + 61u;
+    input.commands.drinkFlask = sequence + 67u;
+    input.commands.rest = sequence + 71u;
     return input;
 }
 
@@ -65,13 +79,27 @@ bool MatchesSequence(const PublishedInput& published)
            actual.paused == expected.paused &&
            actual.damageEnabled == expected.damageEnabled &&
            actual.hasAuthoritativePlayerPose == expected.hasAuthoritativePlayerPose &&
+           actual.runHeld == expected.runHeld &&
+           actual.guardHeld == expected.guardHeld &&
+           actual.crouchHeld == expected.crouchHeld &&
+           actual.analogueMovement == expected.analogueMovement &&
+           actual.tutorialEnabled == expected.tutorialEnabled &&
+           actual.tutorialSlowdownEnabled == expected.tutorialSlowdownEnabled &&
            actual.commands.attack == expected.commands.attack &&
            actual.commands.parry == expected.commands.parry &&
            actual.commands.dodge == expected.commands.dodge &&
            actual.commands.routeReset == expected.commands.routeReset &&
            actual.commands.retry == expected.commands.retry &&
            actual.commands.interact == expected.commands.interact &&
-           actual.commands.toggleHeldLightPose == expected.commands.toggleHeldLightPose;
+           actual.commands.toggleHeldLightPose == expected.commands.toggleHeldLightPose &&
+           actual.commands.runToggle == expected.commands.runToggle &&
+           actual.commands.clearRunIntent == expected.commands.clearRunIntent &&
+           actual.commands.crouchToggle == expected.commands.crouchToggle &&
+           actual.commands.clearCrouchIntent == expected.commands.clearCrouchIntent &&
+           actual.commands.drinkFlask == expected.commands.drinkFlask &&
+           actual.commands.rest == expected.commands.rest &&
+           actual.commands.tutorialSkip == expected.commands.tutorialSkip &&
+           actual.commands.tutorialReplay == expected.commands.tutorialReplay;
 }
 
 } // namespace

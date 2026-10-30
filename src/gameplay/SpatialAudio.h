@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "gameplay/ShowcaseRoute.h"
+#include "gameplay/simulation/DevelopmentWorldRoute.h"
 
 namespace horde::gameplay
 {
@@ -15,6 +16,8 @@ struct SpatialAudioEmitter
     float gain = 1.0f;
     float referenceDistance = 1.0f;
     float maximumDistance = 14.0f;
+    // Metadata only for the current planar mix; append to preserve aggregates.
+    float worldY = 0.0f;
 };
 
 struct SpatialAudioListener
@@ -22,6 +25,8 @@ struct SpatialAudioListener
     float x = 0.0f;
     float z = 0.0f;
     float yawRadians = 0.0f;
+    // Metadata only for the current planar mix; append to preserve aggregates.
+    float worldY = horde::gameplay::kShowcaseEyeWorldY;
 };
 
 struct SpatialAudioGains
@@ -34,6 +39,30 @@ struct SpatialAudioGains
 };
 
 constexpr float kObstructedAudioGain = 0.38f;
+
+enum class SpatialAudioDomain { DungeonRoute, ExteriorRoute };
+
+// The dungeon's heightless wall approximation is valid only in its own world
+// domain. Outdoor chapter zones have no authored acoustic wall approximation;
+// leaving the old rectangle union is not evidence of an obstructing wall.
+// Unconfigured/legacy snapshots and unknown zones retain the existing policy.
+inline constexpr SpatialAudioDomain ResolveSpatialAudioDomain(
+    bool chapterWorld, simulation::WorldZoneId zone) noexcept
+{
+    if (chapterWorld)
+    {
+        switch (zone)
+        {
+        case simulation::WorldZoneId::TombExterior:
+        case simulation::WorldZoneId::ForestApproach:
+        case simulation::WorldZoneId::Lookout:
+            return SpatialAudioDomain::ExteriorRoute;
+        default:
+            break;
+        }
+    }
+    return SpatialAudioDomain::DungeonRoute;
+}
 
 // Walking starts with a short weight-shift before the first audible contact,
 // then settles into a brisk but natural alternating cadence.
@@ -82,10 +111,10 @@ private:
 class TravelFootstepCadence
 {
 public:
-    bool Update(float travelledMetres, bool movementIntended)
+    bool Update(float travelledMetres, bool movementIntended, bool grounded = true)
     {
         travelledMetres = std::max(0.0f, travelledMetres);
-        if (!movementIntended)
+        if (!movementIntended || !grounded)
         {
             Reset();
             return false;
@@ -188,13 +217,15 @@ inline bool IsRouteAudioObstructed(float listenerX, float listenerZ, float emitt
 }
 
 inline SpatialAudioGains CalculateSpatialAudio(const SpatialAudioEmitter& emitter,
-                                                const SpatialAudioListener& listener)
+                                                const SpatialAudioListener& listener,
+                                                SpatialAudioDomain domain = SpatialAudioDomain::DungeonRoute)
 {
     SpatialAudioGains result{};
     const float offsetX = emitter.x - listener.x;
     const float offsetZ = emitter.z - listener.z;
     result.distance = std::sqrt(offsetX * offsetX + offsetZ * offsetZ);
-    result.obstructed = IsRouteAudioObstructed(listener.x, listener.z, emitter.x, emitter.z);
+    result.obstructed = domain != SpatialAudioDomain::ExteriorRoute &&
+        IsRouteAudioObstructed(listener.x, listener.z, emitter.x, emitter.z);
 
     if (emitter.gain <= 0.0f || result.distance >= emitter.maximumDistance)
     {

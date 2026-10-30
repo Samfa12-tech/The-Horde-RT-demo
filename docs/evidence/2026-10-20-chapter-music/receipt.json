@@ -1,0 +1,302 @@
+{
+  "date": "2026-10-20",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "sourceBase": "cbfc13f66040ad694532b42442ac278c5f5d1923",
+  "draftPr": 27,
+  "finalFrozenSourcesVerified": 7,
+  "binaries": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+      "bytes": 186114245,
+      "sha256": "df8b9320778f606e671de57a9a0bbc3e23cd5abd6297773c8a54d822e0b291a8"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+      "bytes": 13921792,
+      "sha256": "2c61005647c0156f3b88dc89d77adce2b7ab992913dde5d962f6001617adac7c"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe",
+      "bytes": 4614144,
+      "sha256": "9ef0f7521ba10693c43e15b456fdea4f921caa3d7a52563d04f0f526cb77dd3b"
+    }
+  ],
+  "windowsBuilds": {
+    "Release": "PASS exit 0",
+    "Debug": "PASS exit 0",
+    "target": "horde_rt_diagnostic_window",
+    "parallel": 1
+  },
+  "androidBuild": {
+    "result": "PASS exit 0",
+    "task": ":app:assembleDebug",
+    "offline": true,
+    "workers": 2,
+    "instrumentation": "Shipping",
+    "dielectricQuality": "Mobile",
+    "cacheFlags": [
+      {
+        "abi": "arm64-v8a",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      },
+      {
+        "abi": "armeabi-v7a",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      },
+      {
+        "abi": "x86",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      },
+      {
+        "abi": "x86_64",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      }
+    ],
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "installedOrLaunched": false
+  },
+  "packagedCuesMatchRuntimeAndAdmittedManifest": [
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/A-body.wav",
+      "bytes": 2304044,
+      "sha256": "8c6201afb7129775ded6696c5819f4e592202d1b0f33f755b9d4f408f2e81556"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/A-tail.wav",
+      "bytes": 576044,
+      "sha256": "a7459fc656b1520be5fad2b9e11cec314d62cdf0164abdb2fda53d619d7b962c"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/B-body.wav",
+      "bytes": 2304044,
+      "sha256": "27944d203f9453b7ff9edb2bfd653bac524d4da4db4a000f76115fb4810dd3b5"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/B-tail.wav",
+      "bytes": 576044,
+      "sha256": "7a437a4641f4b99d8b21db934ece9bb3a9c4d0464fea37eb94a2841d70f3132f"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/C-body.wav",
+      "bytes": 576044,
+      "sha256": "3ce3a8ea381c3e81c0b34841df3f1d8d236a5ef335f594001553a400b65accb3"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/C-tail.wav",
+      "bytes": 576044,
+      "sha256": "ec3650bd450cebe9985c1d4d4b59749debe34301f9f9e889171d0e49a316c89c"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/D-body.wav",
+      "bytes": 2304044,
+      "sha256": "4398311b5870e614ffe611950264e370cf819f8d323aafe291816f38e36bf4c6"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/D-tail.wav",
+      "bytes": 576044,
+      "sha256": "14550157b1a3fbf44f3d1a4dda424223475a7a0a9975b0361687bb2031f7ec50"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/E-body.wav",
+      "bytes": 2304044,
+      "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/E-tail.wav",
+      "bytes": 576044,
+      "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/F-body.wav",
+      "bytes": 2304044,
+      "sha256": "158f015c3ffbb12169eb088206751f56fbed799e0b3dea3ab4496124634b441d"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/F-tail.wav",
+      "bytes": 576044,
+      "sha256": "a4fdc4b38c8a1e7240cfad5ac364063ec8c6f27f9baefc2d2e6110a8a4429c21"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/G-body.wav",
+      "bytes": 1152044,
+      "sha256": "ab2dbe31c735cbeec11d09eaa308e5faee793a891c34b67f5f50f6b33af25736"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/G-tail.wav",
+      "bytes": 576044,
+      "sha256": "c51b9851ac32e34c57e586f154d3ee1d5f2d138b9c0f21b2c983618905a42609"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/H-body.wav",
+      "bytes": 2304044,
+      "sha256": "58ac260bd18204e9fb1aeb01aab9229de6830032f1d4be3d30b9527fde1fe6ae"
+    },
+    {
+      "entry": "assets/audio/music/what-the-dark-keeps/runtime/H-tail.wav",
+      "bytes": 576044,
+      "sha256": "9e50268573d85733333e10304a0e9faf8d23545e510723035aef1b9d8b0238bf"
+    }
+  ],
+  "packagedManifestExact": true,
+  "hostTests": {
+    "result": "13/13 PASS",
+    "newChapterChecks": 65,
+    "totalSeconds": 36.46,
+    "selection": "host-tests.log",
+    "output": "LastTest.log",
+    "scope": "Affected Release host tests only; not complete repository, hardware RT or physical route acceptance"
+  },
+  "testBinaries": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_chapter_music_tests.exe",
+      "bytes": 908288,
+      "sha256": "d0c64485f186fd0e474d2542d367c2b6a7718e99c066fac8d28231b6c7b44299"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_music_director_tests.exe",
+      "bytes": 609280,
+      "sha256": "c8028ad89d27e21798394ef918d1d45a1500e30dd7ba3d243b8e078a13e70f84"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_music_playback_session_tests.exe",
+      "bytes": 277504,
+      "sha256": "889cffc3da4ce89a5498e4d1708e68609c466a40de3b458d4a913e155701be69"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_music_pcm_stream_tests.exe",
+      "bytes": 246784,
+      "sha256": "2a4d9a07d3f54ea4e6ec88d81b3add4ad552d741dee3005fcc1382d6e09959a4"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_music_pcm_wave_tests.exe",
+      "bytes": 268288,
+      "sha256": "12033895cb261b9454e9a25d39a4d3fed4f5a1a1e2fdf8327f4c16c386479f57"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_music_pcm_asset_bank_tests.exe",
+      "bytes": 254976,
+      "sha256": "20f81c55a2aa4433846a1da583523cc50717de55e33b9a1860e5e43c4f1c28d6"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_windows_music_focus_tests.exe",
+      "bytes": 282112,
+      "sha256": "36bf300e191fdb4df579dae347ae67f3344ef181d9ff586c7e768da3cfa0a696"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_campaign_checkpoint_tests.exe",
+      "bytes": 979456,
+      "sha256": "672dd1765f3ba7c0bec17f5da54b772f33ea284b2386188b6b23e62ba9786eb6"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_campaign_play_session_tests.exe",
+      "bytes": 1039360,
+      "sha256": "16c493175dc7e5b018d0336c42687600672d5826586d42af6b609d1e24c3ece6"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_campaign_codec_tests.exe",
+      "bytes": 300544,
+      "sha256": "92d31c2aedca68575523467c26b26c012a9dc7f5f5f696ca844c97c665e6ac6c"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_rescue_traversal_tests.exe",
+      "bytes": 436736,
+      "sha256": "743b63e5477a3740c598fa7f5ba3c8dc5b1b07c625aafe27bcc413e24e151cc3"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_rescue_journey_integration_tests.exe",
+      "bytes": 2654720,
+      "sha256": "3c48cfc7e2e55b0944b65d687561f2eb92e3ce5aa82faaa3db12454b72ed4059"
+    }
+  ],
+  "selectedJavaTests": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\test-results\\testDebugUnitTest\\TEST-com.samfa12.hordelanternrt.MusicAudioFocusTest.xml",
+      "bytes": 1688,
+      "sha256": "ac511ed0ae614eeed857e6c9a2d0e3958475a72a8ba9c1076094c89f262870dd",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\test-results\\testDebugUnitTest\\TEST-com.samfa12.hordelanternrt.MusicOutputBufferTest.xml",
+      "bytes": 1078,
+      "sha256": "362c2eaeea400bbcca7d51589a7e2f54787e02c03a7b1d682f172175c0c57dd5",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\test-results\\testDebugUnitTest\\TEST-com.samfa12.hordelanternrt.MusicOutputGainTest.xml",
+      "bytes": 1086,
+      "sha256": "1270a5c20f271aea9cad71bdfc8c6085a3d238008e2a920bb6b663474d46d047",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "selectedJavaTestCount": 19,
+  "assetAudit": {
+    "result": "PASS",
+    "unchangedRuntimeWavBytes": 20160704,
+    "unchangedDecodedPcmBytes": 20160000,
+    "admittedMusicWavs": 16,
+    "newAssets": 0,
+    "initialHelperFailure": "Hydrated WAV compared to its Git LFS pointer; original helper/trace preserved. Corrected helper checks cryptographic LFS oid/size and manifest."
+  },
+  "canonicalOwnerFiles": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\ASSET_LICENSES.md",
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\PROJECT_MEMORY.md",
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e",
+      "unchanged": true
+    }
+  ],
+  "mobileMistPolicy": {
+    "ownerDirection": "mist off on mobile because when it is on, during the keeper fight, we also have those two lights on and all together it was pretty chuggy.",
+    "sharedStartupResetOff": true,
+    "javaStartupResetOff": true,
+    "savedOffChoicePreviouslyRecorded": "docs/evidence/2026-10-20-graphics-followup/README.md",
+    "phoneQueriedInThisSlice": false
+  },
+  "independentReview": "Final frozen source review found no actionable defect; repeated Observe, content clock/cancellation, monotonic mode/retry, queue replacement and exact synthetic G/H seam reviewed. Reviewer made no edits, builds or runtime/device operations.",
+  "phoneOperations": false,
+  "platformAudioPlayback": false,
+  "musicListeningAcceptance": false,
+  "hardwareRtPresentation": false,
+  "performanceAcceptance": false,
+  "publicPushMergeRelease": false,
+  "ReefOperations": false,
+  "audioHapticManualRevalidationRequired": true,
+  "manualReason": "Shared cue/state/timing and Windows replacement-queue transport change. Haptics unchanged.",
+  "recoveryPolicy": "Pending; exact choices and existing health/save behavior in docs/design/HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md",
+  "nextBoundedSourceSlice": "Audit existing licensed local tomb/rope ambience and one real-location/event path if suitable admitted cues exist.",
+  "remaining": [
+    "F/G/H suitability, seams/tails, mix/mute and lifecycle listening on both platforms",
+    "Natural full route/return, physically earned saves/death Load, first-time teaching/contact and controller/touch comfort",
+    "Sustained warm Keeper two-light and exterior performance with mobile Mist Off",
+    "Healing policy decision and later implementation; debris kicking/option and whole-opening art"
+  ]
+}

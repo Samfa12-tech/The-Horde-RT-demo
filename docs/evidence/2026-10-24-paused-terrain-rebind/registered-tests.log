@@ -1,0 +1,16 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start  41: horde_rt_chapter_step_movement_tests
+1/3 Test  #41: horde_rt_chapter_step_movement_tests ...***Timeout  30.02 sec
+
+    Start  42: horde_rt_paused_terrain_rebind_tests
+2/3 Test  #42: horde_rt_paused_terrain_rebind_tests ...   Passed    1.45 sec
+    Start 185: horde_rt_lantern_pendulum_tests
+3/3 Test #185: horde_rt_lantern_pendulum_tests ........   Passed    0.06 sec
+
+67% tests passed, 1 tests failed out of 3
+
+Total Test time (real) =  31.55 sec
+
+The following tests FAILED:
+	 41 - horde_rt_chapter_step_movement_tests (Timeout)
+Errors while running CTest

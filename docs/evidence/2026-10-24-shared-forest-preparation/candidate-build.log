@@ -1,0 +1,13 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <worktree>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <worktree>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  ForestDressing.cpp
+  ForestDressingTests.cpp
+<worktree>\tests\ForestDressingTests.cpp(326,27): error C3538: in a declarator-list 'auto' must always deduce to the same type [<worktree>\build\presets\windows-x64-debug\horde_rt_forest_dressing_tests.vcxproj]
+      <worktree>\tests\ForestDressingTests.cpp(326,27):
+      could be 'std::vector<horde::scene::assets::StaticRtVertex,std::allocator<horde::scene::assets::StaticRtVertex>>'
+      <worktree>\tests\ForestDressingTests.cpp(326,27):
+      or       'std::vector<uint32_t,std::allocator<uint32_t>>'
+
+  Generating Code...

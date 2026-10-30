@@ -1,0 +1,655 @@
+{
+  "sealedAtUtc": "2026-10-20T18:37:49.963347+00:00",
+  "decision": "UNADMITTED; owned turn runtime and dependent tests safely restored",
+  "sourceBase": "b97823fb429ddd75f4015752dc5b96fa84083ef4",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "restoredByteIdenticalTo": "feef147183ddedbb65c4b900e3c6d3b8319cc352",
+  "restoredSources": {
+    "src/gameplay/dialogue/CompanionLocomotion.h": {
+      "bytes": 1063,
+      "sha256": "617cc31b132bde8986d910d0a7ad31322b2a730bd7649c34db812e1fe25f5696"
+    },
+    "src/gameplay/dialogue/CompanionRouteFixture.h": {
+      "bytes": 6903,
+      "sha256": "b4303cef059be832467e7dcb29a0ef1b84e1826c877472ce3d7d0c8fb2dbe70c"
+    },
+    "src/scene/CompanionPose.h": {
+      "bytes": 857,
+      "sha256": "fe069520487f275c1b3f1f7b3886ac2f5be9eeb338583c37f0b2c04d5e0cf29d"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+      "bytes": 490640,
+      "sha256": "28d02f30807f0af44b288012ecca22f89f73249ad6fccdef6db727349d5c5611"
+    },
+    "tests/CompanionLocomotionTests.cpp": {
+      "bytes": 5855,
+      "sha256": "173b8af4e6a4c89fa46c80bd3eae8a5e973514e7f289348da77a305a96afbd8c"
+    },
+    "tests/KitSourceIntakeTests.cpp": {
+      "bytes": 32709,
+      "sha256": "bb8bddeba7c97a9a03d12586545f64eeb2377d2a3788cc78e52549a3ea5bc3b8"
+    }
+  },
+  "currentHarness": {
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 619898,
+      "sha256": "14dda5b816c7a32c4211dd56be4877ad1bbb80a6703a0289a5475043e8f957d5"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "bytes": 49679,
+      "sha256": "b6704ccda0db2cc021831f6c7727ce75016daeefdf62b582147885bfd9d7169a"
+    }
+  },
+  "artifacts": {
+    "windowsDebug": {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 14098944,
+      "sha256": "16671e18158d8f32aeb57fc0f27a95abd04e894f61983706a300f0ee40834f6e"
+    },
+    "windowsRelease": {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4620288,
+      "sha256": "41c4d657ffc118bc1902a7a9572eaff2d3b7be0d460294eec0704479ce97d8de"
+    },
+    "androidDebugShippingMobile": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 186120169,
+      "sha256": "d1a052dd29fd8b6f61e70d247f0446373053bfb7e7c9af4bce07f84636b2ec43"
+    }
+  },
+  "packagedAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "retainedFiles": {
+    "plan.json": {
+      "source": "reports/kit-turn-admission-20261020-r1/plan.json",
+      "bytes": 1065,
+      "sha256": "61b7e576a6358569e90c9d80a67331af22e6ec03f9bb8bfeee38538128b15471"
+    },
+    "source-freeze.json": {
+      "source": "reports/kit-turn-admission-20261020-r1/source-freeze.json",
+      "bytes": 1487,
+      "sha256": "2c375f65de23bc796ddd590651387490afb5e2aef2abbb5cccbbbdcdc16355b7"
+    },
+    "guards.json": {
+      "source": "reports/kit-turn-admission-20261020-r1/guards.json",
+      "bytes": 79,
+      "sha256": "3ce47e312f01ea4ccd3a9b4947532466553978d8137263ccf83f2b3cc86b04fa"
+    },
+    "analysis.json": {
+      "source": "reports/kit-turn-admission-20261020-r1/analysis.json",
+      "bytes": 71650,
+      "sha256": "b2bc7baf7073b2657dd237a04942b2702bc5b3772d533e3cf17651f4ca396192"
+    },
+    "samples.csv": {
+      "source": "reports/kit-turn-admission-20261020-r1/samples.csv",
+      "bytes": 23263,
+      "sha256": "d214868a2d0284d7364028cf692bedc71806306ed94be9b18fec082697ebec79"
+    },
+    "thermal.json": {
+      "source": "reports/kit-turn-admission-20261020-r1/thermal.json",
+      "bytes": 10534,
+      "sha256": "8800671537a1553645d3fb16a3057bd1e407f2b58243e5c1aa4d5198bb799397"
+    },
+    "unadmitted-turn.patch": {
+      "source": "reports/kit-turn-admission-20261020-r1/unadmitted-turn.patch",
+      "bytes": 18172,
+      "sha256": "d0d0be5bddfa9bd0109abbbfa30c04555f1eefbd8fe251c957fb88823be28940"
+    },
+    "owner-before.json": {
+      "source": "reports/kit-turn-admission-20261020-r1/owner-before.json",
+      "bytes": 632,
+      "sha256": "d181f9f543458b0a5dfb9894f426e4515c4382dfbf65a2778a780fa5767f0fc5"
+    },
+    "owner-after.json": {
+      "source": "reports/kit-turn-admission-20261020-r1/owner-after.json",
+      "bytes": 632,
+      "sha256": "d181f9f543458b0a5dfb9894f426e4515c4382dfbf65a2778a780fa5767f0fc5"
+    },
+    "control-a1-receipt.json": {
+      "source": "reports/kit-turn-admission-20261020-r1/control-a1-receipt.json",
+      "bytes": 12148,
+      "sha256": "ae82ba202ed1c78bdda47e7442e61060095d639ad7fc611fdd784e293446ad3d"
+    },
+    "candidate-b-receipt.json": {
+      "source": "reports/kit-turn-admission-20261020-r1/candidate-b-receipt.json",
+      "bytes": 11377,
+      "sha256": "9ac03470ac4c448a7740161b099effe9fb3af89489799d486d4415f2cb41a020"
+    },
+    "control-a2-receipt.json": {
+      "source": "reports/kit-turn-admission-20261020-r1/control-a2-receipt.json",
+      "bytes": 11760,
+      "sha256": "5d8abf4507c12e652f6196b8bcad13ceba3fb0c37128126d9431c4c07e42454f"
+    },
+    "run-comparison.py": {
+      "source": "reports/run-kit-turn-admission-20261020.py",
+      "bytes": 5716,
+      "sha256": "7d9d8108e1aabe30c68028292a9bfa9e89028f7aac8e60b9049949627289ccc4"
+    },
+    "analyze-comparison.py": {
+      "source": "reports/analyze-kit-turn-admission-20261020.py",
+      "bytes": 6069,
+      "sha256": "d1f6fb5a6e99ae9f56287432448dab869749a16817815380d60f894eed3035b4"
+    },
+    "candidate-build.log": {
+      "source": "reports/kit-turn-admission-20261020-candidate-build.log",
+      "bytes": 1775,
+      "sha256": "b647e72ef1c5c9677b41f7ab3db61ea8a3efc64dd8e6cb100af66e16bb5d3035"
+    },
+    "control-build.log": {
+      "source": "reports/kit-turn-admission-20261020-control-build.log",
+      "bytes": 1781,
+      "sha256": "ee41632bc92990c6d56bbf9234f9e7c8371123526a3da8d4bd4b648ec0c4a291"
+    },
+    "restored-debug-build.log": {
+      "source": "reports/kit-turn-admission-20261020-restored-debug-build.log",
+      "bytes": 3212,
+      "sha256": "7ada89264dccdf27356cfdc470eeadf3008c45049f42bd58560020b8699a212a"
+    },
+    "restored-release-build.log": {
+      "source": "reports/kit-turn-admission-20261020-restored-release-build.log",
+      "bytes": 5984,
+      "sha256": "dbdc780b13d70a5732202bcea07d4f3828516de3222a725136d6116132136914"
+    },
+    "restored-android-build.log": {
+      "source": "reports/kit-turn-admission-20261020-restored-android-build.log",
+      "bytes": 2995,
+      "sha256": "0f4f4ec4722b2fc8e7baf645599f4f90c981f95ab336fa0a956e461fe4d471cb"
+    },
+    "restored-tests.log": {
+      "source": "reports/kit-turn-admission-20261020-restored-tests.log",
+      "bytes": 849,
+      "sha256": "65cb4d8692ff5bde48b14ea5776c7e7816d9466af08df7cd18b1e311fb2562e7"
+    },
+    "restored-LastTest.log": {
+      "source": "reports/kit-turn-admission-20261020-restored-LastTest.log",
+      "bytes": 8797,
+      "sha256": "eb88452a4d224267c6f6dece7a0811089697153ec4389cae8bea82f3ea8f25a4"
+    },
+    "restored-debug-locomotion.log": {
+      "source": "reports/kit-turn-admission-20261020-restored-debug-locomotion.log",
+      "bytes": 61,
+      "sha256": "58334656e3f5d876218d574b2ed73030c8d50fea08bd38d8f8b2225c4ce019ed"
+    }
+  },
+  "originalRawFiles": {
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/.slot-1-auto.hrd.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/manifest.json": {
+      "bytes": 166,
+      "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/slot-1-auto.hrd": {
+      "bytes": 162,
+      "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/vulkan_capability_report.json": {
+      "bytes": 2350,
+      "sha256": "edbfd82dd27a13bcf64ba5a7a5eb7c4114d44dc775a19c224b17783e14ed629b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/vulkan_capability_report.txt": {
+      "bytes": 1500,
+      "sha256": "10b6ed6802f8c9146089143ba2c9177dcf96916b5c1e99fe7c98adea82b9149b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-start-0.png": {
+      "bytes": 1425605,
+      "sha256": "0583a470c7a28f68225520cf191134b75eeb62ca8ff6cad12db1e637aa197909"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-start-1.png": {
+      "bytes": 1426868,
+      "sha256": "2df676ab11b0f841758418040f114be3e0639feb30028d2b09d936fc13e2c150"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-start-4.png": {
+      "bytes": 1427583,
+      "sha256": "84cb0b3ab03c9331a7ac32fd69689d3de355d370021df3dd2cd9a55622b819ba"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-start-8.png": {
+      "bytes": 1429154,
+      "sha256": "1f60c0133c4e892eeab3660430ec2e0ade87f0d1f717ce9b03543680d7c1a6df"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-stop-0.png": {
+      "bytes": 1439156,
+      "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-stop-1.png": {
+      "bytes": 1439325,
+      "sha256": "a113a0bc34e01545b600b340cddbf5ada364599c5532b26b2fd83a98870a74c8"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-stop-11.png": {
+      "bytes": 1439483,
+      "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-stop-4.png": {
+      "bytes": 1439401,
+      "sha256": "15c11a03ab3bfa17624015ad035d7f6b6ac67e4803dad42049a4e2ba846957a4"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-stop-8.png": {
+      "bytes": 1439865,
+      "sha256": "a593457b3071907cd17e451cb8465ccc448bd42d2028ea11f9b426b6ea1f303a"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-turn-0.png": {
+      "bytes": 1439483,
+      "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-turn-10.png": {
+      "bytes": 1438432,
+      "sha256": "e112bb2e57d9346c5932fedc18ae10ddf987eb45a7f2b8b836150c417933ae73"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-turn-100.png": {
+      "bytes": 1436241,
+      "sha256": "ef2d4cdc8379e77e7bea0798571890c721669c7f2f0a56cca19991e91438706b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-turn-20.png": {
+      "bytes": 1437617,
+      "sha256": "e15fe89840736ee0bf5442f15fbdb1d462ab09a1bf4989d446e854da0ce6b0e7"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-turn-30.png": {
+      "bytes": 1438169,
+      "sha256": "48cdb661d00f52d2af1b81748114edd6ed48501e5b02d41c2b1f21a156a6eac8"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-turn-40.png": {
+      "bytes": 1436665,
+      "sha256": "b449f778175ae748999d526208bf1e49789195fe0b5742f81a11e1a61f1b5018"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-turn-60.png": {
+      "bytes": 1435071,
+      "sha256": "7bf4ff67429ed6b57bf7db3db0df8d62f7632d98da17edf71997a68c9619e2cd"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-turn-80.png": {
+      "bytes": 1436202,
+      "sha256": "1a2307efa083c2e66e4fe7eaa848451a45f559169d5ef0eb4ce4396f0914c441"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-walk-100.png": {
+      "bytes": 1439156,
+      "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-walk-20.png": {
+      "bytes": 1431305,
+      "sha256": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-walk-35.png": {
+      "bytes": 1436556,
+      "sha256": "f4839ff06365f3a0c88fd59c855e6d4bf50c1f8de85ed22cb3dabab20afc9010"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-walk-50.png": {
+      "bytes": 1436165,
+      "sha256": "b75c6f9155e2ac58894139e1f10e52bff251d230e9a391a68a05a0de9a4a6eac"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-walk-65.png": {
+      "bytes": 1439022,
+      "sha256": "7b53493c5ba068d9d950b99e745b54a901bd4cbecd294dcb0ee6a2ca14995987"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-motion-walk-80.png": {
+      "bytes": 1438526,
+      "sha256": "2d557e8d71d6a42cdb73556a428d5ffb1822f919ffd751d1e2b4782152a4539b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-neutral.png": {
+      "bytes": 1469276,
+      "sha256": "dd627d930ff1375ffbd94c49bcc874196f0db3bc8990221409f81644a4d05052"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-recognition.png": {
+      "bytes": 1469255,
+      "sha256": "51638c30d607fa9775f0dbd96f1553875196460d602c7405df72a08ca2999f8c"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-speaking.png": {
+      "bytes": 1469296,
+      "sha256": "d423c5a5853830ef08ef4694ec28a0b0788f64be82ab8cfe72aa94a196bb53dd"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-timing-turn.png": {
+      "bytes": 1436202,
+      "sha256": "1a2307efa083c2e66e4fe7eaa848451a45f559169d5ef0eb4ce4396f0914c441"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-kit-timing-walk.png": {
+      "bytes": 1439156,
+      "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-loaded-lookout.png": {
+      "bytes": 1403116,
+      "sha256": "1b1ab43226a40b16f4d0547701c83d5e85ec2c324caddc46deef9c78d2ceca8a"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a1/windows-lookout-validation.json": {
+      "bytes": 550587,
+      "sha256": "bf4f50085d66bd0dd2a17f40bd5cd0f90034df757a90613b0f88cb97330fdcbc"
+    },
+    "reports/kit-turn-admission-20261020-r1/control-a1-stdout.log": {
+      "bytes": 2853,
+      "sha256": "43a8efa107c2fcf8fa39f92f31539a795c2daa85c1870c0cea14e25e64e00bb5"
+    },
+    "reports/kit-turn-admission-20261020-r1/control-a1-stderr.log": {
+      "bytes": 50908,
+      "sha256": "d8d5ce2c83ceb27e11bc0b493ff29d5a0d244460d1691976c5d02f378d3e4921"
+    },
+    "reports/kit-turn-admission-20261020-r1/control-a1-export.log": {
+      "bytes": 207,
+      "sha256": "65f1172879f9ee3ec9c84e9c034afd1d28c2e2bfdc1a4f3a509495aa9f2b9fc4"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/.slot-1-auto.hrd.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/manifest.json": {
+      "bytes": 166,
+      "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/slot-1-auto.hrd": {
+      "bytes": 162,
+      "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/vulkan_capability_report.json": {
+      "bytes": 2350,
+      "sha256": "edbfd82dd27a13bcf64ba5a7a5eb7c4114d44dc775a19c224b17783e14ed629b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/vulkan_capability_report.txt": {
+      "bytes": 1500,
+      "sha256": "10b6ed6802f8c9146089143ba2c9177dcf96916b5c1e99fe7c98adea82b9149b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-start-0.png": {
+      "bytes": 1425657,
+      "sha256": "81332acde5ac592fd6b6ce1e63c070e38b500e71223af911e25e5d4d8babfae3"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-start-1.png": {
+      "bytes": 1426891,
+      "sha256": "2e64480ace5b38d7b07a26edb5954da10b95947ed7e873a8553c04d028c07fd0"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-start-4.png": {
+      "bytes": 1427583,
+      "sha256": "84cb0b3ab03c9331a7ac32fd69689d3de355d370021df3dd2cd9a55622b819ba"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-start-8.png": {
+      "bytes": 1429154,
+      "sha256": "1f60c0133c4e892eeab3660430ec2e0ade87f0d1f717ce9b03543680d7c1a6df"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-stop-0.png": {
+      "bytes": 1439156,
+      "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-stop-1.png": {
+      "bytes": 1439325,
+      "sha256": "a113a0bc34e01545b600b340cddbf5ada364599c5532b26b2fd83a98870a74c8"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-stop-11.png": {
+      "bytes": 1439483,
+      "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-stop-4.png": {
+      "bytes": 1439401,
+      "sha256": "15c11a03ab3bfa17624015ad035d7f6b6ac67e4803dad42049a4e2ba846957a4"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-stop-8.png": {
+      "bytes": 1439865,
+      "sha256": "a593457b3071907cd17e451cb8465ccc448bd42d2028ea11f9b426b6ea1f303a"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-turn-0.png": {
+      "bytes": 1439483,
+      "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-turn-10.png": {
+      "bytes": 1438201,
+      "sha256": "c8dcc70d720e2a29d08c9c0a9e7edd46d335f333902f3f8c6f1572243699cf15"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-turn-100.png": {
+      "bytes": 1436241,
+      "sha256": "ef2d4cdc8379e77e7bea0798571890c721669c7f2f0a56cca19991e91438706b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-turn-20.png": {
+      "bytes": 1437557,
+      "sha256": "ad753e97ad865b3714b5e50ddf8ee11b400d6d56b54489846b991deb301e7a7f"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-turn-30.png": {
+      "bytes": 1437709,
+      "sha256": "beb7b9206dff1b8e542594413c0e539eab4b1b6832a93d82a1a4da9612b9d4e9"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-turn-40.png": {
+      "bytes": 1436830,
+      "sha256": "81468bce61952ea28a9912bb248a1dd13b6b231203480e7182b0aae077f720df"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-turn-60.png": {
+      "bytes": 1435035,
+      "sha256": "e261de2eca9e031d48f7d32e46298abc53b7db379d04c9b8d0a81d9dce5455a8"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-turn-80.png": {
+      "bytes": 1436041,
+      "sha256": "fdccbb09f6570cf71d56965b88abf1582b811f51a9268f244e1769ebf0398f76"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-walk-100.png": {
+      "bytes": 1439156,
+      "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-walk-20.png": {
+      "bytes": 1431305,
+      "sha256": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-walk-35.png": {
+      "bytes": 1436556,
+      "sha256": "f4839ff06365f3a0c88fd59c855e6d4bf50c1f8de85ed22cb3dabab20afc9010"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-walk-50.png": {
+      "bytes": 1436165,
+      "sha256": "b75c6f9155e2ac58894139e1f10e52bff251d230e9a391a68a05a0de9a4a6eac"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-walk-65.png": {
+      "bytes": 1439022,
+      "sha256": "7b53493c5ba068d9d950b99e745b54a901bd4cbecd294dcb0ee6a2ca14995987"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-motion-walk-80.png": {
+      "bytes": 1438526,
+      "sha256": "2d557e8d71d6a42cdb73556a428d5ffb1822f919ffd751d1e2b4782152a4539b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-neutral.png": {
+      "bytes": 1469276,
+      "sha256": "dd627d930ff1375ffbd94c49bcc874196f0db3bc8990221409f81644a4d05052"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-recognition.png": {
+      "bytes": 1469255,
+      "sha256": "51638c30d607fa9775f0dbd96f1553875196460d602c7405df72a08ca2999f8c"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-speaking.png": {
+      "bytes": 1469296,
+      "sha256": "d423c5a5853830ef08ef4694ec28a0b0788f64be82ab8cfe72aa94a196bb53dd"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-timing-turn.png": {
+      "bytes": 1436041,
+      "sha256": "fdccbb09f6570cf71d56965b88abf1582b811f51a9268f244e1769ebf0398f76"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-kit-timing-walk.png": {
+      "bytes": 1439156,
+      "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-loaded-lookout.png": {
+      "bytes": 1403116,
+      "sha256": "1b1ab43226a40b16f4d0547701c83d5e85ec2c324caddc46deef9c78d2ceca8a"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-candidate-b/windows-lookout-validation.json": {
+      "bytes": 550575,
+      "sha256": "5f9b861dd90a191a979aef49b44e6af5aaa64a6f31f9259041653e4dd0596cf1"
+    },
+    "reports/kit-turn-admission-20261020-r1/candidate-b-stdout.log": {
+      "bytes": 2855,
+      "sha256": "09712ef6e4c6d2caabd80fd1f2913f6122a19233473b845ada61bd2a51de1c4d"
+    },
+    "reports/kit-turn-admission-20261020-r1/candidate-b-stderr.log": {
+      "bytes": 50908,
+      "sha256": "9c4fa36b1debf006b14488b8975eb5325365ae113768d48f2bf3430bda73824e"
+    },
+    "reports/kit-turn-admission-20261020-r1/candidate-b-export.log": {
+      "bytes": 208,
+      "sha256": "1f9b9e507be230a84960f57f538467de9e75c2e9501ebfbb2af88ec430f654b2"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/.slot-1-auto.hrd.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/manifest.json": {
+      "bytes": 166,
+      "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/slot-1-auto.hrd": {
+      "bytes": 162,
+      "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/vulkan_capability_report.json": {
+      "bytes": 2350,
+      "sha256": "edbfd82dd27a13bcf64ba5a7a5eb7c4114d44dc775a19c224b17783e14ed629b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/vulkan_capability_report.txt": {
+      "bytes": 1500,
+      "sha256": "10b6ed6802f8c9146089143ba2c9177dcf96916b5c1e99fe7c98adea82b9149b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-start-0.png": {
+      "bytes": 1425605,
+      "sha256": "0583a470c7a28f68225520cf191134b75eeb62ca8ff6cad12db1e637aa197909"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-start-1.png": {
+      "bytes": 1426868,
+      "sha256": "2df676ab11b0f841758418040f114be3e0639feb30028d2b09d936fc13e2c150"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-start-4.png": {
+      "bytes": 1427583,
+      "sha256": "84cb0b3ab03c9331a7ac32fd69689d3de355d370021df3dd2cd9a55622b819ba"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-start-8.png": {
+      "bytes": 1429154,
+      "sha256": "1f60c0133c4e892eeab3660430ec2e0ade87f0d1f717ce9b03543680d7c1a6df"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-stop-0.png": {
+      "bytes": 1439156,
+      "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-stop-1.png": {
+      "bytes": 1439325,
+      "sha256": "a113a0bc34e01545b600b340cddbf5ada364599c5532b26b2fd83a98870a74c8"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-stop-11.png": {
+      "bytes": 1439483,
+      "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-stop-4.png": {
+      "bytes": 1439401,
+      "sha256": "15c11a03ab3bfa17624015ad035d7f6b6ac67e4803dad42049a4e2ba846957a4"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-stop-8.png": {
+      "bytes": 1439865,
+      "sha256": "a593457b3071907cd17e451cb8465ccc448bd42d2028ea11f9b426b6ea1f303a"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-turn-0.png": {
+      "bytes": 1439483,
+      "sha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-turn-10.png": {
+      "bytes": 1438432,
+      "sha256": "e112bb2e57d9346c5932fedc18ae10ddf987eb45a7f2b8b836150c417933ae73"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-turn-100.png": {
+      "bytes": 1436241,
+      "sha256": "ef2d4cdc8379e77e7bea0798571890c721669c7f2f0a56cca19991e91438706b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-turn-20.png": {
+      "bytes": 1437617,
+      "sha256": "e15fe89840736ee0bf5442f15fbdb1d462ab09a1bf4989d446e854da0ce6b0e7"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-turn-30.png": {
+      "bytes": 1438169,
+      "sha256": "48cdb661d00f52d2af1b81748114edd6ed48501e5b02d41c2b1f21a156a6eac8"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-turn-40.png": {
+      "bytes": 1436665,
+      "sha256": "b449f778175ae748999d526208bf1e49789195fe0b5742f81a11e1a61f1b5018"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-turn-60.png": {
+      "bytes": 1435071,
+      "sha256": "7bf4ff67429ed6b57bf7db3db0df8d62f7632d98da17edf71997a68c9619e2cd"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-turn-80.png": {
+      "bytes": 1436202,
+      "sha256": "1a2307efa083c2e66e4fe7eaa848451a45f559169d5ef0eb4ce4396f0914c441"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-walk-100.png": {
+      "bytes": 1439156,
+      "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-walk-20.png": {
+      "bytes": 1431305,
+      "sha256": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-walk-35.png": {
+      "bytes": 1436556,
+      "sha256": "f4839ff06365f3a0c88fd59c855e6d4bf50c1f8de85ed22cb3dabab20afc9010"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-walk-50.png": {
+      "bytes": 1436165,
+      "sha256": "b75c6f9155e2ac58894139e1f10e52bff251d230e9a391a68a05a0de9a4a6eac"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-walk-65.png": {
+      "bytes": 1439022,
+      "sha256": "7b53493c5ba068d9d950b99e745b54a901bd4cbecd294dcb0ee6a2ca14995987"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-motion-walk-80.png": {
+      "bytes": 1438526,
+      "sha256": "2d557e8d71d6a42cdb73556a428d5ffb1822f919ffd751d1e2b4782152a4539b"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-neutral.png": {
+      "bytes": 1469276,
+      "sha256": "dd627d930ff1375ffbd94c49bcc874196f0db3bc8990221409f81644a4d05052"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-recognition.png": {
+      "bytes": 1469255,
+      "sha256": "51638c30d607fa9775f0dbd96f1553875196460d602c7405df72a08ca2999f8c"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-speaking.png": {
+      "bytes": 1469296,
+      "sha256": "d423c5a5853830ef08ef4694ec28a0b0788f64be82ab8cfe72aa94a196bb53dd"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-timing-turn.png": {
+      "bytes": 1436202,
+      "sha256": "1a2307efa083c2e66e4fe7eaa848451a45f559169d5ef0eb4ce4396f0914c441"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-kit-timing-walk.png": {
+      "bytes": 1439156,
+      "sha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-loaded-lookout.png": {
+      "bytes": 1403116,
+      "sha256": "1b1ab43226a40b16f4d0547701c83d5e85ec2c324caddc46deef9c78d2ceca8a"
+    },
+    "reports/horde-campaign-fixtures-kit-turn-admission-20261020-control-a2/windows-lookout-validation.json": {
+      "bytes": 550548,
+      "sha256": "aa4e2d60a761464c6fded95b4490e170054cb57c3fa86699c5e17fb2395b1782"
+    },
+    "reports/kit-turn-admission-20261020-r1/control-a2-stdout.log": {
+      "bytes": 2853,
+      "sha256": "7b9788b890540dbbad71ddbb831c423e5fd716e42ebc6d83bf2369be99bd3e33"
+    },
+    "reports/kit-turn-admission-20261020-r1/control-a2-stderr.log": {
+      "bytes": 50908,
+      "sha256": "5c010204459b67f8909cf5da5c3728720f4a69ac774063e13b7a045124a9b113"
+    },
+    "reports/kit-turn-admission-20261020-r1/control-a2-export.log": {
+      "bytes": 207,
+      "sha256": "252d17db1be23e88b053dd1a64de95cfbb75b2c3bae501a502fe76d22df0edcb"
+    }
+  },
+  "ownerFiles": {
+    "ASSET_LICENSES.md": {
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387"
+    },
+    "PROJECT_MEMORY.md": {
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    }
+  },
+  "settings": {
+    "bytes": 471,
+    "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+  },
+  "ownerCampaignExists": false,
+  "phoneOperations": false,
+  "publicOperations": false,
+  "additionalComparisonsAfterPlan": 0,
+  "audioHapticManualRevalidationRequired": false
+}

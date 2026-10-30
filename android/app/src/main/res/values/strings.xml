@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="raise_lantern_touch_prompt">Tap the lantern icon to raise your lantern for Kit.</string>
+    <string name="raise_lantern_keyboard_prompt">Select the lantern icon to raise your lantern for Kit.</string>
+    <string name="raise_lantern_controller_prompt">Y: Raise your lantern for Kit.</string>
     <string name="app_name">Horde Lantern RT Alpha</string>
     <string name="start_demo">ENTER THE RUIN</string>
     <string name="resume_demo">RESUME</string>
@@ -20,6 +23,7 @@
     <string name="restart_route">RESTART ROUTE</string>
     <string name="controls">CONTROLS</string>
     <string name="settings">SETTINGS</string>
+    <string name="dialogue_volume">Dialogue / Speech</string>
     <string name="technical_info">RT DIAGNOSTICS</string>
     <string name="run_benchmark">RUN BENCHMARK</string>
     <string name="more_by_samfa12">MORE BY SAMFA12</string>
@@ -36,11 +40,20 @@
     <string name="quit">QUIT DEMO</string>
     <string name="back">BACK</string>
     <string name="swing">SWING</string>
+    <string name="vitality_half_accessibility">Vitality %1$d and a half of %2$d</string>
     <string name="parry">PARRY</string>
+    <string name="parry_accessibility">Parry / hold guard</string>
     <string name="dodge">DODGE</string>
+    <string name="combat_teaching">Optional combat practice</string>
+    <string name="combat_teaching_slowdown">Ease time during the lesson</string>
+    <string name="combat_teaching_skip">Skip practice</string>
+    <string name="combat_teaching_finish">Finish practice</string>
+    <string name="combat_teaching_replay">Replay opening practice</string>
+    <string name="combat_teaching_description">Practise blocking, parrying, dodging and attacking from guard without taking damage. Move and look stay live. Finish when ready, or skip or replay the opening practice here.</string>
     <string name="interact">INTERACT</string>
     <string name="chest_locked_until_lich_defeated">LOCKED\nSLAY LICH</string>
     <string name="open_chest">OPEN CHEST</string>
+    <string name="take_flask_upgrade">Upgrade flask</string>
     <string name="chest_opening">OPENING…</string>
     <string name="take_lantern">TAKE LANTERN</string>
     <string name="chest_unlocking">SEAL BREAKING…</string>
@@ -91,6 +104,7 @@
     <string name="retry_encounter">RETRY ENCOUNTER</string>
     <string name="retry_unavailable">The encounter cannot be restored yet.</string>
     <string name="retrying_encounter">Restoring encounter…</string>
+    <string name="pause_menu">Pause / menu</string>
     <string name="menu">MENU</string>
     <string name="rt_starting">VULKAN RT STARTING…</string>
     <string name="rt_active">NATIVE VULKAN RT ACTIVE</string>
@@ -111,7 +125,7 @@
     <string name="report_copy_failed">The benchmark report could not be copied.</string>
     <string name="report_saved">Benchmark report saved.</string>
     <string name="report_save_failed">The benchmark report could not be saved.</string>
-    <string name="controls_help">LEFT HALF\nDrag to walk and strafe\n\nRIGHT HALF\nDrag for 360° camera look\n\nSWING\nPress Swing to attack\n\nPARRY\nPress Parry to deflect a skeleton strike\n\nDODGE\nPress to evade in your movement direction; standing still dodges forward\n\nINTERACT\nShows the chest state nearby; tap when enabled\n\nRAISE / LOWER\nAppears while carrying the reward lantern\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
+    <string name="controls_help">LEFT HALF\nDrag gently to walk and strafe; farther to run\n\nRIGHT HALF\nDrag for 360° camera look\n\nSPEED\nMovement follows your drag distance, up to running pace.\n\nLOW OPENINGS\nCrouch automatically when needed and stand when there is headroom.\n\nSWING\nPress Swing to attack\n\nPARRY\nPress just before a strike to parry. Keep holding to fully block normal attacks. Yellow attacks break a held guard: parry or dodge. Release to lower your sword. Keyboard: hold Q. Attacking ends protection until recovery; holding never repeats the parry window. Release and press again for a new timed parry. Red attacks cannot be blocked: dodge.\n\nDODGE\nPress to evade in your movement direction; standing still dodges forward\n\nINTERACT\nUse the nearby chest or rope action when enabled. Follow Climb or Descend; equipment stows automatically on the rope.\n\nLANTERN ICON\nTap to raise or lower the reward lantern while carrying it.\n\nMENU / BACK\nPause, restart, settings and diagnostics</string>
     <string name="sfx_enabled">Sound effects</string>
     <string name="haptics_enabled">Vibration / haptics</string>
     <string name="sfx_volume">SFX volume</string>
@@ -202,6 +216,9 @@
     <string name="graphics_restored">Confirmed graphics settings restored after an interrupted change.</string>
     <string name="graphics_save_failed">Graphics could not be saved. Restoring the previous confirmed settings.</string>
     <string name="benchmark_summary_review">Review benchmark statistics</string>
+    <string name="benchmark_public_preview">Preview public statistics</string>
+    <string name="benchmark_public_scope">See the aggregate statistics that could be shared publicly. This local preview omits private report and run IDs, full timestamps and raw frame rows. Phone model, GPU and Vulkan version are optional. Results remain unverified and unranked; temperature and display scanout FPS were not measured. Nothing is uploaded or published. Public submission is unavailable in this build.</string>
+    <string name="benchmark_public_consent">Prepare a local public preview (does not publish)</string>
     <string name="benchmark_summary_local_only">Local review and export only</string>
     <string name="benchmark_summary_scope">Review a completed run before sharing. This report contains settings and owning frame, CPU and GPU timings. GPU duration is not FPS, and display scanout FPS was not measured. Temperature was not collected and thermal status is unknown. Statistics sending is unavailable in this build; nothing is sent automatically.</string>
     <string name="benchmark_summary_consent">Prepare a local statistics report for review</string>
@@ -219,6 +236,36 @@
     <string name="benchmark_summary_edit">Edit choices (requires new consent)</string>
     <string name="benchmark_summary_unavailable">A complete matching benchmark summary is unavailable. Nothing was prepared or sent.</string>
     <string name="benchmark_summary_picker_pending">Finish or dismiss the previous document picker before saving another report.</string>
-    <string name="controller_help">Controller: left stick moves; right stick looks. Right trigger or X swings; left trigger parries; B dodges; A interacts; Y raises or lowers the lantern; Start opens the menu. In menus, D-pad or left stick selects, A confirms, B goes back, and left/right adjusts a focused slider. These are Android button names; physical labels vary by controller. Touch restores touch controls. Unplugging the active controller pauses play.</string>
-    <string name="controller_play_prompts">Swing: RT / X · Parry: LT · Dodge: B · Menu: Start</string>
+    <string name="controller_help">Controller: deflect the left stick gently to walk, farther to run; right stick looks. Right trigger or X swings; left trigger parries; B dodges; crouch is automatic under low openings; A uses the nearby chest or rope action; Y raises or lowers the lantern; Start opens the menu. In menus, D-pad or left stick selects, A confirms, B goes back, and left/right adjusts a focused slider. These are Android button names; physical labels vary by controller. Touch restores touch controls. Unplugging the active controller pauses play.</string>
+    <string name="run">RUN</string>
+    <string name="running">RUNNING</string>
+    <string name="controller_play_prompts">Swing: RT / X · Parry / hold guard: LT · Dodge red attacks: B · Menu: Start</string>
+    <string name="controller_flask_drink">D-pad Up: Drink %1$d / %2$d</string>
+    <string name="controller_flask_rest">D-pad Down: Rest (2 sec)</string>
+    <string name="campaign_slot_title">Slot %1$d</string>
+    <string name="campaign_slot_current_title">Slot %1$d · Current game</string>
+    <string name="crouch">Crouch</string>
+    <string name="stand">Stand</string>
+    <string name="crouching_blocked">Crouching (ceiling)</string>
+    <string name="compatibility_report">Report compatibility to developer</string>
+    <string name="statistics_private_send_consent">I agree to send this report privately to the developer.</string>
+    <string name="statistics_publish_consent">I agree to publish these reviewed statistics on the public board.</string>
+    <string name="statistics_review_private_submission">Review private submission</string>
+    <string name="statistics_review_public_submission">Review public submission</string>
+    <string name="statistics_submission_preview">Separate submission preview (verification token excluded)</string>
+    <string name="statistics_private_send">Send to developer</string>
+    <string name="statistics_publish_send">Submit to public board</string>
+    <string name="statistics_retry_send">Verify and retry</string>
+    <string name="statistics_check_publication">Check publication status</string>
+    <string name="statistics_send_unavailable">Sending is unavailable. You can still copy or save the local report.</string>
+    <string name="statistics_mock_ready">Local test: review this separate submission. Nothing will be sent to a live service.</string>
+    <string name="statistics_mock_verifying">Local test: requesting synthetic verification. Nothing is sent.</string>
+    <string name="statistics_mock_verification_cancelled">Local test: verification cancelled or unavailable. Choose Send to try again.</string>
+    <string name="statistics_mock_pending">Local test: accepted and awaiting moderation. Not published.</string>
+    <string name="statistics_mock_private_queued">Local test: private report accepted. No live email was sent.</string>
+    <string name="statistics_mock_sent">Local test: provider-handoff receipt verified. No live email was sent.</string>
+    <string name="statistics_mock_published">Local test: published receipt verified. No live result was published.</string>
+    <string name="statistics_mock_rejected">Local test: report rejected or its content conflicts. Nothing new was sent.</string>
+    <string name="statistics_mock_uncertain">Local test: no trustworthy receipt. Retry explicitly with fresh verification.</string>
+    <string name="statistics_mock_interrupted">Local test interrupted. No automatic retry; earlier acceptance is unknown.</string>
 </resources>

@@ -44,6 +44,27 @@ public final class InterfaceLayoutTest {
             assertEquals(r[3],new Rect(b[3].getLeft(),b[3].getTop(),b[3].getRight(),b[3].getBottom()));
         }
     }
+    @Test public void crouchUsesSeparateLeftSlotWithoutMovingCombatControls() {
+        Configuration config=new Configuration(RuntimeEnvironment.getApplication().getResources().getConfiguration());
+        config.densityDpi=160;Context c=RuntimeEnvironment.getApplication().createConfigurationContext(config);
+        for(int width:new int[]{320,360,640})for(boolean compact:new boolean[]{false,true})for(int scale:new int[]{85,100,110})
+                for(int height:new int[]{360,640})for(int inset:new int[]{0,16}) {
+            FrameLayout root=new FrameLayout(c);Button[] controls=new Button[7];
+            for(int i=0;i<controls.length;i++){controls[i]=new Button(c);root.addView(controls[i]);}
+            InterfacePreferences.Values prefs=new InterfacePreferences.Values(compact,scale,70,false,false);
+            UiControlLayout.apply(c,prefs,controls[0],controls[1],controls[2],controls[3],controls[4],inset,inset,width-inset);
+            FrameLayout.LayoutParams run=new FrameLayout.LayoutParams(104,72);run.gravity=android.view.Gravity.BOTTOM|android.view.Gravity.START;
+            run.setMarginStart(24);run.bottomMargin=32;controls[5].setLayoutParams(run);
+            UiControlLayout.applyStance(c,prefs,controls[5],controls[6],inset,inset,width,controls[0],controls[1],controls[2],controls[3],controls[4]);
+            root.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.EXACTLY));root.layout(0,0,width,height);
+            Rect crouch=new Rect(controls[6].getLeft(),controls[6].getTop(),controls[6].getRight(),controls[6].getBottom());
+            assertTrue(crouch.width()>=48 && crouch.height()>=48);assertTrue(crouch.left>=inset && crouch.right<=width-inset);
+            assertTrue("stance remains onscreen",crouch.top>=inset && crouch.bottom<=height-inset);
+            for(int i=0;i<6;i++)assertFalse("stance/combat collision width="+width+" compact="+compact+" scale="+scale+" control="+i,
+                    Rect.intersects(crouch,new Rect(controls[i].getLeft(),controls[i].getTop(),controls[i].getRight(),controls[i].getBottom())));
+        }
+    }
+
     @Test public void longMenuLabelsReflowInsteadOfFixedHeightClipping() throws Exception {
         MainActivity activity=Robolectric.buildActivity(MainActivity.class).get();
         Method create=MainActivity.class.getDeclaredMethod("createMenuButton",String.class,Runnable.class);
@@ -73,7 +94,7 @@ public final class InterfaceLayoutTest {
                     final String configuration="font="+font+" compact="+compact+" scale="+scale+" width="+width;
                     assertEquals(configuration,3,preview.getChildCount());
                     assertEquals("middle reserved action row",activity.getString(R.string.dodge),
-                            ((Button)((LinearLayout)preview.getChildAt(1)).getChildAt(0)).getText().toString());
+                            ((Button)((LinearLayout)preview.getChildAt(1)).getChildAt(1)).getText().toString());
                     for(int rowIndex=0;rowIndex<3;++rowIndex) {
                         LinearLayout row=(LinearLayout)preview.getChildAt(rowIndex);
                         paired|=row.getOrientation()==LinearLayout.HORIZONTAL;
@@ -96,7 +117,7 @@ public final class InterfaceLayoutTest {
                             assertFalse(button.isClickable()); assertFalse(button.isFocusable());
                         }
                     }
-                    Button interact=(Button)((ViewGroup)preview.getChildAt(0)).getChildAt(1);
+                    Button interact=(Button)((ViewGroup)preview.getChildAt(0)).getChildAt(0);
                     assertEquals(activity.getString(R.string.interact),interact.getText().toString());
                     assertEquals(font,activity.getResources().getConfiguration().fontScale,0);
                 }

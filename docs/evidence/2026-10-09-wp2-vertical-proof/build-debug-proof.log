@@ -1,0 +1,35 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  horde_rt_vertical_support_tests.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_rt_vertical_support_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  HeldItemVerticalSupportRigTests.cpp
+  horde_rt_held_item_vertical_support_rig_tests.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_rt_held_item_vertical_support_rig_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/CMakeLists.txt
+  horde_rt_probe_core.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  WindowsMusicPlayback.cpp
+  horde_windows_music.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_windows_music.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/CMakeLists.txt
+  DiagnosticWindowMain.cpp
+  DiagnosticWindow.cpp
+  WindowsGitHubReleaseUpdate.cpp
+  WindowsPlaytestReport.cpp
+  WindowsRemotePlaytestReport.cpp
+  WindowsPlaytestScreenshot.cpp
+  WindowsPlaytestSubmission.cpp
+  WindowsPlaytestVerification.cpp
+  DiagnosticOverlay.cpp
+  MotionEvidenceScenario.cpp
+  MotionEvidenceLedger.cpp
+  Generating Code...
+  horde_rt_diagnostic_window.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\HordeLanternRT.exe

@@ -1,0 +1,14 @@
+First git diff --cached --check, after staging the verified checkpoint, exit2:
+docs/evidence/2026-10-20-local-ambience/host-build.log:139: trailing whitespace.
++  
+docs/evidence/2026-10-20-local-ambience/host-build.log:177: trailing whitespace.
++  
+docs/evidence/2026-10-20-local-ambience/host-build.log:184: trailing whitespace.
++  
+docs/evidence/2026-10-20-local-ambience/host-build.log:209: trailing whitespace.
++  
+
+The exact MSBuild log contains spaces on blank lines. No source/test failure.
+Applied a scoped raw-log .gitattributes rule, following existing evidence rules,
+to preserve original bytes including this output. The passing source/build/test
+freeze remains unchanged. No log or assertion was trimmed or weakened.

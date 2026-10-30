@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "complete": false,
+  "source": "rt-storage-image",
+  "sceneOnly": true,
+  "overlaysIncluded": false,
+  "settlingFrames": 12,
+  "fixedAnimationTimeSeconds": 0.000000,
+  "buildId": "1.6.2",
+  "playerMountProfile": "AnatomicalBody",
+  "executionBackend": "RayTracingPipeline",
+  "selectedRtPipelineBundle": {"opaqueFast": {"key": "diagnostic_high_opaque_fast", "sha256": "50b5f0aacc4ac7e340ad156109b5ffdfea7b0ebf171bcae95a08e90b4330dfc4"}, "genericDielectric": {"key": "diagnostic_high_generic_dielectric", "sha256": "e0f5a778530b0d72f9533d2f2cbbde6b26a9b74048e718388731f873917045d0"}},
+  "device": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672
+  },
+  "presentation": {
+    "renderScale": 1.000000,
+    "dispatchWidth": 960,
+    "dispatchHeight": 540,
+    "swapchainWidth": 960,
+    "swapchainHeight": 540,
+    "swapchainFormat": 44
+  },
+  "timing": {
+    "sampleCount": 0,
+    "overallMedianMs": 0.000000,
+    "overallMeanMs": 0.000000,
+    "gpuRtCommandBuffer": {"valid": false, "latestMs": 0.000000, "averageMs": 0.000000, "sampleCount": 0, "timestampValidBits": 64, "timestampPeriodNanoseconds": 1.000000}
+  },
+  "staticRtAsset": {"enabled": true, "vertexBytes": 34769856, "indexBytes": 5889876, "materialBytes": 3840, "instanceMetadataBytes": 832, "primitiveMetadataBytes": 512, "textureBytes": 274027796, "descriptorCount": 9, "blasBytes": 1060096, "blasBuildMilliseconds": 1.627100, "swordBlasBytes": 717696, "swordBlasBuildMilliseconds": 0.798300, "torchBlasBytes": 342400, "torchBlasBuildMilliseconds": 0.828800, "productionPropBlasBytes": 24798592, "productionPropBlasBuildMilliseconds": 9.806600},
+  "dielectricDiagnostics": {"availability": "Available", "available": true, "transportOverflowCount": 0, "shadowOverflowCount": 0, "secondaryDielectricRejectCount": 0, "unclosedVolumeCount": 0, "primaryUnclosedVolumeCount": 0, "shadowUnclosedVolumeCount": 0, "productionPaneStackFailureCount": 0, "productionPaneSecondaryOriginCount": 0, "productionPaneSecondaryTerminalCount": 0, "productionPaneSecondarySameMediumCount": 0, "productionPaneSecondaryDifferentMediumCount": 0},
+  "dielectricReasonDiagnostics": {"availability": "Available", "available": true, "secondaryNearSelfHitCount": 0, "primaryOpenMissCount": 0, "primaryOpenOpaqueCount": 0, "primaryMismatchedExitCount": 0, "primaryInterfaceBudgetCount": 0, "primaryVolumeBudgetCount": 0, "shadowOpenMissCount": 0, "shadowMismatchedExitCount": 0, "primaryTirCount": 0, "primaryInterfaceBudgetOpenVolumeCount": 0, "primaryInterfaceBudgetClosedVolumeCount": 0, "shadowMismatchEmptyCount": 0, "shadowImplicitOriginExitCount": 0, "secondaryDielectricTerminalCount": 0, "primaryTirTerminationCount": 0, "shadowFiniteEndpointVolumeCount": 0, "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0, "primaryOpenOpaqueAfterTirCount": 0, "primaryOpenOpaqueTerminalInstanceMask": 0, "primaryOpenOpaqueVolumeInstanceMask": 0, "primaryOpenOpaqueTerminalMaterialMask": 0, "primaryClosedVolumeAbsorptionCount": 0, "primaryCertifiedClosedVolumeRecoveryCount": 0, "shadowCertifiedClosedVolumeRecoveryCount": 0, "certifiedClosedVolumeRecoveryReasonMask": 0, "primaryTorchPixelCount": 0, "primarySwordPixelCount": 0, "primaryPlayerPixelCount": 0, "primaryRewardRingPixelCount": 0, "primaryRewardBodyPixelCount": 0},
+  "error": "Development checkpoint 'chapter-landing-west' could not stage its authoritative combat pose; player=(0,1.85), rescuePhase=0, stowed=0, ropeReady=0, exterior=0, worldGeneration=2, terrain=1,2,1,1,1",
+  "captures": [
+  ]
+}

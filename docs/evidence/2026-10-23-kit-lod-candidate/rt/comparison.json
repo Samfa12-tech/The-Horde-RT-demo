@@ -1,0 +1,984 @@
+{
+  "scope": "Matched frozen Windows RT inspection, not benchmark or earned route/physical acceptance. No noise-independent silhouette mask or one-pixel contour proof.",
+  "processes": {
+    "control": {
+      "label": "control",
+      "arguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\kit-lod-candidate-20261023\\rt\\control\\HordeLanternRT.exe",
+        "--lookout-validate-hidden",
+        "--lookout-inspect-kit-motion",
+        "--campaign-test-root",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-campaign-fixtures-kit-lod-20261023-control"
+      ],
+      "exe": {
+        "bytes": 14157824,
+        "sha256": "c3c931924d01fd62997b752a48516b82dbcb51263b19bfe1130a7ae8fdca3d71"
+      },
+      "before": {
+        "kit": {
+          "bytes": 2151672,
+          "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+        },
+        "world": {
+          "bytes": 2568508,
+          "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f"
+        },
+        "viewmodel": {
+          "bytes": 1228828,
+          "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488"
+        },
+        "settings": {
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "save": {
+          "bytes": 162,
+          "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+        },
+        "manifest": {
+          "bytes": 166,
+          "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+        }
+      },
+      "foregroundBefore": 131626,
+      "pid": 67116,
+      "exitCode": 0,
+      "pending": false,
+      "seconds": 14.375,
+      "after": {
+        "kit": {
+          "bytes": 2151672,
+          "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+        },
+        "world": {
+          "bytes": 2568508,
+          "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f"
+        },
+        "viewmodel": {
+          "bytes": 1228828,
+          "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488"
+        },
+        "settings": {
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "save": {
+          "bytes": 162,
+          "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+        },
+        "manifest": {
+          "bytes": 166,
+          "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+        }
+      },
+      "foregroundUnchanged": true,
+      "sourceAndCustodyUnchanged": true
+    },
+    "candidate": {
+      "label": "candidate",
+      "arguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\kit-lod-candidate-20261023\\rt\\candidate\\HordeLanternRT.exe",
+        "--lookout-validate-hidden",
+        "--lookout-inspect-kit-motion",
+        "--campaign-test-root",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-campaign-fixtures-kit-lod-20261023-candidate"
+      ],
+      "exe": {
+        "bytes": 14157824,
+        "sha256": "c3c931924d01fd62997b752a48516b82dbcb51263b19bfe1130a7ae8fdca3d71"
+      },
+      "before": {
+        "kit": {
+          "bytes": 3736968,
+          "sha256": "30fea4a66bd1a31b48ee0d24414c48e22570870ff97d141860c93a99c3d0bb43"
+        },
+        "world": {
+          "bytes": 2568508,
+          "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f"
+        },
+        "viewmodel": {
+          "bytes": 1228828,
+          "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488"
+        },
+        "settings": {
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "save": {
+          "bytes": 162,
+          "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+        },
+        "manifest": {
+          "bytes": 166,
+          "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+        }
+      },
+      "foregroundBefore": 131626,
+      "pid": 75512,
+      "exitCode": 0,
+      "pending": false,
+      "seconds": 14.26600000000326,
+      "after": {
+        "kit": {
+          "bytes": 3736968,
+          "sha256": "30fea4a66bd1a31b48ee0d24414c48e22570870ff97d141860c93a99c3d0bb43"
+        },
+        "world": {
+          "bytes": 2568508,
+          "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f"
+        },
+        "viewmodel": {
+          "bytes": 1228828,
+          "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488"
+        },
+        "settings": {
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "save": {
+          "bytes": 162,
+          "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+        },
+        "manifest": {
+          "bytes": 166,
+          "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+        }
+      },
+      "foregroundUnchanged": true,
+      "sourceAndCustodyUnchanged": true
+    }
+  },
+  "cohorts": {
+    "control": {
+      "count": 54,
+      "failures": 0,
+      "renderCalls": 34,
+      "complete": true,
+      "physicalVisibleAcceptance": false,
+      "performanceEvidence": false,
+      "ownerSettingsReadOrWritten": false,
+      "foregroundContinuous": true,
+      "ownerObservedForeground": false,
+      "ownerShown": false,
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49622144,
+        "deviceLocalBytes": 407976928
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+        "waterQuality": "high"
+      }
+    },
+    "candidate": {
+      "count": 54,
+      "failures": 0,
+      "renderCalls": 34,
+      "complete": true,
+      "physicalVisibleAcceptance": false,
+      "performanceEvidence": false,
+      "ownerSettingsReadOrWritten": false,
+      "foregroundContinuous": true,
+      "ownerObservedForeground": false,
+      "ownerShown": false,
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49203328,
+        "deviceLocalBytes": 407167840
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+        "waterQuality": "high"
+      }
+    }
+  },
+  "frames": [
+    {
+      "name": "windows-kit-neutral.png",
+      "poseState": {
+        "pose": "neutral",
+        "angles": [
+          0,
+          0,
+          0
+        ]
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "dd627d930ff1375ffbd94c49bcc874196f0db3bc8990221409f81644a4d05052",
+      "candidateImageSha256": "645961f36f57021ce5b510845a6fdc5b51e7e996e378f2468119ef6ef2ee4d6f",
+      "changedPixels": 3750,
+      "changedPixelBoundsExclusive": [
+        561,
+        285,
+        765,
+        721
+      ],
+      "meanAbsoluteChannelDifference": 0.008028941792951756,
+      "maxChannelDifference": 68
+    },
+    {
+      "name": "windows-kit-speaking.png",
+      "poseState": {
+        "pose": "speaking",
+        "angles": [
+          0.0232078,
+          0.022411,
+          0.0119685
+        ]
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "d423c5a5853830ef08ef4694ec28a0b0788f64be82ab8cfe72aa94a196bb53dd",
+      "candidateImageSha256": "85b9247a7db065ae374a494a58bfc25819c97f1b96462527d89fff4398f7961f",
+      "changedPixels": 3756,
+      "changedPixelBoundsExclusive": [
+        561,
+        285,
+        743,
+        721
+      ],
+      "meanAbsoluteChannelDifference": 0.007840255427428527,
+      "maxChannelDifference": 68
+    },
+    {
+      "name": "windows-kit-recognition.png",
+      "poseState": {
+        "pose": "recognition",
+        "angles": [
+          0.14,
+          0,
+          0.035
+        ]
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "51638c30d607fa9775f0dbd96f1553875196460d602c7405df72a08ca2999f8c",
+      "candidateImageSha256": "682649afb8499c560c7f5d27f11568db15a31d944d55a32f29c38c6b9e97150a",
+      "changedPixels": 3724,
+      "changedPixelBoundsExclusive": [
+        153,
+        285,
+        740,
+        721
+      ],
+      "meanAbsoluteChannelDifference": 0.008037702231351048,
+      "maxChannelDifference": 151
+    },
+    {
+      "name": "windows-kit-motion-start-0.png",
+      "poseState": {
+        "stage": "start-0",
+        "root": [
+          -27.7,
+          1.39464,
+          -5.8
+        ],
+        "yaw": 1.89255,
+        "walking": false,
+        "idleSeconds": 1,
+        "walkPhase": 0,
+        "walkWeight": 0
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "0583a470c7a28f68225520cf191134b75eeb62ca8ff6cad12db1e637aa197909",
+      "candidateImageSha256": "7caaaa5bf796848e36177a2dde879b8d2cf2db6834a80080bc803903841c91be",
+      "changedPixels": 3732,
+      "changedPixelBoundsExclusive": [
+        412,
+        300,
+        684,
+        646
+      ],
+      "meanAbsoluteChannelDifference": 0.00729003250796526,
+      "maxChannelDifference": 151
+    },
+    {
+      "name": "windows-kit-motion-start-1.png",
+      "poseState": {
+        "stage": "start-1",
+        "root": [
+          -27.6728,
+          1.39265,
+          -5.78743
+        ],
+        "yaw": 1.93255,
+        "walking": true,
+        "idleSeconds": 1.01667,
+        "walkPhase": 0.0192308,
+        "walkWeight": 0.0925926
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "2df676ab11b0f841758418040f114be3e0639feb30028d2b09d936fc13e2c150",
+      "candidateImageSha256": "b6f7ab63697be056a9ca8af91e389cdc14a23a60fca3cdcf330d7818fd5fded3",
+      "changedPixels": 3774,
+      "changedPixelBoundsExclusive": [
+        518,
+        297,
+        759,
+        652
+      ],
+      "meanAbsoluteChannelDifference": 0.007130322977147385,
+      "maxChannelDifference": 84
+    },
+    {
+      "name": "windows-kit-motion-start-4.png",
+      "poseState": {
+        "stage": "start-4",
+        "root": [
+          -27.591,
+          1.38668,
+          -5.74971
+        ],
+        "yaw": 2.0032,
+        "walking": true,
+        "idleSeconds": 1.06667,
+        "walkPhase": 0.0769233,
+        "walkWeight": 0.37037
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "84cb0b3ab03c9331a7ac32fd69689d3de355d370021df3dd2cd9a55622b819ba",
+      "candidateImageSha256": "c75d5cac13db11b878c6011ac89534b92afffbc7cd04b7827a46b6d28817ca75",
+      "changedPixels": 3704,
+      "changedPixelBoundsExclusive": [
+        519,
+        305,
+        763,
+        661
+      ],
+      "meanAbsoluteChannelDifference": 0.007181537847789405,
+      "maxChannelDifference": 141
+    },
+    {
+      "name": "windows-kit-motion-start-8.png",
+      "poseState": {
+        "stage": "start-8",
+        "root": [
+          -27.4821,
+          1.37873,
+          -5.69943
+        ],
+        "yaw": 2.0032,
+        "walking": true,
+        "idleSeconds": 1.13333,
+        "walkPhase": 0.153847,
+        "walkWeight": 0.740741
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "1f60c0133c4e892eeab3660430ec2e0ade87f0d1f717ce9b03543680d7c1a6df",
+      "candidateImageSha256": "0fe37f8d8775edfb3f4eabd26b3cc02be5c3019438cb05609609b5a70c09de89",
+      "changedPixels": 3682,
+      "changedPixelBoundsExclusive": [
+        517,
+        295,
+        763,
+        662
+      ],
+      "meanAbsoluteChannelDifference": 0.006775525221976031,
+      "maxChannelDifference": 72
+    },
+    {
+      "name": "windows-kit-motion-walk-20.png",
+      "poseState": {
+        "stage": "walk-20",
+        "root": [
+          -27.1552,
+          1.35486,
+          -5.54856
+        ],
+        "yaw": 2.0032,
+        "walking": true,
+        "idleSeconds": 1.33333,
+        "walkPhase": 0.384616,
+        "walkWeight": 1
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378",
+      "candidateImageSha256": "5c5ec7516e99fe0428117e34fd0cdc991ceb4473dfd1bc303f70657863b93a1c",
+      "changedPixels": 3876,
+      "changedPixelBoundsExclusive": [
+        528,
+        325,
+        734,
+        675
+      ],
+      "meanAbsoluteChannelDifference": 0.007454459197921215,
+      "maxChannelDifference": 103
+    },
+    {
+      "name": "windows-kit-motion-walk-35.png",
+      "poseState": {
+        "stage": "walk-35",
+        "root": [
+          -26.7466,
+          1.32656,
+          -5.35999
+        ],
+        "yaw": 2.0032,
+        "walking": true,
+        "idleSeconds": 1.58333,
+        "walkPhase": 0.673079,
+        "walkWeight": 1
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "f4839ff06365f3a0c88fd59c855e6d4bf50c1f8de85ed22cb3dabab20afc9010",
+      "candidateImageSha256": "74f0036b1dd04edb3790b5e72f1ffef29cf56901d7800598ece0d429ce0e3cc1",
+      "changedPixels": 3258,
+      "changedPixelBoundsExclusive": [
+        523,
+        296,
+        764,
+        687
+      ],
+      "meanAbsoluteChannelDifference": 0.006897160539750826,
+      "maxChannelDifference": 61
+    },
+    {
+      "name": "windows-kit-motion-walk-50.png",
+      "poseState": {
+        "stage": "walk-50",
+        "root": [
+          -26.3381,
+          1.2992,
+          -5.17141
+        ],
+        "yaw": 2.0032,
+        "walking": true,
+        "idleSeconds": 1.83333,
+        "walkPhase": 0.961542,
+        "walkWeight": 1
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "b75c6f9155e2ac58894139e1f10e52bff251d230e9a391a68a05a0de9a4a6eac",
+      "candidateImageSha256": "3bf2ce1bacf8f4364c057ddf5ebd5bc8838968322138a1d0942a87bd65d30d1f",
+      "changedPixels": 3777,
+      "changedPixelBoundsExclusive": [
+        171,
+        325,
+        769,
+        676
+      ],
+      "meanAbsoluteChannelDifference": 0.007978400802186605,
+      "maxChannelDifference": 56
+    },
+    {
+      "name": "windows-kit-motion-walk-65.png",
+      "poseState": {
+        "stage": "walk-65",
+        "root": [
+          -25.9295,
+          1.27214,
+          -4.98283
+        ],
+        "yaw": 2.0032,
+        "walking": true,
+        "idleSeconds": 2.08333,
+        "walkPhase": 0.250004,
+        "walkWeight": 1
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "7b53493c5ba068d9d950b99e745b54a901bd4cbecd294dcb0ee6a2ca14995987",
+      "candidateImageSha256": "804c95d187780335f8d44c9bc961832f044d50647fa9889c97b08cc22292409c",
+      "changedPixels": 3724,
+      "changedPixelBoundsExclusive": [
+        519,
+        315,
+        759,
+        675
+      ],
+      "meanAbsoluteChannelDifference": 0.0077560204428199445,
+      "maxChannelDifference": 98
+    },
+    {
+      "name": "windows-kit-motion-walk-80.png",
+      "poseState": {
+        "stage": "walk-80",
+        "root": [
+          -25.5209,
+          1.2476,
+          -4.79426
+        ],
+        "yaw": 2.0032,
+        "walking": true,
+        "idleSeconds": 2.33333,
+        "walkPhase": 0.538466,
+        "walkWeight": 1
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "2d557e8d71d6a42cdb73556a428d5ffb1822f919ffd751d1e2b4782152a4539b",
+      "candidateImageSha256": "e73a5f484be96073a440d85d87481bfb4e899e8011f03bd37ff8acbc9dd95bb5",
+      "changedPixels": 3631,
+      "changedPixelBoundsExclusive": [
+        525,
+        275,
+        763,
+        659
+      ],
+      "meanAbsoluteChannelDifference": 0.006939278032055118,
+      "maxChannelDifference": 79
+    },
+    {
+      "name": "windows-kit-motion-walk-100.png",
+      "poseState": {
+        "stage": "walk-100",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 2.0032,
+        "walking": true,
+        "idleSeconds": 2.66666,
+        "walkPhase": 0.923083,
+        "walkWeight": 1
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150",
+      "candidateImageSha256": "e2d9cd9a516988bf828cdd83ad1f735a36f434511ef7fde3551b7f3272ed6736",
+      "changedPixels": 3566,
+      "changedPixelBoundsExclusive": [
+        343,
+        328,
+        766,
+        671
+      ],
+      "meanAbsoluteChannelDifference": 0.00766470971950424,
+      "maxChannelDifference": 69
+    },
+    {
+      "name": "windows-kit-motion-stop-0.png",
+      "poseState": {
+        "stage": "stop-0",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 2.0032,
+        "walking": true,
+        "idleSeconds": 2.66666,
+        "walkPhase": 0.923083,
+        "walkWeight": 1
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150",
+      "candidateImageSha256": "e2d9cd9a516988bf828cdd83ad1f735a36f434511ef7fde3551b7f3272ed6736",
+      "changedPixels": 3566,
+      "changedPixelBoundsExclusive": [
+        343,
+        328,
+        766,
+        671
+      ],
+      "meanAbsoluteChannelDifference": 0.00766470971950424,
+      "maxChannelDifference": 69
+    },
+    {
+      "name": "windows-kit-motion-stop-1.png",
+      "poseState": {
+        "stage": "stop-1",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 1.9632,
+        "walking": false,
+        "idleSeconds": 2.68333,
+        "walkPhase": 0.923083,
+        "walkWeight": 0.907407
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "a113a0bc34e01545b600b340cddbf5ada364599c5532b26b2fd83a98870a74c8",
+      "candidateImageSha256": "f37a7ff424422ae1a241155974ec3849dd2757b1b206505ca4d715873a0af600",
+      "changedPixels": 3590,
+      "changedPixelBoundsExclusive": [
+        528,
+        326,
+        764,
+        670
+      ],
+      "meanAbsoluteChannelDifference": 0.008303547842775738,
+      "maxChannelDifference": 154
+    },
+    {
+      "name": "windows-kit-motion-stop-4.png",
+      "poseState": {
+        "stage": "stop-4",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 1.89255,
+        "walking": false,
+        "idleSeconds": 2.73333,
+        "walkPhase": 0.923083,
+        "walkWeight": 0.62963
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "15c11a03ab3bfa17624015ad035d7f6b6ac67e4803dad42049a4e2ba846957a4",
+      "candidateImageSha256": "7612ddb706993120837d51539b6928967ad09e2ef9b847bdc65ee81aa5d87c70",
+      "changedPixels": 3813,
+      "changedPixelBoundsExclusive": [
+        528,
+        321,
+        734,
+        660
+      ],
+      "meanAbsoluteChannelDifference": 0.007788366676909641,
+      "maxChannelDifference": 75
+    },
+    {
+      "name": "windows-kit-motion-stop-8.png",
+      "poseState": {
+        "stage": "stop-8",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 1.89255,
+        "walking": false,
+        "idleSeconds": 2.8,
+        "walkPhase": 0.923083,
+        "walkWeight": 0.259259
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "a593457b3071907cd17e451cb8465ccc448bd42d2028ea11f9b426b6ea1f303a",
+      "candidateImageSha256": "fc9fa24c102f076a67b2098df75fe199181a90f2ffa881bdf47717051034437f",
+      "changedPixels": 3763,
+      "changedPixelBoundsExclusive": [
+        530,
+        311,
+        686,
+        663
+      ],
+      "meanAbsoluteChannelDifference": 0.0072950866070417755,
+      "maxChannelDifference": 62
+    },
+    {
+      "name": "windows-kit-motion-stop-11.png",
+      "poseState": {
+        "stage": "stop-11",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 1.89255,
+        "walking": false,
+        "idleSeconds": 2.85,
+        "walkPhase": 0.923083,
+        "walkWeight": 0
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614",
+      "candidateImageSha256": "45bcdf69fb574b3e37970524ed3a409d4a16fafb320a4767fa98c069afff2640",
+      "changedPixels": 3787,
+      "changedPixelBoundsExclusive": [
+        526,
+        304,
+        729,
+        657
+      ],
+      "meanAbsoluteChannelDifference": 0.007461197996689902,
+      "maxChannelDifference": 151
+    },
+    {
+      "name": "windows-kit-motion-turn-0.png",
+      "poseState": {
+        "stage": "turn-0",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 1.89255,
+        "walking": false,
+        "idleSeconds": 2.85,
+        "walkPhase": 0.923083,
+        "walkWeight": 0
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614",
+      "candidateImageSha256": "45bcdf69fb574b3e37970524ed3a409d4a16fafb320a4767fa98c069afff2640",
+      "changedPixels": 3787,
+      "changedPixelBoundsExclusive": [
+        526,
+        304,
+        729,
+        657
+      ],
+      "meanAbsoluteChannelDifference": 0.007461197996689902,
+      "maxChannelDifference": 151
+    },
+    {
+      "name": "windows-kit-motion-turn-10.png",
+      "poseState": {
+        "stage": "turn-10",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 2.29255,
+        "walking": false,
+        "idleSeconds": 3.01666,
+        "walkPhase": 0.923083,
+        "walkWeight": 0
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "e112bb2e57d9346c5932fedc18ae10ddf987eb45a7f2b8b836150c417933ae73",
+      "candidateImageSha256": "e86c3506ccc8496da6f04dd32295f85bce84d41e5a82835b4110acd5e64ea18b",
+      "changedPixels": 3605,
+      "changedPixelBoundsExclusive": [
+        335,
+        313,
+        677,
+        670
+      ],
+      "meanAbsoluteChannelDifference": 0.006647488045370985,
+      "maxChannelDifference": 62
+    },
+    {
+      "name": "windows-kit-motion-turn-20.png",
+      "poseState": {
+        "stage": "turn-20",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 2.69255,
+        "walking": false,
+        "idleSeconds": 3.18333,
+        "walkPhase": 0.923083,
+        "walkWeight": 0
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "e15fe89840736ee0bf5442f15fbdb1d462ab09a1bf4989d446e854da0ce6b0e7",
+      "candidateImageSha256": "0c3bcddbd33183c6b3e66422100e788ffd3bd7de2c8a412b8c8b33924007443d",
+      "changedPixels": 2805,
+      "changedPixelBoundsExclusive": [
+        526,
+        277,
+        663,
+        660
+      ],
+      "meanAbsoluteChannelDifference": 0.004950658515415676,
+      "maxChannelDifference": 60
+    },
+    {
+      "name": "windows-kit-motion-turn-30.png",
+      "poseState": {
+        "stage": "turn-30",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 3.09255,
+        "walking": false,
+        "idleSeconds": 3.35,
+        "walkPhase": 0.923083,
+        "walkWeight": 0
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "48cdb661d00f52d2af1b81748114edd6ed48501e5b02d41c2b1f21a156a6eac8",
+      "candidateImageSha256": "6f6befa7b7ae385726da84f56a02f64af4ef295e50b0cc19b1c5eec2edd29c48",
+      "changedPixels": 2409,
+      "changedPixelBoundsExclusive": [
+        528,
+        312,
+        738,
+        666
+      ],
+      "meanAbsoluteChannelDifference": 0.0038572884151962606,
+      "maxChannelDifference": 57
+    },
+    {
+      "name": "windows-kit-motion-turn-40.png",
+      "poseState": {
+        "stage": "turn-40",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 3.49255,
+        "walking": false,
+        "idleSeconds": 3.51666,
+        "walkPhase": 0.923083,
+        "walkWeight": 0
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "b449f778175ae748999d526208bf1e49789195fe0b5742f81a11e1a61f1b5018",
+      "candidateImageSha256": "1c794eef5137d4117330493dfa484470f9955ee72c578124117f055a863ca2b5",
+      "changedPixels": 2522,
+      "changedPixelBoundsExclusive": [
+        313,
+        325,
+        683,
+        660
+      ],
+      "meanAbsoluteChannelDifference": 0.004074277735547972,
+      "maxChannelDifference": 77
+    },
+    {
+      "name": "windows-kit-motion-turn-60.png",
+      "poseState": {
+        "stage": "turn-60",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 4.29254,
+        "walking": false,
+        "idleSeconds": 3.85,
+        "walkPhase": 0.923083,
+        "walkWeight": 0
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "7bf4ff67429ed6b57bf7db3db0df8d62f7632d98da17edf71997a68c9619e2cd",
+      "candidateImageSha256": "d46130948a22a19b5e1af694048d965ec2337f873f561a5a05440673f2971bb6",
+      "changedPixels": 2935,
+      "changedPixelBoundsExclusive": [
+        521,
+        326,
+        764,
+        656
+      ],
+      "meanAbsoluteChannelDifference": 0.0050001886863655235,
+      "maxChannelDifference": 53
+    },
+    {
+      "name": "windows-kit-motion-turn-80.png",
+      "poseState": {
+        "stage": "turn-80",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 4.71239,
+        "walking": false,
+        "idleSeconds": 4.18333,
+        "walkPhase": 0.923083,
+        "walkWeight": 0
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "1a2307efa083c2e66e4fe7eaa848451a45f559169d5ef0eb4ce4396f0914c441",
+      "candidateImageSha256": "e837e6d51cf9a8ebaf4eed745fc5ae0815d5f985f82ae2bec6c7ed3585c76a30",
+      "changedPixels": 2966,
+      "changedPixelBoundsExclusive": [
+        521,
+        321,
+        763,
+        653
+      ],
+      "meanAbsoluteChannelDifference": 0.005410918471316977,
+      "maxChannelDifference": 66
+    },
+    {
+      "name": "windows-kit-motion-turn-100.png",
+      "poseState": {
+        "stage": "turn-100",
+        "root": [
+          -24.9761,
+          1.21496,
+          -4.54282
+        ],
+        "yaw": 4.71239,
+        "walking": false,
+        "idleSeconds": 4.51667,
+        "walkPhase": 0.923083,
+        "walkWeight": 0
+      },
+      "width": 1232,
+      "height": 803,
+      "sourceImageSha256": "ef2d4cdc8379e77e7bea0798571890c721669c7f2f0a56cca19991e91438706b",
+      "candidateImageSha256": "f6fe980831c8098999ddb662d3773dcdf73e24be29d2bee0a3eb8b400f7a7139",
+      "changedPixels": 2954,
+      "changedPixelBoundsExclusive": [
+        313,
+        326,
+        763,
+        653
+      ],
+      "meanAbsoluteChannelDifference": 0.0054318087474999055,
+      "maxChannelDifference": 66
+    }
+  ],
+  "profileDegrees": 87.19006293318274,
+  "allMatchedStatesAndRtIdentities": true,
+  "rawStageObservationSources": [
+    "control-windows-lookout-validation.json",
+    "candidate-windows-lookout-validation.json"
+  ]
+}

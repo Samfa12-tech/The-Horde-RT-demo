@@ -1,0 +1,188 @@
+{
+  "baseCommit": "5694eec69d4b35b9ea6cf165157ff1ddf9a81308",
+  "sourceFiles": [
+    {
+      "path": "src/gameplay/DevelopmentCheckpointSimulation.h",
+      "bytes": 17910,
+      "sha256": "56e9af96667df861063cf60a30fb05e8b579d513e802eebbb5598d725dacd67a"
+    },
+    {
+      "path": "src/gameplay/DevelopmentCheckpoints.h",
+      "bytes": 19435,
+      "sha256": "5bd65773c60e8d18f73bb0a6773c9ee6785b0ef880baa31a09e29eb23b12a69b"
+    },
+    {
+      "path": "src/gameplay/ShowcaseGameplay.h",
+      "bytes": 37628,
+      "sha256": "f6ef5f0c66f28d490f159f57a514a6b2b7124d9b980dbdc55c833121d98c476b"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "bytes": 125645,
+      "sha256": "fa271f1f9a1cec4515d29f88f3c1032f3c8fbcd50f49d35ce4236c0d3c1b3ddf"
+    },
+    {
+      "path": "src/vulkan/raytracing/CharacterRenderSlot.cpp",
+      "bytes": 20856,
+      "sha256": "9fbf25022a08078c1c9f9aff8290f491104e1e902e5928440d32a05c44006ff6"
+    },
+    {
+      "path": "src/vulkan/raytracing/CharacterRenderSlot.h",
+      "bytes": 7100,
+      "sha256": "42496b6ce97b04d35d0e28cd8062146c842256debfd70a3f44d12260405582c8"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "bytes": 453817,
+      "sha256": "023587ef3ec2b4da9ea252d6cbbfcef633ff3dd252140f58fc98115ed2fa0b78"
+    },
+    {
+      "path": "tests/CharacterRenderSlotSmoke.cpp",
+      "bytes": 168602,
+      "sha256": "c8a54f9a678c5a32830c3972568e08ac2d1b739a380378ea0f011726369b4e06"
+    },
+    {
+      "path": "tests/CombatFoundationTests.cpp",
+      "bytes": 54595,
+      "sha256": "a5fd875874731237ece3d02ce7b094f480b02bc00e9bd98795a5e6cf34e19e0b"
+    },
+    {
+      "path": "tests/DevelopmentStaticAssetTests.cpp",
+      "bytes": 61020,
+      "sha256": "d70bff4d622fa9f545d626c3d405014f8a69637415fe562d3dfbe256c5dae123"
+    },
+    {
+      "path": "src/scene/TriangleDissolve.h",
+      "bytes": 1796,
+      "sha256": "f43c5713cdfd85ea5d310464419f05f3c9448a3ceb334e8446921e2e0981ca48"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 12444672,
+      "sha256": "0946204b99499721191dc5ad4ad9c0cfc9d868c3aa718668becbe2c7d355dc35"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4335616,
+      "sha256": "f4320fcabe5f396104d50f6f78c32b4db0ea7c50919848a1e1b9b8ebb513831c"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 172449432,
+      "sha256": "548f60e1b5065004a20f145fe3a6eac2a3f29ddcdc2a705405a2d6a95621026f"
+    }
+  ],
+  "captures": [
+    {
+      "stage": "held",
+      "deathFixedTicks": 193,
+      "backend": "pipeline",
+      "image": {
+        "path": "reports\\chapter-death-held-r2-pipeline\\204-chapter-keeper-death-held.png",
+        "bytes": 603261,
+        "sha256": "4ea2e99f3925f4603a9310cd09c25f741ebccbf27e2bfe4900ed4baf2911ff96"
+      },
+      "manifest": {
+        "path": "reports\\chapter-death-held-r2-pipeline\\capture-manifest.json",
+        "bytes": 9268,
+        "sha256": "1adf370cf23b4cc4c4696f50af1896c1766d90574557d30a7c0be586bd095759"
+      }
+    },
+    {
+      "stage": "dissolve",
+      "deathFixedTicks": 216,
+      "backend": "pipeline",
+      "image": {
+        "path": "reports\\chapter-death-dissolve-r2-pipeline\\205-chapter-keeper-death-dissolve.png",
+        "bytes": 613189,
+        "sha256": "2a0d32ca7bc7907748047d23b05e4cd41b419d831f516050b37c3d785fbb850a"
+      },
+      "manifest": {
+        "path": "reports\\chapter-death-dissolve-r2-pipeline\\capture-manifest.json",
+        "bytes": 9288,
+        "sha256": "bdba15c7027923dbd396f28eed07ae5e9db2b208d1361be79e06879af3a9787e"
+      }
+    },
+    {
+      "stage": "retired",
+      "deathFixedTicks": 240,
+      "backend": "pipeline",
+      "image": {
+        "path": "reports\\chapter-death-retired-r2-pipeline\\206-chapter-keeper-death-retired.png",
+        "bytes": 601338,
+        "sha256": "d5b56c4054c86dfe5c41f2c39a28028025d28d632723a6ba526cb270f4a5efe9"
+      },
+      "manifest": {
+        "path": "reports\\chapter-death-retired-r2-pipeline\\capture-manifest.json",
+        "bytes": 9280,
+        "sha256": "2568b481b32f4d096be1e273edf885e06803edd482059b72f022a36679b3a90b"
+      }
+    },
+    {
+      "stage": "held",
+      "deathFixedTicks": 193,
+      "backend": "query",
+      "image": {
+        "path": "reports\\chapter-death-held-r2-query\\204-chapter-keeper-death-held.png",
+        "bytes": 603262,
+        "sha256": "d5e1c07e2be16e2b41366ee634bf5cd395e7aac22f70ff646716f2523f5e9e18"
+      },
+      "manifest": {
+        "path": "reports\\chapter-death-held-r2-query\\capture-manifest.json",
+        "bytes": 9364,
+        "sha256": "de6a9fe246b70e3baa0181a4778c557415372be46159009de967d35da39fb36f"
+      }
+    },
+    {
+      "stage": "dissolve",
+      "deathFixedTicks": 216,
+      "backend": "query",
+      "image": {
+        "path": "reports\\chapter-death-dissolve-r2-query\\205-chapter-keeper-death-dissolve.png",
+        "bytes": 613189,
+        "sha256": "51960f0b58bd383434c466ed798c2910bfd3893d1cfee96a80af1b443803b486"
+      },
+      "manifest": {
+        "path": "reports\\chapter-death-dissolve-r2-query\\capture-manifest.json",
+        "bytes": 9380,
+        "sha256": "286d3845476d497b36cd841aa60e296ea4a2ae919afce68101f7b6dc3696e69f"
+      }
+    },
+    {
+      "stage": "retired",
+      "deathFixedTicks": 240,
+      "backend": "query",
+      "image": {
+        "path": "reports\\chapter-death-retired-r2-query\\206-chapter-keeper-death-retired.png",
+        "bytes": 601332,
+        "sha256": "38209ef41a4bd29299606569c47074b5f14c265a357669f31f7b27b3b0808d30"
+      },
+      "manifest": {
+        "path": "reports\\chapter-death-retired-r2-query\\capture-manifest.json",
+        "bytes": 9376,
+        "sha256": "1e807bdcdd02ced841a3518ac0b2e5afb5faf3693d92f231133e48ffda1441a6"
+      }
+    }
+  ],
+  "backendComparison": {
+    "held": {
+      "pixelIdentical": false,
+      "differentPixels": 15
+    },
+    "dissolve": {
+      "pixelIdentical": false,
+      "differentPixels": 16
+    },
+    "retired": {
+      "pixelIdentical": false,
+      "differentPixels": 17
+    }
+  },
+  "preservedBackup": {
+    "path": "assets/models/world/source/tomb-dressing-v01/tomb-dressing-v01.blend1",
+    "bytes": 259583,
+    "sha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb"
+  }
+}

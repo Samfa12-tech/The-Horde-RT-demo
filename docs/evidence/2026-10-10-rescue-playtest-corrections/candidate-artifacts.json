@@ -1,0 +1,25 @@
+{
+  "source_commit": "53347791b0bd1331219651b01ea3012bafcab26d",
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 11858944,
+      "sha256": "79e1e8634717bb563928611553019506288a78ce0df2cd1032d7a164e45a6a75"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4171264,
+      "sha256": "29d3c1085ea124847b731aad44dc576fc69d7ede879f9cbc2efda640bd572359"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 133692395,
+      "sha256": "deb5f7a0dedc294bd00c7e08c6f9e928b27186baa8d4fa705d61df634bc28c30"
+    },
+    {
+      "path": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "bytes": 121490514,
+      "sha256": "79fe09f5482aba2814a5abbd7cf84b173f9adeaac9a89d983428fdc9f847fe80"
+    }
+  ]
+}

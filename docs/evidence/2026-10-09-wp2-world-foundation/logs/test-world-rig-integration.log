@@ -1,0 +1,39 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 42
+    Start 42: horde_rt_world_route_foundation_tests
+
+42: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_world_route_foundation_tests.exe"
+42: Working Directory: <repo>/build/presets/windows-x64-debug
+42: Test timeout computed to be: 1500
+42: World route checks=16387 failures=0 triangles=350 resident_cpu_ns=88600 staged_cpu_ns=111600 resident_retained_bytes=22752 staged_peak_cpu_bytes=32880 directions=2 GPU_cost=not-measured
+1/2 Test #42: horde_rt_world_route_foundation_tests ...   Passed    4.56 sec
+test 45
+    Start 45: horde_rt_player_directional_rig_tests
+
+45: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_player_directional_rig_tests.exe" "<repo>"
+45: Working Directory: <repo>/build/presets/windows-x64-debug
+45: Test timeout computed to be: 1500
+45: FAIL: directional dodge retains the real rig and both attachment socket contracts
+2/2 Test #45: horde_rt_player_directional_rig_tests ...***Failed    3.04 sec
+FAIL: directional dodge retains the real rig and both attachment socket contracts
+
+
+The following tests passed:
+	horde_rt_world_route_foundation_tests
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =   7.62 sec
+
+The following tests FAILED:
+	 45 - horde_rt_player_directional_rig_tests (Failed)
+Errors while running CTest

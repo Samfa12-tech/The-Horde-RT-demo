@@ -1,0 +1,19 @@
+test_arm_permission_or_publish_failure_stops_without_retry (test_android_keeper_preparation.PreparationTests.test_arm_permission_or_publish_failure_stops_without_retry) ... ok
+test_arm_publication_requires_echo_and_readback_before_rename (test_android_keeper_preparation.PreparationTests.test_arm_publication_requires_echo_and_readback_before_rename) ... ok
+test_arm_transport_failures_never_publish_or_retry (test_android_keeper_preparation.PreparationTests.test_arm_transport_failures_never_publish_or_retry) ... ok
+test_complete_terminal_mist_must_match_request (test_android_keeper_preparation.PreparationTests.test_complete_terminal_mist_must_match_request) ... ok
+test_disconnect_permission_and_wrong_missing_target_stop (test_android_keeper_preparation.PreparationTests.test_disconnect_permission_and_wrong_missing_target_stop) ... ok
+test_empty_stale_or_newline_changed_arm_is_never_published (test_android_keeper_preparation.PreparationTests.test_empty_stale_or_newline_changed_arm_is_never_published) ... ok
+test_exact_missing_file_is_pending_on_either_stream (test_android_keeper_preparation.PreparationTests.test_exact_missing_file_is_pending_on_either_stream) ... ok
+test_exact_ready_and_terminal_are_separate (test_android_keeper_preparation.PreparationTests.test_exact_ready_and_terminal_are_separate) ... ok
+test_image_requires_exact_identity_dimensions_and_bytes (test_android_keeper_preparation.PreparationTests.test_image_requires_exact_identity_dimensions_and_bytes) ... ok
+test_malformed_duplicate_empty_and_extra_bytes_stop (test_android_keeper_preparation.PreparationTests.test_malformed_duplicate_empty_and_extra_bytes_stop) ... ok
+test_old_truthy_stdout_bug_cannot_be_a_report (test_android_keeper_preparation.PreparationTests.test_old_truthy_stdout_bug_cannot_be_a_report) ... ok
+test_owned_pid_or_exact_absence_only (test_android_keeper_preparation.PreparationTests.test_owned_pid_or_exact_absence_only) ... ok
+test_request_paths_are_closed (test_android_keeper_preparation.PreparationTests.test_request_paths_are_closed) ... ok
+test_stale_wrong_type_mist_light_and_extent_stop (test_android_keeper_preparation.PreparationTests.test_stale_wrong_type_mist_light_and_extent_stop) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.001s
+
+OK

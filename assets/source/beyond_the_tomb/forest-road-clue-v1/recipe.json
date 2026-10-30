@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "asset": "original-forest-road-clue",
+  "authorship": "Original geometry authored locally for Horde Lantern RT; no imported mesh, image, provider output or external asset licence.",
+  "metresPerUnit": 1.0,
+  "up": "+Y",
+  "waystoneFront": "-Z",
+  "uvRepeatsPerMetre": 1.0,
+  "material": "HordeRoadMasonry",
+  "meshes": [
+    {
+      "file": "horde-road-kerb.glb",
+      "name": "HordeRoadKerb",
+      "kind": "box",
+      "width": 0.26,
+      "height": 0.14,
+      "depth": 0.65,
+      "expectedVertices": 24,
+      "expectedTriangles": 12
+    },
+    {
+      "file": "horde-road-waystone.glb",
+      "name": "HordeRoadWaystone",
+      "kind": "waystone",
+      "height": 1.05,
+      "bottomWidth": 0.5,
+      "bottomDepth": 0.27,
+      "topWidth": 0.32,
+      "topDepth": 0.18,
+      "marks": [
+        { "centreY": 0.57, "width": 0.16, "height": 0.022 },
+        { "centreY": 0.675, "width": 0.135, "height": 0.022 },
+        { "centreY": 0.78, "width": 0.11, "height": 0.022 }
+      ],
+      "markOutwardDepth": 0.016,
+      "markInsetDepth": 0.003,
+      "expectedVertices": 96,
+      "expectedTriangles": 48
+    }
+  ]
+}

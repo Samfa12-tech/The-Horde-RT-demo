@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "workflow": {
+    "conclusion": "success",
+    "created_at": "2026-10-23T14:03:19Z",
+    "event": "push",
+    "head_branch": "codex/horde-1.7-wp2-vertical-proof",
+    "head_sha": "53cbb8607ef9de769035223435582b63a4bd9e9c",
+    "html_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39966365867",
+    "id": 39966365867,
+    "name": "Shared simulation host tests",
+    "run_attempt": 1,
+    "run_started_at": "2026-10-23T14:03:19Z",
+    "status": "completed",
+    "updated_at": "2026-10-23T14:17:41Z"
+  },
+  "jobs": [
+    {
+      "id": 120457162216,
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:03:23Z",
+      "completedAtUtc": "2026-10-23T14:12:59Z",
+      "totalSeconds": 576.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39966365867/job/120457162216"
+    },
+    {
+      "id": 120457162376,
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:03:23Z",
+      "completedAtUtc": "2026-10-23T14:08:16Z",
+      "totalSeconds": 293.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39966365867/job/120457162376"
+    },
+    {
+      "id": 120457162385,
+      "name": "player-vulkan-host",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:03:23Z",
+      "completedAtUtc": "2026-10-23T14:10:12Z",
+      "totalSeconds": 409.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39966365867/job/120457162385"
+    },
+    {
+      "id": 120457162430,
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:03:23Z",
+      "completedAtUtc": "2026-10-23T14:08:27Z",
+      "totalSeconds": 304.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39966365867/job/120457162430"
+    },
+    {
+      "id": 120457162451,
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:03:23Z",
+      "completedAtUtc": "2026-10-23T14:13:47Z",
+      "totalSeconds": 624.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39966365867/job/120457162451"
+    },
+    {
+      "id": 120457162877,
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:03:24Z",
+      "completedAtUtc": "2026-10-23T14:17:40Z",
+      "totalSeconds": 856.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39966365867/job/120457162877"
+    }
+  ],
+  "msvc": {
+    "jobId": 120457162877,
+    "conclusion": "success",
+    "timeoutMinutes": 15,
+    "totalSeconds": 856.0,
+    "remainingToCapSeconds": 44.0,
+    "configureStepSeconds": 34.0,
+    "buildStepSeconds": 622.0,
+    "selectionStepSeconds": 150.0,
+    "selectedCount": 150,
+    "completedPassedCount": 150,
+    "failedTestResultsObserved": 0,
+    "ctestRealSeconds": 148.62,
+    "unfinishedStartedTest": null,
+    "notStartedCount": 0,
+    "ctestFinalSummaryPresent": true,
+    "portableExcludedCount": 21,
+    "unchangedToolExcludedCount": 15,
+    "benchmarkSliceTests": [
+      {
+        "name": "horde_rt_benchmark_profile_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "name": "horde_rt_windows_benchmark_launch_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      }
+    ],
+    "providerObjectWrapperSeconds": 80.68,
+    "nativeReportUiResults": [
+      {
+        "name": "horde_rt_windows_remote_playtest_report_ui_tests",
+        "result": "Passed",
+        "seconds": 0.81
+      },
+      {
+        "name": "horde_rt_windows_playtest_report_ui_tests",
+        "result": "Passed",
+        "seconds": 2.07
+      }
+    ],
+    "apkResolverStepConclusion": "success",
+    "apkResolverCasesPassed": 10,
+    "annotationCount": 0,
+    "annotations": []
+  },
+  "rawFinalEvidence": [
+    {
+      "path": "reports/benchmark-shipping-20261023/53c-terminal-run.json",
+      "sha256": "1a2dc6f544d7a7e77a9f74e501a785a53750254f14470764267490b1abc62fba",
+      "bytes": 438
+    },
+    {
+      "path": "reports/benchmark-shipping-20261023/53c-terminal-jobs.json",
+      "sha256": "dfcca331acc0ffa80debca3b4959b7293c4df99197f9101d6971d52c6523adbc",
+      "bytes": 26526
+    },
+    {
+      "path": "reports/benchmark-shipping-20261023/53c-msvc-selected.log",
+      "sha256": "fdc9192883eb6f02a18371f9edf9bc741b0d98d0e335ea8f127260acca275da5",
+      "bytes": 32927
+    },
+    {
+      "path": "reports/benchmark-shipping-20261023/53c-msvc-annotations.json",
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+      "bytes": 4
+    }
+  ],
+  "rawFullReceipt": {
+    "path": "reports/benchmark-shipping-20261023/53c-terminal-receipt.json",
+    "bytes": 11079,
+    "sha256": "81f1241179f2bcca5747ad10010fd6917f229d6e7410ba77a4c4c6047086a9e2"
+  },
+  "limitations": [
+    "Terminal evidence applies only to exact 53cbb860, before the packed mist/dust reporting correction.",
+    "All six jobs passed attempt 1 without retries, timeout or coverage changes; prior cancellations remain retained.",
+    "Only 44 s job-cap margin was observed; this is not robust future CI headroom.",
+    "Hosted CPU/build/Android package tests do not certify physical RT or phone behavior."
+  ]
+}

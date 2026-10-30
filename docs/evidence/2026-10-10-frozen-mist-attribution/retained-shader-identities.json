@@ -1,0 +1,522 @@
+[
+  {
+    "path": "reports/frozen-mist/baseline/diagnostic_high_generic_dielectric/minimal.rgen.preprocessed",
+    "bytes": 183747,
+    "sha256": "c44e8de9deed13f8d06cc4d84e50240278e8e77a1b1667be46d139384364ff34"
+  },
+  {
+    "path": "reports/frozen-mist/baseline/diagnostic_high_generic_dielectric/minimal.rgen.resolved",
+    "bytes": 199842,
+    "sha256": "25e6b854327736ae4511780caf8c0047137a399ff10d34733ea5c072e6e1c526"
+  },
+  {
+    "path": "reports/frozen-mist/baseline/diagnostic_high_generic_dielectric/minimal.rgen.spv",
+    "bytes": 295960,
+    "sha256": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795"
+  },
+  {
+    "path": "reports/frozen-mist/baseline/diagnostic_high_generic_dielectric/minimal.rgen.spvasm",
+    "bytes": 875531,
+    "sha256": "43d31ef48e5f23c81d020af2d64e69f59691a84d7b3a1d25f4a90d2ccc189450"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_high_generic_dielectric/minimal.rgen.preprocessed",
+    "bytes": 183747,
+    "sha256": "c44e8de9deed13f8d06cc4d84e50240278e8e77a1b1667be46d139384364ff34"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_high_generic_dielectric/minimal.rgen.resolved",
+    "bytes": 199842,
+    "sha256": "25e6b854327736ae4511780caf8c0047137a399ff10d34733ea5c072e6e1c526"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_high_generic_dielectric/minimal.rgen.spv",
+    "bytes": 295960,
+    "sha256": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_high_generic_dielectric/minimal.rgen.spvasm",
+    "bytes": 875531,
+    "sha256": "43d31ef48e5f23c81d020af2d64e69f59691a84d7b3a1d25f4a90d2ccc189450"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_high_opaque_fast/minimal.rgen.preprocessed",
+    "bytes": 167245,
+    "sha256": "5ab9501f26993e50df99b6b16a53ded8dda648f639604380fbd938e55aedea44"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_high_opaque_fast/minimal.rgen.resolved",
+    "bytes": 199842,
+    "sha256": "5d01232d3ab300f7f5b27b2ffe801e0098af02df8b5829539fab354a0a1e05d7"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_high_opaque_fast/minimal.rgen.spv",
+    "bytes": 595520,
+    "sha256": "2417de5cadd3e753a081ae8f2e26bdc7cfe30d8c02758e8247bda0fa927a5fdd"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_high_opaque_fast/minimal.rgen.spvasm",
+    "bytes": 1606263,
+    "sha256": "7a95005133aae9b20cba7a8c4af9e22a44490f8aacb27c63ec8b6c985d501fac"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_mobile_generic_dielectric/minimal.rgen.preprocessed",
+    "bytes": 183024,
+    "sha256": "9f3aba0718a2a5988bc7b4f45b06aaa8a153132f69bd8faa6ef8b0bdba26fd2d"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_mobile_generic_dielectric/minimal.rgen.resolved",
+    "bytes": 199842,
+    "sha256": "fd69791d8bf1cac556a70a081a0838afc6ecbb30de2ab8b22c58a4d481a3537d"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_mobile_generic_dielectric/minimal.rgen.spv",
+    "bytes": 294460,
+    "sha256": "70afd1988fe149b35857616520df843a670f3f59c921957d4fdc0a17c657cf42"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_mobile_generic_dielectric/minimal.rgen.spvasm",
+    "bytes": 870831,
+    "sha256": "3eb8b2bdc3e8ce0ff9c6fd83b6560cc5de1502ad4082cbcca8d4657db02225cf"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_mobile_opaque_fast/minimal.rgen.preprocessed",
+    "bytes": 166522,
+    "sha256": "5d7faa80fe0f4c95a62a907583c075a61af2b9588d6ef09a35a72f4f16975df2"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_mobile_opaque_fast/minimal.rgen.resolved",
+    "bytes": 199842,
+    "sha256": "87f794778829ea09e3a9f8cda175c05659421b629a59e4f856570e58daac7d33"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_mobile_opaque_fast/minimal.rgen.spv",
+    "bytes": 592420,
+    "sha256": "d50c9d0e5bb65f5dd8ccf6f63ea81ca0952cc24f4883c8be21c02b4805ad5af3"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/diagnostic_mobile_opaque_fast/minimal.rgen.spvasm",
+    "bytes": 1597098,
+    "sha256": "99cd7eed109c8b0f78d87829f27416adba9ca881d5dae16d7cc49fe7c8c6a6c8"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_high_generic_dielectric/minimal.rgen.preprocessed",
+    "bytes": 174620,
+    "sha256": "76a0c3c059254c51e837d1fc1d6cd6f50108eb18de49806c787ccc1894f7a851"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_high_generic_dielectric/minimal.rgen.resolved",
+    "bytes": 199842,
+    "sha256": "94d26d03bf720ca8d2d557e95a61a6215df971ed43fa0e257d0ea282835a4d38"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_high_generic_dielectric/minimal.rgen.spv",
+    "bytes": 287132,
+    "sha256": "dcf4ae58c422c9c512a2f8d0fccffcbb03414058eb59367f3272aab145c2d809"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_high_generic_dielectric/minimal.rgen.spvasm",
+    "bytes": 850485,
+    "sha256": "8ce22316f41d814728350c0cdd2922b15ac0f1260081a8f9950243ad44f87f2b"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_high_opaque_fast/minimal.rgen.preprocessed",
+    "bytes": 158901,
+    "sha256": "d228396d24510efc7395b37f53963ad63852c2e3cfb3c3bcd5f52aa52aa4935d"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_high_opaque_fast/minimal.rgen.resolved",
+    "bytes": 199842,
+    "sha256": "fc6bf0380eba1b87131baccf15744073acc27f8140bb9b705246f961da9cbf3e"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_high_opaque_fast/minimal.rgen.spv",
+    "bytes": 591284,
+    "sha256": "53c750339d09c6d86a962c0b6ee0a8b7d2fd3d2ecf964beeb8230e1a306f6c7f"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_high_opaque_fast/minimal.rgen.spvasm",
+    "bytes": 1594707,
+    "sha256": "f9c4eb986160faaed239215016aa238d357d0a21c0cc492d08405146de14c527"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_mobile_generic_dielectric/minimal.rgen.preprocessed",
+    "bytes": 173897,
+    "sha256": "5e2e092ae3a0ab4ecb7a9cd2eda377fcdb21d7e5884af4662f3c33b684fcce2e"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_mobile_generic_dielectric/minimal.rgen.resolved",
+    "bytes": 199842,
+    "sha256": "160039faec83afa73728691cea4bae22f379cbebe2f0e80ac4c160b03929c05a"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_mobile_generic_dielectric/minimal.rgen.spv",
+    "bytes": 285632,
+    "sha256": "009e1b37a9b3459ca3c1d900a0741c6bc6041288f759d2367e07fd7542889c9a"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_mobile_generic_dielectric/minimal.rgen.spvasm",
+    "bytes": 845779,
+    "sha256": "e042d4cf2e3f70e62da60e577ef92e7112038fd8ad32874697659603cb0c6f0e"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_mobile_opaque_fast/minimal.rgen.preprocessed",
+    "bytes": 158178,
+    "sha256": "dd662c67edabc87c10b861ba3e47274ee873e0a0636b61102202b9ed70e8c31d"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_mobile_opaque_fast/minimal.rgen.resolved",
+    "bytes": 199842,
+    "sha256": "d0d4d1ccdbe1d394d4a7376312ef075ba9c116cd4c93546fd1f8efbb335e46f8"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_mobile_opaque_fast/minimal.rgen.spv",
+    "bytes": 588184,
+    "sha256": "ae779d534970ecb0c2e21289c07ddde58f239ea1906e36d7046323f4b7f249d9"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-baseline/shipping_mobile_opaque_fast/minimal.rgen.spvasm",
+    "bytes": 1585310,
+    "sha256": "4d06a7498b836b203fda688217c7972d5e27c2bcb373b3758205fe0e93d115b4"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_high_generic_dielectric/shader.spv",
+    "bytes": 295832,
+    "sha256": "0603ab67ccebc408017f8be80b4b42379f02911509b5f635cc9417a8a831e82a"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_high_generic_dielectric/shader.spvasm",
+    "bytes": 875195,
+    "sha256": "65d36204d3184a4392bb48a87e6d3703a1ad5a487f4dfed1e936a9bbdb7dacbe"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_high_generic_dielectric/source.rgen",
+    "bytes": 199795,
+    "sha256": "021366db4fbb6892c77fd8d943aaca39815a07d766f0a9e22a20fde1e1e7e5c7"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_high_generic_dielectric/unoptimized.spv",
+    "bytes": 296400,
+    "sha256": "402c5a0d1ea1e0eaeb897768544485dfacc690e6fa1e43fb534e7221a8fae2ea"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_high_opaque_fast/shader.spv",
+    "bytes": 830368,
+    "sha256": "acd95ac938c560f27bc2b3ff1fadb602ad4c331873d195b947f3a7f60ba39f32"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_high_opaque_fast/shader.spvasm",
+    "bytes": 2278653,
+    "sha256": "39f4163d28ac29ea0cc4ece716d47ed561cd742b40da0e96bea6bb458ed76c92"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_high_opaque_fast/source.rgen",
+    "bytes": 199795,
+    "sha256": "6c3ef2e7ed660daa4f74ed18c9c6fb146a358886acaf28f9e26a8bece5f73c85"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_high_opaque_fast/unoptimized.spv",
+    "bytes": 1046208,
+    "sha256": "2e3f70bf19186f161f7c1b340c0214b97712d9fb3d518da75390badce23c2477"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_mobile_generic_dielectric/shader.spv",
+    "bytes": 294332,
+    "sha256": "ca9d75f097e439f1fe47ff0d08bbac6e7b9679241cb7223f62eab559f94e8fc0"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_mobile_generic_dielectric/shader.spvasm",
+    "bytes": 870498,
+    "sha256": "1453998a1474366a2e7468d2cade319a9f8294d20c76a653902e8c0418859a1f"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_mobile_generic_dielectric/source.rgen",
+    "bytes": 199795,
+    "sha256": "a2ef1dd9cd0aa28339d76d55e99937ea2411f877ce00237af9739f6ceef2d58c"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_mobile_generic_dielectric/unoptimized.spv",
+    "bytes": 294900,
+    "sha256": "9f2db579904531fa8324b6fff2c411d3d156a3abd686cf854732de50ec49ba06"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_mobile_opaque_fast/shader.spv",
+    "bytes": 827268,
+    "sha256": "0b014c935b73c4f975dec7cdece54f0ce48b433571168ac6557132ba9d67f3af"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_mobile_opaque_fast/shader.spvasm",
+    "bytes": 2268619,
+    "sha256": "d37396a11c222573eca0e0e6300b6cb59619a378ed438ac937ddbaff14c8d46c"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_mobile_opaque_fast/source.rgen",
+    "bytes": 199795,
+    "sha256": "255396dfc854bab4c0456f34bac186aff0b7db7621c41857fa135125213f46b8"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/diagnostic_mobile_opaque_fast/unoptimized.spv",
+    "bytes": 1036356,
+    "sha256": "aeb90aab2e80893a7a76e24ebb1093974125a1f496e26dfa263ce5f1d7b49c46"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_high_generic_dielectric/shader.spv",
+    "bytes": 287004,
+    "sha256": "bab0555d6be40b801423eaeb22441d65a7e75501f731cf2f014eed222af549e1"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_high_generic_dielectric/shader.spvasm",
+    "bytes": 850151,
+    "sha256": "99c423ba3c8de008ba47fd5d22cecbf4b64b45c74d961d6333abdd3dc3c9823d"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_high_generic_dielectric/source.rgen",
+    "bytes": 199795,
+    "sha256": "5aba0bda0d29f03e0d9f72d975a18aa9b9c399118bada2b416352acf5c4ffc9e"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_high_generic_dielectric/unoptimized.spv",
+    "bytes": 291048,
+    "sha256": "8df1a05d2f12be1881288d43337b02402a82e64efc81d9063379fc868ed10832"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_high_opaque_fast/shader.spv",
+    "bytes": 826132,
+    "sha256": "0a1f854e3f6c2eec9c0723b374e2b935f7b0d56ac4ddaaccf7c4612172240327"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_high_opaque_fast/shader.spvasm",
+    "bytes": 2267022,
+    "sha256": "4e848162f0345c6f9beba0e3ad893bc3e7e2ff44be2b6da52f06ef380a4978b7"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_high_opaque_fast/source.rgen",
+    "bytes": 199795,
+    "sha256": "586dcc4736e3bd0d36a671be72233767412705b461428e6642298e3c25b4bf9d"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_high_opaque_fast/unoptimized.spv",
+    "bytes": 1039092,
+    "sha256": "50337348767e9780a3100473ea4cc57f1167da262a23b0ed1be8a54ef0f2dc00"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_mobile_generic_dielectric/shader.spv",
+    "bytes": 285504,
+    "sha256": "b0523ccb35c4e1765caf7cea8ea21109671758c7015efaa9a880135e8e1531be"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_mobile_generic_dielectric/shader.spvasm",
+    "bytes": 845448,
+    "sha256": "aa2f2b5720d7c888f577ec7cbc08705ea62581c1c99883908a806bf62ceccdcd"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_mobile_generic_dielectric/source.rgen",
+    "bytes": 199795,
+    "sha256": "4e5117de83ea161c91e5b7edf6f22f0c9237db7171584c5f23f8b3147cd4b620"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_mobile_generic_dielectric/unoptimized.spv",
+    "bytes": 289548,
+    "sha256": "8e64936a1941f369e0cc8c3071ede50e66efa2d944c4ee62f4f0ed21e1a67ddf"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_mobile_opaque_fast/shader.spv",
+    "bytes": 823032,
+    "sha256": "5f1222ec5b484f8b7bb75bab40eee6762f1a7bce148cf7b8db2a3c2c6e24f3de"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_mobile_opaque_fast/shader.spvasm",
+    "bytes": 2256737,
+    "sha256": "8445498224f0e613c24b346fa822d90446099dbcf3087670efbc6f8caae5493a"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_mobile_opaque_fast/source.rgen",
+    "bytes": 199795,
+    "sha256": "2c03836a2a939865670d00d72342f3e03fdaf3f9da85ff12d627e80ead6fd435"
+  },
+  {
+    "path": "reports/frozen-mist/matrix-reference/shipping_mobile_opaque_fast/unoptimized.spv",
+    "bytes": 1029240,
+    "sha256": "0611d3522d6d7d0e9cb33f1233c16951f935818c9931a00739585f31e8daabcf"
+  },
+  {
+    "path": "reports/frozen-mist/records/baseline/diagnostic_high_generic_dielectric/minimal.rgen.preprocessed",
+    "bytes": 183747,
+    "sha256": "c44e8de9deed13f8d06cc4d84e50240278e8e77a1b1667be46d139384364ff34"
+  },
+  {
+    "path": "reports/frozen-mist/records/baseline/diagnostic_high_generic_dielectric/minimal.rgen.resolved",
+    "bytes": 199842,
+    "sha256": "25e6b854327736ae4511780caf8c0047137a399ff10d34733ea5c072e6e1c526"
+  },
+  {
+    "path": "reports/frozen-mist/records/baseline/diagnostic_high_generic_dielectric/minimal.rgen.spv",
+    "bytes": 295960,
+    "sha256": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795"
+  },
+  {
+    "path": "reports/frozen-mist/records/baseline/diagnostic_high_generic_dielectric/minimal.rgen.spvasm",
+    "bytes": 875531,
+    "sha256": "43d31ef48e5f23c81d020af2d64e69f59691a84d7b3a1d25f4a90d2ccc189450"
+  },
+  {
+    "path": "reports/frozen-mist/records/shaders/midpoint-lantern/shader.spv",
+    "bytes": 295096,
+    "sha256": "ab53e3048df31c5cf0ee5f3bae359bc8bcfc48acd39c9baf5f3a08ea589a9568"
+  },
+  {
+    "path": "reports/frozen-mist/records/shaders/midpoint-lantern/shader.spvasm",
+    "bytes": 872918,
+    "sha256": "3b409f9ad8401843760e4c25b1f227229628a48877e144ec64fc947e4d4748db"
+  },
+  {
+    "path": "reports/frozen-mist/records/shaders/midpoint-lantern/source.rgen",
+    "bytes": 199716,
+    "sha256": "ea2680ee586567ce4694e958aec3633c805036dc7dd70dbe0b96c997d57fae52"
+  },
+  {
+    "path": "reports/frozen-mist/records/shaders/midpoint-lantern/unoptimized.spv",
+    "bytes": 295660,
+    "sha256": "17b387d77c9ce28a1a90d5a612644c3cd6ec2183e51985ad18090c0a089116d9"
+  },
+  {
+    "path": "reports/frozen-mist/records/shaders/midpoint-sky/shader.spv",
+    "bytes": 293424,
+    "sha256": "c8addfb814c07841a3504143dd60385bc768959fc0b328039b06dfe8494e20fa"
+  },
+  {
+    "path": "reports/frozen-mist/records/shaders/midpoint-sky/shader.spvasm",
+    "bytes": 868005,
+    "sha256": "d3c3bed4b4d2dce1f694c3ff9c488771bdef0ed548e58f8f0a09464e02bfd912"
+  },
+  {
+    "path": "reports/frozen-mist/records/shaders/midpoint-sky/source.rgen",
+    "bytes": 199242,
+    "sha256": "a8eb53dcc563b07cf3653e5f624c3bf595f7b34bec7a1f5ddab9a1b4a41c0144"
+  },
+  {
+    "path": "reports/frozen-mist/records/shaders/midpoint-sky/unoptimized.spv",
+    "bytes": 293888,
+    "sha256": "d67fc9585c8fa130c41455fb53ec147a2ab79da9aa5fbae93e9b37c13c386fd2"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-all/shader.spv",
+    "bytes": 295960,
+    "sha256": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-all/shader.spvasm",
+    "bytes": 875531,
+    "sha256": "43d31ef48e5f23c81d020af2d64e69f59691a84d7b3a1d25f4a90d2ccc189450"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-all/source.rgen",
+    "bytes": 199794,
+    "sha256": "e0083cd342a123b1aa92cd24892484290d44a1180ace9cebcc80de153e9e23ef"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-all/unoptimized.spv",
+    "bytes": 296528,
+    "sha256": "45a45fe10b9918841e72bfc11ffe0b3cd77aab7a06e808d00a8c716cb1be1a32"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-lantern/shader.spv",
+    "bytes": 293912,
+    "sha256": "41ec3eea66114e1a7d2f7b1e09e1017c66c215aa39612781bbb88db67d53e975"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-lantern/shader.spvasm",
+    "bytes": 869234,
+    "sha256": "41fa849bc415f25cd1cfc29589974dc62c753cea90fcc269eee570f90cbc1e73"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-lantern/source.rgen",
+    "bytes": 199029,
+    "sha256": "64f046eb9df866172b30c45821fddd8bd7fe4df391ba65280991db1024b2ecae"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-lantern/unoptimized.spv",
+    "bytes": 294480,
+    "sha256": "94dbe35c431c8dac274a82ae1e9ebd5d2bd68ef3a9ff37f11fc4cb06dd6b8d6e"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-sky/shader.spv",
+    "bytes": 292648,
+    "sha256": "81b7a1e3a58ccd5c8ca1542be767a57925908cd944ba20646b5190301409b7d7"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-sky/shader.spvasm",
+    "bytes": 865469,
+    "sha256": "95935ab298edc87d0b18a30a997c6a1356335d85f785ee4ab7b08748ad2da936"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-sky/source.rgen",
+    "bytes": 198752,
+    "sha256": "10722d2bde93c5ec3fb1542771921a6b203423a85904d5451c8ec87519035025"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/midpoint-sky/unoptimized.spv",
+    "bytes": 293200,
+    "sha256": "1a699460b41264583ceb2cffde0af8fc8dd19b487db906a366d683983b0cb487"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-all/shader.spv",
+    "bytes": 295832,
+    "sha256": "0603ab67ccebc408017f8be80b4b42379f02911509b5f635cc9417a8a831e82a"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-all/shader.spvasm",
+    "bytes": 875195,
+    "sha256": "65d36204d3184a4392bb48a87e6d3703a1ad5a487f4dfed1e936a9bbdb7dacbe"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-all/source.rgen",
+    "bytes": 199899,
+    "sha256": "9472d889a62d37a0657b33cfc96ca9659aeecf634d0857b6be706739d9f1cdd0"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-all/unoptimized.spv",
+    "bytes": 296400,
+    "sha256": "402c5a0d1ea1e0eaeb897768544485dfacc690e6fa1e43fb534e7221a8fae2ea"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-lantern/shader.spv",
+    "bytes": 293784,
+    "sha256": "3cd4cd0d86abc417ff893373ed600563c78267229ea31c2316e936a0ce26bf6f"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-lantern/shader.spvasm",
+    "bytes": 868901,
+    "sha256": "fbc57a89c6e2e3fc8cef4e7585e02063baeef48bfcaa6af3e864dfddec4271a1"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-lantern/source.rgen",
+    "bytes": 199134,
+    "sha256": "ec908fc5a58a921c744127dfda5ba2dc10ccb313e414268fcfaf0c83a5d737ac"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-lantern/unoptimized.spv",
+    "bytes": 294352,
+    "sha256": "867e3e84891606c0b935ee72d53e3549ee1b2ec8030379085c23995d696c499b"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-sky/shader.spv",
+    "bytes": 292520,
+    "sha256": "be20163adfaa33ceb563b0580bdbe977df3b1a9d5348522ae5acf6850c098edb"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-sky/shader.spvasm",
+    "bytes": 865135,
+    "sha256": "2753f542952cf9458d043734c683c56a628e70a285d75711d920ccd7faf2b809"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-sky/source.rgen",
+    "bytes": 198857,
+    "sha256": "f3ab0dec7b3b1af7123d77597194951097a3ecdb351dc6d5f418802a1bdfee45"
+  },
+  {
+    "path": "reports/frozen-mist/shaders/sample-local-sky/unoptimized.spv",
+    "bytes": 293072,
+    "sha256": "be189ccb68376ca8a105923883ace4f83afc8fd28e213ecbbd0832ae947c9081"
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "authoring": "Original Horde Blender geometry; no third-party input",
+  "sourceBlendSha256": "49a7f0bfee81a8d7d977151fecf420d7b251d5f85ff9b23b4dc0f5e5e9617198",
+  "scriptSha256": "01cbc3855afbe5900b94d8eb1feea6f6d1d07d7803d771b924b2550fb82df6b9",
+  "blenderVersion": "5.2.0 LTS",
+  "units": "metres",
+  "nativeAxes": "+Y up / +Z forward",
+  "uvScale": "2m per repeat; production reuses admitted MedievalWall02",
+  "texturesAdded": 0,
+  "assets": [
+    {
+      "name": "grave-marker-round",
+      "file": "grave-marker-round.runtime.glb",
+      "triangles": 292,
+      "sha256": "2eec59d80f737a90c2e5f22cec020e2fc227ebf7ac40118e136ef7b8ac656ba1",
+      "bytes": 38056
+    },
+    {
+      "name": "grave-marker-damaged",
+      "file": "grave-marker-damaged.runtime.glb",
+      "triangles": 272,
+      "sha256": "b937d5165187b22728901e63b37f72ffc872af9bf521de08cd7edb67f67d3e92",
+      "bytes": 41172
+    }
+  ]
+}

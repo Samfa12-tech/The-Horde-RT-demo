@@ -1,0 +1,2 @@
+ordinary movement automatically lowers the body before entering a low root/ceiling passage
+65 chapter step movement checks, 1 failures; retained step bytes=680

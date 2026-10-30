@@ -1,0 +1,18 @@
+{
+  "cases": [
+    {
+      "entrypoint": "native",
+      "exitCode": 2,
+      "pass": true
+    },
+    {
+      "entrypoint": "cpu",
+      "exitCode": 2,
+      "pass": true
+    }
+  ],
+  "saveBytesUnchanged": true,
+  "originalSha256": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b",
+  "matchingOtherRecordSha256": "ece9ae040c3d9257f4404cfef0c077bdb1fb4b54012ebcb4f029318b16a52dd2",
+  "class": "two matching valid-CRC completed lower records with another held pose; rejected before game restoration"
+}

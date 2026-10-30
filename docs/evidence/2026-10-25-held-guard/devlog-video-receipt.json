@@ -1,0 +1,61 @@
+{
+  "sourceCommit": "11c136590ba0db2261e62409e2c693eb7699d537",
+  "exeSha256": "2f3c42775e84c0d871521919cb75d000d0578d333831552ceefde5202bf0c0a2",
+  "library": {
+    "library_file_id": "libfile_1d733e64d39081919fa7c8a70124ab57",
+    "file_id": "file_00000000fd5481f596877a68a6f120ed",
+    "file_name": "the-horde-1.7-guard-animation-preview.mp4",
+    "path": "/the-horde-1.7-guard-animation-preview.mp4",
+    "current_version_number": 0,
+    "uploadStatus": "succeeded"
+  },
+  "video": {
+    "width": 960,
+    "height": 540,
+    "durationSeconds": 11.55,
+    "bytes": 2109599,
+    "sha256": "f935d5a3f5924d72d1abbff3974313615e1d7be075c3e99e778b7b51cfa9e045",
+    "audio": false,
+    "capturedFrames": 354,
+    "simulationTicks": 693,
+    "simulationHz": 60,
+    "maximumEncodedTimestampErrorSeconds": 3.334e-7,
+    "frameInterpolation": false,
+    "repeatedPadding": false
+  },
+  "capture": {
+    "actualWindowsRt": true,
+    "rtTier": "Diagnostic-High",
+    "hidden": true,
+    "unpaced": true,
+    "exitCode": 0,
+    "elapsedWallSeconds": 105.90026593208313,
+    "completed": true,
+    "parryWindows": 1,
+    "returnedGuard": true,
+    "released": true,
+    "custodyUnchanged": true
+  },
+  "inspection": {
+    "encodedFramesReviewedAtSeconds": [
+      3,
+      5.5,
+      6.5,
+      10.8
+    ],
+    "actionOrder": "draw; fresh parry; held guard; attack; held return; release",
+    "composition": "Existing large skylight; no lighting, exposure, FOV or material alteration"
+  },
+  "limitations": [
+    "Simulation-timed animation preview, not a real-time recording or FPS evidence",
+    "Staged diagnostic enemy context with incoming damage disabled; not damage/balance or natural progression acceptance",
+    "Original raised sword tip can leave the first-person frame",
+    "Silent; not audio, touch comfort or phone acceptance"
+  ],
+  "localLibraryMetadata": {
+    "applied": false,
+    "helper": "unchanged official library_file_transfer.py apply-xattrs",
+    "failure": "Native Windows Python: AttributeError: module os has no attribute setxattr",
+    "retryOrBypass": false
+  }
+}

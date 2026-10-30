@@ -1,0 +1,5 @@
+Exception: <repo>\tools\compile-raygen.ps1:1165
+Line |
+1165 |          throw '-OutputDirectory is only supported with -Check.'
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | -OutputDirectory is only supported with -Check.

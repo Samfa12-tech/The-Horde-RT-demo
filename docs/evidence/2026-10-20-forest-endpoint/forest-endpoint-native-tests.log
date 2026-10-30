@@ -1,0 +1,25 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+      Start 31: horde_rt_windows_campaign_menu_tests
+ 1/10 Test #31: horde_rt_windows_campaign_menu_tests ...........   Passed    1.82 sec
+      Start 33: horde_rt_android_campaign_load_barrier_tests
+ 2/10 Test #33: horde_rt_android_campaign_load_barrier_tests ...   Passed    1.48 sec
+      Start 34: horde_rt_campaign_play_session_tests
+ 3/10 Test #34: horde_rt_campaign_play_session_tests ...........   Passed    7.52 sec
+      Start 35: horde_rt_campaign_session_tests
+ 4/10 Test #35: horde_rt_campaign_session_tests ................   Passed    1.53 sec
+      Start 37: horde_rt_campaign_save_worker_tests
+ 5/10 Test #37: horde_rt_campaign_save_worker_tests ............   Passed    1.44 sec
+      Start 38: horde_rt_campaign_save_coordinator_tests
+ 6/10 Test #38: horde_rt_campaign_save_coordinator_tests .......   Passed    1.37 sec
+      Start 39: horde_rt_campaign_codec_tests
+ 7/10 Test #39: horde_rt_campaign_codec_tests ..................   Passed    1.51 sec
+      Start 40: horde_rt_campaign_storage_tests
+ 8/10 Test #40: horde_rt_campaign_storage_tests ................   Passed    1.68 sec
+      Start 41: horde_rt_chapter_dialogue_tests
+ 9/10 Test #41: horde_rt_chapter_dialogue_tests ................   Passed    0.95 sec
+      Start 42: horde_rt_campaign_checkpoint_tests
+10/10 Test #42: horde_rt_campaign_checkpoint_tests .............   Passed    2.70 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Total Test time (real) =  22.05 sec

@@ -17,12 +17,16 @@
     "collapsed-entry/Boulder01Rock",
     "collapsed-entry/MedievalWall02",
     "rag-torch-player/RagTorch_Atlas",
-    "player-sword-scabbard/LeatherIron"
+    "player-sword-scabbard/LeatherIron",
+    "forest-tree-pair-v1/Bark",
+    "forest-tree-pair-v1/Pine",
+    "forest-tree-pair-v1/Moss",
+    "forest-tree-pair-v1/Alder"
   ],
   "layerCounts": {
-    "baseColor": 14,
-    "normal": 14,
-    "orm": 14,
+    "baseColor": 18,
+    "normal": 15,
+    "orm": 15,
     "emissive": 1
   },
   "sourceLayers": [
@@ -277,23 +281,87 @@
         "bytes": 5352,
         "sha256": "45123bcaf49892f3943ed6c61e09dc030772f6ef18d1f174026a588ad1a2594e"
       }
+    },
+    {
+      "layer": 14,
+      "baseColor": {
+        "path": "assets/textures/props/source/forest-tree-pair-v1/bark-base-color.png",
+        "bytes": 299232,
+        "sha256": "1949c26649928f1de93915fbcfc069f8a0524529aff86baaed367fe675b85a95"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/forest-tree-pair-v1/bark-normal.png",
+        "bytes": 719911,
+        "sha256": "3b61f4ba26d7983eec210c95ba6e6050fe691b5fae50f349401eaae8f7f28868"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/forest-tree-pair-v1/bark-orm.png",
+        "bytes": 139339,
+        "sha256": "12958c868bf13ac288c1cd2c5308bc275e09cdf6bf28ae0bdc76916b944874ed"
+      }
+    },
+    {
+      "layer": 15,
+      "baseColor": {
+        "path": "assets/textures/props/source/forest-tree-pair-v1/pine-base-color.png",
+        "bytes": 66048,
+        "sha256": "93a58c57c4dbca4516b3d28415f81779d31918a9434bdd7ba370197b4e8b5d32"
+      },
+      "normal": null,
+      "orm": null
+    },
+    {
+      "layer": 16,
+      "baseColor": {
+        "path": "assets/textures/props/source/forest-tree-pair-v1/moss-base-color.png",
+        "bytes": 111019,
+        "sha256": "b29d4f393a11f945ffe4c80519722b5438b30c7f80d1148b8a8bb04dc5a68fcd"
+      },
+      "normal": null,
+      "orm": null
+    },
+    {
+      "layer": 17,
+      "baseColor": {
+        "path": "assets/textures/props/source/forest-tree-pair-v1/alder-base-color.png",
+        "bytes": 98534,
+        "sha256": "8ab8b50fc465f2630862bd63428d3cc5956ee2f31c4ab670a310c17b4445271b"
+      },
+      "normal": null,
+      "orm": null
     }
   ],
+  "forestSource": {
+    "originalResolution": 512,
+    "arrayInputResolution": 1024,
+    "resampling": "Nearest-neighbour 2x replication; exact 512px texels retained at mip level 1; source PNGs unchanged",
+    "originalDirectory": "assets/models/world/source/forest-tree-pair-v1/textures",
+    "originalBarkRoughness": {
+      "path": "assets/models/world/source/forest-tree-pair-v1/textures/horde-bark-original-roughness-512.png",
+      "bytes": 145997,
+      "sha256": "03e409b0fc569647c0f4ac18154ee506cce4328433ab8096c97a53ea02105e76"
+    },
+    "generatedBarkOrm": {
+      "path": "assets/textures/props/source/forest-tree-pair-v1/bark-orm.png",
+      "bytes": 139339,
+      "sha256": "12958c868bf13ac288c1cd2c5308bc275e09cdf6bf28ae0bdc76916b944874ed"
+    }
+  },
   "normalConvention": "linear glTF/OpenGL +Y; existing generated-mipmap filter unchanged; runtime renormalizes mapped normals",
   "colorPrimaries": "BT709/sRGB assigned metadata only, no pixel conversion",
   "ormConvention": "R ambient occlusion, G roughness, B metallic; source ARM is already this channel order",
   "android": {
     "baseColor": {
       "format": "ASTC_6x6_SRGB_BLOCK",
-      "sha256": "8ec835e988441ab533b77cc25ac9f2dbd83e91a36f614c0cdbed21a035e7c856"
+      "sha256": "5e21700c1f781c913e5dcf0ca05ff79e01db57eac39514ef3ed19a2b961eeb44"
     },
     "normal": {
       "format": "ASTC_4x4_UNORM_BLOCK",
-      "sha256": "8b830b88a95b8a3eedbbb7555c5ef61046bd3280730fd25dc817b217decfdf3c"
+      "sha256": "defa8b9dbce7130cc8ea601a2868a486a4f11882851d62b25e60aa0742bcfa30"
     },
     "orm": {
       "format": "ASTC_6x6_UNORM_BLOCK",
-      "sha256": "81ef2a8bb533d27f5609a6e36852a7c5d31a9d51a4b7ccf6d1622a31ba0d8744"
+      "sha256": "97bd3e4d4f687beec09cd080c9753d794c7a38d3ce5209cefc208cafd2f32ec2"
     },
     "emissive": {
       "format": "ASTC_6x6_SRGB_BLOCK",
@@ -303,20 +371,20 @@
   "windows": {
     "baseColor": {
       "format": "R8G8B8A8_SRGB",
-      "sha256": "849103d8a02c3f947549eb4c5cdebe40d6f671522d68a28af16264a5e25caa8b"
+      "sha256": "05b7fef7b69ac1f2f42f863594663f4bafa0f4f346334cbfc01a1efabb7456cf"
     },
     "normal": {
       "format": "R8G8B8A8_UNORM",
-      "sha256": "ebbc7dfae582c0efe91c37f9ab9108d33aecacdc88071d797b37e55b42601c65"
+      "sha256": "6ecc469a0bfde110a82a49857f7dd786823c9cebfe50da22963d54149af2a4e3"
     },
     "orm": {
       "format": "R8G8B8A8_UNORM",
-      "sha256": "43b10b4f1684ce3269ebedf096d426b679d12e442d5567c2f02b99d619720e82"
+      "sha256": "b18098e68c838f6b3ca2a4578fb851ba73bd22e84b89bf546b3e6559ba2f01c7"
     },
     "emissive": {
       "format": "R8G8B8A8_SRGB",
       "sha256": "c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56"
     }
   },
-  "licenceStatus": "Existing Meshy outputs conservatively CC BY 4.0; collapsed-entry Boulder01 and MedievalWall02 CC0; RagTorch_Atlas and player sword scabbard are original assistant-authored geometry/maps with no blanket licence assigned; provenance in ASSET_LICENSES.md"
+  "licenceStatus": "Existing Meshy outputs conservatively CC BY 4.0; collapsed-entry Boulder01 and MedievalWall02 CC0; RagTorch_Atlas and player sword scabbard are original assistant-authored geometry/maps with no blanket licence assigned; forest tree pair is owner-authored and owner-approved for game/repository integration, with no blanket open-source license assigned; provenance in ASSET_LICENSES.md"
 }

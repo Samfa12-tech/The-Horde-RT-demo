@@ -1,0 +1,332 @@
+{
+  "schema": 1,
+  "implementationCheckpoint": "59eb44c692783e71362aa7dd068ba462703bcdc5",
+  "evidenceClass": "Actual payload/hash/header inspection; native outcomes reference separately retained prior runs; no new runtime or physical acceptance",
+  "files": [
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_displaced_lid.glb",
+      "bytes": 67240,
+      "sha256": "e93203b35e8e1979ba16a67f31044076b20127fa8bfbc60b96512d2a5e777962",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/source/t03_displaced_lid.blend",
+      "bytes": 93841,
+      "sha256": "04337b52843d8b2c16bb05b7330ebb6bb0e29ab591c2598c6528465b871928ef",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_offering_bowl.glb",
+      "bytes": 45880,
+      "sha256": "6e193a9b36656bffa8c972dab0958884208c0a4f38b72333a4677ad2ceab302b",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/source/t03_offering_bowl.blend",
+      "bytes": 113679,
+      "sha256": "4c3a26fc619f4fa461aa0e042fe8dac3e75b713d5b64eeef96caf9b4cea6d8b1",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_urn_broken_base.glb",
+      "bytes": 87384,
+      "sha256": "c0ed7c0261a125385f821109927567c4fc8f1ff0799d0c3c479d4149e09ad594",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/source/t03_urn_broken_base.blend",
+      "bytes": 111595,
+      "sha256": "360e25af3e98a97397eb6ace31b72c7bee5e2c8972c514ab5993c49622a1b4cc",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_urn_rim_shard.glb",
+      "bytes": 56588,
+      "sha256": "63a76503741ae51f9230e7b23201037bb1e4402d348bbd27323000a82605f1ad",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/source/t03_urn_rim_shard.blend",
+      "bytes": 105211,
+      "sha256": "49cb88219e770c7557a903cfbacfa3cde634e3cf30c79a1a36360bff0d8c5527",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_candle_stub_1.glb",
+      "bytes": 34992,
+      "sha256": "5e454e5aa302e3d081c9857e00a9c8d005c5454a5a7e04d6f212fdbf56c20823",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/source/t03_candle_stub_1.blend",
+      "bytes": 109793,
+      "sha256": "e63f2539136a0e1316d51dd47eef4c5480f909995619f692e1f9babead3f9d9b",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_candle_stub_2.glb",
+      "bytes": 38456,
+      "sha256": "01d24d1c097267b87bafe4a7545d0cdde50292f2fe7af12a70022c590a82d125",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/source/t03_candle_stub_2.blend",
+      "bytes": 110107,
+      "sha256": "5d48445438aeced31d950535c15c1f39e8937934d0343d588683fbe1e008af3e",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/models/t03_candle_stub_3.glb",
+      "bytes": 30440,
+      "sha256": "1a7967a9ae3a82a1e470067b9a344804aa5f40b36b7ba13b401538c6b8fa30a3",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t03-v01/source/t03_candle_stub_3.blend",
+      "bytes": 109227,
+      "sha256": "8857d528f75d347ad67698b7bcfd7d6b60260e343fbc94ba595f19f4b894f66b",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/femur.glb",
+      "bytes": 8804,
+      "sha256": "b00f2492791a3d2b6936d76fe689acea7a1d6c5820c40408fe4a76d71d827c6c",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/femur_cage.glb",
+      "bytes": 3212,
+      "sha256": "3c967558b8abe4801cb2561de2ea68f6e6aceded38e5e920a304d3ab41e197d9",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/humerus.glb",
+      "bytes": 7156,
+      "sha256": "3608f324e9f70ff73dba0fc9bc1a350a486c220a333114b43bfdde64369e4a99",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/humerus_cage.glb",
+      "bytes": 2860,
+      "sha256": "aec11cebb0ecb1db2de2b4e41fb51525f20a451863a2a65f2d583f8cde6b8831",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/skeletal_core_static.glb",
+      "bytes": 290384,
+      "sha256": "a8c045559768153f35945bcd0b0dbe96c93ee8a476837fe682c94d2cf89eedc5",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/skull_jaw.glb",
+      "bytes": 104032,
+      "sha256": "35b2643b2154afd5d0593e9048b0ec43cb5db09cdc3f4e5ca8b46dc0c3ff9aa3",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/skull_jaw_cage.glb",
+      "bytes": 47672,
+      "sha256": "14712039700e01c37f6fb4a82ce3a9d43ab724133171b822e8b11cf177e9e49e",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/source/fgc_skeleton.original.blend",
+      "bytes": 1748720,
+      "sha256": "0ba13c9f0c2af50aafb317f450a92083f7d08ece67c3ecc9a2c64eac13257926",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/source/horde_skeletal_source_kit.blend",
+      "bytes": 489951,
+      "sha256": "a41575270f59735e83f69985c0805583d4668df8ed185cdce446ae1d18dbd1df",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb",
+      "bytes": 7034964,
+      "sha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb",
+      "bytes": 1402952,
+      "sha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb",
+      "bytes": 1436640,
+      "sha256": "f545d7e08370b5e451597c3fd903d8d93b6703d11c75039181a04f7f5312e0bb",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/prologue.kit_grate.wav",
+      "bytes": 310558,
+      "sha256": "2af6b1b650afb8395ced3ba2ec95beea7875a214fed26fcb5f967fcf9c1038a8",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/rescue.found.wav",
+      "bytes": 116706,
+      "sha256": "4e01035e42315c13012b358ba3db3438ea6b88a030c9fafaa56fc6aa78e55f9c",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/rescue.rope.wav",
+      "bytes": 125944,
+      "sha256": "7713bf78793f580d2a418126fd521b01ebcb309bedc3cd8b10c13b91f112a0b6",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/reunion.question.wav",
+      "bytes": 149212,
+      "sha256": "061f23a012cd37d8cc8158ba19df85f9fa16edff479c53aaec1fd677b400a927",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/reunion.hint.wav",
+      "bytes": 102750,
+      "sha256": "c5c9a012a562e900697bfdca5cd4b7dda7cb579b08d25db10bfaca5ea6fd7191",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/reunion.proof.wav",
+      "bytes": 124898,
+      "sha256": "f9c2db3ce4fc592d994e73ea1f82761c807b4e178012d413652cbcb70c0394b2",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/reunion.first_piece.wav",
+      "bytes": 160058,
+      "sha256": "8456da25e25588900c87ddfc3bba962eba6b232410e54cf284fe27b4515366d9",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/reunion.depart.wav",
+      "bytes": 211648,
+      "sha256": "d94158155041ab556a73d15241480b41b4305aa3c2933e8c5eced47fc980f8b4",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/forest.night.wav",
+      "bytes": 117006,
+      "sha256": "b063e4daa2497bb3f94d1eea388028309c835086433c8c8cfa33edd8596d84bc",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/forest.waystone.wav",
+      "bytes": 142994,
+      "sha256": "c00c2d6956ef6fd6c93c71092d01f2c03b125644c211c7a700a8909a40ad795a",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/forest.clue.wav",
+      "bytes": 202438,
+      "sha256": "cc783ba0141f6b47f67d77e197e2b60a38c69c50b79ac5b2db0d00657c47970b",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/forest.wait.wav",
+      "bytes": 76326,
+      "sha256": "8fb4e10dc2a596eba85a4c9ec07e111e42a336f018e824f6e942839883bdf950",
+      "actualPayload": true
+    },
+    {
+      "path": "assets/audio/kit/runtime/forest.village.wav",
+      "bytes": 104386,
+      "sha256": "33b6b9d34dea2f6eda32ac44ceeddacfd51e3ab98dbdddafde3b65cee57d047d",
+      "actualPayload": true
+    }
+  ],
+  "archives": [
+    {
+      "name": "Horde-1.7-original-forest-dressing-v1.zip",
+      "bytes": 20047163,
+      "sha256": "94afbaeb56809c47dae3a45b930409a41b6015756f38284880dfe2bae0656dd4",
+      "manifestPayloadsVerified": 59,
+      "extraEntries": []
+    },
+    {
+      "name": "Horde-1.7-stump-editable-handoff.zip",
+      "bytes": 11860550,
+      "sha256": "00c99650a1b56541784c8b03944f1fb8f3369a242f994a5a2667a568f04b46cd",
+      "manifestPayloadsVerified": 18,
+      "extraEntries": [
+        "README.txt"
+      ]
+    },
+    {
+      "name": "Horde-1.7-tree-pair-compact-editable.zip",
+      "bytes": 16003405,
+      "sha256": "d359c7accd7618ab4581e3c57ff8c4e4ab479b9d7b9d08e8c0c08cebebf841fb",
+      "manifestPayloadsVerified": 48,
+      "extraEntries": []
+    },
+    {
+      "name": "Horde_Dead_Snag_01_Source_Candidate_v1_Compact.zip",
+      "bytes": 15619575,
+      "sha256": "3faa08dea903e6a018517e7ade8c04782c970801d86cc2f12e0c5c1c63f47761",
+      "manifestPayloadsVerified": 18,
+      "extraEntries": []
+    },
+    {
+      "name": "Horde-connected-reference-maps-r2.zip",
+      "bytes": 7602193,
+      "sha256": "5b3d1eadb7606e0348f19c9959aa34f901b3c1986350d69f4ebc6a21bc7cba8b",
+      "manifestPayloadsVerified": 15
+    }
+  ],
+  "issues": [
+    "Terrain Blender handoff not delivered.",
+    "Dedicated player directional and final Kit acting clips not established.",
+    "Outdoor mist/fireflies and final combined-scene device budgets remain open; markers are not effects."
+  ],
+  "t03": {
+    "pieces": 7,
+    "sourceTriangles": 5460,
+    "manifestSha256": "5f16c2dead279914176322b62fb8d3a39bb62427106464b87f7a720aa676b1e6",
+    "rights": "Original Horde kit; preserved supplied authorship; no blanket MIT asset grant"
+  },
+  "t02": {
+    "checksumRosterVerified": 55,
+    "glbs": 7,
+    "editableSources": 2,
+    "rights": "Gord Goodwin source geometry CC0; supplied notice retained; separate Horde derivation/material provenance",
+    "sumFileSha256": "71464aa1c8605c2ca94302c2eb6466ba541dfc161bb40e10094e54e9fd7e8d24"
+  },
+  "topo": {
+    "suppliedPngMatchesPinnedDecodedWebp": [
+      "01-forest-track-1-7",
+      "02a-bellwether-terrain-1-8"
+    ],
+    "allFourPinnedMapSheetsVisuallyInspected": true,
+    "regionalImageVisuallyInspected": true,
+    "terrainHandoff": "Not supplied; Eric authoring has not started according to owner; heightfield is planning input, not production collider"
+  },
+  "kitSpeech": {
+    "verifiedCuts": 13,
+    "format": "mono PCM16 24 kHz",
+    "rights": "Owner confirmed public game/repository distribution for these exact approved takes; earlier pending-rights statements superseded",
+    "deviceListeningAcceptance": "Pending for next rebuilt candidate"
+  },
+  "nativeDisposition": {
+    "forestOriginals": "Prior actual native inspection: 15 candidates, 3 imports accepted (two ferns and stump), 12 rejected for missing tangents on mapped normals. Payloads available; importer rejection is not absence.",
+    "selectedTreeDerivatives": "Pine/alder tangent derivatives passed actual native import; integration/package/physical gates pending current rebuild.",
+    "kit": "Actual native import plus 35 skinned samples across 7 clips passed; visible actor integration pending.",
+    "funerary": "Existing native T03/T02 derivations are already used by TombDressing; current check revalidates source bytes, not new performance admission."
+  },
+  "stumpRights": {
+    "status": "resolved by owner confirmation on 11 October 2026",
+    "scope": "Exact supplied Meshy stump; owner confirms ownership, paid-plan creation and unrestricted intended Horde reuse/public distribution",
+    "licenseLabel": "Creator-owned paid-plan output under Meshy terms section 3.2; no automatic CC0 or blanket MIT license asserted",
+    "runtimeAdmission": "Pending scene/material/performance/physical gates, separate from resolved rights",
+    "termsUrl": "https://www.meshy.ai/terms-of-use",
+    "termsLastUpdated": "2026-09-19",
+    "reviewDate": "2026-10-11",
+    "commercialGuidanceUrl": "https://help.meshy.ai/en/articles/9992001-can-i-use-meshy-assets-commercially-license-copyright-explained",
+    "provenanceCommit": "e6cf2e97e5577aa051c5a18014477598762d7b75",
+    "provenancePath": "assets/source/beyond_the_tomb/forest_dressing/stump-v01/RIGHTS.md",
+    "sourceInputs": "Original text prompts; no third-party model or reference image",
+    "provenanceSha256": "d6a8440bef508c3b668f31dbe2a82650dc717431dff7279daa9f610aada85000"
+  }
+}

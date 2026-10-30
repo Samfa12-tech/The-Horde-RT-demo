@@ -1,0 +1,13 @@
+{
+  "outputsByteEqual": true,
+  "checks": 73,
+  "assertionFailures": 0,
+  "candidateWallSeconds": 28.406,
+  "candidateCpuBusySeconds": 27.90625,
+  "accepted096bWallSeconds": 31.641,
+  "accepted096bCpuBusySeconds": 28.90625,
+  "unchangedCTestDeadlineSeconds": 30,
+  "baselineExceedsDeadline": true,
+  "scope": "one sequential pair, not a performance benchmark or a CTest gate pass",
+  "sourcesRestoredByteExact": true
+}

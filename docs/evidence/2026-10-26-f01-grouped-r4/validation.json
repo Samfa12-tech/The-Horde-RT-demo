@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "action": "CreateProcess for one hidden native RT F01 grouped-r4 north/recreation capture",
+  "target": "reports/forest-branch-crown-r4-20261026/candidate-grouped/HordeLanternRT.exe",
+  "executableSha256": "95e95e681a21e4a2da352a30cd6c6ddbaefeca875a23cf2accdf972de8fa8eac",
+  "result": "denied-before-process-creation",
+  "windowsError": 4551,
+  "message": "An Application Control policy has blocked this file",
+  "ownedProcessStarted": false,
+  "nativeCapturePerformed": false,
+  "retryAttempted": false,
+  "sourceBuildPassed": true,
+  "focusedHostTestsPassed": true,
+  "productionChanged": false,
+  "parkedOwnerFileRosterCount": 151,
+  "parkedOwnerFileRosterUnchanged": true,
+  "testLogSha256": "e87dd466366dc95e1320aa3959b5fce73bdabf7e1abfa57bc01f5b38ad558a22",
+  "buildLogSha256": "e8d9dfa3d553fa6c647a456334fb058c2243f7b7db595782f40bdf3f5b457f28",
+  "runtimeCandidateAccepted": false
+}

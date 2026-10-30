@@ -1,0 +1,93 @@
+{
+  "scope": "Exact raw evidence bytes; excludes this self-referential manifest",
+  "files": {
+    ".gitattributes": {
+      "bytes": 189,
+      "sha256": "4be0abcc98b81acf61470391cd53ddb4d7cd64c2095e43b852f9b9e608ba42c7"
+    },
+    "android-build-java-tests-unrestricted.log": {
+      "bytes": 3104,
+      "sha256": "4a18e513a6f6e76c7f0ab03d527ea9a42a0949d8fc5bc16c597ce261a628144f"
+    },
+    "android-build-java-tests.log": {
+      "bytes": 436,
+      "sha256": "cc35e5ee31e85a4643066d083ccf24659a03dda3a29926e17633bff8d076db29"
+    },
+    "artifact-receipt.json": {
+      "bytes": 3610,
+      "sha256": "9b95a90d7aec843423b333a1a626d34e1c2d57060ced6ba9609d27a960ddace3"
+    },
+    "build-affected-checks.log": {
+      "bytes": 1118,
+      "sha256": "219f32e90d885e6ab80d65fedc5a6e68cf4bf353a298abf7369169d38aa5690b"
+    },
+    "build-debug.log": {
+      "bytes": 3671,
+      "sha256": "15bbb52c7381b6edbe6ad1a78093c6248edbd08dcbc29916e5395b43004e5cad"
+    },
+    "build-release-final.log": {
+      "bytes": 5441,
+      "sha256": "cafe1fc8b0dcddc64a18fedbb3ec42e1e295e2ddc5772af84881da5b80bda191"
+    },
+    "build-release-initial.log": {
+      "bytes": 7863,
+      "sha256": "b5c9b941c61cc0ca4b7264bcbf81e5e69d476fb1aaed0ad0c6e0192323e6df30"
+    },
+    "host-tests-corrected-detail.log": {
+      "bytes": 5884,
+      "sha256": "de0c27dc9d81c6e410271681b438a21c958852594f2abb5353cae41b08604b57"
+    },
+    "host-tests-corrected.log": {
+      "bytes": 479,
+      "sha256": "ff05d7c579e20e6b490c9be6a6833b341496e13c8d7db0a6e4e5e84b4de0a169"
+    },
+    "host-tests-initial-detail.log": {
+      "bytes": 13621,
+      "sha256": "857855bf40ae6e2c9fa337efb431301d8010ff0ea7af86f2821595d3c7e1c3cb"
+    },
+    "host-tests-initial.log": {
+      "bytes": 2320,
+      "sha256": "661724ff15a95c8d45ac3a988dc1bbb56d4edb740a36a827d1b0d22b8e1c6627"
+    },
+    "java/TEST-com.samfa12.hordelanternrt.ChapterAmbienceFeedbackTest.xml": {
+      "bytes": 1096,
+      "sha256": "947798d62b60dfcfb4cf6e716017e40090e429372b820986611a7038345c5035"
+    },
+    "java/TEST-com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest.xml": {
+      "bytes": 1388,
+      "sha256": "895faa99cdf5e0f550714dbb7df9bc4d0004ba36786395921b02890f2263501a"
+    },
+    "java/TEST-com.samfa12.hordelanternrt.MusicAudioFocusTest.xml": {
+      "bytes": 1685,
+      "sha256": "22983bcd14d44c73fe51b85b209ce8d510d2f06f255a6bdf90daf2a686472023"
+    },
+    "java/TEST-com.samfa12.hordelanternrt.MusicOutputBufferTest.xml": {
+      "bytes": 1076,
+      "sha256": "92a335f58b6af1ab5705e394ce6f2829c0a1b36cff3488e11e4e9c951c2000a8"
+    },
+    "java/TEST-com.samfa12.hordelanternrt.MusicOutputGainTest.xml": {
+      "bytes": 1086,
+      "sha256": "339fc4c65204ab20142276ca664a5a6586435cb61117231907af0ebeff05e205"
+    },
+    "README.md": {
+      "bytes": 8950,
+      "sha256": "2b816ced3bc5a7392d0f537055fd6c54be3f014ed1490bd971841ec87ac1c24b"
+    },
+    "reproducibility.json": {
+      "bytes": 1885,
+      "sha256": "90423aed70ce88b602258f6ceb327fb9a01c62241a539cdc2d9a48784e575f51"
+    },
+    "source-freeze.json": {
+      "bytes": 24699,
+      "sha256": "a4bddc1062bcf7331338131867472a92943b4d02ffdc1218ac530c914d5545f9"
+    },
+    "source-statistics.json": {
+      "bytes": 3245,
+      "sha256": "7f8785d9468f49adaafd7e2cd733ecf2d8993b35d468e410a38f1c63af8d7048"
+    },
+    "storage-test-unrestricted.log": {
+      "bytes": 335,
+      "sha256": "ffdeac9ee169b2ebe83aead4fd1f6b369c615db42cf9c9996e01fedcde05e7cf"
+    }
+  }
+}

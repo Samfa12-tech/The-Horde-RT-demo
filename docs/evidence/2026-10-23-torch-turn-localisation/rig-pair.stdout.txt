@@ -1,0 +1,4 @@
+actual-rig yaw=3.129999876 grip=1.787360072,0.3270559907,-4.618139267 light=1.804127455,0.8611103892,-4.535130024 socketPositionError=4.915124805e-07 socketOrientationError=0 gauntletSamples=13257
+actual-rig yaw=3.139999628 grip=1.784966946,0.2724222541,-4.343352795 light=1.80090344,0.8064766526,-4.260179996 socketPositionError=1.228781201e-07 socketOrientationError=0 gauntletSamples=13257
+actual-pair gripDeltaMetres=0.2801752687 lightDeltaMetres=0.2803439796 maxGauntletVertexDeltaMetres=0.2808637023
+actual-pair only; no native RT visibility or owner comfort acceptance

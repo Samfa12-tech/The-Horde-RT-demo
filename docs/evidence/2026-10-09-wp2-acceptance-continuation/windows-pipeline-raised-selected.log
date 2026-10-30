@@ -1,0 +1,8 @@
+Probe initialisation: OK
+GPU name: NVIDIA GeForce RTX 5050 Laptop GPU
+Driver info: 610.47
+Vulkan API version: 1.4.341
+- Vulkan API version: 1.4.341
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+RT render scale 100%: 960x540 -> 960x540
+Showcase capture failed: Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.

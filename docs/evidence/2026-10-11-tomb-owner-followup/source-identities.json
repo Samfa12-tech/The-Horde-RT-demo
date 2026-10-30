@@ -1,0 +1,83 @@
+{
+  "sourceCommit": "4459d64897d080eec72c956abbe85407fa912c89",
+  "files": [
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 84410,
+      "sha256": "ac19c992e4cbd0217a76a76fe9f2170394bc4e0517fa363ce928508aeb1e2089",
+      "gitBlob": "ca03cd88dfb0f041af19fb5eeaae80025d557a63"
+    },
+    {
+      "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-arched/candidate-receipt.json",
+      "bytes": 951,
+      "sha256": "9742c991425ea277277bf7c7f4dc933c343cf9c19857b93b35971e6df6cfdf01",
+      "gitBlob": "a6ae679501ebe3a171044fbf286d73e473fb993a"
+    },
+    {
+      "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-arched/tomb-niche-arched-lod0.runtime.glb",
+      "bytes": 99856,
+      "sha256": "fe78a2108e94814967f49387c3285476776ce7a6a04f82a610d2dbf5e0f20934",
+      "gitBlob": "16766f1b8a47e41e6df67fe64b986d3db576832f"
+    },
+    {
+      "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json",
+      "bytes": 948,
+      "sha256": "5cd5c866c5b304431bbc8132adbf117485a87b8e1d0aec7dbea792d05bc112ea",
+      "gitBlob": "f5b38903a4b68c5f5a18a6e121dcf86929a20599"
+    },
+    {
+      "path": "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-rect/tomb-niche-rect-lod0.runtime.glb",
+      "bytes": 85684,
+      "sha256": "55643831df0b1f8adb118d1dde53435d86aa1898271552781c7289307c2eca62",
+      "gitBlob": "3ac5c70632a556fdcdd679c030a242eb5c56bbc0"
+    },
+    {
+      "path": "assets/models/world/source/tomb-dressing-v01/tomb-dressing-v01.blend",
+      "bytes": 259212,
+      "sha256": "ad16ff3716ed92ff6c666944526bf3cc7679a4df79cd3020d5eaa91e2f54adbc",
+      "gitBlob": "cba72ffd02134fd1d3f11612e54f257e456a74c6"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 518468,
+      "sha256": "3fd9b2376169fdeb31cb5ebd19c4ce3729edbf10793ce80ce17427c33ef73fb7",
+      "gitBlob": "aaffa6ed0b86d90883b38c1d43f2ec7a15e52151"
+    },
+    {
+      "path": "src/scene/TombDressing.cpp",
+      "bytes": 28783,
+      "sha256": "da56ed42cecbd0ca46472f1ed8b2b312d4a4a411fc1a9f8375cd07488be8354e",
+      "gitBlob": "782ee0a24a5e6d7fb57c3d8492bd39b944a6b7fc"
+    },
+    {
+      "path": "tests/RescueJourneyIntegrationTests.cpp",
+      "bytes": 17844,
+      "sha256": "2562c2910dc469c4370d0a9c672e896e057a45041590e07763fd3a1dd8c16568",
+      "gitBlob": "842d75b177d282b3d3414932bf257aa682d35a09"
+    },
+    {
+      "path": "tests/TombDressingTests.cpp",
+      "bytes": 31709,
+      "sha256": "e35ae7c462da44f51a7691ae7ce2d3f79828bafda53f76118b5878514c3301f9",
+      "gitBlob": "426beabf7896438683596e0bc32c769976e770e0"
+    },
+    {
+      "path": "tests/WindowsCombatTeachingPresentationTests.ps1",
+      "bytes": 1749,
+      "sha256": "04225d3ba6822530acb30ec756a23b81d2ff4d4514de903faa93df2fc3e836c5",
+      "gitBlob": "c416eed4a438a1247cbc1124e4ea2b30de901c47"
+    },
+    {
+      "path": "tools/author-tomb-dressing.py",
+      "bytes": 35857,
+      "sha256": "cefe0332ad590307456c092d0b8972b1b023e421f91d744c3369c8366da409f9",
+      "gitBlob": "6ce418b55261f53dd301ad168e66d2cab1e3d025"
+    },
+    {
+      "path": "tools/horde-1.7-tomb-asset-policy.ps1",
+      "bytes": 7710,
+      "sha256": "dee068727006779ad12d7bf9f9fb77c733d772682ccdeafb54548d5cf6d74af8",
+      "gitBlob": "0628aa0f05329dcf0bbba1cf028d3de53688787d"
+    }
+  ]
+}

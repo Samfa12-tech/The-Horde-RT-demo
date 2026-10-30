@@ -1,0 +1,5 @@
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\compile-raygen.ps1:241
+Line |
+ 241 |          throw "$Label requires an absolute path."
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | ArtifactDirectory requires an absolute path.

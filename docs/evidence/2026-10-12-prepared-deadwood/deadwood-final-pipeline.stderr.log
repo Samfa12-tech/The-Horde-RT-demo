@@ -1,0 +1,2 @@
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+Showcase capture failed: Development checkpoint 'chapter-deadwood-bank' could not stage its authoritative combat pose; player=(-33.7,-12.8), rescuePhase=4, stowed=0, ropeReady=1, exterior=1, worldGeneration=3, terrain=1,2,2,2,2

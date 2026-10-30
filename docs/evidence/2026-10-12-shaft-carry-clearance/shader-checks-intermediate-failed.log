@@ -1,0 +1,19 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 97: horde_rt_raygen_variant_manifest_tests
+1/2 Test #97: horde_rt_raygen_variant_manifest_tests ...   Passed   32.94 sec
+    Start 98: horde_rt_raygen_variant_artifact_tests
+2/2 Test #98: horde_rt_raygen_variant_artifact_tests ...***Failed    1.35 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\RaygenVariantArtifactTests.ps1:28
+Line |
+  28 |      if (-not $Condition) { throw $Message }
+     |                             ~~~~~~~~~~~~~~
+     | Current/Higher-only OpaqueFast raw SPIR-V snapshot changed: diagnostic_high_opaque_fast
+
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =  34.31 sec
+
+The following tests FAILED:
+	 98 - horde_rt_raygen_variant_artifact_tests (Failed)
+Errors while running CTest

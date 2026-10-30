@@ -1,0 +1,26 @@
+{
+  "source": "preserved supplied packages; separate Blender tangent derivatives",
+  "materialDefault": "reuse admitted ForestBark, including cut wood; original maps preserved",
+  "files": [
+    {
+      "path": "horde-fallen-log.glb",
+      "bytes": 1873468,
+      "sha256": "5f4f1fcd6ecdb69715f09cabbe2fac8e716851b87eacad7ec07ec702f715ecef"
+    },
+    {
+      "path": "horde-root-tangle.glb",
+      "bytes": 1876496,
+      "sha256": "a964f9af66778ddeda2dc3e03d9984fc66f7a36c0a20bf18f8b9b67cc12db5b6"
+    },
+    {
+      "path": "horde-gnarled-stump.glb",
+      "bytes": 1425904,
+      "sha256": "291381fef23ae05de5382214c778b97cce0969ccc0ff8876879a340ecc6d86d2"
+    },
+    {
+      "path": "horde-dead-snag-lod2.glb",
+      "bytes": 3730464,
+      "sha256": "71905eaa0bf27baa40ccecd4d4a1d8722d43c9954dff94e3ccc242d639d410dd"
+    }
+  ]
+}

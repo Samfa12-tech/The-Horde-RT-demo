@@ -1,0 +1,521 @@
+{
+  "android": {
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "command": "./gradlew.bat --offline --no-daemon --max-workers=2 --console=plain :app:testDebugUnitTest :app:lintDebug",
+    "environment": "ANDROID_HOME/SDK_ROOT existing SDK; JAVA_HOME JDK21; HORDE_VALIDATION_UNSIGNED=1",
+    "apkProducedOrSigned": false,
+    "nativeFourAbiBuildRun": false,
+    "total": {
+      "tests": 256,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "suites": 39,
+    "lint": {
+      "format": "6",
+      "by": "lint 8.7.2"
+    },
+    "logSha256": "21fb5c1e47723fd6a76960296e9dd108adeef8e4b57900c235bec4f588d61fee",
+    "lintIssueCounts": {
+      "Error": 0,
+      "Fatal": 0,
+      "Warning": 60,
+      "Information": 0
+    }
+  },
+  "windows": {
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "configuration": "windows-x64-debug",
+    "initialConfigure": {
+      "command": "cmake --preset windows-x64-debug",
+      "result": "failed setup: pinned WebView2 SDK absent"
+    },
+    "setupCorrection": {
+      "command": "tools/restore-report-webview2.ps1",
+      "result": "passed pinned SDK size/hash and six entry identities; no Runtime installation"
+    },
+    "correctedConfigure": {
+      "command": "cmake --preset windows-x64-debug",
+      "result": "passed"
+    },
+    "build": {
+      "command": "cmake --build --preset windows-x64-debug --parallel 2",
+      "result": "passed"
+    },
+    "fullCtest": {
+      "command": "ctest --preset windows-x64-debug --timeout 180",
+      "exitCode": 8,
+      "total": 144,
+      "passed": 138,
+      "failed": 6,
+      "seconds": 1580.45,
+      "failures": [
+        {
+          "number": 42,
+          "name": "horde_rt_final_held_torch_clearance_tests",
+          "result": "Timeout"
+        },
+        {
+          "number": 71,
+          "name": "horde_rt_static_gltf_asset_tests",
+          "result": "Timeout"
+        },
+        {
+          "number": 85,
+          "name": "horde_rt_static_texture_array_tool_tests",
+          "result": "Failed"
+        },
+        {
+          "number": 86,
+          "name": "horde_rt_static_preparation_lod_policy_tests",
+          "result": "Failed"
+        },
+        {
+          "number": 88,
+          "name": "horde_rt_static_preparation_colliding_lod_policy_tests",
+          "result": "Failed"
+        },
+        {
+          "number": 89,
+          "name": "horde_rt_dielectric_topology_tool_tests",
+          "result": "Failed"
+        }
+      ]
+    },
+    "logSha256": {
+      "configure-debug.log": "a55ebb19a28d5f7864d93c4c59a9c0ecf4d8cafbe69dac7687d024b497a6f70e",
+      "webview2-restore.log": "955463d8c835eb2442e233c919d86866589229fd8d5846810de4de90125319fa",
+      "configure-debug-corrected.log": "477de507daab2fb2f8bbf2dd0cc29a2369db073dc81b6612bb49ebeb10418c0e",
+      "build-debug.log": "4b8d9a37d6fc2c32eba08681aebedeb7d274eb22235b7ab5b2cc3421474ba361",
+      "ctest-debug.log": "a14f3045ced4da8c59a6c6c5f7b570da413a77a4f232c5c4db5ef72888e56e9e"
+    },
+    "fixtureRetry": {
+      "command": "ctest --preset windows-x64-debug --timeout 180 -R '^horde_rt_(static_gltf_asset_tests|static_texture_array_tool_tests|static_preparation_lod_policy_tests|static_preparation_colliding_lod_policy_tests|dielectric_topology_tool_tests)$'",
+      "exitCode": 8,
+      "total": 5,
+      "passed": 3,
+      "failed": 2,
+      "seconds": 18.3,
+      "failures": [
+        {
+          "number": 85,
+          "name": "horde_rt_static_texture_array_tool_tests",
+          "result": "Failed"
+        },
+        {
+          "number": 88,
+          "name": "horde_rt_static_preparation_colliding_lod_policy_tests",
+          "result": "Failed"
+        }
+      ],
+      "logSha256": "41042f966fc346bc95c52fb718c08431a2915c69dfbdacfb80f0542ee81c1069"
+    },
+    "textureRetry": {
+      "command": "ctest --preset windows-x64-debug --timeout 180 -R '^horde_rt_(static_texture_array_tool_tests|static_preparation_colliding_lod_policy_tests)$'",
+      "exitCode": 0,
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "seconds": 10.63,
+      "logSha256": "589535a6ca47b30e18203a8bb7b23549dfb51582630a669906ed7129826b4c8c"
+    },
+    "observedFinalDisposition": {
+      "uniqueTestsWithPassingResult": 143,
+      "unresolved": [
+        {
+          "name": "horde_rt_final_held_torch_clearance_tests",
+          "result": "Timeout 180.03 seconds; not repeated; runtime inputs already hydrated"
+        }
+      ],
+      "fullMatrixRerun": false,
+      "note": "Original full run remains 138 passed / six failed. Subsequent runs only followed proven cached-input setup corrections; do not call this a fresh 144/144 pass."
+    },
+    "testToolProductionBoundary": "Existing asset-tool contract tests exercised Blender/KTX/glTF temporary fixtures; no future source admission, package change, asset generation or Kit production."
+  },
+  "fixtureSetupCorrection": {
+    "baseline": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "networkFetch": false,
+    "runtimeAdmission": false,
+    "checkoutExit": 0,
+    "hydratedInputs": [
+      {
+        "path": "tests/fixtures/static-gltf/bad-chunk.glb",
+        "sha256": "61770ea16c446fdf2e4d3c46fa07f07bb5259c1bc9db3bca1a309cdec2e8f395",
+        "size": 2608,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/static-gltf/bad-magic.glb",
+        "sha256": "1e4122c2588ac3581b1005da3455b0ed1b3184071e48cdbfc9fd14874cd2332d",
+        "size": 2612,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/static-gltf/bad-version.glb",
+        "sha256": "a6ecf33eb22dca12bb59c3da82232b48c053d5f8c8c34be602315ce952728e1d",
+        "size": 2612,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/static-gltf/valid-multi.glb",
+        "sha256": "33117460383ec35cb7dfd95b680645c137f4871a4f2b45a706aa53269468732b",
+        "size": 2612,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/closed-dielectric-lod0.runtime.glb",
+        "sha256": "843fd245da61352a124e3de03f4ccf01923a293afedee2ed73b65a8a18eebf5b",
+        "size": 1848,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/disconnected-shells-dielectric-lod0.runtime.glb",
+        "sha256": "92caade8efd565b8180428fca62a087ee7de46d9e6594d71a1e1c682d1a0f78b",
+        "size": 2264,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/inward-dielectric-lod0.runtime.glb",
+        "sha256": "0015ac99c270df550effbe046ecb4ff4fd40d5a4d108820d21d8da9242dd10b8",
+        "size": 1848,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/large-trs-matrix-seam-dielectric-lod0.runtime.glb",
+        "sha256": "1ac543c73cdf50fb86fef291a11b13e2f3d637fd9eda5bd086826ebfc8167f73",
+        "size": 2972,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/millimetre-dielectric-lod0.runtime.glb",
+        "sha256": "09f35d8b6518a6223b4a61526b53ac54df10133e32d4834a23253d69d34337f4",
+        "size": 1912,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/mixed-orientation-shells-dielectric-lod0.runtime.glb",
+        "sha256": "ec220ddd121e97ee68e7e36aa13091a365837b2a3ca60f7e485be5db9776aed5",
+        "size": 2260,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/mixed-orientation-shells-reordered-dielectric-lod0.runtime.glb",
+        "sha256": "17647e835f79c5a17531cfd5bbbad78bdf03f337c422ef1bea28e100f7f96032",
+        "size": 2260,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/negative-scale-dielectric-lod0.runtime.glb",
+        "sha256": "1dcb1ec40b4a931cd55390aae0114b92f429b410547827082433cca1d9bb1b8b",
+        "size": 1864,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/non-manifold-dielectric-lod0.runtime.glb",
+        "sha256": "0fc314cf495ca0236944a759ff7fea89b01c2a7a9ecab7c45531f31163288250",
+        "size": 1856,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/non-unit-max-disconnected-dielectric-lod0.runtime.glb",
+        "sha256": "3804b1eeb91d01e92e28463b9e9258646314cf1265df93bfb7607ab2359c67f1",
+        "size": 2216,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/non-unit-max-scale-seam-dielectric-lod0.runtime.glb",
+        "sha256": "27a6390f4fe734f905db4cefc73e60dfcb9e541b397a1258d2835e8e12274ad0",
+        "size": 2560,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/non-unit-min-diagonal-dielectric-lod0.runtime.glb",
+        "sha256": "33f8c26c88a2d508f94900dba3444797d87fae796520716419f8eb8a4508f686",
+        "size": 2676,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/non-unit-min-scale-seam-dielectric-lod0.runtime.glb",
+        "sha256": "3f200b01d630491bc7fb4a7ad52d4f4a8eb51848cf14dca5724bbedfd4e9972c",
+        "size": 2604,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/non-unit-min-seam-dielectric-lod0.runtime.glb",
+        "sha256": "cad64bacbd24a67dee2dbc1cc4bd571abedca7fcdb5bf85264c35c04d6e800ba",
+        "size": 2656,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/non-unit-min-seam-reordered-dielectric-lod0.runtime.glb",
+        "sha256": "f6bce620f5c5b69993d76945bafa9a7ab9cbae9816d537b930a30af2bd3002b8",
+        "size": 2656,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/open-dielectric-lod0.runtime.glb",
+        "sha256": "3143e4fd43d79d25fa73a43550bc6efabc852660482f739e6442e5dd44149388",
+        "size": 1844,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/position-nan-dielectric-lod0.runtime.glb",
+        "sha256": "8049fdf040f86cb5061e9a9c0319e3ceb57b31b581cee945c54410fcd5f1a8ed",
+        "size": 1848,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/position-negative-infinity-dielectric-lod0.runtime.glb",
+        "sha256": "0c401cfa55fcac168a98bbdc43a76799187114e4d457fa343efdf3c324f2f826",
+        "size": 1848,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/position-positive-infinity-dielectric-lod0.runtime.glb",
+        "sha256": "5f5b6c5d16cb45b9a1752dc177989b77cde6a604ae74096fc9030b25e22c9141",
+        "size": 1848,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/single-face-flipped-dielectric-lod0.runtime.glb",
+        "sha256": "ec418351858cef33d76df502b8b457ed26585aa854f58614a8d00b8dabfd35d1",
+        "size": 1848,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/split-flipped-face-dielectric-lod0.runtime.glb",
+        "sha256": "8c05f9328cc1cb7bb777599c4a767a4ffaecb8c74e20e95e51b43248310bd750",
+        "size": 2112,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/split-shell-dielectric-lod0.runtime.glb",
+        "sha256": "e23d3eec9f60828b55e4dce42470abaf6248b092545fdc8d68bb61a88c97e1e5",
+        "size": 2132,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/transmission-only-lod0.runtime.glb",
+        "sha256": "16818e4f40b20d4dbfde9e2eaf22035bd9aef1c06cab8fdf253a182281e16be2",
+        "size": 1692,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/valid-transformed-dielectric-lod0.runtime.glb",
+        "sha256": "acd96904818550eb979615b251605396c196cdc09c7cef2ad06a5f14a44e90e9",
+        "size": 1888,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/weld-domain-lower-at-dielectric-lod0.runtime.glb",
+        "sha256": "197844d5a9246e01de55ca394e3e0a067834d6d947fdaa418cdfdd3a0d2ccc79",
+        "size": 1924,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/weld-domain-lower-inside-dielectric-lod0.runtime.glb",
+        "sha256": "4c3fc16a73bece2c5de3636806beb36bcf0d8375bf270d50e0717a6ed361c0ae",
+        "size": 1924,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/weld-domain-lower-outside-dielectric-lod0.runtime.glb",
+        "sha256": "5a6353fb9efdcfcc986841fcbf4277fcfc4d3b0b44d3bc64e80b07cdcc50c487",
+        "size": 1924,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/weld-domain-upper-at-dielectric-lod0.runtime.glb",
+        "sha256": "97d82b486e2d905dc6db7b9fd170e5790e85415e36f0d9f0f45cb59fdc6dd5a2",
+        "size": 1924,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/weld-domain-upper-inside-dielectric-lod0.runtime.glb",
+        "sha256": "f4a31ffbb9be9eda37803079c2f8bf0ebd1af9bcecab466e46901aef10d5e522",
+        "size": 1924,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/weld-domain-upper-outside-dielectric-lod0.runtime.glb",
+        "sha256": "f6168151ba8751ca16639a318db951917bff21da9d0ac0d61f677132346b1d86",
+        "size": 1924,
+        "hydratedVerified": true
+      },
+      {
+        "path": "tests/fixtures/dielectric-topology/zero-thickness-lod0.runtime.glb",
+        "sha256": "81c9afbb66bcbed3d8ceaecd18f12a59cc7ca239bc1af2aeeecddb28fc6e0af8",
+        "size": 1848,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/player-base-color.png",
+        "sha256": "2879df8e5913528f173f2c42972862fbd62e76607bc5f199f279a6da3b2ed0e7",
+        "size": 2124689,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/player-gauntlet-base-color.png",
+        "sha256": "8c3973ad314b15790957baea6234d7dc19ce5ee701b2024e82cc9652fa167b77",
+        "size": 1172980,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/player-gauntlet-normal.png",
+        "sha256": "b01e29fbafd1b68a3bf0b469bebc03672a495dca02f077162c69dae78947e512",
+        "size": 1560112,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/player-gauntlet-orm.png",
+        "sha256": "d1ad61026aadda406f8a1e49676d8c5bd01947d02c52a4e4ae001c8924ff8f58",
+        "size": 923227,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/player-normal.png",
+        "sha256": "b4b314df0cc59e5a40f1e11c8a1e3577e1eccce9a5bd2eea46696647f00e7187",
+        "size": 2518053,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/player-orm.png",
+        "sha256": "0cfb62b92fab7176c15ecd66b997a3304f8ab61f28e0a39b71546a66f78bb3d3",
+        "size": 1364632,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/sword-base-color.png",
+        "sha256": "96bdf325e14273cf6a33ae54867a4809ea916596c223c790a9c4fa8ebcc30bce",
+        "size": 2161738,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/sword-normal.png",
+        "sha256": "fa57b9346b38a6b20c92e084735cfc001a5449f635400984e74cbdf6dae483a9",
+        "size": 1940639,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/sword-orm.png",
+        "sha256": "c6ba0139b11372fff054ff7e8ac519ddd62f475f602b89db59b677e75dd5a424",
+        "size": 986191,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/torch-base-color.png",
+        "sha256": "0c10aa85be74b377c019b453a280030b8d4c05ebea9f33d01834235cbc9a1b77",
+        "size": 693589,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/torch-emissive.png",
+        "sha256": "cd35d58f304b8d8fad68411d5b2fb0f210d656a61d07c87f3b62086981ec2bec",
+        "size": 6489,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/torch-normal.png",
+        "sha256": "e1062d92e09285fd4bf26cb083eadf23aef9448538b804095dbe6f1c146158e8",
+        "size": 1197875,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/static-array-1k/torch-orm.png",
+        "sha256": "0c177ef9fdacd717fdde1071a97d16880a4b0e3635c425d0576ecebe5da95a01",
+        "size": 676947,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/models/weapons/meshy/gothic_arming_sword_rh_lod1.glb",
+        "sha256": "3a8be880cb459b515620575a53135968b36c89ed148069a077307f1beb3f8539",
+        "size": 8298316,
+        "hydratedVerified": true
+      }
+    ],
+    "missingCache": []
+  },
+  "notRun": [
+    "Windows Release and seven-stage Host/capture/package programme",
+    "Android native four-ABI Debug/unsigned Shipping APK matrix",
+    "new physical Android/Windows hardware-RT presentation or lifecycle/device sessions",
+    "sustained FPS/power/thermal and owner-feel/listening",
+    "future source native import, image interpretation and runtime admission"
+  ],
+  "runtimeChanged": false,
+  "textureSetupCorrection": {
+    "networkFetch": false,
+    "runtimeAdmission": false,
+    "checkoutExit": 0,
+    "hydratedInputs": [
+      {
+        "path": "assets/textures/props/source/collapsed-entry/boulder01-base-color.png",
+        "sha256": "fc8f868aaabe94b50906911f3212d7ca84c5296403049feac7ef25ba22ed4e3c",
+        "size": 2297056,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/collapsed-entry/boulder01-normal.png",
+        "sha256": "65070b8fe4b9f1d029411558c4aa9c5a7f5dd93fd6b06b38ce35b893d61af65b",
+        "size": 2574169,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/collapsed-entry/boulder01-orm.png",
+        "sha256": "732f1c63ede2f5af04e736487fbe3d3ab49066ec9ec7c59bdc52825bb03140cc",
+        "size": 1561263,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/collapsed-entry/medieval-wall02-base-color.png",
+        "sha256": "8e45c274021d9f83f0f65e5f950df875b27efbceaa54d786ddd9bbc4fcbe0d15",
+        "size": 1777108,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/collapsed-entry/medieval-wall02-normal.png",
+        "sha256": "cc076a2019d06816a58d6d61244354cac5d79c5c2259f78f7ef417a25792943c",
+        "size": 2503251,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/textures/props/source/collapsed-entry/medieval-wall02-orm.png",
+        "sha256": "68e68c8c66fd61b1a0143e77cb0a21a3ed8101dee47402e5d1f75c002cccb68e",
+        "size": 1771080,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/models/weapons/meshy/gothic_arming_sword_rh_v01_textures/base_color.png",
+        "sha256": "db30beb8e4a947f4d7dc61e2156052c86dead9a0f428843d0cdc2c93c3932c76",
+        "size": 7622912,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/models/weapons/meshy/gothic_arming_sword_rh_v01_textures/emission.png",
+        "sha256": "9c13e4e5e0ae17bbf358ee2ae3b0bb2749e136288414edac21425e8d51e8ebfb",
+        "size": 80565,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/models/weapons/meshy/gothic_arming_sword_rh_v01_textures/metallic.png",
+        "sha256": "6a8e4aab39d2982f923d86297f1ac1b93db45edf0aa72174be7ed50d37a8241b",
+        "size": 485380,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/models/weapons/meshy/gothic_arming_sword_rh_v01_textures/normal.png",
+        "sha256": "cb2ac6f0573f8d50b0359bfc44a2278361c63d00e4157ed39c33ed3bc5d65932",
+        "size": 7515906,
+        "hydratedVerified": true
+      },
+      {
+        "path": "assets/models/weapons/meshy/gothic_arming_sword_rh_v01_textures/roughness.png",
+        "sha256": "d004def038e5f1308036d8ecd275dd5a52787b772a69c1a7ef58f7ee2bd3a356",
+        "size": 579346,
+        "hydratedVerified": true
+      }
+    ],
+    "missingCache": []
+  }
+}

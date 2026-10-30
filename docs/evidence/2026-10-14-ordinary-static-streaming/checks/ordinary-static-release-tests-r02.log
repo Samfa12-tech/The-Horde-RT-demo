@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/chapter-shipping-measurement
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/chapter-shipping-measurement
+    Start  98: horde_rt_static_gltf_asset_tests
+1/4 Test  #98: horde_rt_static_gltf_asset_tests .............   Passed    1.86 sec
+    Start 167: horde_rt_static_geometry_cutover_tests
+2/4 Test #167: horde_rt_static_geometry_cutover_tests .......   Passed    1.19 sec
+    Start 183: horde_rt_rescue_journey_integration_tests
+3/4 Test #183: horde_rt_rescue_journey_integration_tests ....   Passed    1.53 sec
+    Start 186: horde_rt_corridor_detail_certificate_tests
+4/4 Test #186: horde_rt_corridor_detail_certificate_tests ...   Passed    0.11 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   4.72 sec

@@ -1,0 +1,22 @@
+{
+  "label": "candidate-before",
+  "startedUtc": "2026-10-23T01:23:51.890077+00:00",
+  "diagnosticCeilingSeconds": 120,
+  "productionCTestDeadlineSeconds": 30,
+  "gateChanged": false,
+  "wallSeconds": 28.40600000001723,
+  "kernelSeconds": 0.25,
+  "userSeconds": 27.65625,
+  "pid": 75004,
+  "exitCode": 0,
+  "timedOut": false,
+  "executableSha256": "2051aa58a2d8f7f7476ba151da7d216a17710e63875e628ece01e651893a9a18",
+  "sources": {
+    "src/gameplay/animation/PlayerAnimationState.cpp": "8ffd14144c89dfee1e4a550860621ca7e6dda92acf1c887b7d9b0ff5ee275831",
+    "src/gameplay/animation/PlayerAnimationState.h": "7a7784eb5f7415d756980c78080e1a8e927df88b7cf003751a711d67066f2495",
+    "src/gameplay/simulation/GameSimulation.cpp": "41beefa6cdff48d448308583c276c25be505ab2765494f10c6b1e9c2afee0fd6",
+    "src/gameplay/simulation/GameSimulation.h": "70114c1ca06ce9b19750b2d08a4e135924c62291d6f21017519d004d71cd0bfb",
+    "src/vulkan/raytracing/PlayerRenderSlot.cpp": "cfcb75dd5ed8092189c7d9f906710aa97803a444b58d1e77d525c5ab74f10ba5"
+  },
+  "scope": "direct completion diagnostic, not a CTest timeout pass"
+}

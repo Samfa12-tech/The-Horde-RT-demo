@@ -1,0 +1,4 @@
+Native selected geometry common+tomb: primitives=5 vertexBytes=2119872 indexBytes=319080 removedVertexBytes=24132864 removedIndexBytes=4287768; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry common+forest: primitives=8 vertexBytes=25590336 indexBytes=4444656 removedVertexBytes=662400 removedIndexBytes=162192; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+forest: primitives=8 vertexBytes=25590336 indexBytes=4444656 removedVertexBytes=662400 removedIndexBytes=162192; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+tomb: primitives=5 vertexBytes=2119872 indexBytes=319080 removedVertexBytes=24132864 removedIndexBytes=4287768; CPU preparation only; common masonry still includes tomb surfaces

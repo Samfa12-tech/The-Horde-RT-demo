@@ -1,0 +1,717 @@
+{
+  "frozen": [
+    {
+      "backend": "pipeline",
+      "view": "chapter-landing-north",
+      "beforePngSha256": "2bdaea07acc37196699477e58ee2af7e87163ace8e372008b3fb31ddeef267c3",
+      "afterPngSha256": "25351c147216ed1abf4d17958aeff5eb894924073391293e9c66a193f87e3468",
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49408256,
+        "deviceLocalBytes": 405550288
+      },
+      "preservedCameraPoseQualityLightsGeometry": true,
+      "displayDifference": {
+        "changedPixels": 151357,
+        "maximumChannelDifference": 49,
+        "meanAbsoluteDisplayChannelDifference": 4.437440843621399
+      }
+    },
+    {
+      "backend": "pipeline",
+      "view": "chapter-forest-second-bend",
+      "beforePngSha256": "3c800bc634c34e781b8c991ec0c5bb6ba3b57dac0a955e10be4160a6a3ded02c",
+      "afterPngSha256": "5be24a9f264837e2edbabcba7663fef87fe7624ac97779551433d453c0ed538c",
+      "resources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49408256,
+        "deviceLocalBytes": 405550288
+      },
+      "preservedCameraPoseQualityLightsGeometry": true,
+      "displayDifference": {
+        "changedPixels": 250930,
+        "maximumChannelDifference": 50,
+        "meanAbsoluteDisplayChannelDifference": 6.833048482510288
+      }
+    },
+    {
+      "backend": "pipeline",
+      "view": "chapter-kit-reunion",
+      "beforePngSha256": "4c5a51853a8c7c856d57d562fcbde377a0c3a9b22fc2ab0267477ccb46fb99b0",
+      "afterPngSha256": "9117764c348590bea65eca75ae26a4a628329e775db49389cb92b2baa215b6fd",
+      "resources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48084992,
+        "deviceLocalBytes": 371995856
+      },
+      "preservedCameraPoseQualityLightsGeometry": true,
+      "displayDifference": {
+        "changedPixels": 166658,
+        "maximumChannelDifference": 49,
+        "meanAbsoluteDisplayChannelDifference": 4.955323431069959
+      }
+    },
+    {
+      "backend": "query",
+      "view": "chapter-landing-north",
+      "beforePngSha256": "a59c74f0b6ff053d6ecb9c6267b3a5cb2ba82d83120ab98534711a690da71164",
+      "afterPngSha256": "5937ddcdf08a4791ec44efc8408ea2641c4def49328a93170168d0ae434b25fe",
+      "resources": {
+        "bufferCount": 50,
+        "memoryAllocationCount": 61,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49407744,
+        "deviceLocalBytes": 405550288
+      },
+      "preservedCameraPoseQualityLightsGeometry": true,
+      "displayDifference": {
+        "changedPixels": 151350,
+        "maximumChannelDifference": 49,
+        "meanAbsoluteDisplayChannelDifference": 4.437459490740741
+      }
+    },
+    {
+      "backend": "query",
+      "view": "chapter-forest-second-bend",
+      "beforePngSha256": "78599c8dac93d200729baeb49a0af8fa760c3566522a9ad0418409f7fd65bc44",
+      "afterPngSha256": "f097d1b6e21a37ffc99a4fdbc6cc9f835b5ea7ed863bd49b46c72bc33c0fe77f",
+      "resources": {
+        "bufferCount": 50,
+        "memoryAllocationCount": 61,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49407744,
+        "deviceLocalBytes": 405550288
+      },
+      "preservedCameraPoseQualityLightsGeometry": true,
+      "displayDifference": {
+        "changedPixels": 250935,
+        "maximumChannelDifference": 50,
+        "meanAbsoluteDisplayChannelDifference": 6.833140432098766
+      }
+    },
+    {
+      "backend": "query",
+      "view": "chapter-kit-reunion",
+      "beforePngSha256": "3da46201d23910cd6d3d86df5e99436fc509e2ceae54a305c4c6bc63ec644590",
+      "afterPngSha256": "e15181040ad08826699842e7098b3beb67fdb18e4bb8a08de5927610e34734fb",
+      "resources": {
+        "bufferCount": 49,
+        "memoryAllocationCount": 58,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48084480,
+        "deviceLocalBytes": 371995856
+      },
+      "preservedCameraPoseQualityLightsGeometry": true,
+      "displayDifference": {
+        "changedPixels": 166659,
+        "maximumChannelDifference": 49,
+        "meanAbsoluteDisplayChannelDifference": 4.955278420781894
+      }
+    }
+  ],
+  "route": {
+    "pipeline": {
+      "complete": true,
+      "frames": 1241,
+      "keeperTextureLifetime": {
+        "retiredDeviceLocalBytes": 33554432,
+        "retiredHostVisibleBytes": 0,
+        "baseMemoryFlags": 1,
+        "emissiveMemoryFlags": 1,
+        "retirements": 1,
+        "restorations": 1,
+        "resetRestored": true
+      },
+      "comparisons": [
+        {
+          "file": "1-initial-reunion.png",
+          "displayDifference": {
+            "changedPixels": 166658,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 4.955323431069959
+          }
+        },
+        {
+          "file": "2-landing-sweep-2.png",
+          "displayDifference": {
+            "changedPixels": 186104,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 5.289329989711934
+          }
+        },
+        {
+          "file": "3-landing-sweep-2.png",
+          "displayDifference": {
+            "changedPixels": 173362,
+            "maximumChannelDifference": 48,
+            "meanAbsoluteDisplayChannelDifference": 5.208566100823045
+          }
+        },
+        {
+          "file": "4-landing-sweep-2.png",
+          "displayDifference": {
+            "changedPixels": 182130,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 5.230094521604939
+          }
+        },
+        {
+          "file": "5-landing-sweep-2.png",
+          "displayDifference": {
+            "changedPixels": 181968,
+            "maximumChannelDifference": 48,
+            "meanAbsoluteDisplayChannelDifference": 5.607091692386831
+          }
+        },
+        {
+          "file": "6-kit-walking.png",
+          "displayDifference": {
+            "changedPixels": 160637,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 4.744339634773662
+          }
+        },
+        {
+          "file": "7-fresh-raise-3.png",
+          "displayDifference": {
+            "changedPixels": 187302,
+            "maximumChannelDifference": 48,
+            "meanAbsoluteDisplayChannelDifference": 5.416361882716049
+          }
+        },
+        {
+          "file": "8-outbound-4.png",
+          "displayDifference": {
+            "changedPixels": 319173,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 11.076822916666666
+          }
+        },
+        {
+          "file": "9-outbound-5.png",
+          "displayDifference": {
+            "changedPixels": 267197,
+            "maximumChannelDifference": 50,
+            "meanAbsoluteDisplayChannelDifference": 7.244746656378601
+          }
+        },
+        {
+          "file": "10-outbound-6.png",
+          "displayDifference": {
+            "changedPixels": 301496,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 8.034353780864198
+          }
+        },
+        {
+          "file": "11-outbound-7.png",
+          "displayDifference": {
+            "changedPixels": 212030,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 7.173072273662552
+          }
+        },
+        {
+          "file": "12-lookout-sweep-7.png",
+          "displayDifference": {
+            "changedPixels": 213824,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 6.794124871399177
+          }
+        },
+        {
+          "file": "13-lookout-sweep-7.png",
+          "displayDifference": {
+            "changedPixels": 238742,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 5.926887860082306
+          }
+        },
+        {
+          "file": "14-lookout-sweep-7.png",
+          "displayDifference": {
+            "changedPixels": 244977,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 6.645276491769548
+          }
+        },
+        {
+          "file": "15-lookout-sweep-7.png",
+          "displayDifference": {
+            "changedPixels": 253440,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 5.862844650205761
+          }
+        },
+        {
+          "file": "16-return-6.png",
+          "displayDifference": {
+            "changedPixels": 346817,
+            "maximumChannelDifference": 47,
+            "meanAbsoluteDisplayChannelDifference": 8.304213605967078
+          }
+        },
+        {
+          "file": "17-return-5.png",
+          "displayDifference": {
+            "changedPixels": 309799,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 9.233234953703704
+          }
+        },
+        {
+          "file": "18-return-4.png",
+          "displayDifference": {
+            "changedPixels": 249723,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 7.947600951646091
+          }
+        },
+        {
+          "file": "19-return-3.png",
+          "displayDifference": {
+            "changedPixels": 165728,
+            "maximumChannelDifference": 48,
+            "meanAbsoluteDisplayChannelDifference": 5.031446116255144
+          }
+        },
+        {
+          "file": "20-return-2.png",
+          "displayDifference": {
+            "changedPixels": 120994,
+            "maximumChannelDifference": 48,
+            "meanAbsoluteDisplayChannelDifference": 3.6019000771604937
+          }
+        },
+        {
+          "file": "21-descent-2.png",
+          "displayDifference": {
+            "changedPixels": 0,
+            "maximumChannelDifference": 0,
+            "meanAbsoluteDisplayChannelDifference": 0.0
+          }
+        },
+        {
+          "file": "22-lower-sweep-0.png",
+          "displayDifference": {
+            "changedPixels": 24,
+            "maximumChannelDifference": 2,
+            "meanAbsoluteDisplayChannelDifference": 2.1862139917695473e-05
+          },
+          "lowerFloorCrop": {
+            "box": [
+              120,
+              330,
+              820,
+              540
+            ],
+            "difference": {
+              "changedPixels": 0,
+              "maximumChannelDifference": 0,
+              "meanAbsoluteDisplayChannelDifference": 0.0
+            }
+          }
+        },
+        {
+          "file": "23-lower-sweep-0.png",
+          "displayDifference": {
+            "changedPixels": 117,
+            "maximumChannelDifference": 2,
+            "meanAbsoluteDisplayChannelDifference": 0.00011188271604938272
+          },
+          "lowerFloorCrop": {
+            "box": [
+              120,
+              330,
+              820,
+              540
+            ],
+            "difference": {
+              "changedPixels": 5,
+              "maximumChannelDifference": 1,
+              "meanAbsoluteDisplayChannelDifference": 1.8140589569160997e-05
+            }
+          }
+        },
+        {
+          "file": "24-lower-sweep-0.png",
+          "displayDifference": {
+            "changedPixels": 55,
+            "maximumChannelDifference": 2,
+            "meanAbsoluteDisplayChannelDifference": 5.0797325102880667e-05
+          },
+          "lowerFloorCrop": {
+            "box": [
+              120,
+              330,
+              820,
+              540
+            ],
+            "difference": {
+              "changedPixels": 1,
+              "maximumChannelDifference": 1,
+              "meanAbsoluteDisplayChannelDifference": 2.2675736961451247e-06
+            }
+          }
+        },
+        {
+          "file": "25-lower-sweep-0.png",
+          "displayDifference": {
+            "changedPixels": 2,
+            "maximumChannelDifference": 1,
+            "meanAbsoluteDisplayChannelDifference": 1.286008230452675e-06
+          },
+          "lowerFloorCrop": {
+            "box": [
+              120,
+              330,
+              820,
+              540
+            ],
+            "difference": {
+              "changedPixels": 1,
+              "maximumChannelDifference": 1,
+              "meanAbsoluteDisplayChannelDifference": 2.2675736961451247e-06
+            }
+          }
+        },
+        {
+          "file": "26-repeat-ascent-2.png",
+          "displayDifference": {
+            "changedPixels": 173432,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 5.198519161522634
+          }
+        },
+        {
+          "file": "27-reset-opening.png",
+          "displayDifference": {
+            "changedPixels": 0,
+            "maximumChannelDifference": 0,
+            "meanAbsoluteDisplayChannelDifference": 0.0
+          }
+        }
+      ]
+    },
+    "query": {
+      "complete": true,
+      "frames": 1241,
+      "keeperTextureLifetime": {
+        "retiredDeviceLocalBytes": 33554432,
+        "retiredHostVisibleBytes": 0,
+        "baseMemoryFlags": 1,
+        "emissiveMemoryFlags": 1,
+        "retirements": 1,
+        "restorations": 1,
+        "resetRestored": true
+      },
+      "comparisons": [
+        {
+          "file": "1-initial-reunion.png",
+          "displayDifference": {
+            "changedPixels": 166659,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 4.955278420781894
+          }
+        },
+        {
+          "file": "2-landing-sweep-2.png",
+          "displayDifference": {
+            "changedPixels": 186100,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 5.2893158436214
+          }
+        },
+        {
+          "file": "3-landing-sweep-2.png",
+          "displayDifference": {
+            "changedPixels": 173394,
+            "maximumChannelDifference": 48,
+            "meanAbsoluteDisplayChannelDifference": 5.208560313786008
+          }
+        },
+        {
+          "file": "4-landing-sweep-2.png",
+          "displayDifference": {
+            "changedPixels": 182146,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 5.230082947530864
+          }
+        },
+        {
+          "file": "5-landing-sweep-2.png",
+          "displayDifference": {
+            "changedPixels": 181978,
+            "maximumChannelDifference": 48,
+            "meanAbsoluteDisplayChannelDifference": 5.6071373456790115
+          }
+        },
+        {
+          "file": "6-kit-walking.png",
+          "displayDifference": {
+            "changedPixels": 160654,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 4.744421296296296
+          }
+        },
+        {
+          "file": "7-fresh-raise-3.png",
+          "displayDifference": {
+            "changedPixels": 187301,
+            "maximumChannelDifference": 48,
+            "meanAbsoluteDisplayChannelDifference": 5.416402391975308
+          }
+        },
+        {
+          "file": "8-outbound-4.png",
+          "displayDifference": {
+            "changedPixels": 319167,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 11.07663644547325
+          }
+        },
+        {
+          "file": "9-outbound-5.png",
+          "displayDifference": {
+            "changedPixels": 267194,
+            "maximumChannelDifference": 50,
+            "meanAbsoluteDisplayChannelDifference": 7.244712577160494
+          }
+        },
+        {
+          "file": "10-outbound-6.png",
+          "displayDifference": {
+            "changedPixels": 301495,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 8.034249614197531
+          }
+        },
+        {
+          "file": "11-outbound-7.png",
+          "displayDifference": {
+            "changedPixels": 212031,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 7.173011188271605
+          }
+        },
+        {
+          "file": "12-lookout-sweep-7.png",
+          "displayDifference": {
+            "changedPixels": 213818,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 6.794138374485597
+          }
+        },
+        {
+          "file": "13-lookout-sweep-7.png",
+          "displayDifference": {
+            "changedPixels": 238742,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 5.926883359053498
+          }
+        },
+        {
+          "file": "14-lookout-sweep-7.png",
+          "displayDifference": {
+            "changedPixels": 244979,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 6.645237268518518
+          }
+        },
+        {
+          "file": "15-lookout-sweep-7.png",
+          "displayDifference": {
+            "changedPixels": 253440,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 5.862832433127572
+          }
+        },
+        {
+          "file": "16-return-6.png",
+          "displayDifference": {
+            "changedPixels": 346809,
+            "maximumChannelDifference": 47,
+            "meanAbsoluteDisplayChannelDifference": 8.304238040123456
+          }
+        },
+        {
+          "file": "17-return-5.png",
+          "displayDifference": {
+            "changedPixels": 309797,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 9.233220164609053
+          }
+        },
+        {
+          "file": "18-return-4.png",
+          "displayDifference": {
+            "changedPixels": 249722,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 7.947596450617284
+          }
+        },
+        {
+          "file": "19-return-3.png",
+          "displayDifference": {
+            "changedPixels": 165720,
+            "maximumChannelDifference": 48,
+            "meanAbsoluteDisplayChannelDifference": 5.031429398148148
+          }
+        },
+        {
+          "file": "20-return-2.png",
+          "displayDifference": {
+            "changedPixels": 120979,
+            "maximumChannelDifference": 48,
+            "meanAbsoluteDisplayChannelDifference": 3.601871784979424
+          }
+        },
+        {
+          "file": "21-descent-2.png",
+          "displayDifference": {
+            "changedPixels": 0,
+            "maximumChannelDifference": 0,
+            "meanAbsoluteDisplayChannelDifference": 0.0
+          }
+        },
+        {
+          "file": "22-lower-sweep-0.png",
+          "displayDifference": {
+            "changedPixels": 24,
+            "maximumChannelDifference": 2,
+            "meanAbsoluteDisplayChannelDifference": 2.1862139917695473e-05
+          },
+          "lowerFloorCrop": {
+            "box": [
+              120,
+              330,
+              820,
+              540
+            ],
+            "difference": {
+              "changedPixels": 0,
+              "maximumChannelDifference": 0,
+              "meanAbsoluteDisplayChannelDifference": 0.0
+            }
+          }
+        },
+        {
+          "file": "23-lower-sweep-0.png",
+          "displayDifference": {
+            "changedPixels": 117,
+            "maximumChannelDifference": 2,
+            "meanAbsoluteDisplayChannelDifference": 0.00011188271604938272
+          },
+          "lowerFloorCrop": {
+            "box": [
+              120,
+              330,
+              820,
+              540
+            ],
+            "difference": {
+              "changedPixels": 5,
+              "maximumChannelDifference": 1,
+              "meanAbsoluteDisplayChannelDifference": 1.8140589569160997e-05
+            }
+          }
+        },
+        {
+          "file": "24-lower-sweep-0.png",
+          "displayDifference": {
+            "changedPixels": 55,
+            "maximumChannelDifference": 2,
+            "meanAbsoluteDisplayChannelDifference": 5.0797325102880667e-05
+          },
+          "lowerFloorCrop": {
+            "box": [
+              120,
+              330,
+              820,
+              540
+            ],
+            "difference": {
+              "changedPixels": 1,
+              "maximumChannelDifference": 1,
+              "meanAbsoluteDisplayChannelDifference": 2.2675736961451247e-06
+            }
+          }
+        },
+        {
+          "file": "25-lower-sweep-0.png",
+          "displayDifference": {
+            "changedPixels": 2,
+            "maximumChannelDifference": 1,
+            "meanAbsoluteDisplayChannelDifference": 1.286008230452675e-06
+          },
+          "lowerFloorCrop": {
+            "box": [
+              120,
+              330,
+              820,
+              540
+            ],
+            "difference": {
+              "changedPixels": 1,
+              "maximumChannelDifference": 1,
+              "meanAbsoluteDisplayChannelDifference": 2.2675736961451247e-06
+            }
+          }
+        },
+        {
+          "file": "26-repeat-ascent-2.png",
+          "displayDifference": {
+            "changedPixels": 173433,
+            "maximumChannelDifference": 49,
+            "meanAbsoluteDisplayChannelDifference": 5.19853845164609
+          }
+        },
+        {
+          "file": "27-reset-opening.png",
+          "displayDifference": {
+            "changedPixels": 0,
+            "maximumChannelDifference": 0,
+            "meanAbsoluteDisplayChannelDifference": 0.0
+          }
+        }
+      ]
+    }
+  },
+  "scope": "Display differences and invariant checks; not radiance or sustained performance acceptance"
+}

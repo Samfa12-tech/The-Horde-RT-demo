@@ -1,0 +1,63 @@
+Start testing: Oct 20 21:35 AUS Eastern Summer Time
+----------------------------------------------------------
+32/219 Testing: horde_rt_windows_lookout_objective_panel_tests
+32/219 Test: horde_rt_windows_lookout_objective_panel_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_windows_lookout_objective_panel_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_windows_lookout_objective_panel_tests" start time: Oct 20 21:35 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-create command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=0000000000000000 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-create command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-layout command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-forged-disabled-actions command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-command command=4322 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-command command=4322 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-command command=4324 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-command command=4324 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-open command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-command command=4323 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=before-destroy command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+HORDE_LOOKOUT_HIDDEN_FOREGROUND stage=after-destroy command=0 initial=0000000000020704 previous=0000000000020704 current=0000000000020704 parent=00000000002E08D0 ours=0 visible=0 observed_owner_foreground=0
+44 Windows lookout panel checks, 0 failures
+<end of output>
+Test time =   1.07 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_windows_lookout_objective_panel_tests" end time: Oct 20 21:35 AUS Eastern Summer Time
+"horde_rt_windows_lookout_objective_panel_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 20 21:35 AUS Eastern Summer Time

@@ -1,0 +1,31 @@
+{
+  "firstUnitRun": {
+    "tests": 48,
+    "failures": [
+      {
+        "name": "savedClientKeepsExactIndependentLayoutPolicyIncludingUndefinedRelativeEdges",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError",
+        "originalAssertion": "OpeningBenchmarkOutputTest.java:68 sameLayout(after,before)"
+      }
+    ]
+  },
+  "firstLintRun": [
+    {
+      "id": "SuspiciousIndentation",
+      "severity": "Error",
+      "message": "Suspicious indentation: This is conditionally executed; expected it to be indented",
+      "location": [
+        {
+          "line": "2261",
+          "column": "17"
+        },
+        {
+          "line": "2260",
+          "column": "17"
+        }
+      ]
+    }
+  ],
+  "resolution": "Original assertions retained; public cloned margin semantics and explicit braces corrected; final tests/lint pass. Raw original XML/logs remain in ignored reports/android-benchmark-fixed-output-20261024."
+}

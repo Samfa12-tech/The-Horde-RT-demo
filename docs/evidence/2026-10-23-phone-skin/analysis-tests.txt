@@ -1,0 +1,6 @@
+19 offline analyzer checks passed; synthetic evidence only, no runtime/performance result.
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.127s
+
+OK

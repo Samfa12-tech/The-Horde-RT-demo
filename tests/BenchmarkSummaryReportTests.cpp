@@ -1,5 +1,8 @@
 #include "reporting/BenchmarkSummaryReport.h"
+#include "reporting/PublicBenchmarkReport.h"
+#include "reporting/DeveloperReportSubmission.h"
 #include "reporting/PlaytestReport.h"
+#include "platform/windows/WindowsBenchmarkReviewPayload.h"
 
 #include <iostream>
 #include <string>
@@ -16,128 +19,7 @@ void Check(const bool value, const char* message)
 {
     if (!value) { passed = false; std::cerr << "Benchmark summary: " << message << '\n'; }
 }
-constexpr std::string_view kRunUuid = "11111111-1111-4111-8111-111111111111";
-constexpr std::string_view kReportUuid = "22222222-2222-4222-9222-222222222222";
-
-BenchmarkSummaryConfiguration Configuration()
-{
-    BenchmarkSummaryConfiguration c;
-    c.sceneEpoch = 3u; c.measurementGeneration = 8u;
-    c.metadata.buildIdentity = "1.6.2-local";
-    c.metadata.shaderIdentity = "opaqueFast:shipping_mobile_opaque@" + std::string(64u, 'a') +
-        "|genericDielectric:shipping_mobile_generic@" + std::string(64u, 'b');
-    c.metadata.gpuName = "Test GPU"; c.metadata.vulkanApi = "1.3.0";
-    c.metadata.executionBackend = "RayTracingPipeline";
-    c.metadata.presentMode = "FIFO"; c.metadata.materialEncoding = "RGBA8 raw fallback";
-    c.metadata.legacyFrameTimingScope = "windows-render-plus-rtlab-telemetry";
-    c.metadata.internalWidth = 960u; c.metadata.internalHeight = 540u;
-    c.metadata.presentationWidth = 960u; c.metadata.presentationHeight = 540u;
-    // Deliberately private/unbounded-looking unused legacy fields MUST NOT escape.
-    c.metadata.runId = "private-account-run";
-    c.metadata.timestampUtc = "private-original-file-label";
-    c.metadata.rtMode = "private-full-diagnostic-report";
-    return c;
-}
-
-RtPerformanceEvidenceSnapshot Snapshot(const std::uint64_t serial, const RtSampleStatus gpu)
-{
-    RtPerformanceEvidenceSnapshot s;
-    s.identity.submitted.frame = {3u, 8u, serial, serial, 1000u + serial, 0u};
-    s.identity.submitted.submissionSerial = serial; s.identity.completionSerial = serial;
-    auto& p = s.scene.pipeline;
-    p.executionMode = RtExecutionMode::RayTracingPipeline;
-    p.instrumentation = RtInstrumentationMode::Shipping;
-    p.dielectricQuality = RtDielectricQuality::Mobile;
-    p.activeStrategy = RtMaterialStrategy::OpaqueFast; p.waterQuality = RtWaterQuality::Mobile;
-    Check(AssignRtFixedText(p.bundleKey, "shipping_mobile_pair"), "fixture bundle key");
-    Check(AssignRtFixedText(p.opaqueFast.key, "shipping_mobile_opaque"), "fixture opaque key");
-    Check(AssignRtFixedText(p.opaqueFast.sha256, std::string(64u, 'a')), "fixture opaque hash");
-    Check(AssignRtFixedText(p.genericDielectric.key, "shipping_mobile_generic"), "fixture generic key");
-    Check(AssignRtFixedText(p.genericDielectric.sha256, std::string(64u, 'b')), "fixture generic hash");
-    p.active = p.opaqueFast;
-    s.scene.stages.status = RtSampleStatus::Valid;
-    for (auto& stage : s.scene.stages.values) { stage.durationNanoseconds = 1000u; stage.operationCount = 1u; }
-    auto& skin = s.scene.stages.values[RtStageIndex(RtStage::Skin)];
-    skin.durationNanoseconds = 2000u; skin.operationCount = 2u;
-    s.scene.stages.values[RtStageIndex(RtStage::WholeFrameCycle)].durationNanoseconds = 10'000'000u + serial * 1000u;
-    s.scene.dispatch.sceneReady = s.scene.dispatch.rtDispatchRecorded = s.scene.dispatch.swapchainCopyRecorded = true;
-    s.dielectric.status = RtSampleStatus::CompiledOut;
-    s.gpu.status = gpu;
-    if (gpu == RtSampleStatus::Valid)
-    {
-        s.gpu.hasDuration = true; s.gpu.durationNanoseconds = 5'000'000u + serial * 2000u;
-        s.gpu.completedSubmissionSerial = serial; s.gpu.timestampValidBits = 64u;
-        s.gpu.timestampPeriodPicoseconds = 1000u; s.gpu.sampleCount = 1u;
-    }
-    s.presentation.outcome = RtPresentationOutcome::Presented;
-    s.presentation.lastSuccessfulPresentSubmissionSerial = serial;
-    s.cpuBenchmarkEligible = true;
-    s.benchmarkEligible = gpu == RtSampleStatus::Valid || gpu == RtSampleStatus::Disabled || gpu == RtSampleStatus::Unsupported;
-    return s;
-}
-
-struct CompletedOwners
-{
-    ShowcaseBenchmarkRun benchmark;
-    RtBenchmarkEvidenceRun evidence;
-    void Run(const RtSampleStatus gpu = RtSampleStatus::Valid, const bool wrongZone = false,
-        const bool leaveLastPending = false, const bool mixedUnsupported = false,
-        const BenchmarkSummaryConfiguration* uploaded = nullptr, const bool middleQualityChange = false,
-        const bool middleShadowChange = false, const bool middleMistChange = false,
-        const bool middleMistUnavailable = false)
-    {
-        benchmark.Start(2u, BenchmarkWorkload::LanternHeldHigh);
-        Check(evidence.Start(kLanternBenchmarkFramesPerLap), "allocate real bounded evidence owner");
-        bool armed = false;
-        std::uint64_t serial = 0u;
-        while (benchmark.IsRunning())
-        {
-            const auto advance = benchmark.Advance();
-            if (benchmark.CurrentLap() == 2u)
-            {
-                if (!armed) { Check(evidence.ArmMeasurement(3u, 8u), "arm measurement after warmup"); armed = true; }
-                ++serial;
-                auto s = Snapshot(serial, mixedUnsupported && serial % 2u == 0u ? RtSampleStatus::Unsupported : gpu);
-                if (uploaded)
-                {
-                    s.scene.shadowQuality = uploaded->shadowQuality;
-                    s.scene.fireQuality = uploaded->uploadedFireQuality;
-                    s.scene.actualUploadedMistEnabled = uploaded->actualUploadedMistEnabled;
-                    s.scene.actualUploadedDustQuality = uploaded->actualUploadedDustQuality;
-                    if (middleMistChange && serial == kLanternBenchmarkFramesPerLap / 2u)
-                        s.scene.actualUploadedMistEnabled = !uploaded->actualUploadedMistEnabled.value_or(true);
-                    if (middleMistUnavailable && serial == kLanternBenchmarkFramesPerLap / 2u)
-                        s.scene.actualUploadedMistEnabled.reset();
-                    if (middleQualityChange && serial == kLanternBenchmarkFramesPerLap / 2u)
-                        s.scene.fireQuality = RtFireQualityEvidence{RtFireQuality::Mobile, 4u, 1u};
-                    if (middleShadowChange && serial == kLanternBenchmarkFramesPerLap / 2u)
-                        s.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Current, 1u, 1u, 0u};
-                }
-                const auto zone = wrongZone ? ShowcaseZone::Opening : advance.replay.zone;
-                const auto index = evidence.ExpectFrame({static_cast<std::uint32_t>(zone), 2u});
-                Check(index.has_value(), "expected frame owned");
-                if (index)
-                {
-                    Check(evidence.BindSubmitted(*index, s.identity.submitted), "bind exact submitted fixture identity");
-                    if (!leaveLastPending || serial != kLanternBenchmarkFramesPerLap)
-                        Check(evidence.Complete(s), "canonical fixture completes on real ledger seam");
-                }
-            }
-            benchmark.RecordFrame(16.0 + static_cast<double>(serial % 7u), true);
-        }
-        if (!leaveLastPending)
-        {
-            Check(evidence.RecordOwnerDrainResult(true), "actual owner drain result fixture");
-            Check(evidence.Finalize(), "full ledger finalization fixture");
-        }
-    Check(benchmark.Passed(), "real deterministic benchmark course completed");
-    }
-};
-
-BenchmarkSummaryReportApproval Approval(const bool hardware = false)
-{
-    return {true, hardware, kReportUuid, "2026-10-03T12:34:56Z"};
-}
+#include "BenchmarkSummaryFixtures.inl"
 
 void TestCompletedFreezePrivacyAndPopulation()
 {
@@ -158,6 +40,18 @@ void TestCompletedFreezePrivacyAndPopulation()
     const auto prepared = PrepareBenchmarkSummaryReport(summary, Approval());
     Check(prepared.IsReady() && prepared.Json().size() <= kBenchmarkSummaryReportMaxBytes, "schema2 bounded local summary ready");
     const auto json = prepared.Json();
+    Check(!PreparePrivateDeveloperReport(prepared).IsReady(), "local benchmark approval is not private send consent");
+    const auto remote = PreparePrivateDeveloperReport(prepared, true);
+    Check(remote.IsReady() && remote.LocalJson() == json && remote.Kind() == DeveloperReportKind::Benchmark &&
+        remote.Json().find("\"publishToBoard\":false") != std::string_view::npos,
+        "typed private benchmark wrapper has no public-board authority");
+    Check(BuildDeveloperReportRequest(remote, "").empty() && BuildDeveloperReportRequest(remote, "bad\ntoken").empty() &&
+        !BuildDeveloperReportRequest(remote, "fresh-local-token").empty() &&
+        remote.Json().find("turnstileToken") == std::string_view::npos,
+        "one-time verification cannot mutate the reviewed benchmark or frozen private wrapper");
+    Check(json.find("\"benchmarkProfile\":{\"id\":\"custom\",\"classification\":\"custom-unranked\",\"ranked\":false}") != std::string_view::npos &&
+        json.find("provisional-v1") == std::string_view::npos,
+        "current live report explicitly stays custom and unranked until fixed-surface observations exist");
     Check(json.find("\"reportKind\":\"benchmark-summary\"") != std::string_view::npos &&
         json.find("\"warmupLaps\":1") != std::string_view::npos && json.find("not-collected") != std::string_view::npos &&
         json.find("\"temperatureC\":null") != std::string_view::npos && json.find("\"scanoutFpsMeasured\":false") != std::string_view::npos,
@@ -435,11 +329,165 @@ void TestOwningMistSummary()
         "historical summary absence remains absent without an inferred Mist On default");
 }
 
+void TestPublicProjectionConsentPrivacyAndEvidence()
+{
+    constexpr std::string_view publicId="33333333-3333-4333-a333-333333333333";
+    CompletedOwners owners;
+    owners.submittedDimensions=RtFrameDimensionsEvidence{960,540,960,540,0,960.0f/540,false,false};
+    owners.Run();
+    auto configuration=Configuration();
+    const auto frozen=CaptureBenchmarkSummary(owners.benchmark,owners.evidence,configuration,configuration,kRunUuid,"Reviewed model");
+    const auto local=PrepareBenchmarkSummaryReport(frozen,Approval(true));
+    const auto privateSend=PreparePrivateDeveloperReport(local,true);
+    Check(privateSend.IsReady(),"private sharing has independent approved content");
+    auto approval=PublicBenchmarkReportApproval{false,false,publicId,"2026-10-03T12:34:56Z"};
+    const auto declined=PreparePublicBenchmarkReport(frozen,approval);
+    Check(declined.Status()==BenchmarkSummaryReportStatus::ConsentRequired && declined.Json().empty() && declined.ResultId().empty(),
+        "private/local consent never authorizes public projection");
+    approval.consentToPreparePublicPreview=true;
+    const auto publicReport=PreparePublicBenchmarkReport(frozen,approval);
+    const auto json=publicReport.Json();
+    Check(!PreparePublicBenchmarkSubmission(publicReport).IsReady(), "public preview consent is not publication consent");
+    const auto publish=PreparePublicBenchmarkSubmission(publicReport,true);
+    Check(publish.IsReady() && publish.ResultId()==publicId && publish.LocalJson()==json &&
+        publish.Json()==std::string(json.substr(0,json.size()-1))+",\"consentToPublish\":true}" &&
+        publish.Json().find("consentToSubmit")==json.npos && publish.Json().find("developer-private")==json.npos,
+        "public Send freezes exactly the reviewed projection plus independent publication consent");
+    Check(BuildPublicBenchmarkRequest(publish,"").empty() && BuildPublicBenchmarkRequest(publish,"bad\ntoken").empty() &&
+        !BuildPublicBenchmarkRequest(publish,"fresh-local-token").empty() && publish.Json().find("turnstileToken")==json.npos &&
+        !PreparePublicBenchmarkSubmission(PreparedPublicBenchmarkReport{},true).IsReady(),
+        "invalid public preparation/token fails closed and token never enters frozen public bytes");
+    Check(publicReport.IsReady() && publicReport.ResultId()==publicId && json.size()<=kPublicBenchmarkReportMaxBytes,
+        "typed public preview has separate bounded immutable identity");
+    for (const auto privateValue : {kRunUuid,kReportUuid,std::string_view{"2026-10-03T12:34:56Z"},
+         std::string_view{"private-account"},std::string_view{"private-original"},std::string_view{"private-full"},
+         std::string_view{"runId"},std::string_view{"reportId"},std::string_view{"capturedAtUtc"},
+         std::string_view{"submissionSerial"},std::string_view{"sceneEpoch"},std::string_view{"turnstileToken"},
+         std::string_view{"consentToSubmit"},std::string_view{"Reviewed model"},std::string_view{"Test GPU"}})
+        Check(json.find(privateValue)==json.npos,"public projection must omit private identity, timing, raw fields and unapproved hardware");
+    Check(json.find("\"dateUtc\":\"2026-10-03\"")!=json.npos && json.find("\"model\":null")!=json.npos &&
+        json.find("community-client-reported")!=json.npos && json.find("\"deviceCompatibilityVerified\":false")!=json.npos &&
+        json.find("\"rankingEligible\":false")!=json.npos && json.find("custom-unranked")!=json.npos &&
+        json.find("\"courseRevision\":null")!=json.npos && json.find("\"packageArtifactSha256\":null")!=json.npos,
+        "public preview coarsens date and does not certify hardware, comparison buckets, profiles or artifact identity");
+    Check(json.find("\"submittedDimensions\":{\"internalExtent\":[960,540]")!=json.npos &&
+        json.find("\"dynamicResolutionEnabled\":false")!=json.npos &&
+        json.find("\"measuredFrames\":600")!=json.npos && json.find("\"gpuStatusCounts\":{\"denominator\":600,\"valid\":600")!=json.npos &&
+        json.find("\"scanoutFpsMeasured\":false")!=json.npos,
+        "public projection preserves actual submitted pixels, DRS, measured population and measurement limits");
+    approval.includeBasicHardware=true;
+    const auto withHardware=PreparePublicBenchmarkReport(frozen,approval);
+    Check(withHardware.IsReady() && withHardware.Json().find("Reviewed model")!=json.npos &&
+        withHardware.Json().find("Test GPU")!=json.npos && publicReport.Json()==json,
+        "optional reviewed hardware creates new public bytes without mutating earlier approval");
+    const auto retry=PreparePublicBenchmarkReport(frozen,approval);
+    Check(retry.Json()==withHardware.Json(),"same public approval/evidence retains exact review/retry bytes");
+    approval.declaredCooling=BenchmarkSummaryCooling::ExternalDeclared;
+    const auto cooling=PreparePublicBenchmarkReport(frozen,approval);
+    Check(cooling.IsReady() && cooling.Json().find("external-declared")!=json.npos &&
+        cooling.Json().find("\"temperatureC\":null")!=json.npos,"declared cooling remains separate from absent measured thermals");
+    approval.resultUuid=kRunUuid;
+    Check(PreparePublicBenchmarkReport(frozen,approval).Status()==BenchmarkSummaryReportStatus::InvalidIdentity,"a private measured run identity cannot be reused as a public result ID");
+    approval.resultUuid="bad";
+    Check(PreparePublicBenchmarkReport(frozen,approval).Status()==BenchmarkSummaryReportStatus::InvalidIdentity,"invalid public identity rejects");
+    approval.resultUuid=publicId;approval.capturedAtUtc="2026-02-30T00:00:00Z";
+    Check(PreparePublicBenchmarkReport(frozen,approval).Status()==BenchmarkSummaryReportStatus::InvalidTimestamp,"public coarse date requires a real validated calendar timestamp");
+    approval.capturedAtUtc="2026-10-03T12:34:56Z";
+    const auto unsafe=CaptureBenchmarkSummary(owners.benchmark,owners.evidence,configuration,configuration,kRunUuid,"person@example.com");
+    Check(PreparePublicBenchmarkReport(unsafe,approval).Status()==BenchmarkSummaryReportStatus::InvalidLabel,"hardware opt-in cannot admit private/contact labels");
+    approval.includeBasicHardware=false;
+    Check(PreparePublicBenchmarkReport(unsafe,approval).IsReady(),"omitted hardware does not leak or unnecessarily block aggregate projection");
+    Check(!PreparePublicBenchmarkReport(FrozenBenchmarkSummary{},approval).IsReady(),"incomplete benchmark cannot become a public result");
+    owners.benchmark.Start();Check(owners.evidence.Start(2u),"replace measured owners after approved public capture");
+    configuration.metadata.buildIdentity="later-build";
+    Check(publicReport.Json()==json && privateSend.LocalJson()==local.Json(),"owner reset does not mutate either separately approved destination");
+}
+
+void TestWindowsReviewAudienceOwnership()
+{
+    constexpr std::string_view publicId="33333333-3333-4333-a333-333333333333";
+    CompletedOwners owners; owners.Run();
+    const auto config=Configuration();
+    const auto frozen=CaptureBenchmarkSummary(owners.benchmark,owners.evidence,config,config,kRunUuid);
+    const auto privateReport=PrepareBenchmarkSummaryReport(frozen,Approval());
+    auto approval=PublicBenchmarkReportApproval{false,false,publicId,"2026-10-03T12:34:56Z"};
+    horde::platform::windows::WindowsBenchmarkReviewPayload review;
+    Check(!review.IsPublicPreview() && !review.IsReady() && review.Json().empty(),"Windows starts without prepared bytes or public consent");
+    Check(!review.Admit(PreparePublicBenchmarkReport(frozen,approval)),"private local consent cannot grant public admission");
+    Check(review.Admit(privateReport) && review.Json()==privateReport.Json(),"Windows private copy retains exact typed bytes");
+    const std::string savedPrivate(review.Json());
+    review.SelectPublic(true);
+    Check(review.IsPublicPreview() && !review.IsReady() && review.Json().empty(),"changing audience retires the preceding reviewed payload");
+    Check(!review.Admit(privateReport),"public review cannot borrow a ready private payload");
+    Check(!review.Admit(PreparePublicBenchmarkReport(frozen,approval)),"public review selection alone cannot prepare bytes");
+    approval.consentToPreparePublicPreview=true;
+    const auto publicReport=PreparePublicBenchmarkReport(frozen,approval);
+    Check(review.Admit(publicReport) && review.Json()==publicReport.Json(),"fresh public consent admits exact public projection");
+    Check(review.Json().find(kRunUuid)==std::string_view::npos && review.Json().find(kReportUuid)==std::string_view::npos,
+        "public review excludes private run/report identities");
+    Check(!review.Admit(publicReport) && review.Json()==publicReport.Json(),"prepared bytes cannot be replaced without an explicit new review");
+    const std::string savedPublic(review.Json());
+    review.SelectPublic(false);
+    Check(!review.IsPublicPreview() && !review.IsReady() && review.Json().empty(),"switching back does not restore earlier consent or bytes");
+    Check(!review.Admit(publicReport) && review.Admit(privateReport),"typed payload cannot cross into the other audience");
+    Check(savedPrivate==privateReport.Json() && savedPublic==publicReport.Json(),"explicit exported copies remain stable after review ownership changes");
+}
+
+void TestSubmittedDimensionsSummary()
+{
+    const RtFrameDimensionsEvidence d{960,540,960,540,0,960.0f/540,false,false};
+    const auto config = Configuration();
+    CompletedOwners uniform; uniform.submittedDimensions = d; uniform.Run();
+    const auto frozen = CaptureBenchmarkSummary(uniform.benchmark, uniform.evidence, config, config, kRunUuid);
+    const auto prepared = PrepareBenchmarkSummaryReport(frozen, Approval());
+    Check(frozen.IsReady() && frozen.Data().submittedDimensions == d && prepared.IsReady() &&
+        prepared.Json().find("\"submittedDimensions\":{\"internalExtent\":[960,540]") != std::string_view::npos &&
+        prepared.Json().find("\"dynamicResolutionEnabled\":false") != std::string_view::npos &&
+        prepared.Json().find("custom-unranked") != std::string_view::npos,
+        "aggregate report copies uniform actual completed-row dimensions without promoting the run");
+    RtExpectedFrameRecord row{};
+    Check(uniform.evidence.TryGetExpectedFrame(300, row) && row.dimensions == d,
+        "ledger retains actual dimensions with its exact completed frame identity");
+    for (unsigned drift = 1; drift <= 6; ++drift) {
+        CompletedOwners owners;
+        if (drift != 6) owners.submittedDimensions = d;
+        owners.dimensionsDrift = drift; owners.Run();
+        Check(CaptureBenchmarkSummary(owners.benchmark, owners.evidence, config, config, kRunUuid).Status() ==
+            BenchmarkSummaryStatus::MismatchedPopulation,
+            "one intermediate dimension/aspect/DRS change or unavailable observation cannot be hidden by matching endpoints");
+    }
+    auto wrongMetadata = config; wrongMetadata.metadata.internalWidth = 1280;
+    wrongMetadata.metadata.internalHeight = 720; wrongMetadata.metadata.presentationWidth = 1280;
+    wrongMetadata.metadata.presentationHeight = 720;
+    Check(CaptureBenchmarkSummary(uniform.benchmark, uniform.evidence, wrongMetadata, wrongMetadata, kRunUuid).Status() ==
+        BenchmarkSummaryStatus::MismatchedPopulation, "matching requested start/end dimensions cannot replace different actual completed pixels");
+    CompletedOwners adaptive; adaptive.submittedDimensions = d;
+    adaptive.submittedDimensions->dynamicResolutionEnabled = true; adaptive.Run();
+    const auto customAdaptive = PrepareBenchmarkSummaryReport(CaptureBenchmarkSummary(adaptive.benchmark, adaptive.evidence,
+        config, config, kRunUuid), Approval());
+    Check(customAdaptive.IsReady() && customAdaptive.Json().find("\"dynamicResolutionEnabled\":true") != std::string_view::npos &&
+        customAdaptive.Json().find("custom-unranked") != std::string_view::npos,
+        "uniform adaptive custom evidence is declared honestly, never labeled a DRS-off standard");
+    CompletedOwners historical; historical.Run();
+    const auto old = PrepareBenchmarkSummaryReport(CaptureBenchmarkSummary(historical.benchmark, historical.evidence,
+        config, config, kRunUuid), Approval());
+    Check(old.IsReady() && old.Json().find("\"submittedDimensions\":null") != std::string_view::npos,
+        "historical absence remains unavailable instead of copying requested dimensions into evidence");
+}
+
 } // namespace
+
+#ifdef _WIN32
+int RunWindowsBenchmarkSummaryInteractionTests(const char* outputDirectory);
+#endif
 
 int main(const int argc, const char* const* const argv)
 {
-    if (argc == 2 && std::string_view{argv[1]} == "--wire-fixture")
+#ifdef _WIN32
+    if (argc == 3 && std::string_view{argv[1]} == "--windows-ui")
+        return RunWindowsBenchmarkSummaryInteractionTests(argv[2]);
+#endif
+    if (argc == 2 && (std::string_view{argv[1]} == "--wire-fixture" || std::string_view{argv[1]} == "--public-wire-fixture"))
     {
         // Synthetic owner evidence through the real immutable preparation API.
         // No device, personal labels or remote consent; optional hardware stays off.
@@ -448,6 +496,12 @@ int main(const int argc, const char* const* const argv)
         const auto configuration = Configuration();
         const auto frozen = CaptureBenchmarkSummary(owners.benchmark, owners.evidence,
             configuration, configuration, kRunUuid);
+        if (std::string_view{argv[1]} == "--public-wire-fixture") {
+            const auto prepared=PreparePublicBenchmarkReport(frozen,
+                {true,false,"33333333-3333-4333-a333-333333333333","2026-10-03T00:01:02.003Z"});
+            if (!passed || !prepared.IsReady()) return 1;
+            std::cout << prepared.Json() << '\n';return 0;
+        }
         const auto prepared = PrepareBenchmarkSummaryReport(frozen,
             {true, false, kReportUuid, "2026-10-03T00:01:02.003Z"});
         if (!passed || !prepared.IsReady()) return 1;
@@ -462,6 +516,9 @@ int main(const int argc, const char* const* const argv)
     TestUploadedQualitySummary();
     TestOwningDustSummary();
     TestOwningMistSummary();
+    TestSubmittedDimensionsSummary();
+    TestPublicProjectionConsentPrivacyAndEvidence();
+    TestWindowsReviewAudienceOwnership();
     TestUnavailableHardwarePrivacyAndIdentityRetry();
     return passed ? 0 : 1;
 }

@@ -1,0 +1,45 @@
+{
+  "apk": "android/app/build/outputs/apk/debug/app-debug.apk",
+  "bytes": 206326727,
+  "sha256": "846e3f563cb4d2b9f02feac7926ef3f490e913d666c6d72b8b66c801c5db88d8",
+  "build": "Debug; build-only, not installed or phone/performance evidence",
+  "applicationId": "com.samfa12.hordelanternrt.debug",
+  "versionCode": 10,
+  "versionName": "1.6.2-debug",
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "jointRuntimeEntries": [
+    {
+      "path": "assets/models/props/runtime/attack-warning-ring-v1/asset.manifest.json",
+      "bytes": 811,
+      "compressedBytes": 474,
+      "sha256": "cb13f85e0e0e25f98aca9dbf858801df8ed3aaa248bc9adb042dfee71d2f51b9"
+    },
+    {
+      "path": "assets/models/props/runtime/attack-warning-ring-v1/attack-warning-ring-v1.runtime.glb",
+      "bytes": 2388,
+      "compressedBytes": 1040,
+      "sha256": "15befb04ac511128714249c27b09a3ba96ea0c847edfbd91e80b14ef1eb7ed85"
+    },
+    {
+      "path": "assets/models/props/runtime/healing-flask-v1/asset.manifest.json",
+      "bytes": 823,
+      "compressedBytes": 487,
+      "sha256": "1b6a6146bda80b085c4b595ec50a3d54e73d3e677e93cf592b911bbfae086dbd"
+    },
+    {
+      "path": "assets/models/props/runtime/healing-flask-v1/healing-flask-v1.runtime.glb",
+      "bytes": 11372,
+      "compressedBytes": 5022,
+      "sha256": "e7571eb7b56b78ebe0a43946e16979f66b3b0b1f9a82613912e193300358341d"
+    }
+  ],
+  "jointRuntimeUncompressedBytes": 15394,
+  "jointRuntimeCompressedEntryBytes": 7023,
+  "sourceOrBlendPayloads": [],
+  "sourceBuildContext": "Built from dirty d89189cb with the joint resource implementation subsequently committed as522a1763. This is not a clean post-commit rebuild; exact APK hash and file-entry hashes are retained."
+}

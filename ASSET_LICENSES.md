@@ -1,5 +1,91 @@
 # Asset Licenses
 
+## Original F03 road masonry clue (1.7 development)
+
+`tools/prepare-forest-road-clue.py` authors two small closed static GLBs from
+numeric geometry for this project: a kerb and a tapered waystone with three
+raised scored marks. The recipe and authorship record remain under
+`assets/source/beyond_the_tomb/forest-road-clue-v1/`; runtime consumes only the
+three-file `assets/models/world/runtime/forest-road-clue-v1/` roster. No external
+model, generation service or paid input was acquired. Applicable user/service
+rights remain unchanged; no blanket MIT, CC0 or third-party licence is assigned
+to the original geometry. Placements reuse the existing Poly Haven CC0
+MedievalWall02 material and maps, whose separate attribution remains below.
+The same terrain-fitted triangles supply ordinary RT geometry and nonwalkable
+contact in the existing consolidated world owner. No new material, texture
+layer, light, transparency, instance, save field or road interaction is added.
+Native image/grounding and physical-device acceptance remain separate.
+
+## Original tomb-floor masonry chips (1.7 development)
+
+`src/scene/TombFloorDebris.h` authors six small closed fractured-stone meshes in
+metres, placed beneath the existing broken right roof shoulder. The deterministic
+recipe is original Horde geometry, using the existing shared static PBR path and
+CC0 Poly Haven MedievalWall02 material/texture family documented below. No new
+third-party model, texture layer, generated/downloaded asset, licence change or
+paid production is involved. These are static cosmetic pieces; no kick/contact,
+collision or save state is introduced. Disabled construction omits their geometry.
+
+
+## Generic distant forest bird candidate (1.7 development)
+
+`assets/audio/filmcow/forest_distant_bird.wav` derives from the existing private
+FilmCow Recorded SFX archive's exact `distand bird.wav` (source SHA-256
+`eeec1e8ebae3af6395640fb0086cb2ebf006724efbb4859e93fb9c5b4a9de8a4`).
+FilmCow's custom royalty-free project-use terms apply, as for the existing
+showcase/equipment subsets below: personal/commercial project use is permitted;
+national-government, law-enforcement and SPLC/CAHN-designated hate-group uses
+are prohibited. This is **not CC0**; do not claim authorship or redistribute the
+private original as a standalone sound library. Official source/terms:
+https://filmcow.itch.io/filmcow-sfx . Voluntary credit: FilmCow Royalty Free Sound
+Effects Library - FilmCow.
+
+Only one mono 48 kHz PCM16 runtime derivative and its compact provenance
+manifest enter packages. `tools/prepare-forest-bird.py` reproduces the inspected
+FFmpeg 9 conversion without gain, pitch, crop, filters or looping; original
+source remains private and unchanged. Runtime SHA-256:
+`811c2a1d10a565615dd786ef4b99fda5dd0e4465aa121e36ad9158531d6902ff`.
+It is an 8.288-second **generic distant bird candidate**, not an identified
+nocturnal species or complete forest soundscape. Listening, night suitability,
+mix and exact-device acceptance remain pending. This repository-native recipe
+does not claim canonical game-dev CLI package admission.
+
+## Prepared original woodland rocks (1.7 development)
+
+The low boulder, upright crag and split shelf are the three original Horde
+masters in the supplied forest-dressing package. Their editable scene, maps,
+authoring scripts, original-authorship notice and all 59 hash-verified payloads
+remain in `assets/models/world/source/forest-understory-v1/original-package/`.
+Separate `forest-rocks-v1` runtime derivatives add authored tangents, preserving
+source triangles, UVs, normals and embedded image pixels. The runtime placements
+reuse the admitted Poly Haven Boulder01Rock PBR family; that CC0 attribution
+remains below. The original slate maps are preserved in source, rather than
+overwritten or represented as the reused material. Native render and collision
+consume the same world-baked triangles. No new model generation, lights,
+transparency, material rows or texture layers are introduced.
+
+## Original Bellwether distant shell (Horde1.7 development chapter)
+
+The source-only `assets/models/world/source/chimney-smoke-study-r1/` derivative
+opens the existing B01 flue using the same original geometry and material owners.
+Its editable Blender scene and inspection lights are authoring evidence, excluded
+from runtime packages. No third-party geometry/texture or admitted smoke effect
+is added; the v4 runtime remains unchanged. The source README and manifest retain
+exact provenance, regeneration and the rejected shader study's boundary.
+
+`assets/models/world/runtime/bellwether-shell-v4/` contains original closed Horde
+geometry authored with Blender5.2 from the reviewed connected-map footprints.
+The editable master, exact map/terrain/export hashes and reversible foundation
+adjustments are in `assets/models/world/source/bellwether-shell-v4/`.
+The owner-authorised public chapter task covers these original authored masses;
+no third-party model, new generation, light or texture is included in the GLB.
+Runtime reuses the existing MedievalWall02 and TombEarthenware material/texture
+owners. Their individual provenance below remains unchanged. The preserved v1/v2
+source iterations and v2 export stay intact outside new runtime packages.
+Revision4 adds bounded solid portal/step/tower/shutter detail to the same
+nine closed footprints; no building interior, new light or texture is admitted. This asset notice
+does not apply the code licence to third-party texture/audio/model sources.
+
 ## Generic closed dielectric fixture
 
 - `assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb`
@@ -64,6 +150,38 @@ Android runtime derivatives for the five CC0 rows are strict KTX2 arrays using A
 
 Poly Haven's asset license states that its assets are CC0 and may be used commercially without required attribution: https://polyhaven.com/license. Attribution is retained here as project provenance.
 
+## Outdoor score (1.7 sources and full main PCM)
+
+### Beneath the Same Moon — Outdoor Exploration r2 (1.7 source admission)
+
+Owner-supplied original arrangement and audio, approved for Horde outdoor music
+work and handed off through the owner's Drive folder on 2026-10-23. **Authorised
+for Horde use only**; no general redistribution licence, Core software licence
+change or release authority is inferred. Exact Drive IDs, byte hashes, original
+filenames and ZIP member hashes are recorded under
+`assets/source/beyond_the_tomb/music/beneath-the-same-moon-outdoor-r2/`.
+The two original stereo 48 kHz PCM24 FLACs, original editable source ZIP and
+verbatim JSON/PCS1 scores remain source assets, excluded from game packages.
+The source pack preserves the earlier forest-theme provenance and its pinned
+Pocket Chordsmith rendering/finishing recipes; imported scripts were not run.
+
+The main-only runtime derivative is pinned by
+`assets/audio/music/beneath-the-same-moon/asset.manifest.json`: stereo 48 kHz PCM16,
+5,120,000 frames / 106.666667 seconds, WAV SHA-256
+`14fe0a94e665cf25b4fb4aa08a45e26e18990794740b670906adfecfaf6aee15`.
+It preserves the full approved main without gain, trimming, normalization,
+sample-rate or tempo change. The quiet mix is neither loaded nor packaged;
+existing runtime dialogue ducking and user volume remain independent.
+
+The reviewed canonical native Core update
+`b77a9d0bfe3051c6e352815295164b9b80586f56` supplies explicit bounded long-PCM
+support while retaining legacy defaults; Horde vendors the exact subset with
+unchanged private/UNLICENSED notices. No A-H asset or legacy dawn cue is replaced.
+This source/runtime admission does not establish listening with Kit, phone
+performance or release acceptance. See the
+[source verification](docs/evidence/2026-10-23-outdoor-music-source/README.md) and
+[main integration checkpoint](docs/evidence/2026-10-23-outdoor-main/README.md).
+
 ## Supplied adaptive score (1.6.1 runtime assets and playback accepted)
 
 `What the Dark Keeps`, supplied in `What_the_Dark_Keeps_Horde_RT_Music_Pack.zip`
@@ -72,7 +190,7 @@ Owner-confirmed rights statement,2026-09-30: **Owner-supplied; authorised for Ho
 No general permissive redistribution licence is inferred. Editable canonical JSON/
 PCS1 under `assets/audio/music/what-the-dark-keeps/source/` remains the revisable
 source of truth and is excluded from game packages, as is the supplied preview.
-Only the hash-pinned manifest and sixteen measured stereo48kHz PCM16 body/tail
+Only the hash-pinned manifest and sixteen measured stereo 48 kHz PCM16 body/tail
 derivatives under that asset's `runtime/` enter Windows/Android packages.
 Current native-clock/loop/transition and owner listening checks are accepted;
 see the [finite current A/D delta receipt](docs/evidence/2026-10-03-music-drone/README.md).
@@ -230,3 +348,424 @@ The existing Pixabay licence/provenance applies to this integrated derivative;
 it is excluded from Windows runtime packaging. Exact-candidate repeated-loop
 listening and Android output/lifecycle acceptance remain pending. The change is
 not evidence that the former MediaPlayer issue was reproduced or diagnosed.
+
+### Original development rescue blockout (1.7 journey)
+
+The later `assets/source/development-rescue-ground-stake-v1/` is a separate
+original Blender master/GLB round-trip. It replaces the development overhead
+frame with a short buried iron stake and retains the accepted shaft, lid,
+coping and apron interfaces. The stake reuses existing Poly Haven CC0
+Rusty Metal 04 (world layer 4); exact source-map hashes are in its source
+manifest. The original rescue master and backups remain preserved. Neither
+editable source directory belongs in runtime packages. No new texture family,
+generation service or third-party geometry was acquired.
+
+`assets/source/development-rescue/` contains original shaft, coping, lid and landing geometry authored locally from `src/scene/RescueBlockoutGeometry.h` through installed Blender 5.2. No third-party geometry was acquired. Editable Blender and GLB roundtrip sources remain outside runtime packaging; the renderer consumes the verified shared geometry recipe. Existing Poly Haven CC0 DryStone (world layer 0) and MossyStone (layer 2) maps retain their original attribution and exact byte identities in the source manifest. Native import and source admission are engineering checks, not artistic/device acceptance or new redistribution rights. The temporary outdoor skeleton reuses the already-admitted runtime model and its existing licence entry; it is a render workload witness, not Kit or a new enemy roster entry. Outstanding Hotstrike/Meshy public redistribution questions remain unresolved.
+
+### Original development wooded terrain recipe (11 October 2026)
+
+`DevelopmentWorldRoute.h`, `DevelopmentWorldGeometry.h` and `RescueJourneyGeometry.h`
+retain the editable original terrain, closed banks and opaque tree silhouette
+recipes. The native world upload consumes those recipes directly. The owner-supplied
+original pine/alder pair below provides the bounded LOD1 forest dressing; the former
+silhouette recipe remains a separate diagnostic geometry path. Kit's thirteen
+exact approved WAV cuts were subsequently admitted after the owner confirmed
+public repository and game-package distribution rights; see the dedicated Kit
+audio entry below. This does not change the asset-specific licence notices or
+establish physical playback/performance acceptance.
+
+- **Original irregular pine and upright alder tree pair v1**: owner-authored editable
+  Blender sources, original 512px PBR maps, LOD0/LOD1 GLB exports, source receipts,
+  and LOD1 runtime GLBs. Supplied in `Horde-1.7-tree-pair-compact-editable.zip`; the
+  exact package SHA-256 and preserved closed source roster are in
+  `assets/models/world/source/forest-tree-pair-v1/`. The owner confirms these assets
+  are approved for game integration and public PR. The package assigns no blanket
+  public/open-source license; this entry claims no MIT, CC0, Meshy, or other
+  third-party rights. The runtime admits only `horde-irregular-pine-v1-lod1.glb`
+  (5,000 triangles) and `horde-upright-alder-v1-lod1.glb` (5,102 triangles), at
+  authored scale 1.0. Exact bytes, hashes, bounds and source links are in
+  `assets/models/world/runtime/forest-tree-pair-v1/runtime-roster.json`. Original
+  bark normal/roughness and foliage/base maps remain 512px; production array inputs
+  use exact nearest-neighbour 2x texel replication, with bark roughness packed as
+  ORM G, and original source PNGs remain unchanged. Four base-colour families append
+  at layers 14–17; mapped bark alone appends normal/ORM layer 14. The 18/15/15
+  layer-count manifest and full-mip Windows RGBA8/Android ASTC outputs record exact
+  hashes. Source masters and rights notices stay preserved; the repository license
+  does not assign a license to these assets.
+  The separate owned `forest-crown-study-r1/` source-only derivatives preserve this
+  provenance and introduce no third-party geometry/textures. They are unadmitted
+  study files, excluded from runtime selection and shipping; no broader licence
+  or production replacement is asserted.
+
+
+### 1.7 development tomb native candidates (2026-10-10)
+
+- **T02 skull/jaw, femur and humerus**: recovered from the public immutable source archive at `93bdbd54016de6c4c7381a29b909d4049e4bf528`, `assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1`. Gord Goodwin's Simple Rigged Skeleton is **CC0-1.0**; retained source credit, licence notice, source-page check and checksum rosters accompany the recovered kit. Three selected GLBs have a runtime-only UV0 addition for the native importer; positions, topology, authored normals and source masters remain unchanged. The exact recipe and source/runtime hashes are in `models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/derivation-receipt.json`. Coarse alternatives remain source candidates, not runtime LOD admission. This is static burial dressing, not reuse of the animated enemy mesh.
+- **T03 seven funerary props**: recovered original project Blender kit at immutable planning pin `d37f16381311c6e620f0c4a9d01c1cce83260dc8`, `assets/source/beyond_the_tomb/funerary/t03-v01`. Seven selected runtime GLBs are byte-exact copies (5,460 source triangles) with no imported texture bytes. Editable Blender files, recipes, authored-source provenance and source checksum rosters are retained separately. Original project geometry introduces no third-party model licence; no exclusive copyright or legal warranty is claimed. Exact-copy runtime receipt: `models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json`.
+- **Two original recessed niche modules**: deterministic headless Blender geometry authored specifically for Horde, using the already admitted masonry binding. Editable sources and derivation receipts remain outside runtime packages. They add no third-party texture/model bytes. Earlier unselected replacement skull/bone/funerary experiments are not admitted or packaged.
+- **Wet contact cues**: four short Windows and Android PCM step variants use the owner-supplied “Footsteps Water 01” by aglinder. The provided MP3 is distributed on [Pixabay](https://pixabay.com/sound-effects/footsteps-water-01-73731/) under the **Pixabay Content License**; the identified [original Freesound recording](https://freesound.org/people/aglinder/sounds/265582/) states **CC0 1.0**. The supplied MP3 hash is `70f548d544985d6fa7e14463684d3792c51d87da5a987b631d51f3e589f401a9`; it stays outside the repository and packages. Four separated transient onsets are used for fixed 0.38-second cuts, fades, measured level matching and dual-mono Android conversion. The game-ready cues are combined runtime media, not standalone audio distribution. Pixabay terms permit commercial and non-commercial use and adaptation subject to prohibited uses, including standalone distribution; attribution is voluntary. `assets/audio/pixabay/water-contact.manifest.json` records source identity, cut/fade/gain/channel recipe, measured levels and runtime hashes. Owner listening approval for the revised mix remains pending.
+
+- **Keeper death scream**: the owner-supplied “Monster Demon Voice - Death / Defeat Scream” by PhatPhrogStudio, [Pixabay item 582531](https://pixabay.com/sound-effects/film-special-effects-monster-demon-voice-death-defeat-scream-582531/), published 17 August 2026, is used under the [Pixabay Content License terms](https://pixabay.com/service/terms/), checked 10 October 2026. Adapted commercial/non-commercial game use is permitted; standalone redistribution is prohibited. This audio is not MIT-licensed. The original MP3 remains outside the public repository. Only the game-integrated mono/dual-mono PCM derivatives and provenance/processing manifest are included. Full source/runtime hashes, endpoint fades and measured levels are in `assets/audio/pixabay/keeper-death.manifest.json`; `tools/prepare-keeper-death-audio.py` reproduces them from an independently supplied source. Voluntary credit: PhatPhrogStudio via Pixabay. Exact-candidate owner listening and Android device acceptance remain pending.
+
+The repository code licence does not override these individual asset terms. Native import and exact package hashes do not establish artistic, RT presentation or sustained-performance acceptance. Library locators identify the recovered prepared packages; they do not by themselves admit runtime use. The later-outdoor Meshy stump is excluded from this tomb slice. No private Briarhold assets or Kit recordings are transferred.
+
+### Approved Kit English runtime cuts (11 October 2026)
+
+The owner explicitly confirmed: **“I confirm public game/repository distribution
+rights”** for the thirteen previously approved Mureka Kit cuts. This supersedes
+the pending audio-rights disposition at chapter checkpoint `24eb2587`; it does
+not change the separate visual-actor or unrelated asset rights. The evidence
+class is owner-confirmed permission, not a newly obtained provider legal opinion.
+
+Only the thirteen clean game-integrated PCM cuts are admitted under
+`assets/audio/kit/runtime/`, with a closed source/runtime hash roster and measured
+clip duration in `asset.manifest.json`. `tools/prepare-kit-audio.py` verifies the
+private approved-cut package and copies byte-exact mono PCM16 24 kHz cuts without
+normalization, resampling or additional mask/grate treatment. The master audio,
+provider manifest/account details and prototype archives remain private and
+unchanged. Runtime redistribution is covered by the owner's confirmed grant;
+these audio files are not blanket MIT-licensed by the repository code licence.
+No new generation, acquisition or spending occurred. Exact-candidate positional
+listening, Voice/SFX balance and Android playback/lifecycle acceptance remain
+pending. The visible Kit model remains unadmitted.
+
+
+### Kit visual source intake (11 October 2026)
+
+The owner expressly confirmed that public Horde repository and game-package
+redistribution of the exact Meshy Warden model is covered. The copied source
+`assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb` has SHA-256
+`47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e`.
+This records the owner's entitlement confirmation, not an independent account
+inspection or an MIT/CC0 claim. Credit: Warden/Kit source created with Meshy;
+source supplied by Samfa12. The original private-project file is unchanged.
+Native clip/skin intake is separate from runtime admission: no visible Kit,
+Kit renderer/resource handoff is shipped by this intake. The intended non-overlapping Keeper/Kit lifecycle may reuse the dedicated character slot; that is a subsequent admission task.
+
+### Kit same-rig step-turn authoring proof (23 October 2026)
+
+The separate `assets/models/characters/source/kit-step-turn-proof-v1/` source-only
+study contains offline-authored joint animation on the same owner-approved Warden
+rig. Original geometry, weights and imported bind transforms are retained; motion
+authoring is by Samfa12/Codex using Blender. The source above and its entitlement
+remain the provenance; no new provider generation or blanket MIT/CC0 claim.
+This editable turn study and its studio previews are unadmitted and excluded from
+runtime packages. See `docs/evidence/2026-10-23-kit-step-turn-proof/README.md`.
+
+### Kit same-rig turn runtime promotion (24 October 2026)
+
+`assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb`
+is a byte-identical promotion of the owned native export
+`assets/models/characters/source/kit-step-turn-proof-v1/native/kit-turn-proof.glb`:
+2,272,652 bytes, SHA-256
+`a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11`.
+It retains the original seven animations, mesh, materials, skin/bind hierarchy,
+accessors and original binary payload, appending only the two offline-authored
+joint-only turn takes. The shared runtime applies the exported yaw separately
+and controls playback timing; no root yaw is embedded in those joint clips.
+
+The existing owner-confirmed Meshy Warden entitlement and Samfa12/Codex motion
+authoring provenance above apply. No new provider generation, texture processing,
+rig replacement or blanket MIT/CC0 claim occurs. Original source and
+`kit-warden-lod0.runtime.glb` remain unchanged in the repository. Development
+packages select the promoted derivative once, reusing the same manifest and
+platform texture arrays; they exclude the original duplicate, editable study,
+previews, root-motion/reference data and promotion receipt. The exact-copy and
+append-only checks are recorded in
+`assets/models/characters/runtime/kit-warden-v1/turn-runtime-promotion.json`.
+This records provenance and package selection, not a public release, physical
+phone or full campaign acceptance.
+
+### Chapter terrain and shortened entry source candidates (11 October 2026)
+
+`assets/models/world/source/chapter-entry-return-r03/` preserves original Horde architectural authoring derived from the accepted collapse, reusing the existing Poly Haven Boulder01 rock and Boulder01/MedievalWall02 CC0 maps. `assets/models/world/source/chapter-terrain-r18/` is original Horde Blender authoring from the owner-supplied r2 heightfield, with admitted Poly Haven damp_sand/mossy_stone_wall CC0 materials. Individual texture/source hashes and derivation recipes remain with each candidate. The recovered original planning NPZ is under `assets/source/beyond_the_tomb/terrain/topo-r2/`. These sources and candidate GLBs are outside runtime package paths; native import and source validation do not grant final runtime/visual/performance acceptance. No blanket third-party licence change or new generation occurred.
+
+The separate development runtime `assets/models/world/runtime/chapter-entry-return-v1/` now consumes the byte-identical compact r03 candidate, with a runtime manifest retaining the original per-asset ceilings and both existing atlas families. Legacy collapsed-entry files and all editable sources remain unchanged. See the [native admission and capture receipt](docs/evidence/2026-10-11-chapter-entry-runtime/README.md); terrain r18 remains a source candidate.
+
+
+## Chapter forest-floor material (11 October 2026)
+
+Forest Ground 01 by Rob Tuytel, [Poly Haven original](https://polyhaven.com/a/forrest_ground_01), is CC0 1.0 under the [asset licence](https://polyhaven.com/license). The owner authorized this source on 11 October. Original 1K PNG diffuse, OpenGL normal and packed AO/roughness/metal maps are preserved under `assets/textures/polyhaven/source/forrest_ground_01-1k-v1/`; provenance.json records provider URLs, sizes, MD5 and local SHA-256. All three provider digests were verified. These are material maps, not scene lighting or baked world shadows.
+
+`chapter-terrain-r19` replaces the unsuitable broad mossy-masonry bank material with this forest-ground family at the published 2 m texture width. Existing damp sand remains on the trail. `tools/build-chapter-terrain-textures.ps1` records the two-layer runtime derivation in `assets/textures/props/source/chapter-terrain-maps-r03/receipt.json`: Windows 1K RGBA8 and Android strict ASTC6x6 base/ORM, ASTC4x4 normal, eleven mips. The original prop arrays are not re-encoded. Previous terrain and texture candidates remain preserved. Runtime distribution includes only the two-layer platform arrays and admitted GLB/manifest, not editable sources.
+
+`chapter-terrain-r21` extends the original Horde landform using the owner-designated connected-region atlas and local topo at planning commit `d37f16381311c6e620f0c4a9d01c1cce83260dc8`. Its source receipt identifies both authoring scripts and the exact recovered layout/grid. The regional mesh reuses the same admitted damp-sand and Forest Ground 01 material images and platform arrays unchanged; no additional texture, external model or licence is introduced. The editable master stays outside runtime packages. Beyond the reviewed macro rectangle, coarse surrounding relief is labelled provisional continuation, not additional approved map content.
+
+`chapter-terrain-material-r01` records a named linear base-colour-factor
+adjustment for Forest Ground only. Its receipt preserves the exact r21 model
+and original six texture-array hashes; no new provider content or licence is
+introduced. The original manifest and reproduction recipe stay in source, and
+only the admitted material sidecar accompanies runtime assets.
+
+`chapter-terrain-r22` subdivides only the original Horde regional mesh's coarse
+water-intersecting outer triangles and necessary shared edges. Added vertices
+sample the unchanged owner-designated heightfield; the exact core, route,
+openings, bounds, two embedded material/image payloads and existing platform
+arrays are preserved. No external asset or new licence is introduced. Its
+compact source receipt pins the recipes and local reproducible master/export;
+the admitted runtime GLB is SHA-256
+`12c0c577a67c5fc8e88fe0528a9eaa5b2ec950ba409bbffe969560b7c54ee060`.
+The existing runtime manifest and Forest Ground material factor remain exact.
+
+`chapter-terrain-r23` adds bounded bank-crest sampling to r22 without changing
+the owner atlas, original vertices, grid, route/core or admitted material images.
+Its documented authoring exception raises only 42 deficient NEW crest samples
+using the original continuous carve profile: 40 capped at 0.50 m and two exact
+outflow endcaps capped at 1.25 m. Dry samples are never lowered. No external asset
+or licence is introduced. The runtime GLB is SHA-256
+`c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774`;
+the compact source receipts pin all changes and preserve rejected trials.
+
+### Kit preserved runtime derivative (11 October 2026)
+
+`assets/models/characters/runtime/kit-warden-v1/` is a prepared derivative of the
+exact Kit source covered by the owner confirmation above. All non-image GLB
+buffer views are byte-preserved; routing thumbnails replace embedded image
+payloads, and the reproducible map extraction/compilation keeps the source
+masters untouched. Credit: Warden/Kit source created with Meshy; runtime
+processing by Samfa12/Codex. The same asset-specific Meshy entitlement applies,
+not a blanket MIT/CC0 licence. The development chapter packages the runtime
+derivative and exact native maps under `assets/textures/characters/runtime/kit-warden-v1/`.
+Editable masters remain separate; see the runtime README and processing receipt.
+
+### Original Horde grave markers (1.7 development)
+
+`assets/models/world/source/grave-markers-r03` contains a new original Blender master and derivation hashes for two plain closed stone markers, authored with `tools/author-grave-markers.py`. Runtime GLBs in `assets/models/world/runtime/grave-markers-r03` contain no third-party asset or embedded texture. Rendering reuses the admitted CC0 MedievalWall02 family; its separate licence remains unchanged. The graveyard also reuses existing T03 covers, bowls, urn and cold candle source/runtime identities and original provenance. Editable sources and failed r01 intake evidence remain outside packages; no flames, lights, loot or new texture layers are admitted.
+
+### Original rescue grave-lid relief (12 October 2026)
+
+`assets/source/development-rescue-lid-finish-v1` preserves the original editable
+Blender master and native GLB round trip of `src/scene/RescueLidFinish.h`, authored
+with `tools/author-rescue-lid-finish.py`. No external input or provider output is
+included. Runtime consumes the same closed stone recipe through the shared
+world-surface material transport, without packaging the editable source/GLB or
+adding a texture, material row or light. Existing stone texture notices remain
+separate; this original geometry does not change their licensing.
+
+### Original supplied forest understory (1.7 development)
+
+`assets/models/world/source/forest-understory-v1/original-package` preserves all
+59 manifest payloads of the supplied original Horde forest-dressing kit,
+including its seven masters, editable Blender scene, maps, scripts and
+`ORIGINAL-AUTHORSHIP.txt`. The two runtime fern GLBs are byte-identical originals
+with Horde runtime filenames. Geometry and foliage are project-owned original
+work; no third-party model/map is included and no new CC0/MIT declaration is
+made. The current owner task authorizes public Horde reuse. Fern albedo matches
+the supplied tree-pair map exactly and reuses the admitted ForestAlder family.
+Rocks/log/root candidates remain source-only pending separate native derivative,
+material, collision and cost checks. No new texture or transparency is admitted.
+
+### Prepared woodland deadwood (12 October2026)
+
+Four separately hashed native tangent derivatives are admitted under
+`assets/models/world/runtime/forest-deadwood-v1`: original supplied fallen log
+and roots, the owner-created paid-plan Meshy stump (public Horde redistribution
+confirmed), and Quaternius CC0 DeadTree_1's prepared coarse LOD2 snag. Original
+stump/snag archives, notices, maps and editable sources are byte-preserved at
+`assets/models/world/source/forest-deadwood-v1`; log/root masters remain in the
+original forest-dressing package. Its rights/custody/derivative receipts identify
+each source separately; no blanket MIT/CC0 claim applies to the Meshy stump or
+original Horde assets. The compact stump is a repaired low-poly editable source,
+not the separately archived high-poly Meshy master.
+
+The reversible runtime material default shares the existing opaque dielectric
+ForestBark family, including cut wood, without allocating another texture layer.
+Original painted bark/end-grain/stump maps remain preserved. No new generation,
+decimation, transparency, light or shader feature is added. Exact world triangles
+supply nonwalkable contact; the open snag is not claimed as a closed volume.
+Phone performance and final owner art acceptance remain separate gates.
+
+### Original low trail root (18 October 2026)
+
+`src/scene/ForestDeadwood.cpp` authors one new tapered twenty-triangle trail root
+directly from numeric rings. This is original project geometry created for Horde,
+not a derivative/copy of the supplied 548-triangle root tangle, imported art or
+paid generation. It reuses the already admitted ForestBark material/maps and
+existing static native RT owner; it adds no texture, external file or licence.
+The exact final world-space RT triangles also form its explicit STEP contacts.
+The ten original off-trail deadwood placements remain nonwalkable and retain
+their individual provenance above. Physical performance and final visual
+acceptance of the new root remain separate gates.
+
+### Free nature recordings for the same-night exterior (18 October 2026)
+
+`assets/audio/night-ambience/manifest.json` pins original SHA-256 values and
+every prepared PCM derivative. `NOTICE.md` carries credits/source/licence links
+and processing disclosures into the Android package. The originals are preserved
+in ignored local staging, not redistributed as large game payloads. Prepared
+derivatives are mono 24kHz PCM16 with bounded excerpts, fixed attenuation and
+150ms fades; exact crop/gain/hash/levels are in the manifest and reproduced by
+`tools/prepare-night-ambience.py`. No loop, pitch or noise filter is added.
+Source species/time descriptions are metadata, not independent listening
+acceptance. All four cuts remain unheard here; final native mix is pending.
+
+| Prepared recording | Credit and licence | Disposition |
+| --- | --- | --- |
+| `runtime/tawny_owl.wav` | W.carter, [Tawny owl calling at night in Tuntorp, Brastad, Sweden](https://commons.wikimedia.org/wiki/File:Tawny_owl_calling_at_night_in_Tuntorp,_Brastad,_Sweden.ogg), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Original already contains cuts from two locations and background-noise reduction; these prior changes are retained in the manifest. | Eight-second finite candidate in the shared forest cue, superseding the generic FilmCow bird mapping. Author identifies Strix aluco and night recording; no independent species or listening claim. |
+| `runtime/evening_cricket.wav` | Gunther Tschuch, [Oecanthus pellucens song 23C](https://commons.wikimedia.org/wiki/File:Oecanthus_pellucens_song_23C.wav), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). **The adapted audio remains CC BY-SA 4.0**, with attribution, source/licence links and disclosed changes; no endorsement is implied. | Eight-second finite candidate in alternating quiet gaps. Author records male Italian tree cricket at 21:04; darkness is not independently established. |
+| `runtime/pond_frogs_crickets.wav` | Glaneur de sons, [Nature sounds ambience in a Dordogne pond](https://commons.wikimedia.org/wiki/File:Nature_sounds_ambience_in_a_Dordogne_pond.ogg), [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), as recorded by Commons and its 2014 licence review. | Eight-second finite mixed dusk pond candidate admitted byte-exact from preparation, only within 18 m of actual shared regional water faces in the ready same-night grounded exterior. Tomb runoff and guessed forest ponds do not admit it. Source species are unspecified; recording remains unheard and native mix/listening acceptance is pending. |
+| `candidates/periodical_cicada.wav` | Kathryn M. Fontaine, John R. Cooley and Chris Simon, [Calling song of Magicicada septendecim / Audio S1](https://commons.wikimedia.org/wiki/File:Calling_song_of_Magicicada_septendecim_-_pone.0000892.s001.oga), PLOS ONE 2007, doi:10.1371/journal.pone.0000892; [CC BY 2.5](https://creativecommons.org/licenses/by/2.5/). | Prepared 5.8-second candidate, **excluded from runtime packages/playback**. North American species with no night metadata; it is not admitted as nocturnal European ambience. |
+
+The earlier FilmCow candidate and its provenance remain preserved, but Android
+no longer packages its unused WAV. No blanket CC0 or software-licence claim
+applies to these separately attributed recordings. No paid generation was used.
+
+## 1.7 finite local tomb and rope cues
+
+`assets/audio/chapter-local-ambience/` admits two small game-integrated FilmCow
+derivatives from the existing private Possum Cafe archive: the full `rope tighten
+1.wav` (0.991667 s) and a one-second activity window from `ambience - dripping
+water 1.wav` at source frames [5,083,200, 5,131,200). Jason Steele / FilmCow's
+custom royalty-free project-use licence applies, **not CC0**; the existing
+[licence record](docs/licenses/README.md) and owner-supplied
+[PDF](docs/licenses/filmcow-sfx-license.pdf) retain its personal/commercial media
+permission and authorship/resale/government/law-enforcement/hate-group restrictions.
+Voluntary credit: FilmCow Royalty Free Sound Effects Library — FilmCow.
+
+The manifest pins original and runtime hashes, source crop, PCM format and
+licence-PDF identity. `tools/prepare-chapter-local-ambience.py` reads the original
+mono 48 kHz PCM24 files without modification, converts to PCM16 and applies only
+10/80 ms edge fades. The two runtime WAVs total 191,288 bytes. Originals stay
+private and are excluded from packages. Purpose labels and PCM activity support
+these bounded candidates; actual listening, character and mix remain unverified.
+No generic rock handling is admitted as structural creaking, and no continuous
+drip bed, live-collapse sound or paid generation is added.
+
+## 1.7 finite forest foliage cue
+
+`assets/audio/forest-foliage/` admits one bounded game-integrated derivative of
+Jason Steele / FilmCow's `leaves rustle 1.wav` from the existing private archive.
+The same custom royalty-free project-use licence and restrictions above apply;
+this is **not CC0**. The original remains private. Voluntary credit: FilmCow
+Royalty Free Sound Effects Library - FilmCow.
+
+The full 43,283-frame mono 48 kHz PCM24 source is converted deterministically to
+PCM16 with 10/80 ms edge fades, preserving duration and source level. Only
+`runtime/leaf_rustle.wav` (86,610 bytes, 0.901729 s) and its hash/provenance manifest
+ship. `tools/prepare-forest-foliage.py --verify` reproduces both without writing.
+This is a labelled leaf-rustle candidate, not a certified natural wind recording;
+actual listening, character and in-game level remain unverified. No continuous
+wind bed, synthesis, provider generation or new audio layer is supplied.
+
+## Compact torch carry r1 - source-only rejected study, 24 October 2026
+
+`assets/models/player/source/compact-torch-carry-study-r1/` contains original
+pose-intent coordinates, an editable Blender reference and its construction
+recipe. It derives from the existing Gothic traveller/viewmodel and original
+assistant-authored player Rag torch recorded above; their provenance, CC BY
+attribution obligations where applicable, and user/service rights remain
+unchanged. No additional third-party or paid input and no blanket licence is
+assigned. The native-solved reference meshes do not replace those originals.
+
+This endpoint study is rejected, source-only and excluded from every runtime
+manifest/package. It supplies no admitted GLB or skeletal clip. Exact hashes and
+failed native evidence are in
+`docs/evidence/2026-10-24-compact-carry-study/receipt.json`.
+
+
+## Private unshipped Keeper revival audition (2026-10-25)
+
+"Short Monster Scream" by djani00 (Freesound), distributed by freesound_community
+on [Pixabay](https://pixabay.com/sound-effects/horror-short-monster-scream-105026/),
+was supplied privately by the owner. It is retained under the
+[Pixabay Content License](https://pixabay.com/service/terms/), not relabelled CC0.
+The owner MP3 SHA-256 is
+`31509a2a1b39b488603f17f3ab92c3c1000e8cdf49733c7a337d7d482f84ae5f`.
+A private full-duration mono 48 kHz PCM16 draft is 175,104 frames / 3.648 seconds,
+350,252 file bytes (350,208 PCM bytes), SHA-256
+`1e1891010f4c89e6f20ec5fba90191aa0f0999c0bd95a4df3fe36659beb9e521`.
+Its conversion is an equal L/2+R/2 downmix, without amplification, trimming,
+pitch or timing change. Conversion alone does not grant standalone redistribution.
+
+Neither source nor draft is in public assets, runtime manifests, or packages.
+Only an explicit Debug local-file audition can load the exact pinned draft from
+`debug_audio/lich_revival.wav` within the isolated Windows application directory
+or Android app-private files directory. Missing or changed files are diagnosed;
+no other clip is substituted. Normal and Release behavior remains unchanged.
+Actual listening, mix, encounter admission and any game-distribution decision are
+still pending. Current terms (checked 2026-10-25) distinguish an integrated new
+creative work from standalone content distribution; this note does not admit the
+standalone audio to the public repository.
+
+## Healing flask r1 - original source-only study, 26 October 2026
+
+`assets/models/props/source/healing-flask-study-r1/` contains original
+project-authored profile geometry, uniform opaque PBR factors, an exact `Grip`
+marker, deterministic source GLB, editable Blender source and authoring recipe.
+No third-party mesh/image/texture, paid generation or provider input is used.
+Applicable user/service rights remain unchanged; no blanket MIT, CC0, Meshy or
+other third-party licence is assigned.
+
+The GLB SHA256 is
+`ba93fd1a0242fb806c8be3972a1db1371e1aee3cd7ee4e22be447dbb7d8e95dd`.
+This is an unadmitted source study, not a runtime import or a completed healing
+feature. Blender studio lights/floor are preview-only and absent from the GLB.
+Source files and previews are excluded from runtime manifests/packages. Static
+validation and authoring previews are recorded in
+`docs/evidence/2026-10-26-flask-source-study/README.md`; native hand/RT admission
+and the pending joint resource decision remain open.
+
+## Flask use/neck fit - source-only derivative, 26 October 2026
+
+`assets/models/player/source/flask-use-study-r1/` is an editable source animation
+study using the existing Gothic Traveller body/viewmodel, original admitted
+sword and project-authored flask. Existing player/gauntlet/sword provenance,
+attribution and user/service rights remain unchanged. No new provider, paid
+generation or third-party input is used, and no blanket MIT/CC0 is assigned.
+
+`assets/models/props/source/healing-flask-neck-fit-r2/` derives from the original
+r1 flask above. It lengthens the neck for the unchanged gauntlet while retaining
+the body/Grip positions, radii, material and primitive/triangle/vertex counts.
+GLB SHA256 is `4a4337e81d98065c050ab896b8b0b61563feeedac55806665d2727ad14555cfa`.
+The r1 source is preserved. Its editable derivative is in the separate study
+Blend; no modelled asset or clip is admitted to runtime/package inventories.
+
+`assets/models/player/source/flask-use-tick-aligned-r2/` is a separate timing
+derivative of that same owned source scene. It advances only the complete-use
+flask return/restore edge to53/60seconds, retaining original meshes, binds,
+materials, rights and cancellation action. The original r1 source remains.
+This source-only study is not a runtime/package asset or new third-party input.
+
+Silent source previews and compact provenance/validation receipts are retained
+in `docs/evidence/2026-10-26-flask-motion-study/`. They contain project assets in
+an authoring scene, not captured game footage, RT/performance evidence or an
+approved public demonstration. All native/physical and resource gates remain.
+
+## Joint warning/flask runtime candidates - 26 October 2026
+
+`assets/models/props/runtime/attack-warning-ring-v1/` is original project-authored
+annulus geometry and scalar emissive PBR material. Its deterministic recipe and
+source GLB are under `assets/models/props/source/attack-warning-ring-v1/`.
+`assets/models/props/runtime/healing-flask-v1/` derives from the original owned
+neck-fit r2 flask above, adding only required UV0 data; original geometry, material
+and exact Grip are preserved. The untouched source remains under
+`assets/models/props/source/healing-flask-neck-fit-r2/`; the new runtime recipe
+and preservation receipt are under `assets/models/props/source/healing-flask-v1/`.
+
+No third-party mesh, texture, audio, paid generation or provider input is used.
+Applicable user/service rights remain unchanged; no blanket MIT/CC0 is assigned.
+Runtime hashes are respectively
+`15befb04ac511128714249c27b09a3ba96ea0c847edfbd91e80b14ef1eb7ed85` and
+`e7571eb7b56b78ebe0a43946e16979f66b3b0b1f9a82613912e193300358341d`.
+The two explicitly selected runtime GLBs/manifests may enter development packages
+for the approved joint resource test. Source folders, recipes and validation
+receipts are not runtime package inputs. These assets and their gameplay
+presentation remain unadmitted for normal play or release until native visual,
+lifecycle and gameplay gates pass. Resource approval is not visual acceptance.
+
+## Flask native binding source candidate - 26 October 2026
+
+`assets/models/player/source/flask-native-binding-r1/` is a separate derivative
+of the owned tick-aligned source study and existing Gothic Traveller body above.
+It preserves original geometry, binds, scales and Idle/Walking, appending only
+the project-authored FlaskUse/FlaskCancel tracks. The editable Blend corrects
+right-arm quaternion interpolation while preserving authored keys. Existing
+player/gauntlet/sword attribution and user/service rights remain unchanged; no
+new third-party, provider or paid input is used and no blanket MIT/CC0 is assigned.
+
+Candidate GLB SHA256 is
+`56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014`.
+This source-folder candidate is excluded from Android/runtime packages and is
+not normal-play or release admission. Its explicit native CPU binding, exact
+receipt and remaining cancellation/RT gates are recorded in
+`docs/evidence/2026-10-26-flask-native-binding/README.md`.

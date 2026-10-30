@@ -1,0 +1,1635 @@
+{
+  "schemaVersion": 1,
+  "description": "Sanitized exact-head terminal job timings and completed CTest roster; no environment, credentials, build output or device evidence.",
+  "workflow": {
+    "conclusion": "success",
+    "created_at": "2026-10-23T10:27:04Z",
+    "event": "push",
+    "head_sha": "e5868b9a17be495c85901f877454299f23be62eb",
+    "html_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39939186296",
+    "id": 39939186296,
+    "name": "Shared simulation host tests",
+    "run_attempt": 1,
+    "run_started_at": "2026-10-23T10:27:04Z",
+    "status": "completed",
+    "updated_at": "2026-10-23T10:41:00Z"
+  },
+  "observedAtUtc": "2026-10-23T10:41:08.976112Z",
+  "jobs": [
+    {
+      "id": 120366123962,
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:27:07Z",
+      "completedAtUtc": "2026-10-23T10:31:34Z",
+      "totalSeconds": 267.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39939186296/job/120366123962"
+    },
+    {
+      "id": 120366124392,
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:27:07Z",
+      "completedAtUtc": "2026-10-23T10:34:25Z",
+      "totalSeconds": 438.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39939186296/job/120366124392"
+    },
+    {
+      "id": 120366124393,
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:27:08Z",
+      "completedAtUtc": "2026-10-23T10:36:52Z",
+      "totalSeconds": 584.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39939186296/job/120366124393"
+    },
+    {
+      "id": 120366124510,
+      "name": "player-vulkan-host",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:27:08Z",
+      "completedAtUtc": "2026-10-23T10:34:53Z",
+      "totalSeconds": 465.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39939186296/job/120366124510"
+    },
+    {
+      "id": 120366124599,
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:27:08Z",
+      "completedAtUtc": "2026-10-23T10:36:36Z",
+      "totalSeconds": 568.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39939186296/job/120366124599"
+    },
+    {
+      "id": 120366124787,
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:27:08Z",
+      "completedAtUtc": "2026-10-23T10:40:59Z",
+      "totalSeconds": 831.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39939186296/job/120366124787"
+    }
+  ],
+  "msvc": {
+    "jobId": 120366124787,
+    "timeoutMinutes": 15,
+    "totalSeconds": 831,
+    "remainingToCapSeconds": 69,
+    "buildStepSeconds": 541,
+    "selectionStepSeconds": 152,
+    "ctestRealSeconds": 146.87,
+    "selectedCount": 149,
+    "passedCount": 149,
+    "portableExcludedCount": 21,
+    "unchangedToolExcludedCount": 15,
+    "registeredCountInferredFromVerifiedPartition": 185,
+    "providerObjectWrapperCount": 4,
+    "providerObjectWrapperSeconds": 86.24,
+    "apkResolverCasesPassed": 10,
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T10:27:08Z",
+        "completedAtUtc": "2026-10-23T10:27:09Z",
+        "seconds": 1.0
+      },
+      {
+        "name": "Check out source",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T10:27:09Z",
+        "completedAtUtc": "2026-10-23T10:27:29Z",
+        "seconds": 20.0
+      },
+      {
+        "name": "Fetch portable-test GLB and music PCM assets",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T10:27:29Z",
+        "completedAtUtc": "2026-10-23T10:27:42Z",
+        "seconds": 13.0
+      },
+      {
+        "name": "Restore pinned Windows report-verification SDK",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T10:27:42Z",
+        "completedAtUtc": "2026-10-23T10:27:44Z",
+        "seconds": 2.0
+      },
+      {
+        "name": "Configure non-hardware host tests",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T10:27:44Z",
+        "completedAtUtc": "2026-10-23T10:29:22Z",
+        "seconds": 98.0
+      },
+      {
+        "name": "Build shared gameplay tests",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T10:29:22Z",
+        "completedAtUtc": "2026-10-23T10:38:23Z",
+        "seconds": 541.0
+      },
+      {
+        "name": "Run shared gameplay tests",
+        "conclusion": "skipped",
+        "startedAtUtc": "2026-10-23T10:38:23Z",
+        "completedAtUtc": "2026-10-23T10:38:23Z",
+        "seconds": 0.0
+      },
+      {
+        "name": "Run complete Windows native and platform selection",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T10:38:23Z",
+        "completedAtUtc": "2026-10-23T10:40:55Z",
+        "seconds": 152.0
+      },
+      {
+        "name": "Retain native report edit timing trace",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T10:40:55Z",
+        "completedAtUtc": "2026-10-23T10:40:55Z",
+        "seconds": 0.0
+      },
+      {
+        "name": "Check offline gauntlet chirality and UV winding",
+        "conclusion": "skipped",
+        "startedAtUtc": "2026-10-23T10:40:55Z",
+        "completedAtUtc": "2026-10-23T10:40:55Z",
+        "seconds": 0.0
+      },
+      {
+        "name": "Check exact player cloth seam weight transfers",
+        "conclusion": "skipped",
+        "startedAtUtc": "2026-10-23T10:40:55Z",
+        "completedAtUtc": "2026-10-23T10:40:55Z",
+        "seconds": 0.0
+      },
+      {
+        "name": "Check upper torso partition preserves the head mask",
+        "conclusion": "skipped",
+        "startedAtUtc": "2026-10-23T10:40:55Z",
+        "completedAtUtc": "2026-10-23T10:40:55Z",
+        "seconds": 0.0
+      },
+      {
+        "name": "Check bounded segmented cloth seam plans",
+        "conclusion": "skipped",
+        "startedAtUtc": "2026-10-23T10:40:55Z",
+        "completedAtUtc": "2026-10-23T10:40:55Z",
+        "seconds": 0.0
+      },
+      {
+        "name": "Check Gradle APK artifact resolution",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T10:40:55Z",
+        "completedAtUtc": "2026-10-23T10:40:56Z",
+        "seconds": 1.0
+      },
+      {
+        "name": "Check Android combat capture expectations",
+        "conclusion": "skipped",
+        "startedAtUtc": "2026-10-23T10:40:56Z",
+        "completedAtUtc": "2026-10-23T10:40:56Z",
+        "seconds": 0.0
+      },
+      {
+        "name": "Post Check out source",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T10:40:56Z",
+        "completedAtUtc": "2026-10-23T10:40:58Z",
+        "seconds": 2.0
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T10:40:58Z",
+        "completedAtUtc": "2026-10-23T10:40:58Z",
+        "seconds": 0.0
+      }
+    ],
+    "completedTests": [
+      {
+        "position": 1,
+        "total": 149,
+        "testNumber": 1,
+        "name": "horde_rt_region_streaming_tests",
+        "result": "Passed",
+        "seconds": 0.04
+      },
+      {
+        "position": 2,
+        "total": 149,
+        "testNumber": 2,
+        "name": "horde_rt_geometry_page_table_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 3,
+        "total": 149,
+        "testNumber": 3,
+        "name": "horde_rt_geometry_partition_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 4,
+        "total": 149,
+        "testNumber": 4,
+        "name": "horde_rt_sky_attribution_launch_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 5,
+        "total": 149,
+        "testNumber": 5,
+        "name": "horde_rt_triangle_support_surface_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 6,
+        "total": 149,
+        "testNumber": 6,
+        "name": "horde_rt_character_step_geometry_tests",
+        "result": "Passed",
+        "seconds": 0.05
+      },
+      {
+        "position": 7,
+        "total": 149,
+        "testNumber": 7,
+        "name": "horde_rt_menu_ambience_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 8,
+        "total": 149,
+        "testNumber": 8,
+        "name": "horde_rt_indoor_dust_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 9,
+        "total": 149,
+        "testNumber": 9,
+        "name": "horde_rt_retirement_owner_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 10,
+        "total": 149,
+        "testNumber": 10,
+        "name": "horde_rt_graphics_settings_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 11,
+        "total": 149,
+        "testNumber": 11,
+        "name": "horde_rt_entry_menu_handoff_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 12,
+        "total": 149,
+        "testNumber": 12,
+        "name": "horde_rt_foreground_pause_render_cadence_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 13,
+        "total": 149,
+        "testNumber": 13,
+        "name": "horde_rt_surface_presentation_policy_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 14,
+        "total": 149,
+        "testNumber": 14,
+        "name": "horde_rt_presentation_transform_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 15,
+        "total": 149,
+        "testNumber": 15,
+        "name": "horde_rt_compiled_pipeline_cache_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 16,
+        "total": 149,
+        "testNumber": 16,
+        "name": "horde_rt_pipeline_cache_seed_tests",
+        "result": "Passed",
+        "seconds": 0.07
+      },
+      {
+        "position": 17,
+        "total": 149,
+        "testNumber": 17,
+        "name": "horde_rt_graphics_scale_min33_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 18,
+        "total": 149,
+        "testNumber": 18,
+        "name": "horde_rt_graphics_scale_legacy50_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 19,
+        "total": 149,
+        "testNumber": 19,
+        "name": "horde_rt_graphics_preview_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 20,
+        "total": 149,
+        "testNumber": 20,
+        "name": "horde_rt_graphics_preview_performance_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 21,
+        "total": 149,
+        "testNumber": 21,
+        "name": "horde_rt_texture_layer_subset_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 22,
+        "total": 149,
+        "testNumber": 22,
+        "name": "horde_rt_shaft_dressing_geometry_tests",
+        "result": "Passed",
+        "seconds": 0.07
+      },
+      {
+        "position": 23,
+        "total": 149,
+        "testNumber": 23,
+        "name": "horde_rt_graphics_windows_persistence_tests",
+        "result": "Passed",
+        "seconds": 0.72
+      },
+      {
+        "position": 24,
+        "total": 149,
+        "testNumber": 24,
+        "name": "horde_rt_device_address_layout_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 25,
+        "total": 149,
+        "testNumber": 25,
+        "name": "horde_rt_player_primitive_contract_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 26,
+        "total": 149,
+        "testNumber": 26,
+        "name": "horde_rt_windows_campaign_menu_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 27,
+        "total": 149,
+        "testNumber": 27,
+        "name": "horde_rt_windows_lookout_objective_panel_tests",
+        "result": "Passed",
+        "seconds": 0.03
+      },
+      {
+        "position": 28,
+        "total": 149,
+        "testNumber": 28,
+        "name": "horde_rt_chapter_regional_water_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 29,
+        "total": 149,
+        "testNumber": 29,
+        "name": "horde_rt_android_campaign_load_barrier_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 30,
+        "total": 149,
+        "testNumber": 30,
+        "name": "horde_rt_campaign_play_session_tests",
+        "result": "Passed",
+        "seconds": 4.49
+      },
+      {
+        "position": 31,
+        "total": 149,
+        "testNumber": 31,
+        "name": "horde_rt_campaign_session_tests",
+        "result": "Passed",
+        "seconds": 0.26
+      },
+      {
+        "position": 32,
+        "total": 149,
+        "testNumber": 32,
+        "name": "horde_rt_chapter_step_movement_tests",
+        "result": "Passed",
+        "seconds": 3.53
+      },
+      {
+        "position": 33,
+        "total": 149,
+        "testNumber": 33,
+        "name": "horde_rt_campaign_save_worker_tests",
+        "result": "Passed",
+        "seconds": 0.09
+      },
+      {
+        "position": 34,
+        "total": 149,
+        "testNumber": 34,
+        "name": "horde_rt_campaign_save_coordinator_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 35,
+        "total": 149,
+        "testNumber": 35,
+        "name": "horde_rt_campaign_codec_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 36,
+        "total": 149,
+        "testNumber": 36,
+        "name": "horde_rt_campaign_storage_tests",
+        "result": "Passed",
+        "seconds": 0.82
+      },
+      {
+        "position": 37,
+        "total": 149,
+        "testNumber": 37,
+        "name": "horde_rt_chapter_dialogue_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 38,
+        "total": 149,
+        "testNumber": 38,
+        "name": "horde_rt_companion_acting_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 39,
+        "total": 149,
+        "testNumber": 39,
+        "name": "horde_rt_companion_locomotion_tests",
+        "result": "Passed",
+        "seconds": 0.05
+      },
+      {
+        "position": 40,
+        "total": 149,
+        "testNumber": 40,
+        "name": "horde_rt_campaign_checkpoint_tests",
+        "result": "Passed",
+        "seconds": 1.9
+      },
+      {
+        "position": 41,
+        "total": 149,
+        "testNumber": 41,
+        "name": "horde_rt_windows_vitality_layout_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 42,
+        "total": 149,
+        "testNumber": 42,
+        "name": "horde_rt_combat_foundation_tests",
+        "result": "Passed",
+        "seconds": 0.07
+      },
+      {
+        "position": 43,
+        "total": 149,
+        "testNumber": 43,
+        "name": "horde_rt_held_item_transition_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 44,
+        "total": 149,
+        "testNumber": 44,
+        "name": "horde_rt_combat_timing_trace_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 45,
+        "total": 149,
+        "testNumber": 45,
+        "name": "horde_rt_input_presentation_trace_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 46,
+        "total": 149,
+        "testNumber": 46,
+        "name": "horde_rt_held_item_clearance_tests",
+        "result": "Passed",
+        "seconds": 0.41
+      },
+      {
+        "position": 47,
+        "total": 149,
+        "testNumber": 47,
+        "name": "horde_rt_ambience_pcm_loop_tests",
+        "result": "Passed",
+        "seconds": 0.07
+      },
+      {
+        "position": 48,
+        "total": 149,
+        "testNumber": 48,
+        "name": "horde_rt_benchmark_summary_report_tests",
+        "result": "Passed",
+        "seconds": 0.04
+      },
+      {
+        "position": 49,
+        "total": 149,
+        "testNumber": 49,
+        "name": "horde_rt_staged_primary_contract_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 50,
+        "total": 149,
+        "testNumber": 50,
+        "name": "horde_rt_lantern_benchmark_tests",
+        "result": "Passed",
+        "seconds": 0.06
+      },
+      {
+        "position": 51,
+        "total": 149,
+        "testNumber": 51,
+        "name": "horde_rt_benchmark_evidence_report_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 52,
+        "total": 149,
+        "testNumber": 52,
+        "name": "horde_rt_windows_benchmark_launch_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 53,
+        "total": 149,
+        "testNumber": 53,
+        "name": "horde_rt_windows_output_resize_launch_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 54,
+        "total": 149,
+        "testNumber": 54,
+        "name": "horde_rt_windows_motion_evidence_launch_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 55,
+        "total": 149,
+        "testNumber": 55,
+        "name": "horde_rt_windows_combat_practice_launch_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 56,
+        "total": 149,
+        "testNumber": 56,
+        "name": "horde_rt_windows_combat_teaching_presentation_tests",
+        "result": "Passed",
+        "seconds": 0.4
+      },
+      {
+        "position": 57,
+        "total": 149,
+        "testNumber": 57,
+        "name": "horde_rt_android_motion_evidence_policy_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 58,
+        "total": 149,
+        "testNumber": 58,
+        "name": "horde_rt_android_debug_request_admission_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 59,
+        "total": 149,
+        "testNumber": 59,
+        "name": "horde_rt_motion_evidence_scenario_tests",
+        "result": "Passed",
+        "seconds": 0.94
+      },
+      {
+        "position": 60,
+        "total": 149,
+        "testNumber": 60,
+        "name": "horde_rt_benchmark_evidence_run_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 61,
+        "total": 149,
+        "testNumber": 61,
+        "name": "horde_rt_evidence_publication_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 62,
+        "total": 149,
+        "testNumber": 62,
+        "name": "horde_rt_ray_tracing_requirements_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 63,
+        "total": 149,
+        "testNumber": 63,
+        "name": "horde_rt_performance_evidence_tests",
+        "result": "Passed",
+        "seconds": 0.28
+      },
+      {
+        "position": 64,
+        "total": 149,
+        "testNumber": 64,
+        "name": "horde_rt_scene_record_observation_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 65,
+        "total": 149,
+        "testNumber": 65,
+        "name": "horde_rt_pipeline_variants_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 66,
+        "total": 149,
+        "testNumber": 66,
+        "name": "horde_rt_pipeline_variant_provider_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 67,
+        "total": 149,
+        "testNumber": 67,
+        "name": "horde_rt_pipeline_bundle_contracts_tests",
+        "result": "Passed",
+        "seconds": 0.03
+      },
+      {
+        "position": 68,
+        "total": 149,
+        "testNumber": 68,
+        "name": "horde_rt_provider_shipping_mobile_fixture",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 69,
+        "total": 149,
+        "testNumber": 69,
+        "name": "horde_rt_provider_shipping_mobile_fixture_evidence",
+        "result": "Passed",
+        "seconds": 21.59
+      },
+      {
+        "position": 70,
+        "total": 149,
+        "testNumber": 70,
+        "name": "horde_rt_provider_shipping_high_fixture",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 71,
+        "total": 149,
+        "testNumber": 71,
+        "name": "horde_rt_provider_shipping_high_fixture_evidence",
+        "result": "Passed",
+        "seconds": 21.41
+      },
+      {
+        "position": 72,
+        "total": 149,
+        "testNumber": 72,
+        "name": "horde_rt_provider_diagnostic_mobile_fixture",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 73,
+        "total": 149,
+        "testNumber": 73,
+        "name": "horde_rt_provider_diagnostic_mobile_fixture_evidence",
+        "result": "Passed",
+        "seconds": 21.58
+      },
+      {
+        "position": 74,
+        "total": 149,
+        "testNumber": 74,
+        "name": "horde_rt_provider_diagnostic_high_fixture",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 75,
+        "total": 149,
+        "testNumber": 75,
+        "name": "horde_rt_provider_diagnostic_high_fixture_evidence",
+        "result": "Passed",
+        "seconds": 21.66
+      },
+      {
+        "position": 76,
+        "total": 149,
+        "testNumber": 76,
+        "name": "horde_rt_github_release_updater_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 77,
+        "total": 149,
+        "testNumber": 77,
+        "name": "horde_rt_version_contract_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 78,
+        "total": 149,
+        "testNumber": 78,
+        "name": "horde_rt_version_contract_incremental_configure_tests",
+        "result": "Passed",
+        "seconds": 5.75
+      },
+      {
+        "position": 79,
+        "total": 149,
+        "testNumber": 79,
+        "name": "horde_rt_dielectric_math_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 80,
+        "total": 149,
+        "testNumber": 80,
+        "name": "horde_rt_opaque_segment_coverage_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 81,
+        "total": 149,
+        "testNumber": 81,
+        "name": "horde_rt_skinned_node_pose_batch_tests",
+        "result": "Passed",
+        "seconds": 0.07
+      },
+      {
+        "position": 82,
+        "total": 149,
+        "testNumber": 82,
+        "name": "horde_rt_player_animation_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 83,
+        "total": 149,
+        "testNumber": 83,
+        "name": "horde_rt_player_dodge_presentation_tests",
+        "result": "Passed",
+        "seconds": 0.03
+      },
+      {
+        "position": 84,
+        "total": 149,
+        "testNumber": 84,
+        "name": "horde_rt_fire_emitter_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 85,
+        "total": 149,
+        "testNumber": 85,
+        "name": "horde_rt_held_item_socket_tests",
+        "result": "Passed",
+        "seconds": 2.19
+      },
+      {
+        "position": 86,
+        "total": 149,
+        "testNumber": 86,
+        "name": "horde_rt_skeleton_render_pose_contracts",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 87,
+        "total": 149,
+        "testNumber": 87,
+        "name": "horde_rt_combat_sword_authority_agreement",
+        "result": "Passed",
+        "seconds": 0.13
+      },
+      {
+        "position": 88,
+        "total": 149,
+        "testNumber": 88,
+        "name": "horde_rt_development_static_asset_tests",
+        "result": "Passed",
+        "seconds": 0.03
+      },
+      {
+        "position": 89,
+        "total": 149,
+        "testNumber": 89,
+        "name": "horde_rt_scene_abi_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 90,
+        "total": 149,
+        "testNumber": 90,
+        "name": "horde_rt_tomb_wall_recess_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 91,
+        "total": 149,
+        "testNumber": 91,
+        "name": "horde_rt_tomb_dressing_tests",
+        "result": "Passed",
+        "seconds": 0.18
+      },
+      {
+        "position": 92,
+        "total": 149,
+        "testNumber": 92,
+        "name": "horde_rt_world_surface_range_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 93,
+        "total": 149,
+        "testNumber": 93,
+        "name": "horde_rt_graveyard_dressing_tests",
+        "result": "Passed",
+        "seconds": 0.25
+      },
+      {
+        "position": 94,
+        "total": 149,
+        "testNumber": 94,
+        "name": "horde_rt_forest_understory_tests",
+        "result": "Passed",
+        "seconds": 0.04
+      },
+      {
+        "position": 95,
+        "total": 149,
+        "testNumber": 95,
+        "name": "horde_rt_forest_rock_dressing_tests",
+        "result": "Passed",
+        "seconds": 0.03
+      },
+      {
+        "position": 96,
+        "total": 149,
+        "testNumber": 96,
+        "name": "horde_rt_forest_deadwood_tests",
+        "result": "Passed",
+        "seconds": 0.41
+      },
+      {
+        "position": 97,
+        "total": 149,
+        "testNumber": 97,
+        "name": "horde_rt_bellwether_shell_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 98,
+        "total": 149,
+        "testNumber": 98,
+        "name": "horde_rt_forest_dressing_tests",
+        "result": "Passed",
+        "seconds": 3.48
+      },
+      {
+        "position": 99,
+        "total": 149,
+        "testNumber": 99,
+        "name": "horde_rt_static_gltf_asset_tests",
+        "result": "Passed",
+        "seconds": 0.17
+      },
+      {
+        "position": 100,
+        "total": 149,
+        "testNumber": 100,
+        "name": "horde_rt_static_gltf_intake_missing_argument_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 101,
+        "total": 149,
+        "testNumber": 101,
+        "name": "horde_rt_static_gltf_intake_unknown_argument_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 102,
+        "total": 149,
+        "testNumber": 102,
+        "name": "horde_rt_production_prop_asset_tests",
+        "result": "Passed",
+        "seconds": 0.05
+      },
+      {
+        "position": 103,
+        "total": 149,
+        "testNumber": 103,
+        "name": "horde_rt_static_collapse_asset_tests",
+        "result": "Passed",
+        "seconds": 0.13
+      },
+      {
+        "position": 104,
+        "total": 149,
+        "testNumber": 104,
+        "name": "horde_rt_benchmark_scale_policy_tests",
+        "result": "Passed",
+        "seconds": 1.41
+      },
+      {
+        "position": 105,
+        "total": 149,
+        "testNumber": 105,
+        "name": "horde_rt_windows_glass_graphics_contract_tests",
+        "result": "Passed",
+        "seconds": 19.2
+      },
+      {
+        "position": 106,
+        "total": 149,
+        "testNumber": 106,
+        "name": "horde_rt_windows_benchmark_summary_review_contract_tests",
+        "result": "Passed",
+        "seconds": 0.46
+      },
+      {
+        "position": 107,
+        "total": 149,
+        "testNumber": 107,
+        "name": "horde_rt_android_staged_admission_tests",
+        "result": "Passed",
+        "seconds": 0.7
+      },
+      {
+        "position": 108,
+        "total": 149,
+        "testNumber": 108,
+        "name": "horde_rt_combat_target_observation_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 109,
+        "total": 149,
+        "testNumber": 109,
+        "name": "horde_rt_keeper_mist_fixture_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 110,
+        "total": 149,
+        "testNumber": 110,
+        "name": "horde_rt_simulation_timing_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 111,
+        "total": 149,
+        "testNumber": 111,
+        "name": "horde_rt_simulation_gameplay_tests",
+        "result": "Passed",
+        "seconds": 0.15
+      },
+      {
+        "position": 112,
+        "total": 149,
+        "testNumber": 112,
+        "name": "horde_rt_water_contact_tests",
+        "result": "Passed",
+        "seconds": 0.03
+      },
+      {
+        "position": 113,
+        "total": 149,
+        "testNumber": 113,
+        "name": "horde_rt_dry_footstep_tests",
+        "result": "Passed",
+        "seconds": 1.15
+      },
+      {
+        "position": 114,
+        "total": 149,
+        "testNumber": 114,
+        "name": "horde_rt_waterfall_production_route_tests",
+        "result": "Passed",
+        "seconds": 0.14
+      },
+      {
+        "position": 115,
+        "total": 149,
+        "testNumber": 115,
+        "name": "horde_rt_waterfall_legacy_route_tests",
+        "result": "Passed",
+        "seconds": 0.12
+      },
+      {
+        "position": 116,
+        "total": 149,
+        "testNumber": 116,
+        "name": "horde_rt_music_director_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 117,
+        "total": 149,
+        "testNumber": 117,
+        "name": "horde_rt_chapter_music_tests",
+        "result": "Passed",
+        "seconds": 0.72
+      },
+      {
+        "position": 118,
+        "total": 149,
+        "testNumber": 118,
+        "name": "horde_rt_chapter_local_ambience_tests",
+        "result": "Passed",
+        "seconds": 0.99
+      },
+      {
+        "position": 119,
+        "total": 149,
+        "testNumber": 119,
+        "name": "horde_rt_forest_foliage_ambience_tests",
+        "result": "Passed",
+        "seconds": 0.12
+      },
+      {
+        "position": 120,
+        "total": 149,
+        "testNumber": 120,
+        "name": "horde_rt_dialogue_ducking_tests",
+        "result": "Passed",
+        "seconds": 0.19
+      },
+      {
+        "position": 121,
+        "total": 149,
+        "testNumber": 121,
+        "name": "horde_rt_entry_portal_cap_geometry_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 122,
+        "total": 149,
+        "testNumber": 122,
+        "name": "horde_rt_tomb_terrain_exclusion_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 123,
+        "total": 149,
+        "testNumber": 123,
+        "name": "horde_rt_windows_subtitle_bitmap_tests",
+        "result": "Passed",
+        "seconds": 0.19
+      },
+      {
+        "position": 124,
+        "total": 149,
+        "testNumber": 124,
+        "name": "horde_rt_sfx_volume_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 125,
+        "total": 149,
+        "testNumber": 125,
+        "name": "horde_rt_windows_music_focus_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 126,
+        "total": 149,
+        "testNumber": 126,
+        "name": "horde_rt_music_pcm_stream_tests",
+        "result": "Passed",
+        "seconds": 0.26
+      },
+      {
+        "position": 127,
+        "total": 149,
+        "testNumber": 127,
+        "name": "horde_rt_music_pcm_wave_tests",
+        "result": "Passed",
+        "seconds": 0.13
+      },
+      {
+        "position": 128,
+        "total": 149,
+        "testNumber": 128,
+        "name": "horde_rt_music_pcm_asset_bank_tests",
+        "result": "Passed",
+        "seconds": 0.84
+      },
+      {
+        "position": 129,
+        "total": 149,
+        "testNumber": 129,
+        "name": "horde_rt_music_playback_session_tests",
+        "result": "Passed",
+        "seconds": 0.23
+      },
+      {
+        "position": 130,
+        "total": 149,
+        "testNumber": 130,
+        "name": "horde_rt_surface_session_mailbox_tests",
+        "result": "Passed",
+        "seconds": 0.28
+      },
+      {
+        "position": 131,
+        "total": 149,
+        "testNumber": 131,
+        "name": "horde_rt_playtest_report_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 132,
+        "total": 149,
+        "testNumber": 132,
+        "name": "horde_rt_playtest_submission_tests",
+        "result": "Passed",
+        "seconds": 0.04
+      },
+      {
+        "position": 133,
+        "total": 149,
+        "testNumber": 133,
+        "name": "horde_rt_windows_playtest_screenshot_tests",
+        "result": "Passed",
+        "seconds": 0.05
+      },
+      {
+        "position": 134,
+        "total": 149,
+        "testNumber": 134,
+        "name": "horde_rt_windows_playtest_submission_tests",
+        "result": "Passed",
+        "seconds": 2.14
+      },
+      {
+        "position": 135,
+        "total": 149,
+        "testNumber": 135,
+        "name": "horde_rt_windows_playtest_verification_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 136,
+        "total": 149,
+        "testNumber": 136,
+        "name": "horde_rt_windows_remote_playtest_report_ui_tests",
+        "result": "Passed",
+        "seconds": 0.82
+      },
+      {
+        "position": 137,
+        "total": 149,
+        "testNumber": 137,
+        "name": "horde_rt_windows_playtest_report_ui_tests",
+        "result": "Passed",
+        "seconds": 0.95
+      },
+      {
+        "position": 138,
+        "total": 149,
+        "testNumber": 138,
+        "name": "horde_rt_lantern_reward_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 139,
+        "total": 149,
+        "testNumber": 139,
+        "name": "horde_rt_lantern_pendulum_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 140,
+        "total": 149,
+        "testNumber": 140,
+        "name": "horde_rt_input_mailbox_stress",
+        "result": "Passed",
+        "seconds": 0.44
+      },
+      {
+        "position": 141,
+        "total": 149,
+        "testNumber": 141,
+        "name": "horde_rt_desktop_controller_input_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 142,
+        "total": 149,
+        "testNumber": 142,
+        "name": "horde_rt_gpu_timestamp_math_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 143,
+        "total": 149,
+        "testNumber": 143,
+        "name": "horde_rt_combat_smoke",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 144,
+        "total": 149,
+        "testNumber": 144,
+        "name": "horde_rt_showcase_route_smoke",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "position": 145,
+        "total": 149,
+        "testNumber": 145,
+        "name": "horde_rt_showcase_gameplay_smoke",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 146,
+        "total": 149,
+        "testNumber": 146,
+        "name": "horde_rt_spatial_audio_smoke",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 147,
+        "total": 149,
+        "testNumber": 147,
+        "name": "horde_rt_rescue_traversal_tests",
+        "result": "Passed",
+        "seconds": 0.08
+      },
+      {
+        "position": 148,
+        "total": 149,
+        "testNumber": 148,
+        "name": "horde_rt_rescue_blockout_import_tests",
+        "result": "Passed",
+        "seconds": 0.02
+      },
+      {
+        "position": 149,
+        "total": 149,
+        "testNumber": 149,
+        "name": "pocket_audio_native_pcm_tests",
+        "result": "Passed",
+        "seconds": 0.1
+      }
+    ]
+  },
+  "linux": {
+    "gcc": {
+      "jobId": 120366124393,
+      "passedCount": 157,
+      "ctestRealSeconds": 242.36
+    },
+    "clang": {
+      "jobId": 120366124599,
+      "passedCount": 157,
+      "ctestRealSeconds": 279.87
+    },
+    "exactPortableCoverage": [
+      {
+        "name": "horde_rt_third_party_notice_admission_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 1.64,
+        "clangResult": "Passed",
+        "clangSeconds": 1.5
+      },
+      {
+        "name": "horde_rt_raygen_artifact_ownership_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.95,
+        "clangResult": "Passed",
+        "clangSeconds": 0.98
+      },
+      {
+        "name": "horde_rt_player_manifest_agreement_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 1.0,
+        "clangResult": "Passed",
+        "clangSeconds": 0.72
+      },
+      {
+        "name": "horde_rt_player_package_inventory_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 1.01,
+        "clangResult": "Passed",
+        "clangSeconds": 0.8
+      },
+      {
+        "name": "horde_rt_forest_runtime_roster_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.04,
+        "clangResult": "Passed",
+        "clangSeconds": 0.04
+      },
+      {
+        "name": "horde_rt_forest_texture_source_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 13.66,
+        "clangResult": "Passed",
+        "clangSeconds": 8.96
+      },
+      {
+        "name": "horde_rt_forest_placement_source_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.33,
+        "clangResult": "Passed",
+        "clangSeconds": 0.21
+      },
+      {
+        "name": "horde_rt_forest_root_placement_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.46,
+        "clangResult": "Passed",
+        "clangSeconds": 0.35
+      },
+      {
+        "name": "horde_rt_music_asset_admission_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 14.08,
+        "clangResult": "Passed",
+        "clangSeconds": 12.88
+      },
+      {
+        "name": "horde_rt_horde_162_asset_policy_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 114.41,
+        "clangResult": "Passed",
+        "clangSeconds": 166.2
+      },
+      {
+        "name": "horde_rt_android_showcase_witness_policy_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 1.17,
+        "clangResult": "Passed",
+        "clangSeconds": 0.98
+      },
+      {
+        "name": "horde_rt_pocket_audio_core_pin_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.66,
+        "clangResult": "Passed",
+        "clangSeconds": 0.51
+      },
+      {
+        "name": "horde_rt_region_page_build_policy_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.12,
+        "clangResult": "Passed",
+        "clangSeconds": 0.1
+      },
+      {
+        "name": "horde_rt_chapter_host_phase_analysis_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.05,
+        "clangResult": "Passed",
+        "clangSeconds": 0.06
+      },
+      {
+        "name": "horde_rt_corridor_detail_certificate_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.05,
+        "clangResult": "Passed",
+        "clangSeconds": 0.04
+      },
+      {
+        "name": "horde_rt_rescue_source_admission_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.06,
+        "clangResult": "Passed",
+        "clangSeconds": 0.06
+      },
+      {
+        "name": "horde_rt_water_contact_audio_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.11,
+        "clangResult": "Passed",
+        "clangSeconds": 0.1
+      },
+      {
+        "name": "horde_rt_chapter_local_audio_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.07,
+        "clangResult": "Passed",
+        "clangSeconds": 0.06
+      },
+      {
+        "name": "horde_rt_keeper_death_audio_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.09,
+        "clangResult": "Passed",
+        "clangSeconds": 0.07
+      },
+      {
+        "name": "horde_rt_kit_audio_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.06,
+        "clangResult": "Passed",
+        "clangSeconds": 0.05
+      },
+      {
+        "name": "horde_rt_chapter_texture_alias_payload_tests",
+        "windows": "excluded",
+        "gccResult": "Passed",
+        "gccSeconds": 0.21,
+        "clangResult": "Passed",
+        "clangSeconds": 0.24
+      }
+    ],
+    "postCheckCoverage": [
+      {
+        "name": "Check offline gauntlet chirality and UV winding",
+        "windows": "skipped",
+        "gcc": "success",
+        "clang": "success"
+      },
+      {
+        "name": "Check exact player cloth seam weight transfers",
+        "windows": "skipped",
+        "gcc": "success",
+        "clang": "success"
+      },
+      {
+        "name": "Check upper torso partition preserves the head mask",
+        "windows": "skipped",
+        "gcc": "success",
+        "clang": "success"
+      },
+      {
+        "name": "Check bounded segmented cloth seam plans",
+        "windows": "skipped",
+        "gcc": "success",
+        "clang": "success"
+      },
+      {
+        "name": "Check Android combat capture expectations",
+        "windows": "skipped",
+        "gcc": "success",
+        "clang": "success"
+      }
+    ]
+  },
+  "verification": [
+    "Exact run/head and six successful terminal jobs checked.",
+    "149 unique MSVC results, contiguous positions1..149, all Passed.",
+    "157 unique GCC and157 unique Clang results, each contiguous and all Passed.",
+    "Each exact portable exclusion absent from MSVC and passed exactly once in both Linux lanes.",
+    "Five portable post-steps skipped on MSVC and succeeded in both Linux lanes.",
+    "All four provider object evidence wrappers completed.",
+    "Windows report UI and APK resolver completed successfully."
+  ],
+  "limitations": [
+    "Hosted durations have API step/job second resolution; CTest reports146.87s real time.",
+    "185 registered CTests is inferred from the successful selector partition149+21+15, not an independently archived raw unfiltered listing.",
+    "One changed-head completed run does not isolate selector savings: native build541s differed from prior606/618s, and prior selections were cancelled.",
+    "No rerun, workflow mutation or phone operation was performed for this terminal monitor."
+  ]
+}

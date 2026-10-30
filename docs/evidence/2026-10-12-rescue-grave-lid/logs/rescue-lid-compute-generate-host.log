@@ -1,0 +1,9 @@
+RayQuery compute variant rayquery_compute_diagnostic_high_generic_dielectric: bytes=295044; functions=83; calls=264; ray-query sites=2; atomics=41; SPIR-V SHA-256=63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67
+RayQuery compute variant rayquery_compute_diagnostic_high_opaque_fast: bytes=585220; functions=1; calls=0; ray-query sites=29; atomics=5; SPIR-V SHA-256=82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668
+RayQuery compute variant rayquery_compute_diagnostic_mobile_generic_dielectric: bytes=293544; functions=83; calls=261; ray-query sites=2; atomics=41; SPIR-V SHA-256=9b578ab93f66ea93abe9dd55354fca033aaeba02b8d7d6c667a9aabd6e7b4061
+RayQuery compute variant rayquery_compute_diagnostic_mobile_opaque_fast: bytes=582272; functions=1; calls=0; ray-query sites=27; atomics=5; SPIR-V SHA-256=0aae45f37a9604bcf4da9ef60f9307b1600b485e5d40e314afa3517d62a19601
+RayQuery compute variant rayquery_compute_shipping_high_generic_dielectric: bytes=286216; functions=83; calls=264; ray-query sites=2; atomics=0; SPIR-V SHA-256=2706264ebbe3d059423ec8b4fa00a7b7a055e86930b37f22665b2958a51d7616
+RayQuery compute variant rayquery_compute_shipping_high_opaque_fast: bytes=580984; functions=1; calls=0; ray-query sites=29; atomics=0; SPIR-V SHA-256=87f12a8cba831ab18be0f1be1b807f8ca91e8a0da6a875e46ed4e4989fe31e76
+RayQuery compute variant rayquery_compute_shipping_mobile_generic_dielectric: bytes=284716; functions=83; calls=261; ray-query sites=2; atomics=0; SPIR-V SHA-256=40d49459ff47383fc070f820baaba108e207a09dc1823369ca5d29dbf54958f7
+RayQuery compute variant rayquery_compute_shipping_mobile_opaque_fast: bytes=578036; functions=1; calls=0; ray-query sites=27; atomics=0; SPIR-V SHA-256=0db06582bc0e13db5cd8eca2678801dd659566aaa263de2c80d2a78feb09e632
+Frozen eight RayQuery compute artifacts, provenance catalog, and generated adapter.

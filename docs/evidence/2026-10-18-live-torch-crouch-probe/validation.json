@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-18",
+  "source_parent": "6d4033d3058efdf4ccacf73923615fc65ce1972a",
+  "source_state": "two diagnostic input/test source changes before local commit",
+  "sources": [
+    {
+      "path": "src/gameplay/validation/MotionEvidenceScenario.cpp",
+      "sha256": "e6728f03b39b43a59bf608390666402ff18d0f3bd2cc8332d7aaf1c0137940e2"
+    },
+    {
+      "path": "tests/MotionEvidenceScenarioTests.cpp",
+      "sha256": "fd9d9c1350dbaf2f3982267e9cd4b788f706079056238b397a36a3f4b5c6ce01"
+    }
+  ],
+  "baseline": "motion suite FAILED both configurations; live torch blocked at low opening at all four rates",
+  "result": {
+    "assertions": "inherited held/toggled input cleared; no reseed/authoritative pose/time override;actual crouch/standing;production baseline and two-torch reveal",
+    "release": "1/1PASS,1.74s",
+    "debug": "1/1PASS,11.29s",
+    "rates": [
+      15,
+      30,
+      60,
+      120
+    ]
+  },
+  "successful_output": {
+    "debug": [
+      "live-torch-crouch rate=15 complete=1 crouch=1 standingAgain=1",
+      "live-torch-crouch rate=30 complete=1 crouch=1 standingAgain=1",
+      "live-torch-crouch rate=60 complete=1 crouch=1 standingAgain=1",
+      "live-torch-crouch rate=120 complete=1 crouch=1 standingAgain=1"
+    ],
+    "release": [
+      "live-torch-crouch rate=15 complete=1 crouch=1 standingAgain=1",
+      "live-torch-crouch rate=30 complete=1 crouch=1 standingAgain=1",
+      "live-torch-crouch rate=60 complete=1 crouch=1 standingAgain=1",
+      "live-torch-crouch rate=120 complete=1 crouch=1 standingAgain=1"
+    ]
+  },
+  "builds": {
+    "windows": "Debug+Release applications PASS",
+    "android": "4ABI Debug PASS,12s"
+  },
+  "apk": {
+    "installed": false,
+    "bytes": 183958042,
+    "sha256": "74811b2a9c91d030a50897c670732e9788f8687c178181744fed5d94d9afd973"
+  },
+  "phone_evidence": "../2026-10-18-android-campaign-readiness-followup/README.md",
+  "review": "independent bounded read-only review: no material findings",
+  "limits": [
+    "CPU diagnostic protocol/motor evidence only",
+    "no new GPU performance/physical crouch acceptance",
+    "installed phone remains on separately accepted5eb3282a/source6d4033d3"
+  ],
+  "logs": [
+    {
+      "path": "reports/2026-10-18-campaign-camera-debug-tests.log",
+      "sha256": "4ea358f1c0eb3996cd2deec3124c62ac6d4301523194141a1e2d15ba58798114",
+      "bytes": 5095
+    },
+    {
+      "path": "reports/2026-10-18-campaign-camera-release-tests.log",
+      "sha256": "23d79a21ca0b65590d65cdba4573aa7387de6a869770c7816534d3ba586cff53",
+      "bytes": 5097
+    },
+    {
+      "path": "reports/2026-10-18-live-torch-crouch-debug-build.log",
+      "sha256": "1a6a0bce0475676c04216ffacf88661c700dc142088ce4188cbf2f04694129db",
+      "bytes": 1978
+    },
+    {
+      "path": "reports/2026-10-18-live-torch-crouch-release-build.log",
+      "sha256": "3ce6ff945f9c8af5aa8f569185efcad30b1353bd77da6ec55941bcd420cead4c",
+      "bytes": 1984
+    },
+    {
+      "path": "reports/2026-10-18-live-torch-crouch-debug-tests.log",
+      "sha256": "c156d97e1ee1890ed956bccb1d2378803961526d2b2872b9218598c6cb3b1023",
+      "bytes": 349
+    },
+    {
+      "path": "reports/2026-10-18-live-torch-crouch-release-tests.log",
+      "sha256": "49abdb22a20026800eb6e970cdcc517b50200377e57fccc178d676d7bd40dce2",
+      "bytes": 351
+    },
+    {
+      "path": "reports/2026-10-18-live-torch-crouch-android-build.log",
+      "sha256": "0ff33c44268d623ca59d61b19a8ba7c5154c947e176c7fb037b1c14f7867186c",
+      "bytes": 2232
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "encoding": "Exact little-endian IEEE754 float32: decoded PNG BGRA bytes; -1 means no positive integrated raw sky contribution. Mask map R=density sample count,G=committed opaque mask,B=rope mask.",
+  "formula": "loss = sum(T_before * density * 0.82 * ds * luminance(rawSky-visibleSky)) / sum(T_before * density * 0.82 * ds * luminance(rawSky)); transmittance evolves by original exp(-density*ds). RGB luminance weights 0.2126/0.7152/0.0722.",
+  "precision": "float32 GPU accumulation, exact bit transport, CPU double aggregate. 1e-6 only classifies numerical equality in the diagnostic report, not an acceptance tolerance.",
+  "scope": "Existing six density samples and physical helper/mask. Proves discrete sampled blockage, not a continuous-volume convergence reference or corrected production shader.",
+  "results": [
+    {
+      "shadow": "current",
+      "midpoint": {
+        "active_pixels": 533781,
+        "minimum": -4.403730002877637e-08,
+        "maximum": 1.0000001192092896,
+        "mean": 0.6282894848947795,
+        "sum": 335368.9895366203,
+        "negative_roundoff_pixels": 198412,
+        "over_one_roundoff_pixels": 7204
+      },
+      "sample_local": {
+        "active_pixels": 533781,
+        "minimum": -5.173531292257394e-08,
+        "maximum": 1.0000001192092896,
+        "mean": 0.660327519241318,
+        "sum": 352470.28354815,
+        "negative_roundoff_pixels": 115802,
+        "over_one_roundoff_pixels": 5631
+      },
+      "midpoint_rope": {
+        "active_pixels": 533781,
+        "minimum": 0.0,
+        "maximum": 1.0000001192092896,
+        "mean": 0.013749084285376212,
+        "sum": 7338.9999589324,
+        "negative_roundoff_pixels": 0,
+        "over_one_roundoff_pixels": 108
+      },
+      "sample_local_rope": {
+        "active_pixels": 533781,
+        "minimum": 0.0,
+        "maximum": 1.0000001192092896,
+        "mean": 0.014336465533790775,
+        "sum": 7652.532909092373,
+        "negative_roundoff_pixels": 0,
+        "over_one_roundoff_pixels": 1
+      },
+      "local_more_shadow_pixels": 87742,
+      "local_less_shadow_pixels": 68366,
+      "midpoint_clear_local_shadow_pixels": 87740,
+      "midpoint_clear_local_rope_shadow_pixels": 29669,
+      "retained_local_rope_shadow_pixels": 36860,
+      "retained_rope_with_midpoint_shadow_pixels": 7182,
+      "midpoint_rope_shadow_pixels": 7339,
+      "midpoint_rope_without_local_rope_pixels": 6689,
+      "midpoint_and_local_rope_pixels": 650,
+      "local_rope_without_midpoint_rope_pixels": 36210,
+      "valid_rope_loss_mean": 0.2076107680166135,
+      "valid_rope_loss_min": 2.000787802103332e-08,
+      "valid_rope_loss_max": 1.0000001192092896,
+      "rope_density_sample_intersections": 38586,
+      "all_opaque_density_sample_intersections": 2073123,
+      "local_rope_bounds_inclusive": [
+        467,
+        291,
+        1231,
+        802
+      ]
+    },
+    {
+      "shadow": "higher",
+      "midpoint": {
+        "active_pixels": 533781,
+        "minimum": -4.403730002877637e-08,
+        "maximum": 1.0000001192092896,
+        "mean": 0.35083298917119937,
+        "sum": 187267.98379279196,
+        "negative_roundoff_pixels": 346513,
+        "over_one_roundoff_pixels": 4225
+      },
+      "sample_local": {
+        "active_pixels": 533781,
+        "minimum": -5.1735352002424406e-08,
+        "maximum": 1.0000001192092896,
+        "mean": 0.45608313727653654,
+        "sum": 243448.51309860696,
+        "negative_roundoff_pixels": 213307,
+        "over_one_roundoff_pixels": 2371
+      },
+      "midpoint_rope": {
+        "active_pixels": 533781,
+        "minimum": 0.0,
+        "maximum": 1.0000001192092896,
+        "mean": 0.019410582122043663,
+        "sum": 10360.999935686588,
+        "negative_roundoff_pixels": 0,
+        "over_one_roundoff_pixels": 80
+      },
+      "sample_local_rope": {
+        "active_pixels": 533781,
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "mean": 0.018310295066136177,
+        "sum": 9773.687610697234,
+        "negative_roundoff_pixels": 0,
+        "over_one_roundoff_pixels": 0
+      },
+      "local_more_shadow_pixels": 143567,
+      "local_less_shadow_pixels": 83139,
+      "midpoint_clear_local_shadow_pixels": 143567,
+      "midpoint_clear_local_rope_shadow_pixels": 51647,
+      "retained_local_rope_shadow_pixels": 51647,
+      "retained_rope_with_midpoint_shadow_pixels": 0,
+      "midpoint_rope_shadow_pixels": 10361,
+      "midpoint_rope_without_local_rope_pixels": 10361,
+      "midpoint_and_local_rope_pixels": 0,
+      "local_rope_without_midpoint_rope_pixels": 51647,
+      "valid_rope_loss_mean": 0.18924018066290849,
+      "valid_rope_loss_min": 0.002793409861624241,
+      "valid_rope_loss_max": 1.0,
+      "rope_density_sample_intersections": 51735,
+      "all_opaque_density_sample_intersections": 1215081,
+      "local_rope_bounds_inclusive": [
+        721,
+        383,
+        1231,
+        802
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "path": "windows-default-ground.log",
+    "raw_private_sha256": "39fc4b81f0e9da6b1dbf55b9045cf05fac03e646d93d4413ac5b1ce01128aa13",
+    "public_sha256": "52605228136af3e88a932ea987faef29d60f50fb10c23c81501ca093f946f0b3",
+    "raw_published": false
+  },
+  {
+    "path": "approved-debug-install.log",
+    "raw_private_sha256": "393f91b2e599ea86068d5d604313a80fd51095036c9fce556cb6af04631ab751",
+    "public_sha256": "783b7a7fdad072e6a244f6d58dd270874ee84340c59c7d09f431ae59286dc7b1",
+    "raw_published": false
+  },
+  {
+    "path": "android-ordinary-launch.log",
+    "raw_private_sha256": "538971a51f367a419582b51ef7ed812771635f60aa4f7dff2135812119e107d5",
+    "public_sha256": "7b78b1d95f6c124e978946073edecb45f03b422d17c460fb7ca0eb185cd9ffef",
+    "raw_published": false
+  }
+]

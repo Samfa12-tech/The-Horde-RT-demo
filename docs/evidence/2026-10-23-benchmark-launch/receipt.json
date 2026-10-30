@@ -1,0 +1,702 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "78883df79fe49f0e7281857debd0e8633474d98e",
+  "evidenceClass": "MSVC Release CPU contracts plus actual Windows Debug Vulkan RT bounded lifecycle validation; no full timing course, Shipping run, ranking or phone acceptance",
+  "sourceGitBlobs": {
+    "src/gameplay/BenchmarkProfile.h": "96aa59dc0a45c749bc1af6f35a398104abbfcc7d",
+    "src/graphics/RtPresentationTransform.h": "ef9a236c571971079da953d80c8de99a088b2d98",
+    "src/platform/windows/DiagnosticWindow.cpp": "29fc3f301e24f0c853f4925451d5e322e0e5e5db",
+    "src/platform/windows/WindowsBenchmarkLaunch.h": "28942577a269d2e56fc8f8942fb2cd9ea270ea07",
+    "src/platform/windows/WindowsBenchmarkProfile.h": "ea37265a27e592c91cb08a2f8fb20f260a8815ea",
+    "src/platform/windows/WindowsBenchmarkProfile.inl": "1671e38975114ffa986045f83da96a9992abc97a",
+    "src/reporting/BenchmarkSummaryReport.cpp": "98526cf34f3bbe4f0b95c2132387ad6a083eb50c",
+    "src/telemetry/BenchmarkSummary.cpp": "432e37c72da6020f157e77955b6642060f22e242",
+    "src/telemetry/BenchmarkSummary.h": "33bdaead65ea8a4dbaf94270d140d8602d0f7829",
+    "src/telemetry/RtBenchmarkEvidenceReport.cpp": "f6bd3f5c38c9d604db06c8ba8258e818c306c786",
+    "src/telemetry/RtBenchmarkEvidenceRun.cpp": "6511425caeaf003368b9b31d0408cedef32fac9b",
+    "src/telemetry/RtBenchmarkEvidenceRun.h": "6bd9a5a20539a814ffc193e28617744aefb2d2d8",
+    "src/telemetry/RtFrameDimensionsEvidence.h": "c5d2912907a5a332ff157b303a770fffaea1cfed",
+    "src/telemetry/RtPerformanceEvidence.cpp": "e301d4fa33756cada77eeb9e566b8ba6e78daf25",
+    "src/telemetry/RtPerformanceEvidence.h": "f9af046afb492a30b0551b0461aad5448cc70ad1",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "fcfea0733646d5240bb7d551eb9e38c358857331",
+    "tests/BenchmarkProfileTests.cpp": "87d94cacf8e4a88deb06b980c1f31121cd9a9fcd",
+    "tests/BenchmarkSummaryReportTests.cpp": "1da51ea8f564b68f41d34a83701d9dd0931492a7",
+    "tests/RtPerformanceEvidenceTests.cpp": "6422a95264ff6d87b0f559b8b9b24c20e0cdfb06",
+    "tests/WindowsBenchmarkLaunchTests.cpp": "c90fa31bd8b23b645d281dba1dc91c37faa5b9c7"
+  },
+  "binary": {
+    "bytes": 14236672,
+    "sha256": "37c97a7d0a8716e750d65896f8e10c50ed7c83c7c57d700d1baa3c7bf62967fc"
+  },
+  "appliedPipelineIdentity": {
+    "executionBackend": "RayTracingPipeline",
+    "instrumentation": "diagnostic",
+    "dielectricQuality": "high",
+    "bundleKey": "diagnostic_high_pair",
+    "opaqueFast": {
+      "key": "diagnostic_high_opaque_fast",
+      "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_high_generic_dielectric",
+      "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+    },
+    "activeStrategy": "opaque-fast",
+    "activeKey": "diagnostic_high_opaque_fast",
+    "activeSha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3",
+    "waterQuality": "high"
+  },
+  "hostTests": {
+    "release": {
+      "tests": 5,
+      "passed": 5,
+      "seconds": 6.31,
+      "profileChecks": 175,
+      "profileFailures": 0
+    },
+    "debug": {
+      "tests": 2,
+      "passed": 2,
+      "seconds": 4.74
+    }
+  },
+  "retainedFailures": [
+    {
+      "kind": "shared profile odd-size camera precondition",
+      "checks": 165,
+      "failuresBefore": 2,
+      "correction": "Use actual internal image/packed transform aspect; provisional fixed contract stays strict"
+    },
+    {
+      "kind": "initial native setup rejection",
+      "exitCode": 2,
+      "rtStarted": false,
+      "custodyUnchanged": true,
+      "guardUnchanged": true,
+      "processReceiptSha256": "c31f37ff1e34594005f1a6380fa9720e85f22437380c03925d7a0fb5e508825f"
+    },
+    {
+      "kind": "decorated fixed output apply failure",
+      "exitCode": 1,
+      "applyAcknowledged": false,
+      "rtRestorationAcknowledged": true,
+      "custodyUnchanged": true,
+      "correction": "Single temporary borderless fixed-client window repair; target dimensions unchanged",
+      "rawReceiptSha256": "43908dc9dd0399ba08e5dd1e322ca4479da3000f6accdcc8fb7adcba6e90c96a"
+    },
+    {
+      "kind": "first native build nonmovable session",
+      "error": "C2280 context move/reset unavailable",
+      "correction": "Lazy unique_ptr stable address; ordinary launches allocate no session",
+      "rawBuildSha256": "25c412969bc57046920295ea7fadc57f6c4ed5a815f9aebb6bf99634d0247eef"
+    }
+  ],
+  "nativeCases": [
+    {
+      "label": "final-apply100",
+      "case": "apply-restore",
+      "originalScalePercent": 100,
+      "exitCode": 0,
+      "seconds": 12.266,
+      "custodyUnchanged": true,
+      "ownerCampaignFileCount": 0,
+      "campaignAttached": false,
+      "settingsWritesPermitted": false,
+      "confirmedTupleUnchanged": true,
+      "actualApplyAcknowledged": true,
+      "actualRestorationAcknowledged": true,
+      "additionalAppliedFrames": 3,
+      "staleOwnerRejected": false,
+      "cancelRequested": false,
+      "closeRequested": false,
+      "measuredCoursePassed": false,
+      "originalDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "appliedDimensions": {
+        "internalExtent": [
+          1920,
+          1080
+        ],
+        "outputExtent": [
+          1920,
+          1080
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "restoredDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "windowRestored": true,
+      "menuRestored": true,
+      "fullscreenBookkeepingRestored": true,
+      "monitorExtent": [
+        1920,
+        1080
+      ],
+      "images": {
+        "benchmark-profile-applied.png": {
+          "bytes": 2404834,
+          "sha256": "aeb4cdca65044799629f22537e7c70e3e22fc3f36aafdb7d4f44b9e8079d777b"
+        },
+        "benchmark-profile-restored.png": {
+          "bytes": 1261440,
+          "sha256": "2d021e6c2b27e2803c2e783da3eb46ff5a8425e66fce309e4b47b315ced8c8fd"
+        }
+      },
+      "rawReceiptSha256": "446f064c2eace5ed7a97715c46a9d3c81e6564fd95cff09d395dcde83c4f02f0",
+      "processCustodyReceiptSha256": "816294e71c4cf6b4669789e1b886e6acaeb33799020d03d176bb6e0c9d570f93"
+    },
+    {
+      "label": "final-cancelapply100",
+      "case": "cancel-apply",
+      "originalScalePercent": 100,
+      "exitCode": 0,
+      "seconds": 10.36,
+      "custodyUnchanged": true,
+      "ownerCampaignFileCount": 0,
+      "campaignAttached": false,
+      "settingsWritesPermitted": false,
+      "confirmedTupleUnchanged": true,
+      "actualApplyAcknowledged": false,
+      "actualRestorationAcknowledged": true,
+      "additionalAppliedFrames": 0,
+      "staleOwnerRejected": false,
+      "cancelRequested": true,
+      "closeRequested": false,
+      "measuredCoursePassed": false,
+      "originalDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "appliedDimensions": null,
+      "restoredDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "windowRestored": true,
+      "menuRestored": true,
+      "fullscreenBookkeepingRestored": true,
+      "monitorExtent": [
+        1920,
+        1080
+      ],
+      "images": {
+        "benchmark-profile-restored.png": {
+          "bytes": 1261440,
+          "sha256": "2d021e6c2b27e2803c2e783da3eb46ff5a8425e66fce309e4b47b315ced8c8fd"
+        }
+      },
+      "rawReceiptSha256": "42ab9a483d0845c2bbb3283ee117bded1881f3b11152f023b694b542c1048a0e",
+      "processCustodyReceiptSha256": "4226045d997382a0ce8c584cac0d4152ac62123506f54fb84c78f8e53b210477"
+    },
+    {
+      "label": "final-cancelmeasure75",
+      "case": "cancel-measure",
+      "originalScalePercent": 75,
+      "exitCode": 0,
+      "seconds": 9.828,
+      "custodyUnchanged": true,
+      "ownerCampaignFileCount": 0,
+      "campaignAttached": false,
+      "settingsWritesPermitted": false,
+      "confirmedTupleUnchanged": true,
+      "actualApplyAcknowledged": true,
+      "actualRestorationAcknowledged": true,
+      "additionalAppliedFrames": 3,
+      "staleOwnerRejected": false,
+      "cancelRequested": true,
+      "closeRequested": false,
+      "measuredCoursePassed": false,
+      "originalDimensions": {
+        "internalExtent": [
+          924,
+          602
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53488374,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": true,
+        "aspectPreserved": false
+      },
+      "appliedDimensions": {
+        "internalExtent": [
+          1920,
+          1080
+        ],
+        "outputExtent": [
+          1920,
+          1080
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "restoredDimensions": {
+        "internalExtent": [
+          924,
+          602
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53488374,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": true,
+        "aspectPreserved": false
+      },
+      "windowRestored": true,
+      "menuRestored": true,
+      "fullscreenBookkeepingRestored": true,
+      "monitorExtent": [
+        1920,
+        1080
+      ],
+      "images": {
+        "benchmark-profile-applied.png": {
+          "bytes": 2404834,
+          "sha256": "aeb4cdca65044799629f22537e7c70e3e22fc3f36aafdb7d4f44b9e8079d777b"
+        },
+        "benchmark-profile-restored.png": {
+          "bytes": 762480,
+          "sha256": "3604424dd51bc898650e15910e15ec443b2e7453a692caf206385622fdb27aba"
+        }
+      },
+      "rawReceiptSha256": "dfec242665ad6d8f987763cf0cf08a69a1ac0c716557346dd30e8e565da34031",
+      "processCustodyReceiptSha256": "efd858781944aeb311f72f1a7d99ac4512c811545dbff5cfb87ce3da0d7c306e"
+    },
+    {
+      "label": "final-restart100",
+      "case": "restart-measure",
+      "originalScalePercent": 100,
+      "exitCode": 0,
+      "seconds": 11.312,
+      "custodyUnchanged": true,
+      "ownerCampaignFileCount": 0,
+      "campaignAttached": false,
+      "settingsWritesPermitted": false,
+      "confirmedTupleUnchanged": true,
+      "actualApplyAcknowledged": true,
+      "actualRestorationAcknowledged": true,
+      "additionalAppliedFrames": 3,
+      "staleOwnerRejected": false,
+      "cancelRequested": true,
+      "closeRequested": false,
+      "measuredCoursePassed": false,
+      "originalDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "appliedDimensions": {
+        "internalExtent": [
+          1920,
+          1080
+        ],
+        "outputExtent": [
+          1920,
+          1080
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "restoredDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "windowRestored": true,
+      "menuRestored": true,
+      "fullscreenBookkeepingRestored": true,
+      "monitorExtent": [
+        1920,
+        1080
+      ],
+      "images": {
+        "benchmark-profile-applied.png": {
+          "bytes": 2404834,
+          "sha256": "aeb4cdca65044799629f22537e7c70e3e22fc3f36aafdb7d4f44b9e8079d777b"
+        },
+        "benchmark-profile-restored.png": {
+          "bytes": 1261440,
+          "sha256": "2d021e6c2b27e2803c2e783da3eb46ff5a8425e66fce309e4b47b315ced8c8fd"
+        }
+      },
+      "rawReceiptSha256": "8e7e68b64ff8933a031fe704c4719e52720eaa283101ec31771a5f6a65011e35",
+      "processCustodyReceiptSha256": "8dead56b190407eaa0472ebc1ca473dc9ef3087ca2162721881ec18a80a5a6f6"
+    },
+    {
+      "label": "final-close100",
+      "case": "close-measure",
+      "originalScalePercent": 100,
+      "exitCode": 0,
+      "seconds": 10.797,
+      "custodyUnchanged": true,
+      "ownerCampaignFileCount": 0,
+      "campaignAttached": false,
+      "settingsWritesPermitted": false,
+      "confirmedTupleUnchanged": true,
+      "actualApplyAcknowledged": true,
+      "actualRestorationAcknowledged": true,
+      "additionalAppliedFrames": 3,
+      "staleOwnerRejected": false,
+      "cancelRequested": true,
+      "closeRequested": true,
+      "measuredCoursePassed": false,
+      "originalDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "appliedDimensions": {
+        "internalExtent": [
+          1920,
+          1080
+        ],
+        "outputExtent": [
+          1920,
+          1080
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "restoredDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "windowRestored": true,
+      "menuRestored": true,
+      "fullscreenBookkeepingRestored": true,
+      "monitorExtent": [
+        1920,
+        1080
+      ],
+      "images": {
+        "benchmark-profile-applied.png": {
+          "bytes": 2404834,
+          "sha256": "aeb4cdca65044799629f22537e7c70e3e22fc3f36aafdb7d4f44b9e8079d777b"
+        },
+        "benchmark-profile-restored.png": {
+          "bytes": 1261440,
+          "sha256": "2d021e6c2b27e2803c2e783da3eb46ff5a8425e66fce309e4b47b315ced8c8fd"
+        }
+      },
+      "rawReceiptSha256": "2239ab256d003c8c6f844ce501271f576b2281cc02a953e767ca456cc755594f",
+      "processCustodyReceiptSha256": "3d300be25abd3279f285640154e2592b1c0b3a9f9ee14883c9f56778e67569e2",
+      "closeControls": "The final binary injects Alt+F4 and verifies cancellation/close flags before WM_CLOSE; restoration is acknowledged before retirement."
+    },
+    {
+      "label": "final-stale100",
+      "case": "stale-owner",
+      "originalScalePercent": 100,
+      "exitCode": 0,
+      "seconds": 10.797,
+      "custodyUnchanged": true,
+      "ownerCampaignFileCount": 0,
+      "campaignAttached": false,
+      "settingsWritesPermitted": false,
+      "confirmedTupleUnchanged": true,
+      "actualApplyAcknowledged": true,
+      "actualRestorationAcknowledged": true,
+      "additionalAppliedFrames": 3,
+      "staleOwnerRejected": true,
+      "cancelRequested": false,
+      "closeRequested": false,
+      "measuredCoursePassed": false,
+      "originalDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "appliedDimensions": {
+        "internalExtent": [
+          1920,
+          1080
+        ],
+        "outputExtent": [
+          1920,
+          1080
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "restoredDimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "windowRestored": true,
+      "menuRestored": true,
+      "fullscreenBookkeepingRestored": true,
+      "monitorExtent": [
+        1920,
+        1080
+      ],
+      "images": {
+        "benchmark-profile-applied.png": {
+          "bytes": 2404834,
+          "sha256": "aeb4cdca65044799629f22537e7c70e3e22fc3f36aafdb7d4f44b9e8079d777b"
+        },
+        "benchmark-profile-restored.png": {
+          "bytes": 1261440,
+          "sha256": "2d021e6c2b27e2803c2e783da3eb46ff5a8425e66fce309e4b47b315ced8c8fd"
+        }
+      },
+      "rawReceiptSha256": "795c539887a3a9a89ad62d6ebf4e382c491fad89b2cefa12fae73599e5f64ab5",
+      "processCustodyReceiptSha256": "0d1e071985412af3a70e82533874bd6ca095971e0db0df3da850dc512b8c0a4e"
+    },
+    {
+      "label": "final-apply75",
+      "case": "apply-restore",
+      "originalScalePercent": 75,
+      "exitCode": 0,
+      "seconds": 9.078,
+      "custodyUnchanged": true,
+      "ownerCampaignFileCount": 0,
+      "campaignAttached": false,
+      "settingsWritesPermitted": false,
+      "confirmedTupleUnchanged": true,
+      "actualApplyAcknowledged": true,
+      "actualRestorationAcknowledged": true,
+      "additionalAppliedFrames": 3,
+      "staleOwnerRejected": false,
+      "cancelRequested": false,
+      "closeRequested": false,
+      "measuredCoursePassed": false,
+      "originalDimensions": {
+        "internalExtent": [
+          924,
+          602
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53488374,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": true,
+        "aspectPreserved": false
+      },
+      "appliedDimensions": {
+        "internalExtent": [
+          1920,
+          1080
+        ],
+        "outputExtent": [
+          1920,
+          1080
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "restoredDimensions": {
+        "internalExtent": [
+          924,
+          602
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53488374,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": true,
+        "aspectPreserved": false
+      },
+      "windowRestored": true,
+      "menuRestored": true,
+      "fullscreenBookkeepingRestored": true,
+      "monitorExtent": [
+        1920,
+        1080
+      ],
+      "images": {
+        "benchmark-profile-applied.png": {
+          "bytes": 2404834,
+          "sha256": "aeb4cdca65044799629f22537e7c70e3e22fc3f36aafdb7d4f44b9e8079d777b"
+        },
+        "benchmark-profile-restored.png": {
+          "bytes": 762480,
+          "sha256": "3604424dd51bc898650e15910e15ec443b2e7453a692caf206385622fdb27aba"
+        }
+      },
+      "rawReceiptSha256": "1274ff4b6dcf728364900d831a1427500e5559b6c48a14e483d7327125f6b0ef",
+      "processCustodyReceiptSha256": "1bb168af30a52f5ea427961ec57a89a10342f276430d937cf72a007a9ac74ba5"
+    }
+  ],
+  "visualInspection": {
+    "label": "final-apply100",
+    "images": [
+      "benchmark-profile-applied.png",
+      "benchmark-profile-restored.png"
+    ],
+    "scope": "Final exact-binary RT storage readbacks visually inspected: scene, recorded image extents and expected different aspect/FOV; no quality or FPS gain claim"
+  },
+  "rawLogs": {
+    "reports/benchmark-launch-20261023/telemetry-build.log": "bed62ae3ed38d71f2935d1adaf2e1199fbe5a781e803b38741906269cb72699c",
+    "reports/benchmark-launch-20261023/telemetry-tests.log": "30824feed65df592814805bdbe573d2d3ffd395b3b33df502bfd99e93531236d",
+    "reports/benchmark-launch-20261023/telemetry-final-build.log": "3a73cec64ba1de91ca71e0a5ef503ff1807fd884371b8513d65a126277d8361d",
+    "reports/benchmark-launch-20261023/telemetry-final-tests.log": "ae76de5bc6a631469496037a93da0dcc661b9b28ff49f2f622921a229358a5c9",
+    "reports/benchmark-launch-20261023/renderer-build.log": "889059c9bdb4ee50ba97d279f141ad98b200d7a7ac6b9c24d66d9114b0b1e07c",
+    "reports/benchmark-launch-20261023/odd-aspect-before-build.log": "cc0b16bd42b3f00833dd170de1a381414874a544ab79d8ec52823a6ff5973910",
+    "reports/benchmark-launch-20261023/odd-aspect-before.log": "327c8ffe00c148ecfe55679cb6e7f69ad2ed79bcccca6350b750fe8334f577fb",
+    "reports/benchmark-launch-20261023/windows-build-first.log": "25c412969bc57046920295ea7fadc57f6c4ed5a815f9aebb6bf99634d0247eef",
+    "reports/benchmark-launch-20261023/windows-build-fixed.log": "4e093c1c30f5a1252ae2a8caaa9e8e8978461d9853d60413c194961ccc7499e0",
+    "reports/benchmark-launch-20261023/windows-build-receipt.log": "bc6668edc54f924cc242fd0e571a06ea3a1cd201a3e3efcaea27458a3992821e",
+    "reports/benchmark-launch-20261023/windows-borderless-build.log": "bc6668edc54f924cc242fd0e571a06ea3a1cd201a3e3efcaea27458a3992821e",
+    "reports/benchmark-launch-20261023/windows-final-tests.log": "29554fa98858e3a45707e17db557671cd684c792b1690140b029e5a4af31053b",
+    "reports/benchmark-launch-20261023/coordinator-final-build.log": "204ecc3db56cacdb4914abee415801551f0016331a566e938c3dc245d733b1d3",
+    "reports/benchmark-launch-20261023/native-apply100.log": "ac2cf743e503fbb434051db64a8f373c0cd5d4b34e551180b55def8006d216c7",
+    "reports/benchmark-launch-20261023/native-apply100b.log": "28ebb0c849c6ac349e9760e01ff46ebace31dc0665b28bdfe752375236e9fb9f",
+    "reports/benchmark-launch-20261023/windows-final-build.log": "bc6668edc54f924cc242fd0e571a06ea3a1cd201a3e3efcaea27458a3992821e",
+    "reports/benchmark-launch-20261023/native-final-apply100.log": "b6c9a848824b187c75935fdbc13cc6955e279ba231eecbe60e4918255627218f",
+    "reports/benchmark-launch-20261023/native-final-cancelapply100.log": "73ecccbfc1f8f8215b7fc92127e2227f49dfb059d6a12bf9fbc958d2d9ae7668",
+    "reports/benchmark-launch-20261023/native-final-cancelmeasure75.log": "2f6f6d837077d06bcd924e646ca9678acd383f05107e5e2350266cef05954ba6",
+    "reports/benchmark-launch-20261023/native-final-restart100.log": "e09cc2b8de73de478efe87bafd5477927af21f65cf5402c90485c5ffb5d4067e",
+    "reports/benchmark-launch-20261023/native-final-close100.log": "f75d491df61137a642b0e3e106e6e4b08ee385f9ae52ee550114c34e4011a06c",
+    "reports/benchmark-launch-20261023/native-final-stale100.log": "08faaa40f2fd2e2edd5e2a4a571799cbb3df9a4ac40e100698b32051859a5ef3",
+    "reports/benchmark-launch-20261023/native-final-apply75.log": "38dc3deb45421f7a50b4c1b451a7c2e8ef7c5f7c279e6e820cf5df1af9af790a"
+  },
+  "limits": [
+    "All reports remain custom-unranked and ranked=false",
+    "No full measured course or Shipping native build/run in this slice",
+    "No Android fixed-profile launch, phone, owner listening or sustained performance measurement",
+    "Camera aspect is derived from actual image/transform matching immutable shader math; not shader-variable readback",
+    "DRS=false describes current fixed-allocation renderer with no adaptive controller",
+    "Raw publications/custody details/images stay ignored; no report send/upload"
+  ],
+  "nextMilestone": "One full provisional Windows Shipping course, final local report population and acknowledged restoration; then Android fixed-output lifecycle/practicality under authorized hardware access"
+}

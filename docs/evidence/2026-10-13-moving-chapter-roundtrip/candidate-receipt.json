@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "implementationParent": "48de62a45ccf50b5cbd21d2a754916f1e8f4259b",
+  "scope": "desktop validation-only change; normal production geometry/shaders remain complete",
+  "compiledSourceHashes": {
+    "src/platform/windows/DiagnosticWindow.cpp": "936de0b18de124c17a92ff00edd7072d918300fc8ca55ac1ef33441350792829",
+    "src/platform/windows/WindowsChapterRoundTripCapture.inl": "d8c2b1dfac79ee516306052d24e8cbddb6cf65c389b2ddeec4b55ac1fbb5359a",
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "fb8368500a4d6712803e21c2cdbf36118599908bf747d424cdffe77e9f9282a0",
+    "tests/RescueJourneyIntegrationTests.cpp": "5db32e23e2f542f74baf9d9058bb3f30698e74fb4e841254ddb0a82ad7867b76",
+    "tools/capture-chapter-roundtrip.ps1": "6b48251c8e7d71dcbb95505de4b6ada8a981f030d8a7cd12574f61f88ca924a5"
+  },
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 13049344,
+      "sha256": "70ac63404be9660d461d901a8c7ceea633d1cc1255d86a25906b8dcbc03e4262"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4451328,
+      "sha256": "2d5bb6cba2f572fb597e7e2361c83cc6f50ba59bcb70834c65de2b1c3ecf0e9d"
+    },
+    {
+      "path": "reports/phone-candidate-1a6f553f9f57/horde-debug.apk",
+      "bytes": 183107002,
+      "sha256": "1a6f553f9f5761e7d4979ae0fc5b029ca46fe07f4a9bf648be89c71c758f8abc"
+    }
+  ],
+  "androidArtifactScope": "unchanged48de62a4 Android code; no Android source or runtime payload changed; prepared, uninstalled",
+  "measurementScope": "Debug Diagnostic/High/Higher960x540100%; scripted max4 simulation60Hz ticks/render; not Shipping/owner acceptance",
+  "earlierQueryScope": "r03 completed before final one-second Kit-walking inspection and caption metadata; its overwritten executable hash was not sealed, so it does not certify the final build",
+  "normalPlayResidencySavingBytes": 0,
+  "statistics": {
+    "pipeline": {
+      "complete": true,
+      "renderedFrames": 1241,
+      "simulationHz": 60,
+      "maximumTicksPerRender": 4,
+      "simulationTicks": 4961,
+      "simulationBatchCpuMs": {
+        "count": 1241,
+        "mean": 19.273939403706688,
+        "median": 8.6439,
+        "p95": 104.129,
+        "maximum": 636.152
+      },
+      "renderCycleCpuMs": {
+        "count": 1241,
+        "mean": 59.232978323932315,
+        "median": 58.4624,
+        "p95": 73.1276,
+        "maximum": 154.954
+      },
+      "owningMovingGpuMs": {
+        "count": 1241,
+        "mean": 7.808346688154714,
+        "median": 7.47664,
+        "p95": 13.694048,
+        "maximum": 24.344576
+      },
+      "finalPhase": "repeat-ascent",
+      "deviceLocalBytes": [
+        405550288
+      ],
+      "hostVisibleBytes": [
+        49408256
+      ],
+      "normalPlayResidencySavingBytes": 0
+    },
+    "query-incomplete": {
+      "complete": false,
+      "renderedFrames": 1123,
+      "simulationHz": 60,
+      "maximumTicksPerRender": 4,
+      "simulationTicks": 4492,
+      "simulationBatchCpuMs": {
+        "count": 1123,
+        "mean": 22.15899430097952,
+        "median": 10.4886,
+        "p95": 119.86,
+        "maximum": 314.43
+      },
+      "renderCycleCpuMs": {
+        "count": 1123,
+        "mean": 73.35686874443455,
+        "median": 64.6578,
+        "p95": 103.324,
+        "maximum": 637.258
+      },
+      "owningMovingGpuMs": {
+        "count": 1122,
+        "mean": 8.451182573975045,
+        "median": 7.689807999999999,
+        "p95": 13.884608,
+        "maximum": 20.639424
+      },
+      "finalPhase": "lower-sweep",
+      "deviceLocalBytes": [
+        405550288
+      ],
+      "hostVisibleBytes": [
+        49407744
+      ],
+      "normalPlayResidencySavingBytes": 0
+    }
+  }
+}

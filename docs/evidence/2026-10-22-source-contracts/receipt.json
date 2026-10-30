@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "createdUtc": "2026-10-22T21:16:58.063327+00:00",
+  "baseCommit": "cc20af8ff8270bb86bd7b7126d73fc1558b9c8c6",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "scope": "test-only source-contract repair; no production edits",
+  "artifacts": [
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 117546,
+      "sha256": "7955965fb93d91d860b573f7ac2252dc41c86a4f80ff69600f77f7c3da146580"
+    },
+    {
+      "path": "tests/CharacterRenderSlotSmoke.cpp",
+      "bytes": 178952,
+      "sha256": "00886bb143380a6bb5ea6f1f9da78fc43c2ef6983220990a56c9cb093c8d2711"
+    },
+    {
+      "path": "tests/CompiledShaderContracts.h.in",
+      "bytes": 1168,
+      "sha256": "7d6b429eef337795cc90059bd2cfc9c78b6702d642657c86cec71788d8099175"
+    },
+    {
+      "path": "build/presets/windows-x64-release/generated/tests/CompiledShaderContracts.h",
+      "bytes": 1914,
+      "sha256": "8f44295f1646bc4d94233cf2e8903d89b8fc5bbbf2eac838a14721e7c73c0d97"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_character_render_slot_smoke.exe",
+      "bytes": 2172416,
+      "sha256": "345624cf1ef2cf33b402d0a551e4bfa9d38574ef629f10183c209441b526efc9"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_chapter_regional_water_tests.exe",
+      "bytes": 313856,
+      "sha256": "1f0519a63ab4fcc6718173b0a4202d5741c27324d643cefe947da502b71af3db"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_dielectric_math_tests.exe",
+      "bytes": 347136,
+      "sha256": "a2d26b9d33f7e82a65f8d5c2e1b0f4a9236efb7da1904c65f3897bab4f426717"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4628992,
+      "sha256": "cabcc003c0edc43cf217b6f79d8038ada9be3790d780106036e7abadb57400e8"
+    }
+  ],
+  "baseline": {
+    "buildExitCode": 0,
+    "testExitCode": 8,
+    "assertionsFailed": 8,
+    "log": "baseline-test.txt"
+  },
+  "candidateFailure": {
+    "cause": "Android check initially scoped to outer SwapchainRenderLoop instead of actual RenderFrame",
+    "failedAssertions": 3,
+    "retainedLog": "scope-fixture-failure.txt"
+  },
+  "final": {
+    "buildExitCode": 0,
+    "hostTestsPassed": 3,
+    "hostTestsFailed": 0,
+    "log": "host-tests.txt",
+    "windowsApplicationBuildExitCode": 0
+  },
+  "coverage": {
+    "numericSignedAxes": 6,
+    "numericWaterCameraPaths": 4,
+    "negativeSourceMutations": 6,
+    "existingConcurrentWriterIterations": 2000,
+    "existingConcurrentReaderIterations": 2000
+  },
+  "ownerCustody": {
+    "phoneOperations": 0,
+    "ownerSaveOrPreferenceAccess": false,
+    "canonicalFileHashes": {
+      "ASSET_LICENSES.md": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387",
+      "PROJECT_MEMORY.md": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    }
+  },
+  "limits": [
+    "CPU arithmetic/source-integration only, not SPIR-V or Vulkan execution",
+    "Textual extraction anchors remain a test seam",
+    "No fresh hosted full-CI result",
+    "PR27 conflicts and Debug route timeout remain open",
+    "Kit cc20af8f endpoint/listening acceptance remains pending"
+  ]
+}

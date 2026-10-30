@@ -1,0 +1,21 @@
+{
+  "status": "pass",
+  "input": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\source\\forest-understory-v1\\original-package\\assets\\bh_log_fallen_trunk.glb",
+  "output": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\source\\forest-deadwood-v1\\candidates\\horde-fallen-log.glb",
+  "inputSha256": "f3d5c2ee914f7871ea11dc98d9f2af7791fe8a8842368dfc044cd6b0b8fe44ab",
+  "outputSha256": "5f4f1fcd6ecdb69715f09cabbe2fac8e716851b87eacad7ec07ec702f715ecef",
+  "outputBytes": 1873468,
+  "geometryUnchanged": true,
+  "geometryComparison": "positions/winding/UV0 exact at 1e-6; normal direction dot >= 0.99999",
+  "maximumNormalComponentDelta": 9.800000000000086e-05,
+  "minimumNormalDirectionDot": 0.9999999951755307,
+  "embeddedImagePixelsUnchanged": true,
+  "tangentLoopCountsByMappedMaterial": {
+    "BH_Shared_Original_Bark": 1332,
+    "BH_Original_Weathered_Endgrain": 300
+  },
+  "materialTriangles": {
+    "BH_Shared_Original_Bark": 444,
+    "BH_Original_Weathered_Endgrain": 100
+  }
+}

@@ -1,0 +1,27 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  33: horde_rt_held_item_clearance_tests
+1/7 Test  #33: horde_rt_held_item_clearance_tests ..............   Passed   10.59 sec
+    Start  53: horde_rt_held_item_vertical_support_rig_tests
+2/7 Test  #53: horde_rt_held_item_vertical_support_rig_tests ...   Passed    0.09 sec
+    Start  54: horde_rt_player_directional_rig_tests
+3/7 Test  #54: horde_rt_player_directional_rig_tests ...........   Passed    1.33 sec
+    Start  83: horde_rt_development_static_asset_tests
+4/7 Test  #83: horde_rt_development_static_asset_tests .........***Failed    0.96 sec
+FAIL: near-wall high checkpoint freezes the shared wall-retracted hinge and authoritative sideways body camera-side of the fixture
+1 development static asset assertion(s) failed
+
+    Start 183: horde_rt_rescue_journey_integration_tests
+5/7 Test #183: horde_rt_rescue_journey_integration_tests .......   Passed    1.29 sec
+    Start 191: horde_rt_rescue_rig_attachment_tests
+6/7 Test #191: horde_rt_rescue_rig_attachment_tests ............   Passed    3.06 sec
+    Start 192: horde_rt_rescue_adversarial_regression_tests
+7/7 Test #192: horde_rt_rescue_adversarial_regression_tests ....   Passed    2.50 sec
+
+86% tests passed, 1 tests failed out of 7
+
+Total Test time (real) =  19.85 sec
+
+The following tests FAILED:
+	 83 - horde_rt_development_static_asset_tests (Failed)
+Errors while running CTest

@@ -1,0 +1,64 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added setup test horde_rt_campaign_play_session_tests required by fixture HordeEarnedEndpoint
+Added cleanup test horde_rt_campaign_earned_fixture_cleanup required by fixture HordeEarnedEndpoint
+Added 2 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 37
+    Start 37: horde_rt_campaign_play_session_tests
+
+37: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_play_session_tests.exe" "--produce-earned-fixture"
+37: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+37: Test timeout computed to be: 30
+37: PLAY_SESSION_ELAPSED phase=suite-start totalMs=0 sincePreviousMs=0 tick=0 checks=0 failures=0
+37: PLAY_SESSION_ELAPSED phase=terrain-ready totalMs=83 sincePreviousMs=83 tick=0 checks=0 failures=0
+37: PLAY_SESSION_ELAPSED phase=storage-prelude-complete totalMs=101 sincePreviousMs=18 tick=54 checks=42 failures=0
+37: PLAY_SESSION_ELAPSED phase=normal-earned-journey-start totalMs=101 sincePreviousMs=0 tick=0 checks=42 failures=0
+37: PLAY_SESSION_ELAPSED phase=earned-lower-boundary totalMs=139 sincePreviousMs=37 tick=3228 checks=50 failures=0
+37: ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+37: PLAY_SESSION_ELAPSED phase=earned-upper-boundary totalMs=298 sincePreviousMs=159 tick=3892 checks=71 failures=0
+37: ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+37: PLAY_SESSION_ELAPSED phase=earned-upper-recovery-complete totalMs=688 sincePreviousMs=389 tick=3892 checks=101 failures=0
+37: PLAY_SESSION_ELAPSED phase=earned-forest-endpoint totalMs=1575 sincePreviousMs=886 tick=7088 checks=107 failures=0
+37: PLAY_SESSION_ELAPSED phase=earned-journey-end totalMs=1759 sincePreviousMs=184 tick=7947 checks=131 failures=0
+37: PLAY_SESSION_ELAPSED phase=endpoint-write-failure-start totalMs=1760 sincePreviousMs=1 tick=0 checks=131 failures=0
+37: PLAY_SESSION_ELAPSED phase=suite-end totalMs=1768 sincePreviousMs=8 tick=0 checks=144 failures=0
+37: 144 campaign play session checks, 0 failures
+1/3 Test #37: horde_rt_campaign_play_session_tests .......   Passed    1.79 sec
+test 38
+    Start 38: horde_rt_campaign_earned_return_tests
+
+38: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_play_session_tests.exe" "--consume-earned-fixture"
+38: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+38: Test timeout computed to be: 30
+38: PLAY_SESSION_ELAPSED phase=suite-start totalMs=0 sincePreviousMs=0 tick=0 checks=0 failures=0
+38: PLAY_SESSION_ELAPSED phase=terrain-ready totalMs=84 sincePreviousMs=84 tick=0 checks=0 failures=0
+38: PLAY_SESSION_ELAPSED phase=earned-return-start totalMs=107 sincePreviousMs=22 tick=122 checks=11 failures=0
+38: PLAY_SESSION_ELAPSED phase=earned-return-complete totalMs=1370 sincePreviousMs=1262 tick=3204 checks=12 failures=0
+38: 15 cross-process earned return checks, 0 failures
+2/3 Test #38: horde_rt_campaign_earned_return_tests ......   Passed    1.40 sec
+test 39
+    Start 39: horde_rt_campaign_earned_fixture_cleanup
+
+39: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_play_session_tests.exe" "--cleanup-earned-fixture"
+39: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+39: Test timeout computed to be: 30
+39: PLAY_SESSION_ELAPSED phase=suite-start totalMs=0 sincePreviousMs=0 tick=0 checks=0 failures=0
+3/3 Test #39: horde_rt_campaign_earned_fixture_cleanup ...   Passed    0.03 sec
+
+The following tests passed:
+	horde_rt_campaign_play_session_tests
+	horde_rt_campaign_earned_return_tests
+	horde_rt_campaign_earned_fixture_cleanup
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   3.24 sec

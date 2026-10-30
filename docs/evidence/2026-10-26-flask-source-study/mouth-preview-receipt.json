@@ -1,0 +1,24 @@
+{
+  "scope": "Blender authoring preview, not Horde RT evidence",
+  "file": "mouth.png",
+  "sha256": "f2728f222953d10002ff029b246c2bce815092371b3134b531b8b4373d22aca0",
+  "bytes": 338790,
+  "cameraBlenderMetres": [
+    0.1,
+    -0.18,
+    0.24
+  ],
+  "targetBlenderMetres": [
+    0,
+    0,
+    0.035
+  ],
+  "orthographicScale": 0.2,
+  "resolution": [
+    512,
+    640
+  ],
+  "engine": "Cycles CPU",
+  "samples": 24,
+  "sourceGlbSha256": "ba93fd1a0242fb806c8be3972a1db1371e1aee3cd7ee4e22be447dbb7d8e95dd"
+}

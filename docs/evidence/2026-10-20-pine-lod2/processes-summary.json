@@ -1,0 +1,219 @@
+[
+  {
+    "label": "native-inspection",
+    "pid": 36980,
+    "exitCode": 0,
+    "pending": false,
+    "deadlineSeconds": 90,
+    "seconds": 56.51600000000326,
+    "executable": {
+      "exists": true,
+      "bytes": 14029824,
+      "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+    },
+    "settingsBefore": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "settingsAfter": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "foregroundBefore": null,
+    "foregroundAfter": null,
+    "settingsUnchanged": true,
+    "foregroundApiSamplesUnchanged": true,
+    "argumentsSha256": "d62b0f58ac0eaa91c987f73f43037f6cb446feefac18c83ffb6b3063f57093be",
+    "foregroundApiSampleCount": 213,
+    "allForegroundApiSamplesNull": true,
+    "omissions": null
+  },
+  {
+    "label": "near-pipeline",
+    "pid": 34864,
+    "exitCode": 0,
+    "pending": false,
+    "deadlineSeconds": 90,
+    "seconds": 51.34299999999348,
+    "executable": {
+      "exists": true,
+      "bytes": 14029824,
+      "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+    },
+    "settingsBefore": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "settingsAfter": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "foregroundBefore": null,
+    "foregroundAfter": null,
+    "settingsUnchanged": true,
+    "foregroundApiSamplesUnchanged": true,
+    "argumentsSha256": "654fdbe081aef7d426c5a311085d3ebf15b17eab8a26d1941a2bc4c7ce2b84bd",
+    "foregroundApiSampleCount": 205,
+    "allForegroundApiSamplesNull": true,
+    "omissions": "global-omissions.json#globalTriangleIds"
+  },
+  {
+    "label": "mid-pipeline",
+    "pid": 39348,
+    "exitCode": 0,
+    "pending": false,
+    "deadlineSeconds": 90,
+    "seconds": 23.546000000002095,
+    "executable": {
+      "exists": true,
+      "bytes": 14029824,
+      "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+    },
+    "settingsBefore": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "settingsAfter": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "foregroundBefore": null,
+    "foregroundAfter": null,
+    "settingsUnchanged": true,
+    "foregroundApiSamplesUnchanged": true,
+    "argumentsSha256": "ca156baa51b666bf910cacd3fcd0d77e8020d8c45a5e5f2f589b11d81e6101fd",
+    "foregroundApiSampleCount": 94,
+    "allForegroundApiSamplesNull": true,
+    "omissions": "global-omissions.json#globalTriangleIds"
+  },
+  {
+    "label": "far-pipeline",
+    "pid": 33392,
+    "exitCode": 0,
+    "pending": false,
+    "deadlineSeconds": 90,
+    "seconds": 23.797000000005937,
+    "executable": {
+      "exists": true,
+      "bytes": 14029824,
+      "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+    },
+    "settingsBefore": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "settingsAfter": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "foregroundBefore": null,
+    "foregroundAfter": null,
+    "settingsUnchanged": true,
+    "foregroundApiSamplesUnchanged": true,
+    "argumentsSha256": "84f89a1b573eaea070166c87210cb84d2c0a51bd1d81f826bde1a039f0189a86",
+    "foregroundApiSampleCount": 95,
+    "allForegroundApiSamplesNull": true,
+    "omissions": "global-omissions.json#globalTriangleIds"
+  },
+  {
+    "label": "near-query",
+    "pid": 36132,
+    "exitCode": 0,
+    "pending": false,
+    "deadlineSeconds": 90,
+    "seconds": 55.10899999999674,
+    "executable": {
+      "exists": true,
+      "bytes": 14029824,
+      "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+    },
+    "settingsBefore": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "settingsAfter": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "foregroundBefore": null,
+    "foregroundAfter": null,
+    "settingsUnchanged": true,
+    "foregroundApiSamplesUnchanged": true,
+    "argumentsSha256": "c49b91e38ba47c7431286c649920233532177242deda8fe60118db4d405d193c",
+    "foregroundApiSampleCount": 220,
+    "allForegroundApiSamplesNull": true,
+    "omissions": "global-omissions.json#globalTriangleIds"
+  },
+  {
+    "label": "mid-query",
+    "pid": 33036,
+    "exitCode": 0,
+    "pending": false,
+    "deadlineSeconds": 90,
+    "seconds": 22.312999999994645,
+    "executable": {
+      "exists": true,
+      "bytes": 14029824,
+      "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+    },
+    "settingsBefore": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "settingsAfter": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "foregroundBefore": null,
+    "foregroundAfter": null,
+    "settingsUnchanged": true,
+    "foregroundApiSamplesUnchanged": true,
+    "argumentsSha256": "1d7bdb25486f55a937fe21b2c08339e78b6221b73017691f7005e7a540016059",
+    "foregroundApiSampleCount": 89,
+    "allForegroundApiSamplesNull": true,
+    "omissions": "global-omissions.json#globalTriangleIds"
+  },
+  {
+    "label": "far-query",
+    "pid": 36764,
+    "exitCode": 0,
+    "pending": false,
+    "deadlineSeconds": 90,
+    "seconds": 21.531000000002678,
+    "executable": {
+      "exists": true,
+      "bytes": 14029824,
+      "sha256": "6c4b2cb1b2953a1815543cf519a2082f892c6eb9e4f41dc02f4b4a3ae5387e78"
+    },
+    "settingsBefore": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "settingsAfter": {
+      "exists": true,
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "foregroundBefore": null,
+    "foregroundAfter": null,
+    "settingsUnchanged": true,
+    "foregroundApiSamplesUnchanged": true,
+    "argumentsSha256": "01d0574bd65a3b730b43f9902001df17af43875579302a3948cfc0193288d92a",
+    "foregroundApiSampleCount": 86,
+    "allForegroundApiSamplesNull": true,
+    "omissions": "global-omissions.json#globalTriangleIds"
+  }
+]

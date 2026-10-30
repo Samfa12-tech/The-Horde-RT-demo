@@ -1,0 +1,310 @@
+Start testing: Oct 21 00:03 AUS Eastern Summer Time
+----------------------------------------------------------
+35/224 Testing: horde_rt_campaign_play_session_tests
+35/224 Test: horde_rt_campaign_play_session_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_play_session_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_play_session_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+145 campaign play session checks, 0 failures
+<end of output>
+Test time =   4.15 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_play_session_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_campaign_play_session_tests" time elapsed: 00:00:04
+----------------------------------------------------------
+
+40/224 Testing: horde_rt_campaign_codec_tests
+40/224 Test: horde_rt_campaign_codec_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_codec_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_codec_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+2283 campaign codec checks, 0 failures
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_codec_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_campaign_codec_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+45/224 Testing: horde_rt_campaign_checkpoint_tests
+45/224 Test: horde_rt_campaign_checkpoint_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_checkpoint_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_checkpoint_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+1026 campaign checkpoint checks, 0 failures
+<end of output>
+Test time =   2.34 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_checkpoint_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_campaign_checkpoint_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+47/224 Testing: horde_rt_combat_foundation_tests
+47/224 Test: horde_rt_combat_foundation_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_combat_foundation_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_combat_foundation_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+combat foundation checks=683 failures=0
+<end of output>
+Test time =   1.09 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_combat_foundation_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_combat_foundation_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+57/224 Testing: horde_rt_graphics_preview_frame_adapter_tests
+57/224 Test: horde_rt_graphics_preview_frame_adapter_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_graphics_preview_frame_adapter_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_graphics_preview_frame_adapter_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.94 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_graphics_preview_frame_adapter_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_graphics_preview_frame_adapter_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+62/224 Testing: horde_rt_windows_benchmark_launch_tests
+62/224 Test: horde_rt_windows_benchmark_launch_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_windows_benchmark_launch_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_windows_benchmark_launch_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_windows_benchmark_launch_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_windows_benchmark_launch_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+73/224 Testing: horde_rt_player_directional_rig_tests
+73/224 Test: horde_rt_player_directional_rig_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_player_directional_rig_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_player_directional_rig_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Directional runtime rig, aim independence, run stride, dodge disposition, route support poses, and attachment sockets passed; dedicated run/back/strafe/dodge clips remain absent; route_pose_samples=75 GPU_cost=not-measured.
+<end of output>
+Test time =   1.28 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_player_directional_rig_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_player_directional_rig_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+74/224 Testing: horde_rt_player_dodge_rig_tests
+74/224 Test: horde_rt_player_dodge_rig_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_player_dodge_rig_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_player_dodge_rig_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+dodge_rig_samples=562 checks=9230 failures=0; native CPU runtime-asset rig only, GPU/device acceptance not measured
+<end of output>
+Test time =   2.22 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_player_dodge_rig_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_player_dodge_rig_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+75/224 Testing: horde_rt_player_dodge_lifecycle_tests
+75/224 Test: horde_rt_player_dodge_lifecycle_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_player_dodge_lifecycle_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_player_dodge_lifecycle_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+28 dodge lifecycle checks, 0 failures
+CPU restore fixtures and actual rope motor only; same-tick hostile death is not covered.
+<end of output>
+Test time =   0.41 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_player_dodge_lifecycle_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_player_dodge_lifecycle_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+76/224 Testing: horde_rt_player_crouch_rig_tests
+76/224 Test: horde_rt_player_crouch_rig_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_player_crouch_rig_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_player_crouch_rig_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+crouch_pose_samples=288 failures=0; native CPU rig only, GPU not measured
+<end of output>
+Test time =   1.94 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_player_crouch_rig_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_player_crouch_rig_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+100/224 Testing: horde_rt_player_animation_tests
+100/224 Test: horde_rt_player_animation_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_player_animation_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_player_animation_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Unequal folded IK: elbow=(-0.075,0.290474,0), upper=0.3, lower=0.4
+Owner portrait safe-frame NDC x=[-0.934917, 0.864117]
+Downward portrait safe-frame NDC x=[-0.934917, 0.818936]
+Upward portrait safe-frame NDC x=[-0.934917, 0.730322]
+Player animation, IK, socket, reset/import, visibility, and delivery contracts passed
+<end of output>
+Test time =   1.26 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_player_animation_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_player_animation_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+101/224 Testing: horde_rt_player_dodge_presentation_tests
+101/224 Test: horde_rt_player_dodge_presentation_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_player_dodge_presentation_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_player_dodge_presentation_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Player dodge presentation: 750 checks, 0 failures
+<end of output>
+Test time =   1.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_player_dodge_presentation_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_player_dodge_presentation_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+103/224 Testing: horde_rt_held_item_socket_tests
+103/224 Test: horde_rt_held_item_socket_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_held_item_socket_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_held_item_socket_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+post-claim chest held depth/x/y/clearance=1.02728/-0.130527/-0.0501483/2.66
+reward carry open held/high/low x=0.68/1.04/1.04/-0.13 guard clearance/hand=0.0600006/0.2 emergency wall held/hand/x=0.3/0.2/-0.45
+reward one-millimetre wall sweep max clearance/depth/lateral/yaw delta=0.00100112/0.000478745/0.000261545/0.00098294
+stowed scabbard full-mesh sweep poses=16 closestGap=0.0838906m playerTri=16301 sheathTri=11 floorGap=0.157182m releasedHand=0.503615m
+parry actual mesh clearance aspect=0.46 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=7 time=0.04 successful=0 hilt=0.0495894 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=8 time=0.05 successful=0 hilt=0.0495894 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+sword grip-local envelope y=-0.135279:0.915253 vertexBands(y<=.15,.15-.35,.35-.55,.55-.75,.75-.95,>.95)=4348,2266,1969,1782,1059,0, primitiveMaterials=material:34497,
+combat-geometry normal-near target=0,-1.2 targetY=-0.95 targetFacing=0 playerYaw=0 targetBearing=0 targetBoundsY=-0.939193:0.543894 downPulseTick=17 downActionTime=0.103333 downAdmitted=1 upPulseTick=0 upActionTime=-1 targetDeadAtUpPulse=0 downPulseSurfaceGap=0.00213471 upPulseSurfaceGap=3.40282e+38 downPulseBoundsGap=0 upPulseBoundsGap=3.40282e+38 downPulseBladeGap=0.00213471 upPulseBladeGap=3.40282e+38 downPulseNearestGripLocal=0.0321889,0.630462,0.0016153 upPulseNearestGripLocal=0,0,0 minSurfaceGap=0.00213471 closestSurfaceTick=17 closestSurfaceGripLocal=0.0321889,0.630462,0.0016153 minBladeSurfaceGap=0.00213471 closestBladeTick=17 closestBladeGripLocal=0.0321889,0.630462,0.0016153 nearSurfaceTicks20mm=17:17 downActiveNearTicks=17:17 upActiveNearTicks=0:0 downActiveBladeNearTicks=17:17 upActiveBladeNearTicks=0:0 minGap=0 boundsOverlapSamples=10:22 importedSwordVertices=11424 importedTargetVertices=28206
+combat-geometry combo-near target=0,-1.2 targetY=-0.95 targetFacing=0 playerYaw=0 targetBearing=0 targetBoundsY=-0.939193:0.543894 downPulseTick=17 downActionTime=0.103333 downAdmitted=1 upPulseTick=30 upActionTime=0.05 targetDeadAtUpPulse=1 downPulseSurfaceGap=0.00213471 upPulseSurfaceGap=0.0131259 downPulseBoundsGap=0 upPulseBoundsGap=0 downPulseBladeGap=0.00213471 upPulseBladeGap=0.0131259 downPulseNearestGripLocal=0.0321889,0.630462,0.0016153 upPulseNearestGripLocal=0.0319776,0.642511,0.00157196 minSurfaceGap=0.00213471 closestSurfaceTick=17 closestSurfaceGripLocal=0.0321889,0.630462,0.0016153 minBladeSurfaceGap=0.00213471 closestBladeTick=17 closestBladeGripLocal=0.0321889,0.630462,0.0016153 nearSurfaceTicks20mm=17:30 downActiveNearTicks=17:17 upActiveNearTicks=30:30 downActiveBladeNearTicks=17:17 upActiveBladeNearTicks=30:30 minGap=0 boundsOverlapSamples=10:32 importedSwordVertices=11424 importedTargetVertices=28206
+open anatomical hands right=0.18,-0.34,0.6 left=-0.135,-0.31,0.68 lowering/retraction=0/0 torch=0
+sword overhead phase sweep max lowering/vertices clear=0.733974/1 anatomical finalGrip/vertices=1/1 resolved=60/60 leftSocketErrorMax/failures=9.996e-08/0 rightSocketError=1.78814e-07 finalGripError=5.05762e-07m/0rad
+sword five-mm approach max lowering/hand step=0.0027637/0.00296172
+Held-item socket contracts passed.
+<end of output>
+Test time =   3.12 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_held_item_socket_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_held_item_socket_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+174/224 Testing: horde_rt_lantern_reward_tests
+174/224 Test: horde_rt_lantern_reward_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_lantern_reward_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_lantern_reward_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Lantern reward interaction, command, and finale tests passed
+<end of output>
+Test time =   0.98 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_lantern_reward_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_lantern_reward_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+175/224 Testing: horde_rt_lantern_pendulum_tests
+175/224 Test: horde_rt_lantern_pendulum_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_lantern_pendulum_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_lantern_pendulum_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Lantern pendulum deterministic physics tests passed
+<end of output>
+Test time =   0.99 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_lantern_pendulum_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_lantern_pendulum_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+209/224 Testing: horde_rt_rescue_traversal_tests
+209/224 Test: horde_rt_rescue_traversal_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_traversal_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_rescue_traversal_tests" start time: Oct 21 00:03 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Rescue traversal cases=98612 failures=0 max_root_step=0.0249996 max_landing_root_step=0.0197426
+<end of output>
+Test time =   0.90 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_traversal_tests" end time: Oct 21 00:03 AUS Eastern Summer Time
+"horde_rt_rescue_traversal_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 21 00:03 AUS Eastern Summer Time

@@ -3,6 +3,7 @@ Set-StrictMode -Version Latest
 $repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 . (Join-Path $repo 'tools/horde-1.6.2-asset-policy.ps1')
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+Add-Type -AssemblyName System.IO.Compression
 $temp=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
 $scratch=Join-Path $temp ('Horde162AssetPolicy-'+[Guid]::NewGuid().ToString('N'))
 $null=New-Item -ItemType Directory -Path $scratch
@@ -10,14 +11,36 @@ $script:checks=0
 function Require([bool]$Value,[string]$Message) { if(-not $Value){throw $Message} }
 function Assert-CollapseGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'models/world/*' })
-    $expected=@('models/world/runtime/collapsed-entry/asset.manifest.json','models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb')
-    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle world assets must be the exact two-file runtime roster.'
+    $expected=@('models/world/runtime/collapsed-entry/asset.manifest.json','models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb',
+        'models/world/runtime/forest-tree-pair-v1/asset.manifest.json','models/world/runtime/forest-tree-pair-v1/runtime-roster.json',
+        'models/world/runtime/forest-rocks-v1/asset.manifest.json',
+        'models/world/runtime/forest-deadwood-v1/asset.manifest.json',
+        'models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-gnarled-stump.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb',
+        'models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb',
+        'models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb',
+        'models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb',
+        'models/world/runtime/forest-road-clue-v1/asset.manifest.json',
+        'models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb',
+        'models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb',
+        'models/world/runtime/bellwether-shell-v4/asset.manifest.json',
+        'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb',
+        'models/world/runtime/forest-understory-v1/asset.manifest.json',
+        'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb',
+        'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb',
+        'models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb','models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb') + @(Get-Horde17TombAssetSpecification | Where-Object {$_.Path -like 'models/world/*'} | ForEach-Object Path)
+    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle world assets must match the exact collapse, forest and tomb runtime rosters.'
 }
 function Assert-PropsGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'textures/props/*' })
     $expected=@('textures/props/runtime/asset.manifest.json','textures/props/runtime/base-color.android.ktx2',
-                'textures/props/runtime/normal.android.ktx2','textures/props/runtime/orm.android.ktx2','textures/props/runtime/emissive.android.ktx2')
-    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle props assets must be the exact five-file Android runtime roster.'
+                'textures/props/runtime/normal.android.ktx2','textures/props/runtime/orm.android.ktx2','textures/props/runtime/emissive.android.ktx2',
+                'textures/props/runtime/chapter-terrain/base-color.android.ktx2',
+                'textures/props/runtime/chapter-terrain/normal.android.ktx2',
+                'textures/props/runtime/chapter-terrain/orm.android.ktx2')
+    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle props assets must be the exact eight-file Android runtime roster.'
 }
 function Assert-RagTorchGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'models/props/runtime/player-rag-torch/*' })
@@ -46,15 +69,31 @@ function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
     $required=@([regex]::Matches($Gradle, "(?m)^\s*include '([^']+)'\s*$") |
         ForEach-Object { $_.Groups[1].Value } |
         Where-Object { $_ -like 'models/props/runtime/player-rag-torch/*' -or
-                       $_ -like 'models/props/runtime/player-sword-scabbard/*' })
-    Require ($required.Count -eq 5) 'Android equipment staging requires the closed five-file package roster.'
-    $startup=[regex]::Match($Activity, '(?s)private void collectInitialDiagnostics\(\)\s*\{(.*?)final boolean written = ProbeBridge[.]writeReports\(filesRoot\);')
-    Require $startup.Success 'Android equipment staging must precede native report-root publication.'
-    $staged=@([regex]::Matches($startup.Groups[1].Value,
+                       $_ -like 'models/props/runtime/player-sword-scabbard/*' -or
+                       $_ -like 'models/world/runtime/chapter-entry-return-v1/*' -or
+                       $_ -like 'models/world/runtime/chapter-terrain-v1/*' -or
+                       $_ -like 'textures/props/runtime/chapter-terrain/*.android.ktx2' -or
+                       $_ -like 'models/characters/runtime/kit-warden-v1/*' -or
+                       $_ -like 'textures/characters/runtime/kit-warden-v1/*.android.ktx2' })
+    Require ($required.Count -eq 18) 'Android equipment, entry and terrain staging require the closed eighteen-file package roster.'
+    $startup=@([regex]::Matches($Activity,
+        '(?ms)^    StartupDiagnostics prepareInitialDiagnostics\(\)\s*\{(.*?)^    \}'))
+    $helper=@([regex]::Matches($Activity,
+        '(?ms)^    private boolean\[\] stageRuntimeAssetCache\(\)\s*\{(.*?)^    \}'))
+    Require ($startup.Count -eq 1 -and $helper.Count -eq 1) 'Android equipment staging requires unique startup and runtime-cache methods.'
+    $body=$startup[0].Groups[1].Value
+    $publication=[regex]::Match($body, 'ProbeBridge[.]writeReports\(filesRoot\)')
+    $invocations=@([regex]::Matches($body, 'stageRuntimeAssetCache\(\)'))
+    Require ($publication.Success -and $invocations.Count -eq 1 -and
+             $invocations[0].Index -lt $publication.Index) 'Android runtime-cache staging must run once before native report-root publication.'
+    $staged=@([regex]::Matches($helper[0].Groups[1].Value,
         'stageAsset\("([^"]+)",\s*"([^"]+)"\)'))
+    $allStaged=@([regex]::Matches($Activity, 'stageAsset\("([^"]+)",\s*"([^"]+)"\)'))
     foreach($path in $required) {
         $matches=@($staged | Where-Object { $_.Groups[1].Value -ceq $path })
-        Require ($matches.Count -eq 1 -and $matches[0].Groups[2].Value -ceq $path) "Android equipment asset must be staged once at its exact native path: $path"
+        $allMatches=@($allStaged | Where-Object { $_.Groups[1].Value -ceq $path })
+        Require ($matches.Count -eq 1 -and $allMatches.Count -eq 1 -and
+                 $matches[0].Groups[2].Value -ceq $path) "Android equipment asset must be staged once at its exact native path: $path"
     }
 }
 function Assert-CollapsePackageInventory([string]$Text) {
@@ -63,6 +102,12 @@ function Assert-CollapsePackageInventory([string]$Text) {
     $strings=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.StringConstantExpressionAst]},$true) | ForEach-Object Value)
     foreach ($name in @('assets/models/world/runtime/collapsed-entry/asset.manifest.json','assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb')) {
         Require (@($strings | Where-Object { $_ -ceq $name }).Count -eq 2) 'Package inventory must require the collapse pair in both platform archives.'
+    }
+    foreach ($name in @('assets/models/world/runtime/forest-tree-pair-v1/asset.manifest.json',
+                       'assets/models/world/runtime/forest-tree-pair-v1/runtime-roster.json',
+                       'assets/models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb',
+                       'assets/models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb')) {
+        Require (@($strings | Where-Object { $_ -ceq $name }).Count -eq 2) 'Package inventory must require the exact forest tree-pair roster in both platform archives.'
     }
     $commands=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.CommandAst]},$true) | ForEach-Object { $_.GetCommandName() })
     Require ($commands -contains 'Copy-Horde162RuntimeAssets' -and @($commands | Where-Object { $_ -ceq 'Assert-Horde162Package' }).Count -ge 2) 'Package inventory must use closed staging and admission.'
@@ -151,11 +196,12 @@ function New-HeldFixtureArchive([string]$Name,[string[]]$Omit=@(), [string]$Dupl
 try {
     $gradle=Get-Content (Join-Path $repo 'android/app/build.gradle') -Raw
     Assert-CollapseGradleInventory $gradle; ++$script:checks
-    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/collapsed-entry/asset.manifest.json'",''))} 'exact two-file runtime roster'
-    Expect-Failure {Assert-CollapseGradleInventory ($gradle+"`ninclude 'models/world/source/*.blend'`n")} 'exact two-file runtime roster'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/collapsed-entry/asset.manifest.json'",''))} 'exact collapse, forest and tomb runtime rosters'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/forest-tree-pair-v1/runtime-roster.json'",''))} 'exact collapse, forest and tomb runtime rosters'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle+"`ninclude 'models/world/source/*.blend'`n")} 'exact collapse, forest and tomb runtime rosters'
     Assert-PropsGradleInventory $gradle; ++$script:checks
-    Expect-Failure {Assert-PropsGradleInventory ($gradle.Replace('textures/props/runtime/base-color.android.ktx2','textures/props/runtime/*.android.ktx2'))} 'exact five-file Android runtime roster'
-    Expect-Failure {Assert-PropsGradleInventory ($gradle+"`ninclude 'textures/props/runtime/base-color.windows.ktx2'`n")} 'exact five-file Android runtime roster'
+    Expect-Failure {Assert-PropsGradleInventory ($gradle.Replace('textures/props/runtime/base-color.android.ktx2','textures/props/runtime/*.android.ktx2'))} 'exact eight-file Android runtime roster'
+    Expect-Failure {Assert-PropsGradleInventory ($gradle+"`ninclude 'textures/props/runtime/base-color.windows.ktx2'`n")} 'exact eight-file Android runtime roster'
     Assert-RagTorchGradleInventory $gradle; ++$script:checks
     Expect-Failure {Assert-RagTorchGradleInventory ($gradle.Replace("        include 'models/props/runtime/player-rag-torch/asset.manifest.json'",''))} 'exact two-file Android runtime roster'
     Expect-Failure {Assert-RagTorchGradleInventory ($gradle+"`ninclude 'models/props/runtime/player-rag-torch/*.glb'`n")} 'exact two-file Android runtime roster'
@@ -174,11 +220,33 @@ try {
                        'models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb',
                        'models/props/runtime/player-sword-scabbard/asset.manifest.json',
                        'models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb',
-                       'models/props/runtime/player-sword-scabbard/processing-receipt.json')) {
-        $call='stageAsset("'+$path+'", "'+$path+'")'
-        Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($call,'true'))} 'exact native path'
-        Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($call,'stageAsset("'+$path+'", "wrong-native-path")'))} 'exact native path'
+                       'models/props/runtime/player-sword-scabbard/processing-receipt.json',
+                       'models/world/runtime/chapter-entry-return-v1/asset.manifest.json',
+                       'models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb',
+                       'models/world/runtime/chapter-terrain-v1/asset.manifest.json',
+                       'models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb',
+                       'textures/props/runtime/chapter-terrain/base-color.android.ktx2',
+                       'textures/props/runtime/chapter-terrain/normal.android.ktx2',
+                       'textures/props/runtime/chapter-terrain/orm.android.ktx2',
+                       'models/characters/runtime/kit-warden-v1/asset.manifest.json',
+                       'models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb',
+                       'textures/characters/runtime/kit-warden-v1/base-color.android.ktx2',
+                       'textures/characters/runtime/kit-warden-v1/normal.android.ktx2',
+                       'textures/characters/runtime/kit-warden-v1/orm.android.ktx2',
+                       'textures/characters/runtime/kit-warden-v1/emissive.android.ktx2')) {
+        $call='stageAsset\("'+[regex]::Escape($path)+'",\s*"'+[regex]::Escape($path)+'"\)'
+        Expect-Failure {Assert-EquipmentAndroidStaging $gradle ([regex]::Replace($activity,$call,'true'))} 'exact native path'
+        Expect-Failure {Assert-EquipmentAndroidStaging $gradle ([regex]::Replace($activity,$call,'stageAsset("'+$path+'", "wrong-native-path")'))} 'exact native path'
     }
+    $startupCall='final boolean[] staged = stageRuntimeAssetCache();'
+    $publicationCall='written=ProbeBridge.writeReports(filesRoot);'
+    Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,'final boolean[] staged = new boolean[4];'))} 'once before native report-root publication'
+    $late=$activity.Replace($startupCall,'final boolean[] staged = new boolean[4];').Replace($publicationCall,$publicationCall+' stageRuntimeAssetCache();')
+    Expect-Failure {Assert-EquipmentAndroidStaging $gradle $late} 'once before native report-root publication'
+    Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+' stageRuntimeAssetCache();'))} 'once before native report-root publication'
+    $duplicate='stageAsset("models/props/runtime/player-rag-torch/asset.manifest.json", "models/props/runtime/player-rag-torch/asset.manifest.json");'
+    Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+$duplicate))} 'exact native path'
+    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed eighteen-file package roster'
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
         Assert-CollapsePackageInventory $text; ++$script:checks
@@ -218,8 +286,84 @@ try {
         $heldArchive=New-HeldFixtureArchive ('held-corrupt-'+$name+'.zip') -Corrupt $path
         Expect-Failure {& $heldContract -AndroidApkPath $heldArchive -RequireHorde162World} 'byte/hash mismatch'
     }
+    foreach ($name in @('asset.manifest.json','collapsed-entry-lod0.runtime.glb')) {
+        $path="assets/models/world/runtime/chapter-entry-return-v1/$name"
+        $heldArchive=New-HeldFixtureArchive ('chapter-missing-'+$name+'.zip') -Omit $path
+        Expect-Failure {& $heldContract -AndroidApkPath $heldArchive} 'missing exact entry'
+        $heldArchive=New-HeldFixtureArchive ('chapter-duplicate-'+$name+'.zip') -Duplicate $path
+        Expect-Failure {& $heldContract -AndroidApkPath $heldArchive} 'exactly one'
+        $heldArchive=New-HeldFixtureArchive ('chapter-corrupt-'+$name+'.zip') -Corrupt $path
+        Expect-Failure {& $heldContract -AndroidApkPath $heldArchive} 'byte/hash mismatch'
+    }
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
-    Require ($windows.Count -eq 29 -and $android.Count -eq 30) 'Closed runtime roster count changed.'
+    $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
+    $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 50 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 51) 'Current shared asset roster includes five exact prepared deadwood and three exact road-clue payloads.'
+    Require ($windows.Count -eq 107 -and $android.Count -eq 108) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory, town, deadwood and road-clue runtime assets; no editable sources.'
+    $deadwoodFiles=@('models/world/runtime/forest-deadwood-v1/asset.manifest.json',
+        'models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-gnarled-stump.glb',
+        'models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/forest-deadwood-*/*'}).Count -eq 5 -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/forest-deadwood-*/*'}).Count -eq 5) 'Both platforms admit only five exact deadwood payloads.'
+    foreach($piece in $deadwoodFiles) {
+        Require (@($windows | Where-Object {$_ -ceq $piece}).Count -eq 1 -and
+                 @($android | Where-Object {$_ -ceq $piece}).Count -eq 1) 'Each exact deadwood payload is admitted once on both platforms.'
+    }
+    $rockFiles=@('models/world/runtime/forest-rocks-v1/asset.manifest.json',
+        'models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb',
+        'models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb',
+        'models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/forest-rocks-*/*'}).Count -eq 4 -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/forest-rocks-*/*'}).Count -eq 4) 'Both platforms admit only four final rock payloads.'
+    foreach($rock in $rockFiles) {
+        Require (@($windows | Where-Object {$_ -ceq $rock}).Count -eq 1 -and
+                 @($android | Where-Object {$_ -ceq $rock}).Count -eq 1) 'Each exact rock payload is admitted once.'
+    }
+    $townFiles=@('models/world/runtime/bellwether-shell-v4/asset.manifest.json',
+        'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/bellwether-shell-*/*'}).Count -eq 2 -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/bellwether-shell-*/*'}).Count -eq 2) 'Both platforms admit only the two final closed town payloads.'
+    foreach($town in $townFiles) {
+        Require (@($windows | Where-Object {$_ -ceq $town}).Count -eq 1 -and
+                 @($android | Where-Object {$_ -ceq $town}).Count -eq 1) 'Each exact town payload is admitted once on both platforms.'
+    }
+    $understory=@('models/world/runtime/forest-understory-v1/asset.manifest.json',
+        'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb',
+        'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/forest-understory-v1/*'}).Count -eq 3 -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/forest-understory-v1/*'}).Count -eq 3) 'Both platforms admit only the three final understory files.'
+    foreach($clump in $understory) {
+        Require (@($windows | Where-Object {$_ -ceq $clump}).Count -eq 1 -and
+                 @($android | Where-Object {$_ -ceq $clump}).Count -eq 1) 'Each exact understory payload is admitted once on both platforms.'
+    }
+    $graveMarkers=@('models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json',
+        'models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb',
+        'models/world/runtime/grave-markers-r03/grave-marker-damaged.manifest.json',
+        'models/world/runtime/grave-markers-r03/grave-marker-damaged.runtime.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/grave-markers-*/*'}).Count -eq 4 -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/grave-markers-*/*'}).Count -eq 4) 'Both platforms admit only the four final grave-marker files.'
+    foreach($marker in $graveMarkers) {
+        Require (@($windows | Where-Object {$_ -ceq $marker}).Count -eq 1 -and
+                 @($android | Where-Object {$_ -ceq $marker}).Count -eq 1) 'Each exact grave-marker path must be admitted once on both platforms.'
+    }
+    Require (@(Get-Horde17KitAssetSpecification).Count -eq 14) 'Kit admission must retain its exact thirteen-cut/one-manifest roster.'
+    foreach ($kit in Get-Horde17KitAssetSpecification) {
+        Require ($windows -ccontains $kit.Path -and $android -ccontains $kit.Path) 'Both platforms must admit every approved Kit runtime entry.'
+        Require (@($packageStrings | Where-Object { $_ -ceq ('assets/'+$kit.Path) }).Count -eq 2) 'Both package inventories must explicitly require every Kit runtime entry.'
+    }
+    $kitSpec=@(Get-Horde17KitAssetSpecification | Where-Object {$_.Kind -ceq 'KitWave'})[0]
+    $kitWave=Join-Horde162Path $repo ('assets/'+$kitSpec.Path)
+    Assert-Horde17KitWave $kitWave $kitSpec.Frames
+    Expect-Failure {Assert-Horde17KitWave $kitWave 0} 'Kit WAV requires'
+    Expect-Failure {Assert-Horde17KitWave $kitWave 156001} 'Kit WAV requires'
+    $badKitWave=Join-Path $scratch 'kit-wrong-rate.wav'
+    $kitBytes=[IO.File]::ReadAllBytes($kitWave)
+    [BitConverter]::GetBytes([uint32]48000).CopyTo($kitBytes,24)
+    [IO.File]::WriteAllBytes($badKitWave,$kitBytes)
+    Expect-Failure {Assert-Horde17KitWave $badKitWave $kitSpec.Frames} 'Kit WAV requires'
     Require ($windows -ccontains 'audio/pixabay/waterfall_loop.wav' -and $windows -cnotcontains 'audio/pixabay/waterfall_core_loop.wav') 'Windows must preserve accepted full waterfall only.'
     Require ($android -ccontains 'audio/pixabay/waterfall_core_loop.wav' -and $android -cnotcontains 'audio/pixabay/waterfall_loop.wav') 'Android must use admitted Core loop only.'
     ++$script:checks
@@ -260,12 +404,27 @@ try {
     Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'closed runtime roster'
     $archive=New-FixtureArchive 'nonempty-directory.zip' Windows -Extra 'assets/textures/environment/runtime/'
     Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'malformed nonempty directory'
+    $kitArchive=New-FixtureArchive 'foreign-kit-master.zip' Windows -EmptyFile 'assets/audio/kit/master.wav'
+    Expect-Failure {Assert-Horde162Package $repo $kitArchive Windows} 'closed runtime roster'
+    $kitArchive=New-FixtureArchive 'duplicate-original-kit-model.zip' Windows -EmptyFile 'assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb'
+    Expect-Failure {Assert-Horde162Package $repo $kitArchive Windows} 'closed runtime roster'
+    $kitArchive=New-FixtureArchive 'kit-promotion-receipt.zip' Android -EmptyFile 'assets/models/characters/runtime/kit-warden-v1/turn-runtime-promotion.json'
+    Expect-Failure {Assert-Horde162Package $repo $kitArchive Android} 'closed runtime roster'
     $archive=New-FixtureArchive 'zero-byte-foreign-file.zip' Windows -EmptyFile 'assets/audio/pixabay/foreign.wav'
     Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'closed runtime roster'
     $archive=New-FixtureArchive 'foreign-empty-directory.zip' Windows -Directories @('assets/textures/environment/source/')
     Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'closed runtime roster'
     foreach($case in @(
         @{Name='missing-cue';Platform='Windows';Omit='assets/audio/pixabay/keeper_i_sense_you.wav'},
+        @{Name='missing-kit-grate';Platform='Windows';Omit='assets/audio/kit/runtime/prologue.kit_grate.wav'},
+        @{Name='missing-kit-model';Platform='Windows';Omit='assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb'},
+        @{Name='missing-kit-normal';Platform='Android';Omit='assets/textures/characters/runtime/kit-warden-v1/normal.android.ktx2'},
+        @{Name='kit-private-source';Platform='Windows';Extra='assets/models/characters/source/private.blend'},
+        @{Name='kit-private-texture';Platform='Android';Extra='assets/textures/characters/source/master.png'},
+        @{Name='missing-kit-manifest';Platform='Android';Omit='assets/audio/kit/runtime/asset.manifest.json'},
+        @{Name='missing-death-cue';Platform='Windows';Omit='assets/audio/pixabay/keeper_death.wav'},
+        @{Name='missing-death-core';Platform='Android';Omit='assets/audio/pixabay/keeper_death_core.wav'},
+        @{Name='missing-death-manifest';Platform='Android';Omit='assets/audio/pixabay/keeper-death.manifest.json'},
         @{Name='missing-core-manifest';Platform='Android';Omit='assets/audio/pixabay/waterfall-core.manifest.json'},
         @{Name='missing-collapse-glb';Platform='Android';Omit='assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb'},
         @{Name='missing-collapse-manifest';Platform='Windows';Omit='assets/models/world/runtime/collapsed-entry/asset.manifest.json'},
@@ -327,6 +486,9 @@ try {
         @{Name='corrupt-sword-draw';Platform='Windows';Path='assets/audio/filmcow/equipment/sword_draw.wav'},
         @{Name='corrupt-sword-sheath';Platform='Android';Path='assets/audio/filmcow/equipment/sword_sheath.wav'},
         @{Name='corrupt-equipment-manifest';Platform='Android';Path='assets/audio/filmcow/equipment/asset.manifest.json'},
+        @{Name='corrupt-kit-rope';Platform='Android';Path='assets/audio/kit/runtime/rescue.rope.wav'},
+        @{Name='corrupt-kit-visual';Platform='Android';Path='assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb'},
+        @{Name='corrupt-kit-map';Platform='Windows';Path='assets/textures/characters/runtime/kit-warden-v1/base-color.windows.ktx2'},
         @{Name='corrupt-scabbard-glb';Platform='Windows';Path='assets/models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb'},
         @{Name='corrupt-scabbard-receipt';Platform='Android';Path='assets/models/props/runtime/player-sword-scabbard/processing-receipt.json'},
         @{Name='corrupt-scabbard-manifest';Platform='Android';Path='assets/models/props/runtime/player-sword-scabbard/asset.manifest.json'}
@@ -335,7 +497,7 @@ try {
         Expect-Failure {Assert-Horde162Package $repo $archive $case.Platform} 'byte/hash mismatch'
     }
     $fixtureRepo=Join-Path $scratch 'manifest-fixture'
-    foreach($relative in (@(Get-Horde162AssetSpecification | ForEach-Object Path)+@(Get-Horde162ManifestSpecification | ForEach-Object Path))) {
+    foreach($relative in (@(Get-Horde162AssetSpecification | ForEach-Object Path)+@(Get-Horde162ManifestSpecification | ForEach-Object Path)+@(Get-Horde17TombAssetSpecification | ForEach-Object Path)+@(Get-Horde17KitAssetSpecification | ForEach-Object Path)+@(Get-Horde17KitVisualAssetSpecification | ForEach-Object Path))) {
         $source=Join-Horde162Path $repo "assets/$relative";$target=Join-Horde162Path $fixtureRepo "assets/$relative"
         $null=New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force
         Copy-Item -LiteralPath $source -Destination $target

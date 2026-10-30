@@ -1,0 +1,129 @@
+{
+  "sourceBase": "5b8d7760f5547c06326648fe71bee7714a454938",
+  "scope": "diagnostic authored placement repair; strict capture acceptance remains failed",
+  "debugExecutableSha256": "f205a81fcf3045202f3c13c206ab6b9e50b89977e8425e2728d946fb2e4d9b96",
+  "runs": [
+    {
+      "name": "pipeline-held-high",
+      "imageSha256": "3fe114713d1bc9baeec3198b82975c57798bef4ea2df612c143f8f9d99ed55a4",
+      "error": "Checkpoint 'lantern-held-high' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=49794/461/19238 sword/torch=0/6 wall-retraction=0 grip=0/0 authority=1.78814e-07/0 finalGrip=-11.2706,0.535769,-15.02 body=-11.3037,0.478967,-15.07.",
+      "complete": false,
+      "executionBackend": "RayTracingPipeline",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "settlingFrames": 12,
+      "fixedAnimationTimeSeconds": 0.0,
+      "dielectricReasonDiagnostics": {
+        "availability": "Available",
+        "available": true,
+        "secondaryNearSelfHitCount": 0,
+        "primaryOpenMissCount": 0,
+        "primaryOpenOpaqueCount": 0,
+        "primaryMismatchedExitCount": 0,
+        "primaryInterfaceBudgetCount": 0,
+        "primaryVolumeBudgetCount": 0,
+        "shadowOpenMissCount": 0,
+        "shadowMismatchedExitCount": 0,
+        "primaryTirCount": 1507,
+        "primaryInterfaceBudgetOpenVolumeCount": 0,
+        "primaryInterfaceBudgetClosedVolumeCount": 0,
+        "shadowMismatchEmptyCount": 0,
+        "shadowImplicitOriginExitCount": 0,
+        "secondaryDielectricTerminalCount": 682,
+        "primaryTirTerminationCount": 212,
+        "shadowFiniteEndpointVolumeCount": 20556,
+        "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+        "primaryOpenOpaqueAfterTirCount": 0,
+        "primaryOpenOpaqueTerminalInstanceMask": 0,
+        "primaryOpenOpaqueVolumeInstanceMask": 0,
+        "primaryOpenOpaqueTerminalMaterialMask": 0,
+        "primaryClosedVolumeAbsorptionCount": 0,
+        "primaryCertifiedClosedVolumeRecoveryCount": 0,
+        "shadowCertifiedClosedVolumeRecoveryCount": 0,
+        "certifiedClosedVolumeRecoveryReasonMask": 0,
+        "primaryTorchPixelCount": 6,
+        "primarySwordPixelCount": 0,
+        "primaryPlayerPixelCount": 49794,
+        "primaryRewardRingPixelCount": 461,
+        "primaryRewardBodyPixelCount": 19238
+      }
+    },
+    {
+      "name": "pipeline-chest-held",
+      "imageSha256": "395b8a2c8bbad19ca488442fcbc20e987f09fb93b79ebc4a8659282b8fe068d4",
+      "error": "Checkpoint 'lantern-chest-held-high' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=53347/516/19765 sword/torch=0/3849 wall-retraction=0 grip=0/0 authority=5.96046e-08/0 finalGrip=-34.6349,0.686607,-17.3695 body=-34.6804,0.639164,-17.4195.",
+      "complete": false,
+      "executionBackend": "RayTracingPipeline",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "settlingFrames": 12,
+      "fixedAnimationTimeSeconds": 0.0,
+      "dielectricReasonDiagnostics": {
+        "availability": "Available",
+        "available": true,
+        "secondaryNearSelfHitCount": 0,
+        "primaryOpenMissCount": 0,
+        "primaryOpenOpaqueCount": 0,
+        "primaryMismatchedExitCount": 0,
+        "primaryInterfaceBudgetCount": 0,
+        "primaryVolumeBudgetCount": 0,
+        "shadowOpenMissCount": 0,
+        "shadowMismatchedExitCount": 0,
+        "primaryTirCount": 1102,
+        "primaryInterfaceBudgetOpenVolumeCount": 0,
+        "primaryInterfaceBudgetClosedVolumeCount": 0,
+        "shadowMismatchEmptyCount": 0,
+        "shadowImplicitOriginExitCount": 0,
+        "secondaryDielectricTerminalCount": 630,
+        "primaryTirTerminationCount": 139,
+        "shadowFiniteEndpointVolumeCount": 7366,
+        "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+        "primaryOpenOpaqueAfterTirCount": 0,
+        "primaryOpenOpaqueTerminalInstanceMask": 0,
+        "primaryOpenOpaqueVolumeInstanceMask": 0,
+        "primaryOpenOpaqueTerminalMaterialMask": 0,
+        "primaryClosedVolumeAbsorptionCount": 0,
+        "primaryCertifiedClosedVolumeRecoveryCount": 0,
+        "shadowCertifiedClosedVolumeRecoveryCount": 0,
+        "certifiedClosedVolumeRecoveryReasonMask": 0,
+        "primaryTorchPixelCount": 3849,
+        "primarySwordPixelCount": 0,
+        "primaryPlayerPixelCount": 53347,
+        "primaryRewardRingPixelCount": 516,
+        "primaryRewardBodyPixelCount": 19765
+      }
+    }
+  ]
+}

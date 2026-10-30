@@ -1,0 +1,17 @@
+{
+  "scope": "full194-test host roster plus focused unchanged-coverage repair, not hardware/device acceptance",
+  "parent": "d8882c1b5f6afff92d46ba715294da2d10f4b3a1",
+  "parentWindowsSourceSha256": "9515c813b48b53cfe6a3349456ca066038e482c825fda20a938ebad8cee93593",
+  "parentTestSourceSha256": "c6a2dcc2953cdebd0c48bd9ca0894aa7c83d1d035c4c78e1abf8aa8299c10eb5",
+  "staleRequiredLiteral": "record.primaryTorchPixels != 0u",
+  "parentLiteralPresent": false,
+  "parentOwnershipHelperPresent": true,
+  "initialCompletePassingTests": 193,
+  "initialFailedTest": 177,
+  "resumedFromFirstUnfinishedTest": 107,
+  "finalDebugAffected": "2/2 pass",
+  "finalOptimizedReleaseAffected": "2/2 pass",
+  "all194RegisteredTestsCovered": true,
+  "productionArtifactsUnchanged": true,
+  "currentTestSha256": "dd66d4b6d6812c2def94cbbf8985c5d4e4f08eeec05434240b26389c85c6fff1"
+}

@@ -1,0 +1,153 @@
+{
+  "workflow": {
+    "conclusion": "cancelled",
+    "created_at": "2026-10-23T12:28:54Z",
+    "event": "push",
+    "head_branch": "codex/horde-1.7-wp2-vertical-proof",
+    "head_sha": "ca49a762d97f441c64aa6a7322f5caedb1d4fa53",
+    "html_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39953625341",
+    "id": 39953625341,
+    "name": "Shared simulation host tests",
+    "run_attempt": 1,
+    "run_started_at": "2026-10-23T12:28:54Z",
+    "status": "completed",
+    "updated_at": "2026-10-23T12:44:06Z"
+  },
+  "jobs": [
+    {
+      "id": 120413931364,
+      "name": "player-vulkan-host",
+      "conclusion": "success",
+      "totalSeconds": 493.0
+    },
+    {
+      "id": 120413931474,
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success",
+      "totalSeconds": 580.0
+    },
+    {
+      "id": 120413931602,
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success",
+      "totalSeconds": 316.0
+    },
+    {
+      "id": 120413931645,
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success",
+      "totalSeconds": 630.0
+    },
+    {
+      "id": 120413931648,
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success",
+      "totalSeconds": 304.0
+    },
+    {
+      "id": 120413931687,
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "cancelled",
+      "totalSeconds": 908.0
+    }
+  ],
+  "msvc": {
+    "jobId": 120413931687,
+    "conclusion": "cancelled",
+    "timeoutMinutes": 15,
+    "totalSeconds": 908.0,
+    "configureStepSeconds": 100.0,
+    "buildStepSeconds": 622.0,
+    "cancelledSelectionStepSeconds": 142.0,
+    "selectedCount": 149,
+    "completedPassedCount": 118,
+    "failedTestResultsObserved": 0,
+    "lastCompletedTest": {
+      "completedAtUtc": "2026-10-23T12:43:59.4551057Z",
+      "position": 118,
+      "total": 149,
+      "name": "horde_rt_chapter_local_ambience_tests",
+      "result": "Passed",
+      "seconds": 1.07
+    },
+    "unfinishedStartedTest": {
+      "startedAtUtc": "2026-10-23T12:43:59.4555597Z",
+      "position": 119,
+      "name": "horde_rt_forest_foliage_ambience_tests"
+    },
+    "cancellationLogAtUtc": "2026-10-23T12:43:59.5318059Z",
+    "unfinishedTestElapsedToCancellationSeconds": 0.0762462,
+    "notStartedCount": 30,
+    "ctestFinalSummaryPresent": false,
+    "portableExcludedCount": 21,
+    "unchangedToolExcludedCount": 15,
+    "providerObjectWrappers": [
+      {
+        "name": "horde_rt_provider_shipping_mobile_fixture_evidence",
+        "result": "Passed",
+        "seconds": 19.97
+      },
+      {
+        "name": "horde_rt_provider_shipping_high_fixture_evidence",
+        "result": "Passed",
+        "seconds": 19.61
+      },
+      {
+        "name": "horde_rt_provider_diagnostic_mobile_fixture_evidence",
+        "result": "Passed",
+        "seconds": 19.45
+      },
+      {
+        "name": "horde_rt_provider_diagnostic_high_fixture_evidence",
+        "result": "Passed",
+        "seconds": 19.58
+      }
+    ],
+    "providerObjectWrapperSeconds": 78.61,
+    "nativeReportUiReached": false,
+    "apkResolverStepConclusion": "skipped",
+    "phases": [
+      {
+        "name": "Configure non-hardware host tests",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T12:29:35Z",
+        "completedAtUtc": "2026-10-23T12:31:15Z",
+        "seconds": 100.0
+      },
+      {
+        "name": "Build shared gameplay tests",
+        "conclusion": "success",
+        "startedAtUtc": "2026-10-23T12:31:15Z",
+        "completedAtUtc": "2026-10-23T12:41:37Z",
+        "seconds": 622.0
+      },
+      {
+        "name": "Run complete Windows native and platform selection",
+        "conclusion": "cancelled",
+        "startedAtUtc": "2026-10-23T12:41:37Z",
+        "completedAtUtc": "2026-10-23T12:43:59Z",
+        "seconds": 142.0
+      }
+    ],
+    "annotationCount": 2,
+    "annotations": [
+      {
+        "annotation_level": "failure",
+        "end_line": 1,
+        "message": "The job has exceeded the maximum execution time of 15m0s",
+        "path": ".github",
+        "start_line": 1,
+        "title": ""
+      },
+      {
+        "annotation_level": "failure",
+        "end_line": 248,
+        "message": "The operation was canceled.",
+        "path": ".github",
+        "start_line": 248,
+        "title": ""
+      }
+    ]
+  },
+  "rawReceiptSha256": "1602e4b98baf3f20af18b2434ea31f6b8347ac4147cd0b19e5c9eeee5d6217a1"
+}

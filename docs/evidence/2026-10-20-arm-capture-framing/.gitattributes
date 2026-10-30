@@ -1,0 +1,4 @@
+# Preserve exact captured evidence bytes.
+** -text whitespace=cr-at-eol
+*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol

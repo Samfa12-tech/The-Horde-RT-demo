@@ -1,0 +1,28 @@
+{
+  "apkBytes": 206135428,
+  "sha256": "6ce0d20e8104b2a394a0784b470b526238ad4b0524b668d5a70e2965c310f28e",
+  "kind": "Debug multi-ABI, not Shipping installer size",
+  "entries": 204,
+  "nativeLibraries": [
+    {
+      "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "bytes": 5247952
+    },
+    {
+      "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "bytes": 4535712
+    },
+    {
+      "entry": "lib/x86/libhorde_rt_probe_android.so",
+      "bytes": 5881068
+    },
+    {
+      "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+      "bytes": 5520912
+    }
+  ],
+  "disallowedSourceAndParkedAssetMatches": [],
+  "sourceArchiveOrBlendOrFlacIncluded": false,
+  "oldDebugApkBytes": 200596480,
+  "sizeDeltaAttribution": "No sealed old entry inventory is available; do not attribute the whole byte difference to this feature or to Shipping."
+}

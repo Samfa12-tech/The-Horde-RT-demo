@@ -1,0 +1,17 @@
+{
+  "windows_focus": {
+    "normal_restore_attempt": true,
+    "foreground_verified": false,
+    "global_input_sent": false
+  },
+  "android_visual_guard": {
+    "android_candidate_foreground_verified": false,
+    "candidate_only_screenshot_captured": false
+  },
+  "windows_live_input_sent": false,
+  "windows_own_app_close_requested": true,
+  "window_capture_setup": "Initial DPI-virtualized client rectangle was unsuitable; that private capture was excluded. DPI-aware retry required verified game foreground and refused capture/input when unavailable. One ordinary restore/focus retry also returned foreground_verified=false. No lock policy or global input bypass was used.",
+  "missing_live_observation": "Source inventory: Windows live overlay reports RT/event counters but no support/camera/listener tuple. A new diagnostics/control slice is not authorized here.",
+  "runtime_defect_established": false,
+  "next_step": "Resume with a supported, safely verified foreground/input surface. Seek separate approval before adding diagnostics or control source changes."
+}

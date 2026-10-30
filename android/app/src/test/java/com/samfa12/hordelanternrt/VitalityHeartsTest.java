@@ -53,6 +53,19 @@ public final class VitalityHeartsTest {
             assertEquals(i < 4 ? FULL_RED : 0, b.getPixel((i % 3) * step + size / 2, (i / 3) * step + size / 2));
         assertEquals("unused cells are transparent", 0, b.getPixel(step + size / 2, 2 * step + size / 2));
     }
+    @Test public void halfHeartShowsHalfFillAndAnAccurateAccessibleValue() throws Exception {
+        Context c=RuntimeEnvironment.getApplication();
+        VitalityHeartsDrawable d=new VitalityHeartsDrawable(c,3,3,10000,true);
+        Rect bounds=d.getBounds();Bitmap b=Bitmap.createBitmap(bounds.width(),bounds.height(),Bitmap.Config.ARGB_8888);
+        d.draw(new Canvas(b));int size=HordeUiTokens.dp(c,22),step=size+HordeUiTokens.dp(c,4);
+        assertEquals(FULL_RED,b.getPixel(2*step+size*3/8,size/2));
+        assertEquals(0,b.getPixel(2*step+size*5/8,size/2));
+        MainActivity a=Robolectric.buildActivity(MainActivity.class).get();a.setContentView(R.layout.activity_main);
+        TextView hud=a.findViewById(R.id.vitality_status);Field f=MainActivity.class.getDeclaredField("vitalityStatus");f.setAccessible(true);f.set(a,hud);
+        Method update=MainActivity.class.getDeclaredMethod("updateVitalityHud",int.class,int.class,boolean.class);update.setAccessible(true);
+        update.invoke(a,3,3,true);assertEquals("Vitality 2 and a half of 3",hud.getContentDescription().toString());
+    }
+
     @Test public void heartOnlyHudRetainsAccessibleCurrentAndChangingMaximum() throws Exception {
         MainActivity a = Robolectric.buildActivity(MainActivity.class).get();
         a.setContentView(R.layout.activity_main);

@@ -1,0 +1,493 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 54
+    Start  54: horde_rt_scene_record_observation_tests
+
+54: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_scene_record_observation_tests.exe"
+54: Working Directory: <repo>/build/presets/windows-x64-debug
+54: Test timeout computed to be: 1500
+1/6 Test  #54: horde_rt_scene_record_observation_tests .....   Passed    0.02 sec
+test 152
+    Start 152: horde_rt_rescue_traversal_tests
+
+152: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_traversal_tests.exe"
+152: Working Directory: <repo>/build/presets/windows-x64-debug
+152: Test timeout computed to be: 1500
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: Rescue traversal cases=22096 failures=204 max_root_step=0.0245255 max_landing_root_step=0.0243783
+2/6 Test #152: horde_rt_rescue_traversal_tests .............***Failed    4.32 sec
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+Rescue traversal cases=22096 failures=204 max_root_step=0.0245255 max_landing_root_step=0.0243783
+
+test 153
+    Start 153: horde_rt_rescue_blockout_import_tests
+
+153: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_blockout_import_tests.exe"
+153: Working Directory: <repo>/build/presets/windows-x64-debug
+153: Test timeout computed to be: 1500
+3/6 Test #153: horde_rt_rescue_blockout_import_tests .......   Passed    0.04 sec
+test 154
+    Start 154: horde_rt_rescue_journey_integration_tests
+
+154: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_journey_integration_tests.exe"
+154: Working Directory: <repo>/build/presets/windows-x64-debug
+154: Test timeout computed to be: 1500
+154: claim-site position=-34,-17.55 prompt=0 phase=4
+154: cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+154: unready-edge start=39.9707,-0.0043903 end=39.9707,-0.0043903 blocked=1
+154: cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+154: Rescue journey integration cases=19105 failures=0 retained_triangles=1010
+4/6 Test #154: horde_rt_rescue_journey_integration_tests ...   Passed    9.11 sec
+test 155
+    Start 155: horde_rt_rescue_source_admission_tests
+
+155: Test command: <user-home>\AppData\Local\Programs\Python\Python312\python.exe "<repo>/tests/RescueBlockoutSourceAdmissionTests.py"
+155: Working Directory: <repo>/build/presets/windows-x64-debug
+155: Test timeout computed to be: 1500
+155: Rescue blockout source admission passed: exact existing hashes, missing path, and changed bytes.
+5/6 Test #155: horde_rt_rescue_source_admission_tests ......   Passed    0.10 sec
+test 156
+    Start 156: horde_rt_rescue_rig_attachment_tests
+
+156: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_rig_attachment_tests.exe"
+156: Working Directory: <repo>/build/presets/windows-x64-debug
+156: Test timeout computed to be: 180
+156: FAIL: rescue rig/attachment resolution: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=0.016778 leftTarget=0.000000,1.311731,0.526670 leftSocket=0.000000,1.311731,0.526670 leftHandTarget=0.033675,1.312090,0.466985 leftHandSocket=0.033675,1.312090,0.466985 rightHandTarget=0.053845,0.873812,0.508380 rightHandSocket=0.049492,0.885296,0.496949.
+156: FAIL: rescue rig/attachment resolution: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=0.026492 leftTarget=0.000000,1.311730,0.540836 leftSocket=0.000000,1.311730,0.540836 leftHandTarget=0.033675,1.312090,0.481152 leftHandSocket=0.033675,1.312090,0.481152 rightHandTarget=0.053845,0.873811,0.522547 rightHandSocket=0.047048,0.891742,0.504267.
+156: FAIL: rescue rig/attachment resolution: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=0.036330 leftTarget=0.000000,1.311729,0.555003 leftSocket=0.000000,1.311729,0.555003 leftHandTarget=0.033675,1.312088,0.495319 leftHandSocket=0.033675,1.312088,0.495319 rightHandTarget=0.053845,0.873809,0.536714 rightHandSocket=0.044629,0.898121,0.511340.
+156: Rescue rig attachment cases=14838 failures=3 sampled_poses=876 max_left_reach=0.591965@phase=6 max_right_reach=0.774665@phase=3
+6/6 Test #156: horde_rt_rescue_rig_attachment_tests ........***Failed   20.35 sec
+FAIL: rescue rig/attachment resolution: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=0.016778 leftTarget=0.000000,1.311731,0.526670 leftSocket=0.000000,1.311731,0.526670 leftHandTarget=0.033675,1.312090,0.466985 leftHandSocket=0.033675,1.312090,0.466985 rightHandTarget=0.053845,0.873812,0.508380 rightHandSocket=0.049492,0.885296,0.496949.
+FAIL: rescue rig/attachment resolution: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=0.026492 leftTarget=0.000000,1.311730,0.540836 leftSocket=0.000000,1.311730,0.540836 leftHandTarget=0.033675,1.312090,0.481152 leftHandSocket=0.033675,1.312090,0.481152 rightHandTarget=0.053845,0.873811,0.522547 rightHandSocket=0.047048,0.891742,0.504267.
+FAIL: rescue rig/attachment resolution: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=0.036330 leftTarget=0.000000,1.311729,0.555003 leftSocket=0.000000,1.311729,0.555003 leftHandTarget=0.033675,1.312088,0.495319 leftHandSocket=0.033675,1.312088,0.495319 rightHandTarget=0.053845,0.873809,0.536714 rightHandSocket=0.044629,0.898121,0.511340.
+Rescue rig attachment cases=14838 failures=3 sampled_poses=876 max_left_reach=0.591965@phase=6 max_right_reach=0.774665@phase=3
+
+
+The following tests passed:
+	horde_rt_scene_record_observation_tests
+	horde_rt_rescue_blockout_import_tests
+	horde_rt_rescue_journey_integration_tests
+	horde_rt_rescue_source_admission_tests
+
+67% tests passed, 2 tests failed out of 6
+
+Total Test time (real) =  33.96 sec
+
+The following tests FAILED:
+	152 - horde_rt_rescue_traversal_tests (Failed)
+	156 - horde_rt_rescue_rig_attachment_tests (Failed)
+Errors while running CTest

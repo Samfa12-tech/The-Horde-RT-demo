@@ -1,0 +1,1545 @@
+{
+  "start_commit": "8bb62ede19b0a06756b89abc9812d4828c61a280",
+  "source_commit": "262a7fc096876d2417471285c6809f631103cfe6",
+  "source_milestones": [
+    "759fd593bef99746f3701bde5476e3431e5b4204",
+    "262a7fc096876d2417471285c6809f631103cfe6"
+  ],
+  "changed_source_paths": [
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 79821,
+      "working_sha256": "c419e0e0c8bc86fb2e27e7129d99c7032e390c0c199a0676652f65f883358b6c",
+      "git_blob": "1472838ba674c5342ad9bdbe422b7408cab96f90",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/CMakeLists.txt"
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "bytes": 344727,
+      "working_sha256": "b681dfb3921723f142af6f85c353b3437c238331994e2447cd1cd15de70acc20",
+      "git_blob": "bcdf5a7813d71ac7adcf63d52718ecb89e18b4cf",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/android/app/src/main/cpp/android_probe_bridge.cpp"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/CombatTeachingPreferences.java",
+      "bytes": 4214,
+      "working_sha256": "67b767d8a1e4b6b9297f91e5c3776ce72a480b9fc187fb1d29d80855ed9d94bb",
+      "git_blob": "1a83cebc43767e3437999c7235a6b8b99e55fa99",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/android/app/src/main/java/com/samfa12/hordelanternrt/CombatTeachingPreferences.java"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "bytes": 363039,
+      "working_sha256": "fb550840323256d8b1c40e590e1e5120cee0989b2d09ad8f156b8b35ca362c7c",
+      "git_blob": "4dd74f4374a1bc596e0f126258e01f3c29a44d93",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java",
+      "bytes": 9438,
+      "working_sha256": "177ded340c8e218c8b622d2ffb9ab14339585b74a2a8b35675eb3166db1b3823",
+      "git_blob": "b0d663297a2f0d7fd5a6e6c3c87dfafb749d4158",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java"
+    },
+    {
+      "path": "android/app/src/main/res/layout/activity_main.xml",
+      "bytes": 10115,
+      "working_sha256": "f8d5efff5018fdfcf29e438de141c5d2f7787d92857513874f0543f83a839ebe",
+      "git_blob": "c71f91aae6b449a31405c4ebd7be301f15d52112",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/android/app/src/main/res/layout/activity_main.xml"
+    },
+    {
+      "path": "android/app/src/main/res/values/strings.xml",
+      "bytes": 24633,
+      "working_sha256": "3389bb9f2487368ece7641bf4e6170f3589e4a8e7c14615cce9fc61becea4caa",
+      "git_blob": "e2033778fbd4217a7ad6cad28cf9acbcbe3283cb",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/android/app/src/main/res/values/strings.xml"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingPreferencesTest.java",
+      "bytes": 4619,
+      "working_sha256": "735660704b72f05a84a124e9b75b37a0def12048c67e73871b0dbc024acd8483",
+      "git_blob": "d0292bd5f6c03bd16e3a013b802c03faf9491a01",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingPreferencesTest.java"
+    },
+    {
+      "path": "src/audio/MusicDirector.cpp",
+      "bytes": 14514,
+      "working_sha256": "0c15fa6401ab76b8155d016fe26e12918e51b49ca33f144b6751994073980c43",
+      "git_blob": "25adbd1f675b3529cfa72dd5b4baea24b56b6883",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/audio/MusicDirector.cpp"
+    },
+    {
+      "path": "src/gameplay/ShowcaseCheckpoints.h",
+      "bytes": 10184,
+      "working_sha256": "513db98670f56d59c30b80c3be292548b4dbe3f04594bbc85040a3c48e3bf682",
+      "git_blob": "0d6de8917883f787b10806baa083bbcfd3b7a26e",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/ShowcaseCheckpoints.h"
+    },
+    {
+      "path": "src/gameplay/ShowcaseGameplay.h",
+      "bytes": 34821,
+      "working_sha256": "2720fc1afe1cb15631be1553aa56da0f0b388f60642cf654c70816c3b159ea9a",
+      "git_blob": "9b359598789a21dee40450250dbd15691fb16d85",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/ShowcaseGameplay.h"
+    },
+    {
+      "path": "src/gameplay/SwordCombat.h",
+      "bytes": 42917,
+      "working_sha256": "d3013c7fb698776ff18d1523f0fade3e2b37f2efc689c6cffe80e0c120e4de96",
+      "git_blob": "05458285c5431cb143591f29fc15254abb4968fc",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/SwordCombat.h"
+    },
+    {
+      "path": "src/gameplay/SwordContactProxy.h",
+      "bytes": 6515,
+      "working_sha256": "b4abc96a6d42a21638caadbf4d3c919b9f1b83a85799a836c16c05be867807a3",
+      "git_blob": "126c2579e276df9c057338943d386a99c3b4cc50",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/SwordContactProxy.h"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.cpp",
+      "bytes": 63369,
+      "working_sha256": "2a5e7eccc055d2a70f89aa281529291d3be86cf1687ee83296f944ee42dfe55f",
+      "git_blob": "9f344d62de651dd43b2b464c9172174c409f36e5",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/items/HeldItemKinematics.cpp"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.h",
+      "bytes": 11564,
+      "working_sha256": "a431fd3c6c48ab10b4b6a1126156633b9fe2d317fab269aa3f23a6fb360b80a7",
+      "git_blob": "538dc875605b15d4b1037344a6746e01def57e44",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/items/HeldItemKinematics.h"
+    },
+    {
+      "path": "src/gameplay/simulation/CombatContactTrace.h",
+      "bytes": 2404,
+      "working_sha256": "436b956ad5f095c9878d028239c99006ee79df7cea642853640e7bd95f5b8919",
+      "git_blob": "5bf564a358c73b3b2a4f609b0cb36deb7602c2b0",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/simulation/CombatContactTrace.h"
+    },
+    {
+      "path": "src/gameplay/simulation/CombatTeaching.h",
+      "bytes": 6990,
+      "working_sha256": "39ef98148dbd353d973b25f21f3f511e3872582212a40ebb899160801fb5cb09",
+      "git_blob": "9404dca3db35d3236589ff7b452c8e92d0049f7e",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/simulation/CombatTeaching.h"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "bytes": 116130,
+      "working_sha256": "9ef75b0b8fd89b67b3ed0ff6375cdf564d0eb9ca8ceab406871ee720759f10dd",
+      "git_blob": "d0b5bb6f7741b229d1505865d7a69221cd47d2aa",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/simulation/GameSimulation.cpp"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.h",
+      "bytes": 15635,
+      "working_sha256": "33a039ea2c68c780e1be6927ae0eb8e61eede89fe42118daa92b3ac2f71a4083",
+      "git_blob": "ac52701f8922e3f0975a00634b1044fe010e1e54",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/simulation/GameSimulation.h"
+    },
+    {
+      "path": "src/gameplay/simulation/GameplayEvent.h",
+      "bytes": 3362,
+      "working_sha256": "7cf385989d055e9055e14388d4d2252f34d1ad541e52105a3febc233e6ff3f7c",
+      "git_blob": "734e24285eaac01d01acb0eecb55de9a52057e0e",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/simulation/GameplayEvent.h"
+    },
+    {
+      "path": "src/gameplay/simulation/InputSnapshot.h",
+      "bytes": 4220,
+      "working_sha256": "2a396cda0302035aa88a8e1e92fd0f5b34faa571cefdec981a9dbcf2a9c94907",
+      "git_blob": "6da6dd87ddad74a4d6a3f6f5df47193903edfbee",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/simulation/InputSnapshot.h"
+    },
+    {
+      "path": "src/gameplay/simulation/SimulationSnapshot.h",
+      "bytes": 6846,
+      "working_sha256": "1cc6ed4caf90286c5504b21ac72d89e8b0fca8cb06f05141be4dfc59b09588c7",
+      "git_blob": "08d6e173ee588c9fdf3a8f6be22f24ce33b130f5",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/gameplay/simulation/SimulationSnapshot.h"
+    },
+    {
+      "path": "src/platform/android/AndroidDebugRequestAdmission.h",
+      "bytes": 945,
+      "working_sha256": "963d0da67d2d8d9dcd1b34cffebe039d3039095da1f230ae70a1ff7751524eb0",
+      "git_blob": "37c6ca27ba71a1cfe47edb834c3366b55a61265e",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/platform/android/AndroidDebugRequestAdmission.h"
+    },
+    {
+      "path": "src/platform/android/GameplayEventMetadata.h",
+      "bytes": 1681,
+      "working_sha256": "2667cf185f0df81e34abe89761b10827655f68c8190ef18b029e87c09ab8c8d0",
+      "git_blob": "926d5db2fea994e02058ac9206cac6366ef0fc29",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/platform/android/GameplayEventMetadata.h"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 496619,
+      "working_sha256": "cc6d586c7aa63a855a267d79702660f69e9b6d82c700548d0f544deec9417cd5",
+      "git_blob": "f9bb3c3270516e3564382dccbfb251c6c6ff72a1",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/platform/windows/DiagnosticWindow.cpp"
+    },
+    {
+      "path": "src/platform/windows/WindowsCombatPracticeLaunch.h",
+      "bytes": 2475,
+      "working_sha256": "69ab7ac36462725102e9d09c49794fbbd248ab4b3bdb05a866daabd3971c552f",
+      "git_blob": "84625172f5921d9d32df2ecf23cce062ef4a802a",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/platform/windows/WindowsCombatPracticeLaunch.h"
+    },
+    {
+      "path": "src/platform/windows/WindowsCombatTeachingPrompt.h",
+      "bytes": 3365,
+      "working_sha256": "9709efde3a838a8c2d50b39d28f1daeed79e30e95fbf4d39bf9174c3985e31c2",
+      "git_blob": "ae2a872a3da3e1941401ca09b7595711b8486e42",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/platform/windows/WindowsCombatTeachingPrompt.h"
+    },
+    {
+      "path": "src/telemetry/CombatTimingTrace.h",
+      "bytes": 9453,
+      "working_sha256": "47dcdd49342c2300c6289f13a432d450da178899cff3ac30cac1fb1ac6d74baf",
+      "git_blob": "f2c004193f4ae125ea79ba4d54574345e4d384b1",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/telemetry/CombatTimingTrace.h"
+    },
+    {
+      "path": "src/vulkan/raytracing/CharacterRenderSlot.cpp",
+      "bytes": 17260,
+      "working_sha256": "e98012b423ac3100473ac56fa9c977a852aa27e80004cebeea5385446a2f59fe",
+      "git_blob": "5a8875c29a8a863db708790c3919d328a7ef5f0b",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/CharacterRenderSlot.cpp"
+    },
+    {
+      "path": "src/vulkan/raytracing/CharacterRenderSlot.h",
+      "bytes": 6376,
+      "working_sha256": "a53eb67450adcc9307a03791806d172a5a5496120e83f00e651c523c3d36803d",
+      "git_blob": "c4398c7eadc69d5971d11f3e7dc190310dc120cf",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/CharacterRenderSlot.h"
+    },
+    {
+      "path": "tests/AndroidDebugRequestAdmissionTests.cpp",
+      "bytes": 1790,
+      "working_sha256": "1b8228956374f053133e39826bc54b205a0a43370b324fce7dead24f79b90fdb",
+      "git_blob": "0f3f4ca5afe79733c0ff681f7f18ae59354661a8",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tests/AndroidDebugRequestAdmissionTests.cpp"
+    },
+    {
+      "path": "tests/CharacterRenderSlotSmoke.cpp",
+      "bytes": 142659,
+      "working_sha256": "d9dcf9067534c5819c25dd0b59a7d8f6650d5a6f224ffedf1fb0104eca5a3d9a",
+      "git_blob": "a6a5a279db7d5bc4498fd37aa4357c671c046243",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tests/CharacterRenderSlotSmoke.cpp"
+    },
+    {
+      "path": "tests/CombatFoundationTests.cpp",
+      "bytes": 25502,
+      "working_sha256": "acb71d31eefc314c3049cc6117a2a82fc2dab9e6229178b54166e31a3268fddf",
+      "git_blob": "d1fc00f4a17f32d95c2bf8e7960d94e2347fef37",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tests/CombatFoundationTests.cpp"
+    },
+    {
+      "path": "tests/CombatTimingTraceTests.cpp",
+      "bytes": 6557,
+      "working_sha256": "f244a1ebfe4599cedfe875702be2b55353052f3bc3ce8c196239df1f3173aa46",
+      "git_blob": "11716acfa76f63577ccfbb5576a262f3bbe9dc49",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tests/CombatTimingTraceTests.cpp"
+    },
+    {
+      "path": "tests/InputMailboxStress.cpp",
+      "bytes": 9375,
+      "working_sha256": "104464b489fa17166353e5b6a8290d340c7ed6dc826c8514d8a5ee5f1113c34b",
+      "git_blob": "a04e90afbfb954352774156d4e40df3e197cf2e8",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tests/InputMailboxStress.cpp"
+    },
+    {
+      "path": "tests/SimulationGameplayTests.cpp",
+      "bytes": 134576,
+      "working_sha256": "dbf9bb7299622927bf2780c701138f07b554cf548a35a6e7710a8ae6b056534d",
+      "git_blob": "8e52baf328f220c2e357e1db3f28cb79570c1fe1",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tests/SimulationGameplayTests.cpp"
+    },
+    {
+      "path": "tests/SpatialAudioSmoke.cpp",
+      "bytes": 36218,
+      "working_sha256": "cb0458b74237112695c78e60d53eb6a39dfe6db2f8f6a134b00f4235d1aac1fe",
+      "git_blob": "7616abf1b2c197f53a62344ddbf8b035e0298bb8",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tests/SpatialAudioSmoke.cpp"
+    },
+    {
+      "path": "tests/SwordTargetContactRegionWitnessTests.cpp",
+      "bytes": 88633,
+      "working_sha256": "e7f7710f0f52695cb224a92288650167e667feb4a871abcccd9df58d3935bfd2",
+      "git_blob": "dcb871b5fd3becb9369c4f8ca3ed23c70990e60d",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tests/SwordTargetContactRegionWitnessTests.cpp"
+    },
+    {
+      "path": "tests/WaterfallProductionRouteTests.cpp",
+      "bytes": 44217,
+      "working_sha256": "909a913a22df95c25f8ca96cdd9eb8a372c29c1b343e168e48f4bc28ffe059ae",
+      "git_blob": "905a7547bcb430ae2501df87b58985de3ef819df",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tests/WaterfallProductionRouteTests.cpp"
+    },
+    {
+      "path": "tests/WindowsCombatPracticeLaunchTests.cpp",
+      "bytes": 5280,
+      "working_sha256": "f6124b4a30c01949af3eeb6bf1bbfd5e88a5df0552aa0cf9a175bc1255c893de",
+      "git_blob": "9f33fd061059c6d2416b41219e4b68f69e7938b8",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tests/WindowsCombatPracticeLaunchTests.cpp"
+    }
+  ],
+  "unchanged_shader_policy_abi_and_generated": [
+    {
+      "path": "shaders/README.md",
+      "bytes": 483,
+      "working_sha256": "9b68e260625a9cca7e6f20cf3b3eccad45589c48033ec8bf8dac1dfe2dc98efd",
+      "git_blob": "da997f9062a313ae8434e989273849ecbbf62ba8",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/README.md"
+    },
+    {
+      "path": "shaders/raytracing/README.md",
+      "bytes": 747,
+      "working_sha256": "edb0fbd2fae39809b6f4806d643d471a1fa243f393051bea59e2159447a4ac2c",
+      "git_blob": "bf6af316883891521e252d0c05ee6940a266aca7",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/README.md"
+    },
+    {
+      "path": "shaders/raytracing/experimental/staged_primary_record.glsl",
+      "bytes": 3971,
+      "working_sha256": "caa851350ec1f14845ea3c59e63aa6ac820685dc42ec720cd7695124edecf5bc",
+      "git_blob": "5f2078259062bd5b448ebe94dc279c4816c4ef8e",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/experimental/staged_primary_record.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+      "bytes": 15064,
+      "working_sha256": "36ddb178dcfe0076715d810f77df932ea87bb7dce01e9bba6b3d4bc41475b9c7",
+      "git_blob": "8dbe73e13aadb209aa7712f5cf41fc28fbc82673",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_atmosphere.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+      "bytes": 755,
+      "working_sha256": "50028bb601d18546110ea546de9c9dcee0cfad89a5520ef448756e43206f2bb4",
+      "git_blob": "83b07524182e02e47985bae0464969a8e8fcb4d9",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_diagnostics.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+      "bytes": 19185,
+      "working_sha256": "54ea2f2b2d1c898fcd93fad561d5dcd53b4e942ba245a1639ad45abcedcf028e",
+      "git_blob": "d058107d7e40e5eefc55536f0c8bc11637f04cd8",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_dielectric_common.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+      "bytes": 7572,
+      "working_sha256": "652200988024f3bdb5f61284474f5d6b34d0777743d2989ce342203bc7fbe5c7",
+      "git_blob": "21037217cfeaec9b1504bfd5b3288172df49daa2",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_dielectric_spawn.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+      "bytes": 31729,
+      "working_sha256": "10b109115a509ef2865e68b463f200f3df6c98d50f5834633435d0dfee7a17ae",
+      "git_blob": "549c245c4373b512af375ee5221a47bedd9b15c7",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_dielectric_transport.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_fire.glsl",
+      "bytes": 11117,
+      "working_sha256": "74b5130bc37f2b601fca6181736bcb402a583e2a7c1fcf8a1be8b7c07c7cc57f",
+      "git_blob": "f5cd42000ef2c32a556b871dd6f9ccdf71c119a4",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_fire.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_frame.glsl",
+      "bytes": 5029,
+      "working_sha256": "6541ff4011f3051ed89752c04de6beb2af90a002011b705f63c96fdf8ab835b2",
+      "git_blob": "c299a32452da9c24220f2aa13ed925cc43537c0f",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_frame.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+      "bytes": 33543,
+      "working_sha256": "ae27a7b7430da299fad2f94817d7a3033a3a0aa663c0a720474ebf88b0662a66",
+      "git_blob": "3d5d90c4655187fdd5fbf9f058d9e03293d3c8f0",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_hit_decode.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+      "bytes": 5518,
+      "working_sha256": "63f2bdd44c4500926d68b05c834f4916bbfe7f438d9f06c2ba537d39ddc7d865",
+      "git_blob": "98a07df95604791a91f6509f0f6f57e8fee96451",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_indoor_dust.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_lighting.glsl",
+      "bytes": 61471,
+      "working_sha256": "7a060aa3808e179b21c69ce730173bbdfca18b0a8ff9195109986513ca0d9dd1",
+      "git_blob": "4f2e63b58847e763af27b0a313c96fc830a32028",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_lighting.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+      "bytes": 7107,
+      "working_sha256": "a8c1d283245009e72e8478a10baafbf5954b96d76ba57ef3580a645ed354adfb",
+      "git_blob": "7d3bf2ce830480836f808bc208cfb448ab7b5fcf",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_scene_abi.generated.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+      "bytes": 3863,
+      "working_sha256": "467b95c024fcee6e0fb2224680f9555c944c705a6984b14afbd8f071e8ae4577",
+      "git_blob": "9d01430219962609639d82eb3d3a77324af94f40",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_scene_abi.glsl"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_variant_config.glsl",
+      "bytes": 2034,
+      "working_sha256": "b75a99a9c7789d0dc89c180d0c5918077d64274d08ec86fb523ae092318c3f5c",
+      "git_blob": "996413d714b87549774ac8e4f5e4393080280bfa",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/include/rt_variant_config.glsl"
+    },
+    {
+      "path": "shaders/raytracing/minimal.comp",
+      "bytes": 554,
+      "working_sha256": "e7f78df4a5233b0fa4488b80a6f130227a7ee92170f44e5ba75c16dd06a06594",
+      "git_blob": "d52ce41c2a5814c4191846af8f218da86b72123e",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/minimal.comp"
+    },
+    {
+      "path": "shaders/raytracing/minimal.rchit",
+      "bytes": 174,
+      "working_sha256": "59a374fa105f231f9ade604212d731a475f07f22c723fff6b0e0089dd2cd2a37",
+      "git_blob": "c02daf341235eebfa61f8f2d7fa05c25ec40b0e2",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/minimal.rchit"
+    },
+    {
+      "path": "shaders/raytracing/minimal.rgen",
+      "bytes": 220,
+      "working_sha256": "bdad62d56ed79e2c4beb9ff3830628ac6d3ad94f9ef8863911228ca059d74ced",
+      "git_blob": "5bb77363793fc1fee63452b24200825ab48114ee",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/minimal.rgen"
+    },
+    {
+      "path": "shaders/raytracing/minimal.rmiss",
+      "bytes": 788,
+      "working_sha256": "7bcc1b7fbdcf1802ed80ec25ccae50f20e9e7239026d767c0e7ba5f110ada936",
+      "git_blob": "36e5c1d2d2ebcaebf5e25deb424be65fee9dd276",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/shaders/raytracing/minimal.rmiss"
+    },
+    {
+      "path": "src/vulkan/raytracing/MinimalLegacyRayGenShader.inc",
+      "bytes": 1999516,
+      "working_sha256": "5394aa6748bc8b99d833d7fadbd81b9560ce29b5c69abaf0d6b6b1186142061f",
+      "git_blob": "379b7825d5b51c6fce493031b0b6f2e45cffba78",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/MinimalLegacyRayGenShader.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/MinimalRayGenShader.inc",
+      "bytes": 995397,
+      "working_sha256": "48c920b5ed71dca2ca3b000bc25ccf0c77693af0982c553d79e91c892d004713",
+      "git_blob": "4e10ef11a64c339b13e43f5bdc63301d1005ec0f",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/MinimalRayGenShader.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "bytes": 4575,
+      "working_sha256": "d6910233696db9ad6faf8d1051870e7e99d2dc9fc4497d0e71f1ac2ee79b57eb",
+      "git_blob": "1b5a40a37d47b0558781226f35a8fa17cfad2e39",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      "bytes": 4820,
+      "working_sha256": "57a342b1132e3d34637104bd194154ee78d9b74a368e1e9bf371e942b8bf7b2a",
+      "git_blob": "76a12d4eb705475b4a3c913d4c4a705bc93a6aa5",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.def",
+      "bytes": 9471,
+      "working_sha256": "2fdbed363632b485d8adc6869fbd6285396693a92f30eb90e014e7116cdfd8d4",
+      "git_blob": "598563552deac9ebc35072d56689add211c7d212",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/RtSceneAbi.def"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.generated.h",
+      "bytes": 15202,
+      "working_sha256": "a97aa2d124fd1e2a4249c85a4e4fc7851ce96e5c71ffc8306111e5328b735999",
+      "git_blob": "692ed6fe43ff1bd8c6b3713808ac4efae57a6ad5",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/RtSceneAbi.generated.h"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+      "bytes": 999019,
+      "working_sha256": "778669367d81842a01aa6fb7b48166fc696226f07f362b7c93b08ee487a0b3e4",
+      "git_blob": "a144dab98c85425de5394d6dc4361123a11b2ab3",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+      "bytes": 2010026,
+      "working_sha256": "53a6c3511119a4cf1ce33da5533367258ca265986c8d2574c43f3e49d2a1e01e",
+      "git_blob": "e07f83f403131c9bd578a078d697eecd734b82f4",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+      "bytes": 993958,
+      "working_sha256": "fcc9b0d9cb33637b3b091828c95a399ac153e3cafb0f3040c3eb5637c6e0f286",
+      "git_blob": "c6e11ecdf02d9a7631832d49287a9fdb87675d38",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+      "bytes": 1999569,
+      "working_sha256": "75305b54681a0252f1a96bca78d2a5cdc877f7958a72e5cceb0f26261933bbfc",
+      "git_blob": "0aa08db9d49f7c43b68d0cceb5804b3fbf77070d",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+      "bytes": 999894,
+      "working_sha256": "e74f636a45c056578f14c9d4bae03a847edf29c1ca2bd36f4ae81d359f1589f9",
+      "git_blob": "f617add0033e565de305cfdb0adc27eaf2c5734f",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+      "bytes": 2014128,
+      "working_sha256": "9e64a6031b4268b846ea22ef537413e52a3da3ea3a214ec73af30d9be180565f",
+      "git_blob": "e46c92f23663b7f9e5d79146c3a4ca06577e1c46",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+      "bytes": 994833,
+      "working_sha256": "5088dc747ab848d367d8bf0e03d94ef61276afa633aa9a31d535ac1480761049",
+      "git_blob": "e47913153c7fd770c3005eecb24f92d15dacfb03",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+      "bytes": 2003667,
+      "working_sha256": "be92f36ad841ea1719e9db0329449b35d2d331cdd41246a0e0471293ed039df2",
+      "git_blob": "76cebfccb8545e6654cf555dc956dfb5c8917084",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+      "bytes": 970097,
+      "working_sha256": "90f357ff6468df0fbb9495b1eade24970cd9149ae50c54fc4e2abefdb36cd4b8",
+      "git_blob": "9efd7394b163ad461bb38684b7754fbf82026b36",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+      "bytes": 1999831,
+      "working_sha256": "a84270b21b748619b5a0b1ff3dc5d6d53b0b4d519eccfc72ab3dc40e0fcd5aab",
+      "git_blob": "e9a431e0a7c02f1a987d32fbdcbea55eac61322a",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+      "bytes": 965036,
+      "working_sha256": "f3cf561c158dc2c876cfa01badc880363fe3dd04f2c24c4f75e73816c1a68ec1",
+      "git_blob": "e42041da0a481bd5747e605641c441855d726564",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+      "bytes": 1989370,
+      "working_sha256": "9fe1247043e8e0570d3e85742e1d1e003b921cc6fdb048aaf15eec9c0f0495be",
+      "git_blob": "aad5fb7369644f2050af406251f762c47bb87a6d",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+      "bytes": 969222,
+      "working_sha256": "9eb4dbc2a6cbbd9a426e999961d63146ff5fbe3c90b1e01fff7df6bf7189de12",
+      "git_blob": "80f10c0aa70d0c0814c4fffa254c79e356a3cddf",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+      "bytes": 1995729,
+      "working_sha256": "68f5832b42542514dfaa6aad186c9e74f91ab691f4f30caba3c9e7fd553fd2a1",
+      "git_blob": "1a30a1d12e39058014441e22f3717fcd60f63328",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+      "bytes": 964161,
+      "working_sha256": "3bd3d01cb8da7da2ef72582c23cdccc9363c11c146f9d338140dbff65b157574",
+      "git_blob": "efee7ad1630c4c0abeabc4ab0a734906b94a47e1",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+      "bytes": 1985268,
+      "working_sha256": "56936428d14d46800266b22daf11b0629ada77acc1bc3db57413e723f6d1be70",
+      "git_blob": "cf95e634dfd42e7c990036feabef69af6e511d08",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc"
+    },
+    {
+      "path": "tools/GenerateRayQueryComputeVariants.ps1",
+      "bytes": 31028,
+      "working_sha256": "d1442ca1ad5600d93260167a569adb44a5ea1a81d6eed9ce56f632877a2c9a0b",
+      "git_blob": "75ae0e6cfe3ea5c172c57334c5ce75a50576e87d",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tools/GenerateRayQueryComputeVariants.ps1"
+    },
+    {
+      "path": "tools/GenerateRtPipelineVariantCatalog.ps1",
+      "bytes": 8336,
+      "working_sha256": "0de388d15aec82c56741a4a4348a812a8110857c5352561603691e54dfb9bf26",
+      "git_blob": "ae9efc9176c19767e17fdddff5b5c589ce1289ed",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tools/GenerateRtPipelineVariantCatalog.ps1"
+    },
+    {
+      "path": "tools/compile-raygen.ps1",
+      "bytes": 71868,
+      "working_sha256": "11147f647ed10a8ee4b606157229e588a3bde71017072a7bc5f9132702d7ce7e",
+      "git_blob": "01c0571af4f357a05e6d25e39984f0a30207903c",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tools/compile-raygen.ps1"
+    },
+    {
+      "path": "tools/raygen-variant-budgets.json",
+      "bytes": 6425,
+      "working_sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+      "git_blob": "90d40a313084dca95055ed2ea32a231da9d0b9bb",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tools/raygen-variant-budgets.json"
+    },
+    {
+      "path": "tools/raygen-variant-catalog.json",
+      "bytes": 35050,
+      "working_sha256": "388953d0a643a68c8d63753ed5841d0cec02888c9836740f187e37562908494c",
+      "git_blob": "6bfa9f24a91189835b05567d4b30cf79b4ddb9ec",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tools/raygen-variant-catalog.json"
+    },
+    {
+      "path": "tools/raygen-variants.json",
+      "bytes": 1551,
+      "working_sha256": "d615c29c129cf8f3495ae8c1b9d46476979dbdf23003d690c6416f8eae45fca5",
+      "git_blob": "4fc8e115e92dfd237bacd076d2227b646343bf44",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tools/raygen-variants.json"
+    },
+    {
+      "path": "tools/rayquery-variant-catalog.json",
+      "bytes": 39371,
+      "working_sha256": "e1fcee8a2ba55900c0376c738dd4b6abdd7780f6a746c9ae95ca36975f538777",
+      "git_blob": "20905500ef148c87870b02f680281d1ee2e200a1",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/tools/rayquery-variant-catalog.json"
+    }
+  ],
+  "input_payloads": [
+    {
+      "path": "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
+      "bytes": 31568152,
+      "working_sha256": "340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db",
+      "git_blob": "37818de935539e4998467bc32589d805047c7da4",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
+      "lfs_oid": "340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db",
+      "hydrated_payload_matches_lfs": true
+    },
+    {
+      "path": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+      "bytes": 2568508,
+      "working_sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+      "git_blob": "1e3b6b9e70b0cde462be82cb29e189de8e70a1dc",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+      "lfs_oid": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+      "hydrated_payload_matches_lfs": true
+    },
+    {
+      "path": "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
+      "bytes": 621220,
+      "working_sha256": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1",
+      "git_blob": "de837efc8a1dbdc109a5bac3016a0807564256ce",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
+      "lfs_oid": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1",
+      "hydrated_payload_matches_lfs": true
+    },
+    {
+      "path": "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+      "bytes": 280040,
+      "working_sha256": "b1a2078c78d54dae548b89e20168c9922c7dfe33851d47f3d98e7ff1e7c14b8d",
+      "git_blob": "e28f3a8a933130bd17a85ac999d32e9a13e8d2d0",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/262a7fc096876d2417471285c6809f631103cfe6/assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+      "lfs_oid": "b1a2078c78d54dae548b89e20168c9922c7dfe33851d47f3d98e7ff1e7c14b8d",
+      "hydrated_payload_matches_lfs": true
+    }
+  ],
+  "shader_toolchain": [
+    {
+      "tool": "glslangValidator.exe",
+      "sha256": "afd12a24c54137ab6169bc71458ecd58a1b1b2891345a7f2f5ec8e1f22e948d7",
+      "version": "Glslang Version: 11:16.2.0\nESSL Version: OpenGL ES GLSL 3.20 glslang Khronos. 16.2.0\nGLSL Version: 4.60 glslang Khronos. 16.2.0\nSPIR-V Version 0x00010600, Revision 1\nGLSL.std.450 Version 100, Revision 1\nKhronos Tool ID 8\nSPIR-V Generator Version 11\nGL_KHR_vulkan_glsl version 100\nARB_GL_gl_spirv version 100\n"
+    },
+    {
+      "tool": "spirv-opt.exe",
+      "sha256": "ba03c9c7762a32155fd3800fef1a6cd8ca75b49e68f73e48bc96e1e911768f47",
+      "version": ""
+    },
+    {
+      "tool": "spirv-val.exe",
+      "sha256": "556f42595acb5c144f94eb6c15f8e5b75b412bac7b326f828725b3368767afa7",
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a\nTargets:\n  SPIR-V 1.0\n  SPIR-V 1.1\n  SPIR-V 1.2\n  SPIR-V 1.3\n  SPIR-V 1.4\n  SPIR-V 1.5\n  SPIR-V 1.6\n  SPIR-V 1.2 (under OpenCL 2.2 Full Profile semantics)\n  SPIR-V 1.0 (under Vulkan 1.0 semantics)\n  SPIR-V 1.3 (under Vulkan 1.1 semantics)\n  SPIR-V 1.4 (under Vulkan 1.1 semantics)\n  SPIR-V 1.5 (under Vulkan 1.2 semantics)\n  SPIR-V 1.6 (under Vulkan 1.3 semantics) SPIR-V 1.6 (under Vulkan 1.4 semantics)\n"
+    },
+    {
+      "tool": "spirv-dis.exe",
+      "sha256": "1848582c22f378a22c330cd8e4d9c97aeca1bd79c2b15a3a5e2eeb89dfa93d64",
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a\nTarget: SPIR-V 1.5\n"
+    }
+  ],
+  "powershell_version": "7.6.6",
+  "windows_packages": [
+    {
+      "target": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "targetPlatform": "Windows",
+      "instrumentation": "Diagnostic",
+      "quality": "High",
+      "targetSha256": "57768441056da4dd8c784ac515954f7924566c5f68517c0f0ede262782402a7d",
+      "targetBytes": 11713024,
+      "semanticKeys": [
+        "diagnostic_high_generic_dielectric",
+        "diagnostic_high_opaque_fast",
+        "rayquery_compute_diagnostic_high_generic_dielectric",
+        "rayquery_compute_diagnostic_high_opaque_fast"
+      ],
+      "modules": [
+        {
+          "offset": 7138848,
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "2417de5cadd3e753a081ae8f2e26bdc7cfe30d8c02758e8247bda0fa927a5fdd",
+          "words": 148880,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 29,
+          "binding22": true,
+          "atomicInstructions": 5
+        },
+        {
+          "offset": 7734368,
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795",
+          "words": 73990,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2,
+          "binding22": true,
+          "atomicInstructions": 41
+        },
+        {
+          "offset": 8030336,
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "6728cadff8b1dc2bc7d18d370b1bf6ccff1533908efd587a77e3848b7b940f95",
+          "words": 149181,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 29,
+          "binding22": true,
+          "atomicInstructions": 5
+        },
+        {
+          "offset": 8627072,
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "5f51a1b5175b29db3b5fb34eaa784fe3322607059b190fa770cd7835e3cef760",
+          "words": 74052,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2,
+          "binding22": true,
+          "atomicInstructions": 41
+        }
+      ],
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    },
+    {
+      "target": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "targetPlatform": "Windows",
+      "instrumentation": "Shipping",
+      "quality": "High",
+      "targetSha256": "eb125addc50cdfbc0a4e4398456f2fe2847d10cb8ec649569f3ee1690c15fc6d",
+      "targetBytes": 4115968,
+      "semanticKeys": [
+        "shipping_high_generic_dielectric",
+        "shipping_high_opaque_fast",
+        "rayquery_compute_shipping_high_generic_dielectric",
+        "rayquery_compute_shipping_high_opaque_fast"
+      ],
+      "modules": [
+        {
+          "offset": 1816384,
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "53c750339d09c6d86a962c0b6ee0a8b7d2fd3d2ecf964beeb8230e1a306f6c7f",
+          "words": 147821,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 29,
+          "binding22": false,
+          "atomicInstructions": 0
+        },
+        {
+          "offset": 2407680,
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "dcf4ae58c422c9c512a2f8d0fccffcbb03414058eb59367f3272aab145c2d809",
+          "words": 71783,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2,
+          "binding22": false,
+          "atomicInstructions": 0
+        },
+        {
+          "offset": 2694816,
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "f21fb2fe7acf6991d43ba697cc40ca05460e844b0be5c6e5d1e0bd5dcc193ee5",
+          "words": 148122,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 29,
+          "binding22": false,
+          "atomicInstructions": 0
+        },
+        {
+          "offset": 3287312,
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "cf819ead8266e755bc3c783380f983a7a0d3e0e338834234cb643f78a65ef1bb",
+          "words": 71845,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2,
+          "binding22": false,
+          "atomicInstructions": 0
+        }
+      ],
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    }
+  ],
+  "android_packages": {
+    "source_commit": "262a7fc096876d2417471285c6809f631103cfe6",
+    "packages": [
+      {
+        "configuration": "debug",
+        "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+        "sha256": "72a1d88ad9b879bedad74701575c5f310cc0b3c47ba929fe0330c1fb8d17a8b7",
+        "bytes": 133584379,
+        "libraries": [
+          {
+            "abi": "arm64-v8a",
+            "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+            "bytes": 4613264,
+            "sha256": "af15afc14bc4f4639af59e57dae0e070f1123e103bda6a06dee12e38e854c728",
+            "packaged_matches_stripped": true,
+            "elf_class": "ELF64",
+            "machine": "AArch64",
+            "load_alignments": [
+              "0x4000",
+              "0x4000",
+              "0x4000"
+            ]
+          },
+          {
+            "abi": "armeabi-v7a",
+            "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+            "bytes": 4057992,
+            "sha256": "2da01ecc3e030a95a67fdc5b7a94164423ad3e7044fa8163e619ece7e1ade2af",
+            "packaged_matches_stripped": true,
+            "elf_class": "ELF32",
+            "machine": "ARM",
+            "load_alignments": [
+              "0x4000",
+              "0x4000",
+              "0x4000"
+            ]
+          },
+          {
+            "abi": "x86",
+            "entry": "lib/x86/libhorde_rt_probe_android.so",
+            "bytes": 5030400,
+            "sha256": "018b0cef385e966d3585fad8dbaaaeea355d5d305288cac67e016362846cfc9d",
+            "packaged_matches_stripped": true,
+            "elf_class": "ELF32",
+            "machine": "Intel 80386",
+            "load_alignments": [
+              "0x4000",
+              "0x4000",
+              "0x4000"
+            ]
+          },
+          {
+            "abi": "x86_64",
+            "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+            "bytes": 4775184,
+            "sha256": "2acd68bdb47973bd8d45554db690c51fdcf01f6307b394d5ea759aa4c35c99b1",
+            "packaged_matches_stripped": true,
+            "elf_class": "ELF64",
+            "machine": "Advanced Micro Devices X86-64",
+            "load_alignments": [
+              "0x4000",
+              "0x4000",
+              "0x4000"
+            ]
+          }
+        ]
+      },
+      {
+        "configuration": "release-unsigned",
+        "path": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+        "sha256": "b192f94cbfc305055b4766d5223d912141396cf08f4664b4bcca3f021143d255",
+        "bytes": 121284038,
+        "libraries": [
+          {
+            "abi": "arm64-v8a",
+            "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+            "bytes": 4419064,
+            "sha256": "e3041cd2c8c08d332ddb4655325bb331fb40d3de88808851d07f3e25e4fccc18",
+            "packaged_matches_stripped": true,
+            "elf_class": "ELF64",
+            "machine": "AArch64",
+            "load_alignments": [
+              "0x4000",
+              "0x4000",
+              "0x4000"
+            ]
+          },
+          {
+            "abi": "armeabi-v7a",
+            "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+            "bytes": 3900068,
+            "sha256": "a83b01dce7f63fac1044f3050a29c6c26ae56d14c35613f591ff7808cfddcb50",
+            "packaged_matches_stripped": true,
+            "elf_class": "ELF32",
+            "machine": "ARM",
+            "load_alignments": [
+              "0x4000",
+              "0x4000",
+              "0x4000"
+            ]
+          },
+          {
+            "abi": "x86",
+            "entry": "lib/x86/libhorde_rt_probe_android.so",
+            "bytes": 4790620,
+            "sha256": "2f8b67a217cdd3838dfc66ce3d53908af8088f304edf0148ef4cfd46f8e122cc",
+            "packaged_matches_stripped": true,
+            "elf_class": "ELF32",
+            "machine": "Intel 80386",
+            "load_alignments": [
+              "0x4000",
+              "0x4000",
+              "0x4000"
+            ]
+          },
+          {
+            "abi": "x86_64",
+            "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+            "bytes": 4570328,
+            "sha256": "6f18d0d5f07dd8aeaf7930ba6569e6dc2830f77f01cca2d829c277b9162a2a81",
+            "packaged_matches_stripped": true,
+            "elf_class": "ELF64",
+            "machine": "Advanced Micro Devices X86-64",
+            "load_alignments": [
+              "0x4000",
+              "0x4000",
+              "0x4000"
+            ]
+          }
+        ]
+      }
+    ],
+    "readelf_sha256": "9c48e71a399c83160d132cf68e3d98404a1aa9ac03d9dbfc2ba9d11bc8528723",
+    "scope": "All four ABIs: exact APK-entry/stripped-library identity, ELF class/machine and 16KiB LOAD alignment. This does not inspect all-ABI shader payloads; supported shader inspection is separately ARM64-only."
+  },
+  "android_arm64_shader_inspection": [
+    {
+      "apk": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "apkEntry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "instrumentation": "Diagnostic",
+      "quality": "Mobile",
+      "arm64Sha256": "af15afc14bc4f4639af59e57dae0e070f1123e103bda6a06dee12e38e854c728",
+      "stripped": {
+        "target": "android/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "targetPlatform": "Android",
+        "instrumentation": "Diagnostic",
+        "quality": "Mobile",
+        "targetSha256": "af15afc14bc4f4639af59e57dae0e070f1123e103bda6a06dee12e38e854c728",
+        "targetBytes": 4613264,
+        "semanticKeys": [
+          "diagnostic_mobile_generic_dielectric",
+          "diagnostic_mobile_opaque_fast",
+          "rayquery_compute_diagnostic_mobile_generic_dielectric",
+          "rayquery_compute_diagnostic_mobile_opaque_fast"
+        ],
+        "modules": [
+          {
+            "offset": 554776,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "a48b9bb85102c62a1695d62b98ed4cdd4075d2343b1366e79e9e42e7f26aa945",
+            "words": 148406,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 27,
+            "binding22": true,
+            "atomicInstructions": 5
+          },
+          {
+            "offset": 1148400,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "c26dd2ce36c68f02ef22df49e3f08a7612f80a0a84d8cd696a474af667f85451",
+            "words": 73677,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": true,
+            "atomicInstructions": 41
+          },
+          {
+            "offset": 1443108,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "d50c9d0e5bb65f5dd8ccf6f63ea81ca0952cc24f4883c8be21c02b4805ad5af3",
+            "words": 148105,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 27,
+            "binding22": true,
+            "atomicInstructions": 5
+          },
+          {
+            "offset": 2035528,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "70afd1988fe149b35857616520df843a670f3f59c921957d4fdc0a17c657cf42",
+            "words": 73615,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": true,
+            "atomicInstructions": 41
+          }
+        ],
+        "spirvVal": "passed",
+        "spirvDis": "passed"
+      },
+      "packaged": {
+        "target": "android/app/build/outputs/apk/debug/app-debug.apk!/lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "targetPlatform": "Android",
+        "instrumentation": "Diagnostic",
+        "quality": "Mobile",
+        "targetSha256": "af15afc14bc4f4639af59e57dae0e070f1123e103bda6a06dee12e38e854c728",
+        "targetBytes": 4613264,
+        "semanticKeys": [
+          "diagnostic_mobile_generic_dielectric",
+          "diagnostic_mobile_opaque_fast",
+          "rayquery_compute_diagnostic_mobile_generic_dielectric",
+          "rayquery_compute_diagnostic_mobile_opaque_fast"
+        ],
+        "modules": [
+          {
+            "offset": 554776,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "a48b9bb85102c62a1695d62b98ed4cdd4075d2343b1366e79e9e42e7f26aa945",
+            "words": 148406,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 27,
+            "binding22": true,
+            "atomicInstructions": 5
+          },
+          {
+            "offset": 1148400,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "c26dd2ce36c68f02ef22df49e3f08a7612f80a0a84d8cd696a474af667f85451",
+            "words": 73677,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": true,
+            "atomicInstructions": 41
+          },
+          {
+            "offset": 1443108,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "d50c9d0e5bb65f5dd8ccf6f63ea81ca0952cc24f4883c8be21c02b4805ad5af3",
+            "words": 148105,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 27,
+            "binding22": true,
+            "atomicInstructions": 5
+          },
+          {
+            "offset": 2035528,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "70afd1988fe149b35857616520df843a670f3f59c921957d4fdc0a17c657cf42",
+            "words": 73615,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": true,
+            "atomicInstructions": 41
+          }
+        ],
+        "spirvVal": "passed",
+        "spirvDis": "passed"
+      }
+    },
+    {
+      "apk": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "apkEntry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "instrumentation": "Shipping",
+      "quality": "Mobile",
+      "arm64Sha256": "e3041cd2c8c08d332ddb4655325bb331fb40d3de88808851d07f3e25e4fccc18",
+      "stripped": {
+        "target": "android/app/build/intermediates/stripped_native_libs/release/stripReleaseDebugSymbols/out/lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "targetPlatform": "Android",
+        "instrumentation": "Shipping",
+        "quality": "Mobile",
+        "targetSha256": "e3041cd2c8c08d332ddb4655325bb331fb40d3de88808851d07f3e25e4fccc18",
+        "targetBytes": 4419064,
+        "semanticKeys": [
+          "shipping_mobile_generic_dielectric",
+          "shipping_mobile_opaque_fast",
+          "rayquery_compute_shipping_mobile_generic_dielectric",
+          "rayquery_compute_shipping_mobile_opaque_fast"
+        ],
+        "modules": [
+          {
+            "offset": 529600,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "d05eec30c1fbdc256a34856c1a87f8f5789137ea79d04027bcaa059259565e64",
+            "words": 147347,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 27,
+            "binding22": false,
+            "atomicInstructions": 0
+          },
+          {
+            "offset": 1118988,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "72b03e6bce4b3800a686a106290647af078a119c5da38c7d4cce870477df86d0",
+            "words": 71470,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": false,
+            "atomicInstructions": 0
+          },
+          {
+            "offset": 1404868,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "ae779d534970ecb0c2e21289c07ddde58f239ea1906e36d7046323f4b7f249d9",
+            "words": 147046,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 27,
+            "binding22": false,
+            "atomicInstructions": 0
+          },
+          {
+            "offset": 1993052,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "009e1b37a9b3459ca3c1d900a0741c6bc6041288f759d2367e07fd7542889c9a",
+            "words": 71408,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": false,
+            "atomicInstructions": 0
+          }
+        ],
+        "spirvVal": "passed",
+        "spirvDis": "passed"
+      },
+      "packaged": {
+        "target": "android/app/build/outputs/apk/release/app-release-unsigned.apk!/lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "targetPlatform": "Android",
+        "instrumentation": "Shipping",
+        "quality": "Mobile",
+        "targetSha256": "e3041cd2c8c08d332ddb4655325bb331fb40d3de88808851d07f3e25e4fccc18",
+        "targetBytes": 4419064,
+        "semanticKeys": [
+          "shipping_mobile_generic_dielectric",
+          "shipping_mobile_opaque_fast",
+          "rayquery_compute_shipping_mobile_generic_dielectric",
+          "rayquery_compute_shipping_mobile_opaque_fast"
+        ],
+        "modules": [
+          {
+            "offset": 529600,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "d05eec30c1fbdc256a34856c1a87f8f5789137ea79d04027bcaa059259565e64",
+            "words": 147347,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 27,
+            "binding22": false,
+            "atomicInstructions": 0
+          },
+          {
+            "offset": 1118988,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "72b03e6bce4b3800a686a106290647af078a119c5da38c7d4cce870477df86d0",
+            "words": 71470,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": false,
+            "atomicInstructions": 0
+          },
+          {
+            "offset": 1404868,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "ae779d534970ecb0c2e21289c07ddde58f239ea1906e36d7046323f4b7f249d9",
+            "words": 147046,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 27,
+            "binding22": false,
+            "atomicInstructions": 0
+          },
+          {
+            "offset": 1993052,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "009e1b37a9b3459ca3c1d900a0741c6bc6041288f759d2367e07fd7542889c9a",
+            "words": 71408,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": false,
+            "atomicInstructions": 0
+          }
+        ],
+        "spirvVal": "passed",
+        "spirvDis": "passed"
+      }
+    }
+  ],
+  "java_tests": [
+    {
+      "name": "com.samfa12.hordelanternrt.AmbienceOutputBufferTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "3.356"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.AmbienceOutputQueueTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.002"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.AndroidControllerInputTest",
+      "tests": "11",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.262"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.AndroidControllerIntegrationTest",
+      "tests": "26",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "5.206"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.BenchmarkAutomationExportTest",
+      "tests": "13",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.444"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.BenchmarkAutomationIntentTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.111"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.BenchmarkSummaryReviewTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.148"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.BenchmarkSummaryUiTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.487"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.CombatTeachingPreferencesTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.178"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.ContextualControlsLayoutTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "3.342"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.ControllerNavigationTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.751"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.DeathRecoveryTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.021"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.DustDebugAutomationTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.062"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.EntryMenuStateTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.001"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.EquipmentAudioFeedbackTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.0"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GameplayTouchCancellationTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.233"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GraphicsMenuLifecycleTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.245"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GraphicsPreferencesTest",
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.672"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GraphicsPreviewCompactLayoutTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.842"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GraphicsPreviewOptionsTest",
+      "tests": "16",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.922"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GraphicsViewportRecoveryTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.474"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GrateDebugCheckpointTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.022"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.InterfaceLayoutTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.361"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.InterfacePreferencesTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.153"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MainActivityPlaytestReportLifecycleTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.301"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.002"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MusicAudioFocusTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.085"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MusicOutputBufferTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.082"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MusicOutputGainTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.098"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlayerDebugCheckpointTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.094"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlaytestReportExportTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.003"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlaytestReportFlowResourceTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.05"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlaytestReportScreenshotTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.1"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlaytestReportSubmissionTest",
+      "tests": "16",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.026"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlaytestReportVerificationTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.412"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.RenderScalePreferenceTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.068"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.SurfaceSuspensionLifecycleTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.366"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.TouchControlStateTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.0"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.VitalityHeartsTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.132"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.WaterDebugCheckpointTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.051"
+    }
+  ],
+  "java_total": 268,
+  "limits": "Host compilation/package inspection only. No GPU presentation, Android installation, touch/lifecycle, listening, vibration or performance acceptance."
+}

@@ -41,6 +41,17 @@ constexpr bool RtPresentationTransformSwapsAxes(const RtPresentationTransform tr
     return index == 1u || index == 3u || index == 5u || index == 7u;
 }
 
+// Matches rt_frame.glsl's camera aspect from the actual storage/dispatch image.
+// Output upscaling dimensions are a separate presentation fact, including when
+// integer percentage rounding gives ordinary custom runs a slightly new ratio.
+constexpr float RtPresentationCameraAspect(const std::uint32_t width, const std::uint32_t height,
+                                           const RtPresentationTransform transform) noexcept
+{
+    if (!width || !height) return 0;
+    const float imageAspect = float(width) / float(height);
+    return RtPresentationTransformSwapsAxes(transform) ? 1.0f / imageAspect : imageAspect;
+}
+
 // Pack transform index and the existing red/blue swap flag into an exactly
 // representable integer-valued float. Identity therefore retains its old 0/1 values.
 constexpr std::uint32_t EncodeRtPresentationOutputMode(

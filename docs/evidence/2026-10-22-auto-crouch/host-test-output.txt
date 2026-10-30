@@ -1,0 +1,152 @@
+Start testing: Oct 23 07:10 AUS Eastern Summer Time
+----------------------------------------------------------
+37/230 Testing: horde_rt_chapter_step_movement_tests
+37/230 Test: horde_rt_chapter_step_movement_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_chapter_step_movement_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_step_movement_tests" start time: Oct 23 07:10 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+automatic crossing target=-23.5 ticks=55 blocked=2
+automatic crossing target=-22.5 ticks=75 blocked=0
+automatic crossing target=-24.5 ticks=172 blocked=2
+automatic crossing target=-22.5 ticks=152 blocked=2
+73 chapter step movement checks, 0 failures; retained step bytes=680
+<end of output>
+Test time =   3.82 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_step_movement_tests" end time: Oct 23 07:10 AUS Eastern Summer Time
+"horde_rt_chapter_step_movement_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+69/230 Testing: horde_rt_motion_evidence_scenario_tests
+69/230 Test: horde_rt_motion_evidence_scenario_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_motion_evidence_scenario_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_motion_evidence_scenario_tests" start time: Oct 23 07:10 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+live-torch-crouch rate=15 complete=1 crouch=1 standingAgain=1
+torch-drench rate=15 stage=complete endpoint=(-5.4757,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=15 stage=complete endpoint=(-3.7859e-10,-3.78285) simulationSeconds=24.4667 states=367 events=26 reservedLedgerBytes=39410560 reason=
+shaft-up rate=15 stage=complete endpoint=(-1.66,-15.3675) simulationSeconds=17.9333 states=269 events=21 reservedLedgerBytes=39410560 reason=
+shaft coverage views=182 zSpan=0.479259 retry=0 finaleRoof=0
+keeper-first-entry rate=15 stage=complete endpoint=(-31.1865,-15.2) simulationSeconds=10.2667 states=154 events=13 reservedLedgerBytes=39410560 reason=
+keeper-retry-reward rate=15 stage=complete endpoint=(-31.1867,-15.2001) simulationSeconds=46.6167 states=700 events=63 reservedLedgerBytes=39410560 reason=
+waterfall-equipment rate=15 stage=complete endpoint=(0.400877,-15.1484) simulationSeconds=6.46667 states=97 events=16 reservedLedgerBytes=39410560 reason=
+live-torch-crouch rate=30 complete=1 crouch=1 standingAgain=1
+torch-drench rate=30 stage=complete endpoint=(-5.48048,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=30 stage=complete endpoint=(-9.95028e-10,-3.78032) simulationSeconds=24.4 states=732 events=26 reservedLedgerBytes=39410560 reason=
+shaft-up rate=30 stage=complete endpoint=(-1.66,-15.3853) simulationSeconds=17.8667 states=536 events=21 reservedLedgerBytes=39410560 reason=
+shaft coverage views=361 zSpan=0.48181 retry=0 finaleRoof=0
+keeper-first-entry rate=30 stage=complete endpoint=(-31.1779,-15.2) simulationSeconds=10.2333 states=307 events=13 reservedLedgerBytes=39410560 reason=
+keeper-retry-reward rate=30 stage=complete endpoint=(-31.1786,-15.2002) simulationSeconds=46.5167 states=1396 events=63 reservedLedgerBytes=39410560 reason=
+waterfall-equipment rate=30 stage=complete endpoint=(0.464386,-15.1416) simulationSeconds=6.36667 states=191 events=16 reservedLedgerBytes=39410560 reason=
+live-torch-crouch rate=60 complete=1 crouch=1 standingAgain=1
+torch-drench rate=60 stage=complete endpoint=(-5.47667,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=60 stage=complete endpoint=(-1.10681e-09,-3.77682) simulationSeconds=24.4167 states=1465 events=26 reservedLedgerBytes=39410560 reason=
+shaft-up rate=60 stage=complete endpoint=(-1.66,-15.3852) simulationSeconds=17.8667 states=1072 events=22 reservedLedgerBytes=39410560 reason=
+shaft coverage views=721 zSpan=0.471199 retry=0 finaleRoof=0
+keeper-first-entry rate=60 stage=complete endpoint=(-31.1772,-15.2) simulationSeconds=10.2167 states=613 events=13 reservedLedgerBytes=39410560 reason=
+keeper-retry-reward rate=60 stage=complete endpoint=(-31.1779,-15.2003) simulationSeconds=46.45 states=2787 events=62 reservedLedgerBytes=39410560 reason=
+waterfall-equipment rate=60 stage=complete endpoint=(0.495852,-15.1465) simulationSeconds=6.36667 states=382 events=16 reservedLedgerBytes=39410560 reason=
+live-torch-crouch rate=120 complete=1 crouch=1 standingAgain=1
+torch-drench rate=120 stage=complete endpoint=(-5.47667,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=120 stage=complete endpoint=(-1.10681e-09,-3.77682) simulationSeconds=24.4167 states=2930 events=26 reservedLedgerBytes=39410560 reason=
+shaft-up rate=120 stage=complete endpoint=(-1.66,-15.3852) simulationSeconds=17.8667 states=2144 events=22 reservedLedgerBytes=39410560 reason=
+shaft coverage views=1441 zSpan=0.471199 retry=0 finaleRoof=0
+keeper-first-entry rate=120 stage=complete endpoint=(-31.1772,-15.2) simulationSeconds=10.2167 states=1226 events=13 reservedLedgerBytes=39410560 reason=
+keeper-retry-reward rate=120 stage=complete endpoint=(-31.1779,-15.2003) simulationSeconds=46.45 states=5573 events=62 reservedLedgerBytes=39410560 reason=
+waterfall-equipment rate=120 stage=complete endpoint=(0.495852,-15.1465) simulationSeconds=6.36667 states=764 events=16 reservedLedgerBytes=39410560 reason=
+<end of output>
+Test time =   0.71 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_motion_evidence_scenario_tests" end time: Oct 23 07:10 AUS Eastern Summer Time
+"horde_rt_motion_evidence_scenario_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+76/230 Testing: horde_rt_player_crouch_rig_tests
+76/230 Test: horde_rt_player_crouch_rig_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_player_crouch_rig_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_player_crouch_rig_tests" start time: Oct 23 07:10 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+crouch_pose_samples=288 failures=0; native CPU rig only, GPU not measured
+<end of output>
+Test time =   2.68 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_player_crouch_rig_tests" end time: Oct 23 07:10 AUS Eastern Summer Time
+"horde_rt_player_crouch_rig_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+148/230 Testing: horde_rt_simulation_gameplay_tests
+148/230 Test: horde_rt_simulation_gameplay_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_simulation_gameplay_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_simulation_gameplay_tests" start time: Oct 23 07:10 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+lich/chest delayed finale events hits/defeat/unlock=3/1/1 phase=1 pending=0 time=0 sequence=7/8
+open shaft actual X/Z=-5.5/-14.5 mount torch lowering/left Y legacy=0/-0.41 anatomical=0/-0.31
+Shared simulation command, event, seam-persistence, and retry tests passed.
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_simulation_gameplay_tests" end time: Oct 23 07:10 AUS Eastern Summer Time
+"horde_rt_simulation_gameplay_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+151/230 Testing: horde_rt_waterfall_production_route_tests
+151/230 Test: horde_rt_waterfall_production_route_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_waterfall_production_route_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_waterfall_production_route_tests" start time: Oct 23 07:10 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Waterfall production route passed: stowed cold start/reset/checkpoint/retry, first-room isolation, real fixed-step route and encounter draw/retreat cases, four bays, and Keeper arrival.
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_waterfall_production_route_tests" end time: Oct 23 07:10 AUS Eastern Summer Time
+"horde_rt_waterfall_production_route_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+181/230 Testing: horde_rt_input_mailbox_stress
+181/230 Test: horde_rt_input_mailbox_stress
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_input_mailbox_stress.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_input_mailbox_stress" start time: Oct 23 07:10 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Input mailbox retained coherent POD snapshots across 125000 publications for 4 concurrent readers.
+<end of output>
+Test time =   3.26 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_input_mailbox_stress" end time: Oct 23 07:10 AUS Eastern Summer Time
+"horde_rt_input_mailbox_stress" time elapsed: 00:00:03
+----------------------------------------------------------
+
+183/230 Testing: horde_rt_desktop_controller_input_tests
+183/230 Test: horde_rt_desktop_controller_input_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_desktop_controller_input_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_desktop_controller_input_tests" start time: Oct 23 07:10 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Desktop controller input tests passed
+<end of output>
+Test time =   1.15 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_desktop_controller_input_tests" end time: Oct 23 07:10 AUS Eastern Summer Time
+"horde_rt_desktop_controller_input_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 23 07:10 AUS Eastern Summer Time

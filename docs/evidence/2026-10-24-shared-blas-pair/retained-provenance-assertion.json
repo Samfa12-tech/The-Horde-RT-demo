@@ -1,0 +1,10 @@
+{
+  "stage": "initialization before first presented image",
+  "result": "failed; no visual/performance acceptance",
+  "assertion": "cannot seek value-initialized vector iterator",
+  "cause": "diagnostic bake sought full source.triangleRegions range; StaticMeshAsset permits an unclassified suffix (including empty) as Shared",
+  "observation": "read only the owned test process window/error text; no focus or interaction",
+  "ownedPid": 27548,
+  "cleanup": "stopped only tracked executable after bounded close did not exit",
+  "correction": "copy each classified source triangle, otherwise retain existing Shared semantics"
+}

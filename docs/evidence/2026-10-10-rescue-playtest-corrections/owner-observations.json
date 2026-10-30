@@ -1,0 +1,23 @@
+{
+  "tested_source": "1a0205efcb423a3df527f617cf2fe48034116cb3",
+  "tested_exe_sha256": "4e265d7fb26603a170c34d7ca7cfababaca68a0f3ef8cb8ae29611d1ddc69a61",
+  "evidence_class": "owner report and game-only screenshots; no new candidate physical acceptance",
+  "observations": [
+    "Climb prompt did not appear while walking around rope.",
+    "Controller sprint requested on L3.",
+    "Rope shadow glitch visible in indoor mist.",
+    "Indoor dust label clipped in windowed graphics menu."
+  ],
+  "screenshot_sha256": [
+    "0cdc4a155616c75868eba0a50806c74a6bbe822208215b395f05ae583aac13ff",
+    "d6c99698f115c923767c2fff506c563cb9df3ad7145b32ac8afba08ffa981bd4"
+  ],
+  "read_only_controller_mapping": {
+    "owner_confirmed_press_and_release": true,
+    "fresh_legacy_L3_mask": "0x2000",
+    "held_seconds_observed": 2.344,
+    "scope": "exact recognized controller only; unknown WinMM devices unchanged"
+  },
+  "new_candidate_owner_acceptance": "PENDING",
+  "Kit_voice_subtitle_integration": "LATER; no added on-screen throw warning"
+}

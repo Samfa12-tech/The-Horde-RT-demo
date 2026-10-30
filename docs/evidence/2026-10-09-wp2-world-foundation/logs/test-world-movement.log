@@ -1,0 +1,27 @@
+Test project <repo>/build/presets/windows-x64-debug
+    Start 42: horde_rt_world_route_foundation_tests
+1/5 Test #42: horde_rt_world_route_foundation_tests .....   Passed    7.42 sec
+    Start 45: horde_rt_player_directional_rig_tests
+2/5 Test #45: horde_rt_player_directional_rig_tests .....***Failed    1.89 sec
+FAIL: rights-cleared runtime rig must skin each directional stride and retain both hand attachment sockets
+
+    Start 68: horde_rt_player_animation_tests
+3/5 Test #68: horde_rt_player_animation_tests ...........   Passed    4.88 sec
+    Start 73: horde_rt_development_static_asset_tests
+4/5 Test #73: horde_rt_development_static_asset_tests ...***Failed    3.95 sec
+FAIL: development registry retains prior views and admits bounded water-lighting views
+1 development static asset assertion(s) failed
+
+    Start 98: horde_rt_simulation_gameplay_tests
+5/5 Test #98: horde_rt_simulation_gameplay_tests ........***Exception: SegFault  1.56 sec
+
+
+40% tests passed, 3 tests failed out of 5
+
+Total Test time (real) =  19.72 sec
+
+The following tests FAILED:
+	 45 - horde_rt_player_directional_rig_tests (Failed)
+	 73 - horde_rt_development_static_asset_tests (Failed)
+	 98 - horde_rt_simulation_gameplay_tests (SEGFAULT)
+Errors while running CTest

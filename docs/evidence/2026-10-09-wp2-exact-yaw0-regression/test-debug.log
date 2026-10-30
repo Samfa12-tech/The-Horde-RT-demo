@@ -1,0 +1,35 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 43
+    Start 43: horde_rt_held_item_vertical_support_rig_tests
+
+43: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_held_item_vertical_support_rig_tests.exe" "<repo>"
+43: Working Directory: <repo>/build/presets/windows-x64-debug
+43: Test timeout computed to be: 180
+43: Exact-pose rejected missing geometry: missing skinned geometry
+43: Exact-pose rejected omitted support: body mesh or eye applied support incorrectly
+43: Exact-pose rejected doubled support: body mesh or eye applied support incorrectly
+43: Exact-pose rejected unreachable wrist: actual wrist is outside anatomical reach
+43: Exact-pose rejected broken torch Grip: torch no longer attaches to the solved rig Grip
+43: Exact-pose rejected broken sword Hips attachment: production stowed sword no longer attaches to animated Hips
+43: Exact-pose rejected independent flame offset: flame or physical light left its authored item socket
+43: Exact-pose rejected independent physical-light offset: flame or physical light left its authored item socket
+43: Exact checkpoint171 production rig yaw0 pitch-0.05 aspect16:9 passed; mesh points=34304 lowering/retraction/headroom=0.333987/0.200392/0.0347347 returned lowering=0 same-validator negatives=9 descent ticks=59
+43: Actual cached player rig support transform passed: support delta=0.35 m; actual skinned body vertices, hand/item sockets, reward-lantern hinge/body/flame/light, and torch clearance translated with XZ preserved.
+43: First fixture (0,0) torch retraction/headroom floor=0/0.0557224 m raised=0.197407/0.0347347 m
+1/1 Test #43: horde_rt_held_item_vertical_support_rig_tests ...   Passed    2.74 sec
+
+The following tests passed:
+	horde_rt_held_item_vertical_support_rig_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   2.79 sec

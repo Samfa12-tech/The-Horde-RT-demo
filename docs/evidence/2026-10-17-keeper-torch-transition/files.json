@@ -1,0 +1,34 @@
+{
+  "build-receipt.json": {
+    "bytes": 2317,
+    "sha256": "4efa2af1bb1f5db45ec1e5f709b45f2c4aa2b04f828f10310a34e8e59e1c859c"
+  },
+  "install-restore.json": {
+    "bytes": 293,
+    "sha256": "ddbbe78e456d5d652ab733ee43463d5dfe1e4ab319a8c3eeb8f992f976f90d85"
+  },
+  "pipeline-timing-analysis.json": {
+    "bytes": 27302,
+    "sha256": "9098b00d13dc9d74af384470c1508c4af296e20a132965ecc763276735652688"
+  },
+  "query-timing-analysis.json": {
+    "bytes": 27284,
+    "sha256": "b63ce8d9019675ae165944cd6a02c98447a2df21f077755f146d859b4d9ac360"
+  },
+  "raw-evidence.zip": {
+    "bytes": 1316106,
+    "sha256": "3eb87c700881bac0175b4ca69034bee11e9bd4325f94d3791d596ad86578e1d3"
+  },
+  "README.md": {
+    "bytes": 10101,
+    "sha256": "0a7fff85860807b58f99d93688fb822a2d4063d21848ccd4256d1af1b02ab8e4"
+  },
+  "torch-baseline.png": {
+    "bytes": 1279344,
+    "sha256": "dc2a551383a7d3a6bf952afae4075f4814d9ce8e92eedcc7057a07177cdffb96"
+  },
+  "torch-lit.png": {
+    "bytes": 3676627,
+    "sha256": "af8f9599d37749ecf29e0dd9b812cd6ce0e1a79df0a05ce743a5e780ce633a3d"
+  }
+}

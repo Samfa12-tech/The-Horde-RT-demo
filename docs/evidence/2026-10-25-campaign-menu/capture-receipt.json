@@ -1,0 +1,123 @@
+{
+  "kind": "Actual Android widgets rendered by existing Robolectric integration test; NOT phone/RT/touch/storage evidence",
+  "beforeSource": "6dbc43fd3f1359ba5b2abc8fc99eb5f47b94bff3 plus test-only capture hook",
+  "viewports": [
+    [
+      411,
+      801
+    ],
+    [
+      804,
+      381
+    ]
+  ],
+  "observedPanelWidthPixels": 288,
+  "afterResourceDisplayPixels": [
+    320,
+    470
+  ],
+  "scenarios": [
+    "allEmpty",
+    "slot1manualLowerChamber1heart-and-autoForestLookout2hearts"
+  ],
+  "captureOperations": "view measure/layout/draw only; no forced scroll or crop",
+  "afterTitleVisibilityAssertion": "PASS both viewports/scenarios",
+  "tests": {
+    "CampaignMenuIntegrationTest": 34,
+    "CampaignMenuStateTest": 10,
+    "failures": 0
+  },
+  "retainedFailures": [
+    {
+      "kind": "capture compile compatibility",
+      "reason": "Files.writeString missing in Android test API; changed to Files.write UTF8 bytes; production unchanged"
+    },
+    {
+      "kind": "first after test1of44",
+      "test": "unavailableDirectoryDoesNotInvokeNativeConfigurationOrClaimReady",
+      "reason": "stale unavailable wording assertion; native configuration==0 and configured==false guards unchanged"
+    }
+  ],
+  "files": [
+    {
+      "file": "before/android-widget-fixture-empty-411x801.png",
+      "bytes": 40068,
+      "sha256": "504c6b10f7f5962831347def58abd16c62e0efd073bf7c2c653df8915bc25dbf"
+    },
+    {
+      "file": "before/android-widget-fixture-empty-411x801.png.txt",
+      "bytes": 389,
+      "sha256": "90c178c1efcdac4cf494e23e4638155b468690468bc018dc9c77d9bebc5d373d"
+    },
+    {
+      "file": "before/android-widget-fixture-empty-804x381.png",
+      "bytes": 23200,
+      "sha256": "6d3be6e57182c67746c7cefd3e04dfd13e4636a9155bb42134593c6ad9a8e7b1"
+    },
+    {
+      "file": "before/android-widget-fixture-empty-804x381.png.txt",
+      "bytes": 389,
+      "sha256": "90c178c1efcdac4cf494e23e4638155b468690468bc018dc9c77d9bebc5d373d"
+    },
+    {
+      "file": "before/android-widget-fixture-occupied-411x801.png",
+      "bytes": 42216,
+      "sha256": "1bf20b7d083cf0540be7292c04cce3bf8aa96fc4d3cbb99cb7186d26f8661b64"
+    },
+    {
+      "file": "before/android-widget-fixture-occupied-411x801.png.txt",
+      "bytes": 438,
+      "sha256": "76f4064e27e4620db179363937ea31a14bbdd5b77c63699e7b0c80072cb43b83"
+    },
+    {
+      "file": "before/android-widget-fixture-occupied-804x381.png",
+      "bytes": 24360,
+      "sha256": "530492a3f8bc5d1c1cedb686a544a6a75aef39c7eb53c3678c69247b9bf54005"
+    },
+    {
+      "file": "before/android-widget-fixture-occupied-804x381.png.txt",
+      "bytes": 438,
+      "sha256": "76f4064e27e4620db179363937ea31a14bbdd5b77c63699e7b0c80072cb43b83"
+    },
+    {
+      "file": "after/android-widget-fixture-empty-411x801.png",
+      "bytes": 26790,
+      "sha256": "3c7bf4d2be2596508cdd73ad7c1305c3b4959221e52d3e124ba669f7a41d5c7d"
+    },
+    {
+      "file": "after/android-widget-fixture-empty-411x801.png.txt",
+      "bytes": 341,
+      "sha256": "b593643cc92e024e339eb1871160f59f5b699efaa26b92e25195fac3a1e70438"
+    },
+    {
+      "file": "after/android-widget-fixture-empty-804x381.png",
+      "bytes": 16575,
+      "sha256": "65d6f7b584a9cf7511d164b514209ac84e9c0cd0eceb1f51afb350977c4344f3"
+    },
+    {
+      "file": "after/android-widget-fixture-empty-804x381.png.txt",
+      "bytes": 343,
+      "sha256": "d28c2d9404d38bbaa171d04536207117b4ca2153f1df7926f54f4ce065b020ce"
+    },
+    {
+      "file": "after/android-widget-fixture-occupied-411x801.png",
+      "bytes": 34200,
+      "sha256": "69cdaf04906efe8cd0181215d28b40560ddb6778ac7a3382a53aa21c3c22f249"
+    },
+    {
+      "file": "after/android-widget-fixture-occupied-411x801.png.txt",
+      "bytes": 428,
+      "sha256": "015767f9c6ace366198a9a06d1adab6da4721b3d612cf02b89013f4c040921d4"
+    },
+    {
+      "file": "after/android-widget-fixture-occupied-804x381.png",
+      "bytes": 21102,
+      "sha256": "5b6749098fde99f624e750828c8f9a4141cbf318de459248428196641bd477b6"
+    },
+    {
+      "file": "after/android-widget-fixture-occupied-804x381.png.txt",
+      "bytes": 430,
+      "sha256": "7d00ef484346fa9e82618e37421b0e6eff991d1cfdd3280f3174e1e61439ec35"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 159: horde_rt_gpu_resources_observation_tests
+1/4 Test #159: horde_rt_gpu_resources_observation_tests ...   Passed    0.87 sec
+    Start 160: horde_rt_gpu_buffer_batch_tests
+2/4 Test #160: horde_rt_gpu_buffer_batch_tests ............   Passed    1.15 sec
+    Start 163: horde_rt_static_geometry_cutover_tests
+3/4 Test #163: horde_rt_static_geometry_cutover_tests .....   Passed    1.06 sec
+    Start 164: horde_rt_scene_resource_inventory_tests
+4/4 Test #164: horde_rt_scene_resource_inventory_tests ....   Passed    3.31 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   6.43 sec

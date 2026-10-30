@@ -1,0 +1,37 @@
+{
+  "implementationParent": "549152ff3863b5aab3c54a1c159acbf6f340fe2d",
+  "sourceFiles": {
+    "src/platform/windows/DiagnosticWindow.cpp": "2c8a7c4df673beb2b5cdf9c036aba8ee5ac38b1ab3ae1f5bab8f63b5569f16dc",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "27a1708eaf8f6e275679945fd0792cba715ff76efe0504c3fea92c1ec81f8837",
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": "f4f49f04240439d560902041da15435ea62a8989ae0995bed39aaaec75c56274",
+    "src/vulkan/raytracing/RtStaticMeshSlot.h": "17aa4b9e37290c857eec86265c3cc8fc045a5012e7c5b59467f71418aa9eab29",
+    "src/vulkan/raytracing/RtStaticMeshSlot.cpp": "2497eb518986624aa8cc3524d5ae7f5d89ed9cd14a92de52487331226dfab429",
+    "tests/ForestDressingTests.cpp": "e06a89e90c3882bbb5224061cd2bc0c6cf96ecdb511584d59e2c922984395e87",
+    "tests/StaticGltfAssetTests.cpp": "f7ca94589bfdcc6eaafae8eb7e4f92d82e73c6f3e521751f3dff96518c3928f5"
+  },
+  "artifacts": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "sha256": "4ef84e4d890a51819b6818340fbe2ece5fd2fcb85c0741f18cc9464589813083",
+      "bytes": 12978176
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "sha256": "3cca59009f56be1dc8357dfe4fd93b5f2e731b6c13f0287dfefcc569dd275a93",
+      "bytes": 4451328
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "sha256": "1a6f553f9f5761e7d4979ae0fc5b029ca46fe07f4a9bf648be89c71c758f8abc",
+      "bytes": 183107002
+    }
+  },
+  "javaTests": {
+    "tests": 286,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "normalPlayResidencySavingBytes": 0,
+  "experimentalDeviceLocalSavingBytes": 996096,
+  "immutableSourceVertexPolicy": "unchanged complete vertex arrays; index-only omission, no decimation",
+  "phoneInstalledSource": "42d00817356b1bdd93b14a0684268152fb2d0795",
+  "phoneInstalledApkSha256": "24aaf0b5894e57a38804f39875c06fbf34b801dfd0c83997b76c8aea8fa9233e"
+}

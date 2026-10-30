@@ -1,0 +1,60 @@
+{
+  "baseCommit": "4beff836efa408a31df1f21a0a686611e6e163f7",
+  "scope": "HUD backing and component-only polish, locally committed with this receipt; no phone use, dialogue/input policy, save or rendering change",
+  "implementation": {
+    "skipLine": "Already removed; unchanged, nine caption policy tests retain no-visible-skip assertion",
+    "lanternIcon": "Already 56dp target with 32dp raise/lower icon, accessible state/action; unchanged",
+    "newBacking": "Native stateful drawable; actual saved 55..95 percent face opacity with strong 95 retained; circular lantern and 16dp-rounded text actions; no opaque underlay",
+    "unchanged": "View target bounds, labels, listeners, controller/keyboard mapping, subtitles/timing and settings keys/defaults"
+  },
+  "build": {
+    "variant": "Ordinary arm64 Debug, no instrumentation overrides",
+    "command": "gradlew.bat assembleDebug --offline --console=plain --max-workers=2 -Pandroid.injected.build.abi=arm64-v8a",
+    "exitCode": 0,
+    "gradleSeconds": 35,
+    "apkBytes": 178942282,
+    "apkSha256": "8be1c9272b2ce840083904f25f13b61e85cc13c5cf890920b3a1883f28b77228",
+    "installed": false
+  },
+  "sourceCanonicalLfSha256": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "65cebde4afb175fd73fd6e53039ebca796854e890b72cc1f59e7cf68bd0db1b0",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/HordeUiTokens.java": "9a4cf860b38a6ffb60b9b84a3e2efc80e7c0480a7209e844e6360f5b809dd600",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/TouchButtonDrawable.java": "42bdac756bb0b6271cfbbb41dc5e9c1c2de5ba9979b9f654e19f35c1fa522566"
+  },
+  "checks": {
+    "sixClassSelection": "Passed 31 tests in 16s: new HUD 3, interface layout 5, contextual controls 6, subtitle policy 9, lantern 2, touch cancellation 6",
+    "finalComponentFixture": "Passed 3 tests in 9s after hiding unconfigured startup chrome; no production change after build",
+    "pixelCoverage": "Native Skia at55/70/95 percent, corners, alpha, press/focus/disable/raised states, opaque disabled labels",
+    "bounds": "Matched original/native target rectangles in360x640 and800x360, 1.7 font, explicit safe margins; existing font1..2, compact/scale layout matrix remains passing"
+  },
+  "images": {
+    "after-360x640.png": {
+      "sha256": "07f365460c373d0a30b52c503718ebd8519e05fa717d1b2c577a3f2db1d530e6",
+      "bytes": 16392
+    },
+    "after-800x360.png": {
+      "sha256": "cbfbfe574303ed8cad60952432be69d8fbe44c467f5eed95ccab5c761cff6223",
+      "bytes": 16307
+    },
+    "before-360x640.png": {
+      "sha256": "f3c2dcc8451a313e4b5d3f2159f14a735d4a757d7361f15de5d6c76c4bfbd8ec",
+      "bytes": 14298
+    },
+    "before-800x360.png": {
+      "sha256": "c49fa63104fb3a392e3213e9d31834f508f0acc6f0243ef4d25f6beed78ace1f",
+      "bytes": 14035
+    }
+  },
+  "imageClass": "Robolectric API34 native Android Canvas/Views, actual retained plate factory vs new factory; synthetic contrast backdrop. Not running game screenshots or physical RT evidence.",
+  "withdrawn": "12dp horizontal-padding trial caused expected-one-line/actual-two-line assertion. Removed padding, preserved original text bounds, reduced label corner radius; failure log retained.",
+  "optionalReferenceBlocker": {
+    "action": "Read-only git status/grep",
+    "target": "C:/Users/sam_s/Documents/Briarhold",
+    "reason": "Filesystem Permission denied",
+    "state": "denied; no retry or alternate access attempted",
+    "impact": "Optional reference unavailable; Horde implementation completed independently"
+  },
+  "phoneOperations": false,
+  "audioHapticManualRevalidationRequired": false,
+  "remaining": "Physical contrast/touch and complete HUD over actual moving RT imagery pending; no game FPS claim"
+}

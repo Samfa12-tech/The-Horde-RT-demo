@@ -1,0 +1,347 @@
+{
+  "package": "Horde 1.7 original woodland tree pair",
+  "version": "1.0.0",
+  "status": "art-reviewed mid-distance source and runtime candidates",
+  "created_date": "2026-10-06",
+  "authorship": "Original geometry and mathematical PBR texture source authored for The Horde",
+  "license_notice": "No new public license assigned by this package; owner controls publication",
+  "paid_provider_calls": 0,
+  "provider_spend": 0,
+  "third_party_source_geometry_or_textures": false,
+  "style_reference_url": "https://samfa12.com/games/briarhold/play/assets/world/briarhold-forest-impostor-512.webp",
+  "reference_image_included": false,
+  "blender_version": "4.3.2",
+  "assets": [
+    {
+      "asset": "horde-upright-alder-v1",
+      "units": "meters",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "bounds_blender_xyz": {
+        "min": [
+          -1.6904454231262207,
+          -1.7183218002319336,
+          -0.007092012092471123
+        ],
+        "max": [
+          1.6727383136749268,
+          1.3647300004959106,
+          8.474547386169434
+        ]
+      },
+      "dimensions_m": [
+        3.3631837368011475,
+        3.0830518007278442,
+        8.481639398261905
+      ],
+      "triangles": 7832,
+      "meshes": [
+        {
+          "name": "Alder | closed trunk roots branches",
+          "vertices": 1976,
+          "triangles": 3656
+        },
+        {
+          "name": "Alder | individually closed opaque leaves",
+          "vertices": 2640,
+          "triangles": 3960
+        },
+        {
+          "name": "Alder | closed moss tendrils",
+          "vertices": 120,
+          "triangles": 216
+        }
+      ],
+      "materials": 3,
+      "texture_resolution": [
+        512,
+        512
+      ],
+      "opaque_only": true,
+      "closed_leaf_geometry": true,
+      "alpha_cards": false,
+      "degenerate_triangles": 0,
+      "nonfinite_vertices": 0,
+      "engine_import_tested": false,
+      "canonical_game_dev_validation": "CLI not installed; not run",
+      "lod_level": 0,
+      "source_seed": 7319
+    },
+    {
+      "asset": "horde-irregular-pine-v1",
+      "units": "meters",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "bounds_blender_xyz": {
+        "min": [
+          -1.8599222898483276,
+          -1.5585356950759888,
+          -0.00683143176138401
+        ],
+        "max": [
+          1.8909538984298706,
+          1.8350584506988525,
+          8.686391830444336
+        ]
+      },
+      "dimensions_m": [
+        3.7508761882781982,
+        3.3935941457748413,
+        8.69322326220572
+      ],
+      "triangles": 7984,
+      "meshes": [
+        {
+          "name": "Pine | closed trunk roots branches",
+          "vertices": 1806,
+          "triangles": 3376
+        },
+        {
+          "name": "Pine | closed needle-spray volumes",
+          "vertices": 2928,
+          "triangles": 4392
+        },
+        {
+          "name": "Pine | closed moss tendrils",
+          "vertices": 120,
+          "triangles": 216
+        }
+      ],
+      "materials": 3,
+      "texture_resolution": [
+        512,
+        512
+      ],
+      "opaque_only": true,
+      "closed_leaf_geometry": true,
+      "alpha_cards": false,
+      "degenerate_triangles": 0,
+      "nonfinite_vertices": 0,
+      "engine_import_tested": false,
+      "canonical_game_dev_validation": "CLI not installed; not run",
+      "lod_level": 0,
+      "source_seed": 4126
+    },
+    {
+      "asset": "horde-upright-alder-v1-lod1",
+      "units": "meters",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "bounds_blender_xyz": {
+        "min": [
+          -1.6800742149353027,
+          -1.7183218002319336,
+          -0.003950951620936394
+        ],
+        "max": [
+          1.6727383136749268,
+          1.3665071725845337,
+          8.474547386169434
+        ]
+      },
+      "dimensions_m": [
+        3.3528125286102295,
+        3.0848289728164673,
+        8.47849833779037
+      ],
+      "triangles": 5102,
+      "meshes": [
+        {
+          "name": "Alder | closed trunk roots branches",
+          "vertices": 1301,
+          "triangles": 2306
+        },
+        {
+          "name": "Alder | individually closed opaque leaves",
+          "vertices": 1980,
+          "triangles": 2640
+        },
+        {
+          "name": "Alder | closed moss tendrils",
+          "vertices": 90,
+          "triangles": 156
+        }
+      ],
+      "materials": 3,
+      "texture_resolution": [
+        512,
+        512
+      ],
+      "opaque_only": true,
+      "closed_leaf_geometry": true,
+      "alpha_cards": false,
+      "degenerate_triangles": 0,
+      "nonfinite_vertices": 0,
+      "engine_import_tested": false,
+      "canonical_game_dev_validation": "CLI not installed; not run",
+      "lod_level": 1,
+      "source_seed": 7319
+    },
+    {
+      "asset": "horde-irregular-pine-v1-lod1",
+      "units": "meters",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "bounds_blender_xyz": {
+        "min": [
+          -1.8599222898483276,
+          -1.5585356950759888,
+          -0.0037124399095773697
+        ],
+        "max": [
+          1.8909538984298706,
+          1.8350584506988525,
+          8.686391830444336
+        ]
+      },
+      "dimensions_m": [
+        3.7508761882781982,
+        3.3935941457748413,
+        8.690104270353913
+      ],
+      "triangles": 5000,
+      "meshes": [
+        {
+          "name": "Pine | closed trunk roots branches",
+          "vertices": 1076,
+          "triangles": 1916
+        },
+        {
+          "name": "Pine | closed needle-spray volumes",
+          "vertices": 2196,
+          "triangles": 2928
+        },
+        {
+          "name": "Pine | closed moss tendrils",
+          "vertices": 90,
+          "triangles": 156
+        }
+      ],
+      "materials": 3,
+      "texture_resolution": [
+        512,
+        512
+      ],
+      "opaque_only": true,
+      "closed_leaf_geometry": true,
+      "alpha_cards": false,
+      "degenerate_triangles": 0,
+      "nonfinite_vertices": 0,
+      "engine_import_tested": false,
+      "canonical_game_dev_validation": "CLI not installed; not run",
+      "lod_level": 1,
+      "source_seed": 4126
+    }
+  ],
+  "validated_gates": [
+    "GLB v2 byte structure and self-contained images",
+    "finite positions/normals/UVs, valid indices and zero degenerate triangles",
+    "opaque materials and original 512px maps",
+    "closed source parts and reimported parts after UV-seam welding",
+    "Blender actual-GLB reimport and rendered review",
+    "identical centerlines/radii/leaf poses across LODs",
+    "wood side-branch start attachment within parent path volume",
+    "front/back LOD silhouette comparison",
+    "binary-identical deterministic GLB and texture rebuild"
+  ],
+  "unperformed_gates": [
+    "game-dev canonical package build/verify and policy validation: CLI absent",
+    "engine/GPU runtime import and integration",
+    "runtime frame-rate, draw call, collision, LOD-switch and wind tests"
+  ],
+  "visual_limitations": [
+    "Intentionally sparse canopies and chunky solid foliage",
+    "Mid-distance source candidates, not hero-closeup finished art or botanical realism",
+    "Overlapping branch/root parts and texture discontinuity at joins remain visible close up",
+    "Root tips penetrate ground about 7mm"
+  ],
+  "lod_metrics": [
+    {
+      "asset": "horde-upright-alder-v1",
+      "centerlines_and_leaf_placements_identical": true,
+      "tube_count": 80,
+      "leaf_count": 330,
+      "wood_branch_attachment_starts_checked": 73,
+      "wood_attachment_clearance_conservative_worst_m": -0.0018085253786858395,
+      "detached_wood_starts": [],
+      "silhouette_views": [
+        {
+          "view": "front",
+          "full_silhouette_iou": 0.9318170701883101,
+          "crown_silhouette_iou": 0.9283782846841849,
+          "lod_to_full_coverage_ratio": 0.963412209186717,
+          "mask_resolution": [
+            512,
+            600
+          ]
+        },
+        {
+          "view": "back",
+          "full_silhouette_iou": 0.9371738060068932,
+          "crown_silhouette_iou": 0.9285563454635039,
+          "lod_to_full_coverage_ratio": 0.9653329337129727,
+          "mask_resolution": [
+            512,
+            600
+          ]
+        }
+      ],
+      "acceptance_thresholds": {
+        "full_silhouette_iou": 0.85,
+        "crown_silhouette_iou": 0.8
+      },
+      "pass": true,
+      "notes": "Alpha masks compare actual exported geometry at identical front/back cameras. Tube centerlines, radii and leaf poses are unchanged. Surface side/perimeter counts differ."
+    },
+    {
+      "asset": "horde-irregular-pine-v1",
+      "centerlines_and_leaf_placements_identical": true,
+      "tube_count": 65,
+      "leaf_count": 366,
+      "wood_branch_attachment_starts_checked": 58,
+      "wood_attachment_clearance_conservative_worst_m": -0.004546416488086887,
+      "detached_wood_starts": [],
+      "silhouette_views": [
+        {
+          "view": "front",
+          "full_silhouette_iou": 0.9321022008601062,
+          "crown_silhouette_iou": 0.9296605293440736,
+          "lod_to_full_coverage_ratio": 0.9594643132023193,
+          "mask_resolution": [
+            512,
+            600
+          ]
+        },
+        {
+          "view": "back",
+          "full_silhouette_iou": 0.9361012956419317,
+          "crown_silhouette_iou": 0.9305247084952804,
+          "lod_to_full_coverage_ratio": 0.9633703279749166,
+          "mask_resolution": [
+            512,
+            600
+          ]
+        }
+      ],
+      "acceptance_thresholds": {
+        "full_silhouette_iou": 0.85,
+        "crown_silhouette_iou": 0.8
+      },
+      "pass": true,
+      "notes": "Alpha masks compare actual exported geometry at identical front/back cameras. Tube centerlines, radii and leaf poses are unchanged. Surface side/perimeter counts differ."
+    }
+  ],
+  "delivery_note": "Primary ZIP includes final runtime front/back views and shared pair render; duplicate front-name PNGs and intermediate Blender backups/logs are omitted. Full local evidence remains beside the archive."
+}

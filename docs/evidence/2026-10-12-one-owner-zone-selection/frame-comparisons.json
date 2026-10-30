@@ -1,0 +1,30 @@
+[
+  {
+    "backend": "RayTracingPipeline",
+    "changedPixels": 0,
+    "maximumChannelDifference": 0,
+    "candidateSha256": "89e99a389d08e3fe41c684315f5a545a75103e7a5eef7c0e81380fbbbf81407d",
+    "parentSha256": "89e99a389d08e3fe41c684315f5a545a75103e7a5eef7c0e81380fbbbf81407d",
+    "parentSource": "37310bd5",
+    "camera": {
+      "x": -17.700905,
+      "z": 15.206802,
+      "yaw": 1.914,
+      "pitch": -0.15
+    }
+  },
+  {
+    "backend": "RayQueryCompute",
+    "changedPixels": 0,
+    "maximumChannelDifference": 0,
+    "candidateSha256": "d3509d1ed3d55c4a82f1b2397d928cc1fd529cbe4940b108f443bbd547413e95",
+    "parentSha256": "d3509d1ed3d55c4a82f1b2397d928cc1fd529cbe4940b108f443bbd547413e95",
+    "parentSource": "37310bd5",
+    "camera": {
+      "x": -17.700905,
+      "z": 15.206802,
+      "yaw": 1.914,
+      "pitch": -0.15
+    }
+  }
+]

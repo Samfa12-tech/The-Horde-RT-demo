@@ -1,0 +1,7 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  GameSimulation.cpp
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  CombatFoundationTests.cpp
+  horde_rt_combat_foundation_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_foundation_tests.exe

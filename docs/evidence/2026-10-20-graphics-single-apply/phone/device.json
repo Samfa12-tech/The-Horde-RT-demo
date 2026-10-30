@@ -1,0 +1,9 @@
+{
+  "model": "SM-S948B",
+  "androidRelease": "17",
+  "sdk": "37",
+  "fontScale": "1.7",
+  "density": "Physical density: 600\r\nOverride density: 560",
+  "screen": "Physical size: 1440x3120",
+  "debugPid": null
+}

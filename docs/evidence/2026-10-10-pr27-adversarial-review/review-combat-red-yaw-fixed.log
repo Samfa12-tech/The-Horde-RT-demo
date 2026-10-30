@@ -1,0 +1,34 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 24
+    Start 24: horde_rt_combat_foundation_tests
+
+24: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_combat_foundation_tests.exe"
+24: Working Directory: <repo>/build/presets/windows-x64-release
+24: Test timeout computed to be: 30
+24: FAIL: live GameSimulation caller accepts the forgiving nonfatal hit on B
+24: FAIL: ordinary movement reaches the branch where B is nearest while A winds up
+24: FAIL: live GameSimulation caller accepts the forgiving nonfatal hit on B
+24: combat foundation checks=494 failures=3
+1/1 Test #24: horde_rt_combat_foundation_tests ...***Failed    1.49 sec
+FAIL: live GameSimulation caller accepts the forgiving nonfatal hit on B
+FAIL: ordinary movement reaches the branch where B is nearest while A winds up
+FAIL: live GameSimulation caller accepts the forgiving nonfatal hit on B
+combat foundation checks=494 failures=3
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   1.51 sec
+
+The following tests FAILED:
+	 24 - horde_rt_combat_foundation_tests (Failed)
+Errors while running CTest

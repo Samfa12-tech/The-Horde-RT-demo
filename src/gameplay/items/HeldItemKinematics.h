@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 
+namespace horde::gameplay::simulation { class TriangleSupportSurface; }
+
 namespace horde::gameplay::items
 {
 
@@ -19,6 +21,13 @@ namespace horde::gameplay::items
 // dielectric geometry and authored Flame/Light sockets share this scale;
 // the gameplay-owned hand Grip remains fixed.
 inline constexpr float kClaimedRewardLanternScale = 0.44f;
+
+// Native glass radius .736322*.44, ring socket separation .097*.44,
+// final skinned Grip tolerance .015, and dielectric spawn .006 fit below .40.
+// The Light socket radius .515*.44 plus the same attachment/tolerance and
+// maximum Current/Higher horizontal area offset .09605 also fit below .40.
+// This constrains the shared physical hand, never a detached light or pane.
+inline constexpr float kRewardLanternHorizontalOriginEnvelope = 0.40f;
 
 inline constexpr float kSwordGripRollRadians = 1.3962634f;
 
@@ -61,6 +70,17 @@ struct HeldItemKinematicsInput
     // Logical presentation aspect, used only to spread held hand targets in
     // wide views. Portrait and square views retain the authored targets.
     float logicalViewAspect = 1.0f;
+    // Absolute support surface under the player. The default preserves the
+    // established route-floor camera and held-item world positions.
+    float playerSupportWorldY = kRouteFloorWorldY;
+    bool developmentWorldRoute = false;
+    bool readableCombatPose = false;
+    // Explicit zone choice: the rescue apron/connector is not the isolated WP2 route.
+    bool rescueExterior = false;
+    // Borrowed only during the synchronous fixed-step solve; never published
+    // in a snapshot. The simulation supplies its generation-validated owner.
+    const simulation::TriangleSupportSurface* chapterTerrain = nullptr;
+    float playerCrouchDropMetres=0;
 };
 
 struct HeldSwordPose
@@ -126,6 +146,17 @@ struct HeldItemFixedStepInput
     PlayerMountProfile playerMountProfile = PlayerMountProfile::LegacyViewRelative;
     const HeldItemState* swordItemState = nullptr;
     float logicalViewAspect = 1.0f;
+    // Absolute support surface under the player; appended to preserve existing
+    // positional aggregate initializers.
+    float playerSupportWorldY = kRouteFloorWorldY;
+    bool developmentWorldRoute = false;
+    bool readableCombatPose = false;
+    // Explicit zone choice: the rescue apron/connector is not the isolated WP2 route.
+    bool rescueExterior = false;
+    // Borrowed only during the synchronous fixed-step solve; never published
+    // in a snapshot. The simulation supplies its generation-validated owner.
+    const simulation::TriangleSupportSurface* chapterTerrain = nullptr;
+    float playerCrouchDropMetres=0;
 };
 
 inline constexpr float kHeldItemSpreadStartAspect = 1.0f;
@@ -168,7 +199,8 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    float swordSwingRadians,
                                    float heldPropDepth,
                                    bool bulkyLeftHandCarry = false,
-                                   float idleTimeSeconds = 0.0f);
+                                   float idleTimeSeconds = 0.0f,
+                                   bool readableCombatPose = false);
 
 std::array<float, 3u> EvaluateSwordBladeAxisInView(float inwardRadians,
                                                    float forwardRadians);
@@ -210,7 +242,10 @@ float ComputePlayerTorchOverheadLowering(
 float ComputeRewardLanternForwardClearance(float cameraX,
                                            float cameraZ,
                                            float forwardX,
-                                           float forwardZ);
+                                           float forwardZ, bool developmentWorldRoute = false,
+                                           bool rescueExterior = false,
+                                           float supportWorldY = kRouteFloorWorldY,
+                                           const simulation::TriangleSupportSurface* chapterTerrain = nullptr);
 
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input);
 

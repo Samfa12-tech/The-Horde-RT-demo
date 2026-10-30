@@ -1,8 +1,10 @@
 #include "scene/assets/AssetManifest.h"
 #include "scene/assets/AssetValidation.h"
 #include "scene/assets/DielectricTopologyMath.h"
+#include "scene/assets/GltfDocument.h"
 #include "scene/assets/StaticMeshAsset.h"
 #include "scene/assets/PlayerPrimitiveContract.h"
+#include "scene/ChapterTerrainSurface.h"
 #include "vulkan/raytracing/RtLanternGeometryProfile.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "cgltf/cgltf.h"
@@ -10,6 +12,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <chrono>
 #include <cstdlib>
 #include <cstdint>
 #include <cstring>
@@ -975,6 +978,693 @@ void TestSharedTextureSourceRouting()
     auto ungroupedTextured = makeAsset({makeMaterial("UngroupedTextured", -1, 601)});
     expectFailure({worldRegistration, {1u, 2u, 0u, 0u, &ungroupedTextured, &world}},
                   "explicit texture group", "textured ungrouped alias is rejected");
+    // Explicit immutable material sharing is independent of texture-only aliasing.
+    // Geometry remains separate, and every primitive retains the same GPU record.
+    auto duplicate = world;
+    duplicate.vertices[0].position[0] = 9.0f;
+    auto trailing = makeAsset({makeMaterial("Trailing", -1, 0, {{false,false,false,false}})});
+    const auto materialRegistrations = [&]() {
+        return std::array<StaticRtAssetRegistration, 3>{{worldRegistration,
+            {1u, 2u, 0u, 0u, &duplicate, &world}, {2u, 3u, 0u, 0u, &trailing}}};
+    };
+    RtStaticMeshSlot immutable;
+    Check(immutable.Initialize(materialRegistrations(), diagnostic), "immutable fixture initializes");
+    const auto beforeMaterials = immutable.Materials();
+    const auto beforePrimitives = immutable.PrimitiveMetadata();
+    const auto beforeVertices = immutable.Vertices();
+    const auto beforeIndices = immutable.Indices();
+    const auto beforeInstances = immutable.InstanceMetadata();
+    using horde::vulkan::raytracing::RtImmutableMaterialAlias;
+    using horde::vulkan::raytracing::RtMaterialGpu;
+    const std::array<RtImmutableMaterialAlias,2> exactAliases{{{2u,0u},{3u,1u}}};
+    Check(immutable.ShareImmutableMaterialRows(exactAliases, diagnostic), "exact converted material rows may share");
+    Check(immutable.Materials().size() == 3u && immutable.Measurements().materialBytes == 3u*sizeof(RtMaterialGpu) &&
+          immutable.Indices() == beforeIndices &&
+          std::memcmp(immutable.Vertices().data(), beforeVertices.data(), beforeVertices.size()*sizeof(beforeVertices[0])) == 0 &&
+          std::memcmp(immutable.InstanceMetadata().data(), beforeInstances.data(), sizeof(beforeInstances)) == 0,
+          "immutable sharing saves only material rows; geometry and instance ownership stay identical");
+    for (std::size_t i=0; i<beforePrimitives.size(); ++i)
+    {
+        const auto& old = beforePrimitives[i]; const auto& now = immutable.PrimitiveMetadata()[i];
+        Check(old.vertexOffset == now.vertexOffset && old.indexOffset == now.indexOffset && old.indexCount == now.indexCount &&
+              std::memcmp(&beforeMaterials[old.materialIndex], &immutable.Materials()[now.materialIndex], sizeof(RtMaterialGpu)) == 0,
+              "every primitive including later materials preserves its exact converted GPU record");
+    }
+    const auto rejectAliases = [&](std::vector<RtImmutableMaterialAlias> aliases) {
+        RtStaticMeshSlot rejected;
+        Check(rejected.Initialize(materialRegistrations(), diagnostic), "negative immutable fixture initializes");
+        const auto materials = rejected.Materials(); const auto primitives = rejected.PrimitiveMetadata();
+        Check(!rejected.ShareImmutableMaterialRows(aliases, diagnostic) &&
+              rejected.Materials().size() == materials.size() &&
+              std::memcmp(rejected.Materials().data(), materials.data(), materials.size()*sizeof(materials[0])) == 0 &&
+              std::memcmp(rejected.PrimitiveMetadata().data(), primitives.data(), primitives.size()*sizeof(primitives[0])) == 0,
+              "invalid immutable aliases reject before any row or primitive changes");
+    };
+    rejectAliases({{2u,0u},{2u,0u}}); // duplicate consumer
+    rejectAliases({{0u,0u}}); rejectAliases({{2u,4u}}); rejectAliases({{99u,0u}});
+    rejectAliases({{2u,1u}}); // different exact factors and texture group
+    // Same converted bytes can still form a forbidden ownership chain.
+    auto thirdCopy = world;
+    RtStaticMeshSlot chain;
+    Check(chain.Initialize(std::array<StaticRtAssetRegistration,3>{{worldRegistration,
+        {1u,2u,0u,0u,&duplicate,&world},{2u,3u,0u,0u,&thirdCopy,&world}}},diagnostic), "chain fixture initializes");
+    Check(!chain.ShareImmutableMaterialRows(std::array<RtImmutableMaterialAlias,2>{{{4u,2u},{2u,0u}}},diagnostic),
+          "material alias chains reject regardless of request order");
+    // Include loader-derived optical fields and flags, not just base colour.
+    for (unsigned field=0; field<10; ++field)
+    {
+        duplicate = world;
+        auto& m=duplicate.materials[0];
+        switch(field) {
+        case 0: m.baseColorFactor[0]+=.01f;break;
+        case 1: m.emissiveStrength+=.01f;break;
+        case 2: m.roughnessFactor+=.01f;break;
+        case 3: m.ior+=.01f;break;
+        case 4: m.attenuationColor[2]+=.01f;break;
+        case 5: m.normalScale+=.01f;break;
+        case 6: m.textureScale[1]+=.01f;break;
+        case 7: m.numericalSpawnMinimumWidth=.01f;break;
+        case 8: m.numericalSpawnGeometryError=.01f;break;
+        case 9: m.flags ^= 0x80000000u;break;
+        }
+        rejectAliases({{2u,0u}});
+    }
+
+}
+
+void TestBoundedImmutableMeshCopy()
+{
+    using namespace horde::vulkan::raytracing;
+    horde::scene::assets::StaticMeshAsset world;
+    world.nodeTransforms.resize(1); world.materials.resize(1); world.vertices.resize(129);
+    world.indices={0,1,2}; world.primitives={{0,0,3,0,0}};
+    for(std::size_t i=0;i<world.vertices.size();++i) world.vertices[i].position[0]=static_cast<float>(i);
+    auto body=world, view=world;
+    const auto pbr=static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    std::string error;
+    {
+        using Region=horde::scene::assets::StaticTriangleRegion;
+        auto tagged=world;
+        tagged.indices={0,1,2,3,4,5,6,7,8};tagged.primitives[0].indexCount=9;
+        tagged.triangleRegions={Region::Shared,Region::TombDressing,Region::ExteriorDressing};
+        auto packed=std::make_shared<RtStaticMeshSlot>();
+        const std::array rows{
+            StaticRtAssetRegistration{21,100,pbr,0,&tagged},
+            StaticRtAssetRegistration{22,101,pbr,0,&body,nullptr,RtGeometryRole::PlayerWorldBody},
+            StaticRtAssetRegistration{20,102,pbr,0,&view,nullptr,RtGeometryRole::PlayerViewmodel}};
+        Check(packed->Initialize(rows,error) && packed->TriangleRegions().size()==5 &&
+            packed->TriangleRegions()[1]==Region::TombDressing && packed->TriangleRegions().back()==Region::Shared,
+            "packed provenance follows the actual global triangle index order and defaults untagged roles to Shared");
+        RtStaticMeshCopy selected;
+        Check(!selected.Begin(packed,error,21,4u) && !selected.Begin(packed,error,UINT32_MAX,2u),
+            "invalid region/instance cannot begin a cached selection");
+        Check(selected.Begin(packed,error,21,2u),"cached selection pins admitted source without asset repacking");
+        unsigned turns=0;
+        while(!selected.Ready() && turns++<300u)
+            Check(selected.Advance(128u,error) && selected.LastCopiedBytes()<=128u &&
+                selected.LastScannedBytes()<=128u,"copy and selection scan remain individually bounded");
+        auto result=selected.Take();
+        const auto same=[](const auto& a,const auto& b){return a.size()==b.size() &&
+            (a.empty() || std::memcmp(a.data(),b.data(),a.size()*sizeof(a.front()))==0);};
+        Check(result && result->Indices()==std::vector<std::uint32_t>({0,1,2,6,7,8,0,1,2,0,1,2}) &&
+            result->PrimitiveMetadata()[0].indexCount==6 && result->PrimitiveMetadata()[1].indexOffset==6 &&
+            result->TriangleRegions()==std::vector<Region>({Region::Shared,Region::ExteriorDressing,Region::Shared,Region::Shared}),
+            "cached selection removes only tagged owner triangles and remaps all later index offsets");
+        Check(result && same(result->Vertices(),packed->Vertices()) &&
+            same(result->Materials(),packed->Materials()) && same(result->InstanceMetadata(),packed->InstanceMetadata()) &&
+            same(result->GeometryTransforms(),packed->GeometryTransforms()) &&
+            same(result->PrimitiveVertexCounts(),packed->PrimitiveVertexCounts()) &&
+            same(result->Vertices(RtGeometryRole::PlayerWorldBody),packed->Vertices(RtGeometryRole::PlayerWorldBody)) &&
+            same(result->Vertices(RtGeometryRole::PlayerViewmodel),packed->Vertices(RtGeometryRole::PlayerViewmodel)),
+            "index-only selection preserves all vertices, player roles, materials and row identities exactly");
+        for(unsigned turn=0;turn<turns;++turn){
+            Check(selected.Begin(packed,error,21,2u),"cached selection cancellation begins");
+            for(unsigned i=0;i<turn;++i)Check(selected.Advance(128u,error),"each selected cancellation boundary advances");
+            selected.Cancel();Check(!selected.Take() && packed->Indices().size()==15,
+                "cancellation cannot expose partial output or change source payload");
+        }
+        for(unsigned bad=0;bad<3u;++bad) {
+            auto malformed=tagged;
+            if(bad==0u)malformed.triangleRegions.push_back(Region::Shared);
+            if(bad==1u)malformed.triangleRegions[1]=static_cast<Region>(3u);
+            if(bad==2u)malformed.indices[3]=UINT32_MAX;
+            RtStaticMeshSlot rejected;
+            Check(!rejected.Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&malformed}},error),
+                "cached-source admission rejects excess/invalid labels and bad indices even on omitted triangles");
+        }
+        auto empty=world;empty.triangleRegions={Region::TombDressing};
+        auto emptySource=std::make_shared<RtStaticMeshSlot>();
+        Check(emptySource->Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&empty}},error) &&
+            selected.Begin(emptySource,error,21,2u),"empty-row negative owns a valid source");
+        bool success=true;unsigned turn=0;
+        while(!selected.Ready() && success && turn++<300u)success=selected.Advance(128u,error);
+        Check(!success && !selected.Take() && emptySource->Indices().size()==3,
+            "selection cannot delete a fixed primitive row or alter its source");
+        auto shared=std::make_shared<RtStaticMeshSlot>();
+        Check(shared->Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&tagged},
+            StaticRtAssetRegistration{19,101,pbr,0,&tagged}},error) && !selected.Begin(shared,error,21,2u),
+            "one selected instance cannot drop geometry still owned by another instance");
+        auto prefix=world,suffix=world;
+        prefix.indices={2,1,0};prefix.triangleRegions={Region::TombDressing};
+        suffix.triangleRegions={Region::TombDressing};
+        auto middle=std::make_shared<RtStaticMeshSlot>();
+        Check(middle->Initialize(std::array{StaticRtAssetRegistration{1,11,pbr,0,&prefix},
+            StaticRtAssetRegistration{21,100,pbr,0,&tagged},
+            StaticRtAssetRegistration{22,12,pbr,0,&suffix,nullptr,RtGeometryRole::PlayerWorldBody}},error),
+            "middle-owner fixture admits prefix, selected owner and role-separated suffix");
+        for(unsigned retry=0;retry<2u;++retry) {
+            Check(selected.Begin(middle,error,21,2u),"middle-owner selection starts or retries");
+            Check(selected.Advance(512u,error) && !selected.Take(),"middle-owner partial output stays private");
+            if(retry==0u){selected.Cancel();continue;}
+            unsigned turns=0;
+            while(!selected.Ready() && turns++<300u)Check(selected.Advance(512u,error),"middle-owner selection advances");
+            auto result=selected.Take();
+            Check(result && result->Indices()==std::vector<std::uint32_t>({2,1,0,0,1,2,6,7,8,0,1,2}) &&
+                result->TriangleRegions()==std::vector<Region>({Region::TombDressing,Region::Shared,
+                    Region::ExteriorDressing,Region::TombDressing}) &&
+                std::memcmp(&result->PrimitiveMetadata()[0],&middle->PrimitiveMetadata()[0],sizeof(RtPrimitiveMetadata))==0 &&
+                result->PrimitiveMetadata()[1].indexOffset==3 && result->PrimitiveMetadata()[1].indexCount==6 &&
+                result->PrimitiveMetadata()[2].indexOffset==9 && result->PrimitiveMetadata()[2].indexCount==3 &&
+                same(result->Vertices(),middle->Vertices()) && same(result->GeometryTransforms(),middle->GeometryTransforms()) &&
+                same(result->Materials(),middle->Materials()) && same(result->InstanceMetadata(),middle->InstanceMetadata()) &&
+                same(result->Vertices(RtGeometryRole::PlayerWorldBody),middle->Vertices(RtGeometryRole::PlayerWorldBody)),
+                "middle selection preserves foreign-tagged prefix/suffix and all identities, rebasing only affected indices after retry");
+        }
+    }
+    auto source=std::make_shared<RtStaticMeshSlot>();
+    const std::array registrations{
+        StaticRtAssetRegistration{21,100,pbr,0,&world},
+        StaticRtAssetRegistration{22,101,pbr,0,&body,nullptr,RtGeometryRole::PlayerWorldBody},
+        StaticRtAssetRegistration{20,102,pbr,0,&view,nullptr,RtGeometryRole::PlayerViewmodel}};
+    Check(source->Initialize(registrations,error),"immutable copy source includes all geometry roles");
+    Check(source->TransmissionOwnersWithin({}),"opaque source needs no long-continuation owner exception");
+    {
+        auto pane=world;
+        pane.materials[0].flags|=static_cast<std::uint32_t>(RtMaterialFlag::Transmission);
+        pane.materials[0].transmissionFactor=0.f;
+        RtStaticMeshSlot panes;
+        Check(panes.Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&pane}},error),
+            "foreign zero-strength pane fixture admits for contributor inventory");
+        Check(!panes.TransmissionOwnersWithin({}) && !panes.TransmissionOwnersWithin(std::array<std::uint32_t,1>{{8}}) &&
+            panes.TransmissionOwnersWithin(std::array<std::uint32_t,1>{{21}}),
+            "exact transmission owner roster rejects even dormant foreign panes before a later strength change");
+        Check(!RtStaticMeshSlot{}.TransmissionOwnersWithin({}),"unadmitted geometry has no usable contributor inventory");
+    }
+    RtStaticMeshCopy copy;
+    Check(!copy.Begin({},error) && !copy.Begin(std::make_shared<RtStaticMeshSlot>(),error),
+        "null or unadmitted copy source rejects");
+    auto malformed=world;
+    malformed.primitives={{0,0,3,0,0},{3,0,3,99,0}};
+    auto failed=std::make_shared<RtStaticMeshSlot>();
+    Check(!failed->Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&malformed}},error) &&
+        !failed->PrimitiveMetadata().empty(),"late admission failure exercises a partially populated slot");
+    Check(!copy.Begin(failed,error),"failed admission cannot become a ready immutable copy");
+    copy.Cancel();
+    Check(copy.Begin(source,error) && !copy.Take(),"source pins without exposing a partial slot");
+    if(!copy.Ready() && copy.Advance(512u,error)) {
+        Check(copy.LastCopiedBytes()<=512u && !copy.Begin(source,error) && !copy.Advance(0u,error),
+            "copy is byte bounded and rejects replacement/zero budget");
+        unsigned turns=1;
+        while(!copy.Ready() && turns++<200u) Check(copy.Advance(512u,error) && copy.LastCopiedBytes()<=512u,
+            "every immutable copy turn respects its payload budget");
+        auto result=copy.Take();
+        const auto same=[](const auto& a,const auto& b) {
+            return a.size()==b.size() && (a.empty() || std::memcmp(a.data(),b.data(),a.size()*sizeof(a.front()))==0);
+        };
+        Check(result && same(source->InstanceMetadata(),result->InstanceMetadata()) &&
+            same(source->PrimitiveMetadata(),result->PrimitiveMetadata()) &&
+            same(source->GeometryTransforms(),result->GeometryTransforms()) &&
+            same(source->Indices(),result->Indices()) && same(source->Materials(),result->Materials()) &&
+            same(source->PrimitiveVertexCounts(),result->PrimitiveVertexCounts()) &&
+            same(source->Vertices(),result->Vertices()) &&
+            same(source->Vertices(RtGeometryRole::PlayerWorldBody),result->Vertices(RtGeometryRole::PlayerWorldBody)) &&
+            same(source->Vertices(RtGeometryRole::PlayerViewmodel),result->Vertices(RtGeometryRole::PlayerViewmodel)) &&
+            source->PayloadBytes()==result->PayloadBytes(),"completed copy preserves every admitted byte and role");
+        Check(!copy.Take(),"completed immutable owner transfers once");
+        {
+            const auto vertexBytes=source->Measurements().vertexBytes;
+            const auto copiedBefore=copy.CopiedBytes();
+            Check(copy.Begin(source,error,UINT32_MAX,horde::scene::assets::kAllStaticTriangleRegions,{},true),
+                "unchanged vertices can use a pinned immutable owner");
+            while(!copy.Ready()) Check(copy.Advance(512u,error) && copy.LastCopiedBytes()<=512u,
+                "shared-vertex metadata and indices retain bounded copy work");
+            const auto sharedCopied=copy.CopiedBytes();
+            auto shared=copy.Take();
+            Check(shared && shared->SharesVertexPayloadWith(*source) &&
+                &shared->Vertices()==&source->Vertices() &&
+                &shared->Vertices(RtGeometryRole::PlayerWorldBody)==&source->Vertices(RtGeometryRole::PlayerWorldBody) &&
+                &shared->Vertices(RtGeometryRole::PlayerViewmodel)==&source->Vertices(RtGeometryRole::PlayerViewmodel) &&
+                shared->PayloadBytes()==source->PayloadBytes() && sharedCopied+vertexBytes==copiedBefore,
+                "all three vertex domains alias their exact root and are excluded from copied bytes");
+            std::shared_ptr<const RtStaticMeshSlot> sharedSource(std::move(shared));
+            Check(copy.Begin(sharedSource,error),"ordinary deep copy can consume shared vertex storage");
+            while(!copy.Ready()) Check(copy.Advance(512u,error),"deep copy reads aliased source getters");
+            auto deep=copy.Take();
+            Check(deep && same(deep->Vertices(),source->Vertices()) && !deep->SharesVertexPayloadWith(*source),
+                "deep copy of shared output preserves vertices without aliasing");
+            Check(copy.Begin(sharedSource,error,UINT32_MAX,horde::scene::assets::kAllStaticTriangleRegions,{},true),
+                "a second shared copy flattens ownership");
+            std::weak_ptr<const RtStaticMeshSlot> intermediate=sharedSource;
+            while(!copy.Ready()) Check(copy.Advance(512u,error),"flattened copy advances");
+            auto flattened=copy.Take();sharedSource.reset();
+            Check(intermediate.expired() && flattened && flattened->SharesVertexPayloadWith(*source),
+                "shared descendants retain the root without retaining intermediate index owners");
+            Check(copy.Begin(source,error,UINT32_MAX,horde::scene::assets::kAllStaticTriangleRegions,{},true),
+                "shared cancellation begins");
+            copy.Cancel();Check(!copy.Take() && same(flattened->Vertices(),source->Vertices()),
+                "cancel cannot release another admitted shared vertex lease");
+        }
+        for(unsigned cancelTurn=0;cancelTurn<turns;++cancelTurn) {
+            Check(copy.Begin(source,error),"cancel/retry begins on preserved source");
+            for(unsigned t=0;t<cancelTurn;++t) Check(copy.Advance(512u,error),"cancel boundary advances");
+            copy.Cancel(); copy.Cancel(); Check(!copy.Take(),"cancellation never exposes partial geometry");
+        }
+        std::weak_ptr<const RtStaticMeshSlot> weak=source;
+        Check(copy.Begin(source,error),"lifetime pin begins"); source.reset();
+        Check(!weak.expired(),"source survives external owner release"); copy.Cancel();
+        Check(weak.expired(),"cancellation releases only its source lease");
+    } else Check(false,"bounded source copy must advance");
+}
+
+void TestSparseImmutableTriangleOmissions()
+{
+    using namespace horde::vulkan::raytracing;
+    using Asset=horde::scene::assets::StaticMeshAsset;
+    using Region=horde::scene::assets::StaticTriangleRegion;
+    constexpr auto all=horde::scene::assets::kAllStaticTriangleRegions;
+    const auto pbr=static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    Asset world;
+    world.nodeTransforms.resize(1);world.materials.resize(1);world.vertices.resize(129);
+    for(std::size_t i=0;i<world.vertices.size();++i)world.vertices[i].position[0]=static_cast<float>(i);
+    world.indices={0,1,2,3,4,5,6,7,8,0,1,2,3,4,5,6,7,8,9,10,11};
+    world.primitives={{0,0,9,0,0},{9,9,12,0,0}};
+    world.triangleRegions={Region::Shared,Region::TombDressing,Region::ExteriorDressing,
+        Region::TombDressing,Region::ExteriorDressing,Region::TombDressing,Region::ExteriorDressing};
+    auto foreign=world;
+    foreign.indices={2,1,0};foreign.primitives={{0,0,3,0,0}};
+    foreign.triangleRegions={Region::ExteriorDressing};
+    auto body=foreign;body.indices={0,1,2};body.triangleRegions={Region::TombDressing};
+    const std::array rows{StaticRtAssetRegistration{1,11,pbr,0,&foreign},
+        StaticRtAssetRegistration{21,100,pbr,0,&world},
+        StaticRtAssetRegistration{22,12,pbr,0,&body,nullptr,RtGeometryRole::PlayerWorldBody}};
+    auto source=std::make_shared<RtStaticMeshSlot>();std::string error;
+    Check(source->Initialize(rows,error),"sparse fixture has mixed region rows and foreign prefix/body suffix");
+    const auto same=[](const auto& a,const auto& b){return a.size()==b.size() &&
+        (a.empty() || std::memcmp(a.data(),b.data(),a.size()*sizeof(a.front()))==0);};
+    auto checkCopy=[&](const RtStaticMeshSlot& result) {
+        Check(result.Indices()==std::vector<std::uint32_t>({2,1,0,0,1,2,3,4,5,9,10,11,0,1,2}) &&
+            result.TriangleRegions()==std::vector<Region>({Region::ExteriorDressing,Region::Shared,
+                Region::ExteriorDressing,Region::ExteriorDressing,Region::TombDressing}) &&
+            result.PrimitiveMetadata()[0].indexOffset==0 && result.PrimitiveMetadata()[0].indexCount==3 &&
+            result.PrimitiveMetadata()[1].indexOffset==3 && result.PrimitiveMetadata()[1].indexCount==3 &&
+            result.PrimitiveMetadata()[2].indexOffset==6 && result.PrimitiveMetadata()[2].indexCount==6 &&
+            result.PrimitiveMetadata()[3].indexOffset==12 && result.PrimitiveMetadata()[3].indexCount==3,
+            "sparse mixed-region omissions retain exact order and rebase every affected primitive");
+        Check(same(result.Vertices(),source->Vertices()) && same(result.Materials(),source->Materials()) &&
+            same(result.InstanceMetadata(),source->InstanceMetadata()) &&
+            same(result.PrimitiveVertexCounts(),source->PrimitiveVertexCounts()) &&
+            same(result.GeometryTransforms(),source->GeometryTransforms()) &&
+            same(result.Vertices(RtGeometryRole::PlayerWorldBody),source->Vertices(RtGeometryRole::PlayerWorldBody)) &&
+            result.Measurements().indexBytes==result.Indices().size()*sizeof(std::uint32_t),
+            "sparse copy preserves all admitted vertex/material/role/instance/transform bytes");
+    };
+    std::vector<std::uint32_t> ids{2,3,4,6};
+    auto plan=RtStaticTriangleOmissions::Create(source,21,ids,error);
+    Check(plan && std::ranges::equal(plan->Triangles(),ids),"sparse plan binds a valid exclusive immutable owner");
+    if(!plan)return;
+    ids[0]=UINT32_MAX;
+    Check(plan->Triangles()[0]==2,"plan owns its IDs rather than borrowing caller mutation");
+    RtStaticMeshCopy copy;
+    auto equivalent=std::make_shared<RtStaticMeshSlot>();Check(equivalent->Initialize(rows,error),"equal-byte second source admits");
+    Check(!copy.Begin(equivalent,error,21,all,plan) && !copy.Begin(source,error,1,all,plan) &&
+        !copy.Begin(source,error,21,2u,plan),"source identity, owner and region-mask mixing reject before copying");
+    unsigned turns=0;
+    Check(copy.Begin(source,error,21,all,plan),"sparse copy starts with both region bits retained");
+    while(!copy.Ready() && turns++<300u)
+        Check(copy.Advance(128u,error) && copy.LastCopiedBytes()<=128u && copy.LastScannedBytes()<=128u,
+            "sparse copy and plan scan fit the unchanged per-turn byte budget");
+    Check(copy.Ready() && copy.ScannedBytes()==source->TriangleRegions().size()*17u,
+        "scan accounts for indices, provenance and explicit-plan reads");
+    auto result=copy.Take();Check(result!=nullptr,"only complete sparse output transfers");
+    if(result)checkCopy(*result);
+    for(unsigned cancel=0;cancel<turns;++cancel) {
+        Check(copy.Begin(source,error,21,all,plan),"sparse cancellation/retry starts");
+        for(unsigned turn=0;turn<cancel;++turn)Check(copy.Advance(128u,error),"sparse cancellation boundary advances");
+        copy.Cancel();copy.Cancel();Check(!copy.Take() && source->Indices().size()==27,
+            "no cancellation boundary exposes partial geometry or changes the source");
+    }
+    Check(copy.Begin(source,error,21,all,plan),"small scan budget negative starts");
+    while(copy.CopiedBytes()<source->PayloadBytes()-sizeof(source->InstanceMetadata())-
+          sizeof(source->TextureArrayCounts())-sizeof(source->Measurements())) {
+        if(!copy.Advance(128u,error)){Check(false,"copy reaches scan boundary");break;}
+    }
+    Check(!copy.Ready() && !copy.Take() && !copy.Advance(16u,error) && copy.LastScannedBytes()==0,
+        "retained region bits cannot expose a plan before its scan; too-small scan budget rejects");
+    while(!copy.Ready())if(!copy.Advance(128u,error)){Check(false,"scan recovers after small budget rejection");break;}
+    result=copy.Take();if(result)checkCopy(*result);else Check(false,"sparse retry transfers");
+
+    const std::vector<std::vector<std::uint32_t>> bad{{2,2},{3,2},{0},{1},{8},{UINT32_MAX},{4,5,6,7}};
+    for(const auto& invalid:bad)
+        Check(!RtStaticTriangleOmissions::Create(source,21,invalid,error),
+            "duplicates, unsorted, foreign, Shared, overflow and empty-row omissions reject");
+    Check(!RtStaticTriangleOmissions::Create({},21,{},error) &&
+        !RtStaticTriangleOmissions::Create(std::make_shared<RtStaticMeshSlot>(),21,{},error) &&
+        !RtStaticTriangleOmissions::Create(source,22,std::array{8u},error),
+        "null, unadmitted and dedicated player-role omissions reject");
+    auto shared=std::make_shared<RtStaticMeshSlot>();
+    Check(shared->Initialize(std::array{StaticRtAssetRegistration{21,100,pbr,0,&world},
+        StaticRtAssetRegistration{19,101,pbr,0,&world}},error) &&
+        !RtStaticTriangleOmissions::Create(shared,21,std::array{1u},error),
+        "sparse omission cannot alter another instance's shared primitive owner");
+    auto empty=RtStaticTriangleOmissions::Create(source,21,{},error);
+    Check(empty && copy.Begin(source,error,21,all,empty),"empty sparse plan is valid complete restoration");
+    unsigned fullTurns=0;
+    while(!copy.Ready() && fullTurns++<300u)Check(copy.Advance(128u,error),"empty-plan restoration advances");
+    result=copy.Take();Check(result && same(result->Indices(),source->Indices()) &&
+        same(result->PrimitiveMetadata(),source->PrimitiveMetadata()),"empty-plan restoration is byte-identical");
+    std::weak_ptr<const RtStaticMeshSlot> sourceLease=source;
+    std::weak_ptr<const RtStaticTriangleOmissions> planLease=plan;
+    empty.reset();Check(copy.Begin(source,error,21,all,plan),"sparse owner lifetime begins");
+    source.reset();plan.reset();Check(!sourceLease.expired() && !planLease.expired(),"copy pins both exact source and plan");
+    copy.Cancel();Check(sourceLease.expired() && planLease.expired(),"cancel releases both immutable leases");
+}
+
+void TestStaticPrimitiveRangeOwnership()
+{
+    using namespace horde::vulkan::raytracing;
+    using horde::scene::assets::StaticMeshAsset;
+    StaticMeshAsset asset;
+    asset.nodeTransforms.resize(1);
+    asset.materials.resize(3);
+    asset.vertices.resize(12);
+    asset.indices = {0,1,2, 0,1,2, 0,1,2, 0,2,3};
+    asset.primitives = {{0,0,3,0,0}, {3,3,3,1,0}, {6,6,6,2,0}};
+    for (std::size_t i = 0; i < asset.materials.size(); ++i) {
+        asset.materials[i].name = "owner-" + std::to_string(i);
+        asset.materials[i].baseColorTexture = static_cast<std::int32_t>(i);
+        asset.materials[i].baseColorFactor[0] = 0.25f * static_cast<float>(i + 1);
+    }
+    const auto pbr = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    StaticRtAssetRegistration complete{21, 0x434f4c4c, pbr, 0, &asset};
+    std::string diagnostic;
+    RtStaticMeshSlot baseline;
+    const bool baselineReady = baseline.Initialize(std::array{complete}, diagnostic);
+    Check(baselineReady,
+          "complete primitive ownership baseline initializes");
+    if (!baselineReady) return;
+    std::array<StaticRtAssetRegistration,3> owners{{
+        {14, 0x434f4d4d, pbr, 0, &asset, nullptr, RtGeometryRole::Static, 0, 1},
+        {15, 0x544f4d42, pbr, 0, &asset, nullptr, RtGeometryRole::Static, 1, 1},
+        {16, 0x464f5253, pbr, 0, &asset, nullptr, RtGeometryRole::Static, 2, 1}}};
+    RtStaticMeshSlot partitioned;
+    const bool partitionReady = partitioned.Initialize(owners, diagnostic);
+    Check(partitionReady,
+          std::string("three independent primitive owners initialize: ") + diagnostic);
+    if (!partitionReady) return;
+    for (std::size_t i = 0; i < owners.size(); ++i) {
+        const auto& row = partitioned.InstanceMetadata()[owners[i].instanceCustomIndex];
+        Check(row.primitiveBase == i && row.primitiveCount == 1 &&
+              row.stableObjectId == owners[i].stableObjectId && row.assetIndex == 0 &&
+              row.flags == pbr && row.geometryRole == static_cast<std::uint32_t>(RtGeometryRole::Static),
+              "zone metadata addresses exactly its indexed PBR primitive range");
+        const auto& primitive = partitioned.PrimitiveMetadata()[row.primitiveBase];
+        Check(primitive.indexOffset == asset.primitives[i].indexOffset &&
+              primitive.indexCount == asset.primitives[i].indexCount &&
+              primitive.materialIndex == i &&
+              partitioned.PrimitiveVertexCounts()[row.primitiveBase] == (i == 2 ? 6 : 3),
+              "range owner retains local hit indices, material and vertex span");
+    }
+    const auto equalBytes = [](const auto& a, const auto& b) {
+        return a.size() == b.size() &&
+            (a.empty() || std::memcmp(a.data(), b.data(), a.size() * sizeof(a[0])) == 0);
+    };
+    Check(equalBytes(baseline.Vertices(), partitioned.Vertices()) &&
+          baseline.Indices() == partitioned.Indices() &&
+          equalBytes(baseline.Materials(), partitioned.Materials()) &&
+          equalBytes(baseline.PrimitiveMetadata(), partitioned.PrimitiveMetadata()) &&
+          baseline.GeometryTransforms() == partitioned.GeometryTransforms() &&
+          baseline.Measurements().vertexBytes == partitioned.Measurements().vertexBytes &&
+          baseline.Measurements().indexBytes == partitioned.Measurements().indexBytes &&
+          baseline.Measurements().descriptorCount == partitioned.Measurements().descriptorCount &&
+          partitioned.TextureArrayCounts().baseColor == 3,
+          "primitive ownership shares byte-identical packed geometry/materials and texture allocation");
+    std::reverse(owners.begin(), owners.end());
+    RtStaticMeshSlot reordered;
+    Check(reordered.Initialize(owners, diagnostic) &&
+          equalBytes(reordered.InstanceMetadata(), partitioned.InstanceMetadata()) &&
+          equalBytes(reordered.PrimitiveMetadata(), partitioned.PrimitiveMetadata()),
+          "reordered range registrations preserve exact instance and primitive metadata");
+    // Intentional repeated geometry remains legal (e.g. multiple instances).
+    auto repeated = owners;
+    repeated[0].primitiveOffset = 1;
+    Check(reordered.Initialize(repeated, diagnostic) &&
+          reordered.InstanceMetadata()[16].primitiveBase == 1 &&
+          reordered.InstanceMetadata()[15].primitiveBase == 1,
+          "overlapping immutable range instances share storage without rewriting another owner");
+    const auto reject = [&](std::uint32_t offset, std::uint32_t count,
+                            RtGeometryRole role, std::uint32_t flags) {
+        auto invalid = complete;
+        invalid.primitiveOffset = offset; invalid.primitiveCount = count;
+        invalid.geometryRole = role; invalid.flags = flags;
+        RtStaticMeshSlot rejected;
+        Check(!rejected.Initialize(std::array{invalid}, diagnostic) &&
+              diagnostic.find("primitive range") != std::string::npos,
+              "invalid/empty/overflow or animated primitive range is rejected before packing");
+    };
+    reject(1, 0, RtGeometryRole::Static, pbr);
+    reject(3, 1, RtGeometryRole::Static, pbr);
+    reject(2, 2, RtGeometryRole::Static, pbr);
+    reject(1, std::numeric_limits<std::uint32_t>::max(), RtGeometryRole::Static, pbr);
+    reject(std::numeric_limits<std::uint32_t>::max(), 1, RtGeometryRole::Static, pbr);
+    reject(0, 1, RtGeometryRole::PlayerWorldBody, pbr);
+    reject(0, 1, RtGeometryRole::PlayerViewmodel, pbr);
+    reject(0, 1, RtGeometryRole::Static, 0);
+    auto explicitComplete = complete;
+    explicitComplete.primitiveCount = 3;
+    Check(reordered.Initialize(std::array{explicitComplete}, diagnostic) &&
+          equalBytes(baseline.InstanceMetadata(), reordered.InstanceMetadata()),
+          "explicit complete static range matches the legacy zero/zero route exactly");
+
+    std::vector<StaticMeshAsset> fullAssets(kRtStaticAssetCapacity, asset);
+    std::vector<StaticRtAssetRegistration> fullOwners;
+    // One three-primitive owner plus twelve one-primitive owners: 15 rows,
+    // exactly 13 unique assets. Three extra instance ranges must cost neither
+    // a fourteenth asset nor duplicated metadata/geometry/material storage.
+    for (std::uint32_t i = 0; i < kRtStaticAssetCapacity; ++i) {
+        auto& next = fullAssets[i];
+        next.materials[0].baseColorTexture = -1;
+        next.materials[1].baseColorTexture = -1;
+        next.materials[2].baseColorTexture = -1;
+        if (i != 0) {
+            next.primitives.resize(1); next.materials.resize(1);
+            next.vertices.resize(3); next.indices.resize(3);
+        }
+        fullOwners.push_back({i, i + 100, pbr, 0, &next});
+    }
+    RtStaticMeshSlot fullBaseline;
+    Check(fullBaseline.Initialize(fullOwners, diagnostic),
+          "unchanged full static-asset ceiling initializes for ownership proof");
+    for (std::uint32_t i = 0; i < 3; ++i)
+        fullOwners.push_back({static_cast<std::uint32_t>(fullAssets.size())+1u+i,
+                             200+i, pbr, 0, &fullAssets[0], nullptr,
+                             RtGeometryRole::Static, i, 1});
+    RtStaticMeshSlot fullPartition;
+    Check(fullPartition.Initialize(fullOwners, diagnostic) &&
+          equalBytes(fullBaseline.Vertices(), fullPartition.Vertices()) &&
+          fullBaseline.Indices() == fullPartition.Indices() &&
+          equalBytes(fullBaseline.Materials(), fullPartition.Materials()) &&
+          equalBytes(fullBaseline.PrimitiveMetadata(), fullPartition.PrimitiveMetadata()),
+          "three range aliases fit the saturated asset ceiling without extra packed rows/bytes");
+
+    auto provider = asset;
+    auto consumer = asset;
+    for (std::size_t i = 0; i < 3; ++i) {
+        provider.materials[i].textureGroup = static_cast<std::int32_t>(i);
+        consumer.materials[i].textureGroup = static_cast<std::int32_t>(i);
+        consumer.materials[i].baseColorTexture = static_cast<std::int32_t>(100 + i);
+        consumer.materials[i].baseColorFactor[0] *= 0.5f;
+    }
+    std::array<StaticRtAssetRegistration,3> textureOwners{{
+        {21, 100, pbr, 0, &provider},
+        {14, 200, pbr, 0, &consumer, &provider, RtGeometryRole::Static, 0, 1},
+        {15, 201, pbr, 0, &consumer, &provider, RtGeometryRole::Static, 1, 2}}};
+    Check(reordered.Initialize(textureOwners, diagnostic) &&
+          reordered.InstanceMetadata()[14].primitiveBase == 3 &&
+          reordered.InstanceMetadata()[15].primitiveBase == 4 &&
+          reordered.InstanceMetadata()[15].primitiveCount == 2 &&
+          reordered.TextureArrayCounts().baseColor == 3 &&
+          reordered.Materials()[4].textureLayers == reordered.Materials()[1].textureLayers &&
+          reordered.Materials()[4].baseColorFactor != reordered.Materials()[1].baseColorFactor,
+          "subranges retain earlier-provider texture aliases and distinct consumer material factors");
+}
+
+void TestSelectedGeometryPacking()
+{
+    using namespace horde::vulkan::raytracing;
+    using horde::scene::assets::StaticMeshAsset;
+    StaticMeshAsset source;
+    source.nodeTransforms.resize(1);
+    source.materials.resize(3);
+    source.vertices.resize(12);
+    for (std::size_t i = 0; i < source.vertices.size(); ++i)
+        source.vertices[i].position[0] = static_cast<float>(i);
+    source.indices = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 2, 3};
+    source.primitives = {{0, 0, 3, 0, 0}, {3, 3, 3, 1, 0}, {6, 6, 6, 2, 0}};
+    for (std::size_t i = 0; i < source.materials.size(); ++i) {
+        source.materials[i].name = "retained-family-" + std::to_string(i);
+        source.materials[i].textureGroup = static_cast<std::int32_t>(i);
+        source.materials[i].baseColorTexture = static_cast<std::int32_t>(i);
+    }
+    const auto preserved = source;
+    const auto pbr = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    std::array<StaticRtAssetRegistration, 2> owners{{
+        {14, 100, pbr, 0, &source, nullptr, RtGeometryRole::Static, 0, 1},
+        {16, 102, pbr, 0, &source, nullptr, RtGeometryRole::Static, 2, 1}}};
+    RtStaticMeshSlot selected;
+    std::string diagnostic;
+    const bool packed = selected.InitializeSelectedGeometry(owners, diagnostic);
+    Check(packed, std::string("selected zone geometry admits: ") + diagnostic);
+    if (!packed) return;
+    Check(selected.Vertices().size() == 9 && selected.Indices().size() == 9 &&
+          selected.PrimitiveMetadata().size() == 2 &&
+          selected.Measurements().vertexBytes == 9 * sizeof(StaticRtVertex) &&
+          selected.Measurements().indexBytes == 9 * sizeof(std::uint32_t),
+          "retired primitive contributes no candidate geometry bytes or primitive rows");
+    Check(selected.InstanceMetadata()[14].primitiveBase == 0 &&
+          selected.InstanceMetadata()[16].primitiveBase == 1 &&
+          selected.InstanceMetadata()[14].primitiveCount == 1 &&
+          selected.InstanceMetadata()[16].primitiveCount == 1,
+          "source ranges remap to their exact compacted owners");
+    if (selected.Vertices().size() == 9 && selected.PrimitiveMetadata().size() == 2) {
+        Check(selected.Vertices()[3].position[0] == 6 &&
+              selected.PrimitiveMetadata()[1].vertexOffset == 3 &&
+              selected.PrimitiveMetadata()[1].indexOffset == 3 &&
+              selected.PrimitiveVertexCounts()[1] == 6 &&
+              selected.Indices() == std::vector<std::uint32_t>({0,1,2,0,1,2,0,2,3}),
+              "compaction retains local indices and the complete referenced vertex spans");
+    }
+    const auto equalBytes = [](const auto& a, const auto& b) {
+        return a.size() == b.size() && (a.empty() ||
+            std::memcmp(a.data(), b.data(), a.size() * sizeof(a[0])) == 0);
+    };
+    Check(equalBytes(source.vertices, preserved.vertices) && source.indices == preserved.indices &&
+          equalBytes(source.primitives, preserved.primitives),
+          "zone packing never mutates the archived/native source geometry");
+    RtStaticMeshSlot legacy;
+    Check(legacy.Initialize(owners, diagnostic) && legacy.Vertices().size() == 12 &&
+          legacy.PrimitiveMetadata().size() == 3 &&
+          equalBytes(legacy.Materials(), selected.Materials()) &&
+          legacy.TextureArrayCounts().baseColor == selected.TextureArrayCounts().baseColor,
+          "legacy range packing and shared material/texture identity are unchanged");
+    const auto before = selected;
+    std::reverse(owners.begin(), owners.end());
+    Check(selected.InitializeSelectedGeometry(owners, diagnostic) &&
+          equalBytes(before.Vertices(), selected.Vertices()) &&
+          equalBytes(before.InstanceMetadata(), selected.InstanceMetadata()),
+          "registration order does not reorder a source's retained geometry");
+    auto overlap = owners;
+    overlap[0].primitiveOffset = 0;
+    Check(selected.InitializeSelectedGeometry(overlap, diagnostic) &&
+          selected.Vertices().size() == 3 && selected.Indices().size() == 3 &&
+          selected.PrimitiveMetadata().size() == 1 &&
+          selected.InstanceMetadata()[14].primitiveBase == selected.InstanceMetadata()[16].primitiveBase,
+          "overlapping instances own one retained primitive payload");
+    const StaticRtAssetRegistration complete{21, 200, pbr, 0, &source};
+    RtStaticMeshSlot completeLegacy;
+    Check(completeLegacy.Initialize(std::array{complete}, diagnostic) &&
+          selected.InitializeSelectedGeometry(std::array{complete}, diagnostic) &&
+          equalBytes(completeLegacy.Vertices(), selected.Vertices()) &&
+          equalBytes(completeLegacy.PrimitiveMetadata(), selected.PrimitiveMetadata()) &&
+          equalBytes(completeLegacy.InstanceMetadata(), selected.InstanceMetadata()) &&
+          completeLegacy.Indices() == selected.Indices(),
+          "full selection remains byte-identical to complete asset packing");
+    const auto admitted = selected;
+    const auto reject = [&](const auto& invalid) {
+        Check(!selected.InitializeSelectedGeometry(invalid, diagnostic) &&
+              !diagnostic.empty() && equalBytes(admitted.Vertices(), selected.Vertices()) &&
+              equalBytes(admitted.InstanceMetadata(), selected.InstanceMetadata()) &&
+              equalBytes(admitted.PrimitiveMetadata(), selected.PrimitiveMetadata()) &&
+              admitted.PrimitiveVertexCounts() == selected.PrimitiveVertexCounts() &&
+              admitted.GeometryTransforms() == selected.GeometryTransforms() &&
+              equalBytes(admitted.Materials(), selected.Materials()) &&
+              admitted.TextureArrayCounts().baseColor == selected.TextureArrayCounts().baseColor &&
+              admitted.TextureArrayCounts().normal == selected.TextureArrayCounts().normal &&
+              admitted.TextureArrayCounts().orm == selected.TextureArrayCounts().orm &&
+              admitted.TextureArrayCounts().emissive == selected.TextureArrayCounts().emissive &&
+              admitted.Indices() == selected.Indices(),
+              "failed candidate leaves every previously admitted route and payload intact");
+    };
+    const std::array<std::uint32_t,2> disconnected{{0,2}};
+    auto oneOwner = complete;
+    oneOwner.primitiveSelection = disconnected;
+    Check(selected.InitializeSelectedGeometry(std::array{oneOwner}, diagnostic) &&
+          selected.InstanceMetadata()[21].primitiveCount == 2 &&
+          selected.InstanceMetadata()[21].primitiveBase == 0 &&
+          selected.PrimitiveMetadata().size() == 2 && selected.Vertices().size() == 9 &&
+          selected.Indices() == std::vector<std::uint32_t>({0,1,2,0,1,2,0,2,3}) &&
+          equalBytes(admitted.Materials(), selected.Materials()),
+          "one owner selects disconnected source families with exact decode and shared material identity");
+    // Put the admitted baseline back before each failure-atomic assertion.
+    Check(selected.InitializeSelectedGeometry(std::array{complete}, diagnostic),
+          "complete owner remains reconstructible after disconnected selection");
+    RtStaticMeshSlot legacySelection = admitted;
+    Check(!legacySelection.Initialize(std::array{oneOwner}, diagnostic) &&
+          !diagnostic.empty() && equalBytes(admitted.Vertices(), legacySelection.Vertices()) &&
+          equalBytes(admitted.PrimitiveMetadata(), legacySelection.PrimitiveMetadata()),
+          "legacy packing rejects explicit selection without clobbering admitted data");
+    const auto rejectList = [&](std::span<const std::uint32_t> list) {
+        auto invalid = oneOwner; invalid.primitiveSelection = list;
+        reject(std::array{invalid});
+    };
+    const std::array<std::uint32_t,2> duplicateList{{0,0}}, reversedList{{2,0}},
+        outsideList{{0,3}}, overflowList{{0,UINT32_MAX}};
+    rejectList(duplicateList); rejectList(reversedList); rejectList(outsideList); rejectList(overflowList);
+    auto invalidSelection = oneOwner;
+    invalidSelection.primitiveCount = 1; reject(std::array{invalidSelection});
+    invalidSelection = oneOwner; invalidSelection.primitiveOffset = 1; reject(std::array{invalidSelection});
+    invalidSelection = oneOwner; invalidSelection.geometryRole = RtGeometryRole::PlayerWorldBody;
+    reject(std::array{invalidSelection});
+    invalidSelection = oneOwner; invalidSelection.flags = 0; reject(std::array{invalidSelection});
+    const std::array<std::uint32_t,1> middle{{1}};
+    auto interleavingOwner = complete;
+    interleavingOwner.instanceCustomIndex = 14; interleavingOwner.primitiveSelection = middle;
+    reject(std::array{oneOwner, interleavingOwner});
+    auto overlappingOwner = oneOwner;
+    overlappingOwner.instanceCustomIndex = 14;
+    Check(selected.InitializeSelectedGeometry(std::array{oneOwner,overlappingOwner}, diagnostic) &&
+          selected.PrimitiveMetadata().size() == 2 && selected.Vertices().size() == 9 &&
+          selected.InstanceMetadata()[21].primitiveBase == selected.InstanceMetadata()[14].primitiveBase &&
+          selected.InstanceMetadata()[21].primitiveCount == 2,
+          "two identical disconnected owners share one exact packed payload");
+    Check(selected.InitializeSelectedGeometry(std::array{complete}, diagnostic),
+          "baseline restored after overlapping selection");
+    reject(std::span<const StaticRtAssetRegistration>{});
+    auto bad = owners;
+    bad[0].primitiveCount = std::numeric_limits<std::uint32_t>::max(); reject(bad);
+    bad = owners; bad[0].geometryRole = RtGeometryRole::PlayerViewmodel; reject(bad);
+    bad = owners; bad[0].instanceCustomIndex = bad[1].instanceCustomIndex; reject(bad);
+    bad = owners; bad[0].asset = nullptr; reject(bad);
+    auto invalidSource = source;
+    bad = owners; for (auto& owner : bad) owner.asset = &invalidSource;
+    invalidSource.primitives[2].indexOffset = std::numeric_limits<std::uint32_t>::max(); reject(bad);
+    invalidSource = source; invalidSource.primitives[2].indexCount = 5; reject(bad);
+    invalidSource = source; invalidSource.indices[6] = 6; reject(bad);
+    invalidSource = source; invalidSource.primitives[2].vertexOffset = 2; reject(bad);
+    invalidSource = source; invalidSource.primitives[2].materialIndex = 3; reject(bad);
+    invalidSource = source; invalidSource.primitives[2].nodeTransformIndex = 1; reject(bad);
+
+    auto consumer = source;
+    for (auto& material : consumer.materials) material.baseColorFactor[0] = .5f;
+    const std::array<StaticRtAssetRegistration, 3> aliased{{
+        {21, 200, pbr, 0, &source, nullptr, RtGeometryRole::Static, 0, 1},
+        {14, 100, pbr, 0, &consumer, &source, RtGeometryRole::Static, 2, 1},
+        {16, 102, pbr, 0, &consumer, &source, RtGeometryRole::Static, 2, 1}}};
+    Check(selected.InitializeSelectedGeometry(aliased, diagnostic) &&
+          selected.Vertices().size() == 9 && selected.PrimitiveMetadata().size() == 2 &&
+          selected.TextureArrayCounts().baseColor == 3 &&
+          selected.Materials()[5].textureLayers == selected.Materials()[2].textureLayers &&
+          selected.Materials()[5].baseColorFactor != selected.Materials()[2].baseColorFactor,
+          "selected providers retain alias families without duplicate consumer geometry/textures");
 }
 
 void TestGeometryRolePartitioning()
@@ -1203,6 +1893,68 @@ void TestAcceptedStaticGlbContract(const horde::scene::assets::AssetManifest& ma
         Check(material.baseColorTexture == 0 && material.normalTexture == 0 &&
                   material.ormTexture == 0 && material.emissiveTexture == 0,
               "four runtime texture categories receive deterministic layers");
+    }
+}
+
+void TestMaterialBaseColorAuthoring(const std::filesystem::path& temporaryRoot,
+                                   const horde::scene::assets::AssetManifest& manifest)
+{
+    using namespace horde::scene::assets;
+    StaticMeshAsset baseline, authored;
+    std::string diagnostic;
+    Check(StaticMeshAsset::Load(kFixtureRoot / "valid-multi.glb", manifest, baseline, diagnostic),
+          "base-colour authoring has an admitted control asset");
+    const auto path = RewriteManifest(temporaryRoot, "base-colour.manifest.json",
+        "\"roughnessFactor\": 0.18", "\"roughnessFactor\": 0.18, \"baseColorFactor\": [0.5,0.5,0.5,1]");
+    AssetManifest candidate;
+    const bool parsed = AssetManifest::Load(path, candidate, diagnostic);
+    Check(parsed, std::string("linear base-colour sidecar is admitted: ") + diagnostic);
+    const bool loaded = parsed && StaticMeshAsset::Load(kFixtureRoot / "valid-multi.glb", candidate, authored, diagnostic);
+    Check(loaded && authored.materials[0].baseColorFactor == std::array<float,4>{{.5f,.5f,.5f,1.f}},
+          "named base-colour authoring reaches the native PBR factor without changing encoded texels");
+    if (loaded) {
+        Check(authored.indices == baseline.indices && authored.vertices.size() == baseline.vertices.size() &&
+              std::memcmp(authored.vertices.data(), baseline.vertices.data(), baseline.vertices.size()*sizeof(StaticRtVertex)) == 0 &&
+              authored.bounds.minimum == baseline.bounds.minimum && authored.bounds.maximum == baseline.bounds.maximum,
+              "base-colour authoring preserves exact geometry, UVs, tangents and support bounds");
+        Check(authored.materials[0].baseColorTexture == baseline.materials[0].baseColorTexture &&
+              authored.materials[0].roughnessFactor == baseline.materials[0].roughnessFactor &&
+              authored.materials[0].flags == baseline.materials[0].flags,
+              "base-colour authoring preserves texture routing, roughness and optical flags");
+        candidate = manifest;
+        MaterialOverride unrelated;
+        unrelated.material = "UnrelatedMaterial";
+        unrelated.hasBaseColorFactor = true;
+        unrelated.baseColorFactor = {{.5f,.5f,.5f,1.f}};
+        candidate.materialOverrides.push_back(unrelated);
+        Check(StaticMeshAsset::Load(kFixtureRoot / "valid-multi.glb", candidate, authored, diagnostic) &&
+              authored.materials[0].baseColorFactor == std::array<float,4>{{.2f,.3f,.4f,.8f}},
+              "a named colour override does not alter an unrelated material");
+    }
+    std::string colourOnly = ReadText(kFixtureRoot / "valid.manifest.json");
+    const auto overridesBegin = colourOnly.find("\"materialOverrides\"");
+    const auto overridesEnd = colourOnly.rfind(']');
+    Check(overridesBegin != std::string::npos && overridesEnd != std::string::npos,
+          "colour-only test preserves the complete manifest outside its named overrides");
+    if (overridesBegin != std::string::npos && overridesEnd != std::string::npos) {
+        colourOnly.replace(overridesBegin, overridesEnd-overridesBegin+1u,
+            "\"materialOverrides\": [{\"material\":\"FixtureMaterial\",\"baseColorFactor\":[0.5,0.5,0.5,1]}]");
+        const auto onlyPath = temporaryRoot / "colour-only.manifest.json";
+        WriteText(onlyPath, colourOnly);
+        Check(AssetManifest::Load(onlyPath, candidate, diagnostic) &&
+              candidate.materialOverrides.size() == 1u && candidate.materialOverrides[0].hasBaseColorFactor,
+              "base-colour-only authoring is a complete optional override");
+    }
+    for (const std::string_view value : {"[0,0,0,1]", "[1,1,1,1]"}) {
+        const auto edge = RewriteManifest(temporaryRoot, "base-colour-edge.manifest.json",
+            "\"roughnessFactor\": 0.18", "\"roughnessFactor\": 0.18, \"baseColorFactor\": " + std::string(value));
+        Check(AssetManifest::Load(edge, candidate, diagnostic), "finite base-colour boundary factors are admitted");
+    }
+    for (const std::string_view value : {"[]", "[1,1,1]", "[1,1,1,1,1]", "[-0.1,1,1,1]",
+            "[1,1.01,1,1]", "[1,1,1,2]", "[1e40,1,1,1]", "[1,null,1,1]", "[1,\"1\",1,1]"}) {
+        const auto invalid = RewriteManifest(temporaryRoot, "base-colour-invalid.manifest.json",
+            "\"roughnessFactor\": 0.18", "\"roughnessFactor\": 0.18, \"baseColorFactor\": " + std::string(value));
+        Check(!AssetManifest::Load(invalid, candidate, diagnostic), "invalid colour array lengths/types/ranges reject admission");
     }
 }
 
@@ -2197,11 +2949,436 @@ void TestExactDielectricWeldCellDomain()
     }
 }
 
+void TestTombDressingCandidates()
+{
+    using namespace horde::scene::assets;
+    struct Candidate { const char* id; std::size_t triangles; std::size_t primitives; const char* material; };
+    constexpr Candidate candidates[] = {
+        {"tomb-niche-rect", 1188u, 10u, "MedievalWall02"},
+        {"tomb-niche-arched", 1280u, 16u, "MedievalWall02"},
+    };
+    // Only the original niche family is selected from this directory. Bones and
+    // funerary props use the recovered T02/T03 roster tested below. Unselected
+    // local replacement experiments must never become required test inputs.
+    for (const Candidate& candidate : candidates)
+    {
+        const auto directory = std::filesystem::path(HORDE_RT_TOMB_DRESSING_ROOT) / candidate.id;
+        AssetManifest manifest;
+        StaticMeshAsset asset;
+        std::string diagnostic;
+        const bool manifestLoaded = AssetManifest::Load(
+            directory / "asset.manifest.json", manifest, diagnostic);
+        Check(manifestLoaded, std::string(candidate.id) + " candidate manifest loads: " + diagnostic);
+        if (!manifestLoaded) continue;
+        const bool loaded = StaticMeshAsset::Load(
+            directory / (std::string(candidate.id) + "-lod0.runtime.glb"),
+            manifest, asset, diagnostic);
+        Check(loaded, std::string(candidate.id) + " imports through the production static GLB loader: " + diagnostic);
+        if (!loaded) continue;
+        Check(asset.indices.size() == candidate.triangles * 3u,
+              std::string(candidate.id) + " imported triangle count matches its author receipt");
+        Check(asset.primitives.size() >= candidate.primitives,
+              std::string(candidate.id) + " retains separate authored geometry primitives");
+        Check(std::any_of(asset.materials.begin(), asset.materials.end(), [&](const StaticMaterial& material) {
+                  return material.name == candidate.material;
+              }), std::string(candidate.id) + " retains its intended ordinary static PBR material family");
+        Check(asset.materials.size() == 1u,
+              std::string(candidate.id) + " retains only its declared PBR material families");
+        Check(std::all_of(asset.materials.begin(), asset.materials.end(), [](const StaticMaterial& material) {
+                  return material.baseColorTexture < 0 && material.normalTexture < 0 &&
+                         material.ormTexture < 0 && material.emissiveTexture < 0 &&
+                         material.metallicFactor == 0.0f && material.transmissionFactor == 0.0f &&
+                         material.emissiveFactor == std::array<float, 3u>{};
+              }), std::string(candidate.id) + " is texture-free, opaque, nonmetal and nonemissive");
+        Check(std::all_of(asset.vertices.begin(), asset.vertices.end(), [](const StaticRtVertex& vertex) {
+                  return std::isfinite(vertex.position[0]) && std::isfinite(vertex.position[1]) &&
+                         std::isfinite(vertex.position[2]);
+              }), std::string(candidate.id) + " imported vertices are finite");
+        if (std::string_view(candidate.id).starts_with("tomb-niche-"))
+            Check(asset.primitives.size() >= 10u && asset.indices.size() > 1000u,
+                  std::string(candidate.id) + " contains deep modular wall geometry instead of a dark quad");
+    }
+}
+
+void TestJointPresentationAssetCandidates(const std::filesystem::path& temporaryRoot)
+{
+    using namespace horde::scene::assets;
+    const auto runtimeRoot = kDielectricFixtureRoot.parent_path();
+    const auto sourceRoot = runtimeRoot.parent_path() / "source";
+    struct Candidate
+    {
+        const char* id;
+        std::size_t vertices;
+        std::size_t triangles;
+    };
+    const Candidate candidates[] = {
+        {"attack-warning-ring-v1", 32u, 32u},
+        {"healing-flask-v1", 242u, 384u},
+    };
+    for (const auto& candidate : candidates)
+    {
+        const std::string label = candidate.id;
+        const bool isRing = label == "attack-warning-ring-v1";
+        const auto directory = runtimeRoot / candidate.id;
+        const auto glb = directory / (label + ".runtime.glb");
+        AssetManifest manifest;
+        StaticMeshAsset asset;
+        std::string diagnostic;
+        const bool manifestLoaded = AssetManifest::Load(directory / "asset.manifest.json", manifest, diagnostic);
+        Check(manifestLoaded, label + " standard manifest loads: " + diagnostic);
+        if (!manifestLoaded) continue;
+        Check(manifest.assetName == label && manifest.metresPerUnit == 1.0f &&
+                  manifest.budgets.maxVertices == candidate.vertices &&
+                  manifest.budgets.maxIndices == candidate.triangles * 3u &&
+                  manifest.budgets.maxPrimitives == 1u && manifest.budgets.maxMaterials == 1u &&
+                  manifest.budgets.maxTextureLayersPerKind == 1u &&
+                  manifest.lods.size() == 1u && manifest.lods[0].maxTriangles == candidate.triangles &&
+                  manifest.materialOverrides.empty(),
+              label + " manifest pins measured geometry and ordinary shared PBR intake");
+        const bool loaded = StaticMeshAsset::Load(glb, manifest, asset, diagnostic);
+        Check(loaded, label + " actual native StaticMeshAsset loader accepts candidate: " + diagnostic);
+        if (!loaded) continue;
+        Check(asset.vertices.size() == candidate.vertices && asset.indices.size() == candidate.triangles * 3u &&
+                  asset.primitives.size() == 1u && asset.materials.size() == 1u,
+              label + " native counts match the bounded candidate");
+        if (asset.materials.size() != 1u || asset.primitives.size() != 1u ||
+            asset.vertices.size() != candidate.vertices || asset.indices.size() != candidate.triangles * 3u)
+            continue;
+        GltfDocument candidateDocument;
+        const bool candidateParsed = GltfDocument::Load(glb, candidateDocument, diagnostic);
+        Check(candidateParsed, label + " candidate document parses: " + diagnostic);
+        if (!candidateParsed) continue;
+        Check(candidateDocument.Data()->textures_count == 0u && candidateDocument.Data()->images_count == 0u &&
+                  candidateDocument.Data()->lights_count == 0u && candidateDocument.Data()->animations_count == 0u &&
+                  candidateDocument.Data()->skins_count == 0u,
+              label + " contains no texture, image, light, skin or animation payload");
+        const auto& material = asset.materials[0];
+        Check(material.baseColorTexture == -1 && material.normalTexture == -1 &&
+                  material.ormTexture == -1 && material.emissiveTexture == -1 &&
+                  material.transmissionFactor == 0.0f && (material.flags & (4u | 512u)) == 0u,
+              label + " retains texture-free opaque PBR with no dielectric route");
+        Check(std::all_of(asset.vertices.begin(), asset.vertices.end(), [](const StaticRtVertex& vertex) {
+                  return std::all_of(vertex.position.begin(), vertex.position.end(), [](float v) { return std::isfinite(v); }) &&
+                         std::all_of(vertex.normal.begin(), vertex.normal.end(), [](float v) { return std::isfinite(v); }) &&
+                         std::all_of(vertex.tangent.begin(), vertex.tangent.end(), [](float v) { return std::isfinite(v); }) &&
+                         std::isfinite(vertex.uv0[0]) && std::isfinite(vertex.uv0[1]) &&
+                         vertex.uv0[0] >= 0.0f && vertex.uv0[0] <= 1.0f &&
+                         vertex.uv0[1] >= 0.0f && vertex.uv0[1] <= 1.0f;
+              }), label + " imports finite geometry, fallback tangents and unit-range UV0");
+
+        const auto missing = temporaryRoot / (label + "-missing.glb");
+        ExpectAssetFailure(missing, manifest, "Could not read static GLB: " + missing.string());
+        auto corruptBytes = ReadBytes(glb);
+        Check(!corruptBytes.empty(), label + " candidate bytes are available for a corruption fixture");
+        if (!corruptBytes.empty())
+        {
+            corruptBytes.pop_back();
+            const auto corrupt = temporaryRoot / (label + "-truncated.glb");
+            WriteBytes(corrupt, corruptBytes);
+            ExpectAssetFailure(corrupt, manifest, "Static GLB chunks are malformed or truncated.");
+        }
+        auto tooSmall = manifest;
+        --tooSmall.budgets.maxVertices;
+        ExpectAssetFailure(glb, tooSmall, "Static GLB exceeds manifest maxVertices capacity.");
+        const auto missingManifest = temporaryRoot / (label + "-missing.manifest.json");
+        ExpectManifestFailure(missingManifest, "Could not read asset manifest: " + missingManifest.string());
+        const auto corruptManifest = temporaryRoot / (label + "-corrupt.manifest.json");
+        WriteText(corruptManifest, "{");
+        ExpectManifestFailure(corruptManifest, "Asset manifest JSON is invalid.");
+
+        if (isRing)
+        {
+            Check(ReadBytes(glb) == ReadBytes(sourceRoot / label / (label + ".glb")),
+                  "annulus runtime is byte-identical to its original project-authored source");
+            Check(manifest.requiredSockets.empty() && asset.sockets.empty() && asset.nodeTransforms.size() == 1u,
+                  "annulus has one ordinary mesh node and no socket/light node");
+            Check(material.name == "AttackWarningAmber" && (material.flags & 1u) != 0u &&
+                      material.baseColorFactor == std::array<float, 4u>{{0.72f, 0.09f, 0.015f, 1.0f}} &&
+                      material.emissiveFactor == std::array<float, 3u>{{1.0f, 0.16f, 0.015f}} &&
+                      material.emissiveStrength == 1.0f && material.metallicFactor == 0.0f &&
+                      material.roughnessFactor == 1.0f,
+                  "annulus constant amber emission and double-sided flag survive native material conversion");
+            Check(asset.bounds.minimum == std::array<float, 3u>{{-1.0f, -1.0f, 0.0f}} &&
+                      asset.bounds.maximum == std::array<float, 3u>{{1.0f, 1.0f, 0.0f}},
+                  "annulus imports in local XY without adding thickness or changing unit bounds");
+            bool radiiAndNormals = true;
+            for (std::size_t i = 0u; i < asset.vertices.size(); ++i)
+            {
+                const auto& vertex = asset.vertices[i];
+                radiiAndNormals = radiiAndNormals && vertex.position[2] == 0.0f &&
+                    NearlyEqual(std::hypot(vertex.position[0], vertex.position[1]), i % 2u == 0u ? 0.88f : 1.0f) &&
+                    vertex.normal == std::array<float, 4u>{{0.0f, 0.0f, 1.0f, 0.0f}};
+            }
+            Check(radiiAndNormals, "annulus retains 16 inner/outer vertex pairs with +Z normals");
+            bool positiveWinding = true;
+            for (std::size_t i = 0u; i < asset.indices.size(); i += 3u)
+            {
+                const auto a = asset.vertices[asset.indices[i]].position;
+                const auto b = asset.vertices[asset.indices[i + 1u]].position;
+                const auto c = asset.vertices[asset.indices[i + 2u]].position;
+                positiveWinding = positiveWinding &&
+                    (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]) > 0.0f;
+            }
+            Check(positiveWinding, "all native annulus triangles wind toward the authored +Z normal");
+            continue;
+        }
+
+        const auto original = sourceRoot / "healing-flask-neck-fit-r2/healing-flask-neck-fit-r2.glb";
+        Check(ReadBytes(original).size() == 9292u, "owned flask r2 source retains its exact byte count");
+        ExpectAssetFailure(original, manifest, "Static GLB primitive 0 is missing TEXCOORD_0.");
+        Check(manifest.requiredSockets == std::vector<std::string>{"Grip"} &&
+                  asset.sockets.size() == 1u && asset.sockets[0].name == "Grip" &&
+                  asset.sockets[0].world == std::array<float, 16u>{{
+                      1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0.065f, 0, 1}},
+              "flask preserves exact case-sensitive Grip and its source transform");
+        Check(material.name == "HealingFlaskPewter" && (material.flags & 1u) == 0u &&
+                  material.baseColorFactor == std::array<float, 4u>{{0.28f, 0.25f, 0.19f, 1.0f}} &&
+                  material.emissiveFactor == std::array<float, 3u>{{0, 0, 0}} &&
+                  material.metallicFactor == 0.8f && material.roughnessFactor == 0.43f,
+              "flask preserves the source opaque pewter PBR factors");
+        GltfDocument sourceDocument;
+        const bool sourceParsed = GltfDocument::Load(original, sourceDocument, diagnostic);
+        Check(sourceParsed, "owned source flask parses through native cgltf: " + diagnostic);
+        if (!sourceParsed) continue;
+        const auto& source = *sourceDocument.Data();
+        const auto& runtime = *candidateDocument.Data();
+        const bool expectedLayout = source.meshes_count == 1u && source.meshes[0].primitives_count == 1u &&
+            source.buffer_views_count == 3u && source.accessors_count == 3u &&
+            runtime.buffer_views_count == 4u && runtime.accessors_count == 4u;
+        Check(expectedLayout, "flask derivative appends exactly one UV0 view/accessor");
+        if (!expectedLayout) continue;
+        bool preservedViews = true;
+        for (std::size_t i = 0u; i < source.buffer_views_count; ++i)
+        {
+            const auto& before = source.buffer_views[i];
+            const auto& after = runtime.buffer_views[i];
+            const auto* beforeData = cgltf_buffer_view_data(&before);
+            const auto* afterData = cgltf_buffer_view_data(&after);
+            preservedViews = preservedViews && before.offset == after.offset && before.size == after.size &&
+                beforeData != nullptr && afterData != nullptr &&
+                std::memcmp(beforeData, afterData, before.size) == 0;
+        }
+        Check(preservedViews, "UV-only flask preserves every existing source buffer-view byte and offset");
+        const auto& primitive = source.meshes[0].primitives[0];
+        const cgltf_accessor* positions = nullptr;
+        const cgltf_accessor* normals = nullptr;
+        for (std::size_t i = 0u; i < primitive.attributes_count; ++i)
+        {
+            if (primitive.attributes[i].type == cgltf_attribute_type_position) positions = primitive.attributes[i].data;
+            if (primitive.attributes[i].type == cgltf_attribute_type_normal) normals = primitive.attributes[i].data;
+        }
+        Check(positions != nullptr && normals != nullptr && positions->count == asset.vertices.size() &&
+                  normals->count == asset.vertices.size() && primitive.indices != nullptr &&
+                  primitive.indices->count == asset.indices.size(),
+              "flask source exposes the preserved POSITION/NORMAL/index layout");
+        if (positions == nullptr || normals == nullptr || primitive.indices == nullptr ||
+            positions->count != asset.vertices.size() || normals->count != asset.vertices.size() ||
+            primitive.indices->count != asset.indices.size()) continue;
+        bool preservedGeometry = true;
+        for (std::size_t i = 0u; i < asset.vertices.size(); ++i)
+        {
+            std::array<float, 3u> position{}, normal{};
+            preservedGeometry = preservedGeometry && cgltf_accessor_read_float(positions, i, position.data(), 3u) &&
+                cgltf_accessor_read_float(normals, i, normal.data(), 3u);
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+                preservedGeometry = preservedGeometry && position[axis] == asset.vertices[i].position[axis] &&
+                    NearlyEqual(normal[axis], asset.vertices[i].normal[axis], 0.000001f);
+        }
+        for (std::size_t i = 0u; i < asset.indices.size(); ++i)
+            preservedGeometry = preservedGeometry && cgltf_accessor_read_index(primitive.indices, i) == asset.indices[i];
+        Check(preservedGeometry, "native flask positions, normals and every triangle preserve the source geometry");
+    }
+}
+
+void TestPreparedFunerarySourceAssets(const std::filesystem::path& temporaryRoot)
+{
+    using namespace horde::scene::assets;
+    const std::filesystem::path repositoryRoot =
+        kFixtureRoot.parent_path().parent_path().parent_path();
+    const std::filesystem::path sourceRoot = repositoryRoot / "assets/source/beyond_the_tomb/funerary";
+    const std::filesystem::path t02Root = sourceRoot / "t02-skeletal-source-v1";
+    const std::filesystem::path t03Root = sourceRoot / "t03-v01";
+    const std::filesystem::path runtimeRoot = repositoryRoot /
+        "assets/models/world/runtime/prepared-funerary-v01/t02-native-import-candidates";
+    const auto manifestPath = temporaryRoot / "prepared-funerary-import-probe.manifest.json";
+    WriteText(manifestPath,
+        R"({
+            "schema": 1,
+            "asset": "prepared-funerary-import-probe",
+            "metresPerUnit": 1.0,
+            "coordinateSystem": { "up": "+Y", "forward": "+Z" },
+            "budgets": {
+                "maxVertices": 1000000,
+                "maxIndices": 3000000,
+                "maxPrimitives": 128,
+                "maxMaterials": 32,
+                "maxTextureLayersPerKind": 18
+            },
+            "lods": [{ "name": "lod0", "maxTriangles": 100000 }],
+            "requiredSockets": [],
+            "runtimeTextureProfile": {
+                "android": "astc", "windows": "rgba8", "mipmapped": true
+            },
+            "materialOverrides": []
+        })");
+    AssetManifest manifest;
+    std::string diagnostic;
+    const bool manifestLoaded = AssetManifest::Load(manifestPath, manifest, diagnostic);
+    Check(manifestLoaded, "prepared-source native-import probe manifest loads: " + diagnostic);
+    if (!manifestLoaded) return;
+
+    struct Candidate
+    {
+        const char* label;
+        std::filesystem::path path;
+        std::size_t triangles;
+        bool expectNativeImport;
+    };
+    const Candidate candidates[] = {
+        {"T02 skull/jaw source", t02Root / "meshes/skull_jaw.glb", 5564u, false},
+        {"T02 femur source", t02Root / "meshes/femur.glb", 396u, false},
+        {"T02 humerus source", t02Root / "meshes/humerus.glb", 304u, false},
+        {"T02 skull/jaw UV candidate", runtimeRoot / "skull-jaw/tomb-skull-jaw-lod0.runtime.glb", 5564u, true},
+        {"T02 femur UV candidate", runtimeRoot / "femur/tomb-femur-lod0.runtime.glb", 396u, true},
+        {"T02 humerus UV candidate", runtimeRoot / "humerus/tomb-humerus-lod0.runtime.glb", 304u, true},
+        {"T03 displaced lid", t03Root / "models/t03_displaced_lid.glb", 496u, true},
+        {"T03 offering bowl", t03Root / "models/t03_offering_bowl.glb", 960u, true},
+        {"T03 broken urn base", t03Root / "models/t03_urn_broken_base.glb", 1212u, true},
+        {"T03 urn rim shard", t03Root / "models/t03_urn_rim_shard.glb", 800u, true},
+        {"T03 candle stub 1", t03Root / "models/t03_candle_stub_1.glb", 664u, true},
+        {"T03 candle stub 2", t03Root / "models/t03_candle_stub_2.glb", 664u, true},
+        {"T03 candle stub 3", t03Root / "models/t03_candle_stub_3.glb", 664u, true},
+    };
+    for (const Candidate& candidate : candidates)
+    {
+        StaticMeshAsset asset;
+        diagnostic.clear();
+        const bool loaded = StaticMeshAsset::Load(candidate.path, manifest, asset, diagnostic);
+        if (!candidate.expectNativeImport)
+        {
+            Check(!loaded && diagnostic.find("missing TEXCOORD_0") != std::string::npos,
+                  std::string(candidate.label) + " confirms the texture-free source UV import gap: " + diagnostic);
+            continue;
+        }
+        Check(loaded, std::string(candidate.label) + " imports through the production static GLB loader: " + diagnostic);
+        if (!loaded) continue;
+        Check(asset.indices.size() == candidate.triangles * 3u,
+              std::string(candidate.label) + " native triangle count matches its prepared package evidence");
+        Check(!asset.vertices.empty() && !asset.primitives.empty() && !asset.materials.empty(),
+              std::string(candidate.label) + " imports geometry, primitives, and material slots");
+        Check(std::all_of(asset.vertices.begin(), asset.vertices.end(), [](const StaticRtVertex& vertex) {
+                  return std::isfinite(vertex.position[0]) && std::isfinite(vertex.position[1]) &&
+                         std::isfinite(vertex.position[2]);
+              }), std::string(candidate.label) + " imports finite vertex positions");
+    }
+}
+
+void TestChapterTerrainSupportIntake()
+{
+    using namespace horde::scene::assets;
+    StaticMeshAsset mesh;
+    mesh.materials.resize(2);
+    mesh.materials[0].name="ChapterTrailDampSand";
+    mesh.materials[1].name="ChapterBankStone";
+    mesh.vertices.resize(6);
+    const std::array<std::array<float,3>,6> points{{{{0,0,0}},{{0,0,1}},{{1,0,0}},
+                                                 {{1,0,0}},{{0,0,1}},{{1,0,1}}}};
+    for(std::size_t i=0;i<points.size();++i)for(std::size_t k=0;k<3;++k)mesh.vertices[i].position[k]=points[i][k];
+    mesh.indices={0,1,2,0,1,2};
+    mesh.primitives={{0,0,3,0,0},{3,3,3,1,0}};
+    std::string diagnostic;
+    const auto valid=horde::scene::PrepareChapterTerrainSurface(mesh,diagnostic);
+    Check(valid&&valid->TriangleCount()==2&&valid->Query(.1f,.1f).walkable&&
+          valid->Query(.9f,.9f).surface==horde::gameplay::simulation::SupportSurface::Stone,
+          "terrain intake preserves local indices and material surface classification");
+    auto invalid=mesh;invalid.indices[0]=3;
+    Check(!horde::scene::PrepareChapterTerrainSurface(invalid,diagnostic),"terrain index cannot borrow another primitive's vertices");
+    invalid=mesh;invalid.primitives[1].indexOffset=0;
+    Check(!horde::scene::PrepareChapterTerrainSurface(invalid,diagnostic),"terrain primitive cannot overlap index ownership");
+    invalid=mesh;invalid.materials[1].name="unadmitted";
+    Check(!horde::scene::PrepareChapterTerrainSurface(invalid,diagnostic),"unknown terrain material rejected");
+    invalid=mesh;invalid.primitives.pop_back();
+    Check(!horde::scene::PrepareChapterTerrainSurface(invalid,diagnostic),"unowned terrain indices rejected");
+}
+
+int InspectTerrainSupport(const char* glb,const char* manifestPath,const char* stationsPath)
+{
+    using namespace horde::scene::assets;
+    AssetManifest manifest;StaticMeshAsset asset;std::string diagnostic;
+    if(!AssetManifest::Load(manifestPath,manifest,diagnostic)||!StaticMeshAsset::Load(glb,manifest,asset,diagnostic)) {
+        std::cerr<<"Native terrain rejected: "<<diagnostic<<'\n';return 1;
+    }
+    const auto started=std::chrono::steady_clock::now();
+    const auto surface=horde::scene::PrepareChapterTerrainSurface(asset,diagnostic);
+    const auto prepared=std::chrono::steady_clock::now();
+    if(!surface){std::cerr<<diagnostic<<'\n';return 1;}
+    std::ifstream input(stationsPath);
+    std::vector<std::array<float,3>> stations;
+    std::string line;
+    while(std::getline(input,line)) {
+        std::istringstream row(line);std::array<float,3> p{};std::string extra;
+        if(!(row>>p[0]>>p[1]>>p[2])||(row>>extra)) {std::cerr<<"Invalid route station row\n";return 1;}
+        stations.push_back(p);
+    }
+    if(stations.size()<2||stations.size()>10000){std::cerr<<"Missing or unbounded route station fixture\n";return 1;}
+    std::uint64_t queries=0,triangleTests=0,sweeps=0;
+    for(std::size_t i=0;i<stations.size();++i) {
+        const auto p=stations[i];const auto centre=surface->Query(p[0],p[1]);
+        Check(centre.found&&centre.walkable&&std::abs(centre.worldY-p[2])<=.18f,"native terrain route disagrees with graded height");
+        triangleTests+=centre.testedTriangles;++queries;
+        for(int ring=0;ring<8;++ring) {
+            const float angle=float(ring)*.785398163397f;
+            const auto sample=surface->Query(p[0]+.24f*std::cos(angle),p[1]+.24f*std::sin(angle));
+            Check(sample.found&&sample.walkable,"native terrain footprint is unsupported or steep");
+            triangleTests+=sample.testedTriangles;++queries;
+        }
+        if(i) {
+            const auto previous=stations[i-1];const auto previousSample=surface->Query(previous[0],previous[1]);
+            Check(surface->GroundSweep(previous[0],previous[1],p[0],p[1],previousSample.worldY,.24f),
+                  "native terrain forward sweep failed");
+            Check(surface->GroundSweep(p[0],p[1],previous[0],previous[1],centre.worldY,.24f),
+                  "native terrain reverse sweep failed");
+            sweeps+=2;
+        }
+    }
+    const auto finished=std::chrono::steady_clock::now();
+    std::cout<<"Native terrain triangles="<<surface->TriangleCount()<<" retainedBytes="<<surface->RetainedBytes()
+             <<" preparationMs="<<std::chrono::duration<double,std::milli>(prepared-started).count()
+             <<" routeCheckMs="<<std::chrono::duration<double,std::milli>(finished-prepared).count()
+             <<" queries="<<queries<<" triangleTests="<<triangleTests<<" sweeps="<<sweeps<<" failures="<<failures<<'\n';
+    return failures?1:0;
+}
+
 } // namespace
 
 int main(int argc, char** argv)
 {
     executablePath = std::filesystem::absolute(argv[0]);
+    if(argc==5&&std::string_view(argv[1])=="--inspect-terrain-support")
+        return InspectTerrainSupport(argv[2],argv[3],argv[4]);
+    // Read-only source-candidate intake uses the same native importer as the
+    // normal fixture suite. A successful import is not runtime admission.
+    if (argc == 4 && std::string_view(argv[1]) == "--inspect-candidate")
+    {
+        horde::scene::assets::AssetManifest manifest;
+        horde::scene::assets::StaticMeshAsset asset;
+        std::string diagnostic;
+        if (!horde::scene::assets::AssetManifest::Load(argv[3], manifest, diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(argv[2], manifest, asset, diagnostic))
+        {
+            std::cerr << "Native candidate rejected: " << diagnostic << '\n';
+            return 1;
+        }
+        std::cout << "Native candidate=" << std::filesystem::path(argv[2]).filename().string()
+                  << " vertices=" << asset.vertices.size() << " triangles=" << asset.indices.size()/3
+                  << " primitives=" << asset.primitives.size() << " materials=" << asset.materials.size()
+                  << " bounds=";
+        for(float coordinate:asset.bounds.minimum) std::cout << coordinate << ',';
+        std::cout << " to ";
+        for(float coordinate:asset.bounds.maximum) std::cout << coordinate << ',';
+        std::cout << '\n';
+        return 0;
+    }
 #if defined(_WIN32)
     const char* cyclicEnvironment = std::getenv("HORDE_TEST_CYCLIC_PATH");
     const char* manifestEnvironment = std::getenv("HORDE_TEST_CYCLIC_MANIFEST");
@@ -2229,6 +3406,15 @@ int main(int argc, char** argv)
         return !loaded && IsSafeCyclicRejectionDiagnostic(diagnostic) ? 0 : 2;
     }
 
+    // A malformed intake command must never silently run the ordinary suite
+    // and report success without inspecting the requested candidate.
+    if (argc != 1)
+    {
+        std::cerr << "Expected no arguments, or --inspect-candidate <glb> <manifest>, "
+                     "or --inspect-terrain-support <glb> <manifest> <stations>, "
+                     "or --probe-cyclic <glb> <manifest>.\n";
+        return 64;
+    }
     const ScopedStaticGltfTestDirectory scopedTemporaryRoot;
     Check(scopedTemporaryRoot.Ready(),
           "process/config-unique static GLB temporary directory is safely created");
@@ -2243,10 +3429,18 @@ int main(int argc, char** argv)
     TestExactDielectricWeldCellDomain();
     TestPlayerSemanticManifestAndGeometry(temporaryRoot);
     TestSharedTextureSourceRouting();
+    TestStaticPrimitiveRangeOwnership();
+    TestSelectedGeometryPacking();
+    TestBoundedImmutableMeshCopy();
+    TestSparseImmutableTriangleOmissions();
     TestGeometryRolePartitioning();
     TestProductionDielectricFixture();
     TestLanternGeometryQualityProfile();
     TestRuntimeOfflineDielectricComponentParity();
+    TestTombDressingCandidates();
+    TestJointPresentationAssetCandidates(temporaryRoot);
+    TestPreparedFunerarySourceAssets(temporaryRoot);
+    TestChapterTerrainSupportIntake();
 
     horde::scene::assets::AssetManifest manifest;
     std::string diagnostic;
@@ -2259,6 +3453,7 @@ int main(int argc, char** argv)
     else
     {
         TestAcceptedStaticGlbContract(manifest);
+        TestMaterialBaseColorAuthoring(temporaryRoot, manifest);
         TestMaterialNormalAndTextureAuthoring(temporaryRoot, manifest);
         TestUnsupportedAlphaMaterialIsRejected(temporaryRoot, manifest);
         TestTransmissionDefaultThinWallSemantics(temporaryRoot, manifest);

@@ -73,16 +73,25 @@ bool MotionEvidenceLedger::AppendState(std::uint64_t now,
     std::span<const horde::gameplay::simulation::GameplayEvent> events)
 {
     if (Failed()) return false;
-    if (runId_.empty() || scenario.Scenario() != scenario_ || states_.size() >= kMaximumStateRows ||
-        events.size() > kMaximumEventRows - events_.size() || input.hasAuthoritativePlayerPose ||
-        state.playerMountProfile != horde::gameplay::items::PlayerMountProfile::AnatomicalBody ||
-        state.eventQueueOverflowCount != 0u || !std::isfinite(state.playerX) || !std::isfinite(state.playerZ) ||
-        !std::isfinite(state.playerYawRadians) || !std::isfinite(state.playerPitchRadians) ||
+    if (runId_.empty()) return Reject("Motion state has no admitted run identity.");
+    if (scenario.Scenario() != scenario_) return Reject("Motion state scenario differs from the admitted ledger.");
+    if (states_.size() >= kMaximumStateRows) return Reject("Motion state row capacity exhausted.");
+    if (events.size() > kMaximumEventRows - events_.size()) return Reject("Motion event row capacity exhausted.");
+    if (input.hasAuthoritativePlayerPose) return Reject("Motion input contains an authoritative player pose.");
+    if (state.playerMountProfile != horde::gameplay::items::PlayerMountProfile::AnatomicalBody)
+        return Reject("Motion state lacks the production anatomical player profile.");
+    if (state.eventQueueOverflowCount != 0u) return Reject("Motion semantic event queue overflow count is nonzero.");
+    if (!std::isfinite(state.playerX) || !std::isfinite(state.playerZ) ||
+        !std::isfinite(state.playerYawRadians) || !std::isfinite(state.playerPitchRadians))
+        return Reject("Motion state player position or camera is nonfinite.");
+    if (
         !std::isfinite(input.moveForward) || !std::isfinite(input.moveStrafe) ||
-        !std::isfinite(input.yawRadians) || !std::isfinite(input.pitchRadians) ||
-        std::abs(input.moveForward) > 1.00001f || std::abs(input.moveStrafe) > 1.00001f ||
-        (!states_.empty() && (now < states_.back().wallNanoseconds || state.tickIndex < states_.back().tick)))
-        return Reject("Motion state input/profile/time/capacity admission failed.");
+        !std::isfinite(input.yawRadians) || !std::isfinite(input.pitchRadians))
+        return Reject("Motion input axes or camera is nonfinite.");
+    if (std::abs(input.moveForward) > 1.00001f || std::abs(input.moveStrafe) > 1.00001f)
+        return Reject("Motion input axes exceed their admitted bounds.");
+    if (!states_.empty() && (now < states_.back().wallNanoseconds || state.tickIndex < states_.back().tick))
+        return Reject("Motion state wall clock or simulation tick regressed.");
     if (state.fireEmitterCount > 4u || state.fireEmitterCount > state.fireEmitters.size())
         return Reject("Motion configured fire-source count exceeds its admitted capacity.");
     for (std::size_t index = 0u; index < state.fireEmitterCount; ++index)

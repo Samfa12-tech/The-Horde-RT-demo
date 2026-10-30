@@ -1,0 +1,32 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 76
+    Start 76: horde_rt_development_static_asset_tests
+
+76: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_development_static_asset_tests.exe"
+76: Working Directory: <repo>/build/presets/windows-x64-debug
+76: Test timeout computed to be: 1500
+76: FAIL: development registry retains prior views plus bounded water-lighting and world-route views
+76: FAIL: development lookup still rejects IDs beyond the appended route views
+76: 2 development static asset assertion(s) failed
+1/1 Test #76: horde_rt_development_static_asset_tests ...***Failed    5.27 sec
+FAIL: development registry retains prior views plus bounded water-lighting and world-route views
+FAIL: development lookup still rejects IDs beyond the appended route views
+2 development static asset assertion(s) failed
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   5.30 sec
+
+The following tests FAILED:
+	 76 - horde_rt_development_static_asset_tests (Failed)
+Errors while running CTest

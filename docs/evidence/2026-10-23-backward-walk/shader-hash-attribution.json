@@ -1,0 +1,13 @@
+{
+  "file": "src/vulkan/raytracing/MinimalRayGenShader.inc",
+  "expectedCanonicalSha256": "c96c4e361e28f9bc4b4f69ebcb5a25e91ed1586e3f968f7761693443fea4fd6f",
+  "currentCanonicalSha256": "3e773b9594abf6a154a843af3633ee5d9573d273506df509032ac620f0d25d8c",
+  "accepted096bCanonicalSha256": "3e773b9594abf6a154a843af3633ee5d9573d273506df509032ac620f0d25d8c",
+  "canonicalBytesEqualToAcceptedHead": true,
+  "gatesChanged": false,
+  "failures": [
+    "horde_rt_raygen_variant_manifest_tests: Generic include hash changed before matrix compilation.",
+    "horde_rt_raygen_variant_artifact_tests: Compatibility generic include changed unexpectedly."
+  ],
+  "scope": "read-only attribution; no shader/test/hash expectation changed"
+}

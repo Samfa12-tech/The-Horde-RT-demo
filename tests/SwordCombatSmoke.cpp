@@ -55,6 +55,107 @@ bool ContactPartitionsStayOrdered()
     }
     return true;
 }
+
+bool HeldGuardActionsAreBounded()
+{
+    using namespace horde::gameplay;
+    constexpr float step = 1.0f / 60.0f;
+    bool passed = true;
+    const auto expect = [&](bool condition, const char* message) {
+        if (!condition) { passed = false; std::cerr << "Guard smoke: " << message << '\n'; }
+    };
+    // Disable enemy admission rather than manufacture damage or overwrite poses;
+    // this fixture isolates the player's real action/recovery clock.
+    const auto tick = [&](SwordCombat& combat, bool held, bool parryEdge = false) {
+        combat.SetGuardHeld(held);
+        if (parryEdge) combat.RequestParry();
+        return combat.Update(step, 0.0f, 20.0f, 0.0f, true, false);
+    };
+    SwordCombat held;
+    auto state = tick(held, true, true);
+    expect(state.player.action == PlayerCombatAction::ParryStartup,
+           "fresh held press starts the original startup, not immediate guard");
+    bool sawActive = false, reachedGuard = false;
+    for (int frame = 0; frame < 60; ++frame)
+    {
+        state = tick(held, true);
+        sawActive |= state.player.action == PlayerCombatAction::ParryActive;
+        reachedGuard |= state.player.action == PlayerCombatAction::Guard;
+    }
+    expect(sawActive && reachedGuard && state.player.action == PlayerCombatAction::Guard,
+           "the existing active window finishes into held guard");
+    for (int frame = 0; frame < 120; ++frame)
+    {
+        state = tick(held, true, true); // Even malformed repeated edges cannot refresh a hold.
+        expect(state.player.action == PlayerCombatAction::Guard,
+               "continued hold and edge spam cannot reopen parry");
+        expect(std::isfinite(state.player.guardPoseWeight) &&
+               state.player.guardPoseWeight >= 0.0f && state.player.guardPoseWeight <= 1.0f,
+               "held presentation weight stays finite and bounded");
+    }
+
+    expect(held.RequestAttack() == PlayerAttackCut::DownwardCut,
+           "a deliberate attack is accepted from guard");
+    state = tick(held, true);
+    expect(state.player.action == PlayerCombatAction::SwingWindup &&
+           state.player.guardPoseWeight > 0.0f,
+           "attack starts immediately while blending from guard instead of dropping to rest");
+    float attackSeconds = step;
+    bool returnedGuard = false, sawAttackRecovery = false, sawRepeatedParry = false;
+    for (int frame = 0; frame < 120; ++frame)
+    {
+        state = tick(held, true, true);
+        attackSeconds += step;
+        sawAttackRecovery |= state.player.action == PlayerCombatAction::SwingRecovery;
+        sawRepeatedParry |= state.player.action == PlayerCombatAction::ParryStartup ||
+                            state.player.action == PlayerCombatAction::ParryActive;
+        if (state.player.action == PlayerCombatAction::Guard) { returnedGuard = true; break; }
+    }
+    expect(returnedGuard && sawAttackRecovery && !sawRepeatedParry &&
+           attackSeconds + 0.00001f >= SwordCombat::kSwordDuration - step,
+           "held protection returns only after complete attack recovery and never grants a parry");
+
+    // A release or re-press during the busy action cannot cancel its recovery.
+    expect(held.RequestAttack() == PlayerAttackCut::DownwardCut,
+           "the recovered guard accepts another ordinary attack");
+    state = tick(held, true);
+    float busySeconds = step;
+    for (int frame = 0; frame < 8; ++frame) { state = tick(held, false); busySeconds += step; }
+    bool repressedWindow = false;
+    state = tick(held, true, true); busySeconds += step;
+    for (int frame = 0; frame < 120; ++frame)
+    {
+        repressedWindow |= state.player.action == PlayerCombatAction::ParryStartup ||
+                           state.player.action == PlayerCombatAction::ParryActive;
+        if (state.player.action == PlayerCombatAction::Guard) break;
+        state = tick(held, true); busySeconds += step;
+    }
+    expect(state.player.action == PlayerCombatAction::Guard && !repressedWindow &&
+           busySeconds + 0.00001f >= SwordCombat::kSwordDuration - step,
+           "rapid release/re-press during a swing cannot cancel recovery or buffer a parry");
+
+    expect(held.RequestAttack() == PlayerAttackCut::DownwardCut,
+           "release-during-swing fixture starts an actual attack");
+    tick(held, true);
+    for (int frame = 0; frame < 90; ++frame) state = tick(held, false);
+    expect(state.player.action == PlayerCombatAction::Idle && state.player.guardPoseWeight == 0.0f,
+           "release during swing leaves no recovered guard or stuck pose");
+    state = tick(held, true, true);
+    expect(state.player.action == PlayerCombatAction::ParryStartup,
+           "a fresh physical press after release can open one new parry");
+    for (int frame = 0; frame < 50; ++frame) state = tick(held, true);
+    state = tick(held, false);
+    expect(state.player.action != PlayerCombatAction::Guard,
+           "release ends logical guard on its first update");
+    for (int frame = 0; frame < 30; ++frame) state = tick(held, false);
+    expect(state.player.action == PlayerCombatAction::Idle && state.player.guardPoseWeight == 0.0f,
+           "released guard settles naturally without a stuck action");
+    held.CancelPlayerActions();
+    expect(held.Snapshot().player.action == PlayerCombatAction::Idle &&
+           held.Snapshot().player.guardPoseWeight == 0.0f,
+           "explicit action cancellation clears held presentation");
+    return passed;
+}
 }
 
 int main()
@@ -411,7 +512,8 @@ int main()
     }
     const bool lateParryFailed = lateSawDamage && lateRequested && !lateSucceeded;
     const bool contactPartitions = ContactPartitionsStayOrdered();
-    if (!contactPartitions || !exactSpawns || !exactHistoricalSpawn || !strictNearestSelection ||
+    const bool heldGuardActions = HeldGuardActionsAreBounded();
+    if (!heldGuardActions || !contactPartitions || !exactSpawns || !exactHistoricalSpawn || !strictNearestSelection ||
         !sawSwing || !sawDeath || !deadPersisted || !singleTargetHit ||
         !clearedPair || !pairPersistsDead || !resetPair || !maintainedSeparation ||
         !oneAttackToken || !sawDamage ||
@@ -440,6 +542,7 @@ int main()
                   << " phases=" << swingStillWindup << swingEnteredActive << swingEnteredRecovery << swingFinished
                   << " strokeContact=" << downwardContactDuringStroke << contactsDuringBothStrokes
                   << " partitions=" << contactPartitions
+                  << " heldGuard=" << heldGuardActions
                   << " rearMiss=" << rearSwingMissed << " bothParry=" << bothIdsParry
                   << " failedParries=" << failedParriesDamage << " tokenHeld=" << tokenHeldThroughStagger
                   << " riposte=" << immediateRiposte << " staggerEdge=" << staggerNearlyComplete

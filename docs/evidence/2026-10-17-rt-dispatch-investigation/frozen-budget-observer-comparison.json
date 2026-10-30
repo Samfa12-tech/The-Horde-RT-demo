@@ -1,0 +1,135 @@
+{
+  "scope": "Two instrumented observation variants only; no production admission or budget modification",
+  "variants": [
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "comparisonToUnchangedBudget": [
+        {
+          "metric": "bytes",
+          "actual": 625484,
+          "maximum": 588184,
+          "passes": false
+        },
+        {
+          "metric": "words",
+          "actual": 156371,
+          "maximum": 147046,
+          "passes": false
+        },
+        {
+          "metric": "instructions",
+          "actual": 34430,
+          "maximum": 32695,
+          "passes": false
+        },
+        {
+          "metric": "branchOperations",
+          "actual": 4492,
+          "maximum": 4557,
+          "passes": true
+        },
+        {
+          "metric": "loops",
+          "actual": 82,
+          "maximum": 80,
+          "passes": false
+        },
+        {
+          "metric": "selectionMerges",
+          "actual": 1817,
+          "maximum": 1841,
+          "passes": true
+        },
+        {
+          "metric": "functions",
+          "actual": 1,
+          "maximum": 1,
+          "passes": true
+        },
+        {
+          "metric": "functionCalls",
+          "actual": 0,
+          "maximum": 0,
+          "passes": true
+        },
+        {
+          "metric": "rayQueryInitializations",
+          "actual": 27,
+          "maximum": 27,
+          "passes": true
+        },
+        {
+          "metric": "atomicInstructions",
+          "actual": 0,
+          "maximum": 0,
+          "passes": true
+        }
+      ]
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "comparisonToUnchangedBudget": [
+        {
+          "metric": "bytes",
+          "actual": 294324,
+          "maximum": 285632,
+          "passes": false
+        },
+        {
+          "metric": "words",
+          "actual": 73581,
+          "maximum": 71408,
+          "passes": false
+        },
+        {
+          "metric": "instructions",
+          "actual": 17638,
+          "maximum": 17129,
+          "passes": false
+        },
+        {
+          "metric": "branchOperations",
+          "actual": 929,
+          "maximum": 930,
+          "passes": true
+        },
+        {
+          "metric": "loops",
+          "actual": 22,
+          "maximum": 20,
+          "passes": false
+        },
+        {
+          "metric": "selectionMerges",
+          "actual": 382,
+          "maximum": 386,
+          "passes": true
+        },
+        {
+          "metric": "functions",
+          "actual": 86,
+          "maximum": 83,
+          "passes": false
+        },
+        {
+          "metric": "functionCalls",
+          "actual": 293,
+          "maximum": 261,
+          "passes": false
+        },
+        {
+          "metric": "rayQueryInitializations",
+          "actual": 2,
+          "maximum": 2,
+          "passes": true
+        },
+        {
+          "metric": "atomicInstructions",
+          "actual": 0,
+          "maximum": 0,
+          "passes": true
+        }
+      ]
+    }
+  ]
+}

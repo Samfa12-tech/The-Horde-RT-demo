@@ -1,0 +1,18 @@
+{
+  "sourceCommit": "811852fae36e5a334f55580c22767363b6d505f2",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "apkSha256": "d1a052dd29fd8b6f61e70d247f0446373053bfb7e7c9af4bce07f84636b2ec43",
+  "originalSavesAndLocks": 12,
+  "custody": "all pre-existing paths and settings byte-exact; only ret-20261020-r1 namespace added",
+  "policy": "Horde paused by owner; touchscreen redesign recorded, recovery proposal unapproved, no runtime changes",
+  "evidenceClass": "isolated physical post-Keeper return/reload/hot-resume plus seeded noncombat warm lookout baseline",
+  "noClaim": [
+    "natural victory/claim/death",
+    "process death/power-loss",
+    "listening",
+    "actual display spacing",
+    "two-light Keeper",
+    "sustained 30 FPS"
+  ]
+}

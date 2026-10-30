@@ -1,0 +1,35 @@
+{
+  "key": "diagnostic_high_generic_dielectric",
+  "source_sha256": "fe610e35234b27494de161b6bb83be17378624ec805e52489ecad5f7e2a22c81",
+  "raw_spirv_sha256": "5fce92f3a8fabc2c4550e01e1d696f842bf44810dd3d032675de8d917f9d620d",
+  "spirv_sha256": "fe32e68a44981532b723d9c29d1a9c251afe34755a450817f451efee4b1a6528",
+  "disassembly_sha256": "311c0161d2f9e7aa5f64799770c824cfd2a10abe5c67f776fcc15444f2d77be1",
+  "metrics": {
+    "instructions": 14150,
+    "branchOperations": 866,
+    "loops": 17,
+    "selectionMerges": 362,
+    "functions": 62,
+    "functionCalls": 177,
+    "rayQueryInitializations": 2,
+    "atomicInstructions": 41,
+    "bytes": 238796,
+    "words": 59699
+  },
+  "measured_exact": {
+    "instrumentation": "Diagnostic",
+    "quality": "High",
+    "material": "GenericDielectric",
+    "strategy": "GenericRetained",
+    "shippingAllowed": false,
+    "atomicInstructions": 41,
+    "hasDiagnosticsBinding": true,
+    "driverSafeFullyInlined": false,
+    "boundedGenericFunctionsRetained": true
+  },
+  "excess": {},
+  "exact_violations": {},
+  "historical_surface_spirv_sha256": "fe32e68a44981532b723d9c29d1a9c251afe34755a450817f451efee4b1a6528",
+  "byte_identical_to_historical_surface_module": true,
+  "new_gpu_pixels_tested": false
+}

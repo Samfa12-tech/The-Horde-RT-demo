@@ -1,0 +1,24 @@
+{
+  "scope": "Private opt-in Debug/Mobile page profile, supports ordinary root before chapter adoption; four-ABI build/lint only; not installed",
+  "apkSha256": "c0545439b3850acb8d1c6c1c86355408c15a97eeb5fcd9098fb66780beda0b41",
+  "path": "reports\\region-page-phone-preparation\\horde-region-page-debug-c0545439.apk",
+  "abis": {
+    "arm64-v8a": {
+      "privateRootOnlyGuardPresent": true,
+      "nativeSha256": "fad746daacddbdbb555fb95bbe4b4313444b930e6770c1b525fa28f3f3f5f814"
+    },
+    "armeabi-v7a": {
+      "privateRootOnlyGuardPresent": true,
+      "nativeSha256": "7b09befdbfe4ca049b47b6bb18351e447c0858c1e7a92021d8d0bfef0e1743cd"
+    },
+    "x86": {
+      "privateRootOnlyGuardPresent": true,
+      "nativeSha256": "f5bcb0113fb73a354f841bc2c80b9097bd02e701af1efb10f73afe9cd815f000"
+    },
+    "x86_64": {
+      "privateRootOnlyGuardPresent": true,
+      "nativeSha256": "dd440496341bb6218f9791c42501c91b2720b6ee0a22bd8da23183ebffc2a156"
+    }
+  },
+  "sourceChangesBasedOn": "fe73c765ff0b82fc9279166955b4384c31b55e91"
+}

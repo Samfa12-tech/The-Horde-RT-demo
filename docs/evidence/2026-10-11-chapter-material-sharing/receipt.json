@@ -1,0 +1,117 @@
+{
+  "sourceParent": "6124e51ce12cd4b9c051a5824633448f9f51bd16",
+  "artifacts": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 12282880,
+      "sha256": "d2e176c15507a8b7a8b3e96b6690e5d781853ecbd665b192e2c7f67b976cae18"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4287488,
+      "sha256": "1b20f0d77c968886118c3482ea18c22eb1899944b9a64aa6f40fc96b046b5e06"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 149531917,
+      "sha256": "d1204f536837b2c99cfd26cb572f104ddc1bef65d9fea2af898e9443d474a5d9"
+    }
+  },
+  "captures": {
+    "Pipeline": {
+      "complete": true,
+      "executionBackend": "RayTracingPipeline",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 11724544,
+        "indexBytes": 1814676,
+        "materialBytes": 3584,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 480,
+        "textureBytes": 223696160,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.2435,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.6357,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6078,
+        "productionPropBlasBytes": 5401984,
+        "productionPropBlasBuildMilliseconds": 6.0398
+      },
+      "imageSha256": "4be4e621e11b2abf1786279b6b91a2cc8b194e66cbcc86b41e38347b69fd1317"
+    },
+    "QueryCompute": {
+      "complete": true,
+      "executionBackend": "RayQueryCompute",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "57b7a23d6eaed1885001e488654815cbbc1c1e25cec29db16c77b698aac92f13"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "c329f47673a9ed4bb3287c59c52a6db4d7a29dc39814b78beb78b969d2f527ec"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 11724544,
+        "indexBytes": 1814676,
+        "materialBytes": 3584,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 480,
+        "textureBytes": 223696160,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.7377,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.9016,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.8361,
+        "productionPropBlasBytes": 5401984,
+        "productionPropBlasBuildMilliseconds": 8.6425
+      },
+      "imageSha256": "c4acca9b3d4f03ec349c026138b63399cfbb85fe8324cd542e7da3d6b2f4db21"
+    }
+  },
+  "sameBackendPriorImageChangedPixels": 0,
+  "crossBackendChangedPixels": 94,
+  "crossBackendMaximumChannelDifference": 30,
+  "firstPipelineAttempt": "access violation 0xc0000005 in ntdll.dll; no captured frame; isolated retry passed; cause unproven",
+  "installedPhone": {
+    "model": "SM-S948B",
+    "authorized": true,
+    "package": "com.samfa12.hordelanternrt.debug",
+    "versionName": "1.6.2-debug",
+    "versionCode": 10,
+    "apkSha256": "1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c",
+    "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "candidateCertificateMatches": true,
+    "installedCandidate": false,
+    "launched": false
+  }
+}

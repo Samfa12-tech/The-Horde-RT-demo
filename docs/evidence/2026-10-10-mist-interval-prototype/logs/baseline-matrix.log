@@ -1,0 +1,16 @@
+<repo>\reports\mist-interval-prototype\baseline-matrix\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 295540 bytes; functions=83; calls=264; ray-query sites=2; dependency SHA-256=82372f03db772aee0601188ba05951cd59903587bbbfd087f56ffc57ac45506c
+<repo>\reports\mist-interval-prototype\baseline-matrix\diagnostic_high_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_high_opaque_fast: 590596 bytes; functions=1; calls=0; ray-query sites=29; dependency SHA-256=8eba1bffac1e70b0aa944526a2b60698fc83c43b5911a605978d184337e11c7d
+<repo>\reports\mist-interval-prototype\baseline-matrix\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_generic_dielectric: 294040 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=b9a1122acbc7b82e7a9803a4f87414365fad625ae6d491e9344616752604131c
+<repo>\reports\mist-interval-prototype\baseline-matrix\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_opaque_fast: 587496 bytes; functions=1; calls=0; ray-query sites=27; dependency SHA-256=42bcc14bc930d7598eba514f7f4ad7b7612725151fd60524a5c289e59d0df9df
+<repo>\reports\mist-interval-prototype\baseline-matrix\shipping_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_high_generic_dielectric: 286712 bytes; functions=83; calls=264; ray-query sites=2; dependency SHA-256=a3403153b4cb9cf2f44ab3ff93d73bb6c2955907ab4afdb9db88773fd8a9e762
+<repo>\reports\mist-interval-prototype\baseline-matrix\shipping_high_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_high_opaque_fast: 586360 bytes; functions=1; calls=0; ray-query sites=29; dependency SHA-256=46b9b9b762fa74d1367d8b661f6dd0a681a04259fa26c72bdded0fc2335a15c5
+<repo>\reports\mist-interval-prototype\baseline-matrix\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 285212 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=1bd6eeac45e5cd561fbc2eed942442ac891cf506b64ce8d6bbcfc7b3b6e0d2ea
+<repo>\reports\mist-interval-prototype\baseline-matrix\shipping_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_mobile_opaque_fast: 583260 bytes; functions=1; calls=0; ray-query sites=27; dependency SHA-256=6d75ca154ae32790582b1dac5de67455aefb1ab8ce8ef419afd63c3a81637cbd

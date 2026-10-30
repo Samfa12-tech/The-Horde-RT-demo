@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "complete": true,
+  "source": "rt-storage-image",
+  "sceneOnly": true,
+  "overlaysIncluded": false,
+  "settlingFrames": 12,
+  "fixedAnimationTimeSeconds": 0.000000,
+  "buildId": "1.6.2",
+  "playerMountProfile": "AnatomicalBody",
+  "executionBackend": "RayTracingPipeline",
+  "selectedRtPipelineBundle": {"opaqueFast": {"key": "diagnostic_high_opaque_fast", "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"}, "genericDielectric": {"key": "diagnostic_high_generic_dielectric", "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"}},
+  "device": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672
+  },
+  "presentation": {
+    "renderScale": 1.000000,
+    "dispatchWidth": 960,
+    "dispatchHeight": 540,
+    "swapchainWidth": 960,
+    "swapchainHeight": 540,
+    "swapchainFormat": 44
+  },
+  "timing": {
+    "sampleCount": 12,
+    "overallMedianMs": 11.933700,
+    "overallMeanMs": 131.104575,
+    "gpuRtCommandBuffer": {"valid": true, "latestMs": 8.187520, "averageMs": 10.748227, "sampleCount": 12, "timestampValidBits": 64, "timestampPeriodNanoseconds": 1.000000}
+  },
+  "staticRtAsset": {"enabled": true, "vertexBytes": 38717312, "indexBytes": 6180540, "materialBytes": 3840, "instanceMetadataBytes": 832, "primitiveMetadataBytes": 512, "textureBytes": 274027796, "descriptorCount": 9, "blasBytes": 1060096, "blasBuildMilliseconds": 1.428700, "swordBlasBytes": 717696, "swordBlasBuildMilliseconds": 0.744600, "torchBlasBytes": 342400, "torchBlasBuildMilliseconds": 0.684100, "productionPropBlasBytes": 26294912, "productionPropBlasBuildMilliseconds": 15.653900},
+  "dielectricDiagnostics": {"availability": "Available", "available": true, "transportOverflowCount": 0, "shadowOverflowCount": 0, "secondaryDielectricRejectCount": 0, "unclosedVolumeCount": 0, "primaryUnclosedVolumeCount": 0, "shadowUnclosedVolumeCount": 0, "productionPaneStackFailureCount": 0, "productionPaneSecondaryOriginCount": 667, "productionPaneSecondaryTerminalCount": 667, "productionPaneSecondarySameMediumCount": 667, "productionPaneSecondaryDifferentMediumCount": 0},
+  "dielectricReasonDiagnostics": {"availability": "Available", "available": true, "secondaryNearSelfHitCount": 0, "primaryOpenMissCount": 0, "primaryOpenOpaqueCount": 0, "primaryMismatchedExitCount": 0, "primaryInterfaceBudgetCount": 0, "primaryVolumeBudgetCount": 0, "shadowOpenMissCount": 0, "shadowMismatchedExitCount": 0, "primaryTirCount": 1513, "primaryInterfaceBudgetOpenVolumeCount": 0, "primaryInterfaceBudgetClosedVolumeCount": 0, "shadowMismatchEmptyCount": 0, "shadowImplicitOriginExitCount": 0, "secondaryDielectricTerminalCount": 667, "primaryTirTerminationCount": 198, "shadowFiniteEndpointVolumeCount": 2796, "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0, "primaryOpenOpaqueAfterTirCount": 0, "primaryOpenOpaqueTerminalInstanceMask": 0, "primaryOpenOpaqueVolumeInstanceMask": 0, "primaryOpenOpaqueTerminalMaterialMask": 0, "primaryClosedVolumeAbsorptionCount": 0, "primaryCertifiedClosedVolumeRecoveryCount": 0, "shadowCertifiedClosedVolumeRecoveryCount": 0, "certifiedClosedVolumeRecoveryReasonMask": 0, "primaryTorchPixelCount": 0, "primarySwordPixelCount": 0, "primaryPlayerPixelCount": 57550, "primaryRewardRingPixelCount": 518, "primaryRewardBodyPixelCount": 19319},
+  "error": null,
+  "captures": [
+    {
+      "id": 214,
+      "checkpoint": "chapter-understory-close",
+      "preset": "finale-roof-open",
+      "zone": "finale",
+      "camera": {"x": -17.700905, "z": 15.206802, "yaw": 1.150000, "pitch": 0.100000},
+      "requestedCamera": {"x": -17.700001, "z": 15.200000, "yaw": 1.150000, "pitch": 0.100000},
+      "state": {"torchFailurePhase": "settled", "selectedEnemy": "lich", "lichPhase": "dead", "finaleSkylightOpenProgress": 1.000000},
+      "width": 960,
+      "height": 540,
+      "rescueTraversal": {"phase":4,"generation":4,"claimCount":1,"deploymentCount":1,"equipmentStowed":false,"ropeHandsActive":false,"bodyStowWitness":false,"plantedPelvisDropMetres":0,"bodyYawRadians":0.136817,"root":[-17.7009,-0.548164,15.2068],"renderedEye":[-17.7009,1.10184,15.2068],"gripNodeIndices":[0.2,0.45],"gripTargets":[[-33.4,2.5625,-14.979],[-33.3999,2.45312,-14.979]],"ropeNodes":[[-33.4,2.65,-14.979],[-33.3999,2.21248,-14.9789],[-33.4002,1.77505,-14.9789],[-33.4007,1.33775,-14.9788],[-33.4011,0.900611,-14.9789],[-33.4005,0.463649,-14.9791],[-33.4007,0.0268801,-14.9794],[-33.4015,-0.409687,-14.9799],[-33.404,-0.846047,-14.9808],[-33.7309,-0.924961,-15.2589],[-33.3104,-0.925,-15.3755],[-32.9119,-0.925,-15.1978]],"publishedLanternHinge":[0.408487,0,0.912764,0,-0.0455813,0.998752,0.0203989,0,-0.911625,-0.0499376,0.407978,0,-17.1943,1.18494,14.7803,1],"publishedLanternBody":[0.408134,0.00748893,0.912891,0,-0.0486444,0.998724,0.0135548,0,-0.911625,-0.0499393,0.407978,0,-17.1283,1.18744,14.8055,1]},
+      "honestlyPresentedRtFrame": true,
+      "completedFrame": {"schema":1,"identity":{"sceneEpoch":2,"measurementGeneration":1,"recordAttemptSerial":12,"recordSerial":12,"submissionSerial":12,"completionSerial":12,"simulationTick":1777,"frameSlot":0},"pipeline":{"executionBackend":"RayTracingPipeline","instrumentation":"diagnostic","dielectricQuality":"high","bundleKey":"diagnostic_high_pair","opaqueFast":{"key":"diagnostic_high_opaque_fast","sha256":"b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"},"genericDielectric":{"key":"diagnostic_high_generic_dielectric","sha256":"28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"},"activeStrategy":"generic-dielectric","activeKey":"diagnostic_high_generic_dielectric","activeSha256":"28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6","waterQuality":"high"},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"shadowQuality":{"mode":"higher","localPrimarySamples":4,"skyPrimarySamples":2,"reserved":0},"fireQuality":{"quality":"High","volumeSteps":10,"reflectionSamples":2,"reflectedVolumeSteps":8},"actualUploadedDustQuality":2,"actualUploadedMistEnabled":true,"fireLighting":{"count":1,"emitters":[{"stableId":1279348308,"positionStrength":[-17.1153183,0.918497562,14.8015814,0.686399996],"colourIntensity":[1,0.426759988,0.0815246254,0.686399996]},{"stableId":0,"positionStrength":[0,0,0,0],"colourIntensity":[0,0,0,0]},{"stableId":0,"positionStrength":[0,0,0,0],"colourIntensity":[0,0,0,0]},{"stableId":0,"positionStrength":[0,0,0,0],"colourIntensity":[0,0,0,0]}]},"resources":{"bufferCount":52,"memoryAllocationCount":63,"bottomLevelAccelerationStructureCount":20,"topLevelAccelerationStructureCount":1,"tlasInstanceCount":28,"pipelineCount":2,"shaderBindingTableCount":2,"descriptorSetCount":1,"hostVisibleBytes":48162352,"deviceLocalBytes":403540608},"player":{"skinCadenceHz":60,"skinUpdateCount":1,"maximumSocketErrorMicrometres":10,"primaryPixelCountAvailable":true,"primaryPixelCount":57550,"primaryVisible":true},"dielectric":{"status":"valid","available":true,"compiled":true,"completedSubmissionSerial":12,"readCount":12,"resetCount":12,"counters":[0,0,0,0,0,0,0,667,667,667,0,0,0,0,0,0,0,0,0,1513,0,0,0,0,667,198,2796,0,0,0,0,0,0,0,0,0,0,0,57550,518,19319],"detail":"Diagnostic counters were collected after the owning fence."},"gpu":{"status":"valid","available":true,"completedSubmissionSerial":12,"wholeRtGpuMs":8.187520,"timestampValidBits":64,"timestampPeriodPicoseconds":1000,"sampleCount":12,"unavailableResultCount":0,"errorCount":0,"detail":"GPU RT command-buffer timing is available."},"stages":{"status":"valid","simulationStepCpuMs":0.000000,"skinCpuMs":0.000000,"playerSkinCpuMs":0.000000,"characterSkinCpuMs":0.000000,"dynamicUploadCpuMs":0.076700,"blasRefitRecordCpuMs":0.041600,"tlasUpdateRecordCpuMs":0.010200,"traceCopyRecordCpuMs":0.042000,"frameFenceWaitCpuMs":9.380000,"imageAcquireCpuMs":0.009800,"queueSubmitCpuMs":0.067800,"presentCallCpuMs":0.163900,"wholeFrameCycleCpuMs":11.936800,"workInvocationCounts":[0,0,0,0,9,1,1,1,1,1,1,1,1],"byteCounts":[0,0,0,0,76048,0,0,0,0,0,0,0,0],"operationCounts":[0,0,0,0,9,0,0,0,1,1,1,1,1]},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":12,"finalIdleCompletion":true},"cpuBenchmarkEligible":true,"benchmarkEligible":true}
+,
+      "indoorDust": {"requestedQuality": 2, "actualUploadedQuality": 2, "cpuWork": {"admittedZones": 0, "generatedMotes": 0, "projectedMotes": 0, "tileReferences": 0, "overflowReferences": 0}},
+      "visibility": {"playerPrimaryVisible": true, "primaryArmsMayBeOutsideFrame": false, "primaryArmsCeilingRetracted": false, "verticalProofPoseWitness": {"supportWorldY": -0.548164, "heightDelta": 0.401836, "supportId": 204, "heldLightKind": 2, "swordStowBlend": 1.000000, "swordHandGripBlend": 0.000000, "torchOverheadLoweringMetres": 0.000000, "torchOverheadRetractionMetres": 0.000000}, "chapterCompanion": {"grounded": false, "walking": false, "position": [-27.699997, 1.450000, -5.800000], "yaw": 0.000000, "animationSeconds": 0.000000, "generation": 1, "keeperDissolve": 0.000000}, "playerWorldBodyInstanceFlags": 9, "instanceMasks": [1, 0, 1, 2, 144, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 32, 1, 1, 64, 1, 0, 1, 1, 54, 1, 1], "diagnostics": {"availability": "Available", "available": true}, "primaryPixels": {"torch": 0, "sword": 0, "player": 57550, "rewardRing": 518, "rewardBody": 19319}, "rewardGrip": {"positionErrorMetres": 0.000000, "orientationErrorRadians": 0.000000, "authorityPositionErrorMetres": 0.000000, "authorityOrientationErrorRadians": 0.000000, "finalGripPosition": [-17.194292, 1.184938, 14.780285], "ringGripPosition": [-17.194292, 1.184938, 14.780285], "bodyPosition": [-17.126341, 1.144809, 14.804653]}},
+      "timing": {"sampleCount": 12, "medianMs": 11.933700, "meanMs": 131.104575},
+      "outputRedBlueSwapAppliedAndNormalised": true,
+      "pixelFormat": "RGBA8",
+      "file": "214-chapter-understory-close.png",
+      "viewmodelGeometry": {"available": true, "space": "model", "source": "cpu-upload", "file": "214-chapter-understory-close.obj", "sha256": "4a0ffd789308000c026db5141869d9d484a878c2d001e3673fd9b8162a6e0228", "finiteVerticesValidated": false, "finiteVertexCount": 0, "faceCount": 0},
+      "playerWorldBodyGeometry": {"available": true, "space": "model", "source": "cpu-upload", "file": "214-chapter-understory-close.player-world-body.obj", "sha256": "07f0ffa1c60bd6f0b6af77526c72b1bd704594e5ac33983e7212367310f06bdd", "finiteVerticesValidated": false, "finiteVertexCount": 0, "faceCount": 0},
+      "pngSha256": "fa39c461408b674857a6cefca3d77f91facdc37ebdac41285ad2cde26d0ffd98"
+    }
+  ]
+}

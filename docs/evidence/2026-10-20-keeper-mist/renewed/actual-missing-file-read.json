@@ -1,0 +1,5 @@
+{
+  "exit": 0,
+  "stdout": "cat: files/reports/environment-survey-keeper20r-read-probe.json: No such file or directory\n",
+  "stderr": ""
+}

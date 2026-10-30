@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "source": "Source in the same commit as this receipt; exact content manifest below",
+  "sourceBase": "9d84eaac9d1b123ec8a6f2d4d16fd63f9a11af53",
+  "receiverSource": "1904c89f33941af8106d523b39bda502ad87de98",
+  "evidenceClass": "synthetic-local-only",
+  "windows": {
+    "testsPassed": 5,
+    "testsFailed": 0,
+    "seconds": 7.32,
+    "applicationBuild": "passed; not launched",
+    "dpi": 120,
+    "physicalInput": "not tested",
+    "osClipboardAndPicker": "not used",
+    "logSha256": "4dbb1bd5fc6cbe07fa4f8c1a3a8f1d8221735728a844754c9f36e1775d7231a2"
+  },
+  "android": {
+    "tests": [
+      {
+        "name": "PublicBenchmarkReportFlowTest",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "StatisticsReportSendControlsTest",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "DeveloperReportFlowTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "PlaytestReportSubmissionTest",
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "BenchmarkSummaryReviewTest",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "CompatibilityReportDialogTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "javaCompile": "passed",
+    "lintErrors": 0,
+    "lintWarnings": 92,
+    "nativeBuild": "Debug arm64-v8a only; passed",
+    "nativeLibraryBytes": 40947616,
+    "nativeLibrarySha256": "3edf68753afd0e37035df7c169c3f019e38c3959c9d224f08168799b17ba55f2",
+    "apkPackaged": false,
+    "installed": false,
+    "logSha256": "74bce2ab551bb748e8fc1a208af49e5731769753dcb428b80bc070343f5700d6",
+    "malformedEscapeRegression": {
+      "before": "demonstrated failure, misclassified published",
+      "after": "ASCII hex only; passes",
+      "failedXmlSha256": "57283dabd8dce97c7d7240e81ad8c8319eeba81b28533a48603ad49e69164621"
+    }
+  },
+  "wireValidation": {
+    "source": "native synthetic fixture only; no network",
+    "backend": "1904c89f33941af8106d523b39bda502ad87de98",
+    "results": [
+      {
+        "name": "synthetic-public-request.json",
+        "bytes": 8718,
+        "sha256": "55441b0413eafe0648c719a68495b902beec50650ba1b374f613140212ad874d",
+        "acceptedByStagedValidator": true
+      },
+      {
+        "name": "synthetic-private-request.json",
+        "bytes": 10239,
+        "sha256": "9001e3fb64bfe3f50f451cd82096b52a6ff2019cbbfff8af5e2b6685345d58df",
+        "acceptedByStagedValidator": true
+      }
+    ]
+  },
+  "image": {
+    "path": "public-send-local-test-800.png",
+    "width": 800,
+    "height": 850,
+    "bytes": 51636,
+    "sha256": "be7894e708b7f029db4dd415c3b244d82b48cadae7f780233746c0a812dd9d41",
+    "scope": "own native window; synthetic receipt; no gameplay"
+  },
+  "ownerFiles": {
+    "checked": 151,
+    "changed": 0
+  },
+  "liveSendEnabled": false,
+  "phoneUsed": false,
+  "hostedReceiverCi": {
+    "run": 40685884210,
+    "source": "1904c89f33941af8106d523b39bda502ad87de98",
+    "state": "jobs not started; account policy restriction",
+    "workflowRetried": false
+  },
+  "inputs": [
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/BenchmarkSummaryReview.java",
+      "sha256": "a919143975be11f64088f4d170ee69a670a4ff4f0319e115232e608983b5eb3d"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/CompatibilityReportDialog.java",
+      "sha256": "13122a165c0052c74636f9b108757a49d0fa2489dae090606a5d47c0c5b62f53"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "sha256": "18ecff7e38f58f74b831766c1b852fb65cca636ec797cfbe0224dc423bdeebf3"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/PlaytestReportSubmission.java",
+      "sha256": "32f0155524297d9641e034c5f7560a76f7a39c84c512105ac631d1ba0b14c9bc"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/StatisticsReportSendControls.java",
+      "sha256": "654614491c044ea6b4d9b408ad10b5bd56147f17f80173195c41f129c3bf11dd"
+    },
+    {
+      "path": "android/app/src/main/res/values/strings.xml",
+      "sha256": "7f2cb461e1e87823cce63986b753b58ebc1c6651335ba2b3dfe8376ac1291afe"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/PublicBenchmarkReportFlowTest.java",
+      "sha256": "a850f41d4442ee944a0481502a90e6343ddaa21b4902c2ef40a56e6d9b0019c8"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/StatisticsReportSendControlsTest.java",
+      "sha256": "575d2390ef1926ec1dd463c0520a15947dda5166628b39b366cff3b57af908e8"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "f390623445504803c9380ecbc110056944c0d0a0fc135d5d76bb32d2686cae2a"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "sha256": "e29a10571423b1a4c5e7160d9280a0b4bad474c5a69fc186cad0e35dc94cc0a8"
+    },
+    {
+      "path": "src/platform/windows/WindowsBenchmarkReviewPayload.h",
+      "sha256": "9f961c86258fd4017f3b1fa9e8dca882cac6e8a3b65900f1e4600c987fcd669a"
+    },
+    {
+      "path": "src/platform/windows/WindowsBenchmarkSummaryReviewUi.inl",
+      "sha256": "bdb7b5ce4c923f682b49b05e346dd91c143866bf7eb94d768535e0e312234283"
+    },
+    {
+      "path": "src/platform/windows/WindowsCompatibilityReport.cpp",
+      "sha256": "38a037e13313ff44296ca73f863cdb43f9be8e8d0c4f0a13fbfe517538708d51"
+    },
+    {
+      "path": "src/platform/windows/WindowsCompatibilityReport.h",
+      "sha256": "0b6aaf71cccdd635105976d64bb3103b5578ec3edfd56d186ea4959996f80734"
+    },
+    {
+      "path": "src/platform/windows/WindowsPlaytestSubmission.cpp",
+      "sha256": "13c126ada84c62b1398e3595ef7b5da12b9b9c3a64f775cba91a912d082a9366"
+    },
+    {
+      "path": "src/platform/windows/WindowsPlaytestSubmission.h",
+      "sha256": "0e46c0971504013961cc10cf6e1e8fb10da803d20a47f02710553621b51be569"
+    },
+    {
+      "path": "src/platform/windows/WindowsStatisticsSubmission.h",
+      "sha256": "c1585d6e9ca7ab45c343678da5df37b3e1a38eaf3e11ba3e9163c78a68ea18cf"
+    },
+    {
+      "path": "src/reporting/DeveloperReportSubmission.cpp",
+      "sha256": "a12a17f990ae90d0c0826839b594e59d683e1fc01d88736aa1458592bc050e6e"
+    },
+    {
+      "path": "src/reporting/DeveloperReportSubmission.h",
+      "sha256": "b48c8dd874836f4f0d9334597fc7190df0e876bdcc242c51cc6f4e6a9a62f7bf"
+    },
+    {
+      "path": "tests/BenchmarkSummaryReportTests.cpp",
+      "sha256": "17363a2ab8b3c208a49f9b981b06942169f6170515e49427371918311a0b1c20"
+    },
+    {
+      "path": "tests/WindowsBenchmarkSummaryInteractionTests.cpp",
+      "sha256": "9f5ff8e2b40c7cc9351f139e2c2f5abc8aea59a744b7ae07e16ac50d6c7d4821"
+    },
+    {
+      "path": "tests/WindowsCompatibilityReportTests.cpp",
+      "sha256": "82b7b0e1215e2941a64c1086a37216c4e97951575433e15ab6fb32b07b482974"
+    }
+  ]
+}

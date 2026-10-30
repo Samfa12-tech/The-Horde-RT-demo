@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "asset": "healing-flask-v1",
+  "status": "candidate-unadmitted",
+  "source": "assets/models/props/source/healing-flask-neck-fit-r2/healing-flask-neck-fit-r2.glb",
+  "sourceSha256": "4a4337e81d98065c050ab896b8b0b61563feeedac55806665d2727ad14555cfa",
+  "sourceBytes": 9292,
+  "metresPerUnit": 1,
+  "coordinateSystem": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "derivation": "Append one FLOAT VEC2 TEXCOORD_0 accessor; no other JSON semantics or existing buffer-view bytes change",
+  "loaderReason": "StaticMeshAsset requires TEXCOORD_0 for every primitive, including untextured PBR",
+  "uv0": "Planar X/Y over stored float32 bounds: ((x-minX)/(maxX-minX), (y-minY)/(maxY-minY)); no texture",
+  "grip": [
+    0.0,
+    0.065,
+    0.0
+  ],
+  "textures": 0,
+  "lights": 0,
+  "provenance": "Original project-authored geometry supplied for Horde; no third-party mesh, image, texture, provider or paid generation. Applicable user/service rights remain unchanged; no blanket MIT, CC0, Meshy or other licence is assigned.",
+  "authoringScript": "tools/author-joint-presentation-assets.py",
+  "acceptance": "Candidate only. Native importer/capacity integration, real RT presentation, lifecycle and owner visual acceptance remain pending; normal enablement stays OFF."
+}

@@ -1,0 +1,535 @@
+{
+  "receiptVersion": 1,
+  "milestoneLabel": "2026-10-18 regional water foundation",
+  "recordedAtUtc": "2026-10-18T06:13:12.537487+00:00",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "headAtDocumentation": "48662cc1cccf1a227408f1969ecb9eaacf68ff31",
+  "identityScope": "Source hashes bind the reviewed working files; HEAD is context, not a claim that these additions are committed or that a final capture build matches them.",
+  "acceptance": {
+    "hostGeometryProximityProfiles": "PASS",
+    "hostActualForestOmissionClosure": "PASS",
+    "readOnlyRendererProtocolReview": "NO_ACTIONABLE_FINDINGS",
+    "rtPresentation": "FIRST_SURVEY_FAILED; POST_FIX_CAPTURE_PENDING",
+    "visualAppearance": "PENDING",
+    "runtimePerformance": "PENDING",
+    "audioListening": "NOT_RUN",
+    "physicalDevice": "NOT_RUN"
+  },
+  "sources": [
+    {
+      "path": "src/scene/ChapterRegionalWater.h",
+      "bytes": 8435,
+      "sha256": "d2de7832ae4b03313b5b692c8f8902a67d1d97d1a7e05607e51edb09d2cac31b"
+    },
+    {
+      "path": "src/vulkan/raytracing/RegionalWaterRenderData.h",
+      "bytes": 4921,
+      "sha256": "c5c9d70247910d047f477b9141f3b56a23f5e28d4f1c149be421c285fadb87d9"
+    },
+    {
+      "path": "src/scene/CorridorRegionalWaterClosure.h",
+      "bytes": 3157,
+      "sha256": "43c26f2f6b957e5ceb65fd59a8d4c6e3f64bea866ae932bac8f77a428824eb1c"
+    },
+    {
+      "path": "src/scene/CorridorStaticDetail.h",
+      "bytes": 2725,
+      "sha256": "ca5e5f2a73f7ab6d3a715133c25412f434bd9aebf637c7645600c655a196d465"
+    },
+    {
+      "path": "src/scene/CorridorStaticDetailFaces.h",
+      "bytes": 4742,
+      "sha256": "433af75a893cd7a0492dcd977e5fb9f588cb6a31447b5a5fd8a7c76766f17881"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.def",
+      "bytes": 10334,
+      "sha256": "2226f3deaaf17ad4f3031b6c148cea3ef396eb21f90ed1156348ba3a5fcf4e0a"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.generated.h",
+      "bytes": 16339,
+      "sha256": "e7f3a672fba1b59fecabcc70605f596228cef2df6d0928f896e1a36c57b4b59c"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+      "bytes": 7849,
+      "sha256": "f4ef574a36e0c83533092b4b0769eb40fa9b7b09fbcebc4e071185876a73e943"
+    },
+    {
+      "path": "shaders/raytracing/include/rt_regional_water_bounds.generated.glsl",
+      "bytes": 673,
+      "sha256": "8f4f269c1c3704f01ff19d4e3d79b7d8c082b76d6fd4e634df26500c0a7a8970"
+    },
+    {
+      "path": "tests/ChapterRegionalWaterTests.cpp",
+      "bytes": 14914,
+      "sha256": "8964e4e43092f2491916774cbd0db04794d0bc0ad58669f63d3945b52f05c0d3"
+    },
+    {
+      "path": "tests/ForestDressingTests.cpp",
+      "bytes": 52921,
+      "sha256": "f4d1c1a1f49de3c6ea697e85a28757d052cdc17bd69da1b0a1426cef62a33541"
+    },
+    {
+      "path": "docs/references/horde-1.7/d37f1638/docs/design/world/dungeons/baseline/shared-coordinate-layout.json",
+      "bytes": 8345,
+      "sha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59"
+    },
+    {
+      "path": "src/vulkan/raytracing/EnvironmentSurveyFrame.h",
+      "bytes": 8722,
+      "sha256": "52fed077c37c64cd7a0c1acc271b581560867eecc570e0271ff5f0e156c5abf3"
+    },
+    {
+      "path": "tests/GraphicsPreviewFrameAdapterTests.cpp",
+      "bytes": 19180,
+      "sha256": "7af104fbee9c75939d84db858d01db28e2cb397853b48ec40ee3e517c510d5bb"
+    }
+  ],
+  "geometry": {
+    "atlasTransform": "X=East+78.3, Y=Up-31.55, Z=126.2-North",
+    "originalAuthorship": "Shared original surface definition follows pinned atlas lake/river and existing RegionalTerrain headwater/outflow; no imported water asset or invented nearby pond.",
+    "lake": {
+      "triangles": 14,
+      "outlineVertices": 16,
+      "areaSquareMetres": 36274,
+      "atlasUpMetres": 0,
+      "engineYMetres": -31.55,
+      "shape": "Concave outline, ear-clipped without a centre fan; original dry west notch retained."
+    },
+    "mainRiverAndHeadwater": {
+      "triangles": 24,
+      "stations": 13,
+      "atlasUpRangeMetres": [
+        0,
+        79
+      ],
+      "engineYRangeMetres": [
+        -31.55,
+        47.45
+      ],
+      "direction": "Headwaters toward lake",
+      "coverageHalfWidthMetres": 5,
+      "widthMeaning": "Finite surface coverage reaches beneath the measured banks; this is not a claim of a uniform 10m wetted channel. Actual opaque terrain intersections determine the visible shore."
+    },
+    "outflow": {
+      "triangles": 4,
+      "stations": 3,
+      "atlasUpRangeMetres": [
+        -1.2,
+        0
+      ],
+      "engineYRangeMetres": [
+        -32.75,
+        -31.55
+      ],
+      "direction": "Away from lake",
+      "coverageHalfWidthMetres": 5,
+      "widthMeaning": "Finite surface coverage reaches beneath the measured banks; this is not a claim of a uniform 10m wetted channel. Actual opaque terrain intersections determine the visible shore."
+    },
+    "fixedTriangleCap": 42,
+    "renderVertexCount": 126,
+    "proximity": "Euclidean 3D distance to actual finite triangles and edges, rejecting nonfinite/negative inputs. Query does not enable frog playback or establish visibility.",
+    "boundBodies": [
+      "lake",
+      "main river including headwaters",
+      "outflow"
+    ],
+    "generatedBounds": "Deterministic --shader-bounds stdout exactly compared by host fixture with generated GLSL include.",
+    "bankAcceptance": "r23 source/native conformance accepted at 48662cc1. Wider finite coverage remains subject to actual shoreline visual/device/performance gates and finite sample limits; the prior 3 m cut-edge failure remains historical."
+  },
+  "abi": {
+    "binding": 27,
+    "prefixBytes": 16,
+    "metadataOffsetBytes": 16,
+    "surfaceArrayOffsetBytes": 32,
+    "surfaceRecordBytes": 112,
+    "surfaceRecordCount": 42,
+    "totalRequestedSsboBytes": 4736,
+    "additionalRequestedSsboBytes": 4720,
+    "recordFields": [
+      "aAlong",
+      "bAlong",
+      "cAlong",
+      "aFlow",
+      "bFlow",
+      "cFlow",
+      "normalKind"
+    ],
+    "along": "XYZ positions plus continuous cumulative downstream metres; lake along values zero, standing phase derives from world coordinates.",
+    "flow": "XZ direction, signed coverage-bank coordinate +/-5 m, authored phase speed 0.45 m/s; not fluid simulation.",
+    "normal": "Unit upward geometric normal of each graded triangle; kind 0 lake / 1 channel.",
+    "frameWrites": "Existing per-frame ripple upload writes only the original 16-byte prefix; static profiles remain unchanged."
+  },
+  "requestedGeometryBytes": {
+    "addedTriangles": 42,
+    "addedVertexBytes": 1512,
+    "addedUint32IndexBytes": 504,
+    "addedSurfaceCodeBytes": 168,
+    "scope": "Requested geometry/upload payload bytes, not actual Vulkan allocation, BLAS build memory, scratch memory, frame time or measured GPU cost.",
+    "actualBlasAllocationCost": "PENDING_CAPTURE"
+  },
+  "closure": {
+    "requiredExistingCertificate": "DetailForestReceiverEnvelopeBlocked(actualOmittedBounds)",
+    "actualOmittedTriangleCount": 84219,
+    "waterFaces": 42,
+    "continuousLowerBound": "Per-triangle AABB distance, downward-rounded arithmetic, strictly greater than 30.04 metres",
+    "identity": "all actual water float32 vertex bits and order must match shared canonical data; actual forest registry bits/regions/count checked",
+    "queryReachMetres": 30.04,
+    "originalOpaqueWitnessTriangles": 10,
+    "originalImmutableTriangleCount": 2036,
+    "runtimeIntegrationReview": "Renderer extracts appended BLAS vertex/index faces and validates corresponding codes; admission passes actual regionalWaterFaces_ span. Prior report integrationPending was resolved by root before read-only review.",
+    "preservedContracts": "Existing source/owner/generation/opaque-face/60Hz/mask/identity guards remain required. No claim that all water is invisible, no new south-wall witness and no disabled omission optimisation."
+  },
+  "hostValidation": {
+    "buildTool": "Visual Studio Build Tools bundled CMake 3.31; MSVC host presets",
+    "buildCommandTemplate": "cmake --build --preset windows-x64-{debug|release} --target horde_rt_chapter_regional_water_tests horde_rt_forest_dressing_tests horde_rt_graphics_preview_frame_adapter_tests --parallel 2",
+    "ctestCommandTemplate": "ctest --test-dir build/presets/windows-x64-{debug|release} -C {Debug|Release} -R \"^(horde_rt_chapter_regional_water_tests|horde_rt_forest_dressing_tests|horde_rt_graphics_preview_frame_adapter_tests)$\" --output-on-failure",
+    "results": {
+      "Debug": {
+        "selectedTests": 3,
+        "passed": 3,
+        "seconds": 15.24
+      },
+      "Release": {
+        "selectedTests": 3,
+        "passed": 3,
+        "seconds": 3.96
+      },
+      "geometryAssertions": 3047,
+      "adapterAssertions": "Boolean contract fixture; assertion count not instrumented; exit 0 in both configurations."
+    },
+    "scope": "Geometry/proximity/generated bounds, finite profile data, flow direction/shared-vertex phase continuity, normal planes, disabled payload, exact actual packed forest omission count/regions/source float bits and conservative analytic closure. Elapsed seconds are test runtime, not game performance. Current geometry uses 5m coverage half-width; adapter fixture reproduces camera-only Grip failure and validates coherent render-only rebase. This focused target does not compile the Windows application or establish Android integration.",
+    "executables": [
+      {
+        "path": "build/presets/windows-x64-debug/Debug/horde_rt_chapter_regional_water_tests.exe",
+        "bytes": 2534912,
+        "sha256": "36f3421d308d56add15c06e1c572c0928ac2229a47a11d5623887ab0525da948"
+      },
+      {
+        "path": "build/presets/windows-x64-debug/Debug/horde_rt_forest_dressing_tests.exe",
+        "bytes": 4553728,
+        "sha256": "13bcfc6134c9423c3d1b7f7cc0f5f02665c482c85e4ebbb5a3c92a51a1b30377"
+      },
+      {
+        "path": "build/presets/windows-x64-debug/Debug/horde_rt_graphics_preview_frame_adapter_tests.exe",
+        "bytes": 4003328,
+        "sha256": "9ea445a8f0a9ad6a224bb84c19fb38c08fe5b397362657e0af6a231c04edbb73"
+      },
+      {
+        "path": "build/presets/windows-x64-release/Release/horde_rt_chapter_regional_water_tests.exe",
+        "bytes": 313856,
+        "sha256": "1f0519a63ab4fcc6718173b0a4202d5741c27324d643cefe947da502b71af3db"
+      },
+      {
+        "path": "build/presets/windows-x64-release/Release/horde_rt_forest_dressing_tests.exe",
+        "bytes": 865792,
+        "sha256": "9ec9215f447b4ed6badf089a4a916e8fb0c75390ad2401aae6f7416115ce1a80"
+      },
+      {
+        "path": "build/presets/windows-x64-release/Release/horde_rt_graphics_preview_frame_adapter_tests.exe",
+        "bytes": 413696,
+        "sha256": "a2f806e496845ecb4174a9caff5618e584c94a285267431e7fea39a10b75b7d0"
+      }
+    ],
+    "runtimeTerrainAtTest": {
+      "source": "r22",
+      "sha256": "12c0c577a67c5fc8e88fe0528a9eaa5b2ec950ba409bbffe969560b7c54ee060",
+      "scope": "The earlier focused geometry/forest/adapter matrix predates r23. Separate r23 receipts establish its source/native acceptance; the matrix is not relabelled as a new r23 run."
+    }
+  },
+  "preservedTrials": [
+    {
+      "trial": "Initial geometry fixture",
+      "result": "2 failed checks before closure additions",
+      "cause": "Generated bounds include did not exist yet; purported dry-notch coordinate was actually inside original lake polygon.",
+      "resolution": "Root generated exact shared include; corrected notch sample to atlas (-15,-275). Later 3040-check Debug/Release geometry/profile fixture passed; final expanded fixture has 3047 checks."
+    },
+    {
+      "scope": "initial strengthened negative fixture",
+      "result": "Both Debug and Release geometry fixture had 1 of 3047 failures; forest fixture passed",
+      "reason": "Far-X synthetic omission box already failed existing certificate, so could not demonstrate new distance guard independently",
+      "correction": "Near-lake synthetic box passes existing certificate but is rejected by new distance guard; final reruns passed"
+    },
+    {
+      "scope": "discarded broader retained-wall extraction investigation",
+      "result": "Temporary standalone extraction compile failed from missing source includes; not used as evidence",
+      "reason": "Parent accepted smaller distance closure; no full-water visibility proof claimed"
+    },
+    {
+      "trial": "Broad all-water retained-cell visibility proposal",
+      "result": "REJECTED; not admitted as a certificate",
+      "cause": "An actual river target can leave the east X portal while inside cell Y/Z; north/south/roof/floor first-exit coverage cannot prove all water hidden.",
+      "resolution": "Use bounded-distance closure with original source-prism certificate instead; no shipping deliberately failing or unused proof helper."
+    },
+    {
+      "trial": "Initial host regeneration using SDK CMake 3.22",
+      "result": "Configure failed: No preprocessor test for Comeau",
+      "cause": "Mixed CMake module/cache/tool versions.",
+      "resolution": "Used matching VS bundled CMake 3.31; focused Debug/Release builds and checks passed."
+    },
+    {
+      "trial": "Prior 3m surface coverage at actual r22 bend banks",
+      "result": "FAILED_SHORE_COVERAGE; earlier host geometry/profile/closure checks remain historical host passes only",
+      "measurements": "Surface edge approx 3.028m from centre; measured dry bank contacts 3.899m / 4.327m, leaving approx 0.87m / 1.30m of submerged bed uncovered.",
+      "resolution": "Root changed finite coverage half-width to5; 42 faces/datums unchanged, generated bounds refreshed. Bank-crest source and visual gates still pending."
+    },
+    {
+      "trial": "First hidden Windows survey baseline",
+      "result": "FAILED_FIRST_FRAME; no accepted RT frame/PNG",
+      "report": "reports/regional-water-runtime-b1/environment-survey.json",
+      "error": "Final composed player item Grip exceeded position/orientation tolerance: left=196.034180m/1.570796rad right=0.000000m/0.000000rad.",
+      "cause": "Survey camera/support override followed frame adaptation but left held-item world transforms at the frozen simulation pose.",
+      "resolution": "Shared coherent rebase plus host regression tests; post-fix app/RT acceptance pending. No gate bypass or simulation staging."
+    },
+    {
+      "trial": "Initial sandbox focused adapter build",
+      "result": "Stalled after MSBuild banner; cancelled own invocation without claiming a compile result.",
+      "resolution": "Authorized normal build runtime succeeded; final Debug/Release matrix passed."
+    }
+  ],
+  "localSupportingReports": [
+    {
+      "path": "reports/corridor-water-proof-2026-10-18/validation.json",
+      "sha256": "b50eaab0f2995ecc046d8e6f5e3066050f41e6739b18742f206c53174a4f1878",
+      "note": "Preserved local compact proof receipt. Its integrationPending text is historical; renderer actual-face extraction has since been reviewed."
+    },
+    {
+      "path": "reports/corridor-water-proof-2026-10-18/extract.cpp",
+      "note": "Discarded larger standalone wall extraction experiment; compile failure from missing includes. Not shipped or used as proof."
+    },
+    {
+      "path": "reports/regional-water-foundation-host-debug.log",
+      "bytes": 2029,
+      "sha256": "95213602ca006f6238e5d634f43249fcb9d37172f6b6bf8472af9e509502ed3e",
+      "scope": "Current half-width5 focused host evidence"
+    },
+    {
+      "path": "reports/regional-water-foundation-ctest-debug.log",
+      "bytes": 794,
+      "sha256": "ce52ac379f872122676cb447a7c597d13d88b3190342430030e6bc2f213caa67",
+      "scope": "Current half-width5 focused host evidence"
+    },
+    {
+      "path": "reports/regional-water-foundation-host-release.log",
+      "bytes": 2212,
+      "sha256": "83097cebb060fc188f7e791f8fe908ffa3ba5d33d85b3cd6867c91beec913cbe",
+      "scope": "Current half-width5 focused host evidence"
+    },
+    {
+      "path": "reports/regional-water-foundation-ctest-release.log",
+      "bytes": 798,
+      "sha256": "bab574a6499aae1e72cbdd54688d61aa5b4ea11b99baa24f082ccacd6ef2b266",
+      "scope": "Current half-width5 focused host evidence"
+    }
+  ],
+  "relatedTerrainEvidence": {
+    "path": "assets/models/world/source/chapter-terrain-r23/README.md",
+    "runtimeGlbSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+    "scope": "Separate source-conformance/native-intake lane. This subagent did not independently resample the actual exported GLB water depth; see source receipts for finite sample limits and preserved failed shore/budget/seam trials.",
+    "pendingFollowup": "r23 source/native gates now PASS: source 12/12, regional 5/5, unchanged-limit intake, native support 2,781 queries / 616 sweeps / zero failures and glTF zero errors / zero warnings. Actual RT shoreline appearance/device/performance acceptance remain separate.",
+    "r22Path": "assets/models/world/source/chapter-terrain-r22/README.md",
+    "bankReceipt": "assets/models/world/source/chapter-terrain-r23/bank-conformance-receipt.json",
+    "historicalR22RuntimeGlbSha256": "12c0c577a67c5fc8e88fe0528a9eaa5b2ec950ba409bbffe969560b7c54ee060",
+    "acceptedCommit": "48662cc1cccf1a227408f1969ecb9eaacf68ff31"
+  },
+  "pendingRootAppend": [
+    "Exact final shader-bank/source hashes and build receipts",
+    "Actual RT captures and visual inspection",
+    "Baseline/candidate game frame cost and actual RT geometry/allocation cost",
+    "Any listening or device acceptance",
+    "Matching post-fix survey app identity and separate shoreline visual/device/performance evidence"
+  ],
+  "noActions": [
+    "No device interaction, app installation, owner save access, new repository/worktree, downloads, paid generation, public push, merge or release in these host/proof tasks."
+  ],
+  "historicalSnapshots": [
+    {
+      "scope": "Prior 3m coverage half-width host snapshot; host pass did not establish shoreline coverage",
+      "geometry": {
+        "atlasTransform": "X=East+78.3, Y=Up-31.55, Z=126.2-North",
+        "originalAuthorship": "Shared original surface definition follows pinned atlas lake/river and existing RegionalTerrain headwater/outflow; no imported water asset or invented nearby pond.",
+        "lake": {
+          "triangles": 14,
+          "outlineVertices": 16,
+          "areaSquareMetres": 36274,
+          "atlasUpMetres": 0,
+          "engineYMetres": -31.55,
+          "shape": "Concave outline, ear-clipped without a centre fan; original dry west notch retained."
+        },
+        "mainRiverAndHeadwater": {
+          "triangles": 24,
+          "stations": 13,
+          "atlasUpRangeMetres": [
+            0,
+            79
+          ],
+          "engineYRangeMetres": [
+            -31.55,
+            47.45
+          ],
+          "direction": "Headwaters toward lake",
+          "coverageHalfWidthMetres": 5,
+          "widthMeaning": "Finite surface coverage reaches beneath the measured banks; this is not a claim of a uniform 10m wetted channel. Actual opaque terrain intersections determine the visible shore."
+        },
+        "outflow": {
+          "triangles": 4,
+          "stations": 3,
+          "atlasUpRangeMetres": [
+            -1.2,
+            0
+          ],
+          "engineYRangeMetres": [
+            -32.75,
+            -31.55
+          ],
+          "direction": "Away from lake",
+          "coverageHalfWidthMetres": 5,
+          "widthMeaning": "Finite surface coverage reaches beneath the measured banks; this is not a claim of a uniform 10m wetted channel. Actual opaque terrain intersections determine the visible shore."
+        },
+        "fixedTriangleCap": 42,
+        "renderVertexCount": 126,
+        "proximity": "Euclidean 3D distance to actual finite triangles and edges, rejecting nonfinite/negative inputs. Query does not enable frog playback or establish visibility.",
+        "boundBodies": [
+          "lake",
+          "main river including headwaters",
+          "outflow"
+        ],
+        "generatedBounds": "Deterministic --shader-bounds stdout exactly compared by host fixture with generated GLSL include.",
+        "bankAcceptance": "Prior 3m coverage was insufficient at measured r22 bend cross-sections. Wider surface coverage is host-checked only; r23 bank-crest/source and visual acceptance remain pending."
+      },
+      "sourceIdentities": [
+        {
+          "path": "src/scene/ChapterRegionalWater.h",
+          "bytes": 8230,
+          "sha256": "19b4a8acc19e6851c65e92b33513de36693d856333699b3e07d615ff69c7aaca"
+        },
+        {
+          "path": "src/vulkan/raytracing/RegionalWaterRenderData.h",
+          "bytes": 4921,
+          "sha256": "c5c9d70247910d047f477b9141f3b56a23f5e28d4f1c149be421c285fadb87d9"
+        },
+        {
+          "path": "src/scene/CorridorRegionalWaterClosure.h",
+          "bytes": 3157,
+          "sha256": "43c26f2f6b957e5ceb65fd59a8d4c6e3f64bea866ae932bac8f77a428824eb1c"
+        },
+        {
+          "path": "tests/ChapterRegionalWaterTests.cpp",
+          "bytes": 14821,
+          "sha256": "2d2b6055fda530b3fee507b0f55a1dd7b189975d57dfa9b1377ea129ac010bba"
+        }
+      ],
+      "hostResults": {
+        "Debug": {
+          "selectedTests": 2,
+          "passed": 2,
+          "seconds": 10.48
+        },
+        "Release": {
+          "selectedTests": 2,
+          "passed": 2,
+          "seconds": 1.41
+        },
+        "geometryAssertions": 3047
+      }
+    }
+  ],
+  "renderOnlySurveyRebase": {
+    "header": "src/vulkan/raytracing/EnvironmentSurveyFrame.h",
+    "api": "bool RebaseEnvironmentSurveyFrame(RtSceneFrameInputs&, const EnvironmentSurveyPose&, std::string&)",
+    "poseFields": [
+      "x",
+      "z",
+      "supportY",
+      "yaw",
+      "pitch",
+      "timeSeconds"
+    ],
+    "policy": "Pure copy/commit render-only adaptation; stationary settled snapshots only. Destination pitch outside [-.32,.28], nonfinite data, traversal or in-flight equipment transitions reject without mutation.",
+    "moved": "Attached player hand/body item matrices, matching local held-light/fire transforms and motion history, carried lantern hinge/body/history. Hand attachments use exact production view basis; body stow uses yaw/height basis.",
+    "preserved": "GameSimulation and published progression/ticks, local kinematics/IK/animation and crouch, detached/world items/lights, actors, world release anchors and contact effects. Flame-local lean remains local. Existing renderer Grip validators are unchanged.",
+    "tested": [
+      "Fresh ordinary production snapshot has coherent source Grip",
+      "Old distant camera-only override exceeds 100m Grip error",
+      "Rebased distant support/yaw/pitch frame restores <1mm item Grip/socket agreement",
+      "Stowed sword retains grounded yaw/height policy without camera-pitch rotation",
+      "Local IK and frozen simulation/progression remain unchanged",
+      "Only matching player fire and carried lantern transforms/history move; world/dropped lights remain fixed",
+      "Rigid round trip and reject/no-mutation including late nonfinite fire history"
+    ],
+    "integration": "Windows override calls shared helper; Android owner consumes the same API separately. Actual post-fix RT/app acceptance pending."
+  },
+  "priorCompiledReleaseValidation": {
+    "result": "14/14 PASS in 82.81 seconds",
+    "report": {
+      "path": "reports/regional-water-final-release-validation.json",
+      "bytes": 5286,
+      "sha256": "e9843b33dd8e723ed5399b5e050b8a98c10b1bd17e1d033037c1fbdb4a6a4989"
+    },
+    "scope": "ABI, selectors, exact provider-object containment and ownership checks ran against the catalog identities in that prior receipt. They were not rerun or relabelled after the look2 appearance regeneration."
+  },
+  "postAppearanceRegenerationIdentity": {
+    "phase": "look2 frozen width5 banks",
+    "status": "PASS",
+    "variantsChecked": 16,
+    "catalogCheck": "Existing GenerateRtPipelineVariantCatalog.ps1 -Check PASS",
+    "checked": "Raw SPIR-V SHA/count/magic, canonical include SHA, all recorded shader dependency hashes, exact generated catalog enum/policy/metadata rows; no shader recompile.",
+    "files": [
+      {
+        "path": "src/vulkan/raytracing/RtSceneAbi.def",
+        "bytes": 10334,
+        "sha256": "2226f3deaaf17ad4f3031b6c148cea3ef396eb21f90ed1156348ba3a5fcf4e0a"
+      },
+      {
+        "path": "src/vulkan/raytracing/RtSceneAbi.generated.h",
+        "bytes": 16339,
+        "sha256": "e7f3a672fba1b59fecabcc70605f596228cef2df6d0928f896e1a36c57b4b59c"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+        "bytes": 7849,
+        "sha256": "f4ef574a36e0c83533092b4b0769eb40fa9b7b09fbcebc4e071185876a73e943"
+      },
+      {
+        "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+        "bytes": 4575,
+        "sha256": "5e0ddb44337114fc162eac8fdd6bb5b5b1ab4c53c348a3d00f28338ef345e63c"
+      },
+      {
+        "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+        "bytes": 4820,
+        "sha256": "508019e135daaca52b29886adbec865823400b45171e1b9edb1f9364e0e47ab7"
+      },
+      {
+        "path": "tools/raygen-variant-catalog.json",
+        "bytes": 39062,
+        "sha256": "ba8cab1bd22e0a2f75c0d16cb0cecd4a2c0e13c90959ec585659295f7eea97e3"
+      },
+      {
+        "path": "tools/rayquery-variant-catalog.json",
+        "bytes": 43742,
+        "sha256": "53e949f6571b91974cc3c24ddaf0034961f680cb5ea6d3b0024fb1969a0c20e2"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_regional_water_bounds.generated.glsl",
+        "bytes": 673,
+        "sha256": "8f4f269c1c3704f01ff19d4e3d79b7d8c082b76d6fd4e634df26500c0a7a8970"
+      }
+    ],
+    "reports": [
+      {
+        "path": "reports/regional-water-look2-abi-catalog-hashes.json",
+        "bytes": 5672,
+        "sha256": "2dbc036e9262cd6c66d947bc2d5beca7a2d8997d004419d6341d9a878d2645a7"
+      },
+      {
+        "path": "reports/regional-water-look2-catalog-check.log",
+        "bytes": 42,
+        "sha256": "7ad4629a61d1463cefde8a750dcf8a06e758943016b13e879fe398ed4d7548ce"
+      }
+    ],
+    "scope": "Latest source/artifact identity evidence only. Separate from earlier compiled host tests and from root runtime/visual/build evidence."
+  }
+}

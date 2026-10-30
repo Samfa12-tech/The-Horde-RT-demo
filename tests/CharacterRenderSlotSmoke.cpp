@@ -4,13 +4,21 @@
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include "platform/android/AndroidRtLabState.h"
+#include "platform/windows/WindowsCaptureContracts.h"
+#include "KeeperLowerBodyWitnesses.h"
+#include "scene/TriangleDissolve.h"
+#include "CompiledShaderContracts.h"
+#include "gameplay/effects/KeeperCastPresentation.h"
 
 #include <cmath>
 #include <atomic>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -97,6 +105,18 @@ std::size_t CountOccurrences(const std::string& text, const std::string_view nee
         position += needle.size();
     }
     return count;
+}
+
+bool HasCoherentAndroidTuning(const std::string& renderFrame,const std::string& routeReset)
+{
+    return renderFrame.find(
+        "const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = context.environmentSurvey\n"
+        "            ? horde::vulkan::raytracing::RtSceneTuning{} : gRtLabState.Snapshot();") != std::string::npos &&
+        CountOccurrences(renderFrame,"gRtLabState.Snapshot()") == 1u &&
+        renderFrame.find("simulationInput.waterfallWidthScale = rtLabTuning.waterfallWidthScale;") != std::string::npos &&
+        renderFrame.find("rtLabTuning, context.graphicsSettings.shadowQuality);") != std::string::npos &&
+        renderFrame.find("                    rtLabTuning);") != std::string::npos &&
+        CountOccurrences(routeReset,"gRtLabState.Reset();") == 1u;
 }
 
 } // namespace
@@ -232,17 +252,34 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kBlasCount == 20u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 26u &&
-                      kRtInstanceMetadataCapacity == 24u &&
-                      kRtStaticAssetCapacity == 12u &&
+    ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 23u &&
+                      PresentableTinyRtScene::kBlasCount == 25u &&
+                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 31u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 107u &&
+                      kRtInstanceMetadataCapacity == 30u &&
+                      kRtStaticAssetCapacity == 15u &&
+                      kRtPrimitiveMetadataCapacity == 38u && kRtMaterialCapacity == 34u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&
                       PresentableTinyRtScene::kPlayerTorchInstanceIndex == 22u &&
+                      kPlayerWorldBodyInstanceIndex == 4u &&
+                      kPlayerViewmodelInstanceIndex == 20u &&
                       PresentableTinyRtScene::kPlayerSwordScabbardMetadataIndex == 23u &&
-                      PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex == 25u,
-                  "new scabbard metadata23/TLAS25 and static asset12 fit fixed capacities while preserving viewmodel20/collapse21/player torch22 and Keeper TLAS aliases23/24");
+                      PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex == 25u &&
+                      PresentableTinyRtScene::kWaterDropletMetadataIndex == 24u &&
+                      PresentableTinyRtScene::kWaterDropletInstanceIndex == 26u &&
+                      PresentableTinyRtScene::kKeeperMetadataIndex == 25u &&
+                      PresentableTinyRtScene::kKeeperInstanceIndex == 27u &&
+                      PresentableTinyRtScene::kAttackWarningMetadataIndex == 28u &&
+                      PresentableTinyRtScene::kAttackWarningInstanceIndex == 28u &&
+                      PresentableTinyRtScene::kHealingFlaskMetadataIndex == 29u &&
+                      PresentableTinyRtScene::kHealingFlaskInstanceIndex == 29u &&
+                      PresentableTinyRtScene::kHealingFlaskUpgradeInstanceIndex == 30u,
+                  "joint ring28/flask29 plus physical pickup30 preserve Keeper27 and every previous metadata/TLAS owner");
+    ok &= Require(PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 64u == 95u &&
+                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 76u == 107u,
+                  "forest placement definitions follow the thirty-one-role physical prefix and fit both bounded populations");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =
@@ -384,7 +421,246 @@ int main()
         interactions::ChestRewardPhase::LanternClaimed;
     simulationSnapshot.lanternPendulum.forwardAngleRadians = 0.37f;
     simulationSnapshot.rewardLanternWorldFromHinge[12] = -12.5f;
+    simulationSnapshot.waterContact.stepCount = 19u;
+    simulationSnapshot.waterContact.droplets[3].active = true;
+    simulationSnapshot.waterContact.droplets[3].position = {-2.1f, 0.4f, -15.0f};
+    simulationSnapshot.waterContact.ripples[1].active = true;
+    simulationSnapshot.waterContact.ripples[1].strength = 0.72f;
     const RtSceneFrameInputs adaptedFrame = BuildRtSceneFrameInputs(simulationSnapshot, 0.75f);
+    ok &= Require(std::none_of(adaptedFrame.skeletonPoseBlends.begin(), adaptedFrame.skeletonPoseBlends.end(),
+                              [](const auto& blend) { return blend.has_value(); }),
+                  "ordinary shared adapter must not enable skeleton clip blending");
+    {
+        using RevivalPhase = simulation::SkeletonRevivalPhase;
+        constexpr float deadDuration = 2.9666666984558105f;
+        constexpr float standDuration = 1.5f;
+        constexpr auto standClip = static_cast<horde::scene::SkinnedClip>(4u);
+        auto source = simulationSnapshot;
+        source.enemyRoster.selectedEnemy = EnemyKind::Lich;
+        source.enemyRoster.renderedEnemyCount = source.enemyRoster.renderedEnemyCapacity = 1u;
+        source.enemyRoster.renderedEnemies[0] = EnemyKind::Lich;
+        source.skeletonRevivalDeadDurationSeconds = deadDuration;
+        source.skeletonRevivalStandDurationSeconds = standDuration;
+        source.skeletonRevival.phase = RevivalPhase::Signal;
+        for (auto& actor : source.skeletonEnemies) {
+            actor.health = 0; actor.dead = true;
+            actor.animation = EnemyAnimation::Dead; actor.action = EnemyCombatAction::Dead;
+            actor.animationTime = 7.f; actor.idlePhaseSeconds = .73f;
+            actor.forceCurrentCombatPose = true;
+        }
+        const auto noBlend = [](const RtSceneFrameInputs& frame) {
+            return std::none_of(frame.skeletonPoseBlends.begin(), frame.skeletonPoseBlends.end(),
+                                [](const auto& request) { return request.has_value(); });
+        };
+        const auto adapt = [&] {
+            std::array<std::byte, sizeof(source)> retained{};
+            std::memcpy(retained.data(), &source, sizeof(source));
+            const auto frame = BuildRtSceneFrameInputs(source, .75f);
+            ok &= Require(std::memcmp(retained.data(), &source, sizeof(source)) == 0,
+                          "revival presentation must not mutate the authoritative snapshot");
+            ok &= Require(frame.skeletonEnemyCount == source.skeletonEnemyCount &&
+                          frame.roster.selectedEnemy == source.enemyRoster.selectedEnemy &&
+                          frame.roster.renderedEnemyCount == source.enemyRoster.renderedEnemyCount &&
+                          frame.roster.renderedEnemyCapacity == source.enemyRoster.renderedEnemyCapacity &&
+                          frame.roster.renderedEnemies == source.enemyRoster.renderedEnemies &&
+                          frame.cameraX == source.playerX && frame.cameraZ == source.playerZ &&
+                          frame.cameraYaw == source.playerYawRadians && frame.cameraPitch == source.playerPitchRadians &&
+                          frame.playerAnimation == source.playerAnimation,
+                          "revival presentation must preserve actor count, roster and player ownership");
+            for (std::size_t i = 0; i < source.skeletonEnemies.size(); ++i) {
+                const auto& a = source.skeletonEnemies[i]; const auto& b = frame.skeletonEnemies[i];
+                ok &= Require(a.id == b.id && a.x == b.x && a.z == b.z && a.worldY == b.worldY &&
+                              a.facingRadians == b.facingRadians && a.health == b.health && a.dead == b.dead,
+                              "revival render copy must retain stable IDs, roots, facing and dead/health authority");
+            }
+            for (std::size_t i = 0; i < source.heldItems.size(); ++i) {
+                const auto& a = source.heldItems[i]; const auto& b = frame.heldItems[i];
+                ok &= Require(a.id == b.id && a.hand == b.hand && a.parentMode == b.parentMode &&
+                              a.worldFromItem == b.worldFromItem && a.worldFromDetach == b.worldFromDetach &&
+                              a.visualStowBlend == b.visualStowBlend && a.visualGripBlend == b.visualGripBlend &&
+                              a.detachTick == b.detachTick && a.detached == b.detached,
+                              "revival presentation must not change retained player gear");
+            }
+            return frame;
+        };
+        const auto disabled = adapt();
+        ok &= Require(noBlend(disabled) &&
+                      std::memcmp(disabled.skeletonEnemies.data(), source.skeletonEnemies.data(),
+                                  sizeof(source.skeletonEnemies)) == 0,
+                      "disabled revival must retain the exact original actor render inputs");
+        source.skeletonRevival.enabled = true;
+        source.skeletonRevival.phase = RevivalPhase::Practice;
+        const auto notAdmittedPractice = adapt();
+        ok &= Require(noBlend(notAdmittedPractice) &&
+                      std::memcmp(notAdmittedPractice.skeletonEnemies.data(), source.skeletonEnemies.data(),
+                                  sizeof(source.skeletonEnemies)) == 0,
+                      "not-ready practice must remain the ordinary presentation");
+        source.skeletonRevival.phase = RevivalPhase::Signal;
+        const auto notReady = adapt();
+        CharacterRenderSlot admissionGate;
+        std::string admissionError;
+        ok &= Require(notReady.skeletonPoseBlends[0] &&
+                      !std::isfinite(notReady.skeletonPoseBlends[0]->timeSeconds) &&
+                      !admissionGate.CacheFramePlan(notReady.skeletonEnemies, notReady.skeletonEnemyCount,
+                          notReady.roster, notReady.lich, admissionError, notReady.skeletonPoseBlends) &&
+                      admissionError.find("finite") != std::string::npos,
+                      "active not-ready revival must reject before upload rather than drop to an ordinary corpse");
+        source.skeletonRevivalPresentationReady = true;
+        const auto signal = adapt();
+        ok &= Require(noBlend(signal) && signal.skeletonEnemies[0].animationTime == deadDuration &&
+                      signal.skeletonEnemies[1].animationTime == deadDuration &&
+                      !signal.skeletonEnemies[0].forceCurrentCombatPose,
+                      "signal must hold the exact settled Dead endpoint without a force-refresh pulse");
+        source.skeletonRevival.phase = RevivalPhase::Rising;
+        source.skeletonRevival.phaseSeconds = 0.f;
+        const auto risingStart = adapt();
+        ok &= Require(noBlend(risingStart) && risingStart.skeletonEnemies[0].animationTime == deadDuration,
+                      "reverse Dead must begin at its exact authored endpoint");
+        auto previous = risingStart;
+        unsigned reverseRefreshes = 1u;
+        for (unsigned tick = 1u; tick < 178u; ++tick) {
+            source.skeletonRevival.phaseSeconds = float(tick) / 60.f;
+            const auto current = adapt();
+            const float requested = current.skeletonEnemies[0].animationTime;
+            const float last = previous.skeletonEnemies[0].animationTime;
+            const bool refresh = CharacterPoseNeedsRefresh(
+                int(horde::scene::SkinnedClip::Dead), requested,
+                int(horde::scene::SkinnedClip::Dead), last, 1.f / 30.f);
+            ok &= Require(noBlend(current) && refresh == ((tick % 2u) == 0u),
+                          "60 Hz reverse clock must preserve paired 30 Hz render-cache times");
+            reverseRefreshes += refresh ? 1u : 0u;
+            previous = current;
+        }
+        ok &= Require(reverseRefreshes == 89u, "reverse Dead unexpectedly doubled pose work to 60 Hz");
+        source.skeletonRevival.phaseSeconds = deadDuration;
+        const auto standStart = adapt();
+        ok &= Require(standStart.skeletonPoseBlends[0] &&
+                      standStart.skeletonPoseBlends[0]->clip == standClip &&
+                      standStart.skeletonPoseBlends[0]->timeSeconds == 0.f &&
+                      standStart.skeletonPoseBlends[0]->weight == 1.f &&
+                      standStart.skeletonEnemies[0].animationTime == 0.f,
+                      "Dead0 must join the existing explicit stand binding at its exact start");
+        previous = standStart;
+        unsigned standRefreshes = 1u;
+        for (unsigned tick = 1u; tick <= 90u; ++tick) {
+            source.skeletonRevival.phaseSeconds = deadDuration + float(tick) / 60.f;
+            const auto current = adapt();
+            const auto& requested = current.skeletonPoseBlends[0];
+            const auto& last = previous.skeletonPoseBlends[0];
+            const bool refresh = requested && last && CharacterPoseNeedsRefresh(
+                int(horde::scene::SkinnedClip::Dead), 0.f,
+                int(horde::scene::SkinnedClip::Dead), 0.f, 1.f / 30.f, false, &*requested, &*last);
+            ok &= Require(requested && current.skeletonPoseBlends[1] &&
+                          requested->timeSeconds == current.skeletonPoseBlends[1]->timeSeconds &&
+                          refresh == ((tick % 2u) == 0u),
+                          "60 Hz stand clock must retain shared paired 30 Hz blend identities");
+            standRefreshes += refresh ? 1u : 0u;
+            previous = current;
+        }
+        ok &= Require(standRefreshes == 46u && previous.skeletonPoseBlends[0] &&
+                      previous.skeletonPoseBlends[0]->timeSeconds == standDuration,
+                      "stand rendering must retain its exact endpoint without 60 Hz refresh identities");
+        const auto frozen = adapt();
+        ok &= Require(frozen.skeletonPoseBlends[0] && previous.skeletonPoseBlends[0] &&
+                      frozen.skeletonPoseBlends[0]->timeSeconds == previous.skeletonPoseBlends[0]->timeSeconds,
+                      "a frozen source phase must preserve the same render request");
+        source.skeletonRevival.phase = RevivalPhase::Rearming;
+        source.skeletonRevival.phaseSeconds = .25f;
+        const auto rearming = adapt();
+        const auto rearmPlan = EvaluateCharacterFramePlan(rearming.skeletonEnemies,
+            rearming.skeletonEnemyCount, rearming.roster, rearming.lich, deadDuration,
+            rearming.skeletonPoseBlends);
+        ok &= Require(noBlend(rearming) && rearmPlan.skeletonCount == 2u && rearmPlan.lichVisible &&
+                      rearmPlan.skeletons[0].clip == horde::scene::SkinnedClip::Idle &&
+                      rearmPlan.skeletons[1].clip == horde::scene::SkinnedClip::Idle &&
+                      rearmPlan.skeletons[0].time == 0.f && rearmPlan.skeletons[1].time == 0.f,
+                      "rearming must show both dead actors at Idle0 without B's inherited phase seed, even with Keeper selected");
+        for (const float bad : {0.f, -1.f, std::numeric_limits<float>::quiet_NaN(),
+                                std::numeric_limits<float>::infinity()}) {
+            source.skeletonRevivalStandDurationSeconds = bad;
+            const auto malformed = adapt();
+            ok &= Require(!admissionGate.CacheFramePlan(malformed.skeletonEnemies, malformed.skeletonEnemyCount,
+                              malformed.roster, malformed.lich, admissionError, malformed.skeletonPoseBlends),
+                          "malformed admitted timing must reuse finite-blend rejection, not silently render a fallback");
+        }
+        source.skeletonRevivalStandDurationSeconds = standDuration;
+        for (const float bad : {0.f, -1.f, std::numeric_limits<float>::quiet_NaN(),
+                                std::numeric_limits<float>::infinity()}) {
+            source.skeletonRevivalDeadDurationSeconds = bad;
+            const auto malformed = adapt();
+            ok &= Require(!admissionGate.CacheFramePlan(malformed.skeletonEnemies, malformed.skeletonEnemyCount,
+                              malformed.roster, malformed.lich, admissionError, malformed.skeletonPoseBlends),
+                          "malformed Dead duration must reject before any skin/upload");
+        }
+        source.skeletonRevivalDeadDurationSeconds = deadDuration;
+        for (const float bad : {-1.f, std::numeric_limits<float>::quiet_NaN(),
+                                std::numeric_limits<float>::infinity()}) {
+            source.skeletonRevival.phaseSeconds = bad;
+            const auto malformed = adapt();
+            ok &= Require(!admissionGate.CacheFramePlan(malformed.skeletonEnemies, malformed.skeletonEnemyCount,
+                              malformed.roster, malformed.lich, admissionError, malformed.skeletonPoseBlends),
+                          "malformed active phase clock must reject rather than silently clamp");
+        }
+        source.skeletonRevival.phaseSeconds = 0.f;
+        source.skeletonRevival.phase = RevivalPhase::Live;
+        const auto live = adapt();
+        ok &= Require(noBlend(live) &&
+                      std::memcmp(live.skeletonEnemies.data(), source.skeletonEnemies.data(),
+                                  sizeof(source.skeletonEnemies)) == 0,
+                      "live/default rendering must return to the exact authoritative actor inputs");
+    }
+    auto rescueExteriorSnapshot = simulationSnapshot;
+    rescueExteriorSnapshot.developmentRescueJourney = true;
+    rescueExteriorSnapshot.rescue.exteriorSide = true;
+    rescueExteriorSnapshot.enemyRoster.selectedEnemy = EnemyKind::Skeleton;
+    const RtSceneFrameInputs rescueExteriorFrame =
+        BuildRtSceneFrameInputs(rescueExteriorSnapshot, 0.75f);
+    ok &= Require(rescueExteriorFrame.skeletonEnemyCount == 2u &&
+                  rescueExteriorFrame.skeletonEnemies[0].id == rescueExteriorSnapshot.skeletonEnemies[0].id &&
+                  rescueExteriorFrame.skeletonEnemies[0].x == rescueExteriorSnapshot.skeletonEnemies[0].x &&
+                  rescueExteriorFrame.skeletonEnemies[1].id == rescueExteriorSnapshot.skeletonEnemies[1].id &&
+                  rescueExteriorFrame.skeletonEnemies[1].x == rescueExteriorSnapshot.skeletonEnemies[1].x &&
+                  rescueExteriorFrame.roster.selectedEnemy == EnemyKind::Lich,
+                  "rescue exterior Keeper selection replaced or dropped the original waterfall skeleton snapshots");
+    ok &= Require(Near(adaptedFrame.tuning.fogDensityScale, 1.f) &&
+                  Near(rescueExteriorFrame.tuning.fogDensityScale, .004f),
+                  "chapter woodland retains distant detail while historical non-chapter tuning remains unchanged");
+    auto chapterInterior = rescueExteriorSnapshot;
+    chapterInterior.rescue.exteriorSide = false;
+    const auto chapterInteriorFrame = BuildRtSceneFrameInputs(chapterInterior, .75f);
+    ok &= Require(Near(chapterInteriorFrame.tuning.fogDensityScale, 0.f) &&
+                  chapterInteriorFrame.lich.roomMistDensityScale == chapterInterior.lich.roomMistDensityScale,
+                  "chapter tomb removes global distance fog without changing authoritative Keeper mist clearing");
+    RtSceneTuning fogOverride;fogOverride.fogDensityScale=2.f;
+    ok &= Require(Near(BuildRtSceneFrameInputs(rescueExteriorSnapshot,.75f,fogOverride).tuning.fogDensityScale,.008f),
+                  "woodland environment preserves the explicit RT Lab density multiplier");
+    auto ropeFog=simulationSnapshot;ropeFog.developmentRescueJourney=true;
+    ropeFog.rescue.phase=traversal::Phase::Ascent;
+    ropeFog.playerSupportWorldY=-.95f;
+    ok &= Require(Near(BuildRtSceneFrameInputs(ropeFog,.75f).tuning.fogDensityScale,0.f),
+                  "lower rope approach remains at the indoor atmosphere");
+    ropeFog.playerSupportWorldY=.70f;
+    const float ascendingFog=BuildRtSceneFrameInputs(ropeFog,.75f).tuning.fogDensityScale;
+    ropeFog.rescue.phase=traversal::Phase::Descent;ropeFog.rescue.exteriorSide=true;
+    const float descendingFog=BuildRtSceneFrameInputs(ropeFog,.75f).tuning.fogDensityScale;
+    ok &= Require(ascendingFog>0.f && ascendingFog<.004f && Near(ascendingFog,descendingFog),
+                  "both rope directions blend atmosphere from the same physical eye position");
+    ropeFog.playerSupportWorldY=2.05f;
+    ok &= Require(Near(BuildRtSceneFrameInputs(ropeFog,.75f).tuning.fogDensityScale,.004f),
+                  "upper rope handoff has reached the woodland atmosphere before release");
+    ropeFog.playerSupportWorldY=-.95f;ropeFog.rescue.phase=traversal::Phase::LowerSafe;
+    ropeFog.rescue.exteriorSide=false;
+    ok &= Require(Near(BuildRtSceneFrameInputs(ropeFog,.75f).tuning.fogDensityScale,0.f) &&
+                  ropeFog.tickIndex==simulationSnapshot.tickIndex,
+                  "return/reconstruction restore indoor atmosphere without renderer state or simulation mutation");
+    ok &= Require(adaptedFrame.waterContact.stepCount == simulationSnapshot.waterContact.stepCount &&
+                  adaptedFrame.waterContact.droplets[3].active &&
+                  adaptedFrame.waterContact.droplets[3].position[0] == -2.1f &&
+                  adaptedFrame.waterContact.droplets[3].position[1] == 0.4f &&
+                  adaptedFrame.waterContact.droplets[3].position[2] == -15.0f &&
+                  adaptedFrame.waterContact.ripples[1].active &&
+                  adaptedFrame.waterContact.ripples[1].strength == 0.72f,
+                  "frame adapter preserves authoritative water contact snapshot");
     ok &= Require(adaptedFrame.playerAnimation == simulationSnapshot.playerAnimation,
                   "simulation adapter must copy authoritative player animation without platform logic");
     ok &= Require(adaptedFrame.interaction == simulationSnapshot.interaction &&
@@ -528,7 +804,7 @@ int main()
     lich.hitRecoil = 0.0f;
     lich.animationTime = 3.25f;
     const CharacterFramePlan lichPlan = EvaluateCharacterFramePlan(skeletons, 0u, roster, lich, 2.967f);
-    ok &= Require(lichPlan.selectedLich && lichPlan.lichClip == horde::scene::SkinnedClip::Idle,
+    ok &= Require(lichPlan.lichVisible && lichPlan.lichClip == horde::scene::SkinnedClip::Idle,
                   "living lich selection or clip changed");
     ok &= Require(Near(lichPlan.lichTime, 3.25f), "lich animation time changed");
     ok &= Require(Near(lichPlan.lichTransform.matrix[0][3], -32.2f) &&
@@ -539,6 +815,86 @@ int main()
     ok &= Require(EvaluateCharacterFramePlan(skeletons, 0u, roster, lich, 2.967f).lichClip == horde::scene::SkinnedClip::Dead,
                   "lich death clip mapping changed");
 
+    auto keeperSnapshots = skeletons;
+    keeperSnapshots[0].dead = true;
+    keeperSnapshots[0].animation = EnemyAnimation::Dead;
+    keeperSnapshots[1].action = EnemyCombatAction::AttackWindup;
+    const CharacterFramePlan concurrentPlan = EvaluateCharacterFramePlan(
+        keeperSnapshots, keeperSnapshots.size(), roster, lich, 2.967f);
+    ok &= Require(concurrentPlan.lichVisible && concurrentPlan.skeletonCount == 2u &&
+                  concurrentPlan.skeletonPoseBucketCount == 2u,
+                  "Keeper selection dropped one or both retained skeleton snapshots");
+    ok &= Require(concurrentPlan.skeletons[0].clip == horde::scene::SkeletonClip::Dead &&
+                  concurrentPlan.skeletons[1].clip != horde::scene::SkeletonClip::Dead,
+                  "Keeper overlap did not preserve the waterfall corpse pose independently from the surviving skeleton");
+    EnemyRosterSnapshot backtrackRoster = roster;
+    backtrackRoster.selectedEnemy = EnemyKind::Skeleton;
+    const CharacterFramePlan backtrackPlan = EvaluateCharacterFramePlan(
+        keeperSnapshots, keeperSnapshots.size(), backtrackRoster, lich, 2.967f);
+    ok &= Require(backtrackPlan.lichVisible && backtrackPlan.skeletonCount == 2u &&
+                  backtrackPlan.lichClip == horde::scene::SkinnedClip::Dead,
+                  "backtracking to the waterfall hid the Keeper corpse or either skeleton snapshot");
+    {
+        auto chapterKeeper = lich;
+        chapterKeeper.deathAnimationComplete = true;
+        chapterKeeper.deathDissolveProgress = .5f;
+        const auto dissolving = EvaluateCharacterFramePlan(
+            keeperSnapshots, keeperSnapshots.size(), backtrackRoster, chapterKeeper, 2.967f);
+        ok &= Require(dissolving.lichVisible && dissolving.lichDissolveProgress == .5f &&
+                      dissolving.skeletonCount == 2u,
+                      "chapter dissolve must retain the full independent skeleton roster");
+        chapterKeeper.deathDissolveProgress = 1.0f;
+        const auto retired = EvaluateCharacterFramePlan(
+            keeperSnapshots, keeperSnapshots.size(), roster, chapterKeeper, 2.967f);
+        ok &= Require(!retired.lichVisible && retired.skeletonCount == 2u &&
+                      retired.skeletons[0].clip == horde::scene::SkeletonClip::Dead,
+                      "completed chapter death cannot be resurrected by Keeper roster selection");
+        chapterKeeper.deathAnimationComplete = false;
+        ok &= Require(EvaluateCharacterFramePlan(keeperSnapshots, keeperSnapshots.size(), roster,
+                      chapterKeeper, 2.967f).lichVisible,
+                      "retirement cannot skip the authoritative death animation");
+
+        std::array<horde::scene::TexturedSkinnedRtVertex, 6> original{};
+        for (std::size_t i=0; i<original.size(); ++i) {
+            original[i].position[0] = static_cast<float>(i%3);
+            original[i].position[1] = i%3 == 1u ? 2.0f : 0.0f;
+            original[i].position[2] = static_cast<float>(i/3);
+            original[i].normal[2] = 1.0f; original[i].texcoord[0] = static_cast<float>(i);
+        }
+        auto zero = original;
+        ok &= Require(horde::scene::ApplyTriangleDissolve(std::span(zero), 0.0f) &&
+                      std::memcmp(zero.data(), original.data(), sizeof(original)) == 0,
+                      "zero dissolve must preserve exact legacy skinned bytes");
+        auto invalid = original;
+        ok &= Require(!horde::scene::ApplyTriangleDissolve(std::span(invalid).first(5), .5f) &&
+                      std::memcmp(invalid.data(), original.data(), sizeof(original)) == 0 &&
+                      !horde::scene::ApplyTriangleDissolve(std::span(invalid), NAN),
+                      "invalid dissolve input must be rejected before modifying geometry");
+        float previousExtent = 100.0f;
+        for (int step=0; step<=24; ++step) {
+            auto sample = original;
+            auto repeat = original;
+            const float progress = static_cast<float>(step)/24.0f;
+            ok &= Require(horde::scene::ApplyTriangleDissolve(std::span(sample), progress) &&
+                          horde::scene::ApplyTriangleDissolve(std::span(repeat), progress) &&
+                          std::memcmp(sample.data(), repeat.data(), sizeof(sample)) == 0,
+                          "bounded dissolve must be deterministic without a render-time clock");
+            float extent = 0.0f;
+            for (std::size_t i=0; i<sample.size(); ++i) {
+                extent += std::abs(sample[i].position[0]-1.0f);
+                ok &= Require(sample[i].position[0]>=0 && sample[i].position[0]<=2 &&
+                              sample[i].position[1]>=0 && sample[i].position[1]<=2 &&
+                              sample[i].position[2]==original[i].position[2] &&
+                              std::memcmp(sample[i].normal,original[i].normal,sizeof(sample[i].normal))==0 &&
+                              std::memcmp(sample[i].texcoord,original[i].texcoord,sizeof(sample[i].texcoord))==0,
+                              "dissolve must remain inside source triangles without changing normals/UVs");
+            }
+            ok &= Require(extent<=previousExtent,"dissolve cannot re-expand or resurrect geometry");
+            previousExtent=extent;
+        }
+        ok &= Require(previousExtent==0,"completed triangles collapse to their own centres");
+    }
+
     constexpr float interval = 1.0f / 30.0f;
     ok &= Require(CharacterPoseNeedsRefresh(1, 1.0f, -1, -1.0f), "first pose must refresh");
     ok &= Require(!CharacterPoseNeedsRefresh(1, 1.0f + interval * 0.5f, 1, 1.0f),
@@ -547,6 +903,11 @@ int main()
                   "pose did not refresh at the 30 Hz boundary");
     ok &= Require(CharacterPoseNeedsRefresh(2, 1.0f, 1, 1.0f), "clip change did not refresh");
     ok &= Require(CharacterPoseNeedsRefresh(1, 0.5f, 1, 1.0f), "time rewind did not refresh");
+    ok &= Require(CharacterPoseNeedsRefresh(1, 1.0f + interval * 0.25f, 1, 1.0f,
+                                          interval, true),
+                  "contact proof must skin the current published combat pose below the ordinary interval");
+    ok &= Require(!CharacterPoseNeedsRefresh(1, 1.0f, 1, 1.0f, interval, true),
+                  "repeated presentation of the same combat pose must not force another skin/refit");
 
     {
         CharacterRenderSlot slot;
@@ -561,6 +922,21 @@ int main()
         slot.SkeletonGpu(0u).accelerationStructure.address = 101u;
         slot.SkeletonGpu(1u).accelerationStructure.address = 202u;
         slot.LichGpu().accelerationStructure.address = 303u;
+        const auto initialKeeper = slot.BuildActiveInstances()[2];
+        ok &= Require(initialKeeper.instanceCustomIndex == 25u && initialKeeper.mask == 0u &&
+                      initialKeeper.accelerationStructureReference == 303u &&
+                      HasInvertibleLinearTransform(initialKeeper.transform),
+                      "initial dormant Keeper owner requires its real BLAS and an invertible transform");
+        CharacterRenderSlot dormantSlot;
+        dormantSlot.LichGpu().accelerationStructure.address = 303u;
+        EnemyRosterSnapshot dormantRoster;
+        dormantRoster.selectedEnemy = EnemyKind::Skeleton;
+        LichSnapshot dormantLich;
+        ok &= Require(dormantSlot.CacheFramePlan({}, 0u, dormantRoster, dormantLich, diagnostic), diagnostic.c_str());
+        const auto nextDormantKeeper = dormantSlot.BuildActiveInstances()[2];
+        ok &= Require(!RequiresTlasInstanceRebuild(
+            std::span(&initialKeeper, 1u), std::span(&nextDormantKeeper, 1u)),
+            "first dormant snapshot must not invent a third-lane definition change");
         EnemyRosterSnapshot skeletonRoster = roster;
         skeletonRoster.selectedEnemy = EnemyKind::Skeleton;
         skeletons[1] = skeletons[0];
@@ -582,15 +958,29 @@ int main()
                       splitInstances[1].accelerationStructureReference == 202u,
                       "divergent second skeleton did not select pose one BLAS and shader route");
         invalidRoster.selectedEnemy = EnemyKind::Lich;
-        ok &= Require(slot.CacheFramePlan(skeletons, 0u, invalidRoster, lich, diagnostic), diagnostic.c_str());
+        ok &= Require(slot.CacheFramePlan(skeletons, skeletons.size(), invalidRoster, lich, diagnostic), diagnostic.c_str());
         const auto lichInstances = slot.BuildActiveInstances();
-        ok &= Require(lichInstances[0].accelerationStructureReference == 303u &&
-                      lichInstances[0].mask == 0x01u && lichInstances[1].mask == 0u,
-                      "singular lich route populated the second character slot");
-        ok &= Require(HasInvertibleLinearTransform(lichInstances[0].transform) &&
-                      HasInvertibleLinearTransform(lichInstances[1].transform),
-                      "singular lich route emitted a non-invertible masked TLAS transform");
+        ok &= Require(lichInstances[0].accelerationStructureReference == 101u &&
+                      lichInstances[1].accelerationStructureReference == 202u &&
+                      lichInstances[2].accelerationStructureReference == 303u &&
+                      lichInstances[0].mask == 0x01u && lichInstances[1].mask == 0x01u &&
+                      lichInstances[2].mask == 0x01u &&
+                      lichInstances[0].instanceCustomIndex == CharacterRenderSlot::kTlasInstanceIndex &&
+                      lichInstances[1].instanceCustomIndex == CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex &&
+                      lichInstances[2].instanceCustomIndex == 25u,
+                      "Keeper selection did not preserve both skeleton BLAS owners and route the Keeper through dedicated identity25");
+        ok &= Require(Near(lichInstances[0].transform.matrix[0][3], skeletons[0].x) &&
+                      Near(lichInstances[1].transform.matrix[0][3], skeletons[1].x) &&
+                      Near(lichInstances[2].transform.matrix[0][3], lich.x),
+                      "concurrent character TLAS transforms did not follow each independent snapshot");
         skeletonRoster.selectedEnemy = EnemyKind::Skeleton;
+        ok &= Require(slot.CacheFramePlan(skeletons, skeletons.size(), skeletonRoster, lich, diagnostic), diagnostic.c_str());
+        const auto backtrackInstances = slot.BuildActiveInstances();
+        ok &= Require(backtrackInstances[0].mask == 0x01u && backtrackInstances[1].mask == 0x01u &&
+                      backtrackInstances[2].mask == 0x01u &&
+                      backtrackInstances[2].instanceCustomIndex == CharacterRenderSlot::kKeeperMetadataIndex,
+                      "backtracking to Skeleton selection dropped the active Keeper corpse TLAS owner");
+        lich.phase = LichPhase::Dormant;
         ok &= Require(slot.CacheFramePlan(skeletons, 1u, skeletonRoster, lich, diagnostic), diagnostic.c_str());
         const auto oneSkeletonInstances = slot.BuildActiveInstances();
         ok &= Require(oneSkeletonInstances[1].mask == 0u &&
@@ -601,8 +991,10 @@ int main()
         ok &= Require(noSkeletonInstances[0].mask == 0u && noSkeletonInstances[1].mask == 0u &&
                       noSkeletonInstances[0].instanceCustomIndex == 2u &&
                       noSkeletonInstances[1].instanceCustomIndex == 18u &&
+                      noSkeletonInstances[2].mask == 0u && noSkeletonInstances[2].instanceCustomIndex == 25u &&
                       HasInvertibleLinearTransform(noSkeletonInstances[0].transform) &&
-                      HasInvertibleLinearTransform(noSkeletonInstances[1].transform),
+                      HasInvertibleLinearTransform(noSkeletonInstances[1].transform) &&
+                      HasInvertibleLinearTransform(noSkeletonInstances[2].transform),
                       "empty skeleton route did not preserve masked TLAS transforms and custom indices");
     }
 
@@ -682,6 +1074,15 @@ int main()
                       hitDecodeSource.find("precise vec3 surfacePosition = objectToWorld * localPosition +") != std::string::npos &&
                       hitDecodeSource.find("h.position = surfacePosition;") != std::string::npos,
                       "transmitting triangle hits must reconstruct the geometric surface point before spawning dielectric rays");
+        ok &= Require(hitDecodeSource.find("const int kKeeperInstanceMetadataIndex = 25;") != std::string::npos &&
+                      hitDecodeSource.find("instance == 2 || instance == 18 || instance == kKeeperInstanceMetadataIndex") != std::string::npos &&
+                      hitDecodeSource.find("h.instance == 2 || h.instance == 18 || h.instance == kKeeperInstanceMetadataIndex") != std::string::npos &&
+                      hitDecodeSource.find("instance == 2 && controls.enemyKind > 0.5") == std::string::npos,
+                      "shared pipeline/query hit decode must keep the Keeper identity distinct from both skeleton pose routes");
+        ok &= Require(sceneSource.find("instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];") != std::string::npos &&
+                      sceneSource.find("instances[CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex] = characterInstances[1];") != std::string::npos &&
+                      sceneSource.find("instances[kKeeperInstanceIndex] = characterInstances[2];") != std::string::npos,
+                      "the fixed RT scene must retain both skeleton owners and append the dedicated Keeper TLAS owner");
         const std::size_t shadowStart = lightingSource.find("vec3 boundedShadowTransmittanceMask(");
         const std::size_t shadowEnd = lightingSource.find("float visibilityMask(", shadowStart);
         const std::string selectedShadow = shadowStart != std::string::npos &&
@@ -760,18 +1161,31 @@ int main()
             "SurfaceUp = 0u", "SurfaceDown = 1u", "SurfaceRight = 2u",
             "SurfaceLeft = 3u", "SurfaceForward = 4u", "SurfaceBack = 5u",
         }};
-        constexpr std::array<const char*, 6u> shaderNormalAbi{{
-            "if (normalCode == 0u) return vec3(0.0, 1.0, 0.0);",
-            "if (normalCode == 1u) return vec3(0.0, -1.0, 0.0);",
-            "if (normalCode == 2u) return vec3(1.0, 0.0, 0.0);",
-            "if (normalCode == 3u) return vec3(-1.0, 0.0, 0.0);",
-            "if (normalCode == 4u) return vec3(0.0, 0.0, 1.0);",
-            "if (normalCode == 5u) return vec3(0.0, 0.0, -1.0);",
+        namespace shaderContracts=horde::tests::shader_contracts;
+        const auto normalSourceBound=[](const std::string& source) {
+            return source.find(shaderContracts::kNormalSource) != std::string::npos;
+        };
+        ok &= Require(normalSourceBound(hitDecodeSource),
+                      "normal ABI fixture must execute the current production shader source, not stale compiled arithmetic");
+        auto wrongNormal=std::string(shaderContracts::kNormalSource);
+        const auto normalBody=wrongNormal.find('{');
+        if(normalBody!=std::string::npos)wrongNormal.insert(normalBody+1,"return vec3(0.0,0.0,0.0);");
+        ok &= Require(normalBody!=std::string::npos && !normalSourceBound(wrongNormal),
+                      "normal source binding must reject a changed decoder before rebuild");
+        constexpr std::array<std::array<float,3>,6u> shaderNormalAbi{{
+            {{0,1,0}},{{0,-1,0}},{{1,0,0}},{{-1,0,0}},{{0,0,1}},{{0,0,-1}}
         }};
         for (std::size_t normal = 0u; normal < cpuNormalAbi.size(); ++normal)
+        {
+            // Material/upper metadata bits must not change the signed-axis ABI.
+            const auto decoded=shaderContracts::normalForSurfaceCode(
+                0xabc0005au | (static_cast<std::uint32_t>(normal)<<8u));
             ok &= Require(sceneSource.find(cpuNormalAbi[normal]) != std::string::npos &&
-                          hitDecodeSource.find(shaderNormalAbi[normal]) != std::string::npos,
+                          Near(decoded.x,shaderNormalAbi[normal][0]) &&
+                          Near(decoded.y,shaderNormalAbi[normal][1]) &&
+                          Near(decoded.z,shaderNormalAbi[normal][2]),
                           "CPU/GLSL world normal codes must retain their signed-axis agreement");
+        }
         constexpr std::array<const char*, 11u> cpuMaterialAbi{{
             "SurfaceDryStone = 0u", "SurfaceWetCobble = 1u", "SurfaceMossyStone = 2u",
             "SurfaceDampGround = 3u", "SurfaceAgedMetal = 4u", "SurfaceFlame = 5u",
@@ -795,13 +1209,22 @@ int main()
                       sceneSource.find("addWaterfallQuad") != std::string::npos &&
                       sceneSource.find("worldSurfaceCodes.size() != sceneIndexCount / 3u") != std::string::npos &&
                       sceneSource.find("waterStreams.size() == 3u") != std::string::npos &&
-                      sceneSource.find("falling water streams must retain real ten-centimetre air gaps") != std::string::npos,
+                      sceneSource.find("falling water streams must retain real ten-centimetre air gaps") != std::string::npos &&
+                      sceneSource.find("waterScale.crossLane") != std::string::npos &&
+                      hitDecodeSource.find("-15.26 + (-15.44 + 15.26) * widthScale") != std::string::npos &&
+                      hitDecodeSource.find("0.065 * widthScale") != std::string::npos,
                       "world water must use separated metadata-backed geometry and retain the triangle-code contract");
-        ok &= Require(sceneSource.find("roundedCatchmentRim") != std::string::npos &&
-                      sceneSource.find("addWorldTriangle(waterImpactCentre") != std::string::npos &&
-                      sceneSource.find("runoffDrainLipX = -5.30f") != std::string::npos &&
+        ok &= Require(sceneSource.find("WaterSurfaceTriangles()") != std::string::npos &&
+                      sceneSource.find("addWorldTriangle(Vertex{{triangle[0][0]") != std::string::npos &&
                       sceneSource.find("-5.16f, -1.035f") == std::string::npos,
-                      "floor water must use a rounded catchment and remain visible through the drain lip");
+                      "floor water rendering must use the same contact triangle source and preserve its drain separation");
+        ok &= Require(raygenSource.find("rtWaterContactRipple.value") != std::string::npos &&
+                      raygenSource.find("bool runoff = abs(n.y) > 0.65;") != std::string::npos &&
+                      raygenSource.find("(runoff ? 1.0 : 0.0)") != std::string::npos &&
+                      raygenSource.find("angularWarp") == std::string::npos &&
+                      sceneSource.find("kRtBindingWaterContactRipple") != std::string::npos &&
+                      sceneSource.find("MakeWaterContactRippleGpu(frame.waterContact)") != std::string::npos,
+                      "one bounded contact ripple must drive only horizontal water hit normals through the owned binding27 buffer");
         ok &= Require(raygenSource.find("const int kMaterialWater = 10;") != std::string::npos &&
                       raygenSource.find("bool isThinWater") != std::string::npos &&
                       raygenSource.find("material == kMaterialClearGlass") != std::string::npos &&
@@ -905,8 +1328,8 @@ int main()
                       lightingSource.find("return clamp(int(rtQualityControls.value.controls.y), 1, 4);") != std::string::npos &&
                       lightingSource.find("return clamp(int(rtQualityControls.value.controls.y), 1, 2);") != std::string::npos &&
                       lightingSource.find("return clamp(int(rtQualityControls.value.controls.z), 1, 2);") != std::string::npos &&
-                      lightingSource.find("if (rtQualityControls.value.controls.x == 0u) return vec3(0.0);") != std::string::npos,
-                      "independent shadow controls must retain bounded real RGB visibility, normalized weights, hard Lower and one-ray secondary receivers");
+                      lightingSource.find("rtQualityControls.value.controls.x == 0u") == std::string::npos,
+                      "independent shadow controls must retain bounded real RGB visibility, normalized weights, no retired Lower branch and one-ray secondary receivers");
         ok &= Require(raygenSource.find("waterSheetCoverage") == std::string::npos &&
                       raygenSource.find("bool waterStreamExit") != std::string::npos &&
                       raygenSource.find("controls.waterQuality < 0.5") != std::string::npos &&
@@ -1134,8 +1557,12 @@ int main()
                       androidBridgeSource.find("shadowCertifiedClosedVolumeRecoveryCount") != std::string::npos &&
                       androidBridgeSource.find("certifiedClosedVolumeRecoveryReasonMask") != std::string::npos,
                       "CPU and platform diagnostics must retain route and production-pane failure attribution");
-        ok &= Require(waterPrimary.find("transmittedHit.t += h.t + waterPathLength;") !=
+        ok &= Require(waterPrimary.find(shaderContracts::kWaterDistanceStatement) !=
                           std::string::npos &&
+                      Near(shaderContracts::WaterCameraPath(2.0f,4.0f,.006f,false),6.006f) &&
+                      Near(shaderContracts::WaterCameraPath(2.0f,4.0f,5.0f,false),11.0f) &&
+                      Near(shaderContracts::WaterCameraPath(5.0f,4.0f,5.0f,true),9.0f) &&
+                      Near(shaderContracts::WaterCameraPath(5.0f,0.0f,5.0f,true),5.0f) &&
                       waterPrimary.find("float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;") !=
                           std::string::npos &&
                       waterPrimary.find("reflectedHit.t += h.t;") != std::string::npos &&
@@ -1143,6 +1570,14 @@ int main()
                       waterPrimary.find("min(reflectedHit.hit ? reflectedHit.t : 12.0, 12.0)") ==
                           std::string::npos,
                       "secondary water hits must preserve accumulated camera-path distance for fog and distance lighting");
+        auto doubleWater=waterPrimary;
+        const auto distanceStatement=doubleWater.find(shaderContracts::kWaterDistanceStatement);
+        if(distanceStatement!=std::string::npos)
+            doubleWater.replace(distanceStatement,shaderContracts::kWaterDistanceStatement.size(),
+                "transmittedHit.t += h.t + waterPathLength;");
+        ok &= Require(distanceStatement!=std::string::npos &&
+                      doubleWater.find(shaderContracts::kWaterDistanceStatement)==std::string::npos,
+                      "water source binding must reject restoring regional bed-distance double counting");
         const std::size_t opaqueSecondaryBegin = raygenSource.find("vec3 shadeOpaqueSecondary(");
         const std::size_t opaqueSecondaryEnd =
             raygenSource.find("vec3 shadeThinWater", opaqueSecondaryBegin);
@@ -1314,11 +1749,21 @@ int main()
                       windowsSource.find("IsCaptureSwordFullyStowed(simulation.heldItems[1])") != std::string::npos &&
                       windowsSource.find("instanceMasks[4] != 0x10u") != std::string::npos &&
                       windowsSource.find("instanceMasks[10] != 0x04u") != std::string::npos &&
-                      windowsSource.find("record.primaryTorchPixels != 0u") != std::string::npos &&
+                      windowsSource.find("ClaimedTorchPrimaryOwnershipValid(") != std::string::npos &&
+                      windowsSource.find("record.primaryTorchPixels, record.instanceMasks[1],") != std::string::npos &&
                       windowsSource.find("DiagnosticsAvailability()") != std::string::npos &&
                       androidBridgeSource.find("diagnosticsAvailability") != std::string::npos &&
                       windowsSource.find("rewardGripPositionErrorMetres") != std::string::npos,
                       "capture evidence must qualify diagnostic pixels by availability while retaining masks and final reward GripRing contact");
+        using horde::platform::windows::ClaimedTorchPrimaryOwnershipValid;
+        ok &= Require(ClaimedTorchPrimaryOwnershipValid(0u,0u,0u,0u,0u) &&
+                      !ClaimedTorchPrimaryOwnershipValid(7u,0u,0u,0u,0u) &&
+                      ClaimedTorchPrimaryOwnershipValid(7u,0u,0u,0x01u,0u) &&
+                      ClaimedTorchPrimaryOwnershipValid(7u,0u,0u,0u,0x01u) &&
+                      !ClaimedTorchPrimaryOwnershipValid(7u,0x02u,0u,0x01u,0u) &&
+                      !ClaimedTorchPrimaryOwnershipValid(7u,0u,0x02u,0u,0x01u) &&
+                      !ClaimedTorchPrimaryOwnershipValid(7u,0u,0u,0x02u,0x02u),
+                      "claimed capture retains raw legacy pixels, requires a real world alias and rejects either hand-torch owner");
         ok &= Require(simulationSource.find("SynchronizePausedInput") != std::string::npos &&
                       simulationSource.find("pendingToggleHeldLightPoseCommands_ = 0u") != std::string::npos &&
                       androidBridgeSource.find("RequestLifecyclePauseSynchronizationLocked") != std::string::npos &&
@@ -1359,7 +1804,7 @@ int main()
                     androidPauseSyncEnd - androidPauseSyncBegin)
                 : std::string{};
         const std::size_t androidCaptureBegin =
-            androidBridgeSource.find("void ApplyCaptureCheckpoint(");
+            androidBridgeSource.find("bool ApplyCaptureCheckpoint(");
         const std::size_t androidCaptureEnd =
             androidBridgeSource.find("void ApplyRouteReplay(", androidCaptureBegin);
         const std::string androidCapture =
@@ -1577,11 +2022,29 @@ int main()
                       androidBridgeSource.find("ProductionGameSimulationConfig()") !=
                           std::string::npos,
                       "Android gameplay/reward/glass must use the accepted production route and shared anatomical profile");
+        const auto androidRouteReset=androidFunctionSource(
+            "Java_com_samfa12_hordelanternrt_ProbeBridge_requestRouteReset(");
+        const auto androidRenderFrame=androidFunctionSource("bool RenderFrame(SwapchainContext& context,");
         ok &= Require(androidBridgeSource.find("AndroidRtLabState gRtLabState;") != std::string::npos &&
-                      androidBridgeSource.find("const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();") != std::string::npos &&
-                      androidBridgeSource.find("rtLabTuning);") != std::string::npos &&
-                      androidBridgeSource.find("gRtLabState.Reset();") != std::string::npos,
+                      HasCoherentAndroidTuning(androidRenderFrame,androidRouteReset),
                       "Android renderer must consume exactly one mutex-protected RT tuning snapshot and reset it with the route");
+        const auto rejectTuningMutation=[&](const std::string_view before,const std::string_view after) {
+            auto source=androidRenderFrame;const auto offset=source.find(before);
+            if(offset==std::string::npos)return false;
+            source.replace(offset,before.size(),after);
+            return !HasCoherentAndroidTuning(source,androidRouteReset);
+        };
+        ok &= Require(rejectTuningMutation(": gRtLabState.Snapshot();",": horde::vulkan::raytracing::RtSceneTuning{};"),
+                      "tuning contract must reject live frames losing the Lab snapshot");
+        ok &= Require(rejectTuningMutation("? horde::vulkan::raytracing::RtSceneTuning{} :","? gRtLabState.Snapshot() :"),
+                      "tuning contract must reject surveys consuming mutable Lab settings");
+        ok &= Require(!HasCoherentAndroidTuning(androidRenderFrame+"\ngRtLabState.Snapshot();",androidRouteReset),
+                      "tuning contract must reject a second owner-frame snapshot");
+        auto missingRouteReset=androidRouteReset;
+        const auto resetCall=missingRouteReset.find("gRtLabState.Reset();");
+        if(resetCall!=std::string::npos)missingRouteReset.erase(resetCall,std::string_view("gRtLabState.Reset();").size());
+        ok &= Require(resetCall!=std::string::npos && !HasCoherentAndroidTuning(androidRenderFrame,missingRouteReset),
+                      "tuning contract must reject missing route reset even when other JNI resets remain");
         ok &= Require(androidBridgeSource.find("gRtLabState.SetFire(") != std::string::npos &&
                       androidJavaBridgeSource.find("setRtFireTuning") != std::string::npos &&
                       androidSource.find("publishRtFireTuning()") != std::string::npos &&
@@ -1740,11 +2203,396 @@ int main()
                           diagnostic),
                       diagnostic.c_str());
         ok &= Require(slot.PrepareInitialGeometry(diagnostic), diagnostic.c_str());
+        {
+            // Exercise the optional loader seam using only original clips.
+            // CPU-backed coherent uploads/cache checks are not Vulkan presentation.
+            const auto skeletonPath=(root / "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();
+            const auto lichPath=(root / "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb").string();
+            const auto ordinaryBindings=horde::scene::SkeletonCombatClipSet().clips;
+            const auto sameSkin=[](const auto& a,const auto& b) {
+                return !a.empty() && a.size()==b.size() &&
+                    std::memcmp(a.data(),b.data(),a.size()*sizeof(horde::scene::SkinnedRtVertex))==0;
+            };
+            CharacterRenderSlot explicitFour;
+            ok &= Require(explicitFour.LoadAssets(skeletonPath,lichPath,diagnostic,false,ordinaryBindings) &&
+                          explicitFour.PrepareInitialGeometry(diagnostic) &&
+                          Near(explicitFour.SkeletonDeadClipDuration(),slot.SkeletonDeadClipDuration()) &&
+                          sameSkin(explicitFour.SkeletonVertices(0),slot.SkeletonVertices(0)) &&
+                          sameSkin(explicitFour.SkeletonVertices(1),slot.SkeletonVertices(1)) &&
+                          explicitFour.LichVertices().size()==slot.LichVertices().size() &&
+                          !slot.LichVertices().empty() &&
+                          std::memcmp(explicitFour.LichVertices().data(),slot.LichVertices().data(),
+                              slot.LichVertices().size()*sizeof(horde::scene::TexturedSkinnedRtVertex))==0,
+                          "explicit ordinary four bindings must preserve default initial skeleton and lich output");
+            const auto bind=[](CharacterRenderSlot& owner,std::vector<std::byte>& memory) {
+                memory.resize(owner.SkeletonVertices(0).size()*sizeof(horde::scene::SkinnedRtVertex));
+                auto& buffer=owner.SkeletonGpu(0).vertices;
+                buffer.memory=(VkDeviceMemory)1; buffer.size=memory.size(); buffer.mappedWriteData=memory.data();
+            };
+            std::vector<std::byte> defaultMemory,explicitMemory;
+            bind(slot,defaultMemory); bind(explicitFour,explicitMemory);
+            RtGpuResources resources;
+            EnemyRosterSnapshot originalRoster;
+            originalRoster.selectedEnemy=EnemyKind::Skeleton;
+            originalRoster.renderedEnemyCount=1u; originalRoster.renderedEnemies[0]=EnemyKind::Skeleton;
+            LichSnapshot dormant; dormant.phase=LichPhase::Dormant;
+            std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,2> actors{};
+            actors[0].id=horde::gameplay::simulation::EntityId::SkeletonA;
+            struct OrdinarySample { EnemyAnimation animation; EnemyCombatAction action; float time; };
+            const std::array<OrdinarySample,4> samples{{
+                {EnemyAnimation::Idle,EnemyCombatAction::Locomotion,.21f},
+                {EnemyAnimation::Walking,EnemyCombatAction::Locomotion,.42f},
+                {EnemyAnimation::Attack,EnemyCombatAction::AttackWindup,.35f},
+                {EnemyAnimation::Dead,EnemyCombatAction::Dead,.70f},
+            }};
+            for(const auto& sample:samples) {
+                actors[0].animation=sample.animation; actors[0].action=sample.action;
+                actors[0].animationTime=actors[0].actionTime=sample.time;
+                actors[0].dead=sample.action==EnemyCombatAction::Dead;
+                actors[0].health=actors[0].dead?0:1;
+                ok &= Require(slot.PrepareFrame(actors,1u,originalRoster,dormant,resources,diagnostic) &&
+                              explicitFour.PrepareFrame(actors,1u,originalRoster,dormant,resources,diagnostic) &&
+                              sameSkin(slot.SkeletonVertices(0),explicitFour.SkeletonVertices(0)) &&
+                              defaultMemory==explicitMemory && explicitFour.SkeletonPoseBucketCount()==1u,
+                              "explicit four-binding native skins/uploads must be byte-identical for every ordinary clip");
+                slot.NotifyFrameSubmitted(); explicitFour.NotifyFrameSubmitted();
+            }
+            slot.SkeletonGpu(0).vertices={}; explicitFour.SkeletonGpu(0).vertices={};
+            ok &= Require(slot.PrepareInitialGeometry(diagnostic),diagnostic.c_str());
+
+            std::array<horde::scene::SkinnedClipBinding,5> extraBindings{};
+            std::copy(ordinaryBindings.begin(),ordinaryBindings.end(),extraBindings.begin());
+            extraBindings[4]={"Idle_5",true,false}; // Existing optional slot, not a new capacity or candidate asset.
+            CharacterRenderSlot extra;
+            ok &= Require(extra.LoadAssets(skeletonPath,lichPath,diagnostic,true,extraBindings) &&
+                          extra.PrepareInitialGeometry(diagnostic),diagnostic.c_str());
+            const auto plainIdle=extra.SkeletonVertices(0);
+            std::vector<std::byte> extraMemory; bind(extra,extraMemory);
+            actors[0].animation=EnemyAnimation::Dead; actors[0].action=EnemyCombatAction::Dead;
+            actors[0].dead=true; actors[0].health=0; actors[0].animationTime=.70f;
+            SkeletonPoseBlendRequests extraBlend{};
+            extraBlend[0]=horde::scene::SkinnedClipBlend{horde::scene::SkinnedClip::TurnLeft,0.f,1.f};
+            ok &= Require(extra.PrepareFrame(actors,1u,originalRoster,dormant,resources,diagnostic,nullptr,extraBlend) &&
+                          sameSkin(extra.SkeletonVertices(0),plainIdle) && extra.SkeletonPoseBucketCount()==1u &&
+                          extra.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "mapped optional slot4 must feed a weight-one blend with exact original Idle output in one bucket");
+            const auto written=extraMemory; extra.NotifyFrameSubmitted();
+            ok &= Require(extra.PrepareFrame(actors,1u,originalRoster,dormant,resources,diagnostic,nullptr,extraBlend) &&
+                          extraMemory==written && extra.PendingRefit()==CharacterBlasRefit::None,
+                          "submitted optional-slot blend must retain its exact ordinary cache identity without another refit");
+            extra.SkeletonGpu(0).vertices={};
+
+            auto badBindings=ordinaryBindings; badBindings[2].name="missing-required-attack";
+            CharacterRenderSlot badRequired; diagnostic.clear();
+            ok &= Require(!badRequired.LoadAssets(skeletonPath,lichPath,diagnostic,true,badBindings) &&
+                          diagnostic.find("missing required clip")!=std::string::npos,
+                          "explicit bindings cannot silently omit a named required attack clip");
+            CharacterRenderSlot missingDead; diagnostic.clear();
+            ok &= Require(!missingDead.LoadAssets(skeletonPath,lichPath,diagnostic,true,
+                              std::span<const horde::scene::SkinnedClipBinding>(ordinaryBindings).first(3u)) &&
+                          diagnostic.find("Dead clip has no usable duration")!=std::string::npos,
+                          "an explicit span missing the required Dead slot must fail rather than admit an incomplete owner");
+        }
+        {
+            // Real native skinning/host upload with CPU-backed coherent memory;
+            // no Vulkan submission is claimed by this failed-record regression.
+            std::vector<std::byte> memory(slot.LichVertices().size()*sizeof(horde::scene::TexturedSkinnedRtVertex));
+            auto& buffer=slot.LichGpu().vertices;
+            buffer.memory=(VkDeviceMemory)1;
+            buffer.size=memory.size();buffer.mappedWriteData=memory.data();
+            RtGpuResources resources;
+            LichSnapshot dying;
+            dying.phase=LichPhase::Dead;dying.deathAnimationComplete=true;
+            dying.animationTime=LichEncounter::kDeathAnimationDuration;dying.deathDissolveProgress=.5f;
+            EnemyRosterSnapshot keeperRoster;keeperRoster.selectedEnemy=EnemyKind::Lich;
+            ok &= Require(slot.PrepareFrame(skeletons,0u,keeperRoster,dying,resources,diagnostic) &&
+                          HasCharacterBlasRefit(slot.PendingRefit(),CharacterBlasRefit::Lich),
+                          "dissolved native vertices require a matching BLAS refit");
+            const auto written=memory;
+            ok &= Require(slot.PrepareFrame(skeletons,0u,keeperRoster,dying,resources,diagnostic) &&
+                          memory==written && HasCharacterBlasRefit(slot.PendingRefit(),CharacterBlasRefit::Lich),
+                          "abandoned recording must retry an unchanged uploaded pose's refit");
+            slot.NotifyFrameSubmitted();
+            ok &= Require(slot.PendingRefit()==CharacterBlasRefit::None &&
+                          slot.PrepareFrame(skeletons,0u,keeperRoster,dying,resources,diagnostic) &&
+                          slot.PendingRefit()==CharacterBlasRefit::None,
+                          "submitted frozen pose must not redundantly refit");
+            std::fill(memory.begin(),memory.end(),std::byte{0x7f});
+            slot.InvalidateLichPose();
+            ok &= Require(slot.PrepareFrame(skeletons,0u,keeperRoster,dying,resources,diagnostic) &&
+                          memory==written && HasCharacterBlasRefit(slot.PendingRefit(),CharacterBlasRefit::Lich),
+                          "restored storage must receive the exact fresh skin even at unchanged clip/time");
+            buffer={};
+            // Restore this fixture's neutral CPU pose for the later staff tests.
+            ok &= Require(slot.PrepareInitialGeometry(diagnostic),diagnostic.c_str());
+        }
         EnemyRosterSnapshot spareCapacityRoster;
         spareCapacityRoster.renderedEnemyCapacity = 8u;
         spareCapacityRoster.renderedEnemyCount = 1u;
         spareCapacityRoster.selectedEnemy = EnemyKind::Skeleton;
         spareCapacityRoster.renderedEnemies[0] = EnemyKind::Skeleton;
+        EnemyRosterSnapshot keeperRoster;
+        keeperRoster.renderedEnemyCapacity = 1u;
+        keeperRoster.renderedEnemyCount = 1u;
+        keeperRoster.selectedEnemy = EnemyKind::Lich;
+        keeperRoster.renderedEnemies[0] = EnemyKind::Lich;
+        LichSnapshot castSnapshot;
+        castSnapshot.readableCastPresentation = true;
+        castSnapshot.phase = LichPhase::Charging;
+        castSnapshot.phaseTime = 0.0f;
+        const auto earlyCast = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phaseTime = 0.96f;
+        const auto lateCast = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phaseTime = 1.20f;
+        const auto chargeBoundary = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phase = LichPhase::Recovering;
+        castSnapshot.phaseTime = 0.0f;
+        const auto recoveryBoundary = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phaseTime = 0.18f;
+        const auto visibleBurstEnd = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phaseTime = 0.60f;
+        const auto recoveryEnd = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        const bool weightedSelected = horde::gameplay::effects::kKeeperCastPoseStyle ==
+            horde::gameplay::effects::KeeperCastPoseStyle::WeightedCandidate;
+        const bool selectedDischargeJoin = weightedSelected
+            ? Near(recoveryBoundary.lichStaffCastRadians, 0.0f) && visibleBurstEnd.lichStaffCastRadians > 0.0f
+            : recoveryBoundary.lichStaffCastRadians > 0.0f && Near(visibleBurstEnd.lichStaffCastRadians, 0.0f);
+        ok &= Require(earlyCast.lichStaffLiftRadians < lateCast.lichStaffLiftRadians &&
+                      Near(lateCast.lichStaffLiftRadians, chargeBoundary.lichStaffLiftRadians) &&
+                      Near(chargeBoundary.lichStaffLiftRadians, recoveryBoundary.lichStaffLiftRadians) &&
+                      selectedDischargeJoin &&
+                      Near(recoveryEnd.lichStaffLiftRadians, 0.0f) &&
+                      Near(recoveryEnd.lichStaffCastRadians, 0.0f),
+                      "weighted keeper pose must join discharge continuously and settle after, without extending, the actual visible light burst");
+        using horde::gameplay::effects::EvaluateKeeperCastPose;
+        using horde::gameplay::effects::KeeperCastPoseStyle;
+        LichSnapshot controlSnapshot = castSnapshot;
+        controlSnapshot.phase = LichPhase::Charging;
+        controlSnapshot.phaseTime = 0.96f;
+        const auto existingLift = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::ExistingControl);
+        const auto weightedLift = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::WeightedCandidate);
+        controlSnapshot.phaseTime = 0.36f;
+        const auto weightedBrace = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::WeightedCandidate);
+        controlSnapshot.phase = LichPhase::Recovering;
+        controlSnapshot.phaseTime = 0.0f;
+        const auto existingRelease = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::ExistingControl);
+        controlSnapshot.phaseTime = 0.18f;
+        const auto existingSettled = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::ExistingControl);
+        controlSnapshot.phaseTime = 0.10f;
+        const auto weightedRelease = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::WeightedCandidate);
+        controlSnapshot.phaseTime = 0.35f;
+        const auto weightedSettling = EvaluateKeeperCastPose(controlSnapshot, KeeperCastPoseStyle::WeightedCandidate);
+        ok &= Require(Near(existingLift.staffLiftRadians, 0.58f) &&
+                      Near(existingRelease.staffLiftRadians, 0.58f) &&
+                      Near(existingRelease.staffCastRadians, 0.46f) &&
+                      existingRelease.upperBodyPitchRadians == 0.0f &&
+                      existingSettled.staffLiftRadians == 0.0f && existingSettled.staffCastRadians == 0.0f &&
+                      Near(weightedBrace.staffLiftRadians, 0.22f) &&
+                      Near(weightedLift.staffLiftRadians, 0.72f) &&
+                      Near(weightedRelease.staffCastRadians, 0.50f) &&
+                      weightedLift.upperBodyPitchRadians < 0.0f && weightedRelease.upperBodyPitchRadians > 0.0f,
+                      "original control curve must remain exact alongside the bounded upper-body brace and release candidate");
+        castSnapshot.phase = LichPhase::Dormant;
+        const auto castReset = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phase = LichPhase::Dead;
+        const auto castDeath = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        castSnapshot.phase = LichPhase::Charging;
+        castSnapshot.readableCastPresentation = false;
+        const auto legacyCast = EvaluateCharacterFramePlan(
+            skeletons, 0u, keeperRoster, castSnapshot, slot.SkeletonDeadClipDuration());
+        ok &= Require(Near(castReset.lichStaffLiftRadians, 0.0f) &&
+                      Near(castDeath.lichStaffLiftRadians, 0.0f) &&
+                      Near(legacyCast.lichStaffLiftRadians, 0.0f) &&
+                      Near(legacyCast.lichStaffCastRadians, 0.0f),
+                      "reset, death, and legacy keeper captures must disable readable cast pose");
+
+        horde::scene::SkinnedMeshAsset castSkin;
+        const auto lichPath = (root / "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb").string();
+        ok &= Require(castSkin.LoadClips(lichPath, horde::scene::LichPlaceholderClipSet(), diagnostic),
+                      diagnostic.c_str());
+        std::vector<horde::scene::TexturedSkinnedRtVertex> neutralSkin, liftedSkin, forwardSkin;
+        const std::array<horde::scene::SkinnedNodeRotation, 2u> identityPose{{
+            {"LeftArm", {{0.0f, 0.0f, 0.0f, 1.0f}}},
+            {"LeftForeArm", {{0.0f, 0.0f, 0.0f, 1.0f}}}}};
+        const std::array<horde::scene::SkinnedNodeRotation, 2u> liftedPose{{
+            {"LeftArm", {{std::sin(-0.58f * 0.5f), 0.0f, 0.0f, std::cos(0.58f * 0.5f)}}},
+            {"LeftForeArm", {{std::sin(-0.72f * 0.58f * 0.5f), 0.0f, 0.0f,
+                               std::cos(0.72f * 0.58f * 0.5f)}}}}};
+        const std::array<horde::scene::SkinnedNodeRotation, 2u> forwardPose{{
+            {"LeftArm", {{std::sin((-0.58f - 0.46f) * 0.5f), 0.0f, 0.0f,
+                           std::cos((-0.58f - 0.46f) * 0.5f)}}},
+            {"LeftForeArm", {{std::sin(-0.72f * 0.58f * 0.5f), 0.0f, 0.0f,
+                               std::cos(0.72f * 0.58f * 0.5f)}}}}};
+        if (castSkin.IsLoaded())
+        {
+            ok &= Require(castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                neutralSkin, diagnostic), diagnostic.c_str());
+            ok &= Require(castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                liftedSkin, diagnostic, liftedPose), diagnostic.c_str());
+            ok &= Require(castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                forwardSkin, diagnostic, forwardPose), diagnostic.c_str());
+            // Spine was verified in the actual 24-joint source, above the
+            // independent Hips/leg chains. Pin every existing lower-body skin
+            // witness for the strongest brace/release and a settling sample.
+            for (const auto pose : {weightedLift, weightedRelease, weightedSettling})
+            {
+                const auto rotationX = [](float value) -> std::array<float, 4u> {
+                    return {{std::sin(value * 0.5f), 0.0f, 0.0f, std::cos(value * 0.5f)}};
+                };
+                const std::array<horde::scene::SkinnedNodeRotation, 3u> weightedPose{{
+                    {"LeftArm", rotationX(-pose.staffLiftRadians - pose.staffCastRadians)},
+                    {"LeftForeArm", rotationX(-0.72f * pose.staffLiftRadians)},
+                    {"Spine", rotationX(pose.upperBodyPitchRadians)}}};
+                std::vector<horde::scene::TexturedSkinnedRtVertex> weightedSkin;
+                ok &= Require(castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                   weightedSkin, diagnostic, weightedPose), diagnostic.c_str());
+                bool finite = !weightedSkin.empty() && weightedSkin.size() == neutralSkin.size();
+                for (const auto& vertex : weightedSkin)
+                {
+                    for (float value : vertex.position) finite &= std::isfinite(value);
+                    for (float value : vertex.normal) finite &= std::isfinite(value);
+                }
+                bool lowerBodyExact = finite;
+                for (const auto& witness : horde::tests::keeper_lower_body_witnesses::kWitnesses)
+                {
+                    if (witness.outputIndex >= weightedSkin.size() || witness.outputIndex >= neutralSkin.size())
+                    { lowerBodyExact = false; continue; }
+                    for (std::size_t axis = 0; axis < 3u; ++axis)
+                        lowerBodyExact &= weightedSkin[witness.outputIndex].position[axis] ==
+                                          neutralSkin[witness.outputIndex].position[axis];
+                }
+                ok &= Require(finite && lowerBodyExact,
+                              "weighted upper-body cast must keep all audited lower-body vertices exactly fixed with finite skin");
+            }
+        }
+        std::vector<horde::scene::TexturedSkinnedRtVertex> identitySkin;
+        if (castSkin.IsLoaded())
+        {
+            ok &= Require(castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                identitySkin, diagnostic, identityPose), diagnostic.c_str());
+            ok &= Require(!neutralSkin.empty() && identitySkin.size() == neutralSkin.size() &&
+                          std::memcmp(identitySkin.data(), neutralSkin.data(),
+                              neutralSkin.size() * sizeof(horde::scene::TexturedSkinnedRtVertex)) == 0,
+                          "identity additive node rotations must preserve exact authored skin bytes");
+            std::array<horde::scene::SkinnedNodeRotation, 1u> missingPose{{
+                {"MissingCastNode", {{0.0f, 0.0f, 0.0f, 1.0f}}}}};
+            std::array<horde::scene::SkinnedNodeRotation, 2u> duplicatePose{{
+                {"LeftArm", {{0.0f, 0.0f, 0.0f, 1.0f}}},
+                {"LeftArm", {{0.0f, 0.0f, 0.0f, 1.0f}}}}};
+            std::array<horde::scene::SkinnedNodeRotation, 1u> invalidPose{{
+                {"LeftArm", {{0.0f, 0.0f, 0.0f, 0.0f}}}}};
+            ok &= Require(!castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                 identitySkin, diagnostic, missingPose) &&
+                          diagnostic.find("missing additive rotation node") != std::string::npos,
+                          "named additive rotations must reject a missing rig node");
+            ok &= Require(!castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                 identitySkin, diagnostic, duplicatePose) &&
+                          diagnostic.find("duplicate node name") != std::string::npos,
+                          "named additive rotations must reject duplicate rig nodes");
+            ok &= Require(!castSkin.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f,
+                                                 identitySkin, diagnostic, invalidPose) &&
+                          diagnostic.find("finite nonzero quaternion") != std::string::npos,
+                          "named additive rotations must reject invalid quaternions");
+        }
+        std::size_t stableLowerBodyWitnesses = 0u;
+        float liftedStaffDelta = 0.0f;
+        float forwardStaffDelta = 0.0f;
+        std::array<float, 3u> neutralStaffCentroid{};
+        std::array<float, 3u> liftedStaffCentroid{};
+        std::array<float, 3u> forwardStaffCentroid{};
+        bool finiteCastSkin = neutralSkin.size() == liftedSkin.size() &&
+            neutralSkin.size() == forwardSkin.size() && !neutralSkin.empty();
+        for (std::size_t index = 0u; index < neutralSkin.size() && index < liftedSkin.size() &&
+             index < forwardSkin.size(); ++index)
+        {
+            const auto finiteVertex = [](const horde::scene::TexturedSkinnedRtVertex& vertex) {
+                for (float value : vertex.position) if (!std::isfinite(value)) return false;
+                for (float value : vertex.normal) if (!std::isfinite(value)) return false;
+                return true;
+            };
+            finiteCastSkin &= finiteVertex(neutralSkin[index]) && finiteVertex(liftedSkin[index]) &&
+                finiteVertex(forwardSkin[index]);
+        }
+        for (const auto& witness : horde::tests::keeper_lower_body_witnesses::kWitnesses)
+        {
+            const std::size_t index = witness.outputIndex;
+            const bool inRange = index < neutralSkin.size() && index < liftedSkin.size() &&
+                index < forwardSkin.size();
+            if (!inRange)
+            {
+                std::cerr << "Keeper lower-body witness index out of range: " << witness.outputIndex << '\n';
+                continue;
+            }
+            bool pinned = true;
+            bool stationary = true;
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+            {
+                pinned &= Near(neutralSkin[index].position[axis], witness.neutralPosition[axis], 0.0002f);
+                stationary &= Near(liftedSkin[index].position[axis], neutralSkin[index].position[axis], 0.0001f) &&
+                    Near(forwardSkin[index].position[axis], neutralSkin[index].position[axis], 0.0001f);
+            }
+            if (pinned && stationary)
+            {
+                ++stableLowerBodyWitnesses;
+            }
+            else
+            {
+                std::cerr << "Keeper lower-body witness changed or missed neutral pin: output="
+                          << witness.outputIndex << " pin=" << pinned << " stationary=" << stationary << '\n';
+            }
+        }
+        for (const std::uint32_t vertexIndex : std::array<std::uint32_t, 40u>{{
+                 15436u,16369u,16370u,16373u,17107u,17124u,17125u,17339u,17685u,17686u,
+                 17687u,17988u,17989u,17990u,17994u,17995u,17996u,18822u,18823u,18826u,
+                 18829u,18835u,19152u,19153u,19154u,19174u,19792u,20010u,20011u,20012u,
+                 20385u,20387u,20388u,20389u,20390u,20625u,20845u,20846u,21255u,25309u}})
+        {
+            if (vertexIndex < neutralSkin.size() && vertexIndex < liftedSkin.size() &&
+                vertexIndex < forwardSkin.size())
+            {
+                for (std::size_t axis = 0u; axis < 3u; ++axis)
+                {
+                    neutralStaffCentroid[axis] += neutralSkin[vertexIndex].position[axis];
+                    liftedStaffCentroid[axis] += liftedSkin[vertexIndex].position[axis];
+                    forwardStaffCentroid[axis] += forwardSkin[vertexIndex].position[axis];
+                    liftedStaffDelta += std::abs(liftedSkin[vertexIndex].position[axis] -
+                                                 neutralSkin[vertexIndex].position[axis]);
+                    forwardStaffDelta += std::abs(forwardSkin[vertexIndex].position[axis] -
+                                                  neutralSkin[vertexIndex].position[axis]);
+                }
+            }
+        }
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            neutralStaffCentroid[axis] /= 40.0f;
+            liftedStaffCentroid[axis] /= 40.0f;
+            forwardStaffCentroid[axis] /= 40.0f;
+        }
+        const auto& sampledStaff = slot.LichStaffLocalSample();
+        ok &= Require(Near(sampledStaff[0], neutralStaffCentroid[0]) &&
+                      Near(sampledStaff[1], neutralStaffCentroid[1]) &&
+                      Near(sampledStaff[2], neutralStaffCentroid[2]),
+                      "physical staff light sample must match the audited neutral staff mesh centroid");
+        std::cerr << "Keeper audited staff centroids: neutral=(" << neutralStaffCentroid[0] << ", "
+                  << neutralStaffCentroid[1] << ", " << neutralStaffCentroid[2] << ") lifted=("
+                  << liftedStaffCentroid[0] << ", " << liftedStaffCentroid[1] << ", "
+                  << liftedStaffCentroid[2] << ") forward=(" << forwardStaffCentroid[0] << ", "
+                  << forwardStaffCentroid[1] << ", " << forwardStaffCentroid[2] << ")\n";
+        ok &= Require(finiteCastSkin && stableLowerBodyWitnesses > 100u &&
+                      stableLowerBodyWitnesses == horde::tests::keeper_lower_body_witnesses::kWitnesses.size() &&
+                      liftedStaffDelta > 1.0f &&
+                      forwardStaffDelta > 1.0f &&
+                      liftedStaffCentroid[1] > neutralStaffCentroid[1] + 0.10f &&
+                      forwardStaffCentroid[2] > liftedStaffCentroid[2] + 0.04f,
+                      "actual keeper staff centroid must rise during lift and move along actor-forward +Z during cast; both skins must keep the lower body fixed with finite positions and normals");
         const float deadDuration = slot.SkeletonDeadClipDuration();
         ok &= Require(deadDuration > 0.0f, "skeleton Dead clip duration was not captured from the model");
         skeletons[0].animation = EnemyAnimation::Dead;
@@ -1820,6 +2668,86 @@ int main()
                       std::abs(tilted.lichTransform.matrix[1][2]) > 0.1f,
                       "bounded keeper presentation tilt stays invertible and preserves its raised root");
 
+        {
+            // Native skin/upload cache with CPU-backed coherent memory, not a
+            // Vulkan presentation claim. Both actors retain the shared bucket.
+            auto corpses = skeletons;
+            for (auto& actor : corpses) {
+                actor.health=0;actor.dead=true;actor.animation=EnemyAnimation::Dead;
+                actor.action=EnemyCombatAction::Dead;actor.animationTime=0;actor.forceCurrentCombatPose=false;
+            }
+            LichSnapshot dormant;
+            SkeletonPoseBlendRequests blends{};
+            for (auto& blend : blends) blend=horde::scene::SkinnedClipBlend{horde::scene::SkinnedClip::Idle,0.f,.5f};
+            const auto owned = EvaluateCharacterFramePlan(corpses,2,spareCapacityRoster,dormant,deadDuration,blends);
+            blends[0]->weight=.75f;
+            ok &= Require(owned.skeletons[0].blend && owned.skeletons[0].blend->weight==.5f &&
+                          owned.skeletonPoseBucketCount==1u &&
+                          EvaluateCharacterFramePlan(corpses,2,spareCapacityRoster,dormant,deadDuration,blends).skeletonPoseBucketCount==2u,
+                          "blend plans must own values and split different weights");
+            blends[0]=blends[1];blends[0]->timeSeconds=.1f;
+            ok &= Require(EvaluateCharacterFramePlan(corpses,2,spareCapacityRoster,dormant,deadDuration,blends).skeletonPoseBucketCount==2u,
+                          "different blend target times cannot share a skin bucket");
+            blends[0]=blends[1];blends[0]->clip=horde::scene::SkinnedClip::Walking;
+            ok &= Require(EvaluateCharacterFramePlan(corpses,2,spareCapacityRoster,dormant,deadDuration,blends).skeletonPoseBucketCount==2u,
+                          "different blend target clips cannot share a skin bucket");
+            blends[0]=blends[1];
+            std::array<std::vector<std::byte>,2> memory;
+            const auto bind = [&] {
+                for(unsigned bucket=0;bucket<2;++bucket) {
+                    memory[bucket].resize(slot.SkeletonVertices(bucket).size()*sizeof(horde::scene::SkinnedRtVertex));
+                    auto& buffer=slot.SkeletonGpu(bucket).vertices;
+                    buffer.memory=(VkDeviceMemory)1;buffer.size=memory[bucket].size();buffer.mappedWriteData=memory[bucket].data();
+                }
+            };
+            bind();slot.NotifyFrameSubmitted();
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          slot.SkeletonPoseBucketCount()==1u &&
+                          slot.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "matching blended actors require one skin/upload/refit bucket");
+            const auto half=memory[0];slot.NotifyFrameSubmitted();
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          memory[0]==half && slot.PendingRefit()==CharacterBlasRefit::None,
+                          "unchanged blend should preserve submitted skin without redundant refit");
+            for(auto& blend:blends)blend->weight=.75f;
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          memory[0]!=half && slot.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "weight-only changes at fixed Dead0 must upload and refit");
+            const auto threeQuarters=memory[0];
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          memory[0]==threeQuarters && slot.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "abandoned blended upload must retain its pending refit");
+            for(float invalid:{-1.f,1.01f,std::numeric_limits<float>::infinity(),std::numeric_limits<float>::quiet_NaN()}) {
+                auto bad=blends;bad[0]->weight=invalid;
+                ok &= Require(!slot.CacheFramePlan(corpses,2,spareCapacityRoster,dormant,diagnostic,bad),
+                              "frame cache must reject invalid blend weights before upload");
+            }
+            auto bad=blends;bad[0]->timeSeconds=std::numeric_limits<float>::quiet_NaN();
+            ok &= Require(!slot.CacheFramePlan(corpses,2,spareCapacityRoster,dormant,diagnostic,bad),
+                          "frame cache must reject nonfinite blend target time");
+            bad=blends;bad[0]->clip=horde::scene::SkinnedClip::TurnLeft;
+            ok &= Require(!slot.CacheFramePlan(corpses,2,spareCapacityRoster,dormant,diagnostic,bad) &&
+                          !slot.CacheFramePlan(corpses,1,spareCapacityRoster,dormant,diagnostic,blends),
+                          "frame cache rejects unmapped clips or requests for absent actors");
+            slot.NotifyFrameSubmitted();
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic),diagnostic.c_str());
+            const auto plain=memory[0];slot.NotifyFrameSubmitted();
+            for(auto& blend:blends)blend->weight=0;
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          memory[0]==plain && slot.PendingRefit()==CharacterBlasRefit::None,
+                          "validated zero blend must share the ordinary null-request cache identity");
+            ok &= Require(slot.PrepareInitialGeometry(diagnostic),diagnostic.c_str());
+            std::fill(memory[0].begin(),memory[0].end(),std::byte{0x7f});
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic) &&
+                          memory[0]==plain && slot.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "initial/recreated geometry must invalidate the old blend/clip upload identity");
+            slot.DestroyGpuResources(unboundResources);bind();
+            ok &= Require(slot.PrepareFrame(corpses,2,spareCapacityRoster,dormant,unboundResources,diagnostic,nullptr,blends) &&
+                          slot.PendingRefit()==CharacterBlasRefit::SkeletonPose0,
+                          "destroyed/rebound owner must not retain stale submitted blend identity");
+            for(unsigned bucket=0;bucket<2;++bucket)slot.SkeletonGpu(bucket).vertices={};
+        }
+
         CharacterRenderSlot previewSlot;
         diagnostic.clear();
         ok &= Require(previewSlot.LoadAssets(
@@ -1829,15 +2757,21 @@ int main()
                       !previewSlot.SkeletonVertices(0u).empty() &&
                       previewSlot.SkeletonVertices(1u).empty() && previewSlot.LichVertices().empty(),
                       "skeleton-only preview must omit lich and second-pose CPU geometry");
-        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 2u, spareCapacityRoster, lich, diagnostic),
+        LichSnapshot previewLich{};
+        previewLich.phase = LichPhase::Dormant;
+        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 2u, spareCapacityRoster, previewLich, diagnostic),
                       "skeleton-only preview cannot admit the full two-enemy game workload");
-        ok &= Require(previewSlot.CacheFramePlan(skeletons, 1u, spareCapacityRoster, lich, diagnostic) &&
+        ok &= Require(previewSlot.CacheFramePlan(skeletons, 1u, spareCapacityRoster, previewLich, diagnostic) &&
                       previewSlot.SkeletonPoseBucketCount() == 1u,
                       "skeleton-only preview retains one actual authored skeleton pose");
         auto forbiddenLich = spareCapacityRoster;
         forbiddenLich.selectedEnemy = EnemyKind::Lich;
-        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 1u, forbiddenLich, lich, diagnostic),
+        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 1u, forbiddenLich, previewLich, diagnostic),
                       "skeleton-only preview cannot select unadmitted lich resources");
+        LichSnapshot unadmittedKeeper = previewLich;
+        unadmittedKeeper.phase = LichPhase::Dead;
+        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 1u, spareCapacityRoster, unadmittedKeeper, diagnostic),
+                      "skeleton-only preview cannot admit a non-dormant Keeper corpse without Keeper resources");
     }
 
     return ok ? 0 : 1;

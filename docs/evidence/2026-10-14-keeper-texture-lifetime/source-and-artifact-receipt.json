@@ -1,0 +1,56 @@
+{
+  "scope": "Pre-commit local builds: base commit plus exact build-input bytes, not a post-commit rebuild",
+  "baseCommit": "d9d7b0567d4c5823fae8ea510765b3154370b47e",
+  "sources": {
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "ff79768a43c16129cb3fb6a039d5acff017981baf9835ffd224e646b74b5dc2d",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "eb9f3a81a42338adf08f04b33ebc492d8ce1d9110bbbceb379db37e023aa1f69",
+    "src/platform/windows/DiagnosticWindow.cpp": "29444ae0927bf5c28a3c8d7560868993359c8637b341ffdaab7800193de04e6e",
+    "src/platform/windows/WindowsChapterRoundTripCapture.inl": "a87ff7935ee47331007c9d4c5fac57b775cd6f6c2931fe9456b5e575876fe635",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "b689bb390aacfef7e307c8c38a85e02cba8e2e35d44322ed95e1190442a6e578",
+    "tests/StaticGeometryCutoverTests.cpp": "ea9dafd05f5ba32b22015d667224c7ceb664dc94f1d8fd52ee28d5bb57ea532d",
+    "tools/capture-chapter-roundtrip.ps1": "dd99751ca2d03430f42e0a0aad26fe511b032eda9af91e5c86446a8fb1be4a9a",
+    "tools/raygen-variant-catalog.json": "e3b43b8f8ab01279f2d1c09cb9d4290b6e7a431b2e4101bdeccfc76b890fcb25",
+    "tools/raygen-variant-budgets.json": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+  },
+  "canonicalGitInputBlobs": {
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "7d5b89ca34fe1cfc6a96576aaf63674ec85abd10",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "2176c5f7e559e1968dc5e33480a9ba795e30be1e",
+    "src/platform/windows/DiagnosticWindow.cpp": "b6628e586f696573a366135124a847ca967080ef",
+    "src/platform/windows/WindowsChapterRoundTripCapture.inl": "971483b52eadd58e65a11ca907c9ff2ab4c34635",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "b7802557fec8d7f8752a7199e44de6f88906aed5",
+    "tests/StaticGeometryCutoverTests.cpp": "2cc24dc768cc8bccdf363392259b3570429b14a8",
+    "tools/capture-chapter-roundtrip.ps1": "b0a14e7eef118554079d4624b85156a615289b53",
+    "tools/raygen-variant-catalog.json": "47183605c440bf43a51c9af3191b35f680150120",
+    "tools/raygen-variant-budgets.json": "90d40a313084dca95055ed2ea32a231da9d0b9bb"
+  },
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "e88e078d7a2b095a590051391733459d97701f797adf7a7646a63893a49e21bc",
+      "bytes": 13135360
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "100c3484dc77c0a02325ad7502e16152cde7d04c8a1f9b84504920d0bd2426c5",
+      "bytes": 4467712
+    },
+    {
+      "path": "reports/phone-candidate-525e73bbd3c3/horde-debug.apk",
+      "sha256": "525e73bbd3c3c77db3e1bfd5251a15ee0d54e2d705fa0cd1555813bcf9ec5a53",
+      "bytes": 183169738
+    }
+  ],
+  "phoneInstalled": false,
+  "versionCode": 10,
+  "developmentCertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "apkChangedEntriesVsF9d01fc4f53c": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "00605b847ef23c07e631a95cb2d46ebb6d1470854ac6cfb22c2163da56fa5dc0",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "5d3561fd7353006f9a8010ea9ea7b33252c534c8a0dedcdde95063d984561842",
+    "lib/x86/libhorde_rt_probe_android.so": "3bf220fa34d3448642a99c71b5832d6b529479318af31234911846893ec11c51",
+    "lib/x86_64/libhorde_rt_probe_android.so": "baeeb032f594a48234846caa58aea9a9c1f725076d368a70535e89e4cf6914d3"
+  },
+  "normalPlayKeeperDeviceLocalRetirementBytesWindows": 33554432,
+  "normalPlayStaticRegionResidencySavingBytes": 0,
+  "staticRegionStreamingComplete": false,
+  "androidPhysicalAllocationMeasurementPending": true
+}

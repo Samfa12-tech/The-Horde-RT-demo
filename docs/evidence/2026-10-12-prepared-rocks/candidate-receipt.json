@@ -1,0 +1,730 @@
+{
+  "parent": "0b369af9ba0c91749b2a586ae0205e77db7b2357",
+  "parentCiRun": 38190308187,
+  "parentCiJobs": [
+    {
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success"
+    },
+    {
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success"
+    },
+    {
+      "name": "player-vulkan-host",
+      "conclusion": "success"
+    },
+    {
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "success"
+    }
+  ],
+  "parentTraversalExecutions": 1,
+  "parentTownCTestExecutions": 1,
+  "frames": {
+    "before": {
+      "buildId": "1.6.2",
+      "executionBackend": "RayTracingPipeline",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 10.19315,
+        "overallMeanMs": 84.265142,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 4.601856,
+          "averageMs": 8.646792,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 37532928,
+        "indexBytes": 6102420,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.4053,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7735,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6318,
+        "productionPropBlasBytes": 25892096,
+        "productionPropBlasBuildMilliseconds": 8.5068
+      },
+      "camera": {
+        "x": -17.700905,
+        "z": 15.206802,
+        "yaw": 1.15,
+        "pitch": 0.1
+      },
+      "rescue": {
+        "phase": 4,
+        "generation": 4,
+        "claimCount": 1,
+        "deploymentCount": 1,
+        "equipmentStowed": false,
+        "ropeHandsActive": false,
+        "bodyStowWitness": false,
+        "plantedPelvisDropMetres": 0,
+        "bodyYawRadians": 0.136817,
+        "root": [
+          -17.7009,
+          -0.548164,
+          15.2068
+        ],
+        "renderedEye": [
+          -17.7009,
+          1.10184,
+          15.2068
+        ],
+        "gripNodeIndices": [
+          0.2,
+          0.45
+        ],
+        "gripTargets": [
+          [
+            -33.4,
+            2.5625,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.45312,
+            -14.979
+          ]
+        ],
+        "ropeNodes": [
+          [
+            -33.4,
+            2.65,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.21248,
+            -14.9789
+          ],
+          [
+            -33.4002,
+            1.77505,
+            -14.9789
+          ],
+          [
+            -33.4007,
+            1.33775,
+            -14.9788
+          ],
+          [
+            -33.4011,
+            0.900611,
+            -14.9789
+          ],
+          [
+            -33.4005,
+            0.463649,
+            -14.9791
+          ],
+          [
+            -33.4007,
+            0.0268801,
+            -14.9794
+          ],
+          [
+            -33.4015,
+            -0.409687,
+            -14.9799
+          ],
+          [
+            -33.404,
+            -0.846047,
+            -14.9808
+          ],
+          [
+            -33.7309,
+            -0.924961,
+            -15.2589
+          ],
+          [
+            -33.3104,
+            -0.925,
+            -15.3755
+          ],
+          [
+            -32.9119,
+            -0.925,
+            -15.1978
+          ]
+        ],
+        "publishedLanternHinge": [
+          0.408487,
+          0,
+          0.912764,
+          0,
+          -0.0455813,
+          0.998752,
+          0.0203989,
+          0,
+          -0.911625,
+          -0.0499376,
+          0.407978,
+          0,
+          -17.1943,
+          1.18494,
+          14.7803,
+          1
+        ],
+        "publishedLanternBody": [
+          0.408134,
+          0.00748893,
+          0.912891,
+          0,
+          -0.0486444,
+          0.998724,
+          0.0135548,
+          0,
+          -0.911625,
+          -0.0499393,
+          0.407978,
+          0,
+          -17.1283,
+          1.18744,
+          14.8055,
+          1
+        ]
+      },
+      "preset": "finale-roof-open",
+      "pngSha256": "38a90353e7b0fbc29d99fe21189b6d79c1ca9c8a13477963b06006d322b0f3f5"
+    },
+    "pipeline": {
+      "buildId": "1.6.2",
+      "executionBackend": "RayTracingPipeline",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 11.9337,
+        "overallMeanMs": 131.104575,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 8.18752,
+          "averageMs": 10.748227,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 38717312,
+        "indexBytes": 6180540,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.4287,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7446,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6841,
+        "productionPropBlasBytes": 26294912,
+        "productionPropBlasBuildMilliseconds": 15.6539
+      },
+      "camera": {
+        "x": -17.700905,
+        "z": 15.206802,
+        "yaw": 1.15,
+        "pitch": 0.1
+      },
+      "rescue": {
+        "phase": 4,
+        "generation": 4,
+        "claimCount": 1,
+        "deploymentCount": 1,
+        "equipmentStowed": false,
+        "ropeHandsActive": false,
+        "bodyStowWitness": false,
+        "plantedPelvisDropMetres": 0,
+        "bodyYawRadians": 0.136817,
+        "root": [
+          -17.7009,
+          -0.548164,
+          15.2068
+        ],
+        "renderedEye": [
+          -17.7009,
+          1.10184,
+          15.2068
+        ],
+        "gripNodeIndices": [
+          0.2,
+          0.45
+        ],
+        "gripTargets": [
+          [
+            -33.4,
+            2.5625,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.45312,
+            -14.979
+          ]
+        ],
+        "ropeNodes": [
+          [
+            -33.4,
+            2.65,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.21248,
+            -14.9789
+          ],
+          [
+            -33.4002,
+            1.77505,
+            -14.9789
+          ],
+          [
+            -33.4007,
+            1.33775,
+            -14.9788
+          ],
+          [
+            -33.4011,
+            0.900611,
+            -14.9789
+          ],
+          [
+            -33.4005,
+            0.463649,
+            -14.9791
+          ],
+          [
+            -33.4007,
+            0.0268801,
+            -14.9794
+          ],
+          [
+            -33.4015,
+            -0.409687,
+            -14.9799
+          ],
+          [
+            -33.404,
+            -0.846047,
+            -14.9808
+          ],
+          [
+            -33.7309,
+            -0.924961,
+            -15.2589
+          ],
+          [
+            -33.3104,
+            -0.925,
+            -15.3755
+          ],
+          [
+            -32.9119,
+            -0.925,
+            -15.1978
+          ]
+        ],
+        "publishedLanternHinge": [
+          0.408487,
+          0,
+          0.912764,
+          0,
+          -0.0455813,
+          0.998752,
+          0.0203989,
+          0,
+          -0.911625,
+          -0.0499376,
+          0.407978,
+          0,
+          -17.1943,
+          1.18494,
+          14.7803,
+          1
+        ],
+        "publishedLanternBody": [
+          0.408134,
+          0.00748893,
+          0.912891,
+          0,
+          -0.0486444,
+          0.998724,
+          0.0135548,
+          0,
+          -0.911625,
+          -0.0499393,
+          0.407978,
+          0,
+          -17.1283,
+          1.18744,
+          14.8055,
+          1
+        ]
+      },
+      "preset": "finale-roof-open",
+      "pngSha256": "fa39c461408b674857a6cefca3d77f91facdc37ebdac41285ad2cde26d0ffd98"
+    },
+    "query": {
+      "buildId": "1.6.2",
+      "executionBackend": "RayQueryCompute",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67"
+        }
+      },
+      "device": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 8.36625,
+        "overallMeanMs": 64.489333,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 4.690144,
+          "averageMs": 4.840736,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 38717312,
+        "indexBytes": 6180540,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.7448,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.8603,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.8845,
+        "productionPropBlasBytes": 26294912,
+        "productionPropBlasBuildMilliseconds": 18.8777
+      },
+      "camera": {
+        "x": -17.700905,
+        "z": 15.206802,
+        "yaw": 1.15,
+        "pitch": 0.1
+      },
+      "rescue": {
+        "phase": 4,
+        "generation": 4,
+        "claimCount": 1,
+        "deploymentCount": 1,
+        "equipmentStowed": false,
+        "ropeHandsActive": false,
+        "bodyStowWitness": false,
+        "plantedPelvisDropMetres": 0,
+        "bodyYawRadians": 0.136817,
+        "root": [
+          -17.7009,
+          -0.548164,
+          15.2068
+        ],
+        "renderedEye": [
+          -17.7009,
+          1.10184,
+          15.2068
+        ],
+        "gripNodeIndices": [
+          0.2,
+          0.45
+        ],
+        "gripTargets": [
+          [
+            -33.4,
+            2.5625,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.45312,
+            -14.979
+          ]
+        ],
+        "ropeNodes": [
+          [
+            -33.4,
+            2.65,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.21248,
+            -14.9789
+          ],
+          [
+            -33.4002,
+            1.77505,
+            -14.9789
+          ],
+          [
+            -33.4007,
+            1.33775,
+            -14.9788
+          ],
+          [
+            -33.4011,
+            0.900611,
+            -14.9789
+          ],
+          [
+            -33.4005,
+            0.463649,
+            -14.9791
+          ],
+          [
+            -33.4007,
+            0.0268801,
+            -14.9794
+          ],
+          [
+            -33.4015,
+            -0.409687,
+            -14.9799
+          ],
+          [
+            -33.404,
+            -0.846047,
+            -14.9808
+          ],
+          [
+            -33.7309,
+            -0.924961,
+            -15.2589
+          ],
+          [
+            -33.3104,
+            -0.925,
+            -15.3755
+          ],
+          [
+            -32.9119,
+            -0.925,
+            -15.1978
+          ]
+        ],
+        "publishedLanternHinge": [
+          0.408487,
+          0,
+          0.912764,
+          0,
+          -0.0455813,
+          0.998752,
+          0.0203989,
+          0,
+          -0.911625,
+          -0.0499376,
+          0.407978,
+          0,
+          -17.1943,
+          1.18494,
+          14.7803,
+          1
+        ],
+        "publishedLanternBody": [
+          0.408134,
+          0.00748893,
+          0.912891,
+          0,
+          -0.0486444,
+          0.998724,
+          0.0135548,
+          0,
+          -0.911625,
+          -0.0499393,
+          0.407978,
+          0,
+          -17.1283,
+          1.18744,
+          14.8055,
+          1
+        ]
+      },
+      "preset": "finale-roof-open",
+      "pngSha256": "06a0046012abf49befbe8253f8d4685659b905bb078d32ea541875af36b59e44"
+    }
+  },
+  "pixelComparisons": {
+    "backend": {
+      "changedPixels": 1510,
+      "maxChannel": 45,
+      "meanChannel": 0.004372427983539095
+    },
+    "selected": {
+      "changedPixels": 0,
+      "maxChannel": 0,
+      "meanChannel": 0.0
+    },
+    "restored": {
+      "changedPixels": 0,
+      "maxChannel": 0,
+      "meanChannel": 0.0
+    }
+  },
+  "builds": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 12803072,
+      "sha256": "78581a7ffcab033b3c6b046d0db1ada3b2993250a96cd7cf7c5fba93a064d276"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4425216,
+      "sha256": "e4c4d9c3a3a35258422bb58da5d0f9a15246839b449c613663bd60f03b7b3a7c"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 172837566,
+      "sha256": "c626f520ab8eff0741876e216a11a5939e0e30551f68d97da3fcf1f91397df5e"
+    }
+  },
+  "sources": {
+    "src\\scene\\ForestRockDressing.cpp": {
+      "bytes": 8052,
+      "sha256": "46516f9660db5b2c39417c81c7bff34c21b5bc88f46dead3dc95a4e61219e4c6"
+    },
+    "src\\scene\\ForestRockDressing.h": {
+      "bytes": 622,
+      "sha256": "0cdf0cc642f870e9531b7318a9d2cc1e7ce4c9ccb32faf80d49e61144f3ff8c5"
+    },
+    "src\\gameplay\\simulation\\TriangleSupportSurface.h": {
+      "bytes": 20779,
+      "sha256": "2e9f3c04aade22c7aa854c5819a638b396ece90d0cb1b94422d23e1248096c51"
+    },
+    "assets\\models\\world\\source\\forest-rocks-v1\\admission-receipt.json": {
+      "bytes": 1384,
+      "sha256": "5de9be21994a41d70b104a570cd4e3d6812877cd43d839cb8bb92e2e441f62a5"
+    },
+    "assets\\models\\world\\source\\forest-rocks-v1\\horde-rock-low_boulder.glb.tangent-receipt.json": {
+      "bytes": 996,
+      "sha256": "94fe873f8a1fe84cd7c4a3459b7798b4973409443749bc82a311a8d47a65ae3c"
+    },
+    "assets\\models\\world\\source\\forest-rocks-v1\\horde-rock-split_shelf.glb.tangent-receipt.json": {
+      "bytes": 996,
+      "sha256": "2c50e81cfeb877f0c317d4e68baae297612af42e2317861c6d8a9de39fcb950d"
+    },
+    "assets\\models\\world\\source\\forest-rocks-v1\\horde-rock-upright_crag.glb.tangent-receipt.json": {
+      "bytes": 998,
+      "sha256": "d8acb9bdb4b7a3b1a730a17b12921de320ceacacf3e5d83bb214c949aa997a04"
+    },
+    "assets\\models\\world\\source\\forest-rocks-v1\\README.md": {
+      "bytes": 1315,
+      "sha256": "bf61705a680f6402c968bf1d44062b87f284dc2c048b97a0531a7eaa9a9c1954"
+    },
+    "assets\\models\\world\\source\\forest-rocks-v1\\tangent-recipe.executed.py": {
+      "bytes": 9928,
+      "sha256": "62a1b7f918ac19e24f9a55377103ce27359843abf5ab3285163d16d31fc66037"
+    },
+    "assets\\models\\world\\runtime\\forest-rocks-v1\\asset.manifest.json": {
+      "bytes": 854,
+      "sha256": "252add83e55b0e2e0e38c4d395e5422b77047fcc456e0bade1ac6dec33d2a072"
+    },
+    "assets\\models\\world\\runtime\\forest-rocks-v1\\horde-rock-low_boulder.glb": {
+      "bytes": 704076,
+      "sha256": "1bdc6f650410a1f352ad8a314fa0f0b1a978ab226720c97a3e6dde6fd94df262"
+    },
+    "assets\\models\\world\\runtime\\forest-rocks-v1\\horde-rock-split_shelf.glb": {
+      "bytes": 763376,
+      "sha256": "00cc649340942f503cb83a3f5f91c5c5d9509bffe0851f972a4fd2c6625b3aa5"
+    },
+    "assets\\models\\world\\runtime\\forest-rocks-v1\\horde-rock-upright_crag.glb": {
+      "bytes": 703880,
+      "sha256": "2e3e0ca2a3d25c91d12dfa46c3ba6fb639dbda54af2a551c0a46c79b9c186d4a"
+    }
+  },
+  "limits": {
+    "textureLayers": 18,
+    "highPrimitiveRows": 32,
+    "materialRows": 30,
+    "actorSlots": 3
+  },
+  "normalPlayResidencySavingBytes": 0,
+  "remaining": "Full two-way normal-play GPU loading/retirement, remaining prepared wood/stump/snag, full gallery, sustained and phone acceptance; Easy Tree/canopy and mist28 deferred"
+}

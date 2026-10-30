@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "e3486d73c71bd57129438d3dc20faf8febbc8300",
+  "evidenceClass": "Read-only full approved 1.7 backlog reconciliation; terminal exact-source hosted CI; documentation-only checkpoint",
+  "workflow": {
+    "conclusion": "success",
+    "created_at": "2026-10-23T14:22:19Z",
+    "event": "push",
+    "head_branch": "codex/horde-1.7-wp2-vertical-proof",
+    "head_sha": "e3486d73c71bd57129438d3dc20faf8febbc8300",
+    "html_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39969045780",
+    "id": 39969045780,
+    "name": "Shared simulation host tests",
+    "run_attempt": 1,
+    "run_started_at": "2026-10-23T14:22:19Z",
+    "status": "completed",
+    "updated_at": "2026-10-23T14:36:03Z"
+  },
+  "jobs": [
+    {
+      "id": 120466517893,
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:22:22Z",
+      "completedAtUtc": "2026-10-23T14:28:43Z",
+      "totalSeconds": 381.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39969045780/job/120466517893"
+    },
+    {
+      "id": 120466518329,
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:22:22Z",
+      "completedAtUtc": "2026-10-23T14:29:35Z",
+      "totalSeconds": 433.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39969045780/job/120466518329"
+    },
+    {
+      "id": 120466518440,
+      "name": "player-vulkan-host",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:22:22Z",
+      "completedAtUtc": "2026-10-23T14:29:52Z",
+      "totalSeconds": 450.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39969045780/job/120466518440"
+    },
+    {
+      "id": 120466518522,
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:22:22Z",
+      "completedAtUtc": "2026-10-23T14:32:56Z",
+      "totalSeconds": 634.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39969045780/job/120466518522"
+    },
+    {
+      "id": 120466518537,
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:22:23Z",
+      "completedAtUtc": "2026-10-23T14:36:03Z",
+      "totalSeconds": 820.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39969045780/job/120466518537"
+    },
+    {
+      "id": 120466518579,
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T14:22:23Z",
+      "completedAtUtc": "2026-10-23T14:26:29Z",
+      "totalSeconds": 246.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39969045780/job/120466518579"
+    }
+  ],
+  "msvc": {
+    "jobId": 120466518537,
+    "conclusion": "success",
+    "timeoutMinutes": 15,
+    "totalSeconds": 820.0,
+    "remainingToCapSeconds": 80.0,
+    "configureStepSeconds": 28.0,
+    "buildStepSeconds": 615.0,
+    "selectionStepSeconds": 128.0,
+    "selectedCount": 150,
+    "completedPassedCount": 150,
+    "failedTestResultsObserved": 0,
+    "ctestRealSeconds": 126.82,
+    "unfinishedStartedTest": null,
+    "notStartedCount": 0,
+    "ctestFinalSummaryPresent": true,
+    "portableExcludedCount": 21,
+    "unchangedToolExcludedCount": 15,
+    "benchmarkSliceTests": [
+      {
+        "name": "horde_rt_benchmark_profile_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      },
+      {
+        "name": "horde_rt_windows_benchmark_launch_tests",
+        "result": "Passed",
+        "seconds": 0.01
+      }
+    ],
+    "providerObjectWrapperSeconds": 79.58,
+    "nativeReportUiResults": [
+      {
+        "name": "horde_rt_windows_remote_playtest_report_ui_tests",
+        "result": "Passed",
+        "seconds": 0.86
+      },
+      {
+        "name": "horde_rt_windows_playtest_report_ui_tests",
+        "result": "Passed",
+        "seconds": 0.6
+      }
+    ],
+    "apkResolverStepConclusion": "success",
+    "apkResolverCasesPassed": 10,
+    "annotationCount": 0,
+    "annotations": []
+  },
+  "rawCiEvidence": [
+    {
+      "path": "reports/1-7-final-reconciliation-20261023/e348-terminal-run.json",
+      "sha256": "b774ea4fd26abd6d4d52ca5665cd46133da7589c8199a929029f2e4e70c61e4c",
+      "bytes": 438
+    },
+    {
+      "path": "reports/1-7-final-reconciliation-20261023/e348-terminal-jobs.json",
+      "sha256": "6944fdc6605f979f7bcb3c39af992341a2413f9d30f9ef636e3bf8043164e3ef",
+      "bytes": 26526
+    },
+    {
+      "path": "reports/1-7-final-reconciliation-20261023/e348-msvc-selected.log",
+      "sha256": "cec0c2f1ce0be5d34d9cc69866def33b15f3815f1deaaa8c4dcf687ea0f43ba0",
+      "bytes": 32927
+    },
+    {
+      "path": "reports/1-7-final-reconciliation-20261023/e348-msvc-annotations.json",
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+      "bytes": 4
+    }
+  ],
+  "rawCiReceipt": {
+    "path": "reports/1-7-final-reconciliation-20261023/e348-terminal-receipt.json",
+    "bytes": 11338,
+    "sha256": "71eee5fd62771b4803e75fe7e72b38d563f4eba00370b77c897852ef9dc770d4"
+  },
+  "sourceGitBlobs": {
+    "src/platform/windows/DiagnosticWindow.cpp": "29fc3f301e24f0c853f4925451d5e322e0e5e5db",
+    "src/platform/windows/WindowsBenchmarkLaunch.h": "5d4670440de1ff52d98548227377a216f86e3d53",
+    "src/platform/windows/WindowsBenchmarkProfile.inl": "1671e38975114ffa986045f83da96a9992abc97a",
+    "src/reporting/BenchmarkSummaryReport.cpp": "98526cf34f3bbe4f0b95c2132387ad6a083eb50c",
+    "src/scene/ForestDressing.cpp": "dd0ef9bc101be6e977776a4f498a1884efe7f642",
+    "src/gameplay/dialogue/CompanionRouteFixture.h": "3c9bdf20375e3279b50a25a1f0ac18d3013ef769",
+    "src/graphics/ForegroundPauseRenderCadence.h": "242f08b351466671980d709774d3862e806e02f8",
+    "src/gameplay/simulation/GameSimulationRescue.cpp": "ff97e543d109ef856c2d47919bad86c08dbab8fd",
+    "CMakeLists.txt": "ab24ad3e08bb7d4017479ded3b9ea3c4e30f3a5d"
+  },
+  "pr27": {
+    "baseRefName": "main",
+    "baseRefOid": "e1b142c167d57530504af51b43fd89568da61bb9",
+    "headRefName": "codex/horde-1.7-wp2-vertical-proof",
+    "headRefOid": "e3486d73c71bd57129438d3dc20faf8febbc8300",
+    "isDraft": true,
+    "mergeable": "CONFLICTING",
+    "state": "OPEN",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/27"
+  },
+  "readOnlyOverlap": {
+    "head": "e3486d73c71bd57129438d3dc20faf8febbc8300",
+    "base": "e1b142c167d57530504af51b43fd89568da61bb9",
+    "mergeBase": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "headChangedCount": 6157,
+    "baseChangedCount": 32,
+    "bothSidesChanged": [
+      ".gitattributes",
+      "PROJECT_DECISIONS.md",
+      "docs/ROADMAP.md"
+    ],
+    "classification": "Overlap candidates only, not an exact textual conflict list; no merge-tree, merge, rebase or checkout operation."
+  },
+  "rawPrEvidence": {
+    "reports/1-7-final-reconciliation-20261023/pr27-readback.json": "248f08c320ab11f42744fe65ee56ed8fe707e8edcc2e87163ebff424a37f9c6e",
+    "reports/1-7-final-reconciliation-20261023/pr27-overlap.json": "ec671e38932eb6e3a72febded795105fb45adc0554f629aa1d28c51056c64e76"
+  },
+  "noNewBuildOrBroadTests": true,
+  "noRuntimeSourceEdits": true,
+  "noPhoneOperations": true,
+  "noBaseIntegration": true,
+  "parkedOwnerFileCount": 151,
+  "manualAudioHapticRevalidationRequired": false,
+  "nextNonPhoneCandidate": "Windows explicit provisional/custom benchmark UI entry and safe campaign/menu return, reusing the tested profile ownership/rollback seam; no implementation authorized by this documentation pass.",
+  "limits": [
+    "All six CI jobs pass on exact e3486d73. The new documentation commit has no new runtime validation claim.",
+    "Current implementation/evidence is separate from phone/owner comfort, listening, natural-play and sustained thermal acceptance.",
+    "Overlap candidates are not an exact textual conflict list. No merge-tree, merge, rebase, reset/stash, checkout or resolution was applied.",
+    "Flask semantics and deferred forest/smoke dispositions are not invented or overridden. Closed experiments remain closed.",
+    "No game report, raw owner inventory, device trace or hardware report is sent/uploaded; only sanitized repository documentation/CI evidence is backed up."
+  ]
+}

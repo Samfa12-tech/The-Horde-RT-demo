@@ -1,6 +1,11 @@
 #include "graphics/GraphicsPreviewSession.h"
 #include "platform/windows/WindowsGraphicsPreviewCapture.h"
+#include "platform/windows/WindowsPreviewMeshPairCapture.h"
+#include "platform/windows/WindowsHiddenCaptureLaunch.h"
+#include "platform/windows/WindowsForestRouteProofLaunch.h"
+#include "platform/windows/WindowsForestContentCandidate.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -17,6 +22,108 @@ void Check(const bool condition, const char* message)
 int main()
 {
     using namespace horde::platform::windows;
+    Check(MatchesFrozenForestContentCandidate(kForestContentCandidateName,
+        kForestContentCandidateFingerprint,kForestContentCandidateCount,kForestContentCandidateBounds,true),
+        "independently frozen forest content descriptor matches");
+    Check(!MatchesFrozenForestContentCandidate("other",kForestContentCandidateFingerprint,
+        kForestContentCandidateCount,kForestContentCandidateBounds,true),"unknown forest candidate rejected");
+    Check(!MatchesFrozenForestContentCandidate(kForestContentCandidateName,"different",
+        kForestContentCandidateCount,kForestContentCandidateBounds,true),"changed source identity rejected");
+    Check(!MatchesFrozenForestContentCandidate(kForestContentCandidateName,kForestContentCandidateFingerprint,
+        kForestContentCandidateCount+1,kForestContentCandidateBounds,true),"changed triangle count rejected");
+    auto changedBounds=kForestContentCandidateBounds;++changedBounds[0];
+    Check(!MatchesFrozenForestContentCandidate(kForestContentCandidateName,kForestContentCandidateFingerprint,
+        kForestContentCandidateCount,changedBounds,true),"changed bounds rejected without tolerance widening");
+    Check(!MatchesFrozenForestContentCandidate(kForestContentCandidateName,kForestContentCandidateFingerprint,
+        kForestContentCandidateCount,kForestContentCandidateBounds,false),"failed structural validation rejected");
+    const std::array<std::wstring_view,7> forestArgs{L"--forest-route-proof",L"shared64",L"--capture-hidden",
+        L"--capture-showcase",L"C:\\captures\\forest",L"--development-checkpoint",L"chapter-landing-north"};
+    Check(ParseForestRouteProofLaunch(forestArgs,true).mode==ForestRouteCaptureMode::SharedExisting64 &&
+          ParseForestRouteProofLaunch(forestArgs,true).error.empty(),"shared64 is limited to an explicit hidden chapter capture");
+    Check(!ParseForestRouteProofLaunch(forestArgs,false).error.empty(),"forest proof is rejected by Release");
+    auto bakedForest=forestArgs;bakedForest[1]=L"baked-resident";
+    Check(ParseForestRouteProofLaunch(bakedForest,true).mode==ForestRouteCaptureMode::BakedResident &&
+          ParseForestRouteProofLaunch(bakedForest,true).error.empty(),"existing baked control remains independently selectable");
+    auto sectorArgs=forestArgs;sectorArgs[1]=L"f01-sector";
+    Check(ParseForestRouteProofLaunch(sectorArgs,true).mode==ForestRouteCaptureMode::SharedF01Sector76 &&
+          ParseForestRouteProofLaunch(sectorArgs,true).error.empty(),"F01 sector is a separate explicit hidden composition proof");
+    Check(!ParseForestRouteProofLaunch(sectorArgs,false).error.empty(),"Release rejects F01 sector composition");
+    auto groupedArgs=sectorArgs;groupedArgs[1]=L"f01-grouped-r4";
+    Check(ParseForestRouteProofLaunch(groupedArgs,true).mode==ForestRouteCaptureMode::SharedF01Grouped76 &&
+          ParseForestRouteProofLaunch(groupedArgs,true).error.empty(),"grouped F01 is a separate hidden candidate, not a replacement of the sparse control");
+    Check(!ParseForestRouteProofLaunch(groupedArgs,false).error.empty(),"Release rejects grouped F01 composition");
+    auto retentionArgs=forestArgs;retentionArgs[1]=L"shared64-retention";
+    Check(ParseForestRouteProofLaunch(retentionArgs,true).mode==ForestRouteCaptureMode::SharedRetention64 &&
+          ParseForestRouteProofLaunch(retentionArgs,true).error.empty(),"whole-instance retention requires its own explicit proof selection");
+    Check(!ParseForestRouteProofLaunch(retentionArgs,false).error.empty(),"Release rejects whole-instance retention proof");
+    auto normalForestArgs=forestArgs;normalForestArgs[1]=L"normal-shared64";
+    Check(ParseForestRouteProofLaunch(normalForestArgs,true).mode==ForestRouteCaptureMode::NormalShared64 &&
+          ParseForestRouteProofLaunch(normalForestArgs,true).error.empty(),"normal shared ownership uses a distinct explicit validation selection");
+    Check(!ParseForestRouteProofLaunch(normalForestArgs,false).error.empty(),"normal-owner validation launcher remains Debug-only");
+    std::array<std::wstring_view,8> normalRouteArgs{};
+    std::copy(normalForestArgs.begin(),normalForestArgs.end(),normalRouteArgs.begin());
+    normalRouteArgs[6]=L"chapter-kit-reunion";normalRouteArgs[7]=L"--validate-chapter-roundtrip";
+    Check(ParseForestRouteProofLaunch(normalRouteArgs,true).error.empty(),"normal shared ownership may use the existing reunion roundtrip gate");
+    normalRouteArgs[1]=L"shared64";
+    Check(!ParseForestRouteProofLaunch(normalRouteArgs,true).error.empty(),"isolated proof mode cannot bypass normal route ownership");
+    const std::array<std::wstring_view,8> routeStages{L"--capture-showcase",L"C:\\captures\\route",L"--capture-hidden",
+        L"--development-checkpoint",L"chapter-kit-reunion",L"--validate-chapter-roundtrip",
+        L"--capture-chapter-route-stages",L"--development-rescue-journey"};
+    const auto observedRoute=ParseForestRouteProofLaunch(routeStages,true);
+    Check(observedRoute.error.empty() && observedRoute.gpuStages && !observedRoute.landingOnly &&
+        observedRoute.mode==ForestRouteCaptureMode::Disabled,"GPU observation preserves the complete ordinary baked route gate");
+    Check(!ParseForestRouteProofLaunch(routeStages,false).error.empty(),"Release rejects full-route GPU observation");
+    auto invalidRouteStages=routeStages;invalidRouteStages[5]=L"--other";
+    Check(!ParseForestRouteProofLaunch(invalidRouteStages,true).error.empty(),"GPU observation cannot replace full-route validation");
+    invalidRouteStages=routeStages;invalidRouteStages[2]=L"--other";
+    Check(!ParseForestRouteProofLaunch(invalidRouteStages,true).error.empty(),"full-route GPU observation requires hidden operation");
+    const std::array<std::wstring_view,7> landingArgs{L"--capture-chapter-landing",L"stages",L"--capture-hidden",
+        L"--capture-showcase",L"C:\\captures\\landing",L"--development-checkpoint",L"chapter-kit-reunion"};
+    const auto landing=ParseForestRouteProofLaunch(landingArgs,true);
+    Check(landing.error.empty() && landing.landingOnly && landing.gpuStages && landing.mode==ForestRouteCaptureMode::Disabled,
+          "landing attribution selects the ordinary baked owner and explicit stage capture");
+    auto landingControl=landingArgs;landingControl[1]=L"control";
+    Check(ParseForestRouteProofLaunch(landingControl,true).error.empty() &&
+          !ParseForestRouteProofLaunch(landingControl,true).gpuStages,"uninstrumented landing control is explicit");
+    Check(!ParseForestRouteProofLaunch(landingArgs,false).error.empty(),"Release rejects partial landing observation");
+    std::array<std::wstring_view,8> mixedLanding{};
+    std::copy(landingArgs.begin(),landingArgs.end(),mixedLanding.begin());mixedLanding[7]=L"--validate-chapter-roundtrip";
+    Check(!ParseForestRouteProofLaunch(mixedLanding,true).error.empty(),"partial attribution cannot replace full route validation");
+    std::array<std::wstring_view,9> sharedLanding{};
+    std::copy(landingArgs.begin(),landingArgs.end(),sharedLanding.begin());
+    sharedLanding[7]=L"--forest-route-proof";sharedLanding[8]=L"normal-shared64";
+    Check(ParseForestRouteProofLaunch(sharedLanding,true).error.empty(),"normal shared owner supports the same bounded landing workload");
+    sharedLanding[8]=L"shared64";
+    Check(!ParseForestRouteProofLaunch(sharedLanding,true).error.empty(),"isolated shared proof cannot substitute for normal-owner attribution");
+    auto badLanding=landingArgs;badLanding[2]=L"--validate-chapter-roundtrip";
+    Check(!ParseForestRouteProofLaunch(badLanding,true).error.empty(),"landing observation cannot acquire foreground");
+    badLanding=landingArgs;badLanding[6]=L"chapter-forest-lookout";
+    Check(!ParseForestRouteProofLaunch(badLanding,true).error.empty(),"partial observation is restricted to its original prefix start");
+    auto mixedRetention=retentionArgs;mixedRetention[2]=L"--validate-static-zone-cutover";
+    Check(!ParseForestRouteProofLaunch(mixedRetention,true).error.empty(),"whole-instance proof cannot reuse common-owner cutover");
+    auto unsafeSector=sectorArgs;unsafeSector[2]=L"--validate-static-zone-cutover";
+    Check(!ParseForestRouteProofLaunch(unsafeSector,true).error.empty(),"F01 sector cannot invoke static cutover");
+    auto badForest=forestArgs;badForest[1]=L"other";
+    Check(!ParseForestRouteProofLaunch(badForest,true).error.empty(),"unknown forest representation rejected");
+    badForest=forestArgs;badForest[2]=L"--validate-static-zone-cutover";
+    Check(!ParseForestRouteProofLaunch(badForest,true).error.empty(),"fully resident forest proof cannot invoke static cutover");
+    badForest=forestArgs;badForest[6]=L"ordinary";
+    Check(!ParseForestRouteProofLaunch(badForest,true).error.empty(),"forest proof cannot select unrelated scenes");
+    const std::array<std::wstring_view,3> pairArgs{L"--capture-hidden-preview-pair",L"shared",L"C:\\captures\\pair"};
+    Check(ParsePreviewMeshPairCaptureLaunch(pairArgs,true).mode==PreviewMeshPairCaptureMode::Shared &&
+          ParsePreviewMeshPairCaptureLaunch(pairArgs,true).error.empty(),"explicit Debug hidden shared pair parses");
+    Check(!ParsePreviewMeshPairCaptureLaunch(pairArgs,false).error.empty(),"Release rejects hidden pair");
+    auto invalidPair=pairArgs;invalidPair[1]=L"other";
+    Check(!ParsePreviewMeshPairCaptureLaunch(invalidPair,true).error.empty(),"unknown pair mode rejected");
+    invalidPair=pairArgs;invalidPair[2]=L"relative";
+    Check(!ParsePreviewMeshPairCaptureLaunch(invalidPair,true).error.empty(),"relative pair output rejected");
+    const std::array<std::wstring_view,4> mixedPair{pairArgs[0],pairArgs[1],pairArgs[2],L"--capture-hidden"};
+    Check(!ParsePreviewMeshPairCaptureLaunch(mixedPair,true).error.empty(),"pair cannot weaken generic hidden guard");
+    const std::array<std::wstring_view,3> oldHiddenPreview{L"--capture-hidden",L"--capture-graphics-preview",L"C:\\captures\\preview"};
+    Check(!ParseWindowsHiddenCaptureLaunch(oldHiddenPreview,true).error.empty(),"ordinary hidden-preview incompatibility remains");
+    const std::array<std::wstring_view,6> repeatedPair{pairArgs[0],pairArgs[1],pairArgs[2],pairArgs[0],L"baked",pairArgs[2]};
+    Check(!ParsePreviewMeshPairCaptureLaunch(repeatedPair,true).error.empty(),"duplicate pair request rejected");
+    Check(!ParsePreviewMeshPairCaptureLaunch(std::span(pairArgs).first(2),true).error.empty(),"missing pair output rejected");
     const std::array<std::wstring_view, 2u> captureArguments{L"--capture-graphics-preview", L"C:\\captures\\preview"};
     Check(ParseGraphicsPreviewCaptureLaunch(captureArguments).requested &&
           ParseGraphicsPreviewCaptureLaunch(captureArguments).error.empty(), "absolute isolated Debug capture arguments parse");

@@ -1,0 +1,25 @@
+{
+  "case": "pipeline-fire-c1",
+  "outcome": "rejected-preparation",
+  "timedRouteLaunched": false,
+  "reason": "AP40.1C vs A3 reference42.5C exceeded unchanged1.5C maximum delta; all statuses0",
+  "benchmarkLatestOwnership": "Copied common latest report is stale and excluded from Fire evidence. No motion-launch file or run-id manifest exists.",
+  "ownerSettingsUnchanged": true,
+  "artifacts": {
+    "android-motion-cpu20-pipeline-fire-c1-ledger.json": "c807fa6893f04ff7b28793510226eb2d2332c8d3924f81fa53f2d5a6bca92fd1",
+    "android-motion-cpu20-pipeline-fire-c1-manifest.json": "86e5c395c939e69c3a96a053f78748694c06da0274679c847b535d6afa72ac22",
+    "android-motion-cpu20-pipeline-fire-c1-present-timing.json": "4980713c30dc253a320fd4fa6a8aa50eeefb56b961747ece07b48ac6233964d1",
+    "android-motion-cpu20-pipeline-fire-c1-resources.csv": "6edf9f5d17ed2941a5d87938d81df0bcfb7dec3f889576c87615fe89b60256f8",
+    "battery-after.txt": "b36cefa0543232cc0455df36e652a34217636bd6b166b095aa17065b65847443",
+    "battery-before.txt": "0f33af06cc00474b38506df981f7dec5e2a76a65b7ebf84f854c431d72bd5d56",
+    "HordeLanternRT-benchmark-latest.json": "4e59deba5034383805b996e8bbefab0cba4851e106b37ffbf3f722a891370656",
+    "launch.txt": "ea0efa120e6331119d4e8eacb7de854f3fd967a775b8f979016ee613b5650102",
+    "owned-final.log": "0bf18456c86fe19e0f1c9ffaad163eb98a9f85455469b86402e4fe78f4681221",
+    "prestart-capability.json": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+    "request.json": "692a834e43114c7057f475eb97c4a8393c433c66f5ba5ae9e86f266d0843a908",
+    "settings-after.xml": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "thermal-admission.json": "8f0e11064910c2a032c18c6b0ceec262eae75689bcc6c1bde1e0f802e682f0a4",
+    "thermals.json": "b7d008ca647a4641110f881243fd1567f6077050bf806e00232b0fb9070b5fe5",
+    "vulkan_capability_report.json": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a"
+  }
+}

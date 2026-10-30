@@ -1,0 +1,83 @@
+{
+  "sourceParent": "d24a9971016050964a7a9a1f2cf1ac383b411324",
+  "artifacts": {
+    "WindowsDebug": {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 12438528,
+      "sha256": "25da7fbd4276e05a90a2d9094c39a87b0b20c1ba3d26f2d0af3cd7e718af0d6f"
+    },
+    "WindowsRelease": {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4332544,
+      "sha256": "85e85d5161fbeca030b0982f3ccea1d76445ca7ad1ffdd9c080bbf5bd4748e71"
+    },
+    "AndroidDebug": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 172446648,
+      "sha256": "4f69959f8951d10b7f8be7c7520198c40940b7614df8d0d557c870edce3fb6e5"
+    }
+  },
+  "captures": [
+    {
+      "label": "before-second-bend",
+      "pngSha256": "699ce3ed5f89fcc9092349e41e5cea3f85c9dfba4cc0aefb1e3512b33dd53fcb",
+      "manifestSha256": "5684cf93dbef4fde08647e499a2a5e27fbea526eddb5941084f4116284c88303",
+      "complete": true,
+      "backend": "RayTracingPipeline"
+    },
+    {
+      "label": "before-lookout",
+      "pngSha256": "e1409a4bebd4c98a83ac6de14e397c46a73fe248469017eea29e794152f32ff1",
+      "manifestSha256": "5992089e4032b2cac17a5c5012edf5c35bde2087f63000f9f49f00d21312bb68",
+      "complete": false,
+      "backend": "RayTracingPipeline"
+    },
+    {
+      "label": "after-second-bend",
+      "pngSha256": "f2af0038e0ebed68d946cf25a6fa6a2eed7234c2b811ab6f13ed8be11a5197ad",
+      "manifestSha256": "75c0ea4ac3bec86ccf3c5faa534d49d7354338e891bafd44d712f0d75ae2983d",
+      "complete": true,
+      "backend": "RayTracingPipeline"
+    },
+    {
+      "label": "after-lookout-query",
+      "pngSha256": "52d0a2d5b625e68869b678d22d67b3fae4ab274646639ccaaf57ba6d1f32f95f",
+      "manifestSha256": "1211f20d27524a13615d7ffa8333aa321e1f156e83fbe9cd95d0b4bfdd1e9917",
+      "complete": true,
+      "backend": "RayQueryCompute"
+    },
+    {
+      "label": "after-west",
+      "pngSha256": "652d14454c1212529b7d5aa79052662ff121ae6fc53a4b3d86b29b679b320b75",
+      "manifestSha256": "72980429bdccbc70c43f196d5a182c3f72456f4379fb68043131f48a9bf51cc5",
+      "complete": true,
+      "backend": "RayTracingPipeline"
+    },
+    {
+      "label": "after-lookout-pipeline",
+      "pngSha256": "9bbe9a26e03bc60a26aa6130f41611e501ada9a0eaf85015f2a1c5e4a886c3b7",
+      "manifestSha256": "57e2531f42cc8f09a2d7baf31e944423313bb786ef34442ef63549bd429e0343",
+      "complete": true,
+      "backend": "RayTracingPipeline"
+    }
+  ],
+  "changedSourceHashes": {
+    "CMakeLists.txt": "536a47e0de371a94c0210798bb639f11af4ab1cf62e649eb4d43a27e0cc16968",
+    "src/gameplay/DevelopmentCheckpointSimulation.h": "3fb9cfac507c0e3940333f7d1a2960728a58a2e77a4b5009f8ed422f07ca009e",
+    "src/gameplay/DevelopmentCheckpoints.h": "1f3b366c7d5783805b268303d19c10f920a1043687d95db6cd0f727165e98770",
+    "src/gameplay/items/HeldItemKinematics.cpp": "da6a54b8800280ad95d227d8309420052140cd2f193571370ff79d6bba29c8cb",
+    "src/gameplay/items/HeldItemKinematics.h": "93492bfa73c49eade001864ed69c943abe145888b0861c28f72babfc5c8bb1b2",
+    "src/gameplay/simulation/ForestTreePlacementContract.h": "b56b76f7122361edfddbfa371e7096416bd74b7c160e9c7a66bc5f9fce4bc1d8",
+    "src/gameplay/simulation/GameSimulation.cpp": "3b035d726d93536f6b7fa29a12255b94398ef9ad2336868929049446c658b463",
+    "src/scene/ForestDressing.cpp": "517f63a7c4a49db6be3b43dd573931e485715b78e36d2d2c3dd1acb9cf77ef9f",
+    "src/scene/ForestDressing.h": "06c5b5c109404f2c0e80c59317713dca40240c5e3e6f1f09287797882945296a",
+    "tests/DevelopmentStaticAssetTests.cpp": "22d49ca04df38b76c4086736452045245ed3a47489d85a74ea62a3276764785c",
+    "tests/ForestDressingTests.cpp": "fb966ce4ea741a6ae8560884b71a9738700c2a4b429bd15c9e8e86e8211010ef",
+    "tests/RescueJourneyIntegrationTests.cpp": "def7ac61670e3223d7449fd5d8fecb9ad3560d9c617a55a320d7f747e3745c83",
+    "tests/RtSceneResourceInventoryTests.cpp": "a775b373f3191e9f1cc92e0cd8266f2dfcd5c16c07dbf2774cde1085a696b506",
+    "tools/build-forest-placement-contract.py": "22046ecff8dfbc9c6416f4173bf295e2d8667e13a53ef283d6abef486966deae",
+    "tools/fit-forest-root-placements.py": "a23df2a72fe1e03ca46bef06a37e1b41d010d95c9d85a7d4e9b550354a850ca5",
+    "assets/models/world/source/forest-tree-pair-v1/woodland-placements-v2.json": "f1217b13e10e12b7bed1647ff9c9aded296a741f88b8a5ac6c9dbba05c062486",
+    "assets/models/world/source/forest-tree-pair-v1/woodland-placements-v3.json": "7988cdc1e08e262b3bdc957f01fb00f87cf2fc268654e387c3918272fe7db06a"
+  }
+}

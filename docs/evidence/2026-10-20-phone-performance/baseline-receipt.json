@@ -1,0 +1,1073 @@
+{
+  "sourceHead": "b2d548a22cc44a58c92c290018f5bf211f2a8d87",
+  "sourcePatchSha256": "84f3506ef3ca0e44ee66ac51be97749c21ab10e1b537dc617ad62ce468ab98dc",
+  "apkSha256": "01b414878a57f16a9001b1ff28394a8d2c7c5da4b5c867ecd63ebde94d7f9d5a",
+  "scope": "measurement-only working patch; optimized Debug with Shipping/Mobile route timing",
+  "device": "SM-S948B / Adreno840 / Android17 API37",
+  "settings": {
+    "scalePercent": 40,
+    "width": 1440,
+    "height": 2971,
+    "internalWidth": 576,
+    "internalHeight": 1188,
+    "backend": "RayTracingPipeline",
+    "water": 1,
+    "fire": 0,
+    "cap": 30,
+    "glass": false,
+    "shadow": 1,
+    "mist": true,
+    "dust": 1
+  },
+  "joinedFrames": 704,
+  "strictActualPresentationEligible": true,
+  "actualDisplayIntervalsNs": {
+    "median": 75000001,
+    "p90NearestRank": 154166666,
+    "p95NearestRank": 158333281,
+    "maximum": 162499948,
+    "over33333000Nanoseconds": 703,
+    "over250000000Nanoseconds": 0
+  },
+  "views": {
+    "landing-sweep": {
+      "pose": {
+        "x": -33.689,
+        "y": 2.05,
+        "z": -12.7846,
+        "yaw": 3.14159,
+        "pitch": -0.15
+      },
+      "cpu": {
+        "simulation": {
+          "all": {
+            "n": 39,
+            "meanMs": 3.6222060256410256,
+            "medianMs": 3.33349,
+            "p95Ms": 5.380469,
+            "maximumMs": 5.389479
+          },
+          "active": {
+            "n": 39,
+            "meanMs": 3.6222060256410256,
+            "medianMs": 3.33349,
+            "p95Ms": 5.380469,
+            "maximumMs": 5.389479
+          },
+          "calls": 39
+        },
+        "skin": {
+          "all": {
+            "n": 39,
+            "meanMs": 9.867819282051283,
+            "medianMs": 11.13625,
+            "p95Ms": 12.014635,
+            "maximumMs": 12.15495
+          },
+          "active": {
+            "n": 39,
+            "meanMs": 9.867819282051283,
+            "medianMs": 11.13625,
+            "p95Ms": 12.014635,
+            "maximumMs": 12.15495
+          },
+          "calls": 117
+        },
+        "player_skin": {
+          "all": {
+            "n": 39,
+            "meanMs": 5.129270871794872,
+            "medianMs": 5.921979,
+            "p95Ms": 6.797397,
+            "maximumMs": 6.813281
+          },
+          "active": {
+            "n": 39,
+            "meanMs": 5.129270871794872,
+            "medianMs": 5.921979,
+            "p95Ms": 6.797397,
+            "maximumMs": 6.813281
+          },
+          "calls": 78
+        },
+        "character_skin": {
+          "all": {
+            "n": 39,
+            "meanMs": 4.73854841025641,
+            "medianMs": 5.201354,
+            "p95Ms": 5.390678,
+            "maximumMs": 5.791875
+          },
+          "active": {
+            "n": 39,
+            "meanMs": 4.73854841025641,
+            "medianMs": 5.201354,
+            "p95Ms": 5.390678,
+            "maximumMs": 5.791875
+          },
+          "calls": 39
+        },
+        "pose_copy": {
+          "all": {
+            "n": 39,
+            "meanMs": 0.6902564102564103,
+            "medianMs": 0.69427,
+            "p95Ms": 0.838073,
+            "maximumMs": 0.848854
+          },
+          "active": {
+            "n": 39,
+            "meanMs": 0.6902564102564103,
+            "medianMs": 0.69427,
+            "p95Ms": 0.838073,
+            "maximumMs": 0.848854
+          },
+          "calls": 78
+        },
+        "dynamic_upload": {
+          "all": {
+            "n": 39,
+            "meanMs": 0.4509357692307692,
+            "medianMs": 0.450156,
+            "p95Ms": 0.599426,
+            "maximumMs": 0.614584
+          },
+          "active": {
+            "n": 39,
+            "meanMs": 0.4509357692307692,
+            "medianMs": 0.450156,
+            "p95Ms": 0.599426,
+            "maximumMs": 0.614584
+          },
+          "calls": 468
+        },
+        "fence_wait": {
+          "all": {
+            "n": 39,
+            "meanMs": 137.80177343589745,
+            "medianMs": 137.827916,
+            "p95Ms": 139.750313,
+            "maximumMs": 140.216823
+          },
+          "active": {
+            "n": 39,
+            "meanMs": 137.80177343589745,
+            "medianMs": 137.827916,
+            "p95Ms": 139.750313,
+            "maximumMs": 140.216823
+          },
+          "calls": 39
+        },
+        "queue_submit": {
+          "all": {
+            "n": 39,
+            "meanMs": 0.1752739487179487,
+            "medianMs": 0.169063,
+            "p95Ms": 0.308281,
+            "maximumMs": 0.35375
+          },
+          "active": {
+            "n": 39,
+            "meanMs": 0.1752739487179487,
+            "medianMs": 0.169063,
+            "p95Ms": 0.308281,
+            "maximumMs": 0.35375
+          },
+          "calls": 39
+        },
+        "whole_frame": {
+          "all": {
+            "n": 39,
+            "meanMs": 153.64821712820512,
+            "medianMs": 154.154166,
+            "p95Ms": 158.939947,
+            "maximumMs": 159.107604
+          },
+          "active": {
+            "n": 39,
+            "meanMs": 153.64821712820512,
+            "medianMs": 154.154166,
+            "p95Ms": 158.939947,
+            "maximumMs": 159.107604
+          },
+          "calls": 39
+        }
+      },
+      "gpu": {
+        "n": 39,
+        "meanMs": 137.6307552307692,
+        "medianMs": 137.712913,
+        "p95Ms": 139.582132,
+        "maximumMs": 139.815986
+      }
+    },
+    "lower-sweep": {
+      "pose": {
+        "x": -33.7,
+        "y": -0.95,
+        "z": -15.2,
+        "yaw": 3.14159,
+        "pitch": -0.15
+      },
+      "cpu": {
+        "simulation": {
+          "all": {
+            "n": 62,
+            "meanMs": 0.24557629032258063,
+            "medianMs": 0.269349,
+            "p95Ms": 0.305677,
+            "maximumMs": 0.462292
+          },
+          "active": {
+            "n": 62,
+            "meanMs": 0.24557629032258063,
+            "medianMs": 0.269349,
+            "p95Ms": 0.305677,
+            "maximumMs": 0.462292
+          },
+          "calls": 62
+        },
+        "skin": {
+          "all": {
+            "n": 62,
+            "meanMs": 6.09149270967742,
+            "medianMs": 6.6079425,
+            "p95Ms": 6.841667,
+            "maximumMs": 6.910312
+          },
+          "active": {
+            "n": 62,
+            "meanMs": 6.09149270967742,
+            "medianMs": 6.6079425,
+            "p95Ms": 6.841667,
+            "maximumMs": 6.910312
+          },
+          "calls": 124
+        },
+        "player_skin": {
+          "all": {
+            "n": 62,
+            "meanMs": 6.09149270967742,
+            "medianMs": 6.6079425,
+            "p95Ms": 6.841667,
+            "maximumMs": 6.910312
+          },
+          "active": {
+            "n": 62,
+            "meanMs": 6.09149270967742,
+            "medianMs": 6.6079425,
+            "p95Ms": 6.841667,
+            "maximumMs": 6.910312
+          },
+          "calls": 124
+        },
+        "character_skin": {
+          "all": {
+            "n": 62,
+            "meanMs": 0.0,
+            "medianMs": 0.0,
+            "p95Ms": 0.0,
+            "maximumMs": 0.0
+          },
+          "active": null,
+          "calls": 0
+        },
+        "pose_copy": {
+          "all": {
+            "n": 62,
+            "meanMs": 0.8668153225806452,
+            "medianMs": 0.7752095,
+            "p95Ms": 1.827865,
+            "maximumMs": 2.184063
+          },
+          "active": {
+            "n": 62,
+            "meanMs": 0.8668153225806452,
+            "medianMs": 0.7752095,
+            "p95Ms": 1.827865,
+            "maximumMs": 2.184063
+          },
+          "calls": 124
+        },
+        "dynamic_upload": {
+          "all": {
+            "n": 62,
+            "meanMs": 0.35868791935483874,
+            "medianMs": 0.364271,
+            "p95Ms": 0.39599,
+            "maximumMs": 0.842969
+          },
+          "active": {
+            "n": 62,
+            "meanMs": 0.35868791935483874,
+            "medianMs": 0.364271,
+            "p95Ms": 0.39599,
+            "maximumMs": 0.842969
+          },
+          "calls": 682
+        },
+        "fence_wait": {
+          "all": {
+            "n": 62,
+            "meanMs": 54.322781451612904,
+            "medianMs": 54.3916405,
+            "p95Ms": 54.934948,
+            "maximumMs": 55.271771
+          },
+          "active": {
+            "n": 62,
+            "meanMs": 54.322781451612904,
+            "medianMs": 54.3916405,
+            "p95Ms": 54.934948,
+            "maximumMs": 55.271771
+          },
+          "calls": 62
+        },
+        "queue_submit": {
+          "all": {
+            "n": 62,
+            "meanMs": 0.21733711290322583,
+            "medianMs": 0.1858855,
+            "p95Ms": 0.442657,
+            "maximumMs": 0.525937
+          },
+          "active": {
+            "n": 62,
+            "meanMs": 0.21733711290322583,
+            "medianMs": 0.1858855,
+            "p95Ms": 0.442657,
+            "maximumMs": 0.525937
+          },
+          "calls": 62
+        },
+        "whole_frame": {
+          "all": {
+            "n": 62,
+            "meanMs": 63.17351646774193,
+            "medianMs": 63.738984,
+            "p95Ms": 64.725469,
+            "maximumMs": 65.399584
+          },
+          "active": {
+            "n": 62,
+            "meanMs": 63.17351646774193,
+            "medianMs": 63.738984,
+            "p95Ms": 64.725469,
+            "maximumMs": 65.399584
+          },
+          "calls": 62
+        }
+      },
+      "gpu": {
+        "n": 62,
+        "meanMs": 53.991014338709675,
+        "medianMs": 54.007629,
+        "p95Ms": 54.625519,
+        "maximumMs": 54.82703
+      }
+    },
+    "passage-sweep": {
+      "pose": {
+        "x": -22.0187,
+        "y": -0.95,
+        "z": -15.2,
+        "yaw": 1.5708,
+        "pitch": -0.15
+      },
+      "cpu": {
+        "simulation": {
+          "all": {
+            "n": 52,
+            "meanMs": 0.2596794423076923,
+            "medianMs": 0.267995,
+            "p95Ms": 0.353438,
+            "maximumMs": 0.402812
+          },
+          "active": {
+            "n": 52,
+            "meanMs": 0.2596794423076923,
+            "medianMs": 0.267995,
+            "p95Ms": 0.353438,
+            "maximumMs": 0.402812
+          },
+          "calls": 52
+        },
+        "skin": {
+          "all": {
+            "n": 52,
+            "meanMs": 5.615391596153846,
+            "medianMs": 6.3992445,
+            "p95Ms": 6.89849,
+            "maximumMs": 7.328906
+          },
+          "active": {
+            "n": 52,
+            "meanMs": 5.615391596153846,
+            "medianMs": 6.3992445,
+            "p95Ms": 6.89849,
+            "maximumMs": 7.328906
+          },
+          "calls": 104
+        },
+        "player_skin": {
+          "all": {
+            "n": 52,
+            "meanMs": 5.615391596153846,
+            "medianMs": 6.3992445,
+            "p95Ms": 6.89849,
+            "maximumMs": 7.328906
+          },
+          "active": {
+            "n": 52,
+            "meanMs": 5.615391596153846,
+            "medianMs": 6.3992445,
+            "p95Ms": 6.89849,
+            "maximumMs": 7.328906
+          },
+          "calls": 104
+        },
+        "character_skin": {
+          "all": {
+            "n": 52,
+            "meanMs": 0.0,
+            "medianMs": 0.0,
+            "p95Ms": 0.0,
+            "maximumMs": 0.0
+          },
+          "active": null,
+          "calls": 0
+        },
+        "pose_copy": {
+          "all": {
+            "n": 52,
+            "meanMs": 0.7480829423076922,
+            "medianMs": 0.7796095,
+            "p95Ms": 0.871094,
+            "maximumMs": 1.185052
+          },
+          "active": {
+            "n": 52,
+            "meanMs": 0.7480829423076922,
+            "medianMs": 0.7796095,
+            "p95Ms": 0.871094,
+            "maximumMs": 1.185052
+          },
+          "calls": 104
+        },
+        "dynamic_upload": {
+          "all": {
+            "n": 52,
+            "meanMs": 0.3486216538461539,
+            "medianMs": 0.362345,
+            "p95Ms": 0.418023,
+            "maximumMs": 0.462968
+          },
+          "active": {
+            "n": 52,
+            "meanMs": 0.3486216538461539,
+            "medianMs": 0.362345,
+            "p95Ms": 0.418023,
+            "maximumMs": 0.462968
+          },
+          "calls": 572
+        },
+        "fence_wait": {
+          "all": {
+            "n": 52,
+            "meanMs": 66.25517928846153,
+            "medianMs": 66.076224,
+            "p95Ms": 68.126667,
+            "maximumMs": 68.854896
+          },
+          "active": {
+            "n": 52,
+            "meanMs": 66.25517928846153,
+            "medianMs": 66.076224,
+            "p95Ms": 68.126667,
+            "maximumMs": 68.854896
+          },
+          "calls": 52
+        },
+        "queue_submit": {
+          "all": {
+            "n": 52,
+            "meanMs": 0.24543375,
+            "medianMs": 0.215547,
+            "p95Ms": 0.462813,
+            "maximumMs": 0.535052
+          },
+          "active": {
+            "n": 52,
+            "meanMs": 0.24543375,
+            "medianMs": 0.215547,
+            "p95Ms": 0.462813,
+            "maximumMs": 0.535052
+          },
+          "calls": 52
+        },
+        "whole_frame": {
+          "all": {
+            "n": 52,
+            "meanMs": 74.56266932692307,
+            "medianMs": 75.1898695,
+            "p95Ms": 77.310625,
+            "maximumMs": 77.920104
+          },
+          "active": {
+            "n": 52,
+            "meanMs": 74.56266932692307,
+            "medianMs": 75.1898695,
+            "p95Ms": 77.310625,
+            "maximumMs": 77.920104
+          },
+          "calls": 52
+        }
+      },
+      "gpu": {
+        "n": 52,
+        "meanMs": 65.9432485576923,
+        "medianMs": 65.9339565,
+        "p95Ms": 67.269634,
+        "maximumMs": 68.001613
+      }
+    },
+    "repeat-ascent": {
+      "pose": {
+        "x": -33.7,
+        "y": 2.05,
+        "z": -12.8,
+        "yaw": 3.14159,
+        "pitch": -0.15
+      },
+      "cpu": {
+        "simulation": {
+          "all": {
+            "n": 40,
+            "meanMs": 3.7512356749999998,
+            "medianMs": 3.6723175,
+            "p95Ms": 5.423229,
+            "maximumMs": 6.092187
+          },
+          "active": {
+            "n": 40,
+            "meanMs": 3.7512356749999998,
+            "medianMs": 3.6723175,
+            "p95Ms": 5.423229,
+            "maximumMs": 6.092187
+          },
+          "calls": 40
+        },
+        "skin": {
+          "all": {
+            "n": 40,
+            "meanMs": 9.711911574999998,
+            "medianMs": 10.2812515,
+            "p95Ms": 11.979062,
+            "maximumMs": 12.130209
+          },
+          "active": {
+            "n": 40,
+            "meanMs": 9.711911574999998,
+            "medianMs": 10.2812515,
+            "p95Ms": 11.979062,
+            "maximumMs": 12.130209
+          },
+          "calls": 120
+        },
+        "player_skin": {
+          "all": {
+            "n": 40,
+            "meanMs": 4.955080875,
+            "medianMs": 5.1810945,
+            "p95Ms": 6.739739,
+            "maximumMs": 6.75776
+          },
+          "active": {
+            "n": 40,
+            "meanMs": 4.955080875,
+            "medianMs": 5.1810945,
+            "p95Ms": 6.739739,
+            "maximumMs": 6.75776
+          },
+          "calls": 80
+        },
+        "character_skin": {
+          "all": {
+            "n": 40,
+            "meanMs": 4.7568307,
+            "medianMs": 5.1765625,
+            "p95Ms": 5.429271,
+            "maximumMs": 5.506927
+          },
+          "active": {
+            "n": 40,
+            "meanMs": 4.7568307,
+            "medianMs": 5.1765625,
+            "p95Ms": 5.429271,
+            "maximumMs": 5.506927
+          },
+          "calls": 40
+        },
+        "pose_copy": {
+          "all": {
+            "n": 40,
+            "meanMs": 0.677457125,
+            "medianMs": 0.684219,
+            "p95Ms": 0.819844,
+            "maximumMs": 0.947448
+          },
+          "active": {
+            "n": 40,
+            "meanMs": 0.677457125,
+            "medianMs": 0.684219,
+            "p95Ms": 0.819844,
+            "maximumMs": 0.947448
+          },
+          "calls": 80
+        },
+        "dynamic_upload": {
+          "all": {
+            "n": 40,
+            "meanMs": 0.4465443,
+            "medianMs": 0.4314075,
+            "p95Ms": 0.52547,
+            "maximumMs": 0.770364
+          },
+          "active": {
+            "n": 40,
+            "meanMs": 0.4465443,
+            "medianMs": 0.4314075,
+            "p95Ms": 0.52547,
+            "maximumMs": 0.770364
+          },
+          "calls": 480
+        },
+        "fence_wait": {
+          "all": {
+            "n": 40,
+            "meanMs": 137.25483585,
+            "medianMs": 137.2761455,
+            "p95Ms": 139.278645,
+            "maximumMs": 140.578125
+          },
+          "active": {
+            "n": 40,
+            "meanMs": 137.25483585,
+            "medianMs": 137.2761455,
+            "p95Ms": 139.278645,
+            "maximumMs": 140.578125
+          },
+          "calls": 40
+        },
+        "queue_submit": {
+          "all": {
+            "n": 40,
+            "meanMs": 0.19630982500000002,
+            "medianMs": 0.17013,
+            "p95Ms": 0.309635,
+            "maximumMs": 0.509219
+          },
+          "active": {
+            "n": 40,
+            "meanMs": 0.19630982500000002,
+            "medianMs": 0.17013,
+            "p95Ms": 0.309635,
+            "maximumMs": 0.509219
+          },
+          "calls": 40
+        },
+        "whole_frame": {
+          "all": {
+            "n": 40,
+            "meanMs": 153.081154975,
+            "medianMs": 153.3323435,
+            "p95Ms": 158.189583,
+            "maximumMs": 158.973021
+          },
+          "active": {
+            "n": 40,
+            "meanMs": 153.081154975,
+            "medianMs": 153.3323435,
+            "p95Ms": 158.189583,
+            "maximumMs": 158.973021
+          },
+          "calls": 40
+        }
+      },
+      "gpu": {
+        "n": 40,
+        "meanMs": 136.998858725,
+        "medianMs": 136.96458,
+        "p95Ms": 138.933538,
+        "maximumMs": 140.36833
+      }
+    }
+  },
+  "allRouteCpu": {
+    "simulation": {
+      "all": {
+        "n": 704,
+        "meanMs": 2.101248884943182,
+        "medianMs": 0.344036,
+        "p95Ms": 9.491928,
+        "maximumMs": 31.76151
+      },
+      "active": {
+        "n": 704,
+        "meanMs": 2.101248884943182,
+        "medianMs": 0.344036,
+        "p95Ms": 9.491928,
+        "maximumMs": 31.76151
+      },
+      "calls": 704
+    },
+    "skin": {
+      "all": {
+        "n": 704,
+        "meanMs": 7.255360286931818,
+        "medianMs": 6.7730205,
+        "p95Ms": 11.999584,
+        "maximumMs": 13.639427
+      },
+      "active": {
+        "n": 704,
+        "meanMs": 7.255360286931818,
+        "medianMs": 6.7730205,
+        "p95Ms": 11.999584,
+        "maximumMs": 13.639427
+      },
+      "calls": 1711
+    },
+    "player_skin": {
+      "all": {
+        "n": 704,
+        "meanMs": 5.353210801136363,
+        "medianMs": 6.140443,
+        "p95Ms": 6.924323,
+        "maximumMs": 7.849687
+      },
+      "active": {
+        "n": 704,
+        "meanMs": 5.353210801136363,
+        "medianMs": 6.140443,
+        "p95Ms": 6.924323,
+        "maximumMs": 7.849687
+      },
+      "calls": 1408
+    },
+    "character_skin": {
+      "all": {
+        "n": 704,
+        "meanMs": 1.9021494857954546,
+        "medianMs": 0.0,
+        "p95Ms": 5.612813,
+        "maximumMs": 6.696198
+      },
+      "active": {
+        "n": 303,
+        "meanMs": 4.4195156369636965,
+        "medianMs": 4.856563,
+        "p95Ms": 6.155729,
+        "maximumMs": 6.696198
+      },
+      "calls": 303
+    },
+    "pose_copy": {
+      "all": {
+        "n": 704,
+        "meanMs": 0.7228426931818183,
+        "medianMs": 0.769192,
+        "p95Ms": 0.86901,
+        "maximumMs": 2.184063
+      },
+      "active": {
+        "n": 704,
+        "meanMs": 0.7228426931818183,
+        "medianMs": 0.769192,
+        "p95Ms": 0.86901,
+        "maximumMs": 2.184063
+      },
+      "calls": 1408
+    },
+    "dynamic_upload": {
+      "all": {
+        "n": 704,
+        "meanMs": 0.389017046875,
+        "medianMs": 0.3861715,
+        "p95Ms": 0.537709,
+        "maximumMs": 1.012863
+      },
+      "active": {
+        "n": 704,
+        "meanMs": 0.389017046875,
+        "medianMs": 0.3861715,
+        "p95Ms": 0.537709,
+        "maximumMs": 1.012863
+      },
+      "calls": 8047
+    },
+    "fence_wait": {
+      "all": {
+        "n": 704,
+        "meanMs": 82.05968095170455,
+        "medianMs": 66.542526,
+        "p95Ms": 138.438125,
+        "maximumMs": 195.89599
+      },
+      "active": {
+        "n": 704,
+        "meanMs": 82.05968095170455,
+        "medianMs": 66.542526,
+        "p95Ms": 138.438125,
+        "maximumMs": 195.89599
+      },
+      "calls": 704
+    },
+    "queue_submit": {
+      "all": {
+        "n": 704,
+        "meanMs": 0.21504751136363634,
+        "medianMs": 0.186094,
+        "p95Ms": 0.431979,
+        "maximumMs": 1.542084
+      },
+      "active": {
+        "n": 704,
+        "meanMs": 0.21504751136363634,
+        "medianMs": 0.186094,
+        "p95Ms": 0.431979,
+        "maximumMs": 1.542084
+      },
+      "calls": 704
+    },
+    "whole_frame": {
+      "all": {
+        "n": 704,
+        "meanMs": 93.82068808380681,
+        "medianMs": 76.1042445,
+        "p95Ms": 155.890834,
+        "maximumMs": 199.626979
+      },
+      "active": {
+        "n": 704,
+        "meanMs": 93.82068808380681,
+        "medianMs": 76.1042445,
+        "p95Ms": 155.890834,
+        "maximumMs": 199.626979
+      },
+      "calls": 704
+    }
+  },
+  "thermals": [
+    {
+      "phase": "before-prepare",
+      "hostMonotonic": 82502.906,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 29.4,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 26.9,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 29.1,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "before-route",
+      "hostMonotonic": 82520.984,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 41.4,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 28.4,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 33.5,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "running",
+      "hostMonotonic": 82536.796,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 39.0,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 29.6,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 33.8,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "running",
+      "hostMonotonic": 82552.765,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 39.3,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 30.0,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 34.2,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "running",
+      "hostMonotonic": 82568.453,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 39.8,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 30.6,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 34.6,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "running",
+      "hostMonotonic": 82584.109,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 40.1,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 31.1,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 35.1,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    },
+    {
+      "phase": "after-route",
+      "hostMonotonic": 82590.984,
+      "thermal": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 39.1,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 31.4,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 35.1,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      }
+    }
+  ],
+  "custody": "All286priorfilehashesunchangedimmediatelyaftercompatibleinstall. Afterlaunchall.hrdrecords/locksandHordesettingsunchanged; AndroidActivityThread.IDS.xml changed. No restored/cleared owner data.",
+  "limitations": [
+    "Initial baseline has no battery/clock/powerlevel capture; subsequent quality cohort records battery before/after. USBconnected is not matched GPUclock evidence.",
+    "Development optimizedDebug using Shipping/Mobile shaders; not signedRelease or sustainedFPS acceptance.",
+    "CPU instrument scopes cover player skin/copy and companion whole Pose; companion repack is inseparable within CharacterSkin."
+  ],
+  "rawFiles": {
+    "android-motion-cpu20-pipeline-a1-ledger.json": "c654300cc935cff885836ae1bc8cc69a85fb23113126b7219735d3034af33025",
+    "android-motion-cpu20-pipeline-a1-manifest.json": "4b7a499b0b7c1ec081ff529c925ec2fcf9b56ae36fd38764a82e6723471d9bc2",
+    "android-motion-cpu20-pipeline-a1-present-timing.json": "6974e6e92b18b872f09573c143dc3496edba864c0952bc753d73bc5c18a99e27",
+    "android-motion-cpu20-pipeline-a1-resources.csv": "f669c5411cf932ea57a45a29c39ad6960045c0616952635f544a3dd47355a3de",
+    "cpu-analysis.json": "b5212a4d81350ad3a379f2a296af6bd8c7a7d7cd2823e3c376c5af144e59491e",
+    "HordeLanternRT-benchmark-latest.json": "9988f7fad50ac68e5e4edac665fd092154601ea973f976cfcf99485ad7f982a2",
+    "launch.txt": "b5b7141da3915a132d93c8f976e6a781ba538598ea55fc0d19a8f22e034ce5c2",
+    "motion-launch.txt": "8b790058e3abe1418aa53a07a009339088001fa89334aef2889f566389c1f843",
+    "owned-final.log": "9b4d9ee45693309ca37a582e8c92ede07c9d43464f5278257b14c3e38d4e3ba6",
+    "prestart-capability.json": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+    "settings-after.xml": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "thermals.json": "3e75c420db49e8fd6524a37cb6e9629db721d969117d9657adcd3418ae4aaa1a",
+    "vulkan_capability_report.json": "482ff734f1a6bbe1e6ce92409c02768572d70ea7515a5e20ebb205c35daa797b"
+  }
+}

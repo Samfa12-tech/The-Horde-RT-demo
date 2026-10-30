@@ -1,0 +1,198 @@
+{
+  "sourceBase": "efcd303ec138999888f948cf4e514f46bbf824b8",
+  "instrumentationCommit": "411d634db382e8d52f43265bd876b95173538571",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "sourceFiles": {
+    "CMakeLists.txt": "e27ad460c081c0bd2892d3031c14b4eef9f4b9fbdad23559ae3735926253d6e0",
+    "android/app/src/main/cpp/android_motion_evidence.inl": "623c1b102979ecaa19889642d47d3a60481693f6e26b960eacb7cdceef003833",
+    "src/scene/assets/SkinWorkMetrics.h": "07e4acefa1c1c9602d3896ce3caf71479c068b195240ec83fdd7eb7ae45f7d2f",
+    "src/scene/assets/SkinnedMeshAsset.cpp": "eef7e658bc259610ce816cfc6c9df58d9b2bf3b4b0e30ee7a4ddf427c097afce",
+    "src/scene/assets/SkinnedMeshAsset.h": "f0c2877c794d296eda32a79815f0aea1927a178b5508685a0c5b5df9e66f7346",
+    "src/scene/assets/SkinnedPbrActor.h": "4484e9bc0f4e0bed53db15410e0e1e7265259219a8a0465f6f38a550475379aa",
+    "src/telemetry/RtPerformanceEvidence.cpp": "83d6970317f8bac291bae5e95a70f74553cf4374d7b243e1db72b4d3a207f4a4",
+    "src/telemetry/RtPerformanceEvidence.h": "560b2b1232be1deb9c6d7ea00533bf30a22b54b2c697b6a1ec4295147e2d7b5a",
+    "src/vulkan/raytracing/PlayerRenderSlot.cpp": "1168e6b804cab69cb12cd68f23201cfa8f7c08822860ed3961198fc8a6a9a4c3",
+    "src/vulkan/raytracing/CharacterRenderSlot.cpp": "fd069c3f321371baa558c82539e98636e62f4370377d84675c32d97d1618fc3e",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "6334cc79e3b36feb3d1c0d9a53da408d27b88c20d54c3ba1845c5adaaa1e337c",
+    "src/vulkan/raytracing/RtSceneRecordObservation.h": "3c63134aa480c72c897b1cd56f79ea57cff5a26ffbdc879560fd7fbac96316ff",
+    "tests/SkinWorkBenchmark.cpp": "71fc730f4eec8dd23cb6f0e4f86d98a844603e363bd631b2b878c2bbde8c61b6",
+    "tests/PlayerSkinningBenchmark.cpp": "1e9a19f9eebd962124fbf6acbc7009af6684c42f1f456f4ec9dfcac70c13ca5a",
+    "tests/KitSourceIntakeTests.cpp": "1d4b698ec33101b9688b195da6ffdcee121d18a30aaf161a051b67e07146d695",
+    "tests/RtSceneRecordObservationTests.cpp": "f1833932dd44cd5c72e72d421a115a3b5836ddb1143a938519b723710bde8ec9",
+    "tests/RtPerformanceEvidenceTests.cpp": "d400b7a7f5fcf9f191c2a9b9d8be3e6f40fbb7fefb9744050a33fc539764562b"
+  },
+  "artifacts": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "sha256": "30b514f246a17beddcd974ae52c7858c93e7963250e767b94edf733ea22a8bca",
+      "bytes": 14111744
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "sha256": "87c443ce4c76d4f4f6ae0266448aeabab6c40b2123b596134aa4f625f9a94dc6",
+      "bytes": 4627968
+    },
+    "build/presets/windows-x64-release/Release/horde_rt_skin_work_benchmark.exe": {
+      "sha256": "6c1f3d0b4a12af3b84a1884caa77f10d29e2cc66b71866c0a93ebaff16910f0b",
+      "bytes": 620544
+    },
+    "build/presets/windows-x64-release/Release/horde_rt_player_skinning_benchmark.exe": {
+      "sha256": "83306e56d1d9228ab6c29bc1f52cef63c96bfb8687897cad989d49806183b70b",
+      "bytes": 436224
+    }
+  },
+  "phoneScaleReceiptPreserved": {
+    "path": "docs/evidence/2026-10-22-outdoor-scale/receipt.json",
+    "sha256": "e2ddcda23cc9b9d1e2ff5aaf3ee59a708ffc0615d7fe414ca1a0d5a9c4f39d97"
+  },
+  "ownedHiddenCaptures": [
+    {
+      "arguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\skin-attribution-20261022\\rt-baseline",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-forest-lookout"
+      ],
+      "executable": {
+        "exists": true,
+        "bytes": 14111744,
+        "sha256": "d408802a097c15f980da49fdb79172956eeeed6eaf89a637ebafe6a9d73a38d0"
+      },
+      "settingsBefore": {
+        "exists": true,
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "foregroundBefore": 131626,
+      "pid": 57916,
+      "exitCode": 0,
+      "seconds": 60.59299999999348,
+      "pending": false,
+      "settingsAfter": {
+        "exists": true,
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "foregroundUnchanged": true,
+      "settingsUnchanged": true
+    },
+    {
+      "arguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\skin-attribution-20261022\\kit-baseline",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-kit-reunion"
+      ],
+      "executable": {
+        "exists": true,
+        "bytes": 14111744,
+        "sha256": "d408802a097c15f980da49fdb79172956eeeed6eaf89a637ebafe6a9d73a38d0"
+      },
+      "settingsBefore": {
+        "exists": true,
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "foregroundBefore": 131626,
+      "pid": 74476,
+      "exitCode": 0,
+      "seconds": 56.35899999999674,
+      "pending": false,
+      "settingsAfter": {
+        "exists": true,
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "foregroundUnchanged": true,
+      "settingsUnchanged": true
+    },
+    {
+      "arguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\skin-attribution-20261022\\rt-candidate",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-forest-lookout"
+      ],
+      "executable": {
+        "exists": true,
+        "bytes": 14111744,
+        "sha256": "30b514f246a17beddcd974ae52c7858c93e7963250e767b94edf733ea22a8bca"
+      },
+      "settingsBefore": {
+        "exists": true,
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "foregroundBefore": 131626,
+      "pid": 31992,
+      "exitCode": 0,
+      "seconds": 63.73499999998603,
+      "pending": false,
+      "settingsAfter": {
+        "exists": true,
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "foregroundUnchanged": true,
+      "settingsUnchanged": true
+    },
+    {
+      "arguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\skin-attribution-20261022\\kit-candidate",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-kit-reunion"
+      ],
+      "executable": {
+        "exists": true,
+        "bytes": 14111744,
+        "sha256": "30b514f246a17beddcd974ae52c7858c93e7963250e767b94edf733ea22a8bca"
+      },
+      "settingsBefore": {
+        "exists": true,
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "foregroundBefore": 131626,
+      "pid": 65300,
+      "exitCode": 0,
+      "seconds": 50.60999999998603,
+      "pending": false,
+      "settingsAfter": {
+        "exists": true,
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "foregroundUnchanged": true,
+      "settingsUnchanged": true
+    }
+  ],
+  "rawBenchmarkHashes": {
+    "reports\\skin-attribution-20261022\\a-baseline.jsonl": "fd09eda1ad2949ffb04e42b54726d347a510a5bc7336764ba4c1c35b88e78d3d",
+    "reports\\skin-attribution-20261022\\b-candidate.jsonl": "402cbf5b0a48a795718aafaa1d3d6a70403143a85959860bc8cc63cb1f0e242d",
+    "reports\\skin-attribution-20261022\\c-control.jsonl": "a72cef0160bee6abc87ebaaeb099a59858b47fe6f14e64feb2debe19af2ac7a8"
+  },
+  "androidNativeBuild": {
+    "scope": "arm64 Debug compilation only; no APK packaging/install/device operations",
+    "result": "success"
+  },
+  "hostTests": {
+    "broaderSelected": 8,
+    "passed": 7,
+    "failed": 1,
+    "finalAddedKitObservationCheck": "pass"
+  },
+  "candidateDisposition": "retained for PR review with partial CPU reduction; predeclared target NOT met; no frame/mobile acceptance",
+  "phoneOperations": 0,
+  "audioHapticManualRevalidationRequired": false
+}

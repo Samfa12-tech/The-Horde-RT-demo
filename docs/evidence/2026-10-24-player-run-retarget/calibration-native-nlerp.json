@@ -1,0 +1,554 @@
+{
+  "evidenceClass": "offline native-rule pose/contact proxy, not a runtime or RT pass",
+  "samplesPerClip": 120,
+  "motorRunMetresPerSecond": 3.2,
+  "distanceClockBaseMetresPerSecond": 1.9,
+  "originalWalk": {
+    "duration": 1.0416666269302368,
+    "contact": {
+      "10": {
+        "Left": {
+          "contact_fraction": 0.5083333333333333,
+          "intervals": [
+            {
+              "start_seconds": 0.26909721195697783,
+              "end_seconds": 0.798611080646515,
+              "wraps_cycle": false,
+              "fraction": 0.5083333333333333,
+              "fit_samples": 43,
+              "rearward_travel_fit_metres": 0.5626294269000673,
+              "natural_speed_mps": 1.5748396198258772,
+              "fit_rms_metres": 0.0048152575500332775,
+              "current_world_slide_mps": 1.625160380174123
+            }
+          ],
+          "boot_centroid_z_range": 0.8221632702753507,
+          "minimum_sole_height_range": 0.12139690581385575,
+          "maximum_lift_above_lowest_boot": 0.11243370043788069
+        },
+        "Right": {
+          "contact_fraction": 0.5833333333333334,
+          "intervals": [
+            {
+              "start_seconds": 0.7465277493000031,
+              "end_seconds": 1.354166615009308,
+              "wraps_cycle": true,
+              "fraction": 0.5833333333333334,
+              "fit_samples": 50,
+              "rearward_travel_fit_metres": 0.6152997617566331,
+              "natural_speed_mps": 1.4889261501087672,
+              "fit_rms_metres": 0.010318798260419882,
+              "current_world_slide_mps": 1.711073849891233
+            }
+          ],
+          "boot_centroid_z_range": 0.7959673193897288,
+          "minimum_sole_height_range": 0.12441929646515547,
+          "maximum_lift_above_lowest_boot": 0.12116539518077281
+        },
+        "aggregate": {
+          "natural_speed_mps": 1.531882884967322,
+          "natural_stride_metres_per_cycle": 1.5957112776360702,
+          "suggested_visual_playback_multiplier": 2.088932536163339,
+          "current_steps_per_minute": 115.20000439453142,
+          "matched_steps_per_minute": 240.64503734589627
+        }
+      },
+      "20": {
+        "Left": {
+          "contact_fraction": 0.6583333333333333,
+          "intervals": [
+            {
+              "start_seconds": 0.06944444179534912,
+              "end_seconds": 0.1302083283662796,
+              "wraps_cycle": false,
+              "fraction": 0.058333333333333334,
+              "fit_samples": 5,
+              "rearward_travel_fit_metres": -0.10947930984632119,
+              "natural_speed_mps": -3.152850272418741,
+              "fit_rms_metres": 0.00020774108890131537,
+              "current_world_slide_mps": 6.352850272418741
+            },
+            {
+              "start_seconds": 0.24305554628372192,
+              "end_seconds": 0.868055522441864,
+              "wraps_cycle": false,
+              "fraction": 0.6,
+              "fit_samples": 52,
+              "rearward_travel_fit_metres": 0.6751382783818682,
+              "natural_speed_mps": 1.5710299793358065,
+              "fit_rms_metres": 0.006203813780747521,
+              "current_world_slide_mps": 1.6289700206641937
+            }
+          ],
+          "boot_centroid_z_range": 0.8221632702753507,
+          "minimum_sole_height_range": 0.12139690581385575,
+          "maximum_lift_above_lowest_boot": 0.11243370043788069
+        },
+        "Right": {
+          "contact_fraction": 0.625,
+          "intervals": [
+            {
+              "start_seconds": 0.7291666388511657,
+              "end_seconds": 1.3802082806825637,
+              "wraps_cycle": true,
+              "fraction": 0.625,
+              "fit_samples": 53,
+              "rearward_travel_fit_metres": 0.6471716995420529,
+              "natural_speed_mps": 1.4834435838697362,
+              "fit_rms_metres": 0.010646392395335177,
+              "current_world_slide_mps": 1.716556416130264
+            }
+          ],
+          "boot_centroid_z_range": 0.7959673193897288,
+          "minimum_sole_height_range": 0.12441929646515547,
+          "maximum_lift_above_lowest_boot": 0.12116539518077281
+        },
+        "aggregate": {
+          "natural_speed_mps": 1.5272367816027712,
+          "natural_stride_metres_per_cycle": 1.5908715868159495,
+          "suggested_visual_playback_multiplier": 2.0952874096194396,
+          "current_steps_per_minute": 115.20000439453142,
+          "matched_steps_per_minute": 241.37711879596577
+        }
+      },
+      "30": {
+        "Left": {
+          "contact_fraction": 0.775,
+          "intervals": [
+            {
+              "start_seconds": 0.052083331346511844,
+              "end_seconds": 0.19965277016162872,
+              "wraps_cycle": false,
+              "fraction": 0.14166666666666666,
+              "fit_samples": 13,
+              "rearward_travel_fit_metres": -0.3049177830077417,
+              "natural_speed_mps": -2.979314599420637,
+              "fit_rms_metres": 0.0038384691807125094,
+              "current_world_slide_mps": 6.179314599420637
+            },
+            {
+              "start_seconds": 0.217013880610466,
+              "end_seconds": 0.8767360776662827,
+              "wraps_cycle": false,
+              "fraction": 0.6333333333333333,
+              "fit_samples": 54,
+              "rearward_travel_fit_metres": 0.6891390633537713,
+              "natural_speed_mps": 1.5563943103136617,
+              "fit_rms_metres": 0.008369109807918796,
+              "current_world_slide_mps": 1.6436056896863385
+            }
+          ],
+          "boot_centroid_z_range": 0.8221632702753507,
+          "minimum_sole_height_range": 0.12139690581385575,
+          "maximum_lift_above_lowest_boot": 0.11243370043788069
+        },
+        "Right": {
+          "contact_fraction": 0.6583333333333333,
+          "intervals": [
+            {
+              "start_seconds": 0.7204860836267472,
+              "end_seconds": 1.4062499463558198,
+              "wraps_cycle": true,
+              "fraction": 0.6583333333333333,
+              "fit_samples": 57,
+              "rearward_travel_fit_metres": 0.6896986658315296,
+              "natural_speed_mps": 1.4776139792160585,
+              "fit_rms_metres": 0.011030945413262149,
+              "current_world_slide_mps": 1.7223860207839417
+            }
+          ],
+          "boot_centroid_z_range": 0.7959673193897288,
+          "minimum_sole_height_range": 0.12441929646515547,
+          "maximum_lift_above_lowest_boot": 0.12116539518077281
+        },
+        "aggregate": {
+          "natural_speed_mps": 1.5170041447648601,
+          "natural_stride_metres_per_cycle": 1.5802125905164006,
+          "suggested_visual_playback_multiplier": 2.109420736286788,
+          "current_steps_per_minute": 115.20000439453142,
+          "matched_steps_per_minute": 243.00527809015364
+        }
+      }
+    },
+    "rootRanges": {
+      "Hips": [
+        0.07041442896768177,
+        0.07575709739233627,
+        0.0478419252526731
+      ],
+      "Armature": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "rawSoleRange": {
+      "Left": [
+        -0.02423111326236206,
+        0.09716579255149368
+      ],
+      "Right": [
+        -0.020963576303729786,
+        0.10345572016142568
+      ]
+    },
+    "bootCounts": {
+      "Left": 1135,
+      "Right": 1140
+    }
+  },
+  "unscaledRetarget": {
+    "duration": 0.5333333611488342,
+    "contact": {
+      "10": {
+        "Left": {
+          "contact_fraction": 0.4583333333333333,
+          "intervals": [
+            {
+              "start_seconds": 0.07555555949608485,
+              "end_seconds": 0.3200000166893005,
+              "wraps_cycle": false,
+              "fraction": 0.4583333333333333,
+              "fit_samples": 39,
+              "rearward_travel_fit_metres": 0.6315623980778626,
+              "natural_speed_mps": 4.237876773816588,
+              "fit_rms_metres": 0.06776414049765632,
+              "current_world_slide_mps": -1.0378767738165875
+            }
+          ],
+          "boot_centroid_z_range": 0.9472404043242644,
+          "minimum_sole_height_range": 0.6588348053561089,
+          "maximum_lift_above_lowest_boot": 0.6664353411466032
+        },
+        "Right": {
+          "contact_fraction": 0.55,
+          "intervals": [
+            {
+              "start_seconds": 0.32000001668930056,
+              "end_seconds": 0.6133333653211593,
+              "wraps_cycle": true,
+              "fraction": 0.55,
+              "fit_samples": 48,
+              "rearward_travel_fit_metres": 0.6027142983237703,
+              "natural_speed_mps": 4.024960284383695,
+              "fit_rms_metres": 0.08133931625156011,
+              "current_world_slide_mps": -0.8249602843836952
+            }
+          ],
+          "boot_centroid_z_range": 0.9691739722775392,
+          "minimum_sole_height_range": 0.6091780382606657,
+          "maximum_lift_above_lowest_boot": 0.5891042638948187
+        },
+        "aggregate": {
+          "natural_speed_mps": 4.1314185291001415,
+          "natural_stride_metres_per_cycle": 2.2034233304375515,
+          "suggested_visual_playback_multiplier": 0.774552366810677,
+          "current_steps_per_minute": 224.99998826533619,
+          "matched_steps_per_minute": 174.27427344329067
+        }
+      },
+      "20": {
+        "Left": {
+          "contact_fraction": 0.4583333333333333,
+          "intervals": [
+            {
+              "start_seconds": 0.07555555949608485,
+              "end_seconds": 0.3200000166893005,
+              "wraps_cycle": false,
+              "fraction": 0.4583333333333333,
+              "fit_samples": 39,
+              "rearward_travel_fit_metres": 0.6315623980778626,
+              "natural_speed_mps": 4.237876773816588,
+              "fit_rms_metres": 0.06776414049765632,
+              "current_world_slide_mps": -1.0378767738165875
+            }
+          ],
+          "boot_centroid_z_range": 0.9472404043242644,
+          "minimum_sole_height_range": 0.6588348053561089,
+          "maximum_lift_above_lowest_boot": 0.6664353411466032
+        },
+        "Right": {
+          "contact_fraction": 0.5583333333333333,
+          "intervals": [
+            {
+              "start_seconds": 0.3155555720130602,
+              "end_seconds": 0.6133333653211593,
+              "wraps_cycle": true,
+              "fraction": 0.5583333333333333,
+              "fit_samples": 47,
+              "rearward_travel_fit_metres": 0.5894457692489755,
+              "natural_speed_mps": 4.02909692619141,
+              "fit_rms_metres": 0.08219389445111663,
+              "current_world_slide_mps": -0.8290969261914096
+            }
+          ],
+          "boot_centroid_z_range": 0.9691739722775392,
+          "minimum_sole_height_range": 0.6091780382606657,
+          "maximum_lift_above_lowest_boot": 0.5891042638948187
+        },
+        "aggregate": {
+          "natural_speed_mps": 4.133486850003999,
+          "natural_stride_metres_per_cycle": 2.20452643497714,
+          "suggested_visual_playback_multiplier": 0.7741647950318032,
+          "current_steps_per_minute": 224.99998826533619,
+          "matched_steps_per_minute": 174.18706979759213
+        }
+      },
+      "30": {
+        "Left": {
+          "contact_fraction": 0.475,
+          "intervals": [
+            {
+              "start_seconds": 0.07111111481984457,
+              "end_seconds": 0.32444446136554084,
+              "wraps_cycle": false,
+              "fraction": 0.475,
+              "fit_samples": 41,
+              "rearward_travel_fit_metres": 0.6464760744071655,
+              "natural_speed_mps": 4.154051122955157,
+              "fit_rms_metres": 0.07488776772155864,
+              "current_world_slide_mps": -0.9540511229551569
+            }
+          ],
+          "boot_centroid_z_range": 0.9472404043242644,
+          "minimum_sole_height_range": 0.6588348053561089,
+          "maximum_lift_above_lowest_boot": 0.6664353411466032
+        },
+        "Right": {
+          "contact_fraction": 0.5583333333333333,
+          "intervals": [
+            {
+              "start_seconds": 0.3155555720130602,
+              "end_seconds": 0.6133333653211593,
+              "wraps_cycle": true,
+              "fraction": 0.5583333333333333,
+              "fit_samples": 47,
+              "rearward_travel_fit_metres": 0.5894457692489755,
+              "natural_speed_mps": 4.02909692619141,
+              "fit_rms_metres": 0.08219389445111663,
+              "current_world_slide_mps": -0.8290969261914096
+            }
+          ],
+          "boot_centroid_z_range": 0.9691739722775392,
+          "minimum_sole_height_range": 0.6091780382606657,
+          "maximum_lift_above_lowest_boot": 0.5891042638948187
+        },
+        "aggregate": {
+          "natural_speed_mps": 4.0915740245732835,
+          "natural_stride_metres_per_cycle": 2.182172926914932,
+          "suggested_visual_playback_multiplier": 0.7820951010005821,
+          "current_steps_per_minute": 224.99998826533619,
+          "matched_steps_per_minute": 175.97138854750787
+        }
+      }
+    },
+    "rootRanges": {
+      "Hips": [
+        0.0025063883309949598,
+        0.0611463142145392,
+        0.007899284063926232
+      ],
+      "Armature": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "rawSoleRange": {
+      "Left": [
+        -0.01925736533270133,
+        0.6395774400234077
+      ],
+      "Right": [
+        -0.03386813759774031,
+        0.5753099006629254
+      ]
+    },
+    "bootCounts": {
+      "Left": 1135,
+      "Right": 1140
+    }
+  },
+  "calibratedRetarget": {
+    "duration": 1.1602771282196045,
+    "contact": {
+      "10": {
+        "Left": {
+          "contact_fraction": 0.4583333333333333,
+          "intervals": [
+            {
+              "start_seconds": 0.16437259316444397,
+              "end_seconds": 0.6961662769317627,
+              "wraps_cycle": false,
+              "fraction": 0.4583333333333333,
+              "fit_samples": 39,
+              "rearward_travel_fit_metres": 0.6315625308031778,
+              "natural_speed_mps": 1.9479840771550596,
+              "fit_rms_metres": 0.06776413266788368,
+              "current_world_slide_mps": 1.2520159228449406
+            }
+          ],
+          "boot_centroid_z_range": 0.9472404034323765,
+          "minimum_sole_height_range": 0.658834788604931,
+          "maximum_lift_above_lowest_boot": 0.6664353443492682
+        },
+        "Right": {
+          "contact_fraction": 0.55,
+          "intervals": [
+            {
+              "start_seconds": 0.6961662769317627,
+              "end_seconds": 1.3343186974525452,
+              "wraps_cycle": true,
+              "fraction": 0.55,
+              "fit_samples": 48,
+              "rearward_travel_fit_metres": 0.6027143604602191,
+              "natural_speed_mps": 1.850114793362663,
+              "fit_rms_metres": 0.08133927940517939,
+              "current_world_slide_mps": 1.3498852066373372
+            }
+          ],
+          "boot_centroid_z_range": 0.9691740133073359,
+          "minimum_sole_height_range": 0.6091780508312327,
+          "maximum_lift_above_lowest_boot": 0.5891042745459246
+        },
+        "aggregate": {
+          "natural_speed_mps": 1.8990494352588612,
+          "natural_stride_metres_per_cycle": 2.203423625089213,
+          "suggested_visual_playback_multiplier": 1.6850535539449005,
+          "current_steps_per_minute": 103.42356759555784,
+          "matched_steps_per_minute": 174.27425013855537
+        }
+      },
+      "20": {
+        "Left": {
+          "contact_fraction": 0.4583333333333333,
+          "intervals": [
+            {
+              "start_seconds": 0.16437259316444397,
+              "end_seconds": 0.6961662769317627,
+              "wraps_cycle": false,
+              "fraction": 0.4583333333333333,
+              "fit_samples": 39,
+              "rearward_travel_fit_metres": 0.6315625308031778,
+              "natural_speed_mps": 1.9479840771550596,
+              "fit_rms_metres": 0.06776413266788368,
+              "current_world_slide_mps": 1.2520159228449406
+            }
+          ],
+          "boot_centroid_z_range": 0.9472404034323765,
+          "minimum_sole_height_range": 0.658834788604931,
+          "maximum_lift_above_lowest_boot": 0.6664353443492682
+        },
+        "Right": {
+          "contact_fraction": 0.5583333333333333,
+          "intervals": [
+            {
+              "start_seconds": 0.686497300863266,
+              "end_seconds": 1.3343186974525452,
+              "wraps_cycle": true,
+              "fraction": 0.5583333333333333,
+              "fit_samples": 47,
+              "rearward_travel_fit_metres": 0.5894458306521773,
+              "natural_speed_mps": 1.8520162758601268,
+              "fit_rms_metres": 0.08219385700153754,
+              "current_world_slide_mps": 1.3479837241398733
+            }
+          ],
+          "boot_centroid_z_range": 0.9691740133073359,
+          "minimum_sole_height_range": 0.6091780508312327,
+          "maximum_lift_above_lowest_boot": 0.5891042745459246
+        },
+        "aggregate": {
+          "natural_speed_mps": 1.9000001765075933,
+          "natural_stride_metres_per_cycle": 2.204526748414972,
+          "suggested_visual_playback_multiplier": 1.6842103698547795,
+          "current_steps_per_minute": 103.42356759555784,
+          "matched_steps_per_minute": 174.18704503181525
+        }
+      },
+      "30": {
+        "Left": {
+          "contact_fraction": 0.475,
+          "intervals": [
+            {
+              "start_seconds": 0.15470361709594727,
+              "end_seconds": 0.7058352530002594,
+              "wraps_cycle": false,
+              "fraction": 0.475,
+              "fit_samples": 41,
+              "rearward_travel_fit_metres": 0.6464762241604161,
+              "natural_speed_mps": 1.9094527683821445,
+              "fit_rms_metres": 0.07488776156562765,
+              "current_world_slide_mps": 1.2905472316178557
+            }
+          ],
+          "boot_centroid_z_range": 0.9472404034323765,
+          "minimum_sole_height_range": 0.658834788604931,
+          "maximum_lift_above_lowest_boot": 0.6664353443492682
+        },
+        "Right": {
+          "contact_fraction": 0.5583333333333333,
+          "intervals": [
+            {
+              "start_seconds": 0.686497300863266,
+              "end_seconds": 1.3343186974525452,
+              "wraps_cycle": true,
+              "fraction": 0.5583333333333333,
+              "fit_samples": 47,
+              "rearward_travel_fit_metres": 0.5894458306521773,
+              "natural_speed_mps": 1.8520162758601268,
+              "fit_rms_metres": 0.08219385700153754,
+              "current_world_slide_mps": 1.3479837241398733
+            }
+          ],
+          "boot_centroid_z_range": 0.9691740133073359,
+          "minimum_sole_height_range": 0.6091780508312327,
+          "maximum_lift_above_lowest_boot": 0.5891042745459246
+        },
+        "aggregate": {
+          "natural_speed_mps": 1.8807345221211356,
+          "natural_stride_metres_per_cycle": 2.1821732502701816,
+          "suggested_visual_playback_multiplier": 1.7014628924825428,
+          "current_steps_per_minute": 103.42356759555784,
+          "matched_steps_per_minute": 175.97136247200163
+        }
+      }
+    },
+    "rootRanges": {
+      "Hips": [
+        0.0025063883698048794,
+        0.061146315161593634,
+        0.007899284186230204
+      ],
+      "Armature": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "rawSoleRange": {
+      "Left": [
+        -0.01925736574264916,
+        0.6395774228622819
+      ],
+      "Right": [
+        -0.03386814335410296,
+        0.5753099074771297
+      ]
+    },
+    "bootCounts": {
+      "Left": 1135,
+      "Right": 1140
+    }
+  },
+  "calibration": {
+    "fittedCycleDistanceMetres": 2.20452643497714,
+    "diagnosticClipDurationSeconds": 1.1602770710406,
+    "wallSecondsPerCycleAtRun": 0.6889145109303563,
+    "sourcePlaybackMultiplier": 0.7741647950318032,
+    "runtimeSampleAdvanceAtRun": 1.6842105263157896,
+    "note": "Choose test-clip period for the existing distance clock; no game speed/phase implementation change. 20mm is the retained measurement window, not a new pass tolerance."
+  },
+  "staticPrefixUnchanged": true,
+  "calibratedProofSha256": "d92d4b3724cea6aabdb63511f05236b9eba848818ae516142bbf1069122d30b9"
+}

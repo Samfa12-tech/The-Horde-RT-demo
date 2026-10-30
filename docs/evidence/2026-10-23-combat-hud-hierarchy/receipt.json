@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "baseCommit": "ac0784b037a31d5953fd66bf80c1194faee6067d",
+  "disposition": "bounded source prototype; host verified, no phone install/comfort acceptance",
+  "sourceCanonicalLfSha256": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "7373a8bd597408c8bd04db918472fc1c895bb871b3b366ff14b31c50ba1ce3fb",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/UiControlLayout.java": "8cb7073d61629fa9e1b258e9aa50e10f91ce942e17480a57079874564733e545",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/TouchButtonDrawable.java": "47731e639c34e3a8c8ec4a043582b3d7d9ac4e920460b50227e3c1eff9356611",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/CombatActionControl.java": "53d68175acaeb0666f7164ae44fac1893620714b13ca2657e7a2d8f4114a1a38",
+    "android/app/src/main/res/drawable/ic_combat_sword.xml": "4be797d321062211466bc8720060a10ba94e12f013c1f61b568b7d50f8a3e503",
+    "android/app/src/main/res/drawable/ic_combat_shield.xml": "39fba1701cc7298b57e0b2a9ed1370d1cb84e081dc7b6cdefaeb60c157485013",
+    "android/app/src/main/res/values/combat_action_control.xml": "1c9d370623bc345017e5947e0e3b37c4133c275c95e7cc14c3d89943377f3dec"
+  },
+  "androidUnit": {
+    "tests": 419,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6,
+    "passed": 413,
+    "skipReason": "existing host symbolic-link assumptions in EnvironmentSurveyExportTest"
+  },
+  "buildAndLint": {
+    "passed": true,
+    "seconds": 151,
+    "lintSeverities": {
+      "Warning": 76
+    },
+    "scope": "ordinary default-ABI Debug APK; all Android unit tests and lint, no device"
+  },
+  "apk": {
+    "bytes": 200205652,
+    "sha256": "bed3f5b79998f2e341277eb8c7e59a36bc40346a800345d26acba2e0a481f858",
+    "installed": false
+  },
+  "focusedSelection": {
+    "classes": [
+      "CompactHudLayoutTest",
+      "GameplayTouchCancellationTest",
+      "HudSafeAreaTest",
+      "InterfaceLayoutTest",
+      "TouchHudPresentationTest"
+    ],
+    "checks": "matrix/resizable/context labels, original listeners through actual native ViewGroup dispatch, backing opacity, safe areas/preview",
+    "pass": true,
+    "seconds": 24,
+    "stage": "after initial height fit; final top-inset/opacity refinements covered by the full419-test checkpoint"
+  },
+  "retainedFailures": {
+    "firstFixture": "TouchHudPresentationTest overwrote complete action accessibility with empty icon visible text; assertion retained, fixture now sets full resource action names",
+    "shortWindow": "first new320x320 regression fails at Interact top=-12px; review also found110percent top=-34px; height fit now uses actual available height and preserves full context text",
+    "oldGridAssertions": "fixed-grid row placement superseded by intentional portrait/landscape arcs; min targets, labels, non-overlap and input guarantees retained/strengthened"
+  },
+  "physicalEvidencePredecessor": "../2026-10-23-compact-hud-phone/receipt.json",
+  "phoneCallsForThisPrototype": false,
+  "inputListenersChanged": false,
+  "settingsSchemaOrPersistenceChanged": false,
+  "newMechanicsOrCustomization": false,
+  "images": {
+    "portrait-bright.png": {
+      "sha256": "985058ee3b6b8c726b188c560126e63d57f72ac5ef567fc66cf69dfc61c6d31a",
+      "evidenceClass": "Robolectric API34 native-Skia component; synthetic background, not actual RT/phone",
+      "logicalDp": [
+        411,
+        801
+      ],
+      "fontScale": 1.7,
+      "density": 1,
+      "backing": "controlled same Slate fill; production Swing retains existing darker Charcoal fill"
+    },
+    "portrait-dark.png": {
+      "sha256": "3a74e2b319356cf32ca95784462ea1c14ae666933118166d6df4e8c2daed2832",
+      "evidenceClass": "Robolectric API34 native-Skia component; synthetic background, not actual RT/phone",
+      "logicalDp": [
+        411,
+        801
+      ],
+      "fontScale": 1.7,
+      "density": 1,
+      "backing": "controlled same Slate fill; production Swing retains existing darker Charcoal fill"
+    },
+    "landscape-bright.png": {
+      "sha256": "44a13619092323b0cd8fbaa9ab452b9d1107ff5e12ec0d6d38a2877eeb37f081",
+      "evidenceClass": "Robolectric API34 native-Skia component; synthetic background, not actual RT/phone",
+      "logicalDp": [
+        804,
+        381
+      ],
+      "fontScale": 1.7,
+      "density": 1,
+      "backing": "controlled same Slate fill; production Swing retains existing darker Charcoal fill"
+    },
+    "landscape-dark.png": {
+      "sha256": "2721e83418a27c87cea4b57687e138b665f377d9a97b33b572ec7fe54e5e52b0",
+      "evidenceClass": "Robolectric API34 native-Skia component; synthetic background, not actual RT/phone",
+      "logicalDp": [
+        804,
+        381
+      ],
+      "fontScale": 1.7,
+      "density": 1,
+      "backing": "controlled same Slate fill; production Swing retains existing darker Charcoal fill"
+    }
+  },
+  "rawLocalLogHashes": {
+    "focused-first.log": "461f931fc73c96b7e2a74b06e8958ef032a0b61b19d575d81f19899b0ebce034",
+    "first-fixture-failure.xml": "5d53b56c1e9face35d9e46ab72cf83e3ecf9ba797f1245b530129d05238cc0d3",
+    "short-window-red.log": "934bc7f760170611e9ac6a6ff294d5637301b30b621b1acf8cb6f403b8c7a885",
+    "short-window-red.xml": "458c1874a1ab50bfa394b0df189c42a7b3f0349465033bd1421beeeb981be459",
+    "focused-final.log": "e20b0f6c3c333f00bc8694f8e66ff63075a6d2f0a7dea930ea53df8bb66dae1a",
+    "checkpoint.log": "86ec4c074d41a3328bd7dc9be0dcdec0fdddb55a68aa5d14951fc537b39cb557"
+  },
+  "provenance": "new sword/shield vectors authored in source; no competitor asset copied/imported",
+  "manualAcceptancePending": [
+    "new layout/thumb reach",
+    "real phone bright/dark readability",
+    "simultaneous movement/look/action comfort"
+  ],
+  "publicFailureSanitization": "host attribute omitted from committed XML; original unchanged local XML hashes retained, result/messages/stack preserved"
+}

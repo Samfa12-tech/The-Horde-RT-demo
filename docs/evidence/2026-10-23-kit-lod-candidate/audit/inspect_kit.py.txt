@@ -1,0 +1,184 @@
+"""Independent row/rig/region/geometry comparison; never edits a candidate."""
+import collections
+import json
+import math
+from pathlib import Path
+import struct
+import sys
+
+sys.dont_write_bytecode = True
+OUT = Path(__file__).resolve().parent
+sys.path.insert(0,str(OUT))
+import prepare_kit as recipe
+
+def canonical(t):return min(t,t[1:]+t[:1],t[2:]+t[:2])
+
+def facts(glb,p):
+    attrs = {name:glb.values(index) for name,index in p['attributes'].items()}
+    records = {name:glb.records(index) for name,index in p['attributes'].items()}
+    rows = [b''.join(records[name][i] for name in sorted(records)) for i in range(len(records['POSITION']))]
+    ts = recipe.triangles([v[0] for v in glb.values(p['indices'])])
+    return attrs,records,rows,ts
+
+def metrics(attrs,ts):
+    result=[]
+    for t in ts:
+        a,b,c=[attrs['POSITION'][i] for i in t]
+        e=[b[k]-a[k] for k in range(3)];f=[c[k]-a[k] for k in range(3)]
+        cross=[e[1]*f[2]-e[2]*f[1],e[2]*f[0]-e[0]*f[2],e[0]*f[1]-e[1]*f[0]]
+        area=math.sqrt(sum(x*x for x in cross))*.5
+        dot=sum(cross[k]*sum(attrs['NORMAL'][i][k] for i in t) for k in range(3))
+        ua,ub,uc=[attrs['TEXCOORD_0'][i] for i in t]
+        determinant=(ub[0]-ua[0])*(uc[1]-ua[1])-(ub[1]-ua[1])*(uc[0]-ua[0])
+        result.append({'areaSquareMetres':area,'crossDotSumNormals':dot,'uvDeterminant':determinant})
+    return result
+
+def topology(pos,ts,weld=True):
+    keys=[recipe.pkey(p) if weld else tuple(p) for p in pos]
+    edgefaces=collections.defaultdict(list)
+    for ti,t in enumerate(ts):
+        for e in recipe.tri_edges(tuple(keys[i] for i in t)):edgefaces[e].append(ti)
+    graph=collections.defaultdict(set)
+    for a,b in edgefaces:graph[a].add(b);graph[b].add(a)
+    unseen=set(graph);components=0
+    while unseen:
+        components+=1;stack=[unseen.pop()]
+        while stack:
+            for n in graph[stack.pop()]:
+                if n in unseen:unseen.remove(n);stack.append(n)
+    return {'components':components,'vertices':len(graph),'edges':len(edgefaces),'faces':len(ts),'euler':len(graph)-len(edgefaces)+len(ts),
+        'boundaryEdges':sum(len(ids)==1 for ids in edgefaces.values()),'nonmanifoldEdges':sum(len(ids)>2 for ids in edgefaces.values()),
+        'edgeMultiplicity':dict(sorted(collections.Counter(len(ids) for ids in edgefaces.values()).items()))},edgefaces
+
+def quality_summary(ms):
+    return {'triangles':len(ms),'zeroAreaAt1eMinus14':sum(x['areaSquareMetres']<=1e-14 for x in ms),
+        'opposedAverageVertexNormal':sum(x['crossDotSumNormals']<0 for x in ms),'zeroUvAt1eMinus14':sum(abs(x['uvDeterminant'])<=1e-14 for x in ms),
+        'minimumAreaSquareMetres':min(x['areaSquareMetres'] for x in ms)}
+
+def inspect():
+    source=recipe.Glb(recipe.WORLD);candidate=recipe.Glb(OUT/recipe.CANDIDATE)
+    assert recipe.sha(source.raw)==recipe.EXPECTED_WORLD
+    assert recipe.sha(recipe.VIEW.read_bytes())==recipe.EXPECTED_VIEW
+    assert recipe.sha(recipe.PLAYER_WORLD.read_bytes())==recipe.EXPECTED_PLAYER_WORLD
+    assert recipe.sha(recipe.KIT_MASTER.read_bytes())==recipe.EXPECTED_MASTER
+    p=source.doc['meshes'][0]['primitives'][0];cp=candidate.doc['meshes'][0]['primitives'][0]
+    attrs,records,rows,ts=facts(source,p);ca,cr,crows,cts=facts(candidate,cp)
+    packed=(OUT/'source-row-map.u32le').read_bytes();assert len(packed)==len(crows)*4
+    mapping=list(struct.unpack('<'+'I'*len(crows),packed))
+    map_json=json.loads((OUT/'source-row-map.json').read_text(encoding='utf8'))
+    assert mapping==map_json['sourceRowsByCandidateVertex'] and map_json['candidateSha256']==recipe.sha(candidate.raw)
+    assert mapping==sorted(set(mapping)) and max(mapping)<len(rows)
+    assert all(crows[i]==rows[j] for i,j in enumerate(mapping)),'Surviving attributes changed'
+    for key in records:
+        assert all(cr[key][i]==records[key][j] for i,j in enumerate(mapping)),key
+    protected_json=json.loads((OUT/'protected-source-rows.json').read_text(encoding='utf8'))
+    packed_protected=(OUT/'protected-source-rows.u32le').read_bytes()
+    protected=set(struct.unpack('<'+'I'*(len(packed_protected)//4),packed_protected))
+    assert sorted(protected)==protected_json['protectedSourceRows'] and protected.issubset(mapping)
+    # Independently check the hard semantic masks against the actual source.
+    names=[source.doc['nodes'][i].get('name','') for i in source.doc['skins'][0]['joints']]
+    head=set();boots=set();hands=set()
+    for i,pos in enumerate(attrs['POSITION']):
+        weights={names[j]:w for j,w in zip(attrs['JOINTS_0'][i],attrs['WEIGHTS_0'][i]) if w>1e-5}
+        if pos[1]>=1.55 or weights.get('Head',0)>0 or weights.get('neck',0)>0:head.add(i)
+        if pos[1]<=.45:boots.add(i)
+        if weights.get('LeftHand',0)>0 or weights.get('RightHand',0)>0:hands.add(i)
+    assert head==set(protected_json['regions']['headNeckOrY155'])
+    assert boots==set(protected_json['regions']['bootsY045']) and hands==set(protected_json['regions']['hands'])
+    assert (head|boots|hands).issubset(protected)
+    candidate_source_triangles=[tuple(mapping[i] for i in t) for t in cts]
+    actual_triangles=collections.Counter(canonical(t) for t in candidate_source_triangles)
+    fixed=collections.Counter(canonical(t) for t in ts if any(i in protected for i in t))
+    assert not(fixed-actual_triangles),'Protected source triangle or winding missing'
+    candidate_boot=collections.Counter(mapping[i] for i,p in enumerate(ca['POSITION']) if p[1]<=.45)
+    assert candidate_boot==collections.Counter(boots),'Native grounding source roster changed'
+    assert candidate.bin[:len(source.bin)]==source.bin
+    assert candidate.doc['accessors'][:len(source.doc['accessors'])]==source.doc['accessors']
+    assert candidate.doc['bufferViews'][:len(source.doc['bufferViews'])]==source.doc['bufferViews']
+    metadata={}
+    for key,value in source.doc.items():
+        if key not in ('meshes','accessors','bufferViews','buffers'):
+            assert candidate.doc[key]==value,key
+            metadata[key]={'decodedValuesExact':True,'canonicalJsonSha256':recipe.sha(json.dumps(value,sort_keys=True,separators=(',',':')).encode())}
+    assert {k:v for k,v in p.items() if k not in ('attributes','indices')}=={k:v for k,v in cp.items() if k not in ('attributes','indices')}
+    assert (OUT/'asset.manifest.json').read_bytes()==(recipe.WORLD.parent/'asset.manifest.json').read_bytes()
+    nongeometry=set(s['inverseBindMatrices'] for s in source.doc['skins'])
+    nongeometry.update(a for an in source.doc['animations'] for s in an['samplers'] for a in (s['input'],s['output']))
+    regions=[]
+    for index in sorted(nongeometry):
+        accessor=source.doc['accessors'][index];view=source.doc['bufferViews'][accessor['bufferView']]
+        width=recipe.COMPONENTS[accessor['componentType']][1]*recipe.WIDTH[accessor['type']]
+        start=view.get('byteOffset',0)+accessor.get('byteOffset',0);stride=view.get('byteStride',width);end=start+(accessor['count']-1)*stride+width
+        assert source.records(index)==candidate.records(index)
+        regions.append({'accessor':index,'bufferView':accessor['bufferView'],'binStart':start,'binEndExclusive':end,'elementBytes':width,'strideBytes':stride,'count':accessor['count'],
+            'packedElementSha256':recipe.sha(b''.join(source.records(index))),'spanSha256':recipe.sha(source.bin[start:end])})
+    assert len(regions)==457
+    st,se=topology(attrs['POSITION'],ts);ct,ce=topology(ca['POSITION'],cts)
+    est,ese=topology(attrs['POSITION'],ts,False);ect,ece=topology(ca['POSITION'],cts,False)
+    sm=metrics(attrs,ts);cm=metrics(ca,cts);minimum_positive=min(x['areaSquareMetres'] for x in sm if x['areaSquareMetres']>1e-14)
+    source_keys=set(canonical(t) for t in ts)
+    source_incident=collections.defaultdict(list)
+    for ti,t in enumerate(ts):
+        for i in t:source_incident[i].append(ti)
+    def source_neighborhood(t):return sorted({i for v in t for i in source_incident[v]})
+    def corner_identities(t):
+        return [{'sourceRow':i,'position':attrs['POSITION'][i],'uv':attrs['TEXCOORD_0'][i],
+            'joints':attrs['JOINTS_0'][i],'weights':attrs['WEIGHTS_0'][i],
+            'protectedRegions':[name for name,ids in protected_json['regions'].items() if i in set(ids)]} for i in t]
+    defects=[]
+    for index,(t,m) in enumerate(zip(candidate_source_triangles,cm)):
+        if canonical(t) in source_keys:continue
+        reasons=[]
+        if m['crossDotSumNormals']<0:reasons.append('new_opposed_average_vertex_normal')
+        if m['areaSquareMetres']<minimum_positive:reasons.append('new_area_below_source_positive_minimum')
+        if abs(m['uvDeterminant'])<=1e-14:reasons.append('new_zero_uv_area')
+        if reasons:defects.append({'candidateTriangleIndex':index,'sourceRows':t,'reasons':reasons,**m,
+            'cornerIdentities':corner_identities(t),'originalIncidentTriangleIndices':source_neighborhood(t),
+            'materialRisk':'A genuine indexed triangle/attribute orientation or area witness, independent of position welding. Requires review for fold/degenerate/UV shading risk; no automatic acceptance from count or geometry saving.'})
+    new_edges=[]
+    for edge,faces in ce.items():
+        if len(faces)<=2 or len(faces)<=len(se.get(edge,[])):continue
+        exact_edges={e for ti in faces for e in recipe.tri_edges(tuple(tuple(ca['POSITION'][i]) for i in cts[ti])) if recipe.edge(recipe.pkey(e[0]),recipe.pkey(e[1]))==edge}
+        exact_new=[{'edge':e,'sourceMultiplicity':len(ese.get(e,[])),'candidateMultiplicity':len(ece[e])} for e in exact_edges if len(ece[e])>2 and len(ece[e])>len(ese.get(e,[]))]
+        source_tris=[candidate_source_triangles[i] for i in faces]
+        new_edges.append({'weldedEdgeKey1um':edge,'sourceMultiplicity':len(se.get(edge,[])),'candidateMultiplicity':len(faces),
+            'candidateIncidentTriangleIndices':faces,'sourceRowsPerIncidentTriangle':source_tris,
+            'originalSourceIncidentTriangleIndices':sorted({i for t in source_tris for i in source_neighborhood(t)}),
+            'skinAndUvIdentities':[corner_identities(t) for t in source_tris],'exactPositionNewNonmanifoldEdges':exact_new,
+            'materialRisk':'New exact-position multi-incident surface edge; possible fold/crack/junction, requiring native posed and actual RT review.' if exact_new else 'Only 1um weld multiplicity increases; no increased exact-position multi-incident edge. Potential coincident seam/rounding witness, not established visible damage; native/RT review still required.'})
+    boundary_exact=recipe.boundary(attrs['POSITION'],ts)==recipe.boundary(ca['POSITION'],cts)
+    duplicates=[{'sourceRows':t,'candidateMultiplicity':n,'sourceMultiplicity':sum(canonical(s)==t for s in ts)} for t,n in actual_triangles.items() if n>1]
+    findings=[]
+    if defects:findings.append('new_triangle_normal_area_or_UV_witnesses')
+    if new_edges:findings.append('new_welded_nonmanifold_edge_witnesses')
+    if st['euler']!=ct['euler']:findings.append('welded_Euler_changed')
+    if st['components']!=ct['components']:findings.append('welded_component_count_changed')
+    if not boundary_exact:findings.append('semantic_boundary_changed')
+    if duplicates:findings.append('duplicate_complete_attribute_triangles')
+    encoded=lambda rec,glb,prim:sum(sum(map(len,v)) for v in rec.values())+sum(map(len,glb.records(prim['indices'])))
+    result={'status':'UNADMITTED_STATIC_FINDINGS_REQUIRE_MATERIAL_REVIEW' if findings else 'UNADMITTED_STATIC_COMPARISON_PASS_PENDING_NATIVE_RT',
+        'sourceSha256':recipe.sha(source.raw),'candidateSha256':recipe.sha(candidate.raw),'auditScriptSha256':recipe.sha(Path(__file__).read_bytes()),
+        'generatorSha256':recipe.sha(Path(recipe.__file__).read_bytes()),'findings':findings,
+        'geometry':{'vertices':[len(rows),len(crows)],'triangles':[len(ts),len(cts)],'vertexReductionPercent':100*(len(rows)-len(crows))/len(rows),
+            'triangleReductionPercent':100*(len(ts)-len(cts))/len(ts),'encodedAccessorBytes':[encoded(records,source,p),encoded(cr,candidate,cp)],
+            'nativeVertexBytes64':[len(rows)*64,len(crows)*64],'nativeIndexBytes32':[len(ts)*12,len(cts)*12],
+            'sourceFileBytes':len(source.raw),'candidateFileBytes':len(candidate.raw),'originalBinPrefixBytes':len(source.bin),'originalBinPrefixSha256':recipe.sha(source.bin)},
+        'preservation':{'allSurvivingAttributeRowsExact':True,'allOriginalAccessorDefinitions':len(source.doc['accessors']),'allOriginalBufferViewDefinitions':len(source.doc['bufferViews']),
+            'sourceMapU32leSha256':recipe.sha(packed),'protectedSourceRowsU32leSha256':recipe.sha(packed_protected),'protectedRowsExact':len(protected),'fixedTrianglesExact':sum(fixed.values()),
+            'nativeBootCandidateSourceRowsExact':len(boots),'headNeckOrY155RowsExact':len(head),'handContactRowsExact':len(hands),'manifestCopyExact':True,
+            'metadata':metadata,'nongeometryAccessorRegionsExact':regions,'viewmodelSha256':recipe.EXPECTED_VIEW,'playerWorldSha256':recipe.EXPECTED_PLAYER_WORLD},
+        'quality':{'source':quality_summary(sm),'candidate':quality_summary(cm),'sourceMinimumPositiveAreaSquareMetres':minimum_positive,'newTriangleWitnesses':defects},
+        'topology':{'sourceWelded':st,'candidateWelded':ct,'sourceExactPosition':est,'candidateExactPosition':ect,
+            'semanticBoundaryMultisetExact':boundary_exact,'newWeldedNonmanifoldEdgeWitnesses':new_edges,'duplicateAttributeTriangles':duplicates},
+        'limits':['One optimizer invocation; no repair/retuning loop.','Any findings are mapped for material risk review, not silently accepted or rejected solely by aggregate count.',
+            'Static original-row/rig identity does not prove unchanged interpolated skin surface, UV/tangent shading, acting or silhouette.','No native, actual RT, timing/GPU/frame/phone acceptance claimed.']}
+    recipe.save_json('static-inspection.json',result)
+    print(json.dumps({'status':result['status'],'candidateSha256':result['candidateSha256'],'geometry':result['geometry'],'findings':findings,
+        'newTriangleWitnesses':len(defects),'newWeldedEdges':len(new_edges),'sourceTopology':st,'candidateTopology':ct,
+        'quality':{'source':quality_summary(sm),'candidate':quality_summary(cm)},'exactNongeometryAccessors':len(regions)}),flush=True)
+
+if __name__=='__main__':
+    try:inspect()
+    except Exception as error:
+        recipe.save_json('static-audit-failure.json',{'status':'UNADMITTED_STATIC_AUDIT_FAILED','reason':str(error),'noAssetMutation':True})
+        raise

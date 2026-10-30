@@ -1,0 +1,309 @@
+{
+  "date": "2026-10-18",
+  "outcome": "PASS bounded seeded first manual creation, file/directory flush and fresh-process real-RT reload; earned/death gate remains open",
+  "evidenceClass": "Physical Android seeded storage-creation diagnostic, not earned route",
+  "sourceBase": "bc0bef02358c9d647586def20b0c34677c1fb25a",
+  "selectedChangedNativeFiles": [
+    {
+      "path": "src/gameplay/campaign/CampaignCheckpointStorage.cpp",
+      "bytes": 18655,
+      "sha256": "3d78100a2a644361a961264027c4b5cff1d8598a0c322c4aec86f5cd08676444"
+    },
+    {
+      "path": "android/app/src/main/cpp/android_campaign_bridge.inl",
+      "bytes": 22697,
+      "sha256": "06675424439b85c415d4c0e2dbbf50a98f903546a2141b32689dd4410b9bfdd2"
+    }
+  ],
+  "hostTestSource": {
+    "path": "tests/CampaignCheckpointStorageTests.cpp",
+    "bytes": 26940,
+    "sha256": "42a33b744dec3bd8ea80b51b69a2fdee3787c1bc90cda8d457c471e318240e29"
+  },
+  "device": {
+    "model": "SM-S948B",
+    "serial": "R5GL219SZGK",
+    "android": 17,
+    "api": 37,
+    "build": "CP2A.260605.016.S948BXXS4BZIG",
+    "user": 0
+  },
+  "package": "com.samfa12.hordelanternrt.debug",
+  "signerCertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "namespace": "files/campaign-tests/create-diagnostic-20261018-r1",
+  "seed": {
+    "source": "Prior isolated test Slot 2 manual; copied only to this diagnostic Slot 1 manual",
+    "sha256": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8",
+    "summary": "Lower chamber, 1/3 hearts",
+    "earnedProgress": false
+  },
+  "failedCandidate": {
+    "apkSha256": "00f196f24eb07cc4eacf4e096f05496912b069f79505f98350812ada657a42b1",
+    "pid": 24510,
+    "storageImplementationChanged": false,
+    "logLineNumber": 987,
+    "nativeLine": "10-18 15:12:33.153 24510 25302 E HordeRtProbeBridge: HORDE_CAMPAIGN_STORAGE_FAILURE operation=1 slot=1 kind=0 status=15 system_error=13 codec_error=0 publication=0 durability=0",
+    "status": 15,
+    "statusName": "PublishFailed",
+    "systemError": 13,
+    "systemErrorName": "EACCES",
+    "publication": 0,
+    "durability": 0,
+    "uiSlot": 2,
+    "cause": "Denied linkat, sole syscall in the create-only publication branch",
+    "specificSelinuxPolicyProven": false
+  },
+  "repair": {
+    "androidCreateOnly": "raw syscall(SYS_renameat2, ..., RENAME_NOREPLACE)",
+    "androidReplace": "renameat unchanged",
+    "nonAndroidPosixCreate": "linkat unchanged",
+    "windows": "unchanged",
+    "minSdk": 24,
+    "libcApi30WrapperUsed": false,
+    "fallbackToReplacingRename": false,
+    "unsupportedResult": "Fail with real errno",
+    "bridge": "Log underlying completion result before public error grouping"
+  },
+  "successfulCandidate": {
+    "apkSha256": "4c84eb456f97717df055245410196101ea681a3bc55d0c9776eb42a59d591073",
+    "pid": 28974,
+    "install": "Compatible same-package/signer in-place update",
+    "androidDebugAbis": 4,
+    "assembleSeconds": 8,
+    "build": "PASS",
+    "nativeLine": "10-18 15:18:57.125 28974 29738 I HordeRtProbeBridge: HORDE_CAMPAIGN request=4 generation=1 phase=7 error=0 active_slot=0 latest=1 rebase=1 presented=1 action=2 isolated=1 durability=2",
+    "phase": 7,
+    "error": 0,
+    "durability": 2,
+    "durabilityName": "FileAndDirectoryFlushed",
+    "activeSlotNative": 0,
+    "targetSlotUi": 2,
+    "newTargetSha256": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8",
+    "seedPreserved": true,
+    "bothSavedSummaries": "Lower chamber, 1/3 hearts",
+    "uiSuccessMessage": "Manual checkpoint saved."
+  },
+  "openedScreenshots": [
+    "reports/android-earned-recovery-2026-10-18/88-diagnostic-create-result.png",
+    "reports/android-earned-recovery-2026-10-18/97-fix-created.png"
+  ],
+  "hostValidation": [
+    {
+      "configuration": "Debug",
+      "checks": 1202,
+      "failures": 0,
+      "seconds": 3.9,
+      "concurrentReads": 430,
+      "log": {
+        "path": "reports/2026-10-18-android-create-storage-debug-tests.log",
+        "bytes": 1188,
+        "sha256": "ff03649919c3ce8d82baf43af262c54da3530b56cc2ab1fa9cdd333c5ac6c45e"
+      }
+    },
+    {
+      "configuration": "Release",
+      "checks": 1202,
+      "failures": 0,
+      "seconds": 1.67,
+      "concurrentReads": 445,
+      "log": {
+        "path": "reports/2026-10-18-android-create-storage-release-tests.log",
+        "bytes": 1194,
+        "sha256": "de1a33b1376f8631671955a9521c51622d6cc2d40198c71de883c037c93999df"
+      }
+    }
+  ],
+  "androidBuildLog": {
+    "path": "reports/2026-10-18-android-create-fix-build.log",
+    "bytes": 2231,
+    "sha256": "173e7c10a6f8dabc924662f7c677982bb2fada67618536854e32173db14d28a6"
+  },
+  "rawArtifacts": [
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/diagnostic-installed.sha256",
+      "bytes": 171,
+      "sha256": "e7e58a30537609f0ccde277cff5a257fd7a5d9a15b6c38cf056c93c68123607b"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/diagnostic-signer.txt",
+      "bytes": 972,
+      "sha256": "a84ee2f0ff3e4ea25230af488c613e2afc1841e761ab076ac134cf8cec26fa2e"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/diagnostic-install.txt",
+      "bytes": 38,
+      "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/diagnostic-seed.sha256",
+      "bytes": 136,
+      "sha256": "ba9a4e96701ce3d09ee4cdc1ba1f728da20ec9cc95149eab6180a44bd3993738"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/pid-24510-diagnostic.log",
+      "bytes": 92968,
+      "sha256": "98133e8dcb9f9f6e9c78193a610ea9033341ddb51228d2907e9c1fc16426daff"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/88-diagnostic-create-result.png",
+      "bytes": 837555,
+      "sha256": "90c63132b2802f1298d3583fc867acc7dd91c3c27fa40744d2e730705d11b673"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/88-diagnostic-create-result.xml",
+      "bytes": 8402,
+      "sha256": "1efbbb5d8141520b3934c330a129a87a8ee70fc153aee74c37dfbafa27730797"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/fix-installed.sha256",
+      "bytes": 171,
+      "sha256": "c09b17ab877b7cd786954058c5e4aa67884dcb6ef72f45bb3291dd7d4c8e3f65"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/fix-signer.txt",
+      "bytes": 972,
+      "sha256": "a84ee2f0ff3e4ea25230af488c613e2afc1841e761ab076ac134cf8cec26fa2e"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/fix-install.txt",
+      "bytes": 38,
+      "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/fix-created.sha256",
+      "bytes": 272,
+      "sha256": "7be5ee04debe79e009011079a101c98b0f298fdacb9f8341db68ec4b17e2f4fa"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/pid-28974-fixed-create.log",
+      "bytes": 110065,
+      "sha256": "be19bbf8752837566da376982920fab954178f56e7a6200e31791d610c91284b"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/97-fix-created.png",
+      "bytes": 834180,
+      "sha256": "ceef067a4b64ef09ffd7482477cd7f9017208466a4b5d4f5766912441719c586"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/97-fix-created.xml",
+      "bytes": 8387,
+      "sha256": "a6bc4c4d88b1d4f09aee9326ccacfd151fc1ab95cdfa7154f2d28ab5d4e990ea"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/fix-fresh-process.json",
+      "bytes": 296,
+      "sha256": "4c14d185a79ac212660e82524e6ebfe640af9698cbdeb8f5334f74f0923e2349"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/fix-terminal.json",
+      "bytes": 125,
+      "sha256": "e06d3c2882e317827d92878f56bcb5a9ab7dd23bedfb4d75b081c1de9748ade9"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/fix-settings-terminal.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/fix-inventory-terminal.txt",
+      "bytes": 20506,
+      "sha256": "59941e06c23c83470cad3da6fe2324ad45e61ee43eed09007e99e3db358a688c"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/fix-records-terminal.sha256",
+      "bytes": 1022,
+      "sha256": "38dc483a8d58581d5de8ea3cb22b2bf04909639be0a943657e4ab580527bcf2d"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/103-fresh-slot2-loaded.png",
+      "bytes": 788180,
+      "sha256": "69e71f9087b18ec36a76ff6ed41f32bb8bee7cbe26f549ef1c60245fbd564082"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/103-fresh-slot2-loaded.xml",
+      "bytes": 8326,
+      "sha256": "1e584fadd1236d2934e1e57776fdfaf106140f560ef75e521ea7014d1789aeee"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/105-fresh-slot2-live.png",
+      "bytes": 3479273,
+      "sha256": "bdd6ee696d00db2f5de8f2c2cc8c51f7a663b6498ec9ee272ded7b7af1e6ae9a"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/pid-32269-fresh-terminal.log",
+      "bytes": 504532,
+      "sha256": "8bff842d3e70462b7fe7ff342422e4f026f58bcd35d5c3577669204a7c58daee"
+    }
+  ],
+  "priorEarnedFailure": "docs/evidence/2026-10-18-android-earned-recovery/README.md",
+  "notRunOrUnaccepted": [
+    "Windows reparse runtime fixture NOT_RUN; nonregular rejection tested",
+    "No WSL/non-Android POSIX runtime",
+    "Android kernel publication race runtime test",
+    "New earned route on repair",
+    "Death Load",
+    "Ascent/full recovery",
+    "Power-loss recovery",
+    "Sustained performance"
+  ],
+  "scope": {
+    "seededDiagnostic": true,
+    "hostRaceChecks": true,
+    "largeCapturesAddedToGit": false,
+    "ownerDataCleared": false,
+    "publicPush": false
+  },
+  "freshProcess": {
+    "oldPid": 28974,
+    "activities": 0,
+    "termination": "am kill --user 0 only matching cached test process",
+    "pidAfter": "",
+    "uninstall": false,
+    "dataClear": false,
+    "firstGuard": "Initial immediate Quit check saw activity teardown in progress; no termination attempted then",
+    "newPid": 32269,
+    "slot": 2,
+    "kind": "manual",
+    "hearts": 1,
+    "explicitResume": true,
+    "currentRtPresented": true,
+    "climbEnabled": true,
+    "screenshot": "reports/android-earned-recovery-2026-10-18/105-fresh-slot2-live.png"
+  },
+  "terminalCustody": {
+    "pid": 32269,
+    "hordeActivityRows": 0,
+    "quit": "Observed QUIT DEMO after fresh Slot2 Load and explicit Resume",
+    "settingsSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "originalPaths": 281,
+    "terminalPaths": 286,
+    "removedOriginalPaths": 0,
+    "addedPaths": [
+      "files/campaign-tests/create-diagnostic-20261018-r1/.slot-2-manual.hrd.lock",
+      "files/campaign-tests/create-diagnostic-20261018-r1/slot-1-manual.hrd",
+      "files/campaign-tests/create-diagnostic-20261018-r1/slot-2-manual.hrd",
+      "files/campaign-tests/earned-20261018-r1/.slot-1-auto.hrd.lock",
+      "files/campaign-tests/earned-20261018-r1/.slot-2-manual.hrd.lock"
+    ],
+    "priorTestRecordsUnchanged": 6,
+    "diagnosticRecords": 2,
+    "ownerCampaignRootExists": false,
+    "fatalLines": 0
+  },
+  "freshNativeTransitions": [
+    "10-18 15:23:59.161 32269 32523 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=3 error=0 active_slot=-1 latest=0 rebase=0 presented=0 action=3 isolated=1 durability=0",
+    "10-18 15:23:59.747 32269 32523 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=5 error=0 active_slot=1 latest=1 rebase=1 presented=0 action=3 isolated=1 durability=0",
+    "10-18 15:23:59.831 32269 32523 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=5 error=0 active_slot=1 latest=1 rebase=1 presented=0 action=3 isolated=1 durability=0",
+    "10-18 15:23:59.909 32269 32523 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=6 error=0 active_slot=1 latest=1 rebase=1 presented=0 action=3 isolated=1 durability=0",
+    "10-18 15:23:59.990 32269 32523 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=7 error=0 active_slot=1 latest=1 rebase=1 presented=1 action=3 isolated=1 durability=0",
+    "10-18 15:23:59.990 32269 32523 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=7 error=0 active_slot=1 latest=1 rebase=1 presented=1 action=3 isolated=1 durability=0",
+    "10-18 15:24:00.032 32269 32523 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=7 error=0 active_slot=1 latest=1 rebase=1 presented=1 action=3 isolated=1 durability=0",
+    "10-18 15:24:00.073 32269 32523 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=7 error=0 active_slot=1 latest=1 rebase=1 presented=1 action=3 isolated=1 durability=0",
+    "10-18 15:24:00.113 32269 32523 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=7 error=0 active_slot=1 latest=1 rebase=1 presented=1 action=3 isolated=1 durability=0",
+    "10-18 15:24:00.153 32269 32523 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=7 error=0 active_slot=1 latest=1 rebase=1 presented=1 action=3 isolated=1 durability=0"
+  ],
+  "packageContentCheck": {
+    "forestWavHashMatches": true,
+    "forestManifestPresent": true
+  }
+}

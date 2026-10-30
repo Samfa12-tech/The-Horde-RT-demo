@@ -1,0 +1,91 @@
+{
+  "results": [
+    {
+      "label": "guard-missing",
+      "expected": 1,
+      "actual": 1,
+      "seconds": 0.032
+    },
+    {
+      "label": "guard-real-producer",
+      "expected": 0,
+      "actual": 0,
+      "seconds": 21.015
+    },
+    {
+      "label": "guard-stale-producer",
+      "expected": 1,
+      "actual": 1,
+      "seconds": 0.016
+    },
+    {
+      "label": "guard-receipt-mismatch",
+      "expected": 1,
+      "actual": 1,
+      "seconds": 0.016
+    },
+    {
+      "label": "guard-payload-tamper",
+      "expected": 1,
+      "actual": 1,
+      "seconds": 0.015
+    },
+    {
+      "label": "guard-build-mismatch",
+      "expected": 1,
+      "actual": 1,
+      "seconds": 0.016
+    },
+    {
+      "label": "guard-cross-run-receipt",
+      "expected": 1,
+      "actual": 1,
+      "seconds": 0.015
+    },
+    {
+      "label": "guard-other-run-cleanup",
+      "expected": 0,
+      "actual": 0,
+      "seconds": 0.016
+    },
+    {
+      "label": "guard-cross-configuration",
+      "expected": 1,
+      "actual": 1,
+      "seconds": 0.016
+    },
+    {
+      "label": "guard-real-consumer",
+      "expected": 0,
+      "actual": 0,
+      "seconds": 16.375
+    },
+    {
+      "label": "guard-consume-once",
+      "expected": 1,
+      "actual": 1,
+      "seconds": 0.015
+    },
+    {
+      "label": "guard-failed-setup",
+      "expected": 8,
+      "actual": 8,
+      "seconds": 0.094
+    },
+    {
+      "label": "guard-cleanup-refuses-extra",
+      "expected": 1,
+      "actual": 1,
+      "seconds": 0.016
+    },
+    {
+      "label": "guard-cleanup-success",
+      "expected": 0,
+      "actual": 0,
+      "seconds": 0.015
+    }
+  ],
+  "allPassed": true,
+  "actualEarnedBytesUsed": true,
+  "fixtureRemoved": true
+}

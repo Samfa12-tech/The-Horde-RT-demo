@@ -1,0 +1,6 @@
+FAIL: renderer must consume the native planted legs rather than lowering only equipment
+FAIL: actual planted ankles must remain above the grounded model origin
+FAIL: renderer must consume the native planted legs rather than lowering only equipment
+FAIL: actual planted ankles must remain above the grounded model origin
+FAIL: planted renderer pose: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.115490 right=0.112518 leftTarget=0.160000,0.560000,0.215000 leftSocket=0.164460,0.667514,0.173063 leftHandTarget=0.126325,0.560359,0.274684 leftHandSocket=0.130785,0.667874,0.232747 rightHandTarget=-0.213845,0.560002,0.233289 rightHandSocket=-0.208543,0.666292,0.196758.
+FAIL: renderer must reach both actual low targets with the planted palette

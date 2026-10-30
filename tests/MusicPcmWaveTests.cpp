@@ -325,7 +325,8 @@ void TestActualRuntimeMusicAssets()
           kMusicPcmAssets[0].bodyFrames == 0u && !kMusicPcmAssets[0].looping,
           "None is the empty, non-looping silence slot");
     std::uint64_t totalPcmBytes = 0u;
-    for (std::size_t index = 1u; index < kMusicPcmAssets.size(); ++index)
+    // Retain the original A-H intake and independent legacy budget verbatim.
+    for (std::size_t index = 1u; index <= static_cast<std::size_t>(MusicCue::H); ++index)
     {
         const auto& asset = kMusicPcmAssets[index];
         Check(static_cast<std::size_t>(asset.cue) == index,
@@ -388,6 +389,69 @@ void TestActualRuntimeMusicAssets()
     Check(totalPcmBytes == 20'160'000u, "runtime bank PCM ownership is the admitted 20,160,000 bytes");
 }
 
+void TestActualOutdoorMainWithExplicitLimits()
+{
+    using namespace horde::audio;
+    const auto& asset = kMusicPcmAssets[static_cast<std::size_t>(MusicCue::Outdoor)];
+    Check(asset.cue == MusicCue::Outdoor && asset.looping && asset.bodyFrames == 5'120'000u &&
+          asset.tailFrames == 0u && asset.tailPath.empty() &&
+          asset.bodyPath == "audio/music/beneath-the-same-moon/runtime/outdoor-main.wav",
+          "only the approved full outdoor main is admitted, without a quiet duplicate or separate tail");
+    const std::filesystem::path path = std::filesystem::path(HORDE_RT_MUSIC_ASSET_DIR) / asset.bodyPath;
+    std::ifstream input(path, std::ios::binary | std::ios::ate);
+    Check(static_cast<bool>(input), "actual admitted outdoor WAV is readable");
+    if (!input) return;
+    const auto fileSize = input.tellg();
+    Check(fileSize == 20'480'044, "actual outdoor WAV retains the full exact 44-byte-header file size");
+    if (fileSize != 20'480'044) return;
+    std::vector<std::uint8_t> bytes(static_cast<std::size_t>(fileSize));
+    input.seekg(0, std::ios::beg);
+    input.read(reinterpret_cast<char*>(bytes.data()), static_cast<std::streamsize>(bytes.size()));
+    Check(static_cast<bool>(input), "actual outdoor WAV is read completely");
+    if (!input) return;
+
+    // Fast whole-file content fingerprint prevents a synthetic same-size WAV
+    // from closing the actual-asset gate. The package policy separately pins
+    // authoritative SHA-256 14fe0a94...; this is not a cryptographic verifier.
+    std::uint64_t fingerprint = 14'695'981'039'346'656'037ull;
+    for (const auto byte : bytes) fingerprint = (fingerprint ^ byte) * 1'099'511'628'211ull;
+    Check(fingerprint == 0x67c8fcac1bf1f490ull, "actual outdoor bytes match the admitted main content fingerprint");
+
+    constexpr pocket_audio::PcmClipLimits limits{5'120'000u, 20'480'000u};
+    std::vector<std::int16_t> samples{12, -34};
+    Check(DecodeMusicPcmWave(bytes, 5'120'000u, samples) ==
+          MusicPcmWaveStatus::InvalidExpectedFrameCount && samples.empty(),
+          "the unchanged default decoder still rejects a full outdoor clip without explicit opt-in");
+    Check(DecodeMusicPcmWave(bytes, 5'120'000u, samples,
+          pocket_audio::PcmClipLimits{5'119'999u, 20'480'000u}) ==
+          MusicPcmWaveStatus::InvalidExpectedFrameCount && samples.empty(),
+          "outdoor explicit admission enforces its frame budget before decoding");
+    Check(DecodeMusicPcmWave(bytes, 5'120'000u, samples,
+          pocket_audio::PcmClipLimits{5'120'000u, 20'479'996u}) ==
+          MusicPcmWaveStatus::InvalidExpectedFrameCount && samples.empty(),
+          "outdoor explicit admission also enforces its independent PCM byte budget");
+    Check(DecodeMusicPcmWave(bytes, 5'120'001u, samples, limits) ==
+          MusicPcmWaveStatus::InvalidExpectedFrameCount && samples.empty(),
+          "one frame beyond the approved outdoor length remains rejected");
+
+    const auto status = DecodeMusicPcmWave(bytes, 5'120'000u, samples, limits);
+    Check(status == MusicPcmWaveStatus::Ok && samples.size() == 10'240'000u,
+          "actual full outdoor WAV decodes through the shared explicit-limits path");
+    if (status != MusicPcmWaveStatus::Ok || samples.size() != 10'240'000u) return;
+    bool exactSamples = true;
+    for (std::size_t index = 0u; index < samples.size(); ++index) {
+        const std::size_t offset = 44u + index * 2u;
+        const auto encoded = static_cast<std::uint16_t>(bytes[offset]) |
+            (static_cast<std::uint16_t>(bytes[offset + 1u]) << 8u);
+        exactSamples = exactSamples && static_cast<std::uint16_t>(samples[index]) == encoded;
+    }
+    Check(exactSamples, "all decoded outdoor samples retain the actual WAV's signed little-endian bits");
+    Check(std::any_of(samples.begin(), samples.end(), [](const auto value) { return value != 0; }),
+          "actual approved outdoor body is not silent");
+    Check(samples.size() * sizeof(std::int16_t) == 20'480'000u,
+          "one outdoor main owns exactly 20,480,000 decoded PCM bytes");
+}
+
 } // namespace
 
 int main()
@@ -399,5 +463,6 @@ int main()
     TestChunkUniquenessAndPresence();
     TestFormatAndFrameValidation();
     TestActualRuntimeMusicAssets();
+    TestActualOutdoorMainWithExplicitLimits();
     return passed ? 0 : 1;
 }

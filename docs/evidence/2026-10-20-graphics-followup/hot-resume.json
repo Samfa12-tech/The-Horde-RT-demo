@@ -1,0 +1,4 @@
+{
+  "stdout": "Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity }\r\nWarning: Activity not started, its current task has been brought to the front\r\nStatus: ok\r\nLaunchState: HOT\r\nActivity: com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity\r\nTotalTime: 47\r\nWaitTime: 50\r\nComplete\r\n",
+  "stderr": ""
+}

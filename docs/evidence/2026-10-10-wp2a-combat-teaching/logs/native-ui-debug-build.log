@@ -1,0 +1,19 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  WindowsMusicPlayback.cpp
+  CharacterRenderSlot.cpp
+  PlayerRenderSlot.cpp
+  horde_windows_music.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_windows_music.lib
+  PresentableTinyRtScene.cpp
+  SimulationFrameAdapter.cpp
+  Generating Code...
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  MotionEvidenceScenario.cpp
+  DiagnosticWindow.cpp
+<repo>\src\platform\windows\DiagnosticWindow.cpp(2277,30): error C3861: 'CombatTeachingPromptText': identifier not found [<repo>\build\presets\windows-x64-debug\horde_rt_diagnostic_window.vcxproj]
+<repo>\src\platform\windows\DiagnosticWindow.cpp(2280,9): error C3861: 'CombatTeachingPromptAlpha': identifier not found [<repo>\build\presets\windows-x64-debug\horde_rt_diagnostic_window.vcxproj]
+  MotionEvidenceLedger.cpp
+  DiagnosticOverlay.cpp
+  Generating Code...

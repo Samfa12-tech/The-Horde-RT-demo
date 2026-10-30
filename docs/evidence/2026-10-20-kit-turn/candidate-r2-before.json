@@ -1,0 +1,35 @@
+{
+  "fixture": {
+    ".slot-1-auto.hrd.lock": {
+      "exists": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "manifest.json": {
+      "exists": true,
+      "bytes": 166,
+      "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+    },
+    "slot-1-auto.hrd": {
+      "exists": true,
+      "bytes": 162,
+      "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+    }
+  },
+  "settings": {
+    "exists": true,
+    "bytes": 471,
+    "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+  },
+  "debug": {
+    "exists": true,
+    "bytes": 14088192,
+    "sha256": "f604ae7d82686064f6651b6636efdfb170def54eb1fb91e211b368c1b394caf3"
+  },
+  "release": {
+    "exists": true,
+    "bytes": 4621312,
+    "sha256": "f5d07195ed0c490f7ccf8ddf990ef3a8f4647f33371da2e1832631c40fa9f65d"
+  },
+  "sourceBase": "feef147183ddedbb65c4b900e3c6d3b8319cc352"
+}

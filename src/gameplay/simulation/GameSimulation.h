@@ -2,13 +2,19 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
+#include "gameplay/campaign/CampaignCheckpoint.h"
 
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
+#include "gameplay/DryFootstepFeedback.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/effects/FireEmitterState.h"
+#include "gameplay/effects/WaterContact.h"
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/items/UtilityEquipmentLease.h"
+#include "gameplay/items/UtilityHandReturn.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
@@ -17,9 +23,17 @@
 #include "gameplay/simulation/CombatPresentation.h"
 #include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/FixedStepRunner.h"
+#include "gameplay/simulation/CharacterPosture.h"
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
 #include "gameplay/simulation/SimulationSnapshot.h"
+#include "gameplay/simulation/ForestBirdAmbience.h"
+#include "gameplay/simulation/ChapterLocalAmbience.h"
+#include "audio/DialogueDucking.h"
+#include "gameplay/simulation/DevelopmentSupportFixture.h"
+#include "gameplay/simulation/DevelopmentWorldRoute.h"
+#include "gameplay/simulation/TriangleSupportSurface.h"
+#include "gameplay/traversal/DevelopmentRescueJourney.h"
 
 namespace horde::gameplay::validation
 {
@@ -53,6 +67,23 @@ struct GameSimulationConfig
     // shared BodyStow transition and repaired anatomical hand pose below.
     bool swordStartsStowed = false;
     bool waterfallSkeletonEncounter = false;
+    bool developmentSupportFixture = false;
+    bool developmentWorldRoute = false;
+    bool developmentRescueJourney = false;
+    bool authoredChapterTerrain = false; // Live applications; historical route fixtures stay explicit.
+    // Current development gameplay; legacy constructor/capture fixtures retain
+    // their authored rules unless the live application profile selects this.
+    bool combatFoundation1_7 = false;
+    // Isolated validation only until the enemy-anchored RT warning is admitted.
+    bool specialSkeletonAttacks1_7 = false;
+    // Remains explicit until the authored clip/private cue package is admitted.
+    bool skeletonRevival1_7 = false;
+    // Shared chapter presentation; historical constructor fixtures stay explicit.
+    bool companionTurnStart = false;
+    // Diagnostic owner slice only. UI/hand/save admission is still separate.
+    bool healingFlask1_7 = false;
+    // Explicit source/native integration trial; normal platform callers stay OFF.
+    bool flaskUtilityCandidate = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -64,6 +95,9 @@ inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
     config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
     config.waterfallSkeletonEncounter = true;
     config.swordStartsStowed = true;
+    config.combatFoundation1_7 = true;
+    // Authored stationary departures; routine bends retain legacy walking.
+    config.companionTurnStart = true;
     return config;
 }
 
@@ -81,6 +115,10 @@ public:
     // Supply the current logical render-view aspect from the surface owner.
     // Call on the simulation owner thread before advancing fixed steps.
     void SetPresentationAspect(float logicalViewAspect);
+    // Owner-thread asset receipt; missing/recreated presentation freezes a rise.
+    // It does not enable the feature or award gameplay/checkpoint progress.
+    bool ConfigureSkeletonRevivalPresentation(std::uint64_t resourceGeneration,
+        float deadDurationSeconds, float standDurationSeconds, bool ready = true);
 
     std::uint32_t AdvanceFrame(const InputSnapshot& input,
                                double frameDeltaSeconds,
@@ -96,9 +134,24 @@ public:
                                 std::uint64_t inputPublicationSequence = 0u,
                                 PausedInputPolicy policy = PausedInputPolicy::DiscardAllCommands);
 
+    // Owner-thread development control; invalidates previous support immediately.
+    void SetDevelopmentSupportFixture(bool enabled, std::uint64_t generation);
+    void SetDevelopmentWorldRoute(bool enabled, bool stagedPreparation = false);
+    void SetDevelopmentRescueJourney(bool enabled, bool authoredTerrain = false);
+    // Live play is deliberately distinct from historical frozen checkpoint imports.
+    void StartLiveDevelopmentRescueJourney(bool authoredTerrain = false);
+    bool PublishChapterTerrain(WorldZoneToken token, std::shared_ptr<const TriangleSupportSurface> terrain);
+    bool PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness);
+    // Current owner receipt only; never awards progress. Empty receipts
+    // withdraw presentation; stale world/resource responses reject.
+    bool PublishFlaskUpgradeReadiness(WorldZoneToken token,const healing::FlaskUpgradeReadiness& readiness);
+    bool HoldStaticDetailLease(const StaticDetailLease& lease);
+    bool ReleaseStaticDetailLease(std::uint64_t resourceGeneration);
+    void InvalidateWorldZoneReadiness();
     void ResetRoute();
     void RetryEncounter();
     bool ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool countAsRetry = false);
+    void BeginCombatPractice(EnemyKind encounter);
     void ImportRewardCheckpoint(
         const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
         const horde::gameplay::interactions::InteractionState& interaction,
@@ -106,12 +159,55 @@ public:
         const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum = nullptr);
     void ResetTiming();
     void ClearEvents();
+    // Render-owner confirmation after a successful matching Showcase present.
+    // A CPU pose, upload or dispatch alone cannot acknowledge the reunion.
+    bool AcknowledgeChapterPresentation(std::uint64_t simulationTick,
+        std::uint64_t dialogueGeneration);
+
+    // Logical-only owner-thread API. Begin leaves live gameplay untouched.
+    // Commit consumes actual destination readiness and current input floors;
+    // it waits paused for a newer neutral publication rebased to the saved
+    // yaw/pitch (sequence zero is the direct-host stepping convention).
+    // No storage or platform calls occur.
+    std::optional<campaign::Checkpoint> CaptureCampaignCheckpoint(campaign::CheckpointId id) const;
+    // Separate milestone policy: only canonical authored respawn anchors are
+    // stored; current movement/camera pose never becomes a saved position.
+    std::optional<campaign::Checkpoint> CaptureAuthoredCampaignBoundary(campaign::CheckpointId id) const;
+    const std::optional<campaign::Checkpoint>& LatestCampaignBoundary() const {return campaignBoundary_;}
+    std::uint64_t CampaignBoundaryRevision() const {return campaignBoundaryRevision_;}
+    std::optional<campaign::RestoreToken> BeginCampaignRestore(const campaign::Checkpoint& checkpoint);
+    bool CommitCampaignRestore(campaign::RestoreToken token, WorldZoneToken readyDestination,
+        std::shared_ptr<const TriangleSupportSurface> terrain, const InputSnapshot& currentInput,
+        std::uint64_t currentInputPublicationSequence = 0);
+    void CancelCampaignRestore() { pendingCampaignRestore_.reset(); }
+    bool CancelCampaignRestore(campaign::RestoreToken token) {
+        if(!pendingCampaignRestore_ || pendingCampaignRestore_->token!=token) return false;
+        pendingCampaignRestore_.reset();return true;
+    }
 
     const SimulationSnapshot& Snapshot() const { return snapshot_; }
     const BoundedGameplayEventQueue& Events() const { return events_; }
     const FixedStepRunner& Timing() const { return fixedStepRunner_; }
 
 private:
+    struct PendingCampaignRestore {
+        campaign::Checkpoint checkpoint;
+        campaign::RestoreToken token;
+        std::uint64_t sourceGeneration = 0;
+    };
+    std::optional<PendingCampaignRestore> pendingCampaignRestore_;
+    std::optional<campaign::Checkpoint> campaignBoundary_;
+    std::uint64_t campaignBoundaryRevision_=0;
+    std::optional<campaign::Checkpoint> BuildCampaignCheckpoint(campaign::CheckpointId,bool canonical, bool allowFlaskAction = false) const;
+    void LatchCampaignBoundary();
+    void ClearCampaignBoundary();
+    std::uint64_t campaignRequestSequence_ = 0;
+    std::uint64_t campaignDestinationGeneration_ = 0;
+    std::optional<std::uint64_t> campaignInputPublicationFloor_;
+    InputSnapshot FilterCampaignInput(const InputSnapshot& input, std::uint64_t publicationSequence);
+    StaticDetailLease staticDetailLease_{};
+    bool deferredStaticDetailReset_ = false;
+    bool deferredStaticDetailRetry_ = false;
     friend class horde::gameplay::validation::MotionEvidenceScenario;
     friend bool horde::gameplay::StageDevelopmentCheckpointSimulation(GameSimulation&,
         const horde::gameplay::DevelopmentCheckpoint&,
@@ -121,6 +217,16 @@ private:
     // opt-in config around an ordinary checkpoint reset.
     bool BeginMotionEvidenceEquipmentSeed();
     void EndMotionEvidenceEquipmentSeed();
+
+    // Only the friend development staging helper may retain an authored pose.
+    // Public reconstruction always returns to the valid recovery side.
+    enum class RewardCheckpointPlacement { SafeRecovery, AuthoredCapture };
+    void ImportRewardCheckpointState(
+        const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
+        const horde::gameplay::interactions::InteractionState& interaction,
+        const horde::gameplay::interactions::FinaleSequenceSnapshot& finale,
+        const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum,
+        RewardCheckpointPlacement placement);
 
     void StepFixedTick(const InputSnapshot& input, float fixedDeltaSeconds,
                        std::uint64_t inputPublicationSequence,
@@ -146,10 +252,35 @@ private:
                                        std::uint64_t eventTick);
     bool ConsumeWorldCommand();
     bool ApplyCheckpoint(std::int32_t checkpointId, bool isRetry);
-    void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
+    void ResolvePlayerSupport();
+    void ResetPlayerFootsteps() { playerFootsteps_.Reset(); dryFootstepCues_.Reset(); }
+    void ResolveMovementCollision(float previousX, float previousZ, bool detectHeadClearance = false);
+    void ResetPlayerSupport();
+    void UpdateMovement(const InputSnapshot& input, float deltaSeconds,
+                        float previousWalkCycleTime);
+    void ClearRunIntent();
+    void ClearCrouchIntent();
+    void UpdatePosture(const InputSnapshot& input,float seconds);
+    bool BodyHeightClear(float height) const;
+    bool CurrentCombatRules() const;
+    bool UsesSkeletonRevival() const;
+    bool OpeningEncounterComplete() const;
+    void UpdateSkeletonRevival(const InputSnapshot& input, float deltaSeconds);
+    void CancelCombatTransients();
+    void BeginKeeperRepel();
+    void ApplyKeeperRepel(float deltaSeconds);
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
     void UpdateRewardSequence(float deltaSeconds, bool commandsAvailable);
     void ResolveHeldItems();
+    bool UsesRescueExterior() const;
+    void StepRescueJourney(bool paused);
+    bool TryRescueInteraction();
+    void RecoverRescueJourney();
+    void ApplyRescuePresentation();
+    void RestoreRescueEquipment();
+    void PublishRescueSnapshot();
+    horde::gameplay::items::HeldItemTransform RescueLanternHinge() const;
+    void RecordSwordContactTrace();
     bool SwordDefenseReady() const;
     bool SwordDrawBlocksDefense() const;
     bool RequestSwordDraw(std::int32_t reasonPayload, bool blocksDefenseDuringDraw);
@@ -165,8 +296,25 @@ private:
                        float x,
                        float z,
                        float intensity = 1.0f,
-                       std::int32_t payload = 0);
+                         std::int32_t payload = 0,
+                         float worldY = 0.0f);
+    void DiscardFlaskRequests();
+    bool UsesFlaskUtility() const;
+    bool FlaskUtilityBusy() const;
+    void CancelFlaskUtility();
+    void ResetFlaskUtility();
+    void PrepareFlaskUtility(const InputSnapshot&, bool competingIntent);
+    void AdvanceFlaskUtility(float gameplaySeconds);
+    void DiscardUtilityCombatCommands();
+    bool FlaskCompetingIntent(const InputSnapshot& input) const;
+    std::optional<campaign::CheckpointId> EligibleFlaskRestAnchor() const;
+    healing::FlaskContext FlaskContextFor(const InputSnapshot&, bool cancel, bool acceptedDamage) const;
+    void StepHealingFlask(const InputSnapshot& input, float gameplaySeconds,
+                          bool competingIntent, int healthBeforeEncounter);
+    bool FlaskUpgradeEligible(const InputSnapshot&) const;
+    bool TryFlaskUpgradeInteraction();
     void RefreshSnapshot(const InputSnapshot& input);
+    void UpdateChapterDialogue(const InputSnapshot& input,float fixedSeconds);
 
     GameSimulationConfig config_{};
     float presentationAspect_ = 1.0f;
@@ -177,7 +325,42 @@ private:
     FixedStepRunner fixedStepRunner_{};
     BoundedGameplayEventQueue events_{};
     CombatPresentationTimeline combatPresentation_{};
+    CombatTeaching combatTeaching_{};
+    SkeletonRevivalBridge skeletonRevival_{};
+    std::uint64_t skeletonRevivalResourceGeneration_ = 0;
+    float skeletonRevivalDeadDurationSeconds_ = 0.0f;
+    float skeletonRevivalStandDurationSeconds_ = 0.0f;
+    bool skeletonRevivalPresentationReady_ = false;
+    bool skeletonRevivalWorkshopBypass_ = false;
+    bool revivedIdlePhaseZero_ = false;
+    CombatContactTraceSnapshot combatContactTrace_{};
+    std::uint64_t currentCutCommandSequence_ = 0, currentCutConsumedTick_ = 0;
+    std::uint64_t queuedUpCutCommandSequence_ = 0, queuedUpCutConsumedTick_ = 0;
+    EntityId swordHitTargetThisTick_ = EntityId::Invalid;
+    std::uint64_t swordHitEventThisTick_ = 0;
+    bool legacyCombatCheckpoint_ = false;
+    bool dodgeProtectionAccepted_ = false;
+    bool guardReleaseRequired_ = false;
+    float gameplayTimeScale_ = 1.0f;
+    std::uint64_t acceptedDodgeSequence_ = 0u;
+    std::uint64_t acceptedDodgeConsumedTick_ = 0u;
+    std::uint64_t dodgeProtectedHitCount_ = 0u;
+    float keeperRepelRemainingSeconds_ = 0.0f;
+    float keeperRepelDirectionX_ = 0.0f;
+    float keeperRepelDirectionZ_ = 0.0f;
+    float keeperRepelTravelledMetres_ = 0.0f;
+    std::uint64_t latestTutorialSkipSequence_ = 0u;
+    std::uint64_t latestTutorialReplaySequence_ = 0u;
+    std::uint64_t pendingTutorialSkipCommands_ = 0u;
+    std::uint64_t pendingTutorialReplayCommands_ = 0u;
     SimulationSnapshot snapshot_{};
+    horde::gameplay::dialogue::Director chapterDialogue_{};
+    horde::audio::DialogueDucking dialogueDucking_{};
+    ForestBirdAmbience forestBird_{};
+    ChapterLocalAmbience localAmbience_{};
+    horde::gameplay::dialogue::CompanionRouteFixture chapterCompanion_{};
+    std::uint64_t chapterSkipFloor_=0,chapterVisibleRaise_=0;
+    bool chapterFirstExterior_=false;
     InputSnapshot lastInput_{};
 
     TorchFailureSequence torchFailure_{};
@@ -189,7 +372,14 @@ private:
     horde::gameplay::interactions::InteractionState interactionState_{};
     horde::gameplay::interactions::LanternPendulum lanternPendulum_{};
     PlayerVitals playerVitals_{};
+    healing::HealingFlask healingFlask_{};
+    items::UtilityEquipmentLease flaskEquipmentLease_{};
+    items::UtilityHandReturn flaskHandReturn_{};
+    std::uint64_t flaskCompletionTick_=0;
+    std::uint64_t campaignRetryRequestGeneration_=0,completedRestGeneration_=0;
     TravelFootstepCadence playerFootsteps_{};
+    DryFootstepSequence dryFootstepCues_{};
+    horde::gameplay::effects::WaterContact waterContact_{};
     std::array<PlayerFootstepCadence, kSkeletonEnemyCapacity> enemyFootsteps_{};
     std::array<double, kSkeletonEnemyCapacity> skeletonIncidentalIdleSeconds_{};
     std::array<double, kSkeletonEnemyCapacity> skeletonIncidentalNextSeconds_{{12.0, 18.0}};
@@ -206,12 +396,38 @@ private:
     std::size_t fireEmitterCount_ = 3u;
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
+    PlayerSupportResolution playerSupport_{};
+    WorldRouteState worldRoute_{};
+    std::shared_ptr<const TriangleSupportSurface> chapterTerrain_;
+    std::uint64_t chapterTerrainGeneration_=0;
+    std::optional<healing::FlaskUpgradeSite> flaskUpgradeSite_;
+    bool flaskUpgradeReady_=false;
+    std::uint64_t flaskUpgradeWorldGeneration_=0,flaskUpgradeResourceGeneration_=0;
+    horde::gameplay::traversal::RescueTraversal rescueTraversal_{};
+    float rescueOpeningSeconds_ = 0.0f;
+    bool rescueMovementSuppressedThisTick_ = false;
+    bool rescueSavedSwordValid_=false;
+    horde::gameplay::items::HeldItemState rescueSavedSword_{};
+    bool stagedWorldPreparation_ = false;
+    std::uint64_t supportGeneration_ = 1u;
     float playerX_ = 0.0f;
     float playerZ_ = 1.85f;
     float playerYawRadians_ = 0.0f;
     float playerPitchRadians_ = -0.05f;
     float walkTime_ = 0.0f;
+    float walkCycleTime_ = 0.0f;
+    float walkPhaseOffset_ = 0.0f;
     float walkVisualAmount_ = 0.0f;
+    float playerMovementSpeed_ = 0.0f;
+    bool runToggleActive_ = false;
+    bool runActive_ = false;
+    bool runInputBlockedUntilRelease_ = false;
+    CharacterPosture posture_{};
+    bool crouchToggleActive_=false,crouchInputBlockedUntilRelease_=false;
+    bool automaticCrouchRequested_=false;
+    std::uint64_t latestCrouchToggleSequence_=0,latestClearCrouchIntentSequence_=0;
+    std::uint64_t lastConsumedCrouchToggleSequence_=0,lastConsumedClearCrouchIntentSequence_=0;
+    std::uint64_t pendingCrouchToggleCommands_=0,pendingClearCrouchIntentCommands_=0;
     std::int32_t retryCheckpoint_ = 0;
     std::uint32_t retryGeneration_ = 0u;
     std::uint64_t tickIndex_ = 0u;
@@ -223,6 +439,8 @@ private:
     std::uint64_t latestRetrySequence_ = 0u;
     std::uint64_t latestInteractSequence_ = 0u;
     std::uint64_t latestToggleHeldLightPoseSequence_ = 0u;
+    std::uint64_t latestRunToggleSequence_ = 0u;
+    std::uint64_t latestClearRunIntentSequence_ = 0u;
     std::uint64_t lastConsumedAttackSequence_ = 0u;
     std::uint64_t lastConsumedParrySequence_ = 0u;
     std::uint64_t lastConsumedDodgeSequence_ = 0u;
@@ -230,6 +448,8 @@ private:
     std::uint64_t lastConsumedRetrySequence_ = 0u;
     std::uint64_t lastConsumedInteractSequence_ = 0u;
     std::uint64_t lastConsumedToggleHeldLightPoseSequence_ = 0u;
+    std::uint64_t lastConsumedRunToggleSequence_ = 0u;
+    std::uint64_t lastConsumedClearRunIntentSequence_ = 0u;
     std::uint64_t pendingAttackCommands_ = 0u;
     std::uint64_t pendingParryCommands_ = 0u;
     std::uint64_t pendingDodgeCommands_ = 0u;
@@ -237,6 +457,11 @@ private:
     std::uint64_t pendingRetryCommands_ = 0u;
     std::uint64_t pendingInteractCommands_ = 0u;
     std::uint64_t pendingToggleHeldLightPoseCommands_ = 0u;
+    std::uint64_t pendingRunToggleCommands_ = 0u;
+    std::uint64_t pendingClearRunIntentCommands_ = 0u;
+    std::uint64_t latestDrinkFlaskSequence_=0,latestRestSequence_=0;
+    std::uint64_t lastConsumedDrinkFlaskSequence_=0,lastConsumedRestSequence_=0;
+    std::uint64_t pendingDrinkFlaskCommands_=0,pendingRestCommands_=0;
     float pendingDodgeForward_ = 0.0f;
     float pendingDodgeStrafe_ = 0.0f;
     float dodgeDirectionX_ = 0.0f;

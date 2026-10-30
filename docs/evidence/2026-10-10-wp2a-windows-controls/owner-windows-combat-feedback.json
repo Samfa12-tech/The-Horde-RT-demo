@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "date_local": "2026-10-10",
+  "evidence_class": "owner statement; scoped Windows combat feel",
+  "checkpoint": "ba7caf656246f8b74f8343b21909b1d16dfa3d98",
+  "reported_result": "positive Windows combat-feel feedback",
+  "authority": "Owner explicitly requested recording positive Windows combat-feel feedback against this checkpoint.",
+  "historical_windows_debug_exe_sha256": "57768441056da4dd8c784ac515954f7924566c5f68517c0f0ede262782402a7d",
+  "historical_identity_source": "docs/evidence/2026-10-10-wp2a-closeout/receipt.json",
+  "scope_limits": [
+    "This is an owner statement, not a new technical/device run.",
+    "It does not transfer acceptance to the new controls/light/occlusion candidate.",
+    "Backend, matched captures, lifecycle, Android and separately documented audio/haptic acceptance remain open."
+  ],
+  "new_candidate_owner_acceptance": "PENDING"
+}

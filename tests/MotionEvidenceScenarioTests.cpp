@@ -60,12 +60,13 @@ void Run(MotionScenario kind, int rate, const char* receiptPath)
               "water shaft route starts from an admitted fresh torch checkpoint before ordinary movement");
     Check(ledger.Begin("cpu_only_input_evidence", kind), "bounded ledger accepts a safe local run ID");
     InputSnapshot publication;
+    publication.analogueMovement=true;
     // No current RT output: same production paused-input path, no commands.
     const auto notReady = scenario.BuildInput(simulation.Snapshot(), publication, now, false);
     simulation.AdvanceFrame(notReady, 1.0 / rate, 1u);
     scenario.ObserveAdvance(simulation.Snapshot(), simulation.Events().Events());
     Check(simulation.Snapshot().tickIndex == 0u && notReady.paused && !notReady.hasAuthoritativePlayerPose &&
-          notReady.commands.attack == 0u && scenario.SimulationSeconds() == 0.0,
+          notReady.commands.attack == 0u && !notReady.analogueMovement && scenario.SimulationSeconds() == 0.0,
           "unpresented output defers live simulation input instead of forcing frame time");
     simulation.ClearEvents();
     bool pauseChecked = false;
@@ -183,12 +184,21 @@ void Run(MotionScenario kind, int rate, const char* receiptPath)
 
 void TestEquipmentEventAdmission()
 {
-    // The observer must preserve newly appended ordinary equipment events.
+    // The observer must preserve appended equipment and teaching cue events.
     // These are observer-only fixtures, not manufactured gameplay evidence.
+    static_assert(static_cast<unsigned>(GameplayEventType::ParryPrepareCue) == 24u);
+    static_assert(static_cast<unsigned>(GameplayEventType::LichDischargeWarning) == 25u);
+    static_assert(static_cast<unsigned>(GameplayEventType::PlayerWetFootstep) == 26u);
+    static_assert(static_cast<unsigned>(GameplayEventType::WaterfallContact) == 27u);
     for (const auto type : {GameplayEventType::PlayerSwordDrawStarted,
                             GameplayEventType::PlayerSwordAttachmentChanged,
                             GameplayEventType::SkeletonEncounterWarning,
-                            static_cast<GameplayEventType>(24u)})
+                            GameplayEventType::ParryPrepareCue,
+                            GameplayEventType::LichDischargeWarning,
+                            GameplayEventType::PlayerWetFootstep,
+                            GameplayEventType::WaterfallContact,
+                            static_cast<GameplayEventType>(kGameplayEventTypeCount),
+                            static_cast<GameplayEventType>(255u)})
     {
         GameSimulation simulation(ProductionGameSimulationConfig());
         MotionEvidenceScenario scenario;
@@ -199,19 +209,44 @@ void TestEquipmentEventAdmission()
         const std::array<GameplayEvent, 1u> events{{{.sequence = 1u, .tickIndex = 1u, .type = type}}};
         scenario.ObserveAdvance(simulation.Snapshot(), events);
         const bool accepted = ledger.AppendState(2u, simulation.Snapshot(), {}, scenario, events);
-        const bool known = type != static_cast<GameplayEventType>(24u);
+        const bool known = static_cast<std::size_t>(type) < kGameplayEventTypeCount;
         Check(accepted == known && scenario.Failed() != known,
-              "draw, attachment and waterfall warning events admitted; unknown event rejected");
+              "equipment and both teaching cues admitted; first unknown and byte-boundary events rejected");
         if (known && accepted && !scenario.Failed())
         {
             Check(scenario.EventCounts()[static_cast<std::size_t>(type)] == 1u &&
                   ledger.Events().size() == 1u && ledger.Events()[0].event.type == type,
-                  "new equipment event retained exactly once with its original type");
+                  "equipment or teaching cue retained exactly once with its original type");
             scenario.ObserveAdvance(simulation.Snapshot(), events);
             Check(scenario.Failed() && !ledger.AppendState(3u, simulation.Snapshot(), {}, scenario, events),
-                  "duplicate equipment event remains rejected");
+                  "duplicate equipment or teaching cue remains rejected");
         }
     }
+
+    GameSimulation simulation(ProductionGameSimulationConfig());
+    MotionEvidenceScenario scenario;
+    MotionEvidenceLedger ledger;
+    Check(scenario.Begin(MotionScenario::TorchLowOpening, simulation, 1u) &&
+          ledger.Begin("ordered_teaching_cues", MotionScenario::TorchLowOpening),
+          "ordered cue observer fixture admitted");
+    const std::array<GameplayEvent, 3u> cues{{
+        {.sequence=1u, .tickIndex=1u, .type=GameplayEventType::ParryPrepareCue},
+        {.sequence=2u, .tickIndex=1u, .type=GameplayEventType::LichDischargeWarning},
+        {.sequence=3u, .tickIndex=2u, .type=GameplayEventType::ParryPrepareCue}}};
+    scenario.ObserveAdvance(simulation.Snapshot(), cues);
+    Check(!scenario.Failed() && ledger.AppendState(2u, simulation.Snapshot(), {}, scenario, cues) &&
+          ledger.Events().size()==3u &&
+          scenario.EventCounts()[static_cast<std::size_t>(GameplayEventType::ParryPrepareCue)]==2u &&
+          scenario.EventCounts()[static_cast<std::size_t>(GameplayEventType::LichDischargeWarning)]==1u,
+          "repeated valid cues retain every event in sequence rather than merging types");
+    for (std::size_t i=0; i<ledger.Events().size() && i<cues.size(); ++i)
+        Check(ledger.Events()[i].event.sequence==cues[i].sequence &&
+              ledger.Events()[i].event.type==cues[i].type,
+              "mixed teaching cue sequence and identity preserved");
+    const std::array<GameplayEvent, 1u> stale{{cues[1]}};
+    scenario.ObserveAdvance(simulation.Snapshot(), stale);
+    Check(scenario.Failed() && !ledger.AppendState(3u, simulation.Snapshot(), {}, scenario, stale) &&
+          ledger.Events().size()==3u, "out-of-order cue cannot append after the accepted sequence");
 }
 
 void TestSwordTransitionLedgerIsolation()
@@ -247,6 +282,72 @@ void TestSwordTransitionLedgerIsolation()
 void TestAdmissionAndFrameBinding()
 {
     MotionScenario parsed{};
+    {
+        GameSimulation live(ProductionGameSimulationConfig());MotionEvidenceScenario probe;
+        Check(probe.Begin(MotionScenario::TorchLowOpening,live,1),"ledger diagnostic fixture uses canonical production state");
+        const auto rejects=[&](const SimulationSnapshot& state,const InputSnapshot& input,std::string_view expected) {
+            MotionEvidenceLedger ledger;
+            Check(ledger.Begin("exact_admission_reason",MotionScenario::TorchLowOpening) &&
+                  !ledger.AppendState(2,state,input,probe,{}) && ledger.States().empty() && ledger.Failure()==expected,
+                  "split ledger diagnostics preserve the original fail-closed state admission");
+        };
+        auto overflow=live.Snapshot();overflow.eventQueueOverflowCount=1;
+        rejects(overflow,{},"Motion semantic event queue overflow count is nonzero.");
+        InputSnapshot forced;forced.hasAuthoritativePlayerPose=true;
+        rejects(live.Snapshot(),forced,"Motion input contains an authoritative player pose.");
+        InputSnapshot outside;outside.moveForward=1.1f;
+        rejects(live.Snapshot(),outside,"Motion input axes exceed their admitted bounds.");
+    }
+    Check(ParseMotionScenario("chapter-outdoor-scale-hold",parsed) &&
+          parsed==MotionScenario::ChapterOutdoorScaleHold && IsTimedMotionScenario(parsed) &&
+          !IsChapterMotionScenario(parsed), "outdoor hold has its own exact timed identity, never the tomb round-trip route");
+    {
+        auto config=ProductionGameSimulationConfig();config.developmentRescueJourney=true;config.authoredChapterTerrain=true;
+        GameSimulation outdoor(config);MotionEvidenceScenario hold;
+        const auto tick=outdoor.Snapshot().tickIndex;
+        Check(!hold.Begin(MotionScenario::ChapterOutdoorScaleHold,outdoor,1) && outdoor.Snapshot().tickIndex==tick,
+              "outdoor hold rejects unprepared/non-lookout starts without seeding or advancing them");
+        // CPU contract fixture only. The rejected first fixture attempted full
+        // checkpoint203 route staging over blockout triangles, which do not
+        // cover every forest tree origin: ChapterExteriorObstacleClear rejects
+        // a terrain missing any of those required ground samples, even when
+        // that tree is distant from the player's local sweep.
+        // Use the existing restore API and an explicit flat test surface to
+        // test this observer, without claiming natural traversal or RT proof.
+        const std::array<TriangleSupportSurface::Triangle,2> triangles{{
+            {{{{-100,-1.15f,-100},{-100,-1.15f,100},{100,-1.15f,100}}},SupportSurface::Earth},
+            {{{{-100,-1.15f,-100},{100,-1.15f,100},{100,-1.15f,-100}}},SupportSurface::Earth}}};
+        std::string error;const auto terrain=TriangleSupportSurface::Build(triangles,error);
+        Check(terrain && std::all_of(kForestTreePlacementContract.begin(),kForestTreePlacementContract.end(),
+              [&](const auto& tree){return terrain->Query(tree.x,tree.z).found;}),
+              "CPU fixture covers every required forest trunk ground sample, including distant trees");
+        campaign::Checkpoint checkpoint;checkpoint.contentRevision=2;
+        checkpoint.id=campaign::CheckpointId::ForestEndpoint;checkpoint.zone=WorldZoneId::Lookout;
+        checkpoint.position={kWorldRoutePoints.back().x,-1.15f,kWorldRoutePoints.back().z};
+        checkpoint.yaw=2.51f;checkpoint.pitch=-.15f;checkpoint.firstAscentCompleted=true;
+        checkpoint.dialogue.grateConsumed=checkpoint.dialogue.rescueConsumed=checkpoint.dialogue.reunionStarted=true;
+        checkpoint.dialogue.proofAccepted=checkpoint.dialogue.forestNightConsumed=true;
+        checkpoint.dialogue.forestWaystoneConsumed=checkpoint.dialogue.forestClueConsumed=checkpoint.dialogue.forestVillageConsumed=true;
+        const auto restore=outdoor.BeginCampaignRestore(checkpoint);
+        Check(terrain && restore && outdoor.CommitCampaignRestore(*restore,{restore->worldGeneration,WorldZoneId::Lookout},terrain,{}),
+              "CPU-only lookout fixture uses validated campaign restore on explicit test terrain; it is not natural traversal evidence");
+        InputSnapshot neutral;neutral.yawRadians=checkpoint.yaw;neutral.pitchRadians=checkpoint.pitch;
+        outdoor.StepFixed(neutral);outdoor.ClearEvents();
+        const auto initial=outdoor.Snapshot();
+        Check(hold.Begin(MotionScenario::ChapterOutdoorScaleHold,outdoor,1) && outdoor.Snapshot().tickIndex==initial.tickIndex,
+              "ready outdoor hold observes rather than reseeds its route start");
+        std::uint64_t now=1;InputSnapshot owner;
+        for(unsigned frame=0;frame<2401 && !hold.Complete() && !hold.Failed();++frame) {
+            now+=16'666'667ull;auto input=hold.BuildInput(outdoor.Snapshot(),owner,now,true);
+            Check(input.moveForward==0 && input.moveStrafe==0 && !input.hasAuthoritativePlayerPose && !input.paused,
+                  "hold advances ordinary neutral input without importing player transforms");
+            outdoor.AdvanceFrame(input,1./60.);hold.ObserveAdvance(outdoor.Snapshot(),outdoor.Events().Events());outdoor.ClearEvents();
+        }
+        if(!hold.Complete())std::cerr<<"Outdoor hold: "<<hold.Failure()<<'\n';
+        Check(hold.Complete() && outdoor.Snapshot().tickIndex>initial.tickIndex+2300 &&
+              std::hypot(outdoor.Snapshot().playerX-initial.playerX,outdoor.Snapshot().playerZ-initial.playerZ)<.001f,
+              "bounded40s wall hold advances live fixed steps while preserving position");
+    }
     Check(ParseMotionScenario("keeper-first-entry", parsed) && parsed == MotionScenario::KeeperFirstEntry &&
           !ParseMotionScenario("keeper-first-entry ", parsed) && !ParseMotionScenario("../torch-low-opening", parsed),
           "exact scenario parser cannot silently broaden unsupported launch input");
@@ -812,6 +913,59 @@ int main(int argc, char** argv)
     TestRearLookCannotBeSkipped();
     for (int rate : {15, 30, 60, 120})
     {
+        {
+            GameSimulation live(ProductionGameSimulationConfig());
+            MotionEvidenceScenario probe;
+            Check(!probe.Begin(MotionScenario::KeeperTorchTransition,live,1),
+                "torch probe rejects the legacy showcase instead of silently profiling it");
+            live.StartLiveDevelopmentRescueJourney(true);
+            InputSnapshot owner;owner.crouchHeld=true;owner.commands.crouchToggle=5;
+            live.StepFixed(owner);live.ClearEvents();
+            const auto initialTick=live.Snapshot().tickIndex;
+            Check(probe.Begin(MotionScenario::KeeperTorchTransition,live,1) &&
+                  live.Snapshot().tickIndex==initialTick,
+                "torch probe observes live chapter without reseeding/advancing it");
+            std::uint64_t now=1,publication=1;
+            bool baseline=false,lit=false,pauseChecked=false,crouchSeen=false,standingAgain=false;
+            for(int frame=0;frame<rate*115 && !probe.Complete() && !probe.Failed();++frame) {
+                now+=1'000'000'000ull/rate;
+                const auto input=probe.BuildInput(live.Snapshot(),owner,now,true);
+                if(frame==0)Check(!input.crouchHeld && input.commands.clearCrouchIntent>owner.commands.clearCrouchIntent,
+                    "live probe releases inherited held/toggled crouch before steering its own route");
+                Check(!input.hasAuthoritativePlayerPose && !input.tutorialEnabled,
+                    "torch probe retains ordinary movement and normal simulation time");
+                live.AdvanceFrame(input,1.0/rate,publication++);
+                crouchSeen=crouchSeen || (live.Snapshot().playerZ<-3.f && live.Snapshot().playerCrouchDropMetres>.5f);
+                standingAgain=standingAgain || (crouchSeen && live.Snapshot().playerZ<-4.f && !live.Snapshot().crouchActive);
+                probe.ObserveAdvance(live.Snapshot(),live.Events().Events());live.ClearEvents();
+                if(probe.Stage()==MotionStage::TorchBaseline || probe.Stage()==MotionStage::TorchLit) {
+                    unsigned litSources=0;
+                    for(unsigned i=0;i<live.Snapshot().fireEmitterCount;++i) {
+                        const auto& e=live.Snapshot().fireEmitters[i];
+                        if((e.stableId==3 || e.stableId==4) && e.strength>0)++litSources;
+                    }
+                    Check(litSources==(probe.Stage()==MotionStage::TorchLit?2u:0u),
+                        "both production torches switch at the real reveal, never during baseline");
+                    if(!pauseChecked && probe.Stage()==MotionStage::TorchLit) {
+                        const auto tick=live.Snapshot().tickIndex;
+                        InputSnapshot pause;pause.paused=true;
+                        const auto held=probe.BuildInput(live.Snapshot(),pause,now,false);
+                        live.AdvanceFrame(held,1.0/rate,publication++);
+                        probe.ObserveAdvance(live.Snapshot(),live.Events().Events());live.ClearEvents();
+                        Check(held.paused && live.Snapshot().tickIndex==tick,
+                            "foreground/readiness loss freezes the ordinary reveal rather than forcing it");
+                        pauseChecked=true;
+                    }
+                }
+                baseline=baseline || probe.Stage()==MotionStage::TorchBaseline;
+                lit=lit || probe.Stage()==MotionStage::TorchLit;
+            }
+            if(!probe.Complete())std::cerr<<"Torch probe: "<<probe.Failure()<<" stage "<<MotionStageName(probe.Stage())<<" at "<<live.Snapshot().playerX<<","<<live.Snapshot().playerZ<<'\n';
+            Check(probe.Complete() && baseline && lit,"live torch crossing completes baseline and actual reveal");
+            Check(crouchSeen && standingAgain,"live torch route crouches under the opening and stands when clear");
+            std::cout<<"live-torch-crouch rate="<<rate<<" complete="<<probe.Complete()
+                     <<" crouch="<<crouchSeen<<" standingAgain="<<standingAgain<<'\n';
+        }
         TestWaterfallEquipmentSeedOwnership(rate);
         RunTorchDrench(rate);
         for (const auto kind : {MotionScenario::TorchLowOpening, MotionScenario::ShaftUp,

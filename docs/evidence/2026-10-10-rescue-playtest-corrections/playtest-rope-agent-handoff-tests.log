@@ -1,0 +1,163 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 152
+    Start 152: horde_rt_rescue_traversal_tests
+
+152: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_traversal_tests.exe"
+152: Working Directory: <repo>/build/presets/windows-x64-debug
+152: Test timeout computed to be: 1500
+152: Lower grip selection indices=6.75,7.5 points=-33.9255,0.719505,-15.5844|-33.9579,0.397845,-15.5353
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: left hand must finish its ordered upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: left hand must finish its ordered upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: right hand must finish its solved upper regrip before the supported planar handoff
+152: Ascent final phase=4 support=2.05 root=-33.7,2.05,-12.8 indices=0.4,0.7 gripsY=3.50281,3.37142
+152: PullUp diagnostic start_indices=0.5,1 max_hand_step=0.0316543 at_indices=0.4,0.85 z=-15.1657
+152: continuous alternating hand targets must not jump between rope particles
+152: Rescue traversal cases=80482 failures=59 max_root_step=0.0250012 max_landing_root_step=0.0243965
+1/2 Test #152: horde_rt_rescue_traversal_tests ........***Failed    4.43 sec
+Lower grip selection indices=6.75,7.5 points=-33.9255,0.719505,-15.5844|-33.9579,0.397845,-15.5353
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+right hand must finish its solved upper regrip before the supported planar handoff
+left hand must finish its ordered upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+left hand must finish its ordered upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+right hand must finish its solved upper regrip before the supported planar handoff
+Ascent final phase=4 support=2.05 root=-33.7,2.05,-12.8 indices=0.4,0.7 gripsY=3.50281,3.37142
+PullUp diagnostic start_indices=0.5,1 max_hand_step=0.0316543 at_indices=0.4,0.85 z=-15.1657
+continuous alternating hand targets must not jump between rope particles
+Rescue traversal cases=80482 failures=59 max_root_step=0.0250012 max_landing_root_step=0.0243965
+
+test 156
+    Start 156: horde_rt_rescue_rig_attachment_tests
+
+156: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_rig_attachment_tests.exe"
+156: Working Directory: <repo>/build/presets/windows-x64-debug
+156: Test timeout computed to be: 180
+156: Rescue rig attachment cases=14975 failures=0 sampled_poses=883 max_left_reach=0.622384@phase=2 max_right_reach=0.651852@phase=2
+2/2 Test #156: horde_rt_rescue_rig_attachment_tests ...   Passed   20.06 sec
+
+The following tests passed:
+	horde_rt_rescue_rig_attachment_tests
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =  24.51 sec
+
+The following tests FAILED:
+	152 - horde_rt_rescue_traversal_tests (Failed)
+Errors while running CTest

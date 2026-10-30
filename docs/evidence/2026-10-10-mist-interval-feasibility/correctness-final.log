@@ -1,0 +1,10 @@
+{
+  "passed": false,
+  "cases": 6,
+  "output": "reports/mist-interval-feasibility/correctness-2.json",
+  "failures": [
+    "frozen ray (465, 286) source 1 lean: cell error 0.0007696972313426809 exceeds fixed 2e-5 discriminator",
+    "frozen ray (465, 286) source 1 current: cell error 0.0023341908730053484 exceeds fixed 2e-5 discriminator",
+    "frozen ray (465, 286) source 1 higher: cell error 0.003112603668330549 exceeds fixed 2e-5 discriminator"
+  ]
+}

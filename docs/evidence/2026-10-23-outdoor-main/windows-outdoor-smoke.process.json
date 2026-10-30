@@ -1,0 +1,8 @@
+{
+  "exeSha256": "0783947D116852BEAF885FE024E3C15D870EC9547DCCB458DAA763AC42426436",
+  "elapsedSeconds": 108.2911123,
+  "exitCode": 0,
+  "pid": 74100,
+  "timedOut": false,
+  "scope": "actual XAudio2 silent outdoor output, one full period, pause/resume/retry/join; isolated audio snapshot, not listening/natural journey"
+}

@@ -1,0 +1,38 @@
+Start testing: Oct 12 02:36 AUS Eastern Summer Time
+----------------------------------------------------------
+85/182 Testing: horde_rt_forest_dressing_tests
+85/182 Test: horde_rt_forest_dressing_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_forest_dressing_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_forest_dressing_tests" start time: Oct 12 02:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Native root footprint samples=4992 exposed=0 maximum_gap_m=-0.0199988
+Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, forest 6; primitiveRows=11 vertexBytes=26252736 indexBytes=4606848; CPU admission only
+Native forest tree-pair import, grounding, grouping, and clean-failure checks passed.
+<end of output>
+Test time =  10.61 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_forest_dressing_tests" end time: Oct 12 02:37 AUS Eastern Summer Time
+"horde_rt_forest_dressing_tests" time elapsed: 00:00:10
+----------------------------------------------------------
+
+90/182 Testing: horde_rt_static_gltf_asset_tests
+90/182 Test: horde_rt_static_gltf_asset_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_static_gltf_asset_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_static_gltf_asset_tests" start time: Oct 12 02:37 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Static GLB temporary root=horde-rt-static-gltf-tests-debug-pid-51008
+Static GLB asset contract passed
+<end of output>
+Test time =   3.69 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_static_gltf_asset_tests" end time: Oct 12 02:37 AUS Eastern Summer Time
+"horde_rt_static_gltf_asset_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Oct 12 02:37 AUS Eastern Summer Time

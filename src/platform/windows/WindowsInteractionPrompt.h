@@ -21,6 +21,12 @@ struct WindowsChestPromptVisibility
     bool captureMode = false;
 };
 
+constexpr std::string_view WindowsRaiseLanternPromptText(bool controller,bool descend)
+{
+    return controller ? (descend ? "Y: RAISE LANTERN | A: DESCEND" : "Y: RAISE LANTERN") :
+        (descend ? "E: RAISE LANTERN | CLICK: DESCEND" : "E: RAISE LANTERN");
+}
+
 constexpr std::string_view WindowsChestPromptText(
     const horde::gameplay::interactions::ChestRewardPrompt prompt)
 {
@@ -30,11 +36,11 @@ constexpr std::string_view WindowsChestPromptText(
     case ChestRewardPrompt::Locked:
         return "LOCKED | DEFEAT THE LICH";
     case ChestRewardPrompt::OpenChest:
-        return "PRESS E / A TO OPEN CHEST";
+        return "LEFT-CLICK / A TO OPEN CHEST";
     case ChestRewardPrompt::Opening:
         return "OPENING...";
     case ChestRewardPrompt::ClaimLantern:
-        return "PRESS E / A TO TAKE LANTERN";
+        return "LEFT-CLICK / A TO TAKE LANTERN";
     case ChestRewardPrompt::Unlocking:
         return "THE LICH'S SEAL IS BREAKING...";
     default:

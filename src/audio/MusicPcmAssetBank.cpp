@@ -30,7 +30,23 @@ MusicPcmBankResult MusicPcmAssetBank::Load(
             {
                 activePath = isTail ? asset.tailPath : asset.bodyPath;
                 const std::uint32_t frames = isTail
-                    ? static_cast<std::uint32_t>(kMusicPcmTailFrames) : asset.bodyFrames;
+                    ? asset.tailFrames : asset.bodyFrames;
+                if (frames == 0u) continue; // Already-looped outdoor main has no separate tail.
+                const auto limits = asset.cue == MusicCue::Outdoor && !isTail
+                    ? kOutdoorMusicClipLimits : pocket_audio::PcmClipLimits{};
+                if (!limits.AllowsFrames(frames))
+                {
+                    ReleasePartial();
+                    return {MusicPcmBankStatus::DecodeFailed, activePath,
+                            MusicPcmWaveStatus::InvalidExpectedFrameCount};
+                }
+                const auto decodedBytes = static_cast<std::uint64_t>(frames) * 4u;
+                if (decodedBytes > kMusicPcmBankBytes ||
+                    PcmBytes() > kMusicPcmBankBytes - decodedBytes)
+                {
+                    ReleasePartial();
+                    return {MusicPcmBankStatus::WrongFileSize, activePath};
+                }
                 const std::size_t expectedBytes = static_cast<std::size_t>(frames) * 4u + 44u;
                 fileBytes.clear();
                 if (!reader(context, activePath, expectedBytes, fileBytes))
@@ -44,7 +60,7 @@ MusicPcmBankResult MusicPcmAssetBank::Load(
                     return {MusicPcmBankStatus::WrongFileSize, activePath};
                 }
                 auto& samples = isTail ? tails_[index] : bodies_[index];
-                const auto decoded = DecodeMusicPcmWave(fileBytes, frames, samples);
+                const auto decoded = DecodeMusicPcmWave(fileBytes, frames, samples, limits);
                 if (decoded != MusicPcmWaveStatus::Ok)
                 {
                     ReleasePartial();

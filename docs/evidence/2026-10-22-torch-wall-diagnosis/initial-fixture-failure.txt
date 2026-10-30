@@ -1,0 +1,21 @@
+Internal ctest changing into directory: <worktree>/build/presets/windows-x64-debug
+Test project <worktree>/build/presets/windows-x64-debug
+    Start 51: horde_rt_held_item_clearance_tests
+1/1 Test #51: horde_rt_held_item_clearance_tests ...***Failed    6.84 sec
+Portal cases=19392 maximum world-down carry=0.79874 m
+Maximum sampled walk/look hand step=0.0295375 m at step 197 previous z/yaw/pitch=-3.46/-0.210644/0.0560644 current=-3.47/-0.214874/0.0519433 retreat/lowering=0.189427/0.558001 -> 0.178705/0.532593
+Rag torch held/lowered residual=0.577716/0.0887203 m; lowered hand Y=-0.910606
+First horizontal Rag failure: right native witness aspect=1 pitch=-0.32 phase=0 resolved=1 mesh/flame/light/shadows/complete=0/0/0/0/0 Light=1.97041,0.81964,-4.90942
+FAIL: production anatomical Rag mesh, Flame, Light and Current/Higher shadow endpoints stay inside the complete outer route union
+FAIL: outer-wall protection preserves the ordinary calibrated centre carry
+FAIL: both near-wall turning sweeps retain complete Rag clearance at every sampled pose
+Horizontal Rag cases=339 turnIncrementRadians=.01 maximumHandStepMetres=0.00260098 maximumLightStepMetres=0.00333319
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   6.86 sec
+
+The following tests FAILED:
+	 51 - horde_rt_held_item_clearance_tests (Failed)
+Errors while running CTest

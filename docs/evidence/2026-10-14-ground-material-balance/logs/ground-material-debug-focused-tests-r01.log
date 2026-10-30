@@ -1,0 +1,31 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+      Start  51: horde_rt_world_route_foundation_tests
+ 1/13 Test  #51: horde_rt_world_route_foundation_tests ................   Passed    5.03 sec
+      Start  52: horde_rt_vertical_support_tests
+ 2/13 Test  #52: horde_rt_vertical_support_tests ......................   Passed    4.89 sec
+      Start  53: horde_rt_held_item_vertical_support_rig_tests
+ 3/13 Test  #53: horde_rt_held_item_vertical_support_rig_tests ........   Passed    2.72 sec
+      Start  54: horde_rt_player_directional_rig_tests
+ 4/13 Test  #54: horde_rt_player_directional_rig_tests ................   Passed    7.12 sec
+      Start  98: horde_rt_static_gltf_asset_tests
+ 5/13 Test  #98: horde_rt_static_gltf_asset_tests .....................   Passed    0.59 sec
+      Start  99: horde_rt_static_gltf_intake_missing_argument_tests
+ 6/13 Test  #99: horde_rt_static_gltf_intake_missing_argument_tests ...   Passed    0.02 sec
+      Start 100: horde_rt_static_gltf_intake_unknown_argument_tests
+ 7/13 Test #100: horde_rt_static_gltf_intake_unknown_argument_tests ...   Passed    0.01 sec
+      Start 129: horde_rt_tomb_terrain_exclusion_tests
+ 8/13 Test #129: horde_rt_tomb_terrain_exclusion_tests ................   Passed    2.50 sec
+      Start 167: horde_rt_static_geometry_cutover_tests
+ 9/13 Test #167: horde_rt_static_geometry_cutover_tests ...............   Passed    2.07 sec
+      Start 183: horde_rt_rescue_journey_integration_tests
+10/13 Test #183: horde_rt_rescue_journey_integration_tests ............   Passed   13.39 sec
+      Start 184: horde_rt_chapter_terrain_journey_tests
+11/13 Test #184: horde_rt_chapter_terrain_journey_tests ...............   Passed   58.67 sec
+      Start 191: horde_rt_rescue_rig_attachment_tests
+12/13 Test #191: horde_rt_rescue_rig_attachment_tests .................   Passed   29.25 sec
+      Start 192: horde_rt_rescue_adversarial_regression_tests
+13/13 Test #192: horde_rt_rescue_adversarial_regression_tests .........   Passed   34.65 sec
+
+100% tests passed, 0 tests failed out of 13
+
+Total Test time (real) = 160.95 sec

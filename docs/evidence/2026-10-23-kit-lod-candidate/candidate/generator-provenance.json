@@ -1,0 +1,8 @@
+{
+  "helperSourcePath": "reports\\world-body-lod-20261023\\prepare_world_body.py",
+  "helperSourceSha256": "711fb5279b9fda6880e7b63a38fa80bff0a62e7a28ba5c512d5066eea8254c08",
+  "copiedHelperPrefixSha256": "d251b0464a0c79e0a89771f69d13d24d3cf6fd13aab942595c2a7ef064df7bf2",
+  "generatorTailSha256": "bbfe7a877a47ea798cc9b2e73dd16f81042f9a58758cb2bad68c85a0a6cdc6b7",
+  "generatorSha256": "d5641f16aafc998d7d3e9100ca1a37d1be93f95ca56a29bc08b46c180b677000",
+  "note": "Unchanged shared GLB/record/index helpers; one Kit protection plan and same source-row index proposal/graft. No generic production pipeline changes."
+}

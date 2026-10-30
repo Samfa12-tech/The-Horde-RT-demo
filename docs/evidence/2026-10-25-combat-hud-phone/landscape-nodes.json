@@ -1,0 +1,62 @@
+{
+  "menu_button": {
+    "bounds": [
+      2644,
+      161,
+      2896,
+      329
+    ],
+    "label": "MENU",
+    "description": "MENU",
+    "enabled": "true",
+    "clickable": "true"
+  },
+  "toggle_held_light_pose_button": {
+    "bounds": [
+      2385,
+      852,
+      2581,
+      1048
+    ],
+    "label": "",
+    "description": "LOWER. Lantern raised.",
+    "enabled": "true",
+    "clickable": "true"
+  },
+  "dodge_button": {
+    "bounds": [
+      2672,
+      894,
+      2924,
+      1076
+    ],
+    "label": "DODGE",
+    "description": "DODGE",
+    "enabled": "true",
+    "clickable": "true"
+  },
+  "parry_button": {
+    "bounds": [
+      2350,
+      1076,
+      2616,
+      1342
+    ],
+    "label": "",
+    "description": "PARRY",
+    "enabled": "true",
+    "clickable": "true"
+  },
+  "attack_button": {
+    "bounds": [
+      2644,
+      1104,
+      2924,
+      1384
+    ],
+    "label": "",
+    "description": "SWING",
+    "enabled": "true",
+    "clickable": "true"
+  }
+}

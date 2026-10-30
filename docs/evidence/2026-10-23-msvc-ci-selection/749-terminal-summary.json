@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "workflow": {
+    "conclusion": "success",
+    "created_at": "2026-10-23T10:59:21Z",
+    "event": "push",
+    "head_sha": "749e5ffec26973fcc716d54a6e886255b2d7c284",
+    "html_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39942919352",
+    "id": 39942919352,
+    "name": "Shared simulation host tests",
+    "run_attempt": 1,
+    "run_started_at": "2026-10-23T10:59:21Z",
+    "status": "completed",
+    "updated_at": "2026-10-23T11:10:17Z"
+  },
+  "jobs": [
+    {
+      "id": 120378489186,
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:59:24Z",
+      "completedAtUtc": "2026-10-23T11:04:15Z",
+      "totalSeconds": 291.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39942919352/job/120378489186"
+    },
+    {
+      "id": 120378489365,
+      "name": "player-vulkan-host",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:59:25Z",
+      "completedAtUtc": "2026-10-23T11:07:09Z",
+      "totalSeconds": 464.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39942919352/job/120378489365"
+    },
+    {
+      "id": 120378489402,
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:59:24Z",
+      "completedAtUtc": "2026-10-23T11:06:02Z",
+      "totalSeconds": 398.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39942919352/job/120378489402"
+    },
+    {
+      "id": 120378489415,
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:59:24Z",
+      "completedAtUtc": "2026-10-23T11:10:17Z",
+      "totalSeconds": 653.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39942919352/job/120378489415"
+    },
+    {
+      "id": 120378489584,
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:59:25Z",
+      "completedAtUtc": "2026-10-23T11:10:01Z",
+      "totalSeconds": 636.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39942919352/job/120378489584"
+    },
+    {
+      "id": 120378489662,
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T10:59:25Z",
+      "completedAtUtc": "2026-10-23T11:09:17Z",
+      "totalSeconds": 592.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39942919352/job/120378489662"
+    }
+  ],
+  "msvc": {
+    "totalSeconds": 653,
+    "nativeBuildSeconds": 465,
+    "selectionSeconds": 122,
+    "ctestPassed": 149,
+    "ctestTotal": 149,
+    "ctestSeconds": 116.23,
+    "apkResolverPassed": 10,
+    "apkResolverTotal": 10,
+    "same149NameRosterAsPrior": true
+  },
+  "sanitizedFullLocalReceiptSha256": "8ccdb2a2f11a1664f72681084e751d51c887ed4ab468390dfd3cb524811eb363",
+  "scope": "Exact749 source checkpoint; read-only monitoring, no rerun, timeout/coverage change, device or performance admission"
+}

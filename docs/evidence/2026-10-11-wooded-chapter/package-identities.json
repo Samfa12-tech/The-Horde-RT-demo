@@ -1,0 +1,499 @@
+{
+  "source": "58586878db970785254b61b8bf3fb6f27bcbd673",
+  "artifacts": [
+    {
+      "platform": "Windows",
+      "configuration": "debug",
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 12132352,
+      "sha256": "013f543a9f8b78e97df3b5d5ae8ce34874d12013f3e1596bd0720f9bef864b14",
+      "shaderInspection": {
+        "target": "<repo>\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "targetPlatform": "Windows",
+        "instrumentation": "Diagnostic",
+        "quality": "High",
+        "targetSha256": "013f543a9f8b78e97df3b5d5ae8ce34874d12013f3e1596bd0720f9bef864b14",
+        "targetBytes": 12132352,
+        "semanticKeys": [
+          "diagnostic_high_generic_dielectric",
+          "diagnostic_high_opaque_fast",
+          "rayquery_compute_diagnostic_high_generic_dielectric",
+          "rayquery_compute_diagnostic_high_opaque_fast"
+        ],
+        "modules": [
+          {
+            "offset": 7511504,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "a38a62242bbcbddad7f6dbb94c397791944a0cdad788bda8c717e1d46d338b09",
+            "words": 147792,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 29,
+            "binding22": true,
+            "atomicInstructions": 5
+          },
+          {
+            "offset": 8102672,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "9937fc79adcc50c017c1d15fc84c24b088b5628f2b58472ae4e6086829a56414",
+            "words": 73933,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": true,
+            "atomicInstructions": 41
+          },
+          {
+            "offset": 8398416,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "093711e01b0edb08eb8312094653b6ae4499034b9c59722dd6db6b94a7768c8d",
+            "words": 148093,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 29,
+            "binding22": true,
+            "atomicInstructions": 5
+          },
+          {
+            "offset": 8990800,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "dec03f19fefc361f67f7f0e242ff585f05e64f6ac3e4c88cb63061d43cf3f4c4",
+            "words": 73995,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": true,
+            "atomicInstructions": 41
+          }
+        ],
+        "spirvVal": "passed",
+        "spirvDis": "passed"
+      }
+    },
+    {
+      "platform": "Windows",
+      "configuration": "release",
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4252672,
+      "sha256": "a48ec806c0874c3402e343220580fb2ea8a17e66646a353bf5f7d6fcd03735ac",
+      "shaderInspection": {
+        "target": "<repo>\\build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe",
+        "targetPlatform": "Windows",
+        "instrumentation": "Shipping",
+        "quality": "High",
+        "targetSha256": "a48ec806c0874c3402e343220580fb2ea8a17e66646a353bf5f7d6fcd03735ac",
+        "targetBytes": 4252672,
+        "semanticKeys": [
+          "shipping_high_generic_dielectric",
+          "shipping_high_opaque_fast",
+          "rayquery_compute_shipping_high_generic_dielectric",
+          "rayquery_compute_shipping_high_opaque_fast"
+        ],
+        "modules": [
+          {
+            "offset": 1953296,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "28217780606cfc2456209b776f7faee7363c33ed96940fd53ef75a332c150f4f",
+            "words": 146733,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 29,
+            "binding22": false,
+            "atomicInstructions": 0
+          },
+          {
+            "offset": 2540240,
+            "backend": "RayTracingPipeline",
+            "executionModel": "RayGenerationKHR",
+            "sha256": "265d7982700835fe1837f05ec27c6fbf19c0f8a8b7eb33890cee752c9c381250",
+            "words": 71726,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": false,
+            "atomicInstructions": 0
+          },
+          {
+            "offset": 2827152,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "44d81bcc71f4366236792d8b9af8aff8502bd28b128fd0c2572f12793ec697ac",
+            "words": 147034,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 29,
+            "binding22": false,
+            "atomicInstructions": 0
+          },
+          {
+            "offset": 3415296,
+            "backend": "RayQueryCompute",
+            "executionModel": "GLCompute",
+            "sha256": "0ff4029639bbc38e3a1a775f3a9f00ec7a422e4cc087608ffa284faf193902a7",
+            "words": 71788,
+            "rayQueryCapability": true,
+            "rayQueryInitializations": 2,
+            "binding22": false,
+            "atomicInstructions": 0
+          }
+        ],
+        "spirvVal": "passed",
+        "spirvDis": "passed"
+      }
+    },
+    {
+      "platform": "Android",
+      "configuration": "debug",
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 138588046,
+      "sha256": "83a9d29c09fd5fb446e649bc48ba65c8d6a398522c14d24240ee364a8c7065ed",
+      "shaderInspectionCoverage": "arm64-v8a only; both packaged and stripped exact library, external SPIR-V validation enabled",
+      "shaderInspection": {
+        "apk": "<repo>\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+        "apkEntry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "instrumentation": "Diagnostic",
+        "quality": "Mobile",
+        "arm64Sha256": "39f20362b87c913730a6c6ea7b0a40c80fb9f890770fb3efa5e00b86d0199f1f",
+        "stripped": {
+          "target": "<repo>\\android\\app\\build\\intermediates\\stripped_native_libs\\debug\\stripDebugDebugSymbols\\out\\lib\\arm64-v8a\\libhorde_rt_probe_android.so",
+          "targetPlatform": "Android",
+          "instrumentation": "Diagnostic",
+          "quality": "Mobile",
+          "targetSha256": "39f20362b87c913730a6c6ea7b0a40c80fb9f890770fb3efa5e00b86d0199f1f",
+          "targetBytes": 4730384,
+          "semanticKeys": [
+            "diagnostic_mobile_generic_dielectric",
+            "diagnostic_mobile_opaque_fast",
+            "rayquery_compute_diagnostic_mobile_generic_dielectric",
+            "rayquery_compute_diagnostic_mobile_opaque_fast"
+          ],
+          "modules": [
+            {
+              "offset": 576808,
+              "backend": "RayQueryCompute",
+              "executionModel": "GLCompute",
+              "sha256": "26827e4b5c68037d945ac05c749300e49d36652f55e0599c332fffd0f1b38a58",
+              "words": 147318,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 27,
+              "binding22": true,
+              "atomicInstructions": 5
+            },
+            {
+              "offset": 1166080,
+              "backend": "RayQueryCompute",
+              "executionModel": "GLCompute",
+              "sha256": "b38489dbccc39bbe5eb3071c83ae0f7e22eedad52f99e4864009386d0502dc7c",
+              "words": 73620,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 2,
+              "binding22": true,
+              "atomicInstructions": 41
+            },
+            {
+              "offset": 1460560,
+              "backend": "RayTracingPipeline",
+              "executionModel": "RayGenerationKHR",
+              "sha256": "9b71b88c3d6f97d055b9f3fadfc54205c68767fc1dd4a86b9dc03b9496b26224",
+              "words": 147017,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 27,
+              "binding22": true,
+              "atomicInstructions": 5
+            },
+            {
+              "offset": 2048628,
+              "backend": "RayTracingPipeline",
+              "executionModel": "RayGenerationKHR",
+              "sha256": "d105e2ce407a90405f2ff1bcdd55fbeb76fc88e863ebf7aa925823dacd295e44",
+              "words": 73558,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 2,
+              "binding22": true,
+              "atomicInstructions": 41
+            }
+          ],
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        },
+        "packaged": {
+          "target": "<user>\\AppData\\Local\\Temp\\horde-rt-android-containment-fac372cc1fa44805a93ae1b723aefe16\\libhorde_rt_probe_android.so",
+          "targetPlatform": "Android",
+          "instrumentation": "Diagnostic",
+          "quality": "Mobile",
+          "targetSha256": "39f20362b87c913730a6c6ea7b0a40c80fb9f890770fb3efa5e00b86d0199f1f",
+          "targetBytes": 4730384,
+          "semanticKeys": [
+            "diagnostic_mobile_generic_dielectric",
+            "diagnostic_mobile_opaque_fast",
+            "rayquery_compute_diagnostic_mobile_generic_dielectric",
+            "rayquery_compute_diagnostic_mobile_opaque_fast"
+          ],
+          "modules": [
+            {
+              "offset": 576808,
+              "backend": "RayQueryCompute",
+              "executionModel": "GLCompute",
+              "sha256": "26827e4b5c68037d945ac05c749300e49d36652f55e0599c332fffd0f1b38a58",
+              "words": 147318,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 27,
+              "binding22": true,
+              "atomicInstructions": 5
+            },
+            {
+              "offset": 1166080,
+              "backend": "RayQueryCompute",
+              "executionModel": "GLCompute",
+              "sha256": "b38489dbccc39bbe5eb3071c83ae0f7e22eedad52f99e4864009386d0502dc7c",
+              "words": 73620,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 2,
+              "binding22": true,
+              "atomicInstructions": 41
+            },
+            {
+              "offset": 1460560,
+              "backend": "RayTracingPipeline",
+              "executionModel": "RayGenerationKHR",
+              "sha256": "9b71b88c3d6f97d055b9f3fadfc54205c68767fc1dd4a86b9dc03b9496b26224",
+              "words": 147017,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 27,
+              "binding22": true,
+              "atomicInstructions": 5
+            },
+            {
+              "offset": 2048628,
+              "backend": "RayTracingPipeline",
+              "executionModel": "RayGenerationKHR",
+              "sha256": "d105e2ce407a90405f2ff1bcdd55fbeb76fc88e863ebf7aa925823dacd295e44",
+              "words": 73558,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 2,
+              "binding22": true,
+              "atomicInstructions": 41
+            }
+          ],
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        }
+      },
+      "libraries": [
+        {
+          "abi": "arm64-v8a",
+          "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+          "bytes": 4730384,
+          "sha256": "39f20362b87c913730a6c6ea7b0a40c80fb9f890770fb3efa5e00b86d0199f1f",
+          "matchesStripped": true,
+          "elfMagic": true,
+          "shaderInspection": true
+        },
+        {
+          "abi": "armeabi-v7a",
+          "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+          "bytes": 4153256,
+          "sha256": "f07bac6ffb4e6f54fd982fe6699ce441953f725a7dcffdaabce624965e78560c",
+          "matchesStripped": true,
+          "elfMagic": true,
+          "shaderInspection": false
+        },
+        {
+          "abi": "x86",
+          "entry": "lib/x86/libhorde_rt_probe_android.so",
+          "bytes": 5168784,
+          "sha256": "1628553ba17c5d078a48620d470458245af67346525d9e044bdcfb17450b1585",
+          "matchesStripped": true,
+          "elfMagic": true,
+          "shaderInspection": false
+        },
+        {
+          "abi": "x86_64",
+          "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+          "bytes": 4909456,
+          "sha256": "079a7c663d24cbac2952fddcb45b134667622126dec0423115bec8fe7e896059",
+          "matchesStripped": true,
+          "elfMagic": true,
+          "shaderInspection": false
+        }
+      ],
+      "kitAudioPackaged": false
+    },
+    {
+      "platform": "Android",
+      "configuration": "release",
+      "path": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "bytes": 122820177,
+      "sha256": "9d73a74d151ad55afd5aeea1349b055eecec0e12d55a41356a1f98fc41e9b4ae",
+      "shaderInspectionCoverage": "arm64-v8a only; both packaged and stripped exact library, external SPIR-V validation enabled",
+      "shaderInspection": {
+        "apk": "<repo>\\android\\app\\build\\outputs\\apk\\release\\app-release-unsigned.apk",
+        "apkEntry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "instrumentation": "Shipping",
+        "quality": "Mobile",
+        "arm64Sha256": "1bc60982d65907a9f2e522b6264425332fdc4e9f226b108ad881abec4d6644c4",
+        "stripped": {
+          "target": "<repo>\\android\\app\\build\\intermediates\\stripped_native_libs\\release\\stripReleaseDebugSymbols\\out\\lib\\arm64-v8a\\libhorde_rt_probe_android.so",
+          "targetPlatform": "Android",
+          "instrumentation": "Shipping",
+          "quality": "Mobile",
+          "targetSha256": "1bc60982d65907a9f2e522b6264425332fdc4e9f226b108ad881abec4d6644c4",
+          "targetBytes": 4535896,
+          "semanticKeys": [
+            "shipping_mobile_generic_dielectric",
+            "shipping_mobile_opaque_fast",
+            "rayquery_compute_shipping_mobile_generic_dielectric",
+            "rayquery_compute_shipping_mobile_opaque_fast"
+          ],
+          "modules": [
+            {
+              "offset": 551504,
+              "backend": "RayQueryCompute",
+              "executionModel": "GLCompute",
+              "sha256": "fb9036ce5b85682cb5727cf9c701e8a3e666cf87caeee6a1c81d22aea6f573ac",
+              "words": 146259,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 27,
+              "binding22": false,
+              "atomicInstructions": 0
+            },
+            {
+              "offset": 1136540,
+              "backend": "RayQueryCompute",
+              "executionModel": "GLCompute",
+              "sha256": "fa9ff2db02287987b077745d4e72268c689de82aff6930587f883faffbd818ad",
+              "words": 71413,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 2,
+              "binding22": false,
+              "atomicInstructions": 0
+            },
+            {
+              "offset": 1422192,
+              "backend": "RayTracingPipeline",
+              "executionModel": "RayGenerationKHR",
+              "sha256": "0c5dfc70cde011e47325c38bc818722d000dd22d4134d0dc3a419d9792cb3711",
+              "words": 145958,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 27,
+              "binding22": false,
+              "atomicInstructions": 0
+            },
+            {
+              "offset": 2006024,
+              "backend": "RayTracingPipeline",
+              "executionModel": "RayGenerationKHR",
+              "sha256": "2e60e707f21089375ef457159eda188d75450989f6a9d7feb4c58cc84b140745",
+              "words": 71351,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 2,
+              "binding22": false,
+              "atomicInstructions": 0
+            }
+          ],
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        },
+        "packaged": {
+          "target": "<user>\\AppData\\Local\\Temp\\horde-rt-android-containment-3269b0358a774ac0acc4cb9e5ad7acb6\\libhorde_rt_probe_android.so",
+          "targetPlatform": "Android",
+          "instrumentation": "Shipping",
+          "quality": "Mobile",
+          "targetSha256": "1bc60982d65907a9f2e522b6264425332fdc4e9f226b108ad881abec4d6644c4",
+          "targetBytes": 4535896,
+          "semanticKeys": [
+            "shipping_mobile_generic_dielectric",
+            "shipping_mobile_opaque_fast",
+            "rayquery_compute_shipping_mobile_generic_dielectric",
+            "rayquery_compute_shipping_mobile_opaque_fast"
+          ],
+          "modules": [
+            {
+              "offset": 551504,
+              "backend": "RayQueryCompute",
+              "executionModel": "GLCompute",
+              "sha256": "fb9036ce5b85682cb5727cf9c701e8a3e666cf87caeee6a1c81d22aea6f573ac",
+              "words": 146259,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 27,
+              "binding22": false,
+              "atomicInstructions": 0
+            },
+            {
+              "offset": 1136540,
+              "backend": "RayQueryCompute",
+              "executionModel": "GLCompute",
+              "sha256": "fa9ff2db02287987b077745d4e72268c689de82aff6930587f883faffbd818ad",
+              "words": 71413,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 2,
+              "binding22": false,
+              "atomicInstructions": 0
+            },
+            {
+              "offset": 1422192,
+              "backend": "RayTracingPipeline",
+              "executionModel": "RayGenerationKHR",
+              "sha256": "0c5dfc70cde011e47325c38bc818722d000dd22d4134d0dc3a419d9792cb3711",
+              "words": 145958,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 27,
+              "binding22": false,
+              "atomicInstructions": 0
+            },
+            {
+              "offset": 2006024,
+              "backend": "RayTracingPipeline",
+              "executionModel": "RayGenerationKHR",
+              "sha256": "2e60e707f21089375ef457159eda188d75450989f6a9d7feb4c58cc84b140745",
+              "words": 71351,
+              "rayQueryCapability": true,
+              "rayQueryInitializations": 2,
+              "binding22": false,
+              "atomicInstructions": 0
+            }
+          ],
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        }
+      },
+      "libraries": [
+        {
+          "abi": "arm64-v8a",
+          "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+          "bytes": 4535896,
+          "sha256": "1bc60982d65907a9f2e522b6264425332fdc4e9f226b108ad881abec4d6644c4",
+          "matchesStripped": true,
+          "elfMagic": true,
+          "shaderInspection": true
+        },
+        {
+          "abi": "armeabi-v7a",
+          "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+          "bytes": 3995044,
+          "sha256": "17fc05dda92c54ca8bead7be5b27899712a0c8d6f6b213668ee59ac89ef32a66",
+          "matchesStripped": true,
+          "elfMagic": true,
+          "shaderInspection": false
+        },
+        {
+          "abi": "x86",
+          "entry": "lib/x86/libhorde_rt_probe_android.so",
+          "bytes": 4928556,
+          "sha256": "3ddd397dbb93aa59f97e2745972aa2dd173501b27d14c7226e33e3e3e1785a05",
+          "matchesStripped": true,
+          "elfMagic": true,
+          "shaderInspection": false
+        },
+        {
+          "abi": "x86_64",
+          "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+          "bytes": 4704360,
+          "sha256": "2a4378279f8f109b24941fb0aaaf0c4e1127d0da3078fea6a4fd91659916fe35",
+          "matchesStripped": true,
+          "elfMagic": true,
+          "shaderInspection": false
+        }
+      ],
+      "kitAudioPackaged": false
+    }
+  ]
+}

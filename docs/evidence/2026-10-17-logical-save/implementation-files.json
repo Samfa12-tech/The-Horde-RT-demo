@@ -1,0 +1,87 @@
+[
+  {
+    "path": ".github/workflows/shared-simulation-host.yml",
+    "bytes": 36801,
+    "sha256": "6ab63ff32fb66bb3fad8120ca981999adc954cff2ba1e9c11495d0fb4d5099ce"
+  },
+  {
+    "path": "CMakeLists.txt",
+    "bytes": 102126,
+    "sha256": "c110aa73c9c60deb821747520efbee77d0c4614dc1e8e1e27dc570d7f40e5968"
+  },
+  {
+    "path": "cmake/HordeRtSources.cmake",
+    "bytes": 3106,
+    "sha256": "6f4bef86996e16b6e43e013f9563856ee48af58dcb8ce3cd7bc8c4a4304f1d54"
+  },
+  {
+    "path": "src/gameplay/ShowcaseGameplay.h",
+    "bytes": 38575,
+    "sha256": "408e1512f045658705029b79e6bd218914e684cc4cc2a4b472ee433062b1f401"
+  },
+  {
+    "path": "src/gameplay/SwordCombat.h",
+    "bytes": 44406,
+    "sha256": "a9d1457d4df34d9138b0f3107b50e8feee201f4f7e86748e188a36a584c84cf1"
+  },
+  {
+    "path": "src/gameplay/campaign/CampaignCheckpoint.h",
+    "bytes": 3413,
+    "sha256": "579eccaca7732954d3feced657460b2761060a8a1f3ac6eb5e675dc73d2eeecf"
+  },
+  {
+    "path": "src/gameplay/dialogue/ChapterDialogue.h",
+    "bytes": 20191,
+    "sha256": "fe7e70000575fd7be0f3fdb6011551e4cd9662f4e80e5ab0bb564dee2d8b1349"
+  },
+  {
+    "path": "src/gameplay/dialogue/CompanionRouteFixture.h",
+    "bytes": 4970,
+    "sha256": "6af9ff4dd8ccf48853ede869a01ce814d02f25d8eb4ba5b7d12a0831d5b2bb8c"
+  },
+  {
+    "path": "src/gameplay/simulation/GameSimulation.cpp",
+    "bytes": 128803,
+    "sha256": "5e903f1a04217924bd6b17947acfd461e73baf3a04f328900777031977414825"
+  },
+  {
+    "path": "src/gameplay/simulation/GameSimulation.h",
+    "bytes": 20155,
+    "sha256": "3a282de91ef4f110af9eaf5070905bcaa1a68a368b7fac64a9e1a4c41c048ef9"
+  },
+  {
+    "path": "src/gameplay/simulation/GameSimulationCampaign.cpp",
+    "bytes": 12119,
+    "sha256": "f150173658eb32e03f8b2272e86cd39ef1dece9e414a28b59392cdb58fdd91e7"
+  },
+  {
+    "path": "src/gameplay/simulation/GameSimulationRescue.cpp",
+    "bytes": 11054,
+    "sha256": "5b031cca4b76e26a3ca324683e80f9d66dba8a1cd8298fc0b204783a5da5cf19"
+  },
+  {
+    "path": "src/gameplay/traversal/RescueTraversal.cpp",
+    "bytes": 53915,
+    "sha256": "afa393a4a9782ffaedc9c29fa568f83d23cf605890bc180689ecdee2aa2b4fe8"
+  },
+  {
+    "path": "src/gameplay/traversal/RescueTraversal.h",
+    "bytes": 7259,
+    "sha256": "ee704633eeb04f3d4bc62eb9e1234844f0c9e38da573e34604a04731efb6e977"
+  },
+  {
+    "path": "tests/CampaignCheckpointTests.cpp",
+    "bytes": 27131,
+    "sha256": "2230b07c720d4baea208d9dadd91b260c1699411d2edf93240a096c1d65ad790"
+  },
+  {
+    "path": "tests/ChapterDialogueTests.cpp",
+    "bytes": 24438,
+    "sha256": "89bb3106528b2c601d3ea2c70ec1b7b6d64d4e08b666bb057b1d03c06d0c1e84"
+  },
+  {
+    "path": "tools/run-host-sanitizer-validation.sh",
+    "bytes": 1821,
+    "sha256": "fe4aab2015d40f9ad6cb8997beccbb86a161c07cd4e95fae305a3c18c75055d7"
+  }
+]

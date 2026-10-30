@@ -1,0 +1,9 @@
+{
+  "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "058e4bb52b269789d2fe541b0eabecfdf2e169f8702bb17b840bf972b6ca49d5",
+  "src/vulkan/raytracing/PresentableTinyRtScene.h": "ed51c1ecb12b8f1ea57f07ff8deb7a41b41f019920f1fa9c16fef102cff96285",
+  "src/platform/windows/DiagnosticWindow.cpp": "11221caf7c84207c58b3f27222da5307f5ff0e87f0a4a4b0560310ad668cc36c",
+  "src/scene/BellwetherShell.cpp": "376e7235041f964a06d580f7198e8cb3929f793f79b787df50ccfad9a5213150",
+  "src/vulkan/raytracing/RtSceneAbi.generated.h": "a3c0f135b6d4f414e55dda8f0a56f5ea868c5186fbc5503c32a39971b04378b9",
+  "shaders/raytracing/include/rt_scene_abi.generated.glsl": "781a39ae9fc0a43b9a6c37e7fc15efe532865bc04c0b069d984c1bdf42f67fd3",
+  "reports/chimney-smoke-20261024/native-probe.inl": "f5a548efb0192844aed14804ebdaf9ab167c3ed7356abc7045cde49820417e4d"
+}

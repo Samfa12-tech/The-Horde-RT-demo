@@ -1,0 +1,5 @@
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+HORDE_SHOWCASE_CAPTURE enter checkpoint=chapter-kit-reunion
+HORDE_SHOWCASE_CAPTURE options-ready
+HORDE_SHOWCASE_CAPTURE directory-result=0
+Chapter Shipping measurement failed: Release route requires an uncovered visible client (visible Z-order overlap); no focus was acquired.

@@ -32,3 +32,45 @@ The owner-requested Irhouen `Metal Creaks 189729` replaces the initial Hammy01
 chain. Its authored one-second event is cropped from 4.1–5.1 s and edge-faded;
 room bytes and the saved 7%/21% mix remain unchanged. Replacement listening
 is pending on its own exact build.
+
+## Kit chapter speech (1.7 development)
+
+`kit/runtime/` contains the thirteen approved English cuts with owner-confirmed
+public game/repository distribution rights. They preserve the approved mono
+PCM16 24 kHz samples and measured timing; source masters and private provider
+account records remain outside the repository. Public provenance names Mureka
+and pins the approved cut hashes. The closed manifest, reproducible
+read-only-source admission recipe and ASSET_LICENSES entry identify the exact
+cuts. Windows uses its generation-owned XAudio2 speech voice; Android reuses
+its finite SoundPool speech mapping. Both use persisted independent Voice gain
+and the shared subtitle/skip/fallback owner. `forest.wait` is admitted and mapped
+but remains catalog-only until a separate gameplay trigger is accepted.
+
+## Local tomb and rope incidental cues (1.7 development)
+
+`chapter-local-ambience/` contains two finite mono48k PCM16 FilmCow derivatives:
+one second of dripping-water activity and the complete 0.991667-second labelled
+rope-tightening sound. The manifest and reproducible read-only-source recipe pin
+licence, source and runtime identity. Originals stay private. No continuous bed,
+metal substitute, stone-creak or listening acceptance is implied.
+
+Shared simulation schedules sparse drips only near the existing waterfall runoff
+in the cleared room, and rope contact only after actual grip travel during loaded
+ascent/descent. Speech, pause, death, reconstruction and area exit suppress or
+rebase cadence. Both platforms reuse the existing single finite nature/incidental
+voice, SFX setting and lifecycle cleanup. No separate mixer or save field is added.
+
+## Finite local forest foliage (1.7 development)
+
+`forest-foliage/` adds one 0.901729-second labelled FilmCow leaf-rustle cut with
+source/licence/runtime hashes and a read-only reproduction recipe. It occupies a
+spare slot in the same finite nature/incidental voice: first after 44 quiet seconds,
+then every 40, within 12 metres of the accepted route pine's lower crown. The outer
+four metres fade source gain; missed slots drop, and pause/load/area transitions
+do not cause an immediate restart. Existing planar pan/obstruction and saved SFX
+gain apply once. Audio-focus loss now also stops the Android shared voice.
+
+The original stays private. No continuous wind recording, audible character,
+in-game mix or real output cleanup has been verified by listening. This does not
+implement renderer foliage wind or change dialogue ducking, volume settings or
+campaign saves.

@@ -1,0 +1,60 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 84
+    Start 84: horde_rt_raygen_variant_artifact_tests
+
+84: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RaygenVariantArtifactTests.ps1"
+84: Working Directory: <repo>/build/presets/windows-x64-debug
+84: Test timeout computed to be: 1200
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-47c048c801304930ae4fe4d70b62a0e9\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+84: Raygen variant diagnostic_high_generic_dielectric: 295960 bytes; functions=83; calls=264; ray-query sites=2; dependency SHA-256=48417a6160c6b049f93f9a69f4630ec04790d22c6ad472a9ad77823a684272b8
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-47c048c801304930ae4fe4d70b62a0e9\diagnostic_high_opaque_fast\minimal.rgen.resolved
+84: Raygen variant diagnostic_high_opaque_fast: 595520 bytes; functions=1; calls=0; ray-query sites=29; dependency SHA-256=f48687e370d8f4c34b0cbcfd0ff0fdc7484d9a3c605e3bce7ea4d6f43e04258e
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-47c048c801304930ae4fe4d70b62a0e9\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+84: Raygen variant diagnostic_mobile_generic_dielectric: 294460 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=d9eddf452a49888ecb3e6b4f72c89d737b6a61691b0e151f0320b18b5407c390
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-47c048c801304930ae4fe4d70b62a0e9\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+84: Raygen variant diagnostic_mobile_opaque_fast: 592420 bytes; functions=1; calls=0; ray-query sites=27; dependency SHA-256=e8f9143905742dceda9feda2493161e69d56d4a3ecf30ed4296f9b16fef0f9ca
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-47c048c801304930ae4fe4d70b62a0e9\shipping_high_generic_dielectric\minimal.rgen.resolved
+84: Raygen variant shipping_high_generic_dielectric: 287132 bytes; functions=83; calls=264; ray-query sites=2; dependency SHA-256=8c608eaf2e12a13ff100ed2d0acd82eb201afea395a651f3c2c1e876678cf6a0
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-47c048c801304930ae4fe4d70b62a0e9\shipping_high_opaque_fast\minimal.rgen.resolved
+84: Raygen variant shipping_high_opaque_fast: 591284 bytes; functions=1; calls=0; ray-query sites=29; dependency SHA-256=12168a8c2897ccc8795a53a2ca848a8ea7ebd4169695846e2700b56908baade6
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-47c048c801304930ae4fe4d70b62a0e9\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+84: Raygen variant shipping_mobile_generic_dielectric: 285632 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=f95f347812f32154079cb48b1a412a9c346df59c26d02d8ffaaeda5f6222db4f
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-47c048c801304930ae4fe4d70b62a0e9\shipping_mobile_opaque_fast\minimal.rgen.resolved
+84: Raygen variant shipping_mobile_opaque_fast: 588184 bytes; functions=1; calls=0; ray-query sites=27; dependency SHA-256=9f47b79fc53f8ccec50d32857d96cd2b663dee14332619322b4bfebd14f1eb30
+84: Frozen raygen variant catalog matches a fresh eight-key compilation.
+84: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-1048fe17e5e944b68823069e96c1098c\compatibility-generic\minimal.rgen.resolved
+84: Raygen check artifacts: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-1048fe17e5e944b68823069e96c1098c\compatibility-generic
+84: Source dependency SHA-256: fd1ecfed52a9f94c146c3f490ad8441c17fb6c4c399e5257d7a5d20c783e91b7; embedded include SHA-256: 48c920b5ed71dca2ca3b000bc25ccf0c77693af0982c553d79e91c892d004713
+84: SPIR-V bytes: 294904; words: 73726; instructions: 17577; branch operations: 974; loops: 20; selection merges: 413; SHA-256: fd9db8f8134acf2c9f8096bc2542a7df5703cba4726f6d61a99a8990dc7fad4b
+84: Raygen optimizer shape: functions=83; calls=261; ray-query sites=2
+84: Embedded raygen SPIR-V words match the compiled shader.
+84: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-1048fe17e5e944b68823069e96c1098c\compatibility-generic\legacy\minimal.legacy.rgen.resolved
+84: Raygen check artifacts: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-1048fe17e5e944b68823069e96c1098c\compatibility-generic\legacy
+84: Source dependency SHA-256: ad4ff3b66c000719071db63a202a1a3582f27183a98ebb3379be3cebf9cb3e19; embedded include SHA-256: 5394aa6748bc8b99d833d7fadbd81b9560ce29b5c69abaf0d6b6b1186142061f
+84: SPIR-V bytes: 592420; words: 148105; instructions: 32874; branch operations: 4579; loops: 80; selection merges: 1850; SHA-256: f56d90debd2f6e82c52b01638ea92a23ff41149cf8a9bae4997774b6146d0683
+84: Raygen optimizer shape: functions=1; calls=0; ray-query sites=27
+84: Embedded raygen SPIR-V words match the compiled shader.
+84: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-1048fe17e5e944b68823069e96c1098c\compatibility-legacy\minimal.legacy.rgen.resolved
+84: Raygen check artifacts: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-1048fe17e5e944b68823069e96c1098c\compatibility-legacy
+84: Source dependency SHA-256: ad4ff3b66c000719071db63a202a1a3582f27183a98ebb3379be3cebf9cb3e19; embedded include SHA-256: 5394aa6748bc8b99d833d7fadbd81b9560ce29b5c69abaf0d6b6b1186142061f
+84: SPIR-V bytes: 592420; words: 148105; instructions: 32874; branch operations: 4579; loops: 80; selection merges: 1850; SHA-256: f56d90debd2f6e82c52b01638ea92a23ff41149cf8a9bae4997774b6146d0683
+84: Raygen optimizer shape: functions=1; calls=0; ray-query sites=27
+84: Embedded raygen SPIR-V words match the compiled shader.
+84: Raygen variant artifact specialization and compatibility contracts passed.
+1/1 Test #84: horde_rt_raygen_variant_artifact_tests ...   Passed   92.52 sec
+
+The following tests passed:
+	horde_rt_raygen_variant_artifact_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  92.53 sec

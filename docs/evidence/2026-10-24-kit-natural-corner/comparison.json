@@ -1,0 +1,284 @@
+{
+  "control": {
+    "count": 15,
+    "failures": 0,
+    "complete": true,
+    "frames": 1419,
+    "final": {
+      "frame": 1419,
+      "tick": 5714,
+      "x": 13.3,
+      "z": 36.2,
+      "kit_x": 14.3,
+      "kit_z": 36.2,
+      "kit_waypoint": 8,
+      "kit_wait": 4,
+      "kit_motion_mode": 0,
+      "kit_turn_phase": 0.0,
+      "player_yaw": 2.51,
+      "kit_yaw": -1.5708,
+      "boundary": 3
+    },
+    "maxSeparationBeforeKitEndpoint": 2.8137974127502483,
+    "tetherWaitRowsBeforeKitEndpoint": 0,
+    "firstTetherWait": null,
+    "corners": [
+      {
+        "waypoint": 5,
+        "firstRecorded": {
+          "frame": 368,
+          "tick": 1466,
+          "x": -16.6989,
+          "z": -0.261971,
+          "kit_x": -14.746,
+          "kit_z": 0.273403,
+          "kit_waypoint": 5,
+          "kit_wait": 0,
+          "kit_motion_mode": 0,
+          "kit_turn_phase": 0.0,
+          "player_yaw": 1.82643,
+          "kit_yaw": -4.15998,
+          "boundary": 2
+        },
+        "firstNewSegmentTravel": {
+          "frame": 368,
+          "tick": 1466,
+          "x": -16.6989,
+          "z": -0.261971,
+          "kit_x": -14.746,
+          "kit_z": 0.273403,
+          "kit_waypoint": 5,
+          "kit_wait": 0,
+          "kit_motion_mode": 0,
+          "kit_turn_phase": 0.0,
+          "player_yaw": 1.82643,
+          "kit_yaw": -4.15998,
+          "boundary": 2
+        },
+        "sampledStationarySeconds": 0.0,
+        "firstTravelHeadingErrorDegrees": 65.80732163878886
+      },
+      {
+        "waypoint": 6,
+        "firstRecorded": {
+          "frame": 494,
+          "tick": 1970,
+          "x": -17.6623,
+          "z": 14.9142,
+          "kit_x": -16.6083,
+          "kit_z": 15.177,
+          "kit_waypoint": 6,
+          "kit_wait": 0,
+          "kit_motion_mode": 0,
+          "kit_turn_phase": 0.0,
+          "player_yaw": 1.84193,
+          "kit_yaw": -3.13144,
+          "boundary": 2
+        },
+        "firstNewSegmentTravel": {
+          "frame": 494,
+          "tick": 1970,
+          "x": -17.6623,
+          "z": 14.9142,
+          "kit_x": -16.6083,
+          "kit_z": 15.177,
+          "kit_waypoint": 6,
+          "kit_wait": 0,
+          "kit_motion_mode": 0,
+          "kit_turn_phase": 0.0,
+          "player_yaw": 1.84193,
+          "kit_yaw": -3.13144,
+          "boundary": 2
+        },
+        "sampledStationarySeconds": 0.0,
+        "firstTravelHeadingErrorDegrees": 70.72445511554676
+      },
+      {
+        "waypoint": 7,
+        "firstRecorded": {
+          "frame": 617,
+          "tick": 2462,
+          "x": -3.44285,
+          "z": 20.4533,
+          "kit_x": -2.75413,
+          "kit_z": 20.1805,
+          "kit_waypoint": 7,
+          "kit_wait": 0,
+          "kit_motion_mode": 0,
+          "kit_turn_phase": 0.0,
+          "player_yaw": 1.2316,
+          "kit_yaw": -4.36582,
+          "boundary": 2
+        },
+        "firstNewSegmentTravel": {
+          "frame": 617,
+          "tick": 2462,
+          "x": -3.44285,
+          "z": 20.4533,
+          "kit_x": -2.75413,
+          "kit_z": 20.1805,
+          "kit_waypoint": 7,
+          "kit_wait": 0,
+          "kit_motion_mode": 0,
+          "kit_turn_phase": 0.0,
+          "player_yaw": 1.2316,
+          "kit_yaw": -4.36582,
+          "boundary": 2
+        },
+        "sampledStationarySeconds": 0.0,
+        "firstTravelHeadingErrorDegrees": 23.351281995208204
+      }
+    ],
+    "failedChecks": [],
+    "custodyUnchanged": true,
+    "foregroundUnchanged": true,
+    "seconds": 153.15599999999904,
+    "executable": {
+      "bytes": 14389248,
+      "sha256": "95bbceb01dca05ba95a18d073feab27092e79dcb0a6f0691bd6f3be290b4966c"
+    }
+  },
+  "candidate": {
+    "count": 12,
+    "failures": 1,
+    "complete": false,
+    "frames": 1581,
+    "final": {
+      "frame": 1581,
+      "tick": 6318,
+      "x": 13.2919,
+      "z": 36.1924,
+      "kit_x": -2.74891,
+      "kit_z": 20.1823,
+      "kit_waypoint": 7,
+      "kit_wait": 1,
+      "kit_motion_mode": 0,
+      "kit_turn_phase": 1.0,
+      "player_yaw": -0.786338,
+      "kit_yaw": -3.95817,
+      "boundary": 2
+    },
+    "maxSeparationBeforeKitEndpoint": 22.66342620757285,
+    "tetherWaitRowsBeforeKitEndpoint": 882,
+    "firstTetherWait": {
+      "frame": 700,
+      "tick": 2794,
+      "x": 1.17062,
+      "z": 24.7921,
+      "kit_x": -2.74891,
+      "kit_z": 20.1823,
+      "kit_waypoint": 7,
+      "kit_wait": 1,
+      "kit_motion_mode": 1,
+      "kit_turn_phase": 0.4,
+      "player_yaw": -0.704062,
+      "kit_yaw": -4.22746,
+      "boundary": 2
+    },
+    "corners": [
+      {
+        "waypoint": 5,
+        "firstRecorded": {
+          "frame": 403,
+          "tick": 1606,
+          "x": -16.469,
+          "z": -0.155631,
+          "kit_x": -14.7494,
+          "kit_z": 0.177181,
+          "kit_waypoint": 5,
+          "kit_wait": 0,
+          "kit_motion_mode": 1,
+          "kit_turn_phase": 0.0,
+          "player_yaw": 1.76624,
+          "kit_yaw": -4.27998,
+          "boundary": 2
+        },
+        "firstNewSegmentTravel": {
+          "frame": 421,
+          "tick": 1678,
+          "x": -15.9079,
+          "z": 1.60276,
+          "kit_x": -14.7498,
+          "kit_z": 0.17966,
+          "kit_waypoint": 5,
+          "kit_wait": 0,
+          "kit_motion_mode": 2,
+          "kit_turn_phase": 1.0,
+          "player_yaw": 0.691551,
+          "kit_yaw": -3.01248,
+          "boundary": 2
+        },
+        "sampledStationarySeconds": 1.2,
+        "firstTravelHeadingErrorDegrees": 0.0001332405525683286
+      },
+      {
+        "waypoint": 6,
+        "firstRecorded": {
+          "frame": 549,
+          "tick": 2190,
+          "x": -15.3727,
+          "z": 16.0183,
+          "kit_x": -16.6933,
+          "kit_z": 15.1481,
+          "kit_waypoint": 6,
+          "kit_wait": 0,
+          "kit_motion_mode": 0,
+          "kit_turn_phase": 1.0,
+          "player_yaw": -0.983263,
+          "kit_yaw": -3.01245,
+          "boundary": 2
+        },
+        "firstNewSegmentTravel": {
+          "frame": 568,
+          "tick": 2266,
+          "x": -13.107,
+          "z": 16.83,
+          "kit_x": -16.6862,
+          "kit_z": 15.1506,
+          "kit_waypoint": 6,
+          "kit_wait": 0,
+          "kit_motion_mode": 2,
+          "kit_turn_phase": 1.0,
+          "player_yaw": -1.13144,
+          "kit_yaw": -4.36592,
+          "boundary": 2
+        },
+        "sampledStationarySeconds": 1.2666666666666666,
+        "firstTravelHeadingErrorDegrees": 0.00024420639697960984
+      },
+      {
+        "waypoint": 7,
+        "firstRecorded": {
+          "frame": 694,
+          "tick": 2770,
+          "x": 0.617009,
+          "z": 24.2715,
+          "kit_x": -2.74891,
+          "kit_z": 20.1823,
+          "kit_waypoint": 7,
+          "kit_wait": 0,
+          "kit_motion_mode": 0,
+          "kit_turn_phase": 1.0,
+          "player_yaw": -0.687928,
+          "kit_yaw": -4.36589,
+          "boundary": 2
+        },
+        "firstNewSegmentTravel": null,
+        "sampledStationarySeconds": null
+      }
+    ],
+    "failedChecks": [
+      {
+        "name": "bounded route stopped before completing all stages",
+        "pass": false
+      }
+    ],
+    "custodyUnchanged": true,
+    "foregroundUnchanged": true,
+    "seconds": 146.23500000000058,
+    "executable": {
+      "bytes": 14389248,
+      "sha256": "95bbceb01dca05ba95a18d073feab27092e79dcb0a6f0691bd6f3be290b4966c"
+    }
+  }
+}

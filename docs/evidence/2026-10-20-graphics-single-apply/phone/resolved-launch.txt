@@ -1,0 +1,7 @@
+Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10008000 cmp=com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity
+TotalTime: 538
+WaitTime: 540
+Complete

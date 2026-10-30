@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "baseCommit": "bc550ebe2eae05bd1bfb2672d0d46c5cd665b34f",
+  "class": "CPU source/snapshot contract only",
+  "tests": {
+    "selected": 4,
+    "passed": 4,
+    "failed": 0,
+    "seconds": 26.36
+  },
+  "normalRingEnabled": false,
+  "normalYellowEnabled": false,
+  "normalFlaskEnabled": false,
+  "renderAdapterConnected": false,
+  "saveSchemaChanged": false,
+  "deadlineChanged": false,
+  "remaining": [
+    "opt-in adapter/phase transform and independently mutable material mapping",
+    "non-colour/reduced-motion shape and actual RT readability",
+    "flask native utility caller and pose integration"
+  ]
+}

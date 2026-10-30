@@ -1,0 +1,259 @@
+{
+  "date": "2026-10-20",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "sourceBase": "93cb806e722408ea66a46fd3d6f26b77e4ca9504",
+  "evidenceClass": "Shared-simulation/actual-rig host regressions and seeded hidden Windows hardware-RT pose inspection; no physical phone or live native fresh-raise acceptance",
+  "sources": {
+    "CMakeLists.txt": {
+      "sha256": "8964cac15d7d6d2af5cb3349644317516551acb2893644fcf422442f62307e2d",
+      "gitBlob": "0fd8321928be17fd5909b02df800900e9cbcd82e"
+    },
+    "src/gameplay/dialogue/CompanionActing.h": {
+      "sha256": "3bee68f2286cf0754fa28724bfae22a4e764cf1f19c0036046e5c8e66f8ddf8a",
+      "gitBlob": "607706749b4d60b45255de67a2dbf52a584ddbc8"
+    },
+    "src/gameplay/dialogue/CompanionRouteFixture.h": {
+      "sha256": "7b1e317ff2954f091e22fc644dce3fdd98a658fe14ceff2bfe00e6b01429ce48",
+      "gitBlob": "3148501a430974b379e48feb39c7fd6a3784482a"
+    },
+    "src/gameplay/simulation/GameSimulationDialogue.cpp": {
+      "sha256": "265b3c371775f8a5f0d056cef100d96feaef23a543a685c3ed0e0191e47ac40a",
+      "gitBlob": "4e5261aabc8c1468dcee2f674ba1c764b01fa60a"
+    },
+    "src/scene/CompanionPose.h": {
+      "sha256": "fe069520487f275c1b3f1f7b3886ac2f5be9eeb338583c37f0b2c04d5e0cf29d",
+      "gitBlob": "bcef626866f9f582095cc9f1264dbc09e9295d10"
+    },
+    "src/scene/assets/SkinnedMeshAsset.h": {
+      "sha256": "3df0556e18c5c05aeca1ffd4cb54e300228b475d2b89dec153521535d9938ed2",
+      "gitBlob": "90a268abea3af0a3c14752d7f2b7bb80e086466a"
+    },
+    "src/scene/assets/SkinnedMeshAsset.cpp": {
+      "sha256": "c8362cfb4b6948b4b97a1cf2778fee78dd2f5813d43c023510fcd65438cd98c1",
+      "gitBlob": "3610daa962fe1a1110f420634f2f12e2873aa051"
+    },
+    "src/scene/assets/SkinnedPbrActor.h": {
+      "sha256": "f68c2e8e33fa9981b97666f91ad6c725961d7cdf0e5fc9ebd1f3f3bdb46aef3c",
+      "gitBlob": "9b88e24a0bdcacb750bdeb85ac1efb66bced0237"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+      "sha256": "8fc17bcc6562840c6315cc91b224622f39cd0570cc686ece361720a56f29f493",
+      "gitBlob": "8a9d32bb9139aacb8cfb21e4e56bb2e7edea7ecd"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+      "sha256": "efeb211d3e1ddbca37fab1ae804282b4c6c61d18ee7cb95f68e4b66fb5eb5692",
+      "gitBlob": "04e07b0ecc3d7ada368f3498242627a076748992"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "sha256": "ca6497f9e69d2f7a19558c7a477715f1e39d662876744e2c2879467eed34230f",
+      "gitBlob": "762427a99635710e86bbaf2814bc15700baf4014"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "sha256": "1bea8eaad0b21d62b88c6350a298a243f6cb047ae9d9f6840039073bff6fa2ff",
+      "gitBlob": "a875a210c58d7035121453d210af2f61d656c3f4"
+    },
+    "tests/CompanionActingTests.cpp": {
+      "sha256": "8eafe526b83d12e67cc333d9feb5ede3d2929ed01b450bfd522a919a84167023",
+      "gitBlob": "75d8509de2f46bc1bd961bf16e77c2efa391035a"
+    },
+    "tests/KitSourceIntakeTests.cpp": {
+      "sha256": "c57393aad086549ca9554ae889a966d992218f1ca7516479b2814afae65e7d9c",
+      "gitBlob": "18c03c521a4db1659bc6b209f2bd9440714e9241"
+    },
+    "tests/RescueJourneyIntegrationTests.cpp": {
+      "sha256": "fc7a9b9c20ac34cb1c5392e131f50fc43380432ba52e70923745b0334cd55a07",
+      "gitBlob": "554696a715eca1e0c99697b11ac49ab72a188828"
+    }
+  },
+  "scope": [
+    "Small transient head/chest speech acting over current idle/walk",
+    "One 1.2 second recognition beat from live false-to-true presented-proof transaction",
+    "Correct imported positive-Z facing to logical sin(yaw),0,-cos(yaw)",
+    "Generic optional additive-node span for indexed PBR skinning; existing empty span exact",
+    "No new clip/mesh/texture acquisition, gameplay mechanics, dialogue timing, audio source or save fields"
+  ],
+  "nativeRegressions": {
+    "configuration": "windows-x64-release",
+    "suites": 12,
+    "failures": 0,
+    "actingChecks": 150,
+    "codecChecks": 2283,
+    "checkpointChecks": 1026,
+    "playSessionChecks": 145,
+    "sessionChecks": 77,
+    "actualTerrainJourneyCases": 47773,
+    "actualTerrainMovingProbeFrames": 5788,
+    "nativeRig": {
+      "speakingPeakMaximumDisplacementMetres": 0.011135,
+      "recognitionPeakMaximumDisplacementMetres": 0.0405345,
+      "plantedLowVertices": 2071,
+      "legacyClips": 7,
+      "legacyClipSamples": 35
+    }
+  },
+  "artifacts": {
+    "windowsDebug": {
+      "path": "build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+      "bytes": 13838336,
+      "sha256": "7bdd1b72ecd4a44dd9c0560f84d0f5043c4a34762d27f45b6d10947aefe4a0a4"
+    },
+    "windowsRelease": {
+      "path": "build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe",
+      "bytes": 4603904,
+      "sha256": "1f91d304967124610898a7711a0419b56bc48d8c4ba4b68bf53d5d80a4995297"
+    },
+    "androidDebug": {
+      "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+      "bytes": 186150965,
+      "sha256": "4af1c097ae224adb42478e34f570e28416586443d168e5753ca64bc7758e1fa3",
+      "nativeAbis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86",
+        "x86_64"
+      ],
+      "installedOrLaunched": false
+    }
+  },
+  "runtime": {
+    "checks": 30,
+    "failures": 0,
+    "complete": true,
+    "renderCalls": 10,
+    "seconds": 21.75,
+    "foregroundSampleCount": 107,
+    "foregroundStoredSampleCount": 83,
+    "foregroundContinuous": true,
+    "foregroundAtLaunchAndExit": null,
+    "ownerObservedForeground": false,
+    "ownerShown": false,
+    "recordManifestLockAndOwnerIniUnchanged": true,
+    "campaignWriteAttempts": 0,
+    "quality": "Normal Windows 100%, 1232x803, Diagnostic/High Pipeline, High water/current shadows/Mist On; no fog override",
+    "seededPoseInspection": {
+      "requested": true,
+      "evidenceClass": "seeded render-only pose; not live fresh-raise acceptance",
+      "cameraOffset": [
+        -3,
+        0,
+        0
+      ],
+      "poses": [
+        {
+          "pose": "neutral",
+          "angles": [
+            0,
+            0,
+            0
+          ],
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 3,
+            "recordSerial": 3,
+            "submissionSerial": 3,
+            "completionSerial": 3,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 3,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "pose": "speaking",
+          "angles": [
+            0.0232078,
+            0.022411,
+            0.0119685
+          ],
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 4,
+            "recordSerial": 4,
+            "submissionSerial": 4,
+            "completionSerial": 4,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 4,
+            "finalIdleCompletion": true
+          }
+        },
+        {
+          "pose": "recognition",
+          "angles": [
+            0.14,
+            0,
+            0.035
+          ],
+          "identity": {
+            "sceneEpoch": 3,
+            "measurementGeneration": 1,
+            "recordAttemptSerial": 5,
+            "recordSerial": 5,
+            "submissionSerial": 5,
+            "completionSerial": 5,
+            "simulationTick": 2,
+            "frameSlot": 0
+          },
+          "presentation": {
+            "outcome": "presented",
+            "presented": true,
+            "lastSuccessfulPresentSubmissionSerial": 5,
+            "finalIdleCompletion": true
+          }
+        }
+      ]
+    },
+    "liveNativeFreshRaiseAcceptance": false
+  },
+  "gpu": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672,
+    "driverVersion": 2559295488,
+    "driverProperties": {
+      "available": true,
+      "driverId": 4,
+      "driverName": "NVIDIA",
+      "driverInfo": "610.47",
+      "conformanceVersion": "1.4.3.3"
+    },
+    "vulkanApiVersionText": "1.4.341",
+    "executionBackend": "RayTracingPipeline"
+  },
+  "asset": {
+    "runtimeKitGlb": {
+      "path": "assets\\models\\characters\\runtime\\kit-warden-v1\\kit-warden-lod0.runtime.glb",
+      "bytes": 2151672,
+      "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+    },
+    "assetFilesChanged": false,
+    "newAcquisitionOrSpend": false
+  },
+  "visualInspection": {
+    "ordinarySavedVillageView": "Kit remains cropped at left as predicted by camera composition; production camera and root positions preserved.",
+    "frontDiagnostic": "All three original images inspected: whole Kit and both boots in frame, actual model front faces camera, restrained upper-body change; dark/noisy presentation remains.",
+    "scope": "Seeded single-pose RT readbacks at matched camera/idle/lighting; not live sequence, turn/stride/comfort, final art or phone acceptance."
+  },
+  "independentReview": "Bounded read-only review found no actionable proof/restore/pause/cache/additive/diagnostic-scope issue. Builds and runs owned by root.",
+  "phoneOperations": false,
+  "publicPushReleaseMerge": false,
+  "ReefOperations": false,
+  "audioHapticManualRevalidationRequired": false,
+  "remaining": [
+    "Actual fresh raise into readable native animated recognition and synchronized VO feel",
+    "Idle/walk start-stop joins, measured stride and turning foot pivots",
+    "Physical touch/controller/lifecycle/full-route/naturally earned saves and warm performance",
+    "Final lighting, character/art composition and full phone placement acceptance"
+  ]
+}

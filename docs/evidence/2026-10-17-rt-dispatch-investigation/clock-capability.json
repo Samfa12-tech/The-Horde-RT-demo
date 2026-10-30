@@ -1,0 +1,13 @@
+{
+  "scope": "Read-only system GPU service capability query; features then explicitly checked/enabled in the private APK, with valid physical clock records on both RT backends",
+  "shaderClockFeatures": {
+    "shaderClockFeaturesKHR": {
+      "shaderDeviceClock": 1.0,
+      "shaderSubgroupClock": 1.0
+    }
+  },
+  "extensions": [
+    "VK_KHR_shader_clock",
+    "VK_KHR_pipeline_executable_properties"
+  ]
+}

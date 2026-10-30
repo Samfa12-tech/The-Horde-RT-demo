@@ -1,0 +1,5 @@
+*.log -text -diff
+*.xml -text -diff
+*.json text eol=lf
+*.md text eol=lf
+.gitattributes text eol=lf

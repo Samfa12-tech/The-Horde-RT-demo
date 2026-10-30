@@ -1,0 +1,21 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 91: horde_rt_forest_dressing_tests
+1/1 Test #91: horde_rt_forest_dressing_tests ...***Failed    2.05 sec
+Native root footprint samples=4992 exposed=0 maximum_gap_m=-0.0199988
+FAIL: native material consolidation must retain explicit per-triangle region provenance
+FAIL: mixed candle/urn material families must distinguish tomb and actual graveyard geometry
+Native selected geometry common+tomb: primitives=5 vertexBytes=4041536 indexBytes=478896 removedVertexBytes=27915904 removedIndexBytes=4642920; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry common+forest: primitives=8 vertexBytes=31048000 indexBytes=4916112 removedVertexBytes=909440 removedIndexBytes=205704; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+forest: primitives=8 vertexBytes=31048000 indexBytes=4916112 removedVertexBytes=909440 removedIndexBytes=205704; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+tomb: primitives=5 vertexBytes=4041536 indexBytes=478896 removedVertexBytes=27915904 removedIndexBytes=4642920; CPU preparation only; common masonry still includes tomb surfaces
+Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, forest 6; primitiveRows=11 vertexBytes=31957440 indexBytes=5121816; CPU admission only
+2 forest dressing check(s) failed.
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   2.07 sec
+
+The following tests FAILED:
+	 91 - horde_rt_forest_dressing_tests (Failed)
+Errors while running CTest

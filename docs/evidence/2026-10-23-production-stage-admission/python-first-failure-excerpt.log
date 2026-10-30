@@ -1,0 +1,6 @@
+FAIL: test_scale_tuple_and_actual_upload_admission (test_android_motion_present_timing.AndroidMotionPresentTimingTests.test_scale_tuple_and_actual_upload_admission)
+analyze_android_present_timing.AnalysisError: motion scale must be an explicit (33, 40, 50) comparison
+AssertionError: "33, 40 or 50" does not match "motion scale must be an explicit (33, 40, 50) comparison"
+Ran 18 tests in 0.025s
+FAILED (failures=1)
+

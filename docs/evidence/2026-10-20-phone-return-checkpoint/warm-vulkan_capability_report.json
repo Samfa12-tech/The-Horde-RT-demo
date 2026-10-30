@@ -1,0 +1,60 @@
+{
+  "backend": "Vulkan",
+  "rtMode": "RayTracingPipeline",
+  "executionBackend": "RayTracingPipeline",
+  "gpuName": "Adreno (TM) 840",
+  "vendorId": 20803,
+  "deviceId": 1141180977,
+  "driverVersion": 2150932499,
+  "driverVersionText": "raw 2150932499 (vendor-specific)",
+  "driverProperties": {
+    "available": true,
+    "driverId": 8,
+    "driverName": "Qualcomm Technologies Inc. Adreno Vulkan Driver",
+    "driverInfo": "Driver Build: 089d643e2a, Icecd8f0534, 1782882597\nDate: 07/01/26\nCompiler Version: E031.50.19.27\nDriver Branch: \n",
+    "conformanceVersion": "1.4.1.0"
+  },
+  "vulkanApiVersion": 4210983,
+  "vulkanApiVersionText": "1.4.295",
+  "extensions": {
+    "VK_KHR_acceleration_structure": true,
+    "VK_KHR_ray_tracing_pipeline": true,
+    "VK_KHR_ray_query": true,
+    "VK_KHR_buffer_device_address": true,
+    "VK_KHR_deferred_host_operations": true
+  },
+  "features": {
+    "accelerationStructure": true,
+    "rayTracingPipeline": true,
+    "rayQuery": true,
+    "bufferDeviceAddress": true
+  },
+  "internalRenderResolution": {
+    "width": 576,
+    "height": 1188
+  },
+  "fps": 17.501890,
+  "frameTimeMs": 57.136684,
+  "gpuRtTiming": {
+    "status": "GPU RT command-buffer timing is available.",
+    "supported": true,
+    "valid": true,
+    "latestMs": 55.144112,
+    "averageMs": 59.625923,
+    "timestampPeriodNanoseconds": 52.0833,
+    "timestampValidBits": 48,
+    "sampleCount": 2092,
+    "unavailableCount": 0,
+    "errorCount": 0
+  },
+  "rtScene": {
+    "status": "Presented via swapchain",
+    "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+    "dispatchWidth": 576,
+    "dispatchHeight": 1188,
+    "presented": true
+  },
+  "diagnostics": ["Inspecting candidate 0", "Driver version: raw 2150932499 (vendor-specific)", "Vulkan API version: 1.4.295", "Driver properties: available", "Optional VK_KHR_swapchain_maintenance1 advertised: yes", "Optional VK_EXT_swapchain_maintenance1 advertised: yes", "Optional swapchainMaintenance1 feature: yes; query only, not logical-device enablement.", "RT capability mode: RayTracingPipeline", "Presentation retirement: KHR maintenance1 fences enabled."],
+  "rtFrameEvidence": {"version":1,"observerAvailable":true,"sceneEpoch":4,"measurementGeneration":9,"running":true,"paused":false,"presented":true,"diagnosticStatus":"compiled-out","gpuStatus":"valid","completedFrameStatus":"available","completedFrameReason":null,"completedFrame":{"schema":1,"identity":{"sceneEpoch":4,"measurementGeneration":9,"recordAttemptSerial":7664,"recordSerial":7664,"submissionSerial":7664,"completionSerial":7664,"simulationTick":22078,"frameSlot":0},"pipeline":{"executionBackend":"RayTracingPipeline","instrumentation":"shipping","dielectricQuality":"mobile","bundleKey":"shipping_mobile_pair","opaqueFast":{"key":"shipping_mobile_opaque_fast","sha256":"1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9"},"genericDielectric":{"key":"shipping_mobile_generic_dielectric","sha256":"a1edeb782800c91a58b073c1f789c2e14d68cc56cd8ff1b0b535d628d1e9ee38"},"activeStrategy":"opaque-fast","activeKey":"shipping_mobile_opaque_fast","activeSha256":"1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9","waterQuality":"mobile"},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"shadowQuality":{"mode":"current","localPrimarySamples":1,"skyPrimarySamples":1,"reserved":0},"fireQuality":{"quality":"Mobile","volumeSteps":4,"reflectionSamples":1,"reflectedVolumeSteps":4},"actualUploadedDustQuality":1,"actualUploadedMistEnabled":false,"fireLighting":{"count":1,"emitters":[{"stableId":1279348308,"positionStrength":[13.7859144,0.160412759,36.638073,0.686399996],"colourIntensity":[1,0.426759988,0.0815246254,0.686399996]},{"stableId":0,"positionStrength":[0,0,0,0],"colourIntensity":[0,0,0,0]},{"stableId":0,"positionStrength":[0,0,0,0],"colourIntensity":[0,0,0,0]},{"stableId":0,"positionStrength":[0,0,0,0],"colourIntensity":[0,0,0,0]}]},"resources":{"bufferCount":50,"memoryAllocationCount":59,"bottomLevelAccelerationStructureCount":20,"topLevelAccelerationStructureCount":1,"tlasInstanceCount":28,"pipelineCount":2,"shaderBindingTableCount":2,"descriptorSetCount":1,"hostVisibleBytes":48277888,"deviceLocalBytes":161315776},"player":{"skinCadenceHz":60,"skinUpdateCount":972,"maximumSocketErrorMicrometres":10,"primaryPixelCountAvailable":false,"primaryPixelCount":null,"primaryVisible":false},"dielectric":{"status":"compiled-out","available":false,"compiled":false,"completedSubmissionSerial":0,"readCount":0,"resetCount":0,"counters":null,"detail":""},"gpu":{"status":"valid","available":true,"completedSubmissionSerial":7664,"wholeRtGpuMs":55.144113,"timestampValidBits":48,"timestampPeriodPicoseconds":52083,"sampleCount":2092,"unavailableResultCount":0,"errorCount":0,"detail":"GPU RT command-buffer timing is available."},"stages":{"status":"valid","simulationStepCpuMs":0.006927,"skinCpuMs":0.000000,"playerSkinCpuMs":0.000000,"characterSkinCpuMs":0.000000,"dynamicUploadCpuMs":0.009897,"blasRefitRecordCpuMs":0.014844,"tlasUpdateRecordCpuMs":0.007969,"traceCopyRecordCpuMs":0.143906,"frameFenceWaitCpuMs":55.065625,"imageAcquireCpuMs":0.065052,"queueSubmitCpuMs":0.186979,"presentCallCpuMs":0.240156,"wholeFrameCycleCpuMs":56.208542,"poseCopyCpuMs":0.000000,"workInvocationCounts":[1,0,0,0,9,1,1,1,1,1,1,1,1,0],"byteCounts":[0,0,0,0,75360,0,0,0,0,0,0,0,0,0],"operationCounts":[0,0,0,0,9,0,0,0,1,1,1,1,1,0]},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":7664,"finalIdleCompletion":false},"cpuBenchmarkEligible":true,"benchmarkEligible":true}
+}
+}

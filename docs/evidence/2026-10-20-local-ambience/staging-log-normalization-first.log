@@ -1,0 +1,12 @@
+First staged-source/raw-log verification exited1 before git commit:
+Traceback (most recent call last):
+  File "<stdin>", line 8, in <module>
+AssertionError
+
+All 19 source/runtime raw hashes and staged Git blobs had matched. The final
+assertion compared staged host-build.log with the original copied log bytes.
+Read-only diagnosis: staged25461B, working25681B; equal after CRLF normalization.
+Git retained its prior LF-normalized index entry despite the later -text rule.
+Scoped git add --renormalize on only this evidence folder's *.log entries
+reapplies the new attributes, preserving original CRLF. Source/build/test files
+and actual log output are unchanged. No commit ran after the failed assertion.

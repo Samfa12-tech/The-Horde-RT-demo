@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  33: horde_rt_chapter_regional_water_tests
+1/4 Test  #33: horde_rt_chapter_regional_water_tests ...   Passed    0.02 sec
+    Start 120: horde_rt_forest_root_placement_tests
+2/4 Test #120: horde_rt_forest_root_placement_tests ....   Passed    0.37 sec
+    Start 176: horde_rt_horde_162_asset_policy_tests
+3/4 Test #176: horde_rt_horde_162_asset_policy_tests ...   Passed  151.67 sec
+    Start 224: horde_rt_chapter_local_audio_tests
+4/4 Test #224: horde_rt_chapter_local_audio_tests ......   Passed    0.13 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) = 152.22 sec

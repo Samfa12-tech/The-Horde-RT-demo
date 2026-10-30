@@ -1,9 +1,38 @@
 #pragma once
+#ifndef HORDE_RT_FRAME_STAGE_PROBE
+#define HORDE_RT_FRAME_STAGE_PROBE 0
+#endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+#include "vulkan/raytracing/RtSceneGpuStageProbe.h"
+#endif
+#ifndef HORDE_RT_CHAPTER_MEASUREMENT
+#define HORDE_RT_CHAPTER_MEASUREMENT 0
+#endif
+#ifndef HORDE_RT_REGION_PAGE_PROTOTYPE
+#define HORDE_RT_REGION_PAGE_PROTOTYPE 0
+#endif
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+#include "vulkan/raytracing/RtRegionGeometryPreparation.h"
+#include "vulkan/raytracing/RtRegionPreparationRecovery.h"
+#include "vulkan/raytracing/RtRegionGeometrySource.h"
+#include "world/streaming/GeometryPageTable.h"
+#endif
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+#include "vulkan/raytracing/RtDispatchClockProbe.h"
+#endif
+#include "vulkan/raytracing/RtGpuWorkLease.h"
 #include "scene/atmosphere/IndoorDust.h"
+#include "scene/DevelopmentWorldGeometry.h"
+#include "scene/ChapterRegionalWater.h"
+#include "scene/ForestDressing.h"
+#include "gameplay/simulation/TriangleSupportSurface.h"
+#include "gameplay/traversal/RescueTraversal.h"
 
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <optional>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -16,12 +45,17 @@
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/healing/FlaskUpgradeSite.h"
 #include "gameplay/items/HeldLightState.h"
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "vulkan/raytracing/CharacterRenderSlot.h"
+#include "scene/assets/SkinnedPbrActor.h"
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+#include "scene/assets/SkinnedPbrActorWorker.h"
+#endif
 #include "vulkan/raytracing/FireEmitterBuffer.h"
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
@@ -31,11 +65,14 @@
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/RtSceneProfile.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
+#include "vulkan/raytracing/RtTextureLayerSubset.h"
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
 #include "vulkan/raytracing/experimental/StagedPrimaryPass.h"
 #endif
 
 namespace horde::graphics { class GraphicsPreviewSession; class EntryMenuSession; }
+namespace horde::gameplay::simulation { class GameSimulation; }
+namespace horde::scene { struct DetailBox; }
 
 namespace horde::vulkan::raytracing
 {
@@ -82,8 +119,34 @@ PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
     float swordSwingRadians,
     float heldPropDepth);
 
+#if defined(_DEBUG)
+// Hidden Windows validation only. Slots belong to a separate inspection actor;
+// they do not add gameplay animations or change the production clip set.
+struct ChapterActorInspectionPose {
+    enum class Clip : unsigned { Idle, Walk, TurnLeft, TurnRight };
+    Clip clip=Clip::Idle,blendClip=Clip::Walk;
+    float seconds=0,turnPhase=0,blendSeconds=0,weight=0;
+    bool hasBlend=false;
+    bool operator==(const ChapterActorInspectionPose&) const=default;
+};
+#endif
 struct RtSceneFrameInputs
 {
+    // CPU experiment selection only; ignored when its compile gate is OFF.
+    // Default preserves existing opt-in desktop worker fixtures. Android
+    // experiment callers explicitly supply serial/worker per immutable frame.
+    bool actorWorkerExperiment = true;
+#if defined(_DEBUG)
+    // Frozen Windows light attribution only. Physical roof/lid state, ordinary
+    // gameplay and Shipping rendering continue to use the authoritative value.
+    bool diagnosticSuppressFinaleApertureLighting = false;
+    std::optional<ChapterActorInspectionPose> diagnosticChapterActor;
+#endif
+    bool developmentRescueJourney = false;
+    horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
+    horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
+    float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
+    float playerCrouchDropMetres=0;
     std::uint64_t tickIndex = 0u;
     float cameraYaw = 0.0f;
     float cameraPitch = 0.0f;
@@ -107,6 +170,8 @@ struct RtSceneFrameInputs
     std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                horde::gameplay::simulation::kSkeletonEnemyCapacity> skeletonEnemies{};
     std::size_t skeletonEnemyCount = 0u;
+    // CPU-only optional local-joint clip transition; ordinary adapter stays empty.
+    SkeletonPoseBlendRequests skeletonPoseBlends{};
     horde::gameplay::TorchFailureSnapshot torchFailure{};
     horde::gameplay::items::HeldItemStates heldItems{};
     horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};
@@ -120,9 +185,27 @@ struct RtSceneFrameInputs
     horde::gameplay::interactions::FinaleSequenceSnapshot finale{};
     horde::gameplay::interactions::LanternPendulumSnapshot lanternPendulum{};
     horde::gameplay::items::HeldItemTransform rewardLanternWorldFromHinge{};
+    // Presentation-only inputs; gameplay admission remains with the snapshot owner.
+    bool attackWarningRingVisible = false;
+    bool healingFlaskVisible = false;
+    bool healingFlaskUpgradeVisible = false;
+    // Explicit immutable utility trial; ordinary adapters leave this empty.
+    std::optional<horde::gameplay::items::UtilityHandReturnSnapshot> playerUtilityHand;
+    std::array<float, 4u> attackWarningRingBaseColour{{0.72f,0.09f,0.015f,1.f}};
+    std::array<float, 4u> attackWarningRingEmission{{1.f,0.16f,0.015f,1.f}};
+    horde::gameplay::items::HeldItemTransform attackWarningRingWorldFromItem =
+        horde::gameplay::items::IdentityHeldItemTransform();
+    horde::gameplay::items::HeldItemTransform healingFlaskWorldFromItem =
+        horde::gameplay::items::IdentityHeldItemTransform();
+    horde::gameplay::items::HeldItemTransform healingFlaskUpgradeWorldFromItem =
+        horde::gameplay::items::IdentityHeldItemTransform();
     horde::gameplay::EnemyRosterSnapshot roster{};
     horde::gameplay::LichSnapshot lich{};
     horde::gameplay::ShowcaseZone zone = horde::gameplay::ShowcaseZone::Opening;
+    // Authoritative fixed-step water contact state is passed through unchanged
+    // so the renderer can consume bounded droplets/ripples without sampling
+    // or advancing gameplay state of its own.
+    horde::gameplay::effects::WaterContactSnapshot waterContact{};
     std::array<horde::gameplay::effects::FireEmitterState,
                horde::gameplay::effects::kFireEmitterCapacity> fireEmitters{};
     std::size_t fireEmitterCount = 0u;
@@ -166,7 +249,7 @@ public:
         bool succeeded = false;
     };
 
-#ifndef NDEBUG
+#if defined(_DEBUG) || (defined(HORDE_RT_DEBUG_CHECKPOINTS) && HORDE_RT_DEBUG_CHECKPOINTS)
     // Process-local opaque identities, read on the render owner thread after
     // completion. No device addresses, resource contents or ownership transfer.
     struct ResourceHandleSnapshot
@@ -193,13 +276,26 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
-    // Maximum including the optional development viewmodel. Live reports count owners.
-    static constexpr std::uint32_t kBlasCount = 20u;
+    // Owner maxima, not live counts. The explicit forest proof adds two masters.
+    static constexpr std::uint32_t kOrdinaryBlasCount = 23u;
+    static constexpr std::uint32_t kBlasCount = kOrdinaryBlasCount + 2u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
     static constexpr std::uint32_t kPlayerSwordScabbardMetadataIndex = 23u;
     static constexpr std::uint32_t kPlayerSwordScabbardInstanceIndex = 25u;
+    static constexpr std::uint32_t kWaterDropletMetadataIndex = 24u;
+    static constexpr std::uint32_t kWaterDropletInstanceIndex = 26u;
+    static constexpr std::uint32_t kKeeperMetadataIndex = CharacterRenderSlot::kKeeperMetadataIndex;
+    static constexpr std::uint32_t kKeeperInstanceIndex = CharacterRenderSlot::kKeeperTlasInstanceIndex;
+    static constexpr std::uint32_t kAttackWarningMetadataIndex = 28u;
+    static constexpr std::uint32_t kAttackWarningInstanceIndex = 28u;
+    static constexpr std::uint32_t kHealingFlaskMetadataIndex = 29u;
+    static constexpr std::uint32_t kHealingFlaskInstanceIndex = 29u;
+    // Separate physical pickup, shared immutable metadata/mesh/material/BLAS.
+    static constexpr std::uint32_t kHealingFlaskUpgradeInstanceIndex = 30u;
     static constexpr std::uint32_t kTlasCount = 1u;
+    static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kRtOrdinaryShowcaseInstanceCount;
+    // Storage capacity; builds and updates use the separate live count.
     static constexpr std::uint32_t kTlasInstanceCount = kRtTlasInstanceCapacity;
     // Keep the two existing Keeper body instances at their original TLAS slots.
     // Their custom index remains the old torch metadata index1.
@@ -208,7 +304,17 @@ public:
     static_assert(kKeeperTorchFirstTlasInstance + kKeeperTorchInstanceCount ==
                   kPlayerSwordScabbardInstanceIndex);
     static_assert(kPlayerSwordScabbardMetadataIndex < kRtInstanceMetadataCapacity);
-    static_assert(kTlasInstanceCount == kPlayerSwordScabbardInstanceIndex + 1u);
+    static_assert(kWaterDropletMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kKeeperMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kAttackWarningMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kHealingFlaskMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kAttackWarningInstanceIndex == kKeeperInstanceIndex + 1u);
+    static_assert(kHealingFlaskInstanceIndex == kAttackWarningInstanceIndex + 1u);
+    static_assert(kHealingFlaskUpgradeInstanceIndex == kHealingFlaskInstanceIndex + 1u);
+    static_assert(kOrdinaryTlasInstanceCount == 31u);
+    static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskUpgradeInstanceIndex + 1u);
+    static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
+                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 12u);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -236,11 +342,190 @@ public:
                     RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
                     bool glassEnabled = true,
                     VkPipelineCache pipelineCache = VK_NULL_HANDLE,
-                    RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr);
+                    RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr,
+                    std::span<const horde::scene::SkinnedClipBinding> skeletonClipBindings = {});
 
     void Destroy();
+#if defined(_DEBUG)
+    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64, SharedF01Grouped76 };
+    bool SetForestRouteProofMode(ForestRouteProofMode mode, std::string& diagnostic);
+    [[nodiscard]] std::string ForestRouteProofJson() const;
+#endif
+    // Validation only: compare the last successfully submitted definitions with
+    // their current shared owners. No gameplay state or resource is changed.
+    bool ValidateForestRouteProof(std::string& diagnostic,
+        std::optional<bool> expectedRetentionFrame = std::nullopt) const;
+    [[nodiscard]] std::uint32_t SharedForestMaskedInstanceCount() const noexcept { return forestRetentionOmittedCount_; }
+#if defined(_DEBUG)
+    // Explicit isolated GraphicsPreview proof only. Configuration survives
+    // Initialise's initial Destroy; the aliasing handle owns the admitted master.
+    bool SetDiagnosticPreviewMeshPair(std::shared_ptr<const horde::scene::assets::StaticMeshAsset> master,
+        const std::array<horde::gameplay::items::HeldItemTransform,2>& transforms,
+        bool sharedInstances, std::string& diagnostic);
+    struct DiagnosticPreviewMeshPairEvidence {
+        bool active=false, sharedInstances=false, definitionsValid=false;
+        std::uint32_t physicalCount=0, primitiveCount=0;
+        std::uint64_t vertexBytes=0,indexBytes=0,blasBytes=0;
+        std::uint64_t buildScratchAllocationBytes=0;
+        double buildMilliseconds=0.;
+        std::array<VkTransformMatrixKHR,2> transforms{};
+        std::array<horde::gameplay::items::HeldItemTransform,2> authoredTransforms{};
+        std::array<bool,2> referencesOwnedBlas{};
+        std::array<std::array<std::uint32_t,4>,3> textureLayers{};
+    };
+    DiagnosticPreviewMeshPairEvidence DiagnosticPreviewMeshPair() const;
+#endif
+    std::optional<horde::gameplay::dialogue::CompanionMotionPose> ChapterCompanionPublishedMotion() const {
+        return thirdActorIsCompanion_?chapterActorMotion_:std::nullopt;
+    }
+#if defined(_DEBUG)
+    bool LoadChapterActorInspection(const std::filesystem::path& directory,std::string& diagnostic);
+    bool ReleaseChapterActorInspection(std::string& diagnostic);
+    std::optional<ChapterActorInspectionPose> ChapterActorInspectionPublishedPose() const {return chapterInspectionLast_;}
+#endif
 
+    // Set before Initialise; geometry admission is explicit and development-only.
+    void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
+    void SetDevelopmentRescueJourney(bool enabled) { developmentRescueJourney_=enabled; }
+    // Candidate source binding only, chosen before resource creation. Empty
+    // retains the original runtime asset; no platform selects this normally.
+    bool SetPlayerUtilityCandidateAsset(std::string path) {
+        if(ready_ || device_!=VK_NULL_HANDLE)return false;
+        playerUtilityCandidateAsset_=std::move(path);return true;
+    }
+    // Explicit representation fallback; select before initialisation. This does
+    // not change settings, geometry quality, placement, collision or save state.
+    bool SetSharedForestGeometryEnabled(bool enabled) {
+        if((ready_ || device_!=VK_NULL_HANDLE) && enabled!=sharedForestGeometryEnabled_)return false;
+        sharedForestGeometryEnabled_=enabled;return true;
+    }
+    [[nodiscard]] bool SharedForestGeometryActive() const noexcept { return sharedForestGeometryActive_; }
+#ifndef NDEBUG
+    // Survey A/B only; call before initialization. Does not change settings.
+    bool SetRegionalWaterDiagnosticEnabled(bool enabled) {
+        if (ready_ || device_ != VK_NULL_HANDLE) return false;
+        regionalWaterDiagnosticEnabled_ = enabled;
+        return true;
+    }
+    bool SetFloorDebrisDiagnosticEnabled(bool enabled) {
+        if (ready_ || device_ != VK_NULL_HANDLE) return false;
+        floorDebrisEnabled_ = enabled;
+        return true;
+    }
+#endif
+    void SetDevelopmentWorldRoute(bool enabled, bool staged = false) { developmentWorldRoute_=enabled; stagedWorldPreparation_=staged; }
+    horde::gameplay::simulation::ZoneReadiness WorldZoneReadiness(horde::gameplay::simulation::WorldZoneToken token) const;
+    const horde::scene::DevelopmentWorldGeometry& WorldRouteGeometry() const { return worldRouteGeometry_; }
+    std::shared_ptr<const horde::gameplay::simulation::TriangleSupportSurface> ChapterTerrainSurface() const { return chapterTerrainSurface_; }
+    horde::gameplay::healing::FlaskUpgradeReadiness FlaskUpgradeReadiness() const;
     bool IsReady() const { return ready_; }
+#if defined(_DEBUG)
+    struct ForestDetailClosureObservation {
+        bool ready = false;
+        bool fullSourceAvailable = false;
+        bool completeContributors = false;
+        bool transmissionOwnersWithin = false;
+        bool faceCoverageVerified = false;
+        bool receiverEnvelopeBlocked = false;
+        bool regionalWaterEnabled = false;
+        bool regionalWaterCheckPerformed = false;
+        bool regionalWaterSeparated = false;
+        bool lanternTransportBounded = false;
+        std::size_t regionalWaterFaceCount = 0;
+        std::uint64_t sourceGeneration = 0;
+    };
+    // Read-only static closure observation, not admission or a current-frame
+    // camera/light proof. The caller must retain those distinct live guards.
+    ForestDetailClosureObservation DebugForestDetailClosure(
+        const horde::scene::DetailBox& measuredSelectionBounds) const;
+    // Explicit hidden-capture candidate only. Caller must first match an
+    // independently frozen content fingerprint; this method independently
+    // reselects the exact source IDs/bounds and retains every native closure
+    // and ordinary per-frame/lease guard. No GPU mutation or default admission.
+    bool DebugAdmitOrdinaryForestCandidate(std::uint64_t expectedGeneration,
+        const std::shared_ptr<const RtStaticMeshSlot>& expectedSource,
+        std::span<const std::uint32_t> expectedIds, std::uint64_t expectedCount,
+        const horde::scene::DetailBox& expectedBounds, std::string& diagnostic);
+    // Inspection only: the pinned complete CPU source, never the mutable active
+    // GPU candidate. No mutable aliases or ownership operations cross this seam.
+    std::shared_ptr<const RtStaticMeshSlot> DebugCachedCompleteStaticWorldSource() const noexcept {
+        return ready_ && developmentRescueJourney_ && sceneProfile_ == RtSceneProfile::Showcase
+            ? fullStaticGeometrySource_ : nullptr;
+    }
+    const horde::scene::assets::StaticMeshAsset* DebugCollapseStaticAsset() const noexcept {
+        return ready_ && developmentRescueJourney_ && sceneProfile_ == RtSceneProfile::Showcase
+            ? &collapseStaticAsset_ : nullptr;
+    }
+#endif
+    // Offside GPU preparation only. The caller supplies a conservative retained
+    // world-family set; an empty set restores the complete admitted geometry.
+    // Shared textures, materials, player buffers and unchanged BLAS stay owned.
+    std::uint64_t StaticGeometryGeneration() const noexcept { return staticGeometryGeneration_; }
+    bool StaticGeometryHasCompleteContributors() const noexcept {
+        return staticGeometryRetainedAllFamilies_ && staticGeometryRetainedAllTriangles_ &&
+            staticGeometryRetainedTriangleRegions_ == horde::scene::assets::kAllStaticTriangleRegions;
+    }
+    bool PrepareStaticGeometryReplacement(std::uint64_t expectedGeneration,
+        std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic);
+    // CPU admission against the scene's pinned complete source, with current
+    // generation identity. No GPU allocation, publication or visibility proof.
+    std::shared_ptr<const RtStaticTriangleOmissions> CreateStaticGeometryTriangleOmissions(
+        std::uint64_t expectedGeneration, std::span<const std::uint32_t> triangles,
+        std::string& diagnostic) const;
+    bool BeginStaticGeometryReplacement(std::uint64_t expectedGeneration,
+        std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic,
+        std::uint8_t retainedTriangleRegions = horde::scene::assets::kAllStaticTriangleRegions,
+        std::shared_ptr<const RtStaticTriangleOmissions> omissions = {});
+    // One bounded CPU/upload step or one owned AS submit/nonblocking fence
+    // poll. Allocation and command-record latency are not time guarantees.
+    bool AdvanceStaticGeometryReplacement(std::uint64_t expectedGeneration,
+        VkDeviceSize maxCopyBytes, std::string& diagnostic);
+    bool StaticGeometryReplacementReady() const noexcept;
+    bool StaticGeometryReplacementHasGpuWork() const noexcept;
+    enum class StaticDetailFrame { Render, WaitForRestore, Cutover };
+    bool AdvanceOrdinaryStaticDetail(horde::gameplay::simulation::GameSimulation& simulation,
+        const RtSceneFrameInputs& frame, bool allowEviction, StaticDetailFrame& decision, std::string& diagnostic);
+    void FinishOrdinaryStaticDetail(horde::gameplay::simulation::GameSimulation& simulation);
+    struct OrdinaryStaticDetailMeasurements {
+        std::uint64_t omittedTriangles=0, unloads=0, restores=0, cancelled=0, waitFrames=0;
+        std::uint64_t savedOwnerBytes=0, peakSavedOwnerBytes=0, peakOverlapOwnerBytes=0, preparationFailures=0;
+    };
+    const OrdinaryStaticDetailMeasurements& OrdinaryStaticDetailEvidence() const { return ordinaryStaticDetailEvidence_; }
+    bool OrdinaryStaticDetailAvailable() const { return ordinaryStaticFacesVerified_ && ordinaryStaticOmissions_; }
+    bool RefreshStaticGeometryReplacement(std::uint64_t expectedGeneration,
+        std::string& diagnostic);
+    bool CancelStaticGeometryReplacement(std::string& diagnostic);
+    std::uint64_t CachedStaticGeometryPayloadBytes() const noexcept {
+        return fullStaticGeometrySource_ ? fullStaticGeometrySource_->PayloadBytes() : 0u;
+    }
+    // Proof must complete GPU/evidence work and reset ALL recorded frame command
+    // buffers. Failed proof retains both owners; no descriptors are published.
+    bool CommitStaticGeometryReplacement(std::uint64_t expectedGeneration,
+        bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
+    bool StaticGeometryCompletionUnproved() const noexcept { return staticGeometryCompletionUnproved_; }
+    struct StaticGeometryReplacementMeasurements {
+        double prepareMilliseconds = 0.0;
+        double cutoverMilliseconds = 0.0;
+        double packMilliseconds = 0.0;
+        double beginMilliseconds = 0.0;
+        double maximumCpuCopyAdvanceMilliseconds = 0.0;
+        double maximumAdvanceMilliseconds = 0.0;
+        std::uint32_t uploadAdvanceCount = 0;
+        std::uint32_t asSubmissionCount = 0, asPollCount = 0, asPendingPollCount = 0;
+        std::uint64_t uploadedBytes = 0;
+        std::uint32_t cpuCopyAdvanceCount = 0;
+        std::uint32_t cpuRegionScanAdvanceCount = 0;
+        std::uint64_t scannedCpuPayloadBytes = 0;
+        std::uint64_t copiedCpuPayloadBytes = 0;
+        std::uint64_t oldOwnerAllocationBytes = 0;
+        std::uint64_t candidateOwnerAllocationBytes = 0;
+        std::uint64_t overlapOwnerAllocationBytes = 0;
+        std::uint32_t oldPrimitiveCount = 0;
+        std::uint32_t newPrimitiveCount = 0;
+    };
+    const StaticGeometryReplacementMeasurements& StaticGeometryReplacementEvidence() const noexcept {
+        return staticGeometryReplacementMeasurements_;
+    }
     // CPU-side timings for the most recent Initialise attempt. Failed attempts
     // retain partial measurements across cleanup until the next attempt begins.
     const InitialisationMeasurements& InitialiseMeasurements() const noexcept
@@ -533,6 +818,21 @@ public:
 #endif
         return "{\"organisation\":\"Monolithic\"}";
     }
+    // CPU preparation observations only, never submitted/presented GPU evidence.
+    bool LastActorPreparationPerformed() const noexcept {
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+        return lastActorPreparationPerformed_;
+#else
+        return false;
+#endif
+    }
+    bool LastActorPreparationUsedWorker() const noexcept {
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+        return lastActorPreparationUsedWorker_;
+#else
+        return false;
+#endif
+    }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
     VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }
@@ -560,6 +860,11 @@ public:
     void PublishCompletedDiagnostic(
         const RtDiagnosticCounterPayload& payload) noexcept;
 
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    std::uint32_t DispatchClockTicket() const noexcept { return dispatchClockTicket_; }
+    bool CollectDispatchClocks(std::uint32_t ticket,std::vector<RtDispatchClockSample>&,
+                              std::array<std::uint64_t,8>&,std::string&) const;
+#endif
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,
                             VkImageLayout& swapchainImageLayout,
@@ -571,12 +876,64 @@ public:
                             , experimental::StagedPrimaryTiming* stagedTiming = nullptr,
                             std::uint32_t timingFrameSlot = 0u
 #endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                            , RtSceneGpuStageProbe* gpuProbe = nullptr
+#endif
+                            );
+
+    // A completed offside owner can be adopted while poses keep moving only
+    // through this combined path. Proof must retire previous submitted work and
+    // reset prior frame references before this command's first scene record,
+    // while preserving the supplied command's already-begun recording state.
+    // Failure after publication retains both owners for platform teardown.
+    bool RecordTraceAndCopyWithStaticReplacement(std::uint64_t expectedGeneration,
+                            bool (*retireReferences)(void*, std::string&), void* user,
+                            VkCommandBuffer commandBuffer, VkImage swapchainImage,
+                            VkImageLayout& swapchainImageLayout, VkExtent2D swapchainExtent,
+                            const RtSceneFrameInputs& frame, std::string& diagnostic,
+                            RtSceneRecordObservation* observation = nullptr
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                            , experimental::StagedPrimaryTiming* stagedTiming = nullptr,
+                            std::uint32_t timingFrameSlot = 0u
+#endif
+#if HORDE_RT_FRAME_STAGE_PROBE
+                            , RtSceneGpuStageProbe* gpuProbe = nullptr
+#endif
                             );
 
     // Owning render thread, only after successful submission of the recorded RT
     // command buffer. One frame in flight: pending TLAS definitions never become
     // the UPDATE baseline merely because a BUILD was recorded.
     void NotifyFrameSubmitted() noexcept;
+
+    // Before this frame binds any scene descriptor. The callback must prove
+    // the preceding graphics submission complete and reset all older recorded
+    // references; it must preserve this frame's unbound recording, if begun.
+    // Only the Keeper vertex allocation changes. Shared AS/textures stay owned.
+    bool PrepareThirdActorVertexLifetime(const RtSceneFrameInputs& frame,
+        bool (*retireReferences)(void*, std::string&), void* user,
+        std::string& diagnostic, RtSceneRecordObservation* observation = nullptr);
+    // Includes the private Keeper texture pair. Shared AS and static texture
+    // families remain owned; texture aliases are valid while Kit owns the slot.
+    bool PrepareThirdActorResourceLifetime(const RtSceneFrameInputs& frame,
+        bool (*retireReferences)(void*, std::string&), void* user,
+        std::string& diagnostic, RtSceneRecordObservation* observation = nullptr);
+    struct KeeperVertexLifetimeEvidence {
+        std::uint32_t retirementCount = 0u, restorationCount = 0u;
+        std::uint64_t retiredAllocationBytes = 0u;
+        VkMemoryPropertyFlags retiredMemoryFlags = 0u;
+        bool retired = false;
+    };
+    KeeperVertexLifetimeEvidence KeeperVertexLifetime() const noexcept {
+        return keeperVertexLifetime_;
+    }
+    struct KeeperTextureLifetimeEvidence {
+        std::uint32_t retirementCount=0,restorationCount=0;
+        std::uint64_t retiredDeviceLocalBytes=0,retiredHostVisibleBytes=0;
+        VkMemoryPropertyFlags baseMemoryFlags=0,emissiveMemoryFlags=0;
+        bool retired=false;
+    };
+    KeeperTextureLifetimeEvidence KeeperTextureLifetime() const noexcept { return keeperTextureLifetime_; }
 
     // Owning render thread only, after successful device-idle/evidence completion.
     // Replaces only the extent-dependent output image; caller must reset and
@@ -590,11 +947,11 @@ public:
     // bytes are canonical RGBA even when the presentation push constant had
     // swapped red/blue for a raw copy to a BGRA swapchain.
     bool CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic);
-#ifndef NDEBUG
-    // Debug asset inspection only: model-space copy of the exact current upload.
+#if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
+    // Opt-in asset inspection: model-space copy of the exact current upload.
     // This is CPU geometry evidence, not a GPU readback or a second pose solve.
     bool CaptureViewmodelMesh(const std::string& path, std::string& diagnostic) const;
-    // Debug asset inspection only: model-space copy of the exact current world-body
+    // Opt-in asset inspection: model-space copy of the exact current world-body
     // upload and its actual TLAS transform. This is CPU geometry evidence, not readback.
     bool CapturePlayerWorldBodyMesh(const std::string& path, std::string& diagnostic) const;
 #endif
@@ -603,9 +960,114 @@ private:
     friend struct PresentableTinyRtScenePreflightTestAccess;
     friend struct PresentableTinyRtSceneObservationTestAccess;
     friend struct PresentableTinyRtSceneOutputResizeTestAccess;
+    friend struct PresentableTinyRtSceneStaticCutoverTestAccess;
 
     using Buffer = RtGpuBuffer;
     using AccelerationStructure = RtAccelerationStructure;
+    struct TextureArray;
+    struct ThirdActorTextureLifetimeApi {
+        void* user=nullptr;
+        bool (*retireReferences)(void*,std::string&)=nullptr;
+        bool (*prepareKeeper)(void*,TextureArray&,TextureArray&,std::string&)=nullptr;
+        void (*bindImages)(void*,const std::array<VkDescriptorImageInfo,2>&) noexcept=nullptr;
+        void (*destroyImage)(void*,TextureArray&) noexcept=nullptr;
+    };
+    bool PrepareThirdActorTextureLifetimeWithApi(const RtSceneFrameInputs&,
+        const ThirdActorTextureLifetimeApi&,std::string&);
+    std::array<VkDescriptorImageInfo, 2> KeeperTextureDescriptors(bool preview = false) const noexcept;
+    struct ThirdActorVertexLifetimeApi {
+        void* user = nullptr;
+        bool (*retireReferences)(void*, std::string&) = nullptr;
+        bool (*prepareKeeper)(void*, Buffer&, std::string&) = nullptr;
+        void (*bindVertices)(void*, const VkDescriptorBufferInfo&) noexcept = nullptr;
+        void (*destroyVertices)(void*, Buffer&) noexcept = nullptr;
+    };
+    bool WantsChapterCompanion(const RtSceneFrameInputs&) const noexcept;
+    bool PrepareThirdActorVertexLifetimeWithApi(const RtSceneFrameInputs&,
+        const ThirdActorVertexLifetimeApi&, std::string&);
+
+    struct PreparedStaticGeometry {
+        enum class Phase { Copy, Upload, Collapse, CollapseWait, Tlas, TlasWait, Ready };
+        std::uint64_t sourceGeneration = 0;
+        std::uint8_t retainedTriangleRegions = horde::scene::assets::kAllStaticTriangleRegions;
+        bool retainedAllFamilies = true;
+        bool retainedAllTriangles = true;
+        // Sparse index replacement retains the exact vertex address domain.
+        // This is a borrow from the current generation, never a second owner.
+        VkDeviceAddress sharedVertexAddress = 0;
+        bool ready = false;
+        Phase phase = Phase::Upload;
+        std::chrono::steady_clock::time_point prepareStart;
+        std::unique_ptr<RtGpuBufferPreparation> uploads;
+        std::unique_ptr<RtStaticMeshCopy> copy;
+        std::uint64_t collapseBuildOwnerBytes = 0;
+        RtStaticMeshSlot slot;
+        Buffer vertices, indices, transforms, instances, primitives, tlasInstances;
+        AccelerationStructure collapse, tlas;
+        Buffer collapseScratch, tlasScratch;
+        RtGpuWorkLease buildWork;
+        std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount> definitions{};
+    };
+    struct StaticCutoverApi {
+        void* user = nullptr;
+        bool (*retireReferences)(void*, std::string&) = nullptr;
+        bool (*publishDescriptors)(void*, PresentableTinyRtScene&, std::string&) = nullptr;
+        void (*destroyRetired)(void*, PresentableTinyRtScene&, PreparedStaticGeometry&) noexcept = nullptr;
+        // Optional mandatory first-frame recorder. Only this path admits a
+        // completed candidate with an older submitted pose: the real dynamic
+        // upload/TLAS record must precede its trace and old-owner retirement.
+        bool (*recordCurrentFrame)(void*, PresentableTinyRtScene&, std::string&) = nullptr;
+    };
+    bool CommitStaticGeometryWithApi(std::uint64_t expectedGeneration,
+        const StaticCutoverApi& api, std::string& diagnostic);
+    bool PackLoadedStaticAssets(RtStaticMeshSlot& out,
+        std::span<const std::uint32_t> retainedWorldFamilies, std::string& diagnostic,
+        std::uint8_t retainedTriangleRegions = horde::scene::assets::kAllStaticTriangleRegions);
+    void DestroyPreparedStaticGeometry(PreparedStaticGeometry& owner) noexcept;
+    void StageTlasSubmissionDefinitions(
+        const std::array<VkAccelerationStructureInstanceKHR,kTlasInstanceCount>& definitions) noexcept;
+    bool BeginPreparedStaticUploads(PreparedStaticGeometry& owner, std::string& diagnostic);
+    std::shared_ptr<const RtStaticMeshSlot> fullStaticGeometrySource_;
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    friend struct PresentableTinyRtSceneRegionPageTestAccess;
+    // Chapter packing retires the legacy glass-fixture registration when Kit
+    // owns its atlas family. Metadata9 is free and outside legacy player10-13.
+    static constexpr std::uint32_t kRegionPageTlasSlot=9,kRegionPageMetadataSlot=9;
+    std::shared_ptr<const horde::world::streaming::GeometryPayload> regionPageSource_;
+    RtRegionGeometryOwner regionPageOwner_;
+    std::unique_ptr<RtRegionGeometryPreparation> regionPagePreparation_;
+    horde::world::streaming::RegionStreaming regionStreaming_;
+    enum class RegionCutover { None, Disable, Adopt };
+    RegionCutover regionCutover_=RegionCutover::None;
+    horde::world::streaming::Token regionCutoverToken_{};
+    bool regionPageVisible_=true,regionRetirementAwaitingFrame_=false;
+    RtRegionPreparationRecovery regionPreparationRecovery_;
+    std::uint64_t regionPreparationPeakBytes_=0;
+    bool PrepareRegionPageSource(std::string&);
+    bool CreateInitialRegionPage(std::string&);
+    bool ApplyRegionPage(std::array<VkAccelerationStructureInstanceKHR,kTlasInstanceCount>&,
+        std::array<RtInstanceMetadata,kRtInstanceMetadataCapacity>&,
+        horde::world::streaming::GeometryPageTable&,std::string&) const;
+    void DestroyRegionPage() noexcept;
+    bool AdvanceRegionPage(horde::gameplay::simulation::GameSimulation&,const RtSceneFrameInputs&,
+        bool safe,bool inner,bool allowEviction,StaticDetailFrame&,std::string&);
+    bool RetireCompletedRegionPage(bool (*)(void*,std::string&),void*,std::string&);
+#endif
+    void AdmitOrdinaryStaticDetail();
+    bool RecoverOrdinaryStaticPreparation(bool safe, StaticDetailFrame& decision, std::string& diagnostic);
+    std::shared_ptr<const RtStaticTriangleOmissions> ordinaryStaticOmissions_;
+    bool ordinaryStaticFacesVerified_=false, ordinaryStaticCandidate_=false;
+    bool ordinaryStaticCandidateReduced_=false, ordinaryStaticReduced_=false;
+    bool ordinaryStaticRearm_=true;
+    unsigned ordinaryStaticRestoreFailures_=0;
+    OrdinaryStaticDetailMeasurements ordinaryStaticDetailEvidence_{};
+    std::unique_ptr<PreparedStaticGeometry> preparedStaticGeometry_;
+    std::uint64_t staticGeometryGeneration_ = 1;
+    std::uint8_t staticGeometryRetainedTriangleRegions_ = horde::scene::assets::kAllStaticTriangleRegions;
+    bool staticGeometryRetainedAllFamilies_ = true;
+    bool staticGeometryRetainedAllTriangles_ = true;
+    bool staticGeometryCompletionUnproved_ = false;
+    StaticGeometryReplacementMeasurements staticGeometryReplacementMeasurements_{};
 
     struct OutputImageResources
     {
@@ -652,6 +1114,10 @@ private:
         VkMemoryPropertyFlags memoryPropertyFlags = 0u;
         std::uint32_t mipLevels = 0u;
     };
+    struct TextureUploadRecovery {
+        Buffer staging;
+        RtGpuWorkLease work;
+    };
 
     bool InitialiseWithOrchestration(
         VkInstance instance,
@@ -674,6 +1140,7 @@ private:
         VkPipelineCache pipelineCache = VK_NULL_HANDLE,
         RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr);
     void ApplyGlassFixtureVisibility(std::span<VkAccelerationStructureInstanceKHR> instances) const;
+    void CleanupFailedInitialisation();
     bool ContinueInitialiseAfterPreflight(
         VkFormat presentationFormat,
         const std::string& skeletonAssetPath,
@@ -682,7 +1149,8 @@ private:
         const std::string& lichTextureDirectory,
         const std::string& developmentStaticAssetDirectory,
         const std::string& productionAssetRoot,
-        std::string& diagnostic);
+        std::string& diagnostic,
+        std::span<const horde::scene::SkinnedClipBinding> skeletonClipBindings = {});
 
     bool LoadEntryPoints(std::string& diagnostic);
     bool CreateBuffer(VkDeviceSize size,
@@ -714,11 +1182,19 @@ private:
                        TextureArray& texture,
                        std::string& diagnostic,
                        std::span<const std::uint32_t> sourceLayers = {},
-                       VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY);
+                       VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
+                       std::span<const RtTextureLayerAlias> sourceAliases = {},
+                       std::span<const std::string> appendedArrayPaths = {},
+                       TextureUploadRecovery* recovery = nullptr,
+                       RtSceneRecordObservation* observation = nullptr);
+    VkAccelerationStructureGeometryKHR ChapterActorGeometry() const;
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
     bool CreateEnvironmentTexture(const std::string& productionRoot, std::string& diagnostic);
     bool CreateLichTextures(const std::string& directory, std::string& diagnostic);
+    bool CreateKeeperTexturePair(const std::string& directory, TextureArray& base,
+        TextureArray& emissive, std::string& diagnostic,
+        TextureUploadRecovery* recovery = nullptr, RtSceneRecordObservation* observation = nullptr);
     bool LoadStaticHeldItemAssets(const std::string& developmentDirectory,
                                   const std::string& productionAssetRoot,
                                   std::string& diagnostic);
@@ -732,11 +1208,16 @@ private:
         std::span<const VkAccelerationStructureBuildRangeInfoKHR> ranges,
         VkAccelerationStructureTypeKHR type, VkBuildAccelerationStructureFlagsKHR flags,
         AccelerationStructure& out, Buffer* retainedScratch,
-        std::string& diagnostic);
+        std::string& diagnostic, bool* completionUnproved = nullptr,
+        RtGpuWorkLease* queuedWork = nullptr);
     bool UpdatePreviewInstances(VkCommandBuffer commandBuffer,
                                 const RtSceneFrameInputs& frame,
                                 std::string& diagnostic,
                                 RtSceneRecordObservation* observation);
+    bool ApplyHealingFlaskInstances(std::span<VkAccelerationStructureInstanceKHR> instances,
+        const RtSceneFrameInputs& frame,
+        const horde::gameplay::items::HeldItemTransform& carriedWorldFromItem,
+        std::string& diagnostic) const;
     const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateScratchBuffer(VkDeviceSize usableSize, Buffer& out,
@@ -778,13 +1259,15 @@ private:
                                  Buffer& out,
                                  std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
                                  std::string& diagnostic);
+    bool PackPlayerWorldBodyPoseUpload(std::string& diagnostic,
+                                      RtSceneRecordObservation* observation = nullptr);
     bool UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                 const RtSceneFrameInputs& frame,
                                 std::string& diagnostic,
                                 RtSceneRecordObservation* observation = nullptr);
     void ApplyKeeperTorchBodyInstances(
         std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount>& instances) const;
-    bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
+    bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic, bool* completionUnproved = nullptr) const;
     void DestroyBuffer(Buffer& buffer) const;
     void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
     void DestroyTextureArray(TextureArray& texture);
@@ -819,6 +1302,10 @@ private:
     VkSampler environmentSampler_ = VK_NULL_HANDLE;
     TextureArray lichBaseColor_;
     TextureArray lichEmissive_;
+    KeeperTextureLifetimeEvidence keeperTextureLifetime_{};
+    std::array<TextureArray,2> keeperTextureRestoreQuarantine_{};
+    TextureUploadRecovery keeperTextureUploadRecovery_{};
+    std::string keeperTextureDirectory_;
     TextureArray staticBaseColor_;
     TextureArray staticNormal_;
     TextureArray staticOrm_;
@@ -830,6 +1317,8 @@ private:
     Buffer indexBuffer_;
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
+    // Exact last successful submission, including transform-only UPDATEs;
+    // also supplies the discrete BUILD-vs-UPDATE comparison baseline.
     std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount> tlasBuiltInstances_{};
     bool tlasInstanceDefinitionsValid_ = false;
     std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount> tlasPendingInstances_{};
@@ -837,6 +1326,7 @@ private:
     Buffer heldLightBuffer_;
     Buffer fireEmitterBuffer_;
     Buffer qualityControlsBuffer_;
+    Buffer waterContactRippleBuffer_;
     RtQualityControlsGpu uploadedQualityControls_{};
     FireEmitterQuality uploadedFireQuality_ = FireEmitterQuality::Mobile;
     FireEmitterUpload uploadedFireEmitters_{};
@@ -864,6 +1354,10 @@ private:
     AccelerationStructure rewardLanternBodyBlas_;
     AccelerationStructure dielectricFixtureBlas_;
     AccelerationStructure collapseBlas_;
+    AccelerationStructure waterDropletBlas_;
+    AccelerationStructure attackWarningRingBlas_;
+    AccelerationStructure healingFlaskBlas_;
+    Buffer waterDropletBlasUpdateScratch_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
     AccelerationStructure skinnedPlayerBlas_;
@@ -873,6 +1367,24 @@ private:
     AccelerationStructure tlas_;
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
+    bool developmentSupportFixture_ = false;
+    bool developmentWorldRoute_ = false;
+    bool stagedWorldPreparation_ = false;
+    bool developmentRescueJourney_ = false;
+    std::string playerUtilityCandidateAsset_;
+    bool jointPropPresentationActive_ = false;
+    bool regionalWaterDiagnosticEnabled_ = true;
+    bool floorDebrisEnabled_ = true;
+    std::vector<horde::scene::ChapterWaterTriangle> regionalWaterFaces_;
+    Buffer rescueWorldUpdateScratch_;
+    std::vector<std::array<float,3>> rescueWorldVertices_;
+    std::vector<std::uint32_t> rescueWorldSurfaceCodes_;
+    std::size_t rescueRopeVertexOffset_ = 0;
+    std::uint32_t rescueWorldPrimitiveCount_ = 0;
+    std::uint32_t rescueWorldMaxVertex_ = 0;
+    std::uint32_t finaleRoofSurfaceBase_ = 0, finaleRoofSurfaceCount_ = 0;
+    horde::scene::DevelopmentWorldGeometry worldRouteGeometry_{};
+    std::shared_ptr<const horde::gameplay::simulation::TriangleSupportSurface> chapterTerrainSurface_;
     RtSceneProfile sceneProfile_ = RtSceneProfile::Showcase;
     bool glassEnabled_ = true;
     bool mistEnabled_ = true;
@@ -882,11 +1394,79 @@ private:
     bool WriteDustQuality(const RtQualityControlsGpu&, const RtSceneFrameInputs&, std::string&, RtSceneRecordObservation*);
     std::vector<RtMaterialGpu> sceneMaterials_;
     std::uint32_t worldMaterialBase_ = 0u;
-    std::uint32_t tlasInstanceCount_ = kTlasInstanceCount;
+    std::uint32_t tlasInstanceCount_ = kOrdinaryTlasInstanceCount;
     std::array<horde::gameplay::items::HeldItemTransform, 5u> previewTransforms_{};
     std::array<horde::gameplay::effects::FireEmitterFixedStepInput, 2u> previewFireInputs_{};
+#if defined(_DEBUG)
+    ForestRouteProofMode forestRouteProofMode_ = ForestRouteProofMode::Disabled;
+#endif
+    // Candidate remains opt-in until normal-path validation admits it.
+    static constexpr bool kDefaultSharedForestGeometryEnabled=false;
+    bool sharedForestGeometryEnabled_=kDefaultSharedForestGeometryEnabled;
+    bool sharedForestGeometryActive_=false;
+    bool SelectSharedForestGeometry() const noexcept;
+    bool UsesSharedForestGeometry() const noexcept { return sharedForestGeometryActive_; }
+    bool UsesSharedForestRetention() const noexcept;
+    bool UsesSupplementalForestProof() const noexcept;
+    void AdmitSharedForestRetentionProof();
+    void ApplySharedForestRetentionProof(std::span<VkAccelerationStructureInstanceKHR>, const RtSceneFrameInputs&);
+    bool ForestRetentionIdentityMatches() const;
+    struct ForestRetentionProof {
+        std::shared_ptr<const RtStaticMeshSlot> source;
+        std::shared_ptr<const horde::scene::PreparedForestDressing> prepared;
+        std::array<horde::scene::ForestDressingMasterRange,2> ranges{};
+        std::array<horde::scene::ForestDressingBounds,64> bounds{};
+        std::array<bool,64> eligible{};
+        std::uint64_t generation=0;
+        bool admitted=false;
+        std::uint32_t eligibleCount=0;
+    } forestRetentionProof_;
+    std::array<bool,64> forestRetentionLastOmitted_{};
+    bool forestRetentionFrameEligible_=false;
+    std::uint64_t forestRetentionFrameGeneration_=0;
+    std::uint32_t forestRetentionOmittedCount_=0;
+    horde::scene::ForestDressingSharedLayout forestSharedLayout_{};
+    std::array<AccelerationStructure, 2u> forestMasterBlas_{};
+    Buffer forestMasterBuildScratch_{};
+    RtGpuWorkLease forestMasterBuildWork_{};
+#if defined(_DEBUG)
+    static constexpr std::uint32_t kDiagnosticPreviewPairMetadataIndex = 3u;
+    std::shared_ptr<const horde::scene::assets::StaticMeshAsset> diagnosticPreviewPairMaster_;
+    std::array<horde::gameplay::items::HeldItemTransform,2> diagnosticPreviewPairTransforms_{};
+    bool diagnosticPreviewPairShared_=false,diagnosticPreviewPairActive_=false;
+    horde::scene::assets::StaticMeshAsset diagnosticPreviewPairBaked_;
+    AccelerationStructure diagnosticPreviewPairBlas_{};
+    Buffer diagnosticPreviewPairScratch_{};
+    RtGpuWorkLease diagnosticPreviewPairBuild_{};
+    VkDeviceSize diagnosticPreviewPairScratchPeak_=0;
+    double diagnosticPreviewPairBuildMilliseconds_=0.;
+#endif
     VkDeviceSize scratchAddressAlignment_ = 0u;
     CharacterRenderSlot characterSlot_;
+    horde::scene::assets::SkinnedPbrActor chapterActor_;
+#if defined(_DEBUG)
+    std::unique_ptr<horde::scene::assets::SkinnedPbrActor> chapterInspectionActor_;
+    std::optional<ChapterActorInspectionPose> chapterInspectionLast_;
+    bool chapterWorkerUsesInspection_=false;
+#endif
+#if HORDE_RT_ACTOR_WORKER_EXPERIMENT
+    // Retired before actor reload/move/destruction; every frame joins before
+    // any actor asset read/upload. No GPU ownership crosses this CPU lane.
+    std::unique_ptr<horde::scene::assets::SkinnedPbrActorWorker> chapterPoseWorker_;
+    bool lastActorPreparationPerformed_=false, lastActorPreparationUsedWorker_=false;
+#endif
+    bool chapterActorReady_ = false;
+    bool thirdActorIsCompanion_ = false;
+    bool thirdActorSubmittedCompanion_ = false;
+    KeeperVertexLifetimeEvidence keeperVertexLifetime_{};
+    bool thirdActorNeedsBuild_ = false;
+    bool chapterActorNeedsRefit_ = false;
+    std::uint64_t chapterActorPoseGeneration_ = UINT64_MAX;
+    float chapterActorPoseSeconds_ = -1.0f;
+    bool chapterActorWalking_ = false;
+    horde::gameplay::dialogue::CompanionActingPose chapterActorActing_{};
+    horde::gameplay::dialogue::CompanionLocomotionPose chapterActorLocomotion_{};
+    std::optional<horde::gameplay::dialogue::CompanionMotionPose> chapterActorMotion_;
     PlayerRenderSlot playerRenderSlot_;
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset collapseStaticAsset_;
@@ -902,7 +1482,7 @@ private:
     bool viewmodelAvailable_ = false;
     bool playerBodyRemainderAvailable_ = false;
     bool viewmodelPoseCurrent_ = false;
-#ifndef NDEBUG
+#if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     VkTransformMatrixKHR viewmodelCaptureTransform_{};
     VkTransformMatrixKHR playerWorldBodyCaptureTransform_{};
     bool playerWorldBodyPoseCurrent_ = false;
@@ -912,6 +1492,11 @@ private:
     horde::scene::assets::StaticMeshAsset rewardLanternRingAsset_;
     horde::scene::assets::StaticMeshAsset rewardLanternBodyAsset_;
     horde::scene::assets::StaticMeshAsset productionDielectricFixtureAsset_;
+    horde::scene::assets::StaticMeshAsset waterDropletAsset_;
+    horde::scene::assets::StaticMeshAsset attackWarningRingAsset_;
+    horde::scene::assets::StaticMeshAsset healingFlaskAsset_;
+    std::optional<horde::gameplay::healing::FlaskUpgradeSite> healingFlaskUpgradeSite_;
+    bool waterDropletGeometryVisible_ = false;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;
     std::uint32_t playerStaticVertexBase_ = 0u;
     std::uint32_t dielectricFixtureMaterialIndex_ = 0u;
@@ -983,6 +1568,9 @@ private:
     HeldItemBlasMeasurements heldItemBlasMeasurements_{};
 
     RtPipelineBundle pipelineBundle_;
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    std::uint32_t dispatchClockTicket_=0;
+#endif
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
     std::unique_ptr<experimental::StagedPrimaryPass> stagedPrimary_;
 #endif

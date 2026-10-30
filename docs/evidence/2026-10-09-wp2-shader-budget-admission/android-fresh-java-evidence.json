@@ -1,0 +1,47 @@
+{
+  "candidateHead": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "command": "android/gradlew.bat --offline testDebugUnitTest --rerun --tests *PlayerDebugCheckpointTest --tests *EquipmentAudioFeedbackTest --tests *SurfaceSuspensionLifecycleTest --console=plain",
+  "unsignedFlag": "HORDE_VALIDATION_UNSIGNED=1",
+  "task": ":app:testDebugUnitTest",
+  "taskSpecificRerunSupported": true,
+  "taskExecuted": true,
+  "taskStartedUtc": "2026-10-09T06:19:01.5857184+00:00",
+  "totalTests": 14,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "tests": [
+    {
+      "name": "PlayerDebugCheckpointTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true,
+      "xml": "android/app/build/test-results/testDebugUnitTest/TEST-com.samfa12.hordelanternrt.PlayerDebugCheckpointTest.xml",
+      "xmlLastWriteTimeUtc": "2026-10-09T06:19:11.0728700+00:00"
+    },
+    {
+      "name": "EquipmentAudioFeedbackTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true,
+      "xml": "android/app/build/test-results/testDebugUnitTest/TEST-com.samfa12.hordelanternrt.EquipmentAudioFeedbackTest.xml",
+      "xmlLastWriteTimeUtc": "2026-10-09T06:19:11.0728700+00:00"
+    },
+    {
+      "name": "SurfaceSuspensionLifecycleTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true,
+      "xml": "android/app/build/test-results/testDebugUnitTest/TEST-com.samfa12.hordelanternrt.SurfaceSuspensionLifecycleTest.xml",
+      "xmlLastWriteTimeUtc": "2026-10-09T06:19:11.0738700+00:00"
+    }
+  ],
+  "rawLog": "reports/shader-budget-admission/android-fresh-selected-java-tests.log",
+  "limitation": "Build/package lane earlier reported testDebugUnitTest UP-TO-DATE; this separate task-specific rerun executed the selected tests. No device tests."
+}

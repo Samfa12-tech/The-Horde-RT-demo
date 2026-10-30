@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "command": "python tools/prepare-forest-foliage.py --verify",
+  "result": "PASS: finite leaf cue and manifest reproduce byte-for-byte; verify wrote nothing; listening unverified",
+  "verifyReadOnlyHashesSizesMtimesUnchanged": true,
+  "readOnlyIdentityScope": "Both runtime products and all five original leaves rustle WAV files",
+  "independentExactFractionSamplesCompared": 43283,
+  "independentMethod": "Every runtime PCM16 sample equals round(Fraction(sourcePCM24,256) * min(1,Fraction(i,480),Fraction(N-1-i,3840))); Python Fraction rounding is exact nearest-even",
+  "endpointsZero": true,
+  "allFiveSourceStatisticsRecomputedExact": true,
+  "runtimeFormat": "Uncompressed mono 48000Hz PCM16, full 43283 frames",
+  "runtimeDurationSeconds": 0.9017291666666667,
+  "runtimePeakDbfs": -14.016057310157237,
+  "runtimeRmsDbfs": -41.03420677009289,
+  "runtimeFullScaleSamples": 0,
+  "edgeFadeFrames": {"in": 480, "out": 3840},
+  "listeningPerformed": false,
+  "nativePlaybackAcceptance": false,
+  "originalsCopied": false,
+  "files": {
+    "tools/prepare-forest-foliage.py": {
+      "sha256": "fa5987bd4512c13ee5b1ed7953222443eafdb41b0af48a0ef0fee13ae4a312cb",
+      "bytes": 7912
+    },
+    "assets/audio/forest-foliage/runtime/leaf_rustle.wav": {
+      "sha256": "8126b71f00621241084e663535ab7fa5da47ac3db64419feb1532a4fd05319a8",
+      "bytes": 86610
+    },
+    "assets/audio/forest-foliage/asset.manifest.json": {
+      "sha256": "e000b0337507b3b79296eddc561e402818d71577450504436fb65197d387a197",
+      "bytes": 2796
+    },
+    "reports/forest-foliage-20261020/source-statistics.json": {
+      "sha256": "7f8785d9468f49adaafd7e2cd733ecf2d8993b35d468e410a38f1c63af8d7048",
+      "bytes": 3245
+    },
+    "docs/licenses/filmcow-sfx-license.pdf": {
+      "sha256": "bda56a077aa8ba8e053ae916dd4c19038baa12cd33d10209658646ac9351b73f",
+      "bytes": 30703
+    }
+  }
+}

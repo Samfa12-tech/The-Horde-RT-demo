@@ -6,6 +6,8 @@
 #include <type_traits>
 
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/items/UtilityEquipmentLease.h"
+#include "gameplay/healing/HealingFlask.h"
 
 namespace
 {
@@ -407,6 +409,189 @@ void TestTorchDropInterruptsBeforeChangingOwnership()
           "a drop after attachment must interrupt at the stowed parent before world trajectory owns it");
 }
 
+void TestUtilityLeaseProvenanceAndCancellation()
+{
+    static_assert(std::is_trivially_copyable_v<UtilityEquipmentLease>);
+    for (const auto cancelTick : {0u, 1u, 9u, 18u, 36u, 54u, 74u})
+    {
+        auto sword = MakeHeldItemState(HeldItemId::Sword, HeldHand::RightHand);
+        UtilityEquipmentLease lease;
+        Check(lease.Begin(sword, 0) && lease.OwnsTransition(sword),
+              "utility owns only its fresh Stow transition");
+        const auto sequence = sword.transition.semanticEdgeSequence;
+        Check(!lease.Begin(sword, 0) && sword.transition.semanticEdgeSequence == sequence,
+              "duplicate utility admission never creates another edge");
+        for (unsigned tick = 1; tick <= cancelTick; ++tick)
+        {
+            AdvanceHeldItemTransition(sword, tick, 1.f/60.f);
+            lease.Observe(sword);
+            Check(lease.AllowsUtilityProgress(sword),
+                  "an owned Stow and completed body attachment do not self-cancel utility");
+        }
+        const auto beforeReturn = sword.transition;
+        Check(!lease.RequestReturn(sword, cancelTick, false) &&
+                  SameTransition(beforeReturn, sword.transition),
+              "cancellation cannot reclaim the sword before the hand releases the utility");
+        Check(lease.RequestReturn(sword, cancelTick, true),
+              "a released utility can return through the existing reversal/Restore path");
+        const auto returnSequence = sword.transition.semanticEdgeSequence;
+        if (sword.transition.active)
+        {
+            const auto paused = sword.transition;
+            AdvanceHeldItemTransition(sword, cancelTick+1, 1.f/60.f, true);
+            lease.Observe(sword);
+            Check(SameTransition(paused, sword.transition) && lease.OwnsTransition(sword),
+                  "pause freezes the equipment clock while preserving lease provenance");
+            Check(lease.RequestReturn(sword, cancelTick+1, true) &&
+                      sword.transition.semanticEdgeSequence == returnSequence,
+                  "repeated return intent does not restart an owned Restore");
+        }
+        for (unsigned tick = cancelTick+1; tick <= cancelTick+22; ++tick)
+        {
+            AdvanceHeldItemTransition(sword, tick, 1.f/60.f);
+            lease.Observe(sword);
+        }
+        Check(lease.Phase() == UtilityEquipmentPhase::Returned &&
+                  sword.parentMode == HeldItemParentMode::HandSocket &&
+                  !sword.transition.active && sword.visualGripBlend == 1.f &&
+                  sword.visualStowBlend == 0.f && ValidateHeldItemState(sword),
+              "early/middle/late cancellation settles the original owner without snapping readiness");
+    }
+
+    auto sword = MakeHeldItemState(HeldItemId::Sword, HeldHand::RightHand);
+    UtilityEquipmentLease lease;
+    Check(lease.Begin(sword, 0), "foreign-transition fixture begins");
+    AdvanceHeldItemTransition(sword, 1, 1.f/60.f);
+    InterruptHeldItemTransition(sword, 1);
+    RequestHeldItemTransition(sword, HeldItemTransitionKind::Stow, 2);
+    const auto foreign = sword.transition;
+    Check(!lease.OwnsTransition(sword) && !lease.RequestReturn(sword, 3, true) &&
+              lease.Phase() == UtilityEquipmentPhase::Invalidated &&
+              SameTransition(foreign, sword.transition),
+          "same-kind foreign Stow is rejected by sequence rather than borrowed or interrupted");
+    lease.Reset();
+    Check(lease.Phase() == UtilityEquipmentPhase::Idle &&
+              SameTransition(foreign, sword.transition) && sword.transition.active,
+          "lifecycle token reset does not silently reset equipment or grant readiness");
+    Check(!lease.Begin(sword, 3), "a new utility cannot adopt an existing transition");
+
+    for (auto invalid : {MakeHeldItemState(HeldItemId::OriginalTorch, HeldHand::LeftHand),
+                         MakeHeldItemState(HeldItemId::Sword, HeldHand::LeftHand),
+                         MakeHeldItemState(HeldItemId::Sword, HeldHand::RightHand,
+                                           HeldItemParentMode::WorldObject)})
+    {
+        UtilityEquipmentLease rejected;
+        Check(!rejected.Begin(invalid, 1) && rejected.Phase() == UtilityEquipmentPhase::Idle,
+              "utility cannot take left-light, wrong-hand or world ownership");
+    }
+    auto exhausted = MakeHeldItemState(HeldItemId::Sword, HeldHand::RightHand);
+    exhausted.transition.semanticEdgeSequence = std::numeric_limits<std::uint64_t>::max();
+    UtilityEquipmentLease rejected;
+    Check(!rejected.Begin(exhausted, 1) && !exhausted.transition.active,
+          "sequence exhaustion never creates an unidentifiable utility transition");
+
+    auto stowed = MakeHeldItemState(HeldItemId::Sword, HeldHand::RightHand,
+                                    HeldItemParentMode::BodyStow);
+    UtilityEquipmentLease sheathed;
+    Check(sheathed.Begin(stowed, 0) && !sheathed.OwnsTransition(stowed) &&
+              sheathed.RequestReturn(stowed, 75, true) &&
+              sheathed.Phase() == UtilityEquipmentPhase::Returned &&
+              stowed.parentMode == HeldItemParentMode::BodyStow &&
+              stowed.transition.semanticEdgeSequence == 0,
+          "a sheathed start returns sheathed without an automatic draw");
+}
+
+void TestUtilityLeaseSnapshotContinuation()
+{
+    auto sword = MakeHeldItemState(HeldItemId::Sword, HeldHand::RightHand);
+    UtilityEquipmentLease lease;
+    Check(lease.Begin(sword, 1), "utility snapshot fixture begins");
+    for (unsigned tick=1; tick<=9; ++tick)
+        AdvanceHeldItemTransition(sword,tick,1.f/60.f);
+    const auto checkpointSword = sword;
+    const auto checkpointLease = lease;
+    auto restoredSword = checkpointSword;
+    auto restoredLease = checkpointLease;
+    for (unsigned tick=10; tick<=80; ++tick)
+    {
+        if (tick==54)
+        {
+            Check(lease.RequestReturn(sword,tick,true) &&
+                      restoredLease.RequestReturn(restoredSword,tick,true),
+                  "copied owner state makes the same single return request");
+        }
+        AdvanceHeldItemTransition(sword,tick,1.f/60.f);
+        AdvanceHeldItemTransition(restoredSword,tick,1.f/60.f);
+        lease.Observe(sword); restoredLease.Observe(restoredSword);
+        Check(SameTransition(sword.transition,restoredSword.transition) &&
+                  sword.parentMode==restoredSword.parentMode &&
+                  sword.visualGripBlend==restoredSword.visualGripBlend &&
+                  sword.visualStowBlend==restoredSword.visualStowBlend &&
+                  lease.Phase()==restoredLease.Phase(),
+              "copied transient owner state continues deterministically without another clock");
+    }
+}
+
+struct UtilityClockObservation
+{
+    unsigned readyTick=0, healTick=0, charges=0;
+};
+
+UtilityClockObservation ObserveUtilityClock(const double handReturnCue,
+                                            const bool guardCompletionReadiness)
+{
+    namespace healing = horde::gameplay::healing;
+    healing::HealingFlask flask;
+    healing::FlaskContext context{2,true,false,false,false};
+    auto sword=MakeHeldItemState(HeldItemId::Sword,HeldHand::RightHand);
+    UtilityEquipmentLease lease;
+    Check(flask.BeginDrink(context) && lease.Begin(sword,1),
+          "clock composition admits utility before the first equipment advance");
+    UtilityClockObservation observation;
+    constexpr float dt=1.f/60.f;
+    for (unsigned tick=1; tick<=80; ++tick)
+    {
+        const auto before=flask.Snapshot();
+        if (before.action==healing::FlaskAction::Drinking &&
+            before.elapsedSeconds+1e-9>=handReturnCue)
+            Check(lease.RequestReturn(sword,tick,true), "hand-return cue requests owned Restore");
+        AdvanceHeldItemTransition(sword,tick,dt);
+        lease.Observe(sword);
+        const bool ready=lease.Phase()==UtilityEquipmentPhase::Returned &&
+            !sword.transition.active && sword.parentMode==HeldItemParentMode::HandSocket;
+        if (ready && observation.readyTick==0) observation.readyTick=tick;
+        const bool completionTick=before.action==healing::FlaskAction::Drinking &&
+            before.elapsedSeconds+dt+1e-9>=healing::HealingFlask::kDrinkSeconds;
+        context.drinkEligible=(!sword.transition.active || lease.OwnsTransition(sword)) &&
+            (!guardCompletionReadiness || !completionTick || ready);
+        const auto completion=flask.Step(dt,context);
+        if (completion.completed) observation.healTick=tick;
+    }
+    observation.charges=flask.Snapshot().resources.charges;
+    return observation;
+}
+
+void TestUtilityClockReadinessPrerequisite()
+{
+    // These are source-stage caller-order experiments, not production binding.
+    // The retained art returns the flask at0.89s. A proposed53/60 cue requires
+    // separately retimed/contact-reviewed hand art before it can be admitted.
+    const auto unguarded=ObserveUtilityClock(.89,false);
+    const auto guarded=ObserveUtilityClock(.89,true);
+    const auto aligned=ObserveUtilityClock(53./60.,true);
+    Check(unguarded.readyTick==76 && unguarded.healTick==75 && unguarded.charges==1,
+          "literal source cue exposes the one-tick equipment/health completion mismatch");
+    Check(guarded.readyTick==76 && guarded.healTick==0 && guarded.charges==2,
+          "readiness rejection cancels an incomplete composition without consuming a charge");
+    Check(aligned.readyTick==75 && aligned.healTick==75 && aligned.charges==1,
+          "provisional tick-aligned hand return can meet tick75 with unchanged Restore duration");
+    std::cout<<"Utility source clock: literal-ready="<<unguarded.readyTick
+             <<", literal-heal="<<unguarded.healTick
+             <<", guarded-heal="<<guarded.healTick
+             <<", proposed-ready="<<aligned.readyTick
+             <<", proposed-heal="<<aligned.healTick<<'\n';
+}
+
 } // namespace
 
 int main()
@@ -418,6 +603,9 @@ int main()
     TestDeathInterruptFreezesVisualBlendAndRestoredStateRecovers();
     TestResetAndTorchWorldOwnershipRemainSeparate();
     TestTorchDropInterruptsBeforeChangingOwnership();
+    TestUtilityLeaseProvenanceAndCancellation();
+    TestUtilityLeaseSnapshotContinuation();
+    TestUtilityClockReadinessPrerequisite();
     if (failures != 0)
     {
         std::cerr << failures << " held-item transition checks failed\n";

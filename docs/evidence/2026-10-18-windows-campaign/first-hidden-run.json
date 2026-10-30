@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "evidenceClass": "hidden native HWND commands and hardware RT swapchain; seeded saves",
+  "checks": [
+    {
+      "name": "isolated root and hidden owner",
+      "pass": true
+    },
+    {
+      "name": "entry More opens actual six-record load panel",
+      "pass": true
+    },
+    {
+      "name": "load starts paused through WM_COMMAND",
+      "pass": true
+    },
+    {
+      "name": "precommit Back retains entry game and no active slot",
+      "pass": true
+    },
+    {
+      "name": "saved lower checkpoint reaches matching fresh hardware RT present",
+      "pass": true
+    },
+    {
+      "name": "load adopts saved hearts and slot while result stays paused",
+      "pass": true
+    },
+    {
+      "name": "loaded camera and desktop input rebased without retained movement or pose",
+      "pass": true
+    },
+    {
+      "name": "actual Resume control enabled only after matching RT frame",
+      "pass": true
+    },
+    {
+      "name": "loaded RT storage image read back for inspection",
+      "pass": true
+    },
+    {
+      "name": "explicit native Resume releases loaded game",
+      "pass": true
+    },
+    {
+      "name": "pause opens actual Save panel after retained Load receipt",
+      "pass": true
+    },
+    {
+      "name": "occupied slot requires confirmation within hidden owner",
+      "pass": true
+    },
+    {
+      "name": "confirmed manual save writes chosen slot without retargeting active autosave",
+      "pass": true
+    },
+    {
+      "name": "native manual save has an actual durable readable record",
+      "pass": true
+    },
+    {
+      "name": "diagnostic encounter produces genuine combat death and actual death card",
+      "pass": false
+    },
+    {
+      "name": "foreground unchanged and owner never shown",
+      "pass": true
+    }
+  ],
+  "count": 16,
+  "failures": 1,
+  "physicalVisibleAcceptance": false,
+  "precommitCancellationPreparationHold": true,
+  "ownerSettingsReadOrWritten": false,
+  "binarySha256": "208d4305f3a2805861fd33b57c64d6f1d856c3949ce77e3839e0cadff7ac5092",
+  "classification": "Rejected diagnostic death seed: legacy encounter coordinates did not kill production waterfall guards. No death-origin acceptance on this candidate."
+}

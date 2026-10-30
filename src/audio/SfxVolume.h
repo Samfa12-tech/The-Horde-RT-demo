@@ -8,7 +8,8 @@ namespace horde::audio
 inline constexpr int kSfxVolumePercentMinimum = 0;
 inline constexpr int kSfxVolumePercentMaximum = 100;
 inline constexpr int kSfxVolumeSettingMissing = 101;
-inline constexpr float kPlayerFootstepCueGain = 0.45f;
+inline constexpr float kPlayerFootstepCueGain = 0.29f;
+inline constexpr float kWetFootstepCueGain = 1.0f;
 
 [[nodiscard]] constexpr int ClampSfxVolumePercent(const int percent) noexcept
 {

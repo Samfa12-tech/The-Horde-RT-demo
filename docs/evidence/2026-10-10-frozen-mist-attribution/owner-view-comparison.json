@@ -1,0 +1,548 @@
+{
+  "source": "f2a095fcf85520d63aebc1a48547cf4a453e97ba",
+  "family": "owner-view",
+  "frame_sha256": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+  "frames": [
+    {
+      "name": "current-midpoint-all",
+      "shadow": {
+        "mode": "current",
+        "localPrimarySamples": 1,
+        "skyPrimarySamples": 1,
+        "reserved": 0
+      },
+      "shader": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    },
+    {
+      "name": "current-midpoint-lantern",
+      "shadow": {
+        "mode": "current",
+        "localPrimarySamples": 1,
+        "skyPrimarySamples": 1,
+        "reserved": 0
+      },
+      "shader": "41ec3eea66114e1a7d2f7b1e09e1017c66c215aa39612781bbb88db67d53e975",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    },
+    {
+      "name": "current-midpoint-sky",
+      "shadow": {
+        "mode": "current",
+        "localPrimarySamples": 1,
+        "skyPrimarySamples": 1,
+        "reserved": 0
+      },
+      "shader": "81b7a1e3a58ccd5c8ca1542be767a57925908cd944ba20646b5190301409b7d7",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    },
+    {
+      "name": "current-sample-local-all",
+      "shadow": {
+        "mode": "current",
+        "localPrimarySamples": 1,
+        "skyPrimarySamples": 1,
+        "reserved": 0
+      },
+      "shader": "0603ab67ccebc408017f8be80b4b42379f02911509b5f635cc9417a8a831e82a",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    },
+    {
+      "name": "current-sample-local-lantern",
+      "shadow": {
+        "mode": "current",
+        "localPrimarySamples": 1,
+        "skyPrimarySamples": 1,
+        "reserved": 0
+      },
+      "shader": "3cd4cd0d86abc417ff893373ed600563c78267229ea31c2316e936a0ce26bf6f",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    },
+    {
+      "name": "current-sample-local-sky",
+      "shadow": {
+        "mode": "current",
+        "localPrimarySamples": 1,
+        "skyPrimarySamples": 1,
+        "reserved": 0
+      },
+      "shader": "be20163adfaa33ceb563b0580bdbe977df3b1a9d5348522ae5acf6850c098edb",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    },
+    {
+      "name": "higher-midpoint-all",
+      "shadow": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "shader": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    },
+    {
+      "name": "higher-midpoint-lantern",
+      "shadow": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "shader": "41ec3eea66114e1a7d2f7b1e09e1017c66c215aa39612781bbb88db67d53e975",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    },
+    {
+      "name": "higher-midpoint-sky",
+      "shadow": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "shader": "81b7a1e3a58ccd5c8ca1542be767a57925908cd944ba20646b5190301409b7d7",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    },
+    {
+      "name": "higher-sample-local-all",
+      "shadow": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "shader": "0603ab67ccebc408017f8be80b4b42379f02911509b5f635cc9417a8a831e82a",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    },
+    {
+      "name": "higher-sample-local-lantern",
+      "shadow": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "shader": "3cd4cd0d86abc417ff893373ed600563c78267229ea31c2316e936a0ce26bf6f",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    },
+    {
+      "name": "higher-sample-local-sky",
+      "shadow": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "shader": "be20163adfaa33ceb563b0580bdbe977df3b1a9d5348522ae5acf6850c098edb",
+      "exe": "549fd16ed6c644dc64933af5140fb282a5458956c50865d5972fd498bf64b27c"
+    }
+  ],
+  "comparisons": [
+    {
+      "pair": [
+        "current-midpoint-all",
+        "current-midpoint-sky"
+      ],
+      "changed_pixels": 1,
+      "second_brighter": 1,
+      "second_darker": 0,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "mean_abs_rgb": [
+        0.0,
+        1.0108198153030033e-06,
+        0.0
+      ]
+    },
+    {
+      "pair": [
+        "current-sample-local-all",
+        "current-sample-local-sky"
+      ],
+      "changed_pixels": 0,
+      "second_brighter": 0,
+      "second_darker": 0,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "mean_abs_rgb": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pair": [
+        "current-midpoint-lantern",
+        "current-sample-local-lantern"
+      ],
+      "changed_pixels": 0,
+      "second_brighter": 0,
+      "second_darker": 0,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "mean_abs_rgb": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pair": [
+        "current-midpoint-all",
+        "current-sample-local-all"
+      ],
+      "changed_pixels": 113776,
+      "second_brighter": 39748,
+      "second_darker": 74028,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          18
+        ],
+        [
+          0,
+          24
+        ],
+        [
+          0,
+          34
+        ]
+      ],
+      "mean_abs_rgb": [
+        0.34287715708948585,
+        0.46302926525529264,
+        0.6484692144717051
+      ]
+    },
+    {
+      "pair": [
+        "higher-midpoint-all",
+        "higher-midpoint-sky"
+      ],
+      "changed_pixels": 1,
+      "second_brighter": 1,
+      "second_darker": 0,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "mean_abs_rgb": [
+        0.0,
+        1.0108198153030033e-06,
+        0.0
+      ]
+    },
+    {
+      "pair": [
+        "higher-sample-local-all",
+        "higher-sample-local-sky"
+      ],
+      "changed_pixels": 0,
+      "second_brighter": 0,
+      "second_darker": 0,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "mean_abs_rgb": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pair": [
+        "higher-midpoint-lantern",
+        "higher-sample-local-lantern"
+      ],
+      "changed_pixels": 0,
+      "second_brighter": 0,
+      "second_darker": 0,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "mean_abs_rgb": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "pair": [
+        "higher-midpoint-all",
+        "higher-sample-local-all"
+      ],
+      "changed_pixels": 159928,
+      "second_brighter": 28234,
+      "second_darker": 131694,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          19
+        ],
+        [
+          0,
+          26
+        ],
+        [
+          0,
+          36
+        ]
+      ],
+      "mean_abs_rgb": [
+        0.5411343015639404,
+        0.7253167909301159,
+        1.0124886788180687
+      ]
+    },
+    {
+      "pair": [
+        "current-midpoint-all",
+        "higher-midpoint-all"
+      ],
+      "changed_pixels": 846609,
+      "second_brighter": 414622,
+      "second_darker": 431987,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          144
+        ],
+        [
+          0,
+          88
+        ],
+        [
+          0,
+          64
+        ]
+      ],
+      "mean_abs_rgb": [
+        5.5329618233572155,
+        5.398654194497905,
+        5.782589841665184
+      ]
+    },
+    {
+      "pair": [
+        "current-midpoint-sky",
+        "higher-midpoint-sky"
+      ],
+      "changed_pixels": 846609,
+      "second_brighter": 414622,
+      "second_darker": 431987,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          144
+        ],
+        [
+          0,
+          88
+        ],
+        [
+          0,
+          64
+        ]
+      ],
+      "mean_abs_rgb": [
+        5.5329618233572155,
+        5.398656216137536,
+        5.782589841665184
+      ]
+    },
+    {
+      "pair": [
+        "current-midpoint-lantern",
+        "higher-midpoint-lantern"
+      ],
+      "changed_pixels": 836814,
+      "second_brighter": 376301,
+      "second_darker": 460513,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          144
+        ],
+        [
+          0,
+          88
+        ],
+        [
+          0,
+          61
+        ]
+      ],
+      "mean_abs_rgb": [
+        4.414989042713202,
+        3.775139088806586,
+        3.3854377254128187
+      ]
+    },
+    {
+      "pair": [
+        "current-sample-local-all",
+        "higher-sample-local-all"
+      ],
+      "changed_pixels": 846999,
+      "second_brighter": 406132,
+      "second_darker": 440867,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          144
+        ],
+        [
+          0,
+          88
+        ],
+        [
+          0,
+          64
+        ]
+      ],
+      "mean_abs_rgb": [
+        5.572073474470734,
+        5.429023265028869,
+        5.792646488007634
+      ]
+    },
+    {
+      "pair": [
+        "current-sample-local-sky",
+        "higher-sample-local-sky"
+      ],
+      "changed_pixels": 846999,
+      "second_brighter": 406132,
+      "second_darker": 440867,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          144
+        ],
+        [
+          0,
+          88
+        ],
+        [
+          0,
+          64
+        ]
+      ],
+      "mean_abs_rgb": [
+        5.572073474470734,
+        5.429023265028869,
+        5.792646488007634
+      ]
+    },
+    {
+      "pair": [
+        "current-sample-local-lantern",
+        "higher-sample-local-lantern"
+      ],
+      "changed_pixels": 836814,
+      "second_brighter": 376301,
+      "second_darker": 460513,
+      "equal_luma_different_RGB": 0,
+      "extrema": [
+        [
+          0,
+          144
+        ],
+        [
+          0,
+          88
+        ],
+        [
+          0,
+          61
+        ]
+      ],
+      "mean_abs_rgb": [
+        4.414989042713202,
+        3.775139088806586,
+        3.3854377254128187
+      ]
+    }
+  ],
+  "caveat": "Displayed sRGB differences, not a physical shadow-strength metric. CURRENT alternates aperture source by parity; HIGHER uses source 0. Surface shading retained in every diagnostic. Owner-view is an approximation, not exact screenshot recovery."
+}

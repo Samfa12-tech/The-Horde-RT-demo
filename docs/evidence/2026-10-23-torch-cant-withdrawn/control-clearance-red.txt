@@ -1,0 +1,8 @@
+Portal cases=19392 maximum world-down carry=0.79874 m
+Maximum sampled walk/look hand step=0.0295375 m at step 197 previous z/yaw/pitch=-3.46/-0.210644/0.0560644 current=-3.47/-0.214874/0.0519433 retreat/lowering=0.189427/0.558001 -> 0.178705/0.532593
+Rag torch held/lowered residual=0.577716/0.0887203 m; lowered hand Y=-0.910606
+First horizontal Rag failure: right native witness aspect=1 pitch=-0.32 phase=0 resolved=1 mesh/flame/light/shadows/complete=0/0/0/0/0 Light=1.97041,0.81964,-4.90942
+FAIL: production anatomical Rag mesh, Flame, Light and Current/Higher shadow endpoints stay inside the complete outer route union
+Horizontal Rag calibration witness resolved=1 centre leftHandLocal=-0.184999987,-0.350947767,0.606509387
+Horizontal Rag cases=375 turnIncrementRadians=.01 maximumHandStepMetres=0.00260098 maximumLightStepMetres=0.00333319
+FAIL: both near-wall turning sweeps retain complete Rag clearance at every sampled pose

@@ -1,6 +1,8 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "scene/SkeletonRenderPose.h"
+#include "scene/TriangleDissolve.h"
+#include "gameplay/effects/KeeperCastPresentation.h"
 
 #include <algorithm>
 #include <cmath>
@@ -47,6 +49,22 @@ std::array<float, 3u> TransformPoint(const VkTransformMatrixKHR& transform,
             transform.matrix[2][2] * point[2] + transform.matrix[2][3]}};
 }
 
+std::array<float, 4u> RotationAroundX(const float radians)
+{
+    const float halfAngle = radians * 0.5f;
+    return {{std::sin(halfAngle), 0.0f, 0.0f, std::cos(halfAngle)}};
+}
+
+bool SameSkeletonBlend(const horde::scene::SkinnedClipBlend* a,
+                       const horde::scene::SkinnedClipBlend* b)
+{
+    // A validated zero-weight request is the ordinary source pose.
+    if (a && a->weight == 0.0f) a = nullptr;
+    if (b && b->weight == 0.0f) b = nullptr;
+    return (!a || !b) ? a == b :
+        a->clip == b->clip && a->timeSeconds == b->timeSeconds && a->weight == b->weight;
+}
+
 } // namespace
 
 CharacterFramePlan EvaluateCharacterFramePlan(
@@ -55,20 +73,27 @@ CharacterFramePlan EvaluateCharacterFramePlan(
     const std::size_t skeletonCount,
     const horde::gameplay::EnemyRosterSnapshot& roster,
     const horde::gameplay::LichSnapshot& lich,
-    const float skeletonDeadClipDuration)
+    const float skeletonDeadClipDuration,
+    const SkeletonPoseBlendRequests& blends)
 {
     CharacterFramePlan plan;
-    plan.selectedLich = roster.selectedEnemy == horde::gameplay::EnemyKind::Lich;
+    plan.lichVisible = roster.selectedEnemy == horde::gameplay::EnemyKind::Lich ||
+        lich.phase != horde::gameplay::LichPhase::Dormant;
+    if (lich.phase == horde::gameplay::LichPhase::Dead && lich.deathAnimationComplete &&
+        std::isfinite(lich.deathDissolveProgress)) {
+        // At most 24 additional skinned/refitted poses over the short dissolve.
+        // No extra geometry, shader variant, material or light is introduced.
+        plan.lichDissolveProgress = std::floor(std::clamp(lich.deathDissolveProgress, 0.0f, 1.0f)*24.0f)/24.0f;
+        if (lich.deathDissolveProgress >= 1.0f) plan.lichVisible = false;
+    }
     plan.lichClip = lich.phase == horde::gameplay::LichPhase::Dead
         ? horde::scene::SkinnedClip::Dead
         : horde::scene::SkinnedClip::Idle;
     plan.lichTime = lich.animationTime;
+    const auto castPose = horde::gameplay::effects::EvaluateKeeperCastPose(lich);
+    plan.lichStaffLiftRadians = castPose.staffLiftRadians;
+    plan.lichStaffCastRadians = castPose.staffCastRadians;
     plan.lichTransform = LichInstanceTransform(lich);
-    if (plan.selectedLich)
-    {
-        return plan;
-    }
-
     plan.skeletonCount = std::min<std::size_t>(skeletonCount, plan.skeletons.size());
     for (std::size_t skeletonIndex = 0u; skeletonIndex < plan.skeletonCount; ++skeletonIndex)
     {
@@ -78,6 +103,9 @@ CharacterFramePlan EvaluateCharacterFramePlan(
             horde::scene::EvaluateSkeletonRenderPose(source, skeletonDeadClipDuration);
         destination.clip = pose.clip;
         destination.time = pose.time;
+        destination.forceCurrentCombatPose = source.forceCurrentCombatPose;
+        if (blends[skeletonIndex] && blends[skeletonIndex]->weight != 0.0f)
+            destination.blend = blends[skeletonIndex];
         destination.transform = {{
             {pose.transform[0], pose.transform[1], pose.transform[2], pose.transform[3]},
             {pose.transform[4], pose.transform[5], pose.transform[6], pose.transform[7]},
@@ -86,7 +114,9 @@ CharacterFramePlan EvaluateCharacterFramePlan(
         for (std::size_t previousIndex = 0u; previousIndex < skeletonIndex; ++previousIndex)
         {
             const auto& previous = plan.skeletons[previousIndex];
-            if (destination.clip == previous.clip && std::abs(destination.time - previous.time) <= 0.0001f)
+            if (destination.clip == previous.clip && std::abs(destination.time - previous.time) <= 0.0001f &&
+                SameSkeletonBlend(destination.blend ? &*destination.blend : nullptr,
+                                  previous.blend ? &*previous.blend : nullptr))
             {
                 destination.poseBucket = previous.poseBucket;
                 break;
@@ -104,18 +134,29 @@ bool CharacterPoseNeedsRefresh(const int requestedClip,
                                const float requestedTime,
                                const int lastClip,
                                const float lastTime,
-                               const float updateInterval)
+                               const float updateInterval,
+                               const bool forceCurrentCombatPose,
+                               const horde::scene::SkinnedClipBlend* requestedBlend,
+                               const horde::scene::SkinnedClipBlend* lastBlend)
 {
-    return requestedClip != lastClip || lastTime < 0.0f || requestedTime < lastTime ||
+    return !SameSkeletonBlend(requestedBlend, lastBlend) ||
+           requestedClip != lastClip || lastTime < 0.0f || requestedTime < lastTime ||
+           (forceCurrentCombatPose && requestedTime != lastTime) ||
            (requestedTime - lastTime) >= updateInterval;
 }
 
 bool CharacterRenderSlot::LoadAssets(const std::string& skeletonAssetPath,
                                      const std::string& lichAssetPath,
                                      std::string& diagnostic,
-                                     const bool skeletonOnly)
+                                     const bool skeletonOnly,
+                                     const std::span<const horde::scene::SkinnedClipBinding> skeletonClipBindings)
 {
-    if (!skeletonModel_.LoadCombatClips(skeletonAssetPath, diagnostic))
+    // Empty bindings retain the exact ordinary four-clip path. Explicit caller
+    // bindings are copied by the shared importer; no borrowed span survives.
+    const bool loaded = skeletonClipBindings.empty()
+        ? skeletonModel_.LoadCombatClips(skeletonAssetPath, diagnostic)
+        : skeletonModel_.LoadClips(skeletonAssetPath, skeletonClipBindings, diagnostic);
+    if (!loaded)
     {
         return false;
     }
@@ -140,6 +181,7 @@ bool CharacterRenderSlot::LoadAssets(const std::string& skeletonAssetPath,
 
 bool CharacterRenderSlot::PrepareInitialGeometry(std::string& diagnostic)
 {
+    InvalidateSkeletonPoseCache();
     if (!skeletonModel_.Skin(horde::scene::SkeletonClip::Idle, 0.0f, skeletonSkinnedVertices_[0], diagnostic) ||
         skeletonSkinnedVertices_[0].empty())
     {
@@ -190,10 +232,12 @@ bool CharacterRenderSlot::CacheFramePlan(
     const std::size_t skeletonCount,
     const horde::gameplay::EnemyRosterSnapshot& roster,
     const horde::gameplay::LichSnapshot& lich,
-    std::string& diagnostic)
+    std::string& diagnostic,
+    const SkeletonPoseBlendRequests& blends)
 {
     if (skeletonOnly_ && (skeletonCount > 1u ||
-        roster.selectedEnemy != horde::gameplay::EnemyKind::Skeleton))
+        roster.selectedEnemy != horde::gameplay::EnemyKind::Skeleton ||
+        lich.phase != horde::gameplay::LichPhase::Dormant))
     {
         diagnostic = "Skeleton-only CharacterRenderSlot admits one skeleton and no lich.";
         return false;
@@ -203,8 +247,19 @@ bool CharacterRenderSlot::CacheFramePlan(
         diagnostic = "CharacterRenderSlot supports at most two active skeletons; the frame exceeded that limit.";
         return false;
     }
+    for (std::size_t i = 0; i < blends.size(); ++i)
+    {
+        if (!blends[i]) continue;
+        const auto& blend = *blends[i];
+        if (i >= skeletonCount || !std::isfinite(blend.timeSeconds) || !std::isfinite(blend.weight) ||
+            blend.weight < 0.0f || blend.weight > 1.0f || skeletonModel_.ClipDuration(blend.clip) <= 0.0f)
+        {
+            diagnostic = "Skeleton blend needs an active actor, mapped clip, finite time and weight in [0,1].";
+            return false;
+        }
+    }
     cachedFramePlan_ = EvaluateCharacterFramePlan(
-        skeletons, skeletonCount, roster, lich, skeletonDeadClipDuration_);
+        skeletons, skeletonCount, roster, lich, skeletonDeadClipDuration_, blends);
     skeletonPoseBucketCount_ = cachedFramePlan_.skeletonPoseBucketCount;
     diagnostic.clear();
     return true;
@@ -218,73 +273,120 @@ bool CharacterRenderSlot::PrepareFrame(
     const horde::gameplay::LichSnapshot& lich,
     const RtGpuResources& resources,
     std::string& diagnostic,
-    RtSceneRecordObservation* observation)
+    RtSceneRecordObservation* observation,
+    const SkeletonPoseBlendRequests& blends)
 {
-    pendingRefit_ = CharacterBlasRefit::None;
-    if (!CacheFramePlan(skeletons, skeletonCount, roster, lich, diagnostic))
+    // Host writes survive an abandoned recording or failed queue submission.
+    // Keep their refits pending until the submission owner acknowledges them.
+    if (!CacheFramePlan(skeletons, skeletonCount, roster, lich, diagnostic, blends))
     {
         return false;
     }
     const CharacterFramePlan& framePlan = cachedFramePlan_;
-    if (!framePlan.selectedLich)
+    for (std::size_t bucket = 0u; bucket < framePlan.skeletonPoseBucketCount; ++bucket)
     {
-        for (std::size_t bucket = 0u; bucket < framePlan.skeletonPoseBucketCount; ++bucket)
+        const auto representative = std::find_if(
+            framePlan.skeletons.begin(),
+            framePlan.skeletons.begin() + framePlan.skeletonCount,
+            [bucket](const SkeletonRenderPlan& skeleton) { return skeleton.poseBucket == bucket; });
+        if (representative == framePlan.skeletons.begin() + framePlan.skeletonCount)
         {
-            const auto representative = std::find_if(
-                framePlan.skeletons.begin(),
-                framePlan.skeletons.begin() + framePlan.skeletonCount,
-                [bucket](const SkeletonRenderPlan& skeleton) { return skeleton.poseBucket == bucket; });
-            if (representative == framePlan.skeletons.begin() + framePlan.skeletonCount)
-            {
-                diagnostic = "CharacterRenderSlot produced an empty skeleton pose bucket.";
-                return false;
-            }
-            const int clipIndex = static_cast<int>(representative->clip);
-            if (!CharacterPoseNeedsRefresh(clipIndex,
-                                           representative->time,
-                                           lastSkeletonClips_[bucket],
-                                           lastSkeletonUpdateTimes_[bucket]))
-            {
-                continue;
-            }
-            auto& vertices = skeletonSkinnedVertices_[bucket];
-            RtSceneStageScope skinScope(
-                observation, horde::telemetry::RtStage::CharacterSkin);
-            if (!skeletonModel_.Skin(representative->clip, representative->time, vertices, diagnostic))
-            {
-                skinScope.Cancel();
-                return false;
-            }
-            skinScope.Complete(1u);
-            const VkDeviceSize byteSize = sizeof(horde::scene::SkinnedRtVertex) * vertices.size();
-            if (!resources.WriteBuffer(skeletonGpus_[bucket].vertices,
-                                       vertices.data(),
-                                       byteSize,
-                                       bucket == 0u ? "animated skeleton pose 0 vertex" : "animated skeleton pose 1 vertex",
-                                       diagnostic,
-                                       observation))
-            {
-                return false;
-            }
-            lastSkeletonUpdateTimes_[bucket] = representative->time;
-            lastSkeletonClips_[bucket] = clipIndex;
-            pendingRefit_ = pendingRefit_ |
-                (bucket == 0u ? CharacterBlasRefit::SkeletonPose0 : CharacterBlasRefit::SkeletonPose1);
+            diagnostic = "CharacterRenderSlot produced an empty skeleton pose bucket.";
+            return false;
         }
+        const int clipIndex = static_cast<int>(representative->clip);
+        const bool forceCurrentCombatPose = std::any_of(
+            framePlan.skeletons.begin(), framePlan.skeletons.begin() + framePlan.skeletonCount,
+            [bucket](const SkeletonRenderPlan& skeleton) {
+                return skeleton.poseBucket == bucket && skeleton.forceCurrentCombatPose;
+            });
+        if (!CharacterPoseNeedsRefresh(clipIndex,
+                                       representative->time,
+                                       lastSkeletonClips_[bucket],
+                                       lastSkeletonUpdateTimes_[bucket], 1.0f / 30.0f,
+                                       forceCurrentCombatPose,
+                                       representative->blend ? &*representative->blend : nullptr,
+                                       lastSkeletonBlends_[bucket] ? &*lastSkeletonBlends_[bucket] : nullptr))
+        {
+            continue;
+        }
+        auto& vertices = skeletonSkinnedVertices_[bucket];
+        RtSceneStageScope skinScope(
+            observation, horde::telemetry::RtStage::CharacterSkin);
+        horde::scene::SkinWorkMetrics work;
+        if (!skeletonModel_.Skin(representative->clip, representative->time, vertices, diagnostic, {},
+                                 WantsSkinWorkMetrics(observation)?&work:nullptr,
+                                 representative->blend ? &*representative->blend : nullptr))
+        {
+            skinScope.Cancel();
+            return false;
+        }
+        skinScope.Complete(1u);
+        ObserveSkinWork(observation,work);
+        const VkDeviceSize byteSize = sizeof(horde::scene::SkinnedRtVertex) * vertices.size();
+        if (!resources.WriteBuffer(skeletonGpus_[bucket].vertices,
+                                   vertices.data(),
+                                   byteSize,
+                                   bucket == 0u ? "animated skeleton pose 0 vertex" : "animated skeleton pose 1 vertex",
+                                   diagnostic,
+                                   observation))
+        {
+            return false;
+        }
+        lastSkeletonUpdateTimes_[bucket] = representative->time;
+        lastSkeletonClips_[bucket] = clipIndex;
+        lastSkeletonBlends_[bucket] = representative->blend;
+        pendingRefit_ = pendingRefit_ |
+            (bucket == 0u ? CharacterBlasRefit::SkeletonPose0 : CharacterBlasRefit::SkeletonPose1);
     }
-    else
+    if(framePlan.lichVisible)
     {
         const int clipIndex = static_cast<int>(framePlan.lichClip);
-        if (CharacterPoseNeedsRefresh(clipIndex, framePlan.lichTime, lastLichClip_, lastLichUpdateTime_))
+        const bool castPoseChanged =
+            std::abs(framePlan.lichStaffLiftRadians - lastLichStaffLiftRadians_) > 0.0001f ||
+            std::abs(framePlan.lichStaffCastRadians - lastLichStaffCastRadians_) > 0.0001f;
+        if (castPoseChanged || framePlan.lichDissolveProgress != lastLichDissolveProgress_ || CharacterPoseNeedsRefresh(
+                clipIndex, framePlan.lichTime, lastLichClip_, lastLichUpdateTime_))
         {
             RtSceneStageScope skinScope(
                 observation, horde::telemetry::RtStage::CharacterSkin);
-            if (!lichModel_.SkinTextured(framePlan.lichClip, framePlan.lichTime, lichSkinnedVertices_, diagnostic))
+            horde::scene::SkinWorkMetrics work;
+            bool skinned = false;
+            if (framePlan.lichStaffLiftRadians == 0.0f && framePlan.lichStaffCastRadians == 0.0f)
+            {
+                // Keep dormant, dead, and legacy capture skins byte-identical
+                // to the authored clip path.
+                skinned = lichModel_.SkinTextured(
+                    framePlan.lichClip, framePlan.lichTime, lichSkinnedVertices_, diagnostic, {},
+                    WantsSkinWorkMetrics(observation)?&work:nullptr);
+            }
+            else
+            {
+                const float upperBodyPitch = horde::gameplay::effects::KeeperCastUpperBodyPitch(
+                    framePlan.lichStaffLiftRadians, framePlan.lichStaffCastRadians);
+                const std::array<horde::scene::SkinnedNodeRotation, 3u> castPose{{
+                    {"LeftArm", RotationAroundX(-framePlan.lichStaffLiftRadians -
+                                                  framePlan.lichStaffCastRadians)},
+                    {"LeftForeArm", RotationAroundX(-0.72f * framePlan.lichStaffLiftRadians)},
+                    {"Spine", RotationAroundX(upperBodyPitch)}}};
+                skinned = lichModel_.SkinTextured(framePlan.lichClip, framePlan.lichTime,
+                                                  lichSkinnedVertices_, diagnostic,
+                                                  std::span(castPose).first(upperBodyPitch == 0.0f ? 2u : 3u),
+                                                  WantsSkinWorkMetrics(observation)?&work:nullptr);
+            }
+            if (!skinned)
             {
                 skinScope.Cancel();
                 return false;
             }
+            if (!horde::scene::ApplyTriangleDissolve(
+                    std::span(lichSkinnedVertices_), framePlan.lichDissolveProgress)) {
+                diagnostic = "Textured character dissolve requires finite progress and a triangle stream.";
+                skinScope.Cancel();
+                return false;
+            }
             skinScope.Complete(1u);
+            ObserveSkinWork(observation,work);
             const VkDeviceSize byteSize = sizeof(horde::scene::TexturedSkinnedRtVertex) * lichSkinnedVertices_.size();
             if (!resources.WriteBuffer(lichGpu_.vertices, lichSkinnedVertices_.data(), byteSize,
                                        "animated lich vertex", diagnostic, observation) ||
@@ -294,7 +396,10 @@ bool CharacterRenderSlot::PrepareFrame(
             }
             lastLichUpdateTime_ = framePlan.lichTime;
             lastLichClip_ = clipIndex;
-            pendingRefit_ = CharacterBlasRefit::Lich;
+            lastLichStaffLiftRadians_ = framePlan.lichStaffLiftRadians;
+            lastLichStaffCastRadians_ = framePlan.lichStaffCastRadians;
+            lastLichDissolveProgress_ = framePlan.lichDissolveProgress;
+            pendingRefit_ = pendingRefit_ | CharacterBlasRefit::Lich;
         }
     }
     diagnostic.clear();
@@ -320,10 +425,10 @@ void CharacterRenderSlot::AccumulateResourceInventory(
     accumulate(lichGpu_);
 }
 
-std::array<VkAccelerationStructureInstanceKHR, CharacterRenderSlot::kMaximumActiveSkeletons>
+std::array<VkAccelerationStructureInstanceKHR, CharacterRenderSlot::kMaximumCharacterInstances>
 CharacterRenderSlot::BuildActiveInstances() const
 {
-    std::array<VkAccelerationStructureInstanceKHR, kMaximumActiveSkeletons> instances{};
+    std::array<VkAccelerationStructureInstanceKHR, kMaximumCharacterInstances> instances{};
     for (std::size_t index = 0u; index < instances.size(); ++index)
     {
         auto& instance = instances[index];
@@ -332,21 +437,11 @@ CharacterRenderSlot::BuildActiveInstances() const
             0.0f, 1.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f}};
         instance.instanceCustomIndex = index == 0u
-            ? kTlasInstanceIndex
-            : kSecondSkeletonTlasInstanceIndex;
+            ? kTlasInstanceIndex : kSecondSkeletonTlasInstanceIndex;
         instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
         instance.accelerationStructureReference = skeletonGpus_[0].accelerationStructure.address;
     }
     const CharacterFramePlan& framePlan = cachedFramePlan_;
-    if (framePlan.selectedLich)
-    {
-        instances[0].transform = framePlan.lichTransform;
-        instances[0].instanceCustomIndex = kTlasInstanceIndex;
-        instances[0].mask = 0x01u;
-        instances[0].accelerationStructureReference = lichGpu_.accelerationStructure.address;
-        return instances;
-    }
-
     for (std::size_t index = 0u; index < framePlan.skeletonCount; ++index)
     {
         const auto& plan = framePlan.skeletons[index];
@@ -358,6 +453,11 @@ CharacterRenderSlot::BuildActiveInstances() const
         instance.mask = 0x01u;
         instance.accelerationStructureReference = skeletonGpus_[plan.poseBucket].accelerationStructure.address;
     }
+    auto& keeper = instances[2];
+    keeper.instanceCustomIndex = kKeeperMetadataIndex;
+    keeper.mask = framePlan.lichVisible ? 0x01u : 0u;
+    keeper.transform = framePlan.lichTransform;
+    keeper.accelerationStructureReference = lichGpu_.accelerationStructure.address;
     return instances;
 }
 
@@ -380,9 +480,11 @@ void CharacterRenderSlot::DestroyGpuResources(const RtGpuResources& resources)
     resources.DestroyBuffer(lichGpu_.updateScratch);
     resources.DestroyBuffer(lichGpu_.vertices);
     lichGpu_ = {};
-    lastSkeletonUpdateTimes_.fill(-1.0f);
-    lastSkeletonClips_.fill(-1);
+    InvalidateSkeletonPoseCache();
     lastLichUpdateTime_ = -1.0f;
+    lastLichStaffLiftRadians_ = -1.0f;
+    lastLichStaffCastRadians_ = -1.0f;
+    lastLichDissolveProgress_ = -1.0f;
     lastLichClip_ = -1;
     pendingRefit_ = CharacterBlasRefit::None;
     skeletonPoseBucketCount_ = 0u;

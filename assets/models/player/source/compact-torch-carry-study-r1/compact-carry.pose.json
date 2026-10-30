@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "name": "compact-cross-chest-r1",
+  "status": "authoring proof, not admitted",
+  "coordinateFrame": "camera right / up / positive forward, metres; left-handed view frame",
+  "gripInView": [
+    0.4,
+    -0.2,
+    0.4
+  ],
+  "gripYInView": [
+    -0.707739127357656,
+    0.46621033277478346,
+    -0.530804345518242
+  ],
+  "mirrorX": true,
+  "intent": "Keep unscaled torch across lower chest, head toward view centre, original root/shoulders and right arm",
+  "selection": "Explicit study endpoints only; mirrored wall-side intent is not a production visibility/clearance policy",
+  "preserved": "All original meshes, bind transforms, skin weights, textures, socket offsets, camera, collision, fire and light power",
+  "sourceHashes": {
+    "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+    "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+    "assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb": "476cb05a8f11f1af917a0cfa29610cc03f23522478a366f6cf2cf49b906db74d"
+  }
+}

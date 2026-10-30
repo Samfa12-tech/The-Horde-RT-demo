@@ -1,0 +1,10 @@
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+HORDE_CHAPTER_INITIALISE begin checkpoint=chapter-niche-rect
+HORDE_CHAPTER_INITIALISE scene-ready checkpoint=chapter-niche-rect
+HORDE_CAPTURE_HOST scene-admitted
+HORDE_CAPTURE_HOST callbacks-attached
+HORDE_SHOWCASE_CAPTURE enter checkpoint=chapter-niche-rect
+HORDE_SHOWCASE_CAPTURE options-ready
+HORDE_SHOWCASE_CAPTURE directory-result=0
+HORDE_CAPTURE_OWNERSHIP_FAILURE dedicated=1 visible=1 flags=9 world_mask=144 viewmodel_mask=64 diagnostic=1
+Showcase capture failed: Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.

@@ -2,6 +2,135 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## Resource sizing within approved features - 2026-10-26
+
+Sam approved the separate world flask-upgrade instance at TLAS107, reusing the
+existing flask mesh/material/BLAS; metadata30 and the other current ceilings stay
+unchanged in this patch. The normal feature remains gated by real acceptance.
+He also clarified that routine technical capacity sizing within approved features
+is an engineering decision, supported by bounded invariants and honest memory/
+performance measurements, rather than repeated owner questions about slot numbers.
+Surface meaningful gameplay, download/memory/performance or platform trade-offs
+and genuinely new scope. This grants no spending, security change, unconstrained
+feature expansion, publication or release. Counts alone are not allocation or FPS.
+
+## Congruent distant town and future hub - 2026-10-26
+
+Sam subsequently approved keeping a representative low-detail town resident and
+measuring detailed areas and transition peaks before deciding what to stream.
+Use the same authoritative placement/scale/silhouette across1.7/1.8. Initial
+10-30k distant,+100-250k near,+60-150k interior unique-triangle targets remain
+measurement hypotheses, not guaranteed capacity, final asset freeze or permission
+to load every detailed area/actor concurrently. No scope/engine rewrite or release.
+
+Sam requires the low-cost or preloaded Bellwether visible from the1.7 vantage
+to represent the actual1.8 town, with minimal shell/layout change between
+versions. Use one authoritative placement, scale, building/landmark arrangement
+and roofline/silhouette layout; derive the distant representation from it rather
+than authoring an unrelated disposable skyline. Whether the full shell can stay
+resident is a measured resource question, not a presumed streaming requirement
+or approval to enlarge budgets.
+
+The common coordinate plan already informs r23 terrain and the current v4
+nine-mass distant shell. The coordinated R2 sheets/register are a proposed metric
+blockout under the approved regional topology, not a final production master.
+R17 is the best identified editable assembly checkpoint, with four refined
+buildings and unfinished roofs, terrain, LOD and collision. Compare those sources
+with normal v4 and settle the remaining layout details before town/terrain edits;
+do not search for or imply an already finished1.8 master. Local
+v3/v5 shell studies are not that authority (rejected footing and isolated chimney
+outlet respectively). The full low-detail world with accurately placed major
+locations remains1.7 scope; playable town/Foundry gameplay remains later work.
+Map arrows are not accepted3D sightlines. This decision does not freeze every
+terrain detail or authorize broad1.8 implementation.
+
+## Phone performance and 1.7 scope - 2026-10-26
+
+Sam explicitly clarified: sustained phone performance is ongoing measured
+optimisation, **not a release blocker and not a reason to reduce approved1.7
+scope**. Continue the intended forest, world and visual features; measure their
+cost honestly and keep experimenting with optimisations and quality options.
+There is no required sustained frame-rate target before release. This does not
+waive correctness, save integrity, crash handling, asset readiness, existing
+unapproved capacity changes or explicit publication approval. It does not claim
+performance solved or authorise a release.
+
+## Forest endpoint and completed return recovery - 2026-10-20
+
+The approved forest endpoint now uses stable checkpoint ID 3 (Forest lookout),
+with the existing format/schema/payload. Content revision 1 remains byte-exact
+and supported; revision 2 records the admitted completed forest and later safe
+lower/summit returns without resetting Kit or consumed speech. No eager record
+rewrite. The endpoint requires completed Kit movement, quiescent finished story,
+current terrain/support/standing clearance and existing reward/ascent/readiness
+proof. Exterior exploration retains the earned boundary; completed descent may
+replace it with a coherent lower safe side. See the
+[local implementation/evidence](docs/evidence/2026-10-20-forest-endpoint/README.md).
+Host/build acceptance is separate from physical exact-APK acceptance.
+
+The owner also explicitly selects **saved Mist Off on the connected phone** for
+the Keeper two-light case. This supersedes restoring that phone's former On
+choice. Other preference values and all campaign files remain preserved in the
+[corrected-APK graphics follow-up](docs/evidence/2026-10-20-graphics-followup/README.md).
+
+## Android single Apply/save flow - 2026-10-20
+
+The approved 1.7 graphics simplification replaces separate Use/Keep with one
+Apply action. It requests the complete clicked tuple and saves only after current
+serial/surface, requested/effective settings and successful hardware-RT
+presentation match, with native confirmation. Transient draft/preview edits do
+not save. Restore, Back, failure or lifecycle interruption revokes outstanding
+save intent; storage failure restores the previous saved native settings. This
+supersedes the October5 two-step confirmation UX below. Mobile fresh/reset Mist
+Off and explicit saved choices remain as directed. The
+[local checkpoint](docs/evidence/2026-10-20-graphics-single-apply/README.md) has
+build/host UI evidence; physical interaction/lifecycle acceptance remains open.
+
+## Mobile Mist Off default and bounded performance trials — 2026-10-20
+
+The owner now selects Mist Off for Android fresh-install and staged Reset Defaults
+because mist plus the two lights made the Keeper fight chuggy on the phone.
+This supersedes only the Mist On part of
+the October 5 mobile default below. Preserve all existing explicit saved choices,
+the historical accepted preset and Windows defaults. The owner's accepted 40%
+resolution is permitted for measured phone trials; it is not a silent new default.
+Fire Low, Dust Off, Current shadows and Mobile water may be compared individually
+and together using transient Debug noncombat profiles, without saving over owner
+preferences. Real Vulkan hardware RT, scene identity and honest absolute timing
+remain required. No signed release or public publication is authorized.
+
+## 1.7 scope and save retention reconciliation - 2026-10-18
+
+Three slots each retain a separate manual save and one latest autosave. Autosaving
+must never replace the manual record; no indefinite history is requested. Manual
+Save uses the supported safe-checkpoint state, not arbitrary mid-rope/combat state.
+
+The owner-approved 2026-10-30 chooser presents three primary slots, with manual
+and autosave retention kept behind the scenes. Each slot displays and loads the
+same latest valid record by its embedded UTC save-request time, formatted in the
+player's local locale/timezone. A dated tie favours manual; undated local fixtures
+use autosave when both are valid and say "Date unavailable". New writes use the
+bounded schema4 metadata extension; no file-mtime fallback or rewrite-on-read.
+Populated slots require explicit overwrite/new-game confirmation. Normal Load
+enters gameplay only after existing neutral-input and real RT presentation gates;
+interrupted post-commit recovery retains an explicit Continue when necessary.
+
+The owner's reconciled [1.7 feature checklist](docs/design/HORDE_1_7_FEATURE_STATUS_2026_10_18.md)
+supersedes earlier exploratory exclusions where explicit: small-root stepping /
+mantle and crouching are agreed directions; free jump/slide remain deferred.
+Full low-detail geography includes correctly placed terrain, major locations and
+river/lake representation, with distant Bellwether shell; playable town is 1.8.
+Kit's approved WAV voice, named configurable subtitles, hearts, licensed forest
+ambience, mobile interaction/pause fixes and deliberate tomb storytelling remain
+1.7 work. Tomb floor rubble/debris is agreed; nearby kicking is conditional on
+bounded measured cost, with static/instanced distant detail and optional detail
+controls if material. Preserve collision, readability, determinism and saves.
+
+Continue bounded tested implementation while physical owner playtesting is
+pending. Owner availability is not a blanket development stop. Exact-device,
+visual, audio and performance acceptance remain explicit gates; no release,
+public push or merge follows from this continuation authorization.
+
 ## Whole-world continuity and Bellwether capacity - 2026-10-12
 
 Sam requires 1.7 to ship the complete mapped low-detail authored world with accurately positioned major locations/objects/landmarks, continuous coarse terrain above ground and unobstructed distant landmarks including the forge. Playable scope remains tomb-to-lookout. [Canonical roadmap](docs/ROADMAP.md#17---beyond-the-tomb) and [current world/streaming/Bellwether decisions](docs/superpowers/plans/2026-10-12-horde-world-continuity-and-bellwether.md) own the requirement, open registration/roof/tomb/treasury and regional-water tasks, stable near/mid/far building contracts and safe resource lifetimes.
@@ -158,6 +287,27 @@ This candidate does not change `vkCmdTraceRaysKHR`, `rayQueryEXT`, recursion dep
 The automated `SM-S948B` requirements passed on 2026-08-12 for exact clean commit `b3428a7`: matched cooled lich A/B was 19.497 ms enabled / 19.268 ms disabled, all six 75% checkpoints stayed below 20 ms, 100% opening was reported separately, and replay, 13 captures, and Home/resume passed. The owner then reported that hands-on play on the still-installed exact candidate “feels fine,” closing the broad two-enemy promotion boundary without independently certifying every positional-audio or haptic cue.
 
 ## Animation-owned combat and timed-parry decision - 2026-08-13
+
+25 October later owner approval supersedes the initial 1.7 half-damage guard
+rule below: eligible normal frontal attacks are fully blockable, yellow special
+attacks break held guard but remain parryable, and red attacks require avoidance.
+The [shared rule/four-skill checkpoint](docs/evidence/2026-10-25-four-skill-practice/README.md)
+implements normal full block and tests the special policy, but new yellow
+attacks stay OFF until their required enemy-anchored RT warning is admitted.
+Four actual practice outcomes lead to protected Ready and an explicit safe
+Finish/Skip boundary; a confirmed earned restore grants no pretend skills.
+Timed-parry/dodge windows, accepted guard/attack joins, health maximum and old
+fractional-save support remain unchanged. Audio/haptic and phone balance
+acceptance remain open. The earlier paragraph retains its historical snapshot.
+
+The25October2026approved1.7 [held-guard extension](docs/evidence/2026-10-25-held-guard/README.md)
+adds a continuous defensive hold after the existing timed window. It does not
+replace the historical parry timing or successful benefit below. Guard halves
+frontal blockable skeleton damage exactly, red/rear contacts remain full, attack
+ends protection and retains recovery before held return. No held repeat creates
+a parry window. Half-heart HUD/save representation preserves maximum3hearts and
+schema1bytes; schema2carries a canonical fractional flag. Physical feel/balance,
+the local storage-execution blocker and exact-head CI remain separate gates.
 
 Player swing, parry, skeleton strike, and stagger timing belong to the shared fixed-step gameplay authority. Player swing uses wind-up/active/recovery boundaries `0-0.18 / 0.18-0.34 / 0.34-0.56 s`; skeleton melee uses `0-1.12 / 1.12-1.30 / 1.30-2.80 s`. Damage resolves once at visible active contact. The lich consumes the same player active-window range/cone contact pulse while retaining three health, its two-second accepted-hit lockout, recoil, cries, death, and finale.
 
@@ -411,3 +561,44 @@ the same pair and location even when the selected encounter is the Keeper.
 Legacy default-config capture fixtures retain their historical behavior. Host
 route/Keeper/reward and frozen RT checkpoint evidence pass; current moving and
 phone acceptance remain separate. No new enemies, health rules or adventure scope.
+
+## Full outdoor music through shared Core - 2026-10-23
+
+Owner direction preserves one shared music system and the approved full outdoor
+arrangement rather than dividing it to satisfy the first score's 12-second cap.
+Use the full main only with existing smooth dialogue ducking. The separately
+balanced quiet mix remains a source/reference until actual listening warrants
+its runtime cost; it is not required for ordinary volume ducking.
+
+Canonical Pocket Chordsmith commit b77a9d0bfe3051c6e352815295164b9b80586f56
+provides reviewed frame/byte/aggregate admission limits with legacy defaults
+preserved. Horde re-vendors that exact native subset and opts in only for the
+5,120,000-frame main and exact 40,640,000-byte mixed bank. Chapter outdoors uses a
+separate cue; tomb/dawn policy, sample-clock lifecycle and saved volume remain.
+No synth, new codec or disk-streaming path is introduced. Package source
+exclusion, download size, live PCM residency and loading peak are separate
+measurements. Listening with Kit and warmed-phone acceptance remain open.
+
+
+## Bounded crowns, flask proposal and effects scope — 2026-10-24
+
+Sam replied “Yes” directly to the three recommendations at 21:10:41 UTC (trusted parent delegation, `Sentinel_e4691101c80081919a5706c390214030`). Authorize one owned editable pine/alder crown study, preserving trunks, roots and placements, with small-sample review before broader replacement. This does not admit the private Easy Tree prototype. Keep the refillable/upgradeable flask in 1.7; its complete healing/refill/use/death/load/migration policy must be approved before implementation. Numeric parameters and new upgrade content remain recommendations.
+
+Prioritize measured chimney smoke with Windows High/mobile Low. Explicitly defer new outdoor participating mist, shafts, fireflies and visual wind for initial 1.7. Existing effects and explicit user preferences remain unchanged, with Android fresh/reset Mist OFF and desktop defaults preserved. No assumed extra GPU budget, paid generation, broad framework, phone use, merge or release. See the [current decision sheet](docs/design/HORDE_1_7_OWNER_DECISIONS_2026_10_24.md) and [flask proposal](docs/design/HORDE_1_7_FLASK_POLICY_PROPOSAL_2026_10_24.md).
+
+## Joint attack-ring and flask resource implementation - 2026-10-26
+
+Sam replied "yes" (`Sentinel_d422ddba5e2c8191bb230909a3cd7e7f`) to the bounded
+joint implementation/evaluation recommendation (`Sentinel_24da819eed7c819185d572948660b6d7`),
+as relayed by the trusted parent delegation. Append ring owner28 and flask29;
+preserve owners0-27 and forest metadata26/27. Approved ceilings are ordinary
+definitions/metadata28→30, static assets13→15, primitives36→38, materials32→34,
+TLAS104→106, and ordinary/shared BLAS21/23→23/25.
+
+Implement and test the [joint layout](docs/design/HORDE_1_7_JOINT_RING_FLASK_ADMISSION_2026_10_26.md)
+within the existing shared RT/static-PBR architecture. Preserve record layouts,
+bindings, texture layers18, lights, fire4, one frame in flight and approved
+gameplay rules. Both features stay gated/OFF in normal play until asset, visual,
+lifecycle and gameplay checks pass. Resource counts are not measured GPU
+allocation or FPS evidence. No wider capacity increase, paid signing, security
+change, publication, merge or release follows from this approval.

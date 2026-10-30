@@ -1,0 +1,61 @@
+{
+  "scope": "Retained failed source witnesses, not production defects",
+  "shortNeck": {
+    "scope": "Four source samples of selected head materials only; not full swept/native collision or acceptance",
+    "samples": [
+      {
+        "frame": 31,
+        "headFlaskTriangleOverlaps": 0,
+        "headGauntletTriangleOverlaps": 27,
+        "lipNearestHeadDistanceMetres": 0.008575809188187122
+      },
+      {
+        "frame": 34,
+        "headFlaskTriangleOverlaps": 16,
+        "headGauntletTriangleOverlaps": 120,
+        "lipNearestHeadDistanceMetres": 0.005999961867928505
+      },
+      {
+        "frame": 37,
+        "headFlaskTriangleOverlaps": 16,
+        "headGauntletTriangleOverlaps": 120,
+        "lipNearestHeadDistanceMetres": 0.005999961867928505
+      },
+      {
+        "frame": 43,
+        "headFlaskTriangleOverlaps": 16,
+        "headGauntletTriangleOverlaps": 120,
+        "lipNearestHeadDistanceMetres": 0.005999961867928505
+      }
+    ]
+  },
+  "longNeckStraightApproach": {
+    "scope": "Four source samples of selected head materials only; not full swept/native collision or acceptance",
+    "samples": [
+      {
+        "frame": 31,
+        "headFlaskTriangleOverlaps": 0,
+        "headGauntletTriangleOverlaps": 0,
+        "lipNearestHeadDistanceMetres": 0.01005147397518158
+      },
+      {
+        "frame": 34,
+        "headFlaskTriangleOverlaps": 16,
+        "headGauntletTriangleOverlaps": 13,
+        "lipNearestHeadDistanceMetres": 0.005999999586492777
+      },
+      {
+        "frame": 37,
+        "headFlaskTriangleOverlaps": 16,
+        "headGauntletTriangleOverlaps": 13,
+        "lipNearestHeadDistanceMetres": 0.005999999586492777
+      },
+      {
+        "frame": 43,
+        "headFlaskTriangleOverlaps": 16,
+        "headGauntletTriangleOverlaps": 13,
+        "lipNearestHeadDistanceMetres": 0.005999999586492777
+      }
+    ]
+  }
+}

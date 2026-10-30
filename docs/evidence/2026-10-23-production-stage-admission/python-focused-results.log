@@ -1,0 +1,11 @@
+# Verbatim test names and summary lines from corrected completed tool result.
+test_explicit_outdoor_hold_preserves_legacy_scale_policy (test_android_motion_present_timing.AndroidMotionPresentTimingTests.test_explicit_outdoor_hold_preserves_legacy_scale_policy) ... ok
+test_outdoor_hold_metadata_and_final_owner_remain_required (test_android_motion_present_timing.AndroidMotionPresentTimingTests.test_outdoor_hold_metadata_and_final_owner_remain_required) ... ok
+Ran 18 tests in 0.028s
+OK
+
+test_explicit_outdoor_uses_owner_wall_window_and_actual_phase (test_android_rt_stage_profile.StageJoinTests.test_explicit_outdoor_uses_owner_wall_window_and_actual_phase) ... ok
+test_outdoor_never_omits_warmup_or_final_failures (test_android_rt_stage_profile.StageJoinTests.test_outdoor_never_omits_warmup_or_final_failures) ... ok
+Ran 7 tests in 0.034s
+OK
+

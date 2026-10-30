@@ -1,0 +1,1560 @@
+{
+  "schema": "horde.collapse-form-authoring.v1",
+  "revision": 2,
+  "function": "approved",
+  "form": "pending-owner-review",
+  "runtime": "not-exported-not-validated",
+  "sourceTriangles": 66122,
+  "totalTrianglesIncludingStructuralContext": 8302,
+  "geometry": [
+    {
+      "name": "Original rear substrate - real cut opening",
+      "role": "structure",
+      "triangles": 434,
+      "boundsHorde": [
+        [
+          -1.9199999570846558,
+          -0.9900000095367432,
+          3.4000000953674316
+        ],
+        [
+          1.9199999570846558,
+          1.4200000762939453,
+          3.6599998474121094
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Closed cave-in side envelope left",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          1.350000023841858,
+          2.9200000762939453
+        ],
+        [
+          -1.850000023841858,
+          1.9800000190734863,
+          3.680000066757202
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Rising full-width stairwell left",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          -1.100000023841858,
+          3.6600000858306885
+        ],
+        [
+          -1.850000023841858,
+          1.9500000476837158,
+          4.78000020980835
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Upper stairwell left",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          -1.100000023841858,
+          4.78000020980835
+        ],
+        [
+          -1.850000023841858,
+          4.559999942779541,
+          8.140000343322754
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Closed cave-in side envelope right",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          1.850000023841858,
+          1.350000023841858,
+          2.9200000762939453
+        ],
+        [
+          2.0,
+          1.9800000190734863,
+          3.680000066757202
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Rising full-width stairwell right",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          1.850000023841858,
+          -1.100000023841858,
+          3.6600000858306885
+        ],
+        [
+          2.0,
+          1.9500000476837158,
+          4.78000020980835
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Upper stairwell right",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          1.850000023841858,
+          -1.100000023841858,
+          4.78000020980835
+        ],
+        [
+          2.0,
+          4.559999942779541,
+          8.140000343322754
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Rising enclosure over collapse",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          1.600000023841858,
+          2.9200000762939453
+        ],
+        [
+          2.0,
+          1.9800000190734863,
+          4.78000020980835
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Ascending roof beyond visible flight",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          1.7999999523162842,
+          4.78000020980835
+        ],
+        [
+          2.0,
+          4.559999942779541,
+          8.140000343322754
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Upper turn landing",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          -1.0999999046325684,
+          8.139999389648438
+        ],
+        [
+          2.0,
+          2.7100000381469727,
+          11.84000015258789
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Upper turn west wall",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          -1.0999999046325684,
+          8.139999389648438
+        ],
+        [
+          -1.8499999046325684,
+          4.559999942779541,
+          11.989999771118164
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Upper turn north wall",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          -1.0999999046325684,
+          11.84000015258789
+        ],
+        [
+          2.0,
+          4.559999942779541,
+          11.989999771118164
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Upper turn landing roof",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          4.360000133514404,
+          8.139999389648438
+        ],
+        [
+          1.8499999046325684,
+          4.559999942779541,
+          11.989999771118164
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair upper east tread 13",
+      "role": "stair",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          1.850000023841858,
+          -1.1000001430511475,
+          8.139999389648438
+        ],
+        [
+          2.130000114440918,
+          2.950000047683716,
+          11.84000015258789
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair upper east tread 14",
+      "role": "stair",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          2.129999876022339,
+          -1.100000023841858,
+          8.139999389648438
+        ],
+        [
+          2.4100000858306885,
+          3.190000057220459,
+          11.84000015258789
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair upper east tread 15",
+      "role": "stair",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          2.4099998474121094,
+          -1.1000001430511475,
+          8.139999389648438
+        ],
+        [
+          2.690000057220459,
+          3.430000066757202,
+          11.84000015258789
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair upper east tread 16",
+      "role": "stair",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          2.68999981880188,
+          -1.100000023841858,
+          8.139999389648438
+        ],
+        [
+          2.9700000286102295,
+          3.6700000762939453,
+          11.84000015258789
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair upper east tread 17",
+      "role": "stair",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          2.9699997901916504,
+          -1.1000001430511475,
+          8.139999389648438
+        ],
+        [
+          3.25,
+          3.9100000858306885,
+          11.84000015258789
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair upper east tread 18",
+      "role": "stair",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          3.25,
+          -1.100000023841858,
+          8.139999389648438
+        ],
+        [
+          3.5300002098083496,
+          4.150000095367432,
+          11.84000015258789
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Upper east front wall",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          1.850000023841858,
+          -1.100000023841858,
+          7.990000247955322
+        ],
+        [
+          3.5299999713897705,
+          6.0,
+          8.140000343322754
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Upper east rear wall",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          1.850000023841858,
+          -1.100000023841858,
+          11.84000015258789
+        ],
+        [
+          3.5299999713897705,
+          6.0,
+          11.989999771118164
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Upper east ascending roof",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          1.850000023841858,
+          4.360000133514404,
+          7.990000247955322
+        ],
+        [
+          3.5299999713897705,
+          6.0,
+          11.989999771118164
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Return landing",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          3.5300002098083496,
+          -1.100000023841858,
+          6.940000534057617
+        ],
+        [
+          7.230000019073486,
+          4.150000095367432,
+          11.84000015258789
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Return east wall",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          7.230000019073486,
+          -1.0999999046325684,
+          6.7900004386901855
+        ],
+        [
+          7.37999963760376,
+          6.0,
+          11.989999771118164
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Return north wall",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          3.5299999713897705,
+          -1.0999999046325684,
+          11.84000015258789
+        ],
+        [
+          7.380000114440918,
+          6.0,
+          11.989999771118164
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Return west reveal",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          3.379999876022339,
+          -1.0999999046325684,
+          6.789999961853027
+        ],
+        [
+          3.5299999713897705,
+          6.0,
+          8.140000343322754
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Return enclosure roof",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          3.5299999713897705,
+          5.800000190734863,
+          6.7900004386901855
+        ],
+        [
+          7.380000114440918,
+          6.0,
+          11.989999771118164
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Remote physical seal - visibility forbidden",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          3.5300002098083496,
+          -1.0999999046325684,
+          6.789999961853027
+        ],
+        [
+          7.230000019073486,
+          6.0,
+          6.939999580383301
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Continuous solid floor",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -1.9199999570846558,
+          -1.100000023841858,
+          -6.400000095367432
+        ],
+        [
+          1.9199999570846558,
+          -0.949999988079071,
+          10.199999809265137
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Existing chamber left",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          -1.0999999046325684,
+          -6.400000095367432
+        ],
+        [
+          -1.8499999046325684,
+          1.5,
+          3.6600003242492676
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Existing chamber right",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          1.8499999046325684,
+          -1.0999999046325684,
+          -6.400000095367432
+        ],
+        [
+          2.0,
+          1.5,
+          3.6600003242492676
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Existing chamber roof",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          1.3499999046325684,
+          -6.400000095367432
+        ],
+        [
+          2.0,
+          1.5,
+          2.940000057220459
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 1",
+      "role": "stair",
+      "triangles": 44,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.9500000476837158,
+          4.78000020980835
+        ],
+        [
+          1.850000023841858,
+          0.2800000011920929,
+          5.059999942779541
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 2",
+      "role": "stair",
+      "triangles": 44,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.9500000476837158,
+          5.059999942779541
+        ],
+        [
+          1.850000023841858,
+          0.49000000953674316,
+          5.339999675750732
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 3",
+      "role": "stair",
+      "triangles": 44,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.949999988079071,
+          5.340000152587891
+        ],
+        [
+          1.850000023841858,
+          0.699999988079071,
+          5.619999885559082
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 4",
+      "role": "stair",
+      "triangles": 44,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.949999988079071,
+          5.62000036239624
+        ],
+        [
+          1.850000023841858,
+          0.9100000262260437,
+          5.900000095367432
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 5",
+      "role": "stair",
+      "triangles": 44,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.949999988079071,
+          5.900000095367432
+        ],
+        [
+          1.850000023841858,
+          1.1200000047683716,
+          6.179999828338623
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 6",
+      "role": "stair",
+      "triangles": 44,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.949999988079071,
+          6.180000305175781
+        ],
+        [
+          1.850000023841858,
+          1.3299999237060547,
+          6.460000038146973
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 7",
+      "role": "stair",
+      "triangles": 44,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.9500000476837158,
+          6.460000038146973
+        ],
+        [
+          1.850000023841858,
+          1.5399999618530273,
+          6.739999771118164
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 8",
+      "role": "stair",
+      "triangles": 44,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.9500000476837158,
+          6.740000247955322
+        ],
+        [
+          1.850000023841858,
+          1.75,
+          7.019999980926514
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 9",
+      "role": "stair",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.9500000476837158,
+          7.019999980926514
+        ],
+        [
+          1.850000023841858,
+          1.9900000095367432,
+          7.299999713897705
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 10",
+      "role": "stair",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.9500000476837158,
+          7.300000190734863
+        ],
+        [
+          1.850000023841858,
+          2.2300000190734863,
+          7.579999923706055
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 11",
+      "role": "stair",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.9500000476837158,
+          7.579999923706055
+        ],
+        [
+          1.850000023841858,
+          2.4700000286102295,
+          7.859999656677246
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Stair remnant tread 12",
+      "role": "stair",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -1.850000023841858,
+          -0.9500000476837158,
+          7.860000133514404
+        ],
+        [
+          1.850000023841858,
+          2.7100000381469727,
+          8.140000343322754
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "dominant-left",
+      "role": "collapse",
+      "triangles": 2374,
+      "boundsHorde": [
+        [
+          -1.867156982421875,
+          -0.9519999623298645,
+          3.507967948913574
+        ],
+        [
+          -0.134657084941864,
+          0.30963021516799927,
+          4.66757869720459
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "dominant-right",
+      "role": "collapse",
+      "triangles": 2326,
+      "boundsHorde": [
+        [
+          -0.12091052532196045,
+          -0.9519999623298645,
+          3.8075695037841797
+        ],
+        [
+          1.3511500358581543,
+          0.10400015115737915,
+          4.9091997146606445
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "upper-interlocked",
+      "role": "collapse",
+      "triangles": 2174,
+      "boundsHorde": [
+        [
+          -0.47279655933380127,
+          -0.20000000298023224,
+          4.074795722961426
+        ],
+        [
+          0.4347034692764282,
+          0.6979586482048035,
+          4.759195804595947
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "tilted-lintel",
+      "role": "collapse",
+      "triangles": 78,
+      "boundsHorde": [
+        [
+          -0.45969003438949585,
+          -0.46400004625320435,
+          3.56727933883667
+        ],
+        [
+          1.205297827720642,
+          0.1624123752117157,
+          4.289278507232666
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "fallen-left",
+      "role": "collapse",
+      "triangles": 44,
+      "boundsHorde": [
+        [
+          -1.615155577659607,
+          -0.9520000219345093,
+          3.4019999504089355
+        ],
+        [
+          -0.9926392436027527,
+          -0.4860824942588806,
+          3.98055362701416
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0.12127690505981459
+    },
+    {
+      "name": "fallen-right",
+      "role": "collapse",
+      "triangles": 44,
+      "boundsHorde": [
+        [
+          0.8360919952392578,
+          -0.9520000219345093,
+          3.4094111919403076
+        ],
+        [
+          1.5783419609069824,
+          -0.4860824942588806,
+          4.008120059967041
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "masonry-interlock",
+      "role": "collapse",
+      "triangles": 36,
+      "boundsHorde": [
+        [
+          -0.42295998334884644,
+          0.33000001311302185,
+          3.768442392349243
+        ],
+        [
+          0.23098161816596985,
+          0.6983218193054199,
+          4.308685779571533
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Supported fractured roof shoulder left",
+      "role": "structure",
+      "triangles": 12,
+      "boundsHorde": [
+        [
+          -2.0,
+          1.2425107955932617,
+          2.9200000762939453
+        ],
+        [
+          -1.620856523513794,
+          1.4900000095367432,
+          4.559999942779541
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    },
+    {
+      "name": "Supported fractured roof shoulder right",
+      "role": "structure",
+      "triangles": 8,
+      "boundsHorde": [
+        [
+          1.5980100631713867,
+          1.2334175109863281,
+          2.9200000762939453
+        ],
+        [
+          2.0,
+          1.4900000095367432,
+          4.370369911193848
+        ]
+      ],
+      "closedManifold": true,
+      "uv": true,
+      "studyDepthCorrectionMeters": 0
+    }
+  ],
+  "supportChecks": [
+    {
+      "object": "upper-interlocked",
+      "support_meshes": [
+        "dominant-right"
+      ],
+      "intersects_real_support": true,
+      "gravitySettlementMeters": 0
+    },
+    {
+      "object": "tilted-lintel",
+      "support_meshes": [
+        "dominant-left",
+        "upper-interlocked"
+      ],
+      "intersects_real_support": true,
+      "gravitySettlementMeters": 0
+    },
+    {
+      "object": "tilted-lintel right fracture",
+      "support_meshes": [
+        "dominant-right"
+      ],
+      "intersects_real_support": true,
+      "gravitySettlementMeters": 0.044000000000000025
+    },
+    {
+      "object": "masonry-interlock",
+      "support_meshes": [
+        "upper-interlocked"
+      ],
+      "intersects_real_support": true,
+      "gravitySettlementMeters": 0
+    }
+  ],
+  "floorContacts": [
+    {
+      "object": "dominant-left",
+      "planarFootAreaSquareMeters": 0.6709453367473799,
+      "floorInsetMeters": 0.0019999623298645464
+    },
+    {
+      "object": "dominant-right",
+      "planarFootAreaSquareMeters": 0.5635068101929154,
+      "floorInsetMeters": 0.0019999623298645464
+    }
+  ],
+  "roofSupportChecks": [
+    {
+      "object": "Supported fractured roof shoulder left",
+      "structuralSupports": [
+        "Rising full-width stairwell left",
+        "Existing chamber left"
+      ],
+      "intersectsRealSupport": true
+    },
+    {
+      "object": "Supported fractured roof shoulder right",
+      "structuralSupports": [
+        "Rising full-width stairwell right",
+        "Existing chamber right"
+      ],
+      "intersectsRealSupport": true
+    }
+  ],
+  "physicalEnclosureFrustumChecks": [
+    {
+      "view": "production",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 9216,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 35,
+      "failedRayDetails": []
+    },
+    {
+      "view": "neutral",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 9216,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 35,
+      "failedRayDetails": []
+    },
+    {
+      "view": "contact",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 9216,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 40,
+      "failedRayDetails": []
+    },
+    {
+      "view": "support",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 7661,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 180,
+      "failedRayDetails": []
+    },
+    {
+      "view": "opening-left",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 6316,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 1067,
+      "failedRayDetails": []
+    },
+    {
+      "view": "opening-right",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 6316,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 1142,
+      "failedRayDetails": []
+    },
+    {
+      "view": "wide-left",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 8184,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 1996,
+      "failedRayDetails": []
+    },
+    {
+      "view": "wide-right",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 8184,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 1998,
+      "failedRayDetails": []
+    },
+    {
+      "view": "ceiling",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 4550,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 3854,
+      "failedRayDetails": []
+    },
+    {
+      "view": "ceiling-left",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 7585,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 1778,
+      "failedRayDetails": []
+    },
+    {
+      "view": "ceiling-right",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 7585,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 1732,
+      "failedRayDetails": []
+    },
+    {
+      "view": "stairs-oblique",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 9216,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 1122,
+      "failedRayDetails": []
+    },
+    {
+      "view": "near-cap-upward",
+      "sampleGrid": [
+        128,
+        72
+      ],
+      "rearwardRays": 9216,
+      "worldBoundaryMisses": 0,
+      "visibleRemoteSealSamples": 0,
+      "physicalRoofHits": 3978,
+      "failedRayDetails": []
+    }
+  ],
+  "productionRiserVisibility": [
+    {
+      "tread": 1,
+      "visibleRiserSamples": 0,
+      "samples": 3
+    },
+    {
+      "tread": 2,
+      "visibleRiserSamples": 0,
+      "samples": 3
+    },
+    {
+      "tread": 3,
+      "visibleRiserSamples": 1,
+      "samples": 3
+    },
+    {
+      "tread": 4,
+      "visibleRiserSamples": 3,
+      "samples": 3
+    },
+    {
+      "tread": 5,
+      "visibleRiserSamples": 3,
+      "samples": 3
+    },
+    {
+      "tread": 6,
+      "visibleRiserSamples": 3,
+      "samples": 3
+    },
+    {
+      "tread": 7,
+      "visibleRiserSamples": 3,
+      "samples": 3
+    },
+    {
+      "tread": 8,
+      "visibleRiserSamples": 3,
+      "samples": 3
+    },
+    {
+      "tread": 9,
+      "visibleRiserSamples": 3,
+      "samples": 3
+    },
+    {
+      "tread": 10,
+      "visibleRiserSamples": 3,
+      "samples": 3
+    },
+    {
+      "tread": 11,
+      "visibleRiserSamples": 3,
+      "samples": 3
+    },
+    {
+      "tread": 12,
+      "visibleRiserSamples": 3,
+      "samples": 3
+    }
+  ],
+  "unsharedVertexIndexPrimitiveBytesUpperBound": 1826440,
+  "gpuMemoryDisclosure": "Upper bound uses current64Bvertex/4Bindex/16Bprimitive records; excludes unmeasured BLAS/TLAS and textures, no runtime asset admitted",
+  "textureImages": [
+    {
+      "name": "arm.jpg",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "packed": true
+    },
+    {
+      "name": "arm.jpg.001",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "packed": true
+    },
+    {
+      "name": "boulder_01_arm_1k.jpg",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "packed": true
+    },
+    {
+      "name": "boulder_01_diff_1k.jpg",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "packed": true
+    },
+    {
+      "name": "boulder_01_nor_gl_1k.jpg",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "packed": true
+    },
+    {
+      "name": "diff.jpg",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "packed": true
+    },
+    {
+      "name": "diff.jpg.001",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "packed": true
+    },
+    {
+      "name": "normal.jpg",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "packed": true
+    },
+    {
+      "name": "normal.jpg.001",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "packed": true
+    }
+  ],
+  "newSharedTextureFamily": "Poly Haven Boulder 01 1K CC0",
+  "retainedExistingFamilies": [
+    "MedievalWall02",
+    "CobblestoneFloor08"
+  ],
+  "inspectionLightsOnly": true,
+  "nativeLightingModified": false,
+  "lightingBaked": false,
+  "productionReviewLight": {
+    "sharedCpuTorchPositionHorde": [
+      0.159999937,
+      0.806602836,
+      2.310449123
+    ],
+    "powerWatts": 75,
+    "color": [
+      1,
+      0.47,
+      0.16
+    ],
+    "sourceRadiusMeters": 0.045,
+    "exactNativeLighting": false
+  },
+  "cpuRenderer": {
+    "engine": "Cycles",
+    "device": "CPU",
+    "threads": 2,
+    "samples": 20
+  },
+  "productionCameraHorde": {
+    "position": [
+      0,
+      0.7,
+      1.85
+    ],
+    "target": [
+      0,
+      0.25,
+      4.4
+    ],
+    "verticalFovDegrees": 60,
+    "viewport": [
+      960,
+      540
+    ]
+  },
+  "sealedBackingFrontZ": 6.790000000000001,
+  "sealedTerminalBounds": [
+    [
+      3.5300002098083496,
+      -1.0999999046325684,
+      6.789999961853027
+    ],
+    [
+      7.230000019073486,
+      6.0,
+      6.939999580383301
+    ]
+  ],
+  "unchangedCollisionCapZ": 3.4,
+  "stairDepthRange": [
+    4.78,
+    11.84
+  ],
+  "upperReturn": true,
+  "stairWidthMeters": 3.7,
+  "stairCount": 18,
+  "lowerRiseRunMeters": [
+    0.21,
+    0.28
+  ],
+  "upperRiseRunMeters": [
+    0.24,
+    0.28
+  ],
+  "ownerSteeringOverridesOldRecess": true,
+  "renderedViews": [],
+  "cutawayDisclosure": "overhead-cutaway hides roof meshes for inspection only",
+  "provenance": {
+    "asset": "Boulder 01",
+    "license": "CC0 1.0",
+    "receipt": "../download-receipt.json",
+    "licenseSnapshot": "../polyhaven-license.html",
+    "verifiedSourceFiles": [
+      {
+        "path": "boulder_01_1k.gltf",
+        "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/boulder_01/boulder_01_1k.gltf",
+        "bytes": 2773,
+        "md5": "26e2eef4a1f68c9557c65cd375b21d6c",
+        "sha256": "51487934db898b4c24072780a451e34eca5c02e3ada24a62bbc600bbc4019e92"
+      },
+      {
+        "path": "textures/boulder_01_arm_1k.jpg",
+        "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/boulder_01/boulder_01_arm_1k.jpg",
+        "bytes": 659386,
+        "md5": "d632159982cc3121ed3d69b89a122146",
+        "sha256": "c57187c5746b6be913fa53846cb44ff78743e7ca5000f131c9627b99563c2b87"
+      },
+      {
+        "path": "textures/boulder_01_diff_1k.jpg",
+        "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/boulder_01/boulder_01_diff_1k.jpg",
+        "bytes": 987467,
+        "md5": "25f8a843f13369d56d37f49db05ea8c3",
+        "sha256": "c38f0e918f6dc16b8d386ba3cdd89805c78320c119a1ceec85856f82b09a65b8"
+      },
+      {
+        "path": "boulder_01.bin",
+        "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/boulder_01/boulder_01.bin",
+        "bytes": 2938808,
+        "md5": "27a19fa031d8b4c3a09261f19c444dc5",
+        "sha256": "7f5b06503d62bd95bfe9c6b8a354a5cc8ff04a4d271a8cf87a3e3125db4232d7"
+      },
+      {
+        "path": "textures/boulder_01_nor_gl_1k.jpg",
+        "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/boulder_01/boulder_01_nor_gl_1k.jpg",
+        "bytes": 1183552,
+        "md5": "0c4da644d901144b53e4fe2446f3c389",
+        "sha256": "0810cf6e89d89bb6eb065b4d2e2855288f5dcbd2c15c6e40ab90d462021b50aa"
+      }
+    ]
+  },
+  "acceptanceGaps": [
+    "Owner Form approval",
+    "Chapter derivative owner/native acceptance pending",
+    "Native RT visual/asset-resource validation",
+    "Owner/device acceptance"
+  ],
+  "blendSha256": "cba42d8a06c3d09c35c18dc1586d2bd4c09d440ab9e68575a34cc1f0a78a6f19"
+}

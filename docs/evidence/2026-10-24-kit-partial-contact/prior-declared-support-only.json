@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "evidenceClass": "120 Hz native grounded PBR sole measurement; not automatic contact admission",
+  "runs": [
+    {
+      "direction": "left",
+      "degrees": 0,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxSupportHorizontalDriftM": 0,
+      "maxSupportMeanDriftM": 0,
+      "maxSupportHeightErrorM": 0
+    },
+    {
+      "direction": "left",
+      "degrees": 2,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxSupportHorizontalDriftM": 0.000938633108,
+      "maxSupportMeanDriftM": 0.000807866571,
+      "maxSupportHeightErrorM": 0.000269266078
+    },
+    {
+      "direction": "left",
+      "degrees": 10,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxSupportHorizontalDriftM": 0.0039930623,
+      "maxSupportMeanDriftM": 0.00328759803,
+      "maxSupportHeightErrorM": 0.00098884746
+    },
+    {
+      "direction": "left",
+      "degrees": 22.5,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxSupportHorizontalDriftM": 0.00650431961,
+      "maxSupportMeanDriftM": 0.0047415779,
+      "maxSupportHeightErrorM": 0.0024020155
+    },
+    {
+      "direction": "left",
+      "degrees": 45,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxSupportHorizontalDriftM": 0.00685577048,
+      "maxSupportMeanDriftM": 0.000105015373,
+      "maxSupportHeightErrorM": 0.00493393606
+    },
+    {
+      "direction": "right",
+      "degrees": 0,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxSupportHorizontalDriftM": 0,
+      "maxSupportMeanDriftM": 0,
+      "maxSupportHeightErrorM": 0
+    },
+    {
+      "direction": "right",
+      "degrees": 2,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxSupportHorizontalDriftM": 0.000938600511,
+      "maxSupportMeanDriftM": 0.000807873963,
+      "maxSupportHeightErrorM": 0.000269266078
+    },
+    {
+      "direction": "right",
+      "degrees": 10,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxSupportHorizontalDriftM": 0.00399301155,
+      "maxSupportMeanDriftM": 0.00328760617,
+      "maxSupportHeightErrorM": 0.000988836866
+    },
+    {
+      "direction": "right",
+      "degrees": 22.5,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxSupportHorizontalDriftM": 0.00650417479,
+      "maxSupportMeanDriftM": 0.00474156393,
+      "maxSupportHeightErrorM": 0.00240204856
+    },
+    {
+      "direction": "right",
+      "degrees": 45,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxSupportHorizontalDriftM": 0.00685601775,
+      "maxSupportMeanDriftM": 0.000105013089,
+      "maxSupportHeightErrorM": 0.0049339477
+    }
+  ],
+  "endpointMaxM": 7.31381817e-07,
+  "measurementComplete": true,
+  "contactAdmitted": false
+}

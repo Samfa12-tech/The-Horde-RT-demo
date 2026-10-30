@@ -1,0 +1,11 @@
+{
+  "weldedComponentVertices": 16,
+  "triangles": 28,
+  "allOrientedEdgesHaveOneReverse": true,
+  "mouthFirstHitIsWellFloor": true,
+  "rimFirstHitIsRaisedRim": true,
+  "otherTownAttributesIndicesMaterialsNodesExact": true,
+  "nativeAcceptance": "separate",
+  "trianglesTotal": 982,
+  "verticesTotal": 1990
+}

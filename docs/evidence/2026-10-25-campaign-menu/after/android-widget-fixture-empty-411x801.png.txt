@@ -1,0 +1,15 @@
+HOST ANDROID WIDGET FIXTURE ONLY; no phone, RT world, touch or save IO evidence.
+viewport=411x801 actualDisplay=320x470 scroller=61,16,349,785 scrollBeforeMeasure=0 scrollAfterMeasure=0 titleBounds=Rect(89, 54 - 321, 104) focused=null
+CHOOSE A SLOT
+New game
+Slot 1
+Empty
+New game
+Slot 2
+Empty
+New game
+Slot 3
+Empty
+New game
+Check saves
+Back

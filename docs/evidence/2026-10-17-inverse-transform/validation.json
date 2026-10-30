@@ -1,0 +1,43 @@
+{
+  "nativeBaseHead": "db4c00a05211738d5d3b046c6e5a2dddd1ea59f2",
+  "normalAndTangentCpuTests": {
+    "passed": 3,
+    "scope": "Independent matrix equivalence and tangent/normal checks, not Vulkan driver proof"
+  },
+  "pipelineStaticMatrix": {
+    "compiledAndValidated": 8,
+    "opaqueAllFrozenLimitsPass": 4,
+    "genericFrozenLimitFailures": 4,
+    "genericExcess": {
+      "bytes": 64,
+      "words": 16
+    },
+    "productionFreezeRejected": true
+  },
+  "androidCandidate": "four ABI assembleDebug/lintDebug pass",
+  "windowsCandidate": "isolated Shipping/Mobile optimized Release build pass; no Windows RT image/performance claim",
+  "productionShaderBudgetSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+  "productionRenderingChanged": false,
+  "audioHapticRevalidationRequired": false,
+  "audioHapticReason": "No event, listener, audio/haptic, simulation timing or feedback change",
+  "candidateModules": {
+    "modules": [
+      {
+        "key": "shipping_mobile_opaque_fast",
+        "sha256": "aaa1901fd3631ac009042ac207a5077e96facff41bd7af8d225aad3cc5857c6e",
+        "bytes": 579920,
+        "matrixInverseSites": 0,
+        "worldToObjectSites": 6
+      },
+      {
+        "key": "rayquery_compute_shipping_mobile_opaque_fast",
+        "sha256": "93defa178bd2cb348c68670b8468110e3477ad761b4e791e15a5474752c60a41",
+        "bytes": 581052,
+        "matrixInverseSites": 0,
+        "worldToObjectSites": 6
+      }
+    ],
+    "productionAdoption": false,
+    "scope": "Only Shipping/Mobile Opaque changes in the executable; Generic and other policies retain exact baseline artifacts."
+  }
+}

@@ -1,0 +1,33 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 157: horde_rt_dialogue_ducking_tests
+1/1 Test #157: horde_rt_dialogue_ducking_tests ...***Failed    3.55 sec
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+FAIL: worker suspension freezes content and its last published output gain
+FAIL: ordinary resume observes gain without a cursor or revision reset
+160 dialogue ducking host checks, 18 failures
+Synthetic PCM and logical terrain-backed restores use no output device or owner saves. Listening, physical lifecycle, voice intelligibility and perceived mix remain unaccepted.
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   3.57 sec
+
+The following tests FAILED:
+	157 - horde_rt_dialogue_ducking_tests (Failed)
+Errors while running CTest

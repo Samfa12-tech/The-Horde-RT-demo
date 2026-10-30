@@ -1,0 +1,56 @@
+{
+  "status": "UNRESOLVED / not admitted",
+  "observation": "After portrait Home/resume plus landscape rotation, combat controls were present but lantern control absent. No lantern coordinates guessed or tap issued.",
+  "hierarchySha256": "1100c127911046b06ffd08f28ac9ae085f8f4431b0d5a776d1f51b5fad6b418e",
+  "nodes": {
+    "menu_button": {
+      "bounds": [
+        2812,
+        56,
+        3064,
+        224
+      ],
+      "label": "MENU",
+      "description": "MENU",
+      "enabled": "true",
+      "clickable": "true"
+    },
+    "dodge_button": {
+      "bounds": [
+        2672,
+        614,
+        3036,
+        866
+      ],
+      "label": "DODGE",
+      "description": "DODGE",
+      "enabled": "true",
+      "clickable": "true"
+    },
+    "parry_button": {
+      "bounds": [
+        2266,
+        908,
+        2630,
+        1160
+      ],
+      "label": "PARRY",
+      "description": "PARRY",
+      "enabled": "true",
+      "clickable": "true"
+    },
+    "attack_button": {
+      "bounds": [
+        2672,
+        908,
+        3036,
+        1160
+      ],
+      "label": "SWING",
+      "description": "SWING",
+      "enabled": "true",
+      "clickable": "true"
+    }
+  },
+  "limits": "Not yet attributed to fixture rehydration, production equipment or contextual visibility. Independent direct landscape staging does not close this continuity gap."
+}

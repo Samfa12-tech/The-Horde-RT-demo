@@ -242,6 +242,7 @@ constexpr const char* LichPhaseName(LichPhase phase)
 {
     switch (phase)
     {
+    case LichPhase::Repelling: return "repelling";
     case LichPhase::Dormant: return "dormant";
     case LichPhase::MaintainingRange: return "maintaining-range";
     case LichPhase::Charging: return "charging";

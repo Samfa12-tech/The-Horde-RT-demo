@@ -1,0 +1,49 @@
+{
+  "base": "93b49b018c1876b388582a7ba751023c20532285",
+  "evidenceClass": "local Android compile/lint and Robolectric host contracts, not physical device",
+  "sourceWorkingBytes": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/EnvironmentSurveyExport.java": {
+      "bytes": 10858,
+      "sha256": "ca867d581353bdf5426df86aebf19c999c5ca779fc6dba82384017e96a7c764d"
+    },
+    "android/app/src/test/java/com/samfa12/hordelanternrt/EnvironmentSurveyExportTest.java": {
+      "bytes": 19648,
+      "sha256": "dd63a0df0e1fe3f0486a7747fb624a79bb22e7625af9d4b00c2dc502ee03aba8"
+    }
+  },
+  "evidence": {
+    "android-checks.txt": {
+      "bytes": 8562,
+      "sha256": "5822d96733be877c209a940c3c8d57c450c3a93bc21cb0036a737a3fc7d6f5ce"
+    },
+    "android-results.json": {
+      "bytes": 10982,
+      "sha256": "5278cab38df8a31f3c54ffbb782a55fdbd936ca03e9f8399d7aeff358927a0d3"
+    },
+    "export-cases.json": {
+      "bytes": 3319,
+      "sha256": "853e9f9637f2ff9d003e91bd3d4f23fdac9896fc2359477c30360469754f3edc"
+    },
+    "hosted-lint-baseline.txt": {
+      "bytes": 1089,
+      "sha256": "b4b75a0db8ae9b909c5f912e7c6d06fb5d63ad946493c716104274729497cb6f"
+    },
+    "README.md": {
+      "bytes": 2690,
+      "sha256": "cefe6f34dc70dc8df43732216c3fa0bd5977330ee7e8f21ed7960c9b8da6797a"
+    }
+  },
+  "results": {
+    "passed": 405,
+    "skipped": 6,
+    "failures": 0,
+    "errors": 0,
+    "focusedPassed": 22,
+    "focusedSkipped": 6,
+    "lintErrors": 0,
+    "lintWarnings": 75
+  },
+  "phoneAccessed": false,
+  "securityPolicyChanged": false,
+  "precedingCiCheckpoint": "e87d646e8bcde0eb402d4cfdce44ff62a8e01b2b"
+}

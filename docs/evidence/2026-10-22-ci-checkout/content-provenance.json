@@ -1,0 +1,356 @@
+{
+  "sourceHead": "93b49b018c1876b388582a7ba751023c20532285",
+  "policyRows": 46,
+  "oldPinMatches": 45,
+  "rows": [
+    {
+      "path": "models/world/runtime/grave-markers-r03/grave-marker-damaged.manifest.json",
+      "bytes": 682,
+      "sha256": "dc94eccfbc493be1ffd17df81cb98159f8eaa92c0ba7da84b9234ce3ac0a165c",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/grave-markers-r03/grave-marker-damaged.runtime.glb",
+      "bytes": 41172,
+      "sha256": "b937d5165187b22728901e63b37f72ffc872af9bf521de08cd7edb67f67d3e92",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json",
+      "bytes": 680,
+      "sha256": "e1781f6e973ee61dd00eaf61b3da02653b6280c1ca6c7d276d6feed28407e191",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb",
+      "bytes": 38056,
+      "sha256": "2eec59d80f737a90c2e5f22cec020e2fc227ebf7ac40118e136ef7b8ac656ba1",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/chapter-terrain-v1/asset.manifest.json",
+      "bytes": 781,
+      "sha256": "da0762e1250e9586022c25e1d1600c5e246ca542524cde137185f98f1fe0de13",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb",
+      "bytes": 18441928,
+      "sha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": false
+    },
+    {
+      "path": "textures/props/runtime/chapter-terrain/base-color.windows.ktx2",
+      "bytes": 11185312,
+      "sha256": "91fa9c1870722069ef930df44f88963f1d38ddefd8e689c26c9ca5ecbe8712b9",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "textures/props/runtime/chapter-terrain/normal.windows.ktx2",
+      "bytes": 11185312,
+      "sha256": "2d138ef174528932dcd2c4326d5bfc85663c0fc453ebdccfcbcdec39768db963",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "textures/props/runtime/chapter-terrain/orm.windows.ktx2",
+      "bytes": 11185312,
+      "sha256": "9f0a9b6ab1d61affa0459c58bc5000824caeff50f8e17c979109ad24a1d619c8",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "textures/props/runtime/chapter-terrain/base-color.android.ktx2",
+      "bytes": 1253040,
+      "sha256": "114afde2675443ff09806692e8e42f95b7caec0518b6c5a2f85a7917a8667395",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "textures/props/runtime/chapter-terrain/normal.android.ktx2",
+      "bytes": 2796720,
+      "sha256": "1da244cbd8006b9bd07573435ae0a050a497033a2784f636a9bad5996dc80c78",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "textures/props/runtime/chapter-terrain/orm.android.ktx2",
+      "bytes": 1253040,
+      "sha256": "7f0ca5ad53159ee1ebb31c46a47384511757605375766b4a7d48ea8e61e2f845",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/chapter-entry-return-v1/asset.manifest.json",
+      "bytes": 718,
+      "sha256": "d2693be6a2c743af08006e89b9848b235c16c20df9f1d7a5da214499e02a1468",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb",
+      "bytes": 635844,
+      "sha256": "29cd8b3ad46cd0b115c2bef8264be3b404281ac048c2cfb495c18324a5189c69",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/keeper_death.wav",
+      "bytes": 195650,
+      "sha256": "500f76c3deb40c89c684562acedf6b7549b6b03e402cc51e09553281517d7020",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/keeper_death_core.wav",
+      "bytes": 391256,
+      "sha256": "799cf5d2fdb3f69b3be82683d126fad3852c390bab726a7af9c2b8d02685594c",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/keeper-death.manifest.json",
+      "bytes": 2415,
+      "sha256": "a5830abcb78eb6535c3a5784f4a88269271b6e57cc83c03917417a62497e1cad",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/water_wet_step_1.wav",
+      "bytes": 36524,
+      "sha256": "e3b3855ef7a91b676bc5be94fb403cdb8edbd4a461a5bd56790175b0bd1917de",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/water_wet_step_1_core.wav",
+      "bytes": 73004,
+      "sha256": "b15bd6c9a7b84c08aedbcee87e53bcbc85a2740abd5180858391ed66283b8622",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/water_wet_step_2.wav",
+      "bytes": 36524,
+      "sha256": "b8752ba0dc7b737d8148c1c5c56eac5e5ff52d49d57dc3cfb27239276f2a0fff",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/water_wet_step_2_core.wav",
+      "bytes": 73004,
+      "sha256": "40188320f8eea7d56c948301a969d4e31d8af4dea02a5f1d864eda2973f28224",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/water_wet_step_3.wav",
+      "bytes": 36524,
+      "sha256": "4f5deb13d657dc77065b230dc2d6fac4b9e11f38c1aa1e0912875e969a12d599",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/water_wet_step_3_core.wav",
+      "bytes": 73004,
+      "sha256": "2926ac06b2a10cf388d29142ffd6d15f512d4809da0ad151de191df3040fdd30",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/water_wet_step_4.wav",
+      "bytes": 36524,
+      "sha256": "26e33d3c7d8aca36216dfc45457c1f6ddad57dccc9ceb64d5343482536dd3a46",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/water_wet_step_4_core.wav",
+      "bytes": 73004,
+      "sha256": "1344c72ef5ffc3418aa49e8900b213e6a8140086456ca5cbaebef6d5034a06b1",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/water_stream_contact.wav",
+      "bytes": 33644,
+      "sha256": "2cee1adcb1c944d19af0d2a5c8b81999908f6482bf2fcdd486d0457627ed8cfa",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/water_stream_contact_core.wav",
+      "bytes": 67244,
+      "sha256": "2e242637d10db7b978efaa755eee93d037477985e2106ce462063e7af18c3461",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "audio/pixabay/water-contact.manifest.json",
+      "bytes": 13669,
+      "sha256": "a03036deff4aa1ea889c512b1ba34257b85c1ea3bbd695320dc52be70f22a6a2",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/asset.manifest.json",
+      "bytes": 721,
+      "sha256": "cad866e741683d054a944afe7bb082e8b435cad6d0e27c85252ee8e1ee082abc",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json",
+      "bytes": 948,
+      "sha256": "5cd5c866c5b304431bbc8132adbf117485a87b8e1d0aec7dbea792d05bc112ea",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/tomb-niche-rect-lod0.runtime.glb",
+      "bytes": 85684,
+      "sha256": "55643831df0b1f8adb118d1dde53435d86aa1898271552781c7289307c2eca62",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/tomb-dressing-v01/tomb-niche-arched/asset.manifest.json",
+      "bytes": 723,
+      "sha256": "3f67e0906b49664cb17de8657c4be71a87b3bbd806358ac615df956e88e63c04",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/tomb-dressing-v01/tomb-niche-arched/candidate-receipt.json",
+      "bytes": 951,
+      "sha256": "9742c991425ea277277bf7c7f4dc933c343cf9c19857b93b35971e6df6cfdf01",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/tomb-dressing-v01/tomb-niche-arched/tomb-niche-arched-lod0.runtime.glb",
+      "bytes": 99856,
+      "sha256": "fe78a2108e94814967f49387c3285476776ce7a6a04f82a610d2dbf5e0f20934",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/femur/tomb-femur-lod0.runtime.glb",
+      "bytes": 10580,
+      "sha256": "bdf24bb2b71290b3acf843ea48c2eb280e7d75300463ae0096e0da4796c4c608",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/humerus/tomb-humerus-lod0.runtime.glb",
+      "bytes": 8564,
+      "sha256": "f39dc48c4b0faf1668e748f8927f219dbd3e4d1c90e6e90c71ec9f8a97c192af",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/skull-jaw/tomb-skull-jaw-lod0.runtime.glb",
+      "bytes": 127212,
+      "sha256": "07d00188f183de5fd1ea1d24051e7e3c993953f02aaf85fcc9349d4b38105c4f",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/derivation-receipt.json",
+      "bytes": 3465,
+      "sha256": "390b57a453a0cb883bdd01938b0edb0dcae35e117a74eb324e4387b64022d1b8",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_1.glb",
+      "bytes": 34992,
+      "sha256": "5e454e5aa302e3d081c9857e00a9c8d005c5454a5a7e04d6f212fdbf56c20823",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_2.glb",
+      "bytes": 38456,
+      "sha256": "01d24d1c097267b87bafe4a7545d0cdde50292f2fe7af12a70022c590a82d125",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_3.glb",
+      "bytes": 30440,
+      "sha256": "1a7967a9ae3a82a1e470067b9a344804aa5f40b36b7ba13b401538c6b8fa30a3",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_displaced_lid.glb",
+      "bytes": 67240,
+      "sha256": "e93203b35e8e1979ba16a67f31044076b20127fa8bfbc60b96512d2a5e777962",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_offering_bowl.glb",
+      "bytes": 45880,
+      "sha256": "6e193a9b36656bffa8c972dab0958884208c0a4f38b72333a4677ad2ceab302b",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_broken_base.glb",
+      "bytes": 87384,
+      "sha256": "c0ed7c0261a125385f821109927567c4fc8f1ff0799d0c3c479d4149e09ad594",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_rim_shard.glb",
+      "bytes": 56588,
+      "sha256": "63a76503741ae51f9230e7b23201037bb1e4402d348bbd27323000a82605f1ad",
+      "identityClass": "LFS pointer identity",
+      "oldPinMatched": true
+    },
+    {
+      "path": "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json",
+      "bytes": 5134,
+      "sha256": "6c138994f57a3b3e10bf3113d591d6a47f47493b63618acc20932e9d79ee2f2f",
+      "identityClass": "Git blob",
+      "oldPinMatched": true
+    }
+  ],
+  "rootReceipt": {
+    "onlyChangedField": "grounding.terrainSha256",
+    "before": "fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854",
+    "after": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+    "placementsAndMeasurementsUnchanged": true
+  },
+  "terrain": {
+    "bytes": 18441928,
+    "sha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+    "triangles": 37846,
+    "vertices": 19486,
+    "unchangedCaps": {
+      "vertices": 21134,
+      "triangles": 39618
+    }
+  },
+  "inventory": {
+    "importedMaterials": 30,
+    "worldMaterials": 2,
+    "primitives": 31,
+    "materialCapacity": 32,
+    "primitiveCapacity": 32,
+    "oldCombinedIndices": 1280514,
+    "currentCombinedIndices": 1292118,
+    "expectedDelta": 11604,
+    "reason": "(3796 terrain triangles + 72 floor chips) * 3"
+  }
+}

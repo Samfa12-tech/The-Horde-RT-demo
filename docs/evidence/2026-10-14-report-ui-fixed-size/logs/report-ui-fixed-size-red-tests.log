@@ -1,0 +1,21 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 144: horde_rt_windows_playtest_report_ui_tests
+1/1 Test #144: horde_rt_windows_playtest_report_ui_tests ...***Failed    1.64 sec
+plain report note must retain its chosen UI size across script-font binding
+plain report note must retain its chosen UI size across script-font binding
+note EDIT trace; phase=note-only initial note edit returned=1 elapsedMs=0
+note EDIT trace; phase=note-only rejected-input note edit returned=1 elapsedMs=0
+note EDIT trace; phase=note-only oversized note edit returned=1 elapsedMs=0
+note EDIT trace; phase=note-only approved Unicode note edit returned=1 elapsedMs=16
+note EDIT trace; phase=note-only frozen retry edit returned=1 elapsedMs=0
+note EDIT trace; phase=explicit-context note edit returned=1 elapsedMs=0
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   1.66 sec
+
+The following tests FAILED:
+	144 - horde_rt_windows_playtest_report_ui_tests (Failed)
+Errors while running CTest

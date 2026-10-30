@@ -1,0 +1,19 @@
+{
+  "baseCommit": "4eeafcb64edefcd0f4a60413300753006c155a24",
+  "variants": {
+    "candidate-v1": {
+      "src/gameplay/HorizontalEnvelope.h": "e834289e4a1bd5750220e1fb1efec5f512cce7e90ee4c25c24eb7a101c0e0f86",
+      "src/gameplay/items/HeldItemKinematics.cpp": "0df7f7e57079ad00d4062ee227885ee4006b4985f9f7b5175b9e4d92b46a32fb",
+      "tests/HeldItemClearanceTests.cpp": "a9ff58c2766859c4f22da24c36b1f7198d297ca8c32dea511d7073a740c86570",
+      "tests/FinalHeldTorchClearanceTests.cpp": "9e482fc7aec67d74b69c263027bd1bbad501b4ffe897959cac931170ce926221"
+    },
+    "corrected-v2": {
+      "src/gameplay/HorizontalEnvelope.h": "e834289e4a1bd5750220e1fb1efec5f512cce7e90ee4c25c24eb7a101c0e0f86",
+      "src/gameplay/items/HeldItemKinematics.cpp": "f72d6d8120f8c4f6605b4e3a583537d4a8bd405731f6a2c67343b2b3e83a4d34",
+      "tests/HeldItemClearanceTests.cpp": "a9ff58c2766859c4f22da24c36b1f7198d297ca8c32dea511d7073a740c86570",
+      "tests/FinalHeldTorchClearanceTests.cpp": "9e482fc7aec67d74b69c263027bd1bbad501b4ffe897959cac931170ce926221"
+    }
+  },
+  "rawEvidenceRoot": "reports/torch-clearance-refinement-20261022/",
+  "disposition": "withdrawn; no runtime or compiled-test changes adopted"
+}

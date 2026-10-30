@@ -1,0 +1,130 @@
+Start testing: Oct 23 14:23 AUS Eastern Summer Time
+----------------------------------------------------------
+153/230 Testing: horde_rt_music_director_tests
+153/230 Test: horde_rt_music_director_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_music_director_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_music_director_tests" start time: Oct 23 14:23 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Shared adaptive music resolver tests passed.
+<end of output>
+Test time =   5.89 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_director_tests" end time: Oct 23 14:23 AUS Eastern Summer Time
+"horde_rt_music_director_tests" time elapsed: 00:00:05
+----------------------------------------------------------
+
+154/230 Testing: horde_rt_chapter_music_tests
+154/230 Test: horde_rt_chapter_music_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_chapter_music_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_chapter_music_tests" start time: Oct 23 14:23 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+65 chapter music host checks, 0 failures
+Synthetic PCM has no output device. Rope/terrain and logical restores are CPU fixtures, not natural victory, physically earned saves, listening or platform playback acceptance.
+<end of output>
+Test time =   7.50 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_music_tests" end time: Oct 23 14:23 AUS Eastern Summer Time
+"horde_rt_chapter_music_tests" time elapsed: 00:00:07
+----------------------------------------------------------
+
+162/230 Testing: horde_rt_windows_music_focus_tests
+162/230 Test: horde_rt_windows_music_focus_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_windows_music_focus_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_windows_music_focus_tests" start time: Oct 23 14:23 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+PASS: 16 focus/ready/menu/loss combinations and actual-window publication wiring
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_windows_music_focus_tests" end time: Oct 23 14:23 AUS Eastern Summer Time
+"horde_rt_windows_music_focus_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+163/230 Testing: horde_rt_music_pcm_stream_tests
+163/230 Test: horde_rt_music_pcm_stream_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_music_pcm_stream_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_music_pcm_stream_tests" start time: Oct 23 14:23 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Shared PCM music stream tests passed.
+<end of output>
+Test time =   3.46 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_pcm_stream_tests" end time: Oct 23 14:23 AUS Eastern Summer Time
+"horde_rt_music_pcm_stream_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+164/230 Testing: horde_rt_music_pcm_wave_tests
+164/230 Test: horde_rt_music_pcm_wave_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_music_pcm_wave_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_music_pcm_wave_tests" start time: Oct 23 14:23 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   2.87 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_pcm_wave_tests" end time: Oct 23 14:23 AUS Eastern Summer Time
+"horde_rt_music_pcm_wave_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+165/230 Testing: horde_rt_music_pcm_asset_bank_tests
+165/230 Test: horde_rt_music_pcm_asset_bank_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_music_pcm_asset_bank_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_music_pcm_asset_bank_tests" start time: Oct 23 14:23 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Music bank load: 387.434 ms; PCM bytes=40640000; largest encoded read=20480044; observed input capacity=20480044; logical/capacity payload, not process RSS or phone timing
+<end of output>
+Test time =   7.79 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_pcm_asset_bank_tests" end time: Oct 23 14:23 AUS Eastern Summer Time
+"horde_rt_music_pcm_asset_bank_tests" time elapsed: 00:00:07
+----------------------------------------------------------
+
+166/230 Testing: horde_rt_music_playback_session_tests
+166/230 Test: horde_rt_music_playback_session_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_music_playback_session_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_music_playback_session_tests" start time: Oct 23 14:23 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   3.83 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_playback_session_tests" end time: Oct 23 14:23 AUS Eastern Summer Time
+"horde_rt_music_playback_session_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+178/230 Testing: horde_rt_pocket_audio_core_pin_tests
+178/230 Test: horde_rt_pocket_audio_core_pin_tests
+Command: "C:/Program Files/PowerShell/7/pwsh.exe" "-NoProfile" "-File" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/tests/PocketAudioCorePinTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_pocket_audio_core_pin_tests" start time: Oct 23 14:23 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Pocket Audio Core pin admission: 7/7 checks PASS
+<end of output>
+Test time =   1.01 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_pocket_audio_core_pin_tests" end time: Oct 23 14:23 AUS Eastern Summer Time
+"horde_rt_pocket_audio_core_pin_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 23 14:23 AUS Eastern Summer Time

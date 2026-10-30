@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/region-page-prototype
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/region-page-prototype
+    Start 193: horde_rt_chapter_host_phase_analysis_tests
+1/1 Test #193: horde_rt_chapter_host_phase_analysis_tests ...   Passed    0.10 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.14 sec

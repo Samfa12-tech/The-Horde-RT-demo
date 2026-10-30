@@ -1,0 +1,89 @@
+{
+  "fixed_ticks": 600,
+  "ready": true,
+  "analytic_rope_only_visibility": [
+    {
+      "source_index": 0,
+      "ray_count": 9153,
+      "midpoint_blocked_rays": 118,
+      "rays_with_sample_disagreement": 954,
+      "clear_samples_classified_dark_by_midpoint": 708,
+      "example_clear_samples_of_six": 6,
+      "example_endpoint": [
+        -34.0750008,
+        -0.939999998,
+        -14.4499989
+      ]
+    },
+    {
+      "source_index": 1,
+      "ray_count": 9153,
+      "midpoint_blocked_rays": 137,
+      "rays_with_sample_disagreement": 823,
+      "clear_samples_classified_dark_by_midpoint": 822,
+      "example_clear_samples_of_six": 6,
+      "example_endpoint": [
+        -34.5,
+        -0.939999998,
+        -15.2999992
+      ]
+    },
+    {
+      "source_index": 2,
+      "ray_count": 9153,
+      "midpoint_blocked_rays": 66,
+      "rays_with_sample_disagreement": 439,
+      "clear_samples_classified_dark_by_midpoint": 355,
+      "example_clear_samples_of_six": 5,
+      "example_endpoint": [
+        -34.1749992,
+        -0.939999998,
+        -13.999999
+      ]
+    }
+  ],
+  "evidence_class": "CPU analytic rope-only subset; not full scene/GPU image evidence",
+  "actual_rope_triangle_count": 176,
+  "geometry_json_sha256": "328339399e3d29fc1a46f7ba2311a40e5368e908d3fdc4e865e41632b8586bd2",
+  "camera": [
+    -33.0,
+    0.7,
+    -17.5
+  ],
+  "grid": "81 x 113 endpoints: x=-34.5+ix*0.025, y=-0.94, z=-16.8+iz*0.025",
+  "sources": [
+    {
+      "index": 0,
+      "kind": "authored sky aperture sample 0",
+      "position": [
+        -34.35,
+        2.76,
+        -16.02
+      ]
+    },
+    {
+      "index": 1,
+      "kind": "authored sky aperture sample 1",
+      "position": [
+        -33.05,
+        2.76,
+        -14.38
+      ]
+    },
+    {
+      "index": 2,
+      "kind": "physical lantern position from completed frame (held fixed for probe)",
+      "position": [
+        -33.4996758,
+        0.0909200311,
+        -16.7447662
+      ]
+    }
+  ],
+  "limitations": [
+    "Synthetic camera, not screenshot camera reconstruction",
+    "Actual fixed-step settled rope triangles; excludes other scene geometry and glass transport",
+    "Six authored density sample positions; no density/radiance/image integration",
+    "Demonstrates midpoint visibility disagreement, not source attribution for the owner image"
+  ]
+}

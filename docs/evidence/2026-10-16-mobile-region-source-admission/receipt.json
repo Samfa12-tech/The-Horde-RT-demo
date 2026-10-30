@@ -1,0 +1,42 @@
+{
+  "scope": "Exact approved Debug install, both-backend frozen images and one Query surface recovery; no full phone route, savings or sustained-performance acceptance",
+  "path": "reports\\region-page-phone-2026-10-16\\horde-region-page-fixed-6db07c38.apk",
+  "apkSha256": "6db07c3889ccd440f462e9affcc059cfd5784e26bbcc7645fcefd48f28ab1e30",
+  "assetPayloadCount": 169,
+  "assetsByteIdenticalToFailedCandidate": true,
+  "abis": {
+    "arm64-v8a": {
+      "name": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "sha256": "88a15170075379d310ade8b85eaec1a29ee5f4a005b7bc9aff36580e29238a32"
+    },
+    "armeabi-v7a": {
+      "name": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "sha256": "2456f56a96eab05b60313124ec414124e64162ae2e2827d0d1fbbb31ee7bf96f"
+    },
+    "x86": {
+      "name": "lib/x86/libhorde_rt_probe_android.so",
+      "sha256": "b05d8c74ea35c2e3c87002507305f0ea9a9f3753539213a8c3f26ffae4d259f6"
+    },
+    "x86_64": {
+      "name": "lib/x86_64/libhorde_rt_probe_android.so",
+      "sha256": "69c0195f7b1d3f0967f072fdea0e08e5b1ab97fe7fc77126e2cab1024b91a36b"
+    }
+  },
+  "sourceHashes": {
+    "src/vulkan/raytracing/RtRegionGeometrySource.cpp": "f23be7c9d48fe932422a6e06b5096d47c07d3d22b5106ba3d328d2de4df8e00d",
+    "tests/RtRegionGeometrySourceTests.cpp": "023fd62c15dc1c83b2cc28d35b9fa7c71c516d3860d9d382659f60b9cb804d04",
+    "src/world/streaming/GeometryPartition.cpp": "9c2012f526c6583203b9ab4f670afb2946a3ea596712f7d48a3a9f134421f52d"
+  },
+  "archiveSha256": "03f04fc7c7789c7ca2069bf6d037e94003fab598665a37d55213043cbc75e684",
+  "archiveBytes": 33279,
+  "failedApkSha256": "c0545439b3850acb8d1c6c1c86355408c15a97eeb5fcd9098fb66780beda0b41",
+  "previousInstalledApkSha256": "1a00b34d61ce63423748c5b05434ae1a7744cbb55d196c6be5fa40e82089be6b",
+  "exactNativePartitionSourceUnchanged": true,
+  "basedOn": "482ebaff21e06f8c70222e1d8d487fade4bb340e plus native source/test patch; source hashes pin actual bytes",
+  "rawPrivateDataNotPublished": [
+    "preference XML",
+    "APKs",
+    "full activity/window dumps",
+    "unfiltered process logs"
+  ]
+}

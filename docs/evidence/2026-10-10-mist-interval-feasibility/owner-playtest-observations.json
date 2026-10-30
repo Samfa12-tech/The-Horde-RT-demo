@@ -1,0 +1,19 @@
+{
+  "build": "Windows Debug working-tree tomb playtest; separate from mist experiment",
+  "exe_sha256": "a725e1989f029d0c8b10553bf449bff54f787f1ac5a383e1b33c0ef0ca23f100",
+  "starting_head": "3cac217f78bd000925a534823f7076c5fc186090",
+  "tracked_edits_present": true,
+  "launch_arguments": [
+    "--development-rescue-journey",
+    "--development-teaching-slowdown"
+  ],
+  "owner_observations": {
+    "teaching_slowdown_timing": "positive",
+    "wet_footstep_sound": "positive",
+    "upper_exit_lantern_restoration": "confirmed by owner",
+    "splashes_spray_ripples": "not seen; darkness/view angle noted",
+    "keeper_lightning": "owner reports damage occurs after visible lightning; needs distinct staff anticipation and discharge"
+  },
+  "technical_boundary": "Owner observations are separate from exact backend, lifecycle, performance and phone evidence. Experimental interval shader not loaded.",
+  "mist_visual_acceptance": "PENDING"
+}

@@ -78,11 +78,10 @@ public final class GraphicsViewportRecoveryTest {
         ScrollView after=(ScrollView)tagged(scrim,"graphics-page-scroll"); assertNotNull(after);
         assertEquals("a later setting must not jump back to the page title",y,after.getScrollY());
         assertTrue("the same control keeps focus after its label changes",button(scrim,"Mist:").hasFocus());
-        Button use=button(scrim,"Use"), keep=button(scrim,"Keep"), restore=button(scrim,"Restore"), back=button(scrim,"Back");
-        assertNotNull(use); assertNotNull(keep); assertNotNull(restore); assertNotNull(back);
-        assertEquals("Use these settings for a temporary trial. Saved settings change only after a matching RT presentation and Keep and save.",use.getContentDescription());
-        assertTrue(keep.getContentDescription().toString().contains("acknowledged trial"));
-        for(Button action:new Button[]{use,keep,restore,back}) assertFalse(insideHorizontalScroll(action));
+        Button apply=button(scrim,"Apply"), restore=button(scrim,"Restore"), back=button(scrim,"Back");
+        assertNotNull(apply); assertNull(button(scrim,"Keep")); assertNotNull(restore); assertNotNull(back);
+        assertEquals("Apply and save these settings after a matching RT frame is presented.",apply.getContentDescription());
+        for(Button action:new Button[]{apply,restore,back}) assertFalse(insideHorizontalScroll(action));
     }
     @Test public void freshGraphicsPageCanPublishPreviewDetailsToInitiallyNullDescription() throws Exception {
         FrameLayout[] holder=new FrameLayout[1]; MainActivity a=activity(holder); FrameLayout scrim=holder[0];
@@ -115,10 +114,10 @@ public final class GraphicsViewportRecoveryTest {
         Button replacement=button(scrim,"Mist: "); replacement.setEnabled(true);
         layout(scrim);
         assertEquals(ox,((HorizontalScrollView)replacement.getParent().getParent()).getScrollX());
-        Button use=button(scrim,"Use"), keep=button(scrim,"Keep"), restore=button(scrim,"Restore"), back=button(scrim,"Back");
-        assertNotNull(use); assertNotNull(keep); assertNotNull(restore); assertNotNull(back);
-        for(Button action:new Button[]{use,keep,restore,back}) assertFalse(insideHorizontalScroll(action));
-        assertEquals("Save only the settings confirmed by a matching RT presentation.",keep.getContentDescription());
+        Button apply=button(scrim,"Apply"), restore=button(scrim,"Restore"), back=button(scrim,"Back");
+        assertNotNull(apply); assertNull(button(scrim,"Keep")); assertNotNull(restore); assertNotNull(back);
+        for(Button action:new Button[]{apply,restore,back}) assertFalse(insideHorizontalScroll(action));
+        assertEquals("Apply and save these preview settings after a matching RT frame is presented.",apply.getContentDescription());
         // The native ACK temporarily disables options. Restore focus as soon as editing is available.
         assertTrue(replacement.hasFocus());
     }

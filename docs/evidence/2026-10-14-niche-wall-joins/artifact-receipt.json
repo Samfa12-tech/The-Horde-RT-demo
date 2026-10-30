@@ -1,0 +1,27 @@
+{
+  "scope": "Final source working-tree artifacts before commit; uninstalled intermediate chapter checkpoint. Captures have their own prior executable identity.",
+  "baseCommit": "cfd381a1c911a14d1ef3a6ec592b087de8ad99fe",
+  "artifacts": {
+    "windowsDebug": {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 13209088,
+      "sha256": "e032d4f0032eca63d993b1892a391d08b0a4d53dd3282dceb257ead68f2bace1"
+    },
+    "windowsRelease": {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4480512,
+      "sha256": "c5352734d82970e5d8263cb94bce55be420fde7e3693100c8fcb961c319b531a"
+    },
+    "androidDebug": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183175738,
+      "sha256": "9f8a3ea83b00e153c3631a1e00f0378ae2377963b5fc5d0648e04ecc00f8691c"
+    }
+  },
+  "sourceHashes": {
+    "src/scene/TombWallRecess.h": "d49df0a6e5856863dff1419717f5a73e32aa1bee8aa3d7980e6aac1f34404d4c",
+    "src/scene/TombDressing.h": "a005e4120b61e0641a5bdaf825aa59f2bed142139a60527c684ebd94e4457b90",
+    "src/gameplay/DevelopmentCheckpoints.h": "84a3c2dd774899a7314eaedc86d66fefeba2a54c9ef69e70053ad05f6072ab8a",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "5fa6e4908ed21c9ff5f9581656923c476678265829d1672f4b0509077f326031"
+  }
+}

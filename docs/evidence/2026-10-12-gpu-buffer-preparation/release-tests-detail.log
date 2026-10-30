@@ -1,0 +1,216 @@
+Start testing: Oct 12 06:16 AUS Eastern Summer Time
+----------------------------------------------------------
+154/183 Testing: horde_rt_gpu_resources_observation_tests
+154/183 Test: horde_rt_gpu_resources_observation_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_gpu_resources_observation_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_gpu_resources_observation_tests" start time: Oct 12 06:16 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.90 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_gpu_resources_observation_tests" end time: Oct 12 06:16 AUS Eastern Summer Time
+"horde_rt_gpu_resources_observation_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+155/183 Testing: horde_rt_gpu_buffer_batch_tests
+155/183 Test: horde_rt_gpu_buffer_batch_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_gpu_buffer_batch_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_gpu_buffer_batch_tests" start time: Oct 12 06:16 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+GPU buffer batch: exact uploads, 48 Vulkan failures, preflight, move and cleanup passed.
+<end of output>
+Test time =   0.90 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_gpu_buffer_batch_tests" end time: Oct 12 06:16 AUS Eastern Summer Time
+"horde_rt_gpu_buffer_batch_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+157/183 Testing: horde_rt_scene_initialise_preflight_tests
+157/183 Test: horde_rt_scene_initialise_preflight_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_scene_initialise_preflight_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_scene_initialise_preflight_tests" start time: Oct 12 06:16 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   1.32 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_scene_initialise_preflight_tests" end time: Oct 12 06:16 AUS Eastern Summer Time
+"horde_rt_scene_initialise_preflight_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+158/183 Testing: horde_rt_scene_resource_inventory_tests
+158/183 Test: horde_rt_scene_resource_inventory_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_scene_resource_inventory_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_scene_resource_inventory_tests" start time: Oct 12 06:16 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Resource integration: existing readback/mist/torch contracts
+Actual development static admission materials=30 primitives=31 layers=18,15,15,1
+Actual development static admission materials=30 primitives=32 layers=18,15,15,1
+Resource integration: descriptor contracts
+Resource integration: TLAS and water geometry
+Resource integration: actual tomb intake
+Integrated native tomb static roster: 31 primitives, 30 materials
+Matched CPU intake only (baseline first; cache/order bias possible): 63.6286 / 286.071 ms; additional static vertices/indices bytes: 27178816 / 4817256; no GPU allocation, AS build or presentation measurement
+Resource integration: water owner lifetime
+Water lifetime: populate
+Water lifetime: move
+Water lifetime: destroy
+Resource integration: resize contracts
+Resource integration: command/resource observations
+Resource integration: command execution fixtures
+Resource integration: not-ready rejection
+Resource integration: preview inventory
+Resource integration: populated inventory
+<end of output>
+Test time =   2.66 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_scene_resource_inventory_tests" end time: Oct 12 06:16 AUS Eastern Summer Time
+"horde_rt_scene_resource_inventory_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+159/183 Testing: horde_rt_final_windows_bundle_containment
+159/183 Test: horde_rt_final_windows_bundle_containment
+Command: "C:/Program Files/PowerShell/7/pwsh.exe" "-NoProfile" "-File" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/tools/InspectRtPipelineBundleContainment.ps1" "-TargetPath" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/HordeLanternRT.exe" "-TargetPlatform" "Windows" "-Instrumentation" "Shipping" "-Quality" "High"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_final_windows_bundle_containment" start time: Oct 12 06:16 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+{"target":"C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe","targetPlatform":"Windows","instrumentation":"Shipping","quality":"High","targetSha256":"5db1b7358abf52bdb048dd47880bea3f68a3b1e918d3caf751c5a1d9c81aa193","targetBytes":4383232,"semanticKeys":["shipping_high_generic_dielectric","shipping_high_opaque_fast","rayquery_compute_shipping_high_generic_dielectric","rayquery_compute_shipping_high_opaque_fast"],"modules":[{"offset":2081472,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"792637089a1f7a5ebd7965b68a0d38377180af8a695f7063de82ac0959a4d9f5","words":145523,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":false,"atomicInstructions":0},{"offset":2663568,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"7e011cf42505820acd6e61109f45bdcd311815406f10c77e3b5af59c7b5797b9","words":71641,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":false,"atomicInstructions":0},{"offset":2950144,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"0d2376fba850cae416cb4edc666c208a7da0eee2960f61325d45dd5a2a0d041f","words":145824,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":false,"atomicInstructions":0},{"offset":3533440,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"cf406c2e11e82d599d719f5274793b816bf91ffc705594c22bf80fe6d8dbe778","words":71703,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":false,"atomicInstructions":0}],"spirvVal":"passed","spirvDis":"passed"}
+<end of output>
+Test time =  11.93 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_final_windows_bundle_containment" end time: Oct 12 06:17 AUS Eastern Summer Time
+"horde_rt_final_windows_bundle_containment" time elapsed: 00:00:11
+----------------------------------------------------------
+
+160/183 Testing: horde_rt_final_windows_bundle_containment_controls
+160/183 Test: horde_rt_final_windows_bundle_containment_controls
+Command: "C:/Program Files/PowerShell/7/pwsh.exe" "-NoProfile" "-File" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/tests/RtPipelineBundleContainmentTests.ps1" "-Scanner" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/tools/InspectRtPipelineBundleContainment.ps1" "-TargetPath" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/HordeLanternRT.exe" "-TargetPlatform" "Windows" "-Instrumentation" "Shipping" "-Quality" "High" "-PowerShellExecutable" "C:/Program Files/PowerShell/7/pwsh.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_final_windows_bundle_containment_controls" start time: Oct 12 06:17 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Final-target containment scanner adversarial controls passed.
+<end of output>
+Test time = 122.96 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_final_windows_bundle_containment_controls" end time: Oct 12 06:19 AUS Eastern Summer Time
+"horde_rt_final_windows_bundle_containment_controls" time elapsed: 00:02:02
+----------------------------------------------------------
+
+161/183 Testing: horde_rt_final_windows_bundle_containment_registration
+161/183 Test: horde_rt_final_windows_bundle_containment_registration
+Command: "C:/Program Files/PowerShell/7/pwsh.exe" "-NoProfile" "-File" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/tests/RtPipelineBundleContainmentRegistrationTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe" "-ConfiguredCtestFile" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/CTestTestfile.cmake" "-Configuration" "Release" "-Instrumentation" "Shipping" "-Quality" "High" "-Generator" "Visual Studio 17 2022" "-GeneratorPlatform" "x64"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_final_windows_bundle_containment_registration" start time: Oct 12 06:19 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+-- The CXX compiler identification is MSVC 19.44.35227.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+Generated RT catalog adapter is current.
+-- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+-- Found Vulkan: C:/VulkanSDK/1.4.350.0/Lib/vulkan-1.lib (found version "1.4.350") found components: glslc glslangValidator
+-- Vulkan SDK found: 1.4.350
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Found Python3: C:/Users/sam_s/AppData/Local/Programs/Python/Python312/python.exe (found version "3.12.10") found components: Interpreter
+-- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+-- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+-- Configuring done (29.0s)
+-- Generating done (3.8s)
+-- Build files have been written to: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/rtm-s-94bffbacecaa
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/CMakeLists.txt
+  RtPipelineBundleLifetimeTests.cpp
+  RtPipelineBundle.cpp
+  RtPipelineBundleContracts.cpp
+  RtPipelineVariants.cpp
+  RtPipelineVariantProvider.cpp
+  Generating Code...
+  horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\rtm-s-94bffbacecaa\Debug\horde_rt_pipeline_bundle_lifetime_tests.exe
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/rtm-s-94bffbacecaa
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/rtm-s-94bffbacecaa
+    Start 156: horde_rt_pipeline_bundle_lifetime_tests
+1/1 Test #156: horde_rt_pipeline_bundle_lifetime_tests ...   Passed    4.94 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   4.96 sec
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+-- The CXX compiler identification is MSVC 19.44.35227.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+Generated RT catalog adapter is current.
+-- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+-- Found Vulkan: C:/VulkanSDK/1.4.350.0/Lib/vulkan-1.lib (found version "1.4.350") found components: glslc glslangValidator
+-- Vulkan SDK found: 1.4.350
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Found Python3: C:/Users/sam_s/AppData/Local/Programs/Python/Python312/python.exe (found version "3.12.10") found components: Interpreter
+-- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+-- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+-- Configuring done (35.4s)
+-- Generating done (3.4s)
+-- Build files have been written to: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/rtm-d-e5b87ea9946c
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/CMakeLists.txt
+  RtPipelineBundleLifetimeTests.cpp
+  RtPipelineBundle.cpp
+  RtPipelineBundleContracts.cpp
+  RtPipelineVariants.cpp
+  RtPipelineVariantProvider.cpp
+  Generating Code...
+  horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\rtm-d-e5b87ea9946c\Debug\horde_rt_pipeline_bundle_lifetime_tests.exe
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/rtm-d-e5b87ea9946c
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/rtm-d-e5b87ea9946c
+    Start 156: horde_rt_pipeline_bundle_lifetime_tests
+1/1 Test #156: horde_rt_pipeline_bundle_lifetime_tests ...   Passed    4.58 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   4.60 sec
+Effective final-target containment registrations and Mobile lifetime policies passed.
+<end of output>
+Test time =  94.00 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_final_windows_bundle_containment_registration" end time: Oct 12 06:20 AUS Eastern Summer Time
+"horde_rt_final_windows_bundle_containment_registration" time elapsed: 00:01:34
+----------------------------------------------------------
+
+End testing: Oct 12 06:20 AUS Eastern Summer Time

@@ -1,0 +1,97 @@
+{
+  "inputs": [
+    {
+      "path": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+      "bytes": 2568508,
+      "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+      "lfs_pointer": false,
+      "runtime_packaged": true
+    },
+    {
+      "path": "assets/models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb",
+      "bytes": 76716,
+      "sha256": "75bf4f0d7c64c67848f08f1b2fb5b802527160c79def7f71ca964bdcf72799f5",
+      "lfs_pointer": false,
+      "runtime_packaged": true
+    },
+    {
+      "path": "assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb",
+      "bytes": 658308,
+      "sha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+      "lfs_pointer": false,
+      "runtime_packaged": true
+    },
+    {
+      "path": "assets/source/development-rescue/rescue-shaft-blockout.glb",
+      "bytes": 17116,
+      "sha256": "0baca6df9d2756e07f8948a097253a17855f947d9024ab41dd799670caffae98",
+      "lfs_pointer": false,
+      "runtime_packaged": false
+    },
+    {
+      "path": "assets/source/development-rescue/rescue-shaft-roundtrip.glb",
+      "bytes": 17124,
+      "sha256": "6dcd2e1e5f915b0c4fce411cb537ecc2072c4fe5dfb32f9e67bcb9abcf5485a9",
+      "lfs_pointer": false,
+      "runtime_packaged": false
+    },
+    {
+      "path": "assets/source/development-rescue/rescue-shaft-blockout.blend",
+      "bytes": 99436,
+      "sha256": "1f0e5b16b0479c3df63430c9e5112cb3aebb64c3d6e78089eec3c8bd8257f2be",
+      "lfs_pointer": false,
+      "runtime_packaged": false
+    }
+  ],
+  "test_executables": [
+    {
+      "configuration": "debug",
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_final_held_torch_clearance_tests.exe",
+      "bytes": 4101632,
+      "sha256": "8796dbb5f9859aedf17fa00bcce89e106198324fc62c29ba386a211175e9c491"
+    },
+    {
+      "configuration": "debug",
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_rescue_traversal_tests.exe",
+      "bytes": 3124224,
+      "sha256": "1f173acfb4448f2b95664528228da4604d59780e86af858ac609f211202620b3"
+    },
+    {
+      "configuration": "debug",
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_rescue_journey_integration_tests.exe",
+      "bytes": 8015872,
+      "sha256": "46eb428bfda5da595b6f98dc601b131996c54b0a1f93f27d8c98fec2b5c3a8d6"
+    },
+    {
+      "configuration": "debug",
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_rescue_rig_attachment_tests.exe",
+      "bytes": 4384768,
+      "sha256": "86e4ee6e4e419cd0c4a3c97d704bc8b205182ded2772ea5d4625002e942a0439"
+    },
+    {
+      "configuration": "release",
+      "path": "build/presets/windows-x64-release/Release/horde_rt_final_held_torch_clearance_tests.exe",
+      "bytes": 773632,
+      "sha256": "8123b167f606a3fcd76bf6442391564bed2af2cfbf0a3fdff216b3aaf7f57ef4"
+    },
+    {
+      "configuration": "release",
+      "path": "build/presets/windows-x64-release/Release/horde_rt_rescue_traversal_tests.exe",
+      "bytes": 418816,
+      "sha256": "5e3b35e4c7b1766a8ce9707122f6e1a89f88b76cdbf51aaa3b89dcf2789088a2"
+    },
+    {
+      "configuration": "release",
+      "path": "build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe",
+      "bytes": 2303488,
+      "sha256": "fdbfe23104ef11628f3cdf2af285cac75078bf49597fc0b5e16ff5f6985b5c6a"
+    },
+    {
+      "configuration": "release",
+      "path": "build/presets/windows-x64-release/Release/horde_rt_rescue_rig_attachment_tests.exe",
+      "bytes": 872448,
+      "sha256": "21c9753f956ab21896f61f116fed05e5eb3e7b1fafae05d30a8c481879b340a1"
+    }
+  ],
+  "no_asset_changes": true
+}

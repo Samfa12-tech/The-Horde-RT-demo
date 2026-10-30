@@ -9,6 +9,8 @@ OUTPUT = ROOT / "assets" / "textures" / "props" / "source"
 SIZE = 1024
 SEED = 0x484F524445
 ARRAY_INPUT = OUTPUT / "static-array-1k"
+FOREST_TEXTURES = ROOT / "assets" / "models" / "world" / "source" / "forest-tree-pair-v1" / "textures"
+FOREST_ARRAY_INPUT = OUTPUT / "forest-tree-pair-v1"
 
 
 def save(name: str, values: np.ndarray) -> None:
@@ -149,12 +151,53 @@ def resize_shared_array_inputs() -> None:
     Image.fromarray(gauntlet_orm, "RGBA").save(gauntlet_orm_path)
 
 
+def build_forest_bark_orm() -> None:
+    """Pack the owner-authored bark roughness map into the GLB ORM convention."""
+    roughness_path = FOREST_TEXTURES / "horde-bark-original-roughness-512.png"
+    if not roughness_path.is_file():
+        raise FileNotFoundError(f"Forest bark roughness source is missing: {roughness_path}")
+    roughness = np.asarray(Image.open(roughness_path).convert("L"), dtype=np.uint8)
+    if roughness.shape != (512, 512):
+        raise ValueError(f"Forest bark roughness must remain 512x512, got {roughness.shape}")
+    orm = np.empty((512, 512, 4), dtype=np.uint8)
+    orm[:, :, 0] = 255
+    orm[:, :, 1] = roughness
+    orm[:, :, 2] = 0
+    orm[:, :, 3] = 255
+    FOREST_ARRAY_INPUT.mkdir(parents=True, exist_ok=True)
+    bark_orm_path = FOREST_ARRAY_INPUT / "bark-orm-512.derived.png"
+    Image.fromarray(orm, "RGBA").save(bark_orm_path)
+
+    # The shared arrays are 1024x1024. Nearest-neighbour 2x replication keeps
+    # every original 512px texel and UV coverage intact; it adds no detail and
+    # leaves the source PNGs untouched. The generated full mip chain therefore
+    # contains each exact source map at mip level 1.
+    FOREST_ARRAY_INPUT.mkdir(parents=True, exist_ok=True)
+    names = {
+        "bark-base-color": ("horde-bark-original-basecolor-512.png", "RGBA"),
+        "pine-base-color": ("horde-pine-original-basecolor-512.png", "RGBA"),
+        "moss-base-color": ("horde-moss-original-basecolor-512.png", "RGBA"),
+        "alder-base-color": ("horde-alder-original-basecolor-512.png", "RGBA"),
+        "bark-normal": ("horde-bark-original-normal-512.png", "RGBA"),
+    }
+    for output_name, (source_name, mode) in names.items():
+        source_path = FOREST_TEXTURES / source_name
+        image = Image.open(source_path).convert(mode)
+        if image.size != (512, 512):
+            raise ValueError(f"Forest source must remain 512x512: {source_path} is {image.size}")
+        image.resize((1024, 1024), Image.Resampling.NEAREST).save(
+            FOREST_ARRAY_INPUT / f"{output_name}.png")
+    Image.open(bark_orm_path).convert("RGBA").resize(
+        (1024, 1024), Image.Resampling.NEAREST).save(FOREST_ARRAY_INPUT / "bark-orm.png")
+
+
 OUTPUT.mkdir(parents=True, exist_ok=True)
 rng = np.random.default_rng(SEED)
 wood(rng)
 iron("chest-iron", rng, False)
 iron("lantern-iron", rng, True)
 resize_shared_array_inputs()
+build_forest_bark_orm()
 
 black = np.zeros((1, 1, 4), dtype=np.uint8)
 black[0, 0, 3] = 255

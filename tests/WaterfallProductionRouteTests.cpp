@@ -44,10 +44,11 @@ private:
 
 bool IsAuthoredPair(const SimulationSnapshot& state)
 {
+    const int expectedHealth = state.modernCombatRules ? 2 : 1;
     return state.skeletonEnemyCount == 2u && state.activeSkeletonCount == 2u &&
         state.skeletonEnemies[0].id == EntityId::SkeletonA &&
         state.skeletonEnemies[1].id == EntityId::SkeletonB &&
-        state.skeletonEnemies[0].health == 1 && state.skeletonEnemies[1].health == 1 &&
+        state.skeletonEnemies[0].health == expectedHealth && state.skeletonEnemies[1].health == expectedHealth &&
         !state.skeletonEnemies[0].dead && !state.skeletonEnemies[1].dead &&
         Near(state.skeletonEnemies[0].x, kWaterfallSkeletonGuardSpawns[0].position.x) &&
         Near(state.skeletonEnemies[0].z, kWaterfallSkeletonGuardSpawns[0].position.z) &&
@@ -59,10 +60,11 @@ bool IsAuthoredPair(const SimulationSnapshot& state)
 
 bool PairIsHealthyAndStable(const SimulationSnapshot& state)
 {
+    const int expectedHealth = state.modernCombatRules ? 2 : 1;
     return state.skeletonEnemyCount == 2u && state.activeSkeletonCount == 2u &&
         state.skeletonEnemies[0].id == EntityId::SkeletonA &&
         state.skeletonEnemies[1].id == EntityId::SkeletonB &&
-        state.skeletonEnemies[0].health == 1 && state.skeletonEnemies[1].health == 1 &&
+        state.skeletonEnemies[0].health == expectedHealth && state.skeletonEnemies[1].health == expectedHealth &&
         !state.skeletonEnemies[0].dead && !state.skeletonEnemies[1].dead;
 }
 
@@ -534,16 +536,23 @@ bool MoveThroughRoute(GameSimulation& simulation,
 
 } // namespace
 
-int main()
+int main(int argc, char** argv)
 {
     Checks checks;
-    const GameSimulationConfig config = ProductionGameSimulationConfig();
+    GameSimulationConfig config = ProductionGameSimulationConfig();
+    if (argc == 2 && std::string_view(argv[1]) == "--legacy-contact-policy")
+        config.combatFoundation1_7 = false;
+    else if (argc != 1)
+        return 2;
     checks.Require(config.waterfallSkeletonEncounter,
                    "production config enables the accepted waterfall guard placement");
     checks.Require(config.swordStartsStowed,
                    "production starts with the sword stowed while retaining the waterfall guard placement");
 
     GameSimulation simulation(config);
+    checks.Require(simulation.Snapshot().modernCombatRules == config.combatFoundation1_7 &&
+                   simulation.Snapshot().skeletonEnemies[0].health == (config.combatFoundation1_7 ? 2 : 1),
+                   "explicit live and historical profiles publish their exact two-hit/one-hit durability policy");
     std::uint64_t publicationSequence = simulation.Snapshot().inputPublicationSequence;
     const auto verifyResetPair = [&checks, &config](const SimulationSnapshot& state, std::string_view phase, bool coldStart = false)
     {

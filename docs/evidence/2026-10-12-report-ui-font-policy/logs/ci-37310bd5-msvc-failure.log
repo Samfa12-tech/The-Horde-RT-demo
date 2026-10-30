@@ -1,0 +1,105 @@
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:03.9781904Z         Start 110: horde_rt_windows_remote_playtest_report_ui_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:05.7148591Z 110/132 Test #110: horde_rt_windows_remote_playtest_report_ui_tests ...........   Passed    1.74 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:05.7153017Z         Start 111: horde_rt_windows_playtest_report_ui_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.8999440Z 111/132 Test #111: horde_rt_windows_playtest_report_ui_tests ..................***Failed    4.18 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9001842Z UI stack 0: win32u!NtGdiGetTextMetricsW+0x14 address=0x7ffc60622064
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9002886Z UI stack 1: win32u!NtGdiGetTextMetricsW+0x14 address=0x7ffc60622064
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9003570Z UI stack 2: gdi32full!GetTextMetricsW+0x231 address=0x7ffc5fd59041
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9004473Z UI stack 3: Msftedit!Ordinal15+0xff4ca address=0x7ffc2f9af4ca
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9004927Z UI stack 4: Msftedit!CreateTextServices+0xc5c8 address=0x7ffc2f9bc1a8
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9005866Z UI stack 5: Msftedit!RichEditWndProc+0x16a64 address=0x7ffc2f9eb8e4
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9007560Z UI stack 6: Msftedit!RichEditWndProc+0x1574a address=0x7ffc2f9ea5ca
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9009327Z UI stack 7: Msftedit!Ordinal15+0xef242 address=0x7ffc2f99f242
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9010422Z UI stack 8: Msftedit!Ordinal15+0xef161 address=0x7ffc2f99f161
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9011838Z UI stack 9: Msftedit!Ordinal15+0x402ca address=0x7ffc2f8f02ca
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9012606Z UI stack 10: Msftedit!Ordinal15+0x67909 address=0x7ffc2f917909
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9013662Z UI stack 11: Msftedit!Ordinal15+0x658b3 address=0x7ffc2f9158b3
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9015093Z UI stack 12: Msftedit!CreateTextServices+0x227d3 address=0x7ffc2f9d23b3
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9016673Z UI stack 13: Msftedit!RichEditWndProc+0xb22 address=0x7ffc2f9d59a2
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9017843Z UI stack 14: USER32!CallWindowProcW+0x6a6 address=0x7ffc620d7846
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9018945Z UI stack 15: USER32!SendMessageW+0xacc address=0x7ffc620d70cc
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9021013Z UI stack 16: USER32!User32InitializeImmEntryTable+0x1375 address=0x7ffc620f5ab5
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9022287Z UI stack 17: ntdll!KiUserCallbackDispatcher+0x24 address=0x7ffc62ae6814
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9024292Z UI stack 18: win32u!NtUserGetMessage+0x14 address=0x7ffc60621324
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9028554Z native control message timed out; phase=note-only approved Unicode note edit hwnd=00000000000601E0 controlId=106 message=0xc error=1460 senderThread=9652 ownerThread=856 elapsedMs=2002 enabled=1 visible=1 guiInfoAvailable=1 guiInfoError=0 guiFlags=0x0 active=00000000000501D0 focus=00000000000301D4 capture=0000000000000000
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9032139Z UI stack 19: USER32!GetMessageW+0x22 address=0x7ffc620ff402
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9032942Z UI stack 20: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff75660ddc3
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9034222Z UI stack 21: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff75660908c
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9035767Z UI stack 22: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff75661665f
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9038978Z UI stack 23: KERNEL32!BaseThreadInitThunk+0x17 address=0x7ffc60b6e987
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9039876Z UI stack 0: win32u!NtGdiGetCharWidthW+0x14 address=0x7ffc60622944
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9040664Z UI stack 1: win32u!NtGdiGetCharWidthW+0x14 address=0x7ffc60622944
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9041346Z UI stack 2: gdi32full!GetCharWidth32W+0x212 address=0x7ffc5fd9f1d2
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9042033Z UI stack 3: gdi32full!GetCharWidthW+0x14 address=0x7ffc5fd9efb4
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9042842Z UI stack 4: Msftedit!CreateTextServices+0xef74 address=0x7ffc2f9beb54
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9043593Z UI stack 5: Msftedit!Ordinal15+0xf9915 address=0x7ffc2f9a9915
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9044266Z UI stack 6: Msftedit!Ordinal15+0x4f348 address=0x7ffc2f8ff348
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9045211Z UI stack 7: Msftedit!Ordinal15+0x4e9c0 address=0x7ffc2f8fe9c0
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9045988Z UI stack 8: Msftedit!Ordinal15+0x4ce86 address=0x7ffc2f8fce86
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9046652Z UI stack 9: Msftedit!Ordinal15+0x29377 address=0x7ffc2f8d9377
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9047061Z UI stack 10: Msftedit!Ordinal15+0x28236 address=0x7ffc2f8d8236
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9047441Z UI stack 11: Msftedit!Ordinal15+0x2791a address=0x7ffc2f8d791a
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9047805Z UI stack 12: Msftedit!Ordinal15+0x2642d address=0x7ffc2f8d642d
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9048163Z UI stack 13: Msftedit!Ordinal15+0x55321 address=0x7ffc2f905321
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9048514Z UI stack 14: Msftedit!Ordinal15+0x5403c address=0x7ffc2f90403c
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9048869Z UI stack 15: Msftedit!Ordinal15+0x5b17a address=0x7ffc2f90b17a
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9049230Z UI stack 16: Msftedit!Ordinal15+0x11c89 address=0x7ffc2f8c1c89
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9049605Z UI stack 17: Msftedit!Ordinal15+0x47605 address=0x7ffc2f8f7605
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9049968Z UI stack 18: Msftedit!Ordinal15+0xc1ae address=0x7ffc2f8bc1ae
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9050333Z UI stack 19: Msftedit!Ordinal15+0xc534 address=0x7ffc2f8bc534
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9050695Z UI stack 20: Msftedit!Ordinal15+0x7682a address=0x7ffc2f92682a
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9051054Z UI stack 21: Msftedit!Ordinal15+0x659d0 address=0x7ffc2f9159d0
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9051684Z UI stack 22: Msftedit!CreateTextServices+0x227d3 address=0x7ffc2f9d23b3
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9052112Z UI stack 23: Msftedit!RichEditWndProc+0xb22 address=0x7ffc2f9d59a2
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9052446Z note EDIT executing=1
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9052652Z UI wait-chain nodes=1 cycle=0
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9052870Z   node=0 type=8 status=3
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9053195Z note EDIT trace; phase=note-only initial note edit returned=1 elapsedMs=16
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9053692Z note EDIT trace; phase=note-only rejected-input note edit returned=1 elapsedMs=515
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9054192Z note EDIT trace; phase=note-only oversized note edit returned=1 elapsedMs=0
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9055081Z note EDIT trace; phase=note-only approved Unicode note edit returned=0 elapsedMs=0
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9055574Z note EDIT trace; phase=note-only frozen retry edit returned=1 elapsedMs=16
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9056031Z note EDIT trace; phase=explicit-context note edit returned=1 elapsedMs=0
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9056324Z 
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:09.9056453Z         Start 112: horde_rt_music_asset_admission_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:17.6720418Z 112/132 Test #112: horde_rt_music_asset_admission_tests .......................   Passed    7.77 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:43:17.6725373Z         Start 113: horde_rt_horde_162_asset_policy_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:15.0863830Z 113/132 Test #113: horde_rt_horde_162_asset_policy_tests ......................   Passed  177.41 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:15.0869986Z         Start 114: horde_rt_android_showcase_witness_policy_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:19.7231429Z 114/132 Test #114: horde_rt_android_showcase_witness_policy_tests .............   Passed    4.64 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:19.7237543Z         Start 115: horde_rt_pocket_audio_core_pin_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.8133356Z 115/132 Test #115: horde_rt_pocket_audio_core_pin_tests .......................   Passed    2.09 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.8138173Z         Start 116: horde_rt_lantern_reward_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.8304012Z 116/132 Test #116: horde_rt_lantern_reward_tests ..............................   Passed    0.02 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.8308191Z         Start 117: horde_rt_lantern_pendulum_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.8490793Z 117/132 Test #117: horde_rt_lantern_pendulum_tests ............................   Passed    0.02 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.8494736Z         Start 118: horde_rt_input_mailbox_stress
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.9237981Z 118/132 Test #118: horde_rt_input_mailbox_stress ..............................   Passed    0.07 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.9243857Z         Start 119: horde_rt_desktop_controller_input_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.9674279Z 119/132 Test #119: horde_rt_desktop_controller_input_tests ....................   Passed    0.04 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.9678227Z         Start 120: horde_rt_gpu_timestamp_math_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.9808506Z 120/132 Test #120: horde_rt_gpu_timestamp_math_tests ..........................   Passed    0.01 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.9812592Z         Start 121: horde_rt_combat_smoke
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.9955881Z 121/132 Test #121: horde_rt_combat_smoke ......................................   Passed    0.01 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:21.9959885Z         Start 122: horde_rt_showcase_route_smoke
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:22.0091939Z 122/132 Test #122: horde_rt_showcase_route_smoke ..............................   Passed    0.01 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:22.0096034Z         Start 123: horde_rt_showcase_gameplay_smoke
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:22.0326605Z 123/132 Test #123: horde_rt_showcase_gameplay_smoke ...........................   Passed    0.02 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:22.0332286Z         Start 124: horde_rt_spatial_audio_smoke
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:22.0941978Z 124/132 Test #124: horde_rt_spatial_audio_smoke ...............................   Passed    0.06 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:22.0946645Z         Start 125: horde_rt_rescue_traversal_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:22.1944462Z 125/132 Test #125: horde_rt_rescue_traversal_tests ............................   Passed    0.10 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:22.1948600Z         Start 126: horde_rt_rescue_blockout_import_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:22.2216166Z 126/132 Test #126: horde_rt_rescue_blockout_import_tests ......................   Passed    0.03 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:22.2219913Z         Start 127: horde_rt_rescue_source_admission_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:23.8508856Z 127/132 Test #127: horde_rt_rescue_source_admission_tests .....................   Passed    1.63 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:23.8513713Z         Start 128: horde_rt_water_contact_audio_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:24.1893750Z 128/132 Test #128: horde_rt_water_contact_audio_tests .........................   Passed    0.34 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:24.1898934Z         Start 129: horde_rt_keeper_death_audio_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:24.3493101Z 129/132 Test #129: horde_rt_keeper_death_audio_tests ..........................   Passed    0.16 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:24.3497287Z         Start 130: horde_rt_kit_audio_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:24.4889048Z 130/132 Test #130: horde_rt_kit_audio_tests ...................................   Passed    0.14 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:24.4892902Z         Start 131: horde_rt_chapter_texture_alias_payload_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:24.7530450Z 131/132 Test #131: horde_rt_chapter_texture_alias_payload_tests ...............   Passed    0.26 sec
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:24.7535747Z         Start 132: pocket_audio_native_pcm_tests
+Shared simulation host (MSVC)	Run shared gameplay tests	2026-10-11T19:46:24.7681894Z 132/132 Test #132: pocket_audio_native_pcm_tests ..............................   Passed    0.01 sec

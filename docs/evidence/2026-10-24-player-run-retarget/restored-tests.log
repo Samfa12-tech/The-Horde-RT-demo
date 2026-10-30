@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start  79: horde_rt_player_directional_rig_tests
+1/4 Test  #79: horde_rt_player_directional_rig_tests ......   Passed    9.78 sec
+    Start  80: horde_rt_player_dodge_rig_tests
+2/4 Test  #80: horde_rt_player_dodge_rig_tests ............   Passed   15.93 sec
+    Start  81: horde_rt_player_dodge_lifecycle_tests
+3/4 Test  #81: horde_rt_player_dodge_lifecycle_tests ......   Passed    5.84 sec
+    Start 107: horde_rt_player_dodge_presentation_tests
+4/4 Test #107: horde_rt_player_dodge_presentation_tests ...   Passed    2.87 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  34.46 sec

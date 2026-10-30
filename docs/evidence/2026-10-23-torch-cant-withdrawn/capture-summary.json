@@ -1,0 +1,138 @@
+{
+  "control": {
+    "captures": 49,
+    "matchedSettings": true,
+    "matchedSimulationTicks": true,
+    "matchedEmitterPower": true,
+    "outputAndInternalDimensions": [
+      960,
+      540
+    ],
+    "rtBackend": "RayTracingPipeline",
+    "settings": {
+      "shader": "High",
+      "fire": "High",
+      "shadows": "Higher",
+      "mist": true,
+      "dust": "High"
+    },
+    "zeroPrimaryArmPixelIndices": [
+      1,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      31,
+      37,
+      38,
+      45,
+      46,
+      47
+    ],
+    "processReceipt": "control.process.json"
+  },
+  "candidate": {
+    "captures": 49,
+    "matchedSettings": true,
+    "matchedSimulationTicks": true,
+    "matchedEmitterPower": true,
+    "outputAndInternalDimensions": [
+      960,
+      540
+    ],
+    "rtBackend": "RayTracingPipeline",
+    "settings": {
+      "shader": "High",
+      "fire": "High",
+      "shadows": "Higher",
+      "mist": true,
+      "dust": "High"
+    },
+    "zeroPrimaryArmPixelIndices": [
+      1,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      31,
+      37,
+      38,
+      45,
+      46,
+      47
+    ],
+    "processReceipt": "candidate.process.json"
+  },
+  "corrected": {
+    "captures": 49,
+    "matchedSettings": true,
+    "matchedSimulationTicks": true,
+    "matchedEmitterPower": true,
+    "outputAndInternalDimensions": [
+      960,
+      540
+    ],
+    "rtBackend": "RayTracingPipeline",
+    "settings": {
+      "shader": "High",
+      "fire": "High",
+      "shadows": "Higher",
+      "mist": true,
+      "dust": "High"
+    },
+    "zeroPrimaryArmPixelIndices": [
+      1,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      17,
+      18,
+      21,
+      22,
+      23,
+      24,
+      25,
+      31,
+      37,
+      38,
+      45,
+      46,
+      47
+    ],
+    "processReceipt": "corrected.process.json"
+  }
+}

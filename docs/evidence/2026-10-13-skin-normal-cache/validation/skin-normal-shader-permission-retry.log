@@ -1,0 +1,20 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 104: horde_rt_raygen_variant_artifact_tests
+1/2 Test #104: horde_rt_raygen_variant_artifact_tests ...***Failed    2.21 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\RaygenVariantArtifactTests.ps1:28
+Line |
+  28 |      if (-not $Condition) { throw $Message }
+     |                             ~~~~~~~~~~~~~~
+     | Compatibility generic include changed unexpectedly.
+
+    Start 105: horde_rt_rayquery_compute_shader_tests
+2/2 Test #105: horde_rt_rayquery_compute_shader_tests ...   Passed   62.75 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =  64.99 sec
+
+The following tests FAILED:
+	104 - horde_rt_raygen_variant_artifact_tests (Failed)
+Errors while running CTest

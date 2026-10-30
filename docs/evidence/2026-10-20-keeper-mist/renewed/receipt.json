@@ -1,0 +1,222 @@
+{
+  "sourceHead": "084a73c5457c9f71d1c9ed8070e1ffe451e564e4",
+  "authorization": "Sam explicitly approved corrected guard plus one fresh bounded noncombat comparison after earlier denial",
+  "guardChange": "Exact request-scoped missing-file text with observed host exit0/1 is pending; transport errors/invalid JSON/PID uncertainty stop. Read-only real probe precedes launch.",
+  "installedBuild": {
+    "sourceHead": "084a73c5457c9f71d1c9ed8070e1ffe451e564e4",
+    "apkSha256": "b7e387d16c2876abf532ce461b9b71bb1e77d60220192a9f5333031098bb819d",
+    "bytes": 186143925,
+    "assetCount": 175,
+    "assetsByteExactToPrior175": true,
+    "signerSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "sourceManifestSha256": "6f2539f3080b5ac52204653012066327e0d0c62dbe86956153b567444d31209c",
+    "policy": "optimized Debug Shipping/Mobile RayTracingPipeline; route timing on; stage/clock probes off",
+    "installedPullbackSha256": "b7e387d16c2876abf532ce461b9b71bb1e77d60220192a9f5333031098bb819d"
+  },
+  "sequence": {
+    "declared": [
+      "a1-On",
+      "b1-Off",
+      "b2-Off",
+      "a2-On-closing"
+    ],
+    "appPreparations": 1,
+    "hostArmPublished": true,
+    "nativeArmed": false,
+    "timedFrames": 0,
+    "acceptedPerformanceRuns": 0,
+    "failedRequest": "keeper20r-a1",
+    "nativeError": "fixture-arm-request-identity-mismatch",
+    "remainingRequests": "not launched; stopped at first native failure; no replacement/retry"
+  },
+  "preparedPhysicalScope": {
+    "setupTicks": 430,
+    "camera": [
+      -31.2000008,
+      -0.949999988,
+      -15.1999998,
+      -1.57079637,
+      0
+    ],
+    "keeper": {
+      "x": -34.7000008,
+      "y": -0.519999981,
+      "z": -15.1999998,
+      "health": 3,
+      "readable": true,
+      "roomMistDensity": 1,
+      "staffLight": 0
+    },
+    "settings": {
+      "scalePercent": 40,
+      "water": 1,
+      "fire": 0,
+      "frameCap": 30,
+      "glass": false,
+      "shadow": 1,
+      "mist": true,
+      "dust": 1
+    },
+    "dispatch": [
+      576,
+      1188
+    ],
+    "surface": [
+      1440,
+      2971
+    ],
+    "minimumNativeCheckedPreparationFrames": 12,
+    "retainedActualPresentationRows": 19,
+    "meaning": "real frozen noncombat two-light/mist preparation only; not timed/combat/FPS acceptance"
+  },
+  "failureProof": {
+    "armFileBytes": 0,
+    "armFileSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ownerSimulationBytesUnchanged": true,
+    "retirementProven": true,
+    "wholeSequenceStopped": true,
+    "hostCustodyArmedFieldMeaning": "original armed=true means host token file published; native report armed=false is authoritative"
+  },
+  "custody": {
+    "debugPid": null,
+    "ownerSettingsByteExact": true,
+    "campaignRecordsAndLocksByteExact": 12,
+    "settingsSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee"
+  },
+  "decisions": {
+    "performance": "inconclusive: no new saving/adoption",
+    "keepInBuild": "already banked exact-zero-mist exit and mobile fresh/reset MistOff; saved choices preserved",
+    "newQualityOrCpuReorder": "none",
+    "nextPhoneGate": "prove exact nonempty arm transport before publication; prospective checked host code is offline-only and not device exercised",
+    "nextMilestone": "parent review then existing 1.7 roadmap/acceptance; no endless repeat or heavy expansion"
+  },
+  "postStopChecks": {
+    "guardTests": 11,
+    "analyzerTests": 23,
+    "imageOrNativeFinalImage": null,
+    "prospectiveRunnerExecuted": false,
+    "prospectiveRunnerPath": "reports/keeper-mist-2026-10-20/renewed/runner-proposed-not-executed.py"
+  },
+  "artifactHashes": {
+    "reports/keeper-mist-2026-10-20/renewed/a1.log": {
+      "bytes": 791,
+      "sha256": "9c8bd270412760f3632a2ea4186ba7af51d01f92501ccaffbedf1e5b94abab50"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/actual-missing-file-read.json": {
+      "bytes": 145,
+      "sha256": "573bb94f2a2664c85c4245d172f5248a10e72354e9a324db8d5fe3e537f413d9"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/build-source-manifest.json": {
+      "bytes": 62420,
+      "sha256": "6f2539f3080b5ac52204653012066327e0d0c62dbe86956153b567444d31209c"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/build.json": {
+      "bytes": 621,
+      "sha256": "28a02e7341cd776468d1f358170da729da032046f59e808fccfe97a50e104881"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/final-custody.json": {
+      "bytes": 193,
+      "sha256": "30e60ab47884529ab626d19746f4128608f94fbf95189d47cfa9d424fd18b7bf"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/final-custody.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/install.txt": {
+      "bytes": 38,
+      "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/owner-before.json": {
+      "bytes": 1645,
+      "sha256": "6c118bd0d8a431f732a0ea93fab59b13912293be89a14d48a65acb009b9b8ca4"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/owner-settings.xml": {
+      "bytes": 1351,
+      "sha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/preflight-read-probe-r01.log": {
+      "bytes": 2677,
+      "sha256": "caafd9721d69f6370c2ba8c9a77b60ed1cb8f5f415615f8a57e535b2615c523d"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/preflight.log": {
+      "bytes": 591,
+      "sha256": "00f8408955d7a99ace56705718ca406f123737521b82173016282d2f8d683703"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/run.py": {
+      "bytes": 10544,
+      "sha256": "e99fa19d1fe88d21f955584d0991bc5a979a550e2253850832879f23c113bba1"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/runner-proposed-not-executed.py": {
+      "bytes": 10872,
+      "sha256": "3cc0a630ab02f6e05265b44abe0f6b6f06540cb24e49919c0e9334875c604426"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/runner-used.py": {
+      "bytes": 10544,
+      "sha256": "e99fa19d1fe88d21f955584d0991bc5a979a550e2253850832879f23c113bba1"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/signer.txt": {
+      "bytes": 311,
+      "sha256": "ccabc0788f8c2f0fca0620b6e4b1533bf6da1ade565222ecc603dbe6e2ce546f"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/source.patch": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/arm-readback.bin": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/arm-readback.json": {
+      "bytes": 240,
+      "sha256": "c8d8551e002b0349dabc8e05146cf8e72c15fa74f97431bac674a6652eb5c7aa"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/battery-after.txt": {
+      "bytes": 12735,
+      "sha256": "208df8f5f27baaeb1ce6b02cfcbe7de612048366a340446b170c75a1fa2f008b"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/battery-before.txt": {
+      "bytes": 12735,
+      "sha256": "a71296e8796e2e2491bf4836f60cf8825307aa0974a3865cdd11176e5e2354af"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/custody.json": {
+      "bytes": 127,
+      "sha256": "e4f814af270f72ffccf324e7bc00b4bad1909f63dcc25f1f4784bca501471e1d"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/launch.txt": {
+      "bytes": 318,
+      "sha256": "ebad53290ed0229c72fc274d042034101b2499aadb4230e18483a92d61489fa6"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/native.json": {
+      "bytes": 9245,
+      "sha256": "2d8a1f5dfb291e99d886a426cc51ed342cdb3f47517987a452282663d42c1be8"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/owned.log": {
+      "bytes": 43683,
+      "sha256": "4031d26b472b6ef7fafd5114ff8f535ede113f9a44ef9a1123d662942cf1f04f"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/owner-after.json": {
+      "bytes": 1645,
+      "sha256": "6c118bd0d8a431f732a0ea93fab59b13912293be89a14d48a65acb009b9b8ca4"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/ready.json": {
+      "bytes": 139,
+      "sha256": "d6a6bfcc81a6a3c08376e2ab1c276d9a64b7f4f83e6e1f4730a40b1f96452999"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/request.json": {
+      "bytes": 240,
+      "sha256": "47cd34bb617df9c3b08723bd413b25767fe4f90890251413098a86794bc87970"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/settings-after.xml": {
+      "bytes": 1351,
+      "sha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/thermal-admission.json": {
+      "bytes": 171,
+      "sha256": "fa3199e45c21e89877dffafa0745efdc9444654a96976bb73eacaa3738dc0632"
+    },
+    "reports/keeper-mist-2026-10-20/renewed/a1/thermals.json": {
+      "bytes": 2532,
+      "sha256": "a7b47d05d1c6938588cda878bfc5ae74d76a02c8f835999840eebd3254ec990b"
+    }
+  }
+}

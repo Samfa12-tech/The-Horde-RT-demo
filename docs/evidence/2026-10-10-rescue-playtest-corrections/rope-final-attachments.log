@@ -1,0 +1,459 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 154
+    Start 154: horde_rt_rescue_journey_integration_tests
+
+154: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_journey_integration_tests.exe"
+154: Working Directory: <repo>/build/presets/windows-x64-debug
+154: Test timeout computed to be: 1500
+154: claim-site position=-34,-17.55 prompt=0 phase=4
+154: cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+154: unready-edge start=39.9707,-0.0043903 end=39.9707,-0.0043903 blocked=1
+154: cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+154: region markers were not included as separately counted original geometry
+154: Combined CPU preparation resident_ns=177600 staged_ns=163400 resident_retained_bytes=49056 staged_retained_bytes=49056 resident_peak_capacity_bytes=71808 staged_peak_capacity_bytes=71808 gpu_residency_comparison=NOT_MEASURED
+154: Rescue journey integration cases=19447 failures=1 retained_triangles=1022
+1/2 Test #154: horde_rt_rescue_journey_integration_tests ...***Failed    9.28 sec
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+unready-edge start=39.9707,-0.0043903 end=39.9707,-0.0043903 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+region markers were not included as separately counted original geometry
+Combined CPU preparation resident_ns=177600 staged_ns=163400 resident_retained_bytes=49056 staged_retained_bytes=49056 resident_peak_capacity_bytes=71808 staged_peak_capacity_bytes=71808 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=19447 failures=1 retained_triangles=1022
+
+test 156
+    Start 156: horde_rt_rescue_rig_attachment_tests
+
+156: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_rig_attachment_tests.exe"
+156: Working Directory: <repo>/build/presets/windows-x64-debug
+156: Test timeout computed to be: 180
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+156: Rescue rig attachment cases=15919 failures=204 sampled_poses=942 max_left_reach=0.612487@phase=6 max_right_reach=0.619502@phase=6
+2/2 Test #156: horde_rt_rescue_rig_attachment_tests ........***Failed   29.96 sec
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+FAIL: the cantilever anchor and rope must clear the admitted body radius and margin
+Rescue rig attachment cases=15919 failures=204 sampled_poses=942 max_left_reach=0.612487@phase=6 max_right_reach=0.619502@phase=6
+
+
+0% tests passed, 2 tests failed out of 2
+
+Total Test time (real) =  39.26 sec
+
+The following tests FAILED:
+	154 - horde_rt_rescue_journey_integration_tests (Failed)
+	156 - horde_rt_rescue_rig_attachment_tests (Failed)
+Errors while running CTest

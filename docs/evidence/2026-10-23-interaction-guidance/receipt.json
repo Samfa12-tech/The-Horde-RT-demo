@@ -1,0 +1,72 @@
+{
+  "baseCommit": "c2f39ece941417d112a81b50c2ac3b6d76e07be7",
+  "scope": "Controls-help text only; no input, traversal, gameplay, saves, rendering or defaults changed. No phone or runtime RT/performance acceptance.",
+  "sourceFiles": {
+    "android/app/src/main/res/values/strings.xml": {
+      "bytes": 25137,
+      "sha256": "3025d8a408cacc5a626f087bb0e363cd3a35d694a5c5ff620eb5857a129341c7",
+      "canonicalLfSha256": "8eb50504e58e95303ba53054451e771d1a74ac937fb24cedca82f57eab3f5e83"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 619656,
+      "sha256": "0aca58a5bb95154d9824854f250b526c94fe75cb3bb5707564562216a3e6b57b",
+      "canonicalLfSha256": "8b3a1f38fc459fb8be8fd35b94f48279ade7375f3b60ca3ca6081788a861c829"
+    }
+  },
+  "android": {
+    "resourcesCompiled": true,
+    "gradleExitCode": 0,
+    "command": "gradlew.bat :app:processDebugResources :app:testDebugUnitTest --tests com.samfa12.hordelanternrt.AndroidControllerIntegrationTest --tests com.samfa12.hordelanternrt.ContextualControlsLayoutTest --tests com.samfa12.hordelanternrt.LanternPoseControlTest --offline --console=plain",
+    "cases": 42,
+    "classes": [
+      {
+        "name": "com.samfa12.hordelanternrt.AndroidControllerIntegrationTest",
+        "tests": "34",
+        "skipped": "0",
+        "failures": "0",
+        "errors": "0",
+        "timestamp": "2026-10-23T11:49:32",
+        "hostname": "SAM_LAPPY",
+        "time": "9.574"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.ContextualControlsLayoutTest",
+        "tests": "6",
+        "skipped": "0",
+        "failures": "0",
+        "errors": "0",
+        "timestamp": "2026-10-23T11:49:42",
+        "hostname": "SAM_LAPPY",
+        "time": "4.078"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.LanternPoseControlTest",
+        "tests": "2",
+        "skipped": "0",
+        "failures": "0",
+        "errors": "0",
+        "timestamp": "2026-10-23T11:49:46",
+        "hostname": "SAM_LAPPY",
+        "time": "1.323"
+      }
+    ],
+    "log": {
+      "bytes": 1508,
+      "sha256": "e61abfcb5db36e104b58e8ca2621a4dcf55271611d664e0508992ed8cd35be26"
+    }
+  },
+  "windows": {
+    "buildExitCode": 0,
+    "target": "horde_rt_diagnostic_window Debug",
+    "executable": {
+      "bytes": 14157824,
+      "sha256": "b39b1d617975dab54709587036d65007d5564b0c9ed6f1929254f652007dbadf"
+    },
+    "log": {
+      "bytes": 1775,
+      "sha256": "b647e72ef1c5c9677b41f7ab3db61ea8a3efc64dd8e6cb100af66e16bb5d3035"
+    }
+  },
+  "initialCommandDisposition": "Initial command did not start Gradle: output redirect targeted a missing repository reports directory. Corrected before running checks.",
+  "sourceHashScope": "Raw compiler-input hashes plus canonical LF hashes for Git checkout line-ending normalization."
+}

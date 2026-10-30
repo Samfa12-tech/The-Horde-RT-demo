@@ -1,0 +1,88 @@
+{
+  "starting_commit": "ba7caf656246f8b74f8343b21909b1d16dfa3d98",
+  "source_commit": "214c40c69266e35485f5945bd5db599c8bee7a1c",
+  "protected_files": [
+    {
+      "path": "AGENTS.md",
+      "git_blob": "654e7fa4a57d65bad69de5214019cd1b38352698",
+      "unchanged": true
+    },
+    {
+      "path": "docs/AGENT_ENGINE_CONTRACTS.md",
+      "git_blob": "485f766b84ff28a05980872d3a086a375a77f6b8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/AGENT_VALIDATION.md",
+      "git_blob": "8399d149c9b958349770e28e29322af0687c42a2",
+      "unchanged": true
+    },
+    {
+      "path": "tests/FinalHeldTorchClearanceTests.cpp",
+      "git_blob": "cc6aefb5884e9307a39e97f33ee809f8053a1174",
+      "unchanged": true
+    },
+    {
+      "path": "src/gameplay/SwordContactProxy.h",
+      "git_blob": "126c2579e276df9c057338943d386a99c3b4cc50",
+      "unchanged": true
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.cpp",
+      "git_blob": "9f344d62de651dd43b2b464c9172174c409f36e5",
+      "unchanged": true
+    },
+    {
+      "path": "src/vulkan/raytracing/RtSceneAbi.def",
+      "git_blob": "598563552deac9ebc35072d56689add211c7d212",
+      "unchanged": true
+    },
+    {
+      "path": "tools/raygen-variant-budgets.json",
+      "git_blob": "90d40a313084dca95055ed2ea32a231da9d0b9bb",
+      "unchanged": true
+    },
+    {
+      "path": "tools/raygen-variants.json",
+      "git_blob": "4fc8e115e92dfd237bacd076d2227b646343bf44",
+      "unchanged": true
+    },
+    {
+      "path": "tools/raygen-variant-catalog.json",
+      "git_blob": "6bfa9f24a91189835b05567d4b30cf79b4ddb9ec",
+      "unchanged": true
+    },
+    {
+      "path": "tools/rayquery-variant-catalog.json",
+      "git_blob": "20905500ef148c87870b02f680281d1ee2e200a1",
+      "unchanged": true
+    },
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "git_blob": "1b5a40a37d47b0558781226f35a8fa17cfad2e39",
+      "unchanged": true
+    },
+    {
+      "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      "git_blob": "76a12d4eb705475b4a3c913d4c4a705bc93a6aa5",
+      "unchanged": true
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "git_blob": "4dd74f4374a1bc596e0f126258e01f3c29a44d93",
+      "unchanged": true
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "git_blob": "bcdf5a7813d71ac7adcf63d52718ecb89e18b4cf",
+      "unchanged": true
+    }
+  ],
+  "unchanged_trees": [
+    "shaders",
+    "assets",
+    "src/vulkan/raytracing/variants",
+    "historical docs/evidence and plans"
+  ],
+  "other_worktrees": "No writes or history operations; primary unrelated work preserved."
+}

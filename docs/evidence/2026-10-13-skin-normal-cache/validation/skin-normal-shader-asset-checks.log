@@ -1,0 +1,43 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start  25: horde_rt_player_package_inventory_tests
+1/5 Test  #25: horde_rt_player_package_inventory_tests ...   Passed    1.21 sec
+    Start 103: horde_rt_raygen_variant_manifest_tests
+2/5 Test #103: horde_rt_raygen_variant_manifest_tests ....***Failed    2.00 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\RaygenVariantManifestTests.ps1:25
+Line |
+  25 |      if (-not $Condition) { throw $Message }
+     |                             ~~~~~~~~~~~~~~
+     | Generic include hash changed before matrix compilation.
+
+    Start 104: horde_rt_raygen_variant_artifact_tests
+3/5 Test #104: horde_rt_raygen_variant_artifact_tests ....***Failed    2.53 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\RaygenVariantArtifactTests.ps1:28
+Line |
+  28 |      if (-not $Condition) { throw $Message }
+     |                             ~~~~~~~~~~~~~~
+     | Compatibility generic include changed unexpectedly.
+
+    Start 105: horde_rt_rayquery_compute_shader_tests
+4/5 Test #105: horde_rt_rayquery_compute_shader_tests ....***Failed    1.58 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\GenerateRayQueryComputeVariants.ps1:289
+Line |
+ 289 |          throw "Compute compilation failed for $($Variant.key) with ex …
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Compute compilation failed for rayquery_compute_diagnostic_high_generic_dielectric with exit code 1:
+     | C:\Users\sam_s\Documents\the Horde RT
+     | Demo\.worktrees\horde-1.7-wp2-vertical-proof\shaders\raytracing\minimal.comp ERROR: Failed to open file:
+     | C:\Users\sam_s\AppData\Local\Packages\sandbox.{8ac1f8fe-784b-458a-bb76-70dcda0bbda4}\AC\Temp\horde-rt-rayquery-compute-check-a855634441304a188887629404a42666\run-b0429dcc814049b485299ecdd532d7de\rayquery_compute_diagnostic_high_generic_dielectric\minimal.comp.raw.spv
+
+    Start 144: horde_rt_horde_162_asset_policy_tests
+5/5 Test #144: horde_rt_horde_162_asset_policy_tests .....   Passed  318.79 sec
+
+40% tests passed, 3 tests failed out of 5
+
+Total Test time (real) = 326.15 sec
+
+The following tests FAILED:
+	103 - horde_rt_raygen_variant_manifest_tests (Failed)
+	104 - horde_rt_raygen_variant_artifact_tests (Failed)
+	105 - horde_rt_rayquery_compute_shader_tests (Failed)
+Errors while running CTest

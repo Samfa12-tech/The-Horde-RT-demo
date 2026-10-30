@@ -1,0 +1,40 @@
+[
+  {
+    "render": "12_skull_open_boundaries.png",
+    "render_source": "Derived Blender source subset; topology overlay only, not fresh GLB import",
+    "objects": 1,
+    "materials": 1,
+    "triangles": 2466,
+    "blender_bounds_min_m": [
+      -0.07985502481460571,
+      -0.10296313464641571,
+      0.0
+    ],
+    "blender_bounds_max_m": [
+      0.07985502481460571,
+      0.10296313464641571,
+      0.2149118185043335
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import",
+    "diagnostic_overlay": "Open edges orange, edges with more than two linked faces red; curves excluded from asset outputs"
+  },
+  {
+    "render": "13_spine_source_topology.png",
+    "render_source": "Derived Blender source subset; topology overlay only, not fresh GLB import",
+    "objects": 1,
+    "materials": 1,
+    "triangles": 5325,
+    "blender_bounds_min_m": [
+      -0.04613273963332176,
+      -0.05829674005508423,
+      0.9888806939125061
+    ],
+    "blender_bounds_max_m": [
+      0.04613276943564415,
+      0.11270567774772644,
+      1.5725997686386108
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import",
+    "diagnostic_overlay": "Open edges orange, edges with more than two linked faces red; curves excluded from asset outputs"
+  }
+]

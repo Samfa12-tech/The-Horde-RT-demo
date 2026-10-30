@@ -1,0 +1,19 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 154: horde_rt_gpu_resources_observation_tests
+1/7 Test #154: horde_rt_gpu_resources_observation_tests .................   Passed    0.90 sec
+    Start 155: horde_rt_gpu_buffer_batch_tests
+2/7 Test #155: horde_rt_gpu_buffer_batch_tests ..........................   Passed    0.90 sec
+    Start 157: horde_rt_scene_initialise_preflight_tests
+3/7 Test #157: horde_rt_scene_initialise_preflight_tests ................   Passed    1.32 sec
+    Start 158: horde_rt_scene_resource_inventory_tests
+4/7 Test #158: horde_rt_scene_resource_inventory_tests ..................   Passed    2.66 sec
+    Start 159: horde_rt_final_windows_bundle_containment
+5/7 Test #159: horde_rt_final_windows_bundle_containment ................   Passed   11.93 sec
+    Start 160: horde_rt_final_windows_bundle_containment_controls
+6/7 Test #160: horde_rt_final_windows_bundle_containment_controls .......   Passed  122.96 sec
+    Start 161: horde_rt_final_windows_bundle_containment_registration
+7/7 Test #161: horde_rt_final_windows_bundle_containment_registration ...   Passed   94.00 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) = 234.70 sec

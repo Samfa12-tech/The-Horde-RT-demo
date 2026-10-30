@@ -26,8 +26,8 @@ public final class RenderScalePreferenceTest {
 
     @Test
     public void unsetPreferenceUsesTheMobileDefault() {
-        assertEquals(75, MainActivity.DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT);
-        assertEquals(75, MainActivity.renderScalePercent(preferences));
+        assertEquals(33, MainActivity.DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT);
+        assertEquals(33, MainActivity.renderScalePercent(preferences));
     }
 
     @Test

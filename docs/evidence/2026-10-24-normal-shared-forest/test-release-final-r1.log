@@ -1,0 +1,16 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  21: horde_rt_graphics_preview_tests
+1/5 Test  #21: horde_rt_graphics_preview_tests .................   Passed    1.49 sec
+    Start  63: horde_rt_graphics_preview_frame_adapter_tests
+2/5 Test  #63: horde_rt_graphics_preview_frame_adapter_tests ...   Passed    0.80 sec
+    Start 205: horde_rt_scene_initialise_preflight_tests
+3/5 Test #205: horde_rt_scene_initialise_preflight_tests .......   Passed    1.76 sec
+    Start 206: horde_rt_static_geometry_cutover_tests
+4/5 Test #206: horde_rt_static_geometry_cutover_tests ..........   Passed    2.04 sec
+    Start 207: horde_rt_scene_resource_inventory_tests
+5/5 Test #207: horde_rt_scene_resource_inventory_tests .........   Passed    3.88 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  10.00 sec

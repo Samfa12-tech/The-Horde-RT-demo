@@ -96,6 +96,70 @@ int main()
           NearlyEqual(clampedFatalHold.Snapshot().deathHoldRemaining, 0.60f, 0.001f),
           "oversized updates must clamp to 50 ms instead of skipping the fatal hold");
 
+    // Half damage is exact health, not deferred whole-heart damage or free blocks.
+    PlayerVitals guarded;
+    const auto expireDamageHold = [&] { for(int tick=0;tick<20;++tick) guarded.Update(.05f); };
+    for(int hit=1;hit<=6;++hit) {
+        const auto result=guarded.TryApplyDamage(true);
+        const int remaining=6-hit;
+        check(result==(remaining?PlayerDamageResult::Damaged:PlayerDamageResult::Killed) &&
+              guarded.Snapshot().vitality==(remaining+1)/2 &&
+              guarded.Snapshot().halfHeart==((remaining&1)!=0),
+              "six separately accepted guarded hits consume exactly three hearts");
+        const auto held=guarded.Snapshot();
+        check(guarded.TryApplyDamage(true)==PlayerDamageResult::Ignored &&
+              guarded.Snapshot().vitality==held.vitality && guarded.Snapshot().halfHeart==held.halfHeart,
+              "guarded hits retain normal damage immunity and cannot consume health twice");
+        expireDamageHold();
+    }
+    check(!guarded.Snapshot().halfHeart && guarded.Snapshot().vitality==0,
+          "death cannot leave a fractional alive heart");
+    guarded.ResetForEncounter();
+    check(guarded.Snapshot().vitality==3 && !guarded.Snapshot().halfHeart,
+          "encounter reset clears partial health exactly");
+    check(guarded.RestoreCampaignVitality(3,true),"two and a half hearts restore");
+    check(!guarded.RestoreCampaignVitality(0,true) && guarded.Snapshot().vitality==3 &&
+          guarded.Snapshot().halfHeart,"invalid fractional restore preserves live health");
+    check(guarded.TryApplyDamage()==PlayerDamageResult::Damaged &&
+          guarded.Snapshot().vitality==2 && guarded.Snapshot().halfHeart,
+          "full damage from two and a half hearts leaves one and a half");
+    expireDamageHold();
+    check(guarded.TryApplyDamage(true)==PlayerDamageResult::Damaged &&
+          guarded.Snapshot().vitality==1 && !guarded.Snapshot().halfHeart,
+          "mixed full and guarded damage preserves exact half units");
+    expireDamageHold();
+    guarded.RestoreCampaignVitality(1,true);
+    check(guarded.TryApplyDamage()==PlayerDamageResult::Killed &&
+          guarded.Snapshot().vitality==0 && !guarded.Snapshot().halfHeart,
+          "a full hit kills a remaining half heart without underflow");
+
+    PlayerVitals healing;
+    healing.TryApplyDamage(true);
+    const auto damaged=healing.Snapshot();
+    check(healing.TryHealHalfUnits(1) && healing.Snapshot().vitality==3 &&
+          !healing.Snapshot().halfHeart &&
+          healing.Snapshot().invulnerabilityRemaining==damaged.invulnerabilityRemaining &&
+          healing.Snapshot().damageFlash==damaged.damageFlash &&
+          healing.Snapshot().deathHoldRemaining==damaged.deathHoldRemaining &&
+          healing.Snapshot().phase==damaged.phase,
+          "healing changes health without resetting damage timers or phase");
+    check(!healing.TryHealHalfUnits(2),"full health rejects a redundant heal");
+    healing.RestoreCampaignVitality(1,true);
+    for(int invalid:{-1,0,7,2147483647})
+        check(!healing.TryHealHalfUnits(invalid) && healing.Snapshot().vitality==1 &&
+              healing.Snapshot().halfHeart,"invalid healing cannot mutate half health");
+    check(healing.TryHealHalfUnits(2) && healing.Snapshot().vitality==2 && healing.Snapshot().halfHeart,
+          "one-heart heal preserves an existing half heart exactly");
+    healing.RestoreCampaignVitality(3,true);
+    check(healing.TryHealHalfUnits(2) && healing.Snapshot().vitality==3 && !healing.Snapshot().halfHeart,
+          "healing clamps to three hearts rather than increasing maximum health");
+    healing.RestoreCampaignVitality(1,true);healing.TryApplyDamage();
+    check(!healing.TryHealHalfUnits(2) && healing.Snapshot().phase==PlayerLifePhase::Dying,
+          "healing cannot resurrect during fatal hold");
+    for(int tick=0;tick<20;++tick)healing.Update(.05f);
+    check(!healing.TryHealHalfUnits(2) && healing.Snapshot().phase==PlayerLifePhase::Dead,
+          "healing cannot resurrect a dead player");
+
     const ShowcaseCheckpoint* skeletonRetry = FindShowcaseCheckpoint(0);
     const ShowcaseCheckpoint* lichRetry = FindShowcaseCheckpoint(9);
     const ShowcaseCheckpoint* twoEnemyCombat = FindShowcaseCheckpoint("two-enemy-combat");

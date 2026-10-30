@@ -1,0 +1,79 @@
+Test project <repo>/build/presets/windows-x64-release
+      Start   1: horde_rt_menu_ambience_tests
+ 1/37 Test   #1: horde_rt_menu_ambience_tests ....................   Passed    0.95 sec
+      Start  24: horde_rt_chapter_dialogue_tests
+ 2/37 Test  #24: horde_rt_chapter_dialogue_tests .................   Passed    1.01 sec
+      Start  25: horde_rt_combat_foundation_tests
+ 3/37 Test  #25: horde_rt_combat_foundation_tests ................   Passed    1.02 sec
+      Start  26: horde_rt_held_item_transition_tests
+ 4/37 Test  #26: horde_rt_held_item_transition_tests .............   Passed    0.86 sec
+      Start  27: horde_rt_combat_timing_trace_tests
+ 5/37 Test  #27: horde_rt_combat_timing_trace_tests ..............   Passed    1.66 sec
+      Start  28: horde_rt_input_presentation_trace_tests
+ 6/37 Test  #28: horde_rt_input_presentation_trace_tests .........   Passed    0.84 sec
+      Start  29: horde_rt_held_item_clearance_tests
+ 7/37 Test  #29: horde_rt_held_item_clearance_tests ..............   Passed    1.26 sec
+      Start  30: horde_rt_ambience_pcm_loop_tests
+ 8/37 Test  #30: horde_rt_ambience_pcm_loop_tests ................   Passed    0.88 sec
+      Start  34: horde_rt_graphics_preview_frame_adapter_tests
+ 9/37 Test  #34: horde_rt_graphics_preview_frame_adapter_tests ...   Passed    0.92 sec
+      Start  46: horde_rt_motion_evidence_scenario_tests
+10/37 Test  #46: horde_rt_motion_evidence_scenario_tests .........   Passed    1.52 sec
+      Start  47: horde_rt_world_route_foundation_tests
+11/37 Test  #47: horde_rt_world_route_foundation_tests ...........   Passed    1.25 sec
+      Start  48: horde_rt_vertical_support_tests
+12/37 Test  #48: horde_rt_vertical_support_tests .................   Passed    0.78 sec
+      Start  49: horde_rt_held_item_vertical_support_rig_tests
+13/37 Test  #49: horde_rt_held_item_vertical_support_rig_tests ...   Passed    0.71 sec
+      Start  50: horde_rt_player_directional_rig_tests
+14/37 Test  #50: horde_rt_player_directional_rig_tests ...........   Passed    1.19 sec
+      Start  58: horde_rt_pipeline_variant_provider_tests
+15/37 Test  #58: horde_rt_pipeline_variant_provider_tests ........   Passed    0.02 sec
+      Start  59: horde_rt_pipeline_bundle_contracts_tests
+16/37 Test  #59: horde_rt_pipeline_bundle_contracts_tests ........   Passed    0.04 sec
+      Start  73: horde_rt_player_animation_tests
+17/37 Test  #73: horde_rt_player_animation_tests .................   Passed    0.90 sec
+      Start  75: horde_rt_held_item_socket_tests
+18/37 Test  #75: horde_rt_held_item_socket_tests .................   Passed    2.57 sec
+      Start  78: horde_rt_development_static_asset_tests
+19/37 Test  #78: horde_rt_development_static_asset_tests .........   Passed    1.03 sec
+      Start  81: horde_rt_tomb_dressing_tests
+20/37 Test  #81: horde_rt_tomb_dressing_tests ....................   Passed    0.06 sec
+      Start 104: horde_rt_simulation_timing_tests
+21/37 Test #104: horde_rt_simulation_timing_tests ................   Passed    0.87 sec
+      Start 105: horde_rt_simulation_gameplay_tests
+22/37 Test #105: horde_rt_simulation_gameplay_tests ..............   Passed    1.20 sec
+      Start 106: horde_rt_water_contact_tests
+23/37 Test #106: horde_rt_water_contact_tests ....................   Passed    1.03 sec
+      Start 107: horde_rt_waterfall_production_route_tests
+24/37 Test #107: horde_rt_waterfall_production_route_tests .......   Passed    1.09 sec
+      Start 108: horde_rt_waterfall_legacy_route_tests
+25/37 Test #108: horde_rt_waterfall_legacy_route_tests ...........   Passed    0.10 sec
+      Start 109: horde_rt_music_director_tests
+26/37 Test #109: horde_rt_music_director_tests ...................   Passed    0.94 sec
+      Start 110: horde_rt_sfx_volume_tests
+27/37 Test #110: horde_rt_sfx_volume_tests .......................   Passed    0.02 sec
+      Start 128: horde_rt_lantern_reward_tests
+28/37 Test #128: horde_rt_lantern_reward_tests ...................   Passed    0.80 sec
+      Start 130: horde_rt_input_mailbox_stress
+29/37 Test #130: horde_rt_input_mailbox_stress ...................   Passed    3.32 sec
+      Start 131: horde_rt_desktop_controller_input_tests
+30/37 Test #131: horde_rt_desktop_controller_input_tests .........   Passed    0.98 sec
+      Start 136: horde_rt_spatial_audio_smoke
+31/37 Test #136: horde_rt_spatial_audio_smoke ....................   Passed    0.91 sec
+      Start 144: horde_rt_scene_resource_inventory_tests
+32/37 Test #144: horde_rt_scene_resource_inventory_tests .........   Passed    1.99 sec
+      Start 157: horde_rt_rescue_traversal_tests
+33/37 Test #157: horde_rt_rescue_traversal_tests .................   Passed    1.28 sec
+      Start 158: horde_rt_rescue_blockout_import_tests
+34/37 Test #158: horde_rt_rescue_blockout_import_tests ...........   Passed    0.02 sec
+      Start 159: horde_rt_rescue_journey_integration_tests
+35/37 Test #159: horde_rt_rescue_journey_integration_tests .......   Passed    1.23 sec
+      Start 163: horde_rt_rescue_rig_attachment_tests
+36/37 Test #163: horde_rt_rescue_rig_attachment_tests ............   Passed    2.92 sec
+      Start 164: horde_rt_rescue_adversarial_regression_tests
+37/37 Test #164: horde_rt_rescue_adversarial_regression_tests ....   Passed    1.77 sec
+
+100% tests passed, 0 tests failed out of 37
+
+Total Test time (real) =  39.97 sec

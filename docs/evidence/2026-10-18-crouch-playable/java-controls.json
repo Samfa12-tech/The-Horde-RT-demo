@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-18",
+  "headObserved": "1bf8921a565dd92f40ca2c8b4c6edf651ff0e2c9",
+  "scope": "host Java crouch controls; no native build, device or desktop interaction",
+  "finalGradleExitCode": 0,
+  "finalGradleSeconds": 33,
+  "tests": [
+    {
+      "name": "AndroidControllerInputTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 2.639
+    },
+    {
+      "name": "AndroidControllerIntegrationTest",
+      "tests": 35,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 7.546
+    },
+    {
+      "name": "GameplayTouchCancellationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.214
+    },
+    {
+      "name": "InterfaceLayoutTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 6.106
+    },
+    {
+      "name": "SurfaceSuspensionLifecycleTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.445
+    },
+    {
+      "name": "DeathRecoveryTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.028
+    },
+    {
+      "name": "CombatTeachingUiSchedulingTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.146
+    }
+  ],
+  "testedSha256": {
+    "src/gameplay/simulation/InputSnapshot.h": "07C4DE969E244208FCBCD863E175DE94C894E485FFF8252A1D2BA4136CF8E394",
+    "src/platform/windows/DiagnosticWindow.cpp": "43E3E02AA01906E4E071E260EA3EB66B03DA993022B47F447ACF4820020B436B",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "8C8F18F8CFA6FCA5C7F49C12FE2FFEE01A025D8C62F6A5A4B5060E8A97A127EA",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "50F1A809499455143512E5A451826B2096C35CFFE1CD56F7B9A923058C166D39",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/AndroidControllerInput.java": "0380149674DE8CEB6A78C2D0722335BDE5B21E8408582513F15CD9AFA6BC24B4",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java": "1AF9AFAE9C61DFA808AA9D0FE50BE1013449882D2602A821D5B8D5D6B22EFAF9",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/UiControlLayout.java": "C41CED9ACA863046949D6D7338EB0DCC47ED1CCAF195C7A95B6820B04CF728D7",
+    "android/app/src/main/res/layout/activity_main.xml": "CF5E284DF0260F32D304D8455FFE125D2845DB990C7C56ECA41BD1D772F2F682",
+    "android/app/src/main/res/values/strings.xml": "C5415AB9870EDFDE62DA79D4728A3C880E47255DDA901CD5D95B29CEEA9E23CF",
+    "tests/InputMailboxStress.cpp": "E084DA3942205E258ED526FAEE6510EE1E79768E996FC505374460A79EC20A1E"
+  },
+  "retainedFailures": [
+    "first-layout-failure: 320px compact85% stance/lantern collision fixed without moving combat slots",
+    "takeover-reproduction: fresh L1 dropped by touch cleanup; preserve fresh held input and skip native clear"
+  ],
+  "nativeInputMailboxCheck": "Extended InputMailboxStress; parent owns compile/run"
+}

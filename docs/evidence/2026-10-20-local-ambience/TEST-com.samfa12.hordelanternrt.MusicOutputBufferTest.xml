@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.MusicOutputBufferTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-20T14:25:19" hostname="SAM_LAPPY" time="0.169">
+  <properties/>
+  <testcase name="excessivePlatformMinimumFailsInsteadOfAllocatingOrShrinking" classname="com.samfa12.hordelanternrt.MusicOutputBufferTest" time="0.031"/>
+  <testcase name="largerPlatformMinimumIsNotShrunkToThirtyMilliseconds" classname="com.samfa12.hordelanternrt.MusicOutputBufferTest" time="0.081"/>
+  <testcase name="unavailableMinimumFailsWithoutCreatingOutput" classname="com.samfa12.hordelanternrt.MusicOutputBufferTest" time="0.019"/>
+  <testcase name="insufficientEffectiveQueueFailsInsteadOfIgnoringTheMinimum" classname="com.samfa12.hordelanternrt.MusicOutputBufferTest" time="0.019"/>
+  <testcase name="smallerMinimumRetainsTheExistingBoundedRequest" classname="com.samfa12.hordelanternrt.MusicOutputBufferTest" time="0.019"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

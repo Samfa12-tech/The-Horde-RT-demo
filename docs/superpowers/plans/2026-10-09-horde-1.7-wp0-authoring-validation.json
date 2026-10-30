@@ -1,0 +1,20 @@
+{
+  "planningCommit": "d37f16381311c6e620f0c4a9d01c1cce83260dc8",
+  "authoringValidator": {
+    "static_checks_passed": 436,
+    "lines": 357,
+    "scenes": 209,
+    "runtime_tests_run": false
+  },
+  "packageHashes": {
+    "passed": 409,
+    "failed": [],
+    "unavailable": [
+      {
+        "path": "Horde-Dialogue-Reading-Copy-English-en.docx",
+        "reason": "LFS pointer only; original payload checksum not verified"
+      }
+    ],
+    "originalWholePackageVerified": false
+  }
+}

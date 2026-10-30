@@ -1,0 +1,34 @@
+from pathlib import Path
+import hashlib,json,shutil,subprocess
+root=Path.cwd();base=root/'reports/kit-lod-candidate-20261023/rt'
+assert not base.exists();base.mkdir()
+source=root/'assets';app=root/'build/presets/windows-x64-debug/Debug/HordeLanternRT.exe'
+settings=root/'reports/world-body-rt-repair-20261023/control/HordeLanternRT.settings.ini'
+fixture=root/'reports/horde-campaign-fixtures-kit-acting-20261020-r1'
+candidate=root/'reports/kit-lod-candidate-20261023/kit-warden-protected-index-candidate.glb'
+relative=Path('models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb')
+def junction(src,dst):
+    result=subprocess.run(['cmd','/c','mklink','/J',str(dst),str(src)],capture_output=True)
+    assert result.returncode==0,result.stderr
+def clone(src,dst,target,replacement):
+    dst.mkdir()
+    for item in src.iterdir():
+        dest=dst/item.name
+        rel=item.relative_to(source)
+        if item.is_dir():
+            if rel in target.parents:clone(item,dest,target,replacement)
+            else:junction(item,dest)
+        elif rel==target:shutil.copy2(replacement,dest)
+        else:shutil.copy2(item,dest)
+identity=lambda p:{'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+record={'sourceApplication':identity(app),'unchangedSettings':identity(settings),'packages':{}}
+for label,asset in [('control',source/relative),('candidate',candidate)]:
+    package=base/label;package.mkdir()
+    shutil.copy2(app,package/app.name);shutil.copy2(settings,package/settings.name)
+    clone(source,package/'assets',relative,asset)
+    state=root/('reports/horde-campaign-fixtures-kit-lod-20261023-'+label)
+    assert not state.exists();state.mkdir()
+    for filename in ['manifest.json','slot-1-auto.hrd']:shutil.copy2(fixture/filename,state/filename)
+    record['packages'][label]={'app':identity(package/app.name),'kit':identity(package/'assets'/relative),'fixture':str(state),'fixtureFiles':{n:identity(state/n) for n in ['manifest.json','slot-1-auto.hrd']}}
+(base/'packages.json').write_text(json.dumps(record,indent=2)+'\n')
+print(json.dumps(record,indent=2))

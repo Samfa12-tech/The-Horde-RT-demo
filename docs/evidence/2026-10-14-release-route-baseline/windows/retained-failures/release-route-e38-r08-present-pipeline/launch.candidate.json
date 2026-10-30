@@ -1,0 +1,22 @@
+{
+  "maximumSimulationTicksPerRender": 4,
+  "simulationHz": 60,
+  "executableSha256": "91dbac30a9afdf904e0064519d92124e27dc4152b80eedab86fe61595b25eb81",
+  "backend": "RayTracingPipeline",
+  "configure": "cmake -S . -B build/chapter-shipping-measurement -G \"Visual Studio 17 2022\" -A x64 -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=High -DHORDE_RT_CHAPTER_MEASUREMENT=ON",
+  "sources": {
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "fb8368500a4d6712803e21c2cdbf36118599908bf747d424cdffe77e9f9282a0",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "4e31072a6f5dd57a793d610ef26579cc50281e92426308e4280fb21507d8c64a",
+    "src/platform/windows/WindowsChapterShippingMeasurement.inl": "68682f21efc79186965dd87b52f977a6e07d6a8035d14809dc0ab779827bb774",
+    "CMakeLists.txt": "0e2bb340ba426d802dc7ea5e3339f25fe6cdd4f9a973082d8bf759302762f459",
+    "src/gameplay/validation/ChapterRouteMeasurementClock.h": "7a7e05ed68d0c4f5935967eec393b246103056fdf3406d6e3671be225c431edc",
+    "src/platform/windows/DiagnosticWindow.cpp": "751b5db28487992480697f7997e5ea3899a2d49eea6ddaa4b53ddfb928b76f3e",
+    "src/platform/windows/WindowsAssetRoot.h": "dcf3171daee55dfcdbd96a31bd411a368e7ea4ac73b6c8d131ba31a612f98b39",
+    "src/platform/windows/WindowsChapterShippingLaunch.h": "e7a1b24a3ba752963ebd29f41d0be35d89bdb02b6a2753931b94f3c607b73b7c",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "6d55a7b32081d889a970148314b8aba2361ebfbac683aa672012e9da6641aef9",
+    "src/platform/windows/WindowsPresentInterval.h": "4521dcfeca420704ea4e17a2171471465710ced7e00dcd5ca9c0c66ade09e39c"
+  },
+  "deadlineSeconds": 180,
+  "scope": "Release CPU with Shipping High shaders; uncovered visible wall-clock scripted round-trip after staged Keeper death; zero static-region residency saving; not owner/phone acceptance",
+  "foregroundRequested": false
+}

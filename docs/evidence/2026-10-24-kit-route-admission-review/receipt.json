@@ -1,0 +1,273 @@
+{
+  "status": "HOLD_NORMAL_OFF_GUIDANCE_AND_VIEW_GAPS",
+  "baseCommit": "e955af548b10ecac15a92fa4314d94e7db365749",
+  "normalMotionEnabled": false,
+  "runtimePolicyChanged": false,
+  "phoneUsed": false,
+  "normalActorJoins": {
+    "count": 515,
+    "failures": 0,
+    "details": {
+      "requested": true,
+      "authoredTurnSeconds": 0.75,
+      "playbackTurnSeconds": 0.5,
+      "evidenceClass": "isolated shared diagnostic controller snapshots on actual terrain; not earned journey or owner contact acceptance",
+      "departureNominalAuthoredHz": 30,
+      "cameraPolicy": "fixed world azimuth per case; three-metre translated offset on queried terrain",
+      "speechMetadataOnly": true,
+      "actualRtCornerCoverage": "first route corner only",
+      "fixedStepCalls": 1379,
+      "activeFixedTicks": 1376,
+      "departureFrames": 79,
+      "firstWalkActiveTick": 373,
+      "legacyFirstWalkHeadingErrorRadians": 2.66919,
+      "controllerFirstWalkHeadingErrorRadians": 4.76837e-07,
+      "pauseImagesIdentical": true,
+      "resetOrdinaryImageIdentical": true,
+      "normalActorRestored": true,
+      "inspectionActorUsed": false
+    },
+    "images": 123,
+    "matchedReferenceImagesByteIdentical": 123,
+    "seconds": 32.5,
+    "custodyUnchanged": true,
+    "foregroundUnchanged": true
+  },
+  "actualRoute": {
+    "schema": 1,
+    "evidenceClass": "hidden native RT input-driven continuation from seeded post-Keeper lower checkpoint; not natural victory or physical play",
+    "checks": [
+      {
+        "name": "isolated exported seed and hidden nonactivating native owner",
+        "pass": true
+      },
+      {
+        "name": "admitted record loads through ordinary native commands input rebase and fresh RT barrier",
+        "pass": true
+      },
+      {
+        "name": "current rules two hearts and genuinely unset post-seed progression",
+        "pass": true
+      },
+      {
+        "name": "ordinary context interaction and current fixed steps finish first rope ascent",
+        "pass": true
+      },
+      {
+        "name": "existing input-only route driver admits the actually reached low-lantern upper state",
+        "pass": true
+      },
+      {
+        "name": "actual route turn/walk normal-actor RT witness",
+        "pass": true
+      },
+      {
+        "name": "actual route turn/walk normal-actor RT witness",
+        "pass": true
+      },
+      {
+        "name": "actual route turn/walk normal-actor RT witness",
+        "pass": true
+      },
+      {
+        "name": "actual route turn/walk normal-actor RT witness",
+        "pass": true
+      },
+      {
+        "name": "actual movement fresh presented raise and quiet Kit story produce durable endpoint autosave",
+        "pass": true
+      },
+      {
+        "name": "ordinary native Save creates endpoint manual in empty slot two without retargeting slot one auto",
+        "pass": true
+      },
+      {
+        "name": "input-only forest return and real descent restore lower support and equipment without duplicate claim",
+        "pass": true
+      },
+      {
+        "name": "actual lower return commits revision two autosave retaining completed forest story",
+        "pass": true
+      },
+      {
+        "name": "this-run endpoint manual recovers through native load fresh generation matching RT and explicit Resume",
+        "pass": true
+      },
+      {
+        "name": "resumed endpoint stays quiet without repeated autosave or story restart",
+        "pass": true
+      },
+      {
+        "name": "actual normal actor captures both departure and first corner joins",
+        "pass": true
+      },
+      {
+        "name": "bounded per-frame route receipt written",
+        "pass": true
+      }
+    ],
+    "count": 17,
+    "failures": 0,
+    "frames": 1724,
+    "stagesComplete": true,
+    "kitTurnStartOptIn": true,
+    "deathRecoveryTested": false,
+    "physicalPlayTested": false,
+    "audioListened": false,
+    "seedAndManifestUnchanged": true,
+    "foregroundSampleCount": 3585,
+    "ownerObservedForeground": false,
+    "ownerShown": false,
+    "complete": true
+  },
+  "actualRouteProcess": {
+    "exitCode": 0,
+    "elapsedSeconds": 157.51599999999962,
+    "processPending": false,
+    "custodyUnchanged": true,
+    "initialForeground": 132058,
+    "finalForeground": 132058
+  },
+  "visualLimitation": "departure visible, first-corner actor outside unchanged route-camera view; successful pose publication and PNG are not a visible corner acceptance",
+  "campaignTimeout": {
+    "registeredDeadlineSeconds": 30,
+    "registeredResult": "TIMEOUT_30.02_SECONDS",
+    "normalMotionEnabled": false,
+    "lastFlushedPhase": "earned-return-start at 21.250s",
+    "supplementaryCompletion": "145 checks, zero failures; 37.067s phase clock, return 15.832s from 21.193s",
+    "gateStillOpen": true,
+    "hotFunctionAttribution": "not measured"
+  },
+  "waitingGuidance": "ForestWait has no runtime trigger, and no player-facing consumer of CompanionWait::PlayerLagging was found. Come-on departure and Hold-it-there story lines do not teach the symmetric tether.",
+  "ownerParkedFiles": 151,
+  "ownerParkedFilesChanged": false,
+  "sourceImages": {
+    "reports/horde-campaign-fixtures-kit-admission-joins-20261024/windows-kit-controller-depart-0000.png": {
+      "bytes": 1513039,
+      "sha256": "0e603da990bab34da7b7a6106b1fe23a80e0a4c78981f65cb144eb99c4cc6ed0"
+    },
+    "reports/horde-campaign-fixtures-kit-admission-joins-20261024/windows-kit-controller-depart-0030.png": {
+      "bytes": 1508033,
+      "sha256": "0f55bc357c009c9d77545ffab2d4dc7f628c67f21e796a9ebc074997c0975f18"
+    },
+    "reports/horde-campaign-fixtures-kit-admission-joins-20261024/windows-kit-controller-corner-turn-mid.png": {
+      "bytes": 1707930,
+      "sha256": "7097eb4da671d1677fda22714eccd34a2b85e9621345740cb1835de637fb2696"
+    },
+    "reports/horde-campaign-fixtures-kit-admission-joins-20261024/windows-kit-controller-corner-first-walk.png": {
+      "bytes": 1707439,
+      "sha256": "a4d8e0438ba4aa09b5b92ac7b6408a8b2c93606fe863fb9f18c241dc13eb615c"
+    },
+    "reports/horde-campaign-fixtures-route-kit-admission-20261024-r1/route-kit-depart-turn.png": {
+      "bytes": 1321018,
+      "sha256": "4b26c5777486dace660a4296e8248bf92f6fc73f2a4b0cd3cda4c5bd445afa04"
+    },
+    "reports/horde-campaign-fixtures-route-kit-admission-20261024-r1/route-kit-depart-walk.png": {
+      "bytes": 1319906,
+      "sha256": "0ef965b4c48f648474633a34760af2cc752e9bb96ac1be58baa44f45e0d04b61"
+    },
+    "reports/horde-campaign-fixtures-route-kit-admission-20261024-r1/route-kit-corner-turn.png": {
+      "bytes": 1604898,
+      "sha256": "8c8b879e14f2ff5620490b27d425d02ae13367fa26ccd0d9faf13c6ad6a818a5"
+    },
+    "reports/horde-campaign-fixtures-route-kit-admission-20261024-r1/route-kit-corner-walk.png": {
+      "bytes": 1531914,
+      "sha256": "fb9814ba98c961d293d91de289acd9d1b3a8d9207b58601c621d1f08e24797f7"
+    }
+  },
+  "rawReceiptHashes": {
+    "reports/horde-campaign-fixtures-kit-admission-joins-20261024/windows-lookout-validation.json": {
+      "bytes": 649262,
+      "sha256": "38f2f8734a227765f22ba82326688cb7fb40743dc3ba6b30e27d6be396923d5d"
+    },
+    "reports/horde-campaign-fixtures-route-kit-admission-20261024-r1/windows-route-validation.json": {
+      "bytes": 39010,
+      "sha256": "9a68da162f1692490aa220819608ba4db2238dfee507b58921dac3779f95d677"
+    },
+    "reports/kit-turn-admission-review-20261024/rt-joins/serial-process.json": {
+      "bytes": 54390,
+      "sha256": "1a754f6b555ca7a8f30143120ac01d63e3e66fca34b3c80981955bda09a52457"
+    },
+    "reports/windows-route-kit-admission-20261024-r1/receipt.json": {
+      "bytes": 3459,
+      "sha256": "d681895b6e2a5a2a5cf0f8fb9b48bcc277ba0e51de131c6f15fffbe92eabbbcd"
+    }
+  },
+  "inputs": {
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 649711,
+      "sha256": "639b074946cff0cb8375333cbeb3b20d8145b17c50df0175c748395dd7e08c7c"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "bytes": 94403,
+      "sha256": "de4e39ed2c5802c8d0b31e7080e0f6bcb5b8d4e78e6012e27a9b4233ac52cd9f"
+    },
+    "src/platform/windows/windows_route_validation.inl": {
+      "bytes": 28447,
+      "sha256": "598e4223068d5551035de85418f06dccba18b3db5a39cf9c7bf8f7f3415f98d6"
+    },
+    "src/gameplay/simulation/GameSimulation.h": {
+      "bytes": 22528,
+      "sha256": "5087537164ae9c4e81f6e7dd439531ea33c2f1de927c2a95a17fb4d7e8697597"
+    },
+    "src/gameplay/dialogue/ChapterDialogue.h": {
+      "bytes": 21814,
+      "sha256": "41bbae15cff4c2302baa8db5aa8d8ad7c61132b9625baf805a15e20827aeaeb5"
+    },
+    "tests/CampaignPlaySessionTests.cpp": {
+      "bytes": 64421,
+      "sha256": "f08a1dc665c8b4a5979c3161af16ff37f6b0b44d733f53504b6e4a4d61a6d7d5"
+    },
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 14387712,
+      "sha256": "e385858217cf5746b76997d9670131ec29351f3e71ab7b97b324abe9c3b85214"
+    },
+    "build/presets/windows-x64-debug/Debug/horde_rt_campaign_play_session_tests.exe": {
+      "bytes": 4668928,
+      "sha256": "d0d4d2abd8476f34b3c900ff74ff39d4ba165614bfc2cb9a95c51fbc438445bf"
+    }
+  },
+  "previousExactHeadCi": {
+    "conclusion": "success",
+    "headSha": "e955af548b10ecac15a92fa4314d94e7db365749",
+    "jobs": [
+      {
+        "name": "player-vulkan-host",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:00:09Z",
+        "completedAt": "2026-10-24T06:08:08Z"
+      },
+      {
+        "name": "Android Debug build, playback/report contracts and lint",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:00:09Z",
+        "completedAt": "2026-10-24T06:08:01Z"
+      },
+      {
+        "name": "Shared simulation host (GCC)",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:00:09Z",
+        "completedAt": "2026-10-24T06:07:27Z"
+      },
+      {
+        "name": "Shared simulation host (MSVC)",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:00:09Z",
+        "completedAt": "2026-10-24T06:13:00Z"
+      },
+      {
+        "name": "Shared simulation host (Clang)",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:00:09Z",
+        "completedAt": "2026-10-24T06:10:41Z"
+      },
+      {
+        "name": "Selected host contracts (Clang ASan/UBSan)",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:00:09Z",
+        "completedAt": "2026-10-24T06:03:58Z"
+      }
+    ],
+    "status": "completed"
+  }
+}

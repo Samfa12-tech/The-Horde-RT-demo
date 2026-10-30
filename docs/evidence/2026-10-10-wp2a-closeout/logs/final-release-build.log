@@ -1,0 +1,31 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_motion_evidence_scenario_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_motion_evidence_scenario_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  CombatFoundationTests.cpp
+  horde_rt_combat_foundation_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_combat_foundation_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  Building Custom Rule <repo>/CMakeLists.txt
+  WindowsMotionEvidenceLaunchTests.cpp
+  horde_rt_windows_motion_evidence_launch_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_motion_evidence_launch_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_windows_combat_practice_launch_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_combat_practice_launch_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_combat_timing_trace_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_combat_timing_trace_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  AndroidMotionEvidencePolicyTests.cpp
+  horde_rt_android_motion_evidence_policy_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_android_motion_evidence_policy_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_android_debug_request_admission_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_android_debug_request_admission_tests.exe

@@ -1,0 +1,32 @@
+[
+  {
+    "path": "src/gameplay/ShowcaseGameplay.h",
+    "sha256": "98907fd0253095b9dabe75f4fde741f1563607d11bc0a3d40e7c2cd99ffec9d2",
+    "bytes": 39487
+  },
+  {
+    "path": "src/gameplay/campaign/CampaignCheckpoint.h",
+    "sha256": "99eaa1da86b489d1cf0e66b032b3567281dc1b29f2df9f71ae26fe7aa1b4cfac",
+    "bytes": 3881
+  },
+  {
+    "path": "src/gameplay/simulation/GameSimulation.cpp",
+    "sha256": "f24e27f4fa60bc3c967c5e34e066f80c6bf5e55c88a91d38ca2344cb46ef78a7",
+    "bytes": 129007
+  },
+  {
+    "path": "src/gameplay/simulation/GameSimulationCampaign.cpp",
+    "sha256": "926e5a588eb0b4de37ec260f2049790efdc53a113b33c397ac28945a784023ad",
+    "bytes": 12017
+  },
+  {
+    "path": "tests/CampaignCheckpointCodecTests.cpp",
+    "sha256": "75f4c1206ebcaacf391df4cf16470cc4409fe8afcef6f20b313b09f811900271",
+    "bytes": 10601
+  },
+  {
+    "path": "tests/CampaignCheckpointTests.cpp",
+    "sha256": "4dc82175959bc3f29d72a7970fb36548094282e63d2e687bd8a6e2e7edf033c0",
+    "bytes": 30606
+  }
+]

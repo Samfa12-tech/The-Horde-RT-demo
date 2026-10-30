@@ -1,0 +1,25 @@
+{
+  "basedOn": "1549935dfc764c66a06824c27273b78f28ea61a5 plus route measurement patch; actual hashes pin bytes",
+  "sha256": "51d7d58b3cbb4d1e9b41297415a0fb33c6515a7f156e235f89e6e205367c1046",
+  "bytes": 183631658,
+  "scope": "Explicit Debug/O2 native Shipping/Mobile private page, no mid-route image readbacks, normal wall-clock simulation, bounded display timing; not installed",
+  "sources": {
+    "src/gameplay/validation/MotionEvidenceScenario.cpp": "183e4162f1a2e430fb5bc1714b77ed4f6ceabb8b0134c68674fab8847d273ec2",
+    "src/gameplay/validation/MotionEvidenceScenario.h": "84c6d75864ebba24df1afbb493f32638445955ee5cddbecc4e380a76e1c11524",
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "35de09cb7c977b1339911039112b601af49e95f540ba0ab4e62ebf95f68b6264",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "b2260a371f6af4bf50bfd93ccf3a59a8080be051f234ab5f4517a7d8ef1504dc",
+    "android/app/src/main/cpp/android_motion_evidence.inl": "0303b54c3ca591c43583de73ddac1238facb75c9fb5e5d41425637eea232b90c",
+    "android/app/src/main/cpp/CMakeLists.txt": "1c992ea4b8c27c1f5edade7a451ec12a708ade5b91ac360af9c0ce193498a26a",
+    "android/app/build.gradle": "88eeb6c355e399177415b73809c84a1bf4d9cb26d04a4f3a0388694e90a0a3ef",
+    "src/vulkan/raytracing/RtRegionGeometrySource.cpp": "f23be7c9d48fe932422a6e06b5096d47c07d3d22b5106ba3d328d2de4df8e00d",
+    "src/world/streaming/GeometryPartition.cpp": "9c2012f526c6583203b9ab4f670afb2946a3ea596712f7d48a3a9f134421f52d"
+  },
+  "assetCount": 169,
+  "assetsMatchPrevious": true,
+  "nativeHashes": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "b0201137a9201150239ab4206632b4b538b75a941456023d708124dc4cd49e38",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "857fbecee376c65d339e9f4cf2f7d14ccde0a890df7ceda8374f25bc54a140b1",
+    "lib/x86/libhorde_rt_probe_android.so": "6cd402d62020d66cb0382f0d5512a7161b1d02317048514ecbba018e98050ed5",
+    "lib/x86_64/libhorde_rt_probe_android.so": "692fe749ef3e0b9e2ecd3a90f1273d0febbb7f76ed8ec995f639e26b6de93a87"
+  }
+}

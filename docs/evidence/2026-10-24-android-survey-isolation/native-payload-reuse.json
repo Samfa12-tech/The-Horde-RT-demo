@@ -1,0 +1,46 @@
+{
+  "scope": "JNI export presence previously checked with configured llvm-nm; four native payload hashes are unchanged in corrected APK. Not runtime invocation or lifecycle acceptance.",
+  "methods": [
+    "requestOpeningBenchmark",
+    "requestOpeningProvisionalBenchmark",
+    "cancelOpeningBenchmark",
+    "getOpeningBenchmarkState",
+    "getOpeningBenchmarkOutputState",
+    "ackOpeningBenchmarkOutput"
+  ],
+  "libraries": [
+    {
+      "abi": "arm64-v8a",
+      "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "bytes": 5247952,
+      "sha256": "6a3fee0f5d84cc190972a56b4319c8e2c7876240901147b97e5d5f872b3015c8",
+      "requiredOpeningBenchmarkSymbols": 6,
+      "missing": []
+    },
+    {
+      "abi": "armeabi-v7a",
+      "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "bytes": 4535712,
+      "sha256": "2784b3ad8ce55cfcb41f77438125e0e294c605bbb14d3db07f5e068afe0d3b45",
+      "requiredOpeningBenchmarkSymbols": 6,
+      "missing": []
+    },
+    {
+      "abi": "x86",
+      "entry": "lib/x86/libhorde_rt_probe_android.so",
+      "bytes": 5881068,
+      "sha256": "455099b54465e97de77370fc3020250c058b25c5bb16d8e260f8b9462f156892",
+      "requiredOpeningBenchmarkSymbols": 6,
+      "missing": []
+    },
+    {
+      "abi": "x86_64",
+      "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+      "bytes": 5520912,
+      "sha256": "11251934498d1df2fce66e88caa4c881bb65738e672ac70e158110e228d324ff",
+      "requiredOpeningBenchmarkSymbols": 6,
+      "missing": []
+    }
+  ],
+  "correctedApkSha256": "99f57593d782922e153d7839adc8f523db617d19504b96da3c1e6e008f18f419"
+}

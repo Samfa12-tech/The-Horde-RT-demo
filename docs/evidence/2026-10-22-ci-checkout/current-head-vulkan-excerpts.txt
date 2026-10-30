@@ -1,0 +1,12 @@
+Run39856202161, head93b49b018c1876b388582a7ba751023c20532285, completed Vulkan-host job120094938413.
+2026-10-22T21:23:32.5047447Z Actual development static admission materials=30 primitives=31 layers=18,15,15,1
+2026-10-22T21:23:32.5047977Z Actual development static admission materials=30 primitives=31 layers=18,15,15,1
+2026-10-22T21:23:32.5048781Z FAIL: real dressed tomb/forest production registration exceeds its unchanged resource contracts
+2026-10-22T21:23:32.5049715Z Integrated intake invariants: baseline indices=25266 expected=25266; baseline top=12.24; entry top=6 expected=6; chapter indices=1292118 expected=1280514
+2026-10-22T21:23:32.5051118Z FAIL: actual combined native tomb asset intake retains the frozen primitive/material capacities
+2026-10-22T21:23:32.8612482Z terminate called after throwing an instance of 'std::out_of_range'
+2026-10-22T21:23:32.8613344Z   what():  array::at: __n (which is 2) >= _Nm (which is 2)
+2026-10-22T21:23:35.6825946Z 64/72 Test #179: horde_rt_character_render_slot_smoke .................   Passed    0.05 sec
+2026-10-22T21:23:50.1881952Z 97% tests passed, 2 tests failed out of 72
+2026-10-22T21:23:50.1884604Z 	173 - horde_rt_scene_resource_inventory_tests (Failed)
+2026-10-22T21:23:50.1884821Z 	175 - horde_rt_skinned_character_smoke (Subprocess aborted)

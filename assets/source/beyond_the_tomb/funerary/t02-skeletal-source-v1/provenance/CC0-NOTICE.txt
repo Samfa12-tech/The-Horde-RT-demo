@@ -1,0 +1,39 @@
+THIRD-PARTY GEOMETRY: MANNY THE MANNEQUIN / SIMPLE RIGGED SKELETON
+Creator: Gord Goodwin (feelgoodcomics)
+Source creator listing: https://blendswap.com/blend/1609
+Creator's linked project post: https://gord-goodwin.blogspot.com/2010/03/manny-mannequin.html
+Distributor: https://opengameart.org/content/skeleton-with-rig
+Downloaded source: https://opengameart.org/sites/default/files/fgc_skeleton.blend
+Licence identified on both creator listing and distributor: CC0 1.0 Universal.
+Licence deed: https://creativecommons.org/publicdomain/zero/1.0/
+Legal code: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+The exact source is retained in source/fgc_skeleton.original.blend.
+SHA-256: 0ba13c9f0c2af50aafb317f450a92083f7d08ece67c3ecc9a2c64eac13257926
+Original bytes: 1,748,720.
+It embeds authorship and an any-purpose permission; that notice is retained
+verbatim in embedded-source-notice.txt. The original 237-bone rig has no
+animation actions in this audited file. Its preservation is archival, not
+certification that the legacy rig works in current Blender or a game engine.
+
+This derivative kit extracts and normalizes this geometry. It does not claim
+the source geometry is originally authored by the project or by the assistant.
+Credit to Gord Goodwin is retained as provenance even though CC0 does not
+require attribution. No Quaternius or Hotstrike geometry was used.
+
+MATERIAL / ARRANGEMENTS / SCRIPTS
+The uniform PBR material parameter set, local arrangement examples, build
+scripts and this kit's documentation were newly prepared for the user in
+this task. There are no downloaded material textures. These authored
+additions are distinct from Gord Goodwin's source geometry; this delivery
+does not purport to dedicate the user's original additions to CC0 or change
+the user's ownership/release choices. No exclusive originality claim is
+made for the third-party geometry or commonplace material parameters.
+
+EVIDENCE / CAUTION
+Creator listing and distributor page both showed CC0 when checked on
+2026-10-06. The linked Blogspot post was inaccessible to the web-reading
+tool during this task; it is preserved as a creator link, not claimed as a
+freshly inspected licence page. The distributor HTML is saved in this
+folder. Website page content/branding is evidence only, not game content.
+CC0 provides no warranty. This provenance check is not legal advice.

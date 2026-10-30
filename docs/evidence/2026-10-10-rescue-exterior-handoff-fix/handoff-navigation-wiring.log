@@ -1,0 +1,34 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 126
+    Start 126: horde_rt_desktop_controller_input_tests
+
+126: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_desktop_controller_input_tests.exe"
+126: Working Directory: <repo>
+126: Test timeout computed to be: 1500
+126: Desktop controller input tests passed
+1/2 Test #126: horde_rt_desktop_controller_input_tests ...   Passed    1.02 sec
+test 156
+    Start 156: horde_rt_rescue_rig_attachment_tests
+
+156: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_rig_attachment_tests.exe"
+156: Working Directory: <repo>/build/presets/windows-x64-release
+156: Test timeout computed to be: 180
+156: Rescue rig attachment cases=16455 failures=0 sampled_poses=955 max_left_reach=0.612579@phase=6 max_right_reach=0.619561@phase=6
+2/2 Test #156: horde_rt_rescue_rig_attachment_tests ......   Passed    1.56 sec
+
+The following tests passed:
+	horde_rt_desktop_controller_input_tests
+	horde_rt_rescue_rig_attachment_tests
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   2.60 sec

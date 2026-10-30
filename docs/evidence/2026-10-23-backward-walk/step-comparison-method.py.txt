@@ -1,0 +1,56 @@
+from pathlib import Path
+import ctypes, datetime, hashlib, json, subprocess, time
+ROOT=Path.cwd().resolve()
+OUT=ROOT/'reports/player-backward-20261023/step-timeout-attribution'
+SOURCE=('src/gameplay/animation/PlayerAnimationState.cpp','src/gameplay/animation/PlayerAnimationState.h','src/gameplay/simulation/GameSimulation.cpp','src/gameplay/simulation/GameSimulation.h','src/vulkan/raytracing/PlayerRenderSlot.cpp')
+CMAKE=r'C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe'
+TARGET='horde_rt_chapter_step_movement_tests'
+EXE=ROOT/'build/presets/windows-x64-debug/Debug'/f'{TARGET}.exe'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def native_run(label):
+    started=datetime.datetime.now(datetime.timezone.utc).isoformat()
+    sources={s:sha(ROOT/s) for s in SOURCE}
+    with (OUT/f'{label}.txt').open('wb') as log:
+        then=time.monotonic()
+        proc=subprocess.Popen([str(EXE)],cwd=str(EXE.parent),stdout=log,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+        timeout=False
+        try:proc.wait(timeout=120)
+        except subprocess.TimeoutExpired:timeout=True;proc.kill();proc.wait()
+        wall=time.monotonic()-then
+        create=ctypes.c_ulonglong();ended=ctypes.c_ulonglong();kernel=ctypes.c_ulonglong();user=ctypes.c_ulonglong()
+        gettimes=ctypes.windll.kernel32.GetProcessTimes
+        gettimes.argtypes=[ctypes.c_void_p,*([ctypes.POINTER(ctypes.c_ulonglong)]*4)]
+        ok=gettimes(int(proc._handle),ctypes.byref(create),ctypes.byref(ended),ctypes.byref(kernel),ctypes.byref(user))
+        receipt={'label':label,'startedUtc':started,'diagnosticCeilingSeconds':120,'productionCTestDeadlineSeconds':30,'gateChanged':False,'wallSeconds':wall,'kernelSeconds':kernel.value/1e7 if ok else None,'userSeconds':user.value/1e7 if ok else None,'pid':proc.pid,'exitCode':proc.returncode,'timedOut':timeout,'executableSha256':sha(EXE),'sources':sources,'scope':'direct completion diagnostic, not a CTest timeout pass'}
+    (OUT/f'{label}.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf-8')
+    print(json.dumps(receipt),flush=True)
+    return receipt
+
+def build(label):
+    with (OUT/f'{label}.txt').open('wb') as log:
+        r=subprocess.run([CMAKE,'--build','--preset','windows-x64-debug','--target',TARGET,'--parallel','2'],cwd=ROOT,stdout=log,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+    if r.returncode:raise RuntimeError(f'{label} failed: {r.returncode}')
+
+if subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()!='096b23f0895f78fa0eb3bd492aed005dfc205b44':raise RuntimeError('expected baseline HEAD changed')
+OUT.mkdir(exist_ok=False)
+owned={s:(ROOT/s).read_bytes() for s in SOURCE}
+baseline={s:subprocess.check_output(['git','show',f'HEAD:{s}'],cwd=ROOT) for s in SOURCE}
+expected=dict(owned)
+for s,data in owned.items():
+    p=OUT/'owned-candidate'/s;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(data)
+try:
+    native_run('candidate-before')
+    for s in SOURCE:
+        if (ROOT/s).read_bytes()!=owned[s]:raise RuntimeError(f'concurrent source change: {s}')
+        (ROOT/s).write_bytes(baseline[s]);expected[s]=baseline[s]
+    build('baseline-build')
+    native_run('accepted-baseline')
+finally:
+    conflicts=[]
+    for s,data in owned.items():
+        if (ROOT/s).read_bytes()!=expected[s]:conflicts.append(s);continue
+        (ROOT/s).write_bytes(data)
+    if conflicts:raise RuntimeError(f'Concurrent edits preserved; manual integration needed: {conflicts}')
+    for s,data in owned.items():assert (ROOT/s).read_bytes()==data,s
+    build('candidate-restored-build')
+    (OUT/'candidate-restored.json').write_text(json.dumps({'restoredExactBytes':True,'sources':{s:sha(ROOT/s) for s in SOURCE}},indent=2)+'\n',encoding='utf-8')

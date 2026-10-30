@@ -1,0 +1,425 @@
+{
+  "sourceParent": "6e41b014a0061fa5c10778f921c99f3c8bf409b1",
+  "builds": {
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 12745216,
+      "sha256": "80bdc402d26c058642b13d2a30247c7417e563af38879ea0a5992366e113d17f"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4408832,
+      "sha256": "c5240458c45d9c2e639b638fb6f3fbe4f1058cf1b21fea1122e5c00fb4888441"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 172817278,
+      "sha256": "b3d1931d143814eeac4e23a83ca9b99648346f0b1a11284899e0a086fe9feeb0"
+    }
+  },
+  "originalPayloadsVerified": 59,
+  "protectedBackup": {
+    "bytes": 259583,
+    "sha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb"
+  },
+  "javaResultFiles": {
+    "tests": 284,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "javaExecution": "unchanged tasks UP-TO-DATE in final local Gradle run",
+  "frames": {
+    "pipeline": {
+      "executionBackend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 10.19315,
+        "overallMeanMs": 84.265142,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 4.601856,
+          "averageMs": 8.646792,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "asset": {
+        "enabled": true,
+        "vertexBytes": 37532928,
+        "indexBytes": 6102420,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.4053,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7735,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6318,
+        "productionPropBlasBytes": 25892096,
+        "productionPropBlasBuildMilliseconds": 8.5068
+      },
+      "camera": {
+        "x": -17.700905,
+        "z": 15.206802,
+        "yaw": 1.15,
+        "pitch": 0.1
+      },
+      "rescue": {
+        "phase": 4,
+        "generation": 4,
+        "claimCount": 1,
+        "deploymentCount": 1,
+        "equipmentStowed": false,
+        "ropeHandsActive": false,
+        "bodyStowWitness": false,
+        "plantedPelvisDropMetres": 0,
+        "bodyYawRadians": 0.136817,
+        "root": [
+          -17.7009,
+          -0.548164,
+          15.2068
+        ],
+        "renderedEye": [
+          -17.7009,
+          1.10184,
+          15.2068
+        ],
+        "gripNodeIndices": [
+          0.2,
+          0.45
+        ],
+        "gripTargets": [
+          [
+            -33.4,
+            2.5625,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.45312,
+            -14.979
+          ]
+        ],
+        "ropeNodes": [
+          [
+            -33.4,
+            2.65,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.21248,
+            -14.9789
+          ],
+          [
+            -33.4002,
+            1.77505,
+            -14.9789
+          ],
+          [
+            -33.4007,
+            1.33775,
+            -14.9788
+          ],
+          [
+            -33.4011,
+            0.900611,
+            -14.9789
+          ],
+          [
+            -33.4005,
+            0.463649,
+            -14.9791
+          ],
+          [
+            -33.4007,
+            0.0268801,
+            -14.9794
+          ],
+          [
+            -33.4015,
+            -0.409687,
+            -14.9799
+          ],
+          [
+            -33.404,
+            -0.846047,
+            -14.9808
+          ],
+          [
+            -33.7309,
+            -0.924961,
+            -15.2589
+          ],
+          [
+            -33.3104,
+            -0.925,
+            -15.3755
+          ],
+          [
+            -32.9119,
+            -0.925,
+            -15.1978
+          ]
+        ],
+        "publishedLanternHinge": [
+          0.408487,
+          0,
+          0.912764,
+          0,
+          -0.0455813,
+          0.998752,
+          0.0203989,
+          0,
+          -0.911625,
+          -0.0499376,
+          0.407978,
+          0,
+          -17.1943,
+          1.18494,
+          14.7803,
+          1
+        ],
+        "publishedLanternBody": [
+          0.408134,
+          0.00748893,
+          0.912891,
+          0,
+          -0.0486444,
+          0.998724,
+          0.0135548,
+          0,
+          -0.911625,
+          -0.0499393,
+          0.407978,
+          0,
+          -17.1283,
+          1.18744,
+          14.8055,
+          1
+        ]
+      }
+    },
+    "query": {
+      "executionBackend": "RayQueryCompute",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67"
+        }
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 11.9488,
+        "overallMeanMs": 66.465308,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 2.913984,
+          "averageMs": 2.916589,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "asset": {
+        "enabled": true,
+        "vertexBytes": 37532928,
+        "indexBytes": 6102420,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.3055,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.6319,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6736,
+        "productionPropBlasBytes": 25892096,
+        "productionPropBlasBuildMilliseconds": 10.513
+      },
+      "camera": {
+        "x": -17.700905,
+        "z": 15.206802,
+        "yaw": 1.15,
+        "pitch": 0.1
+      },
+      "rescue": {
+        "phase": 4,
+        "generation": 4,
+        "claimCount": 1,
+        "deploymentCount": 1,
+        "equipmentStowed": false,
+        "ropeHandsActive": false,
+        "bodyStowWitness": false,
+        "plantedPelvisDropMetres": 0,
+        "bodyYawRadians": 0.136817,
+        "root": [
+          -17.7009,
+          -0.548164,
+          15.2068
+        ],
+        "renderedEye": [
+          -17.7009,
+          1.10184,
+          15.2068
+        ],
+        "gripNodeIndices": [
+          0.2,
+          0.45
+        ],
+        "gripTargets": [
+          [
+            -33.4,
+            2.5625,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.45312,
+            -14.979
+          ]
+        ],
+        "ropeNodes": [
+          [
+            -33.4,
+            2.65,
+            -14.979
+          ],
+          [
+            -33.3999,
+            2.21248,
+            -14.9789
+          ],
+          [
+            -33.4002,
+            1.77505,
+            -14.9789
+          ],
+          [
+            -33.4007,
+            1.33775,
+            -14.9788
+          ],
+          [
+            -33.4011,
+            0.900611,
+            -14.9789
+          ],
+          [
+            -33.4005,
+            0.463649,
+            -14.9791
+          ],
+          [
+            -33.4007,
+            0.0268801,
+            -14.9794
+          ],
+          [
+            -33.4015,
+            -0.409687,
+            -14.9799
+          ],
+          [
+            -33.404,
+            -0.846047,
+            -14.9808
+          ],
+          [
+            -33.7309,
+            -0.924961,
+            -15.2589
+          ],
+          [
+            -33.3104,
+            -0.925,
+            -15.3755
+          ],
+          [
+            -32.9119,
+            -0.925,
+            -15.1978
+          ]
+        ],
+        "publishedLanternHinge": [
+          0.408487,
+          0,
+          0.912764,
+          0,
+          -0.0455813,
+          0.998752,
+          0.0203989,
+          0,
+          -0.911625,
+          -0.0499376,
+          0.407978,
+          0,
+          -17.1943,
+          1.18494,
+          14.7803,
+          1
+        ],
+        "publishedLanternBody": [
+          0.408134,
+          0.00748893,
+          0.912891,
+          0,
+          -0.0486444,
+          0.998724,
+          0.0135548,
+          0,
+          -0.911625,
+          -0.0499393,
+          0.407978,
+          0,
+          -17.1283,
+          1.18744,
+          14.8055,
+          1
+        ]
+      }
+    }
+  },
+  "pixelComparisons": {
+    "backend": {
+      "changedPixels": 1589,
+      "maximumChannelDifference": 45,
+      "meanChannelDifference": 0.004426440329218107
+    },
+    "replace": {
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "meanChannelDifference": 0.0
+    },
+    "restore": {
+      "changedPixels": 0,
+      "maximumChannelDifference": 0,
+      "meanChannelDifference": 0.0
+    }
+  },
+  "currentResidencySavingBytes": 0,
+  "shaderArtifacts": "unchanged verified parent artifacts and budgets",
+  "limits": {
+    "actorSlots": 3,
+    "textureLayers": 18
+  },
+  "acceptance": "finite opened desktop diagnostic frames; sustained and phone pending"
+}

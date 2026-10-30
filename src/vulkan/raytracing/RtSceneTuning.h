@@ -37,7 +37,7 @@ inline std::optional<RtQualityControlsGpu> ResolveRtQualityControls(
     const horde::graphics::DustQuality dust = horde::graphics::DustQuality::Off) noexcept
 {
     if (!horde::graphics::ValidDustQuality(dust)) return std::nullopt;
-    if (shadow && static_cast<unsigned>(*shadow) > 2u) return std::nullopt;
+    if (shadow && !horde::graphics::ValidShadowQuality(*shadow)) return std::nullopt;
     const auto mode = shadow ? static_cast<std::uint32_t>(*shadow) : kRtShadowLegacyWorkload;
     const bool higher = shadow ? *shadow == horde::graphics::ShadowQuality::Higher :
         workload == RtWorkloadPreset::Max;

@@ -1,0 +1,46 @@
+[OUTPUT] 
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+
+[HANDLER_OUTPUT] 
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+
+      Start   7: horde_rt_menu_ambience_tests
+ 1/18 Test   #7: horde_rt_menu_ambience_tests ................   Passed    0.01 sec
+      Start  35: horde_rt_campaign_play_session_tests
+ 2/18 Test  #35: horde_rt_campaign_play_session_tests ........   Passed    4.31 sec
+      Start  40: horde_rt_campaign_codec_tests
+ 3/18 Test  #40: horde_rt_campaign_codec_tests ...............   Passed    1.56 sec
+      Start  42: horde_rt_chapter_dialogue_tests
+ 4/18 Test  #42: horde_rt_chapter_dialogue_tests .............   Passed    1.42 sec
+      Start  45: horde_rt_campaign_checkpoint_tests
+ 5/18 Test  #45: horde_rt_campaign_checkpoint_tests ..........   Passed    2.86 sec
+      Start  52: horde_rt_ambience_pcm_loop_tests
+ 6/18 Test  #52: horde_rt_ambience_pcm_loop_tests ............   Passed    0.88 sec
+      Start 148: horde_rt_simulation_gameplay_tests
+ 7/18 Test #148: horde_rt_simulation_gameplay_tests ..........   Passed    1.57 sec
+      Start 153: horde_rt_music_director_tests
+ 8/18 Test #153: horde_rt_music_director_tests ...............   Passed    1.31 sec
+      Start 154: horde_rt_chapter_music_tests
+ 9/18 Test #154: horde_rt_chapter_music_tests ................   Passed    1.57 sec
+      Start 155: horde_rt_chapter_local_ambience_tests
+10/18 Test #155: horde_rt_chapter_local_ambience_tests .......   Passed    2.21 sec
+      Start 156: horde_rt_dialogue_ducking_tests
+11/18 Test #156: horde_rt_dialogue_ducking_tests .............   Passed    0.12 sec
+      Start 160: horde_rt_sfx_volume_tests
+12/18 Test #160: horde_rt_sfx_volume_tests ...................   Passed    0.02 sec
+      Start 161: horde_rt_windows_music_focus_tests
+13/18 Test #161: horde_rt_windows_music_focus_tests ..........   Passed    0.02 sec
+      Start 165: horde_rt_music_playback_session_tests
+14/18 Test #165: horde_rt_music_playback_session_tests .......   Passed    2.37 sec
+      Start 181: horde_rt_forest_bird_ambience_tests
+15/18 Test #181: horde_rt_forest_bird_ambience_tests .........   Passed    4.59 sec
+      Start 213: horde_rt_rescue_traversal_tests
+16/18 Test #213: horde_rt_rescue_traversal_tests .............   Passed    1.49 sec
+      Start 215: horde_rt_rescue_journey_integration_tests
+17/18 Test #215: horde_rt_rescue_journey_integration_tests ...   Passed    1.85 sec
+      Start 216: horde_rt_chapter_terrain_journey_tests
+18/18 Test #216: horde_rt_chapter_terrain_journey_tests ......   Passed   17.09 sec
+
+100% tests passed, 0 tests failed out of 18
+
+Total Test time (real) =  45.30 sec

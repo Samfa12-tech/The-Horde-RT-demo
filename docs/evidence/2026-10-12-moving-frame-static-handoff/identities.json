@@ -1,0 +1,58 @@
+{
+  "parentSource": "c8ee094b5f2084e35f616547be3ccc07d65aabcb",
+  "builtWithListedUncommittedSource": true,
+  "artifactsAndSources": {
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 567225,
+      "sha256": "ecc3eaf525c6011c55169a0307c915214500a3dc347e734997c99956df9bb026"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+      "bytes": 58901,
+      "sha256": "bf72711a9c2c43fd363ae14b579b6a9308e0f1c47a8b36db96ded32d09336823"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": {
+      "bytes": 36137,
+      "sha256": "486a522e67b41d230ccfac7853e7b27093896da52b4a8bed8a8fe2f010780da4"
+    },
+    "tests/StaticGeometryCutoverTests.cpp": {
+      "bytes": 18691,
+      "sha256": "7d418168a54ee947d8c786356da61b9fc43b26d0781d54e77c3f47c8d34e2257"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": {
+      "bytes": 416722,
+      "sha256": "ec8feb284dd3082ca1cfd8be872c2ed831bef3064c7d47310e6aefcad48a1805"
+    },
+    "android/app/src/test/java/com/samfa12/hordelanternrt/ChapterDebugCheckpointTest.java": {
+      "bytes": 2361,
+      "sha256": "24a456ccdb3d477884ba401dadaf5ac3eb8ead06b2a24902ce73ba9eea5c5fb3"
+    },
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 12938752,
+      "sha256": "e473c70216ad0dcee2d26a8289d164d450ddf7ff46d7b3d8ea6a7613936a5dce"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4439552,
+      "sha256": "007f7c3d7ae74554b9dc7c7bcb977ebaf1b09b68ac61ae842a8a1782535b2834"
+    },
+    "android/app/build/outputs/apk/debug/app-debug.apk": {
+      "bytes": 183030634,
+      "sha256": "5826df723d6f663f56361ff48bdbaf294a008529395fe5b9d252e4dacf00525b"
+    }
+  },
+  "androidTests": {
+    "tests": 286,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "physicalCandidateInstalled": false,
+  "normalPlayCaller": false,
+  "residencySavingBytes": 0,
+  "completeChapterAccepted": false,
+  "capacitiesUnchanged": {
+    "characters": 3,
+    "textureLayers": 18,
+    "highPrimitiveRows": 32
+  },
+  "phoneStatus": "owner has taken phone; capture and migration validation pending"
+}

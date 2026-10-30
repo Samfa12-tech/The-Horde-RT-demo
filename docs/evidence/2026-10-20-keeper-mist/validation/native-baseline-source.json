@@ -1,0 +1,31 @@
+{
+  "head": "eaffada89b02cd0ce542a622ee656f67ae989952",
+  "trackedStatus": [],
+  "scope": "Pre-fixture baseline: only existing Release resource-inventory and character-slot targets; no source edits",
+  "sourceFiles": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\tests\\RtSceneResourceInventoryTests.cpp",
+      "sha256": "7E8AB1255329828DB15566455485095F47EB9F0BD01203771490542A21203139"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\tests\\CharacterRenderSlotSmoke.cpp",
+      "sha256": "DD66D4B6D6812C2DEF94CBBF8985C5D4E4F08EEEC05434240B26389C85C6FFF1"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\vulkan\\raytracing\\PresentableTinyRtScene.cpp",
+      "sha256": "0097419090BA9C4B290C6F2521FE1C25BDB834F39747B296B857CF0070F4BBB9"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\vulkan\\raytracing\\PresentableTinyRtSceneStaticGeometry.cpp",
+      "sha256": "93B5CE208378EB8C21891165DCA6CA4F1C72ACA6988DA0A2C887256E76B85E1C"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\shaders\\raytracing\\minimal.rgen",
+      "sha256": "BDAD62D56ED79E2C4BEB9FF3830628AC6D3AD94F9EF8863911228CA059D74CED"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\src\\main\\cpp\\android_probe_bridge.cpp",
+      "sha256": "9ED2737E9C6942BE0B1F2021256D4267EE60492360DDD616919FB6EBCDF9684F"
+    }
+  ]
+}

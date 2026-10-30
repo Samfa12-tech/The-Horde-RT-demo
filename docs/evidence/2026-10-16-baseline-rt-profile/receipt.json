@@ -1,0 +1,7 @@
+{
+  "archiveSha256": "118915878fbec2a1a06037f0bdf5b1d973eece97e39689b13b634ec29e63342a",
+  "archiveBytes": 13023513,
+  "apkIncluded": false,
+  "scope": "Exact source snapshots/patch, two strict ordinary routes, all stage/resource/display rows, scoped GPU source inventory, controls comparison, run scripts, checks and failed initial Windows target command; unrelated Perfetto process inventory excluded",
+  "apkSha256": "f13dda30ad56536a774004ee963c621aec2396f0a25179c490f32e72294fa527"
+}

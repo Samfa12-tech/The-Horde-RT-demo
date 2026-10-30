@@ -1,0 +1,664 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 21
+      Start  21: horde_rt_raygen_artifact_ownership_tests
+
+21: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RaygenArtifactOwnershipTests.ps1"
+21: Working Directory: <repo>/build/presets/windows-x64-release
+21: Test timeout computed to be: 1500
+21: Raygen artifact ownership preserves the exact compute counterpart set and exposes unknown files.
+ 1/48 Test  #21: horde_rt_raygen_artifact_ownership_tests .................   Passed    0.57 sec
+test 24
+      Start  24: horde_rt_combat_foundation_tests
+
+24: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_combat_foundation_tests.exe"
+24: Working Directory: <repo>/build/presets/windows-x64-release
+24: Test timeout computed to be: 30
+24: combat foundation checks=486 failures=0
+ 2/48 Test  #24: horde_rt_combat_foundation_tests .........................   Passed    1.72 sec
+test 25
+      Start  25: horde_rt_held_item_transition_tests
+
+25: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_transition_tests.exe"
+25: Working Directory: <repo>/build/presets/windows-x64-release
+25: Test timeout computed to be: 1500
+25: Held-item transition checks passed
+ 3/48 Test  #25: horde_rt_held_item_transition_tests ......................   Passed    1.29 sec
+test 26
+      Start  26: horde_rt_combat_timing_trace_tests
+
+26: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_combat_timing_trace_tests.exe"
+26: Working Directory: <repo>/build/presets/windows-x64-release
+26: Test timeout computed to be: 1500
+ 4/48 Test  #26: horde_rt_combat_timing_trace_tests .......................   Passed    2.16 sec
+test 27
+      Start  27: horde_rt_input_presentation_trace_tests
+
+27: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_input_presentation_trace_tests.exe"
+27: Working Directory: <repo>/build/presets/windows-x64-release
+27: Test timeout computed to be: 1500
+ 5/48 Test  #27: horde_rt_input_presentation_trace_tests ..................   Passed    1.25 sec
+test 28
+      Start  28: horde_rt_held_item_clearance_tests
+
+28: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_clearance_tests.exe"
+28: Working Directory: <repo>/build/presets/windows-x64-release
+28: Test timeout computed to be: 1500
+28: Portal cases=19392 maximum world-down carry=0.79874 m
+28: Maximum sampled walk/look hand step=0.0295375 m at step 197 previous z/yaw/pitch=-3.46/-0.210644/0.0560644 current=-3.47/-0.214874/0.0519433 retreat/lowering=0.189427/0.558001 -> 0.178705/0.532593
+28: Rag torch held/lowered residual=0.577716/0.0887203 m; lowered hand Y=-0.910606
+ 6/48 Test  #28: horde_rt_held_item_clearance_tests .......................   Passed    1.56 sec
+test 33
+      Start  33: horde_rt_graphics_preview_frame_adapter_tests
+
+33: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_preview_frame_adapter_tests.exe"
+33: Working Directory: <repo>/build/presets/windows-x64-release
+33: Test timeout computed to be: 1500
+ 7/48 Test  #33: horde_rt_graphics_preview_frame_adapter_tests ............   Passed    0.78 sec
+test 36
+      Start  36: horde_rt_lantern_benchmark_tests
+
+36: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_lantern_benchmark_tests.exe"
+36: Working Directory: <repo>/build/presets/windows-x64-release
+36: Test timeout computed to be: 1500
+ 8/48 Test  #36: horde_rt_lantern_benchmark_tests .........................   Passed    1.33 sec
+test 41
+      Start  41: horde_rt_windows_combat_practice_launch_tests
+
+41: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_windows_combat_practice_launch_tests.exe"
+41: Working Directory: <repo>/build/presets/windows-x64-release
+41: Test timeout computed to be: 1500
+ 9/48 Test  #41: horde_rt_windows_combat_practice_launch_tests ............   Passed    0.16 sec
+test 45
+      Start  45: horde_rt_world_route_foundation_tests
+
+45: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_world_route_foundation_tests.exe"
+45: Working Directory: <repo>/build/presets/windows-x64-release
+45: Test timeout computed to be: 1500
+45: World route checks=16388 failures=0 triangles=350 resident_cpu_ns=47700 staged_cpu_ns=49900 resident_retained_bytes=22752 staged_peak_cpu_bytes=32880 directions=2 GPU_cost=not-measured
+10/48 Test  #45: horde_rt_world_route_foundation_tests ....................   Passed    1.71 sec
+test 46
+      Start  46: horde_rt_vertical_support_tests
+
+46: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_vertical_support_tests.exe"
+46: Working Directory: <repo>/build/presets/windows-x64-release
+46: Test timeout computed to be: 1500
+46: Vertical support proof cases=265 failures=0 fixed-walk directions=2
+11/48 Test  #46: horde_rt_vertical_support_tests ..........................   Passed    1.99 sec
+test 47
+      Start  47: horde_rt_held_item_vertical_support_rig_tests
+
+47: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_vertical_support_rig_tests.exe" "<repo>"
+47: Working Directory: <repo>/build/presets/windows-x64-release
+47: Test timeout computed to be: 1500
+47: Exact-pose rejected missing geometry: missing skinned geometry
+47: Exact-pose rejected omitted support: body mesh or eye applied support incorrectly
+47: Exact-pose rejected doubled support: body mesh or eye applied support incorrectly
+47: Exact-pose rejected unreachable wrist: actual wrist is outside anatomical reach
+47: Exact-pose rejected broken torch Grip: torch no longer attaches to the solved rig Grip
+47: Exact-pose rejected broken sword Hips attachment: production stowed sword no longer attaches to animated Hips
+47: Exact-pose rejected independent flame offset: flame or physical light left its authored item socket
+47: Exact-pose rejected independent physical-light offset: flame or physical light left its authored item socket
+47: Exact checkpoint171 production rig yaw0 pitch-0.05 aspect16:9 passed; mesh points=34304 lowering/retraction/headroom=0.333987/0.200392/0.0347347 returned lowering=0 same-validator negatives=9 descent ticks=59
+47: Actual cached player rig support transform passed: support delta=0.35 m; actual skinned body vertices, hand/item sockets, reward-lantern hinge/body/flame/light, and torch clearance translated with XZ preserved.
+47: First fixture (0,0) torch retraction/headroom floor=0/0.0557224 m raised=0.197407/0.0347347 m
+12/48 Test  #47: horde_rt_held_item_vertical_support_rig_tests ............   Passed    1.36 sec
+test 48
+      Start  48: horde_rt_player_directional_rig_tests
+
+48: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_player_directional_rig_tests.exe" "<repo>"
+48: Working Directory: <repo>/build/presets/windows-x64-release
+48: Test timeout computed to be: 1500
+48: Directional runtime rig, aim independence, run stride, dodge disposition, route support poses, and attachment sockets passed; dedicated run/back/strafe/dodge clips remain absent; route_pose_samples=32 GPU_cost=not-measured.
+13/48 Test  #48: horde_rt_player_directional_rig_tests ....................   Passed    1.55 sec
+test 54
+      Start  54: horde_rt_scene_record_observation_tests
+
+54: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_scene_record_observation_tests.exe"
+54: Working Directory: <repo>/build/presets/windows-x64-release
+54: Test timeout computed to be: 1500
+14/48 Test  #54: horde_rt_scene_record_observation_tests ..................   Passed    1.22 sec
+test 55
+      Start  55: horde_rt_pipeline_variants_tests
+
+55: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_variants_tests.exe"
+55: Working Directory: <repo>/build/presets/windows-x64-release
+55: Test timeout computed to be: 1500
+15/48 Test  #55: horde_rt_pipeline_variants_tests .........................   Passed    0.02 sec
+test 56
+      Start  56: horde_rt_pipeline_variant_provider_tests
+
+56: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_variant_provider_tests.exe"
+56: Working Directory: <repo>/build/presets/windows-x64-release
+56: Test timeout computed to be: 1500
+16/48 Test  #56: horde_rt_pipeline_variant_provider_tests .................   Passed    0.02 sec
+test 57
+      Start  57: horde_rt_pipeline_bundle_contracts_tests
+
+57: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_bundle_contracts_tests.exe"
+57: Working Directory: <repo>/build/presets/windows-x64-release
+57: Test timeout computed to be: 1500
+17/48 Test  #57: horde_rt_pipeline_bundle_contracts_tests .................   Passed    0.04 sec
+test 70
+      Start  70: horde_rt_skinned_node_pose_batch_tests
+
+70: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_skinned_node_pose_batch_tests.exe"
+70: Working Directory: <repo>/build/presets/windows-x64-release
+70: Test timeout computed to be: 30
+70: PASS: batched skeleton node-pose sampling and rejection contracts
+18/48 Test  #70: horde_rt_skinned_node_pose_batch_tests ...................   Passed    0.09 sec
+test 73
+      Start  73: horde_rt_held_item_socket_tests
+
+73: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_socket_tests.exe"
+73: Working Directory: <repo>/build/presets/windows-x64-release
+73: Test timeout computed to be: 1500
+73: post-claim chest held depth/x/y/clearance=1.02728/-0.130527/-0.0501483/2.66
+73: reward carry open held/high/low x=0.68/1.04/1.04/-0.13 guard clearance/hand=0.0600006/0.2 emergency wall held/hand/x=0.3/0.2/-0.45
+73: reward one-millimetre wall sweep max clearance/depth/lateral/yaw delta=0.00100112/0.000478745/0.000261545/0.00098294
+73: stowed scabbard full-mesh sweep poses=16 closestGap=0.0838906m playerTri=16301 sheathTri=11 floorGap=0.157182m releasedHand=0.503615m
+73: parry actual mesh clearance aspect=0.46 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=0 action=7 time=0.04 successful=0 hilt=0.0495894 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=0 action=8 time=0.05 successful=0 hilt=0.0495894 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: sword grip-local envelope y=-0.135279:0.915253 vertexBands(y<=.15,.15-.35,.35-.55,.55-.75,.75-.95,>.95)=4348,2266,1969,1782,1059,0, primitiveMaterials=material:34497,
+73: combat-geometry normal-near target=0,-1.2 targetY=-0.95 targetFacing=0 playerYaw=0 targetBearing=0 targetBoundsY=-0.939193:0.543894 downPulseTick=17 downActionTime=0.103333 downAdmitted=1 upPulseTick=0 upActionTime=-1 targetDeadAtUpPulse=0 downPulseSurfaceGap=0.00213471 upPulseSurfaceGap=3.40282e+38 downPulseBoundsGap=0 upPulseBoundsGap=3.40282e+38 downPulseBladeGap=0.00213471 upPulseBladeGap=3.40282e+38 downPulseNearestGripLocal=0.0321889,0.630462,0.0016153 upPulseNearestGripLocal=0,0,0 minSurfaceGap=0.00213471 closestSurfaceTick=17 closestSurfaceGripLocal=0.0321889,0.630462,0.0016153 minBladeSurfaceGap=0.00213471 closestBladeTick=17 closestBladeGripLocal=0.0321889,0.630462,0.0016153 nearSurfaceTicks20mm=17:17 downActiveNearTicks=17:17 upActiveNearTicks=0:0 downActiveBladeNearTicks=17:17 upActiveBladeNearTicks=0:0 minGap=0 boundsOverlapSamples=10:22 importedSwordVertices=11424 importedTargetVertices=28206
+73: combat-geometry combo-near target=0,-1.2 targetY=-0.95 targetFacing=0 playerYaw=0 targetBearing=0 targetBoundsY=-0.939193:0.543894 downPulseTick=17 downActionTime=0.103333 downAdmitted=1 upPulseTick=30 upActionTime=0.05 targetDeadAtUpPulse=1 downPulseSurfaceGap=0.00213471 upPulseSurfaceGap=0.0131259 downPulseBoundsGap=0 upPulseBoundsGap=0 downPulseBladeGap=0.00213471 upPulseBladeGap=0.0131259 downPulseNearestGripLocal=0.0321889,0.630462,0.0016153 upPulseNearestGripLocal=0.0319776,0.642511,0.00157196 minSurfaceGap=0.00213471 closestSurfaceTick=17 closestSurfaceGripLocal=0.0321889,0.630462,0.0016153 minBladeSurfaceGap=0.00213471 closestBladeTick=17 closestBladeGripLocal=0.0321889,0.630462,0.0016153 nearSurfaceTicks20mm=17:30 downActiveNearTicks=17:17 upActiveNearTicks=30:30 downActiveBladeNearTicks=17:17 upActiveBladeNearTicks=30:30 minGap=0 boundsOverlapSamples=10:32 importedSwordVertices=11424 importedTargetVertices=28206
+73: open anatomical hands right=0.18,-0.34,0.6 left=-0.135,-0.31,0.68 lowering/retraction=0/0 torch=0
+73: sword overhead phase sweep max lowering/vertices clear=0.733974/1 anatomical finalGrip/vertices=1/1 resolved=60/60 leftSocketErrorMax/failures=9.996e-08/0 rightSocketError=1.78814e-07 finalGripError=5.05762e-07m/0rad
+73: sword five-mm approach max lowering/hand step=0.0027637/0.00296172
+73: Held-item socket contracts passed.
+19/48 Test  #73: horde_rt_held_item_socket_tests ..........................   Passed    3.25 sec
+test 75
+      Start  75: horde_rt_combat_sword_authority_agreement
+
+75: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_socket_tests.exe" "--combat-sword-authority-agreement"
+75: Working Directory: <repo>/build/presets/windows-x64-release
+75: Test timeout computed to be: 30
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1 case=frontal-1.28 sample=pulse tick=17 playerAction=2 playerActionTime=0.103333 targetAction=1 targetActionTime=0.266667 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00996936 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.96947e-06 rigidBasisFrobeniusDiff=1.98841e-07 maxAxisVectorDelta=1.34987e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0101142 rmsVertexDisplacementMm=0.00997413 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1 case=frontal-1.28 sample=plus1 tick=18 playerAction=2 playerActionTime=0.12 targetAction=1 targetActionTime=0.283333 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00997149 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.97206e-06 rigidBasisFrobeniusDiff=1.72654e-07 maxAxisVectorDelta=1.22878e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0101586 rmsVertexDisplacementMm=0.0100164 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1 case=frontal-1.28 sample=plus2 tick=19 playerAction=2 playerActionTime=0.136667 targetAction=1 targetActionTime=0.3 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.0100175 gameplayToRenderedGripOrientationRad=0.000488281 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0.000488281 fullSwordMatrixFrobeniusDiff=1.00143e-05 rigidBasisFrobeniusDiff=1.63913e-07 maxAxisVectorDelta=1.03238e-07 maxAxisComponentDelta=5.96046e-08 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0101715 rmsVertexDisplacementMm=0.0100518 exactQueries=0 targetSkinQueries=0
+75: combat-prepulse-preflight roof=high-entry-roof roofY=1.35 playerOrigin=0,0 targetOrigin=0,-1.28 aspect=1 case=frontal-1.28 previousTick=16 pulseTick=17 targetAction=1 targetActionTime=0.266667 targetHealth=1 playerAction=2 playerActionTime=0.103333 rangeM=1.28 gateEligible=1 swordLoweringM=0 torchLoweringM=0 damageAdmitted=1 exactQueries=0
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1 case=minus15-1.28 sample=pulse tick=17 playerAction=2 playerActionTime=0.103333 targetAction=1 targetActionTime=0.266667 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00996936 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.96947e-06 rigidBasisFrobeniusDiff=1.98841e-07 maxAxisVectorDelta=1.34987e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0101142 rmsVertexDisplacementMm=0.00997413 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1 case=minus15-1.28 sample=plus1 tick=18 playerAction=2 playerActionTime=0.12 targetAction=1 targetActionTime=0.283333 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00997149 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.97206e-06 rigidBasisFrobeniusDiff=1.72654e-07 maxAxisVectorDelta=1.22878e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0101586 rmsVertexDisplacementMm=0.0100164 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1 case=minus15-1.28 sample=plus2 tick=19 playerAction=2 playerActionTime=0.136667 targetAction=1 targetActionTime=0.3 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.0100175 gameplayToRenderedGripOrientationRad=0.000488281 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0.000488281 fullSwordMatrixFrobeniusDiff=1.00143e-05 rigidBasisFrobeniusDiff=1.63913e-07 maxAxisVectorDelta=1.03238e-07 maxAxisComponentDelta=5.96046e-08 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0101715 rmsVertexDisplacementMm=0.0100518 exactQueries=0 targetSkinQueries=0
+75: combat-prepulse-preflight roof=high-entry-roof roofY=1.35 playerOrigin=0,0 targetOrigin=-0.331288,-1.23638 aspect=1 case=minus15-1.28 previousTick=16 pulseTick=17 targetAction=1 targetActionTime=0.266667 targetHealth=1 playerAction=2 playerActionTime=0.103333 rangeM=1.28 gateEligible=1 swordLoweringM=0 torchLoweringM=0 damageAdmitted=1 exactQueries=0
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1.77778 case=frontal-1.28 sample=pulse tick=17 playerAction=2 playerActionTime=0.103333 targetAction=1 targetActionTime=0.266667 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00992772 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=7.45058e-06 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.92971e-06 rigidBasisFrobeniusDiff=1.98841e-07 maxAxisVectorDelta=1.34987e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0100297 rmsVertexDisplacementMm=0.00993221 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1.77778 case=frontal-1.28 sample=plus1 tick=18 playerAction=2 playerActionTime=0.12 targetAction=1 targetActionTime=0.283333 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.0101099 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=7.45058e-06 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=1.01087e-05 rigidBasisFrobeniusDiff=1.72654e-07 maxAxisVectorDelta=1.22878e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0102797 rmsVertexDisplacementMm=0.010152 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1.77778 case=frontal-1.28 sample=plus2 tick=19 playerAction=2 playerActionTime=0.136667 targetAction=1 targetActionTime=0.3 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.0100083 gameplayToRenderedGripOrientationRad=0.000488281 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0.000488281 fullSwordMatrixFrobeniusDiff=1.00049e-05 rigidBasisFrobeniusDiff=1.63913e-07 maxAxisVectorDelta=1.03238e-07 maxAxisComponentDelta=5.96046e-08 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0101787 rmsVertexDisplacementMm=0.0100424 exactQueries=0 targetSkinQueries=0
+75: combat-prepulse-preflight roof=high-entry-roof roofY=1.35 playerOrigin=0,0 targetOrigin=0,-1.28 aspect=1.77778 case=frontal-1.28 previousTick=16 pulseTick=17 targetAction=1 targetActionTime=0.266667 targetHealth=1 playerAction=2 playerActionTime=0.103333 rangeM=1.28 gateEligible=1 swordLoweringM=0 torchLoweringM=0 damageAdmitted=1 exactQueries=0
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1.77778 case=minus15-1.28 sample=pulse tick=17 playerAction=2 playerActionTime=0.103333 targetAction=1 targetActionTime=0.266667 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00992772 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=7.45058e-06 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.92971e-06 rigidBasisFrobeniusDiff=1.98841e-07 maxAxisVectorDelta=1.34987e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0100297 rmsVertexDisplacementMm=0.00993221 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1.77778 case=minus15-1.28 sample=plus1 tick=18 playerAction=2 playerActionTime=0.12 targetAction=1 targetActionTime=0.283333 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.0101099 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=7.45058e-06 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=1.01087e-05 rigidBasisFrobeniusDiff=1.72654e-07 maxAxisVectorDelta=1.22878e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0102797 rmsVertexDisplacementMm=0.010152 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=high-entry-roof aspect=1.77778 case=minus15-1.28 sample=plus2 tick=19 playerAction=2 playerActionTime=0.136667 targetAction=1 targetActionTime=0.3 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.0100083 gameplayToRenderedGripOrientationRad=0.000488281 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0.000488281 fullSwordMatrixFrobeniusDiff=1.00049e-05 rigidBasisFrobeniusDiff=1.63913e-07 maxAxisVectorDelta=1.03238e-07 maxAxisComponentDelta=5.96046e-08 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0101787 rmsVertexDisplacementMm=0.0100424 exactQueries=0 targetSkinQueries=0
+75: combat-prepulse-preflight roof=high-entry-roof roofY=1.35 playerOrigin=0,0 targetOrigin=-0.331288,-1.23638 aspect=1.77778 case=minus15-1.28 previousTick=16 pulseTick=17 targetAction=1 targetActionTime=0.266667 targetHealth=1 playerAction=2 playerActionTime=0.103333 rangeM=1.28 gateEligible=1 swordLoweringM=0 torchLoweringM=0 damageAdmitted=1 exactQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1 case=frontal-1.28 sample=pulse tick=17 playerAction=2 playerActionTime=0.103333 targetAction=1 targetActionTime=0.266667 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00904597 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.04892e-06 rigidBasisFrobeniusDiff=2.30878e-07 maxAxisVectorDelta=1.68629e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.00986362 rmsVertexDisplacementMm=0.00905543 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1 case=frontal-1.28 sample=plus1 tick=18 playerAction=2 playerActionTime=0.12 targetAction=1 targetActionTime=0.283333 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00963008 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.63196e-06 rigidBasisFrobeniusDiff=1.90282e-07 maxAxisVectorDelta=1.3328e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0109215 rmsVertexDisplacementMm=0.00967443 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1 case=frontal-1.28 sample=plus2 tick=19 playerAction=2 playerActionTime=0.136667 targetAction=1 targetActionTime=0.3 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00991295 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.91423e-06 rigidBasisFrobeniusDiff=1.59275e-07 maxAxisVectorDelta=1.46001e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0106728 rmsVertexDisplacementMm=0.00990812 exactQueries=0 targetSkinQueries=0
+75: combat-prepulse-preflight roof=low-lintel roofY=0.88 playerOrigin=-29.5,-15.2 targetOrigin=-29.5,-13.92 aspect=1 case=frontal-1.28 previousTick=16 pulseTick=17 targetAction=1 targetActionTime=0.266667 targetHealth=1 playerAction=2 playerActionTime=0.103333 rangeM=1.28 gateEligible=1 swordLoweringM=0 torchLoweringM=0.470124 damageAdmitted=1 exactQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1 case=minus15-1.28 sample=pulse tick=17 playerAction=2 playerActionTime=0.103333 targetAction=1 targetActionTime=0.266667 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00904597 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.04892e-06 rigidBasisFrobeniusDiff=2.30878e-07 maxAxisVectorDelta=1.68629e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.00986362 rmsVertexDisplacementMm=0.00905543 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1 case=minus15-1.28 sample=plus1 tick=18 playerAction=2 playerActionTime=0.12 targetAction=1 targetActionTime=0.283333 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00963008 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.63196e-06 rigidBasisFrobeniusDiff=1.90282e-07 maxAxisVectorDelta=1.3328e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0109215 rmsVertexDisplacementMm=0.00967443 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1 case=minus15-1.28 sample=plus2 tick=19 playerAction=2 playerActionTime=0.136667 targetAction=1 targetActionTime=0.3 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00991295 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.91423e-06 rigidBasisFrobeniusDiff=1.59275e-07 maxAxisVectorDelta=1.46001e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0106728 rmsVertexDisplacementMm=0.00990812 exactQueries=0 targetSkinQueries=0
+75: combat-prepulse-preflight roof=low-lintel roofY=0.88 playerOrigin=-29.5,-15.2 targetOrigin=-29.1687,-13.9636 aspect=1 case=minus15-1.28 previousTick=16 pulseTick=17 targetAction=1 targetActionTime=0.266667 targetHealth=1 playerAction=2 playerActionTime=0.103333 rangeM=1.28 gateEligible=1 swordLoweringM=0 torchLoweringM=0.470124 damageAdmitted=1 exactQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1.77778 case=frontal-1.28 sample=pulse tick=17 playerAction=2 playerActionTime=0.103333 targetAction=1 targetActionTime=0.266667 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.0100887 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=1.00913e-05 rigidBasisFrobeniusDiff=2.30878e-07 maxAxisVectorDelta=1.68629e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0114007 rmsVertexDisplacementMm=0.0100969 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1.77778 case=frontal-1.28 sample=plus1 tick=18 playerAction=2 playerActionTime=0.12 targetAction=1 targetActionTime=0.283333 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00984979 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.85163e-06 rigidBasisFrobeniusDiff=1.90282e-07 maxAxisVectorDelta=1.3328e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0111083 rmsVertexDisplacementMm=0.0098934 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1.77778 case=frontal-1.28 sample=plus2 tick=19 playerAction=2 playerActionTime=0.136667 targetAction=1 targetActionTime=0.3 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.010144 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=1.01453e-05 rigidBasisFrobeniusDiff=1.59275e-07 maxAxisVectorDelta=1.46001e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0108795 rmsVertexDisplacementMm=0.0101408 exactQueries=0 targetSkinQueries=0
+75: combat-prepulse-preflight roof=low-lintel roofY=0.88 playerOrigin=-29.5,-15.2 targetOrigin=-29.5,-13.92 aspect=1.77778 case=frontal-1.28 previousTick=16 pulseTick=17 targetAction=1 targetActionTime=0.266667 targetHealth=1 playerAction=2 playerActionTime=0.103333 rangeM=1.28 gateEligible=1 swordLoweringM=0 torchLoweringM=0.475099 damageAdmitted=1 exactQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1.77778 case=minus15-1.28 sample=pulse tick=17 playerAction=2 playerActionTime=0.103333 targetAction=1 targetActionTime=0.266667 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.0100887 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=1.00913e-05 rigidBasisFrobeniusDiff=2.30878e-07 maxAxisVectorDelta=1.68629e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0114007 rmsVertexDisplacementMm=0.0100969 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1.77778 case=minus15-1.28 sample=plus1 tick=18 playerAction=2 playerActionTime=0.12 targetAction=1 targetActionTime=0.283333 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.00984979 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=9.85163e-06 rigidBasisFrobeniusDiff=1.90282e-07 maxAxisVectorDelta=1.3328e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0111083 rmsVertexDisplacementMm=0.0098934 exactQueries=0 targetSkinQueries=0
+75: combat-sword-authority-agreement roof=low-lintel aspect=1.77778 case=minus15-1.28 sample=plus2 tick=19 playerAction=2 playerActionTime=0.136667 targetAction=1 targetActionTime=0.3 swordHandGripBlend=1 rightIkPoseWeight=1 gameplayToRenderedGripPositionMm=0.010144 gameplayToRenderedGripOrientationRad=0 renderedGripSocketPositionMm=0 renderedGripSocketOrientationRad=0 fullSwordMatrixFrobeniusDiff=1.01453e-05 rigidBasisFrobeniusDiff=1.59275e-07 maxAxisVectorDelta=1.46001e-07 maxAxisComponentDelta=1.19209e-07 swordMatricesRigid=1 swordVertices=11424 maxVertexDisplacementMm=0.0108795 rmsVertexDisplacementMm=0.0101408 exactQueries=0 targetSkinQueries=0
+75: combat-prepulse-preflight roof=low-lintel roofY=0.88 playerOrigin=-29.5,-15.2 targetOrigin=-29.1687,-13.9636 aspect=1.77778 case=minus15-1.28 previousTick=16 pulseTick=17 targetAction=1 targetActionTime=0.266667 targetHealth=1 playerAction=2 playerActionTime=0.103333 rangeM=1.28 gateEligible=1 swordLoweringM=0 torchLoweringM=0.475099 damageAdmitted=1 exactQueries=0
+75: combat-sword-authority-summary cases=8 samples=24 vertexComparisons=274176 maxGripPositionErrorMm=0.010144 maxGripOrientationErrorRad=0.000488281 maxVertexDisplacementMm=0.0114007 exactQueries=0 targetSkinQueries=0
+20/48 Test  #75: horde_rt_combat_sword_authority_agreement ................   Passed    0.14 sec
+test 77
+      Start  77: horde_rt_scene_abi_tests
+
+77: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_scene_abi_tests.exe"
+77: Working Directory: <repo>/build/presets/windows-x64-release
+77: Test timeout computed to be: 1500
+77: RT scene ABI contract passed
+21/48 Test  #77: horde_rt_scene_abi_tests .................................   Passed    0.03 sec
+test 86
+      Start  86: horde_rt_pipeline_policy_fence_tests
+
+86: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelinePolicyFenceTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+86: Working Directory: <repo>/build/presets/windows-x64-release
+86: Test timeout computed to be: 300
+86: Generated RT catalog adapter is current.
+86: -- Building for: Visual Studio 17 2022
+86: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+86: -- The CXX compiler identification is MSVC 19.44.35227.0
+86: -- Detecting CXX compiler ABI info
+86: -- Detecting CXX compiler ABI info - done
+86: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+86: -- Detecting CXX compile features
+86: -- Detecting CXX compile features - done
+86: Generated RT catalog adapter is current.
+86: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+86: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+86: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+86: -- Looking for pthread_create in pthreads
+86: -- Looking for pthread_create in pthreads - not found
+86: -- Looking for pthread_create in pthread
+86: -- Looking for pthread_create in pthread - not found
+86: -- Found Threads: TRUE
+86: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+86: -- Horde Lantern RT: configuring shared host gameplay tests without Vulkan targets.
+86: -- Configuring done (22.5s)
+86: -- Generating done (1.3s)
+86: -- Build files have been written to: <user-home>/AppData/Local/Temp/horde-rt-fresh-configure-9bcb7056eb524dd2aa29c6aa2d7928a6
+86: RT provider policy and ownership behavior contracts passed.
+22/48 Test  #86: horde_rt_pipeline_policy_fence_tests .....................   Passed   66.60 sec
+test 90
+      Start  90: horde_rt_pipeline_policy_execution_tests
+
+90: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelinePolicyExecutionTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe" "-GradleExecutable" "<repo>/android/gradlew.bat"
+90: Working Directory: <repo>/build/presets/windows-x64-release
+90: Test timeout computed to be: 300
+90: Executable CMake and Gradle RT policy contracts passed.
+23/48 Test  #90: horde_rt_pipeline_policy_execution_tests .................   Passed   88.80 sec
+test 100
+      Start 100: horde_rt_simulation_timing_tests
+
+100: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_simulation_timing_tests.exe"
+100: Working Directory: <repo>/build/presets/windows-x64-release
+100: Test timeout computed to be: 1500
+100: Shared simulation cadence, hitch, diagonal, pause, and overrun tests passed.
+24/48 Test #100: horde_rt_simulation_timing_tests .........................   Passed    0.90 sec
+test 101
+      Start 101: horde_rt_simulation_gameplay_tests
+
+101: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_simulation_gameplay_tests.exe"
+101: Working Directory: <repo>/build/presets/windows-x64-release
+101: Test timeout computed to be: 1500
+101: lich/chest delayed finale events hits/defeat/unlock=3/1/1 phase=1 pending=0 time=0 sequence=8/9
+101: open shaft actual X/Z=-5.5/-14.5 mount torch lowering/left Y legacy=0/-0.41 anatomical=0/-0.31
+101: Shared simulation command, event, seam-persistence, and retry tests passed.
+25/48 Test #101: horde_rt_simulation_gameplay_tests .......................   Passed    0.96 sec
+test 106
+      Start 106: horde_rt_windows_music_focus_tests
+
+106: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_windows_music_focus_tests.exe"
+106: Working Directory: <repo>
+106: Test timeout computed to be: 1500
+106: PASS: 16 focus/ready/menu/loss combinations and actual-window publication wiring
+26/48 Test #106: horde_rt_windows_music_focus_tests .......................   Passed    1.41 sec
+test 123
+      Start 123: horde_rt_lantern_reward_tests
+
+123: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_lantern_reward_tests.exe"
+123: Working Directory: <repo>/build/presets/windows-x64-release
+123: Test timeout computed to be: 1500
+123: Lantern reward interaction, command, and finale tests passed
+27/48 Test #123: horde_rt_lantern_reward_tests ............................   Passed    1.28 sec
+test 124
+      Start 124: horde_rt_lantern_pendulum_tests
+
+124: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_lantern_pendulum_tests.exe"
+124: Working Directory: <repo>/build/presets/windows-x64-release
+124: Test timeout computed to be: 1500
+124: Lantern pendulum deterministic physics tests passed
+28/48 Test #124: horde_rt_lantern_pendulum_tests ..........................   Passed    1.29 sec
+test 125
+      Start 125: horde_rt_input_mailbox_stress
+
+125: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_input_mailbox_stress.exe"
+125: Working Directory: <repo>/build/presets/windows-x64-release
+125: Test timeout computed to be: 1500
+125: Input mailbox retained coherent POD snapshots across 125000 publications for 4 concurrent readers.
+29/48 Test #125: horde_rt_input_mailbox_stress ............................   Passed    0.09 sec
+test 126
+      Start 126: horde_rt_desktop_controller_input_tests
+
+126: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_desktop_controller_input_tests.exe"
+126: Working Directory: <repo>
+126: Test timeout computed to be: 1500
+126: Desktop controller input tests passed
+30/48 Test #126: horde_rt_desktop_controller_input_tests ..................   Passed    1.24 sec
+test 128
+      Start 128: horde_rt_combat_smoke
+
+128: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_combat_smoke.exe"
+128: Working Directory: <repo>/build/presets/windows-x64-release
+128: Test timeout computed to be: 1500
+128: Combat smoke passed: two stable spawns, separation, one attacker, nearest-only hits, persistent independent deaths, reset, damage pulses, collision, and route leash.
+31/48 Test #128: horde_rt_combat_smoke ....................................   Passed    0.02 sec
+test 131
+      Start 131: horde_rt_spatial_audio_smoke
+
+131: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_spatial_audio_smoke.exe"
+131: Working Directory: <repo>
+131: Test timeout computed to be: 1500
+131: Spatial audio smoke tests passed.
+32/48 Test #131: horde_rt_spatial_audio_smoke .............................   Passed    0.03 sec
+test 133
+      Start 133: horde_rt_staged_primary_resource_tests
+
+133: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_staged_primary_resource_tests.exe"
+133: Working Directory: <repo>/build/presets/windows-x64-release
+133: Test timeout computed to be: 1500
+133: PASS staged-primary owner fault injection (fake Vulkan; Shipping/Mobile fixture)
+33/48 Test #133: horde_rt_staged_primary_resource_tests ...................   Passed    0.91 sec
+test 136
+      Start 136: horde_rt_gpu_resources_observation_tests
+
+136: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_gpu_resources_observation_tests.exe"
+136: Working Directory: <repo>/build/presets/windows-x64-release
+136: Test timeout computed to be: 1500
+34/48 Test #136: horde_rt_gpu_resources_observation_tests .................   Passed    1.02 sec
+test 137
+      Start 137: horde_rt_pipeline_bundle_lifetime_tests
+
+137: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_bundle_lifetime_tests.exe"
+137: Working Directory: <repo>/build/presets/windows-x64-release
+137: Test timeout computed to be: 1500
+35/48 Test #137: horde_rt_pipeline_bundle_lifetime_tests ..................   Passed    0.27 sec
+test 139
+      Start 139: horde_rt_scene_resource_inventory_tests
+
+139: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_scene_resource_inventory_tests.exe"
+139: Working Directory: <repo>/build/presets/windows-x64-release
+139: Test timeout computed to be: 1500
+36/48 Test #139: horde_rt_scene_resource_inventory_tests ..................   Passed    1.77 sec
+test 140
+      Start 140: horde_rt_final_windows_bundle_containment
+
+140: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tools/InspectRtPipelineBundleContainment.ps1" "-TargetPath" "<repo>/build/presets/windows-x64-release/Release/HordeLanternRT.exe" "-TargetPlatform" "Windows" "-Instrumentation" "Shipping" "-Quality" "High"
+140: Working Directory: <repo>/build/presets/windows-x64-release
+140: Test timeout computed to be: 300
+140: {"target":"<user-home>\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe","targetPlatform":"Windows","instrumentation":"Shipping","quality":"High","targetSha256":"7287d53b86d7d24c49d0f91bbde6ff08a2c45748fd1f6c74b7b591d0e8a23086","targetBytes":4160000,"semanticKeys":["shipping_high_generic_dielectric","shipping_high_opaque_fast","rayquery_compute_shipping_high_generic_dielectric","rayquery_compute_shipping_high_opaque_fast"],"modules":[{"offset":1857984,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"53c750339d09c6d86a962c0b6ee0a8b7d2fd3d2ecf964beeb8230e1a306f6c7f","words":147821,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":false,"atomicInstructions":0},{"offset":2449280,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"dcf4ae58c422c9c512a2f8d0fccffcbb03414058eb59367f3272aab145c2d809","words":71783,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":false,"atomicInstructions":0},{"offset":2736416,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"f21fb2fe7acf6991d43ba697cc40ca05460e844b0be5c6e5d1e0bd5dcc193ee5","words":148122,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":false,"atomicInstructions":0},{"offset":3328912,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"cf819ead8266e755bc3c783380f983a7a0d3e0e338834234cb643f78a65ef1bb","words":71845,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":false,"atomicInstructions":0}],"spirvVal":"passed","spirvDis":"passed"}
+37/48 Test #140: horde_rt_final_windows_bundle_containment ................   Passed   10.87 sec
+test 141
+      Start 141: horde_rt_final_windows_bundle_containment_controls
+
+141: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelineBundleContainmentTests.ps1" "-Scanner" "<repo>/tools/InspectRtPipelineBundleContainment.ps1" "-TargetPath" "<repo>/build/presets/windows-x64-release/Release/HordeLanternRT.exe" "-TargetPlatform" "Windows" "-Instrumentation" "Shipping" "-Quality" "High" "-PowerShellExecutable" "C:/Program Files/PowerShell/7/pwsh.exe"
+141: Working Directory: <repo>/build/presets/windows-x64-release
+141: Test timeout computed to be: 300
+141: Final-target containment scanner adversarial controls passed.
+38/48 Test #141: horde_rt_final_windows_bundle_containment_controls .......   Passed  120.55 sec
+test 142
+      Start 142: horde_rt_final_windows_bundle_containment_registration
+
+142: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelineBundleContainmentRegistrationTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe" "-ConfiguredCtestFile" "<repo>/build/presets/windows-x64-release/CTestTestfile.cmake" "-Configuration" "Release" "-Instrumentation" "Shipping" "-Quality" "High" "-Generator" "Visual Studio 17 2022" "-GeneratorPlatform" "x64"
+142: Working Directory: <repo>/build/presets/windows-x64-release
+142: Test timeout computed to be: 300
+142: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+142: -- The CXX compiler identification is MSVC 19.44.35227.0
+142: -- Detecting CXX compiler ABI info
+142: -- Detecting CXX compiler ABI info - done
+142: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+142: -- Detecting CXX compile features
+142: -- Detecting CXX compile features - done
+142: Generated RT catalog adapter is current.
+142: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+142: -- Found Vulkan: C:/VulkanSDK/1.4.350.0/Lib/vulkan-1.lib (found version "1.4.350") found components: glslc glslangValidator
+142: -- Vulkan SDK found: 1.4.350
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+142: -- Looking for pthread_create in pthreads
+142: -- Looking for pthread_create in pthreads - not found
+142: -- Looking for pthread_create in pthread
+142: -- Looking for pthread_create in pthread - not found
+142: -- Found Threads: TRUE
+142: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+142: -- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+142: -- Configuring done (21.0s)
+142: -- Generating done (2.0s)
+142: -- Build files have been written to: <repo>/build/rtm-s-0846369662da
+142: MSBuild version 17.14.40+3e7442088 for .NET Framework
+142:
+142:   1>Checking Build System
+142:   Building Custom Rule <repo>/CMakeLists.txt
+142:   RtPipelineBundleLifetimeTests.cpp
+142:   RtPipelineBundle.cpp
+142:   RtPipelineBundleContracts.cpp
+142:   RtPipelineVariants.cpp
+142:   RtPipelineVariantProvider.cpp
+142:   Generating Code...
+142:   horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> <repo>\build\rtm-s-0846369662da\Debug\horde_rt_pipeline_bundle_lifetime_tests.exe
+142: Internal ctest changing into directory: <repo>/build/rtm-s-0846369662da
+142: Test project <repo>/build/rtm-s-0846369662da
+142:     Start 137: horde_rt_pipeline_bundle_lifetime_tests
+142: 1/1 Test #137: horde_rt_pipeline_bundle_lifetime_tests ...   Passed    4.65 sec
+142:
+142: 100% tests passed, 0 tests failed out of 1
+142:
+142: Total Test time (real) =   4.66 sec
+142: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+142: -- The CXX compiler identification is MSVC 19.44.35227.0
+142: -- Detecting CXX compiler ABI info
+142: -- Detecting CXX compiler ABI info - done
+142: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+142: -- Detecting CXX compile features
+142: -- Detecting CXX compile features - done
+142: Generated RT catalog adapter is current.
+142: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+142: -- Found Vulkan: C:/VulkanSDK/1.4.350.0/Lib/vulkan-1.lib (found version "1.4.350") found components: glslc glslangValidator
+142: -- Vulkan SDK found: 1.4.350
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+142: -- Looking for pthread_create in pthreads
+142: -- Looking for pthread_create in pthreads - not found
+142: -- Looking for pthread_create in pthread
+142: -- Looking for pthread_create in pthread - not found
+142: -- Found Threads: TRUE
+142: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+142: -- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+142: -- Configuring done (20.0s)
+142: -- Generating done (1.5s)
+142: -- Build files have been written to: <repo>/build/rtm-d-857b3376d66a
+142: MSBuild version 17.14.40+3e7442088 for .NET Framework
+142:
+142:   1>Checking Build System
+142:   Building Custom Rule <repo>/CMakeLists.txt
+142:   RtPipelineBundleLifetimeTests.cpp
+142:   RtPipelineBundle.cpp
+142:   RtPipelineBundleContracts.cpp
+142:   RtPipelineVariants.cpp
+142:   RtPipelineVariantProvider.cpp
+142:   Generating Code...
+142:   horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> <repo>\build\rtm-d-857b3376d66a\Debug\horde_rt_pipeline_bundle_lifetime_tests.exe
+142: Internal ctest changing into directory: <repo>/build/rtm-d-857b3376d66a
+142: Test project <repo>/build/rtm-d-857b3376d66a
+142:     Start 137: horde_rt_pipeline_bundle_lifetime_tests
+142: 1/1 Test #137: horde_rt_pipeline_bundle_lifetime_tests ...   Passed    5.85 sec
+142:
+142: 100% tests passed, 0 tests failed out of 1
+142:
+142: Total Test time (real) =   5.86 sec
+142: Effective final-target containment registrations and Mobile lifetime policies passed.
+39/48 Test #142: horde_rt_final_windows_bundle_containment_registration ...   Passed   66.84 sec
+test 143
+      Start 143: horde_rt_skinned_arm_reference_tests
+
+143: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_skinned_arm_reference_tests.exe"
+143: Working Directory: <repo>/build/presets/windows-x64-release
+143: Test timeout computed to be: 1500
+143: Left target=0.2 elbow=(0.475,1.00953,0) upper=0.3 lower=0.4
+143: Right target=0.2 elbow=(-0.475,1.00953,0) upper=0.3 lower=0.4
+143: Left target=0.5 elbow=(0.22,1.06,0) upper=0.3 lower=0.4
+143: Right target=0.5 elbow=(-0.22,1.06,0) upper=0.3 lower=0.4
+143: Skinned arm analytic reference passed: bind 0.30/0.40 m, folded 0.20 m, mirrored mounts, grip sockets, LBS and topology
+40/48 Test #143: horde_rt_skinned_arm_reference_tests .....................   Passed    1.34 sec
+test 144
+      Start 144: horde_rt_skinned_character_smoke
+
+144: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_skinned_character_smoke.exe"
+144: Working Directory: <repo>
+144: Test timeout computed to be: 1500
+144: player exact-grounding candidate vertices=5638
+144: player basic idle/walk skin passed
+144: player static/skinned stream agreement passed
+144: Stable final Grip agreement rest=1.0154e-05m/0.000345267rad down=9.92743e-06m/0rad up=1.00263e-05m/0rad
+144: authored Grip surface left axis/surface/contact/bins/span=0.00971155/7.41892e-06/2539/24/0.0955135 right=0.00973/1.47149e-07/2547/24/0.0954864
+144: sheathed actual right Grip in view=0.18,-0.339998,0.59999
+144: ordinary final-skinned clearance triangle/depth/area/side-cross=0.249519/0.0119556/0.170158/0/15855 near-cross=0/0 max-edge bind/skinned=0.0550014/0.0710506 max-triangle-area=0.00125283 normal-dot/reversed=-0.899975/299/0.000576386 sole-y=-0.94975
+144: grounded boot envelope idle/walk=-0.94975/-0.94975..-0.94975
+144: ordinary-wall final-skinned clearance/depth/area/near-cross=0.276322/-0.139847/0/214/0
+144: high wall final-skinned clearance triangle/depth=0.270617/-0.138872 projected-area wall/open=0 (0/0.802972) side-cross=0/15855 open/ordinary-area=4.71898 near-cross=199/0 max-edge open/wall=0.0764185/0.0734252 max-triangle-area open/wall=0.00330326/0
+144: low wall final-skinned clearance triangle/depth=0.274715/-0.143037 projected-area wall/open=0 (0/0.45415) side-cross=0/15855 open/ordinary-area=2.66899 near-cross=208/0 max-edge open/wall=0.0719549/0.0734252 max-triangle-area open/wall=0.00276535/0
+144: former z=-9.70 final-skinned clearance=0.270617 depth=-0.138872 projected-area=0 near-cross=199/0 side-cross=0/15855 max-edge/triangle-area=0.0734252/0
+144: former z=-9.70 final-skinned clearance=0.275184 depth=-0.145455 projected-area=0 near-cross=207/0 side-cross=0/15855 max-edge/triangle-area=0.0734252/0
+144: high full wall sweep samples=46 worst clearance@z=0.222394@-7.5 depth=-0.138872 area-ratio=1.44222 consecutive-footprint-area-delta=0.0516975@-8.2->-8.25(1.11163->0.882725) side-cross=0
+144: low full wall sweep samples=46 worst clearance@z=0.234326@-7.5 depth=-0.145455 area-ratio=1.00627 consecutive-footprint-area-delta=0.0239198@-8.4->-8.45(0.395608->0.308938) side-cross=0
+144: held-lantern wall approach final-skinned clearance=0.27312 finite=1 final-z=-9.735 blocked-ticks=141 max-edge/triangle-area=0.0982251/0.00142628 worst-step/first/centroid/bind/skinned=0/3326/-0.20772,0.528372,-8.58431/0.230297,1.43295,0.0716676/0.211276,1.46717,0.0493764 camera=0,0.7,-8.53167 triangle=-0.21138,0.53098,-8.58099;-0.206322,0.528837,-8.58391;-0.205458,0.525297,-8.58802;
+144: reward wall-safe movement strafe=0.0316667,-9.7 diagonal=0.0223917,-9.72239 retreat=0,-9.66833 corner-out/in=0.731667/0.668333 rotate-forward=0.0316667,-9.7
+144: walking-arm-pair-evidence case=walk-fixed-target baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryElbow=0.0242103 productionBoundaryElbow=0.0128193 baselineBoundaryP95=0.0287467 productionBoundaryP95=0.0153792 baselineBoundaryMax=0.0456174 productionBoundaryMax=0.0244856 pairedPoseContract=1 heldTorch=1 grip=1 boundary=1 improved=1
+144: walking-arm-paired-flexion case=walk-fixed-target samples=137 baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryTransitions=4 productionBoundaryTransitions=4 baselineBoundaryElbowStepMax=0.0242103 productionBoundaryElbowStepMax=0.0128193 baselineBoundaryArmP95Max=0.0287467 productionBoundaryArmP95Max=0.0153792 baselineBoundaryArmMax=0.0456174 productionBoundaryArmMax=0.0244856 baselineGripError=1.02202e-05 productionGripError=3.62561e-07 nonFlexionPoseHistoryIdentical=1
+144: walking-arm-pair-evidence case=production-torch baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryElbow=0.0339105 productionBoundaryElbow=0.0178584 baselineBoundaryP95=0.0401105 productionBoundaryP95=0.0212512 baselineBoundaryMax=0.0637163 productionBoundaryMax=0.0337062 pairedPoseContract=1 heldTorch=1 grip=1 boundary=1 improved=1
+144: walking-arm-paired-flexion case=production-torch samples=137 baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryTransitions=4 productionBoundaryTransitions=4 baselineBoundaryElbowStepMax=0.0339105 productionBoundaryElbowStepMax=0.0178584 baselineBoundaryArmP95Max=0.0401105 productionBoundaryArmP95Max=0.0212512 baselineBoundaryArmMax=0.0637163 productionBoundaryArmMax=0.0337062 baselineGripError=1.02569e-05 productionGripError=3.47871e-07 nonFlexionPoseHistoryIdentical=1
+144: Skinned character model smoke passed: skeleton=28206 player=83445 lich=27564 textured std430 stride=48 emissiveVertices=377 emissiveX=-0.813946..1.00981 outer=40 avg=0.943092,0.789989,0.636973
+41/48 Test #144: horde_rt_skinned_character_smoke .........................   Passed    5.35 sec
+test 145
+      Start 145: horde_rt_player_skinned_semantic_fixtures
+
+145: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/PlayerSkinnedSemanticFixtures.ps1" "-TestExecutable" "<repo>/build/presets/windows-x64-release/Release/horde_rt_skinned_character_smoke.exe"
+145: Working Directory: <repo>/build/presets/windows-x64-release
+145: Test timeout computed to be: 1500
+145: Actual skinned player: unchanged/reordered accepted; missing/duplicate/unknown rejected.
+42/48 Test #145: horde_rt_player_skinned_semantic_fixtures ................   Passed    2.02 sec
+test 148
+      Start 148: horde_rt_character_render_slot_smoke
+
+148: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_character_render_slot_smoke.exe"
+148: Working Directory: <repo>
+148: Test timeout computed to be: 1500
+43/48 Test #148: horde_rt_character_render_slot_smoke .....................   Passed    3.46 sec
+test 152
+      Start 152: horde_rt_rescue_traversal_tests
+
+152: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_traversal_tests.exe"
+152: Working Directory: <repo>/build/presets/windows-x64-release
+152: Test timeout computed to be: 1500
+152: PullUp diagnostic start_indices=1,2.00114 max_hand_step=0.0341754 at_indices=0.4,1.31155 z=-15.2
+152: Rescue traversal cases=23587 failures=0 max_root_step=0.0245255 max_landing_root_step=0.0243783
+44/48 Test #152: horde_rt_rescue_traversal_tests ..........................   Passed    1.32 sec
+test 153
+      Start 153: horde_rt_rescue_blockout_import_tests
+
+153: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_blockout_import_tests.exe"
+153: Working Directory: <repo>/build/presets/windows-x64-release
+153: Test timeout computed to be: 1500
+45/48 Test #153: horde_rt_rescue_blockout_import_tests ....................   Passed    1.04 sec
+test 154
+      Start 154: horde_rt_rescue_journey_integration_tests
+
+154: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_journey_integration_tests.exe"
+154: Working Directory: <repo>/build/presets/windows-x64-release
+154: Test timeout computed to be: 1500
+154: claim-site position=-34,-17.55 prompt=0 phase=4
+154: cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+154: unready-edge start=39.9707,-0.0043903 end=39.9707,-0.0043903 blocked=1
+154: cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+154: Combined CPU preparation resident_ns=70200 staged_ns=48400 resident_retained_bytes=48480 staged_retained_bytes=48480 resident_peak_capacity_bytes=71232 staged_peak_capacity_bytes=71232 gpu_residency_comparison=NOT_MEASURED
+154: Rescue journey integration cases=19397 failures=0 retained_triangles=1010
+46/48 Test #154: horde_rt_rescue_journey_integration_tests ................   Passed    1.62 sec
+test 155
+      Start 155: horde_rt_rescue_source_admission_tests
+
+155: Test command: <user-home>\AppData\Local\Programs\Python\Python312\python.exe "<repo>/tests/RescueBlockoutSourceAdmissionTests.py"
+155: Working Directory: <repo>/build/presets/windows-x64-release
+155: Test timeout computed to be: 1500
+155: Rescue blockout source admission passed: exact existing hashes, missing path, and changed bytes.
+47/48 Test #155: horde_rt_rescue_source_admission_tests ...................   Passed    0.10 sec
+test 156
+      Start 156: horde_rt_rescue_rig_attachment_tests
+
+156: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_rig_attachment_tests.exe"
+156: Working Directory: <repo>/build/presets/windows-x64-release
+156: Test timeout computed to be: 180
+156: Rescue rig attachment cases=15438 failures=0 sampled_poses=912 max_left_reach=0.618125@phase=3 max_right_reach=0.712535@phase=2
+48/48 Test #156: horde_rt_rescue_rig_attachment_tests .....................   Passed    2.53 sec
+
+The following tests passed:
+	horde_rt_raygen_artifact_ownership_tests
+	horde_rt_combat_foundation_tests
+	horde_rt_held_item_transition_tests
+	horde_rt_combat_timing_trace_tests
+	horde_rt_input_presentation_trace_tests
+	horde_rt_held_item_clearance_tests
+	horde_rt_graphics_preview_frame_adapter_tests
+	horde_rt_lantern_benchmark_tests
+	horde_rt_windows_combat_practice_launch_tests
+	horde_rt_world_route_foundation_tests
+	horde_rt_vertical_support_tests
+	horde_rt_held_item_vertical_support_rig_tests
+	horde_rt_player_directional_rig_tests
+	horde_rt_scene_record_observation_tests
+	horde_rt_pipeline_variants_tests
+	horde_rt_pipeline_variant_provider_tests
+	horde_rt_pipeline_bundle_contracts_tests
+	horde_rt_skinned_node_pose_batch_tests
+	horde_rt_held_item_socket_tests
+	horde_rt_combat_sword_authority_agreement
+	horde_rt_scene_abi_tests
+	horde_rt_pipeline_policy_fence_tests
+	horde_rt_pipeline_policy_execution_tests
+	horde_rt_simulation_timing_tests
+	horde_rt_simulation_gameplay_tests
+	horde_rt_windows_music_focus_tests
+	horde_rt_lantern_reward_tests
+	horde_rt_lantern_pendulum_tests
+	horde_rt_input_mailbox_stress
+	horde_rt_desktop_controller_input_tests
+	horde_rt_combat_smoke
+	horde_rt_spatial_audio_smoke
+	horde_rt_staged_primary_resource_tests
+	horde_rt_gpu_resources_observation_tests
+	horde_rt_pipeline_bundle_lifetime_tests
+	horde_rt_scene_resource_inventory_tests
+	horde_rt_final_windows_bundle_containment
+	horde_rt_final_windows_bundle_containment_controls
+	horde_rt_final_windows_bundle_containment_registration
+	horde_rt_skinned_arm_reference_tests
+	horde_rt_skinned_character_smoke
+	horde_rt_player_skinned_semantic_fixtures
+	horde_rt_character_render_slot_smoke
+	horde_rt_rescue_traversal_tests
+	horde_rt_rescue_blockout_import_tests
+	horde_rt_rescue_journey_integration_tests
+	horde_rt_rescue_source_admission_tests
+	horde_rt_rescue_rig_attachment_tests
+
+100% tests passed, 0 tests failed out of 48
+
+Total Test time (real) = 405.94 sec

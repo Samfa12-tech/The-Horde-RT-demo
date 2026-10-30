@@ -1,0 +1,44 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 24
+    Start  24: horde_rt_combat_foundation_tests
+
+24: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_foundation_tests.exe"
+24: Working Directory: <repo>/build/presets/windows-x64-debug
+24: Test timeout computed to be: 30
+24: combat foundation checks=390 failures=0
+1/3 Test  #24: horde_rt_combat_foundation_tests .....   Passed    5.77 sec
+test 26
+    Start  26: horde_rt_combat_timing_trace_tests
+
+26: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_timing_trace_tests.exe"
+26: Working Directory: <repo>/build/presets/windows-x64-debug
+26: Test timeout computed to be: 1500
+2/3 Test  #26: horde_rt_combat_timing_trace_tests ...   Passed    4.68 sec
+test 101
+    Start 101: horde_rt_simulation_gameplay_tests
+
+101: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_simulation_gameplay_tests.exe"
+101: Working Directory: <repo>/build/presets/windows-x64-debug
+101: Test timeout computed to be: 1500
+101: lich/chest delayed finale events hits/defeat/unlock=3/1/1 phase=1 pending=0 time=0 sequence=8/9
+101: open shaft actual X/Z=-5.5/-14.5 mount torch lowering/left Y legacy=0/-0.41 anatomical=0/-0.31
+101: Shared simulation command, event, seam-persistence, and retry tests passed.
+3/3 Test #101: horde_rt_simulation_gameplay_tests ...   Passed    8.38 sec
+
+The following tests passed:
+	horde_rt_combat_foundation_tests
+	horde_rt_combat_timing_trace_tests
+	horde_rt_simulation_gameplay_tests
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  18.85 sec

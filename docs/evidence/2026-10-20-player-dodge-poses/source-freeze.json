@@ -1,0 +1,105 @@
+{
+  "sourceBase": "2c9fe54a6a072ff0b2756e8840a489c97a5eda19",
+  "sources": {
+    "CMakeLists.txt": {
+      "bytes": 112194,
+      "sha256": "0efd5c9ec78e0b42a473d8fd0631d15ff8c87d05191ab8a1055cd87928818950",
+      "gitBlob": "eeb58382ee3492a87702a77a3959372de5c52484"
+    },
+    "src/gameplay/animation/PlayerAnimationState.cpp": {
+      "bytes": 9833,
+      "sha256": "3cc98bfed23dc942e384bc44b324923c2139f9bf44f506f55bfa41d7db632f4d",
+      "gitBlob": "34a9964e16ce041a84105f966607c372a41f8124"
+    },
+    "src/gameplay/animation/PlayerAnimationState.h": {
+      "bytes": 4497,
+      "sha256": "8a791d9ae45b67e5ec1c4fb3fd355991917515cd1f4cbd3b579a68f5e6c5c53b",
+      "gitBlob": "ad54a524692fa031ee26bfb654c1f44cec237808"
+    },
+    "src/gameplay/simulation/GameSimulation.cpp": {
+      "bytes": 136340,
+      "sha256": "04e52df92310b4c0d66ccb8c0e564c1a2e8baa3c1e48945d62e82440cf8a3a0e",
+      "gitBlob": "b811fd4e86e9b01d8c6fd9df136a6efbe59897e5"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 603558,
+      "sha256": "e5415b7ae0d11d90e2ff84b57f4871e21f90e071196017a96afbe8fc508b85df",
+      "gitBlob": "acd0cf91ef51751a86cf195b3d56cb69fead49f8"
+    },
+    "src/platform/windows/WindowsEnvironmentSurveyCapture.inl": {
+      "bytes": 14484,
+      "sha256": "2e1ecb6da790b7317654ad77ead6353b98d728a918d62c8e8c306ebd1c3fb0d1",
+      "gitBlob": "d85d965008fa953a85b47762da25382e77d7db48"
+    },
+    "src/platform/windows/WindowsEnvironmentSurveyLaunch.h": {
+      "bytes": 4377,
+      "sha256": "913aaf395484e4103911075a0381d294f5e6f0123be9f7e45626f555e2fad5cb",
+      "gitBlob": "488c096e7aa4bff9fb759e2d3fb7559cd2ec15e2"
+    },
+    "src/scene/assets/SkinnedMeshAsset.cpp": {
+      "bytes": 102243,
+      "sha256": "585baf4c6747cfdf6cda641b6ec15d4b0f4fd93a59822ebd7bad453f7c2c3fd9",
+      "gitBlob": "393317c1e42b6de55b69d090b6969368975f677b"
+    },
+    "src/scene/assets/SkinnedMeshAsset.h": {
+      "bytes": 13002,
+      "sha256": "d55e459ad6525631c71521bf844e4a85e1520b05f91e312f5d6a3b4f7e229d66",
+      "gitBlob": "d413657c720fca802c64b4ee77f77b9dc5c7ea5a"
+    },
+    "src/vulkan/raytracing/EnvironmentSurveyFrame.h": {
+      "bytes": 8763,
+      "sha256": "7171e3c34b5d6b87d6e47d166d6e4991ad5753054593893d714755e6bc99e91a",
+      "gitBlob": "1c9892b8071ce030ac093ae459e53c050676906c"
+    },
+    "src/vulkan/raytracing/PlayerRenderSlot.cpp": {
+      "bytes": 44899,
+      "sha256": "e29ec950e65563dec462b87c0b645df044b94a3e22aa1ff916ad2cdf256f8758",
+      "gitBlob": "b2e7215bcf00a18c3911db707250abe06a674b1c"
+    },
+    "tests/GraphicsPreviewFrameAdapterTests.cpp": {
+      "bytes": 19244,
+      "sha256": "6bae11df6ad6b9c3531a95750042d263a08bcc704fd6d190b0f77b1ea18565b1",
+      "gitBlob": "70d15ec0ebcd0963794fb5af0bc6195e00da1902"
+    },
+    "tests/WindowsBenchmarkLaunchTests.cpp": {
+      "bytes": 33200,
+      "sha256": "922f95a0cd882902f36b56a2762264d39872d53f60fd3569898adc921d0d6381",
+      "gitBlob": "8b401a7121f308063afaf5f2bf965c61fa2619f6"
+    },
+    "src/gameplay/validation/PlayerDodgePoseFixture.h": {
+      "bytes": 3047,
+      "sha256": "232a99ee8d61dcdc3dbaea57f4da98feefd9f348ac6161690f877be13fe84956",
+      "gitBlob": "b958e1bd0e330ec6265440c9b13f365cc88c783a"
+    },
+    "src/platform/windows/WindowsPlayerDodgeCapture.inl": {
+      "bytes": 7520,
+      "sha256": "dbaf49645b1af7090837f34ce4b89219c94574a59622b5a4970b8a40638755e2",
+      "gitBlob": "3bce1ea6b7376b095457bc78dd8314cebc96561f"
+    },
+    "tests/PlayerDodgePresentationTests.cpp": {
+      "bytes": 16479,
+      "sha256": "42c253520bdc64498dda0d2266e4f04ad8d4db2b50202fe87a77aae368f56dc6",
+      "gitBlob": "7ff8e56ada9e69df4a5e5832d222d308a6b6d240"
+    },
+    "tests/PlayerDodgeRigTests.cpp": {
+      "bytes": 22805,
+      "sha256": "a241ef782fbdbaa2072137ce7fdb44f08683d150d4e89a40eea43c721c33b9da",
+      "gitBlob": "ee3482edcb5b6fcb50de22038bd084e702166049"
+    },
+    "tests/PlayerDodgeLifecycleTests.cpp": {
+      "bytes": 10824,
+      "sha256": "bef6cdce3b9c09f5aed1083db7a3984aa248a66d067ad6e59d3292d04d9a5f65",
+      "gitBlob": "7d0ada4b49b355339abc43a1604273d438d8f3b9"
+    }
+  },
+  "canonicalOwnerFiles": {
+    "ASSET_LICENSES.md": {
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387"
+    },
+    "PROJECT_MEMORY.md": {
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    }
+  }
+}

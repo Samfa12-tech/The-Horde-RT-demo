@@ -1,0 +1,1042 @@
+{
+  "sourceRuntime": "bceed0c16936cb40400536e1cad58b0040f131f6",
+  "evidenceParent": "73f02cd9a70e8a5ff88c9b225898555639d34d12",
+  "deviceModel": "SM-S948B",
+  "android": 17,
+  "api": 37,
+  "apkSha256": "c1d657491ef072c99a405f0f8ca5264860834057742fc214c820f53fef3fbf09",
+  "nativeSha256": "f73400d0ae4cc544b2def20c01db379632e6fadc5852e90fb0ecbf69ed9375d0",
+  "role": "Current normal-cache source, no redundant-player-copy candidate; one stationary live simulation control only",
+  "control": {
+    "eligible": true,
+    "eligibleForCompleteGpuCpuComparison": true,
+    "reportSha256": "12665bb82b062c5b5a33fef373c0309e179b5024b5e74d98e1a6c5f4c5c85924",
+    "resourcesSha256": "d1ac43eb21e61baf6e8cfdc1dddbaff01691683df0ffe651f7f9f2f05f24d012",
+    "runId": "trace23-control33",
+    "actualSettings": {
+      "scalePercent": 33,
+      "width": 1440,
+      "height": 2981,
+      "internalWidth": 475,
+      "internalHeight": 984,
+      "nativeWindowWidth": 2981,
+      "nativeWindowHeight": 1440,
+      "surfaceCurrentWidth": 2981,
+      "surfaceCurrentHeight": 1440,
+      "surfaceCurrentTransform": 2,
+      "swapchainPreTransform": 2,
+      "rtPreRotationRequired": true,
+      "rtPresentationTransform": 1,
+      "backend": "RayTracingPipeline",
+      "water": 1,
+      "fire": 0,
+      "cap": 30,
+      "glass": false,
+      "shadow": 1,
+      "mist": false,
+      "dust": 1
+    },
+    "pipelines": [
+      {
+        "executionMode": 0,
+        "activeKey": "shipping_mobile_opaque_fast",
+        "activeSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+        "opaqueSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+        "genericSha256": "a1edeb782800c91a58b073c1f789c2e14d68cc56cd8ff1b0b535d628d1e9ee38"
+      }
+    ],
+    "dimensions": {
+      "nativeWindow": [
+        2981,
+        1440
+      ],
+      "surfaceCurrent": [
+        2981,
+        1440
+      ],
+      "swapchain": [
+        1440,
+        2981
+      ],
+      "rtDispatch": [
+        475,
+        984
+      ],
+      "logicalView": [
+        2981,
+        1440
+      ],
+      "logicalAspect": 2.0701388888888888,
+      "dispatchAspect": 0.48272357723577236,
+      "transformIndex": 1,
+      "swapchainPreTransform": 2,
+      "surfaceCurrentTransform": 2
+    },
+    "sampling": {
+      "originWallNs": 419001191699742,
+      "warmupEndWallNs": 419011191699742,
+      "sampleEndWallNs": 419041191699742,
+      "completedFramesAll": 830,
+      "completedFramesPostWarm": 620,
+      "actualSelectedFirstWallNs": 419011230642759,
+      "actualSelectedLastWallNs": 419041175435820,
+      "actualSelectedSpanSeconds": 29.944793061,
+      "warmupOrTerminalFramesExcluded": 210
+    },
+    "gpu": {
+      "scope": "completed owning GPU duration; never reciprocal FPS",
+      "availableSamples": 620,
+      "unavailableSamples": 0,
+      "statusCounts": {
+        "5": 620
+      },
+      "duration": {
+        "samples": 620,
+        "minimumMs": 34.285468,
+        "medianMs": 35.838541,
+        "meanMs": 35.817775340322584,
+        "p95NearestRankMs": 36.690103,
+        "maximumMs": 39.166978
+      }
+    },
+    "cpu": {
+      "simulation": {
+        "allFrames": {
+          "samples": 620,
+          "minimumMs": 0.532708,
+          "medianMs": 1.54763,
+          "meanMs": 1.688857022580645,
+          "p95NearestRankMs": 2.816302,
+          "maximumMs": 3.70125
+        },
+        "activeFrames": {
+          "samples": 620,
+          "minimumMs": 0.532708,
+          "medianMs": 1.54763,
+          "meanMs": 1.688857022580645,
+          "p95NearestRankMs": 2.816302,
+          "maximumMs": 3.70125
+        },
+        "invocations": 620
+      },
+      "skin": {
+        "allFrames": {
+          "samples": 620,
+          "minimumMs": 3.872344,
+          "medianMs": 7.989635,
+          "meanMs": 8.407357201612903,
+          "p95NearestRankMs": 11.483073,
+          "maximumMs": 14.440885
+        },
+        "activeFrames": {
+          "samples": 620,
+          "minimumMs": 3.872344,
+          "medianMs": 7.989635,
+          "meanMs": 8.407357201612903,
+          "p95NearestRankMs": 11.483073,
+          "maximumMs": 14.440885
+        },
+        "invocations": 1860
+      },
+      "player_skin": {
+        "allFrames": {
+          "samples": 620,
+          "minimumMs": 1.00698,
+          "medianMs": 3.897969,
+          "meanMs": 4.285551927419355,
+          "p95NearestRankMs": 6.787188,
+          "maximumMs": 8.774427
+        },
+        "activeFrames": {
+          "samples": 620,
+          "minimumMs": 1.00698,
+          "medianMs": 3.897969,
+          "meanMs": 4.285551927419355,
+          "p95NearestRankMs": 6.787188,
+          "maximumMs": 8.774427
+        },
+        "invocations": 1240
+      },
+      "character_skin": {
+        "allFrames": {
+          "samples": 620,
+          "minimumMs": 2.049948,
+          "medianMs": 4.03586,
+          "meanMs": 4.121805274193549,
+          "p95NearestRankMs": 4.970364,
+          "maximumMs": 6.473073
+        },
+        "activeFrames": {
+          "samples": 620,
+          "minimumMs": 2.049948,
+          "medianMs": 4.03586,
+          "meanMs": 4.121805274193549,
+          "p95NearestRankMs": 4.970364,
+          "maximumMs": 6.473073
+        },
+        "invocations": 620
+      },
+      "pose_copy": {
+        "allFrames": {
+          "samples": 620,
+          "minimumMs": 0.297031,
+          "medianMs": 0.636849,
+          "meanMs": 0.6622125532258064,
+          "p95NearestRankMs": 0.819687,
+          "maximumMs": 2.340156
+        },
+        "activeFrames": {
+          "samples": 620,
+          "minimumMs": 0.297031,
+          "medianMs": 0.636849,
+          "meanMs": 0.6622125532258064,
+          "p95NearestRankMs": 0.819687,
+          "maximumMs": 2.340156
+        },
+        "invocations": 1240
+      },
+      "dynamic_upload": {
+        "allFrames": {
+          "samples": 620,
+          "minimumMs": 0.216353,
+          "medianMs": 0.4046615,
+          "meanMs": 0.41592372580645165,
+          "p95NearestRankMs": 0.505211,
+          "maximumMs": 0.824113
+        },
+        "activeFrames": {
+          "samples": 620,
+          "minimumMs": 0.216353,
+          "medianMs": 0.4046615,
+          "meanMs": 0.41592372580645165,
+          "p95NearestRankMs": 0.505211,
+          "maximumMs": 0.824113
+        },
+        "invocations": 7440
+      },
+      "fence_wait": {
+        "allFrames": {
+          "samples": 620,
+          "minimumMs": 34.568594,
+          "medianMs": 36.192682,
+          "meanMs": 36.16388390322581,
+          "p95NearestRankMs": 37.081719,
+          "maximumMs": 39.268594
+        },
+        "activeFrames": {
+          "samples": 620,
+          "minimumMs": 34.568594,
+          "medianMs": 36.192682,
+          "meanMs": 36.16388390322581,
+          "p95NearestRankMs": 37.081719,
+          "maximumMs": 39.268594
+        },
+        "invocations": 620
+      },
+      "queue_submit": {
+        "allFrames": {
+          "samples": 620,
+          "minimumMs": 0.093386,
+          "medianMs": 0.138958,
+          "meanMs": 0.16428085322580646,
+          "p95NearestRankMs": 0.287552,
+          "maximumMs": 0.645417
+        },
+        "activeFrames": {
+          "samples": 620,
+          "minimumMs": 0.093386,
+          "medianMs": 0.138958,
+          "meanMs": 0.16428085322580646,
+          "p95NearestRankMs": 0.287552,
+          "maximumMs": 0.645417
+        },
+        "invocations": 620
+      },
+      "whole_frame": {
+        "allFrames": {
+          "samples": 620,
+          "minimumMs": 42.219375,
+          "medianMs": 47.84125,
+          "meanMs": 48.32643084032259,
+          "p95NearestRankMs": 52.819531,
+          "maximumMs": 55.692709
+        },
+        "activeFrames": {
+          "samples": 620,
+          "minimumMs": 42.219375,
+          "medianMs": 47.84125,
+          "meanMs": 48.32643084032259,
+          "p95NearestRankMs": 52.819531,
+          "maximumMs": 55.692709
+        },
+        "invocations": 620
+      }
+    },
+    "actualImagePresentationIntervals": {
+      "samples": 619,
+      "minimumMs": 37.500051,
+      "medianMs": 49.999999,
+      "meanMs": 48.37102969951535,
+      "p95NearestRankMs": 54.166562,
+      "maximumMs": 58.333281
+    },
+    "resources": {
+      "device_local_bytes": {
+        "minimum": 160610688,
+        "median": 160610688.0,
+        "maximum": 160610688
+      },
+      "host_visible_bytes": {
+        "minimum": 48298048,
+        "median": 48298048.0,
+        "maximum": 48298048
+      },
+      "omitted_triangles": {
+        "minimum": 0,
+        "median": 0.0,
+        "maximum": 0
+      },
+      "unloads": {
+        "minimum": 0,
+        "median": 0.0,
+        "maximum": 0
+      },
+      "restores": {
+        "minimum": 0,
+        "median": 0.0,
+        "maximum": 0
+      },
+      "saved_owner_bytes": {
+        "minimum": 0,
+        "median": 0.0,
+        "maximum": 0
+      },
+      "peak_overlap_bytes": {
+        "minimum": 0,
+        "median": 0.0,
+        "maximum": 0
+      },
+      "wait_frames": {
+        "minimum": 0,
+        "median": 0.0,
+        "maximum": 0
+      },
+      "run_unloads": {
+        "minimum": 0,
+        "median": 0.0,
+        "maximum": 0
+      },
+      "run_restores": {
+        "minimum": 0,
+        "median": 0.0,
+        "maximum": 0
+      },
+      "tlas_instances": {
+        "minimum": 28,
+        "median": 28.0,
+        "maximum": 28
+      },
+      "blas_count": {
+        "minimum": 20,
+        "median": 20.0,
+        "maximum": 20
+      }
+    },
+    "simulation": {
+      "frozen": false,
+      "tickDeltaPostWarm": 1797,
+      "ticksThisFrame": {
+        "minimum": 2,
+        "median": 3.0,
+        "maximum": 4
+      },
+      "simulationSecondsPostWarm": 29.949999999999996,
+      "catchUpOverrunDelta": 0,
+      "playerSkinUpdateDelta": 619,
+      "playerSkinCalls": 1240,
+      "characterSkinCalls": 620,
+      "skinCacheOrIdleCaveat": false,
+      "phaseCounts": {
+        "lookout-sweep": 620
+      }
+    },
+    "strictPresentationJoin": {
+      "eligible": true,
+      "reportSha256": "12665bb82b062c5b5a33fef373c0309e179b5024b5e74d98e1a6c5f4c5c85924",
+      "runId": "trace23-control33",
+      "workload": "motion-chapter-outdoor-scale-hold-v1",
+      "buildId": "1.6.2",
+      "settings": {
+        "scalePercent": 33,
+        "width": 1440,
+        "height": 2981,
+        "internalWidth": 475,
+        "internalHeight": 984,
+        "nativeWindowWidth": 2981,
+        "nativeWindowHeight": 1440,
+        "surfaceCurrentWidth": 2981,
+        "surfaceCurrentHeight": 1440,
+        "surfaceCurrentTransform": 2,
+        "swapchainPreTransform": 2,
+        "rtPreRotationRequired": true,
+        "rtPresentationTransform": 1,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": false,
+        "dust": 1
+      },
+      "scope": {
+        "surfaceGeneration": 1,
+        "sceneEpoch": 3,
+        "measurementGeneration": 6,
+        "matchedCompletedFrames": 830,
+        "intervalCount": 829,
+        "durationNanoseconds": 40037501026,
+        "setupPresentationRowsExcluded": 0
+      },
+      "simulation": {
+        "stateRows": 830,
+        "eventRows": 0,
+        "ticksThisFrameMaximum": 4,
+        "catchUpOverrunCountFirst": 1,
+        "catchUpOverrunCountLast": 1,
+        "catchUpOverrunDelta": 0
+      },
+      "collector": {
+        "runCounterDelta": {
+          "preparedPresents": 830,
+          "acceptedPresents": 830,
+          "rejectedPresents": 0,
+          "invalidRegistrations": 0,
+          "invalidMetadata": 0,
+          "pendingCapacityExhausted": 0,
+          "queryCalls": 1666,
+          "queryErrors": 0,
+          "incompleteQueries": 0,
+          "zeroPresentTimestamps": 0,
+          "zeroPresentIds": 0,
+          "unknownPresentIds": 0,
+          "duplicateTimings": 0,
+          "rowCapacityExhausted": 0,
+          "missingOnRebind": 0,
+          "missingOnUnbind": 0,
+          "abandonedPreparedPresents": 0
+        },
+        "queryCpuWallNanoseconds": 12171893,
+        "presentMarginAtLeast2Pow63CountIgnored": 830
+      },
+      "limits": [
+        "Bounded stationary staged outdoor hold with zero interval image readbacks; recorder overhead remains.",
+        "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+        "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+        "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+      ]
+    }
+  },
+  "childCpu": {
+    "playerPoseCpuMs": {
+      "completedFrames": 620,
+      "activeCallFrames": 620,
+      "totalCalls": 620,
+      "totalDurationNs": 16644104,
+      "totalBytes": 0,
+      "totalOperations": 0,
+      "allFramesMs": {
+        "samples": 620,
+        "minimum": 0.013333,
+        "median": 0.024427,
+        "mean": 0.026845329032258065,
+        "p95NearestRank": 0.039688,
+        "maximum": 0.145886
+      },
+      "activeFramesMs": {
+        "samples": 620,
+        "minimum": 0.013333,
+        "median": 0.024427,
+        "mean": 0.026845329032258065,
+        "p95NearestRank": 0.039688,
+        "maximum": 0.145886
+      },
+      "callsPerFrame": {
+        "samples": 620,
+        "minimum": 1.0,
+        "median": 1.0,
+        "mean": 1.0,
+        "p95NearestRank": 1.0,
+        "maximum": 1.0
+      },
+      "bytesPerFrame": {
+        "samples": 620,
+        "minimum": 0.0,
+        "median": 0.0,
+        "mean": 0.0,
+        "p95NearestRank": 0.0,
+        "maximum": 0.0
+      },
+      "operationsPerFrame": {
+        "samples": 620,
+        "minimum": 0.0,
+        "median": 0.0,
+        "mean": 0.0,
+        "p95NearestRank": 0.0,
+        "maximum": 0.0
+      },
+      "weightedMeanPerInvocationMs": 0.026845329032258065,
+      "perActiveFrameMeanInvocationMs": {
+        "samples": 620,
+        "minimum": 0.013333,
+        "median": 0.024427,
+        "mean": 0.026845329032258065,
+        "p95NearestRank": 0.039688,
+        "maximum": 0.145886
+      }
+    },
+    "playerVerticesCpuMs": {
+      "completedFrames": 620,
+      "activeCallFrames": 620,
+      "totalCalls": 620,
+      "totalDurationNs": 1964940532,
+      "totalBytes": 0,
+      "totalOperations": 21268480,
+      "allFramesMs": {
+        "samples": 620,
+        "minimum": 0.720156,
+        "median": 2.7927345,
+        "mean": 3.169258922580645,
+        "p95NearestRank": 5.000208,
+        "maximum": 6.642292
+      },
+      "activeFramesMs": {
+        "samples": 620,
+        "minimum": 0.720156,
+        "median": 2.7927345,
+        "mean": 3.169258922580645,
+        "p95NearestRank": 5.000208,
+        "maximum": 6.642292
+      },
+      "callsPerFrame": {
+        "samples": 620,
+        "minimum": 1.0,
+        "median": 1.0,
+        "mean": 1.0,
+        "p95NearestRank": 1.0,
+        "maximum": 1.0
+      },
+      "bytesPerFrame": {
+        "samples": 620,
+        "minimum": 0.0,
+        "median": 0.0,
+        "mean": 0.0,
+        "p95NearestRank": 0.0,
+        "maximum": 0.0
+      },
+      "operationsPerFrame": {
+        "samples": 620,
+        "minimum": 34304.0,
+        "median": 34304.0,
+        "mean": 34304.0,
+        "p95NearestRank": 34304.0,
+        "maximum": 34304.0
+      },
+      "weightedMeanPerInvocationMs": 3.169258922580645,
+      "perActiveFrameMeanInvocationMs": {
+        "samples": 620,
+        "minimum": 0.720156,
+        "median": 2.7927345,
+        "mean": 3.169258922580645,
+        "p95NearestRank": 5.000208,
+        "maximum": 6.642292
+      }
+    },
+    "viewmodelVerticesCpuMs": {
+      "completedFrames": 620,
+      "activeCallFrames": 620,
+      "totalCalls": 620,
+      "totalDurationNs": 674704618,
+      "totalBytes": 0,
+      "totalOperations": 9830100,
+      "allFramesMs": {
+        "samples": 620,
+        "minimum": 0.270625,
+        "median": 1.0482295,
+        "mean": 1.0882332548387097,
+        "p95NearestRank": 1.751094,
+        "maximum": 2.975625
+      },
+      "activeFramesMs": {
+        "samples": 620,
+        "minimum": 0.270625,
+        "median": 1.0482295,
+        "mean": 1.0882332548387097,
+        "p95NearestRank": 1.751094,
+        "maximum": 2.975625
+      },
+      "callsPerFrame": {
+        "samples": 620,
+        "minimum": 1.0,
+        "median": 1.0,
+        "mean": 1.0,
+        "p95NearestRank": 1.0,
+        "maximum": 1.0
+      },
+      "bytesPerFrame": {
+        "samples": 620,
+        "minimum": 0.0,
+        "median": 0.0,
+        "mean": 0.0,
+        "p95NearestRank": 0.0,
+        "maximum": 0.0
+      },
+      "operationsPerFrame": {
+        "samples": 620,
+        "minimum": 15855.0,
+        "median": 15855.0,
+        "mean": 15855.0,
+        "p95NearestRank": 15855.0,
+        "maximum": 15855.0
+      },
+      "weightedMeanPerInvocationMs": 1.0882332548387097,
+      "perActiveFrameMeanInvocationMs": {
+        "samples": 620,
+        "minimum": 0.270625,
+        "median": 1.0482295,
+        "mean": 1.0882332548387097,
+        "p95NearestRank": 1.751094,
+        "maximum": 2.975625
+      }
+    },
+    "characterAnimationCpuMs": {
+      "completedFrames": 620,
+      "activeCallFrames": 620,
+      "totalCalls": 620,
+      "totalDurationNs": 11282230,
+      "totalBytes": 0,
+      "totalOperations": 14880,
+      "allFramesMs": {
+        "samples": 620,
+        "minimum": 0.011875,
+        "median": 0.017031,
+        "mean": 0.018197145161290323,
+        "p95NearestRank": 0.024479,
+        "maximum": 0.099114
+      },
+      "activeFramesMs": {
+        "samples": 620,
+        "minimum": 0.011875,
+        "median": 0.017031,
+        "mean": 0.018197145161290323,
+        "p95NearestRank": 0.024479,
+        "maximum": 0.099114
+      },
+      "callsPerFrame": {
+        "samples": 620,
+        "minimum": 1.0,
+        "median": 1.0,
+        "mean": 1.0,
+        "p95NearestRank": 1.0,
+        "maximum": 1.0
+      },
+      "bytesPerFrame": {
+        "samples": 620,
+        "minimum": 0.0,
+        "median": 0.0,
+        "mean": 0.0,
+        "p95NearestRank": 0.0,
+        "maximum": 0.0
+      },
+      "operationsPerFrame": {
+        "samples": 620,
+        "minimum": 24.0,
+        "median": 24.0,
+        "mean": 24.0,
+        "p95NearestRank": 24.0,
+        "maximum": 24.0
+      },
+      "weightedMeanPerInvocationMs": 0.018197145161290323,
+      "perActiveFrameMeanInvocationMs": {
+        "samples": 620,
+        "minimum": 0.011875,
+        "median": 0.017031,
+        "mean": 0.018197145161290323,
+        "p95NearestRank": 0.024479,
+        "maximum": 0.099114
+      }
+    },
+    "characterVerticesCpuMs": {
+      "completedFrames": 620,
+      "activeCallFrames": 620,
+      "totalCalls": 620,
+      "totalDurationNs": 2166384583,
+      "totalBytes": 0,
+      "totalOperations": 16705900,
+      "allFramesMs": {
+        "samples": 620,
+        "minimum": 1.700469,
+        "median": 3.4290885,
+        "mean": 3.4941686822580644,
+        "p95NearestRank": 4.222396,
+        "maximum": 5.682344
+      },
+      "activeFramesMs": {
+        "samples": 620,
+        "minimum": 1.700469,
+        "median": 3.4290885,
+        "mean": 3.4941686822580644,
+        "p95NearestRank": 4.222396,
+        "maximum": 5.682344
+      },
+      "callsPerFrame": {
+        "samples": 620,
+        "minimum": 1.0,
+        "median": 1.0,
+        "mean": 1.0,
+        "p95NearestRank": 1.0,
+        "maximum": 1.0
+      },
+      "bytesPerFrame": {
+        "samples": 620,
+        "minimum": 0.0,
+        "median": 0.0,
+        "mean": 0.0,
+        "p95NearestRank": 0.0,
+        "maximum": 0.0
+      },
+      "operationsPerFrame": {
+        "samples": 620,
+        "minimum": 26945.0,
+        "median": 26945.0,
+        "mean": 26945.0,
+        "p95NearestRank": 26945.0,
+        "maximum": 26945.0
+      },
+      "weightedMeanPerInvocationMs": 3.4941686822580644,
+      "perActiveFrameMeanInvocationMs": {
+        "samples": 620,
+        "minimum": 1.700469,
+        "median": 3.4290885,
+        "mean": 3.4941686822580644,
+        "p95NearestRank": 4.222396,
+        "maximum": 5.682344
+      }
+    },
+    "characterCopyCpuMs": {
+      "completedFrames": 620,
+      "activeCallFrames": 620,
+      "totalCalls": 1240,
+      "totalDurationNs": 376769940,
+      "totalBytes": 1871060800,
+      "totalOperations": 0,
+      "allFramesMs": {
+        "samples": 620,
+        "minimum": 0.329427,
+        "median": 0.5972135,
+        "mean": 0.6076934516129032,
+        "p95NearestRank": 0.712552,
+        "maximum": 3.199687
+      },
+      "activeFramesMs": {
+        "samples": 620,
+        "minimum": 0.329427,
+        "median": 0.5972135,
+        "mean": 0.6076934516129032,
+        "p95NearestRank": 0.712552,
+        "maximum": 3.199687
+      },
+      "callsPerFrame": {
+        "samples": 620,
+        "minimum": 2.0,
+        "median": 2.0,
+        "mean": 2.0,
+        "p95NearestRank": 2.0,
+        "maximum": 2.0
+      },
+      "bytesPerFrame": {
+        "samples": 620,
+        "minimum": 3017840.0,
+        "median": 3017840.0,
+        "mean": 3017840.0,
+        "p95NearestRank": 3017840.0,
+        "maximum": 3017840.0
+      },
+      "operationsPerFrame": {
+        "samples": 620,
+        "minimum": 0.0,
+        "median": 0.0,
+        "mean": 0.0,
+        "p95NearestRank": 0.0,
+        "maximum": 0.0
+      },
+      "weightedMeanPerInvocationMs": 0.3038467258064516,
+      "perActiveFrameMeanInvocationMs": {
+        "samples": 620,
+        "minimum": 0.1647135,
+        "median": 0.29860675,
+        "mean": 0.3038467258064516,
+        "p95NearestRank": 0.356276,
+        "maximum": 1.5998435
+      }
+    },
+    "blasRefitRecordCpuMs": {
+      "completedFrames": 620,
+      "activeCallFrames": 620,
+      "totalCalls": 2480,
+      "totalDurationNs": 18222044,
+      "totalBytes": 0,
+      "totalOperations": 0,
+      "allFramesMs": {
+        "samples": 620,
+        "minimum": 0.019636,
+        "median": 0.027344,
+        "mean": 0.029390393548387097,
+        "p95NearestRank": 0.038907,
+        "maximum": 0.250469
+      },
+      "activeFramesMs": {
+        "samples": 620,
+        "minimum": 0.019636,
+        "median": 0.027344,
+        "mean": 0.029390393548387097,
+        "p95NearestRank": 0.038907,
+        "maximum": 0.250469
+      },
+      "callsPerFrame": {
+        "samples": 620,
+        "minimum": 4.0,
+        "median": 4.0,
+        "mean": 4.0,
+        "p95NearestRank": 4.0,
+        "maximum": 4.0
+      },
+      "bytesPerFrame": {
+        "samples": 620,
+        "minimum": 0.0,
+        "median": 0.0,
+        "mean": 0.0,
+        "p95NearestRank": 0.0,
+        "maximum": 0.0
+      },
+      "operationsPerFrame": {
+        "samples": 620,
+        "minimum": 0.0,
+        "median": 0.0,
+        "mean": 0.0,
+        "p95NearestRank": 0.0,
+        "maximum": 0.0
+      },
+      "weightedMeanPerInvocationMs": 0.007347598387096774,
+      "perActiveFrameMeanInvocationMs": {
+        "samples": 620,
+        "minimum": 0.004909,
+        "median": 0.006836,
+        "mean": 0.007347598387096774,
+        "p95NearestRank": 0.00972675,
+        "maximum": 0.06261725
+      }
+    },
+    "tlasUpdateRecordCpuMs": {
+      "completedFrames": 620,
+      "activeCallFrames": 620,
+      "totalCalls": 620,
+      "totalDurationNs": 4508948,
+      "totalBytes": 0,
+      "totalOperations": 0,
+      "allFramesMs": {
+        "samples": 620,
+        "minimum": 0.004427,
+        "median": 0.006875,
+        "mean": 0.007272496774193548,
+        "p95NearestRank": 0.009687,
+        "maximum": 0.03875
+      },
+      "activeFramesMs": {
+        "samples": 620,
+        "minimum": 0.004427,
+        "median": 0.006875,
+        "mean": 0.007272496774193548,
+        "p95NearestRank": 0.009687,
+        "maximum": 0.03875
+      },
+      "callsPerFrame": {
+        "samples": 620,
+        "minimum": 1.0,
+        "median": 1.0,
+        "mean": 1.0,
+        "p95NearestRank": 1.0,
+        "maximum": 1.0
+      },
+      "bytesPerFrame": {
+        "samples": 620,
+        "minimum": 0.0,
+        "median": 0.0,
+        "mean": 0.0,
+        "p95NearestRank": 0.0,
+        "maximum": 0.0
+      },
+      "operationsPerFrame": {
+        "samples": 620,
+        "minimum": 0.0,
+        "median": 0.0,
+        "mean": 0.0,
+        "p95NearestRank": 0.0,
+        "maximum": 0.0
+      },
+      "weightedMeanPerInvocationMs": 0.007272496774193548,
+      "perActiveFrameMeanInvocationMs": {
+        "samples": 620,
+        "minimum": 0.004427,
+        "median": 0.006875,
+        "mean": 0.007272496774193548,
+        "p95NearestRank": 0.009687,
+        "maximum": 0.03875
+      }
+    }
+  },
+  "thermal": {
+    "start": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 39.2,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 29.8,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 34.0,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "end": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 38.2,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 30.9,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 34.7,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    }
+  },
+  "rejectedTraceStart": {
+    "thermal": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 34.3,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 30.0,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 33.5,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "admission": {
+      "admitted": false,
+      "reasons": [
+        "AP exceeds the declared temperature delta from reference"
+      ],
+      "requiredFrameworkStatus": 0,
+      "maximumDeltaCelsius": 1.5,
+      "sensorCeilingsCelsius": {},
+      "referenceCompared": true,
+      "performanceComparison": true
+    }
+  },
+  "traceAttempts": [
+    {
+      "outcome": "no session started; ADB stdin config transport hung; exact owned host client closed after query confirmed no session",
+      "rawBytes": 0
+    },
+    {
+      "outcome": "Android OS config read denied; no session started",
+      "action": "perfetto --txt -c /data/local/tmp/horde-scheduler-20261023-r1.pbtxt -o -",
+      "errno": 13,
+      "permission": "denied; no retry or alternate config location attempted",
+      "outputSha256": "e90b5d81b97c4d7018ee2b35f0fbdf648012436a17a6144fa429e073d90c5fe5"
+    }
+  ],
+  "closingControl": "not run after trace access blocker; no overhead or matched baseline/candidate claim",
+  "closure": {
+    "utcUnixMs": 1792736455280,
+    "phoneReleased": true,
+    "safeToDisconnect": true,
+    "installedHashesRestored": {
+      "com.samfa12.hordelanternrt.debug": "fe3a51beb3a2d6385232dcccfdf8315785e969825e8a35a7de65be8894f46925",
+      "com.samfa12.hordelanternrt": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8"
+    },
+    "priorSaveFilesAndLocks": 18,
+    "priorSaveBytesUnchanged": true,
+    "preferencesBytesUnchanged": true,
+    "systemSettingsRestored": {
+      "user_rotation": "0",
+      "accelerometer_rotation": "1",
+      "font_scale": "1.7"
+    },
+    "hordeLayers": [],
+    "hordeDebugPid": null,
+    "ownedDeviceHelpersCompleted": true,
+    "noFurtherPhoneOperationPlanned": true
+  },
+  "addedIsolatedTestPathCount": 0,
+  "localRawDirectory": "reports/phone-trace-20261023-r1",
+  "limits": [
+    "Elapsed CPU stages are not CPU busy time or utilization.",
+    "No scheduler events, sampling profile, per-core usage or GPU stage split was captured.",
+    "No current versus reverted-normal-cache gain, copy candidate gain or sustained performance claim.",
+    "Seeded post-Keeper stationary hold; not natural route, audio, touch or image-quality acceptance.",
+    "Original failed runs retained locally; raw owner settings/save inventories and logs are not committed."
+  ],
+  "gpuProvenance": {
+    "gpuName": "Adreno (TM) 840",
+    "vendorId": 20803,
+    "deviceId": 1141180977,
+    "driverVersion": 2150932499,
+    "driverVersionText": "raw 2150932499 (vendor-specific)",
+    "driverProperties": {
+      "available": true,
+      "driverId": 8,
+      "driverName": "Qualcomm Technologies Inc. Adreno Vulkan Driver",
+      "driverInfo": "Driver Build: 089d643e2a, Icecd8f0534, 1782882597\nDate: 07/01/26\nCompiler Version: E031.50.19.27\nDriver Branch: \n",
+      "conformanceVersion": "1.4.1.0"
+    },
+    "vulkanApiVersion": 4210983,
+    "vulkanApiVersionText": "1.4.295"
+  }
+}

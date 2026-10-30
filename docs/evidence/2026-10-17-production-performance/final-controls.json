@@ -1,0 +1,707 @@
+{
+  "runtimeBaseRevision": "3252820f6f443d127b128840621ed8846282172f",
+  "measurementReviewRevision": "3a9db850c67b680451597f435e1e971b31e08da2",
+  "purpose": "Final reverse-order controls after the owner restored phone foreground",
+  "policy": "Existing current-HAL admission helper, framework 0, each sensor within 1.5 C; no clocks or power control",
+  "disposition": "Trial remains reverted. Controls are descriptive, not thermally matched causal estimates.",
+  "pairs": [
+    {
+      "control": "pipeline-baseline-05",
+      "trial": "pipeline-candidate-02",
+      "beforeRouteControl": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 41.1,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 28.2,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 33.2,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "beforeRouteTrial": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 44.9,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 36.7,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 39.1,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAdmission": {
+        "admitted": false,
+        "reasons": [
+          "AP exceeds the declared temperature delta from reference",
+          "BAT exceeds the declared temperature delta from reference",
+          "SKIN exceeds the declared temperature delta from reference"
+        ],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {},
+        "referenceCompared": true
+      },
+      "controlScope": {
+        "surfaceGeneration": 1,
+        "sceneEpoch": 3,
+        "measurementGeneration": 5,
+        "matchedCompletedFrames": 687,
+        "intervalCount": 686,
+        "durationNanoseconds": 70120466536,
+        "setupPresentationRowsExcluded": 0
+      },
+      "trialScope": {
+        "surfaceGeneration": 1,
+        "sceneEpoch": 3,
+        "measurementGeneration": 5,
+        "matchedCompletedFrames": 685,
+        "intervalCount": 684,
+        "durationNanoseconds": 70437181171,
+        "setupPresentationRowsExcluded": 0
+      },
+      "controlWholeRouteDisplay": {
+        "median": 83333438,
+        "p90NearestRank": 154166615,
+        "p95NearestRank": 154166718,
+        "maximum": 162435260,
+        "over33333000Nanoseconds": 686,
+        "over250000000Nanoseconds": 0
+      },
+      "trialWholeRouteDisplay": {
+        "median": 87500000,
+        "p90NearestRank": 150000052,
+        "p95NearestRank": 154166667,
+        "maximum": 166666666,
+        "over33333000Nanoseconds": 684,
+        "over250000000Nanoseconds": 0
+      },
+      "views": {
+        "landing-sweep": {
+          "controlGpu": {
+            "n": 39,
+            "medianMs": 136.035049,
+            "p95Ms": 137.456403,
+            "maximumMs": 138.007861,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "trialGpu": {
+            "n": 39,
+            "medianMs": 134.585726,
+            "p95Ms": 136.673799,
+            "maximumMs": 137.147497,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "controlDisplay": {
+            "n": 39,
+            "medianMs": 154.166666,
+            "p95Ms": 158.333385,
+            "maximumMs": 158.333386,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "trialDisplay": {
+            "n": 39,
+            "medianMs": 150.000052,
+            "p95Ms": 154.16672,
+            "maximumMs": 158.333333,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "descriptiveGpuMedianChangePercent": -1.0654041077310827,
+          "poseComparison": {
+            "exactMatch": false,
+            "control": {
+              "x": -33.6878,
+              "y": 2.05,
+              "z": -12.7829,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "trial": {
+              "x": -33.6882,
+              "y": 2.05,
+              "z": -12.7834,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "controlMinusTrial": {
+              "x": 0.00039999999999906777,
+              "y": 0.0,
+              "z": 0.0005000000000006111,
+              "yaw": 0.0,
+              "pitch": 0.0
+            },
+            "positionDistanceMetres": 0.0006403124237431797
+          },
+          "causalGainEligible": false
+        },
+        "lower-sweep": {
+          "controlGpu": {
+            "n": 49,
+            "medianMs": 71.29578,
+            "p95Ms": 71.896352,
+            "maximumMs": 72.354165,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "trialGpu": {
+            "n": 49,
+            "medianMs": 70.739061,
+            "p95Ms": 77.37104,
+            "maximumMs": 80.165258,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "controlDisplay": {
+            "n": 49,
+            "medianMs": 83.333333,
+            "p95Ms": 83.333386,
+            "maximumMs": 83.333437,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "trialDisplay": {
+            "n": 49,
+            "medianMs": 83.333333,
+            "p95Ms": 87.499948,
+            "maximumMs": 87.500053,
+            "over33_333ms": 49,
+            "over250ms": 0
+          },
+          "descriptiveGpuMedianChangePercent": -0.7808582780074569,
+          "poseComparison": {
+            "exactMatch": true,
+            "control": {
+              "x": -33.7,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "trial": {
+              "x": -33.7,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "controlMinusTrial": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "yaw": 0.0,
+              "pitch": 0.0
+            },
+            "positionDistanceMetres": 0.0
+          },
+          "causalGainEligible": false
+        },
+        "passage-sweep": {
+          "controlGpu": {
+            "n": 50,
+            "medianMs": 68.6424725,
+            "p95Ms": 69.493019,
+            "maximumMs": 69.928852,
+            "over33_333ms": 50,
+            "over250ms": 0
+          },
+          "trialGpu": {
+            "n": 47,
+            "medianMs": 74.349165,
+            "p95Ms": 79.310311,
+            "maximumMs": 80.800415,
+            "over33_333ms": 47,
+            "over250ms": 0
+          },
+          "controlDisplay": {
+            "n": 50,
+            "medianMs": 75.0000525,
+            "p95Ms": 83.333386,
+            "maximumMs": 83.333386,
+            "over33_333ms": 50,
+            "over250ms": 0
+          },
+          "trialDisplay": {
+            "n": 47,
+            "medianMs": 83.333334,
+            "p95Ms": 91.666666,
+            "maximumMs": 91.666719,
+            "over33_333ms": 47,
+            "over250ms": 0
+          },
+          "descriptiveGpuMedianChangePercent": 8.31364648177555,
+          "poseComparison": {
+            "exactMatch": false,
+            "control": {
+              "x": -22.0188,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 1.5708,
+              "pitch": -0.15
+            },
+            "trial": {
+              "x": -22.021,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 1.5708,
+              "pitch": -0.15
+            },
+            "controlMinusTrial": {
+              "x": 0.002200000000001978,
+              "y": 0.0,
+              "z": 0.0,
+              "yaw": 0.0,
+              "pitch": 0.0
+            },
+            "positionDistanceMetres": 0.002200000000001978
+          },
+          "causalGainEligible": false
+        },
+        "repeat-ascent": {
+          "controlGpu": {
+            "n": 40,
+            "medianMs": 135.0937985,
+            "p95Ms": 137.175465,
+            "maximumMs": 138.166038,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "trialGpu": {
+            "n": 40,
+            "medianMs": 134.395101,
+            "p95Ms": 145.610361,
+            "maximumMs": 146.142809,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "controlDisplay": {
+            "n": 40,
+            "medianMs": 154.166614,
+            "p95Ms": 154.166876,
+            "maximumMs": 158.333386,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "trialDisplay": {
+            "n": 40,
+            "medianMs": 154.166615,
+            "p95Ms": 158.33328,
+            "maximumMs": 166.666614,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "descriptiveGpuMedianChangePercent": -0.5171943551501967,
+          "poseComparison": {
+            "exactMatch": true,
+            "control": {
+              "x": -33.7,
+              "y": 2.05,
+              "z": -12.8,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "trial": {
+              "x": -33.7,
+              "y": 2.05,
+              "z": -12.8,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "controlMinusTrial": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "yaw": 0.0,
+              "pitch": 0.0
+            },
+            "positionDistanceMetres": 0.0
+          },
+          "causalGainEligible": false
+        }
+      }
+    },
+    {
+      "control": "query-baseline-02",
+      "trial": "query-candidate-03",
+      "beforeRouteControl": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 43.2,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 31.0,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 35.7,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "beforeRouteTrial": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 45.8,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 36.1,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 39.0,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAdmission": {
+        "admitted": false,
+        "reasons": [
+          "AP exceeds the declared temperature delta from reference",
+          "BAT exceeds the declared temperature delta from reference",
+          "SKIN exceeds the declared temperature delta from reference"
+        ],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {},
+        "referenceCompared": true
+      },
+      "controlScope": {
+        "surfaceGeneration": 1,
+        "sceneEpoch": 3,
+        "measurementGeneration": 5,
+        "matchedCompletedFrames": 703,
+        "intervalCount": 702,
+        "durationNanoseconds": 68191410964,
+        "setupPresentationRowsExcluded": 0
+      },
+      "trialScope": {
+        "surfaceGeneration": 1,
+        "sceneEpoch": 3,
+        "measurementGeneration": 5,
+        "matchedCompletedFrames": 698,
+        "intervalCount": 697,
+        "durationNanoseconds": 68737156016,
+        "setupPresentationRowsExcluded": 0
+      },
+      "controlWholeRouteDisplay": {
+        "median": 83333334,
+        "p90NearestRank": 141666772,
+        "p95NearestRank": 149999999,
+        "maximum": 158270573,
+        "over33333000Nanoseconds": 702,
+        "over250000000Nanoseconds": 0
+      },
+      "trialWholeRouteDisplay": {
+        "median": 83333438,
+        "p90NearestRank": 149999948,
+        "p95NearestRank": 150000051,
+        "maximum": 162500051,
+        "over33333000Nanoseconds": 697,
+        "over250000000Nanoseconds": 0
+      },
+      "views": {
+        "landing-sweep": {
+          "controlGpu": {
+            "n": 39,
+            "medianMs": 130.372445,
+            "p95Ms": 131.669788,
+            "maximumMs": 131.706611,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "trialGpu": {
+            "n": 39,
+            "medianMs": 131.076976,
+            "p95Ms": 132.692288,
+            "maximumMs": 132.708226,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "controlDisplay": {
+            "n": 39,
+            "medianMs": 141.666719,
+            "p95Ms": 150.000052,
+            "maximumMs": 154.166615,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "trialDisplay": {
+            "n": 39,
+            "medianMs": 149.999948,
+            "p95Ms": 154.166666,
+            "maximumMs": 154.166719,
+            "over33_333ms": 39,
+            "over250ms": 0
+          },
+          "descriptiveGpuMedianChangePercent": 0.5403987015814682,
+          "poseComparison": {
+            "exactMatch": false,
+            "control": {
+              "x": -33.6878,
+              "y": 2.05,
+              "z": -12.7829,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "trial": {
+              "x": -33.6866,
+              "y": 2.05,
+              "z": -12.7812,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "controlMinusTrial": {
+              "x": -0.0012000000000043087,
+              "y": 0.0,
+              "z": -0.0016999999999995907,
+              "yaw": 0.0,
+              "pitch": 0.0
+            },
+            "positionDistanceMetres": 0.0020808652046706315
+          },
+          "causalGainEligible": false
+        },
+        "lower-sweep": {
+          "controlGpu": {
+            "n": 51,
+            "medianMs": 67.342863,
+            "p95Ms": 68.185675,
+            "maximumMs": 69.670519,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "trialGpu": {
+            "n": 51,
+            "medianMs": 67.244946,
+            "p95Ms": 68.99104,
+            "maximumMs": 69.573748,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "controlDisplay": {
+            "n": 51,
+            "medianMs": 75.0,
+            "p95Ms": 83.333334,
+            "maximumMs": 83.333335,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "trialDisplay": {
+            "n": 51,
+            "medianMs": 75.0,
+            "p95Ms": 83.333385,
+            "maximumMs": 83.333386,
+            "over33_333ms": 51,
+            "over250ms": 0
+          },
+          "descriptiveGpuMedianChangePercent": -0.14540070860959986,
+          "poseComparison": {
+            "exactMatch": true,
+            "control": {
+              "x": -33.7,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "trial": {
+              "x": -33.7,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "controlMinusTrial": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "yaw": 0.0,
+              "pitch": 0.0
+            },
+            "positionDistanceMetres": 0.0
+          },
+          "causalGainEligible": false
+        },
+        "passage-sweep": {
+          "controlGpu": {
+            "n": 52,
+            "medianMs": 67.938566,
+            "p95Ms": 68.828175,
+            "maximumMs": 68.994946,
+            "over33_333ms": 52,
+            "over250ms": 0
+          },
+          "trialGpu": {
+            "n": 50,
+            "medianMs": 67.9287225,
+            "p95Ms": 74.215415,
+            "maximumMs": 75.005259,
+            "over33_333ms": 50,
+            "over250ms": 0
+          },
+          "controlDisplay": {
+            "n": 52,
+            "medianMs": 75.000051,
+            "p95Ms": 83.333334,
+            "maximumMs": 87.5,
+            "over33_333ms": 52,
+            "over250ms": 0
+          },
+          "trialDisplay": {
+            "n": 50,
+            "medianMs": 83.333255,
+            "p95Ms": 83.333386,
+            "maximumMs": 83.333437,
+            "over33_333ms": 50,
+            "over250ms": 0
+          },
+          "descriptiveGpuMedianChangePercent": -0.014488825095293478,
+          "poseComparison": {
+            "exactMatch": false,
+            "control": {
+              "x": -22.0206,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 1.5708,
+              "pitch": -0.15
+            },
+            "trial": {
+              "x": -22.0221,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 1.5708,
+              "pitch": -0.15
+            },
+            "controlMinusTrial": {
+              "x": 0.0014999999999965041,
+              "y": 0.0,
+              "z": 0.0,
+              "yaw": 0.0,
+              "pitch": 0.0
+            },
+            "positionDistanceMetres": 0.0014999999999965041
+          },
+          "causalGainEligible": false
+        },
+        "repeat-ascent": {
+          "controlGpu": {
+            "n": 40,
+            "medianMs": 129.1023145,
+            "p95Ms": 131.924632,
+            "maximumMs": 132.311195,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "trialGpu": {
+            "n": 40,
+            "medianMs": 131.2973665,
+            "p95Ms": 142.167653,
+            "maximumMs": 143.060622,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "controlDisplay": {
+            "n": 40,
+            "medianMs": 141.6667185,
+            "p95Ms": 150.000052,
+            "maximumMs": 150.000104,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "trialDisplay": {
+            "n": 40,
+            "medianMs": 150.0,
+            "p95Ms": 154.166719,
+            "maximumMs": 158.333438,
+            "over33_333ms": 40,
+            "over250ms": 0
+          },
+          "descriptiveGpuMedianChangePercent": 1.7002421749766627,
+          "poseComparison": {
+            "exactMatch": true,
+            "control": {
+              "x": -33.7,
+              "y": 2.05,
+              "z": -12.8,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "trial": {
+              "x": -33.7,
+              "y": 2.05,
+              "z": -12.8,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "controlMinusTrial": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0,
+              "yaw": 0.0,
+              "pitch": 0.0
+            },
+            "positionDistanceMetres": 0.0
+          },
+          "causalGainEligible": false
+        }
+      }
+    }
+  ],
+  "poseEligibilityRegressionChecks": 3,
+  "initialExactPoseCheckFailure": {
+    "control": "pipeline-baseline-05",
+    "trial": "pipeline-candidate-02",
+    "phase": "landing-sweep",
+    "disposition": "Not suppressed or treated as a matched view. Each delta is retained below.",
+    "sourceExplanation": "ChapterRoundTripProbe::Walk finishes within 0.025 m using ordinary resolved input, not camera teleportation."
+  },
+  "methodHashes": {
+    "run.py": "eedad567094459f4405782601578aef79e7cefefef8fb7e51570f511db3e054b",
+    "cool-run.py": "c3f790a75fce254d74b8a393df85df3594a532a8997794aedc3536d6b88e3196",
+    "analyze.py": "f8734f1372c4a410a68f92bf84b04fcca2ecea458257e06a9251e8f5ea658843",
+    "final-controls.py": "acc7e8fa56b392919bf0199413a68ea1e05721d502874c59b2c3b95b39d93e52"
+  }
+}

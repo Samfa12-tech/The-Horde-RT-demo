@@ -1,0 +1,28 @@
+{
+  "order": [
+    "control-a1",
+    "candidate-b",
+    "control-a2"
+  ],
+  "maximumRuns": 3,
+  "maximumSecondsPerNativeRun": 120,
+  "nativeLimitsUnchanged": {
+    "seconds": 90,
+    "renderCalls": 180
+  },
+  "samplesPerGroup": 60,
+  "warmupPerGroup": 12,
+  "groups": [
+    "walk",
+    "turn"
+  ],
+  "metrics": [
+    "wholeRtGpuMs",
+    "characterSkinCpuMs",
+    "wholeFrameCycleCpuMs"
+  ],
+  "admission": "All measured GPU and character-skin median/p95 values must be <=1.15 times the lower control bracket. No image/custody/resource regression; thermal comparison must pass.",
+  "thermalAdmission": "AC unchanged; group median temperature within 3 C and median graphics clock within 10 percent of both controls. Pre-run temperature within 2 C of first control, max 30s wait.",
+  "controlScope": "Only renderer CompanionUpperBodyRotations vs CompanionPoseRotations; same candidate simulation oscillator on both. No total simulation-cost claim.",
+  "scope": "one bounded Debug desktop control/candidate/control comparison; not phone or sustained-gameplay parity"
+}

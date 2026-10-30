@@ -1,0 +1,26 @@
+{
+  "release-reject": {
+    "pid": 47136,
+    "exitCode": 2,
+    "seconds": 0.032,
+    "foregroundBefore": null,
+    "foregroundAfter": null,
+    "pending": false
+  },
+  "unbound-inspect-reject": {
+    "pid": 30692,
+    "exitCode": 2,
+    "seconds": 2.312,
+    "foregroundBefore": null,
+    "foregroundAfter": null,
+    "pending": false
+  },
+  "old-mode-inspect-reject": {
+    "pid": 6416,
+    "exitCode": 2,
+    "seconds": 0.016,
+    "foregroundBefore": null,
+    "foregroundAfter": null,
+    "pending": false
+  }
+}

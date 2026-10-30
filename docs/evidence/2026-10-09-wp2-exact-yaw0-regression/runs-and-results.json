@@ -1,0 +1,155 @@
+{
+  "start_head": "c7a96513de1e6da0d3b1a25b6528823f2797168d",
+  "unchanged_runtime_candidate": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "test_source_git_blob": "80ee809df14c894968ff35d5a0a36fc2d9c95ef5",
+  "test_source_working_bytes_sha256": "37fc583eedb76d32f56f81939a35281691f873626efbcbb7ee69e815fa3332f7",
+  "builds": [
+    {
+      "kind": "build",
+      "configuration": "debug",
+      "started_utc": "2026-10-09T09:03:18.040137+00:00",
+      "seconds": 5.45299999999952,
+      "exit": 0,
+      "argv": [
+        "<cmake>",
+        "--build",
+        "--preset",
+        "windows-x64-debug",
+        "--target",
+        "horde_rt_held_item_vertical_support_rig_tests",
+        "--parallel",
+        "2"
+      ],
+      "test_source_sha256": "37fc583eedb76d32f56f81939a35281691f873626efbcbb7ee69e815fa3332f7",
+      "log_sha256": "b0b5937500f8a6e9632b809aa4680b1e710ae67f13fe43b15f7e93fa98662fc7"
+    },
+    {
+      "kind": "build",
+      "configuration": "release",
+      "started_utc": "2026-10-09T09:03:23.483690+00:00",
+      "seconds": 3.25,
+      "exit": 0,
+      "argv": [
+        "<cmake>",
+        "--build",
+        "--preset",
+        "windows-x64-release",
+        "--target",
+        "horde_rt_held_item_vertical_support_rig_tests",
+        "--parallel",
+        "2"
+      ],
+      "test_source_sha256": "37fc583eedb76d32f56f81939a35281691f873626efbcbb7ee69e815fa3332f7",
+      "log_sha256": "7dd3f3128bc4bac5408a47dd9bd72a7bf755c5fcc603251d1dc757b6fb9e886a"
+    }
+  ],
+  "tests": [
+    {
+      "configuration": "debug",
+      "started_utc": "2026-10-09T09:04:31.467611+00:00",
+      "seconds": 2.8599999999996726,
+      "exit": 0,
+      "argv": [
+        "<ctest>",
+        "--preset",
+        "windows-x64-debug",
+        "--no-tests=error",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "-V",
+        "-R",
+        "^horde_rt_held_item_vertical_support_rig_tests$"
+      ],
+      "selected_count": 1,
+      "registered_properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ],
+      "validation_timeout_argument_seconds": 180,
+      "test_exe_sha256": "05bb6eca65afbc2a7266da5e6ba5264ad8e5b647c7aaaaaa8c1a692d11dce784",
+      "test_source_sha256": "37fc583eedb76d32f56f81939a35281691f873626efbcbb7ee69e815fa3332f7",
+      "log_sha256": "62aae2153c6088610ae3ac31e8820a6e1d34c5cf204046854cf3263750d3ae9a"
+    },
+    {
+      "configuration": "release",
+      "started_utc": "2026-10-09T09:04:34.392648+00:00",
+      "seconds": 1.469000000000051,
+      "exit": 0,
+      "argv": [
+        "<ctest>",
+        "--preset",
+        "windows-x64-release",
+        "--no-tests=error",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "-V",
+        "-R",
+        "^horde_rt_held_item_vertical_support_rig_tests$"
+      ],
+      "selected_count": 1,
+      "registered_properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-release"
+        }
+      ],
+      "validation_timeout_argument_seconds": 180,
+      "test_exe_sha256": "9f46d2b1dad61326190080eaddd8d571763ab89b556d3d43b1bb165da6096b94",
+      "test_source_sha256": "37fc583eedb76d32f56f81939a35281691f873626efbcbb7ee69e815fa3332f7",
+      "log_sha256": "0913e8a910c238f64ab910243c043d7a6fbbf84808874fec64b3102e38679bdf"
+    }
+  ],
+  "metrics": [
+    {
+      "configuration": "debug",
+      "mesh_vertex_samples": 34304,
+      "torch_lowering_metres": 0.333987,
+      "torch_retreat_metres": 0.200392,
+      "actual_mesh_flame_light_min_headroom_metres": 0.0347347,
+      "returned_lowering_metres": 0.0,
+      "same_positive_validator_negative_count": 9,
+      "shared_fixed_step_descent_ticks": 59,
+      "negative_rejection_details": [
+        "missing geometry: missing skinned geometry",
+        "omitted support: body mesh or eye applied support incorrectly",
+        "doubled support: body mesh or eye applied support incorrectly",
+        "unreachable wrist: actual wrist is outside anatomical reach",
+        "broken torch Grip: torch no longer attaches to the solved rig Grip",
+        "broken sword Hips attachment: production stowed sword no longer attaches to animated Hips",
+        "independent flame offset: flame or physical light left its authored item socket",
+        "independent physical-light offset: flame or physical light left its authored item socket"
+      ],
+      "stale_pose_negative": "ValidateRecovery rejects constrained raised result against ordinary return control; included in count9",
+      "ctest_total_seconds": 2.79,
+      "computed_timeout_seconds": 180
+    },
+    {
+      "configuration": "release",
+      "mesh_vertex_samples": 34304,
+      "torch_lowering_metres": 0.333987,
+      "torch_retreat_metres": 0.200392,
+      "actual_mesh_flame_light_min_headroom_metres": 0.0347347,
+      "returned_lowering_metres": 0.0,
+      "same_positive_validator_negative_count": 9,
+      "shared_fixed_step_descent_ticks": 59,
+      "negative_rejection_details": [
+        "missing geometry: missing skinned geometry",
+        "omitted support: body mesh or eye applied support incorrectly",
+        "doubled support: body mesh or eye applied support incorrectly",
+        "unreachable wrist: actual wrist is outside anatomical reach",
+        "broken torch Grip: torch no longer attaches to the solved rig Grip",
+        "broken sword Hips attachment: production stowed sword no longer attaches to animated Hips",
+        "independent flame offset: flame or physical light left its authored item socket",
+        "independent physical-light offset: flame or physical light left its authored item socket"
+      ],
+      "stale_pose_negative": "ValidateRecovery rejects constrained raised result against ordinary return control; included in count9",
+      "ctest_total_seconds": 1.43,
+      "computed_timeout_seconds": 180
+    }
+  ],
+  "coverage": "One existing CPU real-rig CTest per configuration. No Vulkan device/presentation/owner/lifecycle acceptance."
+}

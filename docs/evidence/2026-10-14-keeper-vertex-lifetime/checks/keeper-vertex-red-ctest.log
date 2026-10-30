@@ -1,0 +1,30 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 167: horde_rt_static_geometry_cutover_tests
+1/1 Test #167: horde_rt_static_geometry_cutover_tests ...***Failed    5.88 sec
+FAIL: completed Kit adoption rebinds retained storage before retiring exactly one Keeper buffer
+FAIL: inventory saving is exact and shared third BLAS/scratch remain unchanged
+FAIL: repeated Kit frames never retire twice
+FAIL: grounded loss prepares valid Keeper storage without publishing a partial actor switch
+FAIL: ordinary Keeper frames perform no allocation or retirement
+FAIL: unsubmitted, stale or unproved adoption retains the Keeper allocation
+FAIL: unsubmitted, stale or unproved adoption retains the Keeper allocation
+FAIL: unsubmitted, stale or unproved adoption retains the Keeper allocation
+FAIL: failed/reset restore retains Kit owner and destroys only the unsubmitted candidate
+FAIL: failed Keeper storage preparation remains retryable
+FAIL: failed/reset restore retains Kit owner and destroys only the unsubmitted candidate
+FAIL: failed Keeper storage preparation remains retryable
+FAIL: failed/reset restore retains Kit owner and destroys only the unsubmitted candidate
+FAIL: failed Keeper storage preparation remains retryable
+FAIL: failed/reset restore retains Kit owner and destroys only the unsubmitted candidate
+FAIL: failed Keeper storage preparation remains retryable
+FAIL: failed Keeper storage preparation remains retryable
+Keeper vertex lifetime checks: FAIL
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   5.90 sec
+
+The following tests FAILED:
+	167 - horde_rt_static_geometry_cutover_tests (Failed)
+Errors while running CTest

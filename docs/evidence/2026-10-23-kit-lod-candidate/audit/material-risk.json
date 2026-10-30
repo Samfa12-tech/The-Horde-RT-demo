@@ -1,0 +1,672 @@
+{
+  "status": "UNADMITTED_MATERIAL_RISK_REVIEW_REQUIRED",
+  "candidateSha256": "30fea4a66bd1a31b48ee0d24414c48e22570870ff97d141860c93a99c3d0bb43",
+  "interpretation": [
+    "Both added four-incident edges also exist at exact float positions; they are not solely 1um seam/weld rounding artifacts.",
+    "The triangle-normal witnesses are nondegenerate facets on unprotected torso/limbs. They identify real triangulation versus shading-normal disagreement, not a protected face/contact change.",
+    "This does not prove a visible crack or self-intersection; close actual RT views and animated native comparison remain required. Aggregate counts or pose identity cannot grant admission.",
+    "No repair, face flip, triangle deletion, normal rewrite or second optimizer invocation was performed."
+  ],
+  "triangles": [
+    {
+      "candidateTriangle": 11797,
+      "sourceRows": [
+        3051,
+        2941,
+        2747
+      ],
+      "bindCentreMetres": [
+        -0.25465331474939984,
+        1.404825250307719,
+        0.0056387743291755514
+      ],
+      "areaSquareMetres": 3.4505344620792585e-05,
+      "geometryVsAverageNormalCosine": -0.09071277964095531,
+      "geometryVsAverageNormalAngleDegrees": 95.20461409623762,
+      "dominantCornerJoints": [
+        "RightArm",
+        "RightArm",
+        "RightArm"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": 4.736659725779191e-06,
+      "originalIncidentTriangleIndices": [
+        2557,
+        2728,
+        2740
+      ]
+    },
+    {
+      "candidateTriangle": 11947,
+      "sourceRows": [
+        3873,
+        3928,
+        3724
+      ],
+      "bindCentreMetres": [
+        -0.2150710274775823,
+        0.760750929514567,
+        0.045292930056651436
+      ],
+      "areaSquareMetres": 1.99741451991284e-05,
+      "geometryVsAverageNormalCosine": -0.5476772606735949,
+      "geometryVsAverageNormalAngleDegrees": 123.20780881841107,
+      "dominantCornerJoints": [
+        "RightUpLeg",
+        "RightUpLeg",
+        "RightUpLeg"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": 1.703834950461669e-06,
+      "originalIncidentTriangleIndices": [
+        3307,
+        3353,
+        3389,
+        3409,
+        3482,
+        3626,
+        3757,
+        3850
+      ]
+    },
+    {
+      "candidateTriangle": 12688,
+      "sourceRows": [
+        14731,
+        15011,
+        14493
+      ],
+      "bindCentreMetres": [
+        0.03702222431699435,
+        1.0357258319854736,
+        -0.131076509753863
+      ],
+      "areaSquareMetres": 2.9099773351477594e-05,
+      "geometryVsAverageNormalCosine": -0.022094543742108494,
+      "geometryVsAverageNormalAngleDegrees": 91.26602712677798,
+      "dominantCornerJoints": [
+        "Hips",
+        "Hips",
+        "Hips"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": -6.73394224559587e-06,
+      "originalIncidentTriangleIndices": [
+        13721,
+        13826,
+        13936,
+        14201,
+        14659
+      ]
+    },
+    {
+      "candidateTriangle": 13639,
+      "sourceRows": [
+        9033,
+        8260,
+        7833
+      ],
+      "bindCentreMetres": [
+        -0.11959250022967656,
+        0.580062210559845,
+        0.06927311668793361
+      ],
+      "areaSquareMetres": 2.6279142076765805e-05,
+      "geometryVsAverageNormalCosine": -0.11137464867255556,
+      "geometryVsAverageNormalAngleDegrees": 96.39456410322494,
+      "dominantCornerJoints": [
+        "RightUpLeg",
+        "RightUpLeg",
+        "RightUpLeg"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": -3.098780421595393e-06,
+      "originalIncidentTriangleIndices": [
+        7651,
+        7774,
+        8234,
+        8430,
+        8694,
+        8780,
+        8836,
+        8922,
+        9026
+      ]
+    },
+    {
+      "candidateTriangle": 14244,
+      "sourceRows": [
+        7101,
+        8068,
+        7771
+      ],
+      "bindCentreMetres": [
+        -0.1329288383324941,
+        0.8893793821334839,
+        0.10787602017323177
+      ],
+      "areaSquareMetres": 3.727721774723025e-05,
+      "geometryVsAverageNormalCosine": -0.20473009002819528,
+      "geometryVsAverageNormalAngleDegrees": 101.81369923598969,
+      "dominantCornerJoints": [
+        "RightUpLeg",
+        "RightUpLeg",
+        "RightUpLeg"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": 1.2847417707462228e-07,
+      "originalIncidentTriangleIndices": [
+        6534,
+        6733,
+        6832,
+        7091,
+        7360,
+        7473,
+        7664
+      ]
+    },
+    {
+      "candidateTriangle": 15763,
+      "sourceRows": [
+        10579,
+        9978,
+        10481
+      ],
+      "bindCentreMetres": [
+        -0.08934179445107777,
+        0.9710382620493571,
+        -0.13382713993390402
+      ],
+      "areaSquareMetres": 1.4009541472624594e-05,
+      "geometryVsAverageNormalCosine": -0.05485500162791661,
+      "geometryVsAverageNormalAngleDegrees": 93.14453844841843,
+      "dominantCornerJoints": [
+        "Hips",
+        "Hips",
+        "Hips"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": -6.168300323849962e-07,
+      "originalIncidentTriangleIndices": [
+        9876,
+        9885,
+        9887,
+        9980
+      ]
+    },
+    {
+      "candidateTriangle": 16427,
+      "sourceRows": [
+        17235,
+        16662,
+        16456
+      ],
+      "bindCentreMetres": [
+        0.09123286604881287,
+        0.5000692705313364,
+        0.015751974036296208
+      ],
+      "areaSquareMetres": 2.52907943691299e-05,
+      "geometryVsAverageNormalCosine": -0.3033385488456784,
+      "geometryVsAverageNormalAngleDegrees": 107.658234916301,
+      "dominantCornerJoints": [
+        "LeftLeg",
+        "LeftLeg",
+        "LeftUpLeg"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": 4.27943298220157e-06,
+      "originalIncidentTriangleIndices": [
+        15617,
+        15638,
+        15766,
+        15936,
+        16023,
+        16346,
+        16347,
+        16470,
+        16710
+      ]
+    },
+    {
+      "candidateTriangle": 16480,
+      "sourceRows": [
+        16327,
+        14993,
+        14692
+      ],
+      "bindCentreMetres": [
+        0.06336962928374608,
+        1.0985421737035115,
+        -0.13269823292891184
+      ],
+      "areaSquareMetres": 4.135060768079254e-05,
+      "geometryVsAverageNormalCosine": -0.07064025045312423,
+      "geometryVsAverageNormalAngleDegrees": 94.05076190411292,
+      "dominantCornerJoints": [
+        "Hips",
+        "Hips",
+        "Hips"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": 2.6654748630505765e-06,
+      "originalIncidentTriangleIndices": [
+        13874,
+        14064,
+        14081,
+        14184,
+        14368,
+        14398,
+        15076,
+        15308,
+        15309,
+        15503,
+        15578,
+        15728,
+        15752
+      ]
+    },
+    {
+      "candidateTriangle": 16871,
+      "sourceRows": [
+        17338,
+        16646,
+        16165
+      ],
+      "bindCentreMetres": [
+        0.09290015449126561,
+        1.2550151745478313,
+        0.12263342489798863
+      ],
+      "areaSquareMetres": 4.943044062393854e-05,
+      "geometryVsAverageNormalCosine": -0.23008339160246216,
+      "geometryVsAverageNormalAngleDegrees": 103.30198140736574,
+      "dominantCornerJoints": [
+        "Spine02",
+        "Spine02",
+        "Spine01"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": 8.708751266794934e-06,
+      "originalIncidentTriangleIndices": [
+        15329,
+        15515,
+        15802,
+        15818,
+        15918,
+        16059,
+        16531,
+        16532,
+        16537,
+        17003
+      ]
+    },
+    {
+      "candidateTriangle": 17075,
+      "sourceRows": [
+        17058,
+        16757,
+        17387
+      ],
+      "bindCentreMetres": [
+        0.10077436765034993,
+        0.4604366620381673,
+        -0.0008067124290391803
+      ],
+      "areaSquareMetres": 2.1466229847447723e-05,
+      "geometryVsAverageNormalCosine": -0.20642922229761412,
+      "geometryVsAverageNormalAngleDegrees": 101.91317716794347,
+      "dominantCornerJoints": [
+        "LeftLeg",
+        "LeftLeg",
+        "LeftLeg"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": 2.855454681593983e-06,
+      "originalIncidentTriangleIndices": [
+        15914,
+        15915,
+        16221,
+        16333,
+        16338,
+        16521,
+        16611,
+        16614,
+        16638,
+        16712,
+        16724,
+        25966
+      ]
+    },
+    {
+      "candidateTriangle": 18190,
+      "sourceRows": [
+        19364,
+        19509,
+        19512
+      ],
+      "bindCentreMetres": [
+        0.13331416745980582,
+        0.7751646439234415,
+        0.10205446928739548
+      ],
+      "areaSquareMetres": 1.654435625499703e-05,
+      "geometryVsAverageNormalCosine": -0.10277500959657757,
+      "geometryVsAverageNormalAngleDegrees": 95.89899041892662,
+      "dominantCornerJoints": [
+        "LeftUpLeg",
+        "LeftUpLeg",
+        "LeftUpLeg"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": 2.472739453196482e-07,
+      "originalIncidentTriangleIndices": [
+        18456,
+        18462,
+        18643,
+        18647,
+        18748,
+        18757,
+        18766,
+        18811,
+        18814,
+        18842
+      ]
+    },
+    {
+      "candidateTriangle": 18303,
+      "sourceRows": [
+        21480,
+        20594,
+        21240
+      ],
+      "bindCentreMetres": [
+        0.18299623330434164,
+        0.882503608862559,
+        -0.0877490962545077
+      ],
+      "areaSquareMetres": 6.725528040438703e-05,
+      "geometryVsAverageNormalCosine": -0.015579766404296902,
+      "geometryVsAverageNormalAngleDegrees": 90.89269097693261,
+      "dominantCornerJoints": [
+        "LeftUpLeg",
+        "LeftUpLeg",
+        "LeftUpLeg"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": -6.478446040514285e-06,
+      "originalIncidentTriangleIndices": [
+        19581,
+        19942,
+        20342,
+        20474,
+        20567,
+        20616,
+        20652,
+        20655,
+        20843,
+        20987,
+        21016,
+        21027,
+        21246,
+        21342,
+        21381,
+        21400
+      ]
+    },
+    {
+      "candidateTriangle": 19216,
+      "sourceRows": [
+        23766,
+        23932,
+        23858
+      ],
+      "bindCentreMetres": [
+        0.2502699941396713,
+        1.3593761920928955,
+        -0.01970062218606472
+      ],
+      "areaSquareMetres": 3.081798821003848e-05,
+      "geometryVsAverageNormalCosine": -0.2049906116949142,
+      "geometryVsAverageNormalAngleDegrees": 101.82894946692954,
+      "dominantCornerJoints": [
+        "LeftArm",
+        "LeftArm",
+        "LeftArm"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": -2.0088713093002752e-07,
+      "originalIncidentTriangleIndices": [
+        23066,
+        23122,
+        23221,
+        23222,
+        23229,
+        23237
+      ]
+    },
+    {
+      "candidateTriangle": 19223,
+      "sourceRows": [
+        24024,
+        24010,
+        23973
+      ],
+      "bindCentreMetres": [
+        0.2613241970539093,
+        1.3467629353205364,
+        -0.09320701658725739
+      ],
+      "areaSquareMetres": 5.4298512987537785e-05,
+      "geometryVsAverageNormalCosine": -0.47465436240844217,
+      "geometryVsAverageNormalAngleDegrees": 118.33684798666465,
+      "dominantCornerJoints": [
+        "LeftArm",
+        "LeftArm",
+        "LeftArm"
+      ],
+      "touchesProtectedRegion": false,
+      "uvDeterminant": 1.0570967271306131e-05,
+      "originalIncidentTriangleIndices": [
+        23273,
+        23282,
+        23283,
+        23303,
+        23332,
+        23354,
+        23355,
+        23370,
+        23383,
+        23431,
+        23443,
+        23525
+      ]
+    }
+  ],
+  "newEdges": [
+    {
+      "key1um": [
+        [
+          -215129,
+          753890,
+          46088
+        ],
+        [
+          -213110,
+          765336,
+          44911
+        ]
+      ],
+      "exactPositionNewEdges": [
+        {
+          "edge": [
+            [
+              -0.2151285707950592,
+              0.7538902163505554,
+              0.04608769342303276
+            ],
+            [
+              -0.21311037242412567,
+              0.7653364539146423,
+              0.044910721480846405
+            ]
+          ],
+          "sourceMultiplicity": 2,
+          "candidateMultiplicity": 4
+        }
+      ],
+      "sourceRowsPerIncidentTriangle": [
+        [
+          3724,
+          4139,
+          3928
+        ],
+        [
+          3873,
+          3928,
+          3724
+        ],
+        [
+          3928,
+          3723,
+          3724
+        ],
+        [
+          3725,
+          3930,
+          3875
+        ]
+      ],
+      "originalSourceIncidentTriangleIndices": [
+        3306,
+        3307,
+        3318,
+        3322,
+        3353,
+        3380,
+        3389,
+        3409,
+        3445,
+        3482,
+        3489,
+        3525,
+        3599,
+        3626,
+        3757,
+        3850,
+        4006,
+        4077,
+        4083,
+        4747
+      ],
+      "risk": "New exact-position multi-incident surface edge; possible fold/crack/junction, requiring native posed and actual RT review."
+    },
+    {
+      "key1um": [
+        [
+          -18517,
+          1123926,
+          136520
+        ],
+        [
+          -13640,
+          1128766,
+          137034
+        ]
+      ],
+      "exactPositionNewEdges": [
+        {
+          "edge": [
+            [
+              -0.018516501411795616,
+              1.123925805091858,
+              0.136520117521286
+            ],
+            [
+              -0.013639848679304123,
+              1.1287658214569092,
+              0.13703416287899017
+            ]
+          ],
+          "sourceMultiplicity": 2,
+          "candidateMultiplicity": 4
+        }
+      ],
+      "sourceRowsPerIncidentTriangle": [
+        [
+          12894,
+          12455,
+          12710
+        ],
+        [
+          12455,
+          13144,
+          12710
+        ],
+        [
+          12709,
+          12454,
+          12314
+        ],
+        [
+          12712,
+          13145,
+          12457
+        ]
+      ],
+      "originalSourceIncidentTriangleIndices": [
+        11962,
+        12012,
+        12120,
+        12128,
+        12184,
+        12228,
+        12362,
+        12363,
+        12429,
+        12513,
+        12551,
+        12621,
+        12790,
+        12882
+      ],
+      "risk": "New exact-position multi-incident surface edge; possible fold/crack/junction, requiring native posed and actual RT review."
+    }
+  ],
+  "sourceExactTopology": {
+    "components": 1,
+    "vertices": 12976,
+    "edges": 38950,
+    "faces": 25968,
+    "euler": -6,
+    "boundaryEdges": 17,
+    "nonmanifoldEdges": 16,
+    "edgeMultiplicity": {
+      "1": 17,
+      "2": 38917,
+      "3": 11,
+      "4": 5
+    }
+  },
+  "candidateExactTopology": {
+    "components": 1,
+    "vertices": 9953,
+    "edges": 29879,
+    "faces": 19922,
+    "euler": -4,
+    "boundaryEdges": 17,
+    "nonmanifoldEdges": 18,
+    "edgeMultiplicity": {
+      "1": 17,
+      "2": 29844,
+      "3": 11,
+      "4": 7
+    }
+  },
+  "suggestedWitnessViews": [
+    "Existing matched chapter Kit conversational/front and side/three-quarter views, preserving head and body contour.",
+    "Close right-thigh patch around (-0.214,0.760,0.046)m in source bind coordinates.",
+    "Close front-torso patch around (-0.016,1.126,0.137)m; inspect PBR normals, primary/secondary visibility and shadow.",
+    "Original/candidate walk, idle and chapter acting poses with identical solved pose; source-row/protected maps bind every surviving vertex."
+  ]
+}

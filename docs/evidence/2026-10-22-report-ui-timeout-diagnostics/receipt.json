@@ -1,0 +1,122 @@
+{
+  "parent": "b610f9980e8aab33116321b13021fa7b41fadb70",
+  "scope": "test-only diagnostics; production unchanged; hosted root cause unresolved",
+  "testSourceSha256": "0408283bf994ebd4b2bc1b39b7e562943a6ddc0b97a6ed3bf5cee8a10615c43d",
+  "messageDeadlineMs": 2000,
+  "ctestDeadlineSeconds": 30,
+  "hostedFailures": [
+    {
+      "run": 39866535522,
+      "attempt": 1,
+      "job": 120130019850,
+      "fullLogSha256": "501cf491cab84cc2631c0f46365b05ccc486bbe4abb3334029a53634bb5f7c5c",
+      "excerpt": "logs\\hosted-attempt1-ui.txt",
+      "excerptSha256": "4ed1350d522b5be1b41d6e6abacf23b94642cee9e0a7f9e0b1ada10336c54ebb",
+      "result": "failure",
+      "messageElapsedMs": 2003,
+      "windowsMain": "168/169",
+      "isolatedAssetPolicy": "1/1",
+      "otherJobsPassed": 5
+    },
+    {
+      "run": 39866535522,
+      "attempt": 2,
+      "job": 120136530255,
+      "fullLogSha256": "676b8a831b78fd548d60048bcd87ef6ce2947518c8c22256360b0f7b64ef9944",
+      "excerpt": "logs\\hosted-attempt2-ui.txt",
+      "excerptSha256": "21b1f3bc885c9a96a3a76bcec1f0a24894f1bc4997dc7a8e1b62dd80754347e7",
+      "result": "failure",
+      "messageElapsedMs": 2000,
+      "windowsMain": "168/169",
+      "isolatedAssetPolicy": "1/1",
+      "otherJobsPassed": 5
+    }
+  ],
+  "localChecks": [
+    {
+      "log": "logs\\baseline-tests.txt",
+      "sha256": "db2b05a8dc6ace4f068fafa3d9f23428574f2d595533a87d2e6d72d78def0d72",
+      "rawSha256": "d95ab0931e935263c2d071b0062592a9c35bb6eb1b62405514977d9d83a0bf8c",
+      "source": "b610f9980e8aab33116321b13021fa7b41fadb70",
+      "result": "2/2 pass",
+      "nativeUiSeconds": 1.13,
+      "totalSeconds": 2.46
+    },
+    {
+      "log": "logs\\baseline-injected-timeout.txt",
+      "sha256": "19e2a8a1d5e0b95faeb1fa9b3bee339db8221f97030f50829c9c760c47e92e7d",
+      "rawSha256": "60361255a3c9a2e974e69e4c0aa81415867825264b4df7069192655a614bc0b7",
+      "source": "b610f9980e8aab33116321b13021fa7b41fadb70",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "result": "expected rejection",
+      "messageElapsedMs": 2005
+    },
+    {
+      "log": "logs\\candidate-release-tests.txt",
+      "sha256": "9c03304e7646ed7a1c5c69960138a2e6bc59d972e475c78ee0d5548c8744cb88",
+      "rawSha256": "e8ea1c0d2a28be05b3c6729e354c74e4752b25729644a2cc138a5bd453e8dc55",
+      "source": "intermediate test-only diagnostic diff; not final source",
+      "result": "2/2 pass",
+      "nativeUiSeconds": 1.24,
+      "totalSeconds": 1.29
+    },
+    {
+      "log": "logs\\candidate-injected-timeout.txt",
+      "sha256": "25e274fb729bc0f591fb301ad1df3c1bfc05018a5480ee11b856ba7b33010a4a",
+      "rawSha256": "1b2d281499c5ddd3ceb3492a2dd01990b658c0d48ea513e2abf06916c45babc9",
+      "source": "intermediate test-only diagnostic diff; not final source",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "result": "expected rejection",
+      "messageElapsedMs": 2000
+    },
+    {
+      "log": "logs\\candidate-debug-tests.txt",
+      "sha256": "7a525523ce754a4d7dc0a69b3395c06b115f2d7aeb4accd44b65b28c647e960d",
+      "rawSha256": "254f7bad7d3b0ea5ab1ba515d3d579cf1db4595b166af82ce5968c2ea31bef56",
+      "source": "intermediate test-only diagnostic diff; not final source",
+      "result": "2/2 pass",
+      "nativeUiSeconds": 1.68,
+      "totalSeconds": 4.28
+    },
+    {
+      "log": "logs\\candidate-debug-injected-timeout.txt",
+      "sha256": "bdb42c824ccea2054c3c92aa13bff96404390f3624a40e27175e01d167ae8d46",
+      "rawSha256": "470fe8ed15ca5ba5a3294e30c1351a504cd7cef1310f66e3929aacd1b71f98b6",
+      "source": "intermediate test-only diagnostic diff; not final source",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "result": "expected rejection",
+      "messageElapsedMs": 2011
+    },
+    {
+      "log": "logs\\final-release-tests.txt",
+      "sha256": "e3320120296532494c2d058cfa5b56bcb0566bdb806fc0a80b7f41b94c5ba7ed",
+      "rawSha256": "9433cb0addb5ed390fff9fe57820fd8afde6a2e12ecd9e88066db73fb7f4539a",
+      "source": "0408283bf994ebd4b2bc1b39b7e562943a6ddc0b97a6ed3bf5cee8a10615c43d",
+      "result": "2/2 pass",
+      "nativeUiSeconds": 1.51,
+      "totalSeconds": 1.55
+    },
+    {
+      "log": "logs\\final-release-injected-timeout.txt",
+      "sha256": "8dbf55b6ca90bd581412ecea2de3e0a7b58ef577b21f99f103d4c53375f92b21",
+      "rawSha256": "066f4e604f2fdd8fa0a27acb2ced3a3f3281bbfc32fcf8d71dc3fa2a236f0d39",
+      "source": "0408283bf994ebd4b2bc1b39b7e562943a6ddc0b97a6ed3bf5cee8a10615c43d",
+      "expectedExit": 1,
+      "actualExit": 1,
+      "result": "expected rejection",
+      "messageElapsedMs": 2002
+    },
+    {
+      "log": "logs\\final-debug-tests.txt",
+      "sha256": "3dacffeaabe10b869bb841f82afd064de6154524e0eb9aaa6342ff62877ef107",
+      "rawSha256": "a3b6b98d37cd8e789d7729be7f4175748ecac61546ee979a5c7d9da87771a2e4",
+      "source": "0408283bf994ebd4b2bc1b39b7e562943a6ddc0b97a6ed3bf5cee8a10615c43d",
+      "result": "2/2 pass",
+      "nativeUiSeconds": 2.08,
+      "totalSeconds": 2.12
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+[
+  {
+    "asset": "horde-upright-alder-v1",
+    "units": "meters",
+    "origin": [
+      0,
+      0,
+      0
+    ],
+    "bounds_blender_xyz": {
+      "min": [
+        -1.6904454231262207,
+        -1.7183218002319336,
+        -0.007092012092471123
+      ],
+      "max": [
+        1.6727383136749268,
+        1.3647300004959106,
+        8.474547386169434
+      ]
+    },
+    "dimensions_m": [
+      3.3631837368011475,
+      3.0830518007278442,
+      8.481639398261905
+    ],
+    "triangles": 7832,
+    "meshes": [
+      {
+        "name": "Alder | closed trunk roots branches",
+        "vertices": 1976,
+        "triangles": 3656
+      },
+      {
+        "name": "Alder | individually closed opaque leaves",
+        "vertices": 2640,
+        "triangles": 3960
+      },
+      {
+        "name": "Alder | closed moss tendrils",
+        "vertices": 120,
+        "triangles": 216
+      }
+    ],
+    "materials": 3,
+    "texture_resolution": [
+      512,
+      512
+    ],
+    "opaque_only": true,
+    "closed_leaf_geometry": true,
+    "alpha_cards": false,
+    "degenerate_triangles": 0,
+    "nonfinite_vertices": 0,
+    "engine_import_tested": false,
+    "canonical_game_dev_validation": "CLI not installed; not run",
+    "lod_level": 0,
+    "source_seed": 7319
+  },
+  {
+    "asset": "horde-irregular-pine-v1",
+    "units": "meters",
+    "origin": [
+      0,
+      0,
+      0
+    ],
+    "bounds_blender_xyz": {
+      "min": [
+        -1.8599222898483276,
+        -1.5585356950759888,
+        -0.00683143176138401
+      ],
+      "max": [
+        1.8909538984298706,
+        1.8350584506988525,
+        8.686391830444336
+      ]
+    },
+    "dimensions_m": [
+      3.7508761882781982,
+      3.3935941457748413,
+      8.69322326220572
+    ],
+    "triangles": 7984,
+    "meshes": [
+      {
+        "name": "Pine | closed trunk roots branches",
+        "vertices": 1806,
+        "triangles": 3376
+      },
+      {
+        "name": "Pine | closed needle-spray volumes",
+        "vertices": 2928,
+        "triangles": 4392
+      },
+      {
+        "name": "Pine | closed moss tendrils",
+        "vertices": 120,
+        "triangles": 216
+      }
+    ],
+    "materials": 3,
+    "texture_resolution": [
+      512,
+      512
+    ],
+    "opaque_only": true,
+    "closed_leaf_geometry": true,
+    "alpha_cards": false,
+    "degenerate_triangles": 0,
+    "nonfinite_vertices": 0,
+    "engine_import_tested": false,
+    "canonical_game_dev_validation": "CLI not installed; not run",
+    "lod_level": 0,
+    "source_seed": 4126
+  }
+]

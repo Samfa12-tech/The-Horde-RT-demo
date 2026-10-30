@@ -1,0 +1,282 @@
+{
+  "sourceBase": "9d61688168e8be42b47aef13779f81fac8be000f",
+  "changedSourceSha256": {
+    "src/platform/windows/DiagnosticWindow.cpp": "5b49b8a56172997055c713f5d038ae07c28e0b172f8d4cc680da6a07ed4f98f3",
+    "src/platform/windows/WindowsSkeletonReviveCapture.inl": "96c908316080d201bed44b4b71b84ecee37a8b586f08e4d0a5475254ae8cd8ea",
+    "src/vulkan/raytracing/CharacterRenderSlot.cpp": "eb18a927eea0a8abb51f2669e9096ffe5bc69abf59a5b7575a60be64100ca4fe",
+    "src/vulkan/raytracing/CharacterRenderSlot.h": "d216790b43ad401e1a339f8b683dccfd7ce2d21a2d416dd10ec760376bdb302f",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "c0276a46bd5ed72464ca9cdd246c641aca458f43ff42d837f7f649ec10b6dbc7",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "06acbc6818d6412acc72fa0398739914f89307d6b6b47e3e28d6122b087aabaa",
+    "tests/CharacterRenderSlotSmoke.cpp": "61731fdb06c7b020bf187dc3b177d3cb2271a103394c5043dcef2abf61c0210e",
+    "tests/SkinnedCharacterModelSmoke.cpp": "5338ac216ad474c78d688d98fd904341b36aeb8937f3d5bc3ae606cecc6cec3b"
+  },
+  "evidenceClass": "Actual Debug hardware RT immutable pose capture; unpaced30Hz animation samples, not FPS, live encounter revival, gameplay lifecycle or Android acceptance",
+  "controlFrames": 150,
+  "candidateFrames": 251,
+  "controlComplete": true,
+  "candidateComplete": true,
+  "exeSha256": "45a068c540ccc22d3a756890c54edef728e9e24cf92a2f839a642c84c66bba63",
+  "sameExe": true,
+  "sameCopiedSettings": true,
+  "custodyControl": true,
+  "custodyCandidate": true,
+  "ownerFilesChecked": 151,
+  "prefixOriginalExactImages": 120,
+  "ordinaryIdleExactImages": 30,
+  "standEndEqualsOriginalIdleImage": false,
+  "repeatExactImages": 45,
+  "heldRequestAndReentryExact": true,
+  "clearedIdleEqualsOriginal": true,
+  "splitActorImageDiffers": true,
+  "allActorIdentitiesRootsFacingHealthUnchanged": true,
+  "primaryArmPixelsRange": [
+    6393,
+    6393
+  ],
+  "submittedDimensions": {
+    "internalExtent": [
+      960,
+      540
+    ],
+    "outputExtent": [
+      960,
+      540
+    ],
+    "cameraAspect": 1.77777779,
+    "presentationTransform": 0,
+    "dynamicResolutionEnabled": false,
+    "linearBlit": false,
+    "aspectPreserved": true
+  },
+  "pipeline": {
+    "executionBackend": "RayTracingPipeline",
+    "instrumentation": "diagnostic",
+    "dielectricQuality": "high",
+    "bundleKey": "diagnostic_high_pair",
+    "opaqueFast": {
+      "key": "diagnostic_high_opaque_fast",
+      "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_high_generic_dielectric",
+      "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+    },
+    "activeStrategy": "opaque-fast",
+    "activeKey": "diagnostic_high_opaque_fast",
+    "activeSha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0",
+    "waterQuality": "high"
+  },
+  "quality": {
+    "shadowQuality": {
+      "mode": "higher",
+      "localPrimarySamples": 4,
+      "skyPrimarySamples": 2,
+      "reserved": 0
+    },
+    "fireQuality": {
+      "quality": "High",
+      "volumeSteps": 10,
+      "reflectionSamples": 2,
+      "reflectedVolumeSteps": 8
+    },
+    "actualUploadedDustQuality": 2,
+    "actualUploadedMistEnabled": true
+  },
+  "resources": {
+    "bufferCount": 52,
+    "memoryAllocationCount": 63,
+    "bottomLevelAccelerationStructureCount": 21,
+    "topLevelAccelerationStructureCount": 1,
+    "tlasInstanceCount": 28,
+    "pipelineCount": 2,
+    "shaderBindingTableCount": 2,
+    "descriptorSetCount": 1,
+    "hostVisibleBytes": 11183120,
+    "deviceLocalBytes": 306703408
+  },
+  "allControlAndCandidateResourceInventoriesEqual": true,
+  "nativeSkinMinimumY": [
+    {
+      "frame": 0,
+      "phase": "corpse-hold",
+      "sampleSeconds": 2.966666698,
+      "nativeSkinMinimumLocalY": -0.005248427391
+    },
+    {
+      "frame": 45,
+      "phase": "reverse-dead",
+      "sampleSeconds": 1.966666698,
+      "nativeSkinMinimumLocalY": 0.002034205478
+    },
+    {
+      "frame": 75,
+      "phase": "reverse-dead",
+      "sampleSeconds": 0.9666666985,
+      "nativeSkinMinimumLocalY": 0.003553244751
+    },
+    {
+      "frame": 104,
+      "phase": "reverse-dead",
+      "sampleSeconds": 0,
+      "nativeSkinMinimumLocalY": 0.01391734742
+    },
+    {
+      "frame": 119,
+      "phase": "dead0-hold",
+      "sampleSeconds": 0,
+      "nativeSkinMinimumLocalY": 0.01391734742
+    },
+    {
+      "frame": 120,
+      "phase": "authored-stand",
+      "sampleSeconds": 0.03333333507,
+      "nativeSkinMinimumLocalY": 0.01391653623
+    },
+    {
+      "frame": 130,
+      "phase": "authored-stand",
+      "sampleSeconds": 0.3666666746,
+      "nativeSkinMinimumLocalY": 0.02311120741
+    },
+    {
+      "frame": 142,
+      "phase": "authored-stand",
+      "sampleSeconds": 0.7666666508,
+      "nativeSkinMinimumLocalY": 0.01403607894
+    },
+    {
+      "frame": 154,
+      "phase": "authored-stand",
+      "sampleSeconds": 1.166666627,
+      "nativeSkinMinimumLocalY": 0.01403597463
+    },
+    {
+      "frame": 164,
+      "phase": "authored-stand",
+      "sampleSeconds": 1.5,
+      "nativeSkinMinimumLocalY": 0.01080693584
+    },
+    {
+      "frame": 165,
+      "phase": "ordinary-idle",
+      "sampleSeconds": 0,
+      "nativeSkinMinimumLocalY": 0.01080686226
+    },
+    {
+      "frame": 194,
+      "phase": "ordinary-idle",
+      "sampleSeconds": 0.9666666389,
+      "nativeSkinMinimumLocalY": 0.009799173102
+    },
+    {
+      "frame": 195,
+      "phase": "request-reset-dead0",
+      "sampleSeconds": 0,
+      "nativeSkinMinimumLocalY": 0.01391734742
+    },
+    {
+      "frame": 210,
+      "phase": "repeated-stand",
+      "sampleSeconds": 0.5,
+      "nativeSkinMinimumLocalY": 0.02311114594
+    },
+    {
+      "frame": 240,
+      "phase": "repeated-stand",
+      "sampleSeconds": 1.5,
+      "nativeSkinMinimumLocalY": 0.01080693584
+    },
+    {
+      "frame": 241,
+      "phase": "request-clear-idle0",
+      "sampleSeconds": 0,
+      "nativeSkinMinimumLocalY": 0.01080686226
+    },
+    {
+      "frame": 242,
+      "phase": "held-stand-request",
+      "sampleSeconds": 0.75,
+      "nativeSkinMinimumLocalY": 0.0140360361
+    },
+    {
+      "frame": 243,
+      "phase": "held-stand-request",
+      "sampleSeconds": 0.75,
+      "nativeSkinMinimumLocalY": 0.0140360361
+    },
+    {
+      "frame": 244,
+      "phase": "held-stand-request",
+      "sampleSeconds": 0.75,
+      "nativeSkinMinimumLocalY": 0.0140360361
+    },
+    {
+      "frame": 245,
+      "phase": "held-stand-request",
+      "sampleSeconds": 0.75,
+      "nativeSkinMinimumLocalY": 0.0140360361
+    },
+    {
+      "frame": 246,
+      "phase": "held-stand-request",
+      "sampleSeconds": 0.75,
+      "nativeSkinMinimumLocalY": 0.0140360361
+    },
+    {
+      "frame": 247,
+      "phase": "request-clear-idle0",
+      "sampleSeconds": 0,
+      "nativeSkinMinimumLocalY": 0.01080686226
+    },
+    {
+      "frame": 248,
+      "phase": "stand-reentry",
+      "sampleSeconds": 0.75,
+      "nativeSkinMinimumLocalY": 0.0140360361
+    },
+    {
+      "frame": 249,
+      "phase": "split-actor-requests",
+      "sampleSeconds": 0.75,
+      "nativeSkinMinimumLocalY": 0.0140360361
+    },
+    {
+      "frame": 250,
+      "phase": "request-clear-idle0",
+      "sampleSeconds": 0,
+      "nativeSkinMinimumLocalY": 0.01080686226
+    }
+  ],
+  "liveGameplayOrSoundWired": false,
+  "nativeLoaderGate": "PASS20exactoriginalsamples plus36SSP1; see loader-r1.log",
+  "visualGate": "PASS isolated checked pose/joins in one oblique actualRT view; sampled-frame review, not continuous pacing, gameplay lifecycle or phone acceptance.",
+  "sourceHashClass": "Local Windows build-input bytes; Git checkout line endings may differ.",
+  "normalIdleBPhaseSeconds": 0.73,
+  "normalIdleBIntegration": "Outstanding: establish coherent revived Idle clock in actual shared simulation/adapter; fixture uses Idle0.",
+  "buildSetupIssue": "First multi-target command built the app but used a wrong character-test project name. Correct exact target then built and both existing tests passed; original log retained.",
+  "affectedCTests": {
+    "passed": 2,
+    "failed": 0,
+    "skinnedCharacterSeconds": 37.97,
+    "characterRenderSlotSeconds": 8.15,
+    "deadlinesChanged": false
+  },
+  "phoneAccess": false,
+  "normalBindingsChanged": false,
+  "rendererCapacityChanged": false,
+  "audioHapticManualRevalidationForPoseOnly": false,
+  "files": {
+    "joins-and-requests.png": {
+      "bytes": 1198911,
+      "sha256": "7a9f627a08e2e2db6b489db395ca9e30d7a4ff1f3d79259204bc79b6cd15a840"
+    },
+    "stand-midpoint.png": {
+      "bytes": 733930,
+      "sha256": "01ab999d461e685bc04aa4b30536a1ab60b8d3ab89ddf822f8c933875bb278d4"
+    },
+    "stand-native-animation-preview.mp4": {
+      "bytes": 471427,
+      "sha256": "faa7df155487124f4dd5094d09b3787525cf72aa7db3ff86a4129b94ef9e0806"
+    }
+  }
+}

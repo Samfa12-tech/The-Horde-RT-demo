@@ -1,0 +1,3 @@
+Original supported -Freeze invocation exited 1. Complete compilation stdout is in shader-freeze.log. The terminating diagnostic returned by the tool was:
+Raygen variant exceeds frozen budget: diagnostic_high_generic_dielectric/bytes
+Budget and pipeline catalog/artifact files remain byte-identical to the preparation base. Original outer wall duration was not captured; it is unavailable, not inferred from later timestamps.

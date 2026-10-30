@@ -1,0 +1,8 @@
+{
+  "parent": "dc0d17296b6649b6a4b67c7541a9e71306c42001",
+  "sha256": "0374dd8d4c367ff21bf586a6424e9c2f9733b6a3abecbccff9de2f43c0005a0c",
+  "bytes": 183031322,
+  "signer": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "scope": "authored scene selection and readiness-gated chapter capture",
+  "previousInstalledKnown": "b9d4663171511ada530c33c7f03d86d30b2b47d659cf9f8e2602f16ed8a6b015"
+}

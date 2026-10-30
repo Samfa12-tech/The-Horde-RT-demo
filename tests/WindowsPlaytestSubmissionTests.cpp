@@ -123,6 +123,45 @@ bool WinHttpSendContextCallbackFixture()
 int main()
 {
     {
+        CompatibilityReportSnapshot snapshot;
+        snapshot.version = "1.7.0"; snapshot.build = "local-contract";
+        const auto local = PrepareCompatibilityReport(snapshot,
+            {true, "4c417431-ff25-4928-8d5c-35ceaf7af078", "2026-10-27T00:00:00Z"});
+        Check(local.IsReady(), "renderer-independent draft needs no Vulkan device");
+        Check(!PreparePrivateDeveloperReport(local).IsReady(), "local preparation does not authorize remote delivery");
+        const auto privateReport = PreparePrivateDeveloperReport(local, true);
+        Check(privateReport.IsReady() && privateReport.LocalJson() == local.Json() &&
+            privateReport.Json().find("\"publishToBoard\":false") != std::string_view::npos,
+            "private envelope preserves reviewed bytes and cannot grant public consent");
+        WindowsPlaytestSubmission production;
+        Check(!production.BeginDeveloperReportForLocalValidation(nullptr, privateReport, "fresh-local-token"),
+            "new report kind cannot fall through to production schema1 transport");
+        unsigned calls = 0;
+        std::vector<std::string> payloads;
+        WindowsPlaytestSubmission owner([&](std::string_view body, auto, HANDLE) {
+            payloads.emplace_back(body);
+            if (++calls == 1u) return WindowsPlaytestHttpResponse{503, ""};
+            return WindowsPlaytestHttpResponse{202,
+                "{\"ok\":true,\"id\":\"4c417431-ff25-4928-8d5c-35ceaf7af078\",\"status\":\"accepted\","
+                "\"destination\":\"developer-private\",\"reportKind\":\"compatibility\"}"};
+        });
+        Check(owner.BeginDeveloperReportForLocalValidation(nullptr, privateReport, "first-local-token") && WaitIdle(owner) &&
+            owner.CanRetry(), "uncertain private receipt requires explicit retry");
+        Check(owner.Retry(nullptr, "second-local-token") && WaitIdle(owner) &&
+            owner.LastResult() == WindowsPlaytestSubmissionResult::Queued && calls == 2u,
+            "same private report retries with fresh verification and destination-bound receipt");
+        Check(payloads.size() == 2u && FrozenPayloadFromRequest(payloads[0]) == privateReport.Json() &&
+            FrozenPayloadFromRequest(payloads[1]) == privateReport.Json(), "retries do not recapture or mutate local report");
+        WindowsPlaytestSubmission wrongDestination([](std::string_view, auto, HANDLE) {
+            return WindowsPlaytestHttpResponse{200,
+                "{\"ok\":true,\"id\":\"4c417431-ff25-4928-8d5c-35ceaf7af078\",\"status\":\"sent\","
+                "\"destination\":\"public-board\",\"reportKind\":\"compatibility\"}"};
+        });
+        Check(wrongDestination.BeginDeveloperReportForLocalValidation(nullptr, privateReport, "fresh-local-token") &&
+            WaitIdle(wrongDestination) && wrongDestination.LastResult() == WindowsPlaytestSubmissionResult::Uncertain,
+            "wrong-destination receipt never claims private delivery");
+    }
+    {
         detail::PlaytestCallbackContextLeasePool pool;
         detail::PlaytestCallbackContextLifetime immediate(pool);
         Check(immediate.IsLeased() && pool.LiveCount() == 1u && immediate.AcquireHandleReference(),

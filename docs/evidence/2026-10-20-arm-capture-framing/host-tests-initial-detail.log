@@ -1,0 +1,89 @@
+Start testing: Oct 21 03:56 AUS Eastern Summer Time
+----------------------------------------------------------
+106/230 Testing: horde_rt_development_static_asset_tests
+106/230 Test: horde_rt_development_static_asset_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_development_static_asset_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_development_static_asset_tests" start time: Oct 21 03:56 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+FAIL: frozen rect-niche has no walking, crouch or rope camera displacement
+FAIL: restaging the frozen rect-niche cannot relocate its hinge or add elapsed time
+rect-niche projection-inputs yaw=-1.57079637 pitch=-0.319999993 supportY=-0.949999988 left=-0.466763765,-0.0719899163,0.212070361 right=0.230000004,-0.340000004,0.33270824 visibility=NOT_EVALUATED
+2 development static asset assertion(s) failed
+<end of output>
+Test time =   1.14 sec
+----------------------------------------------------------
+Test Failed.
+"horde_rt_development_static_asset_tests" end time: Oct 21 03:56 AUS Eastern Summer Time
+"horde_rt_development_static_asset_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+216/230 Testing: horde_rt_rescue_journey_integration_tests
+216/230 Test: horde_rt_rescue_journey_integration_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_rescue_journey_integration_tests" start time: Oct 21 03:56 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+opening projection-inputs path=generic tick=1 modern=0 yaw=3.14159274 pitch=-0.0500000007 supportY=-0.949999988 left=-0.184999987,-0.316208929,0.406987816 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+opening projection-inputs path=frozen-wrapper tick=0 modern=0 yaw=3.14159274 pitch=-0.0500000007 supportY=-0.949999988 left=-0.184999987,-0.316208929,0.406987816 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+opening projection-inputs path=configured-live tick=0 modern=1 yaw=3.14159274 pitch=0 supportY=-0.949999988 left=-0.184999987,-0.331811994,0.398269385 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=230400 staged_ns=198800 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=16246 failures=0 retained_triangles=528
+<end of output>
+Test time =   1.63 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_journey_integration_tests" end time: Oct 21 03:56 AUS Eastern Summer Time
+"horde_rt_rescue_journey_integration_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+217/230 Testing: horde_rt_chapter_terrain_journey_tests
+217/230 Test: horde_rt_chapter_terrain_journey_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe" "--authored-terrain"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_terrain_journey_tests" start time: Oct 21 03:56 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+live journey and all29 chapter views, including both mist states, retain authored-scene admission
+native-terrain moving probe frames=5788
+phone chapter mode=chapter-round-trip ticks/frame=1 frames=6280 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=3 frames=2097 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=4 frames=1572 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=6 frames=1047 stage=complete phase=complete failure=
+phone chapter mode=chapter-streaming-cycle ticks/frame=5 frames=482 stage=complete phase=complete failure=
+phone chapter mode=chapter-resident-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-resident-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+phone chapter mode=chapter-streamed-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-streamed-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+phone chapter mode=chapter-performance-route ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-performance-route ticks/frame=6 frames=563 stage=complete phase=complete failure=
+lookout held-item clearance=2.7
+shaft carry clearance=1.68
+opening projection-inputs path=generic tick=1 modern=0 yaw=3.14159274 pitch=-0.0500000007 supportY=-0.949999988 left=-0.184999987,-0.316208929,0.406987816 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+opening projection-inputs path=frozen-wrapper tick=0 modern=0 yaw=3.14159274 pitch=-0.0500000007 supportY=-0.949999988 left=-0.184999987,-0.316208929,0.406987816 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+opening projection-inputs path=configured-live tick=0 modern=1 yaw=3.14159274 pitch=0 supportY=-0.949999988 left=-0.184999987,-0.331811994,0.398269385 right=0.230000004,-0.340000004,0.347291529 visibility=NOT_EVALUATED
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=273200 staged_ns=184100 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=47788 failures=1 retained_triangles=528
+<end of output>
+Test time =  18.02 sec
+----------------------------------------------------------
+Test Failed.
+"horde_rt_chapter_terrain_journey_tests" end time: Oct 21 03:56 AUS Eastern Summer Time
+"horde_rt_chapter_terrain_journey_tests" time elapsed: 00:00:18
+----------------------------------------------------------
+
+End testing: Oct 21 03:56 AUS Eastern Summer Time

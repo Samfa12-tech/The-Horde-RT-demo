@@ -495,6 +495,11 @@ std::string BuildRtBenchmarkEvidenceJson(const RtBenchmarkEvidenceRun& run)
                 << ", \"reflectionSamples\": " << quality.reflectionSamples
                 << ", \"reflectedVolumeSteps\": " << std::min(quality.volumeSteps, quality.reflectionSamples * 4u) << '}';
         }
+        if (row.dimensions)
+        {
+            out << ", \"submittedDimensions\": ";
+            WriteRtFrameDimensionsEvidenceJson(out, *row.dimensions);
+        }
         if (row.actualUploadedDustQuality.has_value())
             out << ", \"actualUploadedDustQuality\": " << static_cast<unsigned>(*row.actualUploadedDustQuality);
         if (row.actualUploadedMistEnabled.has_value())

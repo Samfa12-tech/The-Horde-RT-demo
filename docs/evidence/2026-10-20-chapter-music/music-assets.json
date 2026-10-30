@@ -1,0 +1,173 @@
+{
+  "sourceBase": "cbfc13f66040ad694532b42442ac278c5f5d1923",
+  "manifestSha256": "672f2321b2fb429cffe9d61119103a1aa3565f355391a162497f741eec9d6e29",
+  "runtimeWavBytes": 20160704,
+  "decodedPcmBytes": 20160000,
+  "clips": [
+    {
+      "cue": "A",
+      "part": "body",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/A-body.wav",
+      "bytes": 2304044,
+      "sha256": "8c6201afb7129775ded6696c5819f4e592202d1b0f33f755b9d4f408f2e81556",
+      "frames": 576000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "A",
+      "part": "tail",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/A-tail.wav",
+      "bytes": 576044,
+      "sha256": "a7459fc656b1520be5fad2b9e11cec314d62cdf0164abdb2fda53d619d7b962c",
+      "frames": 144000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "B",
+      "part": "body",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/B-body.wav",
+      "bytes": 2304044,
+      "sha256": "27944d203f9453b7ff9edb2bfd653bac524d4da4db4a000f76115fb4810dd3b5",
+      "frames": 576000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "B",
+      "part": "tail",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/B-tail.wav",
+      "bytes": 576044,
+      "sha256": "7a437a4641f4b99d8b21db934ece9bb3a9c4d0464fea37eb94a2841d70f3132f",
+      "frames": 144000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "C",
+      "part": "body",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/C-body.wav",
+      "bytes": 576044,
+      "sha256": "3ce3a8ea381c3e81c0b34841df3f1d8d236a5ef335f594001553a400b65accb3",
+      "frames": 144000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "C",
+      "part": "tail",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/C-tail.wav",
+      "bytes": 576044,
+      "sha256": "ec3650bd450cebe9985c1d4d4b59749debe34301f9f9e889171d0e49a316c89c",
+      "frames": 144000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "D",
+      "part": "body",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/D-body.wav",
+      "bytes": 2304044,
+      "sha256": "4398311b5870e614ffe611950264e370cf819f8d323aafe291816f38e36bf4c6",
+      "frames": 576000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "D",
+      "part": "tail",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/D-tail.wav",
+      "bytes": 576044,
+      "sha256": "14550157b1a3fbf44f3d1a4dda424223475a7a0a9975b0361687bb2031f7ec50",
+      "frames": 144000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "E",
+      "part": "body",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/E-body.wav",
+      "bytes": 2304044,
+      "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03",
+      "frames": 576000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "E",
+      "part": "tail",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/E-tail.wav",
+      "bytes": 576044,
+      "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2",
+      "frames": 144000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "F",
+      "part": "body",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/F-body.wav",
+      "bytes": 2304044,
+      "sha256": "158f015c3ffbb12169eb088206751f56fbed799e0b3dea3ab4496124634b441d",
+      "frames": 576000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "F",
+      "part": "tail",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/F-tail.wav",
+      "bytes": 576044,
+      "sha256": "a4fdc4b38c8a1e7240cfad5ac364063ec8c6f27f9baefc2d2e6110a8a4429c21",
+      "frames": 144000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "G",
+      "part": "body",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/G-body.wav",
+      "bytes": 1152044,
+      "sha256": "ab2dbe31c735cbeec11d09eaa308e5faee793a891c34b67f5f50f6b33af25736",
+      "frames": 288000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "G",
+      "part": "tail",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/G-tail.wav",
+      "bytes": 576044,
+      "sha256": "c51b9851ac32e34c57e586f154d3ee1d5f2d138b9c0f21b2c983618905a42609",
+      "frames": 144000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "H",
+      "part": "body",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/H-body.wav",
+      "bytes": 2304044,
+      "sha256": "58ac260bd18204e9fb1aeb01aab9229de6830032f1d4be3d30b9527fde1fe6ae",
+      "frames": 576000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    },
+    {
+      "cue": "H",
+      "part": "tail",
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/H-tail.wav",
+      "bytes": 576044,
+      "sha256": "9e50268573d85733333e10304a0e9faf8d23545e510723035aef1b9d8b0238bf",
+      "frames": 144000,
+      "matchesHeadAndManifest": true,
+      "headComparison": "Git LFS oid and size"
+    }
+  ],
+  "editableSourcesUnchanged": true,
+  "coreTrackedBytesUnchanged": true,
+  "coreHeadTree": "975fe00388e1c868f30d21e833d4562d598ece44",
+  "musicAudioPlayback": false,
+  "listeningAcceptance": false
+}

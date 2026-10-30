@@ -1,0 +1,161 @@
+{
+  "sourceCommit": "7e0b166110bf0be40e75989779894be7e69cd67f",
+  "priorCi": {
+    "run": 41017548876,
+    "result": "success, all six jobs"
+  },
+  "windows": {
+    "sha256": "412dd0367164995fed53249e2bb3dd92166e80957077c2fbdbd3abec8e0fcbdc",
+    "bytes": 4905472,
+    "labels": [
+      "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:f1cbb8df66d52343cd5795d07bc42e7acf43252599e5f93e450788b3ebd7c353;c:R;s:D"
+    ],
+    "assets": 184,
+    "source": "9d7df2cc plus current bounded three-slot/date/readiness diff; commit binding follows",
+    "liveSend": "OFF/unavailable",
+    "experimentalGates": "unchanged OFF",
+    "profile": "own state child; four copied synthetic records, slot3 empty",
+    "launched": true,
+    "uiAcceptance": "initial activation blocked; owner-return recovery passed on exact same frozen binary",
+    "presented": true,
+    "ownedProcessStopped": true,
+    "fixtureChanges": [],
+    "sourceCommitBackedUp": "7e0b166110bf0be40e75989779894be7e69cd67f",
+    "initialBlockedAttempt": {
+      "error": "failed to activate captured window",
+      "pid": 5440,
+      "presented": false,
+      "disposition": "owned process stopped; no input or writes; no cause established"
+    }
+  },
+  "android": {
+    "frozenPath": "reports\\three-slot-ui-20261030\\horde-three-slots-clarity-debug.apk",
+    "sha256": "aeace11f5e0d07f2bf531a893fc54d543ce6676f0ba0a7d5e0ec3b276264d8fb",
+    "bytes": 201720323,
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "labels": {
+      "arm64-v8a": [
+        "g:827e09f729e143ddfb36f11bb72267fc4f5341c0;i:c897bae330010b44cd79cb10f36d35861a933939ada59d798999144c2978d7af;c:D;s:D"
+      ],
+      "armeabi-v7a": [
+        "g:827e09f729e143ddfb36f11bb72267fc4f5341c0;i:e8d1df39837a00cb030e01640cb508e909d8ff43a75f4eea8236691b3ab1edb5;c:D;s:D"
+      ],
+      "x86": [
+        "g:827e09f729e143ddfb36f11bb72267fc4f5341c0;i:e35f092b6cc3b3cf9b435dac3423f8c6edf7706b2d523acdb189e4289acbcc90;c:D;s:D"
+      ],
+      "x86_64": [
+        "g:827e09f729e143ddfb36f11bb72267fc4f5341c0;i:074cc9ab5209435afc1eae0a8c3de21291a1d0a4b4ff62d2c494bd835fc7b6ff;c:D;s:D"
+      ]
+    },
+    "source": "827e09f7 plus exact d618199f player-facing copy changes",
+    "installed": false,
+    "sourceCommitBackedUp": "d618199f5e498609307db4f06d5d7e2c60f6ccfa",
+    "applicationId": "com.samfa12.hordelanternrt.debug",
+    "versionCode": 10,
+    "versionName": "1.6.2-debug"
+  },
+  "validation": {
+    "nativeRelevantCTest": "13/13 passed; final menu delta rerun passed, 53 HWND checks",
+    "androidUnit": {
+      "registered": 535,
+      "passed": 529,
+      "skipped": 6,
+      "failed": 0,
+      "errors": 0
+    },
+    "androidLint": "0 errors, 92 warnings",
+    "androidBuild": "assembleDebug all four ABIs passed"
+  },
+  "custody": {
+    "parkedOwnerFiles": 151,
+    "changed": 0,
+    "phone": "not acquired or accessed",
+    "ownedProcess5440": "initial blocked process stopped; later R7/R8 sessions closed through Computer Use Alt+F4; no Horde process left",
+    "foreground": "released"
+  },
+  "windowsKeyboardFollowup": {
+    "sha256": "38144dd9d9176b2d4af16e9bf0e12034452438332231ff55eab803669c5c4e85",
+    "bytes": 4905472,
+    "labels": [
+      "g:3815ce2c8a77c444f2a82ceff322bf64504d3a65;i:f61a8f9d6713b359315c3fc8a1fe122a6a978d89b659749d9e07052e76fd6cef;c:R;s:D"
+    ],
+    "source": "3815ce2c plus narrow existing keyboard/focus hook for dynamic campaign buttons",
+    "assets": 184,
+    "profile": "copy of owned R7 synthetic and actually GUI-saved record; Slot3 mtime deliberately2030, embedded date2026",
+    "launched": true,
+    "ownedProcessStopped": true,
+    "uiAcceptance": "R7 mouse confirmation/save/overwrite/cold reload passed; R8 Tab/arrows/Enter/Escape and embedded-date selection passed",
+    "presented": true,
+    "initialBlockedAttempt": null,
+    "sourceCommitBackedUp": "bdb660c299b60ddaf1e1fb1b2e6c9b5809241518"
+  },
+  "intermediateCi": {
+    "head": "3815ce2c8a77c444f2a82ceff322bf64504d3a65",
+    "run": 41021067796,
+    "conclusion": "success, all six jobs"
+  },
+  "windowsObserved": {
+    "directLoad": "Slot1 auto and Slot3 actual manual reach gameplay without extra Resume",
+    "emptySave": "created Slot3 only",
+    "overwrite": "cancel preserved original four; explicit Replace saved Slot3 at18:43:15AEDT",
+    "coldLoad": "same R7 binary, exact dated Slot3, three hearts, actual RT presentation",
+    "r8Keyboard": "Tab Back->Slot1, Down twice->Slot3, Return->gameplay; Escape->pause; keyboard confirmation and Escape cancel",
+    "fileTimeWitness": "R8 copied Slot3 mtime2030-01-01 but displayed embedded30/10/2026 6:43:15PM",
+    "rtScene": {
+      "presented": true,
+      "dispatchWidth": 1232,
+      "dispatchHeight": 803
+    },
+    "dateRecordSha256": "a4dcd4ae4f7b8ff50858625360039f8fc7bff54f051a4d0864221969d07fd28c",
+    "originalFourChanged": [],
+    "limitations": [
+      "synthetic earned-state staging, not natural chapter completion",
+      "physical controller and Android touch/lifecycle not run",
+      "no FPS, sleep or lock-screen cause established"
+    ]
+  },
+  "androidPrevious": {
+    "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "sha256": "88988a12f4f2642e5fb3e379d816f497624a0a955f0d3cbed03ea269a3e683b5",
+    "bytes": 201720323,
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "labels": {
+      "arm64-v8a": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:55dd4f4d74ff959de0d5401d44cf8d819176368cd8f79c059143eebed73dbcc5;c:D;s:D"
+      ],
+      "armeabi-v7a": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:43881e26c8c31e763b63c2efd05d8c7a17d353bfac6029f80809df61e35411a5;c:D;s:D"
+      ],
+      "x86": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:8aad0c3a1f869ca12fa52c5ed86445d9fbb85a58090a222ac104e6e80b5e1e99;c:D;s:D"
+      ],
+      "x86_64": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:495b2db089210a4cf95a720756b61d3e4c0b05abbcdc920ddf957de45605496c;c:D;s:D"
+      ]
+    },
+    "installed": false,
+    "sourceCommitBackedUp": "7e0b166110bf0be40e75989779894be7e69cd67f",
+    "frozenPath": "reports\\three-slot-ui-20261030\\horde-three-slots-debug.apk"
+  },
+  "copyFollowup": {
+    "sourceCommit": "d618199f5e498609307db4f06d5d7e2c60f6ccfa",
+    "changes": "plain Saved success message; benchmark pace explanation on opening choices",
+    "validation": "535registered/529pass/6unchanged skips; lint0errors92warnings; all4ABI assembly passed; Windows Release app compile and existing simulation timing CTest passed",
+    "nativeUi": "new benchmark-copy visual check and captured-look->menu check held after physical Computer Use stop; previous save UI acceptance remains scoped to frozen R7/R8"
+  },
+  "exactCheckpointCi": {
+    "head": "827e09f729e143ddfb36f11bb72267fc4f5341c0",
+    "run": 41022958685,
+    "conclusion": "success, all six jobs"
+  }
+}

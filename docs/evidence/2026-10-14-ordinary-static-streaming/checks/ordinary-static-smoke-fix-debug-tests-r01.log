@@ -1,0 +1,9 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 152: horde_rt_desktop_controller_input_tests
+1/2 Test #152: horde_rt_desktop_controller_input_tests ...   Passed    2.07 sec
+    Start 177: horde_rt_character_render_slot_smoke
+2/2 Test #177: horde_rt_character_render_slot_smoke ......   Passed    5.98 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   8.07 sec

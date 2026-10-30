@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "assetId": "beneath-the-same-moon",
+  "title": "Beneath the Same Moon \u2014 Outdoor Exploration r2",
+  "rights": "Owner-supplied; authorised for Horde use only",
+  "sourceManifest": "assets/source/beyond_the_tomb/music/beneath-the-same-moon-outdoor-r2/source-manifest.json",
+  "render": {
+    "sourceSha256": "38244c2101d42990e37482e75995b7aa8de05a91a9753b8c1566632da64a7f6a",
+    "processing": "Full approved FLAC main decoded to PCM16 with no gain, trimming, normalization or sample-rate change; dither_method=none; strict44-byte WAV header",
+    "method": "docs/evidence/2026-10-23-outdoor-music-source/convert-candidate.py"
+  },
+  "format": {
+    "encoding": "PCM16_LE",
+    "sampleRate": 48000,
+    "channels": 2
+  },
+  "tailFrames": 0,
+  "crossfadeFrames": 12000,
+  "totalWaveBytes": 20480044,
+  "totalPcmBytes": 20480000,
+  "cues": [
+    {
+      "cue": "Outdoor",
+      "looping": true,
+      "body": {
+        "path": "runtime/outdoor-main.wav",
+        "frames": 5120000,
+        "bytes": 20480044,
+        "sha256": "14fe0a94e665cf25b4fb4aa08a45e26e18990794740b670906adfecfaf6aee15"
+      },
+      "tail": null
+    }
+  ]
+}

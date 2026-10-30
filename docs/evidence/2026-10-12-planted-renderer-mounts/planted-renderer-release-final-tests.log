@@ -1,0 +1,19 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  53: horde_rt_player_directional_rig_tests
+1/7 Test  #53: horde_rt_player_directional_rig_tests ..........   Passed    0.31 sec
+    Start  76: horde_rt_player_animation_tests
+2/7 Test  #76: horde_rt_player_animation_tests ................   Passed    0.03 sec
+    Start 161: horde_rt_skinned_arm_reference_tests
+3/7 Test #161: horde_rt_skinned_arm_reference_tests ...........   Passed    0.02 sec
+    Start 162: horde_rt_skinned_character_smoke
+4/7 Test #162: horde_rt_skinned_character_smoke ...............   Passed    3.71 sec
+    Start 164: horde_rt_player_viewmodel_admission
+5/7 Test #164: horde_rt_player_viewmodel_admission ............   Passed    0.18 sec
+    Start 180: horde_rt_rescue_rig_attachment_tests
+6/7 Test #180: horde_rt_rescue_rig_attachment_tests ...........   Passed    1.74 sec
+    Start 181: horde_rt_rescue_adversarial_regression_tests
+7/7 Test #181: horde_rt_rescue_adversarial_regression_tests ...   Passed    1.80 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =   7.83 sec

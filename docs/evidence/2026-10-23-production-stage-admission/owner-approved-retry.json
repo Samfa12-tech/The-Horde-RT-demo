@@ -1,0 +1,10 @@
+{
+  "authorization": "Owner explicitly approved retry using existing wrapper cache after known filesystem denial",
+  "elapsedSeconds": 261.16,
+  "exitCode": 0,
+  "result": "Executable CMake and Gradle RT policy contracts passed",
+  "scope": "Offline configuration cases only; Android APK compilation, device profile and installation not performed",
+  "log": "owner-approved-policy-check.txt",
+  "sourceHead": "9bd46a8f2e3139331dcafa2cd05532a9df3d061e",
+  "priorDenialsRetained": true
+}

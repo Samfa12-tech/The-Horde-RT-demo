@@ -1,0 +1,70 @@
+{
+  "files": {
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe": {
+      "bytes": 14083584,
+      "sha256": "110514db24cd2d5b6141755033840cf86d4de26f8e83a58e48a8f506be54f77f"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\horde_rt_campaign_play_session_tests.exe": {
+      "bytes": 4628480,
+      "sha256": "2f9b1aa27470712c5eeec6a2f7b29d021f459d81d264acce88be5652d719199a"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.settings.ini": {
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\tools\\validate-windows-route.py": {
+      "bytes": 5350,
+      "sha256": "bbdcfc28953c4860405c8240c3ad7f49ffa664a64d4df2bd552eb4e1afcea3e3"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\ASSET_LICENSES.md": {
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\PROJECT_MEMORY.md": {
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\platform\\windows\\DiagnosticWindow.cpp": {
+      "bytes": 619860,
+      "sha256": "6fb8a85d5cb946adf5540d88fab51040153041fba22b3dbf51ddc0996f45facc"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\platform\\windows\\windows_campaign_validation.inl": {
+      "bytes": 46527,
+      "sha256": "4a09c2848564397f1e009a91781299d571c7a36eaa9270cd4625304879294252"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\platform\\windows\\windows_route_validation.inl": {
+      "bytes": 26482,
+      "sha256": "4bc201e2d1dd183f749e5459bd8cec40b7b85f0fba656dc4a8a5dd5cf0007420"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\gameplay\\dialogue\\CompanionRouteFixture.h": {
+      "bytes": 7017,
+      "sha256": "aa2a7683c80108255743017705aae59e46b679e7241da4f57cf43ab3971a0564"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\gameplay\\simulation\\GameSimulationCampaign.cpp": {
+      "bytes": 18676,
+      "sha256": "90f98743391fe050f0d9bc3650538858053bef528f9caf5ca04ee72d4ec493b4"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\gameplay\\validation\\RecordedReturnCheckpoint.h": {
+      "bytes": 1082,
+      "sha256": "d04782738ded9b470e87ec21cdbd4a6a6baaab48eed125e83d0c2da942d4ed67"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\tests\\CampaignPlaySessionTests.cpp": {
+      "bytes": 53151,
+      "sha256": "04f6388d4e262ba8a1216721ffba3673c3b87820eabc8771bbff9c7ceafc380a"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\tests\\ForestDressingTests.cpp": {
+      "bytes": 60599,
+      "sha256": "4991c74a027f321bf9482ba9e98f65b40dafb0ddb539da3e73b9f5c00ff8897b"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-campaign-fixtures-route-20261020-r3\\slot-1-auto.hrd": {
+      "bytes": 162,
+      "sha256": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-native-route-recovery\\r3-receipt.json": {
+      "bytes": 2843,
+      "sha256": "2493fd327588e5c2b2043108aba1074e2d3a29d5b77a6a8ea9abfacef19530d0"
+    }
+  },
+  "ownerCampaignExists": false,
+  "ownerCampaignFiles": {}
+}

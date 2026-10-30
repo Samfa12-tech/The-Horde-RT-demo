@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "source": {
+    "filename": "phatphrogstudio-monster-demon-voice-death-defeat-scream-582531.mp3",
+    "sha256": "d16f67856849c0bb87d9dd6a9c09b15fd729436bdf59ec6c269108b0ebc58d35",
+    "includedInRepository": false,
+    "title": "Monster Demon Voice Death Defeat Scream",
+    "contributor": "PhatPhrogStudio",
+    "published": "2026-08-17",
+    "url": "https://pixabay.com/sound-effects/film-special-effects-monster-demon-voice-death-defeat-scream-582531/",
+    "license": "Pixabay Content License",
+    "licenseTermsUrl": "https://pixabay.com/service/terms/",
+    "usageTerms": "Game-integrated and adapted use is permitted under the Pixabay Content License; standalone redistribution of the source content is prohibited."
+  },
+  "decodedSource": {
+    "sampleRate": 48000,
+    "channels": 1,
+    "frames": 97803,
+    "durationSeconds": 2.0375625
+  },
+  "processing": {
+    "tool": "FFmpeg decode to mono 48 kHz PCM16, followed by deterministic linear endpoint fades",
+    "fadeInSeconds": 0.01,
+    "fadeOutSeconds": 0.03,
+    "gain": 1.0,
+    "reason": "Retains the complete short scream; 10 ms onset and 30 ms quiet-tail fades prevent edge clicks.",
+    "androidLayout": "Dual mono: each output frame is duplicated to left and right channels."
+  },
+  "ffmpegVersion": "ffmpeg version 9.0-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "cues": [
+    {
+      "path": "assets/audio/pixabay/keeper_death.wav",
+      "platform": "Windows",
+      "channels": 1,
+      "sampleRate": 48000,
+      "bitsPerSample": 16,
+      "frames": 97803,
+      "durationSeconds": 2.0375625,
+      "fadeInSeconds": 0.01,
+      "fadeOutSeconds": 0.03,
+      "processingGain": 1.0,
+      "outputPeak": 0.68939209,
+      "outputRms": 0.09983435,
+      "bytes": 195650,
+      "sha256": "500f76c3deb40c89c684562acedf6b7549b6b03e402cc51e09553281517d7020"
+    },
+    {
+      "path": "assets/audio/pixabay/keeper_death_core.wav",
+      "platform": "Android",
+      "channels": 2,
+      "sampleRate": 48000,
+      "bitsPerSample": 16,
+      "frames": 97803,
+      "durationSeconds": 2.0375625,
+      "fadeInSeconds": 0.01,
+      "fadeOutSeconds": 0.03,
+      "processingGain": 1.0,
+      "outputPeak": 0.68939209,
+      "outputRms": 0.09983435,
+      "bytes": 391256,
+      "sha256": "799cf5d2fdb3f69b3be82683d126fad3852c390bab726a7af9c2b8d02685594c"
+    }
+  ],
+  "ownerListeningApproval": false
+}

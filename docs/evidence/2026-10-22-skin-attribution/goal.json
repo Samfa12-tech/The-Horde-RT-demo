@@ -1,0 +1,21 @@
+{
+  "id": "generic-character-normal-transport-once",
+  "baseline": "a-baseline.jsonl",
+  "metric": "idle.vertexNs",
+  "statistic": "median",
+  "unit": "ns",
+  "direction": "lower",
+  "target": 1550000,
+  "maximumIterations": 1,
+  "allowedPaths": [
+    "src/scene/assets/SkinnedMeshAsset.cpp"
+  ],
+  "secondaryRequirements": [
+    "all three output digests unchanged",
+    "all focused correctness tests pass",
+    "pose median no regression above5 percent",
+    "closing unchanged control within10 percent of opening control",
+    "native RT frozen image parity where admitted"
+  ],
+  "scope": "MSVC Release CPU asset work, not frame FPS, GPU AS or Android benefit"
+}

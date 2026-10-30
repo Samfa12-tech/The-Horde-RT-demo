@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "utc": "2026-10-23T10:40:15.027556+00:00",
+  "baseCommit": "e5868b9a17be495c85901f877454299f23be62eb",
+  "disposition": "HOST VALIDATED; candidate phone placement/continuity and owner comfort pending",
+  "sourceCanonicalLfSha256": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "3c8dd2141ef7a2329deb6af977a984b2147bab9e3a9da7d61ecd3a99f56b39dd",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/UiControlLayout.java": "ec9be05c4226fc109217dd766652ef8ab8b41a15895847b29538528244d9dd91",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/HudSafeArea.java": "2afc0a77fece6c52891927c5be498efb1218dbc757ae8c922de35b95a23c1af4",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/InterfaceLayoutTest.java": "4d9aaecb4e7635f88f1319afd1eb9a374a8487f670fe7b6ff6af265a4b547a13",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/TouchHudPresentationTest.java": "f4a3f298e22dccf5080f1f1dbdc2fca32caa14ed820bc2eca71e2edf8b68eeee",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/CompactHudLayoutTest.java": "f9c9e843e774a2d33810c2972497ef26412126e1356696f1877ef58d4779597e",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/HudSafeAreaTest.java": "58baf1af413c9e813668189eb2111f502eadc2211b75b813e4910b517eb9be4f"
+  },
+  "androidUnit": {
+    "discovered": 417,
+    "passed": 411,
+    "skipped": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipReason": "existing Windows symbolic-link host assumptions",
+    "scope": "full suite before evidence-export-only test change; final component test rerun passes"
+  },
+  "buildAndLint": {
+    "passed": true,
+    "combinedSeconds": 58,
+    "configuration": "ordinary Debug default configured ABIs"
+  },
+  "apk": {
+    "bytes": 194997073,
+    "sha256": "3c19e74b1e34369e3208068e4c9dc19337d3d4298d0ef2365a09ed0314a4ded3",
+    "installed": false
+  },
+  "localLogSha256": {
+    "cluster-first-tests.log": "7f9c43a0ed0e793de4917a952d44c692025e3808476090a0234e8690ddd2eb5f",
+    "cluster-label-diagnosis.log": "0dc9b2d02f406ccbbdfce99134485da2d1abba11c7215398e079c37ebc528fea",
+    "cluster-corrected-tests.log": "da51472ea977bce61f421ce15e583155fe6f6b3010a1eff8cc5a0386605de224",
+    "cluster-touch-zones.log": "93ae2c8bed2e473cfc2f3c6ff0efda6e6a483530a0b8fc4bd2465667b3dacd31",
+    "cluster-checkpoint.log": "2583d5bc46823f97a9b1574aea89bc31dd3ad61081f8160c1cafa9a89d458986",
+    "cluster-font-fallback.log": "125c7af8880f4f2db2e70b160d6b75801339cbabb5521ebec38c41c38994515d",
+    "cluster-label-minimum.log": "40b69c45b27d74e0b6fd362398ad0a6851fb11e79b8baa1004cd4fa1903c4e60",
+    "cluster-final-checkpoint.log": "e297b8319a75176d861cb68f5d17e1f14deff0ea0e1d5d63e56ebfcb9159eec3",
+    "cluster-component-images.log": "2694f0b7f590800e9dd6c00cbb5f824f2f423472f89cd9f03fa06bbaa4f29db0"
+  },
+  "imageSha256": {
+    "component-411x801.png": "63197cc4929030d48bdfbf80e9573c7257770c5ee3b85f0b8374f23874e52e54",
+    "component-804x381.png": "fdbed3380d49bc202bfd105477c3febd12e7fee6f9e1fe30c7ac12ed992508ad"
+  },
+  "phoneAttempt": {
+    "status": "DISCONNECTED BEFORE SNAPSHOT",
+    "reason": "adb.exe: device 'R5GL219SZGK' not found",
+    "action": "model guard at start of isolated snapshot helper",
+    "completed": "prior identity SM-S948B, launcher foreground, no Debug PID; local host tests/build/lint",
+    "installOrSettingsOrSaveWrites": false,
+    "ownedActivityRemaining": false
+  },
+  "priorB08PhoneClosure": {
+    "utcUnixMs": 1792750524884,
+    "safeToDisconnect": true,
+    "phoneReleased": true,
+    "bothOriginalInstalledHashesRestored": true,
+    "priorSaveAndLockFiles": 18,
+    "priorSaveBytesUnchanged": true,
+    "preferenceBytesUnchanged": true,
+    "systemSettingsRestored": true,
+    "onlyAddedIsolatedTestPaths": [],
+    "ownedRendererOrTransferRemaining": false,
+    "remainingTaskOrInputMetadata": []
+  },
+  "beforeLibrary": {
+    "portrait": "libfile_535d15ea60f4819183e80cd12241dcfd",
+    "landscape": "libfile_da91d0a1910481919f5128dd5cc677dc"
+  }
+}

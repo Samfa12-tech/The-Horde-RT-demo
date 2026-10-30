@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "asset": "healing-flask-neck-fit-r2",
+  "status": "source-only-unadmitted",
+  "metresPerUnit": 1.0,
+  "up": "+Y",
+  "front": "+Z",
+  "segments": 16,
+  "profileYRadiusXRadiusZ": [
+    [
+      -0.075,
+      0.018,
+      0.012
+    ],
+    [
+      -0.068,
+      0.038,
+      0.02
+    ],
+    [
+      -0.045,
+      0.052,
+      0.026
+    ],
+    [
+      -0.005,
+      0.057,
+      0.028
+    ],
+    [
+      0.032,
+      0.049,
+      0.025
+    ],
+    [
+      0.05,
+      0.03,
+      0.018
+    ],
+    [
+      0.059,
+      0.013,
+      0.012
+    ],
+    [
+      0.111,
+      0.012,
+      0.011
+    ],
+    [
+      0.114,
+      0.014,
+      0.013
+    ],
+    [
+      0.121,
+      0.014,
+      0.013
+    ],
+    [
+      0.124,
+      0.009,
+      0.008
+    ]
+  ],
+  "grip": [
+    0.0,
+    0.065,
+    0.0
+  ],
+  "mouthRecessMetres": 0.014,
+  "mouthBottomRadiusXRadiusZ": [
+    0.006,
+    0.005
+  ],
+  "material": {
+    "name": "HealingFlaskPewter",
+    "pbrMetallicRoughness": {
+      "baseColorFactor": [
+        0.28,
+        0.25,
+        0.19,
+        1.0
+      ],
+      "metallicFactor": 0.8,
+      "roughnessFactor": 0.43
+    },
+    "alphaMode": "OPAQUE",
+    "doubleSided": false,
+    "emissiveFactor": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "budgets": {
+    "maxVertices": 400,
+    "maxTriangles": 400,
+    "maxPrimitives": 1,
+    "maxMaterials": 1,
+    "newTextures": 0,
+    "newLights": 0
+  },
+  "provenance": "Original project-authored lathed pilgrim-flask study; no third-party mesh, image, texture, provider or paid generation. User/service rights unchanged; no blanket CC0/MIT licence assigned. Neck lengthened 35 mm for the unchanged gauntlet; parent geometry/budgets/material/Grip retained.",
+  "generatorLabel": "Horde original healing-flask neck-fit r2",
+  "parentSourceSha256": "ba93fd1a0242fb806c8be3972a1db1371e1aee3cd7ee4e22be447dbb7d8e95dd"
+}

@@ -1,0 +1,26 @@
+{
+  "scope": "APK payload comparison to prepared ec43 candidate; no installation or device evidence",
+  "changedEntries": [
+    {
+      "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "previousSha256": "6239ef21650599cc8d478b646f70560e039085d55484855e550a45f313239949",
+      "currentSha256": "4a656cd8d44cf832440a87c0eacf9fffc98f1ffb3211dabd4758489844d16281"
+    },
+    {
+      "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "previousSha256": "2af5ff22a5ebb5e56ea93d78ada72ca6c109c7ff38d6ea4efc82eda1dde8f697",
+      "currentSha256": "33b0a7ef205bf47193335e08cdf81ea75d6f073b73f886827c7a4541bd4fea92"
+    },
+    {
+      "entry": "lib/x86/libhorde_rt_probe_android.so",
+      "previousSha256": "da9513912d2dab9d05b08edca6ef2a6f0edcbb9b8d785f7fe7dae7ae81fdfdbf",
+      "currentSha256": "aaa78c1561f6cedbaef046907469ac61d4c1d3ac4b10f57515cba59ea3591513"
+    },
+    {
+      "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+      "previousSha256": "1490ac16808bde40894b7381d7eb360c7abf177ef03fe9c12f367c5ab1a0bca8",
+      "currentSha256": "e9bd2ace5d846e726d660656180156143682a23e915652ba140eddcf1d0b6609"
+    }
+  ],
+  "entryRosterUnchanged": true
+}

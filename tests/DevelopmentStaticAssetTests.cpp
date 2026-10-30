@@ -1,14 +1,18 @@
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
+#include "gameplay/effects/KeeperCastPresentation.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
 #include "platform/windows/WindowsCaptureContracts.h"
 
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
+#include <iomanip>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <string_view>
 
@@ -65,10 +69,191 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 68u,
-          "development registry retains prior views and admits bounded water-lighting views");
+    Check(kDevelopmentCheckpoints.size() == 111u,
+          "development registry retains prior views and adds two bounded retention views");
+    for(const auto name : {"chapter-forest-retention-west", "chapter-forest-retention-east"}) {
+        const auto* view=FindDevelopmentCheckpoint(name);
+        Check(view && view->id>=230 && view->id<=231 &&
+            FindDevelopmentCheckpoint(view->id)==view && FindShowcaseCheckpoint(name)==nullptr &&
+            DevelopmentCheckpointRequiresAuthoredChapter(*view) &&
+            view->cameraX==-22.f && view->cameraZ==-15.2f &&
+            view->baseShowcaseCheckpointId==11 && view->rewardPose==DevelopmentRewardPose::HeldHigh &&
+            view->keeperDeathFixedTicks==240u && !view->usesProductionRewardProps && !view->stagesRescueExterior,
+            "retention views remain authored Debug-only corridor fixtures with the real raised lantern");
+        auto retentionConfig=simulation::ProductionGameSimulationConfig();
+        retentionConfig.developmentRescueJourney=true;
+        simulation::GameSimulation staged(retentionConfig);
+        Check(view && StageDevelopmentCheckpointSimulation(staged,*view) &&
+            staged.Snapshot().lich.deathDissolveProgress==1.f && staged.Snapshot().lich.staffLightStrength==0.f &&
+            staged.Snapshot().interaction.heldLightKind==interactions::HeldLightKind::RewardLantern &&
+            staged.Snapshot().chestReward.phase==interactions::ChestRewardPhase::LanternClaimed &&
+            staged.Snapshot().playerX==view->cameraX && staged.Snapshot().playerZ==view->cameraZ,
+            "composed retention fixture preserves the live post-death clock and frozen reward hand without claiming a natural fight");
+    }
+    Check(FindDevelopmentCheckpoint("chapter-understory-close") != nullptr &&
+          FindShowcaseCheckpoint("chapter-understory-close") == nullptr,
+          "understory camera is development-only and cannot alter release checkpoint lookup");
+    const std::array<const char*, 4u> stakeViews{{
+        "chapter-stake-ascent", "chapter-stake-pullup",
+        "chapter-stake-descent", "chapter-stake-repeat-ascent"}};
+    for (std::size_t i = 0u; i < stakeViews.size(); ++i)
+    {
+        const auto* stake = FindDevelopmentCheckpoint(stakeViews[i]);
+        Check(stake != nullptr && stake->id == 210 + static_cast<std::int32_t>(i) &&
+                  FindDevelopmentCheckpoint(stake->id) == stake &&
+                  stake->rescueTraversalCapture == i + 1u &&
+                  !stake->primaryArmsMayBeOutsideFrame &&
+                  FindShowcaseCheckpoint(stakeViews[i]) == nullptr,
+              "stake views have stable unique IDs, real traversal staging and strict primary-arm visibility");
+    }
     Check(FindDevelopmentCheckpoint(164) == nullptr,
-          "development lookup rejects IDs beyond the admitted samples");
+          "development lookup preserves the unassigned gap before later bounded additions");
+    const auto* worldRoute = FindDevelopmentCheckpoint("world-route");
+    const auto* stagedWorldRoute = FindDevelopmentCheckpoint("world-route-staged");
+    Check(worldRoute != nullptr && worldRoute->id == 190 &&
+              FindDevelopmentCheckpoint(190) == worldRoute &&
+              worldRoute->developmentWorldRoute && !worldRoute->stagedWorldPreparation &&
+              stagedWorldRoute != nullptr && stagedWorldRoute->id == 191 &&
+              FindDevelopmentCheckpoint(191) == stagedWorldRoute &&
+              stagedWorldRoute->developmentWorldRoute && stagedWorldRoute->stagedWorldPreparation &&
+              worldRoute->cameraX == -33.7f && worldRoute->cameraZ == -20.8f &&
+              stagedWorldRoute->cameraX == worldRoute->cameraX &&
+              stagedWorldRoute->cameraZ == worldRoute->cameraZ &&
+              FindShowcaseCheckpoint("world-route") == nullptr &&
+              FindShowcaseCheckpoint("world-route-staged") == nullptr,
+          "the appended world-route views remain bounded debug-only entries with stable name and ID lookup");
+    const auto* rescueJourney = FindDevelopmentCheckpoint("rescue-journey-start");
+    Check(rescueJourney != nullptr && rescueJourney->id == 192 &&
+              FindDevelopmentCheckpoint(192) == rescueJourney &&
+              rescueJourney->baseShowcaseCheckpointId == 0 &&
+              rescueJourney->cameraX == 0.0f && rescueJourney->cameraZ == 1.85f &&
+              rescueJourney->yaw == 3.14159265359f && rescueJourney->pitch == -0.05f &&
+              !rescueJourney->developmentWorldRoute && !rescueJourney->stagedWorldPreparation &&
+              !rescueJourney->developmentSupportFixture &&
+              FindShowcaseCheckpoint(192) == nullptr &&
+              FindShowcaseCheckpoint("rescue-journey-start") == nullptr,
+          "rescue entry retains the ordinary lower start and is absent from release checkpoints");
+    for (const auto name : {"chapter-stone-portal-front", "chapter-stone-portal-rear", "chapter-stone-wall-corner"})
+    {
+        const auto* stone = FindDevelopmentCheckpoint(name);
+        Check(stone != nullptr && stone->id >= 198 && stone->id <= 200 &&
+              FindDevelopmentCheckpoint(stone->id) == stone && FindShowcaseCheckpoint(name) == nullptr &&
+              !stone->primaryArmsMayBeOutsideFrame,
+              "stone views are development-only and retain strict primary-arm visibility");
+    }
+    for (const auto name : {"chapter-forest-first-bend", "chapter-forest-second-bend", "chapter-forest-lookout"})
+    {
+        const auto* forest = FindDevelopmentCheckpoint(name);
+        Check(forest != nullptr && forest->id >= 201 && forest->id <= 203 &&
+              FindDevelopmentCheckpoint(forest->id) == forest && FindShowcaseCheckpoint(name) == nullptr &&
+              forest->stagesRescueExterior && forest->exteriorRouteStation >= 4u &&
+              forest->exteriorRouteStation < simulation::kWorldRoutePoints.size() &&
+              !forest->primaryArmsMayBeOutsideFrame,
+              "woodland views require real rescue/native-route staging and retain strict equipment visibility");
+    }
+    const auto* lookoutCentre = FindDevelopmentCheckpoint("chapter-forest-lookout");
+    for (const auto name : {"chapter-forest-lookout-left", "chapter-forest-lookout-right"})
+    {
+        const auto* side = FindDevelopmentCheckpoint(name);
+        Check(side && lookoutCentre && side->id >= 228 && side->id <= 229 &&
+              FindDevelopmentCheckpoint(side->id) == side && FindShowcaseCheckpoint(name) == nullptr &&
+              DevelopmentCheckpointRequiresAuthoredChapter(*side) && side->stagesRescueExterior &&
+              side->exteriorRouteStation == lookoutCentre->exteriorRouteStation &&
+              side->keeperDeathFixedTicks == lookoutCentre->keeperDeathFixedTicks &&
+              side->cameraX == lookoutCentre->cameraX && side->cameraZ == lookoutCentre->cameraZ &&
+              side->pitch == lookoutCentre->pitch && !side->primaryArmsMayBeOutsideFrame &&
+              std::abs(std::abs(side->yaw - lookoutCentre->yaw) - .7853981634f) < .00001f,
+              "lookout side views preserve actual route/seed/equipment and only rotate the diagnostic gaze");
+    }
+    for (const auto name : {"chapter-pine-near", "chapter-pine-mid", "chapter-pine-far"})
+    {
+        const auto* pine = FindDevelopmentCheckpoint(name);
+        Check(pine && pine->id >= 223 && pine->id <= 225 &&
+              FindDevelopmentCheckpoint(pine->id) == pine && FindShowcaseCheckpoint(name) == nullptr &&
+              pine->stagesRescueExterior && pine->keeperDeathFixedTicks == 240u &&
+              pine->exteriorRouteStation >= 3u && pine->exteriorRouteStation <= 5u &&
+              std::abs(pine->cameraX - simulation::kWorldRoutePoints[pine->exteriorRouteStation].x) < .00001f &&
+              std::abs(pine->cameraZ - simulation::kWorldRoutePoints[pine->exteriorRouteStation].z) < .00001f &&
+              !pine->primaryArmsMayBeOutsideFrame,
+              "pine comparison views retain accepted route positions, current rules and ordinary equipment");
+    }
+    for (const auto name : {"chapter-forest-clue-forward", "chapter-forest-clue-reverse"})
+    {
+        const auto* clue = FindDevelopmentCheckpoint(name);
+        Check(clue && clue->id >= 226 && clue->id <= 227 &&
+              FindDevelopmentCheckpoint(clue->id) == clue &&
+              FindShowcaseCheckpoint(name) == nullptr && FindShowcaseCheckpoint(clue->id) == nullptr &&
+              DevelopmentCheckpointRequiresAuthoredChapter(*clue) &&
+              clue->stagesRescueExterior && clue->exteriorRouteStation == 6u &&
+              clue->keeperDeathFixedTicks == 240u && !clue->primaryArmsMayBeOutsideFrame &&
+              std::abs(clue->cameraX - simulation::kWorldRoutePoints[6].x) < .00001f &&
+              std::abs(clue->cameraZ - simulation::kWorldRoutePoints[6].z) < .00001f,
+              "F03 views remain authored, development-only station-six captures with current staging and ordinary arms");
+        if (!clue) continue;
+        std::size_t ids = 0u, names = 0u;
+        for (const auto& other : kDevelopmentCheckpoints)
+        {
+            ids += other.id == clue->id;
+            names += other.name == clue->name;
+        }
+        Check(ids == 1u && names == 1u, "F03 capture IDs and names are unique in the shared registry");
+        const auto& target = simulation::kWorldRoutePoints[clue->id == 226 ? 7u : 5u];
+        const float alongTrail = std::atan2(target.x - clue->cameraX, clue->cameraZ - target.z);
+        Check(std::abs(clue->yaw - alongTrail) < .00001f && clue->pitch == -.30f,
+              "F03 views face the actual next or previous trail segment with a bounded ground inspection pitch");
+    }
+    float previousDissolve = -1.0f;
+    for (const auto name : {"chapter-keeper-death-held", "chapter-keeper-death-dissolve", "chapter-keeper-death-retired"})
+    {
+        const auto* death = FindDevelopmentCheckpoint(name);
+        auto config = simulation::ProductionGameSimulationConfig();
+        config.developmentRescueJourney = true;
+        simulation::GameSimulation staged(config);
+        Check(death && StageDevelopmentCheckpointSimulation(staged, *death),
+              "chapter death capture stages an accepted lethal hit and fixed-step presentation");
+        const auto& keeper = staged.Snapshot().lich;
+        Check(keeper.phase == LichPhase::Dead && keeper.deathAnimationComplete &&
+                  keeper.deathDissolveProgress > previousDissolve && !keeper.damagePulse,
+              "matched death stages preserve completed animation and progress without damage");
+        Check(staged.Snapshot().finale.lichDefeated &&
+                  staged.Snapshot().chestReward.phase == interactions::ChestRewardPhase::ClosedUnlocked,
+              "death seed preserves the actual defeat and chest-unlock owners for scene lighting");
+        if (death && death->id == 204) Check(keeper.deathDissolveProgress == 0.0f, "held corpse precedes dissolve");
+        if (death && death->id == 206) Check(keeper.deathDissolveProgress == 1.0f, "last capture retires corpse");
+        previousDissolve = keeper.deathDissolveProgress;
+    }
+    for (const auto name : {"chapter-keeper-mist-fading", "chapter-keeper-mist-cleared"})
+    {
+        const auto* checkpoint = FindDevelopmentCheckpoint(name);
+        auto config = simulation::ProductionGameSimulationConfig();
+        config.developmentRescueJourney = true;
+        simulation::GameSimulation staged(config);
+        Check(checkpoint && FindShowcaseCheckpoint(name) == nullptr &&
+                  FindDevelopmentCheckpoint(checkpoint->id) == checkpoint &&
+                  StageDevelopmentCheckpointSimulation(staged, *checkpoint),
+              "mist captures remain development-only and use real accepted-hit/death fixed steps");
+        const auto& keeper = staged.Snapshot().lich;
+        Check(keeper.phase == LichPhase::Dead && keeper.deathAnimationComplete &&
+                  keeper.deathDissolveProgress == 1.0f && !keeper.damagePulse,
+              "mist-state capture cannot restore the retired Keeper or pending attack");
+        const float kind = effects::KeeperShaderPresentationKind(true, keeper);
+        if (checkpoint && checkpoint->id == 221)
+            Check(std::abs(keeper.roomMistDensityScale - .5f) < .002f && kind > .75f &&
+                      std::abs(kind - .875f) < .001f,
+                  "268 actual death ticks capture positive half mist, not body dissolve");
+        if (checkpoint && checkpoint->id == 222)
+            Check(keeper.roomMistDensityScale == 0.0f && kind == .75f,
+                  "300 actual death ticks reach the exact-zero mist gate without an epsilon");
+    }
+    for(const auto name:{"chapter-kit-reunion","chapter-kit-departure"}) {
+        const auto* kit=FindDevelopmentCheckpoint(name);
+        Check(kit && kit->stagesRescueExterior && kit->keeperDeathFixedTicks==240u &&
+              FindShowcaseCheckpoint(name)==nullptr && !kit->primaryArmsMayBeOutsideFrame,
+              "Kit captures require the actual retired-Keeper/native-ascent path and remain development-only");
+    }
+    Check(FindDevelopmentCheckpoint(209) == nullptr &&
+              FindDevelopmentCheckpoint("rescue-journey-unknown") == nullptr,
+          "development lookup rejects genuinely unknown IDs and names beyond the woodland inspections");
     const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");
     simulation::GameSimulation stagedTorchParry;
     DevelopmentCheckpointStageEvidence torchParryEvidence{};
@@ -191,6 +376,125 @@ int main()
               HasExpectedPlayerCaptureVisibility(true, true, false, 0u, false) &&
               HasExpectedPlayerCaptureVisibility(true, true, true, 0u, true),
           "declared cropping permits zero arm pixels while ordinary measured captures still require them");
+    using horde::gameplay::simulation::PlayerSupportId;
+    using horde::gameplay::simulation::SimulationSnapshot;
+    using horde::gameplay::items::HeldItemId;
+    using horde::gameplay::items::HeldItemParentMode;
+    using horde::gameplay::items::HeldHand;
+    SimulationSnapshot raisedCapture{};
+    raisedCapture.developmentSupportFixture = true;
+    raisedCapture.playerGrounded = true;
+    raisedCapture.playerSupportId = PlayerSupportId::ProofPlatform;
+    raisedCapture.playerSupportWorldY = horde::gameplay::kRouteFloorWorldY +
+        horde::gameplay::simulation::kProofSupportHeight;
+    raisedCapture.playerHeightDelta = horde::gameplay::simulation::kProofSupportHeight;
+    raisedCapture.playerX = 0.0f;
+    raisedCapture.playerZ = 0.0f;
+    raisedCapture.playerYawRadians = 0.0f;
+    raisedCapture.playerPitchRadians = -0.05f;
+    raisedCapture.interaction.heldLightKind = horde::gameplay::interactions::HeldLightKind::Torch;
+    raisedCapture.heldItems[1] = horde::gameplay::items::MakeHeldItemState(
+        HeldItemId::Sword, HeldHand::RightHand, HeldItemParentMode::BodyStow);
+    raisedCapture.heldItems[1].visualStowBlend = 1.0f;
+    raisedCapture.heldItems[1].visualGripBlend = 0.0f;
+    raisedCapture.heldItemKinematics.swordStowBlend = 1.0f;
+    raisedCapture.heldItemKinematics.swordHandGripBlend = 0.0f;
+    raisedCapture.heldItemKinematics.torchOverheadLowering = 0.333987f;
+    raisedCapture.heldItemKinematics.torchOverheadRetraction = 0.200392f;
+    using horde::platform::windows::VerticalProofRaisedCaptureEvidence;
+    VerticalProofRaisedCaptureEvidence raisedAdmission;
+    raisedAdmission.checkpointId = 171u;
+    raisedAdmission.checkpointName = "vertical-proof-raised";
+    raisedAdmission.simulation = &raisedCapture;
+    raisedAdmission.completedRtDispatch = true;
+    raisedAdmission.completedRtPresentation = true;
+    raisedAdmission.rtStorageImageCopied = true;
+    raisedAdmission.dedicatedPlayerOwnership = true;
+    raisedAdmission.primaryPlayerVisible = true;
+    raisedAdmission.primaryPixelCounterAvailable = true;
+    raisedAdmission.viewmodelGeometry = {true, true, 34304u, 11424u};
+    raisedAdmission.worldBodyGeometry = {true, true, 34304u, 11424u};
+    Check(horde::platform::windows::AdmitsVerticalProofRaisedCeilingRetraction(raisedAdmission) &&
+              HasExpectedPlayerCaptureVisibility(true, true, true, 0u, false, &raisedAdmission),
+          "the combined exact-pose, RT, ownership and finite-geometry admission permits only its proven zero-arm capture");
+    const auto rejectsAdmission = [](const VerticalProofRaisedCaptureEvidence& evidence)
+    {
+        return !horde::platform::windows::AdmitsVerticalProofRaisedCeilingRetraction(evidence) &&
+            !HasExpectedPlayerCaptureVisibility(true, true, true, 0u, false, &evidence);
+    };
+    auto invalidAdmission = raisedAdmission;
+    invalidAdmission.checkpointId = 170u;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects the wrong checkpoint ID");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.checkpointName = "vertical-proof-ground";
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects a wrong checkpoint name");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.checkpointAllowsCroppedArms = true;
+    Check(rejectsAdmission(invalidAdmission), "ceiling retraction does not become a cropped-checkpoint declaration");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.completedRtDispatch = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects missing completed RT dispatch evidence");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.completedRtPresentation = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects missing successful RT presentation");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.rtStorageImageCopied = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects missing RT image readback");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.dedicatedPlayerOwnership = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects missing dedicated ownership masks");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.viewmodelGeometry.currentUploadCaptured = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects missing viewmodel geometry");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.worldBodyGeometry.vertexCount = 0u;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects empty world-body geometry");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.viewmodelGeometry.allVertexPositionsFinite = false;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects non-finite viewmodel geometry");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.worldBodyGeometry.faceCount = 0u;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects geometry with no faces");
+    SimulationSnapshot invalidSnapshot = raisedCapture;
+    invalidSnapshot.playerSupportId = PlayerSupportId::RouteFloor;
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects a changed support surface");
+    invalidSnapshot = raisedCapture;
+    invalidSnapshot.interaction.heldLightKind = horde::gameplay::interactions::HeldLightKind::None;
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects changed equipment");
+    invalidSnapshot = raisedCapture;
+    invalidSnapshot.heldItemKinematics.torchOverheadLowering = 0.0f;
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects inactive ceiling lowering");
+    invalidSnapshot = raisedCapture;
+    invalidSnapshot.heldItemKinematics.torchOverheadRetraction = 0.0f;
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects inactive ceiling retreat");
+    invalidSnapshot = raisedCapture;
+    invalidSnapshot.heldItemKinematics.torchOverheadRetraction =
+        std::numeric_limits<float>::quiet_NaN();
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects non-finite ceiling retreat");
+    invalidSnapshot = raisedCapture;
+    invalidSnapshot.heldItemKinematics.torchOverheadLowering =
+        std::numeric_limits<float>::quiet_NaN();
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.simulation = &invalidSnapshot;
+    Check(rejectsAdmission(invalidAdmission), "combined capture admission rejects non-finite ceiling lowering");
+    invalidAdmission = raisedAdmission;
+    invalidAdmission.primaryArmPixels = 1u;
+    Check(!horde::platform::windows::AdmitsVerticalProofRaisedCeilingRetraction(invalidAdmission) &&
+              HasExpectedPlayerCaptureVisibility(true, true, true, 1u, false, &invalidAdmission),
+          "a visible arm pixel uses the ordinary capture path without invoking the zero-pixel exception");
+    Check(!HasExpectedPlayerCaptureVisibility(false, true, true, 0u, false, &raisedAdmission) &&
+              !HasExpectedPlayerCaptureVisibility(true, false, true, 0u, false, &raisedAdmission),
+          "combined evidence cannot bypass ownership or primary-instance visibility");
     for (const bool cropped : {false, true})
         Check(!HasExpectedPlayerCaptureVisibility(false, true, true, 1u, cropped) &&
                   !HasExpectedPlayerCaptureVisibility(true, false, true, 1u, cropped) &&
@@ -537,6 +841,30 @@ int main()
           "near-wall low checkpoint appends stable ID 133 with representative swing and torsion");
     const DevelopmentCheckpoint* lookUp =
         FindDevelopmentCheckpoint("lantern-held-look-up");
+    const auto* sideHigh=FindDevelopmentCheckpoint("chapter-lantern-side-wall-high");
+    const auto* sideLow=FindDevelopmentCheckpoint("chapter-lantern-side-wall-low");
+    Check(sideHigh && sideLow && sideHigh->id==216 && sideLow->id==217 &&
+          sideHigh->cameraX==-16.0f && sideHigh->cameraZ==-13.84f &&
+          sideHigh->yaw==-1.57079632679f && sideLow->cameraX==sideHigh->cameraX &&
+          sideLow->cameraZ==sideHigh->cameraZ && sideLow->yaw==sideHigh->yaw &&
+          sideHigh->rewardPose==DevelopmentRewardPose::HeldHigh &&
+          sideLow->rewardPose==DevelopmentRewardPose::HeldLow &&
+          DevelopmentCheckpointRequiresAuthoredChapter(*sideHigh) &&
+          DevelopmentCheckpointRequiresAuthoredChapter(*sideLow),
+          "side-wall capture freezes the actual chapter pose beside the coloured passage wall");
+    for(const auto& expected : std::array<std::pair<std::string_view, int>,3>{{
+        {"chapter-niche-rect",218},{"chapter-niche-arch",219},{"chapter-niche-east",220}}})
+    {
+        const auto* niche=FindDevelopmentCheckpoint(expected.first);
+        Check(niche && niche->id==expected.second &&
+              DevelopmentCheckpointRequiresAuthoredChapter(*niche) &&
+              !niche->stagesRescueExterior && !niche->primaryArmsMayBeOutsideFrame &&
+              niche->baseShowcaseCheckpointId==11 &&
+              niche->usesProductionRewardProps &&
+              niche->combatPose==DevelopmentCombatPose::Rest &&
+              niche->rewardPose==DevelopmentRewardPose::HeldHigh && niche->pitch==-.32f,
+              "niche inspection uses authored scene and keeps real primary ownership checks");
+    }
     Check(lookUp != nullptr && lookUp->id == 134 &&
               lookUp->rewardPose == DevelopmentRewardPose::HeldHigh &&
               lookUp->pitch == 0.28f,
@@ -552,6 +880,149 @@ int main()
               QueryShowcaseZone(chestHeldHigh->cameraX, chestHeldHigh->cameraZ) ==
                   ShowcaseZone::Finale,
           "post-claim chest checkpoint freezes the exact finale-room carry pose above the low chest footprint");
+    // A real chapter capture must retain the authored pose through BOTH reward
+    // imports, including the hand target used to construct the frozen pendulum.
+    for (const auto* capture : {heldHigh, heldLow, glassTransmission, motionExtreme,
+                                chestHeldHigh, wallHigh, wallLow, lookUp, sideHigh, sideLow})
+    {
+        simulation::GameSimulationConfig chapterConfig;
+        chapterConfig.developmentRescueJourney = true;
+        simulation::GameSimulation chapterCapture(chapterConfig);
+        simulation::GameSimulation legacyCapture;
+        Check(capture != nullptr && StageDevelopmentCheckpointSimulation(chapterCapture, *capture) &&
+              StageDevelopmentCheckpointSimulation(legacyCapture, *capture),
+              "reward capture stages with rescue enabled");
+        if (capture == nullptr) continue;
+        const auto chapter = chapterCapture.Snapshot();
+        const auto legacy = legacyCapture.Snapshot();
+        Check(chapter.playerX == capture->cameraX && chapter.playerZ == capture->cameraZ &&
+              chapter.playerYawRadians == capture->yaw && chapter.playerPitchRadians == capture->pitch &&
+              chapter.playerSupportWorldY == legacy.playerSupportWorldY,
+              "rescue reward capture preserves authored camera and support");
+        Check(chapter.rewardLanternWorldFromHinge == legacy.rewardLanternWorldFromHinge &&
+              chapter.lanternPendulum.worldFromBody == legacy.lanternPendulum.worldFromBody &&
+              chapter.lanternPendulum.previousPivotPosition == legacy.lanternPendulum.previousPivotPosition &&
+              chapter.lanternPendulum.previousPivotVelocity == legacy.lanternPendulum.previousPivotVelocity,
+              "rescue capture freezes pendulum at the authored hand rather than the recovery landing");
+        Check(chapterCapture.Events().Empty() && chapter.tickIndex == legacy.tickIndex,
+              "capture placement introduces no extra fixed step or feedback");
+        // Ordinary reconstruction must still use the safe lower landing.
+        chapterCapture.ImportRewardCheckpoint(chapter.chestReward, chapter.interaction, chapter.finale);
+        Check(chapterCapture.Snapshot().playerX == traversal::kLowerLanding.x &&
+              chapterCapture.Snapshot().playerZ == traversal::kLowerLanding.z &&
+              chapterCapture.Snapshot().playerSupportWorldY == kRouteFloorWorldY,
+              "public reward import retains lower-side rescue recovery");
+    }
+    {
+        // Match the Windows chapter-capture launch, rather than the historical
+        // default-config reward fixtures above. This checks frozen pose inputs;
+        // it neither projects the rig nor admits a zero-arm RT capture.
+        const auto* niche = FindDevelopmentCheckpoint("chapter-niche-rect");
+        simulation::GameSimulation nicheCapture(simulation::ProductionGameSimulationConfig());
+        nicheCapture.SetDevelopmentRescueJourney(true, true);
+        nicheCapture.SetPresentationAspect(16.0f / 9.0f);
+        const auto before = nicheCapture.Snapshot();
+        StepFixedObservationCounter steps{};
+        const DevelopmentCheckpointStepFixedObservation observer{
+            &steps, BeginObservedStepFixed, CompleteObservedStepFixed};
+        const bool staged = niche != nullptr && StageDevelopmentCheckpointSimulation(
+            nicheCapture, *niche, nullptr, &observer);
+        Check(staged, "production rect-niche pose stages through the Windows generic capture path");
+        if (staged)
+        {
+            const auto pose = nicheCapture.Snapshot();
+            const auto torso = traversal::RescueTorsoOffset(pose.rescue);
+            Check(pose.playerX == niche->cameraX && pose.playerZ == niche->cameraZ &&
+                      pose.playerYawRadians == niche->yaw && pose.playerPitchRadians == niche->pitch &&
+                      pose.playerSupportWorldY == kRouteFloorWorldY && pose.playerHeightDelta == 0.0f &&
+                      pose.playerGrounded,
+                  "production rect-niche retains the authored camera and actual lower-floor support");
+            const auto* base = FindShowcaseCheckpoint(niche->baseShowcaseCheckpointId);
+            const float expectedStageTravel = base != nullptr
+                ? std::hypot(niche->cameraX - base->x, niche->cameraZ - base->z)
+                : std::numeric_limits<float>::quiet_NaN();
+            const auto movementDiagnosticPrecision = std::cout.precision();
+            std::cout << std::setprecision(9) << "rect-niche displacement-components walkTime="
+                      << before.walkTime << "->" << pose.walkTime << " walkAmount=" << pose.walkAmount
+                      << " speed=" << pose.playerMovementSpeedMetresPerSecond
+                      << " authoritativeTravel=" << pose.playerTravelledThisTick
+                      << " crouch=" << pose.crouchActive << " crouchDrop=" << pose.playerCrouchDropMetres
+                      << " equipmentStowed=" << pose.rescue.equipmentStowed
+                      << " ropeHands=" << pose.rescue.ropeHandsActive
+                      << " torso=" << torso.x << ',' << torso.y << ',' << torso.z;
+            std::cout << " baseToAuthoredDistance=" << expectedStageTravel;
+            std::cout << '\n';
+            std::cout.precision(movementDiagnosticPrecision);
+            Check(pose.walkAmount == 0.0f && pose.walkTime == before.walkTime &&
+                      pose.playerMovementSpeedMetresPerSecond == 0.0f && base != nullptr &&
+                      std::abs(pose.playerTravelledThisTick - expectedStageTravel) < 0.00001f &&
+                      !pose.crouchActive && pose.playerCrouchDropMetres == 0.0f &&
+                      !pose.rescue.equipmentStowed && !pose.rescue.ropeHandsActive &&
+                      torso.x == 0.0f && torso.y == 0.0f && torso.z == 0.0f,
+                  "zero-delta rect-niche records its authored relocation without rendered walking, crouch or rope displacement");
+            Check(pose.interaction.heldLightKind == interactions::HeldLightKind::RewardLantern &&
+                      pose.interaction.heldLightPose == interactions::HeldLightPose::High &&
+                      pose.interaction.heldLightPoseProgress == 1.0f &&
+                      pose.chestReward.phase == interactions::ChestRewardPhase::LanternClaimed,
+                  "production rect-niche imports the actual fully raised claimed lantern");
+            Check(steps.started == 1u && steps.completed == 1u && !steps.active && !steps.invalidPairing &&
+                      pose.tickIndex == before.tickIndex + 1u && pose.walkTime == 0.0f &&
+                      pose.playerAnimation.locomotionTime == 0.0f && nicheCapture.Events().Empty(),
+                  "rect-niche observes one zero-delta publication without elapsed locomotion or feedback");
+            const auto& hinge = pose.rewardLanternWorldFromHinge;
+            const auto expectedBody = interactions::ComposeLanternPendulumBodyTransform(
+                hinge, niche->rewardForwardAngleRadians, niche->rewardStrafeAngleRadians,
+                niche->rewardTorsionAngleRadians,
+                pose.heldItemKinematics.rewardLanternPresentationYawRadians);
+            Check(pose.lanternPendulum.initialized && pose.lanternPendulum.worldFromBody == expectedBody &&
+                      pose.lanternPendulum.previousPivotPosition ==
+                          std::array<float, 3>{{hinge[12], hinge[13], hinge[14]}} &&
+                      pose.lanternPendulum.previousHandForward ==
+                          std::array<float, 3>{{hinge[8], hinge[9], hinge[10]}},
+                  "rect-niche pendulum is composed from the final authored hand hinge");
+            bool finite = true;
+            for (float value : hinge) finite = finite && std::isfinite(value);
+            for (float value : pose.lanternPendulum.worldFromBody) finite = finite && std::isfinite(value);
+            for (float value : pose.heldItemKinematics.leftHandLocal) finite = finite && std::isfinite(value);
+            for (float value : pose.heldItemKinematics.rightHandLocal) finite = finite && std::isfinite(value);
+            Check(finite, "rect-niche publishes finite projection inputs and rigid carried transforms");
+            const bool restaged = StageDevelopmentCheckpointSimulation(nicheCapture, *niche);
+            const auto& reimported = nicheCapture.Snapshot();
+            const auto restageDiagnosticPrecision = std::cout.precision();
+            std::cout << std::setprecision(9) << "rect-niche restage-components staged=" << restaged
+                      << " tick=" << pose.tickIndex << "->" << reimported.tickIndex
+                      << " walkTime=" << pose.walkTime << "->" << reimported.walkTime
+                      << " locomotionTime=" << pose.playerAnimation.locomotionTime << "->"
+                      << reimported.playerAnimation.locomotionTime
+                      << " camera=" << (reimported.playerX == pose.playerX && reimported.playerZ == pose.playerZ &&
+                          reimported.playerYawRadians == pose.playerYawRadians &&
+                          reimported.playerPitchRadians == pose.playerPitchRadians)
+                      << " support=" << (reimported.playerSupportWorldY == pose.playerSupportWorldY)
+                      << " hinge=" << (reimported.rewardLanternWorldFromHinge == hinge)
+                      << " pendulum=" << (reimported.lanternPendulum == pose.lanternPendulum)
+                      << " eventsEmpty=" << nicheCapture.Events().Empty() << '\n';
+            std::cout.precision(restageDiagnosticPrecision);
+            Check(restaged && reimported.tickIndex == pose.tickIndex + 1u &&
+                      reimported.walkTime == pose.walkTime &&
+                      reimported.playerAnimation.locomotionTime == pose.playerAnimation.locomotionTime &&
+                      reimported.playerX == pose.playerX && reimported.playerZ == pose.playerZ &&
+                      reimported.playerYawRadians == pose.playerYawRadians &&
+                      reimported.playerPitchRadians == pose.playerPitchRadians &&
+                      reimported.playerSupportWorldY == pose.playerSupportWorldY &&
+                      reimported.rewardLanternWorldFromHinge == hinge &&
+                      reimported.lanternPendulum == pose.lanternPendulum && nicheCapture.Events().Empty(),
+                  "restaging publishes one zero-delta tick with unchanged camera, hinge, pendulum and elapsed time");
+            const auto precision = std::cout.precision();
+            std::cout << std::setprecision(9) << "rect-niche projection-inputs yaw=" << pose.playerYawRadians
+                      << " pitch=" << pose.playerPitchRadians << " supportY=" << pose.playerSupportWorldY
+                      << " left=" << pose.heldItemKinematics.leftHandLocal[0] << ','
+                      << pose.heldItemKinematics.leftHandLocal[1] << ',' << pose.heldItemKinematics.leftHandLocal[2]
+                      << " right=" << pose.heldItemKinematics.rightHandLocal[0] << ','
+                      << pose.heldItemKinematics.rightHandLocal[1] << ',' << pose.heldItemKinematics.rightHandLocal[2]
+                      << " visibility=NOT_EVALUATED\n";
+            std::cout.precision(precision);
+        }
+    }
     horde::gameplay::simulation::GameSimulation stagedWallHigh;
     horde::gameplay::simulation::GameSimulation stagedWallLow;
     horde::gameplay::simulation::GameSimulation stagedLookUp;

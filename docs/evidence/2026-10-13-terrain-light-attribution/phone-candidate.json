@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "scope": "prepared local Debug candidate; not installed or accepted; native code from recorded source inputs",
+  "baseHead": "ec43baa2c03838a124ddc074ab9751505ed74629",
+  "apkSha256": "1b508d6ae48da7fedeac466c945fbd7d3ca076b12aeca8984ec30d7a32e35b72",
+  "bytes": 183124186,
+  "developmentCertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "sourceSha256": {
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "c1b2d9e4d0f6f43cc9e5944225f31b54dab6443f4badffc28ae6350c9bf22c88",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "3b976208f682a67ac9f556a100e72f035a2ce4c149d9eb6c0ef64ca48f9e7fe0",
+    "src/platform/windows/DiagnosticWindow.cpp": "e89a5a8b473d9f893ab6bc55f45a53e12f574a80d07f715d632386330855d764",
+    "src/scene/visibility/OpaqueSegmentCoverage.h": "1c838ed13bf84c14f167a1bf4a5d11599e914e7aae4d8390f3ff17b46109564e",
+    "src/scene/visibility/OpaqueStaticQuadAdmission.h": "f07f26e0b2159b70b7497b1d98770105ebbf454d2fe53398c5c0f48802d69102"
+  },
+  "installed": false
+}

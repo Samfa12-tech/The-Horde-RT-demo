@@ -1,0 +1,52 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 42
+    Start 42: horde_rt_world_route_foundation_tests
+
+42: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_world_route_foundation_tests.exe"
+42: Working Directory: <repo>/build/presets/windows-x64-debug
+42: Test timeout computed to be: 180
+42: continuous forward route failed
+42: continuous forward route failed
+42: continuous forward route failed
+42: continuous forward route failed
+42: continuous forward route failed
+42: continuous forward route failed
+42: lookout state missing
+42: continuous backtrack failed
+42: continuous backtrack failed
+42: continuous backtrack failed
+42: continuous backtrack failed
+42: continuous backtrack failed
+42: World route checks=117146 failures=12 triangles=574 resident_cpu_ns=137400 staged_cpu_ns=184000 resident_retained_bytes=34128 staged_peak_cpu_bytes=49296 directions=2 GPU_cost=not-measured
+1/1 Test #42: horde_rt_world_route_foundation_tests ...***Failed   92.42 sec
+continuous forward route failed
+continuous forward route failed
+continuous forward route failed
+continuous forward route failed
+continuous forward route failed
+continuous forward route failed
+lookout state missing
+continuous backtrack failed
+continuous backtrack failed
+continuous backtrack failed
+continuous backtrack failed
+continuous backtrack failed
+World route checks=117146 failures=12 triangles=574 resident_cpu_ns=137400 staged_cpu_ns=184000 resident_retained_bytes=34128 staged_peak_cpu_bytes=49296 directions=2 GPU_cost=not-measured
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =  92.44 sec
+
+The following tests FAILED:
+	 42 - horde_rt_world_route_foundation_tests (Failed)
+Errors while running CTest

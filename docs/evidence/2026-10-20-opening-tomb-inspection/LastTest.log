@@ -1,0 +1,78 @@
+Start testing: Oct 21 03:36 AUS Eastern Summer Time
+----------------------------------------------------------
+108/230 Testing: horde_rt_tomb_wall_recess_tests
+108/230 Test: horde_rt_tomb_wall_recess_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_tomb_wall_recess_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_tomb_wall_recess_tests" start time: Oct 21 03:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_tomb_wall_recess_tests" end time: Oct 21 03:36 AUS Eastern Summer Time
+"horde_rt_tomb_wall_recess_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+109/230 Testing: horde_rt_tomb_dressing_tests
+109/230 Test: horde_rt_tomb_dressing_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_tomb_dressing_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_tomb_dressing_tests" start time: Oct 21 03:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Imported arch front faces: triangles=14 back-facing=0 opposed-normal=0 minimum-normal-dot=1
+Native niche seam rect low-Z seam first hit fraction=0.030303
+Native niche seam rect high-Z seam first hit fraction=0.030303
+Native niche seam arch upward seam first hit fraction=0.272727
+Native niche seam east edge control first hit fraction=0.0303037
+Native fitted-frame perimeter ray checks: 148
+Native retained dressing quad witnesses: 182; BoneWax witnesses: 0
+Refined niche ray 0 back-surface t=0.15666
+Refined niche ray 1 back-surface t=0.15666
+Refined niche ray 2 back-surface t=0.17666
+Dressing metrics: vertices=19024 indices=53040 triangles=17680 primitives=4 materials=3 instances=16 bounds=[-36.9193,-0.95,-18.3137]..[6.31018,1.21901,2.16]
+Placement 0 rect niche bounds=[-2.16018,-0.54,-1.0478]..[-1.8,0.285,-0.3522]
+Placement 1 arched niche bounds=[-2.16018,-0.55,-2.9572]..[-1.8,0.35,-2.2428]
+Placement 2 rect niche bounds=[5.95,-0.5,-12.729]..[6.31018,0.275,-12.071]
+Placement 3 T03 candle 1 bounds=[-2.0967,-0.394336,-0.7342]..[-2.02921,-0.331127,-0.666956]
+Placement 4 T02 skull/jaw bounds=[-1.99798,-0.391094,-2.65305]..[-1.85595,-0.241166,-2.54695]
+Placement 5 T02 femur bounds=[-2.14459,-0.391094,-2.80403]..[-2.07041,-0.314966,-2.47]
+Placement 6 T02 humerus bounds=[-2.12354,-0.391094,-2.47539]..[-2.09146,-0.33627,-2.25]
+Placement 7 T03 candle 2 bounds=[6.13178,-0.363164,-12.5088]..[6.18822,-0.259739,-12.4526]
+Placement 8 T03 candle 3 bounds=[6.1602,-0.363164,-12.3606]..[6.2398,-0.328768,-12.2814]
+Placement 9 T03 displaced lid bounds=[-1.53,-0.58,0.22]..[-0.745,-0.395,2.16]
+Placement 10 T03 offering bowl bounds=[-31.1321,-0.95,-18.1875]..[-30.6613,-0.832,-17.7159]
+Placement 11 T03 broken urn bounds=[-36.6406,-0.95,-18.1438]..[-36.2592,-0.596276,-17.7638]
+Placement 12 T03 urn rim shard bounds=[-36.9193,-0.949589,-18.3137]..[-36.6129,-0.748349,-17.9784]
+Placement 13 T03 candle 2 bounds=[-0.21156,1.14,-6.32699]..[-0.16844,1.21901,-6.28409]
+Placement 14 T03 offering bowl bounds=[-0.0546447,1.14,-6.37625]..[0.086609,1.1754,-6.23477]
+Placement 15 T03 candle 3 bounds=[0.174594,1.14,-6.33601]..[0.235406,1.16627,-6.27551]
+Floor debris metrics: triangles=72 vertices=216 indices=216 vertexBytes=13824 indexBytes=864 primitivesDelta=0 materialsDelta=0 bounds=[1.63664,-0.951,3.14605]-[1.79058,-0.891,3.36038]
+Prepared tomb dressing import and merge checks passed.
+<end of output>
+Test time =   0.15 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_tomb_dressing_tests" end time: Oct 21 03:36 AUS Eastern Summer Time
+"horde_rt_tomb_dressing_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+159/230 Testing: horde_rt_tomb_terrain_exclusion_tests
+159/230 Test: horde_rt_tomb_terrain_exclusion_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_tomb_terrain_exclusion_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_tomb_terrain_exclusion_tests" start time: Oct 21 03:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Tomb terrain exclusion checks=21 failures=0 triangles=320
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_tomb_terrain_exclusion_tests" end time: Oct 21 03:36 AUS Eastern Summer Time
+"horde_rt_tomb_terrain_exclusion_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 21 03:36 AUS Eastern Summer Time

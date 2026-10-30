@@ -1,0 +1,49 @@
+Internal ctest changing into directory: $WORKTREE/build/presets/windows-x64-release
+UpdateCTestConfiguration  from :$WORKTREE/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:$WORKTREE/build/presets/windows-x64-release/DartConfiguration.tcl
+UpdateCTestConfiguration  from :$WORKTREE/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:$WORKTREE/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project $WORKTREE/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 41
+    Start 41: horde_rt_chapter_step_movement_tests
+
+41: Test command: "$WORKTREE\build\presets\windows-x64-release\Release\horde_rt_chapter_step_movement_tests.exe" "--positive-lifecycle"
+41: Working Directory: $WORKTREE/build/presets/windows-x64-release
+41: Test timeout computed to be: 30
+41: automatic crossing target=-23.5 ticks=55 blocked=2
+41: automatic crossing target=-22.5 ticks=75 blocked=0
+41: automatic crossing target=-24.5 ticks=172 blocked=2
+41: automatic crossing target=-22.5 ticks=152 blocked=2
+41: 67 chapter step movement checks, 0 failures; retained step bytes=680
+1/3 Test #41: horde_rt_chapter_step_movement_tests .......   Passed    2.32 sec
+test 42
+    Start 42: horde_rt_chapter_posture_rejection_tests
+
+42: Test command: "$WORKTREE\build\presets\windows-x64-release\Release\horde_rt_chapter_step_movement_tests.exe" "--rejections"
+42: Working Directory: $WORKTREE/build/presets/windows-x64-release
+42: Test timeout computed to be: 30
+42: 34 chapter step movement checks, 0 failures; retained step bytes=680
+2/3 Test #42: horde_rt_chapter_posture_rejection_tests ...   Passed    1.71 sec
+test 43
+    Start 43: horde_rt_paused_terrain_rebind_tests
+
+43: Test command: "$WORKTREE\build\presets\windows-x64-release\Release\horde_rt_chapter_step_movement_tests.exe" "--paused-terrain-rebind-only"
+43: Working Directory: $WORKTREE/build/presets/windows-x64-release
+43: Test timeout computed to be: 30
+43: 21 paused terrain rebind checks, 0 failures
+3/3 Test #43: horde_rt_paused_terrain_rebind_tests .......   Passed    0.12 sec
+
+The following tests passed:
+	horde_rt_chapter_step_movement_tests
+	horde_rt_chapter_posture_rejection_tests
+	horde_rt_paused_terrain_rebind_tests
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   4.18 sec

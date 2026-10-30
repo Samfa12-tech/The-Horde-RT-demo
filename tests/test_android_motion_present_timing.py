@@ -63,7 +63,131 @@ def encoded(report):
     return json.dumps(report, separators=(",", ":")).encode()
 
 
+def make_outdoor_report(scale=33):
+    report = make_report()
+    scenario = 'chapter-outdoor-scale-hold'
+    for obj in (report, report['motionManifest'], report['motionEvidence']):
+        obj['scenario'] = scenario
+    report['workload'] = f'motion-{scenario}-v1'
+    report['outdoorHold'] = dict(enabled=True, normalFixedStep=True, warmupWallSeconds=10,
+                                 sampleWallSeconds=30, startWallNanoseconds=1_000_000_000)
+    settings = report['settings']
+    settings['scalePercent'] = report['motionManifest']['scale'] = scale
+    settings['internalWidth'] = (settings['width'] * scale + 50) // 100
+    settings['internalHeight'] = (settings['height'] * scale + 50) // 100
+    report['motionManifest']['captures'] = 0
+    report['motionImageCaptures'] = []
+    evidence = report['motionEvidence']
+    timing = report['imagePresentationTiming']
+    state_template, frame_template = evidence['states'][0], evidence['completedRtFrames'][0]
+    timing_template, setup = timing['capture']['rows'][1], timing['capture']['rows'][0]
+    evidence['states'], evidence['completedRtFrames'], timing['capture']['rows'] = [], [], [setup]
+    setup['scalePercent'] = scale
+    for i in range(43):
+        evidence['states'].append(dict(state_template, row=i, wallNs=1_000_000_000 + i * 1_000_000_000,
+                                      tick=i * 60, ticksThisFrame=60, simulationSeconds=i, axes=[0, 0]))
+        evidence['completedRtFrames'].append(dict(frame_template, stateRow=i, tick=i * 60,
+                                                  record=11+i, recordAttempt=11+i, submission=11+i, completion=11+i))
+        timing['capture']['rows'].append(dict(timing_template, simulationTick=i * 60, scalePercent=scale,
+                                              recordSerial=11+i, submissionSerial=11+i, presentID=11+i,
+                                              actualPresentTime=2_000_000_000 + i * 1_000_000_000))
+    report['timingEligibility'].update(matchedCompletedFrames=43, expectedCompletedFrames=43)
+    timing['capture']['counters'].update(preparedPresents=44, acceptedPresents=44, queryCalls=45)
+    timing['counterDelta'] = {field: timing['capture']['counters'][field] - timing['counterBaseline'][field]
+                              for field in COUNTERS}
+    return report
+
+
 class AndroidMotionPresentTimingTests(unittest.TestCase):
+    def test_explicit_outdoor_hold_preserves_legacy_scale_policy(self):
+        for scale in (20, 33, 40):
+            with self.subTest(scale=scale):
+                report = make_outdoor_report(scale)
+                self.assertTrue(analyze_bytes(encoded(report), outdoor_hold=True)['eligible'])
+                with self.assertRaises(AnalysisError):
+                    analyze_bytes(encoded(report))
+        with self.assertRaises(AnalysisError):
+            analyze_bytes(encoded(make_report()), outdoor_hold=True)
+        with self.assertRaises(AnalysisError):
+            analyze_bytes(encoded(make_outdoor_report(50)), outdoor_hold=True)
+        legacy = make_report()
+        legacy['settings']['scalePercent'] = legacy['motionManifest']['scale'] = 20
+        with self.assertRaises(AnalysisError):
+            analyze_bytes(encoded(legacy))
+
+    def test_outdoor_hold_metadata_and_final_owner_remain_required(self):
+        for field, value in (('enabled', False), ('normalFixedStep', False), ('warmupWallSeconds', 9),
+                             ('sampleWallSeconds', 31), ('startWallNanoseconds', 0)):
+            with self.subTest(field=field):
+                report = make_outdoor_report()
+                report['outdoorHold'][field] = value
+                with self.assertRaises(AnalysisError):
+                    analyze_bytes(encoded(report), outdoor_hold=True)
+        for alteration in ('missing-hold', 'short-hold', 'missing-final-timing', 'bad-final-owner'):
+            with self.subTest(alteration=alteration):
+                report = make_outdoor_report()
+                if alteration == 'missing-hold':
+                    del report['outdoorHold']
+                elif alteration == 'short-hold':
+                    report['outdoorHold']['startWallNanoseconds'] += 4_000_000_000
+                elif alteration == 'missing-final-timing':
+                    report['imagePresentationTiming']['capture']['rows'].pop()
+                else:
+                    report['motionEvidence']['completedRtFrames'][-1]['tick'] -= 1
+                with self.assertRaises(AnalysisError):
+                    analyze_bytes(encoded(report), outdoor_hold=True)
+
+    def test_chapter_without_readbacks_still_requires_every_actual_timing_owner(self):
+        report = make_report()
+        for value in (report, report['motionManifest'], report['motionEvidence']):
+            value['scenario'] = 'chapter-round-trip'
+        report['workload'] = 'motion-chapter-round-trip-v1'
+        report['motionManifest']['captures'] = 0
+        report['motionImageCaptures'] = []
+        self.assertTrue(analyze_bytes(encoded(report))['eligible'])
+        missing = copy.deepcopy(report)
+        missing['imagePresentationTiming']['capture']['rows'].pop()
+        self.reject(missing, 'count|timestamp|join|completed|missing|counter')
+        adverse = copy.deepcopy(report)
+        adverse['imagePresentationTiming']['counterDelta']['queryErrors'] = 1
+        adverse['imagePresentationTiming']['capture']['counters']['queryErrors'] = 1
+        self.reject(adverse, 'queryErrors|adverse')
+
+    def test_comparison_modes_keep_strict_timing_and_distinct_identity(self):
+        for scenario in ('chapter-resident-comparison', 'chapter-streamed-comparison', 'keeper-torch-transition', 'chapter-performance-route'):
+            report = make_report()
+            for value in (report, report['motionManifest'], report['motionEvidence']):
+                value['scenario'] = scenario
+            report['workload'] = f'motion-{scenario}-v1'
+            report['motionManifest']['captures'] = 0
+            report['motionImageCaptures'] = []
+            self.assertTrue(analyze_bytes(encoded(report))['eligible'])
+            broken = copy.deepcopy(report)
+            broken['motionManifest']['scenario'] = 'chapter-streaming-cycle'
+            self.reject(broken, 'scenario|identity')
+            report['imagePresentationTiming']['capture']['rows'].pop()
+            self.reject(report, 'count|timestamp|join|completed|missing|counter')
+
+    def test_first_armed_image_cannot_disappear_from_an_otherwise_completed_route(self):
+        report = make_report()
+        for value in (report, report['motionManifest'], report['motionEvidence']):
+            value['scenario'] = 'chapter-performance-route'
+        report['workload'] = 'motion-chapter-performance-route-v1'
+        report['motionManifest']['captures'] = 0
+        report['motionImageCaptures'] = []
+        # Phone reproduction: all submissions fenced; only the first accepted
+        # image stays unresolved while later display timestamps are returned.
+        wrapper = report['imagePresentationTiming']
+        missing = wrapper['capture']['rows'].pop(1)
+        missing.update(actualPresentTime=0, earliestPresentTime=0, presentMargin=0)
+        wrapper['capture']['unresolved'] = [missing]
+        wrapper['capture']['status']['pendingCount'] = 1
+        self.reject(report, 'unresolved|pending|count')
+        # Removing the pending record is not a valid way to turn this into a pass.
+        wrapper['capture']['unresolved'] = []
+        wrapper['capture']['status']['pendingCount'] = 0
+        self.reject(report, 'count|timestamp|join|completed|missing|counter')
+
     def reject(self, report, fragment):
         with self.assertRaisesRegex(AnalysisError, fragment):
             analyze_bytes(encoded(report))

@@ -1,0 +1,414 @@
+{
+  "scope": "Two bounded cold-start Debug capture cases; no save/load integration or performance loop",
+  "recordedUtc": "2026-10-18T00:44:48.044204Z",
+  "sourceCommit": "0d6c22d698604d527b85fddb33f6db1fadedf2ed",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "artifactSource": "Previously sealed combined-review Debug APK; copied to reports before concurrent host bridge edits",
+  "device": {
+    "serial": "R5GL219SZGK",
+    "model": "SM-S948B",
+    "android": "17",
+    "api": "37",
+    "build": "CP2A.260605.016.S948BXXS4BZIG",
+    "securityPatch": "2026-10-05",
+    "currentUser": "0",
+    "testPackage": "com.samfa12.hordelanternrt.debug",
+    "appProcessAfter": []
+  },
+  "capabilities": {
+    "gpu": "Adreno (TM) 840",
+    "vulkan": "1.4.295",
+    "rawDriverVersion": 2150932499,
+    "driverBuild": "089d643e2a",
+    "conformance": "1.4.1.0"
+  },
+  "package": {
+    "name": "com.samfa12.hordelanternrt.debug",
+    "versionName": "1.6.2-debug",
+    "versionCode": 10,
+    "before": {
+      "path": "reports/phone-checkpoint-review-2026-10-18/installed-before.apk",
+      "sha256": "d0363ad6649aecdf3482fa2de7e6d635a8b4a23c2b101fb04929372723817dd0",
+      "bytes": 183558362
+    },
+    "candidate": {
+      "path": "reports/phone-checkpoint-review-2026-10-18/candidate-0d6c22d6.apk",
+      "sha256": "24e286544a801035a65e1b8f75d7259a27f5792b907d32552bc29882cb5cedfa",
+      "bytes": 183665114
+    },
+    "v2CertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "sameSignerVerifiedBeforeInstall": true,
+    "installCommand": "adb -s R5GL219SZGK install -r <sealed-candidate.apk>",
+    "installResult": "Success",
+    "installedApkSha256": "24e286544a801035a65e1b8f75d7259a27f5792b907d32552bc29882cb5cedfa",
+    "releasePackageTargeted": false
+  },
+  "commands": {
+    "launchTemplate": "adb -s R5GL219SZGK shell am start --user 0 --activity-single-top -n com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity --es horde.debug.checkpoint <name> --ez horde.debug.capture true --ez horde.debug.autostart true --ez horde.debug.overlay false --ez horde.debug.gpu_timing true",
+    "timeoutSeconds": 110,
+    "pollSeconds": 3,
+    "logcat": "adb -s R5GL219SZGK logcat -d -b main -b crash -v threadtime -T <device-time> --pid=<actual-test-app-PID> -s HordeRtProbeBridge HordeLanternAudio AndroidRuntime libc",
+    "capture": "adb -s R5GL219SZGK exec-out screencap -p > <local-report>.png",
+    "endTestProcess": "adb -s R5GL219SZGK shell am force-stop --user 0 com.samfa12.hordelanternrt.debug"
+  },
+  "cases": [
+    {
+      "name": "reunion",
+      "checkpoint": "chapter-kit-reunion",
+      "status": "capture-ready",
+      "stablePresentedFrames": 12,
+      "executionBackend": "RayTracingPipeline",
+      "zone": "outside",
+      "player": {
+        "x": -28.7023,
+        "z": -5.8033,
+        "yaw": 1.5708,
+        "pitch": -0.1,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.4,
+      "extent": {
+        "width": 576,
+        "height": 1188
+      },
+      "completedFrameStatus": "available",
+      "identity": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 3,
+        "recordAttemptSerial": 12,
+        "recordSerial": 12,
+        "submissionSerial": 12,
+        "completionSerial": 12,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "dispatch": {
+        "sceneReady": true,
+        "rtDispatchRecorded": true,
+        "swapchainCopyRecorded": true
+      },
+      "presentation": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 12,
+        "finalIdleCompletion": false
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "mobile",
+        "bundleKey": "diagnostic_mobile_pair",
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "6445eb11080b2c9a9ef8cbea536560b009c1a4ffd77465b8bf068b1926cb5bcf"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "5f3080952b05a1abeffee9a1c918aff6a6c38db0a70291d1a26de6e9e20c4859"
+        },
+        "activeStrategy": "opaque-fast",
+        "activeKey": "diagnostic_mobile_opaque_fast",
+        "activeSha256": "6445eb11080b2c9a9ef8cbea536560b009c1a4ffd77465b8bf068b1926cb5bcf",
+        "waterQuality": "mobile"
+      },
+      "shadowQuality": {
+        "mode": "current",
+        "localPrimarySamples": 1,
+        "skyPrimarySamples": 1,
+        "reserved": 0
+      },
+      "fireQuality": {
+        "quality": "Mobile",
+        "volumeSteps": 4,
+        "reflectionSamples": 1,
+        "reflectedVolumeSteps": 4
+      },
+      "uploadedDustQuality": 1,
+      "uploadedMistEnabled": true,
+      "latestGpu": {
+        "status": "valid",
+        "available": true,
+        "completedSubmissionSerial": 12,
+        "wholeRtGpuMs": 187.054318,
+        "timestampValidBits": 48,
+        "timestampPeriodPicoseconds": 52083,
+        "sampleCount": 12,
+        "unavailableResultCount": 0,
+        "errorCount": 0,
+        "detail": "GPU RT command-buffer timing is available."
+      },
+      "stageFailureCount": 0,
+      "fatalCrashCount": 0,
+      "captureReadyMarkers": [
+        "HORDE_CAPTURE_READY generation=1 checkpoint=chapter-kit-reunion scale=40 stable_frames=12 presented=1"
+      ],
+      "screenshotOpened": true,
+      "screenshot": {
+        "path": "reports/phone-checkpoint-review-2026-10-18/reunion-screen.png",
+        "sha256": "9e5fd614b9589c3a23f9deb89100d63d33621186cc4841e3f354b6ec5e9cce62",
+        "bytes": 3008603
+      }
+    },
+    {
+      "name": "opening",
+      "checkpoint": "opening",
+      "status": "capture-ready",
+      "stablePresentedFrames": 12,
+      "executionBackend": "RayTracingPipeline",
+      "zone": "opening",
+      "player": {
+        "x": 0.0,
+        "z": 1.85,
+        "yaw": 0.0,
+        "pitch": -0.05,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.4,
+      "extent": {
+        "width": 576,
+        "height": 1188
+      },
+      "completedFrameStatus": "available",
+      "identity": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 3,
+        "recordAttemptSerial": 12,
+        "recordSerial": 12,
+        "submissionSerial": 12,
+        "completionSerial": 12,
+        "simulationTick": 0,
+        "frameSlot": 0
+      },
+      "dispatch": {
+        "sceneReady": true,
+        "rtDispatchRecorded": true,
+        "swapchainCopyRecorded": true
+      },
+      "presentation": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 12,
+        "finalIdleCompletion": false
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "mobile",
+        "bundleKey": "diagnostic_mobile_pair",
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "6445eb11080b2c9a9ef8cbea536560b009c1a4ffd77465b8bf068b1926cb5bcf"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "5f3080952b05a1abeffee9a1c918aff6a6c38db0a70291d1a26de6e9e20c4859"
+        },
+        "activeStrategy": "opaque-fast",
+        "activeKey": "diagnostic_mobile_opaque_fast",
+        "activeSha256": "6445eb11080b2c9a9ef8cbea536560b009c1a4ffd77465b8bf068b1926cb5bcf",
+        "waterQuality": "mobile"
+      },
+      "shadowQuality": {
+        "mode": "current",
+        "localPrimarySamples": 1,
+        "skyPrimarySamples": 1,
+        "reserved": 0
+      },
+      "fireQuality": {
+        "quality": "Mobile",
+        "volumeSteps": 4,
+        "reflectionSamples": 1,
+        "reflectedVolumeSteps": 4
+      },
+      "uploadedDustQuality": 1,
+      "uploadedMistEnabled": true,
+      "latestGpu": {
+        "status": "valid",
+        "available": true,
+        "completedSubmissionSerial": 12,
+        "wholeRtGpuMs": 19.715416,
+        "timestampValidBits": 48,
+        "timestampPeriodPicoseconds": 52083,
+        "sampleCount": 12,
+        "unavailableResultCount": 0,
+        "errorCount": 0,
+        "detail": "GPU RT command-buffer timing is available."
+      },
+      "stageFailureCount": 0,
+      "fatalCrashCount": 0,
+      "captureReadyMarkers": [
+        "HORDE_CAPTURE_READY generation=1 checkpoint=opening scale=40 stable_frames=12 presented=1"
+      ],
+      "screenshotOpened": true,
+      "screenshot": {
+        "path": "reports/phone-checkpoint-review-2026-10-18/opening-screen.png",
+        "sha256": "b24a98d8e0bb503d855fd9fecddce2411d6c1e09adbd8e0ddc22bea37dd389fa",
+        "bytes": 3120829
+      }
+    }
+  ],
+  "custody": {
+    "hordeInitiallyRunning": false,
+    "initialForeground": "Launcher, user0",
+    "gameSettingsSha256Before": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "gameSettingsSha256After": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "filesAndSharedPrefsPathCountBefore": 274,
+    "filesAndSharedPrefsPathCountAfter": 274,
+    "pathInventoryIdentical": true,
+    "saveCampaignCheckpointNamedPaths": 0,
+    "webviewPrefsUnchanged": true,
+    "frameworkActivityIdsChanged": true,
+    "frameworkActivityIdsRestored": false,
+    "wholeAppDataBytesClaimedIdentical": false,
+    "appProcessAfter": [],
+    "uninstall": false,
+    "clearAppData": false,
+    "deleteSave": false,
+    "securityChange": false,
+    "saveLoadInvoked": false,
+    "temporaryCaptureReportsMayUpdate": true
+  },
+  "historicalFailure": {
+    "checkpointId": 207,
+    "outcome": "NOT REPRODUCED",
+    "cause": "UNATTRIBUTED",
+    "fixedClaim": false,
+    "newFailureDiagnosticsObserved": false
+  },
+  "inspectionIssues": [
+    "Initial sandbox ADB daemon start failed; explicit authorized host ADB succeeded. No device edit occurred before identity/signature/data inspection.",
+    "Initial unqualified pm list packages reported permission denial for user150; current user0 and ps -A showed no Horde process. Explicit-user0 launch/stop used; no user/security changes."
+  ],
+  "evidenceClass": "Exact installed Debug bytes, physical Pipeline checkpoint startup and owning RT-produced presentation with opened frozen screenshots",
+  "limits": [
+    "Query backend NOT RUN",
+    "Integrated Save/Load NOT RUN",
+    "Menus/touch NOT RUN",
+    "Home/resume NOT RUN",
+    "Process-death save recovery NOT RUN",
+    "POSIX directory-fsync and physical power-loss durability NOT RUN",
+    "Sustained or matched performance NOT RUN",
+    "Owner visual/audio/haptic acceptance NOT RUN",
+    "Capability-file initial completed-frame observer pending: current-frame proof comes from later showcase state"
+  ],
+  "audioHapticManualRevalidation": "NO additional requirement from capture-only review; future integrated load acceptance remains",
+  "localArtifacts": [
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/device.json",
+      "sha256": "a46dc6daeae8a11a4c0879607d41d7cccd420331e11e56ce03c5f4366074f287",
+      "bytes": 275
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/full-inventory-after.txt",
+      "sha256": "5a95102852739fe9adf60918d91261dc07ea31834e47f42c8bf5b51780955fb9",
+      "bytes": 19742
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/full-inventory-before.txt",
+      "sha256": "5a95102852739fe9adf60918d91261dc07ea31834e47f42c8bf5b51780955fb9",
+      "bytes": 19742
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/inventory-before.txt",
+      "sha256": "be70a75d93e58e45c38731a5c79d6789c1a17fdb5425fe7083f2d177ee9763a7",
+      "bytes": 484
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/opening-capability.json",
+      "sha256": "5b08c66566ebdcfa87208d34abbf9762210e677aef97a1e743f371a3e555a10d",
+      "bytes": 5797
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/opening-logcat.txt",
+      "sha256": "26b9e8c6bdb5729ce7ba9a326613b4ed2955ddc3ffbc62e6e1e9e43e509ed802",
+      "bytes": 13793
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/opening-pid.txt",
+      "sha256": "fe3bf12be0f69d8c2e05ecb41d0ef04328ee930e649ea70992cd887049fb2ab5",
+      "bytes": 7
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/opening-screen.png",
+      "sha256": "b24a98d8e0bb503d855fd9fecddce2411d6c1e09adbd8e0ddc22bea37dd389fa",
+      "bytes": 3120829
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/opening-start-stamp.txt",
+      "sha256": "2776aab36d493add11b456abef84edfe1203c55283b54b5243d2cde71e3f7d4f",
+      "bytes": 22
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/opening-start.txt",
+      "sha256": "63fa147a0128ba4ae81f9b82ae7b4ceee6d0d126a45a7d9a26ee4e2b7c0fff8e",
+      "bytes": 127
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/opening-state.json",
+      "sha256": "a46af78c0dfd7051a0c21d5c76d4a0bf770dce1a63d896abad08445d23b2c2e5",
+      "bytes": 7539
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/preferences-after.sha256",
+      "sha256": "1e58a45b3aa629d5a36b6bfb49d5c6d91b88865f966e2fe38264c8a8b8ec8410",
+      "bytes": 442
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/preferences-before.sha256",
+      "sha256": "2f94c4b443f5d06bbecdf306f31445ccfc030d3d04ad6e1d64a0ac555e3da862",
+      "bytes": 442
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/reunion-capability.json",
+      "sha256": "5aa4bd564c885c56329e71bbe598623540a3a46d6ff1936027e6f7232fc27c3f",
+      "bytes": 2577
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/reunion-foreground.txt",
+      "sha256": "0ec681bc7565c4f1a3471048b86be23dabcc80bb9dce41f06a345545b3308a46",
+      "bytes": 132
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/reunion-logcat.txt",
+      "sha256": "68eddaf791087745960ab90e879df6256c415c8136169a883ac7b036a04e1c76",
+      "bytes": 18784
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/reunion-pid.txt",
+      "sha256": "8828a13bfcf94825081cd4aa6deecf73bc49b4daf0e07511b690447b93ee6efd",
+      "bytes": 7
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/reunion-screen.png",
+      "sha256": "9e5fd614b9589c3a23f9deb89100d63d33621186cc4841e3f354b6ec5e9cce62",
+      "bytes": 3008603
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/reunion-start-stamp.txt",
+      "sha256": "becb457b15cf0aa818c49e460bc1266f6a5a4df21cf5ed2e3ec3086acd83ae38",
+      "bytes": 22
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/reunion-start.txt",
+      "sha256": "63fa147a0128ba4ae81f9b82ae7b4ceee6d0d126a45a7d9a26ee4e2b7c0fff8e",
+      "bytes": 127
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/reunion-state.json",
+      "sha256": "7e7018be325fff26464946488cc3de8f0dd9f5053f3245f600c215897440250e",
+      "bytes": 7574
+    },
+    {
+      "path": "reports/phone-checkpoint-review-2026-10-18/settings-before.sha256",
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01",
+      "bytes": 113
+    }
+  ]
+}

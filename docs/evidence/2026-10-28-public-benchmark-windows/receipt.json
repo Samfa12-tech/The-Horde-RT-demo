@@ -1,0 +1,33 @@
+{
+  "baseCommit": "02ece6502e72ad3f43202b0d52f93ed50c875ba2",
+  "localTests": {
+    "selected": 2,
+    "passed": 2,
+    "seconds": 2.57,
+    "windowsSourceChecks": 40
+  },
+  "windowsNativeBuild": "passed after include-scope correction",
+  "gameOrFormLaunched": false,
+  "phoneUsed": false,
+  "reportsSent": 0,
+  "published": false,
+  "privateFixtureOutputSha256": "6c0c4bdb67d0bab311f9f82cec63f9cc9f97972c4dd8b17b95831a6c5728617b",
+  "privateEvidence": [
+    {
+      "path": "reports/windows-public-preview-build.log",
+      "sha256": "a50bd8e59b6e0b9401e3665ca8742a736f6771369efdbb3adf4fde78ff037549"
+    },
+    {
+      "path": "reports/windows-public-preview-build-fixed.log",
+      "sha256": "b9f4cd5bb56c7208a3722963c76146259af8d18d5a6bbfdda9ca705c846957c5"
+    },
+    {
+      "path": "reports/windows-public-preview-tests.log",
+      "sha256": "ace74f0242e05d5c25be44ffe77b94b7291bb198fa3b42c537570305f5bfe3a7"
+    },
+    {
+      "path": "reports/windows-public-preview-wire-check.json",
+      "sha256": "24ee41e5541de40676c3783e3351fd629a7ae3477c18d024d87075681f4546e8"
+    }
+  ]
+}

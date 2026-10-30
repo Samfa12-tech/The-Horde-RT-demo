@@ -1,0 +1,326 @@
+{
+  "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+  "argv": [
+    "frozen_mist.exe",
+    "--capture-showcase",
+    "<repo>\\reports\\mist-interval-prototype\\captures\\higher-diagnostic_high_generic_dielectric-interval-yaw-0.025-2",
+    "--development-checkpoint",
+    "rescue-journey-start",
+    "--capture-dust",
+    "standard"
+  ],
+  "environment": {
+    "HORDE_MIST_PROBE_MODE": "0",
+    "HORDE_MIST_PROBE_SHADOW": "HIGHER",
+    "HORDE_MIST_VIEW_YAW": "-0.025"
+  },
+  "mode": 0,
+  "quality": "HIGHER",
+  "elapsed_seconds": 3.8898626000009244,
+  "exit_code": 1,
+  "exe_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+  "shader": {
+    "name": "diagnostic_high_generic_dielectric-interval",
+    "source_sha256": "4f91cf541d929d324cfeaf12eed0bc021bab23167e292e34b22a13f1da0b2903",
+    "spirv_sha256": "eb3db3611c9c9bb58d395ceec61420a5f034d950b4acac5627b4120f384eefb3",
+    "include_sha256": "61b4b45e9cc401541839cb24c5627966343b73421fc66793ee72003703b827ec",
+    "bytes": 305592,
+    "words": 76398,
+    "instructions": 18291,
+    "branchOperations": 1065,
+    "loops": 27,
+    "selectionMerges": 441,
+    "functions": 85,
+    "functionCalls": 267,
+    "rayQueryInitializations": 3,
+    "atomicInstructions": 41,
+    "key": "diagnostic_high_generic_dielectric",
+    "excess": {
+      "bytes": 9632,
+      "words": 2408,
+      "instructions": 642,
+      "branchOperations": 79,
+      "loops": 6,
+      "selectionMerges": 25,
+      "functions": 2,
+      "functionCalls": 3,
+      "rayQueryInitializations": 1
+    }
+  },
+  "completed_frame": {
+    "schema": 1,
+    "identity": {
+      "sceneEpoch": 2,
+      "measurementGeneration": 1,
+      "recordAttemptSerial": 12,
+      "recordSerial": 12,
+      "submissionSerial": 12,
+      "completionSerial": 12,
+      "simulationTick": 601,
+      "frameSlot": 0
+    },
+    "pipeline": {
+      "executionBackend": "RayTracingPipeline",
+      "instrumentation": "diagnostic",
+      "dielectricQuality": "high",
+      "bundleKey": "diagnostic_high_pair",
+      "opaqueFast": {
+        "key": "diagnostic_high_opaque_fast",
+        "sha256": "71791b0672256ab830d16f2c4c711a365e86a63f97c753d825d4a4cebe8e9704"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_high_generic_dielectric",
+        "sha256": "eb3db3611c9c9bb58d395ceec61420a5f034d950b4acac5627b4120f384eefb3"
+      },
+      "activeStrategy": "generic-dielectric",
+      "activeKey": "diagnostic_high_generic_dielectric",
+      "activeSha256": "eb3db3611c9c9bb58d395ceec61420a5f034d950b4acac5627b4120f384eefb3",
+      "waterQuality": "high"
+    },
+    "dispatch": {
+      "sceneReady": true,
+      "rtDispatchRecorded": true,
+      "swapchainCopyRecorded": true
+    },
+    "shadowQuality": {
+      "mode": "higher",
+      "localPrimarySamples": 4,
+      "skyPrimarySamples": 2,
+      "reserved": 0
+    },
+    "fireQuality": {
+      "quality": "High",
+      "volumeSteps": 10,
+      "reflectionSamples": 2,
+      "reflectedVolumeSteps": 8
+    },
+    "actualUploadedDustQuality": 2,
+    "actualUploadedMistEnabled": true,
+    "fireLighting": {
+      "count": 1,
+      "emitters": [
+        {
+          "stableId": 1279348308,
+          "positionStrength": [
+            -34.4869728,
+            0.115621075,
+            -14.0570421,
+            0.686399996
+          ],
+          "colourIntensity": [
+            1,
+            0.426759988,
+            0.0815246254,
+            0.686399996
+          ]
+        },
+        {
+          "stableId": 0,
+          "positionStrength": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "colourIntensity": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "stableId": 0,
+          "positionStrength": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "colourIntensity": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "stableId": 0,
+          "positionStrength": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "colourIntensity": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "resources": {
+      "bufferCount": 53,
+      "memoryAllocationCount": 64,
+      "bottomLevelAccelerationStructureCount": 21,
+      "topLevelAccelerationStructureCount": 1,
+      "tlasInstanceCount": 27,
+      "pipelineCount": 2,
+      "shaderBindingTableCount": 2,
+      "descriptorSetCount": 1,
+      "hostVisibleBytes": 12516704,
+      "deviceLocalBytes": 311146192
+    },
+    "player": {
+      "skinCadenceHz": 60,
+      "skinUpdateCount": 1,
+      "maximumSocketErrorMicrometres": 10,
+      "primaryPixelCountAvailable": true,
+      "primaryPixelCount": 50238,
+      "primaryVisible": true
+    },
+    "dielectric": {
+      "status": "valid",
+      "available": true,
+      "compiled": true,
+      "completedSubmissionSerial": 12,
+      "readCount": 12,
+      "resetCount": 12,
+      "counters": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        605,
+        605,
+        605,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2152,
+        0,
+        0,
+        0,
+        5,
+        605,
+        300,
+        60299,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2491,
+        0,
+        50238,
+        1030,
+        23712
+      ],
+      "detail": "Diagnostic counters were collected after the owning fence."
+    },
+    "gpu": {
+      "status": "valid",
+      "available": true,
+      "completedSubmissionSerial": 12,
+      "wholeRtGpuMs": 6.471072,
+      "timestampValidBits": 64,
+      "timestampPeriodPicoseconds": 1000,
+      "sampleCount": 12,
+      "unavailableResultCount": 0,
+      "errorCount": 0,
+      "detail": "GPU RT command-buffer timing is available."
+    },
+    "stages": {
+      "status": "valid",
+      "simulationStepCpuMs": 0.0,
+      "skinCpuMs": 0.0,
+      "playerSkinCpuMs": 0.0,
+      "characterSkinCpuMs": 0.0,
+      "dynamicUploadCpuMs": 0.0617,
+      "blasRefitRecordCpuMs": 0.0327,
+      "tlasUpdateRecordCpuMs": 0.0082,
+      "traceCopyRecordCpuMs": 0.0319,
+      "frameFenceWaitCpuMs": 6.4726,
+      "imageAcquireCpuMs": 0.0063,
+      "queueSubmitCpuMs": 0.1101,
+      "presentCallCpuMs": 0.1336,
+      "wholeFrameCycleCpuMs": 8.4059,
+      "workInvocationCounts": [
+        0,
+        0,
+        0,
+        0,
+        9,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "byteCounts": [
+        0,
+        0,
+        0,
+        0,
+        111440,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "operationCounts": [
+        0,
+        0,
+        0,
+        0,
+        9,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 12,
+      "finalIdleCompletion": true
+    },
+    "cpuBenchmarkEligible": true,
+    "benchmarkEligible": true
+  },
+  "files": {
+    "192-rescue-journey-start.png": "a25b27728e80b90c52fd87fe1c556403c954a4c94804c54bb3a8ae820b68f783",
+    "capture-manifest.json": "e45fa961199f6c77a730ca84b8dafedd17c5f62487f7c8545f69d3f10448a2e2",
+    "capture.log": "3d8f91266b916b3d740945985e1827f07e91fc0d12de158060f2c2d7dba2754c",
+    "completed-frame.json": "5338339556c5a7c92c301edfed26cdfaf7908853fc958b978e734c17316512d6",
+    "frozen-state.json": "54ac2f84ad2226b574906fc01e4acb8b61693776289877a07c800a969628fd33",
+    "native-resources.json": "4673edf08f61e6b3e20bf6aa433cf68825070ca91611e4bb5fd445d094569a4d"
+  }
+}

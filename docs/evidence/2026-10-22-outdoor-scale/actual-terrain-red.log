@@ -1,0 +1,17 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 150: horde_rt_dry_footstep_tests
+1/1 Test #150: horde_rt_dry_footstep_tests ......***Failed    0.84 sec
+actual-terrain203 staged=1 failure=none overflow=48 tick=2757 x=13.3049 z=36.2046 y=-1.14039 claim=1 deployment=1 attackEdges=0 swingEvents=0 enemyHits=0
+FAIL: long diagnostic exterior preparation drains events without overflowing or erasing an overflow counter
+461 dry footstep host checks, 1 failures
+Logical restore and native CPU terrain/motor fixtures only. Airborne gate is a cadence unit check; no jump motor, actual listening or physical device acceptance is claimed.
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.87 sec
+
+The following tests FAILED:
+	150 - horde_rt_dry_footstep_tests (Failed)
+Errors while running CTest

@@ -1,0 +1,170 @@
+[
+  {
+    "name": "reject-diagnostic_high_generic_dielectric-bytes-one-low",
+    "metric": "bytes",
+    "maximum": 295959,
+    "measured": 295960,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_high_generic_dielectric/bytes"
+  },
+  {
+    "name": "reject-diagnostic_high_generic_dielectric-words-one-low",
+    "metric": "words",
+    "maximum": 73989,
+    "measured": 73990,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_high_generic_dielectric/words"
+  },
+  {
+    "name": "reject-diagnostic_high_generic_dielectric-instructions-one-low",
+    "metric": "instructions",
+    "maximum": 17648,
+    "measured": 17649,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_high_generic_dielectric/instructions"
+  },
+  {
+    "name": "reject-diagnostic_high_opaque_fast-bytes-one-low",
+    "metric": "bytes",
+    "maximum": 595519,
+    "measured": 595520,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_high_opaque_fast/bytes"
+  },
+  {
+    "name": "reject-diagnostic_high_opaque_fast-words-one-low",
+    "metric": "words",
+    "maximum": 148879,
+    "measured": 148880,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_high_opaque_fast/words"
+  },
+  {
+    "name": "reject-diagnostic_high_opaque_fast-instructions-one-low",
+    "metric": "instructions",
+    "maximum": 33066,
+    "measured": 33067,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_high_opaque_fast/instructions"
+  },
+  {
+    "name": "reject-diagnostic_mobile_generic_dielectric-bytes-one-low",
+    "metric": "bytes",
+    "maximum": 294459,
+    "measured": 294460,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_mobile_generic_dielectric/bytes"
+  },
+  {
+    "name": "reject-diagnostic_mobile_generic_dielectric-words-one-low",
+    "metric": "words",
+    "maximum": 73614,
+    "measured": 73615,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_mobile_generic_dielectric/words"
+  },
+  {
+    "name": "reject-diagnostic_mobile_generic_dielectric-instructions-one-low",
+    "metric": "instructions",
+    "maximum": 17552,
+    "measured": 17553,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_mobile_generic_dielectric/instructions"
+  },
+  {
+    "name": "reject-diagnostic_mobile_opaque_fast-bytes-one-low",
+    "metric": "bytes",
+    "maximum": 592419,
+    "measured": 592420,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_mobile_opaque_fast/bytes"
+  },
+  {
+    "name": "reject-diagnostic_mobile_opaque_fast-words-one-low",
+    "metric": "words",
+    "maximum": 148104,
+    "measured": 148105,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_mobile_opaque_fast/words"
+  },
+  {
+    "name": "reject-diagnostic_mobile_opaque_fast-instructions-one-low",
+    "metric": "instructions",
+    "maximum": 32873,
+    "measured": 32874,
+    "required_rejection": "Raygen variant exceeds frozen budget: diagnostic_mobile_opaque_fast/instructions"
+  },
+  {
+    "name": "reject-shipping_high_generic_dielectric-bytes-one-low",
+    "metric": "bytes",
+    "maximum": 287131,
+    "measured": 287132,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_high_generic_dielectric/bytes"
+  },
+  {
+    "name": "reject-shipping_high_generic_dielectric-words-one-low",
+    "metric": "words",
+    "maximum": 71782,
+    "measured": 71783,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_high_generic_dielectric/words"
+  },
+  {
+    "name": "reject-shipping_high_generic_dielectric-instructions-one-low",
+    "metric": "instructions",
+    "maximum": 17224,
+    "measured": 17225,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_high_generic_dielectric/instructions"
+  },
+  {
+    "name": "reject-shipping_high_opaque_fast-bytes-one-low",
+    "metric": "bytes",
+    "maximum": 591283,
+    "measured": 591284,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_high_opaque_fast/bytes"
+  },
+  {
+    "name": "reject-shipping_high_opaque_fast-words-one-low",
+    "metric": "words",
+    "maximum": 147820,
+    "measured": 147821,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_high_opaque_fast/words"
+  },
+  {
+    "name": "reject-shipping_high_opaque_fast-instructions-one-low",
+    "metric": "instructions",
+    "maximum": 32887,
+    "measured": 32888,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_high_opaque_fast/instructions"
+  },
+  {
+    "name": "reject-shipping_mobile_generic_dielectric-bytes-one-low",
+    "metric": "bytes",
+    "maximum": 285631,
+    "measured": 285632,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_mobile_generic_dielectric/bytes"
+  },
+  {
+    "name": "reject-shipping_mobile_generic_dielectric-words-one-low",
+    "metric": "words",
+    "maximum": 71407,
+    "measured": 71408,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_mobile_generic_dielectric/words"
+  },
+  {
+    "name": "reject-shipping_mobile_generic_dielectric-instructions-one-low",
+    "metric": "instructions",
+    "maximum": 17128,
+    "measured": 17129,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_mobile_generic_dielectric/instructions"
+  },
+  {
+    "name": "reject-shipping_mobile_opaque_fast-bytes-one-low",
+    "metric": "bytes",
+    "maximum": 588183,
+    "measured": 588184,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_mobile_opaque_fast/bytes"
+  },
+  {
+    "name": "reject-shipping_mobile_opaque_fast-words-one-low",
+    "metric": "words",
+    "maximum": 147045,
+    "measured": 147046,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_mobile_opaque_fast/words"
+  },
+  {
+    "name": "reject-shipping_mobile_opaque_fast-instructions-one-low",
+    "metric": "instructions",
+    "maximum": 32694,
+    "measured": 32695,
+    "required_rejection": "Raygen variant exceeds frozen budget: shipping_mobile_opaque_fast/instructions"
+  }
+]

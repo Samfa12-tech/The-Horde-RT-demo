@@ -1,0 +1,54 @@
+Start testing: Oct 20 21:29 AUS Eastern Summer Time
+----------------------------------------------------------
+32/219 Testing: horde_rt_windows_lookout_objective_panel_tests
+32/219 Test: horde_rt_windows_lookout_objective_panel_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_windows_lookout_objective_panel_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_windows_lookout_objective_panel_tests" start time: Oct 20 21:29 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+FAIL: hidden fixture preserves foreground owner throughout
+42 Windows lookout panel checks, 1 failures
+<end of output>
+Test time =   1.60 sec
+----------------------------------------------------------
+Test Failed.
+"horde_rt_windows_lookout_objective_panel_tests" end time: Oct 20 21:29 AUS Eastern Summer Time
+"horde_rt_windows_lookout_objective_panel_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+35/219 Testing: horde_rt_campaign_play_session_tests
+35/219 Test: horde_rt_campaign_play_session_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_play_session_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_play_session_tests" start time: Oct 20 21:29 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+145 campaign play session checks, 0 failures
+<end of output>
+Test time =   4.80 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_play_session_tests" end time: Oct 20 21:30 AUS Eastern Summer Time
+"horde_rt_campaign_play_session_tests" time elapsed: 00:00:04
+----------------------------------------------------------
+
+43/219 Testing: horde_rt_campaign_checkpoint_tests
+43/219 Test: horde_rt_campaign_checkpoint_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_campaign_checkpoint_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_campaign_checkpoint_tests" start time: Oct 20 21:30 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+1026 campaign checkpoint checks, 0 failures
+<end of output>
+Test time =   2.50 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_campaign_checkpoint_tests" end time: Oct 20 21:30 AUS Eastern Summer Time
+"horde_rt_campaign_checkpoint_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 20 21:30 AUS Eastern Summer Time

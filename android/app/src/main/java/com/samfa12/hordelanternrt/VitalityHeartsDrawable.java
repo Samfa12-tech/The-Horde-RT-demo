@@ -13,12 +13,17 @@ final class VitalityHeartsDrawable extends Drawable {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path heart = new Path();
     private final int filled;
+    private final boolean halfHeart;
     private final int count, columns, size, gap;
     private int alpha = 255;
 
     VitalityHeartsDrawable(Context context, int vitality, int maximum, int availableWidth) {
+        this(context, vitality, maximum, availableWidth, false);
+    }
+    VitalityHeartsDrawable(Context context, int vitality, int maximum, int availableWidth, boolean half) {
         count = Math.max(0, maximum);
-        filled = Math.max(0, Math.min(count, vitality));
+        halfHeart = half && vitality > 0 && vitality <= count;
+        filled = Math.max(0, Math.min(count, vitality)) - (halfHeart ? 1 : 0);
         size = HordeUiTokens.dp(context, 22);
         gap = HordeUiTokens.dp(context, 4);
         columns = Math.max(1, Math.min(count, (Math.max(size, availableWidth) + gap) / (size + gap)));
@@ -38,10 +43,13 @@ final class VitalityHeartsDrawable extends Drawable {
             canvas.translate(getBounds().left + (i % columns) * (size + gap),
                     getBounds().top + (i / columns) * (size + gap));
             canvas.scale(size / 24f, size / 24f);
-            if (i < filled) {
+            if (i < filled || (halfHeart && i == filled)) {
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(0xFFD64747);
+                int fill = canvas.save();
+                if (halfHeart && i == filled) canvas.clipRect(0, 0, 12, 24);
                 paint.setAlpha(alpha); canvas.drawPath(heart, paint);
+                canvas.restoreToCount(fill);
             }
             paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(1.5f);
             paint.setColor(HordeUiTokens.PARCHMENT); paint.setAlpha(alpha);

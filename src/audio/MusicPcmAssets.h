@@ -15,7 +15,15 @@ inline constexpr std::uint32_t kMusicPcmSampleRate = pocket_audio::kPcmSampleRat
 inline constexpr std::uint64_t kMusicPcmLoopFrames = 576'000u;
 inline constexpr std::uint64_t kMusicPcmTailFrames = 144'000u;
 inline constexpr std::uint64_t kMusicPcmCrossfadeFrames = 12'000u;
-inline constexpr std::size_t kMusicPcmCueCount = 9u;
+inline constexpr std::size_t kMusicPcmCueCount = 10u;
+inline constexpr std::uint32_t kOutdoorMusicFrames = 5'120'000u;
+inline constexpr std::uint64_t kLegacyMusicPcmBytes = 20'160'000u;
+inline constexpr std::uint64_t kOutdoorMusicPcmBytes = kOutdoorMusicFrames * 4ull;
+inline constexpr std::uint64_t kMusicPcmBankBytes = kLegacyMusicPcmBytes + kOutdoorMusicPcmBytes;
+inline constexpr pocket_audio::PcmClipLimits kOutdoorMusicClipLimits{
+    kOutdoorMusicFrames, kOutdoorMusicPcmBytes};
+inline constexpr pocket_audio::PcmBankLimits kMusicPcmBankLimits{
+    kOutdoorMusicClipLimits, kMusicPcmBankBytes};
 
 // Assets-relative paths used by both platform loaders. The editable PCS score
 // is not a runtime asset; these are pre-rendered, owner-authorised derivatives.
@@ -26,6 +34,7 @@ struct MusicPcmAsset
     std::string_view tailPath;
     std::uint32_t bodyFrames = 0u;
     bool looping = false;
+    std::uint32_t tailFrames = kMusicPcmTailFrames;
 };
 
 inline constexpr std::array<MusicPcmAsset, kMusicPcmCueCount> kMusicPcmAssets{{
@@ -46,9 +55,11 @@ inline constexpr std::array<MusicPcmAsset, kMusicPcmCueCount> kMusicPcmAssets{{
                  "audio/music/what-the-dark-keeps/runtime/G-tail.wav", 288'000u, false},
     {MusicCue::H, "audio/music/what-the-dark-keeps/runtime/H-body.wav",
                  "audio/music/what-the-dark-keeps/runtime/H-tail.wav", 576'000u, true},
+    {MusicCue::Outdoor, "audio/music/beneath-the-same-moon/runtime/outdoor-main.wav",
+                       {}, kOutdoorMusicFrames, true, 0u},
 }};
 
-static_assert(static_cast<std::size_t>(MusicCue::H) + 1u == kMusicPcmCueCount);
+static_assert(static_cast<std::size_t>(MusicCue::Outdoor) + 1u == kMusicPcmCueCount);
 static_assert(kMusicPcmAssets[static_cast<std::size_t>(MusicCue::C)].bodyFrames ==
               3u * kMusicPcmSampleRate);
 static_assert(kMusicPcmAssets[static_cast<std::size_t>(MusicCue::G)].bodyFrames ==

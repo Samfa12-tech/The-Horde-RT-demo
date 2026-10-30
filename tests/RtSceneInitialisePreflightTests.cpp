@@ -12,6 +12,28 @@
 namespace horde::vulkan::raytracing {
 
 struct PresentableTinyRtScenePreflightTestAccess {
+    static bool UtilityCandidateConfiguration(std::string& diagnostic) {
+        PresentableTinyRtScene source;
+        const auto path=std::string(HORDE_RT_SOURCE_DIR)+
+            "/assets/models/player/source/flask-native-binding-r1/gothic-traveller-flask-candidate.runtime.glb";
+        if(!source.playerUtilityCandidateAsset_.empty() || !source.SetPlayerUtilityCandidateAsset(path))return false;
+        source.ready_=true;
+        const bool rejected=!source.SetPlayerUtilityCandidateAsset({});source.ready_=false;
+        if(!rejected)return false;
+        PresentableTinyRtScene moved(std::move(source));
+        if(moved.playerUtilityCandidateAsset_!=path || !source.playerUtilityCandidateAsset_.empty())return false;
+        moved.Destroy();
+        // Configuration survives resource recreation; a moved-from scene does
+        // not retain the candidate. Load the real full roster without a device.
+        if(moved.playerUtilityCandidateAsset_!=path || !AdmitChapter(moved,diagnostic) ||
+           !moved.healingFlaskUpgradeSite_ || moved.FlaskUpgradeReadiness().site)return false;
+        const auto site=moved.healingFlaskUpgradeSite_;
+        PresentableTinyRtScene prepared(std::move(moved));
+        if(prepared.healingFlaskUpgradeSite_!=site || moved.healingFlaskUpgradeSite_)return false;
+        prepared.Destroy();
+        return !prepared.healingFlaskUpgradeSite_ && !prepared.FlaskUpgradeReadiness().site &&
+            prepared.playerUtilityCandidateAsset_==path;
+    }
     struct Ledger {
         std::size_t resolverCalls = 0u;
         std::size_t ownershipCalls = 0u;
@@ -77,6 +99,29 @@ struct PresentableTinyRtScenePreflightTestAccess {
     {
         scene.pipelineBundle_.Reset();
     }
+
+    static bool AdmitChapter(PresentableTinyRtScene& scene, std::string& diagnostic)
+    {
+        scene.developmentRescueJourney_ = true;
+        if (!scene.LoadStaticHeldItemAssets({}, std::string(HORDE_RT_SOURCE_DIR) + "/assets", diagnostic))
+            return false;
+        const auto& slot = scene.staticMeshSlot_;
+        const auto counts = slot.TextureArrayCounts();
+        std::size_t emissiveOwners = 0;
+        for (const auto& material : slot.Materials())
+            emissiveOwners += (material.materialFlags[0] & static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture)) != 0;
+        // Real native imports must fit before any Vulkan device is needed.
+        // Kit replaces only the separate laboratory test-box registration.
+        if (!scene.chapterActorReady_ || slot.InstanceMetadata()[9].primitiveCount != 0 ||
+            slot.InstanceMetadata()[25].primitiveCount != 1 ||
+            slot.PrimitiveMetadata().size() > kRtPrimitiveMetadataCapacity ||
+            counts.baseColor != 18 || counts.normal != 15 || counts.orm != 15 ||
+            counts.emissive != 1 || emissiveOwners != 1) {
+            diagnostic = "Chapter's real native asset/material roster exceeded or misrouted the bounded admission.";
+            return false;
+        }
+        return true;
+    }
 };
 
 } // namespace horde::vulkan::raytracing
@@ -113,6 +158,10 @@ int main()
 {
     bool ok = true;
     PresentableTinyRtScene observedScene;
+    std::string utilityDiagnostic;
+    ok &= Require(PresentableTinyRtScenePreflightTestAccess::UtilityCandidateConfiguration(utilityDiagnostic),
+                  "explicit utility binding must survive move/recreation and the real native static roster");
+    if(!utilityDiagnostic.empty())std::cerr<<utilityDiagnostic<<'\n';
     ok &= Require(observedScene.SelectedDielectricQualityName().empty(),
                   "unselected scene must report no dielectric quality");
     ok &= Require(observedScene.GlassEnabled(), "default scene preserves Glass On");
@@ -156,6 +205,8 @@ int main()
                       observedScene.SelectedDielectricQualityName() == expectedQuality &&
                       observationLedger.pipelineCacheDuringOwnership == suppliedPipelineCache,
                   "scene quality and borrowed cache observations must reach the ownership seam");
+    ok &= Require(PresentableTinyRtScenePreflightTestAccess::AdmitChapter(observedScene, observationDiagnostic),
+                  observationDiagnostic);
     PresentableTinyRtScenePreflightTestAccess::ResetSelectedBundle(observedScene);
     ok &= Require(observedScene.SelectedDielectricQualityName().empty(),
                   "reset scene bundle must report no dielectric quality");

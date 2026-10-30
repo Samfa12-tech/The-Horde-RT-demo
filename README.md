@@ -1,5 +1,7 @@
 # Horde Lantern RT
 
+Development note, 30 October 2026: this branch integrates the unfinished 1.7 chapter. Published 1.6.2 summaries/defaults below remain historical release facts; 1.7 now defaults fresh/reset phone scale to 33% while preserving saved choices. [Current scope and acceptance](docs/design/HORDE_1_7_CURRENT_DESIGN_INDEX.md) distinguish implemented, gated and tested work. Sustained mobile performance is ongoing optimisation, not a fixed-FPS release veto. No new release is implied.
+
 ## Current published update — 1.6.2
 
 [Download Android and Windows 1.6.2 on itch](https://samfa12.itch.io/the-horde) or [GitHub v1.6.2](https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.2) (non-draft prerelease with the same frozen files). Android versionCode 10; Android build 2090804 and Windows build 2090803 are ready, and actual downloads match the signed APK and all 96 Windows payload files. PR18 merged at `a3f120cf`; runtime/build source remains the validated `db62032d`. [Exact package hashes, normal Release presentation smokes and retained limits](docs/evidence/2026-10-09-release-publication/README.md).

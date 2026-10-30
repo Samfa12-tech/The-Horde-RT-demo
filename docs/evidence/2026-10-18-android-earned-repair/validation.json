@@ -1,0 +1,303 @@
+{
+  "date": "2026-10-18",
+  "sourceBase": "9ea14fe6",
+  "outcome": "INCOMPLETE natural earned route: Keeper health 2; no checkpoint created or publication exercised",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "device": {
+    "model": "SM-S948B",
+    "android": 17,
+    "api": 37,
+    "gpu": "Adreno 840",
+    "vulkan": "1.4.295",
+    "backend": "RayTracingPipeline"
+  },
+  "phone": {
+    "installedApkSha256": "4c84eb456f97717df055245410196101ea681a3bc55d0c9776eb42a59d591073",
+    "pid": 32269,
+    "namespace": "files/campaign-tests/earned-fix-20261018-r1",
+    "initialRecords": 0,
+    "importedRecords": 0,
+    "forcedPose": false,
+    "forcedCheckpoint": false,
+    "normalTouch": true,
+    "guardsDefeated": true,
+    "keeperInitialHealth": 3,
+    "keeperFinalHealth": 2,
+    "hearts": 3,
+    "unprotectedCombatAccepted": false,
+    "lanternClaimReached": false,
+    "storageBranchExercised": false,
+    "earnedAutosavePassed": false,
+    "manualSeparationPassed": false,
+    "upperReplacementPassed": false,
+    "deathLoadPassed": false,
+    "rtProducedPresentationObserved": true,
+    "performanceAccepted": false,
+    "renderScale": 0.4,
+    "internal": [
+      576,
+      1188
+    ],
+    "presented": [
+      1440,
+      2971
+    ]
+  },
+  "diagnostics": {
+    "overlayAndRtLabInspectionEnabled": true,
+    "routeReplay": false,
+    "readinessInjection": false,
+    "traceBudgetsExhausted": true,
+    "homeReturnRetainedGame": true,
+    "currentRangeMeasured": false,
+    "staleStateUsedAsCurrent": false,
+    "lessonProtectionOmittedByOldOverlay": true
+  },
+  "deniedAction": {
+    "action": "Resume, 180-degree turnaround and Swing",
+    "target": "Existing isolated phone Keeper encounter",
+    "status": "denied before execution",
+    "reason": "Automatic approval review rejected another blind combat retry after repeated non-contact results and absent current separation evidence",
+    "retried": false,
+    "workaround": false
+  },
+  "terminalCustody": {
+    "explicitQuit": true,
+    "hordeActivityRows": 0,
+    "cachedPid": "32269",
+    "processKilled": false,
+    "originalPaths": 286,
+    "terminalPaths": 286,
+    "removedPaths": 0,
+    "addedPaths": 0,
+    "unchangedPriorRecordHashes": 8,
+    "ownerCampaignRootExists": false,
+    "settingsSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "ownerSettingsChanged": false,
+    "dataCleared": false,
+    "uninstall": false
+  },
+  "hostWallProbe": {
+    "checks": 6,
+    "failures": 0,
+    "contactDistancesMetres": [
+      0.894546,
+      0.877598,
+      0.891487
+    ],
+    "obstructionOutcomes": 0,
+    "outsideOutcomes": 0,
+    "damageEnabled": false,
+    "teachingEnabled": false,
+    "cpuReadiness": true,
+    "snapshotGuidedAim": true,
+    "phoneBugReproduced": false,
+    "source": {
+      "path": "reports/keeper-wall-contact-2026-10-18/CPUWallContactProbe.cpp",
+      "bytes": 6646,
+      "sha256": "75eba86fa93958aad0115d940b5d1aae63f9bc088ce90f76f5d512a8cb44e95e"
+    },
+    "result": {
+      "path": "reports/keeper-wall-contact-2026-10-18/result.log",
+      "bytes": 426,
+      "sha256": "93997ee84fbb23c23b610a4688d7b3b36b97aec6c34ebee42b9546a7cd22e381"
+    }
+  },
+  "companionChange": {
+    "kind": "Diagnostic-only lesson protection reporting",
+    "gameplayChanged": false,
+    "saveSchemaChanged": false,
+    "qualityChanged": false,
+    "sources": [
+      {
+        "path": "src/ui/DiagnosticOverlay.h",
+        "bytes": 2539,
+        "sha256": "f014130a48d8a9cc2589c2a0c412ded28a8d15c49157872edbdaee1cf04a0aad"
+      },
+      {
+        "path": "src/ui/DiagnosticOverlay.cpp",
+        "bytes": 5401,
+        "sha256": "4a3915954ffbd91d7d0926697e6917d13e1b4ff8b805344e5abf4616384257e9"
+      },
+      {
+        "path": "src/platform/windows/DiagnosticWindow.cpp",
+        "bytes": 598373,
+        "sha256": "4a31236ead1d8249f9208980259194ac585a7fbcfb6788087fde9ad2c3fb9a66"
+      },
+      {
+        "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+        "bytes": 364679,
+        "sha256": "37838fec9aadc19847859dd33f7c7fd7d23b46103458370fbccfe6d9789c731e"
+      },
+      {
+        "path": "tests/DeveloperOverlaySmoke.cpp",
+        "bytes": 5713,
+        "sha256": "fa950078b46b0664413549178b38ed29585b970afa95767f6c95bdb9d7ff41b0"
+      }
+    ],
+    "tests": [
+      {
+        "configuration": "debug",
+        "selected": "^horde_rt_developer_overlay_smoke$",
+        "passed": 1,
+        "total": 1,
+        "log": {
+          "path": "reports/2026-10-18-lesson-diagnostic-overlay-debug-tests.log",
+          "bytes": 337,
+          "sha256": "4dbedae8d7e664a7d7784f955d4e58b8ba96d21b17f1f496eedc21de394655c4"
+        }
+      },
+      {
+        "configuration": "release",
+        "selected": "^horde_rt_developer_overlay_smoke$",
+        "passed": 1,
+        "total": 1,
+        "log": {
+          "path": "reports/2026-10-18-lesson-diagnostic-overlay-release-tests.log",
+          "bytes": 339,
+          "sha256": "3fe1349321bf140806437ddc6cdc60f92029bb361a8cdb2007e2442a4a4f11b7"
+        }
+      }
+    ],
+    "androidDebugAbis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "androidBuildSeconds": 48,
+    "androidBuildLog": {
+      "path": "reports/2026-10-18-lesson-diagnostic-android-build.log",
+      "bytes": 2232,
+      "sha256": "7ed8867900bc664996e0a17da032db7df8774942b3751a2afe2d2ff504d2b2fb"
+    },
+    "windowsDebugApplicationBuildLog": {
+      "path": "reports/2026-10-18-lesson-diagnostic-windows-window-build.log",
+      "bytes": 1822,
+      "sha256": "41507ed36cc5053c343816ef50a215bfa794797968381dc3ccafa72c3fc277c3"
+    },
+    "newApk": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183959352,
+      "sha256": "7f59186fc88aba8496a69f58be8b03d20d74875c70cd5e3b1d8ea8e691451561"
+    },
+    "newApkInstalled": false,
+    "windowsApplication": {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 13768704,
+      "sha256": "80baed4d043692b9d42636ddf6cc305f23df6deb1783e747027c0d11bc744559"
+    },
+    "windowsApplicationLaunched": false,
+    "initialMistypedTargetFailure": {
+      "path": "reports/2026-10-18-lesson-diagnostic-windows-build.log",
+      "bytes": 1402,
+      "sha256": "ff7eca523bab39324fb7b5a4dd12ab5c0c3e7774eec384a5989e917c037a4dbc"
+    }
+  },
+  "rawArtifacts": [
+    {
+      "path": "reports/android-earned-repair-2026-10-18/01-new-slots.xml",
+      "bytes": 9019,
+      "sha256": "77b9a5c4814241041f8ed90b3bdc83c64ddff5e0e62f8bfd5bd23ccfd3f46aee"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/08-guards-close.png",
+      "bytes": 1524456,
+      "sha256": "a17ec2807aff01cdd1499f24cf12e595289da293355b482fbc12371fdd2c28af"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/12-keeper-contact.png",
+      "bytes": 3276682,
+      "sha256": "06a4094717d63eab0e28fe9ff800eef02108417312c6820a321a01ab6d58d30e"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/24-keeper-reapproach.png",
+      "bytes": 4344701,
+      "sha256": "d35cab898126bd511894aa980d0e49e11a66c802a11ee62f7645f58bed76b9db"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/26-keeper-second.png",
+      "bytes": 3407455,
+      "sha256": "db9aafe0460c653b8cccbc1458fc10e2a8ec67d139813485ffc9994ea46ad16a"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/28-keeper-contact.png",
+      "bytes": 930867,
+      "sha256": "e26f8a8db064a9f5568776c58af01f932ec9496372afc03b8f43610c94f902b5"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/30-return-logcat.txt",
+      "bytes": 1130720,
+      "sha256": "063e356277ab48363f9bda76d4e2077f9150776ac8483d901ed9dac0376ccd0a"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/33-pause-bottom.xml",
+      "bytes": 7737,
+      "sha256": "d962d697eddcb788bfd8bb90764a374b9e47c2f06d1483a54070edbd33bb6834"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/inventory-before.txt",
+      "bytes": 20506,
+      "sha256": "59941e06c23c83470cad3da6fe2324ad45e61ee43eed09007e99e3db358a688c"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/inventory-terminal-complete.txt",
+      "bytes": 20506,
+      "sha256": "59941e06c23c83470cad3da6fe2324ad45e61ee43eed09007e99e3db358a688c"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/settings-before.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/settings-after-verified.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/records-after.sha256",
+      "bytes": 1022,
+      "sha256": "38dc483a8d58581d5de8ea3cb22b2bf04909639be0a943657e4ab580527bcf2d"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/installed-apk.sha256",
+      "bytes": 171,
+      "sha256": "c09b17ab877b7cd786954058c5e4aa67884dcb6ef72f45bb3291dd7d4c8e3f65"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/terminal-activities.txt",
+      "bytes": 178358,
+      "sha256": "05af117050215c9cd834530abbafec1de28245a56573796de55f490db6c7987d"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/terminal-pid.txt",
+      "bytes": 7,
+      "sha256": "5015ad3c331b34e3cd926b2136a6c09609610bffa9e98eb64e4e220e5c8c6885"
+    },
+    {
+      "path": "reports/android-earned-repair-2026-10-18/terminal-logcat.txt",
+      "bytes": 1990292,
+      "sha256": "fd8a90d167faeec35ec6f13aaea96fcab7594531dd9f372a1cb8a85e2dafd87f"
+    }
+  ],
+  "remaining": [
+    "Bounded current phone contact diagnosis before another combat attempt",
+    "Natural lower autosave and separate manual save",
+    "Natural upper autosave replacing only its auto record",
+    "Physical death Load/Cancel and explicit Resume",
+    "Fresh-process recovery from a newly earned record",
+    "Nocturnal audition/admission and verified exterior water proximity",
+    "Sustained frame pacing and full physical route/owner acceptance"
+  ],
+  "scope": {
+    "newRuntimeAssets": false,
+    "audioAudition": false,
+    "paidGeneration": false,
+    "desktopForegroundTaken": false,
+    "publicPush": false,
+    "merge": false,
+    "largeGeneratedArtifactsInGit": false
+  }
+}

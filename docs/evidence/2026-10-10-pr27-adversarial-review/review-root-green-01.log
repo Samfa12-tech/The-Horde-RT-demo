@@ -1,0 +1,35 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 157
+    Start 157: horde_rt_rescue_adversarial_regression_tests
+
+157: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_rig_attachment_tests.exe" "--adversarial-regression"
+157: Working Directory: <repo>/build/presets/windows-x64-release
+157: Test timeout computed to be: 180
+157: finding1 before=0,-0.95,0.900001 after=0,-0.95,0.900001 generation=2->3
+157: finding2 offset=-1.1 walk minZ=-13.3383 support=2.05 copingPenetration=0
+157: finding2 offset=-1.1 dodge minZ=-13.325 support=2.05 copingPenetration=0
+157: finding2 offset=0 walk minZ=-13.3383 support=2.05 copingPenetration=0
+157: finding2 offset=0 dodge minZ=-13.325 support=2.05 copingPenetration=0
+157: finding2 offset=1.1 walk minZ=-13.3383 support=2.05 copingPenetration=0
+157: finding2 offset=1.1 dodge minZ=-13.325 support=2.05 copingPenetration=0
+157: finding6 approachX=-34.4378 maximumLoadedOffset=0.142849 rigPoses=496 rigRejections=0
+157: finding6 approachX=-32.9622 maximumLoadedOffset=0.138577 rigPoses=496 rigRejections=0
+157: finding7 subTickHipBodyError=0 ticks=0
+157: Adversarial rescue cases=17399 failures=0
+1/1 Test #157: horde_rt_rescue_adversarial_regression_tests ...   Passed    3.01 sec
+
+The following tests passed:
+	horde_rt_rescue_adversarial_regression_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   3.02 sec

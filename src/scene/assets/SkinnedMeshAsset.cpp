@@ -1,4 +1,5 @@
 #include "scene/assets/SkinnedMeshAsset.h"
+#include "scene/assets/SkinNormalTransport.h"
 #include "scene/assets/StaticMeshAsset.h"
 
 #include <algorithm>
@@ -312,39 +313,6 @@ Vec3 TransformVector(const Matrix& matrix, Vec3 vector)
             matrix.m[2] * vector.x + matrix.m[6] * vector.y + matrix.m[10] * vector.z};
 }
 
-bool TransformNormal(const Matrix& matrix, const Vec3 normal, Vec3& transformed)
-{
-    const Vec3 column0{matrix.m[0], matrix.m[1], matrix.m[2]};
-    const Vec3 column1{matrix.m[4], matrix.m[5], matrix.m[6]};
-    const Vec3 column2{matrix.m[8], matrix.m[9], matrix.m[10]};
-    const Vec3 cofactor0{
-        column1.y * column2.z - column1.z * column2.y,
-        column1.z * column2.x - column1.x * column2.z,
-        column1.x * column2.y - column1.y * column2.x};
-    const Vec3 cofactor1{
-        column2.y * column0.z - column2.z * column0.y,
-        column2.z * column0.x - column2.x * column0.z,
-        column2.x * column0.y - column2.y * column0.x};
-    const Vec3 cofactor2{
-        column0.y * column1.z - column0.z * column1.y,
-        column0.z * column1.x - column0.x * column1.z,
-        column0.x * column1.y - column0.y * column1.x};
-    const float determinant = column0.x * cofactor0.x +
-        column0.y * cofactor0.y + column0.z * cofactor0.z;
-    if (!std::isfinite(determinant) || std::abs(determinant) <= 1.0e-20f)
-        return false;
-    const float inverseDeterminant = 1.0f / determinant;
-    transformed = {
-        (cofactor0.x * normal.x + cofactor1.x * normal.y +
-         cofactor2.x * normal.z) * inverseDeterminant,
-        (cofactor0.y * normal.x + cofactor1.y * normal.y +
-         cofactor2.y * normal.z) * inverseDeterminant,
-        (cofactor0.z * normal.x + cofactor1.z * normal.y +
-         cofactor2.z * normal.z) * inverseDeterminant};
-    return std::isfinite(transformed.x) && std::isfinite(transformed.y) &&
-        std::isfinite(transformed.z);
-}
-
 Matrix LocalMatrix(Vec3 translation, Quat rotation, Vec3 scale)
 {
     const float x2 = rotation.x + rotation.x;
@@ -426,6 +394,7 @@ struct SkinnedPlayerRigLayout
 struct SkinnedPlayerPoseData
 {
     std::vector<Matrix> skinMatrices;
+    std::vector<detail::SkinNormalTransport> normalTransports;
     std::shared_ptr<const SkinnedPlayerRigLayout> rig;
     SkinnedPlayerSockets sockets{};
 };
@@ -650,12 +619,23 @@ bool SkinnedMeshAsset::LoadCombatClips(const std::string& glbPath, std::string& 
 
 bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSet& clipSet, std::string& diagnostic)
 {
+    return LoadClips(glbPath, std::span<const SkinnedClipBinding>(clipSet.clips), diagnostic);
+}
+
+bool SkinnedMeshAsset::LoadClips(const std::string& glbPath,
+                               std::span<const SkinnedClipBinding> bindings, std::string& diagnostic)
+{
     loaded_ = false;
     playerRigLayout_.reset();
     compatiblePoseRig_.reset();
     hasTexcoords_ = false;
     hasTangents_ = false;
     vertices_.clear(); expandedIndices_.clear(); primitiveRanges_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); idleBootMinimumY_.clear(); walkingBootMinimumY_.clear(); bootGroundingVertexIndices_.clear(); skinnedUniqueVertices_.clear(); texturedSkinScratch_.clear();
+    if (bindings.empty() || bindings.size() > kMaximumClipBindings)
+    {
+        diagnostic = "Skinned clip bindings must contain between one and six semantic slots.";
+        return false;
+    }
     std::ifstream stream(glbPath, std::ios::binary);
     if (!stream)
     {
@@ -963,9 +943,9 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath, const SkinnedClipSe
         }
     }
 
-    for (std::size_t clipIndex = 0u; clipIndex < clipSet.clips.size(); ++clipIndex)
+    for (std::size_t clipIndex = 0u; clipIndex < bindings.size(); ++clipIndex)
     {
-        const SkinnedClipBinding& binding = clipSet.clips[clipIndex];
+        const SkinnedClipBinding& binding = bindings[clipIndex];
         const JsonValue* sourceAnimation = nullptr;
         if (!binding.name.empty()) for (const JsonValue& animation : *animations)
         {
@@ -1379,38 +1359,127 @@ bool SkinnedMeshAsset::NodeTransform(const SkinnedClip clipId,
     output = transforms[0];
     return true;
 }
-bool SkinnedMeshAsset::Skin(SkinnedClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const
+bool SkinnedMeshAsset::Skin(
+    SkinnedClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output,
+    std::string& diagnostic,
+    const std::span<const SkinnedNodeRotation> additiveNodeRotations, SkinWorkMetrics* work,
+    const SkinnedClipBlend* blend) const
 {
+    if(work)*work={};
+    if (!SkinUniqueGeometry(clipId, timeSeconds, diagnostic, additiveNodeRotations, nullptr, blend, work)) return false;
+    SkinWorkScope copyScope(work?&work->copyNanoseconds:nullptr);
+    output.resize(expandedIndices_.size());
+    for (std::size_t index = 0u; index < expandedIndices_.size(); ++index)
+        output[index] = skinnedUniqueVertices_[expandedIndices_[index]];
+    if(work){work->copyBytes+=output.size()*sizeof(output.front());++work->copies;}
+    return true;
+}
+
+bool SkinnedMeshAsset::SkinUniqueGeometry(
+    SkinnedClip clipId, float timeSeconds, std::string& diagnostic,
+    const std::span<const SkinnedNodeRotation> additiveNodeRotations,
+    std::vector<SkinnedPbrTangent>* outputTangents, const SkinnedClipBlend* blend, SkinWorkMetrics* work) const
+{
+    SkinWorkScope animationScope(work?&work->animationNanoseconds:nullptr);
     if (!loaded_) { diagnostic = "Skeleton model was not loaded."; return false; }
     const std::size_t clipIndex = static_cast<std::size_t>(clipId);
     if (clipIndex >= clips_.size()) { diagnostic = "Skeleton combat clip index is invalid."; return false; }
     const Clip& clip = clips_[clipIndex];
     if (clip.channels.empty() || clip.duration <= 0.0f) { diagnostic = "Requested skinned clip is not mapped."; return false; }
-    std::vector<Node> pose = nodes_;
-    const float time = clip.loops
-        ? std::fmod(std::max(timeSeconds, 0.0f), clip.duration)
-        : std::clamp(timeSeconds, 0.0f, clip.duration);
-    for (const Channel& channel : clip.channels)
+    if (blend && (!std::isfinite(blend->timeSeconds) || !std::isfinite(blend->weight) ||
+        blend->weight < 0.0f || blend->weight > 1.0f ||
+        static_cast<std::size_t>(blend->clip) >= clips_.size() ||
+        clips_[static_cast<std::size_t>(blend->clip)].channels.empty() ||
+        clips_[static_cast<std::size_t>(blend->clip)].duration <= 0.0f))
     {
-        if (channel.node >= pose.size() || channel.times.empty()) continue;
-        const auto upper = std::upper_bound(channel.times.begin(), channel.times.end(), time);
-        const std::size_t next = upper == channel.times.end()
-            ? (clip.loops ? 0u : channel.times.size() - 1u)
-            : static_cast<std::size_t>(upper - channel.times.begin());
-        const std::size_t previous = next == 0u ? channel.times.size() - 1u : next - 1u;
-        const float previousTime = channel.times[previous];
-        const float nextTime = next == 0u ? clip.duration : channel.times[next];
-        const float sampledTime = next == 0u && time < previousTime ? time + clip.duration : time;
-        const float fraction = nextTime > previousTime ? std::clamp((sampledTime - previousTime) / (nextTime - previousTime), 0.0f, 1.0f) : 0.0f;
-        const auto& a = channel.values[previous];
-        const auto& b = channel.values[next];
-        if (channel.path == Channel::Path::Rotation) pose[channel.node].rotation = Nlerp({a[0], a[1], a[2], a[3]}, {b[0], b[1], b[2], b[3]}, fraction);
-        else
+        diagnostic = "PBR clip blend requires a mapped clip, finite time and weight in [0,1].";
+        return false;
+    }
+    const auto sample = [&](const Clip& clip, float timeSeconds) {
+        std::vector<Node> pose = nodes_;
+        const float time = clip.loops
+            ? std::fmod(std::max(timeSeconds, 0.0f), clip.duration)
+            : std::clamp(timeSeconds, 0.0f, clip.duration);
+        for (const Channel& channel : clip.channels)
         {
-            const Vec3 value{a[0] + (b[0] - a[0]) * fraction, a[1] + (b[1] - a[1]) * fraction, a[2] + (b[2] - a[2]) * fraction};
-            if (channel.path == Channel::Path::Translation) pose[channel.node].translation = value;
-            else pose[channel.node].scale = value;
+            if (channel.node >= pose.size() || channel.times.empty()) continue;
+            const auto upper = std::upper_bound(channel.times.begin(), channel.times.end(), time);
+            const std::size_t next = upper == channel.times.end()
+                ? (clip.loops ? 0u : channel.times.size() - 1u)
+                : static_cast<std::size_t>(upper - channel.times.begin());
+            const std::size_t previous = next == 0u ? channel.times.size() - 1u : next - 1u;
+            const float previousTime = channel.times[previous];
+            const float nextTime = next == 0u ? clip.duration : channel.times[next];
+            const float sampledTime = next == 0u && time < previousTime ? time + clip.duration : time;
+            const float fraction = nextTime > previousTime ? std::clamp((sampledTime - previousTime) / (nextTime - previousTime), 0.0f, 1.0f) : 0.0f;
+            const auto& a = channel.values[previous];
+            const auto& b = channel.values[next];
+            if (channel.path == Channel::Path::Rotation) pose[channel.node].rotation = Nlerp({a[0], a[1], a[2], a[3]}, {b[0], b[1], b[2], b[3]}, fraction);
+            else
+            {
+                const Vec3 value{a[0] + (b[0] - a[0]) * fraction, a[1] + (b[1] - a[1]) * fraction, a[2] + (b[2] - a[2]) * fraction};
+                if (channel.path == Channel::Path::Translation) pose[channel.node].translation = value;
+                else pose[channel.node].scale = value;
+            }
         }
+        return pose;
+    };
+    // Select endpoint samples directly to retain byte-exact legacy poses.
+    std::vector<Node> pose = blend && blend->weight == 1.0f
+        ? sample(clips_[static_cast<std::size_t>(blend->clip)], blend->timeSeconds)
+        : sample(clip, timeSeconds);
+    if (blend && blend->weight > 0.0f && blend->weight < 1.0f)
+    {
+        const auto target = sample(clips_[static_cast<std::size_t>(blend->clip)], blend->timeSeconds);
+        const float weight = blend->weight;
+        const auto lerp = [weight](Vec3 a, Vec3 b) {
+            return Vec3{a.x+(b.x-a.x)*weight,a.y+(b.y-a.y)*weight,a.z+(b.z-a.z)*weight};
+        };
+        for (std::size_t i = 0; i < pose.size(); ++i)
+        {
+            pose[i].translation = lerp(pose[i].translation, target[i].translation);
+            pose[i].scale = lerp(pose[i].scale, target[i].scale);
+            pose[i].rotation = Nlerp(pose[i].rotation, target[i].rotation, weight);
+        }
+    }
+    for (std::size_t rotationIndex = 0u; rotationIndex < additiveNodeRotations.size(); ++rotationIndex)
+    {
+        const SkinnedNodeRotation& additive = additiveNodeRotations[rotationIndex];
+        const auto node = std::find_if(nodes_.begin(), nodes_.end(), [&additive](const Node& candidate) {
+            return candidate.name == additive.nodeName;
+        });
+        if (node == nodes_.end())
+        {
+            diagnostic = "Skinned asset is missing additive rotation node: " + std::string(additive.nodeName);
+            return false;
+        }
+        for (std::size_t previous = 0u; previous < rotationIndex; ++previous)
+        {
+            if (additiveNodeRotations[previous].nodeName == additive.nodeName)
+            {
+                diagnostic = "Skinned additive node rotations contain a duplicate node name.";
+                return false;
+            }
+        }
+        const auto& value = additive.rotation;
+        const float lengthSquared = value[0] * value[0] + value[1] * value[1] +
+            value[2] * value[2] + value[3] * value[3];
+        if (!std::isfinite(lengthSquared) || lengthSquared <= 1.0e-12f)
+        {
+            diagnostic = "Skinned additive node rotation is not a finite nonzero quaternion.";
+            return false;
+        }
+        if (value[0] == 0.0f && value[1] == 0.0f && value[2] == 0.0f && value[3] == 1.0f)
+        {
+            continue;
+        }
+        const Quat delta = Normalise({value[0], value[1], value[2], value[3]});
+        const Quat base = pose[static_cast<std::size_t>(node - nodes_.begin())].rotation;
+        pose[static_cast<std::size_t>(node - nodes_.begin())].rotation = Normalise({
+            base.w * delta.x + base.x * delta.w + base.y * delta.z - base.z * delta.y,
+            base.w * delta.y - base.x * delta.z + base.y * delta.w + base.z * delta.x,
+            base.w * delta.z + base.x * delta.y - base.y * delta.x + base.z * delta.w,
+            base.w * delta.w - base.x * delta.x - base.y * delta.y - base.z * delta.z});
     }
     std::vector<Matrix> globals(pose.size());
     std::vector<bool> computed(pose.size(), false);
@@ -1422,22 +1491,34 @@ bool SkinnedMeshAsset::Skin(SkinnedClip clipId, float timeSeconds, std::vector<S
         return globals[node];
     };
     std::vector<Matrix> skinMatrices(joints_.size());
+    // The player solved-pose path already uses this exact transport. Generic
+    // clip/PBR actors can share its per-joint factors without changing the
+    // per-influence arithmetic or rejecting unused singular joints early.
+    std::vector<detail::SkinNormalTransport> normalTransports(joints_.size());
     for (std::size_t i = 0u; i < joints_.size(); ++i)
     {
         if (joints_[i] >= pose.size()) { diagnostic = "Skeleton joint node is invalid."; return false; }
         Matrix inverse{};
         std::memcpy(inverse.m.data(), inverseBindMatrices_.data() + i * 16u, sizeof(float) * 16u);
         skinMatrices[i] = Multiply(resolveGlobal(resolveGlobal, joints_[i]), inverse);
+        normalTransports[i]=detail::MakeSkinNormalTransport(skinMatrices[i].m);
     }
-    // Skin each source vertex once. The RT BLAS remains deliberately non-indexed,
-    // but transforming the 9,854 unique vertices is much cheaper than repeating
-    // the same four-weight work for all 28,206 expanded triangle vertices.
+    if(work){work->vertices=vertices_.size();work->joints=joints_.size();}
+    animationScope.Complete();
+    SkinWorkScope vertexScope(work?&work->vertexNanoseconds:nullptr);
+    // Skin each source vertex once. Legacy non-indexed consumers expand this
+    // result afterwards; indexed PBR consumers retain the unique stream.
     skinnedUniqueVertices_.resize(vertices_.size());
+    if (outputTangents) outputTangents->resize(vertices_.size());
     for (std::size_t sourceIndex = 0u; sourceIndex < vertices_.size(); ++sourceIndex)
     {
         const SourceVertex& source = vertices_[sourceIndex];
         Vec3 position{};
         Vec3 normal{};
+        Vec3 tangent{};
+        Vec3 bitangent{};
+        const Vec3 sourceBitangent = outputTangents
+            ? Scale(Cross(source.normal, source.tangent), source.tangentSign) : Vec3{};
         for (std::size_t influence = 0u; influence < 4u; ++influence)
         {
             const float weight = source.weights[influence];
@@ -1445,21 +1526,47 @@ bool SkinnedMeshAsset::Skin(SkinnedClip clipId, float timeSeconds, std::vector<S
             if (weight <= 0.00001f || joint >= skinMatrices.size()) continue;
             const Vec3 transformedPosition = TransformPoint(skinMatrices[joint], source.position);
             Vec3 transformedNormal{};
-            if (!TransformNormal(skinMatrices[joint], source.normal,
-                                 transformedNormal))
+            if (!detail::ApplySkinNormalTransport(normalTransports[joint],source.normal.x,source.normal.y,source.normal.z,
+                                                  transformedNormal.x,transformedNormal.y,transformedNormal.z))
             {
                 diagnostic = "Skinned model produced a non-invertible normal transform.";
                 return false;
             }
             position.x += transformedPosition.x * weight; position.y += transformedPosition.y * weight; position.z += transformedPosition.z * weight;
             normal.x += transformedNormal.x * weight; normal.y += transformedNormal.y * weight; normal.z += transformedNormal.z * weight;
+            if (outputTangents)
+            {
+                tangent = Add(tangent, Scale(TransformVector(skinMatrices[joint], source.tangent), weight));
+                bitangent = Add(bitangent, Scale(TransformVector(skinMatrices[joint], sourceBitangent), weight));
+            }
         }
         normal = Normalise(normal);
         skinnedUniqueVertices_[sourceIndex] = {{position.x, position.y, position.z, 1.0f}, {normal.x, normal.y, normal.z, 0.0f}};
+        if (outputTangents)
+        {
+            tangent = Subtract(tangent, Scale(normal, Dot(normal, tangent)));
+            if (Length(tangent) <= 0.00001f)
+                tangent = Cross(std::abs(normal.y) < 0.9f ? Vec3{0.0f, 1.0f, 0.0f}
+                                                         : Vec3{1.0f, 0.0f, 0.0f}, normal);
+            tangent = Normalise(tangent);
+            for (const float value : {position.x, position.y, position.z,
+                                      normal.x, normal.y, normal.z,
+                                      tangent.x, tangent.y, tangent.z,
+                                      bitangent.x, bitangent.y, bitangent.z})
+                if (!std::isfinite(value))
+                {
+                    diagnostic = "PBR clip skinning produced a non-finite vertex frame.";
+                    return false;
+                }
+            // A reflected joint palette reverses the frame even though the
+            // authored tangent sign is unchanged. Recover handedness from the
+            // deformed bitangent instead of assuming orientation preservation.
+            const float orientation = Dot(Cross(normal, tangent), bitangent);
+            const float sign = std::abs(orientation) <= 0.00000001f
+                ? source.tangentSign : (orientation < 0.0f ? -1.0f : 1.0f);
+            (*outputTangents)[sourceIndex] = {{tangent.x, tangent.y, tangent.z, sign}};
+        }
     }
-    output.resize(expandedIndices_.size());
-    for (std::size_t outputIndex = 0u; outputIndex < expandedIndices_.size(); ++outputIndex)
-        output[outputIndex] = skinnedUniqueVertices_[expandedIndices_[outputIndex]];
 
     diagnostic.clear();
     return true;
@@ -1468,14 +1575,16 @@ bool SkinnedMeshAsset::Skin(SkinnedClip clipId, float timeSeconds, std::vector<S
 bool SkinnedMeshAsset::SkinTextured(SkinnedClip clipId,
                                       float timeSeconds,
                                       std::vector<TexturedSkinnedRtVertex>& output,
-                                      std::string& diagnostic) const
+                                      std::string& diagnostic,
+                                      const std::span<const SkinnedNodeRotation> additiveNodeRotations, SkinWorkMetrics* work) const
 {
     if (!hasTexcoords_)
     {
         diagnostic = "Skinned model has no TEXCOORD_0 stream.";
         return false;
     }
-    if (!Skin(clipId, timeSeconds, texturedSkinScratch_, diagnostic)) return false;
+    if (!Skin(clipId, timeSeconds, texturedSkinScratch_, diagnostic, additiveNodeRotations, work)) return false;
+    SkinWorkScope copyScope(work?&work->copyNanoseconds:nullptr);
     output.resize(texturedSkinScratch_.size());
     for (std::size_t outputIndex = 0u; outputIndex < output.size(); ++outputIndex)
     {
@@ -1489,6 +1598,7 @@ bool SkinnedMeshAsset::SkinTextured(SkinnedClip clipId,
         destination.texcoord[2] = 0.0f;
         destination.texcoord[3] = 0.0f;
     }
+    if(work){work->copyBytes+=output.size()*sizeof(output.front());++work->copies;}
     diagnostic.clear();
     return true;
 }
@@ -1496,14 +1606,23 @@ bool SkinnedMeshAsset::SkinTextured(SkinnedClip clipId,
 bool SkinnedMeshAsset::SkinUniqueTextured(const SkinnedClip clipId,
                                           const float timeSeconds,
                                           std::vector<TexturedSkinnedRtVertex>& output,
-                                          std::string& diagnostic) const
+                                          std::string& diagnostic, SkinWorkMetrics* work) const
 {
     if (!hasTexcoords_)
     {
         diagnostic = "Skinned model has no TEXCOORD_0 stream.";
         return false;
     }
-    if (!Skin(clipId, timeSeconds, texturedSkinScratch_, diagnostic)) return false;
+    if(work)*work={};
+    if (!SkinUniqueGeometry(clipId, timeSeconds, diagnostic, {}, nullptr, nullptr, work)) return false;
+    CopyUniqueTextured(output,work);
+    diagnostic.clear();
+    return true;
+}
+
+void SkinnedMeshAsset::CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& output, SkinWorkMetrics* work) const
+{
+    SkinWorkScope copyScope(work?&work->copyNanoseconds:nullptr);
     output.resize(skinnedUniqueVertices_.size());
     for (std::size_t sourceIndex = 0u; sourceIndex < output.size(); ++sourceIndex)
     {
@@ -1518,7 +1637,28 @@ bool SkinnedMeshAsset::SkinUniqueTextured(const SkinnedClip clipId,
         destination.texcoord[2] = 0.0f;
         destination.texcoord[3] = 0.0f;
     }
-    diagnostic.clear();
+    if(work){work->copyBytes+=output.size()*sizeof(output.front());++work->copies;}
+}
+
+bool SkinnedMeshAsset::SkinUniquePbr(SkinnedClip clip, float time,
+    std::vector<TexturedSkinnedRtVertex>& output,
+    std::vector<SkinnedPbrTangent>& tangents, std::string& diagnostic,
+    std::span<const SkinnedNodeRotation> additiveNodeRotations, const SkinnedClipBlend* blend, SkinWorkMetrics* work) const
+{
+    if(work)*work={};
+    output.clear();
+    tangents.clear();
+    if (!hasTexcoords_ || !hasTangents_ || !std::isfinite(time))
+    {
+        diagnostic = "PBR clip skinning requires UVs, tangents and finite time.";
+        return false;
+    }
+    if (!SkinUniqueGeometry(clip, time, diagnostic, additiveNodeRotations, &tangents, blend, work))
+    {
+        tangents.clear();
+        return false;
+    }
+    CopyUniqueTextured(output,work);
     return true;
 }
 
@@ -1548,12 +1688,15 @@ bool SkinnedMeshAsset::SkinPlayerUniqueTextured(
 bool SkinnedMeshAsset::EvaluatePlayerPose(
     const SkinnedClip clipId, const float timeSeconds,
     const SkinnedArmIkTarget& leftArm, const SkinnedArmIkTarget& rightArm,
-    SkinnedPlayerPose& outputPose, std::string& diagnostic) const
+    SkinnedPlayerPose& outputPose, std::string& diagnostic,
+    const float plantedPelvisDropMetres, const float crouchPelvisDropMetres,
+    const SkinnedPlayerDodgePose dodge) const
 {
     if (!outputPose.data_) outputPose.data_ = std::make_unique<SkinnedPlayerPoseData>();
     auto& solved = *outputPose.data_;
     solved.rig.reset();
     solved.skinMatrices.clear();
+    solved.normalTransports.clear();
     solved.sockets = {};
     auto& sockets = solved.sockets;
     if (!loaded_ || !hasTexcoords_ || !hasTangents_)
@@ -1564,6 +1707,33 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
     if (!std::isfinite(timeSeconds))
     {
         diagnostic = "Player pose time is not finite.";
+        return false;
+    }
+    if (!std::isfinite(plantedPelvisDropMetres) || plantedPelvisDropMetres < 0.0f ||
+        plantedPelvisDropMetres > kMaximumPlayerPelvisDropMetres)
+    {
+        diagnostic = "Player planted pelvis drop is outside the finite admitted range.";
+        return false;
+    }
+    if (plantedPelvisDropMetres > 0.0f && clipId != SkinnedClip::Idle)
+    {
+        diagnostic = "Planted player stance requires the stationary Idle clip.";
+        return false;
+    }
+    if (!std::isfinite(crouchPelvisDropMetres) || crouchPelvisDropMetres < 0.0f ||
+        crouchPelvisDropMetres > kMaximumPlayerCrouchPelvisDropMetres ||
+        (crouchPelvisDropMetres > 0.0f &&
+         (plantedPelvisDropMetres > 0.0f ||
+          (clipId != SkinnedClip::Idle && clipId != SkinnedClip::Walking))))
+    {
+        diagnostic = "Player crouch requires a finite admitted drop, Idle/Walking and no planted stance.";
+        return false;
+    }
+    if (!ValidPlayerDodgePose(dodge) || (dodge.weight > 0.0f &&
+        (plantedPelvisDropMetres > 0.0f || crouchPelvisDropMetres > 0.0f ||
+         (clipId != SkinnedClip::Idle && clipId != SkinnedClip::Walking))))
+    {
+        diagnostic = "Player dodge requires a finite bounded direction/weight, Idle/Walking and no grounded drop.";
         return false;
     }
     const auto finiteArm = [](const SkinnedArmIkTarget& arm) {
@@ -1653,7 +1823,6 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
                                      : static_cast<std::size_t>(found - nodes_.begin());
     };
     const std::size_t hipsNode = findNode("Hips");
-    if (hipsNode < globals.size()) sockets.hips = globals[hipsNode].m;
     const auto isDescendant = [&pose](std::size_t node, const std::size_t ancestor) {
         while (node < pose.size())
         {
@@ -1664,6 +1833,117 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
         }
         return false;
     };
+    const auto dodgeOffset = PlayerDodgeTorsoOffset(dodge);
+    const float pelvisDrop = plantedPelvisDropMetres + crouchPelvisDropMetres - dodgeOffset[1];
+    if (pelvisDrop > 0.0f)
+    {
+        const std::array<std::array<std::size_t, 3u>, 2u> legs{{
+            {{findNode("LeftUpLeg"), findNode("LeftLeg"), findNode("LeftFoot")}},
+            {{findNode("RightUpLeg"), findNode("RightLeg"), findNode("RightFoot")}}}};
+        if (hipsNode >= globals.size())
+        {
+            diagnostic = "Planted player stance requires the Hips root.";
+            return false;
+        }
+        for (const auto& leg : legs)
+            if (leg[0] >= globals.size() || leg[1] >= globals.size() || leg[2] >= globals.size() ||
+                !isDescendant(leg[0], hipsNode) || !isDescendant(leg[1], leg[0]) ||
+                !isDescendant(leg[2], leg[1]))
+            {
+                diagnostic = "Planted player stance requires both hierarchical thigh/shin/foot chains.";
+                return false;
+            }
+        // Translate the whole pelvis/torso, then articulate each leg back to
+        // its original ankle. Foot descendants retain the authored transforms
+        // exactly. No shoulder-only shift, bone stretch or boot translation.
+        const auto authoredGlobals = globals;
+        for (std::size_t node = 0u; node < globals.size(); ++node)
+            if (isDescendant(node, hipsNode))
+            {
+                globals[node].m[13] -= pelvisDrop;
+                globals[node].m[12] += dodgeOffset[0];
+                globals[node].m[14] += dodgeOffset[2] - plantedPelvisDropMetres * kPlayerPlantedPelvisSetbackPerDrop;
+            }
+        const auto position = [](const Matrix& m) { return Vec3{m.m[12], m.m[13], m.m[14]}; };
+        for (std::size_t side = 0u; side < legs.size(); ++side)
+        {
+            const auto& leg = legs[side];
+            const Vec3 hip = position(globals[leg[0]]);
+            const Vec3 originalKnee = position(globals[leg[1]]);
+            const Vec3 originalFoot = position(globals[leg[2]]);
+            // Continuous leading-foot bias avoids a side-switch discontinuity
+            // when the player turns aim during an already accepted world dodge.
+            const float bias = std::clamp(dodge.modelX + .5f*dodge.modelZ, -1.0f, 1.0f);
+            const float step = .04f*dodge.weight*(1.0f+(side==0u?bias:-bias));
+            const Vec3 ankleOffset{dodge.modelX*step,0.0f,dodge.modelZ*step};
+            const Vec3 plantedFoot = Add(position(authoredGlobals[leg[2]]),ankleOffset);
+            const float thigh = Length(Subtract(originalKnee, hip));
+            const float shin = Length(Subtract(originalFoot, originalKnee));
+            const Vec3 request = Subtract(plantedFoot, hip);
+            const float distance = Length(request);
+            if (thigh < 0.0001f || shin < 0.0001f || distance <= std::abs(thigh - shin) ||
+                distance >= thigh + shin)
+            {
+                diagnostic = "Planted player stance cannot reach an ankle without changing leg length.";
+                return false;
+            }
+            const Vec3 direction = Normalise(request);
+            // The imported player is +Z forward. A supported squat opens the
+            // knees outward while both feet retain their exact clip pose.
+            // A moving ankle can rise above the deeply lowered hip. Give the
+            // crouch bend an upward component so the knee (and its weighted
+            // cloth/shin surface) folds above the contact plane, not below it.
+            // The separately admitted rescue recipe stays byte-identical.
+            const Vec3 pole{side == 0u ? 1.0f : -1.0f,
+                            crouchPelvisDropMetres > 0.0f ? 1.0f : dodge.weight*.35f, 1.0f};
+            Vec3 projectedPole = Subtract(pole, Scale(direction, Dot(pole, direction)));
+            if (crouchPelvisDropMetres > 0.0f || dodge.weight > 0.0f)
+            {
+                // Retain the animated knee direction at crouch onset; blend
+                // towards the bounded squat pole as the torso lowers. This
+                // avoids snapping a moving knee to the rescue pose at epsilon.
+                const Vec3 authoredBend = Subtract(Subtract(originalKnee, hip),
+                    Scale(direction, Dot(Subtract(originalKnee, hip), direction)));
+                if (Length(authoredBend) > 0.0001f && Length(projectedPole) > 0.0001f)
+                {
+                    const float blend = crouchPelvisDropMetres > 0.0f
+                        ? std::clamp(crouchPelvisDropMetres / 0.3f, 0.0f, 1.0f) : dodge.weight;
+                    projectedPole = Add(Scale(Normalise(authoredBend), 1.0f - blend),
+                                        Scale(Normalise(projectedPole), blend));
+                }
+            }
+            if (Length(projectedPole) < 0.0001f)
+            {
+                const Vec3 fallback = std::abs(direction.y) < 0.9f
+                    ? Vec3{0.0f, 1.0f, 0.0f} : Vec3{1.0f, 0.0f, 0.0f};
+                projectedPole = Subtract(fallback, Scale(direction, Dot(fallback, direction)));
+            }
+            const Vec3 bend = Normalise(projectedPole);
+            const float adjacent = (thigh * thigh - shin * shin + distance * distance) /
+                (2.0f * distance);
+            const float height = std::sqrt(std::max(thigh * thigh - adjacent * adjacent, 0.0f));
+            const Vec3 knee = Add(hip, Add(Scale(direction, adjacent), Scale(bend, height)));
+            const Matrix upperDelta = RotationAroundPoint(
+                FromToRotation(Subtract(originalKnee, hip), Subtract(knee, hip)), hip);
+            const Matrix lowerDelta = Multiply(
+                LocalMatrix(Subtract(knee, originalKnee), {}, {1.0f, 1.0f, 1.0f}),
+                RotationAroundPoint(FromToRotation(Subtract(originalFoot, originalKnee),
+                                                   Subtract(plantedFoot, knee)), originalKnee));
+            for (std::size_t node = 0u; node < globals.size(); ++node)
+            {
+                if (isDescendant(node, leg[2])) {
+                    globals[node] = authoredGlobals[node];
+                    globals[node].m[12] += ankleOffset.x;
+                    globals[node].m[14] += ankleOffset.z;
+                }
+                else if (isDescendant(node, leg[1])) globals[node] = Multiply(lowerDelta, globals[node]);
+                else if (isDescendant(node, leg[0])) globals[node] = Multiply(upperDelta, globals[node]);
+            }
+            for (std::size_t joint = 0u; joint < leg.size(); ++joint)
+                (side == 0u ? sockets.leftLeg : sockets.rightLeg)[joint] = globals[leg[joint]].m;
+        }
+    }
+    if (hipsNode < globals.size()) sockets.hips = globals[hipsNode].m;
     const auto solveArm = [&globals, &findNode, &isDescendant, this, &diagnostic](
         const char* upperName,
         const char* lowerName,
@@ -1861,6 +2141,7 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
 
     auto& skinMatrices = solved.skinMatrices;
     skinMatrices.resize(joints_.size());
+    solved.normalTransports.resize(joints_.size());
     for (std::size_t joint = 0u; joint < joints_.size(); ++joint)
     {
         if (joints_[joint] >= globals.size())
@@ -1880,6 +2161,9 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
                 return false;
             }
         }
+        // Singular unused joints remain legal; only an admitted, positive
+        // vertex influence consumes this transform and may reject it below.
+        solved.normalTransports[joint] = detail::MakeSkinNormalTransport(skinMatrices[joint].m);
     }
     solved.rig = playerRigLayout_;
     diagnostic.clear();
@@ -1891,7 +2175,8 @@ bool SkinnedMeshAsset::SkinPlayerPoseUniqueTextured(
     std::vector<SkinnedPbrTangent>& outputTangents, std::string& diagnostic) const
 {
     if (!loaded_ || !playerRigLayout_ || !hasTexcoords_ || !hasTangents_ || !pose.IsValid() ||
-        pose.data_->skinMatrices.size() != joints_.size())
+        pose.data_->skinMatrices.size() != joints_.size() ||
+        pose.data_->normalTransports.size() != joints_.size())
     {
         diagnostic = "Player mesh or shared pose is not ready for skinning.";
         output.clear();
@@ -1927,8 +2212,9 @@ bool SkinnedMeshAsset::SkinPlayerPoseUniqueTextured(
             if (weight <= 0.00001f || joint >= skinMatrices.size()) continue;
             position = Add(position, Scale(TransformPoint(skinMatrices[joint], source.position), weight));
             Vec3 transformedNormal{};
-            if (!TransformNormal(skinMatrices[joint], source.normal,
-                                 transformedNormal))
+            if (!detail::ApplySkinNormalTransport(pose.data_->normalTransports[joint],
+                    source.normal.x, source.normal.y, source.normal.z,
+                    transformedNormal.x, transformedNormal.y, transformedNormal.z))
             {
                 diagnostic = "Player IK produced a non-invertible normal transform.";
                 output.clear();

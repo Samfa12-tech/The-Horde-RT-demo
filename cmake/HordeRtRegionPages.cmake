@@ -1,0 +1,31 @@
+# Explicit experimental storage profile, shared by Windows/Android. Empty is
+# production. Private shaders/catalogs never replace the repository artifacts.
+function(horde_rt_attach_private_region_pages target)
+    # Check command-line spelling before CACHE PATH normalizes a relative value.
+    if(DEFINED HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT AND
+       NOT "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}" STREQUAL "" AND
+       NOT IS_ABSOLUTE "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}")
+        message(FATAL_ERROR "Region-page prototype needs an absolute private root.")
+    endif()
+    set(HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT "" CACHE PATH "Private experimental region-page shader source root; never production artifacts")
+    if("${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}" STREQUAL "")
+        return()
+    endif()
+    if(NOT IS_ABSOLUTE "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}")
+        message(FATAL_ERROR "Region-page prototype needs an absolute private root.")
+    endif()
+    if(ANDROID AND (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug"))
+        message(FATAL_ERROR "Android region-page investigation requires Debug checkpoint-enabled builds.")
+    endif()
+    foreach(header RtPipelineVariantCatalog.generated.h RtRayQueryVariantCatalog.generated.h)
+        if(NOT EXISTS "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}/src/vulkan/raytracing/${header}")
+            message(FATAL_ERROR "Private page prototype is missing ${header}.")
+        endif()
+    endforeach()
+    file(READ "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}/shaders/raytracing/include/rt_scene_abi.generated.glsl" page_abi)
+    if(NOT page_abi MATCHES "uvec4 pages\\[8\\]")
+        message(FATAL_ERROR "Private shaders do not contain the admitted region address table.")
+    endif()
+    target_include_directories(${target} BEFORE PRIVATE "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}/src")
+    target_compile_definitions(${target} PUBLIC HORDE_RT_REGION_PAGE_PROTOTYPE=1)
+endfunction()

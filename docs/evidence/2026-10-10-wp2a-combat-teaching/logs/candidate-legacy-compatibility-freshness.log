@@ -1,0 +1,6 @@
+<temporary-workspace>
+Raygen check artifacts: <temporary-workspace>
+Source dependency SHA-256: ad4ff3b66c000719071db63a202a1a3582f27183a98ebb3379be3cebf9cb3e19; embedded include SHA-256: 5394aa6748bc8b99d833d7fadbd81b9560ce29b5c69abaf0d6b6b1186142061f
+SPIR-V bytes: 592420; words: 148105; instructions: 32874; branch operations: 4579; loops: 80; selection merges: 1850; SHA-256: f56d90debd2f6e82c52b01638ea92a23ff41149cf8a9bae4997774b6146d0683
+Raygen optimizer shape: functions=1; calls=0; ray-query sites=27
+Embedded raygen SPIR-V words match the compiled shader.

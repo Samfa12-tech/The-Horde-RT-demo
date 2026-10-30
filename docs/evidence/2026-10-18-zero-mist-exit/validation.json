@@ -1,0 +1,122 @@
+{
+  "nativeAndShaderChecks": [
+    {
+      "localFile": "combat-debug-tests.log",
+      "sha256": "15be9565cbfdc1760827a15fba9c4e7421bc90e2c9a77429d828a7667fe3f47f",
+      "bytes": 491,
+      "result": "all selected tests passed",
+      "summaryLines": [
+        "1/1 Test #32: horde_rt_combat_foundation_tests ...   Passed    6.63 sec",
+        "Total Test time (real) =   6.66 sec"
+      ]
+    },
+    {
+      "localFile": "combat-release-tests.log",
+      "sha256": "db058f95874119e9b2b43927ee23be9421d3f865345344a39f1f4051ef1590f9",
+      "bytes": 495,
+      "result": "all selected tests passed",
+      "summaryLines": [
+        "1/1 Test #32: horde_rt_combat_foundation_tests ...   Passed    1.39 sec",
+        "Total Test time (real) =   1.41 sec"
+      ]
+    },
+    {
+      "localFile": "scene-debug-tests.log",
+      "sha256": "16fbd70e19391981c1cfe619f6633245ed4478885302bd108680476424c6db78",
+      "bytes": 501,
+      "result": "all selected tests passed",
+      "summaryLines": [
+        "1/1 Test #182: horde_rt_character_render_slot_smoke ...   Passed    5.89 sec",
+        "Total Test time (real) =   5.91 sec"
+      ]
+    },
+    {
+      "localFile": "scene-release-tests.log",
+      "sha256": "00d8af9b06c0a34c98f5efd284f41faf052e549393410d9c1284ff44ebd97bd8",
+      "bytes": 505,
+      "result": "all selected tests passed",
+      "summaryLines": [
+        "1/1 Test #182: horde_rt_character_render_slot_smoke ...   Passed    2.55 sec",
+        "Total Test time (real) =   2.57 sec"
+      ]
+    },
+    {
+      "localFile": "mist-capture-fixture-tests.log",
+      "sha256": "ab1d70da5ad9d377eaf022ad05db1eb51dbfa01ce5e207918d5ed9b078bd753d",
+      "bytes": 505,
+      "result": "all selected tests passed",
+      "summaryLines": [
+        "1/1 Test #86: horde_rt_development_static_asset_tests ...   Passed    5.13 sec",
+        "Total Test time (real) =   5.15 sec"
+      ]
+    },
+    {
+      "localFile": "mist-fixtures-release-test.log",
+      "sha256": "910e21da146c6ffc7b19fdbf84f3c0b2aa617009fe677d530cae80fea636d6c3",
+      "bytes": 509,
+      "result": "all selected tests passed",
+      "summaryLines": [
+        "1/1 Test #86: horde_rt_development_static_asset_tests ...   Passed    1.22 sec",
+        "Total Test time (real) =   1.24 sec"
+      ]
+    },
+    {
+      "localFile": "mist-route-admission-debug-tests.log",
+      "sha256": "22406b5c6345a008e72a5a24955bf893c62c4db3b3e2bb1096ded3107dbb4179",
+      "bytes": 649,
+      "result": "all selected tests passed",
+      "summaryLines": [
+        "1/2 Test #188: horde_rt_rescue_journey_integration_tests ...   Passed   10.70 sec",
+        "2/2 Test #189: horde_rt_chapter_terrain_journey_tests ......   Passed  219.78 sec",
+        "Total Test time (real) = 230.51 sec"
+      ]
+    },
+    {
+      "localFile": "mist-route-admission-release-tests.log",
+      "sha256": "bb50674f0b297a4127b57208d0d0429d00de923ecfb19e702e688edb051cc3f1",
+      "bytes": 653,
+      "result": "all selected tests passed",
+      "summaryLines": [
+        "1/2 Test #188: horde_rt_rescue_journey_integration_tests ...   Passed    1.59 sec",
+        "2/2 Test #189: horde_rt_chapter_terrain_journey_tests ......   Passed   18.72 sec",
+        "Total Test time (real) =  20.33 sec"
+      ]
+    },
+    {
+      "localFile": "shader-artifact-tests-final.log",
+      "sha256": "c18017b24eb1440466356b8d68d0ff89e852fd8bb4dba31308562a8cda8cf4c5",
+      "bytes": 505,
+      "result": "all selected tests passed",
+      "summaryLines": [
+        "1/1 Test #109: horde_rt_raygen_variant_artifact_tests ...   Passed  104.95 sec",
+        "Total Test time (real) = 104.98 sec"
+      ]
+    },
+    {
+      "localFile": "all-shader-contract-tests.log",
+      "sha256": "cc9f338cb24359b8acb7b8e685a901847f7f1622fae0be2adaa23bc13b5296cf",
+      "bytes": 5474,
+      "result": "manifest and RayQuery gates passed; earlier artifact hard-pin failure retained and superseded by final gate",
+      "summaryLines": [
+        "1/3 Test #108: horde_rt_raygen_variant_manifest_tests ...   Passed   85.10 sec",
+        "2/3 Test #109: horde_rt_raygen_variant_artifact_tests ...***Failed   96.21 sec",
+        "3/3 Test #110: horde_rt_rayquery_compute_shader_tests ...   Passed   42.21 sec",
+        "109 - horde_rt_raygen_variant_artifact_tests (Failed)"
+      ]
+    }
+  ],
+  "java": {
+    "tests": 286,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "androidBuildLogSha256": "c277036465775c094ca0dde0c380c4c407a0fe6a611279f56376b51588a80cdd",
+  "androidBuildResult": "assembleDebug four ABIs, lintDebug and testDebugUnitTest passed",
+  "unchangedDeadlines": [
+    "original torch 180 seconds",
+    "motion arm 30 seconds",
+    "motion route 120 seconds",
+    "image-timestamp drain 2 seconds"
+  ]
+}

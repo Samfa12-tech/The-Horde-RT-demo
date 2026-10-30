@@ -1,0 +1,32 @@
+[
+  {
+    "path": "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+    "sha256": "05fa866bab2371604a45b897f0ebeaadb69129939da15dfb6cddd43f69c772a4",
+    "bytes": 10261,
+    "lfs_pointer_git_blob": "ff7b4b83546646f3e059197ed607653582880395"
+  },
+  {
+    "path": "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+    "sha256": "6b9d6bd73e675b53180aea63afa1c0ae08d9ead70b1fcdbdac8013510a5526e4",
+    "bytes": 4834,
+    "lfs_pointer_git_blob": "63c8526d5386bedb64ff7a192988bf2e14e01738"
+  },
+  {
+    "path": "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+    "sha256": "20ca40431c3897f0c9531e30878ce9ccf69ccd4ecd63f53d91fd468dfa1b3d2c",
+    "bytes": 17612,
+    "lfs_pointer_git_blob": "9a172fe7356a1741ad2de735a1a76edd7b0346ea"
+  },
+  {
+    "path": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+    "sha256": "4ca316b8f6a7fe33b6cba4572fb80a7ff154b6643f4954fc6c904fc6b661c164",
+    "bytes": 38124,
+    "lfs_pointer_git_blob": "75530f970aafc282b5ddaa6642e19474220864f5"
+  },
+  {
+    "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+    "sha256": "e6626666594e9cc03651add6d4a8cfc8115b57d72d33f34b00edbb6a7afbe38b",
+    "bytes": 66334,
+    "lfs_pointer_git_blob": "b255e8ce68a7cfd1951f20d161acd410996519cc"
+  }
+]

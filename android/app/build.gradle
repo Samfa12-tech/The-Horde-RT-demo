@@ -55,6 +55,11 @@ if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
 
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
 def validationUnsigned = System.getenv('HORDE_VALIDATION_UNSIGNED') == '1'
+def actorWorkerValue = providers.gradleProperty('hordeActorWorkerExperiment').orNull
+if (actorWorkerValue != null && !(actorWorkerValue in ['true', 'false'])) {
+    throw new GradleException('hordeActorWorkerExperiment must be true or false.')
+}
+def actorWorkerExperiment = actorWorkerValue == 'true'
 def hordeBenchmarkValidation = providers.gradleProperty('hordeBenchmarkValidation').orNull == 'true'
 def hordePresentTimingValidationProperty = providers.gradleProperty('hordePresentTimingValidation').orNull
 if (hordePresentTimingValidationProperty != null && !(hordePresentTimingValidationProperty in ['true', 'false'])) {
@@ -91,7 +96,8 @@ if (hordeStagedPrimaryDebugValidation && hordeBenchmarkValidation) {
 }
 // Benchmark validation is an isolated, development-signed app. Do not even
 // read production signing environment variables for either investigation opt-in.
-def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation
+def hordeRegionPagePrototypeRootProperty = providers.gradleProperty('hordeRegionPagePrototypeRoot').orNull
+def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation || hordeRegionPagePrototypeRootProperty != null || actorWorkerExperiment
 def releaseStoreFile = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
 def releaseStorePassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
 def releaseKeyAlias = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
@@ -177,8 +183,87 @@ def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
             '-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=',
             '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF',
             '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF',
+            '-DHORDE_RT_REGION_PAGE_PROTOTYPE_ROOT=',
             '-DHORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=OFF']
 }
+
+def hordeRegionPageDebugArguments = []
+def legacyRouteTimingValue = providers.gradleProperty('hordeRegionPageRouteTiming').orNull
+def productionRouteTimingValue = providers.gradleProperty('hordeRtRouteTiming').orNull
+if (legacyRouteTimingValue != null && productionRouteTimingValue != null &&
+        legacyRouteTimingValue != productionRouteTimingValue) {
+    throw new GradleException('Conflicting route timing properties.')
+}
+def chapterRouteTimingValue = productionRouteTimingValue ?: legacyRouteTimingValue
+if (chapterRouteTimingValue != null && !(chapterRouteTimingValue in ['true', 'false'])) {
+    throw new GradleException('Route timing properties must be true or false.')
+}
+def chapterRouteTiming = chapterRouteTimingValue == 'true'
+def outdoorScaleProbeValue = providers.gradleProperty('hordeRtOutdoorScaleProbe').orNull
+if (outdoorScaleProbeValue != null && !(outdoorScaleProbeValue in ['true', 'false'])) {
+    throw new GradleException('hordeRtOutdoorScaleProbe must be true or false.')
+}
+def outdoorScaleProbe = outdoorScaleProbeValue == 'true'
+if (outdoorScaleProbe && (!chapterRouteTiming || hordeBenchmarkValidation ||
+        hordeStagedPrimaryDebugValidation || providers.gradleProperty('hordeViewmodelCandidateDir').isPresent() ||
+        hordeRegionPagePrototypeRootProperty != null)) {
+    throw new GradleException('Outdoor scale probe requires ordinary private Debug route timing without other renderer experiments.')
+}
+if (actorWorkerExperiment && (!chapterRouteTiming || outdoorScaleProbe || hordeBenchmarkValidation ||
+        hordeStagedPrimaryDebugValidation || providers.gradleProperty('hordeViewmodelCandidateDir').isPresent() ||
+        hordeRegionPagePrototypeRootProperty != null)) {
+    throw new GradleException('Actor worker requires separate Debug production route timing without shader, asset or scale experiments.')
+}
+
+def frameStageProbeValue = providers.gradleProperty('hordeFrameStageProbe').orNull
+if (frameStageProbeValue != null && !(frameStageProbeValue in ['true', 'false'])) {
+    throw new GradleException('hordeFrameStageProbe must be true or false.')
+}
+def frameStageProbe = frameStageProbeValue == 'true'
+def dispatchClockValue = providers.gradleProperty('hordeDispatchClockProbe').orNull
+if (dispatchClockValue != null && !(dispatchClockValue in ['true', 'false'])) {
+    throw new GradleException('hordeDispatchClockProbe must be true or false.')
+}
+def dispatchClockProbe = dispatchClockValue == 'true'
+if (dispatchClockProbe && (!frameStageProbe || hordeRegionPagePrototypeRootProperty == null)) {
+    throw new GradleException('Dispatch clock observation requires the private frame stage/clock shader profile.')
+}
+if (frameStageProbe && (!chapterRouteTiming || hordeBenchmarkValidation ||
+        hordeStagedPrimaryDebugValidation || providers.gradleProperty('hordeViewmodelCandidateDir').isPresent())) {
+    throw new GradleException('Frame stage profiling requires separate Debug chapter route timing without benchmark, staged or viewmodel experiments.')
+}
+if (chapterRouteTiming && (hordeRtInstrumentationOverride != 'Shipping' || hordeRtDielectricQualityOverride != 'Mobile')) {
+    throw new GradleException('Route timing requires Shipping/Mobile Debug; production shaders are used unless an explicit private root is supplied.')
+}
+if (hordeRegionPagePrototypeRootProperty != null) {
+    if (hordeRegionPagePrototypeRootProperty.isEmpty() ||
+        hordeRegionPagePrototypeRootProperty != hordeRegionPagePrototypeRootProperty.trim() ||
+        (hordeRegionPagePrototypeRootProperty =~ /[;|\r\n\u0000]/).find() ||
+        !new File(hordeRegionPagePrototypeRootProperty).isAbsolute()) {
+        throw new GradleException('hordeRegionPagePrototypeRoot requires an absolute private directory without argument delimiters.')
+    }
+    if (hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation || providers.gradleProperty('hordeViewmodelCandidateDir').isPresent()) {
+        throw new GradleException('Region-page investigation must be separate from benchmark, staged and viewmodel experiments.')
+    }
+    def pageRoot = new File(hordeRegionPagePrototypeRootProperty).canonicalFile
+    if (!new File(pageRoot, 'src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h').isFile()) {
+        throw new GradleException('Region-page investigation needs a prepared private shader catalog.')
+    }
+    if (dispatchClockProbe && !new File(pageRoot, 'dispatch-clock-probe.json').isFile()) {
+        throw new GradleException('Dispatch clock observation needs the matching private shader ABI marker.')
+    }
+    hordeRegionPageDebugArguments = ["-DHORDE_RT_REGION_PAGE_PROTOTYPE_ROOT=${pageRoot.path.replace('\\', '/')}"]
+}
+// Timestamp queries observe the ordinary production bank unless the caller
+// explicitly supplies a validated private root. Shader-clock writes still need
+// their separate private shader ABI; neither observation is a production default.
+def hordeRtDebugObservationArguments = [
+    "-DHORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=${chapterRouteTiming ? 'ON' : 'OFF'}",
+    "-DHORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE=${outdoorScaleProbe ? 'ON' : 'OFF'}",
+    "-DHORDE_RT_FRAME_STAGE_PROBE=${frameStageProbe ? 'ON' : 'OFF'}",
+    "-DHORDE_RT_DISPATCH_CLOCK_PROBE=${dispatchClockProbe ? 'ON' : 'OFF'}",
+    "-DHORDE_RT_ACTOR_WORKER_EXPERIMENT=${actorWorkerExperiment ? 'ON' : 'OFF'}"
+]
 def hordeRtBenchmarkStagedPrimaryArguments = [
     "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
     "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}",
@@ -277,9 +362,12 @@ if (viewmodelCandidate) {
 
 def hordeMusicRoot = file('../../assets/audio/music/what-the-dark-keeps')
 def hordeMusicManifest = new File(hordeMusicRoot, 'asset.manifest.json')
+def hordeOutdoorMusicRoot = file('../../assets/audio/music/beneath-the-same-moon')
+def hordeOutdoorMusicManifest = new File(hordeOutdoorMusicRoot, 'asset.manifest.json')
 tasks.register('verifyMusicRuntimeAssets') {
     inputs.file hordeMusicManifest
     inputs.dir new File(hordeMusicRoot, 'runtime')
+    inputs.dir hordeOutdoorMusicRoot
     doLast {
         def digest = { File input -> MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() }
         if (digest(hordeMusicManifest) != '672f2321b2fb429cffe9d61119103a1aa3565f355391a162497f741eec9d6e29') {
@@ -325,6 +413,44 @@ tasks.register('verifyMusicRuntimeAssets') {
             manifest.totalWaveBytes != waveBytes || manifest.totalPcmBytes != pcmBytes) {
             throw new GradleException('Music runtime inventory or byte budget disagrees; no unknown assets may be packaged.')
         }
+
+        // Independent outdoor pin; the accepted A-H manifest and 17-file roster
+        // above remain unchanged. Only the approved full main enters packages.
+        if (!hordeOutdoorMusicManifest.isFile() ||
+            digest(hordeOutdoorMusicManifest) != '5318990386a47c7ef815cfcd5165e779bd01b0994cdca3f76926882d1d4e1657') {
+            throw new GradleException('Outdoor music manifest differs from the reviewed admission pin.')
+        }
+        def outdoor = new JsonSlurper().parse(hordeOutdoorMusicManifest, 'UTF-8')
+        if (outdoor.schemaVersion != 1 || outdoor.assetId != 'beneath-the-same-moon' ||
+            outdoor.rights != 'Owner-supplied; authorised for Horde use only' ||
+            outdoor.format.encoding != 'PCM16_LE' || outdoor.format.sampleRate != 48000 ||
+            outdoor.format.channels != 2 || outdoor.tailFrames != 0 ||
+            outdoor.crossfadeFrames != 12000 || outdoor.totalWaveBytes != 20480044 ||
+            outdoor.totalPcmBytes != 20480000 || outdoor.cues.size() != 1) {
+            throw new GradleException('Outdoor music rights, format or main-only budget disagrees.')
+        }
+        def outdoorCue = outdoor.cues[0]
+        def outdoorWaveHash = '14fe0a94e665cf25b4fb4aa08a45e26e18990794740b670906adfecfaf6aee15'
+        if (outdoorCue.cue != 'Outdoor' || outdoorCue.looping != true || outdoorCue.tail != null ||
+            outdoorCue.body.path != 'runtime/outdoor-main.wav' || outdoorCue.body.frames != 5120000 ||
+            outdoorCue.body.bytes != 20480044 || outdoorCue.body.sha256 != outdoorWaveHash) {
+            throw new GradleException('Outdoor music must retain the full main loop without a quiet mix or tail.')
+        }
+        def outdoorWave = new File(hordeOutdoorMusicRoot, 'runtime/outdoor-main.wav')
+        if (!outdoorWave.isFile() || outdoorWave.length() != 20480044 || digest(outdoorWave) != outdoorWaveHash) {
+            throw new GradleException('Outdoor music runtime identity differs.')
+        }
+        def outdoorFiles = fileTree(hordeOutdoorMusicRoot).files.collect {
+            hordeOutdoorMusicRoot.toPath().relativize(it.toPath()).toString().replace('\\', '/')
+        } as Set
+        if (outdoorFiles != (['asset.manifest.json', 'METADATA.md', 'runtime/outdoor-main.wav'] as Set)) {
+            throw new GradleException('Outdoor music closed inventory excludes source originals, quiet mixes and unknown files.')
+        }
+        def outdoorMetadata = new File(hordeOutdoorMusicRoot, 'METADATA.md').getText('UTF-8')
+        if (!outdoorMetadata.contains('Owner-supplied; authorised for Horde use only') ||
+            !outdoorMetadata.contains('source originals are excluded from game packages')) {
+            throw new GradleException('Outdoor music metadata must preserve source exclusion and rights.')
+        }
     }
 }
 
@@ -347,8 +473,64 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/props/runtime/player-sword-scabbard/asset.manifest.json'
         include 'models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb'
         include 'models/props/runtime/player-sword-scabbard/processing-receipt.json'
+        include 'models/world/runtime/tomb-dressing-v01/tomb-niche-rect/asset.manifest.json'
+        include 'models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json'
+        include 'models/world/runtime/tomb-dressing-v01/tomb-niche-rect/tomb-niche-rect-lod0.runtime.glb'
+        include 'models/world/runtime/tomb-dressing-v01/tomb-niche-arched/asset.manifest.json'
+        include 'models/world/runtime/tomb-dressing-v01/tomb-niche-arched/candidate-receipt.json'
+        include 'models/world/runtime/tomb-dressing-v01/tomb-niche-arched/tomb-niche-arched-lod0.runtime.glb'
+        include 'models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/femur/tomb-femur-lod0.runtime.glb'
+        include 'models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/humerus/tomb-humerus-lod0.runtime.glb'
+        include 'models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/skull-jaw/tomb-skull-jaw-lod0.runtime.glb'
+        include 'models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/derivation-receipt.json'
+        include 'models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_1.glb'
+        include 'models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_2.glb'
+        include 'models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_3.glb'
+        include 'models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_displaced_lid.glb'
+        include 'models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_offering_bowl.glb'
+        include 'models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_broken_base.glb'
+        include 'models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_rim_shard.glb'
+        include 'models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json'
         include 'models/world/runtime/collapsed-entry/asset.manifest.json'
+        include 'models/world/runtime/chapter-entry-return-v1/asset.manifest.json'
+        include 'models/world/runtime/grave-markers-r03/grave-marker-damaged.manifest.json'
+        include 'models/world/runtime/grave-markers-r03/grave-marker-damaged.runtime.glb'
+        include 'models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json'
+        include 'models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb'
+        include 'models/world/runtime/chapter-terrain-v1/asset.manifest.json'
+        include 'models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb'
+        include 'textures/props/runtime/chapter-terrain/base-color.android.ktx2'
+        include 'textures/props/runtime/chapter-terrain/normal.android.ktx2'
+        include 'textures/props/runtime/chapter-terrain/orm.android.ktx2'
+        include 'models/characters/runtime/kit-warden-v1/asset.manifest.json'
+        include 'models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb'
+        include 'textures/characters/runtime/kit-warden-v1/base-color.android.ktx2'
+        include 'textures/characters/runtime/kit-warden-v1/normal.android.ktx2'
+        include 'textures/characters/runtime/kit-warden-v1/orm.android.ktx2'
+        include 'textures/characters/runtime/kit-warden-v1/emissive.android.ktx2'
         include 'models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb'
+        include 'models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb'
+        include 'models/world/runtime/forest-tree-pair-v1/asset.manifest.json'
+        include 'models/world/runtime/forest-rocks-v1/asset.manifest.json'
+        include 'models/world/runtime/forest-deadwood-v1/asset.manifest.json'
+        include 'models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb'
+        include 'models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb'
+        include 'models/world/runtime/forest-deadwood-v1/horde-gnarled-stump.glb'
+        include 'models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb'
+        include 'models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb'
+        include 'models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb'
+        include 'models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb'
+        include 'models/world/runtime/forest-road-clue-v1/asset.manifest.json'
+        include 'models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb'
+        include 'models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb'
+        include 'models/world/runtime/bellwether-shell-v4/asset.manifest.json'
+        include 'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb'
+        include 'models/world/runtime/forest-understory-v1/asset.manifest.json'
+        include 'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb'
+        include 'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb'
+        include 'models/world/runtime/forest-tree-pair-v1/runtime-roster.json'
+        include 'models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb'
+        include 'models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb'
         include 'models/props/runtime/dielectric-fixture/asset.manifest.json'
         include 'models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb'
         include 'models/props/runtime/gothic-chest-base/asset.manifest.json'
@@ -359,6 +541,10 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb'
         include 'models/props/runtime/reward-lantern-body/asset.manifest.json'
         include 'models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb'
+        include 'models/props/runtime/attack-warning-ring-v1/asset.manifest.json'
+        include 'models/props/runtime/attack-warning-ring-v1/attack-warning-ring-v1.runtime.glb'
+        include 'models/props/runtime/healing-flask-v1/asset.manifest.json'
+        include 'models/props/runtime/healing-flask-v1/healing-flask-v1.runtime.glb'
         include 'models/player/runtime/asset.manifest.json'
         include 'models/player/runtime/clip-manifest.json'
         include 'models/player/runtime/gothic-traveller-lod0.runtime.glb'
@@ -373,11 +559,27 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/menu/menu_chain.wav'
         include 'audio/menu/asset.manifest.json'
         include 'audio/filmcow/*.wav'
+        include 'audio/filmcow/forest-distant-bird.manifest.json'
+        exclude 'audio/filmcow/forest_distant_bird.wav' // Superseded unheard generic candidate; retained source provenance.
+        include 'audio/night-ambience/runtime/*.wav'
+        include 'audio/night-ambience/manifest.json'
+        include 'audio/night-ambience/NOTICE.md'
+        include 'audio/chapter-local-ambience/asset.manifest.json'
+        include 'audio/chapter-local-ambience/runtime/tomb_drip.wav'
+        include 'audio/chapter-local-ambience/runtime/rope_contact.wav'
+        include 'audio/forest-foliage/asset.manifest.json'
+        include 'audio/forest-foliage/runtime/leaf_rustle.wav'
         include 'audio/filmcow/equipment/sword_draw.wav'
         include 'audio/filmcow/equipment/sword_sheath.wav'
         include 'audio/filmcow/equipment/asset.manifest.json'
         include 'audio/pixabay/waterfall_core_loop.wav'
         include 'audio/pixabay/waterfall-core.manifest.json'
+        include 'audio/pixabay/water_wet_step_1_core.wav'
+        include 'audio/pixabay/water_wet_step_2_core.wav'
+        include 'audio/pixabay/water_wet_step_3_core.wav'
+        include 'audio/pixabay/water_wet_step_4_core.wav'
+        include 'audio/pixabay/water_stream_contact_core.wav'
+        include 'audio/pixabay/water-contact.manifest.json'
         include 'audio/pixabay/chest_unlock.wav'
         include 'audio/pixabay/chest_open.wav'
         include 'audio/pixabay/torch_extinguish.wav'
@@ -386,10 +588,28 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/pixabay/skeleton_idle_rattle.wav'
         include 'audio/pixabay/skeleton_falling_bones.wav'
         include 'audio/pixabay/keeper-asset.manifest.json'
+        include 'audio/pixabay/keeper_death_core.wav'
+        include 'audio/pixabay/keeper-death.manifest.json'
+        include 'audio/kit/runtime/prologue.kit_grate.wav'
+        include 'audio/kit/runtime/rescue.found.wav'
+        include 'audio/kit/runtime/rescue.rope.wav'
+        include 'audio/kit/runtime/reunion.question.wav'
+        include 'audio/kit/runtime/reunion.hint.wav'
+        include 'audio/kit/runtime/reunion.proof.wav'
+        include 'audio/kit/runtime/reunion.first_piece.wav'
+        include 'audio/kit/runtime/reunion.depart.wav'
+        include 'audio/kit/runtime/forest.night.wav'
+        include 'audio/kit/runtime/forest.waystone.wav'
+        include 'audio/kit/runtime/forest.clue.wav'
+        include 'audio/kit/runtime/forest.wait.wav'
+        include 'audio/kit/runtime/forest.village.wav'
+        include 'audio/kit/runtime/asset.manifest.json'
         include 'textures/environment/runtime/night-storm.android.ktx2'
         include 'textures/environment/runtime/asset.manifest.json'
         include 'audio/music/what-the-dark-keeps/asset.manifest.json'
         include 'audio/music/what-the-dark-keeps/runtime/*.wav'
+        include 'audio/music/beneath-the-same-moon/asset.manifest.json'
+        include 'audio/music/beneath-the-same-moon/runtime/outdoor-main.wav'
     }
     from('../..') {
         include 'ASSET_LICENSES.md'
@@ -418,6 +638,8 @@ android {
         versionName hordeVersionName
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
+        buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', 'false'
+        buildConfigField 'boolean', 'ACTOR_WORKER_EXPERIMENT', 'false'
         buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', '33'
         resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
@@ -452,8 +674,11 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug')
+            applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
+            buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', outdoorScaleProbe ? 'true' : 'false'
+            buildConfigField 'boolean', 'ACTOR_WORKER_EXPERIMENT', actorWorkerExperiment ? 'true' : 'false'
+            if (actorWorkerExperiment) resValue 'string', 'app_name', 'Horde RT Actor Worker Experiment'
             if (viewmodelCandidate) resValue 'string', 'app_name', 'Horde RT Viewmodel Candidate'
             if (hordeStagedPrimaryDebugValidation) resValue 'string', 'app_name', 'Horde RT Staged Investigation'
             versionNameSuffix '-debug'
@@ -461,9 +686,11 @@ android {
             externalNativeBuild {
                 cmake {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
+                        *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
-                        *hordeRtDebugStagedPrimaryArguments
+                        *hordeRtDebugStagedPrimaryArguments,
+                        *hordeRegionPageDebugArguments
                 }
             }
         }
@@ -472,6 +699,7 @@ android {
             externalNativeBuild {
                 cmake {
                     arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF',
+                        '-DHORDE_RT_ACTOR_WORKER_EXPERIMENT=OFF',
                         *hordeRtNativePolicyArguments('Shipping')
                 }
             }
@@ -537,7 +765,8 @@ if (viewmodelCandidate) {
 // It intentionally reports the CMake arguments without configuring native code.
 tasks.register('printHordeRtPolicyForTest') {
     doLast {
-        println("debug=" + (hordeRtNativePolicyArguments('Diagnostic') + hordeRtDebugStagedPrimaryArguments).join('|'))
+        println("debug=" + (hordeRtNativePolicyArguments('Diagnostic') + hordeRtDebugStagedPrimaryArguments + hordeRegionPageDebugArguments).join('|'))
+        println("debugObservation=" + hordeRtDebugObservationArguments.join('|'))
         println("release=" + hordeRtNativePolicyArguments('Shipping').join('|'))
         println("benchmark=" + (hordeBenchmarkValidation
             ? (hordeRtNativePolicyArguments('Shipping') + hordeRtBenchmarkStagedPrimaryArguments).join('|')

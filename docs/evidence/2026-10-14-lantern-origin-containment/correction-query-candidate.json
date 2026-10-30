@@ -1,0 +1,12 @@
+{
+  "executableSha256": "2f1ce5e36a75ff225a5b1ab290818fcd13e665220cd1a248f08d4a576421f169",
+  "scope": "Frozen Debug native-profile confirmation after legacy/registry CI correction; not performance",
+  "arguments": [
+    "--development-rescue-journey",
+    "--capture-showcase",
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\lantern-correction-confirm-query-r01",
+    "--development-checkpoint",
+    "chapter-lantern-side-wall-high",
+    "--require-rayquery-compute"
+  ]
+}

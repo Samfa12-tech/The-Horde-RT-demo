@@ -1,0 +1,36 @@
+Traceback (most recent call last):
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\analyze_keeper_mist_fixture.py", line 97, in load_json
+    return json.loads(raw, object_pairs_hook=pairs, parse_constant=bad_constant)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sam_s\AppData\Local\Programs\Python\Python312\Lib\json\__init__.py", line 359, in loads
+    return cls(**kw).decode(s)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sam_s\AppData\Local\Programs\Python\Python312\Lib\json\decoder.py", line 338, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sam_s\AppData\Local\Programs\Python\Python312\Lib\json\decoder.py", line 356, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\android_keeper_preparation.py", line 32, in request_json_response
+    report = load_json(stdout)
+             ^^^^^^^^^^^^^^^^^
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\analyze_keeper_mist_fixture.py", line 99, in load_json
+    raise AnalysisError(str(error)) from error
+analyze_keeper_mist_fixture.AnalysisError: Expecting value: line 1 column 1 (char 0)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\keeper-mist-2026-10-20\renewed\run.py", line 157, in <module>
+    if sys.argv[1]=='preflight':preflight()
+                                ^^^^^^^^^^^
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\keeper-mist-2026-10-20\renewed\run.py", line 52, in preflight
+    assert request_json_response(p.returncode,p.stdout,p.stderr,'keeper20r-read-probe','report',True) is None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\android_keeper_preparation.py", line 34, in request_json_response
+    raise PreparationReadError("malformed existing JSON report") from error
+android_keeper_preparation.PreparationReadError: malformed existing JSON report

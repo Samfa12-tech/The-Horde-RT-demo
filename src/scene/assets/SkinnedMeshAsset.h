@@ -1,6 +1,8 @@
 #pragma once
+#include "scene/assets/SkinWorkMetrics.h"
 
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -15,6 +17,14 @@ namespace horde::scene
 namespace assets { class StaticMeshAsset; }
 
 using SkinnedNodeTransform = std::array<float, 16u>;
+
+// Local-space additive rotation applied after the authored clip pose. Missing
+// entries leave a node untouched, so existing skins retain their exact pose.
+struct SkinnedNodeRotation
+{
+    std::string_view nodeName;
+    std::array<float, 4u> rotation{{0.0f, 0.0f, 0.0f, 1.0f}};
+};
 
 // std430-compatible layout for both the RT build input and the raygen SSBO.
 struct SkinnedRtVertex
@@ -39,7 +49,7 @@ static_assert(offsetof(TexturedSkinnedRtVertex, normal) == 16u);
 static_assert(offsetof(TexturedSkinnedRtVertex, texcoord) == 32u);
 
 // Kept separate from TexturedSkinnedRtVertex so the established mobile lich
-// SSBO/BLAS stride remains 48 bytes. The static-PBR player path consumes this
+// SSBO/BLAS stride remains 48 bytes. Indexed PBR skinning consumes this
 // alongside its unique skinned vertices and writes it into StaticRtVertex.
 struct SkinnedPbrTangent
 {
@@ -49,12 +59,23 @@ static_assert(sizeof(SkinnedPbrTangent) == 16u);
 
 enum class SkinnedClip
 {
-    Idle,
-    Walking,
-    Attack,
-    Dead
+    Idle = 0,
+    Walking = 1,
+    Attack = 2,
+    Dead = 3,
+    TurnLeft = 4,
+    TurnRight = 5
 };
 using SkeletonClip = SkinnedClip;
+
+// Blend local joint TRS before the single skin/tangent pass. Weight endpoints
+// preserve the exact plain clip; no per-vertex interpolation or second skin.
+struct SkinnedClipBlend
+{
+    SkinnedClip clip = SkinnedClip::Idle;
+    float timeSeconds = 0.0f;
+    float weight = 0.0f;
+};
 
 struct SkinnedClipBinding
 {
@@ -98,7 +119,35 @@ struct SkinnedPlayerSockets
     SkinnedNodeTransform rightHand{};
     SkinnedNodeTransform leftGrip{};
     SkinnedNodeTransform rightGrip{};
+    // Hip joint, knee and ankle in the same immutable solved palette.
+    // Empty when neither grounded leg pose is requested (the legacy fast path).
+    std::array<SkinnedNodeTransform, 3u> leftLeg{};
+    std::array<SkinnedNodeTransform, 3u> rightLeg{};
 };
+
+inline constexpr float kMaximumPlayerPelvisDropMetres = 0.72f;
+inline constexpr float kMaximumPlayerCrouchPelvisDropMetres = 0.6f;
+// Reversible native pose recipe: move the pelvis back as the knees fold.
+// In the imported +Z-forward frame, the deepest admitted pose sets back 18 cm.
+inline constexpr float kPlayerPlantedPelvisSetbackPerDrop = 0.25f;
+
+struct SkinnedPlayerDodgePose
+{
+    float weight = 0.0f;
+    float modelX = 0.0f;
+    float modelZ = 0.0f;
+};
+inline bool ValidPlayerDodgePose(const SkinnedPlayerDodgePose& pose)
+{
+    return std::isfinite(pose.weight) && pose.weight >= 0.0f && pose.weight <= 1.0f &&
+        std::isfinite(pose.modelX) && std::isfinite(pose.modelZ) &&
+        (pose.weight == 0.0f || std::abs(std::hypot(pose.modelX,pose.modelZ)-1.0f) < .002f);
+}
+inline std::array<float,3> PlayerDodgeTorsoOffset(const SkinnedPlayerDodgePose& pose)
+{
+    return {pose.modelX * pose.weight * .04f, -pose.weight * .08f,
+            pose.modelZ * pose.weight * .04f};
+}
 
 struct SkinnedPlayerPoseData;
 struct SkinnedPlayerRigLayout;
@@ -128,7 +177,7 @@ const SkinnedClipSet& LichPlaceholderClipSet();
 const SkinnedClipSet& PlayerLocomotionClipSet();
 
 // Deliberately narrow glTF 2.0 reader for the audited Meshy bipeds. It imports
-// one skinned primitive into four semantic clip slots selected by the caller.
+// one skinned primitive into up to six semantic clip slots selected by the caller.
 class SkinnedMeshAsset
 {
 public:
@@ -140,6 +189,11 @@ public:
     SkinnedMeshAsset& operator=(SkinnedMeshAsset&&) noexcept;
 
     bool LoadClips(const std::string& glbPath, const SkinnedClipSet& clipSet, std::string& diagnostic);
+    // Bindings follow SkinnedClip slot order; omitted trailing slots stay unmapped.
+    // Explicit empty optional bindings preserve holes such as Attack and Dead.
+    static constexpr std::size_t kMaximumClipBindings = 6u;
+    bool LoadClips(const std::string& glbPath, std::span<const SkinnedClipBinding> bindings,
+                   std::string& diagnostic);
     bool LoadCombatClips(const std::string& glbPath, std::string& diagnostic);
     bool IsLoaded() const { return loaded_; }
     bool HasTexcoords() const { return hasTexcoords_; }
@@ -172,12 +226,24 @@ public:
                        std::string_view nodeName,
                        SkinnedNodeTransform& output,
                        std::string& diagnostic) const;
-    bool Skin(SkinnedClip clip, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const;
-    bool SkinTextured(SkinnedClip clip, float timeSeconds, std::vector<TexturedSkinnedRtVertex>& output, std::string& diagnostic) const;
+    bool Skin(SkinnedClip clip, float timeSeconds, std::vector<SkinnedRtVertex>& output,
+              std::string& diagnostic,
+              std::span<const SkinnedNodeRotation> additiveNodeRotations = {}, SkinWorkMetrics* work = nullptr,
+              const SkinnedClipBlend* blend = nullptr) const;
+    bool SkinTextured(SkinnedClip clip, float timeSeconds,
+                      std::vector<TexturedSkinnedRtVertex>& output, std::string& diagnostic,
+                      std::span<const SkinnedNodeRotation> additiveNodeRotations = {}, SkinWorkMetrics* work = nullptr) const;
     bool SkinUniqueTextured(SkinnedClip clip,
                             float timeSeconds,
                             std::vector<TexturedSkinnedRtVertex>& output,
-                            std::string& diagnostic) const;
+                            std::string& diagnostic, SkinWorkMetrics* work = nullptr) const;
+    // Plain clip skinning for indexed PBR actors, without player rig/IK rules.
+    bool SkinUniquePbr(SkinnedClip clip, float timeSeconds,
+                       std::vector<TexturedSkinnedRtVertex>& output,
+                       std::vector<SkinnedPbrTangent>& outputTangents,
+                       std::string& diagnostic,
+                       std::span<const SkinnedNodeRotation> additiveNodeRotations = {},
+                       const SkinnedClipBlend* blend = nullptr, SkinWorkMetrics* work = nullptr) const;
     bool SkinPlayerUniqueTextured(SkinnedClip clip,
                                   float timeSeconds,
                                   const SkinnedArmIkTarget& leftArm,
@@ -186,10 +252,24 @@ public:
                                   std::vector<SkinnedPbrTangent>& outputTangents,
                                   SkinnedPlayerSockets& sockets,
                                   std::string& diagnostic) const;
+    // Positive drop is stationary Idle only: it lowers/sets back the torso and
+    // folds both legs without changing lengths or authored ankle transforms.
+    // [0, 0.72] metres; zero keeps the old palette for every supported clip.
+    // Independent crouch drop [0, 0.6] supports Idle/Walking, vertically lowering
+    // the torso while preserving each animated ankle/foot descendant transform.
+    // The two drops are mutually exclusive. Arm targets remain caller-owned in
+    // the same model frame (including the shared lowered eye); no extra shift.
+    // Optional dodge translates the pelvis and articulates directional ankle
+    // targets in model space before the same arm solve. It is exclusive with
+    // the grounded drops; zero retains the exact original palette. These are
+    // visual pose constraints, not movement/collision or world-foot locking.
     bool EvaluatePlayerPose(SkinnedClip clip, float timeSeconds,
                             const SkinnedArmIkTarget& leftArm,
                             const SkinnedArmIkTarget& rightArm,
-                            SkinnedPlayerPose& pose, std::string& diagnostic) const;
+                            SkinnedPlayerPose& pose, std::string& diagnostic,
+                            float plantedPelvisDropMetres = 0.0f,
+                            float crouchPelvisDropMetres = 0.0f,
+                            SkinnedPlayerDodgePose dodge = {}) const;
     // Requires exact ordered joint names and inverse-bind agreement. A successful
     // binding is cached by immutable rig identity, never by raw asset addresses.
     bool SkinPlayerPoseUniqueTextured(const SkinnedPlayerPose& pose,
@@ -198,6 +278,12 @@ public:
                                       std::string& diagnostic) const;
 
 private:
+    bool SkinUniqueGeometry(SkinnedClip clip, float timeSeconds,
+                            std::string& diagnostic,
+                            std::span<const SkinnedNodeRotation> additiveNodeRotations,
+                            std::vector<SkinnedPbrTangent>* outputTangents = nullptr,
+                            const SkinnedClipBlend* blend = nullptr, SkinWorkMetrics* work = nullptr) const;
+    void CopyUniqueTextured(std::vector<TexturedSkinnedRtVertex>& output, SkinWorkMetrics* work = nullptr) const;
     struct SourceVertex;
     struct Node;
     struct Channel;

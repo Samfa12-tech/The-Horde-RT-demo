@@ -1,0 +1,59 @@
+Start testing: Oct 20 22:45 AUS Eastern Summer Time
+----------------------------------------------------------
+210/221 Testing: horde_rt_kit_source_intake_tests
+210/221 Test: horde_rt_kit_source_intake_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_kit_source_intake_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_kit_source_intake_tests" start time: Oct 20 22:45 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Kit native acting recipe=speaking-peak upper_changed=9457 planted_low_vertices=2071 maximum_displacement_m=0.011135
+Kit native acting recipe=recognition-peak upper_changed=9531 planted_low_vertices=2071 maximum_displacement_m=0.0405345
+Kit native stance duration=0.833333 left_mps=1.99589 right_mps=1.80732 inferred_cycle_m=1.58467 pinned_visual_cycle_m=1.56
+Kit native route transition=stop frames=12 hard_reset_peak_boot_m=0.578439 joint_blend_peak_boot_m=0.0527043
+Kit native route transition=start frames=12 hard_reset_peak_boot_m=0.202567 joint_blend_peak_boot_m=0.116409
+Warden|idle phase=0 duration=2 vertices=77904 height=1.8 minY=-1.02273e-06 maxY=1.8
+Warden|idle phase=0.25 duration=2 vertices=77904 height=1.8 minY=-1.02273e-06 maxY=1.8
+Warden|idle phase=0.5 duration=2 vertices=77904 height=1.80016 minY=-1.02273e-06 maxY=1.80016
+Warden|idle phase=0.75 duration=2 vertices=77904 height=1.79998 minY=-1.02273e-06 maxY=1.79998
+Warden|idle phase=1 duration=2 vertices=77904 height=1.8 minY=-1.02273e-06 maxY=1.8
+Warden|walk phase=0 duration=0.833333 vertices=77904 height=1.79616 minY=-0.0130672 maxY=1.78309
+Warden|walk phase=0.25 duration=0.833333 vertices=77904 height=1.73033 minY=-0.00824328 maxY=1.72209
+Warden|walk phase=0.5 duration=0.833333 vertices=77904 height=1.76996 minY=-0.0165889 maxY=1.75337
+Warden|walk phase=0.75 duration=0.833333 vertices=77904 height=1.73425 minY=-0.00956464 maxY=1.72469
+Warden|walk phase=1 duration=0.833333 vertices=77904 height=1.78595 minY=-0.0134074 maxY=1.77255
+Warden|run phase=0 duration=0.533333 vertices=77904 height=1.69676 minY=-0.00450717 maxY=1.69225
+Warden|run phase=0.25 duration=0.533333 vertices=77904 height=1.71094 minY=0.0385231 maxY=1.74947
+Warden|run phase=0.5 duration=0.533333 vertices=77904 height=1.68057 minY=-0.00351482 maxY=1.67706
+Warden|run phase=0.75 duration=0.533333 vertices=77904 height=1.70327 minY=0.0441332 maxY=1.7474
+Warden|run phase=1 duration=0.533333 vertices=77904 height=1.69676 minY=-0.00450746 maxY=1.69225
+Warden|jump phase=0 duration=0.8 vertices=77904 height=1.78325 minY=0.0715855 maxY=1.85484
+Warden|jump phase=0.25 duration=0.8 vertices=77904 height=1.79413 minY=-0.0191978 maxY=1.77494
+Warden|jump phase=0.5 duration=0.8 vertices=77904 height=1.79873 minY=-0.0416475 maxY=1.75708
+Warden|jump phase=0.75 duration=0.8 vertices=77904 height=1.78991 minY=0.0222505 maxY=1.81216
+Warden|jump phase=1 duration=0.8 vertices=77904 height=1.8 minY=-1.02273e-06 maxY=1.8
+Warden|fall phase=0 duration=0.666667 vertices=77904 height=1.79861 minY=-0.0304022 maxY=1.76821
+Warden|fall phase=0.25 duration=0.666667 vertices=77904 height=1.79349 minY=-0.0187385 maxY=1.77475
+Warden|fall phase=0.5 duration=0.666667 vertices=77904 height=1.79794 minY=-0.0168376 maxY=1.7811
+Warden|fall phase=0.75 duration=0.666667 vertices=77904 height=1.79349 minY=-0.0187385 maxY=1.77475
+Warden|fall phase=1 duration=0.666667 vertices=77904 height=1.79861 minY=-0.0304022 maxY=1.76821
+Warden|slide phase=0 duration=0.8 vertices=77904 height=1.71697 minY=0.228703 maxY=1.94567
+Warden|slide phase=0.25 duration=0.8 vertices=77904 height=1.71371 minY=0.227394 maxY=1.9411
+Warden|slide phase=0.5 duration=0.8 vertices=77904 height=1.70997 minY=0.226484 maxY=1.93645
+Warden|slide phase=0.75 duration=0.8 vertices=77904 height=1.71371 minY=0.227394 maxY=1.9411
+Warden|slide phase=1 duration=0.8 vertices=77904 height=1.71697 minY=0.228703 maxY=1.94567
+Warden|mantle phase=0 duration=1 vertices=77904 height=1.79174 minY=-1.02273e-06 maxY=1.79174
+Warden|mantle phase=0.25 duration=1 vertices=77904 height=1.80526 minY=-0.0774578 maxY=1.72781
+Warden|mantle phase=0.5 duration=1 vertices=77904 height=1.80496 minY=-0.157781 maxY=1.64718
+Warden|mantle phase=0.75 duration=1 vertices=77904 height=1.80485 minY=-0.101791 maxY=1.70306
+Warden|mantle phase=1 duration=1 vertices=77904 height=1.8 minY=-1.02273e-06 maxY=1.8
+Kit source intake clips=7 sampled_poses=35 failures=0 runtime_admission=NO
+<end of output>
+Test time =   2.35 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_kit_source_intake_tests" end time: Oct 20 22:45 AUS Eastern Summer Time
+"horde_rt_kit_source_intake_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 20 22:45 AUS Eastern Summer Time

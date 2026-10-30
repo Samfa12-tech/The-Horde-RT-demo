@@ -1,0 +1,301 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  MusicDirector.cpp
+  MusicPcmAssetBank.cpp
+  MusicPcmStream.cpp
+  MusicPlaybackSession.cpp
+  PlayerAnimationState.cpp
+  HeldItemKinematics.cpp
+  HeldLightState.cpp
+  GameSimulation.cpp
+  GameSimulationRescue.cpp
+  Generating Code...
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  TombDressing.cpp
+  SkinnedMeshAsset.cpp
+  CharacterRenderSlot.cpp
+  PlayerRenderSlot.cpp
+  PresentableTinyRtScene.cpp
+  RtPipelineVariantProvider.cpp
+  SimulationFrameAdapter.cpp
+  Generating Code...
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  CharacterRenderSlotSmoke.cpp
+  horde_rt_character_render_slot_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_character_render_slot_smoke.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  CombatFoundationTests.cpp
+  horde_rt_combat_foundation_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_combat_foundation_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  SwordCombatSmoke.cpp
+  horde_rt_combat_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_combat_smoke.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  CombatTimingTraceTests.cpp
+  horde_rt_combat_timing_trace_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_combat_timing_trace_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  DesktopControllerInputTests.cpp
+  horde_rt_desktop_controller_input_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_desktop_controller_input_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  GraphicsPreviewFrameAdapterTests.cpp
+  horde_rt_graphics_preview_frame_adapter_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_preview_frame_adapter_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  HeldItemVerticalSupportRigTests.cpp
+  horde_rt_held_item_vertical_support_rig_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_vertical_support_rig_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_input_mailbox_stress.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_input_mailbox_stress.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  InputPresentationTraceTests.cpp
+  horde_rt_input_presentation_trace_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_input_presentation_trace_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  MotionEvidenceScenario.cpp
+  MotionEvidenceLedger.cpp
+  MotionEvidenceScenarioTests.cpp
+  Generating Code...
+  horde_rt_motion_evidence_scenario_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_motion_evidence_scenario_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  RtPipelineVariantProvider.cpp
+  horde_rt_pipeline_bundle_contracts_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_bundle_contracts_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  RtPipelineVariantProvider.cpp
+  horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_bundle_lifetime_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  RtPipelineVariantProvider.cpp
+  RtPipelineVariantProviderTests.cpp
+  Generating Code...
+  horde_rt_pipeline_variant_provider_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_variant_provider_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_pipeline_variants_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_variants_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_rescue_blockout_import_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_blockout_import_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  RescueJourneyIntegrationTests.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244: '=': conversion from '_Ty' to '_Ty', possible loss of data [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         with [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:             _Ty=int [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         and [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:             _Ty=float [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+  (compiling source file '../../../tests/RescueJourneyIntegrationTests.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65):
+      the template instantiation context (the oldest one first) is
+          <repo>\tests\RescueJourneyIntegrationTests.cpp(28,85):
+          see reference to function template instantiation 'std::optional<float> &std::optional<float>::operator =<int,0>(_Ty2 &&) noexcept' being compiled
+          with
+          [
+              _Ty2=int
+          ]
+              <repo>\tests\RescueJourneyIntegrationTests.cpp(28,85):
+              see the first reference to 'std::optional<float>::operator =' in 'main'
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(312,15):
+          see reference to function template instantiation 'void std::_Optional_construct_base<_Ty>::_Assign<int>(_Ty2 &&) noexcept' being compiled
+          with
+          [
+              _Ty=float,
+              _Ty2=int
+          ]
+  
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244: 'initializing': conversion from '_Ty' to '_Ty', possible loss of data [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         with [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:             _Ty=int [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         and [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:             _Ty=float [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+  (compiling source file '../../../tests/RescueJourneyIntegrationTests.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64):
+      the template instantiation context (the oldest one first) is
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(312,15):
+          see reference to function template instantiation 'void std::_Optional_construct_base<_Ty>::_Assign<int>(_Ty2 &&) noexcept' being compiled
+          with
+          [
+              _Ty=float,
+              _Ty2=int
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(168,13):
+          see reference to function template instantiation '_Ty &std::_Optional_construct_base<_Ty>::_Construct<int>(int &&) noexcept' being compiled
+          with
+          [
+              _Ty=float
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(156,14):
+          see reference to function template instantiation 'void std::_Construct_in_place<float,_Ty>(float &,_Ty &&) noexcept' being compiled
+          with
+          [
+              _Ty=int
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(472,14):
+          see reference to function template instantiation '_Ty *std::construct_at<_Ty,int>(_Ty *const ,int &&) noexcept(<expr>)' being compiled
+          with
+          [
+              _Ty=float
+          ]
+  
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(476,61): warning C4244: 'initializing': conversion from '_Ty' to 'float', possible loss of data [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(476,61): warning C4244:         with [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(476,61): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(476,61): warning C4244:             _Ty=int [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(476,61): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+  (compiling source file '../../../tests/RescueJourneyIntegrationTests.cpp')
+  
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244: 'initializing': conversion from '_Ty' to '_Ty', possible loss of data [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         with [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:             _Ty=int [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         and [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:             _Ty=float [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+  (compiling source file '../../../tests/RescueJourneyIntegrationTests.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69):
+      the template instantiation context (the oldest one first) is
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(156,14):
+          see reference to function template instantiation 'void std::_Construct_in_place<float,_Ty>(float &,_Ty &&) noexcept' being compiled
+          with
+          [
+              _Ty=int
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(472,14):
+          see reference to function template instantiation '_Ty *std::construct_at<_Ty,int>(_Ty *const ,int &&) noexcept' being compiled
+          with
+          [
+              _Ty=float
+          ]
+  
+  horde_rt_rescue_journey_integration_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_journey_integration_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  RescueRigAttachmentTests.cpp
+  horde_rt_rescue_rig_attachment_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_rig_attachment_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_rescue_traversal_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_traversal_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_scene_abi_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_scene_abi_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  RtSceneResourceInventoryTests.cpp
+  horde_rt_scene_resource_inventory_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_scene_resource_inventory_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  SfxVolumeTests.cpp
+  horde_rt_sfx_volume_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_sfx_volume_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  ShowcaseGameplaySmoke.cpp
+  horde_rt_showcase_gameplay_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_showcase_gameplay_smoke.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  SimulationGameplayTests.cpp
+  horde_rt_simulation_gameplay_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_simulation_gameplay_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  SimulationTimingTests.cpp
+  horde_rt_simulation_timing_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_simulation_timing_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  SpatialAudioSmoke.cpp
+  horde_rt_spatial_audio_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_spatial_audio_smoke.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  TombDressing.cpp
+  TombDressingTests.cpp
+  Generating Code...
+  horde_rt_tomb_dressing_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_tomb_dressing_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  TombWallRecessTests.cpp
+  horde_rt_tomb_wall_recess_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_tomb_wall_recess_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  VerticalSupportTests.cpp
+  horde_rt_vertical_support_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_vertical_support_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  WaterContactTests.cpp
+  horde_rt_water_contact_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_water_contact_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  WaterfallProductionRouteTests.cpp
+  horde_rt_waterfall_production_route_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_waterfall_production_route_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  WindowsCombatPracticeLaunchTests.cpp
+  horde_rt_windows_combat_practice_launch_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_combat_practice_launch_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  WindowsMusicPlayback.cpp
+  horde_windows_music.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_windows_music.lib
+  DiagnosticWindow.cpp
+  horde_rt_diagnostic_window.vcxproj -> <repo>\build\presets\windows-x64-release\Release\HordeLanternRT.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  FinalHeldTorchClearanceTests.cpp
+  horde_rt_final_held_torch_clearance_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_final_held_torch_clearance_tests.exe

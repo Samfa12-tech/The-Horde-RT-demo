@@ -1,0 +1,153 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  GameSimulation.cpp
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_windows_music.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_windows_music.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  horde_rt_diagnostic_window.vcxproj -> <repo>\build\presets\windows-x64-release\Release\HordeLanternRT.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  CombatFoundationTests.cpp
+  horde_rt_combat_foundation_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_combat_foundation_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_combat_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_combat_smoke.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_combat_timing_trace_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_combat_timing_trace_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_input_presentation_trace_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_input_presentation_trace_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_simulation_timing_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_simulation_timing_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_simulation_gameplay_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_simulation_gameplay_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_waterfall_production_route_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_waterfall_production_route_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_music_director_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_music_director_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_held_item_transition_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_transition_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_held_item_socket_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_socket_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_held_item_clearance_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_clearance_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  horde_rt_final_held_torch_clearance_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_final_held_torch_clearance_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  horde_rt_held_item_vertical_support_rig_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_vertical_support_rig_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  horde_rt_player_directional_rig_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_player_directional_rig_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_player_animation_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_player_animation_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  horde_rt_world_route_foundation_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_world_route_foundation_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  horde_rt_vertical_support_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_vertical_support_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  horde_rt_character_render_slot_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_character_render_slot_smoke.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_scene_abi_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_scene_abi_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_spatial_audio_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_spatial_audio_smoke.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_lantern_reward_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_lantern_reward_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_input_mailbox_stress.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_input_mailbox_stress.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_windows_combat_practice_launch_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_combat_practice_launch_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_android_debug_request_admission_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_android_debug_request_admission_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_pipeline_variants_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_variants_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_pipeline_variant_provider_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_variant_provider_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rt_pipeline_bundle_contracts_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_bundle_contracts_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rtpv_0_0_obj.vcxproj -> <repo>\build\presets\windows-x64-release\horde_rtpv_0_0_obj.dir\Release\horde_rtpv_0_0_obj.lib
+  horde_rt_provider_shipping_mobile_fixture.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_provider_shipping_mobile_fixture.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rtpv_0_1_obj.vcxproj -> <repo>\build\presets\windows-x64-release\horde_rtpv_0_1_obj.dir\Release\horde_rtpv_0_1_obj.lib
+  horde_rt_provider_shipping_high_fixture.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_provider_shipping_high_fixture.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rtpv_1_0_obj.vcxproj -> <repo>\build\presets\windows-x64-release\horde_rtpv_1_0_obj.dir\Release\horde_rtpv_1_0_obj.lib
+  horde_rt_provider_diagnostic_mobile_fixture.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_provider_diagnostic_mobile_fixture.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rtpv_1_1_obj.vcxproj -> <repo>\build\presets\windows-x64-release\horde_rtpv_1_1_obj.dir\Release\horde_rtpv_1_1_obj.lib
+  horde_rt_provider_diagnostic_high_fixture.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_provider_diagnostic_high_fixture.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_sword_target_contact_region_witness.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_sword_target_contact_region_witness.exe

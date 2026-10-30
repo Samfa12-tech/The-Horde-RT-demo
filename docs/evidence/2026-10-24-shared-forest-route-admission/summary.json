@@ -1,0 +1,5876 @@
+{
+  "schema": 1,
+  "runs": [
+    {
+      "label": "route-control-open",
+      "shared": false,
+      "rawRows": 1524,
+      "validUniqueStageRows": 1524,
+      "invalidStageRows": 0,
+      "reusedCompletionRows": 0,
+      "routeSummary": {
+        "schema": 2,
+        "scope": "moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance",
+        "maximumSimulationTicksPerRender": 4,
+        "simulationHz": 60,
+        "frames": 1524,
+        "warmupFrames": 64,
+        "fullRouteValidated": true,
+        "recreationTestRequiredSeparately": true,
+        "sharedForestResident": false,
+        "sharedForestValidatedFrames": 0,
+        "maximumSharedForestMaskedInstances": 0,
+        "maximumNormalStaticOwnerSavingBytes": 6216192,
+        "staticDetailUnloads": 1,
+        "staticDetailRestores": 1,
+        "keeperVertexLifetime": {
+          "retiredAllocationBytes": 1323264,
+          "retiredMemoryFlags": 6,
+          "retirements": 1,
+          "restorations": 1,
+          "resetRestored": true
+        },
+        "keeperTextureLifetime": {
+          "retiredDeviceLocalBytes": 33554432,
+          "retiredHostVisibleBytes": 0,
+          "baseMemoryFlags": 1,
+          "emissiveMemoryFlags": 1,
+          "retirements": 1,
+          "restorations": 1,
+          "resetRestored": true
+        },
+        "complete": true
+      },
+      "initialOwner": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 76,
+        "recordSerial": 76,
+        "submissionSerial": 76,
+        "completionSerial": 76,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "initialCamera": [
+        -28.7023,
+        1.4512,
+        -5.80325,
+        1.5708,
+        -0.1
+      ],
+      "initialLighting": {
+        "count": 1,
+        "emitters": [
+          {
+            "stableId": 1279348308,
+            "positionStrength": [
+              -28.1300201,
+              2.60213232,
+              -5.983634,
+              0.686399996
+            ],
+            "colourIntensity": [
+              1,
+              0.426759988,
+              0.0815246254,
+              0.686399996
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+        "waterQuality": "high"
+      },
+      "quality": {
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedMistEnabled": true,
+        "actualUploadedDustQuality": 2
+      },
+      "hardware": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "initialResources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298944,
+        "deviceLocalBytes": 372464608
+      },
+      "processSeconds": 130.46899999999732,
+      "gpuContextSamples": [
+        {
+          "elapsedSeconds": 0.07899999999790452,
+          "exitCode": 0,
+          "values": "44, 1890, 9001, P4, 7.36, 0"
+        },
+        {
+          "elapsedSeconds": 1.1569999999919673,
+          "exitCode": 0,
+          "values": "44, 1890, 9001, P4, 7.36, 0"
+        },
+        {
+          "elapsedSeconds": 2.2189999999973224,
+          "exitCode": 0,
+          "values": "44, 1890, 9001, P4, 7.36, 0"
+        },
+        {
+          "elapsedSeconds": 3.2969999999913853,
+          "exitCode": 0,
+          "values": "44, 1890, 9001, P4, 7.30, 0"
+        },
+        {
+          "elapsedSeconds": 4.375,
+          "exitCode": 0,
+          "values": "44, 1920, 9001, P4, 7.64, 0"
+        },
+        {
+          "elapsedSeconds": 5.421999999991385,
+          "exitCode": 0,
+          "values": "44, 1890, 9001, P4, 8.29, 0"
+        },
+        {
+          "elapsedSeconds": 6.51600000000326,
+          "exitCode": 0,
+          "values": "44, 1890, 9001, P4, 7.35, 0"
+        },
+        {
+          "elapsedSeconds": 7.5789999999979045,
+          "exitCode": 0,
+          "values": "44, 1890, 9001, P8, 7.34, 0"
+        },
+        {
+          "elapsedSeconds": 8.656999999991967,
+          "exitCode": 0,
+          "values": "43, 180, 405, P8, 3.45, 0"
+        },
+        {
+          "elapsedSeconds": 9.75,
+          "exitCode": 0,
+          "values": "44, 180, 405, P5, 5.76, 54"
+        },
+        {
+          "elapsedSeconds": 10.828999999997905,
+          "exitCode": 0,
+          "values": "44, 210, 810, P5, 6.72, 0"
+        },
+        {
+          "elapsedSeconds": 11.906999999991967,
+          "exitCode": 0,
+          "values": "44, 180, 405, P8, 4.05, 0"
+        },
+        {
+          "elapsedSeconds": 12.968999999997322,
+          "exitCode": 0,
+          "values": "44, 225, 9001, P4, 6.59, 0"
+        },
+        {
+          "elapsedSeconds": 14.046999999991385,
+          "exitCode": 0,
+          "values": "44, 225, 9001, P5, 6.62, 0"
+        },
+        {
+          "elapsedSeconds": 15.125,
+          "exitCode": 0,
+          "values": "46, 180, 810, P5, 17.38, 24"
+        },
+        {
+          "elapsedSeconds": 16.203999999997905,
+          "exitCode": 0,
+          "values": "45, 405, 9001, P4, 21.42, 0"
+        },
+        {
+          "elapsedSeconds": 17.281999999991967,
+          "exitCode": 0,
+          "values": "45, 315, 9001, P4, 9.81, 4"
+        },
+        {
+          "elapsedSeconds": 18.360000000000582,
+          "exitCode": 0,
+          "values": "45, 232, 9001, P4, 8.98, 4"
+        },
+        {
+          "elapsedSeconds": 19.421999999991385,
+          "exitCode": 0,
+          "values": "45, 292, 9001, P4, 7.74, 4"
+        },
+        {
+          "elapsedSeconds": 20.485000000000582,
+          "exitCode": 0,
+          "values": "45, 285, 810, P5, 6.69, 0"
+        },
+        {
+          "elapsedSeconds": 21.578999999997905,
+          "exitCode": 0,
+          "values": "45, 412, 810, P5, 9.86, 11"
+        },
+        {
+          "elapsedSeconds": 22.64100000000326,
+          "exitCode": 0,
+          "values": "45, 435, 405, P8, 4.86, 10"
+        },
+        {
+          "elapsedSeconds": 23.718999999997322,
+          "exitCode": 0,
+          "values": "45, 525, 405, P8, 4.74, 3"
+        },
+        {
+          "elapsedSeconds": 24.796999999991385,
+          "exitCode": 0,
+          "values": "45, 712, 810, P5, 6.71, 3"
+        },
+        {
+          "elapsedSeconds": 25.860000000000582,
+          "exitCode": 0,
+          "values": "45, 660, 405, P8, 9.46, 25"
+        },
+        {
+          "elapsedSeconds": 26.937999999994645,
+          "exitCode": 0,
+          "values": "46, 525, 810, P5, 12.32, 18"
+        },
+        {
+          "elapsedSeconds": 28.01600000000326,
+          "exitCode": 0,
+          "values": "45, 435, 405, P8, 6.44, 18"
+        },
+        {
+          "elapsedSeconds": 29.078999999997905,
+          "exitCode": 0,
+          "values": "46, 442, 9001, P4, 12.56, 7"
+        },
+        {
+          "elapsedSeconds": 30.156999999991967,
+          "exitCode": 0,
+          "values": "45, 315, 810, P5, 13.14, 20"
+        },
+        {
+          "elapsedSeconds": 31.25,
+          "exitCode": 0,
+          "values": "45, 255, 810, P5, 9.53, 10"
+        },
+        {
+          "elapsedSeconds": 32.312999999994645,
+          "exitCode": 0,
+          "values": "46, 510, 810, P5, 10.36, 25"
+        },
+        {
+          "elapsedSeconds": 33.39100000000326,
+          "exitCode": 0,
+          "values": "45, 652, 810, P5, 10.95, 18"
+        },
+        {
+          "elapsedSeconds": 34.46899999999732,
+          "exitCode": 0,
+          "values": "45, 607, 810, P5, 9.62, 32"
+        },
+        {
+          "elapsedSeconds": 35.546999999991385,
+          "exitCode": 0,
+          "values": "45, 720, 810, P5, 12.72, 19"
+        },
+        {
+          "elapsedSeconds": 36.61000000000058,
+          "exitCode": 0,
+          "values": "46, 697, 810, P5, 8.31, 10"
+        },
+        {
+          "elapsedSeconds": 37.687999999994645,
+          "exitCode": 0,
+          "values": "45, 600, 405, P8, 7.93, 2"
+        },
+        {
+          "elapsedSeconds": 38.76600000000326,
+          "exitCode": 0,
+          "values": "45, 562, 405, P8, 4.18, 0"
+        },
+        {
+          "elapsedSeconds": 39.828999999997905,
+          "exitCode": 0,
+          "values": "46, 787, 810, P5, 10.68, 19"
+        },
+        {
+          "elapsedSeconds": 40.90699999999197,
+          "exitCode": 0,
+          "values": "46, 607, 810, P5, 11.31, 12"
+        },
+        {
+          "elapsedSeconds": 41.96899999999732,
+          "exitCode": 0,
+          "values": "46, 622, 810, P5, 11.55, 14"
+        },
+        {
+          "elapsedSeconds": 43.046999999991385,
+          "exitCode": 0,
+          "values": "46, 652, 810, P5, 11.94, 18"
+        },
+        {
+          "elapsedSeconds": 44.125,
+          "exitCode": 0,
+          "values": "46, 802, 810, P5, 11.40, 15"
+        },
+        {
+          "elapsedSeconds": 45.187999999994645,
+          "exitCode": 0,
+          "values": "46, 615, 810, P5, 11.65, 11"
+        },
+        {
+          "elapsedSeconds": 46.26600000000326,
+          "exitCode": 0,
+          "values": "46, 495, 405, P8, 4.22, 15"
+        },
+        {
+          "elapsedSeconds": 47.36000000000058,
+          "exitCode": 0,
+          "values": "45, 690, 810, P5, 8.10, 16"
+        },
+        {
+          "elapsedSeconds": 48.421999999991385,
+          "exitCode": 0,
+          "values": "47, 780, 810, P5, 12.88, 18"
+        },
+        {
+          "elapsedSeconds": 49.5,
+          "exitCode": 0,
+          "values": "45, 652, 810, P5, 11.94, 17"
+        },
+        {
+          "elapsedSeconds": 50.578999999997905,
+          "exitCode": 0,
+          "values": "47, 607, 405, P5, 12.04, 20"
+        },
+        {
+          "elapsedSeconds": 51.64100000000326,
+          "exitCode": 0,
+          "values": "47, 607, 405, P8, 11.97, 17"
+        },
+        {
+          "elapsedSeconds": 52.71899999999732,
+          "exitCode": 0,
+          "values": "46, 645, 405, P8, 11.23, 11"
+        },
+        {
+          "elapsedSeconds": 53.812999999994645,
+          "exitCode": 0,
+          "values": "46, 652, 810, P5, 10.77, 15"
+        },
+        {
+          "elapsedSeconds": 54.89100000000326,
+          "exitCode": 0,
+          "values": "47, 660, 810, P5, 13.48, 17"
+        },
+        {
+          "elapsedSeconds": 55.953999999997905,
+          "exitCode": 0,
+          "values": "46, 637, 810, P5, 10.79, 18"
+        },
+        {
+          "elapsedSeconds": 57.03199999999197,
+          "exitCode": 0,
+          "values": "46, 592, 405, P8, 11.13, 19"
+        },
+        {
+          "elapsedSeconds": 58.11000000000058,
+          "exitCode": 0,
+          "values": "46, 667, 810, P5, 10.93, 16"
+        },
+        {
+          "elapsedSeconds": 59.187999999994645,
+          "exitCode": 0,
+          "values": "46, 697, 810, P5, 9.96, 8"
+        },
+        {
+          "elapsedSeconds": 60.25,
+          "exitCode": 0,
+          "values": "46, 705, 405, P8, 9.69, 21"
+        },
+        {
+          "elapsedSeconds": 61.328999999997905,
+          "exitCode": 0,
+          "values": "47, 577, 810, P5, 11.86, 18"
+        },
+        {
+          "elapsedSeconds": 62.40699999999197,
+          "exitCode": 0,
+          "values": "46, 615, 810, P5, 10.55, 16"
+        },
+        {
+          "elapsedSeconds": 63.46899999999732,
+          "exitCode": 0,
+          "values": "46, 525, 810, P5, 10.28, 18"
+        },
+        {
+          "elapsedSeconds": 64.5789999999979,
+          "exitCode": 0,
+          "values": "46, 622, 810, P5, 12.20, 10"
+        },
+        {
+          "elapsedSeconds": 65.65699999999197,
+          "exitCode": 0,
+          "values": "47, 652, 810, P5, 12.81, 15"
+        },
+        {
+          "elapsedSeconds": 66.75,
+          "exitCode": 0,
+          "values": "46, 622, 810, P5, 11.63, 15"
+        },
+        {
+          "elapsedSeconds": 67.8289999999979,
+          "exitCode": 0,
+          "values": "47, 202, 405, P8, 9.23, 27"
+        },
+        {
+          "elapsedSeconds": 68.92199999999139,
+          "exitCode": 0,
+          "values": "45, 277, 405, P8, 5.00, 25"
+        },
+        {
+          "elapsedSeconds": 70.0,
+          "exitCode": 0,
+          "values": "46, 292, 405, P8, 10.90, 22"
+        },
+        {
+          "elapsedSeconds": 71.0789999999979,
+          "exitCode": 0,
+          "values": "45, 360, 405, P8, 4.65, 6"
+        },
+        {
+          "elapsedSeconds": 72.17199999999139,
+          "exitCode": 0,
+          "values": "45, 487, 405, P8, 5.73, 0"
+        },
+        {
+          "elapsedSeconds": 73.25,
+          "exitCode": 0,
+          "values": "45, 592, 405, P8, 9.62, 0"
+        },
+        {
+          "elapsedSeconds": 74.31299999999464,
+          "exitCode": 0,
+          "values": "45, 592, 405, P8, 10.11, 0"
+        },
+        {
+          "elapsedSeconds": 75.39100000000326,
+          "exitCode": 0,
+          "values": "46, 637, 405, P8, 8.06, 0"
+        },
+        {
+          "elapsedSeconds": 76.46899999999732,
+          "exitCode": 0,
+          "values": "46, 630, 810, P5, 11.82, 9"
+        },
+        {
+          "elapsedSeconds": 77.53199999999197,
+          "exitCode": 0,
+          "values": "46, 592, 810, P5, 11.72, 14"
+        },
+        {
+          "elapsedSeconds": 78.61000000000058,
+          "exitCode": 0,
+          "values": "46, 450, 810, P5, 9.78, 17"
+        },
+        {
+          "elapsedSeconds": 79.7039999999979,
+          "exitCode": 0,
+          "values": "45, 202, 810, P5, 11.82, 34"
+        },
+        {
+          "elapsedSeconds": 80.78199999999197,
+          "exitCode": 0,
+          "values": "46, 315, 405, P8, 7.43, 17"
+        },
+        {
+          "elapsedSeconds": 81.89100000000326,
+          "exitCode": 0,
+          "values": "45, 772, 405, P8, 4.50, 0"
+        },
+        {
+          "elapsedSeconds": 82.96899999999732,
+          "exitCode": 0,
+          "values": "45, 337, 405, P8, 5.74, 2"
+        },
+        {
+          "elapsedSeconds": 84.03199999999197,
+          "exitCode": 0,
+          "values": "45, 352, 405, P8, 6.27, 17"
+        },
+        {
+          "elapsedSeconds": 85.11000000000058,
+          "exitCode": 0,
+          "values": "45, 367, 405, P8, 4.26, 0"
+        },
+        {
+          "elapsedSeconds": 86.18799999999464,
+          "exitCode": 0,
+          "values": "46, 577, 810, P5, 13.32, 18"
+        },
+        {
+          "elapsedSeconds": 87.26600000000326,
+          "exitCode": 0,
+          "values": "46, 607, 810, P5, 11.36, 10"
+        },
+        {
+          "elapsedSeconds": 88.3289999999979,
+          "exitCode": 0,
+          "values": "46, 622, 405, P8, 9.41, 5"
+        },
+        {
+          "elapsedSeconds": 89.42199999999139,
+          "exitCode": 0,
+          "values": "45, 637, 810, P8, 8.37, 7"
+        },
+        {
+          "elapsedSeconds": 90.48500000000058,
+          "exitCode": 0,
+          "values": "46, 615, 405, P8, 11.77, 15"
+        },
+        {
+          "elapsedSeconds": 91.5789999999979,
+          "exitCode": 0,
+          "values": "46, 607, 810, P5, 9.87, 12"
+        },
+        {
+          "elapsedSeconds": 92.65699999999197,
+          "exitCode": 0,
+          "values": "46, 675, 810, P5, 10.87, 10"
+        },
+        {
+          "elapsedSeconds": 93.71899999999732,
+          "exitCode": 0,
+          "values": "46, 645, 810, P5, 11.40, 8"
+        },
+        {
+          "elapsedSeconds": 94.79699999999139,
+          "exitCode": 0,
+          "values": "45, 345, 405, P8, 6.23, 3"
+        },
+        {
+          "elapsedSeconds": 95.875,
+          "exitCode": 0,
+          "values": "45, 352, 810, P5, 8.72, 0"
+        },
+        {
+          "elapsedSeconds": 96.9539999999979,
+          "exitCode": 0,
+          "values": "45, 570, 405, P8, 9.68, 0"
+        },
+        {
+          "elapsedSeconds": 98.03199999999197,
+          "exitCode": 0,
+          "values": "45, 472, 405, P8, 7.99, 13"
+        },
+        {
+          "elapsedSeconds": 99.09399999999732,
+          "exitCode": 0,
+          "values": "45, 472, 810, P5, 8.32, 7"
+        },
+        {
+          "elapsedSeconds": 100.18799999999464,
+          "exitCode": 0,
+          "values": "45, 480, 810, P5, 8.84, 8"
+        },
+        {
+          "elapsedSeconds": 101.25,
+          "exitCode": 0,
+          "values": "46, 607, 810, P5, 9.97, 7"
+        },
+        {
+          "elapsedSeconds": 102.3289999999979,
+          "exitCode": 0,
+          "values": "46, 300, 9001, P4, 10.36, 38"
+        },
+        {
+          "elapsedSeconds": 103.40699999999197,
+          "exitCode": 0,
+          "values": "46, 217, 810, P5, 12.69, 20"
+        },
+        {
+          "elapsedSeconds": 104.48500000000058,
+          "exitCode": 0,
+          "values": "46, 217, 9001, P4, 8.71, 36"
+        },
+        {
+          "elapsedSeconds": 105.54699999999139,
+          "exitCode": 0,
+          "values": "46, 187, 810, P5, 10.43, 29"
+        },
+        {
+          "elapsedSeconds": 106.625,
+          "exitCode": 0,
+          "values": "46, 772, 810, P5, 13.61, 21"
+        },
+        {
+          "elapsedSeconds": 107.7039999999979,
+          "exitCode": 0,
+          "values": "47, 727, 810, P5, 12.89, 21"
+        },
+        {
+          "elapsedSeconds": 108.76600000000326,
+          "exitCode": 0,
+          "values": "46, 960, 810, P5, 12.67, 9"
+        },
+        {
+          "elapsedSeconds": 109.8289999999979,
+          "exitCode": 0,
+          "values": "45, 502, 405, P8, 7.65, 0"
+        },
+        {
+          "elapsedSeconds": 110.90699999999197,
+          "exitCode": 0,
+          "values": "46, 600, 405, P8, 10.94, 0"
+        },
+        {
+          "elapsedSeconds": 111.98500000000058,
+          "exitCode": 0,
+          "values": "46, 772, 405, P8, 12.79, 0"
+        },
+        {
+          "elapsedSeconds": 113.06299999999464,
+          "exitCode": 0,
+          "values": "46, 720, 810, P5, 11.50, 0"
+        },
+        {
+          "elapsedSeconds": 114.125,
+          "exitCode": 0,
+          "values": "46, 292, 810, P5, 12.98, 0"
+        },
+        {
+          "elapsedSeconds": 115.2039999999979,
+          "exitCode": 0,
+          "values": "46, 840, 810, P5, 11.62, 0"
+        },
+        {
+          "elapsedSeconds": 116.28199999999197,
+          "exitCode": 0,
+          "values": "46, 697, 810, P5, 13.07, 7"
+        },
+        {
+          "elapsedSeconds": 117.36000000000058,
+          "exitCode": 0,
+          "values": "47, 187, 810, P5, 11.58, 36"
+        },
+        {
+          "elapsedSeconds": 118.43799999999464,
+          "exitCode": 0,
+          "values": "46, 210, 810, P5, 10.85, 18"
+        },
+        {
+          "elapsedSeconds": 119.51600000000326,
+          "exitCode": 0,
+          "values": "46, 187, 810, P5, 9.51, 29"
+        },
+        {
+          "elapsedSeconds": 120.59399999999732,
+          "exitCode": 0,
+          "values": "46, 292, 405, P8, 8.68, 17"
+        },
+        {
+          "elapsedSeconds": 121.64100000000326,
+          "exitCode": 0,
+          "values": "46, 420, 405, P8, 8.07, 5"
+        },
+        {
+          "elapsedSeconds": 122.7039999999979,
+          "exitCode": 0,
+          "values": "46, 240, 405, P8, 7.79, 0"
+        },
+        {
+          "elapsedSeconds": 123.78199999999197,
+          "exitCode": 0,
+          "values": "46, 180, 405, P8, 4.38, 0"
+        },
+        {
+          "elapsedSeconds": 124.86000000000058,
+          "exitCode": 0,
+          "values": "46, 195, 405, P8, 10.82, 0"
+        },
+        {
+          "elapsedSeconds": 125.93799999999464,
+          "exitCode": 0,
+          "values": "46, 195, 405, P8, 8.29, 0"
+        },
+        {
+          "elapsedSeconds": 127.01600000000326,
+          "exitCode": 0,
+          "values": "46, 322, 810, P5, 7.30, 0"
+        },
+        {
+          "elapsedSeconds": 128.09399999999732,
+          "exitCode": 0,
+          "values": "47, 907, 810, P5, 13.94, 19"
+        },
+        {
+          "elapsedSeconds": 129.17199999999139,
+          "exitCode": 0,
+          "values": "47, 900, 810, P5, 14.59, 26"
+        },
+        {
+          "elapsedSeconds": 130.23500000000058,
+          "exitCode": 0,
+          "values": "46, 502, 405, P8, 9.13, 26"
+        }
+      ],
+      "allPhaseDescriptive": {
+        "landing-sweep": {
+          "rows": 128,
+          "gpu_ns": {
+            "samples": 128,
+            "median": 6.9197120000000005,
+            "p95NearestLower": 14.913728,
+            "minimum": 3.1192,
+            "maximum": 15.625504
+          },
+          "gpu_as_ns": {
+            "samples": 128,
+            "median": 2.837232,
+            "p95NearestLower": 5.718688,
+            "minimum": 0.091136,
+            "maximum": 5.907808
+          },
+          "gpu_dispatch_ns": {
+            "samples": 128,
+            "median": 3.9501920000000004,
+            "p95NearestLower": 9.17312,
+            "minimum": 2.397664,
+            "maximum": 9.80544
+          },
+          "gpu_transfer_ns": {
+            "samples": 128,
+            "median": 0.060208,
+            "p95NearestLower": 0.127232,
+            "minimum": 0.011008,
+            "maximum": 0.142144
+          }
+        },
+        "fresh-raise": {
+          "rows": 105,
+          "gpu_ns": {
+            "samples": 105,
+            "median": 8.265536,
+            "p95NearestLower": 15.355648,
+            "minimum": 4.118336,
+            "maximum": 15.823744
+          },
+          "gpu_as_ns": {
+            "samples": 105,
+            "median": 2.831488,
+            "p95NearestLower": 5.642656,
+            "minimum": 1.409024,
+            "maximum": 5.898496
+          },
+          "gpu_dispatch_ns": {
+            "samples": 105,
+            "median": 5.356,
+            "p95NearestLower": 9.588448,
+            "minimum": 2.56016,
+            "maximum": 10.124896
+          },
+          "gpu_transfer_ns": {
+            "samples": 105,
+            "median": 0.06368,
+            "p95NearestLower": 0.122368,
+            "minimum": 0.011072,
+            "maximum": 0.126816
+          }
+        },
+        "outbound": {
+          "rows": 322,
+          "gpu_ns": {
+            "samples": 322,
+            "median": 7.501104,
+            "p95NearestLower": 12.910368,
+            "minimum": 6.213504,
+            "maximum": 15.685984
+          },
+          "gpu_as_ns": {
+            "samples": 322,
+            "median": 2.858672,
+            "p95NearestLower": 5.68832,
+            "minimum": 2.7272,
+            "maximum": 5.91376
+          },
+          "gpu_dispatch_ns": {
+            "samples": 322,
+            "median": 4.557888,
+            "p95NearestLower": 7.13952,
+            "minimum": 3.138272,
+            "maximum": 9.818176
+          },
+          "gpu_transfer_ns": {
+            "samples": 322,
+            "median": 0.059936,
+            "p95NearestLower": 0.117088,
+            "minimum": 0.045376,
+            "maximum": 0.128736
+          }
+        },
+        "lookout-sweep": {
+          "rows": 61,
+          "gpu_ns": {
+            "samples": 61,
+            "median": 7.463168,
+            "p95NearestLower": 12.898304,
+            "minimum": 5.90912,
+            "maximum": 13.655872
+          },
+          "gpu_as_ns": {
+            "samples": 61,
+            "median": 2.84528,
+            "p95NearestLower": 5.903456,
+            "minimum": 2.756128,
+            "maximum": 5.933952
+          },
+          "gpu_dispatch_ns": {
+            "samples": 61,
+            "median": 4.544128,
+            "p95NearestLower": 6.8632,
+            "minimum": 2.999808,
+            "maximum": 7.853728
+          },
+          "gpu_transfer_ns": {
+            "samples": 61,
+            "median": 0.065088,
+            "p95NearestLower": 0.124128,
+            "minimum": 0.045024,
+            "maximum": 0.298528
+          }
+        },
+        "return": {
+          "rows": 363,
+          "gpu_ns": {
+            "samples": 363,
+            "median": 7.676896,
+            "p95NearestLower": 13.85184,
+            "minimum": 6.556512,
+            "maximum": 14.357376
+          },
+          "gpu_as_ns": {
+            "samples": 363,
+            "median": 2.872992,
+            "p95NearestLower": 5.766272,
+            "minimum": 2.766464,
+            "maximum": 5.960128
+          },
+          "gpu_dispatch_ns": {
+            "samples": 363,
+            "median": 4.707424,
+            "p95NearestLower": 8.10976,
+            "minimum": 3.664096,
+            "maximum": 8.608192
+          },
+          "gpu_transfer_ns": {
+            "samples": 363,
+            "median": 0.06016,
+            "p95NearestLower": 0.11568,
+            "minimum": 0.04272,
+            "maximum": 0.1296
+          }
+        },
+        "descent": {
+          "rows": 149,
+          "gpu_ns": {
+            "samples": 149,
+            "median": 7.27856,
+            "p95NearestLower": 13.74416,
+            "minimum": 3.929504,
+            "maximum": 14.176
+          },
+          "gpu_as_ns": {
+            "samples": 149,
+            "median": 2.682176,
+            "p95NearestLower": 5.303232,
+            "minimum": 1.394848,
+            "maximum": 5.522336
+          },
+          "gpu_dispatch_ns": {
+            "samples": 149,
+            "median": 4.486304,
+            "p95NearestLower": 8.300512,
+            "minimum": 2.510272,
+            "maximum": 8.586432
+          },
+          "gpu_transfer_ns": {
+            "samples": 149,
+            "median": 0.055136,
+            "p95NearestLower": 0.116576,
+            "minimum": 0.010496,
+            "maximum": 0.121856
+          }
+        },
+        "lower-sweep": {
+          "rows": 31,
+          "gpu_ns": {
+            "samples": 31,
+            "median": 6.134752,
+            "p95NearestLower": 10.108064,
+            "minimum": 4.31392,
+            "maximum": 10.397728
+          },
+          "gpu_as_ns": {
+            "samples": 31,
+            "median": 2.691232,
+            "p95NearestLower": 5.392864,
+            "minimum": 1.351264,
+            "maximum": 5.499968
+          },
+          "gpu_dispatch_ns": {
+            "samples": 31,
+            "median": 3.323232,
+            "p95NearestLower": 4.645472,
+            "minimum": 2.933728,
+            "maximum": 4.935648
+          },
+          "gpu_transfer_ns": {
+            "samples": 31,
+            "median": 0.03856,
+            "p95NearestLower": 0.069696,
+            "minimum": 0.01008,
+            "maximum": 0.07744
+          }
+        },
+        "tomb-backtrack": {
+          "rows": 58,
+          "gpu_ns": {
+            "samples": 58,
+            "median": 6.063072,
+            "p95NearestLower": 9.926784,
+            "minimum": 4.432544,
+            "maximum": 10.290816
+          },
+          "gpu_as_ns": {
+            "samples": 58,
+            "median": 2.59248,
+            "p95NearestLower": 5.375584,
+            "minimum": 1.349728,
+            "maximum": 5.401248
+          },
+          "gpu_dispatch_ns": {
+            "samples": 58,
+            "median": 4.0897760000000005,
+            "p95NearestLower": 4.563776,
+            "minimum": 3.03952,
+            "maximum": 5.577024
+          },
+          "gpu_transfer_ns": {
+            "samples": 58,
+            "median": 0.030352,
+            "p95NearestLower": 0.058432,
+            "minimum": 0.009536,
+            "maximum": 0.061984
+          }
+        },
+        "passage-sweep": {
+          "rows": 90,
+          "gpu_ns": {
+            "samples": 90,
+            "median": 6.783088,
+            "p95NearestLower": 9.871168,
+            "minimum": 5.434528,
+            "maximum": 13.660288
+          },
+          "gpu_as_ns": {
+            "samples": 90,
+            "median": 2.6561120000000003,
+            "p95NearestLower": 5.329888,
+            "minimum": 1.339296,
+            "maximum": 5.528608
+          },
+          "gpu_dispatch_ns": {
+            "samples": 90,
+            "median": 4.1296479999999995,
+            "p95NearestLower": 4.496256,
+            "minimum": 3.76288,
+            "maximum": 8.273216
+          },
+          "gpu_transfer_ns": {
+            "samples": 90,
+            "median": 0.030032000000000003,
+            "p95NearestLower": 0.056864,
+            "minimum": 0.009632,
+            "maximum": 0.061152
+          }
+        },
+        "rope-return": {
+          "rows": 99,
+          "gpu_ns": {
+            "samples": 99,
+            "median": 6.943552,
+            "p95NearestLower": 10.074944,
+            "minimum": 4.5376,
+            "maximum": 11.093984
+          },
+          "gpu_as_ns": {
+            "samples": 99,
+            "median": 2.689632,
+            "p95NearestLower": 5.349984,
+            "minimum": 1.359808,
+            "maximum": 6.063936
+          },
+          "gpu_dispatch_ns": {
+            "samples": 99,
+            "median": 4.221088,
+            "p95NearestLower": 4.787136,
+            "minimum": 3.098784,
+            "maximum": 7.1408
+          },
+          "gpu_transfer_ns": {
+            "samples": 99,
+            "median": 0.033184,
+            "p95NearestLower": 0.060288,
+            "minimum": 0.009536,
+            "maximum": 0.074496
+          }
+        },
+        "repeat-ascent": {
+          "rows": 118,
+          "gpu_ns": {
+            "samples": 118,
+            "median": 7.234688,
+            "p95NearestLower": 9.17408,
+            "minimum": 5.345248,
+            "maximum": 13.555424
+          },
+          "gpu_as_ns": {
+            "samples": 118,
+            "median": 2.662064,
+            "p95NearestLower": 5.258752,
+            "minimum": 2.578848,
+            "maximum": 5.406336
+          },
+          "gpu_dispatch_ns": {
+            "samples": 118,
+            "median": 4.472336,
+            "p95NearestLower": 4.656416,
+            "minimum": 2.603424,
+            "maximum": 8.173216
+          },
+          "gpu_transfer_ns": {
+            "samples": 118,
+            "median": 0.054015999999999995,
+            "p95NearestLower": 0.061568,
+            "minimum": 0.020448,
+            "maximum": 0.106816
+          }
+        }
+      },
+      "prefixCpuWall": {
+        "simulation_ms": {
+          "samples": 1307,
+          "median": 8.3555,
+          "p95NearestLower": 79.3453,
+          "minimum": 0.6121,
+          "maximum": 194.561
+        },
+        "render_cycle_ms": {
+          "samples": 1307,
+          "median": 50.8899,
+          "p95NearestLower": 87.4583,
+          "minimum": 28.2983,
+          "maximum": 439.993
+        }
+      },
+      "nvmlColumns": [
+        "temperatureC",
+        "graphicsClockMHz",
+        "memoryClockMHz",
+        "performanceState",
+        "powerW",
+        "gpuUtilizationPercent"
+      ],
+      "framesSha256": "c44d129ea52fd6ac7cbc2c6389b3e949cabc0d67b0b5ce00cab80cfec2a6a03b"
+    },
+    {
+      "label": "route-shared",
+      "shared": true,
+      "rawRows": 1483,
+      "validUniqueStageRows": 1483,
+      "invalidStageRows": 0,
+      "reusedCompletionRows": 0,
+      "routeSummary": {
+        "schema": 2,
+        "scope": "moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance",
+        "maximumSimulationTicksPerRender": 4,
+        "simulationHz": 60,
+        "frames": 1483,
+        "warmupFrames": 64,
+        "fullRouteValidated": true,
+        "recreationTestRequiredSeparately": true,
+        "sharedForestResident": true,
+        "sharedForestValidatedFrames": 1484,
+        "maximumSharedForestMaskedInstances": 13,
+        "maximumNormalStaticOwnerSavingBytes": 0,
+        "staticDetailUnloads": 0,
+        "staticDetailRestores": 0,
+        "keeperVertexLifetime": {
+          "retiredAllocationBytes": 1323264,
+          "retiredMemoryFlags": 6,
+          "retirements": 1,
+          "restorations": 1,
+          "resetRestored": true
+        },
+        "keeperTextureLifetime": {
+          "retiredDeviceLocalBytes": 33554432,
+          "retiredHostVisibleBytes": 0,
+          "baseMemoryFlags": 1,
+          "emissiveMemoryFlags": 1,
+          "retirements": 1,
+          "restorations": 1,
+          "resetRestored": true
+        },
+        "complete": true
+      },
+      "initialOwner": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 76,
+        "recordSerial": 76,
+        "submissionSerial": 76,
+        "completionSerial": 76,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "initialCamera": [
+        -28.7023,
+        1.4512,
+        -5.80325,
+        1.5708,
+        -0.1
+      ],
+      "initialLighting": {
+        "count": 1,
+        "emitters": [
+          {
+            "stableId": 1279348308,
+            "positionStrength": [
+              -28.1300201,
+              2.60213232,
+              -5.983634,
+              0.686399996
+            ],
+            "colourIntensity": [
+              1,
+              0.426759988,
+              0.0815246254,
+              0.686399996
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+        "waterQuality": "high"
+      },
+      "quality": {
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedMistEnabled": true,
+        "actualUploadedDustQuality": 2
+      },
+      "hardware": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "initialResources": {
+        "bufferCount": 53,
+        "memoryAllocationCount": 62,
+        "bottomLevelAccelerationStructureCount": 22,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 92,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 22256896,
+        "deviceLocalBytes": 327091744
+      },
+      "processSeconds": 133.23399999999674,
+      "gpuContextSamples": [
+        {
+          "elapsedSeconds": 0.07799999999406282,
+          "exitCode": 0,
+          "values": "46, 180, 405, P8, 4.09, 0"
+        },
+        {
+          "elapsedSeconds": 1.1560000000026776,
+          "exitCode": 0,
+          "values": "46, 795, 9001, P4, 5.41, 14"
+        },
+        {
+          "elapsedSeconds": 2.2339999999967404,
+          "exitCode": 0,
+          "values": "46, 1897, 9001, P4, 7.45, 0"
+        },
+        {
+          "elapsedSeconds": 3.2969999999913853,
+          "exitCode": 0,
+          "values": "46, 1897, 9001, P4, 7.38, 0"
+        },
+        {
+          "elapsedSeconds": 4.35899999999674,
+          "exitCode": 0,
+          "values": "45, 180, 405, P8, 3.44, 0"
+        },
+        {
+          "elapsedSeconds": 5.436999999990803,
+          "exitCode": 0,
+          "values": "45, 300, 405, P8, 3.85, 45"
+        },
+        {
+          "elapsedSeconds": 6.514999999999418,
+          "exitCode": 0,
+          "values": "45, 210, 810, P5, 7.15, 0"
+        },
+        {
+          "elapsedSeconds": 7.5939999999973224,
+          "exitCode": 0,
+          "values": "45, 195, 810, P5, 6.64, 0"
+        },
+        {
+          "elapsedSeconds": 8.671999999991385,
+          "exitCode": 0,
+          "values": "50, 1410, 810, P5, 29.47, 70"
+        },
+        {
+          "elapsedSeconds": 9.75,
+          "exitCode": 0,
+          "values": "45, 180, 810, P5, 6.49, 0"
+        },
+        {
+          "elapsedSeconds": 10.827999999994063,
+          "exitCode": 0,
+          "values": "47, 1275, 810, P5, 34.49, 96"
+        },
+        {
+          "elapsedSeconds": 11.906000000002678,
+          "exitCode": 0,
+          "values": "48, 1147, 810, P5, 7.57, 0"
+        },
+        {
+          "elapsedSeconds": 12.968999999997322,
+          "exitCode": 0,
+          "values": "46, 690, 810, P5, 9.06, 17"
+        },
+        {
+          "elapsedSeconds": 14.031000000002678,
+          "exitCode": 0,
+          "values": "46, 502, 810, P5, 7.34, 15"
+        },
+        {
+          "elapsedSeconds": 15.10899999999674,
+          "exitCode": 0,
+          "values": "45, 330, 405, P8, 6.00, 0"
+        },
+        {
+          "elapsedSeconds": 16.202999999994063,
+          "exitCode": 0,
+          "values": "46, 352, 405, P8, 6.12, 16"
+        },
+        {
+          "elapsedSeconds": 17.281000000002678,
+          "exitCode": 0,
+          "values": "46, 330, 405, P8, 15.14, 15"
+        },
+        {
+          "elapsedSeconds": 18.35899999999674,
+          "exitCode": 0,
+          "values": "46, 562, 810, P5, 10.57, 9"
+        },
+        {
+          "elapsedSeconds": 19.436999999990803,
+          "exitCode": 0,
+          "values": "46, 592, 810, P5, 9.58, 10"
+        },
+        {
+          "elapsedSeconds": 20.514999999999418,
+          "exitCode": 0,
+          "values": "46, 615, 810, P5, 12.12, 11"
+        },
+        {
+          "elapsedSeconds": 21.593999999997322,
+          "exitCode": 0,
+          "values": "45, 562, 405, P8, 5.23, 11"
+        },
+        {
+          "elapsedSeconds": 22.671999999991385,
+          "exitCode": 0,
+          "values": "46, 645, 810, P5, 10.14, 18"
+        },
+        {
+          "elapsedSeconds": 23.73399999999674,
+          "exitCode": 0,
+          "values": "46, 637, 810, P5, 10.63, 18"
+        },
+        {
+          "elapsedSeconds": 24.827999999994063,
+          "exitCode": 0,
+          "values": "45, 562, 405, P8, 7.13, 19"
+        },
+        {
+          "elapsedSeconds": 25.889999999999418,
+          "exitCode": 0,
+          "values": "46, 562, 405, P8, 8.36, 16"
+        },
+        {
+          "elapsedSeconds": 26.968999999997322,
+          "exitCode": 0,
+          "values": "46, 622, 810, P5, 9.40, 12"
+        },
+        {
+          "elapsedSeconds": 28.046999999991385,
+          "exitCode": 0,
+          "values": "46, 652, 810, P5, 11.49, 15"
+        },
+        {
+          "elapsedSeconds": 29.125,
+          "exitCode": 0,
+          "values": "46, 630, 810, P5, 12.07, 17"
+        },
+        {
+          "elapsedSeconds": 30.202999999994063,
+          "exitCode": 0,
+          "values": "46, 577, 405, P8, 11.62, 9"
+        },
+        {
+          "elapsedSeconds": 31.281000000002678,
+          "exitCode": 0,
+          "values": "46, 232, 405, P8, 4.34, 0"
+        },
+        {
+          "elapsedSeconds": 32.35899999999674,
+          "exitCode": 0,
+          "values": "46, 750, 810, P5, 9.96, 23"
+        },
+        {
+          "elapsedSeconds": 33.421999999991385,
+          "exitCode": 0,
+          "values": "46, 765, 810, P5, 7.77, 9"
+        },
+        {
+          "elapsedSeconds": 34.5,
+          "exitCode": 0,
+          "values": "46, 742, 810, P5, 9.14, 23"
+        },
+        {
+          "elapsedSeconds": 35.57799999999406,
+          "exitCode": 0,
+          "values": "46, 592, 810, P5, 15.62, 18"
+        },
+        {
+          "elapsedSeconds": 36.65600000000268,
+          "exitCode": 0,
+          "values": "46, 592, 810, P5, 9.89, 10"
+        },
+        {
+          "elapsedSeconds": 37.73399999999674,
+          "exitCode": 0,
+          "values": "46, 577, 810, P5, 10.85, 7"
+        },
+        {
+          "elapsedSeconds": 38.8119999999908,
+          "exitCode": 0,
+          "values": "46, 750, 810, P5, 10.69, 11"
+        },
+        {
+          "elapsedSeconds": 39.88999999999942,
+          "exitCode": 0,
+          "values": "46, 570, 405, P8, 9.66, 22"
+        },
+        {
+          "elapsedSeconds": 40.96899999999732,
+          "exitCode": 0,
+          "values": "46, 562, 405, P8, 6.88, 20"
+        },
+        {
+          "elapsedSeconds": 42.046999999991385,
+          "exitCode": 0,
+          "values": "45, 412, 405, P8, 7.17, 5"
+        },
+        {
+          "elapsedSeconds": 43.125,
+          "exitCode": 0,
+          "values": "46, 255, 405, P8, 4.73, 2"
+        },
+        {
+          "elapsedSeconds": 44.20299999999406,
+          "exitCode": 0,
+          "values": "45, 247, 405, P8, 4.25, 0"
+        },
+        {
+          "elapsedSeconds": 45.26499999999942,
+          "exitCode": 0,
+          "values": "45, 210, 405, P8, 6.69, 0"
+        },
+        {
+          "elapsedSeconds": 46.375,
+          "exitCode": 0,
+          "values": "47, 637, 810, P5, 10.40, 10"
+        },
+        {
+          "elapsedSeconds": 47.45299999999406,
+          "exitCode": 0,
+          "values": "46, 690, 810, P5, 10.07, 19"
+        },
+        {
+          "elapsedSeconds": 48.53100000000268,
+          "exitCode": 0,
+          "values": "46, 712, 810, P5, 12.79, 8"
+        },
+        {
+          "elapsedSeconds": 49.60899999999674,
+          "exitCode": 0,
+          "values": "46, 652, 810, P5, 10.06, 17"
+        },
+        {
+          "elapsedSeconds": 50.70299999999406,
+          "exitCode": 0,
+          "values": "46, 712, 810, P5, 9.99, 11"
+        },
+        {
+          "elapsedSeconds": 51.78100000000268,
+          "exitCode": 0,
+          "values": "46, 675, 405, P8, 8.58, 15"
+        },
+        {
+          "elapsedSeconds": 52.85899999999674,
+          "exitCode": 0,
+          "values": "46, 645, 405, P8, 12.15, 17"
+        },
+        {
+          "elapsedSeconds": 53.9369999999908,
+          "exitCode": 0,
+          "values": "46, 772, 810, P5, 11.07, 18"
+        },
+        {
+          "elapsedSeconds": 55.01499999999942,
+          "exitCode": 0,
+          "values": "46, 600, 810, P5, 9.68, 11"
+        },
+        {
+          "elapsedSeconds": 56.09399999999732,
+          "exitCode": 0,
+          "values": "46, 690, 405, P8, 10.20, 17"
+        },
+        {
+          "elapsedSeconds": 57.171999999991385,
+          "exitCode": 0,
+          "values": "45, 262, 405, P8, 5.01, 7"
+        },
+        {
+          "elapsedSeconds": 58.25,
+          "exitCode": 0,
+          "values": "46, 577, 810, P5, 9.93, 12"
+        },
+        {
+          "elapsedSeconds": 59.32799999999406,
+          "exitCode": 0,
+          "values": "46, 630, 810, P5, 10.55, 12"
+        },
+        {
+          "elapsedSeconds": 60.40600000000268,
+          "exitCode": 0,
+          "values": "45, 390, 810, P5, 6.94, 0"
+        },
+        {
+          "elapsedSeconds": 61.48399999999674,
+          "exitCode": 0,
+          "values": "45, 555, 810, P5, 9.14, 6"
+        },
+        {
+          "elapsedSeconds": 62.5619999999908,
+          "exitCode": 0,
+          "values": "46, 682, 810, P5, 9.49, 3"
+        },
+        {
+          "elapsedSeconds": 63.63999999999942,
+          "exitCode": 0,
+          "values": "46, 547, 810, P5, 9.80, 7"
+        },
+        {
+          "elapsedSeconds": 64.73399999999674,
+          "exitCode": 0,
+          "values": "46, 585, 810, P5, 10.77, 7"
+        },
+        {
+          "elapsedSeconds": 65.79699999999139,
+          "exitCode": 0,
+          "values": "46, 645, 810, P5, 11.56, 14"
+        },
+        {
+          "elapsedSeconds": 66.875,
+          "exitCode": 0,
+          "values": "46, 390, 405, P8, 8.35, 28"
+        },
+        {
+          "elapsedSeconds": 67.95299999999406,
+          "exitCode": 0,
+          "values": "46, 382, 405, P8, 10.58, 15"
+        },
+        {
+          "elapsedSeconds": 69.03100000000268,
+          "exitCode": 0,
+          "values": "47, 247, 405, P8, 9.70, 0"
+        },
+        {
+          "elapsedSeconds": 70.10899999999674,
+          "exitCode": 0,
+          "values": "46, 277, 405, P8, 9.65, 9"
+        },
+        {
+          "elapsedSeconds": 71.1869999999908,
+          "exitCode": 0,
+          "values": "46, 592, 405, P8, 12.75, 21"
+        },
+        {
+          "elapsedSeconds": 72.26499999999942,
+          "exitCode": 0,
+          "values": "47, 600, 405, P8, 11.40, 9"
+        },
+        {
+          "elapsedSeconds": 73.34399999999732,
+          "exitCode": 0,
+          "values": "47, 660, 810, P5, 11.47, 17"
+        },
+        {
+          "elapsedSeconds": 74.42199999999139,
+          "exitCode": 0,
+          "values": "47, 780, 405, P8, 12.07, 16"
+        },
+        {
+          "elapsedSeconds": 75.48399999999674,
+          "exitCode": 0,
+          "values": "46, 562, 405, P8, 14.40, 15"
+        },
+        {
+          "elapsedSeconds": 76.57799999999406,
+          "exitCode": 0,
+          "values": "46, 585, 810, P5, 12.03, 18"
+        },
+        {
+          "elapsedSeconds": 77.63999999999942,
+          "exitCode": 0,
+          "values": "47, 667, 405, P8, 9.32, 16"
+        },
+        {
+          "elapsedSeconds": 78.70299999999406,
+          "exitCode": 0,
+          "values": "47, 690, 405, P8, 11.69, 30"
+        },
+        {
+          "elapsedSeconds": 79.79699999999139,
+          "exitCode": 0,
+          "values": "46, 832, 405, P5, 10.27, 18"
+        },
+        {
+          "elapsedSeconds": 80.85899999999674,
+          "exitCode": 0,
+          "values": "47, 750, 810, P5, 11.30, 8"
+        },
+        {
+          "elapsedSeconds": 81.9369999999908,
+          "exitCode": 0,
+          "values": "47, 607, 810, P5, 13.13, 9"
+        },
+        {
+          "elapsedSeconds": 83.03100000000268,
+          "exitCode": 0,
+          "values": "46, 600, 810, P5, 12.49, 18"
+        },
+        {
+          "elapsedSeconds": 84.09399999999732,
+          "exitCode": 0,
+          "values": "46, 615, 810, P5, 11.78, 18"
+        },
+        {
+          "elapsedSeconds": 85.17199999999139,
+          "exitCode": 0,
+          "values": "46, 375, 405, P8, 8.58, 16"
+        },
+        {
+          "elapsedSeconds": 86.23399999999674,
+          "exitCode": 0,
+          "values": "46, 345, 405, P8, 6.13, 0"
+        },
+        {
+          "elapsedSeconds": 87.3119999999908,
+          "exitCode": 0,
+          "values": "46, 345, 405, P8, 6.29, 16"
+        },
+        {
+          "elapsedSeconds": 88.38999999999942,
+          "exitCode": 0,
+          "values": "46, 345, 405, P5, 6.66, 14"
+        },
+        {
+          "elapsedSeconds": 89.46899999999732,
+          "exitCode": 0,
+          "values": "46, 367, 405, P8, 4.74, 0"
+        },
+        {
+          "elapsedSeconds": 90.54699999999139,
+          "exitCode": 0,
+          "values": "46, 390, 405, P8, 4.40, 0"
+        },
+        {
+          "elapsedSeconds": 91.625,
+          "exitCode": 0,
+          "values": "46, 502, 810, P8, 7.24, 0"
+        },
+        {
+          "elapsedSeconds": 92.71899999999732,
+          "exitCode": 0,
+          "values": "46, 712, 810, P8, 6.74, 6"
+        },
+        {
+          "elapsedSeconds": 93.79699999999139,
+          "exitCode": 0,
+          "values": "46, 577, 810, P8, 11.78, 8"
+        },
+        {
+          "elapsedSeconds": 94.875,
+          "exitCode": 0,
+          "values": "46, 570, 405, P8, 11.91, 32"
+        },
+        {
+          "elapsedSeconds": 95.95299999999406,
+          "exitCode": 0,
+          "values": "46, 510, 405, P8, 6.29, 16"
+        },
+        {
+          "elapsedSeconds": 97.03100000000268,
+          "exitCode": 0,
+          "values": "45, 345, 405, P8, 6.61, 0"
+        },
+        {
+          "elapsedSeconds": 98.10899999999674,
+          "exitCode": 0,
+          "values": "46, 525, 405, P8, 8.34, 16"
+        },
+        {
+          "elapsedSeconds": 99.1869999999908,
+          "exitCode": 0,
+          "values": "45, 420, 405, P8, 7.10, 14"
+        },
+        {
+          "elapsedSeconds": 100.26499999999942,
+          "exitCode": 0,
+          "values": "45, 210, 405, P8, 5.97, 5"
+        },
+        {
+          "elapsedSeconds": 101.34399999999732,
+          "exitCode": 0,
+          "values": "46, 382, 405, P8, 8.04, 12"
+        },
+        {
+          "elapsedSeconds": 102.42199999999139,
+          "exitCode": 0,
+          "values": "46, 652, 405, P5, 7.75, 16"
+        },
+        {
+          "elapsedSeconds": 103.48399999999674,
+          "exitCode": 0,
+          "values": "46, 555, 810, P8, 9.19, 17"
+        },
+        {
+          "elapsedSeconds": 104.5619999999908,
+          "exitCode": 0,
+          "values": "46, 637, 810, P5, 14.60, 17"
+        },
+        {
+          "elapsedSeconds": 105.63999999999942,
+          "exitCode": 0,
+          "values": "47, 870, 810, P5, 13.77, 19"
+        },
+        {
+          "elapsedSeconds": 106.70299999999406,
+          "exitCode": 0,
+          "values": "46, 810, 810, P5, 13.48, 21"
+        },
+        {
+          "elapsedSeconds": 107.78100000000268,
+          "exitCode": 0,
+          "values": "46, 705, 810, P8, 9.32, 4"
+        },
+        {
+          "elapsedSeconds": 108.85899999999674,
+          "exitCode": 0,
+          "values": "46, 705, 810, P5, 12.98, 6"
+        },
+        {
+          "elapsedSeconds": 109.9369999999908,
+          "exitCode": 0,
+          "values": "47, 495, 405, P8, 12.79, 23"
+        },
+        {
+          "elapsedSeconds": 111.01499999999942,
+          "exitCode": 0,
+          "values": "46, 382, 405, P8, 7.86, 30"
+        },
+        {
+          "elapsedSeconds": 112.09399999999732,
+          "exitCode": 0,
+          "values": "45, 180, 405, P8, 5.17, 11"
+        },
+        {
+          "elapsedSeconds": 113.17199999999139,
+          "exitCode": 0,
+          "values": "45, 195, 405, P8, 10.72, 0"
+        },
+        {
+          "elapsedSeconds": 114.25,
+          "exitCode": 0,
+          "values": "45, 210, 405, P8, 9.81, 0"
+        },
+        {
+          "elapsedSeconds": 115.32799999999406,
+          "exitCode": 0,
+          "values": "46, 217, 405, P8, 5.22, 0"
+        },
+        {
+          "elapsedSeconds": 116.40600000000268,
+          "exitCode": 0,
+          "values": "47, 750, 810, P5, 9.51, 23"
+        },
+        {
+          "elapsedSeconds": 117.46899999999732,
+          "exitCode": 0,
+          "values": "47, 825, 810, P5, 13.66, 17"
+        },
+        {
+          "elapsedSeconds": 118.5619999999908,
+          "exitCode": 0,
+          "values": "47, 840, 810, P5, 14.71, 14"
+        },
+        {
+          "elapsedSeconds": 119.625,
+          "exitCode": 0,
+          "values": "47, 772, 810, P5, 14.97, 23"
+        },
+        {
+          "elapsedSeconds": 120.67199999999139,
+          "exitCode": 0,
+          "values": "47, 697, 810, P5, 11.10, 26"
+        },
+        {
+          "elapsedSeconds": 121.75,
+          "exitCode": 0,
+          "values": "47, 847, 810, P5, 15.95, 23"
+        },
+        {
+          "elapsedSeconds": 122.82799999999406,
+          "exitCode": 0,
+          "values": "47, 840, 810, P5, 15.18, 26"
+        },
+        {
+          "elapsedSeconds": 123.875,
+          "exitCode": 0,
+          "values": "46, 210, 405, P8, 11.13, 0"
+        },
+        {
+          "elapsedSeconds": 124.95299999999406,
+          "exitCode": 0,
+          "values": "46, 232, 405, P8, 10.07, 0"
+        },
+        {
+          "elapsedSeconds": 126.03100000000268,
+          "exitCode": 0,
+          "values": "46, 307, 405, P8, 5.19, 0"
+        },
+        {
+          "elapsedSeconds": 127.09399999999732,
+          "exitCode": 0,
+          "values": "46, 360, 405, P8, 4.41, 0"
+        },
+        {
+          "elapsedSeconds": 128.17199999999139,
+          "exitCode": 0,
+          "values": "46, 465, 405, P8, 6.78, 0"
+        },
+        {
+          "elapsedSeconds": 129.25,
+          "exitCode": 0,
+          "values": "46, 585, 810, P5, 6.67, 0"
+        },
+        {
+          "elapsedSeconds": 130.32799999999406,
+          "exitCode": 0,
+          "values": "46, 712, 810, P5, 12.40, 2"
+        },
+        {
+          "elapsedSeconds": 131.38999999999942,
+          "exitCode": 0,
+          "values": "48, 712, 405, P4, 10.65, 30"
+        },
+        {
+          "elapsedSeconds": 132.46899999999732,
+          "exitCode": 0,
+          "values": "47, 555, 405, P5, 14.31, 34"
+        }
+      ],
+      "allPhaseDescriptive": {
+        "landing-sweep": {
+          "rows": 128,
+          "gpu_ns": {
+            "samples": 128,
+            "median": 7.55856,
+            "p95NearestLower": 13.288416,
+            "minimum": 3.181824,
+            "maximum": 16.630208
+          },
+          "gpu_as_ns": {
+            "samples": 128,
+            "median": 2.961696,
+            "p95NearestLower": 5.92416,
+            "minimum": 0.101344,
+            "maximum": 7.327744
+          },
+          "gpu_dispatch_ns": {
+            "samples": 128,
+            "median": 4.452816,
+            "p95NearestLower": 7.226528,
+            "minimum": 3.062272,
+            "maximum": 8.641312
+          },
+          "gpu_transfer_ns": {
+            "samples": 128,
+            "median": 0.063584,
+            "p95NearestLower": 0.122144,
+            "minimum": 0.011424,
+            "maximum": 0.147584
+          }
+        },
+        "fresh-raise": {
+          "rows": 105,
+          "gpu_ns": {
+            "samples": 105,
+            "median": 7.81952,
+            "p95NearestLower": 14.264064,
+            "minimum": 7.235072,
+            "maximum": 14.647392
+          },
+          "gpu_as_ns": {
+            "samples": 105,
+            "median": 2.927776,
+            "p95NearestLower": 5.909568,
+            "minimum": 2.783648,
+            "maximum": 6.068896
+          },
+          "gpu_dispatch_ns": {
+            "samples": 105,
+            "median": 4.835392,
+            "p95NearestLower": 8.384352,
+            "minimum": 4.32368,
+            "maximum": 8.602336
+          },
+          "gpu_transfer_ns": {
+            "samples": 105,
+            "median": 0.063328,
+            "p95NearestLower": 0.123392,
+            "minimum": 0.053472,
+            "maximum": 0.129024
+          }
+        },
+        "outbound": {
+          "rows": 322,
+          "gpu_ns": {
+            "samples": 322,
+            "median": 7.48632,
+            "p95NearestLower": 12.837664,
+            "minimum": 6.127232,
+            "maximum": 13.383488
+          },
+          "gpu_as_ns": {
+            "samples": 322,
+            "median": 2.960464,
+            "p95NearestLower": 5.9112,
+            "minimum": 2.781632,
+            "maximum": 5.946112
+          },
+          "gpu_dispatch_ns": {
+            "samples": 322,
+            "median": 4.506384,
+            "p95NearestLower": 6.99952,
+            "minimum": 3.253216,
+            "maximum": 7.362144
+          },
+          "gpu_transfer_ns": {
+            "samples": 322,
+            "median": 0.062336,
+            "p95NearestLower": 0.121792,
+            "minimum": 0.046112,
+            "maximum": 0.139584
+          }
+        },
+        "lookout-sweep": {
+          "rows": 61,
+          "gpu_ns": {
+            "samples": 61,
+            "median": 7.401472,
+            "p95NearestLower": 12.613792,
+            "minimum": 5.88016,
+            "maximum": 13.281344
+          },
+          "gpu_as_ns": {
+            "samples": 61,
+            "median": 2.975744,
+            "p95NearestLower": 5.931008,
+            "minimum": 2.797472,
+            "maximum": 6.008576
+          },
+          "gpu_dispatch_ns": {
+            "samples": 61,
+            "median": 4.275424,
+            "p95NearestLower": 6.58992,
+            "minimum": 2.898944,
+            "maximum": 7.343872
+          },
+          "gpu_transfer_ns": {
+            "samples": 61,
+            "median": 0.0624,
+            "p95NearestLower": 0.12304,
+            "minimum": 0.047584,
+            "maximum": 0.133408
+          }
+        },
+        "return": {
+          "rows": 363,
+          "gpu_ns": {
+            "samples": 363,
+            "median": 7.617152,
+            "p95NearestLower": 13.371904,
+            "minimum": 6.644192,
+            "maximum": 13.999264
+          },
+          "gpu_as_ns": {
+            "samples": 363,
+            "median": 2.943648,
+            "p95NearestLower": 5.920736,
+            "minimum": 2.770656,
+            "maximum": 6.169024
+          },
+          "gpu_dispatch_ns": {
+            "samples": 363,
+            "median": 4.644544,
+            "p95NearestLower": 7.541696,
+            "minimum": 3.659648,
+            "maximum": 7.96672
+          },
+          "gpu_transfer_ns": {
+            "samples": 363,
+            "median": 0.061664,
+            "p95NearestLower": 0.118912,
+            "minimum": 0.043488,
+            "maximum": 0.126816
+          }
+        },
+        "descent": {
+          "rows": 149,
+          "gpu_ns": {
+            "samples": 149,
+            "median": 6.811296,
+            "p95NearestLower": 12.416416,
+            "minimum": 4.32368,
+            "maximum": 12.946176
+          },
+          "gpu_as_ns": {
+            "samples": 149,
+            "median": 2.707968,
+            "p95NearestLower": 5.447456,
+            "minimum": 1.33936,
+            "maximum": 5.883328
+          },
+          "gpu_dispatch_ns": {
+            "samples": 149,
+            "median": 3.982816,
+            "p95NearestLower": 6.84864,
+            "minimum": 2.814656,
+            "maximum": 7.253408
+          },
+          "gpu_transfer_ns": {
+            "samples": 149,
+            "median": 0.052992,
+            "p95NearestLower": 0.116288,
+            "minimum": 0.009504,
+            "maximum": 0.120544
+          }
+        },
+        "lower-sweep": {
+          "rows": 31,
+          "gpu_ns": {
+            "samples": 31,
+            "median": 6.285792,
+            "p95NearestLower": 9.372928,
+            "minimum": 4.345152,
+            "maximum": 9.80192
+          },
+          "gpu_as_ns": {
+            "samples": 31,
+            "median": 2.719712,
+            "p95NearestLower": 5.361024,
+            "minimum": 1.34864,
+            "maximum": 5.376672
+          },
+          "gpu_dispatch_ns": {
+            "samples": 31,
+            "median": 3.318944,
+            "p95NearestLower": 4.160704,
+            "minimum": 2.879776,
+            "maximum": 4.631648
+          },
+          "gpu_transfer_ns": {
+            "samples": 31,
+            "median": 0.038784,
+            "p95NearestLower": 0.067136,
+            "minimum": 0.01008,
+            "maximum": 0.072224
+          }
+        },
+        "tomb-backtrack": {
+          "rows": 58,
+          "gpu_ns": {
+            "samples": 58,
+            "median": 6.744752,
+            "p95NearestLower": 9.746528,
+            "minimum": 4.427296,
+            "maximum": 9.836448
+          },
+          "gpu_as_ns": {
+            "samples": 58,
+            "median": 2.642528,
+            "p95NearestLower": 5.37936,
+            "minimum": 1.374432,
+            "maximum": 5.457504
+          },
+          "gpu_dispatch_ns": {
+            "samples": 58,
+            "median": 4.047568,
+            "p95NearestLower": 4.384032,
+            "minimum": 2.990688,
+            "maximum": 8.060672
+          },
+          "gpu_transfer_ns": {
+            "samples": 58,
+            "median": 0.032272,
+            "p95NearestLower": 0.060096,
+            "minimum": 0.009568,
+            "maximum": 0.06432
+          }
+        },
+        "passage-sweep": {
+          "rows": 90,
+          "gpu_ns": {
+            "samples": 90,
+            "median": 6.754064,
+            "p95NearestLower": 9.719328,
+            "minimum": 5.43024,
+            "maximum": 10.170656
+          },
+          "gpu_as_ns": {
+            "samples": 90,
+            "median": 2.6159999999999997,
+            "p95NearestLower": 5.323936,
+            "minimum": 1.380448,
+            "maximum": 5.37296
+          },
+          "gpu_dispatch_ns": {
+            "samples": 90,
+            "median": 4.057824,
+            "p95NearestLower": 4.491424,
+            "minimum": 3.722592,
+            "maximum": 7.096128
+          },
+          "gpu_transfer_ns": {
+            "samples": 90,
+            "median": 0.0308,
+            "p95NearestLower": 0.056128,
+            "minimum": 0.009536,
+            "maximum": 0.059392
+          }
+        },
+        "rope-return": {
+          "rows": 58,
+          "gpu_ns": {
+            "samples": 58,
+            "median": 7.095584000000001,
+            "p95NearestLower": 10.01888,
+            "minimum": 4.466336,
+            "maximum": 10.194432
+          },
+          "gpu_as_ns": {
+            "samples": 58,
+            "median": 2.6970400000000003,
+            "p95NearestLower": 5.380864,
+            "minimum": 1.36656,
+            "maximum": 5.406432
+          },
+          "gpu_dispatch_ns": {
+            "samples": 58,
+            "median": 4.302608,
+            "p95NearestLower": 4.712992,
+            "minimum": 3.041728,
+            "maximum": 6.990368
+          },
+          "gpu_transfer_ns": {
+            "samples": 58,
+            "median": 0.034879999999999994,
+            "p95NearestLower": 0.068608,
+            "minimum": 0.00992,
+            "maximum": 0.074272
+          }
+        },
+        "repeat-ascent": {
+          "rows": 118,
+          "gpu_ns": {
+            "samples": 118,
+            "median": 6.844768,
+            "p95NearestLower": 12.4432,
+            "minimum": 4.1344,
+            "maximum": 12.575136
+          },
+          "gpu_as_ns": {
+            "samples": 118,
+            "median": 2.698144,
+            "p95NearestLower": 5.476704,
+            "minimum": 1.3416,
+            "maximum": 5.58112
+          },
+          "gpu_dispatch_ns": {
+            "samples": 118,
+            "median": 4.015696,
+            "p95NearestLower": 6.859296,
+            "minimum": 2.663328,
+            "maximum": 7.026016
+          },
+          "gpu_transfer_ns": {
+            "samples": 118,
+            "median": 0.052112000000000006,
+            "p95NearestLower": 0.114528,
+            "minimum": 0.009664,
+            "maximum": 0.118496
+          }
+        }
+      },
+      "prefixCpuWall": {
+        "simulation_ms": {
+          "samples": 1307,
+          "median": 8.2583,
+          "p95NearestLower": 78.1479,
+          "minimum": 0.5941,
+          "maximum": 187.918
+        },
+        "render_cycle_ms": {
+          "samples": 1307,
+          "median": 52.4906,
+          "p95NearestLower": 311.962,
+          "minimum": 29.3499,
+          "maximum": 434.386
+        }
+      },
+      "nvmlColumns": [
+        "temperatureC",
+        "graphicsClockMHz",
+        "memoryClockMHz",
+        "performanceState",
+        "powerW",
+        "gpuUtilizationPercent"
+      ],
+      "framesSha256": "89be6ac6a89b7344d26ed21de842a6fd20bcc87a4fd61853fef234c4693ca39f"
+    },
+    {
+      "label": "route-control-close",
+      "shared": false,
+      "rawRows": 1524,
+      "validUniqueStageRows": 1524,
+      "invalidStageRows": 0,
+      "reusedCompletionRows": 0,
+      "routeSummary": {
+        "schema": 2,
+        "scope": "moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance",
+        "maximumSimulationTicksPerRender": 4,
+        "simulationHz": 60,
+        "frames": 1524,
+        "warmupFrames": 64,
+        "fullRouteValidated": true,
+        "recreationTestRequiredSeparately": true,
+        "sharedForestResident": false,
+        "sharedForestValidatedFrames": 0,
+        "maximumSharedForestMaskedInstances": 0,
+        "maximumNormalStaticOwnerSavingBytes": 6216192,
+        "staticDetailUnloads": 1,
+        "staticDetailRestores": 1,
+        "keeperVertexLifetime": {
+          "retiredAllocationBytes": 1323264,
+          "retiredMemoryFlags": 6,
+          "retirements": 1,
+          "restorations": 1,
+          "resetRestored": true
+        },
+        "keeperTextureLifetime": {
+          "retiredDeviceLocalBytes": 33554432,
+          "retiredHostVisibleBytes": 0,
+          "baseMemoryFlags": 1,
+          "emissiveMemoryFlags": 1,
+          "retirements": 1,
+          "restorations": 1,
+          "resetRestored": true
+        },
+        "complete": true
+      },
+      "initialOwner": {
+        "sceneEpoch": 2,
+        "measurementGeneration": 1,
+        "recordAttemptSerial": 76,
+        "recordSerial": 76,
+        "submissionSerial": 76,
+        "completionSerial": 76,
+        "simulationTick": 1436,
+        "frameSlot": 0
+      },
+      "initialCamera": [
+        -28.7023,
+        1.4512,
+        -5.80325,
+        1.5708,
+        -0.1
+      ],
+      "initialLighting": {
+        "count": 1,
+        "emitters": [
+          {
+            "stableId": 1279348308,
+            "positionStrength": [
+              -28.1300201,
+              2.60213232,
+              -5.983634,
+              0.686399996
+            ],
+            "colourIntensity": [
+              1,
+              0.426759988,
+              0.0815246254,
+              0.686399996
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a",
+        "waterQuality": "high"
+      },
+      "quality": {
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedMistEnabled": true,
+        "actualUploadedDustQuality": 2
+      },
+      "hardware": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "initialResources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298944,
+        "deviceLocalBytes": 372464608
+      },
+      "processSeconds": 132.23399999999674,
+      "gpuContextSamples": [
+        {
+          "elapsedSeconds": 0.09399999999732245,
+          "exitCode": 0,
+          "values": "46, 382, 405, P8, 7.60, 1"
+        },
+        {
+          "elapsedSeconds": 1.1560000000026776,
+          "exitCode": 0,
+          "values": "46, 1897, 9001, P4, 7.43, 0"
+        },
+        {
+          "elapsedSeconds": 2.2339999999967404,
+          "exitCode": 0,
+          "values": "46, 1897, 9001, P4, 7.51, 0"
+        },
+        {
+          "elapsedSeconds": 3.311999999990803,
+          "exitCode": 0,
+          "values": "46, 1897, 9001, P5, 7.50, 0"
+        },
+        {
+          "elapsedSeconds": 4.389999999999418,
+          "exitCode": 0,
+          "values": "46, 180, 405, P8, 3.50, 0"
+        },
+        {
+          "elapsedSeconds": 5.4689999999973224,
+          "exitCode": 0,
+          "values": "45, 180, 405, P8, 3.46, 0"
+        },
+        {
+          "elapsedSeconds": 6.546999999991385,
+          "exitCode": 0,
+          "values": "46, 187, 810, P5, 5.47, 100"
+        },
+        {
+          "elapsedSeconds": 7.625,
+          "exitCode": 0,
+          "values": "46, 487, 810, P5, 8.16, 0"
+        },
+        {
+          "elapsedSeconds": 8.702999999994063,
+          "exitCode": 0,
+          "values": "46, 180, 405, P8, 23.75, 92"
+        },
+        {
+          "elapsedSeconds": 9.781000000002678,
+          "exitCode": 0,
+          "values": "46, 225, 9001, P4, 6.69, 0"
+        },
+        {
+          "elapsedSeconds": 10.85899999999674,
+          "exitCode": 0,
+          "values": "46, 225, 9001, P5, 6.69, 0"
+        },
+        {
+          "elapsedSeconds": 11.921999999991385,
+          "exitCode": 0,
+          "values": "49, 997, 810, P5, 37.49, 75"
+        },
+        {
+          "elapsedSeconds": 13.0,
+          "exitCode": 0,
+          "values": "46, 255, 9001, P4, 9.39, 5"
+        },
+        {
+          "elapsedSeconds": 14.061999999990803,
+          "exitCode": 0,
+          "values": "46, 247, 9001, P4, 7.91, 1"
+        },
+        {
+          "elapsedSeconds": 15.139999999999418,
+          "exitCode": 0,
+          "values": "46, 270, 9001, P4, 8.04, 4"
+        },
+        {
+          "elapsedSeconds": 16.218999999997322,
+          "exitCode": 0,
+          "values": "46, 232, 9001, P4, 7.81, 4"
+        },
+        {
+          "elapsedSeconds": 17.296999999991385,
+          "exitCode": 0,
+          "values": "46, 277, 810, P5, 8.06, 0"
+        },
+        {
+          "elapsedSeconds": 18.389999999999418,
+          "exitCode": 0,
+          "values": "47, 555, 405, P8, 9.67, 17"
+        },
+        {
+          "elapsedSeconds": 19.452999999994063,
+          "exitCode": 0,
+          "values": "47, 705, 405, P8, 9.52, 16"
+        },
+        {
+          "elapsedSeconds": 20.531000000002678,
+          "exitCode": 0,
+          "values": "47, 795, 810, P5, 8.57, 17"
+        },
+        {
+          "elapsedSeconds": 21.656000000002678,
+          "exitCode": 0,
+          "values": "46, 630, 405, P8, 10.83, 23"
+        },
+        {
+          "elapsedSeconds": 22.73399999999674,
+          "exitCode": 0,
+          "values": "46, 757, 810, P5, 9.69, 9"
+        },
+        {
+          "elapsedSeconds": 23.811999999990803,
+          "exitCode": 0,
+          "values": "46, 660, 810, P5, 9.94, 11"
+        },
+        {
+          "elapsedSeconds": 24.889999999999418,
+          "exitCode": 0,
+          "values": "46, 397, 405, P8, 7.62, 15"
+        },
+        {
+          "elapsedSeconds": 25.952999999994063,
+          "exitCode": 0,
+          "values": "46, 600, 405, P8, 12.87, 33"
+        },
+        {
+          "elapsedSeconds": 27.031000000002678,
+          "exitCode": 0,
+          "values": "46, 675, 810, P5, 11.33, 19"
+        },
+        {
+          "elapsedSeconds": 28.125,
+          "exitCode": 0,
+          "values": "46, 697, 810, P5, 9.36, 11"
+        },
+        {
+          "elapsedSeconds": 29.202999999994063,
+          "exitCode": 0,
+          "values": "46, 300, 405, P8, 10.34, 0"
+        },
+        {
+          "elapsedSeconds": 30.281000000002678,
+          "exitCode": 0,
+          "values": "46, 435, 405, P8, 6.78, 0"
+        },
+        {
+          "elapsedSeconds": 31.35899999999674,
+          "exitCode": 0,
+          "values": "46, 727, 810, P5, 12.03, 10"
+        },
+        {
+          "elapsedSeconds": 32.421999999991385,
+          "exitCode": 0,
+          "values": "47, 795, 810, P5, 12.21, 19"
+        },
+        {
+          "elapsedSeconds": 33.51499999999942,
+          "exitCode": 0,
+          "values": "47, 802, 405, P5, 13.70, 35"
+        },
+        {
+          "elapsedSeconds": 34.57799999999406,
+          "exitCode": 0,
+          "values": "46, 562, 810, P5, 7.72, 18"
+        },
+        {
+          "elapsedSeconds": 35.671999999991385,
+          "exitCode": 0,
+          "values": "47, 840, 810, P5, 11.55, 20"
+        },
+        {
+          "elapsedSeconds": 36.75,
+          "exitCode": 0,
+          "values": "46, 727, 810, P5, 9.84, 10"
+        },
+        {
+          "elapsedSeconds": 37.84399999999732,
+          "exitCode": 0,
+          "values": "46, 742, 810, P5, 12.13, 19"
+        },
+        {
+          "elapsedSeconds": 38.9369999999908,
+          "exitCode": 0,
+          "values": "46, 682, 810, P5, 10.93, 15"
+        },
+        {
+          "elapsedSeconds": 40.01499999999942,
+          "exitCode": 0,
+          "values": "46, 645, 810, P5, 9.88, 9"
+        },
+        {
+          "elapsedSeconds": 41.09399999999732,
+          "exitCode": 0,
+          "values": "46, 630, 810, P5, 9.61, 9"
+        },
+        {
+          "elapsedSeconds": 42.171999999991385,
+          "exitCode": 0,
+          "values": "47, 727, 810, P5, 9.84, 12"
+        },
+        {
+          "elapsedSeconds": 43.25,
+          "exitCode": 0,
+          "values": "47, 727, 810, P5, 10.20, 20"
+        },
+        {
+          "elapsedSeconds": 44.32799999999406,
+          "exitCode": 0,
+          "values": "46, 757, 810, P5, 9.91, 30"
+        },
+        {
+          "elapsedSeconds": 45.40600000000268,
+          "exitCode": 0,
+          "values": "47, 720, 810, P5, 11.50, 9"
+        },
+        {
+          "elapsedSeconds": 46.46899999999732,
+          "exitCode": 0,
+          "values": "47, 690, 810, P5, 11.64, 10"
+        },
+        {
+          "elapsedSeconds": 47.546999999991385,
+          "exitCode": 0,
+          "values": "46, 390, 405, P8, 7.37, 21"
+        },
+        {
+          "elapsedSeconds": 48.625,
+          "exitCode": 0,
+          "values": "46, 247, 405, P8, 6.84, 21"
+        },
+        {
+          "elapsedSeconds": 49.70299999999406,
+          "exitCode": 0,
+          "values": "47, 645, 810, P5, 11.60, 14"
+        },
+        {
+          "elapsedSeconds": 50.76499999999942,
+          "exitCode": 0,
+          "values": "46, 585, 810, P5, 8.84, 13"
+        },
+        {
+          "elapsedSeconds": 51.84399999999732,
+          "exitCode": 0,
+          "values": "47, 615, 810, P5, 11.83, 16"
+        },
+        {
+          "elapsedSeconds": 52.921999999991385,
+          "exitCode": 0,
+          "values": "46, 870, 810, P5, 9.62, 25"
+        },
+        {
+          "elapsedSeconds": 53.98399999999674,
+          "exitCode": 0,
+          "values": "47, 780, 810, P5, 10.89, 20"
+        },
+        {
+          "elapsedSeconds": 55.07799999999406,
+          "exitCode": 0,
+          "values": "46, 765, 810, P5, 9.93, 9"
+        },
+        {
+          "elapsedSeconds": 56.15600000000268,
+          "exitCode": 0,
+          "values": "46, 675, 810, P5, 10.50, 15"
+        },
+        {
+          "elapsedSeconds": 57.23399999999674,
+          "exitCode": 0,
+          "values": "47, 600, 405, P8, 11.21, 17"
+        },
+        {
+          "elapsedSeconds": 58.32799999999406,
+          "exitCode": 0,
+          "values": "47, 607, 405, P8, 11.23, 17"
+        },
+        {
+          "elapsedSeconds": 59.40600000000268,
+          "exitCode": 0,
+          "values": "47, 600, 405, P8, 11.81, 16"
+        },
+        {
+          "elapsedSeconds": 60.46899999999732,
+          "exitCode": 0,
+          "values": "46, 570, 405, P8, 6.63, 10"
+        },
+        {
+          "elapsedSeconds": 61.546999999991385,
+          "exitCode": 0,
+          "values": "46, 645, 810, P5, 7.03, 5"
+        },
+        {
+          "elapsedSeconds": 62.625,
+          "exitCode": 0,
+          "values": "46, 742, 810, P5, 10.22, 18"
+        },
+        {
+          "elapsedSeconds": 63.6869999999908,
+          "exitCode": 0,
+          "values": "46, 600, 405, P8, 8.88, 16"
+        },
+        {
+          "elapsedSeconds": 64.76499999999942,
+          "exitCode": 0,
+          "values": "46, 607, 810, P5, 9.35, 14"
+        },
+        {
+          "elapsedSeconds": 65.84399999999732,
+          "exitCode": 0,
+          "values": "47, 765, 810, P5, 12.38, 19"
+        },
+        {
+          "elapsedSeconds": 66.92199999999139,
+          "exitCode": 0,
+          "values": "46, 795, 810, P5, 10.68, 9"
+        },
+        {
+          "elapsedSeconds": 68.0,
+          "exitCode": 0,
+          "values": "46, 810, 810, P5, 11.10, 22"
+        },
+        {
+          "elapsedSeconds": 69.07799999999406,
+          "exitCode": 0,
+          "values": "47, 720, 810, P5, 9.27, 21"
+        },
+        {
+          "elapsedSeconds": 70.15600000000268,
+          "exitCode": 0,
+          "values": "46, 675, 810, P5, 7.72, 9"
+        },
+        {
+          "elapsedSeconds": 71.20299999999406,
+          "exitCode": 0,
+          "values": "46, 600, 810, P5, 9.69, 17"
+        },
+        {
+          "elapsedSeconds": 72.28100000000268,
+          "exitCode": 0,
+          "values": "47, 652, 810, P5, 12.17, 31"
+        },
+        {
+          "elapsedSeconds": 73.35899999999674,
+          "exitCode": 0,
+          "values": "46, 607, 810, P5, 13.01, 18"
+        },
+        {
+          "elapsedSeconds": 74.42199999999139,
+          "exitCode": 0,
+          "values": "46, 195, 405, P8, 4.88, 6"
+        },
+        {
+          "elapsedSeconds": 75.5,
+          "exitCode": 0,
+          "values": "46, 667, 810, P5, 11.06, 9"
+        },
+        {
+          "elapsedSeconds": 76.57799999999406,
+          "exitCode": 0,
+          "values": "46, 345, 405, P8, 6.68, 0"
+        },
+        {
+          "elapsedSeconds": 77.63999999999942,
+          "exitCode": 0,
+          "values": "46, 375, 405, P8, 4.26, 0"
+        },
+        {
+          "elapsedSeconds": 78.71899999999732,
+          "exitCode": 0,
+          "values": "46, 750, 810, P5, 10.32, 9"
+        },
+        {
+          "elapsedSeconds": 79.79699999999139,
+          "exitCode": 0,
+          "values": "47, 757, 810, P5, 11.60, 16"
+        },
+        {
+          "elapsedSeconds": 80.875,
+          "exitCode": 0,
+          "values": "46, 765, 810, P5, 12.83, 11"
+        },
+        {
+          "elapsedSeconds": 81.9369999999908,
+          "exitCode": 0,
+          "values": "46, 660, 810, P5, 8.56, 18"
+        },
+        {
+          "elapsedSeconds": 83.01499999999942,
+          "exitCode": 0,
+          "values": "46, 697, 810, P5, 9.84, 9"
+        },
+        {
+          "elapsedSeconds": 84.09399999999732,
+          "exitCode": 0,
+          "values": "46, 637, 810, P5, 7.18, 11"
+        },
+        {
+          "elapsedSeconds": 85.17199999999139,
+          "exitCode": 0,
+          "values": "45, 292, 405, P8, 9.82, 6"
+        },
+        {
+          "elapsedSeconds": 86.23399999999674,
+          "exitCode": 0,
+          "values": "46, 367, 405, P8, 6.36, 16"
+        },
+        {
+          "elapsedSeconds": 87.3119999999908,
+          "exitCode": 0,
+          "values": "46, 352, 405, P8, 6.29, 14"
+        },
+        {
+          "elapsedSeconds": 88.38999999999942,
+          "exitCode": 0,
+          "values": "45, 360, 405, P8, 6.13, 0"
+        },
+        {
+          "elapsedSeconds": 89.46899999999732,
+          "exitCode": 0,
+          "values": "46, 375, 405, P8, 7.02, 17"
+        },
+        {
+          "elapsedSeconds": 90.53100000000268,
+          "exitCode": 0,
+          "values": "47, 630, 810, P5, 13.51, 20"
+        },
+        {
+          "elapsedSeconds": 91.60899999999674,
+          "exitCode": 0,
+          "values": "46, 615, 810, P5, 11.85, 18"
+        },
+        {
+          "elapsedSeconds": 92.6869999999908,
+          "exitCode": 0,
+          "values": "46, 660, 810, P5, 11.75, 17"
+        },
+        {
+          "elapsedSeconds": 93.76499999999942,
+          "exitCode": 0,
+          "values": "47, 615, 810, P5, 12.70, 17"
+        },
+        {
+          "elapsedSeconds": 94.82799999999406,
+          "exitCode": 0,
+          "values": "46, 555, 810, P5, 10.61, 9"
+        },
+        {
+          "elapsedSeconds": 95.90600000000268,
+          "exitCode": 0,
+          "values": "46, 337, 405, P8, 10.06, 16"
+        },
+        {
+          "elapsedSeconds": 96.98399999999674,
+          "exitCode": 0,
+          "values": "45, 345, 405, P8, 4.25, 0"
+        },
+        {
+          "elapsedSeconds": 98.0619999999908,
+          "exitCode": 0,
+          "values": "46, 495, 405, P8, 9.99, 16"
+        },
+        {
+          "elapsedSeconds": 99.13999999999942,
+          "exitCode": 0,
+          "values": "47, 592, 405, P8, 10.78, 25"
+        },
+        {
+          "elapsedSeconds": 100.20299999999406,
+          "exitCode": 0,
+          "values": "46, 435, 405, P8, 8.15, 10"
+        },
+        {
+          "elapsedSeconds": 101.28100000000268,
+          "exitCode": 0,
+          "values": "46, 495, 810, P5, 7.91, 13"
+        },
+        {
+          "elapsedSeconds": 102.375,
+          "exitCode": 0,
+          "values": "46, 502, 405, P8, 8.00, 7"
+        },
+        {
+          "elapsedSeconds": 103.46899999999732,
+          "exitCode": 0,
+          "values": "45, 412, 405, P8, 9.40, 0"
+        },
+        {
+          "elapsedSeconds": 104.54699999999139,
+          "exitCode": 0,
+          "values": "47, 795, 810, P5, 13.01, 12"
+        },
+        {
+          "elapsedSeconds": 105.63999999999942,
+          "exitCode": 0,
+          "values": "46, 855, 810, P5, 14.36, 27"
+        },
+        {
+          "elapsedSeconds": 106.71899999999732,
+          "exitCode": 0,
+          "values": "47, 825, 810, P5, 12.89, 16"
+        },
+        {
+          "elapsedSeconds": 107.78100000000268,
+          "exitCode": 0,
+          "values": "46, 660, 810, P5, 8.57, 27"
+        },
+        {
+          "elapsedSeconds": 108.85899999999674,
+          "exitCode": 0,
+          "values": "46, 517, 405, P8, 8.34, 34"
+        },
+        {
+          "elapsedSeconds": 109.9369999999908,
+          "exitCode": 0,
+          "values": "46, 480, 405, P8, 14.80, 38"
+        },
+        {
+          "elapsedSeconds": 111.01499999999942,
+          "exitCode": 0,
+          "values": "47, 360, 405, P8, 10.30, 29"
+        },
+        {
+          "elapsedSeconds": 112.09399999999732,
+          "exitCode": 0,
+          "values": "46, 232, 405, P8, 8.13, 18"
+        },
+        {
+          "elapsedSeconds": 113.17199999999139,
+          "exitCode": 0,
+          "values": "45, 877, 810, P5, 15.95, 25"
+        },
+        {
+          "elapsedSeconds": 114.25,
+          "exitCode": 0,
+          "values": "47, 885, 810, P5, 36.72, 26"
+        },
+        {
+          "elapsedSeconds": 115.3119999999908,
+          "exitCode": 0,
+          "values": "47, 712, 810, P5, 13.08, 20"
+        },
+        {
+          "elapsedSeconds": 116.38999999999942,
+          "exitCode": 0,
+          "values": "47, 885, 810, P5, 14.99, 18"
+        },
+        {
+          "elapsedSeconds": 117.46899999999732,
+          "exitCode": 0,
+          "values": "48, 960, 810, P5, 10.47, 25"
+        },
+        {
+          "elapsedSeconds": 118.5619999999908,
+          "exitCode": 0,
+          "values": "48, 900, 810, P5, 15.14, 19"
+        },
+        {
+          "elapsedSeconds": 119.63999999999942,
+          "exitCode": 0,
+          "values": "47, 802, 810, P5, 13.63, 9"
+        },
+        {
+          "elapsedSeconds": 120.70299999999406,
+          "exitCode": 0,
+          "values": "46, 592, 810, P5, 13.05, 4"
+        },
+        {
+          "elapsedSeconds": 121.78100000000268,
+          "exitCode": 0,
+          "values": "48, 862, 810, P5, 15.56, 22"
+        },
+        {
+          "elapsedSeconds": 122.85899999999674,
+          "exitCode": 0,
+          "values": "48, 795, 810, P5, 15.64, 14"
+        },
+        {
+          "elapsedSeconds": 123.92199999999139,
+          "exitCode": 0,
+          "values": "47, 892, 810, P5, 15.28, 22"
+        },
+        {
+          "elapsedSeconds": 125.0,
+          "exitCode": 0,
+          "values": "47, 802, 810, P5, 14.54, 23"
+        },
+        {
+          "elapsedSeconds": 126.07799999999406,
+          "exitCode": 0,
+          "values": "47, 667, 810, P5, 12.09, 17"
+        },
+        {
+          "elapsedSeconds": 127.15600000000268,
+          "exitCode": 0,
+          "values": "47, 750, 810, P5, 13.98, 21"
+        },
+        {
+          "elapsedSeconds": 128.21899999999732,
+          "exitCode": 0,
+          "values": "46, 195, 405, P8, 4.34, 0"
+        },
+        {
+          "elapsedSeconds": 129.3119999999908,
+          "exitCode": 0,
+          "values": "47, 915, 810, P5, 13.16, 26"
+        },
+        {
+          "elapsedSeconds": 130.38999999999942,
+          "exitCode": 0,
+          "values": "47, 862, 810, P5, 14.14, 25"
+        },
+        {
+          "elapsedSeconds": 131.46899999999732,
+          "exitCode": 0,
+          "values": "47, 795, 810, P5, 14.10, 27"
+        }
+      ],
+      "allPhaseDescriptive": {
+        "landing-sweep": {
+          "rows": 128,
+          "gpu_ns": {
+            "samples": 128,
+            "median": 7.049264,
+            "p95NearestLower": 14.997184,
+            "minimum": 3.096288,
+            "maximum": 15.560128
+          },
+          "gpu_as_ns": {
+            "samples": 128,
+            "median": 2.847536,
+            "p95NearestLower": 5.772,
+            "minimum": 0.088864,
+            "maximum": 6.067232
+          },
+          "gpu_dispatch_ns": {
+            "samples": 128,
+            "median": 4.048256,
+            "p95NearestLower": 9.332608,
+            "minimum": 2.38624,
+            "maximum": 9.868288
+          },
+          "gpu_transfer_ns": {
+            "samples": 128,
+            "median": 0.06128,
+            "p95NearestLower": 0.127264,
+            "minimum": 0.010976,
+            "maximum": 0.1376
+          }
+        },
+        "fresh-raise": {
+          "rows": 105,
+          "gpu_ns": {
+            "samples": 105,
+            "median": 8.285312,
+            "p95NearestLower": 15.522528,
+            "minimum": 4.473344,
+            "maximum": 15.856768
+          },
+          "gpu_as_ns": {
+            "samples": 105,
+            "median": 2.85552,
+            "p95NearestLower": 5.746624,
+            "minimum": 1.430912,
+            "maximum": 5.964544
+          },
+          "gpu_dispatch_ns": {
+            "samples": 105,
+            "median": 5.341888,
+            "p95NearestLower": 9.684288,
+            "minimum": 3.019456,
+            "maximum": 9.97264
+          },
+          "gpu_transfer_ns": {
+            "samples": 105,
+            "median": 0.063744,
+            "p95NearestLower": 0.12288,
+            "minimum": 0.011264,
+            "maximum": 0.139232
+          }
+        },
+        "outbound": {
+          "rows": 322,
+          "gpu_ns": {
+            "samples": 322,
+            "median": 7.7903199999999995,
+            "p95NearestLower": 13.772,
+            "minimum": 6.191552,
+            "maximum": 15.801824
+          },
+          "gpu_as_ns": {
+            "samples": 322,
+            "median": 2.8981440000000003,
+            "p95NearestLower": 5.846624,
+            "minimum": 2.75552,
+            "maximum": 6.021984
+          },
+          "gpu_dispatch_ns": {
+            "samples": 322,
+            "median": 4.821744,
+            "p95NearestLower": 7.964128,
+            "minimum": 3.257984,
+            "maximum": 9.91728
+          },
+          "gpu_transfer_ns": {
+            "samples": 322,
+            "median": 0.0624,
+            "p95NearestLower": 0.122208,
+            "minimum": 0.045152,
+            "maximum": 0.138784
+          }
+        },
+        "lookout-sweep": {
+          "rows": 61,
+          "gpu_ns": {
+            "samples": 61,
+            "median": 7.621952,
+            "p95NearestLower": 13.692864,
+            "minimum": 5.731808,
+            "maximum": 14.20976
+          },
+          "gpu_as_ns": {
+            "samples": 61,
+            "median": 2.898112,
+            "p95NearestLower": 5.767648,
+            "minimum": 2.775328,
+            "maximum": 5.919328
+          },
+          "gpu_dispatch_ns": {
+            "samples": 61,
+            "median": 4.613792,
+            "p95NearestLower": 7.966208,
+            "minimum": 2.782208,
+            "maximum": 8.338208
+          },
+          "gpu_transfer_ns": {
+            "samples": 61,
+            "median": 0.064992,
+            "p95NearestLower": 0.128672,
+            "minimum": 0.045952,
+            "maximum": 0.1304
+          }
+        },
+        "return": {
+          "rows": 363,
+          "gpu_ns": {
+            "samples": 363,
+            "median": 7.68592,
+            "p95NearestLower": 13.834688,
+            "minimum": 4.532224,
+            "maximum": 14.505536
+          },
+          "gpu_as_ns": {
+            "samples": 363,
+            "median": 2.87344,
+            "p95NearestLower": 5.791136,
+            "minimum": 1.456224,
+            "maximum": 5.997952
+          },
+          "gpu_dispatch_ns": {
+            "samples": 363,
+            "median": 4.752992,
+            "p95NearestLower": 7.962496,
+            "minimum": 3.051904,
+            "maximum": 8.51968
+          },
+          "gpu_transfer_ns": {
+            "samples": 363,
+            "median": 0.059968,
+            "p95NearestLower": 0.11904,
+            "minimum": 0.011168,
+            "maximum": 0.144352
+          }
+        },
+        "descent": {
+          "rows": 149,
+          "gpu_ns": {
+            "samples": 149,
+            "median": 7.231488,
+            "p95NearestLower": 13.810048,
+            "minimum": 3.916352,
+            "maximum": 14.084096
+          },
+          "gpu_as_ns": {
+            "samples": 149,
+            "median": 2.679296,
+            "p95NearestLower": 5.438176,
+            "minimum": 1.351872,
+            "maximum": 5.61696
+          },
+          "gpu_dispatch_ns": {
+            "samples": 149,
+            "median": 4.129888,
+            "p95NearestLower": 8.289312,
+            "minimum": 2.516192,
+            "maximum": 8.690912
+          },
+          "gpu_transfer_ns": {
+            "samples": 149,
+            "median": 0.046464,
+            "p95NearestLower": 0.119072,
+            "minimum": 0.00944,
+            "maximum": 0.123072
+          }
+        },
+        "lower-sweep": {
+          "rows": 31,
+          "gpu_ns": {
+            "samples": 31,
+            "median": 6.122976,
+            "p95NearestLower": 9.588896,
+            "minimum": 5.713792,
+            "maximum": 9.878592
+          },
+          "gpu_as_ns": {
+            "samples": 31,
+            "median": 2.713984,
+            "p95NearestLower": 5.326112,
+            "minimum": 2.581184,
+            "maximum": 5.429568
+          },
+          "gpu_dispatch_ns": {
+            "samples": 31,
+            "median": 3.31984,
+            "p95NearestLower": 4.214528,
+            "minimum": 3.000736,
+            "maximum": 4.48112
+          },
+          "gpu_transfer_ns": {
+            "samples": 31,
+            "median": 0.038528,
+            "p95NearestLower": 0.067168,
+            "minimum": 0.027456,
+            "maximum": 0.075904
+          }
+        },
+        "tomb-backtrack": {
+          "rows": 58,
+          "gpu_ns": {
+            "samples": 58,
+            "median": 6.907168,
+            "p95NearestLower": 9.765792,
+            "minimum": 5.67504,
+            "maximum": 10.298944
+          },
+          "gpu_as_ns": {
+            "samples": 58,
+            "median": 2.63648,
+            "p95NearestLower": 5.371744,
+            "minimum": 2.560032,
+            "maximum": 5.645536
+          },
+          "gpu_dispatch_ns": {
+            "samples": 58,
+            "median": 4.111248,
+            "p95NearestLower": 4.380352,
+            "minimum": 3.051968,
+            "maximum": 4.590496
+          },
+          "gpu_transfer_ns": {
+            "samples": 58,
+            "median": 0.032032000000000005,
+            "p95NearestLower": 0.05728,
+            "minimum": 0.023552,
+            "maximum": 0.064928
+          }
+        },
+        "passage-sweep": {
+          "rows": 90,
+          "gpu_ns": {
+            "samples": 90,
+            "median": 6.90208,
+            "p95NearestLower": 9.867168,
+            "minimum": 5.037728,
+            "maximum": 11.041568
+          },
+          "gpu_as_ns": {
+            "samples": 90,
+            "median": 2.662592,
+            "p95NearestLower": 5.36128,
+            "minimum": 1.339872,
+            "maximum": 5.41536
+          },
+          "gpu_dispatch_ns": {
+            "samples": 90,
+            "median": 4.14016,
+            "p95NearestLower": 4.612416,
+            "minimum": 3.652576,
+            "maximum": 7.42224
+          },
+          "gpu_transfer_ns": {
+            "samples": 90,
+            "median": 0.029984,
+            "p95NearestLower": 0.054624,
+            "minimum": 0.00944,
+            "maximum": 0.07152
+          }
+        },
+        "rope-return": {
+          "rows": 99,
+          "gpu_ns": {
+            "samples": 99,
+            "median": 6.946496,
+            "p95NearestLower": 9.918304,
+            "minimum": 4.439808,
+            "maximum": 11.590688
+          },
+          "gpu_as_ns": {
+            "samples": 99,
+            "median": 2.680224,
+            "p95NearestLower": 5.323712,
+            "minimum": 1.317888,
+            "maximum": 5.426528
+          },
+          "gpu_dispatch_ns": {
+            "samples": 99,
+            "median": 4.225984,
+            "p95NearestLower": 4.718432,
+            "minimum": 3.100832,
+            "maximum": 8.288096
+          },
+          "gpu_transfer_ns": {
+            "samples": 99,
+            "median": 0.032992,
+            "p95NearestLower": 0.059296,
+            "minimum": 0.009664,
+            "maximum": 0.075104
+          }
+        },
+        "repeat-ascent": {
+          "rows": 118,
+          "gpu_ns": {
+            "samples": 118,
+            "median": 7.316768,
+            "p95NearestLower": 8.750272,
+            "minimum": 3.914944,
+            "maximum": 10.537344
+          },
+          "gpu_as_ns": {
+            "samples": 118,
+            "median": 2.670032,
+            "p95NearestLower": 5.357408,
+            "minimum": 1.351552,
+            "maximum": 5.450528
+          },
+          "gpu_dispatch_ns": {
+            "samples": 118,
+            "median": 4.521968,
+            "p95NearestLower": 4.713792,
+            "minimum": 2.531936,
+            "maximum": 4.982656
+          },
+          "gpu_transfer_ns": {
+            "samples": 118,
+            "median": 0.055760000000000004,
+            "p95NearestLower": 0.064256,
+            "minimum": 0.009472,
+            "maximum": 0.074464
+          }
+        }
+      },
+      "prefixCpuWall": {
+        "simulation_ms": {
+          "samples": 1307,
+          "median": 8.306,
+          "p95NearestLower": 80.8059,
+          "minimum": 0.6443,
+          "maximum": 192.855
+        },
+        "render_cycle_ms": {
+          "samples": 1307,
+          "median": 51.6078,
+          "p95NearestLower": 294.5,
+          "minimum": 28.5983,
+          "maximum": 440.895
+        }
+      },
+      "nvmlColumns": [
+        "temperatureC",
+        "graphicsClockMHz",
+        "memoryClockMHz",
+        "performanceState",
+        "powerW",
+        "gpuUtilizationPercent"
+      ],
+      "framesSha256": "4d4a03e5771dbdd2731376ddff5ff43f903622303a09f3041407c1fa6f2c54d9"
+    }
+  ],
+  "matchedPhases": [
+    {
+      "phase": "landing-sweep",
+      "samplesPerRun": 129,
+      "runs": {
+        "route-control-open": {
+          "gpu_ns": {
+            "samples": 129,
+            "median": 6.913984,
+            "p95NearestLower": 14.913728,
+            "minimum": 3.1192,
+            "maximum": 15.625504
+          },
+          "gpu_as_ns": {
+            "samples": 129,
+            "median": 2.83696,
+            "p95NearestLower": 5.718688,
+            "minimum": 0.091136,
+            "maximum": 5.907808
+          },
+          "gpu_dispatch_ns": {
+            "samples": 129,
+            "median": 3.947744,
+            "p95NearestLower": 9.17312,
+            "minimum": 2.397664,
+            "maximum": 9.80544
+          },
+          "gpu_transfer_ns": {
+            "samples": 129,
+            "median": 0.060096,
+            "p95NearestLower": 0.127232,
+            "minimum": 0.011008,
+            "maximum": 0.142144
+          }
+        },
+        "route-shared": {
+          "gpu_ns": {
+            "samples": 129,
+            "median": 7.530336,
+            "p95NearestLower": 13.288416,
+            "minimum": 3.181824,
+            "maximum": 16.630208
+          },
+          "gpu_as_ns": {
+            "samples": 129,
+            "median": 2.961408,
+            "p95NearestLower": 5.92416,
+            "minimum": 0.101344,
+            "maximum": 7.327744
+          },
+          "gpu_dispatch_ns": {
+            "samples": 129,
+            "median": 4.41856,
+            "p95NearestLower": 7.226528,
+            "minimum": 3.062272,
+            "maximum": 8.641312
+          },
+          "gpu_transfer_ns": {
+            "samples": 129,
+            "median": 0.063552,
+            "p95NearestLower": 0.122144,
+            "minimum": 0.011424,
+            "maximum": 0.147584
+          }
+        },
+        "route-control-close": {
+          "gpu_ns": {
+            "samples": 129,
+            "median": 7.049664,
+            "p95NearestLower": 14.997184,
+            "minimum": 3.096288,
+            "maximum": 15.560128
+          },
+          "gpu_as_ns": {
+            "samples": 129,
+            "median": 2.84944,
+            "p95NearestLower": 5.80368,
+            "minimum": 0.088864,
+            "maximum": 6.067232
+          },
+          "gpu_dispatch_ns": {
+            "samples": 129,
+            "median": 4.096736,
+            "p95NearestLower": 9.332608,
+            "minimum": 2.38624,
+            "maximum": 9.868288
+          },
+          "gpu_transfer_ns": {
+            "samples": 129,
+            "median": 0.06128,
+            "p95NearestLower": 0.127264,
+            "minimum": 0.010976,
+            "maximum": 0.1376
+          }
+        }
+      },
+      "sharedWholeMedianPercentVersusHigherControl": 6.8183675136857635
+    },
+    {
+      "phase": "fresh-raise",
+      "samplesPerRun": 105,
+      "runs": {
+        "route-control-open": {
+          "gpu_ns": {
+            "samples": 105,
+            "median": 8.285248,
+            "p95NearestLower": 15.355648,
+            "minimum": 4.162336,
+            "maximum": 15.823744
+          },
+          "gpu_as_ns": {
+            "samples": 105,
+            "median": 2.831488,
+            "p95NearestLower": 5.642656,
+            "minimum": 1.409024,
+            "maximum": 5.898496
+          },
+          "gpu_dispatch_ns": {
+            "samples": 105,
+            "median": 5.356416,
+            "p95NearestLower": 9.588448,
+            "minimum": 2.679328,
+            "maximum": 10.124896
+          },
+          "gpu_transfer_ns": {
+            "samples": 105,
+            "median": 0.063776,
+            "p95NearestLower": 0.122368,
+            "minimum": 0.011072,
+            "maximum": 0.126816
+          }
+        },
+        "route-shared": {
+          "gpu_ns": {
+            "samples": 105,
+            "median": 7.83024,
+            "p95NearestLower": 14.264064,
+            "minimum": 7.235072,
+            "maximum": 14.647392
+          },
+          "gpu_as_ns": {
+            "samples": 105,
+            "median": 2.927776,
+            "p95NearestLower": 5.909568,
+            "minimum": 2.783648,
+            "maximum": 6.068896
+          },
+          "gpu_dispatch_ns": {
+            "samples": 105,
+            "median": 4.83936,
+            "p95NearestLower": 8.384352,
+            "minimum": 4.341632,
+            "maximum": 8.602336
+          },
+          "gpu_transfer_ns": {
+            "samples": 105,
+            "median": 0.06336,
+            "p95NearestLower": 0.123392,
+            "minimum": 0.053472,
+            "maximum": 0.129024
+          }
+        },
+        "route-control-close": {
+          "gpu_ns": {
+            "samples": 105,
+            "median": 8.28384,
+            "p95NearestLower": 15.522528,
+            "minimum": 4.473344,
+            "maximum": 15.856768
+          },
+          "gpu_as_ns": {
+            "samples": 105,
+            "median": 2.85552,
+            "p95NearestLower": 5.745536,
+            "minimum": 1.430912,
+            "maximum": 5.891008
+          },
+          "gpu_dispatch_ns": {
+            "samples": 105,
+            "median": 5.341888,
+            "p95NearestLower": 9.684288,
+            "minimum": 3.019456,
+            "maximum": 9.97264
+          },
+          "gpu_transfer_ns": {
+            "samples": 105,
+            "median": 0.063744,
+            "p95NearestLower": 0.12288,
+            "minimum": 0.011264,
+            "maximum": 0.139232
+          }
+        }
+      },
+      "sharedWholeMedianPercentVersusHigherControl": -5.491784916999465
+    },
+    {
+      "phase": "outbound",
+      "samplesPerRun": 322,
+      "runs": {
+        "route-control-open": {
+          "gpu_ns": {
+            "samples": 322,
+            "median": 7.501104,
+            "p95NearestLower": 12.910368,
+            "minimum": 6.213504,
+            "maximum": 15.685984
+          },
+          "gpu_as_ns": {
+            "samples": 322,
+            "median": 2.858736,
+            "p95NearestLower": 5.68832,
+            "minimum": 2.7272,
+            "maximum": 5.91376
+          },
+          "gpu_dispatch_ns": {
+            "samples": 322,
+            "median": 4.557888,
+            "p95NearestLower": 7.13952,
+            "minimum": 3.138272,
+            "maximum": 9.818176
+          },
+          "gpu_transfer_ns": {
+            "samples": 322,
+            "median": 0.059936,
+            "p95NearestLower": 0.117088,
+            "minimum": 0.045376,
+            "maximum": 0.128736
+          }
+        },
+        "route-shared": {
+          "gpu_ns": {
+            "samples": 322,
+            "median": 7.473184,
+            "p95NearestLower": 12.837664,
+            "minimum": 6.003168,
+            "maximum": 13.383488
+          },
+          "gpu_as_ns": {
+            "samples": 322,
+            "median": 2.960464,
+            "p95NearestLower": 5.9112,
+            "minimum": 2.781632,
+            "maximum": 5.946112
+          },
+          "gpu_dispatch_ns": {
+            "samples": 322,
+            "median": 4.501696,
+            "p95NearestLower": 6.99952,
+            "minimum": 3.127232,
+            "maximum": 7.362144
+          },
+          "gpu_transfer_ns": {
+            "samples": 322,
+            "median": 0.062208,
+            "p95NearestLower": 0.121792,
+            "minimum": 0.046112,
+            "maximum": 0.139584
+          }
+        },
+        "route-control-close": {
+          "gpu_ns": {
+            "samples": 322,
+            "median": 7.7903199999999995,
+            "p95NearestLower": 13.772,
+            "minimum": 6.191552,
+            "maximum": 15.801824
+          },
+          "gpu_as_ns": {
+            "samples": 322,
+            "median": 2.8981440000000003,
+            "p95NearestLower": 5.846624,
+            "minimum": 2.75552,
+            "maximum": 6.021984
+          },
+          "gpu_dispatch_ns": {
+            "samples": 322,
+            "median": 4.821744,
+            "p95NearestLower": 7.964128,
+            "minimum": 3.257984,
+            "maximum": 9.91728
+          },
+          "gpu_transfer_ns": {
+            "samples": 322,
+            "median": 0.06248,
+            "p95NearestLower": 0.122208,
+            "minimum": 0.045152,
+            "maximum": 0.138784
+          }
+        }
+      },
+      "sharedWholeMedianPercentVersusHigherControl": -4.070898242947651
+    },
+    {
+      "phase": "lookout-sweep",
+      "samplesPerRun": 61,
+      "runs": {
+        "route-control-open": {
+          "gpu_ns": {
+            "samples": 61,
+            "median": 7.463168,
+            "p95NearestLower": 13.502688,
+            "minimum": 5.90912,
+            "maximum": 13.655872
+          },
+          "gpu_as_ns": {
+            "samples": 61,
+            "median": 2.84528,
+            "p95NearestLower": 5.903456,
+            "minimum": 2.756128,
+            "maximum": 5.933952
+          },
+          "gpu_dispatch_ns": {
+            "samples": 61,
+            "median": 4.544128,
+            "p95NearestLower": 7.597504,
+            "minimum": 2.999808,
+            "maximum": 7.855328
+          },
+          "gpu_transfer_ns": {
+            "samples": 61,
+            "median": 0.065088,
+            "p95NearestLower": 0.125696,
+            "minimum": 0.045024,
+            "maximum": 0.298528
+          }
+        },
+        "route-shared": {
+          "gpu_ns": {
+            "samples": 61,
+            "median": 7.401472,
+            "p95NearestLower": 12.613792,
+            "minimum": 5.88016,
+            "maximum": 13.281344
+          },
+          "gpu_as_ns": {
+            "samples": 61,
+            "median": 2.975744,
+            "p95NearestLower": 5.931008,
+            "minimum": 2.797472,
+            "maximum": 6.008576
+          },
+          "gpu_dispatch_ns": {
+            "samples": 61,
+            "median": 4.275424,
+            "p95NearestLower": 6.58992,
+            "minimum": 2.898944,
+            "maximum": 7.343872
+          },
+          "gpu_transfer_ns": {
+            "samples": 61,
+            "median": 0.0624,
+            "p95NearestLower": 0.12304,
+            "minimum": 0.047584,
+            "maximum": 0.133408
+          }
+        },
+        "route-control-close": {
+          "gpu_ns": {
+            "samples": 61,
+            "median": 7.571456,
+            "p95NearestLower": 13.692864,
+            "minimum": 5.731808,
+            "maximum": 14.20976
+          },
+          "gpu_as_ns": {
+            "samples": 61,
+            "median": 2.898016,
+            "p95NearestLower": 5.767648,
+            "minimum": 2.775328,
+            "maximum": 5.919328
+          },
+          "gpu_dispatch_ns": {
+            "samples": 61,
+            "median": 4.613792,
+            "p95NearestLower": 7.966208,
+            "minimum": 2.782208,
+            "maximum": 8.338208
+          },
+          "gpu_transfer_ns": {
+            "samples": 61,
+            "median": 0.064832,
+            "p95NearestLower": 0.128672,
+            "minimum": 0.045952,
+            "maximum": 0.1304
+          }
+        }
+      },
+      "sharedWholeMedianPercentVersusHigherControl": -2.2450635650527517
+    },
+    {
+      "phase": "return",
+      "samplesPerRun": 363,
+      "runs": {
+        "route-control-open": {
+          "gpu_ns": {
+            "samples": 363,
+            "median": 7.676896,
+            "p95NearestLower": 13.85184,
+            "minimum": 6.556512,
+            "maximum": 14.357376
+          },
+          "gpu_as_ns": {
+            "samples": 363,
+            "median": 2.872992,
+            "p95NearestLower": 5.766272,
+            "minimum": 2.766464,
+            "maximum": 5.960128
+          },
+          "gpu_dispatch_ns": {
+            "samples": 363,
+            "median": 4.70496,
+            "p95NearestLower": 8.10976,
+            "minimum": 3.664096,
+            "maximum": 8.608192
+          },
+          "gpu_transfer_ns": {
+            "samples": 363,
+            "median": 0.060064,
+            "p95NearestLower": 0.115648,
+            "minimum": 0.04272,
+            "maximum": 0.126528
+          }
+        },
+        "route-shared": {
+          "gpu_ns": {
+            "samples": 363,
+            "median": 7.6232,
+            "p95NearestLower": 13.371904,
+            "minimum": 6.644192,
+            "maximum": 13.999264
+          },
+          "gpu_as_ns": {
+            "samples": 363,
+            "median": 2.946976,
+            "p95NearestLower": 5.920736,
+            "minimum": 2.770656,
+            "maximum": 6.169024
+          },
+          "gpu_dispatch_ns": {
+            "samples": 363,
+            "median": 4.645024,
+            "p95NearestLower": 7.541696,
+            "minimum": 3.659648,
+            "maximum": 7.96672
+          },
+          "gpu_transfer_ns": {
+            "samples": 363,
+            "median": 0.061664,
+            "p95NearestLower": 0.118912,
+            "minimum": 0.043488,
+            "maximum": 0.126816
+          }
+        },
+        "route-control-close": {
+          "gpu_ns": {
+            "samples": 363,
+            "median": 7.686208,
+            "p95NearestLower": 13.862944,
+            "minimum": 4.532224,
+            "maximum": 14.505536
+          },
+          "gpu_as_ns": {
+            "samples": 363,
+            "median": 2.875712,
+            "p95NearestLower": 5.791136,
+            "minimum": 1.456224,
+            "maximum": 5.997952
+          },
+          "gpu_dispatch_ns": {
+            "samples": 363,
+            "median": 4.761536,
+            "p95NearestLower": 7.997376,
+            "minimum": 3.051904,
+            "maximum": 8.51968
+          },
+          "gpu_transfer_ns": {
+            "samples": 363,
+            "median": 0.059968,
+            "p95NearestLower": 0.11904,
+            "minimum": 0.011168,
+            "maximum": 0.144352
+          }
+        }
+      },
+      "sharedWholeMedianPercentVersusHigherControl": -0.8197540321573382
+    },
+    {
+      "phase": "descent",
+      "samplesPerRun": 149,
+      "runs": {
+        "route-control-open": {
+          "gpu_ns": {
+            "samples": 149,
+            "median": 7.2624,
+            "p95NearestLower": 13.74416,
+            "minimum": 3.929504,
+            "maximum": 14.176
+          },
+          "gpu_as_ns": {
+            "samples": 149,
+            "median": 2.681152,
+            "p95NearestLower": 5.303232,
+            "minimum": 1.394848,
+            "maximum": 5.522336
+          },
+          "gpu_dispatch_ns": {
+            "samples": 149,
+            "median": 4.486304,
+            "p95NearestLower": 8.300512,
+            "minimum": 2.510272,
+            "maximum": 8.586432
+          },
+          "gpu_transfer_ns": {
+            "samples": 149,
+            "median": 0.055136,
+            "p95NearestLower": 0.116576,
+            "minimum": 0.010496,
+            "maximum": 0.121856
+          }
+        },
+        "route-shared": {
+          "gpu_ns": {
+            "samples": 149,
+            "median": 6.811296,
+            "p95NearestLower": 12.410016,
+            "minimum": 4.32368,
+            "maximum": 12.792928
+          },
+          "gpu_as_ns": {
+            "samples": 149,
+            "median": 2.707968,
+            "p95NearestLower": 5.441728,
+            "minimum": 1.33936,
+            "maximum": 5.513152
+          },
+          "gpu_dispatch_ns": {
+            "samples": 149,
+            "median": 3.978784,
+            "p95NearestLower": 6.8456,
+            "minimum": 2.814656,
+            "maximum": 7.253408
+          },
+          "gpu_transfer_ns": {
+            "samples": 149,
+            "median": 0.05264,
+            "p95NearestLower": 0.116288,
+            "minimum": 0.009504,
+            "maximum": 0.120544
+          }
+        },
+        "route-control-close": {
+          "gpu_ns": {
+            "samples": 149,
+            "median": 7.228352,
+            "p95NearestLower": 13.790912,
+            "minimum": 3.916352,
+            "maximum": 14.084096
+          },
+          "gpu_as_ns": {
+            "samples": 149,
+            "median": 2.677536,
+            "p95NearestLower": 5.406016,
+            "minimum": 1.351872,
+            "maximum": 5.61696
+          },
+          "gpu_dispatch_ns": {
+            "samples": 149,
+            "median": 4.127488,
+            "p95NearestLower": 8.289312,
+            "minimum": 2.516192,
+            "maximum": 8.690912
+          },
+          "gpu_transfer_ns": {
+            "samples": 149,
+            "median": 0.045632,
+            "p95NearestLower": 0.119072,
+            "minimum": 0.00944,
+            "maximum": 0.123072
+          }
+        }
+      },
+      "sharedWholeMedianPercentVersusHigherControl": -6.211500330469278
+    },
+    {
+      "phase": "lower-sweep",
+      "samplesPerRun": 31,
+      "runs": {
+        "route-control-open": {
+          "gpu_ns": {
+            "samples": 31,
+            "median": 6.134752,
+            "p95NearestLower": 10.108064,
+            "minimum": 4.31392,
+            "maximum": 10.397728
+          },
+          "gpu_as_ns": {
+            "samples": 31,
+            "median": 2.691232,
+            "p95NearestLower": 5.392864,
+            "minimum": 1.351264,
+            "maximum": 5.499968
+          },
+          "gpu_dispatch_ns": {
+            "samples": 31,
+            "median": 3.360992,
+            "p95NearestLower": 4.645472,
+            "minimum": 2.933728,
+            "maximum": 4.935648
+          },
+          "gpu_transfer_ns": {
+            "samples": 31,
+            "median": 0.03856,
+            "p95NearestLower": 0.069696,
+            "minimum": 0.01008,
+            "maximum": 0.07744
+          }
+        },
+        "route-shared": {
+          "gpu_ns": {
+            "samples": 31,
+            "median": 6.260512,
+            "p95NearestLower": 9.372928,
+            "minimum": 4.345152,
+            "maximum": 9.80192
+          },
+          "gpu_as_ns": {
+            "samples": 31,
+            "median": 2.663584,
+            "p95NearestLower": 5.361024,
+            "minimum": 1.34864,
+            "maximum": 5.376672
+          },
+          "gpu_dispatch_ns": {
+            "samples": 31,
+            "median": 3.318176,
+            "p95NearestLower": 4.160704,
+            "minimum": 2.879776,
+            "maximum": 4.631648
+          },
+          "gpu_transfer_ns": {
+            "samples": 31,
+            "median": 0.03648,
+            "p95NearestLower": 0.067136,
+            "minimum": 0.01008,
+            "maximum": 0.072224
+          }
+        },
+        "route-control-close": {
+          "gpu_ns": {
+            "samples": 31,
+            "median": 6.122976,
+            "p95NearestLower": 9.588896,
+            "minimum": 5.713792,
+            "maximum": 9.878592
+          },
+          "gpu_as_ns": {
+            "samples": 31,
+            "median": 2.713984,
+            "p95NearestLower": 5.326112,
+            "minimum": 2.599616,
+            "maximum": 5.429568
+          },
+          "gpu_dispatch_ns": {
+            "samples": 31,
+            "median": 3.31984,
+            "p95NearestLower": 4.214528,
+            "minimum": 3.000736,
+            "maximum": 4.48112
+          },
+          "gpu_transfer_ns": {
+            "samples": 31,
+            "median": 0.038528,
+            "p95NearestLower": 0.067168,
+            "minimum": 0.027456,
+            "maximum": 0.075904
+          }
+        }
+      },
+      "sharedWholeMedianPercentVersusHigherControl": 2.0499606178049357
+    },
+    {
+      "phase": "tomb-backtrack",
+      "samplesPerRun": 58,
+      "runs": {
+        "route-control-open": {
+          "gpu_ns": {
+            "samples": 58,
+            "median": 6.084,
+            "p95NearestLower": 9.926784,
+            "minimum": 4.432544,
+            "maximum": 10.290816
+          },
+          "gpu_as_ns": {
+            "samples": 58,
+            "median": 2.593344,
+            "p95NearestLower": 5.375584,
+            "minimum": 1.349728,
+            "maximum": 5.401248
+          },
+          "gpu_dispatch_ns": {
+            "samples": 58,
+            "median": 4.0897760000000005,
+            "p95NearestLower": 4.563776,
+            "minimum": 3.03952,
+            "maximum": 5.577024
+          },
+          "gpu_transfer_ns": {
+            "samples": 58,
+            "median": 0.030496000000000002,
+            "p95NearestLower": 0.058432,
+            "minimum": 0.009536,
+            "maximum": 0.061984
+          }
+        },
+        "route-shared": {
+          "gpu_ns": {
+            "samples": 58,
+            "median": 6.749616,
+            "p95NearestLower": 9.746528,
+            "minimum": 4.427296,
+            "maximum": 9.836448
+          },
+          "gpu_as_ns": {
+            "samples": 58,
+            "median": 2.66064,
+            "p95NearestLower": 5.37936,
+            "minimum": 1.374432,
+            "maximum": 5.457504
+          },
+          "gpu_dispatch_ns": {
+            "samples": 58,
+            "median": 4.051776,
+            "p95NearestLower": 4.384032,
+            "minimum": 2.990688,
+            "maximum": 8.060672
+          },
+          "gpu_transfer_ns": {
+            "samples": 58,
+            "median": 0.032272,
+            "p95NearestLower": 0.060096,
+            "minimum": 0.009568,
+            "maximum": 0.06432
+          }
+        },
+        "route-control-close": {
+          "gpu_ns": {
+            "samples": 58,
+            "median": 6.912496,
+            "p95NearestLower": 9.765792,
+            "minimum": 5.67504,
+            "maximum": 10.298944
+          },
+          "gpu_as_ns": {
+            "samples": 58,
+            "median": 2.6392160000000002,
+            "p95NearestLower": 5.384064,
+            "minimum": 2.560032,
+            "maximum": 5.645536
+          },
+          "gpu_dispatch_ns": {
+            "samples": 58,
+            "median": 4.1349599999999995,
+            "p95NearestLower": 4.380352,
+            "minimum": 3.051968,
+            "maximum": 4.590496
+          },
+          "gpu_transfer_ns": {
+            "samples": 58,
+            "median": 0.032032000000000005,
+            "p95NearestLower": 0.05728,
+            "minimum": 0.023552,
+            "maximum": 0.064928
+          }
+        }
+      },
+      "sharedWholeMedianPercentVersusHigherControl": -2.3563123942494935
+    },
+    {
+      "phase": "passage-sweep",
+      "samplesPerRun": 90,
+      "runs": {
+        "route-control-open": {
+          "gpu_ns": {
+            "samples": 90,
+            "median": 6.7966560000000005,
+            "p95NearestLower": 9.871168,
+            "minimum": 5.434528,
+            "maximum": 13.660288
+          },
+          "gpu_as_ns": {
+            "samples": 90,
+            "median": 2.6561120000000003,
+            "p95NearestLower": 5.329888,
+            "minimum": 1.339296,
+            "maximum": 5.528608
+          },
+          "gpu_dispatch_ns": {
+            "samples": 90,
+            "median": 4.131232000000001,
+            "p95NearestLower": 4.496256,
+            "minimum": 3.76288,
+            "maximum": 8.273216
+          },
+          "gpu_transfer_ns": {
+            "samples": 90,
+            "median": 0.030032000000000003,
+            "p95NearestLower": 0.057568,
+            "minimum": 0.009632,
+            "maximum": 0.061152
+          }
+        },
+        "route-shared": {
+          "gpu_ns": {
+            "samples": 90,
+            "median": 6.754064,
+            "p95NearestLower": 9.719328,
+            "minimum": 5.43024,
+            "maximum": 10.170656
+          },
+          "gpu_as_ns": {
+            "samples": 90,
+            "median": 2.6143039999999997,
+            "p95NearestLower": 5.321152,
+            "minimum": 1.380448,
+            "maximum": 5.37296
+          },
+          "gpu_dispatch_ns": {
+            "samples": 90,
+            "median": 4.057824,
+            "p95NearestLower": 4.491424,
+            "minimum": 3.722592,
+            "maximum": 7.096128
+          },
+          "gpu_transfer_ns": {
+            "samples": 90,
+            "median": 0.0308,
+            "p95NearestLower": 0.056128,
+            "minimum": 0.009536,
+            "maximum": 0.059392
+          }
+        },
+        "route-control-close": {
+          "gpu_ns": {
+            "samples": 90,
+            "median": 6.90208,
+            "p95NearestLower": 9.867168,
+            "minimum": 5.037728,
+            "maximum": 11.041568
+          },
+          "gpu_as_ns": {
+            "samples": 90,
+            "median": 2.65328,
+            "p95NearestLower": 5.356064,
+            "minimum": 1.339872,
+            "maximum": 5.41536
+          },
+          "gpu_dispatch_ns": {
+            "samples": 90,
+            "median": 4.14016,
+            "p95NearestLower": 4.6384,
+            "minimum": 3.652576,
+            "maximum": 7.42224
+          },
+          "gpu_transfer_ns": {
+            "samples": 90,
+            "median": 0.029936,
+            "p95NearestLower": 0.054624,
+            "minimum": 0.00944,
+            "maximum": 0.07152
+          }
+        }
+      },
+      "sharedWholeMedianPercentVersusHigherControl": -2.1445129584125366
+    }
+  ],
+  "adoptionSignals": [],
+  "executableSha256": "307c3849c775241ff6fc1f5b6f426f43281084b2bd6cc85e0f43a036197acf4d",
+  "equalInitialPreparation": true,
+  "matchedPrefix": {
+    "samplesPerRun": 1308,
+    "firstTick": 1436,
+    "lastTick": 6664,
+    "excludedLaterPhases": [
+      "repeat-ascent",
+      "rope-return"
+    ],
+    "reason": "known baked-owner restore wait changes input/workload; not a dropped outlier"
+  },
+  "captureComparisons": [
+    {
+      "file": "1-initial-reunion.png",
+      "cameras": [
+        [
+          -28.7023,
+          1.4512,
+          -5.80325,
+          1.5708,
+          -0.1
+        ],
+        [
+          -28.7023,
+          1.4512,
+          -5.80325,
+          1.5708,
+          -0.1
+        ],
+        [
+          -28.7023,
+          1.4512,
+          -5.80325,
+          1.5708,
+          -0.1
+        ]
+      ],
+      "ticks": [
+        1436,
+        1436,
+        1436
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 141,
+        "maximumChannelDifference": 1,
+        "meanAbsoluteChannelDifference": 9.902263374485597e-05
+      }
+    },
+    {
+      "file": "2-landing-sweep-2.png",
+      "cameras": [
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          4.71239,
+          -0.15
+        ],
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          4.71239,
+          -0.15
+        ],
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          4.71239,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        1768,
+        1768,
+        1768
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 75,
+        "maximumChannelDifference": 9,
+        "meanAbsoluteChannelDifference": 8.42335390946502e-05
+      }
+    },
+    {
+      "file": "3-landing-sweep-2.png",
+      "cameras": [
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          6.28319,
+          -0.15
+        ],
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          6.28319,
+          -0.15
+        ],
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          6.28319,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        1828,
+        1828,
+        1828
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 53,
+        "maximumChannelDifference": 26,
+        "meanAbsoluteChannelDifference": 8.294753086419753e-05
+      }
+    },
+    {
+      "file": "4-landing-sweep-2.png",
+      "cameras": [
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          7.85398,
+          -0.15
+        ],
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          7.85398,
+          -0.15
+        ],
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          7.85398,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        1888,
+        1888,
+        1888
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 138,
+        "maximumChannelDifference": 11,
+        "meanAbsoluteChannelDifference": 0.00011381172839506173
+      }
+    },
+    {
+      "file": "5-landing-sweep-2.png",
+      "cameras": [
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          9.42478,
+          -0.15
+        ],
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          9.42478,
+          -0.15
+        ],
+        [
+          -33.6881,
+          2.05,
+          -12.7833,
+          9.42478,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        1948,
+        1948,
+        1948
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 196,
+        "maximumChannelDifference": 8,
+        "meanAbsoluteChannelDifference": 0.00014531893004115227
+      }
+    },
+    {
+      "file": "6-kit-walking.png",
+      "cameras": [
+        [
+          -28.7088,
+          1.45186,
+          -5.81235,
+          1.58902,
+          -0.1
+        ],
+        [
+          -28.7088,
+          1.45186,
+          -5.81235,
+          1.58902,
+          -0.1
+        ],
+        [
+          -28.7088,
+          1.45186,
+          -5.81235,
+          1.58902,
+          -0.1
+        ]
+      ],
+      "ticks": [
+        2308,
+        2308,
+        2308
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 130,
+        "maximumChannelDifference": 6,
+        "meanAbsoluteChannelDifference": 9.580761316872428e-05
+      }
+    },
+    {
+      "file": "7-fresh-raise-3.png",
+      "cameras": [
+        [
+          -28.7028,
+          1.45143,
+          -5.80956,
+          2.00373,
+          -0.15
+        ],
+        [
+          -28.7028,
+          1.45143,
+          -5.80956,
+          2.00373,
+          -0.15
+        ],
+        [
+          -28.7028,
+          1.45143,
+          -5.80956,
+          2.00373,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        2368,
+        2368,
+        2368
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 148,
+        "maximumChannelDifference": 4,
+        "meanAbsoluteChannelDifference": 0.00011059670781893004
+      }
+    },
+    {
+      "file": "8-outbound-4.png",
+      "cameras": [
+        [
+          -15.704,
+          0.551638,
+          0.198127,
+          2.00371,
+          -0.15
+        ],
+        [
+          -15.704,
+          0.551638,
+          0.198127,
+          2.00371,
+          -0.15
+        ],
+        [
+          -15.704,
+          0.551638,
+          0.198127,
+          2.00371,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        2648,
+        2648,
+        2648
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 85,
+        "maximumChannelDifference": 2,
+        "meanAbsoluteChannelDifference": 6.108539094650206e-05
+      }
+    },
+    {
+      "file": "9-outbound-5.png",
+      "cameras": [
+        [
+          -17.6166,
+          -0.549846,
+          15.2153,
+          1.91474,
+          -0.15
+        ],
+        [
+          -17.6166,
+          -0.549846,
+          15.2153,
+          1.91474,
+          -0.15
+        ],
+        [
+          -17.6166,
+          -0.549846,
+          15.2153,
+          1.91474,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        2936,
+        2936,
+        2936
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 125,
+        "maximumChannelDifference": 1,
+        "meanAbsoluteChannelDifference": 8.487654320987654e-05
+      }
+    },
+    {
+      "file": "10-outbound-6.png",
+      "cameras": [
+        [
+          -3.68556,
+          -0.251741,
+          20.2221,
+          2.32563,
+          -0.15
+        ],
+        [
+          -3.68556,
+          -0.251741,
+          20.2221,
+          2.32563,
+          -0.15
+        ],
+        [
+          -3.68556,
+          -0.251741,
+          20.2221,
+          2.32563,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        3216,
+        3216,
+        3216
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 36,
+        "maximumChannelDifference": 12,
+        "meanAbsoluteChannelDifference": 5.015432098765432e-05
+      }
+    },
+    {
+      "file": "11-outbound-7.png",
+      "cameras": [
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          2.32562,
+          -0.15
+        ],
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          2.32562,
+          -0.15
+        ],
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          2.32562,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        3656,
+        3656,
+        3656
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "file": "12-lookout-sweep-7.png",
+      "cameras": [
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          4.15934,
+          -0.15
+        ],
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          4.15934,
+          -0.15
+        ],
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          4.15934,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        3720,
+        3720,
+        3720
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 37,
+        "maximumChannelDifference": 1,
+        "meanAbsoluteChannelDifference": 2.7006172839506174e-05
+      }
+    },
+    {
+      "file": "13-lookout-sweep-7.png",
+      "cameras": [
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          5.73013,
+          -0.15
+        ],
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          5.73013,
+          -0.15
+        ],
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          5.73013,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        3780,
+        3780,
+        3780
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 109,
+        "maximumChannelDifference": 12,
+        "meanAbsoluteChannelDifference": 9.709362139917696e-05
+      }
+    },
+    {
+      "file": "14-lookout-sweep-7.png",
+      "cameras": [
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          7.30093,
+          -0.15
+        ],
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          7.30093,
+          -0.15
+        ],
+        [
+          13.3101,
+          -1.14046,
+          36.2095,
+          7.30093,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        3840,
+        3840,
+        3840
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 23,
+        "maximumChannelDifference": 2,
+        "meanAbsoluteChannelDifference": 1.6718106995884773e-05
+      }
+    },
+    {
+      "file": "15-lookout-sweep-7.png",
+      "cameras": [
+        [
+          13.3004,
+          -1.14033,
+          36.2004,
+          -0.815692,
+          -0.15
+        ],
+        [
+          13.3004,
+          -1.14033,
+          36.2004,
+          -0.815692,
+          -0.15
+        ],
+        [
+          13.3004,
+          -1.14033,
+          36.2004,
+          -0.815692,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        3900,
+        3900,
+        3900
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 47,
+        "maximumChannelDifference": 16,
+        "meanAbsoluteChannelDifference": 7.587448559670782e-05
+      }
+    },
+    {
+      "file": "16-return-6.png",
+      "cameras": [
+        [
+          -3.68601,
+          -0.251639,
+          20.2132,
+          -0.815673,
+          -0.15
+        ],
+        [
+          -3.68601,
+          -0.251639,
+          20.2132,
+          -0.815673,
+          -0.15
+        ],
+        [
+          -3.68601,
+          -0.251639,
+          20.2132,
+          -0.815673,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        4348,
+        4348,
+        4348
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 46,
+        "maximumChannelDifference": 2,
+        "meanAbsoluteChannelDifference": 3.60082304526749e-05
+      }
+    },
+    {
+      "file": "17-return-5.png",
+      "cameras": [
+        [
+          -17.6981,
+          -0.546399,
+          15.1153,
+          0.133173,
+          -0.15
+        ],
+        [
+          -17.6981,
+          -0.546399,
+          15.1153,
+          0.133173,
+          -0.15
+        ],
+        [
+          -17.6981,
+          -0.546399,
+          15.1153,
+          0.133173,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        4632,
+        4632,
+        4632
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 42,
+        "maximumChannelDifference": 7,
+        "meanAbsoluteChannelDifference": 3.536522633744856e-05
+      }
+    },
+    {
+      "file": "18-return-4.png",
+      "cameras": [
+        [
+          -15.7032,
+          0.549709,
+          0.223824,
+          0.13316,
+          -0.15
+        ],
+        [
+          -15.7032,
+          0.549709,
+          0.223824,
+          0.13316,
+          -0.15
+        ],
+        [
+          -15.7032,
+          0.549709,
+          0.223824,
+          0.13316,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        4916,
+        4916,
+        4916
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 47,
+        "maximumChannelDifference": 17,
+        "meanAbsoluteChannelDifference": 5.851337448559671e-05
+      }
+    },
+    {
+      "file": "19-return-3.png",
+      "cameras": [
+        [
+          -28.7068,
+          1.45216,
+          -5.82488,
+          -0.621291,
+          -0.15
+        ],
+        [
+          -28.7068,
+          1.45216,
+          -5.82488,
+          -0.621291,
+          -0.15
+        ],
+        [
+          -28.7068,
+          1.45216,
+          -5.82488,
+          -0.621291,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        5188,
+        5188,
+        5188
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 52,
+        "maximumChannelDifference": 3,
+        "meanAbsoluteChannelDifference": 4.308127572016461e-05
+      }
+    },
+    {
+      "file": "20-return-2.png",
+      "cameras": [
+        [
+          -33.6894,
+          2.05,
+          -12.7852,
+          3.14159,
+          -0.15
+        ],
+        [
+          -33.6894,
+          2.05,
+          -12.7852,
+          3.14159,
+          -0.15
+        ],
+        [
+          -33.6894,
+          2.05,
+          -12.7852,
+          3.14159,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        5352,
+        5352,
+        5352
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 188,
+        "maximumChannelDifference": 5,
+        "meanAbsoluteChannelDifference": 0.00013631687242798355
+      }
+    },
+    {
+      "file": "21-descent-2.png",
+      "cameras": [
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          3.14159,
+          -0.15
+        ],
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          3.14159,
+          -0.15
+        ],
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          3.14159,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        5948,
+        5948,
+        5948
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "file": "22-lower-sweep-0.png",
+      "cameras": [
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          4.76475,
+          -0.15
+        ],
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          4.76475,
+          -0.15
+        ],
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          4.76475,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        5980,
+        5980,
+        5980
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "file": "23-lower-sweep-0.png",
+      "cameras": [
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          6.44027,
+          -0.15
+        ],
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          6.44027,
+          -0.15
+        ],
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          6.44027,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        6012,
+        6012,
+        6012
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "file": "24-lower-sweep-0.png",
+      "cameras": [
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          7.90634,
+          -0.15
+        ],
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          7.90634,
+          -0.15
+        ],
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          7.90634,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        6040,
+        6040,
+        6040
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "file": "25-lower-sweep-0.png",
+      "cameras": [
+        [
+          -33.6867,
+          -0.95,
+          -15.2,
+          1.5708,
+          -0.15
+        ],
+        [
+          -33.6867,
+          -0.95,
+          -15.2,
+          1.5708,
+          -0.15
+        ],
+        [
+          -33.6867,
+          -0.95,
+          -15.2,
+          1.5708,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        6072,
+        6072,
+        6072
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "file": "26-tomb-backtrack-0.png",
+      "cameras": [
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          1.58825,
+          -0.15
+        ],
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          1.58825,
+          -0.15
+        ],
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          1.58825,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        6304,
+        6304,
+        6304
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "file": "27-passage-sweep-0.png",
+      "cameras": [
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          3.19395,
+          -0.15
+        ],
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          3.19395,
+          -0.15
+        ],
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          3.19395,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        6396,
+        6396,
+        6396
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "file": "28-passage-sweep-0.png",
+      "cameras": [
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          4.72984,
+          -0.15
+        ],
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          4.72984,
+          -0.15
+        ],
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          4.72984,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        6484,
+        6484,
+        6484
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "file": "29-passage-sweep-0.png",
+      "cameras": [
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          6.33555,
+          -0.15
+        ],
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          6.33555,
+          -0.15
+        ],
+        [
+          -21.9867,
+          -0.95,
+          -15.2,
+          6.33555,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        6576,
+        6576,
+        6576
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "file": "30-passage-sweep-0.png",
+      "cameras": [
+        [
+          -21.9889,
+          -0.95,
+          -15.2,
+          -1.5708,
+          -0.15
+        ],
+        [
+          -21.9889,
+          -0.95,
+          -15.2,
+          -1.5708,
+          -0.15
+        ],
+        [
+          -21.9889,
+          -0.95,
+          -15.2,
+          -1.5708,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        6664,
+        6664,
+        6664
+      ],
+      "samePose": true,
+      "sameTick": true,
+      "controlRepeat": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      },
+      "shared": {
+        "pixels": 518400,
+        "changedPixels": 0,
+        "maximumChannelDifference": 0,
+        "meanAbsoluteChannelDifference": 0.0
+      }
+    },
+    {
+      "file": "31-rope-return-0.png",
+      "cameras": [
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          3.14159,
+          -0.15
+        ],
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          -1.5708,
+          -0.15
+        ],
+        [
+          -33.7,
+          -0.95,
+          -15.2,
+          3.14159,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        7060,
+        6896,
+        7060
+      ],
+      "samePose": false,
+      "sameTick": false
+    },
+    {
+      "file": "32-repeat-ascent-2.png",
+      "cameras": [
+        [
+          -33.7,
+          2.05,
+          -12.8,
+          3.14159,
+          -0.15
+        ],
+        [
+          -33.7,
+          2.05,
+          -12.8,
+          3.14159,
+          -0.15
+        ],
+        [
+          -33.7,
+          2.05,
+          -12.8,
+          3.14159,
+          -0.15
+        ]
+      ],
+      "ticks": [
+        7530,
+        7367,
+        7530
+      ],
+      "samePose": true,
+      "sameTick": false
+    },
+    {
+      "file": "33-reset-opening.png",
+      "cameras": [
+        [
+          0,
+          -0.95,
+          1.85,
+          3.14159,
+          0
+        ],
+        [
+          0,
+          -0.95,
+          1.85,
+          3.14159,
+          0
+        ],
+        [
+          0,
+          -0.95,
+          1.85,
+          3.14159,
+          0
+        ]
+      ],
+      "ticks": [
+        7531,
+        7368,
+        7531
+      ],
+      "samePose": true,
+      "sameTick": false
+    }
+  ],
+  "ownerCustody": {
+    "parkedFiles": 151,
+    "changed": 0,
+    "phoneUsed": false
+  },
+  "componentSignals": [],
+  "scope": "Windows Diagnostic staged post-Keeper normal-controller routes; shared64 remains OFF; not phone or natural campaign acceptance"
+}

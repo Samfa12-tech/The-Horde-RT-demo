@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "workflow": {
+    "conclusion": "success",
+    "created_at": "2026-10-23T12:52:04Z",
+    "event": "push",
+    "head_branch": "codex/horde-1.7-wp2-vertical-proof",
+    "head_sha": "478f6c2512a2ef0aaf3e73e5ce276062091e2118",
+    "html_url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39956585719",
+    "id": 39956585719,
+    "name": "Shared simulation host tests",
+    "run_attempt": 1,
+    "run_started_at": "2026-10-23T12:52:04Z",
+    "status": "completed",
+    "updated_at": "2026-10-23T13:05:33Z"
+  },
+  "observedAtUtc": "2026-10-23T13:06:03.8435239+00:00",
+  "jobs": [
+    {
+      "id": 120423826041,
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:52:08Z",
+      "completedAtUtc": "2026-10-23T12:59:33Z",
+      "totalSeconds": 445.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39956585719/job/120423826041"
+    },
+    {
+      "id": 120423826425,
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:52:08Z",
+      "completedAtUtc": "2026-10-23T13:05:32Z",
+      "totalSeconds": 804.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39956585719/job/120423826425"
+    },
+    {
+      "id": 120423826443,
+      "name": "player-vulkan-host",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:52:08Z",
+      "completedAtUtc": "2026-10-23T12:59:20Z",
+      "totalSeconds": 432.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39956585719/job/120423826443"
+    },
+    {
+      "id": 120423826465,
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:52:08Z",
+      "completedAtUtc": "2026-10-23T13:02:48Z",
+      "totalSeconds": 640.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39956585719/job/120423826465"
+    },
+    {
+      "id": 120423826594,
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:52:09Z",
+      "completedAtUtc": "2026-10-23T12:57:12Z",
+      "totalSeconds": 303.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39956585719/job/120423826594"
+    },
+    {
+      "id": 120423826675,
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success",
+      "startedAtUtc": "2026-10-23T12:52:08Z",
+      "completedAtUtc": "2026-10-23T13:01:51Z",
+      "totalSeconds": 583.0,
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39956585719/job/120423826675"
+    }
+  ],
+  "msvc": {
+    "conclusion": "success",
+    "timeoutMinutes": 15,
+    "totalSeconds": 804.0,
+    "remainingToCapSeconds": 96.0,
+    "configureStepSeconds": 37.0,
+    "buildStepSeconds": 594.0,
+    "selectionStepSeconds": 128.0,
+    "selectedCount": 149,
+    "completedPassedCount": 149,
+    "failedTestResultsObserved": 0,
+    "ctestRealSeconds": 125.63,
+    "lastCompletedTest": {
+      "completedAtUtc": "2026-10-23T13:05:26.5877177Z",
+      "position": 149,
+      "total": 149,
+      "name": "pocket_audio_native_pcm_tests",
+      "result": "Passed",
+      "seconds": 0.09
+    },
+    "unfinishedStartedTest": null,
+    "notStartedCount": 0,
+    "ctestFinalSummaryPresent": true,
+    "apkResolverStepConclusion": "success",
+    "apkResolverCasesPassed": 10,
+    "annotationCount": 0,
+    "annotations": []
+  },
+  "sourceReceiptSha256": "b4af4815d945fc611d3cb5665363a708450edf7a84150df200b683143c52ed08",
+  "limitation": "This preceding exact head is green; it does not validate the newer benchmark-profile source. Earlier cap cancellations remain retained."
+}

@@ -1,0 +1,8 @@
+{
+  "android/app/src/main/java/com/samfa12/hordelanternrt/CombatActionControl.java": "053666ba3681c3741e2541878679d213c22d98eb0a929d7c2c53e1f5dcabe6a7",
+  "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "7ba52dea7d12131a1ea77557d49bea13576748414067d4cdab60a7acd731d9c4",
+  "android/app/src/main/res/values/strings.xml": "1016d9c13dd5cd10486b7f0e97e603c74fcf9db0e3c5afe0fb40aa5132b7df80",
+  "android/app/src/test/java/com/samfa12/hordelanternrt/CompactHudLayoutTest.java": "b1f69391b875adeee1f810b36b94b1f8a82b6f326384022e61861883420a7ff0",
+  "src/gameplay/SwordCombat.h": "04df6569a1c30f8e8e7875697bf4ffd81f7741c2fb1cc2a0a26111ff670fb469",
+  "src/gameplay/simulation/GameSimulation.cpp": "94d20ccc7115f4f520362e6726b410dc9ae4805c9365457966bca7bb719f0708"
+}

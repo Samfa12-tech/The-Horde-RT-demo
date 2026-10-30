@@ -1,0 +1,145 @@
+Start testing: Oct 23 15:36 AUS Eastern Summer Time
+----------------------------------------------------------
+106/230 Testing: horde_rt_development_static_asset_tests
+106/230 Test: horde_rt_development_static_asset_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_development_static_asset_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_development_static_asset_tests" start time: Oct 23 15:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+rect-niche displacement-components walkTime=0->0 walkAmount=0 speed=0 authoritativeTravel=37.9770966 crouch=0 crouchDrop=0 equipmentStowed=0 ropeHands=0 torso=-0,-0,0 baseToAuthoredDistance=37.9770966
+rect-niche restage-components staged=1 tick=1->2 walkTime=0->0 locomotionTime=0->0 camera=1 support=1 hinge=1 pendulum=1 eventsEmpty=1
+rect-niche projection-inputs yaw=-1.57079637 pitch=-0.319999993 supportY=-0.949999988 left=-0.466763765,-0.0719899163,0.212070361 right=0.230000004,-0.340000004,0.33270824 visibility=NOT_EVALUATED
+Development static asset policy passed
+<end of output>
+Test time =   0.15 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_development_static_asset_tests" end time: Oct 23 15:36 AUS Eastern Summer Time
+"horde_rt_development_static_asset_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+110/230 Testing: horde_rt_world_surface_range_tests
+110/230 Test: horde_rt_world_surface_range_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_world_surface_range_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_world_surface_range_tests" start time: Oct 23 15:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_world_surface_range_tests" end time: Oct 23 15:36 AUS Eastern Summer Time
+"horde_rt_world_surface_range_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+111/230 Testing: horde_rt_graveyard_dressing_tests
+111/230 Test: horde_rt_graveyard_dressing_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_graveyard_dressing_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_graveyard_dressing_tests" start time: Oct 23 15:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Placed 12 pieces / 6184 render+contact triangles; CPU support 3202880 bytes (before 2774696).
+Graveyard native geometry/contact checks passed.
+<end of output>
+Test time =   1.73 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_graveyard_dressing_tests" end time: Oct 23 15:36 AUS Eastern Summer Time
+"horde_rt_graveyard_dressing_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+112/230 Testing: horde_rt_forest_understory_tests
+112/230 Test: horde_rt_forest_understory_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_forest_understory_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_forest_understory_tests" start time: Oct 23 15:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Understory native surface/material/rollback checks passed.
+<end of output>
+Test time =   0.19 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_forest_understory_tests" end time: Oct 23 15:36 AUS Eastern Summer Time
+"horde_rt_forest_understory_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+113/230 Testing: horde_rt_forest_rock_dressing_tests
+113/230 Test: horde_rt_forest_rock_dressing_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_forest_rock_dressing_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_forest_rock_dressing_tests" start time: Oct 23 15:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Forest rock/contact pass
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_forest_rock_dressing_tests" end time: Oct 23 15:36 AUS Eastern Summer Time
+"horde_rt_forest_rock_dressing_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+114/230 Testing: horde_rt_forest_deadwood_tests
+114/230 Test: horde_rt_forest_deadwood_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_forest_deadwood_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_forest_deadwood_tests" start time: Oct 23 15:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Root move rejected sign=1 cross=0 height=1.8 step=1 ground=1.15652..1.15501 foot=1.15652 current=1.15652 next=1.15501 swept=0:0 ground_clear=1 props_clear=0 step_clear=1 body_clear=1
+Trail root: triangles=20 vertices=60 native_bytes=4080 max_rise=0.1 bounds=-23.7713,1.08436,-3.91404..-23.2377,1.23115,-2.88176
+Prepared deadwood/contact pass
+<end of output>
+Test time =   4.03 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_forest_deadwood_tests" end time: Oct 23 15:36 AUS Eastern Summer Time
+"horde_rt_forest_deadwood_tests" time elapsed: 00:00:04
+----------------------------------------------------------
+
+115/230 Testing: horde_rt_bellwether_shell_tests
+115/230 Test: horde_rt_bellwether_shell_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_bellwether_shell_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_bellwether_shell_tests" start time: Oct 23 15:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Bellwether native placement/material/rollback passed.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_bellwether_shell_tests" end time: Oct 23 15:36 AUS Eastern Summer Time
+"horde_rt_bellwether_shell_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+116/230 Testing: horde_rt_forest_dressing_tests
+116/230 Test: horde_rt_forest_dressing_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_forest_dressing_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_forest_dressing_tests" start time: Oct 23 15:36 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Native root footprint samples=4992 exposed=0 maximum_gap_m=-0.0199988
+F03 road clue: triangles=144 verticesBytes=18432 indexBytes=1728 minimumTrailClearance=1.64405 minimumBottomGap=-0.281644 maximumBottomGap=-0.03 stepTriangles=20
+Triangle-region candidate: retainedExterior=365376 omittedTomb=13588 vertexBytes=31438784 indexBytes=5007144; CPU candidate only, spatial eviction permission not established
+Cached native selection: turns=173 maximumCpuAdvanceMs=5.7771 scannedBytes=5601050; CPU candidate only, normal eviction remains prohibited
+Native selected geometry common+tomb: primitives=5 vertexBytes=4073792 indexBytes=481488 removedVertexBytes=28041216 removedIndexBytes=4688712; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry common+forest: primitives=8 vertexBytes=31205568 indexBytes=4964496 removedVertexBytes=909440 removedIndexBytes=205704; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+forest: primitives=8 vertexBytes=31205568 indexBytes=4964496 removedVertexBytes=909440 removedIndexBytes=205704; CPU preparation only; common masonry still includes tomb surfaces
+Native selected geometry one-owner common+tomb: primitives=5 vertexBytes=4073792 indexBytes=481488 removedVertexBytes=28041216 removedIndexBytes=4688712; CPU preparation only; common masonry still includes tomb surfaces
+Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, forest 6; primitiveRows=11 vertexBytes=32115008 indexBytes=5170200; CPU admission only
+Native forest tree-pair import, grounding, grouping, and clean-failure checks passed.
+<end of output>
+Test time =  29.76 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_forest_dressing_tests" end time: Oct 23 15:36 AUS Eastern Summer Time
+"horde_rt_forest_dressing_tests" time elapsed: 00:00:29
+----------------------------------------------------------
+
+End testing: Oct 23 15:36 AUS Eastern Summer Time

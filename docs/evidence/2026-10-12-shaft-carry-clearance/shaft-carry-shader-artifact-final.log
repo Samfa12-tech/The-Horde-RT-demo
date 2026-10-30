@@ -1,0 +1,7 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 98: horde_rt_raygen_variant_artifact_tests
+1/1 Test #98: horde_rt_raygen_variant_artifact_tests ...   Passed   89.72 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  89.74 sec

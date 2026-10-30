@@ -1,0 +1,67 @@
+// Temporary diagnostic only: ordinary motor input at an isolated mirror-room
+// start, no campaign storage or natural-route acceptance.
+if (std::getenv("HORDE_LOCAL_BACKWARD_PROBE") != nullptr) {
+    using namespace horde::gameplay::simulation;
+    auto config=ProductionGameSimulationConfig();
+    config.playerStartX=-35.2f;config.playerStartZ=-15.2f;
+    config.playerStartYawRadians=-1.57079632679f;config.playerStartPitchRadians=-.20f;
+    config.waterfallSkeletonEncounter=false;config.swordStartsStowed=false;
+    context.simulation=GameSimulation(config);
+    context.simulation.SetPresentationAspect(float(context.swapchainExtent.width)/context.swapchainExtent.height);
+    context.simulationPaused=true;context.simulationInput.paused=true;
+    const auto clear=ClearColorForMode(capabilities.rtMode);
+    std::ofstream rows(outputDirectory/"frames.jsonstream",std::ios::binary);
+    if(!rows)return fail("Backward diagnostic receipt could not be opened.");
+    unsigned frameIndex=0;
+    const auto capture=[&](unsigned phase,unsigned motorTick) {
+        MirrorSimulationSnapshot(context);
+        for(unsigned settle=0;settle<2;++settle) {
+            bool presented=false;
+            if(!RenderFrame(context,clear,presented) || !presented ||
+               context.lastFramePresentation!=horde::telemetry::RtPresentationOutcome::Presented)return false;
+        }
+        const auto idle=vkDeviceWaitIdle(context.device);
+        if(!CompleteRtEvidenceAfterDeviceIdle(context,idle))return false;
+        const auto published=context.rtFrameEvidence.PublishedStateByValue();
+        const auto& completed=published.completedEvidence;
+        const auto& id=completed.identity.submitted;
+        const auto& s=context.simulation.Snapshot();
+        if(!published.presented || !published.hasCompletedEvidence ||
+           id.frame.simulationTick!=s.tickIndex || id.frame.sceneEpoch!=published.sceneEpoch ||
+           id.frame.measurementGeneration!=published.measurementGeneration ||
+           !completed.scene.fireLighting || !completed.scene.dispatch.sceneReady ||
+           !completed.scene.dispatch.rtDispatchRecorded || !completed.scene.dispatch.swapchainCopyRecorded ||
+           completed.presentation.outcome!=horde::telemetry::RtPresentationOutcome::Presented ||
+           id.submissionSerial!=completed.presentation.lastSuccessfulPresentSubmissionSerial)return false;
+        std::string evidence,error,hash;
+        horde::telemetry::RtEvidenceValidationError validation{};
+        if(!horde::telemetry::SerializeRtPerformanceEvidenceJson(completed,evidence,validation))return false;
+        horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
+        const auto file="mirror-"+std::to_string(frameIndex++)+".png";
+        if(!context.rtScene.CaptureStorageImage(image,error) ||
+           !WriteRgbaPng(outputDirectory/file,image,error) ||
+           !Sha256File(outputDirectory/file,hash,error))return false;
+        rows<<"{\"phase\":"<<phase<<",\"motorTick\":"<<motorTick<<",\"file\":\""<<file
+            <<"\",\"sha256\":\""<<hash<<"\",\"camera\":["<<s.playerX<<','<<s.playerSupportWorldY
+            <<','<<s.playerZ<<','<<s.playerYawRadians<<','<<s.playerPitchRadians
+            <<"],\"legacyLocomotionTime\":"<<s.playerAnimation.locomotionTime
+            <<",\"travelled\":"<<s.playerTravelledThisTick
+            <<",\"armPixels\":"<<context.rtScene.PrimaryPlayerPixelCount()
+            <<",\"completedFrame\":"<<evidence<<"}\n";
+        rows.flush();return bool(rows);
+    };
+    constexpr std::array<unsigned,4> ticks{{24,48,12,24}};
+    constexpr std::array<float,4> directions{{1.f,-1.f,0.f,1.f}};
+    for(unsigned phase=0;phase<ticks.size();++phase) {
+        for(unsigned tick=0;tick<ticks[phase];++tick) {
+            InputSnapshot input;input.damageEnabled=false;input.tutorialEnabled=false;
+            input.yawRadians=-1.57079632679f;input.pitchRadians=-.20f;
+            input.moveForward=directions[phase];
+            context.simulation.StepFixed(input);
+            if((tick+1)%6==0 && !capture(phase,tick+1))
+                return fail("Backward diagnostic failed owning RT presentation/readback.");
+        }
+    }
+    return WriteReportFile(outputDirectory/"diagnostic-only.json",
+        "{\"complete\":true,\"evidenceClass\":\"isolated mirror-room motor sequence; no natural journey, physical control or phone acceptance\",\"captures\":18}\n")?0:1;
+}

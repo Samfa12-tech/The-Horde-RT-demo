@@ -38,6 +38,18 @@ public final class AndroidControllerInputTest {
         assertFalse(input.key(key(1, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_THUMBL, 0, 18), 18).handled);
     }
 
+    @Test public void shouldersNeverLatchManualRunOrCrouchWhileActionsRemainIndependent() {
+        AndroidControllerInput input=new AndroidControllerInput();
+        for(int code:new int[]{KeyEvent.KEYCODE_BUTTON_L1,KeyEvent.KEYCODE_BUTTON_R1}) {
+            assertTrue(input.key(key(14,KeyEvent.ACTION_DOWN,code,0,10),10).handled);
+            assertFalse(input.crouchHeld());assertFalse(input.runHeld());
+            input.key(key(14,KeyEvent.ACTION_UP,code,0,11),11);
+        }
+        assertEquals(AndroidControllerInput.SWING,input.key(key(14,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_X,0,12),12).actions);
+        input.suspend(13);assertFalse(input.crouchHeld());assertFalse(input.runHeld());
+        input.removeDevice(14);assertFalse(input.crouchHeld());assertFalse(input.runHeld());
+    }
+
     @Test public void triggerAxesUseHysteresisAndDeduplicateTheirDigitalRepresentations() {
         AndroidControllerInput input = new AndroidControllerInput();
         input.motion(motion(4, 1, 0, 0, 0, 0, 0, 0), 1); // neutral baseline
@@ -190,6 +202,54 @@ public final class AndroidControllerInputTest {
         assertEquals(-0.279f, ranged.moveForward, 0.02f);
         assertTrue(ranged.lookX > 0.40f);
         assertTrue(ranged.lookY < -0.40f);
+    }
+
+    @Test public void guardHoldTracksDigitalAnalogReleaseAndRequiresNeutralAfterSuspend() {
+        AndroidControllerInput input = new AndroidControllerInput();
+        input.motion(motion(4, 1, 0,0,0,0,0,0), 1);
+        assertFalse(input.guardHeld());
+        assertEquals(AndroidControllerInput.PARRY, input.motion(motion(4,2,0,0,0,0,1,0),2).actions);
+        assertTrue(input.guardHeld());
+        assertEquals(0,input.key(key(4,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L2,0,3),3).actions);
+        input.motion(motion(4,4,0,0,0,0,0,0),4);
+        assertTrue("digital representation still held",input.guardHeld());
+        input.key(key(4,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_L2,0,5),5);
+        assertFalse(input.guardHeld());
+        input.motion(motion(4,6,0,0,0,0,1,0),6);
+        assertTrue(input.guardHeld());
+        input.suspend(7);
+        assertFalse(input.guardHeld());
+        input.motion(motion(4,8,0,0,0,0,1,0),8);
+        assertFalse("held on resume cannot arm guard",input.guardHeld());
+        input.motion(motion(4,9,0,0,0,0,0,0),9);
+        input.motion(motion(4,10,0,0,0,0,1,0),10);
+        assertTrue(input.guardHeld());
+        input.clearGuardHold();
+        assertFalse(input.guardHeld());
+        input.motion(motion(4,11,0,0,0,0,1,0),11);
+        assertFalse("menu barrier requires trigger release",input.guardHeld());
+        input.removeDevice(4);
+        assertFalse(input.guardHeld());
+    }
+
+    @Test public void flaskDpadEdgesDoNotUseStickNavigationOrRepeatAndCoalesceHatKeys() {
+        AndroidControllerInput input=new AndroidControllerInput();
+        input.motion(motionAxes(4,1,0,0,0,0,0,0,0,0,0,0),1);
+        assertEquals(0,input.motion(motionAxes(4,2,0,-1,0,0,0,0,0,0,0,0),2).actions);
+        assertEquals(AndroidControllerInput.DRINK_FLASK,input.key(key(4,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_UP,0,3),3).actions);
+        assertEquals(0,input.key(key(4,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_UP,1,4),4).actions);
+        assertEquals(0,input.motion(motionAxes(4,5,0,0,0,0,0,0,0,0,0,-1),5).actions);
+        input.key(key(4,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_DPAD_UP,0,6),6);
+        assertEquals(0,input.motion(motionAxes(4,7,0,0,0,0,0,0,0,0,0,-1),7).actions);
+        input.motion(motionAxes(4,8,0,0,0,0,0,0,0,0,0,0),8);
+        assertEquals(AndroidControllerInput.REST,input.motion(motionAxes(4,9,0,0,0,0,0,0,0,0,0,1),9).actions);
+        assertEquals(0,input.key(key(4,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_DOWN,0,10),10).actions);
+        input.suspend(11);
+        assertEquals(0,input.key(key(4,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_DOWN,1,12),12).actions);
+        assertEquals(0,input.motion(motionAxes(4,13,0,0,0,0,0,0,0,0,0,1),13).actions);
+        input.key(key(4,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_DPAD_DOWN,0,14),14);
+        input.motion(motionAxes(4,15,0,0,0,0,0,0,0,0,0,0),15);
+        assertEquals(AndroidControllerInput.REST,input.motion(motionAxes(4,16,0,0,0,0,0,0,0,0,0,1),16).actions);
     }
 
     private static KeyEvent key(int deviceId, int action, int keyCode, int repeat, long time) {

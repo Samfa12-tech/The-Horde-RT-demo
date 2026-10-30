@@ -1,0 +1,6218 @@
+{
+  "schema": 1,
+  "classification": "bounded CPU reference, frozen-input geometry, and GLSL-arithmetic mirror; no GPU run",
+  "source_glsl": "docs/evidence/2026-10-10-mist-interval-prototype/reproduce/intervals.glsl",
+  "limits": {
+    "raw_intervals": 64,
+    "candidate_callbacks": 512
+  },
+  "case_count": 6,
+  "passed": true,
+  "failures": [],
+  "displaced_equal_length_control": {
+    "same_union_length": true,
+    "left_endpoints": [
+      [
+        1.0,
+        2.0
+      ],
+      [
+        4.0,
+        5.0
+      ]
+    ],
+    "right_endpoints": [
+      [
+        2.0,
+        3.0
+      ],
+      [
+        5.0,
+        6.0
+      ]
+    ],
+    "left_cells": [
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    "right_cells": [
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0
+    ],
+    "distinguished_by_endpoints_and_cells": true
+  },
+  "invalid_cell_length_controls": [
+    {
+      "cell": [
+        "1.0",
+        "1.0"
+      ],
+      "rejected": true
+    },
+    {
+      "cell": [
+        "2.0",
+        "1.0"
+      ],
+      "rejected": true
+    },
+    {
+      "cell": [
+        "0.0",
+        "nan"
+      ],
+      "rejected": true
+    },
+    {
+      "cell": [
+        "0.0",
+        "inf"
+      ],
+      "rejected": true
+    }
+  ],
+  "frozen_real_input_discriminators": {
+    "classification": "CPU float32 cone clipping vs independent double triangle-derived clipping on frozen inputs; not GPU endpoint readback",
+    "source_artifacts": {
+      "frozen_state": "docs\\evidence\\2026-10-10-mist-interval-prototype\\captures\\current-baseline-5\\frozen-state.json",
+      "cone_geometry_state": "docs\\evidence\\2026-10-10-frozen-mist-attribution\\extension\\owner-view\\current-midpoint-all\\frozen-state.json",
+      "depth_image": "reports\\mist-interval-prototype\\captures\\current-depth-3\\192-rescue-journey-start.png",
+      "depth_completed_frame": "reports\\mist-interval-prototype\\captures\\current-depth-3\\completed-frame.json",
+      "cone_planes": "docs/evidence/2026-10-10-mist-interval-prototype/cones.json",
+      "frozen_state_byte_identical_to_depth_capture": true,
+      "cone_input_triangles_equal_depth_capture_triangles": true,
+      "camera_resolution": [
+        1232,
+        803
+      ],
+      "sha256": {
+        "frozen_state": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+        "depth_image": "a2ca1422aede8c8984d7dba1628e2a6851ac3260eaa60601509772ed1839d710",
+        "cones_json": "b04c8cb18cdcf5499c60fefe96a75ff56ba4354b58f1a8e0295b4964afeb3880",
+        "depth_completed_frame": "24085663669f63d0629739024fa394e34c1355260ca506ce39cf1f8a39766fe5"
+      }
+    },
+    "depth_frame_identity": {
+      "presented": true,
+      "final_idle_completion": true,
+      "backend": "RayTracingPipeline",
+      "source_head": "5febb0ded2f5da0c930dc8a2adb1a2e38622ad34",
+      "executable_sha256": "2277c6a32481e8503fa9b96dee69eccbda62b7f66c1f078389bbd0f1960041d0",
+      "active_spirv_sha256": "06b14261b8b5457e5c246db656dc0fbd2aae5971d6753e25e9b0e56968e434f6"
+    },
+    "lights": [
+      [
+        -34.35,
+        2.76,
+        -16.02
+      ],
+      [
+        -33.05,
+        2.76,
+        -14.38
+      ]
+    ],
+    "ray_count": 6,
+    "source_ray_records": 12,
+    "nonempty_source_witnesses": {
+      "source_0": [
+        838,
+        574
+      ],
+      "source_1": [
+        465,
+        286
+      ]
+    },
+    "quality_sample_counts": {
+      "lean": 2,
+      "current": 6,
+      "higher": 8
+    },
+    "maximum_raw_or_union_endpoint_error_metres": 7.358474953811367e-06,
+    "maximum_cell_coverage_error": 0.003112603668330549,
+    "maximum_cell_coverage_error_bound": 0.006227148247330215,
+    "displaced_equal_length_actual_ray_control": {
+      "pixel": [
+        838,
+        574
+      ],
+      "source_id": 0,
+      "shift": 0.30648145923975145,
+      "original_union_length": 0.09375286102294922,
+      "displaced_union_length": 0.09375286102294922,
+      "original_endpoints": [
+        [
+          2.236839771270752,
+          2.330592632293701
+        ]
+      ],
+      "displaced_endpoints": [
+        [
+          2.5433212305105033,
+          2.6370740915334525
+        ]
+      ],
+      "original_cells": [
+        0.0,
+        0.0,
+        0.0,
+        0.17981043457984924,
+        0.1260925978422165,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "displaced_cells": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.17980778217315674,
+        0.12608668208122253,
+        0.0,
+        0.0
+      ],
+      "endpoint_vectors_differ": true,
+      "cell_vectors_differ": true
+    },
+    "passed": true,
+    "failures": [],
+    "records": [
+      {
+        "pixel": [
+          838,
+          574
+        ],
+        "source_id": 0,
+        "scene_depth": 3.517874240875244,
+        "mist_segment": [
+          1.0660225669572325,
+          3.517874240875244
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 48,
+        "cpu_ray_aabb_candidates_selected_source": 48,
+        "float32_raw_count": 16,
+        "double_oracle_raw_count": 16,
+        "float32_union": [
+          [
+            2.236839771270752,
+            2.330592632293701
+          ]
+        ],
+        "double_oracle_union": [
+          [
+            2.236840781945374,
+            2.330592078980011
+          ]
+        ],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.04495278745889664,
+              0.03152332827448845
+            ],
+            "independent_double_oracle": [
+              0.044951961572885495,
+              0.031522878721271234
+            ],
+            "max_abs_error": 8.258860111423627e-07,
+            "endpoint_error_derived_bound": 3.648834735856545e-06
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.13486012816429138,
+              0.0945676937699318,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.13485764815595463,
+              0.09456633918146481,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 2.480008336747108e-06,
+            "endpoint_error_derived_bound": 6.946506131566741e-06
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.17981043457984924,
+              0.1260925978422165,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.17980713830782477,
+              0.126090786007811,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 3.2962720244722465e-06,
+            "endpoint_error_derived_bound": 8.595341508755655e-06
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      },
+      {
+        "pixel": [
+          838,
+          574
+        ],
+        "source_id": 1,
+        "scene_depth": 3.517874240875244,
+        "mist_segment": [
+          1.0660225669572325,
+          3.517874240875244
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 48,
+        "cpu_ray_aabb_candidates_selected_source": 0,
+        "float32_raw_count": 0,
+        "double_oracle_raw_count": 0,
+        "float32_union": [],
+        "double_oracle_union": [],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      },
+      {
+        "pixel": [
+          915,
+          513
+        ],
+        "source_id": 0,
+        "scene_depth": 4.430617332458496,
+        "mist_segment": [
+          1.3426111799333544,
+          4.430616967403865
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 32,
+        "cpu_ray_aabb_candidates_selected_source": 32,
+        "float32_raw_count": 16,
+        "double_oracle_raw_count": 16,
+        "float32_union": [
+          [
+            2.1105563640594482,
+            2.2151622772216797
+          ]
+        ],
+        "double_oracle_union": [
+          [
+            2.110556715837161,
+            2.215162573982536
+          ]
+        ],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.06774982810020447,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.06774979174969352,
+              0.0
+            ],
+            "max_abs_error": 3.635051094852404e-08,
+            "endpoint_error_derived_bound": 2.4556698648193655e-06
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.2032494992017746,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.2032493909415507,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 1.0826022389665013e-07,
+            "endpoint_error_derived_bound": 3.3670095944580966e-06
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.010508312843739986,
+              0.26049038767814636,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.010507401178337025,
+              0.26049116908003117,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 9.116654029611704e-07,
+            "endpoint_error_derived_bound": 3.822679459277462e-06
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      },
+      {
+        "pixel": [
+          915,
+          513
+        ],
+        "source_id": 1,
+        "scene_depth": 4.430617332458496,
+        "mist_segment": [
+          1.3426111799333544,
+          4.430616967403865
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 32,
+        "cpu_ray_aabb_candidates_selected_source": 0,
+        "float32_raw_count": 0,
+        "double_oracle_raw_count": 0,
+        "float32_union": [],
+        "double_oracle_union": [],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      },
+      {
+        "pixel": [
+          850,
+          556
+        ],
+        "source_id": 0,
+        "scene_depth": 3.7139718532562256,
+        "mist_segment": [
+          1.1254458994636944,
+          3.713971529945452
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 48,
+        "cpu_ray_aabb_candidates_selected_source": 48,
+        "float32_raw_count": 16,
+        "double_oracle_raw_count": 16,
+        "float32_union": [
+          [
+            2.200190544128418,
+            2.2950189113616943
+          ]
+        ],
+        "double_oracle_union": [
+          [
+            2.2001914900947708,
+            2.2950183545552836
+          ]
+        ],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.07326824218034744,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.07326708158194273,
+              0.0
+            ],
+            "max_abs_error": 1.1605984047147189e-06,
+            "endpoint_error_derived_bound": 3.461783943591982e-06
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.21980474889278412,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.21980126499082858,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 3.4839019555366058e-06,
+            "endpoint_error_derived_bound": 6.3853534464442135e-06
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.2930731773376465,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.293068542274581,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 4.635063065472345e-06,
+            "endpoint_error_derived_bound": 7.847140082818229e-06
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      },
+      {
+        "pixel": [
+          850,
+          556
+        ],
+        "source_id": 1,
+        "scene_depth": 3.7139718532562256,
+        "mist_segment": [
+          1.1254458994636944,
+          3.713971529945452
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 48,
+        "cpu_ray_aabb_candidates_selected_source": 0,
+        "float32_raw_count": 0,
+        "double_oracle_raw_count": 0,
+        "float32_union": [],
+        "double_oracle_union": [],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      },
+      {
+        "pixel": [
+          465,
+          286
+        ],
+        "source_id": 0,
+        "scene_depth": 5.023216724395752,
+        "mist_segment": [
+          4.7483997069824735,
+          4.766930501325364
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 6,
+        "cpu_ray_aabb_candidates_selected_source": 0,
+        "float32_raw_count": 0,
+        "double_oracle_raw_count": 0,
+        "float32_union": [],
+        "double_oracle_union": [],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      },
+      {
+        "pixel": [
+          465,
+          286
+        ],
+        "source_id": 1,
+        "scene_depth": 5.023216724395752,
+        "mist_segment": [
+          4.7483997069824735,
+          4.766930501325364
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 6,
+        "cpu_ray_aabb_candidates_selected_source": 6,
+        "float32_raw_count": 2,
+        "double_oracle_raw_count": 2,
+        "float32_union": [
+          [
+            4.76041316986084,
+            4.76693058013916
+          ]
+        ],
+        "double_oracle_union": [
+          [
+            4.760405959660963,
+            4.766930501325364
+          ]
+        ],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.0,
+              0.7034482955932617
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.7042179928246044
+            ],
+            "max_abs_error": 0.0007696972313426809,
+            "endpoint_error_derived_bound": 0.0015584472560746365
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.11021920293569565,
+              1.0,
+              0.999382495880127
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.112553393808701,
+              1.0,
+              0.9993570107269679
+            ],
+            "max_abs_error": 0.0023341908730053484,
+            "endpoint_error_derived_bound": 0.00467182244989657
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.8141210079193115,
+              1.0,
+              1.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.8172336115876421,
+              1.0,
+              0.999965976840119
+            ],
+            "max_abs_error": 0.003112603668330549,
+            "endpoint_error_derived_bound": 0.006227148247330215
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      },
+      {
+        "pixel": [
+          478,
+          305
+        ],
+        "source_id": 0,
+        "scene_depth": 5.019075870513916,
+        "mist_segment": [
+          3.7660782109461564,
+          4.7630009339294785
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 29,
+        "cpu_ray_aabb_candidates_selected_source": 0,
+        "float32_raw_count": 0,
+        "double_oracle_raw_count": 0,
+        "float32_union": [],
+        "double_oracle_union": [],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      },
+      {
+        "pixel": [
+          478,
+          305
+        ],
+        "source_id": 1,
+        "scene_depth": 5.019075870513916,
+        "mist_segment": [
+          3.7660782109461564,
+          4.7630009339294785
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 29,
+        "cpu_ray_aabb_candidates_selected_source": 29,
+        "float32_raw_count": 11,
+        "double_oracle_raw_count": 11,
+        "float32_union": [
+          [
+            4.502510070800781,
+            4.763000965118408
+          ]
+        ],
+        "double_oracle_union": [
+          [
+            4.502509291518507,
+            4.7630009339294785
+          ]
+        ],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.0,
+              0.5225876569747925
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.5225892134437079
+            ],
+            "max_abs_error": 1.5564689154201616e-06,
+            "endpoint_error_derived_bound": 5.126750201805467e-06
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.5677629709243774,
+              1.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.5677676403311237,
+              1.0
+            ],
+            "max_abs_error": 4.669406746260485e-06,
+            "endpoint_error_derived_bound": 1.1380246118760927e-05
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.09035425633192062,
+              1.0,
+              1.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.09036050736356764,
+              1.0,
+              0.9999997497190374
+            ],
+            "max_abs_error": 6.2510316470171245e-06,
+            "endpoint_error_derived_bound": 1.4507018753878115e-05
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      },
+      {
+        "pixel": [
+          530,
+          315
+        ],
+        "source_id": 0,
+        "scene_depth": 4.969621658325195,
+        "mist_segment": [
+          3.328282339143188,
+          4.7160696633864845
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 32,
+        "cpu_ray_aabb_candidates_selected_source": 0,
+        "float32_raw_count": 0,
+        "double_oracle_raw_count": 0,
+        "float32_union": [],
+        "double_oracle_union": [],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 0.0,
+            "endpoint_error_derived_bound": 2e-06
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      },
+      {
+        "pixel": [
+          530,
+          315
+        ],
+        "source_id": 1,
+        "scene_depth": 4.969621658325195,
+        "mist_segment": [
+          3.328282339143188,
+          4.7160696633864845
+        ],
+        "candidate_cones_for_source": 128,
+        "cpu_ray_aabb_candidates_all_sources": 32,
+        "cpu_ray_aabb_candidates_selected_source": 32,
+        "float32_raw_count": 16,
+        "double_oracle_raw_count": 16,
+        "float32_union": [
+          [
+            3.6040501594543457,
+            3.896867036819458
+          ]
+        ],
+        "double_oracle_union": [
+          [
+            3.6040503473930356,
+            3.896868510958037
+          ]
+        ],
+        "coverage_by_quality": {
+          "lean": {
+            "shader_mirror": [
+              0.42199084162712097,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.4219926988482486,
+              0.0
+            ],
+            "max_abs_error": 1.8572211276102202e-06,
+            "endpoint_error_derived_bound": 6.2488904200891595e-06
+          },
+          "current": {
+            "shader_mirror": [
+              0.0,
+              0.8077358603477478,
+              0.45823463797569275,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.8077350260149639,
+              0.458241008958906,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 6.370983213266346e-06,
+            "endpoint_error_derived_bound": 1.4746688779081084e-05
+          },
+          "higher": {
+            "shader_mirror": [
+              0.0,
+              0.41031473875045776,
+              1.0,
+              0.27764567732810974,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "independent_double_oracle": [
+              0.0,
+              0.41031364998350883,
+              1.0,
+              0.2776541822228413,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_abs_error": 8.504894731531376e-06,
+            "endpoint_error_derived_bound": 1.899556168035664e-05
+          }
+        },
+        "per_primitive_interval_mismatches": []
+      }
+    ]
+  },
+  "ordered_scattering_common_loop_equivalence": {
+    "classification": "deterministic CPU float32 arithmetic equivalence for aperture-selected sky coverage plus a fixed extra-light term; not a full physical source/light model or GPU compilation",
+    "seed": "0x4D157",
+    "random_cases": 48,
+    "source_ids": [
+      0,
+      1
+    ],
+    "sample_counts": [
+      2,
+      6,
+      8
+    ],
+    "pattern_counts": {
+      "disjoint": 16,
+      "overlapping": 16,
+      "thin": 16
+    },
+    "comparisons": 288,
+    "passed": true,
+    "failures": [],
+    "rows": [
+      {
+        "case": 0,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 0,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 0,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 0,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 0,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 0,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 1,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 1,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 1,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 1,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 1,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 1,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 2,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 2,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 2,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 2,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 2,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 2,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 3,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 3,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 3,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 3,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 3,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 3,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 4,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 4,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 4,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 4,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 4,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 4,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 5,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 5,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 5,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 5,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 5,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 5,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 6,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 6,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 6,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 6,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 6,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 6,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 7,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 7,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 7,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 7,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 7,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 7,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 8,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 8,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 8,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 8,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 8,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 8,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 9,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 9,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 9,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 9,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 9,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 9,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 10,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 10,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 10,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 10,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 10,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 10,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 11,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 11,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 11,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 11,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 11,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 11,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 12,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 12,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 12,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 12,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 12,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 12,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 13,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 13,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 13,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 13,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 13,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 13,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 14,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 14,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 14,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 14,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 14,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 14,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 15,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 15,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 15,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 15,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 15,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 15,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 16,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 16,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 16,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 16,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 16,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 16,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 17,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 17,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 17,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 17,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 17,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 17,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 18,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 18,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 18,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 18,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 18,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 18,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 19,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 19,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 19,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 19,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 19,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 19,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 20,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 20,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 20,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 20,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 20,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 20,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 21,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 21,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 21,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 21,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 21,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 21,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 22,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 22,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 22,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 22,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 22,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 22,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 23,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 23,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 23,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 23,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 23,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 23,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 24,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 24,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 24,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 24,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 24,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 24,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 25,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 25,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 25,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 25,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 25,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 25,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 26,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 26,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 26,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 26,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 26,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 26,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 27,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 27,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 27,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 27,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 27,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 27,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 28,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 28,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 28,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 28,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 28,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 28,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 29,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 29,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 29,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 29,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 29,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 29,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 30,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 30,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 30,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 30,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 30,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 30,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 31,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 31,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 31,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 31,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 31,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 31,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 32,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 32,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 32,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 32,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 32,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 32,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 33,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 33,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 33,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 33,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 33,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 33,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 34,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 34,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 34,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 34,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 34,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 34,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 35,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 35,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 35,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 35,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 35,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 35,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 36,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 36,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 36,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 36,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 36,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 36,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 37,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 37,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 37,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 37,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 37,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 37,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 38,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 38,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 38,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 38,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 38,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 38,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 39,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 39,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 39,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 39,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 39,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 39,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 40,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 40,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 40,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 40,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 40,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 40,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 41,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 41,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 41,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 41,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 41,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 41,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 42,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 42,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 42,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 42,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 42,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 42,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 43,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 43,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 43,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 43,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 43,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 43,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 44,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 44,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 44,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 44,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 44,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 44,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 45,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 45,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 45,
+        "source_id": 0,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 45,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 45,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 45,
+        "source_id": 1,
+        "pattern": "disjoint",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 46,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 46,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 46,
+        "source_id": 0,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 46,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 46,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 46,
+        "source_id": 1,
+        "pattern": "overlapping",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 47,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 47,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 47,
+        "source_id": 0,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 47,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 2,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 47,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 6,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      },
+      {
+        "case": 47,
+        "source_id": 1,
+        "pattern": "thin",
+        "sample_count": 8,
+        "same_centers": true,
+        "same_cell_coverage": true,
+        "same_scattered": true,
+        "same_transmittance": true,
+        "pass": true
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "aperture-0-overlap-disconnected-thin",
+      "selected_aperture": 0,
+      "callback_count": 5,
+      "selected_raw_count": 4,
+      "status": "valid",
+      "union_endpoints": [
+        [
+          1.0,
+          2.5
+        ],
+        [
+          3.0,
+          3.125
+        ],
+        [
+          4.0,
+          5.0
+        ]
+      ],
+      "expected_endpoints": [
+        [
+          1.0,
+          2.5
+        ],
+        [
+          3.0,
+          3.125
+        ],
+        [
+          4.0,
+          5.0
+        ]
+      ],
+      "cells": [
+        {
+          "cell": [
+            0.0,
+            1.0
+          ],
+          "glsl_mirror": 0.0,
+          "oracle": 0.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            1.0,
+            2.0
+          ],
+          "glsl_mirror": 1.0,
+          "oracle": 1.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            2.0,
+            3.0
+          ],
+          "glsl_mirror": 0.5,
+          "oracle": 0.5,
+          "pass": true
+        },
+        {
+          "cell": [
+            2.5,
+            3.0
+          ],
+          "glsl_mirror": 0.0,
+          "oracle": 0.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            3.0,
+            4.0
+          ],
+          "glsl_mirror": 0.125,
+          "oracle": 0.125,
+          "pass": true
+        },
+        {
+          "cell": [
+            4.0,
+            5.0
+          ],
+          "glsl_mirror": 1.0,
+          "oracle": 1.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            5.0,
+            6.0
+          ],
+          "glsl_mirror": 0.0,
+          "oracle": 0.0,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "name": "aperture-1-source-filtered-displaced",
+      "selected_aperture": 1,
+      "callback_count": 5,
+      "selected_raw_count": 3,
+      "status": "valid",
+      "union_endpoints": [
+        [
+          1.0,
+          2.5
+        ],
+        [
+          4.0,
+          5.0
+        ]
+      ],
+      "expected_endpoints": [
+        [
+          1.0,
+          2.5
+        ],
+        [
+          4.0,
+          5.0
+        ]
+      ],
+      "cells": [
+        {
+          "cell": [
+            0.0,
+            1.0
+          ],
+          "glsl_mirror": 0.0,
+          "oracle": 0.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            1.0,
+            2.0
+          ],
+          "glsl_mirror": 1.0,
+          "oracle": 1.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            2.0,
+            3.0
+          ],
+          "glsl_mirror": 0.5,
+          "oracle": 0.5,
+          "pass": true
+        },
+        {
+          "cell": [
+            3.0,
+            4.0
+          ],
+          "glsl_mirror": 0.0,
+          "oracle": 0.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            4.0,
+            5.0
+          ],
+          "glsl_mirror": 1.0,
+          "oracle": 1.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            5.0,
+            6.0
+          ],
+          "glsl_mirror": 0.0,
+          "oracle": 0.0,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "name": "raw-64-accepted",
+      "selected_aperture": 0,
+      "callback_count": 64,
+      "selected_raw_count": 64,
+      "status": "valid",
+      "union_endpoints": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          2.0,
+          3.0
+        ],
+        [
+          4.0,
+          5.0
+        ],
+        [
+          6.0,
+          7.0
+        ],
+        [
+          8.0,
+          9.0
+        ],
+        [
+          10.0,
+          11.0
+        ],
+        [
+          12.0,
+          13.0
+        ],
+        [
+          14.0,
+          15.0
+        ],
+        [
+          16.0,
+          17.0
+        ],
+        [
+          18.0,
+          19.0
+        ],
+        [
+          20.0,
+          21.0
+        ],
+        [
+          22.0,
+          23.0
+        ],
+        [
+          24.0,
+          25.0
+        ],
+        [
+          26.0,
+          27.0
+        ],
+        [
+          28.0,
+          29.0
+        ],
+        [
+          30.0,
+          31.0
+        ],
+        [
+          32.0,
+          33.0
+        ],
+        [
+          34.0,
+          35.0
+        ],
+        [
+          36.0,
+          37.0
+        ],
+        [
+          38.0,
+          39.0
+        ],
+        [
+          40.0,
+          41.0
+        ],
+        [
+          42.0,
+          43.0
+        ],
+        [
+          44.0,
+          45.0
+        ],
+        [
+          46.0,
+          47.0
+        ],
+        [
+          48.0,
+          49.0
+        ],
+        [
+          50.0,
+          51.0
+        ],
+        [
+          52.0,
+          53.0
+        ],
+        [
+          54.0,
+          55.0
+        ],
+        [
+          56.0,
+          57.0
+        ],
+        [
+          58.0,
+          59.0
+        ],
+        [
+          60.0,
+          61.0
+        ],
+        [
+          62.0,
+          63.0
+        ],
+        [
+          64.0,
+          65.0
+        ],
+        [
+          66.0,
+          67.0
+        ],
+        [
+          68.0,
+          69.0
+        ],
+        [
+          70.0,
+          71.0
+        ],
+        [
+          72.0,
+          73.0
+        ],
+        [
+          74.0,
+          75.0
+        ],
+        [
+          76.0,
+          77.0
+        ],
+        [
+          78.0,
+          79.0
+        ],
+        [
+          80.0,
+          81.0
+        ],
+        [
+          82.0,
+          83.0
+        ],
+        [
+          84.0,
+          85.0
+        ],
+        [
+          86.0,
+          87.0
+        ],
+        [
+          88.0,
+          89.0
+        ],
+        [
+          90.0,
+          91.0
+        ],
+        [
+          92.0,
+          93.0
+        ],
+        [
+          94.0,
+          95.0
+        ],
+        [
+          96.0,
+          97.0
+        ],
+        [
+          98.0,
+          99.0
+        ],
+        [
+          100.0,
+          101.0
+        ],
+        [
+          102.0,
+          103.0
+        ],
+        [
+          104.0,
+          105.0
+        ],
+        [
+          106.0,
+          107.0
+        ],
+        [
+          108.0,
+          109.0
+        ],
+        [
+          110.0,
+          111.0
+        ],
+        [
+          112.0,
+          113.0
+        ],
+        [
+          114.0,
+          115.0
+        ],
+        [
+          116.0,
+          117.0
+        ],
+        [
+          118.0,
+          119.0
+        ],
+        [
+          120.0,
+          121.0
+        ],
+        [
+          122.0,
+          123.0
+        ],
+        [
+          124.0,
+          125.0
+        ],
+        [
+          126.0,
+          127.0
+        ]
+      ],
+      "expected_endpoints": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          2.0,
+          3.0
+        ],
+        [
+          4.0,
+          5.0
+        ],
+        [
+          6.0,
+          7.0
+        ],
+        [
+          8.0,
+          9.0
+        ],
+        [
+          10.0,
+          11.0
+        ],
+        [
+          12.0,
+          13.0
+        ],
+        [
+          14.0,
+          15.0
+        ],
+        [
+          16.0,
+          17.0
+        ],
+        [
+          18.0,
+          19.0
+        ],
+        [
+          20.0,
+          21.0
+        ],
+        [
+          22.0,
+          23.0
+        ],
+        [
+          24.0,
+          25.0
+        ],
+        [
+          26.0,
+          27.0
+        ],
+        [
+          28.0,
+          29.0
+        ],
+        [
+          30.0,
+          31.0
+        ],
+        [
+          32.0,
+          33.0
+        ],
+        [
+          34.0,
+          35.0
+        ],
+        [
+          36.0,
+          37.0
+        ],
+        [
+          38.0,
+          39.0
+        ],
+        [
+          40.0,
+          41.0
+        ],
+        [
+          42.0,
+          43.0
+        ],
+        [
+          44.0,
+          45.0
+        ],
+        [
+          46.0,
+          47.0
+        ],
+        [
+          48.0,
+          49.0
+        ],
+        [
+          50.0,
+          51.0
+        ],
+        [
+          52.0,
+          53.0
+        ],
+        [
+          54.0,
+          55.0
+        ],
+        [
+          56.0,
+          57.0
+        ],
+        [
+          58.0,
+          59.0
+        ],
+        [
+          60.0,
+          61.0
+        ],
+        [
+          62.0,
+          63.0
+        ],
+        [
+          64.0,
+          65.0
+        ],
+        [
+          66.0,
+          67.0
+        ],
+        [
+          68.0,
+          69.0
+        ],
+        [
+          70.0,
+          71.0
+        ],
+        [
+          72.0,
+          73.0
+        ],
+        [
+          74.0,
+          75.0
+        ],
+        [
+          76.0,
+          77.0
+        ],
+        [
+          78.0,
+          79.0
+        ],
+        [
+          80.0,
+          81.0
+        ],
+        [
+          82.0,
+          83.0
+        ],
+        [
+          84.0,
+          85.0
+        ],
+        [
+          86.0,
+          87.0
+        ],
+        [
+          88.0,
+          89.0
+        ],
+        [
+          90.0,
+          91.0
+        ],
+        [
+          92.0,
+          93.0
+        ],
+        [
+          94.0,
+          95.0
+        ],
+        [
+          96.0,
+          97.0
+        ],
+        [
+          98.0,
+          99.0
+        ],
+        [
+          100.0,
+          101.0
+        ],
+        [
+          102.0,
+          103.0
+        ],
+        [
+          104.0,
+          105.0
+        ],
+        [
+          106.0,
+          107.0
+        ],
+        [
+          108.0,
+          109.0
+        ],
+        [
+          110.0,
+          111.0
+        ],
+        [
+          112.0,
+          113.0
+        ],
+        [
+          114.0,
+          115.0
+        ],
+        [
+          116.0,
+          117.0
+        ],
+        [
+          118.0,
+          119.0
+        ],
+        [
+          120.0,
+          121.0
+        ],
+        [
+          122.0,
+          123.0
+        ],
+        [
+          124.0,
+          125.0
+        ],
+        [
+          126.0,
+          127.0
+        ]
+      ],
+      "cells": [
+        {
+          "cell": [
+            0.0,
+            1.0
+          ],
+          "glsl_mirror": 1.0,
+          "oracle": 1.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            126.0,
+            127.0
+          ],
+          "glsl_mirror": 1.0,
+          "oracle": 1.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            126.5,
+            127.5
+          ],
+          "glsl_mirror": 0.5,
+          "oracle": 0.5,
+          "pass": true
+        },
+        {
+          "cell": [
+            128.0,
+            129.0
+          ],
+          "glsl_mirror": 0.0,
+          "oracle": 0.0,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "name": "raw-65-rejected",
+      "selected_aperture": 0,
+      "callback_count": 65,
+      "selected_raw_count": 65,
+      "status": "rejected-raw-capacity",
+      "union_endpoints": [],
+      "expected_endpoints": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          2.0,
+          3.0
+        ],
+        [
+          4.0,
+          5.0
+        ],
+        [
+          6.0,
+          7.0
+        ],
+        [
+          8.0,
+          9.0
+        ],
+        [
+          10.0,
+          11.0
+        ],
+        [
+          12.0,
+          13.0
+        ],
+        [
+          14.0,
+          15.0
+        ],
+        [
+          16.0,
+          17.0
+        ],
+        [
+          18.0,
+          19.0
+        ],
+        [
+          20.0,
+          21.0
+        ],
+        [
+          22.0,
+          23.0
+        ],
+        [
+          24.0,
+          25.0
+        ],
+        [
+          26.0,
+          27.0
+        ],
+        [
+          28.0,
+          29.0
+        ],
+        [
+          30.0,
+          31.0
+        ],
+        [
+          32.0,
+          33.0
+        ],
+        [
+          34.0,
+          35.0
+        ],
+        [
+          36.0,
+          37.0
+        ],
+        [
+          38.0,
+          39.0
+        ],
+        [
+          40.0,
+          41.0
+        ],
+        [
+          42.0,
+          43.0
+        ],
+        [
+          44.0,
+          45.0
+        ],
+        [
+          46.0,
+          47.0
+        ],
+        [
+          48.0,
+          49.0
+        ],
+        [
+          50.0,
+          51.0
+        ],
+        [
+          52.0,
+          53.0
+        ],
+        [
+          54.0,
+          55.0
+        ],
+        [
+          56.0,
+          57.0
+        ],
+        [
+          58.0,
+          59.0
+        ],
+        [
+          60.0,
+          61.0
+        ],
+        [
+          62.0,
+          63.0
+        ],
+        [
+          64.0,
+          65.0
+        ],
+        [
+          66.0,
+          67.0
+        ],
+        [
+          68.0,
+          69.0
+        ],
+        [
+          70.0,
+          71.0
+        ],
+        [
+          72.0,
+          73.0
+        ],
+        [
+          74.0,
+          75.0
+        ],
+        [
+          76.0,
+          77.0
+        ],
+        [
+          78.0,
+          79.0
+        ],
+        [
+          80.0,
+          81.0
+        ],
+        [
+          82.0,
+          83.0
+        ],
+        [
+          84.0,
+          85.0
+        ],
+        [
+          86.0,
+          87.0
+        ],
+        [
+          88.0,
+          89.0
+        ],
+        [
+          90.0,
+          91.0
+        ],
+        [
+          92.0,
+          93.0
+        ],
+        [
+          94.0,
+          95.0
+        ],
+        [
+          96.0,
+          97.0
+        ],
+        [
+          98.0,
+          99.0
+        ],
+        [
+          100.0,
+          101.0
+        ],
+        [
+          102.0,
+          103.0
+        ],
+        [
+          104.0,
+          105.0
+        ],
+        [
+          106.0,
+          107.0
+        ],
+        [
+          108.0,
+          109.0
+        ],
+        [
+          110.0,
+          111.0
+        ],
+        [
+          112.0,
+          113.0
+        ],
+        [
+          114.0,
+          115.0
+        ],
+        [
+          116.0,
+          117.0
+        ],
+        [
+          118.0,
+          119.0
+        ],
+        [
+          120.0,
+          121.0
+        ],
+        [
+          122.0,
+          123.0
+        ],
+        [
+          124.0,
+          125.0
+        ],
+        [
+          126.0,
+          127.0
+        ],
+        [
+          128.0,
+          129.0
+        ]
+      ],
+      "cells": []
+    },
+    {
+      "name": "callbacks-512-accepted-64-selected",
+      "selected_aperture": 0,
+      "callback_count": 512,
+      "selected_raw_count": 64,
+      "status": "valid",
+      "union_endpoints": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          2.0,
+          3.0
+        ],
+        [
+          4.0,
+          5.0
+        ],
+        [
+          6.0,
+          7.0
+        ],
+        [
+          8.0,
+          9.0
+        ],
+        [
+          10.0,
+          11.0
+        ],
+        [
+          12.0,
+          13.0
+        ],
+        [
+          14.0,
+          15.0
+        ],
+        [
+          16.0,
+          17.0
+        ],
+        [
+          18.0,
+          19.0
+        ],
+        [
+          20.0,
+          21.0
+        ],
+        [
+          22.0,
+          23.0
+        ],
+        [
+          24.0,
+          25.0
+        ],
+        [
+          26.0,
+          27.0
+        ],
+        [
+          28.0,
+          29.0
+        ],
+        [
+          30.0,
+          31.0
+        ],
+        [
+          32.0,
+          33.0
+        ],
+        [
+          34.0,
+          35.0
+        ],
+        [
+          36.0,
+          37.0
+        ],
+        [
+          38.0,
+          39.0
+        ],
+        [
+          40.0,
+          41.0
+        ],
+        [
+          42.0,
+          43.0
+        ],
+        [
+          44.0,
+          45.0
+        ],
+        [
+          46.0,
+          47.0
+        ],
+        [
+          48.0,
+          49.0
+        ],
+        [
+          50.0,
+          51.0
+        ],
+        [
+          52.0,
+          53.0
+        ],
+        [
+          54.0,
+          55.0
+        ],
+        [
+          56.0,
+          57.0
+        ],
+        [
+          58.0,
+          59.0
+        ],
+        [
+          60.0,
+          61.0
+        ],
+        [
+          62.0,
+          63.0
+        ],
+        [
+          64.0,
+          65.0
+        ],
+        [
+          66.0,
+          67.0
+        ],
+        [
+          68.0,
+          69.0
+        ],
+        [
+          70.0,
+          71.0
+        ],
+        [
+          72.0,
+          73.0
+        ],
+        [
+          74.0,
+          75.0
+        ],
+        [
+          76.0,
+          77.0
+        ],
+        [
+          78.0,
+          79.0
+        ],
+        [
+          80.0,
+          81.0
+        ],
+        [
+          82.0,
+          83.0
+        ],
+        [
+          84.0,
+          85.0
+        ],
+        [
+          86.0,
+          87.0
+        ],
+        [
+          88.0,
+          89.0
+        ],
+        [
+          90.0,
+          91.0
+        ],
+        [
+          92.0,
+          93.0
+        ],
+        [
+          94.0,
+          95.0
+        ],
+        [
+          96.0,
+          97.0
+        ],
+        [
+          98.0,
+          99.0
+        ],
+        [
+          100.0,
+          101.0
+        ],
+        [
+          102.0,
+          103.0
+        ],
+        [
+          104.0,
+          105.0
+        ],
+        [
+          106.0,
+          107.0
+        ],
+        [
+          108.0,
+          109.0
+        ],
+        [
+          110.0,
+          111.0
+        ],
+        [
+          112.0,
+          113.0
+        ],
+        [
+          114.0,
+          115.0
+        ],
+        [
+          116.0,
+          117.0
+        ],
+        [
+          118.0,
+          119.0
+        ],
+        [
+          120.0,
+          121.0
+        ],
+        [
+          122.0,
+          123.0
+        ],
+        [
+          124.0,
+          125.0
+        ],
+        [
+          126.0,
+          127.0
+        ]
+      ],
+      "expected_endpoints": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          2.0,
+          3.0
+        ],
+        [
+          4.0,
+          5.0
+        ],
+        [
+          6.0,
+          7.0
+        ],
+        [
+          8.0,
+          9.0
+        ],
+        [
+          10.0,
+          11.0
+        ],
+        [
+          12.0,
+          13.0
+        ],
+        [
+          14.0,
+          15.0
+        ],
+        [
+          16.0,
+          17.0
+        ],
+        [
+          18.0,
+          19.0
+        ],
+        [
+          20.0,
+          21.0
+        ],
+        [
+          22.0,
+          23.0
+        ],
+        [
+          24.0,
+          25.0
+        ],
+        [
+          26.0,
+          27.0
+        ],
+        [
+          28.0,
+          29.0
+        ],
+        [
+          30.0,
+          31.0
+        ],
+        [
+          32.0,
+          33.0
+        ],
+        [
+          34.0,
+          35.0
+        ],
+        [
+          36.0,
+          37.0
+        ],
+        [
+          38.0,
+          39.0
+        ],
+        [
+          40.0,
+          41.0
+        ],
+        [
+          42.0,
+          43.0
+        ],
+        [
+          44.0,
+          45.0
+        ],
+        [
+          46.0,
+          47.0
+        ],
+        [
+          48.0,
+          49.0
+        ],
+        [
+          50.0,
+          51.0
+        ],
+        [
+          52.0,
+          53.0
+        ],
+        [
+          54.0,
+          55.0
+        ],
+        [
+          56.0,
+          57.0
+        ],
+        [
+          58.0,
+          59.0
+        ],
+        [
+          60.0,
+          61.0
+        ],
+        [
+          62.0,
+          63.0
+        ],
+        [
+          64.0,
+          65.0
+        ],
+        [
+          66.0,
+          67.0
+        ],
+        [
+          68.0,
+          69.0
+        ],
+        [
+          70.0,
+          71.0
+        ],
+        [
+          72.0,
+          73.0
+        ],
+        [
+          74.0,
+          75.0
+        ],
+        [
+          76.0,
+          77.0
+        ],
+        [
+          78.0,
+          79.0
+        ],
+        [
+          80.0,
+          81.0
+        ],
+        [
+          82.0,
+          83.0
+        ],
+        [
+          84.0,
+          85.0
+        ],
+        [
+          86.0,
+          87.0
+        ],
+        [
+          88.0,
+          89.0
+        ],
+        [
+          90.0,
+          91.0
+        ],
+        [
+          92.0,
+          93.0
+        ],
+        [
+          94.0,
+          95.0
+        ],
+        [
+          96.0,
+          97.0
+        ],
+        [
+          98.0,
+          99.0
+        ],
+        [
+          100.0,
+          101.0
+        ],
+        [
+          102.0,
+          103.0
+        ],
+        [
+          104.0,
+          105.0
+        ],
+        [
+          106.0,
+          107.0
+        ],
+        [
+          108.0,
+          109.0
+        ],
+        [
+          110.0,
+          111.0
+        ],
+        [
+          112.0,
+          113.0
+        ],
+        [
+          114.0,
+          115.0
+        ],
+        [
+          116.0,
+          117.0
+        ],
+        [
+          118.0,
+          119.0
+        ],
+        [
+          120.0,
+          121.0
+        ],
+        [
+          122.0,
+          123.0
+        ],
+        [
+          124.0,
+          125.0
+        ],
+        [
+          126.0,
+          127.0
+        ]
+      ],
+      "cells": [
+        {
+          "cell": [
+            0.0,
+            1.0
+          ],
+          "glsl_mirror": 1.0,
+          "oracle": 1.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            126.0,
+            127.0
+          ],
+          "glsl_mirror": 1.0,
+          "oracle": 1.0,
+          "pass": true
+        },
+        {
+          "cell": [
+            128.0,
+            129.0
+          ],
+          "glsl_mirror": 0.0,
+          "oracle": 0.0,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "name": "callbacks-513-rejected-before-source-filter",
+      "selected_aperture": 0,
+      "callback_count": 513,
+      "selected_raw_count": 64,
+      "status": "rejected-callback-capacity",
+      "union_endpoints": [],
+      "expected_endpoints": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          2.0,
+          3.0
+        ],
+        [
+          4.0,
+          5.0
+        ],
+        [
+          6.0,
+          7.0
+        ],
+        [
+          8.0,
+          9.0
+        ],
+        [
+          10.0,
+          11.0
+        ],
+        [
+          12.0,
+          13.0
+        ],
+        [
+          14.0,
+          15.0
+        ],
+        [
+          16.0,
+          17.0
+        ],
+        [
+          18.0,
+          19.0
+        ],
+        [
+          20.0,
+          21.0
+        ],
+        [
+          22.0,
+          23.0
+        ],
+        [
+          24.0,
+          25.0
+        ],
+        [
+          26.0,
+          27.0
+        ],
+        [
+          28.0,
+          29.0
+        ],
+        [
+          30.0,
+          31.0
+        ],
+        [
+          32.0,
+          33.0
+        ],
+        [
+          34.0,
+          35.0
+        ],
+        [
+          36.0,
+          37.0
+        ],
+        [
+          38.0,
+          39.0
+        ],
+        [
+          40.0,
+          41.0
+        ],
+        [
+          42.0,
+          43.0
+        ],
+        [
+          44.0,
+          45.0
+        ],
+        [
+          46.0,
+          47.0
+        ],
+        [
+          48.0,
+          49.0
+        ],
+        [
+          50.0,
+          51.0
+        ],
+        [
+          52.0,
+          53.0
+        ],
+        [
+          54.0,
+          55.0
+        ],
+        [
+          56.0,
+          57.0
+        ],
+        [
+          58.0,
+          59.0
+        ],
+        [
+          60.0,
+          61.0
+        ],
+        [
+          62.0,
+          63.0
+        ],
+        [
+          64.0,
+          65.0
+        ],
+        [
+          66.0,
+          67.0
+        ],
+        [
+          68.0,
+          69.0
+        ],
+        [
+          70.0,
+          71.0
+        ],
+        [
+          72.0,
+          73.0
+        ],
+        [
+          74.0,
+          75.0
+        ],
+        [
+          76.0,
+          77.0
+        ],
+        [
+          78.0,
+          79.0
+        ],
+        [
+          80.0,
+          81.0
+        ],
+        [
+          82.0,
+          83.0
+        ],
+        [
+          84.0,
+          85.0
+        ],
+        [
+          86.0,
+          87.0
+        ],
+        [
+          88.0,
+          89.0
+        ],
+        [
+          90.0,
+          91.0
+        ],
+        [
+          92.0,
+          93.0
+        ],
+        [
+          94.0,
+          95.0
+        ],
+        [
+          96.0,
+          97.0
+        ],
+        [
+          98.0,
+          99.0
+        ],
+        [
+          100.0,
+          101.0
+        ],
+        [
+          102.0,
+          103.0
+        ],
+        [
+          104.0,
+          105.0
+        ],
+        [
+          106.0,
+          107.0
+        ],
+        [
+          108.0,
+          109.0
+        ],
+        [
+          110.0,
+          111.0
+        ],
+        [
+          112.0,
+          113.0
+        ],
+        [
+          114.0,
+          115.0
+        ],
+        [
+          116.0,
+          117.0
+        ],
+        [
+          118.0,
+          119.0
+        ],
+        [
+          120.0,
+          121.0
+        ],
+        [
+          122.0,
+          123.0
+        ],
+        [
+          124.0,
+          125.0
+        ],
+        [
+          126.0,
+          127.0
+        ]
+      ],
+      "cells": []
+    }
+  ]
+}

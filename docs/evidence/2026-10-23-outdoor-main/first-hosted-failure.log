@@ -1,0 +1,63 @@
+Lane: gcc; run 39896071822; source f21b030eea2fe112080f3a2482303929bd3d422b
+2026-10-23T03:42:14.7826243Z [ 89%] Building CXX object CMakeFiles/horde_rt_dialogue_ducking_tests.dir/tests/DialogueDuckingTests.cpp.o
+2026-10-23T03:42:17.3656766Z [ 90%] Building CXX object CMakeFiles/horde_rt_dialogue_ducking_tests.dir/src/scene/assets/AssetManifest.cpp.o
+2026-10-23T03:42:19.4102490Z [ 90%] Building CXX object CMakeFiles/horde_rt_dialogue_ducking_tests.dir/src/scene/assets/AssetValidation.cpp.o
+2026-10-23T03:42:19.8019913Z [ 90%] Building CXX object CMakeFiles/horde_rt_dialogue_ducking_tests.dir/src/scene/assets/GltfDocument.cpp.o
+2026-10-23T03:42:21.8569932Z [ 92%] Building CXX object CMakeFiles/horde_rt_dialogue_ducking_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+2026-10-23T03:42:24.9202762Z [ 92%] Linking CXX executable horde_rt_dialogue_ducking_tests
+2026-10-23T03:42:24.9722258Z [ 92%] Built target horde_rt_dialogue_ducking_tests
+2026-10-23T03:44:16.1225710Z         Start 121: horde_rt_dialogue_ducking_tests
+2026-10-23T03:44:16.2014953Z 121/157 Test #121: horde_rt_dialogue_ducking_tests .........................***Failed    0.08 sec
+2026-10-23T03:44:16.2016956Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2018142Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2018760Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2019370Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2019975Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2020615Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2021267Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2022048Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2022620Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2023188Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2023753Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2024308Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2024877Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2025430Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2025999Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2026540Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:16.2027228Z FAIL: worker suspension freezes content and its last published output gain
+2026-10-23T03:44:16.2027680Z FAIL: ordinary resume observes gain without a cursor or revision reset
+2026-10-23T03:44:16.2028162Z 160 dialogue ducking host checks, 18 failures
+2026-10-23T03:47:22.5443314Z 99% tests passed, 1 tests failed out of 157
+2026-10-23T03:47:22.5446558Z 	121 - horde_rt_dialogue_ducking_tests (Failed)
+
+Lane: clang; run 39896071822; source f21b030eea2fe112080f3a2482303929bd3d422b
+2026-10-23T03:42:49.2444394Z [ 89%] Building CXX object CMakeFiles/horde_rt_dialogue_ducking_tests.dir/tests/DialogueDuckingTests.cpp.o
+2026-10-23T03:42:52.0584665Z [ 90%] Building CXX object CMakeFiles/horde_rt_dialogue_ducking_tests.dir/src/scene/assets/AssetManifest.cpp.o
+2026-10-23T03:42:54.1394453Z [ 91%] Building CXX object CMakeFiles/horde_rt_dialogue_ducking_tests.dir/src/scene/assets/AssetValidation.cpp.o
+2026-10-23T03:42:54.5593010Z [ 92%] Building CXX object CMakeFiles/horde_rt_dialogue_ducking_tests.dir/src/scene/assets/GltfDocument.cpp.o
+2026-10-23T03:42:57.0819535Z [ 92%] Building CXX object CMakeFiles/horde_rt_dialogue_ducking_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+2026-10-23T03:43:00.5639621Z [ 93%] Linking CXX executable horde_rt_dialogue_ducking_tests
+2026-10-23T03:43:00.6296757Z [ 93%] Built target horde_rt_dialogue_ducking_tests
+2026-10-23T03:44:51.8084247Z         Start 121: horde_rt_dialogue_ducking_tests
+2026-10-23T03:44:51.8767373Z 121/157 Test #121: horde_rt_dialogue_ducking_tests .........................***Failed    0.07 sec
+2026-10-23T03:44:51.8768047Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8768571Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8769103Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8769574Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8770043Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8770506Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8770963Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8771418Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8771880Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8772345Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8773326Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8773820Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8774278Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8774739Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8775205Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8775671Z FAIL: gain updates leave synthetic Core PCM byte-for-byte equal and retain the existing session epoch
+2026-10-23T03:44:51.8776099Z FAIL: worker suspension freezes content and its last published output gain
+2026-10-23T03:44:51.8776466Z FAIL: ordinary resume observes gain without a cursor or revision reset
+2026-10-23T03:44:51.8776890Z 160 dialogue ducking host checks, 18 failures
+2026-10-23T03:47:54.7753368Z 99% tests passed, 1 tests failed out of 157
+2026-10-23T03:47:54.7757729Z 	121 - horde_rt_dialogue_ducking_tests (Failed)

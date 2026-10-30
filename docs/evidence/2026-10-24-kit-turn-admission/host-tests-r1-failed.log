@@ -1,0 +1,27 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 37: horde_rt_campaign_play_session_tests
+1/4 Test #37: horde_rt_campaign_play_session_tests ...***Failed   26.16 sec
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+FAIL: actual completed trail and quiescent speech earn one coherent forest checkpoint
+121 campaign play session checks, 1 failures
+
+    Start 44: horde_rt_chapter_dialogue_tests
+2/4 Test #44: horde_rt_chapter_dialogue_tests ........   Passed    1.60 sec
+    Start 46: horde_rt_companion_locomotion_tests
+3/4 Test #46: horde_rt_companion_locomotion_tests ....***Failed    3.58 sec
+FAIL: normal simulation requests planted turning from ordinary live player movement at the completed endpoint
+companion locomotion checks=2337 failures=1 routeTicks=2254
+
+    Start 47: horde_rt_campaign_checkpoint_tests
+4/4 Test #47: horde_rt_campaign_checkpoint_tests .....   Passed   18.26 sec
+
+50% tests passed, 2 tests failed out of 4
+
+Total Test time (real) =  49.77 sec
+
+The following tests FAILED:
+	 37 - horde_rt_campaign_play_session_tests (Failed)
+	 46 - horde_rt_companion_locomotion_tests (Failed)
+Errors while running CTest

@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "start_head": "d94e57910af1628248ce247f0b50b6ebf6308470",
+  "source_generated_candidate": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "host_package_ready": "YES (inherited)",
+  "full_device_verified": "NO",
+  "windows_raised_static_capture": "FAIL reproduced twice",
+  "android_query_live_presentation": "PASS bounded native technical evidence",
+  "owner_audio_haptic": "Prior short Android Pipeline normal report preserved; broader/Query NOT RUN",
+  "stop_reason": "Reproducible Windows raised capture gate failure; owner unavailable for manual gates",
+  "images_inspected": [
+    "windows-pipeline-ground.png",
+    "windows-pipeline-raised-failed.png"
+  ],
+  "files": {
+    ".gitattributes": "81f7275aed3df8bcb63e50760fd01a37248cd08761f71faa0acc2da0e25459d5",
+    "android-device-and-control.json": "f363d712e0d0e94b70f38fbed71e579952e440a6c0e17861bb0dd32bd451df97",
+    "android-query-native-frame.json": "188f47f466a0aefc406717e2b0e2fbe4019225b25c4214edd429884f71bc6e72",
+    "custody-and-preservation.json": "c7228a35e19629d3ba1ea710985533f8644a131a776d2c6f8f200228317f4c21",
+    "log-identities.json": "817b23d2329e8977d045ad689af2c26920e8cfff2a020159017748da1184bf04",
+    "windows-pipeline-ground-manifest.json": "2e60bc2a191011abf7c106093711297a7a0579a9ebbc7fa3c7594c66c4cfafb6",
+    "windows-pipeline-ground-selected.log": "e3278e58b9f0d587c84269cb63e8cc90084d63968897542c3928197f07bed149",
+    "windows-pipeline-ground.png": "c98c411559e38314ccaf5941ac429016504c7d7419c7b4facf55a49465c02a43",
+    "windows-pipeline-raised-failed.png": "64e8ffb26e7b8e875f4b9a9e09fbab53d8f96ed4e78f4aeda0163b4294de3396",
+    "windows-pipeline-raised-manifest.json": "ad7d53e86daaa7647c26884d3a75e57685eb3d54d893c2ebf850cf48bf51366f",
+    "windows-pipeline-raised-retry-manifest.json": "1d2115ea1b1e44e91eef954ae108c6398d39bf39e520e8f41e53f2259a3d2645",
+    "windows-pipeline-raised-retry-selected.log": "54edcad13bf1801113f54e0eb03ecd35948c817610a95c4670a2bf4345c645c5",
+    "windows-pipeline-raised-selected.log": "54edcad13bf1801113f54e0eb03ecd35948c817610a95c4670a2bf4345c645c5",
+    "windows-runs-and-failure.json": "a992829ae036a836222536fd79d2c7b6aaa52b8507bef6a065376ad23a6b06d1"
+  },
+  "report_sha256": "aee21a76e46fc0fa63562231b9781d8e59bee890b8292b4f23d4c1d78cd56f4a",
+  "compatibility_append_preserves_prior_bytes": true,
+  "recursive_evidence_commit_sha": "Reported externally after push",
+  "report_hash_encoding": "Git canonical LF"
+}

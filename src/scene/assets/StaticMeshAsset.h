@@ -42,6 +42,12 @@ struct StaticBounds
     std::array<float, 3u> maximum{};
 };
 
+// CPU-only provenance, independent of materials and GPU hit/descriptor records.
+// Shared is always retained. An absent/unclassified suffix is Shared too;
+// provenance identifies an authored region, never proves it safe to evict.
+enum class StaticTriangleRegion : std::uint8_t { Shared = 0, TombDressing = 1, ExteriorDressing = 2 };
+inline constexpr std::uint8_t kAllStaticTriangleRegions = 3u;
+
 struct StaticMaterial
 {
     std::string name;
@@ -69,6 +75,10 @@ struct StaticMaterial
     // Optional asset-local texture group. Groups allocate in ascending ID order,
     // independent of GLB material order; -1 retains generic texture-index routing.
     std::int32_t textureGroup = -1;
+    // CPU-only, explicitly prepared atlas families allocate after the ordinary
+    // routes. This keeps legacy layers stable when geometry shares an owner.
+    // Requires an explicit asset-local group; never changes the GPU record ABI.
+    bool deferTextureAllocation = false;
     std::uint32_t flags = 0u;
 };
 
@@ -82,11 +92,17 @@ public:
 
     std::vector<StaticRtVertex> vertices;
     std::vector<std::uint32_t> indices;
+    std::vector<StaticTriangleRegion> triangleRegions;
     std::vector<StaticPrimitiveRecord> primitives;
     std::vector<StaticNodeTransform> nodeTransforms;
     std::vector<StaticMaterial> materials;
     std::vector<StaticSocket> sockets;
     StaticBounds bounds{};
+    bool HasValidTriangleProvenance() const noexcept {
+        if(indices.size()%3u || triangleRegions.size()>indices.size()/3u)return false;
+        for(const auto region:triangleRegions)if(static_cast<unsigned>(region)>2u)return false;
+        return true;
+    }
 };
 
 } // namespace horde::scene::assets

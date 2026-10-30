@@ -1,0 +1,128 @@
+[
+  {
+    "source_mesh": "BONES_ARM.L",
+    "boundary_edges": 0,
+    "other_nonmanifold_edges": 0,
+    "affected_vertex_groups": {},
+    "details": []
+  },
+  {
+    "source_mesh": "BONES_ARM.R",
+    "boundary_edges": 0,
+    "other_nonmanifold_edges": 0,
+    "affected_vertex_groups": {},
+    "details": []
+  },
+  {
+    "source_mesh": "BONES_HEAD",
+    "boundary_edges": 34,
+    "other_nonmanifold_edges": 0,
+    "affected_vertex_groups": {
+      "HEAD": 34
+    },
+    "details": [
+      {
+        "kind": "boundary",
+        "edges": 34,
+        "source_world_min": [
+          -0.9387127757072449,
+          -1.3352283239364624,
+          36.168521881103516
+        ],
+        "source_world_max": [
+          0.9387127757072449,
+          1.1753989458084106,
+          37.365352630615234
+        ],
+        "face_users_histogram": {
+          "1": 34
+        }
+      }
+    ]
+  },
+  {
+    "source_mesh": "BONES_LEG.L",
+    "boundary_edges": 0,
+    "other_nonmanifold_edges": 0,
+    "affected_vertex_groups": {},
+    "details": []
+  },
+  {
+    "source_mesh": "BONES_LEG.R",
+    "boundary_edges": 0,
+    "other_nonmanifold_edges": 0,
+    "affected_vertex_groups": {},
+    "details": []
+  },
+  {
+    "source_mesh": "BONES_PELVIS",
+    "boundary_edges": 0,
+    "other_nonmanifold_edges": 0,
+    "affected_vertex_groups": {},
+    "details": []
+  },
+  {
+    "source_mesh": "BONES_RIBCAGE",
+    "boundary_edges": 0,
+    "other_nonmanifold_edges": 0,
+    "affected_vertex_groups": {},
+    "details": []
+  },
+  {
+    "source_mesh": "BONES_SPINE",
+    "boundary_edges": 42,
+    "other_nonmanifold_edges": 37,
+    "affected_vertex_groups": {
+      "VERTEBRAE_L5": 6,
+      "VERTEBRAE_L4": 6,
+      "VERTEBRAE_L3": 6,
+      "VERTEBRAE_L2": 10,
+      "VERTEBRAE_L1": 9,
+      "VERTEBRAE_C7": 12,
+      "VERTEBRAE_C6": 4,
+      "VERTEBRAE_C5": 8,
+      "VERTEBRAE_C4": 6,
+      "VERTEBRAE_C3": 8,
+      "VERTEBRAE_C2": 8,
+      "VERTEBRAE_C1(atlas)": 4
+    },
+    "details": [
+      {
+        "kind": "boundary",
+        "edges": 42,
+        "source_world_min": [
+          -1.006184458732605,
+          0.025804564356803894,
+          24.06989288330078
+        ],
+        "source_world_max": [
+          1.0061851739883423,
+          1.1046655178070068,
+          35.575443267822266
+        ],
+        "face_users_histogram": {
+          "1": 42
+        }
+      },
+      {
+        "kind": "multi_face_or_wire",
+        "edges": 37,
+        "source_world_min": [
+          -0.8288799524307251,
+          0.025804564356803894,
+          24.06989288330078
+        ],
+        "source_world_max": [
+          0.8328600525856018,
+          1.3978497982025146,
+          35.808876037597656
+        ],
+        "face_users_histogram": {
+          "0": 2,
+          "3": 27,
+          "4": 8
+        }
+      }
+    ]
+  }
+]

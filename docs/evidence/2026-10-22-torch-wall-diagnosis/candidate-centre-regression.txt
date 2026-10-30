@@ -1,0 +1,35 @@
+Internal ctest changing into directory: <worktree>/build/presets/windows-x64-debug
+Test project <worktree>/build/presets/windows-x64-debug
+    Start  48: horde_rt_held_item_transition_tests
+1/9 Test  #48: horde_rt_held_item_transition_tests .............   Passed    2.33 sec
+    Start  51: horde_rt_held_item_clearance_tests
+2/9 Test  #51: horde_rt_held_item_clearance_tests ..............***Failed    6.84 sec
+Portal cases=19392 maximum world-down carry=0.79874 m
+Maximum sampled walk/look hand step=0.0295763 m at step 72 previous z/yaw/pitch=-2.21/0.296596/0.244941 current=-2.22/0.297438/0.246948 retreat/lowering=0.45/0.355433 -> 0.45/0.385424
+Rag torch held/lowered residual=0.577716/0.0888265 m; lowered hand Y=-0.910712
+Horizontal Rag calibration witness resolved=1 centre leftHandLocal=-0.184999987,-0.381909043,0.612701654
+FAIL: outer-wall protection preserves the ordinary calibrated centre carry
+Horizontal Rag cases=339 turnIncrementRadians=.01 maximumHandStepMetres=0.00263038 maximumLightStepMetres=0.00334248
+
+    Start  72: horde_rt_held_item_vertical_support_rig_tests
+3/9 Test  #72: horde_rt_held_item_vertical_support_rig_tests ...   Passed    3.80 sec
+    Start  77: horde_rt_final_held_torch_clearance_tests
+4/9 Test  #77: horde_rt_final_held_torch_clearance_tests .......   Passed  130.07 sec
+    Start 102: horde_rt_fire_emitter_tests
+5/9 Test #102: horde_rt_fire_emitter_tests .....................   Passed    7.47 sec
+    Start 103: horde_rt_held_item_socket_tests
+6/9 Test #103: horde_rt_held_item_socket_tests .................   Passed   27.80 sec
+    Start 104: horde_rt_skeleton_render_pose_contracts
+7/9 Test #104: horde_rt_skeleton_render_pose_contracts .........   Passed    0.02 sec
+    Start 105: horde_rt_combat_sword_authority_agreement
+8/9 Test #105: horde_rt_combat_sword_authority_agreement .......   Passed    0.73 sec
+    Start 148: horde_rt_simulation_gameplay_tests
+9/9 Test #148: horde_rt_simulation_gameplay_tests ..............   Passed    9.48 sec
+
+89% tests passed, 1 tests failed out of 9
+
+Total Test time (real) = 188.56 sec
+
+The following tests FAILED:
+	 51 - horde_rt_held_item_clearance_tests (Failed)
+Errors while running CTest

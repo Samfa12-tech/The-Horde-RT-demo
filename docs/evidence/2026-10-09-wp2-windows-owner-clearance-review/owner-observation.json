@@ -1,0 +1,32 @@
+{
+  "evidence_class": "Direct owner report forwarded by coordinating parent; exact locally launched Windows Debug candidate",
+  "source_generated_candidate": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "launch_head": "1bd73dae7dbfad7a7c9aff133a4f14680d2015db",
+  "exe_sha256": "6cf04484c5711c822b173b9256173311928027f92b681104c456eca5d0da9e03",
+  "argv": [
+    "<verified-exe>",
+    "--development-vertical-proof"
+  ],
+  "requested_backend": "RayTracingPipeline (ordinary preferred selection; no Query override)",
+  "launch_foreground_verified": true,
+  "game_window_title": "Horde Lantern RT - Showcase Alpha 1.6.2",
+  "direct_interactive_checkpoint_171_supported": false,
+  "fixture": "Existing live ground-start support fixture; owner operated traversal. Numeric final pose/checkpoint171 was not separately sampled.",
+  "owner_verbatim": "yes- hands return. theyre onyl out of frame because they lower automatically when near the ceiling so the torch and/or sword dont clip.",
+  "accepted_observation": "Owner confirms hands return and attributes temporary out-of-frame hands to automatic ceiling clearance.",
+  "not_separately_reported": [
+    "look-down result",
+    "turnaround result",
+    "descent result",
+    "exact camera X/Z/yaw/pitch/support tuple",
+    "numeric rig/item/flame/light agreement",
+    "all-gear state",
+    "audio/haptics",
+    "lifecycle/recovery"
+  ],
+  "automated_input_sent": false,
+  "screenshot_sent": false,
+  "owner_returned_to_movie": true,
+  "further_hands_on_requests": "none",
+  "scope": "Scoped Windows owner observation only; does not convert historical raised static capture failure into PASS."
+}

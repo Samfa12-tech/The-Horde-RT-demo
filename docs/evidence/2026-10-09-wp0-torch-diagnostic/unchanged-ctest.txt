@@ -1,0 +1,7 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp0-torch-diagnostic/build/presets/windows-x64-debug
+    Start 42: horde_rt_final_held_torch_clearance_tests
+1/1 Test #42: horde_rt_final_held_torch_clearance_tests ...   Passed  168.85 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) = 168.86 sec

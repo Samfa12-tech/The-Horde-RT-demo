@@ -1,0 +1,23 @@
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+-- The CXX compiler identification is MSVC 19.44.35227.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+Generated RT catalog adapter is current.
+-- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+-- Found Vulkan: C:/VulkanSDK/1.4.350.0/Lib/vulkan-1.lib (found version "1.4.350") found components: glslc glslangValidator
+-- Vulkan SDK found: 1.4.350
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+-- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+-- Configuring done (19.1s)
+-- Generating done (1.6s)
+-- Build files have been written to: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug

@@ -1,0 +1,9 @@
+{
+  "rangeStart": 15805081,
+  "rangeEnd": 21215461,
+  "unreferencedGapBytes": 5410380,
+  "sameBytesAtSamePriorOffsets": 1515558,
+  "currentGapSha256": "17f169942c6445955152f47f44ce99832f3df438bc4c5a90d81b335399c71a7f",
+  "priorSameRangeSha256": "8c7c13ffdc2ec68213b28cee2e4ca221294c6712ad5a2cbcfe9cc0f005eb7397",
+  "interpretation": "Unreferenced gap between central-directory-referenced local records in the incrementally updated APK, separate from entry payload, alignment extras and signing block. No archive repack or clean release build performed; matching-byte count alone does not establish origin of every byte."
+}

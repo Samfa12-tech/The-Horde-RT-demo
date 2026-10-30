@@ -1,0 +1,50 @@
+[
+  {
+    "name": "assets/audio/music/beneath-the-same-moon/runtime/outdoor-main.wav",
+    "compressedByteDelta": 20480044,
+    "oldBytes": 0,
+    "newBytes": 20480044
+  },
+  {
+    "name": "lib/x86/libhorde_rt_probe_android.so",
+    "compressedByteDelta": 28576,
+    "oldBytes": 5785100,
+    "newBytes": 5813676
+  },
+  {
+    "name": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+    "compressedByteDelta": 12736,
+    "oldBytes": 4485032,
+    "newBytes": 4497768
+  },
+  {
+    "name": "lib/x86_64/libhorde_rt_probe_android.so",
+    "compressedByteDelta": -4544,
+    "oldBytes": 5458224,
+    "newBytes": 5453680
+  },
+  {
+    "name": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+    "compressedByteDelta": 1152,
+    "oldBytes": 5193544,
+    "newBytes": 5194696
+  },
+  {
+    "name": "assets/audio/music/beneath-the-same-moon/asset.manifest.json",
+    "compressedByteDelta": 672,
+    "oldBytes": 0,
+    "newBytes": 1160
+  },
+  {
+    "name": "assets/ASSET_LICENSES.md",
+    "compressedByteDelta": 574,
+    "oldBytes": 69250,
+    "newBytes": 70582
+  },
+  {
+    "name": "classes2.dex",
+    "compressedByteDelta": 460,
+    "oldBytes": 524548,
+    "newBytes": 525716
+  }
+]

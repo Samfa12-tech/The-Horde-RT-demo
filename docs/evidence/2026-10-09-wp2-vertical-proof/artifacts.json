@@ -1,0 +1,65 @@
+[
+  {
+    "path": "build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+    "sha256": "5d5f0d821b505e3c0f6febc80d0c85b520022f679116da7ce374d124bb57847c",
+    "bytes": 11580416,
+    "configuration": "debug",
+    "evidence_class": "host executable; not GPU accepted"
+  },
+  {
+    "path": "build\\presets\\windows-x64-debug\\Debug\\horde_rt_final_held_torch_clearance_tests.exe",
+    "sha256": "95c0ff85c8c60a0750ddbe21feb18a4a432b35f3caf24154d74f22d2e55187fe",
+    "bytes": 4099072,
+    "configuration": "debug",
+    "evidence_class": "host executable; not GPU accepted"
+  },
+  {
+    "path": "build\\presets\\windows-x64-debug\\Debug\\horde_rt_held_item_vertical_support_rig_tests.exe",
+    "sha256": "3105d4aab3fe731664765d2a3ed43329a6790f60b13564b9d60b8d1223e8d1bd",
+    "bytes": 4037632,
+    "configuration": "debug",
+    "evidence_class": "host executable; not GPU accepted"
+  },
+  {
+    "path": "build\\presets\\windows-x64-debug\\Debug\\horde_rt_vertical_support_tests.exe",
+    "sha256": "e86322ab085c5695dfeab8e58b006e588376a1ffcc275561ffc7901f43b9e782",
+    "bytes": 3477504,
+    "configuration": "debug",
+    "evidence_class": "host executable; not GPU accepted"
+  },
+  {
+    "path": "build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe",
+    "sha256": "71e2dc99836b07a2c6ce430cf2e5f7d1cd5d136408415c7b6ff15cdba557891d",
+    "bytes": 4068352,
+    "configuration": "release",
+    "evidence_class": "host executable; not GPU accepted"
+  },
+  {
+    "path": "build\\presets\\windows-x64-release\\Release\\horde_rt_held_item_vertical_support_rig_tests.exe",
+    "sha256": "87b2446c5f6a5738d0164192c87505064f5c5954c14f41d60ff45b97142e930f",
+    "bytes": 733696,
+    "configuration": "release",
+    "evidence_class": "host executable; not GPU accepted"
+  },
+  {
+    "path": "build\\presets\\windows-x64-release\\Release\\horde_rt_vertical_support_tests.exe",
+    "sha256": "c694532506879c8b18d7afbf15ce0b183c260a2ef7b6a3265eaebc131d397b6c",
+    "bytes": 438784,
+    "configuration": "release",
+    "evidence_class": "host executable; not GPU accepted"
+  },
+  {
+    "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "sha256": "de8a3fc302b461a03cb180290be56caddcfea2496e3b7b80bb2e7ade8675b0a5",
+    "bytes": 128768507,
+    "configuration": "debug",
+    "evidence_class": "development Debug package; not distributed release"
+  },
+  {
+    "path": "android\\app\\build\\outputs\\apk\\release\\app-release-unsigned.apk",
+    "sha256": "8a858d1ba467e5159e696e9d3822bd508238741dee4270d0a4f63965751d86f3",
+    "bytes": 121090330,
+    "configuration": "release",
+    "evidence_class": "unsigned validation package"
+  }
+]

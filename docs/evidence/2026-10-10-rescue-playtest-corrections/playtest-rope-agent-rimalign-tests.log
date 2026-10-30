@@ -1,0 +1,189 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 152
+    Start 152: horde_rt_rescue_traversal_tests
+
+152: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_traversal_tests.exe"
+152: Working Directory: <repo>/build/presets/windows-x64-debug
+152: Test timeout computed to be: 1500
+152: Lower grip selection indices=6.75,7.5 points=-33.9255,0.719505,-15.5844|-33.9579,0.397845,-15.5353
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: Ascent final phase=2 support=1.84084 root=-33.4897,1.84084,-15.1477 indices=0.5,1 gripsY=3.45901,3.24003
+152: PullUp diagnostic start_indices=-1,-1 max_hand_step=0 at_indices=0,0 z=0
+152: ascent and pull-up did not reach exterior landing
+152: alternating grip, pull-up, or completed-ascent state missing
+152: continuous alternating hand targets must not jump between rope particles
+152: pull-up skipped the coping lift or teleported between fixed ticks
+152: upper landing not interactable or equipment still stowed
+152: upper safe landing must release both rope hands
+152: upper safe endpoint did not accept descent interaction
+152: descent request changed one-shot lantern claim ownership
+152: ready descent failed to commit
+152: descent must remain hands-free until the actual apron-to-rope approach is complete
+152: descent and landing did not return to lower safe support
+152: lower safe landing must release both rope hands
+152: descent and landing phases or deployment count missing
+152: descent skipped the reverse coping lift or teleported between fixed ticks
+152: lower endpoint did not accept the second ascent request
+152: second ascent did not commit against its fresh readiness generation
+152: second ascent did not reach the upper safe endpoint
+152: upper endpoint did not accept the second descent request
+152: second descent did not commit against its fresh readiness generation
+152: second descent did not return to the lower safe endpoint
+152: reconstruction recovery redeployed or lost the already paid-out rope/ownership
+152: Rescue traversal cases=128795 failures=69 max_root_step=0.0250019 max_landing_root_step=0
+1/2 Test #152: horde_rt_rescue_traversal_tests ........***Failed    4.30 sec
+Lower grip selection indices=6.75,7.5 points=-33.9255,0.719505,-15.5844|-33.9579,0.397845,-15.5353
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+Ascent final phase=2 support=1.84084 root=-33.4897,1.84084,-15.1477 indices=0.5,1 gripsY=3.45901,3.24003
+PullUp diagnostic start_indices=-1,-1 max_hand_step=0 at_indices=0,0 z=0
+ascent and pull-up did not reach exterior landing
+alternating grip, pull-up, or completed-ascent state missing
+continuous alternating hand targets must not jump between rope particles
+pull-up skipped the coping lift or teleported between fixed ticks
+upper landing not interactable or equipment still stowed
+upper safe landing must release both rope hands
+upper safe endpoint did not accept descent interaction
+descent request changed one-shot lantern claim ownership
+ready descent failed to commit
+descent must remain hands-free until the actual apron-to-rope approach is complete
+descent and landing did not return to lower safe support
+lower safe landing must release both rope hands
+descent and landing phases or deployment count missing
+descent skipped the reverse coping lift or teleported between fixed ticks
+lower endpoint did not accept the second ascent request
+second ascent did not commit against its fresh readiness generation
+second ascent did not reach the upper safe endpoint
+upper endpoint did not accept the second descent request
+second descent did not commit against its fresh readiness generation
+second descent did not return to the lower safe endpoint
+reconstruction recovery redeployed or lost the already paid-out rope/ownership
+Rescue traversal cases=128795 failures=69 max_root_step=0.0250019 max_landing_root_step=0
+
+test 156
+    Start 156: horde_rt_rescue_rig_attachment_tests
+
+156: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_rig_attachment_tests.exe"
+156: Working Directory: <repo>/build/presets/windows-x64-debug
+156: Test timeout computed to be: 180
+156: FAIL: loaded rope must resolve the player to its authored pull-up phase
+156: FAIL: pull-up must finish on the exterior support
+156: FAIL: second rope sample must come from an active descent snapshot
+156: Rescue rig attachment cases=14461 failures=3 sampled_poses=903 max_left_reach=0.622384@phase=2 max_right_reach=0.651852@phase=2
+2/2 Test #156: horde_rt_rescue_rig_attachment_tests ...***Failed   20.83 sec
+FAIL: loaded rope must resolve the player to its authored pull-up phase
+FAIL: pull-up must finish on the exterior support
+FAIL: second rope sample must come from an active descent snapshot
+Rescue rig attachment cases=14461 failures=3 sampled_poses=903 max_left_reach=0.622384@phase=2 max_right_reach=0.651852@phase=2
+
+
+0% tests passed, 2 tests failed out of 2
+
+Total Test time (real) =  25.14 sec
+
+The following tests FAILED:
+	152 - horde_rt_rescue_traversal_tests (Failed)
+	156 - horde_rt_rescue_rig_attachment_tests (Failed)
+Errors while running CTest

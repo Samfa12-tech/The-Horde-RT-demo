@@ -1,0 +1,25 @@
+{
+  "pid": 63460,
+  "arguments": [
+    "--capture-showcase",
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\player-backward-20261023\\corrected",
+    "--capture-hidden"
+  ],
+  "finishedUtc": "2026-10-23T00:43:06.0511324Z",
+  "version": "corrected",
+  "sources": {
+    "reports/player-backward-20261023/mirror-probe.inl": "E4361E13526BDA24B7EB4389B231DF1138C771E6441A616F83F27B1BE53D5539",
+    "src/gameplay/animation/PlayerAnimationState.h": "7A7784EB5F7415D756980C78080E1A8E927DF88B7CF003751A711D67066F2495",
+    "src/gameplay/animation/PlayerAnimationState.cpp": "8FFD14144C89DFEE1E4A550860621CA7E6DDA92ACF1C887B7D9B0FF5EE275831",
+    "src/gameplay/simulation/GameSimulation.h": "70114C1CA06CE9B19750B2D08A4E135924C62291D6F21017519D004D71CD0BFB",
+    "src/vulkan/raytracing/PlayerRenderSlot.cpp": "CFCB75DD5ED8092189C7D9F906710AA97803A444B58D1E77D525C5AB74F10BA5",
+    "src/gameplay/simulation/GameSimulation.cpp": "41BEEFA6CDFF48D448308583C276C25BE505AB2765494F10C6B1E9C2AFEE0FD6",
+    "src/platform/windows/DiagnosticWindow.cpp": "9ED9FEF48E432E59C7CE60308ACB55961C4E31BB12B9B37739A540D61259A961"
+  },
+  "scope": "isolated mirror-room ordinary motor; not natural journey, physical input, phone or listening acceptance",
+  "executableSha256": "D15B473252FBC9FFC99AEB97B2431BC49994EDF9CE54072E0EA9B23CF67B791A",
+  "exitCode": 0,
+  "startedUtc": "2026-10-23T00:42:56.6721427Z",
+  "timedOut": false,
+  "elapsedSeconds": 6.8061576
+}

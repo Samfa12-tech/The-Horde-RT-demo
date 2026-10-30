@@ -1,0 +1,134 @@
+[
+  {
+    "path": "shaders/README.md",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "da997f9062a313ae8434e989273849ecbbf62ba8",
+    "sha256": "7687c0bbac1f0845fdd6b234eff5a7e9c5879da16b96cfacbd11933150547be4"
+  },
+  {
+    "path": "shaders/raytracing/README.md",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "bf6af316883891521e252d0c05ee6940a266aca7",
+    "sha256": "03f0e4c95dc29ea687ad3797a3d66aeb715c8d181a7574ceffe2e735893579bc"
+  },
+  {
+    "path": "shaders/raytracing/experimental/staged_primary_record.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "5f2078259062bd5b448ebe94dc279c4816c4ef8e",
+    "sha256": "a12b889773f4cbd69823a5e3188f1bfa983155ecd07904e8d2aa365239f77d15"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "aeb95dca8d986e7d3e28c083265d29b63ce90acf",
+    "sha256": "da007b0aba45dac5fd3ed1b3f362534c6cb0e2e2c04ff0eab619e45f07aabff2"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "83b07524182e02e47985bae0464969a8e8fcb4d9",
+    "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "d058107d7e40e5eefc55536f0c8bc11637f04cd8",
+    "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "21037217cfeaec9b1504bfd5b3288172df49daa2",
+    "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "549c245c4373b512af375ee5221a47bedd9b15c7",
+    "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_fire.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "f5cd42000ef2c32a556b871dd6f9ccdf71c119a4",
+    "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_frame.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "fadadd84e5983967b669bf4c209dd9b5e85870ac",
+    "sha256": "c7c1eee2efd951e94e09343a6129e20b9fbc9c9ce294bba821c27723a954193a"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "fd07cd3df04e956f16a7c25566e5437477161254",
+    "sha256": "a1d9ef06ced589edb96858bfb76d2de14c3b5a4e59e96a18b5bb95408740e28d"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "98a07df95604791a91f6509f0f6f57e8fee96451",
+    "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_lighting.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "4f2e63b58847e763af27b0a313c96fc830a32028",
+    "sha256": "d89db03ec94142b32bbbcab8e3917ee2cb66ee64ca6b3dffe368918ed3e119f2"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "745a7de83d2eb8ab425fadbc41ddc1c1d32cb4a8",
+    "sha256": "e62ea176f5b923527d75ab8cea9c45f0ec41315197d2b254eaa468e080db9b1f"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "9d01430219962609639d82eb3d3a77324af94f40",
+    "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_variant_config.glsl",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "996413d714b87549774ac8e4f5e4393080280bfa",
+    "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+  },
+  {
+    "path": "shaders/raytracing/minimal.comp",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "d52ce41c2a5814c4191846af8f218da86b72123e",
+    "sha256": "0aa2731c6a80f3cc015cc23cc85e161970375c383d59fd807c636f981f1ee1a5"
+  },
+  {
+    "path": "shaders/raytracing/minimal.rchit",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "c02daf341235eebfa61f8f2d7fa05c25ec40b0e2",
+    "sha256": "bec751b11f9f078f4d405d233a9babd47f2f5643acd6478167e2345268d9121b"
+  },
+  {
+    "path": "shaders/raytracing/minimal.rgen",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "5bb77363793fc1fee63452b24200825ab48114ee",
+    "sha256": "033484e51931a6884517e003d8bf968f6d9e00438f5ba789cc58f3153a6740ca"
+  },
+  {
+    "path": "shaders/raytracing/minimal.rmiss",
+    "source": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+    "git_blob": "36e5c1d2d2ebcaebf5e25deb424be65fee9dd276",
+    "sha256": "c74cac4360d364d9ef586687d8c765d72730f024e0e8b6af7e96f701a08383fb"
+  },
+  {
+    "path": "tools/compile-raygen.ps1",
+    "source": "d271a08bd18f15bd49411000b174b89a39878479",
+    "git_blob": "01c0571af4f357a05e6d25e39984f0a30207903c",
+    "sha256": "2d919bdb6ad03ed4b67e7691ffb1547801268d09df0794c658ea2f59054debcf"
+  },
+  {
+    "path": "tools/raygen-variants.json",
+    "source": "d271a08bd18f15bd49411000b174b89a39878479",
+    "git_blob": "4fc8e115e92dfd237bacd076d2227b646343bf44",
+    "sha256": "39276571a06644307dd36db0cf7265b7ee43e5bfc912932be06bb0503b34e30d"
+  }
+]

@@ -1,0 +1,77 @@
+{
+  "scope": "Private opt-in Diagnostic Windows automatic page allocation and RT image/route evidence; not optimized playable FPS or phone acceptance",
+  "runs": {
+    "pipeline": {
+      "complete": true,
+      "frames": 1464,
+      "unloads": 1,
+      "restores": 1,
+      "warmFullDeviceLocalBytes": 372042608,
+      "reducedDeviceLocalBytes": 359589168,
+      "restoredDeviceLocalBytes": 372042608,
+      "peakDeviceLocalBytes": 376298736,
+      "normalStaticSavingBytes": 12453440,
+      "peakManagedPageBytes": 16709568,
+      "readinessWaitFrames": 0,
+      "launch": {
+        "backend": "RayTracingPipeline",
+        "simulationHz": 60,
+        "maximumSimulationTicksPerRender": 4,
+        "deadlineSeconds": 180,
+        "scope": "Debug Diagnostic ordinary static-detail and Keeper retirement/restoration route; not Shipping or owner acceptance",
+        "executableSha256": "d2ae42c616513499efd635ab559f689684a9d75367d0f26ee665a764ab7f413b",
+        "sources": {
+          "src/vulkan/raytracing/RtRegionGeometrySource.cpp": "54944b70b33bf2403ed1ff7a8dd78690e7976c82e8a9844d6ba929bb318f1cfb",
+          "src/vulkan/raytracing/PresentableTinyRtSceneRegionPages.cpp": "ab583dd87a0842760ee891b5cc40a562c246ac3ec8b13f9ada9b0a5fa9aa34c0",
+          "src/gameplay/validation/ChapterRoundTripProbe.h": "129a477304e574da834d15f81adfaefdb6c1e952d2fb716805e44f2116efbdd8",
+          "src/gameplay/simulation/GameSimulation.cpp": "ab83576d92bdb7cf374d37d4b6570ad8e2896b87e816395811a8e17027377239",
+          "src/platform/windows/DiagnosticWindow.cpp": "d59957b49bde0a917c3da5e75e55e012c5a9d7a0640cce72951fed29335a252a",
+          "src/scene/CorridorStaticDetailFaces.h": "433af75a893cd7a0492dcd977e5fb9f588cb6a31447b5a5fd8a7c76766f17881",
+          "src/vulkan/raytracing/RtStaticMeshSlot.cpp": "d9cb03a54c7b2c965771bf7fe95dfd9a42c51fb35392d86f6d5f3cfd52d68dd3",
+          "src/platform/windows/WindowsChapterRoundTripCapture.inl": "9f3ce63d4647afb38cbe756730e1222191ae735d3178c1abf3d19d77787f0d54",
+          "src/gameplay/simulation/StaticDetailLease.h": "df676e18d22656f82c1ad7c66ee4ce24181c1eb6e171107e6a9e435d760b1f92",
+          "src/scene/CorridorStaticDetail.h": "ca5e5f2a73f7ab6d3a715133c25412f434bd9aebf637c7645600c655a196d465",
+          "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": "9cc5c6ccb208218a9e595217958d5c518ceed0c2575d4a28ea0a7abb402c7eae",
+          "src/vulkan/raytracing/RtRegionGeometryPreparation.cpp": "dbb54aaf01c8d49773ab66ae36ddbb6ff6cd7c67db4b06cd1f89951cd765cea3"
+        }
+      }
+    },
+    "query": {
+      "complete": true,
+      "frames": 1464,
+      "unloads": 1,
+      "restores": 1,
+      "warmFullDeviceLocalBytes": 372042608,
+      "reducedDeviceLocalBytes": 359589168,
+      "restoredDeviceLocalBytes": 372042608,
+      "peakDeviceLocalBytes": 376298736,
+      "normalStaticSavingBytes": 12453440,
+      "peakManagedPageBytes": 16709568,
+      "readinessWaitFrames": 0,
+      "launch": {
+        "maximumSimulationTicksPerRender": 4,
+        "backend": "RayQueryCompute",
+        "scope": "Debug Diagnostic ordinary static-detail and Keeper retirement/restoration route; not Shipping or owner acceptance",
+        "executableSha256": "d2ae42c616513499efd635ab559f689684a9d75367d0f26ee665a764ab7f413b",
+        "deadlineSeconds": 180,
+        "sources": {
+          "src/vulkan/raytracing/RtRegionGeometrySource.cpp": "54944b70b33bf2403ed1ff7a8dd78690e7976c82e8a9844d6ba929bb318f1cfb",
+          "src/vulkan/raytracing/RtStaticMeshSlot.cpp": "d9cb03a54c7b2c965771bf7fe95dfd9a42c51fb35392d86f6d5f3cfd52d68dd3",
+          "src/platform/windows/DiagnosticWindow.cpp": "d59957b49bde0a917c3da5e75e55e012c5a9d7a0640cce72951fed29335a252a",
+          "src/vulkan/raytracing/RtRegionGeometryPreparation.cpp": "dbb54aaf01c8d49773ab66ae36ddbb6ff6cd7c67db4b06cd1f89951cd765cea3",
+          "src/gameplay/simulation/StaticDetailLease.h": "df676e18d22656f82c1ad7c66ee4ce24181c1eb6e171107e6a9e435d760b1f92",
+          "src/gameplay/simulation/GameSimulation.cpp": "ab83576d92bdb7cf374d37d4b6570ad8e2896b87e816395811a8e17027377239",
+          "src/scene/CorridorStaticDetailFaces.h": "433af75a893cd7a0492dcd977e5fb9f588cb6a31447b5a5fd8a7c76766f17881",
+          "src/scene/CorridorStaticDetail.h": "ca5e5f2a73f7ab6d3a715133c25412f434bd9aebf637c7645600c655a196d465",
+          "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": "9cc5c6ccb208218a9e595217958d5c518ceed0c2575d4a28ea0a7abb402c7eae",
+          "src/vulkan/raytracing/PresentableTinyRtSceneRegionPages.cpp": "ab583dd87a0842760ee891b5cc40a562c246ac3ec8b13f9ada9b0a5fa9aa34c0",
+          "src/platform/windows/WindowsChapterRoundTripCapture.inl": "9f3ce63d4647afb38cbe756730e1222191ae735d3178c1abf3d19d77787f0d54",
+          "src/gameplay/validation/ChapterRoundTripProbe.h": "129a477304e574da834d15f81adfaefdb6c1e952d2fb716805e44f2116efbdd8"
+        },
+        "simulationHz": 60
+      }
+    }
+  },
+  "releaseCandidateSha256": "8b408286c704f85b655f1471fb69d0dc3c5d1e740c1bcaf2350812e0cd965f34",
+  "productionAndroidApkSha256": "6439f9f2b891c7461ebcce0eb2855e5d44c5b5d5b9f5c50040fc1e4cb5c6d30c"
+}

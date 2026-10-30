@@ -1,0 +1,58 @@
+{
+  "read_only_before_install": {
+    "candidate_windows_sha256": "6cf04484c5711c822b173b9256173311928027f92b681104c456eca5d0da9e03",
+    "candidate_android": {
+      "package": "com.samfa12.hordelanternrt.debug",
+      "versionCode": "10",
+      "versionName": "1.6.2-debug",
+      "sha256": "1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c",
+      "certificate_sha256": [
+        "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736"
+      ]
+    },
+    "device_count": 1,
+    "authorised_device_count": 1,
+    "device_operations": "read-only inventory and installed APK retrieval only",
+    "device_class": {
+      "ro.product.model": "SM-S948B",
+      "ro.product.manufacturer": "samsung",
+      "ro.build.version.release": "16",
+      "ro.build.version.sdk": "36",
+      "ro.product.cpu.abi": "arm64-v8a"
+    },
+    "installed_apk_count": 0,
+    "candidate_installed": false,
+    "other_horde_installed": [
+      {
+        "package": "com.samfa12.hordelanternrt",
+        "versionCode": "10",
+        "versionName": "1.6.2",
+        "sha256": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8",
+        "certificate_sha256": [
+          "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245"
+        ],
+        "component": "priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false\r\ncom.samfa12.hordelanternrt/.MainActivity"
+      }
+    ]
+  },
+  "owner_approval": "Explicit side-by-side Debug installation approved in this chat before mutation",
+  "installation": {
+    "action": "owner-approved separate Debug installation",
+    "exit": 0,
+    "seconds": 9.125,
+    "installed_apk_sha256": "1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c",
+    "exact_candidate_pullback_match": true,
+    "package": "com.samfa12.hordelanternrt.debug",
+    "component": "com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity",
+    "release_package_replaced": false,
+    "data_cleared": false,
+    "downgrade": false,
+    "signature_bypass": false
+  },
+  "release_preservation": {
+    "release_package": "com.samfa12.hordelanternrt",
+    "before_after_apk_sha256": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8",
+    "release_preserved": true,
+    "inspection": "device-side SHA-256 after approved separate Debug install"
+  }
+}

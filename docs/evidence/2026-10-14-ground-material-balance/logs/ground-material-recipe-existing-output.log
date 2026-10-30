@@ -1,0 +1,5 @@
+usage: author-terrain-material-balance.py [-h] [--root ROOT]
+                                          [--baseline BASELINE]
+                                          --output-directory OUTPUT_DIRECTORY
+                                          [--factor FACTOR]
+author-terrain-material-balance.py: error: Choose a new output directory; existing sources/backups are preserved

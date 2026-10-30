@@ -1,0 +1,18 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start   2: horde_rt_geometry_page_table_tests
+1/6 Test   #2: horde_rt_geometry_page_table_tests ..........   Passed    1.28 sec
+    Start  66: horde_rt_pipeline_bundle_contracts_tests
+2/6 Test  #66: horde_rt_pipeline_bundle_contracts_tests ....   Passed    0.15 sec
+    Start 167: horde_rt_region_gpu_preparation_tests
+3/6 Test #167: horde_rt_region_gpu_preparation_tests .......   Passed    5.66 sec
+    Start 171: horde_rt_scene_initialise_preflight_tests
+4/6 Test #171: horde_rt_scene_initialise_preflight_tests ...   Passed    8.23 sec
+    Start 172: horde_rt_static_geometry_cutover_tests
+5/6 Test #172: horde_rt_static_geometry_cutover_tests ......   Passed    3.75 sec
+    Start 173: horde_rt_scene_resource_inventory_tests
+6/6 Test #173: horde_rt_scene_resource_inventory_tests .....   Passed   21.97 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  41.07 sec

@@ -1,0 +1,16 @@
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\shader-publication\matrix-after\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 295252 bytes; functions=83; calls=264; ray-query sites=2; dependency SHA-256=9fc01c6f031897cfb91551fae9a9995a8d8c1accaa157b1e3a89c0035c9f9f30
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\shader-publication\matrix-after\diagnostic_high_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_high_opaque_fast: 594984 bytes; functions=1; calls=0; ray-query sites=29; dependency SHA-256=784b815116efe8184122ef3b255bccfd79d6a37b6b7a40548d0617739c2e199f
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\shader-publication\matrix-after\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_generic_dielectric: 293752 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=c53632f29cfcd8994beb788f6c177e64f2de7a656910282503ab64e5dda4d21b
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\shader-publication\matrix-after\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_opaque_fast: 591884 bytes; functions=1; calls=0; ray-query sites=27; dependency SHA-256=d51b4bb576c3326367b9b95e578d30aef004e22346bf935d4e92ee3e4f295323
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\shader-publication\matrix-after\shipping_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_high_generic_dielectric: 286424 bytes; functions=83; calls=264; ray-query sites=2; dependency SHA-256=0e189d0ea34885894f07f934dd18d73f58d93cd1c3c9af862e065b6d92b48e8a
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\shader-publication\matrix-after\shipping_high_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_high_opaque_fast: 590748 bytes; functions=1; calls=0; ray-query sites=29; dependency SHA-256=8080f22c98b289a3131d3db5d2a1096cb62ddd67209e056e02cb1cb13892f195
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\shader-publication\matrix-after\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 284924 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=cc9eefbb777a8542ce27a244a466bbd131af9a9fbd31a3f20e90ea8ff1d1ec9e
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\shader-publication\matrix-after\shipping_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_mobile_opaque_fast: 587648 bytes; functions=1; calls=0; ray-query sites=27; dependency SHA-256=6b9d340c0f91a08ee05a34fab73958ab4862ddff767f8eafca87d7fed0fb9b13

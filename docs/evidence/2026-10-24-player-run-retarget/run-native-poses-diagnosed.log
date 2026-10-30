@@ -1,0 +1,2 @@
+RUN_GROUNDING_FAILURE view=0 tick=36 support=-0.95 soles=-0.844604,-0.838484 originY=-0.94975 phase=0.687719 blend=0.952936
+FAIL: Run retains established native sole grounding bound

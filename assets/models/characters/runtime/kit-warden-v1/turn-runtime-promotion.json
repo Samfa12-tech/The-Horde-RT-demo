@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "promotionDate": "2026-10-24",
+  "purpose": "Existing owned same-rig joint-only turn derivative for normal development Kit following; source masters and original runtime remain preserved. Platform/route acceptance is separate.",
+  "runtime": {
+    "path": "assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb",
+    "bytes": 2272652,
+    "sha256": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11"
+  },
+  "sourceDerivative": {
+    "path": "assets/models/characters/source/kit-step-turn-proof-v1/native/kit-turn-proof.glb",
+    "sha256": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11",
+    "bytes": 2272652
+  },
+  "originalRuntime": {
+    "path": "assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb",
+    "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713",
+    "bytes": 2151672
+  },
+  "ownerApprovedMaster": {
+    "path": "assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb",
+    "sha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e"
+  },
+  "derivation": "Byte-exact promotion of the append-only native export from source/kit-step-turn-proof-v1/export_native.py; no regeneration, decimation, rebinding or texture processing.",
+  "preserved": {
+    "sections": [
+      "meshes",
+      "nodes",
+      "skins",
+      "materials",
+      "scenes",
+      "scene"
+    ],
+    "originalSevenAnimations": true,
+    "originalAccessorsAndBufferViewsPrefix": true,
+    "originalBinaryBufferPrefixBytes": 2036112,
+    "originalBinaryBufferPrefixExact": true,
+    "manifestAndPlatformTextureArrays": "Unchanged existing kit-warden-v1 manifest and character arrays"
+  },
+  "addedAnimationNames": [
+    "KitProof|turn_left",
+    "KitProof|turn_right"
+  ],
+  "rootMotion": "Turn joints contain no root yaw; shared CompanionTurnProfile applies owned exported yaw once. Original authored takes remain 0.75 seconds; shared playback timing is independent.",
+  "runtimePayloadIncreaseBytes": 120980,
+  "packaging": "Select kit-warden-turn.runtime.glb instead of kit-warden-lod0.runtime.glb; do not ship both, source Blend/JSON/reference files or this processing receipt.",
+  "rights": "Owner-confirmed Horde distribution entitlement for original Meshy Warden; offline turn authoring by Samfa12/Codex. See ASSET_LICENSES.md; no blanket MIT/CC0 grant."
+}

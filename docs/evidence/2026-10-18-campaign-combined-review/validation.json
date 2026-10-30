@@ -1,0 +1,229 @@
+{
+  "scope": "Bounded combined review of five local commits and focused restore regressions only",
+  "reviewedRange": "bd55878d1c51ec4b0a560ca34603dde7511560ef..04891bbcf715621790de54c6a4582994c43a80e5",
+  "sourceParent": "04891bbcf715621790de54c6a4582994c43a80e5",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "recordedUtc": "2026-10-18T00:20:29.7808902Z",
+  "sourceManifest": "implementation-files.json",
+  "sourceManifestMeaning": "SHA256 of final compiled working-file bytes before Git newline normalization; unchanged dependencies pinned by sourceParent",
+  "findings": [
+    {
+      "severity": "P1",
+      "issue": "Moving torch release outside drench trigger rejected logical checkpoints and could not reconstruct settled state",
+      "status": "FIXED"
+    },
+    {
+      "severity": "P2",
+      "issue": "Explicit accepted checkpoint replacement retained stale load input barrier and failed requested camera pose",
+      "status": "FIXED"
+    },
+    {
+      "severity": "minor",
+      "issue": "Restored snapshot identified old input publication while consuming current input commands",
+      "status": "FIXED"
+    }
+  ],
+  "review": "No further actionable integration, codec/storage, lifetime/concurrency or compatibility defect found after bounded independent and integration review",
+  "reproduction": {
+    "implementation": "sourceParent unchanged, plus new checkpoint regression blocks and explicit pose assertion; prior negative x0 case unchanged",
+    "test": "horde_rt_campaign_checkpoint_tests",
+    "checks": 736,
+    "failures": 8,
+    "ctestExitCode": 8,
+    "retained": "reproduction-tests.log",
+    "assertionsRemoved": false
+  },
+  "compatibility": {
+    "fileBytes": 162,
+    "schema": 1,
+    "contentRevision": 1,
+    "payloadGoldenCrc32": "01703382",
+    "formatOrFieldOrderChanged": false,
+    "allOriginalTorchRectangleAnchorsPreserved": true,
+    "newAdmission": "Finite walkable route anchors from moving release",
+    "oldNegativeCase": "x0 replaced by off-route x100 because x0 is a valid reversal anchor under corrected contract; positive moving-release cases added",
+    "automaticMigration": false
+  },
+  "windows": {
+    "os": "Microsoft Windows NT 10.0.26300.0",
+    "filesystem": "NTFS",
+    "debug": {
+      "buildExitCode": 0,
+      "ctestExitCode": 0,
+      "selectedPassed": 6,
+      "failed": 0,
+      "durationSeconds": 24.06,
+      "checkpointChecks": 738,
+      "codecChecks": 1991,
+      "storageChecks": 1178,
+      "coordinatorChecks": 306,
+      "concurrentValidReads": 8,
+      "targets": [
+        "horde_rt_campaign_checkpoint_tests",
+        "horde_rt_campaign_codec_tests",
+        "horde_rt_campaign_storage_tests",
+        "horde_rt_campaign_save_coordinator_tests",
+        "horde_rt_chapter_dialogue_tests",
+        "horde_rt_showcase_gameplay_smoke",
+        "horde_rt_diagnostic_window"
+      ],
+      "selectionRegex": "^horde_rt_(campaign_(checkpoint|codec|storage|save_coordinator)_tests|chapter_dialogue_tests|showcase_gameplay_smoke)$"
+    },
+    "release": {
+      "buildExitCode": 0,
+      "ctestExitCode": 0,
+      "selectedPassed": 11,
+      "failed": 0,
+      "durationSeconds": 31.7,
+      "checkpointChecks": 738,
+      "codecChecks": 1991,
+      "storageChecks": 1178,
+      "coordinatorChecks": 306,
+      "combatChecks": 683,
+      "rescueChecks": 16226,
+      "authoredTerrainChecks": 41977,
+      "concurrentValidReads": 542,
+      "targets": [
+        "horde_rt_simulation_timing_tests",
+        "horde_rt_simulation_gameplay_tests",
+        "horde_rt_combat_foundation_tests",
+        "horde_rt_rescue_journey_integration_tests",
+        "horde_rt_campaign_checkpoint_tests",
+        "horde_rt_campaign_codec_tests",
+        "horde_rt_campaign_storage_tests",
+        "horde_rt_campaign_save_coordinator_tests",
+        "horde_rt_chapter_dialogue_tests",
+        "horde_rt_showcase_gameplay_smoke",
+        "horde_rt_diagnostic_window"
+      ],
+      "selectionRegex": "^horde_rt_((simulation_(timing|gameplay)|combat_foundation|rescue_journey_integration|chapter_terrain_journey|campaign_(save_coordinator|codec|storage|checkpoint)|chapter_dialogue)_tests|showcase_gameplay_smoke)$"
+    },
+    "buildCommand": "cmake --build build/presets/windows-x64-{debug|release} --config {Debug|Release} --target <targets> --parallel 2",
+    "testCommand": "ctest --test-dir build/presets/windows-x64-{debug|release} -C {Debug|Release} -R <selectionRegex> --verbose --no-tests=error",
+    "reparseRuntimeFixture": "NOT_RUN: optional Windows symlink privilege unavailable",
+    "initialBuildFailure": "MSB1009/exit1: CTest-only horde_rt_chapter_terrain_journey_tests was incorrectly requested as a build target; corrected to its shared horde_rt_rescue_journey_integration_tests executable without omitting authored-terrain CTest"
+  },
+  "android": {
+    "command": "android/gradlew.bat assembleDebug --offline --console=plain",
+    "environmentSetup": "C:/Users/sam_s/Documents/Codex/shared-tools/setup-tools.ps1",
+    "exitCode": 0,
+    "durationReported": "2m 19s",
+    "nativeEntries": [
+      "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "lib/x86/libhorde_rt_probe_android.so",
+      "lib/x86_64/libhorde_rt_probe_android.so"
+    ],
+    "evidenceClass": "HOST_BUILD_ONLY",
+    "deviceUsed": false,
+    "posixFilesystemRuntime": false
+  },
+  "firstFixedFocusedRun": {
+    "passed": 2,
+    "failed": 0,
+    "durationSeconds": 4.03,
+    "checkpointChecks": 738,
+    "codecChecks": 1991
+  },
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "aebd4feb1ff4fec3b813cfe68334f593b28c0342473ae3a6a44e1c7c07b7a64e",
+      "bytes": 13369856
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "51d079d9c45b3c0284443b2b5fbee559572091cecbf44b0d9b98e2386d14b048",
+      "bytes": 4549632
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_campaign_checkpoint_tests.exe",
+      "sha256": "430396485c371e2b6edceb43dfdbecad644d4745a8a6742a189bb17ee0295233",
+      "bytes": 4162560
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_campaign_checkpoint_tests.exe",
+      "sha256": "d35ed0722285ac5472fdc0960b80f102aefb1edcb4a1986cba65c3fb67b9698d",
+      "bytes": 927232
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_campaign_codec_tests.exe",
+      "sha256": "d86cabc71f422ed3e6e3c079710abc9ed5ef0292817b50e9643e0b2c67e65cfb",
+      "bytes": 2466816
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_campaign_codec_tests.exe",
+      "sha256": "d074043fde68af93f0e998a9bb269b238c53048e46e448afc94e87bbcaa4ea93",
+      "bytes": 294400
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "24e286544a801035a65e1b8f75d7259a27f5792b907d32552bc29882cb5cedfa",
+      "bytes": 183665114
+    }
+  ],
+  "localLogs": [
+    {
+      "path": "reports/campaign-combined-review-2026-10-18/release-build.log",
+      "sha256": "3ef84ebb6ecd049eb864dca5a4c6c99c23d892f315e888d5c62e69ceb5c3652a",
+      "bytes": 3417
+    },
+    {
+      "path": "reports/campaign-combined-review-2026-10-18/reproduction-build.log",
+      "sha256": "2ddd9dc31ed619582019c1338f5a207d302d5994c40860a34bd0fed47e7a766b",
+      "bytes": 712
+    },
+    {
+      "path": "reports/campaign-combined-review-2026-10-18/reproduction-tests.log",
+      "sha256": "ff4296841b3e75ba624d5444fbfc7e26a11687cdc5c34b1fb61f420326d1de03",
+      "bytes": 2634
+    },
+    {
+      "path": "reports/campaign-combined-review-2026-10-18/fix-first-build.log",
+      "sha256": "650fc1dac23e671d984bd540737ecca22668b774ef3054bbc4d3d1c87cd0c193",
+      "bytes": 1626
+    },
+    {
+      "path": "reports/campaign-combined-review-2026-10-18/fix-first-tests.log",
+      "sha256": "119764a25bbf507b1c0da6f88884587ddcc02ec40d57821054cc3a55d44ad6a9",
+      "bytes": 2427
+    },
+    {
+      "path": "reports/campaign-combined-review-2026-10-18/debug-final-build.log",
+      "sha256": "ed493876e9eb2c41b1e5d5481bcdc23fe0a1b9c3d3acc0ec70f2dfd3e9665856",
+      "bytes": 5768
+    },
+    {
+      "path": "reports/campaign-combined-review-2026-10-18/debug-final-tests.log",
+      "sha256": "c86ce408b76b08d8cc89b6f83e1a50e3802e18f3ccdf877f745a64da1009a5e9",
+      "bytes": 4991
+    },
+    {
+      "path": "reports/campaign-combined-review-2026-10-18/release-final-build.log",
+      "sha256": "58848a26388c2ea1e45b668305760d845d5deb7151fa999fa8dd93f9769c97f4",
+      "bytes": 22721
+    },
+    {
+      "path": "reports/campaign-combined-review-2026-10-18/release-final-tests.log",
+      "sha256": "6e458df4c4d9d968bec998f5e233aa14011121050cfbf35be964b8fe995dcc83",
+      "bytes": 10964
+    },
+    {
+      "path": "reports/campaign-combined-review-2026-10-18/android-final-build.log",
+      "sha256": "863f86e77123bd7636a3cc86def0666f53df9a0f4a664ada8346da6ddd551a99",
+      "bytes": 2235
+    }
+  ],
+  "limits": [
+    "No real worker, actual save location, menu, or platform GameSimulation/camera load adapter connected",
+    "No platform durability, physical power-loss, Android lifecycle/process-death, touch, RTX presentation or performance acceptance established",
+    "Host fixture log names containing phone denote CPU simulation modes only",
+    "POSIX filesystem runtime/directory-fsync and Windows reparse runtime remain unverified",
+    "No current cloud CI or sanitizer claim"
+  ],
+  "ownerChoice": "PENDING: manual save retention alongside latest autosave in each of three slots",
+  "audioHapticManualRevalidation": "NO additional live-playback change; actual future load/audio/camera integration retains physical acceptance gate",
+  "publicPush": false,
+  "next": "STOP after focused local review correction commit; await pending retention choice"
+}

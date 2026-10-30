@@ -1,0 +1,6 @@
+{
+  "cause": "Windows PowerShell 5.1 generation differs in dependency enumeration order and JSON serialization from registered PowerShell 7 check",
+  "same_dependency_identity_set": true,
+  "same_spirv_all_eight": true,
+  "corrected_with": "supported -Write in registered PowerShell 7; affected CTest passes"
+}

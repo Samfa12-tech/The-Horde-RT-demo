@@ -1,0 +1,6 @@
+Exception: <repo>\tools\compile-raygen.ps1:587
+Line |
+ 587 |          throw "Variant compilation output directory must not already  …
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Variant compilation output directory must not already exist: <local-path>
+     | Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\mist-interval-prototype\baseline

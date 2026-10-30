@@ -1,0 +1,62 @@
+[
+  {
+    "file": "runtime/horde-irregular-pine-v1-lod1.glb",
+    "sha256": "77c793480abff4ed7515b224a1b4fc55ac840f27d0b1ef9a17dd1ca58ee1ee2c",
+    "rebuild_sha256": "77c793480abff4ed7515b224a1b4fc55ac840f27d0b1ef9a17dd1ca58ee1ee2c",
+    "binary_identical": true
+  },
+  {
+    "file": "runtime/horde-irregular-pine-v1.glb",
+    "sha256": "c9e595041da122b7731157189219f81ad83fb09560c9c544775e1e4cb216bb84",
+    "rebuild_sha256": "c9e595041da122b7731157189219f81ad83fb09560c9c544775e1e4cb216bb84",
+    "binary_identical": true
+  },
+  {
+    "file": "runtime/horde-upright-alder-v1-lod1.glb",
+    "sha256": "38333b05a996d46942fb9fddb022e128a0591c372582b520f4d051a308e9282d",
+    "rebuild_sha256": "38333b05a996d46942fb9fddb022e128a0591c372582b520f4d051a308e9282d",
+    "binary_identical": true
+  },
+  {
+    "file": "runtime/horde-upright-alder-v1.glb",
+    "sha256": "d2e373b23baded5574fc91172f764207a42a10b6388d9fe27bd18d400067cdee",
+    "rebuild_sha256": "d2e373b23baded5574fc91172f764207a42a10b6388d9fe27bd18d400067cdee",
+    "binary_identical": true
+  },
+  {
+    "file": "textures/horde-alder-original-basecolor-512.png",
+    "sha256": "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44",
+    "rebuild_sha256": "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44",
+    "binary_identical": true
+  },
+  {
+    "file": "textures/horde-bark-original-basecolor-512.png",
+    "sha256": "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+    "rebuild_sha256": "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+    "binary_identical": true
+  },
+  {
+    "file": "textures/horde-bark-original-normal-512.png",
+    "sha256": "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+    "rebuild_sha256": "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+    "binary_identical": true
+  },
+  {
+    "file": "textures/horde-bark-original-roughness-512.png",
+    "sha256": "03e409b0fc569647c0f4ac18154ee506cce4328433ab8096c97a53ea02105e76",
+    "rebuild_sha256": "03e409b0fc569647c0f4ac18154ee506cce4328433ab8096c97a53ea02105e76",
+    "binary_identical": true
+  },
+  {
+    "file": "textures/horde-moss-original-basecolor-512.png",
+    "sha256": "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822",
+    "rebuild_sha256": "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822",
+    "binary_identical": true
+  },
+  {
+    "file": "textures/horde-pine-original-basecolor-512.png",
+    "sha256": "6fdeb17cd4ff08e25396926b42827dcd9ab88945d03a604da0a74d762ecd28b7",
+    "rebuild_sha256": "6fdeb17cd4ff08e25396926b42827dcd9ab88945d03a604da0a74d762ecd28b7",
+    "binary_identical": true
+  }
+]

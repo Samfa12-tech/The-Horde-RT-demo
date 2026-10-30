@@ -1,0 +1,28 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 90: horde_rt_static_gltf_asset_tests
+1/1 Test #90: horde_rt_static_gltf_asset_tests ...***Failed    3.83 sec
+Static GLB temporary root=horde-rt-static-gltf-tests-debug-pid-62620
+FAIL: retired primitive contributes no candidate geometry bytes or primitive rows
+FAIL: source ranges remap to their exact compacted owners
+FAIL: overlapping instances own one retained primitive payload
+FAIL: failed candidate leaves every previously admitted route and payload intact
+FAIL: failed candidate leaves every previously admitted route and payload intact
+FAIL: failed candidate leaves every previously admitted route and payload intact
+FAIL: failed candidate leaves every previously admitted route and payload intact
+FAIL: failed candidate leaves every previously admitted route and payload intact
+FAIL: failed candidate leaves every previously admitted route and payload intact
+FAIL: failed candidate leaves every previously admitted route and payload intact
+FAIL: failed candidate leaves every previously admitted route and payload intact
+FAIL: failed candidate leaves every previously admitted route and payload intact
+FAIL: failed candidate leaves every previously admitted route and payload intact
+FAIL: selected providers retain alias families without duplicate consumer geometry/textures
+14 static glTF asset assertion(s) failed
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   3.85 sec
+
+The following tests FAILED:
+	 90 - horde_rt_static_gltf_asset_tests (Failed)
+Errors while running CTest

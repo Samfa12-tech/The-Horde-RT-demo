@@ -1,0 +1,7 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  DiagnosticWindow.cpp
+  ProbeScene.cpp
+  Provider.cpp
+  Generating Code...
+  frozen_mist.vcxproj -> <repo>\reports\mist-interval-prototype\build\Debug\frozen_mist.exe

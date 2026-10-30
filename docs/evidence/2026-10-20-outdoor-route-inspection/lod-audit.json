@@ -1,0 +1,71 @@
+{
+  "baseCommit": "4cd8681e43e645b8a7e5699cd33de5a62efdf450",
+  "scope": "read-only actual GLB accessors, no candidate asset or runtime change",
+  "staticRtVertexStrideBytes": 64,
+  "nativeIndexStrideBytes": 4,
+  "counts": {
+    "Pine": 32,
+    "Alder": 32
+  },
+  "assets": [
+    {
+      "path": "assets/models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb",
+      "bytes": 1402952,
+      "sha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+      "primitives": [
+        {
+          "material": "Original opaque hanging woodland moss",
+          "triangles": 156,
+          "vertices": 156
+        },
+        {
+          "material": "Original opaque pine needle sprays",
+          "triangles": 2928,
+          "vertices": 3660
+        },
+        {
+          "material": "Original charcoal-gray ridged bark",
+          "triangles": 1916,
+          "vertices": 1786
+        }
+      ],
+      "vertices": 5602,
+      "triangles": 5000,
+      "nativeVertexBytes": 358528,
+      "nativeIndexBytes": 60000,
+      "nativeVertexPlusIndexBytes": 418528
+    },
+    {
+      "path": "assets/models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb",
+      "bytes": 1436640,
+      "sha256": "f545d7e08370b5e451597c3fd903d8d93b6703d11c75039181a04f7f5312e0bb",
+      "primitives": [
+        {
+          "material": "Original opaque hanging woodland moss",
+          "triangles": 156,
+          "vertices": 156
+        },
+        {
+          "material": "Original charcoal-gray ridged bark",
+          "triangles": 2306,
+          "vertices": 2176
+        },
+        {
+          "material": "Original opaque alder leaves",
+          "triangles": 2640,
+          "vertices": 3300
+        }
+      ],
+      "vertices": 5632,
+      "triangles": 5102,
+      "nativeVertexBytes": 360448,
+      "nativeIndexBytes": 61224,
+      "nativeVertexPlusIndexBytes": 421672
+    }
+  ],
+  "all64NativeVertexPlusIndexBytes": 26886400,
+  "all64Triangles": 323264,
+  "selectedNextExperiment": "One original pine LOD2 derivative in a Debug-only static bake comparison, preserve bark/root/contact and existing material/instance ownership; inspect actual RT near/mid/far silhouettes and secondary visibility, measure exact payload/allocation/GPU deltas. No default replacement or runtime distance switching in this audit.",
+  "wind": "Not implemented: current static bake has no bounded deformation/refit owner; do not refit entire forest or raise TLAS cap for a quick wind toggle.",
+  "candidateMeasurements": null
+}

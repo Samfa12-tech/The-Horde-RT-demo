@@ -1,0 +1,19 @@
+{
+  "scope": "Debug Diagnostic ordinary static-detail and Keeper retirement/restoration route; not Shipping or owner acceptance",
+  "maximumSimulationTicksPerRender": 4,
+  "sources": {
+    "src/platform/windows/WindowsChapterRoundTripCapture.inl": "9f3ce63d4647afb38cbe756730e1222191ae735d3178c1abf3d19d77787f0d54",
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": "28e6e35fa6f55d061d9d2edbeaa60e74c168e68b5b733cf61cd9270fe5f81ad0",
+    "src/vulkan/raytracing/RtStaticMeshSlot.cpp": "d9cb03a54c7b2c965771bf7fe95dfd9a42c51fb35392d86f6d5f3cfd52d68dd3",
+    "src/scene/CorridorStaticDetail.h": "ca5e5f2a73f7ab6d3a715133c25412f434bd9aebf637c7645600c655a196d465",
+    "src/platform/windows/DiagnosticWindow.cpp": "d59957b49bde0a917c3da5e75e55e012c5a9d7a0640cce72951fed29335a252a",
+    "src/gameplay/simulation/StaticDetailLease.h": "df676e18d22656f82c1ad7c66ee4ce24181c1eb6e171107e6a9e435d760b1f92",
+    "src/gameplay/simulation/GameSimulation.cpp": "ab83576d92bdb7cf374d37d4b6570ad8e2896b87e816395811a8e17027377239",
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "129a477304e574da834d15f81adfaefdb6c1e952d2fb716805e44f2116efbdd8",
+    "src/scene/CorridorStaticDetailFaces.h": "433af75a893cd7a0492dcd977e5fb9f588cb6a31447b5a5fd8a7c76766f17881"
+  },
+  "simulationHz": 60,
+  "executableSha256": "fcdc1b6fbaac7c68de0d0bbe244004b80e15822090c51afc3f281b20859eb6f5",
+  "deadlineSeconds": 180,
+  "backend": "RayTracingPipeline"
+}

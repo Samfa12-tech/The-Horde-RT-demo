@@ -1,0 +1,8 @@
+Test-HeldItemPackage : Cannot find an overload for "Contains" and the argument count: "2".
+At C:\Users\sam_s\Documents\the Horde RT 
+Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\test-held-item-package-contract.ps1:162 char:1
++ Test-HeldItemPackage -PackagePath $AndroidApkPath -LicenceEntry "asse ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [Test-HeldItemPackage], MethodException
+    + FullyQualifiedErrorId : MethodCountCouldNotFindBest,Test-HeldItemPackage
+ 

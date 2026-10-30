@@ -1,0 +1,14 @@
+PLAY_SESSION_ELAPSED phase=suite-start totalMs=0 sincePreviousMs=0 tick=0 checks=0 failures=0
+PLAY_SESSION_ELAPSED phase=terrain-ready totalMs=1366 sincePreviousMs=1366 tick=0 checks=0 failures=0
+PLAY_SESSION_ELAPSED phase=opt-in-earned-journey-start totalMs=1366 sincePreviousMs=0 tick=0 checks=0 failures=0
+PLAY_SESSION_ELAPSED phase=earned-lower-boundary totalMs=1841 sincePreviousMs=474 tick=3228 checks=8 failures=0
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+PLAY_SESSION_ELAPSED phase=earned-upper-boundary totalMs=3728 sincePreviousMs=1886 tick=3892 checks=29 failures=0
+ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+PLAY_SESSION_ELAPSED phase=earned-upper-recovery-complete totalMs=8793 sincePreviousMs=5065 tick=3892 checks=59 failures=0
+KIT_NATURAL_TURN_ROUTE maximumDistance=6.00049 laggingTicks=317 playerAheadTetherStall=0 waypoint=8
+PLAY_SESSION_ELAPSED phase=earned-forest-endpoint totalMs=20238 sincePreviousMs=11445 tick=7088 checks=66 failures=0
+PLAY_SESSION_ELAPSED phase=earned-return-start totalMs=22613 sincePreviousMs=2374 tick=122 checks=84 failures=0
+PLAY_SESSION_ELAPSED phase=earned-return-complete totalMs=38588 sincePreviousMs=15975 tick=3204 checks=85 failures=0
+PLAY_SESSION_ELAPSED phase=earned-journey-end totalMs=38591 sincePreviousMs=2 tick=7947 checks=92 failures=0
+92 opt-in earned-route diagnosis checks, 0 failures

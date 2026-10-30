@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "policy": "closed-roster",
+  "asset": "forest-tree-pair-v1-lod1",
+  "files": [
+    {
+      "path": "horde-irregular-pine-v1-lod1.glb",
+      "bytes": 1402952,
+      "sha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+      "originalLod1Sha256": "77c793480abff4ed7515b224a1b4fc55ac840f27d0b1ef9a17dd1ca58ee1ee2c",
+      "triangles": 5000,
+      "metresPerUnit": 1.0,
+      "boundsMetres": [3.751, 8.690, 3.394],
+      "source": "assets/models/world/source/forest-tree-pair-v1/runtime/horde-irregular-pine-v1-lod1.glb",
+      "tangentDerivation": "Blender 5.2 export added TANGENT; source positions/winding/UV0 and decoded image pixels were preserved; minimum normal-direction dot 0.999999813. Tracked receipt: assets/models/world/source/forest-tree-pair-v1/evidence/runtime-tangents/pine-lod1-tangent-receipt.json"
+    },
+    {
+      "path": "horde-upright-alder-v1-lod1.glb",
+      "bytes": 1436640,
+      "sha256": "f545d7e08370b5e451597c3fd903d8d93b6703d11c75039181a04f7f5312e0bb",
+      "originalLod1Sha256": "38333b05a996d46942fb9fddb022e128a0591c372582b520f4d051a308e9282d",
+      "triangles": 5102,
+      "metresPerUnit": 1.0,
+      "boundsMetres": [3.353, 8.478, 3.085],
+      "source": "assets/models/world/source/forest-tree-pair-v1/runtime/horde-upright-alder-v1-lod1.glb",
+      "tangentDerivation": "Blender 5.2 export added TANGENT; source positions/winding/UV0 and decoded image pixels were preserved; minimum normal-direction dot 0.999999894. Tracked receipt: assets/models/world/source/forest-tree-pair-v1/evidence/runtime-tangents/alder-lod1-tangent-receipt.json"
+    }
+  ],
+  "note": "Runtime GLBs are owner-authored LOD1 derivatives with the mapped bark TANGENT attribute generated for native normal-map import. Exact original LOD1 masters remain in the 48-file source package roster; tracked Blender comparison receipts are in its separate evidence/runtime-tangents directory. World placement is baked into the existing static owner at scale 1."
+}

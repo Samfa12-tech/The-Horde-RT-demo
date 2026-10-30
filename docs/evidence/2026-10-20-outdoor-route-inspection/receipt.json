@@ -1,0 +1,1442 @@
+{
+  "date": "2026-10-20",
+  "sourceBase": "4cd8681e43e645b8a7e5699cd33de5a62efdf450",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "draftPr": 27,
+  "sourceFreezeVerifiedFiles": 3,
+  "change": "Three diagnostic exterior fixtures use existing accepted-hit/death seed/current STEP rules; production placement/collision/save/lighting unchanged",
+  "host": {
+    "passed": 6,
+    "failed": 0,
+    "seconds": 26.89,
+    "selectedRegistrations": [
+      "horde_rt_chapter_step_movement_tests",
+      "horde_rt_development_static_asset_tests",
+      "horde_rt_forest_deadwood_tests",
+      "horde_rt_forest_dressing_tests",
+      "horde_rt_rescue_journey_integration_tests",
+      "horde_rt_chapter_terrain_journey_tests"
+    ],
+    "initialFailures": 6,
+    "initialReproducedPosition": [
+      -23.8234,
+      -3.55062
+    ],
+    "rootCentre": [
+      -23.5,
+      -3.4
+    ],
+    "rootFootprintSamples": 4992,
+    "exposedRoots": 0
+  },
+  "builds": {
+    "WindowsDebug": "PASS exit0",
+    "AndroidDebug": "PASS exit0, offline max-workers2",
+    "androidFlags": [
+      {
+        "abi": "arm64-v8a",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      },
+      {
+        "abi": "armeabi-v7a",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      },
+      {
+        "abi": "x86",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      },
+      {
+        "abi": "x86_64",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION": "Shipping",
+        "HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY": "Mobile"
+      }
+    ],
+    "androidLibraries": [
+      {
+        "abi": "arm64-v8a",
+        "bytes": 5164120,
+        "sha256": "36ed9ee8de245eca015e59c5a885ca7f942eb9508586e564f18a6bcea9c0f7f0",
+        "elfMachine": 183
+      },
+      {
+        "abi": "armeabi-v7a",
+        "bytes": 4455352,
+        "sha256": "bac193acc1737d394e73f3d8f4b27b1e220d9f2218289e4658990d165711d13c",
+        "elfMachine": 40
+      },
+      {
+        "abi": "x86",
+        "bytes": 5756444,
+        "sha256": "3d7f7565a8089f7881bcddca486c7afc740375ca3d820b7bc38805d5c9366e0d",
+        "elfMachine": 3
+      },
+      {
+        "abi": "x86_64",
+        "bytes": 5427952,
+        "sha256": "931f4385092ac68a53b7dcceae5b9204d7f921da5f3347f8cb2afb08c94527d2",
+        "elfMachine": 62
+      }
+    ],
+    "WindowsReleaseApplication": "Not rerun; Debug-only capture fixtures compile under selected Release host tests",
+    "JavaTests": "Not rerun; no Java change"
+  },
+  "artifacts": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+      "bytes": 13936128,
+      "sha256": "c35cdcae32775af070a81bfd953d03efa640e0e774c8ec52bad6bd6aae970cfb"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+      "bytes": 186118459,
+      "sha256": "0c14de22eacf8a96eec19259b4d96629d58d0d558a8457401e88c39e0f7ba65c"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_forest_dressing_tests.exe",
+      "bytes": 1145856,
+      "sha256": "84af36c0f6bf023e5824b2da94fc91c34ea4a1e81ce65e7bd29a88310991680c"
+    }
+  ],
+  "captures": [
+    {
+      "label": "first-bend",
+      "manifest": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\outdoor-composition-20261020-r2\\first-bend\\capture-manifest.json",
+        "bytes": 10697,
+        "sha256": "f908ef4d4112737a7cdc126b4806940e5117373c9a861377cb86125c5c68a8cb"
+      },
+      "image": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\outdoor-composition-20261020-r2\\first-bend\\201-chapter-forest-first-bend.png",
+        "bytes": 911782,
+        "sha256": "da26345d5d17b2958494ed0aa0c85f83250be26601c9af7b3f2dcc7db2c12775"
+      },
+      "camera": {
+        "x": -15.694263,
+        "z": 0.202648,
+        "yaw": -3.009,
+        "pitch": -0.15
+      },
+      "requestedCamera": {
+        "x": -15.7,
+        "z": 0.2,
+        "yaw": -3.009,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "resources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48278656,
+        "deviceLocalBytes": 372437216
+      },
+      "completedFrame": {
+        "schema": 1,
+        "identity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 12,
+          "recordSerial": 12,
+          "submissionSerial": 12,
+          "completionSerial": 12,
+          "simulationTick": 1720,
+          "frameSlot": 0
+        },
+        "pipeline": {
+          "executionBackend": "RayTracingPipeline",
+          "instrumentation": "diagnostic",
+          "dielectricQuality": "high",
+          "bundleKey": "diagnostic_high_pair",
+          "opaqueFast": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          },
+          "activeStrategy": "generic-dielectric",
+          "activeKey": "diagnostic_high_generic_dielectric",
+          "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+          "waterQuality": "high"
+        },
+        "dispatch": {
+          "sceneReady": true,
+          "rtDispatchRecorded": true,
+          "swapchainCopyRecorded": true
+        },
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                -15.6432953,
+                1.66550636,
+                0.811308563,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "resources": {
+          "bufferCount": 51,
+          "memoryAllocationCount": 60,
+          "bottomLevelAccelerationStructureCount": 20,
+          "topLevelAccelerationStructureCount": 1,
+          "tlasInstanceCount": 28,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "descriptorSetCount": 1,
+          "hostVisibleBytes": 48278656,
+          "deviceLocalBytes": 372437216
+        },
+        "player": {
+          "skinCadenceHz": 60,
+          "skinUpdateCount": 1,
+          "maximumSocketErrorMicrometres": 10,
+          "primaryPixelCountAvailable": true,
+          "primaryPixelCount": 22391,
+          "primaryVisible": true
+        },
+        "dielectric": {
+          "status": "valid",
+          "available": true,
+          "compiled": true,
+          "completedSubmissionSerial": 12,
+          "readCount": 12,
+          "resetCount": 12,
+          "counters": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            312,
+            312,
+            312,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            961,
+            0,
+            0,
+            0,
+            4,
+            312,
+            135,
+            794,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            22391,
+            501,
+            11449
+          ],
+          "detail": "Diagnostic counters were collected after the owning fence."
+        },
+        "gpu": {
+          "status": "valid",
+          "available": true,
+          "completedSubmissionSerial": 12,
+          "wholeRtGpuMs": 6.955264,
+          "timestampValidBits": 64,
+          "timestampPeriodPicoseconds": 1000,
+          "sampleCount": 12,
+          "unavailableResultCount": 0,
+          "errorCount": 0,
+          "detail": "GPU RT command-buffer timing is available."
+        },
+        "stages": {
+          "status": "valid",
+          "simulationStepCpuMs": 0.0,
+          "skinCpuMs": 0.0,
+          "playerSkinCpuMs": 0.0,
+          "characterSkinCpuMs": 0.0,
+          "dynamicUploadCpuMs": 0.0687,
+          "blasRefitRecordCpuMs": 0.0324,
+          "tlasUpdateRecordCpuMs": 0.0068,
+          "traceCopyRecordCpuMs": 0.0311,
+          "frameFenceWaitCpuMs": 6.7476,
+          "imageAcquireCpuMs": 0.008,
+          "queueSubmitCpuMs": 0.0506,
+          "presentCallCpuMs": 1.8494,
+          "wholeFrameCycleCpuMs": 10.2696,
+          "poseCopyCpuMs": 0.0,
+          "workInvocationCounts": [
+            0,
+            0,
+            0,
+            0,
+            9,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "byteCounts": [
+            0,
+            0,
+            0,
+            0,
+            75360,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "operationCounts": [
+            0,
+            0,
+            0,
+            0,
+            9,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ]
+        },
+        "presentation": {
+          "outcome": "presented",
+          "presented": true,
+          "lastSuccessfulPresentSubmissionSerial": 12,
+          "finalIdleCompletion": true
+        },
+        "cpuBenchmarkEligible": true,
+        "benchmarkEligible": true
+      },
+      "settlingFrames": 12
+    },
+    {
+      "label": "second-bend",
+      "manifest": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\outdoor-composition-20261020-r2\\second-bend\\capture-manifest.json",
+        "bytes": 10709,
+        "sha256": "fe69733b449c5bc33c430b4289cedd9df96647dce1723a2191c74846d47709f4"
+      },
+      "image": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\outdoor-composition-20261020-r2\\second-bend\\202-chapter-forest-second-bend.png",
+        "bytes": 939256,
+        "sha256": "5ce9d85747c4054fbaf597bbb0972d615d81f7b6def9ec4d7bd7e152b093db5e"
+      },
+      "camera": {
+        "x": -17.700905,
+        "z": 15.206802,
+        "yaw": 1.914,
+        "pitch": -0.15
+      },
+      "requestedCamera": {
+        "x": -17.700001,
+        "z": 15.2,
+        "yaw": 1.914,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "resources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48278656,
+        "deviceLocalBytes": 372437216
+      },
+      "completedFrame": {
+        "schema": 1,
+        "identity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 12,
+          "recordSerial": 12,
+          "submissionSerial": 12,
+          "completionSerial": 12,
+          "simulationTick": 2018,
+          "frameSlot": 0
+        },
+        "pipeline": {
+          "executionBackend": "RayTracingPipeline",
+          "instrumentation": "diagnostic",
+          "dielectricQuality": "high",
+          "bundleKey": "diagnostic_high_pair",
+          "opaqueFast": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          },
+          "activeStrategy": "generic-dielectric",
+          "activeKey": "diagnostic_high_generic_dielectric",
+          "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+          "waterQuality": "high"
+        },
+        "dispatch": {
+          "sceneReady": true,
+          "rtDispatchRecorded": true,
+          "swapchainCopyRecorded": true
+        },
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                -17.0953293,
+                0.566203356,
+                15.2849073,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "resources": {
+          "bufferCount": 51,
+          "memoryAllocationCount": 60,
+          "bottomLevelAccelerationStructureCount": 20,
+          "topLevelAccelerationStructureCount": 1,
+          "tlasInstanceCount": 28,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "descriptorSetCount": 1,
+          "hostVisibleBytes": 48278656,
+          "deviceLocalBytes": 372437216
+        },
+        "player": {
+          "skinCadenceHz": 60,
+          "skinUpdateCount": 1,
+          "maximumSocketErrorMicrometres": 10,
+          "primaryPixelCountAvailable": true,
+          "primaryPixelCount": 22236,
+          "primaryVisible": true
+        },
+        "dielectric": {
+          "status": "valid",
+          "available": true,
+          "compiled": true,
+          "completedSubmissionSerial": 12,
+          "readCount": 12,
+          "resetCount": 12,
+          "counters": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            315,
+            315,
+            315,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1107,
+            0,
+            0,
+            0,
+            0,
+            315,
+            149,
+            35708,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            22236,
+            491,
+            11448
+          ],
+          "detail": "Diagnostic counters were collected after the owning fence."
+        },
+        "gpu": {
+          "status": "valid",
+          "available": true,
+          "completedSubmissionSerial": 12,
+          "wholeRtGpuMs": 5.063968,
+          "timestampValidBits": 64,
+          "timestampPeriodPicoseconds": 1000,
+          "sampleCount": 12,
+          "unavailableResultCount": 0,
+          "errorCount": 0,
+          "detail": "GPU RT command-buffer timing is available."
+        },
+        "stages": {
+          "status": "valid",
+          "simulationStepCpuMs": 0.0,
+          "skinCpuMs": 0.0,
+          "playerSkinCpuMs": 0.0,
+          "characterSkinCpuMs": 0.0,
+          "dynamicUploadCpuMs": 0.0367,
+          "blasRefitRecordCpuMs": 0.0219,
+          "tlasUpdateRecordCpuMs": 0.0067,
+          "traceCopyRecordCpuMs": 0.0233,
+          "frameFenceWaitCpuMs": 5.3005,
+          "imageAcquireCpuMs": 0.0045,
+          "queueSubmitCpuMs": 0.0314,
+          "presentCallCpuMs": 0.1007,
+          "wholeFrameCycleCpuMs": 7.301,
+          "poseCopyCpuMs": 0.0,
+          "workInvocationCounts": [
+            0,
+            0,
+            0,
+            0,
+            9,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "byteCounts": [
+            0,
+            0,
+            0,
+            0,
+            75360,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "operationCounts": [
+            0,
+            0,
+            0,
+            0,
+            9,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ]
+        },
+        "presentation": {
+          "outcome": "presented",
+          "presented": true,
+          "lastSuccessfulPresentSubmissionSerial": 12,
+          "finalIdleCompletion": true
+        },
+        "cpuBenchmarkEligible": true,
+        "benchmarkEligible": true
+      },
+      "settlingFrames": 12
+    },
+    {
+      "label": "lookout",
+      "manifest": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\outdoor-composition-20261020-r2\\lookout\\capture-manifest.json",
+        "bytes": 10671,
+        "sha256": "84dca77089771f22f8fea39f71568518d781ab566ae21f7e072499ffa16738ed"
+      },
+      "image": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\outdoor-composition-20261020-r2\\lookout\\203-chapter-forest-lookout.png",
+        "bytes": 792056,
+        "sha256": "3acf77c5012c9d7a1b53b7dd28d9603c272ca272686e2e115b069eece0008a7f"
+      },
+      "camera": {
+        "x": 13.304916,
+        "z": 36.204624,
+        "yaw": 2.51,
+        "pitch": -0.15
+      },
+      "requestedCamera": {
+        "x": 13.3,
+        "z": 36.200001,
+        "yaw": 2.51,
+        "pitch": -0.15
+      },
+      "backend": "RayTracingPipeline",
+      "resources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48278656,
+        "deviceLocalBytes": 372437216
+      },
+      "completedFrame": {
+        "schema": 1,
+        "identity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 12,
+          "recordSerial": 12,
+          "submissionSerial": 12,
+          "completionSerial": 12,
+          "simulationTick": 2757,
+          "frameSlot": 0
+        },
+        "pipeline": {
+          "executionBackend": "RayTracingPipeline",
+          "instrumentation": "diagnostic",
+          "dielectricQuality": "high",
+          "bundleKey": "diagnostic_high_pair",
+          "opaqueFast": {
+            "key": "diagnostic_high_opaque_fast",
+            "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+          },
+          "genericDielectric": {
+            "key": "diagnostic_high_generic_dielectric",
+            "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+          },
+          "activeStrategy": "generic-dielectric",
+          "activeKey": "diagnostic_high_generic_dielectric",
+          "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+          "waterQuality": "high"
+        },
+        "dispatch": {
+          "sceneReady": true,
+          "rtDispatchRecorded": true,
+          "swapchainCopyRecorded": true
+        },
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                13.7660074,
+                -0.0268690884,
+                36.6128922,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "resources": {
+          "bufferCount": 51,
+          "memoryAllocationCount": 60,
+          "bottomLevelAccelerationStructureCount": 20,
+          "topLevelAccelerationStructureCount": 1,
+          "tlasInstanceCount": 28,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "descriptorSetCount": 1,
+          "hostVisibleBytes": 48278656,
+          "deviceLocalBytes": 372437216
+        },
+        "player": {
+          "skinCadenceHz": 60,
+          "skinUpdateCount": 1,
+          "maximumSocketErrorMicrometres": 10,
+          "primaryPixelCountAvailable": true,
+          "primaryPixelCount": 22357,
+          "primaryVisible": true
+        },
+        "dielectric": {
+          "status": "valid",
+          "available": true,
+          "compiled": true,
+          "completedSubmissionSerial": 12,
+          "readCount": 12,
+          "resetCount": 12,
+          "counters": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            269,
+            269,
+            269,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            955,
+            0,
+            0,
+            0,
+            6,
+            269,
+            130,
+            16669,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            22357,
+            500,
+            11443
+          ],
+          "detail": "Diagnostic counters were collected after the owning fence."
+        },
+        "gpu": {
+          "status": "valid",
+          "available": true,
+          "completedSubmissionSerial": 12,
+          "wholeRtGpuMs": 2.464928,
+          "timestampValidBits": 64,
+          "timestampPeriodPicoseconds": 1000,
+          "sampleCount": 12,
+          "unavailableResultCount": 0,
+          "errorCount": 0,
+          "detail": "GPU RT command-buffer timing is available."
+        },
+        "stages": {
+          "status": "valid",
+          "simulationStepCpuMs": 0.0,
+          "skinCpuMs": 0.0,
+          "playerSkinCpuMs": 0.0,
+          "characterSkinCpuMs": 0.0,
+          "dynamicUploadCpuMs": 0.0105,
+          "blasRefitRecordCpuMs": 0.0234,
+          "tlasUpdateRecordCpuMs": 0.006,
+          "traceCopyRecordCpuMs": 0.0268,
+          "frameFenceWaitCpuMs": 6.434,
+          "imageAcquireCpuMs": 0.0041,
+          "queueSubmitCpuMs": 0.0494,
+          "presentCallCpuMs": 0.0932,
+          "wholeFrameCycleCpuMs": 8.3051,
+          "poseCopyCpuMs": 0.0,
+          "workInvocationCounts": [
+            0,
+            0,
+            0,
+            0,
+            9,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "byteCounts": [
+            0,
+            0,
+            0,
+            0,
+            75360,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "operationCounts": [
+            0,
+            0,
+            0,
+            0,
+            9,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ]
+        },
+        "presentation": {
+          "outcome": "presented",
+          "presented": true,
+          "lastSuccessfulPresentSubmissionSerial": 12,
+          "finalIdleCompletion": true
+        },
+        "cpuBenchmarkEligible": true,
+        "benchmarkEligible": true
+      },
+      "settlingFrames": 12
+    },
+    {
+      "label": "lookout-query",
+      "manifest": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\outdoor-composition-20261020-r2\\lookout-query\\capture-manifest.json",
+        "bytes": 10767,
+        "sha256": "f1ec6adfc6845fa457a0ea914a7f904e4174f7c8d2f66b44b8ea1ee9d26dd410"
+      },
+      "image": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\outdoor-composition-20261020-r2\\lookout-query\\203-chapter-forest-lookout.png",
+        "bytes": 791945,
+        "sha256": "6e96efb9289f155902afb38b396878a5fb4f789eec51203a62acf6fe1602637d"
+      },
+      "camera": {
+        "x": 13.304916,
+        "z": 36.204624,
+        "yaw": 2.51,
+        "pitch": -0.15
+      },
+      "requestedCamera": {
+        "x": 13.3,
+        "z": 36.200001,
+        "yaw": 2.51,
+        "pitch": -0.15
+      },
+      "backend": "RayQueryCompute",
+      "resources": {
+        "bufferCount": 49,
+        "memoryAllocationCount": 58,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48278144,
+        "deviceLocalBytes": 372437216
+      },
+      "completedFrame": {
+        "schema": 1,
+        "identity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 1,
+          "recordAttemptSerial": 12,
+          "recordSerial": 12,
+          "submissionSerial": 12,
+          "completionSerial": 12,
+          "simulationTick": 2757,
+          "frameSlot": 0
+        },
+        "pipeline": {
+          "executionBackend": "RayQueryCompute",
+          "instrumentation": "diagnostic",
+          "dielectricQuality": "high",
+          "bundleKey": "rayquery_compute_diagnostic_high_pair",
+          "opaqueFast": {
+            "key": "rayquery_compute_diagnostic_high_opaque_fast",
+            "sha256": "98cec0ff16f511aac0d3a41c2a91542d2a18ebfc431ec3edd75d9abc5b10761b"
+          },
+          "genericDielectric": {
+            "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+            "sha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f"
+          },
+          "activeStrategy": "generic-dielectric",
+          "activeKey": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "activeSha256": "359469cc391aa787011c9d3c9ba4c84d99779cbb9a0fbe7ce5723f1783b6ab5f",
+          "waterQuality": "high"
+        },
+        "dispatch": {
+          "sceneReady": true,
+          "rtDispatchRecorded": true,
+          "swapchainCopyRecorded": true
+        },
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                13.7660074,
+                -0.0268690884,
+                36.6128922,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "resources": {
+          "bufferCount": 49,
+          "memoryAllocationCount": 58,
+          "bottomLevelAccelerationStructureCount": 20,
+          "topLevelAccelerationStructureCount": 1,
+          "tlasInstanceCount": 28,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 0,
+          "descriptorSetCount": 1,
+          "hostVisibleBytes": 48278144,
+          "deviceLocalBytes": 372437216
+        },
+        "player": {
+          "skinCadenceHz": 60,
+          "skinUpdateCount": 1,
+          "maximumSocketErrorMicrometres": 10,
+          "primaryPixelCountAvailable": true,
+          "primaryPixelCount": 22357,
+          "primaryVisible": true
+        },
+        "dielectric": {
+          "status": "valid",
+          "available": true,
+          "compiled": true,
+          "completedSubmissionSerial": 12,
+          "readCount": 12,
+          "resetCount": 12,
+          "counters": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            269,
+            269,
+            269,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            955,
+            0,
+            0,
+            0,
+            9,
+            269,
+            130,
+            16672,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            22357,
+            500,
+            11443
+          ],
+          "detail": "Diagnostic counters were collected after the owning fence."
+        },
+        "gpu": {
+          "status": "valid",
+          "available": true,
+          "completedSubmissionSerial": 12,
+          "wholeRtGpuMs": 2.881376,
+          "timestampValidBits": 64,
+          "timestampPeriodPicoseconds": 1000,
+          "sampleCount": 12,
+          "unavailableResultCount": 0,
+          "errorCount": 0,
+          "detail": "GPU RT command-buffer timing is available."
+        },
+        "stages": {
+          "status": "valid",
+          "simulationStepCpuMs": 0.0,
+          "skinCpuMs": 0.0,
+          "playerSkinCpuMs": 0.0,
+          "characterSkinCpuMs": 0.0,
+          "dynamicUploadCpuMs": 0.0349,
+          "blasRefitRecordCpuMs": 0.0381,
+          "tlasUpdateRecordCpuMs": 0.0085,
+          "traceCopyRecordCpuMs": 0.0284,
+          "frameFenceWaitCpuMs": 0.005,
+          "imageAcquireCpuMs": 0.0051,
+          "queueSubmitCpuMs": 0.0455,
+          "presentCallCpuMs": 4.4734,
+          "wholeFrameCycleCpuMs": 6.0108,
+          "poseCopyCpuMs": 0.0,
+          "workInvocationCounts": [
+            0,
+            0,
+            0,
+            0,
+            9,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "byteCounts": [
+            0,
+            0,
+            0,
+            0,
+            75360,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "operationCounts": [
+            0,
+            0,
+            0,
+            0,
+            9,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ]
+        },
+        "presentation": {
+          "outcome": "presented",
+          "presented": true,
+          "lastSuccessfulPresentSubmissionSerial": 12,
+          "finalIdleCompletion": true
+        },
+        "cpuBenchmarkEligible": true,
+        "benchmarkEligible": true
+      },
+      "settlingFrames": 12
+    }
+  ],
+  "captureBoundary": "Four death-seeded diagnostic inspections after 12 settling frames each; actual completed RT image proof; no earned Keeper/save, full 360-degree artistic pass or performance claim",
+  "initialCapture": {
+    "exitCode": 1,
+    "capturedShots": 0,
+    "reason": "Legacy diagnostic movement blocked by actual STEP root; native owner exited; unchanged settings, no retry until source correction"
+  },
+  "historicalImagesInspected": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\woodland64-grounded-lookout-pipeline\\203-chapter-forest-lookout.png",
+      "bytes": 744473,
+      "sha256": "9bbe9a26e03bc60a26aa6130f41611e501ada9a0eaf85015f2a1c5e4a886c3b7"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\woodland64-lookout-settled-pipeline\\203-chapter-forest-lookout.png",
+      "bytes": 812618,
+      "sha256": "e1409a4bebd4c98a83ac6de14e397c46a73fe248469017eea29e794152f32ff1"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\regional-water-runtime-a4\\river-bend-119.png",
+      "bytes": 1109475,
+      "sha256": "7ce59e4da85a57ed6b8fdc8b02aa72e664951517f8d010037752aaca81ba3799"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-campaign-fixtures-lookout-objective-20261020-r2\\windows-loaded-lookout.png",
+      "bytes": 1384997,
+      "sha256": "aded6df716fd0d35f68a5f528e0be3299e615af12a9ed165ccfded056f4d551a"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\deadwood-final-lookout\\203-chapter-forest-lookout.png",
+      "bytes": 735317,
+      "sha256": "29fb21103abe66025bd6912263f111a3c382e8540c39b0eb6d7be868d2d69308"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-14-ground-material-balance\\gallery\\ground-material-pipeline-route-contact-1.jpg",
+      "bytes": 229540,
+      "sha256": "5277ae2b655e9552895468511a5ba64a5eb78c2b67cc2cc4424f257f183758ee"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-14-ground-material-balance\\gallery\\ground-material-pipeline-route-contact-2.jpg",
+      "bytes": 235791,
+      "sha256": "6c732c6f25d81709ae5ac07bc797f8ed138162ffcbf3a67a84412ff5f46aa264"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-14-ground-material-balance\\gallery\\ground-material-pipeline-route-contact-3.jpg",
+      "bytes": 194121,
+      "sha256": "d00bf298a3c1c896be05b7c6c2848073dca6eeced285fbd442e250746dfae5bb"
+    }
+  ],
+  "historicalBoundary": "Context only; woodland64-lookout-settled manifest incomplete (missing primary arms); no same-state lighting comparison against corrected captures",
+  "compositionFinding": "Selected current views retain readable trail and visible village/church; no demonstrated floating/intersection placement defect warrants moving geometry. Understory footprint coverage remains limited.",
+  "lodAudit": "lod-audit.json",
+  "nextBoundedExperiment": "One original pine LOD2 derivative, Debug-only static-bake comparison at fixed near/mid/far views with exact payload/native allocation/GPU deltas and secondary visibility; no candidate generated/adopted and no saving claimed",
+  "unchangedTrackedPaths": [
+    "assets",
+    "shaders",
+    "src/gameplay/simulation",
+    "src/gameplay/campaign",
+    "src/gameplay/traversal",
+    "src/scene",
+    "src/vulkan",
+    "android/app/src",
+    "third_party",
+    "docs/design/HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md"
+  ],
+  "canonicalOwnerFiles": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\ASSET_LICENSES.md",
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\PROJECT_MEMORY.md",
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    }
+  ],
+  "sixRecoveryDecisions": "Unchanged and pending; do not block independent work",
+  "independentReview": "No actionable defect; narrow scoped diagnostic seed, genuine prepared-root motor proof, legacy below-ground/collision/saves/lighting settings preserved; reviewer performed no builds/captures",
+  "audioHapticManualRevalidationRequired": false,
+  "reason": "Diagnostic fixture-only seed change; production audio/feedback unchanged",
+  "phoneOperations": false,
+  "mobileMistOffPreserved": true,
+  "ownerSettingsUnchanged": true,
+  "foregroundBoundary": "All outer foreground API samples null; native window unshown, no external foreground identity attributed",
+  "publicPushMergeRelease": false,
+  "ReefOperations": false,
+  "newWorktree": false,
+  "noOwnedProcessesPending": true
+}

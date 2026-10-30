@@ -1,0 +1,15 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 90: horde_rt_bellwether_shell_tests
+1/1 Test #90: horde_rt_bellwether_shell_tests ...***Failed    1.16 sec
+FAIL: all 966 bounded silhouette/facade triangles are preserved
+FAIL: bounded authored facade relief survives native import
+Bellwether native placement/material/rollback failed.
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   1.18 sec
+
+The following tests FAILED:
+	 90 - horde_rt_bellwether_shell_tests (Failed)
+Errors while running CTest

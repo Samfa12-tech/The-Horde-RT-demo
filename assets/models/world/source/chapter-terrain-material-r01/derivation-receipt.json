@@ -1,0 +1,24 @@
+{
+  "scope": "Linear PBR material-only tuning; no geometry/light/shader/texture/limit changes",
+  "parentSource": "assets/models/world/source/chapter-terrain-r21",
+  "modelSha256": "fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854",
+  "baselineManifestSha256": "1ddbc7b615b9b03f99be98c181d88d456c256d6e9b672f937486388c3fba952b",
+  "candidateManifestSha256": "da0762e1250e9586022c25e1d1600c5e246ca542524cde137185f98f1fe0de13",
+  "recipeSha256": "a305f117f9233bc5acae6c789efa6186a06133a749a59f15ae55a08120803628",
+  "baseColorFactor": [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+  ],
+  "unchangedTextureArraySha256": {
+    "assets/textures/props/runtime/chapter-terrain/base-color.android.ktx2": "114afde2675443ff09806692e8e42f95b7caec0518b6c5a2f85a7917a8667395",
+    "assets/textures/props/runtime/chapter-terrain/base-color.windows.ktx2": "91fa9c1870722069ef930df44f88963f1d38ddefd8e689c26c9ca5ecbe8712b9",
+    "assets/textures/props/runtime/chapter-terrain/normal.android.ktx2": "1da244cbd8006b9bd07573435ae0a050a497033a2784f636a9bad5996dc80c78",
+    "assets/textures/props/runtime/chapter-terrain/normal.windows.ktx2": "2d138ef174528932dcd2c4326d5bfc85663c0fc453ebdccfcbcdec39768db963",
+    "assets/textures/props/runtime/chapter-terrain/orm.android.ktx2": "7f0ca5ad53159ee1ebb31c46a47384511757605375766b4a7d48ea8e61e2f845",
+    "assets/textures/props/runtime/chapter-terrain/orm.windows.ktx2": "9f0a9b6ab1d61affa0459c58bc5000824caeff50f8e17c979109ad24a1d619c8"
+  },
+  "trailFactor": "Unchanged imported glTF value",
+  "ownerVisualAcceptance": "Pending matched RT review"
+}

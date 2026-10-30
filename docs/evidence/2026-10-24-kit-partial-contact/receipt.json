@@ -1,0 +1,3135 @@
+{
+  "schema": 1,
+  "sealedAtUtc": "2026-10-24T03:29:15.856470+00:00",
+  "baseCommit": "3fd5ef6cf835d6708663235addaa92d6760487f0",
+  "disposition": "Partial-angle contact prerequisite unpassed/unadmitted; no shared production turn/start state, production binding or source asset change.",
+  "scopePlan": "docs/superpowers/plans/2026-10-24-kit-shared-turn-start-scope.md",
+  "sourceWorkingByteSha256": {
+    "src/platform/windows/DiagnosticWindow.cpp": "d343bd681dc0c7a0b06811e0608b20b03b40456bfaf42907f3e6a922f5c12eab",
+    "src/platform/windows/windows_campaign_validation.inl": "9407015a952c37122e829a400170df2b9fa8944640f0073e92916823037f4d0a",
+    "tests/KitSourceIntakeTests.cpp": "cbaa1a6e8d466550ee759b9e5962b9e4b530078518bf06a712dddfd56fd7cd89",
+    "tests/KitTurnContactData.h": "ff28cd4dd89abc8c17c1b8d0b723f4e3f198e30c2d6cc1021b2fc6ebcc23e9af",
+    "tests/KitTurnContactValidation.h": "42576aeef027061ec97de5940fc67381efae6500c69ee2f9e21febe56e147e75"
+  },
+  "nativeMeasurement": {
+    "executableSha256": "ab36e291ebb29f1386a0936604131519702e85eecaaedcbc94a64a3adc88a75b",
+    "samplesPerAngleDirection": 91,
+    "sampleHz": 120,
+    "runs": 10,
+    "soleRows": [
+      39,
+      38
+    ],
+    "correctedSummarySha256": "87f02235f42f65a3c86cce73e7ae5c43f81b2799a665b06f57368a082239d830",
+    "correctedRawCsvSha256": "9e7847f255ee99f954752c96b25bde3cc9561b9915a299b035a3c467963bc22a",
+    "originalSupportOnlySummarySha256": "93a30be7b1ad485c9f05085397a686db3db92f988b6b299d7dc631107f121e7f",
+    "originalSupportOnlyCsvSha256": "13a52ea9c86028cd16cb66f0160b0d4f8147788ac5f8e9e0ecbffb5056e2064b",
+    "supportWindowNumbersUnchangedAfterCorrection": true,
+    "maximum2DegreeNominalSwingMinimumHeightM": 0.00111399603,
+    "heightBandsAreMeasurementSensitivitiesNotAdmissionTolerances": true
+  },
+  "rtRuns": [
+    {
+      "label": "sampled-and-large",
+      "exe": {
+        "bytes": 14306816,
+        "sha256": "a50549864e7ddd527fe06b7c8b0d40d4c6e58dbac4774ac61f79ec712acc9e85"
+      },
+      "settings": {
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "sourceFilesAtBuild": {
+        "exe": {
+          "bytes": 14306816,
+          "sha256": "a50549864e7ddd527fe06b7c8b0d40d4c6e58dbac4774ac61f79ec712acc9e85"
+        },
+        "settings": {
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "sourceExe": {
+          "bytes": 14306816,
+          "sha256": "a50549864e7ddd527fe06b7c8b0d40d4c6e58dbac4774ac61f79ec712acc9e85"
+        },
+        "save": {
+          "bytes": 162,
+          "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+        },
+        "manifest": {
+          "bytes": 166,
+          "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+        },
+        "kit": {
+          "bytes": 2151672,
+          "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+        },
+        "kitSource": {
+          "bytes": 7034964,
+          "sha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e"
+        },
+        "candidate": {
+          "bytes": 2272652,
+          "sha256": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11"
+        },
+        "rootMotion": {
+          "bytes": 7855,
+          "sha256": "7a4928d4dfec5184071c96a4c8e1f25e07d7ce7c87545324450e75b0c29061d9"
+        },
+        "src/platform/windows/DiagnosticWindow.cpp": {
+          "bytes": 636392,
+          "sha256": "0a0d2e2e98c2ee73f79e24f5bffdc25b80dfa0b2c46d89d38ce7afd0cd41aa7e"
+        },
+        "src/platform/windows/windows_campaign_validation.inl": {
+          "bytes": 67030,
+          "sha256": "c7c9d763c510a58ddeaf72a89a88e3072cf3bcdbebabbbfd50bf81afc8a85382"
+        },
+        "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+          "bytes": 500444,
+          "sha256": "83f226bc0e02987aca75a771b7d62115b8a2e14c49c521927657b1e687fe6486"
+        },
+        "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+          "bytes": 71083,
+          "sha256": "14c80986c7dba5688fa6bbcfefa49e95b8776c4e958a6105341f687302fa5a54"
+        },
+        "contactData": {
+          "bytes": 2496,
+          "sha256": "ff28cd4dd89abc8c17c1b8d0b723f4e3f198e30c2d6cc1021b2fc6ebcc23e9af"
+        }
+      },
+      "rawManifest": {
+        "path": "reports\\horde-campaign-fixtures-kit-partial-contact-20261024\\windows-lookout-validation.json",
+        "sha256": "761e81f1c1bcf127a16fa99c56e7b237dab39488148d7396182805b84ab84a3e"
+      },
+      "rawProcess": {
+        "path": "reports\\kit-partial-contact-20261024\\rt\\serial-process.json",
+        "sha256": "8c8ab5451f1456a3343297041b724ba397fb5fcc12253dd3d120cb0aa911d2bb"
+      },
+      "checks": 148,
+      "failures": 0,
+      "renderCalls": 126,
+      "capturedInspectionFrames": 115,
+      "wallSeconds": 28.98399999999856,
+      "complete": true,
+      "foregroundContinuous": true,
+      "ownerShown": false,
+      "sourceAndSettingsCustodyUnchanged": true,
+      "parkedOwnerFilesPreserved": 151,
+      "ownerCampaignExistsBefore": false,
+      "ownerCampaignExistsAfter": false,
+      "profile": "isolated Debug candidate playback and RT joins; not gameplay turn-state or owner acceptance",
+      "partial": true,
+      "dense": false,
+      "largeSequenceAuthoredHz": 24,
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+        "waterQuality": "high"
+      },
+      "dimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "resources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298880,
+        "deviceLocalBytes": 374422496
+      },
+      "resourcesStable": true,
+      "completionRowsSchema": [
+        "stage",
+        "logicalYaw",
+        "phase",
+        "weight",
+        "submissionSerial",
+        "completionSerial",
+        "lastSuccessfulPresentSubmissionSerial"
+      ],
+      "completionRows": [
+        [
+          "control",
+          2.0032,
+          null,
+          null,
+          7,
+          7,
+          7
+        ],
+        [
+          "partial-left-2-0",
+          2.03811,
+          0,
+          0.0444444,
+          8,
+          8,
+          8
+        ],
+        [
+          "partial-left-2-6",
+          2.02973,
+          0.333333,
+          0.0444444,
+          9,
+          9,
+          9
+        ],
+        [
+          "partial-left-2-9",
+          2.02066,
+          0.5,
+          0.0444444,
+          10,
+          10,
+          10
+        ],
+        [
+          "partial-left-2-12",
+          2.01159,
+          0.666667,
+          0.0444444,
+          11,
+          11,
+          11
+        ],
+        [
+          "partial-left-2-18",
+          2.0032,
+          1,
+          0.0444444,
+          12,
+          12,
+          12
+        ],
+        [
+          "partial-left-10-0",
+          2.17774,
+          0,
+          0.222222,
+          13,
+          13,
+          13
+        ],
+        [
+          "partial-left-10-6",
+          2.13582,
+          0.333333,
+          0.222222,
+          14,
+          14,
+          14
+        ],
+        [
+          "partial-left-10-9",
+          2.09047,
+          0.5,
+          0.222222,
+          15,
+          15,
+          15
+        ],
+        [
+          "partial-left-10-12",
+          2.04512,
+          0.666667,
+          0.222222,
+          16,
+          16,
+          16
+        ],
+        [
+          "partial-left-10-18",
+          2.0032,
+          1,
+          0.222222,
+          17,
+          17,
+          17
+        ],
+        [
+          "partial-left-22_5-0",
+          2.3959,
+          0,
+          0.5,
+          18,
+          18,
+          18
+        ],
+        [
+          "partial-left-22_5-6",
+          2.3016,
+          0.333333,
+          0.5,
+          19,
+          19,
+          19
+        ],
+        [
+          "partial-left-22_5-9",
+          2.19955,
+          0.5,
+          0.5,
+          20,
+          20,
+          20
+        ],
+        [
+          "partial-left-22_5-12",
+          2.09751,
+          0.666667,
+          0.5,
+          21,
+          21,
+          21
+        ],
+        [
+          "partial-left-22_5-18",
+          2.0032,
+          1,
+          0.5,
+          22,
+          22,
+          22
+        ],
+        [
+          "partial-left-45-0",
+          2.7886,
+          0,
+          1,
+          23,
+          23,
+          23
+        ],
+        [
+          "partial-left-45-6",
+          2.59999,
+          0.333333,
+          1,
+          24,
+          24,
+          24
+        ],
+        [
+          "partial-left-45-9",
+          2.3959,
+          0.5,
+          1,
+          25,
+          25,
+          25
+        ],
+        [
+          "partial-left-45-12",
+          2.19182,
+          0.666667,
+          1,
+          26,
+          26,
+          26
+        ],
+        [
+          "partial-left-45-18",
+          2.0032,
+          1,
+          1,
+          27,
+          27,
+          27
+        ],
+        [
+          "partial-right-2-0",
+          1.9683,
+          0,
+          0.0444444,
+          28,
+          28,
+          28
+        ],
+        [
+          "partial-right-2-6",
+          1.97668,
+          0.333333,
+          0.0444444,
+          29,
+          29,
+          29
+        ],
+        [
+          "partial-right-2-9",
+          1.98575,
+          0.5,
+          0.0444444,
+          30,
+          30,
+          30
+        ],
+        [
+          "partial-right-2-12",
+          1.99482,
+          0.666667,
+          0.0444444,
+          31,
+          31,
+          31
+        ],
+        [
+          "partial-right-2-18",
+          2.0032,
+          1,
+          0.0444444,
+          32,
+          32,
+          32
+        ],
+        [
+          "partial-right-10-0",
+          1.82867,
+          0,
+          0.222222,
+          33,
+          33,
+          33
+        ],
+        [
+          "partial-right-10-6",
+          1.87059,
+          0.333333,
+          0.222222,
+          34,
+          34,
+          34
+        ],
+        [
+          "partial-right-10-9",
+          1.91594,
+          0.5,
+          0.222222,
+          35,
+          35,
+          35
+        ],
+        [
+          "partial-right-10-12",
+          1.96129,
+          0.666667,
+          0.222222,
+          36,
+          36,
+          36
+        ],
+        [
+          "partial-right-10-18",
+          2.0032,
+          1,
+          0.222222,
+          37,
+          37,
+          37
+        ],
+        [
+          "partial-right-22_5-0",
+          1.6105,
+          0,
+          0.5,
+          38,
+          38,
+          38
+        ],
+        [
+          "partial-right-22_5-6",
+          1.70481,
+          0.333333,
+          0.5,
+          39,
+          39,
+          39
+        ],
+        [
+          "partial-right-22_5-9",
+          1.80685,
+          0.5,
+          0.5,
+          40,
+          40,
+          40
+        ],
+        [
+          "partial-right-22_5-12",
+          1.9089,
+          0.666667,
+          0.5,
+          41,
+          41,
+          41
+        ],
+        [
+          "partial-right-22_5-18",
+          2.0032,
+          1,
+          0.5,
+          42,
+          42,
+          42
+        ],
+        [
+          "partial-right-45-0",
+          1.21781,
+          0,
+          1,
+          43,
+          43,
+          43
+        ],
+        [
+          "partial-right-45-6",
+          1.40642,
+          0.333333,
+          1,
+          44,
+          44,
+          44
+        ],
+        [
+          "partial-right-45-9",
+          1.6105,
+          0.5,
+          1,
+          45,
+          45,
+          45
+        ],
+        [
+          "partial-right-45-12",
+          1.81459,
+          0.666667,
+          1,
+          46,
+          46,
+          46
+        ],
+        [
+          "partial-right-45-18",
+          2.0032,
+          1,
+          1,
+          47,
+          47,
+          47
+        ],
+        [
+          "large-0000",
+          5.1448,
+          0,
+          0,
+          48,
+          48,
+          48
+        ],
+        [
+          "large-0001",
+          5.1438,
+          0.0555556,
+          0,
+          49,
+          49,
+          49
+        ],
+        [
+          "large-0002",
+          5.13145,
+          0.111111,
+          0,
+          50,
+          50,
+          50
+        ],
+        [
+          "large-0003",
+          5.10398,
+          0.166667,
+          0,
+          51,
+          51,
+          51
+        ],
+        [
+          "large-0004",
+          5.06457,
+          0.222222,
+          0,
+          52,
+          52,
+          52
+        ],
+        [
+          "large-0005",
+          5.01436,
+          0.277778,
+          0,
+          53,
+          53,
+          53
+        ],
+        [
+          "large-0006",
+          4.95618,
+          0.333333,
+          0,
+          54,
+          54,
+          54
+        ],
+        [
+          "large-0007",
+          4.89153,
+          0.388889,
+          0,
+          55,
+          55,
+          55
+        ],
+        [
+          "large-0008",
+          4.82289,
+          0.444444,
+          0,
+          56,
+          56,
+          56
+        ],
+        [
+          "large-0009",
+          4.7521,
+          0.5,
+          0,
+          57,
+          57,
+          57
+        ],
+        [
+          "large-0010",
+          4.6813,
+          0.555556,
+          0,
+          58,
+          58,
+          58
+        ],
+        [
+          "large-0011",
+          4.61267,
+          0.611111,
+          0,
+          59,
+          59,
+          59
+        ],
+        [
+          "large-0012",
+          4.54801,
+          0.666667,
+          0,
+          60,
+          60,
+          60
+        ],
+        [
+          "large-0013",
+          4.48984,
+          0.722222,
+          0,
+          61,
+          61,
+          61
+        ],
+        [
+          "large-0014",
+          4.43963,
+          0.777778,
+          0,
+          62,
+          62,
+          62
+        ],
+        [
+          "large-0015",
+          4.40021,
+          0.833333,
+          0,
+          63,
+          63,
+          63
+        ],
+        [
+          "large-0016",
+          4.37275,
+          0.888889,
+          0,
+          64,
+          64,
+          64
+        ],
+        [
+          "large-0017",
+          4.3604,
+          0.944444,
+          0,
+          65,
+          65,
+          65
+        ],
+        [
+          "large-0018",
+          4.3594,
+          0,
+          0,
+          66,
+          66,
+          66
+        ],
+        [
+          "large-0019",
+          4.3584,
+          0.0555556,
+          0,
+          67,
+          67,
+          67
+        ],
+        [
+          "large-0020",
+          4.34605,
+          0.111111,
+          0,
+          68,
+          68,
+          68
+        ],
+        [
+          "large-0021",
+          4.31859,
+          0.166667,
+          0,
+          69,
+          69,
+          69
+        ],
+        [
+          "large-0022",
+          4.27917,
+          0.222222,
+          0,
+          70,
+          70,
+          70
+        ],
+        [
+          "large-0023",
+          4.22896,
+          0.277778,
+          0,
+          71,
+          71,
+          71
+        ],
+        [
+          "large-0024",
+          4.17078,
+          0.333333,
+          0,
+          72,
+          72,
+          72
+        ],
+        [
+          "large-0025",
+          4.10613,
+          0.388889,
+          0,
+          73,
+          73,
+          73
+        ],
+        [
+          "large-0026",
+          4.0375,
+          0.444444,
+          0,
+          74,
+          74,
+          74
+        ],
+        [
+          "large-0027",
+          3.9667,
+          0.5,
+          0,
+          75,
+          75,
+          75
+        ],
+        [
+          "large-0028",
+          3.8959,
+          0.555556,
+          0,
+          76,
+          76,
+          76
+        ],
+        [
+          "large-0029",
+          3.82727,
+          0.611111,
+          0,
+          77,
+          77,
+          77
+        ],
+        [
+          "large-0030",
+          3.76262,
+          0.666667,
+          0,
+          78,
+          78,
+          78
+        ],
+        [
+          "large-0031",
+          3.70444,
+          0.722222,
+          0,
+          79,
+          79,
+          79
+        ],
+        [
+          "large-0032",
+          3.65423,
+          0.777778,
+          0,
+          80,
+          80,
+          80
+        ],
+        [
+          "large-0033",
+          3.61481,
+          0.833333,
+          0,
+          81,
+          81,
+          81
+        ],
+        [
+          "large-0034",
+          3.58735,
+          0.888889,
+          0,
+          82,
+          82,
+          82
+        ],
+        [
+          "large-0035",
+          3.575,
+          0.944444,
+          0,
+          83,
+          83,
+          83
+        ],
+        [
+          "large-0036",
+          3.574,
+          0,
+          0,
+          84,
+          84,
+          84
+        ],
+        [
+          "large-0037",
+          3.573,
+          0.0555556,
+          0,
+          85,
+          85,
+          85
+        ],
+        [
+          "large-0038",
+          3.56065,
+          0.111111,
+          0,
+          86,
+          86,
+          86
+        ],
+        [
+          "large-0039",
+          3.53319,
+          0.166667,
+          0,
+          87,
+          87,
+          87
+        ],
+        [
+          "large-0040",
+          3.49377,
+          0.222222,
+          0,
+          88,
+          88,
+          88
+        ],
+        [
+          "large-0041",
+          3.44356,
+          0.277778,
+          0,
+          89,
+          89,
+          89
+        ],
+        [
+          "large-0042",
+          3.38539,
+          0.333333,
+          0,
+          90,
+          90,
+          90
+        ],
+        [
+          "large-0043",
+          3.32073,
+          0.388889,
+          0,
+          91,
+          91,
+          91
+        ],
+        [
+          "large-0044",
+          3.2521,
+          0.444444,
+          0,
+          92,
+          92,
+          92
+        ],
+        [
+          "large-0045",
+          3.1813,
+          0.5,
+          0,
+          93,
+          93,
+          93
+        ],
+        [
+          "large-0046",
+          3.11051,
+          0.555556,
+          0,
+          94,
+          94,
+          94
+        ],
+        [
+          "large-0047",
+          3.04187,
+          0.611111,
+          0,
+          95,
+          95,
+          95
+        ],
+        [
+          "large-0048",
+          2.97722,
+          0.666667,
+          0,
+          96,
+          96,
+          96
+        ],
+        [
+          "large-0049",
+          2.91904,
+          0.722222,
+          0,
+          97,
+          97,
+          97
+        ],
+        [
+          "large-0050",
+          2.86883,
+          0.777778,
+          0,
+          98,
+          98,
+          98
+        ],
+        [
+          "large-0051",
+          2.82942,
+          0.833333,
+          0,
+          99,
+          99,
+          99
+        ],
+        [
+          "large-0052",
+          2.80195,
+          0.888889,
+          0,
+          100,
+          100,
+          100
+        ],
+        [
+          "large-0053",
+          2.7896,
+          0.944444,
+          0,
+          101,
+          101,
+          101
+        ],
+        [
+          "large-0054",
+          2.7886,
+          0,
+          0,
+          102,
+          102,
+          102
+        ],
+        [
+          "large-0055",
+          2.7876,
+          0.0555556,
+          0,
+          103,
+          103,
+          103
+        ],
+        [
+          "large-0056",
+          2.77525,
+          0.111111,
+          0,
+          104,
+          104,
+          104
+        ],
+        [
+          "large-0057",
+          2.74779,
+          0.166667,
+          0,
+          105,
+          105,
+          105
+        ],
+        [
+          "large-0058",
+          2.70837,
+          0.222222,
+          0,
+          106,
+          106,
+          106
+        ],
+        [
+          "large-0059",
+          2.65816,
+          0.277778,
+          0,
+          107,
+          107,
+          107
+        ],
+        [
+          "large-0060",
+          2.59999,
+          0.333333,
+          0,
+          108,
+          108,
+          108
+        ],
+        [
+          "large-0061",
+          2.53534,
+          0.388889,
+          0,
+          109,
+          109,
+          109
+        ],
+        [
+          "large-0062",
+          2.4667,
+          0.444444,
+          0,
+          110,
+          110,
+          110
+        ],
+        [
+          "large-0063",
+          2.3959,
+          0.5,
+          0,
+          111,
+          111,
+          111
+        ],
+        [
+          "large-0064",
+          2.32511,
+          0.555556,
+          0,
+          112,
+          112,
+          112
+        ],
+        [
+          "large-0065",
+          2.25647,
+          0.611111,
+          0,
+          113,
+          113,
+          113
+        ],
+        [
+          "large-0066",
+          2.19182,
+          0.666667,
+          0,
+          114,
+          114,
+          114
+        ],
+        [
+          "large-0067",
+          2.13364,
+          0.722222,
+          0,
+          115,
+          115,
+          115
+        ],
+        [
+          "large-0068",
+          2.08343,
+          0.777778,
+          0,
+          116,
+          116,
+          116
+        ],
+        [
+          "large-0069",
+          2.04402,
+          0.833333,
+          0,
+          117,
+          117,
+          117
+        ],
+        [
+          "large-0070",
+          2.01656,
+          0.888889,
+          0,
+          118,
+          118,
+          118
+        ],
+        [
+          "large-0071",
+          2.0042,
+          0.944444,
+          0,
+          119,
+          119,
+          119
+        ],
+        [
+          "large-0072",
+          2.0032,
+          1,
+          0,
+          120,
+          120,
+          120
+        ],
+        [
+          "restored",
+          2.0032,
+          null,
+          null,
+          121,
+          121,
+          121
+        ]
+      ],
+      "imageSha256": {
+        "windows-kit-turn-control.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b",
+        "windows-kit-turn-large-0000.png": "b68bd5acdb1341231461d2db5147d89e981b39281050c11653c8cb1cd92f0ecb",
+        "windows-kit-turn-large-0001.png": "bbfe909bd7b86fb2f8ec855c63ef811c8ff4289208fc0540f1820b3a64b31b60",
+        "windows-kit-turn-large-0002.png": "eb2cb2383307dbcec52b306d52988c326dc4b3e6f4ec9577d345af400ac28576",
+        "windows-kit-turn-large-0003.png": "91439b8c1be21066481c7f9b6e9ed94156bf9d678c2fb633ac8921eb8c89a312",
+        "windows-kit-turn-large-0004.png": "55a1518211302de7c937b6f4a11cde76791ed02ee50bc58cf032f8624e171887",
+        "windows-kit-turn-large-0005.png": "8c7097a15700d61c1cf2466c1d13ff4d38a71828247185e180186c74deca6872",
+        "windows-kit-turn-large-0006.png": "f6dce9a4c260a3ac542c0166d126ca52f90477755476ed8cf5d43474bbc22ae6",
+        "windows-kit-turn-large-0007.png": "f92897157cb33f9ea4cb7d4829ab7072a84d27cca9b0fbb4f8354dccc4a096bd",
+        "windows-kit-turn-large-0008.png": "4a7a20e13b97adbfaf6729dc9ab4327e2f7be498ad1d70dad4f3dc9a90d86e60",
+        "windows-kit-turn-large-0009.png": "486460ae75e0938be6db904a446aee0e7f4076a9dbd47ad3734d8593436b10a8",
+        "windows-kit-turn-large-0010.png": "3c0930518a5d2ef98fcd5624564365aec92e489b8d9bbd464a744b564cddc034",
+        "windows-kit-turn-large-0011.png": "05805fbd094f60c2b4684b3fadeaf972ad7e9268cb33ef92e824128b4cde15e9",
+        "windows-kit-turn-large-0012.png": "2d157421a324c441e23c5c74fcbc2127a8dcfcd51f01b6fa3378db1f1b0f5544",
+        "windows-kit-turn-large-0013.png": "d7a170061dbf256dd88f5ab555ede9bd089bf6913b91b2574501985335cf144d",
+        "windows-kit-turn-large-0014.png": "17ec3ef7497e789288af7c2c5dc99829efbe925532082462a0ab7ee3a90b5531",
+        "windows-kit-turn-large-0015.png": "0af42f467b363d094776d91e6e811f20a196176f58df798bd897a8077433bb68",
+        "windows-kit-turn-large-0016.png": "02b3c2a16999514edb5c8e97c87b34a901ef85557f8650a2e277e22111057f3f",
+        "windows-kit-turn-large-0017.png": "c0582192e6a39b4a523187bd0cd00d94db1256c521c1eb1b5f6ddf7f2246f302",
+        "windows-kit-turn-large-0018.png": "0e20d09377accb731facd46c8dd38231ea31360cfa37ff6c379adf1fc181743a",
+        "windows-kit-turn-large-0019.png": "8a94101d9e2a52b7c37742dfcf9685a02c4d7ad23f1b0c25f83364f1d54fe3c1",
+        "windows-kit-turn-large-0020.png": "a594e3e55a64a3aa6eff8fffde56fc673fbee24f7942af29df65e84bb53fe49f",
+        "windows-kit-turn-large-0021.png": "3ee9174d082daf64ac65c7008b48808e152440a999e1104a683ebe6842ca2e87",
+        "windows-kit-turn-large-0022.png": "9c0b02a847aed5a8ddb36f64408cdb268806ab74b13635fc76dd8967e594c91e",
+        "windows-kit-turn-large-0023.png": "1726b111bc99d376ada35bf15d9c99cf1962abc66c6cda71e67078da56ed78d5",
+        "windows-kit-turn-large-0024.png": "c879263c0497430977970abb77c92d7990626b3347c1c358ba30e855e64f80f2",
+        "windows-kit-turn-large-0025.png": "43b52f22541ec8e012f683303d910a056166103a217f654e9ebc9fa24022cabb",
+        "windows-kit-turn-large-0026.png": "d541c98c3218a2619342a37960d06f0d4eb545b4179c3967f8576a1107a3c11c",
+        "windows-kit-turn-large-0027.png": "ef8dc42791f125abecd55a53d4ea73179e0a6ad7455257cda99cc00348f0f610",
+        "windows-kit-turn-large-0028.png": "4edc3cd2c12f873cc91898cb81ae27ff1a825143337137dfcae88014b7e3628e",
+        "windows-kit-turn-large-0029.png": "28980ffaa50411df7467edd0a89ca6c00ccedbe8d8dcb39eac781b90f3c133bc",
+        "windows-kit-turn-large-0030.png": "e70ca56b18d08dd703570be5b2f5b6410fb10e056bf367a50721820bff024afc",
+        "windows-kit-turn-large-0031.png": "bde3c97697d072dcf4a5d12c296f3017b17233469a2d3e4171856acfaca7e469",
+        "windows-kit-turn-large-0032.png": "197f46c422877b47efe42fcf62ae1c77b6ba48e628058ab77e115ad3a308afd0",
+        "windows-kit-turn-large-0033.png": "4ffb3210427fb6289f3bc019206ee871bcba47c8017ba16b506ab666f12e007e",
+        "windows-kit-turn-large-0034.png": "885beb0681afb26d0218b83b1e4944b55b13e01490d8272c7cb11a3a7029f6c0",
+        "windows-kit-turn-large-0035.png": "584160451b1d03e426199ee733e678ad74edfa30becc00ce4c11e0a2f1c6dd65",
+        "windows-kit-turn-large-0036.png": "f5ab370a55bceb4fb8681e111137d04a2531aaf156b611d90f4c6a0eb2b6a7a2",
+        "windows-kit-turn-large-0037.png": "d714e3f77e2d9a2bf0a7663a2eec3830885cdd2d61a07d6cb96e8b6f980db017",
+        "windows-kit-turn-large-0038.png": "09b72922a8ef400770dce758dface1ef37c12f2608710f079462b9a009f4d914",
+        "windows-kit-turn-large-0039.png": "04bcc9594fefaa72d367927b058d0c345c9a047177355594fb4cf4d703445129",
+        "windows-kit-turn-large-0040.png": "3449e1e2f1ed97979e9a34ce89e1665c0542432d2cdb6c79ca294def6c43b168",
+        "windows-kit-turn-large-0041.png": "66a36ab9d4b7925eea05443e777a6b65cbe6569efdbbe73fa6e367c3272205ab",
+        "windows-kit-turn-large-0042.png": "872d24d99cc19c31155c14266b03bd1ba21ccb3beb8144468de3b65abc5fa3ee",
+        "windows-kit-turn-large-0043.png": "1d3582779520fe5661543b3bdb78ea76be5f2fac2aa5fb70085a93006cdd3ce6",
+        "windows-kit-turn-large-0044.png": "8c321fa138b8427602cdc28ab6104a4ed44a2a1efa71692de1f2b67a8a9feff4",
+        "windows-kit-turn-large-0045.png": "a9c9f76a477d5e2625e968cf92161aa183ac90cad86e32ce613be0091fb572b1",
+        "windows-kit-turn-large-0046.png": "dbeb04de8dab07c027a2c0612e41f45040f7c0bfdb78b38b8e232632eea7424c",
+        "windows-kit-turn-large-0047.png": "041a4bd685956e2196ccdf8f4d2ebf4e2e68c3f164ead1c9c8b2290fcd93a7b2",
+        "windows-kit-turn-large-0048.png": "1e0ce5edd40f14733aaa5a156f4f00bbf7aebacac36c2d5940e81912d11219eb",
+        "windows-kit-turn-large-0049.png": "e559ee091782d48ab7b072f16b55f650eee99f1abdc2a013b867f3fa633ef6be",
+        "windows-kit-turn-large-0050.png": "51f6231ffcae32ca9d6aa88ecafa032595fb498ef0444a603c4d9c15c6511543",
+        "windows-kit-turn-large-0051.png": "fd2e54000dcac262fc0bf238148f7af742b562b1df7f3bd576ee0b764a728879",
+        "windows-kit-turn-large-0052.png": "c9c260d8aca9c0796effe11f149b8a2d18c6516364c4c3069fe5c3c750d728c2",
+        "windows-kit-turn-large-0053.png": "dd9695a3742c3c4983bd3853867e751cc8c906d8ad95bf5fe1ef315dee6bd113",
+        "windows-kit-turn-large-0054.png": "7e7c85f6545014646e585ab69e96b0305425460cc6ccc04169a1687bfa66e352",
+        "windows-kit-turn-large-0055.png": "b5f4891b3415f9c8687e4077a2f85aa961ef54b49e9e00499070b6ab535a423b",
+        "windows-kit-turn-large-0056.png": "fc79b82b06fbb4aba9c049bd37bddef295a472afc14db1c931f5a9e597c83b81",
+        "windows-kit-turn-large-0057.png": "095bae7adf255b33ec82c8a2db229c4dceea3cdad44e9148130237652075379b",
+        "windows-kit-turn-large-0058.png": "825efefa6d0ebdfdfaa8b9a3606276603ff9e655a35bd47ba1b64c4f4c28f58e",
+        "windows-kit-turn-large-0059.png": "5eb269ac318cad95ee43143982c716cb01af3383ca16b9a8aafcbb0968b5049e",
+        "windows-kit-turn-large-0060.png": "17d9893fb741b1ffea29f6bc90e833c835f3ef25d1432c6ced6055c81aa41c4a",
+        "windows-kit-turn-large-0061.png": "39dbc4cb5d563266dc660795382381c675529504bc905f43615ffc071d92244e",
+        "windows-kit-turn-large-0062.png": "209b9aa98e9cc2f9f9155dac1acf423d870b358ee08881ba87dc4940fea287d9",
+        "windows-kit-turn-large-0063.png": "7a2ad84ee7eb313246c771ee4b57a266a77fb457d46acccf3f37ee1a94e9390d",
+        "windows-kit-turn-large-0064.png": "739c650c5f0d56eb478427d7c7480d8811454811387a9acc2cc4ea85d23b761c",
+        "windows-kit-turn-large-0065.png": "e220e2a8f1f3fec5dd356120fe02c95c5e6a5dcf0df1935f48069e134defaf1e",
+        "windows-kit-turn-large-0066.png": "0f3cd9bce34fc80c2d856a50a876720ef8f2af5ec3c7aaa67038f4f507e9183c",
+        "windows-kit-turn-large-0067.png": "9e492925e3f9dac9d21ddda4216c85b3823edb42104712781779e5cbd4c5572e",
+        "windows-kit-turn-large-0068.png": "a51bc16517110017e7e6a0e90f402717c7e9341b2e3537ff34e0c54d20c6b0af",
+        "windows-kit-turn-large-0069.png": "e4ba7d303a87f628f4159f24a0259b022bd603ad5cd58bcf3005cf9469665686",
+        "windows-kit-turn-large-0070.png": "7b601b41672864878913490a6669329feb1a94e2d27966e25587b4905d061ed0",
+        "windows-kit-turn-large-0071.png": "f5eb144b9c07300e93d1c8f4b7db9c9bf031981921dc63bfc4ce0e4a1c63aa44",
+        "windows-kit-turn-large-0072.png": "eb7f44b4622333c8a3f256ed6418ce4b1020ee2df07846cb94345a37f7cf29df",
+        "windows-kit-turn-partial-left-10-0.png": "7265c9bd27e157c5aeaab8d92cbdcce22f68108d99ef5547dbf96530c898f20b",
+        "windows-kit-turn-partial-left-10-12.png": "1d83890b3d663ba3005f38c1b7499d947af42d403510950e7f76dbbe09eea2e3",
+        "windows-kit-turn-partial-left-10-18.png": "d00db269528fea97cf971a0fc2ea563b11664735322092ccaad59ddd9f095fb9",
+        "windows-kit-turn-partial-left-10-6.png": "4ea3f772cb8f9044b6c4ed557b0e8818b4cc7769f47163f90052dffd5356f81f",
+        "windows-kit-turn-partial-left-10-9.png": "b3fcbac8e9df2947c5d0f5ed78fdb586d999594e4741cf5551774276efae893f",
+        "windows-kit-turn-partial-left-2-0.png": "6532194b9626b8ac915e3f0a1bddc1acd397c34b6889773c601dad3695b8aea2",
+        "windows-kit-turn-partial-left-2-12.png": "5b9fb5659771a82f6335faa97b1290ac30ac914faeac2440b5255d25f662c397",
+        "windows-kit-turn-partial-left-2-18.png": "485b15aaab1d5e7f2ccdbb47630bb938d78bd383480234d5be2d558681e0c86b",
+        "windows-kit-turn-partial-left-2-6.png": "116537448c508580b983718cb89a05b099568c78b83ffebe757b1893c8cdcd91",
+        "windows-kit-turn-partial-left-2-9.png": "ba81e8a3d7e2fedc141bea74b03157320ba6c7f22c0628de7489e2575aaea5ab",
+        "windows-kit-turn-partial-left-22_5-0.png": "b239ff7c162923ea5b1919f73fced8a3587031d754fd5ee92f571bc1b1da2d46",
+        "windows-kit-turn-partial-left-22_5-12.png": "cc41bdecf10e6f42ea3ed40299c143743b9a438d9b911a53c96e58f9a6ef0515",
+        "windows-kit-turn-partial-left-22_5-18.png": "18bb9d3801e0bed297a6da1e58920e99c986e78815c9cd3725bf37aac47f4be2",
+        "windows-kit-turn-partial-left-22_5-6.png": "ecb02d55dd533d2a970c4a3bef652784725c153d58e537a67ce454b417e65292",
+        "windows-kit-turn-partial-left-22_5-9.png": "2196dbca0087c1d23186b6975f87e0fff6e1f79a9a276db87bd0fb5accb2b558",
+        "windows-kit-turn-partial-left-45-0.png": "7e7c85f6545014646e585ab69e96b0305425460cc6ccc04169a1687bfa66e352",
+        "windows-kit-turn-partial-left-45-12.png": "0f3cd9bce34fc80c2d856a50a876720ef8f2af5ec3c7aaa67038f4f507e9183c",
+        "windows-kit-turn-partial-left-45-18.png": "eb7f44b4622333c8a3f256ed6418ce4b1020ee2df07846cb94345a37f7cf29df",
+        "windows-kit-turn-partial-left-45-6.png": "17d9893fb741b1ffea29f6bc90e833c835f3ef25d1432c6ced6055c81aa41c4a",
+        "windows-kit-turn-partial-left-45-9.png": "7a2ad84ee7eb313246c771ee4b57a266a77fb457d46acccf3f37ee1a94e9390d",
+        "windows-kit-turn-partial-right-10-0.png": "6967e20c297aaad286863b07c44bb68760ff3021ae5ba716ab3eb13e5ee4d30b",
+        "windows-kit-turn-partial-right-10-12.png": "af3abe2c723b47470dfe385462a023f9ee5bc649c5d58f0c56c5b474dec18ada",
+        "windows-kit-turn-partial-right-10-18.png": "a6312d050bde37d0a728dd2fa03a3da35408e05fcc23353109ba7437f9d6db7d",
+        "windows-kit-turn-partial-right-10-6.png": "232b0d43c669ddbf20452faec72c0443884867db8d28b799c876f04f180001cc",
+        "windows-kit-turn-partial-right-10-9.png": "ca0b060fbb605e62f26495bd48cb8676c33dc887b76b8d7dd0308401d707d0d7",
+        "windows-kit-turn-partial-right-2-0.png": "9f2460495678663321e13a399adbd3b62435bea9282542bebf872dc166c2f133",
+        "windows-kit-turn-partial-right-2-12.png": "8a7f778d7605fa6172eddcdc9c10a250027e60b0f3a1e651ec6b3a3348ed66ec",
+        "windows-kit-turn-partial-right-2-18.png": "3e87371d236ccc48e185005fd819cc1a2de87662ca7f00923ab8a59586a052ba",
+        "windows-kit-turn-partial-right-2-6.png": "5a96a71cf47e74a4caebbcce2379e45a0baef60df7a2be8feae4889dc6157ee2",
+        "windows-kit-turn-partial-right-2-9.png": "985961ec665810008d4bc98eff9017944f310c1e36478bc72dd2df7942241923",
+        "windows-kit-turn-partial-right-22_5-0.png": "4f95077783c17fdc697c1506d092bf5c2baefd54ffeafd708e5b88bc8c48563f",
+        "windows-kit-turn-partial-right-22_5-12.png": "e600dabb481a300da97a8253c5084be184273fe113d769b492354d0aa6eb54e6",
+        "windows-kit-turn-partial-right-22_5-18.png": "c0dbca0abf7e1bc72bda0cd2392a6ac7b6b903cdf84e49044cf96d9ce6112e4a",
+        "windows-kit-turn-partial-right-22_5-6.png": "cbbdc19865412ada8dae7c7054292e866ef6ace52f1b6678e17e7d12c1f03b02",
+        "windows-kit-turn-partial-right-22_5-9.png": "7e6209e5984947b09afda7f56d919c950e20973e6198541812b7d2a8833323c4",
+        "windows-kit-turn-partial-right-45-0.png": "3196ddf795a91519c40fd786c1208e521dd329383b2b6928fcdf7b41bfa28728",
+        "windows-kit-turn-partial-right-45-12.png": "56a2b742b27d204aea9574d6d8e033c68cae0214e148bf83eb9795aaa7e7ef3d",
+        "windows-kit-turn-partial-right-45-18.png": "2b877e9bbeb26c29ef1780dd3bd678a84922619ad8e196f145f5f26bf7ba7dd2",
+        "windows-kit-turn-partial-right-45-6.png": "1f26eb7af9eb33c143a4395522fadacc04d8cc6a10b1b1c7b911edf879527a1b",
+        "windows-kit-turn-partial-right-45-9.png": "22874d1c25a78d759e104425f55185284bf76839f70b90ea55fd239e17b12b50",
+        "windows-kit-turn-restored.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b"
+      }
+    },
+    {
+      "label": "dense-partial-only",
+      "exe": {
+        "bytes": 14316544,
+        "sha256": "70583113e1d47ed458ed73ed6f14ff69154583d40c3fa994a2f020f3714fab1b"
+      },
+      "settings": {
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "sourceFilesAtBuild": {
+        "exe": {
+          "bytes": 14316544,
+          "sha256": "70583113e1d47ed458ed73ed6f14ff69154583d40c3fa994a2f020f3714fab1b"
+        },
+        "settings": {
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "sourceExe": {
+          "bytes": 14316544,
+          "sha256": "70583113e1d47ed458ed73ed6f14ff69154583d40c3fa994a2f020f3714fab1b"
+        },
+        "save": {
+          "bytes": 162,
+          "sha256": "73b513b21f12de701c38aff0f0e4f4fecce0abbc625b20851218f5050b1d41ea"
+        },
+        "manifest": {
+          "bytes": 166,
+          "sha256": "84315162c255558767f9ded6fc6596a85960c82a450e58cf96ece623ccca15a7"
+        },
+        "kit": {
+          "bytes": 2151672,
+          "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+        },
+        "kitSource": {
+          "bytes": 7034964,
+          "sha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e"
+        },
+        "candidate": {
+          "bytes": 2272652,
+          "sha256": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11"
+        },
+        "rootMotion": {
+          "bytes": 7855,
+          "sha256": "7a4928d4dfec5184071c96a4c8e1f25e07d7ce7c87545324450e75b0c29061d9"
+        },
+        "src/platform/windows/DiagnosticWindow.cpp": {
+          "bytes": 636436,
+          "sha256": "d343bd681dc0c7a0b06811e0608b20b03b40456bfaf42907f3e6a922f5c12eab"
+        },
+        "src/platform/windows/windows_campaign_validation.inl": {
+          "bytes": 67672,
+          "sha256": "9407015a952c37122e829a400170df2b9fa8944640f0073e92916823037f4d0a"
+        },
+        "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+          "bytes": 500444,
+          "sha256": "83f226bc0e02987aca75a771b7d62115b8a2e14c49c521927657b1e687fe6486"
+        },
+        "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+          "bytes": 71083,
+          "sha256": "14c80986c7dba5688fa6bbcfefa49e95b8776c4e958a6105341f687302fa5a54"
+        },
+        "contactData": {
+          "bytes": 2496,
+          "sha256": "ff28cd4dd89abc8c17c1b8d0b723f4e3f198e30c2d6cc1021b2fc6ebcc23e9af"
+        }
+      },
+      "rawManifest": {
+        "path": "reports\\horde-campaign-fixtures-kit-partial-contact-dense-20261024\\windows-lookout-validation.json",
+        "sha256": "0c4e0cb2cdfaaaa51e8cbc57bd28ba2330db32b1d188ac2693d9e85b70d34533"
+      },
+      "rawProcess": {
+        "path": "reports\\kit-partial-contact-20261024\\rt-dense\\serial-process.json",
+        "sha256": "509033c65a10cd9c86d2674d4f8a934e8c1d1a86ec4865670c62f80e0310a3ba"
+      },
+      "checks": 187,
+      "failures": 0,
+      "renderCalls": 165,
+      "capturedInspectionFrames": 154,
+      "wallSeconds": 34.53100000000086,
+      "complete": true,
+      "foregroundContinuous": true,
+      "ownerShown": false,
+      "sourceAndSettingsCustodyUnchanged": true,
+      "parkedOwnerFilesPreserved": 151,
+      "ownerCampaignExistsBefore": false,
+      "ownerCampaignExistsAfter": false,
+      "profile": "isolated Debug candidate playback and RT joins; not gameplay turn-state or owner acceptance",
+      "partial": true,
+      "dense": true,
+      "largeSequenceAuthoredHz": 0,
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+        "waterQuality": "high"
+      },
+      "dimensions": {
+        "internalExtent": [
+          1232,
+          803
+        ],
+        "outputExtent": [
+          1232,
+          803
+        ],
+        "cameraAspect": 1.53424656,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "resources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 60,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 48298880,
+        "deviceLocalBytes": 374422496
+      },
+      "resourcesStable": true,
+      "completionRowsSchema": [
+        "stage",
+        "logicalYaw",
+        "phase",
+        "weight",
+        "submissionSerial",
+        "completionSerial",
+        "lastSuccessfulPresentSubmissionSerial"
+      ],
+      "completionRows": [
+        [
+          "control",
+          2.0032,
+          null,
+          null,
+          7,
+          7,
+          7
+        ],
+        [
+          "partial-left-2-0",
+          2.03811,
+          0,
+          0.0444444,
+          8,
+          8,
+          8
+        ],
+        [
+          "partial-left-2-1",
+          2.03807,
+          0.0555556,
+          0.0444444,
+          9,
+          9,
+          9
+        ],
+        [
+          "partial-left-2-2",
+          2.03752,
+          0.111111,
+          0.0444444,
+          10,
+          10,
+          10
+        ],
+        [
+          "partial-left-2-3",
+          2.0363,
+          0.166667,
+          0.0444444,
+          11,
+          11,
+          11
+        ],
+        [
+          "partial-left-2-4",
+          2.03454,
+          0.222222,
+          0.0444444,
+          12,
+          12,
+          12
+        ],
+        [
+          "partial-left-2-5",
+          2.03231,
+          0.277778,
+          0.0444444,
+          13,
+          13,
+          13
+        ],
+        [
+          "partial-left-2-6",
+          2.02973,
+          0.333333,
+          0.0444444,
+          14,
+          14,
+          14
+        ],
+        [
+          "partial-left-2-7",
+          2.02685,
+          0.388889,
+          0.0444444,
+          15,
+          15,
+          15
+        ],
+        [
+          "partial-left-2-8",
+          2.0238,
+          0.444444,
+          0.0444444,
+          16,
+          16,
+          16
+        ],
+        [
+          "partial-left-2-9",
+          2.02066,
+          0.5,
+          0.0444444,
+          17,
+          17,
+          17
+        ],
+        [
+          "partial-left-2-10",
+          2.01751,
+          0.555556,
+          0.0444444,
+          18,
+          18,
+          18
+        ],
+        [
+          "partial-left-2-11",
+          2.01446,
+          0.611111,
+          0.0444444,
+          19,
+          19,
+          19
+        ],
+        [
+          "partial-left-2-12",
+          2.01159,
+          0.666667,
+          0.0444444,
+          20,
+          20,
+          20
+        ],
+        [
+          "partial-left-2-13",
+          2.009,
+          0.722222,
+          0.0444444,
+          21,
+          21,
+          21
+        ],
+        [
+          "partial-left-2-14",
+          2.00677,
+          0.777778,
+          0.0444444,
+          22,
+          22,
+          22
+        ],
+        [
+          "partial-left-2-15",
+          2.00502,
+          0.833333,
+          0.0444444,
+          23,
+          23,
+          23
+        ],
+        [
+          "partial-left-2-16",
+          2.0038,
+          0.888889,
+          0.0444444,
+          24,
+          24,
+          24
+        ],
+        [
+          "partial-left-2-17",
+          2.00325,
+          0.944444,
+          0.0444444,
+          25,
+          25,
+          25
+        ],
+        [
+          "partial-left-2-18",
+          2.0032,
+          1,
+          0.0444444,
+          26,
+          26,
+          26
+        ],
+        [
+          "partial-left-10-0",
+          2.17774,
+          0,
+          0.222222,
+          27,
+          27,
+          27
+        ],
+        [
+          "partial-left-10-1",
+          2.17752,
+          0.0555556,
+          0.222222,
+          28,
+          28,
+          28
+        ],
+        [
+          "partial-left-10-2",
+          2.17477,
+          0.111111,
+          0.222222,
+          29,
+          29,
+          29
+        ],
+        [
+          "partial-left-10-3",
+          2.16867,
+          0.166667,
+          0.222222,
+          30,
+          30,
+          30
+        ],
+        [
+          "partial-left-10-4",
+          2.15991,
+          0.222222,
+          0.222222,
+          31,
+          31,
+          31
+        ],
+        [
+          "partial-left-10-5",
+          2.14875,
+          0.277778,
+          0.222222,
+          32,
+          32,
+          32
+        ],
+        [
+          "partial-left-10-6",
+          2.13582,
+          0.333333,
+          0.222222,
+          33,
+          33,
+          33
+        ],
+        [
+          "partial-left-10-7",
+          2.12146,
+          0.388889,
+          0.222222,
+          34,
+          34,
+          34
+        ],
+        [
+          "partial-left-10-8",
+          2.1062,
+          0.444444,
+          0.222222,
+          35,
+          35,
+          35
+        ],
+        [
+          "partial-left-10-9",
+          2.09047,
+          0.5,
+          0.222222,
+          36,
+          36,
+          36
+        ],
+        [
+          "partial-left-10-10",
+          2.07474,
+          0.555556,
+          0.222222,
+          37,
+          37,
+          37
+        ],
+        [
+          "partial-left-10-11",
+          2.05949,
+          0.611111,
+          0.222222,
+          38,
+          38,
+          38
+        ],
+        [
+          "partial-left-10-12",
+          2.04512,
+          0.666667,
+          0.222222,
+          39,
+          39,
+          39
+        ],
+        [
+          "partial-left-10-13",
+          2.03219,
+          0.722222,
+          0.222222,
+          40,
+          40,
+          40
+        ],
+        [
+          "partial-left-10-14",
+          2.02103,
+          0.777778,
+          0.222222,
+          41,
+          41,
+          41
+        ],
+        [
+          "partial-left-10-15",
+          2.01227,
+          0.833333,
+          0.222222,
+          42,
+          42,
+          42
+        ],
+        [
+          "partial-left-10-16",
+          2.00617,
+          0.888889,
+          0.222222,
+          43,
+          43,
+          43
+        ],
+        [
+          "partial-left-10-17",
+          2.00343,
+          0.944444,
+          0.222222,
+          44,
+          44,
+          44
+        ],
+        [
+          "partial-left-10-18",
+          2.0032,
+          1,
+          0.222222,
+          45,
+          45,
+          45
+        ],
+        [
+          "partial-left-22_5-0",
+          2.3959,
+          0,
+          0.5,
+          46,
+          46,
+          46
+        ],
+        [
+          "partial-left-22_5-1",
+          2.3954,
+          0.0555556,
+          0.5,
+          47,
+          47,
+          47
+        ],
+        [
+          "partial-left-22_5-2",
+          2.38923,
+          0.111111,
+          0.5,
+          48,
+          48,
+          48
+        ],
+        [
+          "partial-left-22_5-3",
+          2.3755,
+          0.166667,
+          0.5,
+          49,
+          49,
+          49
+        ],
+        [
+          "partial-left-22_5-4",
+          2.35579,
+          0.222222,
+          0.5,
+          50,
+          50,
+          50
+        ],
+        [
+          "partial-left-22_5-5",
+          2.33068,
+          0.277778,
+          0.5,
+          51,
+          51,
+          51
+        ],
+        [
+          "partial-left-22_5-6",
+          2.3016,
+          0.333333,
+          0.5,
+          52,
+          52,
+          52
+        ],
+        [
+          "partial-left-22_5-7",
+          2.26927,
+          0.388889,
+          0.5,
+          53,
+          53,
+          53
+        ],
+        [
+          "partial-left-22_5-8",
+          2.23495,
+          0.444444,
+          0.5,
+          54,
+          54,
+          54
+        ],
+        [
+          "partial-left-22_5-9",
+          2.19955,
+          0.5,
+          0.5,
+          55,
+          55,
+          55
+        ],
+        [
+          "partial-left-22_5-10",
+          2.16416,
+          0.555556,
+          0.5,
+          56,
+          56,
+          56
+        ],
+        [
+          "partial-left-22_5-11",
+          2.12984,
+          0.611111,
+          0.5,
+          57,
+          57,
+          57
+        ],
+        [
+          "partial-left-22_5-12",
+          2.09751,
+          0.666667,
+          0.5,
+          58,
+          58,
+          58
+        ],
+        [
+          "partial-left-22_5-13",
+          2.06842,
+          0.722222,
+          0.5,
+          59,
+          59,
+          59
+        ],
+        [
+          "partial-left-22_5-14",
+          2.04332,
+          0.777778,
+          0.5,
+          60,
+          60,
+          60
+        ],
+        [
+          "partial-left-22_5-15",
+          2.02361,
+          0.833333,
+          0.5,
+          61,
+          61,
+          61
+        ],
+        [
+          "partial-left-22_5-16",
+          2.00988,
+          0.888889,
+          0.5,
+          62,
+          62,
+          62
+        ],
+        [
+          "partial-left-22_5-17",
+          2.0037,
+          0.944444,
+          0.5,
+          63,
+          63,
+          63
+        ],
+        [
+          "partial-left-22_5-18",
+          2.0032,
+          1,
+          0.5,
+          64,
+          64,
+          64
+        ],
+        [
+          "partial-left-45-0",
+          2.7886,
+          0,
+          1,
+          65,
+          65,
+          65
+        ],
+        [
+          "partial-left-45-1",
+          2.7876,
+          0.0555556,
+          1,
+          66,
+          66,
+          66
+        ],
+        [
+          "partial-left-45-2",
+          2.77525,
+          0.111111,
+          1,
+          67,
+          67,
+          67
+        ],
+        [
+          "partial-left-45-3",
+          2.74779,
+          0.166667,
+          1,
+          68,
+          68,
+          68
+        ],
+        [
+          "partial-left-45-4",
+          2.70837,
+          0.222222,
+          1,
+          69,
+          69,
+          69
+        ],
+        [
+          "partial-left-45-5",
+          2.65816,
+          0.277778,
+          1,
+          70,
+          70,
+          70
+        ],
+        [
+          "partial-left-45-6",
+          2.59999,
+          0.333333,
+          1,
+          71,
+          71,
+          71
+        ],
+        [
+          "partial-left-45-7",
+          2.53534,
+          0.388889,
+          1,
+          72,
+          72,
+          72
+        ],
+        [
+          "partial-left-45-8",
+          2.4667,
+          0.444444,
+          1,
+          73,
+          73,
+          73
+        ],
+        [
+          "partial-left-45-9",
+          2.3959,
+          0.5,
+          1,
+          74,
+          74,
+          74
+        ],
+        [
+          "partial-left-45-10",
+          2.32511,
+          0.555556,
+          1,
+          75,
+          75,
+          75
+        ],
+        [
+          "partial-left-45-11",
+          2.25647,
+          0.611111,
+          1,
+          76,
+          76,
+          76
+        ],
+        [
+          "partial-left-45-12",
+          2.19182,
+          0.666667,
+          1,
+          77,
+          77,
+          77
+        ],
+        [
+          "partial-left-45-13",
+          2.13364,
+          0.722222,
+          1,
+          78,
+          78,
+          78
+        ],
+        [
+          "partial-left-45-14",
+          2.08343,
+          0.777778,
+          1,
+          79,
+          79,
+          79
+        ],
+        [
+          "partial-left-45-15",
+          2.04402,
+          0.833333,
+          1,
+          80,
+          80,
+          80
+        ],
+        [
+          "partial-left-45-16",
+          2.01656,
+          0.888889,
+          1,
+          81,
+          81,
+          81
+        ],
+        [
+          "partial-left-45-17",
+          2.0042,
+          0.944444,
+          1,
+          82,
+          82,
+          82
+        ],
+        [
+          "partial-left-45-18",
+          2.0032,
+          1,
+          1,
+          83,
+          83,
+          83
+        ],
+        [
+          "partial-right-2-0",
+          1.9683,
+          0,
+          0.0444444,
+          84,
+          84,
+          84
+        ],
+        [
+          "partial-right-2-1",
+          1.96834,
+          0.0555556,
+          0.0444444,
+          85,
+          85,
+          85
+        ],
+        [
+          "partial-right-2-2",
+          1.96889,
+          0.111111,
+          0.0444444,
+          86,
+          86,
+          86
+        ],
+        [
+          "partial-right-2-3",
+          1.97011,
+          0.166667,
+          0.0444444,
+          87,
+          87,
+          87
+        ],
+        [
+          "partial-right-2-4",
+          1.97186,
+          0.222222,
+          0.0444444,
+          88,
+          88,
+          88
+        ],
+        [
+          "partial-right-2-5",
+          1.97409,
+          0.277778,
+          0.0444444,
+          89,
+          89,
+          89
+        ],
+        [
+          "partial-right-2-6",
+          1.97668,
+          0.333333,
+          0.0444444,
+          90,
+          90,
+          90
+        ],
+        [
+          "partial-right-2-7",
+          1.97955,
+          0.388889,
+          0.0444444,
+          91,
+          91,
+          91
+        ],
+        [
+          "partial-right-2-8",
+          1.9826,
+          0.444444,
+          0.0444444,
+          92,
+          92,
+          92
+        ],
+        [
+          "partial-right-2-9",
+          1.98575,
+          0.5,
+          0.0444444,
+          93,
+          93,
+          93
+        ],
+        [
+          "partial-right-2-10",
+          1.9889,
+          0.555556,
+          0.0444444,
+          94,
+          94,
+          94
+        ],
+        [
+          "partial-right-2-11",
+          1.99195,
+          0.611111,
+          0.0444444,
+          95,
+          95,
+          95
+        ],
+        [
+          "partial-right-2-12",
+          1.99482,
+          0.666667,
+          0.0444444,
+          96,
+          96,
+          96
+        ],
+        [
+          "partial-right-2-13",
+          1.99741,
+          0.722222,
+          0.0444444,
+          97,
+          97,
+          97
+        ],
+        [
+          "partial-right-2-14",
+          1.99964,
+          0.777778,
+          0.0444444,
+          98,
+          98,
+          98
+        ],
+        [
+          "partial-right-2-15",
+          2.00139,
+          0.833333,
+          0.0444444,
+          99,
+          99,
+          99
+        ],
+        [
+          "partial-right-2-16",
+          2.00261,
+          0.888889,
+          0.0444444,
+          100,
+          100,
+          100
+        ],
+        [
+          "partial-right-2-17",
+          2.00316,
+          0.944444,
+          0.0444444,
+          101,
+          101,
+          101
+        ],
+        [
+          "partial-right-2-18",
+          2.0032,
+          1,
+          0.0444444,
+          102,
+          102,
+          102
+        ],
+        [
+          "partial-right-10-0",
+          1.82867,
+          0,
+          0.222222,
+          103,
+          103,
+          103
+        ],
+        [
+          "partial-right-10-1",
+          1.82889,
+          0.0555556,
+          0.222222,
+          104,
+          104,
+          104
+        ],
+        [
+          "partial-right-10-2",
+          1.83164,
+          0.111111,
+          0.222222,
+          105,
+          105,
+          105
+        ],
+        [
+          "partial-right-10-3",
+          1.83774,
+          0.166667,
+          0.222222,
+          106,
+          106,
+          106
+        ],
+        [
+          "partial-right-10-4",
+          1.8465,
+          0.222222,
+          0.222222,
+          107,
+          107,
+          107
+        ],
+        [
+          "partial-right-10-5",
+          1.85766,
+          0.277778,
+          0.222222,
+          108,
+          108,
+          108
+        ],
+        [
+          "partial-right-10-6",
+          1.87059,
+          0.333333,
+          0.222222,
+          109,
+          109,
+          109
+        ],
+        [
+          "partial-right-10-7",
+          1.88495,
+          0.388889,
+          0.222222,
+          110,
+          110,
+          110
+        ],
+        [
+          "partial-right-10-8",
+          1.90021,
+          0.444444,
+          0.222222,
+          111,
+          111,
+          111
+        ],
+        [
+          "partial-right-10-9",
+          1.91594,
+          0.5,
+          0.222222,
+          112,
+          112,
+          112
+        ],
+        [
+          "partial-right-10-10",
+          1.93167,
+          0.555556,
+          0.222222,
+          113,
+          113,
+          113
+        ],
+        [
+          "partial-right-10-11",
+          1.94692,
+          0.611111,
+          0.222222,
+          114,
+          114,
+          114
+        ],
+        [
+          "partial-right-10-12",
+          1.96129,
+          0.666667,
+          0.222222,
+          115,
+          115,
+          115
+        ],
+        [
+          "partial-right-10-13",
+          1.97422,
+          0.722222,
+          0.222222,
+          116,
+          116,
+          116
+        ],
+        [
+          "partial-right-10-14",
+          1.98538,
+          0.777778,
+          0.222222,
+          117,
+          117,
+          117
+        ],
+        [
+          "partial-right-10-15",
+          1.99413,
+          0.833333,
+          0.222222,
+          118,
+          118,
+          118
+        ],
+        [
+          "partial-right-10-16",
+          2.00024,
+          0.888889,
+          0.222222,
+          119,
+          119,
+          119
+        ],
+        [
+          "partial-right-10-17",
+          2.00298,
+          0.944444,
+          0.222222,
+          120,
+          120,
+          120
+        ],
+        [
+          "partial-right-10-18",
+          2.0032,
+          1,
+          0.222222,
+          121,
+          121,
+          121
+        ],
+        [
+          "partial-right-22_5-0",
+          1.6105,
+          0,
+          0.5,
+          122,
+          122,
+          122
+        ],
+        [
+          "partial-right-22_5-1",
+          1.611,
+          0.0555556,
+          0.5,
+          123,
+          123,
+          123
+        ],
+        [
+          "partial-right-22_5-2",
+          1.61718,
+          0.111111,
+          0.5,
+          124,
+          124,
+          124
+        ],
+        [
+          "partial-right-22_5-3",
+          1.63091,
+          0.166667,
+          0.5,
+          125,
+          125,
+          125
+        ],
+        [
+          "partial-right-22_5-4",
+          1.65062,
+          0.222222,
+          0.5,
+          126,
+          126,
+          126
+        ],
+        [
+          "partial-right-22_5-5",
+          1.67572,
+          0.277778,
+          0.5,
+          127,
+          127,
+          127
+        ],
+        [
+          "partial-right-22_5-6",
+          1.70481,
+          0.333333,
+          0.5,
+          128,
+          128,
+          128
+        ],
+        [
+          "partial-right-22_5-7",
+          1.73714,
+          0.388889,
+          0.5,
+          129,
+          129,
+          129
+        ],
+        [
+          "partial-right-22_5-8",
+          1.77146,
+          0.444444,
+          0.5,
+          130,
+          130,
+          130
+        ],
+        [
+          "partial-right-22_5-9",
+          1.80685,
+          0.5,
+          0.5,
+          131,
+          131,
+          131
+        ],
+        [
+          "partial-right-22_5-10",
+          1.84225,
+          0.555556,
+          0.5,
+          132,
+          132,
+          132
+        ],
+        [
+          "partial-right-22_5-11",
+          1.87657,
+          0.611111,
+          0.5,
+          133,
+          133,
+          133
+        ],
+        [
+          "partial-right-22_5-12",
+          1.9089,
+          0.666667,
+          0.5,
+          134,
+          134,
+          134
+        ],
+        [
+          "partial-right-22_5-13",
+          1.93799,
+          0.722222,
+          0.5,
+          135,
+          135,
+          135
+        ],
+        [
+          "partial-right-22_5-14",
+          1.96309,
+          0.777778,
+          0.5,
+          136,
+          136,
+          136
+        ],
+        [
+          "partial-right-22_5-15",
+          1.9828,
+          0.833333,
+          0.5,
+          137,
+          137,
+          137
+        ],
+        [
+          "partial-right-22_5-16",
+          1.99653,
+          0.888889,
+          0.5,
+          138,
+          138,
+          138
+        ],
+        [
+          "partial-right-22_5-17",
+          2.00271,
+          0.944444,
+          0.5,
+          139,
+          139,
+          139
+        ],
+        [
+          "partial-right-22_5-18",
+          2.0032,
+          1,
+          0.5,
+          140,
+          140,
+          140
+        ],
+        [
+          "partial-right-45-0",
+          1.21781,
+          0,
+          1,
+          141,
+          141,
+          141
+        ],
+        [
+          "partial-right-45-1",
+          1.2188,
+          0.0555556,
+          1,
+          142,
+          142,
+          142
+        ],
+        [
+          "partial-right-45-2",
+          1.23116,
+          0.111111,
+          1,
+          143,
+          143,
+          143
+        ],
+        [
+          "partial-right-45-3",
+          1.25862,
+          0.166667,
+          1,
+          144,
+          144,
+          144
+        ],
+        [
+          "partial-right-45-4",
+          1.29804,
+          0.222222,
+          1,
+          145,
+          145,
+          145
+        ],
+        [
+          "partial-right-45-5",
+          1.34824,
+          0.277778,
+          1,
+          146,
+          146,
+          146
+        ],
+        [
+          "partial-right-45-6",
+          1.40642,
+          0.333333,
+          1,
+          147,
+          147,
+          147
+        ],
+        [
+          "partial-right-45-7",
+          1.47107,
+          0.388889,
+          1,
+          148,
+          148,
+          148
+        ],
+        [
+          "partial-right-45-8",
+          1.53971,
+          0.444444,
+          1,
+          149,
+          149,
+          149
+        ],
+        [
+          "partial-right-45-9",
+          1.6105,
+          0.5,
+          1,
+          150,
+          150,
+          150
+        ],
+        [
+          "partial-right-45-10",
+          1.6813,
+          0.555556,
+          1,
+          151,
+          151,
+          151
+        ],
+        [
+          "partial-right-45-11",
+          1.74994,
+          0.611111,
+          1,
+          152,
+          152,
+          152
+        ],
+        [
+          "partial-right-45-12",
+          1.81459,
+          0.666667,
+          1,
+          153,
+          153,
+          153
+        ],
+        [
+          "partial-right-45-13",
+          1.87277,
+          0.722222,
+          1,
+          154,
+          154,
+          154
+        ],
+        [
+          "partial-right-45-14",
+          1.92297,
+          0.777778,
+          1,
+          155,
+          155,
+          155
+        ],
+        [
+          "partial-right-45-15",
+          1.96239,
+          0.833333,
+          1,
+          156,
+          156,
+          156
+        ],
+        [
+          "partial-right-45-16",
+          1.98985,
+          0.888889,
+          1,
+          157,
+          157,
+          157
+        ],
+        [
+          "partial-right-45-17",
+          2.00221,
+          0.944444,
+          1,
+          158,
+          158,
+          158
+        ],
+        [
+          "partial-right-45-18",
+          2.0032,
+          1,
+          1,
+          159,
+          159,
+          159
+        ],
+        [
+          "restored",
+          2.0032,
+          null,
+          null,
+          160,
+          160,
+          160
+        ]
+      ],
+      "imageSha256": {
+        "windows-kit-turn-control.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b",
+        "windows-kit-turn-partial-left-10-0.png": "7265c9bd27e157c5aeaab8d92cbdcce22f68108d99ef5547dbf96530c898f20b",
+        "windows-kit-turn-partial-left-10-1.png": "2e821d602af14264db3088c84436b3d83411e9ba9f66ef389eefbd3ca2104cf9",
+        "windows-kit-turn-partial-left-10-10.png": "9aced7b7beb7bed00d513b887deb93dc267e8529018181279545c5b17d6fd736",
+        "windows-kit-turn-partial-left-10-11.png": "315f80b07f7019a6e5a7efcf1f0910ce2a3651b85e38ac2ceb3d5bc818c9baf9",
+        "windows-kit-turn-partial-left-10-12.png": "1d83890b3d663ba3005f38c1b7499d947af42d403510950e7f76dbbe09eea2e3",
+        "windows-kit-turn-partial-left-10-13.png": "b21c026fab8228e6b232f027825415e73183ebbd40049c68349dcaf2066bdf0c",
+        "windows-kit-turn-partial-left-10-14.png": "a5ba73818fe70ba28dfbb02ae0f5ee15c3d7ac6fd44ffd366e5cb1ff719989f2",
+        "windows-kit-turn-partial-left-10-15.png": "95c6ab3e751e335da0dcb2a95b365fd5e1990db47db79d8f1c5ae728762933f1",
+        "windows-kit-turn-partial-left-10-16.png": "bc45d1bee9e405e57c513d67b935ad6866a27bfd70afaa5d614ed5097926570b",
+        "windows-kit-turn-partial-left-10-17.png": "8f791045d033c2d193cbf60a4e6ba7c09dad74311f8e62bd1cc2c1788a9885fa",
+        "windows-kit-turn-partial-left-10-18.png": "d00db269528fea97cf971a0fc2ea563b11664735322092ccaad59ddd9f095fb9",
+        "windows-kit-turn-partial-left-10-2.png": "cc52ceedead2c2e9d0d76b01ce9213b50b9f87f3ec2a2e21cca2aa7bee7164ed",
+        "windows-kit-turn-partial-left-10-3.png": "b6054d7b6d53fcc8ca144ca170c147c3a080474a1185189abd52ee181bdb1486",
+        "windows-kit-turn-partial-left-10-4.png": "4e2d01e3045c2b0d168774567501cdb8bcb8ae13ae938e7ccdecd6c467974ff9",
+        "windows-kit-turn-partial-left-10-5.png": "5593fc531edb798f8c0dbd76d39a8a0e3a1fcdd6e643aec1e4b5275ad55f4733",
+        "windows-kit-turn-partial-left-10-6.png": "4ea3f772cb8f9044b6c4ed557b0e8818b4cc7769f47163f90052dffd5356f81f",
+        "windows-kit-turn-partial-left-10-7.png": "0aa299f9b5ec2126867219e951ebaf01cc780410339c48c9f6d610979b571a7a",
+        "windows-kit-turn-partial-left-10-8.png": "3bafaeb7413927c05c1c4adb819846258f3eb247ffd84f8b348cdebd905e5e9c",
+        "windows-kit-turn-partial-left-10-9.png": "b3fcbac8e9df2947c5d0f5ed78fdb586d999594e4741cf5551774276efae893f",
+        "windows-kit-turn-partial-left-2-0.png": "6532194b9626b8ac915e3f0a1bddc1acd397c34b6889773c601dad3695b8aea2",
+        "windows-kit-turn-partial-left-2-1.png": "f5f264a13940e0d9cf48628209bac3af68790b0e15b68f88758fc647c67072d1",
+        "windows-kit-turn-partial-left-2-10.png": "ad3c4de3fa2329b3601c749ece683102091d0eea4e54c0d72a7ebe89d151a936",
+        "windows-kit-turn-partial-left-2-11.png": "17b27b5be855142c66acab4af09d78a5675f4970e050685bd84d0ca4dbc6cb7b",
+        "windows-kit-turn-partial-left-2-12.png": "5b9fb5659771a82f6335faa97b1290ac30ac914faeac2440b5255d25f662c397",
+        "windows-kit-turn-partial-left-2-13.png": "df9d3e413eaf5b59fcac6e99010ed9f61a33fd77af068c2eb305bccd6354ee28",
+        "windows-kit-turn-partial-left-2-14.png": "5854ba7943384ebb2a8ef91a9c86111de127ad01449b17854ab30a3c41ec37cf",
+        "windows-kit-turn-partial-left-2-15.png": "b2858f3de2aea42e4a610097d1f0a63b85664c1e64bf037431c70c1c4ac2c697",
+        "windows-kit-turn-partial-left-2-16.png": "c548f241cde27a1799cd67627b70c2aaf5d16ae911c8f56f5d6cefdf2d8ce7d8",
+        "windows-kit-turn-partial-left-2-17.png": "144acddee0e3ed5a52d2211bb9f8387c157fda813bf1ac374344991747fa5570",
+        "windows-kit-turn-partial-left-2-18.png": "485b15aaab1d5e7f2ccdbb47630bb938d78bd383480234d5be2d558681e0c86b",
+        "windows-kit-turn-partial-left-2-2.png": "7c790353670cf10befda9fbe4d225ffb7998f963f91ed674af059cf5fd750e72",
+        "windows-kit-turn-partial-left-2-3.png": "e7f4f4f0f551283b531bdd8941de37325cf875f43db45f5da73e247f458855e3",
+        "windows-kit-turn-partial-left-2-4.png": "854a3f14212eafb3bfdd7f743305214db1cc4d9fb11241b813f5c97de395f478",
+        "windows-kit-turn-partial-left-2-5.png": "8a9585c20787ea6a8345a946a9a0db2baadf18e8fdf5a7406a7e9fcf52594947",
+        "windows-kit-turn-partial-left-2-6.png": "116537448c508580b983718cb89a05b099568c78b83ffebe757b1893c8cdcd91",
+        "windows-kit-turn-partial-left-2-7.png": "a77161733afce915d985fd93cbb1b9fbbb128f90a69d8e1c0d11d2f479670e84",
+        "windows-kit-turn-partial-left-2-8.png": "97178a957aafd31bdd00477343e7db31aa6341e84497e7f54c1e129b6f9cd3f7",
+        "windows-kit-turn-partial-left-2-9.png": "ba81e8a3d7e2fedc141bea74b03157320ba6c7f22c0628de7489e2575aaea5ab",
+        "windows-kit-turn-partial-left-22_5-0.png": "b239ff7c162923ea5b1919f73fced8a3587031d754fd5ee92f571bc1b1da2d46",
+        "windows-kit-turn-partial-left-22_5-1.png": "afffeab02e92e22cace7e65fafb418bbd9b883336931f9e34dd477e4acf08ff4",
+        "windows-kit-turn-partial-left-22_5-10.png": "5c93423d82926441e1a542b0601aa0e1bbeac2ad40002d0c59f74b70e443c02f",
+        "windows-kit-turn-partial-left-22_5-11.png": "92186fbe4e7d07a4b1dc014e869641c5f9e9b875dc9fd4d44528192282b0c233",
+        "windows-kit-turn-partial-left-22_5-12.png": "cc41bdecf10e6f42ea3ed40299c143743b9a438d9b911a53c96e58f9a6ef0515",
+        "windows-kit-turn-partial-left-22_5-13.png": "1c28dd47cd84548df96076d0a1490a9b0442535eb5cb07d50c67666c2dd1951f",
+        "windows-kit-turn-partial-left-22_5-14.png": "fd4d2208f2a41cec93db4ce70941d8739bbd4de12f59c544f5d87f7fca943859",
+        "windows-kit-turn-partial-left-22_5-15.png": "cd72a88e68efc29fdfbf8126f7df7cdfd708045bc7f612a5d95db0d7bc1e6e43",
+        "windows-kit-turn-partial-left-22_5-16.png": "7f83bef741136fa7339aeb1e952149850d9b51930e714c9cfbaaa8ca2ae765e1",
+        "windows-kit-turn-partial-left-22_5-17.png": "840c12998e5482de61ca4d553e030fe3317152254b7a68b6bf87d5fe17fd1a7c",
+        "windows-kit-turn-partial-left-22_5-18.png": "18bb9d3801e0bed297a6da1e58920e99c986e78815c9cd3725bf37aac47f4be2",
+        "windows-kit-turn-partial-left-22_5-2.png": "44cbd1103f9a304dbdf652b7166522675d0466aec129002d1551862e46db4d0f",
+        "windows-kit-turn-partial-left-22_5-3.png": "6d37bab4edc7ac8ef9a3a4caced6418c58ec339bfe49df550d11fa512c8256e5",
+        "windows-kit-turn-partial-left-22_5-4.png": "d895e611031317a6b7c5b2d58f7e250ab8d2f1ba133eb467f1924ec7bbf8d17c",
+        "windows-kit-turn-partial-left-22_5-5.png": "8288e10ba20a212aeba9d9f61caaea93b2a09b9004367d1b6ff7d5255a9870a3",
+        "windows-kit-turn-partial-left-22_5-6.png": "ecb02d55dd533d2a970c4a3bef652784725c153d58e537a67ce454b417e65292",
+        "windows-kit-turn-partial-left-22_5-7.png": "9eadf946f2783fa24ee228b89e97dbba4406d90cd8a96b89c879501a685445fe",
+        "windows-kit-turn-partial-left-22_5-8.png": "c2ee364cc152b859b9a08018e2e0340e5ef5869e1e785c756865351d2cab1090",
+        "windows-kit-turn-partial-left-22_5-9.png": "2196dbca0087c1d23186b6975f87e0fff6e1f79a9a276db87bd0fb5accb2b558",
+        "windows-kit-turn-partial-left-45-0.png": "7e7c85f6545014646e585ab69e96b0305425460cc6ccc04169a1687bfa66e352",
+        "windows-kit-turn-partial-left-45-1.png": "b5f4891b3415f9c8687e4077a2f85aa961ef54b49e9e00499070b6ab535a423b",
+        "windows-kit-turn-partial-left-45-10.png": "739c650c5f0d56eb478427d7c7480d8811454811387a9acc2cc4ea85d23b761c",
+        "windows-kit-turn-partial-left-45-11.png": "e220e2a8f1f3fec5dd356120fe02c95c5e6a5dcf0df1935f48069e134defaf1e",
+        "windows-kit-turn-partial-left-45-12.png": "0f3cd9bce34fc80c2d856a50a876720ef8f2af5ec3c7aaa67038f4f507e9183c",
+        "windows-kit-turn-partial-left-45-13.png": "9e492925e3f9dac9d21ddda4216c85b3823edb42104712781779e5cbd4c5572e",
+        "windows-kit-turn-partial-left-45-14.png": "a51bc16517110017e7e6a0e90f402717c7e9341b2e3537ff34e0c54d20c6b0af",
+        "windows-kit-turn-partial-left-45-15.png": "e4ba7d303a87f628f4159f24a0259b022bd603ad5cd58bcf3005cf9469665686",
+        "windows-kit-turn-partial-left-45-16.png": "7b601b41672864878913490a6669329feb1a94e2d27966e25587b4905d061ed0",
+        "windows-kit-turn-partial-left-45-17.png": "f5eb144b9c07300e93d1c8f4b7db9c9bf031981921dc63bfc4ce0e4a1c63aa44",
+        "windows-kit-turn-partial-left-45-18.png": "eb7f44b4622333c8a3f256ed6418ce4b1020ee2df07846cb94345a37f7cf29df",
+        "windows-kit-turn-partial-left-45-2.png": "fc79b82b06fbb4aba9c049bd37bddef295a472afc14db1c931f5a9e597c83b81",
+        "windows-kit-turn-partial-left-45-3.png": "095bae7adf255b33ec82c8a2db229c4dceea3cdad44e9148130237652075379b",
+        "windows-kit-turn-partial-left-45-4.png": "825efefa6d0ebdfdfaa8b9a3606276603ff9e655a35bd47ba1b64c4f4c28f58e",
+        "windows-kit-turn-partial-left-45-5.png": "5eb269ac318cad95ee43143982c716cb01af3383ca16b9a8aafcbb0968b5049e",
+        "windows-kit-turn-partial-left-45-6.png": "17d9893fb741b1ffea29f6bc90e833c835f3ef25d1432c6ced6055c81aa41c4a",
+        "windows-kit-turn-partial-left-45-7.png": "39dbc4cb5d563266dc660795382381c675529504bc905f43615ffc071d92244e",
+        "windows-kit-turn-partial-left-45-8.png": "209b9aa98e9cc2f9f9155dac1acf423d870b358ee08881ba87dc4940fea287d9",
+        "windows-kit-turn-partial-left-45-9.png": "7a2ad84ee7eb313246c771ee4b57a266a77fb457d46acccf3f37ee1a94e9390d",
+        "windows-kit-turn-partial-right-10-0.png": "6967e20c297aaad286863b07c44bb68760ff3021ae5ba716ab3eb13e5ee4d30b",
+        "windows-kit-turn-partial-right-10-1.png": "e1a3c3d3480edd91533a51cc79b6e2df1d3da93804ef10201a65e94412cc8d13",
+        "windows-kit-turn-partial-right-10-10.png": "6d57ae80711b92db9c5433905e0b266e68fc6f023c9aa142abec897a7d7163d8",
+        "windows-kit-turn-partial-right-10-11.png": "5106703a88599ca1e62f653491de557f72ac030012d45a91fd36b4169cf1a59c",
+        "windows-kit-turn-partial-right-10-12.png": "af3abe2c723b47470dfe385462a023f9ee5bc649c5d58f0c56c5b474dec18ada",
+        "windows-kit-turn-partial-right-10-13.png": "b26f9d1fb418ff4e44025016405a8257f7c1159fe3cf7e81ab07a15541d314d5",
+        "windows-kit-turn-partial-right-10-14.png": "3c341bc5e7500cae576094e67997af1b7a4be410997c24c653914387e5c843e6",
+        "windows-kit-turn-partial-right-10-15.png": "40b90af31c255228e45818630d43f126e7b174a9172b8f38dfe8385fd65a313f",
+        "windows-kit-turn-partial-right-10-16.png": "a534495674b58b8ed1232508c4f54314eb1c7324201a2808d55a0139d6d4527d",
+        "windows-kit-turn-partial-right-10-17.png": "42273c3500ab809b2321eb9239089d1f4f0daa53a0e5390635e6123e5dc63061",
+        "windows-kit-turn-partial-right-10-18.png": "a6312d050bde37d0a728dd2fa03a3da35408e05fcc23353109ba7437f9d6db7d",
+        "windows-kit-turn-partial-right-10-2.png": "52039a255b80b945951da558ae73e76d0cc7f1fc3696cde8b83bfa72c79e25bb",
+        "windows-kit-turn-partial-right-10-3.png": "8c0d4c35aad034792b479f2002e737c60d53ab99af8e4e70cfe8ad3ea5cce2bb",
+        "windows-kit-turn-partial-right-10-4.png": "0e1d75ce86612f6529f197f6842948d0e2dbaccf0925a102f5cf36101e5a1d22",
+        "windows-kit-turn-partial-right-10-5.png": "34bc27f4eb846e7d1143a735adba1ba0e21fecd38bd5dff4d3dbcc9be8b0e7ec",
+        "windows-kit-turn-partial-right-10-6.png": "232b0d43c669ddbf20452faec72c0443884867db8d28b799c876f04f180001cc",
+        "windows-kit-turn-partial-right-10-7.png": "a7015206872fb60455099b325b6474fa19905e27ba23ac41ec620f96ba378633",
+        "windows-kit-turn-partial-right-10-8.png": "fd982bb8db3935d314d4ffd96ad95ef1a3f8d62ad25262e17ff4c7486b4fcde0",
+        "windows-kit-turn-partial-right-10-9.png": "ca0b060fbb605e62f26495bd48cb8676c33dc887b76b8d7dd0308401d707d0d7",
+        "windows-kit-turn-partial-right-2-0.png": "9f2460495678663321e13a399adbd3b62435bea9282542bebf872dc166c2f133",
+        "windows-kit-turn-partial-right-2-1.png": "a46b17a23fe31af5ae63f2111d9079cac88f36de0aeb781cbb237c649c6160c2",
+        "windows-kit-turn-partial-right-2-10.png": "b264371adc02b40b5994fd19518368f772e8e1906ac98b13bd89ec1d91ff4281",
+        "windows-kit-turn-partial-right-2-11.png": "fa73c1167ed4a60293a157d38bc2565483ddd269bab2685ff45b113cc77885d0",
+        "windows-kit-turn-partial-right-2-12.png": "8a7f778d7605fa6172eddcdc9c10a250027e60b0f3a1e651ec6b3a3348ed66ec",
+        "windows-kit-turn-partial-right-2-13.png": "07210475a1079e751d1b38bd3faf3aa13721a94a2dedddc10f59c1a5e16e7f1e",
+        "windows-kit-turn-partial-right-2-14.png": "b7e318cb70ee4d6557623df37b26a6e17c6109a6d8e751016a4aec78ee26af5f",
+        "windows-kit-turn-partial-right-2-15.png": "bca0b15345dd3fba4483bf363a83350e6286b163229381e0f3411c073138a21d",
+        "windows-kit-turn-partial-right-2-16.png": "447aa387bd83f65fc390031388b34c345d40f394cd99200bec1bef54c0abd9d9",
+        "windows-kit-turn-partial-right-2-17.png": "e1b391b6a70e41d80d56cb93d14eef6935f60f97c078c5998cd2c5bf38dc7283",
+        "windows-kit-turn-partial-right-2-18.png": "3e87371d236ccc48e185005fd819cc1a2de87662ca7f00923ab8a59586a052ba",
+        "windows-kit-turn-partial-right-2-2.png": "3bebea84cb241270ea99b3f4d4d7e379a57211162b003fd259a083a042004018",
+        "windows-kit-turn-partial-right-2-3.png": "13ddac2cf10b73f63afc67d82b80eb7170cbeb7b498bcb9753810c6dae33ffa2",
+        "windows-kit-turn-partial-right-2-4.png": "2a2f3c732ca4462c75993b52db37d54b6e692513ed535bbf3f8c50173637b260",
+        "windows-kit-turn-partial-right-2-5.png": "b1fc288744e0a4250bb0c4a5ac219692a8fe78f7a84a2986bb461fac908bf2c9",
+        "windows-kit-turn-partial-right-2-6.png": "5a96a71cf47e74a4caebbcce2379e45a0baef60df7a2be8feae4889dc6157ee2",
+        "windows-kit-turn-partial-right-2-7.png": "b2b77c4a771f50f4b0c1e97b7f2b9fd44dc17cb1b06f32d92ffa0d8dc2be63dd",
+        "windows-kit-turn-partial-right-2-8.png": "68128bd35371a03d9867b30aa27a7f717ea3d5476d83f625e3530fda3fe2e43e",
+        "windows-kit-turn-partial-right-2-9.png": "985961ec665810008d4bc98eff9017944f310c1e36478bc72dd2df7942241923",
+        "windows-kit-turn-partial-right-22_5-0.png": "4f95077783c17fdc697c1506d092bf5c2baefd54ffeafd708e5b88bc8c48563f",
+        "windows-kit-turn-partial-right-22_5-1.png": "e1ace312d6add882524ffe7a770988f825b84d3c89b4cee1f63e8741bc5c76b2",
+        "windows-kit-turn-partial-right-22_5-10.png": "a59a8f3bb13cdb507032c7046204fd4c67cfc0fc670828e993c32dda17533186",
+        "windows-kit-turn-partial-right-22_5-11.png": "fd12f133f70cedb300568b3d7cb601a8c993db655374c753cba44638c63d80a0",
+        "windows-kit-turn-partial-right-22_5-12.png": "e600dabb481a300da97a8253c5084be184273fe113d769b492354d0aa6eb54e6",
+        "windows-kit-turn-partial-right-22_5-13.png": "2c90e01cafc7a04b81effc139f26ccac5528ee77e3b720f8b75547ab1fd1f7ad",
+        "windows-kit-turn-partial-right-22_5-14.png": "394cc8b094da4386aa49165d25c7b18eb240a0e47fcb1773ef28f565eb8018c3",
+        "windows-kit-turn-partial-right-22_5-15.png": "920edf828bbf5189f2d680d11ce3026b40e1a60760c8d73c6b8efee9341503ca",
+        "windows-kit-turn-partial-right-22_5-16.png": "8a333f0f48e705227756ef0c27d5b33ac494e50c5814ea00fe66766137f8601c",
+        "windows-kit-turn-partial-right-22_5-17.png": "7d9986dc455f248d3240b426d21f910e6557c20cd2e90a852363c7f43a66f8a8",
+        "windows-kit-turn-partial-right-22_5-18.png": "c0dbca0abf7e1bc72bda0cd2392a6ac7b6b903cdf84e49044cf96d9ce6112e4a",
+        "windows-kit-turn-partial-right-22_5-2.png": "920753e85ae9e7d7290f15a74c18a1de5142cea2368ed9a2210cf72660786263",
+        "windows-kit-turn-partial-right-22_5-3.png": "236e40a62d7e2034a79adc817e3454eb961f493321a5632703a04e81b002f4f5",
+        "windows-kit-turn-partial-right-22_5-4.png": "81a3f3754a8d6ab85c1e6c08fbd5f64d9a87e32a771c0f7e3b60345922ef7deb",
+        "windows-kit-turn-partial-right-22_5-5.png": "0e33605541badb5a34499d3b11550c3daaf9635b9156031f2a7acc701db6c586",
+        "windows-kit-turn-partial-right-22_5-6.png": "cbbdc19865412ada8dae7c7054292e866ef6ace52f1b6678e17e7d12c1f03b02",
+        "windows-kit-turn-partial-right-22_5-7.png": "cb81f80fd3e03e33ab94ba30822ee92e0122d13aa5fcea3c047f598adc3d9814",
+        "windows-kit-turn-partial-right-22_5-8.png": "393f08298634fafd6e96cbe703ac87747ceca7280a838a3c34484c53a75816a9",
+        "windows-kit-turn-partial-right-22_5-9.png": "7e6209e5984947b09afda7f56d919c950e20973e6198541812b7d2a8833323c4",
+        "windows-kit-turn-partial-right-45-0.png": "3196ddf795a91519c40fd786c1208e521dd329383b2b6928fcdf7b41bfa28728",
+        "windows-kit-turn-partial-right-45-1.png": "88ec78beb776aab596e59f34e2104f4b2edd4ce9b4689171cdef061ce70e41af",
+        "windows-kit-turn-partial-right-45-10.png": "16075bc9b21b62c171c8d2fcb8a490b0e05ea7c47e2fa7b382ef88cb463f8a34",
+        "windows-kit-turn-partial-right-45-11.png": "22ba44a066df07c4e43e07bac3293bf55c3eb141c5d4de3e712f8b7bcd96363b",
+        "windows-kit-turn-partial-right-45-12.png": "56a2b742b27d204aea9574d6d8e033c68cae0214e148bf83eb9795aaa7e7ef3d",
+        "windows-kit-turn-partial-right-45-13.png": "7be7fd7006c20d3a17175dd0906d73cefb5f92f3028642b273b4cc52a13f1930",
+        "windows-kit-turn-partial-right-45-14.png": "a11c67471a2cdc4df987f60d8bffe7e609df9b7ef40ada06553bed114f287288",
+        "windows-kit-turn-partial-right-45-15.png": "624cc671ff7ee0c51460683e55f1bbd38bb7f7d47dd9ce85d9ced9bbd46b8831",
+        "windows-kit-turn-partial-right-45-16.png": "b723bd57e4f9214db3bdd2ff15ab5e1e1d4554822ad670375eba9e104a04ae5c",
+        "windows-kit-turn-partial-right-45-17.png": "de45429fb433c1e1aee78bd8e3102cf1267911f8eaa26e8bfb131553848567a5",
+        "windows-kit-turn-partial-right-45-18.png": "2b877e9bbeb26c29ef1780dd3bd678a84922619ad8e196f145f5f26bf7ba7dd2",
+        "windows-kit-turn-partial-right-45-2.png": "f634e248b6dc6e833e1cb9f740e5a7017c3ca3b5b2742c5302b88ad4575b82fa",
+        "windows-kit-turn-partial-right-45-3.png": "d2ab84bef0a368b6d3ba46337edaad7f1e6ebbca4e19de97c51b5ab3ca999818",
+        "windows-kit-turn-partial-right-45-4.png": "561b0d34815ba35d7553909ef8b2528d163fbf3c32c3ef47e0b6c8fce02feb5c",
+        "windows-kit-turn-partial-right-45-5.png": "b4820135c513055b47aa5b92907ba0762659414879a6f3c9902e9e58bf77f9c2",
+        "windows-kit-turn-partial-right-45-6.png": "1f26eb7af9eb33c143a4395522fadacc04d8cc6a10b1b1c7b911edf879527a1b",
+        "windows-kit-turn-partial-right-45-7.png": "5d1e9f7b532cc8d7c5fb6abeaa2a1b97808d0ca47d81366cbc500c681fb9aeb8",
+        "windows-kit-turn-partial-right-45-8.png": "433fa9b2e4c1b3c4c2577d7500322edcc69481b1845748c26636a99d4704b689",
+        "windows-kit-turn-partial-right-45-9.png": "22874d1c25a78d759e104425f55185284bf76839f70b90ea55fd239e17b12b50",
+        "windows-kit-turn-restored.png": "4a20b1c7a802d4688a5224e613111923c0af2388c5808cafdbcb62c04c2a4b6b"
+      }
+    }
+  ],
+  "all40OriginalPartialPngsByteIdenticalInDenseRun": true,
+  "media": {
+    "large": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1232,
+          "height": 804,
+          "r_frame_rate": "24/1",
+          "nb_frames": "97"
+        }
+      ],
+      "format": {
+        "duration": "4.041667"
+      }
+    },
+    "partial": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "width": 1360,
+          "height": 750,
+          "r_frame_rate": "24/1",
+          "nb_frames": "43"
+        }
+      ],
+      "format": {
+        "duration": "1.791667"
+      }
+    },
+    "authoredSampleHz": 24,
+    "largeSourceSamples": 73,
+    "largeMotionSeconds": 3,
+    "partialSourceSamples": 19,
+    "partialMotionSeconds": 0.75,
+    "leadAndEndHoldSeconds": 0.5,
+    "largePacingAdopted": false,
+    "observedEngineFpsClaim": false,
+    "videoLiveListeningOrOwnerFeelAcceptance": false,
+    "review": "Original decoded frames/sheets reviewed; no foreground player opened."
+  },
+  "focusedValidation": {
+    "debugDiagnosticBuildExitCode": 0,
+    "nativeMeasurementExitCode": 0,
+    "originalIntakeCtestPassed": 1,
+    "originalIntakeCtestSeconds": 7.16,
+    "log": "reports/kit-partial-contact-20261024/default-intake.log",
+    "sha256": "adc51fd14f65745a46f8a33c857eda5f057be71cbb6c1d09d40384106718035d"
+  },
+  "rawLogSha256": {
+    "reports\\kit-partial-contact-20261024\\native-ground-touch.log": "87f02235f42f65a3c86cce73e7ae5c43f81b2799a665b06f57368a082239d830",
+    "reports\\kit-partial-contact-20261024\\contact-band-build.log": "808dc2d5dca5e8ecc9ae102830083da60caec291542e4ce5912bd538acc6fc4f",
+    "reports\\kit-partial-contact-20261024\\dense-rt-build.log": "aad08357e8ec4b8898e1aee396fe68c8b81c1e7f491368bb841950ba366bbb68",
+    "reports\\kit-turn-native-export-20261023\\partial-contact-final-build.log": "3a3ada41e2ea696b9a7536520a6149489cd5dfca2a54a962775a66df0a42b9ed"
+  },
+  "limitations": [
+    "77 selected sole vertices; sampled normalized-model-floor contact, not per-boot terrain solve.",
+    "First support-window-only result excluded nominal swing and was insufficient for admission; retained alongside correction.",
+    "Dense wrapper has overbroad copied class text; native manifest/frames correctly identify dense-only.",
+    "Night views do not establish that increased contact creep is acceptable or prove gross visible failure.",
+    "No new admission tolerance, production controller, phone evidence, pacing adoption or performance gain."
+  ],
+  "backedTextCanonicalization": "Backed measurement JSON reserialized UTF8/LF and CSV line endings normalized to LF; raw ignored originals retained with separate hashes.",
+  "backedFiles": {
+    "four-45-turns-180deg-authored-1x.mp4": {
+      "bytes": 466715,
+      "sha256": "f8af66a8462742e7af4c40d981bc70ab0e9306bc27f279410f8ff4982a2049b3"
+    },
+    "large-turn-reviewed-frames.png": {
+      "bytes": 649269,
+      "sha256": "07e8f5e685b9f23708fc24c602dea2b54735fd2053ea527d11704cc8cfa9ed0b"
+    },
+    "left-sole-contact-sheet.png": {
+      "bytes": 583647,
+      "sha256": "6e8b2d1dee60002495a9217acfb77b2f5cc7a6ce0170a45e61aff4ccdddca430"
+    },
+    "measurement.json": {
+      "bytes": 11306,
+      "sha256": "e5a41ad1fbe19a74f6968b9b8ff5783aa008b3e22795f145c895a9cda4e20323"
+    },
+    "partial-angles-contact-authored-1x.mp4": {
+      "bytes": 639630,
+      "sha256": "26a9e23dfa49be53284137efbaef39889bde45088898dde71e94b01c7b530b7f"
+    },
+    "prior-declared-support-only.json": {
+      "bytes": 2924,
+      "sha256": "822dc68f3ff5dda57788e99ddcb67ac6d3c9300e2c399e84bea2304b2674d08c"
+    },
+    "README.md": {
+      "bytes": 8573,
+      "sha256": "ac209b00a90ea651f390e2dd904f79415338d596835522c0d30997b18b7fdf93"
+    },
+    "right-sole-contact-sheet.png": {
+      "bytes": 585810,
+      "sha256": "71389d53bf415cb95a1a921511148120746d93de45c44e885825db7eb6352c9c"
+    },
+    "sole-samples.csv": {
+      "bytes": 267759,
+      "sha256": "b1b111722798e315e9c36492b3a66a39054e39dc8c70d1d28cc1bcabf7f32cd6"
+    }
+  },
+  "priorExactHeadCi": {
+    "commit": "3fd5ef6cf835d6708663235addaa92d6760487f0",
+    "run": 40055011876,
+    "allSixJobsSuccess": true
+  }
+}

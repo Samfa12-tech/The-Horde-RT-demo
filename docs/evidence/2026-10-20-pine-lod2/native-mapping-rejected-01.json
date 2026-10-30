@@ -1,0 +1,8 @@
+{
+  "result": "failed before native comparison",
+  "reason": "Terrain helper required walkable root samples; actual ForestDressing tree grounding requires found only",
+  "scriptSha256": "193bcfd3df3d722fb956a6ef5cf89e6bdd85bade838160d314e3fe0d2276b632",
+  "preservedScript": "verify_native_mapping.initial-rejected.py",
+  "log": "native-mapping-run-01.log",
+  "residualLimitsUnchanged": true
+}

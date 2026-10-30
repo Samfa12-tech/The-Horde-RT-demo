@@ -256,6 +256,35 @@ void TestGlassMigrationAndTransactions()
 }
 void TestIndependentShadowAndLowFire()
 {
+    const auto retiredLower = static_cast<ShadowQuality>(0u);
+    auto retired = GraphicsSettings{63, WaterQuality::Off, FireDetail::Low, 42,
+        false, retiredLower, false, DustQuality::Standard};
+    Check(!ValidGraphicsSettings(retired), "retired Lower is not an active graphics choice");
+    Check(NextShadowQuality(ShadowQuality::Current) == ShadowQuality::Higher &&
+        NextShadowQuality(ShadowQuality::Higher) == ShadowQuality::Current &&
+        NextShadowQuality(retiredLower) == ShadowQuality::Current,
+        "Windows shadow cycling reaches exactly Current and Higher and recovers a stale draft");
+    Check(!horde::vulkan::raytracing::ResolveRtQualityControls(retiredLower,
+        horde::vulkan::raytracing::RtWorkloadPreset::Authored, true),
+        "retired Lower cannot reach the GPU quality upload");
+    for (const auto platform : {GraphicsPlatform::Android, GraphicsPlatform::Windows})
+    {
+        Check(ReducedEffectsGraphicsSettings(platform).shadowQuality == ShadowQuality::Current,
+            "Reduced Effects cannot reactivate retired Lower shadows");
+        GraphicsEditSession session(PlatformDefaultGraphicsSettings(platform));
+        Check(!session.Stage(retired), "live editing rejects the retired choice");
+        for (const auto schema : {3u, 4u, 5u})
+        {
+            auto expected = retired;
+            expected.shadowQuality = ShadowQuality::Current;
+            if (schema < 4u) expected.mistEnabled = true;
+            if (schema < 5u) expected.dustQuality = DustQuality::Off;
+            const auto migrated = RecoverGraphicsSettings({schema, retired, retired}, platform);
+            Check(migrated.startup == expected && migrated.retainedRequested == expected &&
+                !HasGraphicsReason(migrated.reasons, GraphicsReason::InvalidStoredSettings),
+                "saved and interrupted Lower migrate only shadows and existing schema fields");
+        }
+    }
     for (const auto oldSchema : {1u, 2u})
     {
         auto old = BaselineGraphicsSettings(GraphicsPlatform::Android);
@@ -288,7 +317,7 @@ void TestIndependentShadowAndLowFire()
     using namespace horde::vulkan::raytracing;
     for (const bool high : {false, true})
         for (const auto workload : {RtWorkloadPreset::Lean, RtWorkloadPreset::Authored, RtWorkloadPreset::Max})
-            for (const auto mode : {ShadowQuality::Lower, ShadowQuality::Current, ShadowQuality::Higher})
+            for (const auto mode : {ShadowQuality::Current, ShadowQuality::Higher})
             {
                 const auto policy = ResolveRtQualityControls(mode, workload, high);
                 Check(policy && policy->controls[0] == static_cast<std::uint32_t>(mode) &&
@@ -308,8 +337,8 @@ void TestPlatformDefaultsAndMist()
 {
     const auto mobile = PlatformDefaultGraphicsSettings(GraphicsPlatform::Android);
     const auto desktop = PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows);
-    Check(mobile == GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false, ShadowQuality::Current, true, DustQuality::Low},
-          "fresh mobile defaults keep50/Mobile/Mobile/30/GlassOff/Current/MistOn with owner-approved DustLow");
+    Check(mobile == GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false, ShadowQuality::Current, false, DustQuality::Low},
+          "fresh mobile defaults keep50/Mobile/Mobile/30/GlassOff/Current/MistOff with owner-approved DustLow");
     Check(desktop == GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true, ShadowQuality::Current, true, DustQuality::Low},
           "fresh desktop defaults preserve High appearance and MistOn with owner-approved DustLow");
     Check(MatchGraphicsPreset(mobile, GraphicsPlatform::Android) == GraphicsPreset::PlatformDefault &&
@@ -335,23 +364,23 @@ void TestPlatformDefaultsAndMist()
     auto legacyMobile = mobile; legacyMobile.dustQuality = DustQuality::Off;
     const auto migrated = RecoverGraphicsSettings({4u, off, mobile}, GraphicsPlatform::Android);
     Check(migrated.startup == off && migrated.retainedRequested == legacyMobile,
-          "schema4 preserves independently saved Off and interrupted On candidate while migrating DustOff");
+          "schema4 preserves independently saved Off and interrupted Off candidate while migrating DustOff");
     GraphicsEditSession edit(off);
     Check(edit.ResetDraft(GraphicsPlatform::Android) && edit.Draft() == mobile && edit.Committed() == off &&
           !edit.Persistence().pending, "Reset stages defaults; it does not save or issue native work");
     const auto apply = edit.RequestApply(10u);
     if (apply)
     {
-        auto old = Presented(*apply); old.effective.mistEnabled = false;
-        Check(!edit.Acknowledge(old, true) && !edit.Confirm(), "old Off frame cannot acknowledge requested MistOn");
+        auto old = Presented(*apply); old.effective.mistEnabled = true;
+        Check(!edit.Acknowledge(old, true) && !edit.Confirm(), "old On frame cannot acknowledge requested MistOff");
         Check(edit.Persistence().pending == mobile && edit.Committed() == off,
               "pending Reset intent preserves last saved Off until current presented ACK and Keep");
         Check(edit.Acknowledge(Presented(*apply), true) && edit.Committed() == off && edit.Confirm() &&
-              edit.Committed() == mobile && !edit.Persistence().pending, "only current exact MistOn presentation and Keep saves Reset");
+              edit.Committed() == mobile && !edit.Persistence().pending, "only current exact MistOff presentation and Keep saves Reset");
     }
     using namespace horde::vulkan::raytracing;
     for (const bool high : {false, true})
-        for (const auto shadow : {ShadowQuality::Lower, ShadowQuality::Current, ShadowQuality::Higher})
+        for (const auto shadow : {ShadowQuality::Current, ShadowQuality::Higher})
             for (const auto workload : {RtWorkloadPreset::Lean, RtWorkloadPreset::Authored, RtWorkloadPreset::Max})
             {
                 const auto on = ResolveRtQualityControls(shadow, workload, high);

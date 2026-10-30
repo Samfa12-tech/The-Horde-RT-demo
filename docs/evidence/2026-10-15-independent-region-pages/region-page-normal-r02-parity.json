@@ -1,0 +1,167 @@
+[
+  {
+    "file": "1-initial-reunion.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "2-landing-sweep-2.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "3-landing-sweep-2.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "4-landing-sweep-2.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "5-landing-sweep-2.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 1
+  },
+  {
+    "file": "6-kit-walking.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "7-fresh-raise-3.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "8-outbound-4.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "9-outbound-5.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "10-outbound-6.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "11-outbound-7.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "12-lookout-sweep-7.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "13-lookout-sweep-7.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "14-lookout-sweep-7.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "15-lookout-sweep-7.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "16-return-6.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "17-return-5.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "18-return-4.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "19-return-3.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "20-return-2.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "21-descent-2.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "22-lower-sweep-0.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "23-lower-sweep-0.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "24-lower-sweep-0.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "25-lower-sweep-0.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "26-tomb-backtrack-0.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "27-passage-sweep-0.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "28-passage-sweep-0.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "29-passage-sweep-0.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "30-passage-sweep-0.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  },
+  {
+    "file": "31-rope-return-0.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 16066
+  },
+  {
+    "file": "32-repeat-ascent-2.png",
+    "matchedCameraAndLights": false,
+    "changedPixels": 18063
+  },
+  {
+    "file": "33-reset-opening.png",
+    "matchedCameraAndLights": true,
+    "changedPixels": 0
+  }
+]

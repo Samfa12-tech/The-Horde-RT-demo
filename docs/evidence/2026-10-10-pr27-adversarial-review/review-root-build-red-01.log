@@ -1,0 +1,17 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  RescueRigAttachmentTests.cpp
+<repo>\tests\RescueRigAttachmentTests.cpp(482,23): error C2039: 'defeated': is not a member of 'horde::gameplay::LichSnapshot' [<repo>\build\presets\windows-x64-release\horde_rt_rescue_rig_attachment_tests.vcxproj]
+      <repo>\src\gameplay\ShowcaseGameplay.h(508,8):
+      see declaration of 'horde::gameplay::LichSnapshot'
+
+<repo>\tests\RescueRigAttachmentTests.cpp(482,44): error C2039: 'defeated': is not a member of 'horde::gameplay::LichSnapshot' [<repo>\build\presets\windows-x64-release\horde_rt_rescue_rig_attachment_tests.vcxproj]
+      <repo>\src\gameplay\ShowcaseGameplay.h(508,8):
+      see declaration of 'horde::gameplay::LichSnapshot'
+
+<repo>\tests\RescueRigAttachmentTests.cpp(557,65): error C2039: 'heldItemKinematics': is not a member of 'horde::gameplay::animation::PlayerAnimationSnapshot' [<repo>\build\presets\windows-x64-release\horde_rt_rescue_rig_attachment_tests.vcxproj]
+      <repo>\src\gameplay\animation\PlayerAnimationState.h(60,8):
+      see declaration of 'horde::gameplay::animation::PlayerAnimationSnapshot'

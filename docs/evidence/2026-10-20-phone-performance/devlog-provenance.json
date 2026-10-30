@@ -1,0 +1,65 @@
+{
+  "sourceCommit": "b2d548a22cc44a58c92c290018f5bf211f2a8d87",
+  "executableSha256": "fc2997bd424f8f3e026a58a1b9673c9207802578e87961b8cb5412fbf154d746",
+  "runtimeVersionLabel": "1.6.2; unreleased1.7 development snapshot",
+  "device": "Windows / NVIDIA GeForce RTX5050 Laptop GPU",
+  "backend": "Vulkan RayTracingPipeline hardware RT",
+  "pixels": "960x540; internal=output,100%; original unedited PNGs",
+  "quality": "Diagnostic/High shader pair, High water/fire; per-image shadow/dust below.",
+  "limits": "WIP diagnostic compositions, not mobile visuals or earned campaign acceptance. No image enhancement, crop, recolouring or UI removal. Hidden capture, no desktop input. Separate from phone benchmarks.",
+  "images": [
+    {
+      "file": "horde-1-7-tomb-windows-rtx-5050-960x540.png",
+      "source": "reports\\devlog-tomb-low-2026-10-20\\217-chapter-lantern-side-wall-low.png",
+      "sha256": "b7c5309ab61fe6c0fe43378ccc570ffe8317cb0003c1d2f2431fb2dc621fa42d",
+      "bytes": 594977,
+      "diagnosticSetup": "Diagnostic checkpoint chapter-lantern-side-wall-low, frozen animation; seeded equipment, not earned traversal.",
+      "quality": {
+        "shadow": "Higher4local/2sky samples",
+        "dust": "High2",
+        "mist": true,
+        "water": "High",
+        "fire": "High"
+      }
+    },
+    {
+      "file": "horde-1-7-river-windows-rtx-5050-960x540.png",
+      "source": "reports\\devlog-river-2026-10-20\\river-bend-019.png",
+      "sha256": "d739e2dc6d82b6b5d8ec9c6b737527ccb0a6459d12fe7c8760293be31cf662ed",
+      "bytes": 1109777,
+      "diagnosticSetup": "Debug river-bend environment survey, frame19, simulation frozen, render-only animation; not earned exploration or performance evidence.",
+      "quality": {
+        "shadow": "Current1local/1sky sample",
+        "dust": "Low1",
+        "mist": true,
+        "water": "High",
+        "fire": "High"
+      }
+    }
+  ],
+  "rejectedCandidates": [
+    {
+      "path": "devlog-tomb-2026-10-20",
+      "reason": "High lantern occupies much of composition; lower alternative selected."
+    },
+    {
+      "path": "devlog-tomb-arch-2026-10-20",
+      "reason": "Capture guard rejected armPixels0; no image adopted and no assertion weakened."
+    }
+  ],
+  "library": [
+    {
+      "file": "horde-1-7-tomb-windows-rtx-5050-960x540.png",
+      "libraryFileId": "libfile_5b56e9efd5688191b242404f0ddfb64c",
+      "fileId": "file_000000000c2081f5bd71219acc4fafa5",
+      "version": 0
+    },
+    {
+      "file": "horde-1-7-river-windows-rtx-5050-960x540.png",
+      "libraryFileId": "libfile_667913fb266c8191ad73b25b227055d9",
+      "fileId": "file_00000000233081f5aecf10aec490a8fb",
+      "version": 0
+    }
+  ],
+  "metadataNote": "Library version0 stored directly as NTFS user.library-file-version alternate data stream; original PNG bytes unchanged."
+}

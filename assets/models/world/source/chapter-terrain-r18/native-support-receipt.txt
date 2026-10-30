@@ -1,0 +1,1 @@
+Native terrain triangles=39618 retainedBytes=2873928 preparationMs=180.359 routeCheckMs=166.013 queries=2781 triangleTests=57095 sweeps=616 failures=0

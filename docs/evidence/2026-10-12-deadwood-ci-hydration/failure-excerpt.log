@@ -1,0 +1,17 @@
+GitHub Actions run 38202774273 — head 2d6748e37da1413a55ccf2b7af25c50f2000332a
+Source: GitHub-backed job logs retrieved for PR 27; focused failure excerpts.
+
+player-vulkan-host (job 114659580142): compiled, then CTest failed 4/47:
+- horde_rt_forest_deadwood_tests: "Static GLB header magic is not 'glTF'."; "prepared log/root/stump/snag and collision must be admitted together"; "Prepared deadwood/contact fail"
+- horde_rt_forest_dressing_tests: "FAIL: Static GLB header magic is not 'glTF'."
+- horde_rt_scene_initialise_preflight_tests: failed (CTest emits no additional test stdout)
+- horde_rt_scene_resource_inventory_tests: "Real development static admission: Static GLB header magic is not 'glTF'." and "Integrated tomb intake: Static GLB header magic is not 'glTF'."
+
+Shared simulation host (Clang job 114659580189) and GCC job 114659580272: compiled, then each CTest failed 3/127:
+- horde_rt_forest_deadwood_tests: "Static GLB header magic is not 'glTF'."
+- horde_rt_forest_dressing_tests: "FAIL: Static GLB header magic is not 'glTF'."
+- horde_rt_horde_162_asset_policy_tests: tools/horde-1.6.2-asset-policy.ps1:129, "1.6.2 runtime byte/hash mismatch: assets/models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb"
+
+Android Debug job 114659580016: all 284 Java tests passed (0 failures/errors/skips); package contract then failed at tools/test-held-item-package-contract.ps1:119 with "Runtime package contains an unhydrated Git LFS pointer: assets/models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb".
+
+Cause confirmed in workflow: all three LFS fetch/checkout allowlists omit assets/models/world/runtime/forest-deadwood-v1/*.glb (Android runtime, shared simulation host, and player-vulkan-host). The repository's global *.glb LFS rule applies. Add that path to each relevant fetch --include and checkout list; keep assertions, asset policy hashes, and budgets unchanged.

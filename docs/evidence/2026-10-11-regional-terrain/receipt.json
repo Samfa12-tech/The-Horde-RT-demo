@@ -1,0 +1,556 @@
+{
+  "baseCommit": "0457cdbe8a6f5b77390baf90bf0596d6ef3b98ba",
+  "sourceState": "regional terrain commit containing this receipt; production shaders unchanged",
+  "artifacts": {
+    "windowsDebug": {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 12432896,
+      "sha256": "6b8dcc4e84947fb47f5003ba12ce29e8c8983bc470f3bb0fdd7d07e199e7c612"
+    },
+    "windowsRelease": {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4334592,
+      "sha256": "5f18d6a56a4b7e2a99495fb1fe8955eb9255091590187c470c4104fd5a66fa5d"
+    },
+    "androidDebug": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 167423978,
+      "sha256": "e5a9962c52d8369498fd7c7599721fd8fb9445ed06a9a5469bc0b790eeb5428e"
+    },
+    "runtimeTerrain": {
+      "path": "assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb",
+      "bytes": 18328048,
+      "sha256": "fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854"
+    }
+  },
+  "preservation": {
+    "sourceBefore": "cb7f5e68809963e29b52a26d30d6ba3f36ce29c129e43e713fdcf3c6cebc15a9",
+    "sourceAfter": "fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854",
+    "identicalNearTriangles": 15472,
+    "routeStationsIdentical": true,
+    "holesIdentical": true,
+    "oldTriangles": 39618,
+    "newTriangles": 34050,
+    "triangleReduction": 5568,
+    "sourceCandidate": "chapter-terrain-r21"
+  },
+  "captures": [
+    {
+      "image": "north-pipeline.png",
+      "sha256": "a5b588f42f7fc067e36b1debef01b4d52f04659971ac80b47b03f4d3e0e1d9a7",
+      "complete": false,
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.",
+      "backend": "RayTracingPipeline",
+      "shaders": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "settings": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "checkpoint": "chapter-landing-north",
+      "camera": null,
+      "state": null,
+      "honestlyPresentedRtFrame": null,
+      "captureSource": "rt-storage-image",
+      "visibility": null,
+      "timing": {
+        "sampleCount": 0,
+        "overallMedianMs": 0.0,
+        "overallMeanMs": 0.0,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 2.121024,
+          "averageMs": 2.505525,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 12976128,
+        "indexBytes": 2231148,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.3662,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.6715,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6947,
+        "productionPropBlasBytes": 7547008,
+        "productionPropBlasBuildMilliseconds": 5.4986
+      }
+    },
+    {
+      "image": "east-pipeline.png",
+      "sha256": "4550c74d451143e7571f4dcd658271e39b18b60d7727d965642fb12ae46d8cf8",
+      "complete": false,
+      "error": "Checkpoint 'chapter-landing-east' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=51665/485/0 sword/torch=0/0 wall-retraction=0 grip=0/0 authority=2.38419e-07/0 finalGrip=-33.0624,3.62473,-12.9776 body=-34.1557,3.52459,-12.9936.",
+      "backend": "RayTracingPipeline",
+      "shaders": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "settings": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "checkpoint": "chapter-landing-east",
+      "camera": null,
+      "state": null,
+      "honestlyPresentedRtFrame": null,
+      "captureSource": "rt-storage-image",
+      "visibility": null,
+      "timing": {
+        "sampleCount": 0,
+        "overallMedianMs": 0.0,
+        "overallMeanMs": 0.0,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 4.119168,
+          "averageMs": 5.456315,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 12976128,
+        "indexBytes": 2231148,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.4679,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7522,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7157,
+        "productionPropBlasBytes": 7547008,
+        "productionPropBlasBuildMilliseconds": 8.2187
+      }
+    },
+    {
+      "image": "south-pipeline.png",
+      "sha256": "c5b5f9634ebcf437c873b2d50707396cddaf68abd0c879006c7eb3b61e229696",
+      "complete": false,
+      "error": "Checkpoint 'chapter-landing-south' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=51664/485/0 sword/torch=0/0 wall-retraction=0 grip=0/0 authority=2.38419e-07/0 finalGrip=-33.5224,3.62473,-12.1624 body=-34.1473,3.52459,-13.0019.",
+      "backend": "RayTracingPipeline",
+      "shaders": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "settings": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "checkpoint": "chapter-landing-south",
+      "camera": null,
+      "state": null,
+      "honestlyPresentedRtFrame": null,
+      "captureSource": "rt-storage-image",
+      "visibility": null,
+      "timing": {
+        "sampleCount": 0,
+        "overallMedianMs": 0.0,
+        "overallMeanMs": 0.0,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 3.854464,
+          "averageMs": 5.185621,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 12976128,
+        "indexBytes": 2231148,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.6162,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.8424,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7738,
+        "productionPropBlasBytes": 7547008,
+        "productionPropBlasBuildMilliseconds": 9.1659
+      }
+    },
+    {
+      "image": "west-pipeline.png",
+      "sha256": "e2830db3d8c4efc0e1f31226c35a9344049f8ed1fa9c7c289aef8a369f7c5b47",
+      "complete": true,
+      "error": null,
+      "backend": "RayTracingPipeline",
+      "shaders": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "settings": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "checkpoint": "chapter-landing-west",
+      "camera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": -1.570796,
+        "pitch": -0.15
+      },
+      "state": {
+        "torchFailurePhase": "settled",
+        "selectedEnemy": "lich",
+        "lichPhase": "dead",
+        "finaleSkylightOpenProgress": 1.0
+      },
+      "honestlyPresentedRtFrame": true,
+      "captureSource": "rt-storage-image",
+      "visibility": {
+        "playerPrimaryVisible": true,
+        "primaryArmsMayBeOutsideFrame": false,
+        "primaryArmsCeilingRetracted": false,
+        "verticalProofPoseWitness": {
+          "supportWorldY": 2.05,
+          "heightDelta": 3.0,
+          "supportId": 130,
+          "heldLightKind": 2,
+          "swordStowBlend": 1.0,
+          "swordHandGripBlend": 0.0,
+          "torchOverheadLoweringMetres": 0.0,
+          "torchOverheadRetractionMetres": 0.0
+        },
+        "playerWorldBodyInstanceFlags": 9,
+        "instanceMasks": [
+          1,
+          0,
+          1,
+          2,
+          144,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          32,
+          1,
+          1,
+          64,
+          1,
+          0,
+          1,
+          1,
+          54,
+          1,
+          1
+        ],
+        "diagnostics": {
+          "availability": "Available",
+          "available": true
+        },
+        "primaryPixels": {
+          "torch": 0,
+          "sword": 0,
+          "player": 3089,
+          "rewardRing": 729,
+          "rewardBody": 18120
+        },
+        "rewardGrip": {
+          "positionErrorMetres": 0.0,
+          "orientationErrorRadians": 0.0,
+          "authorityPositionErrorMetres": 0.0,
+          "authorityOrientationErrorRadians": 0.0,
+          "finalGripPosition": [
+            -33.966118,
+            3.59808,
+            -12.367244
+          ],
+          "ringGripPosition": [
+            -33.966118,
+            3.59808,
+            -12.367244
+          ],
+          "bodyPosition": [
+            -34.138962,
+            3.52459,
+            -12.993572
+          ]
+        }
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 6.84365,
+        "overallMeanMs": 84.737783,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 3.224448,
+          "averageMs": 4.526357,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 12976128,
+        "indexBytes": 2231148,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.492,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7208,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7712,
+        "productionPropBlasBytes": 7547008,
+        "productionPropBlasBuildMilliseconds": 10.3452
+      }
+    },
+    {
+      "image": "west-query.png",
+      "sha256": "a0b8bf5a592f8a114414dc7be33a90a11982431dcb4765457b250bb781e1bbea",
+      "complete": true,
+      "error": null,
+      "backend": "RayQueryCompute",
+      "shaders": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "57b7a23d6eaed1885001e488654815cbbc1c1e25cec29db16c77b698aac92f13"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "c329f47673a9ed4bb3287c59c52a6db4d7a29dc39814b78beb78b969d2f527ec"
+        }
+      },
+      "settings": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "checkpoint": "chapter-landing-west",
+      "camera": {
+        "x": -33.700001,
+        "z": -12.8,
+        "yaw": -1.570796,
+        "pitch": -0.15
+      },
+      "state": {
+        "torchFailurePhase": "settled",
+        "selectedEnemy": "lich",
+        "lichPhase": "dead",
+        "finaleSkylightOpenProgress": 1.0
+      },
+      "honestlyPresentedRtFrame": true,
+      "captureSource": "rt-storage-image",
+      "visibility": {
+        "playerPrimaryVisible": true,
+        "primaryArmsMayBeOutsideFrame": false,
+        "primaryArmsCeilingRetracted": false,
+        "verticalProofPoseWitness": {
+          "supportWorldY": 2.05,
+          "heightDelta": 3.0,
+          "supportId": 130,
+          "heldLightKind": 2,
+          "swordStowBlend": 1.0,
+          "swordHandGripBlend": 0.0,
+          "torchOverheadLoweringMetres": 0.0,
+          "torchOverheadRetractionMetres": 0.0
+        },
+        "playerWorldBodyInstanceFlags": 9,
+        "instanceMasks": [
+          1,
+          0,
+          1,
+          2,
+          144,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          32,
+          1,
+          1,
+          64,
+          1,
+          0,
+          1,
+          1,
+          54,
+          1,
+          1
+        ],
+        "diagnostics": {
+          "availability": "Available",
+          "available": true
+        },
+        "primaryPixels": {
+          "torch": 0,
+          "sword": 0,
+          "player": 3089,
+          "rewardRing": 729,
+          "rewardBody": 18120
+        },
+        "rewardGrip": {
+          "positionErrorMetres": 0.0,
+          "orientationErrorRadians": 0.0,
+          "authorityPositionErrorMetres": 0.0,
+          "authorityOrientationErrorRadians": 0.0,
+          "finalGripPosition": [
+            -33.966118,
+            3.59808,
+            -12.367244
+          ],
+          "ringGripPosition": [
+            -33.966118,
+            3.59808,
+            -12.367244
+          ],
+          "bodyPosition": [
+            -34.138962,
+            3.52459,
+            -12.993572
+          ]
+        }
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 6.16005,
+        "overallMeanMs": 51.207775,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 2.742848,
+          "averageMs": 3.519699,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 12976128,
+        "indexBytes": 2231148,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.4083,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.8173,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.591,
+        "productionPropBlasBytes": 7547008,
+        "productionPropBlasBuildMilliseconds": 6.7196
+      }
+    }
+  ],
+  "westBackendComparison": {
+    "changedChannels": 4784,
+    "maximumDifference": 18
+  },
+  "limits": {
+    "runtimeManifestUnchanged": true,
+    "shaderBudgetsUnchanged": true,
+    "textureCeiling": 18,
+    "actualBaseNormalOrmLayers": [
+      17,
+      14,
+      14
+    ],
+    "staticPrimitivesHigh": 32,
+    "staticPrimitivesMobile": 31
+  },
+  "validation": {
+    "debug": "6/6 PASS, 21.56s",
+    "release": "5/6 initial PASS; missing exclusion executable NOT RUN, then built and 1/1 PASS 2.00s",
+    "authoringUnitTests": "5/5 PASS; initial arbitrary 1m delta assertion corrected to actual analytic exterior value, failure retained",
+    "nativeRedBefore": "38 missing-regional assertions fail against prior runtime terrain",
+    "nativeGreenAfter": "15617 cases, zero failures",
+    "khronos": "0 errors / 0 warnings",
+    "android": "assembleDebug/testDebugUnitTest/lintDebug PASS, 59 tasks, 1m17s; package strict ASTC/world PASS"
+  },
+  "pending": [
+    "Physical Android and QueryCompute terrain evidence",
+    "Sustained frame time and memory overlap",
+    "Dense colliding woodland and distant water/landmarks",
+    "Visible Kit and safe third-slot reuse",
+    "Actual GPU streaming",
+    "Whole chapter owner acceptance"
+  ]
+}

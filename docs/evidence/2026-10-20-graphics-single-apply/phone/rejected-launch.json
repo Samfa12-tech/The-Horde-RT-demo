@@ -1,0 +1,20 @@
+{
+  "earlierAttempt": "rejected before launch: unsupported --activity-new-task; pid absent afterward",
+  "args": [
+    "shell",
+    "am",
+    "start",
+    "-W",
+    "-f",
+    "0x10008000",
+    "-a",
+    "android.intent.action.MAIN",
+    "-c",
+    "android.intent.category.LAUNCHER",
+    "-n",
+    "com.samfa12.hordelanternrt.debug/.MainActivity"
+  ],
+  "returncode": 1,
+  "stdout": "Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10008000 cmp=com.samfa12.hordelanternrt.debug/.MainActivity }\r\nError type 3\r\nError: Activity class {com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.debug.MainActivity} does not exist.\r\n",
+  "stderr": ""
+}

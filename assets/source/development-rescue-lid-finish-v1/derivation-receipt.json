@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "blender": "5.2.0 LTS",
+  "units": "metres",
+  "runtimeAuthority": "src\\scene\\RescueLidFinish.h",
+  "recipeSha256": "75cf7a704ee34d13d9d9a9c37cf26ab1996007f6fc77e1ce2ebb369552292a94",
+  "authoringScriptSha256": "bfffc05bd96a43dc7c97d90b143905da387cfb0557b8d53fc276263d5373ae2c",
+  "bounds": {
+    "minimum": [
+      -34.94,
+      2.05,
+      -16.64
+    ],
+    "maximum": [
+      -32.46,
+      2.19,
+      -13.76
+    ]
+  },
+  "boxes": 6,
+  "triangles": 72,
+  "sourceOnly": true,
+  "files": {
+    "asset.manifest.json": {
+      "bytes": 526,
+      "sha256": "26a0a6580818466af92e3308b63c204d450bd2e6a4e6c969a4a604ce1327b51a"
+    },
+    "rescue-lid-finish-roundtrip.glb": {
+      "bytes": 12864,
+      "sha256": "e6628e255054eaacde4392793450399216eff4696014eaff2c6e4e217e1c25cc"
+    },
+    "rescue-lid-finish.blend": {
+      "bytes": 90484,
+      "sha256": "38b106d62767ac8d9f834ef8473af118372a79ad5a95bc3f4fe1e93d7228f585"
+    }
+  }
+}

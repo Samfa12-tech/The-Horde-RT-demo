@@ -1,0 +1,5 @@
+Lantern continuity case=fixture116 rebinds=3 ownership=claimed pose=high-low-high rescue_mode=0 rescue_prompt=0
+Lantern continuity case=production-interaction-claim rebinds=3 ownership=claimed pose=high-low-high rescue_mode=0 rescue_prompt=0
+Lantern reward interaction, command, and finale tests passed
+Test time =   6.67 sec
+Test Passed.

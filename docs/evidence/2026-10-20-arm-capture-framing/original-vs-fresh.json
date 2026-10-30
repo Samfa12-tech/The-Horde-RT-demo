@@ -1,0 +1,54 @@
+[
+  {
+    "fresh": "framing-start",
+    "original": "blocked-retreat",
+    "files": {
+      "192-rescue-journey-start.obj": {
+        "bytes": 2372938,
+        "sha256": "d635d9b5a07a72419566f9cb99e415db0a91bfec2e708c84210d4cfa10502633",
+        "sameAsOriginal": true
+      },
+      "192-rescue-journey-start.player-world-body.obj": {
+        "bytes": 5106867,
+        "sha256": "fd3e1e4a6d59931fc0161a26b03bf296a933f2f1dec88e2b14d1dec52ca51adf",
+        "sameAsOriginal": true
+      },
+      "192-rescue-journey-start.png": {
+        "bytes": 771469,
+        "sha256": "586da8437898b2602a6a4a88cb1b73cf6ad50a7529ddce03e4d9fa47d270156b",
+        "sameAsOriginal": true
+      },
+      "failed-primary-pose.json": {
+        "bytes": 213,
+        "sha256": "4ab1e17f6a6e8b0d1df07cf85d897ed5514f2bcb28f2ac9d5356d0dc93b18333",
+        "sameAsOriginal": true
+      }
+    }
+  },
+  {
+    "fresh": "framing-niche",
+    "original": "rect-niche",
+    "files": {
+      "218-chapter-niche-rect.obj": {
+        "bytes": 2378321,
+        "sha256": "b7279f8835c37d0df9830aed9e1335b81b48d97c4b0330566e6c47a5cab598ad",
+        "sameAsOriginal": true
+      },
+      "218-chapter-niche-rect.player-world-body.obj": {
+        "bytes": 5112032,
+        "sha256": "b64e194d33487f299cdee7069b538d062dd23de7a8ed6e1e10e55714cbe17d46",
+        "sameAsOriginal": true
+      },
+      "218-chapter-niche-rect.png": {
+        "bytes": 552628,
+        "sha256": "4f3ce6d4750f51600266bd2faf3264435595803039beaaf3cdcf6e9f17235016",
+        "sameAsOriginal": true
+      },
+      "failed-primary-pose.json": {
+        "bytes": 201,
+        "sha256": "99975f3c34ff8b79955e27a0fd1b8795e2444e65639d5a36a5e840de1f7a65c4",
+        "sameAsOriginal": true
+      }
+    }
+  }
+]

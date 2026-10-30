@@ -214,10 +214,11 @@ bool SetRemainingTimeouts(const HINTERNET request,
 }
 
 bool HasExactAck(std::string_view json, const std::string_view expectedId,
-    const std::string_view expectedStatus) noexcept
+    const std::string_view expectedStatus, const std::string_view developerKind = {}) noexcept
 {
     // The acknowledgement grammar is intentionally narrower than general JSON:
-    // exactly one object, exactly three unique fields, no escapes or nested data.
+    // One object, exactly three legacy or five purpose-bound unique fields;
+    // no escapes or nested data.
     if (expectedId.size() < 8u || expectedId.size() > 96u ||
         !std::all_of(expectedId.begin(), expectedId.end(), [](const unsigned char ch) {
             return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') ||
@@ -242,9 +243,9 @@ bool HasExactAck(std::string_view json, const std::string_view expectedId,
     };
     space();
     if (at >= json.size() || json[at++] != '{') return false;
-    bool haveOk = false, haveId = false, haveStatus = false;
+    bool haveOk = false, haveId = false, haveStatus = false, haveDestination = false, haveKind = false;
     bool ok = false;
-    std::string_view id, status;
+    std::string_view id, status, destination, kind;
     space();
     while (at < json.size() && json[at] != '}')
     {
@@ -260,6 +261,16 @@ bool HasExactAck(std::string_view json, const std::string_view expectedId,
             if (json.substr(at, 4u) == "true") { ok = true; at += 4u; }
             else if (json.substr(at, 5u) == "false") { at += 5u; }
             else return false;
+        }
+        else if (key == "destination" && !developerKind.empty())
+        {
+            if (haveDestination || !quoted(destination)) return false;
+            haveDestination = true;
+        }
+        else if (key == "reportKind" && !developerKind.empty())
+        {
+            if (haveKind || !quoted(kind)) return false;
+            haveKind = true;
         }
         else if (key == "reportId")
         {
@@ -289,7 +300,9 @@ bool HasExactAck(std::string_view json, const std::string_view expectedId,
     if (at >= json.size() || json[at++] != '}') return false;
     space();
     return at == json.size() && haveOk && haveId && haveStatus && ok &&
-        id == expectedId && status == expectedStatus;
+        id == expectedId && status == expectedStatus && (developerKind.empty() ||
+            (haveDestination && haveKind && destination ==
+                (developerKind == "public-benchmark-result" ? "public-board" : "developer-private") && kind == developerKind));
 }
 
 class SingleWorker final
@@ -487,6 +500,7 @@ struct WindowsPlaytestSubmission::State
     mutable std::mutex mutex;
     HWND window = nullptr;
     reporting::PreparedPlaytestSubmission frozen;
+    std::string developerKind;
     WindowsPlaytestExchange exchange;
     std::chrono::milliseconds attemptTimeout = kTotalTimeout;
     std::shared_ptr<CancellationEvent> cancellation;
@@ -511,7 +525,8 @@ bool StartAttempt(const std::shared_ptr<WindowsPlaytestSubmission::State>& state
     auto cancellation = std::make_shared<CancellationEvent>();
     if (cancellation->handle == nullptr) return false;
     std::string requestBody = reporting::BuildPlaytestSubmissionRequest(state->frozen, turnstileToken);
-    if (requestBody.empty() || requestBody.size() > kMaxRequestBytes) { Wipe(requestBody); return false; }
+    const auto maximum = state->developerKind.empty() ? kMaxRequestBytes : reporting::kDeveloperReportSubmissionMaxBytes;
+    if (requestBody.empty() || requestBody.size() > maximum) { Wipe(requestBody); return false; }
     const auto requestBytes = std::shared_ptr<std::string>(new std::string(std::move(requestBody)),
         [](std::string* bytes) { Wipe(*bytes); delete bytes; });
     state->busy = true;
@@ -522,8 +537,9 @@ bool StartAttempt(const std::shared_ptr<WindowsPlaytestSubmission::State>& state
     const auto generation = ++state->generation;
     const auto window = state->window;
     const auto reportId = state->frozen.reportId;
+    const auto developerKind = state->developerKind;
     const auto exchange = state->exchange;
-    const auto accepted = Worker().Submit([state, requestBytes, cancellation, reportId,
+    const auto accepted = Worker().Submit([state, requestBytes, cancellation, reportId, developerKind,
         exchange, generation, window, deadline]() mutable {
         {
             std::lock_guard stateLock(state->mutex);
@@ -559,7 +575,8 @@ bool StartAttempt(const std::shared_ptr<WindowsPlaytestSubmission::State>& state
                 state->cancellation.reset();
                 state->retryAllowed = outcome == WindowsPlaytestSubmissionResult::VerificationExpired ||
                     outcome == WindowsPlaytestSubmissionResult::RateLimited ||
-                    outcome == WindowsPlaytestSubmissionResult::Uncertain;
+                    outcome == WindowsPlaytestSubmissionResult::Uncertain ||
+                    (state->developerKind == "public-benchmark-result" && outcome == WindowsPlaytestSubmissionResult::Queued);
                 if (window == nullptr || state->window != window) return;
                 completion = gNextCompletionToken.fetch_add(1u);
                 state->completionToken = completion;
@@ -577,6 +594,16 @@ bool StartAttempt(const std::shared_ptr<WindowsPlaytestSubmission::State>& state
             const auto response = exchange ? exchange(*requestBytes, deadline, cancellation->handle) :
                 ExchangeWindowsPlaytestReport(*requestBytes, deadline, cancellation->handle);
             outcome = ClassifyWindowsPlaytestResponse(response.statusCode, response.body, reportId);
+            if (!developerKind.empty() && (response.statusCode == 200 || response.statusCode == 202))
+            {
+                const bool publicBoard = developerKind == "public-benchmark-result";
+                const auto status = response.statusCode == 202 ? "accepted" : (publicBoard ? "published" : "sent");
+                outcome = response.body.size() <= kMaxResponseBytes &&
+                    HasExactAck(response.body, reportId, status, developerKind) ?
+                    (response.statusCode == 202 ? WindowsPlaytestSubmissionResult::Queued :
+                        (publicBoard ? WindowsPlaytestSubmissionResult::Published : WindowsPlaytestSubmissionResult::Sent)) :
+                    WindowsPlaytestSubmissionResult::Uncertain;
+            }
         }
         catch (...) { outcome = WindowsPlaytestSubmissionResult::Uncertain; }
         finish(outcome);
@@ -608,6 +635,32 @@ WindowsPlaytestSubmission::~WindowsPlaytestSubmission()
 
 bool WindowsPlaytestSubmission::Begin(const HWND window,
     const reporting::PreparedPlaytestSubmission& submission, const std::string_view turnstileToken)
+{ return BeginFrozen(window, submission, turnstileToken); }
+
+bool WindowsPlaytestSubmission::BeginDeveloperReportForLocalValidation(const HWND window,
+    const reporting::PreparedDeveloperReportSubmission& submission, const std::string_view token)
+{
+    if (!submission.IsReady() || !state_->exchange) return false;
+    reporting::PreparedPlaytestSubmission frozen;
+    frozen.status = reporting::PlaytestSubmissionStatus::Ready;
+    frozen.reportId = submission.ReportId(); frozen.json = submission.Json();
+    return BeginFrozen(window, frozen, token, submission.Kind() == reporting::DeveloperReportKind::Benchmark ?
+        "benchmark-summary" : "compatibility");
+}
+
+bool WindowsPlaytestSubmission::BeginPublicBenchmarkForLocalValidation(const HWND window,
+    const reporting::PreparedPublicBenchmarkSubmission& submission, const std::string_view token)
+{
+    if (!submission.IsReady() || !state_->exchange) return false;
+    reporting::PreparedPlaytestSubmission frozen;
+    frozen.status = reporting::PlaytestSubmissionStatus::Ready;
+    frozen.reportId = submission.ResultId(); frozen.json = submission.Json();
+    return BeginFrozen(window, frozen, token, "public-benchmark-result");
+}
+
+bool WindowsPlaytestSubmission::BeginFrozen(const HWND window,
+    const reporting::PreparedPlaytestSubmission& submission, const std::string_view turnstileToken,
+    std::string developerKind)
 {
     if (!submission.IsReady() || submission.json.empty() || submission.json.size() > kMaxRequestBytes ||
         submission.reportId.empty()) return false;
@@ -616,11 +669,13 @@ bool WindowsPlaytestSubmission::Begin(const HWND window,
         if (state_->busy || state_->frozen.IsReady()) return false;
         state_->window = window;
         state_->frozen = submission;
+        state_->developerKind = std::move(developerKind);
     }
     if (!StartAttempt(state_, turnstileToken, true))
     {
         std::lock_guard lock(state_->mutex);
         state_->frozen = {};
+        state_->developerKind.clear();
         state_->window = nullptr;
         return false;
     }
@@ -664,6 +719,7 @@ void WindowsPlaytestSubmission::Reset() noexcept
     CancelAttempt();
     std::lock_guard lock(state_->mutex);
     state_->frozen = {};
+    state_->developerKind.clear();
     state_->result = WindowsPlaytestSubmissionResult::None;
     state_->retryAllowed = false;
 }

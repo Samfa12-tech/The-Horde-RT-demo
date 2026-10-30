@@ -1,0 +1,13 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  50: horde_rt_world_route_foundation_tests
+1/4 Test  #50: horde_rt_world_route_foundation_tests .....   Passed    1.59 sec
+    Start  88: horde_rt_bellwether_shell_tests
+2/4 Test  #88: horde_rt_bellwether_shell_tests ...........   Passed    1.42 sec
+    Start  89: horde_rt_forest_dressing_tests
+3/4 Test  #89: horde_rt_forest_dressing_tests ............   Passed    1.98 sec
+    Start 163: horde_rt_scene_resource_inventory_tests
+4/4 Test #163: horde_rt_scene_resource_inventory_tests ...   Passed    3.26 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   8.28 sec

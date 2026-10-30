@@ -41,6 +41,12 @@
                 android:textColor="#D8F0D0"
                 android:textIsSelectable="true"
                 android:textSize="12sp" />
+            <Button
+                android:id="@+id/compatibility_report"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/compatibility_report" />
         </LinearLayout>
     </ScrollView>
 
@@ -135,12 +141,72 @@
 
     <Button
         android:id="@+id/menu_button"
-        android:layout_width="72dp"
+        android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="top|end"
         android:layout_margin="16dp"
-        android:text="@string/menu"
+        android:text=""
+        android:drawableLeft="@drawable/ic_pause"
+        android:drawablePadding="0dp"
+        android:gravity="center"
+        android:contentDescription="@string/pause_menu"
         android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/run_button"
+        android:layout_width="104dp"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="32dp"
+        android:maxLines="1"
+        android:text="@string/run"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no" />
+
+    <Button
+        android:id="@+id/crouch_button"
+        android:layout_width="104dp"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="116dp"
+        android:text="@string/crouch"
+        android:contentDescription="@string/crouch"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="10sp"
+        android:autoSizeMaxTextSize="16sp"
+        android:maxLines="2"
+        android:visibility="gone"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no" />
+
+    <TextView
+        android:id="@+id/combat_teaching_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="148dp"
+        android:background="#D90D0B09"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:maxWidth="520dp"
+        android:paddingStart="14dp"
+        android:paddingTop="9dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="9dp"
+        android:textColor="#FFF2E9D8"
+        android:textSize="14sp"
+        android:importantForAccessibility="yes"
+        android:accessibilityLiveRegion="polite"
+        android:clickable="false"
+        android:focusable="false"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/parry_button"

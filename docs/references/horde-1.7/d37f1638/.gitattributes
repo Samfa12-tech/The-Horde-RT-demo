@@ -1,0 +1,5 @@
+# Preserve immutable historical bytes, including their original line endings.
+# Inherited PNG LFS ownership remains unchanged.
+* -text whitespace=cr-at-eol
+# Matplotlib's immutable atlas SVG contains intentional trailing path spaces.
+docs/design/world/dungeons/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol

@@ -1,0 +1,29 @@
+{
+  "basedOn": "1549935dfc764c66a06824c27273b78f28ea61a5 plus exact hashed phone route/cycle patch",
+  "apkSha256": "a6b7a00ccd813bc903250079926970f03096ff7436fb4f50c117e86b58b33d76",
+  "bytes": 183632282,
+  "scope": "Focused40simulated-second ordinary forest/tomb gate cycle; unchanged120second deadline, quality, strict frame/display join; not installed",
+  "sourceHashes": {
+    "CMakeLists.txt": "efe6b0a5a9e04fa0ffc5a4cc65071398fccc0156414314c5c728ea54208e75ef",
+    "src/gameplay/validation/MotionEvidenceScenario.cpp": "5efbd6a6fde99edc522d348e6790e5ace3f073a65d40f3fc23db762097a5b0de",
+    "src/gameplay/validation/MotionEvidenceScenario.h": "b677288ad43e7eaff99d9c265f8f7941e7204b84a9076e4c9a7bcf495cc8a75e",
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "4e976a30d4e8679914a2b8150d5f3381d788c925efb7e7451b5af6431e0ae78d",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "4bf3248bd6a7d0991eafcec0b4abf4835bf8771ba82630c488fe2c4ccb8d9402",
+    "android/app/src/main/cpp/android_motion_evidence.inl": "f432fae8e8a773b8e68aaed02172042b5bff11b522e31bae0b369c9253111337",
+    "android/app/src/main/cpp/CMakeLists.txt": "1c992ea4b8c27c1f5edade7a451ec12a708ade5b91ac360af9c0ce193498a26a",
+    "android/app/build.gradle": "88eeb6c355e399177415b73809c84a1bf4d9cb26d04a4f3a0388694e90a0a3ef",
+    "src/vulkan/raytracing/RtRegionGeometrySource.cpp": "f23be7c9d48fe932422a6e06b5096d47c07d3d22b5106ba3d328d2de4df8e00d",
+    "src/world/streaming/GeometryPartition.cpp": "9c2012f526c6583203b9ab4f670afb2946a3ea596712f7d48a3a9f134421f52d",
+    "tests/RescueJourneyIntegrationTests.cpp": "43f18437dc7cc3f5d1de5ca68ba2f344cb6bb93c86accd9f04d15557ef0a85f1",
+    "tests/test_android_motion_present_timing.py": "520700bf5ec55eb93400cf45ab0b492c506fc5af6bae9d7ae61d74c0b32e0a3c",
+    "tools/analyze_android_motion_present_timing.py": "fc8c7dc270874f7fdd4dfb9f163aa6cb1b7f217447a4826ff843e1bdc2e4c8cb"
+  },
+  "assetsByteIdentical": true,
+  "assetCount": 169,
+  "nativeHashes": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "0e3f7fb376e0bbf505a6f69504894c3b745f2f71e1c0e8bce0cdf5b96752faea",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "ea5a52937a991ec9d7d4ae2b9ca4b9e88653a9bc02dfd9841d8eb7c108d55e89",
+    "lib/x86/libhorde_rt_probe_android.so": "a443b9bb20e3f82ea96ef469b918928488a0d727067ee3db6c35b7fcd280668a",
+    "lib/x86_64/libhorde_rt_probe_android.so": "93201b055e545c92a24f1c771986e480355d03f2867640f238bb8f1b6d992011"
+  }
+}

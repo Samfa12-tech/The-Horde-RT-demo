@@ -64,6 +64,15 @@ $orm = @(
     "$props/lantern-iron-orm.png", "$props/lantern-iron-orm.png",
     "$collapse/boulder01-orm.png", "$collapse/medieval-wall02-orm.png",
     "$props/rag-torch-v01/orm.png", "$props/sword-scabbard/sword-scabbard-orm.png")
+$forest = Join-Path $props "forest-tree-pair-v1"
+# The original tree pair contributes four base-colour families. Only bark has
+# authored normal and roughness maps, so foliage keeps its source material's
+# unmapped normal/ORM semantics instead of receiving fabricated detail.
+$base += @(
+    "$forest/bark-base-color.png", "$forest/pine-base-color.png",
+    "$forest/moss-base-color.png", "$forest/alder-base-color.png")
+$normal += "$forest/bark-normal.png"
+$orm += "$forest/bark-orm.png"
 $compiler = Join-Path $PSScriptRoot "compile-static-texture-array.ps1"
 $compilerOptions = @{ AssignPrimaries = "bt709" }
 if (-not [string]::IsNullOrWhiteSpace($KtxPath)) { $compilerOptions.KtxPath = $KtxPath }
@@ -110,14 +119,26 @@ $manifest = [ordered]@{
         "gothic-chest-lid.BlackIron", "reward-lantern-ring.BlackIron",
         "reward-lantern-body.BlackIron", "collapsed-entry/Boulder01Rock",
         "collapsed-entry/MedievalWall02", "rag-torch-player/RagTorch_Atlas",
-        "player-sword-scabbard/LeatherIron")
-    layerCounts = [ordered]@{ baseColor = 14; normal = 14; orm = 14; emissive = 1 }
+        "player-sword-scabbard/LeatherIron", "forest-tree-pair-v1/Bark",
+        "forest-tree-pair-v1/Pine", "forest-tree-pair-v1/Moss",
+        "forest-tree-pair-v1/Alder")
+    layerCounts = [ordered]@{ baseColor = $base.Count; normal = $normal.Count; orm = $orm.Count; emissive = 1 }
     sourceLayers = @(
         for ($layer = 0; $layer -lt $base.Count; ++$layer) {
+            $normalRecord = if ($layer -lt $normal.Count) { Get-SourceRecord $normal[$layer] } else { $null }
+            $ormRecord = if ($layer -lt $orm.Count) { Get-SourceRecord $orm[$layer] } else { $null }
             [ordered]@{ layer = $layer; baseColor = Get-SourceRecord $base[$layer];
-                normal = Get-SourceRecord $normal[$layer]; orm = Get-SourceRecord $orm[$layer] }
+                normal = $normalRecord; orm = $ormRecord }
         }
     )
+    forestSource = [ordered]@{
+        originalResolution = 512
+        arrayInputResolution = 1024
+        resampling = "Nearest-neighbour 2x replication; exact 512px texels retained at mip level 1; source PNGs unchanged"
+        originalDirectory = "assets/models/world/source/forest-tree-pair-v1/textures"
+        originalBarkRoughness = Get-SourceRecord (Join-Path $repoRoot "assets/models/world/source/forest-tree-pair-v1/textures/horde-bark-original-roughness-512.png")
+        generatedBarkOrm = Get-SourceRecord (Join-Path $forest "bark-orm.png")
+    }
     normalConvention = "linear glTF/OpenGL +Y; existing generated-mipmap filter unchanged; runtime renormalizes mapped normals"
     colorPrimaries = "BT709/sRGB assigned metadata only, no pixel conversion"
     ormConvention = "R ambient occlusion, G roughness, B metallic; source ARM is already this channel order"
@@ -133,7 +154,7 @@ $manifest = [ordered]@{
         orm = [ordered]@{ format = "R8G8B8A8_UNORM"; sha256 = Get-Sha "orm.windows.ktx2" }
         emissive = [ordered]@{ format = "R8G8B8A8_SRGB"; sha256 = Get-Sha "emissive.windows.ktx2" }
     }
-    licenceStatus = "Existing Meshy outputs conservatively CC BY 4.0; collapsed-entry Boulder01 and MedievalWall02 CC0; RagTorch_Atlas and player sword scabbard are original assistant-authored geometry/maps with no blanket licence assigned; provenance in ASSET_LICENSES.md"
+    licenceStatus = "Existing Meshy outputs conservatively CC BY 4.0; collapsed-entry Boulder01 and MedievalWall02 CC0; RagTorch_Atlas and player sword scabbard are original assistant-authored geometry/maps with no blanket licence assigned; forest tree pair is owner-authored and owner-approved for game/repository integration, with no blanket open-source license assigned; provenance in ASSET_LICENSES.md"
 }
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $runtime "asset.manifest.json") -Encoding utf8
 Write-Output "Built deterministic 1K production static-prop texture arrays and manifest."

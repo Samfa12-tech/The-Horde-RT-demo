@@ -4,6 +4,13 @@ The runtime currently uses animated skeleton/placeholder-lich assets, production
 
 ## Asset rules
 
+The 1.7 [bounded nature-audio slice](evidence/2026-10-18-night-ambience/README.md)
+uses two attributed finite mono PCM16 owl/cricket cuts and preserves prepared
+pond/cicada candidates outside the runtime roster. Its own manifest/recipe pins
+24kHz source transformations and exact hashes. Cricket audio remains CC BY-SA 4.0;
+the other clips retain their individual attribution licences. Technical admission
+and source metadata do not establish listening/mix or water-proximity acceptance.
+
 The1.6.1 player pair is admitted as a five-region `WorldBody` plus two-region
 `Viewmodel`. Exact runtime hashes are `f2c3f62b...` and `6f06d77e...`; manifests,
 clip semantics and processing receipts must agree. The body remainder shares
@@ -113,6 +120,13 @@ For repeating surfaces specify metres and desired repeats/metre in the authoring
 record; stretching object geometry does not establish believable texture scale.
 For example, a four-metre surface with UV span 1 and two repeats/metre needs an
 authored UV span 8 or an explicit multiplier 8. Confirm size under moving light.
+
+Named entries may also author `baseColorFactor: [r, g, b, a]`, four finite
+components within [0, 1]. This replaces the imported linear glTF factor; it
+multiplies the sRGB-decoded texture in the existing PBR path without re-encoding
+texels, adding samples or changing alpha-mode admission. Missing factors retain
+the imported value. Record reversible material tuning with the source recipe,
+and inspect matched RT views rather than compensating with global light strength.
 
 Dungeon world-projected materials retain 0.42 repeats/metre and a separate 0.34
 normal blend by default. That blend is not equivalent to glTF XY scale 0.34; the

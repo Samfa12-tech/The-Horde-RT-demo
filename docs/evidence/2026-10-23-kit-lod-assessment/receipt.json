@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "utc": "2026-10-23T11:13:17.569077+00:00",
+  "status": "READ-ONLY FEASIBILITY; no Kit derivative generated or admitted",
+  "source": {
+    "sourceSha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713",
+    "attributeNames": [
+      "JOINTS_0",
+      "NORMAL",
+      "POSITION",
+      "TANGENT",
+      "TEXCOORD_0",
+      "WEIGHTS_0"
+    ],
+    "vertices": 26945,
+    "completeUniqueAttributeRows": 26945,
+    "exactDuplicateCompleteAttributeRows": 0,
+    "positionUvSkinAmbiguousGroups": 0,
+    "joints": 24,
+    "clips": 7
+  },
+  "baseline": {
+    "triangles": 25968,
+    "components": 1,
+    "weldedEuler": -6,
+    "boundaryEdges": 17,
+    "nonmanifoldEdges": 16,
+    "edgeMultiplicityAboveTwo": {
+      "three": 11,
+      "four": 5
+    },
+    "opposedTriangles": 0,
+    "zeroAreaTriangles": 0,
+    "zeroUvTriangles": 0
+  },
+  "proposedTrial": {
+    "exactProtection": [
+      "all Head/neck influenced rows plus bindY>=1.55m",
+      "boots bindY<=0.45m",
+      "Hand-influenced contacts",
+      "original one-ring neighborhoods of boundary/nonmanifold edges",
+      "all source triangles incident to protected rows"
+    ],
+    "protectedRows": 11428,
+    "protectedTriangles": 11075,
+    "eligibleTriangles": 14893,
+    "eligibleReferencedRows": 15305,
+    "hypotheticalHalfEligibleWholeTriangles": 18522,
+    "hypotheticalWholeTriangleReductionPercent": 28.7,
+    "qualification": "estimate, not an optimizer result or performance prediction",
+    "relativeErrorProposal": 0.005,
+    "relativeErrorIsNotAbsoluteMillimetres": true,
+    "silhouetteGoal": "matched actual front/side/conversational RT views, provisional one-output-pixel contour tolerance; no actual comparison yet",
+    "gates": [
+      "no new opposed normal/sliver/UV defects",
+      "source topology/boundary/component preservation",
+      "unchanged rig/clips/acting/contact/grounding",
+      "original surviving attribute bytes; no ambiguous skin recovery",
+      "actualRT moving and conversational visual review before admission"
+    ]
+  },
+  "rejectedOverconstraint": {
+    "method": "all UV seams plus24direction bind contours locked exactly",
+    "protectedRows": 26608,
+    "eligibleTriangles": 53,
+    "reason": "no useful geometric reduction"
+  },
+  "originalRt": {
+    "evidence": "single existing chapter-kit-reunion original control only; not a LOD comparison",
+    "exe": {
+      "exists": true,
+      "bytes": 14157824,
+      "sha256": "c3c931924d01fd62997b752a48516b82dbcb51263b19bfe1130a7ae8fdca3d71"
+    },
+    "device": {
+      "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "vendorId": 4318,
+      "deviceId": 11672
+    },
+    "presentation": {
+      "renderScale": 1.0,
+      "dispatchWidth": 960,
+      "dispatchHeight": 540,
+      "swapchainWidth": 960,
+      "swapchainHeight": 540,
+      "swapchainFormat": 44
+    },
+    "shaderBank": {
+      "opaqueFast": {
+        "key": "diagnostic_high_opaque_fast",
+        "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_high_generic_dielectric",
+        "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+      }
+    },
+    "imageSha256": "8fa2785ebe1b118f84b93e99522e762ba486d2f49d1989308362b7ad4ecb9e6c",
+    "rawManifestSha256": "b40f12dfacc5125d261d55a51900c234159bf976acc5a31a1a63ff272c03dea4",
+    "settingsSha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3",
+    "settingsUnchanged": true,
+    "foregroundReadbacksWereNullAndUnchanged": true,
+    "visualLimit": "hood shadows obscure fine face detail; this existing view alone cannot accept face/silhouette"
+  },
+  "noPhoneOrSourceAssetMutation": true
+}

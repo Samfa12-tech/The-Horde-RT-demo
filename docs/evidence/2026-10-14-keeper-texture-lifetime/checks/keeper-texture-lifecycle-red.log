@@ -1,0 +1,3 @@
+Keeper vertex lifetime checks: PASS
+FAIL: unproved texture upload retains and counts both images, staging and the owning command/fence
+FAIL: move transfers the quarantine and exact-source identity without duplicating GPU owners

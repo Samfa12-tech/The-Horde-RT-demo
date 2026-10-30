@@ -1,0 +1,54 @@
+{
+  "files": {
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe": {
+      "bytes": 14071296,
+      "sha256": "d101855aff7bf7f635427f682bb3fb33b1961d47569b8e8aec4f86d75501df48"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\horde_rt_campaign_play_session_tests.exe": {
+      "bytes": 4614144,
+      "sha256": "d64edc9fcc7b09ebb0da74f1f733947ad33d161c31a2ec0296c52d58b8170e5c"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.settings.ini": {
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\tools\\validate-windows-route.py": {
+      "bytes": 4007,
+      "sha256": "3837b4e61b1e182ba43f5ff2e08b09b6958b6d12d626e68bd65eb15eb7c29949"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\ASSET_LICENSES.md": {
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\PROJECT_MEMORY.md": {
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\platform\\windows\\DiagnosticWindow.cpp": {
+      "bytes": 619767,
+      "sha256": "297a702758a0d353be43a14e21fc0cba7e7177b1c6b0331631cd403357674db2"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\platform\\windows\\windows_campaign_validation.inl": {
+      "bytes": 46305,
+      "sha256": "df2d15e040c9a881b5264bd48b2769910fd526eda88615fc75712c13962af95f"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\platform\\windows\\windows_route_validation.inl": {
+      "bytes": 19247,
+      "sha256": "85490e18a590a95cf705d8038f98fbc9dbafda5b34592f39dd9a640df7e02f39"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\src\\gameplay\\dialogue\\CompanionRouteFixture.h": {
+      "bytes": 7017,
+      "sha256": "aa2a7683c80108255743017705aae59e46b679e7241da4f57cf43ab3971a0564"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\tests\\CampaignPlaySessionTests.cpp": {
+      "bytes": 48181,
+      "sha256": "128c135aaa39369cc3e1d608f06448fca57d7420f7af41de48044b626e7539a2"
+    },
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\tests\\ForestDressingTests.cpp": {
+      "bytes": 60599,
+      "sha256": "4991c74a027f321bf9482ba9e98f65b40dafb0ddb539da3e73b9f5c00ff8897b"
+    }
+  },
+  "ownerCampaignExists": false,
+  "ownerCampaignFiles": {}
+}

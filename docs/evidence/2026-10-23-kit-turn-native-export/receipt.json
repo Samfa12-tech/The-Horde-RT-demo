@@ -1,0 +1,301 @@
+{
+  "schema": 1,
+  "sealedAtUtc": "2026-10-24T01:50:55.527033+00:00",
+  "baseCommit": "0cf8829c847a375eedaa985f1fec58f71d137e65",
+  "disposition": "One bounded offline sole-pose cleanup and append-only native export proof; production behavior/bindings unchanged, gameplay admission pending.",
+  "cleanup": {
+    "algorithm": "Exactly two continuous rigid sole-pose fits per foot per authored key, baked offline; +/-5 degree and 15mm per-fit bounds. No runtime solver.",
+    "takes": [
+      {
+        "direction": "left",
+        "durationSeconds": 0.75,
+        "angleDegrees": 45,
+        "maxRequiredLegStretchM": 0,
+        "maxIdleZeroEndpointVertexErrorM": 4.0267613878463687e-07,
+        "maxSupportSoleHorizontalDriftM": 0.006763670024982718,
+        "minimumSoleZ": -1.175400484498823e-06,
+        "maximumSoleZ": 0.0559220165014267,
+        "bindUnchanged": true,
+        "geometryWeightsUnchanged": true
+      },
+      {
+        "direction": "right",
+        "durationSeconds": 0.75,
+        "angleDegrees": -45,
+        "maxRequiredLegStretchM": 0,
+        "maxIdleZeroEndpointVertexErrorM": 3.888781991083508e-07,
+        "maxSupportSoleHorizontalDriftM": 0.006763654645229655,
+        "minimumSoleZ": -1.1992431154794758e-06,
+        "maximumSoleZ": 0.055922020226716995,
+        "bindUnchanged": true,
+        "geometryWeightsUnchanged": true
+      }
+    ],
+    "saved120Hz": [
+      {
+        "direction": "left",
+        "samples": 91,
+        "maxSupportSoleDriftM": 0.006855728128353703
+      },
+      {
+        "direction": "right",
+        "samples": 91,
+        "maxSupportSoleDriftM": 0.006855667103555607
+      }
+    ]
+  },
+  "nativeExport": {
+    "schema": 1,
+    "sourceBlendSha256": "3eb2db158fad05820a3b40a8771f7f2781f3f5b4771ceef7de61f3ee07542aa4",
+    "baseGlbSha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713",
+    "outputGlbSha256": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11",
+    "outputBytes": 2272652,
+    "originalBinaryPrefixBytes": 2036112,
+    "staticDataAndOriginalClipsUnchanged": true,
+    "rootMotionNotBakedTwice": true,
+    "directions": [
+      {
+        "direction": "left",
+        "calibrationJointOriginMaxErrorM": 1.0077028694708402e-05,
+        "idleGeometryMaxErrorM": 3.921950524544094e-06,
+        "referenceVertices": 142
+      },
+      {
+        "direction": "right",
+        "calibrationJointOriginMaxErrorM": 1.0077028694708402e-05,
+        "idleGeometryMaxErrorM": 3.921950524544094e-06,
+        "referenceVertices": 142
+      }
+    ],
+    "nativeAcceptance": "Pending actual existing-loader validation, not inferred from export."
+  },
+  "nativePositive": {
+    "nativeProof": true,
+    "cases": 38,
+    "comparedVertices": 5396,
+    "endpointMaxM": 6.15305e-07,
+    "singleYawMaxM": 3.79433e-06,
+    "doubleYawMaxM": 0.33001,
+    "missingYawMaxM": 0.330009
+  },
+  "deliberateDoubleYawNegative": {
+    "expectedExit": 1,
+    "observedExit": 1,
+    "result": {
+      "nativeProof": false,
+      "cases": 38,
+      "comparedVertices": 5396,
+      "endpointMaxM": 6.15305e-07,
+      "singleYawMaxM": 0.33001,
+      "doubleYawMaxM": 0.797179,
+      "missingYawMaxM": 0.330009
+    }
+  },
+  "originalClipsComparison": "Kit candidate clips=7 poses=85 candidate_vertices=26945 compared_vertex_poses=2290325 exact_raw_and_grounded_pbr=PASS runtime_admission=NO",
+  "originalStagingFailure": {
+    "path": "reports/kit-turn-native-export-20261023/original-clips.log",
+    "bytes": 149,
+    "sha256": "3f2465a6ed1e731de4cfb9a7cb1242acc2de1179bfd51b3e72a62f7b576ce963"
+  },
+  "defaultIntakeCTest": {
+    "passed": true,
+    "name": "horde_rt_kit_source_intake_tests",
+    "seconds": 7.85,
+    "log": {
+      "path": "reports/kit-turn-native-export-20261023/default-intake.log",
+      "bytes": 493,
+      "sha256": "d6d252080ff49386e634aa2bcb9c942bffb232f134652399f98eb813112d50b6"
+    }
+  },
+  "inputMaster": {
+    "path": "assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb",
+    "bytes": 7034964,
+    "sha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e"
+  },
+  "inputRuntime": {
+    "path": "assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb",
+    "bytes": 2151672,
+    "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+  },
+  "sourceArtifacts": [
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/author_turn.py",
+      "bytes": 13156,
+      "sha256": "213a115ba7096c67f54955ae8b14efa6a0bb7bf12e88cf9bf91774f0bb60511e"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/export_native.py",
+      "bytes": 8886,
+      "sha256": "5b58ab4840b326ff39e5668b727f8a28e76c28e29934c75333b58c2b30770f1d"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/kit-step-turn-cleanup.blend",
+      "bytes": 6920219,
+      "sha256": "3eb2db158fad05820a3b40a8771f7f2781f3f5b4771ceef7de61f3ee07542aa4"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/kit-step-turn-proof.blend",
+      "bytes": 6919526,
+      "sha256": "8800d40902f437b171791a498b9460bca3920f9de942545d24bdf6ca32ffea0a"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/native/asset.manifest.json",
+      "bytes": 754,
+      "sha256": "0218c5f3f122c1be51af356e4b63689c38da9efebb4d03fb06d716a3055b5c57"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/native/kit-turn-proof.glb",
+      "bytes": 2272652,
+      "sha256": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/native/native-reference.bin",
+      "bytes": 86952,
+      "sha256": "3318e6b6a707df93504352ae17e398add33a1fea1890280e791133d0557beeeb"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/native/root-motion.json",
+      "bytes": 7855,
+      "sha256": "7a4928d4dfec5184071c96a4c8e1f25e07d7ce7c87545324450e75b0c29061d9"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/README.md",
+      "bytes": 3806,
+      "sha256": "a74939350857b41a4c5801382987a94ccd12e46c306dfc55c7beac2d26c5484a"
+    },
+    {
+      "path": "assets/models/characters/source/kit-step-turn-proof-v1/verify_preview.py",
+      "bytes": 3163,
+      "sha256": "c674101d34ff4f1acfd81da66f846110af9d2b525ed226d484712490f4a865c5"
+    }
+  ],
+  "previews": [
+    {
+      "path": "docs/evidence/2026-10-23-kit-turn-native-export/foot-left-0013.png",
+      "bytes": 482860,
+      "sha256": "c6f4341379d1926857af0f896a5961e2709d2e8edd302ba146dcb195902d456f"
+    },
+    {
+      "path": "docs/evidence/2026-10-23-kit-turn-native-export/foot-left-0024.png",
+      "bytes": 484784,
+      "sha256": "8d5d782bb7dfda12ef1c738151ab15a9b56fd3f3cc750c871f983f8a67867acc"
+    },
+    {
+      "path": "docs/evidence/2026-10-23-kit-turn-native-export/foot-right-0013.png",
+      "bytes": 506977,
+      "sha256": "da73e89079938a725bff7f19f4bbbc923e9e7d4be0b338b44e4e411a579d2e3c"
+    },
+    {
+      "path": "docs/evidence/2026-10-23-kit-turn-native-export/foot-right-0035.png",
+      "bytes": 485066,
+      "sha256": "b068b549f4f4b8ddcee64cb87cc39ea0e48efa5159c36af1f42cd1cdae2e8df2"
+    },
+    {
+      "path": "docs/evidence/2026-10-23-kit-turn-native-export/left-cleanup-preview.mp4",
+      "bytes": 124985,
+      "sha256": "4c471f2b9f8ae31efedbb1e03e3210864c9eba217e89671eca48db371d4c6a74"
+    },
+    {
+      "path": "docs/evidence/2026-10-23-kit-turn-native-export/right-cleanup-preview.mp4",
+      "bytes": 138260,
+      "sha256": "da2cc58f9132d24799fa0a2755687d1b7f6c184864606ca411ffec2c3802506d"
+    }
+  ],
+  "nativeValidatorSources": [
+    {
+      "path": "tests/KitTurnProofValidation.h",
+      "bytes": 4450,
+      "sha256": "842ee21bee0d8620746bd0b52b5e46f877042dff981cea3f423c18275e16ef3c"
+    },
+    {
+      "path": "tests/KitSourceIntakeTests.cpp",
+      "bytes": 40658,
+      "sha256": "d66a83edcefa42560addc9fc2cc19d6cb55e980507cd7b32cbfff6a80f9ad58c"
+    }
+  ],
+  "rawReceipts": [
+    {
+      "path": "reports/kit-turn-native-export-20261023/native-proof-final.log",
+      "bytes": 162,
+      "sha256": "4f6fa254b1bec901b93d9c51020c399b55e013a8f937f06fc955feb506a60162"
+    },
+    {
+      "path": "reports/kit-turn-native-export-20261023/double-yaw-rejected.log",
+      "bytes": 160,
+      "sha256": "07d8c692f0594fbdde2be8ff4a0f7f85330d10fd44f1b7b7f0b57d8cfc237c58"
+    },
+    {
+      "path": "reports/kit-turn-native-export-20261023/original-clips-staged-manifest.log",
+      "bytes": 140,
+      "sha256": "2436f62a738ef09fe7967746f8443aeee9f8e51ed7e9fc395b5f252fefd9c906"
+    },
+    {
+      "path": "reports/kit-turn-native-export-20261023/cleanup-render/reopened-validation.json",
+      "bytes": 159960,
+      "sha256": "32123853f81fb9a18267af946bc62b456d1485c7b26be13601e7cd211c685711"
+    },
+    {
+      "path": "reports/kit-turn-native-export-20261023/native/export-receipt.json",
+      "bytes": 955,
+      "sha256": "4468b0dcbb1b9bdf41915638b8db06c1b69901c8c2797532c0131efebfed9965"
+    },
+    {
+      "path": "reports/kit-turn-native-export-20261023/native-final-build.log",
+      "bytes": 1055,
+      "sha256": "808dc2d5dca5e8ecc9ae102830083da60caec291542e4ce5912bd538acc6fc4f"
+    }
+  ],
+  "priorCi": {
+    "headSha": "0cf8829c847a375eedaa985f1fec58f71d137e65",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40038985047"
+  },
+  "priorCiJobs": [
+    {
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success",
+      "startedAt": "2026-10-23T23:19:12Z",
+      "completedAt": "2026-10-23T23:24:22Z"
+    },
+    {
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success",
+      "startedAt": "2026-10-23T23:19:12Z",
+      "completedAt": "2026-10-23T23:26:36Z"
+    },
+    {
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success",
+      "startedAt": "2026-10-23T23:19:13Z",
+      "completedAt": "2026-10-23T23:29:39Z"
+    },
+    {
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success",
+      "startedAt": "2026-10-23T23:19:14Z",
+      "completedAt": "2026-10-23T23:26:00Z"
+    },
+    {
+      "name": "player-vulkan-host",
+      "conclusion": "success",
+      "startedAt": "2026-10-23T23:19:12Z",
+      "completedAt": "2026-10-23T23:25:15Z"
+    },
+    {
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "success",
+      "startedAt": "2026-10-23T23:19:13Z",
+      "completedAt": "2026-10-23T23:32:56Z"
+    }
+  ],
+  "recovery": "Exec-server disconnected before final receipt command was created. On reconnection, saved logs, staged/native reproduction hashes, lack of active named processes and all 151 owner file hashes were verified; no tests rerun merely for transport recovery.",
+  "packaging": "Unchanged literal original Kit runtime paths in android/app/build.gradle and tools/package-alpha.ps1 exclude these source-only proof files.",
+  "ownerParkedFilesUnchanged": 151,
+  "phoneOperations": false,
+  "foregroundActivation": false,
+  "productionBindingsEnabled": false,
+  "nativeRTVisualAcceptance": false,
+  "runtimePerformanceClaim": false,
+  "remainingGate": "Preview/contact review, then separately scoped shared transient turn state/bindings, single yaw application and real RT joins/lifecycle/terrain/dialogue acceptance."
+}

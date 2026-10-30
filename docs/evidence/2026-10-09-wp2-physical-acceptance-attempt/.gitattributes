@@ -1,0 +1,4 @@
+.gitattributes -text
+*.json -text
+*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+*.png -filter -diff -merge -text

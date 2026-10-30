@@ -8,13 +8,22 @@ namespace pocket_audio
 
 PcmLoopStream::PcmLoopStream(const std::span<const PcmClip> clips,
                              const std::uint64_t crossfadeFrames) noexcept
+    : PcmLoopStream(clips, PcmBankLimits{}, crossfadeFrames)
+{
+}
+
+PcmLoopStream::PcmLoopStream(const std::span<const PcmClip> clips,
+                             const PcmBankLimits limits,
+                             const std::uint64_t crossfadeFrames) noexcept
     : crossfadeFrames_(crossfadeFrames),
       crossfadePosition_(crossfadeFrames)
 {
-    clipsValid_ = crossfadeFrames <= kPcmMaximumCrossfadeFrames && ValidateClips(clips);
+    clipsValid_ = limits.IsValid() && crossfadeFrames <= kPcmMaximumCrossfadeFrames &&
+                  ValidateClips(clips, limits);
 }
 
-bool PcmLoopStream::ValidateClips(const std::span<const PcmClip> clips) noexcept
+bool PcmLoopStream::ValidateClips(const std::span<const PcmClip> clips,
+                                  const PcmBankLimits limits) noexcept
 {
     if (clips.empty() || clips.size() > kPcmMaximumClipCount ||
         !clips[0].body.empty() || !clips[0].tail.empty() || clips[0].looping)
@@ -24,6 +33,7 @@ bool PcmLoopStream::ValidateClips(const std::span<const PcmClip> clips) noexcept
 
     clipCount_ = clips.size();
     clips_[0] = clips[0];
+    std::uint64_t bankBytes = 0u;
     for (std::size_t index = 1u; index < clips.size(); ++index)
     {
         const PcmClip& clip = clips[index];
@@ -35,11 +45,20 @@ bool PcmLoopStream::ValidateClips(const std::span<const PcmClip> clips) noexcept
 
         const std::uint64_t bodyFrames = static_cast<std::uint64_t>(clip.body.size() / 2u);
         const std::uint64_t tailFrames = static_cast<std::uint64_t>(clip.tail.size() / 2u);
-        if (bodyFrames == 0u || bodyFrames > kPcmMaximumClipFrames ||
+        if (!limits.clip.AllowsFrames(bodyFrames) ||
+            (tailFrames != 0u && !limits.clip.AllowsFrames(tailFrames)) ||
             tailFrames > bodyFrames)
         {
             return false;
         }
+        // Each multiplication is bounded by the shared admission check above.
+        // Subtract before adding so accumulation cannot wrap on hostile input.
+        const std::uint64_t clipBytes = (bodyFrames + tailFrames) * kPcmBytesPerFrame;
+        if (clipBytes > limits.maximumPcmBytes - bankBytes)
+        {
+            return false;
+        }
+        bankBytes += clipBytes;
         clips_[index] = clip;
     }
     return true;

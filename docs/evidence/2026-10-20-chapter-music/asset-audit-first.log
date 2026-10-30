@@ -1,0 +1,12 @@
+Initial command: python reports/audit-chapter-music-assets.py
+Traceback (most recent call last):
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\audit-chapter-music-assets.py", line 22, in <module>
+    assert subprocess.check_output(["git", "show", "HEAD:"+relative], cwd=ROOT) == raw
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+Follow-up read-only diagnosis: A-body.wav Git blob is a 132-byte Git LFS pointer,
+while the already hydrated local WAV is 2,304,044 bytes. Its recorded oid is
+sha256:8c6201afb7129775ded6696c5819f4e592202d1b0f33f755b9d4f408f2e81556.
+The corrected helper compares the local cryptographic hash and size with the
+LFS pointer and the admitted manifest. No asset or pointer is changed/fetched.

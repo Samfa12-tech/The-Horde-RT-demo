@@ -483,6 +483,9 @@ void TestRealFixedTickTorchDetachIsIndependentlyTransformContinuous()
     for (std::size_t step = 0u; step < 80u; ++step)
     {
         const auto before = simulation.Snapshot();
+        // Look can change on the release tick; the last held attachment is
+        // intentionally retained, while the authored landing records new yaw.
+        input.yawRadians += 0.035f;
         simulation.StepFixed(input);
         const auto after = simulation.Snapshot();
         if (after.heldItems[0].detached)
@@ -515,6 +518,20 @@ void TestRealFixedTickTorchDetachIsIndependentlyTransformContinuous()
     simulation.StepFixed(input);
     Check(simulation.Snapshot().heldItems[0].detachTick == detachTick,
           "subsequent authored trajectory ticks must not detach the torch again");
+    bool fallingFramesRigid = true;
+    for (unsigned step = 0; step < 80; ++step)
+    {
+        simulation.StepFixed(input);
+        const auto& item = simulation.Snapshot().heldItems[0];
+        horde::gameplay::items::HeldLightState light;
+        fallingFramesRigid &= item.detachTick == detachTick &&
+            horde::gameplay::items::ComposeHeldLightState(item.worldFromItem,
+                horde::gameplay::items::PlayerRagTorchFlameSocketTransform(),
+                horde::gameplay::items::PlayerRagTorchLightSocketTransform(),
+                1.0f, light, diagnostic);
+    }
+    Check(fallingFramesRigid,
+          "every pitched/yawed real torch-fall frame remains rigid for the renderer light sockets");
 }
 
 void TestSharedFixedStepOwnsItemsKinematicsAndSocketLight()
@@ -596,7 +613,7 @@ void TestHeldLightGpuAbiAppendsWithoutChangingReleasedBindings()
     Check(horde::vulkan::raytracing::kRtBindingInstanceMetadata == 11u &&
               horde::vulkan::raytracing::kRtBindingEmissiveTextures == 19u &&
               horde::vulkan::raytracing::kRtBindingHeldLight == 20u &&
-              sizeof(horde::vulkan::raytracing::RtHeldLightGpu) == 16u,
+              sizeof(horde::vulkan::raytracing::RtHeldLightGpu) == 32u,
           "held light GPU state must append at binding 20 without changing bindings 0-19");
 }
 

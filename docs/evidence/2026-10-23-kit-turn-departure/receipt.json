@@ -1,0 +1,405 @@
+{
+  "schema": 1,
+  "sealedAtUtc": "2026-10-23T22:41:03.119138+00:00",
+  "baseCommit": "6124a374783aaae61ea2eb8f7142428443e75d40",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "disposition": "Production movement/meshes unchanged. Retained visible defect and finite native reproduction; no runtime motion candidate admitted.",
+  "evidenceClass": "Isolated seeded noncombat hidden Windows hardware RT immutable production-route snapshots; not natural gameplay, phone, listening or sustained performance.",
+  "fixture": {
+    "path": "src/platform/windows/windows_campaign_validation.inl",
+    "bytes": 54933,
+    "sha256": "40cee099ea4940098c9cbf19433734f35b505aa194dbb40c65bc95d7a28c4e4b"
+  },
+  "fixtureGitDiffSha256": "f6f403bdb5702a8b55df464b133388b96e1cf80c750f7d498f35eb4011c9373c",
+  "runtimeSourcesUnchanged": [
+    {
+      "path": "src/gameplay/dialogue/CompanionRouteFixture.h",
+      "bytes": 7142,
+      "sha256": "82cac1598041bcc122ff788189d57a9d32ec0dd41d4694cf11c7bb31042f8c9a"
+    },
+    {
+      "path": "src/gameplay/dialogue/CompanionLocomotion.h",
+      "bytes": 1063,
+      "sha256": "617cc31b132bde8986d910d0a7ad31322b2a730bd7649c34db812e1fe25f5696"
+    },
+    {
+      "path": "src/gameplay/dialogue/CompanionActing.h",
+      "bytes": 2902,
+      "sha256": "3bee68f2286cf0754fa28724bfae22a4e764cf1f19c0036046e5c8e66f8ddf8a"
+    },
+    {
+      "path": "src/scene/CompanionPose.h",
+      "bytes": 857,
+      "sha256": "fe069520487f275c1b3f1f7b3886ac2f5be9eeb338583c37f0b2c04d5e0cf29d"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "bytes": 495911,
+      "sha256": "38bf0d81becfafa8f54484c76b8f2a53338a8f9111c777f11814983dc61435aa"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 635861,
+      "sha256": "2ed7fc5527b18fb0b2aa0050633a439b729b12b29974095fa6061c50eccd25f9"
+    }
+  ],
+  "kitAsset": {
+    "path": "assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb",
+    "bytes": 2151672,
+    "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+  },
+  "runs": {
+    "control": {
+      "processReceipt": {
+        "path": "reports/kit-turn-departure-20261023/control-process.json",
+        "bytes": 3881,
+        "sha256": "38995f5935b235f2d2362facbbae0a6e5543631e864f4b86c79e60aa62604b58"
+      },
+      "nativeReceipt": {
+        "path": "reports/horde-campaign-fixtures-kit-turn-departure-20261023-control/windows-lookout-validation.json",
+        "bytes": 210023,
+        "sha256": "f54ea0a49d9f6c0f54eb47e14892391add927ba11ad98a4429790b094ae0da48"
+      },
+      "nativeChecks": 535,
+      "failures": 0,
+      "renderCalls": 37,
+      "seconds": 18.29700000002049,
+      "exitCode": 0,
+      "foregroundUnchanged": true,
+      "custodyUnchanged": true,
+      "build": {
+        "bytes": 14265344,
+        "sha256": "cc60b6204133092bd0da8402bfb66087a28abc8d5fcfa9687d23b13f3a881080"
+      }
+    },
+    "departure-witness": {
+      "processReceipt": {
+        "path": "reports/kit-turn-departure-20261023/departure-witness-process.json",
+        "bytes": 3901,
+        "sha256": "fef87dfeeab62c75ce6e7a4153bec0a051a413a38ac49f120894931cd91d5a95"
+      },
+      "nativeReceipt": {
+        "path": "reports/horde-campaign-fixtures-kit-turn-departure-20261023-departure-witness/windows-lookout-validation.json",
+        "bytes": 242660,
+        "sha256": "6dcee570f1ff8c8b26e30976a2b226336600bd44f2d54009d107b9066beaf9ca"
+      },
+      "nativeChecks": 542,
+      "failures": 0,
+      "renderCalls": 44,
+      "seconds": 19.28100000001723,
+      "exitCode": 0,
+      "foregroundUnchanged": true,
+      "custodyUnchanged": true,
+      "build": {
+        "bytes": 14265344,
+        "sha256": "a7bfa9d68954ec3256e994ec564e38923bb7f3ff916c40ad56994f1b33837d5b"
+      }
+    },
+    "tether-witness": {
+      "processReceipt": {
+        "path": "reports/kit-turn-departure-20261023/tether-witness-process.json",
+        "bytes": 3882,
+        "sha256": "8b1555d037396c3fe7f0b2f5ada7375871e7b327a492fd8483a34fe4f96a45e4"
+      },
+      "nativeReceipt": {
+        "path": "reports/horde-campaign-fixtures-kit-turn-departure-20261023-tether-witness/windows-lookout-validation.json",
+        "bytes": 256807,
+        "sha256": "e0e33280262e1e0fffb100c35ee03f23cf575d26138b0dc062508763f16b13b4"
+      },
+      "nativeChecks": 643,
+      "failures": 0,
+      "renderCalls": 45,
+      "seconds": 19.5,
+      "exitCode": 0,
+      "foregroundUnchanged": true,
+      "custodyUnchanged": true,
+      "build": {
+        "bytes": 14266880,
+        "sha256": "fc913775a53e5047ebdbaf60b5ed65b338b6788de6f2edcd58470b6723f269d7"
+      }
+    }
+  },
+  "narrowerAttemptLimitation": "departure-witness inherited proof=false stop/turn staging. It is retained, but only the later tether-witness retains proof=true across its real PlayerLagging wait and departure.",
+  "nativePresentation": {
+    "pipeline": {
+      "executionBackend": "RayTracingPipeline",
+      "instrumentation": "diagnostic",
+      "dielectricQuality": "high",
+      "bundleKey": "diagnostic_high_pair",
+      "opaqueFast": {
+        "key": "diagnostic_high_opaque_fast",
+        "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_high_generic_dielectric",
+        "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+      },
+      "activeStrategy": "generic-dielectric",
+      "activeKey": "diagnostic_high_generic_dielectric",
+      "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+      "waterQuality": "high"
+    },
+    "submittedDimensions": {
+      "internalExtent": [
+        1232,
+        803
+      ],
+      "outputExtent": [
+        1232,
+        803
+      ],
+      "cameraAspect": 1.53424656,
+      "presentationTransform": 0,
+      "dynamicResolutionEnabled": false,
+      "linearBlit": false,
+      "aspectPreserved": true
+    },
+    "resources": {
+      "bufferCount": 52,
+      "memoryAllocationCount": 63,
+      "bottomLevelAccelerationStructureCount": 20,
+      "topLevelAccelerationStructureCount": 1,
+      "tlasInstanceCount": 28,
+      "pipelineCount": 2,
+      "shaderBindingTableCount": 2,
+      "descriptorSetCount": 1,
+      "hostVisibleBytes": 49622144,
+      "deviceLocalBytes": 407976928
+    },
+    "presentation": {
+      "outcome": "presented",
+      "presented": true,
+      "lastSuccessfulPresentSubmissionSerial": 2,
+      "finalIdleCompletion": true
+    }
+  },
+  "departureSnapshots": [
+    {
+      "stage": "depart-0",
+      "root": [
+        -24.9761,
+        1.21496,
+        -4.54282
+      ],
+      "yaw": 4.71239,
+      "walking": false,
+      "waypoint": 4,
+      "wait": 1,
+      "idleSeconds": 6.18336,
+      "walkPhase": 0.923083,
+      "walkWeight": 0,
+      "horizontalTravelMetresFromDepart0": 0.0
+    },
+    {
+      "stage": "depart-1",
+      "root": [
+        -24.9489,
+        1.21342,
+        -4.53025
+      ],
+      "yaw": 4.67239,
+      "walking": true,
+      "waypoint": 4,
+      "wait": 1,
+      "idleSeconds": 6.20003,
+      "walkPhase": 0.942314,
+      "walkWeight": 0.0925926,
+      "horizontalTravelMetresFromDepart0": 0.029964060138773504,
+      "absoluteFacingToTravelErrorDegrees": 152.90504109494861
+    },
+    {
+      "stage": "depart-4",
+      "root": [
+        -24.8672,
+        1.20881,
+        -4.49253
+      ],
+      "yaw": 4.55239,
+      "walking": true,
+      "waypoint": 4,
+      "wait": 1,
+      "idleSeconds": 6.25003,
+      "walkPhase": 6.4373e-06,
+      "walkWeight": 0.37037,
+      "horizontalTravelMetresFromDepart0": 0.11995121550030083,
+      "absoluteFacingToTravelErrorDegrees": 146.04524950211487
+    },
+    {
+      "stage": "depart-8",
+      "root": [
+        -24.7582,
+        1.20265,
+        -4.44224
+      ],
+      "yaw": 4.39239,
+      "walking": true,
+      "waypoint": 4,
+      "wait": 1,
+      "idleSeconds": 6.31669,
+      "walkPhase": 0.0769297,
+      "walkWeight": 0.740741,
+      "horizontalTravelMetresFromDepart0": 0.2399932215709437,
+      "absoluteFacingToTravelErrorDegrees": 136.88793400939016
+    },
+    {
+      "stage": "depart-20",
+      "root": [
+        -24.4313,
+        1.18418,
+        -4.29138
+      ],
+      "yaw": 3.91239,
+      "walking": true,
+      "waypoint": 4,
+      "wait": 1,
+      "idleSeconds": 6.5167,
+      "walkPhase": 0.3077,
+      "walkWeight": 1,
+      "horizontalTravelMetresFromDepart0": 0.6000242608428416,
+      "absoluteFacingToTravelErrorDegrees": 109.38882778022574
+    },
+    {
+      "stage": "depart-40",
+      "root": [
+        -23.8866,
+        1.15338,
+        -4.03995
+      ],
+      "yaw": 3.11239,
+      "walking": true,
+      "waypoint": 4,
+      "wait": 1,
+      "idleSeconds": 6.85003,
+      "walkPhase": 0.692316,
+      "walkWeight": 1,
+      "horizontalTravelMetresFromDepart0": 1.1999535353087611,
+      "absoluteFacingToTravelErrorDegrees": 63.55063681456436
+    },
+    {
+      "stage": "depart-60",
+      "root": [
+        -23.3418,
+        1.23115,
+        -3.78851
+      ],
+      "yaw": 2.31239,
+      "walking": true,
+      "waypoint": 4,
+      "wait": 1,
+      "idleSeconds": 7.18337,
+      "walkPhase": 0.076933,
+      "walkWeight": 1,
+      "horizontalTravelMetresFromDepart0": 1.7999777960019392,
+      "absoluteFacingToTravelErrorDegrees": 17.714535683400605
+    },
+    {
+      "stage": "depart-80",
+      "root": [
+        -22.797,
+        1.09337,
+        -3.53707
+      ],
+      "yaw": 2.0032,
+      "walking": true,
+      "waypoint": 4,
+      "wait": 1,
+      "idleSeconds": 7.51671,
+      "walkPhase": 0.461549,
+      "walkWeight": 1,
+      "horizontalTravelMetresFromDepart0": 2.4000020567699503,
+      "absoluteFacingToTravelErrorDegrees": 0.00048515493752466723
+    }
+  ],
+  "originalMotionSnapshotsByteIdentical": true,
+  "originalPngCount": 30,
+  "originalPngsByteIdentical": true,
+  "tetherPngSha256": {
+    "windows-kit-motion-depart-0.png": "18c97d8e0411c65833826fc97a6d101c924121abdb9c02557ebe8f3f4678eed5",
+    "windows-kit-motion-depart-1.png": "b28ed095f80f9afa32d057861adc848dc8618ed8d87cda29bfbee3ab3b325659",
+    "windows-kit-motion-depart-20.png": "7afe5e27352a3e9d4793d8a910d231e512543a4da1cb6bbc20886d591516f89a",
+    "windows-kit-motion-depart-4.png": "3187a2c10fc4a811709283a3b734aa57cecb345faa805126b1806013dc067960",
+    "windows-kit-motion-depart-40.png": "eb76ea3ff79fff354273e3d2ab1530c5b6cb4523c70ae34946c4bf87a880d0c4",
+    "windows-kit-motion-depart-60.png": "41065df281f25496b87fb55e99c6b3594c9a0c5527fc4806b47c21a3eca8ca3d",
+    "windows-kit-motion-depart-8.png": "ba44b111d37ad6dada48fb5b3e4d743bfc8049a25bfae52460eb52b5af3d6ff7",
+    "windows-kit-motion-depart-80.png": "7b5c3d4bbcbd3b0a53a631fb60b12762aaf057c43fda3ad8db07411b45ee5bc9",
+    "windows-kit-motion-start-0.png": "0583a470c7a28f68225520cf191134b75eeb62ca8ff6cad12db1e637aa197909",
+    "windows-kit-motion-start-1.png": "2df676ab11b0f841758418040f114be3e0639feb30028d2b09d936fc13e2c150",
+    "windows-kit-motion-start-4.png": "84cb0b3ab03c9331a7ac32fd69689d3de355d370021df3dd2cd9a55622b819ba",
+    "windows-kit-motion-start-8.png": "1f60c0133c4e892eeab3660430ec2e0ade87f0d1f717ce9b03543680d7c1a6df",
+    "windows-kit-motion-stop-0.png": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150",
+    "windows-kit-motion-stop-1.png": "a113a0bc34e01545b600b340cddbf5ada364599c5532b26b2fd83a98870a74c8",
+    "windows-kit-motion-stop-11.png": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614",
+    "windows-kit-motion-stop-4.png": "15c11a03ab3bfa17624015ad035d7f6b6ac67e4803dad42049a4e2ba846957a4",
+    "windows-kit-motion-stop-8.png": "a593457b3071907cd17e451cb8465ccc448bd42d2028ea11f9b426b6ea1f303a",
+    "windows-kit-motion-turn-0.png": "ad61923bf5fd57168cbe6f5c55d20fa41593fbb058bb0edf23350a06b2995614",
+    "windows-kit-motion-turn-10.png": "e112bb2e57d9346c5932fedc18ae10ddf987eb45a7f2b8b836150c417933ae73",
+    "windows-kit-motion-turn-100.png": "ef2d4cdc8379e77e7bea0798571890c721669c7f2f0a56cca19991e91438706b",
+    "windows-kit-motion-turn-20.png": "e15fe89840736ee0bf5442f15fbdb1d462ab09a1bf4989d446e854da0ce6b0e7",
+    "windows-kit-motion-turn-30.png": "48cdb661d00f52d2af1b81748114edd6ed48501e5b02d41c2b1f21a156a6eac8",
+    "windows-kit-motion-turn-40.png": "b449f778175ae748999d526208bf1e49789195fe0b5742f81a11e1a61f1b5018",
+    "windows-kit-motion-turn-60.png": "7bf4ff67429ed6b57bf7db3db0df8d62f7632d98da17edf71997a68c9619e2cd",
+    "windows-kit-motion-turn-80.png": "1a2307efa083c2e66e4fe7eaa848451a45f559169d5ef0eb4ce4396f0914c441",
+    "windows-kit-motion-walk-100.png": "1a896521f430460d9506e525e4003b8368c1d55270a71333da6d1a0929e48150",
+    "windows-kit-motion-walk-20.png": "abda16cfdf47a92c47db38ce6a1d35b249397456099250322a686234739ee378",
+    "windows-kit-motion-walk-35.png": "f4839ff06365f3a0c88fd59c855e6d4bf50c1f8de85ed22cb3dabab20afc9010",
+    "windows-kit-motion-walk-50.png": "b75c6f9155e2ac58894139e1f10e52bff251d230e9a391a68a05a0de9a4a6eac",
+    "windows-kit-motion-walk-65.png": "7b53493c5ba068d9d950b99e745b54a901bd4cbecd294dcb0ee6a2ca14995987",
+    "windows-kit-motion-walk-80.png": "2d557e8d71d6a42cdb73556a428d5ffb1822f919ffd751d1e2b4782152a4539b",
+    "windows-kit-motion-waypoint-after.png": "0e298e23f1eb368cbdc1aec94d005d58860c5e7fe91480bb2915ab90efe41a4a",
+    "windows-kit-motion-waypoint-before.png": "110d5d68c24893810bbaa7bffa506d9599ccb4fd1ee66906cd8547748920b5a2",
+    "windows-kit-motion-waypoint-tick.png": "75fafb20ded3cf368f50dccbb75e08aab8f3cdef9b98b10c1d59cb8d4e949898",
+    "windows-kit-neutral.png": "dd627d930ff1375ffbd94c49bcc874196f0db3bc8990221409f81644a4d05052",
+    "windows-kit-recognition.png": "51638c30d607fa9775f0dbd96f1553875196460d602c7405df72a08ca2999f8c",
+    "windows-kit-speaking.png": "d423c5a5853830ef08ef4694ec28a0b0788f64be82ab8cfe72aa94a196bb53dd",
+    "windows-loaded-lookout.png": "1b1ab43226a40b16f4d0547701c83d5e85ec2c324caddc46deef9c78d2ceca8a"
+  },
+  "ownerUntrackedCount": 151,
+  "ownerUntrackedBytesUnchanged": true,
+  "ownerUntrackedHashRosterSha256": "1c26d11cc16cd87433b05c7a80fed9be8c6cc91eff718fe87b8a64f90e80940f",
+  "logs": [
+    {
+      "path": "reports/kit-turn-departure-20261023/witness-build.log",
+      "bytes": 1775,
+      "sha256": "bc6668edc54f924cc242fd0e571a06ea3a1cd201a3e3efcaea27458a3992821e"
+    },
+    {
+      "path": "reports/kit-turn-departure-20261023/tether-build.log",
+      "bytes": 1775,
+      "sha256": "d3d54616f900f362145a76b4336df734644d752d260a493e20ad8c553d9bab81"
+    },
+    {
+      "path": "reports/kit-turn-departure-20261023/focused-tests.log",
+      "bytes": 750,
+      "sha256": "1c4fac4b1db961cb1fa6f18cc95dc1223931bd7af0ed492ce46fffecb791be68"
+    }
+  ],
+  "focusedTests": {
+    "selected": 3,
+    "passed": 3,
+    "seconds": 9.97,
+    "names": [
+      "horde_rt_companion_acting_tests",
+      "horde_rt_companion_locomotion_tests",
+      "horde_rt_kit_source_intake_tests"
+    ]
+  },
+  "physicalVisibleAcceptance": false,
+  "performanceClaim": false,
+  "phoneOperations": false,
+  "foregroundActivation": false,
+  "audioHapticManualRevalidationRequired": false,
+  "acceptanceStillOpen": [
+    "Stationary turn support-foot contact",
+    "Departure facing/directional foot motion at unchanged motor timing",
+    "Continuous natural gameplay artistic/owner acceptance",
+    "Affected final phone acceptance"
+  ],
+  "baselineCi": {
+    "run": 40032512766,
+    "head": "6124a374783aaae61ea2eb8f7142428443e75d40",
+    "status": "completed",
+    "conclusion": "success",
+    "jobsPassed": 6
+  },
+  "checkpointCi": "Query exact new checkpoint after backup; baseline green does not certify this change."
+}

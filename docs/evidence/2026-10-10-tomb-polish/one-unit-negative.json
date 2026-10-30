@@ -1,0 +1,8 @@
+{
+  "command": "pwsh -NoProfile -File tools/compile-raygen.ps1 -CheckCatalog -ArtifactDirectory <repo>/src/vulkan/raytracing/variants -CatalogPath <repo>/tools/raygen-variant-catalog.json -BudgetPath <repo>/tools/raygen-variant-budgets.json -CheckCatalogFixtureRoot <repo>/reports/tomb-one-unit-fixtures -TestPublicationFaultAfter 1",
+  "exitCode": 0,
+  "cases": 24,
+  "scope": "All eight keys x bytes/words/instructions; each read-only fixture ceiling is measured output minus one. Expected rejection is exceeds frozen budget. Transaction fault restores original exact package bytes.",
+  "initialSetupFailure": "Missing required absolute artifact/catalog/budget paths, exit 1; retained separately.",
+  "productionBudgetUnchanged": true
+}

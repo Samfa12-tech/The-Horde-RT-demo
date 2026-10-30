@@ -1,0 +1,43 @@
+{
+  "backtraceGraph": {
+    "commands": [
+      "add_test"
+    ],
+    "files": [
+      "<repo>/CMakeLists.txt"
+    ],
+    "nodes": [
+      {
+        "file": 0
+      },
+      {
+        "command": 0,
+        "file": 0,
+        "line": 400,
+        "parent": 0
+      }
+    ]
+  },
+  "kind": "ctestInfo",
+  "tests": [
+    {
+      "backtrace": 1,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_vertical_support_rig_tests.exe",
+        "<repo>"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_held_item_vertical_support_rig_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    }
+  ],
+  "version": {
+    "major": 1,
+    "minor": 0
+  }
+}

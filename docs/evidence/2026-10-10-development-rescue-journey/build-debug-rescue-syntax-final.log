@@ -1,0 +1,29 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  SimulationFrameAdapter.cpp
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  RescueRigAttachmentTests.cpp
+<repo>\tests\RescueRigAttachmentTests.cpp(204,5): error C2065: 'PlayerAnimationSnapshot': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(204,29): error C2146: syntax error: missing ';' before identifier 'animation' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(204,29): error C2882: 'animation': illegal use of namespace identifier in expression [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(207,41): error C2882: 'animation': illegal use of namespace identifier in expression [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(207,10): error C2660: '`anonymous-namespace'::MakeRescueRigPose': function does not take 5 arguments [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+      <repo>\tests\RescueRigAttachmentTests.cpp(146,6):
+      see declaration of '`anonymous-namespace'::MakeRescueRigPose'
+      <repo>\tests\RescueRigAttachmentTests.cpp(207,10):
+      while trying to match the argument list '(const horde::vulkan::raytracing::RtSceneFrameInputs, horde::vulkan::raytracing::PlayerRenderSlot, horde::vulkan::raytracing::PlayerModelWorldBasis, `anonymous-namespace'::Vec3, std::string)'
+
+<repo>\tests\RescueRigAttachmentTests.cpp(209,5): error C2065: 'PlayerAnimationSnapshot': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(209,29): error C2146: syntax error: missing ';' before identifier 'lookChangedAnimation' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(209,29): error C2065: 'lookChangedAnimation': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(212,52): error C2065: 'lookChangedAnimation': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(215,11): error C2882: 'animation': illegal use of namespace identifier in expression [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(215,24): error C2065: 'lookChangedAnimation': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(218,11): error C2882: 'animation': illegal use of namespace identifier in expression [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(218,47): error C2882: 'animation': illegal use of namespace identifier in expression [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(229,34): error C2882: 'animation': illegal use of namespace identifier in expression [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(231,38): error C2882: 'animation': illegal use of namespace identifier in expression [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(239,27): error C2882: 'animation': illegal use of namespace identifier in expression [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]
+<repo>\tests\RescueRigAttachmentTests.cpp(255,42): error C2882: 'animation': illegal use of namespace identifier in expression [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_rig_attachment_tests.vcxproj]

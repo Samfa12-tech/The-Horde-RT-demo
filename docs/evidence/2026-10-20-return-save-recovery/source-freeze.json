@@ -1,0 +1,75 @@
+{
+  "baseCommit": "966cd8e456fb17d975169d94afdab8cf038af53f",
+  "workingDirectory": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "files": {
+    "src/gameplay/simulation/GameSimulationCampaign.cpp": {
+      "bytes": 18676,
+      "sha256": "90f98743391fe050f0d9bc3650538858053bef528f9caf5ca04ee72d4ec493b4"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 619860,
+      "sha256": "6fb8a85d5cb946adf5540d88fab51040153041fba22b3dbf51ddc0996f45facc"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "bytes": 46527,
+      "sha256": "4a09c2848564397f1e009a91781299d571c7a36eaa9270cd4625304879294252"
+    },
+    "src/platform/windows/windows_route_validation.inl": {
+      "bytes": 26482,
+      "sha256": "4bc201e2d1dd183f749e5459bd8cec40b7b85f0fba656dc4a8a5dd5cf0007420"
+    },
+    "tests/CampaignPlaySessionTests.cpp": {
+      "bytes": 53151,
+      "sha256": "04f6388d4e262ba8a1216721ffba3673c3b87820eabc8771bbff9c7ceafc380a"
+    },
+    "tools/validate-windows-route.py": {
+      "bytes": 5350,
+      "sha256": "bbdcfc28953c4860405c8240c3ad7f49ffa664a64d4df2bd552eb4e1afcea3e3"
+    },
+    "src/gameplay/validation/RecordedReturnCheckpoint.h": {
+      "bytes": 1082,
+      "sha256": "d04782738ded9b470e87ec21cdbd4a6a6baaab48eed125e83d0c2da942d4ed67"
+    }
+  },
+  "originalR3LowerAuto": {
+    "bytes": 162,
+    "sha256": "031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b",
+    "schema": 1,
+    "contentRevision": 2,
+    "checkpointId": 1,
+    "zone": 0,
+    "position": [
+      -33.70000076293945,
+      -0.949999988079071,
+      -15.199999809265137
+    ],
+    "yawPitch": [
+      -1.5707963705062866,
+      0.0
+    ],
+    "hearts": 2,
+    "flags": {
+      "keeperDefeated": true,
+      "lanternClaimed": true,
+      "lidOpen": true,
+      "ropeReady": true,
+      "night": true,
+      "firstAscentCompleted": true,
+      "swordStowed": false,
+      "lanternHigh": true
+    },
+    "story": {
+      "grateConsumed": true,
+      "rescueConsumed": true,
+      "reunionStarted": true,
+      "waitingForRaise": false,
+      "proofAccepted": true,
+      "reminderConsumed": false,
+      "forestNightConsumed": true,
+      "forestWaystoneConsumed": true,
+      "forestClueConsumed": true,
+      "forestVillageConsumed": true
+    }
+  },
+  "finalNativeRun": "r3"
+}

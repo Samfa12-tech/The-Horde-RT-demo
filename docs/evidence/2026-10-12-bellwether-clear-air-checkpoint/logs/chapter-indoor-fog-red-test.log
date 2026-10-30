@@ -1,0 +1,17 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 175: horde_rt_character_render_slot_smoke
+1/1 Test #175: horde_rt_character_render_slot_smoke ...***Failed    6.06 sec
+FAIL: chapter tomb removes global distance fog without changing authoritative Keeper mist clearing
+FAIL: lower rope approach remains at the indoor atmosphere
+FAIL: both rope directions blend atmosphere from the same physical eye position
+FAIL: return/reconstruction restore indoor atmosphere without renderer state or simulation mutation
+Keeper audited staff centroids: neutral=(0.972983, 0.800802, 0.605775) lifted=(0.466067, 1.09768, 1.11467) forward=(0.0265056, 1.30031, 1.17645)
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   6.08 sec
+
+The following tests FAILED:
+	175 - horde_rt_character_render_slot_smoke (Failed)
+Errors while running CTest

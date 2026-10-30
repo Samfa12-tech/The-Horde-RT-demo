@@ -72,6 +72,9 @@ struct PlayerVitalsSnapshot
 {
     PlayerLifePhase phase = PlayerLifePhase::Alive;
     int vitality = 3;
+    // vitality is the number of occupied hearts, rounded up. A missing half
+    // is explicit so guarded damage never rounds to zero or grants health.
+    bool halfHeart = false;
     int maxVitality = 3;
     float invulnerabilityRemaining = 0.0f;
     float damageFlash = 0.0f;
@@ -98,7 +101,7 @@ public:
         return snapshot_;
     }
 
-    PlayerDamageResult TryApplyDamage()
+    PlayerDamageResult TryApplyDamage(bool halfDamage = false)
     {
         if (snapshot_.phase != PlayerLifePhase::Alive ||
             snapshot_.invulnerabilityRemaining > 0.00001f)
@@ -106,7 +109,10 @@ public:
             return PlayerDamageResult::Ignored;
         }
 
-        snapshot_.vitality = std::max(0, snapshot_.vitality - 1);
+        const int halfUnits = std::max(0, snapshot_.vitality * 2 -
+            (snapshot_.halfHeart ? 1 : 0) - (halfDamage ? 1 : 2));
+        snapshot_.vitality = (halfUnits + 1) / 2;
+        snapshot_.halfHeart = (halfUnits & 1) != 0;
         snapshot_.invulnerabilityRemaining = kInvulnerabilityDuration;
         snapshot_.damageFlash = 1.0f;
         if (snapshot_.vitality == 0)
@@ -121,6 +127,29 @@ public:
     void ResetForEncounter()
     {
         snapshot_ = {};
+    }
+
+    // Recovery changes health only. Damage immunity/feedback/death timing and
+    // phase are not reset, and invalid requests cannot resurrect a player.
+    bool TryHealHalfUnits(int halfUnits)
+    {
+        if (snapshot_.phase != PlayerLifePhase::Alive || halfUnits <= 0 ||
+            halfUnits > kMaxVitality * 2) return false;
+        const int before = snapshot_.vitality * 2 - (snapshot_.halfHeart ? 1 : 0);
+        if (before <= 0 || before >= kMaxVitality * 2) return false;
+        const int healed = std::min(kMaxVitality * 2, before + halfUnits);
+        snapshot_.vitality = (healed + 1) / 2;
+        snapshot_.halfHeart = (healed & 1) != 0;
+        return true;
+    }
+
+    bool RestoreCampaignVitality(int vitality, bool halfHeart = false)
+    {
+        if (vitality < 1 || vitality > kMaxVitality) return false;
+        snapshot_ = {};
+        snapshot_.vitality = vitality;
+        snapshot_.halfHeart = halfHeart;
+        return true;
     }
 
     const PlayerVitalsSnapshot& Snapshot() const { return snapshot_; }
@@ -295,6 +324,25 @@ public:
 
     const TorchFailureSnapshot& Snapshot() const { return snapshot_; }
 
+    // Validated campaign recovery only. The completed release anchor need not
+    // still lie in the original drench trigger; no live sequence is replayed.
+    void RestoreCampaignSettled(float x,float z,float yaw,float viewPitch)
+    {
+        snapshot_ = {};
+        snapshot_.phase = TorchFailurePhase::Settled;
+        snapshot_.sequenceTime = std::max(kSettleTime,kArmLowerEnd);
+        snapshot_.phaseTime = snapshot_.sequenceTime-kSettleTime;
+        snapshot_.triggered = true;
+        snapshot_.heldByPlayer = false;
+        snapshot_.flameStrength = 0.0f;
+        snapshot_.fallProgress = snapshot_.leftArmLowerBlend = 1.0f;
+        snapshot_.droppedX = x; snapshot_.droppedZ = z;
+        snapshot_.droppedY = kRouteFloorWorldY;
+        snapshot_.droppedYawRadians = yaw;
+        snapshot_.droppedViewPitchRadians = viewPitch;
+        snapshot_.droppedPitchRadians = 1.36f;
+    }
+
     static constexpr float kReleaseTime = 0.70f;
     static constexpr float kFallDuration = 0.45f;
     static constexpr float kSettleTime = kReleaseTime + kFallDuration;
@@ -402,7 +450,12 @@ public:
 
     void MarkSelectedDead()
     {
-        if (auto* encounter = Find(snapshot_.selectedEnemy))
+        MarkDead(snapshot_.selectedEnemy);
+    }
+    // Completion belongs to the actual encounter, even after a route selection.
+    void MarkDead(EnemyKind kind)
+    {
+        if (auto* encounter = Find(kind))
         {
             encounter->status = EncounterStatus::Dead;
         }
@@ -481,6 +534,7 @@ enum class LichPhase
     Charging,
     Recovering,
     Dead,
+    Repelling,
 };
 
 enum class KeeperRevealPhase : std::uint8_t
@@ -526,14 +580,23 @@ struct LichSnapshot
     float finaleDawnRevealProgress = 0.0f;
     int health = 3;
     bool damagePulse = false;
+    bool dischargeWarningPulse = false;
+    // Live readable cast presentation; deterministic legacy captures stay unchanged.
+    bool readableCastPresentation = false;
+    // Live encounter medium only; legacy capture imports retain their density.
+    float roomMistDensityScale = 1.0f;
     bool hitPulse = false;
     bool deathAnimationComplete = false;
+    // Chapter-only presentation lifetime. Gameplay death/rewards are separate.
+    float deathDissolveProgress = 0.0f;
     FinaleEndingPhase finaleEndingPhase = FinaleEndingPhase::Inactive;
 };
 
 class LichEncounter
 {
 public:
+    void SetReadableCombat(bool enabled) { readableCombat_ = enabled; }
+    void SetChapterDeathPresentation(bool enabled) { chapterDeathPresentation_ = enabled; }
     LichEncounter() { Reset(); }
 
     const LichSnapshot& Update(float deltaSeconds, float playerX, float playerZ,
@@ -541,7 +604,9 @@ public:
                                bool revealMayStart = true)
     {
         deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
+        snapshot_.readableCastPresentation = readableCombat_ && !legacyCapture_;
         snapshot_.damagePulse = false;
+        snapshot_.dischargeWarningPulse = false;
         snapshot_.hitCooldownRemaining = std::max(0.0f, snapshot_.hitCooldownRemaining - deltaSeconds);
         hitPulseTime_ = std::max(0.0f, hitPulseTime_ - deltaSeconds);
         snapshot_.hitPulse = hitPulseTime_ > 0.0f;
@@ -555,6 +620,15 @@ public:
         // authored Dead clip has reached its clamped final pose.
         if (snapshot_.phase == LichPhase::Dead)
         {
+            deathPresentationTime_ = std::min(kDeathAnimationDuration + kMistDeathDelay + kMistDeathFade,
+                                            deathPresentationTime_ + deltaSeconds);
+            snapshot_.deathDissolveProgress = chapterDeathPresentation_ && !legacyCapture_
+                ? std::clamp((deathPresentationTime_ - kDeathAnimationDuration - kDeathDissolveHold) /
+                                 kDeathDissolveDuration, 0.0f, 1.0f)
+                : 0.0f;
+            if (readableCombat_ && !legacyCapture_)
+                snapshot_.roomMistDensityScale = 1.0f - SmoothStep(
+                    (deathPresentationTime_ - kDeathAnimationDuration - kMistDeathDelay) / kMistDeathFade);
             const float deathTimeRemaining = std::max(0.0f, kDeathAnimationDuration - snapshot_.phaseTime);
             const float deathDelta = std::min(deltaSeconds, deathTimeRemaining);
             snapshot_.phaseTime = std::min(kDeathAnimationDuration, snapshot_.phaseTime + deathDelta);
@@ -618,21 +692,43 @@ public:
 
         switch (snapshot_.phase)
         {
+        case LichPhase::Repelling:
+            snapshot_.staffLightStrength = kStaffLightStart;
+            snapshot_.presentationTiltRadians = 0.0f;
+            if (snapshot_.phaseTime + 0.00001f >= kRepelDuration)
+            {
+                snapshot_.phase = LichPhase::Charging;
+                snapshot_.phaseTime = 0.0f;
+                dischargeWarningEmitted_ = false;
+            }
+            break;
         case LichPhase::MaintainingRange:
             snapshot_.staffLightStrength = 0.0f;
+            snapshot_.presentationTiltRadians = 0.0f;
             if (snapshot_.phaseTime >= kMinimumRepositionDuration &&
                 distance >= kPreferredMinRange && distance <= kPreferredMaxRange)
             {
                 snapshot_.phase = LichPhase::Charging;
                 snapshot_.phaseTime = 0.0f;
                 snapshot_.staffLightStrength = kStaffLightStart;
+                dischargeWarningEmitted_ = false;
             }
             break;
         case LichPhase::Charging:
         {
             const float charge = std::clamp(snapshot_.phaseTime / kChargeDuration, 0.0f, 1.0f);
+            const bool modernReadableCast = readableCombat_ && !legacyCapture_;
+            const float anticipation = modernReadableCast ? SmoothStep(charge) : charge;
             snapshot_.staffLightStrength = kStaffLightStart +
-                                           (kStaffLightPeak - kStaffLightStart) * charge;
+                                           (kStaffLightPeak - kStaffLightStart) * anticipation;
+            snapshot_.presentationTiltRadians = modernReadableCast
+                ? -kChargeAnticipationTiltRadians * anticipation : 0.0f;
+            if (modernReadableCast && !dischargeWarningEmitted_ &&
+                snapshot_.phaseTime + 0.00001f >= kChargeDuration - kDischargeWarningLead)
+            {
+                snapshot_.dischargeWarningPulse = true;
+                dischargeWarningEmitted_ = true;
+            }
             if (snapshot_.phaseTime + 0.00001f >= kChargeDuration)
             {
                 snapshot_.damagePulse = staffHasLineOfSight && distance <= kAttackRange;
@@ -643,15 +739,24 @@ public:
             break;
         }
         case LichPhase::Recovering:
-            snapshot_.staffLightStrength = kStaffLightPeak *
-                (1.0f - std::clamp(snapshot_.phaseTime / kRecoveryDuration, 0.0f, 1.0f));
+        {
+            const bool modernReadableCast = readableCombat_ && !legacyCapture_;
+            const float visibleDuration = modernReadableCast
+                ? kDischargeVisibleBurstDuration : kRecoveryDuration;
+            const float visibleStrength = 1.0f -
+                std::clamp(snapshot_.phaseTime / visibleDuration, 0.0f, 1.0f);
+            snapshot_.staffLightStrength = kStaffLightPeak * visibleStrength;
+            snapshot_.presentationTiltRadians = modernReadableCast
+                ? -kChargeAnticipationTiltRadians * visibleStrength : 0.0f;
             if (snapshot_.phaseTime + 0.00001f >= kRecoveryDuration)
             {
                 snapshot_.phase = LichPhase::MaintainingRange;
                 snapshot_.phaseTime = 0.0f;
                 snapshot_.staffLightStrength = 0.0f;
+                snapshot_.presentationTiltRadians = 0.0f;
             }
             break;
+        }
         default:
             break;
         }
@@ -682,6 +787,17 @@ public:
         {
             BeginDeath();
         }
+        else if (readableCombat_ && !legacyCapture_)
+        {
+            // Interrupt an old cast on each accepted nonfatal hit. The owner
+            // resolves bounded knockback; this phase never carries pulse damage.
+            snapshot_.phase = LichPhase::Repelling;
+            snapshot_.phaseTime = 0.0f;
+            snapshot_.damagePulse = false;
+            snapshot_.dischargeWarningPulse = false;
+            dischargeWarningEmitted_ = false;
+            snapshot_.staffLightStrength = kStaffLightStart;
+        }
         return true;
     }
 
@@ -695,7 +811,9 @@ public:
         hitPulseTime_ = 0.0f;
         hitRecoilTime_ = 0.0f;
         combatTime_ = 0.0f;
+        deathPresentationTime_ = 0.0f;
         legacyCapture_ = false;
+        dischargeWarningEmitted_ = false;
     }
 
     // Authored deterministic captures deliberately bypass the live reveal and
@@ -717,6 +835,23 @@ public:
         legacyCapture_ = true;
     }
 
+    void RestoreCampaignDefeated()
+    {
+        Reset();
+        chapterDeathPresentation_ = true;
+        snapshot_.phase = LichPhase::Dead;
+        snapshot_.revealPhase = KeeperRevealPhase::Defeated;
+        snapshot_.revealStarted = snapshot_.revealComplete = true;
+        snapshot_.health = 0;
+        snapshot_.deathAnimationComplete = true;
+        snapshot_.deathDissolveProgress = 1.0f;
+        snapshot_.roomMistDensityScale = 0.0f;
+        snapshot_.animationTime = kDeathAnimationDuration;
+        snapshot_.phaseTime = kDeathAnimationDuration;
+        snapshot_.y = deathStartY_ = kBaseY;
+        deathPresentationTime_ = kDeathAnimationDuration + kMistDeathDelay + kMistDeathFade + 1.0f;
+    }
+
     void BeginRetryRecognition()
     {
         Reset();
@@ -729,8 +864,17 @@ public:
     const LichSnapshot& Snapshot() const { return snapshot_; }
 
     static constexpr float kChargeDuration = 1.20f;
+    static constexpr float kRepelDuration = 0.30f;
+    static constexpr float kRepelDistance = 1.00f;
+    static constexpr float kDischargeWarningLead = 0.30f;
+    static constexpr float kDischargeVisibleBurstDuration = 0.18f;
+    static constexpr float kChargeAnticipationTiltRadians = 0.10f;
     static constexpr float kRecoveryDuration = 1.80f;
     static constexpr float kDeathAnimationDuration = 2.967f;
+    static constexpr float kDeathDissolveHold = 0.25f;
+    static constexpr float kDeathDissolveDuration = 0.75f;
+    static constexpr float kMistDeathDelay = 1.0f;
+    static constexpr float kMistDeathFade = 1.0f;
     static constexpr float kFinaleSkylightOpenDuration =
         horde::gameplay::interactions::kFinaleSkylightOpenSeconds;
     static constexpr float kFinaleDawnRevealDuration =
@@ -749,6 +893,8 @@ public:
     static constexpr float kRevealRise = 0.25f;
 
 private:
+    bool readableCombat_ = false;
+    bool dischargeWarningEmitted_ = false;
     static float SmoothStep(float value)
     {
         value = std::clamp(value, 0.0f, 1.0f);
@@ -811,6 +957,8 @@ private:
 
     void BeginDeath()
     {
+        deathPresentationTime_ = 0.0f;
+        snapshot_.roomMistDensityScale = 1.0f;
         deathStartY_ = snapshot_.y;
         snapshot_.phase = LichPhase::Dead;
         snapshot_.revealPhase = KeeperRevealPhase::Defeated;
@@ -820,6 +968,8 @@ private:
         snapshot_.animationTime = 0.0f;
         snapshot_.staffLightStrength = 0.0f;
         snapshot_.damagePulse = false;
+        snapshot_.dischargeWarningPulse = false;
+        dischargeWarningEmitted_ = false;
         snapshot_.deathAnimationComplete = false;
         snapshot_.finaleSkylightOpenProgress = 0.0f;
         snapshot_.finaleDawnRevealProgress = 0.0f;
@@ -895,7 +1045,9 @@ private:
     float hitRecoilTime_ = 0.0f;
     float combatTime_ = 0.0f;
     float deathStartY_ = kBaseY;
+    float deathPresentationTime_ = 0.0f;
     bool legacyCapture_ = false;
+    bool chapterDeathPresentation_ = false;
 };
 
 } // namespace horde::gameplay

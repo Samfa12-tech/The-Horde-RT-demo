@@ -5,6 +5,7 @@
 #include <string>
 #include <string_view>
 #include "gameplay/BenchmarkWorkload.h"
+#include "gameplay/BenchmarkProfile.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 
 namespace horde::platform::windows
@@ -13,6 +14,9 @@ namespace horde::platform::windows
 struct WindowsBenchmarkLaunch
 {
     bool requested = false;
+    horde::gameplay::BenchmarkProfileId profile = horde::gameplay::BenchmarkProfileId::Custom;
+    // Bounded local lifecycle validation, never a timing/ranking result.
+    std::string profileValidation;
     std::wstring outputDirectory;
     std::string error;
     horde::gameplay::BenchmarkWorkload workload = horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
@@ -30,9 +34,32 @@ inline WindowsBenchmarkLaunch ParseWindowsBenchmarkLaunch(
     bool captureOrCheckpoint = false;
     bool workloadSpecified = false;
     bool rtWorkloadSpecified = false;
+    bool profileSpecified = false;
+    bool profileMutation = false;
     for (std::size_t index = 0u; index < arguments.size(); ++index)
     {
         const auto argument = arguments[index];
+        if (argument == L"--benchmark-profile")
+        {
+            if (profileSpecified || ++index == arguments.size() ||
+                arguments[index] != L"windows-rt-provisional-v1")
+            { result.error = "--benchmark-profile requires one unique windows-rt-provisional-v1 opt-in."; return result; }
+            profileSpecified = true;
+            result.profile = horde::gameplay::BenchmarkProfileId::WindowsProvisionalV1;
+            continue;
+        }
+        if (argument == L"--validate-benchmark-profile")
+        {
+            if (!result.profileValidation.empty() || ++index == arguments.size())
+            { result.error = "--validate-benchmark-profile requires one unique lifecycle case."; return result; }
+            const auto value = arguments[index];
+            if (value != L"apply-restore" && value != L"stale-owner" && value != L"cancel-apply" && value != L"cancel-measure" &&
+                value != L"restart-measure" && value != L"close-measure")
+            { result.error = "Unknown benchmark profile lifecycle validation case."; return result; }
+            // Each accepted literal is ASCII; make the verified narrowing explicit.
+            for (const wchar_t character : value) result.profileValidation.push_back(static_cast<char>(character));
+            continue;
+        }
         if (argument == L"--benchmark-rt-workload")
         {
             if (rtWorkloadSpecified || ++index == arguments.size())
@@ -84,6 +111,9 @@ inline WindowsBenchmarkLaunch ParseWindowsBenchmarkLaunch(
         {
             captureOrCheckpoint = true;
         }
+        if (argument.starts_with(L"--development-") || argument.starts_with(L"--capture-") ||
+            argument.starts_with(L"--validate-") || argument.starts_with(L"--measure-") ||
+            argument == L"--entry-menu-slice" || argument == L"--mist-off") profileMutation = true;
         if (argument != L"--benchmark-showcase")
         {
             continue;
@@ -110,6 +140,11 @@ inline WindowsBenchmarkLaunch ParseWindowsBenchmarkLaunch(
         result.error = "--benchmark-workload requires --benchmark-showcase.";
     if (rtWorkloadSpecified && !result.requested)
         result.error = "--benchmark-rt-workload requires --benchmark-showcase.";
+    if (profileSpecified && (!result.requested || profileMutation || result.workload != horde::gameplay::BenchmarkWorkload::ShowcaseRoute ||
+        result.rtWorkloadPreset != horde::vulkan::raytracing::RtWorkloadPreset::Authored))
+        result.error = "The provisional Windows profile requires --benchmark-showcase with the authored showcase route.";
+    if (!result.profileValidation.empty() && !profileSpecified)
+        result.error = "--validate-benchmark-profile requires the explicit provisional Windows profile.";
     return result;
 }
 
@@ -142,10 +177,13 @@ inline std::string BuildWindowsBenchmarkTuningJson(
     const auto validUpload = [](
         const std::optional<horde::vulkan::raytracing::RtQualityControlsGpu>& upload,
         const horde::vulkan::raytracing::RtWorkloadPreset preset, const std::string_view quality) {
-        if (!upload || (quality != "High" && quality != "Mobile") || upload->controls[0] > 3u || upload->controls[3] > 1u) return false;
+        if (!upload || (quality != "High" && quality != "Mobile") || upload->controls[0] > 3u) return false;
+        const auto mist = horde::vulkan::raytracing::ResolveUploadedMistEnabled(*upload);
+        const auto dust = horde::vulkan::raytracing::ResolveUploadedDustQuality(*upload);
+        if (!mist || !dust) return false;
         std::optional<horde::graphics::ShadowQuality> shadow;
         if (upload->controls[0] < 3u) shadow = static_cast<horde::graphics::ShadowQuality>(upload->controls[0]);
-        const auto expected = horde::vulkan::raytracing::ResolveRtQualityControls(shadow, preset, quality == "High", upload->controls[3] == 0u);
+        const auto expected = horde::vulkan::raytracing::ResolveRtQualityControls(shadow, preset, quality == "High", *mist, *dust);
         return expected && expected->controls == upload->controls;
     };
     const bool startUploadValid = validUpload(uploadedAtStart, effectiveAtStart, compiledQualityAtStart);
@@ -177,7 +215,8 @@ inline std::string BuildWindowsBenchmarkTuningJson(
         ",\"primaryAreaShadowSamplesPerContributingReceiver\":" + std::to_string(samples) +
         ",\"sampleDomain\":\"contributing-primary-local-and-fire-area-lights\",\"primarySkyVisibilitySamples\":" +
         std::to_string(skySamples) +
-        (endUploadValid ? ",\"actualUploadedMistEnabled\":" + std::string(uploadedAtEnd->controls[3] == 0u ? "true" : "false") : "") +
+        (endUploadValid ? ",\"actualUploadedMistEnabled\":" + std::string(
+            *horde::vulkan::raytracing::ResolveUploadedMistEnabled(*uploadedAtEnd) ? "true" : "false") : "") +
         ",\"secondaryAreaShadowSamples\":1,\"sampleCountMeaning\":\"compiled-physical-policy-not-dynamic-query-counts\","
         "\"costMeaning\":\"whole-rt-workload-preset-not-isolated-shadow-cost\"}";
 }

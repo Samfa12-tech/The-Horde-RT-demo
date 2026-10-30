@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\author-bellwether-shell.py", line 18, in <module>
+    plan = json.loads(plan_path.read_text())
+                      ~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Blender Foundation\Blender 5.2\5.2\python\Lib\pathlib\_local.py", line 546, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Blender Foundation\Blender 5.2\5.2\python\Lib\pathlib\_abc.py", line 632, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Blender Foundation\Blender 5.2\5.2\python\Lib\pathlib\_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\horde-1.7-wp2-vertical-proof\\docs\\references\\horde-1.7\\d37f1638\\docs\\design\\world\\connected\\shared-coordinate-layout.json'
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

@@ -393,6 +393,15 @@ int RunGraphicsPreviewCapture(VulkanSurfaceContext& context,
         !context.graphicsEdit->Stage(baseline) ||
         !command("restore-glass-on-memory-only", context.graphicsEdit->RequestApply(1u), true))
         return fail("Glass Revert/Keep/restore On did not acknowledge the exact fresh RT resources.");
+    auto higherShadows = baseline;
+    higherShadows.shadowQuality = horde::graphics::ShadowQuality::Higher;
+    if (!capturePose("shadows-current", glassPose, baseline) ||
+        !context.graphicsEdit->Stage(higherShadows) ||
+        !command("apply-shadows-higher", context.graphicsEdit->RequestApply(1u), false) ||
+        !capturePose("shadows-higher", glassPose, higherShadows) ||
+        !command("revert-shadows-current", context.graphicsEdit->RequestRevert(1u), false) ||
+        !capturePose("shadows-restored-current", glassPose, baseline))
+        return fail("Current/Higher shadow Apply/Revert lacks exact frozen RT presentation.");
     // The compact Skeleton alcove has no Keeper ground-mist volume. These
     // readbacks prove the ordinary live Apply/Revert path and actual uploaded
     // flag without claiming visible mist coverage. Real Keeper captures remain

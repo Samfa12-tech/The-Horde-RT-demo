@@ -1,0 +1,19 @@
+{
+  "scope": "Original face source contact reference; chosen from inspected front lip region",
+  "surfaceBlenderMetres": [
+    -0.014999999664723873,
+    -0.001131013035774231,
+    1.600000023841858
+  ],
+  "normal": [
+    -0.5113082528114319,
+    -0.7730333209037781,
+    -0.37547767162323
+  ],
+  "suggestedMouthTarget": [
+    -0.018067849799990654,
+    -0.005769213195890188,
+    1.5977472066879272
+  ],
+  "gapMetres": 0.006
+}

@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "start_head": "c7a96513de1e6da0d3b1a25b6528823f2797168d",
+  "unchanged_runtime_source_candidate": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "code_allowlist": [
+    "tests/HeldItemVerticalSupportRigTests.cpp"
+  ],
+  "test_git_blob": "80ee809df14c894968ff35d5a0a36fc2d9c95ef5",
+  "builds_and_tests": "Debug/Release PASS; one affected test each",
+  "negative_cases_per_configuration": 9,
+  "historic_raised_GPU_capture": "FAIL preserved",
+  "new_physical_acceptance": "none",
+  "files": {
+    ".gitattributes": "275b2e3dab44f03716cffc2e03de150c71f28a9834281f1d8d9084eb97500563",
+    "build-debug.log": "c9bb52776f4f66f02288902a8631f3593aff225a2857771e8032b947d157d00b",
+    "build-release.log": "b942458360915bf22ddfd903b668dd4ba307799ed3fcbca42d4176f1fe8197a2",
+    "ctest-debug-selection.json": "04937e1fac5696f8c02f6813660d2a6924f0b25234d0f1d4037e3602d235a2bd",
+    "ctest-release-selection.json": "a152f95162da723c22b0189fb9e261a24a263a431dab55f6885f86e46b8c8a1e",
+    "log-identities.json": "b0f974dd946cb9e3b41bd84354f3e99941237dd66af671711a003a134c3e2259",
+    "preservation.json": "addf337d2275b7eb5ec6d53e397a23b78d5e1b91ba6a02ddde213d67add8c30e",
+    "runs-and-results.json": "1da70e40e0ce3ce5ad2f515f80f1ce5035a3875a294796cca284cb105353a806",
+    "test-debug.log": "a57ad2c0882e5526fe11a5c53a5a665ffd8aacb699292a074b6c266d7a0edaad",
+    "test-release.log": "de0c477721f3fb7f3b080d53373d9a059e77045edcdf297a071732078550156d"
+  },
+  "report_sha256": "293a9ae527d600d75e60867aaa8e99a33035a40b531c29a0ecb963310757102b",
+  "report_hash_encoding": "Git LF"
+}

@@ -1,0 +1,97 @@
+[
+  {
+    "path": ".gitattributes",
+    "bytes": 33601,
+    "sha256": "ec285387a83423a716310858a27736b837a707d4b0b89d0304abda0dcbaf21d6"
+  },
+  {
+    "path": ".github/workflows/shared-simulation-host.yml",
+    "bytes": 39919,
+    "sha256": "ec1ed27f1e9512f8109b7188d716aa154b908801be6d0595147233a2115b3dd2"
+  },
+  {
+    "path": "ASSET_LICENSES.md",
+    "bytes": 72211,
+    "sha256": "9f4186e27391d0a222acdebfa7f5bb9105a49e61cb546c805a4aae67e54a84d5"
+  },
+  {
+    "path": "CMakeLists.txt",
+    "bytes": 117575,
+    "sha256": "a2796bc95451fb1a5ce24e4535575065b520c5a41776c2d360376c51d8410fde"
+  },
+  {
+    "path": "android/app/build.gradle",
+    "bytes": 46509,
+    "sha256": "92c14a7a33334dc3054596ac2620d3c01542110503493b6f60bcd370500bab93"
+  },
+  {
+    "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+    "bytes": 457861,
+    "sha256": "63018551c21784de6a09098352a9d2a1d191a923fb492acf9d6837d7d217458f"
+  },
+  {
+    "path": "cmake/HordeRtSources.cmake",
+    "bytes": 3427,
+    "sha256": "e43dadf7cd404d39656a5cabbd7cf1d0d6fa3aed8f97c3a17889127a190f3c08"
+  },
+  {
+    "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+    "bytes": 491299,
+    "sha256": "eb2ea417b291efb31b78962754b67e0967e1caa7a1f8cd5d630c95925edd45dc"
+  },
+  {
+    "path": "src/scene/ForestRoadClue.cpp",
+    "bytes": 9994,
+    "sha256": "2965197e66b21fa3bbc05d53323363d5631058158cd8b13666b90be7829cf176"
+  },
+  {
+    "path": "src/scene/ForestRoadClue.h",
+    "bytes": 957,
+    "sha256": "76cbddab9d5538800dd2c9b49aa2f36528c683a9c3dfc2d6069c168e71ad67a6"
+  },
+  {
+    "path": "tests/ForestDressingTests.cpp",
+    "bytes": 66555,
+    "sha256": "4b1f19e280016ee77c6c62975dcbf8098fba9eb4fb4cbf1c2d3443609b1b5076"
+  },
+  {
+    "path": "tests/Horde162AssetPolicyTests.ps1",
+    "bytes": 51273,
+    "sha256": "a5df7fe0552c76050113730de714904765285f76ec9dba213b1c0c7ec91db4ad"
+  },
+  {
+    "path": "tools/horde-1.6.2-asset-policy.ps1",
+    "bytes": 28416,
+    "sha256": "af476d0996831cc69931a169b31b5e8bd5379d5fafc6dc1cd79cd88c1f907f6f"
+  },
+  {
+    "path": "tools/package-alpha.ps1",
+    "bytes": 37818,
+    "sha256": "83608de940270284fdc9c2cfd1de4f930915c817e7522527863091a186a6497a"
+  },
+  {
+    "path": "tools/prepare-forest-road-clue.py",
+    "bytes": 17375,
+    "sha256": "86b78348ab736f02b4b882f7ceb12ab9202af9362e80777169ce6b5e43adc32d"
+  },
+  {
+    "path": "assets/models/world/runtime/forest-road-clue-v1/asset.manifest.json",
+    "bytes": 960,
+    "sha256": "d69c31f7fe62864dcdcb76ed054dc2316fe6e63f2b40c45b9cffc9e54b68b0d5"
+  },
+  {
+    "path": "assets/models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb",
+    "bytes": 2596,
+    "sha256": "7bf6a0bafb61d0c32c25ca8f7e730db5d17a72582b1d12097a381be2d29632bc"
+  },
+  {
+    "path": "assets/models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb",
+    "bytes": 6252,
+    "sha256": "7229e9920b0d5892a5f480722fa894a16a667c86059d29967d2a031e3f6edb1b"
+  },
+  {
+    "path": "assets/source/beyond_the_tomb/forest-road-clue-v1/recipe.json",
+    "bytes": 1143,
+    "sha256": "df7451569bdedd4c2d67237836c07c9369e12b529fc44f0c293d0587b670ba6d"
+  }
+]

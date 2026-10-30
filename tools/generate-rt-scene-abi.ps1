@@ -26,7 +26,8 @@ finally {
     $sha256.Dispose()
 }
 $c = $definition.capacities
-foreach ($name in @('instanceMetadata', 'tlasInstances', 'staticAssets', 'fireEmitters', 'activeFireEmitters')) {
+foreach ($name in @('instanceMetadata', 'tlasInstances', 'staticAssets', 'primitives',
+                    'materials', 'textureLayers', 'fireEmitters', 'activeFireEmitters')) {
     $value = $c.$name
     if (($value -isnot [int] -and $value -isnot [long]) -or $value -lt 1 -or $value -gt 256) {
         throw "RT scene ABI capacity '$name' must be an integer in [1,256]."
@@ -39,6 +40,11 @@ if ($c.dustMotes -ne 64 -or $c.dustTiles -ne 576 -or $c.dustTileCandidates -ne 4
 }
 if ($c.tlasInstances -lt $c.instanceMetadata -or $c.activeFireEmitters -gt $c.fireEmitters) {
     throw 'RT scene ABI owner capacities must accommodate metadata and active fire records.'
+}
+$ordinaryCount = $definition.sceneCounts.ordinaryShowcaseTlasInstances
+if (($ordinaryCount -isnot [int] -and $ordinaryCount -isnot [long]) -or
+    $ordinaryCount -lt 1 -or $ordinaryCount -gt $c.tlasInstances) {
+    throw 'The ordinary Showcase live count must be an integer within TLAS storage capacity.'
 }
 $b = $definition.bindings
 $i = $definition.instanceFlags
@@ -129,6 +135,7 @@ namespace horde::vulkan::raytracing
 inline constexpr char kRtSceneAbiDefinitionSha256[] = "$hash";
 inline constexpr std::uint32_t kRtInstanceMetadataCapacity = $($c.instanceMetadata)u;
 inline constexpr std::uint32_t kRtTlasInstanceCapacity = $($c.tlasInstances)u;
+inline constexpr std::uint32_t kRtOrdinaryShowcaseInstanceCount = $($ordinaryCount)u;
 inline constexpr std::uint32_t kRtStaticAssetCapacity = $($c.staticAssets)u;
 inline constexpr std::uint32_t kRtPrimitiveMetadataCapacity = $($c.primitives)u;
 inline constexpr std::uint32_t kRtMaterialCapacity = $($c.materials)u;
@@ -152,6 +159,7 @@ inline constexpr std::uint32_t kRtBindingWorldPlayerVertices = $($b.worldPlayerV
 inline constexpr std::uint32_t kRtBindingViewmodelVertices = $($b.viewmodelVertices)u;
 inline constexpr std::uint32_t kRtBindingEnvironmentTexture = $($b.environmentTexture)u;
 inline constexpr std::uint32_t kRtBindingQualityControls = $($b.qualityControls)u;
+inline constexpr std::uint32_t kRtBindingWaterContactRipple = $($b.waterContactRipple)u;
 
 enum class RtGeometryRole : std::uint32_t
 {
@@ -279,6 +287,14 @@ layout(std430, set = 0, binding = $($b.qualityControls)) readonly buffer RtQuali
     RtDustMoteGpu dustMotes[$($c.dustMotes)];
     uvec4 dustTiles[$($c.dustTiles)];
 } rtQualityControls;
+layout(std430, set = 0, binding = $($b.waterContactRipple)) readonly buffer RtWaterContactRippleBuffer
+{
+    vec4 value;
+    // Preserve the original ripple prefix. Immutable authored water profiles
+    // follow it; per-frame writes touch only the first 16 bytes.
+    uvec4 surfaceMetadata;
+    RtWaterSurfaceGpu surfaces[42];
+} rtWaterContactRipple;
 #if !defined(HORDE_RT_VARIANT_INSTRUMENTATION) || HORDE_RT_VARIANT_INSTRUMENTATION == 1
 layout(std430, set = 0, binding = $($b.dielectricDiagnostics)) restrict buffer RtDielectricDiagnosticsBuffer
 {

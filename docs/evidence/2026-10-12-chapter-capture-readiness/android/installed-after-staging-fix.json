@@ -1,0 +1,9 @@
+{
+  "package": "com.samfa12.hordelanternrt.debug",
+  "sha256": "0374dd8d4c367ff21bf586a6424e9c2f9733b6a3abecbccff9de2f43c0005a0c",
+  "priorKnown": "b9d466317151",
+  "identityCheck": "one verification after changed installed bytes",
+  "settingsRestored": true,
+  "appStopped": true,
+  "releaseAppUntouched": true
+}

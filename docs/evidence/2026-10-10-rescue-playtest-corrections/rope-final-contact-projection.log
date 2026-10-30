@@ -1,0 +1,44 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 152
+    Start 152: horde_rt_rescue_traversal_tests
+
+152: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_traversal_tests.exe"
+152: Working Directory: <repo>/build/presets/windows-x64-debug
+152: Test timeout computed to be: 1500
+152: Lower grip selection indices=6.5,7.25 points=-33.8961,0.836048,-15.3644|-33.9358,0.51199,-15.398
+152: Ascent trace tick=0 root=-33.7075,-0.929837,-15.2127 midpoint=-33.9261,0.701275,-15.3984 root_delta=-0.00747681,0.0201632,-0.0127497 support_error=-0.00709265 bumped=0 grip_radial=0.258277,0.315735 indices=6.47374,7.25
+152: Ascent trace tick=1 root=-33.7155,-0.9088,-15.2236 midpoint=-33.9377,0.731522,-15.4132 root_delta=-0.00801849,0.0210364,-0.0108709 support_error=-0.0163035 bumped=0 grip_radial=0.259535,0.32637 indices=6.40569,7.25
+152: Ascent trace tick=2 root=-33.7249,-0.887594,-15.233 midpoint=-33.9519,0.761443,-15.4252 root_delta=-0.00938797,0.0212065,-0.00933456 support_error=-0.0250175 bumped=0 grip_radial=0.260419,0.338893 indices=6.31192,7.25
+152: Ascent trace tick=3 root=-33.736,-0.866743,-15.2411 midpoint=-33.9688,0.78882,-15.4347 root_delta=-0.0111122,0.0208504,-0.00817204 support_error=-0.031544 bumped=0 grip_radial=0.26134,0.352582 indices=6.2085,7.25
+152: Ascent final phase=4 support=2.05 root=-33.7,2.05,-12.8 indices=0.4,0.7 gripsY=3.50281,3.37142
+152: PullUp diagnostic start_indices=0.5,1 max_hand_step=0.0316581 at_indices=0.4,0.85 z=-15.2
+152: continuous alternating hand targets must not jump between rope particles
+152: Rescue traversal cases=84520 failures=1 max_root_step=0.0250016 max_landing_root_step=0.0243271
+1/1 Test #152: horde_rt_rescue_traversal_tests ...***Failed    4.27 sec
+Lower grip selection indices=6.5,7.25 points=-33.8961,0.836048,-15.3644|-33.9358,0.51199,-15.398
+Ascent trace tick=0 root=-33.7075,-0.929837,-15.2127 midpoint=-33.9261,0.701275,-15.3984 root_delta=-0.00747681,0.0201632,-0.0127497 support_error=-0.00709265 bumped=0 grip_radial=0.258277,0.315735 indices=6.47374,7.25
+Ascent trace tick=1 root=-33.7155,-0.9088,-15.2236 midpoint=-33.9377,0.731522,-15.4132 root_delta=-0.00801849,0.0210364,-0.0108709 support_error=-0.0163035 bumped=0 grip_radial=0.259535,0.32637 indices=6.40569,7.25
+Ascent trace tick=2 root=-33.7249,-0.887594,-15.233 midpoint=-33.9519,0.761443,-15.4252 root_delta=-0.00938797,0.0212065,-0.00933456 support_error=-0.0250175 bumped=0 grip_radial=0.260419,0.338893 indices=6.31192,7.25
+Ascent trace tick=3 root=-33.736,-0.866743,-15.2411 midpoint=-33.9688,0.78882,-15.4347 root_delta=-0.0111122,0.0208504,-0.00817204 support_error=-0.031544 bumped=0 grip_radial=0.26134,0.352582 indices=6.2085,7.25
+Ascent final phase=4 support=2.05 root=-33.7,2.05,-12.8 indices=0.4,0.7 gripsY=3.50281,3.37142
+PullUp diagnostic start_indices=0.5,1 max_hand_step=0.0316581 at_indices=0.4,0.85 z=-15.2
+continuous alternating hand targets must not jump between rope particles
+Rescue traversal cases=84520 failures=1 max_root_step=0.0250016 max_landing_root_step=0.0243271
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   4.29 sec
+
+The following tests FAILED:
+	152 - horde_rt_rescue_traversal_tests (Failed)
+Errors while running CTest

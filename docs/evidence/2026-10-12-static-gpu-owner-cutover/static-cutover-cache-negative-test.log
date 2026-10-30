@@ -1,0 +1,13 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 158: horde_rt_static_geometry_cutover_tests
+1/1 Test #158: horde_rt_static_geometry_cutover_tests ...***Failed    3.86 sec
+FAIL: completion precedes exact publication, cache invalidation and exactly-once retirement
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   3.89 sec
+
+The following tests FAILED:
+	158 - horde_rt_static_geometry_cutover_tests (Failed)
+Errors while running CTest

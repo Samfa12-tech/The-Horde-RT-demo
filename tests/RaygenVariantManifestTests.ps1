@@ -168,9 +168,11 @@ try {
     $legacyIncludePath = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
     $genericHashBefore = Get-RawFileHash $genericIncludePath
     $legacyHashBefore = Get-RawFileHash $legacyIncludePath
-    # These compatibility artifacts carry the shared primary-ray pre-rotation mode; matrix compilation must not mutate them.
-    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq 'a4f367d427c2ecb2e5bba6596e2ea8e833cd8330aad48ee345d15e01015a499d') 'Generic include hash changed before matrix compilation.'
-    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq 'c2b18748201de41faaf77be0bc78861896d8c1f6dbcaaa485ba969834ffb7c9e') 'Legacy include hash changed before matrix compilation.'
+    # Include the approved joint30/38/34 ABI and separate TLAS107 upgrade instance.
+    # Fresh compatibility
+    # compilation independently verified these words; matrix compilation must not mutate them.
+    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq 'a0b76daab949c1fffa6102185159f8017d1bf075b68f77910140c7fac1e642a6') 'Generic include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq 'efd3b051eae161561e58bf94f45a0f201566a0867c086958863af91b8030cc44') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)

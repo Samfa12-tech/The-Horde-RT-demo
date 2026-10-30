@@ -1,0 +1,2096 @@
+{
+  "sourceHead": "9f9da695dde9275802be057aed2b2bc93e466f9d",
+  "currentBuild": {
+    "sourceHead": "9f9da695dde9275802be057aed2b2bc93e466f9d",
+    "apkSha256": "e699bfa82a784827ade52b440e40eb0e4df39da4faa03f3c269959566e09d57e",
+    "bytes": 186118405,
+    "installedPullbackSha256": "e699bfa82a784827ade52b440e40eb0e4df39da4faa03f3c269959566e09d57e",
+    "signerSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "assetsIdenticalToMeasurementBaseline": true,
+    "assetCount": 175,
+    "campaignRecordsAndLocksMatched": 12,
+    "ownerPreferencesByteExact": true,
+    "policy": "optimized Debug; Shipping/Mobile; route timing; stage/dispatch probes disabled",
+    "buildLogSha256": "749874651c941ffa8a2c32ac2f296ede6d80a92db8ec820468b163f1e46dcb14"
+  },
+  "device": "SM-S948B / Adreno840 / Android17 API37 / driver2150932499",
+  "acceptedRuns": {
+    "pipeline-a1": {
+      "settings": {
+        "scalePercent": 40,
+        "width": 1440,
+        "height": 2971,
+        "internalWidth": 576,
+        "internalHeight": 1188,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": true,
+        "dust": 1
+      },
+      "joinedFrames": 704,
+      "routeDisplay": {
+        "median": 75000001,
+        "p90NearestRank": 154166666,
+        "p95NearestRank": 158333281,
+        "maximum": 162499948,
+        "over33333000Nanoseconds": 703,
+        "over250000000Nanoseconds": 0
+      },
+      "thermals": {
+        "before-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 41.4,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 28.4,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 33.5,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "after-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 39.1,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 31.4,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 35.1,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "frameworkStatuses": [
+        0
+      ],
+      "ownerPreferencesByteExact": true,
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.689,
+            "y": 2.05,
+            "z": -12.7846,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 39,
+            "medianMs": 137.712913,
+            "p95Ms": 139.582132,
+            "maximumMs": 139.815986
+          },
+          "actualDisplay": {
+            "n": 39,
+            "medianMs": 154.166666,
+            "p95Ms": 158.333386,
+            "maximumMs": 158.333386
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 11.13625,
+              "p95Ms": 12.014635
+            },
+            "player_skin": {
+              "medianMs": 5.921979,
+              "p95Ms": 6.797397
+            },
+            "character_skin": {
+              "medianMs": 5.201354,
+              "p95Ms": 5.390678
+            },
+            "pose_copy": {
+              "medianMs": 0.69427,
+              "p95Ms": 0.838073
+            },
+            "dynamic_upload": {
+              "medianMs": 0.450156,
+              "p95Ms": 0.599426
+            },
+            "fence_wait": {
+              "medianMs": 137.827916,
+              "p95Ms": 139.750313
+            },
+            "queue_submit": {
+              "medianMs": 0.169063,
+              "p95Ms": 0.308281
+            },
+            "whole_frame": {
+              "medianMs": 154.154166,
+              "p95Ms": 158.939947
+            }
+          }
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 62,
+            "medianMs": 54.007629,
+            "p95Ms": 54.625519,
+            "maximumMs": 54.82703
+          },
+          "actualDisplay": {
+            "n": 62,
+            "medianMs": 62.5,
+            "p95Ms": 66.666718,
+            "maximumMs": 66.666719
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.6079425,
+              "p95Ms": 6.841667
+            },
+            "player_skin": {
+              "medianMs": 6.6079425,
+              "p95Ms": 6.841667
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.7752095,
+              "p95Ms": 1.827865
+            },
+            "dynamic_upload": {
+              "medianMs": 0.364271,
+              "p95Ms": 0.39599
+            },
+            "fence_wait": {
+              "medianMs": 54.3916405,
+              "p95Ms": 54.934948
+            },
+            "queue_submit": {
+              "medianMs": 0.1858855,
+              "p95Ms": 0.442657
+            },
+            "whole_frame": {
+              "medianMs": 63.738984,
+              "p95Ms": 64.725469
+            }
+          }
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0187,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 52,
+            "medianMs": 65.9339565,
+            "p95Ms": 67.269634,
+            "maximumMs": 68.001613
+          },
+          "actualDisplay": {
+            "n": 52,
+            "medianMs": 74.999948,
+            "p95Ms": 83.333333,
+            "maximumMs": 83.333385
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.3992445,
+              "p95Ms": 6.89849
+            },
+            "player_skin": {
+              "medianMs": 6.3992445,
+              "p95Ms": 6.89849
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.7796095,
+              "p95Ms": 0.871094
+            },
+            "dynamic_upload": {
+              "medianMs": 0.362345,
+              "p95Ms": 0.418023
+            },
+            "fence_wait": {
+              "medianMs": 66.076224,
+              "p95Ms": 68.126667
+            },
+            "queue_submit": {
+              "medianMs": 0.215547,
+              "p95Ms": 0.462813
+            },
+            "whole_frame": {
+              "medianMs": 75.1898695,
+              "p95Ms": 77.310625
+            }
+          }
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 136.96458,
+            "p95Ms": 138.933538,
+            "maximumMs": 140.36833
+          },
+          "actualDisplay": {
+            "n": 40,
+            "medianMs": 154.166666,
+            "p95Ms": 158.333385,
+            "maximumMs": 158.333385
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 10.2812515,
+              "p95Ms": 11.979062
+            },
+            "player_skin": {
+              "medianMs": 5.1810945,
+              "p95Ms": 6.739739
+            },
+            "character_skin": {
+              "medianMs": 5.1765625,
+              "p95Ms": 5.429271
+            },
+            "pose_copy": {
+              "medianMs": 0.684219,
+              "p95Ms": 0.819844
+            },
+            "dynamic_upload": {
+              "medianMs": 0.4314075,
+              "p95Ms": 0.52547
+            },
+            "fence_wait": {
+              "medianMs": 137.2761455,
+              "p95Ms": 139.278645
+            },
+            "queue_submit": {
+              "medianMs": 0.17013,
+              "p95Ms": 0.309635
+            },
+            "whole_frame": {
+              "medianMs": 153.3323435,
+              "p95Ms": 158.189583
+            }
+          }
+        }
+      },
+      "artifacts": {
+        "android-motion-cpu20-pipeline-a1-ledger.json": "c654300cc935cff885836ae1bc8cc69a85fb23113126b7219735d3034af33025",
+        "android-motion-cpu20-pipeline-a1-manifest.json": "4b7a499b0b7c1ec081ff529c925ec2fcf9b56ae36fd38764a82e6723471d9bc2",
+        "android-motion-cpu20-pipeline-a1-present-timing.json": "6974e6e92b18b872f09573c143dc3496edba864c0952bc753d73bc5c18a99e27",
+        "android-motion-cpu20-pipeline-a1-resources.csv": "f669c5411cf932ea57a45a29c39ad6960045c0616952635f544a3dd47355a3de",
+        "cpu-analysis.json": "b5212a4d81350ad3a379f2a296af6bd8c7a7d7cd2823e3c376c5af144e59491e",
+        "cpu-display-analysis-v2.json": "eac5a4bdf798531bccfef0b33cbcacb1b60dcb1c72998f41421a6a38484ea6b7",
+        "HordeLanternRT-benchmark-latest.json": "9988f7fad50ac68e5e4edac665fd092154601ea973f976cfcf99485ad7f982a2",
+        "launch.txt": "b5b7141da3915a132d93c8f976e6a781ba538598ea55fc0d19a8f22e034ce5c2",
+        "motion-launch.txt": "8b790058e3abe1418aa53a07a009339088001fa89334aef2889f566389c1f843",
+        "owned-final.log": "9b4d9ee45693309ca37a582e8c92ede07c9d43464f5278257b14c3e38d4e3ba6",
+        "prestart-capability.json": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+        "settings-after.xml": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+        "thermals.json": "3e75c420db49e8fd6524a37cb6e9629db721d969117d9657adcd3418ae4aaa1a",
+        "vulkan_capability_report.json": "482ff734f1a6bbe1e6ce92409c02768572d70ea7515a5e20ebb205c35daa797b"
+      }
+    },
+    "pipeline-a2": {
+      "settings": {
+        "scalePercent": 40,
+        "width": 1440,
+        "height": 2971,
+        "internalWidth": 576,
+        "internalHeight": 1188,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": true,
+        "dust": 1
+      },
+      "joinedFrames": 703,
+      "routeDisplay": {
+        "median": 75000001,
+        "p90NearestRank": 154166614,
+        "p95NearestRank": 154166771,
+        "maximum": 162499948,
+        "over33333000Nanoseconds": 702,
+        "over250000000Nanoseconds": 0
+      },
+      "thermals": {
+        "before-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 42.3,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 29.0,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 34.2,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "after-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 40.0,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 32.1,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 35.8,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "frameworkStatuses": [
+        0
+      ],
+      "ownerPreferencesByteExact": true,
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6867,
+            "y": 2.05,
+            "z": -12.7813,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 39,
+            "medianMs": 137.566976,
+            "p95Ms": 140.658017,
+            "maximumMs": 142.237549
+          },
+          "actualDisplay": {
+            "n": 39,
+            "medianMs": 154.166614,
+            "p95Ms": 158.333334,
+            "maximumMs": 158.333385
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 10.16526,
+              "p95Ms": 11.838647
+            },
+            "player_skin": {
+              "medianMs": 5.023854,
+              "p95Ms": 6.542395
+            },
+            "character_skin": {
+              "medianMs": 5.17875,
+              "p95Ms": 5.638907
+            },
+            "pose_copy": {
+              "medianMs": 0.676354,
+              "p95Ms": 0.846095
+            },
+            "dynamic_upload": {
+              "medianMs": 0.404893,
+              "p95Ms": 0.569792
+            },
+            "fence_wait": {
+              "medianMs": 137.947031,
+              "p95Ms": 140.907344
+            },
+            "queue_submit": {
+              "medianMs": 0.168593,
+              "p95Ms": 0.305156
+            },
+            "whole_frame": {
+              "medianMs": 153.326823,
+              "p95Ms": 158.401093
+            }
+          }
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 63,
+            "medianMs": 53.847915,
+            "p95Ms": 54.639269,
+            "maximumMs": 55.031978
+          },
+          "actualDisplay": {
+            "n": 63,
+            "medianMs": 62.5,
+            "p95Ms": 66.666718,
+            "maximumMs": 66.666719
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.683595,
+              "p95Ms": 7.072812
+            },
+            "player_skin": {
+              "medianMs": 6.683595,
+              "p95Ms": 7.072812
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.808333,
+              "p95Ms": 0.904063
+            },
+            "dynamic_upload": {
+              "medianMs": 0.353229,
+              "p95Ms": 0.405937
+            },
+            "fence_wait": {
+              "medianMs": 54.220938,
+              "p95Ms": 55.061562
+            },
+            "queue_submit": {
+              "medianMs": 0.212864,
+              "p95Ms": 0.44224
+            },
+            "whole_frame": {
+              "medianMs": 63.608802,
+              "p95Ms": 64.590678
+            }
+          }
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0249,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 54,
+            "medianMs": 65.7205455,
+            "p95Ms": 67.407863,
+            "maximumMs": 69.484946
+          },
+          "actualDisplay": {
+            "n": 54,
+            "medianMs": 74.9999735,
+            "p95Ms": 83.333281,
+            "maximumMs": 83.333334
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.0480465,
+              "p95Ms": 6.889948
+            },
+            "player_skin": {
+              "medianMs": 6.0480465,
+              "p95Ms": 6.889948
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.783906,
+              "p95Ms": 1.199218
+            },
+            "dynamic_upload": {
+              "medianMs": 0.34672,
+              "p95Ms": 0.385157
+            },
+            "fence_wait": {
+              "medianMs": 65.982422,
+              "p95Ms": 67.659479
+            },
+            "queue_submit": {
+              "medianMs": 0.194167,
+              "p95Ms": 0.428855
+            },
+            "whole_frame": {
+              "medianMs": 74.6758855,
+              "p95Ms": 77.191615
+            }
+          }
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 137.3368975,
+            "p95Ms": 138.985153,
+            "maximumMs": 139.595986
+          },
+          "actualDisplay": {
+            "n": 40,
+            "medianMs": 154.166666,
+            "p95Ms": 158.333385,
+            "maximumMs": 162.499948
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 10.584245,
+              "p95Ms": 12.001251
+            },
+            "player_skin": {
+              "medianMs": 5.463151,
+              "p95Ms": 6.693959
+            },
+            "character_skin": {
+              "medianMs": 5.117422,
+              "p95Ms": 5.41026
+            },
+            "pose_copy": {
+              "medianMs": 0.684323,
+              "p95Ms": 0.884322
+            },
+            "dynamic_upload": {
+              "medianMs": 0.418802,
+              "p95Ms": 0.624323
+            },
+            "fence_wait": {
+              "medianMs": 137.7243225,
+              "p95Ms": 139.165468
+            },
+            "queue_submit": {
+              "medianMs": 0.160208,
+              "p95Ms": 0.283698
+            },
+            "whole_frame": {
+              "medianMs": 153.990859,
+              "p95Ms": 158.473437
+            }
+          }
+        }
+      },
+      "artifacts": {
+        "android-motion-cpu20-pipeline-a2-ledger.json": "0aef8f8452192fb36995aeb035e0dd9b159fc0c14431eced72401255a3cf8308",
+        "android-motion-cpu20-pipeline-a2-manifest.json": "b7cb115ff8bfe3f15faf87113c7b378396c79e898cd21e6bfc2cfd606c44a71c",
+        "android-motion-cpu20-pipeline-a2-present-timing.json": "c44b7a8c95b5f163b9022a8ff5ebaf86236885c58932d82a063e4b70ee530459",
+        "android-motion-cpu20-pipeline-a2-resources.csv": "39ee71f3e1e92d180c5b5d778dab31eb238633a348ec32d5c784ac608360412d",
+        "battery-during.txt": "cc15afff86d4935fccb10aa793026dd452c8bd9accaf7abebe487f6838270035",
+        "cpu-analysis.json": "4291c8c11e4857efeb8732658e585c7a648d72be59d1ec9a561aac688f9d42d9",
+        "cpu-display-analysis-v2.json": "f7e8c116b077a72f727f2dbddc7efb39477ad5b1469b9798b58ffd8bf18d159a",
+        "final.png": "5c7e9995a8f094988c3223298ed1bf57a47f5c49ba02cd54e113f2c98efe87f3",
+        "HordeLanternRT-benchmark-latest.json": "a27aef4f1fd71013fc29818cd10a12a25a71c14b259b8b2c75002137e14597e4",
+        "launch.txt": "96f3d155c637246a478715f07db1fb3f967264236c461cbcc2bd8ddbfc91d985",
+        "motion-launch.txt": "8b790058e3abe1418aa53a07a009339088001fa89334aef2889f566389c1f843",
+        "owned-final.log": "627a8dc8d82746175674669435564387a2cadbff94ce804b370117d8958ccbcb",
+        "prestart-capability.json": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+        "settings-after.xml": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+        "thermals.json": "966941825f402c6e7051dab3bd4dfa0214e702219cb38ebd1759717d47294eed",
+        "vulkan_capability_report.json": "0827b1cc86aac48085492288e63b769ad0b82a8630de8e3ad850e6a2f55331ba"
+      }
+    },
+    "pipeline-mist-b1": {
+      "settings": {
+        "scalePercent": 40,
+        "width": 1440,
+        "height": 2971,
+        "internalWidth": 576,
+        "internalHeight": 1188,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": false,
+        "dust": 1
+      },
+      "joinedFrames": 700,
+      "routeDisplay": {
+        "median": 75000052,
+        "p90NearestRank": 154166615,
+        "p95NearestRank": 154166771,
+        "maximum": 162500001,
+        "over33333000Nanoseconds": 699,
+        "over250000000Nanoseconds": 0
+      },
+      "thermals": {
+        "before-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 42.0,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 30.1,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 34.9,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "after-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 41.4,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 33.3,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 36.8,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "frameworkStatuses": [
+        0
+      ],
+      "ownerPreferencesByteExact": true,
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6878,
+            "y": 2.05,
+            "z": -12.7829,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 39,
+            "medianMs": 137.09583,
+            "p95Ms": 138.68057,
+            "maximumMs": 140.380569
+          },
+          "actualDisplay": {
+            "n": 39,
+            "medianMs": 154.166666,
+            "p95Ms": 162.499896,
+            "maximumMs": 162.5
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 10.837187,
+              "p95Ms": 12.36776
+            },
+            "player_skin": {
+              "medianMs": 5.553906,
+              "p95Ms": 6.889687
+            },
+            "character_skin": {
+              "medianMs": 5.254844,
+              "p95Ms": 5.571718
+            },
+            "pose_copy": {
+              "medianMs": 0.696146,
+              "p95Ms": 0.885625
+            },
+            "dynamic_upload": {
+              "medianMs": 0.422552,
+              "p95Ms": 0.604427
+            },
+            "fence_wait": {
+              "medianMs": 137.34901,
+              "p95Ms": 139.132552
+            },
+            "queue_submit": {
+              "medianMs": 0.186615,
+              "p95Ms": 0.32849
+            },
+            "whole_frame": {
+              "medianMs": 154.635937,
+              "p95Ms": 159.169531
+            }
+          }
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 62,
+            "medianMs": 54.1325505,
+            "p95Ms": 54.692082,
+            "maximumMs": 55.366822
+          },
+          "actualDisplay": {
+            "n": 62,
+            "medianMs": 62.5000515,
+            "p95Ms": 66.666719,
+            "maximumMs": 66.666719
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.7176045,
+              "p95Ms": 6.864636
+            },
+            "player_skin": {
+              "medianMs": 6.7176045,
+              "p95Ms": 6.864636
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.8152085,
+              "p95Ms": 0.855677
+            },
+            "dynamic_upload": {
+              "medianMs": 0.368698,
+              "p95Ms": 0.39453
+            },
+            "fence_wait": {
+              "medianMs": 54.3425005,
+              "p95Ms": 55.094375
+            },
+            "queue_submit": {
+              "medianMs": 0.214635,
+              "p95Ms": 0.511355
+            },
+            "whole_frame": {
+              "medianMs": 63.834427,
+              "p95Ms": 64.946198
+            }
+          }
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0178,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 52,
+            "medianMs": 65.644738,
+            "p95Ms": 67.879321,
+            "maximumMs": 68.533592
+          },
+          "actualDisplay": {
+            "n": 52,
+            "medianMs": 75.0,
+            "p95Ms": 83.333334,
+            "maximumMs": 83.333438
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.7406505,
+              "p95Ms": 7.225209
+            },
+            "player_skin": {
+              "medianMs": 6.7406505,
+              "p95Ms": 7.225209
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.818985,
+              "p95Ms": 1.625104
+            },
+            "dynamic_upload": {
+              "medianMs": 0.3635155,
+              "p95Ms": 0.431875
+            },
+            "fence_wait": {
+              "medianMs": 65.984479,
+              "p95Ms": 68.113646
+            },
+            "queue_submit": {
+              "medianMs": 0.2142185,
+              "p95Ms": 0.469427
+            },
+            "whole_frame": {
+              "medianMs": 75.4908075,
+              "p95Ms": 78.326302
+            }
+          }
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 137.80583,
+            "p95Ms": 139.499945,
+            "maximumMs": 140.486611
+          },
+          "actualDisplay": {
+            "n": 40,
+            "medianMs": 154.1666665,
+            "p95Ms": 158.333437,
+            "maximumMs": 162.500001
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 10.215912,
+              "p95Ms": 12.023801
+            },
+            "player_skin": {
+              "medianMs": 5.254922,
+              "p95Ms": 6.760209
+            },
+            "character_skin": {
+              "medianMs": 5.067422,
+              "p95Ms": 5.640885
+            },
+            "pose_copy": {
+              "medianMs": 0.673984,
+              "p95Ms": 0.874583
+            },
+            "dynamic_upload": {
+              "medianMs": 0.41073,
+              "p95Ms": 0.513907
+            },
+            "fence_wait": {
+              "medianMs": 138.050182,
+              "p95Ms": 139.831667
+            },
+            "queue_submit": {
+              "medianMs": 0.188646,
+              "p95Ms": 0.306563
+            },
+            "whole_frame": {
+              "medianMs": 154.374531,
+              "p95Ms": 159.06401
+            }
+          }
+        }
+      },
+      "artifacts": {
+        "android-motion-cpu20-pipeline-mist-b1-ledger.json": "9e592f68bb335020b207f931764f019d4c96324da0d17adeb28454be945cca40",
+        "android-motion-cpu20-pipeline-mist-b1-manifest.json": "15de171be0cbf878b2ed531cc8162b952210c540d66d4ed975de5f4ce997c318",
+        "android-motion-cpu20-pipeline-mist-b1-present-timing.json": "0cc63e6c5edb08bbaa15b95eec0e9ec69fb62aec0ec059a93001b5a8368568f2",
+        "android-motion-cpu20-pipeline-mist-b1-resources.csv": "a45aa16e4ce681fab1758b9d51bb5f708d649442eb89657dd292c7597b233dbe",
+        "battery-after.txt": "68379bc17239c7a74d0b383213457d12a819a5db6ca0b28d53eb4e498e4e8e72",
+        "battery-before.txt": "cdfe39a37bfde146a80c591b4db6b17ba264a3f42178b90c310f1a52be76c049",
+        "cpu-analysis.json": "3df83e99133fd86d526e63da0120bd4da4041fe4ae2def76fb244a292aaec6d4",
+        "cpu-display-analysis-v2.json": "db4ff5e3227f0df3ffd827008656b17d3ebb854f45fec20a76bac090d62bddf6",
+        "HordeLanternRT-benchmark-latest.json": "2a66f7d705f048c3e62e0a9be7e9dbc9e0ccd006e35433115dab9aecd9efcdb5",
+        "launch.txt": "4deed3185b9ff5f0192434c1465bc78622704d34faf8469a58dca06cc4f1864f",
+        "motion-launch.txt": "3a2842eeef47148cb02ba3291a1e662598517ff3520d6b33109f1277f2ca6bf9",
+        "owned-final.log": "0ca01ba707b794be44951d91e964aa1a719f2349a4421fd816db7b5821e39a86",
+        "prestart-capability.json": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+        "settings-after.xml": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+        "thermal-admission.json": "38a95634383acfe55f0605dafc33cc4da3529bf475911dcae548667bfcead86b",
+        "thermals.json": "d0f2c4a91eac48618a33a6319645be3bfb8cefcfff3f6758a5203d7cd2026be3",
+        "vulkan_capability_report.json": "e78607bc4e7185e249ce3fb812a7e3ca89eb18df212479eb53afcf00e7ae18bd"
+      }
+    },
+    "pipeline-a3": {
+      "settings": {
+        "scalePercent": 40,
+        "width": 1440,
+        "height": 2971,
+        "internalWidth": 576,
+        "internalHeight": 1188,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": true,
+        "dust": 1
+      },
+      "joinedFrames": 701,
+      "routeDisplay": {
+        "median": 75000052,
+        "p90NearestRank": 154166666,
+        "p95NearestRank": 158333281,
+        "maximum": 162500000,
+        "over33333000Nanoseconds": 700,
+        "over250000000Nanoseconds": 0
+      },
+      "thermals": {
+        "before-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 42.5,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 31.2,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 35.7,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "after-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 42.0,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 34.2,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 37.2,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "frameworkStatuses": [
+        0
+      ],
+      "ownerPreferencesByteExact": true,
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6887,
+            "y": 2.05,
+            "z": -12.7842,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 39,
+            "medianMs": 137.345622,
+            "p95Ms": 140.159319,
+            "maximumMs": 140.670569
+          },
+          "actualDisplay": {
+            "n": 39,
+            "medianMs": 154.166667,
+            "p95Ms": 158.333385,
+            "maximumMs": 158.333386
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 10.711459,
+              "p95Ms": 11.889896
+            },
+            "player_skin": {
+              "medianMs": 5.336093,
+              "p95Ms": 6.522761
+            },
+            "character_skin": {
+              "medianMs": 5.226303,
+              "p95Ms": 5.597188
+            },
+            "pose_copy": {
+              "medianMs": 0.700053,
+              "p95Ms": 0.897918
+            },
+            "dynamic_upload": {
+              "medianMs": 0.423906,
+              "p95Ms": 0.527553
+            },
+            "fence_wait": {
+              "medianMs": 137.509843,
+              "p95Ms": 140.523021
+            },
+            "queue_submit": {
+              "medianMs": 0.175052,
+              "p95Ms": 0.306823
+            },
+            "whole_frame": {
+              "medianMs": 155.308958,
+              "p95Ms": 159.808542
+            }
+          }
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 62,
+            "medianMs": 53.953853,
+            "p95Ms": 54.650936,
+            "maximumMs": 55.008436
+          },
+          "actualDisplay": {
+            "n": 62,
+            "medianMs": 62.5,
+            "p95Ms": 66.666667,
+            "maximumMs": 66.666771
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.766641,
+              "p95Ms": 6.964478
+            },
+            "player_skin": {
+              "medianMs": 6.766641,
+              "p95Ms": 6.964478
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.806536,
+              "p95Ms": 1.543334
+            },
+            "dynamic_upload": {
+              "medianMs": 0.359869,
+              "p95Ms": 0.38453
+            },
+            "fence_wait": {
+              "medianMs": 54.2910675,
+              "p95Ms": 54.931823
+            },
+            "queue_submit": {
+              "medianMs": 0.1903385,
+              "p95Ms": 0.433282
+            },
+            "whole_frame": {
+              "medianMs": 63.838177,
+              "p95Ms": 64.785938
+            }
+          }
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0198,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 52,
+            "medianMs": 65.955389,
+            "p95Ms": 67.322915,
+            "maximumMs": 67.647707
+          },
+          "actualDisplay": {
+            "n": 52,
+            "medianMs": 75.0,
+            "p95Ms": 83.333333,
+            "maximumMs": 83.333385
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.745729,
+              "p95Ms": 7.246823
+            },
+            "player_skin": {
+              "medianMs": 6.745729,
+              "p95Ms": 7.246823
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.8151825,
+              "p95Ms": 1.00474
+            },
+            "dynamic_upload": {
+              "medianMs": 0.3637745,
+              "p95Ms": 0.419793
+            },
+            "fence_wait": {
+              "medianMs": 66.204297,
+              "p95Ms": 67.707187
+            },
+            "queue_submit": {
+              "medianMs": 0.2227085,
+              "p95Ms": 0.555104
+            },
+            "whole_frame": {
+              "medianMs": 75.6404945,
+              "p95Ms": 77.616979
+            }
+          }
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 137.442835,
+            "p95Ms": 139.429788,
+            "maximumMs": 140.158278
+          },
+          "actualDisplay": {
+            "n": 40,
+            "medianMs": 154.1666665,
+            "p95Ms": 158.333385,
+            "maximumMs": 158.333385
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 10.8451295,
+              "p95Ms": 12.081094
+            },
+            "player_skin": {
+              "medianMs": 5.7193485,
+              "p95Ms": 6.808698
+            },
+            "character_skin": {
+              "medianMs": 5.204141,
+              "p95Ms": 5.56724
+            },
+            "pose_copy": {
+              "medianMs": 0.696329,
+              "p95Ms": 0.829687
+            },
+            "dynamic_upload": {
+              "medianMs": 0.4237245,
+              "p95Ms": 0.591824
+            },
+            "fence_wait": {
+              "medianMs": 137.770078,
+              "p95Ms": 139.706718
+            },
+            "queue_submit": {
+              "medianMs": 0.1747655,
+              "p95Ms": 0.326771
+            },
+            "whole_frame": {
+              "medianMs": 153.82737,
+              "p95Ms": 158.895416
+            }
+          }
+        }
+      },
+      "artifacts": {
+        "android-motion-cpu20-pipeline-a3-ledger.json": "84df1ff3184d8160793aca9a244e19ef37a807ebaab8f83f6892429ba2010cd2",
+        "android-motion-cpu20-pipeline-a3-manifest.json": "1ac7068246ba3fece71f5fdfaf6bb176e29a86075f767a5b35bbb6213b695e04",
+        "android-motion-cpu20-pipeline-a3-present-timing.json": "7b4c9795c3a59dfff807ace0c5918241538adeac79d1f99ea3e770a2674e8f86",
+        "android-motion-cpu20-pipeline-a3-resources.csv": "38a68e2616907df1a6384841bd75f3132ec5d7a13281e75811a51eb702cba29c",
+        "battery-after.txt": "50e910439611eac7a9aca6012f69bf71b0f1710c3d016d7936488d2db842c59f",
+        "battery-before.txt": "ebfe9e2243f4b60b22b7f226259e7a7ed29143264884039888396684d84e3424",
+        "cpu-analysis.json": "0c84889454e76a1a0218e9c2753053d256517429c31d3d6eecf5dd2f15ea53f3",
+        "cpu-display-analysis-v2.json": "499d1504d076d2cc3dbb280ba6cf6405d073b7bf0cb360dc0e7558850f93ed21",
+        "HordeLanternRT-benchmark-latest.json": "4e59deba5034383805b996e8bbefab0cba4851e106b37ffbf3f722a891370656",
+        "launch.txt": "a4fe03b6542559a78c94d40a9c30b6f806e80748286eec3cd1d2a9bf57877d83",
+        "motion-launch.txt": "1134bb5377fcdaff8755d20f77d73dbff1e4d75b5cb75180ab3d54777c980112",
+        "owned-final.log": "6dae3590ab275a9463855dbbbf43ecdf1d42ae00c6c2b1b97b12361e33f82b94",
+        "prestart-capability.json": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+        "request.json": "3792ed4f6c8ede239ebc68d0c661cc8a3cdfb173ea1c8dda771325b6983d852d",
+        "settings-after.xml": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+        "thermals.json": "1abea91b715852116472ac622a5136045895ade5cb48fd812520401711326d4b",
+        "vulkan_capability_report.json": "6a0cb3233c6edf1fa5b3f164f8f98c1e9f643f8250f49a740bed59d2db7a973a"
+      }
+    },
+    "pipeline-a5": {
+      "settings": {
+        "scalePercent": 40,
+        "width": 1440,
+        "height": 2971,
+        "internalWidth": 576,
+        "internalHeight": 1188,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": true,
+        "dust": 1
+      },
+      "joinedFrames": 704,
+      "routeDisplay": {
+        "median": 75000051,
+        "p90NearestRank": 154166666,
+        "p95NearestRank": 158267084,
+        "maximum": 162499948,
+        "over33333000Nanoseconds": 703,
+        "over250000000Nanoseconds": 0
+      },
+      "thermals": {
+        "before-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 42.3,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 29.6,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 34.6,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "after-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 40.6,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 32.6,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 36.1,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "frameworkStatuses": [
+        0
+      ],
+      "ownerPreferencesByteExact": true,
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.689,
+            "y": 2.05,
+            "z": -12.7846,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 39,
+            "medianMs": 137.911611,
+            "p95Ms": 139.895674,
+            "maximumMs": 140.079788
+          },
+          "actualDisplay": {
+            "n": 39,
+            "medianMs": 154.166614,
+            "p95Ms": 158.333385,
+            "maximumMs": 158.333386
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 10.203594,
+              "p95Ms": 11.928802
+            },
+            "player_skin": {
+              "medianMs": 5.118906,
+              "p95Ms": 6.677344
+            },
+            "character_skin": {
+              "medianMs": 5.165312,
+              "p95Ms": 5.582969
+            },
+            "pose_copy": {
+              "medianMs": 0.659636,
+              "p95Ms": 0.796719
+            },
+            "dynamic_upload": {
+              "medianMs": 0.422448,
+              "p95Ms": 0.495886
+            },
+            "fence_wait": {
+              "medianMs": 138.121042,
+              "p95Ms": 140.152552
+            },
+            "queue_submit": {
+              "medianMs": 0.15375,
+              "p95Ms": 0.338281
+            },
+            "whole_frame": {
+              "medianMs": 153.374687,
+              "p95Ms": 159.086718
+            }
+          }
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 63,
+            "medianMs": 53.992342,
+            "p95Ms": 54.833124,
+            "maximumMs": 55.087655
+          },
+          "actualDisplay": {
+            "n": 63,
+            "medianMs": 62.5,
+            "p95Ms": 66.666667,
+            "maximumMs": 66.666771
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.769427,
+              "p95Ms": 7.276198
+            },
+            "player_skin": {
+              "medianMs": 6.769427,
+              "p95Ms": 7.276198
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.779115,
+              "p95Ms": 0.850677
+            },
+            "dynamic_upload": {
+              "medianMs": 0.349532,
+              "p95Ms": 0.400365
+            },
+            "fence_wait": {
+              "medianMs": 54.38401,
+              "p95Ms": 55.205521
+            },
+            "queue_submit": {
+              "medianMs": 0.17625,
+              "p95Ms": 0.357656
+            },
+            "whole_frame": {
+              "medianMs": 63.783021,
+              "p95Ms": 64.609896
+            }
+          }
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0214,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 52,
+            "medianMs": 65.804035,
+            "p95Ms": 67.528384,
+            "maximumMs": 67.832238
+          },
+          "actualDisplay": {
+            "n": 52,
+            "medianMs": 75.0,
+            "p95Ms": 83.333281,
+            "maximumMs": 83.333333
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.6027345,
+              "p95Ms": 6.945938
+            },
+            "player_skin": {
+              "medianMs": 6.6027345,
+              "p95Ms": 6.945938
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.8107035,
+              "p95Ms": 0.870156
+            },
+            "dynamic_upload": {
+              "medianMs": 0.346901,
+              "p95Ms": 0.400104
+            },
+            "fence_wait": {
+              "medianMs": 66.141823,
+              "p95Ms": 67.773854
+            },
+            "queue_submit": {
+              "medianMs": 0.2128905,
+              "p95Ms": 0.370364
+            },
+            "whole_frame": {
+              "medianMs": 75.2383075,
+              "p95Ms": 77.139791
+            }
+          }
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 137.0234605,
+            "p95Ms": 138.663747,
+            "maximumMs": 139.77708
+          },
+          "actualDisplay": {
+            "n": 40,
+            "medianMs": 154.166667,
+            "p95Ms": 158.333385,
+            "maximumMs": 162.499948
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 10.7649475,
+              "p95Ms": 11.834843
+            },
+            "player_skin": {
+              "medianMs": 5.5148955,
+              "p95Ms": 6.564166
+            },
+            "character_skin": {
+              "medianMs": 5.221458,
+              "p95Ms": 5.560261
+            },
+            "pose_copy": {
+              "medianMs": 0.702891,
+              "p95Ms": 0.828594
+            },
+            "dynamic_upload": {
+              "medianMs": 0.4309635,
+              "p95Ms": 0.504062
+            },
+            "fence_wait": {
+              "medianMs": 137.3817445,
+              "p95Ms": 138.828802
+            },
+            "queue_submit": {
+              "medianMs": 0.1672915,
+              "p95Ms": 0.326354
+            },
+            "whole_frame": {
+              "medianMs": 154.9922915,
+              "p95Ms": 157.170469
+            }
+          }
+        }
+      },
+      "artifacts": {
+        "android-motion-cpu20-pipeline-a5-ledger.json": "16509d20052a4d5af572cbc236b1d2ffc97c2e3cadfae2bc2bfe063c6225b0db",
+        "android-motion-cpu20-pipeline-a5-manifest.json": "539e2c582838c521aadd76a37ebfdd09a1dbb158c283d7ddca50e1af86ac1735",
+        "android-motion-cpu20-pipeline-a5-present-timing.json": "72be3437d73787171bc5475a1c7c68ca45c8054d24c3d29aab8c209d0944467e",
+        "android-motion-cpu20-pipeline-a5-resources.csv": "16364ebbe92b8578d304e95bd135a3f9ddfa5611eb705e04a4dfcd64f85613ac",
+        "battery-after.txt": "2971bd2778e05859ca9120ec02cfd5eb08fef091449eb098b853c22ad0787edb",
+        "battery-before.txt": "c937ae00f31095014c2b6318a29e5bac94213c5e9497d6278c24828a2a5d7f31",
+        "cpu-analysis.json": "081c492e42b71e0348dc8db7033769ec1f91f6942736f7cd188ea61e8201c960",
+        "cpu-display-analysis-v2.json": "081c492e42b71e0348dc8db7033769ec1f91f6942736f7cd188ea61e8201c960",
+        "HordeLanternRT-benchmark-latest.json": "9b07a5086c41d36c29f412326bc898d9317a6dd2284dd3c551ea4866457709bd",
+        "launch.txt": "2752fcf3889d8d28a254d8cbceff107b02e3c122163c97226ea1efb5074b90be",
+        "motion-launch.txt": "8b790058e3abe1418aa53a07a009339088001fa89334aef2889f566389c1f843",
+        "owned-final.log": "59009cb70abeb038e36e6ea0d3631c4e2c64121c3a990b343f29377e0542ffac",
+        "prestart-capability.json": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+        "request.json": "6ac9c890764f605a2962ab2978f652548cf4a110de8ab4a4804bf8901f75bf30",
+        "settings-after.xml": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+        "thermals.json": "9b0302009a13ac2526750a72b5a05060f95f0efde06ae387fdf0862b3f61bf24",
+        "vulkan_capability_report.json": "3ee910b170caaba5f943e6b3943ff2a49125dc3a71fa4d6805ea6b0e8f889696"
+      }
+    },
+    "pipeline-combined-e1": {
+      "settings": {
+        "scalePercent": 40,
+        "width": 1440,
+        "height": 2971,
+        "internalWidth": 576,
+        "internalHeight": 1188,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 2,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": false,
+        "dust": 0
+      },
+      "joinedFrames": 697,
+      "routeDisplay": {
+        "median": 75000052,
+        "p90NearestRank": 154166667,
+        "p95NearestRank": 158333281,
+        "maximum": 162500052,
+        "over33333000Nanoseconds": 696,
+        "over250000000Nanoseconds": 0
+      },
+      "thermals": {
+        "before-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 43.2,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 30.7,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 35.5,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "after-route": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 42.1,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 33.9,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 37.1,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "frameworkStatuses": [
+        0
+      ],
+      "ownerPreferencesByteExact": true,
+      "views": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6894,
+            "y": 2.05,
+            "z": -12.7852,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 138.393981,
+            "p95Ms": 139.796507,
+            "maximumMs": 140.495465
+          },
+          "actualDisplay": {
+            "n": 40,
+            "medianMs": 154.166667,
+            "p95Ms": 158.333437,
+            "maximumMs": 162.499999
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 10.9188275,
+              "p95Ms": 12.139114
+            },
+            "player_skin": {
+              "medianMs": 5.5830725,
+              "p95Ms": 6.671251
+            },
+            "character_skin": {
+              "medianMs": 5.2391145,
+              "p95Ms": 5.57974
+            },
+            "pose_copy": {
+              "medianMs": 0.674766,
+              "p95Ms": 0.800832
+            },
+            "dynamic_upload": {
+              "medianMs": 0.451693,
+              "p95Ms": 0.539427
+            },
+            "fence_wait": {
+              "medianMs": 138.722682,
+              "p95Ms": 139.959375
+            },
+            "queue_submit": {
+              "medianMs": 0.1790625,
+              "p95Ms": 0.37552
+            },
+            "whole_frame": {
+              "medianMs": 155.257422,
+              "p95Ms": 159.554323
+            }
+          }
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 62,
+            "medianMs": 54.4194515,
+            "p95Ms": 59.109374,
+            "maximumMs": 62.018696
+          },
+          "actualDisplay": {
+            "n": 62,
+            "medianMs": 62.5000005,
+            "p95Ms": 66.66677,
+            "maximumMs": 75.0
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.5397915,
+              "p95Ms": 6.956563
+            },
+            "player_skin": {
+              "medianMs": 6.5397915,
+              "p95Ms": 6.956563
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.7797395,
+              "p95Ms": 0.90974
+            },
+            "dynamic_upload": {
+              "medianMs": 0.343672,
+              "p95Ms": 0.443071
+            },
+            "fence_wait": {
+              "medianMs": 54.7523175,
+              "p95Ms": 59.196719
+            },
+            "queue_submit": {
+              "medianMs": 0.185807,
+              "p95Ms": 0.481875
+            },
+            "whole_frame": {
+              "medianMs": 64.0159635,
+              "p95Ms": 68.839844
+            }
+          }
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0238,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 52,
+            "medianMs": 66.488097,
+            "p95Ms": 68.183488,
+            "maximumMs": 69.417134
+          },
+          "actualDisplay": {
+            "n": 52,
+            "medianMs": 75.0,
+            "p95Ms": 83.333334,
+            "maximumMs": 83.333385
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 6.696354,
+              "p95Ms": 7.344271
+            },
+            "player_skin": {
+              "medianMs": 6.696354,
+              "p95Ms": 7.344271
+            },
+            "character_skin": {
+              "medianMs": 0.0,
+              "p95Ms": 0.0
+            },
+            "pose_copy": {
+              "medianMs": 0.81263,
+              "p95Ms": 0.872553
+            },
+            "dynamic_upload": {
+              "medianMs": 0.353802,
+              "p95Ms": 0.398905
+            },
+            "fence_wait": {
+              "medianMs": 66.832786,
+              "p95Ms": 68.604167
+            },
+            "queue_submit": {
+              "medianMs": 0.2171615,
+              "p95Ms": 0.533802
+            },
+            "whole_frame": {
+              "medianMs": 76.135521,
+              "p95Ms": 78.349947
+            }
+          }
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "gpu": {
+            "n": 40,
+            "medianMs": 137.62346,
+            "p95Ms": 139.657757,
+            "maximumMs": 140.208851
+          },
+          "actualDisplay": {
+            "n": 40,
+            "medianMs": 154.1667195,
+            "p95Ms": 158.333385,
+            "maximumMs": 162.500052
+          },
+          "cpu": {
+            "skin": {
+              "medianMs": 11.098358,
+              "p95Ms": 11.747917
+            },
+            "player_skin": {
+              "medianMs": 5.681797,
+              "p95Ms": 6.395521
+            },
+            "character_skin": {
+              "medianMs": 5.242266,
+              "p95Ms": 5.536823
+            },
+            "pose_copy": {
+              "medianMs": 0.6967445,
+              "p95Ms": 0.832135
+            },
+            "dynamic_upload": {
+              "medianMs": 0.441043,
+              "p95Ms": 0.511615
+            },
+            "fence_wait": {
+              "medianMs": 138.0283595,
+              "p95Ms": 139.891667
+            },
+            "queue_submit": {
+              "medianMs": 0.2161715,
+              "p95Ms": 0.448073
+            },
+            "whole_frame": {
+              "medianMs": 155.525912,
+              "p95Ms": 159.123385
+            }
+          }
+        }
+      },
+      "artifacts": {
+        "android-motion-cpu20-pipeline-combined-e1-ledger.json": "2bbc40c578dbfb43cd0a1b161c031bb9c6a99cf10893dcd72bcac59521546fb5",
+        "android-motion-cpu20-pipeline-combined-e1-manifest.json": "f1505d939e309bc44a9cc8549323c8587d9162c9cdf29d999098829184c6f478",
+        "android-motion-cpu20-pipeline-combined-e1-present-timing.json": "1bf3dd6caad338af2b30f3b8c92531796f64d6714d74d52a37fa2f1ed8c84b0d",
+        "android-motion-cpu20-pipeline-combined-e1-resources.csv": "f3f94380f994bec244360c064395d036065fd22e40e194007be2b6c67e6ef3e9",
+        "battery-after.txt": "dec95260fa4981a58d9a26068cd5df9f67b125eb5164257c534ded40872104b4",
+        "battery-before.txt": "5fd73800716b0ad732c1fb37c78ec6af08908373b3167379fafa84e6c49914b9",
+        "cpu-analysis.json": "5c14846f5730db1f7e904efb3d9dc21cbbae001bd0ff983f58b9f8c6df606b5e",
+        "cpu-display-analysis-v2.json": "5c14846f5730db1f7e904efb3d9dc21cbbae001bd0ff983f58b9f8c6df606b5e",
+        "HordeLanternRT-benchmark-latest.json": "4cad0612aa51ba9813d496802737918292c29e3a0e0d04b717bf68b20835c8b5",
+        "launch.txt": "85dd5cfebae6e93e89f68f2240215dc902ef092c4df2f79578d8cc585346a2ea",
+        "motion-launch.txt": "f69ba8c31cdc7df495409835983ca41f2291aa9946adef904ecebd52faa55b22",
+        "owned-final.log": "e5c6aaa3888964b80c20ebf1db26e5cc806e156a81cb38bacaa3858d0dec7de8",
+        "prestart-capability.json": "b7c1ac4dd02365a04a1507788362e19d082de4ce88917a9a4e93dccd53de099a",
+        "request.json": "e52d68908de8b2b5b5b638fc317d534365d552b5b0c4438c8963c20f9709e091",
+        "settings-after.xml": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+        "thermal-admission.json": "38a95634383acfe55f0605dafc33cc4da3529bf475911dcae548667bfcead86b",
+        "thermals.json": "13f4995e3babe2e484291027bf47c4c782920b2fac27d3058e0c4be52ff2a219",
+        "vulkan_capability_report.json": "c777b0f84ac089204195421abf461bc6b3d7e52749239b0c13c467012416ae4d"
+      }
+    }
+  },
+  "comparisons": {
+    "pipeline-a2-vs-pipeline-mist-b1": {
+      "startThermalAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {},
+        "referenceCompared": true
+      },
+      "endThermalAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {},
+        "referenceCompared": true
+      },
+      "views": {
+        "landing-sweep": {
+          "exactPoseAdmitted": false,
+          "controlGpuMedianMs": 137.566976,
+          "trialGpuMedianMs": 137.09583,
+          "descriptiveDeltaMs": -0.4711460000000045,
+          "descriptiveDeltaPercent": -0.3424848126341029,
+          "controlDisplayMedianMs": 154.166614,
+          "trialDisplayMedianMs": 154.166666
+        },
+        "lower-sweep": {
+          "exactPoseAdmitted": true,
+          "controlGpuMedianMs": 53.847915,
+          "trialGpuMedianMs": 54.1325505,
+          "descriptiveDeltaMs": 0.28463550000000026,
+          "descriptiveDeltaPercent": 0.5285914969966887,
+          "controlDisplayMedianMs": 62.5,
+          "trialDisplayMedianMs": 62.5000515
+        },
+        "passage-sweep": {
+          "exactPoseAdmitted": false,
+          "controlGpuMedianMs": 65.7205455,
+          "trialGpuMedianMs": 65.644738,
+          "descriptiveDeltaMs": -0.07580749999999625,
+          "descriptiveDeltaPercent": -0.11534825133183713,
+          "controlDisplayMedianMs": 74.9999735,
+          "trialDisplayMedianMs": 75.0
+        },
+        "repeat-ascent": {
+          "exactPoseAdmitted": true,
+          "controlGpuMedianMs": 137.3368975,
+          "trialGpuMedianMs": 137.80583,
+          "descriptiveDeltaMs": 0.468932499999994,
+          "descriptiveDeltaPercent": 0.3414468424262962,
+          "controlDisplayMedianMs": 154.166666,
+          "trialDisplayMedianMs": 154.1666665
+        }
+      }
+    },
+    "pipeline-a5-vs-pipeline-combined-e1": {
+      "startThermalAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {},
+        "referenceCompared": true
+      },
+      "endThermalAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {},
+        "referenceCompared": true
+      },
+      "views": {
+        "landing-sweep": {
+          "exactPoseAdmitted": false,
+          "controlGpuMedianMs": 137.911611,
+          "trialGpuMedianMs": 138.393981,
+          "descriptiveDeltaMs": 0.4823700000000031,
+          "descriptiveDeltaPercent": 0.3497675043474091,
+          "controlDisplayMedianMs": 154.166614,
+          "trialDisplayMedianMs": 154.166667
+        },
+        "lower-sweep": {
+          "exactPoseAdmitted": true,
+          "controlGpuMedianMs": 53.992342,
+          "trialGpuMedianMs": 54.4194515,
+          "descriptiveDeltaMs": 0.42710950000000025,
+          "descriptiveDeltaPercent": 0.7910557019364051,
+          "controlDisplayMedianMs": 62.5,
+          "trialDisplayMedianMs": 62.5000005
+        },
+        "passage-sweep": {
+          "exactPoseAdmitted": false,
+          "controlGpuMedianMs": 65.804035,
+          "trialGpuMedianMs": 66.488097,
+          "descriptiveDeltaMs": 0.6840619999999973,
+          "descriptiveDeltaPercent": 1.039544155612937,
+          "controlDisplayMedianMs": 75.0,
+          "trialDisplayMedianMs": 75.0
+        },
+        "repeat-ascent": {
+          "exactPoseAdmitted": true,
+          "controlGpuMedianMs": 137.0234605,
+          "trialGpuMedianMs": 137.62346,
+          "descriptiveDeltaMs": 0.5999994999999956,
+          "descriptiveDeltaPercent": 0.43788085471683225,
+          "controlDisplayMedianMs": 154.166667,
+          "trialDisplayMedianMs": 154.1667195
+        }
+      }
+    }
+  },
+  "decisions": {
+    "mobileDefaultMist": "Off as explicitly selected for the chuggy two-light Keeper fight; saved explicit values preserved",
+    "additionalQualityDefaults": "No FireLow/DustOff adoption; current cleared route yields no useful gain; individual profiles unmeasured; new tiers not visually accepted",
+    "cpuPreparation": "Material active cost established; no scheduling change adopted; immutable ownership refactor remains next prerequisite",
+    "performanceAcceptance": "No sustained30FPS, liveKeeper, fullchapter or owner acceptance pass"
+  },
+  "failures": {
+    "pipeline-fire-c1": "preparation rejected before timing, AP40.1 vs42.5C; common copied report stale and excluded",
+    "pipeline-fire-c2": "timedattempt armed under old fire tuple then existing native ownership guard aborted; fixed exact presentation gate before remaining same-APK controls",
+    "pipeline-a6": "Closing control not launched:180s cooldown bound reached at AP31.8/BAT29.7/SKIN31.8C; declared preparation BAT ceiling29.4C missed. No retry."
+  },
+  "limits": [
+    "Only lower/repeat-ascent poses match exactly; landing/passage descriptive only",
+    "One combined trial and one same-APK control; closing control not launched. No repeated candidate benefit or adopted tier change.",
+    "USB charging and currentHAL trajectories recorded; GPU clocks/power not fixed or measured",
+    "Saved cap30 is not a gameplay frame-rate pass",
+    "No image readbacks during timing; terminal pause-menu screenshot excluded",
+    "No combat commands, save mutation, public push, release or Reef operations"
+  ],
+  "timedAttempts": 7,
+  "completeTimedAttempts": 6,
+  "timedAttemptBudget": 8,
+  "terminalDisposition": "Stopped; no further phone routes at this checkpoint. Closing control not launched; individual Fire/Dust profiles deferred.",
+  "closingControlPreparation": {
+    "admitted": false,
+    "routeLaunched": false,
+    "cooldownBoundSeconds": 180,
+    "lastCurrentHal": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 31.8,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 29.7,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 31.8,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    },
+    "cooldownSha256": "5c44fb3558b73a70e0c6dec227497e16a68437c066ada783eb004abf7a66ec79"
+  }
+}

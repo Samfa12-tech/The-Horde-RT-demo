@@ -1,0 +1,42 @@
+[
+  {
+    "file": "base-color.android.ktx2",
+    "bytes": 626752,
+    "sha256": "d5bfe40003ae53b601f0086f19751f536b3fed59ef31722b8f20458d40cd8abc"
+  },
+  {
+    "file": "base-color.windows.ktx2",
+    "bytes": 5592908,
+    "sha256": "4597dd3294dfab20870b8aa7be6ecad8795e18ebe5715020e387ead852334d17"
+  },
+  {
+    "file": "emissive.android.ktx2",
+    "bytes": 626752,
+    "sha256": "216824b64c3a354d4dc5a613a4afe6b1c8ad47dccb8c88ecad3f85f6e29e7e83"
+  },
+  {
+    "file": "emissive.windows.ktx2",
+    "bytes": 5592908,
+    "sha256": "e5d8010e6aad869f53c9ea3edb1bccae61255a1145f6e2d0ab3055272d48475c"
+  },
+  {
+    "file": "normal.android.ktx2",
+    "bytes": 1398592,
+    "sha256": "8d4f27c08f1e3067285d873a9d07f757e2a45c3027b53a66c503c612f0322831"
+  },
+  {
+    "file": "normal.windows.ktx2",
+    "bytes": 5592908,
+    "sha256": "bba3cc54df1272ac33384a05dc2c7662425452f695788f98dc4b1d4ee0cfc73f"
+  },
+  {
+    "file": "orm.android.ktx2",
+    "bytes": 626752,
+    "sha256": "3f141a1f319ff5b8c410248e2d05b2853e724fec8e20b7fc0a0732c77de90c29"
+  },
+  {
+    "file": "orm.windows.ktx2",
+    "bytes": 5592908,
+    "sha256": "b7f66cde46ea516af41f140b216b091ee394120adad2fca9571365016c57df80"
+  }
+]

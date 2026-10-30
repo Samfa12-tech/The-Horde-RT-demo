@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "date_local": "2026-10-10",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "draft_pr": 27,
+  "starting_commit": "ba7caf656246f8b74f8343b21909b1d16dfa3d98",
+  "source_candidate_commit": "214c40c69266e35485f5945bd5db599c8bee7a1c",
+  "local_host_package_checks": "PASS",
+  "github_checks_at_publication": "PENDING; exact final pushed SHA must be verified externally after publication",
+  "device_verified": false,
+  "owner_audio_haptic_acceptance": "PENDING",
+  "new_candidate_owner_acceptance": "PENDING",
+  "experimental_body_proxy_active": false,
+  "wp2a_fully_complete": false,
+  "windows_artifacts": [
+    {
+      "configuration": "Windows Debug",
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "52a5f8c19a8860941f177530c5c4ab71477689012ae274a0d920f9aca4b92b8c",
+      "bytes": 11754496
+    },
+    {
+      "configuration": "Windows Release",
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "134112d6a44b5e96b5fd7cc6739ee4329ee4f209377e38f53b259bd32ed24400",
+      "bytes": 4119552
+    }
+  ],
+  "android_identity_file": "android-all-abi-identities.json",
+  "shader_identity_file": "shader-identities.json",
+  "source_identity_file": "source-identities.json",
+  "preservation_file": "preservation.json",
+  "owner_feedback_file": "owner-windows-combat-feedback.json",
+  "runs_file": "runs.jsonl",
+  "failed_development_attempts": [
+    "build-debug-final: corrected namespace qualification",
+    "build-debug-corrected: corrected snapshot member access"
+  ],
+  "validation_summary": {
+    "shared_debug": "23/23",
+    "shared_release": "23/23",
+    "final_focused_debug": "4/4",
+    "final_focused_release": "4/4",
+    "package_debug": "10/10",
+    "package_release": "6/6",
+    "final_executable_containment": "1/1 per configuration",
+    "android_builds": "Debug and unsigned Release; all four existing ABIs",
+    "android_lint": "Debug/Release PASS",
+    "android_jvm": {
+      "task": "testDebugUnitTest UP-TO-DATE in local Gradle run",
+      "cached_results": {
+        "suites": 40,
+        "tests": 268,
+        "failures": 0,
+        "errors": 0
+      },
+      "fresh_execution_claimed": false
+    },
+    "android_shader_inspection": "ARM64-only, Diagnostic/Mobile and Shipping/Mobile; no skip validation",
+    "android_all_abi": "Exact package/library identities, ELF class/machine and 16 KiB LOAD alignment; not all-ABI shader inspection"
+  },
+  "torch": {
+    "test_seconds": 168.67,
+    "total_ctest_seconds": 168.68,
+    "outer_wall_seconds": 168.71669800000382,
+    "timeout_seconds": 180,
+    "margin_seconds": 11.33,
+    "poses": 3287,
+    "roof_skinned_poses": 1812,
+    "plane_samples": 3178,
+    "disk_samples": 57970,
+    "failures": 0,
+    "historical_wp0_timeout_seconds": 180.03,
+    "historical_unchanged_focused_pass_seconds": 168.85,
+    "historical_initial_proof_seconds": 168.7,
+    "historical_wp2a_pass_seconds": 166.9,
+    "scope": "Unchanged original full test. Final Windows-only HUD guard does not change its executable, shared/rig inputs or registration. No cause/repeatability/GPU/FPS claim."
+  },
+  "occlusion": {
+    "policy": "Existing planar full-height authored masonry and sampled route-boundary obstruction gate for outgoing skeleton hits, incoming skeleton damage/parry, and Keeper hit admission.",
+    "seeded_cases": [
+      "straight wall",
+      "oblique wall",
+      "55 mm inside corner edge",
+      "moving blocked target"
+    ],
+    "positives": [
+      "actual GameSimulation clear-side hit",
+      "moving clear-side target moves and takes one hit"
+    ],
+    "production_reachability": "Not established for exact seeded negative poses.",
+    "limits": "Not a new 3D mesh/sweep/capsule LOS engine. Low torch stands and reward chest are not masonry occluders. Forgiving aim/reach and timing unchanged.",
+    "mesh_alignment": "Still deferred; historical pulse17 gaps 275.347/234.658 mm and moving 215.684/17.5033 mm remain historical diagnostics."
+  },
+  "physical_checks": "NOT RUN: no game/device launches or input; new exact-candidate backend presentation, captures, lifecycle, lighting, audio/haptic and owner feel remain pending."
+}

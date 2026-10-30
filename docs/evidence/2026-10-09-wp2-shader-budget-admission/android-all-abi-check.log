@@ -1,0 +1,6 @@
+ParserError: <repo>\reports\shader-budget-admission\android-all-abi-package-check.ps1:45
+Line |
+  45 |  … nt -gt 0) { throw "LOAD alignment check failed for $stripRel: $($load …
+     |                                                       ~~~~~~~~~~
+     | Variable reference is not valid. ':' was not followed by a valid variable name character. Consider using ${} to
+     | delimit the name.

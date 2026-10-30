@@ -1,0 +1,34 @@
+{
+  "baseSource": "260aeb7529d14bd9181859557cd905b6c4118df8",
+  "candidate": "intermediate dirty-source staging repair; not final chapter acceptance",
+  "apkBytes": 183030634,
+  "apkSha256": "af533134b224344041c4991f7f50fffbd5d4019ce05c7b735f9bc81a2761eb84",
+  "package": "com.samfa12.hordelanternrt.debug",
+  "device": "Samsung SM-S948B",
+  "serial": "R5GL219SZGK",
+  "signerSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "settings": {
+    "requestedRenderScalePercent": 100,
+    "backend": "RayTracingPipeline",
+    "checkpoint": "rescue-journey-start",
+    "capture": false
+  },
+  "observed": {
+    "firstScreenshotHearts": 3,
+    "gameplayInputSent": false,
+    "gpuValidSamples": 29,
+    "gpuLatestMs": 487.176,
+    "gpuAverageMs": 486.995
+  },
+  "limitations": [
+    "bounded startup samples, not sustained route performance",
+    "no Current/Higher or saved Lower migration physical acceptance yet",
+    "experimental unused moving-frame API compiled in this intermediate artifact; no production caller",
+    "receipt-time hashes include subsequent comment/diagnostic wording edits; this intermediate APK is not claimed to match a pristine commit"
+  ],
+  "receiptTimeSourceHashes": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "9f67d773d642a2e9404e74b633aa8aab2be0b46d57ac915a9cbf9a8985f3222d",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "bf72711a9c2c43fd363ae14b579b6a9308e0f1c47a8b36db96ded32d09336823",
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": "486a522e67b41d230ccfac7853e7b27093896da52b4a8bed8a8fe2f010780da4"
+  }
+}

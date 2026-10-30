@@ -17,6 +17,8 @@ final class AndroidControllerInput {
     static final int PAUSE = 1 << 5;
     static final int CONFIRM = 1 << 6;
     static final int CANCEL = 1 << 7;
+    static final int DRINK_FLASK = 1 << 8;
+    static final int REST = 1 << 9;
 
     private static final float TRIGGER_PRESS = 0.50f;
     private static final float TRIGGER_RELEASE = 0.35f;
@@ -66,8 +68,8 @@ final class AndroidControllerInput {
     private long lastObservedTimeMs = Long.MIN_VALUE;
     private long suspendBoundaryMs = Long.MIN_VALUE;
     private boolean suspended;
-    private final boolean[] keyDown = new boolean[12];
-    private final boolean[] blockedUntilUp = new boolean[12];
+    private final boolean[] keyDown = new boolean[14];
+    private final boolean[] blockedUntilUp = new boolean[14];
     private final DeviceCandidate[] candidates = new DeviceCandidate[MAX_DEVICE_CANDIDATES];
     private long candidateSequence;
     private boolean leftStickSeeded;
@@ -86,6 +88,8 @@ final class AndroidControllerInput {
     private float moveForward;
     private float lookX;
     private float lookY;
+    private boolean runHeld;
+    private boolean crouchHeld;
     private float leftFlatX = 0.12f;
     private float leftFlatY = 0.12f;
     private float rightFlatX = 0.12f;
@@ -109,6 +113,22 @@ final class AndroidControllerInput {
     float moveForward() { return moveForward; }
     float lookX() { return lookX; }
     float lookY() { return lookY; }
+    boolean runHeld() { return runHeld; }
+    boolean crouchHeld() { return crouchHeld; }
+    boolean guardHeld() {
+        return !suspended && (leftTriggerKeyDown || (leftTriggerArmed && leftTriggerAnalogDown));
+    }
+    void clearGuardHold() {
+        blockedUntilUp[4] |= keyDown[4];
+        keyDown[4] = false;
+        leftTriggerKeyDown = leftTriggerAnalogDown = false;
+        leftTriggerSeeded = leftTriggerArmed = false;
+    }
+    void clearCrouchHold() {
+        blockedUntilUp[13] |= keyDown[13];
+        keyDown[13] = false;
+        crouchHeld = false;
+    }
 
     static boolean isControllerKey(KeyEvent event) {
         return isControllerKey(event, event == null ? null : event.getDevice());
@@ -144,6 +164,8 @@ final class AndroidControllerInput {
             if (activeDeviceId == deviceId) {
                 keyDown[slot] = false;
                 blockedUntilUp[slot] = false;
+                if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_R1) runHeld = false;
+                if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_L1) crouchHeld = false;
                 updateDpad(event.getKeyCode(), false);
                 updateDigitalTrigger(event.getKeyCode(), false);
             }
@@ -162,8 +184,13 @@ final class AndroidControllerInput {
         if (blockedUntilUp[slot] || keyDown[slot]) return result(true, false, 0, 0, 0);
         keyDown[slot] = true;
         final int keyCode = event.getKeyCode();
+        // Shoulder presses no longer change locomotion or posture. Stick
+        // deflection owns speed; shared head clearance owns automatic crouch.
+        final boolean drinkBefore=dpadUp || hatNavY<0,restBefore=dpadDown || hatNavY>0;
         updateDpad(keyCode, true);
-        final int actions = updateDigitalTrigger(keyCode, true) | actionForKey(keyCode);
+        final int actions = updateDigitalTrigger(keyCode, true) | actionForKey(keyCode) |
+            (!drinkBefore && (dpadUp || hatNavY<0)?DRINK_FLASK:0) |
+            (!restBefore && (dpadDown || hatNavY>0)?REST:0);
         return result(true, true, actions, 0, 0);
     }
 
@@ -179,6 +206,7 @@ final class AndroidControllerInput {
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
             if (deviceId == activeDeviceId) {
                 neutralizeAxes(true);
+                clearGuardHold();
                 hatNavX = hatNavY = 0;
                 hatSeeded = hatArmed = false;
             }
@@ -251,6 +279,7 @@ final class AndroidControllerInput {
         stickNavX = hysteresisDirection(moveStrafe, stickNavX);
         // MotionEvent Y grows downward; keep navigation's negative=up convention.
         stickNavY = hysteresisDirection(left[1], stickNavY);
+        final boolean drinkBefore=dpadUp || hatNavY<0,restBefore=dpadDown || hatNavY>0;
         final float rawHatX = event.getAxisValue(MotionEvent.AXIS_HAT_X);
         final float rawHatY = event.getAxisValue(MotionEvent.AXIS_HAT_Y);
         if (!hatSeeded) {
@@ -265,7 +294,8 @@ final class AndroidControllerInput {
             hatNavY = hatDirection(rawHatY, hatNavY);
         }
 
-        int actions = 0;
+        int actions = (!drinkBefore && (dpadUp || hatNavY<0)?DRINK_FLASK:0) |
+            (!restBefore && (dpadDown || hatNavY>0)?REST:0);
         final float leftTrigger = trigger(event, device, true);
         final float rightTrigger = trigger(event, device, false);
         if (!leftTriggerSeeded) {
@@ -328,6 +358,8 @@ final class AndroidControllerInput {
     void suspend(long nowMs) {
         suspendBoundaryMs = Math.max(nowMs, lastObservedTimeMs);
         suspended = true;
+        runHeld = false;
+        crouchHeld = false;
         for (int i = 0; i < keyDown.length; ++i) {
             blockedUntilUp[i] |= keyDown[i];
             keyDown[i] = false;
@@ -358,6 +390,8 @@ final class AndroidControllerInput {
 
     private void resetForDevice(int deviceId) {
         activeDeviceId = deviceId;
+        runHeld = false;
+        crouchHeld = false;
         for (int i = 0; i < keyDown.length; ++i) {
             keyDown[i] = false;
             blockedUntilUp[i] = false;
@@ -500,6 +534,8 @@ final class AndroidControllerInput {
             case KeyEvent.KEYCODE_DPAD_RIGHT: return 9;
             case KeyEvent.KEYCODE_DPAD_UP: return 10;
             case KeyEvent.KEYCODE_DPAD_DOWN: return 11;
+            case KeyEvent.KEYCODE_BUTTON_R1: return 12;
+            case KeyEvent.KEYCODE_BUTTON_L1: return 13;
             default: return -1;
         }
     }

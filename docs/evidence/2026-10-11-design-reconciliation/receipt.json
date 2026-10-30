@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "implementationCheckpoint": "59eb44c692783e71362aa7dd068ba462703bcdc5",
+  "planningCommit": "d37f16381311c6e620f0c4a9d01c1cce83260dc8",
+  "fullRead": [
+    "Full 1.7 master, sections 1-19 and appendices",
+    "Full WORLD_LAYOUT",
+    "Full ASSET_PLAN_1_7",
+    "Connected map README, coordinate JSON and building CSV",
+    "Kit animation plan and selected UI README",
+    "Owner supplied topo recovery goal"
+  ],
+  "pixelInspection": [
+    "regional topology PNG",
+    "forest 1.7 sheet",
+    "Bellwether terrain/footprints",
+    "Bellwether services/routes",
+    "river/mill vertical section"
+  ],
+  "referencePayloadsVerified": 24,
+  "localIndexLinksVerified": 14,
+  "implementationChangesIncluded": false,
+  "tests": "Documentation diff/link/hash checks only; no runtime/device passes added",
+  "historicalLinks": "Verbatim historical adjacent links resolve against originalPath at planningCommit; not rewritten",
+  "preservation": "Other worktrees and all preexisting implementation/asset edits excluded from this commit",
+  "missing": [
+    "Eric production terrain handoff",
+    "Visible Kit integration and acting acceptance",
+    "Final combined scene outdoor effects and exact-target performance/physical gates"
+  ],
+  "laterOwnerDecision": "Exact Meshy stump rights resolved by owner paid-plan/ownership/public reuse confirmation; no independent CC0 label asserted"
+}

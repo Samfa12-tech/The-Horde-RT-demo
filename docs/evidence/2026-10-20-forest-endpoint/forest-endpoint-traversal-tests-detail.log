@@ -1,0 +1,63 @@
+Start testing: Oct 20 21:10 AUS Eastern Summer Time
+----------------------------------------------------------
+205/218 Testing: horde_rt_rescue_journey_integration_tests
+205/218 Test: horde_rt_rescue_journey_integration_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_rescue_journey_integration_tests" start time: Oct 20 21:10 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=228700 staged_ns=189800 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=16234 failures=0 retained_triangles=528
+<end of output>
+Test time =   1.96 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_journey_integration_tests" end time: Oct 20 21:10 AUS Eastern Summer Time
+"horde_rt_rescue_journey_integration_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+206/218 Testing: horde_rt_chapter_terrain_journey_tests
+206/218 Test: horde_rt_chapter_terrain_journey_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe" "--authored-terrain"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_chapter_terrain_journey_tests" start time: Oct 20 21:10 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+native-terrain moving probe frames=5788
+phone chapter mode=chapter-round-trip ticks/frame=1 frames=6280 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=3 frames=2097 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=4 frames=1572 stage=complete phase=complete failure=
+phone chapter mode=chapter-round-trip ticks/frame=6 frames=1047 stage=complete phase=complete failure=
+phone chapter mode=chapter-streaming-cycle ticks/frame=5 frames=482 stage=complete phase=complete failure=
+phone chapter mode=chapter-resident-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-resident-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+phone chapter mode=chapter-streamed-comparison ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-streamed-comparison ticks/frame=6 frames=563 stage=complete phase=complete failure=
+phone chapter mode=chapter-performance-route ticks/frame=3 frames=1118 stage=complete phase=complete failure=
+phone chapter mode=chapter-performance-route ticks/frame=6 frames=563 stage=complete phase=complete failure=
+lookout held-item clearance=2.7
+shaft carry clearance=1.68
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=399000 staged_ns=269900 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=41985 failures=0 retained_triangles=528
+<end of output>
+Test time =  16.29 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_terrain_journey_tests" end time: Oct 20 21:10 AUS Eastern Summer Time
+"horde_rt_chapter_terrain_journey_tests" time elapsed: 00:00:16
+----------------------------------------------------------
+
+End testing: Oct 20 21:10 AUS Eastern Summer Time

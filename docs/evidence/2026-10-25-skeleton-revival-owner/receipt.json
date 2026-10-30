@@ -1,0 +1,401 @@
+{
+  "sourceBase": "8a2929479e8224aedc20f906973e73bd25fbb6ce",
+  "originalFailuresRetained": true,
+  "changesToGates": "none; no runtime timing, tolerance, deadline, source-import guard, renderer capacity or storage route relaxed",
+  "failures": [
+    {
+      "name": "new player preservation oracle",
+      "reason": "Accepted upward combo changed private player state before snapshot publication; before-image was stale. Explicitly publish with zero elapsed time, prove no clock/attack identity change, compare named fields rather than padding; future control comparisons retained."
+    },
+    {
+      "name": "new independent-target kill fixture",
+      "reason": "Attack input for B was issued during prior legitimate attack recovery and consumed while busy. Wait bounded actual Idle before each independent target; no recovery cancellation/runtime change."
+    },
+    {
+      "name": "new final Keeper arrival fixture",
+      "reason": "Direct staged arrival skipped existing bounded torch failure trigger. Visit actual trigger and await actual Settled in both pre/post-final branches, retaining same reveal assertion."
+    },
+    {
+      "name": "new Android clearance fixture",
+      "reason": "Existing prompt returns true during its120ms fade to continue polling. Assert visible fading text, then unchanged hidden/empty/accessibility-clear after121ms; no runtime fade change."
+    },
+    {
+      "name": "build invocation",
+      "reason": "Executable output name was initially used as CMake target; actual target horde_rt_diagnostic_window built successfully afterward."
+    }
+  ],
+  "privateLogs": [
+    {
+      "name": "bridge-first-build.log",
+      "bytes": 4504,
+      "sha256": "1dd279923cc4167a73f284fb5de8b60c1b44a591a1228e50c379d014bf95879d",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-first-build.log"
+    },
+    {
+      "name": "bridge-first-tests.log",
+      "bytes": 2013,
+      "sha256": "edd609d2ab451744ecac560ab1c9d37efb62c17ab0f8678ba3cd9ff2a5ed8cec",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-first-tests.log"
+    },
+    {
+      "name": "bridge-diagnostic-tests.log",
+      "bytes": 1436,
+      "sha256": "7f19a5dc167682c5daef0f726cbc8c2f1d0839a3e0af4c8f8fcb2652504877e9",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-diagnostic-tests.log"
+    },
+    {
+      "name": "bridge-window-first-build.log",
+      "bytes": 142,
+      "sha256": "3bfa273ed3e64dd3fd6b04d291af3e2e99b15941e7337e30e98af1d0d2589e2c",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-window-first-build.log"
+    },
+    {
+      "name": "bridge-window-build-r2.log",
+      "bytes": 3029,
+      "sha256": "fad9695e5bda6a5efaebf734b9b681ef4b08394e34a975d6bfb44615cba5a6ad",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-window-build-r2.log"
+    },
+    {
+      "name": "bridge-recovery-tests-r2.log",
+      "bytes": 329,
+      "sha256": "9b703dcb7aa4d09ae193a851b4e76b919ec28fb2ee53e6ce91735d916a47173c",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-recovery-tests-r2.log"
+    },
+    {
+      "name": "bridge-contact-tests-r3.log",
+      "bytes": 357,
+      "sha256": "a04d85f685a50178a87d195da81d1abd5a8e43263670e624958110f67f9f3db3",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-contact-tests-r3.log"
+    },
+    {
+      "name": "bridge-owner-r3-detail.log",
+      "bytes": 1821,
+      "sha256": "aff3e0cbe2cbbd0b4014030e1691afee6f5e9ba319b235304bfa7e22fea7d747",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-owner-r3-detail.log"
+    },
+    {
+      "name": "bridge-base-r2.log",
+      "bytes": 495,
+      "sha256": "7582c4601937948e2e841601b4670b86091f246fe1e24ded9e9a814ff183db97",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-base-r2.log"
+    },
+    {
+      "name": "bridge-java-first.log",
+      "bytes": 2941,
+      "sha256": "37e5f9188bc5c09623b5525b11e0a6bc0936a38eee9a08b8365c88ca53cfc5c3",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-java-first.log"
+    },
+    {
+      "name": "bridge-java-first-ui.xml",
+      "bytes": 3945,
+      "sha256": "611a260e4bf9f89073eb385e7088ca2b03c44b6f6796dd024f28ef4c836f36b0",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-java-first-ui.xml"
+    },
+    {
+      "name": "bridge-java-r2.log",
+      "bytes": 2316,
+      "sha256": "ac82f13a8173889e308809fe6727ef111755c182ed47aadaf69022abe82fcc53",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-java-r2.log"
+    },
+    {
+      "name": "bridge-final-tests.log",
+      "bytes": 1199,
+      "sha256": "13f4c56f5c4886cbb4c0683dcae92c1886556423e98682b23d158c8714f4b95d",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/bridge-final-tests.log"
+    },
+    {
+      "name": "event-roster-build.log",
+      "bytes": 1775,
+      "sha256": "2b39920e38343c1c73b96d4d550f7c78c462fcc36cdc57cd6910baa3522fbe1e",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/event-roster-build.log"
+    },
+    {
+      "name": "event-roster-tests.log",
+      "bytes": 481,
+      "sha256": "d0b2f401e3112371b37f6642821ed082f99d09e825a16a7aa51d5e2fa864fc83",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/event-roster-tests.log"
+    },
+    {
+      "name": "ci-7813e709.json",
+      "bytes": 6428,
+      "sha256": "35cefedd0a22661b14ab5ddb7caa51946bf4bfd68f89f64cad1977b709c022f4",
+      "path": "ignored reports/skeleton-stand-authored-20261025/native-validation/ci-7813e709.json"
+    }
+  ],
+  "evidenceClass": "gated shared-simulation, pure restore, platform unit/build and actual RT validation; no natural-play, phone, listening or performance claim",
+  "defaults": {
+    "revival": false,
+    "yellowPolicy": false,
+    "shared64": false,
+    "mobileMist": "OFF default; saved preference unchanged"
+  },
+  "tests": [
+    {
+      "name": "initial affected six",
+      "result": "4 pass, 2 fail",
+      "seconds": 39.65
+    },
+    {
+      "name": "pure revival restore",
+      "result": "pass",
+      "seconds": 1.58,
+      "deadlineSeconds": 30
+    },
+    {
+      "name": "existing campaign checkpoint",
+      "result": "pass",
+      "seconds": 18.27,
+      "deadlineSeconds": 60
+    },
+    {
+      "name": "corrected combat foundation and Windows prompt",
+      "result": "2/2 pass",
+      "seconds": 4.19
+    },
+    {
+      "name": "corrected owner integration",
+      "result": "240 checks, zero failures",
+      "seconds": 4.97,
+      "deadlineSeconds": 30,
+      "cryEvents": 1,
+      "defeatEvents": 4,
+      "deathSettledWaitTicks": 178
+    },
+    {
+      "name": "character render slot",
+      "result": "pass",
+      "seconds": 8.79
+    },
+    {
+      "name": "spatial audio",
+      "result": "pass",
+      "seconds": 2.43
+    },
+    {
+      "name": "focused Java first/corrected",
+      "result": "67/68 then68/68"
+    },
+    {
+      "name": "full Android Debug unit/build/lint",
+      "result": "pass",
+      "tests": 497,
+      "skipped": 6,
+      "failures": 0,
+      "errors": 0,
+      "abis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86",
+        "x86_64"
+      ],
+      "buildSeconds": 149
+    },
+    {
+      "name": "final affected native selection",
+      "result": "7/7 pass",
+      "seconds": 23.48,
+      "deadlinesChanged": false
+    }
+  ],
+  "apk": {
+    "apk": "app-debug.apk",
+    "bytes": 206318283,
+    "sha256": "fff28a12e1cdacee37a5b7b2c2f766fb47fb6e29deeb9f9525a61bb0e5923380",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "privateLichOrSourceMasters": []
+  },
+  "actualOwnerRt": {
+    "complete": true,
+    "evidenceClass": "Debug public-input GameSimulation to normal adapter; unit-staged player positions, no natural play, audio playback, performance or phone acceptance",
+    "sourceSha256": "800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259",
+    "cpuTicks": 1157,
+    "frames": 167,
+    "crySemanticCount": 1,
+    "heldPauseFrames": [
+      122,
+      123,
+      124,
+      125,
+      126,
+      127
+    ],
+    "enemyDefeats": 2,
+    "simulationHz": 60,
+    "unpaced": true,
+    "poseAuthority": "unedited actual local GameSimulation snapshot through normal adapter",
+    "unitStagedPlayerPositions": true,
+    "readyHandedDriver": true,
+    "audioPlayback": false,
+    "deadDurationSeconds": 2.96667,
+    "standDurationSeconds": 1.5,
+    "finalPhase": 6,
+    "applicationSnapshotUnchanged": true,
+    "error": "",
+    "phaseCounts": {
+      "3": 11,
+      "4": 140,
+      "5": 15,
+      "6": 1
+    },
+    "allImageHashesMatch": true,
+    "heldPauseUniqueImageHashes": 1,
+    "heldPauseUniquePhaseSeconds": 1,
+    "armPixelRange": [
+      5840,
+      6751
+    ],
+    "lastActors": [
+      {
+        "id": 2,
+        "health": 2,
+        "dead": false,
+        "root": [
+          -5.5,
+          -0.9499999881,
+          -15.94999981
+        ],
+        "yaw": -1.570796371,
+        "animationTime": 0,
+        "idlePhase": 0,
+        "renderTime": 0,
+        "standTime": -1
+      },
+      {
+        "id": 4,
+        "health": 2,
+        "dead": false,
+        "root": [
+          -5.87120533,
+          -0.9499999881,
+          -14.93418598
+        ],
+        "yaw": -1.570796371,
+        "animationTime": 0,
+        "idlePhase": 0,
+        "renderTime": 0,
+        "standTime": -1
+      }
+    ],
+    "resources": {
+      "bufferCount": 52,
+      "memoryAllocationCount": 63,
+      "bottomLevelAccelerationStructureCount": 21,
+      "topLevelAccelerationStructureCount": 1,
+      "tlasInstanceCount": 28,
+      "pipelineCount": 2,
+      "shaderBindingTableCount": 2,
+      "descriptorSetCount": 1,
+      "hostVisibleBytes": 11183120,
+      "deviceLocalBytes": 306703408
+    },
+    "pipeline": {
+      "executionBackend": "RayTracingPipeline",
+      "instrumentation": "diagnostic",
+      "dielectricQuality": "high",
+      "bundleKey": "diagnostic_high_pair",
+      "opaqueFast": {
+        "key": "diagnostic_high_opaque_fast",
+        "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_high_generic_dielectric",
+        "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+      },
+      "activeStrategy": "opaque-fast",
+      "activeKey": "diagnostic_high_opaque_fast",
+      "activeSha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0",
+      "waterQuality": "high"
+    },
+    "dimensions": {
+      "internalExtent": [
+        960,
+        540
+      ],
+      "outputExtent": [
+        960,
+        540
+      ],
+      "cameraAspect": 1.77777779,
+      "presentationTransform": 0,
+      "dynamicResolutionEnabled": false,
+      "linearBlit": false,
+      "aspectPreserved": true
+    },
+    "mist": true,
+    "dust": 2,
+    "contactSheet": "owner-r1-contact-sheet.png",
+    "fullFramesViewed": [
+      0,
+      100,
+      125,
+      150,
+      151,
+      166
+    ],
+    "cropReview": "All actual stand samples101..150 plus reverse samples0/11/40/70/100 and rearm/live151/166, native-pixel crops; no broad visible skid or join pop. Sword occludes part of far actor; one oblique view is not all-angle or continuous human acceptance.",
+    "rearmToLiveExactImage": false,
+    "rearmImageHashes": 15,
+    "exeSha256": "8c11e055a65e90cab9199dc1d536a57cd7753a8506b9b938a7359c3473c8d3eb",
+    "custodyUnchanged": true,
+    "ownerFiles": 151,
+    "imageEvidence": [
+      {
+        "file": "actual-joins.png",
+        "bytes": 421410,
+        "sha256": "ed714a267d5dd12ce78e86ddcf044a8660b199924630ac99e3799013b84f34ca"
+      },
+      {
+        "file": "actual-live-idle0.png",
+        "bytes": 739391,
+        "sha256": "9043cc67979103974255716048cdccbb961a579c6fb46f39ebb2ce8b4acf0399"
+      },
+      {
+        "file": "actual-signal.png",
+        "bytes": 734191,
+        "sha256": "b1268cba75ed9eaf22a039b3ac21e968015ca31257be5e896c4d0e6a61e07047"
+      },
+      {
+        "file": "actual-stand-pause.png",
+        "bytes": 740915,
+        "sha256": "80eb4286d843e1e2a52ab7749c164c16ada1a5e193eae2c01955dc7ae469ca3e"
+      }
+    ]
+  },
+  "manual": {
+    "audioHapticRevalidationRequired": true,
+    "reason": "new one-time spatial cry and practice/real-combat timing; no listening or phone result",
+    "newCryHaptic": false
+  },
+  "build": {
+    "windowsExeSha256": "8c11e055a65e90cab9199dc1d536a57cd7753a8506b9b938a7359c3473c8d3eb",
+    "androidSourceDifferenceAfterBuild": "Only Windows-only hidden capture and evidence/docs; Android code unchanged after recorded APK build."
+  },
+  "originalCheckpointCi": {
+    "head": "7813e709fcb1f646c96300a32b8fa54e2c5c42a9",
+    "runId": 40211424566,
+    "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/40211424566",
+    "checkedUtc": "2026-10-25T16:33:28Z",
+    "terminal": false,
+    "jobs": {
+      "Android": "success",
+      "ASan/UBSan": "success",
+      "Clang": "build failure: stale ForestFoliageAmbienceTests count36",
+      "GCC": "build failure: stale ForestFoliageAmbienceTests count36",
+      "Vulkan": "build failure: stale ForestBirdAmbienceTests count36",
+      "MSVC": "still compiling; terminal unknown"
+    },
+    "newIntegrationRestoreCompilerCases": "Not executed in the failed builds; finite sanitizer roster does not select them"
+  },
+  "eventRosterCorrection": {
+    "scope": "tests/docs only; runtime and captured artifacts unchanged",
+    "preserved": "all original event IDs0..35 and original pre-foliage spatial assertions0..34",
+    "added": "Cry ID36/count37 and explicit new cry spatial/non-ambience assertions",
+    "localTests": "2/2 pass; foliage5.38s, bird56.40s; unchanged30/120second deadlines",
+    "replacementCi": "pending after routine correction backup; exact head/run reported in pause handoff"
+  }
+}

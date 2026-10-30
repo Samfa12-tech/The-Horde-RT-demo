@@ -1,0 +1,12 @@
+{
+  "baseline": "2626d273a6215210dde5de0e7b1113039199c50d",
+  "originalCheckExpressions": 118,
+  "currentCheckExpressions": 121,
+  "missingOriginalExpressions": [],
+  "additionalExpressions": 3,
+  "originalNormalPassingCount": 145,
+  "expectedProducer": 144,
+  "expectedConsumer": 15,
+  "inProcessEndpointLifecycleRetained": true,
+  "consumerRepeatsUnselectedSlotCheck": true
+}

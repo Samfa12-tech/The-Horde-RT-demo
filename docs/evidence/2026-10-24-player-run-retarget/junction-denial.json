@@ -1,0 +1,9 @@
+{
+  "action": "create isolated asset junction via cmd mklink /J",
+  "target": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\player-run-retarget-20261024\\control\\assets\\audio",
+  "source": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\audio",
+  "outcome": "denied",
+  "reason": "Access is denied; OS/tool did not report a more precise cause",
+  "retried": false,
+  "alternative": "direct reads by existing diagnostic asset loader; no production asset swap or link creation"
+}

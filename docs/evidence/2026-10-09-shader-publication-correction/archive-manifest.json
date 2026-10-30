@@ -1,0 +1,1192 @@
+{
+  "archive": "temporary-matrices-and-rejected-prototypes.zip",
+  "bytes": 14354945,
+  "sha256": "c7605f768548908c2a5b4002b0e0695b3839389720b7428a0189d18cf4ed98db",
+  "members": [
+    {
+      "path": "abi-active-buffer.log",
+      "bytes": 109,
+      "sha256": "b1ab6406a86c07b9cfdee9e910f199642a0010520fe4fd6744bf3227179ee683"
+    },
+    {
+      "path": "abi-compose.log",
+      "bytes": 109,
+      "sha256": "5181e292ae16f33eb3353fe91973329cf96e98dbaada9dc047e75c5d3b29e663"
+    },
+    {
+      "path": "abi-original.log",
+      "bytes": 109,
+      "sha256": "47cc5a9aacf5136ec4254dcdecff07df237075b9436acf5431805ba9c1873222"
+    },
+    {
+      "path": "abi-restored-check.log",
+      "bytes": 112,
+      "sha256": "e86c0499ed5c45f68bba32d4050c66378ee6decf8fa9b6c679ebd4f0f2b2e4c1"
+    },
+    {
+      "path": "abi-restored.log",
+      "bytes": 109,
+      "sha256": "47cc5a9aacf5136ec4254dcdecff07df237075b9436acf5431805ba9c1873222"
+    },
+    {
+      "path": "active-generic/diagnostic_high_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 183761,
+      "sha256": "7d67536924c76a269cc801bd37280b6a69964972fdbb0773302c6449d5dde029"
+    },
+    {
+      "path": "active-generic/diagnostic_high_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 200011,
+      "sha256": "0e90d02be60c3ff9f4f9c464a8033dfc67a4e017763933102cfa34225192229f"
+    },
+    {
+      "path": "active-generic/diagnostic_high_generic_dielectric/minimal.rgen.spv",
+      "bytes": 295588,
+      "sha256": "055b82870edaca8fd0834bffdb17df401378f64222b76b276812250cc1d8eb2e"
+    },
+    {
+      "path": "active-generic/diagnostic_high_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 874393,
+      "sha256": "75b90a8c1b9c656ccf2e2a1da2443e512ffccfb33b367716cfbce53884ea58b6"
+    },
+    {
+      "path": "active-generic/diagnostic_high_generic_dielectric/raygen-stats.json",
+      "bytes": 3173,
+      "sha256": "9e9de39f0f41f5797fb4808fd1cf64198e8368c7f6d0c727f340c4207e83d902"
+    },
+    {
+      "path": "active-generic.log",
+      "bytes": 377,
+      "sha256": "30818b624759001e8bf934f31ad7f601d563102934b5a9f2d2aeb36af852a2e9"
+    },
+    {
+      "path": "active-opaque/diagnostic_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 167259,
+      "sha256": "31e3962a906f5a301159e47f06884b949ceada960217e786bd4f93c79e538c6f"
+    },
+    {
+      "path": "active-opaque/diagnostic_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 200011,
+      "sha256": "6c64db8bdeab0229cf8b424c2402cc9a9fabe024ed22a290b6d6d4f1ac4fd9ed"
+    },
+    {
+      "path": "active-opaque/diagnostic_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 595372,
+      "sha256": "874fae39fa4c3eb4e0641e1db204d5567879cf6be68a288fd642a9853cd1337c"
+    },
+    {
+      "path": "active-opaque/diagnostic_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1605839,
+      "sha256": "3807b11310aab0525b7092925572a493d11132785cb4fa21ec0c946e83549f2f"
+    },
+    {
+      "path": "active-opaque/diagnostic_high_opaque_fast/raygen-stats.json",
+      "bytes": 3157,
+      "sha256": "fa78b3a61849cd87c0059c7b691f03d27c1f825d6ac8e7aac1bc4904f7fe3f80"
+    },
+    {
+      "path": "active-opaque.log",
+      "bytes": 360,
+      "sha256": "1a2033f1824b9fd5e523f198fc42ba923eeb1c4eeb0dae1e69505b53ffb27357"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/experimental/staged_primary_record.glsl",
+      "bytes": 3882,
+      "sha256": "a12b889773f4cbd69823a5e3188f1bfa983155ecd07904e8d2aa365239f77d15"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_atmosphere.glsl",
+      "bytes": 14720,
+      "sha256": "da007b0aba45dac5fd3ed1b3f362534c6cb0e2e2c04ff0eab619e45f07aabff2"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_diagnostics.glsl",
+      "bytes": 739,
+      "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_dielectric_common.glsl",
+      "bytes": 18772,
+      "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_dielectric_spawn.glsl",
+      "bytes": 7452,
+      "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_dielectric_transport.glsl",
+      "bytes": 31031,
+      "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_fire.glsl",
+      "bytes": 10883,
+      "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_frame.glsl",
+      "bytes": 4900,
+      "sha256": "c7c1eee2efd951e94e09343a6129e20b9fbc9c9ce294bba821c27723a954193a"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_hit_decode.glsl",
+      "bytes": 32819,
+      "sha256": "a1d9ef06ced589edb96858bfb76d2de14c3b5a4e59e96a18b5bb95408740e28d"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_indoor_dust.glsl",
+      "bytes": 5423,
+      "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_lighting.glsl",
+      "bytes": 60108,
+      "sha256": "d89db03ec94142b32bbbcab8e3917ee2cb66ee64ca6b3dffe368918ed3e119f2"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_scene_abi.generated.glsl",
+      "bytes": 6927,
+      "sha256": "e62ea176f5b923527d75ab8cea9c45f0ec41315197d2b254eaa468e080db9b1f"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_scene_abi.glsl",
+      "bytes": 3728,
+      "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/include/rt_variant_config.glsl",
+      "bytes": 1985,
+      "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/minimal.comp",
+      "bytes": 539,
+      "sha256": "0aa2731c6a80f3cc015cc23cc85e161970375c383d59fd807c636f981f1ee1a5"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/minimal.rchit",
+      "bytes": 165,
+      "sha256": "bec751b11f9f078f4d405d233a9babd47f2f5643acd6478167e2345268d9121b"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/minimal.rgen",
+      "bytes": 213,
+      "sha256": "033484e51931a6884517e003d8bf968f6d9e00438f5ba789cc58f3153a6740ca"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/minimal.rmiss",
+      "bytes": 763,
+      "sha256": "c74cac4360d364d9ef586687d8c765d72730f024e0e8b6af7e96f701a08383fb"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/raytracing/README.md",
+      "bytes": 734,
+      "sha256": "03f0e4c95dc29ea687ad3797a3d66aeb715c8d181a7574ceffe2e735893579bc"
+    },
+    {
+      "path": "baseline-source-fixture/shaders/README.md",
+      "bytes": 474,
+      "sha256": "7687c0bbac1f0845fdd6b234eff5a7e9c5879da16b96cfacbd11933150547be4"
+    },
+    {
+      "path": "baseline-source-fixture/tools/compile-raygen.ps1",
+      "bytes": 70458,
+      "sha256": "2d919bdb6ad03ed4b67e7691ffb1547801268d09df0794c658ea2f59054debcf"
+    },
+    {
+      "path": "baseline-source-fixture/tools/raygen-variants.json",
+      "bytes": 1538,
+      "sha256": "39276571a06644307dd36db0cf7265b7ee43e5bfc912932be06bb0503b34e30d"
+    },
+    {
+      "path": "baseline-source-identities.json",
+      "bytes": 5953,
+      "sha256": "f03d6c706348799ea215425d93fc2e7d67a7680e4e0b5fbc9cfdeb6db9651537"
+    },
+    {
+      "path": "baseline.py",
+      "bytes": 1068,
+      "sha256": "7bf4eeaf84b5a1c55dbce8d9c8af450d58682914ef3bb0063a99d2b58159b0a9"
+    },
+    {
+      "path": "cached-active-generic/diagnostic_high_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 183867,
+      "sha256": "7eb05895e8ffb72b08b785b142d3e24a61cac00060a5f3b02dfb6cf8920aef7a"
+    },
+    {
+      "path": "cached-active-generic/diagnostic_high_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 200727,
+      "sha256": "dbf5b6b1bba15bfaa2b709134a9bf5dcead51246ead4e58fa3ca7e83a6a909f5"
+    },
+    {
+      "path": "cached-active-generic/diagnostic_high_generic_dielectric/minimal.rgen.spv",
+      "bytes": 295412,
+      "sha256": "e9a3bba0e70f30d9c48295637a1012c1666bc3a8a4689a72270d8153964fcbe3"
+    },
+    {
+      "path": "cached-active-generic/diagnostic_high_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 873955,
+      "sha256": "16e5998c46ef0db5e5db19f4dde4cd30de9fcdfba7615b6bc1d3a284fdc13874"
+    },
+    {
+      "path": "cached-active-generic/diagnostic_high_generic_dielectric/raygen-stats.json",
+      "bytes": 3173,
+      "sha256": "0b4c5a83dbdd40373595380f8bde4d8cec39b29f28addb342534b49b0a107515"
+    },
+    {
+      "path": "cached-active-generic.log",
+      "bytes": 384,
+      "sha256": "2559fd64c18331839289aa1c8f6e1debcff2bc56c8af72f3b4f5d8808f3691e4"
+    },
+    {
+      "path": "cached-active-opaque/diagnostic_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 167451,
+      "sha256": "f5251223b6e8d726caf695179e0bb5cac4feb34ac2edd7054d5a23a32e41bbe1"
+    },
+    {
+      "path": "cached-active-opaque/diagnostic_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 200727,
+      "sha256": "f61326651ea21d48f0ae11b5e7c8e3d00b40f48315e90f7668c2c820b319ae63"
+    },
+    {
+      "path": "cached-active-opaque/diagnostic_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 594984,
+      "sha256": "47fcf674af333c7cb54981ecb7f1273dcfdbb050eba64d655f4d2eacedb7dcee"
+    },
+    {
+      "path": "cached-active-opaque/diagnostic_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1604651,
+      "sha256": "878c96fe9552636acdf5bea2a71a83a8b2c5f6acd51acf2b1be9511059a742e9"
+    },
+    {
+      "path": "cached-active-opaque/diagnostic_high_opaque_fast/raygen-stats.json",
+      "bytes": 3157,
+      "sha256": "27060647d088aacb00a33b152cb9d61e8bb3206dc1e52dee003243bcade4e509"
+    },
+    {
+      "path": "cached-active-opaque.log",
+      "bytes": 367,
+      "sha256": "1adddd4ec52fc79a0e146caf02beca1f15cea3f55e8fbf39438d4026f8fec656"
+    },
+    {
+      "path": "compose-experiment.patch",
+      "bytes": 10213,
+      "sha256": "be672955325f2293012e927dc12f6d04e49b7fd92121e3a758f19c19686f03cc"
+    },
+    {
+      "path": "compose-generic/diagnostic_high_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 183622,
+      "sha256": "a85e4d30eaf23d60d53340cf5916af4a8d7dbf48bdee507273f7627a5e9979a8"
+    },
+    {
+      "path": "compose-generic/diagnostic_high_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 199869,
+      "sha256": "d8d7fb788cf2477ade119fa305bc77a76538d20aab753d4d93fc1e088eeed752"
+    },
+    {
+      "path": "compose-generic/diagnostic_high_generic_dielectric/minimal.rgen.spv",
+      "bytes": 295896,
+      "sha256": "4eabb2ef7ef153a0de9d0f85bb67d014be57cf4dbf916a14c6249123b639f0fa"
+    },
+    {
+      "path": "compose-generic/diagnostic_high_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 875266,
+      "sha256": "182c1eb23f8082600b4dd7c1843c87e4facd06f6029b4c36faeb426714d70879"
+    },
+    {
+      "path": "compose-generic/diagnostic_high_generic_dielectric/raygen-stats.json",
+      "bytes": 3173,
+      "sha256": "ddd14ad743e0346bca1c46c3c0f3ae2e84d3306d7f9d16d517679523fee16b9b"
+    },
+    {
+      "path": "compose-generic.log",
+      "bytes": 378,
+      "sha256": "616762041e883aa76958898409d8d946e59912bb104d930ee9f5968d035fa200"
+    },
+    {
+      "path": "compose-opaque/diagnostic_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 167120,
+      "sha256": "2d61b7ae47b379d4bc31e4e244f28c328ed0edebe36a466831554152a1a46f20"
+    },
+    {
+      "path": "compose-opaque/diagnostic_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 199869,
+      "sha256": "bc11f7f1daabf5d7cc1f549dbd163a55f25cf8b29c96ca75a679d0eb07284856"
+    },
+    {
+      "path": "compose-opaque/diagnostic_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 596768,
+      "sha256": "817f7e879e94c4d35db1504d271237ba84461f3237c18e83a86959f76e738cb0"
+    },
+    {
+      "path": "compose-opaque/diagnostic_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1609798,
+      "sha256": "55b5327644ed7511703fc4ee89e88dd9ecd273288ff71f1bfffa11a2a1d30e3e"
+    },
+    {
+      "path": "compose-opaque/diagnostic_high_opaque_fast/raygen-stats.json",
+      "bytes": 3157,
+      "sha256": "475b5aea74e7481d9d57290e91604ac649cee83cc163aed60896fcb5913260c9"
+    },
+    {
+      "path": "compose-opaque.log",
+      "bytes": 361,
+      "sha256": "e613645823486d9f79f88b969b51ed0b62dac43f6d5857ee4a49f0720d66ea7a"
+    },
+    {
+      "path": "final-opaque-probe/diagnostic_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 167481,
+      "sha256": "fb42452d9a199ccf29f70b1b5f25035932e5a862e7b683d337b201180599d963"
+    },
+    {
+      "path": "final-opaque-probe/diagnostic_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 200762,
+      "sha256": "ca2c226e8a19d41ff48ccc0ce8d3a0ebad967dd5ad9b0b84d0bf5ce8f2a93c1c"
+    },
+    {
+      "path": "final-opaque-probe/diagnostic_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 594984,
+      "sha256": "47756706ff94178d01ff61b53ce09f1522e66b10e663ee843020584fb8a72696"
+    },
+    {
+      "path": "final-opaque-probe/diagnostic_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1604655,
+      "sha256": "235ec00b0e1c41cbc3294ed2b6badf60a645a3347c34151817398c868671fdb0"
+    },
+    {
+      "path": "final-opaque-probe/diagnostic_high_opaque_fast/raygen-stats.json",
+      "bytes": 3157,
+      "sha256": "29fedbe6a8164ec11e2f6da2bfe3b246e1e8559e7d9573b137e39cf3ef365608"
+    },
+    {
+      "path": "final-opaque-probe.log",
+      "bytes": 365,
+      "sha256": "152e9889153922f7e5b4ed2dee81a36ae1be7ce2e6875c65b4747e7607c202b3"
+    },
+    {
+      "path": "full-metrics.json",
+      "bytes": 129785,
+      "sha256": "0165c10dfa7f8db61bc2474d633daadeb25c4f4325e58cc05c661426f8b18bf3"
+    },
+    {
+      "path": "matrix-after/diagnostic_high_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 183897,
+      "sha256": "4f2f2c5ac46ef4846e6b7c7f220e8576c8adc292b4e7d4e739bf3008e9d927f4"
+    },
+    {
+      "path": "matrix-after/diagnostic_high_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 200762,
+      "sha256": "ac92240629c3bae9ae2b1bdc0c5832fa3b5978df0ad822717b551bea2dea6d6a"
+    },
+    {
+      "path": "matrix-after/diagnostic_high_generic_dielectric/minimal.rgen.spv",
+      "bytes": 295252,
+      "sha256": "4ed8eae092a195ab59128c0ca36ca32c84005a20f63c931b402a1e256efd181d"
+    },
+    {
+      "path": "matrix-after/diagnostic_high_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 873532,
+      "sha256": "3148b5afb4fc2d333d11c22262d6a6e904304059aa86e9601032af0912dede8a"
+    },
+    {
+      "path": "matrix-after/diagnostic_high_generic_dielectric/raygen-stats.json",
+      "bytes": 3173,
+      "sha256": "66646672f6451d0d2dbbe14e89c620104fb93db3a91b8c4b3c353379ae87b47a"
+    },
+    {
+      "path": "matrix-after/diagnostic_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 167481,
+      "sha256": "fb42452d9a199ccf29f70b1b5f25035932e5a862e7b683d337b201180599d963"
+    },
+    {
+      "path": "matrix-after/diagnostic_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 200762,
+      "sha256": "ca2c226e8a19d41ff48ccc0ce8d3a0ebad967dd5ad9b0b84d0bf5ce8f2a93c1c"
+    },
+    {
+      "path": "matrix-after/diagnostic_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 594984,
+      "sha256": "47756706ff94178d01ff61b53ce09f1522e66b10e663ee843020584fb8a72696"
+    },
+    {
+      "path": "matrix-after/diagnostic_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1604655,
+      "sha256": "235ec00b0e1c41cbc3294ed2b6badf60a645a3347c34151817398c868671fdb0"
+    },
+    {
+      "path": "matrix-after/diagnostic_high_opaque_fast/raygen-stats.json",
+      "bytes": 3157,
+      "sha256": "29fedbe6a8164ec11e2f6da2bfe3b246e1e8559e7d9573b137e39cf3ef365608"
+    },
+    {
+      "path": "matrix-after/diagnostic_mobile_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 183174,
+      "sha256": "36eb2449a1c2efb5c9797b4698650f0b0591b4a6bf32b64a28510a6479f720c3"
+    },
+    {
+      "path": "matrix-after/diagnostic_mobile_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 200762,
+      "sha256": "a8805a65e3910a6f9b432bdd5f27c58ab2d4205e5fafc6a704fca78721cc1b59"
+    },
+    {
+      "path": "matrix-after/diagnostic_mobile_generic_dielectric/minimal.rgen.spv",
+      "bytes": 293752,
+      "sha256": "cb3d320c8a68a84e9bfae594ba3b5e85b3bec0347d32d90630f3b531a7e43bdc"
+    },
+    {
+      "path": "matrix-after/diagnostic_mobile_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 868829,
+      "sha256": "e9d5209f2bd0b36d90a2632a629e8fee1747ef41bf02827a21ef319cfb71cbba"
+    },
+    {
+      "path": "matrix-after/diagnostic_mobile_generic_dielectric/raygen-stats.json",
+      "bytes": 3177,
+      "sha256": "ee70f08ac6be997b74bd0c7702fa30a95cd4dc54ef8e5fbbf99b949da64976ef"
+    },
+    {
+      "path": "matrix-after/diagnostic_mobile_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 166758,
+      "sha256": "e9b334922a48de6913bdb41fb8f993b2ae8491359240abf4799996ea7b088dd2"
+    },
+    {
+      "path": "matrix-after/diagnostic_mobile_opaque_fast/minimal.rgen.resolved",
+      "bytes": 200762,
+      "sha256": "8256f03641d1d5d59b87d48e56e6f416e75a634d911ef6cc031b793052566990"
+    },
+    {
+      "path": "matrix-after/diagnostic_mobile_opaque_fast/minimal.rgen.spv",
+      "bytes": 591884,
+      "sha256": "cfe3bdc27ac019d6a8898ded48b8a1f6cb86d73d44386ecec725bf6eb339ebd2"
+    },
+    {
+      "path": "matrix-after/diagnostic_mobile_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1595376,
+      "sha256": "cf5ae63c1689bf8361572d9fe025e78fe4cbcb7cd8b4aed8b54f625d1483f0e1"
+    },
+    {
+      "path": "matrix-after/diagnostic_mobile_opaque_fast/raygen-stats.json",
+      "bytes": 3161,
+      "sha256": "9f5d376d3c69f045dfc482151ae52dcb7ba8282e82efc26e2183bd35aea9ff76"
+    },
+    {
+      "path": "matrix-after/shipping_high_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 174770,
+      "sha256": "d94623571a389846e0193530b36aaf526ded4d3ed3352835be4f24ab8d0e78e2"
+    },
+    {
+      "path": "matrix-after/shipping_high_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 200762,
+      "sha256": "a213d671687535150008b905a25460fd76ba7a58fa9b3e96afab49a0a0819055"
+    },
+    {
+      "path": "matrix-after/shipping_high_generic_dielectric/minimal.rgen.spv",
+      "bytes": 286424,
+      "sha256": "c1782a1fbec9ca0bef389686e2d5f8e6ce760bbefff04194149b891579050d44"
+    },
+    {
+      "path": "matrix-after/shipping_high_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 848485,
+      "sha256": "d3f0d3d4a1bbe272c9ff08bb2abdd882850fc250933f166a9d708acee918a524"
+    },
+    {
+      "path": "matrix-after/shipping_high_generic_dielectric/raygen-stats.json",
+      "bytes": 3169,
+      "sha256": "ae341f4448602522d973c8d096a4edecdcbefc0dfb32912632e98b6be557db44"
+    },
+    {
+      "path": "matrix-after/shipping_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 159137,
+      "sha256": "d34900c77d7c32dcce63bf259ee35a88d64050686c8b24ae6daf9cba99ed36ff"
+    },
+    {
+      "path": "matrix-after/shipping_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 200762,
+      "sha256": "fb8bf9ba8d3ca7b0f15de7b233996f6425f1581a33167b4121fd5e3bab09eaf8"
+    },
+    {
+      "path": "matrix-after/shipping_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 590748,
+      "sha256": "d1ad0e328bc3490ba9ecd16dd1f809b343541322361570ef908c4c2e1d22297f"
+    },
+    {
+      "path": "matrix-after/shipping_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1593000,
+      "sha256": "0f3af0c4e9c3ebaeaf2082ef638f95036de4392a1c7075068abd3a96b683a0a7"
+    },
+    {
+      "path": "matrix-after/shipping_high_opaque_fast/raygen-stats.json",
+      "bytes": 3154,
+      "sha256": "8bd3bfd873097d8b1e7b7fd9669e3e009f14de46443903cbfac8240905c4d5b2"
+    },
+    {
+      "path": "matrix-after/shipping_mobile_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 174047,
+      "sha256": "642b31e7d637e0a0a0ada8062481e26ec1e0caaace180638ccc50dd69c656edb"
+    },
+    {
+      "path": "matrix-after/shipping_mobile_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 200762,
+      "sha256": "6e8e43cd10d2020e5f219ed8cbee6c7ae0bc6d685839403623fd63e9592c03df"
+    },
+    {
+      "path": "matrix-after/shipping_mobile_generic_dielectric/minimal.rgen.spv",
+      "bytes": 284924,
+      "sha256": "73a41172171d448839d00d3a71c78b5bc648f9492b6d15e0debb3d3293762b5b"
+    },
+    {
+      "path": "matrix-after/shipping_mobile_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 843778,
+      "sha256": "bb902962536b74f11417175262a285143a84db1ede63aadeb5dc6e0fbb68e084"
+    },
+    {
+      "path": "matrix-after/shipping_mobile_generic_dielectric/raygen-stats.json",
+      "bytes": 3173,
+      "sha256": "b312aa86a41da8dd0b88fd8e6f2dfcab53a2079f74d406798c81c9c5d90fdad6"
+    },
+    {
+      "path": "matrix-after/shipping_mobile_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 158414,
+      "sha256": "2fd8cbec3d6a0e289ea3247bd5fbb6659da103d41839927b1f370b0239340165"
+    },
+    {
+      "path": "matrix-after/shipping_mobile_opaque_fast/minimal.rgen.resolved",
+      "bytes": 200762,
+      "sha256": "c6202701086a462f507ae6621a0b1017a054163ed457aeaebf51a0ae3f9c388b"
+    },
+    {
+      "path": "matrix-after/shipping_mobile_opaque_fast/minimal.rgen.spv",
+      "bytes": 587648,
+      "sha256": "bb0d4f9e8183343a7b2865a4e93dae28c96d1b2c5a09e65442d559644ff80b05"
+    },
+    {
+      "path": "matrix-after/shipping_mobile_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1583716,
+      "sha256": "f426f198ccc6a0d79bbf094ffbee8c06dc48cf4bba855502102b72aa7f449415"
+    },
+    {
+      "path": "matrix-after/shipping_mobile_opaque_fast/raygen-stats.json",
+      "bytes": 3158,
+      "sha256": "8177bc2f704baf7b17af4e1e99425185e44df3dbbedab5caaf50efea3e19f4b1"
+    },
+    {
+      "path": "matrix-after.log",
+      "bytes": 2936,
+      "sha256": "aef9eda82a0340fa389ff0b1878362e74bcfff5788871985f490ced35eea9f34"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_high_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 183604,
+      "sha256": "0c3433a05049bfae90c8ee29c40cdc0007bf517e4c98e4ad24de92dc60aae969"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_high_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 199500,
+      "sha256": "81c5a29b43ccf389703d02fadf017c6facaad524ee38a272cddb9e6cd8343068"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_high_generic_dielectric/minimal.rgen.spv",
+      "bytes": 295404,
+      "sha256": "8020ea6675a98a11ae3cbb2658c2582f8ac2d2a3f1412f148ae3010397debf91"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_high_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 873851,
+      "sha256": "07eb7649e80d700df15706a9ddea0e93f7ef08c39b297b9003415544bfb5eb0d"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_high_generic_dielectric/raygen-stats.json",
+      "bytes": 3173,
+      "sha256": "f102eccd8e2343ad38dd53faa5697de61f5a187971d36c09b420212dbfe99155"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 167102,
+      "sha256": "d88631d7db187c9d600a8b95202f7e20e66428041e6a0bb34e4f40fdccfba692"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 199500,
+      "sha256": "2c1ac355b44a159054f0d7cb8a0b270f4b3cd66fad5125f369143f1ee016beb4"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 594952,
+      "sha256": "84f1b7dad88d0b6404bacaa1dcaba869c480a153ddb09a7f77c7a92454344130"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1604609,
+      "sha256": "a80f56f0cd9d11bee671de8ccdfb6a8ab7a30439d4d32ea5c21fd05377011131"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_high_opaque_fast/raygen-stats.json",
+      "bytes": 3157,
+      "sha256": "0deab29afa8db6f3a4165e6b0ca59a56304254af647aac1d2f3b6a5feec38352"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_mobile_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 182881,
+      "sha256": "99b38caa16e4dbbb901f319373115faeee041f7c2ee206fd905d4d2031ef74a6"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_mobile_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 199500,
+      "sha256": "2b5be9b773d658514c9151b8faab2a30c4951dad7d14e8942b9436e060475db3"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_mobile_generic_dielectric/minimal.rgen.spv",
+      "bytes": 293904,
+      "sha256": "203efce3be6e3dfbed8b5d3bc8056c3feef7d18dade2120205e008dadca55309"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_mobile_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 869150,
+      "sha256": "82b0a79e013d68505611195cf18be8d922c2f5bc17d4e95f5ee816104961d627"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_mobile_generic_dielectric/raygen-stats.json",
+      "bytes": 3177,
+      "sha256": "d8028a6a394cc90c13ee35a8a9d7de40353274f720f707ef38d6e148fda3c44b"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_mobile_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 166379,
+      "sha256": "71aa72d926af99ff29e4289fb401f345c2fb4f5f3ceb8472836d693419f200c4"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_mobile_opaque_fast/minimal.rgen.resolved",
+      "bytes": 199500,
+      "sha256": "68903a90fedeccc96ae8327605ba0d9ae51c8032467ef4b3265225095f98a934"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_mobile_opaque_fast/minimal.rgen.spv",
+      "bytes": 591852,
+      "sha256": "5bc1d5ffa38e8963245be312993d35fb919f18a93abeda07e61c74da7d32ffa1"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_mobile_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1595331,
+      "sha256": "63dd36ce872288e3ccff69d2e4116d9544909f2e2d987422b2d585d2666146ca"
+    },
+    {
+      "path": "matrix-baseline/diagnostic_mobile_opaque_fast/raygen-stats.json",
+      "bytes": 3161,
+      "sha256": "cb314acdb5deab8f8affa7e2c8bb860f5c3941dc42a2d80e23d84ad1bc848050"
+    },
+    {
+      "path": "matrix-baseline/shipping_high_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 174477,
+      "sha256": "2a7fac3a670e81c12fcf15460a0a02f1330a16211ffdb6645ca2c736efc8462b"
+    },
+    {
+      "path": "matrix-baseline/shipping_high_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 199500,
+      "sha256": "5a9dfd5495549d775700a959079e24cc7a751458b7f3e8d09245260ac925da73"
+    },
+    {
+      "path": "matrix-baseline/shipping_high_generic_dielectric/minimal.rgen.spv",
+      "bytes": 286576,
+      "sha256": "8a3d99bd887517d7368ad8e137f9227732d538f9af0abb76d90f39587ec19dfd"
+    },
+    {
+      "path": "matrix-baseline/shipping_high_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 848805,
+      "sha256": "c382f4130d8134cff92748d6e8c7110770d6b707c87f2ecf4375b47c2a6f373e"
+    },
+    {
+      "path": "matrix-baseline/shipping_high_generic_dielectric/raygen-stats.json",
+      "bytes": 3169,
+      "sha256": "ae583472dc9f079f0bc9af5540d063c58ec106f3131b354a4c039dd9238a6e8d"
+    },
+    {
+      "path": "matrix-baseline/shipping_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 158758,
+      "sha256": "a782326f28b8dce5987c8c78aad0b64f96f67a16d462bc9ffa961e16171bd051"
+    },
+    {
+      "path": "matrix-baseline/shipping_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 199500,
+      "sha256": "5427df0b73f98580cefd71f894fe6fa9ae4159b2cab3a9f8004d609fba64f922"
+    },
+    {
+      "path": "matrix-baseline/shipping_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 590716,
+      "sha256": "a9d054caefebf8adc46953682683250edf589555432c60e9780f4702de78e91e"
+    },
+    {
+      "path": "matrix-baseline/shipping_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1592940,
+      "sha256": "5069363ec7786817fbe4ad8632e4d87a1af74955daab46a308cb794247b8c464"
+    },
+    {
+      "path": "matrix-baseline/shipping_high_opaque_fast/raygen-stats.json",
+      "bytes": 3154,
+      "sha256": "61f9ef518847cb7a7fc4e4f396268f4340ab5fc3302c0ac8edfa149c6b1624ee"
+    },
+    {
+      "path": "matrix-baseline/shipping_mobile_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 173754,
+      "sha256": "828993e2a29c577b90e4d4272b1467bdaf5c18601d7c16a10cb49265544e5484"
+    },
+    {
+      "path": "matrix-baseline/shipping_mobile_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 199500,
+      "sha256": "d213e591eadd002e1046cd61f7cb90bb108c85767e657afa95b18dabda06d76c"
+    },
+    {
+      "path": "matrix-baseline/shipping_mobile_generic_dielectric/minimal.rgen.spv",
+      "bytes": 285076,
+      "sha256": "5be979f72528b9cc0c19586a82381df56a78914673d43d70ba0b0e3fe7fdf33b"
+    },
+    {
+      "path": "matrix-baseline/shipping_mobile_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 844097,
+      "sha256": "5e39a5babc8b806d961ed581445811c3b8a180348d299dcbac56a4ebbcaee4f4"
+    },
+    {
+      "path": "matrix-baseline/shipping_mobile_generic_dielectric/raygen-stats.json",
+      "bytes": 3173,
+      "sha256": "fa54a3085098699561070e87c20c46c6fd6b6bdf28b0ae99e809c5d7080ce01e"
+    },
+    {
+      "path": "matrix-baseline/shipping_mobile_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 158035,
+      "sha256": "24dd4f6f2efdd9e375ef877e259bb0f7d8296194d50355d562987cdcb478a7b1"
+    },
+    {
+      "path": "matrix-baseline/shipping_mobile_opaque_fast/minimal.rgen.resolved",
+      "bytes": 199500,
+      "sha256": "dddfe322a8ac08dd29b95d994b23f86dd3bc1c43ce2261fabd3266d01144788c"
+    },
+    {
+      "path": "matrix-baseline/shipping_mobile_opaque_fast/minimal.rgen.spv",
+      "bytes": 587616,
+      "sha256": "1eb94976017d0d959b80da8b86ce8744836dc2f0e8f0c97b1cae2ddbca0a157b"
+    },
+    {
+      "path": "matrix-baseline/shipping_mobile_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1583668,
+      "sha256": "d0b730925d1ea1355f512a280a120cf7d4a5ef877515fc5ee57997f003dc2b4c"
+    },
+    {
+      "path": "matrix-baseline/shipping_mobile_opaque_fast/raygen-stats.json",
+      "bytes": 3158,
+      "sha256": "7e3d8f34138e452b9234a1d129fe06c42a9f61c8c35d597daf5eac512521a603"
+    },
+    {
+      "path": "matrix-baseline.log",
+      "bytes": 2960,
+      "sha256": "a258dd115e30773f90ff9bdeea4a4f2019f0c169bf17028f03135d327dbda93b"
+    },
+    {
+      "path": "matrix-before/diagnostic_high_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 183747,
+      "sha256": "c44e8de9deed13f8d06cc4d84e50240278e8e77a1b1667be46d139384364ff34"
+    },
+    {
+      "path": "matrix-before/diagnostic_high_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 199842,
+      "sha256": "25e6b854327736ae4511780caf8c0047137a399ff10d34733ea5c072e6e1c526"
+    },
+    {
+      "path": "matrix-before/diagnostic_high_generic_dielectric/minimal.rgen.spv",
+      "bytes": 295960,
+      "sha256": "223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795"
+    },
+    {
+      "path": "matrix-before/diagnostic_high_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 875531,
+      "sha256": "43d31ef48e5f23c81d020af2d64e69f59691a84d7b3a1d25f4a90d2ccc189450"
+    },
+    {
+      "path": "matrix-before/diagnostic_high_generic_dielectric/raygen-stats.json",
+      "bytes": 3173,
+      "sha256": "171c59ede35fe48a6baa088098162ac075c058fd2aa0ab477960aa4838f6275d"
+    },
+    {
+      "path": "matrix-before/diagnostic_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 167245,
+      "sha256": "5ab9501f26993e50df99b6b16a53ded8dda648f639604380fbd938e55aedea44"
+    },
+    {
+      "path": "matrix-before/diagnostic_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 199842,
+      "sha256": "5d01232d3ab300f7f5b27b2ffe801e0098af02df8b5829539fab354a0a1e05d7"
+    },
+    {
+      "path": "matrix-before/diagnostic_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 595520,
+      "sha256": "2417de5cadd3e753a081ae8f2e26bdc7cfe30d8c02758e8247bda0fa927a5fdd"
+    },
+    {
+      "path": "matrix-before/diagnostic_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1606263,
+      "sha256": "7a95005133aae9b20cba7a8c4af9e22a44490f8aacb27c63ec8b6c985d501fac"
+    },
+    {
+      "path": "matrix-before/diagnostic_high_opaque_fast/raygen-stats.json",
+      "bytes": 3157,
+      "sha256": "04b183b57b45ebef50bb38e8658138b3a0b1955dd67d46b3bc331b738ba67306"
+    },
+    {
+      "path": "matrix-before/diagnostic_mobile_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 183024,
+      "sha256": "9f3aba0718a2a5988bc7b4f45b06aaa8a153132f69bd8faa6ef8b0bdba26fd2d"
+    },
+    {
+      "path": "matrix-before/diagnostic_mobile_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 199842,
+      "sha256": "fd69791d8bf1cac556a70a081a0838afc6ecbb30de2ab8b22c58a4d481a3537d"
+    },
+    {
+      "path": "matrix-before/diagnostic_mobile_generic_dielectric/minimal.rgen.spv",
+      "bytes": 294460,
+      "sha256": "70afd1988fe149b35857616520df843a670f3f59c921957d4fdc0a17c657cf42"
+    },
+    {
+      "path": "matrix-before/diagnostic_mobile_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 870831,
+      "sha256": "3eb8b2bdc3e8ce0ff9c6fd83b6560cc5de1502ad4082cbcca8d4657db02225cf"
+    },
+    {
+      "path": "matrix-before/diagnostic_mobile_generic_dielectric/raygen-stats.json",
+      "bytes": 3177,
+      "sha256": "d83bdf94366ad465c5fe7ade7417ae944ce0da50aa5c8b9bb1bc17c6878d4533"
+    },
+    {
+      "path": "matrix-before/diagnostic_mobile_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 166522,
+      "sha256": "5d7faa80fe0f4c95a62a907583c075a61af2b9588d6ef09a35a72f4f16975df2"
+    },
+    {
+      "path": "matrix-before/diagnostic_mobile_opaque_fast/minimal.rgen.resolved",
+      "bytes": 199842,
+      "sha256": "87f794778829ea09e3a9f8cda175c05659421b629a59e4f856570e58daac7d33"
+    },
+    {
+      "path": "matrix-before/diagnostic_mobile_opaque_fast/minimal.rgen.spv",
+      "bytes": 592420,
+      "sha256": "d50c9d0e5bb65f5dd8ccf6f63ea81ca0952cc24f4883c8be21c02b4805ad5af3"
+    },
+    {
+      "path": "matrix-before/diagnostic_mobile_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1597098,
+      "sha256": "99cd7eed109c8b0f78d87829f27416adba9ca881d5dae16d7cc49fe7c8c6a6c8"
+    },
+    {
+      "path": "matrix-before/diagnostic_mobile_opaque_fast/raygen-stats.json",
+      "bytes": 3161,
+      "sha256": "7728e8e13c2d87f7adc502ed9915879c246cb9c9750dc4598a184ed4b7931ddf"
+    },
+    {
+      "path": "matrix-before/shipping_high_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 174620,
+      "sha256": "76a0c3c059254c51e837d1fc1d6cd6f50108eb18de49806c787ccc1894f7a851"
+    },
+    {
+      "path": "matrix-before/shipping_high_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 199842,
+      "sha256": "94d26d03bf720ca8d2d557e95a61a6215df971ed43fa0e257d0ea282835a4d38"
+    },
+    {
+      "path": "matrix-before/shipping_high_generic_dielectric/minimal.rgen.spv",
+      "bytes": 287132,
+      "sha256": "dcf4ae58c422c9c512a2f8d0fccffcbb03414058eb59367f3272aab145c2d809"
+    },
+    {
+      "path": "matrix-before/shipping_high_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 850485,
+      "sha256": "8ce22316f41d814728350c0cdd2922b15ac0f1260081a8f9950243ad44f87f2b"
+    },
+    {
+      "path": "matrix-before/shipping_high_generic_dielectric/raygen-stats.json",
+      "bytes": 3169,
+      "sha256": "64eb3fbeedfedf24b21f2aa2f894c3bbaf5b945bffb901a52f0f11f7c126d826"
+    },
+    {
+      "path": "matrix-before/shipping_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 158901,
+      "sha256": "d228396d24510efc7395b37f53963ad63852c2e3cfb3c3bcd5f52aa52aa4935d"
+    },
+    {
+      "path": "matrix-before/shipping_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 199842,
+      "sha256": "fc6bf0380eba1b87131baccf15744073acc27f8140bb9b705246f961da9cbf3e"
+    },
+    {
+      "path": "matrix-before/shipping_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 591284,
+      "sha256": "53c750339d09c6d86a962c0b6ee0a8b7d2fd3d2ecf964beeb8230e1a306f6c7f"
+    },
+    {
+      "path": "matrix-before/shipping_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1594707,
+      "sha256": "f9c4eb986160faaed239215016aa238d357d0a21c0cc492d08405146de14c527"
+    },
+    {
+      "path": "matrix-before/shipping_high_opaque_fast/raygen-stats.json",
+      "bytes": 3154,
+      "sha256": "7f1b728d1d6c65477ee4281199545a74984ce2db924678d78b67096fbc040a36"
+    },
+    {
+      "path": "matrix-before/shipping_mobile_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 173897,
+      "sha256": "5e2e092ae3a0ab4ecb7a9cd2eda377fcdb21d7e5884af4662f3c33b684fcce2e"
+    },
+    {
+      "path": "matrix-before/shipping_mobile_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 199842,
+      "sha256": "160039faec83afa73728691cea4bae22f379cbebe2f0e80ac4c160b03929c05a"
+    },
+    {
+      "path": "matrix-before/shipping_mobile_generic_dielectric/minimal.rgen.spv",
+      "bytes": 285632,
+      "sha256": "009e1b37a9b3459ca3c1d900a0741c6bc6041288f759d2367e07fd7542889c9a"
+    },
+    {
+      "path": "matrix-before/shipping_mobile_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 845779,
+      "sha256": "e042d4cf2e3f70e62da60e577ef92e7112038fd8ad32874697659603cb0c6f0e"
+    },
+    {
+      "path": "matrix-before/shipping_mobile_generic_dielectric/raygen-stats.json",
+      "bytes": 3173,
+      "sha256": "fe83ed4099b156e8deac8b2e775841841267c8a8e42352a327c8451f20166a94"
+    },
+    {
+      "path": "matrix-before/shipping_mobile_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 158178,
+      "sha256": "dd662c67edabc87c10b861ba3e47274ee873e0a0636b61102202b9ed70e8c31d"
+    },
+    {
+      "path": "matrix-before/shipping_mobile_opaque_fast/minimal.rgen.resolved",
+      "bytes": 199842,
+      "sha256": "d0d4d1ccdbe1d394d4a7376312ef075ba9c116cd4c93546fd1f8efbb335e46f8"
+    },
+    {
+      "path": "matrix-before/shipping_mobile_opaque_fast/minimal.rgen.spv",
+      "bytes": 588184,
+      "sha256": "ae779d534970ecb0c2e21289c07ddde58f239ea1906e36d7046323f4b7f249d9"
+    },
+    {
+      "path": "matrix-before/shipping_mobile_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1585310,
+      "sha256": "4d06a7498b836b203fda688217c7972d5e27c2bcb373b3758205fe0e93d115b4"
+    },
+    {
+      "path": "matrix-before/shipping_mobile_opaque_fast/raygen-stats.json",
+      "bytes": 3158,
+      "sha256": "7f66e2ddf42b526a2dfb8ac4654652443f5267b57599c88a0632835f5afbee6c"
+    },
+    {
+      "path": "matrix-before.log",
+      "bytes": 2944,
+      "sha256": "000ccffdc480780c35eddc718561bfde97253d14aac175061d20625d3e67b0e3"
+    },
+    {
+      "path": "metrics.py",
+      "bytes": 1149,
+      "sha256": "4e912d621c3fcac92a6024cf3ecdfde0f08cce7bbeed544e6df55cafe9e47ea3"
+    },
+    {
+      "path": "package_evidence.py",
+      "bytes": 19947,
+      "sha256": "99fd116e0e1472cb20697f52e72aae599448c589f0e7c1f93fd509f212967ac7"
+    },
+    {
+      "path": "restoration-identities.json",
+      "bytes": 2619,
+      "sha256": "8bb13d6ada958cb7a9e786e5e184890661461a0e9afda4f09d1ad7935845a6e1"
+    },
+    {
+      "path": "restore.py",
+      "bytes": 1587,
+      "sha256": "b45730b41b9579f9d95124ac5aa491caf7baa523554d31e82870c4f5f9114c0b"
+    },
+    {
+      "path": "reuse-generic/diagnostic_high_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 183940,
+      "sha256": "1309bebe02563d5f6162b19d825ae870faaf36020db6bf6ea5a248d5e888893b"
+    },
+    {
+      "path": "reuse-generic/diagnostic_high_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 200183,
+      "sha256": "9ffca2f0495dcbe9955ab8b5bcef9d9d2a1fbda2096c9881be1f24c1841ef599"
+    },
+    {
+      "path": "reuse-generic/diagnostic_high_generic_dielectric/minimal.rgen.spv",
+      "bytes": 296136,
+      "sha256": "300794870ed70ce8cc24cdcce506a90ec4821f2ee325e36edddb286666c54a2e"
+    },
+    {
+      "path": "reuse-generic/diagnostic_high_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 876144,
+      "sha256": "8b030718ce31e8c113c91e00e16eedac40265b8b7f3ba33e07790819f8179a85"
+    },
+    {
+      "path": "reuse-generic/diagnostic_high_generic_dielectric/raygen-stats.json",
+      "bytes": 3173,
+      "sha256": "dbc5ea0bd7229560b9ef294b8d5bc79ce196c05143ee5ff3b758bcce49e101a7"
+    },
+    {
+      "path": "reuse-generic.log",
+      "bytes": 376,
+      "sha256": "685bc8c8f6b08a7a703881ca0791dea4431a5a650f4092f0b8d40eb265cb9abb"
+    },
+    {
+      "path": "reuse-opaque/diagnostic_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 167438,
+      "sha256": "9bd29e4eadb4ba3513c1f7f83b2c781d1de988a0acc3e1fc8622ec7bec8d17ff"
+    },
+    {
+      "path": "reuse-opaque/diagnostic_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 200183,
+      "sha256": "c8f8cf3ca515f87f78096ea76e92a7dc0acd957a7e06c5860c42c670737fdf50"
+    },
+    {
+      "path": "reuse-opaque/diagnostic_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 595300,
+      "sha256": "37dc3b73642ecb6c838c08c9c20912b02718a44bc6333f5dea1ddb35bf1c40fc"
+    },
+    {
+      "path": "reuse-opaque/diagnostic_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1605663,
+      "sha256": "34f01ed7765688d413eb668e49dede1525678166b81b6880814518e4c060381a"
+    },
+    {
+      "path": "reuse-opaque/diagnostic_high_opaque_fast/raygen-stats.json",
+      "bytes": 3157,
+      "sha256": "ba5477cc84b98ab7e06458bc96feb5fc1a2d9f5ab643a48080b292c282b5172b"
+    },
+    {
+      "path": "reuse-opaque.log",
+      "bytes": 359,
+      "sha256": "5d4b7a577baa3846425a8e8679e4b3a72bc6b78fdfbfc1400b4e0be1084008f9"
+    },
+    {
+      "path": "run.py",
+      "bytes": 1046,
+      "sha256": "8e78d0d3488a985bf390205d5681d44a4e43473412ff54d3e069889efcb9514e"
+    },
+    {
+      "path": "runs.jsonl",
+      "bytes": 15340,
+      "sha256": "97f2c3176ebda04f0ea44cd9c6e24b51d28693b4f2268d28237a9f2980a1ea2c"
+    },
+    {
+      "path": "scalar-experiment.patch",
+      "bytes": 701,
+      "sha256": "ec5f0d36d5336ea58eac7acb24994930d428fb81237e6970e3ac8f3337d8410d"
+    },
+    {
+      "path": "scalar-generic/diagnostic_high_generic_dielectric/minimal.rgen.preprocessed",
+      "bytes": 183776,
+      "sha256": "b3f6da2be1b5a82fa6af6e8acc60cf6b8f8fde18d775eba6b9e55d4a3a457f72"
+    },
+    {
+      "path": "scalar-generic/diagnostic_high_generic_dielectric/minimal.rgen.resolved",
+      "bytes": 199870,
+      "sha256": "4f4b79b9115757d3a4002abd6ae8cdd338016d5cdb16cf5d4c08eee4ef587faa"
+    },
+    {
+      "path": "scalar-generic/diagnostic_high_generic_dielectric/minimal.rgen.spv",
+      "bytes": 296092,
+      "sha256": "15c0bf6f1d97f59b5076cd56671f1b6bf3c2be21575de9357a191bacd84f58ac"
+    },
+    {
+      "path": "scalar-generic/diagnostic_high_generic_dielectric/minimal.rgen.spvasm",
+      "bytes": 875883,
+      "sha256": "acdfee22dc56da0b91ca219d0439340049653c67bb43171fae879f481024389d"
+    },
+    {
+      "path": "scalar-generic/diagnostic_high_generic_dielectric/raygen-stats.json",
+      "bytes": 3173,
+      "sha256": "f83043faaa926b6859be21d37639c9cb2bba8319255beb26420c1e1c8e8df292"
+    },
+    {
+      "path": "scalar-generic.log",
+      "bytes": 377,
+      "sha256": "eb7a7cff6a63d1a82dbee847417419e46d0279f34ac4c14ee734e01661b5038d"
+    },
+    {
+      "path": "scalar-opaque/diagnostic_high_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 167274,
+      "sha256": "eaa928b1f2f85604fc922a36d783d69423211b244ebccd615abcf62fbf57ebc5"
+    },
+    {
+      "path": "scalar-opaque/diagnostic_high_opaque_fast/minimal.rgen.resolved",
+      "bytes": 199870,
+      "sha256": "4a0dc03a3619f90ccbb9646e1c25bdaf7a9940d3a27255f7fa5a2cc873b97772"
+    },
+    {
+      "path": "scalar-opaque/diagnostic_high_opaque_fast/minimal.rgen.spv",
+      "bytes": 596120,
+      "sha256": "d66ed470b3778752a220356c90ef540025ab06c5c1a62059f1c3f48bcd0cca99"
+    },
+    {
+      "path": "scalar-opaque/diagnostic_high_opaque_fast/minimal.rgen.spvasm",
+      "bytes": 1607722,
+      "sha256": "e9f5e4054a50fa59d6e87922c90d80f6ce1074ab65c6b29078b007a66044dca1"
+    },
+    {
+      "path": "scalar-opaque/diagnostic_high_opaque_fast/raygen-stats.json",
+      "bytes": 3157,
+      "sha256": "785f9dc013b641d72ea2f0739bc2a11dddfa4f87015a1e6bf39c301866ecec10"
+    },
+    {
+      "path": "scalar-opaque.log",
+      "bytes": 360,
+      "sha256": "55788ecfb7619da8e0d72018729f5bb2a1448567a8eee6f31b478cc3af5080fc"
+    },
+    {
+      "path": "unaccepted-prototype.patch",
+      "bytes": 10746,
+      "sha256": "b1856faf2c9ae87f462ae3368c94545932e0130f8f8dcc3fa3cb28ed2e3a102e"
+    },
+    {
+      "path": "unaccepted-source/shaders/raytracing/include/rt_atmosphere.glsl",
+      "bytes": 14733,
+      "sha256": "aee9dce7ef7a036a9d4688c54eaf72194028b12a68d185ee3193afd7ef79d6f0"
+    },
+    {
+      "path": "unaccepted-source/shaders/raytracing/include/rt_frame.glsl",
+      "bytes": 5763,
+      "sha256": "a078d44a9d2c423983ca093af01b3937f9df1d34d5801fac7c061d8c8a8023c9"
+    },
+    {
+      "path": "unaccepted-source/shaders/raytracing/include/rt_hit_decode.glsl",
+      "bytes": 32796,
+      "sha256": "24a6d8820974638ab390eac80c10d07e9fc02b8dcbc51ea53dfaecc871e15b06"
+    },
+    {
+      "path": "unaccepted-source/shaders/raytracing/include/rt_scene_abi.generated.glsl",
+      "bytes": 7288,
+      "sha256": "20127246a9086f36afaa8e48800b8d8e16e011980a59335bec82eb086f079ff5"
+    },
+    {
+      "path": "unaccepted-source/src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "bytes": 422140,
+      "sha256": "f0bded030122f2361437ea1296673b1da37d04c17e67952d1907ee7195002e81"
+    },
+    {
+      "path": "unaccepted-source/src/vulkan/raytracing/RtSceneAbi.def",
+      "bytes": 9520,
+      "sha256": "3761a8e2d44d537ca077254ad2efe0386fc3fc24490a3f2b94adcbf65538b602"
+    },
+    {
+      "path": "unaccepted-source/src/vulkan/raytracing/RtSceneAbi.generated.h",
+      "bytes": 15470,
+      "sha256": "603eec5186fb729387399d810002b1f2351167c53f845d5ba6d009687ad97359"
+    },
+    {
+      "path": "unaccepted-source/src/vulkan/raytracing/SimulationFrameAdapter.h",
+      "bytes": 2279,
+      "sha256": "873912d38f8e1e8e07e3e8c347d0b93bed462cb4d1725958e9cd07bb82231ca7"
+    },
+    {
+      "path": "verify_evidence.py",
+      "bytes": 2255,
+      "sha256": "3fe6bbd0bc232b4c4f13d42e45248d0f943e630dc76805d23ab0bab5a58647e1"
+    }
+  ]
+}

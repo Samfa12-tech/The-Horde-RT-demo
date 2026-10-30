@@ -44,11 +44,22 @@ function Assert-MistOffExitContract {
     $body = $function.Groups['body'].Value
     $withoutComments = [regex]::Replace($body, '(?m)^\s*//[^\r\n]*', '')
     $gate = [regex]::Match($withoutComments,
-        '^\s*if\s*\(\s*controls\.enemyKind\s*<\s*0\.5\s*\|\|\s*\(\s*rtQualityControls\.value\.controls\.w\s*&\s*1u\s*\)\s*!=\s*0u\s*\)\s*\{\s*return\s+vec4\(0\.0,\s*0\.0,\s*0\.0,\s*1\.0\);\s*\}')
-    Assert-True $gate.Success 'Mist Off must return neutral before any medium query, clipping or march work.'
+        '^\s*if\s*\(\s*controls\.enemyKind\s*<=\s*0\.75\s*\|\|\s*\(\s*rtQualityControls\.value\.controls\.w\s*&\s*1u\s*\)\s*!=\s*0u\s*\)\s*\{\s*return\s+vec4\(0\.0,\s*0\.0,\s*0\.0,\s*1\.0\);\s*\}')
+    Assert-True $gate.Success 'Mist Off and exactly zero death fade must return neutral before any medium query, clipping or march work; no positive fade may be cut off.'
     Assert-True ($withoutComments.IndexOf('buildMistIncidentSources(') -gt ($gate.Index + $gate.Length) -and
         $withoutComments.IndexOf('integrateLichMistSample(') -gt ($gate.Index + $gate.Length)) `
-        'Mist Off gate must dominate incident-source construction and integration.'
+        'Mist Off/zero-density gate must dominate incident-source construction and integration.'
+}
+
+function Assert-KeeperDischargeGate([string]$Atmosphere) {
+    $body = [regex]::Match($Atmosphere, '(?ms)vec3\s+staffElectricity\s*\([^)]*\)\s*\{(?<body>.*?)^\}').Groups['body'].Value
+    Assert-True ($body -match 'if\s*\(controls\.enemyKind\s*<\s*1\.5\s*\|\|\s*controls\.staffLightStrength\s*<\s*0\.05\)') 'Staff bolts require the simulation-owned discharge discriminator, not charge glow alone.'
+}
+
+function Assert-KeeperMistDeathDensity([string]$Atmosphere) {
+    $body = [regex]::Match($Atmosphere, '(?ms)vec4\s+lichMistSample\s*\([^)]*\)\s*\{(?<body>.*?)^\}').Groups['body'].Value
+    Assert-True ($body -match 'float\s+deathFade\s*=\s*clamp\(\(controls\.enemyKind\s*-\s*0\.75\)\s*\*\s*4\.0,\s*0\.0,\s*1\.0\)') 'Only the explicit Keeper discriminator interval may drive the bounded room-mist death fade.'
+    Assert-True ($body -match 'flowNoise\s*\*\s*dawnFade\s*\*\s*deathFade' -and $body -match 'vec4\(incidentLight\s*\*\s*density\s*\*\s*0\.82,\s*density\)') 'Death fade must affect both room scattering and extinction through the same density.'
 }
 
 function Assert-FrozenCatalogShape {
@@ -71,6 +82,12 @@ function Assert-FrozenCatalogShape {
             "Catalog artifact path escaped the dedicated artifact directory: $($row.key)"
     }
 }
+
+$keeperAtmosphere = Get-Content -LiteralPath (Join-Path $repoRoot 'shaders/raytracing/include/rt_atmosphere.glsl') -Raw
+Assert-KeeperDischargeGate $keeperAtmosphere
+Assert-Throws { Assert-KeeperDischargeGate ($keeperAtmosphere.Replace('controls.enemyKind < 1.5', 'controls.enemyKind < 0.5')) } 'Charge-only lightning gate must be rejected.'
+Assert-KeeperMistDeathDensity $keeperAtmosphere
+Assert-Throws { Assert-KeeperMistDeathDensity ($keeperAtmosphere.Replace('* dawnFade * deathFade', '* dawnFade')) } 'An unused death fade must be rejected.'
 
 function New-CatalogFixture {
     param([string]$FixtureRoot, [string]$Name, [string]$ExpectedDiagnostic, [scriptblock]$Mutate)
@@ -517,17 +534,27 @@ try {
     } 'Removing the actual mist flag must fail even when enemy-kind gating remains.'
     Assert-Throws {
         Assert-MistOffExitContract ($atmosphere.Replace(
-            '    if (controls.enemyKind < 0.5 || (rtQualityControls.value.controls.w & 1u) != 0u)',
-            "    buildMistIncidentSources(vec3(0.0), sources);`n    if (controls.enemyKind < 0.5 || (rtQualityControls.value.controls.w & 1u) != 0u)"))
+            '    if (controls.enemyKind <= 0.75 || (rtQualityControls.value.controls.w & 1u) != 0u)',
+            "    buildMistIncidentSources(vec3(0.0), sources);`n    if (controls.enemyKind <= 0.75 || (rtQualityControls.value.controls.w & 1u) != 0u)"))
     } 'Moving medium source queries before the Off exit must fail.'
+    Assert-Throws {
+        Assert-MistOffExitContract ($atmosphere.Replace('controls.enemyKind <= 0.75', 'controls.enemyKind < 0.75'))
+    } 'Leaving the exact-zero boundary active must fail.'
+    Assert-Throws {
+        Assert-MistOffExitContract ($atmosphere.Replace('controls.enemyKind <= 0.75', 'controls.enemyKind <= 0.750001'))
+    } 'An epsilon cutoff that removes positive mist must fail.'
+    Assert-Throws {
+        Assert-MistOffExitContract ($atmosphere.Replace('controls.enemyKind <= 0.75', 'controls.enemyKind < 0.5'))
+    } 'Restoring visibility work for the fully cleared room must fail.'
 
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
-    # These compatibility artifacts carry the shared primary-ray pre-rotation mode; fresh compilation still validates source identity.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'a4f367d427c2ecb2e5bba6596e2ea8e833cd8330aad48ee345d15e01015a499d') `
+    # Include the approved joint30/38/34 ABI bounds; fresh compilation
+    # still validates source identity and the separately frozen budgets.
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'a0b76daab949c1fffa6102185159f8017d1bf075b68f77910140c7fac1e642a6') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq 'c2b18748201de41faaf77be0bc78861896d8c1f6dbcaaa485ba969834ffb7c9e') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq 'efd3b051eae161561e58bf94f45a0f201566a0867c086958863af91b8030cc44') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -568,16 +595,19 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     # 1.6.2 independent primary shadow quality specializes OpaqueFast lighting as
     # well as dielectric lighting. The former equal Mobile/High word pairs are
     # no longer the admitted snapshot; keep exact mist/active-fire4, current ABI
-    # and the reviewed shared presentation pre-rotation raw-word witnesses.
+    # and shared presentation, indexed-PBR Kit and grave-lid witnesses. The
+    # current catalog was independently verified by fresh eight-key compilation.
+    # The approved capacity constants now include the joint props; shader bodies,
+    # ten frozen cost budgets and Current/Higher source policies remain unchanged.
     $opaqueWordPins = @{
-        diagnostic_high_opaque_fast = '84f1b7dad88d0b6404bacaa1dcaba869c480a153ddb09a7f77c7a92454344130'
-        diagnostic_mobile_opaque_fast = '5bc1d5ffa38e8963245be312993d35fb919f18a93abeda07e61c74da7d32ffa1'
-        shipping_high_opaque_fast = 'a9d054caefebf8adc46953682683250edf589555432c60e9780f4702de78e91e'
-        shipping_mobile_opaque_fast = '1eb94976017d0d959b80da8b86ce8744836dc2f0e8f0c97b1cae2ddbca0a157b'
+        diagnostic_high_opaque_fast = 'c1368e40cd4817345f4fc789d80bee78a0773b4ba64c9710043809bcef085fc9'
+        diagnostic_mobile_opaque_fast = '2c88cf86fc57b362fe7e30c317832c68975e8bbe9aeea1faa84876881318d4d6'
+        shipping_high_opaque_fast = 'df4ecc79c51b9887ec6b66d3e27bccb90850bfa13763cb36978f43ea25b551b8'
+        shipping_mobile_opaque_fast = '34083b41ae9238827d547ae0c5a0d72acac096ba23e3bd42f19276b9b950a204'
     }
     foreach ($row in @($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' })) {
         Assert-True ($row.spirvSha256 -ceq $opaqueWordPins[$row.key]) `
-            "Bounded indoor-dust OpaqueFast raw SPIR-V snapshot changed: $($row.key)"
+            "Current/Higher-only OpaqueFast raw SPIR-V snapshot changed: $($row.key)"
     }
     # Equal raw-word hashes are still a valid catalog shape when two explicit
     # variant keys/paths compile identically; freshness is checked separately.
@@ -757,13 +787,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
-        '363b592c49a3853d2e7f863a52f6ed90084ab383469063977be9edb6201559b6') `
+        '99110ba8241d19c598e68d0fef91e4a822712e72be509396237ee291a88ae9b8') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
-        '14a2d50530e9b21c7975495e008be9dc9d1deefc12f399078d4e1f194e4c644f') `
+        '01f84ee720c073bd65862c598c9bf408605758f9885d3a31e02798d1a02a2ca3') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `
         'Temporary artifact compilation modified the worktree.'

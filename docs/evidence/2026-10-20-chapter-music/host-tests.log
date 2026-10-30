@@ -1,0 +1,32 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+      Start  35: horde_rt_campaign_play_session_tests
+ 1/13 Test  #35: horde_rt_campaign_play_session_tests ........   Passed    4.33 sec
+      Start  40: horde_rt_campaign_codec_tests
+ 2/13 Test  #40: horde_rt_campaign_codec_tests ...............   Passed    0.02 sec
+      Start  45: horde_rt_campaign_checkpoint_tests
+ 3/13 Test  #45: horde_rt_campaign_checkpoint_tests ..........   Passed    2.35 sec
+      Start 153: horde_rt_music_director_tests
+ 4/13 Test #153: horde_rt_music_director_tests ...............   Passed    1.06 sec
+      Start 154: horde_rt_chapter_music_tests
+ 5/13 Test #154: horde_rt_chapter_music_tests ................   Passed    1.53 sec
+      Start 159: horde_rt_windows_music_focus_tests
+ 6/13 Test #159: horde_rt_windows_music_focus_tests ..........   Passed    1.06 sec
+      Start 160: horde_rt_music_pcm_stream_tests
+ 7/13 Test #160: horde_rt_music_pcm_stream_tests .............   Passed    3.09 sec
+      Start 161: horde_rt_music_pcm_wave_tests
+ 8/13 Test #161: horde_rt_music_pcm_wave_tests ...............   Passed    1.09 sec
+      Start 162: horde_rt_music_pcm_asset_bank_tests
+ 9/13 Test #162: horde_rt_music_pcm_asset_bank_tests .........   Passed    1.38 sec
+      Start 163: horde_rt_music_playback_session_tests
+10/13 Test #163: horde_rt_music_playback_session_tests .......   Passed    1.88 sec
+      Start 211: horde_rt_rescue_traversal_tests
+11/13 Test #211: horde_rt_rescue_traversal_tests .............   Passed    1.03 sec
+      Start 213: horde_rt_rescue_journey_integration_tests
+12/13 Test #213: horde_rt_rescue_journey_integration_tests ...   Passed    1.53 sec
+      Start 214: horde_rt_chapter_terrain_journey_tests
+13/13 Test #214: horde_rt_chapter_terrain_journey_tests ......   Passed   16.08 sec
+
+100% tests passed, 0 tests failed out of 13
+
+Total Test time (real) =  36.46 sec

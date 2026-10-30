@@ -1,0 +1,32 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 157: horde_rt_scene_resource_inventory_tests
+1/1 Test #157: horde_rt_scene_resource_inventory_tests ...***Failed    3.49 sec
+Resource integration: existing readback/mist/torch contracts
+Actual development static admission materials=30 primitives=31 layers=18,15,15,1
+Actual development static admission materials=30 primitives=32 layers=18,15,15,1
+FAIL: real dressed tomb/forest production registration exceeds its unchanged resource contracts
+Resource integration: descriptor contracts
+Resource integration: TLAS and water geometry
+Resource integration: actual tomb intake
+Integrated native tomb static roster: 31 primitives, 30 materials
+Matched CPU intake only (baseline first; cache/order bias possible): 62.3939 / 276.602 ms; additional static vertices/indices bytes: 27178816 / 4817256; no GPU allocation, AS build or presentation measurement
+Resource integration: water owner lifetime
+Water lifetime: populate
+Water lifetime: move
+Water lifetime: destroy
+Resource integration: resize contracts
+Resource integration: command/resource observations
+Resource integration: command execution fixtures
+Resource integration: not-ready rejection
+Resource integration: preview inventory
+Resource integration: populated inventory
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   3.51 sec
+
+The following tests FAILED:
+	157 - horde_rt_scene_resource_inventory_tests (Failed)
+Errors while running CTest

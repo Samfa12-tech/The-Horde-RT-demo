@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.ChapterDebugCheckpointTest" tests="1" skipped="0" failures="1" errors="0" timestamp="2026-10-22T18:48:58" hostname="SAM_LAPPY" time="0.019">
+  <properties/>
+  <testcase name="allAuthoredChapterCapturesResolveWithTheirNativeCamera" classname="com.samfa12.hordelanternrt.ChapterDebugCheckpointTest" time="0.019">
+    <failure message="java.lang.AssertionError: Capture intent must reach native chapter checkpoint: chapter-pine-near expected:&lt;223&gt; but was:&lt;-1&gt;" type="java.lang.AssertionError">java.lang.AssertionError: Capture intent must reach native chapter checkpoint: chapter-pine-near expected:&lt;223&gt; but was:&lt;-1&gt;
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:647)
+	at com.samfa12.hordelanternrt.ChapterDebugCheckpointTest.allAuthoredChapterCapturesResolveWithTheirNativeCamera(ChapterDebugCheckpointTest.java:29)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.base/java.lang.Thread.run(Unknown Source)
+</failure>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

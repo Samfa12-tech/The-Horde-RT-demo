@@ -1,0 +1,137 @@
+{
+  "status": "REJECT_ADMISSION_PACING_REGRESSION_NORMAL_OFF",
+  "baseCommit": "9b72c139531a2d9d08d3ca597b0b3368705ae50e",
+  "normalEnabled": false,
+  "gameplayOrAnimationPolicyChanged": false,
+  "phoneUsed": false,
+  "caseCount": 2,
+  "matrix": "one fixed-workload natural-walking control/candidate pair; same binary and settings; no scripted escort or speech stops",
+  "observation": "ordinary look at Kit with remapped forward/strafe preserving requested world walk; no authoritative pose or survey rebase",
+  "images": {
+    "reports/horde-campaign-fixtures-route-natural-kit-control-20261024-r2/route-kit-corner-turn.png": {
+      "bytes": 1894978,
+      "sha256": "d9947cf4861b0d4c841b4471407e482313b065dd141aad38281677de458c9701"
+    },
+    "reports/horde-campaign-fixtures-route-natural-kit-control-20261024-r2/route-kit-corner-walk.png": {
+      "bytes": 1884643,
+      "sha256": "edac3c7f6f145d5055e67628fb4214c21537170b9b6b61cfb9cef43827c027dc"
+    },
+    "reports/horde-campaign-fixtures-route-natural-kit-candidate-20261024-r2/route-kit-corner-turn.png": {
+      "bytes": 1888700,
+      "sha256": "c58de7092624bf6766cd6f3730b313dcfe73cc2d382d6328ec47c2f4d1026b11"
+    },
+    "reports/horde-campaign-fixtures-route-natural-kit-candidate-20261024-r2/route-kit-corner-walk.png": {
+      "bytes": 1855318,
+      "sha256": "776b675d893cc296c8e12810a8073ef5c808cef7b9db60b5ddcb571a8e1dd706"
+    }
+  },
+  "rawEvidence": {
+    "reports/horde-campaign-fixtures-route-natural-kit-control-20261024-r2/windows-route-validation.json": {
+      "bytes": 30712,
+      "sha256": "fac73035691b95f31f1311fb201acfd4027732356dea760f33bb8f88fd965119"
+    },
+    "reports/horde-campaign-fixtures-route-natural-kit-control-20261024-r2/route-frames.csv": {
+      "bytes": 173199,
+      "sha256": "0e1a77493fd83fc78eb1bc0fa1700e132c55f0ca8e8c0cfb844a2ad1ba838924"
+    },
+    "reports/windows-route-natural-kit-control-20261024-r2/receipt.json": {
+      "bytes": 3153,
+      "sha256": "2c09cd745065666bbee094180162b81af53333b788ab77e3332f93d700613390"
+    },
+    "reports/windows-route-natural-kit-control-20261024-r2/process.json": {
+      "bytes": 608,
+      "sha256": "6ff56a9682587c5ab99b2f98012838ec487bc807e4ec7b82d175db4e1afcb6ad"
+    },
+    "reports/horde-campaign-fixtures-route-natural-kit-candidate-20261024-r2/windows-route-validation.json": {
+      "bytes": 24067,
+      "sha256": "9c27997d04cf88e6e019d01a15c1e6f0bdac872776cffb90687fc069052e09e0"
+    },
+    "reports/horde-campaign-fixtures-route-natural-kit-candidate-20261024-r2/route-frames.csv": {
+      "bytes": 196211,
+      "sha256": "6449d5ad78327db01b2f3ae4dc5eca6e08f1a4d1e9e27047a2f8b882c6ca6f4a"
+    },
+    "reports/windows-route-natural-kit-candidate-20261024-r2/receipt.json": {
+      "bytes": 2738,
+      "sha256": "6c545b857bacd778af4f282915b01e581a375401fcbe4ff7967f0865735f447b"
+    },
+    "reports/windows-route-natural-kit-candidate-20261024-r2/process.json": {
+      "bytes": 641,
+      "sha256": "8ed63e6bd97e5450aefb2d712e608e5ce9c329a7f256b2113bd0382b836770a5"
+    }
+  },
+  "ownerParkedFilesUnchanged": 151,
+  "offscreenSnap": "not implemented: no reliable production all-ray unseen evidence",
+  "priorHeadCi": {
+    "conclusion": "success",
+    "headSha": "9b72c139531a2d9d08d3ca597b0b3368705ae50e",
+    "jobs": [
+      {
+        "name": "Android Debug build, playback/report contracts and lint",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:16:28Z",
+        "completedAt": "2026-10-24T06:22:19Z"
+      },
+      {
+        "name": "Shared simulation host (Clang)",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:16:27Z",
+        "completedAt": "2026-10-24T06:27:13Z"
+      },
+      {
+        "name": "Selected host contracts (Clang ASan/UBSan)",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:16:27Z",
+        "completedAt": "2026-10-24T06:20:05Z"
+      },
+      {
+        "name": "player-vulkan-host",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:16:27Z",
+        "completedAt": "2026-10-24T06:22:45Z"
+      },
+      {
+        "name": "Shared simulation host (GCC)",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:16:28Z",
+        "completedAt": "2026-10-24T06:23:50Z"
+      },
+      {
+        "name": "Shared simulation host (MSVC)",
+        "conclusion": "success",
+        "startedAt": "2026-10-24T06:16:28Z",
+        "completedAt": "2026-10-24T06:30:06Z"
+      }
+    ],
+    "status": "completed"
+  },
+  "sourceInputs": {
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 649752,
+      "sha256": "d26a145f0cc49e02d6df3d2f61e62849c0bb1d9a22ae08ef97a5b8280867c295"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "bytes": 94599,
+      "sha256": "48b6b4a3042ab216c01f5b4fc7c8bb5b393322ab563a4581c668ef64494cf32e"
+    },
+    "src/platform/windows/windows_route_validation.inl": {
+      "bytes": 30510,
+      "sha256": "3516077ad3cb8ddc5a6563944300126f83b9e829446d1886369e1621995b3273"
+    },
+    "src/gameplay/simulation/GameSimulation.h": {
+      "bytes": 22528,
+      "sha256": "5087537164ae9c4e81f6e7dd439531ea33c2f1de927c2a95a17fb4d7e8697597"
+    },
+    "src/gameplay/dialogue/CompanionTurnPrototype.inl": {
+      "bytes": 7311,
+      "sha256": "e07bf7ffc689281decba19933074932031ddd3a4583e780dda36351460d59687"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+      "bytes": 510127,
+      "sha256": "9c10bb1986a4b892e4f5d785ed76724ff37b662314313b93ab958dc6b2c550c3"
+    },
+    "src/vulkan/raytracing/EnvironmentSurveyFrame.h": {
+      "bytes": 8763,
+      "sha256": "7171e3c34b5d6b87d6e47d166d6e4991ad5753054593893d714755e6bc99e91a"
+    }
+  }
+}

@@ -1,0 +1,1791 @@
+{
+  "schema": 1,
+  "scope": "Unranked staged stationary live lookout203. No natural traversal, listening, long sustained or scanout acceptance.",
+  "device": {
+    "model": "SM-S948B",
+    "android": 17,
+    "api": 37,
+    "gpu": "Adreno 840"
+  },
+  "build": {
+    "sha256": "712f070996124014832b9cf6bf4941e7fbac2d448fabfac926297be8d9d942a2",
+    "bytes": 163664496,
+    "head": "bb507d2461b8feaeae630ea08a9bec62d18b7376",
+    "sourceFreeze": "../source-freeze-r3.json"
+  },
+  "sourceFreeze": {
+    "head": "bb507d2461b8feaeae630ea08a9bec62d18b7376",
+    "files": {
+      "android/app/build.gradle": {
+        "bytes": 43096,
+        "sha256": "5f0f3d8484666279a05fef5e89a71c8b799c36550a5a638d526ab0c20e55951c"
+      },
+      "android/app/src/main/cpp/CMakeLists.txt": {
+        "bytes": 7422,
+        "sha256": "a88c90deb0749a5390c3726c54132b23e52723145311512038f46a6da4505527"
+      },
+      "android/app/src/main/cpp/android_motion_evidence.inl": {
+        "bytes": 55954,
+        "sha256": "9b3b2b3adc2fc6f281d191bc6bba6b0983ec3652a2a3d2bc0eb06d04a98c35a1"
+      },
+      "android/app/src/main/cpp/benchmark_scale_policy.cmake": {
+        "bytes": 2945,
+        "sha256": "c3d19e8f341b5e4eac8d1dc8efb0f9d1ae5d4db74ab3077528c25139c7acb192"
+      },
+      "android/app/src/main/java/com/samfa12/hordelanternrt/PerformanceProfileRequest.java": {
+        "bytes": 4697,
+        "sha256": "82fac3d451eee03b575019c9ce9ca786222a83f3c50f656a86b4977d150f33b2"
+      },
+      "android/app/src/test/java/com/samfa12/hordelanternrt/PerformanceProfileRequestTest.java": {
+        "bytes": 9178,
+        "sha256": "e38f138acadf98bf4df145ddf79635306d1ab5b9f28bc5767b26cee2937968bf"
+      },
+      "src/gameplay/DevelopmentCheckpointSimulation.h": {
+        "bytes": 26091,
+        "sha256": "cf9d2cf84432d5f99932ad2f03041bb5183392fe8a390829222db6a4f148add1"
+      },
+      "src/gameplay/validation/MotionEvidenceScenario.cpp": {
+        "bytes": 50321,
+        "sha256": "153a25f6fa07035b0a8d762788c55e74f9516affa6a4a160437482ddc8c60d54"
+      },
+      "src/gameplay/validation/MotionEvidenceScenario.h": {
+        "bytes": 9215,
+        "sha256": "48d682b45ec97bddfaf38a37ae2b484c39169e0026a9af1d35c4d80fd860b288"
+      },
+      "src/graphics/GraphicsSettings.h": {
+        "bytes": 23621,
+        "sha256": "2a8c85c1239ff9545efe5824644b6b2ad67bbc92a13c0548fc5df092d4b48057"
+      },
+      "src/telemetry/MotionEvidenceLedger.cpp": {
+        "bytes": 28751,
+        "sha256": "ff6600cce0a6fb89f64a4a04ec8443fb362f7545762e7d4f974f9db9f7a670f9"
+      },
+      "tests/DryFootstepTests.cpp": {
+        "bytes": 22572,
+        "sha256": "0249f61b7e18e829f7179f3f4e601cac39772d681c18092706e32343eaaf443f"
+      },
+      "tests/MotionEvidenceScenarioTests.cpp": {
+        "bytes": 69604,
+        "sha256": "61d292c694818fc26d652d09a63ad7e805fa09822134efb0d3e44597578adffe"
+      }
+    }
+  },
+  "flags": [
+    "Debug arm64-v8a",
+    "hordeRtRouteTiming=true",
+    "hordeRtOutdoorScaleProbe=true",
+    "Shipping instrumentation",
+    "Mobile dielectric"
+  ],
+  "cohortOrder": [
+    "conditioning33-r3",
+    "a33",
+    "b20",
+    "c33",
+    "d40",
+    "e33"
+  ],
+  "cases": [
+    {
+      "case": "a33",
+      "runId": "hold22-a33",
+      "reportSha256": "826fce97e9cdbab502bddff8966d81a21d140f2df5d449a397d088c17f5822de",
+      "resourcesSha256": "1fea5328d26c2e247d3b7fa4ce32bd1450bb0faf6829c9a9fb9c36777f2b7077",
+      "settings": {
+        "scalePercent": 33,
+        "width": 1440,
+        "height": 2981,
+        "internalWidth": 475,
+        "internalHeight": 984,
+        "nativeWindowWidth": 2981,
+        "nativeWindowHeight": 1440,
+        "surfaceCurrentWidth": 2981,
+        "surfaceCurrentHeight": 1440,
+        "surfaceCurrentTransform": 2,
+        "swapchainPreTransform": 2,
+        "rtPreRotationRequired": true,
+        "rtPresentationTransform": 1,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": false,
+        "dust": 1
+      },
+      "dimensions": {
+        "nativeWindow": [
+          2981,
+          1440
+        ],
+        "surfaceCurrent": [
+          2981,
+          1440
+        ],
+        "swapchain": [
+          1440,
+          2981
+        ],
+        "rtDispatch": [
+          475,
+          984
+        ],
+        "logicalView": [
+          2981,
+          1440
+        ],
+        "logicalAspect": 2.0701388888888888,
+        "dispatchAspect": 0.48272357723577236,
+        "transformIndex": 1,
+        "swapchainPreTransform": 2,
+        "surfaceCurrentTransform": 2
+      },
+      "sampling": {
+        "originWallNs": 398094853765425,
+        "warmupEndWallNs": 398104853765425,
+        "sampleEndWallNs": 398134853765425,
+        "completedFramesAll": 837,
+        "completedFramesPostWarm": 619,
+        "actualSelectedFirstWallNs": 398104854675213,
+        "actualSelectedLastWallNs": 398134845902545,
+        "actualSelectedSpanSeconds": 29.991227332,
+        "warmupOrTerminalFramesExcluded": 218
+      },
+      "gpu": {
+        "scope": "completed owning GPU duration; never reciprocal FPS",
+        "availableSamples": 619,
+        "unavailableSamples": 0,
+        "statusCounts": {
+          "5": 619
+        },
+        "duration": {
+          "samples": 619,
+          "minimumMs": 33.54578,
+          "medianMs": 35.510885,
+          "meanMs": 35.51029235218093,
+          "p95NearestRankMs": 36.277864,
+          "maximumMs": 37.463124
+        }
+      },
+      "cpu": {
+        "simulation": {
+          "allFrames": {
+            "samples": 619,
+            "minimumMs": 0.558229,
+            "medianMs": 1.457813,
+            "meanMs": 1.6192051308562196,
+            "p95NearestRankMs": 2.785,
+            "maximumMs": 3.701562
+          },
+          "invocations": 619
+        },
+        "skin": {
+          "allFrames": {
+            "samples": 619,
+            "minimumMs": 4.335574,
+            "medianMs": 8.257969,
+            "meanMs": 8.912505878836832,
+            "p95NearestRankMs": 12.461406,
+            "maximumMs": 13.566667
+          },
+          "invocations": 1857
+        },
+        "player_skin": {
+          "allFrames": {
+            "samples": 619,
+            "minimumMs": 1.789896,
+            "medianMs": 3.715312,
+            "meanMs": 4.2963456106623585,
+            "p95NearestRankMs": 6.821666,
+            "maximumMs": 7.944062
+          },
+          "invocations": 1238
+        },
+        "character_skin": {
+          "allFrames": {
+            "samples": 619,
+            "minimumMs": 2.479114,
+            "medianMs": 4.537813,
+            "meanMs": 4.616160268174475,
+            "p95NearestRankMs": 5.652917,
+            "maximumMs": 7.274062
+          },
+          "invocations": 619
+        },
+        "pose_copy": {
+          "allFrames": {
+            "samples": 619,
+            "minimumMs": 0.304583,
+            "medianMs": 0.628906,
+            "meanMs": 0.6651916462035541,
+            "p95NearestRankMs": 0.832188,
+            "maximumMs": 2.245938
+          },
+          "invocations": 1238
+        },
+        "dynamic_upload": {
+          "allFrames": {
+            "samples": 619,
+            "minimumMs": 0.22599,
+            "medianMs": 0.424009,
+            "meanMs": 0.4364021712439418,
+            "p95NearestRankMs": 0.541093,
+            "maximumMs": 0.967761
+          },
+          "invocations": 7428
+        },
+        "fence_wait": {
+          "allFrames": {
+            "samples": 619,
+            "minimumMs": 33.730468,
+            "medianMs": 35.880677,
+            "meanMs": 35.8827444184168,
+            "p95NearestRankMs": 36.727448,
+            "maximumMs": 37.678593
+          },
+          "invocations": 619
+        },
+        "queue_submit": {
+          "allFrames": {
+            "samples": 619,
+            "minimumMs": 0.091614,
+            "medianMs": 0.145261,
+            "meanMs": 0.170960901453958,
+            "p95NearestRankMs": 0.2925,
+            "maximumMs": 1.020313
+          },
+          "invocations": 619
+        },
+        "whole_frame": {
+          "allFrames": {
+            "samples": 619,
+            "minimumMs": 42.172447,
+            "medianMs": 47.747552,
+            "meanMs": 48.47435319386107,
+            "p95NearestRankMs": 53.513542,
+            "maximumMs": 56.412136
+          },
+          "invocations": 619
+        }
+      },
+      "actualImagePresentationIntervals": {
+        "samples": 618,
+        "minimumMs": 37.5,
+        "medianMs": 50.0,
+        "meanMs": 48.530206208737866,
+        "p95NearestRankMs": 54.166615,
+        "maximumMs": 54.16672
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 160578496,
+          "median": 160578496,
+          "maximum": 160578496
+        },
+        "host_visible_bytes": {
+          "minimum": 48277888,
+          "median": 48277888,
+          "maximum": 48277888
+        },
+        "omitted_triangles": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "unloads": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "restores": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "saved_owner_bytes": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "peak_overlap_bytes": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "wait_frames": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "run_unloads": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "run_restores": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "tlas_instances": {
+          "minimum": 28,
+          "median": 28,
+          "maximum": 28
+        },
+        "blas_count": {
+          "minimum": 20,
+          "median": 20,
+          "maximum": 20
+        }
+      },
+      "simulation": {
+        "frozen": false,
+        "tickDeltaPostWarm": 1799,
+        "ticksThisFrame": {
+          "minimum": 2,
+          "median": 3,
+          "maximum": 4
+        },
+        "simulationSecondsPostWarm": 29.983333299999998,
+        "catchUpOverrunDelta": 0,
+        "playerSkinUpdateDelta": 618,
+        "playerSkinCalls": 1238,
+        "characterSkinCalls": 619,
+        "skinCacheOrIdleCaveat": false,
+        "phaseCounts": {
+          "lookout-sweep": 619
+        }
+      },
+      "thermalStart": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 37.6,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 32.6,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 35.9,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalEnd": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 41.1,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 33.4,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 36.7,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {},
+        "referenceCompared": true
+      },
+      "pipelines": [
+        {
+          "executionMode": 0,
+          "activeKey": "shipping_mobile_opaque_fast",
+          "activeSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "opaqueSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "genericSha256": "a1edeb782800c91a58b073c1f789c2e14d68cc56cd8ff1b0b535d628d1e9ee38"
+        }
+      ]
+    },
+    {
+      "case": "b20",
+      "runId": "hold22-b20",
+      "reportSha256": "a972260e24f95078ae4ee41f18a2e4d1e078558f6cf40694f06808090fe46ec1",
+      "resourcesSha256": "fc8b0f65551c554877761a74d2a9c4f0fb73a3c878f5b2a696a73fe71c360d77",
+      "settings": {
+        "scalePercent": 20,
+        "width": 1440,
+        "height": 2981,
+        "internalWidth": 288,
+        "internalHeight": 596,
+        "nativeWindowWidth": 2981,
+        "nativeWindowHeight": 1440,
+        "surfaceCurrentWidth": 2981,
+        "surfaceCurrentHeight": 1440,
+        "surfaceCurrentTransform": 2,
+        "swapchainPreTransform": 2,
+        "rtPreRotationRequired": true,
+        "rtPresentationTransform": 1,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": false,
+        "dust": 1
+      },
+      "dimensions": {
+        "nativeWindow": [
+          2981,
+          1440
+        ],
+        "surfaceCurrent": [
+          2981,
+          1440
+        ],
+        "swapchain": [
+          1440,
+          2981
+        ],
+        "rtDispatch": [
+          288,
+          596
+        ],
+        "logicalView": [
+          2981,
+          1440
+        ],
+        "logicalAspect": 2.0701388888888888,
+        "dispatchAspect": 0.48322147651006714,
+        "transformIndex": 1,
+        "swapchainPreTransform": 2,
+        "surfaceCurrentTransform": 2
+      },
+      "sampling": {
+        "originWallNs": 398150383873321,
+        "warmupEndWallNs": 398160383873321,
+        "sampleEndWallNs": 398190383873321,
+        "completedFramesAll": 1288,
+        "completedFramesPostWarm": 955,
+        "actualSelectedFirstWallNs": 398160411941494,
+        "actualSelectedLastWallNs": 398190379409555,
+        "actualSelectedSpanSeconds": 29.967468061,
+        "warmupOrTerminalFramesExcluded": 333
+      },
+      "gpu": {
+        "scope": "completed owning GPU duration; never reciprocal FPS",
+        "availableSamples": 955,
+        "unavailableSamples": 0,
+        "statusCounts": {
+          "5": 955
+        },
+        "duration": {
+          "samples": 955,
+          "minimumMs": 14.91,
+          "medianMs": 16.082604,
+          "meanMs": 16.09209282094241,
+          "p95NearestRankMs": 16.687031,
+          "maximumMs": 17.601197
+        }
+      },
+      "cpu": {
+        "simulation": {
+          "allFrames": {
+            "samples": 955,
+            "minimumMs": 0.318281,
+            "medianMs": 1.136771,
+            "meanMs": 1.1464226157068063,
+            "p95NearestRankMs": 1.846198,
+            "maximumMs": 3.039948
+          },
+          "invocations": 955
+        },
+        "skin": {
+          "allFrames": {
+            "samples": 955,
+            "minimumMs": 4.248958,
+            "medianMs": 12.059895,
+            "meanMs": 11.528464300523561,
+            "p95NearestRankMs": 13.161303,
+            "maximumMs": 14.608178
+          },
+          "invocations": 2865
+        },
+        "player_skin": {
+          "allFrames": {
+            "samples": 955,
+            "minimumMs": 1.721198,
+            "medianMs": 6.046042,
+            "meanMs": 5.735054129842933,
+            "p95NearestRankMs": 6.854323,
+            "maximumMs": 9.396615
+          },
+          "invocations": 1910
+        },
+        "character_skin": {
+          "allFrames": {
+            "samples": 955,
+            "minimumMs": 2.330469,
+            "medianMs": 5.922969,
+            "meanMs": 5.7934101706806285,
+            "p95NearestRankMs": 7.128021,
+            "maximumMs": 8.162865
+          },
+          "invocations": 955
+        },
+        "pose_copy": {
+          "allFrames": {
+            "samples": 955,
+            "minimumMs": 0.278542,
+            "medianMs": 0.815053,
+            "meanMs": 0.7799072083769634,
+            "p95NearestRankMs": 0.867969,
+            "maximumMs": 1.840573
+          },
+          "invocations": 1910
+        },
+        "dynamic_upload": {
+          "allFrames": {
+            "samples": 955,
+            "minimumMs": 0.21354,
+            "medianMs": 0.518802,
+            "meanMs": 0.5013781445026179,
+            "p95NearestRankMs": 0.559687,
+            "maximumMs": 0.914895
+          },
+          "invocations": 11460
+        },
+        "fence_wait": {
+          "allFrames": {
+            "samples": 955,
+            "minimumMs": 15.132708,
+            "medianMs": 16.432604,
+            "meanMs": 16.44112247853403,
+            "p95NearestRankMs": 17.095104,
+            "maximumMs": 17.849375
+          },
+          "invocations": 955
+        },
+        "queue_submit": {
+          "allFrames": {
+            "samples": 955,
+            "minimumMs": 0.099791,
+            "medianMs": 0.161823,
+            "meanMs": 0.17349646282722514,
+            "p95NearestRankMs": 0.266927,
+            "maximumMs": 1.204167
+          },
+          "invocations": 955
+        },
+        "whole_frame": {
+          "allFrames": {
+            "samples": 955,
+            "minimumMs": 21.592708,
+            "medianMs": 31.911146,
+            "meanMs": 31.364855461780106,
+            "p95NearestRankMs": 33.684375,
+            "maximumMs": 34.98875
+          },
+          "invocations": 955
+        }
+      },
+      "actualImagePresentationIntervals": {
+        "samples": 954,
+        "minimumMs": 20.833282,
+        "medianMs": 33.3332815,
+        "meanMs": 31.42033629245283,
+        "p95NearestRankMs": 33.333437,
+        "maximumMs": 41.666771
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 159321024,
+          "median": 159321024,
+          "maximum": 159321024
+        },
+        "host_visible_bytes": {
+          "minimum": 48277888,
+          "median": 48277888,
+          "maximum": 48277888
+        },
+        "omitted_triangles": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "unloads": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "restores": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "saved_owner_bytes": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "peak_overlap_bytes": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "wait_frames": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "run_unloads": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "run_restores": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "tlas_instances": {
+          "minimum": 28,
+          "median": 28,
+          "maximum": 28
+        },
+        "blas_count": {
+          "minimum": 20,
+          "median": 20,
+          "maximum": 20
+        }
+      },
+      "simulation": {
+        "frozen": false,
+        "tickDeltaPostWarm": 1798,
+        "ticksThisFrame": {
+          "minimum": 1,
+          "median": 2,
+          "maximum": 2
+        },
+        "simulationSecondsPostWarm": 29.966666599999996,
+        "catchUpOverrunDelta": 0,
+        "playerSkinUpdateDelta": 954,
+        "playerSkinCalls": 1910,
+        "characterSkinCalls": 955,
+        "skinCacheOrIdleCaveat": false,
+        "phaseCounts": {
+          "lookout-sweep": 955
+        }
+      },
+      "thermalStart": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 38.1,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 33.1,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 36.4,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalEnd": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 39.4,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 33.1,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 36.2,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {},
+        "referenceCompared": true
+      },
+      "pipelines": [
+        {
+          "executionMode": 0,
+          "activeKey": "shipping_mobile_opaque_fast",
+          "activeSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "opaqueSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "genericSha256": "a1edeb782800c91a58b073c1f789c2e14d68cc56cd8ff1b0b535d628d1e9ee38"
+        }
+      ]
+    },
+    {
+      "case": "c33",
+      "runId": "hold22-c33",
+      "reportSha256": "e46b6068bd23d768d730368002fa6ae9d1b935528f7e1208cdc2ec422c7bb2cc",
+      "resourcesSha256": "d6b33e7ef0183cb503e71ede4650be81a5240b621b183a51e77aa5082d6711be",
+      "settings": {
+        "scalePercent": 33,
+        "width": 1440,
+        "height": 2981,
+        "internalWidth": 475,
+        "internalHeight": 984,
+        "nativeWindowWidth": 2981,
+        "nativeWindowHeight": 1440,
+        "surfaceCurrentWidth": 2981,
+        "surfaceCurrentHeight": 1440,
+        "surfaceCurrentTransform": 2,
+        "swapchainPreTransform": 2,
+        "rtPreRotationRequired": true,
+        "rtPresentationTransform": 1,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": false,
+        "dust": 1
+      },
+      "dimensions": {
+        "nativeWindow": [
+          2981,
+          1440
+        ],
+        "surfaceCurrent": [
+          2981,
+          1440
+        ],
+        "swapchain": [
+          1440,
+          2981
+        ],
+        "rtDispatch": [
+          475,
+          984
+        ],
+        "logicalView": [
+          2981,
+          1440
+        ],
+        "logicalAspect": 2.0701388888888888,
+        "dispatchAspect": 0.48272357723577236,
+        "transformIndex": 1,
+        "swapchainPreTransform": 2,
+        "surfaceCurrentTransform": 2
+      },
+      "sampling": {
+        "originWallNs": 398209601046996,
+        "warmupEndWallNs": 398219601046996,
+        "sampleEndWallNs": 398249601046996,
+        "completedFramesAll": 826,
+        "completedFramesPostWarm": 617,
+        "actualSelectedFirstWallNs": 398219613655742,
+        "actualSelectedLastWallNs": 398249558417762,
+        "actualSelectedSpanSeconds": 29.94476202,
+        "warmupOrTerminalFramesExcluded": 209
+      },
+      "gpu": {
+        "scope": "completed owning GPU duration; never reciprocal FPS",
+        "availableSamples": 617,
+        "unavailableSamples": 0,
+        "statusCounts": {
+          "5": 617
+        },
+        "duration": {
+          "samples": 617,
+          "minimumMs": 33.992708,
+          "medianMs": 35.486249,
+          "meanMs": 35.51226082009725,
+          "p95NearestRankMs": 36.488749,
+          "maximumMs": 37.214114
+        }
+      },
+      "cpu": {
+        "simulation": {
+          "allFrames": {
+            "samples": 617,
+            "minimumMs": 0.625105,
+            "medianMs": 1.475521,
+            "meanMs": 1.6441763630470017,
+            "p95NearestRankMs": 2.781041,
+            "maximumMs": 3.844635
+          },
+          "invocations": 617
+        },
+        "skin": {
+          "allFrames": {
+            "samples": 617,
+            "minimumMs": 4.177761,
+            "medianMs": 8.289011,
+            "meanMs": 8.970918601296596,
+            "p95NearestRankMs": 12.415885,
+            "maximumMs": 13.568386
+          },
+          "invocations": 1851
+        },
+        "player_skin": {
+          "allFrames": {
+            "samples": 617,
+            "minimumMs": 1.805469,
+            "medianMs": 3.712761,
+            "meanMs": 4.331682278768233,
+            "p95NearestRankMs": 6.841406,
+            "maximumMs": 7.598438
+          },
+          "invocations": 1234
+        },
+        "character_skin": {
+          "allFrames": {
+            "samples": 617,
+            "minimumMs": 2.372292,
+            "medianMs": 4.497656,
+            "meanMs": 4.6392363225283635,
+            "p95NearestRankMs": 5.665677,
+            "maximumMs": 6.846771
+          },
+          "invocations": 617
+        },
+        "pose_copy": {
+          "allFrames": {
+            "samples": 617,
+            "minimumMs": 0.301771,
+            "medianMs": 0.627395,
+            "meanMs": 0.6667602933549432,
+            "p95NearestRankMs": 0.839845,
+            "maximumMs": 2.284895
+          },
+          "invocations": 1234
+        },
+        "dynamic_upload": {
+          "allFrames": {
+            "samples": 617,
+            "minimumMs": 0.217864,
+            "medianMs": 0.424788,
+            "meanMs": 0.43769227876823336,
+            "p95NearestRankMs": 0.531196,
+            "maximumMs": 0.80224
+          },
+          "invocations": 7404
+        },
+        "fence_wait": {
+          "allFrames": {
+            "samples": 617,
+            "minimumMs": 34.188229,
+            "medianMs": 35.882917,
+            "meanMs": 35.89125277795787,
+            "p95NearestRankMs": 36.889791,
+            "maximumMs": 37.59151
+          },
+          "invocations": 617
+        },
+        "queue_submit": {
+          "allFrames": {
+            "samples": 617,
+            "minimumMs": 0.096354,
+            "medianMs": 0.143334,
+            "meanMs": 0.17252852998379253,
+            "p95NearestRankMs": 0.294635,
+            "maximumMs": 1.386719
+          },
+          "invocations": 617
+        },
+        "whole_frame": {
+          "allFrames": {
+            "samples": 617,
+            "minimumMs": 42.208073,
+            "medianMs": 47.857136,
+            "meanMs": 48.55970080875202,
+            "p95NearestRankMs": 53.577917,
+            "maximumMs": 55.392761
+          },
+          "invocations": 617
+        }
+      },
+      "actualImagePresentationIntervals": {
+        "samples": 616,
+        "minimumMs": 37.5,
+        "medianMs": 50.0,
+        "meanMs": 48.606602896103894,
+        "p95NearestRankMs": 54.166615,
+        "maximumMs": 58.333333
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 160578496,
+          "median": 160578496,
+          "maximum": 160578496
+        },
+        "host_visible_bytes": {
+          "minimum": 48277888,
+          "median": 48277888,
+          "maximum": 48277888
+        },
+        "omitted_triangles": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "unloads": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "restores": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "saved_owner_bytes": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "peak_overlap_bytes": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "wait_frames": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "run_unloads": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "run_restores": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "tlas_instances": {
+          "minimum": 28,
+          "median": 28,
+          "maximum": 28
+        },
+        "blas_count": {
+          "minimum": 20,
+          "median": 20,
+          "maximum": 20
+        }
+      },
+      "simulation": {
+        "frozen": false,
+        "tickDeltaPostWarm": 1797,
+        "ticksThisFrame": {
+          "minimum": 2,
+          "median": 3,
+          "maximum": 4
+        },
+        "simulationSecondsPostWarm": 29.950000000000003,
+        "catchUpOverrunDelta": 0,
+        "playerSkinUpdateDelta": 616,
+        "playerSkinCalls": 1234,
+        "characterSkinCalls": 617,
+        "skinCacheOrIdleCaveat": false,
+        "phaseCounts": {
+          "lookout-sweep": 617
+        }
+      },
+      "thermalStart": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 36.8,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 32.6,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 35.7,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalEnd": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 41.5,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 33.8,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 36.9,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {},
+        "referenceCompared": true
+      },
+      "pipelines": [
+        {
+          "executionMode": 0,
+          "activeKey": "shipping_mobile_opaque_fast",
+          "activeSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "opaqueSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "genericSha256": "a1edeb782800c91a58b073c1f789c2e14d68cc56cd8ff1b0b535d628d1e9ee38"
+        }
+      ]
+    },
+    {
+      "case": "d40",
+      "runId": "hold22-d40",
+      "reportSha256": "4fd3a5deb061b2673b0b4fbc7506526ddc64585ef5972a0958bae57259b8282b",
+      "resourcesSha256": "3ead93fea2885bf4a93890d5bd8051a699df9143fd1a4579fd8de35ae54be27d",
+      "settings": {
+        "scalePercent": 40,
+        "width": 1440,
+        "height": 2981,
+        "internalWidth": 576,
+        "internalHeight": 1192,
+        "nativeWindowWidth": 2981,
+        "nativeWindowHeight": 1440,
+        "surfaceCurrentWidth": 2981,
+        "surfaceCurrentHeight": 1440,
+        "surfaceCurrentTransform": 2,
+        "swapchainPreTransform": 2,
+        "rtPreRotationRequired": true,
+        "rtPresentationTransform": 1,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": false,
+        "dust": 1
+      },
+      "dimensions": {
+        "nativeWindow": [
+          2981,
+          1440
+        ],
+        "surfaceCurrent": [
+          2981,
+          1440
+        ],
+        "swapchain": [
+          1440,
+          2981
+        ],
+        "rtDispatch": [
+          576,
+          1192
+        ],
+        "logicalView": [
+          2981,
+          1440
+        ],
+        "logicalAspect": 2.0701388888888888,
+        "dispatchAspect": 0.48322147651006714,
+        "transformIndex": 1,
+        "swapchainPreTransform": 2,
+        "surfaceCurrentTransform": 2
+      },
+      "sampling": {
+        "originWallNs": 398264443683017,
+        "warmupEndWallNs": 398274443683017,
+        "sampleEndWallNs": 398304443683017,
+        "completedFramesAll": 626,
+        "completedFramesPostWarm": 467,
+        "actualSelectedFirstWallNs": 398274465641086,
+        "actualSelectedLastWallNs": 398304433861439,
+        "actualSelectedSpanSeconds": 29.968220353,
+        "warmupOrTerminalFramesExcluded": 159
+      },
+      "gpu": {
+        "scope": "completed owning GPU duration; never reciprocal FPS",
+        "availableSamples": 467,
+        "unavailableSamples": 0,
+        "statusCounts": {
+          "5": 467
+        },
+        "duration": {
+          "samples": 467,
+          "minimumMs": 46.167499,
+          "medianMs": 48.204582,
+          "meanMs": 48.42650889721627,
+          "p95NearestRankMs": 51.407603,
+          "maximumMs": 54.534582
+        }
+      },
+      "cpu": {
+        "simulation": {
+          "allFrames": {
+            "samples": 467,
+            "minimumMs": 0.728542,
+            "medianMs": 2.24776,
+            "meanMs": 2.470909233404711,
+            "p95NearestRankMs": 3.714375,
+            "maximumMs": 4.395052
+          },
+          "invocations": 467
+        },
+        "skin": {
+          "allFrames": {
+            "samples": 467,
+            "minimumMs": 4.121198,
+            "medianMs": 11.447605,
+            "meanMs": 10.737012132762313,
+            "p95NearestRankMs": 12.636927,
+            "maximumMs": 13.668541
+          },
+          "invocations": 1401
+        },
+        "player_skin": {
+          "allFrames": {
+            "samples": 467,
+            "minimumMs": 1.666302,
+            "medianMs": 6.008281,
+            "meanMs": 5.530369528907923,
+            "p95NearestRankMs": 6.822031,
+            "maximumMs": 7.910364
+          },
+          "invocations": 934
+        },
+        "character_skin": {
+          "allFrames": {
+            "samples": 467,
+            "minimumMs": 2.40224,
+            "medianMs": 5.237708,
+            "meanMs": 5.20664260385439,
+            "p95NearestRankMs": 6.398229,
+            "maximumMs": 6.885885
+          },
+          "invocations": 467
+        },
+        "pose_copy": {
+          "allFrames": {
+            "samples": 467,
+            "minimumMs": 0.294324,
+            "medianMs": 0.759531,
+            "meanMs": 0.7466345760171307,
+            "p95NearestRankMs": 0.861094,
+            "maximumMs": 2.33052
+          },
+          "invocations": 934
+        },
+        "dynamic_upload": {
+          "allFrames": {
+            "samples": 467,
+            "minimumMs": 0.216043,
+            "medianMs": 0.481459,
+            "meanMs": 0.47125323768736616,
+            "p95NearestRankMs": 0.543801,
+            "maximumMs": 1.044113
+          },
+          "invocations": 5604
+        },
+        "fence_wait": {
+          "allFrames": {
+            "samples": 467,
+            "minimumMs": 46.353958,
+            "medianMs": 48.592812,
+            "meanMs": 48.78408939828694,
+            "p95NearestRankMs": 51.785886,
+            "maximumMs": 54.913906
+          },
+          "invocations": 467
+        },
+        "queue_submit": {
+          "allFrames": {
+            "samples": 467,
+            "minimumMs": 0.094844,
+            "medianMs": 0.145625,
+            "meanMs": 0.1688488158458244,
+            "p95NearestRankMs": 0.295729,
+            "maximumMs": 0.491614
+          },
+          "invocations": 467
+        },
+        "whole_frame": {
+          "allFrames": {
+            "samples": 467,
+            "minimumMs": 54.141927,
+            "medianMs": 64.710625,
+            "meanMs": 64.2629981627409,
+            "p95NearestRankMs": 67.994479,
+            "maximumMs": 72.158385
+          },
+          "invocations": 467
+        }
+      },
+      "actualImagePresentationIntervals": {
+        "samples": 466,
+        "minimumMs": 54.166666,
+        "medianMs": 66.666614,
+        "meanMs": 64.30615318454936,
+        "p95NearestRankMs": 66.666771,
+        "maximumMs": 70.833386
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 161315776,
+          "median": 161315776,
+          "maximum": 161315776
+        },
+        "host_visible_bytes": {
+          "minimum": 48277888,
+          "median": 48277888,
+          "maximum": 48277888
+        },
+        "omitted_triangles": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "unloads": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "restores": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "saved_owner_bytes": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "peak_overlap_bytes": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "wait_frames": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "run_unloads": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "run_restores": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "tlas_instances": {
+          "minimum": 28,
+          "median": 28,
+          "maximum": 28
+        },
+        "blas_count": {
+          "minimum": 20,
+          "median": 20,
+          "maximum": 20
+        }
+      },
+      "simulation": {
+        "frozen": false,
+        "tickDeltaPostWarm": 1798,
+        "ticksThisFrame": {
+          "minimum": 3,
+          "median": 4,
+          "maximum": 5
+        },
+        "simulationSecondsPostWarm": 29.966666599999996,
+        "catchUpOverrunDelta": 0,
+        "playerSkinUpdateDelta": 466,
+        "playerSkinCalls": 934,
+        "characterSkinCalls": 467,
+        "skinCacheOrIdleCaveat": false,
+        "phaseCounts": {
+          "lookout-sweep": 467
+        }
+      },
+      "thermalStart": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 38.5,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 33.6,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 36.7,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalEnd": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 42.0,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 34.5,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 37.3,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {},
+        "referenceCompared": true
+      },
+      "pipelines": [
+        {
+          "executionMode": 0,
+          "activeKey": "shipping_mobile_opaque_fast",
+          "activeSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "opaqueSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "genericSha256": "a1edeb782800c91a58b073c1f789c2e14d68cc56cd8ff1b0b535d628d1e9ee38"
+        }
+      ]
+    },
+    {
+      "case": "e33",
+      "runId": "hold22-e33",
+      "reportSha256": "c7ccbef2f98b73034cccd69ba1fa92d84efd45b8fef2dca5d529f4354e3bb001",
+      "resourcesSha256": "b662595538e186ccf62b0ec963ea28bed8e3d1a5fa03ab091bf509d0fe2d36c7",
+      "settings": {
+        "scalePercent": 33,
+        "width": 1440,
+        "height": 2981,
+        "internalWidth": 475,
+        "internalHeight": 984,
+        "nativeWindowWidth": 2981,
+        "nativeWindowHeight": 1440,
+        "surfaceCurrentWidth": 2981,
+        "surfaceCurrentHeight": 1440,
+        "surfaceCurrentTransform": 2,
+        "swapchainPreTransform": 2,
+        "rtPreRotationRequired": true,
+        "rtPresentationTransform": 1,
+        "backend": "RayTracingPipeline",
+        "water": 1,
+        "fire": 0,
+        "cap": 30,
+        "glass": false,
+        "shadow": 1,
+        "mist": false,
+        "dust": 1
+      },
+      "dimensions": {
+        "nativeWindow": [
+          2981,
+          1440
+        ],
+        "surfaceCurrent": [
+          2981,
+          1440
+        ],
+        "swapchain": [
+          1440,
+          2981
+        ],
+        "rtDispatch": [
+          475,
+          984
+        ],
+        "logicalView": [
+          2981,
+          1440
+        ],
+        "logicalAspect": 2.0701388888888888,
+        "dispatchAspect": 0.48272357723577236,
+        "transformIndex": 1,
+        "swapchainPreTransform": 2,
+        "surfaceCurrentTransform": 2
+      },
+      "sampling": {
+        "originWallNs": 398329770104815,
+        "warmupEndWallNs": 398339770104815,
+        "sampleEndWallNs": 398369770104815,
+        "completedFramesAll": 734,
+        "completedFramesPostWarm": 499,
+        "actualSelectedFirstWallNs": 398339811568144,
+        "actualSelectedLastWallNs": 398369748797456,
+        "actualSelectedSpanSeconds": 29.937229312,
+        "warmupOrTerminalFramesExcluded": 235
+      },
+      "gpu": {
+        "scope": "completed owning GPU duration; never reciprocal FPS",
+        "availableSamples": 499,
+        "unavailableSamples": 0,
+        "statusCounts": {
+          "5": 499
+        },
+        "duration": {
+          "samples": 499,
+          "minimumMs": 34.588124,
+          "medianMs": 43.932759,
+          "meanMs": 46.04693119839679,
+          "p95NearestRankMs": 68.032863,
+          "maximumMs": 75.663384
+        }
+      },
+      "cpu": {
+        "simulation": {
+          "allFrames": {
+            "samples": 499,
+            "minimumMs": 0.51125,
+            "medianMs": 1.898802,
+            "meanMs": 2.1409852124248494,
+            "p95NearestRankMs": 3.863021,
+            "maximumMs": 5.87427
+          },
+          "invocations": 499
+        },
+        "skin": {
+          "allFrames": {
+            "samples": 499,
+            "minimumMs": 3.871198,
+            "medianMs": 9.516874,
+            "meanMs": 9.401046709418837,
+            "p95NearestRankMs": 12.570208,
+            "maximumMs": 13.39453
+          },
+          "invocations": 1497
+        },
+        "player_skin": {
+          "allFrames": {
+            "samples": 499,
+            "minimumMs": 1.659063,
+            "medianMs": 4.279843,
+            "meanMs": 4.651197190380762,
+            "p95NearestRankMs": 6.858697,
+            "maximumMs": 7.30651
+          },
+          "invocations": 998
+        },
+        "character_skin": {
+          "allFrames": {
+            "samples": 499,
+            "minimumMs": 2.212084,
+            "medianMs": 5.041406,
+            "meanMs": 4.749849519038077,
+            "p95NearestRankMs": 6.244791,
+            "maximumMs": 7.21849
+          },
+          "invocations": 499
+        },
+        "pose_copy": {
+          "allFrames": {
+            "samples": 499,
+            "minimumMs": 0.27177,
+            "medianMs": 0.667136,
+            "meanMs": 0.6775446452905811,
+            "p95NearestRankMs": 0.855052,
+            "maximumMs": 2.109427
+          },
+          "invocations": 998
+        },
+        "dynamic_upload": {
+          "allFrames": {
+            "samples": 499,
+            "minimumMs": 0.193906,
+            "medianMs": 0.435208,
+            "meanMs": 0.4329305090180361,
+            "p95NearestRankMs": 0.543488,
+            "maximumMs": 0.851979
+          },
+          "invocations": 5988
+        },
+        "fence_wait": {
+          "allFrames": {
+            "samples": 499,
+            "minimumMs": 34.947188,
+            "medianMs": 44.3125,
+            "meanMs": 46.34625842685371,
+            "p95NearestRankMs": 68.62,
+            "maximumMs": 75.962448
+          },
+          "invocations": 499
+        },
+        "queue_submit": {
+          "allFrames": {
+            "samples": 499,
+            "minimumMs": 0.097187,
+            "medianMs": 0.14849,
+            "meanMs": 0.174007378757515,
+            "p95NearestRankMs": 0.311303,
+            "maximumMs": 0.486302
+          },
+          "invocations": 499
+        },
+        "whole_frame": {
+          "allFrames": {
+            "samples": 499,
+            "minimumMs": 41.363125,
+            "medianMs": 58.279167,
+            "meanMs": 60.04821495791583,
+            "p95NearestRankMs": 83.678229,
+            "maximumMs": 94.252448
+          },
+          "invocations": 499
+        }
+      },
+      "actualImagePresentationIntervals": {
+        "samples": 498,
+        "minimumMs": 37.499947,
+        "medianMs": 58.333334,
+        "meanMs": 60.14893070281125,
+        "p95NearestRankMs": 83.333334,
+        "maximumMs": 95.833333
+      },
+      "resources": {
+        "device_local_bytes": {
+          "minimum": 160578496,
+          "median": 160578496,
+          "maximum": 160578496
+        },
+        "host_visible_bytes": {
+          "minimum": 48277888,
+          "median": 48277888,
+          "maximum": 48277888
+        },
+        "omitted_triangles": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "unloads": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "restores": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "saved_owner_bytes": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "peak_overlap_bytes": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "wait_frames": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "run_unloads": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "run_restores": {
+          "minimum": 0,
+          "median": 0,
+          "maximum": 0
+        },
+        "tlas_instances": {
+          "minimum": 28,
+          "median": 28,
+          "maximum": 28
+        },
+        "blas_count": {
+          "minimum": 20,
+          "median": 20,
+          "maximum": 20
+        }
+      },
+      "simulation": {
+        "frozen": false,
+        "tickDeltaPostWarm": 1796,
+        "ticksThisFrame": {
+          "minimum": 2,
+          "median": 4,
+          "maximum": 6
+        },
+        "simulationSecondsPostWarm": 29.933333399999995,
+        "catchUpOverrunDelta": 0,
+        "playerSkinUpdateDelta": 498,
+        "playerSkinCalls": 998,
+        "characterSkinCalls": 499,
+        "skinCacheOrIdleCaveat": false,
+        "phaseCounts": {
+          "lookout-sweep": 499
+        }
+      },
+      "thermalStart": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 38.7,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 34.0,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 36.0,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalEnd": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 40.6,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 34.3,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 36.8,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAdmission": {
+        "admitted": true,
+        "reasons": [],
+        "requiredFrameworkStatus": 0,
+        "maximumDeltaCelsius": 1.5,
+        "sensorCeilingsCelsius": {},
+        "referenceCompared": true
+      },
+      "pipelines": [
+        {
+          "executionMode": 0,
+          "activeKey": "shipping_mobile_opaque_fast",
+          "activeSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "opaqueSha256": "1b026affab5bf26b44d2dab0ef10f1c17104190a5ad18d45aa2fda85dbcfdec9",
+          "genericSha256": "a1edeb782800c91a58b073c1f789c2e14d68cc56cd8ff1b0b535d628d1e9ee38"
+        }
+      ]
+    }
+  ],
+  "qualitative20": {
+    "sha256": "bd342e67d8c91faa0e28eef5d95b22dd7155913bc2d61372f3110ef0ca6044fc",
+    "bytes": 11995892,
+    "allHostChildrenCompleted": true,
+    "performanceComparison": false,
+    "phoneArtifactRetained": "/data/local/tmp/horde-quality20-20261022-r1.mp4"
+  },
+  "retainedRejections": [
+    {
+      "case": "conditioning33",
+      "apk": "e6eb737fe913656489db36047185527bea6253dc170c38920a272d1c018c4dc9",
+      "reason": "Generic motion state admission rejected before any frame."
+    },
+    {
+      "case": "diagnostic33-r2",
+      "apk": "2e412bfbbf0f815fe7f5ca243247b711c35bdb2ecb2c8bfb6c9989b2e0724247",
+      "reason": "Motion semantic event queue overflow count is nonzero."
+    }
+  ],
+  "limits": [
+    "Closing33 GPU rose23.8percent and CPU22.1percent; cause unresolved. Starting thermals do not establish clock parity.",
+    "No GPU clocks or power measured. Finite warm runs do not establish prolonged sustained performance.",
+    "CPU frame, GPU and fence durations overlap; do not add them or call their reciprocal scanout FPS.",
+    "20percent remains diagnostic and visually unadmitted; no player defaults or saved values changed.",
+    "Full raw reports, owner hashes, captures and video stay in ignored local reports."
+  ]
+}

@@ -1,0 +1,1 @@
+Executable CMake and Gradle RT policy contracts passed.

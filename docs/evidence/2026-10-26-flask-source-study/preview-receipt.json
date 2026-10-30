@@ -1,0 +1,30 @@
+{
+  "scope": "Blender authoring preview only, not Horde RT evidence",
+  "sourceGlbSha256": "ba93fd1a0242fb806c8be3972a1db1371e1aee3cd7ee4e22be447dbb7d8e95dd",
+  "editableBlendSha256": "f19b1e78b345a9dd4181de20f211e678ed57b315e62d213545b857c854a4f47d",
+  "engine": "Cycles CPU",
+  "resolution": [
+    512,
+    640
+  ],
+  "samples": 24,
+  "views": [
+    {
+      "file": "three-quarter.png",
+      "bytes": 347094,
+      "sha256": "e5c5949ff30fd4a4f8aa1fdc4827ca3872164eaa35f2bcdf22d504389386e3d1"
+    },
+    {
+      "file": "front.png",
+      "bytes": 341722,
+      "sha256": "80ff237ced106514266ade4ecaf4080a7da675fd711291819e6bde33b290b144"
+    },
+    {
+      "file": "side.png",
+      "bytes": 339884,
+      "sha256": "a36baa61260ce734e10fe3399dc8e8388a59dd7d10803e5f0aa69cbf4da003a1"
+    }
+  ],
+  "glTfExporterInvoked": false,
+  "gameOrPhoneInvoked": false
+}

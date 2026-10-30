@@ -11,6 +11,64 @@
 namespace horde::vulkan::raytracing
 {
 
+namespace
+{
+horde::scene::SkinnedPlayerDodgePose DodgePose(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation)
+{
+    return {animation.dodge.weight,animation.dodge.modelX,animation.dodge.modelZ};
+}
+bool ValidatePlantedStance(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
+    std::string& diagnostic)
+{
+    const float drop = animation.plantedPelvisDropMetres;
+    if (!std::isfinite(drop) || drop < 0.0f ||
+        drop > horde::scene::kMaximumPlayerPelvisDropMetres)
+    {
+        diagnostic = "Player planted pelvis drop is outside the finite admitted range.";
+        return false;
+    }
+    if (drop > 0.0f && animation.locomotionClip !=
+            horde::gameplay::animation::PlayerLocomotionClip::Idle)
+    {
+        diagnostic = "Planted player stance requires the stationary Idle clip.";
+        return false;
+    }
+    const float crouch = animation.crouchPelvisDropMetres;
+    if (!std::isfinite(crouch) || crouch < 0.0f ||
+        crouch > horde::scene::kMaximumPlayerCrouchPelvisDropMetres ||
+        (crouch > 0.0f && (drop > 0.0f ||
+         (animation.locomotionClip != horde::gameplay::animation::PlayerLocomotionClip::Idle &&
+          animation.locomotionClip != horde::gameplay::animation::PlayerLocomotionClip::Walk))))
+    {
+        diagnostic = "Player crouch requires a finite admitted drop, Idle/Walk and no planted stance.";
+        return false;
+    }
+    if (!horde::scene::ValidPlayerDodgePose(DodgePose(animation)) ||
+        (animation.dodge.weight > 0.0f && (drop > 0.0f || crouch > 0.0f)))
+    {
+        diagnostic = "Player dodge layer is invalid or overlaps a grounded stance.";
+        return false;
+    }
+    return true;
+}
+
+// This is the same translation applied to the native Hips subtree. Use it
+// before the arm solve as well as afterwards; no second skin or pose palette
+// is needed to obtain a coherent mount while composing the arm targets.
+void ApplyPlantedTorsoTranslation(
+    std::array<float, 3u>& position,
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation)
+{
+    position[1] -= animation.plantedPelvisDropMetres + animation.crouchPelvisDropMetres;
+    position[2] -= animation.plantedPelvisDropMetres *
+                   horde::scene::kPlayerPlantedPelvisSetbackPerDrop;
+    const auto dodge = horde::scene::PlayerDodgeTorsoOffset(DodgePose(animation));
+    for (unsigned axis=0;axis<3;++axis) position[axis] += dodge[axis];
+}
+} // namespace
+
 bool HasDedicatedPlayerPrimaryOwnership(
     const std::array<std::uint8_t, kRtTlasInstanceCapacity>& masks,
     std::uint32_t worldBodyInstanceFlags)
@@ -523,6 +581,18 @@ bool PlayerPoseNeedsRefresh(const std::uint64_t tickIndex,
 bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
                                  std::string& diagnostic)
 {
+    return LoadBoundAsset(runtimeGlbPath, false, diagnostic);
+}
+
+bool PlayerRenderSlot::LoadUtilityCandidateAsset(const std::string& runtimeGlbPath,
+                                                 std::string& diagnostic)
+{
+    return LoadBoundAsset(runtimeGlbPath, true, diagnostic);
+}
+
+bool PlayerRenderSlot::LoadBoundAsset(const std::string& runtimeGlbPath,
+                                     const bool utilityCandidate, std::string& diagnostic)
+{
     uniqueVertices_.clear();
     uniqueTangents_.clear();
     solvedPose_ = {};
@@ -530,6 +600,8 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
     lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
     lastPreparedAnimation_ = {};
     hasLastPreparedAnimation_ = false;
+    utilityCandidateReady_ = false;
+    lastUtilitySample_.reset();
     leftSocketErrorMetres_ = 0.0f;
     rightSocketErrorMetres_ = 0.0f;
     leftGripAgreement_ = {};
@@ -539,7 +611,11 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
     rightHandFromGripSocket_ = horde::gameplay::items::IdentityHeldItemTransform();
     stableGripBasesReady_ = false;
     bootGroundingProfilesReady_ = false;
-    if (!asset_.LoadClips(runtimeGlbPath, horde::scene::PlayerLocomotionClipSet(), diagnostic))
+    const horde::scene::SkinnedClipSet utilityBindings{{{
+        {"Idle", true, true}, {"Walking", true, true},
+        {"FlaskUse", false, true}, {"FlaskCancel", false, true}}}};
+    if (!asset_.LoadClips(runtimeGlbPath, utilityCandidate ? utilityBindings :
+                         horde::scene::PlayerLocomotionClipSet(), diagnostic))
         return false;
     std::vector<std::string_view> primitiveNames;
     primitiveNames.reserve(asset_.PrimitiveRanges().size());
@@ -550,8 +626,9 @@ bool PlayerRenderSlot::LoadAsset(const std::string& runtimeGlbPath,
         asset_ = {};
         return false;
     }
-    return DeriveAssetGripSockets(diagnostic) &&
-           BuildBootGroundingProfiles(diagnostic);
+    if (!DeriveAssetGripSockets(diagnostic) || !BuildBootGroundingProfiles(diagnostic)) return false;
+    utilityCandidateReady_ = utilityCandidate;
+    return true;
 }
 
 bool PlayerRenderSlot::BuildBootGroundingProfiles(std::string& diagnostic)
@@ -580,7 +657,8 @@ float PlayerRenderSlot::BootGroundingOffsetMetres(
     float minimumY = 0.0f;
     std::string ignoredDiagnostic;
     if (!asset_.BootGroundingMinimumY(
-            clip, animation.locomotionTime, minimumY, ignoredDiagnostic))
+            clip, horde::gameplay::animation::PlayerLocomotionSampleTime(
+                animation, asset_.ClipDuration(clip)), minimumY, ignoredDiagnostic))
         return kPlayerBootGroundingSafetyMetres;
     return -minimumY + kPlayerBootGroundingSafetyMetres;
 }
@@ -732,16 +810,166 @@ bool PlayerRenderSlot::PreparePose(
     std::string& diagnostic,
     RtSceneRecordObservation* observation)
 {
+    return PrepareBoundPose(animation, std::nullopt, tickIndex, cadence,
+                            poseUpdated, diagnostic, observation);
+}
+
+bool ResolvePlayerUtilitySample(
+    const horde::gameplay::items::UtilityHandReturnSnapshot& hand,
+    std::optional<PlayerUtilitySample>& sample, bool& flaskHeld, std::string& diagnostic)
+{
+    using namespace horde::gameplay::items;
+    using Phase = UtilityHandPhase;
+    using Hand = UtilityHandReturn;
+    sample.reset(); flaskHeld = false;
+    const double t=hand.profileSeconds, elapsed=hand.usingElapsedSeconds;
+    bool valid=std::isfinite(t) && std::isfinite(elapsed) && t>=0.0 && elapsed>=0.0 &&
+        t<=Hand::kUseDurationSeconds && elapsed<=Hand::kUseDurationSeconds;
+    switch(hand.phase) {
+    case Phase::Idle: valid=valid && t==0.0 && elapsed==0.0 && !hand.cancelled; break;
+    case Phase::Using: valid=valid && !hand.cancelled && t==elapsed; break;
+    case Phase::ReverseLift:
+        valid=valid && hand.cancelled && t>Hand::kGripAcquireSeconds && t<Hand::kLiftEndSeconds &&
+            elapsed>=t && elapsed<Hand::kLiftEndSeconds; break;
+    case Phase::ForwardReturn:
+        valid=valid && hand.cancelled && t>=Hand::kHoldEndSeconds && t<Hand::kEquipmentReleaseSeconds &&
+            elapsed>=Hand::kLiftEndSeconds && elapsed<=t; break;
+    case Phase::Released:
+        valid=valid && hand.cancelled &&
+            ((t<=Hand::kGripAcquireSeconds && elapsed==t) ||
+             (t==Hand::kGripAcquireSeconds && elapsed>t && elapsed<Hand::kLiftEndSeconds) ||
+             (t==Hand::kEquipmentReleaseSeconds && elapsed>=Hand::kLiftEndSeconds && elapsed<t) ||
+             (t>=Hand::kEquipmentReleaseSeconds && elapsed==t)); break;
+    default: valid=false; break;
+    }
+    if(!valid || (hand.phase!=Phase::Idle && !hand.generation)) {
+        diagnostic="Utility presentation requires a coherent finite simulation hand profile.";
+        return false;
+    }
+    if(hand.phase!=Phase::Idle && hand.phase!=Phase::Released) {
+        sample=PlayerUtilitySample{PlayerUtilityClip::Use,static_cast<float>(t),Hand::GripWeight(hand)};
+        flaskHeld=Hand::FlaskHeld(hand);
+    }
+    diagnostic.clear(); return true;
+}
+
+bool PlayerRenderSlot::PrepareUtilityCandidatePose(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
+    const PlayerUtilitySample sample, const std::uint64_t tickIndex,
+    const PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic,
+    RtSceneRecordObservation* observation)
+{
+    return PrepareBoundPose(animation, sample, tickIndex, cadence,
+                            poseUpdated, diagnostic, observation);
+}
+
+bool PlayerRenderSlot::PrepareBoundPose(
+    const horde::gameplay::animation::PlayerAnimationSnapshot& requestedAnimation,
+    const std::optional<PlayerUtilitySample> utility, const std::uint64_t tickIndex,
+    const PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic,
+    RtSceneRecordObservation* observation)
+{
+    // Preserve the ordinary no-copy input path. Only the explicit utility
+    // candidate needs a local right-arm target override.
+    std::optional<horde::gameplay::animation::PlayerAnimationSnapshot> utilityAnimation;
+    if (utility) utilityAnimation = requestedAnimation;
+    const auto& animation = utility ? *utilityAnimation : requestedAnimation;
     poseUpdated = false;
     if (!asset_.IsLoaded())
     {
         diagnostic = "Skinned player render slot has no loaded asset.";
         return false;
     }
+    const auto rejectUtility = [&] {
+        solvedPose_ = {}; sockets_ = {}; hasLastPreparedAnimation_ = false;
+        lastUtilitySample_.reset(); lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
+        return false;
+    };
+    horde::scene::SkinnedClip clip = animation.locomotionClip ==
+        horde::gameplay::animation::PlayerLocomotionClip::Walk
+        ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle;
+    if (utility)
+    {
+        using namespace horde::gameplay::animation;
+        if (!utilityCandidateReady_ ||
+            (utility->clip != PlayerUtilityClip::Use && utility->clip != PlayerUtilityClip::Cancel) ||
+            !std::isfinite(utility->seconds) || utility->seconds < 0.f ||
+            !std::isfinite(utility->weight) || utility->weight < 0.f || utility->weight > 1.f ||
+            (animation.locomotionClip != PlayerLocomotionClip::Idle &&
+             animation.locomotionClip != PlayerLocomotionClip::Walk) ||
+            !std::isfinite(animation.locomotionBlend) || animation.locomotionBlend < 0.f ||
+            animation.locomotionBlend > 1.f ||
+            (utility->weight > 0.f && (animation.combatLayer.action != PlayerUpperBodyAction::None ||
+             animation.combatLayer.weight != 0.f || animation.combatLayer.guardPoseWeight != 0.f)))
+        {
+            diagnostic = "Utility candidate requires explicit bindings, a finite sample and unoccupied Idle/Walk pose.";
+            return rejectUtility();
+        }
+        // Slots are caller-selected semantic bindings, not a combat action.
+        const auto utilityClip = utility->clip == PlayerUtilityClip::Use ? horde::scene::SkinnedClip::Attack :
+                                                                        horde::scene::SkinnedClip::Dead;
+        if (utility->seconds > asset_.ClipDuration(utilityClip))
+        {
+            diagnostic = "Utility candidate sample exceeds its non-looping clip.";
+            return rejectUtility();
+        }
+        constexpr std::array<std::string_view, 3> sourceNames{{"RightShoulder", "RightForeArm", "RightGrip"}};
+        constexpr std::array<std::string_view, 2> baseNames{{"RightShoulder", "RightArm"}};
+        std::array<horde::scene::SkinnedNodeTransform, 3> source{};
+        std::array<horde::scene::SkinnedNodeTransform, 2> base{};
+        if (!asset_.NodeTransforms(utilityClip, utility->seconds, sourceNames, source, diagnostic) ||
+            !asset_.NodeTransforms(clip, PlayerLocomotionSampleTime(animation, asset_.ClipDuration(clip)),
+                                   baseNames, base, diagnostic))
+            return rejectUtility();
+        // Rebase the authored targets at the unchanged shoulder parent, not
+        // RightArm's animated rotation. Locomotion still owns hips, spine/feet
+        // and the base pose; only the existing right-arm solve receives goals.
+        const auto anchor = horde::gameplay::items::MultiplyHeldItemTransforms(
+            RigidPlayerBoneInModel(base[0]), InverseRigid(RigidPlayerBoneInModel(source[0])));
+        auto grip = horde::gameplay::items::MultiplyHeldItemTransforms(
+            anchor, RigidPlayerBoneInModel(source[2]));
+        std::array<float,3> shiftedGrip{{grip[12],grip[13],grip[14]}};
+        ApplyPlantedTorsoTranslation(shiftedGrip,animation);
+        for(unsigned axis=0;axis<3;++axis)grip[12+axis]=shiftedGrip[axis];
+        if (!horde::gameplay::items::ValidateHeldItemSocketTransform(grip, diagnostic))
+            return rejectUtility();
+        auto& right = utilityAnimation->rightIk;
+        const auto ordinaryRight=right;
+        if(utility->weight>0.f)right=BlendPlayerArmGripTarget(ordinaryRight,grip,utility->weight);
+        const auto desiredHand = horde::gameplay::items::MultiplyHeldItemTransforms(
+            grip, InverseRigid(rightHandFromGripSocket_));
+        Vec3 elbow{};
+        for (unsigned axis=0; axis<3; ++axis)
+            elbow[axis] = anchor[12+axis] + anchor[axis]*source[1][12] +
+                anchor[4+axis]*source[1][13] + anchor[8+axis]*source[1][14];
+        ApplyPlantedTorsoTranslation(elbow,animation);
+        Vec3 shoulder{{base[1][12], base[1][13], base[1][14]}};
+        ApplyPlantedTorsoTranslation(shoulder,animation);
+        const auto direction = Normalise(Subtract({{desiredHand[12], desiredHand[13], desiredHand[14]}}, shoulder));
+        const auto toElbow = Subtract(elbow, shoulder);
+        if(utility->weight>0.f) {
+            const auto sourcePole=Normalise(Subtract(toElbow, Scale(direction, Dot(toElbow, direction))));
+            const auto pole=Add(Scale(ordinaryRight.pole,1.f-utility->weight),Scale(sourcePole,utility->weight));
+            right.pole=Dot(pole,pole)>1e-12f?Normalise(pole):sourcePole;
+            right.preferredElbowFlexionRadians=ordinaryRight.preferredElbowFlexionRadians*(1.f-utility->weight);
+            right.poseWeight=ordinaryRight.poseWeight+(1.f-ordinaryRight.poseWeight)*utility->weight;
+        }
+    }
+    // Validate before cadence reuse: an invalid request cannot return a stale
+    // valid palette at the same tick or within the 30 Hz interval.
+    if (!ValidatePlantedStance(animation, diagnostic))
+    {
+        solvedPose_ = {};
+        sockets_ = {};
+        hasLastPreparedAnimation_ = false;
+        lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
+        return false;
+    }
     const bool importedPoseAtSameTick = hasLastPreparedAnimation_ &&
         tickIndex == lastSkinnedTick_ && animation != lastPreparedAnimation_;
+    const bool utilityChanged = utility != lastUtilitySample_;
     if (!PlayerPoseNeedsRefresh(tickIndex, lastSkinnedTick_, cadence) &&
-        !importedPoseAtSameTick)
+        !importedPoseAtSameTick && !utilityChanged)
     {
         diagnostic.clear();
         return true;
@@ -752,10 +980,6 @@ bool PlayerRenderSlot::PreparePose(
         return false;
     }
 
-    const horde::scene::SkinnedClip clip =
-        animation.locomotionClip == horde::gameplay::animation::PlayerLocomotionClip::Walk
-        ? horde::scene::SkinnedClip::Walking
-        : horde::scene::SkinnedClip::Idle;
     // The renderer adapter supplies gameplay-owned grip targets transformed
     // into the player's +Z-forward model space. The rig solves to those exact
     // points; imported clips never dictate item or damage timing.
@@ -807,14 +1031,23 @@ bool PlayerRenderSlot::PreparePose(
         return false;
     }
     RtSceneStageScope skinScope(observation, horde::telemetry::RtStage::PlayerSkin);
+    RtSceneStageScope poseScope(observation, horde::telemetry::RtStage::PlayerPose);
+    const float sampleTime = horde::gameplay::animation::PlayerLocomotionSampleTime(animation, asset_.ClipDuration(clip));
     if (!asset_.EvaluatePlayerPose(
-            clip, animation.locomotionTime, left, right, solvedPose_, diagnostic) ||
-        !asset_.SkinPlayerPoseUniqueTextured(
-            solvedPose_, uniqueVertices_, uniqueTangents_, diagnostic))
+            clip, sampleTime, left, right, solvedPose_, diagnostic,
+            animation.plantedPelvisDropMetres, animation.crouchPelvisDropMetres,
+            DodgePose(animation)))
     {
+        poseScope.Cancel();
         skinScope.Cancel();
         return false;
     }
+    poseScope.Complete(1u);
+    RtSceneStageScope vertexScope(observation, horde::telemetry::RtStage::PlayerVertices);
+    if(!asset_.SkinPlayerPoseUniqueTextured(solvedPose_, uniqueVertices_, uniqueTangents_, diagnostic)) {
+        vertexScope.Cancel();skinScope.Cancel();return false;
+    }
+    vertexScope.Complete(1u,0u,uniqueVertices_.size());
     sockets_ = solvedPose_.Sockets();
     skinScope.Complete(1u);
     const auto socketError = [](const horde::scene::SkinnedNodeTransform& socket,
@@ -825,6 +1058,11 @@ bool PlayerRenderSlot::PreparePose(
     };
     leftSocketErrorMetres_ = socketError(sockets_.leftGrip, animation.leftIk);
     rightSocketErrorMetres_ = socketError(sockets_.rightGrip, animation.rightIk);
+    if (utility && rightSocketErrorMetres_ > kPlayerGripSocketToleranceMetres)
+    {
+        diagnostic = "Authored utility right Grip does not match the native solved pose.";
+        return rejectUtility();
+    }
     // The right arm stays solved while its target moves between empty carry
     // and the item Grip. Partial diagnostic IK weights still permit an
     // intentionally unsolved pose; production targets keep the strict bound.
@@ -858,6 +1096,7 @@ bool PlayerRenderSlot::PreparePose(
     }
     lastSkinnedTick_ = tickIndex;
     lastPreparedAnimation_ = animation;
+    lastUtilitySample_ = utility;
     hasLastPreparedAnimation_ = true;
     poseUpdated = true;
     diagnostic.clear();
@@ -869,13 +1108,15 @@ bool PlayerRenderSlot::ShoulderCenter(
     std::array<float, 3u>& center,
     std::string& diagnostic) const
 {
+    if (!ValidatePlantedStance(animation, diagnostic)) return false;
     const horde::scene::SkinnedClip clip =
         animation.locomotionClip == horde::gameplay::animation::PlayerLocomotionClip::Walk
         ? horde::scene::SkinnedClip::Walking
         : horde::scene::SkinnedClip::Idle;
     constexpr std::array<std::string_view, 2u> names{{"LeftArm", "RightArm"}};
     std::array<horde::scene::SkinnedNodeTransform, 2u> pose{};
-    if (!asset_.NodeTransforms(clip, animation.locomotionTime, names, pose,
+    if (!asset_.NodeTransforms(clip, horde::gameplay::animation::PlayerLocomotionSampleTime(
+                animation, asset_.ClipDuration(clip)), names, pose,
                                diagnostic))
         return false;
     const auto& left = pose[0];
@@ -883,6 +1124,7 @@ bool PlayerRenderSlot::ShoulderCenter(
     center = {{(left[12] + right[12]) * 0.5f,
                (left[13] + right[13]) * 0.5f,
                (left[14] + right[14]) * 0.5f}};
+    ApplyPlantedTorsoTranslation(center, animation);
     diagnostic.clear();
     return true;
 }
@@ -899,13 +1141,17 @@ bool PlayerRenderSlot::AnimatedHipsWorldTransform(
         diagnostic = "Player Hips mount requires the loaded runtime rig.";
         return false;
     }
+    if (!ValidatePlantedStance(animation, diagnostic)) return false;
     const auto clip = animation.locomotionClip ==
             horde::gameplay::animation::PlayerLocomotionClip::Walk
         ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle;
     horde::scene::SkinnedNodeTransform hips{};
-    if (!asset_.NodeTransform(clip, animation.locomotionTime, "Hips", hips,
+    if (!asset_.NodeTransform(clip, horde::gameplay::animation::PlayerLocomotionSampleTime(
+                animation, asset_.ClipDuration(clip)), "Hips", hips,
                               diagnostic))
         return false;
+    std::array<float, 3u> hipsPosition{{hips[12], hips[13], hips[14]}};
+    ApplyPlantedTorsoTranslation(hipsPosition, animation);
     const auto axisToWorld = [&basis](const std::array<float, 3u>& axis) {
         return Normalise(PlayerModelVectorToWorld(basis, axis));
     };
@@ -920,7 +1166,7 @@ bool PlayerRenderSlot::AnimatedHipsWorldTransform(
         z = Scale(z, -1.0f);
     }
     const Vec3 offset = PlayerModelVectorToWorld(
-        basis, {{hips[12], hips[13], hips[14]}});
+        basis, hipsPosition);
     const Vec3 position = Add(rootWorld, offset);
     worldFromHips = TransformFromAxes(x, y, z, position);
     if (!horde::gameplay::items::ValidateHeldItemSocketTransform(

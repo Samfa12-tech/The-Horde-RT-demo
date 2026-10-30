@@ -1,0 +1,16 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start  73: horde_rt_player_directional_rig_tests
+1/2 Test  #73: horde_rt_player_directional_rig_tests ...***Failed    5.73 sec
+FAIL: reversed phase must revisit actual foot/toe/boot/Grip/grounding poses in the opposite order
+
+    Start 100: horde_rt_player_animation_tests
+2/2 Test #100: horde_rt_player_animation_tests .........   Passed    3.58 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =   9.34 sec
+
+The following tests FAILED:
+	 73 - horde_rt_player_directional_rig_tests (Failed)
+Errors while running CTest

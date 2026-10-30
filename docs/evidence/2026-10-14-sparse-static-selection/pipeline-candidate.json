@@ -1,0 +1,19 @@
+{
+  "deadlineSeconds": 180,
+  "scope": "Frozen Debug sparse GPU-owner transaction; not contributor eligibility or playable FPS",
+  "triangles": [
+    75693,
+    91585
+  ],
+  "checkpoint": "chapter-lantern-side-wall-high",
+  "executableSha256": "25acda64dcf9828284cc79a4c1a9aa6a8489dfc3875fc5fb446315837ca60190",
+  "backend": "RayTracingPipeline",
+  "sources": {
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "1a7433241c0f4f591546f842c8d954102972f5b19200b29e7bf43fa348cef1c5",
+    "src/platform/windows/DiagnosticWindow.cpp": "1051da2a104d732ddf4135f2d10b57f551c5440bfe41cc1be0b7eea3180844ca",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "2bae2032385935cf4d7e314983cb42bea7f79754749e8b0a73848e485a245540",
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": "6bb72220f8c1e50dc37aab6a96d124c2d66660b3cd7581b50d31fdc6bff3efd8",
+    "src/vulkan/raytracing/RtStaticMeshSlot.h": "0e3557d6bf355cbd4ac91f587e14e63e837b282d7feb1d22fa1fdea5a1eac1ea",
+    "src/vulkan/raytracing/RtStaticMeshSlot.cpp": "17acd3ef03d98ce3e729f6cb9e123d39a15e5968b8e3b7e94f80e56e515971a6"
+  }
+}

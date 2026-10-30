@@ -1,0 +1,515 @@
+--- a/src/vulkan/raytracing/PresentableTinyRtScene.cpp
++++ b/src/vulkan/raytracing/PresentableTinyRtScene.cpp
+@@ -1,3 +1,4 @@
++#include "vulkan/raytracing/SmokeMediumUpload.h"
+ #include "gameplay/effects/KeeperCastPresentation.h"
+ #include "scene/EntryPortalCapGeometry.h"
+ #include "scene/ForestDressing.h"
+@@ -77,6 +78,11 @@
+     horde::scene::atmosphere::DustFrame dust{};
+ };
+ static_assert(offsetof(QualityDustUpload,dust)==16 && sizeof(QualityDustUpload)==11280);
++struct alignas(16) ExtendedQualityDustUpload {
++    QualityDustUpload prefix{};
++    RtSmokeMediumGpu smoke{};
++};
++static_assert(offsetof(ExtendedQualityDustUpload,smoke)==11280 && sizeof(ExtendedQualityDustUpload)==11376);
+ static_assert(sizeof(horde::scene::atmosphere::DustMote)==sizeof(RtDustMoteGpu));
+ static_assert(offsetof(horde::scene::atmosphere::DustMote,response)==offsetof(RtDustMoteGpu,response));
+ }
+@@ -577,6 +583,7 @@
+     tlasPendingDefinitionsValid_ = std::exchange(other.tlasPendingDefinitionsValid_, false);
+     heldLightBuffer_ = std::exchange(other.heldLightBuffer_, Buffer{});
+     fireEmitterBuffer_ = std::exchange(other.fireEmitterBuffer_, Buffer{});
++    smokeInvestigation_ = std::exchange(other.smokeInvestigation_, RtSmokeMediumGpu{});
+     qualityControlsBuffer_ = std::exchange(other.qualityControlsBuffer_, {});
+     waterContactRippleBuffer_ = std::exchange(other.waterContactRippleBuffer_, {});
+     uploadedQualityControls_ = std::exchange(other.uploadedQualityControls_, {});
+@@ -3869,7 +3876,8 @@
+     std::array<RtFireEmitterGpu, kRtFireEmitterCapacity> fire{};
+     const auto initialQuality = *ResolveRtQualityControls(std::nullopt, RtWorkloadPreset::Authored,
+         pipelineBundle_.Request().quality == DielectricQuality::High);
+-    const QualityDustUpload initialDustQuality{initialQuality,{}};
++    const ExtendedQualityDustUpload initialDustQuality{{initialQuality,{}},
++        sceneProfile_==RtSceneProfile::Showcase && developmentRescueJourney_ ? smokeInvestigation_ : RtSmokeMediumGpu{}};
+     const auto initialWaterContactRipple = MakeRegionalWaterRenderData(false);
+     if (!upload(vertices.data(), vertices.size() * sizeof(Vertex), geometryUsage, true, "preview world vertices", vertexBuffer_) ||
+         !upload(indices.data(), indices.size() * sizeof(std::uint32_t), geometryUsage, true, "preview world indices", indexBuffer_) ||
+@@ -4962,7 +4970,7 @@
+         !CreateBuffer(sizeof(RtFireEmitterGpu) * kRtFireEmitterCapacity,
+                       VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                       uploadMemory, false, fireEmitterBuffer_, diagnostic) ||
+-        !CreateBuffer(sizeof(QualityDustUpload), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
++        !CreateBuffer(sizeof(ExtendedQualityDustUpload), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                       uploadMemory, false, qualityControlsBuffer_, diagnostic) ||
+         !CreateBuffer(sizeof(RegionalWaterRenderData), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                       uploadMemory, false, waterContactRippleBuffer_, diagnostic) ||
+@@ -4974,7 +4982,8 @@
+ 
+     const auto initialQuality = *ResolveRtQualityControls(std::nullopt, RtWorkloadPreset::Authored,
+         pipelineBundle_.Request().quality == DielectricQuality::High);
+-    const QualityDustUpload initialDustQuality{initialQuality,{}};
++    const ExtendedQualityDustUpload initialDustQuality{{initialQuality,{}},
++        sceneProfile_==RtSceneProfile::Showcase && developmentRescueJourney_ ? smokeInvestigation_ : RtSmokeMediumGpu{}};
+     const auto initialWaterContactRipple = MakeRegionalWaterRenderData(developmentRescueJourney_ && regionalWaterDiagnosticEnabled_);
+     const RtHeldLightGpu initialHeldLight{};
+     const std::array<RtFireEmitterGpu, kRtFireEmitterCapacity> initialFireEmitters{};
+--- a/src/vulkan/raytracing/PresentableTinyRtScene.h
++++ b/src/vulkan/raytracing/PresentableTinyRtScene.h
+@@ -1,4 +1,5 @@
+ #pragma once
++#include "vulkan/raytracing/SmokeMediumUpload.h"
+ #ifndef HORDE_RT_FRAME_STAGE_PROBE
+ #define HORDE_RT_FRAME_STAGE_PROBE 0
+ #endif
+@@ -353,6 +354,15 @@
+     // Set before Initialise; geometry admission is explicit and development-only.
+     void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
+     void SetDevelopmentRescueJourney(bool enabled) { developmentRescueJourney_=enabled; }
++#ifndef NDEBUG
++    // Static investigation selection only. No live mapped alias or settings write.
++    bool SetSmokeMediumInvestigation(const RtSmokeMediumGpu& medium) {
++        if(!ValidSmokeMedium(medium))return false;
++        if(ready_ || device_!=VK_NULL_HANDLE)return SameSmokeMedium(medium,smokeInvestigation_);
++        smokeInvestigation_=medium;return true;
++    }
++#endif
++
+     // Explicit representation fallback; select before initialisation. This does
+     // not change settings, geometry quality, placement, collision or save state.
+     bool SetSharedForestGeometryEnabled(bool enabled) {
+@@ -1238,6 +1248,7 @@
+     bool tlasPendingDefinitionsValid_ = false;
+     Buffer heldLightBuffer_;
+     Buffer fireEmitterBuffer_;
++    RtSmokeMediumGpu smokeInvestigation_{};
+     Buffer qualityControlsBuffer_;
+     Buffer waterContactRippleBuffer_;
+     RtQualityControlsGpu uploadedQualityControls_{};
+--- a/src/vulkan/raytracing/RtSceneAbi.def
++++ b/src/vulkan/raytracing/RtSceneAbi.def
+@@ -193,6 +193,49 @@
+         { "name": "positionRadius", "type": "float4", "offset": 0 },
+         { "name": "response", "type": "float4", "offset": 16 }
+       ]
++    },
++    {
++      "name": "RtSmokeMediumGpu",
++      "alignment": 16,
++      "size": 96,
++      "fields": [
++        {
++          "name": "boundsMinExtinction",
++          "type": "float4",
++          "offset": 0,
++          "comment": "AABB minimum XYZ; extinction coefficient per metre."
++        },
++        {
++          "name": "boundsMaxReserved",
++          "type": "float4",
++          "offset": 16,
++          "comment": "AABB maximum XYZ; reserved zero."
++        },
++        {
++          "name": "outletRadius",
++          "type": "float4",
++          "offset": 32,
++          "comment": "Rising plume outlet XYZ and base radius metres."
++        },
++        {
++          "name": "flowShape",
++          "type": "float4",
++          "offset": 48,
++          "comment": "Horizontal flow XZ metres/second, rise speed metres/second, upper radius metres."
++        },
++        {
++          "name": "albedoAnisotropy",
++          "type": "float4",
++          "offset": 64,
++          "comment": "Single-scattering albedo RGB and phase anisotropy g."
++        },
++        {
++          "name": "identity",
++          "type": "uint4",
++          "offset": 80,
++          "comment": "Stable source ID (zero disabled), Low1/High2, rising-plume profile1, reserved zero."
++        }
++      ]
+     }
+   ]
+ }
+--- a/tests/RtSceneAbiTests.cpp
++++ b/tests/RtSceneAbiTests.cpp
+@@ -1,3 +1,4 @@
++#include "vulkan/raytracing/SmokeMediumUpload.h"
+ #include "scene/assets/StaticMeshAsset.h"
+ #include "graphics/BoundedDynamicResolution.h"
+ #include "graphics/TemporalGeometryHistory.h"
+@@ -655,11 +656,38 @@
+           !ProposedAttachmentBytes(0,1080),"HDR depth motion history estimate is exact and overflow safe");
+ }
+ 
++void TestBoundedSmokeUpload() {
++    using namespace horde::vulkan::raytracing;
++    static_assert(sizeof(RtSmokeMediumGpu)==96 && alignof(RtSmokeMediumGpu)==16);
++    Check(ValidSmokeMedium(RtSmokeMediumGpu{}),"disabled medium is exactly neutral");
++    RisingSmokeProfile p;p.stableId=17;p.outlet={95.36f,.3804492f,109.28f};
++    const auto low=PackRisingSmoke(p,SmokeMediumQuality::Low);
++    const auto high=PackRisingSmoke(p,SmokeMediumQuality::High);
++    Check(low&&high,"finite bounded plume packs both explicit tiers");
++    if(low&&high) {
++        Check(low->boundsMinExtinction==high->boundsMinExtinction&&low->outletRadius==high->outletRadius&&
++              low->albedoAnisotropy==high->albedoAnisotropy&&low->identity[1]==1&&high->identity[1]==2,
++              "tiers retain physical extinction/albedo/bounds while sampling changes");
++        auto bad=*low;bad.boundsMaxReserved[0]=p.outlet[0];
++        Check(!ValidSmokeMedium(bad),"truncated drift/radius envelope rejects");
++        bad=*low;bad.identity[0]=0;Check(!ValidSmokeMedium(bad),"inactive identity cannot hide stale active fields");
++        bad=*low;bad.identity[2]=2;Check(!ValidSmokeMedium(bad),"future profile is not silently enabled");
++    }
++    p.riseSpeed=0;Check(!PackRisingSmoke(p,SmokeMediumQuality::Low),"zero rise speed rejects before division");
++    p.riseSpeed=.8f;p.outlet[0]=std::numeric_limits<float>::quiet_NaN();
++    Check(!PackRisingSmoke(p,SmokeMediumQuality::High),"nonfinite source cannot reach shader");
++    p.outlet[0]=95.36f;p.height=100;
++    Check(!PackRisingSmoke(p,SmokeMediumQuality::Low),"oversized medium rejects instead of truncating");
++    Check(PackRisingSmoke(p,SmokeMediumQuality::Off)&&
++          ValidSmokeMedium(*PackRisingSmoke(p,SmokeMediumQuality::Off)),"explicit Off clears complete record");
++}
++
+ } // namespace
+ 
+ int main()
+ {
+     TestAbiLayout();
++    TestBoundedSmokeUpload();
+     TestGeneratedConstants();
+     TestGenericRegistrationAndMeasurements();
+     TestExplicitTextureGroups();
+--- a/tools/generate-rt-scene-abi.ps1
++++ b/tools/generate-rt-scene-abi.ps1
+@@ -286,6 +286,8 @@
+     RtQualityControlsGpu value;
+     RtDustMoteGpu dustMotes[$($c.dustMotes)];
+     uvec4 dustTiles[$($c.dustTiles)];
++    // One independent bounded medium follows the unchanged quality/dust prefix.
++    RtSmokeMediumGpu smoke;
+ } rtQualityControls;
+ layout(std430, set = 0, binding = $($b.waterContactRipple)) readonly buffer RtWaterContactRippleBuffer
+ {
+--- a/shaders/raytracing/include/rt_atmosphere.glsl
++++ b/shaders/raytracing/include/rt_atmosphere.glsl
+@@ -55,22 +55,6 @@
+         * (bolt + corona * 0.72) * (0.42 + charge * 2.65) * flicker;
+ }
+ 
+-bool rayBoxInterval(vec3 origin, vec3 direction, vec3 boundsMin, vec3 boundsMax,
+-                    out float intervalStart, out float intervalEnd)
+-{
+-    // Avoid infinities for rays parallel to one of the room planes without
+-    // changing the sign of any non-zero direction component.
+-    vec3 safeDirection = sign(direction + vec3(0.0000001))
+-        * max(abs(direction), vec3(0.0001));
+-    vec3 first = (boundsMin - origin) / safeDirection;
+-    vec3 second = (boundsMax - origin) / safeDirection;
+-    vec3 nearPlane = min(first, second);
+-    vec3 farPlane = max(first, second);
+-    intervalStart = max(max(nearPlane.x, nearPlane.y), nearPlane.z);
+-    intervalEnd = min(min(farPlane.x, farPlane.y), farPlane.z);
+-    return intervalEnd > max(intervalStart, 0.0);
+-}
+-
+ // A bounded source-to-medium visibility estimate, not a surface receiver.
+ // Keep point attenuation at each density sample; only visibility is reused.
+ struct MistIncidentSources
+--- a/shaders/raytracing/include/rt_frame.glsl
++++ b/shaders/raytracing/include/rt_frame.glsl
+@@ -1,7 +1,10 @@
+ // One per-pixel implementation; launchers supply only stage and pixel builtins.
+ #include "rt_scene_abi.glsl"
+ #include "rt_diagnostics.glsl"
++#include "rt_medium_common.glsl"
++#include "rt_smoke_density.glsl"
+ #include "rt_lighting.glsl"
++#include "rt_smoke_scattering.glsl"
+ #include "rt_dielectric_common.glsl"
+ #include "rt_dielectric_transport.glsl"
+ #include "rt_atmosphere.glsl"
+@@ -68,6 +71,9 @@
+             RT_DIAG_ADD(primaryRewardBodyPixelCount, 1u);
+     }
+     vec3 color = shadePrimary(primary, rayDirection);
++    // The selected distant medium precedes admitted near/local fire.
++    vec4 smokeVolume=integrateBoundedSmoke(origin,rayDirection,primary.hit?primary.t:10000.0,false);
++    color=color*smokeVolume.a+smokeVolume.rgb;
+     vec4 fireVolume = integrateFireEmitters(
+         origin, rayDirection, primary.hit ? primary.t : 10000.0, false);
+     color = color * fireVolume.a + fireVolume.rgb;
+--- a/shaders/raytracing/include/rt_lighting.glsl
++++ b/shaders/raytracing/include/rt_lighting.glsl
+@@ -897,11 +897,13 @@
+                                   float maxDistance, uint mask)
+ {
+ #if HORDE_GENERIC_TRANSMISSION_VARIANT
+-    return boundedShadowTransmittanceMask(
+-        origin, direction, maxDistance, mask);
++    vec3 geometry=boundedShadowTransmittanceMask(origin,direction,maxDistance,mask);
+ #else
+-    return vec3(visibilityMask(origin, direction, maxDistance, mask));
++    vec3 geometry=vec3(visibilityMask(origin,direction,maxDistance,mask));
+ #endif
++    if(rtQualityControls.smoke.identity.x==0u || max(geometry.r,max(geometry.g,geometry.b))<=0.0)
++        return geometry;
++    return geometry*boundedSmokeTransmittance(origin,direction,maxDistance);
+ }
+ 
+ vec3 offsetRayOrigin(HitInfo h, vec3 direction)
+--- a/shaders/raytracing/include/rt_dielectric_common.glsl
++++ b/shaders/raytracing/include/rt_dielectric_common.glsl
+@@ -197,6 +197,9 @@
+         float reflectedLocalDistance = reflectedHit.hit ? reflectedHit.t : 12.0;
+         reflectedHit.t += h.t;
+         reflected = shadeOpaqueSecondary(reflectedHit, reflectionDirection);
++        vec4 reflectedSmoke=integrateBoundedSmoke(h.position+geometricNormal*.006,reflectionDirection,min(reflectedLocalDistance,12.0),true);
++        reflected=reflected*reflectedSmoke.a+reflectedSmoke.rgb;
++
+         vec4 reflectedFire = integrateFireEmitters(
+             h.position + geometricNormal * 0.006,
+             reflectionDirection,
+@@ -370,6 +373,9 @@
+         bounce = bounceSample(bounceHit, bounceDirection, wantsPlayerReflection);
+         if (wantsPlayerReflection)
+         {
++            vec4 reflectedSmoke=integrateBoundedSmoke(offsetRayOrigin(h,bounceDirection),bounceDirection,min(bounceHit.hit?bounceHit.t:12.0,12.0),true);
++            bounce=bounce*reflectedSmoke.a+reflectedSmoke.rgb;
++
+             vec4 reflectedFire = integrateFireEmitters(
+                 offsetRayOrigin(h, bounceDirection), bounceDirection,
+                 min(bounceHit.hit ? bounceHit.t : 12.0, 12.0), true);
+@@ -425,6 +431,8 @@
+                                             0.002, false, false);
+         vec3 transmitted = transmittedHit.hit
+             ? bounceSample(transmittedHit, rayDirection, false) : skyColor(rayDirection);
++        vec4 transmittedSmoke=integrateBoundedSmoke(h.position+rayDirection*.012,rayDirection,(transmittedHit.hit?transmittedHit.t:10000.0),true);
++        transmitted=transmitted*transmittedSmoke.a+transmittedSmoke.rgb;
+         vec3 tint = vec3(0.82, 0.94, 1.0);
+         float viewCosine = clamp(dot(h.geometricNormal, -rayDirection), 0.0, 1.0);
+         float fresnel = 0.04 + 0.96 * pow(1.0 - viewCosine, 5.0);
+--- a/shaders/raytracing/include/rt_dielectric_transport.glsl
++++ b/shaders/raytracing/include/rt_dielectric_transport.glsl
+@@ -114,6 +114,8 @@
+     }
+     reflectedLocalDistance = reflectedHit.hit
+         ? max(reflectedHit.t - firstHit.t, 0.0) : 12.0;
++    vec4 reflectedSmoke=integrateBoundedSmoke(firstHit.position+reflectionDirection*.004,reflectionDirection,min(reflectedLocalDistance,12.0),true);
++    reflected=reflected*reflectedSmoke.a+reflectedSmoke.rgb;
+     vec4 reflectedFire = integrateFireEmitters(
+         firstHit.position + reflectionDirection * 0.004,
+         reflectionDirection, min(reflectedLocalDistance, 12.0), true);
+@@ -130,6 +132,7 @@
+     HitInfo currentHit = firstHit;
+     float totalDistance = firstHit.t;
+     vec3 transmitted = vec3(0.0);
++    vec3 transmittedSmoke = vec3(0.0);
+     bool terminalResolved = false;
+     bool overflowed = false;
+     bool touchedProductionPane = false;
+@@ -412,6 +415,7 @@
+     }
+     // Roughness changes the same bounded reflection/transmission response; it
+     // never switches to a screen sample or adds a recursive glossy path.
++    transmitted += transmittedSmoke;
+     return reflected * firstFresnel + transmitted;
+ }
+ 
+@@ -482,6 +486,8 @@
+         reflected = shadeTerminalOpaqueEmissive(
+             reflectedHit, reflectionDirection);
+     }
++    vec4 reflectedSmoke=integrateBoundedSmoke(firstHit.position+reflectionDirection*.004,reflectionDirection,min(reflectedLocalDistance,12.0),true);
++    reflected=reflected*reflectedSmoke.a+reflectedSmoke.rgb;
+     vec4 reflectedFire = integrateFireEmitters(
+         firstHit.position + reflectionDirection * 0.004,
+         reflectionDirection, min(reflectedLocalDistance, 12.0), true);
+@@ -503,6 +509,7 @@
+     HitInfo currentHit = firstHit;
+     float totalDistance = firstHit.t;
+     vec3 transmitted = vec3(0.0);
++    vec3 transmittedSmoke = vec3(0.0);
+ 
+     for (int interfaceIndex = 0; interfaceIndex <= HORDE_RT_DIELECTRIC_INTERFACE_CEILING;
+          ++interfaceIndex)
+@@ -694,5 +701,6 @@
+         transmitted = dielectricOverflowFallback(
+             transmissionDirection, throughput);
+     }
++    transmitted += transmittedSmoke;
+     return reflected * firstFresnel + transmitted;
+ }
+--- /dev/null
++++ b/src/vulkan/raytracing/SmokeMediumUpload.h
+@@ -0,0 +1,64 @@
++#pragma once
++#include "vulkan/raytracing/RtSceneAbi.generated.h"
++#include <array>
++#include <algorithm>
++#include <cmath>
++#include <optional>
++
++namespace horde::vulkan::raytracing {
++enum class SmokeMediumQuality : unsigned { Off=0, Low=1, High=2 };
++// One declared source, not a scatter list or a new simulation owner. Motion uses
++// immutable fixed-step time; no per-frame tail upload.
++struct RisingSmokeProfile {
++    std::uint32_t stableId=0;
++    std::array<float,3> outlet{};
++    float height=7,baseRadius=.22f,upperRadius=1.65f;
++    std::array<float,2> horizontalFlow{{.12f,.08f}};
++    float riseSpeed=.8f,extinction=.45f;
++    std::array<float,3> albedo{{.72f,.74f,.76f}};
++    float anisotropy=.35f;
++};
++inline bool ValidSmokeMedium(const RtSmokeMediumGpu& m) noexcept {
++    const auto finite=[](const auto& v){return std::all_of(v.begin(),v.end(),[](float x){return std::isfinite(x);});};
++    if(!finite(m.boundsMinExtinction)||!finite(m.boundsMaxReserved)||!finite(m.outletRadius)||
++       !finite(m.flowShape)||!finite(m.albedoAnisotropy))return false;
++    if(m.identity[0]==0) return m.identity==std::array<std::uint32_t,4>{}&&
++        m.boundsMinExtinction==std::array<float,4>{}&&m.boundsMaxReserved==std::array<float,4>{}&&
++        m.outletRadius==std::array<float,4>{}&&m.flowShape==std::array<float,4>{}&&m.albedoAnisotropy==std::array<float,4>{};
++    if((m.identity[1]!=1&&m.identity[1]!=2)||m.identity[2]!=1||m.identity[3]!=0||m.boundsMaxReserved[3]!=0||
++       m.boundsMinExtinction[3]<=0||m.boundsMinExtinction[3]>2||m.outletRadius[3]<.05f||m.outletRadius[3]>2||
++       m.flowShape[2]<.1f||m.flowShape[2]>4||m.flowShape[3]<m.outletRadius[3]||m.flowShape[3]>8||
++       std::abs(m.flowShape[0])>2||std::abs(m.flowShape[1])>2||std::abs(m.albedoAnisotropy[3])>.7f)return false;
++    for(unsigned i=0;i<3;++i)if(m.albedoAnisotropy[i]<0||m.albedoAnisotropy[i]>1||
++       m.boundsMaxReserved[i]<=m.boundsMinExtinction[i]||m.boundsMaxReserved[i]-m.boundsMinExtinction[i]>32)return false;
++    const float height=m.boundsMaxReserved[1]-m.outletRadius[1];
++    if(height<=0||height>32||m.boundsMinExtinction[1]!=m.outletRadius[1])return false;
++    for(unsigned j=0;j<2;++j) {
++        const unsigned axis=j?2:0;
++        const float radius=m.flowShape[3]+std::abs(m.flowShape[j])*height/m.flowShape[2]+.35f;
++        if(m.boundsMinExtinction[axis]>m.outletRadius[axis]-radius||
++           m.boundsMaxReserved[axis]<m.outletRadius[axis]+radius)return false;
++    }
++    return true;
++}
++inline bool SameSmokeMedium(const RtSmokeMediumGpu& a,const RtSmokeMediumGpu& b) noexcept {
++    return a.boundsMinExtinction==b.boundsMinExtinction&&a.boundsMaxReserved==b.boundsMaxReserved&&
++        a.outletRadius==b.outletRadius&&a.flowShape==b.flowShape&&
++        a.albedoAnisotropy==b.albedoAnisotropy&&a.identity==b.identity;
++}
++inline std::optional<RtSmokeMediumGpu> PackRisingSmoke(const RisingSmokeProfile& p,SmokeMediumQuality quality) noexcept {
++    if(quality==SmokeMediumQuality::Off)return RtSmokeMediumGpu{};
++    if((quality!=SmokeMediumQuality::Low&&quality!=SmokeMediumQuality::High)||!p.stableId||
++       !std::isfinite(p.riseSpeed)||p.riseSpeed<=0)return std::nullopt;
++    RtSmokeMediumGpu m{};m.outletRadius={p.outlet[0],p.outlet[1],p.outlet[2],p.baseRadius};
++    m.flowShape={p.horizontalFlow[0],p.horizontalFlow[1],p.riseSpeed,p.upperRadius};
++    m.albedoAnisotropy={p.albedo[0],p.albedo[1],p.albedo[2],p.anisotropy};
++    const float rx=p.upperRadius+std::abs(p.horizontalFlow[0])*p.height/p.riseSpeed+.35f;
++    const float rz=p.upperRadius+std::abs(p.horizontalFlow[1])*p.height/p.riseSpeed+.35f;
++    m.boundsMinExtinction={p.outlet[0]-rx,p.outlet[1],p.outlet[2]-rz,p.extinction};
++    m.boundsMaxReserved={p.outlet[0]+rx,p.outlet[1]+p.height,p.outlet[2]+rz,0};
++    m.identity={p.stableId,static_cast<std::uint32_t>(quality),1,0};
++    if(!ValidSmokeMedium(m))return std::nullopt;
++    return m;
++}
++} // namespace horde::vulkan::raytracing
+--- /dev/null
++++ b/shaders/raytracing/include/rt_medium_common.glsl
+@@ -0,0 +1,17 @@
++// Shared finite ray/box interval; unchanged Keeper behavior.
++bool rayBoxInterval(vec3 origin, vec3 direction, vec3 boundsMin, vec3 boundsMax,
++                    out float intervalStart, out float intervalEnd)
++{
++    // Avoid infinities for rays parallel to one of the room planes without
++    // changing the sign of any non-zero direction component.
++    vec3 safeDirection = sign(direction + vec3(0.0000001))
++        * max(abs(direction), vec3(0.0001));
++    vec3 first = (boundsMin - origin) / safeDirection;
++    vec3 second = (boundsMax - origin) / safeDirection;
++    vec3 nearPlane = min(first, second);
++    vec3 farPlane = max(first, second);
++    intervalStart = max(max(nearPlane.x, nearPlane.y), nearPlane.z);
++    intervalEnd = min(min(farPlane.x, farPlane.y), farPlane.z);
++    return intervalEnd > max(intervalStart, 0.0);
++}
++
+--- /dev/null
++++ b/shaders/raytracing/include/rt_smoke_density.glsl
+@@ -0,0 +1,43 @@
++// One bounded smoke medium, independent of flame, light admission and Mist.
++// This density-only path makes no RT or lighting calls, including in shadows.
++bool boundedSmokeSegment(vec3 origin,vec3 direction,float limit,out float a,out float b)
++{
++    if(rtQualityControls.smoke.identity.x==0u || limit<=0.0 || isnan(limit))return false;
++    if(!rayBoxInterval(origin,direction,rtQualityControls.smoke.boundsMinExtinction.xyz,
++        rtQualityControls.smoke.boundsMaxReserved.xyz,a,b))return false;
++    a=max(a,0.0);b=min(b,limit);return b>a;
++}
++float boundedSmokeDensity(vec3 p)
++{
++    RtSmokeMediumGpu m=rtQualityControls.smoke;
++    float height=m.boundsMaxReserved.y-m.outletRadius.y;
++    float y=p.y-m.outletRadius.y;
++    float h=clamp(y/height,0.0,1.0);
++    float time=controls.time;
++    vec2 flow=m.flowShape.xy*y/m.flowShape.z;
++    vec2 sway=vec2(sin(y*1.17-time*.32+float(m.identity.x)*.31),
++                    cos(y*.93-time*.27))*h*.3;
++    vec2 q=p.xz-m.outletRadius.xz-flow-sway;
++    float radius=mix(m.outletRadius.w,m.flowShape.w,h)*
++        (.87+.13*sin(y*1.6-time*.72));
++    float radial=length(q)/max(radius,.001);
++    float edge=1.0-smoothstep(.55,1.0,radial);
++    float advected=y-time*m.flowShape.z;
++    float broad=.62+.20*sin(advected*2.1+sin(q.x*1.6+time*.21)*.7)+
++                     .18*cos(q.y*2.0+advected*1.2);
++    if(m.identity.y==2u)
++        broad+=.10*sin(q.x*6.3+advected*4.7)*cos(q.y*5.8-advected*3.9);
++    float ends=smoothstep(0.0,.025,h)*(1.0-smoothstep(.72,1.0,h));
++    return max(0.0,clamp(broad,0.0,1.0)*edge*ends);
++}
++float boundedSmokeTransmittance(vec3 origin,vec3 direction,float limit)
++{
++    float a,b;if(!boundedSmokeSegment(origin,direction,limit,a,b))return 1.0;
++    int samples=rtQualityControls.smoke.identity.y==2u?4:2;
++    float ds=(b-a)/float(samples),tau=0.0;
++    for(int i=0;i<4;++i) {
++        if(i>=samples)break;
++        tau+=boundedSmokeDensity(origin+direction*(a+(float(i)+.5)*ds))*ds;
++    }
++    return exp(-rtQualityControls.smoke.boundsMinExtinction.w*tau);
++}
+--- /dev/null
++++ b/shaders/raytracing/include/rt_smoke_scattering.glsl
+@@ -0,0 +1,33 @@
++// Actual RT source visibility, with bounded per-interval anchor reuse.
++vec3 boundedSmokeSky(vec3 p,vec3 viewDirection)
++{
++    vec3 direction,radiance;float distance,gain;
++    activeSkyLight(p,areaShadowSampleIndex(),direction,distance,radiance,gain);
++    if(gain<=0.0 || isnan(gain) || isinf(gain))return vec3(0.0);
++    vec3 visibility=sceneShadowTransmittanceMask(p,direction,max(distance-.02,.004),0x35u);
++    float g=rtQualityControls.smoke.albedoAnisotropy.w;
++    float cosine=clamp(dot(-viewDirection,direction),-1.0,1.0);
++    float phase=(1.0-g*g)/(12.5663706*pow(max(1.0+g*g-2.0*g*cosine,.001),1.5));
++    return max(radiance,vec3(0.0))*gain*visibility*phase;
++}
++vec4 integrateBoundedSmoke(vec3 origin,vec3 direction,float limit,bool secondary)
++{
++    float a,b;if(!boundedSmokeSegment(origin,direction,limit,a,b))return vec4(0,0,0,1);
++    bool high=rtQualityControls.smoke.identity.y==2u;
++    int samples=secondary?(high?4:2):(high?8:4);
++    float ds=(b-a)/float(samples);
++    vec3 first=boundedSmokeSky(origin+direction*mix(a,b,high?.25:.5),direction);
++    vec3 second=high?boundedSmokeSky(origin+direction*mix(a,b,.75),direction):first;
++    vec3 radiance=vec3(0);float transmission=1.0;
++    for(int i=0;i<8;++i) {
++        if(i>=samples)break;
++        float t=(float(i)+.5)/float(samples);
++        vec3 p=origin+direction*(a+t*(b-a));
++        float sigma=rtQualityControls.smoke.boundsMinExtinction.w*boundedSmokeDensity(p);
++        float alpha=1.0-exp(-sigma*ds);
++        vec3 incident=mix(first,second,high?clamp((t-.25)*2.0,0.0,1.0):0.0);
++        radiance+=transmission*incident*rtQualityControls.smoke.albedoAnisotropy.rgb*alpha;
++        transmission*=1.0-alpha;
++    }
++    return vec4(radiance,transmission);
++}

@@ -1,4 +1,5 @@
 #include "telemetry/BenchmarkSummary.h"
+#include "reporting/ReportIdentity.h"
 
 #include <algorithm>
 #include <cmath>
@@ -131,14 +132,7 @@ bool CollectPopulation(const horde::gameplay::ShowcaseBenchmarkRun& benchmark,
 
 bool IsBenchmarkSummaryUuid(const std::string_view uuid) noexcept
 {
-    if (uuid.size() != 36u || uuid[14] != '4' ||
-        (uuid[19] != '8' && uuid[19] != '9' && uuid[19] != 'a' && uuid[19] != 'b')) return false;
-    for (std::size_t i = 0u; i < uuid.size(); ++i)
-    {
-        if (i == 8u || i == 13u || i == 18u || i == 23u) { if (uuid[i] != '-') return false; }
-        else if (!((uuid[i] >= '0' && uuid[i] <= '9') || (uuid[i] >= 'a' && uuid[i] <= 'f'))) return false;
-    }
-    return true;
+    return horde::reporting::IsReportUuidV4(uuid);
 }
 
 FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBenchmarkRun& benchmark,
@@ -162,11 +156,21 @@ FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBe
     { result.status_ = BenchmarkSummaryStatus::Incomplete; return result; }
     if (benchmark.Frames().size() != evidence.ExpectedCount())
     { result.status_ = BenchmarkSummaryStatus::MismatchedPopulation; return result; }
+    std::optional<RtFrameDimensionsEvidence> submittedDimensions;
     for (std::size_t i = 0u; i < benchmark.Frames().size(); ++i)
     {
         const auto& frame = benchmark.Frames()[i];
         RtExpectedFrameRecord row{};
-        if (!evidence.TryGetExpectedFrame(i, row) || row.tag.lap != benchmark.TotalLaps() || row.tag.lap != frame.lap ||
+        if (!evidence.TryGetExpectedFrame(i, row))
+        { result.status_ = BenchmarkSummaryStatus::MismatchedPopulation; return result; }
+        if (i == 0) submittedDimensions = row.dimensions;
+        const auto& m = completion.metadata;
+        if (row.dimensions != submittedDimensions || (row.dimensions &&
+            (!ValidRtFrameDimensionsEvidence(*row.dimensions) ||
+             row.dimensions->internalWidth != m.internalWidth || row.dimensions->internalHeight != m.internalHeight ||
+             row.dimensions->outputWidth != m.presentationWidth || row.dimensions->outputHeight != m.presentationHeight)))
+        { result.status_ = BenchmarkSummaryStatus::MismatchedPopulation; return result; }
+        if (row.tag.lap != benchmark.TotalLaps() || row.tag.lap != frame.lap ||
             row.tag.zone != static_cast<std::uint32_t>(frame.zone) ||
             std::find(kZones.begin(), kZones.end(), frame.zone) == kZones.end() ||
             row.disposition != RtExpectedFrameDisposition::Completed || !row.cpuAccepted || !row.hasGpuStatus ||
@@ -178,6 +182,7 @@ FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBe
         { result.status_ = BenchmarkSummaryStatus::MismatchedPopulation; return result; }
     }
     BenchmarkSummaryData data;
+    data.submittedDimensions = submittedDimensions;
     data.runUuid = runUuid;
     data.configuration.platform = completion.platform;
     data.configuration.water = completion.water;

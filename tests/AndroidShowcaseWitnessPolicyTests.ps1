@@ -16,22 +16,29 @@ $script:witnessChecks=0
 function Check([bool]$condition,[string]$message){if(-not $condition){throw $message};$script:witnessChecks++}
 function Reject([scriptblock]$action){$failed=$false;try{& $action}catch{$failed=$true};Check $failed 'Invalid witness policy must fail closed.'}
 $repository=Split-Path -Parent $PSScriptRoot
-Check ((Get-ExpectedShowcaseInstanceCapacity $repository) -eq 26) 'Current physical TLAS capacity26 includes player torch22, Keeper instances23/24 sharing metadata1, and scabbard25 using metadata23.'
+Check ((Get-ExpectedShowcaseInstanceCapacity $repository) -eq 31) 'Ordinary live TLAS count31 includes physical pickup30 while metadata and every legacy role remain unchanged.'
 $fixture=Join-Path ([IO.Path]::GetTempPath()) ('horde-witness-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path (Join-Path $fixture 'src/vulkan/raytracing') -Force | Out-Null
 try{
     $abiPath=Join-Path $fixture 'src/vulkan/raytracing/RtSceneAbi.def'
-    '{"schema":1,"capacities":{"instanceMetadata":21,"tlasInstances":21}}' | Set-Content -LiteralPath $abiPath
+    '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":21},"capacities":{"instanceMetadata":21,"tlasInstances":21}}' | Set-Content -LiteralPath $abiPath
     Check ((Get-ExpectedShowcaseInstanceCapacity $fixture) -eq 21) 'Equal metadata/TLAS fixtures retain their exact physical count.'
-    '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":32}}' | Set-Content -LiteralPath $abiPath
-    Check ((Get-ExpectedShowcaseInstanceCapacity $fixture) -eq 32) 'Aliased metadata22 derives actual physical32 rather than guessing metadata capacity.'
+    '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":30},"capacities":{"instanceMetadata":22,"tlasInstances":106}}' | Set-Content -LiteralPath $abiPath
+    Check ((Get-ExpectedShowcaseInstanceCapacity $fixture) -eq 30) 'The live profile count is independent of aliased metadata22 and spare physical storage106.'
+    '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":31},"capacities":{"instanceMetadata":30,"tlasInstances":107}}' | Set-Content -LiteralPath $abiPath
+    Check ((Get-ExpectedShowcaseInstanceCapacity $fixture) -eq 31) 'The joint carried/world flask profile uses31 physical definitions with shared metadata30 and bounded storage107.'
     foreach($invalid in @(
         '{"schema":1,"capacities":{"instanceMetadata":22}}',
         '{"schema":1,"capacities":{"instanceMetadata":0,"tlasInstances":24}}',
         '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":21}}',
         '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":257}}',
         '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":24.5}}',
-        '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":"24"}}'
+        '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":"24"}}',
+        '{"schema":1,"capacities":{"instanceMetadata":30,"tlasInstances":106}}',
+        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":0},"capacities":{"instanceMetadata":30,"tlasInstances":106}}',
+        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":107},"capacities":{"instanceMetadata":30,"tlasInstances":106}}',
+        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":30.5},"capacities":{"instanceMetadata":30,"tlasInstances":106}}',
+        '{"schema":1,"sceneCounts":{"ordinaryShowcaseTlasInstances":"30"},"capacities":{"instanceMetadata":30,"tlasInstances":106}}'
     )) {
         $invalid | Set-Content -LiteralPath $abiPath
         Reject {Get-ExpectedShowcaseInstanceCapacity $fixture}

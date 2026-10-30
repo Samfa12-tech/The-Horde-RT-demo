@@ -1,0 +1,13 @@
+{
+  "simulationHz": 60,
+  "deadlineSeconds": 180,
+  "maximumSimulationTicksPerRender": 4,
+  "sources": {
+    "src/gameplay/validation/ChapterRoundTripProbe.h": "fb8368500a4d6712803e21c2cdbf36118599908bf747d424cdffe77e9f9282a0",
+    "src/platform/windows/WindowsChapterRoundTripCapture.inl": "8e8ae0f6e2d03a39cec65cac9bfd7245f06457ac872e1e9af929f8321c0451a2",
+    "src/platform/windows/DiagnosticWindow.cpp": "b71a5ca1f884771107e3b75f7d3466e061fd55f6e79e22af1609caf2f549f5c6"
+  },
+  "scope": "Debug Diagnostic static-resident scripted route with normal Keeper vertex retirement/reset restore; not Shipping or owner acceptance",
+  "executableSha256": "30af7fa4ec92e886d4f0d902d05200b441e30e391367023c0dbbc79e01e19544",
+  "backend": "RayTracingPipeline"
+}

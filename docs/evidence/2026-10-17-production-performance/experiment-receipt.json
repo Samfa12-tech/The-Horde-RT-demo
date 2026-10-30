@@ -1,0 +1,26 @@
+{
+  "baseRevision": "3252820f6f443d127b128840621ed8846282172f",
+  "experiment": "Opaque-only hardware world-to-object inverse transpose",
+  "oneChange": true,
+  "decisionRule": {
+    "minimumRepeatableGpuImprovementPercent": 3,
+    "repeatPolicy": "at least two thermally comparable runs on each backend; reverse order as a drift check",
+    "regressions": "no material image difference; no repeatable outdoor or display-tail regression; unchanged ownership and settings",
+    "thermalComparison": "compare AP, BAT, SKIN at route start and throughout; report unmatched pairs, no clock or power control"
+  },
+  "artifacts": {
+    "baseline.apk": {
+      "sha256": "a49955a2638ae5bf0fc5e3ddc8bdf83c43a9335e5ada64f231503e66c95a8d6c",
+      "bytes": 183557978
+    },
+    "candidate.apk": {
+      "sha256": "fbfdf02ac41bc18924f890601e7b5f8769dfa1dbbeb44aa8da3cbfc97ef4e2a7",
+      "bytes": 183558938
+    },
+    "candidate.patch": {
+      "sha256": "647187ec43e8c80ccdd6d111c5dda1bb4915440be5e2e2492125d28e769a90bb",
+      "bytes": 31087668
+    }
+  },
+  "unmodifiedBudgetSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+}

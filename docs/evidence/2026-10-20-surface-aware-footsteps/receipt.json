@@ -1,0 +1,209 @@
+{
+  "date": "2026-10-20",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "sourceBase": "d15be5e000602e96e000a3da8b7b0a540efa6903",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "draftPr": 27,
+  "finalSourcesVerified": 13,
+  "binaries": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+      "bytes": 186113429,
+      "sha256": "b32ae9a387cda8c4248a10cfdc27d179610819d40d19dd6e658983736fc80ce0"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+      "bytes": 13921792,
+      "sha256": "a3feeaf4fa4e5ebd314ded6ac8a21349ab1c19fb24c4a159e5c204c5b705d5ae"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\HordeLanternRT.exe",
+      "bytes": 4613120,
+      "sha256": "d7b483c58fb7819cf90feb172b597a048e5ab98c37e3b46207043b68584fe495"
+    }
+  ],
+  "testBinaries": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_dry_footstep_tests.exe",
+      "bytes": 884736,
+      "sha256": "5b0ca7a9b6c3d1a47f1e4fe99aac117f011542e144a92d79f8495b4fbdeb7136"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_campaign_play_session_tests.exe",
+      "bytes": 1039360,
+      "sha256": "21e19ffca49c24fda85228d8926e925c81f46e9d58c9a16d973bfccc5ba4aba3"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-release\\Release\\horde_rt_spatial_audio_smoke.exe",
+      "bytes": 296448,
+      "sha256": "8b2c101f49c87439e2630bfb167a42a2cfb2ac96245c095c209b3ba262e85272"
+    }
+  ],
+  "androidAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "packagedCuesMatchRuntime": [
+    {
+      "entry": "assets/audio/filmcow/player_step_1.wav",
+      "bytes": 49172,
+      "sha256": "cdaaa9c321e6f4fbf12757fdc20633d4b8f0be30b127038d3cfe0581a8dea0fb"
+    },
+    {
+      "entry": "assets/audio/filmcow/player_step_2.wav",
+      "bytes": 32146,
+      "sha256": "261413fb6c185f9e7038a980fc7b124ef9bc7f6f93b258ed83d1d76eb7b9883e"
+    },
+    {
+      "entry": "assets/audio/filmcow/skeleton_step_1.wav",
+      "bytes": 50584,
+      "sha256": "78ede28cebbad2b61e8a373c45d072ab719fb69a3cf103e57ea7c926c06c176e"
+    },
+    {
+      "entry": "assets/audio/filmcow/skeleton_step_2.wav",
+      "bytes": 52210,
+      "sha256": "e4a080064fdccd821096d9b42dcb312f0fb40ac8227242999b904602a4786122"
+    }
+  ],
+  "selectedJavaTests": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\test-results\\testDebugUnitTest\\TEST-com.samfa12.hordelanternrt.DryFootstepFeedbackTest.xml",
+      "bytes": 630,
+      "sha256": "78ad3a2ed5eeee65ad72c29565753d17e31f1d33162e581d3faa0190b18cd583",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\android\\app\\build\\test-results\\testDebugUnitTest\\TEST-com.samfa12.hordelanternrt.EquipmentAudioFeedbackTest.xml",
+      "bytes": 754,
+      "sha256": "d6aca8b867efb697f555bf59e9c1396d653066230e57610c61b98aeb1bf92a82",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "hostTests": {
+    "newChecks": 459,
+    "initialSelectedPasses": 11,
+    "initialSelectedFailures": 2,
+    "followupPasses": 2,
+    "affectedRegistrationsWithPassingCoverage": 13,
+    "saveTimeout": "Restricted run timed out; unchanged binary passed normal-host run in 3.09 s. Exact cause not instrumented.",
+    "sourceContractFailure": "Pre-existing zero-argument teardown signature; HEAD/current bridge Git blob 5fad68c4431d9644e18dd28ac4ea20fdf0eaeea1 unchanged. Test updated to existing bool signature; queue-clear assertion retained."
+  },
+  "canonicalOwnerFiles": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\ASSET_LICENSES.md",
+      "bytes": 30507,
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\PROJECT_MEMORY.md",
+      "bytes": 51219,
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e",
+      "unchanged": true
+    }
+  ],
+  "newAssets": 0,
+  "runtimeAudioBytesChanged": 0,
+  "phoneOperations": false,
+  "audioPlayback": false,
+  "publicPushMergeRelease": false,
+  "ReefOperations": false,
+  "audioHapticManualRevalidationRequired": true,
+  "independentReview": "Final read-only integration/evidence review clear. Music-gap wording corrected to distinguish legacy F/G/H in natural versus restored states. No reviewer edits, builds, playback or devices.",
+  "remaining": [
+    "Actual listening/mix, run tails, SFX-zero/pause/mono phone acceptance",
+    "Wood-floor cue gap and unverified distinct stone recordings",
+    "Natural full route/earned save/death Load/contact/controller acceptance",
+    "Warm Keeper/exterior mobile performance with Mist Off",
+    "Rescue/forest music continuation against admitted owner pack",
+    "First usable recovery policy and debris kicking/option"
+  ],
+  "evidenceFiles": [
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\audio-audit.json",
+      "bytes": 6021,
+      "sha256": "b5ccdb2e577308ca1ae2b4901020d062d3aa617add5912c48769cfa552a51180"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\audit-audio.py",
+      "bytes": 4119,
+      "sha256": "77f98b5b86fd19ab62477583e6fb0c78a2b68c3b62c5c2feec146f0f861464a0"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\source-freeze.json",
+      "bytes": 3099,
+      "sha256": "9e03706720da9b4dd6d554916eeca1a6b18a5296346918ec0451fb500427fb16"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\initial-source-freeze.json",
+      "bytes": 3099,
+      "sha256": "f2fad653acd751ac6b94f327bc939b62f274fbea1609be90f1332e5f0c8972f7"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\selected-source-freeze.json",
+      "bytes": 3099,
+      "sha256": "26455b4a9b2200c94dbfafd3c978e3165f1af291ec12b6a717e8a920754f1f82"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\first-host-build.log",
+      "bytes": 24788,
+      "sha256": "6ee46b90e5d2aa740944c8c999a8cdc6229166dcfd695e49d717372fda047496"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\first-standalone-test.log",
+      "bytes": 216,
+      "sha256": "686ed22c7629e39af09eeb315bce7eb18e91ef4ab9e79b7ad8af6c4a954ac0a1"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\selected-tests.log",
+      "bytes": 3656,
+      "sha256": "72d6d541d1f8bf25023ec7c63e503e3266bf5e5740aae75013f6ea242ebe3d71"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\selected-LastTest.log",
+      "bytes": 16296,
+      "sha256": "9152c61ad7d52a435ceac5d680bf4bae3d9c2c2aace92838a3d7f44f1b84b942"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\followup-tests.log",
+      "bytes": 628,
+      "sha256": "34b7d0cd21738a38f8a2aa7025e6eb18644c00fe00eba0c6cdb4916d266d8179"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\followup-LastTest.log",
+      "bytes": 2073,
+      "sha256": "f9a12fde688e3a9b30075931d52e24c83306e6932cfc865497d940b756c96d56"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\audio-contract-rebuild.log",
+      "bytes": 283,
+      "sha256": "6666fb1fc0414255c6685da3edfad54aa3089d29c84f84baf8c4204b1875cb5d"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\android-build-tests.log",
+      "bytes": 3076,
+      "sha256": "e7441ef9541fb2a4b10835ba8d499570900fedf3ad3c5ec504bcd45a30105c7b"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\android-final-build.log",
+      "bytes": 2232,
+      "sha256": "eff1f7d6c066b0a9a651f0673af1a164f95c685fb6ea09dab6b4c5a1b8ae255c"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\windows-release-build.log",
+      "bytes": 9805,
+      "sha256": "beda957cef04a2cf7f4af97c1ce9c00e35908bb4875eb0c377330083cf740a46"
+    },
+    {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\docs\\evidence\\2026-10-20-surface-aware-footsteps\\windows-debug-build.log",
+      "bytes": 3771,
+      "sha256": "a9e2c77389ca1beb3cb65511b0a1851574d3aa1937eba04da51388ababa422ee"
+    }
+  ]
+}

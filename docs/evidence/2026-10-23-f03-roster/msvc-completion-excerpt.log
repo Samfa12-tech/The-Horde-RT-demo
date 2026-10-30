@@ -1,0 +1,26 @@
+2026-10-23T04:28:41.9424832Z         Start 165: horde_rt_chapter_local_audio_tests
+2026-10-23T04:28:42.3925222Z 165/169 Test #165: horde_rt_chapter_local_audio_tests .........................   Passed    0.45 sec
+2026-10-23T04:28:42.3933300Z         Start 166: horde_rt_keeper_death_audio_tests
+2026-10-23T04:28:42.6400297Z 166/169 Test #166: horde_rt_keeper_death_audio_tests ..........................   Passed    0.24 sec
+2026-10-23T04:28:42.6401404Z         Start 167: horde_rt_kit_audio_tests
+2026-10-23T04:28:42.7859846Z 167/169 Test #167: horde_rt_kit_audio_tests ...................................   Passed    0.15 sec
+2026-10-23T04:28:42.7865538Z         Start 168: horde_rt_chapter_texture_alias_payload_tests
+2026-10-23T04:28:43.2545654Z 168/169 Test #168: horde_rt_chapter_texture_alias_payload_tests ...............   Passed    0.47 sec
+2026-10-23T04:28:43.2552356Z         Start 169: pocket_audio_native_pcm_tests
+2026-10-23T04:28:43.3831711Z 169/169 Test #169: pocket_audio_native_pcm_tests ..............................   Passed    0.13 sec
+2026-10-23T04:28:43.3857363Z 
+2026-10-23T04:28:43.3857983Z 100% tests passed out of 169
+2026-10-23T04:28:43.3858321Z 
+2026-10-23T04:28:43.3858498Z Total Test time (real) = 240.78 sec
+2026-10-23T04:28:44.0422907Z Test project D:/a/The-Horde-RT-demo/The-Horde-RT-demo/build/host-ci
+2026-10-23T04:28:44.0424028Z     Start 162: horde_rt_horde_162_asset_policy_tests
+2026-10-23T04:28:44.0424757Z 1/1 Test #162: horde_rt_horde_162_asset_policy_tests ...   Passed  240.81 sec
+2026-10-23T04:28:44.0425253Z 
+2026-10-23T04:28:44.0425427Z 100% tests passed out of 1
+2026-10-23T04:28:44.0425669Z 
+2026-10-23T04:28:44.0425859Z Total Test time (real) = 240.83 sec
+2026-10-23T04:28:44.0427348Z 
+2026-10-23T04:28:44.0476411Z Windows selection: 170 tests; asset-policy once plus 169 sequential tests.
+2026-10-23T04:28:45.5994632Z ##[group]Run $path = 'build/host-ci/Testing/Temporary/LastTest.log'
+2026-10-23T04:28:45.5997247Z [36;1m$path = 'build/host-ci/Testing/Temporary/LastTest.log'[0m
+2026-10-23T04:28:45.5997612Z [36;1mif (Test-Path -LiteralPath $path) {[0m

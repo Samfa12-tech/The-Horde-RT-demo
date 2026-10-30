@@ -1,0 +1,12 @@
+authored Hips=-0.0074509,1.01074,-0.0969798
+authored LeftUpLeg=0.0789428,0.909744,-0.0960885
+authored LeftLeg=0.113778,0.505768,-0.0925233
+authored LeftFoot=0.09338,0.11489,-0.145014
+authored RightUpLeg=-0.093068,0.911337,-0.0962538
+authored RightLeg=-0.127969,0.513731,-0.0933495
+authored RightFoot=-0.0941956,0.121835,-0.148489
+stance drop=0.18 hips=0.830743 left_knee=0.267337,0.418531,0.0380115 right_knee=-0.274822,0.423496,0.0362762
+stance drop=0.36 hips=0.650743 left_knee=0.323455,0.352757,0.0704903 right_knee=-0.330772,0.356104,0.0681044
+stance drop=0.54 hips=0.470743 left_knee=0.357536,0.324897,0.060111 right_knee=-0.366067,0.326411,0.0564447
+stance drop=0.72 hips=0.290743 left_knee=0.4317,0.317305,-0.122097 right_knee=-0.446394,0.304425,-0.128982
+Viewmodel addressing, shared pose/vertex/tangent/grip agreement and invalid-pose rejection passed; planted_stance_samples=18

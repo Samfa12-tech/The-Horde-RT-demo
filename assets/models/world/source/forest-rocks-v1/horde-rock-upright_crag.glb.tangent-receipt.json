@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "input": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\source\\forest-understory-v1\\original-package\\assets\\bh_rock_upright_crag.glb",
+  "output": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\runtime\\forest-rocks-v1\\horde-rock-upright_crag.glb",
+  "inputSha256": "4add26b4feda11a9e951dc3c8aa3f88d1aedb1b03d16c1b129f1d8110ddda1bc",
+  "outputSha256": "2e3e0ca2a3d25c91d12dfa46c3ba6fb639dbda54af2a551c0a46c79b9c186d4a",
+  "outputBytes": 703880,
+  "geometryUnchanged": true,
+  "geometryComparison": "positions/winding/UV0 exact at 1e-6; normal direction dot >= 0.99999",
+  "maximumNormalComponentDelta": 0.0,
+  "minimumNormalDirectionDot": 0.9999999999999998,
+  "embeddedImagePixelsUnchanged": true,
+  "tangentLoopCountsByMappedMaterial": {
+    "BH_Original_Slate": 1128
+  },
+  "materialTriangles": {
+    "BH_Original_Slate": 376
+  }
+}

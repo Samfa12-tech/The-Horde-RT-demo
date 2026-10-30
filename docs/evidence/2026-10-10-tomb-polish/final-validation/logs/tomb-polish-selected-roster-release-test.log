@@ -1,0 +1,7 @@
+Test project <repo>/build/presets/windows-x64-release
+    Start 80: horde_rt_static_gltf_asset_tests
+1/1 Test #80: horde_rt_static_gltf_asset_tests ...   Passed    1.26 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.27 sec

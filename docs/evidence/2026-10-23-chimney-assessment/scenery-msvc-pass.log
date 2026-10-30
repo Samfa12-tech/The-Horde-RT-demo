@@ -1,0 +1,17 @@
+2026-10-23T04:54:00.4121041Z 167/169 Test #167: horde_rt_kit_audio_tests ...................................   Passed    0.10 sec
+2026-10-23T04:54:00.4125344Z         Start 168: horde_rt_chapter_texture_alias_payload_tests
+2026-10-23T04:54:00.6527643Z 168/169 Test #168: horde_rt_chapter_texture_alias_payload_tests ...............   Passed    0.24 sec
+2026-10-23T04:54:00.6532224Z         Start 169: pocket_audio_native_pcm_tests
+2026-10-23T04:54:00.7169185Z 169/169 Test #169: pocket_audio_native_pcm_tests ..............................   Passed    0.06 sec
+2026-10-23T04:54:00.7189707Z 
+2026-10-23T04:54:00.7190218Z 100% tests passed out of 169
+2026-10-23T04:54:00.7190556Z 
+2026-10-23T04:54:00.7190911Z Total Test time (real) = 198.10 sec
+2026-10-23T04:54:19.3525752Z Test project D:/a/The-Horde-RT-demo/The-Horde-RT-demo/build/host-ci
+2026-10-23T04:54:19.3526087Z     Start 162: horde_rt_horde_162_asset_policy_tests
+2026-10-23T04:54:19.3526387Z 1/1 Test #162: horde_rt_horde_162_asset_policy_tests ...   Passed  216.70 sec
+2026-10-23T04:54:19.3528019Z 
+2026-10-23T04:54:19.3528069Z 100% tests passed out of 1
+2026-10-23T04:54:19.3528155Z 
+2026-10-23T04:54:19.3528231Z Total Test time (real) = 216.71 sec
+2026-10-23T04:54:19.3528335Z 

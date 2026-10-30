@@ -1,0 +1,111 @@
+{
+  "baseObjectReuseCommit": "d21a2635f97ea6a3064bcdf9d5276dcdc3b2b5db",
+  "scriptOnly": true,
+  "sourceGitBlob": "e2896dc25b96202dc9b09833a2d5367a334b2a6a",
+  "equivalence": {
+    "predicateFunctionsUnchanged": [
+      "Assert-True",
+      "Test-ContainsAscii",
+      "Test-ContainsBytes",
+      "Get-ByteSequenceCount",
+      "Get-FrozenCatalogVariant",
+      "Test-ByteEqual",
+      "Assert-ProviderContainment"
+    ],
+    "mainChecksAndNegativeControlsUnchanged": true,
+    "controlScriptSha256": "0229678bff85e0cc48b8c429ae4b4536a0f9cae1f2dd4f521a6bdbdaba0b546e",
+    "candidateScriptSha256": "f68323af492a38fb243e6769c385e8406213fdd8464d7d2ef2d5218d84455630",
+    "analyticalMaximumDecodeCallsBefore": 14,
+    "analyticalDistinctDecodeCallsAfter": 8,
+    "crossProcessCache": false,
+    "cachedContainmentVerdicts": false
+  },
+  "observation": {
+    "phase": "cache-tests",
+    "exitCode": 0,
+    "elapsedSeconds": 89.8261785,
+    "scriptSha256": "f68323af492a38fb243e6769c385e8406213fdd8464d7d2ef2d5218d84455630",
+    "sameCompiledObjects": true,
+    "parserErrors": 0
+  },
+  "sameObjects": [
+    {
+      "target": "horde_rtpv_0_0_obj",
+      "sha256": "b4f1c98c76433c456273b125f76e96d0271bbd3b4b7f00091759c1f957cdf2c3",
+      "bytes": 1623142
+    },
+    {
+      "target": "horde_rtpv_0_1_obj",
+      "sha256": "27189369a441378d20f88b800f1ea02bd8d3c16f3bb34b2a9806096376bcc99e",
+      "bytes": 1631193
+    },
+    {
+      "target": "horde_rtpv_1_0_obj",
+      "sha256": "02e9b8ee07ad91687bf5a3f2fbe94cfde8548bdccc06a0b0e96fcd52788eb8be",
+      "bytes": 1649863
+    },
+    {
+      "target": "horde_rtpv_1_1_obj",
+      "sha256": "94a54a5be5e5b03abccc64bb4f9bd225870ac56ed8d03c1859d6493bffad4a3c",
+      "bytes": 1657931
+    }
+  ],
+  "existingEvidenceWrappers": [
+    {
+      "name": "horde_rt_provider_shipping_mobile_fixture_evidence",
+      "controlSeconds": 31.58,
+      "cacheSeconds": 22.74,
+      "result": "Passed"
+    },
+    {
+      "name": "horde_rt_provider_shipping_high_fixture_evidence",
+      "controlSeconds": 32.39,
+      "cacheSeconds": 21.63,
+      "result": "Passed"
+    },
+    {
+      "name": "horde_rt_provider_diagnostic_mobile_fixture_evidence",
+      "controlSeconds": 30.15,
+      "cacheSeconds": 22.88,
+      "result": "Passed"
+    },
+    {
+      "name": "horde_rt_provider_diagnostic_high_fixture_evidence",
+      "controlSeconds": 30.88,
+      "cacheSeconds": 22.5,
+      "result": "Passed"
+    }
+  ],
+  "sumWrapperSeconds": {
+    "control": 125.0,
+    "cache": 89.75
+  },
+  "limitations": [
+    "One serial local observation; no causal or whole-CI speed guarantee.",
+    "Decoder-call bounds are source analysis, not runtime counter measurements.",
+    "All original containment/hash/metadata/word-stream checks and both independent negative inputs remain.",
+    "No per-test deadline, test roster, platform/compiler coverage or job cap change."
+  ],
+  "rawEvidence": [
+    {
+      "path": "reports/msvc-ci-dedup-20261023/cache-tests.log",
+      "bytes": 1036,
+      "sha256": "e95760b4c80e5e81928781ce1d31d1aa88ff6145ea0d387fdd6e0368c8d91496"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/cache-tests.json",
+      "bytes": 224,
+      "sha256": "d389d88db8c25fae468d925c666c912684b1c85a52d4faf4ddd9aa79194a0d04"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/cache-equivalence.json",
+      "bytes": 641,
+      "sha256": "d1e30c4ce3b614e0ec459f1d6b23459cf4d8e229316139e5716d93d16192d94d"
+    },
+    {
+      "path": "reports/msvc-ci-dedup-20261023/RtPipelineVariantFixtureEvidence.control.ps1",
+      "bytes": 9011,
+      "sha256": "0229678bff85e0cc48b8c429ae4b4536a0f9cae1f2dd4f521a6bdbdaba0b546e"
+    }
+  ]
+}

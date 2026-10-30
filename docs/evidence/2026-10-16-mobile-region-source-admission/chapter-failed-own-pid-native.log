@@ -1,0 +1,44 @@
+10-16 15:37:18.213 28663 28663 I HordeSurfaceLifecycle: reason=resume activity=264977348 generation=0 resumed=false available=false started=false focus=false changingConfiguration=false finishing=false controllerMode=false
+10-16 15:37:18.232 28663 28663 I HordeRtProbeBridge: HORDE_SURFACE_REQUEST generation=1
+10-16 15:37:18.233 28663 28858 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-16 15:37:18.239 28663 28858 I HordeRtProbeBridge: HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1 generation=1 seed_bytes=0 seed_attempt_result=0 fallback_empty=0 seed_limit_bytes=16777216
+10-16 15:37:18.239 28663 28858 I HordeRtProbeBridge: HORDE_COMPILED_PIPELINE_CACHE_CREATE generation=1 available=1 capacity=2
+10-16 15:37:18.256 28663 28858 I HordeRtProbeBridge: HORDE_ENTRY_STATE generation=1 profile=0 phase=2 fade_permille=1000 presented=0
+10-16 15:37:18.356 28663 28663 I HordeSurfaceLifecycle: reason=focusGain activity=264977348 generation=1 resumed=true available=true started=false focus=true changingConfiguration=false finishing=false controllerMode=false
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT serial=1 generation=1 profile=0 backend=1 glass=0 success=1 compiled_pair_reused=0 compiled_pair=opaqueFast:diagnostic_mobile_opaque_fast@ca54801e0ecf45fc76e57674d99dd6b5b7606a91448b9e9536b132281e290643|genericDielectric:diagnostic_mobile_generic_dielectric@302adeadeae06abd6104ca9f5ecb7e3ee50c804c1e1437c1808b4cf4b10793c3 compiled_cache_entries=1 total_cpu_wall_ms=16015.567
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=preflight attempted=1 success=1 cpu_wall_ms=4.527
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=device-capability-preflight attempted=1 success=1 cpu_wall_ms=0.002
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=character-assets attempted=1 success=1 cpu_wall_ms=97.317
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=vulkan-entry-points attempted=1 success=1 cpu_wall_ms=0.024
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=static-held-item-assets attempted=1 success=1 cpu_wall_ms=37.811
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=storage-image attempted=1 success=1 cpu_wall_ms=0.772
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=material-textures attempted=1 success=1 cpu_wall_ms=3.577
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=environment-texture attempted=1 success=1 cpu_wall_ms=0.251
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=lich-textures attempted=1 success=1 cpu_wall_ms=3.940
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=static-meshes attempted=1 success=1 cpu_wall_ms=71.171
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=acceleration-structures attempted=1 success=1 cpu_wall_ms=34.292
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=pipeline-bundle attempted=1 success=1 cpu_wall_ms=15757.277
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_PIPELINE serial=1 generation=1 strategy=opaque-fast backend=1 result=0 attempted=1 cache_null=0 cpu_wall_ms=3236.812
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_PIPELINE serial=1 generation=1 strategy=generic-dielectric backend=1 result=0 attempted=1 cache_null=0 cpu_wall_ms=12519.517
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_SBT serial=1 generation=1 strategy=opaque-fast attempted=1 success=1 cpu_wall_ms=0.029
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_RT_INIT_SBT serial=1 generation=1 strategy=generic-dielectric attempted=1 success=1 cpu_wall_ms=0.002
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: RT render scale 40%: 576x1188 -> 1440x2971
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTATION generation=1 window=1440x2971 current_extent=1440x2971 current_transform=0x00000001 supported_transforms=0x000001ff pre_transform=0x00000001 swapchain=1440x2971 rt_dispatch=576x1188 rt_pre_rotation_required=0
+10-16 15:37:34.271 28663 28858 I HordeRtProbeBridge: HORDE_SURFACE_STARTED generation=1
+10-16 15:37:34.277 28663 28967 I HordeRtProbeBridge: {"type":"input-presentation","inputPublication":12,"poseTick":0,"moveForward":0,"moveStrafe":0,"playerX":0,"playerZ":1.85,"yaw":0,"pitch":0,"paused":true,"consumedAttack":0,"consumedParry":0,"consumedDodge":0,"playerAction":0,"dodgeActive":false,"sceneEpoch":2,"record":1,"submission":1,"presentCallAcceptedNs":58019271843697,"displayTimeMeasured":false}
+10-16 15:37:34.277 28663 28967 I HordeRtProbeBridge: HORDE_ENTRY_STATE generation=1 profile=0 phase=0 fade_permille=0 presented=1
+10-16 15:37:34.277 28663 28967 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-16 15:37:34.277 28663 28967 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=1
+10-16 15:37:34.297 28663 28967 I HordeRtProbeBridge: HORDE_ENTRY_STATE generation=1 profile=0 phase=2 fade_permille=1000 presented=0
+10-16 15:37:34.670 28663 28967 I HordeRtProbeBridge: HORDE_RT_INIT serial=1 generation=1 profile=0 backend=1 glass=0 success=0 compiled_pair_reused=0 compiled_pair=none compiled_cache_entries=1 total_cpu_wall_ms=365.734
+10-16 15:37:34.670 28663 28967 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=preflight attempted=1 success=1 cpu_wall_ms=9.468
+10-16 15:37:34.670 28663 28967 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=device-capability-preflight attempted=1 success=1 cpu_wall_ms=0.002
+10-16 15:37:34.670 28663 28967 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=character-assets attempted=1 success=1 cpu_wall_ms=34.045
+10-16 15:37:34.670 28663 28967 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=vulkan-entry-points attempted=1 success=1 cpu_wall_ms=0.013
+10-16 15:37:34.670 28663 28967 I HordeRtProbeBridge: HORDE_RT_INIT_STAGE serial=1 generation=1 name=static-held-item-assets attempted=1 success=0 cpu_wall_ms=309.221
+10-16 15:37:34.670 28663 28967 E HordeRtProbeBridge: Failed to initialise presentable RT scene: Invalid or unowned source primitive boundary.
+10-16 15:37:34.670 28663 28967 I HordeRtProbeBridge: HORDE_ENTRY_STATE generation=1 profile=0 phase=4 fade_permille=1000 presented=0
+10-16 15:37:34.670 28663 28967 E HordeRtProbeBridge: HORDE_VERTICAL_SUPPORT_FIXTURE_REBUILD checkpoint=192 requested=0 phase=scene-initialize result=0 presented=0
+10-16 15:37:34.670 28663 28967 E HordeRtProbeBridge: Diagnostic surface stopped after vertical support fixture checkpoint failure.
+10-16 15:37:34.670 28663 28967 I HordeRtProbeBridge: HORDE_PIPELINE_CACHE_SEED_STORE generation=1 query_result=0 read_result=0 requested_bytes=32 returned_bytes=32 admitted=1 retained_bytes=32 cpu_wall_ms=0.022

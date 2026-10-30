@@ -1,3 +1,7 @@
+. (Join-Path $PSScriptRoot 'horde-1.7-kit-visual-asset-policy.ps1')
+. (Join-Path $PSScriptRoot 'horde-1.7-kit-asset-policy.ps1')
+. (Join-Path $PSScriptRoot 'horde-1.7-tomb-asset-policy.ps1')
+
 # Runtime-only 1.6.2 audio/environment/world admission. This does not certify device,
 # listening, signing or release acceptance and works with Debug ZIP/APK files.
 function Get-Horde162AssetSpecification {
@@ -24,16 +28,37 @@ function Get-Horde162AssetSpecification {
         [pscustomobject]@{ Path='textures/environment/runtime/night-storm.android.ktx2'; Bytes=80128; Sha256='f833b77867e7b3c01659f5e9ef38834e4a0e5b967cd077023157eb682feb7cec'; Platform='Android'; Kind='Ktx'; Format=166 },
         [pscustomobject]@{ Path='models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb'; Bytes=652980; Sha256='c67471b522c92f354d9a5880dea6e48b4f22b5095207841c35c95b5cfc75c4d4'; Platform='Both'; Kind='Glb' },
         [pscustomobject]@{ Path='models/world/runtime/collapsed-entry/asset.manifest.json'; Bytes=742; Sha256='952e1920fbc60646154d0424556c2935a18e7cf882866a9fe9f4f45ef38be623'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb'; Bytes=1402952; Sha256='db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb'; Bytes=1436640; Sha256='f545d7e08370b5e451597c3fd903d8d93b6703d11c75039181a04f7f5312e0bb'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-tree-pair-v1/asset.manifest.json'; Bytes=896; Sha256='b244efaa09eb6851c276b0377d0069396812728a1644f14c4df400dfa0d310ab'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-deadwood-v1/asset.manifest.json'; Bytes=914; Sha256='3c2dbb174242634356c9e6efbf686e0f39d4e28571cff24cdff38c35b495a820'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb'; Bytes=3730464; Sha256='71905eaa0bf27baa40ccecd4d4a1d8722d43c9954dff94e3ccc242d639d410dd'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb'; Bytes=1873468; Sha256='5f4f1fcd6ecdb69715f09cabbe2fac8e716851b87eacad7ec07ec702f715ecef'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-deadwood-v1/horde-gnarled-stump.glb'; Bytes=1425904; Sha256='291381fef23ae05de5382214c778b97cce0969ccc0ff8876879a340ecc6d86d2'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb'; Bytes=1876496; Sha256='a964f9af66778ddeda2dc3e03d9984fc66f7a36c0a20bf18f8b9b67cc12db5b6'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-rocks-v1/asset.manifest.json'; Bytes=854; Sha256='252add83e55b0e2e0e38c4d395e5422b77047fcc456e0bade1ac6dec33d2a072'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb'; Bytes=704076; Sha256='1bdc6f650410a1f352ad8a314fa0f0b1a978ab226720c97a3e6dde6fd94df262'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb'; Bytes=763376; Sha256='00cc649340942f503cb83a3f5f91c5c5d9509bffe0851f972a4fd2c6625b3aa5'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb'; Bytes=703880; Sha256='2e3e0ca2a3d25c91d12dfa46c3ba6fb639dbda54af2a551c0a46c79b9c186d4a'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-road-clue-v1/asset.manifest.json'; Bytes=960; Sha256='d69c31f7fe62864dcdcb76ed054dc2316fe6e63f2b40c45b9cffc9e54b68b0d5'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb'; Bytes=2596; Sha256='7bf6a0bafb61d0c32c25ca8f7e730db5d17a72582b1d12097a381be2d29632bc'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb'; Bytes=6252; Sha256='7229e9920b0d5892a5f480722fa894a16a667c86059d29967d2a031e3f6edb1b'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/bellwether-shell-v4/asset.manifest.json'; Bytes=779; Sha256='6cf20606d6e057156c9d4e67f8bc00dd6c88a7cbbd0dfd142f20bfbc1c0c6681'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb'; Bytes=101908; Sha256='66058108eee9e014acfa10086b9da81e577d40d9f88a3a6d7c2131388eea06ba'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-understory-v1/asset.manifest.json'; Bytes=860; Sha256='cbc759a594b2e80092aa0c3daf87c52fd9c9ac77b08120e1fa908359d67241ee'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb'; Bytes=206396; Sha256='0c86c7f7d1072ca18bda70080de645d5975bb9bb1634d2a74bd63943543e652b'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb'; Bytes=166268; Sha256='9e170ceae6443c3a68b3a7a300ca76343e422e1ee304a8f58452da046fe588f9'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/forest-tree-pair-v1/runtime-roster.json'; Bytes=2013; Sha256='6c68e1c9d5a6bcb42a8cabe40e378fd446e0fb262ecb788ab242349815829df3'; Platform='Both'; Kind='Json' },
         [pscustomobject]@{ Path='models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb'; Bytes=267672; Sha256='476cb05a8f11f1af917a0cfa29610cc03f23522478a366f6cf2cf49b906db74d'; Platform='Both'; Kind='Glb' },
         [pscustomobject]@{ Path='models/props/runtime/player-rag-torch/asset.manifest.json'; Bytes=830; Sha256='5316b2072008da441024cda1153f725f5afcd7d366f3a5b89dece98ec74617aa'; Platform='Both'; Kind='Json' },
-        [pscustomobject]@{ Path='textures/props/runtime/asset.manifest.json'; Bytes=12356; Sha256='d01d4be1c68b24c340fe930e23cf0af3197a00f93e86c98010f5fc38d45f619e'; Platform='Both'; Kind='Json' },
-        [pscustomobject]@{ Path='textures/props/runtime/base-color.android.ktx2'; Bytes=8768496; Sha256='8ec835e988441ab533b77cc25ac9f2dbd83e91a36f614c0cdbed21a035e7c856'; Platform='Android'; Kind='PropsKtx'; Format=166; Layers=14 },
-        [pscustomobject]@{ Path='textures/props/runtime/normal.android.ktx2'; Bytes=19574256; Sha256='8b830b88a95b8a3eedbbb7555c5ef61046bd3280730fd25dc817b217decfdf3c'; Platform='Android'; Kind='PropsKtx'; Format=157; Layers=14 },
-        [pscustomobject]@{ Path='textures/props/runtime/orm.android.ktx2'; Bytes=8768496; Sha256='81ef2a8bb533d27f5609a6e36852a7c5d31a9d51a4b7ccf6d1622a31ba0d8744'; Platform='Android'; Kind='PropsKtx'; Format=165; Layers=14 },
+        [pscustomobject]@{ Path='textures/props/runtime/asset.manifest.json'; Bytes=15047; Sha256='11ff79f5aab2f1302060ca7b5a99ce7271591f63000aee55684762416d178f5d'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='textures/props/runtime/base-color.android.ktx2'; Bytes=11273648; Sha256='5e21700c1f781c913e5dcf0ca05ff79e01db57eac39514ef3ed19a2b961eeb44'; Platform='Android'; Kind='PropsKtx'; Format=166; Layers=18 },
+        [pscustomobject]@{ Path='textures/props/runtime/normal.android.ktx2'; Bytes=20972384; Sha256='defa8b9dbce7130cc8ea601a2868a486a4f11882851d62b25e60aa0742bcfa30'; Platform='Android'; Kind='PropsKtx'; Format=157; Layers=15 },
+        [pscustomobject]@{ Path='textures/props/runtime/orm.android.ktx2'; Bytes=9394784; Sha256='97bd3e4d4f687beec09cd080c9753d794c7a38d3ce5209cefc208cafd2f32ec2'; Platform='Android'; Kind='PropsKtx'; Format=165; Layers=15 },
         [pscustomobject]@{ Path='textures/props/runtime/emissive.android.ktx2'; Bytes=626752; Sha256='da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a'; Platform='Android'; Kind='PropsKtx'; Format=166; Layers=1 },
-        [pscustomobject]@{ Path='textures/props/runtime/base-color.windows.ktx2'; Bytes=78294160; Sha256='849103d8a02c3f947549eb4c5cdebe40d6f671522d68a28af16264a5e25caa8b'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=14 },
-        [pscustomobject]@{ Path='textures/props/runtime/normal.windows.ktx2'; Bytes=78294160; Sha256='ebbc7dfae582c0efe91c37f9ab9108d33aecacdc88071d797b37e55b42601c65'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=14 },
-        [pscustomobject]@{ Path='textures/props/runtime/orm.windows.ktx2'; Bytes=78294160; Sha256='43b10b4f1684ce3269ebedf096d426b679d12e442d5567c2f02b99d619720e82'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=14 },
+        [pscustomobject]@{ Path='textures/props/runtime/base-color.windows.ktx2'; Bytes=100663776; Sha256='05b7fef7b69ac1f2f42f863594663f4bafa0f4f346334cbfc01a1efabb7456cf'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=18 },
+        [pscustomobject]@{ Path='textures/props/runtime/normal.windows.ktx2'; Bytes=83886564; Sha256='6ecc469a0bfde110a82a49857f7dd786823c9cebfe50da22963d54149af2a4e3'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=15 },
+        [pscustomobject]@{ Path='textures/props/runtime/orm.windows.ktx2'; Bytes=83886564; Sha256='b18098e68c838f6b3ca2a4578fb851ba73bd22e84b89bf546b3e6559ba2f01c7'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=15 },
         [pscustomobject]@{ Path='textures/props/runtime/emissive.windows.ktx2'; Bytes=5592908; Sha256='c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=1 }
     )
 }
@@ -101,11 +126,12 @@ function Assert-Horde162EnvironmentKtx {
 function Assert-Horde162Assets {
     param([Parameter(Mandatory=$true)][string]$RepositoryRoot)
     $assets=Join-Horde162Path $RepositoryRoot 'assets'
-    foreach ($spec in Get-Horde162AssetSpecification) {
+    foreach ($spec in @(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification; Get-Horde17KitVisualAssetSpecification)) {
         $path=Join-Horde162Path $assets $spec.Path
         if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "1.6.2 runtime asset missing: $($spec.Path)" }
         if ((Get-Item -LiteralPath $path).Length -ne $spec.Bytes -or (Get-Horde162Sha256 $path) -cne $spec.Sha256) { throw "1.6.2 runtime byte/hash mismatch: $($spec.Path)" }
         if ($spec.Kind -ceq 'Wave') { Assert-Horde162Wave $path $spec.Channels $spec.Frames }
+        elseif ($spec.Kind -ceq 'KitWave') { Assert-Horde17KitWave $path $spec.Frames }
         elseif ($spec.Kind -ceq 'Ktx') { Assert-Horde162EnvironmentKtx $path $spec.Format }
         elseif ($spec.Kind -ceq 'PropsKtx') {
             $bytes=[byte[]]::new(80); $stream=[IO.File]::OpenRead($path)
@@ -133,14 +159,14 @@ function Assert-Horde162Assets {
     $keeperPaths=@('keeper_i_sense_you.wav','keeper_come_closer.wav','skeleton_idle_rattle.wav','skeleton_falling_bones.wav')
     foreach ($name in $keeperPaths) {
         $entries=@($keeper.assets | Where-Object { $_.runtimePath -ceq $name })
-        $spec=@(Get-Horde162AssetSpecification | Where-Object { $_.Path -ceq "audio/pixabay/$name" })[0]
+        $spec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification; Get-Horde17KitVisualAssetSpecification) | Where-Object { $_.Path -ceq "audio/pixabay/$name" })[0]
         if ($entries.Count -ne 1 -or $entries[0].sha256 -cne $spec.Sha256 -or $entries[0].bytes -ne $spec.Bytes -or
             $entries[0].sampleRate -ne 48000 -or $entries[0].channels -ne 1 -or $entries[0].bitsPerSample -ne 16 -or
             $entries[0].frames -ne $spec.Frames) { throw "1.6.2 keeper manifest runtime mismatch: $name" }
     }
     $core=Get-Content -LiteralPath (Join-Horde162Path $assets 'audio/pixabay/waterfall-core.manifest.json') -Raw | ConvertFrom-Json
-    $coreSpec=@(Get-Horde162AssetSpecification | Where-Object { $_.Path -ceq 'audio/pixabay/waterfall_core_loop.wav' })[0]
-    $fullSpec=@(Get-Horde162AssetSpecification | Where-Object { $_.Path -ceq 'audio/pixabay/waterfall_loop.wav' })[0]
+    $coreSpec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification; Get-Horde17KitVisualAssetSpecification) | Where-Object { $_.Path -ceq 'audio/pixabay/waterfall_core_loop.wav' })[0]
+    $fullSpec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification; Get-Horde17KitVisualAssetSpecification) | Where-Object { $_.Path -ceq 'audio/pixabay/waterfall_loop.wav' })[0]
     if ($core.schema -ne 1 -or $core.runtimePath -cne 'waterfall_core_loop.wav' -or $core.sha256 -cne $coreSpec.Sha256 -or
         $core.bytes -ne $coreSpec.Bytes -or $core.frames -ne $coreSpec.Frames -or $core.channels -ne 2 -or
         $core.sampleRate -ne 48000 -or $core.bitsPerSample -ne 16 -or $core.source -cne 'waterfall_loop.wav' -or
@@ -149,7 +175,7 @@ function Assert-Horde162Assets {
     if ($environment.schema -ne 1 -or $environment.rights -cne 'Project-owned generated asset.' -or @($environment.runtime).Count -ne 2) { throw '1.6.2 environment manifest admission mismatch.' }
     foreach ($platform in @('windows','android')) {
         $entry=@($environment.runtime | Where-Object { $_.platform -ceq $platform })
-        $spec=@(Get-Horde162AssetSpecification | Where-Object { $_.Path -ceq "textures/environment/runtime/night-storm.$platform.ktx2" })[0]
+        $spec=@(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification; Get-Horde17KitVisualAssetSpecification) | Where-Object { $_.Path -ceq "textures/environment/runtime/night-storm.$platform.ktx2" })[0]
         $format=if($platform -ceq 'windows'){'R8G8B8A8_SRGB'}else{'ASTC_6x6_SRGB_BLOCK'}
         if ($entry.Count -ne 1 -or $entry[0].path -cne "night-storm.$platform.ktx2" -or $entry[0].sha256 -cne $spec.Sha256 -or
             $entry[0].bytes -ne $spec.Bytes -or $entry[0].format -cne $format -or @($entry[0].dimensions).Count -ne 2 -or
@@ -161,14 +187,14 @@ function Assert-Horde162Assets {
 function Get-Horde162RuntimeFiles {
     param([Parameter(Mandatory=$true)][string]$RepositoryRoot, [Parameter(Mandatory=$true)][ValidateSet('Windows','Android')][string]$Platform)
     $null=Assert-Horde162Assets $RepositoryRoot
-    @(Get-Horde162AssetSpecification | Where-Object { $_.Platform -ceq 'Both' -or $_.Platform -ceq $Platform } | ForEach-Object Path)
+    @(@(Get-Horde162AssetSpecification; Get-Horde17TombAssetSpecification; Get-Horde17KitAssetSpecification; Get-Horde17KitVisualAssetSpecification) | Where-Object { $_.Platform -ceq 'Both' -or $_.Platform -ceq $Platform } | ForEach-Object Path)
     @(Get-Horde162ManifestSpecification | Where-Object { $_.Platform -ceq 'Both' -or $_.Platform -ceq $Platform } | ForEach-Object Path)
 }
 
 function Assert-Horde162StagedAssets {
     param([string]$RepositoryRoot, [string]$AssetRoot, [ValidateSet('Windows','Android')][string]$Platform)
     $expected=@(Get-Horde162RuntimeFiles $RepositoryRoot $Platform)
-    $observed=@(foreach($root in @('audio/menu','audio/filmcow/equipment','audio/pixabay','textures/environment','textures/props','models/world','models/props/runtime/player-rag-torch','models/props/runtime/player-sword-scabbard','models/props/source')) {
+    $observed=@(foreach($root in @('audio/menu','audio/filmcow/equipment','audio/pixabay','audio/kit','textures/environment','textures/props','models/world','models/characters','textures/characters','models/props/runtime/player-rag-torch','models/props/runtime/player-sword-scabbard','models/props/source')) {
         $path=Join-Horde162Path $AssetRoot $root
         if (Test-Path -LiteralPath $path -PathType Container) {
             foreach($item in Get-ChildItem -LiteralPath $path -Recurse -Force) {
@@ -212,7 +238,7 @@ function Assert-Horde162Package {
             if ($entry.FullName.Contains('\') -or $entry.FullName.StartsWith('/', [StringComparison]::Ordinal) -or
                 $entry.FullName -match '(^|/)(\.|\.\.)(/|$)') { throw '1.6.2 package contains a noncanonical or traversing entry path.' }
         }
-        $entries=@($zip.Entries | Where-Object { $_.FullName -match '(?i)^assets/(audio/menu|audio/filmcow/equipment|audio/pixabay|textures/environment|textures/props|models/world|models/props/runtime/player-rag-torch|models/props/runtime/player-sword-scabbard|models/props/source)(/|$)' })
+        $entries=@($zip.Entries | Where-Object { $_.FullName -match '(?i)^assets/(audio/menu|audio/filmcow/equipment|audio/pixabay|audio/kit|textures/environment|textures/props|textures/characters|models/characters|models/world|models/props/runtime/player-rag-torch|models/props/runtime/player-sword-scabbard|models/props/source)(/|$)' })
         # ZIP directory entries are metadata, distinguished by their trailing
         # slash, not by byte length (a zero-byte foreign file is still a file).
         foreach($entry in $entries) {

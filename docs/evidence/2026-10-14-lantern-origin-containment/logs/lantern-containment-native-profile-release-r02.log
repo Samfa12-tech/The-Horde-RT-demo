@@ -1,0 +1,12 @@
+Exact-pose rejected missing geometry: missing skinned geometry
+Exact-pose rejected omitted support: body mesh or eye applied support incorrectly
+Exact-pose rejected doubled support: body mesh or eye applied support incorrectly
+Exact-pose rejected unreachable wrist: actual wrist is outside anatomical reach
+Exact-pose rejected broken torch Grip: torch no longer attaches to the solved rig Grip
+Exact-pose rejected broken sword Hips attachment: production stowed sword no longer attaches to animated Hips
+Exact-pose rejected independent flame offset: flame or physical light left its authored item socket
+Exact-pose rejected independent physical-light offset: flame or physical light left its authored item socket
+Exact checkpoint171 production rig yaw0 pitch-0.05 aspect16:9 passed; mesh points=34304 lowering/retraction/headroom=0.333987/0.200392/0.0347347 returned lowering=0 same-validator negatives=9 descent ticks=59
+Native claimed lantern glass/light side-wall containment: 324 cases, side/front walls, High/Low, both aspects, full pitch range, diagonal swing and torsion.
+Actual cached player rig support transform passed: support delta=0.35 m; actual skinned body vertices, hand/item sockets, reward-lantern hinge/body/flame/light, and torch clearance translated with XZ preserved.
+First fixture (0,0) torch retraction/headroom floor=0/0.0557224 m raised=0.197407/0.0347347 m

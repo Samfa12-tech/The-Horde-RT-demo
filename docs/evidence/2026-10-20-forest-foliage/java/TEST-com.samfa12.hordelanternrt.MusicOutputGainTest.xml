@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.MusicOutputGainTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-20T16:23:55" hostname="SAM_LAPPY" time="0.133">
+  <properties/>
+  <testcase name="platformVolumeFailureIsExplicitAndCannotBeAcceptedAsAppliedGain" classname="com.samfa12.hordelanternrt.MusicOutputGainTest" time="0.026"/>
+  <testcase name="malformedTupleOrGainFailsBeforeChangingDeviceVolume" classname="com.samfa12.hordelanternrt.MusicOutputGainTest" time="0.023"/>
+  <testcase name="pausedSinkAcceptsGainWithoutRestartingPlaybackOrAdvancingControl" classname="com.samfa12.hordelanternrt.MusicOutputGainTest" time="0.026"/>
+  <testcase name="mutedUserVolumeStaysMutedAcrossEnvelopeUpdates" classname="com.samfa12.hordelanternrt.MusicOutputGainTest" time="0.036"/>
+  <testcase name="coherentEnvelopeChangesPreserveUserVolumeEpochAndCursor" classname="com.samfa12.hordelanternrt.MusicOutputGainTest" time="0.022"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

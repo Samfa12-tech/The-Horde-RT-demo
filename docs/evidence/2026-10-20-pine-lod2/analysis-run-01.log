@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\reports\pine-lod2-20261020\analyze_pine_compare.py", line 39, in <module>
+    f=row['completedFrame']; identity=f['identity']; g=f['gpu']; c=f['cpu']
+                                                                   ~^^^^^^^
+KeyError: 'cpu'

@@ -6,6 +6,7 @@
 #include <string_view>
 
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/validation/ChapterRoundTripProbe.h"
 
 namespace horde::gameplay::validation
 {
@@ -20,7 +21,38 @@ enum class MotionScenario : std::uint8_t
     KeeperRetryReward,
     WaterfallEquipment,
     TorchDrench,
+    ChapterRoundTrip,
+    ChapterStreamingCycle,
+    ChapterResidentComparison,
+    ChapterStreamedComparison,
+    KeeperTorchTransition,
+    ChapterPerformanceRoute,
+    ChapterOutdoorScaleHold,
 };
+inline constexpr bool IsChapterMotionScenario(MotionScenario scenario) noexcept {
+    return scenario==MotionScenario::ChapterRoundTrip || scenario==MotionScenario::ChapterStreamingCycle ||
+        scenario==MotionScenario::ChapterResidentComparison || scenario==MotionScenario::ChapterStreamedComparison ||
+        scenario==MotionScenario::ChapterPerformanceRoute;
+}
+// Performance observes ordinary residency; zero savings is a valid measured
+// outcome, but unfinished restoration is not. Streaming proof stays stricter.
+inline constexpr bool ChapterPerformanceCountersValid(std::uint64_t beforeUnloads,
+    std::uint64_t beforeRestores,std::uint64_t afterUnloads,std::uint64_t afterRestores) noexcept {
+    return afterUnloads>=beforeUnloads && afterRestores>=beforeRestores &&
+        afterUnloads-beforeUnloads==afterRestores-beforeRestores;
+}
+inline constexpr bool IsTimedMotionScenario(MotionScenario scenario) noexcept {
+    return IsChapterMotionScenario(scenario) || scenario==MotionScenario::KeeperTorchTransition ||
+        scenario==MotionScenario::ChapterOutdoorScaleHold;
+}
+
+// Lifetime counters are cumulative across a scene; validation owns only its delta.
+inline constexpr bool ChapterResidencyCountersValid(bool retain, std::uint64_t beforeUnloads,
+    std::uint64_t beforeRestores,std::uint64_t afterUnloads,std::uint64_t afterRestores) noexcept {
+    return afterUnloads>=beforeUnloads && afterRestores>=beforeRestores &&
+        (retain?afterUnloads==beforeUnloads && afterRestores==beforeRestores:
+         afterUnloads>beforeUnloads && afterUnloads-beforeUnloads==afterRestores-beforeRestores);
+}
 
 enum class MotionStage : std::uint8_t
 {
@@ -29,6 +61,7 @@ enum class MotionStage : std::uint8_t
     AwaitDeath, RetryRequested, Recognition, RetryTelegraph, Fight,
     Reward, TerminalReentry, Complete, Failed,
     TorchDrenchGuttering, TorchDrenchFalling, TorchDrenchSettled,
+    TorchBaseline, TorchActivation, TorchLit,
 };
 
 [[nodiscard]] bool ParseMotionScenario(std::string_view text, MotionScenario& scenario) noexcept;
@@ -39,6 +72,8 @@ class MotionEvidenceScenario
 {
 public:
     static constexpr std::uint64_t kMaximumWallNanoseconds = 120'000'000'000ull;
+    static constexpr std::uint64_t kOutdoorWarmupNanoseconds = 10'000'000'000ull;
+    static constexpr std::uint64_t kOutdoorSampleNanoseconds = 30'000'000'000ull;
 
     // Owner thread only. One accepted checkpoint seed, never a phase import.
     [[nodiscard]] bool Begin(MotionScenario scenario, simulation::GameSimulation& simulation,
@@ -65,9 +100,14 @@ public:
     [[nodiscard]] bool Failed() const noexcept { return stage_ == MotionStage::Failed; }
     [[nodiscard]] std::string_view Failure() const noexcept;
     [[nodiscard]] double SimulationSeconds() const noexcept { return simulationSeconds_; }
+    [[nodiscard]] std::uint64_t StartWallNanoseconds() const noexcept { return startWall_; }
+    [[nodiscard]] ChapterProbePhase ChapterPhase() const noexcept { return scenario_==MotionScenario::ChapterOutdoorScaleHold ? ChapterProbePhase::Lookout : chapter_.Phase(); }
+    [[nodiscard]] unsigned ChapterViewTicks() const noexcept { return scenario_==MotionScenario::ChapterOutdoorScaleHold ? static_cast<unsigned>(previousTick_-outdoorInitialTick_) : chapter_.ComparisonViewTicks(); }
+    [[nodiscard]] bool RetainChapterDetail() const noexcept { return scenario_==MotionScenario::ChapterResidentComparison; }
     [[nodiscard]] std::span<const std::uint32_t> EventCounts() const noexcept { return eventCounts_; }
 
 private:
+    ChapterRoundTripProbe chapter_;
     void Enter(MotionStage stage) noexcept;
     void MoveTowards(simulation::InputSnapshot& input,
                      const simulation::SimulationSnapshot& state, float x, float z) const noexcept;
@@ -78,6 +118,7 @@ private:
     MotionScenario scenario_ = MotionScenario::TorchLowOpening;
     MotionStage stage_ = MotionStage::NotStarted;
     simulation::SimulationCommandSequences commands_{};
+    bool runClearSent_ = false;
     std::array<std::uint32_t, simulation::kGameplayEventTypeCount> eventCounts_{};
     std::array<char, 128u> failure_{};
     std::uint64_t startWall_ = 0u;
@@ -137,6 +178,9 @@ private:
     std::uint64_t swordAttachmentSequence_ = 0u;
     std::uint64_t swordSwingSequence_ = 0u;
     bool equipmentSeedOwned_ = false;
+    unsigned torchRouteWaypoint_ = 0;
+    std::uint64_t outdoorGeneration_ = 0, outdoorInitialTick_ = 0;
+    float outdoorX_ = 0, outdoorY_ = 0, outdoorZ_ = 0, outdoorYaw_ = 0, outdoorPitch_ = 0;
 };
 
 } // namespace horde::gameplay::validation

@@ -1,0 +1,454 @@
+{
+  "baseCommit": "f1bb70194ecf0a4f72b4fd59dc4561134e8a45b1",
+  "sourceState": "this terrain integration commit; no shader changes",
+  "artifacts": {
+    "windowsDebug": {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "482086639b6264064e5daffde4b6a8a7f46d2aa785d299776e02ba6b2eb8f624",
+      "bytes": 12407808
+    },
+    "windowsRelease": {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "dd70c29e5e67af92d8b63293887ad2319d6b3da856e315a902dd34f973237f4c",
+      "bytes": 4326400
+    },
+    "androidDebug": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "bce773bbe29bc94f4d47f6ca73504830c58993337495cbf6ffc702c2650f516e",
+      "bytes": 167488224
+    }
+  },
+  "androidUnitTests": {
+    "tests": 283,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "captures": [
+    {
+      "image": "before-masonry.png",
+      "sha256": "3618914182a0c1723b7156db7ef1b090fab62a33cdafd86c452fd5e71cb61dda",
+      "complete": false,
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.",
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13077120,
+        "indexBytes": 2290092,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.4534,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7875,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6659,
+        "productionPropBlasBytes": 7848064,
+        "productionPropBlasBuildMilliseconds": 6.8353
+      },
+      "timing": {
+        "sampleCount": 0,
+        "overallMedianMs": 0.0,
+        "overallMeanMs": 0.0,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 1.728,
+          "averageMs": 2.063061,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "checkpoint": 193
+    },
+    {
+      "image": "north-pipeline.png",
+      "sha256": "2c9219e2bf8c7df1aaa38f3dcf2bc5950d0005fa17202e910d53445d00ccc3ce",
+      "complete": false,
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.",
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13077120,
+        "indexBytes": 2290092,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.5725,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7345,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.838,
+        "productionPropBlasBytes": 7848064,
+        "productionPropBlasBuildMilliseconds": 9.8718
+      },
+      "timing": {
+        "sampleCount": 0,
+        "overallMedianMs": 0.0,
+        "overallMeanMs": 0.0,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 2.975168,
+          "averageMs": 4.245603,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "checkpoint": 193
+    },
+    {
+      "image": "north-query.png",
+      "sha256": "fcecb816e660ee4910f17a9b291d756001dee853194eede1afac2cc5d6e158b9",
+      "complete": false,
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.",
+      "backend": "RayQueryCompute",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "57b7a23d6eaed1885001e488654815cbbc1c1e25cec29db16c77b698aac92f13"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "c329f47673a9ed4bb3287c59c52a6db4d7a29dc39814b78beb78b969d2f527ec"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13077120,
+        "indexBytes": 2290092,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.31,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.6733,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6367,
+        "productionPropBlasBytes": 7848064,
+        "productionPropBlasBuildMilliseconds": 6.7714
+      },
+      "timing": {
+        "sampleCount": 0,
+        "overallMedianMs": 0.0,
+        "overallMeanMs": 0.0,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 1.808864,
+          "averageMs": 2.201501,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "checkpoint": 193
+    },
+    {
+      "image": "east-pipeline.png",
+      "sha256": "89ff501c5374b1f051849a836d19a31091fccf69cf06e383c234fbc513308875",
+      "complete": false,
+      "error": "Checkpoint 'chapter-landing-east' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=51665/485/0 sword/torch=0/0 wall-retraction=0 grip=0/0 authority=2.38419e-07/0 finalGrip=-33.0624,3.62473,-12.9776 body=-34.1557,3.52459,-12.9936.",
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13077120,
+        "indexBytes": 2290092,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.5811,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7746,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.8065,
+        "productionPropBlasBytes": 7848064,
+        "productionPropBlasBuildMilliseconds": 8.8813
+      },
+      "timing": {
+        "sampleCount": 0,
+        "overallMedianMs": 0.0,
+        "overallMeanMs": 0.0,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 1.928928,
+          "averageMs": 4.784845,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "checkpoint": 194
+    },
+    {
+      "image": "south-pipeline.png",
+      "sha256": "cc0bfe9e785f1b4a4ccd5e20f2bb4fc2f08fc6e8a56979414ad011005571e306",
+      "complete": false,
+      "error": "Checkpoint 'chapter-landing-south' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=51664/485/0 sword/torch=0/0 wall-retraction=0 grip=0/0 authority=2.38419e-07/0 finalGrip=-33.5224,3.62473,-12.1624 body=-34.1473,3.52459,-13.0019.",
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13077120,
+        "indexBytes": 2290092,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 2.7642,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 2.0126,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7516,
+        "productionPropBlasBytes": 7848064,
+        "productionPropBlasBuildMilliseconds": 9.6633
+      },
+      "timing": {
+        "sampleCount": 0,
+        "overallMedianMs": 0.0,
+        "overallMeanMs": 0.0,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 1.785056,
+          "averageMs": 4.393379,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "checkpoint": 195
+    },
+    {
+      "image": "west-pipeline.png",
+      "sha256": "81f101724b350018768e3253126579ffdd3293be0a4c34e78127b0ab87e7e435",
+      "complete": true,
+      "error": null,
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13077120,
+        "indexBytes": 2290092,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.3501,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.6995,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6506,
+        "productionPropBlasBytes": 7848064,
+        "productionPropBlasBuildMilliseconds": 8.9273
+      },
+      "timing": {
+        "sampleCount": 12,
+        "overallMedianMs": 6.32925,
+        "overallMeanMs": 51.806683,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 2.78032,
+          "averageMs": 3.760107,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "checkpoint": 196
+    },
+    {
+      "image": "shaft-pipeline.png",
+      "sha256": "a13f26317dc1078793b96f0a203ec623a7c3ff0fed4978b53ef85b1d16d5a78b",
+      "complete": false,
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.",
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13077120,
+        "indexBytes": 2290092,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.7548,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7552,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.9996,
+        "productionPropBlasBytes": 7848064,
+        "productionPropBlasBuildMilliseconds": 8.9658
+      },
+      "timing": {
+        "sampleCount": 0,
+        "overallMedianMs": 0.0,
+        "overallMeanMs": 0.0,
+        "gpuRtCommandBuffer": {
+          "valid": true,
+          "latestMs": 2.89552,
+          "averageMs": 3.833613,
+          "sampleCount": 12,
+          "timestampValidBits": 64,
+          "timestampPeriodNanoseconds": 1.0
+        }
+      },
+      "checkpoint": 197
+    }
+  ],
+  "limits": {
+    "textureLayerCeiling": 18,
+    "usedBaseNormalOrm": [
+      17,
+      14,
+      14
+    ],
+    "highPrimitives": 32,
+    "mobilePrimitives": 31,
+    "staticMaterials": 30,
+    "worldMaterials": 2
+  },
+  "acceptance": {
+    "physicalAndroid": false,
+    "ownerVisual": false,
+    "wholeChapterComplete": false,
+    "streamingImplemented": false
+  },
+  "regressions": {
+    "debugAffected": "6/6 PASS 60.15s",
+    "releaseAffected": "6/6 PASS 8.61s",
+    "routeRigTorchShader": "8/8 PASS 276.10s",
+    "originalTorchSeconds": 171.59,
+    "originalTorchTimeoutSeconds": 180,
+    "packageNegativeCases": 176
+  }
+}

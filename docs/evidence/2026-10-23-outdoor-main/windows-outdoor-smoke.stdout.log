@@ -1,0 +1,6 @@
+Externally suspended startup: ready, stopped, no generated/played frames
+Consumed 1 actual outdoor PCM body periods: generated=5121600 submitted=5121600 played=5120160 queuedBuffers=3
+Native48k output advanced at gain0: generated=5121600 submitted=5121600 played=5120160
+Pause retained queue; device clock frozen through two150ms intervals at=5120160
+Resume then retry: epoch=2 generated=2400 submitted=2400 played=960
+PASS: output clock/pause/resume/retry/join; silent smoke is not owner listening

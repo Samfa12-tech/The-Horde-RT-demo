@@ -19,13 +19,15 @@ float raySegmentGlow(vec3 rayOrigin, vec3 rayDirection, vec3 segmentStart, vec3 
 
 vec3 staffElectricity(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
 {
-    if (controls.enemyKind < 0.5 || controls.staffLightStrength < 0.05)
+    // 1 = live Keeper anticipation; 2 = discharge or preserved legacy capture.
+    // Surface shading, staff glow and mist still identify the Keeper by > 0.5.
+    if (controls.enemyKind < 1.5 || controls.staffLightStrength < 0.05)
     {
         return vec3(0.0);
     }
 
     vec3 staff = vec3(controls.staffX, controls.staffY, controls.staffZ);
-    vec3 target = vec3(controls.cameraX, 0.28, controls.cameraZ);
+    vec3 target = vec3(controls.cameraX, 0.28 + rtHeldLight.value.playerTransform.x, controls.cameraZ);
     vec3 attackDirection = normalize(target - staff);
     vec3 side = normalize(cross(attackDirection, vec3(0.0, 1.0, 0.0)));
     vec3 arcUp = normalize(cross(side, attackDirection));
@@ -178,8 +180,12 @@ vec4 lichMistSample(vec3 p, MistIncidentSources sources)
     vec2 fromLich = p.xz - vec2(-32.20, -13.10);
     float ritualFocus = 1.0 - smoothstep(1.25, 3.05, length(fromLich));
     float dawnFade = 1.0 - 0.78 * smoothstep(0.12, 1.0, controls.finaleDawnReveal);
+    // Live Keeper discriminator [0.75, 1] carries post-death mist density.
+    // Legacy/discharge kind 2 remains exactly full density. Surface/light
+    // consumers still use > 0.5; global distance fog and shadows are untouched.
+    float deathFade = clamp((controls.enemyKind - 0.75) * 4.0, 0.0, 1.0);
     float density = (0.080 + ritualFocus * 0.27) * heightFalloff
-        * flowNoise * dawnFade;
+        * flowNoise * dawnFade * deathFade;
 
     vec3 incidentLight = sources.skyIncident;
     if (mistRadianceActive(sources.staffVisibleRadiance))
@@ -204,9 +210,11 @@ void integrateLichMistSample(vec4 sampleValue, float stepLength,
 
 vec4 lichGroundMist(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
 {
-    // On keeps the existing medium arithmetic; Off exits before source queries
-    // and march integration. This flag does not control emitter smoke or arcs.
-    if (controls.enemyKind < 0.5 || (rtQualityControls.value.controls.w & 1u) != 0u)
+    // The existing deathFade is exactly zero at/below 0.75. Return neutral
+    // before visibility/marching only there or for Mist Off; every positive
+    // fade and legacy/discharge kind 2 keep the existing medium arithmetic.
+    // Neither gate controls surface shadows, emitter smoke or staff arcs.
+    if (controls.enemyKind <= 0.75 || (rtQualityControls.value.controls.w & 1u) != 0u)
     {
         return vec4(0.0, 0.0, 0.0, 1.0);
     }

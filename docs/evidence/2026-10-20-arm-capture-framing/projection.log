@@ -1,0 +1,5 @@
+192-rescue-journey-start.obj triangles 14370 positive-depth 13849 frustum 0 horizontalY [557.395914347499, 2227.0069165750774]
+192-rescue-journey-start.player-world-body.obj triangles 27815 positive-depth 20286 frustum 9 horizontalY [-1943685649.7522852, 40395001316.22554]
+218-chapter-niche-rect.obj triangles 14370 positive-depth 13996 frustum 0 horizontalY [640.1490021517735, 2431.035248456534]
+218-chapter-niche-rect.player-world-body.obj triangles 27815 positive-depth 24530 frustum 17 horizontalY [-592424668.5981799, 33323441845.34361]
+201-chapter-forest-first-bend.obj triangles 14370 positive-depth 14369 frustum 7489 horizontalY [331.71143331498286, 1496.2442745153983]

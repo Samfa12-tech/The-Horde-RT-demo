@@ -1,0 +1,11 @@
+authored Hips=-0.0074509,1.01074,-0.0969798
+authored LeftUpLeg=0.0789428,0.909744,-0.0960885
+authored LeftLeg=0.113778,0.505768,-0.0925233
+authored LeftFoot=0.09338,0.11489,-0.145014
+authored RightUpLeg=-0.093068,0.911337,-0.0962538
+authored RightLeg=-0.127969,0.513731,-0.0933495
+authored RightFoot=-0.0941956,0.121835,-0.148489
+stance drop=0.18 hips=0.830743 left_knee=0.136887,0.396842,0.128057 right_knee=-0.143842,0.404072,0.12654
+stance drop=0.36 hips=0.650743 left_knee=0.15366,0.288235,0.204665 right_knee=-0.159756,0.295416,0.202702
+stance drop=0.54 hips=0.470743 left_knee=0.166087,0.160942,0.240408 right_knee=-0.169489,0.168214,0.238736
+FAIL: folded stance must keep each knee above the actual standing mesh support plane

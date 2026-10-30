@@ -1,0 +1,21 @@
+{
+  "status": "pass",
+  "input": "assets/models/world/source/forest-tree-pair-v1/runtime/horde-upright-alder-v1-lod1.glb",
+  "output": "assets/models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb",
+  "inputSha256": "38333b05a996d46942fb9fddb022e128a0591c372582b520f4d051a308e9282d",
+  "outputSha256": "f545d7e08370b5e451597c3fd903d8d93b6703d11c75039181a04f7f5312e0bb",
+  "outputBytes": 1436640,
+  "geometryUnchanged": true,
+  "geometryComparison": "positions/winding/UV0 exact at 1e-6; normal direction dot >= 0.99999",
+  "maximumNormalComponentDelta": 0.00044600000000000195,
+  "minimumNormalDirectionDot": 0.9999998938169532,
+  "embeddedImagePixelsUnchanged": true,
+  "tangentLoopCountsByMappedMaterial": {
+    "Original charcoal-gray ridged bark": 6918
+  },
+  "materialTriangles": {
+    "Original charcoal-gray ridged bark": 2306,
+    "Original opaque alder leaves": 2640,
+    "Original opaque hanging woodland moss": 156
+  }
+}

@@ -1,0 +1,309 @@
+{
+  "settings": {
+    "width": 960,
+    "height": 540,
+    "opticalProfile": "High",
+    "shadowQuality": "Higher",
+    "normalStaticResidencySavingBytes": 0,
+    "simulationHz": 60,
+    "settlingFrames": 12,
+    "scope": "Frozen hidden Debug correctness, not playable FPS"
+  },
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 13203968,
+      "sha256": "952032c563124fcc413bc8ca7c847869bd7de986a0d46e482daf72cf699fe3fc"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4482048,
+      "sha256": "779c99223b14470119e7d7f9dbe0ca334931035c59297f7ae3958e59e634f34e"
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT-origin-baseline-ba2b-lantern-origin-baseline-r03.exe",
+      "bytes": 13012992,
+      "sha256": "93e9e646b4b3617a8934a22fdcc0aea2bc2d6728c8bf22960a6906f9a672332e"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183196618,
+      "sha256": "dfcf7be34ffd2b2d4bccbf2acd9292a20111a86b58e44d496b9d8604bcb9f068"
+    }
+  ],
+  "captures": [
+    {
+      "complete": true,
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "case": "Pipeline-after-chapter-lantern-side-wall-high",
+      "manifestSha256": "4053ba496ea8028ac91561b8565ebc38c257eaf36aedd023ca2e2bb25b82a21c"
+    },
+    {
+      "complete": true,
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "case": "Pipeline-after-chapter-lantern-side-wall-low",
+      "manifestSha256": "1cfd9d81079ed94f7189b19c7d0965905c1c704ee994c860a85eb94d054961e8"
+    },
+    {
+      "complete": false,
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "case": "Pipeline-after-lantern-wall-high",
+      "manifestSha256": "12dd21f4769e669e9586861ceea75e58568314e7bc3673248e56945235a8181d"
+    },
+    {
+      "complete": true,
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "case": "Pipeline-before-chapter-lantern-side-wall-high",
+      "manifestSha256": "b7cfbc8cc81f50ccb272db6babd6765b1ac0744e7f95b86592499ae4dc0174bd"
+    },
+    {
+      "complete": true,
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "case": "Pipeline-before-chapter-lantern-side-wall-low",
+      "manifestSha256": "7887288a3b818cde236c74dd2d79a96e6b71c16581bbaac2641a6727a1c10932"
+    },
+    {
+      "complete": false,
+      "backend": "RayTracingPipeline",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6"
+        }
+      },
+      "case": "Pipeline-before-lantern-wall-high",
+      "manifestSha256": "908488f41d3325ff99ae0fd8b6a1658fa5dc0a9e4043da176eb7a68051192015"
+    },
+    {
+      "complete": true,
+      "backend": "RayQueryCompute",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67"
+        }
+      },
+      "case": "Query-after-chapter-lantern-side-wall-high",
+      "manifestSha256": "abde23772be241776a2704c58a8bfeaaebe92f26e8335caec9aa0dbc1c0cde8e"
+    },
+    {
+      "complete": true,
+      "backend": "RayQueryCompute",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67"
+        }
+      },
+      "case": "Query-after-chapter-lantern-side-wall-low",
+      "manifestSha256": "c69fbc7ee40032ace474babad72c70ef5d99929d39be8a7e462e3ffb678140d7"
+    },
+    {
+      "complete": false,
+      "backend": "RayQueryCompute",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67"
+        }
+      },
+      "case": "Query-after-lantern-wall-low",
+      "manifestSha256": "3344a5703dd62f79e59e3b981db2d389d6cc9a785b33d296c95768b60ef15d92"
+    },
+    {
+      "complete": true,
+      "backend": "RayQueryCompute",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67"
+        }
+      },
+      "case": "Query-before-chapter-lantern-side-wall-high",
+      "manifestSha256": "da03ce205156f3446427d48577d7eda37720a0126c097dd3df87b5dcafd16df0"
+    },
+    {
+      "complete": true,
+      "backend": "RayQueryCompute",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67"
+        }
+      },
+      "case": "Query-before-chapter-lantern-side-wall-low",
+      "manifestSha256": "a3787328000a7f0bc7491b8d5e2a25088d92d47799b267a63422a9bc79d15f5a"
+    },
+    {
+      "complete": false,
+      "backend": "RayQueryCompute",
+      "shaderBundle": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67"
+        }
+      },
+      "case": "Query-before-lantern-wall-low",
+      "manifestSha256": "58bf4f8d772038148bda8a985cfc8d734868a06d5da411a47c562769b5beea58"
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb",
+      "bytes": 658308,
+      "sha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4"
+    },
+    {
+      "path": "assets/models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb",
+      "bytes": 76716,
+      "sha256": "75bf4f0d7c64c67848f08f1b2fb5b802527160c79def7f71ca964bdcf72799f5"
+    },
+    {
+      "path": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+      "bytes": 2568508,
+      "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f"
+    }
+  ],
+  "schema": 1,
+  "sourceState": "Parent plus exactly the listed ten source/test files; documentation added after validation",
+  "sourceParent": "ba2b8cc386489c138fff7ebae3ecd666db503609",
+  "captureArchiveSha256": "f447b6756ebfdd6f8fdec7a333080e8dd9e3b80a6d44c253daa03f527b8bc924",
+  "validation": {
+    "android": "four ABI Debug build/lint and closed-roster/ASTC package pass",
+    "phone": "not available, no operation",
+    "nativeCases": 324,
+    "debugAffected": "7 passing from original8; registry/native2/2 after repair; controller1/1",
+    "audioHapticForSlice": "NO",
+    "releaseAffected": "8/8 plus controller1/1"
+  },
+  "sources": [
+    {
+      "path": "src/gameplay/HorizontalEnvelope.h",
+      "bytes": 3983,
+      "sha256": "9efea5e71e7532c2106e1986bfdc9bc7513a2bf3aff65bddc66503e91de89696"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.cpp",
+      "bytes": 70222,
+      "sha256": "4d7f59ee66a9d79ec4ffe61d34a73c929ebed307d3aca656280dd0b120d6dc68"
+    },
+    {
+      "path": "src/gameplay/items/HeldItemKinematics.h",
+      "bytes": 13077,
+      "sha256": "45e3d810f459fb4088d4debbf4a6c2d78d97ce3a857eda05d051a51a05c98551"
+    },
+    {
+      "path": "src/gameplay/DevelopmentCheckpoints.h",
+      "bytes": 22292,
+      "sha256": "c1c1e6c476be41b33c7a08d2820021a973ce45055243b3547dac08795b757424"
+    },
+    {
+      "path": "src/platform/windows/WindowsCaptureContracts.h",
+      "bytes": 11868,
+      "sha256": "8d0a01bde2b0311015661af65cc4b79d9b1cde606f792376f5d3e77bbecf256f"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 578762,
+      "sha256": "1fee4512bc57cc8301e9a2cbdaf79ead82a98dbf44e643efbcecb06004011339"
+    },
+    {
+      "path": "tests/HeldItemClearanceTests.cpp",
+      "bytes": 17784,
+      "sha256": "50faa775c2aee471ae842cab6f0d332fb3da79ae6f323a0dc78adea9af293b38"
+    },
+    {
+      "path": "tests/HeldItemVerticalSupportRigTests.cpp",
+      "bytes": 49966,
+      "sha256": "36840a8207970577cb26301a6916c94c9299c1252b9827e1a8ea8fdc825a493c"
+    },
+    {
+      "path": "tests/DevelopmentStaticAssetTests.cpp",
+      "bytes": 63377,
+      "sha256": "49b966f569dd3a8425c746a5f0a75f9847cab42ddf1453253e4d496f7d417901"
+    },
+    {
+      "path": "tests/DesktopControllerInputTests.cpp",
+      "bytes": 48975,
+      "sha256": "1718a15ab4fffb6d78438ecaf3046548cc5f8a7a016a5dd643f9dab5414a26c5"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+    Start  21: horde_rt_graphics_preview_tests
+1/4 Test  #21: horde_rt_graphics_preview_tests .............   Passed    0.02 sec
+    Start 112: horde_rt_development_static_asset_tests
+2/4 Test #112: horde_rt_development_static_asset_tests .....***Failed    5.40 sec
+FAIL: composed retention fixture preserves the live post-death clock and frozen reward hand without claiming a natural fight
+FAIL: composed retention fixture preserves the live post-death clock and frozen reward hand without claiming a natural fight
+rect-niche displacement-components walkTime=0->0 walkAmount=0 speed=0 authoritativeTravel=37.9770966 crouch=0 crouchDrop=0 equipmentStowed=0 ropeHands=0 torso=-0,-0,0 baseToAuthoredDistance=37.9770966
+rect-niche restage-components staged=1 tick=1->2 walkTime=0->0 locomotionTime=0->0 camera=1 support=1 hinge=1 pendulum=1 eventsEmpty=1
+rect-niche projection-inputs yaw=-1.57079637 pitch=-0.319999993 supportY=-0.949999988 left=-0.466763765,-0.0719899163,0.212070361 right=0.230000004,-0.340000004,0.33270824 visibility=NOT_EVALUATED
+2 development static asset assertion(s) failed
+
+    Start 206: horde_rt_static_geometry_cutover_tests
+3/4 Test #206: horde_rt_static_geometry_cutover_tests ......   Passed    3.66 sec
+    Start 222: horde_rt_rescue_journey_integration_tests
+4/4 Test #222: horde_rt_rescue_journey_integration_tests ...   Passed   10.58 sec
+
+75% tests passed, 1 tests failed out of 4
+
+Total Test time (real) =  19.69 sec
+
+The following tests FAILED:
+	112 - horde_rt_development_static_asset_tests (Failed)
+Errors while running CTest

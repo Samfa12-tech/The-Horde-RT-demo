@@ -1,0 +1,40 @@
+{
+  "basis": "6797e9d3c6ca06fafeb456d44a109e6db6ff1f7a",
+  "evidenceClass": "CPU preparation/compatibility only; production remains world-baked",
+  "sourceSha256": {
+    "src/scene/ForestDressing.cpp": "1cb371f73b26bb6157fe1ef5b508a530d38d00d33023fc52689c8438527a11fa",
+    "src/scene/ForestDressing.h": "97c704cd249f24757e0c22a6f39416121f72e3bfe9552ed5fe2f86d971ab2e9c",
+    "tests/ForestDressingTests.cpp": "2ad949c281aadf8ba4cc002cf2e5d1a60e5d7107315830ee1346003931dd69ff"
+  },
+  "sameSemanticReceipts": [
+    "FOREST_REPRESENTATION ribbon fnv1a64=3599892596236743553 vertices=371955 indices=995058 placements=64",
+    "FOREST_REPRESENTATION native-terrain fnv1a64=4000162986566279105 vertices=371955 indices=995058 placements=64"
+  ],
+  "controlPassedSeconds": 30.04,
+  "candidatePassedSeconds": 31.11,
+  "ownedMasters": 2,
+  "ownedMasterTriangles": 10102,
+  "placements": 64,
+  "productionTreeTriangles": 323264,
+  "negativeCases": [
+    "invalid master reference",
+    "wrong burial transform",
+    "invalid material mapping",
+    "invalid index",
+    "zero triangle count",
+    "one-index triangle",
+    "two-index triangle"
+  ],
+  "retainedFailures": [
+    {
+      "file": "candidate-build.log",
+      "result": "C3538 mixed-type auto declaration; fixed in two declarations"
+    },
+    {
+      "file": "candidate-build-r3.log",
+      "result": "owned sandbox build stalled after MSBuild banner; stopped with Ctrl-C, no test receipt; ordinary escalated local rerun passed"
+    }
+  ],
+  "noGpuOrPerformanceAdmission": true,
+  "fullLogs": "reports/forest-shared-master-20261024 (ignored local evidence)"
+}

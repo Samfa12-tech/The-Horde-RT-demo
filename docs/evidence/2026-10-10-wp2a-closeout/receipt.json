@@ -1,0 +1,278 @@
+{
+  "schema": 1,
+  "date_local": "2026-10-10",
+  "start_checkpoint": "1b96893c18dce6a389498c17264b51f726a96389",
+  "test_source_commit": "c8166de3c0c31b9dfdaa61f5b5103f6fbd30335c",
+  "runtime_source_commit": "262a7fc096876d2417471285c6809f631103cfe6",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "draft_pr": 27,
+  "scope": "Bounded test-only cue correction, retained contact diagnostics and owner combat-test preparation.",
+  "owner_decision": "Existing forgiving contact provisionally retained for first owner playtest; contact correction deferred.",
+  "experimental_proxy_active": false,
+  "experimental_inward_pose_active": false,
+  "wp2a_fully_complete": false,
+  "changed_tests": [
+    {
+      "path": "tests/CombatFoundationTests.cpp",
+      "git_blob": "c4c9c5e404c404ce481dded3dc09243eb61893c2",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/c8166de3c0c31b9dfdaa61f5b5103f6fbd30335c/tests/CombatFoundationTests.cpp"
+    },
+    {
+      "path": "tests/MotionEvidenceScenarioTests.cpp",
+      "git_blob": "e18d4327efd0113d5efa15f5c2e855f4f5e95941",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/c8166de3c0c31b9dfdaa61f5b5103f6fbd30335c/tests/MotionEvidenceScenarioTests.cpp"
+    }
+  ],
+  "motion_fix": {
+    "valid_events": {
+      "ParryPrepareCue": 24,
+      "LichDischargeWarning": 25
+    },
+    "invalid_boundaries": [
+      26,
+      255
+    ],
+    "duplicate_and_unknown_rejection_preserved": true,
+    "mixed_repeated_ordering": [
+      24,
+      25,
+      24
+    ],
+    "original_reproduction": {
+      "run": "reproduce-motion",
+      "exit_code": 8,
+      "test_seconds": 8.8
+    },
+    "corrected_debug": {
+      "run": "corrected-motion",
+      "exit_code": 0,
+      "test_seconds": 9.06
+    },
+    "corrected_release": {
+      "run": "release-motion",
+      "exit_code": 0,
+      "total_ctest_seconds": 2.03
+    }
+  },
+  "local_results": {
+    "debug": "PASS: seven distinct registered checks, six in affected selection then missing launch fixture after build; corner extension separately reran combat.",
+    "release": "PASS: 7/7 affected registrations in final selection, 3.92 seconds CTest total.",
+    "final_combat_assertions": 420,
+    "diagnostic_assertions_do_not_mean_occlusion_correctness": true
+  },
+  "known_correctness_defect": {
+    "status": "REPRODUCED in seeded active SwordCombat consumer; production encounter reachability unproven",
+    "attack_tick": 17,
+    "step_seconds": 0.016666666666666666,
+    "yaw_radians": 3.14159265359,
+    "cases": [
+      {
+        "name": "straight-wall",
+        "player": [
+          0.96,
+          -6.8
+        ],
+        "actual_target": [
+          0.96,
+          -5.95
+        ],
+        "distance_metres": 0.85
+      },
+      {
+        "name": "oblique-wall",
+        "player": [
+          0.96,
+          -6.8
+        ],
+        "actual_target": [
+          1.55,
+          -6.06
+        ],
+        "distance_metres": 0.946414
+      },
+      {
+        "name": "corner-edge",
+        "player": [
+          0.55,
+          -6.8
+        ],
+        "actual_target": [
+          1.55,
+          -6.06
+        ],
+        "distance_metres": 1.24403
+      }
+    ],
+    "legal_poses_and_actual_tick_obstruction_checked": true,
+    "clear_side_game_simulation_positive": true,
+    "resolution": "Pending consistent occlusion correction for all future difficulty/assist settings. No proxy activation/runtime change in this task."
+  },
+  "reach_mesh_correction": {
+    "status": "DEFERRED",
+    "frontal_pulse17_gap_mm": 275.347,
+    "minus15_degree_gap_mm": 234.658,
+    "moving_sample_gaps_mm": [
+      215.684,
+      17.5033
+    ],
+    "remaining": [
+      "Moving-target calibration",
+      "Production wall/corner integration",
+      "Visible connection fairness and owner combat feel"
+    ]
+  },
+  "combat_assist": "Future design candidate independent of enemy difficulty. Aim forgiveness and timing assistance considered separately after playtesting; no matrix or Hard proxy mode implemented.",
+  "playtest": {
+    "platform": "Windows Debug",
+    "artifact": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+    "sha256": "57768441056da4dd8c784ac515954f7924566c5f68517c0f0ede262782402a7d",
+    "bytes": 11713024,
+    "packaged_profile": "Diagnostic High",
+    "selected_backend": "NOT RUN",
+    "launched": false,
+    "launches": [
+      [
+        "--development-combat-practice"
+      ],
+      [
+        "--development-keeper-practice"
+      ]
+    ],
+    "owner_observations": "PENDING; previous route owner receipt retained without transfer"
+  },
+  "preserved": {
+    "runtime_shader_abi_assets_budgets_timeouts_and_prior_evidence_unchanged": true,
+    "original_full_torch_test_unchanged": true,
+    "full_torch_not_rerun": "No changed dependency; earlier 166.90-second result remains historical.",
+    "unrelated_work_and_other_worktrees_untouched": true
+  },
+  "failures_retained": [
+    {
+      "run": "reproduce-motion",
+      "exit_code": 8,
+      "log": "logs/reproduce-motion.log"
+    },
+    {
+      "run": "corrected-build",
+      "exit_code": 1,
+      "log": "logs/corrected-build.log"
+    },
+    {
+      "run": "wall-probe",
+      "exit_code": 8,
+      "log": "logs/wall-probe.log"
+    },
+    {
+      "run": "affected-debug",
+      "exit_code": 8,
+      "log": "logs/affected-debug.log"
+    }
+  ],
+  "failure_disposition": "Original cue fixture regression fixed. Wrong native target name, initial positive-fixture yaw and unavailable launch executable corrected without runtime/policy changes; failed logs retained.",
+  "ci": {
+    "status_at_publication": "PENDING: verify all six checks on final pushed commit externally before owner handoff.",
+    "reviewed_checkpoint_run": 37987676250,
+    "reviewed_checkpoint_result": "3 failed host jobs; Android, sanitizers and Vulkan host passed.",
+    "expected_checks": [
+      "Shared simulation host (GCC)",
+      "Shared simulation host (Clang)",
+      "Shared simulation host (MSVC)",
+      "Android Debug build, playback/report contracts and lint",
+      "Selected host contracts (Clang ASan/UBSan)",
+      "player-vulkan-host"
+    ]
+  },
+  "device_verified": false,
+  "owner_audio_haptic_acceptance": "PENDING",
+  "manual_revalidation_required": true,
+  "remaining_gates": [
+    "Owner Windows combat test",
+    "Exact backend RT presentation, paired captures and off-camera contributors",
+    "Windows focus/resize/recovery and Android backend/lifecycle",
+    "Android sound/vibration and owner listening",
+    "Contact correction and missing dedicated directional clips"
+  ],
+  "runs": {
+    "path": "runs.jsonl",
+    "sha256": "d1431785c6374abe8c4fb716d953394f481f7fb64f8baad68072e0f4ca5c9d89",
+    "count": 18
+  },
+  "evidence_files": [
+    {
+      "path": "logs/affected-debug.log",
+      "sha256": "be5a2dbae3cc18112bded3e67e51fea86a603129059e186b37cd40bdc0f2588e"
+    },
+    {
+      "path": "logs/affected-release.log",
+      "sha256": "d371cc215c57a0b4ef9d7c1ee99c41d43ec4948e273cadf504ce1e08a2bf67c8"
+    },
+    {
+      "path": "logs/corrected-build.log",
+      "sha256": "75b5b809be1c2f532e3fd6d230b2ec7735de6a23759376863e8e3c1635124bd9"
+    },
+    {
+      "path": "logs/corrected-launch-fixture.log",
+      "sha256": "cdd5e6a0c7da57d6f08cc16f1ccccc578e9f68742aa35b7a4a36aeea1ad0d4b3"
+    },
+    {
+      "path": "logs/corrected-motion.log",
+      "sha256": "7a9a282bd261f1954007acb8b046dc2865da8e9fecec7bc9828bf366b5d7cc3a"
+    },
+    {
+      "path": "logs/corrected-native-build.log",
+      "sha256": "bc189a06c41682bdbc00964904c9f1a6e6d20b66c4580664656bf6ff16ae67e4"
+    },
+    {
+      "path": "logs/final-debug-build.log",
+      "sha256": "6d5364f7d8e3d2abc596de64d8307ce5fc9f6f13e965e0857c11e8163edf28e4"
+    },
+    {
+      "path": "logs/final-debug-combat.log",
+      "sha256": "5baebd471110d7029dd05fccc861cf2a62701f717d9b8cc811d4b2537bdda990"
+    },
+    {
+      "path": "logs/final-release-build.log",
+      "sha256": "abe5c1437168e97c863672a7ca8e414c773c1d8220216717ca6e5a58282301a0"
+    },
+    {
+      "path": "logs/missing-launch-fixture-build.log",
+      "sha256": "65cb63cf42972f586f099c6e6be43e539c856cf55e44c1209396183f344135af"
+    },
+    {
+      "path": "logs/release-build.log",
+      "sha256": "15f7153085b8fe1dcb705fd91ce1ee94fe459459f8213e8534c9b756d070868f"
+    },
+    {
+      "path": "logs/release-corner-build.log",
+      "sha256": "466b6c4e9a566af1e4a1327d1ed9f805d1174fd30ba742e1a2dba2b69c6d8cb1"
+    },
+    {
+      "path": "logs/release-motion.log",
+      "sha256": "421917b638b7bdec5a7ff7f2298c0585f28a20e4f0e6a5ba40a7546c628ed33a"
+    },
+    {
+      "path": "logs/reproduce-build.log",
+      "sha256": "940d97f0873da86a000aa9f9995c464ab9fb8c80889ed07aaa1cccc3105f4cd4"
+    },
+    {
+      "path": "logs/reproduce-motion.log",
+      "sha256": "b74673a41cd4c7660a842520023b4f11c55cfc12e7c39a56e24cdca8948cf0dd"
+    },
+    {
+      "path": "logs/wall-build.log",
+      "sha256": "6d5364f7d8e3d2abc596de64d8307ce5fc9f6f13e965e0857c11e8163edf28e4"
+    },
+    {
+      "path": "logs/wall-corrected-build.log",
+      "sha256": "6d5364f7d8e3d2abc596de64d8307ce5fc9f6f13e965e0857c11e8163edf28e4"
+    },
+    {
+      "path": "logs/wall-probe.log",
+      "sha256": "14ad6c806c05c77ec61e319f3a702d3ecdccb6080ebd87d88cc7777a2e19c433"
+    },
+    {
+      "path": "runs.jsonl",
+      "sha256": "d1431785c6374abe8c4fb716d953394f481f7fb64f8baad68072e0f4ca5c9d89"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+HOST ANDROID WIDGET FIXTURE ONLY; no phone, RT world, touch or save IO evidence.
+THREE SLOTS · MANUAL + LATEST AUTOSAVE
+NEW GAME
+Manual saves and the latest autosave are kept separately.
+SLOT 1
+Manual: Lower chamber · 1 / 3 hearts
+Latest autosave: Forest lookout · 2 / 3 hearts
+Begin in Slot 1
+SLOT 2
+Manual: Empty
+Latest autosave: Empty
+Begin in Slot 2
+SLOT 3
+Manual: Empty
+Latest autosave: Empty
+Begin in Slot 3
+Refresh records
+Back

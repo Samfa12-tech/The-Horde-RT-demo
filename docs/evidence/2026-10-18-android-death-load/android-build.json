@@ -1,0 +1,139 @@
+{
+  "date": "2026-10-18",
+  "evidence_class": "Android build-only; no install/device/foreground activity",
+  "head_at_start": "0a9d75882f6e64fc2f2b57465733bb63d6feb825",
+  "head_at_completion": "0a9d75882f6e64fc2f2b57465733bb63d6feb825",
+  "started_utc": "2026-10-18T03:10:41.476076+00:00",
+  "completed_utc": "2026-10-18T03:17:27.137035+00:00",
+  "sources_sha256": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "384f68137f556f26414d3c48c8027d4b957b4d41cc1a6c74fdfbb4bf587d116c",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java": "b7d4bf4f1b20efddfa869da78c6770e4003a5e6c8dabdd2b6c6bec790fb800d4",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/CampaignMenuState.java": "1176f739bd96d3892da6ef1f5017fed25d73c6d061da7d443f0d817b69162258",
+    "src/gameplay/campaign/CampaignLoadBarrier.h": "0b6b5520e3ce4b46192fd6fc8968a17f67450863a0e0f3baf368ec7e46fda731",
+    "src/platform/android/AndroidCampaignLoadBarrier.h": "3f85cf870e38431a6151cd6e1e101dd3e6a8f5d2c1da383e10a8c39ed98d941a",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "f808f2b5a8af52df29efa1c6f8086dccecafc0d353d7cdf164e6c91ffb1b9d78",
+    "android/app/src/main/cpp/android_campaign_bridge.inl": "54940e819166a0e785916927e0726b70e8901d4ed4fb3c5c6296ad3071151541",
+    "android/app/src/main/cpp/android_campaign_state.inl": "5ef37f0a5d4d6524fc8231104efa8a91a07294ccfa1e340b9790e32734f4f1cd",
+    "android/app/src/main/cpp/CMakeLists.txt": "38fa383eb0dec32d9ce927bf3be86189a7403800ee85955947f55bb031a0b5bb",
+    "android/app/build.gradle": "ed3cf8253a8673c3187efedd308b00237573e43bc4797cc02279f3ef2f8f2133",
+    "src/gameplay/simulation/GameSimulationCampaign.cpp": "e1ad3ba301cfe5585bd940af9418316534b0f1e25a62d16ee50f8bb37d5fec5a",
+    "src/gameplay/simulation/GameSimulationRescue.cpp": "88dbc3e97387d9f1183d56aede57cd0359aecb58ae680f7ce0ac17b5aca2f55f",
+    "src/gameplay/campaign/CampaignPlaySession.cpp": "4a8028fbbddfc1a7454e694588f60bc18e1cbefce2a71223fc448c5147fd761e",
+    "src/gameplay/campaign/CampaignSession.cpp": "6136c21c2687d6fe3c53a15fe0dae61607e8fa9862149b57b3ca722385d80556",
+    "src/vulkan/raytracing/DevelopmentWorldSceneAdapter.h": "7f4ad0bb791e4644a4e1f701890d3241f7f99731b6a6aaf73495124a6a4d9b3b"
+  },
+  "selected_affected_sources_stable_before_after": true,
+  "selected_source_count": 15,
+  "environment": {
+    "override": "HORDE_VALIDATION_UNSIGNED=1",
+    "working_environment": "existing installed JDK/Android SDK/NDK; no SDK migration or source configuration changes",
+    "gradle_flags": "--offline --no-daemon --max-workers=2 --console=plain",
+    "release_credentials": "Gradle validation-unsigned branch bypasses release credential environment reads"
+  },
+  "attempts": [
+    {
+      "command_from_android": ".\\gradlew.bat --offline --no-daemon --max-workers=2 assembleDebug assembleRelease --console=plain",
+      "exit_code": 1,
+      "result": "BUILD FAILED in 2m 11s; Debug assembled all4ABIs, Release arm64 passed then ARMv7 object-path failure",
+      "failure": "buildCMakeRelWithDebInfo[armeabi-v7a]: Ninja mkdir of321-character StaticGeometry object path fails"
+    },
+    {
+      "command_from_repo": "<existing SDK cmake3.22.1>/bin/cmake.exe -S android/app/src/main/cpp -B android/app/.cxx/RelWithDebInfo/336v4rx1/armeabi-v7a -DCMAKE_OBJECT_PATH_MAX=260",
+      "exit_code": 0,
+      "result": "Existing ARMv7 Release build cache only; regenerated hashed object path249characters; no source/toolchain/signing edits"
+    },
+    {
+      "command_from_android": ".\\gradlew.bat --offline --no-daemon --max-workers=2 assembleRelease --console=plain",
+      "exit_code": 0,
+      "result": "BUILD SUCCESSFUL in 2m 39s; all4Release native ABIs assembled"
+    }
+  ],
+  "artifacts": [
+    {
+      "variant": "debug",
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183958042,
+      "sha256": "e9ce289a8a527083aa1d6d2ca2976da5ba439768f8cc933b3a34e20f153701c8",
+      "abis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86",
+        "x86_64"
+      ],
+      "native_libraries": [
+        {
+          "path": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+          "bytes": 5232280
+        },
+        {
+          "path": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+          "bytes": 4536968
+        },
+        {
+          "path": "lib/x86/libhorde_rt_probe_android.so",
+          "bytes": 5796204
+        },
+        {
+          "path": "lib/x86_64/libhorde_rt_probe_android.so",
+          "bytes": 5480256
+        }
+      ],
+      "signing": "standard debug"
+    },
+    {
+      "variant": "release",
+      "path": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "bytes": 169333341,
+      "sha256": "3bc695b1a6c15252a0cac83a3a77e5ff596c6a504105796cbcd61d8810438749",
+      "abis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86",
+        "x86_64"
+      ],
+      "native_libraries": [
+        {
+          "path": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+          "bytes": 5023904
+        },
+        {
+          "path": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+          "bytes": 4368244
+        },
+        {
+          "path": "lib/x86/libhorde_rt_probe_android.so",
+          "bytes": 5538824
+        },
+        {
+          "path": "lib/x86_64/libhorde_rt_probe_android.so",
+          "bytes": 5260920
+        }
+      ],
+      "signing": "unsigned validation"
+    }
+  ],
+  "logs": [
+    {
+      "path": "reports/2026-10-18-android-death-load/android-debug-release-assemble.log",
+      "sha256": "a5bf29721fa0227867000e045b9a69f1ac2c02cb5b733fe105b3f4aed2feef2d",
+      "bytes": 14193
+    },
+    {
+      "path": "reports/2026-10-18-android-death-load/android-release-armv7-object-path-configure.log",
+      "sha256": "a5778be0a46558215e9d7ae4f447dd422886c9a37233cf3e4771ccd462e4f4ce",
+      "bytes": 397
+    },
+    {
+      "path": "reports/2026-10-18-android-death-load/android-release-retry-assemble.log",
+      "sha256": "b6991d86c49c48b2bc9c00acd0400bacf1576c47e67e94e335647fd2e1236523",
+      "bytes": 3652
+    }
+  ],
+  "limits": [
+    "Only selected affected inputs were hashed; full source tree and untracked owner assets were not frozen/copied",
+    "APK bytes remain only in normal build-output locations; no redundant copies created",
+    "No app installation, launch, foregrounding, device access, release signing or publication",
+    "Prior physical acceptance stays bound to its original APK/source; neither new APK has physical death-Load acceptance",
+    "Unsigned Release assembly is a compile/package check, not a public release"
+  ]
+}

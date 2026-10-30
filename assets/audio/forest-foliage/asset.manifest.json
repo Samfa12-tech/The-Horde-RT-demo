@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "target": "Horde 1.7 finite localized forest foliage cue",
+  "generator": "tools/prepare-forest-foliage.py",
+  "sourceLibrary": "FilmCow Recorded SFX; local Possum Cafe archive, private originals excluded",
+  "licensor": "Jason Steele / FilmCow",
+  "sourceUrl": "https://filmcow.itch.io/filmcow-sfx",
+  "license": "FilmCow custom royalty-free project-use licence; not CC0",
+  "licenseEvidence": "docs/licenses/filmcow-sfx-license.pdf",
+  "licenseSha256": "bda56a077aa8ba8e053ae916dd4c19038baa12cd33d10209658646ac9351b73f",
+  "rightsRecord": "docs/licenses/README.md",
+  "rightsSummary": "Existing worldwide non-exclusive perpetual royalty-free personal/commercial media use; no authorship claim, sound resale, national government, law-enforcement or SPLC/CAHN hate-group project use. Credit optional. Existing terms unchanged.",
+  "sourcePolicy": "Only this game-integrated finite derivative and manifest ship; original recordings remain private. No source original is copied or relicensed.",
+  "listeningAcceptance": false,
+  "selectionLimit": "The requested full purpose-labelled source and measured PCM activity only; no audition, audible-quality, foliage character or native mix acceptance claim.",
+  "assets": [
+    {
+      "id": "leaf_rustle",
+      "runtimeFile": "runtime/leaf_rustle.wav",
+      "sourceFile": "leaves rustle 1.wav",
+      "sourceSha256": "1c51a4b6ec25fddab7e395e253b8998f415135f6f183ffbf2133b7c3f0750769",
+      "sourceBytes": 129942,
+      "sourceFrames": 43283,
+      "sourceCropFrames": [
+        0,
+        43283
+      ],
+      "sourceFormat": {
+        "sampleRate": 48000,
+        "channels": 1,
+        "bitsPerSample": 24
+      },
+      "sourceLevels": {
+        "peakDbfs": -12.828141275474108,
+        "rmsDbfs": -40.829124782421935,
+        "fullScaleSamples": 0
+      },
+      "runtimeSha256": "8126b71f00621241084e663535ab7fa5da47ac3db64419feb1532a4fd05319a8",
+      "runtimeBytes": 86610,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 43283,
+      "durationSeconds": 0.9017291666666667,
+      "peakDbfs": -14.016057310157237,
+      "rmsDbfs": -41.03420677009289,
+      "fullScaleSamples": 0,
+      "edgeFadeFrames": {
+        "in": 480,
+        "out": 3840
+      },
+      "edgeFadeMilliseconds": {
+        "in": 10,
+        "out": 80
+      },
+      "edgeFadeFormula": "gain[i] = min(1, i/480, (N-1-i)/3840); first and last samples are zero",
+      "quantization": "PCM16[i] = nearest-even(PCM24[i] * gain[i] / 256), using exact signed integer rational rounding",
+      "loop": false,
+      "processing": "Full mono48kHz PCM24 source to PCM16 with 10ms/80ms linear endpoint ramps only. No gain normalization, synthesis, filtering, pitch shift, time-stretch, resampling or looping."
+    }
+  ]
+}

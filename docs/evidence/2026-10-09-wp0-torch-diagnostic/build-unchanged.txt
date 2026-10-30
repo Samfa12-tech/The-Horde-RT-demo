@@ -1,0 +1,73 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp0-torch-diagnostic/third_party/pocket-audio-core/native/CMakeLists.txt
+  PcmLoopStream.cpp
+  PcmWave.cpp
+  Generating Code...
+  pocket_audio_native_pcm.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp0-torch-diagnostic\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp0-torch-diagnostic/CMakeLists.txt
+  AmbiencePcmLoop.cpp
+  MusicDirector.cpp
+  MusicPcmStream.cpp
+  MusicPcmWave.cpp
+  MusicPcmAssetBank.cpp
+  MusicPlaybackSession.cpp
+  PlaytestReport.cpp
+  PlaytestSubmission.cpp
+  BenchmarkSummarySubmission.cpp
+  GameSimulation.cpp
+  PlayerAnimationState.cpp
+  PlayerIkTargets.cpp
+  FireEmitterState.cpp
+  InteractionState.cpp
+  ChestRewardSequence.cpp
+  FinaleSequence.cpp
+  LanternPendulum.cpp
+  HeldItemState.cpp
+  HeldItemKinematics.cpp
+  HeldLightState.cpp
+  Generating Code...
+  horde_gameplay_simulation.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp0-torch-diagnostic\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp0-torch-diagnostic/CMakeLists.txt
+  RtPerformanceEvidence.cpp
+  RtEvidencePublication.cpp
+  RtBenchmarkEvidenceRun.cpp
+  RtBenchmarkEvidenceReport.cpp
+  BenchmarkSummary.cpp
+  BenchmarkSummaryReport.cpp
+  BenchmarkSummarySubmission.cpp
+  ShowcaseBenchmark.cpp
+  AssetManifest.cpp
+  AssetValidation.cpp
+  GitHubReleaseUpdater.cpp
+  DeviceCapabilities.cpp
+  RtCapabilityReport.cpp
+  GpuFrameTimer.cpp
+  VulkanContext.cpp
+  RayTracingRequirements.cpp
+  RtGpuResources.cpp
+  HeldItemRenderSlot.cpp
+  FireEmitterBuffer.cpp
+  RtStaticMeshSlot.cpp
+  Generating Code...
+  Compiling...
+  RtTextureArrays.cpp
+  CharacterRenderSlot.cpp
+  PlayerRenderSlot.cpp
+  RtPipelineVariants.cpp
+  RtPipelineVariantProvider.cpp
+  RtPipelineBundleContracts.cpp
+  RtPipelineBundle.cpp
+  RtFrameEvidenceCoordinator.cpp
+  PresentableTinyRtScene.cpp
+  SimulationFrameAdapter.cpp
+  SkinnedMeshAsset.cpp
+  Generating Code...
+  GltfDocument.cpp
+  StaticMeshAsset.cpp
+  Generating Code...
+  horde_rt_probe_core.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp0-torch-diagnostic\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp0-torch-diagnostic/CMakeLists.txt
+  FinalHeldTorchClearanceTests.cpp
+  horde_rt_final_held_torch_clearance_tests.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp0-torch-diagnostic\build\presets\windows-x64-debug\Debug\horde_rt_final_held_torch_clearance_tests.exe

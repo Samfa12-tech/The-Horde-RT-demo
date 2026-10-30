@@ -1,0 +1,180 @@
+{
+  "scope": "Session/request-bound asynchronous receipt coordinator with fake storage; no application Save/Load integration",
+  "sourceParent": "c721791180ebe73d009f96300c74c1c3aa4c4d9e",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "recordedUtc": "2026-10-18T00:09:22.1773793Z",
+  "sourceManifest": "implementation-files.json",
+  "sourceManifestMeaning": "SHA256 of final compiled working-file bytes before Git newline normalization; unchanged dependencies pinned by sourceParent",
+  "windows": {
+    "os": "Microsoft Windows NT 10.0.26300.0",
+    "filesystem": "NTFS",
+    "debug": {
+      "buildExitCode": 0,
+      "selectedPassed": 5,
+      "failed": 0,
+      "durationSeconds": 16.35,
+      "coordinatorChecks": 306,
+      "codecChecks": 1970,
+      "storageChecks": 1178,
+      "logicalRestoreChecks": 722,
+      "dialogue": "PASS",
+      "concurrentReaderObservations": 485
+    },
+    "release": {
+      "buildExitCode": 0,
+      "selectedPassed": 5,
+      "failed": 0,
+      "durationSeconds": 4.03,
+      "coordinatorChecks": 306,
+      "codecChecks": 1970,
+      "storageChecks": 1178,
+      "logicalRestoreChecks": 722,
+      "dialogue": "PASS",
+      "concurrentReaderObservations": 386
+    },
+    "buildTargets": [
+      "horde_rt_campaign_save_coordinator_tests",
+      "horde_rt_campaign_codec_tests",
+      "horde_rt_campaign_storage_tests",
+      "horde_rt_campaign_checkpoint_tests",
+      "horde_rt_chapter_dialogue_tests",
+      "horde_rt_diagnostic_window"
+    ],
+    "buildCommand": "cmake --build build/presets/windows-x64-{debug|release} --config {Debug|Release} --target <buildTargets> --parallel 2",
+    "testCommand": "ctest --test-dir build/presets/windows-x64-{debug|release} -C {Debug|Release} -R <selectionRegex> --verbose",
+    "selectionRegex": "^horde_rt_(campaign_(save_coordinator|codec|storage|checkpoint)|chapter_dialogue)_tests$",
+    "symlinkReparseRuntimeFixture": "NOT_RUN: optional fixture lacked symlink privilege; nonregular rejection passed"
+  },
+  "android": {
+    "command": "android/gradlew.bat assembleDebug --offline --console=plain",
+    "environmentSetup": "C:/Users/sam_s/Documents/Codex/shared-tools/setup-tools.ps1",
+    "exitCode": 0,
+    "durationReported": "1m",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "nativeEntries": [
+      {
+        "path": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "bytes": 5144072
+      },
+      {
+        "path": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+        "bytes": 4471016
+      },
+      {
+        "path": "lib/x86/libhorde_rt_probe_android.so",
+        "bytes": 5691500
+      },
+      {
+        "path": "lib/x86_64/libhorde_rt_probe_android.so",
+        "bytes": 5383760
+      }
+    ],
+    "evidenceClass": "HOST_BUILD_ONLY",
+    "installedOrLaunched": false,
+    "posixRuntimeTested": false
+  },
+  "review": {
+    "initialReleaseCoordinatorChecks": 195,
+    "initialFailures": 0,
+    "initialRunMeaning": "Earlier source; not final acceptance",
+    "corrections": [
+      "AlreadyCurrent must have a valid expected version exactly equal to candidate; reject impossible create-only/different-version no-op acknowledgements",
+      "Validate failure operation and bound path",
+      "Expose token-checked prepared read copy without early adoption"
+    ],
+    "removedOrWeakenedAssertions": false,
+    "finalReview": "No further material defect reported"
+  },
+  "contracts": [
+    "Full owner/session/request/target/operation/revision binding",
+    "Single-use weak ticket completion channel",
+    "Lifecycle revocation serialized with final-publication gate",
+    "Publication already inside gate may finish; cancellation cannot roll it back",
+    "A receipt cannot mark newer logical B as stored",
+    "Prepared reads require explicit token-checked adoption/baseline acceptance",
+    "Malformed/failure/uncertain receipt requires fresh read before retry",
+    "AlreadyCurrent grants no new durability"
+  ],
+  "limits": [
+    "Fake coordinator storage only; no real worker, queue, shutdown or OS publication integration",
+    "Actual synchronous storage must be split into offside preparation and final gated publication before integration; never gate an entire blocking Write",
+    "No game restore/camera/input transaction or menu/slot/path/overwrite policy",
+    "No POSIX filesystem runtime/directory-fsync evidence",
+    "No current-source sanitizer or cloud CI run",
+    "No physical power-loss, Android lifecycle/process-death/touch, or Windows reparse runtime evidence",
+    "No new renderer/performance claim; currentCheckpointStored is not a power-loss certificate"
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "c9f0bfd26bccf19ad6b9d296fc7c839d4f63acf67553007ecd8d971131368f03",
+      "bytes": 13369344
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "884e60cc0de897b64c5a38df430ab0b70a5d30f2adf5a6d0f3723cd79eadbb14",
+      "bytes": 4549632
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_campaign_save_coordinator_tests.exe",
+      "sha256": "ca460a7b55a15b7cabe14683592b656cbe8ada891ac530d84d84301706103224",
+      "bytes": 2739200
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_campaign_save_coordinator_tests.exe",
+      "sha256": "6efe404c2a80ca81291c07715a08958badc87eaed8e13c7ca206c6a9c1219583",
+      "bytes": 385024
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "d34e5096b6c4278f0a54e87acec56f3060ced7f2587ef0314d829c141764264b",
+      "bytes": 183664938
+    }
+  ],
+  "localLogs": [
+    {
+      "path": "reports/campaign-save-coordinator-2026-10-18/debug-sealed-build.log",
+      "sha256": "79d76dd82b6ef6475fe31ae80c42bc4d0101feb3f58c4b512c6417295e916ea1",
+      "bytes": 5269
+    },
+    {
+      "path": "reports/campaign-save-coordinator-2026-10-18/debug-sealed-tests.log",
+      "sha256": "29a957382ceb27537a8fcd4532ba698a44cf2dd9d08b2694af49f67630bc455b",
+      "bytes": 4355
+    },
+    {
+      "path": "reports/campaign-save-coordinator-2026-10-18/release-sealed-build.log",
+      "sha256": "cad8c1fbbc72b45a147bb6721380681b0a2d09a0a66430663105ba8b9e758f21",
+      "bytes": 5225
+    },
+    {
+      "path": "reports/campaign-save-coordinator-2026-10-18/release-sealed-tests.log",
+      "sha256": "5202115e730fddb420dfd00ed1629979fac70cf4db4186f5b94276bc66bb79ff",
+      "bytes": 4397
+    },
+    {
+      "path": "reports/campaign-save-coordinator-2026-10-18/android-sealed-build.log",
+      "sha256": "cca61c8003283c88a7e0504225f9eb1d727f7ae0661787f12f9556dfffb688d5",
+      "bytes": 2231
+    },
+    {
+      "path": "reports/campaign-save-coordinator-2026-10-18/release-first-build.log",
+      "sha256": "5f1ce359b8d6e9be3edb3dbb65f6341874c8ab5ea0b6c48c4139b086e1acc7a3",
+      "bytes": 1836
+    },
+    {
+      "path": "reports/campaign-save-coordinator-2026-10-18/release-first-tests.log",
+      "sha256": "d0c2bd18d78b1a3a1c64a84d69f14bed1798f83849dc4de1e24fe98d7a04b1ef",
+      "bytes": 1887
+    }
+  ],
+  "next": "STOP FOR REVIEW; see README remaining three-slot work and manual/autosave retention decision",
+  "publicPush": false,
+  "deviceUse": false
+}

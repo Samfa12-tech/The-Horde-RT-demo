@@ -36,9 +36,9 @@ final class PlaytestReportSubmission {
     // prepared offline wrapper never enables any benchmark network attempt.
     private static final boolean BENCHMARK_SUMMARY_LIVE_SEND_ENABLED = false;
 
-    enum State { DRAFT, READY, IN_FLIGHT, RETRYABLE, QUEUED, SENT, CONFLICT, REJECTED, CANCELLED }
+    enum State { DRAFT, READY, IN_FLIGHT, RETRYABLE, QUEUED, SENT, PUBLISHED, CONFLICT, REJECTED, CANCELLED }
     enum ResultCode {
-        QUEUED, SENT, VERIFICATION_EXPIRED, RATE_LIMITED, CONTENT_CONFLICT,
+        QUEUED, SENT, PUBLISHED, VERIFICATION_EXPIRED, RATE_LIMITED, CONTENT_CONFLICT,
         UNCERTAIN, REJECTED, CANCELLED
     }
 
@@ -52,8 +52,16 @@ final class PlaytestReportSubmission {
     /** May run on the worker or deadline thread; callers must post to UI and recheck attempt/state. */
     interface Callback { void completed(long attempt, Result result); }
     interface Transport {
+        // Explicit local/staged contract admission. Production HTTPS keeps the
+        // default false until a compatible deployment is separately verified.
+        default boolean admitsPrivateDeveloperReports() { return false; }
+        default boolean admitsPublicBenchmarkReports() { return false; }
         /** Takes ownership of requestBody and must wipe it on completion or cancellation. */
         Call open(byte[] requestBody);
+        /** Separate injected route; never falls back to the private/legacy endpoint. */
+        default Call openPublicBenchmark(byte[] requestBody) {
+            throw new IllegalStateException("Public reporting transport is unavailable");
+        }
     }
     interface Call {
         Response execute() throws IOException;
@@ -82,6 +90,8 @@ final class PlaytestReportSubmission {
     private long generation;
     private ActiveCall active;
     private boolean benchmarkSummary;
+    private boolean publicBenchmark;
+    private String developerKind = "";
 
     PlaytestReportSubmission(Executor executor, Transport transport) {
         this(executor, transport, REAL_TIMEOUTS, CLEANUP_EXECUTOR::execute);
@@ -134,7 +144,8 @@ final class PlaytestReportSubmission {
      * that owns review must call this method before closing/editing its owner.
      */
     synchronized boolean beginBenchmarkSummary(BenchmarkSummaryReview review, boolean explicitRemoteConsent) {
-        if (!explicitRemoteConsent || state != State.DRAFT || review == null || !review.isPrepared()) return false;
+        if (!explicitRemoteConsent || state != State.DRAFT || review == null ||
+                review.isPublicPreview() || !review.isPrepared()) return false;
         final String id = review.reportId();
         final byte[] local = review.exactJsonBytes();
         if (!BenchmarkSummaryReview.validUuid(id) || local == null || local.length < 2 ||
@@ -154,13 +165,62 @@ final class PlaytestReportSubmission {
 
     boolean beginBenchmarkSummary(BenchmarkSummaryReview review) { return beginBenchmarkSummary(review, false); }
 
+    synchronized boolean beginPrivateBenchmarkSummary(BenchmarkSummaryReview review, boolean privateSendConsent) {
+        return review != null && !review.isPublicPreview() && review.isPrepared() && beginPrivateDeveloperReport(
+                review.reportId(), review.exactJsonBytes(), "benchmark-summary", privateSendConsent);
+    }
+
+    synchronized boolean beginPrivateCompatibility(CompatibilityReportReview review, boolean privateSendConsent) {
+        return review != null && review.isPrepared() && beginPrivateDeveloperReport(
+                review.reportId(), review.exactJsonBytes(), "compatibility", privateSendConsent);
+    }
+
+    synchronized boolean beginPublicBenchmarkSummary(BenchmarkSummaryReview review, boolean publishConsent) {
+        if (!publishConsent || state != State.DRAFT || review == null ||
+                !review.isPublicPreview() || !review.isPrepared()) return false;
+        final String id = review.reportId();
+        final byte[] local = review.exactJsonBytes();
+        if (!BenchmarkSummaryReview.validUuid(id) || local == null || local.length < 2 ||
+                local.length > MAX_BENCHMARK_LOCAL_BYTES || local[0] != '{' || local[local.length-1] != '}') return false;
+        final byte[] suffix = ",\"consentToPublish\":true}".getBytes(StandardCharsets.UTF_8);
+        if ((long)local.length - 1 + suffix.length > MAX_BENCHMARK_SUBMISSION_BYTES) return false;
+        frozenJson = Arrays.copyOf(local, local.length - 1 + suffix.length);
+        System.arraycopy(suffix, 0, frozenJson, local.length - 1, suffix.length);
+        reportId = id; publicBenchmark = true; ++generation; state = State.READY;
+        return true;
+    }
+
+    /** Token-free remote envelope preview. Local Copy/Save keeps its original owner/bytes. */
+    synchronized byte[] statisticsJsonForReview() {
+        return (publicBenchmark || !developerKind.isEmpty()) && frozenJson != null ? frozenJson.clone() : null;
+    }
+
+    synchronized boolean statisticsSendAvailable() {
+        return publicBenchmark ? transport.admitsPublicBenchmarkReports() :
+                !developerKind.isEmpty() && transport.admitsPrivateDeveloperReports();
+    }
+
+    private boolean beginPrivateDeveloperReport(String id, byte[] local, String kind, boolean consent) {
+        if (!consent || state != State.DRAFT || !BenchmarkSummaryReview.validUuid(id) || local == null ||
+                local.length < 2 || local.length > MAX_BENCHMARK_LOCAL_BYTES || local[0] != '{' || local[local.length-1] != '}') return false;
+        byte[] suffix = (",\"consentToSubmit\":true,\"delivery\":{\"destination\":\"developer-private\",\"publishToBoard\":false}}")
+                .getBytes(StandardCharsets.UTF_8);
+        if ((long)local.length - 1 + suffix.length > MAX_BENCHMARK_SUBMISSION_BYTES) return false;
+        frozenJson = Arrays.copyOf(local, local.length - 1 + suffix.length);
+        System.arraycopy(suffix, 0, frozenJson, local.length - 1, suffix.length);
+        reportId = id; developerKind = kind; ++generation; state = State.READY;
+        return true;
+    }
+
     /** Memory-only clone for offline review. This is not a transport capability. */
     synchronized byte[] benchmarkSummaryJsonForOfflineReview() {
         return benchmarkSummary && frozenJson != null ? frozenJson.clone() : null;
     }
 
     synchronized long retry() {
-        if (state != State.RETRYABLE || frozenJson == null) return -1L;
+        // A pending public result may be checked only by an explicit foreground
+        // action, retaining its identity/content and requiring fresh verification.
+        if ((state != State.RETRYABLE && !(publicBenchmark && state == State.QUEUED)) || frozenJson == null) return -1L;
         ++generation;
         state = State.READY;
         return generation;
@@ -172,10 +232,12 @@ final class PlaytestReportSubmission {
         final byte[] body;
         final ActiveCall activeCall;
         synchronized (this) {
-            if (benchmarkSummary && !BENCHMARK_SUMMARY_LIVE_SEND_ENABLED) return false;
+            if ((!developerKind.isEmpty() && !transport.admitsPrivateDeveloperReports()) ||
+                    (publicBenchmark && !transport.admitsPublicBenchmarkReports()) ||
+                    (benchmarkSummary && !BENCHMARK_SUMMARY_LIVE_SEND_ENABLED)) return false;
             if (state != State.READY || requestedAttempt != generation || !validToken(freshToken)) return false;
             body = buildRequest(frozenJson, freshToken,
-                    benchmarkSummary ? MAX_BENCHMARK_SUBMISSION_BYTES : MAX_SUBMISSION_BYTES);
+                    benchmarkSummary || publicBenchmark || !developerKind.isEmpty() ? MAX_BENCHMARK_SUBMISSION_BYTES : MAX_SUBMISSION_BYTES);
             if (body == null) return false;
             state = State.IN_FLIGHT;
             activeCall = new ActiveCall(requestedAttempt, body);
@@ -204,11 +266,11 @@ final class PlaytestReportSubmission {
             if (!activeCall.isCurrent()) return;
             byte[] requestBody = activeCall.requestBody();
             if (requestBody == null) return;
-            Call call = transport.open(requestBody);
+            Call call = publicBenchmark ? transport.openPublicBenchmark(requestBody) : transport.open(requestBody);
             activeCall.register(call);
             if (!activeCall.isCurrent()) return;
             Response response = call.execute();
-            Result result = classify(response, reportId);
+            Result result = classify(response, reportId, developerKind, publicBenchmark);
             finish(requestedAttempt, activeCall, result, callback);
         } catch (IOException | RuntimeException failure) {
             finish(requestedAttempt, activeCall, new Result(ResultCode.UNCERTAIN), callback);
@@ -237,12 +299,14 @@ final class PlaytestReportSubmission {
             switch (result.code) {
                 case QUEUED: state = State.QUEUED; break;
                 case SENT: state = State.SENT; break;
+                case PUBLISHED: state = State.PUBLISHED; break;
                 case CONTENT_CONFLICT: state = State.CONFLICT; break;
                 case REJECTED: state = State.REJECTED; break;
                 case CANCELLED: state = State.CANCELLED; break;
                 default: state = State.RETRYABLE; break;
             }
-            if (state == State.QUEUED || state == State.SENT || state == State.CONFLICT || state == State.REJECTED) {
+            if ((state == State.QUEUED && !publicBenchmark) || state == State.SENT || state == State.PUBLISHED ||
+                    state == State.CONFLICT || state == State.REJECTED) {
                 frozenJson = null;
             }
             // Serialize callback delivery with cancel(): once cancellation wins the
@@ -358,13 +422,14 @@ final class PlaytestReportSubmission {
         return request;
     }
 
-    private static Result classify(Response response, String reportId) {
+    private static Result classify(Response response, String reportId, String developerKind, boolean publicBenchmark) {
         if (response == null || response.body.length > MAX_RESPONSE_BYTES) return new Result(ResultCode.UNCERTAIN);
         if (response.status == 200 || response.status == 202) {
-            Ack ack = parseAck(response.body);
+            Ack ack = parseAck(response.body, developerKind, publicBenchmark);
             if (ack == null || !reportId.equals(ack.id)) return new Result(ResultCode.UNCERTAIN);
             if (response.status == 202 && "accepted".equals(ack.status)) return new Result(ResultCode.QUEUED);
-            if (response.status == 200 && "sent".equals(ack.status)) return new Result(ResultCode.SENT);
+            if (response.status == 200 && (publicBenchmark ? "published" : "sent").equals(ack.status))
+                return new Result(publicBenchmark ? ResultCode.PUBLISHED : ResultCode.SENT);
             return new Result(ResultCode.UNCERTAIN);
         }
         if (response.status == 403) return new Result(ResultCode.VERIFICATION_EXPIRED);
@@ -378,28 +443,33 @@ final class PlaytestReportSubmission {
     private static final class Ack {
         String id;
         String status;
+        String destination, reportKind;
     }
 
-    // The relay acknowledgment has exactly three flat fields. A small strict reader
-    // avoids Android-only JSON classes and rejects duplicate/unknown keys.
-    private static Ack parseAck(byte[] bytes) {
+    // Legacy acknowledgments have three flat fields; statistics receipts have
+    // five destination/kind-bound fields. Unknown/duplicate keys always reject.
+    private static Ack parseAck(byte[] bytes, String developerKind, boolean publicBenchmark) {
         if (bytes == null || bytes.length == 0 || bytes.length > MAX_RESPONSE_BYTES) return null;
         final String text;
         try {
             text = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
                     .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(bytes)).toString();
         } catch (Exception malformed) { return null; }
-        AckParser parser = new AckParser(text);
+        AckParser parser = new AckParser(text, developerKind, publicBenchmark);
         return parser.parse();
     }
 
     private static final class AckParser {
         final String text;
+        final String developerKind;
+        final boolean publicBenchmark;
         int at;
         final Set<String> keys = new HashSet<>();
         Ack ack = new Ack();
         boolean ok;
-        AckParser(String text) { this.text = text; }
+        AckParser(String text, String developerKind, boolean publicBenchmark) {
+            this.text = text; this.developerKind = developerKind; this.publicBenchmark = publicBenchmark;
+        }
         Ack parse() {
             ws(); if (!take('{')) return null; ws();
             if (take('}')) return null;
@@ -409,6 +479,8 @@ final class PlaytestReportSubmission {
                 if ("ok".equals(key)) { if (!literal("true")) return null; ok = true; }
                 else if ("id".equals(key)) { ack.id = string(); if (ack.id == null) return null; }
                 else if ("status".equals(key)) { ack.status = string(); if (ack.status == null) return null; }
+                else if ((publicBenchmark || !developerKind.isEmpty()) && "destination".equals(key)) { ack.destination = string(); if (ack.destination == null) return null; }
+                else if ((publicBenchmark || !developerKind.isEmpty()) && "reportKind".equals(key)) { ack.reportKind = string(); if (ack.reportKind == null) return null; }
                 else return null;
                 ws();
                 if (take('}')) break;
@@ -417,9 +489,12 @@ final class PlaytestReportSubmission {
                 if (at >= text.length() || text.charAt(at) == '}') return null;
             }
             ws();
-            if (at != text.length() || !ok || keys.size() != 3 || ack.id == null || ack.status == null ||
+            if (at != text.length() || !ok || keys.size() != (publicBenchmark || !developerKind.isEmpty() ? 5 : 3) || ack.id == null || ack.status == null ||
+                    ((publicBenchmark || !developerKind.isEmpty()) &&
+                        (!(publicBenchmark ? "public-board" : "developer-private").equals(ack.destination) ||
+                        !(publicBenchmark ? "public-benchmark-result" : developerKind).equals(ack.reportKind))) ||
                     !ack.id.matches("[A-Za-z0-9_-]{8,96}") ||
-                    !("accepted".equals(ack.status) || "sent".equals(ack.status))) return null;
+                    !("accepted".equals(ack.status) || (publicBenchmark ? "published" : "sent").equals(ack.status))) return null;
             return ack;
         }
         void ws() { while (at < text.length() && (text.charAt(at) == ' ' || text.charAt(at) == '\n' || text.charAt(at) == '\r' || text.charAt(at) == '\t')) ++at; }
@@ -443,7 +518,13 @@ final class PlaytestReportSubmission {
                         if (at + 4 > text.length()) return null;
                         int value = 0;
                         for (int i = 0; i < 4; ++i) {
-                            int digit = Character.digit(text.charAt(at++), 16);
+                            // JSON escape hex is ASCII; Character.digit also
+                            // accepts fullwidth/non-ASCII digits and would admit
+                            // malformed receipt keys as trusted field names.
+                            char hex = text.charAt(at++);
+                            int digit = hex >= '0' && hex <= '9' ? hex - '0' :
+                                    hex >= 'a' && hex <= 'f' ? hex - 'a' + 10 :
+                                    hex >= 'A' && hex <= 'F' ? hex - 'A' + 10 : -1;
                             if (digit < 0) return null;
                             value = (value << 4) | digit;
                         }

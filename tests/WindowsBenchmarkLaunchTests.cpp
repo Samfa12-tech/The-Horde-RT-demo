@@ -1,9 +1,17 @@
 #include <array>
+#include <algorithm>
 #include <iostream>
 #include <string_view>
+#include <vector>
 
 #include "platform/windows/WindowsBenchmarkLaunch.h"
+#include "platform/windows/WindowsBenchmarkProfile.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
+#include "platform/windows/WindowsChapterShippingLaunch.h"
+#include "platform/windows/WindowsAssetRoot.h"
+#include "platform/windows/WindowsPresentInterval.h"
+#include "platform/windows/WindowsHiddenCaptureLaunch.h"
+#include "platform/windows/WindowsEnvironmentSurveyLaunch.h"
 
 int main()
 {
@@ -17,8 +25,195 @@ int main()
         }
     };
     const std::array<std::wstring_view, 0> ordinary{};
+    horde::platform::windows::WindowsPresentIntervals intervals(100);
+    check(!intervals.Consume(0) && !intervals.Consume(99) && !intervals.Consume(100),
+        "missing and pre-route successful-present stamps fail before interval publication");
+    const auto first=intervals.Consume(120);
+    check(first && !first->available && first->nanoseconds==0,
+        "first successful present has no preceding interval and cannot become an FPS sample");
+    check(!intervals.Consume(120) && !intervals.Consume(110),
+        "duplicate and reversed successful-present stamps fail closed");
+    const auto next=intervals.Consume(150);
+    check(next && next->available && next->nanoseconds==30,
+        "invalid stamps preserve the previous owner; interval joins actual successive present returns");
+    using horde::platform::windows::ResolveWindowsAssetRoot;
+    const std::filesystem::path packaged="C:/build/Release/assets",source="C:/source";
+    check(ResolveWindowsAssetRoot(packaged,false,source,false,true)==source/"assets",
+        "opt-in optimized route resolves existing checkout assets before Vulkan startup");
+    check(ResolveWindowsAssetRoot(packaged,true,source,false,true)==packaged &&
+        ResolveWindowsAssetRoot(packaged,false,source,false,false)==packaged &&
+        ResolveWindowsAssetRoot(packaged,false,{},false,true)==packaged,
+        "packaged assets win and ordinary Release never masks a missing package");
+    check(ResolveWindowsAssetRoot(packaged,false,source,true,false)==source/"assets",
+        "Debug asset fallback remains unchanged");
+    using horde::platform::windows::ParseWindowsChapterShippingLaunch;
+    const std::array<std::wstring_view,5> shippingArgs{L"--measure-chapter-shipping-route",
+        L"--capture-showcase",L"C:\\reports\\shipping-route",L"--development-checkpoint",L"chapter-kit-reunion"};
+    check(ParseWindowsChapterShippingLaunch(shippingArgs,true).requested &&
+        ParseWindowsChapterShippingLaunch(shippingArgs,true).error.empty(),
+        "bounded Shipping route must select exactly the admitted Debug capture");
+    check(!ParseWindowsChapterShippingLaunch(shippingArgs,false).error.empty(),
+        "Shipping measurement controls cannot enter ordinary Release play");
+    check(ParseWindowsChapterShippingLaunch(shippingArgs,false,true).requested &&
+        ParseWindowsChapterShippingLaunch(shippingArgs,false,true).error.empty(),
+        "separately compiled optimized measurement build admits the exact route without Debug CPU policy");
+    check(!ParseWindowsChapterShippingLaunch(ordinary,false,true).requested &&
+        ParseWindowsChapterShippingLaunch(ordinary,false,true).error.empty(),
+        "optimized measurement support alone cannot acquire inputs or change ordinary launch");
+    auto foregroundArgs=std::vector<std::wstring_view>(shippingArgs.begin(),shippingArgs.end());
+    foregroundArgs.push_back(L"--measure-chapter-foreground");
+    check(ParseWindowsChapterShippingLaunch(foregroundArgs,false,true).foregroundRequested &&
+        ParseWindowsChapterShippingLaunch(foregroundArgs,false,true).error.empty(),
+        "foreground acquisition requires the explicit bounded measurement option");
+    check(!ParseWindowsChapterShippingLaunch(shippingArgs,false,true).foregroundRequested,
+        "ordinary measurement cannot acquire foreground implicitly");
+    const std::array<std::wstring_view,1> foregroundAlone{L"--measure-chapter-foreground"};
+    check(!ParseWindowsChapterShippingLaunch(foregroundAlone,false,true).error.empty(),
+        "foreground flag without the closed measurement fails before window creation");
+    foregroundArgs.push_back(L"--measure-chapter-foreground");
+    check(!ParseWindowsChapterShippingLaunch(foregroundArgs,false,true).error.empty(),
+        "duplicate foreground ownership fails closed");
+    check(!ParseWindowsChapterShippingLaunch(ordinary,true).requested &&
+        ParseWindowsChapterShippingLaunch(ordinary,true).error.empty(),
+        "ordinary launches must not gain a measurement owner");
+    for(const auto conflict:{L"--validate-chapter-roundtrip",L"--validate-static-zone-cutover",
+        L"--validate-static-triangle-cutover",L"--capture-graphics-preview",L"--benchmark-showcase",
+        L"--validate-output-resize",L"--validate-native-motion",L"--capture-sky-attribution",L"--mist-off",
+        L"--capture-dust",L"--measure-chapter-shipping-route"}) {
+        auto args=std::vector<std::wstring_view>(shippingArgs.begin(),shippingArgs.end());args.push_back(conflict);
+        check(!ParseWindowsChapterShippingLaunch(args,true).error.empty(),
+            "route measurement rejects conflicting validation/tuning and duplicate flags");
+        check(!ParseWindowsChapterShippingLaunch(args,false,true).error.empty(),
+            "optimized measurement rejects the same conflicting tuning and validation");
+    }
+    for(const auto badArgs:{
+        std::vector<std::wstring_view>{L"--measure-chapter-shipping-route"},
+        std::vector<std::wstring_view>{L"--measure-chapter-shipping-route",L"--capture-showcase",L"C:\\reports",L"--development-checkpoint",L"chapter-lookout"},
+        std::vector<std::wstring_view>{L"--measure-chapter-shipping-route",L"--capture-showcase",L"C:\\reports",L"--capture-showcase",L"C:\\again",L"--development-checkpoint",L"chapter-kit-reunion"},
+        std::vector<std::wstring_view>{L"--measure-chapter-shipping-route",L"--capture-showcase",L"C:\\reports",L"--development-checkpoint",L"chapter-kit-reunion",L"--development-checkpoint",L"chapter-kit-reunion"}})
+        check(!ParseWindowsChapterShippingLaunch(badArgs,true).error.empty(),
+            "missing, wrong or duplicate route sources fail closed");
     const auto absent = ParseWindowsBenchmarkLaunch(ordinary);
     check(!absent.requested && absent.error.empty(), "ordinary launch must remain interactive");
+    using horde::gameplay::BenchmarkProfileId;
+    check(absent.profile == BenchmarkProfileId::Custom && absent.profileValidation.empty(),
+        "ordinary launches and custom benchmark selection never auto-select a provisional profile");
+    const std::array<std::wstring_view,4> provisional{L"--benchmark-profile",L"windows-rt-provisional-v1",L"--benchmark-showcase",L"reports"};
+    check(ParseWindowsBenchmarkLaunch(provisional).error.empty() &&
+        ParseWindowsBenchmarkLaunch(provisional).profile == BenchmarkProfileId::WindowsProvisionalV1,
+        "Windows provisional profile requires explicit exact opt-in");
+    for (const auto args : {
+        std::vector<std::wstring_view>{L"--benchmark-profile",L"windows-rt-provisional-v1"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"mobile-rt-provisional-v1"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"custom"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"windows-rt-provisional-v1",L"--benchmark-profile",L"windows-rt-provisional-v1"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"windows-rt-provisional-v1",L"--benchmark-workload",L"lantern-held-high-v1"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"windows-rt-provisional-v1",L"--benchmark-rt-workload",L"max"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"windows-rt-provisional-v1",L"--development-world-route"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--validate-benchmark-profile",L"apply-restore"},
+        std::vector<std::wstring_view>{L"--benchmark-showcase",L"reports",L"--benchmark-profile",L"windows-rt-provisional-v1",L"--validate-benchmark-profile",L"unknown"}})
+        check(!ParseWindowsBenchmarkLaunch(args).error.empty(), "ambiguous, orphan or modified provisional launches fail closed");
+    for (const auto validation : {L"apply-restore",L"stale-owner",L"cancel-apply",L"cancel-measure",L"restart-measure",L"close-measure"}) {
+        auto args = std::vector<std::wstring_view>(provisional.begin(),provisional.end());
+        args.push_back(L"--validate-benchmark-profile"); args.push_back(validation);
+        check(ParseWindowsBenchmarkLaunch(args).error.empty() && !ParseWindowsBenchmarkLaunch(args).profileValidation.empty(),
+            "bounded lifecycle validation remains an explicit provisional launch only");
+        args.push_back(L"--validate-benchmark-profile"); args.push_back(validation);
+        check(!ParseWindowsBenchmarkLaunch(args).error.empty(), "duplicate lifecycle case fails closed");
+    }
+    {
+        using namespace horde::gameplay;
+        using namespace horde::graphics;
+        using namespace horde::platform::windows;
+        BenchmarkProfileConfiguration original;
+        original.backend = GraphicsBackend::RayTracingPipeline;
+        original.graphics = {75,WaterQuality::Mobile,FireDetail::Low,60,false,ShadowQuality::Higher,false,DustQuality::Off};
+        original.internal = {738,495}; original.output = {984,661};
+        original.cameraAspect = static_cast<float>(738.0f/495.0f);
+        const auto unchanged = original;
+        WindowsBenchmarkProfileSession session;
+        check(session.Begin(original) && original == unchanged && !session.Begin(original),
+            "one profile owner preserves the external original tuple and refuses restart");
+        auto actual = session.Working(); actual.temporaryOverrideActive = false;
+        actual.cameraAspect = static_cast<float>(16.0f/9.0f);
+        const OutputResizeOwnedFrame appliedOwner{2,3,4,5,6,7,0};
+        auto stale = appliedOwner; ++stale.measurementGeneration;
+        check(!session.Observe(actual,appliedOwner,1) && session.Arm(appliedOwner) && !session.Arm(appliedOwner) &&
+            !session.Observe(actual,stale,1) && !session.Observe(actual,appliedOwner,0) &&
+            session.Observe(actual,appliedOwner,1), "applied admission needs the exact newly armed completed submission");
+        check(session.Phase() == WindowsBenchmarkProfilePhase::Measuring && !session.Succeeded() &&
+            session.Working().graphics.previewFrameCap == 60,
+            "apply acknowledgement alone is not success and preserves the owner's preview cap");
+        check(session.BeginRestore(true,false) && session.Working() == original && !session.Succeeded(),
+            "measurement completion restores the logical tuple but cannot claim physical restoration");
+        const OutputResizeOwnedFrame restoredOwner{3,4,8,9,10,11,1};
+        auto wrongQuality = original; wrongQuality.graphics.mistEnabled = true;
+        check(session.Arm(restoredOwner) && !session.Observe(original,appliedOwner,2) &&
+            !session.Observe(wrongQuality,restoredOwner,2) && !session.Observe(original,restoredOwner,1) &&
+            session.Observe(original,restoredOwner,2) && session.Succeeded(),
+            "restoration requires a newer exact owner and original observed quality/odd extents before success");
+        WindowsBenchmarkProfileSession cancelled;
+        check(cancelled.Begin(original) && cancelled.Arm(appliedOwner) && cancelled.BeginRestore(false,true) &&
+            !cancelled.Observe(original,appliedOwner,1) && cancelled.Arm(restoredOwner) &&
+            cancelled.Observe(original,restoredOwner,2) && cancelled.Restored() && !cancelled.Succeeded(),
+            "cancellation during apply invalidates the apply owner and awaits real restoration without a measurement pass");
+        WindowsBenchmarkProfileSession failed;
+        check(failed.Begin(original) && failed.Arm(appliedOwner), "failure scenario starts with owned apply");
+        actual.graphics.glassEnabled = false;
+        check(!failed.Observe(actual,appliedOwner,1) && failed.BeginRestore(false,false) &&
+            failed.Working() == original, "wrong actual effect fails apply while retaining original restoration state");
+        failed.RestorationFailed();
+        check(!failed.Restored() && !failed.Succeeded() && failed.Phase() == WindowsBenchmarkProfilePhase::Failed,
+            "resource loss never reports unacknowledged restoration or success");
+        WindowsBenchmarkProfileSession incompatible;
+        auto mobile = original; mobile.optical = OpticalProfile::Mobile;
+        check(!incompatible.Begin(mobile) && incompatible.Phase() == WindowsBenchmarkProfilePhase::Idle,
+            "immutable Mobile optics cannot masquerade as the Windows High profile");
+    }
+    {
+        using namespace horde::gameplay;
+        using namespace horde::graphics;
+        using namespace horde::platform::windows;
+        BenchmarkProfileConfiguration original;
+        original.backend=GraphicsBackend::RayTracingPipeline;
+        original.optical=OpticalProfile::Mobile;
+        original.graphics={75,WaterQuality::Mobile,FireDetail::Low,60,false,ShadowQuality::Higher,false,DustQuality::Off};
+        original.internal={738,495};original.output={984,661};
+        original.cameraAspect=static_cast<float>(738.0f/495.0f);
+        original.outputPolicy=BenchmarkOutputPolicy::Native;
+        const auto unchanged=original;
+        auto expected=original;expected.temporaryOverrideActive=true;
+        const OutputResizeOwnedFrame appliedOwner{12,13,14,15,16,17,0};
+        const OutputResizeOwnedFrame restoredOwner{13,14,18,19,20,21,1};
+        auto staleOwner=appliedOwner;++staleOwner.measurementGeneration;
+        WindowsBenchmarkProfileSession custom;
+        check(custom.Begin(original,BenchmarkProfileId::Custom) && original==unchanged && custom.Working()==expected,
+            "explicit Custom preserves odd extents, compiled optics, quality and native output policy without changing personal state");
+        check(!custom.ObserveMeasuring(original) && !custom.Observe(original,appliedOwner,1) &&
+            custom.Arm(appliedOwner) && !custom.Observe(original,staleOwner,1) &&
+            custom.Observe(original,appliedOwner,1) && custom.ObserveMeasuring(original) && !custom.Succeeded(),
+            "Custom needs the newly armed actual apply owner before admitting measured tuple observations");
+        auto changed=original;changed.graphics.shadowQuality=ShadowQuality::Current;
+        check(!custom.ObserveMeasuring(changed) && !custom.ObserveMeasuring(original),
+            "Custom remains bound to its actual starting tuple and cannot erase mid-run quality drift");
+        check(custom.BeginRestore(false,false) && custom.Working()==original &&
+            custom.Arm(restoredOwner) && custom.Observe(original,restoredOwner,2) &&
+            custom.Restored() && !custom.Succeeded() && original==unchanged,
+            "failed Custom measurement can restore the exact original without admitting a benchmark success");
+
+        WindowsBenchmarkProfileSession cancelled;
+        check(cancelled.Begin(original,BenchmarkProfileId::Custom) && cancelled.Arm(appliedOwner) &&
+            cancelled.Observe(original,appliedOwner,1) && cancelled.ObserveMeasuring(original) &&
+            cancelled.BeginRestore(false,true) && cancelled.Working()==original && !cancelled.Restored(),
+            "cancelling an acknowledged Custom run restores logical intent but still awaits physical restoration");
+        check(!cancelled.Observe(original,appliedOwner,2) && cancelled.Arm(restoredOwner) &&
+            !cancelled.Observe(original,appliedOwner,2) && !cancelled.Observe(original,restoredOwner,1) &&
+            cancelled.Observe(original,restoredOwner,2) && cancelled.Restored() && !cancelled.Succeeded(),
+            "cancelled Custom requires a fresh exact restoration owner and newer completion, never a stale apply receipt");
+        check(cancelled.Working()==unchanged && original==unchanged,
+            "Custom cancellation preserves every original field and the external owner tuple exactly");
+    }
     using horde::vulkan::raytracing::RtWorkloadPreset;
     check(absent.rtWorkloadPreset == RtWorkloadPreset::Authored,
           "ordinary launches keep the authored preset");
@@ -158,11 +353,31 @@ int main()
         notUploaded.find("\"shadowPolicySource\":\"unavailable\"") != std::string::npos &&
         notUploaded.find("\"primaryAreaShadowSamplesPerContributingReceiver\":0") != std::string::npos,
         "ordinary reporting without an actual upload never fabricates Max shadow policy");
-    auto invalidUpload = higher; invalidUpload.controls[3] = 2u;
+    // Quality word now packs mist bit0 and the three admitted dust modes in
+    // bits1-2. Six is the first unknown encoding; two means Low dust/mist on.
+    auto invalidUpload = higher; invalidUpload.controls[3] = 6u;
     check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
         RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "High", "High", higher, invalidUpload, true)
         .find("\"shadowPolicySource\":\"unavailable\"") != std::string::npos,
         "unknown quality flags are not admitted as actual physical policy");
+    for (unsigned packed = 0; packed < 6; ++packed)
+    {
+        auto upload = current; upload.controls[3] = packed;
+        const auto packedJson = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+            RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored,
+            "High", "High", upload, upload, true);
+        check(packedJson.find("\"policyStable\":true") != std::string::npos &&
+            packedJson.find("\"shadowPolicySource\":\"uploaded\"") != std::string::npos &&
+            packedJson.find("\"shadowMode\":\"Current\"") != std::string::npos &&
+            packedJson.find((packed & 1u) ? "\"actualUploadedMistEnabled\":false" :
+                "\"actualUploadedMistEnabled\":true") != std::string::npos,
+            "every admitted packed mist/dust policy reports uploaded shadows and the decoded mist bit");
+    }
+    auto lowDust = current; lowDust.controls[3] = 2u;
+    check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored,
+        "High", "High", current, lowDust, true).find("\"policyStable\":false") != std::string::npos,
+        "an actual dust change still invalidates endpoint stability");
     check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
         RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "Mobile", "Mobile", higher, higher, true)
         .find("\"policyStable\":false") != std::string::npos,
@@ -209,5 +424,109 @@ int main()
           "Debug native-motion capture admits explicit dust choice");
     check(!ParseWindowsMistCaptureLaunch(std::array<std::wstring_view, 6>{L"--capture-showcase", L"reports", L"--capture-dust", L"low", L"--capture-dust", L"off"}, true).error.empty(),
           "duplicate dust capture option rejects");
+    using horde::platform::windows::ParseWindowsHiddenCaptureLaunch;
+    check(!ParseWindowsHiddenCaptureLaunch(ordinary, true).hidden &&
+          ParseWindowsHiddenCaptureLaunch(ordinary, true).error.empty(),
+          "ordinary launch preserves default visibility");
+    const std::array<std::wstring_view, 3> hiddenCapture{
+        L"--capture-showcase", L"reports/hidden", L"--capture-hidden"};
+    check(ParseWindowsHiddenCaptureLaunch(hiddenCapture, true).hidden &&
+          ParseWindowsHiddenCaptureLaunch(hiddenCapture, true).error.empty(),
+          "Debug showcase accepts explicit hidden modifier");
+    check(ParseWindowsHiddenCaptureLaunch(
+              std::array<std::wstring_view, 3>{L"--capture-hidden", L"--capture-showcase", L"reports"}, true).error.empty(),
+          "hidden modifier is independent of argument order");
+    check(!ParseWindowsHiddenCaptureLaunch(hiddenCapture, false).error.empty(),
+          "Release rejects hidden capture before renderer startup");
+    check(!ParseWindowsHiddenCaptureLaunch(
+              std::array<std::wstring_view, 1>{L"--capture-hidden"}, true).error.empty() &&
+          !ParseWindowsHiddenCaptureLaunch(
+              std::array<std::wstring_view, 2>{L"--capture-showcase", L"--capture-hidden"}, true).error.empty(),
+          "hidden cannot launch an interactive window or consume a missing output path");
+    check(!ParseWindowsHiddenCaptureLaunch(
+              std::array<std::wstring_view, 4>{L"--capture-showcase", L"reports", L"--capture-hidden", L"--capture-hidden"}, true).error.empty(),
+          "duplicate hidden modifier rejects");
+    for (const auto conflict : {L"--benchmark-showcase", L"--measure-chapter-shipping-route",
+             L"--measure-chapter-foreground", L"--validate-native-motion",
+             L"--validate-output-resize", L"--capture-graphics-preview"})
+        check(!ParseWindowsHiddenCaptureLaunch(
+                  std::array<std::wstring_view, 4>{L"--capture-showcase", L"reports", L"--capture-hidden", conflict}, true).error.empty(),
+              "hidden showcase rejects conflicting benchmark/foreground/validation path");
+    check(ParseWindowsHiddenCaptureLaunch(
+              std::array<std::wstring_view, 5>{L"--capture-showcase", L"reports", L"--capture-hidden",
+                  L"--capture-portrait", L"--require-rayquery-compute"}, true).error.empty(),
+          "hidden leaves existing portrait and RT backend modifiers available");
+    using namespace horde::platform::windows;
+    const std::array<std::wstring_view,6> survey{L"--development-rescue-journey",L"--capture-showcase",L"reports",
+        L"--capture-hidden",L"--capture-environment-survey",L"river-bend"};
+    check(ParseWindowsEnvironmentSurveyLaunch(survey,true).requested &&
+          !ParseWindowsEnvironmentSurveyLaunch(survey,true).waterDisabled &&
+          ParseWindowsEnvironmentSurveyLaunch(survey,true).error.empty(),"hidden Debug survey admits one bounded camera profile");
+    check(!ParseWindowsEnvironmentSurveyLaunch(survey,false).error.empty(),"survey rejects Release");
+    std::vector<std::wstring_view> baseline(survey.begin(),survey.end());baseline.push_back(L"--survey-water-disabled");
+    check(ParseWindowsEnvironmentSurveyLaunch(baseline,true).waterDisabled &&
+          ParseWindowsEnvironmentSurveyLaunch(baseline,true).error.empty(),"explicit survey baseline permits water omission only");
+    for(const auto required:{L"--development-rescue-journey",L"--capture-hidden"}) {
+        auto missing=std::vector<std::wstring_view>(survey.begin(),survey.end());
+        missing.erase(std::find(missing.begin(),missing.end(),required));
+        check(!ParseWindowsEnvironmentSurveyLaunch(missing,true).error.empty(),"survey requires hidden native chapter setup");
+    }
+    for(const auto conflict:{L"--development-checkpoint",L"--validate-chapter-roundtrip",L"--benchmark-showcase",
+            L"--measure-chapter-foreground",L"--validate-native-motion",L"--capture-sky-attribution",L"--rt-lab-scale"}) {
+        auto invalid=std::vector<std::wstring_view>(survey.begin(),survey.end());invalid.push_back(conflict);
+        check(!ParseWindowsEnvironmentSurveyLaunch(invalid,true).error.empty(),"survey excludes gameplay staging and competing validation/tuning");
+    }
+    check(!ParseWindowsEnvironmentSurveyLaunch(std::array<std::wstring_view,1>{L"--survey-water-disabled"},true).error.empty(),
+          "water omission cannot affect an ordinary launch");
+    auto duplicateSurveyProfile=std::vector<std::wstring_view>(survey.begin(),survey.end());
+    duplicateSurveyProfile.push_back(L"--capture-environment-survey");duplicateSurveyProfile.push_back(L"river-bend");
+    check(!ParseWindowsEnvironmentSurveyLaunch(duplicateSurveyProfile,true).error.empty(),"duplicate environment profiles reject");
+    auto unknown=survey;unknown.back()=L"arbitrary-camera";
+    check(!ParseWindowsEnvironmentSurveyLaunch(unknown,true).error.empty(),"unknown survey profile rejects");
+    auto tombSurvey=survey;tombSurvey.back()=L"tomb-debris";
+    const auto tombLaunch=ParseWindowsEnvironmentSurveyLaunch(tombSurvey,true);
+    check(tombLaunch.requested && tombLaunch.profile=="tomb-debris" && !tombLaunch.debrisDisabled &&
+          tombLaunch.error.empty(),"hidden tomb survey admits only its explicit bounded profile");
+    auto debrisBaseline=std::vector<std::wstring_view>(tombSurvey.begin(),tombSurvey.end());
+    debrisBaseline.push_back(L"--survey-debris-disabled");
+    check(ParseWindowsEnvironmentSurveyLaunch(debrisBaseline,true).debrisDisabled &&
+          ParseWindowsEnvironmentSurveyLaunch(debrisBaseline,true).error.empty(),"tomb baseline omits only the optional static chip geometry");
+    check(!ParseWindowsEnvironmentSurveyLaunch(debrisBaseline,false).error.empty(),"tomb survey rejects Release");
+    auto wrongProfile=std::vector<std::wstring_view>(survey.begin(),survey.end());wrongProfile.push_back(L"--survey-debris-disabled");
+    check(!ParseWindowsEnvironmentSurveyLaunch(wrongProfile,true).error.empty(),"debris baseline cannot change river survey");
+    auto waterInTomb=std::vector<std::wstring_view>(tombSurvey.begin(),tombSurvey.end());waterInTomb.push_back(L"--survey-water-disabled");
+    check(!ParseWindowsEnvironmentSurveyLaunch(waterInTomb,true).error.empty(),"tomb survey cannot silently change regional water");
+    check(!ParseWindowsEnvironmentSurveyLaunch(std::array<std::wstring_view,1>{L"--survey-debris-disabled"},true).error.empty(),
+          "debris omission cannot affect ordinary launches");
+    debrisBaseline.push_back(L"--survey-debris-disabled");
+    check(!ParseWindowsEnvironmentSurveyLaunch(debrisBaseline,true).error.empty(),"duplicate debris modifier rejects");
+    const auto opening=TombDebrisSurveyCamera(0),chips=TombDebrisSurveyCamera(60);
+    auto dodgeSurvey=std::vector<std::wstring_view>(survey.begin(),survey.end());dodgeSurvey.back()=L"player-dodge";
+    check(ParseWindowsEnvironmentSurveyLaunch(dodgeSurvey,true).error.empty() &&
+          !ParseWindowsEnvironmentSurveyLaunch(dodgeSurvey,false).error.empty(),"player dodge snapshot inspection is hidden Debug only");
+    dodgeSurvey.push_back(L"--survey-dodge-disabled");
+    check(ParseWindowsEnvironmentSurveyLaunch(dodgeSurvey,true).dodgeDisabled &&
+          ParseWindowsEnvironmentSurveyLaunch(dodgeSurvey,true).error.empty(),"player dodge A/B baseline is an explicit pose-only omission");
+    dodgeSurvey.push_back(L"--survey-dodge-disabled");
+    check(!ParseWindowsEnvironmentSurveyLaunch(dodgeSurvey,true).error.empty() &&
+          !ParseWindowsEnvironmentSurveyLaunch(std::array<std::wstring_view,1>{L"--survey-dodge-disabled"},true).error.empty(),
+          "duplicate or unbound dodge omission rejects");
+    auto wrongDodge=std::vector<std::wstring_view>(survey.begin(),survey.end());wrongDodge.push_back(L"--survey-dodge-disabled");
+    check(!ParseWindowsEnvironmentSurveyLaunch(wrongDodge,true).error.empty(),"dodge omission cannot affect a river survey");
+    check(opening.x==horde::gameplay::kPlayerSpawn.x && opening.z==horde::gameplay::kPlayerSpawn.z && opening.yaw==0 &&
+          horde::gameplay::IsShowcasePlayerPositionWalkable(opening.x,opening.z) &&
+          horde::gameplay::IsShowcasePlayerPositionWalkable(chips.x,chips.z) &&
+          opening.supportY==horde::gameplay::kRouteFloorWorldY && chips.supportY==opening.supportY && chips.pitch>=-.32f,
+          "tomb survey retains ordinary spawn view and legal shared-floor diagnostic camera");
+    const auto plan=RiverBendSurveyCamera();
+    check(std::abs(plan.x-134.3f)<.0001f && std::abs(plan.z-131.2f)<.0001f &&
+          std::abs(plan.yaw-3.041924f)<.0001f,"shore camera follows authored E56 N-5 toward E58 N-25 with the original atlas transform");
+    unsigned pngCount=0;
+    for(unsigned frame=0;frame<kEnvironmentSurveyFrames;++frame) {
+        if((frame+1)%kEnvironmentSurveyCaptureStride==0)++pngCount;
+        if(frame)check(EnvironmentSurveyTime(frame)>EnvironmentSurveyTime(frame-1),"render time strictly advances without simulation input");
+    }
+    check(pngCount==12 && kEnvironmentSurveyFrames==120 && EnvironmentSurveyTime(0)==0 &&
+          std::abs(EnvironmentSurveyTime(119)-119.f/60.f)<.00001f,"survey retains fixed frame, image and time budgets");
     return passed ? 0 : 1;
 }

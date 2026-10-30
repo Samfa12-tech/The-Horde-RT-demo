@@ -1,0 +1,51 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 24
+    Start  24: horde_rt_combat_foundation_tests
+
+24: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_combat_foundation_tests.exe"
+24: Working Directory: <repo>/build/presets/windows-x64-release
+24: Test timeout computed to be: 30
+24: combat foundation checks=486 failures=0
+1/4 Test  #24: horde_rt_combat_foundation_tests ................   Passed    0.05 sec
+test 41
+    Start  41: horde_rt_windows_combat_practice_launch_tests
+
+41: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_windows_combat_practice_launch_tests.exe"
+41: Working Directory: <repo>/build/presets/windows-x64-release
+41: Test timeout computed to be: 1500
+2/4 Test  #41: horde_rt_windows_combat_practice_launch_tests ...   Passed    0.02 sec
+test 123
+    Start 123: horde_rt_lantern_reward_tests
+
+123: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_lantern_reward_tests.exe"
+123: Working Directory: <repo>/build/presets/windows-x64-release
+123: Test timeout computed to be: 1500
+123: Lantern reward interaction, command, and finale tests passed
+3/4 Test #123: horde_rt_lantern_reward_tests ...................   Passed    0.02 sec
+test 126
+    Start 126: horde_rt_desktop_controller_input_tests
+
+126: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_desktop_controller_input_tests.exe"
+126: Working Directory: <repo>
+126: Test timeout computed to be: 1500
+126: Desktop controller input tests passed
+4/4 Test #126: horde_rt_desktop_controller_input_tests .........   Passed    1.54 sec
+
+The following tests passed:
+	horde_rt_combat_foundation_tests
+	horde_rt_windows_combat_practice_launch_tests
+	horde_rt_lantern_reward_tests
+	horde_rt_desktop_controller_input_tests
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   1.65 sec

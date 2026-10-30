@@ -47,14 +47,23 @@ try {
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
     $capacityCpu = Get-Content -LiteralPath $portableCpuPath -Raw
-    if ($definition.capacities.instanceMetadata -ne 24 -or $definition.capacities.tlasInstances -ne 26 -or
-        $definition.capacities.staticAssets -ne 12 -or
-        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 26u;' -or
-        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 24u;' -or
-        $capacityCpu -notmatch 'kRtStaticAssetCapacity = 12u;' -or
+    if ($definition.capacities.instanceMetadata -ne 30 -or $definition.capacities.tlasInstances -ne 107 -or $definition.capacities.primitives -ne 38 -or
+        $definition.capacities.staticAssets -ne 15 -or $definition.capacities.materials -ne 34 -or $definition.capacities.textureLayers -ne 18 -or
+        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 107u;' -or
+        $capacityCpu -notmatch 'kRtOrdinaryShowcaseInstanceCount = 31u;' -or
+        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 30u;' -or
+        $capacityCpu -notmatch 'kRtPrimitiveMetadataCapacity = 38u;' -or
+        $capacityCpu -notmatch 'kRtStaticAssetCapacity = 15u;' -or
+        $capacityCpu -notmatch 'kRtMaterialCapacity = 34u;' -or
+        $capacityCpu -notmatch 'kRtTextureLayerCapacity = 18u;' -or
         $capacityCpu -notmatch 'kRtActiveFireEmitterCapacity = 4u;' -or
-        $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;') {
-        throw 'Generated owners must distinguish26 TLAS instances from24 metadata records, admit12 generic static assets, and retain four fire storage records.'
+        $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;' -or
+        $generatedGlsl -notmatch 'const uint kRtInstanceMetadataCapacity = 30u;' -or
+        $generatedGlsl -notmatch 'const uint kRtTlasInstanceCapacity = 107u;' -or
+        $generatedGlsl -notmatch 'const uint kRtPrimitiveMetadataCapacity = 38u;' -or
+        $generatedGlsl -notmatch 'const uint kRtMaterialCapacity = 34u;' -or
+        $generatedGlsl -notmatch 'const uint kRtTextureLayerCapacity = 18u;') {
+        throw 'Generated joint owners must admit 107 TLAS storage slots, 30 metadata records, 38 primitive records, 15 static assets, 34 materials, 18 texture layers, and four fire storage records.'
     }
     foreach ($case in @(
         @{ name = 'tlasInstances'; value = 21 },
@@ -62,6 +71,9 @@ try {
         @{ name = 'tlasInstances'; value = 24.5 },
         @{ name = 'tlasInstances'; value = '24' },
         @{ name = 'staticAssets'; value = 0 },
+        @{ name = 'primitives'; value = 257 },
+        @{ name = 'materials'; value = 1.5 },
+        @{ name = 'textureLayers'; value = '18' },
         @{ name = 'activeFireEmitters'; value = 5 }
     )) {
         $invalidCapacity = Get-Content -LiteralPath $lfDefinitionPath -Raw | ConvertFrom-Json
@@ -77,6 +89,21 @@ try {
             $capacityRejected = $true
         }
         if (-not $capacityRejected) { throw 'Invalid physical owner/fire capacity was admitted.' }
+    }
+    foreach ($value in @($null, 0, ($definition.capacities.tlasInstances + 1), 30.5, '30')) {
+        $invalidProfile = Get-Content -LiteralPath $lfDefinitionPath -Raw | ConvertFrom-Json
+        $invalidProfile.sceneCounts.ordinaryShowcaseTlasInstances = $value
+        $invalidProfilePath = Join-Path $temporaryRoot 'invalid-profile-count.def'
+        $invalidProfile | ConvertTo-Json -Depth 32 | Set-Content -LiteralPath $invalidProfilePath
+        $rejected = $false
+        try {
+            & (Join-Path $repoRoot 'tools/generate-rt-scene-abi.ps1') -DefinitionPath $invalidProfilePath `
+                -CpuOutputPath $portableCpuPath -GlslOutputPath $portableGlslPath
+        } catch {
+            if ($_.Exception.Message -notmatch '^The ordinary Showcase live count') { throw }
+            $rejected = $true
+        }
+        if (-not $rejected) { throw 'An invalid live scene count was admitted.' }
     }
     if ($definition.schema -ne 1 -or $definition.bindings.dielectricDiagnostics -ne 22 -or
         $definition.bindings.environmentTexture -ne 25 -or

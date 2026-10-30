@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "upstreamRepository": "https://github.com/Samfa12-tech/Pocket-Chordsmith",
-  "upstreamCommit": "534a6e6811ce653efd5422138c5772b967263ed0",
+  "upstreamCommit": "b77a9d0bfe3051c6e352815295164b9b80586f56",
   "component": "packages/pocket-audio-core/native",
   "packageVersion": "0.2.0",
   "packagePrivate": true,
@@ -17,44 +17,44 @@
     {
       "path": "native/README.md",
       "upstreamPath": "packages/pocket-audio-core/native/README.md",
-      "bytes": 4148,
-      "sha256": "0d8fa6478d0fff790cd263578e79061ee6028ca16708b61d1b8a26c3f7a382dd"
+      "bytes": 10239,
+      "sha256": "e597812904ade447ac289d90f65712e8378d408312d61ca2eded3fb56cb63d7d"
     },
     {
       "path": "native/include/pocket_audio/PcmFormat.h",
       "upstreamPath": "packages/pocket-audio-core/native/include/pocket_audio/PcmFormat.h",
-      "bytes": 146,
-      "sha256": "9f1924b2a31d0ceabea049661fc724d42043804839f3778b441e5a9162e06cd5"
+      "bytes": 1709,
+      "sha256": "320ad01b2f2c34e9ef3ec101aa199e55288b0f812939a10d6d92e996d967b057"
     },
     {
       "path": "native/include/pocket_audio/PcmLoopStream.h",
       "upstreamPath": "packages/pocket-audio-core/native/include/pocket_audio/PcmLoopStream.h",
-      "bytes": 3577,
-      "sha256": "3e42dfd9067e8164fea17399cfb6c6c3e6fe5af17e3d241ef0d26d4b05200577"
+      "bytes": 4417,
+      "sha256": "72702eaf7f27672d60df598fcf949df1f209db6e76535b9a0cb95847ae7a2982"
     },
     {
       "path": "native/include/pocket_audio/PcmWave.h",
       "upstreamPath": "packages/pocket-audio-core/native/include/pocket_audio/PcmWave.h",
-      "bytes": 1259,
-      "sha256": "8932524a678c02d07dfcd78519174cf8be2cf3254c7780b3e05436ab2e11996e"
+      "bytes": 1766,
+      "sha256": "981519f66634f0da13748d75a7294fc49b50e8da56f7162f8d8b93e0d3f320f2"
     },
     {
       "path": "native/src/PcmLoopStream.cpp",
       "upstreamPath": "packages/pocket-audio-core/native/src/PcmLoopStream.cpp",
-      "bytes": 11207,
-      "sha256": "4121689e6563ab3708f3b1d82fc86be2bc3b1c9ed9e5b13aa4762597296c669e"
+      "bytes": 12056,
+      "sha256": "7792d406b7f3db6a2e1af77cfd52e06265b2841d7dd22b681a41c77d6185fcce"
     },
     {
       "path": "native/src/PcmWave.cpp",
       "upstreamPath": "packages/pocket-audio-core/native/src/PcmWave.cpp",
-      "bytes": 6972,
-      "sha256": "7f26a2bcc093a6ea761fc61695d67c0c0c454819dfed76949020e9a7fece1e53"
+      "bytes": 7337,
+      "sha256": "a4f14dddd8d4e9ceecfbc73e0c546a990297b4ccfcd24dca03bb9f7238e21386"
     },
     {
       "path": "native/tests/PcmNativeTests.cpp",
       "upstreamPath": "packages/pocket-audio-core/native/tests/PcmNativeTests.cpp",
-      "bytes": 23965,
-      "sha256": "ba4e803e2537d4071b98651db4a183f8050c9814689a251bd13082dcebb33e73"
+      "bytes": 35450,
+      "sha256": "805ac6ad71373e2e0053d044f96de0a046cbb5b37d68291a59c5245830c6abfa"
     },
     {
       "path": "upstream/LICENSE",

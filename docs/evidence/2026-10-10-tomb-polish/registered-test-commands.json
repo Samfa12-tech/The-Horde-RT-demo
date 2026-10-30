@@ -1,0 +1,2598 @@
+{
+  "tests": [
+    {
+      "backtrace": 1,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_menu_ambience_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_menu_ambience_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 3,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_indoor_dust_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_indoor_dust_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 5,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_retirement_owner_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_retirement_owner_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 7,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_settings_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_graphics_settings_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 9,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_entry_menu_handoff_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_entry_menu_handoff_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 11,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_foreground_pause_render_cadence_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_foreground_pause_render_cadence_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 13,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_surface_presentation_policy_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_surface_presentation_policy_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 15,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_presentation_transform_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_presentation_transform_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 17,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_compiled_pipeline_cache_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_compiled_pipeline_cache_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 19,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_pipeline_cache_seed_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_pipeline_cache_seed_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 21,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_scale_min33_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_graphics_scale_min33_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 23,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_scale_legacy50_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_graphics_scale_legacy50_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 25,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_preview_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_graphics_preview_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 27,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_preview_performance_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_graphics_preview_performance_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 29,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_texture_layer_subset_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_texture_layer_subset_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 31,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_shaft_dressing_geometry_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_shaft_dressing_geometry_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 33,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_windows_persistence_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_graphics_windows_persistence_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 35,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_device_address_layout_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_device_address_layout_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 37,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_player_primitive_contract_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_player_primitive_contract_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 39,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/ThirdPartyNoticeAdmissionTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_third_party_notice_admission_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 41,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RaygenArtifactOwnershipTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_raygen_artifact_ownership_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 43,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/PlayerManifestAgreementTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_player_manifest_agreement_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 45,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/PlayerPackageInventoryTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_player_package_inventory_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 47,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_combat_foundation_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_combat_foundation_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 30.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 49,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_transition_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_held_item_transition_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 51,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_combat_timing_trace_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_combat_timing_trace_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 53,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_input_presentation_trace_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_input_presentation_trace_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 55,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_clearance_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_held_item_clearance_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 57,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_ambience_pcm_loop_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_ambience_pcm_loop_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace": 59,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_present_completion_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_present_completion_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 61,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_present_timing_evidence_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_present_timing_evidence_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 63,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_entry_menu_scene_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_entry_menu_scene_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 65,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_graphics_preview_frame_adapter_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_graphics_preview_frame_adapter_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 67,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_benchmark_summary_report_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_benchmark_summary_report_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 69,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_staged_primary_contract_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_staged_primary_contract_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 71,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_lantern_benchmark_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_lantern_benchmark_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 73,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_benchmark_evidence_report_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_benchmark_evidence_report_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 75,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_benchmark_launch_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_benchmark_launch_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 77,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_output_resize_launch_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_output_resize_launch_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 79,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_motion_evidence_launch_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_motion_evidence_launch_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 81,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_combat_practice_launch_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_combat_practice_launch_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 83,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_android_motion_evidence_policy_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_android_motion_evidence_policy_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 85,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_android_debug_request_admission_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_android_debug_request_admission_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 87,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_motion_evidence_scenario_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_motion_evidence_scenario_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 89,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_world_route_foundation_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_world_route_foundation_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 91,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_vertical_support_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_vertical_support_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 93,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_vertical_support_rig_tests.exe",
+        "<repo>"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_held_item_vertical_support_rig_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 95,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_player_directional_rig_tests.exe",
+        "<repo>"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_player_directional_rig_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 97,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_final_held_torch_clearance_tests.exe",
+        "<repo>"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_final_held_torch_clearance_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 99,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_benchmark_evidence_run_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_benchmark_evidence_run_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 101,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_evidence_publication_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_evidence_publication_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 103,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_ray_tracing_requirements_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_ray_tracing_requirements_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 105,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_performance_evidence_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_performance_evidence_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 107,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_scene_record_observation_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_scene_record_observation_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 109,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_pipeline_variants_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_pipeline_variants_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 111,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_pipeline_variant_provider_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_pipeline_variant_provider_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 113,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_pipeline_bundle_contracts_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_pipeline_bundle_contracts_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 116,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_shipping_mobile_fixture.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_provider_shipping_mobile_fixture",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 119,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineVariantFixtureEvidence.ps1",
+        "-Fixture",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_shipping_mobile_fixture.exe",
+        "-ProviderObject",
+        "<repo>/build/presets/windows-x64-debug/horde_rtpv_0_0_obj.dir/Debug/RtPipelineVariantProvider.obj",
+        "-OpaqueSha256",
+        "0a1a74f9a09e55755699f22be7d17d3026fb227f90380fd5961851a20a26f591",
+        "-GenericSha256",
+        "bd0a3e321e095f89222acc3fe2faa7106ac97528eadac8672b1da32165b2c947",
+        "-RequiredKey",
+        "shipping_mobile_opaque_fast"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_provider_shipping_mobile_fixture_evidence",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 122,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_shipping_high_fixture.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_provider_shipping_high_fixture",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 125,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineVariantFixtureEvidence.ps1",
+        "-Fixture",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_shipping_high_fixture.exe",
+        "-ProviderObject",
+        "<repo>/build/presets/windows-x64-debug/horde_rtpv_0_1_obj.dir/Debug/RtPipelineVariantProvider.obj",
+        "-OpaqueSha256",
+        "2e7eff908cf8ec7ba1a450bcb5942d9b3ea48bf1323f16e3a847ed3c77f70e5b",
+        "-GenericSha256",
+        "6d30c051dcf2bca8780d070d2f39488c4e4ecd2a177d4c457765915958e2c1bf",
+        "-RequiredKey",
+        "shipping_high_opaque_fast"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_provider_shipping_high_fixture_evidence",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 128,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_diagnostic_mobile_fixture.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_provider_diagnostic_mobile_fixture",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 131,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineVariantFixtureEvidence.ps1",
+        "-Fixture",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_diagnostic_mobile_fixture.exe",
+        "-ProviderObject",
+        "<repo>/build/presets/windows-x64-debug/horde_rtpv_1_0_obj.dir/Debug/RtPipelineVariantProvider.obj",
+        "-OpaqueSha256",
+        "d1c0a295423ae502d9a4facdc5cc44f8ca1ebf54fffda775042b0aad3443a013",
+        "-GenericSha256",
+        "a5bd72e4c10e95755385668b2977cefc774cb68533efaf1b3f0d0a90bbcc170b",
+        "-RequiredKey",
+        "diagnostic_mobile_opaque_fast"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_provider_diagnostic_mobile_fixture_evidence",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 134,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_diagnostic_high_fixture.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_provider_diagnostic_high_fixture",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 137,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineVariantFixtureEvidence.ps1",
+        "-Fixture",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_provider_diagnostic_high_fixture.exe",
+        "-ProviderObject",
+        "<repo>/build/presets/windows-x64-debug/horde_rtpv_1_1_obj.dir/Debug/RtPipelineVariantProvider.obj",
+        "-OpaqueSha256",
+        "71791b0672256ab830d16f2c4c711a365e86a63f97c753d825d4a4cebe8e9704",
+        "-GenericSha256",
+        "9fed471359c5ae3970eeb7d698cf92a2289708fea263b2189783fa46eff752e1",
+        "-RequiredKey",
+        "diagnostic_high_opaque_fast"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_provider_diagnostic_high_fixture_evidence",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 139,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_github_release_updater_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_github_release_updater_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 141,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_version_contract_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_version_contract_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 143,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_version_contract_incremental_configure_tests.exe",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_version_contract_incremental_configure_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 120.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 145,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_dielectric_math_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_dielectric_math_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 147,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_node_pose_batch_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_skinned_node_pose_batch_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 30.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 149,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_player_animation_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_player_animation_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 151,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_fire_emitter_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_fire_emitter_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 153,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_socket_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_held_item_socket_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 155,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_socket_tests.exe",
+        "--skeleton-render-pose-contracts"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_skeleton_render_pose_contracts",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 157,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_held_item_socket_tests.exe",
+        "--combat-sword-authority-agreement"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_combat_sword_authority_agreement",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 30.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 159,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_development_static_asset_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_development_static_asset_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 161,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_scene_abi_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_scene_abi_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 163,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_tomb_wall_recess_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_tomb_wall_recess_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 165,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_tomb_dressing_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_tomb_dressing_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 167,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_static_gltf_asset_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_static_gltf_asset_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 169,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_production_prop_asset_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_production_prop_asset_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 171,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_static_collapse_asset_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_static_collapse_asset_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 173,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtSceneAbiGeneratorTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_scene_abi_generator_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 120.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 175,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RaygenCompilerStrategyTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_raygen_compiler_strategy_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 600.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 177,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RaygenVariantManifestTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_raygen_variant_manifest_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 600.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 179,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RaygenVariantArtifactTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_raygen_variant_artifact_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 1200.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 181,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/ValidateRayQueryComputeShader.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_rayquery_compute_shader_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 183,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelinePolicyFenceTests.ps1",
+        "-CmakeExecutable",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_pipeline_policy_fence_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 185,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/BenchmarkScalePolicyTests.ps1",
+        "-CmakeExecutable",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_benchmark_scale_policy_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 187,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/WindowsGlassGraphicsContracts.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_glass_graphics_contract_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 189,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/WindowsBenchmarkSummaryReviewContracts.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_benchmark_summary_review_contract_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 191,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelinePolicyExecutionTests.ps1",
+        "-CmakeExecutable",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+        "-GradleExecutable",
+        "<repo>/android/gradlew.bat"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_pipeline_policy_execution_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 193,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tools/tests/Test-AndroidStagedPrimaryAdmission.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_android_staged_admission_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 195,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/StaticTextureArrayToolTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_static_texture_array_tool_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 120.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 197,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/StaticAssetPreparationPolicyTests.ps1",
+        "-Mode",
+        "LodBudget"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_static_preparation_lod_policy_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 120.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 199,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/StaticAssetPreparationPolicyTests.ps1",
+        "-Mode",
+        "UnsafeSkip"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_static_preparation_skip_policy_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 120.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 201,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/StaticAssetPreparationPolicyTests.ps1",
+        "-Mode",
+        "CollidingLod"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_static_preparation_colliding_lod_policy_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 120.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 203,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/DielectricTopologyToolTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_dielectric_topology_tool_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 120.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 205,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/VersionContractPowerShellTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_version_contract_powershell_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 120.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 207,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/GitHubReleasePreflightTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_github_release_preflight_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 120.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 209,
+      "command": [
+        "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/VersionContractPowerShellTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_version_contract_windows_powershell_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 120.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 211,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_simulation_timing_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_simulation_timing_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 213,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_simulation_gameplay_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_simulation_gameplay_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 215,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_water_contact_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_water_contact_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 217,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_waterfall_production_route_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_waterfall_production_route_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 219,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_waterfall_production_route_tests.exe",
+        "--legacy-contact-policy"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_waterfall_legacy_route_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 221,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_music_director_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_music_director_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 223,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_sfx_volume_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_sfx_volume_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 225,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_music_focus_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_music_focus_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace": 227,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_music_pcm_stream_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_music_pcm_stream_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 229,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_music_pcm_wave_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_music_pcm_wave_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 231,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_music_pcm_asset_bank_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_music_pcm_asset_bank_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 233,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_music_playback_session_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_music_playback_session_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 235,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_surface_session_mailbox_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_surface_session_mailbox_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 20.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 237,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_playtest_report_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_playtest_report_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 239,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_playtest_submission_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_playtest_submission_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 241,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_playtest_screenshot_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_playtest_screenshot_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 30.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 243,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_playtest_submission_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_playtest_submission_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 60.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 245,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_playtest_verification_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_playtest_verification_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 30.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 247,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_remote_playtest_report_ui_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_remote_playtest_report_ui_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 45.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 249,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_windows_playtest_report_ui_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_windows_playtest_report_ui_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 30.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 251,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/MusicAssetAdmissionTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_music_asset_admission_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 253,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/Horde162AssetPolicyTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_horde_162_asset_policy_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 255,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/AndroidShowcaseWitnessPolicyTests.ps1"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_android_showcase_witness_policy_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 30.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 257,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/PocketAudioCorePinTests.ps1",
+        "-CmakeExecutable",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_pocket_audio_core_pin_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 259,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_lantern_reward_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_lantern_reward_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 261,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_lantern_pendulum_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_lantern_pendulum_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 263,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_input_mailbox_stress.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_input_mailbox_stress",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 265,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_desktop_controller_input_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_desktop_controller_input_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace": 267,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_gpu_timestamp_math_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_gpu_timestamp_math_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 269,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_combat_smoke.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_combat_smoke",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 271,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_showcase_route_smoke.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_showcase_route_smoke",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 273,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_showcase_gameplay_smoke.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_showcase_gameplay_smoke",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 275,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_spatial_audio_smoke.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_spatial_audio_smoke",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace": 277,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_staged_primary_timing_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_staged_primary_timing_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 279,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_staged_primary_resource_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_staged_primary_resource_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 281,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_gpu_frame_timer_collection_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_gpu_frame_timer_collection_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 283,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_frame_evidence_coordinator_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_frame_evidence_coordinator_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 285,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_gpu_resources_observation_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_gpu_resources_observation_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 287,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_pipeline_bundle_lifetime_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_pipeline_bundle_lifetime_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 289,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_scene_initialise_preflight_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_scene_initialise_preflight_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 291,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_scene_resource_inventory_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_scene_resource_inventory_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 293,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tools/InspectRtPipelineBundleContainment.ps1",
+        "-TargetPath",
+        "<repo>/build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+        "-TargetPlatform",
+        "Windows",
+        "-Instrumentation",
+        "Diagnostic",
+        "-Quality",
+        "High"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_final_windows_bundle_containment",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 295,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineBundleContainmentTests.ps1",
+        "-Scanner",
+        "<repo>/tools/InspectRtPipelineBundleContainment.ps1",
+        "-TargetPath",
+        "<repo>/build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+        "-TargetPlatform",
+        "Windows",
+        "-Instrumentation",
+        "Diagnostic",
+        "-Quality",
+        "High",
+        "-PowerShellExecutable",
+        "C:/Program Files/PowerShell/7/pwsh.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_final_windows_bundle_containment_controls",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 297,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/RtPipelineBundleContainmentRegistrationTests.ps1",
+        "-CmakeExecutable",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+        "-ConfiguredCtestFile",
+        "<repo>/build/presets/windows-x64-debug/CTestTestfile.cmake",
+        "-Configuration",
+        "Debug",
+        "-Instrumentation",
+        "Diagnostic",
+        "-Quality",
+        "High",
+        "-Generator",
+        "Visual Studio 17 2022",
+        "-GeneratorPlatform",
+        "x64"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_final_windows_bundle_containment_registration",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 300.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 299,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_arm_reference_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_skinned_arm_reference_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 301,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_character_smoke.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_skinned_character_smoke",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace": 303,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/PlayerSkinnedSemanticFixtures.ps1",
+        "-TestExecutable",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_character_smoke.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_player_skinned_semantic_fixtures",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 305,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_character_smoke.exe",
+        "--validate-viewmodel-admission",
+        "<repo>/assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
+        "<repo>/assets/models/player/viewmodel/runtime/asset.manifest.json",
+        "<repo>/assets/models/player/runtime/gothic-traveller-lod0.runtime.glb"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_player_viewmodel_admission",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace": 307,
+      "command": [
+        "C:/Program Files/PowerShell/7/pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "<repo>/tests/PlayerViewmodelPoseFixtures.ps1",
+        "-TestExecutable",
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_skinned_character_smoke.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_player_viewmodel_pose_fixtures",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 309,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_character_render_slot_smoke.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_character_render_slot_smoke",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>"
+        }
+      ]
+    },
+    {
+      "backtrace": 311,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_developer_overlay_smoke.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_developer_overlay_smoke",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 313,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_showcase_benchmark_smoke.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_showcase_benchmark_smoke",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 315,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_driver_capability_report_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_driver_capability_report_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 317,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_rescue_traversal_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_rescue_traversal_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 319,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_rescue_blockout_import_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_rescue_blockout_import_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 321,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_rescue_journey_integration_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_rescue_journey_integration_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 323,
+      "command": [
+        "<user>/AppData/Local/Programs/Python/Python312/python.exe",
+        "<repo>/tests/RescueBlockoutSourceAdmissionTests.py"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_rescue_source_admission_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 325,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_rescue_rig_attachment_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_rescue_rig_attachment_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 327,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/Debug/horde_rt_rescue_rig_attachment_tests.exe",
+        "--adversarial-regression"
+      ],
+      "config": "Debug",
+      "name": "horde_rt_rescue_adversarial_regression_tests",
+      "properties": [
+        {
+          "name": "TIMEOUT",
+          "value": 180.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug"
+        }
+      ]
+    },
+    {
+      "backtrace": 329,
+      "command": [
+        "<repo>/build/presets/windows-x64-debug/pocket-audio-core-native/Debug/pocket_audio_native_pcm_tests.exe"
+      ],
+      "config": "Debug",
+      "name": "pocket_audio_native_pcm_tests",
+      "properties": [
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "<repo>/build/presets/windows-x64-debug/pocket-audio-core-native"
+        }
+      ]
+    }
+  ],
+  "note": "Exact current registered argv, cwd and timeout properties. Logs retain batch selection and outcomes. Legacy shell argv was not separately captured for every batch; no reconstructed argv is claimed as a raw receipt."
+}

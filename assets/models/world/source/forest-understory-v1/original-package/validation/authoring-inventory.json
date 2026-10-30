@@ -1,0 +1,160 @@
+[
+  {
+    "name": "bh_rock_low_boulder",
+    "triangles": 378,
+    "vertices": 191,
+    "materials": 1,
+    "material_names": [
+      "BH_Original_Slate"
+    ],
+    "source_texture_count": 3,
+    "source_textures": [
+      "horde-stone-original-basecolor-512.png",
+      "horde-stone-original-normal-512.png",
+      "horde-stone-original-roughness-512.png"
+    ],
+    "dimensions_blender_xyz_m": [
+      1.6573,
+      1.2431,
+      0.8345
+    ],
+    "ground_min_z": 0.0,
+    "finite_positions_normals_uvs": true
+  },
+  {
+    "name": "bh_rock_upright_crag",
+    "triangles": 376,
+    "vertices": 190,
+    "materials": 1,
+    "material_names": [
+      "BH_Original_Slate"
+    ],
+    "source_texture_count": 3,
+    "source_textures": [
+      "horde-stone-original-basecolor-512.png",
+      "horde-stone-original-normal-512.png",
+      "horde-stone-original-roughness-512.png"
+    ],
+    "dimensions_blender_xyz_m": [
+      1.0581,
+      0.9202,
+      1.3514
+    ],
+    "ground_min_z": 0.0,
+    "finite_positions_normals_uvs": true
+  },
+  {
+    "name": "bh_rock_split_shelf",
+    "triangles": 788,
+    "vertices": 398,
+    "materials": 1,
+    "material_names": [
+      "BH_Original_Slate"
+    ],
+    "source_texture_count": 3,
+    "source_textures": [
+      "horde-stone-original-basecolor-512.png",
+      "horde-stone-original-normal-512.png",
+      "horde-stone-original-roughness-512.png"
+    ],
+    "dimensions_blender_xyz_m": [
+      1.9894,
+      1.0993,
+      0.5227
+    ],
+    "ground_min_z": 0.0,
+    "finite_positions_normals_uvs": true
+  },
+  {
+    "name": "bh_log_fallen_trunk",
+    "triangles": 544,
+    "vertices": 278,
+    "materials": 2,
+    "material_names": [
+      "BH_Shared_Original_Bark",
+      "BH_Original_Weathered_Endgrain"
+    ],
+    "source_texture_count": 6,
+    "source_textures": [
+      "horde-bark-original-basecolor-512.png",
+      "horde-bark-original-normal-512.png",
+      "horde-bark-original-roughness-512.png",
+      "horde-endgrain-original-basecolor-512.png",
+      "horde-endgrain-original-normal-512.png",
+      "horde-endgrain-original-roughness-512.png"
+    ],
+    "dimensions_blender_xyz_m": [
+      3.4147,
+      0.8928,
+      0.9989
+    ],
+    "ground_min_z": 0.0,
+    "finite_positions_normals_uvs": true
+  },
+  {
+    "name": "bh_root_branch_tangle",
+    "triangles": 548,
+    "vertices": 284,
+    "materials": 2,
+    "material_names": [
+      "BH_Shared_Original_Bark",
+      "BH_Original_Weathered_Endgrain"
+    ],
+    "source_texture_count": 6,
+    "source_textures": [
+      "horde-bark-original-basecolor-512.png",
+      "horde-bark-original-normal-512.png",
+      "horde-bark-original-roughness-512.png",
+      "horde-endgrain-original-basecolor-512.png",
+      "horde-endgrain-original-normal-512.png",
+      "horde-endgrain-original-roughness-512.png"
+    ],
+    "dimensions_blender_xyz_m": [
+      2.1337,
+      1.5599,
+      0.7539
+    ],
+    "ground_min_z": 0.0,
+    "finite_positions_normals_uvs": true
+  },
+  {
+    "name": "bh_fern_open_clump",
+    "triangles": 1200,
+    "vertices": 785,
+    "materials": 1,
+    "material_names": [
+      "BH_Shared_Original_Leaf"
+    ],
+    "source_texture_count": 1,
+    "source_textures": [
+      "horde-alder-original-basecolor-512.png"
+    ],
+    "dimensions_blender_xyz_m": [
+      1.5574,
+      1.6985,
+      0.7988
+    ],
+    "ground_min_z": 0.0,
+    "finite_positions_normals_uvs": true
+  },
+  {
+    "name": "bh_fern_small_clump",
+    "triangles": 768,
+    "vertices": 496,
+    "materials": 1,
+    "material_names": [
+      "BH_Shared_Original_Leaf"
+    ],
+    "source_texture_count": 1,
+    "source_textures": [
+      "horde-alder-original-basecolor-512.png"
+    ],
+    "dimensions_blender_xyz_m": [
+      1.1361,
+      1.112,
+      0.5622
+    ],
+    "ground_min_z": 0.0,
+    "finite_positions_normals_uvs": true
+  }
+]

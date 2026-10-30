@@ -1,4 +1,70 @@
+assets/models/world/source/forest-crown-clusters-r3/*.py text eol=lf
+docs/evidence/2026-10-26-forest-crown-clusters-r3/*.log -text whitespace=cr-at-eol
+docs/evidence/2026-10-26-forest-crown-clusters-r3/*.patch -text whitespace=cr-at-eol
+assets/models/world/source/forest-crown-study-r2/*.py text eol=lf
+docs/evidence/2026-10-26-forest-crown-r2/*.log -text whitespace=cr-at-eol
+docs/evidence/2026-10-24-kit-stationary-eligibility/*.log -text whitespace=cr-at-eol
+docs/evidence/2026-10-24-kit-natural-corner/*.log -text whitespace=cr-at-eol
+docs/evidence/2026-10-24-kit-route-admission-review/*.log -text whitespace=cr-at-eol
+docs/evidence/2026-10-24-kit-turn-admission/*.log -text whitespace=cr-at-eol
 # Keep high-resolution source art out of normal Git history.
+# Deterministic joint-prop recipes pin exact UTF-8/LF source and manifest bytes.
+tools/author-joint-presentation-assets.py text eol=lf
+assets/models/player/source/flask-native-binding-r1/*.py text eol=lf
+assets/models/player/source/flask-native-binding-r1/*.json text eol=lf
+assets/models/player/source/flask-native-binding-r1/*.md text eol=lf
+assets/models/player/source/flask-native-binding-r1/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/props/source/attack-warning-ring-v1/*.json text eol=lf
+assets/models/props/source/attack-warning-ring-v1/*.md text eol=lf
+assets/models/props/source/healing-flask-v1/*.json text eol=lf
+assets/models/props/source/healing-flask-v1/*.md text eol=lf
+assets/models/props/runtime/attack-warning-ring-v1/*.json text eol=lf
+assets/models/props/runtime/healing-flask-v1/*.json text eol=lf
+assets/models/props/source/healing-flask-study-r1/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/player/source/flask-use-study-r1/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/player/source/flask-use-tick-aligned-r2/*.blend filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-25-held-guard/*.log -text -whitespace
+assets/models/world/source/chimney-smoke-study-r1/source/*.blend filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-24-chimney-smoke-gate/*.patch -text -whitespace
+docs/evidence/2026-10-24-chimney-smoke-gate/*.log -text -whitespace
+assets/models/characters/source/kit-step-turn-proof-v1/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/characters/source/kit-step-turn-proof-v1/native/*.bin -text
+# Retain exact audited Windows receipt/script bytes for this isolated study.
+docs/evidence/2026-10-23-kit-lod-candidate/** -text whitespace=cr-at-eol
+# Generated shader bounds are compared byte-for-byte with native LF output.
+shaders/raytracing/include/rt_regional_water_bounds.generated.glsl text eol=lf
+docs/evidence/2026-10-20-return-save-recovery/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-20-return-save-recovery/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-20-native-route-recovery/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-20-native-route-recovery/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+assets/audio/forest-foliage/runtime/*.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/forest-foliage/asset.manifest.json text eol=lf
+tools/prepare-forest-foliage.py text eol=lf
+docs/evidence/2026-10-16-region-page-host-followup/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-16-region-page-host-followup/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-16-region-page-host-followup/*.zip filter=lfs diff=lfs merge=lfs -text
+tests/fixtures/chapter-route-host-phases/*.csv -text whitespace=cr-at-eol
+docs/evidence/2026-10-15-region-page-release/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-15-region-page-release/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-15-region-page-release/*.zip filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-15-independent-region-pages/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-15-independent-region-pages/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-14-ordinary-static-streaming/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-14-ordinary-static-streaming/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-14-ordinary-static-streaming/*.zip filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-13-cached-region-preparation/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-13-cached-region-preparation/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-13-triangle-region-candidates/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-13-triangle-region-candidates/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+assets/models/world/source/forest-deadwood-v1/** -text whitespace=cr-at-eol
+# Immutable upstream notice retains its original trailing/EOF whitespace.
+assets/models/world/source/forest-deadwood-v1/original-snag/source/QUATERNIUS_LICENSE.txt whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+assets/models/world/source/forest-deadwood-v1/**/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/world/runtime/forest-deadwood-v1/*.json text eol=lf
+docs/evidence/2026-10-12-prepared-deadwood/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-prepared-deadwood/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+# Immutable, unadmitted mist diagnostic captures and shader evidence.
+docs/evidence/2026-10-10-mist-interval-prototype/** -text whitespace=cr-at-eol
 tools/run-host-sanitizer-validation.sh text eol=lf
 # Inactive mist experiment: preserve the pinned original source/budget bytes.
 docs/experiments/1.6.2-mist/rt_atmosphere.candidate.glsl -text whitespace=cr-at-eol
@@ -14,6 +80,23 @@ docs/evidence/2026-10-02-backend-pixel-witness/**/*.log whitespace=-trailing-spa
 *.ktx2 filter=lfs diff=lfs merge=lfs -text
 *.rgba filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
+assets/models/world/runtime/grave-markers-r03/*.json -text whitespace=cr-at-eol
+assets/models/world/source/grave-markers-r03/*.json -text whitespace=cr-at-eol
+tools/author-grave-markers.py text eol=lf
+assets/models/world/source/grave-markers-r03/*.blend filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-12-rescue-graveyard/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-rescue-graveyard/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+assets/audio/pixabay/water_*step*.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/pixabay/water_stream_contact*.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/pixabay/water-contact.manifest.json text eol=lf
+assets/audio/chapter-local-ambience/runtime/*.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/chapter-local-ambience/asset.manifest.json text eol=lf
+# Preserve original compiler output, including spaces on otherwise blank lines.
+docs/evidence/2026-10-20-local-ambience/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-20-dialogue-ducking/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-20-outdoor-route-inspection/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+assets/audio/pixabay/keeper_death*.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/pixabay/keeper-death.manifest.json text eol=lf
 
 # Public package policy pins the player Rag manifest's exact LF bytes.
 assets/models/props/runtime/player-rag-torch/asset.manifest.json text eol=lf
@@ -267,3 +350,159 @@ docs/evidence/2026-10-08-grate-floor/*.png -text
 
 # Preserve exact 1.6.2 GitHub publication checksums and verification receipts.
 docs/evidence/2026-10-09-github-release/** -text whitespace=cr-at-eol
+
+assets/models/world/runtime/prepared-funerary-v01/**/*.glb filter=lfs diff=lfs merge=lfs -text
+assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/**/*.glb filter=lfs diff=lfs merge=lfs -text
+assets/source/beyond_the_tomb/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+assets/source/beyond_the_tomb/**/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/source/beyond_the_tomb/**/*.glb filter=lfs diff=lfs merge=lfs -text
+assets/source/beyond_the_tomb/**/*.png filter=lfs diff=lfs merge=lfs -text
+assets/models/world/runtime/prepared-funerary-v01/**/*.json text eol=lf
+assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/**/*.json text eol=lf
+docs/evidence/2026-10-10-tomb-polish/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Preserve measured authoring recipe bytes across native checkouts.
+tools/author-tomb-dressing.py text eol=lf
+
+# Public sanitized correction receipts remain byte-stable.
+docs/evidence/2026-10-10-tomb-playtest-corrections/** text eol=lf
+docs/evidence/2026-10-10-tomb-playtest-corrections/logs/*.log whitespace=-trailing-space,-blank-at-eof
+
+# Approved public Kit runtime cuts; masters/provider records remain private.
+assets/audio/kit/runtime/*.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/kit/runtime/asset.manifest.json text eol=lf
+
+# Recovered forest packages and runtime manifests have exact-byte receipts.
+# Preserve original package line endings; generated runtime JSON is canonical LF.
+assets/models/world/source/forest-tree-pair-v1/** -text
+assets/models/world/source/forest-tree-pair-v1/evidence/** text eol=lf
+assets/models/world/runtime/forest-tree-pair-v1/*.json text eol=lf
+
+# Portable chapter source receipts and recovered planning payload.
+assets/source/beyond_the_tomb/terrain/topo-r2/*.npz filter=lfs diff=lfs merge=lfs -text
+assets/models/world/source/chapter-entry-return-r03/*.json -text whitespace=cr-at-eol
+assets/models/world/source/chapter-terrain-r18/*.json -text whitespace=cr-at-eol
+assets/models/world/source/chapter-entry-return-r03/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/world/source/chapter-terrain-r18/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/source/beyond_the_tomb/terrain/collapse-recovered-inputs/** -text whitespace=cr-at-eol
+assets/source/beyond_the_tomb/terrain/collapse-recovered-inputs/*.bin filter=lfs diff=lfs merge=lfs -text
+assets/source/beyond_the_tomb/terrain/collapse-recovered-inputs/textures/*.jpg filter=lfs diff=lfs merge=lfs -text
+assets/source/beyond_the_tomb/terrain/collapse-recovered-inputs/polyhaven-license.html -diff
+
+assets/models/world/runtime/chapter-entry-return-v1/*.json text eol=lf
+assets/models/world/runtime/chapter-terrain-v1/*.json text eol=lf
+
+assets/models/world/source/chapter-terrain-r19/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/world/source/chapter-terrain-r19/*.json -text whitespace=cr-at-eol
+
+# Preserve pinned regional reference bytes and the new editable derivative.
+docs/references/horde-1.7/d37f1638/docs/design/world/dungeons/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/references/horde-1.7/d37f1638/docs/design/world/dungeons/baseline/*.npz filter=lfs diff=lfs merge=lfs -text
+assets/models/world/source/chapter-terrain-r21/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/world/source/chapter-terrain-r21/*.json -text whitespace=cr-at-eol
+assets/models/world/source/chapter-terrain-r21/authoring-recipe.executed.py -text whitespace=cr-at-eol
+tools/author-chapter-terrain.py text eol=lf
+tools/chapter_regional_terrain.py text eol=lf
+tools/test-chapter-regional-terrain.py text eol=lf
+tools/validate-chapter-terrain.py text eol=lf
+
+assets/models/characters/runtime/kit-warden-v1/*.json text eol=lf
+docs/evidence/2026-10-11-kit-pbr-preparation/** text eol=lf
+docs/evidence/2026-10-11-kit-pbr-preparation/*.log whitespace=-trailing-space,-blank-at-eof
+tools/prepare-kit-runtime.py text eol=lf
+tools/build-kit-textures.ps1 text eol=lf
+tests/fixtures/skinned-pbr/generate.py text eol=lf
+
+# Preserve exact native Kit scene capture and validation receipts.
+docs/evidence/2026-10-11-kit-scene-admission/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-11-kit-scene-admission/kit-62a688-vulkan-ci-failed.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-11-landing-capture-settling/** -text whitespace=cr-at-eol
+
+# Grounded stake source and exact native traversal evidence.
+assets/source/development-rescue-ground-stake-v1/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/source/development-rescue-ground-stake-v1/*.json -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-ground-stake-traversal/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-selected-zone-geometry/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-gpu-buffer-preparation/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-gpu-buffer-preparation/gpu-buffer-batch-shader-catalog-missing-paths.log whitespace=-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-12-report-ui-font-policy/logs/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-report-ui-font-policy/logs/ci-37310bd5-msvc-failure.log whitespace=-trailing-space,cr-at-eol
+docs/evidence/2026-10-12-one-owner-zone-selection/** -text whitespace=cr-at-eol
+
+# Original moving-lid source; runtime consumes the shared recipe.
+assets/source/development-rescue-lid-finish-v1/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/source/development-rescue-lid-finish-v1/*.json text eol=lf
+src/scene/RescueLidFinish.h text eol=lf
+tools/author-rescue-lid-finish.py text eol=lf
+docs/evidence/2026-10-12-rescue-grave-lid/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-rescue-grave-lid/logs/** whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+assets/models/world/source/forest-understory-v1/original-package/** -text
+assets/models/world/source/forest-understory-v1/original-package/source/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/world/source/forest-understory-v1/*.json text eol=lf
+assets/models/world/runtime/forest-understory-v1/*.json text eol=lf
+assets/models/world/source/bellwether-shell-*/*.blend filter=lfs diff=lfs merge=lfs -text
+assets/models/world/source/bellwether-shell-*/*.json text eol=lf
+assets/models/world/runtime/bellwether-shell-v4/*.json text eol=lf
+docs/evidence/2026-10-12-bellwether-clear-air-checkpoint/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-bellwether-clear-air-checkpoint/logs/** whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+assets/models/world/runtime/bellwether-shell-v2/*.json text eol=lf
+assets/models/world/runtime/forest-rocks-v1/*.json text eol=lf
+assets/models/world/source/forest-rocks-v1/*.json text eol=lf
+docs/evidence/2026-10-12-bellwether-shell/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-bellwether-shell/logs/** whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-12-prepared-rocks/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-prepared-rocks/logs/** whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-12-prepared-understory/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-12-chapter-capture-readiness/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-12-chapter-capture-readiness/logs/** whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-13-moving-chapter-roundtrip/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+# Sealed native diagnostic evidence keeps the exact captured/logged bytes.
+docs/evidence/2026-10-13-terrain-light-attribution/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-13-terrain-light-attribution/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-14-keeper-vertex-lifetime/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-14-keeper-vertex-lifetime/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-14-shipping-route-measurement/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-14-shipping-route-measurement/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+docs/evidence/2026-10-14-keeper-texture-lifetime/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-14-keeper-texture-lifetime/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+assets/models/world/source/chapter-terrain-material-r01/** -text whitespace=cr-at-eol
+tools/author-terrain-material-balance.py text eol=lf
+docs/evidence/2026-10-14-ground-material-balance/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-14-ground-material-balance/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+docs/evidence/2026-10-14-release-route-baseline/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-14-release-route-baseline/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-14-report-ui-fixed-size/logs/* -text -whitespace
+docs/evidence/2026-10-14-forest-region-provenance/logs/* -text -whitespace
+docs/evidence/2026-10-14-lantern-origin-containment/logs/* -text -whitespace
+docs/evidence/2026-10-14-niche-wall-joins/native-join-evidence-r01.zip filter=lfs diff=lfs merge=lfs -text
+
+docs/evidence/2026-10-16-mobile-region-source-admission/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-16-mobile-region-source-admission/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-16-mobile-region-source-admission/*.zip filter=lfs diff=lfs merge=lfs -text
+
+docs/evidence/2026-10-16-phone-streaming-cycle/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-16-phone-streaming-cycle/*.zip filter=lfs diff=lfs merge=lfs -text
+
+docs/evidence/2026-10-16-phone-resident-streamed/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-16-phone-resident-streamed/*.zip filter=lfs diff=lfs merge=lfs -text
+
+docs/evidence/2026-10-16-baseline-rt-profile/*.zip filter=lfs diff=lfs merge=lfs -text
+
+docs/evidence/2026-10-17-rt-dispatch-investigation/*.zip filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-17-inverse-transform/*.zip filter=lfs diff=lfs merge=lfs -text
+
+# Owner-provided outdoor music originals; source only, never package inputs.
+assets/source/beyond_the_tomb/music/beneath-the-same-moon-outdoor-r2/*.flac filter=lfs diff=lfs merge=lfs -text
+assets/source/beyond_the_tomb/music/beneath-the-same-moon-outdoor-r2/*.zip filter=lfs diff=lfs merge=lfs -text
+
+assets/audio/music/beneath-the-same-moon/runtime/*.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/music/beneath-the-same-moon/asset.manifest.json text eol=lf
+assets/models/world/runtime/forest-road-clue-v1/*.json text eol=lf
+
+# Preserve exact bounded journey validation receipts.
+docs/evidence/2026-10-24-campaign-journey-partition/*.log -text whitespace=cr-at-eol
+
+docs/evidence/2026-10-24-kit-context-timing/*.log -text whitespace=cr-at-eol

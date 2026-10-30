@@ -1,0 +1,5 @@
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+KIT_ESCORT_RECOVERY strandedDistance=22.6438 resumed=1 waitTicks=0 reached=1 recoveredMaximumDistance=6.21924 waypoint=8 position=14.2604,36.1628
+FAIL: ordinary return and deliberate escort pacing recover the candidate without changing any route rule
+94 opt-in earned-route diagnosis checks, 1 failures

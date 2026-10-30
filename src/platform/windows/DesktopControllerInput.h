@@ -43,6 +43,12 @@ struct LegacyControllerIdentity
     std::string_view productName;
 };
 
+struct ControllerFlaskEdges {bool drink=false,rest=false;};
+constexpr ControllerFlaskEdges ResolveControllerFlaskEdges(bool up,bool down,bool enabled)
+{
+    return enabled && up!=down?ControllerFlaskEdges{up,down}:ControllerFlaskEdges{};
+}
+
 struct ControllerActionEdges
 {
     bool attackPressed = false;
@@ -55,6 +61,22 @@ struct ControllerActionEdges
     {
         return attackPressed || parryPressed || dodgePressed || interactPressed ||
                toggleHeldLightPosePressed;
+    }
+};
+
+// A resumed/reconnected held trigger is not a fresh guard press. Require neutral.
+struct GuardHoldLatch
+{
+    bool held = false;
+    bool blockedUntilRelease = false;
+    void Reseed(bool down) { held = false; blockedUntilRelease = down; }
+    void Cancel() { blockedUntilRelease = blockedUntilRelease || held; held = false; }
+    bool Observe(bool down, bool allowed)
+    {
+        if (!down) { held = false; blockedUntilRelease = false; }
+        else if (!allowed) { held = false; blockedUntilRelease = true; }
+        else held = !blockedUntilRelease;
+        return held;
     }
 };
 
@@ -246,6 +268,24 @@ inline LegacyRightStickAxes SelectLegacyRightStickAxes(
         return {LegacyAxis::Z, LegacyAxis::R};
     }
     return SelectLegacyRightStickAxes(sample, identity.productName);
+}
+
+// Windows run toggle uses the same simulation intent as keyboard/mobile run.
+// Exact Backbone L3 was observed read-only during the paused owner playtest.
+inline bool LegacyRunTogglePressed(std::uint32_t current, std::uint32_t previous,
+                                   const LegacyControllerIdentity& identity)
+{
+    return IsCapturedBackboneOne(identity) && ((current & ~previous) & 0x2000u) != 0u;
+}
+inline bool XInputRunTogglePressed(std::uint16_t current, std::uint16_t previous)
+{
+    // XINPUT_GAMEPAD_LEFT_THUMB; preserve this SDK-independent host helper.
+    return ((current & ~previous) & 0x0040u) != 0u;
+}
+
+inline bool LegacyGuardHeld(std::uint32_t buttons, const LegacyControllerIdentity& identity)
+{
+    return IsCapturedBackboneOne(identity) && (buttons & 0x100u) != 0u;
 }
 
 inline ControllerActionEdges MapLegacyControllerEdges(

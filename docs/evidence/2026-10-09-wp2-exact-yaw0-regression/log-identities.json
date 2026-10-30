@@ -1,0 +1,34 @@
+[
+  {
+    "kind": "build",
+    "configuration": "debug",
+    "raw_sha256": "b0b5937500f8a6e9632b809aa4680b1e710ae67f13fe43b15f7e93fa98662fc7",
+    "public_file": "build-debug.log",
+    "public_sha256": "c9bb52776f4f66f02288902a8631f3593aff225a2857771e8032b947d157d00b",
+    "raw_retained": "ignored local reports"
+  },
+  {
+    "kind": "test",
+    "configuration": "debug",
+    "raw_sha256": "62aae2153c6088610ae3ac31e8820a6e1d34c5cf204046854cf3263750d3ae9a",
+    "public_file": "test-debug.log",
+    "public_sha256": "a57ad2c0882e5526fe11a5c53a5a665ffd8aacb699292a074b6c266d7a0edaad",
+    "raw_retained": "ignored local reports"
+  },
+  {
+    "kind": "build",
+    "configuration": "release",
+    "raw_sha256": "7dd3f3128bc4bac5408a47dd9bd72a7bf755c5fcc603251d1dc757b6fb9e886a",
+    "public_file": "build-release.log",
+    "public_sha256": "b942458360915bf22ddfd903b668dd4ba307799ed3fcbca42d4176f1fe8197a2",
+    "raw_retained": "ignored local reports"
+  },
+  {
+    "kind": "test",
+    "configuration": "release",
+    "raw_sha256": "0913e8a910c238f64ab910243c043d7a6fbbf84808874fec64b3102e38679bdf",
+    "public_file": "test-release.log",
+    "public_sha256": "de0c477721f3fb7f3b080d53373d9a059e77045edcdf297a071732078550156d",
+    "raw_retained": "ignored local reports"
+  }
+]

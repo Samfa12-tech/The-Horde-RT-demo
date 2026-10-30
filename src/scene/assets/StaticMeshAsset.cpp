@@ -1191,6 +1191,8 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
         {
             if (materialOverride.material == material.name)
             {
+                if (materialOverride.hasBaseColorFactor)
+                    material.baseColorFactor = materialOverride.baseColorFactor;
                 if (materialOverride.hasEmissiveStrength)
                     material.emissiveStrength = materialOverride.emissiveStrength;
                 if (materialOverride.hasTransmissionFactor)

@@ -1,0 +1,282 @@
+{
+  "date": "2026-10-18",
+  "outcome": "FAILED: first earned autosave and manual record creation; recovery acceptance blocked",
+  "evidenceClass": "Physical Android ordinary touch progression, actual RT-presented gameplay, failed fresh isolated persistence",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "candidate": {
+    "apkSha256": "e9ce289a8a527083aa1d6d2ca2976da5ba439768f8cc933b3a34e20f153701c8",
+    "apkBytes": 183958042,
+    "package": "com.samfa12.hordelanternrt.debug",
+    "versionCode": 10,
+    "sourceParent": "0a9d75882f6e64fc2f2b57465733bb63d6feb825",
+    "exactSelectedSources": {
+      "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "384f68137f556f26414d3c48c8027d4b957b4d41cc1a6c74fdfbb4bf587d116c",
+      "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java": "b7d4bf4f1b20efddfa869da78c6770e4003a5e6c8dabdd2b6c6bec790fb800d4",
+      "android/app/src/main/java/com/samfa12/hordelanternrt/CampaignMenuState.java": "1176f739bd96d3892da6ef1f5017fed25d73c6d061da7d443f0d817b69162258",
+      "src/gameplay/campaign/CampaignLoadBarrier.h": "0b6b5520e3ce4b46192fd6fc8968a17f67450863a0e0f3baf368ec7e46fda731",
+      "src/platform/android/AndroidCampaignLoadBarrier.h": "3f85cf870e38431a6151cd6e1e101dd3e6a8f5d2c1da383e10a8c39ed98d941a",
+      "android/app/src/main/cpp/android_probe_bridge.cpp": "f808f2b5a8af52df29efa1c6f8086dccecafc0d353d7cdf164e6c91ffb1b9d78",
+      "android/app/src/main/cpp/android_campaign_bridge.inl": "54940e819166a0e785916927e0726b70e8901d4ed4fb3c5c6296ad3071151541",
+      "android/app/src/main/cpp/android_campaign_state.inl": "5ef37f0a5d4d6524fc8231104efa8a91a07294ccfa1e340b9790e32734f4f1cd",
+      "android/app/src/main/cpp/CMakeLists.txt": "38fa383eb0dec32d9ce927bf3be86189a7403800ee85955947f55bb031a0b5bb",
+      "android/app/build.gradle": "ed3cf8253a8673c3187efedd308b00237573e43bc4797cc02279f3ef2f8f2133",
+      "src/gameplay/simulation/GameSimulationCampaign.cpp": "e1ad3ba301cfe5585bd940af9418316534b0f1e25a62d16ee50f8bb37d5fec5a",
+      "src/gameplay/simulation/GameSimulationRescue.cpp": "88dbc3e97387d9f1183d56aede57cd0359aecb58ae680f7ce0ac17b5aca2f55f",
+      "src/gameplay/campaign/CampaignPlaySession.cpp": "4a8028fbbddfc1a7454e694588f60bc18e1cbefce2a71223fc448c5147fd761e",
+      "src/gameplay/campaign/CampaignSession.cpp": "6136c21c2687d6fe3c53a15fe0dae61607e8fa9862149b57b3ca722385d80556",
+      "src/vulkan/raytracing/DevelopmentWorldSceneAdapter.h": "7f4ad0bb791e4644a4e1f701890d3241f7f99731b6a6aaf73495124a6a4d9b3b"
+    },
+    "sourceIdentityLimit": "Parent plus selected source hashes; parent alone is not APK source identity",
+    "buildReceipt": {
+      "path": "docs/evidence/2026-10-18-android-death-load/android-build.json",
+      "bytes": 6765,
+      "sha256": "d96eeb3852e42c1a4d98a09d7affe5ffd9dc2ed1a950625ecb36ebf199045dfc"
+    },
+    "signerCertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "installedHashVerifiedInSavedFile": true
+  },
+  "device": {
+    "model": "SM-S948B",
+    "serial": "R5GL219SZGK",
+    "android": 17,
+    "api": 37,
+    "build": "CP2A.260605.016.S948BXXS4BZIG",
+    "user": 0
+  },
+  "processId": 31216,
+  "testNamespace": "files/campaign-tests/earned-20261018-r1",
+  "progress": {
+    "normalTouchOpeningAndCrouchPassage": true,
+    "guardsDefeated": true,
+    "keeperDead": true,
+    "chestOpened": true,
+    "lanternClaimed": true,
+    "vitality": 3,
+    "damageEnabled": true,
+    "checkpointImportedOrSeeded": false,
+    "readOnlyGpsInputInspectorEnabledSameActivity": true,
+    "observationSource": "Root execution report plus opened selected screenshots"
+  },
+  "rtPresentation": {
+    "capturedHud": "RT RayTracingPipeline | presented YES",
+    "renderScalePercent": 40,
+    "renderExtent": "576x1188",
+    "surfaceExtent": "1440x2971",
+    "settingChanged": false,
+    "sustainedPerformanceClaim": false
+  },
+  "failures": [
+    {
+      "case": "First earned autosave Slot 1",
+      "phase": 8,
+      "publicError": 6,
+      "durability": 0,
+      "nativeLine": "10-18 15:01:43.119 31216 31623 I HordeRtProbeBridge: HORDE_CAMPAIGN request=2 generation=1 phase=8 error=6 active_slot=0 latest=1 rebase=0 presented=0 action=0 isolated=1 durability=0"
+    },
+    {
+      "case": "Manual save Slot 2",
+      "phase": 8,
+      "publicError": 6,
+      "durability": 0,
+      "nativeLine": "10-18 15:05:23.020 31216 31623 I HordeRtProbeBridge: HORDE_CAMPAIGN request=4 generation=1 phase=8 error=6 active_slot=0 latest=1 rebase=0 presented=0 action=2 isolated=1 durability=0"
+    }
+  ],
+  "rootCause": {
+    "status": "Unproven",
+    "nativeDetailedStorageFailureAvailable": false,
+    "scopedPidAvcLines": 0,
+    "absenceOfScopedAvcProvesCause": false
+  },
+  "custody": {
+    "baselinePathCount": 281,
+    "afterInstallPathCount": 281,
+    "terminalPathCount": 283,
+    "missingBaselinePaths": [],
+    "addedPaths": [
+      "files/campaign-tests/earned-20261018-r1/.slot-1-auto.hrd.lock",
+      "files/campaign-tests/earned-20261018-r1/.slot-2-manual.hrd.lock"
+    ],
+    "earnedHrdRecords": 0,
+    "earnedZeroByteLocks": 2,
+    "settingsSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "settingsBeforeAfterInstallTerminalEqual": true,
+    "oldSixRecordHashesMatchLatestAcceptedReceipt": true,
+    "oldSixRecordHashes": [
+      "26fc5a83d0810cee2087ec1a6474d1aa09ff7a84264b22e9dbc054649667d343  files/campaign-tests/sl-20261018-r1-8b14/slot-1-auto.hrd",
+      "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8  files/campaign-tests/sl-20261018-r1-8b14/slot-1-manual.hrd",
+      "68ddd7cc1af4307696d5f8c8aef66c74ac8d965f5381567b0d0d4828b4ad37ee  files/campaign-tests/sl-20261018-r1-8b14/slot-2-auto.hrd",
+      "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8  files/campaign-tests/sl-20261018-r1-8b14/slot-2-manual.hrd",
+      "7712e9ffcbd0bbaa48ae2f73216ad4981148bab32fea66c867f792ffbb12f1d0  files/campaign-tests/sl-20261018-r1-8b14/slot-3-auto.hrd",
+      "31fc5afe9cc616e284cfc534361a2b451e0d70f5a33449257e90ed4476bb1fd5  files/campaign-tests/sl-20261018-r1-8b14/slot-3-manual.hrd"
+    ],
+    "explicitQuit": true,
+    "remainingActivitiesReportedByRoot": 0,
+    "activityCountRawDumpSaved": false,
+    "surfaceDestroyedInSavedLog": true,
+    "allFileContentPreservationClaim": false,
+    "ownerCampaignRecordCreated": false
+  },
+  "openedScreenshots": [
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/57-keeper-final.png",
+      "bytes": 2864963,
+      "sha256": "e08a88a7aaa7dc9accb84c518031777b7927aa167d48d2eb32054295d2a15787"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/71-chest-close.png",
+      "bytes": 4812396,
+      "sha256": "1e86741ad82237e59d1ba46117c29ab8d02b423d5c271286918514272e77e44d"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/73-lantern-available.png",
+      "bytes": 5010735,
+      "sha256": "0660bd07ed9dc500a084533bd1f7837653e58ab26317c27bd1c04671b5dd13b9"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/75-lantern-claimed.png",
+      "bytes": 2863560,
+      "sha256": "166b03bd9bbbaed0f346798f02588b7da89b19c90dfbfe1d5b30d626490205f0"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/77-save-menu.png",
+      "bytes": 696700,
+      "sha256": "3266caca7df33f0f989780703036fbf11c0ca88d90f6b2031302eb3949cbd733"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/78-manual-result.png",
+      "bytes": 697079,
+      "sha256": "beee7a4ddf5fc0e58868bad36ff8c3dfecd128e7d1ab59e965ebda6171687c86"
+    }
+  ],
+  "supportingArtifacts": [
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/candidate-signer.txt",
+      "bytes": 972,
+      "sha256": "a84ee2f0ff3e4ea25230af488c613e2afc1841e761ab076ac134cf8cec26fa2e"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/install.txt",
+      "bytes": 38,
+      "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/installed-before.sha256",
+      "bytes": 171,
+      "sha256": "1c870418b3c45735098928f605985323301df050f338a3b5de1c3fc7130ec809"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/installed-after.sha256",
+      "bytes": 171,
+      "sha256": "b13e62061dacbbda45cc810a02e1aa3524745fb8b80e24aaa8ddf3a90d5a87fd"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/installed-package-before.txt",
+      "bytes": 288,
+      "sha256": "62bbe677a2154bc9c4761dc336eac36483514ffa33edb16d3c0ec96612e65c4d"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/inventory-before.txt",
+      "bytes": 20162,
+      "sha256": "d329e1956ecb22f1c6e0197f6a20107ac63849163da41504db1dcc990fce8d7d"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/inventory-after-install.txt",
+      "bytes": 20162,
+      "sha256": "d329e1956ecb22f1c6e0197f6a20107ac63849163da41504db1dcc990fce8d7d"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/inventory-terminal.txt",
+      "bytes": 20290,
+      "sha256": "95cc7f124ba7ffdfd39c710aeb5717d56cc323c8a007a311296e21569ec550e7"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/settings-before.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/settings-after-install.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/settings-terminal.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/old-records-terminal.sha256",
+      "bytes": 750,
+      "sha256": "717242ab03914bab84272d62c28507ceb95c91d915e4fe560e45209993272787"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/earned-terminal-directory.txt",
+      "bytes": 268,
+      "sha256": "8e67a908316064b8beecac18213f41e44b8e7922ff4370e425d6388dbb8b8bd5"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/pid-31216-earned-failure.log",
+      "bytes": 452515,
+      "sha256": "6f62508928abd7f820891bfac821b8ea40aefd3d09bb30050a2bad1b39e51940"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/pid-31216-terminal.log",
+      "bytes": 314585,
+      "sha256": "eb4ff45c87c6f1c879b681f85edbc84c20caf85e2e63437d0f785ba9576f301d"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/launch.txt",
+      "bytes": 112,
+      "sha256": "6d05d3b29ddb7865a4ecd0ad72dfff71e51a93d11c725b65f9a83f40feabf465"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/enable-existing-input-trace.txt",
+      "bytes": 127,
+      "sha256": "63fa147a0128ba4ae81f9b82ae7b4ceee6d0d126a45a7d9a26ee4e2b7c0fff8e"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/77-save-menu.xml",
+      "bytes": 8729,
+      "sha256": "0be17ceb7c2701f921621ae2e80836fed9f32a1a026b83c4069be5044f8d74a7"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/78-manual-result.xml",
+      "bytes": 8738,
+      "sha256": "051bbcd4955d5f11b1c41702f265dcbff196de6bede106e58cf99b55e6835f07"
+    },
+    {
+      "path": "reports/android-earned-recovery-2026-10-18/81-terminal-quit.png",
+      "bytes": 5115229,
+      "sha256": "620ab14853df1569c9f07eff9e741833e86d21b93fb73a72192cfbebe43f60ba"
+    }
+  ],
+  "priorRecordHashReceipt": {
+    "path": "docs/evidence/2026-10-18-android-campaign-readiness-followup/validation.json",
+    "bytes": 12891,
+    "sha256": "46c7bcfa7c3f75b4ece684b4acac6b10d01c754076f9a1cd884e1c21700319b2"
+  },
+  "separateDiagnostic": {
+    "outcome": "Recorded separately: EACCES diagnosis, repaired seeded creation/fresh-process reload; earned failure unchanged",
+    "apkSha256": "00f196f24eb07cc4eacf4e096f05496912b069f79505f98350812ada657a42b1",
+    "namespace": "files/campaign-tests/create-diagnostic-20261018-r1",
+    "processIdReported": 24510,
+    "seeded": true,
+    "storageImplementationChanged": false,
+    "purpose": "Fresh creation diagnosis with minimal failure logging; cannot substitute for earned route",
+    "receipt": "../2026-10-18-android-create-publication/validation.json"
+  },
+  "notRunOrUnaccepted": [
+    "Earned durability",
+    "Earned fresh-process reload",
+    "Death Load",
+    "Ascent",
+    "Full route recovery",
+    "Sustained performance",
+    "Owner audio/haptics/controls/comfort"
+  ],
+  "scope": {
+    "largeRawArtifactsAddedToGit": false,
+    "ownerSaveRootUsed": false,
+    "seededProgress": false
+  }
+}

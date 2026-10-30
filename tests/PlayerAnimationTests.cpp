@@ -9,6 +9,7 @@
 #include <array>
 #include <cmath>
 #include <iostream>
+#include <limits>
 
 namespace
 {
@@ -36,6 +37,29 @@ int main()
 {
     using namespace horde::gameplay;
     using namespace horde::gameplay::animation;
+
+    // Accepted movement, rather than a pressed direction, owns the reverse phase.
+    const float reverseOffset = UpdateBackwardWalkPhaseOffset(0.0f, 0.02f,
+                                                             0.01f, -0.01f, 2.0f);
+    if (!Require(Near(reverseOffset, -0.025f, 0.000001f),
+                 "partly blocked backward travel must reverse its effective phase")) return 1;
+    if (!Require(UpdateBackwardWalkPhaseOffset(-0.25f, 0.02f, 0.04f, 0.04f, 2.0f) == -0.25f &&
+                 UpdateBackwardWalkPhaseOffset(0.0f, 0.02f, 0.04f, 0.04f, 2.0f) == 0.0f,
+                 "accepted forward motion must preserve its exact existing phase advance")) return 1;
+    if (!Require(Near(UpdateBackwardWalkPhaseOffset(-0.25f, 0.02f, 0.0f, 0.0f, 2.0f), -0.27f),
+                 "a fully blocked motor must freeze its effective foot phase")) return 1;
+    PlayerAnimationSnapshot phaseProbe;
+    phaseProbe.locomotionTime = 0.01f;
+    phaseProbe.locomotionPhaseOffsetSeconds = reverseOffset;
+    if (!Require(Near(PlayerLocomotionSampleTime(phaseProbe, 1.2f), 1.185f, 0.000001f),
+                 "reverse phase must wrap through zero without the importer clamping to rest")) return 1;
+    phaseProbe.locomotionPhaseOffsetSeconds = 0.0f;
+    phaseProbe.locomotionTime = 53.12345f;
+    if (!Require(PlayerLocomotionSampleTime(phaseProbe, 1.2f) == phaseProbe.locomotionTime,
+                 "uncorrected forward samples must remain bit-identical")) return 1;
+    phaseProbe.locomotionPhaseOffsetSeconds = -0.1f;
+    if (!Require(PlayerLocomotionSampleTime(phaseProbe, 0.0f) == 0.0f,
+                 "invalid clip duration cannot publish a nonfinite phase")) return 1;
 
     const TwoBoneIkSolution foldedUnequal = SolveTwoBoneIk(
         {{0.0f, 0.0f, 0.0f}}, {{0.20f, 0.0f, 0.0f}}, {{0.0f, 1.0f, 0.0f}}, 0.30f, 0.40f);
@@ -133,6 +157,75 @@ int main()
     if (!Require(parryStartupEnd.action == PlayerUpperBodyAction::Parry &&
                  Near(parryStartupEnd.normalizedActionTime, parryActiveStart.normalizedActionTime),
                  "parry layer must be continuous across startup/active")) return 1;
+
+    // The guard freezes the existing raised end-active pose. Its blend must go
+    // directly into/out of the current attack sample, never via an inserted rest.
+    {
+        PlayerCombatSnapshot raised;
+        raised.action = PlayerCombatAction::ParryActive;
+        raised.actionTime = kPlayerParryActiveSeconds;
+        const auto raisedLayer = EvaluatePlayerCombatLayer(raised);
+        PlayerCombatSnapshot guard;
+        guard.action = PlayerCombatAction::Guard;
+        guard.guardPoseWeight = 1.0f;
+        const auto guardLayer = EvaluatePlayerCombatLayer(guard);
+        if (!Require(guardLayer.action == PlayerUpperBodyAction::Parry &&
+                     guardLayer.weight == 1.0f && guardLayer.guardPoseWeight == 1.0f &&
+                     Near(guardLayer.normalizedActionTime, raisedLayer.normalizedActionTime),
+                     "guard metadata must freeze the existing end-active parry pose")) return 1;
+        for (const bool bulky : {false, true})
+        {
+            const auto raisedPose = items::EvaluateHeldSwordPose(raised, 0.0f, 0.95f, bulky);
+            const auto heldPose = items::EvaluateHeldSwordPose(guard, 0.0f, 0.95f, bulky);
+            if (!Require(Distance(raisedPose.rightHandLocal, heldPose.rightHandLocal) < 0.000001f &&
+                         Near(raisedPose.swordRadians, heldPose.swordRadians, 0.000001f) &&
+                         Near(raisedPose.swordForwardRadians, heldPose.swordForwardRadians, 0.000001f),
+                         "held guard must retain the original shared hand and sword frame for both carries")) return 1;
+            for (const auto action : {PlayerCombatAction::SwingWindup,
+                                      PlayerCombatAction::SwingRecovery,
+                                      PlayerCombatAction::UpwardSliceRecovery,
+                                      PlayerCombatAction::Idle})
+            {
+                PlayerCombatSnapshot transition;
+                transition.action = action;
+                transition.actionTime = 0.06f;
+                const auto ordinary = items::EvaluateHeldSwordPose(transition, 0.0f, 0.95f, bulky);
+                transition.guardPoseWeight = 1.0f;
+                const auto fromGuard = items::EvaluateHeldSwordPose(transition, 0.0f, 0.95f, bulky);
+                if (!Require(Distance(fromGuard.rightHandLocal, heldPose.rightHandLocal) < 0.000001f,
+                             "full guard blend must start the attack or finish recovery at the raised pose")) return 1;
+                transition.guardPoseWeight = 0.5f;
+                const auto mixed = items::EvaluateHeldSwordPose(transition, 0.0f, 0.95f, bulky);
+                for (std::size_t axis = 0; axis < 3; ++axis)
+                    if (!Require(Near(mixed.rightHandLocal[axis],
+                                     ordinary.rightHandLocal[axis] +
+                                     (heldPose.rightHandLocal[axis] - ordinary.rightHandLocal[axis]) * 0.5f,
+                                     0.000001f),
+                                 "guard transition must blend against the actual running attack or release curve")) return 1;
+                if (!Require(Near(mixed.swordRadians,
+                                 ordinary.swordRadians + (heldPose.swordRadians - ordinary.swordRadians) * 0.5f,
+                                 0.000001f) &&
+                             Near(mixed.swordForwardRadians,
+                                 ordinary.swordForwardRadians +
+                                 (heldPose.swordForwardRadians - ordinary.swordForwardRadians) * 0.5f,
+                                 0.000001f),
+                             "guard transition must coordinate both blade angles with the same hand blend")) return 1;
+                for (const float invalid : {-1.0f, std::numeric_limits<float>::quiet_NaN()})
+                {
+                    transition.guardPoseWeight = invalid;
+                    const auto unchanged = items::EvaluateHeldSwordPose(transition, 0.0f, 0.95f, bulky);
+                    if (!Require(unchanged.rightHandLocal == ordinary.rightHandLocal &&
+                                 unchanged.swordRadians == ordinary.swordRadians &&
+                                 unchanged.swordForwardRadians == ordinary.swordForwardRadians &&
+                                 EvaluatePlayerCombatLayer(transition).guardPoseWeight == 0.0f,
+                                 "absent or invalid guard weights must preserve exact ordinary outputs")) return 1;
+                }
+            }
+        }
+        guard.guardPoseWeight = 2.0f;
+        if (!Require(EvaluatePlayerCombatLayer(guard).guardPoseWeight == 1.0f,
+                     "guard metadata must clamp an overshooting weight")) return 1;
+    }
 
     PlayerAnimationState state;
     {

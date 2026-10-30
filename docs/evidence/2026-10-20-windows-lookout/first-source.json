@@ -1,0 +1,29 @@
+{
+  "sourceBase": "f522e2454da4335b33a19d60ba115fc29e512e49",
+  "files": {
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 613348,
+      "sha256": "0b1b387dfb32dcaf51d5419b3ea6a4f6a4c8bdb435be37926faa0da29ad52516",
+      "gitBlob": "ed164a9b94668607847b69d1778404a17ea4bbb3"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "bytes": 37716,
+      "sha256": "c2bf65578b19bbb4ec682466e4dc526c72ab88842a7f7c90756f0a3fe8f7a212",
+      "gitBlob": "7b9efbb222057dd46026ad9016cf67d8c0b8131b"
+    },
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe": {
+      "bytes": 13819392,
+      "sha256": "bd5b130b969f6b619b5f8981da27bd2558e4bbb67f72fed7e91e9a59843684ab"
+    },
+    "build/presets/windows-x64-release/Release/HordeLanternRT.exe": {
+      "bytes": 4600832,
+      "sha256": "a85999e5b8cf75e3743177a0851566e907719b3bcea82128a2899a1a23bc91d1"
+    }
+  },
+  "image": {
+    "bytes": 1384997,
+    "sha256": "aded6df716fd0d35f68a5f528e0be3299e615af12a9ed165ccfded056f4d551a",
+    "inspection": "Original 1232x803 RT image inspected: dark/noisy village silhouettes, modeled held lantern and sword; companion torso clipped at left, feet out of view. Not full-body grounding, visible-desktop or final visual acceptance."
+  },
+  "outcome": "7 of 8 checks passed; explicit Resume assertion failed before any post-Resume render; no retry or repair within this run."
+}

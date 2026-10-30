@@ -1,0 +1,35 @@
+from pathlib import Path
+import hashlib,json,statistics,subprocess,time
+root=Path.cwd();base=root/'reports/kit-lod-candidate-20261023'
+bin=root/'build/presets/windows-x64-release/Release'
+candidate=base/'kit-warden-protected-index-candidate.glb'
+world=root/'assets/models/player/runtime/gothic-traveller-lod0.runtime.glb'
+original=root/'assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb'
+view=root/'assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb'
+identity=lambda p:{'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+record={'source':identity(original),'candidate':identity(candidate),'world':identity(world),'viewmodel':identity(view),'runs':[]}
+def run(label,args):
+    assert not (base/(label+'.log')).exists()
+    start=time.monotonic()
+    result=subprocess.run([str(x) for x in args],cwd=root,capture_output=True,timeout=60)
+    (base/(label+'.log')).write_bytes(result.stdout+result.stderr)
+    item={'label':label,'args':[str(x) for x in args],'exitCode':result.returncode,'seconds':time.monotonic()-start,'executable':identity(Path(args[0]))}
+    record['runs'].append(item)
+    assert result.returncode==0, item
+    return result.stdout
+run('native-parity-blends',[bin/'horde_rt_kit_source_intake_tests.exe','--compare-candidate',candidate,base/'source-row-map.u32le'])
+run('original-intake',[bin/'horde_rt_kit_source_intake_tests.exe'])
+run('worker-contracts',[bin/'horde_rt_actor_pose_worker_tests.exe'])
+bench=[]
+for label,path in [('control-open',original),('candidate-once',candidate),('control-close',original)]:
+    data=json.loads(run(label,[bin/'horde_rt_actor_pose_worker_tests.exe','serial','240',world,path]))
+    med={k:statistics.median(v)/1e6 for k,v in data.items() if k.endswith('Ns')}
+    bench.append({'label':label,'mediansMs':med,'kitVertices':data['kitVertices'],'worldVertices':data['worldVertices'],'viewmodelVertices':data['viewmodelVertices'],'outputFnv1a64':data['outputFnv1a64'],'viewmodelFnv1a64':data['viewmodelFnv1a64'],'samples':data['samples'],'warmup':data['warmup']})
+record['benchmarks']=bench
+record['controlDigestEqual']=bench[0]['outputFnv1a64']==bench[-1]['outputFnv1a64']
+record['viewmodelDigestEqual']=len({x['viewmodelFnv1a64'] for x in bench})==1
+record['scope']='One desktop serial process bracket, 30 warmup/240 samples each, actual pose+player preparation only. No upload/AS/GPU/frame/phone gain; no clock or thermal matching proof.'
+record['productionUnchanged']=all(identity(p)==record[k] for p,k in [(original,'source'),(world,'world'),(view,'viewmodel')])
+(base/'native-receipt.json').write_text(json.dumps(record,indent=2)+'\n')
+assert record['controlDigestEqual'] and record['viewmodelDigestEqual'] and record['productionUnchanged']
+print(json.dumps({'benchmarks':bench,'scope':record['scope'],'productionUnchanged':record['productionUnchanged']},indent=2))

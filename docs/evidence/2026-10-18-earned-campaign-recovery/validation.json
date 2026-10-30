@@ -1,0 +1,251 @@
+{
+  "outcome": "PASS: focused host earned-checkpoint persistence and recovery proof",
+  "evidenceClass": "Natural-input CPU journey plus actual isolated worker/storage IO and fresh production objects",
+  "sourceParent": "0a9d75882f6e64fc2f2b57465733bb63d6feb825",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "implementation": {
+    "path": "tests/CampaignPlaySessionTests.cpp",
+    "bytes": 34108,
+    "sha256": "112538a330d4ee2aa60b8d44119873a617a96c4428edc6f3839b7c205f131ba6"
+  },
+  "testedRuntimeSources": [
+    {
+      "path": "src/gameplay/campaign/CampaignPlaySession.cpp",
+      "bytes": 7537,
+      "sha256": "4a8028fbbddfc1a7454e694588f60bc18e1cbefce2a71223fc448c5147fd761e"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignPlaySession.h",
+      "bytes": 3717,
+      "sha256": "bf146ecd7f41cd40a541c471620af752793ca89913fd7c3cdc704bb9b1edd440"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSession.cpp",
+      "bytes": 6091,
+      "sha256": "6136c21c2687d6fe3c53a15fe0dae61607e8fa9862149b57b3ca722385d80556"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignCheckpoint.h",
+      "bytes": 3881,
+      "sha256": "99eaa1da86b489d1cf0e66b032b3567281dc1b29f2df9f71ae26fe7aa1b4cfac"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignCheckpointCodec.cpp",
+      "bytes": 6400,
+      "sha256": "e6948976e9ac03b5c825cd7b564bebf4a1372c727a3d69c39aeae2047058a2e4"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignCheckpointStorage.cpp",
+      "bytes": 17547,
+      "sha256": "a0de7a1c2e66b5eeef42d9c5e5ae29703da66a1294b26a28fdc508bb78124c86"
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSaveWorker.cpp",
+      "bytes": 3863,
+      "sha256": "6e806fe8ebbc934878e927b28232301bbd4819347cc85fa041bc607d242e523a"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "bytes": 134505,
+      "sha256": "3515ebee641be9229c4c415716ac82c0e351f4d8c30fd7f6f49359832d1429e7"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.h",
+      "bytes": 21661,
+      "sha256": "3b4487ba6731639f6ae9d8151e7b0ddf9788be056d166889b33a4d6805788a16"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationCampaign.cpp",
+      "bytes": 15599,
+      "sha256": "e1ad3ba301cfe5585bd940af9418316534b0f1e25a62d16ee50f8bb37d5fec5a"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationRescue.cpp",
+      "bytes": 11595,
+      "sha256": "88dbc3e97387d9f1183d56aede57cd0359aecb58ae680f7ce0ac17b5aca2f55f"
+    },
+    {
+      "path": "src/gameplay/traversal/RescueTraversal.cpp",
+      "bytes": 53915,
+      "sha256": "afa393a4a9782ffaedc9c29fa568f83d23cf605890bc180689ecdee2aa2b4fe8"
+    },
+    {
+      "path": "src/gameplay/traversal/RescueTraversal.h",
+      "bytes": 7259,
+      "sha256": "ee704633eeb04f3d4bc62eb9e1234844f0c9e38da573e34604a04731efb6e977"
+    },
+    {
+      "path": "assets/models/world/runtime/chapter-terrain-v1/asset.manifest.json",
+      "bytes": 781,
+      "sha256": "da0762e1250e9586022c25e1d1600c5e246ca542524cde137185f98f1fe0de13"
+    },
+    {
+      "path": "assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb",
+      "bytes": 18328048,
+      "sha256": "fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854"
+    },
+    {
+      "path": "src/scene/ChapterTerrainSurface.h",
+      "bytes": 2953,
+      "sha256": "cec709b6ee6a24644e52b50575a19975a84837771e166f01dcb0962bbc8bbf84"
+    }
+  ],
+  "target": "horde_rt_campaign_play_session_tests",
+  "existingCtestTimeoutSeconds": 30,
+  "configurations": [
+    {
+      "name": "Debug",
+      "build": "PASS",
+      "ctest": "1/1 PASS",
+      "checks": 106,
+      "failures": 0,
+      "testSeconds": 17.24,
+      "totalCtestSeconds": 17.28
+    },
+    {
+      "name": "Release",
+      "build": "PASS",
+      "ctest": "1/1 PASS",
+      "checks": 106,
+      "failures": 0,
+      "testSeconds": 3.73,
+      "totalCtestSeconds": 3.76
+    }
+  ],
+  "cases": [
+    "Actual movement/sword/chest input earns lower claim without checkpoint import or authoritative pose",
+    "Actual lower autosave and manual publication with equal encoded bytes",
+    "Fresh production session loads the earned lower manual through real disk worker",
+    "Full recaptured schema-1 checkpoint bytes match the earned record",
+    "Rebased fresh input consumes old attack/parry/dodge/interact/run/crouch debt",
+    "Actual physical ascent and multi-tick held movement earn upper checkpoint",
+    "Actual upper autosave preserves earlier lower manual bytes",
+    "Fresh upper autosave reload admits ordinary descent with resident CPU Dungeon and real imported terrain",
+    "One-second interrupted descent retains committed exterior boundary and exact upper record bytes",
+    "Another fresh session recovers outside from the earned upper record",
+    "Ordinary input completes descent and grounded lower landing with one claim/deployment",
+    "Other two slots remain absent"
+  ],
+  "schema": {
+    "format": 1,
+    "bytes": 162,
+    "supportedIds": [
+      "LowerClaimed",
+      "SafeExit"
+    ],
+    "newIdOrMigration": false
+  },
+  "limits": {
+    "damageEnabled": false,
+    "tutorialTeachingEnabled": false,
+    "cpuReadinessExplicitlyInjected": true,
+    "realImportedTerrain": true,
+    "gpuReadinessOrPresentationClaim": false,
+    "freshOsProcessClaim": false,
+    "physicalChapterEarnedClaim": false,
+    "newGameplayPolicy": false,
+    "wholeChapterOrForestClaim": false,
+    "newDurabilityOrPowerLossClaim": false,
+    "sustainedPerformanceClaim": false
+  },
+  "initialAttempts": [
+    {
+      "configuration": "Debug",
+      "execution": "restricted",
+      "sessionId": 84574,
+      "outcome": "Stalled before compiler output; own session Ctrl+C exit 1",
+      "autoReviewDenied": false
+    },
+    {
+      "configuration": "Release",
+      "execution": "restricted",
+      "sessionId": 95520,
+      "outcome": "Stalled before compiler output; own session Ctrl+C exit 1",
+      "autoReviewDenied": false
+    }
+  ],
+  "subsequentExecution": "Standard local builds/tests with require_escalated, Debug then Release sequentially",
+  "assertionsOrTimeoutWeakened": false,
+  "firstRunnableAttemptsPassed": true,
+  "executables": [
+    {
+      "configuration": "Debug",
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_campaign_play_session_tests.exe",
+      "bytes": 4534784,
+      "sha256": "0753a7114386990ebf217487192f7661f8f49fb37a63e6066df8db1933d7c623"
+    },
+    {
+      "configuration": "Release",
+      "path": "build/presets/windows-x64-release/Release/horde_rt_campaign_play_session_tests.exe",
+      "bytes": 1007616,
+      "sha256": "2b58c3d1eb9e244113100789ce5cd08354dee33f1e45312e6bfbdcb9a77db05a"
+    }
+  ],
+  "logs": [
+    {
+      "path": "reports/2026-10-18-earned-checkpoint-recovery-debug-first-build.log",
+      "bytes": 57,
+      "sha256": "807e65597d8f2fd98a35836b8e6e2e613a873c44e044af3ad0942f6c34035162"
+    },
+    {
+      "path": "reports/2026-10-18-earned-checkpoint-recovery-release-first-build.log",
+      "bytes": 57,
+      "sha256": "807e65597d8f2fd98a35836b8e6e2e613a873c44e044af3ad0942f6c34035162"
+    },
+    {
+      "path": "reports/2026-10-18-earned-checkpoint-recovery-debug-escalated-first-build.log",
+      "bytes": 1083,
+      "sha256": "bc79b219878583c487ffac69ea7ed6942c4a80ba521ed2cb9c446306f0b4184f"
+    },
+    {
+      "path": "reports/2026-10-18-earned-checkpoint-recovery-debug-escalated-first-tests.log",
+      "bytes": 499,
+      "sha256": "c326edcf86728c980c94183648fcd2315f9da8b5f2e06c1b3c03707486a1791b"
+    },
+    {
+      "path": "reports/2026-10-18-earned-checkpoint-recovery-release-escalated-first-build.log",
+      "bytes": 1103,
+      "sha256": "9527400185754dc93e4371b45f03f2b0801b4b15e942006f9c7ad4a114b0c76d"
+    },
+    {
+      "path": "reports/2026-10-18-earned-checkpoint-recovery-release-escalated-first-tests.log",
+      "bytes": 503,
+      "sha256": "569e72254d12d3a663446174f3baab087aab708b16c1b33c102d10ee94c21129"
+    },
+    {
+      "path": "reports/2026-10-18-earned-checkpoint-recovery-debug-native-output.log",
+      "bytes": 1215,
+      "sha256": "ca76fbd8ea1e303c89887ad3f63a4bd22b144b25ad3633f784c967d2ab519696"
+    },
+    {
+      "path": "reports/2026-10-18-earned-checkpoint-recovery-release-native-output.log",
+      "bytes": 1221,
+      "sha256": "6063e23f0fa1899953f7f42c28bbebffc521fb4a74b3b2643b1a7f026b6b0816"
+    }
+  ],
+  "audioHapticManualRevalidation": {
+    "required": false,
+    "reason": "Test-only addition; no runtime listener, cue, playback, feedback or damage/death behavior changes"
+  },
+  "scope": {
+    "runtimeSourceEdited": false,
+    "schemaEdited": false,
+    "assetEdited": false,
+    "cmakeEdited": false,
+    "windowsAdapterEdited": false,
+    "androidBuild": false,
+    "deviceActions": false,
+    "desktopActions": false,
+    "ownerDataTouched": false,
+    "publicActions": false
+  },
+  "remaining": [
+    "Platform normal-play earned checkpoint acceptance",
+    "Player-facing post-exit death recovery policy",
+    "Active-IO lifecycle interruption and actual power-loss/fault recovery",
+    "Full RT route/equipment and forest endpoint recovery",
+    "Owner controls/audio/visual/comfort and sustained performance"
+  ],
+  "sourceFrozen": true,
+  "commitCreated": false
+}

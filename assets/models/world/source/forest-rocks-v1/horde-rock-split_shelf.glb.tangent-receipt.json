@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "input": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\source\\forest-understory-v1\\original-package\\assets\\bh_rock_split_shelf.glb",
+  "output": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\runtime\\forest-rocks-v1\\horde-rock-split_shelf.glb",
+  "inputSha256": "e6fecdea0cafca44c02170a090e4f3e0d35059023f8ffd42164da609802adfcb",
+  "outputSha256": "00cc649340942f503cb83a3f5f91c5c5d9509bffe0851f972a4fd2c6625b3aa5",
+  "outputBytes": 763376,
+  "geometryUnchanged": true,
+  "geometryComparison": "positions/winding/UV0 exact at 1e-6; normal direction dot >= 0.99999",
+  "maximumNormalComponentDelta": 0.0,
+  "minimumNormalDirectionDot": 0.9999999999999998,
+  "embeddedImagePixelsUnchanged": true,
+  "tangentLoopCountsByMappedMaterial": {
+    "BH_Original_Slate": 2364
+  },
+  "materialTriangles": {
+    "BH_Original_Slate": 788
+  }
+}

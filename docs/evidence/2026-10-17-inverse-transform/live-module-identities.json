@@ -1,0 +1,50 @@
+[
+  {
+    "view": "pipeline-chapter-forest-second-bend",
+    "activeKey": "shipping_mobile_opaque_fast",
+    "sha256": "aaa1901fd3631ac009042ac207a5077e96facff41bd7af8d225aad3cc5857c6e",
+    "genericUnchanged": true
+  },
+  {
+    "view": "pipeline-chapter-keeper-death-retired",
+    "activeKey": "shipping_mobile_opaque_fast",
+    "sha256": "aaa1901fd3631ac009042ac207a5077e96facff41bd7af8d225aad3cc5857c6e",
+    "genericUnchanged": true
+  },
+  {
+    "view": "pipeline-chapter-landing-south",
+    "activeKey": "shipping_mobile_opaque_fast",
+    "sha256": "aaa1901fd3631ac009042ac207a5077e96facff41bd7af8d225aad3cc5857c6e",
+    "genericUnchanged": true
+  },
+  {
+    "view": "pipeline-lich",
+    "activeKey": "shipping_mobile_opaque_fast",
+    "sha256": "aaa1901fd3631ac009042ac207a5077e96facff41bd7af8d225aad3cc5857c6e",
+    "genericUnchanged": true
+  },
+  {
+    "view": "query-chapter-forest-second-bend",
+    "activeKey": "rayquery_compute_shipping_mobile_opaque_fast",
+    "sha256": "93defa178bd2cb348c68670b8468110e3477ad761b4e791e15a5474752c60a41",
+    "genericUnchanged": true
+  },
+  {
+    "view": "query-chapter-keeper-death-retired",
+    "activeKey": "rayquery_compute_shipping_mobile_opaque_fast",
+    "sha256": "93defa178bd2cb348c68670b8468110e3477ad761b4e791e15a5474752c60a41",
+    "genericUnchanged": true
+  },
+  {
+    "view": "query-chapter-landing-south",
+    "activeKey": "rayquery_compute_shipping_mobile_opaque_fast",
+    "sha256": "93defa178bd2cb348c68670b8468110e3477ad761b4e791e15a5474752c60a41",
+    "genericUnchanged": true
+  },
+  {
+    "view": "query-lich",
+    "activeKey": "rayquery_compute_shipping_mobile_opaque_fast",
+    "sha256": "93defa178bd2cb348c68670b8468110e3477ad761b4e791e15a5474752c60a41",
+    "genericUnchanged": true
+  }
+]

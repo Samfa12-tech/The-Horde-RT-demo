@@ -1,0 +1,7 @@
+{
+  "controlModuleSha256": "2b71c86dabdbf5d435ac9c1dd08895db6adf01990ffd9716ce76fe1a25ebd8c2",
+  "retainedMatrixInverseStaticInstructions": 6,
+  "objectToWorldQueryStaticInstructions": 12,
+  "worldToObjectQueryStaticInstructions": 0,
+  "limits": "Static instructions in exact baseline SPIR-V, not dynamic counts, driver ISA, cost or proof of a gain. Source PBR hit decode explicitly computes transpose(inverse(objectToWorld)); proposed reuse remains unimplemented."
+}

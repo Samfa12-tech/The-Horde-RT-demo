@@ -1,0 +1,15 @@
+{
+  "source_head": "f2a095fcf85520d63aebc1a48547cf4a453e97ba",
+  "scope": "Evidence-only checks; no game/owner acceptance substitution",
+  "json_files_parsed": 160,
+  "python_scripts_parsed": 12,
+  "relative_links_verified": 23,
+  "sensitive_marker_scan": "PASS",
+  "production_input_identities": "PASS",
+  "production_executable_unchanged": "PASS",
+  "evidence_verification": {
+    "exit_code": 0,
+    "output": "Verified 42 presented experiments with 42 retained showcase failures; two frozen views/CURRENT-HIGHER; exact float32 maps; 32 geometric hardware agreements; eight unchanged-budget reference decisions."
+  },
+  "tracked_diff_before_staging": "EMPTY"
+}

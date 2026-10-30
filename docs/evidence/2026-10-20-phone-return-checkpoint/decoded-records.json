@@ -1,0 +1,71 @@
+{
+  "upper-slot-1-auto.hrd": {
+    "sha256": "7e03e25e7de99214a3229c5ab3b415104e273dd3a67502504820156010bf781f",
+    "bytes": 162,
+    "schema": 1,
+    "contentRevision": 2,
+    "checkpointId": 2,
+    "zone": 1,
+    "position": [
+      -33.70000076293945,
+      2.049999952316284,
+      -12.800000190734863
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "vitality": 2,
+    "defeatedGuards": 3,
+    "keeperDefeated": true,
+    "lanternClaimed": true,
+    "firstAscentCompleted": true,
+    "swordStowed": false,
+    "lanternHigh": true,
+    "crcValid": true
+  },
+  "upper-slot-2-manual.hrd": {
+    "sha256": "7e03e25e7de99214a3229c5ab3b415104e273dd3a67502504820156010bf781f",
+    "bytes": 162,
+    "schema": 1,
+    "contentRevision": 2,
+    "checkpointId": 2,
+    "zone": 1,
+    "position": [
+      -33.70000076293945,
+      2.049999952316284,
+      -12.800000190734863
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "vitality": 2,
+    "defeatedGuards": 3,
+    "keeperDefeated": true,
+    "lanternClaimed": true,
+    "firstAscentCompleted": true,
+    "swordStowed": false,
+    "lanternHigh": true,
+    "crcValid": true
+  },
+  "reloaded-slot-2-manual.hrd": {
+    "sha256": "7e03e25e7de99214a3229c5ab3b415104e273dd3a67502504820156010bf781f",
+    "bytes": 162,
+    "schema": 1,
+    "contentRevision": 2,
+    "checkpointId": 2,
+    "zone": 1,
+    "position": [
+      -33.70000076293945,
+      2.049999952316284,
+      -12.800000190734863
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "vitality": 2,
+    "defeatedGuards": 3,
+    "keeperDefeated": true,
+    "lanternClaimed": true,
+    "firstAscentCompleted": true,
+    "swordStowed": false,
+    "lanternHigh": true,
+    "crcValid": true
+  }
+}

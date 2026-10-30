@@ -1,0 +1,129 @@
+# The Horde — Approved World Layout
+
+**Sam-approved geometry: 4 October 2026.** Canonical planning reference for routes, landmarks and their relative positions. Read with [CAMPAIGN_DESIGN.md](CAMPAIGN_DESIGN.md), [ROADMAP.md](ROADMAP.md), the [1.7 plan](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md) and the [1.8 plan](superpowers/plans/2026-09-11-village-hub-1.8.0.md).
+
+The owner approved the overhead concept titled **The Horde — Proposed World Layout**. Its printed “Proposed” and “Concept for review” labels describe the image's creation stage; the topology is now approved. The artwork is **not to scale**. Exact distances, traversal times, slopes, building footprints, collision and camera compositions must be established through playable blockout testing. Do not treat illustrative perspective or decorative details as measured level geometry.
+
+This is a connected regional plan delivered through bounded areas and measured zone/residency transitions. Prefer seamless player-perceived continuity. The 1.7 rope route is now specifically locked to no normal loading screen in either direction; explicit loading/recovery presentation is failure/emergency-only there. Other regional loading compromises still need owner review of measured constraints. This does not promise a general seamless open-world system or require every visible region to be resident and explorable at once. The [shared six-gate outdoor readiness contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#131-six-gate-outdoor-readiness-contract) owns cheap hero-view/terrain/town blockout, combined workload, real 3D LODs, separate RT relevance/residency and measured budgets, then 1.8's arrival-to-tavern proof before expansion. Exact distant-landmark visibility remains a blockout/review decision; this consolidation adds no new geography.
+
+![The Horde - approved world layout, not to scale](design/world/the-horde-world-layout.png)
+
+*Original concept caption: "The Horde - Proposed World Layout". Sam approved its geometry on 4 October 2026; it remains not to scale. The approved names The Veyrlands, Bellwether and King Veyr are recorded in this document but are not yet printed on the image.*
+
+## Approved names and local history
+
+**The land is The Veyrlands; the town is Bellwether** (owner selected 3 October 2026). The Veyrlands were once the heart of King Veyr's realm, now remembered more through warnings than history. King Veyr is the real historical king in the campaign; the lantern entity's claim to be the dead king remains a deception, not a second king or a renamed entity.
+
+Bellwether takes its name from the church bell that guided travellers home through the forest mist. Local folklore says that some nights it rings without anyone pulling the rope. This is approved setting lore, not a locked supernatural explanation, scripted event or bell gameplay mechanic. The map's generic “Village hub” label still identifies Bellwether.
+
+## 1. Fixed geography
+
+North is up in the approved concept. Preserve these relationships when translating it into engine coordinates:
+
+| Landmark | Agreed location and relationship |
+|---|---|
+| Keeper Tomb | Northwest, within an ancient abandoned burial ground beyond the woods. This is the existing prologue tomb, separate from the village's active churchyard. |
+| Forest route | Leads southeast from the tomb through woodland to a lookout northwest of the village. Preserve the moonlit rescue/reunion and bounded forest chapter. |
+| Lookout | The playable 1.7 endpoint. It reveals the future village below and establishes the same approach that 1.8 will extend. |
+| Village hub | Compact, unwalled hamlet below/southeast of the lookout, on the western side of the stream/ravine. Arrival comes from the northwest. Its approved name is Bellwether. |
+| Tavern and well | Central social focal point of the hamlet, surrounded by a small practical settlement rather than a fortified town. |
+| Church and active graveyard | On the northern side of the village, distinct from the abandoned tomb burial ground. |
+| Mill and stream | Eastern edge of the village; mill placement follows the watercourse and believable working access. |
+| Gardens and smith | Gardens on the western side; smith toward the southeastern side, within the compact hub. Their detailed footprints and service implementation remain blockout work. |
+| Starter shrine | A minor nearby spur beyond the northern/northeastern hub edge. It supports the small first-expedition direction, not a fourth major dungeon or required detour between the two middle dungeons. |
+| Drowned Abbey | South/downstream in a river-fed lake filling the low flooded basin, not an ocean. Reveal the broken towers before descending toward the submerged approach. The buildings predate the flooding; its cause/date remain open. |
+| Ashen Foundry | East, on a terrace across the gorge, reached through its broken-bridge/access problem. |
+| Glass Court | Northeast, a ruined castle/palace on the high ridge, approached uphill through the Court gate. |
+| Treasury | Under/behind the high ridge in a dry vault, associated geographically with the Court. It is not below the flooded Abbey basin. |
+
+The watercourse begins at the northeastern upland headwaters and runs generally south, descending past the village/mill and through the ravine into the Abbey basin. Water direction, elevation changes and crossing geometry must remain coherent; a route line is not evidence that a steep slope or river crossing is already walkable.
+
+### Abbey basin clarification — 5 October 2026
+
+The flooded basin is a lake fed by the existing downstream watercourse. Preserve believable inflow, containment/outflow and elevation continuity with the mill/ravine. This clarifies the approved geography without moving the Abbey or enlarging the map into an ocean region.
+
+Before detailed Abbey art, block out a vertical section linking lake level, descent, submerged entry, safe air pockets and predominantly dry dungeon floors. Openings below the lake surface must not leave connected rooms inexplicably dry; use coherent enclosed volumes or higher floors/windows. Flood history and exact architectural explanation remain undecided. The [dedicated Abbey plan](DROWNED_ABBEY_PLAN.md) owns the staged spatial, access and water-rendering proof; the regional map remains not to scale.
+
+## 2. Routes and progression gates
+
+1. Existing tomb prologue → earned lantern → physical rope rescue → forest reunion and trail → lookout.
+2. In 1.8, extend the same road from the lookout into the village. Preserve the village's established location and silhouette rather than moving it to accommodate a new level.
+3. The village and nearby starter-shrine spur establish the useful hub and first small expedition. Exact shrine quest, dialogue and service implementation remain subject to their existing review gates.
+4. From the hub/outbound junction, provide **peer branches** to the southern Abbey and eastern Foundry. Either may be completed first. Map placement does not prescribe a sequence.
+5. The Court route remains locked until **both Abbey and Foundry seals** are acquired and the authored access interaction is satisfied. A visible distant Court does not imply early playable access.
+6. Court → treasury/final confrontation → playable return follows the approved campaign. These later regions are not 1.7 or 1.8 deliverables.
+
+Keep the existing alternative Magic, Tech and Constitution access directions. Abbey preparation concerns the submerged approach; Foundry access can use bridge repair, a maintenance climb or restored magical crossing. Each middle dungeon must be solvable with its own access solution, starting equipment and its local tool. The other dungeon's tool may open optional shortcuts or secrets only.
+
+Main-route retreat remains safe before boss/seal completion; post-seal return shortcuts are additional conveniences. Preserve recoverable access and local-item placement/recall, independent of peer-dungeon completion.
+
+The drawn broken bridge is an access landmark, not approval of final span dimensions, engineering, traversal animation or a single mandatory repair build. Crossing alternatives must converge on the same Foundry and remain recoverable for mixed builds.
+
+## 3. Milestone ownership
+
+### 1.7 — Tomb, forest and lookout
+
+- Deliver the accepted rescue/reunion and bounded moonlit trail, ending at the lookout
+- Place a **visible low-detail village shell** in its fixed future location as distant scenery, using coherent building massing and landmarks
+- Do not add playable streets, interiors, villagers/crowds, services or village quests to 1.7 merely because the shell is visible
+- Use an honest chapter boundary at the lookout and the existing player-controlled continuing-story presentation; do not erect an enormous temporary wall across the future road
+- Natural terrain, composition and clear chapter messaging must agree about the current playable limit
+- Measure the shell together with forest, fog, Kit and lantern; simplified real geometry must preserve relevant visibility, shadows and reflections under the existing RT contracts
+
+The earlier 40–80 m trail figure remains an initial blockout target, not an exact distance approved by this map. Choose traversal length and sightlines through playable testing.
+
+### Locked rope boundary — 5 October 2026
+
+At the connected forest map's F01 rescue point, defeating the Keeper moves its gravestone clear of the separate finale/rescue exit. The ascent ends with a real pull-up onto the forest path, showing the displaced stone. Match shaft, rim, anchor, stone travel and safe landing to the accepted tomb; exact dimensions and poses remain blockout work. Preserve all four earlier openings below.
+
+The rope hides a bounded zone transition in both directions, with forest preparation beginning during reward/approach and tomb preparation on the return approach. Interact to climb down; readiness gates commitment before traversal. Keep the shared upper room/shaft/rope/rim/gravestone/immediate clearing resident and retain all permitted view, reflection/transmission and shadow contributors until retirement is GPU-safe. Both full zones need not remain resident. Both sword and lantern are visibly stowed for two free hands; light follows the physical lantern. Restore equipment only at the grounded landing and preserve victory, loot, moved stone, dialogue and checkpoints. Kit can wait outside; no dungeon-companion behavior is added.
+
+See the [master transition and recovery contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#43-rescue-and-rope) for authored ascent/descent, limited-look/reduced-motion comfort, no normal loading screen, truthful failure handling and phone/Windows memory/performance gates. This is unimplemented 1.7 planning, not a 1.6.2 addition.
+
+### 1.8 — Extend the road and activate the hub
+
+Continue the established road into the same settlement. Develop the distant shell into the scoped useful hub, with a hero tavern, selected interiors, a bounded cast, services/training and access preparation. Preserve the agreed geography while refining street/building details to measured performance, navigation and story needs.
+
+The existing approximately 6–10 visible buildings, 2–3 interiors and 4–7 cast targets remain provisional authoring envelopes, not fixed minimums or certified capacity. Full later dungeons, population simulation and a general open-world system remain outside 1.8.
+
+### Later campaign
+
+Implement and validate the two order-independent dungeon branches, then Court, treasury and return through separately accepted scopes. The [chapter plan](DUNGEON_CHAPTER_PLANS.md) proposes 1.9 Abbey, 1.10 Foundry and 1.11 Court as delivery packages, each including its approach. Labels remain provisional, with no release dates; delivery order does not make Abbey a prerequisite for Foundry. The map itself does not establish version numbers.
+
+## 4. Protected prologue continuity
+
+This regional geography does not reopen the four distinct approved dungeon features:
+
+- Retain the small grated wall access panel just right outside the opening room, with the intended overgrowth and later 1.7 Kit call
+- Close/remove the entry-room skylight in the queued 1.6.2 visual slice
+- Leave the waterfall's own hole and vines untouched
+- Fit the separate large waterfall-room skylight with the approved impassable iron grid and real RT bar shadows
+
+Preserve the separate later-created finale/rescue opening. Kit does not know about the lich or knowingly wait for its defeat. The two existing skeletons now move into the waterfall room during post-reset 1.6.2 under the explicit 5 October owner direction, not as a consequence of this map approval. Kit voice, night/forest and rope rescue remain 1.7.
+
+## 5. Reference custody and verification
+
+Approved source image: **The Horde - Proposed World Layout.png**, PNG, 3,506,134 bytes. SHA-256: `c1ffd94e17fc12793519b6cd03fdbb93f41dc461c201e0bbcbb858d93fcfd95f`.
+
+The original image is retained in the owner's Library. Sam supplied the local original `assets/the horde world layout map.png` and explicitly approved publication in public planning PR16. The exact supplied bytes were visually inspected and admitted at [docs/design/world/the-horde-world-layout.png](design/world/the-horde-world-layout.png) through the repository's PNG Git LFS policy. The verified file is 3,506,134 bytes with SHA-256 `c1ffd94e17fc12793519b6cd03fdbb93f41dc461c201e0bbcbb858d93fcfd95f` (also its LFS object ID). No image edits or regeneration were performed. This remains a documentation reference, separate from runtime assets; the topology above is the canonical contract.
+
+Before later implementation acceptance, verify:
+- Tomb and active churchyard remain separate; northwest arrival and fixed village position read clearly from the lookout
+- River flow, terrain levels, mill access, Abbey basin, Foundry crossing and dry treasury are geographically coherent
+- Both middle-dungeon orders work; Court access cannot bypass the two-seal gate
+- 1.7 clearly stops at the lookout without presenting the shell as playable village content; 1.8 extends the same road
+- Measured distances, climb/crossing routes, collision, saves/backtracking and RT-relevant residency agree with actual playable geometry
+- Other unapproved names, detailed dialogue, encounter rules and numerical content/performance budgets remain provisional
+
+**Documentation only.** No runtime implementation, new asset generation, paid work, merge, release or deployment is delivered or authorised by this update. Audio/haptic manual revalidation required: **NO**.
+
+
+## Connected local reference drawings — 5 October 2026
+
+The [forest and Bellwether map set](design/world/connected/README.md) translates the regional relationships above into coordinated **blockout proposals**. It does not replace this approved regional topology or certify exact distances, slopes, structures, fences, tree instances or collision. Editable coordinates and feature data accompany the drawings. The earlier [town atmosphere/layout concept](design/world/historical/bellwether-earlier-town-concept.webp) is historical and spatially superseded by that coordinated set; its decorative bridge and building details are not authoritative.
+
+Tree circles illustrate woodland coverage, not final exact placement. Author hero occluder/framing trees after blockout; use terrain banks, roots, rocks, undergrowth and fallen wood for natural forest containment while retaining deliberate off-trail pockets. Avoid inviting passable gaps closed by invisible collision. Dry-stone garden boundaries and timber pens remain proposals, not locked positions or meshes.
+
+## Dungeon reference archive — 6 October 2026
+
+The [R2 atlas and production register](design/world/dungeons/README.md) preserve the approach plans, three floorplans, item-to-boss learning chains, editable coordinates and planning inventory. The local item/theme/boss dependencies are approved; room geometry, metric distances, detailed encounters, asset quantities and device budgets remain proposals. Use static graph checks only as planning evidence, never as gameplay acceptance.

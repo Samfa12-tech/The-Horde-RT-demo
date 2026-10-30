@@ -1,0 +1,904 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 157
+    Start 157: horde_rt_rescue_adversarial_regression_tests
+
+157: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_rig_attachment_tests.exe" "--adversarial-regression"
+157: Working Directory: <repo>/build/presets/windows-x64-release
+157: Test timeout computed to be: 180
+157: finding1 before=0,-0.95,0.900001 after=-33.7,-0.95,-15.2 generation=2->3
+157: FAIL: finding1: pre-claim reconstruction must retain ordinary player pose/support
+157: FAIL: finding1: claimed lower-side idle recovery must retain pose/support
+157: FAIL: finding1: released exterior idle recovery must retain pose/support
+157: finding2 walk minZ=-14.9217 support=2.05 copingPenetration=1
+157: FAIL: finding2: ordinary exterior movement must not enter closed coping
+157: finding2 dodge minZ=-13.7 support=2.05 copingPenetration=1
+157: FAIL: finding2: ordinary exterior movement must not enter closed coping
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: finding6 approachX=-34.4378 maximumLoadedOffset=0.581455 rigPoses=514 rigRejections=0
+157: finding6 offset=0.74 first rig rejection: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=0.015853 leftTarget=0.525036,1.781559,0.315108 leftSocket=0.525036,1.781559,0.315108 leftHandTarget=0.558711,1.781919,0.255424 leftHandSocket=0.558711,1.781919,0.255424 rightHandTarget=0.570480,1.251311,0.303723 rightHandSocket=0.556812,1.255195,0.296693.
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: FAIL: both solved rope grips must remain within the admitted imported forearm reach
+157: finding6 approachX=-32.9622 maximumLoadedOffset=0.937096 rigPoses=527 rigRejections=222
+157: finding7 subTickHipBodyError=0.932132 ticks=0
+157: FAIL: finding7: unpaused zero-tick frame must retain one hip/body lantern authority
+157: Adversarial rescue cases=16420 failures=653
+1/1 Test #157: horde_rt_rescue_adversarial_regression_tests ...***Failed    3.28 sec
+finding1 before=0,-0.95,0.900001 after=-33.7,-0.95,-15.2 generation=2->3
+FAIL: finding1: pre-claim reconstruction must retain ordinary player pose/support
+FAIL: finding1: claimed lower-side idle recovery must retain pose/support
+FAIL: finding1: released exterior idle recovery must retain pose/support
+finding2 walk minZ=-14.9217 support=2.05 copingPenetration=1
+FAIL: finding2: ordinary exterior movement must not enter closed coping
+finding2 dodge minZ=-13.7 support=2.05 copingPenetration=1
+FAIL: finding2: ordinary exterior movement must not enter closed coping
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+finding6 approachX=-34.4378 maximumLoadedOffset=0.581455 rigPoses=514 rigRejections=0
+finding6 offset=0.74 first rig rejection: Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=0.000000 right=0.015853 leftTarget=0.525036,1.781559,0.315108 leftSocket=0.525036,1.781559,0.315108 leftHandTarget=0.558711,1.781919,0.255424 leftHandSocket=0.558711,1.781919,0.255424 rightHandTarget=0.570480,1.251311,0.303723 rightHandSocket=0.556812,1.255195,0.296693.
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+FAIL: both solved rope grips must remain within the admitted imported forearm reach
+finding6 approachX=-32.9622 maximumLoadedOffset=0.937096 rigPoses=527 rigRejections=222
+finding7 subTickHipBodyError=0.932132 ticks=0
+FAIL: finding7: unpaused zero-tick frame must retain one hip/body lantern authority
+Adversarial rescue cases=16420 failures=653
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   3.30 sec
+
+The following tests FAILED:
+	157 - horde_rt_rescue_adversarial_regression_tests (Failed)
+Errors while running CTest

@@ -1,0 +1,82 @@
+Start testing: Oct 20 21:46 AUS Eastern Summer Time
+----------------------------------------------------------
+11/219 Testing: horde_rt_entry_menu_handoff_tests
+11/219 Test: horde_rt_entry_menu_handoff_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_entry_menu_handoff_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_entry_menu_handoff_tests" start time: Oct 20 21:46 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Entry generation, two-present Play handoff, loading, cancellation and retry pass
+<end of output>
+Test time =   1.03 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_entry_menu_handoff_tests" end time: Oct 20 21:46 AUS Eastern Summer Time
+"horde_rt_entry_menu_handoff_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+12/219 Testing: horde_rt_foreground_pause_render_cadence_tests
+12/219 Test: horde_rt_foreground_pause_render_cadence_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_foreground_pause_render_cadence_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_foreground_pause_render_cadence_tests" start time: Oct 20 21:46 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   1.28 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_foreground_pause_render_cadence_tests" end time: Oct 20 21:46 AUS Eastern Summer Time
+"horde_rt_foreground_pause_render_cadence_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+31/219 Testing: horde_rt_windows_campaign_menu_tests
+31/219 Test: horde_rt_windows_campaign_menu_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_windows_campaign_menu_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_windows_campaign_menu_tests" start time: Oct 20 21:46 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+45 Windows campaign menu checks, 0 failures; hidden HWND UI/CPU only, no RT presentation claim
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_windows_campaign_menu_tests" end time: Oct 20 21:46 AUS Eastern Summer Time
+"horde_rt_windows_campaign_menu_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+34/219 Testing: horde_rt_android_campaign_load_barrier_tests
+34/219 Test: horde_rt_android_campaign_load_barrier_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_android_campaign_load_barrier_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_android_campaign_load_barrier_tests" start time: Oct 20 21:46 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Android campaign load barrier tests passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_android_campaign_load_barrier_tests" end time: Oct 20 21:46 AUS Eastern Summer Time
+"horde_rt_android_campaign_load_barrier_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+173/219 Testing: horde_rt_desktop_controller_input_tests
+173/219 Test: horde_rt_desktop_controller_input_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_desktop_controller_input_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_desktop_controller_input_tests" start time: Oct 20 21:46 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Desktop controller input tests passed
+<end of output>
+Test time =   0.21 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_desktop_controller_input_tests" end time: Oct 20 21:46 AUS Eastern Summer Time
+"horde_rt_desktop_controller_input_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 20 21:46 AUS Eastern Summer Time

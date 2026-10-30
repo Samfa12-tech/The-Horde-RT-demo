@@ -2,6 +2,10 @@ $script:HordeMusicManifestSha256 = '672f2321b2fb429cffe9d61119103a1aa3565f355391
 $script:HordeMusicAssetRelativeRoot = 'assets/audio/music/what-the-dark-keeps'
 $script:HordeMusicAssetRootRelativeToAssets = 'audio/music/what-the-dark-keeps'
 $script:HordeMusicRights = 'Owner-supplied; authorised for Horde use only'
+$script:HordeOutdoorMusicManifestSha256 = '5318990386a47c7ef815cfcd5165e779bd01b0994cdca3f76926882d1d4e1657'
+$script:HordeOutdoorMusicAssetRelativeRoot = 'assets/audio/music/beneath-the-same-moon'
+$script:HordeOutdoorMusicAssetRootRelativeToAssets = 'audio/music/beneath-the-same-moon'
+$script:HordeOutdoorMusicWaveSha256 = '14fe0a94e665cf25b4fb4aa08a45e26e18990794740b670906adfecfaf6aee15'
 
 function Get-HordeMusicCueSpecification {
     @(
@@ -215,12 +219,15 @@ function Assert-HordeMusicAssets {
     param([Parameter(Mandatory = $true)][string]$RepositoryRoot)
     $repo = [IO.Path]::GetFullPath($RepositoryRoot)
     $musicRoot = Join-HordeMusicRelativePath -BasePath $repo -RelativePath $script:HordeMusicAssetRelativeRoot
-    Assert-HordeMusicAssetTree -MusicRoot $musicRoot
+    $manifest = Assert-HordeMusicAssetTree -MusicRoot $musicRoot
+    $null = Assert-HordeOutdoorMusicAssets -RepositoryRoot $repo
+    return $manifest
 }
 
-function Get-HordeMusicRuntimeFiles {
+function Get-HordeLegacyMusicRuntimeFiles {
     param([Parameter(Mandatory = $true)][string]$RepositoryRoot)
-    $null = Assert-HordeMusicAssets -RepositoryRoot $RepositoryRoot
+    $root = Join-HordeMusicRelativePath -BasePath ([IO.Path]::GetFullPath($RepositoryRoot)) -RelativePath $script:HordeMusicAssetRelativeRoot
+    $null = Assert-HordeMusicAssetTree -MusicRoot $root
     $files = [Collections.Generic.List[string]]::new()
     $files.Add("$($script:HordeMusicAssetRootRelativeToAssets)/asset.manifest.json")
     foreach ($cue in (Get-HordeMusicCueSpecification)) {
@@ -228,6 +235,85 @@ function Get-HordeMusicRuntimeFiles {
         $files.Add("$($script:HordeMusicAssetRootRelativeToAssets)/runtime/$($cue.Cue)-tail.wav")
     }
     return @($files)
+}
+
+function Get-HordeOutdoorMusicExpectedRuntimeFiles {
+    @('asset.manifest.json', 'runtime/outdoor-main.wav')
+}
+
+function Assert-HordeOutdoorMusicAssetTree {
+    param([Parameter(Mandatory = $true)][string]$MusicRoot)
+    $root = [IO.Path]::GetFullPath($MusicRoot)
+    if (-not (Test-Path -LiteralPath $root -PathType Container)) { throw 'Outdoor music asset root is missing.' }
+    foreach ($item in @((Get-Item -LiteralPath $root -Force)) + @(Get-ChildItem -LiteralPath $root -Recurse -Force)) {
+        if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw 'Outdoor music tree must not contain symlinks or reparse points.'
+        }
+    }
+    $manifestPath = Join-Path $root 'asset.manifest.json'
+    if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) { throw 'Outdoor music manifest is missing.' }
+    try { $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json }
+    catch { throw 'Outdoor music manifest JSON is invalid.' }
+    if ($manifest.schemaVersion -ne 1 -or $manifest.assetId -cne 'beneath-the-same-moon' -or
+        $manifest.rights -cne $script:HordeMusicRights -or
+        $manifest.format.encoding -cne 'PCM16_LE' -or $manifest.format.sampleRate -ne 48000 -or
+        $manifest.format.channels -ne 2 -or $manifest.tailFrames -ne 0 -or
+        $manifest.crossfadeFrames -ne 12000 -or $manifest.totalWaveBytes -ne 20480044 -or
+        $manifest.totalPcmBytes -ne 20480000 -or @($manifest.cues).Count -ne 1) {
+        throw 'Outdoor music manifest rights, format or aggregate contract differs from the reviewed main-only asset.'
+    }
+    $cue = $manifest.cues[0]
+    if ($cue.cue -cne 'Outdoor' -or $cue.looping -ne $true -or $null -ne $cue.tail -or
+        $cue.body.path -cne 'runtime/outdoor-main.wav' -or $cue.body.frames -ne 5120000 -or
+        $cue.body.bytes -ne 20480044 -or $cue.body.sha256 -cne $script:HordeOutdoorMusicWaveSha256) {
+        throw 'Outdoor music cue must be the exact full-period main loop without a separate tail or quiet mix.'
+    }
+    $wavePath = Join-HordeMusicRelativePath -BasePath $root -RelativePath 'runtime/outdoor-main.wav'
+    if (-not (Test-Path -LiteralPath $wavePath -PathType Leaf)) { throw 'Outdoor music runtime wave is missing.' }
+    if ((Get-HordeMusicFileSha256 -Path $wavePath) -cne $script:HordeOutdoorMusicWaveSha256) {
+        throw 'Outdoor music runtime SHA-256 mismatch.'
+    }
+    Assert-HordeMusicWave -Path $wavePath -ExpectedFrames 5120000 -Label 'Outdoor main'
+    $metadataPath = Join-Path $root 'METADATA.md'
+    if (-not (Test-Path -LiteralPath $metadataPath -PathType Leaf)) { throw 'Outdoor music metadata is missing.' }
+    $metadata = Get-Content -LiteralPath $metadataPath -Raw
+    if (-not $metadata.Contains($script:HordeMusicRights) -or
+        -not $metadata.Contains('source originals are excluded from game packages')) {
+        throw 'Outdoor music metadata must retain rights and source exclusion.'
+    }
+    $expected = @('asset.manifest.json', 'METADATA.md', 'runtime/outdoor-main.wav')
+    $actual = @(Get-ChildItem -LiteralPath $root -Recurse -File -Force | ForEach-Object {
+        $_.FullName.Substring($root.Length + 1).Replace('\', '/')
+    })
+    if ([string]::Join("`n", [string[]]@($actual | Sort-Object -CaseSensitive)) -cne
+        [string]::Join("`n", [string[]]@($expected | Sort-Object -CaseSensitive))) {
+        throw 'Outdoor music closed inventory excludes all source originals, quiet mixes and unknown files.'
+    }
+    $directories = @(Get-ChildItem -LiteralPath $root -Recurse -Directory -Force)
+    if ($directories.Count -ne 1 -or $directories[0].Name -cne 'runtime') {
+        throw 'Outdoor music tree may contain only its runtime subdirectory.'
+    }
+    if ((Get-HordeMusicFileSha256 -Path $manifestPath) -cne $script:HordeOutdoorMusicManifestSha256) {
+        throw 'Outdoor music manifest SHA-256 does not match the reviewed pin.'
+    }
+    return $manifest
+}
+
+function Assert-HordeOutdoorMusicAssets {
+    param([Parameter(Mandatory = $true)][string]$RepositoryRoot)
+    $root = Join-HordeMusicRelativePath -BasePath ([IO.Path]::GetFullPath($RepositoryRoot)) -RelativePath $script:HordeOutdoorMusicAssetRelativeRoot
+    Assert-HordeOutdoorMusicAssetTree -MusicRoot $root
+}
+
+function Get-HordeOutdoorMusicRuntimeFiles {
+    param([Parameter(Mandatory = $true)][string]$RepositoryRoot)
+    $null = Assert-HordeOutdoorMusicAssets -RepositoryRoot $RepositoryRoot
+    @(Get-HordeOutdoorMusicExpectedRuntimeFiles | ForEach-Object { "$($script:HordeOutdoorMusicAssetRootRelativeToAssets)/$_" })
+}
+
+function Get-HordeMusicRuntimeFiles {
+    param([Parameter(Mandatory = $true)][string]$RepositoryRoot)
+    @(Get-HordeLegacyMusicRuntimeFiles -RepositoryRoot $RepositoryRoot) + @(Get-HordeOutdoorMusicRuntimeFiles -RepositoryRoot $RepositoryRoot)
 }
 
 function Copy-HordeMusicRuntimeAssets {
@@ -241,7 +327,7 @@ function Copy-HordeMusicRuntimeAssets {
     if (-not (Test-Path -LiteralPath $assetRootFull -PathType Container)) {
         New-Item -ItemType Directory -Path $assetRootFull -Force | Out-Null
     }
-    $musicDestination = Join-HordeMusicRelativePath -BasePath $assetRootFull -RelativePath $script:HordeMusicAssetRootRelativeToAssets
+    $musicDestination = Join-HordeMusicRelativePath -BasePath $assetRootFull -RelativePath 'audio/music'
     if (Test-Path -LiteralPath $musicDestination) {
         throw "Refusing to overwrite existing staged Horde music tree: $musicDestination"
     }
@@ -258,14 +344,14 @@ function Copy-HordeMusicRuntimeAssets {
             throw "Staged Horde music file failed byte verification: $relative"
         }
     }
-    $expected = @(Get-HordeMusicRuntimeFiles -RepositoryRoot $repo | ForEach-Object { $_.Substring('audio/music/what-the-dark-keeps/'.Length) })
+    $expected = @(Get-HordeMusicRuntimeFiles -RepositoryRoot $repo | ForEach-Object { $_.Substring('audio/music/'.Length) })
     $actual = @(Get-ChildItem -LiteralPath $musicDestination -Recurse -File -Force | ForEach-Object {
         $_.FullName.Substring($musicDestination.Length + 1).Replace('\', '/')
     })
     $actualSorted = [string]::Join("`n", [string[]]@($actual | Sort-Object -CaseSensitive))
     $expectedSorted = [string]::Join("`n", [string[]]@($expected | Sort-Object -CaseSensitive))
     if ($actualSorted -cne $expectedSorted) {
-        throw 'Staged Horde music tree is not the exact manifest-plus-sixteen-WAV roster.'
+        throw 'Staged Horde music tree is not the exact legacy seventeen plus outdoor two-file roster.'
     }
     if (@(Get-ChildItem -LiteralPath $musicDestination -Recurse -Force | Where-Object { ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 }).Count -ne 0) {
         throw 'Staged Horde music tree contains a symlink or reparse point.'
@@ -294,7 +380,7 @@ function Assert-HordeMusicPackage {
     try {
         $prefix = "assets/$($script:HordeMusicAssetRootRelativeToAssets)/"
         $musicEntries = @($zip.Entries | Where-Object { $_.FullName.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase) })
-        $expectedRelative = @(Get-HordeMusicRuntimeFiles -RepositoryRoot $RepositoryRoot)
+        $expectedRelative = @(Get-HordeLegacyMusicRuntimeFiles -RepositoryRoot $RepositoryRoot)
         $expectedNames = @($expectedRelative | ForEach-Object { "assets/$_" })
         if ($musicEntries.Count -ne $expectedNames.Count) {
             throw "Horde music package must contain exactly $($expectedNames.Count) entries under $prefix; found $($musicEntries.Count)."
@@ -317,8 +403,34 @@ function Assert-HordeMusicPackage {
                 throw "Horde music package entry byte/hash mismatch: $($entry.FullName)"
             }
         }
+        $outdoorPrefix = "assets/$($script:HordeOutdoorMusicAssetRootRelativeToAssets)/"
+        $outdoorEntries = @($zip.Entries | Where-Object { $_.FullName.StartsWith($outdoorPrefix, [StringComparison]::OrdinalIgnoreCase) })
+        $outdoorNames = @(Get-HordeOutdoorMusicRuntimeFiles -RepositoryRoot $RepositoryRoot | ForEach-Object { "assets/$_" })
+        if ($outdoorEntries.Count -ne 2) { throw 'Outdoor music package must contain exactly two main-only runtime entries.' }
+        $actualOutdoorNames = @($outdoorEntries | ForEach-Object FullName)
+        if (@($actualOutdoorNames | Sort-Object -Unique -CaseSensitive).Count -ne 2) {
+            throw 'Outdoor music package contains duplicate entry names.'
+        }
+        if ([string]::Join("`n", [string[]]@($actualOutdoorNames | Sort-Object -CaseSensitive)) -cne
+            [string]::Join("`n", [string[]]@($outdoorNames | Sort-Object -CaseSensitive))) {
+            throw 'Outdoor music package contains missing, source, quiet or unrecognised entries.'
+        }
+        foreach ($entry in $outdoorEntries) {
+            $source = Join-HordeMusicRelativePath -BasePath ([IO.Path]::GetFullPath($RepositoryRoot)) -RelativePath $entry.FullName
+            if ($entry.Length -ne (Get-Item -LiteralPath $source).Length -or
+                (Get-HordeMusicZipEntrySha256 -Entry $entry) -cne (Get-HordeMusicFileSha256 -Path $source)) {
+                throw "Outdoor music package entry byte/hash mismatch: $($entry.FullName)"
+            }
+        }
+        $allowedMusicNames = $expectedNames + $outdoorNames
         $sourceNames = @('What_the_Dark_Keeps_Pocket_Chordsmith.json', 'What_the_Dark_Keeps_PCS1.txt')
         foreach ($entry in $zip.Entries) {
+            if (($entry.FullName.StartsWith('assets/audio/music/', [StringComparison]::OrdinalIgnoreCase) -and
+                 $entry.FullName -cnotin $allowedMusicNames) -or
+                $entry.FullName.StartsWith('assets/source/beyond_the_tomb/music/', [StringComparison]::OrdinalIgnoreCase) -or
+                $entry.FullName.IndexOf('beneath-the-same-moon-outdoor-r2', [StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                throw "Horde music package contains unapproved music/source content: $($entry.FullName)"
+            }
             if ($entry.FullName.StartsWith("assets/$($script:HordeMusicAssetRootRelativeToAssets)/source/", [StringComparison]::OrdinalIgnoreCase) -or
                 ($entry.FullName.StartsWith('assets/audio/music/', [StringComparison]::Ordinal) -and
                     [IO.Path]::GetFileName($entry.FullName) -cin $sourceNames)) {

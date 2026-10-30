@@ -1,0 +1,422 @@
+[
+  {
+    "label": "prior",
+    "bytes": 174177635,
+    "entries": 197,
+    "compressedPayload": 174113581,
+    "localBaseBytes": 17217,
+    "localExtraBytes": 22350,
+    "interRecordGaps": 0,
+    "finalDataEnd": 174153148,
+    "centralDirectoryStart": 174157244,
+    "preCentralGap": 4096,
+    "centralAndEndBytes": 20391,
+    "signingFooterHex": "f80f00000000000041504b2053696720426c6f636b203432",
+    "largestGaps": [
+      {
+        "name": "META-INF/com/android/build/gradle/app-metadata.properties",
+        "offset": 0,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 52,
+        "end": 139
+      },
+      {
+        "name": "classes.dex",
+        "offset": 139,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 4779,
+        "end": 4959
+      },
+      {
+        "name": "classes2.dex",
+        "offset": 4959,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 237430,
+        "end": 242431
+      },
+      {
+        "name": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "offset": 242431,
+        "gapBefore": 0,
+        "localExtraBytes": 3257,
+        "compressedBytes": 5193544,
+        "end": 5439304
+      },
+      {
+        "name": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+        "offset": 5439304,
+        "gapBefore": 0,
+        "localExtraBytes": 110,
+        "compressedBytes": 4485032,
+        "end": 9924520
+      },
+      {
+        "name": "lib/x86/libhorde_rt_probe_android.so",
+        "offset": 9924520,
+        "gapBefore": 0,
+        "localExtraBytes": 4118,
+        "compressedBytes": 5785100,
+        "end": 15713804
+      },
+      {
+        "name": "lib/x86_64/libhorde_rt_probe_android.so",
+        "offset": 15713804,
+        "gapBefore": 0,
+        "localExtraBytes": 14767,
+        "compressedBytes": 5458224,
+        "end": 21186864
+      },
+      {
+        "name": "assets/ASSET_LICENSES.md",
+        "offset": 21186864,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 28543,
+        "end": 21215461
+      },
+      {
+        "name": "assets/LICENSE",
+        "offset": 21215461,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 641,
+        "end": 21216146
+      },
+      {
+        "name": "assets/LICENSE_SCOPE.md",
+        "offset": 21216146,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 2322,
+        "end": 21218521
+      },
+      {
+        "name": "assets/THIRD_PARTY_NOTICES/cgltf-LICENSE.txt",
+        "offset": 21218521,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 633,
+        "end": 21219228
+      },
+      {
+        "name": "assets/audio/chapter-local-ambience/asset.manifest.json",
+        "offset": 21219228,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 1305,
+        "end": 21220618
+      }
+    ],
+    "largestExtras": [
+      {
+        "name": "lib/x86_64/libhorde_rt_probe_android.so",
+        "offset": 15713804,
+        "gapBefore": 0,
+        "localExtraBytes": 14767,
+        "compressedBytes": 5458224,
+        "end": 21186864
+      },
+      {
+        "name": "lib/x86/libhorde_rt_probe_android.so",
+        "offset": 9924520,
+        "gapBefore": 0,
+        "localExtraBytes": 4118,
+        "compressedBytes": 5785100,
+        "end": 15713804
+      },
+      {
+        "name": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "offset": 242431,
+        "gapBefore": 0,
+        "localExtraBytes": 3257,
+        "compressedBytes": 5193544,
+        "end": 5439304
+      },
+      {
+        "name": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+        "offset": 5439304,
+        "gapBefore": 0,
+        "localExtraBytes": 110,
+        "compressedBytes": 4485032,
+        "end": 9924520
+      },
+      {
+        "name": "assets/audio/filmcow/enemy_fall.wav",
+        "offset": 21412084,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 184964,
+        "end": 21597116
+      },
+      {
+        "name": "assets/audio/filmcow/equipment/sword_sheath.wav",
+        "offset": 21640040,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 67558,
+        "end": 21707678
+      },
+      {
+        "name": "assets/audio/kit/runtime/forest.night.wav",
+        "offset": 23060338,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 117006,
+        "end": 23177418
+      },
+      {
+        "name": "assets/audio/kit/runtime/rescue.found.wav",
+        "offset": 23811978,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 116706,
+        "end": 23928758
+      },
+      {
+        "name": "assets/audio/kit/runtime/reunion.depart.wav",
+        "offset": 24054772,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 211648,
+        "end": 24266496
+      },
+      {
+        "name": "assets/audio/kit/runtime/reunion.hint.wav",
+        "offset": 24426634,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 102750,
+        "end": 24529458
+      },
+      {
+        "name": "assets/audio/kit/runtime/reunion.question.wav",
+        "offset": 24654430,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 149212,
+        "end": 24803720
+      },
+      {
+        "name": "assets/audio/menu/menu_room.wav",
+        "offset": 24901956,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 384044,
+        "end": 25286064
+      }
+    ]
+  },
+  {
+    "label": "current",
+    "bytes": 200120444,
+    "entries": 199,
+    "compressedPayload": 194633251,
+    "localBaseBytes": 17402,
+    "localExtraBytes": 34707,
+    "interRecordGaps": 5410380,
+    "finalDataEnd": 200095740,
+    "centralDirectoryStart": 200099836,
+    "preCentralGap": 4096,
+    "centralAndEndBytes": 20608,
+    "signingFooterHex": "f80f00000000000041504b2053696720426c6f636b203432",
+    "largestGaps": [
+      {
+        "name": "assets/LICENSE",
+        "offset": 21215461,
+        "gapBefore": 5410380,
+        "localExtraBytes": 0,
+        "compressedBytes": 641,
+        "end": 21216146
+      },
+      {
+        "name": "META-INF/com/android/build/gradle/app-metadata.properties",
+        "offset": 0,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 52,
+        "end": 139
+      },
+      {
+        "name": "classes.dex",
+        "offset": 139,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 4779,
+        "end": 4959
+      },
+      {
+        "name": "classes2.dex",
+        "offset": 4959,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 237890,
+        "end": 242891
+      },
+      {
+        "name": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "offset": 242891,
+        "gapBefore": 0,
+        "localExtraBytes": 2797,
+        "compressedBytes": 5194696,
+        "end": 5440456
+      },
+      {
+        "name": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+        "offset": 5440456,
+        "gapBefore": 0,
+        "localExtraBytes": 15342,
+        "compressedBytes": 4497768,
+        "end": 9953640
+      },
+      {
+        "name": "lib/x86/libhorde_rt_probe_android.so",
+        "offset": 9953640,
+        "gapBefore": 0,
+        "localExtraBytes": 7766,
+        "compressedBytes": 5813676,
+        "end": 15775148
+      },
+      {
+        "name": "assets/ASSET_LICENSES.md",
+        "offset": 15775148,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 29117,
+        "end": 15804319
+      },
+      {
+        "name": "assets/audio/music/beneath-the-same-moon/asset.manifest.json",
+        "offset": 15804319,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 672,
+        "end": 15805081
+      },
+      {
+        "name": "assets/LICENSE_SCOPE.md",
+        "offset": 21216146,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 2322,
+        "end": 21218521
+      },
+      {
+        "name": "assets/THIRD_PARTY_NOTICES/cgltf-LICENSE.txt",
+        "offset": 21218521,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 633,
+        "end": 21219228
+      },
+      {
+        "name": "assets/audio/chapter-local-ambience/asset.manifest.json",
+        "offset": 21219228,
+        "gapBefore": 0,
+        "localExtraBytes": 0,
+        "compressedBytes": 1305,
+        "end": 21220618
+      }
+    ],
+    "largestExtras": [
+      {
+        "name": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+        "offset": 5440456,
+        "gapBefore": 0,
+        "localExtraBytes": 15342,
+        "compressedBytes": 4497768,
+        "end": 9953640
+      },
+      {
+        "name": "lib/x86_64/libhorde_rt_probe_android.so",
+        "offset": 174153148,
+        "gapBefore": 0,
+        "localExtraBytes": 8703,
+        "compressedBytes": 5453680,
+        "end": 179615600
+      },
+      {
+        "name": "lib/x86/libhorde_rt_probe_android.so",
+        "offset": 9953640,
+        "gapBefore": 0,
+        "localExtraBytes": 7766,
+        "compressedBytes": 5813676,
+        "end": 15775148
+      },
+      {
+        "name": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "offset": 242891,
+        "gapBefore": 0,
+        "localExtraBytes": 2797,
+        "compressedBytes": 5194696,
+        "end": 5440456
+      },
+      {
+        "name": "assets/audio/filmcow/enemy_fall.wav",
+        "offset": 21412084,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 184964,
+        "end": 21597116
+      },
+      {
+        "name": "assets/audio/filmcow/equipment/sword_sheath.wav",
+        "offset": 21640040,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 67558,
+        "end": 21707678
+      },
+      {
+        "name": "assets/audio/kit/runtime/forest.night.wav",
+        "offset": 23060338,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 117006,
+        "end": 23177418
+      },
+      {
+        "name": "assets/audio/kit/runtime/rescue.found.wav",
+        "offset": 23811978,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 116706,
+        "end": 23928758
+      },
+      {
+        "name": "assets/audio/kit/runtime/reunion.depart.wav",
+        "offset": 24054772,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 211648,
+        "end": 24266496
+      },
+      {
+        "name": "assets/audio/kit/runtime/reunion.hint.wav",
+        "offset": 24426634,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 102750,
+        "end": 24529458
+      },
+      {
+        "name": "assets/audio/kit/runtime/reunion.question.wav",
+        "offset": 24654430,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 149212,
+        "end": 24803720
+      },
+      {
+        "name": "assets/audio/menu/menu_room.wav",
+        "offset": 24901956,
+        "gapBefore": 0,
+        "localExtraBytes": 3,
+        "compressedBytes": 384044,
+        "end": 25286064
+      }
+    ]
+  }
+]

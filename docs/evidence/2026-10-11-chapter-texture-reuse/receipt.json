@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 1,
+  "parentSource": "3c682619c107464bb1a27b9d781b2850d68e33b2",
+  "candidateScope": "uncommitted exact-byte texture reuse patch; source checkpoint recorded in Git",
+  "baselineDebugExeSha256": "8504463dfa3ee14c1856c407ded7237eb8fd3c05131ef488029f1a87c8d28aeb",
+  "candidateDebugExeSha256": "e91ac41011d9f7862db6a93a842d4c76b8fdd7e548feea4ad25ec2bc5490d366",
+  "candidateReleaseExeSha256": "20ebba3dd427538e59e4da1afe4b3314ec9b240615bac02972ba7c9ba54599d8",
+  "backends": [
+    {
+      "backend": "RayTracingPipeline",
+      "profile": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "diagnostic_high_generic_dielectric",
+        "activeSha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f",
+        "waterQuality": "high"
+      },
+      "camera": {
+        "x": -33.450001,
+        "z": -17.549999,
+        "yaw": -1.570796,
+        "pitch": -0.32
+      },
+      "size": [
+        960,
+        540
+      ],
+      "shadowQuality": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "fireQuality": {
+        "quality": "High",
+        "volumeSteps": 10,
+        "reflectionSamples": 2,
+        "reflectedVolumeSteps": 8
+      },
+      "dust": 2,
+      "mist": true,
+      "settlingFrames": 12,
+      "differentPixels": 0,
+      "pngBeforeSha256": "4be4e621e11b2abf1786279b6b91a2cc8b194e66cbcc86b41e38347b69fd1317",
+      "pngAfterSha256": "4be4e621e11b2abf1786279b6b91a2cc8b194e66cbcc86b41e38347b69fd1317",
+      "beforeStaticResource": {
+        "enabled": true,
+        "vertexBytes": 11746048,
+        "indexBytes": 1816692,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.1478,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.5556,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.5922,
+        "productionPropBlasBytes": 5409536,
+        "productionPropBlasBuildMilliseconds": 5.6321
+      },
+      "afterStaticResource": {
+        "enabled": true,
+        "vertexBytes": 11746048,
+        "indexBytes": 1816692,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 223696160,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.1282,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.5545,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.5737,
+        "productionPropBlasBytes": 5409536,
+        "productionPropBlasBuildMilliseconds": 5.6206
+      },
+      "beforeResources": {
+        "bufferCount": 53,
+        "memoryAllocationCount": 64,
+        "bottomLevelAccelerationStructureCount": 21,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 16848288,
+        "deviceLocalBytes": 350313072
+      },
+      "afterResources": {
+        "bufferCount": 53,
+        "memoryAllocationCount": 64,
+        "bottomLevelAccelerationStructureCount": 21,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 16848288,
+        "deviceLocalBytes": 299956848
+      },
+      "beforeGpuSample": {
+        "status": "valid",
+        "available": true,
+        "completedSubmissionSerial": 12,
+        "wholeRtGpuMs": 2.707072,
+        "timestampValidBits": 64,
+        "timestampPeriodPicoseconds": 1000,
+        "sampleCount": 12,
+        "unavailableResultCount": 0,
+        "errorCount": 0,
+        "detail": "GPU RT command-buffer timing is available."
+      },
+      "afterGpuSample": {
+        "status": "valid",
+        "available": true,
+        "completedSubmissionSerial": 12,
+        "wholeRtGpuMs": 2.385088,
+        "timestampValidBits": 64,
+        "timestampPeriodPicoseconds": 1000,
+        "sampleCount": 12,
+        "unavailableResultCount": 0,
+        "errorCount": 0,
+        "detail": "GPU RT command-buffer timing is available."
+      },
+      "presentationBefore": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 12,
+        "finalIdleCompletion": true
+      },
+      "presentationAfter": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 12,
+        "finalIdleCompletion": true
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "profile": {
+        "executionBackend": "RayQueryCompute",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "rayquery_compute_diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "57b7a23d6eaed1885001e488654815cbbc1c1e25cec29db16c77b698aac92f13"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "c329f47673a9ed4bb3287c59c52a6db4d7a29dc39814b78beb78b969d2f527ec"
+        },
+        "activeStrategy": "generic-dielectric",
+        "activeKey": "rayquery_compute_diagnostic_high_generic_dielectric",
+        "activeSha256": "c329f47673a9ed4bb3287c59c52a6db4d7a29dc39814b78beb78b969d2f527ec",
+        "waterQuality": "high"
+      },
+      "camera": {
+        "x": -33.450001,
+        "z": -17.549999,
+        "yaw": -1.570796,
+        "pitch": -0.32
+      },
+      "size": [
+        960,
+        540
+      ],
+      "shadowQuality": {
+        "mode": "higher",
+        "localPrimarySamples": 4,
+        "skyPrimarySamples": 2,
+        "reserved": 0
+      },
+      "fireQuality": {
+        "quality": "High",
+        "volumeSteps": 10,
+        "reflectionSamples": 2,
+        "reflectedVolumeSteps": 8
+      },
+      "dust": 2,
+      "mist": true,
+      "settlingFrames": 12,
+      "differentPixels": 0,
+      "pngBeforeSha256": "c4acca9b3d4f03ec349c026138b63399cfbb85fe8324cd542e7da3d6b2f4db21",
+      "pngAfterSha256": "c4acca9b3d4f03ec349c026138b63399cfbb85fe8324cd542e7da3d6b2f4db21",
+      "beforeStaticResource": {
+        "enabled": true,
+        "vertexBytes": 11746048,
+        "indexBytes": 1816692,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 274027796,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.6396,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.788,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.8516,
+        "productionPropBlasBytes": 5409536,
+        "productionPropBlasBuildMilliseconds": 10.2152
+      },
+      "afterStaticResource": {
+        "enabled": true,
+        "vertexBytes": 11746048,
+        "indexBytes": 1816692,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 223696160,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.6823,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.7537,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.9286,
+        "productionPropBlasBytes": 5409536,
+        "productionPropBlasBuildMilliseconds": 6.0942
+      },
+      "beforeResources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 62,
+        "bottomLevelAccelerationStructureCount": 21,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 16847776,
+        "deviceLocalBytes": 350313072
+      },
+      "afterResources": {
+        "bufferCount": 51,
+        "memoryAllocationCount": 62,
+        "bottomLevelAccelerationStructureCount": 21,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 16847776,
+        "deviceLocalBytes": 299956848
+      },
+      "beforeGpuSample": {
+        "status": "valid",
+        "available": true,
+        "completedSubmissionSerial": 12,
+        "wholeRtGpuMs": 2.992736,
+        "timestampValidBits": 64,
+        "timestampPeriodPicoseconds": 1000,
+        "sampleCount": 12,
+        "unavailableResultCount": 0,
+        "errorCount": 0,
+        "detail": "GPU RT command-buffer timing is available."
+      },
+      "afterGpuSample": {
+        "status": "valid",
+        "available": true,
+        "completedSubmissionSerial": 12,
+        "wholeRtGpuMs": 2.861056,
+        "timestampValidBits": 64,
+        "timestampPeriodPicoseconds": 1000,
+        "sampleCount": 12,
+        "unavailableResultCount": 0,
+        "errorCount": 0,
+        "detail": "GPU RT command-buffer timing is available."
+      },
+      "presentationBefore": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 12,
+        "finalIdleCompletion": true
+      },
+      "presentationAfter": {
+        "outcome": "presented",
+        "presented": true,
+        "lastSuccessfulPresentSubmissionSerial": 12,
+        "finalIdleCompletion": true
+      }
+    }
+  ]
+}

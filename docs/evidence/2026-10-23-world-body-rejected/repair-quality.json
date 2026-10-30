@@ -1,0 +1,787 @@
+{
+  "status": "REJECTED_UNADMITTED",
+  "sourceSha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+  "viewmodelSha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+  "priorCandidateSha256": "1ef3f6f5d8187cb0bf99a5bdfa7b752b10b109e08340b383296fe09dfb573195",
+  "repairCandidateSha256": "2734d5aed34402539f9d3470a3fb6b9c94d9d63abbdefa4eb07a7997fd945df9",
+  "repairPlanSha256": "dea4d5a1491f109f4da20c384610b647d6827743fdbd0eacd525983a5223ad13",
+  "qualityScriptSha256": "3a5fd75068902e181e1e5011de9ea005b860a5c6919e52ac2ee64cb8f134e0df",
+  "predeclaredQualityPolicy": "Reject if any non-original triangle is opposed to its average vertex normal, has area below its primitive source minimum positive area (>1e-14 m2), or has UV determinant magnitude <=1e-14; also retain structural/boundary/boot/contact/seam gates. Inherited exact source triangles remain identified separately.",
+  "failureSummary": [
+    {
+      "material": "GauntletPrimaryVisible",
+      "issues": [
+        "new_nonmanifold_edge",
+        "welded_Euler_characteristic_changed"
+      ]
+    }
+  ],
+  "primitives": [
+    {
+      "material": "BodyPrimaryVisible",
+      "source": {
+        "triangles": 5532,
+        "vertices": 4630,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 0,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 2.3513552122219936e-06,
+        "sourceMinimumPositiveAreaSquareMetres": 2.3513552122219936e-06,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 2,
+          "weldedVertices": 2904,
+          "edges": 8437,
+          "triangles": 5532,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 278,
+            "2": 8159
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "sourceTopology": {
+          "components": 2,
+          "weldedVertices": 2904,
+          "edges": 8437,
+          "triangles": 5532,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 278,
+            "2": 8159
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "priorCandidate": {
+        "triangles": 3066,
+        "vertices": 2976,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 0,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 1.6154566135677783e-11,
+        "sourceMinimumPositiveAreaSquareMetres": 2.3513552122219936e-06,
+        "newDefectTriangles": [
+          {
+            "triangleIndex": 911,
+            "rows": [
+              1968,
+              1309,
+              1348
+            ],
+            "reasons": [
+              "new_area_below_source_positive_minimum"
+            ],
+            "areaSquareMetres": 1.6154566135677783e-11,
+            "crossDotSumVertexNormals": 9.516261151652538e-11,
+            "uvDeterminant": -3.7693936860705435e-10
+          },
+          {
+            "triangleIndex": 2453,
+            "rows": [
+              146,
+              189,
+              2674
+            ],
+            "reasons": [
+              "new_area_below_source_positive_minimum"
+            ],
+            "areaSquareMetres": 9.628205745575984e-11,
+            "crossDotSumVertexNormals": 5.053912961070408e-10,
+            "uvDeterminant": 5.0754067615343956e-11
+          },
+          {
+            "triangleIndex": 2502,
+            "rows": [
+              908,
+              2753,
+              209
+            ],
+            "reasons": [
+              "new_area_below_source_positive_minimum"
+            ],
+            "areaSquareMetres": 8.585868386957563e-10,
+            "crossDotSumVertexNormals": 5.087695111004549e-09,
+            "uvDeterminant": 1.4568080075605394e-10
+          }
+        ],
+        "topology": {
+          "components": 2,
+          "weldedVertices": 1671,
+          "edges": 4738,
+          "triangles": 3066,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 278,
+            "2": 4460
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "sourceTopology": {
+          "components": 2,
+          "weldedVertices": 2904,
+          "edges": 8437,
+          "triangles": 5532,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 278,
+            "2": 8159
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "repairedCandidate": {
+        "triangles": 3122,
+        "vertices": 3016,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 0,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 2.3513552122219936e-06,
+        "sourceMinimumPositiveAreaSquareMetres": 2.3513552122219936e-06,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 2,
+          "weldedVertices": 1699,
+          "edges": 4822,
+          "triangles": 3122,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 278,
+            "2": 4544
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "sourceTopology": {
+          "components": 2,
+          "weldedVertices": 2904,
+          "edges": 8437,
+          "triangles": 5532,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 278,
+            "2": 8159
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "issues": []
+    },
+    {
+      "material": "GauntletPrimaryVisible",
+      "source": {
+        "triangles": 8838,
+        "vertices": 11220,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 0,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 1.5495245501827434e-07,
+        "sourceMinimumPositiveAreaSquareMetres": 1.5495245501827434e-07,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 2,
+          "weldedVertices": 4634,
+          "edges": 13618,
+          "triangles": 8838,
+          "euler": -146,
+          "edgeMultiplicity": {
+            "1": 746,
+            "2": 12850,
+            "3": 20,
+            "4": 2
+          },
+          "nonmanifoldEdgeCount": 22
+        },
+        "sourceTopology": {
+          "components": 2,
+          "weldedVertices": 4634,
+          "edges": 13618,
+          "triangles": 8838,
+          "euler": -146,
+          "edgeMultiplicity": {
+            "1": 746,
+            "2": 12850,
+            "3": 20,
+            "4": 2
+          },
+          "nonmanifoldEdgeCount": 22
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "priorCandidate": {
+        "triangles": 7130,
+        "vertices": 9731,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 2,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 1.5495245501827434e-07,
+        "sourceMinimumPositiveAreaSquareMetres": 1.5495245501827434e-07,
+        "newDefectTriangles": [
+          {
+            "triangleIndex": 5991,
+            "rows": [
+              4013,
+              4019,
+              4010
+            ],
+            "reasons": [
+              "new_opposed_average_vertex_normal"
+            ],
+            "areaSquareMetres": 4.763636778638651e-06,
+            "crossDotSumVertexNormals": -2.029814475074166e-06,
+            "uvDeterminant": 1.2824138906353255e-07
+          },
+          {
+            "triangleIndex": 5997,
+            "rows": [
+              4022,
+              4017,
+              3985
+            ],
+            "reasons": [
+              "new_opposed_average_vertex_normal"
+            ],
+            "areaSquareMetres": 6.65142939778093e-06,
+            "crossDotSumVertexNormals": -2.422344497556127e-05,
+            "uvDeterminant": -0.00012216500983086576
+          }
+        ],
+        "topology": {
+          "components": 2,
+          "weldedVertices": 3780,
+          "edges": 11054,
+          "triangles": 7130,
+          "euler": -144,
+          "edgeMultiplicity": {
+            "1": 746,
+            "2": 10284,
+            "3": 20,
+            "4": 4
+          },
+          "nonmanifoldEdgeCount": 24
+        },
+        "sourceTopology": {
+          "components": 2,
+          "weldedVertices": 4634,
+          "edges": 13618,
+          "triangles": 8838,
+          "euler": -146,
+          "edgeMultiplicity": {
+            "1": 746,
+            "2": 12850,
+            "3": 20,
+            "4": 2
+          },
+          "nonmanifoldEdgeCount": 22
+        },
+        "newNonmanifoldEdges": [
+          {
+            "edge": [
+              [
+                446842,
+                1266388,
+                236537
+              ],
+              [
+                451269,
+                1265302,
+                235447
+              ]
+            ],
+            "sourceMultiplicity": 2,
+            "candidateMultiplicity": 4
+          },
+          {
+            "edge": [
+              [
+                -427962,
+                1261203,
+                238520
+              ],
+              [
+                -424295,
+                1262412,
+                241178
+              ]
+            ],
+            "sourceMultiplicity": 2,
+            "candidateMultiplicity": 4
+          }
+        ],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "repairedCandidate": {
+        "triangles": 7170,
+        "vertices": 9762,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 0,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 1.5495245501827434e-07,
+        "sourceMinimumPositiveAreaSquareMetres": 1.5495245501827434e-07,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 2,
+          "weldedVertices": 3800,
+          "edges": 11114,
+          "triangles": 7170,
+          "euler": -144,
+          "edgeMultiplicity": {
+            "1": 746,
+            "2": 10344,
+            "3": 20,
+            "4": 4
+          },
+          "nonmanifoldEdgeCount": 24
+        },
+        "sourceTopology": {
+          "components": 2,
+          "weldedVertices": 4634,
+          "edges": 13618,
+          "triangles": 8838,
+          "euler": -146,
+          "edgeMultiplicity": {
+            "1": 746,
+            "2": 12850,
+            "3": 20,
+            "4": 2
+          },
+          "nonmanifoldEdgeCount": 22
+        },
+        "newNonmanifoldEdges": [
+          {
+            "edge": [
+              [
+                446842,
+                1266388,
+                236537
+              ],
+              [
+                451269,
+                1265302,
+                235447
+              ]
+            ],
+            "sourceMultiplicity": 2,
+            "candidateMultiplicity": 4
+          },
+          {
+            "edge": [
+              [
+                -427962,
+                1261203,
+                238520
+              ],
+              [
+                -424295,
+                1262412,
+                241178
+              ]
+            ],
+            "sourceMultiplicity": 2,
+            "candidateMultiplicity": 4
+          }
+        ],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "issues": [
+        "new_nonmanifold_edge",
+        "welded_Euler_characteristic_changed"
+      ]
+    },
+    {
+      "material": "HeadPrimaryMasked",
+      "source": {
+        "triangles": 1345,
+        "vertices": 1777,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 0,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 3.861538134505916e-06,
+        "sourceMinimumPositiveAreaSquareMetres": 3.861538134505916e-06,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 1,
+          "weldedVertices": 698,
+          "edges": 2043,
+          "triangles": 1345,
+          "euler": 0,
+          "edgeMultiplicity": {
+            "1": 52,
+            "2": 1990,
+            "3": 1
+          },
+          "nonmanifoldEdgeCount": 1
+        },
+        "sourceTopology": {
+          "components": 1,
+          "weldedVertices": 698,
+          "edges": 2043,
+          "triangles": 1345,
+          "euler": 0,
+          "edgeMultiplicity": {
+            "1": 52,
+            "2": 1990,
+            "3": 1
+          },
+          "nonmanifoldEdgeCount": 1
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "priorCandidate": {
+        "triangles": 847,
+        "vertices": 1307,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 0,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 4.557963392796445e-06,
+        "sourceMinimumPositiveAreaSquareMetres": 3.861538134505916e-06,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 1,
+          "weldedVertices": 449,
+          "edges": 1296,
+          "triangles": 847,
+          "euler": 0,
+          "edgeMultiplicity": {
+            "1": 52,
+            "2": 1243,
+            "3": 1
+          },
+          "nonmanifoldEdgeCount": 1
+        },
+        "sourceTopology": {
+          "components": 1,
+          "weldedVertices": 698,
+          "edges": 2043,
+          "triangles": 1345,
+          "euler": 0,
+          "edgeMultiplicity": {
+            "1": 52,
+            "2": 1990,
+            "3": 1
+          },
+          "nonmanifoldEdgeCount": 1
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "repairedCandidate": {
+        "triangles": 847,
+        "vertices": 1307,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 0,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 4.557963392796445e-06,
+        "sourceMinimumPositiveAreaSquareMetres": 3.861538134505916e-06,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 1,
+          "weldedVertices": 449,
+          "edges": 1296,
+          "triangles": 847,
+          "euler": 0,
+          "edgeMultiplicity": {
+            "1": 52,
+            "2": 1243,
+            "3": 1
+          },
+          "nonmanifoldEdgeCount": 1
+        },
+        "sourceTopology": {
+          "components": 1,
+          "weldedVertices": 698,
+          "edges": 2043,
+          "triangles": 1345,
+          "euler": 0,
+          "edgeMultiplicity": {
+            "1": 52,
+            "2": 1990,
+            "3": 1
+          },
+          "nonmanifoldEdgeCount": 1
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "issues": []
+    },
+    {
+      "material": "NearFacePrimaryMasked",
+      "source": {
+        "triangles": 468,
+        "vertices": 553,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 0,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 6.83401050598602e-06,
+        "sourceMinimumPositiveAreaSquareMetres": 6.83401050598602e-06,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 1,
+          "weldedVertices": 293,
+          "edges": 762,
+          "triangles": 468,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 120,
+            "2": 642
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "sourceTopology": {
+          "components": 1,
+          "weldedVertices": 293,
+          "edges": 762,
+          "triangles": 468,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 120,
+            "2": 642
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "priorCandidate": {
+        "triangles": 324,
+        "vertices": 443,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 0,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 6.83401050598602e-06,
+        "sourceMinimumPositiveAreaSquareMetres": 6.83401050598602e-06,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 1,
+          "weldedVertices": 221,
+          "edges": 546,
+          "triangles": 324,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 120,
+            "2": 426
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "sourceTopology": {
+          "components": 1,
+          "weldedVertices": 293,
+          "edges": 762,
+          "triangles": 468,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 120,
+            "2": 642
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "repairedCandidate": {
+        "triangles": 324,
+        "vertices": 443,
+        "zeroAreaAt1eMinus14": 0,
+        "opposedAverageVertexNormals": 0,
+        "zeroUvAt1eMinus14": 0,
+        "minimumAreaSquareMetres": 6.83401050598602e-06,
+        "sourceMinimumPositiveAreaSquareMetres": 6.83401050598602e-06,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 1,
+          "weldedVertices": 221,
+          "edges": 546,
+          "triangles": 324,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 120,
+            "2": 426
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "sourceTopology": {
+          "components": 1,
+          "weldedVertices": 293,
+          "edges": 762,
+          "triangles": 468,
+          "euler": -1,
+          "edgeMultiplicity": {
+            "1": 120,
+            "2": 642
+          },
+          "nonmanifoldEdgeCount": 0
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "issues": []
+    },
+    {
+      "material": "BodyRemainderPrimaryVisible",
+      "source": {
+        "triangles": 11632,
+        "vertices": 16124,
+        "zeroAreaAt1eMinus14": 1,
+        "opposedAverageVertexNormals": 12,
+        "zeroUvAt1eMinus14": 11,
+        "minimumAreaSquareMetres": 0.0,
+        "sourceMinimumPositiveAreaSquareMetres": 1.2029011082071712e-11,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 3,
+          "weldedVertices": 5949,
+          "edges": 17638,
+          "triangles": 11632,
+          "euler": -57,
+          "edgeMultiplicity": {
+            "1": 405,
+            "2": 17216,
+            "3": 9,
+            "4": 8
+          },
+          "nonmanifoldEdgeCount": 17
+        },
+        "sourceTopology": {
+          "components": 3,
+          "weldedVertices": 5949,
+          "edges": 17638,
+          "triangles": 11632,
+          "euler": -57,
+          "edgeMultiplicity": {
+            "1": 405,
+            "2": 17216,
+            "3": 9,
+            "4": 8
+          },
+          "nonmanifoldEdgeCount": 17
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "priorCandidate": {
+        "triangles": 10686,
+        "vertices": 15190,
+        "zeroAreaAt1eMinus14": 1,
+        "opposedAverageVertexNormals": 13,
+        "zeroUvAt1eMinus14": 11,
+        "minimumAreaSquareMetres": 0.0,
+        "sourceMinimumPositiveAreaSquareMetres": 1.2029011082071712e-11,
+        "newDefectTriangles": [
+          {
+            "triangleIndex": 4783,
+            "rows": [
+              8157,
+              8135,
+              8119
+            ],
+            "reasons": [
+              "new_opposed_average_vertex_normal"
+            ],
+            "areaSquareMetres": 1.630773828592575e-05,
+            "crossDotSumVertexNormals": -2.3238086497664666e-05,
+            "uvDeterminant": 7.9940072517104e-07
+          }
+        ],
+        "topology": {
+          "components": 3,
+          "weldedVertices": 5476,
+          "edges": 16219,
+          "triangles": 10686,
+          "euler": -57,
+          "edgeMultiplicity": {
+            "1": 405,
+            "2": 15797,
+            "3": 9,
+            "4": 8
+          },
+          "nonmanifoldEdgeCount": 17
+        },
+        "sourceTopology": {
+          "components": 3,
+          "weldedVertices": 5949,
+          "edges": 17638,
+          "triangles": 11632,
+          "euler": -57,
+          "edgeMultiplicity": {
+            "1": 405,
+            "2": 17216,
+            "3": 9,
+            "4": 8
+          },
+          "nonmanifoldEdgeCount": 17
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "repairedCandidate": {
+        "triangles": 10694,
+        "vertices": 15199,
+        "zeroAreaAt1eMinus14": 1,
+        "opposedAverageVertexNormals": 12,
+        "zeroUvAt1eMinus14": 11,
+        "minimumAreaSquareMetres": 0.0,
+        "sourceMinimumPositiveAreaSquareMetres": 1.2029011082071712e-11,
+        "newDefectTriangles": [],
+        "topology": {
+          "components": 3,
+          "weldedVertices": 5480,
+          "edges": 16231,
+          "triangles": 10694,
+          "euler": -57,
+          "edgeMultiplicity": {
+            "1": 405,
+            "2": 15809,
+            "3": 9,
+            "4": 8
+          },
+          "nonmanifoldEdgeCount": 17
+        },
+        "sourceTopology": {
+          "components": 3,
+          "weldedVertices": 5949,
+          "edges": 17638,
+          "triangles": 11632,
+          "euler": -57,
+          "edgeMultiplicity": {
+            "1": 405,
+            "2": 17216,
+            "3": 9,
+            "4": 8
+          },
+          "nonmanifoldEdgeCount": 17
+        },
+        "newNonmanifoldEdges": [],
+        "newDuplicateAttributeTriangles": 0,
+        "semanticBoundaryExact": true
+      },
+      "issues": []
+    }
+  ],
+  "limits": [
+    "Exactly one repair optimizer invocation, identical settings. No retries or quality threshold changes.",
+    "Static topology/normal/UV witnesses do not prove animated appearance, native admission, RT presentation, GPU or phone performance.",
+    "Inherited exact source degeneracies are retained and reported separately. No face flipping, isolated deletion or first-person/viewmodel changes."
+  ]
+}

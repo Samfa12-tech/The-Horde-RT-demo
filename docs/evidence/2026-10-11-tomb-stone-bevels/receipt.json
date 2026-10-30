@@ -1,0 +1,517 @@
+{
+  "sourceParent": "289589e49b5a5045ee27ffa7a9124278bed2839b",
+  "artifacts": {
+    "androidDebug": {
+      "bytes": 172498840,
+      "sha256": "0fa8de3eb34243dff8fd5406d74dd34dedb3dee83f93813358edea9473d292ed"
+    },
+    "windowsRelease": {
+      "bytes": 4334592,
+      "sha256": "dc580f0bad9eaa78b050727833c941a8f921f7a0ad08f80b2e92bc4f3a5c6227"
+    },
+    "windowsDebug": {
+      "bytes": 12432896,
+      "sha256": "d2bd36bb267624292b995ca76de4a1069ee11fd3ffcc96c4baf9c42576e82759"
+    }
+  },
+  "sourceFiles": {
+    "src/scene/TombDressing.h": "c9eef68c0ee31b4eb8710c7aebd8bb1279e0b241716728bd8edde01df1505bc2",
+    "tests/RtSceneResourceInventoryTests.cpp": "e7d0bb56706e97c3dfdd8439a3c1952383491a677a60c17becdb1fd4514c239e",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "292ac932ae650cc70035f111819836511c2f6841964f5ee307888891c60b687c",
+    "tests/TombDressingTests.cpp": "d22ac9c782973d806d49211b26eed58b3a1954a6f793ad9aa2f30d9f4a45a00a",
+    "src/scene/TombDressing.cpp": "703731390dd504311a109d37933fead5c081968223ff7555a8525ead4c136442",
+    "tests/DevelopmentStaticAssetTests.cpp": "077d9b28527b16ca9f72361ed93301229adc2bcffb1adcf09b46e674bf0a0764",
+    "src/scene/TombStoneBevels.h": "0c695ea7e70305b4804c1c271de21efd1e270d4dcb02bb0b6e5219f0b18bc7c4",
+    "src/gameplay/DevelopmentCheckpoints.h": "19e3c11b461d089ec98edde7ec63beb0b8472fe57749592975f78e5c7a568beb"
+  },
+  "scope": "Screenshot feedback only; live Windows movement and physical Android remain pending",
+  "captures": [
+    {
+      "visibility": {
+        "playerPrimaryVisible": true,
+        "primaryArmsMayBeOutsideFrame": false,
+        "primaryArmsCeilingRetracted": false,
+        "verticalProofPoseWitness": {
+          "supportWorldY": -0.95,
+          "heightDelta": 0.0,
+          "supportId": 1,
+          "heldLightKind": 1,
+          "swordStowBlend": 1.0,
+          "swordHandGripBlend": 0.0,
+          "torchOverheadLoweringMetres": 0.069577,
+          "torchOverheadRetractionMetres": 0.069833
+        },
+        "playerWorldBodyInstanceFlags": 9,
+        "instanceMasks": [
+          1,
+          2,
+          1,
+          2,
+          144,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          32,
+          1,
+          1,
+          64,
+          1,
+          0,
+          1,
+          1,
+          54,
+          1,
+          0
+        ],
+        "diagnostics": {
+          "availability": "Available",
+          "available": true
+        },
+        "primaryPixels": {
+          "torch": 0,
+          "sword": 0,
+          "player": 18,
+          "rewardRing": 0,
+          "rewardBody": 0
+        },
+        "rewardGrip": {
+          "positionErrorMetres": 0.0,
+          "orientationErrorRadians": 0.0,
+          "authorityPositionErrorMetres": 0.0,
+          "authorityOrientationErrorRadians": 0.0,
+          "finalGripPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "ringGripPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "bodyPosition": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13186176,
+        "indexBytes": 2296908,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.342,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.5711,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7709,
+        "productionPropBlasBytes": 7888000,
+        "productionPropBlasBuildMilliseconds": 5.9682
+      },
+      "source": "rt-storage-image",
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "camera": {
+        "x": 0.0,
+        "z": -7.8,
+        "yaw": 3.141593,
+        "pitch": -0.15
+      },
+      "imageSha256": "7aa1ef922bac8512bb211df11db53d1d18eccfc6ba2308aaba4ce633c5353376",
+      "settlingFrames": 12,
+      "executionBackend": "RayTracingPipeline",
+      "complete": true,
+      "label": "rear-before",
+      "error": null,
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      }
+    },
+    {
+      "visibility": {
+        "playerPrimaryVisible": true,
+        "primaryArmsMayBeOutsideFrame": false,
+        "primaryArmsCeilingRetracted": false,
+        "verticalProofPoseWitness": {
+          "supportWorldY": -0.95,
+          "heightDelta": 0.0,
+          "supportId": 1,
+          "heldLightKind": 1,
+          "swordStowBlend": 1.0,
+          "swordHandGripBlend": 0.0,
+          "torchOverheadLoweringMetres": 0.069577,
+          "torchOverheadRetractionMetres": 0.069833
+        },
+        "playerWorldBodyInstanceFlags": 9,
+        "instanceMasks": [
+          1,
+          2,
+          1,
+          2,
+          144,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          32,
+          1,
+          1,
+          64,
+          1,
+          0,
+          1,
+          1,
+          54,
+          1,
+          0
+        ],
+        "diagnostics": {
+          "availability": "Available",
+          "available": true
+        },
+        "primaryPixels": {
+          "torch": 0,
+          "sword": 0,
+          "player": 18,
+          "rewardRing": 0,
+          "rewardBody": 0
+        },
+        "rewardGrip": {
+          "positionErrorMetres": 0.0,
+          "orientationErrorRadians": 0.0,
+          "authorityPositionErrorMetres": 0.0,
+          "authorityOrientationErrorRadians": 0.0,
+          "finalGripPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "ringGripPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "bodyPosition": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13203072,
+        "indexBytes": 2297964,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.8723,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 1.0757,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7966,
+        "productionPropBlasBytes": 7889024,
+        "productionPropBlasBuildMilliseconds": 11.6342
+      },
+      "source": "rt-storage-image",
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "camera": {
+        "x": 0.0,
+        "z": -7.8,
+        "yaw": 3.141593,
+        "pitch": -0.15
+      },
+      "imageSha256": "14d1df3b97e698c7c48ad928da66375ecb1545c15455100ae87b04fd5b9d69ef",
+      "settlingFrames": 12,
+      "executionBackend": "RayTracingPipeline",
+      "complete": true,
+      "label": "rear-pipeline",
+      "error": null,
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      }
+    },
+    {
+      "visibility": {
+        "playerPrimaryVisible": true,
+        "primaryArmsMayBeOutsideFrame": false,
+        "primaryArmsCeilingRetracted": false,
+        "verticalProofPoseWitness": {
+          "supportWorldY": -0.95,
+          "heightDelta": 0.0,
+          "supportId": 1,
+          "heldLightKind": 1,
+          "swordStowBlend": 1.0,
+          "swordHandGripBlend": 0.0,
+          "torchOverheadLoweringMetres": 0.069577,
+          "torchOverheadRetractionMetres": 0.069833
+        },
+        "playerWorldBodyInstanceFlags": 9,
+        "instanceMasks": [
+          1,
+          2,
+          1,
+          2,
+          144,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          32,
+          1,
+          1,
+          64,
+          1,
+          0,
+          1,
+          1,
+          54,
+          1,
+          0
+        ],
+        "diagnostics": {
+          "availability": "Available",
+          "available": true
+        },
+        "primaryPixels": {
+          "torch": 0,
+          "sword": 0,
+          "player": 18,
+          "rewardRing": 0,
+          "rewardBody": 0
+        },
+        "rewardGrip": {
+          "positionErrorMetres": 0.0,
+          "orientationErrorRadians": 0.0,
+          "authorityPositionErrorMetres": 0.0,
+          "authorityOrientationErrorRadians": 0.0,
+          "finalGripPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "ringGripPosition": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "bodyPosition": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13203072,
+        "indexBytes": 2297964,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.4907,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.8154,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.6753,
+        "productionPropBlasBytes": 7889024,
+        "productionPropBlasBuildMilliseconds": 9.3045
+      },
+      "source": "rt-storage-image",
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "57b7a23d6eaed1885001e488654815cbbc1c1e25cec29db16c77b698aac92f13"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "c329f47673a9ed4bb3287c59c52a6db4d7a29dc39814b78beb78b969d2f527ec"
+        }
+      },
+      "camera": {
+        "x": 0.0,
+        "z": -7.8,
+        "yaw": 3.141593,
+        "pitch": -0.15
+      },
+      "imageSha256": "3f2d6bab9523bc68e17e47d8991eedef2bfe5d969e1c6446a744d5cacf6b3ff9",
+      "settlingFrames": 12,
+      "executionBackend": "RayQueryCompute",
+      "complete": true,
+      "label": "rear-query",
+      "error": null,
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      }
+    },
+    {
+      "visibility": null,
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13203072,
+        "indexBytes": 2297964,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.6743,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.8234,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.8509,
+        "productionPropBlasBytes": 7889024,
+        "productionPropBlasBuildMilliseconds": 8.8224
+      },
+      "source": "rt-storage-image",
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "camera": null,
+      "imageSha256": "9ba1e5e6185eaa198a35593710f7719bbb9885f9536558e8c30390d23a9f4867",
+      "settlingFrames": 12,
+      "executionBackend": "RayTracingPipeline",
+      "complete": false,
+      "label": "front",
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.",
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      }
+    },
+    {
+      "visibility": null,
+      "staticRtAsset": {
+        "enabled": true,
+        "vertexBytes": 13203072,
+        "indexBytes": 2297964,
+        "materialBytes": 3840,
+        "instanceMetadataBytes": 832,
+        "primitiveMetadataBytes": 512,
+        "textureBytes": 257250584,
+        "descriptorCount": 9,
+        "blasBytes": 1060096,
+        "blasBuildMilliseconds": 1.5857,
+        "swordBlasBytes": 717696,
+        "swordBlasBuildMilliseconds": 0.8234,
+        "torchBlasBytes": 342400,
+        "torchBlasBuildMilliseconds": 0.7623,
+        "productionPropBlasBytes": 7889024,
+        "productionPropBlasBuildMilliseconds": 7.8251
+      },
+      "source": "rt-storage-image",
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "camera": null,
+      "imageSha256": "00c66c1643100bfa77f35227a235ee390af04d7ced9b0f8c2e11df9a45f62a87",
+      "settlingFrames": 12,
+      "executionBackend": "RayTracingPipeline",
+      "complete": false,
+      "label": "corner",
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.",
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      }
+    }
+  ],
+  "beforeExecutableIdentity": "Not retained; rear-before is the earlier local bevel preview, not an exact-build acceptance receipt",
+  "ownerFeedback": [
+    "Bevel preview: that bevel looks NICE",
+    "Owner cautions the earlier dark edge may be a legitimate moving shadow",
+    "Closed reverse view: perfect!"
+  ]
+}

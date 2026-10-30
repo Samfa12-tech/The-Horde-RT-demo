@@ -1,0 +1,350 @@
+{
+  "schema": 1,
+  "sealedAtUtc": "2026-10-24T04:14:44.506738+00:00",
+  "baseCommit": "1434c356bddb926d4567c68df1ff7b5c2e92e12e",
+  "disposition": "Opt-in shared turn/start prototype only; normal gameplay OFF; large-turn pacing provisional and unadmitted. Original seven clips, assets, saves, route and worker default unchanged.",
+  "source": {
+    "src/gameplay/dialogue/CompanionLocomotion.h": {
+      "workingByteSha256": "4b66a795026d1d2c05013917c04062086e76f546c8697ae8545bc0fdf6eeebbc",
+      "gitBlobIdentity": "90bbdcb1a195265ab143df362f8377269e7893a6"
+    },
+    "src/gameplay/dialogue/CompanionRouteFixture.h": {
+      "workingByteSha256": "928fc47c2b2212341224b9f732113986ea116438001eb1cf25c52493ad92d4ca",
+      "gitBlobIdentity": "5a52bb9be8700d5497adc4177a86cdc8215ed3f6"
+    },
+    "src/gameplay/simulation/GameSimulation.cpp": {
+      "workingByteSha256": "f5d2f0c74ff0209458036bd3497e082dfb7a20ce479f1c8c6959e8143e5cc032",
+      "gitBlobIdentity": "e5efa1242dadc1c64f7b70e250675f17d34d27b7"
+    },
+    "src/gameplay/simulation/GameSimulation.h": {
+      "workingByteSha256": "d6e551e553ed5bc63a693340badc3b2f59dd8fd86a088051ab56357a2245b4f2",
+      "gitBlobIdentity": "be8d0a5f83d7cdb7effd026d504099af24cf426e"
+    },
+    "src/gameplay/simulation/GameSimulationDialogue.cpp": {
+      "workingByteSha256": "54b2d12c90160a5e007af63fe491e50f7cc573e41646b99b417aeff7d6682e05",
+      "gitBlobIdentity": "6586f7ceab2a6cbe734e449305dc1fa13949d147"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "workingByteSha256": "7070ddf2b8e5fb5729e8af65219250e3e08c76a1639e0dd936a6f6451c8cc4b4",
+      "gitBlobIdentity": "4f6b9fb56a8015c7421ebc6f0c0e428b7aa0a6a7"
+    },
+    "src/platform/windows/windows_campaign_validation.inl": {
+      "workingByteSha256": "131f5d2a80609696ea8452d7a95240211e3a655b6ae5270f4ee7ec70ccf1c772",
+      "gitBlobIdentity": "22cec84145046828b0d2dad7a68abca9d80cfe09"
+    },
+    "src/scene/CompanionPose.h": {
+      "workingByteSha256": "39e56f75943f6c4c2bae3caa563dc760bc4584986a438081f1cf719c763b25a5",
+      "gitBlobIdentity": "cee17de35b06a90cbc16f2f57275f1774d269650"
+    },
+    "src/scene/assets/SkinnedMeshAsset.cpp": {
+      "workingByteSha256": "ae63c9a7843047c33578715901a9cc686a49a79267d407997a7feacb7a203331",
+      "gitBlobIdentity": "72c75b08964e9e7491994bedb57765b5422e596d"
+    },
+    "src/scene/assets/SkinnedMeshAsset.h": {
+      "workingByteSha256": "0db8e87d27e2f3b43db097b4a3afd63ab63e5ad87777a6eca38817eb4943f547",
+      "gitBlobIdentity": "a6477b035d490e806767fbbb08cac236c4fdf325"
+    },
+    "src/scene/assets/SkinnedPbrActor.h": {
+      "workingByteSha256": "141989d0cbcd95e45f552db5972e49b15738a1325bb63e1efb5e3b3113235bd1",
+      "gitBlobIdentity": "5e0a8f44d9daa2d82f877af659c5d136aeb0b9e4"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+      "workingByteSha256": "2af7b242bdaac39bcce49ca155bacfb8e5ff5e2f44d6b54b788bbc59f52fd616",
+      "gitBlobIdentity": "a06870823800ab88e26eda68e24eb10c269c020b"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+      "workingByteSha256": "3386aad095f21c47b91a200be723109fd53b3a975eeb420befaf14f2027b711d",
+      "gitBlobIdentity": "40146ebb9a88a15e6d139098efebe7e5b1d326c6"
+    },
+    "tests/CompanionLocomotionTests.cpp": {
+      "workingByteSha256": "f1007784b9246ed618bd75a450e1156548240374efec49c2659b34ff7483b7e8",
+      "gitBlobIdentity": "be691083e95dac4abd0ad88480f989036bc57dff"
+    },
+    "tests/KitSourceIntakeTests.cpp": {
+      "workingByteSha256": "333d0fe7f0c63f52f2149b5fdb292c8a7625afe3d73ef01bc2ad720de790313d",
+      "gitBlobIdentity": "8e50f6852834af36be50e854e476d52e02b91167"
+    },
+    "tests/KitTurnContactData.h": {
+      "workingByteSha256": "651490e069d68080ba9c42942c9c3e02e3f5a59e0af4afcfc61cbb53422a7f8b",
+      "gitBlobIdentity": "2ae737e80678dc9f867fdc9117fbae4b35501acd"
+    },
+    "src/gameplay/dialogue/CompanionTurnProfile.h": {
+      "workingByteSha256": "cc5ff269e47df33204d399a8a2e65114d4d126b333fb863e79bb8f4f7fc4cf96",
+      "gitBlobIdentity": "24fcd54de0dc996fe59c440211b8c75d754b413b"
+    },
+    "src/gameplay/dialogue/CompanionTurnPrototype.inl": {
+      "workingByteSha256": "f496dc00f800e06cabcd5136c960166621cc7bc72c563038a93bcc26d2ff8867",
+      "gitBlobIdentity": "8795d5660462bf6c04b43d8b34a1476c9b4dbb6d"
+    },
+    "tests/CompanionTurnPrototypeValidation.h": {
+      "workingByteSha256": "48458f1a9ba3fca2e8eeb70450668a3951faa715b784ea072c645a687311e44f",
+      "gitBlobIdentity": "ea8073f989655d93b405ee4e26aa9ef074520a62"
+    }
+  },
+  "host": {
+    "DebugSelectedCtests": {
+      "passed": 3,
+      "totalSeconds": 24.7,
+      "locomotionSeconds": 4.33,
+      "dialogueSeconds": 2.19,
+      "checkpointSeconds": 18.16
+    },
+    "locomotionChecks": 2332,
+    "campaignCheckpointChecks": 1058,
+    "namedTurnBindingChecks": 60,
+    "originalIntakeClips": 7,
+    "originalIntakePoses": 35,
+    "sceneResourceInventoryExit": 0,
+    "unchangedPerTestDeadlines": true
+  },
+  "native": {
+    "backend": "RayTracingPipeline",
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driverInfo": "610.47",
+    "executable": {
+      "bytes": 14381056,
+      "sha256": "2f20da985e8e920d9dfc2466a5ac8af5509a7f44c3c0b92ec086bb4f15c070fc"
+    },
+    "settings": {
+      "bytes": 471,
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+    },
+    "runtimeSeconds": 33.31299999999828,
+    "exitCode": 0,
+    "nativeChecks": 578,
+    "failures": 0,
+    "renderCalls": 138,
+    "snapshotImages": 131,
+    "rawReceiptSha256": "1d121241daf6631743b3fde536fab1a3f2c8ed2a57b09e0b1e42d9f154000dcb",
+    "pipeline": {
+      "executionBackend": "RayTracingPipeline",
+      "instrumentation": "diagnostic",
+      "dielectricQuality": "high",
+      "bundleKey": "diagnostic_high_pair",
+      "opaqueFast": {
+        "key": "diagnostic_high_opaque_fast",
+        "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_high_generic_dielectric",
+        "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+      },
+      "activeStrategy": "generic-dielectric",
+      "activeKey": "diagnostic_high_generic_dielectric",
+      "activeSha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+      "waterQuality": "high"
+    },
+    "submittedDimensions": {
+      "internalExtent": [
+        1232,
+        803
+      ],
+      "outputExtent": [
+        1232,
+        803
+      ],
+      "cameraAspect": 1.53424656,
+      "presentationTransform": 0,
+      "dynamicResolutionEnabled": false,
+      "linearBlit": false,
+      "aspectPreserved": true
+    },
+    "everySnapshotCurrentCompletedHardwareRt": true,
+    "samePipelineAndDimensionsForEverySnapshot": true,
+    "perSnapshotReceipts": [
+      {"stage":"control","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":3,"recordSerial":3,"submissionSerial":3,"completionSerial":3,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":3,"finalIdleCompletion":true}},
+      {"stage":"depart-0000","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":4,"recordSerial":4,"submissionSerial":4,"completionSerial":4,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":4,"finalIdleCompletion":true}},
+      {"stage":"depart-0001","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":5,"recordSerial":5,"submissionSerial":5,"completionSerial":5,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":5,"finalIdleCompletion":true}},
+      {"stage":"depart-0002","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":6,"recordSerial":6,"submissionSerial":6,"completionSerial":6,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":6,"finalIdleCompletion":true}},
+      {"stage":"depart-0003","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":7,"recordSerial":7,"submissionSerial":7,"completionSerial":7,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":7,"finalIdleCompletion":true}},
+      {"stage":"depart-0004","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":8,"recordSerial":8,"submissionSerial":8,"completionSerial":8,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":8,"finalIdleCompletion":true}},
+      {"stage":"depart-0005","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":9,"recordSerial":9,"submissionSerial":9,"completionSerial":9,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":9,"finalIdleCompletion":true}},
+      {"stage":"depart-0006","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":10,"recordSerial":10,"submissionSerial":10,"completionSerial":10,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":10,"finalIdleCompletion":true}},
+      {"stage":"depart-0007","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":11,"recordSerial":11,"submissionSerial":11,"completionSerial":11,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":11,"finalIdleCompletion":true}},
+      {"stage":"depart-0008","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":12,"recordSerial":12,"submissionSerial":12,"completionSerial":12,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":12,"finalIdleCompletion":true}},
+      {"stage":"depart-0009","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":13,"recordSerial":13,"submissionSerial":13,"completionSerial":13,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":13,"finalIdleCompletion":true}},
+      {"stage":"depart-0010","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":14,"recordSerial":14,"submissionSerial":14,"completionSerial":14,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":14,"finalIdleCompletion":true}},
+      {"stage":"depart-0011","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":15,"recordSerial":15,"submissionSerial":15,"completionSerial":15,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":15,"finalIdleCompletion":true}},
+      {"stage":"depart-0012","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":16,"recordSerial":16,"submissionSerial":16,"completionSerial":16,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":16,"finalIdleCompletion":true}},
+      {"stage":"depart-0013","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":17,"recordSerial":17,"submissionSerial":17,"completionSerial":17,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":17,"finalIdleCompletion":true}},
+      {"stage":"depart-0014","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":18,"recordSerial":18,"submissionSerial":18,"completionSerial":18,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":18,"finalIdleCompletion":true}},
+      {"stage":"depart-0015","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":19,"recordSerial":19,"submissionSerial":19,"completionSerial":19,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":19,"finalIdleCompletion":true}},
+      {"stage":"pause-a","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":20,"recordSerial":20,"submissionSerial":20,"completionSerial":20,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":20,"finalIdleCompletion":true}},
+      {"stage":"pause-b","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":21,"recordSerial":21,"submissionSerial":21,"completionSerial":21,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":21,"finalIdleCompletion":true}},
+      {"stage":"resume","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":22,"recordSerial":22,"submissionSerial":22,"completionSerial":22,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":22,"finalIdleCompletion":true}},
+      {"stage":"depart-0016","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":23,"recordSerial":23,"submissionSerial":23,"completionSerial":23,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":23,"finalIdleCompletion":true}},
+      {"stage":"depart-0017","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":24,"recordSerial":24,"submissionSerial":24,"completionSerial":24,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":24,"finalIdleCompletion":true}},
+      {"stage":"depart-0018","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":25,"recordSerial":25,"submissionSerial":25,"completionSerial":25,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":25,"finalIdleCompletion":true}},
+      {"stage":"depart-0019","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":26,"recordSerial":26,"submissionSerial":26,"completionSerial":26,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":26,"finalIdleCompletion":true}},
+      {"stage":"depart-0020","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":27,"recordSerial":27,"submissionSerial":27,"completionSerial":27,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":27,"finalIdleCompletion":true}},
+      {"stage":"depart-0021","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":28,"recordSerial":28,"submissionSerial":28,"completionSerial":28,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":28,"finalIdleCompletion":true}},
+      {"stage":"depart-0022","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":29,"recordSerial":29,"submissionSerial":29,"completionSerial":29,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":29,"finalIdleCompletion":true}},
+      {"stage":"depart-0023","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":30,"recordSerial":30,"submissionSerial":30,"completionSerial":30,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":30,"finalIdleCompletion":true}},
+      {"stage":"depart-0024","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":31,"recordSerial":31,"submissionSerial":31,"completionSerial":31,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":31,"finalIdleCompletion":true}},
+      {"stage":"depart-0025","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":32,"recordSerial":32,"submissionSerial":32,"completionSerial":32,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":32,"finalIdleCompletion":true}},
+      {"stage":"depart-0026","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":33,"recordSerial":33,"submissionSerial":33,"completionSerial":33,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":33,"finalIdleCompletion":true}},
+      {"stage":"depart-0027","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":34,"recordSerial":34,"submissionSerial":34,"completionSerial":34,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":34,"finalIdleCompletion":true}},
+      {"stage":"depart-0028","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":35,"recordSerial":35,"submissionSerial":35,"completionSerial":35,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":35,"finalIdleCompletion":true}},
+      {"stage":"depart-0029","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":36,"recordSerial":36,"submissionSerial":36,"completionSerial":36,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":36,"finalIdleCompletion":true}},
+      {"stage":"depart-0030","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":37,"recordSerial":37,"submissionSerial":37,"completionSerial":37,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":37,"finalIdleCompletion":true}},
+      {"stage":"depart-0031","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":38,"recordSerial":38,"submissionSerial":38,"completionSerial":38,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":38,"finalIdleCompletion":true}},
+      {"stage":"depart-0032","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":39,"recordSerial":39,"submissionSerial":39,"completionSerial":39,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":39,"finalIdleCompletion":true}},
+      {"stage":"depart-0033","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":40,"recordSerial":40,"submissionSerial":40,"completionSerial":40,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":40,"finalIdleCompletion":true}},
+      {"stage":"depart-0034","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":41,"recordSerial":41,"submissionSerial":41,"completionSerial":41,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":41,"finalIdleCompletion":true}},
+      {"stage":"depart-0035","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":42,"recordSerial":42,"submissionSerial":42,"completionSerial":42,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":42,"finalIdleCompletion":true}},
+      {"stage":"depart-0036","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":43,"recordSerial":43,"submissionSerial":43,"completionSerial":43,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":43,"finalIdleCompletion":true}},
+      {"stage":"depart-0037","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":44,"recordSerial":44,"submissionSerial":44,"completionSerial":44,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":44,"finalIdleCompletion":true}},
+      {"stage":"depart-0038","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":45,"recordSerial":45,"submissionSerial":45,"completionSerial":45,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":45,"finalIdleCompletion":true}},
+      {"stage":"depart-0039","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":46,"recordSerial":46,"submissionSerial":46,"completionSerial":46,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":46,"finalIdleCompletion":true}},
+      {"stage":"depart-0040","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":47,"recordSerial":47,"submissionSerial":47,"completionSerial":47,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":47,"finalIdleCompletion":true}},
+      {"stage":"depart-0041","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":48,"recordSerial":48,"submissionSerial":48,"completionSerial":48,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":48,"finalIdleCompletion":true}},
+      {"stage":"depart-0042","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":49,"recordSerial":49,"submissionSerial":49,"completionSerial":49,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":49,"finalIdleCompletion":true}},
+      {"stage":"depart-0043","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":50,"recordSerial":50,"submissionSerial":50,"completionSerial":50,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":50,"finalIdleCompletion":true}},
+      {"stage":"depart-0044","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":51,"recordSerial":51,"submissionSerial":51,"completionSerial":51,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":51,"finalIdleCompletion":true}},
+      {"stage":"depart-0045","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":52,"recordSerial":52,"submissionSerial":52,"completionSerial":52,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":52,"finalIdleCompletion":true}},
+      {"stage":"depart-0046","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":53,"recordSerial":53,"submissionSerial":53,"completionSerial":53,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":53,"finalIdleCompletion":true}},
+      {"stage":"depart-0047","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":54,"recordSerial":54,"submissionSerial":54,"completionSerial":54,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":54,"finalIdleCompletion":true}},
+      {"stage":"depart-0048","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":55,"recordSerial":55,"submissionSerial":55,"completionSerial":55,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":55,"finalIdleCompletion":true}},
+      {"stage":"depart-0049","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":56,"recordSerial":56,"submissionSerial":56,"completionSerial":56,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":56,"finalIdleCompletion":true}},
+      {"stage":"depart-0050","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":57,"recordSerial":57,"submissionSerial":57,"completionSerial":57,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":57,"finalIdleCompletion":true}},
+      {"stage":"depart-0051","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":58,"recordSerial":58,"submissionSerial":58,"completionSerial":58,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":58,"finalIdleCompletion":true}},
+      {"stage":"depart-0052","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":59,"recordSerial":59,"submissionSerial":59,"completionSerial":59,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":59,"finalIdleCompletion":true}},
+      {"stage":"depart-0053","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":60,"recordSerial":60,"submissionSerial":60,"completionSerial":60,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":60,"finalIdleCompletion":true}},
+      {"stage":"depart-0054","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":61,"recordSerial":61,"submissionSerial":61,"completionSerial":61,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":61,"finalIdleCompletion":true}},
+      {"stage":"depart-0055","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":62,"recordSerial":62,"submissionSerial":62,"completionSerial":62,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":62,"finalIdleCompletion":true}},
+      {"stage":"depart-0056","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":63,"recordSerial":63,"submissionSerial":63,"completionSerial":63,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":63,"finalIdleCompletion":true}},
+      {"stage":"depart-0057","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":64,"recordSerial":64,"submissionSerial":64,"completionSerial":64,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":64,"finalIdleCompletion":true}},
+      {"stage":"depart-0058","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":65,"recordSerial":65,"submissionSerial":65,"completionSerial":65,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":65,"finalIdleCompletion":true}},
+      {"stage":"depart-0059","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":66,"recordSerial":66,"submissionSerial":66,"completionSerial":66,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":66,"finalIdleCompletion":true}},
+      {"stage":"depart-0060","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":67,"recordSerial":67,"submissionSerial":67,"completionSerial":67,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":67,"finalIdleCompletion":true}},
+      {"stage":"depart-0061","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":68,"recordSerial":68,"submissionSerial":68,"completionSerial":68,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":68,"finalIdleCompletion":true}},
+      {"stage":"depart-0062","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":69,"recordSerial":69,"submissionSerial":69,"completionSerial":69,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":69,"finalIdleCompletion":true}},
+      {"stage":"depart-0063","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":70,"recordSerial":70,"submissionSerial":70,"completionSerial":70,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":70,"finalIdleCompletion":true}},
+      {"stage":"depart-0064","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":71,"recordSerial":71,"submissionSerial":71,"completionSerial":71,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":71,"finalIdleCompletion":true}},
+      {"stage":"depart-0065","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":72,"recordSerial":72,"submissionSerial":72,"completionSerial":72,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":72,"finalIdleCompletion":true}},
+      {"stage":"depart-0066","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":73,"recordSerial":73,"submissionSerial":73,"completionSerial":73,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":73,"finalIdleCompletion":true}},
+      {"stage":"depart-0067","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":74,"recordSerial":74,"submissionSerial":74,"completionSerial":74,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":74,"finalIdleCompletion":true}},
+      {"stage":"depart-0068","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":75,"recordSerial":75,"submissionSerial":75,"completionSerial":75,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":75,"finalIdleCompletion":true}},
+      {"stage":"depart-0069","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":76,"recordSerial":76,"submissionSerial":76,"completionSerial":76,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":76,"finalIdleCompletion":true}},
+      {"stage":"depart-0070","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":77,"recordSerial":77,"submissionSerial":77,"completionSerial":77,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":77,"finalIdleCompletion":true}},
+      {"stage":"depart-0071","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":78,"recordSerial":78,"submissionSerial":78,"completionSerial":78,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":78,"finalIdleCompletion":true}},
+      {"stage":"depart-0072","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":79,"recordSerial":79,"submissionSerial":79,"completionSerial":79,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":79,"finalIdleCompletion":true}},
+      {"stage":"depart-0073","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":80,"recordSerial":80,"submissionSerial":80,"completionSerial":80,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":80,"finalIdleCompletion":true}},
+      {"stage":"depart-0074","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":81,"recordSerial":81,"submissionSerial":81,"completionSerial":81,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":81,"finalIdleCompletion":true}},
+      {"stage":"depart-0075","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":82,"recordSerial":82,"submissionSerial":82,"completionSerial":82,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":82,"finalIdleCompletion":true}},
+      {"stage":"depart-0076","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":83,"recordSerial":83,"submissionSerial":83,"completionSerial":83,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":83,"finalIdleCompletion":true}},
+      {"stage":"depart-0077","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":84,"recordSerial":84,"submissionSerial":84,"completionSerial":84,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":84,"finalIdleCompletion":true}},
+      {"stage":"depart-0078","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":85,"recordSerial":85,"submissionSerial":85,"completionSerial":85,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":85,"finalIdleCompletion":true}},
+      {"stage":"depart-0079","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":86,"recordSerial":86,"submissionSerial":86,"completionSerial":86,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":86,"finalIdleCompletion":true}},
+      {"stage":"depart-0080","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":87,"recordSerial":87,"submissionSerial":87,"completionSerial":87,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":87,"finalIdleCompletion":true}},
+      {"stage":"depart-0081","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":88,"recordSerial":88,"submissionSerial":88,"completionSerial":88,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":88,"finalIdleCompletion":true}},
+      {"stage":"depart-0082","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":89,"recordSerial":89,"submissionSerial":89,"completionSerial":89,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":89,"finalIdleCompletion":true}},
+      {"stage":"depart-0083","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":90,"recordSerial":90,"submissionSerial":90,"completionSerial":90,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":90,"finalIdleCompletion":true}},
+      {"stage":"depart-0084","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":91,"recordSerial":91,"submissionSerial":91,"completionSerial":91,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":91,"finalIdleCompletion":true}},
+      {"stage":"depart-0085","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":92,"recordSerial":92,"submissionSerial":92,"completionSerial":92,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":92,"finalIdleCompletion":true}},
+      {"stage":"depart-0086","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":93,"recordSerial":93,"submissionSerial":93,"completionSerial":93,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":93,"finalIdleCompletion":true}},
+      {"stage":"depart-0087","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":94,"recordSerial":94,"submissionSerial":94,"completionSerial":94,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":94,"finalIdleCompletion":true}},
+      {"stage":"depart-0088","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":95,"recordSerial":95,"submissionSerial":95,"completionSerial":95,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":95,"finalIdleCompletion":true}},
+      {"stage":"depart-0089","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":96,"recordSerial":96,"submissionSerial":96,"completionSerial":96,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":96,"finalIdleCompletion":true}},
+      {"stage":"depart-0090","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":97,"recordSerial":97,"submissionSerial":97,"completionSerial":97,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":97,"finalIdleCompletion":true}},
+      {"stage":"depart-0091","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":98,"recordSerial":98,"submissionSerial":98,"completionSerial":98,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":98,"finalIdleCompletion":true}},
+      {"stage":"depart-0092","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":99,"recordSerial":99,"submissionSerial":99,"completionSerial":99,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":99,"finalIdleCompletion":true}},
+      {"stage":"depart-0093","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":100,"recordSerial":100,"submissionSerial":100,"completionSerial":100,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":100,"finalIdleCompletion":true}},
+      {"stage":"depart-0094","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":101,"recordSerial":101,"submissionSerial":101,"completionSerial":101,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":101,"finalIdleCompletion":true}},
+      {"stage":"depart-0095","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":102,"recordSerial":102,"submissionSerial":102,"completionSerial":102,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":102,"finalIdleCompletion":true}},
+      {"stage":"depart-0096","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":103,"recordSerial":103,"submissionSerial":103,"completionSerial":103,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":103,"finalIdleCompletion":true}},
+      {"stage":"depart-0097","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":104,"recordSerial":104,"submissionSerial":104,"completionSerial":104,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":104,"finalIdleCompletion":true}},
+      {"stage":"depart-0098","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":105,"recordSerial":105,"submissionSerial":105,"completionSerial":105,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":105,"finalIdleCompletion":true}},
+      {"stage":"depart-0099","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":106,"recordSerial":106,"submissionSerial":106,"completionSerial":106,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":106,"finalIdleCompletion":true}},
+      {"stage":"depart-0100","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":107,"recordSerial":107,"submissionSerial":107,"completionSerial":107,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":107,"finalIdleCompletion":true}},
+      {"stage":"depart-0101","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":108,"recordSerial":108,"submissionSerial":108,"completionSerial":108,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":108,"finalIdleCompletion":true}},
+      {"stage":"depart-0102","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":109,"recordSerial":109,"submissionSerial":109,"completionSerial":109,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":109,"finalIdleCompletion":true}},
+      {"stage":"depart-0103","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":110,"recordSerial":110,"submissionSerial":110,"completionSerial":110,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":110,"finalIdleCompletion":true}},
+      {"stage":"depart-0104","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":111,"recordSerial":111,"submissionSerial":111,"completionSerial":111,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":111,"finalIdleCompletion":true}},
+      {"stage":"depart-0105","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":112,"recordSerial":112,"submissionSerial":112,"completionSerial":112,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":112,"finalIdleCompletion":true}},
+      {"stage":"depart-0106","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":113,"recordSerial":113,"submissionSerial":113,"completionSerial":113,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":113,"finalIdleCompletion":true}},
+      {"stage":"depart-0107","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":114,"recordSerial":114,"submissionSerial":114,"completionSerial":114,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":114,"finalIdleCompletion":true}},
+      {"stage":"depart-0108","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":115,"recordSerial":115,"submissionSerial":115,"completionSerial":115,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":115,"finalIdleCompletion":true}},
+      {"stage":"stop","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":116,"recordSerial":116,"submissionSerial":116,"completionSerial":116,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":116,"finalIdleCompletion":true}},
+      {"stage":"partial-begin","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":117,"recordSerial":117,"submissionSerial":117,"completionSerial":117,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":117,"finalIdleCompletion":true}},
+      {"stage":"partial-mid","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":118,"recordSerial":118,"submissionSerial":118,"completionSerial":118,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":118,"finalIdleCompletion":true}},
+      {"stage":"opposite-request","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":119,"recordSerial":119,"submissionSerial":119,"completionSerial":119,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":119,"finalIdleCompletion":true}},
+      {"stage":"opposite-mid","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":120,"recordSerial":120,"submissionSerial":120,"completionSerial":120,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":120,"finalIdleCompletion":true}},
+      {"stage":"opposite-end","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":121,"recordSerial":121,"submissionSerial":121,"completionSerial":121,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":121,"finalIdleCompletion":true}},
+      {"stage":"speech","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":122,"recordSerial":122,"submissionSerial":122,"completionSerial":122,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":122,"finalIdleCompletion":true}},
+      {"stage":"speech-restored","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":123,"recordSerial":123,"submissionSerial":123,"completionSerial":123,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":123,"finalIdleCompletion":true}},
+      {"stage":"slope","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":124,"recordSerial":124,"submissionSerial":124,"completionSerial":124,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":124,"finalIdleCompletion":true}},
+      {"stage":"corner-before","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":125,"recordSerial":125,"submissionSerial":125,"completionSerial":125,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":125,"finalIdleCompletion":true}},
+      {"stage":"corner-at","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":126,"recordSerial":126,"submissionSerial":126,"completionSerial":126,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":126,"finalIdleCompletion":true}},
+      {"stage":"corner-after","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":127,"recordSerial":127,"submissionSerial":127,"completionSerial":127,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":127,"finalIdleCompletion":true}},
+      {"stage":"corner-turn-begin","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":128,"recordSerial":128,"submissionSerial":128,"completionSerial":128,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":128,"finalIdleCompletion":true}},
+      {"stage":"corner-turn-mid","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":129,"recordSerial":129,"submissionSerial":129,"completionSerial":129,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":129,"finalIdleCompletion":true}},
+      {"stage":"corner-turn-end","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":130,"recordSerial":130,"submissionSerial":130,"completionSerial":130,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":130,"finalIdleCompletion":true}},
+      {"stage":"corner-first-walk","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":131,"recordSerial":131,"submissionSerial":131,"completionSerial":131,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":131,"finalIdleCompletion":true}},
+      {"stage":"reset","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":132,"recordSerial":132,"submissionSerial":132,"completionSerial":132,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":132,"finalIdleCompletion":true}},
+      {"stage":"restored","identity":{"sceneEpoch":3,"measurementGeneration":1,"recordAttemptSerial":133,"recordSerial":133,"submissionSerial":133,"completionSerial":133,"simulationTick":2,"frameSlot":0},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":133,"finalIdleCompletion":true}}
+    ],
+    "actualControllerTerrainCoverage": "continuous large departure; partial/opposite samples; pause/resume; speech metadata; slope; first sharp corner begin/mid/end/start; reset and EntryMenu retirement",
+    "legacyFirstMovingHeadingErrorDegrees": 152.9333217185242,
+    "prototypeFirstMovingHeadingErrorDegrees": 2.7320747615679636e-05,
+    "firstWalkDelaySeconds": 3.216666666666667,
+    "pauseImagesIdentical": true,
+    "resetOrdinaryImageIdentical": true,
+    "inspectionActorReleased": true,
+    "foregroundUnchanged": true,
+    "custodyUnchanged": true,
+    "ownerFilesChecked": 151,
+    "zeroCampaignWriteAttempts": true,
+    "ownerCampaignExisted": false
+  },
+  "assetCustody": {
+    "assets/models/characters/source/kit-warden-v1/briarhold-warden-1k.glb": {
+      "bytes": 7034964,
+      "sha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e"
+    },
+    "assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb": {
+      "bytes": 2151672,
+      "sha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713"
+    },
+    "assets/models/characters/source/kit-step-turn-proof-v1/native/kit-turn-proof.glb": {
+      "bytes": 2272652,
+      "sha256": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11"
+    },
+    "assets/models/characters/source/kit-step-turn-proof-v1/native/root-motion.json": {
+      "bytes": 7855,
+      "sha256": "7a4928d4dfec5184071c96a4c8e1f25e07d7ce7c87545324450e75b0c29061d9"
+    }
+  },
+  "manualAcceptance": {
+    "productionEnabled": false,
+    "phoneUsed": false,
+    "foregroundActivationAttempted": false,
+    "earnedJourney": false,
+    "liveVoiceListening": false,
+    "workerDynamicParity": false,
+    "humanComfortAccepted": false
+  },
+  "precedingDocumentationCi": {
+    "commit": "1434c356bddb926d4567c68df1ff7b5c2e92e12e",
+    "run": 40059726798,
+    "allSixJobs": "success"
+  },
+  "reviewArtifacts": {
+    "context-contact-sheet.jpg": {
+      "bytes": 660225,
+      "sha256": "2896e0e5f99d945dcbf11605bb7a28f5428af8bb22071803accdeaa1810b5e34"
+    },
+    "departure-contact-sheet.jpg": {
+      "bytes": 535065,
+      "sha256": "86f295b243e9a9d8130662632105336e3ab1eb198b187a982c8f05aaee2b803b"
+    },
+    "shared-controller-departure-1x.mp4": {
+      "bytes": 601715,
+      "sha256": "6584516747f590da59599e3c936ee75acdefc9f8355f4de063d4d2debf2088a7"
+    },
+    "timeline.json": {
+      "bytes": 86347,
+      "sha256": "021cd1dc160f4b5193d070d2e2fe24b7adde0b9900cd83a26e631ea01d11e722"
+    }
+  }
+}

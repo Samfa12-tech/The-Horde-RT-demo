@@ -1,0 +1,28 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 56
+    Start 56: horde_rt_combat_foundation_tests
+
+56: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-debug\Debug\horde_rt_combat_foundation_tests.exe"
+56: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+56: Test timeout computed to be: 30
+56: Waterfall room-edge contacts=2 killed-A-position=(-7.98,-15.2) guard-health-after-cuts=0,2 B-windup=1 B-practice-contact=1 skipped-health=2
+56: combat foundation checks=766 failures=0
+1/1 Test #56: horde_rt_combat_foundation_tests ...   Passed    8.54 sec
+
+The following tests passed:
+	horde_rt_combat_foundation_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   8.56 sec

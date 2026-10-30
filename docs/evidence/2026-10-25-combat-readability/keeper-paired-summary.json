@@ -1,0 +1,469 @@
+{
+  "scope": "One unpaced paired Debug RT cast, not sustained gameplay, causal performance gain or phone acceptance",
+  "runs": {
+    "control": {
+      "summary": {
+        "complete": true,
+        "evidenceClass": "Debug hidden fixed-input live Keeper practice; incoming damage disabled; not natural victory, balance, performance or phone acceptance",
+        "castStyle": 0,
+        "frames": 279,
+        "images": 104,
+        "fixedSimulationHz": 60,
+        "unpaced": true,
+        "chargeStartMotorTick": 98,
+        "warningMotorTick": 152,
+        "dischargeMotorTick": 170,
+        "neutralReturnMotorTick": 278,
+        "warningPulses": 1,
+        "damagePulses": 1
+      },
+      "rowCount": 279,
+      "phases": {
+        "all": {
+          "frames": 279,
+          "skinCpuMs": {
+            "median": 25.2613,
+            "mean": 24.27313046594982,
+            "range": [
+              20.0654,
+              43.2638
+            ]
+          },
+          "characterSkinCpuMs": {
+            "median": 4.8007,
+            "mean": 2.8263021505376344,
+            "range": [
+              0.0,
+              11.3438
+            ]
+          },
+          "characterAnimationCpuMs": {
+            "median": 0.127,
+            "mean": 0.08246594982078853,
+            "range": [
+              0.0,
+              0.5866
+            ]
+          },
+          "characterVerticesCpuMs": {
+            "median": 2.5448,
+            "mean": 1.4942903225806452,
+            "range": [
+              0.0,
+              7.3281
+            ]
+          },
+          "blasRefitRecordCpuMs": {
+            "median": 0.0678,
+            "mean": 0.07374695340501793,
+            "range": [
+              0.056,
+              0.2424
+            ]
+          },
+          "wholeFrameCycleCpuMs": {
+            "median": 33.1962,
+            "mean": 34.9413311827957,
+            "range": [
+              27.8007,
+              655.4946
+            ]
+          },
+          "characterPoseEvaluations": 150,
+          "characterVerticesProcessed": 1776912,
+          "blasRefitRecordInvocations": 708,
+          "gpuWholeRtMedianMs": 8.652224
+        },
+        "charge": {
+          "frames": 72,
+          "skinCpuMs": {
+            "median": 26.51145,
+            "mean": 26.723154166666667,
+            "range": [
+              20.3135,
+              43.2638
+            ]
+          },
+          "characterSkinCpuMs": {
+            "median": 5.02595,
+            "mean": 4.732793055555556,
+            "range": [
+              0.0,
+              9.9267
+            ]
+          },
+          "characterAnimationCpuMs": {
+            "median": 0.14475,
+            "mean": 0.14544166666666666,
+            "range": [
+              0.0,
+              0.5866
+            ]
+          },
+          "characterVerticesCpuMs": {
+            "median": 2.60915,
+            "mean": 2.486336111111111,
+            "range": [
+              0.0,
+              5.2445
+            ]
+          },
+          "blasRefitRecordCpuMs": {
+            "median": 0.0727,
+            "mean": 0.08055694444444444,
+            "range": [
+              0.0626,
+              0.2424
+            ]
+          },
+          "wholeFrameCycleCpuMs": {
+            "median": 35.045100000000005,
+            "mean": 35.609409722222225,
+            "range": [
+              28.1617,
+              59.4243
+            ]
+          },
+          "characterPoseEvaluations": 62,
+          "characterVerticesProcessed": 736126,
+          "blasRefitRecordInvocations": 206,
+          "gpuWholeRtMedianMs": 8.646927999999999
+        },
+        "recovery": {
+          "frames": 108,
+          "skinCpuMs": {
+            "median": 23.110599999999998,
+            "mean": 23.584144444444444,
+            "range": [
+              20.0929,
+              28.8312
+            ]
+          },
+          "characterSkinCpuMs": {
+            "median": 0.0,
+            "mean": 2.3533546296296297,
+            "range": [
+              0.0,
+              7.0815
+            ]
+          },
+          "characterAnimationCpuMs": {
+            "median": 0.0,
+            "mean": 0.06706203703703703,
+            "range": [
+              0.0,
+              0.3226
+            ]
+          },
+          "characterVerticesCpuMs": {
+            "median": 0.0,
+            "mean": 1.2318546296296295,
+            "range": [
+              0.0,
+              3.7147
+            ]
+          },
+          "blasRefitRecordCpuMs": {
+            "median": 0.0654,
+            "mean": 0.06903518518518519,
+            "range": [
+              0.0573,
+              0.1695
+            ]
+          },
+          "wholeFrameCycleCpuMs": {
+            "median": 32.1961,
+            "mean": 31.905101851851853,
+            "range": [
+              27.8007,
+              43.3521
+            ]
+          },
+          "characterPoseEvaluations": 50,
+          "characterVerticesProcessed": 593650,
+          "blasRefitRecordInvocations": 266,
+          "gpuWholeRtMedianMs": 8.946895999999999
+        }
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "opaque-fast",
+        "activeKey": "diagnostic_high_opaque_fast",
+        "activeSha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0",
+        "waterQuality": "high"
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "exeSha256": "194e955092af9a20e7a22c02817df2b8c671bd6ccf994d59dba092d387dc127a",
+      "wrapperExit": 0,
+      "renderExit": 0,
+      "custodyUnchanged": true
+    },
+    "candidate": {
+      "summary": {
+        "complete": true,
+        "evidenceClass": "Debug hidden fixed-input live Keeper practice; incoming damage disabled; not natural victory, balance, performance or phone acceptance",
+        "castStyle": 1,
+        "frames": 279,
+        "images": 104,
+        "fixedSimulationHz": 60,
+        "unpaced": true,
+        "chargeStartMotorTick": 98,
+        "warningMotorTick": 152,
+        "dischargeMotorTick": 170,
+        "neutralReturnMotorTick": 278,
+        "warningPulses": 1,
+        "damagePulses": 1
+      },
+      "rowCount": 279,
+      "phases": {
+        "all": {
+          "frames": 279,
+          "skinCpuMs": {
+            "median": 27.6237,
+            "mean": 28.034647311827957,
+            "range": [
+              20.6627,
+              57.4494
+            ]
+          },
+          "characterSkinCpuMs": {
+            "median": 5.0023,
+            "mean": 3.5112329749103943,
+            "range": [
+              0.0,
+              13.8257
+            ]
+          },
+          "characterAnimationCpuMs": {
+            "median": 0.1418,
+            "mean": 0.10718422939068101,
+            "range": [
+              0.0,
+              0.4859
+            ]
+          },
+          "characterVerticesCpuMs": {
+            "median": 2.5775,
+            "mean": 1.8035569892473118,
+            "range": [
+              0.0,
+              7.5233
+            ]
+          },
+          "blasRefitRecordCpuMs": {
+            "median": 0.0757,
+            "mean": 0.08790322580645162,
+            "range": [
+              0.0594,
+              0.3436
+            ]
+          },
+          "wholeFrameCycleCpuMs": {
+            "median": 37.6627,
+            "mean": 40.4040688172043,
+            "range": [
+              29.4006,
+              615.8776
+            ]
+          },
+          "characterPoseEvaluations": 166,
+          "characterVerticesProcessed": 1966880,
+          "blasRefitRecordInvocations": 724,
+          "gpuWholeRtMedianMs": 8.69376
+        },
+        "charge": {
+          "frames": 72,
+          "skinCpuMs": {
+            "median": 29.947699999999998,
+            "mean": 31.09872638888889,
+            "range": [
+              22.9198,
+              57.4494
+            ]
+          },
+          "characterSkinCpuMs": {
+            "median": 5.58245,
+            "mean": 5.120691666666667,
+            "range": [
+              0.0,
+              9.1529
+            ]
+          },
+          "characterAnimationCpuMs": {
+            "median": 0.15525,
+            "mean": 0.15593055555555554,
+            "range": [
+              0.0,
+              0.3042
+            ]
+          },
+          "characterVerticesCpuMs": {
+            "median": 2.7247500000000002,
+            "mean": 2.6414208333333336,
+            "range": [
+              0.0,
+              5.1092
+            ]
+          },
+          "blasRefitRecordCpuMs": {
+            "median": 0.0795,
+            "mean": 0.09348333333333333,
+            "range": [
+              0.0654,
+              0.3436
+            ]
+          },
+          "wholeFrameCycleCpuMs": {
+            "median": 39.716300000000004,
+            "mean": 42.063431944444446,
+            "range": [
+              32.6034,
+              76.3426
+            ]
+          },
+          "characterPoseEvaluations": 62,
+          "characterVerticesProcessed": 736126,
+          "blasRefitRecordInvocations": 206,
+          "gpuWholeRtMedianMs": 8.64032
+        },
+        "recovery": {
+          "frames": 108,
+          "skinCpuMs": {
+            "median": 27.2971,
+            "mean": 27.347346296296298,
+            "range": [
+              20.6627,
+              37.714
+            ]
+          },
+          "characterSkinCpuMs": {
+            "median": 4.9998000000000005,
+            "mean": 3.6005814814814814,
+            "range": [
+              0.0,
+              8.4836
+            ]
+          },
+          "characterAnimationCpuMs": {
+            "median": 0.1416,
+            "mean": 0.11077407407407408,
+            "range": [
+              0.0,
+              0.4707
+            ]
+          },
+          "characterVerticesCpuMs": {
+            "median": 2.5760500000000004,
+            "mean": 1.8373398148148148,
+            "range": [
+              0.0,
+              4.6424
+            ]
+          },
+          "blasRefitRecordCpuMs": {
+            "median": 0.07365,
+            "mean": 0.0864037037037037,
+            "range": [
+              0.0602,
+              0.3083
+            ]
+          },
+          "wholeFrameCycleCpuMs": {
+            "median": 37.18425,
+            "mean": 37.46608425925926,
+            "range": [
+              29.6617,
+              50.4248
+            ]
+          },
+          "characterPoseEvaluations": 66,
+          "characterVerticesProcessed": 783618,
+          "blasRefitRecordInvocations": 282,
+          "gpuWholeRtMedianMs": 8.97968
+        }
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "high",
+        "bundleKey": "diagnostic_high_pair",
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "7915286541c5178c1f7258dd4b08d8b4a74bc7aba7b6d339d44362b8aa69604a"
+        },
+        "activeStrategy": "opaque-fast",
+        "activeKey": "diagnostic_high_opaque_fast",
+        "activeSha256": "e4723c5313d81d73cc747ecc072d254d607a43f41e0cac5279adf8b0c3561ae0",
+        "waterQuality": "high"
+      },
+      "dimensions": {
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "cameraAspect": 1.77777779,
+        "presentationTransform": 0,
+        "dynamicResolutionEnabled": false,
+        "linearBlit": false,
+        "aspectPreserved": true
+      },
+      "exeSha256": "2807c2f379e85bfe5fde4a71d8c5c3bb0443bd0e5becd832e0bbd8d14faca84a",
+      "wrapperExit": 1,
+      "renderExit": 0,
+      "custodyUnchanged": false,
+      "custodyDiagnosis": {
+        "settings": {
+          "unchanged": true
+        },
+        "campaignExists": {
+          "unchanged": true
+        },
+        "campaign": {
+          "unchanged": true
+        },
+        "owner": {
+          "unchanged": true,
+          "changedPaths": []
+        },
+        "foreground": {
+          "unchanged": false,
+          "before": 0,
+          "after": 131862
+        }
+      }
+    }
+  }
+}

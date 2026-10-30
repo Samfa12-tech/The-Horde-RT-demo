@@ -1,0 +1,124 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 152
+    Start 152: horde_rt_rescue_traversal_tests
+
+152: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_traversal_tests.exe"
+152: Working Directory: <repo>/build/presets/windows-x64-debug
+152: Test timeout computed to be: 1500
+152: Lower grip selection indices=6.5,7.25 points=-33.8961,0.836048,-15.3644|-33.9358,0.51199,-15.398
+152: Ascent trace tick=0 root=-33.7097,-0.926946,-15.2002 midpoint=-33.9262,0.699839,-15.3987 root_delta=-0.00967026,0.0230536,-0.000174522 support_error=-0.00276667 bumped=0 grip_radial=0.265002,0.322751 indices=6.48043,7.25
+152: Ascent trace tick=1 root=-33.7208,-0.904574,-15.2008 midpoint=-33.9377,0.726682,-15.4144 root_delta=-0.0111389,0.0223722,-0.000619888 support_error=-0.00723749 bumped=0 grip_radial=0.270931,0.339133 indices=6.42846,7.25
+152: Ascent trace tick=2 root=-33.7342,-0.883505,-15.2022 midpoint=-33.9517,0.752566,-15.4277 root_delta=-0.0133858,0.0210694,-0.00136089 support_error=-0.0120522 bumped=0 grip_radial=0.273647,0.355839 indices=6.35423,7.25
+152: Ascent trace tick=3 root=-33.7497,-0.864076,-15.2046 midpoint=-33.968,0.776538,-15.4387 root_delta=-0.0155411,0.0194287,-0.00244713 support_error=-0.0165951 bumped=0 grip_radial=0.273409,0.372109 indices=6.26784,7.25
+152: First solved-grip/root divergence: tick=95 phase=2 support=0.191424 expected=0.231547 initial_mid=-33.916,0.674019,-15.3812 solved_mid=-33.8578,1.85557,-15.4798 root=-33.7451,0.191424,-15.2195 indices=3.59913,4.75 hands=1 support_delta=-0.0401237
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: player root detached from solved rope grip segment
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: player root detached from solved rope grip segment
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: player root detached from solved rope grip segment
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: Ascent final phase=4 support=2.05 root=-33.7,2.05,-12.8 indices=0.4,0.7 gripsY=3.50281,3.37142
+152: PullUp diagnostic start_indices=0.5,1 max_hand_step=0.0316347 at_indices=0.4,0.85 z=-15.2003
+152: Ascent diagnostics max_hand_step=0.0466075 max_root_step=0.0250016 max_tension=400 tick=94 hand=0 previous=-33.8828,2.03646,-15.4924 current=-33.8538,2.07246,-15.4863
+152: Rescue traversal cases=89859 failures=22 max_root_step=0.0250016 max_landing_root_step=0.019381
+1/3 Test #152: horde_rt_rescue_traversal_tests .............***Failed    3.89 sec
+Lower grip selection indices=6.5,7.25 points=-33.8961,0.836048,-15.3644|-33.9358,0.51199,-15.398
+Ascent trace tick=0 root=-33.7097,-0.926946,-15.2002 midpoint=-33.9262,0.699839,-15.3987 root_delta=-0.00967026,0.0230536,-0.000174522 support_error=-0.00276667 bumped=0 grip_radial=0.265002,0.322751 indices=6.48043,7.25
+Ascent trace tick=1 root=-33.7208,-0.904574,-15.2008 midpoint=-33.9377,0.726682,-15.4144 root_delta=-0.0111389,0.0223722,-0.000619888 support_error=-0.00723749 bumped=0 grip_radial=0.270931,0.339133 indices=6.42846,7.25
+Ascent trace tick=2 root=-33.7342,-0.883505,-15.2022 midpoint=-33.9517,0.752566,-15.4277 root_delta=-0.0133858,0.0210694,-0.00136089 support_error=-0.0120522 bumped=0 grip_radial=0.273647,0.355839 indices=6.35423,7.25
+Ascent trace tick=3 root=-33.7497,-0.864076,-15.2046 midpoint=-33.968,0.776538,-15.4387 root_delta=-0.0155411,0.0194287,-0.00244713 support_error=-0.0165951 bumped=0 grip_radial=0.273409,0.372109 indices=6.26784,7.25
+First solved-grip/root divergence: tick=95 phase=2 support=0.191424 expected=0.231547 initial_mid=-33.916,0.674019,-15.3812 solved_mid=-33.8578,1.85557,-15.4798 root=-33.7451,0.191424,-15.2195 indices=3.59913,4.75 hands=1 support_delta=-0.0401237
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+loaded traversal root entered the cantilever anchor body-clearance radius
+player root detached from solved rope grip segment
+loaded traversal root entered the cantilever anchor body-clearance radius
+loaded traversal root entered the cantilever anchor body-clearance radius
+loaded traversal root entered the cantilever anchor body-clearance radius
+loaded traversal root entered the cantilever anchor body-clearance radius
+player root detached from solved rope grip segment
+loaded traversal root entered the cantilever anchor body-clearance radius
+player root detached from solved rope grip segment
+loaded traversal root entered the cantilever anchor body-clearance radius
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+loaded traversal root entered the cantilever anchor body-clearance radius
+loaded traversal root entered the cantilever anchor body-clearance radius
+loaded traversal root entered the cantilever anchor body-clearance radius
+loaded traversal root entered the cantilever anchor body-clearance radius
+loaded traversal root entered the cantilever anchor body-clearance radius
+Ascent final phase=4 support=2.05 root=-33.7,2.05,-12.8 indices=0.4,0.7 gripsY=3.50281,3.37142
+PullUp diagnostic start_indices=0.5,1 max_hand_step=0.0316347 at_indices=0.4,0.85 z=-15.2003
+Ascent diagnostics max_hand_step=0.0466075 max_root_step=0.0250016 max_tension=400 tick=94 hand=0 previous=-33.8828,2.03646,-15.4924 current=-33.8538,2.07246,-15.4863
+Rescue traversal cases=89859 failures=22 max_root_step=0.0250016 max_landing_root_step=0.019381
+
+test 154
+    Start 154: horde_rt_rescue_journey_integration_tests
+
+154: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_journey_integration_tests.exe"
+154: Working Directory: <repo>/build/presets/windows-x64-debug
+154: Test timeout computed to be: 1500
+154: claim-site position=-34,-17.55 prompt=0 phase=4
+154: cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+154: unready-edge start=39.9707,-0.0043903 end=39.9707,-0.0043903 blocked=1
+154: cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+154: region markers were not included as separately counted original geometry
+154: Combined CPU preparation resident_ns=181600 staged_ns=158700 resident_retained_bytes=49056 staged_retained_bytes=49056 resident_peak_capacity_bytes=71808 staged_peak_capacity_bytes=71808 gpu_residency_comparison=NOT_MEASURED
+154: Rescue journey integration cases=19447 failures=1 retained_triangles=1022
+2/3 Test #154: horde_rt_rescue_journey_integration_tests ...***Failed    8.69 sec
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+unready-edge start=39.9707,-0.0043903 end=39.9707,-0.0043903 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+region markers were not included as separately counted original geometry
+Combined CPU preparation resident_ns=181600 staged_ns=158700 resident_retained_bytes=49056 staged_retained_bytes=49056 resident_peak_capacity_bytes=71808 staged_peak_capacity_bytes=71808 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=19447 failures=1 retained_triangles=1022
+
+test 156
+    Start 156: horde_rt_rescue_rig_attachment_tests
+
+156: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_rig_attachment_tests.exe"
+156: Working Directory: <repo>/build/presets/windows-x64-debug
+156: Test timeout computed to be: 180
+156: Rescue rig attachment cases=15919 failures=0 sampled_poses=942 max_left_reach=0.612631@phase=6 max_right_reach=0.619474@phase=6
+3/3 Test #156: horde_rt_rescue_rig_attachment_tests ........   Passed   29.38 sec
+
+The following tests passed:
+	horde_rt_rescue_rig_attachment_tests
+
+33% tests passed, 2 tests failed out of 3
+
+Total Test time (real) =  41.99 sec
+
+The following tests FAILED:
+	152 - horde_rt_rescue_traversal_tests (Failed)
+	154 - horde_rt_rescue_journey_integration_tests (Failed)
+Errors while running CTest

@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "asset": "attack-warning-ring-v1",
+  "status": "candidate-unadmitted",
+  "metresPerUnit": 1,
+  "coordinateSystem": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "geometry": {
+    "segments": 16,
+    "innerRadius": 0.88,
+    "outerRadius": 1.0,
+    "plane": "local XY",
+    "normal": [
+      0,
+      0,
+      1
+    ],
+    "vertices": 32,
+    "triangles": 32,
+    "topology": "Two vertices per segment, shared seam, two CCW triangles per segment"
+  },
+  "uv0": "Planar: (0.5 + 0.5*x, 0.5 + 0.5*y); finite loader-required UV0, no texture",
+  "material": {
+    "name": "AttackWarningAmber",
+    "pbrMetallicRoughness": {
+      "baseColorFactor": [
+        0.72,
+        0.09,
+        0.015,
+        1.0
+      ],
+      "metallicFactor": 0.0,
+      "roughnessFactor": 1.0
+    },
+    "alphaMode": "OPAQUE",
+    "doubleSided": true,
+    "emissiveFactor": [
+      1.0,
+      0.16,
+      0.015
+    ]
+  },
+  "textures": 0,
+  "lights": 0,
+  "provenance": "Original project-authored geometry supplied for Horde; no third-party mesh, image, texture, provider or paid generation. Applicable user/service rights remain unchanged; no blanket MIT, CC0, Meshy or other licence is assigned.",
+  "authoringScript": "tools/author-joint-presentation-assets.py",
+  "acceptance": "Candidate only. Native importer/capacity integration, real RT presentation, lifecycle and owner visual acceptance remain pending; normal enablement stays OFF."
+}

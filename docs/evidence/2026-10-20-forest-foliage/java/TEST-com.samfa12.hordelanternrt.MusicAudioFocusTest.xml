@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.MusicAudioFocusTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-20T16:23:51" hostname="SAM_LAPPY" time="4.117">
+  <properties/>
+  <testcase name="delayedRequestCancelledByLifecycleEdgeRejectsLateGainAndUsesFreshRequest" classname="com.samfa12.hordelanternrt.MusicAudioFocusTest" time="2.69"/>
+  <testcase name="missingAudioFocusServiceFailsClosed" classname="com.samfa12.hordelanternrt.MusicAudioFocusTest" time="0.04"/>
+  <testcase name="menuSfxGateIsNotifiedImmediatelyOnFocusLossAndReturn" classname="com.samfa12.hordelanternrt.MusicAudioFocusTest" time="0.035"/>
+  <testcase name="grantUsesGameMusicAttributesAndRepeatedEligibilityIsIdempotent" classname="com.samfa12.hordelanternrt.MusicAudioFocusTest" time="0.039"/>
+  <testcase name="closeAbandonsOnceAndLateCallbackCannotGrant" classname="com.samfa12.hordelanternrt.MusicAudioFocusTest" time="0.04"/>
+  <testcase name="permanentLossAbandonsAndRequiresNewEligibleEdgeAndRejectsStaleGain" classname="com.samfa12.hordelanternrt.MusicAudioFocusTest" time="0.034"/>
+  <testcase name="transientLossPausesAndGainResumesWhileAutomaticDuckIsLeftToPlatform" classname="com.samfa12.hordelanternrt.MusicAudioFocusTest" time="0.032"/>
+  <testcase name="delayedRequestStaysSilentUntilGainAndFailedRequestDoesNotRetry" classname="com.samfa12.hordelanternrt.MusicAudioFocusTest" time="0.032"/>
+  <testcase name="api24UsesLegacyFocusListenerAndAbandonment" classname="com.samfa12.hordelanternrt.MusicAudioFocusTest" time="1.174"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

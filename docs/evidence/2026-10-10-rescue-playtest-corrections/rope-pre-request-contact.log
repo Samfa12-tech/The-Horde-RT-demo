@@ -1,0 +1,128 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 152
+    Start 152: horde_rt_rescue_traversal_tests
+
+152: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_traversal_tests.exe"
+152: Working Directory: <repo>/build/presets/windows-x64-debug
+152: Test timeout computed to be: 1500
+152: Pre-request rope contact bumped=1 player=-33.7,-0.95,-15.2
+152: Lower grip selection indices=6.75,7.5 points=-33.9255,0.719505,-15.5844|-33.9579,0.397845,-15.5353
+152: Ascent trace tick=0 root=-33.7012,-0.941642,-15.1765 midpoint=-33.9434,0.570234,-15.5273 root_delta=-0.00118256,0.00835794,0.0235319 support_error=-0.00320101 bumped=0 grip_radial=0.446834,0.407814 indices=6.74016,7.5
+152: Ascent trace tick=1 root=-33.702,-0.931449,-15.1537 midpoint=-33.9445,0.586484,-15.4928 root_delta=-0.000862122,0.0101928,0.0228119 support_error=-0.00925821 bumped=0 grip_radial=0.445876,0.390718 indices=6.71296,7.5
+152: Ascent trace tick=2 root=-33.703,-0.920349,-15.1313 midpoint=-33.9462,0.604904,-15.4577 root_delta=-0.000972748,0.0110999,0.0223799 support_error=-0.0165778 bumped=0 grip_radial=0.44495,0.37305 indices=6.67188,7.5
+152: Ascent trace tick=3 root=-33.7043,-0.908695,-15.1092 midpoint=-33.9487,0.624386,-15.4228 root_delta=-0.00129318,0.011654,0.0220795 support_error=-0.0244064 bumped=0 grip_radial=0.445083,0.355724 indices=6.62037,7.5
+152: First solved-grip/root divergence: tick=5 phase=2 support=-0.883957 expected=-0.842434 initial_mid=-33.9417,0.558675,-15.5598 solved_mid=-33.9572,0.666241,-15.3551 root=-33.7082,-0.883957,-15.0659 indices=6.5,7.5 hands=1 support_delta=-0.041523
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: player root detached from solved rope grip segment
+152: Ascent final phase=4 support=2.05 root=-33.7,2.05,-12.8 indices=0.4,0.7 gripsY=3.50281,3.37142
+152: PullUp diagnostic start_indices=0.5,1 max_hand_step=0.0316638 at_indices=0.4,0.85 z=-15.2
+152: Rescue traversal cases=101098 failures=41 max_root_step=0.0250014 max_landing_root_step=0.0167079
+1/1 Test #152: horde_rt_rescue_traversal_tests ...***Failed    3.90 sec
+Pre-request rope contact bumped=1 player=-33.7,-0.95,-15.2
+Lower grip selection indices=6.75,7.5 points=-33.9255,0.719505,-15.5844|-33.9579,0.397845,-15.5353
+Ascent trace tick=0 root=-33.7012,-0.941642,-15.1765 midpoint=-33.9434,0.570234,-15.5273 root_delta=-0.00118256,0.00835794,0.0235319 support_error=-0.00320101 bumped=0 grip_radial=0.446834,0.407814 indices=6.74016,7.5
+Ascent trace tick=1 root=-33.702,-0.931449,-15.1537 midpoint=-33.9445,0.586484,-15.4928 root_delta=-0.000862122,0.0101928,0.0228119 support_error=-0.00925821 bumped=0 grip_radial=0.445876,0.390718 indices=6.71296,7.5
+Ascent trace tick=2 root=-33.703,-0.920349,-15.1313 midpoint=-33.9462,0.604904,-15.4577 root_delta=-0.000972748,0.0110999,0.0223799 support_error=-0.0165778 bumped=0 grip_radial=0.44495,0.37305 indices=6.67188,7.5
+Ascent trace tick=3 root=-33.7043,-0.908695,-15.1092 midpoint=-33.9487,0.624386,-15.4228 root_delta=-0.00129318,0.011654,0.0220795 support_error=-0.0244064 bumped=0 grip_radial=0.445083,0.355724 indices=6.62037,7.5
+First solved-grip/root divergence: tick=5 phase=2 support=-0.883957 expected=-0.842434 initial_mid=-33.9417,0.558675,-15.5598 solved_mid=-33.9572,0.666241,-15.3551 root=-33.7082,-0.883957,-15.0659 indices=6.5,7.5 hands=1 support_delta=-0.041523
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+player root detached from solved rope grip segment
+Ascent final phase=4 support=2.05 root=-33.7,2.05,-12.8 indices=0.4,0.7 gripsY=3.50281,3.37142
+PullUp diagnostic start_indices=0.5,1 max_hand_step=0.0316638 at_indices=0.4,0.85 z=-15.2
+Rescue traversal cases=101098 failures=41 max_root_step=0.0250014 max_landing_root_step=0.0167079
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   3.92 sec
+
+The following tests FAILED:
+	152 - horde_rt_rescue_traversal_tests (Failed)
+Errors while running CTest

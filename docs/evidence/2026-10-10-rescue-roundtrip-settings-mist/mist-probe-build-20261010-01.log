@@ -1,0 +1,9 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule <repo>/reports/rescue-playtest-fixes/mist-probe/CMakeLists.txt
+  probe.cpp
+  RescueTraversal.cpp
+  Generating Code...
+  rope_mist_probe.vcxproj -> <repo>\reports\rescue-playtest-fixes\mist-probe\build\Release\rope_mist_probe.exe
+  Building Custom Rule <repo>/reports/rescue-playtest-fixes/mist-probe/CMakeLists.txt

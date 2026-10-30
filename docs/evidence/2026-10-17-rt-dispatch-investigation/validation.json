@@ -1,0 +1,35 @@
+{
+  "baseHead": "a9283715d68f320627efdc32533df82aaf1c27b6",
+  "privateAndroid": "four ABI assemble/lint pass; same signer/version; installed/pullback verified; original stage-only APK restored",
+  "hostRelease": "2/2 timer/coordinator tests pass including clock bounds/overflow/ticket cases",
+  "hostDebug": "same 2/2 pass",
+  "pythonTests": {
+    "clock": 3,
+    "stage": 5,
+    "motion": 15
+  },
+  "java": {
+    "tests": 286,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "javaSuites": 45,
+  "javaTask": "up-to-date; unchanged Java code",
+  "defaultWindowsRelease": "build pass; clock observer compiled out",
+  "defaultAndroid": "four ABI Debug assemble/lint and unsigned Release assemble/lint pass; observer off",
+  "defaultArtifacts": {
+    "debug": {
+      "sha256": "771ce5e3fdc34a37b1ca61e6c64228bb760fbd93ccdcfc75b4dbcaa1103eb9aa",
+      "bytes": 183487530,
+      "installed": false
+    },
+    "unsignedRelease": {
+      "sha256": "d8b76600969224fa5820fe7d8e49dc60105f877c56702b6a0a6c8f541fa6b4e1",
+      "bytes": 168753989,
+      "installed": false
+    }
+  },
+  "finalGuardChecks": "unscoped Gradle probe and mismatched native/shader ABI both rejected; final default four-ABI Debug and unsigned Release assemble/lint passed after guard",
+  "finalDeviceRefresh": "phone disconnected after completed tests/restoration/stop; final read-only getprop unavailable"
+}

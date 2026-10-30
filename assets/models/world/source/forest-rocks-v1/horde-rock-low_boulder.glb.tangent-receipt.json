@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "input": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\source\\forest-understory-v1\\original-package\\assets\\bh_rock_low_boulder.glb",
+  "output": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\runtime\\forest-rocks-v1\\horde-rock-low_boulder.glb",
+  "inputSha256": "b6e6d78d2b3ebd17a6efeaef2495b43cb438e9716db4de4eca2a9c7bcb899163",
+  "outputSha256": "1bdc6f650410a1f352ad8a314fa0f0b1a978ab226720c97a3e6dde6fd94df262",
+  "outputBytes": 704076,
+  "geometryUnchanged": true,
+  "geometryComparison": "positions/winding/UV0 exact at 1e-6; normal direction dot >= 0.99999",
+  "maximumNormalComponentDelta": 0.0,
+  "minimumNormalDirectionDot": 0.9999999999999998,
+  "embeddedImagePixelsUnchanged": true,
+  "tangentLoopCountsByMappedMaterial": {
+    "BH_Original_Slate": 1134
+  },
+  "materialTriangles": {
+    "BH_Original_Slate": 378
+  }
+}

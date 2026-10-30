@@ -1,0 +1,38 @@
+{
+  "asset.manifest.json": {
+    "bytes": 754,
+    "sha256": "0218c5f3f122c1be51af356e4b63689c38da9efebb4d03fb06d716a3055b5c57"
+  },
+  "generator-provenance.json": {
+    "bytes": 626,
+    "sha256": "b0412a1194a15daee4afbe1cc512e0551e275f6ce6be32bbf824113f1f1d0344"
+  },
+  "kit-warden-protected-index-candidate.glb": {
+    "bytes": 3736968,
+    "sha256": "30fea4a66bd1a31b48ee0d24414c48e22570870ff97d141860c93a99c3d0bb43"
+  },
+  "optimizer-command.json": {
+    "bytes": 676,
+    "sha256": "0d7fe124a6948b2afc4f788bed7a0b3887c0879dc3ea52d0a7eb5529bc923118"
+  },
+  "optimizer-invocation.json": {
+    "bytes": 722,
+    "sha256": "dc45331a1837e59d9cc7584cf0e8cc9a2f94831f2847c06a60e0f6c300c31843"
+  },
+  "prepare_kit.py.txt": {
+    "bytes": 18240,
+    "sha256": "d5641f16aafc998d7d3e9100ca1a37d1be93f95ca56a29bc08b46c180b677000"
+  },
+  "protected-source-rows.u32le": {
+    "bytes": 45712,
+    "sha256": "7efbc5be16b9008f5aa7c661c5fa5ca4bb4a38d3b5ebb32d115816c648daef3f"
+  },
+  "receipt.json": {
+    "bytes": 69611,
+    "sha256": "7719fadb99b8052b97d32d1bca9d08634d2282dda8dbd9dca685d4d1d437de1d"
+  },
+  "source-row-map.u32le": {
+    "bytes": 86156,
+    "sha256": "1a925f85d9617186ed5341452ec42d92364c1ec9becc9ea538f6feb1b161fc3e"
+  }
+}

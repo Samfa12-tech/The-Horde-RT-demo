@@ -1,0 +1,50 @@
+{
+  "sourcePlayerSha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+  "sourceKitSha256": "1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713",
+  "sourceRunDuration": 0.5333333611488342,
+  "playerLegLengths": {
+    "Left": 0.800404821325114,
+    "Right": 0.7963398846577312
+  },
+  "kitLegLengths": {
+    "Left": 0.8067137730253542,
+    "Right": 0.7984301004027899
+  },
+  "legScaleRatios": [
+    0.9921794421873074,
+    0.9973820930047549
+  ],
+  "rootTranslationScale": 0.9947807675960312,
+  "restGlobalRotationDifferenceDegrees": {
+    "Hips": 116.43571010206809,
+    "LeftUpLeg": 2.6250779798925,
+    "LeftLeg": 9.000387009909568,
+    "LeftFoot": 14.354458748387612,
+    "LeftToeBase": 13.465787958119131,
+    "RightUpLeg": 2.368972353000056,
+    "RightLeg": 12.060789017543536,
+    "RightFoot": 13.642782065176256,
+    "RightToeBase": 13.41459910538447,
+    "Spine02": 0.7088606709217539,
+    "Spine01": 0.7088606709217539,
+    "Spine": 11.508228421236797,
+    "LeftShoulder": 7.178429779940436,
+    "LeftArm": 56.20165150993798,
+    "LeftForeArm": 49.26268133210902,
+    "LeftHand": 60.42025637909383,
+    "neck": 1.2226761120270964,
+    "Head": 2.7639367929359175,
+    "head_end": 4.3209654991522415,
+    "headfront": 0.0,
+    "RightShoulder": 7.809599023404852,
+    "RightArm": 55.35478660003186,
+    "RightForeArm": 50.812280500055664,
+    "RightHand": 50.09316403329087
+  },
+  "staticPrefixBytes": 2516028,
+  "staticPrefixUnchanged": true,
+  "staticMetadataUnchanged": true,
+  "idleUnchanged": true,
+  "testOnlyBinding": "retargeted Run replaces Walking only in this separate diagnostic GLB; no production binding",
+  "unscaledProofSha256": "b575e8a45cbc468b7b9b6822d813ce4afcbeb85825b598a6acf8871f8c90795d"
+}

@@ -1,0 +1,1 @@
+FAIL: wall-turn hand continuity retains 10 mm bound per .01 rad

@@ -1,10 +1,14 @@
+#include "scene/TombDressingContact.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/traversal/ChapterTerrainMovement.h"
 
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <utility>
 
 #include "gameplay/CorridorCollision.h"
+#include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/effects/KeeperTorchLighting.h"
 
@@ -18,6 +22,8 @@ constexpr float kMaximumPitch = 0.28f;
 constexpr float kDodgeDurationSeconds = 0.20f;
 constexpr float kDodgeDistanceMetres = 0.90f;
 constexpr float kDodgeCooldownSeconds = 0.55f;
+constexpr float kRunSpeedMetresPerSecond = 3.2f;
+constexpr float kMovementAccelerationMetresPerSecondSquared = 8.0f;
 
 float FiniteOr(float value, float fallback)
 {
@@ -65,7 +71,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
       playerZ_(config.playerStartZ),
       playerYawRadians_(config.playerStartYawRadians),
       playerPitchRadians_(std::clamp(FiniteOr(config.playerStartPitchRadians, 0.0f),
-                                    kMinimumPitch, kMaximumPitch))
+                                    kMinimumPitch, kMaximumPitch)),
+      chapterCompanion_(config.companionTurnStart)
 {
     if (!IsShowcasePlayerPositionWalkable(playerX_, playerZ_))
     {
@@ -78,13 +85,22 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
         const auto& anchor = effects::kKeeperTorchAnchors[index];
         fireEmitters_[index + 1u] = effects::MakeWorldTorchFireEmitter(anchor.stableId, anchor.seed);
     }
+    combatTeaching_.Reset(config_.combatFoundation1_7);
+    skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
+                          config_.waterfallSkeletonEncounter);
+    lichEncounter_.SetReadableCombat(CurrentCombatRules());
+    lichEncounter_.SetChapterDeathPresentation(config_.developmentRescueJourney && CurrentCombatRules());
     enemyDirector_.Reset();
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     if (config_.waterfallSkeletonEncounter)
     {
         swordCombat_.Reset(kSkeletonEnemyCapacity, kWaterfallSkeletonPairCenter,
-                           &kWaterfallSkeletonGuardSpawns);
+                           &kWaterfallSkeletonGuardSpawns, CurrentCombatRules() ? 2 : 1);
         combatSnapshot_ = swordCombat_.Snapshot();
+    }
+    else if (CurrentCombatRules())
+    {
+        swordCombat_.Reset(kSkeletonEnemyCapacity, {0.0f, -4.65f}, nullptr, 2);
     }
     combatSnapshot_ = swordCombat_.Snapshot();
     torchFailureSnapshot_ = torchFailure_.Snapshot();
@@ -98,13 +114,15 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     RefreshSnapshot(lastInput_);
 }
 
-std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
+std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
                                            double frameDeltaSeconds,
                                            std::uint64_t inputPublicationSequence,
                                            std::uint64_t ownerAdvanceSteadyNs)
 {
+    const auto input=FilterCampaignInput(publishedInput,inputPublicationSequence);
     lastInput_ = input;
     inputPublicationSequence_ = inputPublicationSequence;
+    if(input.paused) { chapterDialogue_.Pause(); chapterSkipFloor_=std::max(chapterSkipFloor_,input.commands.dialogueSkip); }
     const bool presentationWasActive = combatPresentation_.Snapshot().parrySuccessActive;
     combatPresentation_.AdvanceFrame(frameDeltaSeconds, input.paused);
     const std::size_t eventsBeforeFrame = events_.Size();
@@ -141,6 +159,11 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
     }
     if (input.paused)
     {
+        DiscardFlaskRequests();
+        forestBird_.Reset();localAmbience_.Reset();
+        ClearCrouchIntent();
+        combatContactTrace_.Clear();
+        gameplayTimeScale_ = 1.0f;
         ClearQueuedDrawAttack();
         ClearScheduledCombatEdges(true);
         lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
@@ -153,16 +176,24 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
         pendingInteractCommands_ = 0u;
         lastConsumedToggleHeldLightPoseSequence_ += pendingToggleHeldLightPoseCommands_;
         pendingToggleHeldLightPoseCommands_ = 0u;
+        lastConsumedRunToggleSequence_ = std::max(
+            lastConsumedRunToggleSequence_, latestRunToggleSequence_);
+        lastConsumedClearRunIntentSequence_ = std::max(
+            lastConsumedClearRunIntentSequence_, latestClearRunIntentSequence_);
+        pendingRunToggleCommands_ = 0u;
+        pendingClearRunIntentCommands_ = 0u;
+        ClearRunIntent();
         dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
         walkVisualAmount_ = 0.0f;
         snapshot_.playerTravelledThisTick = 0.0f;
-        playerFootsteps_.Reset();
+        ResetPlayerFootsteps();
         for (PlayerFootstepCadence& cadence : enemyFootsteps_)
         {
             cadence.Reset();
         }
         lanternPendulum_.Reset(
-            heldItemFixedStepState_.worldFromLeftHand,
+            RescueLanternHinge(),
             heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
         lanternPendulumResetPending_ = true;
     }
@@ -193,10 +224,11 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
     return ticks;
 }
 
-void GameSimulation::StepFixed(const InputSnapshot& input,
+void GameSimulation::StepFixed(const InputSnapshot& publishedInput,
                                float fixedDeltaSeconds,
                                std::uint64_t inputPublicationSequence)
 {
+    const auto input=FilterCampaignInput(publishedInput,inputPublicationSequence);
     // Direct deterministic stepping is also a valid presentation boundary.
     combatPresentation_.AdvanceFrame(fixedDeltaSeconds, input.paused);
     StepFixedTick(input, fixedDeltaSeconds, inputPublicationSequence, false);
@@ -208,6 +240,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
                                    const bool activateTimestampedEdges)
 {
     fixedDeltaSeconds = std::clamp(fixedDeltaSeconds, 0.0f, 0.05f);
+    const float dialogueDeltaSeconds = fixedDeltaSeconds;
     lastInput_ = input;
     inputPublicationSequence_ = inputPublicationSequence;
     ++tickIndex_;
@@ -217,6 +250,13 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     IngestCommands(input);
     if (activateTimestampedEdges)
         ActivateScheduledCombatEdges();
+    const bool flaskCompeting=FlaskCompetingIntent(input);
+    if(config_.healingFlask1_7 && flaskCompeting) {
+        CancelFlaskUtility();
+        healingFlask_.Cancel();
+    }
+    const auto& beforeFlaskHealth=playerVitals_.Snapshot();
+    const int healthBeforeEncounter=beforeFlaskHealth.vitality*2-(beforeFlaskHealth.halfHeart?1:0);
     if (ConsumeWorldCommand())
     {
         RefreshSnapshot(input);
@@ -224,17 +264,27 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         return;
     }
 
+    combatTeaching_.Update(input.tutorialEnabled,
+        input.tutorialSlowdownEnabled, input.paused ||
+            playerVitals_.Snapshot().phase != PlayerLifePhase::Alive ||
+            IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase),
+        combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_, CurrentCombatRules());
+    gameplayTimeScale_ = combatTeaching_.Snapshot().simulationTimeScale;
+    fixedDeltaSeconds *= gameplayTimeScale_;
     const bool wasAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     playerVitals_.Update(fixedDeltaSeconds);
     const bool playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     if (input.paused || !playerAlive)
     {
+        DiscardFlaskRequests();
+        ClearCrouchIntent();
         ClearQueuedDrawAttack();
         if (!playerAlive && heldItems_[1].transition.active)
         {
             horde::gameplay::items::InterruptHeldItemTransition(heldItems_[1], tickIndex_);
             automaticSwordDrawBlocksDefense_ = false;
         }
+        if (!playerAlive) ResetFlaskUtility();
         ClearScheduledCombatEdges(true);
         lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
         pendingAttackCommands_ = 0u;
@@ -246,13 +296,28 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         pendingInteractCommands_ = 0u;
         lastConsumedToggleHeldLightPoseSequence_ += pendingToggleHeldLightPoseCommands_;
         pendingToggleHeldLightPoseCommands_ = 0u;
+        lastConsumedRunToggleSequence_ = std::max(
+            lastConsumedRunToggleSequence_, latestRunToggleSequence_);
+        lastConsumedClearRunIntentSequence_ = std::max(
+            lastConsumedClearRunIntentSequence_, latestClearRunIntentSequence_);
+        pendingRunToggleCommands_ = 0u;
+        pendingClearRunIntentCommands_ = 0u;
+        ClearRunIntent();
         dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
     }
     if (!input.paused && playerAlive)
     {
         walkTime_ += fixedDeltaSeconds;
-        UpdateMovement(input, fixedDeltaSeconds);
+        const float previousWalkCycleTime = walkCycleTime_;
+        walkCycleTime_ += fixedDeltaSeconds;
+        StepRescueJourney(fixedDeltaSeconds<=0);
+        if (!rescueMovementSuppressedThisTick_)
+            UpdateMovement(input, fixedDeltaSeconds, previousWalkCycleTime);
+        PrepareFlaskUtility(input, flaskCompeting);
+        if (FlaskUtilityBusy()) DiscardUtilityCombatCommands();
         AdvanceSwordEquipment(fixedDeltaSeconds);
+        AdvanceFlaskUtility(fixedDeltaSeconds);
         const bool torchWasTriggered = torchFailureSnapshot_.triggered;
         torchFailureSnapshot_ = torchFailure_.Update(fixedDeltaSeconds,
                                            playerX_,
@@ -270,27 +335,28 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         UpdateEncounters(input, fixedDeltaSeconds);
         UpdateRewardSequence(fixedDeltaSeconds, true);
         ResolveHeldItems();
+        RecordSwordContactTrace();
         if (interactionState_.heldLightKind ==
             horde::gameplay::interactions::HeldLightKind::RewardLantern)
         {
             if (lanternPendulumResetPending_)
             {
                 lanternPendulum_.Reset(
-                    heldItemFixedStepState_.worldFromLeftHand,
+                    RescueLanternHinge(),
                     heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
                 lanternPendulumResetPending_ = false;
             }
             else
             {
                 lanternPendulum_.StepFixed(
-                    heldItemFixedStepState_.worldFromLeftHand, fixedDeltaSeconds,
+                    RescueLanternHinge(), fixedDeltaSeconds,
                     heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
             }
         }
         else
         {
             lanternPendulum_.Reset(
-                heldItemFixedStepState_.worldFromLeftHand,
+                RescueLanternHinge(),
                 heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
             lanternPendulumResetPending_ = true;
         }
@@ -299,21 +365,24 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     }
     else
     {
+        StepRescueJourney(true);
         snapshot_.playerTravelledThisTick = 0.0f;
         walkVisualAmount_ = 0.0f;
-        playerFootsteps_.Reset();
+        ResetPlayerFootsteps();
         for (PlayerFootstepCadence& cadence : enemyFootsteps_)
         {
             cadence.Reset();
         }
         lanternPendulum_.Reset(
-            heldItemFixedStepState_.worldFromLeftHand,
+            RescueLanternHinge(),
             heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
         lanternPendulumResetPending_ = true;
     }
 
     if (wasAlive && playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
     {
+        ResetFlaskUtility();
+        ClearRunIntent();
         ClearQueuedDrawAttack();
         if (heldItems_[1].transition.active)
         {
@@ -327,9 +396,42 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         pendingInteractCommands_ = 0u;
         pendingToggleHeldLightPoseCommands_ = 0u;
         dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
     }
 
+    // Speech duration follows the unscaled active fixed-step clock. Combat,
+    // movement and poses still share the teaching time scale; pause freezes both.
+    UpdateChapterDialogue(input,dialogueDeltaSeconds);
+    if(!config_.developmentRescueJourney || playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive)
+        dialogueDucking_.Reset();
+    else if(!input.paused)
+        dialogueDucking_.Step(chapterDialogue_.State().line!=dialogue::Line::None,dialogueDeltaSeconds);
     RefreshSnapshot(input);
+    // Revalidate after damage, death and newly-started dialogue. No further
+    // health/action mutation can intervene before this owner snapshot is used.
+    StepHealingFlask(input,fixedDeltaSeconds,flaskCompeting,healthBeforeEncounter);
+    if(dialogueDeltaSeconds>0) {
+        const auto bird=forestBird_.Step(snapshot_);
+        // Preserve a centred ambient
+        // source/listener tuple rather than invent a perched gameplay actor.
+        if(bird==ForestBirdAmbience::Cue::PlayFoliage)
+            Emit(GameplayEventType::ForestFoliage,EntityId::Invalid,EntityId::Invalid,
+                ForestBirdAmbience::kFoliagePosition.x,ForestBirdAmbience::kFoliagePosition.z,
+                ForestBirdAmbience::kFoliageGain*ForestBirdAmbience::FoliageRangeGain(snapshot_),0,
+                ForestBirdAmbience::kFoliagePosition.y);
+        else if(bird!=ForestBirdAmbience::Cue::None)
+            Emit(bird==ForestBirdAmbience::Cue::Play?GameplayEventType::ForestBird:
+                 bird==ForestBirdAmbience::Cue::PlayCrickets?GameplayEventType::ForestCrickets:
+                 bird==ForestBirdAmbience::Cue::PlayPondFrogs?GameplayEventType::PondFrogs:GameplayEventType::ForestBirdStopped,
+                EntityId::Invalid,EntityId::Invalid,playerX_,playerZ_,1.f,0,playerSupport_.worldY);
+        const auto local=localAmbience_.Step(snapshot_);
+        if(local.cue!=ChapterLocalAmbience::Cue::None)
+            Emit(local.cue==ChapterLocalAmbience::Cue::Drip?GameplayEventType::TombDrip:
+                 local.cue==ChapterLocalAmbience::Cue::Rope?GameplayEventType::RopeContact:
+                 GameplayEventType::ChapterLocalAmbienceStopped,
+                EntityId::Invalid,EntityId::Invalid,local.position.x,local.position.z,local.gain,0,local.position.y);
+    }
+    if(fixedDeltaSeconds>0 && !input.paused)LatchCampaignBoundary();
     snapshot_.eventsEmittedThisTick = events_.Size() - eventsBefore;
 }
 
@@ -337,10 +439,16 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
                                             const std::uint64_t inputPublicationSequence,
                                             const PausedInputPolicy policy)
 {
+    forestBird_.Reset();localAmbience_.Reset();
     lastInput_ = input;
     lastInput_.paused = true;
+    combatContactTrace_.Clear();
     ClearQueuedDrawAttack();
     combatPresentation_.Reset();
+    CancelFlaskUtility();
+    healingFlask_.Cancel();
+    chapterDialogue_.Pause();
+    chapterSkipFloor_=std::max(chapterSkipFloor_,input.commands.dialogueSkip);
     ClearScheduledCombatEdges(false);
     previousOwnerAdvanceSteadyNs_ = 0u;
     inputPublicationSequence_ = std::max(inputPublicationSequence_,
@@ -360,6 +468,10 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
                 lastConsumedDodgeSequence_);
     if (policy == PausedInputPolicy::PreserveWorldCommands)
     {
+        pendingTutorialSkipCommands_ = SaturatingAdd(pendingTutorialSkipCommands_,
+            SequenceDelta(input.commands.tutorialSkip, latestTutorialSkipSequence_));
+        pendingTutorialReplayCommands_ = SaturatingAdd(pendingTutorialReplayCommands_,
+            SequenceDelta(input.commands.tutorialReplay, latestTutorialReplaySequence_));
         pendingRouteResetCommands_ += SequenceDelta(input.commands.routeReset, latestRouteResetSequence_);
         pendingRetryCommands_ += SequenceDelta(input.commands.retry, latestRetrySequence_);
         latestRouteResetSequence_ = std::max(latestRouteResetSequence_, input.commands.routeReset);
@@ -373,29 +485,44 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
                     lastConsumedRetrySequence_);
         pendingRouteResetCommands_ = 0u;
         pendingRetryCommands_ = 0u;
+        pendingTutorialSkipCommands_ = 0u;
+        pendingTutorialReplayCommands_ = 0u;
     }
+    latestTutorialSkipSequence_ = std::max(latestTutorialSkipSequence_, input.commands.tutorialSkip);
+    latestTutorialReplaySequence_ = std::max(latestTutorialReplaySequence_, input.commands.tutorialReplay);
+    synchronize(input.commands.drinkFlask,latestDrinkFlaskSequence_,lastConsumedDrinkFlaskSequence_);
+    synchronize(input.commands.rest,latestRestSequence_,lastConsumedRestSequence_);
+    pendingDrinkFlaskCommands_=pendingRestCommands_=0;
     synchronize(input.commands.interact, latestInteractSequence_,
                 lastConsumedInteractSequence_);
     synchronize(input.commands.toggleHeldLightPose,
                 latestToggleHeldLightPoseSequence_,
                 lastConsumedToggleHeldLightPoseSequence_);
+    synchronize(input.commands.runToggle, latestRunToggleSequence_,
+                lastConsumedRunToggleSequence_);
+    synchronize(input.commands.clearRunIntent, latestClearRunIntentSequence_,
+                lastConsumedClearRunIntentSequence_);
+    synchronize(input.commands.crouchToggle,latestCrouchToggleSequence_,lastConsumedCrouchToggleSequence_);
+    synchronize(input.commands.clearCrouchIntent,latestClearCrouchIntentSequence_,lastConsumedClearCrouchIntentSequence_);
+    ClearCrouchIntent();
 
     pendingAttackCommands_ = 0u;
     pendingParryCommands_ = 0u;
     pendingDodgeCommands_ = 0u;
     pendingInteractCommands_ = 0u;
     pendingToggleHeldLightPoseCommands_ = 0u;
+    pendingRunToggleCommands_ = 0u;
+    pendingClearRunIntentCommands_ = 0u;
     pendingDodgeForward_ = 0.0f;
     pendingDodgeStrafe_ = 0.0f;
     dodgeRemainingSeconds_ = 0.0f;
+    CancelCombatTransients();
+    ClearRunIntent();
     walkVisualAmount_ = 0.0f;
-    playerFootsteps_.Reset();
+    ResetPlayerFootsteps();
     for (PlayerFootstepCadence& cadence : enemyFootsteps_)
         cadence.Reset();
     fixedStepRunner_.ResetAccumulator();
-    lanternPendulum_.Reset(
-        heldItemFixedStepState_.worldFromLeftHand,
-        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     events_.Clear();
 
@@ -406,7 +533,12 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     snapshot_.eventsEmittedThisTick = 0u;
     snapshot_.eventsEmittedThisFrame = 0u;
     ResolveHeldItems();
+    // Focus/capture synchronization can be followed by an unpaused zero-tick
+    // frame. Publish the same physical hip/hand authority as the next tick.
+    lanternPendulum_.Reset(RescueLanternHinge(),
+        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     ResolvePlayerAnimation(0.0f);
+    ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
 }
 
@@ -427,25 +559,255 @@ void GameSimulation::SetPresentationAspect(const float logicalViewAspect)
     // imported-checkpoint frames publish a coherent pose without advancing
     // simulation time or any gameplay authority.
     ResolveHeldItems();
+    lanternPendulum_.RebindHinge(RescueLanternHinge(),
+        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     ResolvePlayerAnimation(0.0f);
+    ResolveFireEmitters(0.0f);
+    RefreshSnapshot(lastInput_);
+}
+
+void GameSimulation::ResetPlayerSupport()
+{
+    playerSupport_ = {};
+    posture_={};ClearCrouchIntent();
+}
+void GameSimulation::ResolvePlayerSupport()
+{
+    if (config_.developmentRescueJourney && rescueTraversal_.IsActive()) return;
+    if (UsesRescueExterior()) {
+        if(config_.authoredChapterTerrain) {
+            if(chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation) {
+                playerSupport_=CurrentCombatRules() && chapterTerrain_->StepTriangleCount()?
+                    horde::gameplay::traversal::ChapterExteriorStepSupport(*chapterTerrain_,playerX_,playerZ_,kPlayerCollisionRadius,posture_.Height()):
+                    horde::gameplay::traversal::ChapterExteriorSupport(chapterTerrain_.get(),playerX_,playerZ_);
+            }
+            return; // retain the last safe support while reconstruction is pending
+        }
+        playerSupport_ = horde::gameplay::traversal::RescueExteriorSupport(playerX_,playerZ_); return;
+    }
+    if (config_.developmentWorldRoute)
+    {
+        const auto support=ResolveWorldRouteSupport(playerX_,playerZ_);
+        const auto projection=ProjectWorldRoute(playerX_,playerZ_);
+        const auto zone=projection.valid?ZoneForRouteSegment(projection.segment):WorldZoneId::TombExterior;
+        playerSupport_ = worldRoute_.readiness[static_cast<std::size_t>(zone)] == ZoneReadiness::Ready ? support : worldRoute_.safeSupport;
+        // Reconstruction retains only the last admitted support. Movement is
+        // blocked until the renderer completes the new resource generation.
+        return;
+    }
+    playerSupport_ = ResolveDevelopmentPlayerSupport(playerX_, playerZ_,
+        config_.developmentSupportFixture, supportGeneration_, supportGeneration_);
+}
+void GameSimulation::ResolveMovementCollision(float previousX, float previousZ, bool detectHeadClearance)
+{
+    if (UsesRescueExterior()) {
+        auto support=config_.authoredChapterTerrain?
+            horde::gameplay::traversal::ChapterExteriorSupport(chapterTerrain_.get(),playerX_,playerZ_):
+            horde::gameplay::traversal::RescueExteriorSupport(playerX_,playerZ_);
+        const auto p=ProjectWorldRoute(playerX_,playerZ_);
+        const auto zone=support.id==static_cast<PlayerSupportId>(130)?WorldZoneId::TombExterior:
+            (p.valid&&p.distance<=kWorldRouteHalfWidth?ZoneForRouteSegment(p.segment):WorldZoneId::TombExterior);
+        const bool ready=worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready;
+        const bool stepMotor=CurrentCombatRules() && config_.authoredChapterTerrain && chapterTerrain_ &&
+           chapterTerrainGeneration_==worldRoute_.generation &&
+           !horde::gameplay::traversal::OnRescueLanding(previousX,previousZ) &&
+           !horde::gameplay::traversal::OnRescueLanding(playerX_,playerZ_);
+        bool clear=!stepMotor && (config_.authoredChapterTerrain ?
+            (chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation && horde::gameplay::traversal::ChapterExteriorMovementClear(
+                *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius)) :
+            (horde::gameplay::traversal::RescueExteriorMovementClear(
+            previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius) &&
+            WorldRouteBlockoutMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,true) &&
+            (support.id==static_cast<PlayerSupportId>(130) ||
+             WorldRouteTerrainMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius))));
+        // Only explicitly admitted step geometry opts into the bounded motor.
+        // Frozen historical captures and the authored rope landing retain their
+        // existing contracts. No runtime root asset is implicitly promoted.
+        if(stepMotor) {
+            const auto movement=horde::gameplay::traversal::ResolveChapterStepMovement(
+                *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,posture_.Height());
+            clear=movement.accepted;support=movement.support;
+        }
+        if(CurrentCombatRules())clear=clear && AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
+            std::max(playerSupport_.worldY,support.worldY),posture_.Height(),kPlayerCollisionRadius);
+        // Reuse ordinary collision admission. Only a failed standing sweep (or
+        // an already lowered body) needs the additional height comparison. A
+        // wall, unloaded zone or missing support cannot request a crouch.
+        if(detectHeadClearance && stepMotor && ready && (!clear || posture_.Active())) {
+            const auto admitsHeight=[&](float height) {
+                const auto candidate=horde::gameplay::traversal::ResolveChapterStepMovement(
+                    *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,height);
+                return candidate.accepted && AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
+                    std::max(playerSupport_.worldY,candidate.support.worldY),height,kPlayerCollisionRadius);
+            };
+            const bool standingClear=!posture_.Active()?clear:admitsHeight(kStandingBodyHeight);
+            if(!standingClear && admitsHeight(kCrouchingBodyHeight))automaticCrouchRequested_=true;
+        }
+        if(!support.grounded||!ready||!clear||std::abs(support.worldY-playerSupport_.worldY)>kWorldRouteMaximumStep) {
+            playerX_=previousX;playerZ_=previousZ;worldRoute_.blocked=true;++worldRoute_.rollbackCount;
+        } else {
+            worldRoute_.safeX=playerX_;worldRoute_.safeZ=playerZ_;worldRoute_.safeSupport=support;worldRoute_.current=zone;worldRoute_.blocked=false;
+        }
+        return;
+    }
+    if (!config_.developmentWorldRoute)
+    {
+        ResolveCorridorPlayerCollision(previousX,previousZ,playerX_,playerZ_);
+        if (config_.developmentRescueJourney &&
+            !horde::scene::TombDressingMovementClear(previousX, previousZ, playerX_, playerZ_)) {
+            playerX_ = previousX; playerZ_ = previousZ;
+        }
+        if(CurrentCombatRules()) {
+            const auto admitsHeight=[&](float height) {return AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
+                playerSupport_.worldY,height,kPlayerCollisionRadius);};
+            const bool clear=admitsHeight(posture_.Height());
+            if(detectHeadClearance && (!clear || posture_.Active()) &&
+               !admitsHeight(kStandingBodyHeight) && admitsHeight(kCrouchingBodyHeight))automaticCrouchRequested_=true;
+            if(!clear){playerX_=previousX;playerZ_=previousZ;}
+        }
+        return;
+    }
+    auto projection=ProjectWorldRoute(playerX_,playerZ_);
+    const auto support=ResolveWorldRouteSupport(playerX_,playerZ_);
+    const auto zone=projection.valid?ZoneForRouteSegment(projection.segment):WorldZoneId::TombExterior;
+    const bool valid=projection.valid && support.grounded &&
+        WorldRouteTerrainMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius) &&
+        WorldRouteBlockoutMovementClear(previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius) &&
+        worldRoute_.readiness[static_cast<std::size_t>(zone)]==ZoneReadiness::Ready &&
+        std::abs(support.worldY-playerSupport_.worldY)<=kWorldRouteMaximumStep;
+    worldRoute_.blocked=!valid;
+    if(!valid)
+    {
+        playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ;
+        ++worldRoute_.rollbackCount;
+    }
+    else
+    {
+        worldRoute_.current=zone;
+        worldRoute_.safeX=playerX_; worldRoute_.safeZ=playerZ_; worldRoute_.safeSupport=support;
+    }
+}
+void GameSimulation::SetDevelopmentWorldRoute(bool enabled, bool stagedPreparation)
+{
+    CancelCampaignRestore();
+    config_.developmentWorldRoute=enabled;
+    stagedWorldPreparation_=stagedPreparation;
+    worldRoute_.Invalidate();
+    if(enabled) { playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ; playerYawRadians_=3.14159265359f; }
+    else { playerX_=config_.playerStartX; playerZ_=config_.playerStartZ; playerYawRadians_=config_.playerStartYawRadians; }
+    ResetPlayerSupport(); ClearEvents(); ResolveHeldItems(); ResolvePlayerAnimation(0);
+    ResolveFireEmitters(0); RefreshSnapshot(lastInput_);
+}
+bool GameSimulation::PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness)
+{
+    if(config_.authoredChapterTerrain && token.zone!=WorldZoneId::Dungeon && readiness==ZoneReadiness::Ready &&
+       (!chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation)) return false;
+    if((!config_.developmentWorldRoute && !config_.developmentRescueJourney) || !worldRoute_.Publish(token,readiness)) return false;
+    RefreshSnapshot(lastInput_); return true;
+}
+bool GameSimulation::HoldStaticDetailLease(const StaticDetailLease& lease)
+{
+    if(!lease.Valid() || lease.worldGeneration!=worldRoute_.generation ||
+       staticDetailLease_.resourceGeneration || !lease.Contains(playerX_,playerZ_) ||
+       !config_.developmentRescueJourney || UsesRescueExterior())return false;
+    staticDetailLease_=lease;
+    // Explicit resource retirement may regress readiness; asynchronous Ready
+    // callbacks themselves still cannot regress/resurrect WorldRouteState.
+    for(std::size_t i=1;i<worldRoute_.readiness.size();++i)
+        worldRoute_.readiness[i]=ZoneReadiness::Preparing;
+    RefreshSnapshot(lastInput_);return true;
+}
+bool GameSimulation::ReleaseStaticDetailLease(std::uint64_t generation)
+{
+    if(!generation || generation!=staticDetailLease_.resourceGeneration)return false;
+    staticDetailLease_={};
+    // Deferred world actions execute on the next simulation turn, never from
+    // inside the renderer's successful current-frame cutover callback.
+    RefreshSnapshot(lastInput_);return true;
+}
+bool GameSimulation::PublishChapterTerrain(WorldZoneToken token, std::shared_ptr<const TriangleSupportSurface> terrain)
+{
+    if(!config_.developmentRescueJourney || !config_.authoredChapterTerrain || !terrain ||
+       !terrain->TriangleCount() || token.zone==WorldZoneId::Dungeon ||
+       (chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation && chapterTerrain_!=terrain) ||
+       !worldRoute_.Publish(token,ZoneReadiness::Ready)) return false;
+    const bool bindingChanged=chapterTerrain_!=terrain || chapterTerrainGeneration_!=token.generation;
+    chapterTerrain_=std::move(terrain);
+    chapterTerrainGeneration_=token.generation;
+    if(bindingChanged) {
+        // Recovery can solve the paused carry against the temporary no-terrain
+        // fallback. Publish a coherent pose as soon as its actual geometry is
+        // admitted, without a gameplay/physics tick or another input barrier.
+        // Other zones and repeated renderer readiness polls reuse this binding.
+        ResolveHeldItems();
+        lanternPendulum_.RebindHinge(RescueLanternHinge(),
+            heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
+        ResolvePlayerAnimation(0.0f);
+        ResolveFireEmitters(0.0f);
+    }
+    RefreshSnapshot(lastInput_);return true;
+}
+void GameSimulation::InvalidateWorldZoneReadiness()
+{
+    CancelCampaignRestore();
+    if(config_.developmentRescueJourney) { RecoverRescueJourney(); return; }
+    if(!config_.developmentWorldRoute) return;
+    worldRoute_.Invalidate(true); playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ;
+    playerSupport_=worldRoute_.safeSupport; ClearRunIntent(); ClearEvents(); ResolveHeldItems(); ResolvePlayerAnimation(0);
+    ResolveFireEmitters(0); RefreshSnapshot(lastInput_);
+}
+void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t generation)
+{
+    if (generation != 0u && generation < supportGeneration_) return;
+    CancelCampaignRestore();
+    config_.developmentSupportFixture = enabled && generation != 0u;
+    supportGeneration_ = std::max(supportGeneration_, generation);
+    ResetPlayerSupport();
+    ResolveHeldItems();
+    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand,
+        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
+    lanternPendulumResetPending_ = true;
+    ResolvePlayerAnimation(0.0f);
+    ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
 }
 
 void GameSimulation::ResetRoute()
 {
-    if (!ApplyShowcaseCheckpoint(0, false))
+    forestBird_.Reset();localAmbience_.Reset();
+    ClearCampaignBoundary();
+    CancelCampaignRestore();
+    if(staticDetailLease_.resourceGeneration) {
+        staticDetailLease_.restoreRequested=true;deferredStaticDetailReset_=true;RefreshSnapshot(lastInput_);return;
+    }
+    skeletonRevivalWorkshopBypass_ = false; revivedIdlePhaseZero_ = false;
+    skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 && config_.waterfallSkeletonEncounter);
+    if(config_.healingFlask1_7){healingFlask_.ResetNewGame();flaskCompletionTick_=0;}
+    DiscardFlaskRequests();
+    campaignInputPublicationFloor_.reset();
+    chapterTerrain_.reset();
+    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();chapterFirstExterior_=false;chapterVisibleRaise_=0;
+    if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
+    legacyCombatCheckpoint_ = false;
+    combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
+    if (!ApplyCheckpoint(0, false))
     {
         return;
     }
 
-    playerX_ = FiniteOr(config_.playerStartX, kPlayerSpawn.x);
-    playerZ_ = FiniteOr(config_.playerStartZ, kPlayerSpawn.z);
-    if (!IsShowcasePlayerPositionWalkable(playerX_, playerZ_))
-    {
-        playerX_ = kPlayerSpawn.x;
-        playerZ_ = kPlayerSpawn.z;
+    if(config_.developmentWorldRoute) {
+        playerX_=worldRoute_.safeX;playerZ_=worldRoute_.safeZ;
+        playerYawRadians_=3.14159265359f;
+    } else {
+        playerX_ = FiniteOr(config_.playerStartX, kPlayerSpawn.x);
+        playerZ_ = FiniteOr(config_.playerStartZ, kPlayerSpawn.z);
+        if (!IsShowcasePlayerPositionWalkable(playerX_, playerZ_))
+        {
+            playerX_ = kPlayerSpawn.x;
+            playerZ_ = kPlayerSpawn.z;
+        }
+        playerYawRadians_ = FiniteOr(config_.playerStartYawRadians, 0.0f);
     }
-    playerYawRadians_ = FiniteOr(config_.playerStartYawRadians, 0.0f);
     playerPitchRadians_ = std::clamp(FiniteOr(config_.playerStartPitchRadians, 0.0f),
                                      kMinimumPitch,
                                      kMaximumPitch);
@@ -455,7 +817,7 @@ void GameSimulation::ResetRoute()
             : RoutePosition{0.0f, -4.65f},
         config_.waterfallSkeletonEncounter
             ? &kWaterfallSkeletonGuardSpawns
-            : nullptr);
+            : nullptr, CurrentCombatRules() ? 2 : 1);
     waterfallWarningEmitted_ = false;
     ResetSwordEquipment();
     combatPresentation_.Reset();
@@ -483,12 +845,75 @@ void GameSimulation::ResetRoute()
 
 void GameSimulation::RetryEncounter()
 {
-    ApplyShowcaseCheckpoint(retryCheckpoint_, true);
+    CancelCampaignRestore();
+    if(staticDetailLease_.resourceGeneration) {
+        staticDetailLease_.restoreRequested=true;deferredStaticDetailRetry_=true;RefreshSnapshot(lastInput_);return;
+    }
+    if(config_.developmentRescueJourney && rescueTraversal_.Snapshot().claimCount) {
+        if(config_.healingFlask1_7) {
+            // A logical boundary is not proof of a committed save. The shared
+            // campaign owner consumes this request and uses its confirmed record.
+            DiscardFlaskRequests();
+            if(campaignRetryRequestGeneration_!=UINT64_MAX)++campaignRetryRequestGeneration_;
+            RefreshSnapshot(lastInput_);return;
+        }
+        RecoverRescueJourney();return;
+    }
+    if(config_.healingFlask1_7){
+        auto resources=healingFlask_.Snapshot().resources;resources.charges=resources.Capacity();
+        (void)healingFlask_.Restore(resources);
+    }
+    const bool retainFinalOpening = config_.skeletonRevival1_7 && !skeletonRevivalWorkshopBypass_ &&
+        (skeletonRevival_.Snapshot().phase == SkeletonRevivalPhase::Complete ||
+         (legacyCombatCheckpoint_ && retryCheckpoint_ == 9)); // Explicit authored past-opening fixture.
+    const auto lesson = combatTeaching_.Snapshot();
+    std::array<SkeletonSpawnPose, kSkeletonCombatantCapacity> settledGuards{};
+    for (std::size_t i = 0; i < settledGuards.size(); ++i) {
+        const auto& actor = combatSnapshot_.combatants[i];
+        settledGuards[i] = {{actor.x, actor.z}, actor.facingRadians, 0};
+    }
+    legacyCombatCheckpoint_ = false;
+    if (!ApplyCheckpoint(retryCheckpoint_, true)) return;
+    revivedIdlePhaseZero_ = false; // Retry is an explicit whole-scene restart, not an Idle join.
+    if (config_.skeletonRevival1_7 && !skeletonRevivalWorkshopBypass_) {
+        if (retainFinalOpening) {
+            swordCombat_.RestoreCampaignDefeated(settledGuards);
+            combatSnapshot_ = swordCombat_.Snapshot();
+            skeletonRevival_.RestoreCompleted();
+            enemyDirector_.MarkDead(EnemyKind::Skeleton);
+        } else {
+            const bool skipped = lesson.stage == TutorialStage::Skipped ||
+                (!lastInput_.tutorialEnabled && !lesson.exitPending && !lesson.safePractice);
+            skeletonRevival_.Retry(lesson.stage == TutorialStage::Complete, skipped);
+            (void)skeletonRevival_.AcknowledgeLivePair(skeletonRevival_.Snapshot().generation,
+                combatSnapshot_.aliveCount == kSkeletonEnemyCapacity, combatSnapshot_.encounterComplete);
+        }
+        RefreshSnapshot(lastInput_);
+    }
 }
 
 bool GameSimulation::ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool countAsRetry)
 {
+    if(staticDetailLease_.resourceGeneration) { staticDetailLease_.restoreRequested=true;return false; }
+    // Frozen evidence imports retain their historical contact/durability/cast rules.
+    if (FindShowcaseCheckpoint(checkpointId) == nullptr) return false;
+    legacyCombatCheckpoint_ = true;
     return ApplyCheckpoint(checkpointId, countAsRetry);
+}
+
+void GameSimulation::BeginCombatPractice(EnemyKind encounter)
+{
+    legacyCombatCheckpoint_ = false;
+    skeletonRevivalWorkshopBypass_ = encounter == EnemyKind::Lich;
+    revivedIdlePhaseZero_ = false;
+    skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
+        config_.waterfallSkeletonEncounter && !skeletonRevivalWorkshopBypass_);
+    combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
+    if (encounter == EnemyKind::Lich)
+        combatTeaching_.ResetForKeeperPractice(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
+    ApplyCheckpoint(encounter == EnemyKind::Lich ? 9 : 12,
+                    encounter == EnemyKind::Lich);
+    RefreshSnapshot(lastInput_);
 }
 
 bool GameSimulation::BeginMotionEvidenceEquipmentSeed()
@@ -529,10 +954,41 @@ void GameSimulation::ImportRewardCheckpoint(
     const horde::gameplay::interactions::FinaleSequenceSnapshot& finale,
     const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum)
 {
+    ImportRewardCheckpointState(chestReward, interaction, finale, pendulum,
+                                RewardCheckpointPlacement::SafeRecovery);
+}
+
+void GameSimulation::ImportRewardCheckpointState(
+    const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
+    const horde::gameplay::interactions::InteractionState& interaction,
+    const horde::gameplay::interactions::FinaleSequenceSnapshot& finale,
+    const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum,
+    RewardCheckpointPlacement placement)
+{
+    CancelCampaignRestore();
+    const bool authoredCapture = placement == RewardCheckpointPlacement::AuthoredCapture;
+    const float authoredX = playerX_, authoredZ = playerZ_;
+    const auto authoredSupport = playerSupport_;
     events_.Clear();
+    chapterDialogue_.Reset(true);dialogueDucking_.Reset();chapterVisibleRaise_=0;
     combatPresentation_.Reset();
+    dodgeRemainingSeconds_ = 0.0f;
+    CancelCombatTransients();
+    combatContactTrace_.Clear();
+    const bool wasRaised = playerSupport_.worldY != kRouteFloorWorldY;
+    if(config_.developmentWorldRoute) { worldRoute_.Invalidate(); playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ; }
+    ResetPlayerSupport();
     chestRewardSequence_.Import(chestReward);
     interactionState_ = interaction;
+    if(config_.developmentRescueJourney) {
+        RestoreRescueEquipment();rescueTraversal_.Reset();worldRoute_.Invalidate();worldRoute_.current=WorldZoneId::Dungeon;
+        rescueOpeningSeconds_=0;
+        if(chestReward.phase==interactions::ChestRewardPhase::LanternClaimed) {
+            rescueTraversal_.NotifyLanternClaimed();rescueTraversal_.DeployOwned();rescueOpeningSeconds_=1;
+            playerX_=traversal::kLowerLanding.x;playerZ_=traversal::kLowerLanding.z;
+        }
+        ResetPlayerSupport();
+    }
     finaleSequence_.Import(finale);
     pendingInteractCommands_ = 0u;
     pendingToggleHeldLightPoseCommands_ = 0u;
@@ -540,11 +996,19 @@ void GameSimulation::ImportRewardCheckpoint(
     finaleCompletionEmitted_ =
         finaleSequence_.Snapshot().endingPhase ==
         horde::gameplay::interactions::FinaleEndingPhase::Complete;
+    if (authoredCapture)
+    {
+        // Restore before resolving either the hand or the imported pendulum.
+        // Restoring only the camera afterwards leaves equipment at a stale hinge.
+        playerX_ = authoredX;
+        playerZ_ = authoredZ;
+        playerSupport_ = authoredSupport;
+    }
     ResolveHeldItems();
     lanternPendulum_.Reset(
         heldItemFixedStepState_.worldFromLeftHand,
         heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
-    if (pendulum != nullptr)
+    if (pendulum != nullptr && (authoredCapture || !wasRaised))
     {
         lanternPendulum_.Import(*pendulum);
         lanternPendulumResetPending_ = false;
@@ -560,6 +1024,7 @@ void GameSimulation::ImportRewardCheckpoint(
 
 void GameSimulation::ResetTiming()
 {
+    DiscardFlaskRequests();
     ClearScheduledCombatEdges(true);
     previousOwnerAdvanceSteadyNs_ = 0u;
     pendingAttackCommands_ = 0u;
@@ -608,17 +1073,39 @@ void GameSimulation::IngestCommands(const InputSnapshot& input, const bool inges
     }
     pendingRouteResetCommands_ = SaturatingAdd(pendingRouteResetCommands_, SequenceDelta(input.commands.routeReset, latestRouteResetSequence_));
     pendingRetryCommands_ = SaturatingAdd(pendingRetryCommands_, SequenceDelta(input.commands.retry, latestRetrySequence_));
+    pendingDrinkFlaskCommands_=SaturatingAdd(pendingDrinkFlaskCommands_,SequenceDelta(input.commands.drinkFlask,latestDrinkFlaskSequence_));
+    pendingRestCommands_=SaturatingAdd(pendingRestCommands_,SequenceDelta(input.commands.rest,latestRestSequence_));
     pendingInteractCommands_ = SaturatingAdd(pendingInteractCommands_, SequenceDelta(input.commands.interact, latestInteractSequence_));
     pendingToggleHeldLightPoseCommands_ = SaturatingAdd(pendingToggleHeldLightPoseCommands_, SequenceDelta(
         input.commands.toggleHeldLightPose, latestToggleHeldLightPoseSequence_));
+    pendingRunToggleCommands_ = SaturatingAdd(pendingRunToggleCommands_,
+        SequenceDelta(input.commands.runToggle, latestRunToggleSequence_));
+    pendingClearRunIntentCommands_ = SaturatingAdd(pendingClearRunIntentCommands_,
+        SequenceDelta(input.commands.clearRunIntent, latestClearRunIntentSequence_));
+    pendingCrouchToggleCommands_=SaturatingAdd(pendingCrouchToggleCommands_,SequenceDelta(input.commands.crouchToggle,latestCrouchToggleSequence_));
+    pendingClearCrouchIntentCommands_=SaturatingAdd(pendingClearCrouchIntentCommands_,SequenceDelta(input.commands.clearCrouchIntent,latestClearCrouchIntentSequence_));
+    pendingTutorialSkipCommands_ = SaturatingAdd(pendingTutorialSkipCommands_,
+        SequenceDelta(input.commands.tutorialSkip, latestTutorialSkipSequence_));
+    pendingTutorialReplayCommands_ = SaturatingAdd(pendingTutorialReplayCommands_,
+        SequenceDelta(input.commands.tutorialReplay, latestTutorialReplaySequence_));
+    latestTutorialSkipSequence_ = std::max(latestTutorialSkipSequence_, input.commands.tutorialSkip);
+    latestTutorialReplaySequence_ = std::max(latestTutorialReplaySequence_, input.commands.tutorialReplay);
     latestAttackSequence_ = std::max(latestAttackSequence_, input.commands.attack);
     latestParrySequence_ = std::max(latestParrySequence_, input.commands.parry);
     latestDodgeSequence_ = std::max(latestDodgeSequence_, input.commands.dodge);
     latestRouteResetSequence_ = std::max(latestRouteResetSequence_, input.commands.routeReset);
     latestRetrySequence_ = std::max(latestRetrySequence_, input.commands.retry);
+    latestDrinkFlaskSequence_=std::max(latestDrinkFlaskSequence_,input.commands.drinkFlask);
+    latestRestSequence_=std::max(latestRestSequence_,input.commands.rest);
     latestInteractSequence_ = std::max(latestInteractSequence_, input.commands.interact);
     latestToggleHeldLightPoseSequence_ = std::max(
         latestToggleHeldLightPoseSequence_, input.commands.toggleHeldLightPose);
+    latestRunToggleSequence_ = std::max(latestRunToggleSequence_,
+                                        input.commands.runToggle);
+    latestClearRunIntentSequence_ = std::max(latestClearRunIntentSequence_,
+        input.commands.clearRunIntent);
+    latestCrouchToggleSequence_=std::max(latestCrouchToggleSequence_,input.commands.crouchToggle);
+    latestClearCrouchIntentSequence_=std::max(latestClearCrouchIntentSequence_,input.commands.clearCrouchIntent);
 }
 
 void GameSimulation::AddCombatTimingTrace(
@@ -994,6 +1481,17 @@ void GameSimulation::LinkCombatTimingSemanticEvent(
 
 bool GameSimulation::ConsumeWorldCommand()
 {
+    if(!staticDetailLease_.resourceGeneration && deferredStaticDetailReset_) {
+        deferredStaticDetailReset_=deferredStaticDetailRetry_=false;ResetRoute();return true;
+    }
+    if(!staticDetailLease_.resourceGeneration && deferredStaticDetailRetry_) {
+        deferredStaticDetailRetry_=false;RetryEncounter();return true;
+    }
+    if(staticDetailLease_.resourceGeneration &&
+       (pendingRouteResetCommands_ || pendingRetryCommands_ || pendingTutorialReplayCommands_)) {
+        staticDetailLease_.restoreRequested=true;
+        return true; // Keep the world command pending until real restoration.
+    }
     if (pendingRouteResetCommands_ > 0u)
     {
         --pendingRouteResetCommands_;
@@ -1005,33 +1503,66 @@ bool GameSimulation::ConsumeWorldCommand()
     {
         --pendingRetryCommands_;
         ++lastConsumedRetrySequence_;
-        ApplyCheckpoint(retryCheckpoint_, true);
+        RetryEncounter();
         return true;
+    }
+    if (pendingTutorialReplayCommands_ > 0u)
+    {
+        pendingTutorialReplayCommands_ = 0u;
+        pendingTutorialSkipCommands_ = 0u;
+        ResetRoute();
+        return true;
+    }
+    if (pendingTutorialSkipCommands_ > 0u)
+    {
+        pendingTutorialSkipCommands_ = 0u;
+        combatTeaching_.Skip();
     }
     return false;
 }
 
 bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
 {
+    if(staticDetailLease_.resourceGeneration) { staticDetailLease_.restoreRequested=true;RefreshSnapshot(lastInput_);return false; }
     const ShowcaseCheckpoint* checkpoint = FindShowcaseCheckpoint(checkpointId);
     if (checkpoint == nullptr)
     {
         return false;
     }
 
+    DiscardFlaskRequests();
+    CancelCampaignRestore();
+    ClearCampaignBoundary();
+    // An accepted explicit checkpoint replaces the loaded session's pose.
+    // Its staging/practice input must not wait for the superseded camera rebase.
+    campaignInputPublicationFloor_.reset();
+    chapterDialogue_.Reset(checkpointId!=0);dialogueDucking_.Reset();chapterVisibleRaise_=0;
+    pendingTutorialReplayCommands_ = 0u;
+    pendingTutorialSkipCommands_ = 0u;
+    gameplayTimeScale_ = 1.0f;
+    ClearRunIntent();
     const auto encounterCheckpoint = ShowcaseCheckpointForEncounter(
         *checkpoint, config_.waterfallSkeletonEncounter);
     checkpoint = &encounterCheckpoint;
     ClearScheduledCombatEdges(true);
 
     events_.Clear();
+    ResetPlayerSupport();
+    combatContactTrace_.Clear();
     combatPresentation_.Reset();
     ShowcaseCheckpointState state = BuildShowcaseCheckpointState(*checkpoint);
     playerX_ = checkpoint->x;
     playerZ_ = checkpoint->z;
     playerYawRadians_ = checkpoint->yaw;
     playerPitchRadians_ = checkpoint->pitch;
+    if(config_.developmentWorldRoute)
+    {
+        worldRoute_.Invalidate(); playerX_=worldRoute_.safeX; playerZ_=worldRoute_.safeZ;
+        playerYawRadians_=3.14159265359f;
+    }
     walkTime_ = 0.0f;
+    walkCycleTime_ = 0.0f;
+    walkPhaseOffset_ = 0.0f;
     walkVisualAmount_ = 0.0f;
     torchFailure_ = state.torchFailure;
     torchFailureSnapshot_ = torchFailure_.Snapshot();
@@ -1044,7 +1575,9 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         enemyDirector_.Update(playerX_, playerZ_, EnemyKind::Skeleton);
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     lichEncounter_ = state.lichEncounter;
-    if (isRetry && checkpoint->preset == ShowcaseCheckpointPreset::LichActive)
+    lichEncounter_.SetReadableCombat(CurrentCombatRules());
+    lichEncounter_.SetChapterDeathPresentation(config_.developmentRescueJourney && CurrentCombatRules());
+    if (isRetry && !config_.developmentWorldRoute && checkpoint->preset == ShowcaseCheckpointPreset::LichActive)
     {
         playerX_ = kKeeperRetryPosition.x;
         playerZ_ = kKeeperRetryPosition.z;
@@ -1080,7 +1613,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
                            ? kSkeletonEnemyCapacity
                            : ((isRetry || pairCheckpoint) ? kSkeletonEnemyCapacity : 1u),
                        combatSpawnCenter,
-                       productionSkeletonEncounter ? &kWaterfallSkeletonGuardSpawns : nullptr);
+                       productionSkeletonEncounter ? &kWaterfallSkeletonGuardSpawns : nullptr,
+                       CurrentCombatRules() ? 2 : 1);
     combatSnapshot_ = swordCombat_.Update(0.0f,
                                            playerX_,
                                            playerZ_,
@@ -1101,7 +1635,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
                           lichHasLineOfSight,
                           finaleActive);
     playerVitals_.ResetForEncounter();
-    playerFootsteps_.Reset();
+    ResetPlayerFootsteps();
     for (PlayerFootstepCadence& cadence : enemyFootsteps_)
     {
         cadence.Reset();
@@ -1121,6 +1655,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     pendingInteractCommands_ = 0u;
     pendingToggleHeldLightPoseCommands_ = 0u;
     dodgeRemainingSeconds_ = 0.0f;
+    CancelCombatTransients();
     dodgeCooldownRemainingSeconds_ = 0.0f;
     retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
     finaleCompletionEmitted_ = false;
@@ -1152,8 +1687,9 @@ void GameSimulation::ResolveHeldItems()
     const horde::gameplay::items::HeldItemFixedStepInput input{
         playerX_,
         playerZ_,
-        playerYawRadians_,
-        playerPitchRadians_,
+        config_.developmentRescueJourney && rescueTraversal_.Snapshot().equipmentStowed
+            ?rescueTraversal_.Snapshot().bodyYawRadians:playerYawRadians_,
+        config_.developmentRescueJourney && rescueTraversal_.Snapshot().equipmentStowed ?0.0f:playerPitchRadians_,
         walkTime_,
         walkVisualAmount_,
         torchFailureSnapshot_,
@@ -1162,7 +1698,10 @@ void GameSimulation::ResolveHeldItems()
         interactionState_,
         config_.playerMountProfile,
         &heldItems_[1],
-        presentationAspect_};
+        presentationAspect_,
+        playerSupport_.worldY,config_.developmentWorldRoute, false, UsesRescueExterior(),
+        config_.authoredChapterTerrain && chapterTerrainGeneration_==worldRoute_.generation
+            ? chapterTerrain_.get() : nullptr,posture_.drop};
     // Simulation owns the transition/visual blend. Kinematics keeps a stable
     // hand-endpoint matrix for gameplay; PlayerRenderSlot composes its single
     // rendered matrix from that endpoint and the animated Hips mount.
@@ -1178,12 +1717,50 @@ void GameSimulation::ResolveHeldItems()
     heldItems_[1].worldFromItem = resolvedItems[1].worldFromItem;
     heldItems_[1].worldFromDetach = resolvedItems[1].worldFromDetach;
     heldItems_[1].detachTick = resolvedItems[1].detachTick;
+    ApplyRescuePresentation();
+}
+
+void GameSimulation::RecordSwordContactTrace()
+{
+    if (!CurrentCombatRules()) return;
+    const auto action = combatSnapshot_.player.action;
+    const auto cut = action == PlayerCombatAction::SwingActive
+        ? PlayerAttackCut::DownwardCut
+        : action == PlayerCombatAction::UpwardSliceActive
+            ? PlayerAttackCut::UpwardSlice : PlayerAttackCut::None;
+    if (cut == PlayerAttackCut::None) return;
+    CombatContactSample sample;
+    sample.tick = tickIndex_;
+    sample.attackId = combatSnapshot_.activePlayerAttackId;
+    sample.commandSequence = currentCutCommandSequence_;
+    sample.consumedTick = currentCutConsumedTick_;
+    sample.cut = cut; sample.phase = action;
+    sample.phaseSeconds = combatSnapshot_.player.actionTime;
+    sample.supportWorldY = playerSupport_.worldY;
+    sample.target = swordHitTargetThisTick_;
+    sample.semanticEventSequence = swordHitEventThisTick_;
+    sample.outcome = swordHitEventThisTick_ != 0
+        ? CombatContactOutcome::AcceptedSwordContact : CombatContactOutcome::NoContact;
+    if (sample.target == EntityId::Lich)
+    {
+        sample.targetX = lichEncounter_.Snapshot().x;
+        sample.targetZ = lichEncounter_.Snapshot().z;
+    }
+    else if (sample.target == EntityId::SkeletonA || sample.target == EntityId::SkeletonB)
+    {
+        const auto index = sample.target == EntityId::SkeletonA ? 0u : 1u;
+        sample.targetX = combatSnapshot_.combatants[index].x;
+        sample.targetZ = combatSnapshot_.combatants[index].z;
+    }
+    sample.hasSwordTransform = true;
+    sample.worldFromSword = heldItems_[1].worldFromItem;
+    combatContactTrace_.Push(sample);
 }
 
 bool GameSimulation::SwordDefenseReady() const
 {
     const horde::gameplay::items::HeldItemState& sword = heldItems_[1];
-    return sword.id == horde::gameplay::items::HeldItemId::Sword &&
+    return !FlaskUtilityBusy() && sword.id == horde::gameplay::items::HeldItemId::Sword &&
            !sword.detached &&
            sword.parentMode == horde::gameplay::items::HeldItemParentMode::HandSocket &&
            !sword.transition.active;
@@ -1200,7 +1777,7 @@ bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
                                      const bool blocksDefenseDuringDraw)
 {
     using namespace horde::gameplay::items;
-    if (!config_.swordStartsStowed || SwordDefenseReady())
+    if (FlaskUtilityBusy() || !config_.swordStartsStowed || SwordDefenseReady())
         return false;
 
     HeldItemState& sword = heldItems_[1];
@@ -1224,6 +1801,7 @@ bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
 
 void GameSimulation::ResetSwordEquipment()
 {
+    ResetFlaskUtility();
     using namespace horde::gameplay::items;
     HeldItemState& sword = heldItems_[1];
     const std::uint64_t sequence = sword.transition.semanticEdgeSequence;
@@ -1284,6 +1862,9 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
         {
             continue;
         }
+        if(config_.developmentRescueJourney && chestRewardSequence_.Snapshot().phase == ChestRewardPhase::LanternClaimed) {
+            if(!TryRescueInteraction())(void)TryFlaskUpgradeInteraction(); continue;
+        }
         const ChestRewardAction action = chestRewardSequence_.TryInteract(query);
         if (action == ChestRewardAction::OpeningStarted)
         {
@@ -1297,6 +1878,7 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
         {
             EquipRewardLantern(interactionState_);
             finaleSequence_.NotifyLanternClaimed();
+            if(config_.developmentRescueJourney) { rescueTraversal_.NotifyLanternClaimed();rescueTraversal_.DeployOwned(); }
             Emit(GameplayEventType::LanternClaimed,
                  EntityId::Player,
                  EntityId::RewardLantern,
@@ -1330,7 +1912,7 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
     AdvanceHeldLightPose(interactionState_, deltaSeconds);
     finaleSequence_.Update(deltaSeconds);
 
-    if (finaleSequence_.Snapshot().endingPhase ==
+    if (!config_.developmentRescueJourney && finaleSequence_.Snapshot().endingPhase ==
             horde::gameplay::interactions::FinaleEndingPhase::Complete &&
         !finaleCompletionEmitted_)
     {
@@ -1355,14 +1937,14 @@ void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
         : 1.0f - std::clamp(torchFailureSnapshot_.leftArmLowerBlend, 0.0f, 1.0f);
     playerAnimationState_.StepFixed(
         {walkVisualAmount_,
-         walkTime_,
+         walkCycleTime_,
          combatPresentation_.PlayerCombatForPresentation(combatSnapshot_.player),
          heldItemFixedStepState_.kinematics,
          leftArmWeight,
          interactionState_.heldLightKind == horde::gameplay::interactions::HeldLightKind::RewardLantern,
          lanternPendulum_.Snapshot().forwardAngleRadians,
          lanternPendulum_.Snapshot().strafeAngleRadians,
-         carryingOriginalTorch},
+         carryingOriginalTorch, walkPhaseOffset_},
         fixedDeltaSeconds);
 
 }
@@ -1396,14 +1978,80 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
     }
 }
 
-void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSeconds)
+void GameSimulation::ClearRunIntent()
 {
+    runToggleActive_ = false;
+    runActive_ = false;
+    playerMovementSpeed_ = 0.0f;
+    runInputBlockedUntilRelease_ = true;
+    pendingRunToggleCommands_ = 0u;
+    pendingClearRunIntentCommands_ = 0u;
+    lastConsumedRunToggleSequence_ = std::max(
+        lastConsumedRunToggleSequence_, latestRunToggleSequence_);
+    lastConsumedClearRunIntentSequence_ = std::max(
+        lastConsumedClearRunIntentSequence_, latestClearRunIntentSequence_);
+}
+
+void GameSimulation::ClearCrouchIntent()
+{
+    automaticCrouchRequested_=false;
+    crouchToggleActive_=false;crouchInputBlockedUntilRelease_=lastInput_.crouchHeld;
+    pendingCrouchToggleCommands_=pendingClearCrouchIntentCommands_=0;
+    lastConsumedCrouchToggleSequence_=std::max(lastConsumedCrouchToggleSequence_,latestCrouchToggleSequence_);
+    lastConsumedClearCrouchIntentSequence_=std::max(lastConsumedClearCrouchIntentSequence_,latestClearCrouchIntentSequence_);
+}
+bool GameSimulation::BodyHeightClear(float height) const
+{
+    if(!AuthoredBodySweepClear(playerX_,playerZ_,playerX_,playerZ_,playerSupport_.worldY,height,kPlayerCollisionRadius))return false;
+    if(UsesRescueExterior() && config_.authoredChapterTerrain) {
+        if(!chapterTerrain_||chapterTerrainGeneration_!=worldRoute_.generation)return false;
+        return horde::gameplay::traversal::ChapterExteriorObstacleClear(*chapterTerrain_,playerX_,playerZ_,playerX_,playerZ_,
+            playerSupport_.worldY+.001f,playerSupport_.worldY+height,kPlayerCollisionRadius) &&
+            chapterTerrain_->HorizontalBodyVolumeClear(playerX_,playerZ_,playerX_,playerZ_,playerSupport_.worldY,height,kPlayerCollisionRadius);
+    }
+    return true;
+}
+void GameSimulation::UpdatePosture(const InputSnapshot& input,float seconds)
+{
+    if(!input.crouchHeld)crouchInputBlockedUntilRelease_=false;
+    if(pendingClearCrouchIntentCommands_)ClearCrouchIntent();
+    if(pendingCrouchToggleCommands_) {
+        if(pendingCrouchToggleCommands_&1u)crouchToggleActive_=!crouchToggleActive_;
+        lastConsumedCrouchToggleSequence_=SaturatingAdd(lastConsumedCrouchToggleSequence_,pendingCrouchToggleCommands_);
+        pendingCrouchToggleCommands_=0;
+    }
+    const bool requested=CurrentCombatRules() && playerSupport_.grounded && !rescueTraversal_.IsActive() &&
+        (automaticCrouchRequested_ || crouchToggleActive_ || (input.crouchHeld&&!crouchInputBlockedUntilRelease_));
+    automaticCrouchRequested_=false;
+    posture_.Step(requested,seconds,[&](float height){return BodyHeightClear(height);});
+    if(requested||posture_.Active()) {ClearRunIntent();dodgeRemainingSeconds_=0;}
+}
+
+void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSeconds,
+                                    const float previousWalkCycleTime)
+{
+    UpdatePosture(input,deltaSeconds);
     playerYawRadians_ = FiniteOr(input.yawRadians, playerYawRadians_);
     playerPitchRadians_ = std::clamp(FiniteOr(input.pitchRadians, playerPitchRadians_),
                                      kMinimumPitch,
                                      kMaximumPitch);
     const float previousX = playerX_;
     const float previousZ = playerZ_;
+
+    if (!input.runHeld)
+        runInputBlockedUntilRelease_ = false;
+    if (pendingClearRunIntentCommands_ > 0u)
+    {
+        ClearRunIntent();
+    }
+    else if (pendingRunToggleCommands_ > 0u)
+    {
+        if ((pendingRunToggleCommands_ & 1u) != 0u)
+            runToggleActive_ = !runToggleActive_;
+        lastConsumedRunToggleSequence_ = SaturatingAdd(
+            lastConsumedRunToggleSequence_, pendingRunToggleCommands_);
+        pendingRunToggleCommands_ = 0u;
+    }
 
     dodgeCooldownRemainingSeconds_ = std::max(
         0.0f, dodgeCooldownRemainingSeconds_ - deltaSeconds);
@@ -1417,9 +2065,11 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
                                  lastConsumedDodgeSequence_);
         pendingDodgeCommands_ = 0u;
         dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
+        ClearRunIntent();
         snapshot_.playerTravelledThisTick = 0.0f;
         walkVisualAmount_ = 0.0f;
-        playerFootsteps_.Reset();
+        ResetPlayerFootsteps();
         return;
     }
     if (pendingDodgeCommands_ > 0u)
@@ -1429,7 +2079,8 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
         MarkCombatTimingConsumed(CombatInputEdgeKind::Dodge, oldDodgeConsumed,
                                  lastConsumedDodgeSequence_);
         pendingDodgeCommands_ = 0u;
-        if (dodgeRemainingSeconds_ <= 0.0f && dodgeCooldownRemainingSeconds_ <= 0.0f)
+        if (!posture_.Active() && !crouchToggleActive_ && !input.crouchHeld &&
+            dodgeRemainingSeconds_ <= 0.0f && dodgeCooldownRemainingSeconds_ <= 0.0f)
         {
             float forward = pendingDodgeForward_;
             float strafe = pendingDodgeStrafe_;
@@ -1449,18 +2100,40 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             dodgeDirectionX_ = forwardX * forward + rightX * strafe;
             dodgeDirectionZ_ = forwardZ * forward + rightZ * strafe;
             dodgeRemainingSeconds_ = kDodgeDurationSeconds;
+            dodgeProtectionAccepted_ = CurrentCombatRules();
+            acceptedDodgeSequence_ = lastConsumedDodgeSequence_;
+            acceptedDodgeConsumedTick_ = tickIndex_;
             dodgeCooldownRemainingSeconds_ = kDodgeCooldownSeconds;
+            ClearRunIntent();
         }
     }
 
+    // A combat action takes priority over run intent. A held key must be
+    // released before it can request run again after the action completes.
+    const bool actionInterruptsRun = input.hasAuthoritativePlayerPose ||
+        combatSnapshot_.player.action != PlayerCombatAction::Idle;
+    if (actionInterruptsRun)
+        ClearRunIntent();
+
+    const bool runRequested = !posture_.Active() && !crouchToggleActive_ && !input.crouchHeld &&
+        (input.analogueMovement || (!runInputBlockedUntilRelease_ && (runToggleActive_ || input.runHeld))) && !actionInterruptsRun;
+    runActive_ = false;
+
+    const bool dodgingThisTick = dodgeRemainingSeconds_ > 0.0f;
     float movementIntent = 0.0f;
     if (input.hasAuthoritativePlayerPose)
     {
         playerX_ = FiniteOr(input.authoritativePlayerX, playerX_);
         playerZ_ = FiniteOr(input.authoritativePlayerZ, playerZ_);
+        playerMovementSpeed_ = 0.0f;
+        dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
     }
     else
     {
+        const bool detectHeadClearance=CurrentCombatRules() && playerSupport_.grounded &&
+            dodgeRemainingSeconds_<=0 && !rescueTraversal_.IsActive() &&
+            (std::abs(FiniteOr(input.moveForward,0.f))>.001f || std::abs(FiniteOr(input.moveStrafe,0.f))>.001f);
         if (dodgeRemainingSeconds_ > 0.0f)
         {
             const float dodgeStepSeconds = std::min(deltaSeconds, dodgeRemainingSeconds_);
@@ -1469,6 +2142,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             playerZ_ += dodgeDirectionZ_ * dodgeSpeed * dodgeStepSeconds;
             dodgeRemainingSeconds_ = std::max(0.0f, dodgeRemainingSeconds_ - dodgeStepSeconds);
             movementIntent = 1.0f;
+            playerMovementSpeed_ = 0.0f;
         }
         else
         {
@@ -1476,7 +2150,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             float strafe = std::clamp(FiniteOr(input.moveStrafe, 0.0f), -1.0f, 1.0f);
             const float magnitude = std::sqrt(forward * forward + strafe * strafe);
             movementIntent = std::min(1.0f, magnitude);
-            if (magnitude > 1.0f)
+            if (magnitude > 0.0001f)
             {
                 forward /= magnitude;
                 strafe /= magnitude;
@@ -1486,42 +2160,252 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
             const float forwardZ = -std::cos(playerYawRadians_);
             const float rightX = std::cos(playerYawRadians_);
             const float rightZ = std::sin(playerYawRadians_);
-            playerX_ += (forwardX * forward + rightX * strafe) *
-                        config_.movementSpeedMetresPerSecond * deltaSeconds;
-            playerZ_ += (forwardZ * forward + rightZ * strafe) *
-                        config_.movementSpeedMetresPerSecond * deltaSeconds;
+            const float maximumSpeed = posture_.Active()?std::min(1.f,config_.movementSpeedMetresPerSecond):runRequested
+                ? kRunSpeedMetresPerSecond
+                : config_.movementSpeedMetresPerSecond;
+            const float targetSpeed = magnitude > 0.001f
+                ? maximumSpeed * std::min(1.0f, magnitude)
+                : 0.0f;
+            if(posture_.Active())playerMovementSpeed_=std::min(playerMovementSpeed_,maximumSpeed);
+            const bool rampMovement = runRequested || config_.developmentWorldRoute ||
+                playerMovementSpeed_ > config_.movementSpeedMetresPerSecond;
+            if (rampMovement)
+            {
+                playerMovementSpeed_ += std::clamp(
+                    targetSpeed - playerMovementSpeed_,
+                    -kMovementAccelerationMetresPerSecondSquared * deltaSeconds,
+                     kMovementAccelerationMetresPerSecondSquared * deltaSeconds);
+            }
+            else
+            {
+                // Keep ordinary, no-run 1.6.2 movement timing exact. Smooth
+                // ramps are limited to the new run transition and opted-in
+                // development route; coming down from run remains smooth.
+                playerMovementSpeed_ = targetSpeed;
+            }
+            movementIntent = maximumSpeed > 0.001f
+                ? std::clamp(playerMovementSpeed_ / maximumSpeed, 0.0f, 1.0f)
+                : std::min(1.0f, magnitude); // Existing stationary pose diagnostics retain walk intent.
+            const float travelledStep = playerMovementSpeed_ * deltaSeconds;
+            playerX_ += (forwardX * forward + rightX * strafe) * travelledStep;
+            playerZ_ += (forwardZ * forward + rightZ * strafe) * travelledStep;
         }
-        ResolveCorridorPlayerCollision(previousX, previousZ, playerX_, playerZ_);
+        ResolveMovementCollision(previousX, previousZ, detectHeadClearance);
         const LichSnapshot& keeper = lichEncounter_.Snapshot();
-        if (!keeper.revealComplete && keeper.phase != LichPhase::Dead)
+        if (!config_.developmentWorldRoute &&
+            !keeper.revealComplete && keeper.phase != LichPhase::Dead)
         {
             ResolveMovementAgainstCircle({keeper.x, keeper.z},
                 kKeeperPresentationCollisionRadius + kPlayerCollisionRadius,
                 previousX, previousZ, playerX_, playerZ_);
-            ResolveCorridorPlayerCollision(previousX, previousZ, playerX_, playerZ_);
+            ResolveMovementCollision(previousX, previousZ, detectHeadClearance);
         }
     }
 
+    if(staticDetailLease_.resourceGeneration && !staticDetailLease_.Contains(playerX_,playerZ_)) {
+        playerX_=previousX;playerZ_=previousZ;
+        staticDetailLease_.restoreRequested=true;
+    }
+    ResolvePlayerSupport();
     const float travelled = std::hypot(playerX_ - previousX, playerZ_ - previousZ);
+    if (!input.hasAuthoritativePlayerPose && dodgeRemainingSeconds_ <= 0.0f &&
+        (runRequested || config_.developmentWorldRoute ||
+         playerMovementSpeed_ > config_.movementSpeedMetresPerSecond))
+    {
+        const float walkSpeed = std::max(config_.movementSpeedMetresPerSecond, 0.001f);
+        // Phase follows collision-resolved path length. Blocked commanded
+        // speed cannot create a faster leg stride against a wall.
+        walkCycleTime_ += travelled / walkSpeed - deltaSeconds;
+    }
+    if (CurrentCombatRules() && !input.hasAuthoritativePlayerPose && !dodgingThisTick &&
+        config_.movementSpeedMetresPerSecond > 0.001f)
+    {
+        const float forwardTravel = (playerX_ - previousX) * std::sin(playerYawRadians_) -
+                                    (playerZ_ - previousZ) * std::cos(playerYawRadians_);
+        walkPhaseOffset_ = horde::gameplay::animation::UpdateBackwardWalkPhaseOffset(
+            walkPhaseOffset_, walkCycleTime_ - previousWalkCycleTime,
+            travelled, forwardTravel, config_.movementSpeedMetresPerSecond);
+    }
     if (input.hasAuthoritativePlayerPose)
     {
         movementIntent = travelled > 0.00001f ? 1.0f : 0.0f;
     }
     snapshot_.playerTravelledThisTick = travelled;
+    runActive_ = runRequested && travelled > 0.00001f && dodgeRemainingSeconds_ <= 0.0f;
     const float blend = std::clamp(deltaSeconds * 8.0f, 0.0f, 1.0f);
-    walkVisualAmount_ += (movementIntent - walkVisualAmount_) * blend;
-    if (playerFootsteps_.Update(travelled, movementIntent > 0.02f))
+    // A stopped capsule returns to idle instead of holding one raised walk
+    // foot indefinitely against a wall. Keep footstep cadence's movementIntent
+    // and all gameplay clocks unchanged; zero-speed capture fixtures stay exact.
+    const bool motorBlocked = CurrentCombatRules() && !input.hasAuthoritativePlayerPose &&
+        !dodgingThisTick && config_.movementSpeedMetresPerSecond > 0.001f && travelled <= 0.000001f;
+    const float visualMovementIntent = motorBlocked ? 0.0f : movementIntent;
+    walkVisualAmount_ += (visualMovementIntent - walkVisualAmount_) * blend;
+    const bool footstep = playerFootsteps_.Update(travelled,
+                                                movementIntent > 0.02f && !input.hasAuthoritativePlayerPose,
+                                                playerSupport_.grounded);
+    const auto wetContact = CurrentCombatRules() ? waterContact_.Step(deltaSeconds,
+        playerX_,playerSupport_.worldY,playerZ_,playerSupport_.grounded,footstep,
+        deltaSeconds>0 ? travelled/deltaSeconds : 0,lastInput_.waterfallWidthScale)
+        : horde::gameplay::effects::WaterContactResult{};
+    if(wetContact.streamEntry && config_.combatFoundation1_7 && !legacyCombatCheckpoint_)
+        Emit(GameplayEventType::WaterfallContact,EntityId::Player,EntityId::Invalid,
+             playerX_,playerZ_,.35f,0,playerSupport_.worldY+.85f);
+    if (footstep)
     {
-        Emit(GameplayEventType::PlayerFootstep,
+        const bool wetStep = wetContact.wetStep && CurrentCombatRules();
+        Emit(wetStep ? GameplayEventType::PlayerWetFootstep : GameplayEventType::PlayerFootstep,
              EntityId::Player,
              EntityId::Invalid,
              playerX_,
-             playerZ_);
+             playerZ_,wetContact.wetStep ? wetContact.intensity : 1.f,
+             wetStep ? 0 : dryFootstepCues_.Next(playerSupport_.surface),
+             wetContact.wetStep ? playerSupport_.worldY : 0.f);
     }
+}
+
+bool GameSimulation::CurrentCombatRules() const
+{
+    return config_.combatFoundation1_7 && !legacyCombatCheckpoint_;
+}
+
+bool GameSimulation::UsesSkeletonRevival() const
+{
+    return config_.skeletonRevival1_7 && config_.waterfallSkeletonEncounter &&
+        CurrentCombatRules() && !skeletonRevivalWorkshopBypass_;
+}
+
+bool GameSimulation::OpeningEncounterComplete() const
+{
+    return UsesSkeletonRevival()
+        ? skeletonRevival_.Snapshot().phase == SkeletonRevivalPhase::Complete
+        : combatSnapshot_.encounterComplete;
+}
+
+bool GameSimulation::ConfigureSkeletonRevivalPresentation(std::uint64_t generation,
+    float deadSeconds, float standSeconds, bool ready)
+{
+    if (!config_.skeletonRevival1_7 || !generation || generation < skeletonRevivalResourceGeneration_)
+        return false;
+    if (ready && (!std::isfinite(deadSeconds) || deadSeconds <= 0.f ||
+                  !std::isfinite(standSeconds) || standSeconds <= 0.f)) return false;
+    if (ready && skeletonRevival_.Snapshot().SuppressesActors() &&
+        (deadSeconds != skeletonRevivalDeadDurationSeconds_ || standSeconds != skeletonRevivalStandDurationSeconds_))
+        return false;
+    skeletonRevivalResourceGeneration_ = generation;
+    skeletonRevivalPresentationReady_ = ready;
+    if (ready) {
+        skeletonRevivalDeadDurationSeconds_ = deadSeconds;
+        skeletonRevivalStandDurationSeconds_ = standSeconds;
+    } else skeletonRevival_.CancelTransient();
+    RefreshSnapshot(lastInput_);
+    return true;
+}
+
+void GameSimulation::UpdateSkeletonRevival(const InputSnapshot& input, float deltaSeconds)
+{
+    if (!UsesSkeletonRevival()) { skeletonRevival_.CancelTransient(); return; }
+    const auto& teaching = combatTeaching_.Snapshot();
+    SkeletonRevivalInput bridge;
+    bridge.practiceFinished = teaching.stage == TutorialStage::Complete;
+    // Initial tutorial OFF is an actual opt-out too. Eligibility/pause alone is
+    // never Skip, and a deliberate disable must finish its protected safe exit.
+    bridge.practiceSkipped = teaching.stage == TutorialStage::Skipped ||
+        (!input.tutorialEnabled && !teaching.exitPending && !teaching.safePractice);
+    bridge.bothDead = combatSnapshot_.combatantCount == kSkeletonEnemyCapacity && combatSnapshot_.encounterComplete;
+    bridge.bothAlive = combatSnapshot_.combatantCount == kSkeletonEnemyCapacity &&
+                       combatSnapshot_.aliveCount == kSkeletonEnemyCapacity;
+    bridge.bothDeathAnimationsComplete = swordCombat_.DefeatedPairReadyToRevive(skeletonRevivalDeadDurationSeconds_);
+    bridge.playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
+    bridge.paused = input.paused;
+    bridge.presentationReady = skeletonRevivalPresentationReady_;
+    bridge.riseDurationSeconds = skeletonRevivalDeadDurationSeconds_ + skeletonRevivalStandDurationSeconds_;
+    // This is an in-place rearm safety margin, not a new movement collider or a
+    // request to relocate a corpse. The player can always step out of the area.
+    constexpr float rearmSeparationMetres = .75f;
+    bridge.actorClearance = std::all_of(combatSnapshot_.combatants.begin(),
+        combatSnapshot_.combatants.begin() + combatSnapshot_.combatantCount, [&](const auto& actor) {
+            return std::hypot(playerX_ - actor.x, playerZ_ - actor.z) >= rearmSeparationMetres;
+        });
+    const auto& state = skeletonRevival_.Step(deltaSeconds, bridge);
+    if (state.signalPulse) {
+        const auto& keeper = lichEncounter_.Snapshot();
+        Emit(GameplayEventType::LichRevivalCry, EntityId::Lich, EntityId::Player, keeper.x, keeper.z);
+    }
+    if (state.revivePulse) {
+        if (swordCombat_.ReviveDefeatedPairInPlace(skeletonRevivalDeadDurationSeconds_)) {
+            combatSnapshot_ = swordCombat_.Snapshot();
+            revivedIdlePhaseZero_ = true; // Both new-life clocks start at the admitted Idle0 join.
+            (void)skeletonRevival_.AcknowledgeLivePair(state.generation,
+                combatSnapshot_.aliveCount == kSkeletonEnemyCapacity, combatSnapshot_.encounterComplete);
+        } else {
+            // Keep progress blocked rather than fake a successful revival.
+            // The ordinary explicit Retry remains available and retains consumption.
+            skeletonRevivalPresentationReady_ = false;
+        }
+    }
+    if (skeletonRevival_.Snapshot().phase == SkeletonRevivalPhase::Complete)
+        enemyDirector_.MarkDead(EnemyKind::Skeleton);
+}
+
+void GameSimulation::CancelCombatTransients()
+{
+    guardReleaseRequired_ = guardReleaseRequired_ || lastInput_.guardHeld;
+    swordCombat_.SetGuardHeld(false);
+    combatSnapshot_.player = swordCombat_.Snapshot().player;
+    waterContact_.Reset();
+    dodgeProtectionAccepted_ = false;
+    keeperRepelRemainingSeconds_ = 0.0f;
+    gameplayTimeScale_ = 1.0f;
+    combatTeaching_.CancelTransient();
+    skeletonRevival_.CancelTransient();
+    currentCutCommandSequence_ = currentCutConsumedTick_ = 0;
+    queuedUpCutCommandSequence_ = queuedUpCutConsumedTick_ = 0;
+    swordHitTargetThisTick_ = EntityId::Invalid;
+    swordHitEventThisTick_ = 0;
+}
+
+void GameSimulation::BeginKeeperRepel()
+{
+    const auto& keeper = lichEncounter_.Snapshot();
+    const float dx = playerX_ - keeper.x, dz = playerZ_ - keeper.z;
+    const float distance = std::hypot(dx, dz);
+    keeperRepelDirectionX_ = distance > 0.0001f ? dx / distance : -std::sin(playerYawRadians_);
+    keeperRepelDirectionZ_ = distance > 0.0001f ? dz / distance : std::cos(playerYawRadians_);
+    keeperRepelRemainingSeconds_ = LichEncounter::kRepelDuration;
+    keeperRepelTravelledMetres_ = 0.0f;
+    ClearRunIntent(); // Dodge/parry and looking remain available.
+}
+
+void GameSimulation::ApplyKeeperRepel(float deltaSeconds)
+{
+    if (keeperRepelRemainingSeconds_ <= 0.0f) return;
+    if (!CurrentCombatRules() || lichEncounter_.Snapshot().phase == LichPhase::Dead ||
+        playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
+    { keeperRepelRemainingSeconds_ = 0.0f; return; }
+    const float seconds = std::min(deltaSeconds, keeperRepelRemainingSeconds_);
+    const float stepDistance = LichEncounter::kRepelDistance * seconds / LichEncounter::kRepelDuration;
+    const float oldX = playerX_, oldZ = playerZ_, oldY = playerSupport_.worldY;
+    const auto previousWorldRoute = worldRoute_;
+    playerX_ += keeperRepelDirectionX_ * stepDistance;
+    playerZ_ += keeperRepelDirectionZ_ * stepDistance;
+    ResolveMovementCollision(oldX, oldZ);
+    ResolvePlayerSupport();
+    // Repel cannot force a support transition, fall, or height snap.
+    if (!playerSupport_.grounded || std::abs(playerSupport_.worldY - oldY) > 0.0001f)
+    {
+        playerX_ = oldX; playerZ_ = oldZ;
+        worldRoute_ = previousWorldRoute;
+        ResolvePlayerSupport();
+    }
+    const float travelled = std::hypot(playerX_ - oldX, playerZ_ - oldZ);
+    keeperRepelTravelledMetres_ += travelled;
+    snapshot_.playerTravelledThisTick += travelled;
+    keeperRepelRemainingSeconds_ = std::max(0.0f, keeperRepelRemainingSeconds_ - seconds);
 }
 
 void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSeconds)
 {
+    ApplyKeeperRepel(deltaSeconds);
     const auto encounterOverride = config_.waterfallSkeletonEncounter &&
         IsWaterfallSkeletonRoom(playerX_, playerZ_)
             ? EnemyKind::Skeleton : EnemyKind::None;
@@ -1530,9 +2414,10 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     if (selectedEnemy != activeEnemyKind_)
     {
         activeEnemyKind_ = selectedEnemy;
-        if (!lichEncounter_.Snapshot().revealStarted)
+        if (!lichEncounter_.Snapshot().revealStarted && (!UsesSkeletonRevival() || OpeningEncounterComplete()))
             playerVitals_.ResetForEncounter();
-        retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
+        retryCheckpoint_ = UsesSkeletonRevival() && !OpeningEncounterComplete()
+            ? 0 : activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
         // Opening enemies and the keeper persist through route selection.
         // Only explicit reset/retry/checkpoint import may initialise them.
     }
@@ -1567,9 +2452,10 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     }
 
     const bool finaleActive = QueryShowcaseZone(playerX_, playerZ_) == ShowcaseZone::Finale;
+    const bool openingAllowsKeeper = !UsesSkeletonRevival() || OpeningEncounterComplete();
     const auto& keeperBeforeActions = lichEncounter_.Snapshot();
     const bool keeperHoldsActions = IsKeeperRevealing(keeperBeforeActions.revealPhase) ||
-        (!keeperBeforeActions.revealStarted && activeEnemyKind_ == EnemyKind::Lich &&
+        (!keeperBeforeActions.revealStarted && openingAllowsKeeper && activeEnemyKind_ == EnemyKind::Lich &&
          finaleActive && torchFailureSnapshot_.phase == TorchFailurePhase::Settled &&
          HasReachedKeeperArrivalThreshold(playerX_, playerZ_));
     if (keeperHoldsActions)
@@ -1587,26 +2473,43 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                                  lastConsumedParrySequence_);
         pendingParryCommands_ = 0u;
         dodgeRemainingSeconds_ = 0.0f;
+        CancelCombatTransients();
         swordCombat_.CancelPlayerActions();
         lichAttackEligible_ = false;
         lichRevealAttackSequenceFloor_ = latestAttackSequence_;
     }
-    const bool parryAvailable = SwordDefenseReady() && swordCombat_.CanAcceptParry();
+    if (!input.guardHeld) guardReleaseRequired_ = false;
+    const bool guardReady = CurrentCombatRules() && SwordDefenseReady() && !keeperHoldsActions &&
+        dodgeRemainingSeconds_ <= 0.0f && !rescueMovementSuppressedThisTick_ &&
+        !rescueTraversal_.IsActive();
+    if (input.guardHeld && !guardReady) guardReleaseRequired_ = true;
+    swordCombat_.SetGuardHeld(guardReady && !guardReleaseRequired_ && input.guardHeld);
+    const bool parryAvailable = SwordDefenseReady() && swordCombat_.CanAcceptParry() &&
+        (!CurrentCombatRules() || !input.guardHeld || !guardReleaseRequired_);
     bool playerActionAccepted = false;
     const auto acceptAttack = [&](const std::uint64_t commandSequence)
     {
         if (!SwordDefenseReady())
             return false;
+        const bool fromGuard = swordCombat_.Snapshot().player.action == PlayerCombatAction::Guard;
         const PlayerAttackCut acceptedCut = swordCombat_.RequestAttack();
         if (acceptedCut == PlayerAttackCut::None)
             return false;
         if (acceptedCut == PlayerAttackCut::DownwardCut)
         {
+            if (CurrentCombatRules() && fromGuard) combatTeaching_.BeginGuardAttack();
+            currentCutCommandSequence_ = commandSequence;
+            currentCutConsumedTick_ = tickIndex_;
+            queuedUpCutCommandSequence_ = queuedUpCutConsumedTick_ = 0;
             lichAttackEligible_ = lichEncounter_.Snapshot().revealComplete &&
                 commandSequence > lichRevealAttackSequenceFloor_;
         }
         else
         {
+            // A buffered continuation must not relabel the still-running
+            // downward cut. Promote its source only when the upward cut starts.
+            queuedUpCutCommandSequence_ = commandSequence;
+            queuedUpCutConsumedTick_ = tickIndex_;
             lichAttackEligible_ = lichAttackEligible_ &&
                 lichEncounter_.Snapshot().revealComplete &&
                 commandSequence > lichRevealAttackSequenceFloor_;
@@ -1676,9 +2579,13 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             swordCombat_.RequestParry();
             parrySourceCommandSequence_ = lastConsumedParrySequence_;
         }
+        swordCombat_.ConsumeGuardPress();
     }
 
     const auto previousSkeletons = combatSnapshot_.combatants;
+    swordHitTargetThisTick_ = EntityId::Invalid;
+    swordHitEventThisTick_ = 0;
+    swordCombat_.SetSpecialAttacksEnabled(CurrentCombatRules() && config_.specialSkeletonAttacks1_7);
     combatSnapshot_ = swordCombat_.Update(deltaSeconds,
                                            playerX_,
                                            playerZ_,
@@ -1688,6 +2595,16 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                                                IsWaterfallSkeletonArena(playerX_, playerZ_),
                                            config_.waterfallSkeletonEncounter);
     EntityId skeletonDamageSource = EntityId::Invalid;
+    EnemyAttackKind incomingAttackKind = EnemyAttackKind::Unblockable;
+    if (queuedUpCutCommandSequence_ != 0 &&
+        (combatSnapshot_.player.action == PlayerCombatAction::UpwardSliceWindup ||
+         combatSnapshot_.player.action == PlayerCombatAction::UpwardSliceActive ||
+         combatSnapshot_.player.action == PlayerCombatAction::UpwardSliceRecovery))
+    {
+        currentCutCommandSequence_ = queuedUpCutCommandSequence_;
+        currentCutConsumedTick_ = queuedUpCutConsumedTick_;
+        queuedUpCutCommandSequence_ = queuedUpCutConsumedTick_ = 0;
+    }
     skeletonIncidentalSpacingSeconds_ = std::max(
         0.0, skeletonIncidentalSpacingSeconds_ - deltaSeconds);
     for (std::size_t index = 0u; index < combatSnapshot_.combatantCount; ++index)
@@ -1705,25 +2622,38 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                  current.x,
                  current.z);
         }
-        if (activeEnemyKind_ == EnemyKind::Skeleton && previous.health > 0 && current.health <= 0)
+        if (activeEnemyKind_ == EnemyKind::Skeleton && current.health < previous.health)
         {
-            Emit(GameplayEventType::EnemyHit,
+            swordHitTargetThisTick_ = entity;
+            swordHitEventThisTick_ = Emit(GameplayEventType::EnemyHit,
                  EntityId::Player,
                  entity,
                  current.x,
                  current.z);
+        }
+        if (activeEnemyKind_ == EnemyKind::Skeleton && previous.health > 0 && current.health <= 0)
+        {
             Emit(GameplayEventType::EnemyDefeated,
                  EntityId::Player,
                  entity,
                  current.x,
                  current.z);
         }
+        if (CurrentCombatRules() && activeEnemyKind_ == EnemyKind::Skeleton &&
+            current.action == EnemyCombatAction::AttackWindup &&
+            current.attackKind == EnemyAttackKind::GuardBreak &&
+            previous.actionTime < CombatTimeline::kSkeletonAttackWindupSeconds - 0.26f &&
+            current.actionTime >= CombatTimeline::kSkeletonAttackWindupSeconds - 0.26f)
+            Emit(GameplayEventType::ParryPrepareCue, entity, EntityId::Player,
+                 current.x, current.z, 0.45f);
         if (current.playerHitPulse)
         {
             skeletonDamageSource = entity;
+            incomingAttackKind = current.playerHitKind;
         }
         if (current.parrySuccessPulse)
         {
+            if (CurrentCombatRules()) combatTeaching_.ParrySucceeded();
             const std::uint64_t eventSequence = Emit(
                 GameplayEventType::PlayerParrySucceeded,
                 EntityId::Player,
@@ -1767,7 +2697,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             }
         }
     }
-    if (activeEnemyKind_ == EnemyKind::Skeleton && combatSnapshot_.encounterComplete)
+    if (!UsesSkeletonRevival() && activeEnemyKind_ == EnemyKind::Skeleton && combatSnapshot_.encounterComplete)
     {
         enemyDirector_.MarkSelectedDead();
     }
@@ -1789,18 +2719,28 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         playerX_,
         playerZ_,
         lineOfSight,
-        activeEnemyKind_ == EnemyKind::Lich && finaleActive,
+        activeEnemyKind_ == EnemyKind::Lich && finaleActive && openingAllowsKeeper,
         torchFailureSnapshot_.phase == TorchFailurePhase::Settled &&
             HasReachedKeeperArrivalThreshold(playerX_, playerZ_));
 
     if (!previousLich.revealStarted && lich.revealStarted)
     {
         Emit(GameplayEventType::KeeperRevealStarted, EntityId::Lich, EntityId::Player, lich.x, lich.z);
+        if(CurrentCombatRules()) {
+            dialogue::Context c;c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY)-posture_.drop,playerZ_};
+            c.yaw=playerYawRadians_;
+            chapterDialogue_.Request(dialogue::Line::KeeperSense,{lich.x,lich.y,lich.z},c);
+        }
     }
     if (previousLich.revealPhase == KeeperRevealPhase::Awakening &&
         (lich.revealPhase == KeeperRevealPhase::Warning || lich.revealPhase == KeeperRevealPhase::Ready))
     {
         Emit(GameplayEventType::KeeperWarning, EntityId::Lich, EntityId::Player, lich.x, lich.z);
+        if(CurrentCombatRules()) {
+            dialogue::Context c;c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY)-posture_.drop,playerZ_};
+            c.yaw=playerYawRadians_;
+            chapterDialogue_.Request(dialogue::Line::KeeperCloser,{lich.x,lich.y,lich.z},c);
+        }
     }
     if (!previousLich.revealComplete && lich.revealComplete)
     {
@@ -1810,6 +2750,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     }
 
     if (activeEnemyKind_ == EnemyKind::Lich && lichAttackEligible_ && combatSnapshot_.playerAttackPulse &&
+        !IsRouteAudioObstructed(playerX_, playerZ_, lich.x, lich.z) &&
         SwordCombat::IsPlayerTargetInRangeCone(playerX_,
                                                 playerZ_,
                                                 playerYawRadians_,
@@ -1817,13 +2758,17 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                                                 lich.z) &&
         lichEncounter_.TryAcceptPlayerHit(playerX_, playerZ_))
     {
-        Emit(GameplayEventType::EnemyHit,
+        swordHitTargetThisTick_ = EntityId::Lich;
+        swordHitEventThisTick_ = Emit(GameplayEventType::EnemyHit,
              EntityId::Player,
              EntityId::Lich,
              lich.x,
              lich.z);
+        if (CurrentCombatRules() && lichEncounter_.Snapshot().phase == LichPhase::Repelling)
+            BeginKeeperRepel();
         if (lichEncounter_.Snapshot().phase == LichPhase::Dead)
         {
+            keeperRepelRemainingSeconds_ = 0.0f;
             Emit(GameplayEventType::LichDefeated,
                  EntityId::Player,
                  EntityId::Lich,
@@ -1846,6 +2791,10 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
              lich.z,
              lich.staffLightStrength);
     }
+    if (CurrentCombatRules() && activeEnemyKind_ == EnemyKind::Lich &&
+        lichEncounter_.Snapshot().dischargeWarningPulse)
+        Emit(GameplayEventType::LichDischargeWarning, EntityId::Lich, EntityId::Player,
+             lich.x, lich.z, 0.45f);
     if (activeEnemyKind_ == EnemyKind::Lich && lichEncounter_.Snapshot().damagePulse)
     {
         Emit(GameplayEventType::LichImpact,
@@ -1863,10 +2812,79 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     if (input.damageEnabled && playerDamagePulse && !keeperRevealInvulnerable &&
         !SwordDrawBlocksDefense())
     {
-        const PlayerDamageResult damageResult = playerVitals_.TryApplyDamage();
+        const bool dodgeProtected = CurrentCombatRules() &&
+            DodgeProtectionWindow::Contains(kDodgeDurationSeconds - dodgeRemainingSeconds_,
+                dodgeProtectionAccepted_ && dodgeRemainingSeconds_ > 0.0f);
+        PlayerDamageResult damageResult = PlayerDamageResult::Ignored;
+        CombatContactSample damageSample;
+        damageSample.tick = tickIndex_;
+        if (dodgeRemainingSeconds_ > 0 && dodgeProtectionAccepted_)
+        {
+            damageSample.commandSequence = acceptedDodgeSequence_;
+            damageSample.consumedTick = acceptedDodgeConsumedTick_;
+        }
+        damageSample.incomingAttackKind = incomingAttackKind;
+        damageSample.phase = combatSnapshot_.player.action;
+        damageSample.phaseSeconds = combatSnapshot_.player.actionTime;
+        damageSample.target = activeEnemyKind_ == EnemyKind::Skeleton
+            ? skeletonDamageSource : EntityId::Lich;
+        damageSample.supportWorldY = playerSupport_.worldY;
+        damageSample.dodgeElapsedSeconds = dodgeRemainingSeconds_ > 0
+            ? kDodgeDurationSeconds - dodgeRemainingSeconds_ : 0;
+        if (activeEnemyKind_ == EnemyKind::Lich)
+        {
+            damageSample.targetX = lich.x;
+            damageSample.targetZ = lich.z;
+        }
+        else
+        {
+            const auto index = skeletonDamageSource == EntityId::SkeletonA ? 0u : 1u;
+            damageSample.targetX = combatSnapshot_.combatants[index].x;
+            damageSample.targetZ = combatSnapshot_.combatants[index].z;
+        }
+        damageSample.outcome = CombatContactOutcome::PostHitProtected;
+        const bool frontalGuard = CurrentCombatRules() && input.guardHeld && !guardReleaseRequired_ &&
+            combatSnapshot_.player.action == PlayerCombatAction::Guard &&
+            activeEnemyKind_ == EnemyKind::Skeleton &&
+            SwordCombat::IsPlayerTargetInRangeCone(playerX_, playerZ_, playerYawRadians_,
+                damageSample.targetX, damageSample.targetZ);
+        if (dodgeProtected)
+        {
+            damageSample.outcome = CombatContactOutcome::DodgeProtected;
+            ++dodgeProtectedHitCount_;
+            if (playerVitals_.Snapshot().invulnerabilityRemaining <= 0.00001f)
+                combatTeaching_.DodgeSucceeded();
+        }
+        else if (frontalGuard && incomingAttackKind == EnemyAttackKind::Normal)
+        {
+            // An actual eligible ordinary contact is blocked, not reduced damage
+            // or a practice-suppressed miss. It consumes no health/invulnerability.
+            damageSample.outcome = CombatContactOutcome::GuardBlocked;
+            if (playerVitals_.Snapshot().invulnerabilityRemaining <= 0.00001f)
+                combatTeaching_.BlockSucceeded();
+        }
+        else
+        {
+            if (frontalGuard && incomingAttackKind == EnemyAttackKind::GuardBreak)
+            {
+                // End mitigation immediately and require a physical release.
+                // Existing release pose blending remains intact; no free parry.
+                guardReleaseRequired_ = true;
+                swordCombat_.SetGuardHeld(false);
+                combatSnapshot_.player = swordCombat_.Snapshot().player;
+                damageSample.guardBroken = true;
+            }
+            if (CurrentCombatRules() && combatTeaching_.Snapshot().safePractice)
+            {
+                damageSample.outcome = CombatContactOutcome::PracticeMiss;
+                combatTeaching_.PracticeMiss();
+            }
+            else damageResult = playerVitals_.TryApplyDamage(false);
+        }
         if (damageResult == PlayerDamageResult::Damaged)
         {
-            Emit(GameplayEventType::PlayerDamaged,
+            damageSample.outcome = CombatContactOutcome::DamageAccepted;
+            damageSample.semanticEventSequence = Emit(GameplayEventType::PlayerDamaged,
                  activeEnemyKind_ == EnemyKind::Skeleton
                      ? skeletonDamageSource
                      : EntityForEnemy(activeEnemyKind_),
@@ -1879,7 +2897,8 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             combatPresentation_.Reset();
             retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
             pendingAttackCommands_ = 0u;
-            Emit(GameplayEventType::PlayerKilled,
+            damageSample.outcome = CombatContactOutcome::DamageAccepted;
+            damageSample.semanticEventSequence = Emit(GameplayEventType::PlayerKilled,
                  activeEnemyKind_ == EnemyKind::Skeleton
                      ? skeletonDamageSource
                      : EntityForEnemy(activeEnemyKind_),
@@ -1887,8 +2906,19 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                  playerX_,
                  playerZ_);
         }
+        if (CurrentCombatRules()) combatContactTrace_.Push(damageSample);
     }
 
+    combatTeaching_.ObserveGuardAttack(combatSnapshot_, input.guardHeld && !guardReleaseRequired_,
+        playerVitals_.Snapshot().phase != PlayerLifePhase::Alive || !SwordDefenseReady() ||
+        dodgeRemainingSeconds_ > 0.0f || playerVitals_.Snapshot().invulnerabilityRemaining > 0.00001f,
+        swordHitTargetThisTick_ != EntityId::Invalid);
+    combatTeaching_.Update(input.tutorialEnabled,
+        input.tutorialSlowdownEnabled, input.paused ||
+            playerVitals_.Snapshot().phase != PlayerLifePhase::Alive ||
+            IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase),
+        combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_, CurrentCombatRules());
+    UpdateSkeletonRevival(input, deltaSeconds);
     if (activeEnemyKind_ == EnemyKind::Lich && lichEncounter_.Snapshot().deathAnimationComplete)
     {
         enemyDirector_.MarkSelectedDead();
@@ -1901,7 +2931,8 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
                                    float x,
                                    float z,
                                    float intensity,
-                                   std::int32_t payload)
+                                   std::int32_t payload,
+                                   float worldY)
 {
     GameplayEvent event;
     event.tickIndex = tickIndex_;
@@ -1910,8 +2941,11 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
     event.target = target;
     event.worldX = x;
     event.worldZ = z;
-    event.listenerX = playerX_;
-    event.listenerZ = playerZ_;
+    event.worldY = worldY;
+    const auto rescueTorsoOffset=traversal::RescueTorsoOffset(rescueTraversal_.Snapshot());
+    event.listenerY = PlayerEyeWorldY(playerSupport_.worldY)+rescueTorsoOffset.y-posture_.drop;
+    event.listenerX = playerX_+rescueTorsoOffset.x;
+    event.listenerZ = playerZ_+rescueTorsoOffset.z;
     event.listenerYawRadians = playerYawRadians_;
     event.intensity = intensity;
     event.payload = payload;
@@ -1919,9 +2953,324 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
     return events_.Push(event) ? sequence : 0u;
 }
 
+bool GameSimulation::UsesFlaskUtility() const
+{
+    return config_.healingFlask1_7 && config_.flaskUtilityCandidate;
+}
+
+bool GameSimulation::PublishFlaskUpgradeReadiness(WorldZoneToken token,
+    const healing::FlaskUpgradeReadiness& readiness)
+{
+    if(!UsesFlaskUtility() || !config_.developmentRescueJourney || token.zone!=WorldZoneId::Lookout ||
+       !token.generation || token.generation!=worldRoute_.generation)return false;
+    const auto floor=flaskUpgradeWorldGeneration_==token.generation?flaskUpgradeResourceGeneration_:0;
+    if((!readiness.resourceGeneration && floor) || readiness.resourceGeneration<floor)return false;
+    if(readiness.site) {
+        std::string diagnostic;
+        if(!readiness.resourceGeneration || !chapterTerrain_ || chapterTerrainGeneration_!=token.generation ||
+           !healing::ValidateFlaskUpgradeSite(*readiness.site,diagnostic))return false;
+        const auto& p=readiness.site->supportPoint;const auto clue=kWorldRoutePoints[6];
+        const auto ground=chapterTerrain_->Query(p[0],p[2]);
+        if(std::hypot(p[0]-clue.x,p[2]-clue.z)>4.f || !ground.found || !ground.walkable ||
+           std::abs(ground.worldY-p[1])>.001f)return false;
+        if(flaskUpgradeWorldGeneration_==token.generation && flaskUpgradeSite_ &&
+           *flaskUpgradeSite_!=*readiness.site)return false;
+    }
+    if(flaskUpgradeWorldGeneration_!=token.generation)flaskUpgradeSite_.reset();
+    flaskUpgradeWorldGeneration_=token.generation;
+    flaskUpgradeResourceGeneration_=std::max(floor,readiness.resourceGeneration);
+    if(readiness.site)flaskUpgradeSite_=readiness.site;
+    flaskUpgradeReady_=readiness.site.has_value();
+    RefreshSnapshot(lastInput_);return true;
+}
+
+bool GameSimulation::FlaskUpgradeEligible(const InputSnapshot& input) const
+{
+    if(!UsesFlaskUtility() || !flaskUpgradeReady_ || !flaskUpgradeSite_ || flaskUpgradeWorldGeneration_!=worldRoute_.generation ||
+       !flaskUpgradeResourceGeneration_ || healingFlask_.Snapshot().resources.upgraded ||
+       healingFlask_.Snapshot().action!=healing::FlaskAction::Idle || FlaskUtilityBusy() ||
+       !UsesRescueExterior() || worldRoute_.current!=WorldZoneId::Lookout ||
+       worldRoute_.readiness[static_cast<std::size_t>(WorldZoneId::Lookout)]!=ZoneReadiness::Ready ||
+       !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation || !playerSupport_.grounded ||
+       input.paused || playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive || input.guardHeld ||
+       pendingAttackCommands_ || pendingParryCommands_ || pendingDodgeCommands_ ||
+       pendingDrinkFlaskCommands_ || pendingRestCommands_ || queuedDrawAttack_ ||
+       heldItems_[1].transition.active || combatSnapshot_.player.action!=PlayerCombatAction::Idle ||
+       combatSnapshot_.attackerIndex>=0 || dodgeRemainingSeconds_>0 || posture_.Active() ||
+       rescueTraversal_.IsActive() || rescueMovementSuppressedThisTick_ || staticDetailLease_.resourceGeneration ||
+       pendingCampaignRestore_ || input.hasAuthoritativePlayerPose || chapterDialogue_.State().line!=dialogue::Line::None)return false;
+    const auto& p=flaskUpgradeSite_->supportPoint;
+    const float dx=p[0]-playerX_,dz=p[2]-playerZ_,dy=p[1]-playerSupport_.worldY;
+    const float horizontal=std::hypot(dx,dz);
+    const float yaw=FiniteOr(input.yawRadians,playerYawRadians_);
+    if(std::hypot(horizontal,dy)>1.5f || std::abs(dy)>.35f ||
+       (horizontal>.0001f && (dx*std::sin(yaw)-dz*std::cos(yaw))<.5f*horizontal))return false;
+    return chapterTerrain_->NonWalkableVolumeClear(playerX_,playerZ_,p[0],p[2],
+        std::min(p[1],playerSupport_.worldY)+.1f,std::max(p[1],playerSupport_.worldY)+.8f,.03f);
+}
+
+bool GameSimulation::TryFlaskUpgradeInteraction()
+{
+    return FlaskUpgradeEligible(lastInput_) && healingFlask_.TryUpgrade();
+}
+
+bool GameSimulation::FlaskUtilityBusy() const
+{
+    return UsesFlaskUtility() && flaskHandReturn_.Snapshot().phase != items::UtilityHandPhase::Idle;
+}
+
+void GameSimulation::CancelFlaskUtility()
+{
+    if (FlaskUtilityBusy()) flaskHandReturn_.Cancel();
+}
+
+void GameSimulation::ResetFlaskUtility()
+{
+    flaskHandReturn_.Reset();
+    flaskEquipmentLease_.Reset();
+}
+
+void GameSimulation::PrepareFlaskUtility(const InputSnapshot& input, const bool competingIntent)
+{
+    if (!UsesFlaskUtility()) return;
+    auto& sword = heldItems_[1];
+    flaskEquipmentLease_.Observe(sword);
+    if (FlaskUtilityBusy())
+    {
+        if (!flaskEquipmentLease_.AllowsUtilityProgress(sword))
+        {
+            // A foreign transition is never adopted, interrupted or made ready.
+            healingFlask_.Cancel();
+            ResetFlaskUtility();
+            return;
+        }
+        if (healingFlask_.Snapshot().action != healing::FlaskAction::Drinking)
+            flaskHandReturn_.Cancel();
+        if (flaskHandReturn_.EquipmentReleaseReady() &&
+            !flaskEquipmentLease_.RequestReturn(sword, tickIndex_, true))
+        {
+            healingFlask_.Cancel();
+            ResetFlaskUtility();
+        }
+        return;
+    }
+    const bool drink = pendingDrinkFlaskCommands_ > 0;
+    const bool rest = pendingRestCommands_ > 0;
+    if (!drink || rest || competingIntent || queuedDrawAttack_ ||
+        healingFlask_.Snapshot().action != healing::FlaskAction::Idle) return;
+    const auto context = FlaskContextFor(input, false, false);
+    if (!context.drinkEligible) return;
+    // Admission is atomic. Probe the token/counter before publishing Stow; a
+    // failed medical/action admission cannot leave a partially owned sword.
+    auto proposedSword = sword;
+    auto proposedLease = flaskEquipmentLease_;
+    auto proposedHand = flaskHandReturn_;
+    if (!proposedLease.Begin(proposedSword, tickIndex_) || !proposedHand.Begin() ||
+        !healingFlask_.BeginDrink(context)) return;
+    sword = proposedSword;
+    flaskEquipmentLease_ = proposedLease;
+    flaskHandReturn_ = proposedHand;
+    lastConsumedDrinkFlaskSequence_ = std::max(lastConsumedDrinkFlaskSequence_, latestDrinkFlaskSequence_);
+    pendingDrinkFlaskCommands_ = 0;
+}
+
+void GameSimulation::AdvanceFlaskUtility(const float gameplaySeconds)
+{
+    if (!FlaskUtilityBusy()) return;
+    flaskEquipmentLease_.Observe(heldItems_[1]);
+    if (!flaskEquipmentLease_.AllowsUtilityProgress(heldItems_[1]))
+    {
+        healingFlask_.Cancel();
+        ResetFlaskUtility();
+        return;
+    }
+    // Using is synchronized only from the medical owner's post-damage result.
+    // Only a cancelled return consumes this same bounded gameplay delta here.
+    flaskHandReturn_.Step(std::min(double(gameplaySeconds), healing::HealingFlask::kMaximumStepSeconds));
+    if (flaskHandReturn_.Snapshot().cancelled &&
+        flaskHandReturn_.EquipmentReleaseReady() && flaskEquipmentLease_.ReturnedFor(heldItems_[1]))
+        ResetFlaskUtility();
+}
+
+void GameSimulation::DiscardUtilityCombatCommands()
+{
+    ClearQueuedDrawAttack();
+    parrySourceCommandSequence_ = 0;
+    lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
+    lastConsumedParrySequence_ = std::max(lastConsumedParrySequence_, latestParrySequence_);
+    pendingAttackCommands_ = pendingParryCommands_ = 0;
+    // Keep dodge scheduling and ordinary movement live. Attack/parry presses
+    // during the occupied return cannot become delayed free actions afterwards.
+    std::uint32_t retained = 0;
+    for (std::uint32_t i=0; i<scheduledCombatEdgeCount_; ++i)
+        if (scheduledCombatEdges_[i].edge.kind == CombatInputEdgeKind::Dodge)
+            scheduledCombatEdges_[retained++] = scheduledCombatEdges_[i];
+    std::fill(scheduledCombatEdges_.begin()+retained, scheduledCombatEdges_.end(), ScheduledCombatEdge{});
+    scheduledCombatEdgeCount_ = retained;
+    snapshot_.combatInputTiming.scheduledEdgeCount = retained;
+    for (unsigned i=0; i<2; ++i) {
+        overflowCombatCommandCounts_[i] = 0;
+        overflowCombatTargetTicks_[i] = 0;
+    }
+    for (std::uint32_t i=0; i<snapshot_.combatInputTiming.traceCount; ++i) {
+        const auto index=(snapshot_.combatInputTiming.nextTraceIndex+
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity)-snapshot_.combatInputTiming.traceCount+i)%
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity);
+        auto& trace=snapshot_.combatInputTiming.traces[index];
+        if (trace.kind != CombatInputEdgeKind::Dodge && trace.status == CombatInputTimingStatus::Scheduled)
+            trace.status = CombatInputTimingStatus::Discarded;
+    }
+}
+
+void GameSimulation::DiscardFlaskRequests()
+{
+    CancelFlaskUtility();
+    healingFlask_.Cancel();
+    lastConsumedDrinkFlaskSequence_=std::max(lastConsumedDrinkFlaskSequence_,latestDrinkFlaskSequence_);
+    lastConsumedRestSequence_=std::max(lastConsumedRestSequence_,latestRestSequence_);
+    pendingDrinkFlaskCommands_=pendingRestCommands_=0;
+    snapshot_.healingFlask=healingFlask_.Snapshot();
+    snapshot_.flaskUtilityCandidate=UsesFlaskUtility();
+    snapshot_.flaskHandReturn=flaskHandReturn_.Snapshot();
+    snapshot_.lastConsumedDrinkFlaskSequence=lastConsumedDrinkFlaskSequence_;
+    snapshot_.lastConsumedRestSequence=lastConsumedRestSequence_;
+    snapshot_.flaskDrinkEligible=false;snapshot_.flaskRestAnchor=0;
+}
+
+bool GameSimulation::FlaskCompetingIntent(const InputSnapshot& input) const
+{
+    return input.paused || std::abs(input.moveForward)>.0001f || std::abs(input.moveStrafe)>.0001f ||
+        input.guardHeld || pendingAttackCommands_ || pendingParryCommands_ || pendingDodgeCommands_ ||
+        pendingInteractCommands_ || pendingToggleHeldLightPoseCommands_ ||
+        pendingRouteResetCommands_ || pendingRetryCommands_;
+}
+
+std::optional<campaign::CheckpointId> GameSimulation::EligibleFlaskRestAnchor() const
+{
+    if(!config_.healingFlask1_7 || !config_.developmentRescueJourney || !chapterTerrain_)return std::nullopt;
+    const auto endpoint=kWorldRoutePoints.back();
+    const auto id=!rescueTraversal_.Snapshot().exteriorSide?campaign::CheckpointId::LowerClaimed:
+        (std::hypot(playerX_-traversal::kExteriorLanding.x,playerZ_-traversal::kExteriorLanding.z)<=1.f?
+         campaign::CheckpointId::SafeExit:campaign::CheckpointId::ForestEndpoint);
+    const auto x=id==campaign::CheckpointId::LowerClaimed?traversal::kLowerLanding.x:
+        id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.x:endpoint.x;
+    const auto z=id==campaign::CheckpointId::LowerClaimed?traversal::kLowerLanding.z:
+        id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.z:endpoint.z;
+    if(std::hypot(playerX_-x,playerZ_-z)>1.f)return std::nullopt;
+    // Reuse the earned boundary's actual terrain/story/contact predicates;
+    // only our own transient recovery action is excluded from serialization.
+    const auto earned=BuildCampaignCheckpoint(id,true,true);
+    if(!earned)return std::nullopt;
+    const double dy=double(playerSupport_.worldY)-earned->position.y;
+    if(std::hypot(std::hypot(double(playerX_)-x,double(playerZ_)-z),dy)>1.0)return std::nullopt;
+    return id;
+}
+
+healing::FlaskContext GameSimulation::FlaskContextFor(const InputSnapshot& input,
+                                                    bool cancel,bool acceptedDamage) const
+{
+    const auto& health=playerVitals_.Snapshot();
+    const bool ready=!config_.developmentWorldRoute && !config_.developmentRescueJourney && !config_.authoredChapterTerrain?
+        true:chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation &&
+             worldRoute_.readiness[static_cast<std::size_t>(worldRoute_.current)]==ZoneReadiness::Ready;
+    const bool available=config_.healingFlask1_7 && !input.paused && health.phase==PlayerLifePhase::Alive &&
+        ready && playerSupport_.grounded && !rescueTraversal_.IsActive() && !rescueMovementSuppressedThisTick_ &&
+        !staticDetailLease_.resourceGeneration && !pendingCampaignRestore_ &&
+        !IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase);
+    const bool stationary=std::abs(input.moveForward)<=.0001f && std::abs(input.moveStrafe)<=.0001f &&
+        playerMovementSpeed_<=.0001f && snapshot_.playerTravelledThisTick<=.0001f;
+    const bool utilityBusy=FlaskUtilityBusy();
+    const bool equipmentFree=utilityBusy ? flaskEquipmentLease_.AllowsUtilityProgress(heldItems_[1]) :
+        !heldItems_[1].transition.active;
+    const bool freeHands=combatSnapshot_.player.action==PlayerCombatAction::Idle &&
+        dodgeRemainingSeconds_<=0.0f && !input.guardHeld && !queuedDrawAttack_ && equipmentFree &&
+        (!utilityBusy || flaskHandReturn_.Snapshot().phase==items::UtilityHandPhase::Using);
+    const bool drink=available && stationary && freeHands;
+    const bool fight=combatSnapshot_.attackerIndex>=0 || lichEncounter_.Snapshot().phase==LichPhase::Charging;
+    return {health.vitality*2-(health.halfHeart?1:0),drink,
+        drink && !fight && completedRestGeneration_!=UINT64_MAX &&
+        chapterDialogue_.State().line==dialogue::Line::None && EligibleFlaskRestAnchor().has_value(),
+        cancel,acceptedDamage};
+}
+
+void GameSimulation::StepHealingFlask(const InputSnapshot& input,float gameplaySeconds,
+                                     bool competingIntent,int healthBeforeEncounter)
+{
+    if(!config_.healingFlask1_7 || input.paused){
+        DiscardFlaskRequests();
+        snapshot_.healingFlask=healingFlask_.Snapshot();
+        snapshot_.lastConsumedDrinkFlaskSequence=lastConsumedDrinkFlaskSequence_;
+        snapshot_.lastConsumedRestSequence=lastConsumedRestSequence_;
+        snapshot_.flaskDrinkEligible=false;snapshot_.flaskRestAnchor=0;
+        return;
+    }
+    const auto& health=playerVitals_.Snapshot();
+    const int currentHealth=health.vitality*2-(health.halfHeart?1:0);
+    auto context=FlaskContextFor(input,competingIntent,currentHealth<healthBeforeEncounter);
+    const auto before=healingFlask_.Snapshot();
+    auto proposedHand=flaskHandReturn_;
+    const bool utilityDrink=UsesFlaskUtility() && before.action==healing::FlaskAction::Drinking;
+    if(utilityDrink) {
+        const double next=std::min(healing::HealingFlask::kDrinkSeconds,
+            before.elapsedSeconds+std::min(double(gameplaySeconds),healing::HealingFlask::kMaximumStepSeconds));
+        const bool clockMatches=flaskHandReturn_.Snapshot().phase==items::UtilityHandPhase::Using &&
+            !flaskHandReturn_.Snapshot().cancelled &&
+            flaskHandReturn_.Snapshot().usingElapsedSeconds==before.elapsedSeconds;
+        const bool finalReady=next+1e-9<healing::HealingFlask::kDrinkSeconds ||
+            flaskEquipmentLease_.ReturnedFor(heldItems_[1]);
+        if(!clockMatches || !finalReady || !proposedHand.SynchronizeUsing(next))context.drinkEligible=false;
+    }
+    const bool drink=pendingDrinkFlaskCommands_>0,rest=pendingRestCommands_>0;
+    lastConsumedDrinkFlaskSequence_=std::max(lastConsumedDrinkFlaskSequence_,latestDrinkFlaskSequence_);
+    lastConsumedRestSequence_=std::max(lastConsumedRestSequence_,latestRestSequence_);
+    pendingDrinkFlaskCommands_=pendingRestCommands_=0;
+    // Exactly one fresh displayed action can begin. Never reinterpret Rest.
+    if(drink!=rest) {
+        if(drink) {
+            if(!UsesFlaskUtility())(void)healingFlask_.BeginDrink(context);
+        }
+        else (void)healingFlask_.BeginRest(context);
+    }
+    const auto completion=healingFlask_.Step(gameplaySeconds,context);
+    if(utilityDrink) {
+        if(completion.completed) {
+            flaskHandReturn_=proposedHand;
+            ResetFlaskUtility();
+        }
+        else if(healingFlask_.Snapshot().action==healing::FlaskAction::Drinking)
+            flaskHandReturn_=proposedHand;
+        else CancelFlaskUtility();
+    }
+    if(completion.completed) {
+        if(completion.healHalfUnits>0)(void)playerVitals_.TryHealHalfUnits(completion.healHalfUnits);
+        flaskCompletionTick_=tickIndex_;
+        if(completion.action==healing::FlaskAction::Resting && completedRestGeneration_!=UINT64_MAX)
+            ++completedRestGeneration_;
+    }
+    snapshot_.healingFlask=healingFlask_.Snapshot();
+    snapshot_.flaskUtilityCandidate=UsesFlaskUtility();
+    snapshot_.flaskHandReturn=flaskHandReturn_.Snapshot();
+    snapshot_.playerVitals=playerVitals_.Snapshot();
+    snapshot_.lastConsumedDrinkFlaskSequence=lastConsumedDrinkFlaskSequence_;
+    snapshot_.lastConsumedRestSequence=lastConsumedRestSequence_;
+    snapshot_.flaskCompletionTick=flaskCompletionTick_;
+    snapshot_.campaignRetryRequestGeneration=campaignRetryRequestGeneration_;
+    snapshot_.completedRestGeneration=completedRestGeneration_;
+    snapshot_.flaskDrinkEligible=context.drinkEligible && !FlaskUtilityBusy() &&
+        snapshot_.playerVitals.vitality*2-(snapshot_.playerVitals.halfHeart?1:0)<6 &&
+        snapshot_.healingFlask.resources.charges>0;
+    const auto anchor=context.restEligible?EligibleFlaskRestAnchor():std::nullopt;
+    snapshot_.flaskRestAnchor=anchor?static_cast<std::uint32_t>(*anchor):0u;
+}
+
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
 {
+    snapshot_.chapterDialogue=chapterDialogue_.State();
+    snapshot_.dialogueBedGain=config_.developmentRescueJourney &&
+        playerVitals_.Snapshot().phase==PlayerLifePhase::Alive ? dialogueDucking_.Gain():1.f;
+    snapshot_.chapterCompanion=chapterCompanion_.State();
     snapshot_.tickIndex = tickIndex_;
+    snapshot_.combatContactTrace = combatContactTrace_;
     snapshot_.inputPublicationSequence = inputPublicationSequence_;
     snapshot_.inputMoveForward = input.moveForward;
     snapshot_.inputMoveStrafe = input.moveStrafe;
@@ -1933,14 +3282,63 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.lastConsumedInteractSequence = lastConsumedInteractSequence_;
     snapshot_.lastConsumedToggleHeldLightPoseSequence =
         lastConsumedToggleHeldLightPoseSequence_;
+    snapshot_.lastConsumedRunToggleSequence = lastConsumedRunToggleSequence_;
+    snapshot_.lastConsumedClearRunIntentSequence = lastConsumedClearRunIntentSequence_;
+    snapshot_.developmentWorldRoute=config_.developmentWorldRoute;
+    snapshot_.stagedWorldPreparation=stagedWorldPreparation_;
+    snapshot_.worldRoute=worldRoute_;
+    snapshot_.staticDetailLease=staticDetailLease_;
+    snapshot_.playerSupportSurface=playerSupport_.surface;
+    snapshot_.playerSupportWorldY = playerSupport_.worldY;
+    snapshot_.playerHeightDelta = PlayerHeightDelta(playerSupport_.worldY);
+    snapshot_.playerSupportId = playerSupport_.id;
+    snapshot_.playerGrounded = playerSupport_.grounded;
+    snapshot_.playerSupportGeneration = config_.developmentWorldRoute ? worldRoute_.generation : supportGeneration_;
+    snapshot_.developmentSupportFixture = config_.developmentSupportFixture;
     snapshot_.playerX = playerX_;
     snapshot_.playerZ = playerZ_;
     snapshot_.playerYawRadians = playerYawRadians_;
     snapshot_.playerPitchRadians = playerPitchRadians_;
+    snapshot_.movementForward = FiniteOr(input.moveForward, 0.0f);
+    snapshot_.movementStrafe = FiniteOr(input.moveStrafe, 0.0f);
+    snapshot_.playerMovementSpeedMetresPerSecond = playerMovementSpeed_;
     snapshot_.walkTime = walkTime_;
     snapshot_.walkAmount = walkVisualAmount_;
     snapshot_.torchLightStrength = std::clamp(FiniteOr(input.torchLightStrength, 1.8f), 0.65f, 2.4f);
     snapshot_.dodgeActive = dodgeRemainingSeconds_ > 0.0f;
+    snapshot_.dodgeElapsedSeconds = snapshot_.dodgeActive
+        ? kDodgeDurationSeconds - dodgeRemainingSeconds_ : 0.0f;
+    snapshot_.modernCombatRules = CurrentCombatRules();
+    snapshot_.dodgeInvulnerable = CurrentCombatRules() && DodgeProtectionWindow::Contains(
+        snapshot_.dodgeElapsedSeconds, dodgeProtectionAccepted_ && snapshot_.dodgeActive);
+    snapshot_.acceptedDodgeSequence = acceptedDodgeSequence_;
+    snapshot_.dodgeProtectedHitCount = dodgeProtectedHitCount_;
+    snapshot_.combatTeaching = combatTeaching_.Snapshot();
+    snapshot_.combatTeaching.lessonSuppressed = !SwordDefenseReady();
+    snapshot_.skeletonRevival = UsesSkeletonRevival() ? skeletonRevival_.Snapshot() : SkeletonRevivalSnapshot{};
+    snapshot_.skeletonRevivalPresentationReady = UsesSkeletonRevival() && skeletonRevivalPresentationReady_;
+    snapshot_.skeletonRevivalDeadDurationSeconds = UsesSkeletonRevival() ? skeletonRevivalDeadDurationSeconds_ : 0.f;
+    snapshot_.skeletonRevivalStandDurationSeconds = UsesSkeletonRevival() ? skeletonRevivalStandDurationSeconds_ : 0.f;
+    const auto recovery=FlaskContextFor(input,false,false);
+    snapshot_.flaskDrinkEligible=recovery.drinkEligible && recovery.healthHalfUnits<6 &&
+        healingFlask_.Snapshot().resources.charges>0;
+    const auto rest=recovery.restEligible?EligibleFlaskRestAnchor():std::nullopt;
+    snapshot_.flaskRestAnchor=rest?static_cast<std::uint32_t>(*rest):0u;
+    // Recompute from the phases just advanced on this authoritative tick, not
+    // the pre-step teaching cue. Readability survives disabled/completed lessons.
+    snapshot_.combatTeaching.attackReadability = EvaluateAttackReadability(
+        combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_,
+        CurrentCombatRules() && !input.paused &&
+            playerVitals_.Snapshot().phase == PlayerLifePhase::Alive);
+    snapshot_.keeperRepelRemainingSeconds = keeperRepelRemainingSeconds_;
+    snapshot_.keeperRepelTravelledMetres = keeperRepelTravelledMetres_;
+    snapshot_.gameplayTimeScale = gameplayTimeScale_;
+    snapshot_.runActive = runActive_;
+    snapshot_.runToggleActive = runToggleActive_;
+    snapshot_.playerCrouchDropMetres=posture_.drop;
+    snapshot_.crouchActive=posture_.Active();snapshot_.crouchStandingBlocked=posture_.standingBlocked;
+    snapshot_.lastConsumedCrouchToggleSequence=lastConsumedCrouchToggleSequence_;
+    snapshot_.lastConsumedClearCrouchIntentSequence=lastConsumedClearCrouchIntentSequence_;
     snapshot_.dodgeCooldownRemainingSeconds = dodgeCooldownRemainingSeconds_;
     snapshot_.zone = QueryShowcaseZone(playerX_, playerZ_);
     snapshot_.activeEnemyKind = activeEnemyKind_;
@@ -1949,7 +3347,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.skeletonAttackerId = combatSnapshot_.attackerIndex >= 0
         ? SkeletonEntity(static_cast<std::size_t>(combatSnapshot_.attackerIndex))
         : EntityId::Invalid;
-    snapshot_.openingEncounterComplete = combatSnapshot_.encounterComplete;
+    snapshot_.openingEncounterComplete = OpeningEncounterComplete();
     for (std::size_t index = 0u; index < combatSnapshot_.combatants.size(); ++index)
     {
         const SkeletonCombatantSnapshot& source = combatSnapshot_.combatants[index];
@@ -1959,7 +3357,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         target.z = source.z;
         target.facingRadians = source.facingRadians;
         target.animationTime = source.animationTime;
-        target.idlePhaseSeconds = skeletonIdlePhasesEnabled_ && index == 1u ? 0.73f : 0.0f;
+        target.idlePhaseSeconds = skeletonIdlePhasesEnabled_ && !revivedIdlePhaseZero_ && index == 1u ? 0.73f : 0.0f;
         target.damageFlash = source.damageFlash;
         target.health = source.health;
         target.animation = source.animation;
@@ -1970,6 +3368,12 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         target.dead = source.health <= 0;
         target.playerHitPulse = source.playerHitPulse;
         target.parrySuccessPulse = source.parrySuccessPulse;
+        target.attackKind = source.attackKind;
+        target.playerHitKind = source.playerHitKind;
+        target.forceCurrentCombatPose = CurrentCombatRules() &&
+            ((source.action != EnemyCombatAction::Locomotion && source.action != EnemyCombatAction::Dead) ||
+             combatSnapshot_.player.action == PlayerCombatAction::SwingActive ||
+             combatSnapshot_.player.action == PlayerCombatAction::UpwardSliceActive);
     }
     snapshot_.activeEnemyId = EntityForEnemy(activeEnemyKind_);
     if (activeEnemyKind_ == EnemyKind::Skeleton)
@@ -1987,7 +3391,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.retryGeneration = retryGeneration_;
     snapshot_.paused = input.paused;
     snapshot_.playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
-    snapshot_.finaleComplete = finaleSequence_.Snapshot().endingPhase ==
+    snapshot_.finaleComplete = !config_.developmentRescueJourney && finaleSequence_.Snapshot().endingPhase ==
         horde::gameplay::interactions::FinaleEndingPhase::Complete;
     snapshot_.interaction = interactionState_;
     snapshot_.chestReward = chestRewardSequence_.Snapshot();
@@ -1995,12 +3399,14 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         playerX_, playerZ_, playerYawRadians_});
     snapshot_.finale = finaleSequence_.Snapshot();
     snapshot_.lanternPendulum = lanternPendulum_.Snapshot();
-    snapshot_.rewardLanternWorldFromHinge = heldItemFixedStepState_.worldFromLeftHand;
+    snapshot_.rewardLanternWorldFromHinge = RescueLanternHinge();
     snapshot_.torchFailure = torchFailureSnapshot_;
+    snapshot_.waterContact = waterContact_.Snapshot();
     snapshot_.heldItems = heldItems_;
     snapshot_.automaticSwordDrawBlocksDefense = SwordDrawBlocksDefense();
     snapshot_.heldItemKinematics = heldItemFixedStepState_.kinematics;
     snapshot_.playerAnimation = playerAnimationState_.Snapshot();
+    snapshot_.playerAnimation.crouchPelvisDropMetres=posture_.drop;
     snapshot_.heldLight = heldItemFixedStepState_.light;
     snapshot_.enemyRoster = enemyDirector_.Snapshot();
     snapshot_.swordCombat = combatSnapshot_;
@@ -2018,7 +3424,23 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.lich.finaleEndingPhase = static_cast<FinaleEndingPhase>(
         snapshot_.finale.endingPhase);
     snapshot_.playerVitals = playerVitals_.Snapshot();
+    snapshot_.healingFlaskEnabled=config_.healingFlask1_7;
+    snapshot_.flaskUtilityCandidate=UsesFlaskUtility();
+    snapshot_.flaskHandReturn=flaskHandReturn_.Snapshot();
+    snapshot_.healingFlask=healingFlask_.Snapshot();
+    snapshot_.lastConsumedDrinkFlaskSequence=lastConsumedDrinkFlaskSequence_;
+    snapshot_.lastConsumedRestSequence=lastConsumedRestSequence_;
+    snapshot_.flaskCompletionTick=flaskCompletionTick_;
+    snapshot_.campaignRetryRequestGeneration=campaignRetryRequestGeneration_;
+    snapshot_.completedRestGeneration=completedRestGeneration_;
     snapshot_.fireEmitters = fireEmitters_;
+    snapshot_.flaskUpgrade={};
+    if(UsesFlaskUtility() && flaskUpgradeReady_ && flaskUpgradeSite_ && flaskUpgradeWorldGeneration_==worldRoute_.generation &&
+       flaskUpgradeResourceGeneration_ && chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation &&
+       !healingFlask_.Snapshot().resources.upgraded) {
+        snapshot_.flaskUpgrade={flaskUpgradeSite_,flaskUpgradeWorldGeneration_,flaskUpgradeResourceGeneration_,
+            FlaskUpgradeEligible(input)};
+    }
     snapshot_.fireEmitterCount = fireEmitterCount_;
     snapshot_.playerMountProfile = config_.playerMountProfile;
     snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();
@@ -2026,6 +3448,29 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.queuedEventCount = events_.Size();
     snapshot_.eventQueueHighWaterMark = events_.HighWaterMark();
     snapshot_.eventQueueOverflowCount = events_.OverflowCount();
+    PublishRescueSnapshot();
+    // Derive after all death/traversal/capture overrides. No new gameplay clock,
+    // accepted command or save state: cancellation uses the existing accepted
+    // transient flag, so a timer left suspended by traversal cannot resurrect it.
+    snapshot_.playerAnimation.dodge = {};
+    if (CurrentCombatRules() && dodgeProtectionAccepted_ && snapshot_.dodgeActive &&
+            snapshot_.playerAlive && !snapshot_.paused && !snapshot_.crouchActive &&
+            !snapshot_.rescue.equipmentStowed && !rescueMovementSuppressedThisTick_ &&
+            !input.hasAuthoritativePlayerPose && !IsKeeperRevealing(snapshot_.lich.revealPhase))
+    {
+        const auto lowerBody = EvaluateLowerBodyPose(snapshot_.walkTime, snapshot_.walkAmount);
+        snapshot_.playerAnimation.dodge = animation::EvaluatePlayerDodgePresentation(true,
+            snapshot_.dodgeElapsedSeconds, kDodgeDurationSeconds,
+            dodgeDirectionX_, dodgeDirectionZ_, snapshot_.playerYawRadians,
+            lowerBody.torsoTwistRadians);
+    }
+    // Snapshot-derived presentation only, after all state/capture overrides.
+    // No second clock, incoming-damage pulse, renderer roster or lesson cue
+    // may choose this source or restart its authoritative windup.
+    snapshot_.attackWarning = BuildAttackWarningPresentation(
+        snapshot_.swordCombat, snapshot_.lich, snapshot_.activeEnemyKind,
+        snapshot_.skeletonAttackerId,
+        snapshot_.modernCombatRules && snapshot_.playerAlive && !snapshot_.paused);
 }
 
 } // namespace horde::gameplay::simulation

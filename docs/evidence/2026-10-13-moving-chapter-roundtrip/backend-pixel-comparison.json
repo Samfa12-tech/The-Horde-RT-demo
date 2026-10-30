@@ -1,0 +1,180 @@
+{
+  "scope": "matched actual finite route views only; final Query run remains incomplete",
+  "frames": [
+    {
+      "file": "1-initial-reunion.png",
+      "changedPixels": 2492,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 12,
+      "meanAbsoluteChannelDelta": 0.0018325617283950618
+    },
+    {
+      "file": "10-outbound-6.png",
+      "changedPixels": 3087,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 7,
+      "meanAbsoluteChannelDelta": 0.0022929526748971195
+    },
+    {
+      "file": "11-outbound-7.png",
+      "changedPixels": 6853,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 10,
+      "meanAbsoluteChannelDelta": 0.005324074074074074
+    },
+    {
+      "file": "12-lookout-sweep-7.png",
+      "changedPixels": 10626,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 21,
+      "meanAbsoluteChannelDelta": 0.014548611111111111
+    },
+    {
+      "file": "13-lookout-sweep-7.png",
+      "changedPixels": 3777,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 11,
+      "meanAbsoluteChannelDelta": 0.002759130658436214
+    },
+    {
+      "file": "14-lookout-sweep-7.png",
+      "changedPixels": 6173,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 12,
+      "meanAbsoluteChannelDelta": 0.004592335390946502
+    },
+    {
+      "file": "15-lookout-sweep-7.png",
+      "changedPixels": 3923,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 13,
+      "meanAbsoluteChannelDelta": 0.002934027777777778
+    },
+    {
+      "file": "16-return-6.png",
+      "changedPixels": 2689,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 22,
+      "meanAbsoluteChannelDelta": 0.0020511831275720166
+    },
+    {
+      "file": "17-return-5.png",
+      "changedPixels": 3916,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 22,
+      "meanAbsoluteChannelDelta": 0.0041132973251028805
+    },
+    {
+      "file": "18-return-4.png",
+      "changedPixels": 2314,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 42,
+      "meanAbsoluteChannelDelta": 0.002750128600823045
+    },
+    {
+      "file": "19-return-3.png",
+      "changedPixels": 4219,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 21,
+      "meanAbsoluteChannelDelta": 0.003195087448559671
+    },
+    {
+      "file": "2-landing-sweep-2.png",
+      "changedPixels": 6386,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 8,
+      "meanAbsoluteChannelDelta": 0.004579475308641975
+    },
+    {
+      "file": "20-return-2.png",
+      "changedPixels": 4357,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 4,
+      "meanAbsoluteChannelDelta": 0.003312114197530864
+    },
+    {
+      "file": "21-descent-2.png",
+      "changedPixels": 86,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 208,
+      "meanAbsoluteChannelDelta": 0.0004867541152263374
+    },
+    {
+      "file": "22-lower-sweep-0.png",
+      "changedPixels": 30,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 32,
+      "meanAbsoluteChannelDelta": 9.002057613168723e-05
+    },
+    {
+      "file": "23-lower-sweep-0.png",
+      "changedPixels": 77,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 9,
+      "meanAbsoluteChannelDelta": 0.0001671810699588477
+    },
+    {
+      "file": "24-lower-sweep-0.png",
+      "changedPixels": 68,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 6,
+      "meanAbsoluteChannelDelta": 8.680555555555556e-05
+    },
+    {
+      "file": "25-lower-sweep-0.png",
+      "changedPixels": 40,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 7,
+      "meanAbsoluteChannelDelta": 4.951131687242798e-05
+    },
+    {
+      "file": "3-landing-sweep-2.png",
+      "changedPixels": 4834,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 44,
+      "meanAbsoluteChannelDelta": 0.003589891975308642
+    },
+    {
+      "file": "4-landing-sweep-2.png",
+      "changedPixels": 3757,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 12,
+      "meanAbsoluteChannelDelta": 0.002595164609053498
+    },
+    {
+      "file": "5-landing-sweep-2.png",
+      "changedPixels": 5686,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 11,
+      "meanAbsoluteChannelDelta": 0.0042984825102880654
+    },
+    {
+      "file": "6-kit-walking.png",
+      "changedPixels": 2704,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 35,
+      "meanAbsoluteChannelDelta": 0.0026015946502057612
+    },
+    {
+      "file": "7-fresh-raise-3.png",
+      "changedPixels": 3227,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 31,
+      "meanAbsoluteChannelDelta": 0.0028202160493827158
+    },
+    {
+      "file": "8-outbound-4.png",
+      "changedPixels": 2577,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 239,
+      "meanAbsoluteChannelDelta": 0.004352494855967078
+    },
+    {
+      "file": "9-outbound-5.png",
+      "changedPixels": 4710,
+      "totalPixels": 518400,
+      "maximumChannelDelta": 248,
+      "meanAbsoluteChannelDelta": 0.007495498971193416
+    }
+  ]
+}

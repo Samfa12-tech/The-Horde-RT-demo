@@ -19,7 +19,7 @@ constexpr std::uint32_t kExecutionModelRayGenerationKhr = 5313u;
 constexpr std::uint32_t kExecutionModelGlCompute = 5u;
 constexpr std::uint32_t kDecorationBinding = 33u;
 
-constexpr std::array<RtDescriptorResourceKind, 27u> kDescriptorKinds{
+constexpr std::array<RtDescriptorResourceKind, 28u> kDescriptorKinds{
     RtDescriptorResourceKind::AccelerationStructure,
     RtDescriptorResourceKind::StorageImage,
     RtDescriptorResourceKind::StorageBuffer,
@@ -47,16 +47,17 @@ constexpr std::array<RtDescriptorResourceKind, 27u> kDescriptorKinds{
     RtDescriptorResourceKind::StorageBuffer,
     RtDescriptorResourceKind::CombinedImageSampler,
     RtDescriptorResourceKind::StorageBuffer,
+    RtDescriptorResourceKind::StorageBuffer,
 };
 
-constexpr std::array<std::uint32_t, 27u> kDiagnosticBindingRoster{
+constexpr std::array<std::uint32_t, 28u> kDiagnosticBindingRoster{
     0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u,
-    13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 22u, 23u, 24u, 25u, 26u,
+    13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 22u, 23u, 24u, 25u, 26u, 27u,
 };
 
-constexpr std::array<std::uint32_t, 26u> kShippingBindingRoster{
+constexpr std::array<std::uint32_t, 27u> kShippingBindingRoster{
     0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u,
-    13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 23u, 24u, 25u, 26u,
+    13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 23u, 24u, 25u, 26u, 27u,
 };
 
 constexpr std::uint32_t RotateRight(std::uint32_t value, std::uint32_t bits) noexcept
@@ -145,6 +146,7 @@ bool IsLowerHexSha256(std::string_view value) noexcept
 }
 
 struct ReflectedModuleContract {
+    bool physicalStorageBufferAddresses=false;
     std::size_t matchingEntryPoints = 0u;
     std::size_t diagnosticsBindings = 0u;
     std::size_t atomicInstructions = 0u;
@@ -168,6 +170,10 @@ bool ReflectModule(std::span<const std::uint32_t> words,
         const std::uint16_t wordCount = static_cast<std::uint16_t>(instruction >> 16u);
         const std::uint16_t opcode = static_cast<std::uint16_t>(instruction & 0xffffu);
         if (wordCount == 0u || wordCount > words.size() - offset) { return false; }
+        // OpCapability PhysicalStorageBufferAddresses, required by the private
+        // address-based geometry profile (not inferred from descriptor absence).
+        if(opcode==17u && wordCount==2u && words[offset+1u]==5347u)
+            reflected.physicalStorageBufferAddresses=true;
         if (opcode == kOpEntryPoint) {
             const auto expectedModel = executionBackend == RtExecutionBackend::RayQueryCompute
                 ? kExecutionModelGlCompute : kExecutionModelRayGenerationKhr;
@@ -195,17 +201,26 @@ bool MatchesDescriptorBindingRoster(
     const ReflectedModuleContract& reflected,
     const RtDescriptorIoContract& descriptorIo) noexcept
 {
-    if (reflected.descriptorBindingCount > descriptorIo.bindingCount) {
+    if (descriptorIo.bindingCount > descriptorIo.bindings.size() ||
+        reflected.descriptorBindingCount > reflected.descriptorBindings.size() ||
+        reflected.descriptorBindingCount > descriptorIo.bindingCount) {
         return false;
     }
     std::array<std::uint32_t, 32u> actual = reflected.descriptorBindings;
-    std::array<std::uint32_t, 27u> expected{};
+    std::array<std::uint32_t, std::tuple_size_v<decltype(RtDescriptorIoContract::bindings)>> expected{};
     std::size_t expectedCount = 0u;
     for (std::size_t index = 0u; index < descriptorIo.bindingCount; ++index) {
         const auto binding = descriptorIo.bindings[index].binding;
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+        // Exact alternative shader-use roster. The unchanged layout keeps these
+        // compatibility descriptors, but page geometry reads their admitted BDA
+        // domains through binding11. No arbitrary missing binding is tolerated.
+        if(binding==kRtBindingPrimitiveMetadata || binding==kRtBindingStaticVertices ||
+           binding==kRtBindingStaticIndices)continue;
+#endif
         // The legacy held-light record remains layout-compatible, but current
         // world-space fire shaders source lighting from binding 21 and optimize
-        // binding 20 away. All other bindings (including 23/24/25/26) remain required.
+        // binding 20 away. All other bindings (including 23/24/25/26/27) remain required.
         if (binding == kRtBindingHeldLight &&
             std::find(actual.begin(), actual.begin() + reflected.descriptorBindingCount, binding) ==
                 actual.begin() + reflected.descriptorBindingCount) continue;
@@ -238,6 +253,10 @@ bool ValidateRecord(const RtPipelineVariantArtifact& record,
         return false;
     }
     ReflectedModuleContract reflected{};
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(!ReflectModule(record.words,expected.executionBackend,reflected) ||
+       !reflected.physicalStorageBufferAddresses)return false;
+#endif
     if (!ReflectModule(record.words, expected.executionBackend, reflected) ||
         reflected.atomicInstructions != record.atomicInstructions ||
         !MatchesDescriptorBindingRoster(reflected, descriptorIo) ||

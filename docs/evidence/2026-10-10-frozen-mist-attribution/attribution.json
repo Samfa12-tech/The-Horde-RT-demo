@@ -1,0 +1,54 @@
+{
+  "frame_class": "Reproducible staged offending frame, not recovery of original owner camera/rope state",
+  "resolution": [
+    1232,
+    803
+  ],
+  "pixels": 989296,
+  "source_isolation": "Only mist incident radiance selection; surface illumination remains live",
+  "midpoint_all_vs_sky": {
+    "changed_pixels": 1,
+    "maximum_channel_difference": 1,
+    "channel": "green"
+  },
+  "sample_local_all_vs_sky": {
+    "changed_pixels": 0
+  },
+  "midpoint_lantern_vs_sample_local_lantern": {
+    "changed_pixels": 0
+  },
+  "midpoint_vs_sample_local_all": {
+    "changed_pixels": 130010,
+    "maximum_channel_difference": 49
+  },
+  "rope_hardware_midpoint": {
+    "world_instance": 0,
+    "first_primitive": 3028,
+    "last_primitive_inclusive": 3203,
+    "triangles": 176,
+    "blocked_pixels": 6722,
+    "changed_under_sample_local": 6427,
+    "brighter": 6427,
+    "darker": 0,
+    "footprint_bounds_inclusive": [
+      118,
+      331,
+      608,
+      529
+    ]
+  },
+  "lantern_hardware_midpoint": {
+    "raw_radiance_max_quantized_byte": 175,
+    "visible_radiance_max_quantized_byte": 0,
+    "active_pixels": 469920,
+    "blocked_by_lantern_body_instance_8": 462427,
+    "blocked_by_world_instance_0": 7470,
+    "blocked_by_character_instance_2": 21,
+    "blocked_by_player_body_instance_4": 2
+  },
+  "query_record_encoding": {
+    "sky": "After BGRA readback: R=committed instance, G=primitive high byte, B=primitive low byte; 255/65535 sentinel means no observed committed blocker",
+    "lantern": "After BGRA readback: R=committed instance, G=max returned visible radiance UNORM8, B=max actual tuned admitted radiance UNORM8",
+    "scope": "Existing committed opaque intersection only; sentinel does not prove clear bounded dielectric visibility"
+  }
+}

@@ -1,0 +1,19 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  MusicDirector.cpp
+  MusicPcmStream.cpp
+  MusicPcmAssetBank.cpp
+  MusicPlaybackSession.cpp
+  GameSimulation.cpp
+  GameSimulationRescue.cpp
+  RescueTraversal.cpp
+  Generating Code...
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  WindowsMusicPlayback.cpp
+  CharacterRenderSlot.cpp
+  PresentableTinyRtScene.cpp
+  horde_windows_music.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_windows_music.lib
+<repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(7011,53): error C2065: 'VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_TRIANGLES_DATA_KHR': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_probe_core.vcxproj]
+  SimulationFrameAdapter.cpp
+  Generating Code...

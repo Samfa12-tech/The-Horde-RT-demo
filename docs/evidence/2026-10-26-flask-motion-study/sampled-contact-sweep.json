@@ -1,0 +1,65 @@
+{
+  "scope": "Both saved source actions at 60 Hz samples and midpoints; selected head/gauntlet regions only",
+  "sampleHz": 120,
+  "continuousCollisionDetection": false,
+  "nativeCollisionAcceptance": false,
+  "allSelectedContactObservationsClear": true,
+  "blendSha256": "68984209d475e2e40a79868851abc575dc2bbe098f97d3ceb338c34e631a86e6",
+  "sourceBytesUnchanged": true,
+  "selectedHeadTriangles": 1813,
+  "selectedGauntletTriangles": 8838,
+  "schema": 1,
+  "sourceAssetCheckpoint": "d51c815e07aee70609180a4c2c8acb90b4ea569c",
+  "checkerSha256": "aa77dcf9fdc0b33ffcf7e655feecabf2c7796742a6ba01a83220e87e2251db48",
+  "originalFourWitnessesIdentical": true,
+  "limits": [
+    "Selected head surfaces only; not whole-body/prop/hand contact",
+    "Discrete samples, not continuous collision detection",
+    "No native IK, camera, left-light, RT reflection/shadow or gameplay acceptance"
+  ],
+  "negativeControl": {
+    "blendSha256": "7f8635ecf820cb747c462aebf249a4233e0ef1bee51c812265dd54fc0e252e6f",
+    "historicalOverlapCountsReproduced": true,
+    "samples": [
+      {
+        "frame": 31,
+        "headFlaskTriangleOverlaps": 0,
+        "headGauntletTriangleOverlaps": 27
+      },
+      {
+        "frame": 34,
+        "headFlaskTriangleOverlaps": 16,
+        "headGauntletTriangleOverlaps": 120
+      },
+      {
+        "frame": 37,
+        "headFlaskTriangleOverlaps": 16,
+        "headGauntletTriangleOverlaps": 120
+      },
+      {
+        "frame": 43,
+        "headFlaskTriangleOverlaps": 16,
+        "headGauntletTriangleOverlaps": 120
+      }
+    ],
+    "lipDistancesExcluded": "Current r2 intent mouth reference is not the old short-neck geometry reference"
+  },
+  "sequences": {
+    "complete": {
+      "observations": 151,
+      "overlapObservations": 0,
+      "firstOverlap": null,
+      "minimumLipNearestHeadDistanceMetres": 0.00521423714235425,
+      "firstSourceSeconds": 0.0,
+      "lastSourceSeconds": 1.25
+    },
+    "cancel": {
+      "observations": 141,
+      "overlapObservations": 0,
+      "firstOverlap": null,
+      "minimumLipNearestHeadDistanceMetres": 0.005999994929879904,
+      "firstSourceSeconds": 0.0,
+      "lastSourceSeconds": 1.1666666666666667
+    }
+  }
+}

@@ -21,7 +21,7 @@ struct MusicPcmClip
 using MusicPcmStatus = pocket_audio::PcmStatus;
 
 // Thin Horde cue/asset adapter to Pocket Audio Core's native PCM cursor/mixer.
-// Horde owns the nine MusicCue rows and C->D/G->H handoff policy, not PCM mixing.
+// Horde owns cue rows and C->D/G->H/Outdoor handoff policy, not PCM mixing.
 // SetSelection, SetVolumePercent, Render, and Reset require one owner thread; this
 // class makes no concurrent-call guarantee. Render performs no allocation,
 // locks, or I/O and reads only the caller-owned immutable clip spans.

@@ -1,0 +1,16 @@
+PLAY_SESSION_ELAPSED phase=suite-start totalMs=0 sincePreviousMs=0 tick=0 checks=0 failures=0
+PLAY_SESSION_ELAPSED phase=terrain-ready totalMs=82 sincePreviousMs=82 tick=0 checks=0 failures=0
+PLAY_SESSION_ELAPSED phase=storage-prelude-complete totalMs=101 sincePreviousMs=19 tick=54 checks=42 failures=0
+PLAY_SESSION_ELAPSED phase=normal-earned-journey-start totalMs=101 sincePreviousMs=0 tick=0 checks=42 failures=0
+PLAY_SESSION_ELAPSED phase=earned-lower-boundary totalMs=138 sincePreviousMs=37 tick=3228 checks=50 failures=0
+ordinary lower live=-34.0119,-17.5184 boundary=1 rope=1
+PLAY_SESSION_ELAPSED phase=earned-upper-boundary totalMs=301 sincePreviousMs=162 tick=3892 checks=71 failures=0
+ordinary upper live=-33.7,-13.3383 speed=1.9 boundary=1
+PLAY_SESSION_ELAPSED phase=earned-upper-recovery-complete totalMs=689 sincePreviousMs=388 tick=3892 checks=101 failures=0
+PLAY_SESSION_ELAPSED phase=earned-forest-endpoint totalMs=1571 sincePreviousMs=882 tick=7088 checks=107 failures=0
+PLAY_SESSION_ELAPSED phase=earned-return-start totalMs=1744 sincePreviousMs=173 tick=122 checks=125 failures=0
+PLAY_SESSION_ELAPSED phase=earned-return-complete totalMs=3060 sincePreviousMs=1315 tick=3204 checks=126 failures=0
+PLAY_SESSION_ELAPSED phase=earned-journey-end totalMs=3061 sincePreviousMs=1 tick=7947 checks=133 failures=0
+PLAY_SESSION_ELAPSED phase=endpoint-write-failure-start totalMs=3063 sincePreviousMs=1 tick=0 checks=133 failures=0
+PLAY_SESSION_ELAPSED phase=suite-end totalMs=3072 sincePreviousMs=9 tick=0 checks=145 failures=0
+145 campaign play session checks, 0 failures

@@ -1,0 +1,8 @@
+{
+  "suites": 51,
+  "tests": 361,
+  "failures": 0,
+  "errors": 0,
+  "environmentSurveyRequestTests": 5,
+  "build": "R04 compile; no new installation/device validation"
+}

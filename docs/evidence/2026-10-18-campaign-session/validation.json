@@ -1,0 +1,195 @@
+{
+  "scope": "Full actual host save/load path with real worker/files, imported terrain, current GameSimulation and owner camera/input values; no live application root or menu integration",
+  "sourceParent": "23274b9855fa38590567df02745f722fda20b007",
+  "workerCommit": "bd0dd9504eca03a2c73d565f782defea0aa24121",
+  "recordedUtc": "2026-10-18T00:53:33.0881415Z",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "sourceMeaning": "SHA256 of compiled working bytes before Git newline normalization; unchanged code including shadow Java fix pinned by sourceParent",
+  "sources": [
+    {
+      "path": ".github/workflows/shared-simulation-host.yml",
+      "sha256": "3c15ad81cba21bf8c4c31a00dcdc204f7cebe543cf90371b46012e4b2c512491",
+      "bytes": 37198
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "338cb3813c67d6b3b5573a9c2b5c451ab7a2797276da867414aa50d7e4608bde",
+      "bytes": 105049
+    },
+    {
+      "path": "cmake/HordeRtSources.cmake",
+      "sha256": "f8a5a138769264fe08ac3aa9d3434f4356594a4d76caeb87b9f6f4229e9efec1",
+      "bytes": 3350
+    },
+    {
+      "path": "tools/run-host-sanitizer-validation.sh",
+      "sha256": "9591c5b5ae09b9afd80f22581ca82e2610083ee7bcffa46ece6d7e02c12217b2",
+      "bytes": 2002
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.h",
+      "sha256": "0785ff8574d77ba2e221cc7c4d4b61ebdd9a6cdaae405df6c4b027403d8a4df3",
+      "bytes": 20373
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSession.h",
+      "sha256": "33b040fccf364b1be8d8aca165a8254e4d0081394ccc7b951708d58ed962f693",
+      "bytes": 1929
+    },
+    {
+      "path": "src/gameplay/campaign/CampaignSession.cpp",
+      "sha256": "03fb9f3ee7421a271741e5a1651d8fa9622c7ba5126605033e3c3c8dce5e009b",
+      "bytes": 5756
+    },
+    {
+      "path": "tests/CampaignSessionTests.cpp",
+      "sha256": "5f9d436f008295d3587124c9a261c4f5eb8cfb3048461c66f457c823ea9cbd64",
+      "bytes": 11572
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "99dfbf47b77228659ff06bca64ffc51cf2f1f980a9c1c07c70e8183352078c0a",
+      "bytes": 13369856
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "58059aba6f9b307ed48b5a1a2fd3f87e761668912526e9448a78c46d8fbac336",
+      "bytes": 4549632
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/horde_rt_campaign_session_tests.exe",
+      "sha256": "283d47534974f51e9e7ff443e533398816e36c1cc0dfacd2cf27879069f65db5",
+      "bytes": 4370432
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/horde_rt_campaign_session_tests.exe",
+      "sha256": "c3af1ce97d8de80735da3c08ac93acb8384d683e8a3a0a58625847d6d231f15e",
+      "bytes": 947712
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "9317b48ab3727869e0551db7c5323d62fae1d8fb1f91cc2cc77813f32dddb1b9",
+      "bytes": 183761818
+    }
+  ],
+  "logs": [
+    {
+      "path": "reports/campaign-session-2026-10-18/release-first-build.log",
+      "sha256": "30609224579015831e6fef921d4ae09b42bbf17c7e46347a44b5f2f6bcf0ca2e",
+      "bytes": 2787
+    },
+    {
+      "path": "reports/campaign-session-2026-10-18/release-first-tests.log",
+      "sha256": "481e07878ae435e695cdbc3fc54295a721f3670e3f4a14f4af5a2fc2a1a5bef1",
+      "bytes": 1846
+    },
+    {
+      "path": "reports/campaign-session-2026-10-18/release-final-build.log",
+      "sha256": "17823e59d5ff6dda6c62847040b6d6925d962c5aa8ecbbc77cb52cfb4e6a1581",
+      "bytes": 5809
+    },
+    {
+      "path": "reports/campaign-session-2026-10-18/release-final-tests.log",
+      "sha256": "c1b2a6b1dde130c1e10ac7ddc1fb943eb8a7ea174d3613f045a1d4d6885a1168",
+      "bytes": 5562
+    },
+    {
+      "path": "reports/campaign-session-2026-10-18/debug-final-build.log",
+      "sha256": "d5729abd309ce6f125031dbeebd4750da3540653ccf26b2f8bcfe6f6aa0e1804",
+      "bytes": 7481
+    },
+    {
+      "path": "reports/campaign-session-2026-10-18/debug-final-tests.log",
+      "sha256": "b04acd862c2a8735e599e975773a9bec4108af4cc1176a03060aab17ba0f2ebe",
+      "bytes": 5507
+    },
+    {
+      "path": "reports/campaign-session-2026-10-18/android-final-build.log",
+      "sha256": "0242eb5d26fe92266ebc201477e7910c3b72e4b1536abfda54caa3f9e12fde35",
+      "bytes": 2213
+    }
+  ],
+  "targets": [
+    "horde_rt_campaign_session_tests",
+    "horde_rt_campaign_save_worker_tests",
+    "horde_rt_campaign_save_coordinator_tests",
+    "horde_rt_campaign_storage_tests",
+    "horde_rt_campaign_codec_tests",
+    "horde_rt_campaign_checkpoint_tests",
+    "horde_rt_chapter_dialogue_tests",
+    "horde_rt_diagnostic_window"
+  ],
+  "buildCommand": "cmake --build build/presets/windows-x64-{debug|release} --config {Debug|Release} --target <targets> --parallel 2",
+  "testCommand": "ctest --test-dir build/presets/windows-x64-{debug|release} -C {Debug|Release} -R <selectionRegex> --verbose --no-tests=error",
+  "selectionRegex": "^horde_rt_(campaign_(session|save_worker|save_coordinator|storage|codec|checkpoint)|chapter_dialogue)_tests$",
+  "debug": {
+    "buildExitCode": 0,
+    "passed": 7,
+    "failed": 0,
+    "seconds": 15.12,
+    "sessionChecks": 58,
+    "workerChecks": 79,
+    "coordinatorChecks": 306,
+    "codecChecks": 1991,
+    "storageChecks": 1197,
+    "checkpointChecks": 738,
+    "concurrentStorageReads": 78
+  },
+  "release": {
+    "buildExitCode": 0,
+    "passed": 7,
+    "failed": 0,
+    "seconds": 4.86,
+    "sessionChecks": 58,
+    "workerChecks": 79,
+    "coordinatorChecks": 306,
+    "codecChecks": 1991,
+    "storageChecks": 1197,
+    "checkpointChecks": 738,
+    "concurrentStorageReads": 352
+  },
+  "firstRelease": {
+    "sessionChecks": 55,
+    "failed": 0,
+    "seconds": 1.16,
+    "subsequentChange": "Added current-live-tick and token-specific cancellation ownership assertions; no production source change"
+  },
+  "android": {
+    "command": "android/gradlew.bat assembleDebug --offline --console=plain",
+    "exitCode": 0,
+    "durationReported": "2m 38s",
+    "nativeEntries": [
+      "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "lib/x86/libhorde_rt_probe_android.so",
+      "lib/x86_64/libhorde_rt_probe_android.so"
+    ],
+    "evidenceClass": "HOST_BUILD_ONLY",
+    "candidateInstalled": false,
+    "saveLoadDeviceRun": false,
+    "posixFilesystemRuntime": false
+  },
+  "policy": "Three slots each manual plus latest autosave; autosave never replaces manual; exactly six files, no history",
+  "transaction": [
+    "Only owner Poll consumes storage receipts",
+    "Failure/stale resources retain prior simulation/camera/input",
+    "CURRENT simulation cloned only at final apply, not across preparation delay",
+    "Strong read adoption then noexcept GameSimulation move/POD controls update",
+    "Monotonic input counters retained, fresh rebased neutral publication required",
+    "Token-specific cancellation cannot cancel newer independent restore"
+  ],
+  "limits": [
+    "No game-facing Save/Load/Continue/New Game/death menus or occupied-slot flow",
+    "No private platform owner-save root, automatic checkpoint hooks or forest-end record",
+    "Windows physical/controller latch reset and Android Java absolute-camera/touch rebase handshake remain unwired",
+    "Real renderer resource publication with this transaction remains unwired; terrain readiness is not RT readiness",
+    "No current save/load phone lifecycle/process-death evidence, POSIX directory-fsync runtime, physical power-loss or Windows reparse fixture",
+    "Cold phone checkpoint207/opening receipt is a separate sealed0d6c22d6 candidate and does not validate these saves",
+    "No new performance/zero-IO-hitch or current cloud CI/sanitizer claim"
+  ],
+  "audioHapticManualRevalidation": "NO additional live playback change in host-only seam; later real platform load needs physical acceptance",
+  "publicPush": false
+}

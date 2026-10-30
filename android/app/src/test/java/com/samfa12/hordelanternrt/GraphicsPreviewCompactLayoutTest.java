@@ -101,7 +101,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                 assertTrue("sticky actions stay within the overlay",dock.getBottom()<=strip.getHeight());
                 List<Button> buttons=new ArrayList<>(); List<HorizontalScrollView> rows=new ArrayList<>();
                 collect(strip,buttons,rows);
-                assertEquals(2,rows.size()); assertEquals(15,buttons.size());
+                assertEquals(2,rows.size()); assertEquals(14,buttons.size());
                 for(HorizontalScrollView row:rows) {
                     assertTrue(row.isHorizontalScrollBarEnabled()); assertFalse(row.isVerticalScrollBarEnabled());
                     assertFalse("scroll affordance must stay visible",row.isScrollbarFadingEnabled());
@@ -114,7 +114,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                     assertEquals(HordeUiTokens.BRASS,((ColorDrawable)row.getHorizontalScrollbarThumbDrawable()).getColor());
                     assertEquals(HordeUiTokens.IRON,((ColorDrawable)row.getHorizontalScrollbarTrackDrawable()).getColor());
                 }
-                String[] labels={"Resolution: 75%","Water: Mobile","Fire: Mobile","Cap: 30 Hz","Glass: On","Shadows: Current","Mist: On","Indoor dust: Off","View","Image","Details","Use","Keep","Restore","Back"};
+                String[] labels={"Resolution: 75%","Water: Mobile","Fire: Mobile","Cap: 30 Hz","Glass: On","Shadows: Current","Mist: On","Indoor dust: Off","View","Image","Details","Apply","Restore","Back"};
                 int minimum=HordeUiTokens.dp(activity,48);
                 for(int i=0;i<buttons.size();++i) {
                     Button button=buttons.get(i); assertEquals(labels[i],button.getText().toString());
@@ -132,10 +132,10 @@ public final class GraphicsPreviewCompactLayoutTest {
                         controlViewport.getHeight()>=firstOptionBottom);
                 assertEquals(2,status.getMaxLines());
                 assertNull(field(activity,"graphicsDetailsDialog")); assertNull(field(activity,"graphicsGraph"));
-                assertFalse(((Button)field(activity,"graphicsConfirm")).isEnabled());
+                assertFalse(((Button)field(activity,"graphicsApply")).isEnabled());
                 Method menu=MainActivity.class.getDeclaredMethod("createGraphicsPreviewOptionMenu",Button.class,int.class);
                 menu.setAccessible(true);
-                int[][] values={BuildConfig.MIN_RENDER_SCALE_PERCENT == 33 ? new int[]{33,40,50,63,75,100} : new int[]{50,63,75,100},{0,1,2},{2,0,1},{15,30,60},{0,1},{0,1,2},{0,1},{0,1,2}};
+                int[][] values={BuildConfig.MIN_RENDER_SCALE_PERCENT == 33 ? new int[]{33,40,50,63,75,100} : new int[]{50,63,75,100},{0,1,2},{2,0,1},{15,30,60},{0,1},{1,2},{0,1},{0,1,2}};
                 int[] selected={75,1,0,30,1,1,1,0};
                 for(int choice=0;choice<8;++choice) {
                     PopupMenu popup=(PopupMenu)menu.invoke(activity,buttons.get(choice),choice);
@@ -149,7 +149,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                         }
                         assertEquals(values[choice][i]==selected[choice],popup.getMenu().getItem(i).isChecked());
                         if(choice==GraphicsPreviewOptions.FIRE) assertEquals(new String[]{"Low","Mobile","High"}[i],popup.getMenu().getItem(i).getTitle().toString());
-                        if(choice==GraphicsPreviewOptions.SHADOW) assertEquals(new String[]{"Lower","Current","Higher"}[i],popup.getMenu().getItem(i).getTitle().toString());
+                        if(choice==GraphicsPreviewOptions.SHADOW) assertEquals(new String[]{"Current","Higher"}[i],popup.getMenu().getItem(i).getTitle().toString());
                     }
                     popup.dismiss();
                 }
@@ -157,75 +157,51 @@ public final class GraphicsPreviewCompactLayoutTest {
         }
     }
 
-    @Test public void previewUseAndKeepStaySeparateAndRetainAllReadinessGates() throws Exception {
+    @Test public void singleApplyRetainsPreviewAndSurfaceReadinessWithoutEnabledChurn() throws Exception {
         MainActivity activity=Robolectric.buildActivity(MainActivity.class).get();
-        TransitionButton use=new TransitionButton(activity), keep=new TransitionButton(activity);
-        use.setText("Use"); keep.setText("Keep");
-        use.setContentDescription("Use these acknowledged preview settings for a temporary trial. This does not save.");
-        setField(activity,"graphicsApply",use); setField(activity,"graphicsConfirm",keep);
-        setField(activity,"graphicsPreviewWanted",true);
+        TransitionButton apply=new TransitionButton(activity);
+        setField(activity,"graphicsApply",apply); setField(activity,"graphicsPreviewWanted",true);
         GraphicsPreferences.Values saved=GraphicsPreferences.baseline();
         GraphicsPreferences.Values candidate=new GraphicsPreferences.Values(50,1,GraphicsPreferences.FIRE_LOW,30,false,GraphicsPreferences.SHADOW_HIGHER);
-        setField(activity,"graphicsConfirmed",saved); setField(activity,"graphicsDraft",candidate);
-        Method optionLabel=MainActivity.class.getDeclaredMethod("graphicsOptionLabel",int.class);
-        optionLabel.setAccessible(true);
+        setField(activity,"graphicsConfirmed",saved);setField(activity,"graphicsDraft",candidate);
+        Method optionLabel=MainActivity.class.getDeclaredMethod("graphicsOptionLabel",int.class);optionLabel.setAccessible(true);
         assertEquals("Fire: Low",optionLabel.invoke(activity,GraphicsPreviewOptions.FIRE));
         assertEquals("Shadows: Higher",optionLabel.invoke(activity,GraphicsPreviewOptions.SHADOW));
         assertEquals("Indoor dust: Off",optionLabel.invoke(activity,GraphicsPreviewOptions.DUST));
-        TextView summary=new TextView(activity); setField(activity,"graphicsSelectionSummary",summary);
-        Method selection=MainActivity.class.getDeclaredMethod("updateGraphicsSelectionSummary",boolean.class);
-        selection.setAccessible(true);
-        selection.invoke(activity,false);
-        assertEquals("Requested 50% / Saved 75%",summary.getText().toString());
-        selection.invoke(activity,true);
-        assertEquals("Preview 50% / Saved 75%",summary.getText().toString());
+        TextView summary=new TextView(activity);setField(activity,"graphicsSelectionSummary",summary);
+        Method selection=MainActivity.class.getDeclaredMethod("updateGraphicsSelectionSummary",boolean.class);selection.setAccessible(true);
+        selection.invoke(activity,false);assertEquals("Requested 50% / Saved 75%",summary.getText().toString());
+        selection.invoke(activity,true);assertEquals("Preview 50% / Saved 75%",summary.getText().toString());
         Method update=MainActivity.class.getDeclaredMethod("updateGraphicsActionButtons",
                 boolean.class,int.class,boolean.class,boolean.class,boolean.class);
         update.setAccessible(true);
-        use.setEnabled(false); keep.setEnabled(true); use.enabledTransitions=0; keep.enabledTransitions=0;
+        apply.setEnabled(false); apply.enabledTransitions=0;
         for(int poll=0;poll<12;++poll) update.invoke(activity,false,2,true,true,true);
-        assertFalse(use.isEnabled()); assertTrue(keep.isEnabled());
-        assertEquals("Keep",keep.getText().toString());
-        assertTrue("a presented trial must not change the saved label",summary.getText().toString().contains("Saved 75%"));
+        assertFalse(apply.isEnabled()); assertEquals(0,apply.enabledTransitions);
         assertSame(saved,field(activity,"graphicsConfirmed"));
-        assertEquals(GraphicsPreferences.FIRE_MOBILE,saved.fire);
-        assertEquals(GraphicsPreferences.SHADOW_CURRENT,saved.shadow);
-        assertEquals("an acknowledged Keep must not churn enabled state",0,keep.enabledTransitions);
-        update.invoke(activity,false,2,true,true,false); // Stale preview/presentation.
-        assertFalse(keep.isEnabled()); assertEquals(1,keep.enabledTransitions);
-        update.invoke(activity,false,2,true,false,true); // Current preview, wrong request ACK.
-        assertFalse(keep.isEnabled()); assertEquals(1,keep.enabledTransitions);
-        update.invoke(activity,false,2,true,true,true);
-        assertTrue(keep.isEnabled()); assertEquals(2,keep.enabledTransitions);
-        update.invoke(activity,false,2,false,false,true); // ACKed state alone is insufficient when readiness drops.
-        assertFalse(keep.isEnabled());
-        update.invoke(activity,false,2,true,true,true); // A ready presentation remains keepable even while busy.
-        assertTrue(keep.isEnabled());
+        assertEquals("a pending Apply cannot move Saved","Preview 50% / Saved 75%",summary.getText().toString());
+        update.invoke(activity,false,0,false,false,false); assertFalse(apply.isEnabled());
+        update.invoke(activity,false,0,false,false,true); assertTrue(apply.isEnabled());
+        for(int poll=0;poll<12;++poll) update.invoke(activity,false,0,false,false,true);
+        assertEquals(1,apply.enabledTransitions);
         setField(activity,"graphicsLiveChoiceError","Choice failed");
-        update.invoke(activity,false,2,true,true,true); assertFalse(keep.isEnabled());
+        update.invoke(activity,false,0,false,false,true); assertFalse(apply.isEnabled());
         setField(activity,"graphicsLiveChoiceError",null);
-        update.invoke(activity,false,1,true,true,true); assertFalse(use.isEnabled());
-        update.invoke(activity,false,4,true,true,true); assertFalse(use.isEnabled());
-        update.invoke(activity,false,0,false,true,true); assertTrue(use.isEnabled());
-
-        TransitionButton draft=new TransitionButton(activity);
-        setField(activity,"graphicsApply",draft); setField(activity,"graphicsPreviewWanted",false);
-        update.invoke(activity,false,0,false,false,false); // Draft surface not ready.
-        assertFalse(draft.isEnabled()); assertFalse(keep.isEnabled());
-        update.invoke(activity,true,0,false,false,false); // Actual ready draft surface.
-        assertTrue(draft.isEnabled()); assertFalse(keep.isEnabled());
-        update.invoke(activity,false,2,true,true,false); // Distinct ordinary Apply/Keep.
-        assertFalse(draft.isEnabled()); assertTrue(keep.isEnabled());
-        update.invoke(activity,false,2,true,false,false); assertFalse(keep.isEnabled());
-        setField(activity,"graphicsPreviewWanted",true); setField(activity,"graphicsApply",use);
-        update.invoke(activity,false,0,false,false,true);
-        assertEquals("Use",use.getText().toString());
-        assertTrue(use.getContentDescription().toString().contains("does not save"));
-        assertTrue(use.isEnabled()); assertFalse(keep.isEnabled());
-        setField(activity,"graphicsDraft",saved); selection.invoke(activity,true);
-        assertEquals("restored labels match saved values","Preview 75% / Saved 75%",summary.getText().toString());
-        setField(activity,"graphicsConfirmed",candidate); setField(activity,"graphicsDraft",candidate); selection.invoke(activity,true);
-        assertEquals("only a confirmed saved tuple moves Saved","Preview 50% / Saved 50%",summary.getText().toString());
+        for(String cancellation:new String[]{"graphicsAwaitingRestore","graphicsSceneRestoring"}) {
+            setField(activity,cancellation,true); update.invoke(activity,true,0,false,true,true);
+            assertFalse(apply.isEnabled()); setField(activity,cancellation,false);
+        }
+        setField(activity,"graphicsSaveSerial",45L); update.invoke(activity,true,0,false,true,true);
+        assertFalse(apply.isEnabled()); setField(activity,"graphicsSaveSerial",0L);
+        setField(activity,"graphicsPreviewWanted",false);
+        update.invoke(activity,false,0,false,false,false); assertFalse(apply.isEnabled());
+        update.invoke(activity,true,0,false,false,false); assertTrue(apply.isEnabled());
+        update.invoke(activity,false,1,true,false,false); assertFalse(apply.isEnabled());
+        update.invoke(activity,false,4,true,false,false); assertFalse(apply.isEnabled());
+        setField(activity,"graphicsPreviewWanted",true);setField(activity,"graphicsDraft",saved);selection.invoke(activity,true);
+        assertEquals("Preview 75% / Saved 75%",summary.getText().toString());
+        setField(activity,"graphicsConfirmed",candidate);setField(activity,"graphicsDraft",candidate);selection.invoke(activity,true);
+        assertEquals("only a confirmed tuple moves Saved","Preview 50% / Saved 50%",summary.getText().toString());
     }
 
     @Test public void heightBudgetIncludesSafeAreaAndOversizeTextUsesNativeVerticalScrolling() {
@@ -236,7 +212,7 @@ public final class GraphicsPreviewCompactLayoutTest {
             int height=568,gap=48;
             ScrollView strip=new GraphicsPreviewControlsScrollView(context,GraphicsPreviewOptions.maximumOverlayHeight(height,gap));
             TextView text=new TextView(context); text.setTextSize(24);
-            text.setText("Resolution\nWater\nFire\nCap\nGlass\nShadows\nMist\nIndoor dust\nView\nDetails\nUse these settings\nKeep and save\nRestore saved\nBack"); strip.addView(text);
+            text.setText("Resolution\nWater\nFire\nCap\nGlass\nShadows\nMist\nIndoor dust\nView\nDetails\nApply and save\nRestore saved\nBack"); strip.addView(text);
             strip.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.AT_MOST));
             strip.layout(0,0,strip.getMeasuredWidth(),strip.getMeasuredHeight());
@@ -313,25 +289,24 @@ public final class GraphicsPreviewCompactLayoutTest {
                 assertTrue((boolean)field(activity,"graphicsPreviewImageOnly"));
                 assertTrue(scrim.isClickable()); assertEquals(1,scrim.getChildCount());
                 List<Button> buttons=new ArrayList<>(); List<HorizontalScrollView> rows=new ArrayList<>();
-                collect(scrim,buttons,rows); assertEquals(5,buttons.size());
+                collect(scrim,buttons,rows); assertEquals(4,buttons.size());
                 Button restore=buttons.get(0); assertEquals("Controls",restore.getText().toString());
                 assertTrue(restore.isEnabled()); assertTrue(restore.isFocusable());
                 assertTrue(restore.getMeasuredWidth()>=HordeUiTokens.dp(activity,48));
                 assertTrue(restore.getMeasuredHeight()>=HordeUiTokens.dp(activity,48));
-                String[] imageActions={"Controls","Use","Keep","Restore","Back"};
+                String[] imageActions={"Controls","Apply","Restore","Back"};
                 for(int i=0;i<imageActions.length;++i) {
                     Button action=buttons.get(i); assertEquals(imageActions[i],action.getText().toString());
                     assertNotNull(action.getContentDescription()); assertTrue(action.isFocusable());
                     assertTrue(action.getMeasuredWidth()>=HordeUiTokens.dp(activity,48));
                     assertTrue(action.getMeasuredHeight()>=HordeUiTokens.dp(activity,48));
                 }
-                assertFalse(buttons.get(1).isEnabled()); assertFalse(buttons.get(2).isEnabled());
-                assertTrue(buttons.get(3).isEnabled()); assertTrue(buttons.get(4).isEnabled());
-                assertTrue(buttons.get(1).getContentDescription().toString().contains("does not save"));
-                assertTrue(buttons.get(2).getContentDescription().toString().contains("Save only"));
-                assertTrue(buttons.get(3).getContentDescription().toString().contains("confirmed"));
-                assertTrue(buttons.get(4).getContentDescription().toString().contains("return to Graphics"));
-                buttons.get(1).performClick(); // A not-ready Use is inert; it cannot stage or save a draft.
+                assertFalse(buttons.get(1).isEnabled());
+                assertTrue(buttons.get(2).isEnabled()); assertTrue(buttons.get(3).isEnabled());
+                assertTrue(buttons.get(1).getContentDescription().toString().contains("Apply and save"));
+                assertTrue(buttons.get(2).getContentDescription().toString().contains("confirmed"));
+                assertTrue(buttons.get(3).getContentDescription().toString().contains("return to Graphics"));
+                buttons.get(1).performClick(); // A not-ready Apply cannot stage or save a draft.
                 assertSame(draft,field(activity,"graphicsDraft"));
                 assertFalse((boolean)field(activity,"graphicsBusy"));
                 assertEquals(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,15,
@@ -343,8 +318,8 @@ public final class GraphicsPreviewCompactLayoutTest {
                 assertTrue("the complete dock stays inside image inspection",
                         imageDock.getTop()>=0 && imageDock.getBottom()<=imageHost.getHeight());
                 assertTrue("Restore and Back remain visible inside the bottom dock",
-                        buttons.get(3).getParent().getParent()==imageDock &&
-                                buttons.get(4).getParent().getParent()==imageDock);
+                        buttons.get(2).getParent().getParent()==imageDock &&
+                                buttons.get(3).getParent().getParent()==imageDock);
                 MotionEvent down=MotionEvent.obtain(0,0,MotionEvent.ACTION_DOWN,180,500,0);
                 MotionEvent up=MotionEvent.obtain(0,10,MotionEvent.ACTION_UP,180,500,0);
                 try { assertTrue(root.dispatchTouchEvent(down)); assertTrue(root.dispatchTouchEvent(up)); }
@@ -356,7 +331,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                 assertTrue((boolean)field(activity,"graphicsPreviewWanted"));
                 assertSame(draft,field(activity,"graphicsDraft"));
                 buttons.clear(); rows.clear(); collect(scrim,buttons,rows);
-                assertEquals(15,buttons.size()); assertEquals(2,rows.size()); assertEquals(42,serial.getLong(activity));
+                assertEquals(14,buttons.size()); assertEquals(2,rows.size()); assertEquals(42,serial.getLong(activity));
                 assertNull(field(activity,"graphicsDetailsDialog")); assertNull(field(activity,"graphicsGraph"));
             } finally { activity.getResources().updateConfiguration(original,activity.getResources().getDisplayMetrics()); }
         }

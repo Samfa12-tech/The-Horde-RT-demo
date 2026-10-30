@@ -1,0 +1,419 @@
+{
+  "runtimeRevision": "3252820f6f443d127b128840621ed8846282172f",
+  "exactRuntimeRevisionCI": {
+    "runId": 39002045686,
+    "sixJobs": "passed"
+  },
+  "auditInput": {
+    "name": "Horde_PR27_Android_Vulkan_RT_Performance_Audit.md",
+    "sha256": "469cc74ded81e75f1ebb40075d2d2be37f16388d0e419e21407cfba434b6749f"
+  },
+  "unitValidation": {
+    "motionDisplayPythonTests": 16,
+    "inverseTransformCpuTests": 3,
+    "nativeDebugCTests": 4,
+    "nativeReleaseCTests": 4,
+    "normalPipelineVariants": 8,
+    "normalQueryVariants": 8,
+    "javaSuites": [
+      {
+        "name": "com.samfa12.hordelanternrt.AmbienceOutputBufferTest",
+        "tests": "7",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.AmbienceOutputQueueTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.AndroidControllerInputTest",
+        "tests": "11",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.AndroidControllerIntegrationTest",
+        "tests": "26",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.BenchmarkAutomationExportTest",
+        "tests": "13",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.BenchmarkAutomationIntentTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.BenchmarkSummaryReviewTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.BenchmarkSummaryUiTest",
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.ChapterDebugCheckpointTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.ChapterSubtitlePolicyTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.ChapterVoiceAssetsTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.CombatTeachingPreferencesTest",
+        "tests": "10",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.CombatTeachingUiSchedulingTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.ContextualControlsLayoutTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.ControllerNavigationTest",
+        "tests": "7",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.DeathRecoveryTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.DustDebugAutomationTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.EntryMenuStateTest",
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.EquipmentAudioFeedbackTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.GameplayTouchCancellationTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.GraphicsMenuLifecycleTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.GraphicsPreferencesTest",
+        "tests": "20",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.GraphicsPreviewCompactLayoutTest",
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.GraphicsPreviewOptionsTest",
+        "tests": "16",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.GraphicsViewportRecoveryTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.GrateDebugCheckpointTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.InterfaceLayoutTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.InterfacePreferencesTest",
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.MainActivityPlaytestReportLifecycleTest",
+        "tests": "7",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest",
+        "tests": "7",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.MusicAudioFocusTest",
+        "tests": "9",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.MusicOutputBufferTest",
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.MusicOutputGainTest",
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.PlayerDebugCheckpointTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.PlaytestReportExportTest",
+        "tests": "6",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.PlaytestReportFlowResourceTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.PlaytestReportScreenshotTest",
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.PlaytestReportSubmissionTest",
+        "tests": "16",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.PlaytestReportVerificationTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.RenderScalePreferenceTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.SurfaceSuspensionLifecycleTest",
+        "tests": "7",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.TouchControlStateTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.VitalityHeartsTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.WaterDebugCheckpointTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.WorldAssetStagingTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ]
+  },
+  "methodHashes": {
+    "run.py": "eedad567094459f4405782601578aef79e7cefefef8fb7e51570f511db3e054b",
+    "cool-run.py": "c3f790a75fce254d74b8a393df85df3594a532a8997794aedc3536d6b88e3196",
+    "capture-parity.py": "1562e82a9aa5c58d69ccece7f9156b3e5b554619bdf940e0b46c6751d8c3f732",
+    "capture-windows.ps1": "0e481a08c85782f119f57743d11ec6dc54cbe6951b716f06aaab4d80ccb63b1b",
+    "analyze.py": "f8734f1372c4a410a68f92bf84b04fcca2ecea458257e06a9251e8f5ea658843",
+    "final-controls.py": "acc7e8fa56b392919bf0199413a68ea1e05721d502874c59b2c3b95b39d93e52"
+  },
+  "logHashes": {
+    "host-debug-tests.log": "865045e05f3963a5465e8de372ad49a7598ff868c6be62d4c374da5b4a23027a",
+    "host-release-tests.log": "9868e1d03696ee1f786eace060d30d8b9573634120ac3130432ced6fb9e214b9",
+    "baseline-android-build.log": "1b47f9f83432a060cedeb7d2c4372f96de88167c483ac7c358a4085186eba2cb",
+    "candidate-android-build.log": "df83009725534143d4e5c7914960e6b7f3b8be261c189de84a0279e82600baf0",
+    "restored-android-build.log": "40344d2de1c4d26d8001fc87b676ac16f95f47d55e94ac786e7ce4e0bb233258",
+    "candidate-pipeline-check.log": "e6a15e3ddb88db79aa4998303155c91048bcef02c2040b8ce1775ef537e425cb",
+    "candidate-query-check.log": "a36cb577b9e59963ca978303c83c63b96850ea09c392504fedc8946312ce306b",
+    "restored-windows-debug-build.log": "e0d05d63ec901134351a8c9f2c6c5fcbdbf47d6fe87ad9da1993662fc426787f",
+    "restored-windows-release-build.log": "e54a0df0e2e9366369351a2d1bd0307f855373ecbc64d65475262a9bca2e1e37"
+  },
+  "unqualifiedAttempts": {
+    "pipeline-baseline-01": "runner expected live-start marker; checkpoint uses benchmark-start; no route input",
+    "pipeline-baseline-02": "local quoting correction failed; startup stopped before route input",
+    "query-candidate-02": "691 GPU completions, 690 display timestamps; first accepted image unresolved; rejected by unchanged two-second drain",
+    "pipeline-baseline-04": "NotificationShade covered game; foreground guard aborted before route input; Debug stopped"
+  },
+  "pending": [
+    "long warm gameplay and 30 FPS acceptance",
+    "live combat on current production bank",
+    "Current/Higher and saved Lower migration acceptance"
+  ],
+  "finalControls": {
+    "cases": [
+      "pipeline-baseline-05",
+      "query-baseline-02"
+    ],
+    "matchedCompletedFrames": 1390,
+    "strictDisplayJoins": "pass; all completed frames have an owned actual display timestamp",
+    "savedOwnerBytes": 8017664,
+    "restoration": "exact starting allocation totals; one unload/restore each; zero readiness waits",
+    "temperatureComparison": "both rejected by existing 1.5 C per-sensor comparison; no causal gain estimate",
+    "poseComparison": "up to 2.2 mm positional drift at ordinary walk stops; exact eligibility retained; unchanged per-hold stationarity check",
+    "focusedPoseEligibilityChecks": 3,
+    "strictAnalyzerRegressionTests": 16,
+    "runtimeOrShaderChanges": "none; same installed control APK; no additional experiment",
+    "thermalParserRegressionTests": 9
+  },
+  "priorExactCommitCi": {
+    "sha": "3a9db850c67b680451597f435e1e971b31e08da2",
+    "runId": 39004383384,
+    "result": "all six jobs passed",
+    "msvc": "attempt 1 reached unchanged 15-minute job deadline; one MSVC-only fresh-worker retry passed all 146 Windows tests; runner delay cause unproven; deadlines/assertions unchanged"
+  },
+  "notEstablished": [
+    "Thermally comparable causal optimization gain; trial closed without adoption",
+    "Exact cross-run timed camera poses at ordinary walk stops (separate frozen correctness captures remain exact)"
+  ],
+  "phoneDisposition": {
+    "installedDebugSha256": "a49955a2638ae5bf0fc5e3ddc8bdf83c43a9335e5ada64f231503e66c95a8d6c",
+    "state": "baseline installed; both final controls complete; Debug stopped; release app untouched",
+    "verifiedUtc": "2026-10-17T05:40:42.245338+00:00",
+    "preferencesByteIdentical": true,
+    "preferencesSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "noInstallDuringFinalControls": true
+  },
+  "artifactInventoryCorrection": {
+    "cause": "Rerunning local analyze.py included the previous derived summary.json in its own rawFiles inventory",
+    "affectedCases": [
+      "pipeline-baseline-03",
+      "query-baseline-01",
+      "pipeline-candidate-01",
+      "query-candidate-01",
+      "pipeline-candidate-02",
+      "query-candidate-03"
+    ],
+    "correction": "Exclude the derived summary output; retain and verify every source artifact hash",
+    "timingOrCaptureDataChanged": false,
+    "negativeChecks": [
+      "self-referencing summary rejected",
+      "changed source artifact hash rejected"
+    ],
+    "methodSha256": "2fd22737b491240a0d0a49d79c745fd419c7f13a80d36443cce8405c7b68d1ad",
+    "correctedAnalyzerSha256": "0ec465bd66e2e16205bbc92c679b75ca213874465d2f960739df118a09af948e"
+  }
+}

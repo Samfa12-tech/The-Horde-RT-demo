@@ -1,0 +1,24 @@
+[
+  {
+    "reference": 1,
+    "filename": "Screenshot 2026-10-10 124425.png",
+    "sha256": "0cdc4a155616c75868eba0a50806c74a6bbe822208215b395f05ae583aac13ff",
+    "dimensions": [
+      1202,
+      763
+    ],
+    "setting": "CURRENT (owner confirmed)",
+    "class_": "Owner screenshot; exact camera, rope freeze and executable/module identity unavailable"
+  },
+  {
+    "reference": 2,
+    "filename": "Screenshot 2026-10-10 155137.png",
+    "sha256": "1cb88c35510a0dbde365f5b77a2276b5c890a5037f8d6198c2b952fee2c7a7c2",
+    "dimensions": [
+      1192,
+      788
+    ],
+    "setting": "Probably HIGHER (owner uncertain)",
+    "class_": "Owner screenshot; exact camera, rope freeze and executable/module identity unavailable"
+  }
+]

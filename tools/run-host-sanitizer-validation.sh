@@ -6,11 +6,24 @@ hordeBuild=build/host-sanitizer-ci
 hordeFlags='-O1 -g -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer'
 hordeTargets=(
   horde_rt_retirement_owner_tests
+  horde_rt_region_streaming_tests
+  horde_rt_geometry_page_table_tests
+  horde_rt_geometry_partition_tests
   horde_rt_pipeline_cache_seed_tests
   pocket_audio_native_pcm_tests
   horde_rt_simulation_timing_tests
   horde_rt_simulation_gameplay_tests
+  horde_rt_campaign_checkpoint_tests
+  horde_rt_campaign_codec_tests
+  horde_rt_campaign_storage_tests
+  horde_rt_campaign_save_coordinator_tests
+  horde_rt_campaign_save_worker_tests
+  horde_rt_campaign_session_tests
+  horde_rt_character_step_geometry_tests
+  horde_rt_chapter_step_movement_tests
   horde_rt_player_animation_tests
+  horde_rt_utility_hand_return_tests
+  horde_rt_flask_simulation_tests
   horde_rt_held_item_socket_tests
   horde_rt_dielectric_math_tests
   horde_rt_music_director_tests
@@ -22,6 +35,7 @@ hordeTargets=(
   horde_rt_input_mailbox_stress
   horde_rt_playtest_report_tests
   horde_rt_playtest_submission_tests
+  horde_rt_forest_understory_tests
 )
 
 cmake -S . -B "$hordeBuild" \
@@ -40,3 +54,10 @@ for hordeTarget in "${hordeTargets[@]}"; do
   ctest --test-dir "$hordeBuild" --output-on-failure --no-tests=error \
     -R "^${hordeTarget}$"
 done
+
+# Same compiled movement target, second bounded registration: keep both
+# rejection fixtures under the original sanitizer coverage after partitioning.
+ctest --test-dir "$hordeBuild" --output-on-failure --no-tests=error \
+  -R '^horde_rt_chapter_posture_rejection_tests$'
+ctest --test-dir "$hordeBuild" --output-on-failure --no-tests=error \
+  -R '^horde_rt_flask_utility_owner_tests$'

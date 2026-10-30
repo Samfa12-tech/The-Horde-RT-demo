@@ -1,0 +1,122 @@
+{
+  "debug": {
+    "trials": [
+      {
+        "trial": 0,
+        "order": [
+          "original",
+          "cached"
+        ],
+        "combinedSkinMedianUs": {
+          "original": 46654.7,
+          "cached": 21949.7
+        },
+        "reductionPercent": 52.952864341641884,
+        "all16StreamsByteIdentical": true
+      },
+      {
+        "trial": 1,
+        "order": [
+          "cached",
+          "original"
+        ],
+        "combinedSkinMedianUs": {
+          "original": 25852.7,
+          "cached": 21120.15
+        },
+        "reductionPercent": 18.30582492350895,
+        "all16StreamsByteIdentical": true
+      },
+      {
+        "trial": 2,
+        "order": [
+          "original",
+          "cached"
+        ],
+        "combinedSkinMedianUs": {
+          "original": 24037.0,
+          "cached": 23264.65
+        },
+        "reductionPercent": 3.213171360818734,
+        "all16StreamsByteIdentical": true
+      },
+      {
+        "trial": 3,
+        "order": [
+          "cached",
+          "original"
+        ],
+        "combinedSkinMedianUs": {
+          "original": 26147.050000000003,
+          "cached": 22040.15
+        },
+        "reductionPercent": 15.70693443428609,
+        "all16StreamsByteIdentical": true
+      }
+    ],
+    "allByteIdentical": true,
+    "samplesPerKind": 384,
+    "originalExeSha256": "f5757fbf01c2b0764a5bbfd6ca17037ec48baadb9f4d8d882af4b9bd8bbb8f84",
+    "cachedExeSha256": "59f1537381963a1b0f8e7674f63d40b8c6ee97870c63563db033e004395c109a"
+  },
+  "release": {
+    "trials": [
+      {
+        "trial": 0,
+        "order": [
+          "original",
+          "cached"
+        ],
+        "combinedSkinMedianUs": {
+          "original": 2152.15,
+          "cached": 1839.5
+        },
+        "reductionPercent": 14.5273331319843,
+        "all16StreamsByteIdentical": true
+      },
+      {
+        "trial": 1,
+        "order": [
+          "cached",
+          "original"
+        ],
+        "combinedSkinMedianUs": {
+          "original": 2214.9,
+          "cached": 1903.1499999999999
+        },
+        "reductionPercent": 14.075127545261646,
+        "all16StreamsByteIdentical": true
+      },
+      {
+        "trial": 2,
+        "order": [
+          "original",
+          "cached"
+        ],
+        "combinedSkinMedianUs": {
+          "original": 2181.4,
+          "cached": 1815.0
+        },
+        "reductionPercent": 16.79655267259559,
+        "all16StreamsByteIdentical": true
+      },
+      {
+        "trial": 3,
+        "order": [
+          "cached",
+          "original"
+        ],
+        "combinedSkinMedianUs": {
+          "original": 2251.45,
+          "cached": 1801.1499999999999
+        },
+        "reductionPercent": 20.000444158209152,
+        "all16StreamsByteIdentical": true
+      }
+    ],
+    "allByteIdentical": true,
+    "samplesPerKind": 384,
+    "originalExeSha256": "9aaeafba5dee7e37ab7d6adfd807d955bf80d3918077ff6aaaf993ee0ff8b4a3",
+    "cachedExeSha256": "e0c034c1a1b1a763c77c07fade77d1c58965eab1710ff618ff1e810e44fa99f6"
+  }
+}

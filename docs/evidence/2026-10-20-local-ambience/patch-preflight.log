@@ -1,0 +1,9 @@
+A combined documentation/test-registration patch failed preflight:
+apply_patch verification failed: Failed to find expected lines in assets/audio/README.md:
+`forest.wait` is admitted and mapped
+but remains catalog-only until a separate gameplay trigger is accepted.
+
+Read-only follow-up confirmed neither file in that patch was changed. The README
+actually wrapped that phrase after the previous sentence. Applied the README
+addition against its exact current last line, then registered the new asset test
+separately. No implementation, assertion or build gate was bypassed.

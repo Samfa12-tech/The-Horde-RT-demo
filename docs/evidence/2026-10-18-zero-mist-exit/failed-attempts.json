@@ -1,0 +1,69 @@
+{
+  "excludedAttempts": [
+    {
+      "case": "pipeline-zero-baseline-01",
+      "reason": "prestart completed-frame identity unavailable; recorder did not start",
+      "routeInputsSent": false
+    },
+    {
+      "case": "pipeline-zero-candidate-01",
+      "reason": "authored checkpoint 207 staging failed at tick 0 after successful real RT initialization",
+      "routeInputsSent": false,
+      "cause": "unattributed; control and candidate focused startup repros subsequently passed"
+    },
+    {
+      "case": "pipeline-zero-baseline-03",
+      "reason": "route-start battery 31.7 C vs 30.0 C reference exceeds unchanged 1.5 C match",
+      "routeInputsSent": false,
+      "protocolResponse": "finite four-run sequence stopped; exactly two final trial repeats use reference BAT minus 1.5 C preparation target instead of minus 0.5 C, with unchanged actual thermal gate and deadlines"
+    }
+  ],
+  "artifactHardPinFailures": "Old canonical module pins and compatibility arrays rejected the changed source until all derived consumers were regenerated and independently proved to differ in only two words; final complete gate passed",
+  "sourceCustody": [
+    {
+      "path": "candidate-startup-owned.log",
+      "sha256": "bf1ab44471f9ac1a900373332b486f700483583fdc9ca707f17097793d2af7d6",
+      "bytes": 101708
+    },
+    {
+      "path": "candidate-startup-capability.json",
+      "sha256": "aae844eadb14b24e6c7b3ccc556d34bedfac1fee5d7e66d1d2db91860ecd33d2",
+      "bytes": 2461
+    },
+    {
+      "path": "candidate-startup-observation.png",
+      "sha256": "c41ea5b775fec4951c4c9b583926e1488bbec38de81e2c1848a865c80e48f444",
+      "bytes": 1063976
+    },
+    {
+      "path": "control-startup-repro-01/result.json",
+      "sha256": "9f26aa15817d1404b08b6a8bdd608cf18e59d272240e48eae98f0d8621b71f4e",
+      "bytes": 85
+    },
+    {
+      "path": "candidate-startup-repro-02/result.json",
+      "sha256": "9f26aa15817d1404b08b6a8bdd608cf18e59d272240e48eae98f0d8621b71f4e",
+      "bytes": 85
+    },
+    {
+      "path": "pipeline-zero-baseline-03/thermals.json",
+      "sha256": "1c141f236a4b433c76f2ead9a2509562a56ad00033b1aab026443fd9bf0621af",
+      "bytes": 1273
+    },
+    {
+      "path": "pipeline-zero-baseline-03/before-route-admission.json",
+      "sha256": "bf417ae067b60761930a3c639d223f39531c0dbca7308a845007e00b78c093f5",
+      "bytes": 238
+    },
+    {
+      "path": "pipeline-zero-baseline-03/prestart.log",
+      "sha256": "04b7aa0db597830e4dc19640d7763518c49705f8356d319959747dec308cb60b",
+      "bytes": 64206
+    },
+    {
+      "path": "matched-repeats.log",
+      "sha256": "f83dd8f3ebe7cee53a43e1134379efeeee6804913da4df3cc4a605e7419261ee",
+      "bytes": 896
+    }
+  ]
+}

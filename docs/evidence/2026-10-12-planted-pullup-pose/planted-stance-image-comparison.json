@@ -1,0 +1,24 @@
+[
+  {
+    "backend": "pipeline",
+    "before": "docs\\evidence\\2026-10-12-shaft-carry-clearance\\pipeline-north-after.png",
+    "after": "reports\\planted-stance-admitted-normal-pipeline\\193-chapter-landing-north.png",
+    "size": [
+      960,
+      540
+    ],
+    "changedPixels": 0,
+    "maximumChannelDifference": 0
+  },
+  {
+    "backend": "query",
+    "before": "docs\\evidence\\2026-10-12-shaft-carry-clearance\\query-north-after.png",
+    "after": "reports\\planted-stance-admitted-normal-query\\193-chapter-landing-north.png",
+    "size": [
+      960,
+      540
+    ],
+    "changedPixels": 0,
+    "maximumChannelDifference": 0
+  }
+]

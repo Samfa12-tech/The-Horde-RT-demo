@@ -1,0 +1,52 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 44
+    Start 44: horde_rt_motion_evidence_scenario_tests
+
+44: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_motion_evidence_scenario_tests.exe"
+44: Working Directory: <repo>/build/presets/windows-x64-release
+44: Test timeout computed to be: 1500
+44: torch-drench rate=15 stage=complete endpoint=(-5.4757,-15.2) simulationSeconds=9.2 reason=
+44: torch-low-opening rate=15 stage=complete endpoint=(-3.7859e-10,-3.78285) simulationSeconds=24.4667 states=367 events=26 reservedLedgerBytes=38230912 reason=
+44: shaft-up rate=15 stage=complete endpoint=(-1.66,-15.3675) simulationSeconds=17.9333 states=269 events=21 reservedLedgerBytes=38230912 reason=
+44: shaft coverage views=182 zSpan=0.479259 retry=0 finaleRoof=0
+44: keeper-first-entry rate=15 stage=complete endpoint=(-31.1865,-15.2) simulationSeconds=10.2667 states=154 events=13 reservedLedgerBytes=38230912 reason=
+44: keeper-retry-reward rate=15 stage=complete endpoint=(-31.1867,-15.2001) simulationSeconds=46.6167 states=700 events=63 reservedLedgerBytes=38230912 reason=
+44: waterfall-equipment rate=15 stage=complete endpoint=(0.400877,-15.1484) simulationSeconds=6.46667 states=97 events=16 reservedLedgerBytes=38230912 reason=
+44: torch-drench rate=30 stage=complete endpoint=(-5.48048,-15.2) simulationSeconds=9.2 reason=
+44: torch-low-opening rate=30 stage=complete endpoint=(-9.95028e-10,-3.78032) simulationSeconds=24.4 states=732 events=26 reservedLedgerBytes=38230912 reason=
+44: shaft-up rate=30 stage=complete endpoint=(-1.66,-15.3853) simulationSeconds=17.8667 states=536 events=21 reservedLedgerBytes=38230912 reason=
+44: shaft coverage views=361 zSpan=0.48181 retry=0 finaleRoof=0
+44: keeper-first-entry rate=30 stage=complete endpoint=(-31.1779,-15.2) simulationSeconds=10.2333 states=307 events=13 reservedLedgerBytes=38230912 reason=
+44: keeper-retry-reward rate=30 stage=complete endpoint=(-31.1786,-15.2002) simulationSeconds=46.5167 states=1396 events=63 reservedLedgerBytes=38230912 reason=
+44: waterfall-equipment rate=30 stage=complete endpoint=(0.464386,-15.1416) simulationSeconds=6.36667 states=191 events=16 reservedLedgerBytes=38230912 reason=
+44: torch-drench rate=60 stage=complete endpoint=(-5.47667,-15.2) simulationSeconds=9.2 reason=
+44: torch-low-opening rate=60 stage=complete endpoint=(-1.10681e-09,-3.77682) simulationSeconds=24.4167 states=1465 events=26 reservedLedgerBytes=38230912 reason=
+44: shaft-up rate=60 stage=complete endpoint=(-1.66,-15.3852) simulationSeconds=17.8667 states=1072 events=22 reservedLedgerBytes=38230912 reason=
+44: shaft coverage views=721 zSpan=0.471199 retry=0 finaleRoof=0
+44: keeper-first-entry rate=60 stage=complete endpoint=(-31.1772,-15.2) simulationSeconds=10.2167 states=613 events=13 reservedLedgerBytes=38230912 reason=
+44: keeper-retry-reward rate=60 stage=complete endpoint=(-31.1779,-15.2003) simulationSeconds=46.45 states=2787 events=62 reservedLedgerBytes=38230912 reason=
+44: waterfall-equipment rate=60 stage=complete endpoint=(0.495852,-15.1465) simulationSeconds=6.36667 states=382 events=16 reservedLedgerBytes=38230912 reason=
+44: torch-drench rate=120 stage=complete endpoint=(-5.47667,-15.2) simulationSeconds=9.2 reason=
+44: torch-low-opening rate=120 stage=complete endpoint=(-1.10681e-09,-3.77682) simulationSeconds=24.4167 states=2930 events=26 reservedLedgerBytes=38230912 reason=
+44: shaft-up rate=120 stage=complete endpoint=(-1.66,-15.3852) simulationSeconds=17.8667 states=2144 events=22 reservedLedgerBytes=38230912 reason=
+44: shaft coverage views=1441 zSpan=0.471199 retry=0 finaleRoof=0
+44: keeper-first-entry rate=120 stage=complete endpoint=(-31.1772,-15.2) simulationSeconds=10.2167 states=1226 events=13 reservedLedgerBytes=38230912 reason=
+44: keeper-retry-reward rate=120 stage=complete endpoint=(-31.1779,-15.2003) simulationSeconds=46.45 states=5573 events=62 reservedLedgerBytes=38230912 reason=
+44: waterfall-equipment rate=120 stage=complete endpoint=(0.495852,-15.1465) simulationSeconds=6.36667 states=764 events=16 reservedLedgerBytes=38230912 reason=
+1/1 Test #44: horde_rt_motion_evidence_scenario_tests ...   Passed    2.02 sec
+
+The following tests passed:
+	horde_rt_motion_evidence_scenario_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   2.03 sec

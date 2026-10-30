@@ -1,0 +1,9 @@
+HORDE_PIPELINE_CACHE_CREATE attempted=1 result=0 available=1
+HORDE_CHAPTER_INITIALISE begin checkpoint=chapter-forest-lookout
+HORDE_CHAPTER_INITIALISE scene-ready checkpoint=chapter-forest-lookout
+HORDE_CAPTURE_HOST scene-admitted
+HORDE_CAPTURE_HOST callbacks-attached
+HORDE_SHOWCASE_CAPTURE enter checkpoint=chapter-forest-lookout
+HORDE_SHOWCASE_CAPTURE options-ready
+HORDE_SHOWCASE_CAPTURE directory-result=0
+Showcase capture failed: Smoke diagnostic rejected owning RT frame or visible-player gate.

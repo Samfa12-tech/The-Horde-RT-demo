@@ -1,0 +1,220 @@
+{
+  "source_commit": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+  "previous_checkpoint": "2463dbbe1e18594f9b8c7af3a3c5ce90fc7c6b9b",
+  "status": "HOST/PACKAGE-READY; new physical handoff acceptance pending",
+  "device_verified": false,
+  "owner_audio_haptic_acceptance": "PENDING",
+  "artifacts": {
+    "windows_debug": {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "2e842b0b4fad29e0156c9d0fc4248739b1b67432d84eb808e225c22eece67521",
+      "bytes": 11913728
+    },
+    "windows_release": {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "0569afe7323b10d4301331f57731e3fd2e5cf9081232b86a1ddc9122fa2c06a7",
+      "bytes": 4174848
+    },
+    "android_debug": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "248921259683b92c9fa1f71fcaf88f21fa751e36405a3150729e0dc6c965f005",
+      "bytes": 133692523
+    },
+    "android_release_unsigned": {
+      "path": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "sha256": "873fadbd480711d3e7a84bd0cdcff8f31b6fff31f1b36b3c69ccdfcefd732ac4",
+      "bytes": 121490642
+    }
+  },
+  "change_paths": [
+    "src/gameplay/items/HeldItemKinematics.cpp",
+    "src/platform/windows/DiagnosticWindow.cpp",
+    "src/platform/windows/GraphicsMenuNavigation.h",
+    "tests/DesktopControllerInputTests.cpp",
+    "tests/RescueRigAttachmentTests.cpp"
+  ],
+  "regression": {
+    "red_actual_rig_failures": 13,
+    "cases": 16455,
+    "sampled_poses": 955,
+    "final_failures": 0,
+    "grip_tolerance_metres": 0.015,
+    "first_owner_retry_right_hand_error_metres": 2.245027,
+    "root_cause": "Sword overhead lowering treated authored roof volumes wholly below exterior support as overhead; rope override hid this until ordinary equipment restored."
+  },
+  "checks": {
+    "debug_selected": 40,
+    "release_selected": 39,
+    "graphics_GDI_gate": "Configuration-independent; run once in Debug",
+    "android_native": "Debug + RelWithDebInfo unsigned Release, arm64-v8a/armeabi-v7a/x86/x86_64 rebuilt",
+    "android_lint": "Debug/Release tasks UP-TO-DATE, unchanged UI sources",
+    "android_java": {
+      "status": "UP-TO-DATE cached unchanged tests, not freshly executed",
+      "tests": 269,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 40
+    },
+    "android_package": "All eight libraries: entry identity, ELF architecture, 16KiB alignment. Shader payload inspection ARM64 ONLY",
+    "shader_freshness": "All eight Pipeline and eight RayQuery; adapters current; no generated changes"
+  },
+  "dirty_during_validation": "Only pre-existing owner-receipt clarification; no source modifications or untracked inputs during final runs.",
+  "historical_torch_debug": {
+    "source_commit": "53347791b0bd1331219651b01ea3012bafcab26d",
+    "ctest_seconds": 169.73,
+    "margin_seconds": 10.27
+  },
+  "fresh_torch": {
+    "debug": {
+      "ctest_seconds": 165.18,
+      "margin_seconds": 14.82,
+      "gate_seconds": 180,
+      "coverage": "3287 poses / 1812 roof-entry skinned / 3178 plane / 57970 disk",
+      "log": "./handoff-torch-debug.log"
+    },
+    "release": {
+      "ctest_seconds": 16.21,
+      "margin_seconds": 163.79,
+      "gate_seconds": 180,
+      "coverage": "3287 poses / 1812 roof-entry skinned / 3178 plane / 57970 disk",
+      "log": "./handoff-torch-release.log"
+    }
+  },
+  "required_runs": [
+    {
+      "label": "handoff-build-debug",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 19.4376171999902,
+      "log": "./handoff-build-debug.log",
+      "log_sha256": "116288ba4749514aaabcf738babed88482e87ee882e950982353d1c35d03701d",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-build-release",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 16.609843399986858,
+      "log": "./handoff-build-release.log",
+      "log_sha256": "3cffbf640cf9221db01a97730c3854c0dd1c03a4e174f4a508410b6a11720ea7",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-android",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 27.248670500004664,
+      "log": "./handoff-android.log",
+      "log_sha256": "911961994521d394da7faa0a246cfa55bb906eef00cbcc6acc3ce9095c6697fd",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-affected-debug",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 398.7788634000026,
+      "log": "./handoff-affected-debug.log",
+      "log_sha256": "c44bbe0688d198752ad217e53a10e7f5110a1f9999c2e63cab37355e36507bf9",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-affected-release",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 231.82059769998887,
+      "log": "./handoff-affected-release.log",
+      "log_sha256": "72f2fd16ff98d0c42654c126d2ef0985bea64d0149681cfdbe3caa37bcd86930",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-torch-debug",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 165.2337991999957,
+      "log": "./handoff-torch-debug.log",
+      "log_sha256": "1363165123025f452e6ddd5bc223d16144dd08ed56bcbd2eedb1e3d235422893",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-torch-release",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 16.25475710000319,
+      "log": "./handoff-torch-release.log",
+      "log_sha256": "ccbacd06f254be017ef82d3d7847ca2717cd3e75a47f11f6a7333ea5aea7d270",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-pipeline-freshness",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 62.44233999999415,
+      "log": "./handoff-pipeline-freshness.log",
+      "log_sha256": "7f5d6b8638ef4e2a44a5e774fb42d6a0cf43899726dc1409bdb8d8f1f59ba081",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-pipeline-adapter",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 12.550893399995402,
+      "log": "./handoff-pipeline-adapter.log",
+      "log_sha256": "359cc7dcf5d4ed04eb4981a4c93826f746f2e506f698e2e1e9c553b9973c4bf9",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-query-freshness",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 44.89269280000008,
+      "log": "./handoff-query-freshness.log",
+      "log_sha256": "e99dd0241ff280c0a52ed30a3fa79fa3651d357f253b56c31e2a002a96abfada",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-all-abi-identities",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 0.6734932000108529,
+      "log": "./handoff-all-abi-identities.log",
+      "log_sha256": "f46b2be24f7c47f346372e6e1885874b9c83da2c2b02b2f73a92a67fd0a55ef9",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-android-debug-arm64-package",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 18.359362200004398,
+      "log": "./handoff-android-debug-arm64-package.log",
+      "log_sha256": "9927830c8376b8fc6f5ba9fa10f9e47420d77a017ff984832267b81b3ae8b46f",
+      "source_unchanged_during_run": true
+    },
+    {
+      "label": "handoff-android-release-arm64-package",
+      "source_head": "d40d75b349c146d9096a768b393705ccc2f9f0fc",
+      "exit_code": 0,
+      "elapsed_seconds": 19.540652900002897,
+      "log": "./handoff-android-release-arm64-package.log",
+      "log_sha256": "7ffcda579c7fd7ab62cc00c8e19479f8f43a189d3d8cfd3d5c9924e12bfbb9e1",
+      "source_unchanged_during_run": true
+    }
+  ],
+  "unchanged": [
+    "shader source/ABI/packages/catalogues/budgets",
+    "assets",
+    "original full torch cases/tolerances/assertions and explicit 180-second gate",
+    "production route and Keeper gate",
+    "rope physical behavior and climb/hand cadence",
+    "Android/controller gameplay mappings",
+    "historical failure records"
+  ],
+  "pending": [
+    "New candidate Windows Pipeline/Query presentation and repeat handoff",
+    "Android candidate presentation/backends/lifecycle",
+    "Equipment/light and off-camera visual checks",
+    "Owner audio/haptic acceptance",
+    "Hand cadence tuning",
+    "WP3 combined workload/budget acceptance"
+  ]
+}

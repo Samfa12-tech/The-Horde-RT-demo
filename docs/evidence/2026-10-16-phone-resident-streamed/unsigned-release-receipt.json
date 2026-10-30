@@ -1,0 +1,14 @@
+{
+  "basedOn": "867b817555bae2ff18c3700cc34ab7c43197674f plus candidate.json source hashes",
+  "scope": "Unsigned default Android Release and lint, four ABIs; private profile off; not installed, signed or published",
+  "apkSha256": "abe5a7a4b1bb219218c6d87bfff0ddc574c85ef31b327be1d0d1cdb47baad3e6",
+  "bytes": 168753925,
+  "signed": false,
+  "installed": false,
+  "nativeHashes": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "2631c33f30ceb7e6757ad7681405566e9831c47236bfe9257aa340b62edfb7e4",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "a6f75a332920f326c7c856daa49ae572bac1c80d1d8235505c4dbe80ef843fdf",
+    "lib/x86/libhorde_rt_probe_android.so": "005b5b01c1a50cbbc595dda78d1123cfd7db40cab45690a91565ffb11d88765a",
+    "lib/x86_64/libhorde_rt_probe_android.so": "5faabd5bf5b2902b8c39f7ad371002706e3fb82b61dd1bdadd5531748c6f889c"
+  }
+}

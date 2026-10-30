@@ -1,0 +1,68 @@
+{
+  "source": "assets\\models\\enemies\\meshy\\skeleton_biped_merged_animations_v01.glb",
+  "sourceSha256": "340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db",
+  "sourceUnchanged": true,
+  "savedBlendSha256": "afd08e9642dea9a399b49588f8a634b7a2f8f503f3f3750fc981bf17d9bbc6bc",
+  "savedBlendUnchanged": true,
+  "ownerFilesChecked": 151,
+  "changedOwnerFiles": [],
+  "nativeExported": false,
+  "productionBindingsChanged": false,
+  "nativeBuildRun": false,
+  "previewBatchCount": 1,
+  "previewFramesPerView": 195,
+  "views": [
+    "quarter",
+    "side"
+  ],
+  "sampledFrameVerdict": "credible stand transition for later isolated native proof; not continuous-playback/naturalness or game RT acceptance",
+  "renderProcessExited": 0,
+  "noActiveOwnedRenderOrEncode": true,
+  "thumbnailWriteRetried": false,
+  "reopenedMaximumSupportDriftM": 0.0001770907059866022,
+  "reopenedMinimumMeshZ": 0.010808341205120087,
+  "sourceGeometryWeightsUvsUnchanged": true,
+  "restBindUnchanged": true,
+  "files": {
+    "author_stand.py": {
+      "sha256": "d470eb16fa6b76511b205a7d49c7f8b8ea2ef9420c64270fb8183cfc742a354d",
+      "bytes": 8256
+    },
+    "render_preview.py": {
+      "sha256": "4f8c04b6a6497a04097601395064bd29d14cacbdd588d10a5df8aaabf7154278",
+      "bytes": 7347
+    },
+    "authoring-contact.json": {
+      "sha256": "f1846621264e4c6dfbfb58fb9e40f9c7ba6cafcf279edee5c73acb2c2a1fcef4",
+      "bytes": 53640
+    },
+    "preview-contact.json": {
+      "sha256": "291e9467b798e239a61bd2c99a938c32b290b22f181815926e675f9d0d9eb291",
+      "bytes": 244443
+    },
+    "preview-batch.log": {
+      "sha256": "292c4a77423ab73c40602a6cb27d3864a624f3a40169fade404e17639bc3e804",
+      "bytes": 73477
+    },
+    "join-step-contact-sheet.png": {
+      "sha256": "824908b0d99766289e8d945475774c3e1b3f894eb2b60bd83e20f179d4c0fc5c",
+      "bytes": 508614
+    },
+    "authoring-quarter.mp4": {
+      "sha256": "43162181d8cdd1e4b8be2fff9f69257fb22a4821c41b76d1c77f4e8d9aea3aed",
+      "bytes": 975297
+    },
+    "authoring-side.mp4": {
+      "sha256": "1dba8958564a2ec5d64aaba4ecb33d698ebedf1323beb771816defc89eda379d",
+      "bytes": 662256
+    },
+    "video-receipts.json": {
+      "sha256": "91099944e0bf075e03246daf63d17e4815dabe26a9145a2849b4468c35b7436c",
+      "bytes": 868
+    },
+    "VISUAL_REVIEW.md": {
+      "sha256": "dbac034b7645ab6a9d619fdc152d0f52aa430c61dbae8765d6d20fd2781d9b59",
+      "bytes": 4555
+    }
+  }
+}

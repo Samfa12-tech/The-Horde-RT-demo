@@ -1,0 +1,7 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 96: horde_rt_static_gltf_asset_tests
+1/1 Test #96: horde_rt_static_gltf_asset_tests ...   Passed    2.70 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   2.72 sec

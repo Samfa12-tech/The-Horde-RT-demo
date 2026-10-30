@@ -1,0 +1,21 @@
+{
+  "artifact": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+  "sha256": "a9d7c4e3cc68c0ea0765487a1b6f2732dbc1cef95005b6516279d17a6bfac5c9",
+  "bytes": 206257243,
+  "frozen69Unchanged": true,
+  "unitTests": 458,
+  "failures": 0,
+  "existingSkips": 6,
+  "assembleLint": "PASS,3m38s",
+  "deviceInstalled": false,
+  "keeperPoseDefault": "ExistingControl",
+  "runtimeFlaskEnabled": false,
+  "nativeLibraries": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "b1d92a241d46886b37efc622ecea9c45c61b4f9ac92578ed047e66a813713153",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "0c3e6307d0c66109a5f71947627e36ca9f022510bcc22f2412b97a00dda117e8",
+    "lib/x86/libhorde_rt_probe_android.so": "caf00dd2f6fc69237a0f0b7e91430514858125e5bc60f898acc7f86b96b57405",
+    "lib/x86_64/libhorde_rt_probe_android.so": "18e8315b5dbadf39bff49bf6707af38cbf597690fa49d1fc11710501a79c7344"
+  },
+  "newAssetEntries": [],
+  "sourceOrSaveEntries": []
+}

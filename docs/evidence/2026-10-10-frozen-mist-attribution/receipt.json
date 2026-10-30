@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "source_commit": "f2a095fcf85520d63aebc1a48547cf4a453e97ba",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "pr": 27,
+  "scope": "Frozen-frame mist attribution; evidence-only checkpoint. Independent fixes completed at d5e4b6a / f2a095fc.",
+  "production_source_shader_abi_budgets_packages_unchanged": true,
+  "ledgers": [
+    "toolchain.json",
+    "shader-metrics.json",
+    "sample-local-full-metrics.json",
+    "input-identities.json",
+    "query-record-input-identities.json",
+    "source-identities.json",
+    "runs.jsonl",
+    "query-record-runs.json",
+    "retained-attempts.json",
+    "quality-comparison.json",
+    "owner-view-comparison.json",
+    "weighted-shadow-metrics.json",
+    "continuous-rope-oracle.json",
+    "extension-identities.json",
+    "extension-runs.jsonl",
+    "extension-retained-shader-identities.json",
+    "owner-reference-identities.json"
+  ],
+  "frozen_state_sha256": "c0504e981daeeb528185a95c1dd19cbfcf6d7244bfb635c913abfab0e67e63b8",
+  "physical_target": {
+    "class": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "os": "Windows",
+    "driver": "32.0.16.1047; Vulkan raw vendor version 2559295488",
+    "vulkan": "1.4.341",
+    "backend": "RayTracingPipeline",
+    "instrumentation": "Diagnostic",
+    "quality": "High",
+    "active_strategy": "GenericDielectric",
+    "coverage": "30 shaded frozen frames plus 12 hardware query/weighted maps, each successfully presented at submission12; original showcase admissions all FAIL. Two distinct frozen viewpoints. No Android/Query/motion/lifecycle/listening acceptance."
+  },
+  "diagnostic_executables": {
+    "shaded": {
+      "bytes": 12471296,
+      "sha256": "018ed89dd2b4bf5bb311c63161b6479cc778890082e6da2c61a8a69f92dd882c"
+    },
+    "query_records": {
+      "bytes": 11053568,
+      "sha256": "45d3ab6494cc9b4938f36118c6bbaf36d397d1d5d095e9e758759766c51b3eb5"
+    }
+  },
+  "unchanged_production_windows_debug_exe": {
+    "bytes": 11917312,
+    "sha256": "1aae10d210842bd789b5ec8e9d939d68831c04bd5b41d144bea44421a1d2f094"
+  },
+  "settings": {
+    "scale_percent": 100,
+    "internal_resolution": [
+      1232,
+      803
+    ],
+    "output_resolution": [
+      1232,
+      803
+    ],
+    "exposure": 0.62,
+    "water": "High",
+    "fire": "High: 10 volume steps / 2 reflection samples / 8 reflected steps",
+    "shadow": "Higher: 4 local / 2 sky primary surface samples",
+    "mist": true,
+    "dust": "Standard",
+    "workload": "Authored: six unchanged density samples",
+    "mist_mask": "0x35",
+    "audio": "Capture SFX zero; no listening acceptance"
+  },
+  "frozen_state": {
+    "tick": 601,
+    "additional_fixed_ticks": 600,
+    "hz": 60,
+    "camera": [
+      -33,
+      0.7,
+      -17.5,
+      -2.805,
+      -0.24
+    ],
+    "support_y": -0.95,
+    "height_delta": 0,
+    "rope_phase": "LowerSafe",
+    "deployment_phase": "Ready",
+    "nodes": 12,
+    "triangles": 176,
+    "tension": 70.2491989,
+    "anchor": [
+      -33.7000008,
+      3.67799997,
+      -15.5
+    ],
+    "lantern_claimed": true,
+    "held_pose": "High",
+    "staff_strength": 0,
+    "roof_open": 1,
+    "dawn_reveal": 0,
+    "gpu_lantern": {
+      "id": 1279348308,
+      "position_strength": [
+        -33.0775375,
+        0.298102945,
+        -16.8894691,
+        0.686399996
+      ],
+      "colour_intensity": [
+        1,
+        0.426759988,
+        0.0815246254,
+        0.686399996
+      ]
+    },
+    "sky_targets": [
+      [
+        -34.35,
+        2.76,
+        -16.02
+      ],
+      [
+        -33.05,
+        2.76,
+        -14.38
+      ]
+    ]
+  },
+  "outcomes": {
+    "fresh_production_matrix": "PASS: eight SPIR-V identities match unchanged catalogue",
+    "experimental_compile_spirv_val": "PASS: six shaded / two record / eight sample-local reference modules",
+    "completed_hardware_rt_presentation": "PASS for each recorded probe on this target",
+    "original_showcase_capture_gate": "FAIL for every probe: original rig primary visibility assertion retained",
+    "sample_local_reference_admission": "FAIL: each OpaqueFast exceeds seven frozen maxima and fails driverSafeFullyInlined exact invariant; no publication attempted",
+    "mist_attribution": "A similar detached band is reproduced and hardware-attributed to rope/sky midpoint reuse. Actual short blocked mist intervals exist: midpoint repeats them over the whole segment, while six local samples can miss them. Do not treat brighter local output as a correct continuous-shadow solution; exact original screenshot camera/rope/module identities remain unavailable.",
+    "lantern": "No visible mist scattering in this pose; hardware proves body/world occlusion with nonzero raw radiance",
+    "production_correction": "NOT IMPLEMENTED OR ADMITTED; full sample-local reference both fails Opaque bounds and can miss genuine thin blocked intervals."
+  },
+  "remaining_gates": [
+    "Bounded reusable sample-aware implementation satisfying every frozen maximum; full per-sample reference cannot ship",
+    "Original owner camera/rope freeze not recovered; future motion/bump/other-pose confirmation",
+    "Android / Query physical evidence not run",
+    "Continuous movement, traversal, lifecycle, owner audio/haptic pending on latest production fixes",
+    "Lantern self-occlusion requires separate physical emission-boundary investigation; no mask removal"
+  ],
+  "published_frozen_state_sha256": "60bb3521a8f670d872d19442e4a39ae084b9f28ae32dc3eb366ae4d608f675d6",
+  "byte_custody": "frozen_state_sha256 is native CRLF output; public text is explicitly normalized to LF. Published files have separate exact identities.",
+  "extension": {
+    "owner_frame_recovery": false,
+    "approximate_owner_view": {
+      "camera": [
+        -34.4,
+        0.7,
+        -13.5,
+        0.1,
+        -0.24
+      ],
+      "lantern_pose": "Low",
+      "native_frozen_state_sha256": "b19c4e07b17725ae920907974310240ff130d5b8ddf25fd28a771a9067dcc7f7",
+      "published_frozen_state_sha256": "f503e5e493db759af1cb7dd1ee029c56fb2a4f999a3bab8d522c05e17d36d479"
+    },
+    "quality_modes": {
+      "CURRENT": "1 local / 1 sky; pixel-parity aperture",
+      "HIGHER": "4 local / 2 sky; aperture0 for mist"
+    },
+    "shadow_strength": "Sky-only source-normalized scattering loss weighted by unchanged density, step length and previous extinction. Exact float32 payload transport through RGBA8/PNG; not surface shadow intensity.",
+    "continuous_oracle": "32 selected clear-floor rays agree with actual midpoint/six-sample rope masks. Analytic cone intervals and CPU quadrature are independent geometry evidence, not GPU/continuous-volume acceptance. Selected floor depth is a premise, not independently captured; all selected rays use aperture point0; no other occluders/area mixture.",
+    "conclusion": "A similar detached band is reproduced and hardware-attributed to rope/sky midpoint reuse. Actual short blocked mist intervals exist: midpoint repeats them over the whole segment, while six local samples can miss them. Do not treat brighter local output as a correct continuous-shadow solution; exact original screenshot camera/rope/module identities remain unavailable."
+  }
+}

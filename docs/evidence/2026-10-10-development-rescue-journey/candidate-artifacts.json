@@ -1,0 +1,31 @@
+{
+  "runtime_source": "1a0205efcb423a3df527f617cf2fe48034116cb3",
+  "test_correction_commit": "8cc0b9a7a197293764f353ce5e4995aaae06f05a",
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 11858944,
+      "sha256": "4e265d7fb26603a170c34d7ca7cfababaca68a0f3ef8cb8ae29611d1ddc69a61"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4160000,
+      "sha256": "7287d53b86d7d24c49d0f91bbde6ff08a2c45748fd1f6c74b7b591d0e8a23086"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 133661851,
+      "sha256": "4d6ad4d66854908af27405376a2d1e9bbcb3a3db7b1e0ff5377e82bfdea91f1f"
+    },
+    {
+      "path": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "bytes": 121443778,
+      "sha256": "48c7a0878c30020f3acdb10a7105efc58874ea0a8ec300dcc9fe982522fb1238"
+    }
+  ],
+  "test_correction_commits": [
+    "8cc0b9a7a197293764f353ce5e4995aaae06f05a",
+    "f01d02dcc77efc27993b2c8b273915667993da57"
+  ],
+  "runtime_inputs_unchanged_after_source": true
+}

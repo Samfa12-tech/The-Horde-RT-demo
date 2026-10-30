@@ -6,6 +6,7 @@
 #include <span>
 
 #include "audio/MusicDirector.h"
+#include "audio/MusicPcmAssets.h"
 #include "gameplay/simulation/GameSimulation.h"
 
 namespace
@@ -453,6 +454,84 @@ void TestIrregularUpdateEquivalence()
           "irregular update cadence matches the same elapsed audio clock");
 }
 
+void TestOutdoorLoopAndLifecycle()
+{
+    constexpr auto index = static_cast<std::size_t>(MusicCue::Outdoor);
+    constexpr double sampleSeconds = 1.0 / kMusicPcmSampleRate;
+    constexpr double duration = static_cast<double>(kMusicPcmAssets[index].bodyFrames) /
+        kMusicPcmSampleRate;
+    Check(kMusicPcmAssets[index].bodyFrames == 5'120'000u &&
+          kMusicPcmAssets[index].tailFrames == 0u && kMusicPcmAssets[index].looping,
+          "Outdoor admits the full aligned main loop with no invented release tail");
+    SimulationSnapshot snapshot{};
+    snapshot.developmentRescueJourney = true;
+    snapshot.playerAlive = true;
+    snapshot.finale.lichDefeated = true;
+    snapshot.lich.phase = LichPhase::Dead;
+    snapshot.rescue.firstAscentCompleted = snapshot.rescue.exteriorSide = true;
+    snapshot.rescue.lanternClaimed = true;
+    MusicDirector director;
+    auto result = director.Update(snapshot, {}, 0.0, 1u);
+    const auto revision = result.revision;
+    Check(result.cue == MusicCue::Outdoor && result.looping && Near(result.positionSeconds, 0.0),
+          "loaded exterior selects Outdoor directly without replaying the arrival reveal");
+    result = director.Update(snapshot, {}, 12.0, 1u);
+    Check(result.cue == MusicCue::Outdoor && Near(result.positionSeconds, 12.0) &&
+          result.revision == revision, "Outdoor does not wrap or restart at the legacy twelve-second boundary");
+    result = director.Update(snapshot, {}, duration - sampleSeconds, 1u);
+    Check(result.cue == MusicCue::Outdoor && Near(result.positionSeconds, duration - sampleSeconds,
+          sampleSeconds / 4.0) && result.revision == revision,
+          "Outdoor retains its final full-length source frame before wrapping");
+    result = director.Update(snapshot, {}, duration, 1u);
+    Check(result.cue == MusicCue::Outdoor && Near(result.positionSeconds, 0.0, sampleSeconds / 4.0) &&
+          result.revision == revision, "Outdoor wraps at exactly 5120000 frames without a new cue revision");
+    double clock = 2.0 * duration + .125;
+    result = director.Update(snapshot, {}, clock, 1u);
+    Check(Near(result.positionSeconds, .125, sampleSeconds / 4.0) && result.revision == revision,
+          "irregular multi-period Outdoor updates preserve the full-loop remainder");
+    snapshot.dialogueBedGain = .65f;
+    result = director.Update(snapshot, {}, clock += .125, 1u);
+    Check(result.cue == MusicCue::Outdoor && result.revision == revision &&
+          Near(result.positionSeconds, .25) && Near(result.revealGain, .65),
+          "dialogue gain ducks the same main Outdoor cue without selecting another asset or restarting it");
+    for (const bool externalFocus : {false, true})
+    {
+        snapshot.paused = !externalFocus;
+        result = director.Update(snapshot, {}, clock += 100.0, 1u, externalFocus);
+        Check(result.suspended && result.cue == MusicCue::Outdoor &&
+              Near(result.positionSeconds, .25) && result.revision == revision && Near(result.revealGain, .65),
+              "pause or lost output focus preserves Outdoor cursor, revision and dialogue envelope");
+        snapshot.paused = false;
+        result = director.Update(snapshot, {}, clock += 100.0, 1u);
+        Check(!result.suspended && result.cue == MusicCue::Outdoor && Near(result.positionSeconds, .25) &&
+              result.revision == revision, "resume excludes the suspended Outdoor wall-clock interval");
+    }
+    snapshot.dialogueBedGain = 1.0f;
+    snapshot.playerAlive = false;
+    result = director.Update(snapshot, {}, clock += .25, 1u);
+    Check(result.cue == MusicCue::None && !result.looping,
+          "death interrupts the outdoor main loop to silence");
+    snapshot.playerAlive = true;
+    result = director.Update(snapshot, {}, clock += .25, 1u);
+    Check(result.cue == MusicCue::Outdoor && Near(result.positionSeconds, 0.0),
+          "alive exterior reconstruction starts Outdoor without resurrecting G");
+    ++snapshot.retryGeneration;
+    result = director.Update(snapshot, {}, clock += .25, 1u);
+    Check(result.cue == MusicCue::Outdoor && result.discontinuity && Near(result.positionSeconds, 0.0),
+          "new retry identity discards the previous Outdoor timeline");
+    result = director.Update(snapshot, {}, clock += 1.0, 1u);
+    Check(Near(result.positionSeconds, 1.0), "fresh Outdoor retry resumes its own content clock");
+    ++snapshot.lastConsumedRouteResetSequence;
+    result = director.Update(snapshot, {}, clock += 1.0, 1u);
+    Check(result.cue == MusicCue::Outdoor && result.discontinuity && Near(result.positionSeconds, 0.0),
+          "route-reset identity also clears the retained Outdoor cursor");
+    snapshot.developmentRescueJourney = false;
+    snapshot.finale.phase = interactions::FinaleSequencePhase::Complete;
+    result = director.Update(snapshot, {}, clock += .25, 1u);
+    Check(result.cue == MusicCue::H && result.looping && Near(result.positionSeconds, 0.0),
+          "leaving chapter mode preserves the legacy completed-showcase H dawn cue");
+}
+
 void TestKeeperRevealMusic()
 {
     MusicDirector director;
@@ -583,6 +662,7 @@ int main()
     TestSkylightAndDawnContinuity();
     TestSuspensionClockAndLoopPeriods();
     TestIrregularUpdateEquivalence();
+    TestOutdoorLoopAndLifecycle();
     if (!passed)
     {
         return 1;

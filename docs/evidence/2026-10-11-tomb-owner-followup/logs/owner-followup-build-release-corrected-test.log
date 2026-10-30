@@ -1,0 +1,232 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_rtpv_0_1_obj.vcxproj -> <repo>\build\presets\windows-x64-release\horde_rtpv_0_1_obj.dir\Release\horde_rtpv_0_1_obj.lib
+  horde_rtpv_1_0_obj.vcxproj -> <repo>\build\presets\windows-x64-release\horde_rtpv_1_0_obj.dir\Release\horde_rtpv_1_0_obj.lib
+  horde_rtpv_1_1_obj.vcxproj -> <repo>\build\presets\windows-x64-release\horde_rtpv_1_1_obj.dir\Release\horde_rtpv_1_1_obj.lib
+  horde_rtpv_0_0_obj.vcxproj -> <repo>\build\presets\windows-x64-release\horde_rtpv_0_0_obj.dir\Release\horde_rtpv_0_0_obj.lib
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_rt_android_debug_request_admission_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_android_debug_request_admission_tests.exe
+  horde_rt_android_motion_evidence_policy_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_android_motion_evidence_policy_tests.exe
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_combat_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_combat_smoke.exe
+  horde_rt_combat_foundation_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_combat_foundation_tests.exe
+  horde_rt_ambience_pcm_loop_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_ambience_pcm_loop_tests.exe
+  horde_rt_combat_timing_trace_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_combat_timing_trace_tests.exe
+  horde_rt_benchmark_evidence_run_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_benchmark_evidence_run_tests.exe
+  horde_rt_benchmark_evidence_report_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_benchmark_evidence_report_tests.exe
+  horde_rt_benchmark_summary_report_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_benchmark_summary_report_tests.exe
+  horde_rt_compiled_pipeline_cache_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_compiled_pipeline_cache_tests.exe
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  horde_rt_desktop_controller_input_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_desktop_controller_input_tests.exe
+  horde_rt_capability_probe.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_capability_probe.exe
+  horde_rt_character_render_slot_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_character_render_slot_smoke.exe
+  horde_rt_developer_overlay_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_developer_overlay_smoke.exe
+  horde_rt_development_static_asset_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_development_static_asset_tests.exe
+  horde_rt_device_address_layout_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_device_address_layout_tests.exe
+  horde_rt_dielectric_math_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_dielectric_math_tests.exe
+  horde_windows_music.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_windows_music.lib
+  horde_rt_diagnostic_window.vcxproj -> <repo>\build\presets\windows-x64-release\Release\HordeLanternRT.exe
+  horde_rt_driver_capability_report_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_driver_capability_report_tests.exe
+  horde_rt_entry_menu_scene_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_entry_menu_scene_tests.exe
+  horde_rt_entry_menu_handoff_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_entry_menu_handoff_tests.exe
+  horde_rt_evidence_publication_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_evidence_publication_tests.exe
+  horde_rt_final_held_torch_clearance_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_final_held_torch_clearance_tests.exe
+  horde_rt_foreground_pause_render_cadence_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_foreground_pause_render_cadence_tests.exe
+  horde_rt_fire_emitter_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_fire_emitter_tests.exe
+  horde_rt_frame_evidence_coordinator_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_frame_evidence_coordinator_tests.exe
+  horde_rt_github_release_updater_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_github_release_updater_tests.exe
+  horde_rt_gpu_frame_timer_collection_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_gpu_frame_timer_collection_tests.exe
+  horde_rt_gpu_resources_observation_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_gpu_resources_observation_tests.exe
+  horde_rt_gpu_timestamp_math_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_gpu_timestamp_math_tests.exe
+  horde_rt_graphics_preview_frame_adapter_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_preview_frame_adapter_tests.exe
+  horde_rt_graphics_preview_performance_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_preview_performance_tests.exe
+  horde_rt_graphics_preview_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_preview_tests.exe
+  horde_rt_graphics_scale_legacy50_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_scale_legacy50_tests.exe
+  horde_rt_graphics_scale_min33_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_scale_min33_tests.exe
+  horde_rt_graphics_settings_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_settings_tests.exe
+  horde_rt_graphics_windows_persistence_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_graphics_windows_persistence_tests.exe
+  horde_rt_held_item_clearance_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_clearance_tests.exe
+  horde_rt_held_item_socket_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_socket_tests.exe
+  horde_rt_held_item_transition_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_transition_tests.exe
+  horde_rt_indoor_dust_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_indoor_dust_tests.exe
+  horde_rt_held_item_vertical_support_rig_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_held_item_vertical_support_rig_tests.exe
+  horde_rt_input_mailbox_stress.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_input_mailbox_stress.exe
+  horde_rt_input_presentation_trace_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_input_presentation_trace_tests.exe
+  horde_rt_lantern_benchmark_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_lantern_benchmark_tests.exe
+  horde_rt_lantern_pendulum_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_lantern_pendulum_tests.exe
+  horde_rt_lantern_reward_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_lantern_reward_tests.exe
+  horde_rt_menu_ambience_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_menu_ambience_tests.exe
+  horde_rt_motion_evidence_scenario_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_motion_evidence_scenario_tests.exe
+  horde_rt_music_director_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_music_director_tests.exe
+  horde_rt_music_pcm_asset_bank_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_music_pcm_asset_bank_tests.exe
+  horde_rt_music_pcm_stream_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_music_pcm_stream_tests.exe
+  horde_rt_music_pcm_wave_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_music_pcm_wave_tests.exe
+  horde_rt_music_playback_session_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_music_playback_session_tests.exe
+  horde_rt_performance_evidence_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_performance_evidence_tests.exe
+  horde_rt_pipeline_bundle_contracts_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_bundle_contracts_tests.exe
+  horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_bundle_lifetime_tests.exe
+  horde_rt_pipeline_cache_seed_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_cache_seed_tests.exe
+  horde_rt_pipeline_variant_provider_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_variant_provider_tests.exe
+  horde_rt_pipeline_variants_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_pipeline_variants_tests.exe
+  horde_rt_player_animation_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_player_animation_tests.exe
+  horde_rt_player_directional_rig_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_player_directional_rig_tests.exe
+  horde_rt_player_primitive_contract_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_player_primitive_contract_tests.exe
+  horde_rt_player_skinning_benchmark.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_player_skinning_benchmark.exe
+  horde_rt_playtest_report_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_playtest_report_tests.exe
+  horde_rt_playtest_submission_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_playtest_submission_tests.exe
+  horde_rt_present_completion_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_present_completion_tests.exe
+  horde_rt_present_timing_evidence_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_present_timing_evidence_tests.exe
+  horde_rt_presentation_transform_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_presentation_transform_tests.exe
+  horde_rt_production_prop_asset_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_production_prop_asset_tests.exe
+  horde_rt_provider_diagnostic_high_fixture.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_provider_diagnostic_high_fixture.exe
+  horde_rt_provider_shipping_high_fixture.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_provider_shipping_high_fixture.exe
+  horde_rt_provider_shipping_mobile_fixture.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_provider_shipping_mobile_fixture.exe
+  horde_rt_ray_tracing_requirements_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_ray_tracing_requirements_tests.exe
+  horde_rt_rescue_blockout_import_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_blockout_import_tests.exe
+  horde_rt_provider_diagnostic_mobile_fixture.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_provider_diagnostic_mobile_fixture.exe
+  horde_rt_rescue_rig_attachment_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_rig_attachment_tests.exe
+  horde_rt_rescue_traversal_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_traversal_tests.exe
+  RescueJourneyIntegrationTests.cpp
+  horde_rt_retirement_owner_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_retirement_owner_tests.exe
+  horde_rt_scene_abi_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_scene_abi_tests.exe
+  horde_rt_scene_initialise_preflight_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_scene_initialise_preflight_tests.exe
+  horde_rt_scene_record_observation_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_scene_record_observation_tests.exe
+  horde_rt_scene_resource_inventory_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_scene_resource_inventory_tests.exe
+  horde_rt_sfx_volume_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_sfx_volume_tests.exe
+  horde_rt_shaft_dressing_geometry_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_shaft_dressing_geometry_tests.exe
+  horde_rt_showcase_benchmark_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_showcase_benchmark_smoke.exe
+  horde_rt_showcase_gameplay_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_showcase_gameplay_smoke.exe
+  horde_rt_showcase_route_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_showcase_route_smoke.exe
+  horde_rt_simulation_timing_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_simulation_timing_tests.exe
+  horde_rt_simulation_gameplay_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_simulation_gameplay_tests.exe
+  horde_rt_skinned_arm_reference_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_skinned_arm_reference_tests.exe
+  horde_rt_skinned_character_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_skinned_character_smoke.exe
+  horde_rt_skinned_node_pose_batch_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_skinned_node_pose_batch_tests.exe
+  horde_rt_spatial_audio_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_spatial_audio_smoke.exe
+  horde_rt_staged_primary_contract_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_staged_primary_contract_tests.exe
+  horde_rt_staged_primary_resource_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_staged_primary_resource_tests.exe
+  horde_rt_staged_primary_timing_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_staged_primary_timing_tests.exe
+  horde_rt_static_collapse_asset_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_static_collapse_asset_tests.exe
+  horde_rt_static_gltf_asset_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_static_gltf_asset_tests.exe
+  horde_rt_surface_presentation_policy_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_surface_presentation_policy_tests.exe
+  horde_rt_surface_session_mailbox_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_surface_session_mailbox_tests.exe
+  horde_rt_texture_layer_subset_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_texture_layer_subset_tests.exe
+  horde_rt_tomb_wall_recess_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_tomb_wall_recess_tests.exe
+  horde_rt_tomb_dressing_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_tomb_dressing_tests.exe
+  horde_rt_version_contract_incremental_configure_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_version_contract_incremental_configure_tests.exe
+  horde_rt_version_contract_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_version_contract_tests.exe
+  horde_rt_vertical_support_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_vertical_support_tests.exe
+  horde_rt_water_contact_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_water_contact_tests.exe
+  horde_rt_waterfall_production_route_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_waterfall_production_route_tests.exe
+  horde_rt_windows_benchmark_launch_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_benchmark_launch_tests.exe
+  horde_rt_windows_combat_practice_launch_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_combat_practice_launch_tests.exe
+  horde_rt_windows_motion_evidence_launch_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_motion_evidence_launch_tests.exe
+  horde_rt_windows_music_focus_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_music_focus_tests.exe
+  horde_rt_windows_music_playback_smoke.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_music_playback_smoke.exe
+  horde_rt_windows_output_resize_launch_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_output_resize_launch_tests.exe
+  horde_rt_windows_playtest_report_ui_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_playtest_report_ui_tests.exe
+  horde_rt_windows_playtest_screenshot_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_playtest_screenshot_tests.exe
+  horde_rt_windows_playtest_submission_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_playtest_submission_tests.exe
+  horde_rt_windows_playtest_verification_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_playtest_verification_tests.exe
+  horde_rt_windows_remote_playtest_report_ui_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_windows_remote_playtest_report_ui_tests.exe
+  horde_rt_world_route_foundation_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_world_route_foundation_tests.exe
+  pocket_audio_native_pcm_tests.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm_tests.exe
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244: '=': conversion from '_Ty' to '_Ty', possible loss of data [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         with [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:             _Ty=int [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         and [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:             _Ty=float [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+  (compiling source file '../../../tests/RescueJourneyIntegrationTests.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(166,65):
+      the template instantiation context (the oldest one first) is
+          <repo>\tests\RescueJourneyIntegrationTests.cpp(45,85):
+          see reference to function template instantiation 'std::optional<float> &std::optional<float>::operator =<int,0>(_Ty2 &&) noexcept' being compiled
+          with
+          [
+              _Ty2=int
+          ]
+              <repo>\tests\RescueJourneyIntegrationTests.cpp(45,85):
+              see the first reference to 'std::optional<float>::operator =' in 'main'
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(312,15):
+          see reference to function template instantiation 'void std::_Optional_construct_base<_Ty>::_Assign<int>(_Ty2 &&) noexcept' being compiled
+          with
+          [
+              _Ty=float,
+              _Ty2=int
+          ]
+
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244: 'initializing': conversion from '_Ty' to '_Ty', possible loss of data [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         with [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:             _Ty=int [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         and [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:             _Ty=float [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+  (compiling source file '../../../tests/RescueJourneyIntegrationTests.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(462,64):
+      the template instantiation context (the oldest one first) is
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(312,15):
+          see reference to function template instantiation 'void std::_Optional_construct_base<_Ty>::_Assign<int>(_Ty2 &&) noexcept' being compiled
+          with
+          [
+              _Ty=float,
+              _Ty2=int
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(168,13):
+          see reference to function template instantiation '_Ty &std::_Optional_construct_base<_Ty>::_Construct<int>(int &&) noexcept' being compiled
+          with
+          [
+              _Ty=float
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(156,14):
+          see reference to function template instantiation 'void std::_Construct_in_place<float,_Ty>(float &,_Ty &&) noexcept' being compiled
+          with
+          [
+              _Ty=int
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(472,14):
+          see reference to function template instantiation '_Ty *std::construct_at<_Ty,int>(_Ty *const ,int &&) noexcept(<expr>)' being compiled
+          with
+          [
+              _Ty=float
+          ]
+
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(476,61): warning C4244: 'initializing': conversion from '_Ty' to 'float', possible loss of data [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(476,61): warning C4244:         with [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(476,61): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(476,61): warning C4244:             _Ty=int [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(476,61): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+  (compiling source file '../../../tests/RescueJourneyIntegrationTests.cpp')
+
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244: 'initializing': conversion from '_Ty' to '_Ty', possible loss of data [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         with [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:             _Ty=int [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         and [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         [ [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:             _Ty=float [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69): warning C4244:         ] [<repo>\build\presets\windows-x64-release\horde_rt_rescue_journey_integration_tests.vcxproj]
+  (compiling source file '../../../tests/RescueJourneyIntegrationTests.cpp')
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(463,69):
+      the template instantiation context (the oldest one first) is
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\optional(156,14):
+          see reference to function template instantiation 'void std::_Construct_in_place<float,_Ty>(float &,_Ty &&) noexcept' being compiled
+          with
+          [
+              _Ty=int
+          ]
+          C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xutility(472,14):
+          see reference to function template instantiation '_Ty *std::construct_at<_Ty,int>(_Ty *const ,int &&) noexcept' being compiled
+          with
+          [
+              _Ty=float
+          ]
+
+  horde_rt_rescue_journey_integration_tests.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_rt_rescue_journey_integration_tests.exe

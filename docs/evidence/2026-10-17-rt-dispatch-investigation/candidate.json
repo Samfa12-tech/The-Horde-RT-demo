@@ -1,0 +1,13 @@
+{
+  "baseHead": "a9283715d68f320627efdc32533df82aaf1c27b6",
+  "apkSha256": "29d2de014fbb12510e6003279c07bd19fed660a6d14b6abea2255f00a60e05e9",
+  "apkBytes": 183998970,
+  "identicalAssetPayloads": 169,
+  "nativeHashes": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "d3321b9852117484c474418980e2868a736fb33db46314700f1535c141d4e870",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "210fc263007f566aa9ce35ec75523543c7ad003c00e92460c47604dee82baba6",
+    "lib/x86/libhorde_rt_probe_android.so": "6688fc1272b6b3fd91bd801842e92adedd4d4fdc8c9d809bc1a507aecfac0f3d",
+    "lib/x86_64/libhorde_rt_probe_android.so": "d2f2e15dfc002d2fc10e670af0ebfa2dc657c8990e3bd66e86ef6ff1a94b6d35"
+  },
+  "profile": "private Shipping/Mobile sparse device clock observer + stage timers + unchanged region pages; not production-budget admitted"
+}

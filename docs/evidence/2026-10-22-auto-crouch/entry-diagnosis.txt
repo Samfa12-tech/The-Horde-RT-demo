@@ -1,0 +1,3 @@
+automatic entry x=-23.701 target=-23.5 drop=0.2 blocked=0
+ordinary movement automatically lowers the body before entering a low root/ceiling passage
+65 chapter step movement checks, 1 failures; retained step bytes=680

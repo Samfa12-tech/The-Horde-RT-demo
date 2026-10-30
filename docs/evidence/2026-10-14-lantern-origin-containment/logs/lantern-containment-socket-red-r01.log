@@ -1,0 +1,60 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 80: horde_rt_held_item_socket_tests
+1/1 Test #80: horde_rt_held_item_socket_tests ...***Failed    2.70 sec
+post-claim chest held depth/x/y/clearance=1.02728/-0.130527/-0.0501483/2.66
+reward carry open held/high/low x=0.68/1.04/1.04/-0.13 guard clearance/hand=0.0600006/0.1891 emergency wall held/hand/x=0.3/0.1891/-0.45
+FAIL: reward carry must solve reach through only the left arm while both shoulders remain close to the ordinary anchored torso depth
+reward one-millimetre wall sweep max clearance/depth/lateral/yaw delta=0.00100112/0.000999168/0.000261545/0.00098294
+stowed scabbard full-mesh sweep poses=16 closestGap=0.0838906m playerTri=16301 sheathTri=11 floorGap=0.157182m releasedHand=0.503615m
+parry actual mesh clearance aspect=0.46 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=7 time=0.04 successful=0 hilt=0.0495894 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=8 time=0.05 successful=0 hilt=0.0495894 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+sword grip-local envelope y=-0.135279:0.915253 vertexBands(y<=.15,.15-.35,.35-.55,.55-.75,.75-.95,>.95)=4348,2266,1969,1782,1059,0, primitiveMaterials=material:34497,
+combat-geometry normal-near target=0,-1.2 targetY=-0.95 targetFacing=0 playerYaw=0 targetBearing=0 targetBoundsY=-0.939193:0.543894 downPulseTick=17 downActionTime=0.103333 downAdmitted=1 upPulseTick=0 upActionTime=-1 targetDeadAtUpPulse=0 downPulseSurfaceGap=0.00213471 upPulseSurfaceGap=3.40282e+38 downPulseBoundsGap=0 upPulseBoundsGap=3.40282e+38 downPulseBladeGap=0.00213471 upPulseBladeGap=3.40282e+38 downPulseNearestGripLocal=0.0321889,0.630462,0.0016153 upPulseNearestGripLocal=0,0,0 minSurfaceGap=0.00213471 closestSurfaceTick=17 closestSurfaceGripLocal=0.0321889,0.630462,0.0016153 minBladeSurfaceGap=0.00213471 closestBladeTick=17 closestBladeGripLocal=0.0321889,0.630462,0.0016153 nearSurfaceTicks20mm=17:17 downActiveNearTicks=17:17 upActiveNearTicks=0:0 downActiveBladeNearTicks=17:17 upActiveBladeNearTicks=0:0 minGap=0 boundsOverlapSamples=10:22 importedSwordVertices=11424 importedTargetVertices=28206
+combat-geometry combo-near target=0,-1.2 targetY=-0.95 targetFacing=0 playerYaw=0 targetBearing=0 targetBoundsY=-0.939193:0.543894 downPulseTick=17 downActionTime=0.103333 downAdmitted=1 upPulseTick=30 upActionTime=0.05 targetDeadAtUpPulse=1 downPulseSurfaceGap=0.00213471 upPulseSurfaceGap=0.0131259 downPulseBoundsGap=0 upPulseBoundsGap=0 downPulseBladeGap=0.00213471 upPulseBladeGap=0.0131259 downPulseNearestGripLocal=0.0321889,0.630462,0.0016153 upPulseNearestGripLocal=0.0319776,0.642511,0.00157196 minSurfaceGap=0.00213471 closestSurfaceTick=17 closestSurfaceGripLocal=0.0321889,0.630462,0.0016153 minBladeSurfaceGap=0.00213471 closestBladeTick=17 closestBladeGripLocal=0.0321889,0.630462,0.0016153 nearSurfaceTicks20mm=17:30 downActiveNearTicks=17:17 upActiveNearTicks=30:30 downActiveBladeNearTicks=17:17 upActiveBladeNearTicks=30:30 minGap=0 boundsOverlapSamples=10:32 importedSwordVertices=11424 importedTargetVertices=28206
+open anatomical hands right=0.18,-0.34,0.6 left=-0.135,-0.31,0.68 lowering/retraction=0/0 torch=0
+sword overhead phase sweep max lowering/vertices clear=0.733974/1 anatomical finalGrip/vertices=1/1 resolved=60/60 leftSocketErrorMax/failures=9.996e-08/0 rightSocketError=1.78814e-07 finalGripError=5.05762e-07m/0rad
+sword five-mm approach max lowering/hand step=0.0027637/0.00296172
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   2.72 sec
+
+The following tests FAILED:
+	 80 - horde_rt_held_item_socket_tests (Failed)
+Errors while running CTest

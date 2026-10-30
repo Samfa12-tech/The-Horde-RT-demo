@@ -1,0 +1,30 @@
+#pragma once
+
+#include <cmath>
+#include <cstdint>
+#include <string_view>
+
+// Test-only execution of two scalar/vector GLSL subsets taken verbatim from
+// production source at configure time. This is CPU arithmetic coverage, not
+// SPIR-V execution or physical Vulkan presentation.
+namespace horde::tests::shader_contracts {
+using uint=std::uint32_t;
+struct vec3 {
+    float x,y,z;
+    vec3(float a,float b,float c):x(a),y(b),z(c) {}
+};
+inline vec3 operator*(vec3 v,float s) {return {v.x*s,v.y*s,v.z*s};}
+inline vec3 normalize(vec3 v) {return v*(1.0f/std::sqrt(v.x*v.x+v.y*v.y+v.z*v.z));}
+
+@HORDE_TEST_NORMAL_FUNCTION@
+
+inline constexpr std::string_view kNormalSource=R"HORDE(@HORDE_TEST_NORMAL_FUNCTION@)HORDE";
+inline constexpr std::string_view kWaterDistanceStatement=R"HORDE(@HORDE_TEST_WATER_DISTANCE@)HORDE";
+inline float WaterCameraPath(float localDistance,float cameraDistance,float mediumDistance,bool regionalWater) {
+    struct Hit {float t;};
+    Hit transmittedHit{localDistance},h{cameraDistance};
+    const float waterPathLength=mediumDistance;
+    @HORDE_TEST_WATER_DISTANCE@
+    return transmittedHit.t;
+}
+} // namespace horde::tests::shader_contracts

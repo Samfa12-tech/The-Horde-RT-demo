@@ -328,6 +328,7 @@ bool VulkanContext::InitialiseForCapabilityProbe()
     }
 
     startupDiagnostics_.clear();
+    confirmedNoPhysicalDevices_ = false;
     selectedCapabilities_ = DeviceCapabilities{};
     selectedCapabilities_.rtMode = RtMode::Unsupported;
     selectedPhysicalDevice_ = VK_NULL_HANDLE;
@@ -351,6 +352,7 @@ bool VulkanContext::InitialiseForCapabilityProbe()
 
     std::uint32_t deviceCount = 0;
     const VkResult deviceCountResult = vkEnumeratePhysicalDevices(instance_, &deviceCount, nullptr);
+    confirmedNoPhysicalDevices_ = deviceCountResult == VK_SUCCESS && deviceCount == 0u;
     if (deviceCountResult != VK_SUCCESS || deviceCount == 0)
     {
         startupDiagnostics_.push_back("vkEnumeratePhysicalDevices returned no devices.");

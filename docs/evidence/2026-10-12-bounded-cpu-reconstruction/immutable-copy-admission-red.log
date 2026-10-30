@@ -1,0 +1,15 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 95: horde_rt_static_gltf_asset_tests
+1/1 Test #95: horde_rt_static_gltf_asset_tests ...***Failed    3.78 sec
+Static GLB temporary root=horde-rt-static-gltf-tests-debug-pid-29152
+FAIL: failed admission cannot become a ready immutable copy
+1 static glTF asset assertion(s) failed
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   3.80 sec
+
+The following tests FAILED:
+	 95 - horde_rt_static_gltf_asset_tests (Failed)
+Errors while running CTest

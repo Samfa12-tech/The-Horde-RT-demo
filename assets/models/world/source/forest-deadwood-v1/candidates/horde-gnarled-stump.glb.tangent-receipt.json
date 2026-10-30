@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "input": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\source\\forest-deadwood-v1\\original-stump\\runtime-candidate\\horde-1.7-gnarled-stump-3k-512.glb",
+  "output": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\models\\world\\source\\forest-deadwood-v1\\candidates\\horde-gnarled-stump.glb",
+  "inputSha256": "c15516edb1ad34535becf9d51bd2333d73a6dc69bbded421de34df715f84a5d9",
+  "outputSha256": "291381fef23ae05de5382214c778b97cce0969ccc0ff8876879a340ecc6d86d2",
+  "outputBytes": 1425904,
+  "geometryUnchanged": true,
+  "geometryComparison": "positions/winding/UV0 exact at 1e-6; normal direction dot >= 0.99999",
+  "maximumNormalComponentDelta": 0.00033299999999999996,
+  "minimumNormalDirectionDot": 0.9999999434216713,
+  "embeddedImagePixelsUnchanged": true,
+  "tangentLoopCountsByMappedMaterial": {
+    "gnarled_stump_bark_opaque": 9318
+  },
+  "materialTriangles": {
+    "gnarled_stump_bark_opaque": 3106
+  }
+}

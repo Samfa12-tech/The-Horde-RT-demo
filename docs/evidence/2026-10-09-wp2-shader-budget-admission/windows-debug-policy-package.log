@@ -1,0 +1,15 @@
+Test project <repo>/build/presets/windows-x64-debug
+    Start  81: horde_rt_pipeline_policy_fence_tests
+1/5 Test  #81: horde_rt_pipeline_policy_fence_tests .....................   Passed   63.80 sec
+    Start  85: horde_rt_pipeline_policy_execution_tests
+2/5 Test  #85: horde_rt_pipeline_policy_execution_tests .................   Passed   93.56 sec
+    Start 134: horde_rt_final_windows_bundle_containment
+3/5 Test #134: horde_rt_final_windows_bundle_containment ................   Passed   12.73 sec
+    Start 135: horde_rt_final_windows_bundle_containment_controls
+4/5 Test #135: horde_rt_final_windows_bundle_containment_controls .......   Passed  125.34 sec
+    Start 136: horde_rt_final_windows_bundle_containment_registration
+5/5 Test #136: horde_rt_final_windows_bundle_containment_registration ...   Passed   57.55 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) = 352.99 sec

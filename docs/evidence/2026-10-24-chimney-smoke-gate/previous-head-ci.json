@@ -1,0 +1,32 @@
+{
+  "headSha": "bed6afe7c851f88aedef62dd7eab1478f8a5901e",
+  "status": "completed",
+  "conclusion": "success",
+  "run": 40135203801,
+  "jobs": [
+    {
+      "name": "Shared simulation host (GCC)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Shared simulation host (Clang)",
+      "conclusion": "success"
+    },
+    {
+      "name": "player-vulkan-host",
+      "conclusion": "success"
+    },
+    {
+      "name": "Android Debug build, playback/report contracts and lint",
+      "conclusion": "success"
+    },
+    {
+      "name": "Shared simulation host (MSVC)",
+      "conclusion": "success"
+    },
+    {
+      "name": "Selected host contracts (Clang ASan/UBSan)",
+      "conclusion": "success"
+    }
+  ]
+}

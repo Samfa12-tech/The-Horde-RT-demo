@@ -1,0 +1,13 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/CMakeLists.txt
+  TombDressing.cpp
+  RtStaticMeshSlot.cpp
+  TombDressingTests.cpp
+  Generating Code...
+  StaticMeshAsset.cpp
+  horde_rt_tomb_dressing_tests.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_tomb_dressing_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  WindowsBenchmarkLaunchTests.cpp
+  horde_rt_windows_benchmark_launch_tests.vcxproj -> C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_windows_benchmark_launch_tests.exe

@@ -1,0 +1,19 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  74: horde_rt_player_dodge_rig_tests
+1/3 Test  #74: horde_rt_player_dodge_rig_tests ............   Passed    3.27 sec
+    Start  75: horde_rt_player_dodge_lifecycle_tests
+2/3 Test  #75: horde_rt_player_dodge_lifecycle_tests ......   Passed    1.50 sec
+    Start 101: horde_rt_player_dodge_presentation_tests
+3/3 Test #101: horde_rt_player_dodge_presentation_tests ...***Failed    0.96 sec
+FAIL: snapshot equipment identity matches the labelled original torch or imported lantern fixture
+Player dodge presentation: 750 checks, 1 failures
+
+
+67% tests passed, 1 tests failed out of 3
+
+Total Test time (real) =   5.75 sec
+
+The following tests FAILED:
+	101 - horde_rt_player_dodge_presentation_tests (Failed)
+Errors while running CTest

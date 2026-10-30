@@ -1,0 +1,173 @@
+Start testing: Oct 14 00:38 AUS Eastern Summer Time
+----------------------------------------------------------
+55/193 Testing: horde_rt_final_held_torch_clearance_tests
+55/193 Test: horde_rt_final_held_torch_clearance_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_final_held_torch_clearance_tests.exe" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_final_held_torch_clearance_tests" start time: Oct 14 00:38 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+primary-arm portal poleY=nan bendDegrees=nan clippedLeftTriangles=2310 itemLightDelta=0 vertexDelta=0 target=-0.185,-0.350948,0.606509
+primary-arm portal poleY=nan bendDegrees=nan clippedLeftTriangles=0 itemLightDelta=0.109506 vertexDelta=0.105004 target=-0.185,-0.433164,0.530666
+primary-frustum witnesses=2; original sweep pose count remains separate
+worst-bend targetGripY=0.330294 finalGripY=0.330294 flameY=0.892789 lightY=0.870196 finalMainEnvelopeHeadroom=0.0494097 root=4.2,-0.949749,-10
+clearance viewport aspect=1
+imported structural underside triangles=118 planeSamples=3178 diskSamples=57970
+new roof final rig cases=1812 actualViewmodelVerticesPerPose=15855 skinnedRoofCases=1812 worstHeadroom=0.0323757 worstPoseXZ=-0.58,-4.3 yaw/pitch=1.5708,0 walk=10.07 action=8 target/finalGripY=0.348713,0.348714
+limiting worldPoint=-0.0634497,1.31762,-4.33031 roofY=1.35 sharedY=1.35
+actual final rig cases=3287 worstHeadroom=0.0323757 maxGripError=0.0118211 failures=0
+<end of output>
+Test time = 163.07 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_final_held_torch_clearance_tests" end time: Oct 14 00:40 AUS Eastern Summer Time
+"horde_rt_final_held_torch_clearance_tests" time elapsed: 00:02:43
+----------------------------------------------------------
+
+166/193 Testing: horde_rt_scene_initialise_preflight_tests
+166/193 Test: horde_rt_scene_initialise_preflight_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_scene_initialise_preflight_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_scene_initialise_preflight_tests" start time: Oct 14 00:40 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   4.50 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_scene_initialise_preflight_tests" end time: Oct 14 00:40 AUS Eastern Summer Time
+"horde_rt_scene_initialise_preflight_tests" time elapsed: 00:00:04
+----------------------------------------------------------
+
+167/193 Testing: horde_rt_static_geometry_cutover_tests
+167/193 Test: horde_rt_static_geometry_cutover_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_static_geometry_cutover_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_static_geometry_cutover_tests" start time: Oct 14 00:40 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Keeper vertex lifetime checks: PASS
+<end of output>
+Test time =   3.93 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_static_geometry_cutover_tests" end time: Oct 14 00:40 AUS Eastern Summer Time
+"horde_rt_static_geometry_cutover_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+168/193 Testing: horde_rt_scene_resource_inventory_tests
+168/193 Test: horde_rt_scene_resource_inventory_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_scene_resource_inventory_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_scene_resource_inventory_tests" start time: Oct 14 00:40 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Resource integration: existing readback/mist/torch contracts
+Actual development static admission materials=30 primitives=31 layers=18,15,15,1
+Actual development static admission materials=30 primitives=32 layers=18,15,15,1
+Resource integration: descriptor contracts
+Resource integration: TLAS and water geometry
+Resource integration: actual tomb intake
+Integrated native tomb static roster: 31 primitives, 30 materials
+Matched CPU intake only (baseline first; cache/order bias possible): 621.561 / 4430.67 ms; additional static vertices/indices bytes: 32883520 / 5332224; no GPU allocation, AS build or presentation measurement
+Resource integration: water owner lifetime
+Water lifetime: populate
+Water lifetime: move
+Water lifetime: destroy
+Resource integration: resize contracts
+Resource integration: command/resource observations
+Resource integration: command execution fixtures
+Resource integration: not-ready rejection
+Resource integration: preview inventory
+Resource integration: populated inventory
+<end of output>
+Test time =  14.32 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_scene_resource_inventory_tests" end time: Oct 14 00:41 AUS Eastern Summer Time
+"horde_rt_scene_resource_inventory_tests" time elapsed: 00:00:14
+----------------------------------------------------------
+
+177/193 Testing: horde_rt_character_render_slot_smoke
+177/193 Test: horde_rt_character_render_slot_smoke
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_character_render_slot_smoke.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_character_render_slot_smoke" start time: Oct 14 00:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Keeper audited staff centroids: neutral=(0.972983, 0.800802, 0.605775) lifted=(0.466067, 1.09768, 1.11467) forward=(0.0265056, 1.30031, 1.17645)
+<end of output>
+Test time =   2.19 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_character_render_slot_smoke" end time: Oct 14 00:41 AUS Eastern Summer Time
+"horde_rt_character_render_slot_smoke" time elapsed: 00:00:02
+----------------------------------------------------------
+
+183/193 Testing: horde_rt_rescue_journey_integration_tests
+183/193 Test: horde_rt_rescue_journey_integration_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_rescue_journey_integration_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_rescue_journey_integration_tests" start time: Oct 14 00:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=1147700 staged_ns=1123300 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=16206 failures=0 retained_triangles=528
+<end of output>
+Test time =  10.78 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_journey_integration_tests" end time: Oct 14 00:41 AUS Eastern Summer Time
+"horde_rt_rescue_journey_integration_tests" time elapsed: 00:00:10
+----------------------------------------------------------
+
+191/193 Testing: horde_rt_rescue_rig_attachment_tests
+191/193 Test: horde_rt_rescue_rig_attachment_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_rescue_rig_attachment_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_rescue_rig_attachment_tests" start time: Oct 14 00:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+planted_renderer_mount_samples=15; stationary mounts, shared legs and cadence rejection checked
+Rescue rig attachment cases=22894 failures=0 sampled_poses=1133 max_left_reach=0.70931@phase=6 max_right_reach=0.712182@phase=3
+<end of output>
+Test time =  29.44 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_rig_attachment_tests" end time: Oct 14 00:41 AUS Eastern Summer Time
+"horde_rt_rescue_rig_attachment_tests" time elapsed: 00:00:29
+----------------------------------------------------------
+
+192/193 Testing: horde_rt_rescue_adversarial_regression_tests
+192/193 Test: horde_rt_rescue_adversarial_regression_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug/Debug/horde_rt_rescue_rig_attachment_tests.exe" "--adversarial-regression"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+"horde_rt_rescue_adversarial_regression_tests" start time: Oct 14 00:41 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+finding1 before=0,-0.95,0.900001 after=0,-0.95,0.900001 generation=2->3
+finding2 offset=-1.1 walk minZ=-13.3383 support=2.05 copingPenetration=0
+finding2 offset=-1.1 dodge minZ=-13.325 support=2.05 copingPenetration=0
+finding2 offset=0 walk minZ=-13.3383 support=2.05 copingPenetration=0
+finding2 offset=0 dodge minZ=-13.325 support=2.05 copingPenetration=0
+finding2 offset=1.1 walk minZ=-13.3383 support=2.05 copingPenetration=0
+finding2 offset=1.1 dodge minZ=-13.325 support=2.05 copingPenetration=0
+finding6 approachX=-34.4378 maximumLoadedOffset=0.0555382 rigPoses=533 rigRejections=0
+finding6 approachX=-32.9622 maximumLoadedOffset=0.0349007 rigPoses=580 rigRejections=0
+finding7 subTickHipBodyError=0 ticks=0
+Adversarial rescue cases=22668 failures=0
+<end of output>
+Test time =  27.22 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_adversarial_regression_tests" end time: Oct 14 00:42 AUS Eastern Summer Time
+"horde_rt_rescue_adversarial_regression_tests" time elapsed: 00:00:27
+----------------------------------------------------------
+
+End testing: Oct 14 00:42 AUS Eastern Summer Time

@@ -1,0 +1,5 @@
+Run39851917764, c2bbc714, API26 use at minSdk24, retained hosted failure excerpt.
+Android Debug build, playback/report contracts and lint	UNKNOWN STEP	2026-10-22T20:50:56.5052376Z Lint found 16 errors, 70 warnings. First failure:
+Android Debug build, playback/report contracts and lint	UNKNOWN STEP	2026-10-22T20:50:56.5054253Z /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/android/app/src/main/java/com/samfa12/hordelanternrt/EnvironmentSurveyExport.java:108: Error: Call requires API level 26, or core library desugaring (current min is 24): java.io.File#toPath [NewApi]
+Android Debug build, playback/report contracts and lint	UNKNOWN STEP	2026-10-22T20:50:56.5970870Z   Lint found 16 errors, 70 warnings. First failure:
+Android Debug build, playback/report contracts and lint	UNKNOWN STEP	2026-10-22T20:50:56.5972661Z   /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/android/app/src/main/java/com/samfa12/hordelanternrt/EnvironmentSurveyExport.java:108: Error: Call requires API level 26, or core library desugaring (current min is 24): java.io.File#toPath [NewApi]

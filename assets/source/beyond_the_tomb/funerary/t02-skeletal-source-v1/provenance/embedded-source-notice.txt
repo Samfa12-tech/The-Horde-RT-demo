@@ -1,0 +1,11 @@
+Manny the Mannequin by Gord Goodwin
+http://gord-goodwin.blogspot.com/
+	
+	This rig may be used for any purpose.
+	
+BONE LAYERS:
+	1-8 = deform, 9-16 = mechanisms
+	
+	1. Control Bones - Basic Movement
+	8. Skeleton Deform Bones
+	9. Skeleton Mechanism Bones

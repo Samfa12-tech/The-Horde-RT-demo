@@ -1,0 +1,26 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 1: horde_rt_sky_attribution_launch_tests
+1/1 Test #1: horde_rt_sky_attribution_launch_tests ...***Failed    2.57 sec
+FAIL: explicit frozen Debug chapter capture must opt into directional-only lighting
+FAIL: sky-off attribution must retain an explicit identity
+FAIL: Release must reject diagnostic light mutation
+FAIL: missing authority, missing values or duplicate/unknown modes must reject
+FAIL: missing authority, missing values or duplicate/unknown modes must reject
+FAIL: missing authority, missing values or duplicate/unknown modes must reject
+FAIL: missing authority, missing values or duplicate/unknown modes must reject
+FAIL: missing authority, missing values or duplicate/unknown modes must reject
+FAIL: missing authority, missing values or duplicate/unknown modes must reject
+FAIL: missing authority, missing values or duplicate/unknown modes must reject
+FAIL: attribution may not mutate a moving route
+FAIL: attribution may not taint a benchmark
+13 sky-attribution launch checks, 12 failures
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   2.59 sec
+
+The following tests FAILED:
+	  1 - horde_rt_sky_attribution_launch_tests (Failed)
+Errors while running CTest

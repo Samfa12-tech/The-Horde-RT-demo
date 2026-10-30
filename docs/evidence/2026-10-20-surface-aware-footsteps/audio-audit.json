@@ -1,0 +1,149 @@
+{
+  "sourceBase": "d15be5e000602e96e000a3da8b7b0a540efa6903",
+  "sourceBank": "C:\\Users\\sam_s\\Documents\\Possum Cafe\\PossumCafeAndroid\\Archive\\FilmCow Recorded SFX",
+  "clips": [
+    {
+      "source": {
+        "path": "C:\\Users\\sam_s\\Documents\\Possum Cafe\\PossumCafeAndroid\\Archive\\FilmCow Recorded SFX\\footstep dirt 9.wav",
+        "sha256": "45f82df19e1034c86b479bc7717e71de0eb53c34ea6253bcb485b338db058e7c",
+        "bytes": 73784,
+        "channels": 1,
+        "sampleRate": 48000,
+        "bitsPerSample": 24,
+        "frames": 24564,
+        "seconds": 0.51175,
+        "peak": 0.2623021602630615,
+        "rms": 0.024136310707539434,
+        "digitalFullScaleSamples": 0
+      },
+      "runtime": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\audio\\filmcow\\player_step_1.wav",
+        "sha256": "cdaaa9c321e6f4fbf12757fdc20633d4b8f0be30b127038d3cfe0581a8dea0fb",
+        "bytes": 49172,
+        "channels": 1,
+        "sampleRate": 48000,
+        "bitsPerSample": 16,
+        "frames": 24564,
+        "seconds": 0.51175,
+        "peak": 0.779998779296875,
+        "rms": 0.07177340365933658,
+        "digitalFullScaleSamples": 0
+      },
+      "byteExactImporterRecipe": true,
+      "unchangedFromHead": true,
+      "playerCueGain": 0.29,
+      "peakAtPlayerCueGain": 0.22619964599609374,
+      "role": "accepted generic Stone/Wood fallback"
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\sam_s\\Documents\\Possum Cafe\\PossumCafeAndroid\\Archive\\FilmCow Recorded SFX\\footstep dirt 14.wav",
+        "sha256": "9b44f117b3570e8f3e14d1e31fdff8c8cee509a8fce6a9d7b6ecafebf9107148",
+        "bytes": 48246,
+        "channels": 1,
+        "sampleRate": 48000,
+        "bitsPerSample": 24,
+        "frames": 16051,
+        "seconds": 0.33439583333333334,
+        "peak": 0.2447744607925415,
+        "rms": 0.01872747094600793,
+        "digitalFullScaleSamples": 0
+      },
+      "runtime": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\audio\\filmcow\\player_step_2.wav",
+        "sha256": "261413fb6c185f9e7038a980fc7b124ef9bc7f6f93b258ed83d1d76eb7b9883e",
+        "bytes": 32146,
+        "channels": 1,
+        "sampleRate": 48000,
+        "bitsPerSample": 16,
+        "frames": 16051,
+        "seconds": 0.33439583333333334,
+        "peak": 0.779998779296875,
+        "rms": 0.05967708923206383,
+        "digitalFullScaleSamples": 0
+      },
+      "byteExactImporterRecipe": true,
+      "unchangedFromHead": true,
+      "playerCueGain": 0.29,
+      "peakAtPlayerCueGain": 0.22619964599609374,
+      "role": "accepted generic Stone/Wood fallback"
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\sam_s\\Documents\\Possum Cafe\\PossumCafeAndroid\\Archive\\FilmCow Recorded SFX\\footstep dirt 17.wav",
+        "sha256": "68d9079f06e323cd4147f6c17d47ff80ffc64681304b2d1b262d56ab95d797a5",
+        "bytes": 75902,
+        "channels": 1,
+        "sampleRate": 48000,
+        "bitsPerSample": 24,
+        "frames": 25270,
+        "seconds": 0.5264583333333334,
+        "peak": 0.33768415451049805,
+        "rms": 0.014809054996231096,
+        "digitalFullScaleSamples": 0
+      },
+      "runtime": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\audio\\filmcow\\skeleton_step_1.wav",
+        "sha256": "78ede28cebbad2b61e8a373c45d072ab719fb69a3cf103e57ea7c926c06c176e",
+        "bytes": 50584,
+        "channels": 1,
+        "sampleRate": 48000,
+        "bitsPerSample": 16,
+        "frames": 25270,
+        "seconds": 0.5264583333333334,
+        "peak": 0.779998779296875,
+        "rms": 0.03420666018012699,
+        "digitalFullScaleSamples": 0
+      },
+      "byteExactImporterRecipe": true,
+      "unchangedFromHead": true,
+      "playerCueGain": 0.29,
+      "peakAtPlayerCueGain": 0.22619964599609374,
+      "role": "Earth dirt reuse"
+    },
+    {
+      "source": {
+        "path": "C:\\Users\\sam_s\\Documents\\Possum Cafe\\PossumCafeAndroid\\Archive\\FilmCow Recorded SFX\\footstep dirt 18.wav",
+        "sha256": "a3da2e323f2c710d71e71ed70a70f09aa4f55bbbae8e3fd49d3072b847a18075",
+        "bytes": 78342,
+        "channels": 1,
+        "sampleRate": 48000,
+        "bitsPerSample": 24,
+        "frames": 26083,
+        "seconds": 0.5433958333333333,
+        "peak": 0.38642215728759766,
+        "rms": 0.014968266518400324,
+        "digitalFullScaleSamples": 0
+      },
+      "runtime": {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\assets\\audio\\filmcow\\skeleton_step_2.wav",
+        "sha256": "e4a080064fdccd821096d9b42dcb312f0fb40ac8227242999b904602a4786122",
+        "bytes": 52210,
+        "channels": 1,
+        "sampleRate": 48000,
+        "bitsPerSample": 16,
+        "frames": 26083,
+        "seconds": 0.5433958333333333,
+        "peak": 0.779998779296875,
+        "rms": 0.030213744138400656,
+        "digitalFullScaleSamples": 0
+      },
+      "byteExactImporterRecipe": true,
+      "unchangedFromHead": true,
+      "playerCueGain": 0.29,
+      "peakAtPlayerCueGain": 0.22619964599609374,
+      "role": "Earth dirt reuse"
+    }
+  ],
+  "licensePdfSha256": "bda56a077aa8ba8e053ae916dd4c19038baa12cd33d10209658646ac9351b73f",
+  "licenseRecord": "ASSET_LICENSES.md:115",
+  "newAssets": 0,
+  "audioPlayback": false,
+  "limitations": [
+    "File metadata/PCM data are not listening acceptance.",
+    "Stone retains the accepted generic pair; no new verified stone recording.",
+    "Wood uses the generic fallback; a suitable admitted wood-floor cue is missing.",
+    "Earth full-file RMS is about 6 dB lower; no automatic gain compensation.",
+    "Tail overlap, cue character, speech/combat balance and mono-phone feel remain unassessed."
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "timeUtc": "2026-10-23T01:28:50.082213+00:00",
+  "ownerFiles": {
+    "C:/Users/sam_s/Documents/the Horde RT Demo/ASSET_LICENSES.md": {
+      "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387",
+      "matchesPriorCustody": true
+    },
+    "C:/Users/sam_s/Documents/the Horde RT Demo/PROJECT_MEMORY.md": {
+      "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e",
+      "matchesPriorCustody": true
+    },
+    "build/presets/windows-x64-debug/Debug/HordeLanternRT.settings.ini": {
+      "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3",
+      "matchesPriorCustody": true
+    }
+  },
+  "ownerCampaignDirectoryPresent": false,
+  "noPhoneOperations": true,
+  "productionSources": {
+    "src/gameplay/animation/PlayerAnimationState.cpp": "8ffd14144c89dfee1e4a550860621ca7e6dda92acf1c887b7d9b0ff5ee275831",
+    "src/gameplay/animation/PlayerAnimationState.h": "7a7784eb5f7415d756980c78080e1a8e927df88b7cf003751a711d67066f2495",
+    "src/gameplay/simulation/GameSimulation.cpp": "41beefa6cdff48d448308583c276c25be505ab2765494f10c6b1e9c2afee0fd6",
+    "src/gameplay/simulation/GameSimulation.h": "70114c1ca06ce9b19750b2d08a4e135924c62291d6f21017519d004d71cd0bfb",
+    "src/vulkan/raytracing/PlayerRenderSlot.cpp": "cfcb75dd5ed8092189c7d9f906710aa97803a444b58d1e77d525c5ab74f10ba5"
+  },
+  "finalFullBuildExitCode": 0,
+  "finalBuildLogSha256": "0700b2ed3ec6287816cbdf13a256fa2fe17c4a680a81bc3dabf3c77b59fecfa1",
+  "finalFocusedSourceSha256": {
+    "tests/PlayerDirectionalRigTests.cpp": "588129bfd9cb58a9996dc62c3c5a51d46a15e2c23066965648d0e95f0aab1ece",
+    "tests/PlayerAnimationTests.cpp": "5e2af9bedba4abecbf971c150a47790173442e35281a3c2ca707e44da5a33697"
+  },
+  "finalFirstPersonImageSha256": "b693545ef2390f9331d1ff8fa49892eb64e2e922cb47cc5472c5b2f26cb9cc90",
+  "finalAndEarlierStaticImagesByteIdentical": true,
+  "finalFocusedSummary": "animation and directional tests pass including added Idle assertion; step-movement retains30.01s timeout; no thresholds changed"
+}

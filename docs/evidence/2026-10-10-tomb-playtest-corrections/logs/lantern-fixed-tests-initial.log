@@ -1,0 +1,13 @@
+Test project <repo>/build/presets/windows-x64-debug
+    Start  24: horde_rt_combat_foundation_tests
+1/4 Test  #24: horde_rt_combat_foundation_tests ...............   Passed    5.74 sec
+    Start 157: horde_rt_rescue_journey_integration_tests
+2/4 Test #157: horde_rt_rescue_journey_integration_tests ......   Passed   10.23 sec
+    Start 159: horde_rt_rescue_rig_attachment_tests
+3/4 Test #159: horde_rt_rescue_rig_attachment_tests ...........   Passed   20.98 sec
+    Start 160: horde_rt_rescue_adversarial_regression_tests
+4/4 Test #160: horde_rt_rescue_adversarial_regression_tests ...   Passed   21.19 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  58.15 sec

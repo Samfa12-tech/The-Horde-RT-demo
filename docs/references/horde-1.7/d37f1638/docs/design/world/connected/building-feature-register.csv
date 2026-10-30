@@ -1,0 +1,10 @@
+ID,Feature,East_m,North_m,Width_m,Depth_m,Floor_m,Door_east_m,Door_north_m,Scope
+B01,Tavern,12,15,22,16,20.4,4,7,Hero interior
+B02,Church,-2,65,18,24,29,-2,53,Exterior; service outside
+B03,House A,-43,8,16,12,20.8,-35,8,Optional interior
+B04,House B,-47,29,16,14,24.6,-39,29,Optional interior
+B05,Mill,48,13,16,16,16,40,13,Exterior / working edge
+B06,Smith,29,-29,18,14,18.2,20,-29,Exterior service yard
+B07,Store,-22,-28,13,11,19.9,-15.5,-28,Closed shell
+B08,Outbuilding,1,-44,12,9,18.2,1,-39.5,Closed shell
+B09,Starter shrine,25,101,8,8,31.2,25,97,Nearby spur; provisional

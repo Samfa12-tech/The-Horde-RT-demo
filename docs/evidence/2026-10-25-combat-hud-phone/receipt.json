@@ -1,0 +1,47 @@
+{
+  "model": "SM-S948B",
+  "android": "17",
+  "api": "37",
+  "sourceCommit": "9d799fd1adb7856942ca15bb16b1a0026f433c31",
+  "apkSha256": "82cbfad2c2374127455edbb45d4554991515a2acad00c4f037596a7b22a9a625",
+  "package": "com.samfa12.hordelanternrt.debug",
+  "versionName": "1.6.2-debug",
+  "versionCode": 10,
+  "signatureCompatible": true,
+  "staging": "lantern-held-high in isolated namespace; not naturally earned",
+  "rtFixturePresented": true,
+  "normalUiExposed": true,
+  "rotation": "portrait-landscape-portrait; same surfaceGeneration1",
+  "verifiedAction": "observed enabled lantern lower tap in landscape; returned portrait label RAISE. Lantern lowered.",
+  "combatOrLookInputsIssued": false,
+  "simultaneousMultitouch": "not tested; requires hands-on acceptance",
+  "kitRouteSave": "not tested under usage limit",
+  "density": {
+    "physicalDpi": 600,
+    "existingOverrideDpi": 560
+  },
+  "targetsDp": {
+    "swing": 80,
+    "parry": 76,
+    "lantern": 56
+  },
+  "releasedUtc": "2026-10-25T04:07:35.537000+00:00",
+  "closure": {
+    "utcUnixMs": 1792901255537,
+    "safeToDisconnect": true,
+    "phoneReleased": true,
+    "bothOriginalInstalledHashesRestored": true,
+    "priorSaveAndLockFiles": 18,
+    "priorSaveBytesUnchanged": true,
+    "preferenceBytesUnchanged": true,
+    "systemSettingsRestored": true,
+    "onlyAddedIsolatedTestPaths": [],
+    "ownedRendererOrTransferRemaining": false,
+    "remainingTaskOrInputMetadata": []
+  },
+  "captureSha256": {
+    "portrait.png": "2d46c5894742408ea0383c9d0ea36d9a4c80e1c72ef79573b536b11e11df03ff",
+    "landscape.png": "f8ffa76fd3f46a90f572771a418747015d3b7517801921d7e1a610f46195f338"
+  },
+  "debugPerformanceClaim": false
+}

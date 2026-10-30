@@ -1,0 +1,160 @@
+{
+  "outcome": "PASS: 26 final hidden native UI/worker/simulation/RT handoff checks; physical visible acceptance remains open",
+  "sourceParent": "0a9d75882f6e64fc2f2b57465733bb63d6feb825",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "executable": {
+    "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+    "bytes": 13764096,
+    "sha256": "aaa3147d0d0aeb7737010c5f0c0341c374bf4d752f9c48b0e5395575adf4ccfe"
+  },
+  "gpu": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672,
+    "driverVersion": 2559295488,
+    "driverProperties": {
+      "available": true,
+      "driverId": 4,
+      "driverName": "NVIDIA",
+      "driverInfo": "610.47",
+      "conformanceVersion": "1.4.3.3"
+    },
+    "vulkanApiVersionText": "1.4.341",
+    "executionBackend": "RayTracingPipeline"
+  },
+  "hiddenRun": {
+    "pid": 77160,
+    "exitCode": 0,
+    "checks": 26,
+    "failures": 0,
+    "renderScale": "100%; unchanged normal quality; 1232x803 swapchain and dispatch",
+    "storageImage": {
+      "path": "reports/horde-campaign-fixtures-2026-10-18-windows-r3/windows-loaded-lower.png",
+      "bytes": 1000245,
+      "sha256": "cf52b6dbfddbeb582700e43e966a70c97cd19401492ce7b67799d5fa1904ac87"
+    },
+    "visualInspection": "Readback inspected: lower opened rescue doorway with modeled held lantern and sword, consistent with lower checkpoint; no UI/visible-screen inspection claim.",
+    "rawRoot": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-campaign-fixtures-2026-10-18-windows-r3",
+    "probeReport": "Initial capability probe only; its rtScene.presented field predates the hidden load frames. hidden-rt.json is the subsequent direct frame-result receipt."
+  },
+  "nativeUiOnly": {
+    "Debug": {
+      "checks": 43,
+      "failures": 0,
+      "ctestSeconds": 2.27
+    },
+    "Release": {
+      "checks": 43,
+      "failures": 0,
+      "ctestSeconds": 1.11
+    }
+  },
+  "normalStorage": "FOLDERID_LocalAppData/HordeLanternRT/campaign-v1; existing manual/latest-auto .hrd schema, no migration",
+  "limits": [
+    "Seeded saves and diagnostic combat-death position, not naturally earned Windows campaign progress",
+    "Precommit cancellation holds preparation explicitly to avoid a fast-IO race",
+    "New Game entry origin reopened diagnostically; production control/owner path used thereafter",
+    "Hidden HWND Vulkan swapchain presentation and storage-image readback are not visible-desktop or physical input acceptance",
+    "No owner settings/save reads or writes, foreground activation, cursor/audio, device actions, push or release",
+    "Physical Android death Load flow remains untested on the newly built APKs",
+    "No performance gain, power-loss, sustained route, controller/audio/comfort or full1.7 acceptance claim"
+  ],
+  "headAtFinalHiddenRun": "15ce496017499e8ac9752e660579167c83d5a86e",
+  "releaseExecutable": {
+    "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+    "bytes": 4699136,
+    "sha256": "742a43a8414ec8d977269cb64d51d6f87db4c5c682cc6de637e4363f8c6d4cec"
+  },
+  "releaseHiddenAutomationRejection": {
+    "exitCode": 2,
+    "diagnostic": "Hidden campaign validation is Debug-only.",
+    "windowCreated": false
+  },
+  "affectedSuites": {
+    "selection": [
+      "entry_menu_handoff",
+      "foreground_pause_render_cadence",
+      "windows_campaign_menu",
+      "android_campaign_load_barrier",
+      "development_world_scene_adapter",
+      "desktop_controller_input"
+    ],
+    "Debug": {
+      "passed": 6,
+      "failed": 0,
+      "seconds": 4.96
+    },
+    "Release": {
+      "passed": 6,
+      "failed": 0,
+      "seconds": 0.57
+    },
+    "firstRun": {
+      "Debug": "5/6; desktop controller stale source-expression assertion failed",
+      "Release": "5/6; same stale source-expression assertion failed",
+      "repair": "Updated source contract to preserve RT Lab/all old pause predicates and require campaign pause/visible chooser; no runtime contract weakened"
+    }
+  },
+  "rawEvidence": [
+    {
+      "path": "reports/2026-10-18-windows-campaign-owner-final-debug-build.log",
+      "bytes": 1775,
+      "sha256": "a4661d847a95e8a83b102c7cf0fe41f917f7c80eb7c9114f23e67fcaab9d8d1e"
+    },
+    {
+      "path": "reports/2026-10-18-windows-campaign-owner-final-release-build.log",
+      "bytes": 1811,
+      "sha256": "a86c980671960452926a84374dd7bade0abc8e0d5d41cbb094da4efc347617a2"
+    },
+    {
+      "path": "reports/2026-10-18-windows-campaign-affected-debug-tests.log",
+      "bytes": 1514,
+      "sha256": "e9db0cb953362521e41de079dfdb0b5987017037bb8e636f2dc4ff1071e086f5"
+    },
+    {
+      "path": "reports/2026-10-18-windows-campaign-affected-release-tests.log",
+      "bytes": 1518,
+      "sha256": "033f7bc37e5bb63de5b0006b60548ef19242566d255b4ecbf402e1e5b96cea1d"
+    },
+    {
+      "path": "reports/2026-10-18-windows-campaign-controller-debug-tests.log",
+      "bytes": 1082,
+      "sha256": "a01ba06d7002073cf793f61434473ce8714fae6eadb93b8dd3825aba83c389f9"
+    },
+    {
+      "path": "reports/2026-10-18-windows-campaign-controller-release-tests.log",
+      "bytes": 1086,
+      "sha256": "015b135ac988a22c3cd7e44ec6dcfc50bac0631bbb4f21d774a4291401da3044"
+    },
+    {
+      "path": "reports/2026-10-18-windows-campaign-affected-final-debug-tests.log",
+      "bytes": 1244,
+      "sha256": "17193688352c9318be65755a1ee5ef7b0a2c93e993fe28274d8a07a9aeb5540b"
+    },
+    {
+      "path": "reports/2026-10-18-windows-campaign-affected-final-release-tests.log",
+      "bytes": 1248,
+      "sha256": "16c25d9f46c7c01e9997bbc4b2f3a01667ad41077e341311b4092e48a070a75c"
+    },
+    {
+      "path": "reports/2026-10-18-windows-campaign-release-cli-rejection.stderr.log",
+      "bytes": 43,
+      "sha256": "f6692c74a4b1bce666bb9149b3855d07137392d916bae5618928e4eef8f469c4"
+    },
+    {
+      "path": "reports/horde-campaign-fixtures-2026-10-18-windows-r1/windows-stderr.log",
+      "bytes": 1616,
+      "sha256": "8e37332f32706d148223351c0b086dc8aeb547b114633aa683fc483d8ff21010"
+    },
+    {
+      "path": "reports/horde-campaign-fixtures-2026-10-18-windows-r2/windows-stderr.log",
+      "bytes": 2580,
+      "sha256": "1ec35e208f9c6b17cc793d3d1e5d4d26c7fe3bdda8fe6b8a5cbd33adf40aaa7a"
+    },
+    {
+      "path": "reports/horde-campaign-fixtures-2026-10-18-windows-r3/windows-stderr.log",
+      "bytes": 2799,
+      "sha256": "d23b692e2c88c0a2f0f4cc022358d2162458337215398273dcb59d0e72e7e9a7"
+    }
+  ]
+}

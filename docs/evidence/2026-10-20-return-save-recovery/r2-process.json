@@ -1,0 +1,13 @@
+{
+  "pid": 39604,
+  "command": [
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+    "--route-return-recovery-hidden",
+    "--campaign-test-root",
+    "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-campaign-fixtures-route-return-20261020-r2"
+  ],
+  "executable": {
+    "bytes": 14071296,
+    "sha256": "6f1a112028283d51b65dde797fd214c3dd0e91f3ce4b569e24d6942218b14ff1"
+  }
+}

@@ -1,0 +1,280 @@
+Starting a Gradle Daemon, 1 incompatible and 1 stopped Daemons could not be reused, use --status for details
+> Task :app:verifyMusicRuntimeAssets
+> Task :app:prepareRuntimeAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugResources
+
+> Task :app:configureCMakeDebug[arm64-v8a]
+[CXX5304] This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+[CXX5304] This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+
+> Task :app:processDebugResources
+> Task :app:buildCMakeDebug[arm64-v8a]
+
+> Task :app:compileDebugJavaWithJavac
+Note: <repo>\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:dexBuilderDebug
+> Task :app:mergeProjectDexDebug
+> Task :app:configureCMakeDebug[armeabi-v7a]
+> Task :app:buildCMakeDebug[armeabi-v7a]
+> Task :app:configureCMakeDebug[x86]
+> Task :app:buildCMakeDebug[x86]
+> Task :app:configureCMakeDebug[x86_64]
+> Task :app:buildCMakeDebug[x86_64]
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :app:generateReleaseBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileRelease UP-TO-DATE
+> Task :app:checkReleaseAarMetadata UP-TO-DATE
+> Task :app:generateReleaseResValues UP-TO-DATE
+> Task :app:mapReleaseSourceSetPaths
+> Task :app:generateReleaseResources
+> Task :app:createReleaseCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksRelease UP-TO-DATE
+> Task :app:processReleaseMainManifest UP-TO-DATE
+> Task :app:processReleaseManifest UP-TO-DATE
+> Task :app:processReleaseManifestForPackage UP-TO-DATE
+> Task :app:mergeReleaseResources
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:processReleaseResources
+> Task :app:mergeDebugNativeLibs
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:stripDebugDebugSymbols
+
+> Task :app:compileReleaseJavaWithJavac
+Note: <repo>\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:generateReleaseLintVitalReportModel
+> Task :app:lintVitalAnalyzeRelease
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:lintVitalReportRelease
+> Task :app:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :app:lintVitalRelease
+> Task :app:packageDebug
+> Task :app:buildCMakeRelWithDebInfo[armeabi-v7a]
+> Task :app:configureCMakeRelWithDebInfo[x86]
+> Task :app:buildCMakeRelWithDebInfo[x86]
+> Task :app:configureCMakeRelWithDebInfo[x86_64]
+> Task :app:buildCMakeRelWithDebInfo[x86_64]
+> Task :app:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :app:checkReleaseDuplicateClasses UP-TO-DATE
+> Task :app:mergeReleaseNativeLibs
+> Task :app:dexBuilderRelease
+> Task :app:desugarReleaseFileDependencies UP-TO-DATE
+> Task :app:mergeReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexRelease UP-TO-DATE
+> Task :app:mergeReleaseArtProfile UP-TO-DATE
+> Task :app:mergeReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:mergeReleaseShaders UP-TO-DATE
+> Task :app:compileReleaseShaders NO-SOURCE
+> Task :app:generateReleaseAssets UP-TO-DATE
+> Task :app:mergeReleaseAssets UP-TO-DATE
+> Task :app:compressReleaseAssets UP-TO-DATE
+> Task :app:extractReleaseVersionControlInfo UP-TO-DATE
+> Task :app:processReleaseJavaRes NO-SOURCE
+> Task :app:mergeReleaseJavaResource UP-TO-DATE
+> Task :app:collectReleaseDependencies UP-TO-DATE
+> Task :app:sdkReleaseDependencyData UP-TO-DATE
+> Task :app:writeReleaseAppMetadata UP-TO-DATE
+> Task :app:writeReleaseSigningConfigVersions UP-TO-DATE
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:generateDebugAndroidTestResValues UP-TO-DATE
+> Task :app:stripReleaseDebugSymbols
+> Task :app:generateDebugLintReportModel
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:mergeDexRelease
+> Task :app:generateDebugAndroidTestLintModel
+> Task :app:compileReleaseArtProfile
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:extractReleaseNativeSymbolTables
+> Task :app:generateDebugUnitTestLintModel
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebug
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:mergeReleaseNativeDebugMetadata
+
+> Task :app:compileDebugUnitTestJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:packageDebugUnitTestForUnitTest
+> Task :app:processDebugUnitTestJavaRes NO-SOURCE
+> Task :app:optimizeReleaseResources
+> Task :app:generateDebugUnitTestConfig
+> Task :app:lintAnalyzeDebugAndroidTest
+> Task :app:lintAnalyzeDebugUnitTest
+> Task :app:lintAnalyzeDebug
+
+> Task :app:testDebugUnitTest
+
+AndroidControllerIntegrationTest > deathRetryAndEndingContinueAreReachableWithoutCombatLeakage FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > startPauseSettingsAndGraphicsAreRealNativeControllerRoutes FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > entryPlaquesFollowTheirVisibleDirectionsAndStartOnPlay FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > manifestHandlesExternalControllerConfigurationWithoutActivityRecreation FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > controllerConfigurationChangeNeutralizesHeldAxesAndPreservesActiveUiTrial FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > coldEntryMoreSettingsPlayAndPendingBackAreControllerAccessible FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > sidePagesResizeInBothLandscapeDirectionsAndPortraitWithoutRebuild FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > largeFontEntryPlaquesKeepDirectionalSelection FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > takeoverRetainsHealthAndContextWhileLeavingPreferencesUntouched FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > landscapeEntryPlaquesUseTheSameDirectionalGeometry FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > pressDownActionsRemainIndependentWithoutDuplicateReleases FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > dialogFocusLossNeutralizesHeldNavigationAndRequiresRelease FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > connectionAndDriftDoNotTakeOverButMoveLookAndDodgeCanCoexist FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > disconnectPausesAndReconnectCannotReplayHeldMotion FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > suspensionAndKeyboardDoNotProduceControllerActions FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > menuConfirmActivatesFocusedNativeControlAndNeverLeaksIntoCombat FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > firstIntentionalTouchRestoresTargetsAndNeutralizesControllerAxes FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > rotationNeutralizesAxesWithoutChangingSavedSettings FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > dismissedNestedDialogReturnsToTheStillVisibleParent FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > firstTouchRestoresControllerOwnedButtonPolicyBeforeDispatch FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > viewportRelayoutWaitsForChangedSizeAfterAnUnchangedLayoutPass FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > dialogFocusLossRejectsConfirmUntilWindowReturns FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > nativeDialogConfirmAndCancelPreserveButtonCallbacks FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > rapidDpadPressNavigatesBeforeItsRelease FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+AndroidControllerIntegrationTest > focusLossNeutralizesTouchRolesAndPausesActiveController FAILED
+    java.lang.reflect.InvocationTargetException at AndroidControllerIntegrationTest.java:58
+        Caused by: java.lang.NullPointerException at AndroidControllerIntegrationTest.java:58
+
+GameplayTouchCancellationTest > productionWholeCancelClearsLookFirstAndMovementFirstGestures FAILED
+    java.lang.reflect.InvocationTargetException at GameplayTouchCancellationTest.java:47
+        Caused by: java.lang.NullPointerException at GameplayTouchCancellationTest.java:47
+
+GameplayTouchCancellationTest > menuEndingAndCancelledReleaseCannotPublishExtraActions FAILED
+    java.lang.reflect.InvocationTargetException at GameplayTouchCancellationTest.java:47
+        Caused by: java.lang.NullPointerException at GameplayTouchCancellationTest.java:47
+
+GameplayTouchCancellationTest > nativeReadyAfterPlayOrSurfaceRecoveryRestoresAllThreeActionButtons FAILED
+    java.lang.reflect.InvocationTargetException at GameplayTouchCancellationTest.java:47
+        Caused by: java.lang.NullPointerException at GameplayTouchCancellationTest.java:47
+
+GameplayTouchCancellationTest > moveAndLookCanCoexistWithEachPressDownActionWithoutDuplicateRelease FAILED
+    java.lang.reflect.InvocationTargetException at GameplayTouchCancellationTest.java:47
+        Caused by: java.lang.NullPointerException at GameplayTouchCancellationTest.java:47
+
+GameplayTouchCancellationTest > productionMenuCleanupAndLifecyclePauseClearHeldGestureBeforeRecovery FAILED
+    java.lang.reflect.InvocationTargetException at GameplayTouchCancellationTest.java:47
+        Caused by: java.lang.NullPointerException at GameplayTouchCancellationTest.java:47
+
+> Task :app:packageRelease
+
+> Task :app:testDebugUnitTest FAILED
+
+260 tests completed, 30 failed
+
+> Task :app:createReleaseApkListingFileRedirect UP-TO-DATE
+[Incubating] Problems report is available at: file:///<user-home>/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.7-wp2-vertical-proof/android/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///<user-home>/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.7-wp2-vertical-proof/android/app/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+BUILD FAILED in 4m 32s
+109 actionable tasks: 57 executed, 52 up-to-date

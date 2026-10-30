@@ -1,0 +1,971 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 180: horde_rt_rescue_rig_attachment_tests
+1/2 Test #180: horde_rt_rescue_rig_attachment_tests ...........***Failed    4.99 sec
+planted_renderer_mount_samples=15; stationary mounts, shared legs and cadence rejection checked
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9875 grips=-33.4004,2.5625,-14.9801 / -33.402,2.21252,-14.9847
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9874 grips=-33.4004,2.5625,-14.9801 / -33.402,2.21812,-14.9842
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9874 grips=-33.4004,2.5625,-14.98 / -33.4019,2.23348,-14.9837
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9873 grips=-33.4004,2.5625,-14.9799 / -33.4018,2.25644,-14.9831
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9872 grips=-33.4004,2.5625,-14.9799 / -33.4016,2.28482,-14.9826
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9872 grips=-33.4004,2.5625,-14.9798 / -33.4015,2.31645,-14.9821
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9871 grips=-33.4004,2.5625,-14.9798 / -33.4013,2.34917,-14.9816
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9871 grips=-33.4004,2.5625,-14.9797 / -33.4011,2.38081,-14.9812
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9871 grips=-33.4004,2.5625,-14.9797 / -33.401,2.40919,-14.9809
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.987 grips=-33.4003,2.5625,-14.9796 / -33.4009,2.43215,-14.9806
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.987 grips=-33.4003,2.5625,-14.9796 / -33.4008,2.44752,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.732926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.987 grips=-33.4003,2.5625,-14.9796 / -33.4007,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.747092,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9796 / -33.4007,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.761259,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9796 / -33.4007,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.775426,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9795 / -33.4007,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.789592,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9795 / -33.4007,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.803759,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9795 / -33.4006,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.817926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9795 / -33.4006,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.832092,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9795 / -33.4006,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.846259,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9795 / -33.4006,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.860426,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9795 / -33.4006,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.874592,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9796 / -33.4006,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.888759,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9869 grips=-33.4002,2.5625,-14.9796 / -33.4006,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.902926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9869 grips=-33.4002,2.5625,-14.9796 / -33.4005,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.917092,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.987 grips=-33.4002,2.5625,-14.9796 / -33.4005,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.931259,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.987 grips=-33.4002,2.5625,-14.9796 / -33.4005,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.945426,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.987 grips=-33.4002,2.5625,-14.9796 / -33.4005,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.959592,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.987 grips=-33.4002,2.5625,-14.9796 / -33.4005,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.973759,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.987 grips=-33.4002,2.5625,-14.9796 / -33.4004,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.987926,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.987 grips=-33.4002,2.5625,-14.9796 / -33.4004,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.00209,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.987 grips=-33.4002,2.5625,-14.9796 / -33.4004,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.01626,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.987 grips=-33.4002,2.5625,-14.9796 / -33.4004,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.03043,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.987 grips=-33.4001,2.5625,-14.9796 / -33.4003,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.04459,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.987 grips=-33.4001,2.5625,-14.9796 / -33.4003,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.05876,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.987 grips=-33.4001,2.5625,-14.9796 / -33.4002,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.07293,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.987 grips=-33.4001,2.5625,-14.9796 / -33.4002,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.08709,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.987 grips=-33.4001,2.5625,-14.9796 / -33.4002,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.10126,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.987 grips=-33.4001,2.5625,-14.9796 / -33.4001,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.11543,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9869 grips=-33.4001,2.5625,-14.9796 / -33.4001,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.12959,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9869 grips=-33.4001,2.5625,-14.9796 / -33.4001,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.14376,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9869 grips=-33.4001,2.5625,-14.9795 / -33.4001,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.15793,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9869 grips=-33.4001,2.5625,-14.9795 / -33.4001,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.17209,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9869 grips=-33.4001,2.5625,-14.9795 / -33.4001,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.18626,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9869 grips=-33.4001,2.5625,-14.9795 / -33.4001,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.20043,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9795 / -33.4001,2.45312,-14.98
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.21459,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9794 / -33.4001,2.45312,-14.98
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.22876,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9794 / -33.4002,2.45312,-14.9799
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.24293,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9794 / -33.4002,2.45312,-14.9799
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.25709,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9867 grips=-33.4001,2.5625,-14.9794 / -33.4002,2.45312,-14.9798
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.27126,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9867 grips=-33.4001,2.5625,-14.9793 / -33.4002,2.45312,-14.9798
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.28543,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9867 grips=-33.4001,2.5625,-14.9793 / -33.4002,2.45312,-14.9797
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.29959,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9867 grips=-33.4001,2.5625,-14.9793 / -33.4003,2.45312,-14.9797
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.31376,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9866 grips=-33.4001,2.5625,-14.9793 / -33.4003,2.45312,-14.9796
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.32793,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9866 grips=-33.4001,2.5625,-14.9792 / -33.4003,2.45312,-14.9795
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.34209,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9866 grips=-33.4001,2.5625,-14.9792 / -33.4003,2.45312,-14.9795
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.35626,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9866 grips=-33.4001,2.5625,-14.9792 / -33.4003,2.45312,-14.9795
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.37043,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9866 grips=-33.4001,2.5625,-14.9792 / -33.4003,2.45312,-14.9794
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.38459,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9865 grips=-33.4001,2.5625,-14.9792 / -33.4003,2.45312,-14.9794
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.39876,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9865 grips=-33.4001,2.5625,-14.9791 / -33.4003,2.45312,-14.9793
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.41293,-15.3 yaw=2.39 drop=0.00955972 vertexId=4913 vertex=-33.3882,2.61214,-14.9865 grips=-33.4001,2.5625,-14.9791 / -33.4003,2.45312,-14.9793
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.42709,-15.3 yaw=2.39 drop=0.0237266 vertexId=4913 vertex=-33.3882,2.61214,-14.9865 grips=-33.4001,2.5625,-14.9791 / -33.4003,2.45312,-14.9793
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.44126,-15.3 yaw=2.39 drop=0.0378934 vertexId=4913 vertex=-33.3882,2.61214,-14.9865 grips=-33.4001,2.5625,-14.9791 / -33.4003,2.45312,-14.9792
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.45543,-15.3 yaw=2.39 drop=0.05206 vertexId=4913 vertex=-33.3882,2.61214,-14.9865 grips=-33.4001,2.5625,-14.9791 / -33.4003,2.45312,-14.9792
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.46959,-15.3 yaw=2.39 drop=0.0662266 vertexId=4913 vertex=-33.3882,2.61214,-14.9865 grips=-33.4001,2.5625,-14.9791 / -33.4003,2.45312,-14.9792
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.48376,-15.3 yaw=2.39 drop=0.0803934 vertexId=4913 vertex=-33.3882,2.61214,-14.9864 grips=-33.4001,2.5625,-14.9791 / -33.4003,2.45312,-14.9792
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.49793,-15.3 yaw=2.39 drop=0.0945602 vertexId=4913 vertex=-33.3882,2.61214,-14.9864 grips=-33.4001,2.5625,-14.9791 / -33.4003,2.45312,-14.9791
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.51209,-15.3 yaw=2.39 drop=0.108727 vertexId=4913 vertex=-33.3882,2.61214,-14.9864 grips=-33.4001,2.5625,-14.979 / -33.4003,2.45312,-14.9791
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.52626,-15.3 yaw=2.39 drop=0.122893 vertexId=4913 vertex=-33.3882,2.61214,-14.9864 grips=-33.4001,2.5625,-14.979 / -33.4003,2.45312,-14.9791
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.54043,-15.3 yaw=2.39 drop=0.13706 vertexId=4913 vertex=-33.3882,2.61214,-14.9864 grips=-33.4001,2.5625,-14.979 / -33.4003,2.45312,-14.9791
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.55459,-15.3 yaw=2.39 drop=0.151227 vertexId=4913 vertex=-33.3882,2.61214,-14.9864 grips=-33.4002,2.5625,-14.979 / -33.4003,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.56876,-15.3 yaw=2.39 drop=0.165394 vertexId=4913 vertex=-33.3882,2.61214,-14.9864 grips=-33.4002,2.5625,-14.979 / -33.4003,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.58293,-15.3 yaw=2.39 drop=0.17956 vertexId=4913 vertex=-33.3882,2.61214,-14.9864 grips=-33.4002,2.5625,-14.979 / -33.4003,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.59709,-15.3 yaw=2.39 drop=0.193727 vertexId=4913 vertex=-33.3882,2.61214,-14.9863 grips=-33.4002,2.5625,-14.979 / -33.4003,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.61126,-15.3 yaw=2.39 drop=0.207894 vertexId=4913 vertex=-33.3882,2.61214,-14.9863 grips=-33.4002,2.5625,-14.979 / -33.4004,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.62543,-15.3 yaw=2.39 drop=0.222061 vertexId=4913 vertex=-33.3882,2.61214,-14.9863 grips=-33.4002,2.5625,-14.9789 / -33.4004,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.63959,-15.3 yaw=2.39 drop=0.236227 vertexId=4913 vertex=-33.3882,2.61214,-14.9863 grips=-33.4002,2.5625,-14.9789 / -33.4004,2.45312,-14.9788
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.65376,-15.3 yaw=2.39 drop=0.250394 vertexId=4913 vertex=-33.3882,2.61214,-14.9863 grips=-33.4002,2.5625,-14.9789 / -33.4004,2.45312,-14.9788
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.66793,-15.3 yaw=2.39 drop=0.264561 vertexId=4913 vertex=-33.3882,2.61214,-14.9863 grips=-33.4002,2.5625,-14.9789 / -33.4004,2.45312,-14.9787
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.68209,-15.3 yaw=2.39 drop=0.278727 vertexId=4913 vertex=-33.3882,2.61214,-14.9862 grips=-33.4002,2.5625,-14.9789 / -33.4004,2.45312,-14.9787
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.69626,-15.3 yaw=2.39 drop=0.292893 vertexId=4913 vertex=-33.3882,2.61214,-14.9862 grips=-33.4002,2.5625,-14.9788 / -33.4004,2.45312,-14.9786
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.71043,-15.3 yaw=2.39 drop=0.30706 vertexId=4913 vertex=-33.3882,2.61214,-14.9862 grips=-33.4002,2.5625,-14.9788 / -33.4004,2.45312,-14.9786
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.72459,-15.3 yaw=2.39 drop=0.321227 vertexId=4913 vertex=-33.3882,2.61214,-14.9862 grips=-33.4002,2.5625,-14.9788 / -33.4004,2.45312,-14.9785
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.73876,-15.3 yaw=2.39 drop=0.335393 vertexId=4913 vertex=-33.3882,2.61214,-14.9861 grips=-33.4002,2.5625,-14.9788 / -33.4004,2.45312,-14.9785
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.75293,-15.3 yaw=2.39 drop=0.34956 vertexId=4913 vertex=-33.3883,2.61214,-14.9861 grips=-33.4002,2.5625,-14.9787 / -33.4004,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.76709,-15.3 yaw=2.39 drop=0.363726 vertexId=4913 vertex=-33.3883,2.61214,-14.9861 grips=-33.4002,2.5625,-14.9787 / -33.4004,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.78126,-15.3 yaw=2.39 drop=0.377893 vertexId=4913 vertex=-33.3883,2.61214,-14.9861 grips=-33.4002,2.5625,-14.9787 / -33.4004,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.79543,-15.3 yaw=2.39 drop=0.392059 vertexId=4913 vertex=-33.3883,2.61214,-14.9861 grips=-33.4002,2.5625,-14.9787 / -33.4005,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.80959,-15.3 yaw=2.39 drop=0.406226 vertexId=4913 vertex=-33.3883,2.61214,-14.986 grips=-33.4002,2.5625,-14.9787 / -33.4005,2.45312,-14.9782
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.82376,-15.3 yaw=2.39 drop=0.420393 vertexId=4913 vertex=-33.3883,2.61214,-14.986 grips=-33.4002,2.5625,-14.9786 / -33.4005,2.45312,-14.9782
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.83793,-15.3 yaw=2.39 drop=0.434559 vertexId=4913 vertex=-33.3883,2.61214,-14.986 grips=-33.4002,2.5625,-14.9786 / -33.4005,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.8521,-15.3 yaw=2.39 drop=0.448726 vertexId=4913 vertex=-33.3883,2.61214,-14.986 grips=-33.4002,2.5625,-14.9786 / -33.4005,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.86626,-15.3 yaw=2.39 drop=0.462892 vertexId=4913 vertex=-33.3883,2.61214,-14.9859 grips=-33.4002,2.5625,-14.9786 / -33.4005,2.45312,-14.978
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.88043,-15.3 yaw=2.39 drop=0.477058 vertexId=4913 vertex=-33.3883,2.61214,-14.9859 grips=-33.4002,2.5625,-14.9785 / -33.4005,2.45312,-14.978
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.8946,-15.3 yaw=2.39 drop=0.491225 vertexId=4913 vertex=-33.3883,2.61214,-14.9859 grips=-33.4002,2.5625,-14.9785 / -33.4005,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.90876,-15.3 yaw=2.39 drop=0.505391 vertexId=4913 vertex=-33.3883,2.61214,-14.9859 grips=-33.4002,2.5625,-14.9785 / -33.4005,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.92293,-15.3 yaw=2.39 drop=0.519557 vertexId=4913 vertex=-33.3883,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9785 / -33.4005,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.9371,-15.3 yaw=2.39 drop=0.533724 vertexId=4913 vertex=-33.3883,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9784 / -33.4005,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.95126,-15.3 yaw=2.39 drop=0.54789 vertexId=4913 vertex=-33.3883,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9784 / -33.4004,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.96543,-15.3 yaw=2.39 drop=0.562057 vertexId=4913 vertex=-33.3883,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9784 / -33.4004,2.45312,-14.9776
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.9796,-15.3 yaw=2.39 drop=0.576223 vertexId=4913 vertex=-33.3882,2.61214,-14.9857 grips=-33.4002,2.5625,-14.9784 / -33.4004,2.45312,-14.9776
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.99376,-15.3 yaw=2.39 drop=0.590389 vertexId=4913 vertex=-33.3882,2.61214,-14.9857 grips=-33.4002,2.5625,-14.9783 / -33.4004,2.45312,-14.9775
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.00793,-15.3 yaw=2.39 drop=0.604555 vertexId=4913 vertex=-33.3882,2.61214,-14.9857 grips=-33.4001,2.5625,-14.9783 / -33.4003,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.0221,-15.3 yaw=2.39 drop=0.618722 vertexId=4913 vertex=-33.3882,2.61214,-14.9857 grips=-33.4001,2.5625,-14.9783 / -33.4002,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.03626,-15.3 yaw=2.39 drop=0.632888 vertexId=4913 vertex=-33.3881,2.61214,-14.9856 grips=-33.4001,2.5625,-14.9783 / -33.4002,2.45312,-14.9773
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.3 yaw=2.39 drop=0.646876 vertexId=4913 vertex=-33.3881,2.61214,-14.9856 grips=-33.4001,2.5625,-14.9782 / -33.4002,2.45312,-14.9773
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2858 yaw=2.36746 drop=0.646876 vertexId=4913 vertex=-33.3883,2.61214,-14.9859 grips=-33.4001,2.5625,-14.9782 / -33.4001,2.45312,-14.9772
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2717 yaw=2.34382 drop=0.646876 vertexId=4913 vertex=-33.3885,2.61214,-14.9861 grips=-33.4,2.5625,-14.9782 / -33.4001,2.45312,-14.9772
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2575 yaw=2.31905 drop=0.646875 vertexId=4913 vertex=-33.3886,2.61214,-14.9864 grips=-33.4,2.5625,-14.9782 / -33.4001,2.45312,-14.9772
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2433 yaw=2.29308 drop=0.646875 vertexId=4913 vertex=-33.3888,2.61214,-14.9867 grips=-33.4,2.5625,-14.9782 / -33.4,2.45312,-14.9771
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2292 yaw=2.26586 drop=0.646875 vertexId=4913 vertex=-33.3891,2.61214,-14.987 grips=-33.4,2.5625,-14.9782 / -33.4,2.45312,-14.9771
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.215 yaw=2.23735 drop=0.646875 vertexId=4913 vertex=-33.3893,2.61214,-14.9873 grips=-33.4,2.5625,-14.9782 / -33.3999,2.45313,-14.9771
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2008 yaw=2.20751 drop=0.646875 vertexId=4913 vertex=-33.3895,2.61214,-14.9876 grips=-33.3999,2.5625,-14.9781 / -33.3999,2.45313,-14.9771
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1867 yaw=2.17628 drop=0.646875 vertexId=4913 vertex=-33.3898,2.61214,-14.9879 grips=-33.3999,2.5625,-14.9781 / -33.3998,2.45313,-14.9771
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1725 yaw=2.14365 drop=0.646875 vertexId=4913 vertex=-33.3901,2.61214,-14.9882 grips=-33.3999,2.5625,-14.9781 / -33.3997,2.45313,-14.9771
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1583 yaw=2.10958 drop=0.646875 vertexId=4913 vertex=-33.3904,2.61214,-14.9885 grips=-33.3999,2.5625,-14.9782 / -33.3997,2.45313,-14.9771
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1442 yaw=2.07406 drop=0.646875 vertexId=4913 vertex=-33.3908,2.61214,-14.9889 grips=-33.3999,2.5625,-14.9782 / -33.3997,2.45313,-14.9771
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.13 yaw=2.0371 drop=0.646875 vertexId=4913 vertex=-33.3912,2.61214,-14.9892 grips=-33.3998,2.5625,-14.9782 / -33.3997,2.45313,-14.9771
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1158 yaw=1.99872 drop=0.646875 vertexId=4913 vertex=-33.3916,2.61214,-14.9895 grips=-33.3998,2.5625,-14.9782 / -33.3996,2.45312,-14.9772
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1017 yaw=1.95894 drop=0.646875 vertexId=4913 vertex=-33.3921,2.61214,-14.9899 grips=-33.3998,2.5625,-14.9782 / -33.3996,2.45312,-14.9772
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0875 yaw=1.91894 drop=0.646876 vertexId=4913 vertex=-33.3925,2.61214,-14.9902 grips=-33.3998,2.5625,-14.9782 / -33.3996,2.45312,-14.9772
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0733 yaw=1.87894 drop=0.646876 vertexId=4913 vertex=-33.393,2.61214,-14.9905 grips=-33.3998,2.5625,-14.9782 / -33.3996,2.45312,-14.9773
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0592 yaw=1.83894 drop=0.646876 vertexId=4913 vertex=-33.3935,2.61214,-14.9908 grips=-33.3998,2.5625,-14.9783 / -33.3995,2.45312,-14.9773
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.045 yaw=1.79894 drop=0.646877 vertexId=4913 vertex=-33.394,2.61214,-14.9911 grips=-33.3998,2.5625,-14.9783 / -33.3995,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0308 yaw=1.75894 drop=0.646877 vertexId=4913 vertex=-33.3945,2.61214,-14.9913 grips=-33.3997,2.5625,-14.9783 / -33.3994,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0167 yaw=1.71894 drop=0.646877 vertexId=4913 vertex=-33.395,2.61214,-14.9915 grips=-33.3997,2.5625,-14.9783 / -33.3994,2.45312,-14.9775
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0025 yaw=1.67894 drop=0.646877 vertexId=4913 vertex=-33.3955,2.61214,-14.9917 grips=-33.3997,2.5625,-14.9784 / -33.3993,2.45312,-14.9776
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9883 yaw=1.63894 drop=0.646878 vertexId=4913 vertex=-33.396,2.61214,-14.9919 grips=-33.3997,2.5625,-14.9784 / -33.3993,2.45312,-14.9776
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9742 yaw=1.59894 drop=0.646878 vertexId=4913 vertex=-33.3965,2.61214,-14.9921 grips=-33.3997,2.5625,-14.9784 / -33.3992,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.96 yaw=1.55894 drop=0.646879 vertexId=4913 vertex=-33.397,2.61214,-14.9922 grips=-33.3996,2.5625,-14.9784 / -33.3992,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9458 yaw=1.51894 drop=0.646879 vertexId=4913 vertex=-33.3976,2.61214,-14.9924 grips=-33.3996,2.5625,-14.9785 / -33.3992,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9317 yaw=1.47894 drop=0.646879 vertexId=4913 vertex=-33.3981,2.61214,-14.9925 grips=-33.3996,2.5625,-14.9785 / -33.3992,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9175 yaw=1.43894 drop=0.646879 vertexId=4913 vertex=-33.3987,2.61214,-14.9925 grips=-33.3996,2.5625,-14.9785 / -33.3991,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9033 yaw=1.39894 drop=0.64688 vertexId=4913 vertex=-33.3993,2.61214,-14.9926 grips=-33.3996,2.5625,-14.9786 / -33.3991,2.45312,-14.978
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8892 yaw=1.35894 drop=0.64688 vertexId=4913 vertex=-33.3998,2.61214,-14.9926 grips=-33.3996,2.5625,-14.9786 / -33.3991,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.875 yaw=1.31894 drop=0.64688 vertexId=4913 vertex=-33.4004,2.61214,-14.9926 grips=-33.3996,2.5625,-14.9786 / -33.3991,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8608 yaw=1.27894 drop=0.646881 vertexId=4913 vertex=-33.4009,2.61214,-14.9926 grips=-33.3996,2.5625,-14.9786 / -33.3992,2.45312,-14.9782
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8467 yaw=1.23894 drop=0.646881 vertexId=4913 vertex=-33.4015,2.61214,-14.9926 grips=-33.3996,2.5625,-14.9787 / -33.3992,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8325 yaw=1.19894 drop=0.646881 vertexId=4913 vertex=-33.4021,2.61214,-14.9925 grips=-33.3996,2.5625,-14.9787 / -33.3992,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8183 yaw=1.15894 drop=0.646881 vertexId=4913 vertex=-33.4026,2.61214,-14.9924 grips=-33.3996,2.5625,-14.9787 / -33.3992,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8042 yaw=1.11894 drop=0.646881 vertexId=4913 vertex=-33.4032,2.61214,-14.9923 grips=-33.3997,2.5625,-14.9787 / -33.3992,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.79 yaw=1.07894 drop=0.646882 vertexId=4913 vertex=-33.4037,2.61214,-14.9922 grips=-33.3997,2.5625,-14.9788 / -33.3992,2.45312,-14.9785
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7758 yaw=1.03894 drop=0.646882 vertexId=4913 vertex=-33.4043,2.61214,-14.992 grips=-33.3997,2.5625,-14.9788 / -33.3993,2.45312,-14.9785
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7617 yaw=0.998937 drop=0.646882 vertexId=4913 vertex=-33.4048,2.61214,-14.9919 grips=-33.3997,2.5625,-14.9788 / -33.3993,2.45312,-14.9785
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7475 yaw=0.958937 drop=0.646882 vertexId=4913 vertex=-33.4053,2.61214,-14.9917 grips=-33.3997,2.5625,-14.9788 / -33.3993,2.45312,-14.9786
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7333 yaw=0.918937 drop=0.646882 vertexId=4913 vertex=-33.4059,2.61214,-14.9914 grips=-33.3997,2.5625,-14.9788 / -33.3993,2.45312,-14.9786
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.72 yaw=0.858611 drop=0.646884 vertexId=4913 vertex=-33.4069,2.61214,-14.9912 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.7313 yaw=0.880665 drop=0.646884 vertexId=4913 vertex=-33.4067,2.61214,-14.9913 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.7427 yaw=0.903552 drop=0.646884 vertexId=4913 vertex=-33.4064,2.61214,-14.9915 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.754 yaw=0.927295 drop=0.646884 vertexId=4913 vertex=-33.4061,2.61214,-14.9916 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.7653 yaw=0.951915 drop=0.646884 vertexId=4913 vertex=-33.4058,2.61214,-14.9918 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.7767 yaw=0.977429 drop=0.646884 vertexId=4913 vertex=-33.4054,2.61214,-14.9919 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.788 yaw=1.00385 drop=0.646884 vertexId=4913 vertex=-33.4051,2.61214,-14.9921 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.7993 yaw=1.0312 drop=0.646884 vertexId=4913 vertex=-33.4047,2.61214,-14.9922 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.8107 yaw=1.05946 drop=0.646884 vertexId=4913 vertex=-33.4043,2.61214,-14.9923 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.822 yaw=1.08866 drop=0.646884 vertexId=4913 vertex=-33.4039,2.61214,-14.9924 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.8333 yaw=1.11877 drop=0.646884 vertexId=4913 vertex=-33.4035,2.61214,-14.9926 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.8447 yaw=1.1498 drop=0.646884 vertexId=4913 vertex=-33.4031,2.61214,-14.9927 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.856 yaw=1.1817 drop=0.646884 vertexId=4913 vertex=-33.4027,2.61214,-14.9928 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.8673 yaw=1.21447 drop=0.646884 vertexId=4913 vertex=-33.4022,2.61214,-14.9928 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.8787 yaw=1.24805 drop=0.646884 vertexId=4913 vertex=-33.4018,2.61214,-14.9929 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.89 yaw=1.28241 drop=0.646884 vertexId=4913 vertex=-33.4013,2.61214,-14.993 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.9013 yaw=1.31748 drop=0.646884 vertexId=4913 vertex=-33.4008,2.61214,-14.993 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.9127 yaw=1.35319 drop=0.646884 vertexId=4913 vertex=-33.4003,2.61214,-14.993 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.924 yaw=1.38948 drop=0.646884 vertexId=4913 vertex=-33.3998,2.61214,-14.993 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.9353 yaw=1.42626 drop=0.646884 vertexId=4913 vertex=-33.3993,2.61214,-14.993 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.9467 yaw=1.46344 drop=0.646884 vertexId=4913 vertex=-33.3987,2.61214,-14.993 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.958 yaw=1.50092 drop=0.646884 vertexId=4913 vertex=-33.3982,2.61214,-14.9929 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.9693 yaw=1.5386 drop=0.646884 vertexId=4913 vertex=-33.3977,2.61214,-14.9928 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.9807 yaw=1.57636 drop=0.646884 vertexId=4913 vertex=-33.3972,2.61214,-14.9927 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-14.992 yaw=1.61411 drop=0.646884 vertexId=4913 vertex=-33.3966,2.61214,-14.9926 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.0033 yaw=1.65174 drop=0.646884 vertexId=4913 vertex=-33.3961,2.61214,-14.9925 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.0147 yaw=1.68914 drop=0.646884 vertexId=4913 vertex=-33.3956,2.61214,-14.9923 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.026 yaw=1.72621 drop=0.646884 vertexId=4913 vertex=-33.3951,2.61214,-14.9922 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.0373 yaw=1.76286 drop=0.646884 vertexId=4913 vertex=-33.3947,2.61214,-14.992 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.0487 yaw=1.79899 drop=0.646884 vertexId=4913 vertex=-33.3942,2.61214,-14.9918 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.06 yaw=1.83452 drop=0.646884 vertexId=4913 vertex=-33.3937,2.61214,-14.9916 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.0713 yaw=1.86939 drop=0.646884 vertexId=4913 vertex=-33.3933,2.61214,-14.9913 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.0827 yaw=1.90352 drop=0.646884 vertexId=4913 vertex=-33.3929,2.61214,-14.9911 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.094 yaw=1.93687 drop=0.646884 vertexId=4913 vertex=-33.3925,2.61214,-14.9909 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.1053 yaw=1.96938 drop=0.646884 vertexId=4913 vertex=-33.3921,2.61214,-14.9906 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.1167 yaw=2.00103 drop=0.646884 vertexId=4913 vertex=-33.3917,2.61214,-14.9903 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.128 yaw=2.03179 drop=0.646884 vertexId=4913 vertex=-33.3914,2.61214,-14.9901 grips=-33.4,2.5625,-14.979 / -33.3999,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.1393 yaw=2.06163 drop=0.646884 vertexId=4913 vertex=-33.3911,2.61214,-14.9898 grips=-33.4,2.5625,-14.979 / -33.3999,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.1507 yaw=2.09055 drop=0.646884 vertexId=4913 vertex=-33.3907,2.61214,-14.9896 grips=-33.4,2.5625,-14.979 / -33.3999,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.162 yaw=2.11855 drop=0.646884 vertexId=4913 vertex=-33.3905,2.61214,-14.9893 grips=-33.4,2.5625,-14.979 / -33.3999,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.1733 yaw=2.14562 drop=0.646884 vertexId=4913 vertex=-33.3902,2.61214,-14.989 grips=-33.4,2.5625,-14.979 / -33.3999,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.1847 yaw=2.17178 drop=0.646884 vertexId=4913 vertex=-33.3899,2.61214,-14.9888 grips=-33.4,2.5625,-14.979 / -33.3999,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.196 yaw=2.19703 drop=0.646884 vertexId=4913 vertex=-33.3897,2.61214,-14.9885 grips=-33.4,2.5625,-14.979 / -33.3999,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.2073 yaw=2.22138 drop=0.646884 vertexId=4913 vertex=-33.3895,2.61214,-14.9883 grips=-33.4,2.5625,-14.979 / -33.3999,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.2187 yaw=2.24487 drop=0.646884 vertexId=4913 vertex=-33.3892,2.61214,-14.988 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.23 yaw=2.26751 drop=0.646884 vertexId=4913 vertex=-33.389,2.61214,-14.9878 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.2413 yaw=2.28932 drop=0.646884 vertexId=4913 vertex=-33.3888,2.61214,-14.9875 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.2527 yaw=2.31034 drop=0.646884 vertexId=4913 vertex=-33.3887,2.61214,-14.9873 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.264 yaw=2.33057 drop=0.646884 vertexId=4913 vertex=-33.3885,2.61214,-14.9871 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.2753 yaw=2.35006 drop=0.646884 vertexId=4913 vertex=-33.3884,2.61214,-14.9868 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.2867 yaw=2.36882 drop=0.646884 vertexId=4913 vertex=-33.3882,2.61214,-14.9866 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=6 root=-33.7,2.05025,-15.298 yaw=2.38689 drop=0.646884 vertexId=4913 vertex=-33.3881,2.61214,-14.9864 grips=-33.4,2.5625,-14.979 / -33.4,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+Rescue rig attachment cases=22894 failures=197 sampled_poses=1133 max_left_reach=0.70931@phase=6 max_right_reach=0.712182@phase=3
+
+    Start 181: horde_rt_rescue_adversarial_regression_tests
+2/2 Test #181: horde_rt_rescue_adversarial_regression_tests ...***Failed    5.37 sec
+finding1 before=0,-0.95,0.900001 after=0,-0.95,0.900001 generation=2->3
+finding2 offset=-1.1 walk minZ=-13.3383 support=2.05 copingPenetration=0
+finding2 offset=-1.1 dodge minZ=-13.325 support=2.05 copingPenetration=0
+finding2 offset=0 walk minZ=-13.3383 support=2.05 copingPenetration=0
+finding2 offset=0 dodge minZ=-13.325 support=2.05 copingPenetration=0
+finding2 offset=1.1 walk minZ=-13.3383 support=2.05 copingPenetration=0
+finding2 offset=1.1 dodge minZ=-13.325 support=2.05 copingPenetration=0
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3879,2.61214,-14.9873 grips=-33.3999,2.5625,-14.9799 / -33.3993,2.2125,-14.9836
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3879,2.61214,-14.9873 grips=-33.3998,2.5625,-14.9799 / -33.3993,2.2181,-14.9833
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3879,2.61214,-14.9872 grips=-33.3998,2.5625,-14.9798 / -33.3992,2.23347,-14.9829
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3879,2.61214,-14.9872 grips=-33.3998,2.5625,-14.9798 / -33.3992,2.25643,-14.9825
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3879,2.61214,-14.9871 grips=-33.3998,2.5625,-14.9797 / -33.3992,2.28481,-14.9821
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3879,2.61214,-14.9871 grips=-33.3998,2.5625,-14.9797 / -33.3993,2.31645,-14.9817
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3879,2.61214,-14.987 grips=-33.3998,2.5625,-14.9797 / -33.3993,2.34917,-14.9813
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.987 grips=-33.3998,2.5625,-14.9796 / -33.3993,2.38081,-14.9809
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.987 grips=-33.3998,2.5625,-14.9796 / -33.3994,2.40919,-14.9806
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.9869 grips=-33.3998,2.5625,-14.9796 / -33.3994,2.43215,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.9869 grips=-33.3997,2.5625,-14.9795 / -33.3994,2.44752,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.9869 grips=-33.3997,2.5625,-14.9795 / -33.3994,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.866749,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.9869 grips=-33.3997,2.5625,-14.9795 / -33.3994,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.880915,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.9869 grips=-33.3997,2.5625,-14.9795 / -33.3994,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.895082,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.9869 grips=-33.3997,2.5625,-14.9795 / -33.3994,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.909248,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.9869 grips=-33.3997,2.5625,-14.9795 / -33.3994,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.923415,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.9869 grips=-33.3998,2.5625,-14.9795 / -33.3994,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.937582,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.9869 grips=-33.3998,2.5625,-14.9795 / -33.3995,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.951748,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3878,2.61214,-14.9869 grips=-33.3998,2.5625,-14.9795 / -33.3995,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.965915,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3879,2.61214,-14.9869 grips=-33.3998,2.5625,-14.9795 / -33.3995,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.980082,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3879,2.61214,-14.9869 grips=-33.3998,2.5625,-14.9795 / -33.3996,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.994248,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3879,2.61214,-14.9869 grips=-33.3998,2.5625,-14.9795 / -33.3996,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.00842,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3879,2.61214,-14.9869 grips=-33.3999,2.5625,-14.9795 / -33.3997,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.02258,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.388,2.61214,-14.9869 grips=-33.3999,2.5625,-14.9795 / -33.3998,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.03675,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.388,2.61214,-14.9869 grips=-33.3999,2.5625,-14.9795 / -33.3998,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.05092,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.388,2.61214,-14.9869 grips=-33.3999,2.5625,-14.9795 / -33.3999,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.06508,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.388,2.61214,-14.9869 grips=-33.4,2.5625,-14.9795 / -33.3999,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.07925,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.388,2.61214,-14.9869 grips=-33.4,2.5625,-14.9795 / -33.3999,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.09342,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9869 grips=-33.4,2.5625,-14.9795 / -33.4,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.10758,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9869 grips=-33.4,2.5625,-14.9795 / -33.4,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.12175,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9868 grips=-33.4,2.5625,-14.9795 / -33.4001,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.13592,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9795 / -33.4002,2.45312,-14.98
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.15008,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9794 / -33.4002,2.45312,-14.98
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.16425,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9794 / -33.4003,2.45312,-14.9799
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.17842,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9794 / -33.4003,2.45312,-14.9799
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.19258,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9867 grips=-33.4002,2.5625,-14.9793 / -33.4003,2.45312,-14.9798
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.20675,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9867 grips=-33.4002,2.5625,-14.9793 / -33.4004,2.45312,-14.9797
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.22092,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9867 grips=-33.4002,2.5625,-14.9793 / -33.4004,2.45312,-14.9796
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.23508,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9866 grips=-33.4002,2.5625,-14.9792 / -33.4005,2.45312,-14.9795
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.24925,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9866 grips=-33.4002,2.5625,-14.9792 / -33.4005,2.45312,-14.9794
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.26342,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9865 grips=-33.4003,2.5625,-14.9791 / -33.4006,2.45312,-14.9793
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.27758,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9865 grips=-33.4003,2.5625,-14.9791 / -33.4007,2.45312,-14.9792
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.29175,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9864 grips=-33.4003,2.5625,-14.9791 / -33.4007,2.45312,-14.9791
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.30592,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9864 grips=-33.4004,2.5625,-14.979 / -33.4008,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.32008,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9863 grips=-33.4004,2.5625,-14.9789 / -33.4009,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.33425,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9863 grips=-33.4004,2.5625,-14.9789 / -33.4009,2.45312,-14.9788
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.34842,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9862 grips=-33.4004,2.5625,-14.9788 / -33.4009,2.45312,-14.9787
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.36258,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9862 grips=-33.4004,2.5625,-14.9788 / -33.401,2.45312,-14.9785
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.37675,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9861 grips=-33.4004,2.5625,-14.9787 / -33.401,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.39092,-15.3 yaw=2.39 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9861 grips=-33.4005,2.5625,-14.9787 / -33.401,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.40508,-15.3 yaw=2.39 drop=0.00171217 vertexId=4913 vertex=-33.3885,2.61214,-14.986 grips=-33.4005,2.5625,-14.9787 / -33.401,2.45312,-14.9782
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.41925,-15.3 yaw=2.39 drop=0.0158783 vertexId=4913 vertex=-33.3885,2.61214,-14.986 grips=-33.4005,2.5625,-14.9786 / -33.4011,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.43342,-15.3 yaw=2.39 drop=0.0300446 vertexId=4913 vertex=-33.3885,2.61214,-14.986 grips=-33.4005,2.5625,-14.9786 / -33.4011,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.44758,-15.3 yaw=2.39 drop=0.044211 vertexId=4913 vertex=-33.3885,2.61214,-14.9859 grips=-33.4005,2.5625,-14.9785 / -33.4011,2.45312,-14.978
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.46175,-15.3 yaw=2.39 drop=0.0583771 vertexId=4913 vertex=-33.3885,2.61214,-14.9859 grips=-33.4005,2.5625,-14.9785 / -33.4011,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.47592,-15.3 yaw=2.39 drop=0.0725432 vertexId=4913 vertex=-33.3885,2.61214,-14.9859 grips=-33.4005,2.5625,-14.9785 / -33.4011,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.49008,-15.3 yaw=2.39 drop=0.0867098 vertexId=4913 vertex=-33.3885,2.61214,-14.9858 grips=-33.4005,2.5625,-14.9785 / -33.4011,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.50425,-15.3 yaw=2.39 drop=0.100876 vertexId=4913 vertex=-33.3885,2.61214,-14.9858 grips=-33.4005,2.5625,-14.9784 / -33.401,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.51842,-15.3 yaw=2.39 drop=0.115043 vertexId=4913 vertex=-33.3885,2.61214,-14.9858 grips=-33.4005,2.5625,-14.9784 / -33.401,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.53258,-15.3 yaw=2.39 drop=0.129209 vertexId=4913 vertex=-33.3885,2.61214,-14.9858 grips=-33.4005,2.5625,-14.9784 / -33.401,2.45312,-14.9776
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.54675,-15.3 yaw=2.39 drop=0.143375 vertexId=4913 vertex=-33.3885,2.61214,-14.9857 grips=-33.4005,2.5625,-14.9784 / -33.401,2.45312,-14.9776
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.56092,-15.3 yaw=2.39 drop=0.157542 vertexId=4913 vertex=-33.3885,2.61214,-14.9857 grips=-33.4004,2.5625,-14.9783 / -33.401,2.45312,-14.9775
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.57508,-15.3 yaw=2.39 drop=0.171708 vertexId=4913 vertex=-33.3885,2.61214,-14.9857 grips=-33.4004,2.5625,-14.9783 / -33.401,2.45312,-14.9775
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.58925,-15.3 yaw=2.39 drop=0.185875 vertexId=4913 vertex=-33.3885,2.61214,-14.9857 grips=-33.4004,2.5625,-14.9783 / -33.401,2.45312,-14.9775
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.60342,-15.3 yaw=2.39 drop=0.200042 vertexId=4913 vertex=-33.3885,2.61214,-14.9857 grips=-33.4004,2.5625,-14.9783 / -33.401,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.61758,-15.3 yaw=2.39 drop=0.214208 vertexId=4913 vertex=-33.3885,2.61214,-14.9857 grips=-33.4004,2.5625,-14.9783 / -33.4009,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.63175,-15.3 yaw=2.39 drop=0.228375 vertexId=4913 vertex=-33.3885,2.61214,-14.9857 grips=-33.4004,2.5625,-14.9783 / -33.4009,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.64592,-15.3 yaw=2.39 drop=0.242542 vertexId=4913 vertex=-33.3885,2.61214,-14.9857 grips=-33.4004,2.5625,-14.9783 / -33.4009,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.66008,-15.3 yaw=2.39 drop=0.256708 vertexId=4913 vertex=-33.3885,2.61214,-14.9856 grips=-33.4004,2.5625,-14.9783 / -33.4009,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.67425,-15.3 yaw=2.39 drop=0.270875 vertexId=4913 vertex=-33.3885,2.61214,-14.9856 grips=-33.4004,2.5625,-14.9783 / -33.4009,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.68842,-15.3 yaw=2.39 drop=0.285042 vertexId=4913 vertex=-33.3884,2.61214,-14.9856 grips=-33.4004,2.5625,-14.9783 / -33.4009,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.70258,-15.3 yaw=2.39 drop=0.299209 vertexId=4913 vertex=-33.3884,2.61214,-14.9857 grips=-33.4004,2.5625,-14.9783 / -33.4008,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.71675,-15.3 yaw=2.39 drop=0.313376 vertexId=4913 vertex=-33.3884,2.61214,-14.9857 grips=-33.4004,2.5625,-14.9783 / -33.4008,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.73092,-15.3 yaw=2.39 drop=0.327543 vertexId=4913 vertex=-33.3884,2.61214,-14.9857 grips=-33.4004,2.5625,-14.9783 / -33.4008,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.74508,-15.3 yaw=2.39 drop=0.34171 vertexId=4913 vertex=-33.3884,2.61214,-14.9857 grips=-33.4003,2.5625,-14.9783 / -33.4008,2.45312,-14.9774
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.75925,-15.3 yaw=2.39 drop=0.355877 vertexId=4913 vertex=-33.3884,2.61214,-14.9857 grips=-33.4003,2.5625,-14.9783 / -33.4007,2.45312,-14.9775
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.77342,-15.3 yaw=2.39 drop=0.370044 vertexId=4913 vertex=-33.3884,2.61214,-14.9857 grips=-33.4003,2.5625,-14.9783 / -33.4007,2.45312,-14.9775
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.78758,-15.3 yaw=2.39 drop=0.384211 vertexId=4913 vertex=-33.3884,2.61214,-14.9857 grips=-33.4003,2.5625,-14.9783 / -33.4007,2.45312,-14.9775
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.80175,-15.3 yaw=2.39 drop=0.398378 vertexId=4913 vertex=-33.3884,2.61214,-14.9857 grips=-33.4003,2.5625,-14.9784 / -33.4007,2.45312,-14.9775
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.81592,-15.3 yaw=2.39 drop=0.412545 vertexId=4913 vertex=-33.3883,2.61214,-14.9857 grips=-33.4003,2.5625,-14.9784 / -33.4006,2.45312,-14.9776
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.83008,-15.3 yaw=2.39 drop=0.426712 vertexId=4913 vertex=-33.3883,2.61214,-14.9858 grips=-33.4003,2.5625,-14.9784 / -33.4006,2.45312,-14.9776
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.84425,-15.3 yaw=2.39 drop=0.440879 vertexId=4913 vertex=-33.3883,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9784 / -33.4006,2.45312,-14.9776
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.85842,-15.3 yaw=2.39 drop=0.455046 vertexId=4913 vertex=-33.3883,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9784 / -33.4005,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.87258,-15.3 yaw=2.39 drop=0.469213 vertexId=4913 vertex=-33.3883,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9784 / -33.4005,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.88675,-15.3 yaw=2.39 drop=0.48338 vertexId=4913 vertex=-33.3883,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9784 / -33.4005,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.90092,-15.3 yaw=2.39 drop=0.497547 vertexId=4913 vertex=-33.3883,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9784 / -33.4004,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.91508,-15.3 yaw=2.39 drop=0.511713 vertexId=4913 vertex=-33.3883,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9784 / -33.4004,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.92925,-15.3 yaw=2.39 drop=0.52588 vertexId=4913 vertex=-33.3882,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9784 / -33.4004,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.94342,-15.3 yaw=2.39 drop=0.540047 vertexId=4913 vertex=-33.3882,2.61214,-14.9858 grips=-33.4002,2.5625,-14.9784 / -33.4004,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.95758,-15.3 yaw=2.39 drop=0.554214 vertexId=4913 vertex=-33.3882,2.61214,-14.9858 grips=-33.4001,2.5625,-14.9784 / -33.4003,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.97175,-15.3 yaw=2.39 drop=0.568381 vertexId=4913 vertex=-33.3882,2.61214,-14.9858 grips=-33.4001,2.5625,-14.9784 / -33.4003,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.98592,-15.3 yaw=2.39 drop=0.582548 vertexId=4913 vertex=-33.3882,2.61214,-14.9858 grips=-33.4001,2.5625,-14.9784 / -33.4002,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.00009,-15.3 yaw=2.39 drop=0.596714 vertexId=4913 vertex=-33.3882,2.61214,-14.9858 grips=-33.4001,2.5625,-14.9784 / -33.4002,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.01425,-15.3 yaw=2.39 drop=0.610881 vertexId=4913 vertex=-33.3881,2.61214,-14.9858 grips=-33.4001,2.5625,-14.9784 / -33.4002,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.02842,-15.3 yaw=2.39 drop=0.625048 vertexId=4913 vertex=-33.3881,2.61214,-14.9858 grips=-33.4001,2.5625,-14.9784 / -33.4001,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.04258,-15.3 yaw=2.39 drop=0.639214 vertexId=4913 vertex=-33.3881,2.61214,-14.9858 grips=-33.4001,2.5625,-14.9784 / -33.4001,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.3 yaw=2.39 drop=0.64688 vertexId=4913 vertex=-33.3881,2.61214,-14.9858 grips=-33.4,2.5625,-14.9784 / -33.4001,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2858 yaw=2.36746 drop=0.64688 vertexId=4913 vertex=-33.3883,2.61214,-14.9861 grips=-33.4,2.5625,-14.9784 / -33.4001,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2717 yaw=2.34382 drop=0.64688 vertexId=4913 vertex=-33.3885,2.61214,-14.9864 grips=-33.4,2.5625,-14.9784 / -33.4001,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2575 yaw=2.31905 drop=0.64688 vertexId=4913 vertex=-33.3886,2.61214,-14.9866 grips=-33.4,2.5625,-14.9784 / -33.4001,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2433 yaw=2.29308 drop=0.64688 vertexId=4913 vertex=-33.3889,2.61214,-14.9869 grips=-33.4,2.5625,-14.9784 / -33.4,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2292 yaw=2.26586 drop=0.64688 vertexId=4913 vertex=-33.3891,2.61214,-14.9872 grips=-33.4,2.5625,-14.9784 / -33.4,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.215 yaw=2.23735 drop=0.64688 vertexId=4913 vertex=-33.3893,2.61214,-14.9875 grips=-33.4,2.5625,-14.9784 / -33.4,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2008 yaw=2.20751 drop=0.64688 vertexId=4913 vertex=-33.3896,2.61214,-14.9879 grips=-33.4,2.5625,-14.9784 / -33.4,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1867 yaw=2.17628 drop=0.64688 vertexId=4913 vertex=-33.3899,2.61214,-14.9882 grips=-33.4,2.5625,-14.9784 / -33.4,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1725 yaw=2.14365 drop=0.64688 vertexId=4913 vertex=-33.3902,2.61214,-14.9885 grips=-33.4,2.5625,-14.9784 / -33.4,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1583 yaw=2.10958 drop=0.64688 vertexId=4913 vertex=-33.3905,2.61214,-14.9888 grips=-33.4,2.5625,-14.9784 / -33.3999,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1442 yaw=2.07406 drop=0.64688 vertexId=4913 vertex=-33.3909,2.61214,-14.9892 grips=-33.4,2.5625,-14.9785 / -33.3999,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.13 yaw=2.0371 drop=0.64688 vertexId=4913 vertex=-33.3913,2.61214,-14.9895 grips=-33.3999,2.5625,-14.9785 / -33.3998,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1158 yaw=1.99872 drop=0.64688 vertexId=4913 vertex=-33.3917,2.61214,-14.9898 grips=-33.3999,2.5625,-14.9785 / -33.3998,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1017 yaw=1.95894 drop=0.64688 vertexId=4913 vertex=-33.3921,2.61214,-14.9902 grips=-33.3999,2.5625,-14.9785 / -33.3997,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0875 yaw=1.91894 drop=0.64688 vertexId=4913 vertex=-33.3926,2.61214,-14.9905 grips=-33.3999,2.5625,-14.9785 / -33.3997,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0733 yaw=1.87894 drop=0.646881 vertexId=4913 vertex=-33.3931,2.61214,-14.9908 grips=-33.3999,2.5625,-14.9785 / -33.3997,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0592 yaw=1.83894 drop=0.646881 vertexId=4913 vertex=-33.3935,2.61214,-14.9911 grips=-33.3999,2.5625,-14.9785 / -33.3997,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.045 yaw=1.79894 drop=0.646881 vertexId=4913 vertex=-33.394,2.61214,-14.9913 grips=-33.3998,2.5625,-14.9785 / -33.3997,2.45312,-14.978
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0308 yaw=1.75894 drop=0.646881 vertexId=4913 vertex=-33.3946,2.61214,-14.9916 grips=-33.3998,2.5625,-14.9786 / -33.3997,2.45312,-14.978
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0167 yaw=1.71894 drop=0.646882 vertexId=4913 vertex=-33.3951,2.61214,-14.9918 grips=-33.3998,2.5625,-14.9786 / -33.3997,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0025 yaw=1.67894 drop=0.646882 vertexId=4913 vertex=-33.3956,2.61214,-14.992 grips=-33.3998,2.5625,-14.9786 / -33.3997,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9883 yaw=1.63894 drop=0.646882 vertexId=4913 vertex=-33.3962,2.61214,-14.9922 grips=-33.3998,2.5625,-14.9786 / -33.3997,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9742 yaw=1.59894 drop=0.646882 vertexId=4913 vertex=-33.3967,2.61214,-14.9923 grips=-33.3998,2.5625,-14.9786 / -33.3996,2.45312,-14.9782
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.96 yaw=1.55894 drop=0.646882 vertexId=4913 vertex=-33.3972,2.61214,-14.9924 grips=-33.3998,2.5625,-14.9787 / -33.3996,2.45312,-14.9782
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9458 yaw=1.51894 drop=0.646882 vertexId=4913 vertex=-33.3978,2.61214,-14.9926 grips=-33.3998,2.5625,-14.9787 / -33.3996,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9317 yaw=1.47894 drop=0.646883 vertexId=4913 vertex=-33.3983,2.61214,-14.9926 grips=-33.3998,2.5625,-14.9787 / -33.3996,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9175 yaw=1.43894 drop=0.646883 vertexId=4913 vertex=-33.3989,2.61214,-14.9927 grips=-33.3998,2.5625,-14.9787 / -33.3996,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9033 yaw=1.39894 drop=0.646883 vertexId=4913 vertex=-33.3995,2.61214,-14.9928 grips=-33.3998,2.5625,-14.9787 / -33.3996,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8892 yaw=1.35894 drop=0.646883 vertexId=4913 vertex=-33.4,2.61214,-14.9928 grips=-33.3998,2.5625,-14.9788 / -33.3996,2.45312,-14.9785
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.875 yaw=1.31894 drop=0.646883 vertexId=4913 vertex=-33.4006,2.61214,-14.9928 grips=-33.3998,2.5625,-14.9788 / -33.3996,2.45312,-14.9785
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8608 yaw=1.27894 drop=0.646883 vertexId=4913 vertex=-33.4011,2.61214,-14.9928 grips=-33.3998,2.5625,-14.9788 / -33.3996,2.45312,-14.9786
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8467 yaw=1.23894 drop=0.646883 vertexId=4913 vertex=-33.4017,2.61214,-14.9927 grips=-33.3998,2.5625,-14.9788 / -33.3996,2.45312,-14.9786
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8325 yaw=1.19894 drop=0.646883 vertexId=4913 vertex=-33.4022,2.61214,-14.9927 grips=-33.3998,2.5625,-14.9788 / -33.3996,2.45312,-14.9787
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8183 yaw=1.15894 drop=0.646883 vertexId=4913 vertex=-33.4028,2.61214,-14.9926 grips=-33.3998,2.5625,-14.9789 / -33.3996,2.45312,-14.9787
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8042 yaw=1.11894 drop=0.646883 vertexId=4913 vertex=-33.4033,2.61214,-14.9925 grips=-33.3998,2.5625,-14.9789 / -33.3996,2.45312,-14.9787
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.79 yaw=1.07894 drop=0.646883 vertexId=4913 vertex=-33.4039,2.61214,-14.9923 grips=-33.3998,2.5625,-14.9789 / -33.3996,2.45312,-14.9788
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7758 yaw=1.03894 drop=0.646883 vertexId=4913 vertex=-33.4044,2.61214,-14.9922 grips=-33.3998,2.5625,-14.9789 / -33.3996,2.45312,-14.9788
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7617 yaw=0.998937 drop=0.646884 vertexId=4913 vertex=-33.405,2.61214,-14.992 grips=-33.3998,2.5625,-14.9789 / -33.3996,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7475 yaw=0.958937 drop=0.646884 vertexId=4913 vertex=-33.4055,2.61214,-14.9918 grips=-33.3998,2.5625,-14.979 / -33.3996,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7333 yaw=0.918937 drop=0.646884 vertexId=4913 vertex=-33.406,2.61214,-14.9916 grips=-33.3998,2.5625,-14.979 / -33.3996,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+finding6 approachX=-34.4378 maximumLoadedOffset=0.0555382 rigPoses=533 rigRejections=0
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9869 grips=-33.4004,2.5625,-14.9795 / -33.4021,2.21249,-14.9815
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9868 grips=-33.4004,2.5625,-14.9794 / -33.4021,2.2181,-14.9812
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9868 grips=-33.4004,2.5625,-14.9794 / -33.402,2.23346,-14.9809
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9867 grips=-33.4004,2.5625,-14.9793 / -33.4019,2.25642,-14.9805
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9867 grips=-33.4004,2.5625,-14.9793 / -33.4017,2.28481,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9866 grips=-33.4004,2.5625,-14.9793 / -33.4016,2.31644,-14.98
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9866 grips=-33.4004,2.5625,-14.9792 / -33.4014,2.34917,-14.9798
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9866 grips=-33.4004,2.5625,-14.9792 / -33.4012,2.3808,-14.9796
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9866 grips=-33.4004,2.5625,-14.9792 / -33.4011,2.40919,-14.9795
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9865 grips=-33.4004,2.5625,-14.9792 / -33.401,2.43215,-14.9794
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3885,2.61214,-14.9865 grips=-33.4004,2.5625,-14.9792 / -33.4009,2.44751,-14.9794
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.852767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9865 grips=-33.4004,2.5625,-14.9792 / -33.4008,2.45312,-14.9793
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.866934,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9865 grips=-33.4004,2.5625,-14.9792 / -33.4008,2.45312,-14.9793
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.8811,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9865 grips=-33.4004,2.5625,-14.9792 / -33.4008,2.45312,-14.9794
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.895267,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9865 grips=-33.4003,2.5625,-14.9792 / -33.4008,2.45312,-14.9794
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.909434,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9866 grips=-33.4003,2.5625,-14.9792 / -33.4008,2.45312,-14.9794
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.9236,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9866 grips=-33.4003,2.5625,-14.9792 / -33.4007,2.45312,-14.9795
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.937767,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9866 grips=-33.4003,2.5625,-14.9792 / -33.4007,2.45312,-14.9795
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.951934,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9866 grips=-33.4003,2.5625,-14.9793 / -33.4007,2.45312,-14.9796
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.9661,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9867 grips=-33.4003,2.5625,-14.9793 / -33.4007,2.45312,-14.9797
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.980267,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9867 grips=-33.4003,2.5625,-14.9793 / -33.4007,2.45312,-14.9798
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,0.994434,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9867 grips=-33.4003,2.5625,-14.9794 / -33.4007,2.45312,-14.9798
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.0086,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9868 grips=-33.4003,2.5625,-14.9794 / -33.4007,2.45312,-14.9799
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.02277,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9868 grips=-33.4003,2.5625,-14.9794 / -33.4007,2.45312,-14.98
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.03693,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9868 grips=-33.4003,2.5625,-14.9795 / -33.4007,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.0511,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3884,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9795 / -33.4006,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.06527,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9795 / -33.4006,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.07943,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9869 grips=-33.4003,2.5625,-14.9796 / -33.4006,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.0936,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.987 grips=-33.4003,2.5625,-14.9796 / -33.4006,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.10777,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.987 grips=-33.4003,2.5625,-14.9796 / -33.4006,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.12193,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.987 grips=-33.4003,2.5625,-14.9796 / -33.4006,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.1361,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.987 grips=-33.4003,2.5625,-14.9797 / -33.4006,2.45312,-14.9805
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.15027,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9871 grips=-33.4002,2.5625,-14.9797 / -33.4006,2.45312,-14.9805
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.16443,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9871 grips=-33.4002,2.5625,-14.9797 / -33.4005,2.45312,-14.9806
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.1786,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9871 grips=-33.4002,2.5625,-14.9797 / -33.4005,2.45312,-14.9806
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.19277,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9871 grips=-33.4002,2.5625,-14.9797 / -33.4005,2.45312,-14.9806
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.20693,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9871 grips=-33.4002,2.5625,-14.9797 / -33.4005,2.45312,-14.9806
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.2211,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9871 grips=-33.4002,2.5625,-14.9797 / -33.4005,2.45312,-14.9806
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.23527,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3883,2.61214,-14.9871 grips=-33.4002,2.5625,-14.9797 / -33.4004,2.45312,-14.9806
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.24943,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9871 grips=-33.4002,2.5625,-14.9797 / -33.4004,2.45312,-14.9806
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.2636,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9871 grips=-33.4002,2.5625,-14.9797 / -33.4004,2.45312,-14.9805
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.27777,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.987 grips=-33.4002,2.5625,-14.9797 / -33.4004,2.45312,-14.9805
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.29193,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.987 grips=-33.4002,2.5625,-14.9796 / -33.4003,2.45312,-14.9805
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.3061,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.987 grips=-33.4001,2.5625,-14.9796 / -33.4003,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.32027,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.987 grips=-33.4001,2.5625,-14.9796 / -33.4003,2.45312,-14.9804
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.33443,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9869 grips=-33.4001,2.5625,-14.9796 / -33.4003,2.45312,-14.9803
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.3486,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9869 grips=-33.4001,2.5625,-14.9795 / -33.4002,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.36277,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3882,2.61214,-14.9869 grips=-33.4001,2.5625,-14.9795 / -33.4002,2.45312,-14.9802
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.37693,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9869 grips=-33.4001,2.5625,-14.9795 / -33.4002,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.3911,-15.3 yaw=-3.89319 drop=0 vertexId=4913 vertex=-33.3881,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9795 / -33.4002,2.45312,-14.9801
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.40527,-15.3 yaw=-3.89319 drop=0.00189933 vertexId=4913 vertex=-33.3881,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9794 / -33.4002,2.45312,-14.98
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.41944,-15.3 yaw=-3.89319 drop=0.0160666 vertexId=4913 vertex=-33.3881,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9794 / -33.4002,2.45312,-14.9799
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.4336,-15.3 yaw=-3.89319 drop=0.0302335 vertexId=4913 vertex=-33.3881,2.61214,-14.9868 grips=-33.4001,2.5625,-14.9794 / -33.4002,2.45312,-14.9799
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.44777,-15.3 yaw=-3.89319 drop=0.0444003 vertexId=4913 vertex=-33.3881,2.61214,-14.9867 grips=-33.4001,2.5625,-14.9794 / -33.4001,2.45312,-14.9798
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.46194,-15.3 yaw=-3.89319 drop=0.0585674 vertexId=4913 vertex=-33.3881,2.61214,-14.9867 grips=-33.4001,2.5625,-14.9793 / -33.4001,2.45312,-14.9797
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.4761,-15.3 yaw=-3.89319 drop=0.0727344 vertexId=4913 vertex=-33.3881,2.61214,-14.9867 grips=-33.4001,2.5625,-14.9793 / -33.4001,2.45312,-14.9797
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.49027,-15.3 yaw=-3.89319 drop=0.086901 vertexId=4913 vertex=-33.3881,2.61214,-14.9867 grips=-33.4001,2.5625,-14.9793 / -33.4001,2.45312,-14.9796
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.50444,-15.3 yaw=-3.89319 drop=0.101068 vertexId=4913 vertex=-33.3881,2.61214,-14.9866 grips=-33.4001,2.5625,-14.9792 / -33.4001,2.45312,-14.9796
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.5186,-15.3 yaw=-3.89319 drop=0.115235 vertexId=4913 vertex=-33.3881,2.61214,-14.9866 grips=-33.4001,2.5625,-14.9792 / -33.4001,2.45312,-14.9795
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.53277,-15.3 yaw=-3.89319 drop=0.129402 vertexId=4913 vertex=-33.3881,2.61214,-14.9866 grips=-33.4001,2.5625,-14.9792 / -33.4001,2.45312,-14.9794
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.54694,-15.3 yaw=-3.89319 drop=0.143569 vertexId=4913 vertex=-33.3881,2.61214,-14.9865 grips=-33.4001,2.5625,-14.9792 / -33.4001,2.45312,-14.9794
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.5611,-15.3 yaw=-3.89319 drop=0.157735 vertexId=4913 vertex=-33.3881,2.61214,-14.9865 grips=-33.4,2.5625,-14.9791 / -33.4001,2.45312,-14.9793
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.57527,-15.3 yaw=-3.89319 drop=0.171902 vertexId=4913 vertex=-33.3881,2.61214,-14.9865 grips=-33.4,2.5625,-14.9791 / -33.4001,2.45312,-14.9793
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.58944,-15.3 yaw=-3.89319 drop=0.186069 vertexId=4913 vertex=-33.3881,2.61214,-14.9865 grips=-33.4,2.5625,-14.9791 / -33.4001,2.45312,-14.9792
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.6036,-15.3 yaw=-3.89319 drop=0.200236 vertexId=4913 vertex=-33.3881,2.61214,-14.9864 grips=-33.4,2.5625,-14.9791 / -33.4001,2.45312,-14.9792
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.61777,-15.3 yaw=-3.89319 drop=0.214402 vertexId=4913 vertex=-33.3881,2.61214,-14.9864 grips=-33.4,2.5625,-14.9791 / -33.4001,2.45312,-14.9791
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.63194,-15.3 yaw=-3.89319 drop=0.228569 vertexId=4913 vertex=-33.3881,2.61214,-14.9864 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.9791
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.6461,-15.3 yaw=-3.89319 drop=0.242736 vertexId=4913 vertex=-33.3881,2.61214,-14.9864 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.66027,-15.3 yaw=-3.89319 drop=0.256903 vertexId=4913 vertex=-33.3881,2.61214,-14.9864 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.67444,-15.3 yaw=-3.89319 drop=0.271069 vertexId=4913 vertex=-33.3881,2.61214,-14.9864 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.979
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.6886,-15.3 yaw=-3.89319 drop=0.285236 vertexId=4913 vertex=-33.3881,2.61214,-14.9863 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.70277,-15.3 yaw=-3.89319 drop=0.299403 vertexId=4913 vertex=-33.3881,2.61214,-14.9863 grips=-33.4,2.5625,-14.979 / -33.4001,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.71694,-15.3 yaw=-3.89319 drop=0.31357 vertexId=4913 vertex=-33.3881,2.61214,-14.9863 grips=-33.4,2.5625,-14.9789 / -33.4001,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.7311,-15.3 yaw=-3.89319 drop=0.327736 vertexId=4913 vertex=-33.3881,2.61214,-14.9863 grips=-33.4,2.5625,-14.9789 / -33.4001,2.45312,-14.9789
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.74527,-15.3 yaw=-3.89319 drop=0.341903 vertexId=4913 vertex=-33.3881,2.61214,-14.9863 grips=-33.4,2.5625,-14.9789 / -33.4,2.45312,-14.9788
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.75944,-15.3 yaw=-3.89319 drop=0.35607 vertexId=4913 vertex=-33.3881,2.61214,-14.9863 grips=-33.4,2.5625,-14.9789 / -33.4,2.45312,-14.9788
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.7736,-15.3 yaw=-3.89319 drop=0.370236 vertexId=4913 vertex=-33.3881,2.61214,-14.9863 grips=-33.4,2.5625,-14.9789 / -33.4,2.45312,-14.9788
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.78777,-15.3 yaw=-3.89319 drop=0.384403 vertexId=4913 vertex=-33.3881,2.61214,-14.9863 grips=-33.4,2.5625,-14.9789 / -33.4,2.45312,-14.9788
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.80194,-15.3 yaw=-3.89319 drop=0.39857 vertexId=4913 vertex=-33.3881,2.61214,-14.9863 grips=-33.4,2.5625,-14.9789 / -33.4,2.45312,-14.9788
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.8161,-15.3 yaw=-3.89319 drop=0.412737 vertexId=4913 vertex=-33.388,2.61214,-14.9863 grips=-33.4,2.5625,-14.9789 / -33.3999,2.45312,-14.9788
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.83027,-15.3 yaw=-3.89319 drop=0.426903 vertexId=4913 vertex=-33.388,2.61214,-14.9863 grips=-33.4,2.5625,-14.9789 / -33.3999,2.45312,-14.9787
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.84444,-15.3 yaw=-3.89319 drop=0.44107 vertexId=4913 vertex=-33.388,2.61214,-14.9862 grips=-33.3999,2.5625,-14.9789 / -33.3999,2.45312,-14.9787
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.8586,-15.3 yaw=-3.89319 drop=0.455236 vertexId=4913 vertex=-33.388,2.61214,-14.9862 grips=-33.3999,2.5625,-14.9789 / -33.3998,2.45312,-14.9787
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.87277,-15.3 yaw=-3.89319 drop=0.469403 vertexId=4913 vertex=-33.388,2.61214,-14.9862 grips=-33.3999,2.5625,-14.9789 / -33.3998,2.45312,-14.9787
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.88694,-15.3 yaw=-3.89319 drop=0.483569 vertexId=4913 vertex=-33.3879,2.61214,-14.9862 grips=-33.3999,2.5625,-14.9788 / -33.3997,2.45312,-14.9786
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.9011,-15.3 yaw=-3.89319 drop=0.497736 vertexId=4913 vertex=-33.3879,2.61214,-14.9862 grips=-33.3999,2.5625,-14.9788 / -33.3997,2.45312,-14.9786
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.91527,-15.3 yaw=-3.89319 drop=0.511903 vertexId=4913 vertex=-33.3879,2.61214,-14.9862 grips=-33.3999,2.5625,-14.9788 / -33.3997,2.45312,-14.9786
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.92944,-15.3 yaw=-3.89319 drop=0.52607 vertexId=4913 vertex=-33.3879,2.61214,-14.9862 grips=-33.3999,2.5625,-14.9788 / -33.3997,2.45312,-14.9785
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.9436,-15.3 yaw=-3.89319 drop=0.540236 vertexId=4913 vertex=-33.3879,2.61214,-14.9861 grips=-33.3999,2.5625,-14.9788 / -33.3997,2.45312,-14.9785
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.95777,-15.3 yaw=-3.89319 drop=0.554402 vertexId=4913 vertex=-33.3879,2.61214,-14.9861 grips=-33.3999,2.5625,-14.9788 / -33.3997,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.97194,-15.3 yaw=-3.89319 drop=0.568569 vertexId=4913 vertex=-33.3879,2.61214,-14.9861 grips=-33.3999,2.5625,-14.9787 / -33.3997,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,1.9861,-15.3 yaw=-3.89319 drop=0.582736 vertexId=4913 vertex=-33.3879,2.61214,-14.9861 grips=-33.3999,2.5625,-14.9787 / -33.3997,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.00027,-15.3 yaw=-3.89319 drop=0.596902 vertexId=4913 vertex=-33.3879,2.61214,-14.9861 grips=-33.3999,2.5625,-14.9787 / -33.3997,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.01444,-15.3 yaw=-3.89319 drop=0.611069 vertexId=4913 vertex=-33.3879,2.61214,-14.986 grips=-33.3999,2.5625,-14.9787 / -33.3997,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.0286,-15.3 yaw=-3.89319 drop=0.625235 vertexId=4913 vertex=-33.3879,2.61214,-14.986 grips=-33.3999,2.5625,-14.9786 / -33.3997,2.45312,-14.9782
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.04277,-15.3 yaw=-3.89319 drop=0.639402 vertexId=4913 vertex=-33.3879,2.61214,-14.986 grips=-33.3999,2.5625,-14.9786 / -33.3997,2.45312,-14.9782
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.3 yaw=-3.89319 drop=0.646882 vertexId=4913 vertex=-33.3879,2.61214,-14.986 grips=-33.3999,2.5625,-14.9786 / -33.3997,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2858 yaw=-3.91573 drop=0.646882 vertexId=4913 vertex=-33.3881,2.61214,-14.9862 grips=-33.3999,2.5625,-14.9786 / -33.3997,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2717 yaw=-3.93936 drop=0.646881 vertexId=4913 vertex=-33.3883,2.61214,-14.9865 grips=-33.3999,2.5625,-14.9786 / -33.3997,2.45312,-14.978
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2575 yaw=-3.96414 drop=0.646881 vertexId=4913 vertex=-33.3885,2.61214,-14.9867 grips=-33.3999,2.5625,-14.9785 / -33.3997,2.45312,-14.978
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2433 yaw=-3.99011 drop=0.646881 vertexId=4913 vertex=-33.3887,2.61214,-14.987 grips=-33.3998,2.5625,-14.9785 / -33.3997,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2292 yaw=-4.01732 drop=0.646881 vertexId=4913 vertex=-33.3889,2.61214,-14.9873 grips=-33.3998,2.5625,-14.9785 / -33.3997,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.215 yaw=-4.04583 drop=0.64688 vertexId=4913 vertex=-33.3892,2.61214,-14.9876 grips=-33.3998,2.5625,-14.9785 / -33.3997,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.2008 yaw=-4.07568 drop=0.64688 vertexId=4913 vertex=-33.3894,2.61214,-14.9879 grips=-33.3998,2.5625,-14.9785 / -33.3996,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1867 yaw=-4.1069 drop=0.64688 vertexId=4913 vertex=-33.3897,2.61214,-14.9882 grips=-33.3998,2.5625,-14.9785 / -33.3996,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1725 yaw=-4.13954 drop=0.64688 vertexId=4913 vertex=-33.3901,2.61214,-14.9885 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1583 yaw=-4.17361 drop=0.64688 vertexId=4913 vertex=-33.3904,2.61214,-14.9888 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1442 yaw=-4.20912 drop=0.64688 vertexId=4913 vertex=-33.3908,2.61214,-14.9891 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.13 yaw=-4.24608 drop=0.646879 vertexId=4913 vertex=-33.3912,2.61214,-14.9895 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1158 yaw=-4.28447 drop=0.646879 vertexId=4913 vertex=-33.3916,2.61214,-14.9898 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.1017 yaw=-4.32425 drop=0.646879 vertexId=4913 vertex=-33.3921,2.61214,-14.9901 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0875 yaw=-4.36425 drop=0.646879 vertexId=4913 vertex=-33.3925,2.61214,-14.9904 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0733 yaw=-4.40425 drop=0.646879 vertexId=4913 vertex=-33.393,2.61214,-14.9907 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0592 yaw=-4.44425 drop=0.646879 vertexId=4913 vertex=-33.3935,2.61214,-14.9909 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.045 yaw=-4.48425 drop=0.646879 vertexId=4913 vertex=-33.394,2.61214,-14.9912 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0308 yaw=-4.52425 drop=0.646879 vertexId=4913 vertex=-33.3945,2.61214,-14.9914 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0167 yaw=-4.56425 drop=0.64688 vertexId=4913 vertex=-33.395,2.61214,-14.9916 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-15.0025 yaw=-4.60425 drop=0.64688 vertexId=4913 vertex=-33.3956,2.61214,-14.9918 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9777
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9883 yaw=-4.64425 drop=0.64688 vertexId=4913 vertex=-33.3961,2.61214,-14.992 grips=-33.3998,2.5625,-14.9784 / -33.3996,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9742 yaw=-4.68425 drop=0.64688 vertexId=4913 vertex=-33.3967,2.61214,-14.9921 grips=-33.3998,2.5625,-14.9785 / -33.3996,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.96 yaw=-4.72425 drop=0.64688 vertexId=4913 vertex=-33.3972,2.61214,-14.9923 grips=-33.3998,2.5625,-14.9785 / -33.3996,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9458 yaw=-4.76425 drop=0.64688 vertexId=4913 vertex=-33.3978,2.61214,-14.9924 grips=-33.3998,2.5625,-14.9785 / -33.3996,2.45312,-14.9778
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9317 yaw=-4.80425 drop=0.646881 vertexId=4913 vertex=-33.3983,2.61214,-14.9924 grips=-33.3998,2.5625,-14.9785 / -33.3996,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9175 yaw=-4.84425 drop=0.646881 vertexId=4913 vertex=-33.3989,2.61214,-14.9925 grips=-33.3998,2.5625,-14.9785 / -33.3996,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.9033 yaw=-4.88425 drop=0.646881 vertexId=4913 vertex=-33.3995,2.61214,-14.9926 grips=-33.3998,2.5625,-14.9785 / -33.3996,2.45312,-14.9779
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8892 yaw=-4.92425 drop=0.646881 vertexId=4913 vertex=-33.4,2.61214,-14.9926 grips=-33.3998,2.5625,-14.9785 / -33.3997,2.45312,-14.978
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.875 yaw=-4.96425 drop=0.646881 vertexId=4913 vertex=-33.4006,2.61214,-14.9926 grips=-33.3999,2.5625,-14.9786 / -33.3997,2.45312,-14.978
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8608 yaw=-5.00425 drop=0.646882 vertexId=4913 vertex=-33.4012,2.61214,-14.9925 grips=-33.3999,2.5625,-14.9786 / -33.3997,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8467 yaw=-5.04425 drop=0.646882 vertexId=4913 vertex=-33.4017,2.61214,-14.9925 grips=-33.3999,2.5625,-14.9786 / -33.3997,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8325 yaw=-5.08425 drop=0.646882 vertexId=4913 vertex=-33.4023,2.61214,-14.9924 grips=-33.3999,2.5625,-14.9786 / -33.3997,2.45312,-14.9781
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8183 yaw=-5.12425 drop=0.646882 vertexId=4913 vertex=-33.4029,2.61214,-14.9923 grips=-33.3999,2.5625,-14.9786 / -33.3997,2.45312,-14.9782
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.8042 yaw=-5.16425 drop=0.646883 vertexId=4913 vertex=-33.4034,2.61214,-14.9922 grips=-33.3999,2.5625,-14.9787 / -33.3997,2.45312,-14.9782
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.79 yaw=-5.20425 drop=0.646883 vertexId=4913 vertex=-33.4039,2.61214,-14.9921 grips=-33.3999,2.5625,-14.9787 / -33.3997,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7758 yaw=-5.24425 drop=0.646883 vertexId=4913 vertex=-33.4045,2.61214,-14.9919 grips=-33.3999,2.5625,-14.9787 / -33.3997,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7617 yaw=-5.28425 drop=0.646883 vertexId=4913 vertex=-33.405,2.61214,-14.9918 grips=-33.3999,2.5625,-14.9787 / -33.3998,2.45312,-14.9783
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7475 yaw=-5.32425 drop=0.646883 vertexId=4913 vertex=-33.4055,2.61214,-14.9916 grips=-33.3999,2.5625,-14.9787 / -33.3998,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+mesh_contact phase=3 root=-33.7,2.05025,-14.7333 yaw=-5.36425 drop=0.646883 vertexId=4913 vertex=-33.4061,2.61214,-14.9913 grips=-33.3999,2.5625,-14.9787 / -33.3998,2.45312,-14.9784
+FAIL: actual skinned rescue body/boots must not enter shaft, coping, stake, collar or apron solids
+finding6 approachX=-32.9622 maximumLoadedOffset=0.0349007 rigPoses=580 rigRejections=0
+finding7 subTickHipBodyError=0 ticks=0
+Adversarial rescue cases=22668 failures=274
+
+
+0% tests passed, 2 tests failed out of 2
+
+Total Test time (real) =  10.39 sec
+
+The following tests FAILED:
+	180 - horde_rt_rescue_rig_attachment_tests (Failed)
+	181 - horde_rt_rescue_adversarial_regression_tests (Failed)
+Errors while running CTest

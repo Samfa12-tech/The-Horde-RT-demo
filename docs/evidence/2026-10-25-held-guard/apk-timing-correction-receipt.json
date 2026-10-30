@@ -1,0 +1,21 @@
+{
+  "sourceCommit": "69e46426e2bb09efb64c951049241f68413453ef",
+  "artifact": "reports/held-guard-20261025/Horde-guard-69e46426-debug.apk",
+  "sha256": "1444b50824ee23ea0099559365a58d5bd304b2e27ddf58c6a3714f8725043a8d",
+  "bytes": 206256052,
+  "package": "com.samfa12.hordelanternrt.debug",
+  "versionName": "1.6.2-debug",
+  "versionCode": 10,
+  "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "nativeLibraries": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": "60fe4e3d427ea595354a928a0d8c145924a16dd8399268d9be7d8e69834e66a5",
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": "198342be0f150b747009b58fa10e76828bf806434a5b00a04f3c3c76fc296621",
+    "lib/x86/libhorde_rt_probe_android.so": "82cfedc76cf174614f88c40a83bd1e08940e43c9c98b0defbbc97b10fadfc88d",
+    "lib/x86_64/libhorde_rt_probe_android.so": "184f5e4ca8633a47746cee7bdf659ab6c519cae6c80c7882528f047ac4e15b0c"
+  },
+  "assembleAndLint": "PASS,3m10s",
+  "fullJava": "453tests,0failures,6pre-existing skips",
+  "phoneInstalled": false,
+  "phoneSlot": "released; wait for parent allocation",
+  "nextBoundedDeviceTest": "5minutes normal entry/draw, freshheldguard aftertimedwindow, release/cancel; actualtwo-thumbmanual remainsseparate"
+}

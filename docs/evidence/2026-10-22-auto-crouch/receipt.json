@@ -1,0 +1,145 @@
+{
+  "recorded_utc": "2026-10-22T20:14:35.6511736Z",
+  "source_base": "026bceda8924cff7356337ae14b83cc1cbaf0352",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "source_files": [
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "sha256": "4576e7b70d8b9defd4238963068df72315ead6d1419a2220bb0e0052ae88a7a8"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/AndroidControllerInput.java",
+      "sha256": "aef23da08fe94bec80e9e1470d6bede347a80f11ed32f0e09913caad74a1ef6f"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "sha256": "baff7b0816ae4df78fc964a8085833d6dee0cb197f9686270f5285a011e77253"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java",
+      "sha256": "bbbcfca4706667909775f7c7fb2ba0eb694e177b1b3fc5664ee9ae0d029eb143"
+    },
+    {
+      "path": "android/app/src/main/res/layout/activity_main.xml",
+      "sha256": "eca09fdbc1e42a16a1b736174f112c609100a33b56d0da052e3c1d1db944983e"
+    },
+    {
+      "path": "android/app/src/main/res/values/strings.xml",
+      "sha256": "735fd6b69e1d72dfcb5594c055e34ce5be722e8c2b117466e8886a6a8ae986b2"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerInputTest.java",
+      "sha256": "67c93d53909e00ead5701e5e291f4a1b9d68121649c198f7fc8a0f353dc81991"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerIntegrationTest.java",
+      "sha256": "6b8eaffd0c7c6981a2ee62103d7e65428c30ff30d502d434bcf7a494737270cb"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CampaignMenuIntegrationTest.java",
+      "sha256": "be5b7e1dbe79022cb2217bdbfb1209706ccb61bdae77688bdec106cd0cc79f49"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingUiSchedulingTest.java",
+      "sha256": "6e123916de9dd7499c48cc4269b63dcab18cdbf6d63152b60ca8de8c4b2daf50"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/DeathRecoveryTest.java",
+      "sha256": "bb63d31172d0bcca1ee6024b9bc1b6d3052193fc2e767b2e0fdcf4159cb70de6"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/GameplayTouchCancellationTest.java",
+      "sha256": "be2535c247b3866f5e7a78802c4277aaa76719f028247461c3c3dc10560a148f"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/LookoutObjectiveMenuTest.java",
+      "sha256": "cec99b53b45b3ef7b9d092ac7dac629cc0ed6acdd8f3443961c71359e0f4e03c"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/SurfaceSuspensionLifecycleTest.java",
+      "sha256": "4b219b26a4ff6d591a254a78d47f8a3b61740f0a18f1a0022d6fbeeb56f6fbc8"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "sha256": "a657153ea819d4edc9e4e348fbc35a558292e76150997d2a12c06c9a17d29191"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.h",
+      "sha256": "346168220ae8f5ddea395b6daa4b5523de42da8634b2a86f6c07479fcf4442f5"
+    },
+    {
+      "path": "src/gameplay/simulation/InputSnapshot.h",
+      "sha256": "da9ca3baf3f725d1cf117b89eb26c3e9724d7217ff4c5712af5b219b46ea7202"
+    },
+    {
+      "path": "src/gameplay/validation/MotionEvidenceScenario.cpp",
+      "sha256": "3912ad03a0b2f608457cad030381c5a445101d960c2900f4d3ddb74d32ebd234"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "sha256": "2bf03547261bf20eaf7ed22b13d0f9754c13586fa3039796038fffb481bda756"
+    },
+    {
+      "path": "src/platform/windows/WindowsGameplayInput.h",
+      "sha256": "92a0e32bc3370dad089d8395daeb5f0610c5b47f91086b79a0af6a9690e14256"
+    },
+    {
+      "path": "tests/ChapterStepMovementTests.cpp",
+      "sha256": "c5b5353e9ec7c72d348e69c236bdb624506de463e13648685d070127465c3de6"
+    },
+    {
+      "path": "tests/DesktopControllerInputTests.cpp",
+      "sha256": "0bad0d239a1c47ef88519f85e7801d2701a6f57fcd6d725df97fd7833ccc0c9e"
+    },
+    {
+      "path": "tests/InputMailboxStress.cpp",
+      "sha256": "4fe527cb6aff420cb56ef61301515fdb56683f959d300020cdccbf105c606a85"
+    },
+    {
+      "path": "tests/MotionEvidenceScenarioTests.cpp",
+      "sha256": "ed1b3a7100f322492ab8c953be8850089db78e2fbe9e357b53f6b87cde39feab"
+    },
+    {
+      "path": "tests/SimulationGameplayTests.cpp",
+      "sha256": "2c30870d9f4af85170aa96fda25387250713edafb00592c2f5843203995f5685"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "009eb24fd2a50356bb151a8f5d7cdb27b75751e8cc2c69d789c83d5094429164",
+      "bytes": 4620800,
+      "last_write_utc": "2026-10-22T20:10:23.8940060Z"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "d4cd5b021cc2b71b65f6ce828cbc560e0380ebd804f112ee2bb248eda4de27c8",
+      "bytes": 174177635,
+      "last_write_utc": "2026-10-22T20:14:00.2820824Z"
+    }
+  ],
+  "host_ctest": {
+    "selected": 7,
+    "passed": 7,
+    "failed": 0,
+    "configuration": "Release",
+    "full_output": "host-test-output.txt",
+    "final_desktop_binding_rebuild_pass": true
+  },
+  "android_tests": {
+    "suites": 8,
+    "tests": 97,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "counts": "android-tests.json"
+  },
+  "windows_application_build": "success",
+  "android_assemble_debug": "success; 4 ABIs; build only",
+  "phone_operations": 0,
+  "physical_input_acceptance": "pending",
+  "new_rt_visual_acceptance": "not run",
+  "performance_gain_claim": "none",
+  "audio_haptic_manual_revalidation": "YES: movement-driven footstep cadence"
+}

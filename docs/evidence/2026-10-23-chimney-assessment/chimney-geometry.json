@@ -1,0 +1,215 @@
+{
+  "sourceHead": "b9019b43a555a3f5994bcd603bc862999613a961",
+  "runtimeSha256": "66058108eee9e014acfa10086b9da81e577d40d9f88a3a6d7c2131388eea06ba",
+  "townTriangles": 966,
+  "cameraSource": "docs\\evidence\\2026-10-23-f03-masonry\\lookout-manifest.json",
+  "eye": [
+    13.3049,
+    0.50961,
+    36.2046
+  ],
+  "scope": "Actual owned runtime vertices plus exact retained RT camera; CPU town-only occlusion excludes terrain/trees and does not prove complete scene visibility or effect quality/cost.",
+  "chimneys": [
+    {
+      "building": "B01",
+      "label": "Tavern",
+      "capCentre": [
+        95.36,
+        -0.27955078124999977,
+        109.28
+      ],
+      "distanceFromLookoutMetres": 109.88028165193545,
+      "withinCurrent24mEmitterSelection": false,
+      "capCornerMaximumNativeVertexErrorMetres": 3.86039070731123e-06,
+      "roofMinusCapAtCentreMetres": 0.010933333333332573,
+      "probes": [
+        {
+          "aboveCapMetres": 0,
+          "point": [
+            95.36,
+            -0.27955078124999977,
+            109.28
+          ],
+          "pixelAt960x540": [
+            407.9351883792771,
+            184.3687804023402
+          ],
+          "occludedByTownTrianglesOnly": true
+        },
+        {
+          "aboveCapMetres": 0.3,
+          "point": [
+            95.36,
+            0.02044921875000022,
+            109.28
+          ],
+          "pixelAt960x540": [
+            407.89497513361215,
+            183.07903649131978
+          ],
+          "occludedByTownTrianglesOnly": true
+        },
+        {
+          "aboveCapMetres": 1,
+          "point": [
+            95.36,
+            0.7204492187500002,
+            109.28
+          ],
+          "pixelAt960x540": [
+            407.8009694693431,
+            180.06402909543093
+          ],
+          "occludedByTownTrianglesOnly": true
+        },
+        {
+          "aboveCapMetres": 4,
+          "point": [
+            95.36,
+            3.7204492187500002,
+            109.28
+          ],
+          "pixelAt960x540": [
+            407.395296132104,
+            167.05302468839753
+          ],
+          "occludedByTownTrianglesOnly": false
+        }
+      ]
+    },
+    {
+      "building": "B03",
+      "label": "House A",
+      "capCentre": [
+        38.98,
+        -3.8785253906250006,
+        116.76
+      ],
+      "distanceFromLookoutMetres": 84.66190974326327,
+      "withinCurrent24mEmitterSelection": false,
+      "capCornerMaximumNativeVertexErrorMetres": 2.4626411805911975e-06,
+      "roofMinusCapAtCentreMetres": 0.026545454545455094,
+      "probes": [
+        {
+          "aboveCapMetres": 0,
+          "point": [
+            38.98,
+            -3.8785253906250006,
+            116.76
+          ],
+          "pixelAt960x540": [
+            591.2404397790242,
+            206.03636402075657
+          ],
+          "occludedByTownTrianglesOnly": true
+        },
+        {
+          "aboveCapMetres": 0.3,
+          "point": [
+            38.98,
+            -3.5785253906250007,
+            116.76
+          ],
+          "pixelAt960x540": [
+            591.3228479273027,
+            204.34017389175304
+          ],
+          "occludedByTownTrianglesOnly": true
+        },
+        {
+          "aboveCapMetres": 1,
+          "point": [
+            38.98,
+            -2.8785253906250006,
+            116.76
+          ],
+          "pixelAt960x540": [
+            591.5156092533301,
+            200.3726067847208
+          ],
+          "occludedByTownTrianglesOnly": true
+        },
+        {
+          "aboveCapMetres": 4,
+          "point": [
+            38.98,
+            0.12147460937499943,
+            116.76
+          ],
+          "pixelAt960x540": [
+            592.3493468067098,
+            183.2119565606362
+          ],
+          "occludedByTownTrianglesOnly": true
+        }
+      ]
+    },
+    {
+      "building": "B06",
+      "label": "Smith",
+      "capCentre": [
+        111.44,
+        -6.7426123046875,
+        153.51999999999998
+      ],
+      "distanceFromLookoutMetres": 153.12085311128135,
+      "withinCurrent24mEmitterSelection": false,
+      "capCornerMaximumNativeVertexErrorMetres": 4.782236935428088e-06,
+      "roofMinusCapAtCentreMetres": 0.020216216216216054,
+      "probes": [
+        {
+          "aboveCapMetres": 0,
+          "point": [
+            111.44,
+            -6.7426123046875,
+            153.51999999999998
+          ],
+          "pixelAt960x540": [
+            458.33486400238706,
+            202.7631340859609
+          ],
+          "occludedByTownTrianglesOnly": true
+        },
+        {
+          "aboveCapMetres": 0.3,
+          "point": [
+            111.44,
+            -6.442612304687501,
+            153.51999999999998
+          ],
+          "pixelAt960x540": [
+            458.32642393442956,
+            201.8698861657213
+          ],
+          "occludedByTownTrianglesOnly": true
+        },
+        {
+          "aboveCapMetres": 1,
+          "point": [
+            111.44,
+            -5.7426123046875,
+            153.51999999999998
+          ],
+          "pixelAt960x540": [
+            458.30670484600734,
+            199.78293203088342
+          ],
+          "occludedByTownTrianglesOnly": true
+        },
+        {
+          "aboveCapMetres": 4,
+          "point": [
+            111.44,
+            -2.7426123046875004,
+            153.51999999999998
+          ],
+          "pixelAt960x540": [
+            458.2217864608951,
+            190.79566187218595
+          ],
+          "occludedByTownTrianglesOnly": true
+        }
+      ]
+    }
+  ]
+}

@@ -193,6 +193,8 @@ bool ValidStageFrame(const RtStageFrameSample& stages,
 bool ValidSceneFrame(const RtSceneFrameEvidence& scene,
                      RtEvidenceValidationError& error) noexcept
 {
+    if (scene.dimensions && !ValidRtFrameDimensionsEvidence(*scene.dimensions))
+    { error = RtEvidenceValidationError::InvalidDispatchState; return false; }
     if (!ValidPipelineIdentity(scene.pipeline, error) ||
         !ValidPlayerDiagnostics(scene.player, error))
     {
@@ -218,6 +220,8 @@ bool ValidSceneFrame(const RtSceneFrameEvidence& scene,
 bool ValidRecordedScene(const RtRecordedSceneEvidence& scene,
                          RtEvidenceValidationError& error) noexcept
 {
+    if (scene.dimensions && !ValidRtFrameDimensionsEvidence(*scene.dimensions))
+    { error = RtEvidenceValidationError::InvalidDispatchState; return false; }
     if (!ValidPipelineIdentity(scene.pipeline, error) ||
         !ValidPlayerDiagnostics(scene.player, error))
     {
@@ -605,6 +609,13 @@ const char* RtStageMetricName(const RtStage stage) noexcept
     case RtStage::QueueSubmit: return "queueSubmitCpuMs";
     case RtStage::PresentCall: return "presentCallCpuMs";
     case RtStage::WholeFrameCycle: return "wholeFrameCycleCpuMs";
+    case RtStage::PoseCopy: return "poseCopyCpuMs";
+    case RtStage::PlayerPose: return "playerPoseCpuMs";
+    case RtStage::PlayerVertices: return "playerVerticesCpuMs";
+    case RtStage::ViewmodelVertices: return "viewmodelVerticesCpuMs";
+    case RtStage::CharacterAnimation: return "characterAnimationCpuMs";
+    case RtStage::CharacterVertices: return "characterVerticesCpuMs";
+    case RtStage::CharacterCopy: return "characterCopyCpuMs";
     default: return nullptr;
     }
 }
@@ -1126,6 +1137,11 @@ bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& sna
          << ",\"swapchainCopyRecorded\":"
          << (snapshot.scene.dispatch.swapchainCopyRecorded ? "true" : "false") << '}';
 
+    if (snapshot.scene.dimensions)
+    {
+        json << ",\"submittedDimensions\":";
+        WriteRtFrameDimensionsEvidenceJson(json, *snapshot.scene.dimensions);
+    }
     if (snapshot.scene.shadowQuality)
     {
         const auto& quality = *snapshot.scene.shadowQuality;
@@ -1729,6 +1745,7 @@ bool RtEvidenceLifecycle::Complete(const RtSubmittedFrameIdentity& submitted,
     candidate.identity.submitted = submitted;
     candidate.identity.completionSerial = seeds_.completionSerial + 1u;
     candidate.scene.pipeline = slot.scene.pipeline;
+    candidate.scene.dimensions = slot.scene.dimensions;
     candidate.scene.resources = slot.scene.resources;
     candidate.scene.shadowQuality = slot.scene.shadowQuality;
     candidate.scene.fireQuality = slot.scene.fireQuality;

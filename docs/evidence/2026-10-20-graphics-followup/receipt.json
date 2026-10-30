@@ -1,0 +1,114 @@
+{
+  "date": "2026-10-20",
+  "package": "com.samfa12.hordelanternrt.debug",
+  "device": "SM-S948B",
+  "android": "17 / API 37",
+  "installedApkSha256": "c5a11bb287327900327b2266c313f53d4a77ad02d2b94d5787ef81cb23269707",
+  "evidenceClass": "Noncombat native graphics UI, settings persistence and lifecycle checks; not a performance experiment",
+  "savedMistOffOwnerInstruction": "mist off on mobile because when it is on, during the keeper fight, we also have those two lights on and all together it was pretty chuggy.",
+  "files": {
+    "before.json": {
+      "bytes": 3287,
+      "sha256": "890de8afad517437c8b91039d781ec1e31e6d3729065ce881e4230e163824199"
+    },
+    "before-settings.xml": {
+      "bytes": 1350,
+      "sha256": "59fe30e8180851a016c612fbed866f8a5dbc20477fac60487c2ca2192c6867e7"
+    },
+    "rotation-before.json": {
+      "bytes": 88,
+      "sha256": "d769ef22558669e8468f2c3c840fbc0c7032122dde20146b658a8ffc0ff73620"
+    },
+    "06-home-interrupted-custody.json": {
+      "bytes": 3446,
+      "sha256": "6881551276469a549ce832262e1dcd9bcfd2361f057405fd70c87571a18dbbef"
+    },
+    "06-home-interrupted-logcat.txt": {
+      "bytes": 502,
+      "sha256": "72881561c9f5fabe2dbacba3cea45e26d174f5c01c6cf8a57ab50a0f80111969"
+    },
+    "06-home-interrupted-settings.xml": {
+      "bytes": 1350,
+      "sha256": "0247c48a055b25480ac1249c82eab70a9f7a7e8be79f0e591cb4d366780f5671"
+    },
+    "hot-resume.json": {
+      "bytes": 467,
+      "sha256": "ab6568d66bd827e9cfeabddb12c340779bf9763b233c03f195a2f73672df79c2"
+    },
+    "08-recovered-custody.json": {
+      "bytes": 3369,
+      "sha256": "afcba6614e2bffa699a41e71818e4d9629a13868734ba88117f2a30a88fa123d"
+    },
+    "09-current-recovery.xml": {
+      "bytes": 10842,
+      "sha256": "81649456603e5dd9135476bd9beb1c6548c7996c8eab8fd79bdaae69e7fd3701"
+    },
+    "14-preview-landscape-stable.xml": {
+      "bytes": 9641,
+      "sha256": "2422c96781a0ad90bcd6c5ea47432ae7be369ef1e3e7661ec88f253c898fa4ae"
+    },
+    "18-mist-off-preview-custody.json": {
+      "bytes": 3449,
+      "sha256": "333aa53ed56299f2148b37fbf540468d8f2f92135ce54d7bdbbf760152299d6b"
+    },
+    "18-mist-off-preview.xml": {
+      "bytes": 10026,
+      "sha256": "fd9f19751314343b5b086984f11cab14121670c11b0a8fce1f03de65df4293de"
+    },
+    "19-mist-off-applied.xml": {
+      "bytes": 10018,
+      "sha256": "68bc95dcdb7a05828ac9b570c88c81906670f57b9929375d4b99251b55515c63"
+    },
+    "19-mist-off-applied-custody.json": {
+      "bytes": 3456,
+      "sha256": "bcfd1e109af24ce88aa2e8e3b0523e1fa42943b9b37e8a477269844bc6a5cd76"
+    },
+    "19-mist-off-applied.png": {
+      "bytes": 3616537,
+      "sha256": "0c41e17a173f3b0c9b61b58a52eac5955c5ab3e228a97a8b28efb52b4470c777"
+    },
+    "21-preview-details.xml": {
+      "bytes": 7410,
+      "sha256": "ac64488f4ecf3a21b6f2b90eb23f637373140993cb4db83f1af501add40c6024"
+    },
+    "23-preview-image-current.xml": {
+      "bytes": 5713,
+      "sha256": "675f77f4290e1b60356b6fe4f505c2d1ad82484dc4ed37ef0df6098d811d33f5"
+    },
+    "25-image-portrait.xml": {
+      "bytes": 6078,
+      "sha256": "6ea352169fe4b5f892abebcbadc60865cb3350a0a58b83279389bf8fb908f5a6"
+    },
+    "26-controls-portrait.xml": {
+      "bytes": 11208,
+      "sha256": "db4887606de5b601549894efc7b3adacc3c83c9020a6231beb614b899e0a26d7"
+    },
+    "27-preview-back.xml": {
+      "bytes": 10846,
+      "sha256": "65229036254d482d77fd2d9d744c182b55c903a59a05e97fe161fe9402a6be9a"
+    },
+    "28-ordinary-restored.xml": {
+      "bytes": 10843,
+      "sha256": "a61c9955096bd5e09243a9f43f20fdff777b59b64db3726ede34387939d23765"
+    },
+    "29-final-logcat.txt": {
+      "bytes": 5115,
+      "sha256": "9e07f235ea0d28d976dcfd09a30a27c2a9d2c7d0426f8042880a9d2c8d555ea9"
+    },
+    "30-final-custody.json": {
+      "bytes": 3456,
+      "sha256": "ec34d21d2a02570424e9ad8e469e632381c3470c5f11f7e4e1ddc0df69174c7a"
+    },
+    "30-final-settings.xml": {
+      "bytes": 1352,
+      "sha256": "c5b0a127fc8d40e1d5801411848eb4002f4e93721ff12c0ff588b3e52984a54a"
+    },
+    "final-device-state.json": {
+      "bytes": 244,
+      "sha256": "51b62a6f1ab32056e1823052ef8880a5c8e2613f03125bdd89ff99834dba1c38"
+    }
+  },
+  "observationBaseCommit": "54347496",
+  "apkSourceDescription": "ed44d417 plus the graphics saved-status predicate and regression committed as 99912848; no later native source changes in this installed APK",
+  "apkSourceEvidence": "../2026-10-20-graphics-single-apply/phone/receipt.json"
+}

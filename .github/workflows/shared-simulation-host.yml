@@ -1,12 +1,14 @@
 name: Shared simulation host tests
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
       - main
       - codex/horde-1.6.1-engineering-pass
       - codex/horde-1.6.2-engine-readiness
+      - codex/horde-1.7-wp2-vertical-proof
 
 permissions:
   contents: read
@@ -43,7 +45,7 @@ jobs:
       - name: Fetch only Android runtime LFS payloads
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb,assets/models/player/runtime/*.runtime.glb,assets/models/player/viewmodel/runtime/*.runtime.glb,assets/models/props/runtime/*.runtime.glb,assets/models/props/runtime/*/*.runtime.glb,assets/models/weapons/runtime/*.runtime.glb,assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2,assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb"
+          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb,assets/models/player/runtime/*.runtime.glb,assets/models/player/viewmodel/runtime/*.runtime.glb,assets/models/props/runtime/*.runtime.glb,assets/models/props/runtime/*/*.runtime.glb,assets/models/weapons/runtime/*.runtime.glb,assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2,assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/music/beneath-the-same-moon/runtime/outdoor-main.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb,assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb,assets/models/world/runtime/grave-markers-r03/*.glb,assets/textures/props/runtime/chapter-terrain/*.ktx2,assets/models/world/runtime/forest-tree-pair-v1/*.glb,assets/models/world/runtime/forest-understory-v1/*.glb,assets/models/world/runtime/forest-rocks-v1/*.glb,assets/models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb,assets/models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb,assets/models/world/runtime/forest-deadwood-v1/*.glb,assets/models/world/runtime/bellwether-shell-v4/*.glb,assets/models/world/source/forest-tree-pair-v1/**,assets/textures/props/source/forest-tree-pair-v1/**,assets/models/characters/source/kit-warden-v1/*.glb,assets/models/characters/runtime/kit-warden-v1/*.glb,assets/textures/characters/runtime/kit-warden-v1/*.ktx2,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav,assets/audio/chapter-local-ambience/runtime/*.wav,assets/audio/forest-foliage/runtime/*.wav"
           && git lfs checkout
           "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb"
           "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb"
@@ -53,11 +55,39 @@ jobs:
           "assets/models/props/runtime/*/*.runtime.glb"
           "assets/models/weapons/runtime/*.runtime.glb"
           "assets/models/world/runtime/collapsed-entry/*.runtime.glb"
+          "assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb"
+          "assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb"
+          "assets/models/world/runtime/grave-markers-r03/*.glb"
+          "assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2"
+          "assets/textures/props/runtime/chapter-terrain/*.ktx2"
+          "assets/models/world/runtime/forest-tree-pair-v1/*.glb"
+          "assets/models/world/runtime/forest-understory-v1/*.glb"
+          "assets/models/world/runtime/forest-rocks-v1/*.glb"
+          "assets/models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb"
+          "assets/models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb"
+          "assets/models/world/runtime/forest-deadwood-v1/*.glb"
+          "assets/models/world/runtime/bellwether-shell-v4/*.glb"
+          "assets/models/world/source/forest-tree-pair-v1/**"
+          "assets/textures/props/source/forest-tree-pair-v1/**"
+          "assets/models/characters/source/kit-warden-v1/*.glb"
+          "assets/models/characters/runtime/kit-warden-v1/*.glb"
+          "assets/textures/characters/runtime/kit-warden-v1/*.ktx2"
+          "assets/models/world/runtime/prepared-funerary-v01/**/*.glb"
+          "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb"
+          "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb"
+          "assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb"
+          "assets/audio/pixabay/water_wet_step*.wav"
+          "assets/audio/pixabay/water_stream_contact*.wav"
+          "assets/audio/pixabay/keeper_death*.wav"
+          "assets/audio/kit/runtime/*.wav"
+          "assets/audio/chapter-local-ambience/runtime/*.wav"
+          "assets/audio/forest-foliage/runtime/*.wav"
           "assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2"
           "assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2"
           "assets/textures/props/runtime/*.android.ktx2"
           "assets/textures/props/runtime/*.windows.ktx2"
           "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          "assets/audio/music/beneath-the-same-moon/runtime/outdoor-main.wav"
           "assets/audio/pixabay/keeper_i_sense_you.wav"
           "assets/audio/pixabay/keeper_come_closer.wav"
           "assets/audio/pixabay/skeleton_idle_rattle.wav"
@@ -132,8 +162,8 @@ jobs:
   shared-gameplay:
     name: Shared simulation host (${{ matrix.compiler }})
     runs-on: ${{ matrix.os }}
-    # Includes the Windows build, CPU tests and separate offline asset checks.
-    # The 853d31f2 PR lane passed all 97 CTests but exhausted 10 minutes afterward.
+    # Windows retains MSVC native/platform coverage; compiler-independent
+    # source and asset checks remain in both complete Linux lanes.
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -151,7 +181,7 @@ jobs:
             compiler: MSVC
             compiler_args: ''
             # The separate WIN32 tool matrix includes SDK/Android/tool-dependent fixtures.
-            # This additive compiler lane runs the same common CPU-host tests.
+            # The Windows helper separately validates its portable-check exclusions.
             ctest_filter_args: >-
               -E '^(horde_rt_scene_abi_generator_tests|horde_rt_raygen_compiler_strategy_tests|horde_rt_raygen_variant_manifest_tests|horde_rt_raygen_variant_artifact_tests|horde_rt_rayquery_compute_shader_tests|horde_rt_pipeline_policy_fence_tests|horde_rt_pipeline_policy_execution_tests|horde_rt_static_texture_array_tool_tests|horde_rt_static_preparation_lod_policy_tests|horde_rt_static_preparation_skip_policy_tests|horde_rt_static_preparation_colliding_lod_policy_tests|horde_rt_dielectric_topology_tool_tests|horde_rt_version_contract_powershell_tests|horde_rt_github_release_preflight_tests|horde_rt_version_contract_windows_powershell_tests)$'
     steps:
@@ -161,19 +191,50 @@ jobs:
       - name: Fetch portable-test GLB and music PCM assets
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2"
+          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/props/source/attack-warning-ring-v1/attack-warning-ring-v1.glb,assets/models/props/source/healing-flask-neck-fit-r2/healing-flask-neck-fit-r2.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/source/development-rescue*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/music/beneath-the-same-moon/runtime/outdoor-main.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb,assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb,assets/models/world/runtime/grave-markers-r03/*.glb,assets/textures/props/runtime/chapter-terrain/*.ktx2,assets/models/world/runtime/forest-tree-pair-v1/*.glb,assets/models/world/runtime/forest-understory-v1/*.glb,assets/models/world/runtime/forest-rocks-v1/*.glb,assets/models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb,assets/models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb,assets/models/world/runtime/forest-deadwood-v1/*.glb,assets/models/world/runtime/bellwether-shell-v4/*.glb,assets/models/world/source/forest-tree-pair-v1/**,assets/textures/props/source/forest-tree-pair-v1/**,assets/models/characters/source/kit-warden-v1/*.glb,assets/models/characters/runtime/kit-warden-v1/*.glb,assets/textures/characters/runtime/kit-warden-v1/*.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav,assets/audio/chapter-local-ambience/runtime/*.wav,assets/audio/forest-foliage/runtime/*.wav"
           && git lfs checkout
           "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb"
           "assets/models/player/runtime/*.glb"
           "assets/models/player/viewmodel/runtime/*.glb"
           "assets/models/props/runtime/*.glb"
           "assets/models/props/runtime/*/*.glb"
+          "assets/models/props/source/attack-warning-ring-v1/attack-warning-ring-v1.glb"
+          "assets/models/props/source/healing-flask-neck-fit-r2/healing-flask-neck-fit-r2.glb"
           "assets/models/weapons/runtime/*.glb"
           "assets/models/world/runtime/collapsed-entry/*.runtime.glb"
+          "assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb"
+          "assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb"
+          "assets/models/world/runtime/grave-markers-r03/*.glb"
+          "assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2"
+          "assets/textures/props/runtime/chapter-terrain/*.ktx2"
+          "assets/models/world/runtime/forest-tree-pair-v1/*.glb"
+          "assets/models/world/runtime/forest-understory-v1/*.glb"
+          "assets/models/world/runtime/forest-rocks-v1/*.glb"
+          "assets/models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb"
+          "assets/models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb"
+          "assets/models/world/runtime/forest-deadwood-v1/*.glb"
+          "assets/models/world/runtime/bellwether-shell-v4/*.glb"
+          "assets/models/world/source/forest-tree-pair-v1/**"
+          "assets/textures/props/source/forest-tree-pair-v1/**"
+          "assets/models/characters/source/kit-warden-v1/*.glb"
+          "assets/models/characters/runtime/kit-warden-v1/*.glb"
+          "assets/textures/characters/runtime/kit-warden-v1/*.ktx2"
+          "assets/models/world/runtime/prepared-funerary-v01/**/*.glb"
+          "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb"
+          "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb"
+          "assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb"
+          "assets/audio/pixabay/water_wet_step*.wav"
+          "assets/audio/pixabay/water_stream_contact*.wav"
+          "assets/audio/pixabay/keeper_death*.wav"
+          "assets/audio/kit/runtime/*.wav"
+          "assets/audio/chapter-local-ambience/runtime/*.wav"
+          "assets/audio/forest-foliage/runtime/*.wav"
           "assets/textures/props/runtime/*.android.ktx2"
           "assets/textures/props/runtime/*.windows.ktx2"
           "tests/fixtures/*/*.glb"
+          "assets/source/development-rescue*/*.glb"
           "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          "assets/audio/music/beneath-the-same-moon/runtime/outdoor-main.wav"
           "assets/audio/pixabay/keeper_i_sense_you.wav"
           "assets/audio/pixabay/keeper_come_closer.wav"
           "assets/audio/pixabay/skeleton_idle_rattle.wav"
@@ -198,20 +259,47 @@ jobs:
         run: cmake --build build/host-ci --config Release --parallel 2
 
       - name: Run shared gameplay tests
+        if: runner.os != 'Windows'
         run: >-
           ctest --test-dir build/host-ci --build-config Release
           --output-on-failure --no-tests=error ${{ matrix.ctest_filter_args }}
 
+      - name: Run complete Windows native and platform selection
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          HORDE_HOST_CTEST_FILTER: ${{ matrix.ctest_filter_args }}
+        run: |
+          $match = [regex]::Match($env:HORDE_HOST_CTEST_FILTER, "^-E '([^']+)'$")
+          if (-not $match.Success) { throw 'Unexpected Windows CTest filter format.' }
+          ./tools/run-windows-host-ci-tests.ps1 -BuildDirectory build/host-ci -Configuration Release -ExcludePattern $match.Groups[1].Value
+
+      - name: Retain native report edit timing trace
+        if: always() && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $path = 'build/host-ci/Testing/Temporary/LastTest.log'
+          if (Test-Path -LiteralPath $path) {
+            $text = [IO.File]::ReadAllText((Resolve-Path -LiteralPath $path))
+            $record = [regex]::Match($text, '(?ms)^\d+/\d+ Testing: horde_rt_windows_playtest_report_ui_tests\r?\n.*?(?=^\d+/\d+ Testing:|\z)')
+            if ($record.Success) { Write-Output $record.Value }
+            else { Write-Output 'Native report UI fixture did not execute in this job.' }
+          }
+
       - name: Check offline gauntlet chirality and UV winding
+        if: runner.os != 'Windows'
         run: python -m unittest discover -s tests -p test_player_gauntlet_geometry.py -v
 
       - name: Check exact player cloth seam weight transfers
+        if: runner.os != 'Windows'
         run: python -m unittest discover -s tests -p test_player_sleeve_seams.py -v
 
       - name: Check upper torso partition preserves the head mask
+        if: runner.os != 'Windows'
         run: python -m unittest discover -s tests -p test_player_body_partition.py -v
 
       - name: Check bounded segmented cloth seam plans
+        if: runner.os != 'Windows'
         run: python -m unittest discover -s tests -p test_player_segmented_seams.py -v
 
       - name: Check Gradle APK artifact resolution
@@ -219,6 +307,7 @@ jobs:
         run: ./tools/test-resolve-android-apk.ps1
 
       - name: Check Android combat capture expectations
+        if: runner.os != 'Windows'
         shell: pwsh
         run: ./tests/AndroidCombatCaptureExpectations.ps1
 
@@ -233,7 +322,7 @@ jobs:
       - name: Fetch only selected fixture and PCM payloads
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb"
+          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/source/development-rescue*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/music/beneath-the-same-moon/runtime/outdoor-main.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb,assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb,assets/models/world/runtime/grave-markers-r03/*.glb,assets/textures/props/runtime/chapter-terrain/*.ktx2,assets/models/world/runtime/forest-tree-pair-v1/*.glb,assets/models/world/runtime/forest-understory-v1/*.glb,assets/models/world/runtime/forest-rocks-v1/*.glb,assets/models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb,assets/models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb,assets/models/world/runtime/forest-deadwood-v1/*.glb,assets/models/world/runtime/bellwether-shell-v4/*.glb,assets/models/world/source/forest-tree-pair-v1/**,assets/textures/props/source/forest-tree-pair-v1/**,assets/models/characters/source/kit-warden-v1/*.glb,assets/models/characters/runtime/kit-warden-v1/*.glb,assets/textures/characters/runtime/kit-warden-v1/*.ktx2,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav,assets/audio/chapter-local-ambience/runtime/*.wav,assets/audio/forest-foliage/runtime/*.wav"
           && git lfs checkout
           "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb"
           "assets/models/player/runtime/*.glb"
@@ -242,8 +331,36 @@ jobs:
           "assets/models/props/runtime/*/*.glb"
           "assets/models/weapons/runtime/*.glb"
           "assets/models/world/runtime/collapsed-entry/*.runtime.glb"
+          "assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb"
+          "assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb"
+          "assets/models/world/runtime/grave-markers-r03/*.glb"
+          "assets/textures/props/runtime/chapter-terrain/*.ktx2"
+          "assets/models/world/runtime/forest-tree-pair-v1/*.glb"
+          "assets/models/world/runtime/forest-understory-v1/*.glb"
+          "assets/models/world/runtime/forest-rocks-v1/*.glb"
+          "assets/models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb"
+          "assets/models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb"
+          "assets/models/world/runtime/forest-deadwood-v1/*.glb"
+          "assets/models/world/runtime/bellwether-shell-v4/*.glb"
+          "assets/models/world/source/forest-tree-pair-v1/**"
+          "assets/textures/props/source/forest-tree-pair-v1/**"
+          "assets/models/characters/source/kit-warden-v1/*.glb"
+          "assets/models/characters/runtime/kit-warden-v1/*.glb"
+          "assets/textures/characters/runtime/kit-warden-v1/*.ktx2"
+          "assets/models/world/runtime/prepared-funerary-v01/**/*.glb"
+          "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb"
+          "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb"
+          "assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb"
+          "assets/audio/pixabay/water_wet_step*.wav"
+          "assets/audio/pixabay/water_stream_contact*.wav"
+          "assets/audio/pixabay/keeper_death*.wav"
+          "assets/audio/kit/runtime/*.wav"
+          "assets/audio/chapter-local-ambience/runtime/*.wav"
+          "assets/audio/forest-foliage/runtime/*.wav"
           "tests/fixtures/*/*.glb"
+          "assets/source/development-rescue*/*.glb"
           "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          "assets/audio/music/beneath-the-same-moon/runtime/outdoor-main.wav"
           "assets/audio/pixabay/keeper_i_sense_you.wav"
           "assets/audio/pixabay/keeper_come_closer.wav"
           "assets/audio/pixabay/skeleton_idle_rattle.wav"
@@ -274,17 +391,50 @@ jobs:
       - name: Fetch player smoke GLB and texture assets
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb"
+          --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/props/source/attack-warning-ring-v1/attack-warning-ring-v1.glb,assets/models/props/source/healing-flask-neck-fit-r2/healing-flask-neck-fit-r2.glb,assets/models/player/source/flask-native-binding-r1/gothic-traveller-flask-candidate.runtime.glb,assets/models/weapons/runtime/*.glb,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb,assets/source/development-rescue*/*.glb,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb,assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb,assets/models/world/runtime/grave-markers-r03/*.glb,assets/textures/props/runtime/chapter-terrain/*.ktx2,assets/models/world/runtime/forest-tree-pair-v1/*.glb,assets/models/world/runtime/forest-understory-v1/*.glb,assets/models/world/runtime/forest-rocks-v1/*.glb,assets/models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb,assets/models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb,assets/models/world/runtime/forest-deadwood-v1/*.glb,assets/models/world/runtime/bellwether-shell-v4/*.glb,assets/models/world/source/forest-tree-pair-v1/**,assets/textures/props/source/forest-tree-pair-v1/**,assets/models/characters/source/kit-warden-v1/*.glb,assets/models/characters/runtime/kit-warden-v1/*.glb,assets/textures/characters/runtime/kit-warden-v1/*.ktx2,assets/models/world/runtime/prepared-funerary-v01/**/*.glb,assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb,assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb,assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb,assets/audio/pixabay/water_wet_step*.wav,assets/audio/pixabay/water_stream_contact*.wav,assets/audio/pixabay/keeper_death*.wav,assets/audio/kit/runtime/*.wav,assets/audio/chapter-local-ambience/runtime/*.wav,assets/audio/forest-foliage/runtime/*.wav"
           && git lfs checkout
           "assets/models/enemies/meshy/*.glb"
           "assets/models/player/runtime/*.glb"
           "assets/models/player/viewmodel/runtime/*.glb"
           "assets/models/props/runtime/*.glb"
           "assets/models/props/runtime/*/*.glb"
+          "assets/models/props/source/attack-warning-ring-v1/attack-warning-ring-v1.glb"
+          "assets/models/props/source/healing-flask-neck-fit-r2/healing-flask-neck-fit-r2.glb"
+          "assets/models/player/source/flask-native-binding-r1/gothic-traveller-flask-candidate.runtime.glb"
           "assets/models/weapons/runtime/*.glb"
           "assets/models/world/runtime/collapsed-entry/*.runtime.glb"
+          "assets/models/world/runtime/chapter-entry-return-v1/*.runtime.glb"
+          "assets/models/world/runtime/chapter-terrain-v1/*.runtime.glb"
+          "assets/models/world/runtime/grave-markers-r03/*.glb"
+          "assets/textures/props/source/chapter-terrain-maps-r03/*.ktx2"
+          "assets/textures/props/runtime/chapter-terrain/*.ktx2"
+          "assets/models/world/runtime/forest-tree-pair-v1/*.glb"
+          "assets/models/world/runtime/forest-understory-v1/*.glb"
+          "assets/models/world/runtime/forest-rocks-v1/*.glb"
+          "assets/models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb"
+          "assets/models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb"
+          "assets/models/world/runtime/forest-deadwood-v1/*.glb"
+          "assets/models/world/runtime/bellwether-shell-v4/*.glb"
+          "assets/models/world/source/forest-tree-pair-v1/**"
+          "assets/textures/props/source/forest-tree-pair-v1/**"
+          "assets/models/characters/source/kit-warden-v1/*.glb"
+          "assets/models/characters/runtime/kit-warden-v1/*.glb"
+          "assets/textures/characters/runtime/kit-warden-v1/*.ktx2"
+          "assets/models/world/runtime/prepared-funerary-v01/**/*.glb"
+          "assets/models/world/runtime/tomb-dressing-v01/tomb-niche-*/*.glb"
+          "assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1/meshes/*.glb"
+          "assets/source/beyond_the_tomb/funerary/t03-v01/models/*.glb"
+          "assets/audio/pixabay/water_wet_step*.wav"
+          "assets/audio/pixabay/water_stream_contact*.wav"
+          "assets/audio/pixabay/keeper_death*.wav"
+          "assets/audio/kit/runtime/*.wav"
+          "assets/audio/chapter-local-ambience/runtime/*.wav"
+          "assets/audio/forest-foliage/runtime/*.wav"
+          "assets/textures/props/runtime/*.android.ktx2"
+          "assets/textures/props/runtime/*.windows.ktx2"
           "assets/textures/meshy/lich_placeholder_v01/*.ktx2"
           "tests/fixtures/*/*.glb"
+          "assets/source/development-rescue*/*.glb"
           "assets/audio/pixabay/keeper_i_sense_you.wav"
           "assets/audio/pixabay/keeper_come_closer.wav"
           "assets/audio/pixabay/skeleton_idle_rattle.wav"
@@ -318,16 +468,61 @@ jobs:
           horde_rt_scene_abi_tests
           horde_rt_static_gltf_asset_tests
           horde_rt_static_collapse_asset_tests
+          horde_rt_forest_dressing_tests
+          horde_rt_forest_understory_tests
+          horde_rt_forest_rock_dressing_tests
+          horde_rt_forest_deadwood_tests
+          horde_rt_bellwether_shell_tests
+          horde_rt_graveyard_dressing_tests
+          horde_rt_world_surface_range_tests
+          horde_rt_kit_source_intake_tests
+          horde_rt_actor_pose_worker_tests
+          horde_rt_character_render_slot_smoke
           horde_rt_skinned_character_smoke
           horde_rt_skinned_arm_reference_tests
           horde_rt_scene_initialise_preflight_tests
+          horde_rt_texture_layer_subset_tests
           horde_rt_scene_resource_inventory_tests
+          horde_rt_static_geometry_cutover_tests
+          horde_rt_sky_attribution_launch_tests
+          horde_rt_opaque_segment_coverage_tests
+          horde_rt_tomb_dressing_tests
           horde_rt_gpu_resources_observation_tests
+          horde_rt_gpu_frame_timer_collection_tests
+          horde_rt_frame_evidence_coordinator_tests
+          horde_rt_gpu_buffer_batch_tests
+          horde_rt_gpu_work_lease_tests
+          horde_rt_region_gpu_preparation_tests
+          horde_rt_region_geometry_source_tests
           horde_rt_staged_primary_resource_tests
           horde_rt_staged_primary_timing_tests
           horde_rt_driver_capability_report_tests
           horde_rt_present_completion_tests
           horde_rt_present_timing_evidence_tests
+          horde_rt_region_streaming_tests
+          horde_rt_geometry_page_table_tests
+          horde_rt_geometry_partition_tests
+          horde_rt_world_route_foundation_tests
+          horde_rt_vertical_support_tests
+          horde_rt_triangle_support_surface_tests
+          horde_rt_held_item_vertical_support_rig_tests
+          horde_rt_player_directional_rig_tests
+          horde_rt_player_crouch_rig_tests
+          horde_rt_player_utility_binding_tests
+          horde_rt_rescue_journey_integration_tests
+          horde_rt_campaign_checkpoint_tests
+          horde_rt_campaign_codec_tests
+          horde_rt_campaign_storage_tests
+          horde_rt_campaign_save_coordinator_tests
+          horde_rt_campaign_save_worker_tests
+          horde_rt_campaign_session_tests
+          horde_rt_forest_bird_ambience_tests
+          horde_rt_campaign_play_session_tests
+          horde_rt_development_world_scene_adapter_tests
+          horde_rt_android_campaign_load_barrier_tests
+          horde_rt_character_step_geometry_tests
+          horde_rt_chapter_step_movement_tests
+          horde_rt_rescue_rig_attachment_tests
 
       - name: Run focused player, semantic and output-ownership fixtures
         run: >-
@@ -335,7 +530,10 @@ jobs:
           --build-config Release
           --output-on-failure
           --no-tests=error
-          -R "^(horde_rt_present_completion_tests|horde_rt_present_timing_evidence_tests|horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_final_held_torch_clearance_tests|horde_rt_windows_output_resize_launch_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_static_collapse_asset_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures|horde_rt_scene_initialise_preflight_tests|horde_rt_scene_resource_inventory_tests|horde_rt_gpu_resources_observation_tests|horde_rt_staged_primary_resource_tests|horde_rt_staged_primary_timing_tests|horde_rt_driver_capability_report_tests)$"
+          -R "^(horde_rt_present_completion_tests|horde_rt_present_timing_evidence_tests|horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_final_held_torch_clearance_tests|horde_rt_windows_output_resize_launch_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_static_gltf_intake_missing_argument_tests|horde_rt_static_gltf_intake_unknown_argument_tests|horde_rt_static_collapse_asset_tests|horde_rt_forest_dressing_tests|horde_rt_forest_understory_tests|horde_rt_forest_rock_dressing_tests|horde_rt_forest_deadwood_tests|horde_rt_bellwether_shell_tests|horde_rt_graveyard_dressing_tests|horde_rt_world_surface_range_tests|horde_rt_kit_source_intake_tests|horde_rt_actor_pose_worker_tests|horde_rt_skinned_character_smoke|horde_rt_character_render_slot_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures|horde_rt_scene_initialise_preflight_tests|horde_rt_texture_layer_subset_tests|horde_rt_chapter_texture_alias_payload_tests|horde_rt_chapter_texture_append_payload_tests|horde_rt_scene_resource_inventory_tests|horde_rt_static_geometry_cutover_tests|horde_rt_corridor_detail_certificate_tests|horde_rt_sky_attribution_launch_tests|horde_rt_opaque_segment_coverage_tests|horde_rt_tomb_dressing_tests|horde_rt_gpu_frame_timer_collection_tests|horde_rt_frame_evidence_coordinator_tests|horde_rt_gpu_resources_observation_tests|horde_rt_gpu_buffer_batch_tests|horde_rt_gpu_work_lease_tests|horde_rt_region_gpu_preparation_tests|horde_rt_region_geometry_source_tests|horde_rt_staged_primary_resource_tests|horde_rt_staged_primary_timing_tests|horde_rt_driver_capability_report_tests|horde_rt_region_streaming_tests|horde_rt_geometry_page_table_tests|horde_rt_geometry_partition_tests|horde_rt_world_route_foundation_tests|horde_rt_vertical_support_tests|horde_rt_triangle_support_surface_tests|horde_rt_held_item_vertical_support_rig_tests|horde_rt_player_directional_rig_tests|horde_rt_player_crouch_rig_tests|horde_rt_player_utility_binding_tests|horde_rt_rescue_journey_integration_tests|horde_rt_chapter_terrain_journey_tests|horde_rt_campaign_checkpoint_tests|horde_rt_campaign_codec_tests|horde_rt_campaign_storage_tests|horde_rt_campaign_save_coordinator_tests|horde_rt_campaign_save_worker_tests|horde_rt_campaign_session_tests|horde_rt_forest_bird_ambience_tests|horde_rt_campaign_play_session_tests|horde_rt_campaign_earned_return_tests|horde_rt_development_world_scene_adapter_tests|horde_rt_android_campaign_load_barrier_tests|horde_rt_character_step_geometry_tests|horde_rt_chapter_step_movement_tests|horde_rt_chapter_posture_rejection_tests|horde_rt_rescue_rig_attachment_tests|horde_rt_rescue_adversarial_regression_tests)$"
+
+      - name: Check sparse forest bird audio provenance
+        run: python -m unittest discover -s tests -p test_forest_bird_audio.py -v
 
       - name: Check strict Android image-presentation analysis
         run: python -m unittest discover -s tests -p test_android_present_timing_analysis.py -v
@@ -345,3 +543,15 @@ jobs:
 
       - name: Check strict Android motion-presentation join
         run: python -m unittest discover -s tests -p test_android_motion_present_timing.py -v
+
+      - name: Check optional GPU stage submission joins
+        run: python -m unittest discover -s tests -p test_android_rt_stage_profile.py -v
+
+      - name: Check authored Keeper torch-transition attribution
+        run: python -m unittest discover -s tests -p test_keeper_torch_transition.py -v
+
+      - name: Check private sparse clock evidence admission
+        run: python -m unittest discover -s tests -p test_android_dispatch_clock.py -v
+
+      - name: Check isolated inverse-transform normal and tangent regressions
+        run: python -m unittest discover -s tests -p test_inverse_transform_candidate.py -v

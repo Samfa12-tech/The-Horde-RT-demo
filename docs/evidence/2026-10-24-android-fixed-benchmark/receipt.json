@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "timestampUtc": "2026-10-24T11:59:06.910980+00:00",
+  "headAtReceipt": "3898bceec8d14210c4d1d960aff9079d79065331",
+  "sourceStatus": "uncommitted bounded provisional fixed-output candidate; no device admission",
+  "hostPolicy": {
+    "checks": 77,
+    "failures": 0
+  },
+  "nativeDebugCompileAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "firstRun": {
+    "log": "native-build-r1.log",
+    "exitCode": 1,
+    "tests": 48,
+    "failures": 1,
+    "retainedXml": "OpeningBenchmarkOutputTest-r1-failure.xml",
+    "cause": "Undefined RTL margins serialized as explicit values; undefined setters marked absolute-only policy for resolution."
+  },
+  "focusedCorrection": {
+    "log": "java-output-r2.log",
+    "exitCode": 0,
+    "tests": 9,
+    "failures": 0
+  },
+  "lintFailure": {
+    "log": "java-package-r3.log",
+    "retainedXml": "lint-r3-failure.xml",
+    "cause": "New SuspiciousIndentation in conditional cancellation catch; explicit braces preserve predicate."
+  },
+  "final": {
+    "log": "java-package-r4.log",
+    "exitCode": 0,
+    "seconds": 15,
+    "junit": [
+      {
+        "name": "com.samfa12.hordelanternrt.OpeningBenchmarkStateTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.OpeningBenchmarkMenuLifecycleTest",
+        "tests": "15",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.OpeningBenchmarkOutputTest",
+        "tests": "9",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.EntryMenuStateTest",
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.SurfaceSuspensionLifecycleTest",
+        "tests": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.GraphicsMenuLifecycleTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.BenchmarkAutomationIntentTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "lint": {
+      "Warning": 80
+    }
+  },
+  "apk": {
+    "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "bytes": 206135428,
+    "sha256": "6ce0d20e8104b2a394a0784b470b526238ad4b0524b668d5a70e2965c310f28e",
+    "modifiedUtc": "2026-10-24T11:57:36.776722+00:00"
+  },
+  "ownedSourceSha256": {
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "25ef8f9f51e829cfaaee4d8702875cb86fe4fd38cb204778b573e78c68a2fceb",
+    "android/app/src/main/cpp/android_opening_benchmark.inl": "0187fcafa4eb83d021395d56b731ee967c66abb287f167037a538671d364bd0c",
+    "src/platform/android/AndroidBenchmarkOutputTransaction.h": "be41df466f9b86769bd46ba8d10ad9cea4be14cfae1985372e772598bc0e86ab",
+    "tests/WindowsBenchmarkMenuOwnerTests.cpp": "f1d8a05df5ee36aea32c08cc8136ee3b46cfea7da7b36f614f6f9746deb41423",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "35709ad5579e6f758e4b6a6ac90e3713be09a13ec37e9220425634754669ed2f",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java": "d2a1644a4efeea4b9c5a4b76f7c4ca72a7999211fc2bfe819e93615d7d195846",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/OpeningBenchmarkState.java": "541881f5f89bb5b626480545ea3e7a3b8b4f86d61ad5aec2cedb5b69e9339412",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/OpeningBenchmarkOutput.java": "fb05a55eecd0f1dfc4b16280634bc1e4e11aa0f98021573976d360d0d62c6428",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/OpeningBenchmarkClient.java": "4c0c1ae6f08d3990381ff02479bedb8c1cf3a694351ad1ecf7a7c58f48760805",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/OpeningBenchmarkStateTest.java": "aa85ab0f03838579edd9b05c915f31a6f4b93c7229b9cd08b47f5c5a12b86a43",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/OpeningBenchmarkMenuLifecycleTest.java": "81b500345659d58534f9e814dd952dfc1a12a81ee0143f8ef40da8f8e86d1751",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/OpeningBenchmarkOutputTest.java": "87fbeb31283d31851033fcb66918c36d9a503c0c7ab6675c91f4fa8f79732a19"
+  },
+  "phoneUsed": false,
+  "installed": false,
+  "actualHolderResizeValidated": false,
+  "actualCompletedRtProfileValidated": false,
+  "physicalLifecycleValidated": false,
+  "ranked": false,
+  "publicTransmission": false
+}

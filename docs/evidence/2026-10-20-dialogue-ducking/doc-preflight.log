@@ -1,0 +1,14 @@
+Combined design-record patch failed context preflight before writes:
+apply_patch verification failed: Failed to find expected lines in
+HORDE_1_7_RECOVERY_DECISIONS_FOR_MORNING_2026_10_20.md:
+existing forest/pond calls and waterfall audio are already implemented.
+
+The existing sentence begins with capital Existing and was not being changed.
+The combined patch applied no files. Replaced only exact current text in four
+records using an all-needles-validated-before-write helper; it confirmed that
+morning choices and the existing health/save audit stayed byte-equivalent.
+This was a documentation preflight error, not a code/build/test failure.
+
+Exact-six-row assertion initially failed: the copied inventory used straight quotes around safe area; the morning original uses curly quotes. Replaced only the copied table with the original text; no policy change. Both the original substring and bounded eight-line comparison now pass.
+
+The first staging audit verified the exact 43-file roster, all 12 frozen source blobs and every raw log byte, then failed a separate hard-coded expected log count (expected 16, actual 15; printed 17 was also a label typo). The log roster contains 11 top-level retained logs plus 4 ABI logs. Rechecked against their explicit filenames; all 15 are byte-exact. No source, build, test, policy or evidence-log omission was involved.

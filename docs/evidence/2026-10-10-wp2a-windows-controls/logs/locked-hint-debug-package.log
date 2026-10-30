@@ -1,0 +1,25 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 140
+    Start 140: horde_rt_final_windows_bundle_containment
+
+140: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tools/InspectRtPipelineBundleContainment.ps1" "-TargetPath" "<repo>/build/presets/windows-x64-debug/Debug/HordeLanternRT.exe" "-TargetPlatform" "Windows" "-Instrumentation" "Diagnostic" "-Quality" "High"
+140: Working Directory: <repo>/build/presets/windows-x64-debug
+140: Test timeout computed to be: 300
+140: {"target":"<user-home>\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe","targetPlatform":"Windows","instrumentation":"Diagnostic","quality":"High","targetSha256":"8daf640e32479783739a86a9ee431184d0d1121c6e2a107bbf5d343c0af2d7fd","targetBytes":11755008,"semanticKeys":["diagnostic_high_generic_dielectric","diagnostic_high_opaque_fast","rayquery_compute_diagnostic_high_generic_dielectric","rayquery_compute_diagnostic_high_opaque_fast"],"modules":[{"offset":7176432,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"2417de5cadd3e753a081ae8f2e26bdc7cfe30d8c02758e8247bda0fa927a5fdd","words":148880,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":true,"atomicInstructions":5},{"offset":7771952,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795","words":73990,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":true,"atomicInstructions":41},{"offset":8067920,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"6728cadff8b1dc2bc7d18d370b1bf6ccff1533908efd587a77e3848b7b940f95","words":149181,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":true,"atomicInstructions":5},{"offset":8664656,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"5f51a1b5175b29db3b5fb34eaa784fe3322607059b190fa770cd7835e3cef760","words":74052,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":true,"atomicInstructions":41}],"spirvVal":"passed","spirvDis":"passed"}
+1/1 Test #140: horde_rt_final_windows_bundle_containment ...   Passed   14.85 sec
+
+The following tests passed:
+	horde_rt_final_windows_bundle_containment
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  14.88 sec

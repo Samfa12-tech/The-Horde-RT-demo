@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-20",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "sourceBase": "32fdcab7864827c9689925d053322713ef1801a1",
+  "evidenceClass": "Host shared policy, native hidden HWND and Android UI tests, platform compilation; no new physical RT acceptance",
+  "sources": {
+    "CMakeLists.txt": {
+      "sha256": "da7435a3cff3326409e162b836f347ef81781695b1ca19e0ae52cc5aee6479c0",
+      "gitBlob": "3094d0976ebaf4d76b1660ea7140e089ac82b15a"
+    },
+    "android/app/src/main/cpp/android_probe_bridge.cpp": {
+      "sha256": "b034a25e75abd61be4f6c5295e1148ad5a54d60836e445ee97b412791d7a1999",
+      "gitBlob": "5fad68c4431d9644e18dd28ac4ea20fdf0eaeea1"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": {
+      "sha256": "daaff13de81acb5163eb9509eda18873b2eacacaeffbf878fde1a30919282ed1",
+      "gitBlob": "a5055ac0b7f2cf7d28d36d8628a9a7ba80a5eb06"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java": {
+      "sha256": "7d01c606863b9b7ab9d5e4f981ff87e8ed2277700da9ed40a32b3ee8cd836d19",
+      "gitBlob": "5eedcea99b65156ced5614ab904001b06c500dd8"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/LookoutObjectiveState.java": {
+      "sha256": "b80b6338996cf1fe947c83dd12bbcbd80ad555d10862a743d4939c59f778bc50",
+      "gitBlob": "10b5572cf296fb7d50c8145e3d51734549b90060"
+    },
+    "android/app/src/test/java/com/samfa12/hordelanternrt/LookoutObjectiveMenuTest.java": {
+      "sha256": "65905492e3005005d8c98f28d436e309510000dac1902ae6ad9da7a83cc6c05e",
+      "gitBlob": "edeeb30c98602588868e583bcf8beace0319d5ac"
+    },
+    "src/gameplay/campaign/LookoutObjective.h": {
+      "sha256": "8af2e01b5be168c7a93223efed06db33a88c979b34e84fb37d2f6393d581ae7a",
+      "gitBlob": "fdad86ee8fb704664b047f6a5f7d2f79ffc26b63"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "sha256": "d5e0c724840e6ba8b21a46f1fad00a36405d5ef181bae56398232e571a1d02d5",
+      "gitBlob": "2f531ebc376b851575c482adcc87ae8f794c79fc"
+    },
+    "src/platform/windows/WindowsLookoutObjectivePanel.h": {
+      "sha256": "4ae4aa76caabbc8dc825faba72efb63d9a61ac853efa0afa5c10c8ec8f34138b",
+      "gitBlob": "0e9e52a51040c85e2846b6d413f308a718058b1c"
+    },
+    "tests/WindowsLookoutObjectivePanelTests.cpp": {
+      "sha256": "d1d0c64cd15b4b65cc9645730a1c96ae61c7b61b62e809e4f613a58998acc447",
+      "gitBlob": "04b246ae7eba4b64b0a12a83cada6ac1a8a24ceb"
+    },
+    "tests/CampaignCheckpointTests.cpp": {
+      "sha256": "ef9f00256dbcd13eacbd475cefb59cc118921889eca440e51f88d42073afec83",
+      "gitBlob": "66bf8dd05eabe79d89e8e1fa17a55105811fbefb"
+    },
+    "tests/CampaignPlaySessionTests.cpp": {
+      "sha256": "499151c3b132b9fdf26e70b072fff2f3ac45691c2b464e99f800860550e2d9b9",
+      "gitBlob": "c2dfb3b7518f68b6e798b2fa4ffc77ad0dd6373a"
+    }
+  },
+  "java": {
+    "suites": 52,
+    "tests": 381,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "native": {
+    "configuration": "windows-x64-release",
+    "checkpointChecks": 1026,
+    "playSessionChecks": 145,
+    "panelFinalChecks": 44,
+    "finalFailures": 0,
+    "initialPanelFailure": "Foreground owner changed; cause unrecorded/unknown. Failed logs retained. Assertion not weakened."
+  },
+  "artifacts": {
+    "androidDebug": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 186149765,
+      "sha256": "a0f302c02707d673df5e448e4f1a9a471f7b19b177ce1546e5787efa9c6c60e1",
+      "nativeAbis": [
+        "arm64-v8a",
+        "armeabi-v7a",
+        "x86",
+        "x86_64"
+      ],
+      "installedOrLaunched": false
+    },
+    "windowsRelease": {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4600320,
+      "sha256": "7850d2420485bf139bb5b558c4228de367ef6ad5d7d07ef7283e82a4d1d019a6",
+      "launched": false
+    }
+  },
+  "phone": {
+    "newInstallation": false,
+    "newLaunch": false,
+    "fixtureStaged": false,
+    "workStoppedForOwnerUnplug": true,
+    "installedApkSha256": "c5a11bb287327900327b2266c313f53d4a77ad02d2b94d5787ef81cb23269707",
+    "savedMist": false,
+    "pending": false,
+    "priorSettingsAndAll12CampaignFilesUnchanged": true
+  },
+  "scopeLimits": [
+    "No physical panel, controller, lookout load or full-route acceptance",
+    "No Keeper preparation, arm, timing or combat retry",
+    "No new performance claim or quality reduction",
+    "No public push, release, merge or Reef operation"
+  ]
+}

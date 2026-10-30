@@ -219,7 +219,14 @@ function Get-ExpectedShowcaseInstanceCapacity {
         $abi.capacities.tlasInstances -gt 256) {
         throw 'The checkout has no valid generated showcase TLAS instance capacity.'
     }
-    return [int]$abi.capacities.tlasInstances
+    # This legacy helper name predates the storage/live-count split. A normal
+    # device witness must prove its actual profile, not diagnostic spare slots.
+    $ordinaryCount = $abi.sceneCounts.ordinaryShowcaseTlasInstances
+    if (($ordinaryCount -isnot [int] -and $ordinaryCount -isnot [long]) -or
+        $ordinaryCount -lt 1 -or $ordinaryCount -gt $abi.capacities.tlasInstances) {
+        throw 'The checkout has no valid ordinary Showcase live-instance count.'
+    }
+    return [int]$ordinaryCount
 }
 
 function New-ScopedLogcatArguments {
@@ -557,7 +564,7 @@ function Invoke-CaptureCheckpoint {
         $failures.Add("$Checkpoint lacks the requested anatomical gameplay profile or nonduplicating primary ownership.")
     }
     if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne $expectedShowcaseInstanceCapacity) {
-        $failures.Add("$Checkpoint reported $($state.tlasInstanceCount) TLAS instances instead of this checkout's generated capacity $expectedShowcaseInstanceCapacity.")
+        $failures.Add("$Checkpoint reported $($state.tlasInstanceCount) TLAS instances instead of this checkout's ordinary profile count $expectedShowcaseInstanceCapacity.")
     }
     $image = Save-Screenshot ("capture-{0:d2}-{1}-{2}" -f $Index, $Checkpoint, $RequestedScale)
     $captureRecords.Add([PSCustomObject]@{
@@ -920,7 +927,7 @@ function Invoke-CheckpointBenchmark {
         $failures.Add("$Checkpoint benchmark lacks the requested anatomical gameplay profile or nonduplicating primary ownership.")
     }
     if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne $expectedShowcaseInstanceCapacity) {
-        $failures.Add("$Checkpoint benchmark reported $($state.tlasInstanceCount) TLAS instances instead of this checkout's generated capacity $expectedShowcaseInstanceCapacity.")
+        $failures.Add("$Checkpoint benchmark reported $($state.tlasInstanceCount) TLAS instances instead of this checkout's ordinary profile count $expectedShowcaseInstanceCapacity.")
     }
     if ($RtWorkload -ge 0 -and [int]$state.rtLab.workloadPreset -ne $RtWorkload) {
         $failures.Add("$Checkpoint $RtLabProfile state reported workload $($state.rtLab.workloadPreset) instead of $RtWorkload.")

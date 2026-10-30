@@ -1,0 +1,40 @@
+{
+  "file": "reports/devlog-2026-10-20-wide-landing/193-chapter-landing-north.png",
+  "sha256": "826c0dfab6335c659770da0d1dd56cf0f05288bcf079c33dfe8444c515838284",
+  "width": 960,
+  "height": 540,
+  "source": "unaltered native RT storage image; existing b2d548a2 Debug binary",
+  "executableSha256": "fc2997bd424f8f3e026a58a1b9673c9207802578e87961b8cb5412fbf154d746",
+  "device": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672
+  },
+  "backend": "RayTracingPipeline",
+  "shaderBundle": {
+    "opaqueFast": {
+      "key": "diagnostic_high_opaque_fast",
+      "sha256": "990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_high_generic_dielectric",
+      "sha256": "938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a"
+    }
+  },
+  "settlingFrames": 12,
+  "view": "existing chapter-landing-north; hidden native window; no desktop or phone input",
+  "promotionAccepted": false,
+  "review": "Wider shaft/trees composition but dark foreground, noisy ground and simple unfinished horizon; diagnostic only; no Library upload or image edits",
+  "manifestSha256": "2796c4ad0b3e10cf89f7fd6b61a00163a8555ab4697b392ec7593bfb292fcab3",
+  "process": {
+    "pid": 34152,
+    "processStartUtc": "2026-10-20T08:19:14.0542346Z",
+    "startedUtc": "2026-10-20T08:19:14.0448470Z",
+    "finishedUtc": "2026-10-20T08:19:39.3604919Z",
+    "exitCode": 0,
+    "timedOut": false,
+    "output": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\devlog-2026-10-20-wide-landing",
+    "tomb": true,
+    "executableSha256": "fc2997bd424f8f3e026a58a1b9673c9207802578e87961b8cb5412fbf154d746"
+  }
+}

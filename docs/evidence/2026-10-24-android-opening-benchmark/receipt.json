@@ -1,0 +1,92 @@
+{
+  "scope": "Custom-only Android opening-menu benchmark; no install or device acceptance",
+  "host": {
+    "target": "horde_rt_windows_benchmark_menu_owner_tests",
+    "checks": 63,
+    "failures": 0,
+    "seconds": 1.74
+  },
+  "androidBuild": {
+    "passed": true,
+    "seconds": 99,
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "task": "assembleDebug lintDebug testDebugUnitTest (six focused classes)",
+    "log": "native-build-r1.log"
+  },
+  "java": [
+    {
+      "name": "OpeningBenchmarkStateTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "OpeningBenchmarkMenuLifecycleTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "EntryMenuStateTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "SurfaceSuspensionLifecycleTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "GraphicsMenuLifecycleTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "BenchmarkAutomationIntentTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "lint": {
+    "severity": "Warning",
+    "count": 79
+  },
+  "apk": {
+    "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 200596480,
+    "sha256": "00a74c39115dd9b4874748598a2321f055b9e1e95bde368b1ee3b5c3c0e1f8c5"
+  },
+  "fixedOutputImplemented": false,
+  "nativeRuntimePresentationValidated": false,
+  "basis": "6797e9d3c6ca06fafeb456d44a109e6db6ff1f7a",
+  "sourceSha256": {
+    "android/app/src/main/cpp/android_campaign_bridge.inl": "a621ce12354ebf6755519b3f9824bcf34d3688c762c3d68f3ec18688798ab572",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "52c67aeec5dea2453674dc08ab94f612974bc2ba3abe63e3c9e1bc8185af13e6",
+    "android/app/src/main/cpp/android_opening_benchmark.inl": "49ef840839ea9bb121c62e6d237de3c87020c95f8cb4c0a00be62cdfa54e22bc",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "cd7dfff4820f5c0bf8c3a3e1fcaa622fa9f298018dddcb54a32b580321d18901",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java": "fea7529321d3a4575a5666440bb821e21c8b92dd921ea60dde4f5ef135d3b78e",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/OpeningBenchmarkState.java": "28297dbf0d66307eabad2228e4ca0302258c635629e5eb3917012c8088a56f8e",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/OpeningBenchmarkMenuLifecycleTest.java": "612eccc94f2a680e7702643ef62665082a74e354b8f27dae8a1fc44100824410",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/OpeningBenchmarkStateTest.java": "92ac7c4c55179aa37c2018f80cab960a7fd4679f7ff5086eea1cc0ab06156ddc",
+    "src/graphics/OpeningBenchmarkOwner.h": "7518a68a53e1e33ea3b48ca0a124b1b923732ac12dd0abbc71ecfa49645880d0",
+    "src/platform/android/AndroidOpeningBenchmarkOwner.h": "79c63d7eb8d8600cab6faad8679edcda78bda26ab42b43a76d48f5359aa3457e",
+    "src/platform/windows/WindowsBenchmarkMenuOwner.h": "9a4b6d12b76be143e54677e4f773fe6252357f51adc673ad7b1cc3450d2faebc",
+    "tests/WindowsBenchmarkMenuOwnerTests.cpp": "0ed859b91af2fde662d93573852acd81d5fc49faabef8818281c2a7664a69e83"
+  },
+  "noPhoneOperations": true
+}

@@ -16,6 +16,7 @@ import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -46,6 +47,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
@@ -96,11 +98,26 @@ import java.util.UUID;
 import org.json.JSONObject;
 
 public class MainActivity extends Activity {
+    private boolean environmentSurveyMode;
+    private boolean environmentSurveyFinishing;
+    private EnvironmentSurveyRequest environmentSurveyRequest;
+    private long environmentSurveyStartedAt;
+
     private static final String TAG = "HordeLanternAudio";
     private static final String PREFS = "horde_lantern_alpha_settings";
     private static final String PREF_MUSIC_VOLUME = "music_volume";
+    private static final String PREF_CHAPTER_SUBTITLES = "chapter_subtitles_enabled";
+    private static final String PREF_CHAPTER_SUBTITLE_SIZE = "chapter_subtitle_size_percent";
+    private static final String PREF_CHAPTER_SUBTITLE_POSITION = "chapter_subtitle_position";
+    private static final String PREF_CHAPTER_SUBTITLE_BACKING = "chapter_subtitle_backing";
+    private static final String PREF_CHAPTER_VOICE_VOLUME = "chapter_voice_volume";
+    static final int SUBTITLE_POSITION_AUTO = 0;
+    static final int SUBTITLE_POSITION_TOP = 1;
+    static final int SUBTITLE_POSITION_BOTTOM = 2;
+    static final int SUBTITLE_INPUT_TOUCH = 0;
+    static final int SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER = 1;
     static final String PREF_RENDER_SCALE = "render_scale";
-    static final int DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT = 75;
+    static final int DEFAULT_ANDROID_RT_RENDER_SCALE_PERCENT = GraphicsPreferences.mobileDefaults().scale;
     private static final String PREF_RT_LAB_UNLOCKED = "rt_lab_unlocked";
     private static final String REPORT_DIRECTORY = "reports";
     private static final String ACTION_BENCHMARK = "com.samfa12.hordelanternrt.action.BENCHMARK";
@@ -118,6 +135,8 @@ public class MainActivity extends Activity {
     private static final String LICH_ASSET = "models/enemies/meshy/lich_placeholder_merged_animations_v01.glb";
     private static final String LICH_FILE = "lich_placeholder_merged_animations_v01.glb";
     private static final String EXTRA_DEBUG_CHECKPOINT = "horde.debug.checkpoint";
+    private static final int DEBUG_COMBAT_PRACTICE_PARRY = 1;
+    private static final int DEBUG_COMBAT_PRACTICE_DODGE = 2;
     private static final String EXTRA_DEBUG_CAPTURE = "horde.debug.capture";
     private static final String EXTRA_DEBUG_REPLAY = "horde.debug.replay";
     private static final String EXTRA_DEBUG_MOTION = "horde.debug.motion";
@@ -147,6 +166,8 @@ public class MainActivity extends Activity {
     private static final int REQUEST_SAVE_PLAYTEST = 7102;
     private static final int REQUEST_SAVE_BENCHMARK_SUMMARY = 7103;
     private BenchmarkSummaryReview benchmarkSummaryReview;
+    private StatisticsReportSendControls benchmarkSummarySendControls;
+    private CompatibilityReportDialog compatibilityReportDialog;
     private boolean benchmarkSummaryVisible;
     private long benchmarkSummaryFormGeneration, benchmarkSummaryPickerToken, benchmarkSummaryPickerGeneration;
     private BenchmarkSummaryReview benchmarkSummaryPickerReview;
@@ -201,6 +222,16 @@ public class MainActivity extends Activity {
     private static final int PLATFORM_EVENT_SKELETON_INCIDENTAL = 20;
     private static final int PLATFORM_EVENT_PLAYER_SWORD_ATTACHMENT_CHANGED = 22;
     private static final int PLATFORM_EVENT_SKELETON_ENCOUNTER_WARNING = 23;
+    private static final int PLATFORM_EVENT_PARRY_PREPARE_CUE = 24;
+    private static final int PLATFORM_EVENT_LICH_DISCHARGE_WARNING = 25;
+    private static final int PLATFORM_EVENT_PLAYER_WET_FOOTSTEP = 26;
+    private static final float PLAYER_DRY_FOOTSTEP_GAIN = 0.29f;
+    private static final float PLAYER_WET_FOOTSTEP_GAIN = 1.0f;
+    private static final int PLATFORM_EVENT_WATERFALL_CONTACT = 27;
+    private static final int PLATFORM_EVENT_FOREST_BIRD = 28;
+    private static final int PLATFORM_EVENT_FOREST_BIRD_STOPPED = 29;
+    private static final int PLATFORM_EVENT_FOREST_CRICKETS = 30;
+    private static final int PLATFORM_EVENT_POND_FROGS = 31;
     private static final int EQUIPMENT_AUDIO_SWORD_DRAW = 1;
     private static final int EQUIPMENT_AUDIO_SWORD_SHEATH = 2;
     private static final int ENTITY_LICH = 3;
@@ -216,11 +247,17 @@ public class MainActivity extends Activity {
     private static final int HAPTIC_FATAL = 2;
     private static final int HAPTIC_PARRY = 3;
     private static final long ENEMY_IMPACT_FALL_DELAY_MILLISECONDS = 140L;
+    private static final long COMBAT_TEACHING_PROMPT_REFRESH_MILLISECONDS = 32L;
     private static final int CONTEXTUAL_INTERACT = 1;
     private static final int CONTEXTUAL_RAISE = 2;
     private static final int CONTEXTUAL_LOWER = 4;
     private static final int CHEST_PROMPT_SHIFT = 3;
     private static final int CHEST_PROMPT_MASK = 7 << CHEST_PROMPT_SHIFT;
+    private static final int RESCUE_PROMPT_SHIFT = 6;
+    private static final int RESCUE_PROMPT_MASK = 7 << RESCUE_PROMPT_SHIFT;
+    private static final int CONTEXTUAL_RESCUE_MODE = 1 << 9;
+    private static final int CONTEXTUAL_FLASK_UPGRADE = 1 << 12;
+    private static final int CONTEXTUAL_RAISE_OBJECTIVE = 1 << 13;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -234,6 +271,9 @@ public class MainActivity extends Activity {
     private final int[] activePointers = {-1, -1};
     private final AndroidControllerInput controllerInput = new AndroidControllerInput();
     private boolean controllerMode, controllerFrameScheduled;
+    private long debugContextualGeneration = -1;
+    private int debugContextualBits = Integer.MIN_VALUE, debugContextualGates = -1;
+    private String lastHudLayoutWitness;
     private Configuration lastAppliedConfiguration;
     private boolean controllerWindowFocused = true;
     private long controllerFrameTime;
@@ -242,6 +282,27 @@ public class MainActivity extends Activity {
     private final ArrayList<AlertDialog> controllerDialogs = new ArrayList<>();
     private final Set<AlertDialog> controllerFocusedDialogs = new HashSet<>();
     private TextView controllerPrompt;
+    private TextView combatTeachingPrompt;
+    private FrameLayout appRoot;
+    private LinearLayout chapterSubtitlePanel;
+    private ScrollView chapterSubtitleScroll;
+    private TextView chapterSubtitleText;
+    private long chapterSubtitleGeneration = Long.MIN_VALUE;
+    private long chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
+    private final ChapterSubtitlePlacement chapterSubtitlePlacement = new ChapterSubtitlePlacement();
+    private int latestSubtitleInputMode = SUBTITLE_INPUT_TOUCH;
+    private long chapterVoiceGeneration = Long.MIN_VALUE;
+    private int chapterVoiceStream;
+    private PrivateLichRevivalAudio privateLichRevivalAudio;
+    private int chapterAmbienceStream;
+    private boolean chapterAmbienceDialogueActive;
+    private boolean chapterVoicePaused;
+    private boolean chapterSubtitleOverflowReported;
+    private String combatTeachingFadeText = "";
+    private boolean combatAttackCueVisible;
+    private boolean combatPracticeCueVisible;
+    private int combatTeachingFadeOpacity;
+    private long combatTeachingFadeStartedAtMs;
     private final InputManager.InputDeviceListener controllerDevices = new InputManager.InputDeviceListener() {
         @Override public void onInputDeviceAdded(int deviceId) { /* Connection alone never takes over touch. */ }
         @Override public void onInputDeviceChanged(int deviceId) {
@@ -277,11 +338,20 @@ public class MainActivity extends Activity {
     private Button attackButton;
     private Button parryButton;
     private Button dodgeButton;
+    private Button runButton;
+    private Button crouchButton;
+    private int crouchControlKeys;
+    private int crouchBlockedControlKeys;
+    private boolean crouchTraversalOwned;
     private PressActionButton swingTouch, dodgeTouch;
+    private boolean runToggleEnabled;
     private Button interactButton;
     private Button toggleHeldLightPoseButton;
     private boolean parryRequestedOnTouchDown;
     private boolean parryTouchActive;
+    private int parryTouchPointerId = -1;
+    private boolean publishedGuardHeld;
+    private boolean keyboardGuardHeld;
     private SoundPool soundPool;
     private HordeAmbiencePlayback waterfallPlayback;
     private MenuAmbiencePlayback menuAmbience;
@@ -309,19 +379,36 @@ public class MainActivity extends Activity {
     private boolean diagnosticsErrorState;
     private boolean autoDiagnosticsShown;
     private boolean firstMenu = true;
+    private AlertDialog backExitDialog;
     private int swingVariant;
     private int playerStepVariant;
     private int enemyStepVariant;
     private int diagnosticsRefreshTick;
     private int pendingDebugCheckpoint = -1;
+    private int pendingDebugCombatPractice = -1;
     private boolean pendingDebugCapture;
     private boolean pendingDebugReplay;
     private String pendingDebugMotion, pendingDebugMotionId;
+    private PerformanceProfileRequest.PresentationGate pendingDebugMotionGraphics;
     private boolean debugMotionActive;
     private boolean debugAutomationAutostart;
     private boolean developerOverlayVisible;
     private boolean debugCaptureUiSuppressed;
+    private int verticalProofFeedbackCheckpoint = -1;
+    private int verticalProofFeedbackDiagnosticCount;
     private boolean benchmarkRunning;
+    private long openingBenchmarkRequest, openingBenchmarkRequestGeneration;
+    private boolean openingBenchmarkCancelRequested, openingBenchmarkBlocked;
+    private Button openingBenchmarkButton;
+    private Button openingBenchmarkProvisionalButton;
+    private boolean openingBenchmarkProvisional;
+    private OpeningBenchmarkOutput openingBenchmarkOutput;
+    // Process lifetime fallback covers finish/swipe without onSaveInstanceState.
+    // This immutable DTO contains no View, Context, renderer or mutable phase.
+    private static OpeningBenchmarkClient openingBenchmarkClientFallback;
+    private OpeningBenchmarkClient openingBenchmarkRecoveryClient;
+    private boolean openingBenchmarkRecovered, openingBenchmarkRecoveredComplete;
+    private boolean openingBenchmarkRecoveryRejected, openingBenchmarkRecoveryLaunch, openingBenchmarkRecoveryStoragePending;
     private boolean benchmarkStatusExpanded;
     private boolean benchmarkReportVisible;
     private View.OnLayoutChangeListener configurationLayoutListener;
@@ -377,7 +464,9 @@ public class MainActivity extends Activity {
     private int graphicsLatencyPollCount;
     private TextView graphicsTelemetry;
     private String graphicsDetailedStatus = "";
-    private Button graphicsApply, graphicsConfirm, graphicsRevert, graphicsBack;
+    private Button graphicsApply, graphicsRevert, graphicsBack;
+    // Only an explicit Apply owns persistence; live preview comparisons never do.
+    private long graphicsSaveSerial, graphicsSaveGeneration;
     private boolean rtLabReturnToEnding;
     private TextView rtLabTelemetry;
     private int rtWaterfallWidthPercent = 100;
@@ -397,7 +486,12 @@ public class MainActivity extends Activity {
     private final int[] rtLightHueDegrees = {0, 0, 0, 0};
     private final int[] rtLightIntensityPercent = {100, 100, 100, 100};
     private int rtWorkloadPreset = 1;
-    private boolean retryPending;
+    private int keyboardFlaskHeld,keyboardFlaskBlocked;
+    private boolean startupAssetsPrepared,startupAssetsPending,startupAssetsFailed,startupUiVisible,startupEntryFailed;
+    private long startupAssetsAttempt,entryMenuAdmittedGeneration, startupCompatibilityAttempt;
+    private int startupShownRuntime=-1;
+    private boolean retryPending, confirmedRetryPending;
+    private long confirmedRetryRequestFloor, confirmedRetryStarted;
     private boolean updateCheckInFlight;
     private boolean updatePromptShown;
     private boolean startupUpdateCheckScheduled;
@@ -407,6 +501,7 @@ public class MainActivity extends Activity {
     private int lastPlayerLifePhase = PLAYER_ALIVE;
     private int lastPlayerVitality = 3;
     private int lastPlayerMaxVitality = 3;
+    private boolean lastPlayerHalfHeart;
     private long delayedGameplayFeedbackGeneration;
     static int renderScalePercent(final SharedPreferences preferences) {
         return preferences.getInt(PREF_RENDER_SCALE,
@@ -441,9 +536,39 @@ public class MainActivity extends Activity {
             handler.postDelayed(this, 250L);
         }
     };
+    private static final java.util.concurrent.atomic.AtomicLong campaignActivityEpochs=
+            new java.util.concurrent.atomic.AtomicLong();
+    private final long campaignConfigurationEpoch=campaignActivityEpochs.incrementAndGet();
+    private static final String CAMPAIGN_SURFACE_UNAVAILABLE=
+            "Saved games are unavailable right now. Please try again.";
+    private CampaignMenuState campaignState;
+    private boolean campaignMenuVisible, campaignConfigured, campaignLoadedReady, campaignPublicationValid;
+    private boolean campaignFromDeath, campaignDeathLoadCommitted, campaignReturnToDeathWhenSettled;
+    private long campaignDeathLoadRequest;
+    private String campaignDeathMessage;
+    private volatile boolean campaignDestroyed;
+    private String campaignTestNamespace, campaignLocalMessage;
+    private int campaignMenuAction=CampaignMenuState.LOAD, campaignAction;
+    private long campaignRequest, campaignAcknowledgedToken, campaignAcknowledgedGeneration;
+    private long campaignRebaseAttemptToken, campaignRebaseAttemptGeneration, campaignRebaseAttemptRevision;
+    private AlertDialog campaignConfirmation;
+    private boolean lookoutObjectiveVisible;
+    private long lookoutObjectiveEpoch;
+    private LookoutObjectiveState lookoutObjectiveState;
+    private LinearLayout lookoutObjectivePanel;
+    private final Runnable refreshCampaignMenu = new Runnable() {
+        @Override public void run() {
+            if(campaignDestroyed || !resumed || (!campaignMenuVisible && campaignRequest==0 && !confirmedRetryPending)) return;
+            pollCampaignMenu();
+            handler.postDelayed(this, 150L);
+        }
+    };
+
     private final Runnable refreshEntryMenu = new Runnable() {
         @Override public void run() {
             if (!entryMenuEnabled || !resumed || surfaceRequestGeneration == 0) return;
+            if (openingBenchmarkPending()) return; // The separate owner poll cannot complete campaign Play.
+            if(campaignMenuVisible) { handler.postDelayed(this,200L); return; }
             final EntryMenuState state;
             try { state = EntryMenuState.decode(ProbeBridge.getEntryMenuState()); }
             catch (RuntimeException | LinkageError unavailable) {
@@ -455,7 +580,7 @@ public class MainActivity extends Activity {
                 handler.postDelayed(this, 100L);
                 return;
             }
-            if (entryPlayRequested && state.completedPlay(surfaceRequestGeneration)) {
+            if (!campaignMenuVisible && entryPlayRequested && state.completedPlay(surfaceRequestGeneration)) {
                 entryPlayRequested = false;
                 entryMenuEnabled = false;
                 handler.removeCallbacks(this);
@@ -475,48 +600,88 @@ public class MainActivity extends Activity {
                         surfaceRequestGeneration); }
                 catch (RuntimeException | LinkageError ignored) { /* Keep the failure visible for manual recovery. */ }
             }
+            if(startupUiVisible) {
+                if(isMenuRuntimeReady()) {showMainMenu(false);return;}
+                if(state.phase==EntryMenuState.PHASE_FAILURE) {startupEntryFailed=true;showStartupLoading();}
+            }
             updateEntryMenuPresentation(state);
             handler.postDelayed(this, state.phase == EntryMenuState.PHASE_LOADING ? 100L : 200L);
+        }
+    };
+
+    private final Runnable refreshOpeningBenchmark = new Runnable() {
+        @Override public void run() {
+            if(!openingBenchmarkPending() || !resumed) return;
+            pollOpeningBenchmark();
+            if(openingBenchmarkPending()) handler.postDelayed(this,100L);
         }
     };
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Consume the explicit diagnostic action before any normal settings, input,
+        // campaign worker, entry menu or SurfaceView is configured.
+        if (EnvironmentSurveyRequest.isSurvey(getIntent())) {
+            environmentSurveyMode = true;
+            createEnvironmentSurvey(savedInstanceState);
+            return;
+        }
+        selectOpeningBenchmarkRecovery(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
+        final View hudRoot=findViewById(R.id.root);
+        hudRoot.setOnApplyWindowInsetsListener((view,insets) -> {
+            view.post(this::applyInterfacePresentation);
+            return insets;
+        });
+        hudRoot.addOnLayoutChangeListener((view,l,t,r,b,ol,ot,or,ob) -> {
+            if(r-l!=or-ol || b-t!=ob-ot)view.post(this::applyInterfacePresentation);
+        });
+        hudRoot.requestApplyInsets();
         lastAppliedConfiguration = new Configuration(getResources().getConfiguration());
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+        if(!openingBenchmarkRecoveryLaunch)applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
         rtLabUnlocked = preferences.getBoolean(PREF_RT_LAB_UNLOCKED, false);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        ProbeBridge.resetRtSceneTuning();
+        if(!openingBenchmarkRecoveryLaunch)ProbeBridge.resetRtSceneTuning();
         graphicsConfirmed = GraphicsPreferences.confirmed(preferences);
-        graphicsRecovering = GraphicsPreferences.hasPending(preferences);
+        graphicsRecovering = !openingBenchmarkRecoveryLaunch && GraphicsPreferences.hasPending(preferences);
         if (graphicsRecovering) {
             final GraphicsPreferences.Values retained = GraphicsPreferences.retainedCandidate(preferences);
             graphicsRecoveryNotice = "An unconfirmed graphics change was interrupted. Restoring " + graphicsConfirmed.scale +
                     "% / water " + waterName(graphicsConfirmed.water) + ". Retained request: " + retained.scale +
                     "% / water " + waterName(retained.water) + "; it has not been confirmed.";
         }
-        setNativeGraphics(graphicsConfirmed);
-        if (!consumeBenchmarkAutomationIntent(getIntent(), true)) consumeDebugAutomationIntent(getIntent());
+        if(!openingBenchmarkRecoveryLaunch) {
+            setNativeGraphics(graphicsConfirmed);
+            if (!consumeBenchmarkAutomationIntent(getIntent(), true)) consumeDebugAutomationIntent(getIntent());
+        }
 
         surfaceView = findViewById(R.id.scene_surface);
         surfaceView.setHapticFeedbackEnabled(true);
         menuScrim = findViewById(R.id.menu_scrim);
         diagnosticsPanel = findViewById(R.id.diagnostics_panel);
         reportTextView = findViewById(R.id.report_text);
+        findViewById(R.id.compatibility_report).setOnClickListener(view -> showCompatibilityReport());
         rtStatus = findViewById(R.id.rt_status);
         developerOverlay = findViewById(R.id.developer_overlay);
         menuButton = findViewById(R.id.menu_button);
         attackButton = findViewById(R.id.attack_button);
         parryButton = findViewById(R.id.parry_button);
         dodgeButton = findViewById(R.id.dodge_button);
+        runButton = findViewById(R.id.run_button);
+        crouchButton = findViewById(R.id.crouch_button);
+        crouchButton.setVisibility(View.GONE);
+        runButton.setVisibility(View.GONE);
         interactButton = findViewById(R.id.interact_button);
         toggleHeldLightPoseButton = findViewById(R.id.toggle_held_light_pose_button);
         vitalityStatus = findViewById(R.id.vitality_status);
         controllerPrompt = findViewById(R.id.controller_prompt);
+        combatTeachingPrompt = findViewById(R.id.combat_teaching_prompt);
+        appRoot = findViewById(R.id.root);
+        createChapterDialogueOverlay();
         inputManager = (InputManager)getSystemService(Context.INPUT_SERVICE);
         if (inputManager != null) inputManager.registerInputDeviceListener(controllerDevices, handler);
         keeperRevealTitle = findViewById(R.id.keeper_reveal_title);
@@ -526,16 +691,21 @@ public class MainActivity extends Activity {
         styleActionButton(attackButton, 0xDD5B210D, 0xFFFFE0A3);
         styleActionButton(parryButton, 0xDD263B42, 0xFFE5F7FF);
         styleActionButton(interactButton, 0xDD5C4216, 0xFFFFE5A8);
+        styleActionButton(runButton, 0xDD5C4216, 0xFFFFE5A8);
+        styleActionButton(crouchButton, 0xDD5C4216, 0xFFFFE5A8);
         styleActionButton(toggleHeldLightPoseButton, 0xDD173E34, 0xFFE2FFF0);
         applyInterfacePresentation();
         findViewById(R.id.root).setOnApplyWindowInsetsListener((view,insets) -> {
             if(menuVisible) applyInterfacePresentation(); // Never move an action under a held finger.
+            reflowChapterDialoguePlacement();
             return insets;
         });
+        appRoot.addOnLayoutChangeListener((view, left, top, right, bottom,
+                oldLeft, oldTop, oldRight, oldBottom) -> reflowChapterDialoguePlacement());
         styleActionButton(diagnosticsBack, 0xCC211B15, 0xFFFFD28A);
-        menuButton.setContentDescription(getString(R.string.menu));
+        menuButton.setContentDescription(getString(R.string.pause_menu));
         attackButton.setContentDescription(getString(R.string.swing));
-        parryButton.setContentDescription(getString(R.string.parry));
+        parryButton.setContentDescription(getString(R.string.parry_accessibility));
         dodgeButton.setContentDescription(getString(R.string.dodge));
         interactButton.setContentDescription(getString(R.string.interact));
         toggleHeldLightPoseButton.setContentDescription(getString(R.string.lower_lantern));
@@ -550,12 +720,18 @@ public class MainActivity extends Activity {
             registerDebugRetryReceiver();
         }
 
-        initialiseAudio();
-        musicPlayback = new HordeMusicPlayback(this, musicVolumePercent());
-        musicPlayback.setOnFocusChanged(() -> {
-            if (!isMusicAudioFocusGranted() && menuAmbience != null) menuAmbience.stop();
-        });
-        handler.post(menuAmbienceFrame);
+        if(!openingBenchmarkRecoveryRejected) {
+            initialiseAudio();
+            musicPlayback = new HordeMusicPlayback(this, musicVolumePercent());
+            musicPlayback.setOnFocusChanged(() -> {
+            if (!isMusicAudioFocusGranted()) {
+                if (menuAmbience != null) menuAmbience.stop();
+                stopChapterAmbience();
+                stopPrivateLichRevivalAudio();
+            }
+            });
+            handler.post(menuAmbienceFrame);
+        }
         menuButton.setOnClickListener(view -> {
             playSound("menu_toggle", 0.20f);
             showMainMenu(false);
@@ -569,30 +745,185 @@ public class MainActivity extends Activity {
         });
 
         configureTouchControls();
-        entryMenuEnabled = shouldUseEntryMenu(true);
-        if (entryMenuEnabled) {
+        recoverOpeningBenchmarkClient(); // Views exist; decide identity before any holder/start mutation.
+        entryMenuEnabled = openingBenchmarkRecoveryLaunch || shouldUseEntryMenu(true);
+        if (entryMenuEnabled && !openingBenchmarkRecoveryRejected) {
             entryMenuSidePage = false;
             try { ProbeBridge.setEntryMenu(true, false, isReducedMotionEnabled(), false, 0); }
             catch (RuntimeException | LinkageError unavailable) { /* Report through the entry screen after views exist. */ }
         }
         configureSurface();
-        collectInitialDiagnostics();
+        openingBenchmarkRecoveryStoragePending=openingBenchmarkPending();
+        if(!openingBenchmarkPending() && !openingBenchmarkRecoveryRejected)configureCampaignStorage();
+        if(!openingBenchmarkRecoveryLaunch)collectInitialDiagnostics();
         showMainMenu(true);
         handler.post(runtimePoll);
         scheduleStartupUpdateCheck();
     }
 
-    private void collectInitialDiagnostics() {
+    private void createEnvironmentSurvey(Bundle restored) {
+        environmentSurveyRequest = EnvironmentSurveyRequest.parse(getIntent(), BuildConfig.DEBUG, restored == null);
+        if (environmentSurveyRequest == null) {
+            Log.e("HordeEnvironmentSurvey", "Rejected survey: Debug cold start and closed typed request required");
+            environmentSurveyFinishing = true;
+            finishAndRemoveTask();
+            return;
+        }
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         try {
-            final String textReport = ProbeBridge.getTextReport();
-            final String jsonReport = ProbeBridge.getJsonReport();
-            final String filesRoot = getFilesDir().getAbsolutePath();
+            // Reading confirmed quality does not begin/recover/commit a preference transaction.
+            final GraphicsPreferences.Values quality = GraphicsPreferences.confirmed(getSharedPreferences(PREFS, MODE_PRIVATE));
+            stageRuntimeAssetCache();
+            final boolean keeper=environmentSurveyRequest.keeperMist;
+            if (keeper && quality.scale!=40) {finishEnvironmentSurvey(3);return;}
+            final boolean configured=keeper ? ProbeBridge.configureKeeperMistFixture(environmentSurveyRequest.requestId,
+                    quality.scale,quality.water,quality.fire,quality.cap,quality.glassEnabled,quality.shadow,
+                    environmentSurveyRequest.mistEnabled,quality.dust) :
+                ProbeBridge.configureEnvironmentSurvey(environmentSurveyRequest.requestId,
+                    environmentSurveyRequest.waterDisabled, quality.scale, quality.water, quality.fire,
+                    quality.cap, quality.glassEnabled, quality.shadow, quality.mistEnabled, quality.dust);
+            if (!configured) {finishEnvironmentSurvey(3);return;}
+            environmentSurveyStartedAt = SystemClock.elapsedRealtime();
+            surfaceView = new SurfaceView(this);
+            setContentView(surfaceView);
+            surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+                @Override public void surfaceCreated(SurfaceHolder holder) {
+                    if (environmentSurveyFinishing) return;
+                    currentSurface = holder.getSurface();
+                    surfaceAvailable = true;
+                    startEnvironmentSurveySurface();
+                }
+                @Override public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                    // Native owns the immutable survey camera and actual swapchain extent.
+                }
+                @Override public void surfaceDestroyed(SurfaceHolder holder) {
+                    surfaceAvailable = false;
+                    currentSurface = null;
+                    if (!environmentSurveyFinishing) finishEnvironmentSurvey(3);
+                    stopEnvironmentSurveySurface();
+                }
+            });
+            handler.post(environmentSurveyPoll);
+        } catch (RuntimeException | LinkageError failure) {
+            Log.e("HordeEnvironmentSurvey", "Survey configuration failed", failure);
+            finishEnvironmentSurvey(3);
+        }
+    }
+
+    private void startEnvironmentSurveySurface() {
+        if (environmentSurveyFinishing || !resumed || !surfaceAvailable ||
+                currentSurface == null || surfaceRequestGeneration != 0) return;
+        try {
+            surfaceRequestGeneration = ProbeBridge.startEnvironmentSurveySurface(currentSurface,
+                    getFilesDir().getAbsolutePath(), environmentSurveyRequest.requestId);
+            if (surfaceRequestGeneration == 0) finishEnvironmentSurvey(3);
+        } catch (RuntimeException | LinkageError failure) {
+            Log.e("HordeEnvironmentSurvey", "Survey surface failed", failure);
+            finishEnvironmentSurvey(3);
+        }
+    }
+
+    private void stopEnvironmentSurveySurface() {
+        final long generation = surfaceRequestGeneration;
+        surfaceRequestGeneration = 0;
+        if (generation == 0) return;
+        try { ProbeBridge.stopEnvironmentSurveySurface(generation); }
+        catch (RuntimeException | LinkageError failure) { Log.e("HordeEnvironmentSurvey", "Survey retirement failed", failure); }
+    }
+
+    private final Runnable environmentSurveyPoll = new Runnable() {
+        @Override public void run() {
+            if (environmentSurveyFinishing || environmentSurveyRequest == null) return;
+            int phase = 3;
+            try {
+                final long[] status = ProbeBridge.getEnvironmentSurveyStatus();
+                if (status != null && status.length > 0 && status[0] >= 0 && status[0] <= 3) phase = (int)status[0];
+            } catch (RuntimeException | LinkageError unavailable) { /* Record unavailable as failed. */ }
+            if (phase == 2 || phase == 3 || SystemClock.elapsedRealtime() - environmentSurveyStartedAt > 180000L) {
+                finishEnvironmentSurvey(phase == 2 ? 2 : 3);
+                return;
+            }
+            handler.postDelayed(this, 200L);
+        }
+    };
+
+    private void finishEnvironmentSurvey(final int phase) {
+        if (environmentSurveyFinishing) return;
+        environmentSurveyFinishing = true; // Never rearm after interruption or export failure.
+        handler.removeCallbacks(environmentSurveyPoll);
+        if (phase != 2) {
+            try { ProbeBridge.cancelEnvironmentSurvey(); }
+            catch (RuntimeException | LinkageError unavailable) { /* Export retains missing/failed evidence. */ }
+        }
+        stopEnvironmentSurveySurface();
+        if (environmentSurveyRequest == null) { finishAndRemoveTask(); return; }
+        final EnvironmentSurveyRequest request = environmentSurveyRequest;
+        final File reports = new File(getFilesDir(), REPORT_DIRECTORY);
+        final File external = getExternalFilesDir(null);
+        final Thread export = new Thread(() -> {
+            try {
+                // Stop is asynchronous. Lifecycle cancellation must not race a
+                // native image write or the failed manifest published at retirement.
+                final int terminalPhase = EnvironmentSurveyTerminalAwait.await(
+                        ProbeBridge::getEnvironmentSurveyStatus, SystemClock::elapsedRealtime,
+                        Thread::sleep, EnvironmentSurveyTerminalAwait.MAX_WAIT_MILLIS);
+                if(request.keeperMist) {
+                    // Host pulls request-scoped native evidence after proven retirement.
+                    // Do not run the unrelated river-image exporter or open campaign storage.
+                    Log.i("HordeEnvironmentSurvey", "Keeper fixture terminal phase="+terminalPhase+" id="+request.requestId);
+                } else {
+                final EnvironmentSurveyExport.Result result = EnvironmentSurveyExport.export(
+                        reports, external, request.requestId, request.waterDisabled, terminalPhase);
+                Log.i("HordeEnvironmentSurvey", "Export successful=" + result.successful + " directory=" + result.directory + " detail=" + result.detail);
+                }
+            } catch (Exception failure) {
+                Log.e("HordeEnvironmentSurvey", "Survey export failed; existing evidence was preserved", failure);
+            } finally { handler.post(() -> finishAndRemoveTask()); }
+        }, "HordeEnvironmentSurveyExport");
+        export.setDaemon(true);
+        export.start();
+    }
+
+    private void configureCampaignStorage() {
+        final String requested=getIntent()==null ? null : getIntent().getStringExtra("campaign_test_namespace");
+        campaignTestNamespace=CampaignMenuState.testNamespace(BuildConfig.DEBUG, requested);
+        if(BuildConfig.DEBUG && requested!=null && campaignTestNamespace==null) {
+            campaignLocalMessage="Invalid test save namespace. Save storage has not been opened.";
+            return; // A malformed test launch must never fall back to owner records.
+        }
+        final File directory=campaignTestNamespace==null ? new File(getFilesDir(), "campaign-v1") :
+                new File(new File(getFilesDir(), "campaign-tests"), campaignTestNamespace);
+        final Thread preparation=new Thread(() -> {
+            boolean ready=false;
+            try {
+                if(!campaignDestroyed) ready=directory.isDirectory() || directory.mkdirs();
+            } catch(RuntimeException unavailable) { /* Honest unavailable state below. */ }
+            final boolean prepared=ready;
+            handler.post(() -> completeCampaignConfiguration(directory.getAbsolutePath(),prepared));
+        }, "HordeCampaignDirectory");
+        preparation.setDaemon(true);
+        preparation.start();
+    }
+
+    private void completeCampaignConfiguration(String directory,boolean prepared) {
+        // Metadata-only native admission runs on UI, after BOTH lifetime and newer-Activity checks.
+        if(campaignDestroyed || campaignActivityEpochs.get()!=campaignConfigurationEpoch) return;
+        boolean configured=false;
+        try { if(prepared) configured=ProbeBridge.configureCampaign(directory); }
+        catch(RuntimeException | LinkageError unavailable) { /* Keep unavailable visible, without retrying another root. */ }
+        campaignConfigured=configured;
+        campaignLocalMessage=configured ? null : "Your saves could not be opened.";
+        if(campaignMenuVisible) {
+            if(configured) sendCampaignRequest(CampaignMenuState.REFRESH,0,0);
+            else renderCampaignMenu();
+        }
+    }
+
+    /** Only the existing closed runtime cache roster; no reports, settings or save storage. */
+    private boolean[] stageRuntimeAssetCache() {
             final boolean skeletonStaged = stageAsset(SKELETON_ASSET, SKELETON_FILE);
             final boolean lichStaged = stageAsset(LICH_ASSET, LICH_FILE);
-            for (final String legacy : new String[]{"diff-array-512.rgba", "normal-array-512.rgba", "arm-array-512.rgba"}) {
-                final File stale = new File(getFilesDir(), legacy);
-                if (stale.exists()) stale.delete();
-            }
             final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2", "diff-array-512-astc6x6.ktx2")
                     && stageAsset("textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2", "normal-array-512-astc4x4.ktx2")
                     && stageAsset("textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2", "arm-array-512-astc6x6.ktx2")
@@ -621,6 +952,10 @@ public class MainActivity extends Activity {
                     && stageAsset("models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb", "models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb")
                     && stageAsset("models/props/runtime/reward-lantern-body/asset.manifest.json", "models/props/runtime/reward-lantern-body/asset.manifest.json")
                     && stageAsset("models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb", "models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb")
+                    && stageAsset("models/props/runtime/attack-warning-ring-v1/asset.manifest.json", "models/props/runtime/attack-warning-ring-v1/asset.manifest.json")
+                    && stageAsset("models/props/runtime/attack-warning-ring-v1/attack-warning-ring-v1.runtime.glb", "models/props/runtime/attack-warning-ring-v1/attack-warning-ring-v1.runtime.glb")
+                    && stageAsset("models/props/runtime/healing-flask-v1/asset.manifest.json", "models/props/runtime/healing-flask-v1/asset.manifest.json")
+                    && stageAsset("models/props/runtime/healing-flask-v1/healing-flask-v1.runtime.glb", "models/props/runtime/healing-flask-v1/healing-flask-v1.runtime.glb")
                     && stageAsset("models/player/runtime/asset.manifest.json", "models/player/runtime/asset.manifest.json")
                     && stageAsset("models/player/runtime/clip-manifest.json", "models/player/runtime/clip-manifest.json")
                     && stageAsset("models/player/runtime/gothic-traveller-lod0.runtime.glb", "models/player/runtime/gothic-traveller-lod0.runtime.glb")
@@ -637,16 +972,145 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
                     "models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb");
             if (!collapseStaged) throw new IllegalStateException("Required collapsed-entry runtime assets could not be staged.");
+            final boolean chapterEntryStaged =
+                    stageAsset("models/world/runtime/chapter-entry-return-v1/asset.manifest.json",
+                            "models/world/runtime/chapter-entry-return-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb",
+                            "models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb");
+            if (!chapterEntryStaged) throw new IllegalStateException("Required chapter-entry runtime assets could not be staged.");
+            final boolean chapterTerrainStaged =
+                    stageAsset("models/world/runtime/chapter-terrain-v1/asset.manifest.json", "models/world/runtime/chapter-terrain-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb", "models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb") &&
+                    stageAsset("textures/props/runtime/chapter-terrain/base-color.android.ktx2", "textures/props/runtime/chapter-terrain/base-color.android.ktx2") &&
+                    stageAsset("textures/props/runtime/chapter-terrain/normal.android.ktx2", "textures/props/runtime/chapter-terrain/normal.android.ktx2") &&
+                    stageAsset("textures/props/runtime/chapter-terrain/orm.android.ktx2", "textures/props/runtime/chapter-terrain/orm.android.ktx2") &&
+                    stageAsset("models/characters/runtime/kit-warden-v1/asset.manifest.json", "models/characters/runtime/kit-warden-v1/asset.manifest.json") &&
+                    stageAsset("models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb", "models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb") &&
+                    stageAsset("textures/characters/runtime/kit-warden-v1/base-color.android.ktx2", "textures/characters/runtime/kit-warden-v1/base-color.android.ktx2") &&
+                    stageAsset("textures/characters/runtime/kit-warden-v1/normal.android.ktx2", "textures/characters/runtime/kit-warden-v1/normal.android.ktx2") &&
+                    stageAsset("textures/characters/runtime/kit-warden-v1/orm.android.ktx2", "textures/characters/runtime/kit-warden-v1/orm.android.ktx2") &&
+                    stageAsset("textures/characters/runtime/kit-warden-v1/emissive.android.ktx2", "textures/characters/runtime/kit-warden-v1/emissive.android.ktx2");
+            if (!chapterTerrainStaged) throw new IllegalStateException("Required authored terrain assets could not be staged.");
+            final boolean forestTreesStaged =
+                    stageAsset("models/world/runtime/forest-tree-pair-v1/asset.manifest.json", "models/world/runtime/forest-tree-pair-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-tree-pair-v1/runtime-roster.json", "models/world/runtime/forest-tree-pair-v1/runtime-roster.json") &&
+                    stageAsset("models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb", "models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb") &&
+                    stageAsset("models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb", "models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb");
+            if (!forestTreesStaged) throw new IllegalStateException("Required forest tree-pair runtime assets could not be staged.");
+            final boolean tombDressingStaged =
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-rect/asset.manifest.json", "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json", "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/candidate-receipt.json") &&
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-rect/tomb-niche-rect-lod0.runtime.glb", "models/world/runtime/tomb-dressing-v01/tomb-niche-rect/tomb-niche-rect-lod0.runtime.glb") &&
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-arched/asset.manifest.json", "models/world/runtime/tomb-dressing-v01/tomb-niche-arched/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-arched/candidate-receipt.json", "models/world/runtime/tomb-dressing-v01/tomb-niche-arched/candidate-receipt.json") &&
+                    stageAsset("models/world/runtime/tomb-dressing-v01/tomb-niche-arched/tomb-niche-arched-lod0.runtime.glb", "models/world/runtime/tomb-dressing-v01/tomb-niche-arched/tomb-niche-arched-lod0.runtime.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/femur/tomb-femur-lod0.runtime.glb", "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/femur/tomb-femur-lod0.runtime.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/humerus/tomb-humerus-lod0.runtime.glb", "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/humerus/tomb-humerus-lod0.runtime.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/skull-jaw/tomb-skull-jaw-lod0.runtime.glb", "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/skull-jaw/tomb-skull-jaw-lod0.runtime.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/derivation-receipt.json", "models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/derivation-receipt.json") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_1.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_1.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_2.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_2.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_3.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_candle_stub_3.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_displaced_lid.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_displaced_lid.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_offering_bowl.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_offering_bowl.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_broken_base.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_broken_base.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_rim_shard.glb", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/t03_urn_rim_shard.glb") &&
+                    stageAsset("models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json", "models/world/runtime/prepared-funerary-v01/t03-native-import-candidates/derivation-receipt.json");
+            if (!tombDressingStaged) throw new IllegalStateException("Required tomb dressing runtime assets could not be staged.");
+            final boolean chapterDressingStaged =
+                    stageAsset("models/world/runtime/grave-markers-r03/grave-marker-damaged.manifest.json", "models/world/runtime/grave-markers-r03/grave-marker-damaged.manifest.json") &&
+                    stageAsset("models/world/runtime/grave-markers-r03/grave-marker-damaged.runtime.glb", "models/world/runtime/grave-markers-r03/grave-marker-damaged.runtime.glb") &&
+                    stageAsset("models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json", "models/world/runtime/grave-markers-r03/grave-marker-round.manifest.json") &&
+                    stageAsset("models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb", "models/world/runtime/grave-markers-r03/grave-marker-round.runtime.glb") &&
+                    stageAsset("models/world/runtime/forest-rocks-v1/asset.manifest.json", "models/world/runtime/forest-rocks-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-road-clue-v1/asset.manifest.json", "models/world/runtime/forest-road-clue-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb", "models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb") &&
+                    stageAsset("models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb", "models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb") &&
+                    stageAsset("models/world/runtime/forest-deadwood-v1/asset.manifest.json", "models/world/runtime/forest-deadwood-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb", "models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb") &&
+                    stageAsset("models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb", "models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb") &&
+                    stageAsset("models/world/runtime/forest-deadwood-v1/horde-gnarled-stump.glb", "models/world/runtime/forest-deadwood-v1/horde-gnarled-stump.glb") &&
+                    stageAsset("models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb", "models/world/runtime/forest-deadwood-v1/horde-dead-snag-lod2.glb") &&
+                    stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb", "models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb") &&
+                    stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb", "models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb") &&
+                    stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb", "models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb") &&
+                    stageAsset("models/world/runtime/bellwether-shell-v4/asset.manifest.json", "models/world/runtime/bellwether-shell-v4/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb", "models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb") &&
+                    stageAsset("models/world/runtime/forest-understory-v1/asset.manifest.json", "models/world/runtime/forest-understory-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb", "models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb") &&
+                    stageAsset("models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb", "models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb");
+            if (!chapterDressingStaged) throw new IllegalStateException("Required graveyard and woodland runtime assets could not be staged.");
             if (BuildConfig.VIEWMODEL_CANDIDATE && !stageAsset(
                     "models/player/viewmodel/runtime/candidate-receipt.json",
                     "models/player/viewmodel/runtime/candidate-receipt.json")) {
                 throw new IllegalStateException("Opt-in viewmodel candidate receipt could not be staged.");
             }
-            final boolean written = ProbeBridge.writeReports(filesRoot);
-            final StringBuilder output = new StringBuilder(textReport).append('\n');
-            if (textReport.contains("RT mode: Unsupported")) {
-                output.append("Unsupported: fake RT fallback is disabled.\n\n");
+        return new boolean[]{skeletonStaged, lichStaged, materialsStaged, heldItemsStaged};
+    }
+
+    static final class StartupDiagnostics {
+        final boolean assetsPrepared;
+        final String text;
+        StartupDiagnostics(boolean assetsPrepared,String text) {this.assetsPrepared=assetsPrepared;this.text=text;}
+    }
+
+    private void collectInitialDiagnostics() {
+        if(startupAssetsPending || campaignDestroyed || openingBenchmarkRecoveryLaunch)return;
+        if(startupAssetsAttempt==Long.MAX_VALUE) {startupAssetsFailed=true;showStartupLoading();return;}
+        final long attempt=++startupAssetsAttempt,epoch=campaignConfigurationEpoch;
+        startupAssetsPending=true;startupAssetsPrepared=false;startupAssetsFailed=false;
+        try {startupCompatibilityAttempt=ProbeBridge.beginCompatibilityStartupAttempt();}
+        catch(RuntimeException | LinkageError unavailable) {startupCompatibilityAttempt=0;}
+        try {StartupAssetWork.execute(() -> {
+            // A queued obsolete Activity never starts a second writer. An already
+            // running writer finishes before the single queue starts its successor.
+            if(campaignDestroyed || campaignActivityEpochs.get()!=epoch)return;
+            StartupDiagnostics prepared;
+            try {prepared=prepareInitialDiagnostics();}
+            catch(Throwable unavailable) {prepared=new StartupDiagnostics(false,"Startup preparation failed: "+unavailable.getMessage());}
+            final StartupDiagnostics result=prepared;
+            handler.post(() -> completeInitialDiagnostics(epoch,attempt,result));
+        });}catch(RuntimeException unavailable) {
+            completeInitialDiagnostics(epoch,attempt,new StartupDiagnostics(false,"Startup work could not be queued."));
+        }
+    }
+
+    private void completeInitialDiagnostics(long epoch,long attempt,StartupDiagnostics result) {
+        if(campaignDestroyed || isFinishing() || isDestroyed() || campaignActivityEpochs.get()!=epoch || epoch!=campaignConfigurationEpoch ||
+           attempt!=startupAssetsAttempt)return;
+        startupAssetsPending=false;startupAssetsPrepared=result.assetsPrepared;
+        startupAssetsFailed=!result.assetsPrepared;reportText=result.text;
+        if(!result.assetsPrepared && startupCompatibilityAttempt>0) {
+            try {ProbeBridge.failCompatibilityAssetPreparation(startupCompatibilityAttempt);}
+            catch(RuntimeException | LinkageError unavailable) { /* Optional diagnostics cannot block Close/Retry. */ }
+        }
+        if(reportTextView!=null)reportTextView.setText(reportText);
+        if(!resumed)return; // Resume observes the retained result; never opens UI in background.
+        if(startupAssetsPrepared)startSurfaceIfReady();
+        if(startupUiVisible)showStartupLoading();
+    }
+
+    // Native probe/cache/report work only. No UI, surface/lifecycle calls or gameplay.
+    StartupDiagnostics prepareInitialDiagnostics() {
+        boolean assetsPrepared=false;
+        String preparedText;
+        try {
+            final String textReport = ProbeBridge.getTextReport();
+            final String jsonReport = ProbeBridge.getJsonReport();
+            final String filesRoot = getFilesDir().getAbsolutePath();
+            for (final String legacy : new String[]{"diff-array-512.rgba", "normal-array-512.rgba", "arm-array-512.rgba"}) {
+                final File stale = new File(getFilesDir(), legacy);
+                if (stale.exists()) stale.delete();
             }
+            final boolean[] staged = stageRuntimeAssetCache();
+            final boolean skeletonStaged = staged[0], lichStaged = staged[1];
+            final boolean materialsStaged = staged[2], heldItemsStaged = staged[3];
+            assetsPrepared=skeletonStaged && lichStaged && materialsStaged && heldItemsStaged;
+            boolean written=false;
+            try {written=ProbeBridge.writeReports(filesRoot);}
+            catch(Throwable reportUnavailable) { /* Optional report IO cannot invalidate prepared runtime assets. */ }
+            final StringBuilder output = new StringBuilder(textReport).append('\n');
+            if (textReport.contains("RT mode: Unsupported")) output.append("Unsupported: fake RT fallback is disabled.\n\n");
             output.append("Reports written: ").append(written ? "yes" : "no").append('\n');
             output.append("Animated skeleton staged: ").append(skeletonStaged ? "yes" : "no").append('\n');
             output.append("Animated lich placeholder staged: ").append(lichStaged ? "yes" : "no").append('\n');
@@ -654,16 +1118,88 @@ public class MainActivity extends Activity {
             output.append("Production PBR held items/player staged: ").append(heldItemsStaged ? "yes" : "no").append('\n');
             output.append("Report directory: ").append(filesRoot).append('/').append(REPORT_DIRECTORY).append('\n');
             output.append("Report files: ").append(TEXT_REPORT_FILE).append(", ").append(JSON_REPORT_FILE).append('\n');
-            output.append("JSON sample:\n").append(jsonReport);
-            reportText = output.toString();
-        } catch (final Throwable error) {
-            reportText = "Unable to load the native Vulkan RT renderer.\n\n" + error.getMessage();
+            output.append("JSON sample:\n").append(jsonReport);preparedText=output.toString();
+        } catch(Throwable error) {preparedText="Unable to prepare the native Vulkan RT renderer.\n\n"+error.getMessage();}
+        return new StartupDiagnostics(assetsPrepared,preparedText);
+    }
+
+    private boolean isMenuRuntimeReady() {
+        if(!resumed || surfaceRequestGeneration<=0 || (!startupAssetsPrepared && !openingBenchmarkRecoveryLaunch))return false;
+        try {
+            if(ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration)!=1)return false;
+            if(!entryMenuEnabled || entryMenuAdmittedGeneration==surfaceRequestGeneration)return true;
+            EntryMenuState entry=EntryMenuState.decode(ProbeBridge.getEntryMenuState());
+            if(entry!=null && entry.isEntryPresented(surfaceRequestGeneration) && entry.phase==EntryMenuState.PHASE_IDLE) {
+                entryMenuAdmittedGeneration=surfaceRequestGeneration;return true;
+            }
+        } catch(RuntimeException | LinkageError unavailable) { /* No assumed readiness. */ }
+        return false;
+    }
+
+    private void showStartupLoading() {
+        startupUiVisible=true;menuVisible=true;interfaceVisible=false;diagnosticsVisible=false;
+        setGameplayPaused(true);clearTouchState();
+        entryPlayButton=entrySettingsButton=entryMoreButton=null;
+        entryMenuPanel=null;entryMenuStatus=null;entryMenuProgress=null;
+        menuScrim.setVisibility(View.VISIBLE);menuScrim.removeAllViews();
+        menuScrim.setBackgroundColor(0xFF050403);
+        diagnosticsPanel.setVisibility(View.GONE);
+        for(View control:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,
+                interactButton,toggleHeldLightPoseButton,rtStatus,vitalityStatus,developerOverlay})
+            if(control!=null)control.setVisibility(View.GONE);
+        int runtime=0;
+        try {if(surfaceRequestGeneration>0)runtime=ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);}
+        catch(RuntimeException | LinkageError unavailable) {runtime=3;}
+        startupShownRuntime=runtime;
+        final boolean failed=startupAssetsFailed || startupEntryFailed || runtime==2 || runtime==3;
+        LinearLayout panel=createPanel(getString(R.string.entry_menu_brand),failed?"COULD NOT LOAD":"LOADING");
+        addBody(panel,runtime==2 ? "This device cannot run Horde’s required hardware ray tracing." :
+                failed?"Horde could not finish loading. You can retry or leave.":"Loading…");
+        if(!failed && !isReducedMotionEnabled()) {
+            ProgressBar spinner=new ProgressBar(this,null,android.R.attr.progressBarStyleSmall);
+            spinner.setIndeterminate(true);spinner.setContentDescription("Loading");
+            LinearLayout.LayoutParams spin=new LinearLayout.LayoutParams(dp(32),dp(32));spin.gravity=Gravity.CENTER_HORIZONTAL;
+            panel.addView(spinner,spin);
         }
-        reportTextView.setText(reportText);
+        if(failed) {
+            Button retry=addEntryMenuButton(panel,"Retry",this::retryStartupLoading,true);
+            retry.setEnabled(!startupAssetsPending);
+            addEntryMenuButton(panel,getString(R.string.compatibility_report),this::showCompatibilityReport,false);
+        }
+        addEntryMenuButton(panel,"Cancel",() -> {if(startupUiVisible)showBackExitConfirmation();},false);
+        attachPanel(panel);
+        menuScrim.setBackgroundColor(0xFF050403); // attachPanel normally selects a translucent menu.
+    }
+
+    private void retryStartupLoading() {
+        if(!startupUiVisible || startupAssetsPending || campaignDestroyed || !resumed)return;
+        int runtime=0;
+        try {if(surfaceRequestGeneration>0)runtime=ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);}
+        catch(RuntimeException | LinkageError unavailable) {runtime=3;}
+        if(!startupAssetsFailed && !startupEntryFailed && runtime!=2 && runtime!=3)return; // Detached old Retry cannot restart a healthy/pending owner.
+        startupEntryFailed=false;
+        if(!startupAssetsPrepared)collectInitialDiagnostics();
+        else {stopSurface();entryMenuAdmittedGeneration=0;startSurfaceIfReady();}
+        showStartupLoading();
+    }
+
+    private void showCompatibilityReport() {
+        if(campaignDestroyed || isFinishing() || (!startupUiVisible && !diagnosticsVisible))return;
+        if(compatibilityReportDialog!=null && compatibilityReportDialog.pickerOutstanding()) {
+            Toast.makeText(this,"Finish the current file choice before opening another report.",Toast.LENGTH_LONG).show();return;
+        }
+        if(compatibilityReportDialog!=null)compatibilityReportDialog.close();
+        compatibilityReportDialog=new CompatibilityReportDialog(this,reportExecutor,
+            ProbeBridge::getCompatibilityReportRevision,
+            (revision,id,utc,consent)->ProbeBridge.prepareCompatibilityReport(revision,id,utc,consent,
+                Build.MODEL,"Android "+Build.VERSION.RELEASE+" (API "+Build.VERSION.SDK_INT+")"));
+        compatibilityReportDialog.show();
     }
 
     private void configureSurface() {
         surfaceView.setClickable(true);
+        surfaceView.addOnLayoutChangeListener((view,left,top,right,bottom,oldLeft,oldTop,oldRight,oldBottom) ->
+            observeOpeningBenchmarkOutput(openingBenchmarkOutput==null?null:openingBenchmarkOutput.current(),true));
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(final SurfaceHolder holder) {
@@ -675,10 +1211,12 @@ public class MainActivity extends Activity {
             @Override
             public void surfaceChanged(final SurfaceHolder holder, final int format, final int width, final int height) {
                 currentSurface = holder.getSurface();
+                observeOpeningBenchmarkOutput(openingBenchmarkOutput==null?null:openingBenchmarkOutput.current(),true);
             }
 
             @Override
             public void surfaceDestroyed(final SurfaceHolder holder) {
+                cancelOpeningBenchmarkRequest();
                 surfaceAvailable = false;
                 currentSurface = null;
                 logSurfaceLifecycle("surfaceDestroyed");
@@ -688,7 +1226,8 @@ public class MainActivity extends Activity {
     }
 
     private void startSurfaceIfReady() {
-        if (!resumed || !surfaceAvailable || surfaceRequestGeneration != 0 || currentSurface == null) return;
+        if (openingBenchmarkRecoveryRejected || !resumed || !surfaceAvailable || surfaceRequestGeneration != 0 || currentSurface == null) return;
+        if(!startupAssetsPrepared && !openingBenchmarkRecoveryLaunch)return;
         try {
             if (entryMenuEnabled) {
                 entryPlayRequested = false;
@@ -696,15 +1235,15 @@ public class MainActivity extends Activity {
             }
             surfaceRequestGeneration = ProbeBridge.startDiagnosticSurface(currentSurface, getFilesDir().getAbsolutePath());
             surfaceStarted = false; // Accepted/pending is distinct from an RT-presented frame.
-            setGameplayPaused(menuVisible || diagnosticsVisible);
+            setGameplayPaused(menuVisible || diagnosticsVisible || openingBenchmarkCancelRequested);
             if (entryMenuEnabled) publishEntryMenuState();
             if (surfaceRequestGeneration == 0) {
-                reportTextView.append("\n\nRenderer surface failed to start.");
-                showDiagnostics(true);
+                if(startupUiVisible) {startupEntryFailed=true;showStartupLoading();}
+                else {reportTextView.append("\n\nRenderer surface failed to start.");showDiagnostics(true);}
             }
         } catch (final Throwable error) {
-            reportTextView.append("\n\nRenderer surface failure: " + error.getMessage());
-            showDiagnostics(true);
+            if(startupUiVisible) {startupEntryFailed=true;showStartupLoading();}
+            else {reportTextView.append("\n\nRenderer surface failure: " + error.getMessage());showDiagnostics(true);}
         }
     }
 
@@ -718,6 +1257,11 @@ public class MainActivity extends Activity {
     }
 
     private void stopSurface() {
+        stopPrivateLichRevivalAudio();
+        cancelOpeningBenchmarkRequest();
+        stopChapterAmbience();
+        cancelCombatTeachingPromptPoll();
+        clearCombatTeachingPrompt();
         stopMenuAmbience();
         setBenchmarkStatusExpanded(false);
         if (musicPlayback != null) musicPlayback.setSuspended(true);
@@ -745,7 +1289,7 @@ public class MainActivity extends Activity {
 
     private void configureTouchControls() {
         surfaceView.setOnTouchListener((view, event) -> {
-            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return true;
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible || benchmarkRunning || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return true;
             final int action = event.getActionMasked();
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 final int index = event.getActionIndex();
@@ -785,10 +1329,13 @@ public class MainActivity extends Activity {
                 return true;
             }
             if (action == MotionEvent.ACTION_CANCEL) {
+                clearRunIntent();
+                clearCrouchIntent();
                 if (swingTouch != null) swingTouch.cancel();
                 if (dodgeTouch != null) dodgeTouch.cancel();
                 TouchControlState.cancelGesture(activePointers, viewControls);
                 parryTouchActive = false;
+                parryTouchPointerId = -1;
                 parryRequestedOnTouchDown = false;
                 if (parryButton != null) parryButton.setPressed(false);
                 pushViewControls();
@@ -811,6 +1358,11 @@ public class MainActivity extends Activity {
     }
 
     private void showMainMenu(final boolean firstLaunch) {
+        if(openingBenchmarkRecoveryRejected) { showOpeningBenchmarkRecoveryBlocked();return; }
+        if(openingBenchmarkPending()) { showOpeningBenchmarkProgress(); return; }
+        invalidateLookoutObjective();
+        if(!isMenuRuntimeReady()) {showStartupLoading();return;}
+        startupUiVisible=false;
         if (shouldUseEntryMenu(firstLaunch)) {
             entryMenuEnabled = true;
             entryMenuSidePage = false;
@@ -838,6 +1390,8 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
+        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -852,6 +1406,15 @@ public class MainActivity extends Activity {
             firstMenu = false;
             hideMenu();
         });
+        addMenuButtonRow(panel, "Save checkpoint", () -> showCampaignMenu(CampaignMenuState.SAVE_MANUAL),
+                "Load checkpoint", () -> showCampaignMenu(CampaignMenuState.LOAD));
+        final LookoutObjectiveState lookout=readLookoutObjective();
+        if(lookout!=null && lookout.available) {
+            final long menuEpoch=lookoutObjectiveEpoch;
+            addMenuButton(panel,"Lookout objective",() -> {
+                if(menuEpoch==lookoutObjectiveEpoch)showLookoutObjective(lookout);
+            });
+        }
         final Runnable restartAction = () -> {
             playSound("ui_select", 0.18f);
             resetRoute();
@@ -867,7 +1430,6 @@ public class MainActivity extends Activity {
         if (rtLabUnlocked || debugRtLabAccess) {
             addMenuButton(panel, getString(R.string.rt_lab), () -> openRtLab(false));
         }
-        addMenuButton(panel, getString(R.string.run_benchmark), this::startBenchmark);
         addMenuButton(panel, getString(R.string.playtest_report), this::showPlaytestReport);
         addMenuButtonRow(panel,
                 getString(R.string.more_by_samfa12), this::openSamfa12Website,
@@ -876,6 +1438,57 @@ public class MainActivity extends Activity {
                 getString(R.string.credits), this::showCredits,
                 getString(R.string.quit), this::finishAndRemoveTask);
         attachPanel(panel);
+    }
+
+    private LookoutObjectiveState readLookoutObjective() {
+        if(!resumed || entryMenuEnabled || deathOverlayVisible || endingOverlayVisible ||
+                graphicsVisible || graphicsSceneRestoring || campaignMenuVisible ||
+                (campaignState!=null && campaignState.loadBarrier()) ||
+                ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration)!=1)return null;
+        try {
+            return LookoutObjectiveState.decode(ProbeBridge.getLookoutObjectiveState(surfaceRequestGeneration),
+                    surfaceRequestGeneration);
+        } catch(RuntimeException | LinkageError unavailable) {return null;}
+    }
+
+    private void invalidateLookoutObjective() {
+        lookoutObjectiveVisible=false;lookoutObjectiveState=null;lookoutObjectivePanel=null;++lookoutObjectiveEpoch;
+    }
+
+    private void showLookoutObjective(LookoutObjectiveState expected) {
+        if(!menuVisible || !controllerWindowFocused || expected==null || !expected.matches(readLookoutObjective()))return;
+        // Opening is an explicit pause-menu action. No arrival poll invokes this page.
+        clearTouchState();setGameplayPaused(true);
+        invalidateLookoutObjective();lookoutObjectiveVisible=true;lookoutObjectiveState=expected;
+        final long epoch=lookoutObjectiveEpoch;
+        menuScrim.removeAllViews();
+        final LinearLayout panel=createPanel("The road ahead","FOREST LOOKOUT");
+        lookoutObjectivePanel=panel;
+        addBody(panel,"The village lies beyond the trees. Continue exploring the lookout with Kit.");
+        addBody(panel,"The onward journey to the village belongs to a future chapter.");
+        final Button exploring=createMenuButton("Continue exploring",() -> finishLookoutObjective(epoch,expected,false));
+        panel.addView(exploring,menuButtonLayoutParams());
+        addMenuButton(panel,"Return to menu",() -> finishLookoutObjective(epoch,expected,true));
+        attachPanel(panel);
+        if(controllerMode)ControllerNavigation.ensureFocus(menuScrim);
+        else exploring.requestFocus();
+    }
+
+    private void finishLookoutObjective(long epoch,LookoutObjectiveState expected,boolean returnToMenu) {
+        if(!lookoutObjectiveVisible || epoch!=lookoutObjectiveEpoch || !resumed || !controllerWindowFocused)return;
+        ViewParent owner=lookoutObjectivePanel==null?null:lookoutObjectivePanel.getParent();
+        while(owner instanceof View && owner!=menuScrim)owner=owner.getParent();
+        if(owner!=menuScrim)return;
+        if(!expected.matches(readLookoutObjective())) {
+            showMainMenu(false);return; // A replaced world remains paused; old UI cannot resume it.
+        }
+        invalidateLookoutObjective();clearTouchState();
+        if(returnToMenu) {
+            entryMenuAdmittedGeneration=0; // Showcase output cannot certify a newly requested Entry scene.
+            entryMenuEnabled=true;entryMenuSidePage=false;entryPlayRequested=false;entryMenuFailed=false;
+            publishEntryMenuState(); // Native synchronously invalidates the prior scene's presented flag.
+            showEntryMenu(false);
+        } else hideMenu();
     }
 
     private boolean isReducedMotionEnabled() {
@@ -893,7 +1506,7 @@ public class MainActivity extends Activity {
     }
 
     private void publishEntryMenuState() {
-        if (!entryMenuEnabled || surfaceRequestGeneration <= 0) return;
+        if (openingBenchmarkRecoveryRejected || !entryMenuEnabled || surfaceRequestGeneration <= 0) return;
         try {
             ProbeBridge.setEntryMenu(true, entryMenuSidePage, isReducedMotionEnabled(),
                     entryPlayRequested, surfaceRequestGeneration);
@@ -905,6 +1518,13 @@ public class MainActivity extends Activity {
     }
 
     private void showEntryMenu(final boolean sidePage) {
+        if(!isMenuRuntimeReady()) {
+            showStartupLoading();
+            publishEntryMenuState(); // Request the profile before waiting for its owning presentation.
+            return;
+        }
+        startupUiVisible=false;
+        invalidateLookoutObjective();
         closeBenchmarkSummaryReview();
         interfaceVisible = false;
         menuVisible = true;
@@ -919,6 +1539,8 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
+        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -1015,23 +1637,28 @@ public class MainActivity extends Activity {
 
         entryPlayButton = createEntryPlaque(getString(R.string.entry_play), this::requestEntryPlay, true);
         entrySettingsButton = createEntryPlaque(getString(R.string.settings), () -> {
+            if(!isMenuRuntimeReady())return;
             entryMenuSidePage = true; publishEntryMenuState(); showSettings();
         }, false);
         entryMoreButton = createEntryPlaque(getString(R.string.entry_more), () -> {
+            if(!isMenuRuntimeReady())return;
             entryMenuSidePage = true; publishEntryMenuState(); showEntryMorePage();
         }, false);
 
         final int bottomPlaqueLimit = Math.max(dp(48), (availableWidth - dp(20)) / 2);
+        final int secondaryPlaqueWidth = Math.max(
+                entryPlaqueWidth(entryMoreButton, bottomPlaqueLimit),
+                entryPlaqueWidth(entrySettingsButton, bottomPlaqueLimit));
         final int bottomPlaqueMargin = bottom + (portrait ? dp(72) : dp(12));
         final FrameLayout.LayoutParams moreLayout = new FrameLayout.LayoutParams(
-                entryPlaqueWidth(entryMoreButton, bottomPlaqueLimit), -2);
+                secondaryPlaqueWidth, -2);
         moreLayout.gravity = Gravity.BOTTOM | Gravity.START;
-        moreLayout.setMargins(left, 0, 0, bottomPlaqueMargin);
+        moreLayout.setMargins(left, 0, right, bottomPlaqueMargin);
         composition.addView(entryMoreButton, moreLayout);
         final FrameLayout.LayoutParams settingsLayout = new FrameLayout.LayoutParams(
-                entryPlaqueWidth(entrySettingsButton, bottomPlaqueLimit), -2);
+                secondaryPlaqueWidth, -2);
         settingsLayout.gravity = Gravity.BOTTOM | Gravity.END;
-        settingsLayout.setMargins(0, 0, right, bottomPlaqueMargin);
+        settingsLayout.setMargins(left, 0, right, bottomPlaqueMargin);
         composition.addView(entrySettingsButton, settingsLayout);
         entryMoreButton.measure(View.MeasureSpec.makeMeasureSpec(moreLayout.width, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.UNSPECIFIED));
@@ -1040,8 +1667,12 @@ public class MainActivity extends Activity {
         final int bottomPlaqueHeight = Math.max(entryMoreButton.getMeasuredHeight(), entrySettingsButton.getMeasuredHeight());
         final FrameLayout.LayoutParams playLayout = new FrameLayout.LayoutParams(
                 entryPlaqueWidth(entryPlayButton, availableWidth), -2);
-        playLayout.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-        playLayout.setMargins(left, 0, right, bottomPlaqueMargin + bottomPlaqueHeight + dp(16));
+        // FrameLayout CENTER_HORIZONTAL applies the full left-right margin
+        // difference. Centre in the physical safe span instead, including RTL.
+        playLayout.gravity = Gravity.BOTTOM | Gravity.START;
+        final int playSideSpace = (availableWidth - playLayout.width) / 2;
+        playLayout.setMargins(left + playSideSpace, 0, right + playSideSpace,
+                bottomPlaqueMargin + bottomPlaqueHeight + dp(16));
         // First controller/keyboard selection is Play; geometry still owns arrows.
         composition.addView(entryPlayButton, 1, playLayout);
 
@@ -1135,6 +1766,7 @@ public class MainActivity extends Activity {
     }
 
     private void showEntryMorePage() {
+        if(openingBenchmarkPending()) { showOpeningBenchmarkProgress(); return; }
         entryPlayButton = null;
         entrySettingsButton = null;
         entryMoreButton = null;
@@ -1146,6 +1778,12 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel("HORDE LANTERN", getString(R.string.entry_more_eyebrow));
         addBody(panel, getString(R.string.entry_more_description));
+        addBody(panel,"The benchmark course speeds up or slows down with rendering speed. Normal gameplay does not.");
+        openingBenchmarkButton=addEntryMenuButton(panel,"Custom benchmark (unranked)",this::requestOpeningCustomBenchmark,false);
+        openingBenchmarkButton.setEnabled(canRequestOpeningBenchmark());
+        openingBenchmarkProvisionalButton=addEntryMenuButton(panel,"Mobile provisional benchmark (unranked)",this::requestOpeningProvisionalBenchmark,false);
+        openingBenchmarkProvisionalButton.setEnabled(canRequestOpeningBenchmark());
+        addEntryMenuButton(panel, "Load checkpoint", () -> showCampaignMenu(CampaignMenuState.LOAD), false);
         addEntryMenuButton(panel, getString(R.string.controls), this::showControls, false);
         addEntryMenuButton(panel, getString(R.string.credits), this::showCredits, false);
         addEntryMenuButton(panel, getString(R.string.playtest_report), this::showPlaytestReport, false);
@@ -1159,8 +1797,403 @@ public class MainActivity extends Activity {
         attachEntryMenuPanel(panel);
     }
 
+    private void showCampaignMenu(int action) {
+        if(openingBenchmarkPending() || !isMenuRuntimeReady()) return;
+        if(campaignState!=null && campaignState.pending()) return;
+        if(deathOverlayVisible && (action!=CampaignMenuState.LOAD || retryPending)) return;
+        campaignFromDeath=deathOverlayVisible;
+        campaignDeathLoadCommitted=false;
+        campaignReturnToDeathWhenSettled=false;
+        campaignDeathLoadRequest=0;
+        campaignDeathMessage=null;
+        cancelPendingEntryPlay();
+        if(!campaignFromDeath) showMainMenu(false);
+        campaignMenuAction=action;
+        campaignMenuVisible=true;
+        campaignLoadedReady=false;
+        if(campaignConfigured) campaignLocalMessage=null;
+        else if(campaignLocalMessage==null) campaignLocalMessage="Preparing your saves…";
+        entryMenuSidePage=entryMenuEnabled;
+        publishEntryMenuState();
+        setGameplayPaused(true);
+        clearTouchState();
+        renderCampaignMenu();
+        if(campaignConfigured) sendCampaignRequest(CampaignMenuState.REFRESH,0,0);
+        handler.removeCallbacks(refreshCampaignMenu);
+        handler.post(refreshCampaignMenu);
+    }
+
+    private boolean campaignBusy() {
+        return campaignRequest!=0 && (campaignState==null ||
+                campaignState.ackRequest!=campaignRequest || campaignState.pending());
+    }
+
+    private void renderCampaignMenu() {
+        if(!campaignMenuVisible || campaignDestroyed) return;
+        menuVisible=true;
+        menuScrim.setVisibility(View.VISIBLE);
+        menuScrim.removeAllViews();
+        String title=campaignMenuAction==CampaignMenuState.NEW_GAME ? "New game" :
+                campaignMenuAction==CampaignMenuState.SAVE_MANUAL ? "Save game" : "Load game";
+        final LinearLayout panel=createPanel(title,campaignMenuAction==CampaignMenuState.LOAD ?
+                "CHOOSE A SAVED GAME" : "CHOOSE A SLOT");
+        if(campaignTestNamespace!=null) addBody(panel,"Test saves only");
+        final CampaignMenuState shown=campaignState;
+        if(campaignLocalMessage!=null) addBody(panel,campaignLocalMessage);
+        else if(shown==null) addBody(panel,"Checking your saves…");
+        else if(shown.error!=0 || shown.phase!=CampaignMenuState.READY) addBody(panel,shown.message());
+        final boolean ready=campaignConfigured && campaignPublicationValid && shown!=null && shown.current(surfaceRequestGeneration) &&
+                shown.phase!=CampaignMenuState.UNAVAILABLE && shown.error==0 && !campaignBusy() && !shown.pending() &&
+                !campaignLoadedReady && !(shown.phase==CampaignMenuState.SUCCESS && shown.lastOperation==CampaignMenuState.LOAD);
+        if(campaignMenuAction==CampaignMenuState.NEW_GAME && shown!=null) {
+            boolean savedGame=false;
+            for(int slot=0;slot<3;++slot)for(int kind=0;kind<2;++kind)
+                savedGame|=shown.status(slot,kind)==CampaignMenuState.VALID;
+            if(savedGame) {
+                Button continueGame=addEntryMenuButton(panel,"Continue",() -> {
+                    // Navigation only. Each slot selects its latest valid record.
+                    if(campaignMenuVisible && campaignMenuAction==CampaignMenuState.NEW_GAME &&
+                       campaignPublicationValid && campaignState==shown && shown.current(surfaceRequestGeneration) &&
+                       shown.error==0 && !campaignBusy() && !shown.pending())showCampaignMenu(CampaignMenuState.LOAD);
+                },true);
+                continueGame.setEnabled(ready);
+            }
+        }
+        if(campaignLoadedReady) addEntryMenuButton(panel,"Continue",this::resumeLoadedCampaign,true);
+        if(campaignMenuAction==CampaignMenuState.SAVE_MANUAL) {
+            addBody(panel,"Save at your latest checkpoint.");
+            if(shown!=null && !shown.canSaveLatest) addBody(panel,"Reach a safe checkpoint before saving.");
+        }
+        final android.util.DisplayMetrics display=getResources().getDisplayMetrics();
+        final boolean wideSlots=display.widthPixels>display.heightPixels && display.widthPixels/display.density>=680 &&
+                getResources().getConfiguration().fontScale<=1.3f;
+        LinearLayout slotRow=null;
+        if(wideSlots) {
+            panel.setPadding(dp(20),dp(12),dp(20),dp(12));
+            slotRow=new LinearLayout(this);slotRow.setOrientation(LinearLayout.HORIZONTAL);
+            panel.addView(slotRow,matchWrap());
+        }
+        for(int i=0;i<3;i++) {
+            final int slot=i;
+            final LinearLayout slotPanel;
+            if(wideSlots) {
+                slotPanel=new LinearLayout(this);slotPanel.setOrientation(LinearLayout.VERTICAL);
+                slotPanel.setPadding(dp(8),0,dp(8),dp(8));
+                final GradientDrawable surface=new GradientDrawable();surface.setColor(0xFF202427);
+                surface.setCornerRadius(dp(4));surface.setStroke(dp(1),0xFF484335);slotPanel.setBackground(surface);
+                LinearLayout.LayoutParams card=new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT,1);
+                card.setMargins(dp(4),0,dp(4),0);slotRow.addView(slotPanel,card);
+            } else slotPanel=panel;
+            TextView slotTitle=new TextView(this);
+            slotTitle.setText(getString(shown!=null && shown.activeSlot==slot ?
+                    R.string.campaign_slot_current_title : R.string.campaign_slot_title,slot+1));
+            slotTitle.setTextSize(17);slotTitle.setTypeface(Typeface.SANS_SERIF,Typeface.BOLD);
+            slotTitle.setTextColor(HordeUiTokens.PARCHMENT);slotTitle.setPadding(0,dp(14),0,dp(4));
+            slotPanel.addView(slotTitle,matchWrap());
+            addBody(slotPanel,shown==null ? "Checking saves..." : shown.slotDescription(slot));
+            if(wideSlots)slotPanel.getChildAt(slotPanel.getChildCount()-1).setMinimumHeight(dp(64));
+            final int selectedKind=shown==null ? -1 : shown.selectedKind(slot);
+            final int chosenAction=campaignMenuAction;
+            final String action=chosenAction==CampaignMenuState.LOAD ? "Continue" :
+                    chosenAction==CampaignMenuState.NEW_GAME ? "New game" : "Save in Slot "+(slot+1);
+            Button choose=addEntryMenuButton(slotPanel,action,
+                    () -> chooseCampaignRecord(chosenAction,slot,chosenAction==CampaignMenuState.LOAD ? selectedKind : CampaignMenuState.MANUAL,shown),false);
+            choose.setContentDescription((chosenAction==CampaignMenuState.LOAD ? "Continue Slot " :
+                    chosenAction==CampaignMenuState.NEW_GAME ? "New game in Slot " : "Save in Slot ")+(slot+1));
+            boolean checked=shown!=null && shown.status(slot,0)>=CampaignMenuState.EMPTY && shown.status(slot,1)>=CampaignMenuState.EMPTY;
+            boolean writable=shown!=null && (shown.status(slot,0)==CampaignMenuState.EMPTY || shown.status(slot,0)==CampaignMenuState.VALID);
+            choose.setEnabled(ready && checked && (chosenAction==CampaignMenuState.LOAD ? selectedKind>=0 :
+                    chosenAction==CampaignMenuState.NEW_GAME || (shown.canSaveLatest && writable)));
+        }
+        if(campaignLocalMessage!=null || (shown!=null && (shown.error!=0 || shown.phase==CampaignMenuState.FAILED || shown.hasUnreadable()))) {
+            Button refresh=addEntryMenuButton(panel,"Try again",
+                    () -> sendCampaignRequest(CampaignMenuState.REFRESH,0,0),false);
+            refresh.setEnabled(campaignConfigured && !campaignLoadedReady && !campaignBusy() && (shown==null || !shown.pending()));
+        }
+        addEntryMenuButton(panel,campaignBusy() || (shown!=null && shown.pending()) ? "Cancel" : "Back",
+                this::backFromCampaignMenu,false);
+        attachPanel(panel,wideSlots?760:520);
+    }
+
+    private void chooseCampaignRecord(int action,int slot,int kind,CampaignMenuState shown) {
+        if(!isMenuRuntimeReady() || !campaignMenuVisible || action!=campaignMenuAction || !campaignPublicationValid || shown==null || shown!=campaignState || campaignBusy() || shown.pending() ||
+                !shown.current(surfaceRequestGeneration)) return;
+        if(shown.error!=0 || slot<0 || slot>2 || kind<0 || kind>1) return;
+        if(action==CampaignMenuState.LOAD && (shown.status(slot,kind)!=CampaignMenuState.VALID || shown.selectedKind(slot)!=kind)) return;
+        if(action==CampaignMenuState.SAVE_MANUAL && (!shown.canSaveLatest ||
+                (shown.status(slot,0)!=CampaignMenuState.EMPTY && shown.status(slot,0)!=CampaignMenuState.VALID))) return;
+        boolean confirm=action==CampaignMenuState.NEW_GAME ? shown.occupied(slot) :
+                action==CampaignMenuState.SAVE_MANUAL && shown.occupied(slot);
+        if(!confirm) { sendCampaignRequest(action,slot,kind); return; }
+        dismissCampaignConfirmation();
+        final long generation=surfaceRequestGeneration;
+        final AlertDialog dialog=new AlertDialog.Builder(this)
+                .setTitle(action==CampaignMenuState.NEW_GAME ? "New game in Slot "+(slot+1)+"?" : "Replace save in Slot "+(slot+1)+"?")
+                .setMessage(action==CampaignMenuState.NEW_GAME ?
+                        "New progress is saved at checkpoints. Your previous checkpoint is kept until then." :
+                        "Save your latest checkpoint in Slot "+(slot+1)+"?")
+                .setNegativeButton("Cancel",(d,w) -> {})
+                .setPositiveButton(action==CampaignMenuState.NEW_GAME ? "Start new game" : "Replace save",null).create();
+        campaignConfirmation=dialog;
+        dialog.setOnDismissListener(d -> { if(campaignConfirmation==d) campaignConfirmation=null; });
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+            boolean current=campaignConfirmation==dialog && dialog.isShowing() && campaignMenuVisible && resumed &&
+                    generation==surfaceRequestGeneration && !campaignBusy() && campaignState==shown;
+            dismissCampaignConfirmation();
+            if(current) sendCampaignRequest(action,slot,kind);
+        });
+        installControllerDialog(dialog);
+        Button keep=dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        keep.setFocusableInTouchMode(true);
+        keep.requestFocus();
+    }
+
+    private void dismissCampaignConfirmation() {
+        final AlertDialog dialog=campaignConfirmation;
+        campaignConfirmation=null;
+        if(dialog!=null) { if(controllerDialog==dialog) controllerDialog=null; dialog.dismiss(); }
+    }
+
+    private void sendCampaignRequest(int action,int slot,int kind) {
+        if(campaignDestroyed || !resumed || surfaceRequestGeneration<=0 || !campaignConfigured) return;
+        if(action!=CampaignMenuState.CANCEL && campaignBusy()) return;
+        long request=0;
+        try { request=ProbeBridge.requestCampaign(action,slot,kind,surfaceRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { /* Keep the old publication and show failure. */ }
+        if(request==0) campaignLocalMessage="The request was not accepted. The game remains paused.";
+        else {
+            campaignRequest=request;
+            campaignAction=action;
+            campaignLocalMessage=null;
+            if(action==CampaignMenuState.LOAD || action==CampaignMenuState.NEW_GAME) campaignLoadedReady=false;
+            if(campaignFromDeath && action==CampaignMenuState.LOAD) {
+                campaignDeathLoadRequest=request;
+                campaignDeathLoadCommitted=false;
+                campaignReturnToDeathWhenSettled=false;
+            }
+        }
+        renderCampaignMenu();
+    }
+
+    private void pollCampaignMenu() {
+        if(!resumed || campaignDestroyed) return;
+        CampaignMenuState state=null;
+        try { state=CampaignMenuState.decode(ProbeBridge.getCampaignState()); }
+        catch(RuntimeException | LinkageError unavailable) { /* Native API absent: visible unavailable, never success. */ }
+        if(state==null || !state.current(surfaceRequestGeneration)) {
+            if(confirmedRetryPending) {
+                failConfirmedRetry(CAMPAIGN_SURFACE_UNAVAILABLE);
+                return;
+            }
+            boolean wasValid=campaignPublicationValid;
+            campaignPublicationValid=false;
+            campaignLoadedReady=false;
+            if(campaignLocalMessage==null || wasValid) {
+                campaignLocalMessage=CAMPAIGN_SURFACE_UNAVAILABLE;
+                renderCampaignMenu();
+            }
+            return;
+        }
+        if(campaignState!=null && campaignState.surfaceGeneration==state.surfaceGeneration &&
+                state.revision<campaignState.revision) return;
+        final boolean changed=!campaignPublicationValid || campaignState==null || campaignState.revision!=state.revision ||
+                campaignState.surfaceGeneration!=state.surfaceGeneration;
+        if(!changed) state=campaignState;
+        campaignPublicationValid=true;
+        campaignState=state;
+        if(confirmedRetryPending) {
+            if(campaignAction==CampaignMenuState.CANCEL && campaignRequest>confirmedRetryRequestFloor &&
+               state.ackRequest==campaignRequest && !state.pending() && !state.presented) {
+                failConfirmedRetry(state.message());return;
+            }
+            if(state.confirmedRetry && state.ackRequest>confirmedRetryRequestFloor &&
+               state.lastOperation==CampaignMenuState.LOAD) {
+                campaignRequest=state.ackRequest;campaignAction=CampaignMenuState.LOAD;
+                campaignDeathLoadRequest=state.ackRequest;
+                if(state.error!=0 || state.phase==CampaignMenuState.FAILED ||
+                   state.phase==CampaignMenuState.READY || state.phase==CampaignMenuState.UNAVAILABLE) {
+                    failConfirmedRetry(state.message());return;
+                }
+            } else {
+                if(SystemClock.uptimeMillis()-confirmedRetryStarted>=60000L)
+                    failConfirmedRetry("Checkpoint retry did not become ready. The game remains paused.");
+                return; // An older load/Alive publication cannot complete this retry.
+            }
+        }
+        if(campaignFromDeath && campaignDeathLoadRequest>0 && state.ackRequest>=campaignDeathLoadRequest &&
+                state.lastOperation==CampaignMenuState.LOAD &&
+                (state.phase==CampaignMenuState.REBASE || state.phase==CampaignMenuState.PRESENTING ||
+                        (state.phase==CampaignMenuState.SUCCESS && state.presented))) campaignDeathLoadCommitted=true;
+        if(campaignFromDeath && !campaignDeathLoadCommitted &&
+                ((campaignReturnToDeathWhenSettled && state.ackRequest==campaignRequest && !state.pending()) ||
+                 (campaignDeathLoadRequest>0 && state.ackRequest>=campaignDeathLoadRequest &&
+                        state.lastOperation==CampaignMenuState.LOAD && state.phase==CampaignMenuState.FAILED))) {
+            campaignDeathMessage=state.error==0 ? null : state.message();
+            returnToDeathFromCampaign();
+            return;
+        }
+        if(CAMPAIGN_SURFACE_UNAVAILABLE.equals(campaignLocalMessage) && state.error==0 &&
+                (state.phase==CampaignMenuState.READY || state.phase==CampaignMenuState.SUCCESS))
+            campaignLocalMessage=null;
+
+        if(state.phase!=CampaignMenuState.SUCCESS || state.lastOperation!=CampaignMenuState.LOAD ||
+                state.error!=0 || !state.presented) campaignLoadedReady=false;
+        if(state.phase==CampaignMenuState.REBASE &&
+                (campaignAcknowledgedToken!=state.rebaseToken || campaignAcknowledgedGeneration!=state.surfaceGeneration) &&
+                (campaignRebaseAttemptToken!=state.rebaseToken || campaignRebaseAttemptGeneration!=state.surfaceGeneration ||
+                        campaignRebaseAttemptRevision!=state.revision)) {
+            campaignRebaseAttemptToken=state.rebaseToken;
+            campaignRebaseAttemptGeneration=state.surfaceGeneration;
+            campaignRebaseAttemptRevision=state.revision;
+            rebaseCampaignInput(state);
+            try {
+                if(ProbeBridge.acknowledgeCampaignInput(state.rebaseToken,state.surfaceGeneration)) {
+                    campaignAcknowledgedToken=state.rebaseToken;
+                    campaignAcknowledgedGeneration=state.surfaceGeneration;
+                }
+            } catch(RuntimeException | LinkageError unavailable) {
+                campaignLocalMessage="The game could not finish loading. It is still paused.";
+            }
+        }
+        if(state.completes(campaignRequest,campaignAction,surfaceRequestGeneration)) {
+            final int operation=campaignAction;
+            campaignRequest=0;
+            campaignLocalMessage=null;
+            if(operation==CampaignMenuState.NEW_GAME && campaignMenuVisible) {
+                rebaseCampaignInput(state);
+                campaignMenuVisible=false;
+                showEntryMenu(false);
+                beginPreparedEntryPlay();
+                return;
+            }
+            if(operation==CampaignMenuState.LOAD) {
+                campaignLoadedReady=true;
+                // Only the current deliberate Load auto-enters. Interrupted or
+                // cancelled post-commit recovery retains an explicit Continue.
+                if(campaignMenuVisible && resumed && campaignAcknowledgedGeneration==state.surfaceGeneration &&
+                   campaignAcknowledgedToken!=0 && campaignAcknowledgedToken==state.rebaseToken) {
+                    resumeLoadedCampaign();
+                    if(!campaignMenuVisible)return;
+                }
+            }
+        } else if(state.ackRequest==campaignRequest && !state.pending() &&
+                  !(campaignAction==CampaignMenuState.LOAD && state.phase==CampaignMenuState.SUCCESS && state.error==0 && !state.presented)) {
+            campaignRequest=0;
+        }
+        // An interrupted post-commit load still needs an explicit Resume after native rebase/presentation.
+        if(state.phase==CampaignMenuState.SUCCESS && state.error==0 && state.lastOperation==CampaignMenuState.LOAD && state.presented &&
+                campaignAcknowledgedGeneration==state.surfaceGeneration && campaignAcknowledgedToken!=0 &&
+                state.rebaseToken==campaignAcknowledgedToken &&
+                (campaignRequest==0 || state.ackRequest==campaignRequest)) {
+            campaignLoadedReady=true;
+            campaignLocalMessage=null;
+        }
+        if(confirmedRetryPending && campaignLoadedReady &&
+           campaignAcknowledgedGeneration==state.surfaceGeneration && campaignAcknowledgedToken!=0 &&
+           state.rebaseToken==campaignAcknowledgedToken) {
+            // resumeLoadedCampaign also verifies a living restored player. Only
+            // this owner-started confirmed retry auto-resumes; manual Load does not.
+            resumeLoadedCampaign();
+        }
+        if(changed) { if(!state.pending()) dismissCampaignConfirmation(); renderCampaignMenu(); }
+    }
+
+    private void rebaseCampaignInput(CampaignMenuState state) {
+        // Publish the absolute camera and a neutral, paused input sample before native owner acknowledgement.
+        setGameplayPaused(true);
+        clearTouchState();
+        stopChapterAmbience();
+        ++delayedGameplayFeedbackGeneration;
+        stopPrivateLichRevivalAudio();
+        clearVerticalProofFeedbackSelection();
+        suspendAndResetWaterfall();
+        stopChapterVoice();
+        chapterSubtitleGeneration=Long.MIN_VALUE;
+        chapterDialogueSkipPendingGeneration=Long.MIN_VALUE;
+        if(chapterSubtitlePanel!=null) chapterSubtitlePanel.setVisibility(View.GONE);
+        cancelCombatTeachingPromptPoll(); clearCombatTeachingPrompt();
+        if(vibrator!=null) vibrator.cancel();
+        viewControls[0]=state.yaw; viewControls[1]=state.pitch;
+        pushViewControls();
+    }
+
+    private void backFromCampaignMenu() {
+        dismissCampaignConfirmation();
+        if(campaignBusy() || (campaignState!=null && campaignState.pending())) {
+            if(campaignFromDeath && !campaignDeathLoadCommitted) campaignReturnToDeathWhenSettled=true;
+            sendCampaignRequest(CampaignMenuState.CANCEL,0,0);
+            campaignLocalMessage="Cancellation requested. The game remains paused; checking the outcome…";
+            renderCampaignMenu();
+            return;
+        }
+        if(campaignFromDeath) {
+            if(campaignDeathLoadCommitted) {
+                campaignLocalMessage="The checkpoint is loaded. Choose Resume after restoration finishes.";
+                renderCampaignMenu();
+            } else returnToDeathFromCampaign();
+            return;
+        }
+        if(campaignLoadedReady) { resumeLoadedCampaign(false); return; }
+        campaignMenuVisible=false;
+        campaignRequest=0;
+        handler.removeCallbacks(refreshCampaignMenu);
+        showMainMenu(false);
+    }
+
+    private void returnToDeathFromCampaign() {
+        campaignMenuVisible=false;
+        campaignRequest=0;
+        campaignLoadedReady=false;
+        campaignReturnToDeathWhenSettled=false;
+        handler.removeCallbacks(refreshCampaignMenu);
+        renderDeathOverlay();
+    }
+
+    private void resumeLoadedCampaign() { resumeLoadedCampaign(true); }
+
+    private void resumeLoadedCampaign(boolean resume) {
+        if(!campaignLoadedReady || campaignBusy() || !campaignPublicationValid || campaignState==null || !campaignState.current(surfaceRequestGeneration) ||
+                campaignState.phase!=CampaignMenuState.SUCCESS || campaignState.lastOperation!=CampaignMenuState.LOAD ||
+                campaignState.error!=0 || !campaignState.presented) return;
+        if(campaignFromDeath) {
+            if(!resume) return;
+            final int life;
+            final long vitality;
+            try { life=ProbeBridge.getPlayerLifePhase(); vitality=ProbeBridge.getPlayerVitalityState(); }
+            catch(RuntimeException | LinkageError unavailable) { return; }
+            final int current=(int)vitality, maximum=(int)((vitality>>>32)&0x7fffffffL);
+            if(life!=PLAYER_ALIVE || current<=0 || maximum<=0 || current>maximum) {
+                campaignLocalMessage="Waiting for the restored living player. The game remains paused.";
+                renderCampaignMenu();
+                return;
+            }
+            rebaseCampaignInput(campaignState);
+            deathOverlayVisible=false;
+            retryPending=false;
+            lastPlayerLifePhase=life;
+            updateVitalityHud(current,maximum,vitality<0);
+            campaignFromDeath=false;
+            campaignDeathLoadCommitted=false;
+            campaignDeathMessage=null;
+        }
+        confirmedRetryPending=false;
+        campaignMenuVisible=false; campaignRequest=0; campaignLoadedReady=false;
+        entryPlayRequested=false; entryMenuEnabled=false; entryMenuSidePage=false; firstMenu=false;
+        handler.removeCallbacks(refreshEntryMenu);
+        handler.removeCallbacks(refreshCampaignMenu);
+        try { ProbeBridge.setEntryMenu(false,false,isReducedMotionEnabled(),false,surfaceRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { /* Native load gate keeps the game paused if unavailable. */ }
+        if(resume) hideMenu(); else showMainMenu(false);
+    }
+
     private void requestEntryPlay() {
-        if (!entryMenuEnabled || entryPlayRequested) return;
+        if (!entryMenuEnabled || entryPlayRequested || openingBenchmarkPending() || !isMenuRuntimeReady()) return;
+        showCampaignMenu(CampaignMenuState.NEW_GAME);
+    }
+
+    private void beginPreparedEntryPlay() {
+        if (!entryMenuEnabled || entryPlayRequested || openingBenchmarkPending()) return;
         playSound("ui_select", 0.18f);
         entryMenuSidePage = false;
         entryMenuFailed = false;
@@ -1194,7 +2227,7 @@ public class MainActivity extends Activity {
         }
         publishEntryMenuState();
         handler.postDelayed(() -> {
-            if (!entryMenuEnabled || surfaceRequestGeneration <= 0) return;
+            if (!entryMenuEnabled || campaignMenuVisible || surfaceRequestGeneration <= 0) return;
             entryPlayRequested = true;
             applyEntryMenuAvailability(null);
             publishEntryMenuState();
@@ -1240,10 +2273,14 @@ public class MainActivity extends Activity {
     }
 
     private void applyEntryMenuAvailability(EntryMenuState state) {
-        final boolean busy = entryPlayRequested;
+        if(state!=null && state.isEntryPresented(surfaceRequestGeneration) && state.phase==EntryMenuState.PHASE_IDLE)
+            entryMenuAdmittedGeneration=surfaceRequestGeneration;
+        final boolean busy = entryPlayRequested || openingBenchmarkPending() || !isMenuRuntimeReady();
         if (entryPlayButton != null) { entryPlayButton.setEnabled(!busy); entryPlayButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
         if (entrySettingsButton != null) { entrySettingsButton.setEnabled(!busy); entrySettingsButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
         if (entryMoreButton != null) { entryMoreButton.setEnabled(!busy); entryMoreButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
+        if(openingBenchmarkButton!=null) openingBenchmarkButton.setEnabled(!busy && canRequestOpeningBenchmark());
+        if(openingBenchmarkProvisionalButton!=null) openingBenchmarkProvisionalButton.setEnabled(!busy && canRequestOpeningBenchmark());
         if (entryPlayButton != null && state != null && state.phase != EntryMenuState.PHASE_FAILURE)
             entryPlayButton.setText(R.string.entry_play);
     }
@@ -1263,6 +2300,301 @@ public class MainActivity extends Activity {
             if (ProbeBridge.requestBenchmarkWithSummaryId(UUID.randomUUID().toString(), Build.MODEL)) return true;
         } catch (RuntimeException | LinkageError unavailable) { /* Optional statistics cannot block the run. */ }
         return ProbeBridge.requestBenchmark(); // Native readiness/busy guards still apply.
+    }
+
+    private static OpeningBenchmarkState readOpeningBenchmarkOwner() {
+        try { return OpeningBenchmarkState.decode(ProbeBridge.getOpeningBenchmarkState()); }
+        catch(RuntimeException | LinkageError unavailable) { return null; }
+    }
+
+    private void selectOpeningBenchmarkRecovery(Bundle saved) {
+        final OpeningBenchmarkClient bundled=OpeningBenchmarkClient.restore(saved),fallback=openingBenchmarkClientFallback;
+        openingBenchmarkRecoveryLaunch=OpeningBenchmarkClient.saved(saved) || fallback!=null;
+        if(!openingBenchmarkRecoveryLaunch)return;
+        final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+        // Prefer the exact in-process LayoutParams copy; a stale/reconstituted
+        // Bundle must not hide a matching same-process checkpoint.
+        openingBenchmarkRecoveryClient=fallback!=null && fallback.matches(owner)?fallback:
+            bundled!=null && bundled.matches(owner)?bundled:bundled!=null?bundled:fallback;
+        openingBenchmarkRecoveryRejected=openingBenchmarkRecoveryClient==null || owner==null ||
+            (!openingBenchmarkRecoveryClient.matches(owner) && owner.phase!=OpeningBenchmarkState.IDLE);
+    }
+
+    private void retainOpeningBenchmarkClient() {
+        if(!openingBenchmarkPending())return;
+        if(openingBenchmarkProvisional && openingBenchmarkOutput==null && openingBenchmarkRecoveryClient==null)return;
+        openingBenchmarkRecoveryClient=new OpeningBenchmarkClient(openingBenchmarkRequest,openingBenchmarkRequestGeneration,
+            openingBenchmarkProvisional,openingBenchmarkOutput!=null?openingBenchmarkOutput.originalLayout():
+                openingBenchmarkRecoveryClient==null?null:openingBenchmarkRecoveryClient.originalLayout());
+        if(openingBenchmarkRecoveryClient.matches(readOpeningBenchmarkOwner()))openingBenchmarkClientFallback=openingBenchmarkRecoveryClient;
+    }
+
+    private void clearOpeningBenchmarkClient() {
+        final OpeningBenchmarkClient stale=openingBenchmarkRecoveryClient;
+        if(stale!=null && openingBenchmarkClientFallback!=null &&
+                stale.request==openingBenchmarkClientFallback.request && stale.origin==openingBenchmarkClientFallback.origin)
+            openingBenchmarkClientFallback=null;
+        openingBenchmarkRecoveryClient=null;
+    }
+
+    private void restoreOpeningBenchmarkLayout() {
+        final FrameLayout.LayoutParams original=openingBenchmarkRecoveryClient==null?null:openingBenchmarkRecoveryClient.originalLayout();
+        if(original!=null) { surfaceView.setLayoutParams(original);surfaceView.getHolder().setSizeFromLayout(); }
+    }
+
+    private void rejectOpeningBenchmarkRecovery() {
+        openingBenchmarkRecoveryRejected=true;
+        openingBenchmarkRequest=openingBenchmarkRequestGeneration=0;
+        openingBenchmarkOutput=null;benchmarkRunning=false;entryPlayRequested=false;
+        handler.removeCallbacks(refreshOpeningBenchmark);
+        showOpeningBenchmarkRecoveryBlocked();
+    }
+
+    private void recoverOpeningBenchmarkClient() {
+        if(!openingBenchmarkRecoveryLaunch)return;
+        if(resumed || surfaceRequestGeneration!=0){rejectOpeningBenchmarkRecovery();return;}
+        final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+        if(openingBenchmarkRecoveryClient==null || owner==null ||
+                (!openingBenchmarkRecoveryClient.matches(owner) && owner.phase!=OpeningBenchmarkState.IDLE)) {
+            rejectOpeningBenchmarkRecovery();return; // Never resize/cancel/start a different live owner.
+        }
+        openingBenchmarkRecoveryRejected=false;
+        if(owner.phase==OpeningBenchmarkState.IDLE) {
+            restoreOpeningBenchmarkLayout();clearOpeningBenchmarkClient();
+            // Fresh-process startup uses confirmed preferences as usual, after
+            // the stale client is discarded. Nothing is written to preferences.
+            applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
+            ProbeBridge.resetRtSceneTuning();setNativeGraphics(graphicsConfirmed);
+            return;
+        }
+        final OpeningBenchmarkClient client=openingBenchmarkRecoveryClient;
+        openingBenchmarkRequest=client.request;openingBenchmarkRequestGeneration=client.origin;
+        openingBenchmarkProvisional=client.provisional;
+        openingBenchmarkRecovered=true;openingBenchmarkCancelRequested=true;
+        openingBenchmarkRecoveredComplete=owner.phase==OpeningBenchmarkState.COMPLETE;
+        benchmarkRunning=true;entryMenuEnabled=true;entryPlayRequested=false;
+        // Cancellation is issued before any lifecycle start/resume; recovery
+        // never resumes measurement, even if the saved run had been running.
+        cancelOpeningBenchmarkRequest();
+        // This Activity's recreated holder has no native owner yet. Establish
+        // the original layout before first start, including a completion race.
+        // Later polls may only observe it or execute the drained native command.
+        restoreOpeningBenchmarkLayout();
+        if(!openingBenchmarkRecoveredComplete && client.provisional)
+            openingBenchmarkOutput=new OpeningBenchmarkOutput(client.request,client.origin,client.originalLayout(),true);
+    }
+
+    private void showOpeningBenchmarkRecoveryBlocked() {
+        menuVisible=true;entryPlayRequested=false;
+        if(menuScrim!=null){menuScrim.removeAllViews();menuScrim.setVisibility(View.GONE);}
+        for(View view:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,interactButton,
+                toggleHeldLightPoseButton,vitalityStatus,developerOverlay,diagnosticsPanel})if(view!=null)view.setVisibility(View.GONE);
+        if(rtStatus!=null){rtStatus.setVisibility(View.VISIBLE);rtStatus.setText(
+            "Benchmark recovery could not identify its renderer owner. No surface or other run was changed. Close this screen and reopen after that run ends.");}
+    }
+
+    private boolean openingBenchmarkPending() { return openingBenchmarkRequest>0; }
+
+    private boolean canRequestOpeningBenchmark() {
+        if(openingBenchmarkRecoveryRejected || !entryMenuEnabled || entryPlayRequested || openingBenchmarkPending() || benchmarkRunning || !resumed ||
+                surfaceRequestGeneration<=0 || benchmarkAutomationId!=null || campaignMenuVisible || campaignRequest!=0 ||
+                (campaignState!=null && (campaignState.activeSlot>=0 || campaignState.pending())) ||
+                graphicsVisible || graphicsSceneRestoring || diagnosticsVisible || playtestReportVisible || rtLabVisible) return false;
+        try {
+            final EntryMenuState state=EntryMenuState.decode(ProbeBridge.getEntryMenuState());
+            return state!=null && state.isEntryPresented(surfaceRequestGeneration);
+        } catch(RuntimeException | LinkageError unavailable) { return false; }
+    }
+
+    private void requestOpeningCustomBenchmark() {
+        requestOpeningBenchmark(false);
+    }
+
+    private void requestOpeningProvisionalBenchmark() {
+        requestOpeningBenchmark(true);
+    }
+
+    private void requestOpeningBenchmark(boolean provisional) {
+        if(!canRequestOpeningBenchmark()) return;
+        final FrameLayout.LayoutParams original=provisional?OpeningBenchmarkOutput.snapshot(surfaceView):null;
+        if(provisional && original==null) {
+            Toast.makeText(this,"Provisional unavailable; choose Custom.",Toast.LENGTH_LONG).show(); return;
+        }
+        final long origin=surfaceRequestGeneration,request;
+        try { request=provisional?ProbeBridge.requestOpeningProvisionalBenchmark(origin):ProbeBridge.requestOpeningBenchmark(origin); }
+        catch(RuntimeException | LinkageError unavailable) {
+            Toast.makeText(this,provisional?"Provisional unavailable; choose Custom.":getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return;
+        }
+        if(request<=0) { Toast.makeText(this,provisional?"Provisional unavailable; choose Custom.":getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return; }
+        openingBenchmarkRequest=request; openingBenchmarkRequestGeneration=origin;
+        openingBenchmarkProvisional=provisional;
+        openingBenchmarkOutput=provisional?new OpeningBenchmarkOutput(request,origin,original):null;
+        openingBenchmarkRecovered=openingBenchmarkRecoveredComplete=false;
+        retainOpeningBenchmarkClient();
+        openingBenchmarkCancelRequested=openingBenchmarkBlocked=false;
+        benchmarkRunning=true; latestBenchmarkReport="";
+        entryPlayRequested=false; entryMenuFailed=false;
+        closeBenchmarkSummaryReview();
+        clearTouchState();
+        playSound("ui_select",.18f);
+        showOpeningBenchmarkProgress();
+        handler.removeCallbacks(refreshEntryMenu);
+        handler.removeCallbacks(refreshOpeningBenchmark);
+        handler.post(refreshOpeningBenchmark);
+    }
+
+    private void cancelOpeningBenchmarkRequest() {
+        if(openingBenchmarkRecoveryRejected || !openingBenchmarkPending()) return;
+        openingBenchmarkCancelRequested=true;
+        final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+        if(owner==null || !owner.matches(openingBenchmarkRequest,openingBenchmarkRequestGeneration))return;
+        try { ProbeBridge.cancelOpeningBenchmark(openingBenchmarkRequest,openingBenchmarkRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { /* Native surface retirement also cancels this owner. */ }
+        // The owner may already have replaced apply with restore; observing the
+        // current command prevents an old callback from acknowledging either.
+        observeOpeningBenchmarkOutput(openingBenchmarkOutput==null?null:openingBenchmarkOutput.current());
+    }
+
+    private void pollOpeningBenchmarkOutput() {
+        if(openingBenchmarkOutput==null || !openingBenchmarkPending())return;
+        final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+        if(owner==null || !owner.matches(openingBenchmarkRequest,openingBenchmarkRequestGeneration))return;
+        final OpeningBenchmarkOutput.Command command;
+        try { command=OpeningBenchmarkOutput.Command.decode(ProbeBridge.getOpeningBenchmarkOutputState()); }
+        catch(RuntimeException | LinkageError unavailable) { cancelOpeningBenchmarkRequest();return; }
+        if(command==null)return;
+        if(openingBenchmarkOutput.begin(command,surfaceRequestGeneration,openingBenchmarkCancelRequested,surfaceView)) {
+            // A holder already at the requested dimensions may emit no resize
+            // callback. This posted check still observes real layout and buffer.
+            surfaceView.post(() -> observeOpeningBenchmarkOutput(command,true));
+        }
+        observeOpeningBenchmarkOutput(command);
+    }
+
+    private void observeOpeningBenchmarkOutput(OpeningBenchmarkOutput.Command expected) {
+        observeOpeningBenchmarkOutput(expected,false);
+    }
+
+    private void observeOpeningBenchmarkOutput(OpeningBenchmarkOutput.Command expected,boolean layoutOrPosted) {
+        if(expected==null || openingBenchmarkOutput==null || !openingBenchmarkPending() || surfaceView==null)return;
+        try {
+            final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+            if(owner==null || !owner.matches(openingBenchmarkRequest,openingBenchmarkRequestGeneration))return;
+            final OpeningBenchmarkOutput.Command current=OpeningBenchmarkOutput.Command.decode(ProbeBridge.getOpeningBenchmarkOutputState());
+            if(!expected.same(current))return; // Stale posted work/callback/command cannot ACK a successor.
+            if(layoutOrPosted)openingBenchmarkOutput.observedLayoutOrPost(current);
+            final SurfaceHolder holder=surfaceView.getHolder();
+            final Rect frame=holder.getSurfaceFrame();
+            final int width=frame==null?0:frame.width(),height=frame==null?0:frame.height();
+            final Surface surface=holder.getSurface();
+            final OpeningBenchmarkOutput.Ack ack=openingBenchmarkOutput.observe(current,surfaceRequestGeneration,
+                openingBenchmarkCancelRequested || !resumed,surfaceView,surface!=null && surface.isValid(),width,height);
+            if(ack==null)return;
+            final OpeningBenchmarkState ackOwner=readOpeningBenchmarkOwner();
+            if(ackOwner==null || !ackOwner.matches(current.request,current.origin))return;
+            ProbeBridge.ackOpeningBenchmarkOutput(current.request,current.origin,current.generation,current.sequence,
+                ack.success,ack.width,ack.height,ack.layoutRestoredOrAspectPreserved);
+            openingBenchmarkOutput.acknowledged(ack);
+        } catch(RuntimeException | LinkageError unavailable) {
+            // Keep the layout snapshot and existing cancellation until a native
+            // restore command can be acknowledged on a current surface.
+            openingBenchmarkCancelRequested=true;
+            try {
+                final OpeningBenchmarkState owner=readOpeningBenchmarkOwner();
+                if(owner!=null && owner.matches(openingBenchmarkRequest,openingBenchmarkRequestGeneration)) {
+                    ProbeBridge.cancelOpeningBenchmark(openingBenchmarkRequest,openingBenchmarkRequestGeneration);
+                }
+            }
+            catch(RuntimeException | LinkageError ignored) { /* Native retirement also cancels the request. */ }
+        }
+    }
+
+    private String openingBenchmarkLabel() {
+        return openingBenchmarkProvisional?"Mobile provisional benchmark (unranked)":"Custom benchmark (unranked)";
+    }
+
+    private void showOpeningBenchmarkProgress() {
+        if(!openingBenchmarkPending()) return;
+        menuVisible=false; benchmarkReportVisible=false; diagnosticsVisible=false;
+        entryPlayRequested=false;
+        if(menuScrim!=null) { menuScrim.removeAllViews(); menuScrim.setVisibility(View.GONE); }
+        for(View action:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,vitalityStatus,developerOverlay})
+            if(action!=null) action.setVisibility(View.GONE);
+        if(diagnosticsPanel!=null) diagnosticsPanel.setVisibility(View.GONE);
+        if(rtStatus!=null) {
+            rtStatus.setVisibility(View.VISIBLE);
+            rtStatus.setText(openingBenchmarkBlocked ? "Benchmark stopped. Could not return to the opening menu. Close and reopen The Horde." :
+                openingBenchmarkCancelRequested ? "Returning to opening menu..." : openingBenchmarkLabel()+". Back cancels.");
+        }
+        // This leaves campaign Play disabled. The native benchmark owner alone
+        // advances Showcase and requires a fresh Entry frame before releasing UI.
+        if(resumed) setGameplayPaused(openingBenchmarkBlocked || openingBenchmarkCancelRequested);
+    }
+
+    private void pollOpeningBenchmark() {
+        if(!openingBenchmarkPending()) return;
+        pollOpeningBenchmarkOutput(); // Restore commands must also run during RETURNING.
+        final OpeningBenchmarkState state;
+        try { state=OpeningBenchmarkState.decode(ProbeBridge.getOpeningBenchmarkState()); }
+        catch(RuntimeException | LinkageError unavailable) { cancelOpeningBenchmarkRequest(); return; }
+        if(state==null || !state.matches(openingBenchmarkRequest,openingBenchmarkRequestGeneration)) return;
+        if(state.phase==OpeningBenchmarkState.BLOCKED) {
+            if(!openingBenchmarkBlocked) {
+                openingBenchmarkBlocked=true;
+                showOpeningBenchmarkProgress();
+            }
+            return; // Never present Entry as restored from an unproved owner.
+        }
+        if(openingBenchmarkRecovered && !openingBenchmarkRecoveredComplete && state.phase==OpeningBenchmarkState.COMPLETE &&
+                state.entryPresented && state.surfaceGeneration!=surfaceRequestGeneration) {
+            // Completion may race Activity replacement before its new surface
+            // binds. Native Complete cannot issue a new-generation output ACK.
+            openingBenchmarkRecoveredComplete=true;openingBenchmarkOutput=null;
+        }
+        boolean returned=state.returnedToEntry(openingBenchmarkRequest,openingBenchmarkRequestGeneration,surfaceRequestGeneration);
+        if(openingBenchmarkRecoveredComplete && state.phase==OpeningBenchmarkState.COMPLETE && state.entryPresented) {
+            // Complete's old native generation is deliberately left untouched.
+            // This is a new, separate current Entry witness after local policy restore.
+            final EntryMenuState entry=EntryMenuState.decode(ProbeBridge.getEntryMenuState());
+            returned=entry!=null && entry.isEntryPresented(surfaceRequestGeneration) && recoveredOpeningLayoutPresented();
+        }
+        if(!returned) {
+            if(rtStatus!=null && state.phase==OpeningBenchmarkState.RETURNING)
+                rtStatus.setText("Returning to opening menu...");
+            if(rtStatus!=null && !openingBenchmarkCancelRequested && state.phase==OpeningBenchmarkState.RUNNING) {
+                final String progress=ProbeBridge.getBenchmarkProgress();
+                if(!progress.isEmpty()) rtStatus.setText(openingBenchmarkLabel()+"\n"+progress);
+            }
+            return;
+        }
+        if(openingBenchmarkOutput!=null && !openingBenchmarkOutput.canRelease())return;
+        final boolean completed=!openingBenchmarkRecovered && state.result==OpeningBenchmarkState.SUCCEEDED;
+        final boolean unavailable=state.result==OpeningBenchmarkState.UNAVAILABLE;
+        openingBenchmarkRequest=openingBenchmarkRequestGeneration=0;
+        openingBenchmarkCancelRequested=openingBenchmarkBlocked=false;
+        openingBenchmarkOutput=null; openingBenchmarkProvisional=false;
+        clearOpeningBenchmarkClient();openingBenchmarkRecovered=openingBenchmarkRecoveredComplete=false;
+        benchmarkRunning=false; entryMenuEnabled=true; entryMenuSidePage=false; entryPlayRequested=false;
+        handler.removeCallbacks(refreshOpeningBenchmark);
+        if(openingBenchmarkRecoveryStoragePending){openingBenchmarkRecoveryStoragePending=false;configureCampaignStorage();}
+        if(completed) {
+            latestBenchmarkReport=ProbeBridge.getBenchmarkReport();
+            if(latestBenchmarkReport.isEmpty()) latestBenchmarkReport=getString(R.string.benchmark_interrupted);
+            showBenchmarkReport(true);
+        } else {
+            showMainMenu(false);
+            Toast.makeText(this,unavailable?"Provisional unavailable; choose Custom.":
+                "Benchmark did not complete. Returned to opening menu.",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private boolean recoveredOpeningLayoutPresented() {
+        if(!openingBenchmarkProvisional)return true;
+        if(openingBenchmarkRecoveryClient==null || surfaceView==null || !surfaceView.isLaidOut() || surfaceView.isLayoutRequested())return false;
+        final SurfaceHolder holder=surfaceView.getHolder();final Surface surface=holder.getSurface();final Rect frame=holder.getSurfaceFrame();
+        return surface!=null && surface.isValid() && frame!=null &&
+            OpeningBenchmarkOutput.sameLayout(surfaceView.getLayoutParams(),openingBenchmarkRecoveryClient.originalLayout()) &&
+            frame.width()==surfaceView.getWidth() && frame.height()==surfaceView.getHeight() && frame.width()>0 && frame.height()>0;
     }
 
     private void startBenchmark() {
@@ -1292,6 +2624,8 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
+        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.VISIBLE);
         vitalityStatus.setVisibility(View.GONE);
         rtStatus.setText(R.string.benchmark_starting);
@@ -1441,6 +2775,8 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
+        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
@@ -1453,6 +2789,7 @@ public class MainActivity extends Activity {
                 completed ? getString(R.string.benchmark_complete) : getString(R.string.benchmark_invalid));
         if (completed && BenchmarkSummaryReview.validUuid(readyBenchmarkSummaryRunId())) {
             addMenuButton(panel, getString(R.string.benchmark_summary_review), this::showBenchmarkSummaryReview);
+            addMenuButton(panel, getString(R.string.benchmark_public_preview), () -> showBenchmarkSummaryReview(true));
         }
         final TextView report = new TextView(this);
         report.setText(latestBenchmarkReport);
@@ -1475,13 +2812,17 @@ public class MainActivity extends Activity {
     }
 
     private void showBenchmarkSummaryReview() {
+        showBenchmarkSummaryReview(false);
+    }
+
+    private void showBenchmarkSummaryReview(boolean publicPreview) {
         final String runId = readyBenchmarkSummaryRunId();
         if (!BenchmarkSummaryReview.validUuid(runId)) {
             Toast.makeText(this, R.string.benchmark_summary_unavailable, Toast.LENGTH_LONG).show();
             return;
         }
         closeBenchmarkSummaryReview();
-        benchmarkSummaryReview = new BenchmarkSummaryReview(runId);
+        benchmarkSummaryReview = new BenchmarkSummaryReview(runId, publicPreview);
         benchmarkSummaryVisible = true;
         renderBenchmarkSummaryForm();
     }
@@ -1490,11 +2831,12 @@ public class MainActivity extends Activity {
         final BenchmarkSummaryReview owner = benchmarkSummaryReview;
         final long generation = benchmarkSummaryFormGeneration;
         menuScrim.removeAllViews();
-        final LinearLayout panel = createPanel(getString(R.string.benchmark_summary_review),
+        final LinearLayout panel = createPanel(getString(owner.isPublicPreview()
+                        ? R.string.benchmark_public_preview : R.string.benchmark_summary_review),
                 getString(R.string.benchmark_summary_local_only));
-        addBody(panel, getString(R.string.benchmark_summary_scope));
+        addBody(panel, getString(owner.isPublicPreview() ? R.string.benchmark_public_scope : R.string.benchmark_summary_scope));
         benchmarkSummaryConsent = new CheckBox(this);
-        benchmarkSummaryConsent.setText(R.string.benchmark_summary_consent);
+        benchmarkSummaryConsent.setText(owner.isPublicPreview() ? R.string.benchmark_public_consent : R.string.benchmark_summary_consent);
         stylePlaytestConsent(benchmarkSummaryConsent);
         benchmarkSummaryConsent.setMinHeight(dp(48));
         panel.addView(benchmarkSummaryConsent, matchWrap());
@@ -1538,6 +2880,8 @@ public class MainActivity extends Activity {
             button.setVisibility(View.GONE);
             panel.addView(button, menuButtonLayoutParams());
         }
+        benchmarkSummarySendControls = StatisticsReportSendControls.benchmark(this, panel, reportExecutor,
+                owner, StatisticsReportSendControls.Services.unavailable());
         addMenuButton(panel, getString(R.string.back),
                 benchmarkSummaryAction(owner, generation, () -> showBenchmarkReport(true)));
         attachPanel(panel);
@@ -1557,8 +2901,10 @@ public class MainActivity extends Activity {
         if (!benchmarkSummaryVisible || owner == null || owner.isPrepared() || !benchmarkSummaryConsent.isChecked()) return;
         final SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ROOT);
         utc.setTimeZone(TimeZone.getTimeZone("UTC"));
+        final BenchmarkSummaryReview.Preparer preparer = owner.isPublicPreview()
+                ? ProbeBridge::preparePublicBenchmarkPreview : ProbeBridge::prepareBenchmarkSummaryReport;
         if (!owner.prepare(true, benchmarkSummaryHardware.isChecked(), benchmarkSummaryCooling.getSelectedItemPosition(),
-                UUID.randomUUID().toString(), utc.format(new Date()), ProbeBridge::prepareBenchmarkSummaryReport)) {
+                UUID.randomUUID().toString(), utc.format(new Date()), preparer)) {
             benchmarkSummaryStatus.setText(R.string.benchmark_summary_unavailable);
             return;
         }
@@ -1571,6 +2917,7 @@ public class MainActivity extends Activity {
         benchmarkSummaryCopy.setVisibility(View.VISIBLE);
         benchmarkSummarySave.setVisibility(View.VISIBLE);
         benchmarkSummaryEdit.setVisibility(View.VISIBLE);
+        if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.refresh();
     }
 
     private void copyBenchmarkSummary() {
@@ -1587,8 +2934,9 @@ public class MainActivity extends Activity {
         if (export != null && (export.state() == PlaytestReportExport.State.CHOOSING ||
                 export.state() == PlaytestReportExport.State.WRITING)) return;
         final String runId = benchmarkSummaryReview.runId();
+        final boolean publicPreview = benchmarkSummaryReview.isPublicPreview();
         closeBenchmarkSummaryReview();
-        benchmarkSummaryReview = new BenchmarkSummaryReview(runId);
+        benchmarkSummaryReview = new BenchmarkSummaryReview(runId, publicPreview);
         benchmarkSummaryVisible = true;
         renderBenchmarkSummaryForm(); // New preparation needs new UUID and fresh unchecked consent.
     }
@@ -1611,7 +2959,8 @@ public class MainActivity extends Activity {
         final Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("application/json");
-        intent.putExtra(Intent.EXTRA_TITLE, "HordeLanternRT-benchmark-statistics.json");
+        intent.putExtra(Intent.EXTRA_TITLE, benchmarkSummaryReview.isPublicPreview()
+                ? "HordeLanternRT-public-preview.json" : "HordeLanternRT-benchmark-statistics.json");
         try { startActivityForResult(intent, REQUEST_SAVE_BENCHMARK_SUMMARY); }
         catch (RuntimeException unavailable) {
             benchmarkSummaryPickerReview = null;
@@ -1666,6 +3015,8 @@ public class MainActivity extends Activity {
 
     private void closeBenchmarkSummaryReview() {
         ++benchmarkSummaryFormGeneration;
+        if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.close();
+        benchmarkSummarySendControls = null;
         if (benchmarkSummaryReview != null) benchmarkSummaryReview.close();
         benchmarkSummaryReview = null;
         benchmarkSummaryVisible = false;
@@ -2411,6 +3762,9 @@ public class MainActivity extends Activity {
     }
 
     private void hideMenu() {
+        if(openingBenchmarkPending() || !isMenuRuntimeReady()) return;
+        invalidateLookoutObjective();
+        if(campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier())) return;
         if (entryMenuEnabled) {
             cancelPendingEntryPlay();
             if (!menuVisible) showEntryMenu(false);
@@ -2470,7 +3824,504 @@ public class MainActivity extends Activity {
         attachPanel(panel);
     }
 
+    private void applyCombatTeachingOptions(CombatTeachingPreferences.Values values) {
+        ProbeBridge.setCombatTeachingOptions(values.enabled, values.slowdown);
+    }
+
+    private boolean updateCombatTeachingPrompt(int surfaceState) {
+        if (combatTeachingPrompt == null) return false;
+        final long packed = ProbeBridge.getCombatTeachingState();
+        final String text = CombatTeachingPreferences.prompt(packed, controllerMode);
+        final boolean attackCue = CombatTeachingPreferences.attackReadability(packed) != 0;
+        final boolean practiceCue=CombatTeachingPreferences.safePractice(packed) && !CombatTeachingPreferences.lessonSuppressed(packed);
+        if (combatAttackCueVisible && !attackCue || combatPracticeCueVisible && !practiceCue) {
+            // Never fade stale attack warnings or advertise protection after it ends.
+            combatTeachingFadeText = "";
+            combatTeachingFadeOpacity = 0;
+            combatTeachingFadeStartedAtMs = 0L;
+        }
+        combatAttackCueVisible = attackCue;
+        combatPracticeCueVisible = practiceCue;
+        final boolean allowed = resumed && surfaceStarted && surfaceState == 1 &&
+                preferences.getBoolean("show_hud", true) &&
+                !menuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
+                !playtestReportVisible && !benchmarkRunning && !debugCaptureUiSuppressed &&
+                !deathOverlayVisible && !endingOverlayVisible;
+        final boolean reducedMotion = isReducedMotionEnabled();
+        if (!allowed || reducedMotion && text.isEmpty()) {
+            clearCombatTeachingPrompt();
+            return false;
+        }
+        if (!text.isEmpty()) {
+            combatTeachingFadeText = text;
+            combatTeachingFadeOpacity = CombatTeachingPreferences.promptOpacity(packed);
+            combatTeachingFadeStartedAtMs = 0L;
+            combatTeachingPrompt.setText(text);
+            combatTeachingPrompt.setContentDescription(CombatTeachingPreferences.description(packed, text));
+            combatTeachingPrompt.setTextColor(CombatTeachingPreferences.promptColor(packed));
+            combatTeachingPrompt.setAlpha(CombatTeachingPreferences.alpha(
+                    combatTeachingFadeOpacity, reducedMotion));
+            combatTeachingPrompt.setVisibility(View.VISIBLE);
+            return CombatTeachingPreferences.needsTimelyRefresh(packed);
+        }
+        if (combatTeachingFadeText.isEmpty()) {
+            combatTeachingPrompt.setText("");
+            combatTeachingPrompt.setContentDescription("");
+            combatTeachingPrompt.setVisibility(View.GONE);
+            return false;
+        }
+        final long now = SystemClock.uptimeMillis();
+        if (combatTeachingFadeStartedAtMs == 0L) combatTeachingFadeStartedAtMs = now;
+        final int fadeOpacity = CombatTeachingPreferences.fadeAlpha(combatTeachingFadeOpacity,
+                now - combatTeachingFadeStartedAtMs, reducedMotion);
+        if (fadeOpacity == 0) {
+            combatTeachingFadeText = "";
+            combatTeachingFadeOpacity = 0;
+            combatTeachingFadeStartedAtMs = 0L;
+            combatTeachingPrompt.setText("");
+            combatTeachingPrompt.setContentDescription("");
+            combatTeachingPrompt.setVisibility(View.GONE);
+            return false;
+        }
+        combatTeachingPrompt.setText(combatTeachingFadeText);
+        combatTeachingPrompt.setContentDescription(combatTeachingFadeText.replace('\n', ' '));
+        combatTeachingPrompt.setAlpha(CombatTeachingPreferences.alpha(fadeOpacity, false));
+        combatTeachingPrompt.setVisibility(View.VISIBLE);
+        return true;
+    }
+
+    private boolean combatTeachingPromptPollScheduled;
+    private final Runnable combatTeachingPromptPoll = new Runnable() {
+        @Override public void run() {
+            combatTeachingPromptPollScheduled = false;
+            if (!resumed || !surfaceAvailable || !surfaceStarted || surfaceRequestGeneration == 0) {
+                clearCombatTeachingPrompt();
+                return;
+            }
+            final int state;
+            try {
+                state = ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);
+            } catch (final RuntimeException | LinkageError unavailable) {
+                clearCombatTeachingPrompt();
+                return;
+            }
+            if (state != 1) {
+                clearCombatTeachingPrompt();
+                return;
+            }
+            if (updateCombatTeachingPrompt(state)) scheduleCombatTeachingPromptPoll();
+        }
+    };
+
+    private void createChapterDialogueOverlay() {
+        if (appRoot == null) return;
+        chapterSubtitlePanel = new LinearLayout(this);
+        chapterSubtitlePanel.setOrientation(LinearLayout.VERTICAL);
+        chapterSubtitlePanel.setPadding(0, dp(2), 0, dp(2));
+        chapterSubtitlePanel.setClickable(false);
+        chapterSubtitlePanel.setFocusable(false);
+        chapterSubtitlePanel.setBackground(null);
+
+        chapterSubtitleScroll = new ScrollView(this);
+        chapterSubtitleScroll.setFillViewport(true);
+        chapterSubtitleScroll.setVerticalScrollBarEnabled(true);
+        chapterSubtitleScroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
+        chapterSubtitleText = new TextView(this);
+        chapterSubtitleText.setTextColor(0xFFF2E9D8);
+        chapterSubtitleText.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        chapterSubtitleText.setGravity(Gravity.CENTER);
+        chapterSubtitleText.setIncludeFontPadding(true);
+        chapterSubtitleText.setShadowLayer(dp(2), 0, dp(1), 0xE6000000);
+        chapterSubtitleText.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+        chapterSubtitleText.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        final LinearLayout content = new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.addView(chapterSubtitleText, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        chapterSubtitleScroll.addView(content, new ScrollView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        chapterSubtitlePanel.addView(chapterSubtitleScroll,
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        chapterSubtitlePanel.setVisibility(View.GONE);
+        appRoot.addView(chapterSubtitlePanel, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        applyChapterSubtitleBacking();
+    }
+
+    private void applyChapterSubtitleBacking() {
+        if (chapterSubtitlePanel == null) return;
+        if (preferences != null && preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false)) {
+            final GradientDrawable backing = new GradientDrawable();
+            backing.setColor(0xC9000000);
+            backing.setCornerRadius(dp(3));
+            chapterSubtitlePanel.setBackground(backing);
+            chapterSubtitlePanel.setPadding(dp(8), dp(4), dp(8), dp(4));
+        } else {
+            chapterSubtitlePanel.setBackground(null);
+            applyChapterSubtitleBasePadding();
+        }
+        reflowChapterDialoguePlacement();
+    }
+
+    static int resolveChapterSubtitlePosition(int preferred, int inputMode, boolean landscape,
+            int topRoom, int bottomRoom, int requiredHeight) {
+        if (preferred == SUBTITLE_POSITION_TOP || preferred == SUBTITLE_POSITION_BOTTOM)
+            return preferred;
+        final boolean topFits = topRoom >= requiredHeight;
+        final boolean bottomFits = bottomRoom >= requiredHeight;
+        if (inputMode == SUBTITLE_INPUT_TOUCH) {
+            // Touch keeps the upper view clear in portrait. In landscape the lower
+            // region is allowed only when its measured safe area fits the whole panel.
+            if (landscape && bottomFits) return SUBTITLE_POSITION_BOTTOM;
+            if (topFits) return SUBTITLE_POSITION_TOP;
+            return bottomFits ? SUBTITLE_POSITION_BOTTOM : SUBTITLE_POSITION_TOP;
+        }
+        // Keyboard, mouse, and actual controller input default below the scene;
+        // use the upper region only when the measured lower region cannot fit.
+        if (bottomFits) return SUBTITLE_POSITION_BOTTOM;
+        if (topFits) return SUBTITLE_POSITION_TOP;
+        return SUBTITLE_POSITION_BOTTOM;
+    }
+
+    static final class ChapterSubtitlePlacement {
+        private long generation = Long.MIN_VALUE;
+        private int inputMode = SUBTITLE_INPUT_TOUCH;
+        private int position = -1;
+        private int landscape = -1;
+
+        void beginLine(long nextGeneration, int nextInputMode) {
+            if (generation == nextGeneration) return;
+            generation = nextGeneration;
+            inputMode = nextInputMode;
+            position = -1;
+            landscape = -1;
+        }
+
+        int positionFor(int preferred, boolean isLandscape, int topRoom, int bottomRoom,
+                int requiredHeight) {
+            if (preferred == SUBTITLE_POSITION_TOP || preferred == SUBTITLE_POSITION_BOTTOM)
+                return preferred;
+            final int orientation = isLandscape ? 1 : 0;
+            final int currentRoom = position == SUBTITLE_POSITION_TOP ? topRoom : bottomRoom;
+            final int alternateRoom = position == SUBTITLE_POSITION_TOP ? bottomRoom : topRoom;
+            if (position < 0 || landscape != orientation ||
+                    (currentRoom < requiredHeight && alternateRoom >= requiredHeight)) {
+                position = resolveChapterSubtitlePosition(SUBTITLE_POSITION_AUTO, inputMode,
+                        isLandscape, topRoom, bottomRoom, requiredHeight);
+                landscape = orientation;
+            }
+            return position;
+        }
+
+        void resetPosition() { position = -1; landscape = -1; }
+
+        int inputModeForCurrentLine() { return inputMode; }
+        long generation() { return generation; }
+    }
+
+    private static boolean isMouseSubtitleInput(MotionEvent event) {
+        if (event == null || !event.isFromSource(InputDevice.SOURCE_MOUSE)) return false;
+        final int action = event.getActionMasked();
+        return action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE ||
+                action == MotionEvent.ACTION_HOVER_MOVE || action == MotionEvent.ACTION_SCROLL ||
+                action == MotionEvent.ACTION_BUTTON_PRESS;
+    }
+
+    private static boolean isTouchSubtitleInput(MotionEvent event) {
+        if (event == null || event.getActionMasked() != MotionEvent.ACTION_DOWN) return false;
+        if (event.isFromSource(InputDevice.SOURCE_TOUCHSCREEN)) return true;
+        for (int i = 0; i < event.getPointerCount(); i++)
+            if (event.getToolType(i) == MotionEvent.TOOL_TYPE_FINGER) return true;
+        return false;
+    }
+
+    private void observeSubtitleInputMode(int inputMode) {
+        latestSubtitleInputMode = inputMode;
+    }
+
+    static int clampChapterSubtitleSize(int percent) {
+        return Math.max(80, Math.min(160, percent));
+    }
+
+    private void updateChapterDialoguePresentation(int surfaceState) {
+        chapterAmbienceDialogueActive = true; // Fail closed while the coherent line is unavailable.
+        if (chapterSubtitlePanel == null) return;
+        final long[] state;
+        final String text;
+        try {
+            state = ProbeBridge.getChapterDialogueState();
+            if (state == null || state.length != 5) {
+                chapterSubtitlePanel.setVisibility(View.GONE);
+                pauseChapterVoice(true);
+                return;
+            }
+            text = ProbeBridge.getChapterDialogueText(state[1]);
+        } catch (RuntimeException | LinkageError unavailable) {
+            chapterSubtitlePanel.setVisibility(View.GONE);
+            pauseChapterVoice(true);
+            return;
+        }
+        final long[] confirm;
+        try { confirm = ProbeBridge.getChapterDialogueState(); }
+        catch (RuntimeException | LinkageError unavailable) { pauseChapterVoice(true); return; }
+        if (confirm == null || confirm.length != 5 || state[1] != confirm[1] ||
+                (state[0] > 0 && (text == null || text.isEmpty()))) {
+            // The render owner published between JNI reads. Wait one poll for a coherent pair.
+            pauseChapterVoice(true);
+            return;
+        }
+        final int line = (int) state[0];
+        if (line <= 0 || text == null || text.isEmpty()) {
+            chapterAmbienceDialogueActive = false;
+            chapterSubtitlePanel.setVisibility(View.GONE);
+            chapterSubtitleGeneration = Long.MIN_VALUE;
+            chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
+            chapterSubtitlePlacement.beginLine(Long.MIN_VALUE, latestSubtitleInputMode);
+            stopChapterVoice();
+            chapterSubtitleText.setText("");
+            chapterSubtitleScroll.scrollTo(0, 0);
+            applyChapterSubtitleBasePadding();
+            chapterSubtitleScroll.setVisibility(View.VISIBLE);
+            return;
+        }
+        final long generation = state[1];
+        stopChapterAmbience(); // Kit has priority even when captions or Voice gain are muted.
+        if (chapterDialogueSkipPendingGeneration != generation)
+            chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
+        final boolean hiddenByUi = !resumed || !surfaceStarted || surfaceState != 1 || menuVisible ||
+                diagnosticsVisible || graphicsVisible || rtLabVisible || benchmarkRunning ||
+                playtestReportVisible || deathOverlayVisible || endingOverlayVisible || debugMotionActive;
+        final boolean paused = state[4] != 0 || hiddenByUi;
+        if (chapterDialogueSkipPendingGeneration == generation) {
+            stopChapterVoice();
+            chapterVoiceGeneration = generation;
+        } else updateChapterVoice(line, generation, paused);
+        final boolean subtitles = preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true);
+        chapterSubtitleText.setVisibility(subtitles ? View.VISIBLE : View.GONE);
+        if (chapterSubtitleGeneration != generation) {
+            chapterSubtitleGeneration = generation;
+            chapterSubtitlePlacement.beginLine(generation, latestSubtitleInputMode);
+            chapterSubtitleOverflowReported = false;
+            chapterSubtitleText.setText(text);
+            chapterSubtitleText.setContentDescription(text.replace('\n', ' '));
+            chapterSubtitleScroll.scrollTo(0, 0);
+            final int size = clampChapterSubtitleSize(
+                    preferences.getInt(PREF_CHAPTER_SUBTITLE_SIZE, 100));
+            chapterSubtitleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20.0f * size / 100.0f);
+        }
+        chapterSubtitlePanel.setVisibility(hiddenByUi ? View.GONE : View.VISIBLE);
+        if (!hiddenByUi) reflowChapterDialoguePlacement();
+    }
+
+    private void updateChapterVoice(int line, long generation, boolean paused) {
+        // SoundPool has no playback-completion callback. The shared Director advances
+        // from its measured line duration; this UI never fabricates a completion event.
+        if (generation != chapterVoiceGeneration) {
+            stopChapterVoice();
+            chapterVoicePaused = paused;
+            // Paused lines remain eligible to start on resume. An unavailable or
+            // not-yet-loaded asset falls back for this generation without a late start.
+            if (paused) return;
+            chapterVoiceGeneration = generation;
+            if (soundPool == null) return;
+            final Integer soundId = ChapterVoiceAssets.soundIdForLine(line, sounds);
+            if (soundId == null) return;
+            synchronized (loadedSounds) { if (!loadedSounds.contains(soundId)) return; }
+            final long gains = ProbeBridge.getChapterDialogueStereoGains(generation);
+            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70) / 100.0f;
+            final float left = clamp(Float.intBitsToFloat((int) gains), 0.0f, 1.0f);
+            final float right = clamp(Float.intBitsToFloat((int) (gains >>> 32)), 0.0f, 1.0f);
+            chapterVoiceStream = soundPool.play(soundId, voiceGain * left, voiceGain * right,
+                    2, 0, 1.0f);
+            if (chapterVoiceStream == 0) Log.w(TAG, "Chapter voice playback could not start.");
+            return;
+        }
+        if (chapterVoiceStream != 0 && chapterVoicePaused != paused) {
+            if (paused) soundPool.pause(chapterVoiceStream);
+            else soundPool.resume(chapterVoiceStream);
+            chapterVoicePaused = paused;
+        }
+        if (chapterVoiceStream != 0 && !paused) {
+            final long gains = ProbeBridge.getChapterDialogueStereoGains(generation);
+            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70) / 100.0f;
+            final float left = clamp(Float.intBitsToFloat((int) gains), 0.0f, 1.0f);
+            final float right = clamp(Float.intBitsToFloat((int) (gains >>> 32)), 0.0f, 1.0f);
+            soundPool.setVolume(chapterVoiceStream, voiceGain * left, voiceGain * right);
+        }
+    }
+
+    private void pauseChapterVoice(boolean paused) {
+        if (paused) stopChapterAmbience(); // A transient caption/voice publication is not a cue lifetime change.
+        if (chapterVoiceStream == 0 || soundPool == null || chapterVoicePaused == paused) return;
+        if (paused) soundPool.pause(chapterVoiceStream);
+        else soundPool.resume(chapterVoiceStream);
+        chapterVoicePaused = paused;
+    }
+
+    private void stopChapterVoice() {
+        if (chapterVoiceStream != 0 && soundPool != null) soundPool.stop(chapterVoiceStream);
+        chapterVoiceStream = 0;
+        chapterVoicePaused = false;
+        chapterVoiceGeneration = Long.MIN_VALUE;
+    }
+
+    private void reflowChapterDialoguePlacement() {
+        if (chapterSubtitlePanel == null || appRoot == null ||
+                chapterSubtitlePanel.getVisibility() != View.VISIBLE) return;
+        final int width = appRoot.getWidth(), height = appRoot.getHeight();
+        if (width <= 0 || height <= 0) return;
+        int insetLeft = 0, insetTop = 0, insetRight = 0, insetBottom = 0;
+        if (Build.VERSION.SDK_INT >= 23 && appRoot.getRootWindowInsets() != null) {
+            final WindowInsets insets = appRoot.getRootWindowInsets();
+            insetLeft = insets.getSystemWindowInsetLeft();
+            insetTop = insets.getSystemWindowInsetTop();
+            insetRight = insets.getSystemWindowInsetRight();
+            insetBottom = insets.getSystemWindowInsetBottom();
+        }
+        int left = insetLeft + dp(18), right = width - insetRight - dp(18);
+        int topStart = insetTop + dp(8), bottomEnd = height - insetBottom - dp(8);
+        final int divider = topStart + Math.max(0, bottomEnd - topStart) * 55 / 100;
+        final View[] topObstacles = {rtStatus, vitalityStatus, keeperRevealTitle,
+                developerOverlay, menuButton};
+        final View[] bottomObstacles = {controllerPrompt, attackButton, parryButton,
+                dodgeButton, interactButton, runButton, crouchButton};
+        // Landscape touch controls occupy side columns, not the whole width.
+        // Keep their real hit regions clear while using the open central lane.
+        if (width > height && chapterSubtitlePlacement.inputModeForCurrentLine() == SUBTITLE_INPUT_TOUCH) {
+            int laneLeft = left, laneRight = right;
+            for (View obstacle : bottomObstacles) {
+                final Rect rect = visibleRectInRoot(obstacle);
+                if (rect == null) continue;
+                if (rect.right <= width / 2) laneLeft = Math.max(laneLeft, rect.right + dp(8));
+                else if (rect.left >= width / 2) laneRight = Math.min(laneRight, rect.left - dp(8));
+            }
+            if (laneRight - laneLeft >= dp(240)) { left = laneLeft; right = laneRight; }
+        }
+        for (View obstacle : topObstacles) {
+            final Rect rect = visibleRectInRoot(obstacle);
+            if (rect != null && rect.left < right && rect.right > left && rect.top < divider)
+                topStart = Math.max(topStart, rect.bottom + dp(8));
+        }
+        for (View obstacle : bottomObstacles) {
+            final Rect rect = visibleRectInRoot(obstacle);
+            if (rect != null && rect.left < right && rect.right > left && rect.bottom > divider)
+                bottomEnd = Math.min(bottomEnd, rect.top - dp(8));
+        }
+        final int panelWidth = Math.max(1, right - left);
+        applyChapterSubtitleBasePadding();
+        chapterSubtitleScroll.setVisibility(View.VISIBLE);
+        final LinearLayout.LayoutParams scrollParams =
+                (LinearLayout.LayoutParams) chapterSubtitleScroll.getLayoutParams();
+        if (scrollParams.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
+            scrollParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            chapterSubtitleScroll.setLayoutParams(scrollParams);
+        }
+        chapterSubtitlePanel.measure(View.MeasureSpec.makeMeasureSpec(panelWidth, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        final int requiredHeight = chapterSubtitlePanel.getMeasuredHeight();
+        int topRoom = Math.max(0, divider - topStart);
+        int bottomRoom = Math.max(0, bottomEnd - divider);
+        // The divider is a placement preference, not an obstacle. A long line
+        // may use the whole connected clear gap before it needs scrolling.
+        if (requiredHeight > topRoom && requiredHeight > bottomRoom) {
+            final int connectedRoom = Math.max(0, bottomEnd - topStart);
+            topRoom = Math.max(topRoom, connectedRoom);
+            bottomRoom = Math.max(bottomRoom, connectedRoom);
+        }
+        final int preferred = Math.max(SUBTITLE_POSITION_AUTO, Math.min(SUBTITLE_POSITION_BOTTOM,
+                preferences.getInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO)));
+        final int selected = chapterSubtitlePlacement.positionFor(preferred, width > height,
+                topRoom, bottomRoom, requiredHeight);
+        final int selectedRoom = selected == SUBTITLE_POSITION_TOP ? topRoom : bottomRoom;
+        if (requiredHeight > selectedRoom) {
+            // Scroll the complete caption. A diagnostic label
+            // must never displace the dialogue or consume its remaining space.
+            scrollParams.height = Math.max(1, selectedRoom - chapterSubtitlePanel.getPaddingTop() -
+                    chapterSubtitlePanel.getPaddingBottom());
+            chapterSubtitleScroll.setLayoutParams(scrollParams);
+            if (!chapterSubtitleOverflowReported) {
+                Log.w(TAG, "CHAPTER_SUBTITLE_SCROLL generation=" + chapterSubtitleGeneration +
+                        " position=" + selected + " requiredDp=" +
+                        (requiredHeight / getResources().getDisplayMetrics().density));
+                chapterSubtitleOverflowReported = true;
+            }
+        }
+        chapterSubtitlePanel.setContentDescription(chapterSubtitleText.getContentDescription());
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) chapterSubtitlePanel.getLayoutParams();
+        final int topMargin = selected == SUBTITLE_POSITION_TOP ? topStart : 0;
+        final int bottomMargin = selected == SUBTITLE_POSITION_BOTTOM ? height - bottomEnd : 0;
+        final int gravity = selected == SUBTITLE_POSITION_BOTTOM ? Gravity.BOTTOM : Gravity.TOP;
+        if (params.width == panelWidth && params.height == ViewGroup.LayoutParams.WRAP_CONTENT &&
+                params.gravity == gravity && params.leftMargin == left && params.rightMargin == width - right &&
+                params.topMargin == topMargin && params.bottomMargin == bottomMargin) return;
+        params.width = panelWidth;
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params.gravity = gravity;
+        params.leftMargin = left;
+        params.rightMargin = width - right;
+        params.topMargin = topMargin;
+        params.bottomMargin = bottomMargin;
+        chapterSubtitlePanel.setLayoutParams(params);
+    }
+
+    private void applyChapterSubtitleBasePadding() {
+        final boolean backing = preferences != null &&
+                preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false);
+        final int horizontal = backing ? dp(8) : 0;
+        final int vertical = backing ? dp(4) : dp(2);
+        chapterSubtitlePanel.setPadding(horizontal, vertical, horizontal, vertical);
+    }
+
+    private Rect visibleRectInRoot(View view) {
+        if (view == null || view.getVisibility() != View.VISIBLE) return null;
+        ViewParent ancestor = view.getParent();
+        while (ancestor instanceof View) {
+            if (((View) ancestor).getVisibility() != View.VISIBLE) return null;
+            ancestor = ancestor.getParent();
+        }
+        final Rect rect = new Rect();
+        if (!view.getLocalVisibleRect(rect)) {
+            // Pre-draw/layout and Robolectric may not have a window coordinate map yet.
+            // The descendants are still measured in appRoot coordinates and can safely
+            // constrain the panel before the first frame is attached.
+            rect.set(0, 0, view.getWidth(), view.getHeight());
+        }
+        // Keep both operands in the view hierarchy's coordinates. A cutout-
+        // inset window can have different window and physical screen origins.
+        try { appRoot.offsetDescendantRectToMyCoords(view, rect); }
+        catch (IllegalArgumentException notADescendant) { return null; }
+        if (!rect.intersect(0, 0, appRoot.getWidth(), appRoot.getHeight())) return null;
+        return rect;
+    }
+
+    private void scheduleCombatTeachingPromptPoll() {
+        if (combatTeachingPromptPollScheduled) return;
+        combatTeachingPromptPollScheduled = true;
+        handler.postDelayed(combatTeachingPromptPoll,
+                COMBAT_TEACHING_PROMPT_REFRESH_MILLISECONDS);
+    }
+
+    private void cancelCombatTeachingPromptPoll() {
+        handler.removeCallbacks(combatTeachingPromptPoll);
+        combatTeachingPromptPollScheduled = false;
+    }
+
+    private void clearCombatTeachingPrompt() {
+        combatAttackCueVisible = false;
+        combatPracticeCueVisible = false;
+        combatTeachingFadeText = "";
+        combatTeachingFadeOpacity = 0;
+        combatTeachingFadeStartedAtMs = 0L;
+        if (combatTeachingPrompt == null) return;
+        combatTeachingPrompt.setText("");
+        combatTeachingPrompt.setContentDescription("");
+        combatTeachingPrompt.setVisibility(View.GONE);
+    }
+
     private void showSettings() {
+        if(openingBenchmarkPending()) return;
         interfaceVisible=false;
         entryMenuPanel = null;
         entryPlayButton = null; entrySettingsButton = null; entryMoreButton = null;
@@ -2494,6 +4345,66 @@ public class MainActivity extends Activity {
 
         addSlider(panel, getString(R.string.sfx_volume), preferences.getInt("sfx_volume", 70), 0, 100,
                 value -> preferences.edit().putInt("sfx_volume", value).apply());
+        addSlider(panel, getString(R.string.dialogue_volume), preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70), 0, 100,
+                value -> preferences.edit().putInt(PREF_CHAPTER_VOICE_VOLUME, value).apply());
+        addBody(panel, "Chapter subtitles");
+        final CheckBox subtitlesEnabled = new CheckBox(this);
+        subtitlesEnabled.setText("Show subtitles");
+        subtitlesEnabled.setTextColor(0xFFFFE5BA);
+        subtitlesEnabled.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        subtitlesEnabled.setTextSize(16);
+        subtitlesEnabled.setChecked(preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true));
+        subtitlesEnabled.setMinHeight(dp(48));
+        subtitlesEnabled.setOnCheckedChangeListener((buttonView, checked) ->
+                preferences.edit().putBoolean(PREF_CHAPTER_SUBTITLES, checked).apply());
+        panel.addView(subtitlesEnabled, matchWrap());
+        final CheckBox subtitleBacking = new CheckBox(this);
+        subtitleBacking.setText("Add contrast backing behind subtitles");
+        subtitleBacking.setContentDescription("Add a subtle background behind subtitles for extra contrast");
+        subtitleBacking.setTextColor(0xFFFFE5BA);
+        subtitleBacking.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        subtitleBacking.setTextSize(16);
+        subtitleBacking.setChecked(preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false));
+        subtitleBacking.setMinHeight(dp(48));
+        subtitleBacking.setOnCheckedChangeListener((buttonView, checked) -> {
+            preferences.edit().putBoolean(PREF_CHAPTER_SUBTITLE_BACKING, checked).apply();
+            applyChapterSubtitleBacking();
+        });
+        panel.addView(subtitleBacking, matchWrap());
+        addSlider(panel, "Subtitle size", clampChapterSubtitleSize(
+                        preferences.getInt(PREF_CHAPTER_SUBTITLE_SIZE, 100)), 80, 160,
+                value -> {
+                    final int size = clampChapterSubtitleSize(value);
+                    preferences.edit().putInt(PREF_CHAPTER_SUBTITLE_SIZE, size).apply();
+                    if (chapterSubtitleText != null) chapterSubtitleText.setTextSize(
+                            TypedValue.COMPLEX_UNIT_SP, 20.0f * size / 100.0f);
+                    reflowChapterDialoguePlacement();
+                });
+        final TextView positionLabel = new TextView(this);
+        positionLabel.setText("Subtitle position");
+        positionLabel.setTextColor(HordeUiTokens.PARCHMENT);
+        positionLabel.setTextSize(15);
+        positionLabel.setPadding(0, dp(8), 0, dp(2));
+        panel.addView(positionLabel, matchWrap());
+        final Spinner subtitlePosition = new Spinner(this);
+        final String[] positionNames = {"Auto", "Top", "Bottom"};
+        final ArrayAdapter<String> positionAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, positionNames);
+        positionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        subtitlePosition.setAdapter(positionAdapter);
+        subtitlePosition.setContentDescription("Subtitle position: Auto, Top, or Bottom");
+        subtitlePosition.setSelection(Math.max(SUBTITLE_POSITION_AUTO, Math.min(SUBTITLE_POSITION_BOTTOM,
+                preferences.getInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO))));
+        subtitlePosition.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view,
+                    int position, long id) {
+                preferences.edit().putInt(PREF_CHAPTER_SUBTITLE_POSITION, position).apply();
+                chapterSubtitlePlacement.resetPosition();
+                reflowChapterDialoguePlacement();
+            }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        });
+        panel.addView(subtitlePosition, matchWrap());
         addSlider(panel, getString(R.string.music_volume), musicVolumePercent(), 0, 100,
                 value -> {
                     final int clamped = Math.max(0, Math.min(100, value));
@@ -2505,6 +4416,50 @@ public class MainActivity extends Activity {
         addBody(panel, "Controls");
         addSlider(panel, getString(R.string.look_sensitivity), preferences.getInt("look_sensitivity", 100), 50, 175,
                 value -> preferences.edit().putInt("look_sensitivity", value).apply());
+
+        final CombatTeachingPreferences.Values teaching = CombatTeachingPreferences.read(preferences);
+        addBody(panel, getString(R.string.combat_teaching_description));
+        final CheckBox teachingEnabled = new CheckBox(this);
+        teachingEnabled.setText(R.string.combat_teaching);
+        teachingEnabled.setTextColor(0xFFFFE5BA);
+        teachingEnabled.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        teachingEnabled.setTextSize(16);
+        teachingEnabled.setChecked(teaching.enabled);
+        teachingEnabled.setMinHeight(dp(48));
+        teachingEnabled.setOnCheckedChangeListener((buttonView, checked) -> {
+            final CombatTeachingPreferences.Values next = new CombatTeachingPreferences.Values(
+                    checked, CombatTeachingPreferences.read(preferences).slowdown);
+            CombatTeachingPreferences.save(preferences, next);
+            applyCombatTeachingOptions(next);
+        });
+        panel.addView(teachingEnabled, matchWrap());
+
+        final CheckBox teachingSlowdown = new CheckBox(this);
+        teachingSlowdown.setText(R.string.combat_teaching_slowdown);
+        teachingSlowdown.setTextColor(0xFFFFE5BA);
+        teachingSlowdown.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        teachingSlowdown.setTextSize(16);
+        teachingSlowdown.setChecked(teaching.slowdown);
+        teachingSlowdown.setMinHeight(dp(48));
+        teachingSlowdown.setOnCheckedChangeListener((buttonView, checked) -> {
+            final CombatTeachingPreferences.Values next = new CombatTeachingPreferences.Values(
+                    CombatTeachingPreferences.read(preferences).enabled, checked);
+            CombatTeachingPreferences.save(preferences, next);
+            applyCombatTeachingOptions(next);
+        });
+        panel.addView(teachingSlowdown, matchWrap());
+        long teachingState=0;
+        try {teachingState=ProbeBridge.getCombatTeachingState();}
+        catch(RuntimeException | LinkageError unavailable) { /* Unavailable publication cannot claim Ready. */ }
+        addMenuButtonRow(panel, getString(CombatTeachingPreferences.practiceActionLabelResource(teachingState)),
+                ProbeBridge::requestCombatTeachingSkip,
+                getString(R.string.combat_teaching_replay), () -> {
+                    final CombatTeachingPreferences.Values current = CombatTeachingPreferences.read(preferences);
+                    final CombatTeachingPreferences.Values next = new CombatTeachingPreferences.Values(true, current.slowdown);
+                    CombatTeachingPreferences.save(preferences, next);
+                    applyCombatTeachingOptions(next);
+                    ProbeBridge.requestCombatTeachingReplay();
+                });
 
         final CheckBox hapticsEnabled = new CheckBox(this);
         hapticsEnabled.setText(R.string.haptics_enabled);
@@ -2533,8 +4488,15 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.reset_non_graphics), () -> {
                     preferences.edit().putBoolean("sfx_enabled", true).putInt("sfx_volume", 70)
+                            .putBoolean(PREF_CHAPTER_SUBTITLES, true)
+                            .putInt(PREF_CHAPTER_SUBTITLE_SIZE, 100)
+                            .putInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO)
+                            .putInt(PREF_CHAPTER_VOICE_VOLUME, 70)
                             .putInt(PREF_MUSIC_VOLUME, 70).putInt("look_sensitivity", 100)
-                            .putBoolean("haptics_enabled", true).putBoolean("show_hud", true).apply();
+                            .putBoolean("haptics_enabled", true).putBoolean("show_hud", true)
+                            .putBoolean(CombatTeachingPreferences.ENABLED, true)
+                            .putBoolean(CombatTeachingPreferences.SLOWDOWN, false).apply();
+                    applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
                     if (musicPlayback != null) musicPlayback.setVolumePercent(70);
                     InterfacePreferences.reset(preferences);
                     applyInterfacePresentation();
@@ -2577,8 +4539,8 @@ public class MainActivity extends Activity {
             menuAmbience.setMixPercent(menuAmbienceMix[0], menuAmbienceMix[1]);
     }
 
-    private void setNativeGraphics(GraphicsPreferences.Values values) {
-        ProbeBridge.setGraphicsSettings(values.scale, values.water, values.fire, values.cap, values.glassEnabled, values.shadow, values.mistEnabled, values.dust);
+    private long setNativeGraphics(GraphicsPreferences.Values values) {
+        return ProbeBridge.setGraphicsSettings(values.scale, values.water, values.fire, values.cap, values.glassEnabled, values.shadow, values.mistEnabled, values.dust);
     }
 
     private void openGraphics() {
@@ -2586,6 +4548,7 @@ public class MainActivity extends Activity {
         clearTouchState();
         graphicsPageViewport.reset();
         graphicsPreviewViewport.reset();
+        cancelGraphicsSave();
         graphicsConfirmed = GraphicsPreferences.confirmed(preferences);
         graphicsDraft = graphicsConfirmed;
         graphicsRestoreDraftAfterPreview = null;
@@ -2607,6 +4570,7 @@ public class MainActivity extends Activity {
     }
 
     private void showGraphicsPage() {
+        if(openingBenchmarkPending()) return;
         if (graphicsPreviewWanted) { showGraphicsPreviewPage(); return; }
         final long uiBuildStartedNs = SystemClock.elapsedRealtimeNanos();
         entryMenuPanel = null; entryPlayButton = null; entrySettingsButton = null; entryMoreButton = null;
@@ -2674,7 +4638,9 @@ public class MainActivity extends Activity {
             showGraphicsPage();
         });
         addGraphicsButton(panel, "Shadows: " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow), () -> {
-            graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.SHADOW, (graphicsDraft.shadow + 1) % 3);
+            final int next = graphicsDraft.shadow == GraphicsPreferences.SHADOW_CURRENT ?
+                    GraphicsPreferences.SHADOW_HIGHER : GraphicsPreferences.SHADOW_CURRENT;
+            graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.SHADOW, next);
             showGraphicsPage();
         });
         addGraphicsButton(panel, "Preview shadows", () -> openGraphicsPreview(GraphicsPreviewOptions.SHADOW));
@@ -2703,28 +4669,13 @@ public class MainActivity extends Activity {
         final LinearLayout dock = addGraphicsActionDock(page);
         dock.addView(graphicsTelemetry, 0, matchWrap());
         graphicsPanel = page;
-        graphicsApply = graphicsActionButton("Use", "graphics-page-action-use", () -> {
-            graphicsSubmitted = graphicsDraft;
-            if (!GraphicsPreferences.markPending(preferences, graphicsSubmitted)) {
-                graphicsTelemetry.setText(R.string.graphics_storage_failed); return;
-            }
-            graphicsRequestSerial = requestTimedGraphicsApply(graphicsDraft);
-            if (graphicsRequestSerial == 0) {
-                graphicsTelemetry.setText(R.string.graphics_not_ready);
-                return; // Keep recovery marker until an acknowledged restore.
-            }
-            graphicsConfirmationStarted = 0;
-            graphicsBusy = graphicsRequestSerial != 0;
-            setGraphicsEditorsEnabled(graphicsPanel, !graphicsBusy);
-        }, "Use these settings for a temporary trial. Saved settings change only after a matching RT presentation and Keep and save.");
-        graphicsConfirm = graphicsActionButton("Keep", "graphics-page-action-keep", this::confirmGraphicsSelection,
-                "Keep the acknowledged trial settings as Saved settings.");
-        graphicsConfirm.setEnabled(false);
+        graphicsApply = graphicsActionButton("Apply", "graphics-page-action-apply", this::applyGraphicsSelection,
+                "Apply and save these settings after a matching RT frame is presented.");
         graphicsRevert = graphicsActionButton("Restore", "graphics-page-action-restore",
-                () -> requestGraphicsRevert(false), "Discard the trial and restore Saved settings.");
+                () -> requestGraphicsRevert(false), "Discard unsaved changes and restore Saved settings.");
         graphicsBack = graphicsActionButton("Back", "graphics-page-action-back",
                 () -> requestGraphicsRevert(true), "Restore Saved settings and leave Graphics.");
-        addGraphicsActionButtons(dock, graphicsApply, graphicsConfirm, graphicsRevert, graphicsBack);
+        addGraphicsActionButtons(dock, graphicsApply, graphicsRevert, graphicsBack);
         // Scroll/reflow at system font scales. Native buttons retain minimum 48dp hit areas.
         final WindowInsets insets = menuScrim.getRootWindowInsets();
         int left = dp(16), right = dp(16), top = dp(20), bottom = dp(20);
@@ -2747,7 +4698,6 @@ public class MainActivity extends Activity {
         if (entryMenuEnabled) ensureEntryMenuTargets(page);
         menuScrim.addView(page, layout);
         setGraphicsEditorsEnabled(page, !graphicsBusy);
-        graphicsConfirm.setEnabled(false);
         graphicsPageViewport.restoreAfterLayout(menuScrim);
         logGraphicsUiBuild("graphics", uiBuildStartedNs);
     }
@@ -2782,11 +4732,12 @@ public class MainActivity extends Activity {
 
     private void addGraphicsActionButtons(LinearLayout dock, Button... buttons) {
         // Short labels fit one native row on landscape phones, preserving more of the RT image.
-        if (graphicsActionsUseLandscapeRow() && buttons.length == 4) {
+        if (graphicsActionsUseLandscapeRow()) {
             addGraphicsActionRow(dock, buttons);
         } else {
             for (int i = 0; i < buttons.length; i += 2) {
-                addGraphicsActionRow(dock, buttons[i], buttons[Math.min(i + 1, buttons.length - 1)]);
+                if (i + 1 < buttons.length) addGraphicsActionRow(dock, buttons[i], buttons[i + 1]);
+                else addGraphicsActionRow(dock, buttons[i]);
             }
         }
     }
@@ -2818,29 +4769,14 @@ public class MainActivity extends Activity {
     }
 
     private void addGraphicsPreviewActions(LinearLayout dock) {
-        graphicsApply = graphicsActionButton("Use", "graphics-preview-action-use", () -> {
-            // Disabled native controls may still receive programmatic/stale click events. Guard
-            // readiness here too, before touching the JNI bridge.
-            if (graphicsApply == null || !graphicsApply.isEnabled()) return;
-            final long[] applied = ProbeBridge.getGraphicsSnapshot();
-            if (!GraphicsPreviewOptions.presented(applied, surfaceRequestGeneration, graphicsRequestSerial, previewSelection())) return;
-            if (applied[2] == 2) return; // Use never saves; Keep owns that decision.
-            if (GraphicsPreferences.markPending(preferences, previewSelection())) {
-                resetGraphicsPreviewTimeline();
-                graphicsSubmitted = previewSelection(); graphicsDraft = graphicsSubmitted;
-                graphicsRequestSerial = requestTimedGraphicsApply(graphicsSubmitted);
-                graphicsBusy = graphicsRequestSerial != 0; graphicsConfirmationStarted = 0;
-            }
-        }, "Use these acknowledged preview settings for a temporary trial. This does not save.");
-        graphicsConfirm = graphicsActionButton("Keep", "graphics-preview-action-keep",
-                this::confirmGraphicsSelection, "Save only the settings confirmed by a matching RT presentation.");
+        graphicsApply = graphicsActionButton("Apply", "graphics-preview-action-apply", this::applyGraphicsSelection,
+                "Apply and save these preview settings after a matching RT frame is presented.");
         graphicsRevert = graphicsActionButton("Restore", "graphics-preview-action-restore",
                 () -> requestGraphicsRevert(false), getString(R.string.graphics_revert));
         graphicsBack = graphicsActionButton("Back", "graphics-preview-action-back",
                 this::returnFromGraphicsPreview, "Revert live settings and return to Graphics.");
-        addGraphicsActionButtons(dock, graphicsApply, graphicsConfirm, graphicsRevert, graphicsBack);
+        addGraphicsActionButtons(dock, graphicsApply, graphicsRevert, graphicsBack);
         graphicsApply.setEnabled(false);
-        graphicsConfirm.setEnabled(false);
     }
 
     private void showGraphicsSettingsDetails() {
@@ -2848,11 +4784,11 @@ public class MainActivity extends Activity {
         final TextView details = new TextView(this);
         details.setText("Resolution controls RT render scale. Water Off omits water appearance; Mobile uses reduced reflected detail; High adds a reflected scene query. " +
                 "Fire detail changes volume steps while preserving emitters, lights and gameplay. Menu / preview cap controls their frame cap. " +
-                "Glass enables only glass supported by this build; mobile lantern panes remain absent. Shadows select Lower, Current or Higher RT sampling. " +
+                "Glass enables only glass supported by this build; mobile lantern panes remain absent. Shadows select Current or Higher RT sampling. " +
                 "Mist toggles keeper-room ground mist; fire, smoke and electricity stay enabled. The compact authored preview has no ground mist.\n" +
                 "Indoor dust controls the bounded room effect; the preview reports uploaded quality even where no motes are visible.\n\n" +
-                "Changing a choice edits the draft. Use starts a temporary trial only after the RT request is accepted. Keep and save is enabled only after a matching RT frame is presented. " +
-                "Unconfirmed settings restore after 15 visible seconds or when backgrounded. Preview measurements are not full-game performance guarantees." +
+                "Changing a choice edits the draft. Apply saves it automatically only after the exact requested settings appear in a successful RT presentation. " +
+                "Back, Restore or backgrounding cancels an outstanding Apply. Interrupted or failed changes restore Saved settings. Preview measurements are not full-game performance guarantees." +
                 (graphicsDetailedStatus.isEmpty() ? "" : "\n\nCurrent status\n" + graphicsDetailedStatus));
         details.setTextColor(HordeUiTokens.PARCHMENT);
         details.setTextSize(15);
@@ -2874,8 +4810,7 @@ public class MainActivity extends Activity {
         if (view instanceof ViewGroup) {
             final ViewGroup group = (ViewGroup)view;
             for (int i = 0; i < group.getChildCount(); ++i) setGraphicsEditorsEnabled(group.getChildAt(i), enabled);
-        } else if ((view instanceof SeekBar || view instanceof Button) && view != graphicsConfirm &&
-                view != graphicsRevert && view != graphicsBack && view != graphicsDetailsButton &&
+        } else if ((view instanceof SeekBar || view instanceof Button) && view != graphicsRevert && view != graphicsBack && view != graphicsDetailsButton &&
                 view != graphicsImageButton && view != graphicsControlsButton) view.setEnabled(enabled);
     }
 
@@ -2922,6 +4857,7 @@ public class MainActivity extends Activity {
     }
 
     private void compareGraphicsPreview(GraphicsPreferences.Values values) {
+        cancelGraphicsSave();
         graphicsPreviewImageOnly = false;
         if (!GraphicsPreferences.markPending(preferences, values)) {
             graphicsLiveChoiceError = getString(R.string.graphics_storage_failed); return;
@@ -3077,7 +5013,7 @@ public class MainActivity extends Activity {
         graphicsTelemetry.setContentDescription("Preview status and current graphics request details are available here.");
         // Reserve the dock's two-line status height before budgeting the viewport. Later telemetry
         // can change the text but must not unexpectedly consume the first option target.
-        graphicsTelemetry.setText("Preview FPS: waiting for RT\nKeep or Restore: 15 s");
+        graphicsTelemetry.setText("Preview FPS: waiting for RT\nNot saved; choose Apply");
         final LinearLayout optionsRow = addPreviewControlRow(panel);
         for (int choice = 0; choice < graphicsOptionButtons.length; ++choice) {
             final int selectedChoice = choice;
@@ -3276,7 +5212,7 @@ public class MainActivity extends Activity {
         graphicsGraph.setSamples(graphicsPreviewDetailsSamples);
         panel.addView(graphicsGraph, new LinearLayout.LayoutParams(-1, dp(56)));
         addBody(panel, "Choose settings directly in this scene. Each choice retains the other live settings. Preview changes do not save. " +
-                "Use these settings starts a 15-second trial; Keep and save makes that choice your Saved settings. Restore saved or Back discards the trial. " +
+                "Apply saves the selected settings after their matching RT frame is presented. Restore or Back cancels unsaved changes. " +
                 "Preview FPS counts successful RT swapchain presents per second, not display scanout FPS or full-game performance. Image hides the strip; Controls restores it.");
         addBody(panel, "Timing display is a snapshot while Details is open. Rendering and measurement continue; closing Details refreshes the display.");
         final Button pause = addGraphicsButton(panel, graphicsPreviewPaused ? "Resume preview animation" : "Pause preview animation", () -> {
@@ -3350,9 +5286,8 @@ public class MainActivity extends Activity {
         }
         final boolean matching = GraphicsPreviewOptions.presented(applied, surfaceRequestGeneration,
                 graphicsRequestSerial, previewSelection());
-        final String state = graphicsLiveChoiceError != null ? "choice unavailable; Restore saved" : applied[2] == 2 && matching ? "Keep and save? " + Math.max(0, 15 -
-                (SystemClock.elapsedRealtime() - graphicsConfirmationStarted) / 1000) + "s" : matching ?
-                (graphicsConfirmed != null && graphicsDraft.same(graphicsConfirmed) ? "Saved settings shown" : "Not saved; Use then Keep") :
+        final String state = graphicsLiveChoiceError != null ? "choice unavailable; Restore saved" : applied[2] == 2 && matching ? "Applying and saving" : matching ?
+                (graphicsConfirmed != null && graphicsDraft.same(graphicsConfirmed) ? "Saved settings shown" : "Not saved; choose Apply") :
                 (applied[14] & 64) != 0 ? "unavailable; previous output retained" : "waiting for RT";
         final String[] cameras = {"Overview", "Materials", "Glass", "Water", "Skeleton", "Mirror"};
         final double[] p = matching ? ProbeBridge.getGraphicsPreviewPerformance() : null;
@@ -3417,8 +5352,47 @@ public class MainActivity extends Activity {
 
     private String waterName(int quality) { return quality == 2 ? "High" : quality == 1 ? "Mobile" : "Off"; }
 
+    private void cancelGraphicsSave() {
+        graphicsSaveSerial = 0;
+        graphicsSaveGeneration = 0;
+    }
+
+    private void applyGraphicsSelection() {
+        // Revalidate stale/programmatic clicks against the current native state as well as UI state.
+        if (!graphicsVisible || !resumed || graphicsApply == null || !graphicsApply.isEnabled() ||
+                graphicsBusy || graphicsAwaitingRestore || graphicsSceneRestoring || graphicsSaveSerial != 0 ||
+                ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
+        final long[] applied = ProbeBridge.getGraphicsSnapshot();
+        if (applied == null || applied.length != 28 || applied[2] == 1 || applied[2] == 2 || applied[2] == 4) return;
+        if (graphicsPreviewWanted && (graphicsLiveChoiceError != null ||
+                !GraphicsPreviewOptions.presented(applied, surfaceRequestGeneration, graphicsRequestSerial, previewSelection()))) return;
+        final GraphicsPreferences.Values candidate = graphicsDraft;
+        if (!GraphicsPreferences.markPending(preferences, candidate)) {
+            graphicsTelemetry.setText(R.string.graphics_storage_failed);
+            return;
+        }
+        graphicsSubmitted = candidate;
+        graphicsRequestSerial = requestTimedGraphicsApply(candidate);
+        if (graphicsRequestSerial == 0) {
+            graphicsTelemetry.setText(R.string.graphics_not_ready);
+            return; // Retain the durable recovery marker, without a save intent.
+        }
+        graphicsSaveSerial = graphicsRequestSerial;
+        graphicsSaveGeneration = surfaceRequestGeneration;
+        graphicsBusy = true;
+        graphicsConfirmationStarted = 0;
+        if (graphicsPreviewWanted) resetGraphicsPreviewTimeline();
+        setGraphicsEditorsEnabled(graphicsPanel, false);
+    }
+
     private void confirmGraphicsSelection() {
-        if (!ProbeBridge.confirmGraphicsSettings(graphicsRequestSerial, surfaceRequestGeneration)) return;
+        if (!graphicsVisible || !resumed || graphicsAwaitingRestore || graphicsSaveSerial == 0 ||
+                graphicsSaveSerial != graphicsRequestSerial || graphicsSaveGeneration != surfaceRequestGeneration) return;
+        cancelGraphicsSave(); // Consume once, including native/storage rejection.
+        if (!ProbeBridge.confirmGraphicsSettings(graphicsRequestSerial, surfaceRequestGeneration)) {
+            requestGraphicsRevert(false);
+            return;
+        }
         if (GraphicsPreferences.confirm(preferences, graphicsSubmitted)) {
             graphicsConfirmed = graphicsSubmitted; graphicsDraft = graphicsSubmitted;
             updateGraphicsSelectionSummary(true);
@@ -3434,8 +5408,9 @@ public class MainActivity extends Activity {
                 resetGraphicsPreviewTimeline();
             }
             graphicsAwaitingRestore = true;
+            graphicsBusy = true;
             graphicsRequestSerial = ProbeBridge.revertGraphicsSettings(surfaceRequestGeneration);
-            if (graphicsRequestSerial == 0) { setNativeGraphics(graphicsConfirmed); graphicsRecovering = true; }
+            if (graphicsRequestSerial == 0) { graphicsRequestSerial = setNativeGraphics(graphicsConfirmed); graphicsRecovering = true; }
             Toast.makeText(this, R.string.graphics_save_failed, Toast.LENGTH_LONG).show();
         }
         graphicsConfirmationStarted = 0;
@@ -3535,19 +5510,18 @@ public class MainActivity extends Activity {
             button.setIncludeFontPadding(false); button.setPadding(dp(12),dp(8),dp(12),dp(8));
             button.setClickable(false); button.setFocusable(false);
             button.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-            styleActionButton(button,interfaceBacking(values,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT);
+            styleGameplayActionButton(button,interfaceBacking(values,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,false);
+            if(button==swing || button==parry)CombatActionControl.preview(button,button==swing);
             button.measure(View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED),
                     View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));
             button.setLayoutParams(new LinearLayout.LayoutParams(Math.max(nominal.width,button.getMeasuredWidth()),
                     Math.max(nominal.height,button.getMeasuredHeight())));
         }
-        addInterfacePreviewPair(preview,light,interact,available);
-        final LinearLayout dodgeRow=new LinearLayout(this);
-        dodgeRow.setGravity(Gravity.END);
-        dodgeRow.addView(dodge);
-        final LinearLayout.LayoutParams dodgeLayout=matchWrap();
-        dodgeLayout.topMargin=dp(12);
-        preview.addView(dodgeRow,dodgeLayout);
+        final LinearLayout contextRow=new LinearLayout(this);
+        contextRow.setGravity(Gravity.END);
+        contextRow.addView(interact);
+        preview.addView(contextRow,matchWrap());
+        addInterfacePreviewPair(preview,light,dodge,available);
         addInterfacePreviewPair(preview,parry,swing,available);
     }
 
@@ -3574,43 +5548,43 @@ public class MainActivity extends Activity {
     private void applyInterfacePresentation() {
         if(preferences==null || attackButton==null || parryButton==null || interactButton==null || toggleHeldLightPoseButton==null) return;
         final InterfacePreferences.Values v=InterfacePreferences.read(preferences);
-        final WindowInsets insets=menuScrim==null?null:menuScrim.getRootWindowInsets();
-        int safeLeft=0,safeRight=0,safeTop=0,safeBottom=0;
-        if(insets!=null) {
-            safeLeft=insets.getStableInsetLeft(); safeRight=insets.getStableInsetRight();
-            safeTop=insets.getStableInsetTop(); safeBottom=insets.getStableInsetBottom();
-            if(Build.VERSION.SDK_INT>=28 && insets.getDisplayCutout()!=null) {
-                safeLeft=Math.max(safeLeft,insets.getDisplayCutout().getSafeInsetLeft());
-                safeRight=Math.max(safeRight,insets.getDisplayCutout().getSafeInsetRight());
-                safeTop=Math.max(safeTop,insets.getDisplayCutout().getSafeInsetTop());
-                safeBottom=Math.max(safeBottom,insets.getDisplayCutout().getSafeInsetBottom());
+        final View root=findViewById(R.id.root);
+        final android.graphics.Rect safe=HudSafeArea.read(root);
+        final int safeLeft=safe.left,safeRight=safe.right,safeTop=safe.top,safeBottom=safe.bottom;
+        final int width=root!=null && root.getWidth()>0?root.getWidth():getResources().getDisplayMetrics().widthPixels;
+        final int height=root!=null && root.getHeight()>0?root.getHeight():getResources().getDisplayMetrics().heightPixels;
+        if(BuildConfig.DEBUG && root!=null) {
+            int[] position=new int[2];root.getLocationOnScreen(position);
+            String witness="parent="+position[0]+","+position[1]+","+width+","+root.getHeight()+" insets="+safe;
+            if(!witness.equals(lastHudLayoutWitness)) {
+                Log.i("HordeHudLayout",witness);lastHudLayoutWitness=witness;
             }
         }
         if(controllerPrompt!=null) {
             FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)controllerPrompt.getLayoutParams();
             p.leftMargin=dp(16)+safeLeft; p.rightMargin=dp(16)+safeRight; p.bottomMargin=dp(16)+safeBottom;
             controllerPrompt.setLayoutParams(p);
-            controllerPrompt.setMaxWidth(Math.max(dp(48),getResources().getDisplayMetrics().widthPixels-safeLeft-safeRight-dp(32)));
+            controllerPrompt.setMaxWidth(Math.max(dp(48),width-safeLeft-safeRight-dp(32)));
             controllerPrompt.setMaxLines(Integer.MAX_VALUE);
             controllerPrompt.setBackground(HordeUiTokens.plate(this,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
         }
         UiControlLayout.apply(this,v,attackButton,parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton,
-                safeRight,safeBottom,getResources().getDisplayMetrics().widthPixels-safeLeft);
-        styleActionButton(attackButton,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.PARCHMENT);
-        for(Button b:new Button[]{parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton})
-            if(b!=null) styleActionButton(b,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT);
+                safeRight,safeBottom,width,Math.max(1,height-safeTop));
+        styleGameplayActionButton(attackButton,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.PARCHMENT,false);
+        for(Button b:new Button[]{parryButton,dodgeButton,interactButton})
+            if(b!=null) styleGameplayActionButton(b,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,false);
+        styleGameplayActionButton(toggleHeldLightPoseButton,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,true);
         if(menuButton!=null) {
-            styleActionButton(menuButton,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT);
-            FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)menuButton.getLayoutParams();
-            p.setMarginEnd(dp(16)+safeRight); p.topMargin=dp(16)+safeTop; menuButton.setLayoutParams(p);
+            styleGameplayActionButton(menuButton,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,true);
+            PauseControl.apply(menuButton,safeRight,safeTop);
         }
         if(vitalityStatus!=null) {
             FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)vitalityStatus.getLayoutParams();
             p.gravity=Gravity.TOP|Gravity.START; p.setMarginStart(dp(16)+safeLeft); p.topMargin=dp(16)+safeTop;
             p.height=FrameLayout.LayoutParams.WRAP_CONTENT; vitalityStatus.setLayoutParams(p);
             vitalityStatus.setPadding(dp(10),dp(8),dp(10),dp(8)); vitalityStatus.setTextSize(12);
-            vitalityStatus.setMaxWidth(Math.max(dp(42),getResources().getDisplayMetrics().widthPixels-safeLeft-safeRight-dp(128)));
-            updateVitalityHud(lastPlayerVitality, lastPlayerMaxVitality);
+            vitalityStatus.setMaxWidth(Math.max(dp(42),width-safeLeft-safeRight-dp(128)));
+            updateVitalityHud(lastPlayerVitality, lastPlayerMaxVitality, lastPlayerHalfHeart);
             vitalityStatus.setBackground(HordeUiTokens.plate(this,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
         }
     }
@@ -3619,18 +5593,18 @@ public class MainActivity extends Activity {
         if(rtStatus==null) return;
         FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)rtStatus.getLayoutParams();
         int gravity=compact?Gravity.TOP|Gravity.END:Gravity.TOP|Gravity.CENTER_HORIZONTAL;
-        if(p.gravity!=gravity || p.height!=(compact?dp(48):-2)) {
+        android.graphics.Rect safe=HudSafeArea.read(findViewById(R.id.root));
+        int top=dp(compact?64:16)+safe.top,right=compact?dp(16)+safe.right:0;
+        if(p.gravity!=gravity || p.height!=(compact?dp(48):-2) || p.topMargin!=top || p.getMarginEnd()!=right) {
             p.gravity=gravity; p.height=compact?dp(48):-2; p.width=-2;
-            int top=dp(compact?64:16),right=0;
-            WindowInsets insets=rtStatus.getRootWindowInsets();
-            if(insets!=null) { top+=insets.getStableInsetTop(); right=insets.getStableInsetRight(); }
-            p.topMargin=top; p.setMarginEnd(compact?dp(16)+right:0); rtStatus.setLayoutParams(p);
+            p.topMargin=top; p.setMarginEnd(right); rtStatus.setLayoutParams(p);
         }
         rtStatus.setMinWidth(dp(compact?48:260)); rtStatus.setMaxWidth(dp(compact?80:360));
         rtStatus.setTextSize(compact?12:13);
     }
 
     private void requestGraphicsRevert(boolean close) {
+        cancelGraphicsSave();
         dismissGraphicsPreviewDetails();
         if (close) graphicsPreviewImageOnly = false;
         graphicsLiveChoiceError = null;
@@ -3648,7 +5622,7 @@ public class MainActivity extends Activity {
         graphicsRequestSerial = requestTimedGraphicsRevert();
         graphicsConfirmationStarted = 0;
         if (graphicsRequestSerial == 0) {
-            setNativeGraphics(graphicsConfirmed);
+            graphicsRequestSerial = setNativeGraphics(graphicsConfirmed);
             graphicsRecovering = true;
             if (close) { graphicsVisible = false; showSettings(); }
         }
@@ -3656,16 +5630,8 @@ public class MainActivity extends Activity {
 
     private void updateGraphicsActionButtons(boolean draftApplyReady, int state,
             boolean busy, boolean ready, boolean previewReady) {
-        // Use submits the temporary trial; Keep remains a separate control and
-        // is enabled only for the matching acknowledged RT presentation.
-        if (graphicsApply != graphicsConfirm) {
-            graphicsApply.setEnabled(graphicsPreviewWanted
-                    ? previewReady && graphicsLiveChoiceError == null && !busy && state != 2
-                    : draftApplyReady);
-        }
-        graphicsConfirm.setEnabled(graphicsPreviewWanted
-                ? previewReady && graphicsLiveChoiceError == null && state == 2 && ready
-                : state == 2 && ready);
+        graphicsApply.setEnabled(!graphicsAwaitingRestore && !graphicsSceneRestoring && graphicsSaveSerial == 0 &&
+                !busy && (graphicsPreviewWanted ? previewReady && graphicsLiveChoiceError == null && state != 2 : draftApplyReady));
     }
 
     private void addGraphicsSelectionSummary(LinearLayout panel) {
@@ -3705,11 +5671,22 @@ public class MainActivity extends Activity {
             }
             final double seconds = graphicsPollTime == 0 ? 0 : Math.max(0, now - graphicsPollTime) / 1000.0;
             graphicsPollTime = now;
+            if (graphicsSaveGeneration != surfaceRequestGeneration) cancelGraphicsSave();
             final long[] a = ProbeBridge.getGraphicsSnapshot();
             if (a == null || a.length != 28) { scheduleGraphicsPoll(this); return; }
             final boolean presented = GraphicsPreferences.presented(a, surfaceRequestGeneration);
-            if (graphicsRecovering && presented && GraphicsPreferences.matchesEffective(a, graphicsConfirmed)) {
+            if (graphicsRecovering && presented && (a[14] & 64) == 0 &&
+                    GraphicsPreferences.matchesEffective(a, graphicsConfirmed) &&
+                    GraphicsPreferences.matchesRequested(a, graphicsConfirmed) &&
+                    (!graphicsAwaitingRestore || (graphicsRequestSerial > 0 && a[0] == graphicsRequestSerial))) {
                 if (GraphicsPreferences.clearAfterRestore(preferences)) {
+                    if (graphicsAwaitingRestore) {
+                        // The direct fallback bypassed the edit session's pending Revert. Rebase
+                        // only after this exact restored RT receipt, so editing can resume safely.
+                        ProbeBridge.beginGraphicsEdit(graphicsConfirmed.scale, graphicsConfirmed.water,
+                                graphicsConfirmed.fire, graphicsConfirmed.cap, graphicsConfirmed.glassEnabled,
+                                graphicsConfirmed.shadow, graphicsConfirmed.mistEnabled, graphicsConfirmed.dust);
+                    }
                     graphicsRecovering = false;
                     Toast.makeText(MainActivity.this, R.string.graphics_restored, Toast.LENGTH_LONG).show();
                 }
@@ -3718,15 +5695,18 @@ public class MainActivity extends Activity {
             if (graphicsSceneRestoring && presented && a[19] == restoredProfile) graphicsSceneRestoring = false;
             if (graphicsVisible) {
                 final int state = (int)a[2];
+                if (state == 5 || ((a[14] & 64) != 0 && a[0] == graphicsSaveSerial &&
+                        a[1] == graphicsSaveGeneration)) cancelGraphicsSave();
                 final boolean busy = state == 1 || state == 2 || state == 4;
                 graphicsBusy = busy;
                 setGraphicsEditorsEnabled(graphicsPanel, !busy);
                 if (graphicsDetailsPanel != null) setGraphicsEditorsEnabled(graphicsDetailsPanel, !busy);
                 final GraphicsPreferences.Values expected = graphicsAwaitingRestore ? graphicsConfirmed :
                         graphicsSubmitted != null ? graphicsSubmitted : graphicsConfirmed;
-                final boolean ready = presented && a[0] == graphicsRequestSerial && (graphicsPreviewWanted ?
-                        GraphicsPreviewOptions.presented(a, surfaceRequestGeneration, graphicsRequestSerial, previewSelection()) :
-                        GraphicsPreferences.matchesEffective(a, expected) && GraphicsPreferences.matchesRequested(a, expected));
+                final boolean ready = presented && a[0] == graphicsRequestSerial &&
+                        GraphicsPreferences.matchesEffective(a, expected) && GraphicsPreferences.matchesRequested(a, expected) &&
+                        (!graphicsPreviewWanted || GraphicsPreviewOptions.presented(a,
+                                surfaceRequestGeneration, graphicsRequestSerial, expected));
                 if (ready && graphicsLatencySerial == a[0]) {
                     Log.i("HordeGraphicsLatency", "UI_ACK_SEEN serial=" + a[0] +
                             " generation=" + surfaceRequestGeneration + " state=" + state +
@@ -3735,6 +5715,11 @@ public class MainActivity extends Activity {
                             " polls=" + graphicsLatencyPollCount + " max_poll_lateness_ms=" +
                             graphicsLatencyMaxPollLatenessNs / 1.0e6);
                     graphicsLatencySerial = 0; // One observation per accepted UI request.
+                }
+                if (state == 2 && ready && graphicsSaveSerial == graphicsRequestSerial && graphicsSaveSerial != 0) {
+                    confirmGraphicsSelection();
+                    scheduleGraphicsPoll(this);
+                    return; // Await the native post-confirm/restore state before enabling editors.
                 }
                 if (state == 2 && ready) {
                     final boolean firstConfirmationPoll = graphicsConfirmationStarted == 0;
@@ -3763,7 +5748,7 @@ public class MainActivity extends Activity {
                 }
                 final boolean previewReady = graphicsPreviewWanted && GraphicsPreviewOptions.presented(a,
                         surfaceRequestGeneration, graphicsRequestSerial, previewSelection());
-                final boolean draftApplyReady = graphicsApply != graphicsConfirm && !busy &&
+                final boolean draftApplyReady = !busy &&
                         ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
                 updateGraphicsActionButtons(draftApplyReady, state, busy, ready, previewReady);
                 updateGraphicsSelectionSummary(previewReady);
@@ -3784,10 +5769,11 @@ public class MainActivity extends Activity {
                         "Accepted 1.6.1 baseline" : graphicsDraft.same(GraphicsPreferences.mobileDefaults()) ? "Mobile defaults" : "Custom";
                 final String status = state == 1 ? "Waiting for RT frame · Saved unchanged" : state == 4 ? "Restoring saved settings" :
                         state == 5 ? "Trial failed · previous output retained" : state == 2 ?
-                        (ready ? "Keep or Restore: " + Math.max(0, 15 - (now - graphicsConfirmationStarted) / 1000) + " s" :
-                        "Waiting for current RT frame · Saved unchanged") : state == 3 ? "Confirmed and saved" :
+                        (ready ? "Waiting to save or restore settings" :
+                        "Waiting for current RT frame · Saved unchanged") :
+                        state == 3 && graphicsConfirmed != null && graphicsDraft.same(graphicsConfirmed) ? "Confirmed and saved" :
                         graphicsConfirmed != null && graphicsDraft.same(graphicsConfirmed) ? "Saved settings selected" :
-                        "Not saved · choose Use, then Keep";
+                        "Not saved · choose Apply";
                 final String settingsText = preset + "\n" + status + "\nRequested: " + graphicsDraft.scale + "% / water " +
                         waterName(graphicsDraft.water) + " / fire " + GraphicsPreviewOptions.fireLabel(graphicsDraft.fire) +
                         " / glass " + (graphicsDraft.glassEnabled ? "On" : "Off") +
@@ -3834,13 +5820,39 @@ public class MainActivity extends Activity {
     }
 
     private void setGameplayPaused(boolean paused) {
+        if(openingBenchmarkRecoveryRejected)return;
+        if (paused) {stopChapterAmbience();stopPrivateLichRevivalAudio();}
+        if(!paused && (campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier()))) paused=true;
+        if (paused) { clearRunIntent(); clearCrouchIntent(); }
         if (paused) suspendAndResetWaterfall(); // Same generation retains the Core cursor.
         if (musicPlayback != null) musicPlayback.setSuspended(paused || !resumed ||
                 !surfaceStarted || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1);
         ProbeBridge.setSimulationPaused(paused); // Existing JNI mailbox authority unchanged.
     }
 
+    private void clearRunIntent() {
+        runToggleEnabled = false;
+        if (runButton != null) runButton.setText(R.string.run);
+        try { ProbeBridge.clearRunIntent(); }
+        catch (RuntimeException | LinkageError ignored) { /* Lifecycle cleanup is best effort. */ }
+    }
+
+    private void clearCrouchIntent() {
+        clearCrouchIntent(false);
+    }
+
+    private void clearCrouchIntent(boolean preserveFreshControllerHold) {
+        crouchBlockedControlKeys |= crouchControlKeys;
+        crouchControlKeys = 0;
+        if (!preserveFreshControllerHold) controllerInput.clearCrouchHold();
+        if (crouchButton != null) { crouchButton.setText(R.string.crouch); crouchButton.setContentDescription(getString(R.string.crouch)); }
+        if (preserveFreshControllerHold) return; // A fresh hold adds to the explicit touch-toggle intent.
+        try { ProbeBridge.clearCrouchIntent(); }
+        catch (RuntimeException | LinkageError ignored) { /* Lifecycle cleanup is best effort. */ }
+    }
+
     private void showDiagnostics(final boolean errorState) {
+        invalidateLookoutObjective();
         menuVisible = true;
         diagnosticsVisible = true;
         diagnosticsErrorState = errorState;
@@ -3852,6 +5864,8 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
+        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
@@ -3873,7 +5887,11 @@ public class MainActivity extends Activity {
     }
 
     private void resetRoute() {
+        clearRunIntent();
+        stopChapterAmbience();
         ++delayedGameplayFeedbackGeneration;
+        stopPrivateLichRevivalAudio();
+        clearVerticalProofFeedbackSelection();
         suspendAndResetWaterfall();
         endingOverlayVisible = false;
         endingOverlayDismissed = false;
@@ -3888,22 +5906,34 @@ public class MainActivity extends Activity {
     }
 
     private void updateVitalityHud(final int vitality, final int maximum) {
+        updateVitalityHud(vitality, maximum, false);
+    }
+    private void updateVitalityHud(final int vitality, final int maximum, final boolean halfHeart) {
+        if (vitality <= 0) clearRunIntent();
         final int safeMaximum = Math.max(0, maximum);
         final int safeVitality = Math.max(0, Math.min(safeMaximum, vitality));
         lastPlayerVitality = safeVitality;
         lastPlayerMaxVitality = safeMaximum;
+        lastPlayerHalfHeart = halfHeart && safeVitality > 0;
         final int available = Math.max(dp(22), Math.min(vitalityStatus.getMaxWidth()
                 - vitalityStatus.getPaddingLeft() - vitalityStatus.getPaddingRight(),
                 getResources().getDisplayMetrics().widthPixels - dp(148)));
         vitalityStatus.setText("");
-        vitalityStatus.setCompoundDrawables(new VitalityHeartsDrawable(this, safeVitality, safeMaximum, available),
+        vitalityStatus.setCompoundDrawables(new VitalityHeartsDrawable(this, safeVitality, safeMaximum, available, lastPlayerHalfHeart),
                 null, null, null);
         vitalityStatus.setCompoundDrawablePadding(0);
-        vitalityStatus.setContentDescription(getString(R.string.vitality_accessibility, safeVitality, safeMaximum));
+        vitalityStatus.setContentDescription(lastPlayerHalfHeart
+                ? getString(R.string.vitality_half_accessibility, safeVitality - 1, safeMaximum)
+                : getString(R.string.vitality_accessibility, safeVitality, safeMaximum));
     }
 
     private void showDeathOverlay() {
         if (deathOverlayVisible || graphicsVisible || playtestReportVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
+        renderDeathOverlay();
+    }
+
+    private void renderDeathOverlay() {
+        invalidateLookoutObjective();
         deathOverlayVisible = true;
         menuVisible = true;
         setGameplayPaused(true);
@@ -3911,6 +5941,8 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
+        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -3920,6 +5952,8 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
 
         final LinearLayout panel = createPanel(getString(R.string.you_fell), getString(R.string.death_message));
+        if(campaignDeathMessage!=null) addBody(panel,campaignDeathMessage);
+        addMenuButton(panel,"Load checkpoint",() -> showCampaignMenu(CampaignMenuState.LOAD));
         addMenuButtonRow(panel,
                 getString(R.string.retry_encounter), this::retryEncounter,
                 getString(R.string.restart_route), this::restartAfterDeath);
@@ -3937,6 +5971,8 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
+        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -3983,6 +6019,8 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
+        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -4380,26 +6418,72 @@ public class MainActivity extends Activity {
         hideMenu();
     }
 
+    private void updateDeathRecoveryPresentation(int lifePhase) {
+        lastPlayerLifePhase=lifePhase;
+        if(deathOverlayVisible && lifePhase==PLAYER_ALIVE && !campaignFromDeath && !confirmedRetryPending) {
+            deathOverlayVisible=false;
+            if(retryPending) { retryPending=false; firstMenu=false; hideMenu(); }
+            else showMainMenu(false);
+        }
+    }
+
     private void retryEncounter() {
-        if (retryPending) {
+        if (retryPending || (campaignFromDeath && campaignMenuVisible)) {
             return;
         }
+        final boolean confirmed;
+        try { confirmed=ProbeBridge.getConfirmedRetryMode(); }
+        catch(RuntimeException | LinkageError unavailable) {
+            Toast.makeText(this,R.string.retry_unavailable,Toast.LENGTH_LONG).show();return;
+        }
+        if(confirmed) {
+            CampaignMenuState before=null;
+            try { before=CampaignMenuState.decode(ProbeBridge.getCampaignState()); }
+            catch(RuntimeException | LinkageError unavailable) { /* No legacy substitution. */ }
+            if(!campaignConfigured || before==null || !before.current(surfaceRequestGeneration) || before.pending()) {
+                campaignDeathMessage=CAMPAIGN_SURFACE_UNAVAILABLE;renderDeathOverlay();return;
+            }
+            confirmedRetryRequestFloor=before.ackRequest;
+        }
+        clearVerticalProofFeedbackSelection();
         final int checkpoint = ProbeBridge.retryEncounter();
         if (checkpoint < 0) {
             Toast.makeText(this, R.string.retry_unavailable, Toast.LENGTH_LONG).show();
             return;
         }
+        stopChapterAmbience();
         ++delayedGameplayFeedbackGeneration;
+        stopPrivateLichRevivalAudio();
+        campaignFromDeath=confirmed;
+        campaignDeathMessage=null;
         retryPending = true;
+        confirmedRetryPending=confirmed;
+        confirmedRetryStarted=SystemClock.uptimeMillis();
+        if(confirmed) {
+            campaignDeathLoadRequest=0;campaignDeathLoadCommitted=false;
+            campaignRequest=0;campaignLoadedReady=false;
+            handler.removeCallbacks(refreshCampaignMenu);handler.post(refreshCampaignMenu);
+        }
         suspendAndResetWaterfall();
-        applyCheckpointViewPose(checkpoint);
+        if(!confirmed)applyCheckpointViewPose(checkpoint);
         clearTouchState();
         pushViewControls();
         Toast.makeText(this, R.string.retrying_encounter, Toast.LENGTH_SHORT).show();
     }
 
+    private void failConfirmedRetry(String message) {
+        confirmedRetryPending=false;retryPending=false;
+        campaignDeathMessage=message;campaignFromDeath=true;
+        // Keep failed/unavailable recovery visibly paused; never heal/reset or
+        // close on an Alive publication which lacks its owning RT presentation.
+        setGameplayPaused(true);clearTouchState();
+        returnToDeathFromCampaign();
+    }
+
     private void restartAfterDeath() {
-        if (retryPending) return;
+        if (retryPending || (campaignFromDeath && campaignMenuVisible)) return;
+        campaignFromDeath=false;
+        campaignDeathMessage=null;
         // Keep the death menu paused until the simulation owner acknowledges
         // Alive, just as Retry Encounter does. An old Dead publication must
         // not reopen the menu between the reset request and its application.
@@ -4411,6 +6495,7 @@ public class MainActivity extends Activity {
     private final Runnable runtimePoll = new Runnable() {
         @Override
         public void run() {
+            if(openingBenchmarkRecoveryRejected)return;
             try {
                 if (benchmarkAutomationId != null && !benchmarkAutomationFinishing &&
                         SystemClock.elapsedRealtime() - benchmarkAutomationStartedAt >=
@@ -4426,7 +6511,25 @@ public class MainActivity extends Activity {
                         Log.i(TAG, "Debug motion evidence finished: status=" + motionStatus);
                     }
                 }
+                int motionGraphicsState = PerformanceProfileRequest.PresentationGate.READY;
+                if (pendingDebugMotion != null && pendingDebugMotionGraphics != null) {
+                    motionGraphicsState = pendingDebugMotionGraphics.poll(ProbeBridge.getGraphicsSnapshot(),
+                            surfaceRequestGeneration, SystemClock.elapsedRealtime());
+                    if (motionGraphicsState == PerformanceProfileRequest.PresentationGate.FAILED) {
+                        pendingDebugMotion = pendingDebugMotionId = null;
+                        pendingDebugMotionGraphics = null;
+                        debugAutomationAutostart = false;
+                        Log.e(TAG, "Performance motion cancelled before arming: graphics ownership or30s deadline.");
+                    }
+                }
                 surfaceStarted = resumed && surfaceAvailable && surfaceRequestGeneration != 0 && state == 1;
+                if(startupUiVisible) {
+                    if(isMenuRuntimeReady())showMainMenu(false);
+                    else if((state==2 || state==3) && startupShownRuntime!=state)showStartupLoading();
+                }
+                updateChapterDialoguePresentation(state);
+                if (updateCombatTeachingPrompt(state)) scheduleCombatTeachingPromptPoll();
+                else cancelCombatTeachingPromptPoll();
                 if (musicPlayback != null) musicPlayback.setSuspended(!resumed || !surfaceStarted ||
                         state != 1 || menuVisible || diagnosticsVisible || debugMotionActive || pendingDebugMotion != null);
                 if (state == 1) {
@@ -4437,30 +6540,27 @@ public class MainActivity extends Activity {
                     // Both values come from one immutable simulation publication.
                     final long vitalityState = ProbeBridge.getPlayerVitalityState();
                     final int vitality = (int) vitalityState;
-                    final int maximumVitality = (int) (vitalityState >>> 32);
+                    final int maximumVitality = (int) ((vitalityState >>> 32) & 0x7fffffffL);
+                    final boolean halfHeart = vitalityState < 0;
                     final int lifePhase = ProbeBridge.getPlayerLifePhase();
                     final int finaleEndingPhase = ProbeBridge.getFinaleEndingPhase();
-                    if (vitality != lastPlayerVitality || maximumVitality != lastPlayerMaxVitality)
-                        updateVitalityHud(vitality, maximumVitality);
-                    lastPlayerLifePhase = lifePhase;
-                    if (deathOverlayVisible && lifePhase == PLAYER_ALIVE) {
-                        deathOverlayVisible = false;
-                        if (retryPending) {
-                            retryPending = false;
-                            firstMenu = false;
-                            hideMenu();
-                        } else {
-                            showMainMenu(false);
-                        }
-                    }
+                    if (vitality != lastPlayerVitality || maximumVitality != lastPlayerMaxVitality || halfHeart != lastPlayerHalfHeart)
+                        updateVitalityHud(vitality, maximumVitality, halfHeart);
+                    updateDeathRecoveryPresentation(lifePhase);
                     final boolean showHud = preferences.getBoolean("show_hud", true);
                     if (!menuVisible && !benchmarkRunning && !debugCaptureUiSuppressed)
                         rtStatus.setVisibility(showHud && InterfacePreferences.read(preferences).routineStatus ? View.VISIBLE : View.GONE);
-                    if (!debugCaptureUiSuppressed && !menuVisible && !benchmarkRunning && showHud &&
-                            lifePhase == PLAYER_ALIVE && !controllerMode) {
+                    final boolean showGameplayActions = !debugCaptureUiSuppressed &&
+                            !menuVisible && !diagnosticsVisible && !benchmarkRunning &&
+                            !endingOverlayVisible && showHud && lifePhase == PLAYER_ALIVE &&
+                            !controllerMode;
+                    if (showGameplayActions) {
                         attackButton.setVisibility(View.VISIBLE);
                         parryButton.setVisibility(View.VISIBLE);
                         dodgeButton.setVisibility(View.VISIBLE);
+                        if (runButton != null) runButton.setVisibility(View.GONE);
+                    } else if (runButton != null) {
+                        runButton.setVisibility(View.GONE);
                     }
                     updateContextualControls(!debugCaptureUiSuppressed && !menuVisible &&
                             !diagnosticsVisible && !benchmarkRunning && !endingOverlayVisible &&
@@ -4474,6 +6574,8 @@ public class MainActivity extends Activity {
                         attackButton.setVisibility(View.GONE);
                         parryButton.setVisibility(View.GONE);
                         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+                        if (runButton != null) runButton.setVisibility(View.GONE);
+                        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
                     }
                     if (lifePhase == PLAYER_DEAD && !debugMotionActive) showDeathOverlay();
                     if (finaleEndingPhase == FINALE_ENDING_COMPLETE && !benchmarkRunning && !debugMotionActive &&
@@ -4484,17 +6586,21 @@ public class MainActivity extends Activity {
                         }
                         showEndingOverlay();
                     }
-                    if (debugAutomationAutostart && menuVisible && !deathOverlayVisible && !endingOverlayVisible) hideMenu();
+                    if (debugAutomationAutostart && menuVisible && !deathOverlayVisible && !endingOverlayVisible &&
+                            (pendingDebugMotionGraphics == null || motionGraphicsState == PerformanceProfileRequest.PresentationGate.READY)) hideMenu();
                     if (pendingDebugMotion != null) {
-                        final String scenario = pendingDebugMotion, runId = pendingDebugMotionId;
-                        pendingDebugMotion = pendingDebugMotionId = null;
-                        suppressUiForDebugCapture();
-                        debugMotionActive = ProbeBridge.requestDebugMotionEvidence(scenario, runId);
-                        if (!debugMotionActive) {
-                            restoreUiAfterDebugMotion();
-                            Log.e(TAG, "Debug motion evidence request rejected.");
+                        if (motionGraphicsState == PerformanceProfileRequest.PresentationGate.READY) {
+                            pendingDebugMotionGraphics = null;
+                            final String scenario = pendingDebugMotion, runId = pendingDebugMotionId;
+                            pendingDebugMotion = pendingDebugMotionId = null;
+                            suppressUiForDebugCapture();
+                            debugMotionActive = ProbeBridge.requestDebugMotionEvidence(scenario, runId);
+                            if (!debugMotionActive) {
+                                restoreUiAfterDebugMotion();
+                                Log.e(TAG, "Debug motion evidence request rejected.");
+                            }
+                            debugAutomationAutostart = false;
                         }
-                        debugAutomationAutostart = false;
                     } else if (pendingDebugCheckpoint >= 0) {
                         applyCheckpointViewPose(pendingDebugCheckpoint);
                         clearTouchState();
@@ -4510,6 +6616,14 @@ public class MainActivity extends Activity {
                             Log.e(TAG, "Debug checkpoint request rejected: " + checkpoint);
                         }
                         debugAutomationAutostart = false;
+                    } else if (pendingDebugCombatPractice >= 0) {
+                        final int enemyKind = pendingDebugCombatPractice;
+                        pendingDebugCombatPractice = -1;
+                        clearTouchState();
+                        if (!ProbeBridge.requestDebugCombatPractice(enemyKind)) {
+                            Log.e(TAG, "Debug combat practice request rejected: " + enemyKind);
+                        }
+                        debugAutomationAutostart = false;
                     } else if (pendingDebugReplay) {
                         pendingDebugReplay = false;
                         viewControls[0] = 0.0f;
@@ -4523,25 +6637,31 @@ public class MainActivity extends Activity {
                 } else if (state == 2) {
                     layoutRtStatus(false);
                     updateContextualControls(false);
+                    if (runButton != null) runButton.setVisibility(View.GONE);
+                    if (crouchButton != null) crouchButton.setVisibility(View.GONE);
                     rtStatus.setText(R.string.rt_unsupported);
                     rtStatus.setContentDescription(getString(R.string.rt_unsupported));
                     rtStatus.setTextColor(0xFFFF8A7A);
-                    if (!autoDiagnosticsShown) {
+                    if (!autoDiagnosticsShown && !startupUiVisible) {
                         autoDiagnosticsShown = true;
                         showDiagnostics(false);
                     }
                 } else if (state == 3) {
                     layoutRtStatus(false);
                     updateContextualControls(false);
+                    if (runButton != null) runButton.setVisibility(View.GONE);
+                    if (crouchButton != null) crouchButton.setVisibility(View.GONE);
                     rtStatus.setText(R.string.rt_error);
                     rtStatus.setContentDescription(getString(R.string.rt_error));
                     rtStatus.setTextColor(0xFFFF8A7A);
-                    if (!autoDiagnosticsShown) {
+                    if (!autoDiagnosticsShown && !startupUiVisible) {
                         autoDiagnosticsShown = true;
                         showDiagnostics(true);
                     }
                 } else {
                     updateContextualControls(false);
+                    if (runButton != null) runButton.setVisibility(View.GONE);
+                    if (crouchButton != null) crouchButton.setVisibility(View.GONE);
                     rtStatus.setText(R.string.rt_starting);
                 }
 
@@ -4553,7 +6673,7 @@ public class MainActivity extends Activity {
                         if (!benchmarkRunning) finishBenchmarkAutomation(3);
                     }
                 }
-                if (benchmarkRunning) {
+                if (benchmarkRunning && !openingBenchmarkPending()) {
                     final int benchmarkStatus = ProbeBridge.getBenchmarkStatus();
                     if (benchmarkStatus == 1) {
                         final String progress = ProbeBridge.getBenchmarkProgress();
@@ -4563,6 +6683,8 @@ public class MainActivity extends Activity {
                         attackButton.setVisibility(View.GONE);
                         parryButton.setVisibility(View.GONE);
                         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+                        if (runButton != null) runButton.setVisibility(View.GONE);
+                        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
                         updateContextualControls(false);
                         vitalityStatus.setVisibility(View.GONE);
                     } else if (benchmarkStatus == 2 || benchmarkStatus == 3) {
@@ -4598,19 +6720,49 @@ public class MainActivity extends Activity {
                 // active. Native teardown discards its pending transport queue, so a
                 // pre-Home event can neither play in the background nor replay after
                 // the new surface resumes.
+                updatePrivateLichRevivalAudio(state);
                 if (resumed && surfaceStarted && state == 1) {
                     final long[] platformEvents = ProbeBridge.drainPlatformEvents();
-                    for (int eventIndex = 0; !debugMotionActive && eventIndex + 1 < platformEvents.length; eventIndex += 2) {
+                    final int latestAmbienceSignal=ChapterAmbienceFeedback.latestSignalIndex(platformEvents);
+                    for (int eventIndex = 0; !debugMotionActive && eventIndex + 2 < platformEvents.length; eventIndex += 3) {
                     final long metadata = platformEvents[eventIndex];
                     final long stereoGains = platformEvents[eventIndex + 1];
+                    final long verticalMetadata = platformEvents[eventIndex + 2];
                     final int eventType = (int) (metadata & 0xffL);
                     final int targetEntity = (int) ((metadata >>> 16) & 0xffL);
-                    final int equipmentAudioCue = (int) ((metadata >>> 24) & 0xffL);
+                    final int eventAudioCue = (int) ((metadata >>> 24) & 0xffL);
                     final long eventSequence = (metadata >>> 32) & 0xffffffffL;
                     switch (eventType) {
+                        case PrivateLichRevivalAudio.EVENT_TYPE: // LichRevivalCry; no damage/haptic mapping.
+                            if(privateLichRevivalAudio!=null)privateLichRevivalAudio.start(metadata,stereoGains,
+                                delayedGameplayFeedbackGeneration,privateRevivalAudible(state),
+                                preferences.getInt("sfx_volume",70)/100.f,privateRevivalDuck());
+                            break;
+                        case PLATFORM_EVENT_FOREST_BIRD:
+                        case PLATFORM_EVENT_FOREST_CRICKETS:
+                        case PLATFORM_EVENT_POND_FROGS:
+                        case ChapterAmbienceFeedback.TOMB_DRIP:
+                        case ChapterAmbienceFeedback.ROPE_CONTACT:
+                        case ChapterAmbienceFeedback.FOREST_FOLIAGE:
+                            if(eventIndex==latestAmbienceSignal)
+                                playChapterAmbience(stereoGains, ChapterAmbienceFeedback.soundKey(eventType));
+                            break;
+                        case PLATFORM_EVENT_FOREST_BIRD_STOPPED:
+                        case ChapterAmbienceFeedback.LOCAL_STOPPED:
+                            if(eventIndex==latestAmbienceSignal)stopChapterAmbience();
+                            break;
+                        case PLATFORM_EVENT_PLAYER_WET_FOOTSTEP:
+                            playSpatialSound(wetFootstepSoundKey(playerStepVariant++), PLAYER_WET_FOOTSTEP_GAIN,
+                                    stereoGains, verticalMetadata);
+                            break;
+                        case PLATFORM_EVENT_WATERFALL_CONTACT:
+                            playSpatialSound("water_stream_contact", 0.45f,
+                                    stereoGains, verticalMetadata);
+                            break;
                         case PLATFORM_EVENT_PLAYER_FOOTSTEP:
-                            playSpatialSound((playerStepVariant++ & 1) == 0 ?
-                                    "player_step_1" : "player_step_2", 0.45f, stereoGains);
+                            final String dryStepKey = DryFootstepFeedback.soundKey(eventAudioCue);
+                            if (dryStepKey != null) playSpatialSound(dryStepKey, PLAYER_DRY_FOOTSTEP_GAIN,
+                                    stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_PLAYER_SWING:
                             if (isDebuggableApp()) {
@@ -4618,7 +6770,8 @@ public class MainActivity extends Activity {
                                         " sound=1 haptic=1");
                             }
                             playSpatialSound((swingVariant++ & 1) == 0 ?
-                                    "sword_swing_1" : "sword_swing_2", 0.28f, stereoGains);
+                                    "sword_swing_1" : "sword_swing_2", 0.28f,
+                                    stereoGains, verticalMetadata);
                             performHaptic(HAPTIC_SWING);
                             break;
                         case PLATFORM_EVENT_PLAYER_DAMAGED:
@@ -4629,19 +6782,33 @@ public class MainActivity extends Activity {
                             break;
                         case PLATFORM_EVENT_ENEMY_FOOTSTEP:
                             playSpatialSound((enemyStepVariant++ & 1) == 0 ?
-                                    "skeleton_step_1" : "skeleton_step_2", 0.11f, stereoGains);
+                                    "skeleton_step_1" : "skeleton_step_2", 0.11f,
+                                    stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_ENEMY_ATTACK_STARTED:
-                            playSpatialSound("skeleton_attack", 0.22f, stereoGains);
+                            playSpatialSound("skeleton_attack", 0.22f, stereoGains, verticalMetadata);
+                            break;
+                        case PLATFORM_EVENT_PARRY_PREPARE_CUE:
+                            if (!menuVisible && !diagnosticsVisible && !graphicsVisible &&
+                                    !deathOverlayVisible && !endingOverlayVisible) {
+                                playSpatialSound("sword_hit_1", 0.18f, stereoGains, verticalMetadata);
+                            }
+                            break;
+                        case PLATFORM_EVENT_LICH_DISCHARGE_WARNING:
+                            if (!menuVisible && !diagnosticsVisible && !graphicsVisible &&
+                                    !deathOverlayVisible && !endingOverlayVisible) {
+                                playSpatialSound("skeleton_attack", 0.16f, stereoGains, verticalMetadata);
+                            }
                             break;
                         case PLATFORM_EVENT_ENEMY_HIT:
                             if (targetEntity == ENTITY_LICH) {
                                 // The hurt source includes its own impact; layering the
                                 // fencing hit masks the short vocal reaction.
-                                playSpatialSound("lich_hurt", 0.82f, stereoGains);
+                                playSpatialSound("lich_hurt", 0.82f, stereoGains, verticalMetadata);
                             } else {
                                 playSpatialSound((swingVariant & 1) == 0 ?
-                                        "sword_hit_1" : "sword_hit_2", 0.32f, stereoGains);
+                                        "sword_hit_1" : "sword_hit_2", 0.32f,
+                                        stereoGains, verticalMetadata);
                             }
                             break;
                         case PLATFORM_EVENT_ENEMY_DEFEATED:
@@ -4651,59 +6818,62 @@ public class MainActivity extends Activity {
                             handler.postDelayed(
                                     () -> {
                                         if (feedbackGeneration == delayedGameplayFeedbackGeneration) {
-                                            playSpatialSound("skeleton_falling_bones", 0.24f, stereoGains);
+                                            playSpatialSound("skeleton_falling_bones", 0.24f,
+                                                    stereoGains, verticalMetadata);
                                         }
                                     },
                                     ENEMY_IMPACT_FALL_DELAY_MILLISECONDS);
                             break;
                         case PLATFORM_EVENT_LICH_CHARGE_STARTED:
-                            playSpatialSound("lich_charge", 0.38f, stereoGains);
+                            playSpatialSound("lich_charge", 0.38f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_LICH_IMPACT:
-                            playSpatialSound("lich_impact", 0.55f, stereoGains);
+                            playSpatialSound("lich_impact", 0.55f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_LICH_DEFEATED:
-                            playSpatialSound("lich_fall", 0.28f, stereoGains);
+                            playSpatialSound("keeper_death", 0.28f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_CHEST_UNLOCKED:
-                            playSpatialSound("chest_unlock", 0.82f, stereoGains);
+                            playSpatialSound("chest_unlock", 0.82f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_CHEST_OPENED:
-                            playSpatialSound("chest_open", 1.0f, stereoGains);
+                            playSpatialSound("chest_open", 1.0f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_TORCH_EXTINGUISHED:
-                            playSpatialSound("torch_extinguish", 0.78f, stereoGains);
+                            playSpatialSound("torch_extinguish", 0.78f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_SKELETON_INCIDENTAL:
-                            playSpatialSound("skeleton_idle_rattle", 0.10f, stereoGains);
+                            playSpatialSound("skeleton_idle_rattle", 0.10f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_SKELETON_ENCOUNTER_WARNING:
                             if (!menuVisible && !diagnosticsVisible && !graphicsVisible &&
                                     !deathOverlayVisible && !endingOverlayVisible) {
-                                playSpatialSound("skeleton_idle_rattle", 0.22f, stereoGains);
+                                playSpatialSound("skeleton_idle_rattle", 0.22f,
+                                        stereoGains, verticalMetadata);
                             }
                             break;
                         case PLATFORM_EVENT_PLAYER_SWORD_ATTACHMENT_CHANGED:
                             final String equipmentKey = EquipmentAudioFeedback.soundKey(
-                                    eventType, equipmentAudioCue, !menuVisible &&
+                                    eventType, eventAudioCue, !menuVisible &&
                                     !diagnosticsVisible && !graphicsVisible &&
                                     !deathOverlayVisible && !endingOverlayVisible);
                             if (equipmentKey != null) {
                                 playSound(equipmentKey,
-                                        equipmentAudioCue == EQUIPMENT_AUDIO_SWORD_DRAW ? 0.26f : 0.24f);
+                                        eventAudioCue == EQUIPMENT_AUDIO_SWORD_DRAW ? 0.26f : 0.24f);
                             }
                             break;
                         case PLATFORM_EVENT_KEEPER_REVEAL_STARTED:
-                            playSpatialSound("keeper_i_sense_you", 0.36f, stereoGains);
+                            // Chapter dialogue owns the admitted Keeper lines now.
+                            // Consume this legacy gameplay event without duplicating playback.
                             break;
                         case PLATFORM_EVENT_KEEPER_WARNING:
-                            playSpatialSound("keeper_come_closer", 0.36f, stereoGains);
+                            // See PLATFORM_EVENT_KEEPER_REVEAL_STARTED.
                             break;
                         case PLATFORM_EVENT_KEEPER_COMBAT_READY:
                             // Readiness has no separate admitted sound; title polls the snapshot.
                             break;
                         case PLATFORM_EVENT_PLAYER_PARRY_SUCCEEDED:
-                            playSpatialSound("sword_hit_2", 0.46f, stereoGains);
+                            playSpatialSound("sword_hit_2", 0.46f, stereoGains, verticalMetadata);
                             performHaptic(HAPTIC_PARRY);
                             break;
                         default:
@@ -4839,6 +7009,49 @@ public class MainActivity extends Activity {
             case "dust-ellipsoid": return 158;
             case "dust-box-wall": return 159;
             case "player-torch-parry-clearance": return 160;
+            case "world-route": return 190;
+            case "world-route-staged": return 191;
+            case "rescue-journey-start": return 192;
+            case "chapter-landing-north": return 193;
+            case "chapter-landing-east": return 194;
+            case "chapter-landing-south": return 195;
+            case "chapter-landing-west": return 196;
+            case "chapter-landing-shaft": return 197;
+            case "chapter-stone-portal-front": return 198;
+            case "chapter-stone-portal-rear": return 199;
+            case "chapter-stone-wall-corner": return 200;
+            case "chapter-forest-first-bend": return 201;
+            case "chapter-forest-second-bend": return 202;
+            case "chapter-forest-lookout": return 203;
+            case "chapter-forest-lookout-left": return 228;
+            case "chapter-forest-lookout-right": return 229;
+            case "chapter-forest-retention-west": return 230;
+            case "chapter-forest-retention-east": return 231;
+            case "chapter-forest-clue-forward": return 226;
+            case "chapter-forest-clue-reverse": return 227;
+            case "chapter-keeper-death-held": return 204;
+            case "chapter-keeper-death-dissolve": return 205;
+            case "chapter-keeper-death-retired": return 206;
+            case "chapter-keeper-mist-fading": return 221;
+            case "chapter-keeper-mist-cleared": return 222;
+            case "chapter-kit-reunion": return 207;
+            case "chapter-kit-departure": return 208;
+            case "chapter-stake-ascent": return 210;
+            case "chapter-stake-pullup": return 211;
+            case "chapter-stake-descent": return 212;
+            case "chapter-stake-repeat-ascent": return 213;
+            case "chapter-understory-close": return 214;
+            case "chapter-deadwood-bank": return 215;
+            case "chapter-lantern-side-wall-high": return 216;
+            case "chapter-lantern-side-wall-low": return 217;
+            case "chapter-niche-rect": return 218;
+            case "chapter-niche-arch": return 219;
+            case "chapter-niche-east": return 220;
+            case "chapter-pine-near": return 223;
+            case "chapter-pine-mid": return 224;
+            case "chapter-pine-far": return 225;
+            case "vertical-proof-ground": return 170;
+            case "vertical-proof-raised": return 171;
             case "layout-c-wall-panel-upward": return 152;
             case "wall-panel-bottom": return 161;
             case "wall-panel-bottom-left": return 162;
@@ -4849,6 +7062,27 @@ public class MainActivity extends Activity {
             case "water-torch-catchment": return 183;
             default: return -1;
         }
+    }
+
+    static int combatPracticeKind(final String name) {
+        if ("combat-practice-parry".equals(name)) return DEBUG_COMBAT_PRACTICE_PARRY;
+        if ("combat-practice-dodge".equals(name)) return DEBUG_COMBAT_PRACTICE_DODGE;
+        return -1;
+    }
+
+    static boolean enablesVerticalProofFeedback(final boolean debugBuild, final int checkpoint) {
+        return debugBuild && (checkpoint == 170 || checkpoint == 171);
+    }
+
+    private void selectVerticalProofFeedbackCheckpoint(final int checkpoint) {
+        verticalProofFeedbackCheckpoint = enablesVerticalProofFeedback(isDebuggableApp(), checkpoint)
+                ? checkpoint : -1;
+        verticalProofFeedbackDiagnosticCount = 0;
+    }
+
+    private void clearVerticalProofFeedbackSelection() {
+        verticalProofFeedbackCheckpoint = -1;
+        verticalProofFeedbackDiagnosticCount = 0;
     }
 
     static int admittedDebugDustQuality(final Intent intent, final boolean debuggable,
@@ -4899,18 +7133,34 @@ public class MainActivity extends Activity {
     }
 
     private void consumeDebugAutomationIntent(final Intent intent) {
+        final int actorMode=ActorWorkerIntent.mode(intent,isDebuggableApp(),BuildConfig.ACTOR_WORKER_EXPERIMENT);
+        if(actorMode>=0) {
+            try {
+                if(!ProbeBridge.requestActorWorkerExperiment(actorMode==1))
+                    Log.w(TAG,"Actor CPU experiment is unavailable; no mode changed.");
+            } catch(RuntimeException | LinkageError unavailable) {
+                Log.w(TAG,"Actor CPU experiment request unavailable.");
+            }
+        }
         final boolean requireRayQueryCompute =
                 shouldRequireRayQueryCompute(isDebuggableApp(), intent);
         ProbeBridge.setRequiredRayQueryCompute(requireRayQueryCompute);
-        if (intent == null) return;
+        if (intent == null) {
+            clearVerticalProofFeedbackSelection();
+            return;
+        }
         if (!isDebuggableApp()) {
+            clearVerticalProofFeedbackSelection();
             if (intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false)) {
                 Log.w(TAG, "Rejected debug capture intent in a non-debuggable build.");
             }
             return;
         }
         final int requestedScale = admittedDebugRenderScale(intent);
-        final int requestedCheckpoint = checkpointId(intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT));
+        final String requestedCheckpointName = intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT);
+        final int requestedPractice = combatPracticeKind(requestedCheckpointName);
+        final int requestedCheckpoint = requestedPractice >= 0 ? -1 : checkpointId(requestedCheckpointName);
+        selectVerticalProofFeedbackCheckpoint(requestedCheckpoint);
         final boolean requestedReplay = intent.getBooleanExtra(EXTRA_DEBUG_REPLAY, false);
         final boolean requestedCapture = intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false);
         final String requestedMotion = intent.getStringExtra(EXTRA_DEBUG_MOTION);
@@ -4931,6 +7181,12 @@ public class MainActivity extends Activity {
         final boolean motionRequested = requestedMotion != null && requestedMotionId != null &&
                 requestedCheckpoint < 0 && !requestedReplay && !requestedCapture && !hasRtLabIntent &&
                 !intent.hasExtra(EXTRA_BENCHMARK_RUN_ID);
+        if (requestedPractice >= 0 && (requestedCapture || requestedReplay || hasRtLabIntent ||
+                intent.hasExtra(EXTRA_BENCHMARK_RUN_ID) || motionRequested)) {
+            Log.w(TAG, "Rejected combat practice combined with capture, benchmark, replay, RT lab, or motion work.");
+            clearVerticalProofFeedbackSelection();
+            return;
+        }
         final int requestedDustQuality = admittedDebugDustQuality(intent, true, requestedCheckpoint,
                 requestedCapture, requestedReplay, hasRtLabIntent, motionRequested);
         if (requestedDustQuality >= 0) {
@@ -4986,15 +7242,36 @@ public class MainActivity extends Activity {
             if (requestedDustQuality >= 0) waterCapture = withDebugDustQuality(waterCapture, requestedDustQuality);
             if (waterCapture != null) setNativeGraphics(waterCapture);
         }
+        PerformanceProfileRequest.PresentationGate motionGraphics = null;
+        if (intent.hasExtra(PerformanceProfileRequest.EXTRA)) {
+            final GraphicsPreferences.Values performance = PerformanceProfileRequest.resolve(
+                    intent, BuildConfig.DEBUG, motionRequested, hasRtLabIntent, graphicsConfirmed);
+            if (performance == null) {
+                Log.w(TAG, "Rejected performance profile outside the typed noncombat 40% Debug route.");
+                return;
+            }
+            // Coherent native publication only. Saved/confirmed preferences stay intact.
+            final long serial = ProbeBridge.setGraphicsSettings(performance.scale, performance.water,
+                    performance.fire, performance.cap, performance.glassEnabled, performance.shadow,
+                    performance.mistEnabled, performance.dust);
+            motionGraphics = new PerformanceProfileRequest.PresentationGate(performance,
+                    serial, surfaceRequestGeneration, SystemClock.elapsedRealtime());
+        }
         if (requestedCheckpoint >= 0 || requestedReplay || hasRtLabIntent || motionRequested) {
             ProbeBridge.markRtLabDebugAutomation();
         }
         if (motionRequested) {
             pendingDebugMotion = requestedMotion;
             pendingDebugMotionId = requestedMotionId;
+            pendingDebugMotionGraphics = motionGraphics;
         } else if (requestedCheckpoint >= 0) {
             pendingDebugCheckpoint = requestedCheckpoint;
             pendingDebugCapture = requestedCapture;
+            pendingDebugReplay = false;
+        } else if (requestedPractice >= 0) {
+            pendingDebugCombatPractice = requestedPractice;
+            pendingDebugCheckpoint = -1;
+            pendingDebugCapture = false;
             pendingDebugReplay = false;
         } else if (requestedReplay) {
             pendingDebugReplay = true;
@@ -5002,7 +7279,7 @@ public class MainActivity extends Activity {
             pendingDebugCapture = false;
         }
         debugAutomationAutostart = intent.getBooleanExtra(EXTRA_DEBUG_AUTOSTART, false) ||
-                requestedCheckpoint >= 0 || requestedReplay || motionRequested;
+                requestedCheckpoint >= 0 || requestedPractice >= 0 || requestedReplay || motionRequested;
         if (debugAutomationAutostart) {
             Log.i(TAG, "Accepted debug automation intent: checkpoint=" + requestedCheckpoint +
                     " capture=" + requestedCapture + " replay=" + requestedReplay + " scale=" + requestedScale +
@@ -5061,6 +7338,8 @@ public class MainActivity extends Activity {
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        if (runButton != null) runButton.setVisibility(View.GONE);
+        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
@@ -5069,6 +7348,45 @@ public class MainActivity extends Activity {
 
     static float[] developmentCheckpointViewPose(final int checkpoint) {
         switch (checkpoint) {
+            case 192: return new float[]{3.1415927f, -0.05f};
+            case 193: return new float[]{0.0f, -0.15f};
+            case 194: return new float[]{1.57079632679f, -0.15f};
+            case 195: return new float[]{3.14159265359f, -0.15f};
+            case 196: return new float[]{-1.57079632679f, -0.15f};
+            case 197: return new float[]{0.0f, -0.65f};
+            case 198: return new float[]{0.0f, -0.15f};
+            case 199: return new float[]{3.14159265359f, -0.15f};
+            case 200: return new float[]{0.55f, -0.15f};
+            case 201: return new float[]{-3.009f, -0.15f};
+            case 202: return new float[]{1.914f, -0.15f};
+            case 203: return new float[]{2.51f, -0.15f};
+            case 226: return new float[]{2.32590073027f, -0.30f};
+            case 227: return new float[]{-1.22777238637f, -0.30f};
+            case 228: return new float[]{1.7246018366f, -0.15f};
+            case 229: return new float[]{3.2953981634f, -0.15f};
+            case 230: return new float[]{-1.57079632679f, .014f};
+            case 231: return new float[]{1.57079632679f, .014f};
+            case 204: return new float[]{-1.57079632679f, -0.35f};
+            case 205: return new float[]{-1.57079632679f, -0.35f};
+            case 206: return new float[]{-1.57079632679f, -0.35f};
+            case 221: return new float[]{-1.57079632679f, -0.35f};
+            case 222: return new float[]{-1.57079632679f, -0.35f};
+            case 223: return new float[]{-2.068f, .28f};
+            case 224: return new float[]{-2.781f, .18f};
+            case 225: return new float[]{2.876f, .14f};
+            case 207: return new float[]{1.57079632679f, -0.10f};
+            case 208: return new float[]{1.57079632679f, -0.10f};
+            case 210: return new float[]{2.35619449f, -.32f};
+            case 211: return new float[]{2.35619449f, -.32f};
+            case 212: return new float[]{1.57079632679f, -.32f};
+            case 213: return new float[]{2.35619449f, -.32f};
+            case 214: return new float[]{1.15f, .10f};
+            case 215: return new float[]{.55f, .18f};
+            case 216: return new float[]{-1.57079632679f, -.05f};
+            case 217: return new float[]{-1.57079632679f, -.05f};
+            case 218: return new float[]{-1.57079632679f, -.32f};
+            case 219: return new float[]{-1.57079632679f, -.32f};
+            case 220: return new float[]{1.57079632679f, -.32f};
             case 136: return new float[]{0.0f, -0.32f};
             case 137: return new float[]{0.0f, -0.05f};
             case 138: return new float[]{0.0f, -0.28f};
@@ -5150,18 +7468,32 @@ public class MainActivity extends Activity {
         loadSound("enemy_fall", "audio/filmcow/enemy_fall.wav");
         loadSound("player_step_1", "audio/filmcow/player_step_1.wav");
         loadSound("player_step_2", "audio/filmcow/player_step_2.wav");
+        loadSound("water_wet_step_1", "audio/pixabay/water_wet_step_1_core.wav");
+        loadSound("water_wet_step_2", "audio/pixabay/water_wet_step_2_core.wav");
+        loadSound("water_wet_step_3", "audio/pixabay/water_wet_step_3_core.wav");
+        loadSound("water_wet_step_4", "audio/pixabay/water_wet_step_4_core.wav");
+        loadSound("water_stream_contact", "audio/pixabay/water_stream_contact_core.wav");
+        loadSound("forest_night_owl", "audio/night-ambience/runtime/tawny_owl.wav");
+        loadSound("forest_evening_cricket", "audio/night-ambience/runtime/evening_cricket.wav");
+        loadSound("pond_frogs_crickets", "audio/night-ambience/runtime/pond_frogs_crickets.wav");
+        loadSound("tomb_drip", "audio/chapter-local-ambience/runtime/tomb_drip.wav");
+        loadSound("rope_contact", "audio/chapter-local-ambience/runtime/rope_contact.wav");
+        loadSound("forest_leaf_rustle", "audio/forest-foliage/runtime/leaf_rustle.wav");
         loadSound("skeleton_step_1", "audio/filmcow/skeleton_step_1.wav");
         loadSound("skeleton_step_2", "audio/filmcow/skeleton_step_2.wav");
         loadSound("skeleton_attack", "audio/filmcow/skeleton_attack.wav");
         loadSound("lich_charge", "audio/filmcow/lich_charge.wav");
         loadSound("lich_impact", "audio/filmcow/lich_impact.wav");
-        loadSound("lich_fall", "audio/filmcow/lich_fall.wav");
+        loadSound("keeper_death", "audio/pixabay/keeper_death_core.wav");
         loadSound("lich_hurt", "audio/filmcow/lich_hurt.wav");
         loadSound("chest_unlock", "audio/pixabay/chest_unlock.wav");
         loadSound("chest_open", "audio/pixabay/chest_open.wav");
         loadSound("torch_extinguish", "audio/pixabay/torch_extinguish.wav");
         loadSound("keeper_i_sense_you", "audio/pixabay/keeper_i_sense_you.wav");
         loadSound("keeper_come_closer", "audio/pixabay/keeper_come_closer.wav");
+        for (ChapterVoiceAssets.Asset asset : ChapterVoiceAssets.all()) {
+            if (asset.line > 2) loadSound(asset.soundKey, asset.assetPath);
+        }
         loadSound("skeleton_idle_rattle", "audio/pixabay/skeleton_idle_rattle.wav");
         loadSound("skeleton_falling_bones", "audio/pixabay/skeleton_falling_bones.wav");
         loadSound("menu_room", "audio/menu/menu_room.wav");
@@ -5184,6 +7516,7 @@ public class MainActivity extends Activity {
                 if (BuildConfig.DEBUG) Log.i("HordeMenuAmbience", "stop stream=" + stream);
             }
         });
+        initialisePrivateLichRevivalAudio();
         initialiseWaterfallLoop();
         if (BuildConfig.DEBUG) {
             menuAmbienceTuningPreferences = getSharedPreferences("horde_menu_ambience_tuning", MODE_PRIVATE);
@@ -5240,6 +7573,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateWaterfallLoop() {
+        if (!chapterAmbienceAudible()) stopChapterAmbience();
         if (waterfallPlayback == null) return;
         final boolean audible = resumed && surfaceStarted && !menuVisible && !diagnosticsVisible &&
                 !benchmarkRunning && preferences.getBoolean("sfx_enabled", true) &&
@@ -5259,6 +7593,38 @@ public class MainActivity extends Activity {
                 clamp(userGain * leftScale, 0.0f, 1.0f),
                 clamp(userGain * rightScale, 0.0f, 1.0f), delayedGameplayFeedbackGeneration);
     }
+
+    private void initialisePrivateLichRevivalAudio() {
+        if(!PrivateLichRevivalAudio.enabled(BuildConfig.DEBUG,getIntent()!=null &&
+                getIntent().getBooleanExtra(PrivateLichRevivalAudio.INTENT_OPT_IN,false)))return;
+        String error=PrivateLichRevivalAudio.validate(getFilesDir());
+        if(error!=null){Log.e(TAG,error);return;}
+        final int id=soundPool.load(PrivateLichRevivalAudio.file(getFilesDir()).getAbsolutePath(),1);
+        if(id==0){Log.e(TAG,"SoundPool rejected the verified private revival WAV.");return;}
+        privateLichRevivalAudio=new PrivateLichRevivalAudio(new PrivateLichRevivalAudio.Sink() {
+            public int start(float left,float right) {
+                synchronized(loadedSounds){if(!loadedSounds.contains(id)){Log.e(TAG,"Private revival WAV is not ready.");return 0;}}
+                return soundPool==null?0:soundPool.play(id,left,right,1,0,1.f);
+            }
+            public void gain(int stream,float left,float right){if(soundPool!=null)soundPool.setVolume(stream,left,right);}
+            public void stop(int stream){if(soundPool!=null)soundPool.stop(stream);}
+        });
+    }
+    private boolean privateRevivalAudible(int state) {
+        return resumed && surfaceStarted && state==1 && hasWindowFocus() && isMusicAudioFocusGranted() &&
+            !menuVisible && !campaignMenuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
+            !playtestReportVisible && !benchmarkRunning && !debugMotionActive && !deathOverlayVisible && !endingOverlayVisible &&
+            preferences.getBoolean("sfx_enabled",true);
+    }
+    private float privateRevivalDuck() {
+        try{return ProbeBridge.getSfxDialogueBedGain();}
+        catch(RuntimeException | LinkageError unavailable){return 0.f;}
+    }
+    private void updatePrivateLichRevivalAudio(int state) {
+        if(privateLichRevivalAudio!=null)privateLichRevivalAudio.update(delayedGameplayFeedbackGeneration,
+            privateRevivalAudible(state),preferences.getInt("sfx_volume",70)/100.f,privateRevivalDuck());
+    }
+    private void stopPrivateLichRevivalAudio(){if(privateLichRevivalAudio!=null)privateLichRevivalAudio.stop();}
 
     private void loadSound(final String key, final String assetPath) {
         final File audioDirectory = new File(getCacheDir(), "alpha_sfx");
@@ -5280,6 +7646,30 @@ public class MainActivity extends Activity {
         }
     }
 
+    private boolean chapterAmbienceAudible() {
+        return resumed && surfaceStarted && hasWindowFocus() && isMusicAudioFocusGranted() && !chapterAmbienceDialogueActive &&
+                !menuVisible && !campaignMenuVisible && !diagnosticsVisible && !graphicsVisible &&
+                !rtLabVisible && !playtestReportVisible && !benchmarkRunning && !debugMotionActive &&
+                !deathOverlayVisible && !endingOverlayVisible && preferences.getBoolean("sfx_enabled", true) &&
+                preferences.getInt("sfx_volume", 70)>0;
+    }
+
+    private void stopChapterAmbience() {
+        if (soundPool!=null && chapterAmbienceStream!=0) soundPool.stop(chapterAmbienceStream);
+        chapterAmbienceStream=0;
+    }
+
+    private void playChapterAmbience(long packedStereoGains, String soundKey) {
+        if (!chapterAmbienceAudible() || soundPool==null) return;
+        final Integer id=sounds.get(soundKey);
+        if (id==null) return;
+        synchronized(loadedSounds) { if (!loadedSounds.contains(id)) return; }
+        stopChapterAmbience(); // One finite voice; never queue/retry a missed ambience cue.
+        final float gain=preferences.getInt("sfx_volume",70)/100.f;
+        chapterAmbienceStream=soundPool.play(id,gain*clamp(Float.intBitsToFloat((int)packedStereoGains),0,1),
+                gain*clamp(Float.intBitsToFloat((int)(packedStereoGains>>>32)),0,1),0,0,1.f);
+    }
+
     private void playSound(final String key, final float mixGain) {
         playSound(key, mixGain, 1.0f, 1.0f);
     }
@@ -5288,6 +7678,27 @@ public class MainActivity extends Activity {
         final float left = clamp(Float.intBitsToFloat((int) packedStereoGains), 0.0f, 1.0f);
         final float right = clamp(Float.intBitsToFloat((int) (packedStereoGains >>> 32)), 0.0f, 1.0f);
         playSound(key, mixGain, left, right);
+    }
+
+    private static String wetFootstepSoundKey(final int variant) {
+        switch (variant & 3) {
+            case 0: return "water_wet_step_1";
+            case 1: return "water_wet_step_2";
+            case 2: return "water_wet_step_3";
+            default: return "water_wet_step_4";
+        }
+    }
+
+    private void playSpatialSound(final String key, final float mixGain,
+            final long packedStereoGains, final long verticalMetadata) {
+        // Y is diagnostic metadata only; playback still uses the established planar gains.
+        playSpatialSound(key, mixGain, packedStereoGains);
+        if (verticalProofFeedbackCheckpoint < 0 || verticalProofFeedbackDiagnosticCount >= 64) return;
+        final float sourceY = Float.intBitsToFloat((int) verticalMetadata);
+        final float listenerY = Float.intBitsToFloat((int) (verticalMetadata >>> 32));
+        Log.i(TAG, "HORDE_VERTICAL_FEEDBACK checkpoint=" + verticalProofFeedbackCheckpoint +
+                " sourceY=" + sourceY + " listenerY=" + listenerY);
+        ++verticalProofFeedbackDiagnosticCount;
     }
 
     private void playSound(final String key, final float mixGain, final float leftScale, final float rightScale) {
@@ -5335,7 +7746,10 @@ public class MainActivity extends Activity {
         return panel;
     }
 
-    private void attachPanel(final LinearLayout panel) {
+    private void attachPanel(final LinearLayout panel) {attachPanel(panel,520);}
+
+    private void attachPanel(final LinearLayout panel,final int maximumWidthDp) {
+        if(lookoutObjectiveVisible && panel!=lookoutObjectivePanel)invalidateLookoutObjective();
         if (entryMenuEnabled) ensureEntryMenuTargets(panel);
         menuScrim.setBackgroundColor(0xC7080706);
         final ScrollView scroller = new ScrollView(this);
@@ -5354,7 +7768,7 @@ public class MainActivity extends Activity {
                 bottom=Math.max(bottom,insets.getDisplayCutout().getSafeInsetBottom()+dp(8));
             }
         }
-        final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(Math.min(dp(520), Math.max(dp(48),screenWidth-left-right)), FrameLayout.LayoutParams.MATCH_PARENT);
+        final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(Math.min(dp(maximumWidthDp), Math.max(dp(48),screenWidth-left-right)), FrameLayout.LayoutParams.MATCH_PARENT);
         params.gravity = Gravity.CENTER_HORIZONTAL;
         params.setMargins(left,top,right,bottom);
         menuScrim.addView(scroller, params);
@@ -5488,17 +7902,53 @@ public class MainActivity extends Activity {
         button.setTextColor(HordeUiTokens.label(text));
         button.setMinHeight(dp(48));
     }
+    private void styleGameplayActionButton(final Button button, final int fill, final int text, final boolean circular) {
+        final boolean combat=button.getId()==R.id.attack_button || button.getId()==R.id.parry_button;
+        button.setBackground(new TouchButtonDrawable(fill,getResources().getDisplayMetrics().density,circular || combat,combat));
+        if(combat)CombatActionControl.apply(button,button.getId()==R.id.attack_button);
+        button.setStateListAnimator(null);
+        button.setTextColor(HordeUiTokens.label(text));
+        button.setMinHeight(dp(48));
+        if(!circular && !combat && button.getId()!=R.id.interact_button)button.setPadding(dp(6),0,dp(6),0);
+    }
     private LinearLayout.LayoutParams matchWrap() {
         return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
     }
 
     private void pushViewControls() {
-        ProbeBridge.setViewControls(viewControls[0], viewControls[1], viewControls[2], viewControls[7], viewControls[8]);
+        if(openingBenchmarkRecoveryRejected)return;
+        final boolean analogue = canSendGameplayAction() && (viewControls[7] != 0 || viewControls[8] != 0);
+        ProbeBridge.setViewControls(viewControls[0], viewControls[1], viewControls[2], viewControls[7], viewControls[8],
+                false, analogue);
+        pushGuardHold();
+    }
+
+    private void pushGuardHold() {
+        final boolean allowed = canSendGameplayAction() && resumed && controllerHasFocusedWindow();
+        if (!allowed) {
+            keyboardGuardHeld = false;
+            parryTouchActive = false;
+            parryTouchPointerId = -1;
+            controllerInput.clearGuardHold();
+            if (parryButton != null) parryButton.setPressed(false);
+        }
+        final boolean held = allowed && (parryTouchActive || keyboardGuardHeld || controllerInput.guardHeld());
+        if (held == publishedGuardHeld) return;
+        ProbeBridge.setGuardHeld(held);
+        publishedGuardHeld = held;
     }
 
     private void configureGameplayActionButtons() {
-        swingTouch = new PressActionButton(attackButton, this::canSendGameplayAction, ProbeBridge::requestAttack);
-        dodgeTouch = new PressActionButton(dodgeButton, this::canSendGameplayAction, ProbeBridge::requestDodge);
+        swingTouch = new PressActionButton(attackButton, this::canSendGameplayAction, () -> {
+            clearRunIntent();
+            ProbeBridge.requestAttack();
+        });
+        dodgeTouch = new PressActionButton(dodgeButton, this::canSendGameplayAction, () -> {
+            clearRunIntent();
+            ProbeBridge.requestDodge();
+        });
+        if (runButton != null) { runButton.setOnClickListener(null); runButton.setVisibility(View.GONE); }
+        if (crouchButton != null) { crouchButton.setOnClickListener(null); crouchButton.setVisibility(View.GONE); }
         interactButton.setOnClickListener(view -> {
             if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
                     endingOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
@@ -5515,28 +7965,40 @@ public class MainActivity extends Activity {
                 return;
             }
             if (!canSendGameplayAction()) return;
+            clearRunIntent();
             ProbeBridge.requestParry();
         });
         parryButton.setOnTouchListener((view, event) -> {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     if (parryTouchActive) return true;
-                    parryTouchActive = true;
                     parryRequestedOnTouchDown = true;
-                    view.setPressed(true);
                     if (canSendGameplayAction()) {
-                        ProbeBridge.requestParry();
+                        parryTouchActive = true;
+                        parryTouchPointerId = event.getPointerId(event.getActionIndex());
+                        view.setPressed(true);
+                        clearRunIntent();
+                        pushGuardHold();
                     }
                     return true;
+                case MotionEvent.ACTION_POINTER_UP:
+                    if (event.getPointerId(event.getActionIndex()) != parryTouchPointerId) return true;
+                    // The owning finger released even when another finger remains down.
                 case MotionEvent.ACTION_UP:
                     view.setPressed(false);
-                    if (parryTouchActive) view.performClick();
+                    final boolean wasActive = parryTouchActive;
                     parryTouchActive = false;
+                    parryTouchPointerId = -1;
+                    pushGuardHold();
+                    if (wasActive) view.performClick();
+                    parryRequestedOnTouchDown = false;
                     return true;
                 case MotionEvent.ACTION_CANCEL:
                     parryTouchActive = false;
+                    parryTouchPointerId = -1;
                     parryRequestedOnTouchDown = false;
                     view.setPressed(false);
+                    pushGuardHold();
                     return true;
                 default:
                     return true;
@@ -5545,7 +8007,53 @@ public class MainActivity extends Activity {
     }
 
     @Override public boolean dispatchKeyEvent(KeyEvent event) {
-        if (!AndroidControllerInput.isControllerKey(event)) return super.dispatchKeyEvent(event);
+        if (environmentSurveyMode) {
+            if (event != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
+                finishEnvironmentSurvey(3);
+            return true;
+        }
+        if(lookoutObjectiveVisible && event!=null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) &&
+                event.getKeyCode()==KeyEvent.KEYCODE_ESCAPE) {
+            if(event.getAction()==KeyEvent.ACTION_UP)
+                finishLookoutObjective(lookoutObjectiveEpoch,lookoutObjectiveState,false);
+            return true;
+        }
+        if (!AndroidControllerInput.isControllerKey(event)) {
+            if(event!=null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) &&
+               (event.getKeyCode()==KeyEvent.KEYCODE_H || event.getKeyCode()==KeyEvent.KEYCODE_J)) {
+                final int bit=event.getKeyCode()==KeyEvent.KEYCODE_H?1:2;
+                if(event.getAction()==KeyEvent.ACTION_UP && ((keyboardFlaskHeld|keyboardFlaskBlocked)&bit)!=0) {
+                    keyboardFlaskHeld&=~bit;keyboardFlaskBlocked&=~bit;return true;
+                }
+                HealingFlaskUiState flask=readHealingFlaskState();
+                if(flask!=null && flask.enabled && canSendGameplayAction()) {
+                    if(event.getAction()==KeyEvent.ACTION_DOWN && event.getRepeatCount()==0 &&
+                       ((keyboardFlaskHeld|keyboardFlaskBlocked)&bit)==0) {
+                        keyboardFlaskHeld|=bit;requestHealingFlaskAction(bit==2);
+                    }
+                    return true;
+                }
+            }
+            if (event != null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) && event.getKeyCode() == KeyEvent.KEYCODE_Q) {
+                if (event.getAction() == KeyEvent.ACTION_UP && (keyboardGuardHeld || canSendGameplayAction())) {
+                    keyboardGuardHeld = false;
+                    pushGuardHold();
+                    return true;
+                }
+                if (event.getAction() == KeyEvent.ACTION_DOWN && canSendGameplayAction()) {
+                    if (event.getRepeatCount() == 0) {
+                        keyboardGuardHeld = true;
+                        clearRunIntent();
+                        pushGuardHold();
+                    }
+                    return true;
+                }
+            }
+            if (event != null && event.getAction() == KeyEvent.ACTION_DOWN &&
+                    event.getRepeatCount() == 0 && event.isFromSource(InputDevice.SOURCE_KEYBOARD))
+                observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
+            return super.dispatchKeyEvent(event);
+        }
         AndroidControllerInput.Result result=controllerInput.key(event,SystemClock.uptimeMillis());
         if (!result.handled) return super.dispatchKeyEvent(event);
         if (resumed && controllerHasFocusedWindow()) {
@@ -5557,6 +8065,9 @@ public class MainActivity extends Activity {
     }
 
     @Override public boolean dispatchGenericMotionEvent(MotionEvent event) {
+        if (environmentSurveyMode) return true;
+        if (isMouseSubtitleInput(event))
+            observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
         if (!AndroidControllerInput.isControllerMotion(event)) return super.dispatchGenericMotionEvent(event);
         AndroidControllerInput.Result result=controllerInput.motion(event,SystemClock.uptimeMillis());
         if (!result.handled) return super.dispatchGenericMotionEvent(event);
@@ -5569,6 +8080,10 @@ public class MainActivity extends Activity {
     }
 
     @Override public boolean dispatchTouchEvent(MotionEvent event) {
+        if (environmentSurveyMode) return true;
+        if (isMouseSubtitleInput(event))
+            observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
+        else if (isTouchSubtitleInput(event)) observeSubtitleInputMode(SUBTITLE_INPUT_TOUCH);
         if (event.getActionMasked()==MotionEvent.ACTION_DOWN && controllerMode) {
             // Restore hit targets BEFORE this intentional first fallback down is dispatched.
             suspendControllerInput(true);
@@ -5580,10 +8095,17 @@ public class MainActivity extends Activity {
 
     @Override public void onWindowFocusChanged(boolean focused) {
         super.onWindowFocusChanged(focused);
+        if (environmentSurveyMode) return;
         logSurfaceLifecycle(focused ? "focusGain" : "focusLoss");
         controllerWindowFocused=focused;
+        if (!focused) keyboardGuardHeld = false;
         currentControllerDialog();
         if (!focused) {
+            if(lookoutObjectiveVisible)showMainMenu(false);
+            stopChapterAmbience();
+            stopPrivateLichRevivalAudio();
+            clearRunIntent();
+            clearCrouchIntent();
             stopMenuAmbience();
             suspendControllerInput(false);
             if(surfaceView!=null && interactButton!=null && toggleHeldLightPoseButton!=null)clearTouchGesture();
@@ -5671,13 +8193,18 @@ public class MainActivity extends Activity {
 
     private void handleControllerResult(AndroidControllerInput.Result result) {
         if(result.meaningful && !controllerMode) {
-            clearTouchGesture();
+            clearTouchGesture(controllerInput.crouchHeld());
             controllerMode=true;
             refreshControllerHud();
         }
+        if (result.meaningful)
+            observeSubtitleInputMode(SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);
         if(!controllerMode)return;
         View ui=controllerUiRoot();
         if(ui!=null) {
+            controllerInput.clearGuardHold();
+            pushGuardHold();
+            controllerInput.clearCrouchHold(); // Menu/dialog presses require release before gameplay.
             ControllerNavigation.ensureFocus(ui);
             if ((result.actions & AndroidControllerInput.CANCEL)!=0 ||
                     (result.actions & AndroidControllerInput.PAUSE)!=0) {
@@ -5691,12 +8218,17 @@ public class MainActivity extends Activity {
         else if(canSendGameplayAction()) {
             viewControls[7]=controllerInput.moveStrafe(); viewControls[8]=controllerInput.moveForward();
             pushViewControls(); // A directional Dodge sees the same coherent axes publication.
+            if((result.actions & (AndroidControllerInput.SWING | AndroidControllerInput.PARRY |
+                    AndroidControllerInput.DODGE))!=0)clearRunIntent();
             if((result.actions & AndroidControllerInput.SWING)!=0)ProbeBridge.requestAttack();
-            if((result.actions & AndroidControllerInput.PARRY)!=0)ProbeBridge.requestParry();
+            pushGuardHold(); // LT hold and its fresh edge publish coherently in JNI.
             if((result.actions & AndroidControllerInput.DODGE)!=0)ProbeBridge.requestDodge();
             if((result.actions & AndroidControllerInput.INTERACT)!=0)ProbeBridge.requestInteract();
             if((result.actions & AndroidControllerInput.LANTERN)!=0)ProbeBridge.requestToggleHeldLightPose();
+            if((result.actions & AndroidControllerInput.DRINK_FLASK)!=0)requestHealingFlaskAction(false);
+            if((result.actions & AndroidControllerInput.REST)!=0)requestHealingFlaskAction(true);
         }
+        pushGuardHold();
         requestControllerFrame();
     }
 
@@ -5749,6 +8281,8 @@ public class MainActivity extends Activity {
         final boolean playing=canSendGameplayAction() && !debugCaptureUiSuppressed;
         final int actions=hud && playing && !controllerMode?View.VISIBLE:View.GONE;
         for(Button button:new Button[]{attackButton,parryButton,dodgeButton})if(button!=null)button.setVisibility(actions);
+        if(runButton!=null)runButton.setVisibility(View.GONE);
+        if(crouchButton!=null)crouchButton.setVisibility(View.GONE);
         if(menuButton!=null)menuButton.setVisibility(hud && playing && !controllerMode?View.VISIBLE:View.GONE);
         if(vitalityStatus!=null)vitalityStatus.setVisibility(hud && playing && lastPlayerLifePhase==PLAYER_ALIVE?View.VISIBLE:View.GONE);
         if(interactButton!=null && toggleHeldLightPoseButton!=null)updateContextualControls(hud && playing);
@@ -5756,11 +8290,65 @@ public class MainActivity extends Activity {
 
     private void updateControllerPrompt(int interactLabel,boolean interactEnabled,boolean raise,boolean lower) {
         if(controllerPrompt==null || !controllerMode)return;
-        String prompt=getString(R.string.controller_play_prompts);
-        if(interactLabel!=0)prompt+="\n"+(interactEnabled?"A: ":"")+getString(interactLabel);
+        // Timed teaching has its own owner. This footer contains nearby actions only.
+        String prompt="";
+        if(interactLabel!=0)prompt+=(interactEnabled?"A: ":"")+getString(interactLabel);
         if(raise || lower)prompt+="\nY: "+getString(raise?R.string.raise_lantern:R.string.lower_lantern);
+        HealingFlaskUiState flask=readHealingFlaskState();
+        if(flask!=null && flask.enabled) {
+            prompt+="\n"+getString(R.string.controller_flask_drink,flask.charges,flask.capacity);
+            if(flask.restAnchor!=0)prompt+="\n"+getString(R.string.controller_flask_rest);
+        }
+        prompt=prompt.trim();
         controllerPrompt.setText(prompt); controllerPrompt.setContentDescription(prompt);
+        controllerPrompt.setVisibility(prompt.isEmpty()?View.GONE:View.VISIBLE);
+    }
+
+    private void showRaiseLanternObjective(int contextualState) {
+        if (controllerPrompt == null || (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0) return;
+        final int label = controllerMode ? R.string.raise_lantern_controller_prompt :
+                latestSubtitleInputMode == SUBTITLE_INPUT_TOUCH ? R.string.raise_lantern_touch_prompt :
+                R.string.raise_lantern_keyboard_prompt;
+        String prompt = controllerMode && controllerPrompt.getVisibility() == View.VISIBLE
+                ? controllerPrompt.getText().toString() + "\n" : "";
+        prompt += getString(label);
+        controllerPrompt.setText(prompt);
+        controllerPrompt.setContentDescription(prompt);
         controllerPrompt.setVisibility(View.VISIBLE);
+        positionContextualPrompt(!controllerMode);
+    }
+
+    private void positionContextualPrompt(boolean aboveTouchControls) {
+        if (controllerPrompt == null) return;
+        FrameLayout.LayoutParams params=(FrameLayout.LayoutParams)controllerPrompt.getLayoutParams();
+        int bottom=dp(16)+HudSafeArea.read(findViewById(R.id.root)).bottom;
+        if (aboveTouchControls) for (View control:new View[]{attackButton,parryButton,dodgeButton,
+                interactButton,toggleHeldLightPoseButton}) {
+            if (control==null || control.getVisibility()!=View.VISIBLE) continue;
+            FrameLayout.LayoutParams target=(FrameLayout.LayoutParams)control.getLayoutParams();
+            bottom=Math.max(bottom,target.bottomMargin+Math.max(0,target.height)+dp(8));
+        }
+        if(params.bottomMargin!=bottom) {params.bottomMargin=bottom;controllerPrompt.setLayoutParams(params);}
+    }
+
+    private void updateLanternPoseControl(int state) {
+        final boolean raise = (state & CONTEXTUAL_RAISE) != 0;
+        final boolean lower = (state & CONTEXTUAL_LOWER) != 0;
+        if (!raise && !lower) { toggleHeldLightPoseButton.setVisibility(View.GONE); return; }
+        LanternPoseControl.apply(toggleHeldLightPoseButton, lower,
+                getString(raise ? R.string.raise_lantern : R.string.lower_lantern));
+        toggleHeldLightPoseButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
+    }
+
+    private HealingFlaskUiState readHealingFlaskState() {
+        try {return HealingFlaskUiState.decode(ProbeBridge.getHealingFlaskState(),surfaceRequestGeneration);}
+        catch(RuntimeException | LinkageError unavailable) {return null;}
+    }
+    private void requestHealingFlaskAction(boolean rest) {
+        if(!resumed || !controllerHasFocusedWindow() || !canSendGameplayAction())return;
+        final HealingFlaskUiState state=readHealingFlaskState();
+        if(state==null || !state.allows(rest))return;
+        if(rest)ProbeBridge.requestRest();else ProbeBridge.requestDrinkFlask();
     }
 
     private boolean canSendGameplayAction() {
@@ -5768,54 +8356,115 @@ public class MainActivity extends Activity {
                 !benchmarkRunning && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
     }
     private void clearTouchState() {
+        keyboardFlaskBlocked|=keyboardFlaskHeld;keyboardFlaskHeld=0;
+        keyboardGuardHeld = false;
+        parryTouchActive = false;
+        parryTouchPointerId = -1;
         suspendControllerInput(false);
         clearTouchGesture();
         requestControllerFrame();
     }
 
     private void clearTouchGesture() {
+        clearTouchGesture(false);
+    }
+
+    private void clearTouchGesture(boolean preserveFreshControllerHold) {
         if (swingTouch != null) swingTouch.cancel();
         if (dodgeTouch != null) dodgeTouch.cancel();
+        clearRunIntent();
         TouchControlState.clear(activePointers, viewControls);
+        clearCrouchIntent(preserveFreshControllerHold);
         parryTouchActive = false;
+        parryTouchPointerId = -1;
         parryRequestedOnTouchDown = false;
         if (parryButton != null) parryButton.setPressed(false);
         pushViewControls();
         updateContextualControls(false);
     }
 
+    private void logDebugContextualControls(boolean allowed, int bits) {
+        if (!BuildConfig.DEBUG) return;
+        final int gates = (allowed ? 1 : 0) | (controllerMode ? 2 : 0) |
+                (menuVisible ? 4 : 0) | (diagnosticsVisible ? 8 : 0) |
+                (deathOverlayVisible ? 16 : 0) | (endingOverlayVisible ? 32 : 0) |
+                (benchmarkRunning ? 64 : 0) | (debugCaptureUiSuppressed ? 128 : 0);
+        if (debugContextualGeneration == surfaceRequestGeneration &&
+                debugContextualBits == bits && debugContextualGates == gates) return;
+        Log.i("HordeContextualHud", "generation=" + surfaceRequestGeneration +
+                " allowed=" + allowed + " bits=" + bits + " gates=" + gates);
+        debugContextualGeneration = surfaceRequestGeneration;
+        debugContextualBits = bits;
+        debugContextualGates = gates;
+    }
+
+    static int contextualInteractLabel(final int state) {
+        if ((state & CONTEXTUAL_RESCUE_MODE) != 0) return 0; // Separate rope labels retain priority.
+        if ((state & CONTEXTUAL_FLASK_UPGRADE) != 0) return R.string.take_flask_upgrade;
+        switch ((state & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT) {
+            case CHEST_PROMPT_LOCKED: return R.string.chest_locked_until_lich_defeated;
+            case CHEST_PROMPT_OPEN: return R.string.open_chest;
+            case CHEST_PROMPT_OPENING: return R.string.chest_opening;
+            case CHEST_PROMPT_CLAIM: return R.string.take_lantern;
+            case CHEST_PROMPT_UNLOCKING: return R.string.chest_unlocking;
+            default: return 0;
+        }
+    }
+
     private void updateContextualControls(final boolean controlsAllowed) {
         if (controllerPrompt != null) controllerPrompt.setVisibility(View.GONE);
         if (!controlsAllowed) {
+            positionContextualPrompt(false);
+            logDebugContextualControls(false, -1);
+            if (crouchButton != null) crouchButton.setVisibility(View.GONE);
             interactButton.setVisibility(View.GONE);
             toggleHeldLightPoseButton.setVisibility(View.GONE);
             return;
         }
         final int contextualState = ProbeBridge.getContextualControlState();
-        final int chestPrompt = (contextualState & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT;
-        final boolean interactEnabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
-        final int interactLabel;
-        switch (chestPrompt) {
-            case CHEST_PROMPT_LOCKED:
-                interactLabel = R.string.chest_locked_until_lich_defeated;
-                break;
-            case CHEST_PROMPT_OPEN:
-                interactLabel = R.string.open_chest;
-                break;
-            case CHEST_PROMPT_OPENING:
-                interactLabel = R.string.chest_opening;
-                break;
-            case CHEST_PROMPT_CLAIM:
-                interactLabel = R.string.take_lantern;
-                break;
-            case CHEST_PROMPT_UNLOCKING:
-                interactLabel = R.string.chest_unlocking;
-                break;
-            case CHEST_PROMPT_NONE:
-            default:
-                interactLabel = 0;
-                break;
+        if (controllerMode || (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0)
+            positionContextualPrompt(false);
+        logDebugContextualControls(true, contextualState);
+        final boolean traversalOwned = (contextualState & CONTEXTUAL_RESCUE_MODE) != 0 &&
+                ((contextualState & RESCUE_PROMPT_MASK) >> RESCUE_PROMPT_SHIFT) == 4;
+        if (traversalOwned && !crouchTraversalOwned) clearCrouchIntent();
+        crouchTraversalOwned = traversalOwned;
+        if (crouchButton != null) crouchButton.setVisibility(View.GONE);
+        if ((contextualState & CONTEXTUAL_RESCUE_MODE) != 0) {
+            final int rescuePrompt = (contextualState & RESCUE_PROMPT_MASK) >> RESCUE_PROMPT_SHIFT;
+            final String label;
+            switch (rescuePrompt) {
+                case 1: label = "Climb rescue rope"; break;
+                case 2: label = "Descend rescue rope"; break;
+                case 3: label = "Preparing rescue route…"; break;
+                case 4: label = "Traversing rescue rope…"; break;
+                default: label = ""; break;
+            }
+            final boolean enabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
+            if (label.isEmpty()) {
+                interactButton.setVisibility(View.GONE);
+            } else {
+                interactButton.setText(label);
+                interactButton.setContentDescription(label);
+                interactButton.setEnabled(enabled);
+                interactButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
+            }
+            if (controllerPrompt != null) {
+                if (controllerMode) {
+                    final String prompt = label.isEmpty() ? "" : (enabled ? "A: " : "") + label;
+                    controllerPrompt.setText(prompt);
+                    controllerPrompt.setContentDescription(prompt);
+                    controllerPrompt.setVisibility(prompt.isEmpty() ? View.GONE : View.VISIBLE);
+                } else {
+                    controllerPrompt.setVisibility(View.GONE);
+                }
+            }
+            updateLanternPoseControl(contextualState);
+            showRaiseLanternObjective(contextualState);
+            return;
         }
+        final boolean interactEnabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
+        final int interactLabel = contextualInteractLabel(contextualState);
         if (interactLabel == 0) {
             interactButton.setVisibility(View.GONE);
         } else {
@@ -5826,15 +8475,10 @@ public class MainActivity extends Activity {
         }
         final boolean showRaise = (contextualState & CONTEXTUAL_RAISE) != 0;
         final boolean showLower = (contextualState & CONTEXTUAL_LOWER) != 0;
-        updateControllerPrompt(interactLabel, interactEnabled, showRaise, showLower);
-        if (!showRaise && !showLower) {
-            toggleHeldLightPoseButton.setVisibility(View.GONE);
-            return;
-        }
-        final int label = showRaise ? R.string.raise_lantern : R.string.lower_lantern;
-        toggleHeldLightPoseButton.setText(label);
-        toggleHeldLightPoseButton.setContentDescription(getString(label));
-        toggleHeldLightPoseButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
+        updateControllerPrompt(interactLabel, interactEnabled,
+                showRaise && (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0, showLower);
+        updateLanternPoseControl(contextualState);
+        showRaiseLanternObjective(contextualState);
     }
 
     private boolean stageAsset(final String assetPath, final String fileName) {
@@ -5873,6 +8517,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==CompatibilityReportDialog.SAVE_REQUEST) {
+            if(compatibilityReportDialog!=null)compatibilityReportDialog.finishPicker(resultCode,data);
+            return;
+        }
         if (requestCode == REQUEST_SAVE_BENCHMARK_SUMMARY) {
             finishBenchmarkSummaryPicker(resultCode, data);
             return;
@@ -5895,8 +8543,74 @@ public class MainActivity extends Activity {
         }
     }
 
+    private boolean isBackExitBoundary() {
+        return menuVisible && (startupUiVisible || entryMenuEnabled || firstMenu) && (startupUiVisible || !entryMenuSidePage) &&
+                !entryPlayRequested && !interfaceVisible && !graphicsVisible && !graphicsSceneRestoring &&
+                !playtestReportVisible && !diagnosticsVisible && !rtLabVisible &&
+                !benchmarkSummaryVisible && !benchmarkReportVisible && !benchmarkRunning &&
+                benchmarkAutomationId == null && !deathOverlayVisible && !endingOverlayVisible;
+    }
+
+    private void dismissBackExitConfirmation() {
+        final AlertDialog dialog = backExitDialog;
+        backExitDialog = null;
+        if (dialog != null) dialog.dismiss();
+    }
+
+    private void showBackExitConfirmation() {
+        if (!isBackExitBoundary() || isFinishing() || isDestroyed()) return;
+        if (backExitDialog != null && backExitDialog.isShowing()) return;
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Exit The Horde?")
+                .setMessage("Close The Horde and return to Android?")
+                .setNegativeButton("Stay", null)
+                .setPositiveButton(R.string.quit, null)
+                .create();
+        backExitDialog = dialog;
+        dialog.setOnDismissListener(ignored -> {
+            if (backExitDialog == dialog) backExitDialog = null;
+        });
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+            // A delayed tap cannot exit after navigation, lifecycle cancellation or a newer dialog.
+            final boolean current = backExitDialog == dialog && dialog.isShowing() && isBackExitBoundary() &&
+                    !isFinishing() && !isDestroyed();
+            dialog.dismiss();
+            if (current) finishAndRemoveTask();
+        });
+        installControllerDialog(dialog);
+        final Button stay = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        stay.setFocusableInTouchMode(true);
+        stay.requestFocus();
+    }
+
     @Override
     public void onBackPressed() {
+        if (environmentSurveyMode) { finishEnvironmentSurvey(3); return; }
+        if(openingBenchmarkRecoveryRejected){finish();return;}
+        if(startupUiVisible) {
+            if(backExitDialog!=null && backExitDialog.isShowing())dismissBackExitConfirmation();
+            else showBackExitConfirmation();
+            return;
+        }
+        if(openingBenchmarkPending()) {
+            cancelOpeningBenchmarkRequest(); showOpeningBenchmarkProgress(); return;
+        }
+        if(benchmarkReportVisible && entryMenuEnabled) {
+            playSound("ui_back",.18f); showMainMenu(false); return;
+        }
+        if(campaignConfirmation!=null && campaignConfirmation.isShowing()) {
+            dismissCampaignConfirmation(); return;
+        }
+        if(campaignMenuVisible) { backFromCampaignMenu(); return; }
+        if(lookoutObjectiveVisible) {
+            finishLookoutObjective(lookoutObjectiveEpoch,lookoutObjectiveState,false);return;
+        }
+        if (backExitDialog != null && backExitDialog.isShowing()) {
+            backExitDialog.cancel();
+            return;
+        }
         if (benchmarkSummaryVisible) {
             showBenchmarkReport(true);
             return;
@@ -5933,8 +8647,9 @@ public class MainActivity extends Activity {
         }
         if (entryMenuEnabled && menuVisible) {
             // The Entry front page owns Back until native reports current Showcase
-            // presentation; never fall through to a path that hides or unpauses it.
+            // presentation; staying in the confirmation never hides or unpauses it.
             playSound("ui_back", 0.18f);
+            showBackExitConfirmation();
             return;
         }
         if (deathOverlayVisible) {
@@ -5962,7 +8677,7 @@ public class MainActivity extends Activity {
             showMainMenu(false);
         } else {
             if (firstMenu) {
-                finishAndRemoveTask();
+                showBackExitConfirmation();
             } else {
                 playSound("ui_back", 0.18f);
                 hideMenu();
@@ -6008,6 +8723,7 @@ public class MainActivity extends Activity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if (environmentSurveyMode) { finishEnvironmentSurvey(3); return; }
         final Configuration previous = lastAppliedConfiguration;
         final boolean viewportChanged = viewportConfigurationChanged(previous, newConfig);
         lastAppliedConfiguration = new Configuration(newConfig);
@@ -6023,6 +8739,7 @@ public class MainActivity extends Activity {
         // menu focus, and any acknowledged graphics trial intact.
         clearTouchState();
         if (!viewportChanged) return;
+        if(openingBenchmarkPending() && openingBenchmarkProvisional)cancelOpeningBenchmarkRequest();
         applyInterfacePresentation();
         if (menuScrim == null) return;
         if (configurationLayoutListener != null) {
@@ -6060,9 +8777,24 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.resume();
+        if (compatibilityReportDialog != null) compatibilityReportDialog.resumeSubmission();
+        if (environmentSurveyMode) {
+            resumed = true;
+            enterImmersiveMode();
+            startEnvironmentSurveySurface();
+            return;
+        }
         logSurfaceLifecycle("resume");
         if (musicPlayback != null) musicPlayback.setSuspended(true); // Wait for a ready new surface.
         resumed = true;
+        if(openingBenchmarkRecoveryRejected){showOpeningBenchmarkRecoveryBlocked();return;}
+        if(startupUiVisible)showStartupLoading();
+        if(openingBenchmarkRecovered)cancelOpeningBenchmarkRequest(); // Before resume/start can advance a frame.
+        if(campaignMenuVisible || campaignRequest!=0 || confirmedRetryPending) {
+            handler.removeCallbacks(refreshCampaignMenu);
+            handler.post(refreshCampaignMenu);
+        }
         handler.removeCallbacks(menuAmbienceFrame);
         handler.post(menuAmbienceFrame);
         controllerInput.suspend(SystemClock.uptimeMillis());
@@ -6072,8 +8804,12 @@ public class MainActivity extends Activity {
         resumeSurfaceForLifecycle();
         startSurfaceIfReady();
         if (hadSurfaceGeneration && surfaceRequestGeneration != 0) {
-            setGameplayPaused(menuVisible || diagnosticsVisible);
+            setGameplayPaused(menuVisible || diagnosticsVisible || openingBenchmarkCancelRequested);
             if (entryMenuEnabled) publishEntryMenuState();
+        }
+        if(openingBenchmarkPending()) {
+            showOpeningBenchmarkProgress();
+            handler.removeCallbacks(refreshOpeningBenchmark); handler.post(refreshOpeningBenchmark);
         }
         if (rtLabVisible) handler.post(refreshRtLabTelemetry);
         graphicsPollTime = SystemClock.elapsedRealtime();
@@ -6090,8 +8826,22 @@ public class MainActivity extends Activity {
     @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
+        if(openingBenchmarkRecoveryRejected)return;
+        if (environmentSurveyMode || EnvironmentSurveyRequest.isSurvey(intent)) {
+            Log.w("HordeEnvironmentSurvey", "Survey intents require a fresh Activity; no live reconfiguration");
+            return;
+        }
+        if(openingBenchmarkPending()) {
+            cancelOpeningBenchmarkRequest();
+            Log.w(TAG,"New automation intent rejected while the opening benchmark owner is returning.");
+            return;
+        }
         setIntent(intent);
-        if (!consumeBenchmarkAutomationIntent(intent, false)) consumeDebugAutomationIntent(intent);
+        if (consumeBenchmarkAutomationIntent(intent, false)) {
+            clearVerticalProofFeedbackSelection();
+        } else {
+            consumeDebugAutomationIntent(intent);
+        }
         if (entryMenuEnabled && (debugAutomationAutostart || debugCaptureUiSuppressed ||
                 pendingDebugCheckpoint >= 0 || pendingDebugCapture || pendingDebugReplay ||
                 benchmarkAutomationId != null || debugRtLabAccess)) {
@@ -6109,6 +8859,45 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.interrupt();
+        if (compatibilityReportDialog != null) compatibilityReportDialog.interruptSubmission();
+        if (environmentSurveyMode) {
+            resumed = false;
+            finishEnvironmentSurvey(3);
+            super.onPause();
+            return;
+        }
+        if(openingBenchmarkRecoveryRejected){resumed=false;super.onPause();return;}
+        cancelOpeningBenchmarkRequest();
+        handler.removeCallbacks(refreshOpeningBenchmark);
+        if(lookoutObjectiveVisible)showMainMenu(false);
+        if (pendingDebugMotionGraphics != null) {
+            pendingDebugMotion = pendingDebugMotionId = null;
+            pendingDebugMotionGraphics = null;
+            debugAutomationAutostart = false;
+            Log.w(TAG, "Pending performance motion cancelled by pause before arming.");
+        }
+        stopChapterAmbience();
+        campaignAcknowledgedToken=campaignAcknowledgedGeneration=0;
+        campaignRebaseAttemptToken=campaignRebaseAttemptGeneration=campaignRebaseAttemptRevision=0;
+        dismissCampaignConfirmation();
+        if(campaignRequest!=0 || confirmedRetryPending || (campaignState!=null && campaignState.pending())) {
+            long cancellation=0;
+            try { cancellation=ProbeBridge.requestCampaign(CampaignMenuState.CANCEL,0,0,surfaceRequestGeneration); }
+            catch(RuntimeException | LinkageError ignored) { /* Native lifecycle also revokes stale work. */ }
+            campaignRequest=0;
+            if(campaignFromDeath && !campaignDeathLoadCommitted) {
+                campaignReturnToDeathWhenSettled=true;
+                if(cancellation>0) { campaignRequest=cancellation; campaignAction=CampaignMenuState.CANCEL; }
+            }
+            campaignLocalMessage="Interrupted. Check your saves before trying again.";
+        }
+        handler.removeCallbacks(refreshCampaignMenu);
+        dismissBackExitConfirmation();
+        pauseChapterVoice(true);
+        cancelCombatTeachingPromptPoll();
+        clearCombatTeachingPrompt();
+        clearRunIntent();
         clearTouchState();
         handler.removeCallbacks(refreshEntryMenu);
         if (entryMenuEnabled) {
@@ -6120,6 +8909,7 @@ public class MainActivity extends Activity {
                 catch (RuntimeException | LinkageError ignored) { /* Lifecycle cleanup is best effort. */ }
             }
         }
+        cancelGraphicsSave();
         graphicsPreviewImageOnly = false;
         dismissGraphicsPreviewDetails();
         if (keeperRevealTitle != null) keeperRevealTitle.setVisibility(View.GONE);
@@ -6127,7 +8917,7 @@ public class MainActivity extends Activity {
             graphicsPreviewWanted = false;
             graphicsSceneRestoring = false;
             ProbeBridge.setGraphicsPreview(false, true, false, 0, false, 0);
-            setNativeGraphics(graphicsConfirmed); // New surface starts from confirmed settings.
+            graphicsRequestSerial = setNativeGraphics(graphicsConfirmed); // New surface starts from confirmed settings.
             graphicsRecovering = GraphicsPreferences.hasPending(preferences);
             graphicsVisible = false;
             handler.removeCallbacks(refreshGraphics);
@@ -6145,10 +8935,12 @@ public class MainActivity extends Activity {
         handler.removeCallbacks(runStartupUpdateCheck);
         startupUpdateCheckScheduled = false;
         handler.removeCallbacks(refreshRtLabTelemetry);
+        stopChapterAmbience();
         ++delayedGameplayFeedbackGeneration;
+        stopPrivateLichRevivalAudio();
         suspendAndResetWaterfall();
         if (vibrator != null) vibrator.cancel();
-        if (deathOverlayVisible || retryPending || endingOverlayVisible) {
+        if (!campaignFromDeath && (deathOverlayVisible || retryPending || endingOverlayVisible)) {
             retryPending = false;
             deathOverlayVisible = false;
             endingOverlayVisible = false;
@@ -6157,7 +8949,7 @@ public class MainActivity extends Activity {
             updateVitalityHud(3, 3);
             showMainMenu(false);
         }
-        if (benchmarkRunning) {
+        if (benchmarkRunning && !openingBenchmarkPending()) {
             ProbeBridge.cancelBenchmark();
             benchmarkRunning = false;
             showMainMenu(false);
@@ -6172,13 +8964,47 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onStop() {
+        if (environmentSurveyMode) { stopEnvironmentSurveySurface(); super.onStop(); return; }
+        if(openingBenchmarkRecoveryRejected){super.onStop();return;}
         logSurfaceLifecycle("stop");
         stopSurface();
         super.onStop();
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle state) {
+        if (environmentSurveyMode) { super.onSaveInstanceState(state); return; }
+        retainOpeningBenchmarkClient();
+        if(openingBenchmarkRecoveryClient!=null)openingBenchmarkRecoveryClient.save(state);
+        super.onSaveInstanceState(state);
+    }
+
+    @Override
     protected void onDestroy() {
+        if(compatibilityReportDialog!=null)compatibilityReportDialog.close();
+        if (environmentSurveyMode) {
+            finishEnvironmentSurvey(3);
+            stopEnvironmentSurveySurface();
+            reportExecutor.shutdownNow();
+            updateExecutor.shutdownNow();
+            super.onDestroy();
+            return;
+        }
+        retainOpeningBenchmarkClient(); // Includes finish/swipe paths with no Bundle callback.
+        if(openingBenchmarkRecoveryRejected) {
+            handler.removeCallbacksAndMessages(null);
+            if(inputManager!=null)inputManager.unregisterInputDeviceListener(controllerDevices);
+            if(debugRetryReceiver!=null)unregisterReceiver(debugRetryReceiver);
+            reportExecutor.shutdownNow();updateExecutor.shutdownNow();
+            if(musicPlayback!=null){musicPlayback.close();musicPlayback=null;}
+            if(soundPool!=null)soundPool.release();
+            super.onDestroy();return;
+        }
+        cancelOpeningBenchmarkRequest();
+        invalidateLookoutObjective();
+        campaignDestroyed=true;
+        dismissCampaignConfirmation();
+        dismissBackExitConfirmation();
         logSurfaceLifecycle("destroy");
         handler.removeCallbacks(controllerFrame);
         if (inputManager != null) inputManager.unregisterInputDeviceListener(controllerDevices);
@@ -6200,6 +9026,7 @@ public class MainActivity extends Activity {
         stopSurface();
         if (menuAmbience != null) { menuAmbience.close(); menuAmbience = null; }
         if (soundPool != null) soundPool.release();
+        chapterVoiceStream = 0;
         if (waterfallPlayback != null) { waterfallPlayback.close(); waterfallPlayback = null; }
         super.onDestroy();
     }

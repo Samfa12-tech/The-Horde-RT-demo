@@ -1,0 +1,7 @@
+{
+  "complete": false,
+  "error": "Existing owner retirement/recreate/reset gate failed: ",
+  "capturesCompleted": 4,
+  "cause": "setter rejected exact retained request because Destroy deliberately retains device identity",
+  "correction": "idempotent identical immutable request returns success without changing GPU state; different requests remain rejected"
+}

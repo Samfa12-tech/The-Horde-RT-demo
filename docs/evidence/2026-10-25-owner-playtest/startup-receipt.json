@@ -1,0 +1,52 @@
+{
+  "baseCommit": "bf2dee1cfbab4201ed6d5b139f161c4c6c8bf408",
+  "sourceClosure": "startup-source-roster.json",
+  "originalReadinessTests": {
+    "tests": 3,
+    "failures": 3
+  },
+  "firstExpandedTests": {
+    "tests": 119,
+    "failures": 6
+  },
+  "correctedFocusedTests": {
+    "tests": 122,
+    "failures": 0,
+    "skipped": 0
+  },
+  "finalAndroidTests": {
+    "tests": 483,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6
+  },
+  "debugAssemble": "PASS; arm64-v8a, armeabi-v7a, x86, x86_64",
+  "lint": {
+    "errors": 0,
+    "warnings": 83,
+    "warningsBaseline": 83
+  },
+  "combinedGradleElapsed": "2m44s",
+  "assetPolicy": {
+    "cases": 201,
+    "result": "PASS",
+    "firstStaleAnchorFailureRetained": true
+  },
+  "apk": {
+    "bytes": 206289547,
+    "sha256": "12711f634f9bb1e291156ea2a42fabf0002f960c9c37dd2f1fb6cd3620c368ea",
+    "runtimeAssets": 185,
+    "allRuntimeAssetsEqualFrozenF279": true,
+    "startupWorkerInDex": true,
+    "installed": false,
+    "sourceLimit": "predates the separate CombatTeaching outcome correction"
+  },
+  "phone": {
+    "access": "released; no calls for this correction",
+    "installedCandidate": "f27982cd",
+    "physicalAcceptance": "pending new allocation"
+  },
+  "foregroundUsed": false,
+  "qualitySaveAudioSemanticsChanged": false,
+  "manualAudioHapticRevalidation": "NO, startup-only change"
+}

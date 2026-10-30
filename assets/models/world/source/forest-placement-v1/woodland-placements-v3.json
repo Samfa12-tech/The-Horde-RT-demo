@@ -1,0 +1,794 @@
+{
+  "schema": 1,
+  "units": "metres",
+  "coordinates": "native X east, Y up, Z south",
+  "description": "64 upright woodland placements fitted to native root footprints; 2.4m trail plus capsule margin, original models and four material families retained. v2 preserved. Runtime validates <=0.65m burial and actual imported tips.",
+  "sources": {
+    "Pine": {
+      "path": "assets/models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb",
+      "sha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f"
+    },
+    "Alder": {
+      "path": "assets/models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb",
+      "sha256": "f545d7e08370b5e451597c3fd903d8d93b6703d11c75039181a04f7f5312e0bb"
+    }
+  },
+  "placements": [
+    {
+      "species": "Pine",
+      "x": -29.794079338,
+      "z": -15.58994333,
+      "yawRadians": 0.0
+    },
+    {
+      "species": "Alder",
+      "x": -37.605920662,
+      "z": -10.01005667,
+      "yawRadians": 0.314159265
+    },
+    {
+      "species": "Alder",
+      "x": -25.639155895,
+      "z": -9.497463098,
+      "yawRadians": 0.628318531
+    },
+    {
+      "species": "Pine",
+      "x": -31.760844105,
+      "z": -2.102536902,
+      "yawRadians": 0.942477796
+    },
+    {
+      "species": "Pine",
+      "x": -11.494337832,
+      "z": -2.113526686,
+      "yawRadians": 1.256637061
+    },
+    {
+      "species": "Alder",
+      "x": -20.905662168,
+      "z": 2.513526686,
+      "yawRadians": 0.0
+    },
+    {
+      "species": "Alder",
+      "x": -12.101898786,
+      "z": 11.700886869,
+      "yawRadians": 0.314159265
+    },
+    {
+      "species": "Pine",
+      "x": -22.298101214,
+      "z": 17.699113131,
+      "yawRadians": 0.628318531
+    },
+    {
+      "species": "Pine",
+      "x": -1.194931918,
+      "z": 16.105536189,
+      "yawRadians": 0.942477796
+    },
+    {
+      "species": "Alder",
+      "x": -6.705068082,
+      "z": 24.794463811,
+      "yawRadians": 1.256637061
+    },
+    {
+      "species": "Pine",
+      "x": 7.35255661,
+      "z": 23.12335867,
+      "yawRadians": 5.41742458
+    },
+    {
+      "species": "Alder",
+      "x": 2.60572512,
+      "z": 38.79054255,
+      "yawRadians": 3.59037633
+    },
+    {
+      "species": "Pine",
+      "x": 11.97324001,
+      "z": 23.94371091,
+      "yawRadians": 1.43365226
+    },
+    {
+      "species": "Alder",
+      "x": -30.04536272,
+      "z": 3.79818195,
+      "yawRadians": 6.13171515
+    },
+    {
+      "species": "Pine",
+      "x": -15.86135942,
+      "z": 26.24677247,
+      "yawRadians": 2.36603696
+    },
+    {
+      "species": "Alder",
+      "x": -15.90756729,
+      "z": -10.20653822,
+      "yawRadians": 5.71090207
+    },
+    {
+      "species": "Pine",
+      "x": -37.91492007,
+      "z": -19.89065503,
+      "yawRadians": 5.43173047
+    },
+    {
+      "species": "Alder",
+      "x": -7.06984878,
+      "z": 5.51148579,
+      "yawRadians": 0.75886636
+    },
+    {
+      "species": "Pine",
+      "x": 18.17036436,
+      "z": 29.41482502,
+      "yawRadians": 2.49690795
+    },
+    {
+      "species": "Alder",
+      "x": -3.20925976,
+      "z": 33.06385944,
+      "yawRadians": 4.08658394
+    },
+    {
+      "species": "Pine",
+      "x": -24.84228907,
+      "z": 8.61164246,
+      "yawRadians": 1.60735774
+    },
+    {
+      "species": "Alder",
+      "x": 5.46260255,
+      "z": 17.78682846,
+      "yawRadians": 4.24961395
+    },
+    {
+      "species": "Pine",
+      "x": 2.58065314,
+      "z": 33.09312409,
+      "yawRadians": 3.88568579
+    },
+    {
+      "species": "Alder",
+      "x": -37.6636718,
+      "z": -1.28380012,
+      "yawRadians": 0.9177729
+    },
+    {
+      "species": "Pine",
+      "x": -6.56839678,
+      "z": 13.17945765,
+      "yawRadians": 2.90177113
+    },
+    {
+      "species": "Alder",
+      "x": -25.65888721,
+      "z": 1.84431402,
+      "yawRadians": 0.46555729
+    },
+    {
+      "species": "Pine",
+      "x": 7.59008605,
+      "z": 39.51472118,
+      "yawRadians": 3.05012361
+    },
+    {
+      "species": "Alder",
+      "x": -16.45996675,
+      "z": -4.44512363,
+      "yawRadians": 4.86249988
+    },
+    {
+      "species": "Pine",
+      "x": -16.38003841,
+      "z": 19.81074578,
+      "yawRadians": 3.00754847
+    },
+    {
+      "species": "Alder",
+      "x": -7.42166179,
+      "z": 29.63902842,
+      "yawRadians": 4.41691935
+    },
+    {
+      "species": "Pine",
+      "x": -6.23119644,
+      "z": -1.05922805,
+      "yawRadians": 2.79848704
+    },
+    {
+      "species": "Alder",
+      "x": 12.02434182,
+      "z": 27.73891261,
+      "yawRadians": 3.04834333
+    },
+    {
+      "species": "Pine",
+      "x": -21.81467571,
+      "z": 22.89273747,
+      "yawRadians": 3.57525843
+    },
+    {
+      "species": "Alder",
+      "x": -25.93775232,
+      "z": 14.58222921,
+      "yawRadians": 1.93706524
+    },
+    {
+      "species": "Pine",
+      "x": -0.80345425,
+      "z": 11.06448992,
+      "yawRadians": 3.08478812
+    },
+    {
+      "species": "Alder",
+      "x": -22.19919806,
+      "z": -13.12445675,
+      "yawRadians": 0.26671796
+    },
+    {
+      "species": "Pine",
+      "x": 15.09391596,
+      "z": 32.20752455,
+      "yawRadians": 2.9309884
+    },
+    {
+      "species": "Alder",
+      "x": -13.65885875,
+      "z": 6.95614868,
+      "yawRadians": 5.65974846
+    },
+    {
+      "species": "Pine",
+      "x": -31.82732856,
+      "z": -19.86384665,
+      "yawRadians": 5.3646568
+    },
+    {
+      "species": "Alder",
+      "x": -12.4698579,
+      "z": -7.17197578,
+      "yawRadians": 0.31835968
+    },
+    {
+      "species": "Pine",
+      "x": -41.35488129,
+      "z": -16.8702425,
+      "yawRadians": 0.66357719
+    },
+    {
+      "species": "Alder",
+      "x": -25.54604785,
+      "z": -17.18939374,
+      "yawRadians": 4.43474702
+    },
+    {
+      "species": "Pine",
+      "x": -0.943697,
+      "z": 29.18563675,
+      "yawRadians": 1.92786251
+    },
+    {
+      "species": "Alder",
+      "x": -34.16151953,
+      "z": 1.68153985,
+      "yawRadians": 2.56861946
+    },
+    {
+      "species": "Pine",
+      "x": 1.86917019,
+      "z": 18.18728977,
+      "yawRadians": 5.64480305
+    },
+    {
+      "species": "Alder",
+      "x": -41.32943575,
+      "z": -7.83867698,
+      "yawRadians": 1.25774935
+    },
+    {
+      "species": "Pine",
+      "x": 9.1183238,
+      "z": 20.00744403,
+      "yawRadians": 2.15023911
+    },
+    {
+      "species": "Alder",
+      "x": -9.94758513,
+      "z": 1.98070083,
+      "yawRadians": 1.38860958
+    },
+    {
+      "species": "Pine",
+      "x": 2.60159805,
+      "z": 14.37268571,
+      "yawRadians": 3.50521001
+    },
+    {
+      "species": "Alder",
+      "x": -8.52629926,
+      "z": -5.38964138,
+      "yawRadians": 4.87491688
+    },
+    {
+      "species": "Pine",
+      "x": -9.81633529,
+      "z": 11.37040444,
+      "yawRadians": 3.90118819
+    },
+    {
+      "species": "Alder",
+      "x": 6.10200746,
+      "z": 42.44470201,
+      "yawRadians": 4.40103276
+    },
+    {
+      "species": "Pine",
+      "x": -22.03977999,
+      "z": -7.8687119,
+      "yawRadians": 2.93482659
+    },
+    {
+      "species": "Alder",
+      "x": -24.89529217,
+      "z": 20.13709622,
+      "yawRadians": 0.52634132
+    },
+    {
+      "species": "Pine",
+      "x": -40.44583835,
+      "z": -13.05345418,
+      "yawRadians": 2.54848593
+    },
+    {
+      "species": "Alder",
+      "x": -10.37533197,
+      "z": 27.23450764,
+      "yawRadians": 1.09514929
+    },
+    {
+      "species": "Pine",
+      "x": 14.60743138,
+      "z": 27.06361364,
+      "yawRadians": 4.91449037
+    },
+    {
+      "species": "Alder",
+      "x": -21.6482789,
+      "z": 6.42800631,
+      "yawRadians": 1.23549084
+    },
+    {
+      "species": "Pine",
+      "x": 5.45645444,
+      "z": 35.45456833,
+      "yawRadians": 4.58012026
+    },
+    {
+      "species": "Alder",
+      "x": -35.12378257,
+      "z": -3.98954832,
+      "yawRadians": 4.40977043
+    },
+    {
+      "species": "Pine",
+      "x": -13.04523893,
+      "z": 23.89112159,
+      "yawRadians": 1.47799034
+    },
+    {
+      "species": "Alder",
+      "x": -23.18560182,
+      "z": 10.94958303,
+      "yawRadians": 2.55294413
+    },
+    {
+      "species": "Pine",
+      "x": -19.57702555,
+      "z": -10.39272887,
+      "yawRadians": 3.9137133
+    },
+    {
+      "species": "Alder",
+      "x": -27.97225654,
+      "z": -19.57623487,
+      "yawRadians": 1.97283076
+    }
+  ],
+  "grounding": {
+    "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+    "rootBaseBandMetres": 0.02,
+    "minimumTipEmbedMetres": 0.02,
+    "runtimeMaximumBurialMetres": 0.65,
+    "measurements": [
+      {
+        "index": 0,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.20732862253217596,
+        "afterBurial": 0.20732862253217596
+      },
+      {
+        "index": 1,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.08869902975053166,
+        "afterBurial": 0.08869902975053166
+      },
+      {
+        "index": 2,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.2133946310765424,
+        "afterBurial": 0.2133946310765424
+      },
+      {
+        "index": 3,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.03770984973634926,
+        "afterBurial": 0.03770984973634926
+      },
+      {
+        "index": 4,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.5570063133084084,
+        "afterBurial": 0.5570063133084084
+      },
+      {
+        "index": 5,
+        "moveMetres": 1.0,
+        "beforeBurial": 0.96716552687498,
+        "afterBurial": 0.472510202189939
+      },
+      {
+        "index": 6,
+        "moveMetres": 1.8027756377319946,
+        "beforeBurial": 1.4149571065264666,
+        "afterBurial": 0.5513775386234614
+      },
+      {
+        "index": 7,
+        "moveMetres": 0.5,
+        "beforeBurial": 0.605990639098932,
+        "afterBurial": 0.3820955675975164
+      },
+      {
+        "index": 8,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.5835770972441225,
+        "afterBurial": 0.5835770972441225
+      },
+      {
+        "index": 9,
+        "moveMetres": 0.7071067811865476,
+        "beforeBurial": 1.0151905779267487,
+        "afterBurial": 0.4367851146474888
+      },
+      {
+        "index": 10,
+        "moveMetres": 1.4142135623730951,
+        "beforeBurial": 1.2887872645960818,
+        "afterBurial": 0.5966633486996371
+      },
+      {
+        "index": 11,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.13520245303085496,
+        "afterBurial": 0.13520245303085496
+      },
+      {
+        "index": 12,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.1323997110377426,
+        "afterBurial": 0.1323997110377426
+      },
+      {
+        "index": 13,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.1452168497639121,
+        "afterBurial": 0.1452168497639121
+      },
+      {
+        "index": 14,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.1605770649453173,
+        "afterBurial": 0.1605770649453173
+      },
+      {
+        "index": 15,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.07672765922446743,
+        "afterBurial": 0.07672765922446743
+      },
+      {
+        "index": 16,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.14038298168053617,
+        "afterBurial": 0.14038298168053617
+      },
+      {
+        "index": 17,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.5648084971289546,
+        "afterBurial": 0.5648084971289546
+      },
+      {
+        "index": 18,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.18299277477829354,
+        "afterBurial": 0.18299277477829354
+      },
+      {
+        "index": 19,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.14273252650362564,
+        "afterBurial": 0.14273252650362564
+      },
+      {
+        "index": 20,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.11283577196095539,
+        "afterBurial": 0.11283577196095539
+      },
+      {
+        "index": 21,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.5659591348713895,
+        "afterBurial": 0.5659591348713895
+      },
+      {
+        "index": 22,
+        "moveMetres": 0.7071067811865476,
+        "beforeBurial": 0.9563472301792655,
+        "afterBurial": 0.35460641045674257
+      },
+      {
+        "index": 23,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.14513971240684095,
+        "afterBurial": 0.14513971240684095
+      },
+      {
+        "index": 24,
+        "moveMetres": 0.5,
+        "beforeBurial": 0.6222251334474884,
+        "afterBurial": 0.5986218403151962
+      },
+      {
+        "index": 25,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.13772462093507928,
+        "afterBurial": 0.13772462093507928
+      },
+      {
+        "index": 26,
+        "moveMetres": 0.7071067811865476,
+        "beforeBurial": 0.7218401821928543,
+        "afterBurial": 0.5412229117296417
+      },
+      {
+        "index": 27,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.46184849058179034,
+        "afterBurial": 0.46184849058179034
+      },
+      {
+        "index": 28,
+        "moveMetres": 1.0,
+        "beforeBurial": 1.1350188644284582,
+        "afterBurial": 0.5895728258647769
+      },
+      {
+        "index": 29,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.17378600962184929,
+        "afterBurial": 0.17378600962184929
+      },
+      {
+        "index": 30,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.5704817724293205,
+        "afterBurial": 0.5704817724293205
+      },
+      {
+        "index": 31,
+        "moveMetres": 1.5811388300841898,
+        "beforeBurial": 1.2118842685188538,
+        "afterBurial": 0.5038781439644027
+      },
+      {
+        "index": 32,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.169256333565126,
+        "afterBurial": 0.169256333565126
+      },
+      {
+        "index": 33,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.1507608917198375,
+        "afterBurial": 0.1507608917198375
+      },
+      {
+        "index": 34,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.3179480504785537,
+        "afterBurial": 0.3179480504785537
+      },
+      {
+        "index": 35,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.08813344647951114,
+        "afterBurial": 0.08813344647951114
+      },
+      {
+        "index": 36,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.12067468147803971,
+        "afterBurial": 0.12067468147803971
+      },
+      {
+        "index": 37,
+        "moveMetres": 1.4142135623730951,
+        "beforeBurial": 1.1562179091025615,
+        "afterBurial": 0.5514092402501988
+      },
+      {
+        "index": 38,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.018054278020231945,
+        "afterBurial": 0.018054278020231945
+      },
+      {
+        "index": 39,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.07887445641677181,
+        "afterBurial": 0.07887445641677181
+      },
+      {
+        "index": 40,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.08771560141207678,
+        "afterBurial": 0.08771560141207678
+      },
+      {
+        "index": 41,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.1019615581368165,
+        "afterBurial": 0.1019615581368165
+      },
+      {
+        "index": 42,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.5221072144421284,
+        "afterBurial": 0.5221072144421284
+      },
+      {
+        "index": 43,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.1290518654808903,
+        "afterBurial": 0.1290518654808903
+      },
+      {
+        "index": 44,
+        "moveMetres": 2.0,
+        "beforeBurial": 2.180868490567422,
+        "afterBurial": 0.5764635257736006
+      },
+      {
+        "index": 45,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.11135591435845947,
+        "afterBurial": 0.11135591435845947
+      },
+      {
+        "index": 46,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.13006773497050525,
+        "afterBurial": 0.13006773497050525
+      },
+      {
+        "index": 47,
+        "moveMetres": 0.5,
+        "beforeBurial": 0.6691129654259704,
+        "afterBurial": 0.47036900338693055
+      },
+      {
+        "index": 48,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.4344925656975893,
+        "afterBurial": 0.4344925656975893
+      },
+      {
+        "index": 49,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.08084389119534573,
+        "afterBurial": 0.08084389119534573
+      },
+      {
+        "index": 50,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.5225709824450013,
+        "afterBurial": 0.5225709824450013
+      },
+      {
+        "index": 51,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.14230410829611648,
+        "afterBurial": 0.14230410829611648
+      },
+      {
+        "index": 52,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.4785531699281056,
+        "afterBurial": 0.4785531699281056
+      },
+      {
+        "index": 53,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.19086129178011732,
+        "afterBurial": 0.19086129178011732
+      },
+      {
+        "index": 54,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.05064716192011608,
+        "afterBurial": 0.05064716192011608
+      },
+      {
+        "index": 55,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.1693066970526624,
+        "afterBurial": 0.1693066970526624
+      },
+      {
+        "index": 56,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.14384737995118743,
+        "afterBurial": 0.14384737995118743
+      },
+      {
+        "index": 57,
+        "moveMetres": 1.118033988749895,
+        "beforeBurial": 1.142538220871005,
+        "afterBurial": 0.5844116925785621
+      },
+      {
+        "index": 58,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.4816503621284002,
+        "afterBurial": 0.4816503621284002
+      },
+      {
+        "index": 59,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.06419395982196184,
+        "afterBurial": 0.06419395982196184
+      },
+      {
+        "index": 60,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.163596860303544,
+        "afterBurial": 0.163596860303544
+      },
+      {
+        "index": 61,
+        "moveMetres": 1.0,
+        "beforeBurial": 1.137480809656772,
+        "afterBurial": 0.5944537865665116
+      },
+      {
+        "index": 62,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.06976037120423138,
+        "afterBurial": 0.06976037120423138
+      },
+      {
+        "index": 63,
+        "moveMetres": 0.0,
+        "beforeBurial": 0.13943256470122065,
+        "afterBurial": 0.13943256470122065
+      }
+    ]
+  }
+}

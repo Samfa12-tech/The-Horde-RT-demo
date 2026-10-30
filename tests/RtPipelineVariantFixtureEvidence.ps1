@@ -8,6 +8,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
+# Includes are immutable within this fixture process. Cache decoded input only;
+# each provider-byte copy still runs the complete containment predicate.
+$includeBytesByKey = @{}
 function Assert-True([bool]$condition, [string]$message) { if (-not $condition) { throw $message } }
 function Test-ContainsAscii([byte[]]$bytes, [string]$text) {
     $needle = [Text.Encoding]::ASCII.GetBytes($text)
@@ -36,10 +39,12 @@ function Get-ByteSequenceCount([byte[]]$bytes, [byte[]]$needle) {
     return $count
 }
 function Get-IncludeBytes([string]$key) {
+    if ($includeBytesByKey.ContainsKey($key)) { return $includeBytesByKey[$key] }
     $path = Join-Path $repoRoot ([string]::Join([IO.Path]::DirectorySeparatorChar, @('src','vulkan','raytracing','variants', "$key.inc")))
     $words = [regex]::Matches((Get-Content -LiteralPath $path -Raw), '0x([0-9a-fA-F]{8})u') | ForEach-Object { [Convert]::ToUInt32($_.Groups[1].Value, 16) }
     $bytes = New-Object byte[] ($words.Count * 4)
     for ($index = 0; $index -lt $words.Count; ++$index) { [Array]::Copy([BitConverter]::GetBytes([uint32]$words[$index]), 0, $bytes, $index * 4, 4) }
+    $includeBytesByKey[$key] = $bytes
     return $bytes
 }
 function Get-FrozenCatalogVariant([string]$key) {

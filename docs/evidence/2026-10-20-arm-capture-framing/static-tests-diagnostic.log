@@ -1,0 +1,25 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start 106: horde_rt_development_static_asset_tests
+1/1 Test #106: horde_rt_development_static_asset_tests ...***Failed    1.13 sec
+rect-niche displacement-components walkTime=0->0 walkAmount=0 speed=0 authoritativeTravel=37.9770966 crouch=0 crouchDrop=0 equipmentStowed=0 ropeHands=0 torso=-0,-0,0 baseToAuthoredDistance=37.9770966
+FAIL: frozen rect-niche has no walking, crouch or rope camera displacement
+rect-niche restage-components staged=1 tick=1->2 walkTime=0->0 locomotionTime=0->0 camera=1 support=1 hinge=1 pendulum=1 eventsEmpty=1
+rect-niche restage-diff hinge=unchanged
+rect-niche restage-diff body=unchanged
+rect-niche restage-diff pivot=unchanged
+rect-niche restage-diff pivotVelocity=unchanged
+rect-niche restage-diff handForward=unchanged
+rect-niche restage-diff motionAndParameters=unchanged
+FAIL: restaging the frozen rect-niche cannot relocate its hinge or add elapsed time
+rect-niche projection-inputs yaw=-1.57079637 pitch=-0.319999993 supportY=-0.949999988 left=-0.466763765,-0.0719899163,0.212070361 right=0.230000004,-0.340000004,0.33270824 visibility=NOT_EVALUATED
+2 development static asset assertion(s) failed
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   1.15 sec
+
+The following tests FAILED:
+	106 - horde_rt_development_static_asset_tests (Failed)
+Errors while running CTest

@@ -15,7 +15,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 if ($InputPaths.Count -lt 1) { throw "Static texture arrays require at least one input layer." }
-if ($InputPaths.Count -gt 16) { throw "Static texture arrays cannot exceed 16 layers." }
+if ($InputPaths.Count -gt 18) { throw "Static texture arrays cannot exceed the approved 18-layer capacity." }
 if ($Width -lt 1 -or $Height -lt 1) { throw "Static texture array dimensions must be greater than zero." }
 $resolvedInputs = @($InputPaths | ForEach-Object { [IO.Path]::GetFullPath($_) })
 foreach ($inputPath in $resolvedInputs) {
@@ -26,7 +26,7 @@ if ([string]::IsNullOrWhiteSpace($KtxPath)) {
     if ($null -ne $command) { $KtxPath = $command.Source }
 }
 if ([string]::IsNullOrWhiteSpace($KtxPath)) {
-    $KtxPath = "C:\Users\sam_s\Documents\Codex\shared-tools\KTX-Software-4.4.2-src\build-local\Release\ktx.exe"
+    $KtxPath = Join-Path $env:USERPROFILE "Documents\Codex\shared-tools\KTX-Software-4.4.2-src\build-local\Release\ktx.exe"
 }
 if (-not (Test-Path -LiteralPath $KtxPath)) { throw "KTX-Software 4.4.2 is required for runtime texture compilation." }
 $resolvedOutput = [IO.Path]::GetFullPath($OutputPath)

@@ -1,0 +1,200 @@
+{
+  "scope": "CPU logical recovery; local unpushed development checkpoint",
+  "sourceParent": "1014a97ce5b3e467608fba8d151eaeb9c046ed23",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "recordedUtc": "2026-10-17T23:41:14.1827785Z",
+  "sourceManifest": "implementation-files.json",
+  "sourceManifestMeaning": "SHA256 of actual compiled working-file bytes, before Git newline normalization; the only final post-matrix edit removed a test EOF blank line and that fixture was rebuilt/retested in both configurations",
+  "checkpointSchema": 1,
+  "contentRevision": 1,
+  "checkpointIds": [
+    "LowerClaimed",
+    "SafeExit"
+  ],
+  "native": {
+    "debug": {
+      "applicationBuildExitCode": 0,
+      "selectedCtestPassed": 9,
+      "selectedCtestFailed": 0,
+      "durationSeconds": 306.52,
+      "terrainFixtureSeconds": 215.1,
+      "finalFixtureAfterWhitespaceCleanupPassed": 1,
+      "finalFixtureDurationSeconds": 7.93
+    },
+    "release": {
+      "applicationBuildExitCode": 0,
+      "selectedCtestPassed": 9,
+      "selectedCtestFailed": 0,
+      "durationSeconds": 27.4,
+      "terrainFixtureSeconds": 18.72,
+      "finalFixtureAfterWhitespaceCleanupPassed": 1,
+      "finalFixtureDurationSeconds": 1.85
+    },
+    "selectionRegex": "^horde_rt_(campaign_checkpoint|chapter_dialogue|simulation_gameplay|combat_foundation|rescue_traversal|rescue_journey_integration|chapter_terrain_journey|rescue_rig_attachment|rescue_adversarial_regression)_tests$",
+    "ctestCommand": "ctest --test-dir build/presets/windows-x64-{debug|release} -C {Debug|Release} -R <selectionRegex> --output-on-failure",
+    "campaignChecks": 722,
+    "campaignFailures": 0,
+    "freshCombinationCount": 24,
+    "buildCommand": "cmake --build build/presets/windows-x64-{debug|release} --config {Debug|Release} --target <buildTargets> --parallel 2",
+    "buildTargets": [
+      "horde_rt_campaign_checkpoint_tests",
+      "horde_rt_chapter_dialogue_tests",
+      "horde_rt_simulation_gameplay_tests",
+      "horde_rt_combat_foundation_tests",
+      "horde_rt_rescue_traversal_tests",
+      "horde_rt_rescue_journey_integration_tests",
+      "horde_rt_rescue_rig_attachment_tests",
+      "horde_rt_diagnostic_window"
+    ]
+  },
+  "android": {
+    "command": "android/gradlew.bat assembleDebug --offline --console=plain",
+    "exitCode": 0,
+    "durationSeconds": 119,
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "nativeEntries": [
+      {
+        "entry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+        "bytes": 5102344
+      },
+      {
+        "entry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+        "bytes": 4441064
+      },
+      {
+        "entry": "lib/x86/libhorde_rt_probe_android.so",
+        "bytes": 5643740
+      },
+      {
+        "entry": "lib/x86_64/libhorde_rt_probe_android.so",
+        "bytes": 5338832
+      }
+    ],
+    "installed": false,
+    "launched": false
+  },
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 13369344,
+      "sha256": "cdd6d21b1fef1b44addd6f94103b61825c5acbc1cada4323883501c6cb23afbf"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4549632,
+      "sha256": "139f7357ebcf760e553edbc180423416fbc53229350c43eee4295e038b0f07ea"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183538090,
+      "sha256": "7e9a58235f7886ec88986ed55d2f5c08864c416ca61ee3e240ca3bb27e5f3207"
+    },
+    {
+      "path": "assets/models/world/runtime/chapter-terrain-v1/asset.manifest.json",
+      "bytes": 781,
+      "sha256": "da0762e1250e9586022c25e1d1600c5e246ca542524cde137185f98f1fe0de13"
+    },
+    {
+      "path": "assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb",
+      "bytes": 18328048,
+      "sha256": "fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854"
+    }
+  ],
+  "acceptedLocalLogHashes": [
+    {
+      "path": "reports/logical-save-2026-10-17/debug-final-build.log",
+      "sha256": "594aa21b6d8df21ccff6db88a6e4bb1067701c98c356ce9c6c63c370e0b24f6b"
+    },
+    {
+      "path": "reports/logical-save-2026-10-17/release-completed-build.log",
+      "sha256": "0f2317873d41d929616fb5f1702d5374df134bccb18296ccf9bf7361f7c5204c"
+    },
+    {
+      "path": "reports/logical-save-2026-10-17/android-final-build.log",
+      "sha256": "8ecbf717780e4df5a7df44f6a0f5b7eaa083cc54913a796678d317d0588ef83b"
+    },
+    {
+      "path": "reports/logical-save-2026-10-17/debug-final-tests.log",
+      "sha256": "7c18eaca036c1e3487d2da25e4a4ea3617a74c68be43bddf8786996d1e3c3e16"
+    },
+    {
+      "path": "reports/logical-save-2026-10-17/release-completed-tests.log",
+      "sha256": "41b68f7cfc58c27fd3b75e4b873cadb9fdd8f6f6645812c5cbe35ce48219503d"
+    },
+    {
+      "path": "reports/logical-save-2026-10-17/debug-final-fixture-build.log",
+      "sha256": "3cddc90dc36276f57546c74292ea04952bfc63a90f8055a2dd38c1a47b89177c"
+    },
+    {
+      "path": "reports/logical-save-2026-10-17/release-final-fixture-build.log",
+      "sha256": "2ddd9dc31ed619582019c1338f5a207d302d5994c40860a34bd0fed47e7a766b"
+    },
+    {
+      "path": "reports/logical-save-2026-10-17/debug-final-fixture-tests.log",
+      "sha256": "2e8b5e93d3114c8d0b1f587aeee3442b44ae569af8c50f7e48f3f85e30d221ca"
+    },
+    {
+      "path": "reports/logical-save-2026-10-17/release-final-fixture-tests.log",
+      "sha256": "c19a36b8b37318328899cf4d8bd6e86311cfb41e95eeaf6ddc1880f961692ab1"
+    }
+  ],
+  "rejectedDevelopmentRuns": [
+    {
+      "stage": "initial Release campaign fixture",
+      "checks": 707,
+      "failedAssertions": 5,
+      "cause": "Return-descent test published Dungeon through exterior-terrain API; manual-raise test toggled again before lowering finished",
+      "disposition": "Corrected tests; retained production rules; raw initial log superseded, concise result preserved from tool output"
+    },
+    {
+      "stage": "second Release campaign fixture",
+      "checks": 708,
+      "failedAssertions": 3,
+      "cause": "0.5s test wait was shorter than the existing 0.65s pose transition",
+      "disposition": "Fixture now derives wait from real transition constant and asserts completed pose",
+      "localLog": "reports/logical-save-2026-10-17/release-focused-tests.log",
+      "sha256": "3208a6f2a9f60a7b0e7760433e114b9075b5095e70b2865e8de9b4a42118bbba"
+    },
+    {
+      "stage": "Release integration linking",
+      "exitCode": 1,
+      "cause": "LNK1104: overlapping owned test held integration executable open",
+      "disposition": "Waited for test exit, completed linking, reran all nine against final binaries",
+      "localLog": "reports/logical-save-2026-10-17/release-final-build.log",
+      "sha256": "c2f6f4e275f8886219e8850af373751874b98c5649900ea8305a26bf5d045771"
+    }
+  ],
+  "reviewCorrections": [
+    "saved drawn-sword mode no longer changes New Game policy",
+    "required proof response suffix validation",
+    "coherent input neutral/rebased/fresh-publication barrier"
+  ],
+  "notRun": [
+    "physical RTX/Android RT presentation",
+    "phone install/lifecycle/touch",
+    "audio/haptic owner check",
+    "process-death/durable-file acceptance",
+    "current-source cloud CI and sanitizers"
+  ],
+  "audioHapticManualRevalidation": {
+    "required": true,
+    "when": "platform load integration",
+    "reason": "Active speech restarts with fresh callback and source/listener identities; no player-facing load adapter exists yet"
+  },
+  "notImplemented": [
+    "byte codec",
+    "durable storage",
+    "three-slot storage/menus",
+    "manual/autosave retention policy",
+    "automatic checkpoint/death coordinator",
+    "platform resource preparation/camera/load adapter",
+    "forest-end checkpoint"
+  ],
+  "nextSlice": "Typed codec plus isolated atomic file adapter with injected open/write/flush/replace failures, corrupt/unsupported records, slot isolation and stale success receipts; no destructive UI overwrite policy"
+}

@@ -1,0 +1,14 @@
+CMake is re-running because <repo>/build/presets/windows-x64-debug/CMakeFiles/generate.stamp is out-of-date.
+  the file '<repo>/CMakeLists.txt'
+  is newer than '<repo>/build/presets/windows-x64-debug/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+Generated RT catalog adapter is current.
+-- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+-- Vulkan SDK found: 1.4.350
+-- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+-- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+-- Configuring done (14.5s)
+-- Generating done (2.1s)
+-- Build files have been written to: <repo>/build/presets/windows-x64-debug
+MSBuild version 17.14.40+3e7442088 for .NET Framework

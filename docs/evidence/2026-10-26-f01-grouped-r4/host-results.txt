@@ -1,0 +1,7 @@
+Test time =   3.31 sec
+Test Passed.
+F01_SUPPLEMENT_CPU roots=12 pine=8 alder=4 rootTipSamples=936 exposed=0 maximumBurial=0.146903 maximumGap=-0.0199999; diagnostic composition only, collision/adoption unadmitted
+F01_GROUPED_R4 roots=12 rootTipSamples=936 maximumBurial=0.147444; collision/adoption unadmitted
+Native forest tree-pair import, grounding, grouping, and clean-failure checks passed.
+Test time =  56.41 sec
+Test Passed.

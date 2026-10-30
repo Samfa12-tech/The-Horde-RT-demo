@@ -1,20 +1,34 @@
 #pragma once
+#include "gameplay/effects/WaterContact.h"
+#include "gameplay/dialogue/ChapterDialogue.h"
+#include "gameplay/dialogue/CompanionRouteFixture.h"
+#include "gameplay/simulation/DevelopmentSupportFixture.h"
+#include "gameplay/simulation/DevelopmentWorldRoute.h"
+#include "gameplay/simulation/StaticDetailLease.h"
+#include "gameplay/traversal/DevelopmentRescueJourney.h"
 
 #include <array>
 #include <cstddef>
 #include <cstdint>
 
 #include "gameplay/ShowcaseGameplay.h"
+#include "gameplay/healing/HealingFlask.h"
+#include "gameplay/healing/FlaskUpgradeSite.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/effects/FireEmitterState.h"
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/items/HeldItemState.h"
+#include "gameplay/items/UtilityHandReturn.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/interactions/ChestRewardSequence.h"
 #include "gameplay/interactions/FinaleSequence.h"
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "gameplay/simulation/CombatPresentation.h"
+#include "gameplay/simulation/CombatTeaching.h"
+#include "gameplay/simulation/AttackWarningPresentation.h"
+#include "gameplay/simulation/SkeletonRevivalBridge.h"
+#include "gameplay/simulation/CombatContactTrace.h"
 #include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
@@ -42,11 +56,22 @@ struct SkeletonEnemySnapshot
     bool dead = false;
     bool playerHitPulse = false;
     bool parrySuccessPulse = false;
+    EnemyAttackKind attackKind = EnemyAttackKind::Normal;
+    EnemyAttackKind playerHitKind = EnemyAttackKind::Normal;
+    // Contact/readability proofs must skin the exact published combat pose.
+    // Ordinary locomotion and frozen evidence retain the existing 30Hz policy.
+    bool forceCurrentCombatPose = false;
+    float worldY = horde::gameplay::kRouteFloorWorldY;
 };
 
 struct SimulationSnapshot
 {
+    horde::gameplay::dialogue::Snapshot chapterDialogue{};
+    // Transient shared presentation multiplier, never a saved user setting.
+    float dialogueBedGain=1.f;
+    horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     std::uint64_t tickIndex = 0;
+    CombatContactTraceSnapshot combatContactTrace{};
     std::uint64_t inputPublicationSequence = 0;
     // Diagnostic observation of the coherent publication consumed by this
     // snapshot, including zero-tick and pause synchronization frames.
@@ -59,17 +84,55 @@ struct SimulationSnapshot
     std::uint64_t lastConsumedRetrySequence = 0;
     std::uint64_t lastConsumedInteractSequence = 0;
     std::uint64_t lastConsumedToggleHeldLightPoseSequence = 0;
+    std::uint64_t lastConsumedRunToggleSequence = 0;
+    std::uint64_t lastConsumedClearRunIntentSequence = 0;
 
+    bool developmentWorldRoute = false;
+    bool stagedWorldPreparation = false;
+    WorldRouteState worldRoute{};
+    StaticDetailLease staticDetailLease{};
+    bool developmentRescueJourney = false;
+    horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
+    horde::gameplay::traversal::RescuePrompt rescuePrompt = horde::gameplay::traversal::RescuePrompt::None;
+    SupportSurface playerSupportSurface = SupportSurface::Stone;
+    float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
+    float playerHeightDelta = 0.0f;
+    PlayerSupportId playerSupportId = PlayerSupportId::RouteFloor;
+    bool playerGrounded = true;
+    bool developmentSupportFixture = false;
+    std::uint64_t playerSupportGeneration = 1u;
     float playerX = 0.0f;
     float playerZ = 1.85f;
     float playerYawRadians = 0.0f;
     float playerPitchRadians = -0.05f;
     float playerTravelledThisTick = 0.0f;
+    float movementForward = 0.0f;
+    float movementStrafe = 0.0f;
+    float playerMovementSpeedMetresPerSecond = 0.0f;
     float walkTime = 0.0f;
     float walkAmount = 0.0f;
     float torchLightStrength = 1.8f;
     float dodgeCooldownRemainingSeconds = 0.0f;
     bool dodgeActive = false;
+    bool dodgeInvulnerable = false;
+    bool modernCombatRules = false;
+    float dodgeElapsedSeconds = 0.0f;
+    std::uint64_t acceptedDodgeSequence = 0u;
+    std::uint64_t dodgeProtectedHitCount = 0u;
+    CombatTeachingSnapshot combatTeaching{};
+    AttackWarningPresentation attackWarning{};
+    SkeletonRevivalSnapshot skeletonRevival{};
+    bool skeletonRevivalPresentationReady = false;
+    float skeletonRevivalDeadDurationSeconds = 0.0f;
+    float skeletonRevivalStandDurationSeconds = 0.0f;
+    float keeperRepelRemainingSeconds = 0.0f;
+    float keeperRepelTravelledMetres = 0.0f;
+    float gameplayTimeScale = 1.0f;
+    bool runActive = false;
+    bool runToggleActive = false;
+    float playerCrouchDropMetres=0;
+    bool crouchActive=false,crouchStandingBlocked=false;
+    std::uint64_t lastConsumedCrouchToggleSequence=0,lastConsumedClearCrouchIntentSequence=0;
 
     ShowcaseZone zone = ShowcaseZone::Opening;
     EnemyKind activeEnemyKind = EnemyKind::Skeleton;
@@ -94,6 +157,7 @@ struct SimulationSnapshot
     horde::gameplay::items::HeldItemTransform rewardLanternWorldFromHinge{};
 
     TorchFailureSnapshot torchFailure{};
+    horde::gameplay::effects::WaterContactSnapshot waterContact{};
     horde::gameplay::items::HeldItemStates heldItems =
         horde::gameplay::items::MakeDefaultHeldItemStates();
     horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};
@@ -106,6 +170,18 @@ struct SimulationSnapshot
     CombatInputTimingSnapshot combatInputTiming{};
     LichSnapshot lich{};
     PlayerVitalsSnapshot playerVitals{};
+    bool healingFlaskEnabled = false;
+    healing::FlaskSnapshot healingFlask{};
+    healing::FlaskUpgradeSnapshot flaskUpgrade{};
+    bool flaskUtilityCandidate = false;
+    items::UtilityHandReturnSnapshot flaskHandReturn{};
+    bool flaskDrinkEligible = false;
+    // Zero means unavailable; otherwise the existing earned checkpoint ID.
+    std::uint32_t flaskRestAnchor = 0;
+    std::uint64_t lastConsumedDrinkFlaskSequence = 0,lastConsumedRestSequence = 0;
+    std::uint64_t flaskCompletionTick = 0;
+    // Owner handoffs, not persisted progress or filesystem acknowledgements.
+    std::uint64_t campaignRetryRequestGeneration = 0,completedRestGeneration = 0;
 
     std::array<horde::gameplay::effects::FireEmitterState,
                horde::gameplay::effects::kFireEmitterCapacity> fireEmitters{};
@@ -123,6 +199,23 @@ struct SimulationSnapshot
         horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
     // True only during the automatic pre-encounter draw's temporary defense lockout.
     bool automaticSwordDrawBlocksDefense = false;
+
+    // A reminder of the existing manual proof, never a completion or input event.
+    bool NeedsRaiseLanternPrompt() const
+    {
+        using namespace horde::gameplay::interactions;
+        return chapterDialogue.waitingForRaise && !chapterDialogue.proofAccepted &&
+            developmentRescueJourney && rescue.phase == horde::gameplay::traversal::Phase::UpperSafe &&
+            interaction.heldLightKind == HeldLightKind::RewardLantern &&
+            interaction.heldLightPose == HeldLightPose::Low;
+    }
+
+    horde::gameplay::interactions::FinaleEndingPhase EndingPhaseForUi() const
+    {
+        return developmentRescueJourney
+            ? horde::gameplay::interactions::FinaleEndingPhase::Inactive
+            : finale.endingPhase;
+    }
 };
 
 } // namespace horde::gameplay::simulation

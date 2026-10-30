@@ -1,0 +1,146 @@
+[
+  {
+    "key": "diagnostic_high_generic_dielectric",
+    "material": "GenericDielectric",
+    "beforeSha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6",
+    "afterSha256": "28e42e4c9683c403c0958735998d7ef44c7587640e676930121d3eac394f45a6",
+    "beforeBytes": 294796,
+    "afterBytes": 294796,
+    "byteIdentical": true
+  },
+  {
+    "key": "diagnostic_high_opaque_fast",
+    "material": "OpaqueFast",
+    "beforeSha256": "b4cad65003368cce20cc95b2415e8b57a43561a44ba4d761753f9a3418eb6296",
+    "afterSha256": "55b6432cda8cee741f2ff51c445d0d78b8433865a5636993f2fc6fd7579e53dc",
+    "beforeBytes": 584016,
+    "afterBytes": 584496,
+    "byteIdentical": false
+  },
+  {
+    "key": "diagnostic_mobile_generic_dielectric",
+    "material": "GenericDielectric",
+    "beforeSha256": "61d4a96d05188768abccdef60386ba2ba14aa044d1decc3f818937aef20d511e",
+    "afterSha256": "61d4a96d05188768abccdef60386ba2ba14aa044d1decc3f818937aef20d511e",
+    "beforeBytes": 293296,
+    "afterBytes": 293296,
+    "byteIdentical": true
+  },
+  {
+    "key": "diagnostic_mobile_opaque_fast",
+    "material": "OpaqueFast",
+    "beforeSha256": "b5017f41da75094e83e9b87ee9f9be5bef0086755d6dd78f38b8c8e092c7e770",
+    "afterSha256": "38b5f64deed30f2afd85b7dc20531afd445921791d85520a0ebaf06505388f0f",
+    "beforeBytes": 581068,
+    "afterBytes": 581548,
+    "byteIdentical": false
+  },
+  {
+    "key": "shipping_high_generic_dielectric",
+    "material": "GenericDielectric",
+    "beforeSha256": "548181588cfbd8fda4e419f6b90aa20e33305c7ae2366202d96dd07e8f46cf6c",
+    "afterSha256": "548181588cfbd8fda4e419f6b90aa20e33305c7ae2366202d96dd07e8f46cf6c",
+    "beforeBytes": 285968,
+    "afterBytes": 285968,
+    "byteIdentical": true
+  },
+  {
+    "key": "shipping_high_opaque_fast",
+    "material": "OpaqueFast",
+    "beforeSha256": "618c575ad4895d820cc2d49b01a1bcf07ede7158e3ee0668b1ebc392b33f7645",
+    "afterSha256": "ed0963736f60ee943c96b63c5a6cba5e7754e2e982215c9dcc9e57a36a8786af",
+    "beforeBytes": 579780,
+    "afterBytes": 580260,
+    "byteIdentical": false
+  },
+  {
+    "key": "shipping_mobile_generic_dielectric",
+    "material": "GenericDielectric",
+    "beforeSha256": "d1d7e77e55a5e6e97129b94579d4730eb669c23bf0b5fe1c969722f3a87583ce",
+    "afterSha256": "d1d7e77e55a5e6e97129b94579d4730eb669c23bf0b5fe1c969722f3a87583ce",
+    "beforeBytes": 284468,
+    "afterBytes": 284468,
+    "byteIdentical": true
+  },
+  {
+    "key": "shipping_mobile_opaque_fast",
+    "material": "OpaqueFast",
+    "beforeSha256": "51972efdf4bbdfeea86b2898daf60dbd3fbaa1dcebed803ec7a57ea31dc1fbf2",
+    "afterSha256": "a385d28653a006b2ca76c0389823f4025a578a247ae6a1538b138243743255d8",
+    "beforeBytes": 576832,
+    "afterBytes": 577312,
+    "byteIdentical": false
+  },
+  {
+    "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+    "material": "GenericDielectric",
+    "beforeSha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67",
+    "afterSha256": "63d3bbb9f67940f42559f09383aacd511c3ca5b0b91dc812ecddcfc7d1468e67",
+    "beforeBytes": 295044,
+    "afterBytes": 295044,
+    "byteIdentical": true
+  },
+  {
+    "key": "rayquery_compute_diagnostic_high_opaque_fast",
+    "material": "OpaqueFast",
+    "beforeSha256": "82f1aa6d54c5cae3d29c646996163a3480b547e9ef3903abf3cc7b01be1ae668",
+    "afterSha256": "169c28589aca5b838e6f85e8ffcd17490ada2889b6b42256bc803a226a2d31b6",
+    "beforeBytes": 585220,
+    "afterBytes": 585700,
+    "byteIdentical": false
+  },
+  {
+    "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+    "material": "GenericDielectric",
+    "beforeSha256": "9b578ab93f66ea93abe9dd55354fca033aaeba02b8d7d6c667a9aabd6e7b4061",
+    "afterSha256": "9b578ab93f66ea93abe9dd55354fca033aaeba02b8d7d6c667a9aabd6e7b4061",
+    "beforeBytes": 293544,
+    "afterBytes": 293544,
+    "byteIdentical": true
+  },
+  {
+    "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+    "material": "OpaqueFast",
+    "beforeSha256": "0aae45f37a9604bcf4da9ef60f9307b1600b485e5d40e314afa3517d62a19601",
+    "afterSha256": "459f2e0d363b51ca46dc79c747dfd5134460b5df4364ef8a0f35ccc3f5baa1c5",
+    "beforeBytes": 582272,
+    "afterBytes": 582752,
+    "byteIdentical": false
+  },
+  {
+    "key": "rayquery_compute_shipping_high_generic_dielectric",
+    "material": "GenericDielectric",
+    "beforeSha256": "2706264ebbe3d059423ec8b4fa00a7b7a055e86930b37f22665b2958a51d7616",
+    "afterSha256": "2706264ebbe3d059423ec8b4fa00a7b7a055e86930b37f22665b2958a51d7616",
+    "beforeBytes": 286216,
+    "afterBytes": 286216,
+    "byteIdentical": true
+  },
+  {
+    "key": "rayquery_compute_shipping_high_opaque_fast",
+    "material": "OpaqueFast",
+    "beforeSha256": "87f12a8cba831ab18be0f1be1b807f8ca91e8a0da6a875e46ed4e4989fe31e76",
+    "afterSha256": "641f8cce1c856fda5828ba7f72e9acddfa35b5ccd3eb67d04fa1761807164bdc",
+    "beforeBytes": 580984,
+    "afterBytes": 581464,
+    "byteIdentical": false
+  },
+  {
+    "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+    "material": "GenericDielectric",
+    "beforeSha256": "40d49459ff47383fc070f820baaba108e207a09dc1823369ca5d29dbf54958f7",
+    "afterSha256": "40d49459ff47383fc070f820baaba108e207a09dc1823369ca5d29dbf54958f7",
+    "beforeBytes": 284716,
+    "afterBytes": 284716,
+    "byteIdentical": true
+  },
+  {
+    "key": "rayquery_compute_shipping_mobile_opaque_fast",
+    "material": "OpaqueFast",
+    "beforeSha256": "0db06582bc0e13db5cd8eca2678801dd659566aaa263de2c80d2a78feb09e632",
+    "afterSha256": "f4752f617e1d2c4264d5bb0bdb5c5fdeeaf42acef315bed873aa923a7791b588",
+    "beforeBytes": 578036,
+    "afterBytes": 578516,
+    "byteIdentical": false
+  }
+]

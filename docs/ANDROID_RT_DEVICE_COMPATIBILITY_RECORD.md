@@ -1,5 +1,510 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-30 19:20 UTC - current readiness correction, bounded natural start/lifecycle
+
+**SM-S948B / Android17**, Codex Debug APK SHA256 `e27e37f944730ed461954d2b0fb18fa74bf8f70e4d359e390e0cdfa933dd8ee2`, code10 / `1.6.2-debug`. Matching-certificate in-place update; `201e2d60` readiness runtime inputs unchanged by integrated `8291d269`. Real RT main menu and a fresh empty-slot New game reached the starting corridor without staged progress. The block lesson remained absent while stowed, appeared after sword draw, and portrait/landscape plus injected held-guard background/rotation cancellation were inspected. This is bounded RT presentation/input/lifecycle evidence, **not full natural chapter, human multi-touch/controller, authoritative combat mitigation or performance acceptance**.
+
+Debug stopped/Home restored at19:20:56UTC; original `lock 0` rotation/font1.5, default Debug campaign records and production/actor-worker APK hashes unchanged. Latest tested Debug remains installed as approved. [Exact artifact, scope and remaining checks](evidence/2026-10-30-interactive-acceptance/README.md).
+
+## 2026-10-30 UTC - three-slot current debug candidate accepted in isolation
+
+**SM-S948B / Android 17**, debug APK SHA256
+`aeace11f5e0d07f2bf531a893fc54d543ce6676f0ba0a7d5e0ec3b276264d8fb`,
+versionCode10 / `1.6.2-debug`; frozen source includes `d618199f` and the
+three-slot/date implementation. Compatible in-place installation followed a
+matching-certificate check and private backup. Actual RT gameplay was observed
+after direct Load, cold restart and background/return, using staged checkpoint
+records in a dedicated test namespace. Three slots, actual localized embedded
+save dates, missing-date fallback, empty save, overwrite cancellation/hash
+preservation and confirmed overwrite passed the bounded injected-input checks.
+Portrait and landscape were inspected at the unchanged 150% system font;
+landscape actions remain reachable by scrolling.
+
+This is **current-build RT presentation and isolated save/UI/lifecycle evidence**,
+not natural chapter completion, physical two-thumb/controller, performance or
+experimental feature acceptance. At09:09:46UTC the app was stopped, rotation
+restored, default debug campaign files verified unchanged, and phone released.
+Production/actor-worker APK hashes are unchanged. The tested debug APK remains
+installed by owner instruction. [Exact scope, identity and limitations](evidence/2026-10-30-three-slot-device/README.md).
+
+## 2026-10-30 AEDT - installed f27982cd normal UI and checkpoint round trip
+
+Local ADB-injected input and screenshot inspection on **SM-S948B**, Adreno840,
+Vulkan1.4.295 / driver2150932499. Installed Debug APK hash
+`53af984fe8ce7fe275e2ea523c9fe7e2ccc7c433997c6ff708635f1cafa8224e`
+matches frozen sourcef27982cd; no installation occurred. Existing saved33%
+presented Pipeline RT at475x980 internal /1440x2971 output. Normal Play/Continue
+loaded the existing Safe Exit autosave, Resume reached the outdoor scene, touch
+look/movement responded and an emulated gamepad-Y action raised the lantern.
+The actual Save UI wrote empty manual Slot2; a cold restart loaded that record
+and resumed Safe Exit with three hearts. This does not establish full-chapter,
+physical two-thumb/controller, current04dc8346, Windows or performance acceptance.
+
+Released20:21:08UTC October29 (07:21AEDT October30): app stopped, original three
+save/lock/preferences files restored byte-exact, only test Slot2/manual lock and
+owned temporary UI XML removed; original APK/system settings unchanged, launcher
+foreground. No owned monitor/transfer remains. [Scope and restoration receipt](evidence/2026-10-30-phone-check/README.md).
+
+## 2026-10-28 - e2addc77 installation/preflight interrupted; no new RT verdict
+
+SM-S948B / Android17 API37, isolated Debug sourcee2addc77, APK
+`5704832437d098211882e3a40a39a7940c37d78af02235a0ee4b7bb7f696b91f`.
+Compatible update verified; the first ACK read was inconclusive and the laptop
+transport disconnected before raw-byte inspection. No timing run or fresh
+RT-presented acknowledgement was established. Cleanup verified09:27:50UTC:
+owned test stopped, Home, original automatic brightness/rotation/font restored,
+owner APKs unchanged. Existing958f5182 evidence below remains separate.
+[Recovery and exact limits](evidence/2026-10-28-chapter-start-ack/disconnect-followup.md).
+
+## 2026-10-28 - isolated actor-worker route; no causal performance gain
+
+SM-S948B / Android17 API37, exact source958f5182 and isolated Debug APK
+`9466ba1a06437bfaa119cf19c457aa017fab2848e0dc910cb8ed8d95a9fa3296`.
+Real Pipeline RT presentation at720x1486/1440x2971; generated serial/worker routes
+complete with590/589 owning rows, zero pending submissions and actual CPU-mode
+witnesses. Thermal starts/process setup differ, no closing control or clock trace:
+no measured causal gain, normal worker admission or natural journey acceptance.
+Released08:36:55UTC with original APKs unchanged, no owned process/monitor/transfer.
+Original auto-brightness mode restored; readback73 versus initial94 is explicitly
+recorded. [Bounded evidence and limits](evidence/2026-10-28-actor-worker-phone/README.md).
+
+## 2026-10-23 - touch HUD physical checks; rotation continuity unresolved
+
+Local ADB-injected input/screenshot inspection on Galaxy S26 Ultra **SM-S948B**,
+Android 17 API 37, 560 dpi / font scale 1.7. Source `1bd99485`, ordinary arm64
+Debug APK `8be1c9272b2ce840083904f25f13b61e85cc13c5cf890920b3a1883f28b77228`.
+Independent staged held-lantern portrait and landscape cases present Pipeline RT,
+keep visible targets at least 48 dp inside the app window, and retain exact target
+bounds across held-lantern/return-tap state sequences. Circular icon, pressed rim,
+rounded saved-opacity backings and full action labels were inspected in actual
+screenshots. This is not Sam comfort/feel, contextual Interact, dialogue overlap,
+natural journey, physical controller or performance acceptance.
+
+The first orientation continuation lost the staged lantern control; guard stopped
+before input. Cause remains unverified and direct landscape restaging does not
+close that continuity failure. Original APKs, all 18 prior save/lock files,
+preferences and rotation/settings are verified restored/unchanged. Phone released,
+no owned process/content surface/capture/install/transfer; system task/input
+metadata remains documented rather than forcibly removed. **Safe to disconnect.**
+[Exact physical evidence, retained guards and next source slice](evidence/2026-10-23-touch-hud-phone/README.md).
+
+## 2026-10-23 - production-bank outdoor GPU-stage attribution
+
+Local ADB physical profiling on Galaxy S26 Ultra **SM-S948B**, Android 17 API 37,
+Adreno 840 / driver 2150932499. Source `8c3246d0`, arm64 Shipping/Mobile Debug
+APK `91f2ff1d7fe9dcb979d91978c9befe72b577d971a998572487b2c862a0e114bc`.
+Exact production SPIR-V/native payloads and installed hash verified; actor worker
+OFF, no private shader bank, no renderer change or new trace source.
+
+One 33% post-Keeper staged lookout hold: portrait 475 x 980 internal / 1440 x 2971
+output, Mist OFF, Mobile fire/water, Low dust, Current shadows. Strict submission
+joins pass for all 838 frames, with 626 post-warm samples. GPU median AS 0.548 ms,
+RT dispatch 33.815 ms, transfer 0.125 ms. CPU skin wall median 8.694 ms and fence
+wait 34.887 ms; nested wall timings are not per-core utilization. No comparative
+gain, worker-phone acceptance, natural journey, scanout FPS or sustained warmed
+performance is claimed. Thermal framework status zero at start/end; short hold
+does not establish equilibrium. Original installs, all 18 prior save/lock files,
+preferences and system settings verified restored/unchanged; phone released,
+no owned renderer/capture/install/transfer remains. **Safe to disconnect.**
+[Artifact, raw samples, strict analysis and limits](evidence/2026-10-23-production-stage-phone/README.md).
+
+## 2026-10-20 - isolated return/reload and warm lookout; paused
+
+SM-S948B / Android 17 API 37 / Adreno 840, exact compatible Debug APK
+`d1a052dd29fd8b6f61e70d247f0446373053bfb7e7c9af4bce07f84636b2ec43`
+from accepted runtime at 811852fa. Native UI loads the actual Windows lower-return
+test record, completes repeat ascent, saves upper auto/manual and reloads manual
+Slot 2 with two hearts. Hot Home/resume restores successful Pipeline RT on a new
+surface generation. These are isolated post-Keeper continuation checks, not
+naturally earned phone victory/claim, process-death or full-route acceptance.
+
+Same-process noncombat lookout baseline at unchanged owner 40% / Mist Off and
+Shipping/Mobile records three warm 120-frame CPU present-loop means:
+57.107 / 57.090 / 57.111 ms. Final valid GPU frame is 55.589738 ms. No actual
+display-spacing, GPU-window, thermal-equilibrium, two-light Keeper or sustained
+30-FPS claim. All prior 12 campaign files/locks and settings remain byte-exact;
+only the new isolated namespace was added. Ordinary Quit returns to launcher;
+cached Debug PID remains, no install/capture/transfer active. **Phone safe to
+disconnect; Horde paused at owner's request.** Portrait touch clutter is recorded
+for future redesign, with no implementation during the pause.
+[Exact receipt, retained controls/failures and limits](evidence/2026-10-20-phone-return-checkpoint/README.md).
+
+## 2026-10-20 - phone idle release; lookout panel build only
+
+SM-S948B / Android 17 API 37 remains on corrected Debug APK c5a11bb2. A completed
+read-only check confirms no Debug PID, saved Mist Off/pending false and exact
+previous settings/all 12 campaign records/locks. Sam then requested unplug;
+phone work stopped before any install, transfer, fixture staging or launch.
+The new lookout objective candidate passes 381 Java tests and all four Debug
+ABIs **only**; no new physical endpoint/panel/controller/RT acceptance is claimed.
+[Exact build identity, idle custody and deferred gates](evidence/2026-10-20-lookout-objective/README.md).
+
+
+## 2026-10-20 - single Apply/save noncombat UI acceptance
+
+SM-S948B / Android 17 API 37 normal-entry portrait UI at existing font scale 1.7 and
+density 560. Compatible Debug ed44d417 APK
+e62249b98b5996c5dc74165475565db24accf3d6d89155214b339df14050b62d
+passes one Mist Off Apply/current Pipeline RT acknowledgement, draft Restore,
+Back and outstanding 100% Apply→Home/hot-resume recovery to saved 40%.
+A stale Confirmed and saved label on later drafts was found and corrected.
+
+Corrected APK c5a11bb287327900327b2266c313f53d4a77ad02d2b94d5787ef81cb23269707
+is installed with matching remote hash/signer, then passes Apply of the original
+owner 40% tuple, explicit Not saved 50% draft, Restore and Back. Home interruption
+was not repeated on this second APK; only the status predicate changed. All 370
+Java checks/four-ABI Debug build pass. No performance, Keeper/combat, physical
+resource/storage-failure or preview/controller/rotation-matrix acceptance claim.
+
+Original owner graphics/settings types and values restored, 12 campaign records/
+locks byte-exact, production save directory empty, Debug process stopped. Raw
+settings XML differs only by a trailing blank line; exact before/after hashes are
+retained. No data clearing, security change or public release.
+[APK-specific screens, custody and limits](evidence/2026-10-20-graphics-single-apply/phone/README.md).
+
+
+## 2026-10-20 - R04 prepared two-light Keeper; arm transport fails
+
+SM-S948B / Android17 API37 / Adreno840 / driver2150932499 now has exact R04
+Debug b7e387d16c2876abf532ce461b9b71bb1e77d60220192a9f5333031098bb819d,
+matching signer/pullback and175 unchanged assets. Fresh authorized keeper20r-a1
+passes12 native preparation frames with live reveal, both production lights,
+full room mist, actual MistOn and40% (576x1188 / 1440x2971), Shipping/Mobile real
+Pipeline RT. This is a frozen noncombat preparation evidence class only.
+
+Native rejects an empty arm token, retires successfully and records zero timed
+frames. Whole sequence stops; Off/closing requests never launch, no retry or new
+performance claim. Host missing-file guard is corrected;11 offline guard tests
+and23 analyzer tests pass. No Debug process, byte-exact settings/all 12 campaign
+records/locks, Release untouched. Next gate: exact arm transport/readback before
+publication; prospective host correction is not physically exercised.
+[Receipt and preserved failure](evidence/2026-10-20-keeper-mist/renewed/README.md).
+
+
+## 2026-10-20 - Keeper fixture built; phone timing blocked
+
+SM-S948B / Android 17 API 37 / Adreno 840 / driver 2150932499 receives exact
+compatible Debug R03 APK
+33d301a5825a5da2ec1d3b5eaeb21150281a8a42384b8011f4ca41bcb2ff769c
+with matching installed pullback, preserved settings and all 12 campaign
+records/locks. No new timing, completed fixture or physical fight acceptance
+exists: ADB custody failure and a host missing-file guard stopped two preparations
+before arm. Automatic review denied another preparation beyond the declared
+rejection bound; it was not retried. Debug stopped; Release untouched.
+
+Final R04 APK b7e387d16c2876abf532ce461b9b71bb1e77d60220192a9f5333031098bb819d
+adds a request-serial cancellation safeguard, compiles all four ABIs and passes
+361 Java tests; **not installed or device validated**. Both focused fixture/policy
+host tests and 23 synthetic evidence tests pass; two independently classified
+older native failures remain. All 175 packaged assets are unchanged.
+Evidence class: **build/install/custody and failed preparations only; no Keeper
+performance result**.
+[Receipts, rejection, fixture differences and next gate](evidence/2026-10-20-keeper-mist/README.md).
+
+
+## 2026-10-20 - mobile Mist Off default and bounded quality comparison
+
+Exact SM-S948B / Android 17 API 37 / Adreno 840 / driver 2150932499 evidence:
+installed Debug APK `e699bfa82a784827ade52b440e40eb0e4df39da4faa03f3c269959566e09d57e`
+from 9f9da695 uses real Pipeline RT, production Shipping/Mobile shaders and 40%
+(576 x 1188 internal / 1440 x 2971 output). New Android fresh/reset defaults select
+Mist Off following the owner's two-light Keeper report; existing saved choices
+are preserved. The current saved phone choice remains Mist On.
+
+One combined Mist Off / Fire Low / Dust Off trial has exact lower-room GPU
+54.419 ms versus 53.992 ms control, actual display medians 62.500/62.500 ms;
+repeat-ascent GPU 137.623 versus 137.023 ms, display 154.167/154.167 ms. The earlier
+same-APK Mist Off pair is also below the 3% useful-gain threshold. Neither admits
+an additional quality default or tests the live Keeper fight. Current-HAL start
+and end comparisons pass the unchanged 1.5 C gate at framework 0, with USB charging
+recorded but GPU clocks/power unmeasured. Closing control fails its 180 s passive
+preparation bound before launch. Individual Fire/Dust and visual acceptance stay
+open. Whole-route intervals remain far above 33.333 ms; no sustained 30 FPS claim.
+
+A failed Fire attempt exposed asynchronous graphics/motion ordering; the native
+ownership guard aborted correctly. The fixed path waits exact serial/surface/
+full tuple/successful RT presentation before arming, with 30 s timeout and pause
+cancellation. Corrected control and combined runs strictly join actual display
+ownership. All 360 Android tests pass. Six valid routes / 4,209 completed frames,
+one failed timed attempt and two rejected preparations are preserved. All 12
+campaign records/locks and Horde settings remain byte-exact, Debug stopped,
+release app untouched. Evidence class: **bounded noncombat production-shader
+quality timing; incomplete comparison, no earned/live-combat acceptance**.
+[Checkpoint, limits, failures and exact receipts](evidence/2026-10-20-phone-performance/README.md).
+
+## 2026-10-20 — fresh CPU/GPU baseline at preserved 40% settings
+
+SM-S948B / Android 17 API 37 / Adreno 840 / driver 2150932499 presents the
+current r23 scene through real RayTracingPipeline using production Shipping/Mobile
+shaders in optimized Debug. Exact installed baseline APK:
+`01b414878a57f16a9001b1ff28394a8d2c7c5da4b5c867ecd63ebde94d7f9d5a`,
+source `b2d548a2` plus the archived measurement-only patch. The existing noncombat
+chapter route strictly joins 704 completed RT frames to actual display evidence
+at 40% (576 × 1188 internal, 1440 × 2971 output), Mist On, Mobile fire/water,
+Low dust, Glass Off and Current shadows. Whole-route display median is 75.000 ms,
+p95 158.333 ms. Exterior GPU medians are about 137 ms, with 10–11 ms skinning;
+the lower-room GPU/skin medians are 54.008 / 6.608 ms. These are current measured
+costs, not a sustained 30 FPS pass or proof from the old October 1 timings.
+
+Current-HAL framework thermal status stayed 0; starting AP/BAT/SKIN were
+41.4/28.4/33.5 C and ending 39.1/31.4/35.1 C. GPU clocks/power level and initial
+battery state were not captured. All 286 pre-existing file hashes matched after
+compatible `install -r`; after launch, save/lock records and Horde preferences
+remain unchanged. Android's ActivityThread ID metadata changed. No combat input,
+data clear, earned-save claim, public release or release-app update occurred.
+Evidence class: **bounded physical production-shader route timing with exact CPU
+stage and actual-presentation joins**. See the [baseline receipt](evidence/2026-10-20-phone-performance/baseline-receipt.json)
+and [CPU preparation evaluation](evidence/2026-10-20-phone-performance/cpu-preparation.md).
+
+## 2026-10-18 - repaired checkpoint artifact, incomplete natural route
+
+SM-S948B / Android 17 / API 37 / Adreno 840 / Vulkan 1.4.295, installed Debug
+APK `4c84eb456f97717df055245410196101ea681a3bc55d0c9776eb42a59d591073`:
+an isolated, unseeded New Game reaches the Keeper through ordinary phone touch,
+with RT-produced presentation observed, but stops with Keeper health 2 before
+lantern claim. No new record is created; earned autosave/manual separation,
+ascent replacement and physical death Load are **not accepted**. The old overlay
+omits lesson protection, so `damage ON` is not unprotected-combat evidence.
+All eight existing test records, 286 paths and owner settings are unchanged;
+normal Quit leaves zero activities. This is an incomplete route receipt, not a
+new compatibility/performance pass. [Exact evidence and diagnostic correction](evidence/2026-10-18-android-earned-repair/README.md).
+
+## 2026-10-18 — exact-zero mist optimisation, bounded physical evidence
+
+SM-S948B / Adreno840 / API37 / Vulkan1.4.295 / driver2150932499: both
+hardware RT backends present the normal Shipping/Mobile bank at the preserved
+40%/CURRENT settings. Six short routes join4,324 actual presentations; repeated
+cleared-tomb GPU medians improve71.082→57.754/57.716ms (Pipeline) and
+67.611→55.709/55.727ms (Query), with display median66.667ms. Fourteen phone
+image pairs are pixel-identical; all routes retain7.65MiB saving/exact return.
+Final Debug APK SHA-256 `d0363ad6649aecdf3482fa2de7e6d635a8b4a23c2b101fb04929372723817dd0`
+is installed/byte-verified and stopped, with identical saved preferences and
+untouched release app. [Artifacts, matched-start thermals, images, failed attempts
+and limitations](evidence/2026-10-18-zero-mist-exit/README.md). This is not a
+signed Release, long-session/live-combat30FPS, CURRENT/HIGHER migration or owner
+acceptance pass. One earlier checkpoint-staging failure remains unattributed.
+
+
+## 17 October normal production-bank optimization loop — SM-S948B / Android17
+
+Evidence class: **authorized same-signer Debug/O2 phone update, normal
+Shipping/Mobile shaders, eight short out-and-back runs with strict actual-display
+joins, eight frozen image comparisons and inspected representative frames**. See the
+[exact revision/artifacts, temperatures, results and limitations](evidence/2026-10-17-production-performance/README.md).
+Runtime base3252820f, control APKa49955a2…95a8d6c, trialfbfdf02a…ef4e2a7;
+API37/Adreno840/Vulkan1.4.295/driver2150932499. Saved40%/CURRENT and all169
+assets are unchanged. No private stage/clock shader observer is used.
+
+All5,554 completed frame/display joins pass. Opaque-only inverse transpose is
+**not adopted**: small mixed observations are thermally confounded. Both final
+reverse-order controls completed after the excluded NotificationShade attempt;
+neither matches the trial's starting temperatures, and landing/passage positions
+differ by at most2.2mm. These remain descriptive comparisons. One hotter Query run rejects691 completed submissions with
+only690 actual timestamps, leaving the first present ID unresolved. The
+two-second drain and strict coverage remain unchanged. Six image pairs are
+pixel-identical; two differ at50pixels by at most1/255 in a channel.
+
+Normal-bank routes retain one7.65MiB static-owner saving/exact restoration and
+zero readiness waits; larger observed overlap and UMA accounting are documented
+without claiming whole-process RAM savings. No sustained30FPS, live combat,
+Current/Higher migration, lifecycle or owner visual/audio/haptic acceptance is
+established. Shader edits/artifacts and default build products are restored;
+unrelated chapter work, release app, data and saved settings are preserved.
+
+## 17 October real Keeper torch activation — SM-S948B / Android17
+
+Evidence class: **authorized private Debug/O2 install/hash verification,
+natural live-chapter transition on both hardware RT backends, strict GPU-stage/
+actual-display joins and separately inspected foreground screenshots**.
+[Exact artifacts, captures, analysis and limitations](evidence/2026-10-17-keeper-torch-transition/README.md).
+APK6d43d5dc3fa9325a7be4b85ffc3521f536e5ad41d63db7b7ac71ae5ff3d625e8,
+183,656,522B; API37/Adreno840/Vulkan1.4.295/driver2150932499.
+Current saved40%/CURRENT,576×1188 internal,169 matching asset payloads and
+unchanged original Shipping/Mobile shaders. No inverse-transform or clock
+treatment. Source4cb91457 plus archived exact native patch/hashes; this is the
+existing private r10 page/stage profile, not a production release candidate.
+
+All608 Pipeline and604 Query frames pass owned stage/display joins. Unlit/lit
+dispatch medians66.304→104.590ms and67.056→109.951ms; display intervals
+75→116.667ms and75→120.833ms. AS medians stay0.36–0.44ms, allocations and
+28 TLAS/21 BLAS counts stay flat. All50 settled lit frames reach the existing
+six-tick cap and overrun; none of64 settled unlit frames do. Framework thermal
+status0 at both boundaries. The ordinary crossing moves6.33cm and co-activates
+reveal presentation; attribution to individual light/shadow/volume paths is
+still open. Short observations are not sustained FPS or owner acceptance.
+
+No production rendering, quality, streaming or budget change. Original
+f13dda30…fa527 restored/installed-hash verified, preferences byte-identical,
+Debug stopped, release app untouched. Current/Higher and Lower→Current
+migration physical acceptance, complete route/lifecycle and owner play/listen/
+haptic acceptance remain pending. No other phone is certified by this result.
+
+## 17 October inverse-transform experiment — SM-S948B / Android17
+
+Evidence class: **owner-authorized private Debug/O2 install/pullback, eight
+matched frozen image pairs, four ordinary routes and four legacy Keeper still
+benchmarks**. [Exact scope/results](evidence/2026-10-17-inverse-transform/README.md).
+Candidate84e878a3dd8bbc0b56f5ead59fb9304e46c07a83f0bc4c8de25e63c760c7ce2d;
+API37/Adreno840/Vulkan1.4.295, saved40%/Current and all169 asset payloads unchanged.
+Only Shipping/Mobile Opaque changes on both real RT backends; Generic retains
+the exact original modules. Six pixel-exact/two near-identical image pairs
+(50pixels each, at most1/255 channel change); actual frames inspected. All2,708
+route frames join to owned stages/actual display; all four unload/restore once
+with13.59MiB saving/exact restoration and zero readiness waits.
+Pipeline single-pair dispatch observations are6–8% lower inside/3% outside;
+starts match within0.4°C/status1 but end temperatures differ. No repeatable
+causal gain or smooth-play acceptance. Query control starts at status2 versus0
+and is excluded from speedup claims. Legacy frozen maintaining-range Keeper
+snapshots differ less than1% on Pipeline; periodic390-sample GPU aggregates
+include warmup and are not final phase medians or live fight performance.
+Active lightning/charge worst-frame cost is not reproduced. All four Generic
+source variants exceed unchanged bytes/words ceilings; no production adoption.
+Original f13dda30…fa527 control restored/pullback-verified, Debug stopped,
+preference bytes preserved and release app untouched. No signing/publication.
+Windows optimized candidate compiles; no new Windows RT image/performance claim.
+Current/Higher and Lower→Current migration physical acceptance remain pending.
+
+## 17 October sparse dispatch-clock observation — SM-S948B / Android17
+
+Evidence class: **owner-authorized private Debug/O2 observer install/pullback,
+six exact frozen image pairs, four ordinary routes and strict owned GPU/stage/
+clock/actual-display joins**. [Exact inputs/results](evidence/2026-10-17-rt-dispatch-investigation/README.md).
+Observer29d2de014fbb12510e6003279c07bd19fed660a6d14b6abea2255f00a60e05e9;
+raw modelSM-S948B/API37/Adreno840/Vulkan1.4.295. Saved40%/Current unchanged.
+Native-checked/enabled shaderDeviceClock produces1,338valid per-frame sparse
+records (666invocations/frame);2,683total completed frames have display/stage
+joins. All six full frozen PNG pairs are byte-identical on both RT backends.
+Composition is sampled implementation-defined ticks, not GPU milliseconds,
+utilisation or a production speedup. Query starts match within0.9°C/status0;
+Pipeline control is warmer/status1, leaving its causal overhead unbounded.
+13.59MiB unload/exact restoration and zero waits remain; observation adds655,424B
+constant metadata allocation. Instrumented modules exceed unchanged production
+budgets and are not admitted. Default builds compile out the observer. Original
+stage-only APKf13dda30…fa527 restored/pullback verified; preferences identical,
+Debug stopped, release untouched. Smooth-play, Current/Higher and Lower→Current
+physical acceptance remain open.
+
+## 16 October baseline stage profile — SM-S948B / Android17
+
+Evidence class: **owner-authorized exact Debug/O2 install/pullback, Shipping/Mobile
+private timestamp observer, two ordinary physical routes with strict completed
+submission/stage/actual-display joins**. [Source/APK/raw evidence](evidence/2026-10-16-baseline-rt-profile/README.md).
+APK f13dda30ad56536a774004ee963c621aec2396f0a25179c490f32e72294fa527;
+SM-S948B/API37/Adreno840/Vulkan1.4.295, unchanged40%/Current576×1188,169assets
+and shader modules. Pipeline667/667, Query678/678 stage/display joins. Exterior
+dispatch137–142ms, AS-update0.53–0.55ms, transfer0.11–0.12ms; nonadditive execution
+intervals, no shader-internal/hardware-counter attribution. Whole-route actual
+median83.33ms both; smoothness remains open. Same13.59MiB unload/exact restore,
+12.85MiB observed overlap, zero readiness waits. No policy/quality/production adoption.
+Original preference bytes preserved, Debug stopped, release untouched. Current/Higher
+and Lower→Current migration physical acceptance remain pending. Older measurements
+below retain their own artifact/OS/settings scope.
+
+## 16 October matched resident/streamed pairs — SM-S948B / Android17
+
+Evidence class: **owner-authorized exact Debug/O2 install/pullback, Shipping/Mobile
+private profile, four ordinary matched-view routes, strict actual display joins**.
+[Exact source/APK/raw receipts](evidence/2026-10-16-phone-resident-streamed/README.md).
+APK a42a0651dc9282eaceb13e1627b19e5348688127352c18f1b36be9f0c0414808;
+raw modelSM-S948B, API37, Adreno840/Vulkan1.4.295. Saved40%/Current,
+576×1188 internal,1440×2971 swapchain, all169 assets/shaders unchanged.
+Pipeline resident/streamed647/667 frames, Query652/673, every completed frame
+matched to actual display time. Resident allocation is constant; each streamed
+run frees14,249,664B, restores exactly and has zero readiness waits; observed peak
+13,476,160B above full. GPU medians remain expensive even resident: exterior
+142ms Pipeline,147–149ms Query resident versus138–139ms Query streamed. Pipeline
+matched GPU changes −0.17% to+1.29%; Query −6.30% to+0.67% is one paired observation,
+not an attributed speedup. Starts match within1.5°C at equal framework status
+(Pipeline0; Query1); no clock/power or sustained thermal claim. Measured
+streaming-step CPU maxima4.60/4.41ms exclude separate retirement/commit/AS GPU work.
+Display median83/88ms and overrun deltas263–269 still fail smooth-play expectations.
+A preceding Query route failed strict terminal validation because boot/setup IDs
+remained pending; the private collector now registers IDs only after arming.
+No rows/checks/deadlines were removed. All corrected runs start with zero setup
+IDs and end with zero pending. Original preferences remain byte-identical,
+Debug is stopped and release app untouched. Broader lifecycle/pressure/full-route,
+Current/Higher and saved Lower migration and production acceptance remain pending.
+
+## 16 October ordinary private streaming cycles — SM-S948B / Android17
+
+Evidence class: **owner-approved exact Debug/O2 install/pullback, two failed full
+routes and two successful focused ordinary residency cycles with actual display
+timing**. Full-route APK51d7d58b…367c1046 fails both unchanged120s deadlines before
+unloading (Pipeline lower landing, Query tomb backtrack); actual joined median/max
+intervals133/242 and129/250ms,607/589 simulation overruns. No memory saving is
+claimed for those failed routes.
+
+Focused APK `a6b7a00ccd813bc903250079926970f03096ff7436fb4f50c117e86b58b33d76`
+adopts the ready reunion, walks to the rope, descends/backtracks, then returns and
+ascends through normal simulation/input and existing safety gates. Both hardware
+backends retire/reload one certified84,219-triangle forest detail owner. Device-local
+full/retired/restored: Pipeline160,831,232 /146,581,568 /160,831,232B;
+Query160,830,720 /146,581,056 /160,830,720B. Actual saving14,249,664B (13.59MiB),
+observed peaks174,307,392 /174,306,880B (12.85MiB above full), zero readiness waits.
+Cached CPU sources/coarse world/shared/uncertain contributors stay resident.
+
+Raw modelSM-S948B, Android17/API37, Adreno840/Vulkan1.4.295. Native optimizedDebug,
+actual Shipping/Mobile private shaders, saved40% /Current,576×1188 inside1440×2971.
+No mid-route image readbacks. Exact521/530 completed-frame/display joins pass with
+no adverse collector counters.45.46/45.39s spans: median83.33ms,p95141.67ms,
+max166.60/162.50ms;139/141 overrun deltas. These are actual display-timing intervals,
+not GPU-reciprocal FPS, scanout or a smooth-play pass. Post-run current-HAL framework
+status0/1, skin37.3/39.7°C; starting thermal states differ, no causal/backend ranking
+or sustained thermal claim. Restored visible forest/ground shadows/rope prompt were
+inspected after timing; matched primary/reflection/transmission coverage remains open.
+
+Four ABI/lint and default286 Java checks pass, native Debug/Release2/2 each,
+timing analyzer14/14 and build policy1/1. Default build profile restored, not
+installed. Same signer/version, preference bytes preserved, owned Debug stopped,
+release untouched. Full route/continuous performance, lifecycle/pressure during
+transitions, broader residency/I/O and Current/Higher/Lower migration remain open.
+[Exact receipts, failed runs, focused cycles and acceptance limits](evidence/2026-10-16-phone-streaming-cycle/README.md).
+
+## 16 October private region-page startup correction — SM-S948B / Android17
+
+Evidence class: **approved exact Debug replacement/pullback, both-backend frozen
+chapter presentation and one Query Home/resume**, not full route or sustained
+streaming acceptance. APK `6db07c3889ccd440f462e9affcc059cfd5784e26bbcc7645fcefd48f28ab1e30`
+is pinned to482ebaff plus source/test hashes. The prior installed ground build
+was identified/backed up once; failed approved candidatec0545439 is retained.
+Its CPU-side `Invalid or unowned source primitive boundary` failure reproduced
+with actual High/Glass Off and Mobile lantern profiles. The source adapter now
+normalizes only referenced index ranges under existing bounds; strict partition
+checks and all active attributes/identities remain intact. Debug/Release2/2,
+four ABI build and lint pass. All169 assets/shaders match the failed candidate.
+
+Raw modelSM-S948B, Android17/API37, Adreno840, Vulkan1.4.295. Saved40% scale,
+Current shadows, Diagnostic/Mobile, internal576×1188 / swapchain1440×2971.
+Both real backends present12 stable frozen landing frames with completed-frame
+identity; inspected RGB images are identical. Frozen Pipeline/Query allocations
+are166,119,424 /166,118,912 device-local bytes and49,445,056 /49,444,544 host-visible
+bytes,21BLAS/1TLAS/28instances. Last GPU samples54.724322/54.184322ms are not
+playable FPS or sustained performance. Query Home/resume advances native surface
+1→3, scene3→5 and measurement6→10 with fresh presentation; unchanged capture
+request generation2 is not used as a resource epoch. Original preferences are
+byte-identical; owned Debug app stopped; release app untouched. No full phone
+out/back, savings/restoration, sustained/thermal, Current/Higher or Lower migration
+pass is inferred. [Failure, fix, exact receipts and inspected gallery](evidence/2026-10-16-mobile-region-source-admission/README.md).
+
+## 13 October 1.7 chapter resume — 42d00817 / SM-S948B
+
+Evidence class: **authorized exact Debug update/pullback, four frozen chapter
+images and two bounded frozen GPU workloads**, not final chapter acceptance.
+APK `24aaf0b5894e57a38804f39875c06fbf34b801dfd0c83997b76c8aea8fa9233e`,
+source `42d00817356b1bdd93b14a0684268152fb2d0795`, unchanged development signer
+and versionCode10. Debug data is preserved; the release app is untouched. Actual
+Pipeline landing/lookout and QueryCompute visible-Kit/lookout images were opened.
+Both frozen lookout runs completed120 warmup+360 measured frames at the original
+40% scale, Mobile/Current: three CPU-window means54.692–54.960ms; final owning
+GPU samples52.763/52.951ms. Resources remain finite/stable, thermal status0.
+This is roughly18FPS for frozen Diagnostic rendering, not motion/route, Shipping
+or sustained mobile-budget acceptance. A prior progress label incorrectly called
+simulation live; saved tick2516/animation41.9162 and the native benchmark branch
+prove freezing. The correction and unchanged raw states are retained.
+Debug stopped and original preferences restored before the phone disconnected.
+The new triangle-ownership APK is prepared, uninstalled; normal-play residency
+saving stays zero. [Exact images, identities, timings and remaining gates](evidence/2026-10-13-triangle-region-candidates/README.md).
+
 ## 9 October 2026: S24 Ultra and S25 Ultra complete the 1.6.2 RT benchmark
 
 **Status: working in the reported 1.6.2 benchmark configuration on both phones.** Evidence class: **owner-supplied complete in-app benchmark text reports, with owner-reported marketing model names**. Both reports were read in full. This is successful field-run evidence, not a local installation/pullback test or complete device certification. Exact Samsung model codes, Android versions and installed APK hashes were not supplied.
@@ -2759,3 +3264,637 @@ Both real hardware RT backends pass short waterfall-equipment and torch-drench s
 Ordinary portrait Entry/Settings/Graphics/details/preview/choices/scrolling/Back at font scale1.7, Controls/Credits/unchecked report-consent routes pass without saving settings, preparing or sending reports. A separate landscape Entry/Settings/Graphics/details/live-preview/Back check runs with system reduced motion active. Real initial loading and Home/re-entry are captured; Home return presents a new portrait surface generation3. Original free rotation/animator scale1 and all app preferences are restored, and the owned app stops. Opposite landscape and BB-51 comfort remain owner-reported on their original exact builds with runtime continuity established; this automated leg does not relabel them as new physical acceptance.
 
 Evidence class: exact local Debug installation, actual RT frame/readback ledger and bounded ordinary native UI/lifecycle observation. No sustained30FPS, thermal/power/memory, controller latency, untested hardware or owner-audio claim follows. Current source is runtime-identical to owner-accepted `ac97da91`; the long sustained programme and precise contact correction are explicitly owner-deferred. [Public receipts, selected actual images, failures and audit limits](ENGINEERING_1_6_2_FINAL_REVIEW_2026_10_09.md).
+
+
+## 9 October WP2 height proof — partial exact-candidate physical attempt
+
+SM-S948B / Android16 API36 / Adreno840, Vulkan1.4.295 driver raw2150932499
+(compilerE031.50.19.18). Source/generated candidate
+`0eb665900c9efc95c443beada4c418776092cbe3`; exact Debug APK and installed
+pullback SHA-256
+`1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c`.
+Read-only inventory identified the existing release; the owner approved adding
+the separate `.debug` package with separate development certificate/data.
+The release APK rehash remains unchanged. No uninstall/downgrade/data clear
+or signature bypass occurred.
+
+Ordinary no-fixture EntryMenu reports actual Pipeline Diagnostic/Mobile
+completed-frame dispatch/copy/successful presentation (serial29), with exact
+fresh catalogue pair hashes. Evidence class: exact installed local Debug bytes
+and native completed/presented-frame diagnostics only. Candidate foreground
+was not safely verified for a phone screenshot; visual acceptance is NOT RUN.
+The bounded pass stopped at Windows foreground/input access before continuous
+vertical traversal, Query, equipment/event-height and lifecycle checks.
+Full vertical DEVICE-VERIFIED remains NO; owner listening/haptics PENDING.
+No sustained performance, matched legacy-route, other backend or other-device
+acceptance follows. [Partial receipt and control blocker](superpowers/plans/2026-10-09-horde-1.7-wp2-physical-acceptance-attempt.md).
+
+
+### 9 October WP2 — owner-operated Android Pipeline ramp proof
+
+Same authorised SM-S948B/Android16 API36 and exact installed Debug APK
+`1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c`,
+source/generated candidate `0eb665900c9efc95c443beada4c418776092cbe3`.
+No reinstall. Existing noncapture vertical-proof-ground launch followed owner
+unlock/foreground response; current-focus and resumed-activity verification
+passed before capture. Pipeline Diagnostic/Mobile genuine completed/presented
+frames and inspected game-only stills are current technical evidence.
+56 selected feedback records transport listener-eye Y0.70 through ramp values
+to1.05. The owner separately reports up/back ramp traversal works, equipment
+remains attached with roof compensation, Swing/Parry are fine, and sound and
+vibration are normal. Immediate height snap at the step/edge, with no gravity,
+is retained as an observed fixture limitation; no source change followed.
+
+Evidence class: exact physical candidate native frame/event evidence plus direct
+owner-operated short portrait manual report. Scoped Android Pipeline check passes
+with the step-snap limitation. Full vertical DEVICE-VERIFIED remains NO: Windows,
+Query, lifecycle/rotation/recovery, all gear/secondary contributors and delayed
+fall/cancellation gates remain pending. Short Swing/Parry listening/haptic report
+does not certify those broader gates. [Manual report and separate evidence classes](superpowers/plans/2026-10-09-horde-1.7-wp2-android-manual-vertical-proof.md).
+
+
+### 9 October WP2 continuation - bounded Android Query presentation
+
+Same authorized SM-S948B / Android16 API36, exact installed Debug APK
+`1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c`,
+source/generated candidate `0eb665900c9efc95c443beada4c418776092cbe3`.
+Read-only package hashing confirms the separate release is unchanged; no reinstall.
+The supported explicit Query live-ground launch is followed by fresh current-focus
+and resumed-activity guards and post-launch native report timestamps. Query
+completion/presentation serial10606 joins true RT dispatch/copy/presentation,
+matching package/catalog Diagnostic/Mobile modules and actual BLAS/TLAS resources.
+
+Evidence class: exact local installed Debug bytes and current native hardware
+Query completed/presented-frame diagnostics only. No input, screenshot, manual
+Query traversal, owner listening or lifecycle acceptance occurred. The existing
+Pipeline owner ramp/attachment/roof and short normal Swing/Parry sound/vibration
+report remains preserved, including instant step-height snap. Windows raised
+static capture fails its arm-pixel gate twice and is stopped for review. Owner
+absence is not acceptance; manual and lifecycle gates need his return. Full
+DEVICE-VERIFIED remains NO. No other device or sustained-performance claim.
+[Continuation report and exact evidence](superpowers/plans/2026-10-09-horde-1.7-wp2-acceptance-continuation.md).
+
+
+### 11 October chapter terrain — ordinary-startup regression and repair
+
+Authorized Samsung SM-S948B / Android 16 / Adreno 840. Owner-approved Debug APK
+`bce773bbe29bc94f4d47f6ca73504830c58993337495cbf6ffc702c2650f516e`
+failed before RT presentation: ordinary atlas ownership did not select its
+legacy rows from the enlarged packaged atlas. Installed/staged bytes matched.
+The separately approved corrected APK
+`eb50a06a1bfab9612f2a40fe87390c7e36567388cf540d16338417ad6944ba0e`
+installed without data clearing, signature changes or release-app modification.
+
+Evidence class: bounded exact-candidate physical Pipeline Diagnostic/Mobile
+startup/presentation plus an inspected foreground game screenshot. Owner reports
+"Game visible". Actual saved render scale 50%, 720x1490 into 1440x2980; settings
+were not lowered for this test. Native ordinary startup and chapter rebuild both
+succeeded, followed by genuine RT presentation. Fresh checkpoint shows 3/3 hearts.
+No automated input. This does not establish QueryCompute, complete chapter
+traversal, sustained performance, lifecycle or audio/haptic acceptance.
+[Failure, correction, hashes and evidence](evidence/2026-10-11-android-atlas-startup/README.md).
+
+
+### 12 October chapter dependency staging — bounded physical clean start
+
+Owner-authorized Samsung SM-S948B / Adreno840 / API1.4.295, raw driver2150932499.
+Exact separate Debug APK `af533134b224344041c4991f7f50fffbd5d4019ce05c7b735f9bc81a2761eb84`
+(183,030,634 bytes) repairs the packaged-versus-filesystem-staged dependency gap.
+This intermediate APK contains the recorded uncommitted staging/owner-API source;
+it is not claimed to be a pristine later commit. Existing development signer,
+versionCode10, app data and release app are preserved.
+
+Evidence class: native Pipeline Diagnostic/Mobile startup, real GPU timestamp
+samples and an opened foreground screenshot. Clean start shows three hearts
+before movement/damage. At unchanged100%/1440x2980, 29 valid bounded GPU samples
+average486.995ms (latest487.176ms): very poor performance, not sustained acceptance.
+The initial `live-start` JSON predates presentation and is not presentation proof.
+The attempted chapter shadow capture did not select the requested checkpoint;
+Java lacked the new names. It is retained as failure, not blamed on GPU cost.
+Original Debug preferences were restored and the game stopped. The owner then
+took the phone; Current/Higher, Lower→Current migration, Query, complete route,
+life-cycle, sustained timing and listening/haptic acceptance remain pending.
+[Exact startup evidence](evidence/2026-10-12-android-world-startup/README.md) and
+[chapter capture correction/new uninstalled APK](evidence/2026-10-12-moving-frame-static-handoff/README.md).
+
+### 12 October — physical chapter capture readiness and shadow tiers
+
+Owner-authorized SM-S948B, same development signer/versionCode10 and separate
+Debug app, release untouched. Original installed bytes were identified once.
+An initial b9d466317151 prototype falsely named a start frame `capture-ready`;
+actual camera/progression admission now rejects that failure. APK
+`0374dd8d4c367ff21bf586a6424e9c2f9733b6a3abecbccff9de2f43c0005a0c`
+then rendered the actual frozen landing at X-33.7/Z-12.8/tick922/3 hearts.
+
+Evidence class: four opened frozen screenshots plus12 stable presented frames
+per case, Current/Higher on both Pipeline and QueryCompute, at original saved40%
+scale/576x1192 into1440x3120. Legacy saved Lower(0) actually rendered Current(1);
+confirmation and saved-value normalization remain physically untested. Last GPU
+samples range54.64–67.91ms, not sustained acceptance. Primary arm counters are0
+in this portrait Low pose, so no held-arm/equipment visual acceptance is claimed.
+Original preferences were restored exactly and Debug stopped after each case.
+The owner has paused the goal and removed the phone; no further action is due.
+
+Final prepared APK `24aaf0b5894e57a38804f39875c06fbf34b801dfd0c83997b76c8aea8fa9233e`
+includes subsequent legacy-exit and inspection-camera corrections and is NOT
+installed/device accepted. Full route, lifecycle, listening/haptics, sustained
+performance and owner acceptance remain open. No other device is certified.
+[Exact artifacts, failed evidence and matched results](evidence/2026-10-12-chapter-capture-readiness/README.md).
+
+### 14 October — physical ground-material candidate, both RT backends
+
+Owner-authorized Samsung **SM-S948B**. Separate Debug APK
+`1a00b34d61ce63423748c5b05434ae1a7744cbb55d196c6be5fa40e82089be6b`
+(183,170,474 bytes), ground checkpoint `e38a08c5d1d9ff098273cfd621bbb9aa721d939d`,
+installed and byte-verified once with the existing development signer/code10;
+app data preserved and release app untouched.
+
+Evidence class: four opened actual foreground screenshots and current stable
+completed/presented native RT identities, landing north/second bend × Pipeline/
+QueryCompute. Original saved40% scale/576x1192 into1440x2980, CURRENT shadows,
+Mobile optical/fire/water and Diagnostic instrumentation. Last owning GPU
+samples are55.919/54.698ms at landing and139.624/166.012ms at the bend
+(Pipeline/Query); these are frozen-view samples, **not sustained FPS or a
+performance acceptance pass**. Device-local live allocations166,076,608/
+166,076,096 bytes and host-visible49,407,552/49,407,040, respectively.
+
+Debug was stopped and original preferences byte-restored before the owner
+removed the phone. No more device work until it returns. Current/Higher and
+saved Lower normalization on this candidate, complete live chapter, lifecycle,
+sustained performance and owner audio/haptic/visual acceptance remain pending.
+[Exact receipt and separate Windows Release baseline](evidence/2026-10-14-release-route-baseline/README.md).
+
+### 18 October - bounded cold checkpoint 207 and ordinary opening review
+
+Owner-authorized Samsung **SM-S948B**, freshly inspected Android **17 / API 37**,
+build `CP2A.260605.016.S948BXXS4BZIG`, Adreno 840, Vulkan 1.4.295 / raw driver
+2150932499. Separate Debug APK from local commit
+`0d6c22d698604d527b85fddb33f6db1fadedf2ed`, SHA-256
+`24e286544a801035a65e1b8f75d7259a27f5792b907d32552bc29882cb5cedfa`
+(183,665,114 bytes), was installed in place after package/code10 and identical
+public development-signer verification; installed bytes matched. Horde was not
+running beforehand. Release app, security settings and owner saves were not
+targeted. No uninstall or data clearing occurred.
+
+Evidence class: two finite cold-start Pipeline Diagnostic/Mobile captures with
+opened foreground screenshots and current fence-owned completed RT frames.
+`chapter-kit-reunion`/207 reaches 12 stable presented frames at tick 1436,
+X -28.7023 / Z -5.8033; the fresh ordinary `opening` control also reaches 12. Both
+show 3/3 hearts, genuine RT-produced swapchain presentation and the saved 40%
+576x1188 dispatch into 1440x2971 swapchain, CURRENT shadows and unchanged quality.
+The historical 207 tick 0 failure did **not recur**; its cause remains unattributed,
+and this result is not a claim that the failure was fixed. Early capability-file
+completed-frame snapshots remain pending; the later showcase states carry the
+actual current completed/presented identities.
+
+Latest individual GPU samples are 187.054318 ms at reunion and 19.715416 ms at
+opening; they are frozen-view Diagnostic observations, not sustained FPS or a
+matched comparison with earlier Shipping workloads. No performance loop ran.
+The 274 `files/`/`shared_prefs/` path inventory and Horde settings bytes are
+unchanged; Android's framework activity-ID preference changed normally on
+launch and was not restored. Debug was stopped after the isolated cases.
+Query, Save/Load, menus/touch, Home/resume, process-death save recovery,
+POSIX/power-loss durability, sustained warm performance and owner visual/audio/
+haptic acceptance remain untested on this candidate. No other device is certified.
+[Exact scope, custody, frame identities and hashes](evidence/2026-10-18-phone-checkpoint-review/README.md).
+
+### 18 October - physical entry Back exit-confirmation acceptance
+
+Owner-authorized **SM-S948B**, Android **17 / API 37**, build
+`CP2A.260605.016.S948BXXS4BZIG`. Exact source checkpoint
+`a447bb731612c45ab494ab63a5ac4a9eac71c810` contains the `ad5857ed` Back fix.
+Separate development-signed Debug APK, code 10 / `1.6.2-debug`, SHA-256
+`6d865599c74828bc15165693e7ea23e31454e2909c7ddd0b66123cf0534809d6`
+(183,787,786 bytes), installed in place and matched by on-device hash.
+
+Evidence class: finite physical entry-menu Back/Stay/cancel/Home/resume/explicit
+Quit/relaunch behavior, verified by Android UI hierarchy and an opened app-only
+dialog screenshot. Stay is focused by default. Stay and Back cancel preserve
+entry PLAY; Home/resume revokes the old dialog; explicit Quit removes the task;
+relaunch returns to a clean entry menu. The terminal test session also exited
+through explicit Quit. No process kill, uninstall or data clearing occurred.
+Horde settings are byte-identical and all 274 `files/`/`shared_prefs/` paths are
+unchanged. No owner-running Horde process was displaced, release app targeted,
+desktop input used or Reef interaction performed.
+
+This receipt does not validate root stepping, crouch/headroom, Save/Load,
+process-death save recovery, platform durability, gameplay, Query or sustained
+performance. The earlier startup/checkpoint receipt remains bound to its older
+APK; no additional startup/performance loop was run. An initial large-APK
+copy/pull preflight was denied before execution by automatic approval review;
+the suggested compact hash-only alternative completed without retrying that
+copy/pull. [Exact sequence, custody, denial and artifact hashes](evidence/2026-10-18-android-back-device/README.md).
+
+### 18 October - ordinary-play crouch and bounded lifecycle pass
+
+Owner-authorized **SM-S948B**, Android **17 / API 37**, build
+`CP2A.260605.016.S948BXXS4BZIG`. Source commit
+`1906a733b8b401672643c7f22d0327a500bdd211`, separate same-signer Debug APK/code 10,
+SHA-256 `b1f266f69adf6b92eda2c18fe7c02aa967cbb626d853ef4dd910ab1394f82211`
+(183,853,322 bytes), installed in place and matched by on-device hash.
+
+Evidence class: finite ordinary entry PLAY -> native Crouch/Stand HUD acceptance
+with four opened actual app-only screenshots, pause/resume and Android Home/
+resume stance-request release. The view visibly lowers/restores while torch and
+hands remain present. First loading and resumed-surface pending samples were
+retained before one bounded readiness check each. Native RT presentation is
+logged for opening and resumed generation 3, at saved 40%/576x1188 into 1440x2971.
+Terminal explicit Quit removes the test activity/task; settings are byte-identical,
+all 274 `files/`/`shared_prefs/` paths unchanged, and scoped logs have no fatal crash.
+Release, owner saves, security settings, desktop and Reef were not targeted.
+
+Full-body mesh, physical root walking/low-ceiling blocking, numeric 0.6 m eye drop,
+controller/gesture/font/orientation matrix, sustained performance, audio/haptics
+and comfort remain unaccepted. This does not establish Save/Load, process-death
+recovery or platform/power-loss durability. No extra forest or performance trial
+ran, and no redundant APK copy/pull occurred.
+[Exact sequence, limits, screenshots and custody hashes](evidence/2026-10-18-android-crouch-device/README.md).
+
+### 18 October - isolated persistence review, upper return blocked
+
+Owner-authorized **SM-S948B**, Android **17 / API 37**, build
+`CP2A.260605.016.S948BXXS4BZIG`. Source commit
+`7d89445030727a9099524c3728c190dfd636e51b`, same-signer Debug code 10 APK,
+SHA-256 `ca08919a8c63aac269b4fc68a02bde706131a25a92d8765acd550297841918a9`
+(183,957,866 bytes), installed compatibly in place and matched by device hash.
+
+Evidence class: six tiny **seeded persistence fixtures**, actual UI and opened
+phone screenshots, native rebase/presentation transitions. Isolated namespace
+`sl-20261018-r1-8b14` only. Lower manual load/Resume shows 1/3 hearts and the rope
+anchor; Keep records cancellation preserves all six hashes. Confirmed manual
+replacement in Slot 2 reports `FileAndDirectoryFlushed` and becomes byte-identical
+to the lower fixture; other five records remain unchanged. Upper autosave loads
+and presents with 3/3 hearts, but disabled Preparing rescue route persists before/
+after same-generation Home/resume and one bounded final check. Upper descent is
+**blocked**, not accepted; the fresh-process reload was not run after this failure.
+This is not a completed Save/Load or normal chapter-completion certification.
+
+Terminal explicit Quit leaves zero Horde activities. The 274 original paths and
+Horde settings bytes are preserved; seven added files are confined to the test
+namespace. Owner `campaign-v1` remains absent. No uninstall, clearing, deletion,
+settings rollback, process kill, Release/desktop/Reef action or APK copy/pull
+occurred. Earlier wrong-camera and corrected opening-only APK observations are
+retained separately in the receipt. No sustained performance, full traversal,
+power-loss durability or audio/haptic acceptance is claimed.
+[Exact blocked receipt, prior attempts, hashes and remaining gates](evidence/2026-10-18-android-campaign-device/README.md).
+
+### 18 October - upper-return readiness and fresh-process persistence follow-up
+
+Owner-authorized **SM-S948B**, Android **17 / API 37**, build
+`CP2A.260605.016.S948BXXS4BZIG`. Source commit
+`6d4033d3058efdf4ccacf73923615fc65ce1972a`, same-signer Debug code 10 APK,
+SHA-256 `5eb3282a6f5551df5db24067b7854fa340c4d4e14a35c8415ae0928df0269128`
+(183,957,818 bytes), installed compatibly in place and matched by device hash.
+
+Evidence class: bounded **seeded persistence fixture** follow-up using only the
+existing test namespace. Upper autosave loads with 3/3 hearts and real RT
+presentation; explicit Resume exposes enabled Descend rescue rope. One tap
+produces the actual Traversing rescue rope state. Immediate pause and explicit
+Quit stop before landing; no record changes. After only the known cached test
+process is terminated with `am kill`, a proven different PID reloads the earlier
+actual Slot 2 manual save: native completion, 1/3 hearts, lower rope/lantern view,
+enabled Climb rescue rope and normal HUD, no retained traversal. Terminal explicit
+Quit leaves zero Horde activities, unchanged settings, unchanged 281-path
+inventory and all six test-record hashes; owner `campaign-v1` remains absent.
+
+The earlier blocked candidate remains a failed dated result. This follow-up
+accepts descent admission and fresh-process save recovery only, not full descent,
+normal chapter completion/autosaves, active-IO interruption, power-loss durability,
+full controls/route/art/audio/haptic acceptance or sustained performance. No app
+data clearing, save deletion, owner process termination, settings rollback,
+Release/desktop/Reef action or APK copy/pull occurred.
+[Exact artifact, finite sequence, process identities and custody](evidence/2026-10-18-android-campaign-readiness-followup/README.md).
+
+### 18 October - earned-save failure and first-create repair
+
+Owner-authorized **SM-S948B**, Android **17 / API 37**, same device build
+`CP2A.260605.016.S948BXXS4BZIG`. Same-signer Debug code 10 APK
+`e9ce289a8a527083aa1d6d2ca2976da5ba439768f8cc933b3a34e20f153701c8`
+reached the opening, crouch passage, guards, Keeper victory and actual lantern
+claim through ordinary touch input with damage enabled and 3/3 hearts. Evidence
+class: **physical earned progression followed by failed persistence**. Both first
+Slot 1 autosave and empty Slot 2 manual creation failed; no records were created.
+The earlier seeded replacement/reload passes did not cover this first-create path.
+The settings hash, all 281 prior paths and six prior test records were preserved.
+Two locks were added only in the new earned-test namespace. The failed result
+remains [separately recorded](evidence/2026-10-18-android-earned-recovery/README.md).
+
+A separate **seeded storage diagnostic**, APK
+`00f196f24eb07cc4eacf4e096f05496912b069f79505f98350812ada657a42b1`,
+identified create-only `linkat` publication returning `EACCES (13)`, unchanged
+publication and no durability. This identifies the failing operation; no specific
+SELinux policy is inferred. Android now uses atomic no-replace `renameat2` via
+the kernel syscall, retaining minSdk 24, real errors and no unsafe fallback.
+The repaired four-ABI Debug APK
+`4c84eb456f97717df055245410196101ea681a3bc55d0c9776eb42a59d591073`
+matches its installed hash and creates the previously empty Slot 2 manual record
+with `FileAndDirectoryFlushed`, preserving the source and active Slot 1. Evidence
+class: **bounded physical first-create repair using an isolated seeded fixture**;
+after verified termination of only the cached test process, a fresh PID reloads
+that newly created Slot 2 record, explicitly Resumes alive with one heart/current
+RT/enabled Climb, then Quits to zero activities. All 281 prior paths, six prior
+test records and settings remain unchanged; five added files stay within the two
+test namespaces, and owner saves remain absent. This accepts bounded creation and
+fresh-process recovery only;
+this does not retroactively pass the earned candidate or establish earned auto,
+death Load, whole-route, interruption/power-loss, audio or sustained performance.
+[Exact diagnostic and repair receipt](evidence/2026-10-18-android-create-publication/README.md).
+
+### 22 October - live outdoor scaling and separate caption candidate
+
+SM-S948B / Android17 API37 / Adreno840. Development-signed arm64 Debug APK
+`712f070996124014832b9cf6bf4941e7fbac2d448fabfac926297be8d9d942a2`
+uses the real RayTracingPipeline with Shipping/Mobile shaders. Evidence class:
+**bounded physical, staged, stationary live-simulation performance comparison**,
+not natural traversal, listening or prolonged sustained acceptance. Matched
+33/20/33/40/33 holds retain exact internal/output extents, transforms, tuple,
+completed-frame ownership and joined actual image presentation intervals.
+Initial33 controls measure35.49–35.51ms GPU;20 measures16.08ms but remains
+visually unadmitted;40 measures48.20ms. Closing33 rises to43.93ms despite the
+starting thermal gate; this unresolved drift remains reported. Source repair
+drains diagnostic exterior events, retaining the original overflow rejection.
+[Exact receipt and limitations](evidence/2026-10-22-outdoor-scale/README.md).
+
+Separate final UI APK
+`fe3a51beb3a2d6385232dcccfdf8315785e969825e8a35a7de65be8894f46925`
+builds and matches the installed update. Cold diagnostic checkpoint207 fails
+terrain admission before corrected captions/icons can be inspected. Final UI
+portrait/landscape acceptance stays pending; this does not establish a natural
+gameplay or hardware incompatibility. Earlier712f warm207 has one complete real
+Kit question at100% Auto/font1.7 but still shows residual layout issues.
+[UI failure and custody](evidence/2026-10-22-caption-ui/README.md).
+
+Phone released19:44 UTC, launcher foreground/no Horde surface, all operations
+complete. All18 pre-existing save/lock hashes and settings bytes match; zero
+new save paths. Original rotation/font and production APK preserved. Neither
+phone evidence class certifies a signed Release package or another device.
+
+### 20 October - corrected graphics APK lifecycle and preview follow-up
+
+SM-S948B / Android 17 API 37, same installed Debug APK SHA-256
+`c5a11bb287327900327b2266c313f53d4a77ad02d2b94d5787ef81cb23269707`.
+Evidence class: bounded noncombat native UI/settings lifecycle checks. Fresh
+Home-during-Apply recovery, preview live compare/single Apply, Details/Image/
+Restore/Controls/Back and portrait/landscape UI reflow were observed on this exact
+artifact. The owner's new explicit Mist Off request was saved after a matching
+hardware RT presentation; other preference values and all 12 campaign files/locks
+are preserved. Rotation policy/font/density restored; test-started Debug stopped.
+Controller hardware was absent; renderer orientation/aspect, fault injection,
+combat and sustained performance remain unaccepted. Read-only UI idle failures
+and retained pre-preview draft behavior are preserved in the
+[follow-up receipt](evidence/2026-10-20-graphics-followup/README.md).
+
+### 23 October - finer skin phases, rejected thermal comparison and forest listening
+
+Owner-offered **SM-S948B**, Android **17 / API37**, Adreno840, real
+RayTracingPipeline/Shipping/Mobile. Evidence class: **bounded staged live control
+performance and separate owner subjective listening**, not candidate gain,
+natural traversal, signed release or other-device certification. Arm64 pure
+control APK `778b1692563473a19d717b24bef6a94c90a5a4a4bd4fea5dbd9aa22343458a06`
+and current normal-cache candidate
+`c1d657491ef072c99a405f0f8ca5264860834057742fc214c820f53fef3fbf09`
+match in every ZIP entry except the intended native library. Exact installed
+hashes are verified; version remains1.6.2-debug/code10 at bceed0c1 source.
+
+Landscape20/33/40% control GPU medians are17.8562/39.6475/61.7734ms, with
+944/539/390 post-warm completed frames. Appended counters separate player pose,
+world/viewmodel vertices, Kit clip/vertices/copies and CPU BLAS/TLAS recording.
+At33%, skin median11.7278ms includes Kit vertices4.6984ms, player world4.5489ms
+and viewmodel1.5818ms. These elapsed subsets are not CPU utilization; GPU/wait
+intervals overlap. Differing starting temperatures reject a common-temperature
+scaling claim. Candidate starts fail thermal matching; final attempted warm
+reference records framework/skin status1 at skin40.3C and stops before sampling.
+No Android speedup is admitted.20% remains visually unadmitted. The initial
+stale-artifact selection and lifecycle observer timeout are preserved separately.
+
+Sam reports the new forest track sounds good in the current control session.
+This accepts that subjective track/session only; Kit balance, ducking/section
+transitions, every loop seam and other endpoints remain open. Subtitle/touch,
+auto-crouch feel and earned recovery were not accepted by these timed holds.
+
+Phone released **05:24:29UTC23October**: starting development fe3a51be and
+production cc4de768 APK hashes restored, all18 prior save/lock files and
+preferences byte-identical, zero new save paths, original rotation/font restored,
+launcher foreground, no Horde PID/surface, no owned helper/transfer remaining.
+No app-data clear/uninstall, release, merge or deployment occurred.
+[Exact receipt, failures, analysis and remaining gates](evidence/2026-10-23-phone-skin/README.md).
+
+### 23 October 2026: current normal-cache source, bounded control and trace blocker
+
+SM-S948B Android17/API37, bceed0c1 runtime APK c1d65749: one33% RT Pipeline
+Shipping/Mobile stationary lookout control admitted620 post-warm completed
+frames. GPU median35.839ms/p9536.690ms; skin elapsed7.990ms; whole frame47.841ms;
+measured image presentation interval median50.000ms. This is current cached
+source, not a matched gain over the earlier reverted-cache build. No sustained,
+CPU-utilization, natural journey or subjective acceptance follows.
+
+The matched trace start failed thermal admission; the config-file attempt then
+received Android errno13 reading its `/data/local/tmp/` config before any trace
+session started. No alternate access route was attempted. No scheduling/per-core
+profile or detailed GPU-stage result was captured. All failures retained.
+
+Phone released06:20:55UTC: both starting APK hashes,18 prior save/lock files,
+settings, rotation and font verified; zero new save paths; no owned renderer,
+trace, installation or transfer. [Exact receipt and scope](evidence/2026-10-23-current-cache-phone/README.md).
+
+### 23 October 2026: authorized stdin scheduling retry
+
+SM-S948B Android17/API37, unchanged bceed0c1 runtime APK c1d65749: one approved
+50-second Perfetto stdin retry collected scheduling/frequency events around the
+same33% hold. A recovered CRLF-normalized derivative has complete packet/state
+coverage and no reported loss counters; raw transport and its caveat are retained.
+In the clock-aligned30-second sample the native render owner is on-core8.226s,
+runnable0.089s and sleeping/D21.685s. This is a qualitative event profile, not
+complete CPU/GPU-stage or sustained-performance acceptance.
+
+Opening/traced holds retain620/543 valid frames, GPU medians35.859/39.598ms and
+frame cycles47.780/55.737ms. Closing start rejects before sampling: AP/BAT/SKIN
+deltas1.8/2.3/1.7C exceed1.5C, all thermal statuses0. Warm timing remains useful;
+tracing/context prevent causal attribution. No gain or thermal-only explanation.
+Player-copy APK was not installed. No denied config read, permissions change or
+extra retry. Released07:04:48UTC with both original APKs,18 save/lock files,
+preferences and rotation/font verified; no active renderer/trace/transfer.
+[Recovered profile and exact custody](evidence/2026-10-23-phone-scheduling/README.md).
+
+### 23 October 2026: staged lantern continuity and touch-placement baseline
+
+**SM-S948B, Android17/API37**, owner font1.7, effective560 dpi. Evidence class:
+bounded actual RT staged-equipment lifecycle and native Android HUD captures,
+not natural earned progression, performance or owner comfort acceptance.
+Source b08aef65, ordinary default-ABI Debug APK194,755,843 bytes, SHA-256
+`2b745081d334a7f9e6ab59c3c092bccf3aa9989ce3eae2fbc876b78ab3ba1f31`.
+Fixture116 was staged once; foreground rotation and Home/full-surface-rebind
+returns in both orientations retained native claimed light/pose and restored the
+Java control through its ordinary poll. No restaging between those checks.
+The earlier disappearance remains retained and unreproduced, not declared fixed.
+
+Actual portrait/landscape images exposed poor placement and inconsistent prior
+inset anchoring. The subsequent compact-layout APK
+`3c19e74b1e34369e3208068e4c9dc19337d3d4298d0ef2365a09ed0314a4ded3`
+has host unit/build/lint evidence only: the phone disconnected before its first
+snapshot, so it was not installed and has no physical after/rotation acceptance.
+The [layout receipt and actual before bounds](evidence/2026-10-23-compact-hud/README.md)
+separate these evidence classes.
+
+Baseline phone released10:15:24UTC: both original installed APK hashes, all18
+prior save/lock files, preference bytes and rotation/settings verified restored;
+no app PID, Horde surface, owned capture/install/transfer remained. The later
+disconnected attempt started no phone mutation or renderer.
+
+### 23 October 2026: compact HUD physical after check
+
+SM-S948B Android17/API37, owner font1.7/effective560dpi. Exact already-built
+compact-HUD Debug APK `3c19e74b1e34369e3208068e4c9dc19337d3d4298d0ef2365a09ed0314a4ded3`
+was temporarily installed in the owner-authorized short window. Bounded actual
+RT equipment-fixture/HUD evidence: portrait Lower, Home/landscape full-surface
+rebind in the same process without restaging, retained lowered pose and returned
+control, landscape Raise, and one held/released look gesture pass. Actual
+portrait/landscape captures show the compact lower-right dock. This supersedes
+the prior compact-APK disconnected validation gap for these specific checks.
+It does not establish a natural earned journey, original disappearance cause,
+all lifecycle paths, performance or owner thumb acceptance. Sam requests revised
+Swing/Parry prominence after comparative mobile-game research; no redesign yet.
+[Exact captures, scope and receipt](evidence/2026-10-23-compact-hud-phone/README.md).
+
+Released19:27:12UTC: both original APK hashes,18 prior save/lock files, preference
+bytes and original system settings verified restored; zero new save paths; no
+owned app renderer, installation, capture or transfer. No phone calls afterwards.
+
+
+### 25 October 2026: current combat HUD and handled rotation
+
+SM-S948B Android17/API37; ordinary Diagnostic/Mobile Debug build from
+`9d799fd1`, APK `82cbfad2c2374127455edbb45d4554991515a2acad00c4f037596a7b22a9a625`.
+Bounded actual RT equipment-fixture/HUD evidence: new sword/shield controls
+visible in portrait and landscape; enabled lantern retained through handled
+portrait→landscape→portrait, with one observed Lower tap and lowered pose/label
+retained on return. Same surfaceGeneration1; not full surface recreation or
+naturally earned progression. No combat/look inputs or multi-touch were issued.
+Thumb feel, simultaneous input, Kit route/save and performance remain untested.
+[Captures, exact build and limitations](evidence/2026-10-25-combat-hud-phone/README.md).
+
+Phone released04:07:35UTC: both original APK hashes,18prior save/lock files,
+preference bytes and system settings verified restored; zero new save paths,
+no owned app PID/rendering surface/install/capture/transfer. Development paused;
+no subsequent phone operations. Existing compatibility/evidence classes remain.
+
+### 25 October 2026: first held-guard attempt — not accepted
+
+SM-S948B Android17/API37, source6c5e2fb9 ordinary Debug APK
+`a2c9602d4d01627fd655b3a3b57029e30197a04e2dfc96c1fe34935867c98f9e`.
+Normal isolated entry used no imported checkpoint/progression flags. An observed
+Swing press drew the sword; one stationary2.5second shield hold/release visibly
+pressed the control but did not establish the raised held pose. This is retained
+as unverified physical evidence, not guard/damage/feel/performance acceptance.
+[Exact captures and scope](evidence/2026-10-25-held-guard/README.md#first-physical-guard-attempt--held-pose-not-accepted).
+
+Independent shared tests then reproduced a timestamped catch-up defect and the
+69e46426 correction; that is not a retrospectively proven cause of these images.
+Corrected APK needs a new allocated device slot. Phone released06:45:57UTC with
+both original APKs,18save/lock files, preferences and system settings restored,
+zero new save paths and no owned renderer/transfer. No device calls after release.
+
+### 25 October 2026: corrected guard APK — setup only, guard still unverified
+
+SM-S948B, Android 17/API 37; source `69e46426`, ordinary Diagnostic Debug APK
+`1444b50824ee23ea0099559365a58d5bd304b2e27ddf58c6a3714f8725043a8d`.
+The allocated retest installed the compatible build and observed normal isolated
+gameplay readiness, but startup-observation and receipt-name errors exhausted
+the action margin before any Swing/guard input. No physical guard, damage,
+multi-touch or performance pass is claimed. The independent exact-head hosted
+CI completed all six jobs successfully.
+
+Phone released **07:28:34 UTC**: both original installed APK hashes, all 18 prior
+save/lock files, preference bytes and system settings verified restored, zero
+added save paths and no owned renderer/transfer. Setup failures are retained;
+the next attempt requires an offline preflight and a new allocated device slot.
+
+### 25 October 2026: 6dbc43fd physical guard pose, partial acceptance
+
+SM-S948B; exact source `6dbc43fd3f1359ba5b2abc8fc99eb5f47b94bff3`, Debug package
+`com.samfa12.hordelanternrt.debug`, versionCode10 / versionName1.6.2-debug. APK
+SHA256 `e1b4ff57fd61f38e1be92bf388e181db5a23642c40ea43fc5c606df59a820ee2`;
+arm64 native library `61943ba8d7c2f32dbfe5fab9f797033ba39b27a95087a3c123e519cca484eedd`.
+This is normal isolated New Game entry and physical RT screenshot evidence,
+not Shipping performance, hardware-family certification or a full gameplay pass.
+
+Observed PLAY and an empty isolated slot led to normal ready gameplay, one sword
+draw, touch-held guard and release. Full-resolution images show the raised
+hand/sword and return to rest; the same-anchor portrait pause icon is present.
+The mixed keyboard/touch held-return trial remains unadmitted: saved key-up events
+precede Swing, so its intended continuous hold was not established. This does
+not demonstrate a production held-return defect. True two-finger guard/attack,
+landscape/pause interaction, damage/balance and natural earned progression remain
+open. No thermal or performance comparison was performed. Flask/shared64 and the
+heavier Keeper candidate remain disabled; owner preferences are unchanged.
+
+The preceding old-selector attempt is retained as a setup failure, not erased.
+At09:29:31.855UTC both original APK hashes,18 save/lock files, preferences and
+system settings were verified restored, with no added save paths or owned
+renderer/transfer. Candidate was not retained. Horde released the phone to Spin.
+See [exact receipt](evidence/2026-10-25-held-guard/phone-6dbc43fd-receipt.json).
+
+### 25 October 2026: frozen f27982cd installed for owner input acceptance
+
+SM-S948B; frozen source `f27982cd1b03a2cab9dc822d39b8ea038c721d9e`, Debug package
+`com.samfa12.hordelanternrt.debug`, code 10 / 1.6.2-debug. Installed APK SHA-256
+`53af984fe8ce7fe275e2ea523c9fe7e2ccc7c433997c6ff708635f1cafa8224e`.
+All six exact-source CI jobs passed in run 40183128749. This is compatible
+installation and normal title-screen RT presentation evidence, not completed
+guard, save-screen, audio, progression or performance acceptance.
+
+The first start command used an unsupported option and did not launch the app.
+The verified recovery update restored the original APK and unchanged owner data.
+One corrected attempt used the phone's supported Intent flags. At
+**10:15:35.146 UTC** the exact candidate hash and normal RT title presentation
+were verified; all 18 prior save/lock files, preference bytes and system settings
+were unchanged, as was the separate release package. No gameplay input or save
+slot selection was automated. No test-namespace/fixture extras were passed.
+
+The candidate is deliberately retained and open for Sam's real two-finger check.
+Automation has ended; the running title is intentional. Owner acceptance still
+requires hold Shield, tap Sword with another finger, keep holding through recovery,
+then release in both orientations. No further device calls follow the handover.
+Private custody receipts remain under ignored
+`reports/guard-phone-f27982cd-owner-r1/` and `-r2/`; no private save/settings bytes
+are published. The frozen APK remains separate from later source work.
+
+### 25 October 2026: owner guard feedback and private recording review
+
+On the retained SM-S948B `f27982cd` APK identified above, Sam reports that the
+held block animation and attacking while held, followed by return to block,
+look good. This is owner-observed acceptance of those transitions in that
+session. It does not establish both-orientation coverage, mitigation arithmetic,
+red-attack handling, combat balance or the full journey/save/death acceptance.
+
+Sam also reports that the second skeleton stopped after the first died, that
+neither damaged him, and that the yellow parry prompt needs a stronger visual
+warning. The authorised private recording was copied locally, verified against
+the original hash and reviewed for gameplay only. It shows full hearts, a dark
+encounter and a largely text-led yellow warning; it cannot establish the exact
+teaching stage or authoritative hit/token state. No listening or performance
+claim is made, and neither the video nor unrelated phone content is published.
+
+The original recording remains on the phone. Retrieval used no gameplay input,
+installation or save/settings writes. Device access was released at
+**10:37:25.915 UTC**, with the same frozen candidate retained for Sam. No owned
+transfer or automated interaction remains. Subsequent startup, encounter and
+warning investigations are offline; the phone is free to disconnect.
+
+### 26 October 2026: startup acceptance preflight, no app changes
+
+An authorized read-only connection/custody check identified the connected
+**SM-S948B**. The phone was awake and unlocked with its launcher foreground,
+while `com.samfa12.hordelanternrt.debug` already had a background process.
+No safe stopped-app baseline was available for the prepared startup candidate
+update/restart. The owner was asleep, so the existing process and any unsaved
+progress were left untouched; no button press was requested.
+
+This is **connection/custody preflight only**, not RT presentation, installed
+build verification, startup Load/Resume/Cancel acceptance or performance
+evidence. The current installed APK hash/version was not queried; do not attach
+the earlier f27982cd identity to this observation. No APK installation, launch,
+force-stop, input, capture, save/settings write or forwarding was performed.
+The sandboxed ADB client initially could not connect to its daemon; the normal
+host-access read-only check succeeded. No security setting changed. Device
+access was released after preflight, with no owned device operation remaining.

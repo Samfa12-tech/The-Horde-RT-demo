@@ -1,0 +1,44 @@
+Extensions: writing cache failed ([Errno 30] Read-only file system: '/home/agent/.config/blender').
+ERROR Draco mesh compression is not available because library could not be found at /usr/bin/4.3/python/lib/python3.13/site-packages/libextern_draco.so
+21:48:04 | INFO: Starting glTF 2.0 export
+21:48:04 | INFO: Extracting primitive: femur_master_lod0
+21:48:04 | INFO: Primitives created: 1
+21:48:04 | INFO: Finished glTF 2.0 export in 0.007527351379394531 s
+
+21:48:04 | INFO: Starting glTF 2.0 export
+21:48:04 | INFO: Extracting primitive: humerus_master_lod0
+21:48:04 | INFO: Primitives created: 1
+21:48:04 | INFO: Finished glTF 2.0 export in 0.006479501724243164 s
+
+21:48:04 | INFO: Starting glTF 2.0 export
+21:48:04 | INFO: Extracting primitive: skull_jaw_master_lod0
+21:48:04 | INFO: Primitives created: 1
+21:48:04 | INFO: Finished glTF 2.0 export in 0.009258508682250977 s
+
+21:48:04 | INFO: Starting glTF 2.0 export
+21:48:04 | INFO: Extracting primitive: femur_cage_lod1
+21:48:04 | INFO: Primitives created: 1
+21:48:04 | INFO: Finished glTF 2.0 export in 0.005176544189453125 s
+
+21:48:04 | INFO: Starting glTF 2.0 export
+21:48:04 | INFO: Extracting primitive: humerus_cage_lod1
+21:48:04 | INFO: Primitives created: 1
+21:48:04 | INFO: Finished glTF 2.0 export in 0.005101919174194336 s
+
+21:48:04 | INFO: Starting glTF 2.0 export
+21:48:04 | INFO: Extracting primitive: skull_jaw_cage_lod1
+21:48:04 | INFO: Primitives created: 1
+21:48:04 | INFO: Finished glTF 2.0 export in 0.00639653205871582 s
+
+21:48:04 | INFO: Starting glTF 2.0 export
+21:48:04 | INFO: Extracting primitive: manny_skeletal_core_static
+21:48:04 | INFO: Primitives created: 1
+21:48:04 | INFO: Finished glTF 2.0 export in 0.018718957901000977 s
+
+Info: No new files have been packed
+Info: Saved "horde_skeletal_source_kit.blend"
+BUILD_MANIFEST {"format_version": 1, "asset": "Horde skeletal source kit", "status": "Static source candidate; not canonical game-dev certification or native-engine admission", "source_sha256": "0ba13c9f0c2af50aafb317f450a92083f7d08ece67c3ecc9a2c64eac13257926", "source_to_metres_scale": 0.045849185918292054, "target_skeleton_height_m": 1.72, "coordinate_contract": {"blender": "right handed, +Z up, -Y front", "gltf": "right handed, +Y up, +Z front (standard Blender exporter conversion)", "asset_transforms": "exported individual meshes have identity local transforms; metric geometry baked"}, "material": {"name": "Horde_AgedBone_Matte_v1", "baseColorFactor_linear": [0.46, 0.395, 0.29, 1], "metallicFactor": 0, "roughnessFactor": 0.84, "textures": 0, "reason": "Uniform matte warm bone is sufficient for this restrained source kit, shares one material and avoids texture/mip residency; cavities are real geometry. No faux AO/dirt lighting."}, "selection": {"femur": {"source_mesh": "BONES_LEG.L", "source_vertex_group": "FEMUR.L", "source_vertex_indices": [552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 593, 594, 595, 596, 597, 598, 599, 600, 601], "source_cage_vertices": 50, "source_cage_triangles": 96, "operation": "One Catmull-Clark level; bounds restored to source cage dimensions"}, "humerus": {"source_mesh": "BONES_ARM.L", "source_vertex_group": "HUMERUS.L", "source_vertex_indices": [730, 731, 732, 733, 734, 735, 736, 737, 738, 739, 740, 741, 742, 743, 744, 745, 746, 747, 748, 749, 750, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 762, 763, 764, 765, 766, 767, 768, 769], "source_cage_vertices": 40, "source_cage_triangles": 76, "operation": "One Catmull-Clark level; bounds restored to source cage dimensions"}, "skull_jaw": {"source_mesh": "BONES_HEAD", "source_cage_vertices": 1309, "source_cage_triangles": 2466, "smoothed_shell_island_vertex_counts": [386, 119], "untouched_tooth_islands": 32, "operation": "One Catmull-Clark level on cranium and jaw only; 32 tooth islands kept at base topology"}}, "assets": {"femur": {"vertices": 200, "triangles": 396, "polygons": 198, "materials": 1, "bounds_min_m": [-0.0528666228055954, -0.05150921642780304, 0.0], "bounds_max_m": [0.0528666228055954, 0.05150921642780304, 0.4639294147491455], "dimensions_m": [0.1057332456111908, 0.10301843285560608, 0.4639294147491455], "boundary_edges": 0, "non_manifold_edges_including_boundary": 0, "zero_area_faces": 0, "signed_volume_m3": 0.000766007907378944, "mesh_objects": 1, "armatures": 0, "actions": 0, "textures": 0}, "humerus": {"vertices": 154, "triangles": 304, "polygons": 152, "materials": 1, "bounds_min_m": [-0.038072578608989716, -0.02227909117937088, 0.0], "bounds_max_m": [0.038072578608989716, 0.02227909117937088, 0.3130432665348053], "dimensions_m": [0.07614515721797943, 0.04455818235874176, 0.3130432665348053], "boundary_edges": 0, "non_manifold_edges_including_boundary": 0, "zero_area_faces": 0, "signed_volume_m3": 0.0002598049712413644, "mesh_objects": 1, "armatures": 0, "actions": 0, "textures": 0}, "skull_jaw": {"vertices": 2875, "triangles": 5564, "polygons": 2782, "materials": 1, "bounds_min_m": [-0.0736747607588768, -0.0993751585483551, 0.0], "bounds_max_m": [0.0736747682094574, 0.09789307415485382, 0.2082327902317047], "dimensions_m": [0.1473495289683342, 0.19726823270320892, 0.2082327902317047], "boundary_edges": 68, "non_manifold_edges_including_boundary": 68, "zero_area_faces": 0, "signed_volume_m3": 0.0023585972739726246, "mesh_objects": 1, "armatures": 0, "actions": 0, "textures": 0}}, "source_cage_lod_candidates": {"femur": {"vertices": 50, "triangles": 96, "polygons": 51, "materials": 1, "bounds_min_m": [-0.0528666228055954, -0.05150921642780304, 0.0], "bounds_max_m": [0.0528666228055954, 0.05150921642780304, 0.4639294147491455], "dimensions_m": [0.1057332456111908, 0.10301843285560608, 0.4639294147491455], "boundary_edges": 0, "non_manifold_edges_including_boundary": 0, "zero_area_faces": 0, "signed_volume_m3": 0.0007209237174330131, "mesh_objects": 1, "armatures": 0, "actions": 0, "textures": 0}, "humerus": {"vertices": 40, "triangles": 76, "polygons": 38, "materials": 1, "bounds_min_m": [-0.038072578608989716, -0.02227909117937088, 0.0], "bounds_max_m": [0.038072578608989716, 0.02227909117937088, 0.3130432665348053], "dimensions_m": [0.07614515721797943, 0.04455818235874176, 0.3130432665348053], "boundary_edges": 0, "non_manifold_edges_including_boundary": 0, "zero_area_faces": 0, "signed_volume_m3": 0.00025766954752714475, "mesh_objects": 1, "armatures": 0, "actions": 0, "textures": 0}, "skull_jaw": {"vertices": 1309, "triangles": 2466, "polygons": 1268, "materials": 1, "bounds_min_m": [-0.07985502481460571, -0.10296313464641571, 0.0], "bounds_max_m": [0.07985502481460571, 0.10296313464641571, 0.2149118185043335], "dimensions_m": [0.15971004962921143, 0.20592626929283142, 0.2149118185043335], "boundary_edges": 34, "non_manifold_edges_including_boundary": 34, "zero_area_faces": 0, "signed_volume_m3": 0.0025334272220895824, "mesh_objects": 1, "armatures": 0, "actions": 0, "textures": 0}}, "static_core": {"vertices": 8128, "triangles": 15585, "polygons": 8918, "materials": 1, "bounds_min_m": [-0.38615337014198303, -0.12753455340862274, 0.0], "bounds_max_m": [0.38615337014198303, 0.12753455340862274, 1.7200000286102295], "dimensions_m": [0.7723067402839661, 0.2550691068172455, 1.7200000286102295], "boundary_edges": 76, "non_manifold_edges_including_boundary": 111, "zero_area_faces": 0, "signed_volume_m3": 0.011276839431206463, "mesh_objects": 1, "armatures": 0, "actions": 0, "textures": 0}, "source_rig": {"bone_count": 237, "actions": 0, "preserved_in": "source/fgc_skeleton.original.blend", "exported": false}, "smoothing_policy": "Sparse one-level subdivision for three prop masters only. Teeth remain base; whole-skeleton candidate remains 15585 base triangles. Cages offered for later screen-space LOD assessment, no game LOD thresholds asserted.", "gaps": ["Native Horde importer and material compatibility", "Android and Windows RT measurements", "Collision/clearance and actual niche fit", "Owner visual acceptance", "Core retopology/rig adaptation/animation; no runtime skeleton supplied", "LOD thresholds and silhouette validation at gameplay distances"]}
+Blender 4.3.2
+Read blend: "/source-workspace/horde-skeletal-source-kit-v1/source/fgc_skeleton.original.blend"
+
+Blender quit

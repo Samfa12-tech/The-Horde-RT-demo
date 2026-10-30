@@ -1,0 +1,20 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  DesktopControllerInputTests.cpp
+<repo>\tests\DesktopControllerInputTests.cpp(601,23): error C2374: 'overlayStateBegin': redefinition; multiple initialization [<repo>\build\presets\windows-x64-release\horde_rt_desktop_controller_input_tests.vcxproj]
+      <repo>\tests\DesktopControllerInputTests.cpp(503,23):
+      see declaration of 'overlayStateBegin'
+
+<repo>\tests\DesktopControllerInputTests.cpp(601,23): error C2086: 'const size_t overlayStateBegin': redefinition [<repo>\build\presets\windows-x64-release\horde_rt_desktop_controller_input_tests.vcxproj]
+      <repo>\tests\DesktopControllerInputTests.cpp(503,23):
+      see declaration of 'overlayStateBegin'
+
+<repo>\tests\DesktopControllerInputTests.cpp(602,23): error C2374: 'overlayStateEnd': redefinition; multiple initialization [<repo>\build\presets\windows-x64-release\horde_rt_desktop_controller_input_tests.vcxproj]
+      <repo>\tests\DesktopControllerInputTests.cpp(504,23):
+      see declaration of 'overlayStateEnd'
+
+<repo>\tests\DesktopControllerInputTests.cpp(602,23): error C2086: 'const size_t overlayStateEnd': redefinition [<repo>\build\presets\windows-x64-release\horde_rt_desktop_controller_input_tests.vcxproj]
+      <repo>\tests\DesktopControllerInputTests.cpp(504,23):
+      see declaration of 'overlayStateEnd'

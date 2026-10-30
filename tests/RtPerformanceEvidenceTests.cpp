@@ -336,6 +336,7 @@ RtSceneFrameEvidence MakeSceneEvidence(TestContext& context,
 RtRecordedSceneEvidence MakeRecordedScene(const RtSceneFrameEvidence& evidence)
 {
     RtRecordedSceneEvidence recorded{};
+    recorded.dimensions = evidence.dimensions;
     recorded.pipeline = evidence.pipeline;
     recorded.resources = evidence.resources;
     recorded.shadowQuality = evidence.shadowQuality;
@@ -517,6 +518,25 @@ void TestFixedTextAndEnums(TestContext& context)
 
 void TestStageAccumulatorAndConversion(TestContext& context)
 {
+    constexpr std::array<RtStage, 13u> originalStageOrder{{
+        RtStage::SimulationStep, RtStage::Skin, RtStage::PlayerSkin,
+        RtStage::CharacterSkin, RtStage::DynamicUpload, RtStage::BlasRefitRecord,
+        RtStage::TlasUpdateRecord, RtStage::TraceCopyRecord, RtStage::FrameFenceWait,
+        RtStage::ImageAcquire, RtStage::QueueSubmit, RtStage::PresentCall,
+        RtStage::WholeFrameCycle}};
+    for (std::size_t index = 0u; index < originalStageOrder.size(); ++index)
+        context.Check(RtStageIndex(originalStageOrder[index]) == index,
+                      "appended pose-copy stage must preserve every existing count-array index");
+    context.Check(RtStageIndex(RtStage::PoseCopy) == originalStageOrder.size() &&
+                      RtStageIndex(RtStage::PlayerPose) == originalStageOrder.size() + 1u &&
+                      std::string_view(RtStageMetricName(RtStage::PoseCopy)) == "poseCopyCpuMs",
+                  "pose-copy metric must append one named stage after the original roster");
+    constexpr std::array<RtStage,6> skinSubstages{{RtStage::PlayerPose,RtStage::PlayerVertices,
+        RtStage::ViewmodelVertices,RtStage::CharacterAnimation,RtStage::CharacterVertices,RtStage::CharacterCopy}};
+    for(std::size_t i=0;i<skinSubstages.size();++i)
+        context.Check(RtStageIndex(skinSubstages[i])==14u+i && RtStageMetricName(skinSubstages[i])!=nullptr,
+                      "skin substage names append without changing any saved count-array index");
+    context.Check(kRtStageCount==20u,"appended skin attribution roster has exactly six new phases");
     std::uint64_t nanoseconds = 0u;
     context.Check(CheckedMillisecondsToNanoseconds(1.25, nanoseconds) &&
                       nanoseconds == 1'250'000u,
@@ -568,6 +588,9 @@ void TestStageAccumulatorAndConversion(TestContext& context)
     context.Check(accumulator.Accumulate(RtStage::PlayerSkin, 50u, 1u, 0u, 1u) &&
                       accumulator.Accumulate(RtStage::CharacterSkin, 70u, 2u, 0u, 2u),
                   "player and character skin contributions must accumulate independently");
+    context.Check(accumulator.Accumulate(RtStage::PoseCopy, 20u, 1u, 1024u, 1u) &&
+                      accumulator.Accumulate(RtStage::PoseCopy, 30u, 1u, 512u, 1u),
+                  "world-body and viewmodel repacks must retain independent contributions");
     context.Check(!accumulator.Accumulate(RtStage::Skin, 999u, 1u, 0u, 1u),
                   "derived total skin timing must reject direct contributions that could double count");
     RtStageFrameSample committed{};
@@ -583,6 +606,11 @@ void TestStageAccumulatorAndConversion(TestContext& context)
     context.Check(upload.durationNanoseconds == 400u && upload.byteCount == 4096u &&
                       upload.operationCount == 2u,
                   "dynamic upload scope must retain duration, bytes and operations");
+    const RtStageValue& poseCopy = committed.values[RtStageIndex(RtStage::PoseCopy)];
+    context.Check(poseCopy.durationNanoseconds == 50u &&
+                      poseCopy.workInvocationCount == 2u && poseCopy.byteCount == 1536u &&
+                      poseCopy.operationCount == 2u,
+                  "pose repacks must count output bytes without changing skin or GPU upload totals");
     const RtStageValue& playerSkin = committed.values[RtStageIndex(RtStage::PlayerSkin)];
     const RtStageValue& characterSkin = committed.values[RtStageIndex(RtStage::CharacterSkin)];
     const RtStageValue& totalSkin = committed.values[RtStageIndex(RtStage::Skin)];
@@ -1002,6 +1030,7 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     sceneA.fireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
     sceneA.actualUploadedMistEnabled = true;
     sceneA.actualUploadedDustQuality = horde::graphics::DustQuality::Low;
+    sceneA.dimensions = RtFrameDimensionsEvidence{640,360,1280,720,0,640.0f/360,false,true};
     sceneA.fireLighting = RtFireLightingEvidence{};
     sceneA.fireLighting->count = 2u;
     sceneA.fireLighting->emitters[0] = {3u, {{-32.5f, 0.85f, -16.5f, 0.5f}}, {{1.0f, 0.5f, 0.25f, 0.5f}}};
@@ -1027,6 +1056,7 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     sceneB.fireQuality = RtFireQualityEvidence{RtFireQuality::High, 10u, 2u};
     sceneB.actualUploadedMistEnabled = false;
     sceneB.actualUploadedDustQuality = horde::graphics::DustQuality::Standard;
+    sceneB.dimensions = RtFrameDimensionsEvidence{720,1280,720,1280,1,1280.0f/720,false,false};
     sceneB.fireLighting = RtFireLightingEvidence{}; // actual empty upload, not legacy absence
     RtFrameToken recordedB{};
     context.Check(lifecycle.FinishRecord(attemptB, MakeRecordedScene(sceneB), recordedB),
@@ -1083,6 +1113,8 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
                       completedA.scene.shadowQuality != sceneB.shadowQuality &&
                       completedA.scene.fireQuality != sceneB.fireQuality,
                   "record B uploaded quality must not contaminate A owning completion");
+    context.Check(completedA.scene.dimensions == sceneA.dimensions && completedA.scene.dimensions != sceneB.dimensions,
+                  "later recording cannot replace completed A's submitted dimensions/aspect/DRS tuple");
     context.Check(completedA.scene.pipeline.activeStrategy != sceneB.pipeline.activeStrategy &&
                       completedA.scene.resources.bufferCount != sceneB.resources.bufferCount &&
                       completedA.scene.player.primaryPixelCount != sceneB.player.primaryPixelCount &&
@@ -2001,10 +2033,12 @@ void TestValidatorAndSerializers(TestContext& context)
         "\"blasRefitRecordCpuMs\":0.000005,\"tlasUpdateRecordCpuMs\":0.000006,"
         "\"traceCopyRecordCpuMs\":0.000007,\"frameFenceWaitCpuMs\":0.000008,"
         "\"imageAcquireCpuMs\":0.000009,\"queueSubmitCpuMs\":0.000010,"
-        "\"presentCallCpuMs\":0.000011,\"wholeFrameCycleCpuMs\":0.000012,"
-        "\"workInvocationCounts\":[1,0,0,0,0,0,0,0,0,0,0,0,0],"
-        "\"byteCounts\":[0,0,0,0,64,0,0,0,0,0,0,0,0],"
-        "\"operationCounts\":[0,0,0,0,2,0,0,0,0,0,0,0,0]},"
+        "\"presentCallCpuMs\":0.000011,\"wholeFrameCycleCpuMs\":0.000012,\"poseCopyCpuMs\":0.000013,"
+        "\"playerPoseCpuMs\":0.000014,\"playerVerticesCpuMs\":0.000015,\"viewmodelVerticesCpuMs\":0.000016,"
+        "\"characterAnimationCpuMs\":0.000017,\"characterVerticesCpuMs\":0.000018,\"characterCopyCpuMs\":0.000019,"
+        "\"workInvocationCounts\":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"
+        "\"byteCounts\":[0,0,0,0,64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"
+        "\"operationCounts\":[0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"
         "\"presentation\":{\"outcome\":\"presented\",\"presented\":true,"
         "\"lastSuccessfulPresentSubmissionSerial\":1,\"finalIdleCompletion\":false},"
         "\"cpuBenchmarkEligible\":true,\"benchmarkEligible\":true}\n";
@@ -2025,7 +2059,7 @@ void TestValidatorAndSerializers(TestContext& context)
         "Presentation: presented last-successful-submission=1 final-idle=no cpu-benchmark-eligible=yes benchmark-eligible=yes\n"
         "Dielectric diagnostics: compiled-out counters=N/A reads=0 resets=0\n"
         "Whole RT GPU: disabled value=N/A\n"
-        "Stages (CPU wall/record): simulationStepCpuMs=0.000000 skinCpuMs=0.000005 playerSkinCpuMs=0.000002 characterSkinCpuMs=0.000003 dynamicUploadCpuMs=0.000004 blasRefitRecordCpuMs=0.000005 tlasUpdateRecordCpuMs=0.000006 traceCopyRecordCpuMs=0.000007 frameFenceWaitCpuMs=0.000008 imageAcquireCpuMs=0.000009 queueSubmitCpuMs=0.000010 presentCallCpuMs=0.000011 wholeFrameCycleCpuMs=0.000012\n";
+        "Stages (CPU wall/record): simulationStepCpuMs=0.000000 skinCpuMs=0.000005 playerSkinCpuMs=0.000002 characterSkinCpuMs=0.000003 dynamicUploadCpuMs=0.000004 blasRefitRecordCpuMs=0.000005 tlasUpdateRecordCpuMs=0.000006 traceCopyRecordCpuMs=0.000007 frameFenceWaitCpuMs=0.000008 imageAcquireCpuMs=0.000009 queueSubmitCpuMs=0.000010 presentCallCpuMs=0.000011 wholeFrameCycleCpuMs=0.000012 poseCopyCpuMs=0.000013 playerPoseCpuMs=0.000014 playerVerticesCpuMs=0.000015 viewmodelVerticesCpuMs=0.000016 characterAnimationCpuMs=0.000017 characterVerticesCpuMs=0.000018 characterCopyCpuMs=0.000019\n";
     context.Check(shippingText == expectedShippingText,
                   "Shipping text must match the hand-derived canonical golden projection");
     context.Check(shippingText.find("N/A") != std::string::npos,
@@ -2562,6 +2596,49 @@ void TestUploadedFireLightingEvidence(TestContext& context)
                   "the retained attempt can accept a subsequently valid exact empty upload");
 }
 
+void TestSubmittedDimensions(TestContext& context)
+{
+    auto snapshot = MakeSnapshot(context, RtInstrumentationMode::Shipping);
+    RtEvidenceValidationError error{}; std::string json;
+    context.Check(SerializeRtPerformanceEvidenceJson(snapshot, json, error) &&
+        json.find("submittedDimensions") == std::string::npos,
+        "historical absence cannot invent submitted dimensions");
+    RtFrameDimensionsEvidence d{640, 360, 1280, 720, 0, 640.0f / 360.0f, false, true};
+    for (unsigned transform = 0; transform < 8; ++transform) {
+        d.presentationTransform = transform;
+        d.cameraAspect = RtRecordedCameraAspect(d.internalWidth, d.internalHeight, transform);
+        snapshot.scene.dimensions = d;
+        context.Check(ValidateRtPerformanceEvidence(snapshot, error), "all real packed surface transforms retain shader-derived aspect");
+    }
+    d.presentationTransform = 0; d.cameraAspect = 640.0f / 360.0f;
+    snapshot.scene.dimensions = d;
+    context.Check(SerializeRtPerformanceEvidenceJson(snapshot, json, error) &&
+        json.find("\"internalExtent\":[640,360]") != std::string::npos &&
+        json.find("\"outputExtent\":[1280,720]") != std::string::npos &&
+        json.find("\"dynamicResolutionEnabled\":false") != std::string::npos,
+        "completed RT JSON exposes actual pixel tuple and explicit fixed allocation");
+    for (unsigned invalid = 0; invalid < 8; ++invalid) {
+        auto bad = d;
+        switch (invalid) {
+        case 0: bad.internalWidth = 0; break;
+        case 1: bad.outputHeight = 0; break;
+        case 2: bad.outputWidth = 16385; break;
+        case 3: bad.internalWidth = 1281; break;
+        case 4: bad.presentationTransform = 8; break;
+        case 5: bad.cameraAspect += 2e-5f; break;
+        case 6: bad.cameraAspect = std::numeric_limits<float>::quiet_NaN(); break;
+        case 7: bad.linearBlit = false; break;
+        }
+        snapshot.scene.dimensions = bad;
+        context.Check(!ValidateRtPerformanceEvidence(snapshot, error) &&
+            error == RtEvidenceValidationError::InvalidDispatchState,
+            "malformed submitted dimensions cannot enter canonical completed evidence");
+    }
+    d.internalWidth = 639; d.cameraAspect = 639.0f / 360.0f;
+    context.Check(ValidRtFrameDimensionsEvidence(d) && !RtRecordedAspectPreserved(d),
+        "valid ordinary odd-scale blit is truthfully reported as differing aspect, not declared a standard");
+}
+
 void TestUploadedQualityEvidence(TestContext& context)
 {
     auto snapshot = MakeSnapshot(context, RtInstrumentationMode::Shipping);
@@ -2606,6 +2683,7 @@ int main()
     TestContext context;
     TestExecutionModeEvidence(context);
     TestFixedTextAndEnums(context);
+    TestSubmittedDimensions(context);
     TestUploadedQualityEvidence(context);
     TestUploadedFireLightingEvidence(context);
     TestStageAccumulatorAndConversion(context);

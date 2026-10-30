@@ -1,0 +1,33 @@
+{
+  "sourceBeforeCorrection": "1484d72e8e20e5bfd010e810c450cec3c6121663",
+  "scope": "Actual MainActivity widget callbacks under existing Robolectric/native-state shadow; not a device or RT presentation test",
+  "target": ":app:testDebugUnitTest",
+  "tests": [
+    {
+      "name": "CampaignMenuIntegrationTest.coldEntryPlayCannotOpenSaveChooserBeforeOwningPresentation",
+      "result": "failed",
+      "assertion": "accepted surface without RT Entry output cannot open slots"
+    },
+    {
+      "name": "CampaignMenuIntegrationTest.stalePresentedEntryCannotUnlockReplacementSurface",
+      "result": "failed",
+      "scope": "Entry presentation belongs to generation 30 while current surface is 31"
+    },
+    {
+      "name": "CampaignMenuIntegrationTest.coldPauseResumeAndLoadCannotBypassPendingSurface",
+      "result": "failed",
+      "scope": "Pending runtime state must reject ordinary Resume/Load"
+    }
+  ],
+  "testsRun": 3,
+  "failures": 3,
+  "errors": 0,
+  "gradleResult": "BUILD FAILED in 14s",
+  "retainedPrivateLog": "reports/owner-playtest-startup-20261025/baseline-startup-tests-cache-approved.log",
+  "retainedPrivateXml": "reports/owner-playtest-startup-20261025/baseline-startup-failures.xml",
+  "limitations": [
+    "The host reproduction establishes premature command admission, not the exact phone JNI stall duration or deadlock cause.",
+    "No phone access or input was used.",
+    "The first sandbox Gradle attempt could not open the existing cache lock. The already owner-authorised normal elevated cache route ran these tests; no permissions or cache paths were changed."
+  ]
+}

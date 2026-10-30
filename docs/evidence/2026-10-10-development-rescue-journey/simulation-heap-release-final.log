@@ -1,0 +1,27 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 101
+    Start 101: horde_rt_simulation_gameplay_tests
+
+101: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_simulation_gameplay_tests.exe"
+101: Working Directory: <repo>/build/presets/windows-x64-release
+101: Test timeout computed to be: 1500
+101: lich/chest delayed finale events hits/defeat/unlock=3/1/1 phase=1 pending=0 time=0 sequence=8/9
+101: open shaft actual X/Z=-5.5/-14.5 mount torch lowering/left Y legacy=0/-0.41 anatomical=0/-0.31
+101: Shared simulation command, event, seam-persistence, and retry tests passed.
+1/1 Test #101: horde_rt_simulation_gameplay_tests ...   Passed    1.00 sec
+
+The following tests passed:
+	horde_rt_simulation_gameplay_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.02 sec

@@ -1,0 +1,259 @@
+{
+  "scope": "Fresh native RT opening-tomb inspection; no production/source/asset/lighting/collision/save edit and no phone or listening",
+  "baseCommit": "075e49ef22e388842ebb313bf4b5370ce8032684",
+  "executable": {
+    "exists": true,
+    "bytes": 14035968,
+    "sha256": "223b1f02398f852f05bbf6d26239a748b996b2d4e0d448d16cad899827c85579"
+  },
+  "successfulNativeSurvey": {
+    "frames": 120,
+    "pngs": 12,
+    "backend": "RayTracingPipeline",
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driverVersion": 2559295488,
+    "dispatch": [
+      960,
+      540
+    ],
+    "renderScale": 1,
+    "outputExposure": 0.620000005,
+    "surveyFogDensityScale": null,
+    "simulationTick": 0,
+    "snapshotBytesUnchanged": true,
+    "owningCompletedPresentationAll120": true,
+    "resourceStateCount": 1,
+    "resources": {
+      "bufferCount": 52,
+      "memoryAllocationCount": 63,
+      "bottomLevelAccelerationStructureCount": 20,
+      "topLevelAccelerationStructureCount": 1,
+      "tlasInstanceCount": 28,
+      "pipelineCount": 2,
+      "shaderBindingTableCount": 2,
+      "descriptorSetCount": 1,
+      "hostVisibleBytes": 49601920,
+      "deviceLocalBytes": 405991648
+    },
+    "settings": {
+      "shadow": {
+        "mode": "current",
+        "localPrimarySamples": 1,
+        "skyPrimarySamples": 1,
+        "reserved": 0
+      },
+      "fire": {
+        "quality": "High",
+        "volumeSteps": 10,
+        "reflectionSamples": 2,
+        "reflectedVolumeSteps": 8
+      },
+      "dust": 1,
+      "mist": true
+    },
+    "fullManifest": {
+      "exists": true,
+      "bytes": 415699,
+      "sha256": "367fe36094613fd6448833b3dba44e9fd8fdc163ea0f1604bf037051d9d42e41"
+    }
+  },
+  "failedFullCaptures": [
+    {
+      "label": "blocked-retreat",
+      "status": "FAILED, not denied; no retry",
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.",
+      "manifest": {
+        "exists": true,
+        "bytes": 3554,
+        "sha256": "dd510ddf52e9e68604bef0334ae15fff8c4f4b25c788acfc69d3ac4b2266bc33"
+      },
+      "retainedPose": {
+        "checkpoint": "rescue-journey-start",
+        "camera": [
+          0,
+          -0.95,
+          1.85,
+          3.14159,
+          -0.05
+        ],
+        "torchLowering": 0.00588667,
+        "torchRetraction": 0.003532,
+        "leftHandLocal": [
+          -0.185,
+          -0.316209,
+          0.406988
+        ],
+        "rightHandLocal": [
+          0.23,
+          -0.34,
+          0.347292
+        ]
+      }
+    },
+    {
+      "label": "rect-niche",
+      "status": "FAILED, not denied; no retry",
+      "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.",
+      "manifest": {
+        "exists": true,
+        "bytes": 3558,
+        "sha256": "46f8907d7b12325bbd3dacf22d29e6735aba89b1c47f3d66c6ad6d402ccc80d4"
+      },
+      "retainedPose": {
+        "checkpoint": "chapter-niche-rect",
+        "camera": [
+          -0.4,
+          -0.95,
+          -0.7,
+          -1.5708,
+          -0.32
+        ],
+        "torchLowering": 0,
+        "torchRetraction": 0,
+        "leftHandLocal": [
+          -0.466764,
+          -0.0719899,
+          0.21207
+        ],
+        "rightHandLocal": [
+          0.23,
+          -0.34,
+          0.332708
+        ]
+      }
+    }
+  ],
+  "notRun": [
+    {
+      "checkpoint": "chapter-niche-arch",
+      "reason": "Stopped after second independent full capture failed the same unresolved primary-arm gate."
+    },
+    {
+      "checkpoint": "chapter-stone-portal-rear",
+      "reason": "Stopped after second independent full capture failed the same unresolved primary-arm gate."
+    }
+  ],
+  "visualInspection": [
+    {
+      "path": "opening-survey/tomb-debris-059.png",
+      "status": "complete native survey frame",
+      "observed": "Clear forward floor lane, opening portal and side-wall bays; bier/lid only peripheral at lower left. No demonstrated grounding/path defect; not an all-prop composition pass."
+    },
+    {
+      "path": "opening-survey/tomb-debris-119.png",
+      "status": "complete native survey frame",
+      "observed": "Collapse-side masonry, damaged shoulder and small chips remain related and grounded in this view; no justified relocation."
+    },
+    {
+      "path": "blocked-retreat/192-rescue-journey-start.png",
+      "status": "UNADMITTED full capture; context only",
+      "observed": "Blocked-retreat masonry appears closed, but the primary-arms ownership gate failed; no accepted initial-view or equipment result."
+    },
+    {
+      "path": "rect-niche/218-chapter-niche-rect.png",
+      "status": "UNADMITTED full capture; context only",
+      "observed": "Rectangular niche/candle visible and neighboring skull partly in frame; no visually demonstrated float, but the same primary-arm gate failed. Not accepted full-frame niche evidence."
+    }
+  ],
+  "originalImageAndMeshFiles": {
+    "blocked-retreat\\192-rescue-journey-start.obj": {
+      "exists": true,
+      "bytes": 2372938,
+      "sha256": "d635d9b5a07a72419566f9cb99e415db0a91bfec2e708c84210d4cfa10502633"
+    },
+    "blocked-retreat\\192-rescue-journey-start.player-world-body.obj": {
+      "exists": true,
+      "bytes": 5106867,
+      "sha256": "fd3e1e4a6d59931fc0161a26b03bf296a933f2f1dec88e2b14d1dec52ca51adf"
+    },
+    "blocked-retreat\\192-rescue-journey-start.png": {
+      "exists": true,
+      "bytes": 771469,
+      "sha256": "586da8437898b2602a6a4a88cb1b73cf6ad50a7529ddce03e4d9fa47d270156b"
+    },
+    "opening-survey\\tomb-debris-009.png": {
+      "exists": true,
+      "bytes": 742646,
+      "sha256": "e6eef003c3c6de9c3d343e1ce61d33744bfa5b693962b616c4462d100102ff12"
+    },
+    "opening-survey\\tomb-debris-019.png": {
+      "exists": true,
+      "bytes": 742650,
+      "sha256": "05abd3598010526e3e2af815f02ae64857257c496542fefb63911341e3013b51"
+    },
+    "opening-survey\\tomb-debris-029.png": {
+      "exists": true,
+      "bytes": 742641,
+      "sha256": "fcd3c3b1ef98aa8c16874bd6ba12606eadb0e0d7d9416bfb7f4a4c7eba2889b5"
+    },
+    "opening-survey\\tomb-debris-039.png": {
+      "exists": true,
+      "bytes": 742646,
+      "sha256": "6c5438cab009fb82d8646ff5742f021d6b7480fc6efa569b31ad44d490ebab53"
+    },
+    "opening-survey\\tomb-debris-049.png": {
+      "exists": true,
+      "bytes": 742647,
+      "sha256": "c450150ec79bf7759076b734e06580721ff36b8b7ecec131b0ad28dd1ee97469"
+    },
+    "opening-survey\\tomb-debris-059.png": {
+      "exists": true,
+      "bytes": 742649,
+      "sha256": "7f8588894fd03c49753dd980bc82b17a5ea81b2fe3105dea525d5cff92fdfb2a"
+    },
+    "opening-survey\\tomb-debris-069.png": {
+      "exists": true,
+      "bytes": 793707,
+      "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+    },
+    "opening-survey\\tomb-debris-079.png": {
+      "exists": true,
+      "bytes": 793707,
+      "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+    },
+    "opening-survey\\tomb-debris-089.png": {
+      "exists": true,
+      "bytes": 793707,
+      "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+    },
+    "opening-survey\\tomb-debris-099.png": {
+      "exists": true,
+      "bytes": 793707,
+      "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+    },
+    "opening-survey\\tomb-debris-109.png": {
+      "exists": true,
+      "bytes": 793707,
+      "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+    },
+    "opening-survey\\tomb-debris-119.png": {
+      "exists": true,
+      "bytes": 793707,
+      "sha256": "1b13b84da7804ce3dd6f43f6b1efd013a6da1566983b4c364c38d8ca204df8be"
+    },
+    "rect-niche\\218-chapter-niche-rect.obj": {
+      "exists": true,
+      "bytes": 2378321,
+      "sha256": "b7279f8835c37d0df9830aed9e1335b81b48d97c4b0330566e6c47a5cab598ad"
+    },
+    "rect-niche\\218-chapter-niche-rect.player-world-body.obj": {
+      "exists": true,
+      "bytes": 5112032,
+      "sha256": "b64e194d33487f299cdee7069b538d062dd23de7a8ed6e1e10e55714cbe17d46"
+    },
+    "rect-niche\\218-chapter-niche-rect.png": {
+      "exists": true,
+      "bytes": 552628,
+      "sha256": "4f3ce6d4750f51600266bd2faf3264435595803039beaaf3cdcf6e9f17235016"
+    }
+  },
+  "ownerSettingsSourcesAssetsAndCampaignUnchanged": true,
+  "allOwnProcessesExited": true,
+  "noProcessKilled": true,
+  "foregroundObservation": "All foreground API samples were null and unchanged; native survey also checks that its own window is unshown and unfocused. This does not certify a particular external foreground HWND.",
+  "audioListeningPerformed": false,
+  "newAudioHapticManualRevalidationRequired": false,
+  "priorAudioManualAcceptanceStillPending": true,
+  "performanceClaim": null,
+  "nextBoundedItem": "Diagnose zero primary-arm pixels in current full captures from retained exact uploaded meshes, model transforms and frozen pose; distinguish pose/frustum/occlusion/diagnostic handling before any patch. Preserve the gate and the ordinary initial camera/lighting."
+}

@@ -1,0 +1,21 @@
+{
+  "head": "9bd46a8f2e3139331dcafa2cd05532a9df3d061e",
+  "run": 39924505547,
+  "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/39924505547",
+  "status": "completed",
+  "conclusion": "cancelled",
+  "jobs": {
+    "Android": "success",
+    "GCC": "success",
+    "Clang": "success",
+    "Clang ASan/UBSan": "success",
+    "player-vulkan-host": "success",
+    "MSVC": "cancelled"
+  },
+  "msvcAnnotations": [
+    "The job has exceeded the maximum execution time of 15m0s",
+    "The operation was canceled."
+  ],
+  "msvcLastObservedSelection": "159/169 passed; started region_page_build_policy_tests at160 before cancellation",
+  "limits": "Incomplete MSVC lane, not all-required-checks pass; no runtime defect or complete selection pass inferred"
+}

@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -17,6 +18,8 @@ namespace horde::vulkan::raytracing
 {
 
 struct RtSceneRecordObservation;
+using SkeletonPoseBlendRequests = std::array<std::optional<horde::scene::SkinnedClipBlend>,
+    horde::gameplay::simulation::kSkeletonEnemyCapacity>;
 
 enum class CharacterBlasRefit
 {
@@ -42,14 +45,22 @@ struct SkeletonRenderPlan
     float time = 0.0f;
     VkTransformMatrixKHR transform{};
     std::uint32_t poseBucket = 0u;
+    bool forceCurrentCombatPose = false;
+    std::optional<horde::scene::SkinnedClipBlend> blend;
 };
 
 struct CharacterFramePlan
 {
-    bool selectedLich = false;
+    bool lichVisible = false;
     horde::scene::SkinnedClip lichClip = horde::scene::SkinnedClip::Idle;
     float lichTime = 0.0f;
-    VkTransformMatrixKHR lichTransform{};
+    float lichStaffLiftRadians = 0.0f;
+    float lichStaffCastRadians = 0.0f;
+    float lichDissolveProgress = 0.0f;
+    VkTransformMatrixKHR lichTransform{{
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f}};
     std::array<SkeletonRenderPlan, horde::gameplay::simulation::kSkeletonEnemyCapacity> skeletons{};
     std::size_t skeletonCount = 0u;
     std::size_t skeletonPoseBucketCount = 0u;
@@ -59,7 +70,10 @@ bool CharacterPoseNeedsRefresh(int requestedClip,
                                float requestedTime,
                                int lastClip,
                                float lastTime,
-                               float updateInterval = 1.0f / 30.0f);
+                               float updateInterval = 1.0f / 30.0f,
+                               bool forceCurrentCombatPose = false,
+                               const horde::scene::SkinnedClipBlend* requestedBlend = nullptr,
+                               const horde::scene::SkinnedClipBlend* lastBlend = nullptr);
 
 CharacterFramePlan EvaluateCharacterFramePlan(
     const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
@@ -67,7 +81,8 @@ CharacterFramePlan EvaluateCharacterFramePlan(
     std::size_t skeletonCount,
     const horde::gameplay::EnemyRosterSnapshot& roster,
     const horde::gameplay::LichSnapshot& lich,
-    float skeletonDeadClipDuration);
+    float skeletonDeadClipDuration,
+    const SkeletonPoseBlendRequests& blends = {});
 
 class CharacterRenderSlot
 {
@@ -75,19 +90,24 @@ public:
     static constexpr std::uint32_t kTlasInstanceIndex = 2u;
     static constexpr std::uint32_t kSecondSkeletonTlasInstanceIndex = 18u;
     static constexpr std::uint32_t kMaximumActiveSkeletons = 2u;
+    static constexpr std::uint32_t kKeeperMetadataIndex = 25u;
+    static constexpr std::uint32_t kKeeperTlasInstanceIndex = 27u;
+    static constexpr std::uint32_t kMaximumCharacterInstances = 3u;
     static constexpr std::uint32_t kMaximumSkeletonPoseBuckets = 2u;
 
     bool LoadAssets(const std::string& skeletonAssetPath,
                     const std::string& lichAssetPath,
                     std::string& diagnostic,
-                    bool skeletonOnly = false);
+                    bool skeletonOnly = false,
+                    std::span<const horde::scene::SkinnedClipBinding> skeletonClipBindings = {});
     bool PrepareInitialGeometry(std::string& diagnostic);
     bool CacheFramePlan(const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                                          horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
                         std::size_t skeletonCount,
                         const horde::gameplay::EnemyRosterSnapshot& roster,
                         const horde::gameplay::LichSnapshot& lich,
-                        std::string& diagnostic);
+                        std::string& diagnostic,
+                        const SkeletonPoseBlendRequests& blends = {});
     bool PrepareFrame(const std::array<horde::gameplay::simulation::SkeletonEnemySnapshot,
                                        horde::gameplay::simulation::kSkeletonEnemyCapacity>& skeletons,
                       std::size_t skeletonCount,
@@ -95,12 +115,22 @@ public:
                       const horde::gameplay::LichSnapshot& lich,
                       const RtGpuResources& resources,
                       std::string& diagnostic,
-                      RtSceneRecordObservation* observation = nullptr);
+                      RtSceneRecordObservation* observation = nullptr,
+                      const SkeletonPoseBlendRequests& blends = {});
 
-    std::array<VkAccelerationStructureInstanceKHR, kMaximumActiveSkeletons> BuildActiveInstances() const;
+    std::array<VkAccelerationStructureInstanceKHR, kMaximumCharacterInstances> BuildActiveInstances() const;
     std::array<float, 3u> LichStaffWorldPosition(const horde::gameplay::LichSnapshot& lich) const;
 
     CharacterBlasRefit PendingRefit() const { return pendingRefit_; }
+    // Called only after the owning frame was successfully submitted.
+    void NotifyFrameSubmitted() noexcept { pendingRefit_ = CharacterBlasRefit::None; }
+    // A recreated upload owner must receive the requested skin even when its
+    // clip/time matches the cached CPU pose.
+    void InvalidateLichPose() noexcept {
+        lastLichUpdateTime_ = lastLichStaffLiftRadians_ = lastLichStaffCastRadians_ =
+            lastLichDissolveProgress_ = -1.0f;
+        lastLichClip_ = -1;
+    }
 
     RtUpdatableTriangleBlas& SkeletonGpu(std::size_t bucket = 0u) { return skeletonGpus_.at(bucket); }
     const RtUpdatableTriangleBlas& SkeletonGpu(std::size_t bucket = 0u) const { return skeletonGpus_.at(bucket); }
@@ -122,6 +152,11 @@ public:
 
 private:
     bool UpdateLichStaffSample(std::string& diagnostic);
+    void InvalidateSkeletonPoseCache() noexcept {
+        lastSkeletonUpdateTimes_.fill(-1.0f);
+        lastSkeletonClips_.fill(-1);
+        lastSkeletonBlends_.fill(std::nullopt);
+    }
 
     horde::scene::SkeletonBipedModel skeletonModel_;
     horde::scene::SkinnedCharacterModel lichModel_;
@@ -132,7 +167,11 @@ private:
     std::array<float, 3u> lichStaffLocalSample_{{0.94f, 0.79f, 0.64f}};
     std::array<float, kMaximumSkeletonPoseBuckets> lastSkeletonUpdateTimes_{{-1.0f, -1.0f}};
     std::array<int, kMaximumSkeletonPoseBuckets> lastSkeletonClips_{{-1, -1}};
+    SkeletonPoseBlendRequests lastSkeletonBlends_{};
     float lastLichUpdateTime_ = -1.0f;
+    float lastLichStaffLiftRadians_ = -1.0f;
+    float lastLichStaffCastRadians_ = -1.0f;
+    float lastLichDissolveProgress_ = -1.0f;
     int lastLichClip_ = -1;
     CharacterBlasRefit pendingRefit_ = CharacterBlasRefit::None;
     std::size_t skeletonPoseBucketCount_ = 0u;

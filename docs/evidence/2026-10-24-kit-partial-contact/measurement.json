@@ -1,0 +1,389 @@
+{
+  "schema": 1,
+  "evidenceClass": "120 Hz native grounded PBR sole measurement; not automatic contact admission",
+  "runs": [
+    {
+      "direction": "left",
+      "degrees": 0,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxDeclaredSupportHorizontalDriftM": 0,
+      "maxDeclaredSupportMeanDriftM": 0,
+      "maxDeclaredSupportHeightErrorM": 0,
+      "measuredContactBands": [
+        {
+          "maximumPointHeightM": 9.99999997e-07,
+          "maxContactRunSlipM": 0,
+          "maxContactRunPathM": 0,
+          "longestRunSamples": 91,
+          "touchPointSamples": 182,
+          "contactRuns": 2
+        },
+        {
+          "maximumPointHeightM": 9.99999975e-05,
+          "maxContactRunSlipM": 0,
+          "maxContactRunPathM": 0,
+          "longestRunSamples": 91,
+          "touchPointSamples": 546,
+          "contactRuns": 6
+        },
+        {
+          "maximumPointHeightM": 0.00100000005,
+          "maxContactRunSlipM": 0,
+          "maxContactRunPathM": 0,
+          "longestRunSamples": 91,
+          "touchPointSamples": 2912,
+          "contactRuns": 32
+        }
+      ]
+    },
+    {
+      "direction": "left",
+      "degrees": 2,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxDeclaredSupportHorizontalDriftM": 0.000938633108,
+      "maxDeclaredSupportMeanDriftM": 0.000807866571,
+      "maxDeclaredSupportHeightErrorM": 0.000269266078,
+      "measuredContactBands": [
+        {
+          "maximumPointHeightM": 9.99999997e-07,
+          "maxContactRunSlipM": 0.000421685778,
+          "maxContactRunPathM": 0.000482975884,
+          "longestRunSamples": 40,
+          "touchPointSamples": 195,
+          "contactRuns": 14
+        },
+        {
+          "maximumPointHeightM": 9.99999975e-05,
+          "maxContactRunSlipM": 0.000899760402,
+          "maxContactRunPathM": 0.00126998394,
+          "longestRunSamples": 54,
+          "touchPointSamples": 588,
+          "contactRuns": 27
+        },
+        {
+          "maximumPointHeightM": 0.00100000005,
+          "maxContactRunSlipM": 0.00309714628,
+          "maxContactRunPathM": 0.00422384823,
+          "longestRunSamples": 66,
+          "touchPointSamples": 2540,
+          "contactRuns": 64
+        }
+      ]
+    },
+    {
+      "direction": "left",
+      "degrees": 10,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxDeclaredSupportHorizontalDriftM": 0.0039930623,
+      "maxDeclaredSupportMeanDriftM": 0.00328759803,
+      "maxDeclaredSupportHeightErrorM": 0.00098884746,
+      "measuredContactBands": [
+        {
+          "maximumPointHeightM": 9.99999997e-07,
+          "maxContactRunSlipM": 0.00167468702,
+          "maxContactRunPathM": 0.0018281081,
+          "longestRunSamples": 27,
+          "touchPointSamples": 224,
+          "contactRuns": 19
+        },
+        {
+          "maximumPointHeightM": 9.99999975e-05,
+          "maxContactRunSlipM": 0.00186310173,
+          "maxContactRunPathM": 0.00204349728,
+          "longestRunSamples": 32,
+          "touchPointSamples": 532,
+          "contactRuns": 39
+        },
+        {
+          "maximumPointHeightM": 0.00100000005,
+          "maxContactRunSlipM": 0.00538602052,
+          "maxContactRunPathM": 0.00637636892,
+          "longestRunSamples": 54,
+          "touchPointSamples": 2201,
+          "contactRuns": 94
+        }
+      ]
+    },
+    {
+      "direction": "left",
+      "degrees": 22.5,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxDeclaredSupportHorizontalDriftM": 0.00650431961,
+      "maxDeclaredSupportMeanDriftM": 0.0047415779,
+      "maxDeclaredSupportHeightErrorM": 0.0024020155,
+      "measuredContactBands": [
+        {
+          "maximumPointHeightM": 9.99999997e-07,
+          "maxContactRunSlipM": 0.00299773179,
+          "maxContactRunPathM": 0.00302493828,
+          "longestRunSamples": 23,
+          "touchPointSamples": 220,
+          "contactRuns": 21
+        },
+        {
+          "maximumPointHeightM": 9.99999975e-05,
+          "maxContactRunSlipM": 0.00323616038,
+          "maxContactRunPathM": 0.00331737287,
+          "longestRunSamples": 27,
+          "touchPointSamples": 425,
+          "contactRuns": 43
+        },
+        {
+          "maximumPointHeightM": 0.00100000005,
+          "maxContactRunSlipM": 0.00843258761,
+          "maxContactRunPathM": 0.0093482798,
+          "longestRunSamples": 52,
+          "touchPointSamples": 1952,
+          "contactRuns": 82
+        }
+      ]
+    },
+    {
+      "direction": "left",
+      "degrees": 45,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxDeclaredSupportHorizontalDriftM": 0.00685577048,
+      "maxDeclaredSupportMeanDriftM": 0.000105015373,
+      "maxDeclaredSupportHeightErrorM": 0.00493393606,
+      "measuredContactBands": [
+        {
+          "maximumPointHeightM": 9.99999997e-07,
+          "maxContactRunSlipM": 0.00231805444,
+          "maxContactRunPathM": 0.00270887534,
+          "longestRunSamples": 31,
+          "touchPointSamples": 187,
+          "contactRuns": 19
+        },
+        {
+          "maximumPointHeightM": 9.99999975e-05,
+          "maxContactRunSlipM": 0.00236021145,
+          "maxContactRunPathM": 0.00280461251,
+          "longestRunSamples": 32,
+          "touchPointSamples": 350,
+          "contactRuns": 44
+        },
+        {
+          "maximumPointHeightM": 0.00100000005,
+          "maxContactRunSlipM": 0.00491491007,
+          "maxContactRunPathM": 0.00542386854,
+          "longestRunSamples": 49,
+          "touchPointSamples": 1811,
+          "contactRuns": 92
+        }
+      ]
+    },
+    {
+      "direction": "right",
+      "degrees": 0,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxDeclaredSupportHorizontalDriftM": 0,
+      "maxDeclaredSupportMeanDriftM": 0,
+      "maxDeclaredSupportHeightErrorM": 0,
+      "measuredContactBands": [
+        {
+          "maximumPointHeightM": 9.99999997e-07,
+          "maxContactRunSlipM": 0,
+          "maxContactRunPathM": 0,
+          "longestRunSamples": 91,
+          "touchPointSamples": 182,
+          "contactRuns": 2
+        },
+        {
+          "maximumPointHeightM": 9.99999975e-05,
+          "maxContactRunSlipM": 0,
+          "maxContactRunPathM": 0,
+          "longestRunSamples": 91,
+          "touchPointSamples": 546,
+          "contactRuns": 6
+        },
+        {
+          "maximumPointHeightM": 0.00100000005,
+          "maxContactRunSlipM": 0,
+          "maxContactRunPathM": 0,
+          "longestRunSamples": 91,
+          "touchPointSamples": 2912,
+          "contactRuns": 32
+        }
+      ]
+    },
+    {
+      "direction": "right",
+      "degrees": 2,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxDeclaredSupportHorizontalDriftM": 0.000938600511,
+      "maxDeclaredSupportMeanDriftM": 0.000807873963,
+      "maxDeclaredSupportHeightErrorM": 0.000269266078,
+      "measuredContactBands": [
+        {
+          "maximumPointHeightM": 9.99999997e-07,
+          "maxContactRunSlipM": 0.000421819394,
+          "maxContactRunPathM": 0.000482994248,
+          "longestRunSamples": 40,
+          "touchPointSamples": 195,
+          "contactRuns": 14
+        },
+        {
+          "maximumPointHeightM": 9.99999975e-05,
+          "maxContactRunSlipM": 0.000922622567,
+          "maxContactRunPathM": 0.00127002085,
+          "longestRunSamples": 54,
+          "touchPointSamples": 588,
+          "contactRuns": 27
+        },
+        {
+          "maximumPointHeightM": 0.00100000005,
+          "maxContactRunSlipM": 0.00329142273,
+          "maxContactRunPathM": 0.00422391063,
+          "longestRunSamples": 66,
+          "touchPointSamples": 2540,
+          "contactRuns": 64
+        }
+      ]
+    },
+    {
+      "direction": "right",
+      "degrees": 10,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxDeclaredSupportHorizontalDriftM": 0.00399301155,
+      "maxDeclaredSupportMeanDriftM": 0.00328760617,
+      "maxDeclaredSupportHeightErrorM": 0.000988836866,
+      "measuredContactBands": [
+        {
+          "maximumPointHeightM": 9.99999997e-07,
+          "maxContactRunSlipM": 0.00167461694,
+          "maxContactRunPathM": 0.00182811846,
+          "longestRunSamples": 27,
+          "touchPointSamples": 224,
+          "contactRuns": 19
+        },
+        {
+          "maximumPointHeightM": 9.99999975e-05,
+          "maxContactRunSlipM": 0.00186309277,
+          "maxContactRunPathM": 0.00204353244,
+          "longestRunSamples": 32,
+          "touchPointSamples": 532,
+          "contactRuns": 39
+        },
+        {
+          "maximumPointHeightM": 0.00100000005,
+          "maxContactRunSlipM": 0.00538599631,
+          "maxContactRunPathM": 0.0063765021,
+          "longestRunSamples": 54,
+          "touchPointSamples": 2201,
+          "contactRuns": 94
+        }
+      ]
+    },
+    {
+      "direction": "right",
+      "degrees": 22.5,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxDeclaredSupportHorizontalDriftM": 0.00650417479,
+      "maxDeclaredSupportMeanDriftM": 0.00474156393,
+      "maxDeclaredSupportHeightErrorM": 0.00240204856,
+      "measuredContactBands": [
+        {
+          "maximumPointHeightM": 9.99999997e-07,
+          "maxContactRunSlipM": 0.00299759419,
+          "maxContactRunPathM": 0.00302467495,
+          "longestRunSamples": 23,
+          "touchPointSamples": 220,
+          "contactRuns": 21
+        },
+        {
+          "maximumPointHeightM": 9.99999975e-05,
+          "maxContactRunSlipM": 0.00323647284,
+          "maxContactRunPathM": 0.00331759686,
+          "longestRunSamples": 27,
+          "touchPointSamples": 425,
+          "contactRuns": 43
+        },
+        {
+          "maximumPointHeightM": 0.00100000005,
+          "maxContactRunSlipM": 0.0084325606,
+          "maxContactRunPathM": 0.0093482323,
+          "longestRunSamples": 52,
+          "touchPointSamples": 1952,
+          "contactRuns": 82
+        }
+      ]
+    },
+    {
+      "direction": "right",
+      "degrees": 45,
+      "samples": 91,
+      "soleRows": [
+        39,
+        38
+      ],
+      "maxDeclaredSupportHorizontalDriftM": 0.00685601775,
+      "maxDeclaredSupportMeanDriftM": 0.000105013089,
+      "maxDeclaredSupportHeightErrorM": 0.0049339477,
+      "measuredContactBands": [
+        {
+          "maximumPointHeightM": 9.99999997e-07,
+          "maxContactRunSlipM": 0.00231796224,
+          "maxContactRunPathM": 0.00270913192,
+          "longestRunSamples": 31,
+          "touchPointSamples": 187,
+          "contactRuns": 19
+        },
+        {
+          "maximumPointHeightM": 9.99999975e-05,
+          "maxContactRunSlipM": 0.00235996977,
+          "maxContactRunPathM": 0.00280463998,
+          "longestRunSamples": 32,
+          "touchPointSamples": 350,
+          "contactRuns": 44
+        },
+        {
+          "maximumPointHeightM": 0.00100000005,
+          "maxContactRunSlipM": 0.0049149543,
+          "maxContactRunPathM": 0.00542366505,
+          "longestRunSamples": 49,
+          "touchPointSamples": 1811,
+          "contactRuns": 92
+        }
+      ]
+    }
+  ],
+  "endpointMaxM": 7.31381817e-07,
+  "measurementComplete": true,
+  "contactAdmitted": false
+}

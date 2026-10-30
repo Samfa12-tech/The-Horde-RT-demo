@@ -1,0 +1,26 @@
+[
+  {
+    "backend": "pipeline",
+    "size": [
+      960,
+      540
+    ],
+    "changedPixels": 0,
+    "before": "docs/evidence/2026-10-12-planted-pullup-pose/pipeline-normal.png",
+    "after": "reports/planted-renderer-normal-pipeline/193-chapter-landing-north.png",
+    "inspected": true,
+    "positiveStanceEnabled": false
+  },
+  {
+    "backend": "query",
+    "size": [
+      960,
+      540
+    ],
+    "changedPixels": 0,
+    "before": "docs/evidence/2026-10-12-planted-pullup-pose/query-normal.png",
+    "after": "reports/planted-renderer-normal-query/193-chapter-landing-north.png",
+    "inspected": true,
+    "positiveStanceEnabled": false
+  }
+]

@@ -1,0 +1,91 @@
+{
+  "attempts": [
+    {
+      "name": "prelaunch custody read",
+      "timed": false,
+      "appLaunch": false,
+      "result": "ADB server read failed; connected read and idle subsequently verified"
+    },
+    {
+      "name": "keeper20-a1",
+      "timed": false,
+      "armed": false,
+      "result": "host harness mistook remote cat missing-file diagnostic for native report; owned startup stopped; no valid report"
+    }
+  ],
+  "artifacts": {
+    "reports/keeper-mist-2026-10-20/prelaunch-custody-read-failed.log": {
+      "bytes": 1409,
+      "sha256": "24c04245618f9f57221c3b996f9d906eea1de2e7572d3b1a24ab7b9671ba7fa0"
+    },
+    "reports/keeper-mist-2026-10-20/a1.log": {
+      "bytes": 911,
+      "sha256": "104cfb397640a273c1aa8a98f0fff7e8e92856cce73a4d7990b53992e68559c9"
+    },
+    "reports/keeper-mist-2026-10-20/a1/battery-after.txt": {
+      "bytes": 12740,
+      "sha256": "5d2420e24bacb4b30326113ae43d4beba885affdc794cc55c213efaddd1f6886"
+    },
+    "reports/keeper-mist-2026-10-20/a1/battery-before.txt": {
+      "bytes": 12740,
+      "sha256": "5d2420e24bacb4b30326113ae43d4beba885affdc794cc55c213efaddd1f6886"
+    },
+    "reports/keeper-mist-2026-10-20/a1/custody.json": {
+      "bytes": 128,
+      "sha256": "7f36d020f7cc3e23ed49d0f2883b0560bfa3912aeb70337f48712cb7bad591d1"
+    },
+    "reports/keeper-mist-2026-10-20/a1/launch.txt": {
+      "bytes": 318,
+      "sha256": "4fdd3f7c7889ed5bc29e3b395eeee96af56e4b18a2b043831a878d0b8afc8f81"
+    },
+    "reports/keeper-mist-2026-10-20/a1/native.json": {
+      "bytes": 82,
+      "sha256": "3b8ddead147ea9cdc7a02faa0b8f019a5d26b94f75c8ab671f6efacb3df964ea"
+    },
+    "reports/keeper-mist-2026-10-20/a1/owned.log": {
+      "bytes": 34967,
+      "sha256": "170fca266dfecd16c16be2101b9ee40feffba051b008dff94ac04734ca999f7c"
+    },
+    "reports/keeper-mist-2026-10-20/a1/owner-after.json": {
+      "bytes": 1645,
+      "sha256": "6c118bd0d8a431f732a0ea93fab59b13912293be89a14d48a65acb009b9b8ca4"
+    },
+    "reports/keeper-mist-2026-10-20/a1/request.json": {
+      "bytes": 239,
+      "sha256": "1fa2dbeaa11ce34d75527e9a6c698dd8315e2422df3106eb3669c87ad8932f3a"
+    },
+    "reports/keeper-mist-2026-10-20/a1/settings-after.xml": {
+      "bytes": 1351,
+      "sha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee"
+    },
+    "reports/keeper-mist-2026-10-20/a1/thermals.json": {
+      "bytes": 1277,
+      "sha256": "9b38b81d4ef9efdc95ce0d7b0bb7b445b94ecb8ceee4e0a2af9c25a4bf4c58b4"
+    },
+    "reports/keeper-mist-2026-10-20/run.py": {
+      "bytes": 9635,
+      "sha256": "5c171896cdcb5131c1e971821851fe6f20a5a4126b7728530c19f7f8c04e1fa2"
+    },
+    "reports/keeper-mist-2026-10-20/final-custody.json": {
+      "bytes": 193,
+      "sha256": "30e60ab47884529ab626d19746f4128608f94fbf95189d47cfa9d424fd18b7bf"
+    },
+    "reports/keeper-mist-2026-10-20/owner-before.json": {
+      "bytes": 1645,
+      "sha256": "6c118bd0d8a431f732a0ea93fab59b13912293be89a14d48a65acb009b9b8ca4"
+    },
+    "reports/keeper-mist-2026-10-20/owner-settings.xml": {
+      "bytes": 1351,
+      "sha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee"
+    }
+  },
+  "strictOfflineRejection": {
+    "exit": 1,
+    "reason": "JSON Expecting value at line 1 column 1; missing-file diagnostic is never a completed native report"
+  },
+  "newPreparation": {
+    "status": "denied; not retried",
+    "target": "SM-S948B R5GL219SZGK / com.samfa12.hordelanternrt.debug / isolated keeper-mist request",
+    "reason": "This attempts another phone preparation after two prior failed preparations, exceeding the declared two-rejection bound; the fresh retry and harness change lack explicit user authorization for that expanded scope."
+  }
+}

@@ -1,11 +1,18 @@
 #include "platform/windows/WindowsPlaytestReport.h"
 
 #include <atomic>
+#include <array>
+#include <algorithm>
+#include <cstring>
 #include <chrono>
 #include <iostream>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
+#include <wct.h>
+#include <dbghelp.h>
+#include <richedit.h>
 
 namespace
 {
@@ -14,6 +21,191 @@ std::atomic<int> exports{0};
 std::atomic<const char*> currentPhase{"startup"};
 std::vector<std::string> approved;
 bool acceptExport = false; // Accessed only by the UI owner thread.
+std::atomic<ULONGLONG> noteEditStarted{0};
+std::atomic<bool> noteEditExecuting{false};
+std::atomic<ULONGLONG> noteEditElapsed{0};
+std::atomic<ULONGLONG> noteKernelStarted{0}, noteUserStarted{0};
+std::atomic<bool> noteCpuAvailable{false};
+std::atomic<const char*> noteEditPhase{nullptr};
+bool exerciseTimeoutDiagnostic = false;
+struct NoteTrace { const char* phase; bool returned; ULONGLONG elapsed; };
+std::array<NoteTrace, 8> noteTraces{};
+std::size_t noteTraceCount = 0;
+
+ULONGLONG FileTimeTicks(const FILETIME value)
+{
+    return (static_cast<ULONGLONG>(value.dwHighDateTime) << 32u) | value.dwLowDateTime;
+}
+
+LRESULT CALLBACK TraceNoteEntry(int code, WPARAM value, LPARAM argument)
+{
+    if (code >= 0) {
+        const auto& message = *reinterpret_cast<CWPSTRUCT*>(argument);
+        if (message.message == WM_SETTEXT && GetDlgCtrlID(message.hwnd) == 106) {
+            noteEditStarted.store(GetTickCount64());
+            noteEditElapsed.store(0);
+            FILETIME created{}, exited{}, kernel{}, user{};
+            noteCpuAvailable.store(GetThreadTimes(GetCurrentThread(), &created, &exited, &kernel, &user) != FALSE);
+            noteKernelStarted.store(FileTimeTicks(kernel));
+            noteUserStarted.store(FileTimeTicks(user));
+            noteEditPhase.store(currentPhase.load());
+            noteEditExecuting.store(true);
+            if (exerciseTimeoutDiagnostic &&
+                std::strcmp(currentPhase.load(), "note-only approved Unicode note edit") == 0)
+                std::this_thread::sleep_for(std::chrono::milliseconds(2200));
+        }
+    }
+    return CallNextHookEx(nullptr, code, value, argument);
+}
+
+LRESULT CALLBACK TraceNoteReturn(int code, WPARAM value, LPARAM argument)
+{
+    if (code >= 0) {
+        const auto& message = *reinterpret_cast<CWPRETSTRUCT*>(argument);
+        if (message.message == WM_SETTEXT && GetDlgCtrlID(message.hwnd) == 106) {
+            const auto elapsed = GetTickCount64() - noteEditStarted.load();
+            noteEditExecuting.store(false);
+            noteEditElapsed.store(elapsed);
+        }
+    }
+    return CallNextHookEx(nullptr, code, value, argument);
+}
+
+#if defined(_M_X64)
+struct OwnerStackSnapshot {
+    std::array<unsigned char, 64u * 1024u> bytes{};
+    CONTEXT context{};
+    DWORD thread = 0;
+    SIZE_T size = 0;
+    bool captured = false, resumeSucceeded = false, cpuAvailable = false;
+    ULONGLONG editAgeMs = 0, kernelTicks = 0, userTicks = 0;
+    long long suspendMicros = 0;
+};
+const OwnerStackSnapshot* decodedSnapshot = nullptr;
+BOOL CALLBACK ReadCapturedStack(HANDLE process, DWORD64 address, PVOID output, DWORD bytes, LPDWORD read)
+{
+    const auto& stack = *decodedSnapshot;
+    if (address >= stack.context.Rsp && address - stack.context.Rsp <= stack.size &&
+        bytes <= stack.size - static_cast<std::size_t>(address - stack.context.Rsp)) {
+        std::memcpy(output, stack.bytes.data() + (address - stack.context.Rsp), bytes);
+        *read = bytes; return TRUE;
+    }
+    SIZE_T count = 0;
+    const BOOL result = ReadProcessMemory(process, reinterpret_cast<void*>(address), output, bytes, &count);
+    *read = static_cast<DWORD>(count); return result;
+}
+void CaptureOwnerStack(DWORD thread, OwnerStackSnapshot& snapshot)
+{
+    static std::mutex captureMutex;
+    const std::lock_guard<std::mutex> captureLock(captureMutex);
+    HANDLE owner = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION, FALSE, thread);
+    if (!owner) return;
+    snapshot.thread = thread;
+    snapshot.context.ContextFlags = CONTEXT_FULL;
+    const auto editStarted = noteEditStarted.load();
+    const auto kernelStarted = noteKernelStarted.load(), userStarted = noteUserStarted.load();
+    const bool cpuStarted = noteCpuAvailable.load();
+    const char* phase = currentPhase.load();
+    snapshot.editAgeMs = GetTickCount64() - editStarted;
+    const auto suspended = std::chrono::steady_clock::now();
+    // Preallocated raw copy only: no allocation, symbols or output while the
+    // synthetic UI is suspended. Symbol work must also stay outside its gate.
+    if (SuspendThread(owner) != DWORD(-1)) {
+        if (GetThreadContext(owner, &snapshot.context)) {
+            MEMORY_BASIC_INFORMATION region{};
+            if (VirtualQuery(reinterpret_cast<void*>(snapshot.context.Rsp), &region, sizeof(region))) {
+                const auto end = reinterpret_cast<ULONG_PTR>(region.BaseAddress) + region.RegionSize;
+                const auto size = std::min<std::size_t>(snapshot.bytes.size(), end - snapshot.context.Rsp);
+                snapshot.captured = ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(snapshot.context.Rsp),
+                                              snapshot.bytes.data(), size, &snapshot.size) != FALSE;
+            }
+        }
+        snapshot.resumeSucceeded = ResumeThread(owner) != DWORD(-1);
+    }
+    snapshot.suspendMicros = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now() - suspended).count();
+    FILETIME created{}, exited{}, kernel{}, user{};
+    snapshot.cpuAvailable = cpuStarted && noteEditExecuting.load() && phase == noteEditPhase.load() &&
+        GetThreadTimes(owner, &created, &exited, &kernel, &user) != FALSE &&
+        editStarted == noteEditStarted.load() && phase == currentPhase.load() && noteEditExecuting.load() &&
+        FileTimeTicks(kernel) >= kernelStarted && FileTimeTicks(user) >= userStarted;
+    if (snapshot.cpuAvailable) {
+        snapshot.kernelTicks = FileTimeTicks(kernel) - kernelStarted;
+        snapshot.userTicks = FileTimeTicks(user) - userStarted;
+    }
+    CloseHandle(owner);
+}
+
+void DescribeOwnerStack(const OwnerStackSnapshot& snapshot, const char* label)
+{
+    std::cerr << "UI snapshot " << label << " editAgeMs=" << snapshot.editAgeMs
+              << " captured=" << snapshot.captured << " resumeSucceeded=" << snapshot.resumeSucceeded
+              << " suspendMicros=" << snapshot.suspendMicros << " bytes=" << snapshot.size
+              << " cpuAvailable=" << snapshot.cpuAvailable
+              << " kernelMs=" << snapshot.kernelTicks / 10000.0
+              << " userMs=" << snapshot.userTicks / 10000.0 << '\n';
+}
+
+void TraceOwnerStack(const OwnerStackSnapshot& snapshot, const char* label)
+{
+    DescribeOwnerStack(snapshot, label);
+    if (!snapshot.captured) return;
+    HANDLE owner = OpenThread(THREAD_QUERY_INFORMATION, FALSE, snapshot.thread);
+    if (!owner) return;
+    CONTEXT context = snapshot.context;
+    decodedSnapshot = &snapshot;
+    SymSetOptions(SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_NO_PROMPTS);
+    if (SymInitialize(GetCurrentProcess(), "", TRUE)) {
+        STACKFRAME64 frame{};
+        frame.AddrPC = {context.Rip, 0, AddrModeFlat};
+        frame.AddrStack = {context.Rsp, 0, AddrModeFlat};
+        frame.AddrFrame = {context.Rbp, 0, AddrModeFlat};
+        for (int depth = 0; depth < 24; ++depth) {
+            alignas(SYMBOL_INFO) unsigned char storage[sizeof(SYMBOL_INFO) + MAX_SYM_NAME]{};
+            auto* symbol = reinterpret_cast<SYMBOL_INFO*>(storage);
+            symbol->SizeOfStruct = sizeof(SYMBOL_INFO); symbol->MaxNameLen = MAX_SYM_NAME;
+            DWORD64 displacement = 0;
+            const bool named = SymFromAddr(GetCurrentProcess(), frame.AddrPC.Offset, &displacement, symbol) != FALSE;
+            IMAGEHLP_MODULE64 module{}; module.SizeOfStruct = sizeof(module);
+            const bool hasModule = SymGetModuleInfo64(GetCurrentProcess(), frame.AddrPC.Offset, &module) != FALSE;
+            std::cerr << "UI stack " << depth << ": " << (hasModule ? module.ModuleName : "unknown-module")
+                      << '!' << (named ? symbol->Name : "unresolved") << "+0x" << std::hex << displacement
+                      << " address=0x" << frame.AddrPC.Offset << std::dec << '\n';
+            if (!StackWalk64(IMAGE_FILE_MACHINE_AMD64, GetCurrentProcess(), owner, &frame, &context,
+                             ReadCapturedStack, SymFunctionTableAccess64, SymGetModuleBase64, nullptr)) break;
+        }
+        SymCleanup(GetCurrentProcess());
+    }
+    decodedSnapshot = nullptr;
+    CloseHandle(owner);
+}
+#else
+struct OwnerStackSnapshot {};
+void CaptureOwnerStack(DWORD, OwnerStackSnapshot&) {}
+void DescribeOwnerStack(const OwnerStackSnapshot&, const char*) {}
+void TraceOwnerStack(const OwnerStackSnapshot&, const char*) {}
+#endif
+OwnerStackSnapshot slowEditSnapshot;
+std::atomic<bool> slowEditSnapshotReady{false};
+bool slowEditSnapshotDecoded = false; // Action thread, then main after join.
+
+void TraceOwnerWait(DWORD thread)
+{
+    std::cerr << "note EDIT executing=" << noteEditExecuting.load() << '\n';
+    const HWCT session = OpenThreadWaitChainSession(0, nullptr);
+    if (!session) { std::cerr << "wait-chain session error=" << GetLastError() << '\n'; return; }
+    WAITCHAIN_NODE_INFO nodes[WCT_MAX_NODE_COUNT]{};
+    DWORD count = WCT_MAX_NODE_COUNT;
+    BOOL cycle = FALSE;
+    if (GetThreadWaitChain(session, 0, WCTP_GETINFO_ALL_FLAGS, thread, &count, nodes, &cycle)) {
+        std::cerr << "UI wait-chain nodes=" << count << " cycle=" << cycle << '\n';
+        for (DWORD i = 0; i < count; ++i)
+            std::cerr << "  node=" << i << " type=" << nodes[i].ObjectType
+                      << " status=" << nodes[i].ObjectStatus << '\n';
+    } else std::cerr << "wait-chain query error=" << GetLastError() << '\n';
+    // Deliberately omit object names, note text and private process metadata.
+    CloseThreadWaitChainSession(session);
+}
 
 void SetPhase(const char* phase) { currentPhase.store(phase); }
 
@@ -96,8 +288,20 @@ LRESULT Send(HWND window, const UINT message, const WPARAM value = 0, const LPAR
                       << " capture=" << info.hwndCapture;
         }
         std::cerr << '\n';
+        // The deadline outcome above is final before any module enumeration,
+        // symbol loading or console stack output can compete with the edit.
+        OwnerStackSnapshot timeoutSnapshot;
+        CaptureOwnerStack(ownerThread, timeoutSnapshot);
+        TraceOwnerWait(ownerThread);
+        if (slowEditSnapshotReady.load()) {
+            TraceOwnerStack(slowEditSnapshot, "100ms-observer");
+            slowEditSnapshotDecoded = true;
+        }
+        TraceOwnerStack(timeoutSnapshot, "after-timeout");
         passed.store(false);
     }
+    if (message == WM_SETTEXT && GetDlgCtrlID(window) == 106 && noteTraceCount < noteTraces.size())
+        noteTraces[noteTraceCount++] = {currentPhase.load(), !noteEditExecuting.load(), noteEditElapsed.load()};
     return static_cast<LRESULT>(result);
 }
 
@@ -116,17 +320,47 @@ void Defaults(HWND form, const bool hasContext)
     Check(Send(GetDlgItem(form, 108), BM_GETCHECK) == BST_UNCHECKED, "context consent default is not off");
     Check(IsWindowEnabled(GetDlgItem(form, 108)) == (hasContext ? TRUE : FALSE),
         "unavailable context opt-in must be disabled, never guessed");
+    Check((Send(GetDlgItem(form, 106), EM_GETTEXTMODE) & TM_PLAINTEXT) != 0,
+        "report note must use native Unicode plain-text mode, without rich formatting or objects");
+    Check(Send(GetDlgItem(form, 106), EM_GETAUTOURLDETECT) == 0,
+        "report note must not activate automatic links");
+    Check((Send(GetDlgItem(form, 106), EM_GETLANGOPTIONS) & IMF_UIFONTS) != 0,
+        "report note must bind script fallback to Windows user-interface fonts");
+    Check((Send(GetDlgItem(form, 106), EM_GETLANGOPTIONS) & IMF_AUTOFONTSIZEADJUST) == 0,
+        "plain report note must retain its chosen UI size across script-font binding");
     Check(GetDlgItem(form, 102) != GetDlgItem(form, IDCANCEL), "category and Close IDs collide");
 }
 } // namespace
 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc > 1) {
+        if (argc != 2 || std::strcmp(argv[1], "--exercise-timeout-diagnostic") != 0) return 2;
+        exerciseTimeoutDiagnostic = true; // Explicit failing diagnostic, never enabled by normal CTest.
+    }
     SetProcessDPIAware();
     const HWND owner = CreateWindowExW(0, L"STATIC", L"Horde report UI test owner", WS_OVERLAPPEDWINDOW,
         0, 0, 800, 800, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
     if (!owner) return 1;
     const DWORD thread = GetCurrentThreadId();
+    const HHOOK entryTrace = SetWindowsHookExW(WH_CALLWNDPROC, TraceNoteEntry, nullptr, thread);
+    const HHOOK returnTrace = SetWindowsHookExW(WH_CALLWNDPROCRET, TraceNoteReturn, nullptr, thread);
+    Check(entryTrace != nullptr && returnTrace != nullptr, "note UI timing trace hooks unavailable");
+    std::atomic<bool> stopObserver{false};
+    std::thread slowEditObserver([thread, &stopObserver] {
+        // A cold Unicode edit can be slow without reaching the unchanged 2 s
+        // deadline. Sample that real path once; no delay or font warm-up is
+        // inserted into the UI owner or its action sequence.
+        while (!stopObserver.load()) {
+            if (noteEditExecuting.load() && GetTickCount64() - noteEditStarted.load() >= 100 &&
+                std::strcmp(currentPhase.load(), "note-only approved Unicode note edit") == 0) {
+                CaptureOwnerStack(thread, slowEditSnapshot);
+                slowEditSnapshotReady.store(true);
+                return;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        }
+    });
     std::thread actions([thread] {
         SetPhase("note-only default and private-content checks");
         const HWND form = WaitForForm(thread);
@@ -143,6 +377,10 @@ int main()
         SetNote(form, L"test@example.invalid", "note-only rejected-input note edit");
         ClickExport(form);
         Check(exports.load() == 0, "private-content rejection reached destination");
+        const std::wstring oversized(4097, L'x');
+        SetNote(form, oversized.c_str(), "note-only oversized note edit");
+        ClickExport(form);
+        Check(exports.load() == 0, "oversized native note reached destination");
         SetNote(form, L"Walk.\r\nThen parry. \u9f8d \U0001f525", "note-only approved Unicode note edit");
         SetPhase("note-only approved export and retry");
         ClickExport(form);
@@ -179,6 +417,10 @@ int main()
         Send(GetDlgItem(form, 102), CB_SETCURSEL, 1);
         Send(GetDlgItem(form, 104), CB_SETCURSEL, 2);
         SetNote(form, L"Explicit context test", "explicit-context note edit");
+        const HWND note = GetDlgItem(form, 106);
+        Send(note, EM_SETSEL, static_cast<WPARAM>(-1), static_cast<LPARAM>(-1));
+        SetPhase("explicit-context native Unicode insertion");
+        Send(note, EM_REPLACESEL, FALSE, reinterpret_cast<LPARAM>(L" \u0915 \u03a9"));
         Send(GetDlgItem(form, 107), BM_SETCHECK, BST_CHECKED);
         Send(GetDlgItem(form, 108), BM_SETCHECK, BST_CHECKED);
         ClickExport(form);
@@ -188,9 +430,23 @@ int main()
     });
     horde::platform::windows::ShowWindowsPlaytestReport(owner, context, FakeDestination);
     contextActions.join();
+    stopObserver.store(true);
+    slowEditObserver.join();
+    if (slowEditSnapshotReady.load() && !slowEditSnapshotDecoded)
+        DescribeOwnerStack(slowEditSnapshot, "100ms-observer-without-timeout");
+    // Flush after both action threads have joined, not between input operations:
+    // console IO must not space out the messages and hide an initialization race.
+    for (std::size_t i = 0; i < noteTraceCount; ++i)
+        std::cerr << "note EDIT trace; phase=" << noteTraces[i].phase
+                  << " returned=" << noteTraces[i].returned << " elapsedMs=" << noteTraces[i].elapsed << '\n';
     Check(approved.size() == 1 && approved[0].find("\"rtPresented\":false") != std::string::npos &&
         approved[0].find("\"context\"") != std::string::npos,
         "explicit allowlist context or honest false presentation state missing");
+    Check(approved.size() == 1 &&
+        approved[0].find("Explicit context test \xe0\xa4\x95 \xce\xa9") != std::string::npos,
+        "native insertion changed the Unicode report note");
     DestroyWindow(owner);
+    if (entryTrace) UnhookWindowsHookEx(entryTrace);
+    if (returnTrace) UnhookWindowsHookEx(returnTrace);
     return passed.load() ? 0 : 1;
 }

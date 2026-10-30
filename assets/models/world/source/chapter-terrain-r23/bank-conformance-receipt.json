@@ -1,0 +1,662 @@
+{
+  "status": "PASS bounded r23 source/native admission; actual RT shoreline/device/performance acceptance pending",
+  "runtimeSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+  "runtimeBytes": 18441928,
+  "byteGrowthFromR22": 33000,
+  "triangles": 37846,
+  "exportedVertices": 19486,
+  "runtimeMaximumTriangles": 39618,
+  "runtimeMaximumVertices": 21134,
+  "runtimeManifestSha256": "da0762e1250e9586022c25e1d1600c5e246ca542524cde137185f98f1fe0de13",
+  "allOriginalVerticesPreserved": 17125,
+  "exactProtectedTriangles": 15610,
+  "exactCoreTriangles": 15472,
+  "exactGridRouteHolesEnvelopesBounds": true,
+  "embeddedMaterialsAndImagesIdentical": true,
+  "waterConformance": {
+    "originalFaces": 33912,
+    "faces": 37708,
+    "insertedVertices": 1898,
+    "changedOuterFaces": 491,
+    "protectedFaces": 15472,
+    "bankCrest": {
+      "crestVertices": 320,
+      "raisedVertices": 42,
+      "maximumPositiveDelta": 1.129625891092111,
+      "minimumClearance": 0.015085224003378528,
+      "repairs": [
+        {
+          "insertedIndex": 770,
+          "atlasEN": [
+            202.7,
+            409.733844182
+          ],
+          "oldBilinearY": 42.99265475958781,
+          "newAnalyticY": 43.30942095090887,
+          "positiveDelta": 0.3167661913210651,
+          "actualWaterY": 43.10555645259615,
+          "clearance": 0.20386449831272557,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 771,
+          "atlasEN": [
+            198.645901078,
+            396.220181107
+          ],
+          "oldBilinearY": 40.33253759843174,
+          "newAnalyticY": 40.606688335649025,
+          "positiveDelta": 0.27415073721728334,
+          "actualWaterY": 40.4004175445275,
+          "clearance": 0.20627079112152558,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 835,
+          "atlasEN": [
+            208.239846746,
+            428.2
+          ],
+          "oldBilinearY": 46.650253859127275,
+          "newAnalyticY": 47.002652114197076,
+          "positiveDelta": 0.3523982550698008,
+          "actualWaterY": 46.80207576860157,
+          "clearance": 0.20057634559550763,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 836,
+          "atlasEN": [
+            203.756923922,
+            413.256923922
+          ],
+          "oldBilinearY": 43.7203384095974,
+          "newAnalyticY": 44.01403689890887,
+          "positiveDelta": 0.2936984893114669,
+          "actualWaterY": 43.81079973327515,
+          "clearance": 0.2032371656337233,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 839,
+          "atlasEN": [
+            218.680153254,
+            428.2
+          ],
+          "oldBilinearY": 47.16250757011305,
+          "newAnalyticY": 47.57734788527965,
+          "positiveDelta": 0.41484031516660025,
+          "actualWaterY": 47.3774124540964,
+          "clearance": 0.19993543118324908,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 840,
+          "atlasEN": [
+            218.671647506,
+            428.171647506
+          ],
+          "oldBilinearY": 47.154159235893005,
+          "newAnalyticY": 47.571677386605586,
+          "positiveDelta": 0.41751815071258136,
+          "actualWaterY": 47.37174699488425,
+          "clearance": 0.1999303917213382,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 847,
+          "atlasEN": [
+            203.44020259799998,
+            412.201186175
+          ],
+          "oldBilinearY": 43.421644294336744,
+          "newAnalyticY": 43.802889349456905,
+          "positiveDelta": 0.3812450551201607,
+          "actualWaterY": 43.599464195291915,
+          "clearance": 0.2034251541649894,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 886,
+          "atlasEN": [
+            209.21086857400002,
+            431.436739428
+          ],
+          "oldBilinearY": 47.26225400625944,
+          "newAnalyticY": 47.64999999996823,
+          "positiveDelta": 0.3877459937087906,
+          "actualWaterY": 47.450000000036866,
+          "clearance": 0.19999999993136441,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 890,
+          "atlasEN": [
+            218.70095111199998,
+            428.269326192
+          ],
+          "oldBilinearY": 47.18385347957343,
+          "newAnalyticY": 47.591213123931524,
+          "positiveDelta": 0.40735964435809535,
+          "actualWaterY": 47.39126536998083,
+          "clearance": 0.19994775395069553,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 893,
+          "atlasEN": [
+            218.78913142599998,
+            428.563260572
+          ],
+          "oldBilinearY": 47.289068096429006,
+          "newAnalyticY": 47.649999999931524,
+          "positiveDelta": 0.360931903502518,
+          "actualWaterY": 47.44999999996334,
+          "clearance": 0.19999999996818474,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1758,
+          "atlasEN": [
+            -5.598402307000001,
+            -446.670329426
+          ],
+          "oldBilinearY": -31.591462840584512,
+          "newAnalyticY": -31.377758942440256,
+          "positiveDelta": 0.2137038981442565,
+          "actualWaterY": -31.577674500569994,
+          "clearance": 0.1999155581297387,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1764,
+          "atlasEN": [
+            -9.452761510000002,
+            -450.8
+          ],
+          "oldBilinearY": -31.69069736711788,
+          "newAnalyticY": -31.43282121650106,
+          "positiveDelta": 0.2578761506168199,
+          "actualWaterY": -31.63256927724668,
+          "clearance": 0.19974806074561968,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1791,
+          "atlasEN": [
+            1.453796889000003,
+            -453.77031923600003
+          ],
+          "oldBilinearY": -31.60964424542012,
+          "newAnalyticY": -31.381449706587077,
+          "positiveDelta": 0.2281945388330442,
+          "actualWaterY": -31.581545961048544,
+          "clearance": 0.20009625446146728,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1792,
+          "atlasEN": [
+            3.655276341000004,
+            -451.41159125200005
+          ],
+          "oldBilinearY": -31.547734050133343,
+          "newAnalyticY": -31.350000000014994,
+          "positiveDelta": 0.1977340501183491,
+          "actualWaterY": -31.55000000000286,
+          "clearance": 0.19999999998786677,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1796,
+          "atlasEN": [
+            -1.4898691799999995,
+            -456.924247168
+          ],
+          "oldBilinearY": -31.657949654438198,
+          "newAnalyticY": -31.423502078627834,
+          "positiveDelta": 0.23444757581036413,
+          "actualWaterY": -31.62372703845103,
+          "clearance": 0.20022495982319555,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1803,
+          "atlasEN": [
+            -13.288429011999995,
+            -454.909643753
+          ],
+          "oldBilinearY": -31.7223970742636,
+          "newAnalyticY": -31.48761646688665,
+          "positiveDelta": 0.23478060737695117,
+          "actualWaterY": -31.687197841913502,
+          "clearance": 0.19958137502685247,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1807,
+          "atlasEN": [
+            -10.707238489999995,
+            -466.8
+          ],
+          "oldBilinearY": -31.768348752200914,
+          "newAnalyticY": -31.555178783113877,
+          "positiveDelta": 0.213169969087037,
+          "actualWaterY": -31.755806751004947,
+          "clearance": 0.2006279678910694,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1809,
+          "atlasEN": [
+            -17.362141633,
+            -459.27433584700003
+          ],
+          "oldBilinearY": -31.78788359188549,
+          "newAnalyticY": -31.54581236150212,
+          "positiveDelta": 0.2420712303833703,
+          "actualWaterY": -31.745216706481642,
+          "clearance": 0.19940434497952353,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1818,
+          "atlasEN": [
+            -24.386094842999995,
+            -466.8
+          ],
+          "oldBilinearY": -31.959276362185083,
+          "newAnalyticY": -31.64615454997839,
+          "positiveDelta": 0.3131218122066919,
+          "actualWaterY": -31.84525365751805,
+          "clearance": 0.19909910753965931,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1822,
+          "atlasEN": [
+            -13.927353495999995,
+            -470.25012322000003
+          ],
+          "oldBilinearY": -31.826897073191674,
+          "newAnalyticY": -31.601180426344055,
+          "positiveDelta": 0.22571664684761927,
+          "actualWaterY": -31.801949186013793,
+          "clearance": 0.20076875966973873,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1824,
+          "atlasEN": [
+            -17.348212767,
+            -473.91532958199997
+          ],
+          "oldBilinearY": -31.927053910903908,
+          "newAnalyticY": -31.650049844415026,
+          "positiveDelta": 0.27700406648888176,
+          "actualWaterY": -31.850968173321654,
+          "clearance": 0.20091832890662786,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1826,
+          "atlasEN": [
+            -21.619295719999997,
+            -478.491489889
+          ],
+          "oldBilinearY": -32.017407137138264,
+          "newAnalyticY": -31.711065315085964,
+          "positiveDelta": 0.30634182205229976,
+          "actualWaterY": -31.912170387290946,
+          "clearance": 0.20110507220498164,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1828,
+          "atlasEN": [
+            -28.671324505999998,
+            -471.391317496
+          ],
+          "oldBilinearY": -32.03690752776607,
+          "newAnalyticY": -31.70737211656292,
+          "positiveDelta": 0.32953541120314966,
+          "actualWaterY": -31.906285002285717,
+          "clearance": 0.1989128857227982,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1833,
+          "atlasEN": [
+            -25.507993307999996,
+            -482.8
+          ],
+          "oldBilinearY": -32.12286160061838,
+          "newAnalyticY": -31.78939113275451,
+          "positiveDelta": 0.3334704678638687,
+          "actualWaterY": -31.98710963559521,
+          "clearance": 0.1977185028407007,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1834,
+          "atlasEN": [
+            -24.259288678999994,
+            -481.320053774
+          ],
+          "oldBilinearY": -32.00515084988837,
+          "newAnalyticY": -31.75239247672192,
+          "positiveDelta": 0.2527583731664542,
+          "actualWaterY": -31.950000000000184,
+          "clearance": 0.1976075232782648,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1840,
+          "atlasEN": [
+            -33.224576231,
+            -476.438600935
+          ],
+          "oldBilinearY": -32.09495393128215,
+          "newAnalyticY": -31.791573890881978,
+          "positiveDelta": 0.30338004040017097,
+          "actualWaterY": -31.99383527411222,
+          "clearance": 0.202261383230244,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1842,
+          "atlasEN": [
+            -31.740711321,
+            -474.679946226
+          ],
+          "oldBilinearY": -32.00052687330865,
+          "newAnalyticY": -31.74905945247973,
+          "positiveDelta": 0.25146742082892004,
+          "actualWaterY": -31.949999999999285,
+          "clearance": 0.20094054751955426,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1846,
+          "atlasEN": [
+            -36.124280156,
+            -479.875287068
+          ],
+          "oldBilinearY": -32.10831675951275,
+          "newAnalyticY": -31.87749104408146,
+          "positiveDelta": 0.23082571543129404,
+          "actualWaterY": -32.07949625005346,
+          "clearance": 0.2020052059720001,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1848,
+          "atlasEN": [
+            -38.592006692,
+            -482.8
+          ],
+          "oldBilinearY": -32.28120652919917,
+          "newAnalyticY": -31.950608867548816,
+          "positiveDelta": 0.3305976616503514,
+          "actualWaterY": -32.15239605945749,
+          "clearance": 0.20178719190867156,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1854,
+          "atlasEN": [
+            -33.213772588999994,
+            -491.932775444
+          ],
+          "oldBilinearY": -32.27985458367716,
+          "newAnalyticY": -32.01771051891337,
+          "positiveDelta": 0.26214406476378826,
+          "actualWaterY": -32.216113880917526,
+          "clearance": 0.1984033620041572,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1859,
+          "atlasEN": [
+            -36.344408048,
+            -495.64315820999997
+          ],
+          "oldBilinearY": -32.48344187468728,
+          "newAnalyticY": -32.110470088151686,
+          "positiveDelta": 0.3729717865355937,
+          "actualWaterY": -32.309151688581885,
+          "clearance": 0.19868160043019856,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1861,
+          "atlasEN": [
+            -43.418597962999996,
+            -488.52040446899997
+          ],
+          "oldBilinearY": -32.4397785179762,
+          "newAnalyticY": -32.09361897914829,
+          "positiveDelta": 0.34615953882791217,
+          "actualWaterY": -32.294979760913385,
+          "clearance": 0.20136078176509642,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1865,
+          "atlasEN": [
+            -39.007993307999996,
+            -498.8
+          ],
+          "oldBilinearY": -32.382486812231065,
+          "newAnalyticY": -32.18939113275451,
+          "positiveDelta": 0.19309567947655637,
+          "actualWaterY": -32.38830946226332,
+          "clearance": 0.19891832950881394,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1867,
+          "atlasEN": [
+            -49.093939995,
+            -495.246735766
+          ],
+          "oldBilinearY": -32.4948949500615,
+          "newAnalyticY": -32.26177726150356,
+          "positiveDelta": 0.23311768855793957,
+          "actualWaterY": -32.462636649290765,
+          "clearance": 0.20085938778720447,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1872,
+          "atlasEN": [
+            -50.713976724,
+            -497.166779296
+          ],
+          "oldBilinearY": -32.67396433199268,
+          "newAnalyticY": -32.309778349502565,
+          "positiveDelta": 0.36418598249011325,
+          "actualWaterY": -32.510494613702264,
+          "clearance": 0.20071626419969846,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1874,
+          "atlasEN": [
+            -52.092006692,
+            -498.8
+          ],
+          "oldBilinearY": -32.62714194862344,
+          "newAnalyticY": -32.350608867548814,
+          "positiveDelta": 0.27653308107462493,
+          "actualWaterY": -32.55120338778577,
+          "clearance": 0.20059452023695457,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1876,
+          "atlasEN": [
+            -43.639528102,
+            -504.289226423
+          ],
+          "oldBilinearY": -32.72277761880884,
+          "newAnalyticY": -32.326621793138216,
+          "positiveDelta": 0.39615582567062546,
+          "actualWaterY": -32.52595175534876,
+          "clearance": 0.1993299622105411,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1880,
+          "atlasEN": [
+            -49.086685382999995,
+            -510.74511653400003
+          ],
+          "oldBilinearY": -32.76571555899468,
+          "newAnalyticY": -32.48801904583962,
+          "positiveDelta": 0.27769651315505683,
+          "actualWaterY": -32.687833129941865,
+          "clearance": 0.19981408410224333,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1884,
+          "atlasEN": [
+            -50.935615874999996,
+            -512.9364415609999
+          ],
+          "oldBilinearY": -33.64015659026047,
+          "newAnalyticY": -32.542802171735396,
+          "positiveDelta": 1.0973544185250717,
+          "actualWaterY": -32.742780581260696,
+          "clearance": 0.19997840952530055,
+          "approvedOutflowEndcap": true
+        },
+        {
+          "insertedIndex": 1886,
+          "atlasEN": [
+            -58.009723998,
+            -505.81359088100004
+          ],
+          "oldBilinearY": -32.727291889647915,
+          "newAnalyticY": -32.5259486395041,
+          "positiveDelta": 0.2013432501438146,
+          "actualWaterY": -32.726020352865135,
+          "clearance": 0.2000717133610337,
+          "approvedOutflowEndcap": false
+        },
+        {
+          "insertedIndex": 1892,
+          "atlasEN": [
+            -51.178542582999995,
+            -513.224354696
+          ],
+          "oldBilinearY": -33.67962589135843,
+          "newAnalyticY": -32.550000000266316,
+          "positiveDelta": 1.129625891092111,
+          "actualWaterY": -32.75000000000591,
+          "clearance": 0.19999999973959603,
+          "approvedOutflowEndcap": true
+        },
+        {
+          "insertedIndex": 1896,
+          "atlasEN": [
+            -58.821457417,
+            -506.77564530399997
+          ],
+          "oldBilinearY": -32.774753232484194,
+          "newAnalyticY": -32.55000000026036,
+          "positiveDelta": 0.2247532322238328,
+          "actualWaterY": -32.74999999999409,
+          "clearance": 0.19999999973372695,
+          "approvedOutflowEndcap": false
+        }
+      ]
+    }
+  },
+  "endcapExceptions": [
+    {
+      "insertedIndex": 1884,
+      "atlasEN": [
+        -50.935615874999996,
+        -512.9364415609999
+      ],
+      "oldBilinearY": -33.64015659026047,
+      "newAnalyticY": -32.542802171735396,
+      "positiveDelta": 1.0973544185250717,
+      "actualWaterY": -32.742780581260696,
+      "clearance": 0.19997840952530055,
+      "approvedOutflowEndcap": true
+    },
+    {
+      "insertedIndex": 1892,
+      "atlasEN": [
+        -51.178542582999995,
+        -513.224354696
+      ],
+      "oldBilinearY": -33.67962589135843,
+      "newAnalyticY": -32.550000000266316,
+      "positiveDelta": 1.129625891092111,
+      "actualWaterY": -32.75000000000591,
+      "clearance": 0.19999999973959603,
+      "approvedOutflowEndcap": true
+    }
+  ],
+  "sourceTests": 12,
+  "regionalTests": 5,
+  "gltfErrors": 0,
+  "gltfWarnings": 0,
+  "physicalAcceptance": false,
+  "performanceMeasured": false,
+  "oldBilinearFieldException": "42 deficient NEW5m longitudinal crest samples only; dry samples/original vertices/grid/ordinary inserts preserved exactly. Continuous unblended carve profile, never lower; two exact outflow endcaps approved beyond grid.",
+  "unchangedDryCrestSamples": 278,
+  "maximumOrdinaryRaise": 0.41751815071258136,
+  "everyFloat32CrestWaterClearanceAtLeastOneCentimetre": true,
+  "checks": {
+    "source": {
+      "passed": 12,
+      "total": 12,
+      "log": "reports/2026-10-19-r23-bank-final-quantized-edge-tests.log"
+    },
+    "regional": {
+      "passed": 5,
+      "total": 5,
+      "log": "reports/2026-10-19-r23-regional-foundation-tests.log"
+    },
+    "terrain": "reports/2026-10-19-terrain-r23-validation.log",
+    "nativeIntake": "reports/2026-10-19-terrain-r23-native-intake.log",
+    "nativeSupport": {
+      "queries": 2781,
+      "sweeps": 616,
+      "failures": 0,
+      "retainedBytes": 2774696,
+      "log": "reports/2026-10-19-terrain-r23-native-support.log"
+    },
+    "gltf": "reports/2026-10-19-terrain-r23-khronos-validation.log"
+  },
+  "preservedFailures": [
+    {
+      "path": "reports/2026-10-19-river-bank5-prototype.json",
+      "result": "Plain old-bilinear5m constraints:both final214/430 edges belowdatum; export stopped"
+    },
+    {
+      "path": "reports/2026-10-19-river-bank5-analytic-preflight.json",
+      "result": "Blanket analytic replacement:7cap failures (5unnecessary drybanklowerings,2outflowendcapraises); export stopped"
+    },
+    {
+      "path": "reports/2026-10-19-r23-bank-final12-tests.log",
+      "result": "New allcrest fixture used double probes outside finitefloat32wateredges;12-test lane failed1"
+    },
+    {
+      "path": "reports/2026-10-19-r23-bank-float32-double-query.log",
+      "result": "Changing query arithmetic alone still left offedgeprobes; fixture stillfailed; assertion preserved"
+    }
+  ],
+  "sourceRecipesSha256": {
+    "tools/author-chapter-terrain.py": "d5e6438eef6875794106d6d5199708c72bc4b4dd1b355c1f7a9f9196ede3e42e",
+    "tools/chapter_regional_terrain.py": "c0c7d86c72460fae04793bf9545c4cbc1f4dad709c23d4b97ee05137fee4c368",
+    "tools/chapter_water_conformance.py": "3004e2dadaeaa8ae597a45a493290ecf06dd2c6ea87a86449f28339b311c0a89"
+  },
+  "sourceTestSha256": "881cacfbf1d637d82607c90b4ffd646b0c6afa544fac90473c4c22895f694689",
+  "largeSourcePolicy": "Local reproducible Blend/GLB/surface retained but Git-ignored; existing tracked runtime GLB is sole distribution copy"
+}

@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "sourceParent": "91a68a58288b9d0654ed61a1628bf180b693372c",
+  "positivePoseEnabledInGameplay": false,
+  "date": "2026-10-12",
+  "files": [
+    {
+      "path": "src/gameplay/animation/PlayerAnimationState.h",
+      "sha256": "4076af59c407484a9fc0138a97201d80bfb1d36f0cbdf443aa5beb225e944140",
+      "bytes": 3696
+    },
+    {
+      "path": "src/gameplay/animation/PlayerAnimationState.cpp",
+      "sha256": "de50bfb5853878c829880d8e5407b78d4104ed3b850eb49a89a382ceded60d61",
+      "bytes": 8446
+    },
+    {
+      "path": "src/vulkan/raytracing/PlayerRenderSlot.cpp",
+      "sha256": "bac9257974af19db5b212e620bd114c8d5144756d7b233ec0d68e190f3742cd1",
+      "bytes": 43592
+    },
+    {
+      "path": "tests/RescueRigAttachmentTests.cpp",
+      "sha256": "79df1fb9b609b9145a697ab4a4550c8f1d237299fb3fe4250ee0314cb7bf8af8",
+      "bytes": 50908
+    },
+    {
+      "path": "src/scene/assets/SkinnedMeshAsset.cpp",
+      "sha256": "16907eec6df4d9396bafbdf9eefca7c77183bde83ec781e3cb04bb0683057a43",
+      "bytes": 99001
+    },
+    {
+      "path": "src/scene/assets/SkinnedMeshAsset.h",
+      "sha256": "2aa9b399bb6956b5143430d5a5e0ace089ceb332996f97fddab611645dbe0bb0",
+      "bytes": 11050
+    },
+    {
+      "path": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+      "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+      "bytes": 2568508
+    },
+    {
+      "path": "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
+      "sha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
+      "bytes": 1228828
+    },
+    {
+      "path": "assets/models/world/source/tomb-dressing-v01/tomb-dressing-v01.blend1",
+      "sha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb",
+      "bytes": 259583
+    },
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "808e3c3d011757469918a67b02b927ffa97b6d5438a8e084fb93878ab082bbc4",
+      "bytes": 12521984
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "fa2b5724d974de8c472ed8bdaa3ff51b9df1ad6d44f89dbadee5c4d5f1b602e2",
+      "bytes": 4364288
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "787c6e6b936697ef93c9341194e896b6f5a1e71c46ce3fc064d8c718b0bbef75",
+      "bytes": 172744987
+    },
+    {
+      "path": "tools/raygen-variant-budgets.json",
+      "sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+      "bytes": 6425
+    }
+  ]
+}

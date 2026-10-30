@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "status": "unadmitted offline lateral authoring study; not exported or integrated",
+  "sourceSha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+  "productionModified": false,
+  "phoneUsed": false,
+  "nativeExportAttempted": false,
+  "nativeRtAttempted": false,
+  "originalRuntimeClipNames": [
+    "Idle",
+    "Walking"
+  ],
+  "workflow": "Existing Blender 5.2 offline authoring; optional game-dev CLI unavailable",
+  "optionalThumbnailFailure": "Initial Blender OpenImageIO could not open its global .thumbnails output; source save/contact/ten image outputs completed, no thumbnail-path retry. Later process disables optional file preview and does not save preferences.",
+  "sourceFiles": {
+    "author_strafe.py": "6bb90eaf5a4ac776a6e2bd018ae51f0eedf659b44b96b243c27e660579773941",
+    "player-lateral-knee-proof.blend": "ea277ea0756332208b551084d9aa144065c3f1a0aec37e20155853db7c2de308"
+  },
+  "trials": [
+    {
+      "label": "initial",
+      "geometryDigest": "3e28917ab04941ea052da9fe87266a85d2a240273309f56ff15dc88a9e4c6301",
+      "directions": [
+        {
+          "direction": "right",
+          "durationSeconds": 0.6666666666666666,
+          "declaredSpeed": 1.9,
+          "stride": 1.2666666666666666,
+          "geometryWeightsUnchanged": true,
+          "bindUnchanged": true,
+          "maximumLegStretch": 0.09473949995059738,
+          "maximumAdjacentStanceSoleDrift": 0.007422959681158447,
+          "minimumSoleZ": -0.0077884686179459095
+        },
+        {
+          "direction": "left",
+          "durationSeconds": 0.6666666666666666,
+          "declaredSpeed": 1.9,
+          "stride": 1.2666666666666666,
+          "geometryWeightsUnchanged": true,
+          "bindUnchanged": true,
+          "maximumLegStretch": 0.09574324411923996,
+          "maximumAdjacentStanceSoleDrift": 0.007149845626491862,
+          "minimumSoleZ": -0.006895759142935276
+        }
+      ]
+    },
+    {
+      "label": "knee-cleanup",
+      "geometryDigest": "3e28917ab04941ea052da9fe87266a85d2a240273309f56ff15dc88a9e4c6301",
+      "directions": [
+        {
+          "direction": "right",
+          "durationSeconds": 0.6666666666666666,
+          "declaredSpeed": 1.9,
+          "stride": 1.2666666666666666,
+          "geometryWeightsUnchanged": true,
+          "bindUnchanged": true,
+          "maximumLegStretch": 0,
+          "maximumAdjacentStanceSoleDrift": 0.005064049144102644,
+          "minimumSoleZ": -0.005736560095101595
+        },
+        {
+          "direction": "left",
+          "durationSeconds": 0.6666666666666666,
+          "declaredSpeed": 1.9,
+          "stride": 1.2666666666666666,
+          "geometryWeightsUnchanged": true,
+          "bindUnchanged": true,
+          "maximumLegStretch": 0,
+          "maximumAdjacentStanceSoleDrift": 0.004563161494035132,
+          "minimumSoleZ": -0.005511895753443241
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "assetPolicyCTest": [
+      "1/1 Test #182: horde_rt_horde_162_asset_policy_tests ...   Passed  181.17 sec",
+      "",
+      "100% tests passed, 0 tests failed out of 1",
+      "",
+      "Total Test time (real) = 181.20 sec"
+    ],
+    "blenderReopen": [
+      "REOPEN_PASS 4 [('LEFT lateral crossover proof - NOT RUNTIME', 1, 41), ('RIGHT lateral crossover proof - NOT RUNTIME', 1, 41)]"
+    ],
+    "sourceAst": "pass",
+    "relativeLinks": "pass",
+    "originalRuntimeSha256Unchanged": true,
+    "parkedOwnerFilesUnchanged": 151
+  }
+}

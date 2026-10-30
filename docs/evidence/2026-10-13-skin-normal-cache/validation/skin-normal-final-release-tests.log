@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  75: horde_rt_skinned_node_pose_batch_tests
+1/4 Test  #75: horde_rt_skinned_node_pose_batch_tests ....   Passed    0.15 sec
+    Start 170: horde_rt_skinned_arm_reference_tests
+2/4 Test #170: horde_rt_skinned_arm_reference_tests ......   Passed    1.51 sec
+    Start 171: horde_rt_skinned_character_smoke
+3/4 Test #171: horde_rt_skinned_character_smoke ..........   Passed    7.40 sec
+    Start 174: horde_rt_player_viewmodel_pose_fixtures
+4/4 Test #174: horde_rt_player_viewmodel_pose_fixtures ...   Passed    1.87 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  10.99 sec

@@ -25,4 +25,12 @@ using MusicPcmWaveStatus = pocket_audio::PcmWaveStatus;
     std::uint32_t expectedFrameCount,
     std::vector<std::int16_t>& outputSamples) noexcept;
 
+// Only callers admitting an explicitly reviewed longer asset opt in. Legacy
+// calls retain Core's strict 12-second defaults.
+[[nodiscard]] MusicPcmWaveStatus DecodeMusicPcmWave(
+    std::span<const std::uint8_t> fileBytes,
+    std::uint32_t expectedFrameCount,
+    std::vector<std::int16_t>& outputSamples,
+    pocket_audio::PcmClipLimits limits) noexcept;
+
 } // namespace horde::audio

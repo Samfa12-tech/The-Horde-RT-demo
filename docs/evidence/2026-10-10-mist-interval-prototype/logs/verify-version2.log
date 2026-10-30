@@ -1,0 +1,98 @@
+{
+  "current": {
+    "quality": "current",
+    "exact_surface_rgba_equal": true,
+    "full_frame_changed_pixels": 69539,
+    "maximum_channel_delta": 32,
+    "interval_pixels": 121981,
+    "overflow_pixels": 0,
+    "negative_overflow_pixels": 300527,
+    "comparison_rays": 452,
+    "cpu_verification_seconds": 0.5440249999955995,
+    "maximum_length_error": 8.964186561932763e-06,
+    "gpu_ms": {
+      "baseline": 6.193056,
+      "prototype": 7.789472
+    },
+    "weighted_witnesses": [
+      {
+        "pixel": [
+          838,
+          574
+        ],
+        "gpu_weighted_fraction": 0.03804466873407364,
+        "cpu_cell_weighted_fraction": 0.03804472241753422,
+        "dense4096_fraction": 0.039103932174852835,
+        "cell_approximation_error_pp": -0.10592634407791957
+      },
+      {
+        "pixel": [
+          915,
+          513
+        ],
+        "gpu_weighted_fraction": 0.02350316010415554,
+        "cpu_cell_weighted_fraction": 0.023503128461922426,
+        "dense4096_fraction": 0.024949306373577475,
+        "cell_approximation_error_pp": -0.1446146269421935
+      },
+      {
+        "pixel": [
+          850,
+          556
+        ],
+        "gpu_weighted_fraction": 0.03288687765598297,
+        "cpu_cell_weighted_fraction": 0.03288652718804246,
+        "dense4096_fraction": 0.03405066960885034,
+        "cell_approximation_error_pp": -0.11637919528673657
+      }
+    ]
+  },
+  "higher": {
+    "quality": "higher",
+    "exact_surface_rgba_equal": true,
+    "full_frame_changed_pixels": 134977,
+    "maximum_channel_delta": 34,
+    "interval_pixels": 183471,
+    "overflow_pixels": 0,
+    "negative_overflow_pixels": 300527,
+    "comparison_rays": 452,
+    "cpu_verification_seconds": 0.5609205000073416,
+    "maximum_length_error": 2.200182180445154e-06,
+    "gpu_ms": {
+      "baseline": 4.719488,
+      "prototype": 5.822784
+    },
+    "weighted_witnesses": [
+      {
+        "pixel": [
+          838,
+          574
+        ],
+        "gpu_weighted_fraction": 0.03804466873407364,
+        "cpu_cell_weighted_fraction": 0.03804472241753422,
+        "dense4096_fraction": 0.039103932174852835,
+        "cell_approximation_error_pp": -0.10592634407791957
+      },
+      {
+        "pixel": [
+          915,
+          513
+        ],
+        "gpu_weighted_fraction": 0.02350316010415554,
+        "cpu_cell_weighted_fraction": 0.023503128461922426,
+        "dense4096_fraction": 0.024949306373577475,
+        "cell_approximation_error_pp": -0.1446146269421935
+      },
+      {
+        "pixel": [
+          850,
+          556
+        ],
+        "gpu_weighted_fraction": 0.03288687765598297,
+        "cpu_cell_weighted_fraction": 0.03288652718804246,
+        "dense4096_fraction": 0.03405066960885034,
+        "cell_approximation_error_pp": -0.11637919528673657
+      }
+    ]
+  }
+}

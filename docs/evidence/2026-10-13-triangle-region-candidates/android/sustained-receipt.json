@@ -1,0 +1,144 @@
+{
+  "source": "42d00817356b1bdd93b14a0684268152fb2d0795",
+  "apkSha256": "24aaf0b5894e57a38804f39875c06fbf34b801dfd0c83997b76c8aea8fa9233e",
+  "device": "SM-S948B",
+  "renderScale": 0.4,
+  "scope": "frozen checkpoint camera and simulation; not a route",
+  "warmupFrames": 120,
+  "sampleFramesPerWindow": 120,
+  "windows": 3,
+  "runs": {
+    "RayTracingPipeline": {
+      "cpuWindowMeansMs": [
+        54.692,
+        54.716,
+        54.866
+      ],
+      "finalGpu": {
+        "status": "valid",
+        "available": true,
+        "completedSubmissionSerial": 480,
+        "wholeRtGpuMs": 52.762655,
+        "timestampValidBits": 48,
+        "timestampPeriodPicoseconds": 52083,
+        "sampleCount": 480,
+        "unavailableResultCount": 0,
+        "errorCount": 0,
+        "detail": "GPU RT command-buffer timing is available."
+      },
+      "finalResources": {
+        "bufferCount": 52,
+        "memoryAllocationCount": 63,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 2,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49407552,
+        "deviceLocalBytes": 166076608
+      },
+      "finalFrameIdentity": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 5,
+        "recordAttemptSerial": 480,
+        "recordSerial": 480,
+        "submissionSerial": 480,
+        "completionSerial": 480,
+        "simulationTick": 2516,
+        "frameSlot": 0
+      },
+      "shadow": {
+        "mode": "current",
+        "localPrimarySamples": 1,
+        "skyPrimarySamples": 1,
+        "reserved": 0
+      },
+      "pipeline": {
+        "executionBackend": "RayTracingPipeline",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "mobile",
+        "bundleKey": "diagnostic_mobile_pair",
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "b5017f41da75094e83e9b87ee9f9be5bef0086755d6dd78f38b8c8e092c7e770"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "61d4a96d05188768abccdef60386ba2ba14aa044d1decc3f818937aef20d511e"
+        },
+        "activeStrategy": "opaque-fast",
+        "activeKey": "diagnostic_mobile_opaque_fast",
+        "activeSha256": "b5017f41da75094e83e9b87ee9f9be5bef0086755d6dd78f38b8c8e092c7e770",
+        "waterQuality": "mobile"
+      },
+      "status": "complete"
+    },
+    "RayQueryCompute": {
+      "cpuWindowMeansMs": [
+        54.901,
+        54.79,
+        54.96
+      ],
+      "finalGpu": {
+        "status": "valid",
+        "available": true,
+        "completedSubmissionSerial": 480,
+        "wholeRtGpuMs": 52.951457,
+        "timestampValidBits": 48,
+        "timestampPeriodPicoseconds": 52083,
+        "sampleCount": 480,
+        "unavailableResultCount": 0,
+        "errorCount": 0,
+        "detail": "GPU RT command-buffer timing is available."
+      },
+      "finalResources": {
+        "bufferCount": 50,
+        "memoryAllocationCount": 61,
+        "bottomLevelAccelerationStructureCount": 20,
+        "topLevelAccelerationStructureCount": 1,
+        "tlasInstanceCount": 28,
+        "pipelineCount": 2,
+        "shaderBindingTableCount": 0,
+        "descriptorSetCount": 1,
+        "hostVisibleBytes": 49407040,
+        "deviceLocalBytes": 166076096
+      },
+      "finalFrameIdentity": {
+        "sceneEpoch": 3,
+        "measurementGeneration": 5,
+        "recordAttemptSerial": 480,
+        "recordSerial": 480,
+        "submissionSerial": 480,
+        "completionSerial": 480,
+        "simulationTick": 2516,
+        "frameSlot": 0
+      },
+      "shadow": {
+        "mode": "current",
+        "localPrimarySamples": 1,
+        "skyPrimarySamples": 1,
+        "reserved": 0
+      },
+      "pipeline": {
+        "executionBackend": "RayQueryCompute",
+        "instrumentation": "diagnostic",
+        "dielectricQuality": "mobile",
+        "bundleKey": "rayquery_compute_diagnostic_mobile_pair",
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+          "sha256": "0aae45f37a9604bcf4da9ef60f9307b1600b485e5d40e314afa3517d62a19601"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+          "sha256": "9b578ab93f66ea93abe9dd55354fca033aaeba02b8d7d6c667a9aabd6e7b4061"
+        },
+        "activeStrategy": "opaque-fast",
+        "activeKey": "rayquery_compute_diagnostic_mobile_opaque_fast",
+        "activeSha256": "0aae45f37a9604bcf4da9ef60f9307b1600b485e5d40e314afa3517d62a19601",
+        "waterQuality": "mobile"
+      },
+      "status": "complete"
+    }
+  }
+}

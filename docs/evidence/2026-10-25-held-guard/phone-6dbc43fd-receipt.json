@@ -1,0 +1,76 @@
+{
+  "sourceCommit": "6dbc43fd3f1359ba5b2abc8fc99eb5f47b94bff3",
+  "artifactSha256": "e1b4ff57fd61f38e1be92bf388e181db5a23642c40ea43fc5c606df59a820ee2",
+  "artifactBytes": 206289499,
+  "package": "com.samfa12.hordelanternrt.debug",
+  "versionCode": 10,
+  "versionName": "1.6.2-debug",
+  "deviceModel": "SM-S948B",
+  "evidenceClass": "Physical device, normal isolated new-game entry and actual RT screenshots; bounded input/presentation check",
+  "build": {
+    "androidUnitTests": 469,
+    "failures": 0,
+    "errors": 0,
+    "existingSkips": 6,
+    "assembleLint": "PASS,2m43s",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "newRuntimeAssetEntries": [],
+    "sourceOrSaveEntries": []
+  },
+  "defaults": {
+    "flask": false,
+    "shared64": false,
+    "keeperCast": "ExistingControl",
+    "savedSettings": "preserved"
+  },
+  "attempts": [
+    {
+      "id": "r1",
+      "normalGameplayInputIssued": false,
+      "result": "Old harness expected ENTER THE RUIN; actual current menu shows PLAY; stopped/restored. Original failure retained.",
+      "restored": true
+    },
+    {
+      "id": "r2",
+      "normalFlow": "Observed PLAY -> Begin in Slot 1, fresh supported isolated namespace; no completion flags/checkpoint staging",
+      "workflowSeconds": 90.812,
+      "workflowCompleted": true,
+      "visualReview": {
+        "touchHeldGuard": "raised sword/hand visible",
+        "touchRelease": "returned to original rest pose",
+        "sameAnchorPauseIcon": "visible in portrait",
+        "mixedKeyboardTouchHeldReturn": "unadmitted: key-up events precede Swing, so continuous hold not established"
+      },
+      "restored": true
+    }
+  ],
+  "limitations": [
+    "No genuine multipointer/two-thumb device witness",
+    "No accepted held-attack-return device witness",
+    "No damage/balance, natural Keeper victory, earned lantern full journey/save/death, physical audio or sustained performance pass",
+    "Landscape/pause interaction and owner thumb feel remain pending",
+    "Successful scripted completion is not feature acceptance"
+  ],
+  "closure": {
+    "releasedUtc": "2026-10-25T09:29:31.855Z",
+    "originalBothApkHashesRestored": true,
+    "priorSaveAndLockFiles": 18,
+    "priorSaveBytesAndPreferencesUnchanged": true,
+    "systemSettingsUnchanged": true,
+    "addedIsolatedPaths": [],
+    "ownedRendererOrTransferRemaining": false,
+    "candidateLeftInstalled": false,
+    "safeToDisconnect": true
+  },
+  "installedAfterClosure": {
+    "debugSha256": "fe3a51beb3a2d6385232dcccfdf8315785e969825e8a35a7de65be8894f46925",
+    "releaseSha256": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8"
+  },
+  "next": "Future allocation: owner-assisted genuine two-thumb held guard/attack and orientation checks, then deliberately retain verified candidate for recording. Current source UI cleanup is separate."
+}

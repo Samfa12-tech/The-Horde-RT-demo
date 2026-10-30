@@ -1,0 +1,142 @@
+[
+  {
+    "case": "actual-landing-lower-migration-current-pipeline",
+    "sourceParent": "dc0d1729",
+    "apk": "0374dd8d4c367ff21bf586a6424e9c2f9733b6a3abecbccff9de2f43c0005a0c",
+    "backend": "RayTracingPipeline",
+    "shadow": {
+      "mode": "current",
+      "localPrimarySamples": 1,
+      "skyPrimarySamples": 1,
+      "reserved": 0
+    },
+    "player": {
+      "x": -33.7,
+      "z": -12.8,
+      "yaw": 0.0,
+      "pitch": -0.15,
+      "vitality": 3,
+      "maxVitality": 3,
+      "lifePhase": "alive",
+      "damageEnabled": false
+    },
+    "tick": 922,
+    "internal": {
+      "width": 576,
+      "height": 1192
+    },
+    "scale": 0.4,
+    "lastGpuMs": 54.636665,
+    "deviceBytes": 166076608,
+    "hostBytes": 49407552,
+    "presented": true,
+    "primaryPixels": 0,
+    "shader": "b5017f41da75094e83e9b87ee9f9be5bef0086755d6dd78f38b8c8e092c7e770",
+    "stableFrames": 12
+  },
+  {
+    "case": "actual-landing-higher-pipeline",
+    "sourceParent": "dc0d1729",
+    "apk": "0374dd8d4c367ff21bf586a6424e9c2f9733b6a3abecbccff9de2f43c0005a0c",
+    "backend": "RayTracingPipeline",
+    "shadow": {
+      "mode": "higher",
+      "localPrimarySamples": 2,
+      "skyPrimarySamples": 2,
+      "reserved": 0
+    },
+    "player": {
+      "x": -33.7,
+      "z": -12.8,
+      "yaw": 0.0,
+      "pitch": -0.15,
+      "vitality": 3,
+      "maxVitality": 3,
+      "lifePhase": "alive",
+      "damageEnabled": false
+    },
+    "tick": 922,
+    "internal": {
+      "width": 576,
+      "height": 1192
+    },
+    "scale": 0.4,
+    "lastGpuMs": 67.906509,
+    "deviceBytes": 166076608,
+    "hostBytes": 49407552,
+    "presented": true,
+    "primaryPixels": 0,
+    "shader": "b5017f41da75094e83e9b87ee9f9be5bef0086755d6dd78f38b8c8e092c7e770",
+    "stableFrames": 12
+  },
+  {
+    "case": "actual-landing-current-query",
+    "sourceParent": "dc0d1729",
+    "apk": "0374dd8d4c367ff21bf586a6424e9c2f9733b6a3abecbccff9de2f43c0005a0c",
+    "backend": "RayQueryCompute",
+    "shadow": {
+      "mode": "current",
+      "localPrimarySamples": 1,
+      "skyPrimarySamples": 1,
+      "reserved": 0
+    },
+    "player": {
+      "x": -33.7,
+      "z": -12.8,
+      "yaw": 0.0,
+      "pitch": -0.15,
+      "vitality": 3,
+      "maxVitality": 3,
+      "lifePhase": "alive",
+      "damageEnabled": false
+    },
+    "tick": 922,
+    "internal": {
+      "width": 576,
+      "height": 1192
+    },
+    "scale": 0.4,
+    "lastGpuMs": 55.481926,
+    "deviceBytes": 166076096,
+    "hostBytes": 49407040,
+    "presented": true,
+    "primaryPixels": 0,
+    "shader": "0aae45f37a9604bcf4da9ef60f9307b1600b485e5d40e314afa3517d62a19601",
+    "stableFrames": 12
+  },
+  {
+    "case": "actual-landing-higher-query",
+    "sourceParent": "dc0d1729",
+    "apk": "0374dd8d4c367ff21bf586a6424e9c2f9733b6a3abecbccff9de2f43c0005a0c",
+    "backend": "RayQueryCompute",
+    "shadow": {
+      "mode": "higher",
+      "localPrimarySamples": 2,
+      "skyPrimarySamples": 2,
+      "reserved": 0
+    },
+    "player": {
+      "x": -33.7,
+      "z": -12.8,
+      "yaw": 0.0,
+      "pitch": -0.15,
+      "vitality": 3,
+      "maxVitality": 3,
+      "lifePhase": "alive",
+      "damageEnabled": false
+    },
+    "tick": 922,
+    "internal": {
+      "width": 576,
+      "height": 1192
+    },
+    "scale": 0.4,
+    "lastGpuMs": 64.751301,
+    "deviceBytes": 166076096,
+    "hostBytes": 49407040,
+    "presented": true,
+    "primaryPixels": 0,
+    "shader": "0aae45f37a9604bcf4da9ef60f9307b1600b485e5d40e314afa3517d62a19601",
+    "stableFrames": 12
+  }
+]

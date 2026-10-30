@@ -1,0 +1,15 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  24: horde_rt_raygen_artifact_ownership_tests
+1/5 Test  #24: horde_rt_raygen_artifact_ownership_tests ...   Passed    0.74 sec
+    Start  98: horde_rt_static_gltf_asset_tests
+2/5 Test  #98: horde_rt_static_gltf_asset_tests ...........   Passed    0.17 sec
+    Start 146: horde_rt_horde_162_asset_policy_tests
+3/5 Test #146: horde_rt_horde_162_asset_policy_tests ......   Passed  180.20 sec
+    Start 167: horde_rt_static_geometry_cutover_tests
+4/5 Test #167: horde_rt_static_geometry_cutover_tests .....   Passed    2.17 sec
+    Start 168: horde_rt_scene_resource_inventory_tests
+5/5 Test #168: horde_rt_scene_resource_inventory_tests ....   Passed    3.99 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) = 187.31 sec

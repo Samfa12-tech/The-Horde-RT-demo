@@ -1,0 +1,3 @@
+GDI font fixture Segoe UI resolved as Segoe UI.
+GDI font fixture Georgia resolved as Georgia.
+PASS: Windows glass graphics source contracts; 342 checks. No Vulkan/GUI/device execution.

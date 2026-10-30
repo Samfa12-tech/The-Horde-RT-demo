@@ -1,0 +1,33 @@
+{
+  "witness": 13,
+  "scope": "Conservative screen-contained grip-centre and world-upright full flame envelope bounds only. This does not prove that partly visible fingers, a tilted/adaptive pose, or all upright rig solutions are infeasible.",
+  "shaderForward": [
+    0.9059366932655255,
+    -0.19611613513818402,
+    0.3752561383023421
+  ],
+  "shaderRight": [
+    -0.3826876743598231,
+    0.0,
+    0.9238777754081272
+  ],
+  "shaderUp": [
+    0.1811873386531051,
+    0.9805806756909201,
+    0.07505122766046843
+  ],
+  "horizontalHalfSlope": 1.4571948998178506,
+  "verticalHalfSlope": 0.6065573770491803,
+  "roof": 1.35,
+  "flameTopFromGrip": 0.965,
+  "roofGap": 0.03,
+  "wall": 1.85,
+  "minimumHorizontalFlameRadius": 0.15,
+  "wallGap": 0.03,
+  "eyeWorldY": 0.7,
+  "requiredDrop": 0.34499999999999986,
+  "minimumViewDepth": 0.43621490107138255,
+  "minimumWallwardDisplacementAtThatDepth": 0.10398737232908645,
+  "availableWallwardDisplacement": 0.07092000000000004,
+  "necessaryConditionsIncompatible": true
+}

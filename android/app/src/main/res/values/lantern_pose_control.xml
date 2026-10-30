@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="lantern_pose_icon_state" type="id" />
+    <string name="lantern_raised_action">%1$s. Lantern raised.</string>
+    <string name="lantern_lowered_action">%1$s. Lantern lowered.</string>
+</resources>

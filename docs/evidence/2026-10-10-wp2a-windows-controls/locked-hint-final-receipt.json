@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "source_candidate_commit": "5eea37f87771e7f9405b5b7f1263741b7685a6c3",
+  "prior_source_commit": "214c40c69266e35485f5945bd5db599c8bee7a1c",
+  "prior_receipt": "receipt.json",
+  "local_host_package_checks": "PASS",
+  "github_checks_at_publication": "PENDING; final pushed SHA verified externally in PR/handoff",
+  "refinement": "Locked hint does not suppress attack. Previously displayed actionable prompt remains an interaction even after reset locks chest; never falls through to swing.",
+  "changed_source_paths": [
+    "src/platform/windows/WindowsGameplayInput.h",
+    "tests/DesktopControllerInputTests.cpp"
+  ],
+  "windows_artifacts": [
+    {
+      "configuration": "Windows Debug",
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "8daf640e32479783739a86a9ee431184d0d1121c6e2a107bbf5d343c0af2d7fd",
+      "bytes": 11755008
+    },
+    {
+      "configuration": "Windows Release",
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "2c7691553f90e1d3c7c06604ae9feab168bdd2c6e46212ae7719d3cbaf35bdc7",
+      "bytes": 4119552
+    }
+  ],
+  "source_identity_file": "locked-hint-source-identities.json",
+  "runs_file": "runs.jsonl",
+  "new_run_labels": [
+    "locked-hint-debug-build",
+    "locked-hint-debug",
+    "locked-hint-release-build",
+    "locked-hint-release",
+    "locked-hint-debug-package",
+    "locked-hint-release-package"
+  ],
+  "focused_debug": "4/4, 2.95 s",
+  "focused_release": "4/4, 1.75 s",
+  "final_executable_containment": "1/1 Debug and Release; rebuilt actual executable policy pairs",
+  "unaffected_evidence": "Earlier 23/23 each, full torch 168.67 s, shader matrix/freshness and Android build/package records retained; inputs unaffected by final Windows-only helper/test correction. No repeated full sweep.",
+  "android_identity_file": "android-all-abi-identities.json",
+  "device_verified": false,
+  "owner_acceptance": "PENDING",
+  "historical_owner_feedback": "ba7caf656246f8b74f8343b21909b1d16dfa3d98 only; no transfer",
+  "wp2a_fully_complete": false
+}

@@ -1,0 +1,16 @@
+{
+  "canonicalAssetLicenses": {
+    "sha256": "3a6cff3d34421d2ec751b1f64ec44b6c3ee801cdc1d6d1123c3cb479c0b92387",
+    "matchesBefore": true
+  },
+  "canonicalProjectMemory": {
+    "sha256": "9cfbea7667b50a9a960396c8f13c68905791aebd42121ecb353a8354b8cd406e",
+    "matchesBefore": true
+  },
+  "desktopDebugSettings": {
+    "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3",
+    "matchesBefore": true
+  },
+  "ownerDesktopCampaignDirectoryRemainsAbsent": true,
+  "phoneAccessed": false
+}

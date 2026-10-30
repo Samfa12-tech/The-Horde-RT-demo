@@ -1,0 +1,9 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+    Start  69: horde_rt_motion_evidence_scenario_tests
+1/2 Test  #69: horde_rt_motion_evidence_scenario_tests ...   Passed    1.66 sec
+    Start 188: horde_rt_spatial_audio_smoke
+2/2 Test #188: horde_rt_spatial_audio_smoke ..............   Passed    0.93 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   2.61 sec

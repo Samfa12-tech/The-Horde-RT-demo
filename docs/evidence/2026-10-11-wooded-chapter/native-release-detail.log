@@ -1,0 +1,731 @@
+Start testing: Oct 11 02:09 AUS Eastern Summer Time
+----------------------------------------------------------
+1/165 Testing: horde_rt_menu_ambience_tests
+1/165 Test: horde_rt_menu_ambience_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_menu_ambience_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_menu_ambience_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Bounded motion-linked chain cues and reset/focus/catch-up delivery pass
+<end of output>
+Test time =   0.95 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_menu_ambience_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_menu_ambience_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/165 Testing: horde_rt_chapter_dialogue_tests
+24/165 Test: horde_rt_chapter_dialogue_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_chapter_dialogue_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_chapter_dialogue_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed
+<end of output>
+Test time =   1.01 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_chapter_dialogue_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_chapter_dialogue_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+25/165 Testing: horde_rt_combat_foundation_tests
+25/165 Test: horde_rt_combat_foundation_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_combat_foundation_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_combat_foundation_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+combat foundation checks=677 failures=0
+<end of output>
+Test time =   1.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_combat_foundation_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_combat_foundation_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+26/165 Testing: horde_rt_held_item_transition_tests
+26/165 Test: horde_rt_held_item_transition_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_held_item_transition_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_held_item_transition_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Held-item transition checks passed
+<end of output>
+Test time =   0.86 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_held_item_transition_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_held_item_transition_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/165 Testing: horde_rt_combat_timing_trace_tests
+27/165 Test: horde_rt_combat_timing_trace_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_combat_timing_trace_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_combat_timing_trace_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   1.66 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_combat_timing_trace_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_combat_timing_trace_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+28/165 Testing: horde_rt_input_presentation_trace_tests
+28/165 Test: horde_rt_input_presentation_trace_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_input_presentation_trace_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_input_presentation_trace_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.84 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_input_presentation_trace_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_input_presentation_trace_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/165 Testing: horde_rt_held_item_clearance_tests
+29/165 Test: horde_rt_held_item_clearance_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_held_item_clearance_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_held_item_clearance_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Portal cases=19392 maximum world-down carry=0.79874 m
+Maximum sampled walk/look hand step=0.0295375 m at step 197 previous z/yaw/pitch=-3.46/-0.210644/0.0560644 current=-3.47/-0.214874/0.0519433 retreat/lowering=0.189427/0.558001 -> 0.178705/0.532593
+Rag torch held/lowered residual=0.577716/0.0887203 m; lowered hand Y=-0.910606
+<end of output>
+Test time =   1.26 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_held_item_clearance_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_held_item_clearance_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+30/165 Testing: horde_rt_ambience_pcm_loop_tests
+30/165 Test: horde_rt_ambience_pcm_loop_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_ambience_pcm_loop_tests.exe"
+Directory: <repo>
+"horde_rt_ambience_pcm_loop_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.88 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_ambience_pcm_loop_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_ambience_pcm_loop_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+34/165 Testing: horde_rt_graphics_preview_frame_adapter_tests
+34/165 Test: horde_rt_graphics_preview_frame_adapter_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_graphics_preview_frame_adapter_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_graphics_preview_frame_adapter_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.92 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_graphics_preview_frame_adapter_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_graphics_preview_frame_adapter_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+46/165 Testing: horde_rt_motion_evidence_scenario_tests
+46/165 Test: horde_rt_motion_evidence_scenario_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_motion_evidence_scenario_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_motion_evidence_scenario_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+torch-drench rate=15 stage=complete endpoint=(-5.4757,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=15 stage=complete endpoint=(-3.7859e-10,-3.78285) simulationSeconds=24.4667 states=367 events=26 reservedLedgerBytes=38755200 reason=
+shaft-up rate=15 stage=complete endpoint=(-1.66,-15.3675) simulationSeconds=17.9333 states=269 events=21 reservedLedgerBytes=38755200 reason=
+shaft coverage views=182 zSpan=0.479259 retry=0 finaleRoof=0
+keeper-first-entry rate=15 stage=complete endpoint=(-31.1865,-15.2) simulationSeconds=10.2667 states=154 events=13 reservedLedgerBytes=38755200 reason=
+keeper-retry-reward rate=15 stage=complete endpoint=(-31.1867,-15.2001) simulationSeconds=46.6167 states=700 events=63 reservedLedgerBytes=38755200 reason=
+waterfall-equipment rate=15 stage=complete endpoint=(0.400877,-15.1484) simulationSeconds=6.46667 states=97 events=16 reservedLedgerBytes=38755200 reason=
+torch-drench rate=30 stage=complete endpoint=(-5.48048,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=30 stage=complete endpoint=(-9.95028e-10,-3.78032) simulationSeconds=24.4 states=732 events=26 reservedLedgerBytes=38755200 reason=
+shaft-up rate=30 stage=complete endpoint=(-1.66,-15.3853) simulationSeconds=17.8667 states=536 events=21 reservedLedgerBytes=38755200 reason=
+shaft coverage views=361 zSpan=0.48181 retry=0 finaleRoof=0
+keeper-first-entry rate=30 stage=complete endpoint=(-31.1779,-15.2) simulationSeconds=10.2333 states=307 events=13 reservedLedgerBytes=38755200 reason=
+keeper-retry-reward rate=30 stage=complete endpoint=(-31.1786,-15.2002) simulationSeconds=46.5167 states=1396 events=63 reservedLedgerBytes=38755200 reason=
+waterfall-equipment rate=30 stage=complete endpoint=(0.464386,-15.1416) simulationSeconds=6.36667 states=191 events=16 reservedLedgerBytes=38755200 reason=
+torch-drench rate=60 stage=complete endpoint=(-5.47667,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=60 stage=complete endpoint=(-1.10681e-09,-3.77682) simulationSeconds=24.4167 states=1465 events=26 reservedLedgerBytes=38755200 reason=
+shaft-up rate=60 stage=complete endpoint=(-1.66,-15.3852) simulationSeconds=17.8667 states=1072 events=22 reservedLedgerBytes=38755200 reason=
+shaft coverage views=721 zSpan=0.471199 retry=0 finaleRoof=0
+keeper-first-entry rate=60 stage=complete endpoint=(-31.1772,-15.2) simulationSeconds=10.2167 states=613 events=13 reservedLedgerBytes=38755200 reason=
+keeper-retry-reward rate=60 stage=complete endpoint=(-31.1779,-15.2003) simulationSeconds=46.45 states=2787 events=62 reservedLedgerBytes=38755200 reason=
+waterfall-equipment rate=60 stage=complete endpoint=(0.495852,-15.1465) simulationSeconds=6.36667 states=382 events=16 reservedLedgerBytes=38755200 reason=
+torch-drench rate=120 stage=complete endpoint=(-5.47667,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=120 stage=complete endpoint=(-1.10681e-09,-3.77682) simulationSeconds=24.4167 states=2930 events=26 reservedLedgerBytes=38755200 reason=
+shaft-up rate=120 stage=complete endpoint=(-1.66,-15.3852) simulationSeconds=17.8667 states=2144 events=22 reservedLedgerBytes=38755200 reason=
+shaft coverage views=1441 zSpan=0.471199 retry=0 finaleRoof=0
+keeper-first-entry rate=120 stage=complete endpoint=(-31.1772,-15.2) simulationSeconds=10.2167 states=1226 events=13 reservedLedgerBytes=38755200 reason=
+keeper-retry-reward rate=120 stage=complete endpoint=(-31.1779,-15.2003) simulationSeconds=46.45 states=5573 events=62 reservedLedgerBytes=38755200 reason=
+waterfall-equipment rate=120 stage=complete endpoint=(0.495852,-15.1465) simulationSeconds=6.36667 states=764 events=16 reservedLedgerBytes=38755200 reason=
+<end of output>
+Test time =   1.52 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_motion_evidence_scenario_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_motion_evidence_scenario_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+47/165 Testing: horde_rt_world_route_foundation_tests
+47/165 Test: horde_rt_world_route_foundation_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_world_route_foundation_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_world_route_foundation_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+World route checks=18880 failures=0 triangles=556 resident_cpu_ns=52800 staged_cpu_ns=37400 resident_retained_bytes=34128 staged_peak_cpu_bytes=49296 directions=2 GPU_cost=not-measured
+<end of output>
+Test time =   1.25 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_world_route_foundation_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_world_route_foundation_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+48/165 Testing: horde_rt_vertical_support_tests
+48/165 Test: horde_rt_vertical_support_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_vertical_support_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_vertical_support_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Vertical support proof cases=265 failures=0 fixed-walk directions=2
+<end of output>
+Test time =   0.78 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_vertical_support_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_vertical_support_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+49/165 Testing: horde_rt_held_item_vertical_support_rig_tests
+49/165 Test: horde_rt_held_item_vertical_support_rig_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_held_item_vertical_support_rig_tests.exe" "<repo>"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_held_item_vertical_support_rig_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Exact-pose rejected missing geometry: missing skinned geometry
+Exact-pose rejected omitted support: body mesh or eye applied support incorrectly
+Exact-pose rejected doubled support: body mesh or eye applied support incorrectly
+Exact-pose rejected unreachable wrist: actual wrist is outside anatomical reach
+Exact-pose rejected broken torch Grip: torch no longer attaches to the solved rig Grip
+Exact-pose rejected broken sword Hips attachment: production stowed sword no longer attaches to animated Hips
+Exact-pose rejected independent flame offset: flame or physical light left its authored item socket
+Exact-pose rejected independent physical-light offset: flame or physical light left its authored item socket
+Exact checkpoint171 production rig yaw0 pitch-0.05 aspect16:9 passed; mesh points=34304 lowering/retraction/headroom=0.333987/0.200392/0.0347347 returned lowering=0 same-validator negatives=9 descent ticks=59
+Actual cached player rig support transform passed: support delta=0.35 m; actual skinned body vertices, hand/item sockets, reward-lantern hinge/body/flame/light, and torch clearance translated with XZ preserved.
+First fixture (0,0) torch retraction/headroom floor=0/0.0557224 m raised=0.197407/0.0347347 m
+<end of output>
+Test time =   0.71 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_held_item_vertical_support_rig_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_held_item_vertical_support_rig_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+50/165 Testing: horde_rt_player_directional_rig_tests
+50/165 Test: horde_rt_player_directional_rig_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_player_directional_rig_tests.exe" "<repo>"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_player_directional_rig_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Directional runtime rig, aim independence, run stride, dodge disposition, route support poses, and attachment sockets passed; dedicated run/back/strafe/dodge clips remain absent; route_pose_samples=75 GPU_cost=not-measured.
+<end of output>
+Test time =   1.19 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_player_directional_rig_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_player_directional_rig_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+58/165 Testing: horde_rt_pipeline_variant_provider_tests
+58/165 Test: horde_rt_pipeline_variant_provider_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_pipeline_variant_provider_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_pipeline_variant_provider_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_pipeline_variant_provider_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_pipeline_variant_provider_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+59/165 Testing: horde_rt_pipeline_bundle_contracts_tests
+59/165 Test: horde_rt_pipeline_bundle_contracts_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_pipeline_bundle_contracts_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_pipeline_bundle_contracts_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_pipeline_bundle_contracts_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_pipeline_bundle_contracts_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+73/165 Testing: horde_rt_player_animation_tests
+73/165 Test: horde_rt_player_animation_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_player_animation_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_player_animation_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Unequal folded IK: elbow=(-0.075,0.290474,0), upper=0.3, lower=0.4
+Owner portrait safe-frame NDC x=[-0.934917, 0.864117]
+Downward portrait safe-frame NDC x=[-0.934917, 0.818936]
+Upward portrait safe-frame NDC x=[-0.934917, 0.730322]
+Player animation, IK, socket, reset/import, visibility, and delivery contracts passed
+<end of output>
+Test time =   0.90 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_player_animation_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_player_animation_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+75/165 Testing: horde_rt_held_item_socket_tests
+75/165 Test: horde_rt_held_item_socket_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_held_item_socket_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_held_item_socket_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+post-claim chest held depth/x/y/clearance=1.02728/-0.130527/-0.0501483/2.66
+reward carry open held/high/low x=0.68/1.04/1.04/-0.13 guard clearance/hand=0.0600006/0.2 emergency wall held/hand/x=0.3/0.2/-0.45
+reward one-millimetre wall sweep max clearance/depth/lateral/yaw delta=0.00100112/0.000478745/0.000261545/0.00098294
+stowed scabbard full-mesh sweep poses=16 closestGap=0.0838906m playerTri=16301 sheathTri=11 floorGap=0.157182m releasedHand=0.503615m
+parry actual mesh clearance aspect=0.46 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=7 time=0.04 successful=0 hilt=0.0495894 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=8 time=0.05 successful=0 hilt=0.0495894 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=0.46 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.33333 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+parry actual mesh clearance aspect=1.77778 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+sword grip-local envelope y=-0.135279:0.915253 vertexBands(y<=.15,.15-.35,.35-.55,.55-.75,.75-.95,>.95)=4348,2266,1969,1782,1059,0, primitiveMaterials=material:34497,
+combat-geometry normal-near target=0,-1.2 targetY=-0.95 targetFacing=0 playerYaw=0 targetBearing=0 targetBoundsY=-0.939193:0.543894 downPulseTick=17 downActionTime=0.103333 downAdmitted=1 upPulseTick=0 upActionTime=-1 targetDeadAtUpPulse=0 downPulseSurfaceGap=0.00213471 upPulseSurfaceGap=3.40282e+38 downPulseBoundsGap=0 upPulseBoundsGap=3.40282e+38 downPulseBladeGap=0.00213471 upPulseBladeGap=3.40282e+38 downPulseNearestGripLocal=0.0321889,0.630462,0.0016153 upPulseNearestGripLocal=0,0,0 minSurfaceGap=0.00213471 closestSurfaceTick=17 closestSurfaceGripLocal=0.0321889,0.630462,0.0016153 minBladeSurfaceGap=0.00213471 closestBladeTick=17 closestBladeGripLocal=0.0321889,0.630462,0.0016153 nearSurfaceTicks20mm=17:17 downActiveNearTicks=17:17 upActiveNearTicks=0:0 downActiveBladeNearTicks=17:17 upActiveBladeNearTicks=0:0 minGap=0 boundsOverlapSamples=10:22 importedSwordVertices=11424 importedTargetVertices=28206
+combat-geometry combo-near target=0,-1.2 targetY=-0.95 targetFacing=0 playerYaw=0 targetBearing=0 targetBoundsY=-0.939193:0.543894 downPulseTick=17 downActionTime=0.103333 downAdmitted=1 upPulseTick=30 upActionTime=0.05 targetDeadAtUpPulse=1 downPulseSurfaceGap=0.00213471 upPulseSurfaceGap=0.0131259 downPulseBoundsGap=0 upPulseBoundsGap=0 downPulseBladeGap=0.00213471 upPulseBladeGap=0.0131259 downPulseNearestGripLocal=0.0321889,0.630462,0.0016153 upPulseNearestGripLocal=0.0319776,0.642511,0.00157196 minSurfaceGap=0.00213471 closestSurfaceTick=17 closestSurfaceGripLocal=0.0321889,0.630462,0.0016153 minBladeSurfaceGap=0.00213471 closestBladeTick=17 closestBladeGripLocal=0.0321889,0.630462,0.0016153 nearSurfaceTicks20mm=17:30 downActiveNearTicks=17:17 upActiveNearTicks=30:30 downActiveBladeNearTicks=17:17 upActiveBladeNearTicks=30:30 minGap=0 boundsOverlapSamples=10:32 importedSwordVertices=11424 importedTargetVertices=28206
+open anatomical hands right=0.18,-0.34,0.6 left=-0.135,-0.31,0.68 lowering/retraction=0/0 torch=0
+sword overhead phase sweep max lowering/vertices clear=0.733974/1 anatomical finalGrip/vertices=1/1 resolved=60/60 leftSocketErrorMax/failures=9.996e-08/0 rightSocketError=1.78814e-07 finalGripError=5.05762e-07m/0rad
+sword five-mm approach max lowering/hand step=0.0027637/0.00296172
+Held-item socket contracts passed.
+<end of output>
+Test time =   2.57 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_held_item_socket_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_held_item_socket_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+78/165 Testing: horde_rt_development_static_asset_tests
+78/165 Test: horde_rt_development_static_asset_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_development_static_asset_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_development_static_asset_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Development static asset policy passed
+<end of output>
+Test time =   1.03 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_development_static_asset_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_development_static_asset_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+81/165 Testing: horde_rt_tomb_dressing_tests
+81/165 Test: horde_rt_tomb_dressing_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_tomb_dressing_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_tomb_dressing_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Imported arch front faces: triangles=14 back-facing=0 opposed-normal=0 minimum-normal-dot=1
+Refined niche ray 0 back-surface t=0.15666
+Refined niche ray 1 back-surface t=0.15666
+Refined niche ray 2 back-surface t=0.17666
+Dressing metrics: vertices=19024 indices=53040 triangles=17680 primitives=4 materials=3 instances=16 bounds=[-36.9193,-0.95,-18.3137]..[6.31018,1.21901,2.16]
+Placement 0 rect niche bounds=[-2.16018,-0.54,-1.0478]..[-1.8,0.285,-0.3522]
+Placement 1 arched niche bounds=[-2.16018,-0.55,-2.9572]..[-1.8,0.35,-2.2428]
+Placement 2 rect niche bounds=[5.95,-0.5,-12.729]..[6.31018,0.275,-12.071]
+Placement 3 T03 candle 1 bounds=[-2.0967,-0.394336,-0.7342]..[-2.02921,-0.331127,-0.666956]
+Placement 4 T02 skull/jaw bounds=[-1.99798,-0.391094,-2.65305]..[-1.85595,-0.241166,-2.54695]
+Placement 5 T02 femur bounds=[-2.14459,-0.391094,-2.80403]..[-2.07041,-0.314966,-2.47]
+Placement 6 T02 humerus bounds=[-2.12354,-0.391094,-2.47539]..[-2.09146,-0.33627,-2.25]
+Placement 7 T03 candle 2 bounds=[6.13178,-0.363164,-12.5088]..[6.18822,-0.259739,-12.4526]
+Placement 8 T03 candle 3 bounds=[6.1602,-0.363164,-12.3606]..[6.2398,-0.328768,-12.2814]
+Placement 9 T03 displaced lid bounds=[-1.53,-0.58,0.22]..[-0.745,-0.395,2.16]
+Placement 10 T03 offering bowl bounds=[-31.1321,-0.95,-18.1875]..[-30.6613,-0.832,-17.7159]
+Placement 11 T03 broken urn bounds=[-36.6406,-0.95,-18.1438]..[-36.2592,-0.596276,-17.7638]
+Placement 12 T03 urn rim shard bounds=[-36.9193,-0.949589,-18.3137]..[-36.6129,-0.748349,-17.9784]
+Placement 13 T03 candle 2 bounds=[-0.21156,1.14,-6.32699]..[-0.16844,1.21901,-6.28409]
+Placement 14 T03 offering bowl bounds=[-0.0546447,1.14,-6.37625]..[0.086609,1.1754,-6.23477]
+Placement 15 T03 candle 3 bounds=[0.174594,1.14,-6.33601]..[0.235406,1.16627,-6.27551]
+Prepared tomb dressing import and merge checks passed.
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_tomb_dressing_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_tomb_dressing_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+104/165 Testing: horde_rt_simulation_timing_tests
+104/165 Test: horde_rt_simulation_timing_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_simulation_timing_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_simulation_timing_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Shared simulation cadence, hitch, diagonal, pause, and overrun tests passed.
+<end of output>
+Test time =   0.87 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_simulation_timing_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_simulation_timing_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+105/165 Testing: horde_rt_simulation_gameplay_tests
+105/165 Test: horde_rt_simulation_gameplay_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_simulation_gameplay_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_simulation_gameplay_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+lich/chest delayed finale events hits/defeat/unlock=3/1/1 phase=1 pending=0 time=0 sequence=8/9
+open shaft actual X/Z=-5.5/-14.5 mount torch lowering/left Y legacy=0/-0.41 anatomical=0/-0.31
+Shared simulation command, event, seam-persistence, and retry tests passed.
+<end of output>
+Test time =   1.20 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_simulation_gameplay_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_simulation_gameplay_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+106/165 Testing: horde_rt_water_contact_tests
+106/165 Test: horde_rt_water_contact_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_water_contact_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_water_contact_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+110 water checks, 0 failures
+<end of output>
+Test time =   1.03 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_water_contact_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_water_contact_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+107/165 Testing: horde_rt_waterfall_production_route_tests
+107/165 Test: horde_rt_waterfall_production_route_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_waterfall_production_route_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_waterfall_production_route_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Waterfall production route passed: stowed cold start/reset/checkpoint/retry, first-room isolation, real fixed-step route and encounter draw/retreat cases, four bays, and Keeper arrival.
+<end of output>
+Test time =   1.09 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_waterfall_production_route_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_waterfall_production_route_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+108/165 Testing: horde_rt_waterfall_legacy_route_tests
+108/165 Test: horde_rt_waterfall_legacy_route_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_waterfall_production_route_tests.exe" "--legacy-contact-policy"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_waterfall_legacy_route_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Waterfall production route passed: stowed cold start/reset/checkpoint/retry, first-room isolation, real fixed-step route and encounter draw/retreat cases, four bays, and Keeper arrival.
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_waterfall_legacy_route_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_waterfall_legacy_route_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+109/165 Testing: horde_rt_music_director_tests
+109/165 Test: horde_rt_music_director_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_music_director_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_music_director_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Shared adaptive music resolver tests passed.
+<end of output>
+Test time =   0.94 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_director_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_music_director_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+110/165 Testing: horde_rt_sfx_volume_tests
+110/165 Test: horde_rt_sfx_volume_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_sfx_volume_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_sfx_volume_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_sfx_volume_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_sfx_volume_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+128/165 Testing: horde_rt_lantern_reward_tests
+128/165 Test: horde_rt_lantern_reward_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_lantern_reward_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_lantern_reward_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Lantern reward interaction, command, and finale tests passed
+<end of output>
+Test time =   0.80 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_lantern_reward_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_lantern_reward_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+130/165 Testing: horde_rt_input_mailbox_stress
+130/165 Test: horde_rt_input_mailbox_stress
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_input_mailbox_stress.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_input_mailbox_stress" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Input mailbox retained coherent POD snapshots across 125000 publications for 4 concurrent readers.
+<end of output>
+Test time =   3.32 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_input_mailbox_stress" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_input_mailbox_stress" time elapsed: 00:00:03
+----------------------------------------------------------
+
+131/165 Testing: horde_rt_desktop_controller_input_tests
+131/165 Test: horde_rt_desktop_controller_input_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_desktop_controller_input_tests.exe"
+Directory: <repo>
+"horde_rt_desktop_controller_input_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Desktop controller input tests passed
+<end of output>
+Test time =   0.98 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_desktop_controller_input_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_desktop_controller_input_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+136/165 Testing: horde_rt_spatial_audio_smoke
+136/165 Test: horde_rt_spatial_audio_smoke
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_spatial_audio_smoke.exe"
+Directory: <repo>
+"horde_rt_spatial_audio_smoke" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Spatial audio smoke tests passed.
+<end of output>
+Test time =   0.91 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_spatial_audio_smoke" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_spatial_audio_smoke" time elapsed: 00:00:00
+----------------------------------------------------------
+
+144/165 Testing: horde_rt_scene_resource_inventory_tests
+144/165 Test: horde_rt_scene_resource_inventory_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_scene_resource_inventory_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_scene_resource_inventory_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Resource integration: existing readback/mist/torch contracts
+Resource integration: descriptor contracts
+Resource integration: TLAS and water geometry
+Resource integration: actual tomb intake
+Integrated native tomb static roster: 28 primitives, 26 materials
+Matched CPU intake only (baseline first; cache/order bias possible): 57.3883 / 62.3427 ms; additional static vertices/indices bytes: 1217536 / 212160; no GPU allocation, AS build or presentation measurement
+Resource integration: water owner lifetime
+Water lifetime: populate
+Water lifetime: move
+Water lifetime: destroy
+Resource integration: resize contracts
+Resource integration: command/resource observations
+Resource integration: command execution fixtures
+Resource integration: not-ready rejection
+Resource integration: preview inventory
+Resource integration: populated inventory
+<end of output>
+Test time =   1.99 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_scene_resource_inventory_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_scene_resource_inventory_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+157/165 Testing: horde_rt_rescue_traversal_tests
+157/165 Test: horde_rt_rescue_traversal_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_rescue_traversal_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_rescue_traversal_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Rescue traversal cases=89973 failures=0 max_root_step=0.0250017 max_landing_root_step=0.0193812
+<end of output>
+Test time =   1.28 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_traversal_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_rescue_traversal_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+158/165 Testing: horde_rt_rescue_blockout_import_tests
+158/165 Test: horde_rt_rescue_blockout_import_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_rescue_blockout_import_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_rescue_blockout_import_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_blockout_import_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_rescue_blockout_import_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+159/165 Testing: horde_rt_rescue_journey_integration_tests
+159/165 Test: horde_rt_rescue_journey_integration_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_rescue_journey_integration_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_rescue_journey_integration_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0506989
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0510889
+Combined CPU preparation resident_ns=75400 staged_ns=71400 resident_retained_bytes=54912 staged_retained_bytes=54912 resident_peak_capacity_bytes=89040 staged_peak_capacity_bytes=89040 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=13710 failures=0 retained_triangles=1144
+<end of output>
+Test time =   1.23 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_journey_integration_tests" end time: Oct 11 02:09 AUS Eastern Summer Time
+"horde_rt_rescue_journey_integration_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+163/165 Testing: horde_rt_rescue_rig_attachment_tests
+163/165 Test: horde_rt_rescue_rig_attachment_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_rescue_rig_attachment_tests.exe"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_rescue_rig_attachment_tests" start time: Oct 11 02:09 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Rescue rig attachment cases=16455 failures=0 sampled_poses=955 max_left_reach=0.612579@phase=6 max_right_reach=0.619561@phase=6
+<end of output>
+Test time =   2.92 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_rig_attachment_tests" end time: Oct 11 02:10 AUS Eastern Summer Time
+"horde_rt_rescue_rig_attachment_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+164/165 Testing: horde_rt_rescue_adversarial_regression_tests
+164/165 Test: horde_rt_rescue_adversarial_regression_tests
+Command: "<repo>/build/presets/windows-x64-release/Release/horde_rt_rescue_rig_attachment_tests.exe" "--adversarial-regression"
+Directory: <repo>/build/presets/windows-x64-release
+"horde_rt_rescue_adversarial_regression_tests" start time: Oct 11 02:10 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+finding1 before=0,-0.95,0.900001 after=0,-0.95,0.900001 generation=2->3
+finding2 offset=-1.1 walk minZ=-13.3383 support=2.05 copingPenetration=0
+finding2 offset=-1.1 dodge minZ=-13.325 support=2.05 copingPenetration=0
+finding2 offset=0 walk minZ=-13.3383 support=2.05 copingPenetration=0
+finding2 offset=0 dodge minZ=-13.325 support=2.05 copingPenetration=0
+finding2 offset=1.1 walk minZ=-13.3383 support=2.05 copingPenetration=0
+finding2 offset=1.1 dodge minZ=-13.325 support=2.05 copingPenetration=0
+finding6 approachX=-34.4378 maximumLoadedOffset=0.142849 rigPoses=496 rigRejections=0
+finding6 approachX=-32.9622 maximumLoadedOffset=0.138577 rigPoses=496 rigRejections=0
+finding7 subTickHipBodyError=0 ticks=0
+Adversarial rescue cases=17409 failures=0
+<end of output>
+Test time =   1.77 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_rescue_adversarial_regression_tests" end time: Oct 11 02:10 AUS Eastern Summer Time
+"horde_rt_rescue_adversarial_regression_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 11 02:10 AUS Eastern Summer Time

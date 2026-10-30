@@ -1,0 +1,25 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 24
+    Start 24: horde_rt_combat_foundation_tests
+
+24: Test command: "<repo>\build\presets\windows-x64-release\Release\horde_rt_combat_foundation_tests.exe"
+24: Working Directory: <repo>/build/presets/windows-x64-release
+24: Test timeout computed to be: 30
+24: combat foundation checks=558 failures=0
+1/1 Test #24: horde_rt_combat_foundation_tests ...   Passed    1.36 sec
+
+The following tests passed:
+	horde_rt_combat_foundation_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.38 sec

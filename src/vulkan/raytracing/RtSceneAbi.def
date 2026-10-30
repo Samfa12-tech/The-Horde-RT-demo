@@ -1,12 +1,13 @@
 {
   "schema": 1,
+  "sceneCounts": { "ordinaryShowcaseTlasInstances": 31 },
   "capacities": {
-    "instanceMetadata": 24,
-    "tlasInstances": 26,
-    "staticAssets": 12,
-    "primitives": 32,
-    "materials": 32,
-    "textureLayers": 16,
+    "instanceMetadata": 30,
+    "tlasInstances": 107,
+    "staticAssets": 15,
+    "primitives": 38,
+    "materials": 34,
+    "textureLayers": 18,
     "fireEmitters": 4,
     "activeFireEmitters": 4,
     "dustMotes": 64,
@@ -29,7 +30,8 @@
     "worldPlayerVertices": 23,
     "viewmodelVertices": 24,
     "environmentTexture": 25,
-    "qualityControls": 26
+    "qualityControls": 26,
+    "waterContactRipple": 27
   },
   "geometryRoles": { "static": 0, "playerWorldBody": 1, "playerViewmodel": 2 },
   "playerInstances": { "worldBody": 4, "viewmodel": 20, "viewmodelPrimaryMask": 64, "bodyRemainderPrimaryMask": 128 },
@@ -146,15 +148,28 @@
       ]
     },
     {
+      "name": "RtWaterSurfaceGpu", "alignment": 16, "size": 112,
+      "fields": [
+        { "name": "aAlong", "type": "float4", "offset": 0, "comment": "Triangle vertex XYZ and continuous downstream distance in metres." },
+        { "name": "bAlong", "type": "float4", "offset": 16 },
+        { "name": "cAlong", "type": "float4", "offset": 32 },
+        { "name": "aFlow", "type": "float4", "offset": 48, "comment": "Per-vertex downstream XZ direction, signed bank coordinate metres, speed metres/second." },
+        { "name": "bFlow", "type": "float4", "offset": 64 },
+        { "name": "cFlow", "type": "float4", "offset": 80 },
+        { "name": "normalKind", "type": "float4", "offset": 96, "comment": "Exact triangle normal XYZ; w=0 standing water, w=1 channel. No actor-specific shading." }
+      ]
+    },
+    {
       "name": "RtQualityControlsGpu", "alignment": 16, "size": 16,
       "fields": [
         { "name": "controls", "type": "uint4", "offset": 0, "comment": "shadow mode and resolved primary samples; flags bit0 mistDisabled, bits1-2 Dust Off0/Low1/Standard2, other bits zero. Fixed dust arrays follow this 16-byte header at binding26." }
       ]
     },
     {
-      "name": "RtHeldLightGpu", "alignment": 16, "size": 16,
+      "name": "RtHeldLightGpu", "alignment": 16, "size": 32,
       "fields": [
-        { "name": "positionStrength", "type": "float4", "offset": 0 }
+        { "name": "positionStrength", "type": "float4", "offset": 0 },
+        { "name": "playerTransform", "type": "float4", "offset": 16, "comment": "x: authoritative support height delta from legacy -0.95 floor; yzw reserved zero. Shared camera transform, independent of physical light position." }
       ]
     },
     {

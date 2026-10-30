@@ -1,0 +1,1239 @@
+{
+  "stageJoin": {
+    "joinedFrames": 604,
+    "allFrames": {
+      "as": {
+        "n": 604,
+        "medianMs": 0.389401,
+        "p95Ms": 0.508021,
+        "maximumMs": 0.716823
+      },
+      "dispatch": {
+        "n": 604,
+        "medianMs": 59.2474985,
+        "p95Ms": 110.420466,
+        "maximumMs": 171.264319
+      },
+      "transfer": {
+        "n": 604,
+        "medianMs": 0.1203905,
+        "p95Ms": 0.142865,
+        "maximumMs": 0.326406
+      }
+    },
+    "views": {},
+    "limits": "GPU stage execution intervals; not additive counters or playable FPS. AS brackets UpdateDynamicInstances; dispatch includes all shader work; transfer brackets the post-barrier transfer/copy path."
+  },
+  "heldViews": {
+    "unlit": {
+      "firstSubmission": 488,
+      "lastSubmission": 551,
+      "viewAnchor": {
+        "x": -30.4456,
+        "y": -0.95,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": 0.0
+      },
+      "viewAnchorConvention": "x/z player origin; y player support height, not optical eye; yaw/pitch are rendered view angles",
+      "actualInterPresent": {
+        "n": 64,
+        "medianMs": 75.0,
+        "p95Ms": 83.333334,
+        "maximumMs": 83.333386
+      },
+      "gpuStages": {
+        "as": {
+          "n": 64,
+          "medianMs": 0.358568,
+          "p95Ms": 0.371354,
+          "maximumMs": 0.388177
+        },
+        "dispatch": {
+          "n": 64,
+          "medianMs": 67.056144,
+          "p95Ms": 67.765155,
+          "maximumMs": 67.873905
+        },
+        "transfer": {
+          "n": 64,
+          "medianMs": 0.108021,
+          "p95Ms": 0.128229,
+          "maximumMs": 0.150365
+        }
+      },
+      "deviceLocalBytes": [
+        166118720
+      ],
+      "hostVisibleBytes": [
+        49444352
+      ],
+      "tlasInstances": [
+        28
+      ],
+      "blasCount": [
+        21
+      ],
+      "skinUpdates": [
+        487,
+        488,
+        489,
+        490,
+        491,
+        492,
+        493,
+        494,
+        495,
+        496,
+        497,
+        498,
+        499,
+        500,
+        501,
+        502,
+        503,
+        504,
+        505,
+        506,
+        507,
+        508,
+        509,
+        510,
+        511,
+        512,
+        513,
+        514,
+        515,
+        516,
+        517,
+        518,
+        519,
+        520,
+        521,
+        522,
+        523,
+        524,
+        525,
+        526,
+        527,
+        528,
+        529,
+        530,
+        531,
+        532,
+        533,
+        534,
+        535,
+        536,
+        537,
+        538,
+        539,
+        540,
+        541,
+        542,
+        543,
+        544,
+        545,
+        546,
+        547,
+        548,
+        549,
+        550
+      ],
+      "skinUpdatesPerFrame": [
+        1
+      ],
+      "pipelineIndices": [
+        0
+      ],
+      "simulationTicksPerFrame": [
+        4,
+        5
+      ],
+      "catchUpOverrunIncrease": 0
+    },
+    "lit": {
+      "firstSubmission": 563,
+      "lastSubmission": 612,
+      "viewAnchor": {
+        "x": -30.509,
+        "y": -0.95,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": 0.0
+      },
+      "viewAnchorConvention": "x/z player origin; y player support height, not optical eye; yaw/pitch are rendered view angles",
+      "actualInterPresent": {
+        "n": 50,
+        "medianMs": 120.833333,
+        "p95Ms": 125.000001,
+        "maximumMs": 125.000051
+      },
+      "gpuStages": {
+        "as": {
+          "n": 50,
+          "medianMs": 0.4287235,
+          "p95Ms": 0.439531,
+          "maximumMs": 0.442031
+        },
+        "dispatch": {
+          "n": 50,
+          "medianMs": 109.951091,
+          "p95Ms": 111.549268,
+          "maximumMs": 112.411768
+        },
+        "transfer": {
+          "n": 50,
+          "medianMs": 0.1318225,
+          "p95Ms": 0.144792,
+          "maximumMs": 0.162187
+        }
+      },
+      "deviceLocalBytes": [
+        166118720
+      ],
+      "hostVisibleBytes": [
+        49444352
+      ],
+      "tlasInstances": [
+        28
+      ],
+      "blasCount": [
+        21
+      ],
+      "skinUpdates": [
+        562,
+        563,
+        564,
+        565,
+        566,
+        567,
+        568,
+        569,
+        570,
+        571,
+        572,
+        573,
+        574,
+        575,
+        576,
+        577,
+        578,
+        579,
+        580,
+        581,
+        582,
+        583,
+        584,
+        585,
+        586,
+        587,
+        588,
+        589,
+        590,
+        591,
+        592,
+        593,
+        594,
+        595,
+        596,
+        597,
+        598,
+        599,
+        600,
+        601,
+        602,
+        603,
+        604,
+        605,
+        606,
+        607,
+        608,
+        609,
+        610,
+        611
+      ],
+      "skinUpdatesPerFrame": [
+        1
+      ],
+      "pipelineIndices": [
+        0
+      ],
+      "simulationTicksPerFrame": [
+        6
+      ],
+      "catchUpOverrunIncrease": 50
+    }
+  },
+  "firstLitSubmission": 553,
+  "transitionFrames": [
+    {
+      "submission": 550,
+      "tick": 2223,
+      "actualIntervalMs": 70.833333,
+      "asMs": 0.368021,
+      "dispatchMs": 67.243436,
+      "uploadedLights": {
+        "count": 0,
+        "emitters": [
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "keeper": {
+        "phase": 0,
+        "revealPhase": 0,
+        "revealSeconds": 0,
+        "position": [
+          -34.7000008,
+          -0.769999981,
+          -15.1999998
+        ],
+        "tilt": -0.159999996,
+        "facing": 1.57079637,
+        "title": 0,
+        "hp": 3,
+        "phaseTime": 0,
+        "staff": 0,
+        "damagePulse": false
+      }
+    },
+    {
+      "submission": 551,
+      "tick": 2228,
+      "actualIntervalMs": 75.000051,
+      "asMs": 0.335729,
+      "dispatchMs": 66.671248,
+      "uploadedLights": {
+        "count": 0,
+        "emitters": [
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "keeper": {
+        "phase": 0,
+        "revealPhase": 0,
+        "revealSeconds": 0,
+        "position": [
+          -34.7000008,
+          -0.769999981,
+          -15.1999998
+        ],
+        "tilt": -0.159999996,
+        "facing": 1.57079637,
+        "title": 0,
+        "hp": 3,
+        "phaseTime": 0,
+        "staff": 0,
+        "damagePulse": false
+      }
+    },
+    {
+      "submission": 552,
+      "tick": 2233,
+      "actualIntervalMs": 83.333282,
+      "asMs": 0.369062,
+      "dispatchMs": 66.679113,
+      "uploadedLights": {
+        "count": 0,
+        "emitters": [
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "keeper": {
+        "phase": 0,
+        "revealPhase": 0,
+        "revealSeconds": 0,
+        "position": [
+          -34.7000008,
+          -0.769999981,
+          -15.1999998
+        ],
+        "tilt": -0.159999996,
+        "facing": 1.57079637,
+        "title": 0,
+        "hp": 3,
+        "phaseTime": 0,
+        "staff": 0,
+        "damagePulse": false
+      }
+    },
+    {
+      "submission": 553,
+      "tick": 2237,
+      "actualIntervalMs": 116.666718,
+      "asMs": 0.3425,
+      "dispatchMs": 109.850258,
+      "uploadedLights": {
+        "count": 2,
+        "emitters": [
+          {
+            "stableId": 3,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -16.3250008,
+              0.876919031
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.876919031
+            ]
+          },
+          {
+            "stableId": 4,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -14.0250006,
+              0.886123717
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.886123717
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "keeper": {
+        "phase": 0,
+        "revealPhase": 1,
+        "revealSeconds": 0.0500000045,
+        "position": [
+          -34.7000008,
+          -0.769999981,
+          -15.1999998
+        ],
+        "tilt": -0.159999996,
+        "facing": 1.57079637,
+        "title": 0,
+        "hp": 3,
+        "phaseTime": 0,
+        "staff": 0,
+        "damagePulse": false
+      }
+    },
+    {
+      "submission": 554,
+      "tick": 2243,
+      "actualIntervalMs": 116.666667,
+      "asMs": 0.362604,
+      "dispatchMs": 111.939476,
+      "uploadedLights": {
+        "count": 2,
+        "emitters": [
+          {
+            "stableId": 3,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -16.3250008,
+              0.914703071
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.914703071
+            ]
+          },
+          {
+            "stableId": 4,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -14.0250006,
+              0.906281114
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.906281114
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "keeper": {
+        "phase": 0,
+        "revealPhase": 1,
+        "revealSeconds": 0.150000006,
+        "position": [
+          -34.7000008,
+          -0.769999981,
+          -15.1999998
+        ],
+        "tilt": -0.159999996,
+        "facing": 1.57079637,
+        "title": 0,
+        "hp": 3,
+        "phaseTime": 0,
+        "staff": 0,
+        "damagePulse": false
+      }
+    },
+    {
+      "submission": 555,
+      "tick": 2249,
+      "actualIntervalMs": 125.0,
+      "asMs": 0.375,
+      "dispatchMs": 110.540674,
+      "uploadedLights": {
+        "count": 2,
+        "emitters": [
+          {
+            "stableId": 3,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -16.3250008,
+              0.946769297
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.946769297
+            ]
+          },
+          {
+            "stableId": 4,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -14.0250006,
+              0.924930751
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.924930751
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "keeper": {
+        "phase": 0,
+        "revealPhase": 1,
+        "revealSeconds": 0.25,
+        "position": [
+          -34.7000008,
+          -0.769999981,
+          -15.1999998
+        ],
+        "tilt": -0.159999996,
+        "facing": 1.57079637,
+        "title": 0,
+        "hp": 3,
+        "phaseTime": 0,
+        "staff": 0,
+        "damagePulse": false
+      }
+    },
+    {
+      "submission": 556,
+      "tick": 2255,
+      "actualIntervalMs": 116.666667,
+      "asMs": 0.37625,
+      "dispatchMs": 109.949737,
+      "uploadedLights": {
+        "count": 2,
+        "emitters": [
+          {
+            "stableId": 3,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -16.3250008,
+              0.960637093
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.960637093
+            ]
+          },
+          {
+            "stableId": 4,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -14.0250006,
+              0.924696445
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.924696445
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "keeper": {
+        "phase": 0,
+        "revealPhase": 1,
+        "revealSeconds": 0.350000083,
+        "position": [
+          -34.7000008,
+          -0.769999981,
+          -15.1999998
+        ],
+        "tilt": -0.159999996,
+        "facing": 1.57079637,
+        "title": 0,
+        "hp": 3,
+        "phaseTime": 0,
+        "staff": 0,
+        "damagePulse": false
+      }
+    },
+    {
+      "submission": 557,
+      "tick": 2261,
+      "actualIntervalMs": 120.833333,
+      "asMs": 0.343073,
+      "dispatchMs": 110.862497,
+      "uploadedLights": {
+        "count": 2,
+        "emitters": [
+          {
+            "stableId": 3,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -16.3250008,
+              0.9576419
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.9576419
+            ]
+          },
+          {
+            "stableId": 4,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -14.0250006,
+              0.899458826
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.899458826
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "keeper": {
+        "phase": 0,
+        "revealPhase": 1,
+        "revealSeconds": 0.450000167,
+        "position": [
+          -34.7000008,
+          -0.769999981,
+          -15.1999998
+        ],
+        "tilt": -0.159999996,
+        "facing": 1.57079637,
+        "title": 0,
+        "hp": 3,
+        "phaseTime": 0,
+        "staff": 0,
+        "damagePulse": false
+      }
+    },
+    {
+      "submission": 558,
+      "tick": 2267,
+      "actualIntervalMs": 125.000052,
+      "asMs": 0.365729,
+      "dispatchMs": 111.209685,
+      "uploadedLights": {
+        "count": 2,
+        "emitters": [
+          {
+            "stableId": 3,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -16.3250008,
+              0.945280313
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.945280313
+            ]
+          },
+          {
+            "stableId": 4,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -14.0250006,
+              0.860422015
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.860422015
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "keeper": {
+        "phase": 0,
+        "revealPhase": 1,
+        "revealSeconds": 0.550000131,
+        "position": [
+          -34.7000008,
+          -0.769999981,
+          -15.1999998
+        ],
+        "tilt": -0.159999996,
+        "facing": 1.57079637,
+        "title": 0,
+        "hp": 3,
+        "phaseTime": 0,
+        "staff": 0,
+        "damagePulse": false
+      }
+    },
+    {
+      "submission": 559,
+      "tick": 2273,
+      "actualIntervalMs": 120.833282,
+      "asMs": 0.339844,
+      "dispatchMs": 111.362654,
+      "uploadedLights": {
+        "count": 2,
+        "emitters": [
+          {
+            "stableId": 3,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -16.3250008,
+              0.948016584
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.948016584
+            ]
+          },
+          {
+            "stableId": 4,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -14.0250006,
+              0.86123544
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.86123544
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "keeper": {
+        "phase": 0,
+        "revealPhase": 1,
+        "revealSeconds": 0.650000036,
+        "position": [
+          -34.7000008,
+          -0.769999981,
+          -15.1999998
+        ],
+        "tilt": -0.159999996,
+        "facing": 1.57079637,
+        "title": 0,
+        "hp": 3,
+        "phaseTime": 0,
+        "staff": 0,
+        "damagePulse": false
+      }
+    }
+  ],
+  "limits": "Natural reveal co-activates actor presentation and two lights. Small ordinary arrival displacement is reported; this is not a light-only counterfactual or sustained gameplay FPS.",
+  "strictTiming": {
+    "eligible": true,
+    "reportSha256": "959a9e4026121cfdeab523c4b3d41eba6684ebebb9894984d4aea7baa1fd9786",
+    "runId": "torch-query-timing-r01",
+    "workload": "motion-keeper-torch-transition-v1",
+    "buildId": "1.6.2",
+    "settings": {
+      "scalePercent": 40,
+      "width": 1440,
+      "height": 2971,
+      "internalWidth": 576,
+      "internalHeight": 1188,
+      "backend": "RayQueryCompute",
+      "water": 1,
+      "fire": 0,
+      "cap": 30,
+      "glass": false,
+      "shadow": 1,
+      "mist": true,
+      "dust": 1
+    },
+    "scope": {
+      "surfaceGeneration": 1,
+      "sceneEpoch": 3,
+      "measurementGeneration": 4,
+      "matchedCompletedFrames": 604,
+      "intervalCount": 603,
+      "durationNanoseconds": 44291667797,
+      "setupPresentationRowsExcluded": 0
+    },
+    "intervalsNanoseconds": {
+      "median": 66666718,
+      "p90NearestRank": 116666719,
+      "p95NearestRank": 120833334,
+      "maximum": 183333334,
+      "over33333000Nanoseconds": 603,
+      "over250000000Nanoseconds": 0
+    },
+    "observedPresentedImageRatePerSecond": 13.614299,
+    "simulation": {
+      "stateRows": 604,
+      "eventRows": 95,
+      "ticksThisFrameMaximum": 6,
+      "catchUpOverrunCountFirst": 8,
+      "catchUpOverrunCountLast": 97,
+      "catchUpOverrunDelta": 89
+    },
+    "collector": {
+      "runCounterDelta": {
+        "preparedPresents": 604,
+        "acceptedPresents": 604,
+        "rejectedPresents": 0,
+        "invalidRegistrations": 0,
+        "invalidMetadata": 0,
+        "pendingCapacityExhausted": 0,
+        "queryCalls": 1204,
+        "queryErrors": 0,
+        "incompleteQueries": 0,
+        "zeroPresentTimestamps": 0,
+        "zeroPresentIds": 0,
+        "unknownPresentIds": 0,
+        "duplicateTimings": 0,
+        "rowCapacityExhausted": 0,
+        "missingOnRebind": 0,
+        "missingOnUnbind": 0,
+        "abandonedPreparedPresents": 0
+      },
+      "queryCpuWallNanoseconds": 9267715,
+      "presentMarginAtLeast2Pow63CountIgnored": 604
+    },
+    "limits": [
+      "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+      "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+      "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+      "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+    ]
+  }
+}

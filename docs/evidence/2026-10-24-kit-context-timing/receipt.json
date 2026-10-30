@@ -1,0 +1,58 @@
+{
+  "baselineCommit": "245c0b011938b94eb86db5d86559fee28f17da0f",
+  "status": "ADMITTED_SHARED_DEVELOPMENT_PROFILE_CONTEXT_TIMING",
+  "selection": {
+    "travelIntent": "proof accepted and route waypoint remains; including waiting for the unchanged tether",
+    "relaxedIntent": "reunion before proof or completed lookout; existing face-player behavior only",
+    "travelSeconds": 0.5,
+    "relaxedSeconds": 0.75,
+    "selectionBoundary": "BeginTurn, not each fixed step",
+    "midExchangeChange": false,
+    "persisted": false
+  },
+  "host": {
+    "focusedCompanionChecks": 2355,
+    "failures": 0,
+    "debugSelectionPassed": 5,
+    "releaseSelectionPassed": 5,
+    "debugTotalSeconds": 58.75,
+    "releaseTotalSeconds": 8.55,
+    "originalRouteTetherCollisionSpeedLimitsUnchanged": true
+  },
+  "native": {
+    "checks": 494,
+    "failures": 0,
+    "renderCalls": 137,
+    "firstWalkActiveTick": 373,
+    "departureStartTick": 240,
+    "departureSeconds": 2.216666666666667,
+    "departureImagesByteIdenticalToRetainedControl": 79,
+    "relaxedPartialSecondsIncludingEntry": 0.95,
+    "priorPartialSecondsIncludingEntry": 0.7,
+    "matchedPartialImagesByteIdentical": 7,
+    "pauseImagesIdentical": true,
+    "resetOrdinaryImageIdentical": true,
+    "normalActorRestored": true,
+    "inspectionActorUsed": false,
+    "allActiveCapturedDurationsMatchContext": true,
+    "evidenceClass": "isolated actual shared controller and normal actor on native RT; not natural earned play or human feel"
+  },
+  "visualReview": "Original native mid/end frames and labelled sheet reviewed; no new sampled contact/silhouette/join defect identified at 3m. Night lighting limits subtle foot judgments; no interactive/phone review. Encoded clip uses fixed-step timing, not measured engine FPS.",
+  "audioHapticManualRevalidationRequired": false,
+  "ownerFilesUnchanged": 151,
+  "foregroundAndCampaignCustody": true,
+  "rawReceipt": {
+    "path": "reports\\horde-campaign-fixtures-kit-context-timing-20261024\\windows-lookout-validation.json",
+    "sha256": "9eea1a05e5c4d7b2f8b70073aacb224fed781a9581695f827aa57fe05c87ed80"
+  },
+  "sourceSha256": {
+    "src/gameplay/dialogue/CompanionTurnProfile.h": "8fd740d00b08cd991e1acabb97c8660f8277d2e3dc54f8b47b2258d60e69bc5b",
+    "src/gameplay/dialogue/CompanionTurnPrototype.inl": "3721bb4f5e29ca960ecfb5deab0756c119fd1131c34a5d9f3ace6bd64022aae0",
+    "src/platform/windows/windows_campaign_validation.inl": "61c36d6af27393d3f6ce4cde18d72a435ffaff51c1a25858ef62bbfeb6bd02d4",
+    "tests/CompanionTurnPrototypeValidation.h": "4602864df9721db0e784a4b7e7c5c8e517d9c1ffa7863e33b3b104755233ddf1"
+  },
+  "mediaSha256": {
+    "relaxed-turn-1x.mp4": "aa658264a4caace9c44d185e2d230e6f8bb3a686005540366b64b7db67eb04f4",
+    "relaxed-rt-review.jpg": "ad1d714ca56702db0a0af0ebef639171fb6a6aa50b779640788d72a2f8accbcd"
+  }
+}

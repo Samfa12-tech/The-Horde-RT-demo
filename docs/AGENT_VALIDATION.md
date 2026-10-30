@@ -30,16 +30,25 @@ ctest --test-dir build/host-ci --build-config Release --output-on-failure
 This covers non-hardware shared tests, not Vulkan presentation or phone behaviour. Use CTest selection for an affected subset when appropriate; report the actual selection and result instead of hard-coding a test count.
 
 The portable workflow has GCC/Clang Linux and MSVC Windows entries. Windows builds
-the portable targets and runs common tests (including the
-music resolver, audio-worker session/inbox, Core-backed PCM cursor/WAV decoder and immutable asset bank, generic Core contracts and
-byte-exact native-only dependency and closed-roster music asset admission, plus
-the consent-bounded player-report contract and staged-primary page/packing
-contract), plus platform-specific native CPU/UI fixtures including the real
-Windows report form with an injected file destination. Its explicit exclusion is
-the 15 additional `WIN32` tooling fixtures, some of which need shader SDK/Android
-tools not provisioned by this compiler lane. This is additive MSVC coverage, not
-a replacement for the separate full Windows tooling/shader gate. Keep that scope
-and the workflow's fail-on-empty-test behaviour explicit in validation reports.
+the portable targets and retains every native C++ test, including Core-backed PCM,
+shared gameplay, reporting and the compiler-produced provider-object evidence
+wrappers, plus Windows OS/UI fixtures such as the real report form with an
+injected file destination. The existing 15 additional `WIN32` tooling exclusions
+remain; some require shader SDK/Android tools outside this compiler lane.
+Exactly 21 compiler-independent source/asset/policy CTests and five portable
+post-check steps run in both Linux entries instead of repeating on Windows. The
+APK resolver still runs on Windows. The exact roster and bounded evidence are in
+the [MSVC selection checkpoint](evidence/2026-10-23-msvc-ci-selection/README.md).
+
+`tools/run-windows-host-ci-tests.ps1` verifies each portable exclusion occurs once
+in the complete registered roster and checks CTest's filtered result against the
+intended partition. Other registrations, including new native tests, enter by
+default. One CTest execution owns the selection and its log; `--no-tests=error`
+and an explicit nonempty-selection guard remain. `-DryRun` reports the partition
+without executing fixtures. The 15-minute job cap, compiler/build settings and
+permissions are unchanged. This is additive MSVC coverage, not a replacement for
+the separate full Windows tooling/shader gate; local selection checks do not
+establish hosted completion or measured time savings.
 
 The additive `selected-host-sanitizers` Ubuntu24.04 lane runs the finite target
 roster in `tools/run-host-sanitizer-validation.sh` with Clang ASan/UBSan on both
@@ -92,6 +101,34 @@ ctest --preset windows-x64-debug
 ```
 
 The corresponding Release preset is `windows-x64-release`. Shader regeneration uses `tools/compile-raygen.ps1`. An Android build-only command, from `android/`, is `.\gradlew.bat assembleDebug --console=plain`; adding `installDebug` changes a device and is a separate action.
+
+### Isolated interactive Windows development acceptance
+
+`HORDE_RT_WINDOWS_ACCEPTANCE=ON` is an explicit development-only build option,
+default OFF. Stage that executable and verified copies of the existing runtime
+assets in a plain directory named `reports/horde-windows-acceptance-<suffix>`
+directly under the same checkout's `reports`. It still requires packaged assets;
+it does not enable source-asset fallback, capture fixtures or new gameplay.
+
+The executable accepts either no arguments (for supported desktop launch tools)
+or exactly `--acceptance-root <absolute-package-directory>/state`. Both paths
+require that same dedicated package and use only its `state/campaign-v1` and
+`state/settings.ini`. A fresh state must be empty; repeat launches require its
+exact ownership marker. Linked/nonregular contents, hardlinks, traversal,
+alternate roots and concurrent profile use fail closed before normal settings,
+known-folder or Vulkan startup. A build outside that package cannot fall back to
+owner careers. Valid Windows DOS short-name aliases resolve to that same
+canonical package/state; they do not authorize another state directory. Inactive
+profiles expose no save/settings paths. The exclusive marker lease lasts until process exit. This guards
+test isolation; it is not a security boundary against another same-user process
+mutating files during a run.
+
+Ordinary builds reject the acceptance option. Development acceptance windows are
+labelled `[isolated acceptance]`, their provenance includes the build flag, and
+release packaging rejects that marker. Keep source/package hashes and actual
+screen/input observations separate from CPU/fixture results. Do not seed earned
+progress and call it natural journey acceptance. Preserve the isolated state for
+same-package relaunch checks, and close owned processes after validation.
 
 For a requested broad candidate gate, `tools/run-foundation-validation.ps1 -Mode Host` runs the foundation's host-side programme; it is not the lightweight portable CI lane. `-Mode Full` includes device work. Inspect current parameters and choose the intended device explicitly rather than trusting a historical default serial. The runner writes evidence beneath ignored `reports/` and labels its staged artefacts as unpublishable/unsigned; its success does not authorise release publication.
 

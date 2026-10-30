@@ -1,0 +1,66 @@
+Start testing: Oct 21 03:23 AUS Eastern Summer Time
+----------------------------------------------------------
+69/230 Testing: horde_rt_motion_evidence_scenario_tests
+69/230 Test: horde_rt_motion_evidence_scenario_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_motion_evidence_scenario_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_motion_evidence_scenario_tests" start time: Oct 21 03:23 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+live-torch-crouch rate=15 complete=1 crouch=1 standingAgain=1
+torch-drench rate=15 stage=complete endpoint=(-5.4757,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=15 stage=complete endpoint=(-3.7859e-10,-3.78285) simulationSeconds=24.4667 states=367 events=26 reservedLedgerBytes=39410560 reason=
+shaft-up rate=15 stage=complete endpoint=(-1.66,-15.3675) simulationSeconds=17.9333 states=269 events=21 reservedLedgerBytes=39410560 reason=
+shaft coverage views=182 zSpan=0.479259 retry=0 finaleRoof=0
+keeper-first-entry rate=15 stage=complete endpoint=(-31.1865,-15.2) simulationSeconds=10.2667 states=154 events=13 reservedLedgerBytes=39410560 reason=
+keeper-retry-reward rate=15 stage=complete endpoint=(-31.1867,-15.2001) simulationSeconds=46.6167 states=700 events=63 reservedLedgerBytes=39410560 reason=
+waterfall-equipment rate=15 stage=complete endpoint=(0.400877,-15.1484) simulationSeconds=6.46667 states=97 events=16 reservedLedgerBytes=39410560 reason=
+live-torch-crouch rate=30 complete=1 crouch=1 standingAgain=1
+torch-drench rate=30 stage=complete endpoint=(-5.48048,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=30 stage=complete endpoint=(-9.95028e-10,-3.78032) simulationSeconds=24.4 states=732 events=26 reservedLedgerBytes=39410560 reason=
+shaft-up rate=30 stage=complete endpoint=(-1.66,-15.3853) simulationSeconds=17.8667 states=536 events=21 reservedLedgerBytes=39410560 reason=
+shaft coverage views=361 zSpan=0.48181 retry=0 finaleRoof=0
+keeper-first-entry rate=30 stage=complete endpoint=(-31.1779,-15.2) simulationSeconds=10.2333 states=307 events=13 reservedLedgerBytes=39410560 reason=
+keeper-retry-reward rate=30 stage=complete endpoint=(-31.1786,-15.2002) simulationSeconds=46.5167 states=1396 events=63 reservedLedgerBytes=39410560 reason=
+waterfall-equipment rate=30 stage=complete endpoint=(0.464386,-15.1416) simulationSeconds=6.36667 states=191 events=16 reservedLedgerBytes=39410560 reason=
+live-torch-crouch rate=60 complete=1 crouch=1 standingAgain=1
+torch-drench rate=60 stage=complete endpoint=(-5.47667,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=60 stage=complete endpoint=(-1.10681e-09,-3.77682) simulationSeconds=24.4167 states=1465 events=26 reservedLedgerBytes=39410560 reason=
+shaft-up rate=60 stage=complete endpoint=(-1.66,-15.3852) simulationSeconds=17.8667 states=1072 events=22 reservedLedgerBytes=39410560 reason=
+shaft coverage views=721 zSpan=0.471199 retry=0 finaleRoof=0
+keeper-first-entry rate=60 stage=complete endpoint=(-31.1772,-15.2) simulationSeconds=10.2167 states=613 events=13 reservedLedgerBytes=39410560 reason=
+keeper-retry-reward rate=60 stage=complete endpoint=(-31.1779,-15.2003) simulationSeconds=46.45 states=2787 events=62 reservedLedgerBytes=39410560 reason=
+waterfall-equipment rate=60 stage=complete endpoint=(0.495852,-15.1465) simulationSeconds=6.36667 states=382 events=16 reservedLedgerBytes=39410560 reason=
+live-torch-crouch rate=120 complete=1 crouch=1 standingAgain=1
+torch-drench rate=120 stage=complete endpoint=(-5.47667,-15.2) simulationSeconds=9.2 reason=
+torch-low-opening rate=120 stage=complete endpoint=(-1.10681e-09,-3.77682) simulationSeconds=24.4167 states=2930 events=26 reservedLedgerBytes=39410560 reason=
+shaft-up rate=120 stage=complete endpoint=(-1.66,-15.3852) simulationSeconds=17.8667 states=2144 events=22 reservedLedgerBytes=39410560 reason=
+shaft coverage views=1441 zSpan=0.471199 retry=0 finaleRoof=0
+keeper-first-entry rate=120 stage=complete endpoint=(-31.1772,-15.2) simulationSeconds=10.2167 states=1226 events=13 reservedLedgerBytes=39410560 reason=
+keeper-retry-reward rate=120 stage=complete endpoint=(-31.1779,-15.2003) simulationSeconds=46.45 states=5573 events=62 reservedLedgerBytes=39410560 reason=
+waterfall-equipment rate=120 stage=complete endpoint=(0.495852,-15.1465) simulationSeconds=6.36667 states=764 events=16 reservedLedgerBytes=39410560 reason=
+<end of output>
+Test time =   1.66 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_motion_evidence_scenario_tests" end time: Oct 21 03:23 AUS Eastern Summer Time
+"horde_rt_motion_evidence_scenario_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+188/230 Testing: horde_rt_spatial_audio_smoke
+188/230 Test: horde_rt_spatial_audio_smoke
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_spatial_audio_smoke.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_spatial_audio_smoke" start time: Oct 21 03:23 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Spatial audio smoke tests passed.
+<end of output>
+Test time =   0.93 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_spatial_audio_smoke" end time: Oct 21 03:23 AUS Eastern Summer Time
+"horde_rt_spatial_audio_smoke" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 21 03:23 AUS Eastern Summer Time

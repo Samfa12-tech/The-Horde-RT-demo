@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "parent": "c22d6f6e629d356ce96be59a4526522e99fc200b",
+  "chapterComplete": false,
+  "pausedByOwner": true,
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 12938752,
+      "sha256": "214c79ee806ffe0e1d9ecc71262b208a3bda8b18d8d6548bfa76eb837fc4909b"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4440576,
+      "sha256": "9f38f9f485de2ae29513921e858875227f3cf1161ff8c4f4ff036c0341b75d32"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183030874,
+      "sha256": "b9d4663171511ada530c33c7f03d86d30b2b47d659cf9f8e2602f16ed8a6b015"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "src\\vulkan\\raytracing\\SimulationFrameAdapter.cpp",
+      "sha256": "48d3c630add8243f3ee9b40d28da198799eefdd1c4e0a45bf24feee3120eb144"
+    },
+    {
+      "path": "tests\\CharacterRenderSlotSmoke.cpp",
+      "sha256": "1bc258d902ddb4ec43a7e6a04a9ebd9e111b1203e6cd1045754a4739bf4e1b7e"
+    },
+    {
+      "path": "src\\scene\\BellwetherShell.cpp",
+      "sha256": "bcce79b46f416b54c92a0e271ed588ea486a1a6b0017abe74786c731428daf6a"
+    },
+    {
+      "path": "tests\\BellwetherShellTests.cpp",
+      "sha256": "1be1fb6d61bdafb279b62d6bb83e51e166cebc6ac730616a1bf51d5ec064783c"
+    },
+    {
+      "path": "tools\\refine-bellwether-shell.py",
+      "sha256": "83c7622a451943512146ab79221f800812a40a9a707cb05a56d6125e4df935e5"
+    },
+    {
+      "path": "assets\\models\\world\\source\\bellwether-shell-v4\\authoring-receipt.json",
+      "sha256": "a93c72970511f41a783c12fcce986b78d9ddf4fc8f38d1a036edf767cad07b85"
+    },
+    {
+      "path": "assets\\models\\world\\source\\bellwether-shell-v4\\authoring-recipe.executed.py",
+      "sha256": "83c7622a451943512146ab79221f800812a40a9a707cb05a56d6125e4df935e5"
+    },
+    {
+      "path": "assets\\models\\world\\source\\bellwether-shell-v4\\bellwether-shell-v4.blend",
+      "sha256": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581"
+    },
+    {
+      "path": "assets\\models\\world\\source\\bellwether-shell-v4\\README.md",
+      "sha256": "5199cbd386a83567baff4f234f57f44e49de1ad868d1ef3590b26ca23555b2d8"
+    },
+    {
+      "path": "assets\\models\\world\\runtime\\bellwether-shell-v4\\asset.manifest.json",
+      "sha256": "6cf20606d6e057156c9d4e67f8bc00dd6c88a7cbbd0dfd142f20bfbc1c0c6681"
+    },
+    {
+      "path": "assets\\models\\world\\runtime\\bellwether-shell-v4\\bellwether-shell-v4.glb",
+      "sha256": "66058108eee9e014acfa10086b9da81e577d40d9f88a3a6d7c2131388eea06ba"
+    }
+  ],
+  "chapterDistanceFog": {
+    "interior": 0,
+    "keeperMistUnchanged": true,
+    "shaftEyeHeightBlendMetres": [
+      1.7,
+      2.6
+    ],
+    "woodland": 0.004
+  },
+  "visualGate": "Failed portal primary-arm guard: armPixels=0; gallery stopped without weakening assertions",
+  "normalPlayResidencySavingsBytes": 0,
+  "phoneValidation": "Pending: owner has phone",
+  "parentCi": {
+    "run": 38210575536,
+    "allSixPassed": true
+  }
+}

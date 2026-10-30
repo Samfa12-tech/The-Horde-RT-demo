@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "author": "Original Horde authoring from owner-supplied r2 topo",
+  "entryAuditSha256": "c0cae7d7cda070669241093105178638ef2e9d84fefc1fc18cec24057252e618",
+  "sourceNpzSha256": "251126186fa4923f9902524ec4ac2cc76d0f7a1c82cb1feac9901cc7832bb0ba",
+  "recipeSha256": "9b1afdba9663e04bcb0dc3681e9282a4d42d69af3354279aa699f5ff936bff6c",
+  "blender": "5.2.0 LTS",
+  "vertices": 17125,
+  "triangles": 34050,
+  "materials": 2,
+  "uvRepeatsPerMetre": {
+    "trail": 0.42,
+    "forest": 0.5
+  },
+  "textures": [
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/diff.jpg",
+      "sha256": "3b26e6033205d4c774bb8c48bda8081b5a369e01ac701a0dcaa7ddc1f484f1de"
+    },
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/normal.jpg",
+      "sha256": "1bda846d2361eeba2938700e68771711a29880299da61733bd2bcdd7af83c1f4"
+    },
+    {
+      "path": "assets/textures/polyhaven/mobile_1k/damp_sand/arm.jpg",
+      "sha256": "a54ba44a05381a87b4506c6e75d92e096b11cb45c5d7d052957b1d36eee4aef9"
+    },
+    {
+      "path": "assets/textures/polyhaven/source/forrest_ground_01-1k-v1/diff.png",
+      "sha256": "c4bae8c86c8f9f50f2cd0fa627b097e089de3427f071e3446e69bf8e39132896"
+    },
+    {
+      "path": "assets/textures/polyhaven/source/forrest_ground_01-1k-v1/normal.png",
+      "sha256": "879a84565d016743583421a644bae72df26f4031ea8852fc6d6275feb967353e"
+    },
+    {
+      "path": "assets/textures/polyhaven/source/forrest_ground_01-1k-v1/arm.png",
+      "sha256": "f4a137f68021a6e84495ea990323bdc471d4e34dad3f393bdf608a211aebe772"
+    }
+  ],
+  "boundsEngine": [
+    [
+      -12926.0,
+      -67.0,
+      -12910.0
+    ],
+    [
+      12905.0,
+      55.42475891113281,
+      12929.0
+    ]
+  ],
+  "regional": {
+    "east": [
+      -150,
+      410
+    ],
+    "north": [
+      -510,
+      440
+    ],
+    "ringCount": 49,
+    "layoutSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59"
+  },
+  "regionalRecipeSha256": "b93d04fc63ede8bbbb7c69e139ce5e0aef1997c124a97473ee0613188b3f43bf",
+  "gridSpacing": "1m near; stitched 4/8/16m regional rings; coarse surrounding envelope beyond 10km ray reach",
+  "adjustments": [
+    "Five-tap separable planning-height smoothing",
+    "2.4m graded trail; 6.4m/7m pockets",
+    "Clue trail cut into exterior mound shoulder; occupied roofs and rising stairs retained",
+    "Banks and retained tomb roof/collapse mound clearance",
+    "Exact 2.05m apron and three separate open shafts"
+  ],
+  "files": [
+    {
+      "path": "asset.manifest.json",
+      "bytes": 680,
+      "sha256": "7ecd78f2e371d31065883c0f0f002cc8c9267a118659959293bb9515a6bfae19"
+    },
+    {
+      "path": "chapter-terrain-r21.blend",
+      "bytes": 21765001,
+      "sha256": "0bd34f100d9c996a65718144eef1268ed124e520e8f20bf3fdbae22a1c9d7003"
+    },
+    {
+      "path": "chapter-terrain-r21.glb",
+      "bytes": 18328048,
+      "sha256": "fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854"
+    },
+    {
+      "path": "surface.json",
+      "bytes": 2073496,
+      "sha256": "c11a5e6281a73eacecbe743c67b05c08c82b68b785d68aa5beb5044f1b1b63ac"
+    },
+    {
+      "path": "authoring-recipe.executed.py",
+      "bytes": 24968,
+      "sha256": "9b1afdba9663e04bcb0dc3681e9282a4d42d69af3354279aa699f5ff936bff6c"
+    }
+  ],
+  "status": "Authored source candidate; NOT runtime admission or visual acceptance",
+  "executedRecipePath": "authoring-recipe.executed.py",
+  "canonicalToolSha256": "c1a595b635fc1b6299aedc27304cb4b5c52d4390e0c958102698c0d46d63fe60",
+  "canonicalToolDifference": "Line endings only: executed CRLF recipe preserved; canonical tool normalized to LF."
+}

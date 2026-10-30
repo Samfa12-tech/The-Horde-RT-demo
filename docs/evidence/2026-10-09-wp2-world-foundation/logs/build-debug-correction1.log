@@ -1,0 +1,55 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  GameSimulation.cpp
+  HeldItemKinematics.cpp
+  HeldLightState.cpp
+  Generating Code...
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  CharacterRenderSlot.cpp
+  PlayerRenderSlot.cpp
+  PresentableTinyRtScene.cpp
+<repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,36): error C2440: '<function-style-cast>': cannot convert from 'initializer list' to 'horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::Vertex' [<repo>\build\presets\windows-x64-debug\horde_rt_probe_core.vcxproj]
+      <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,36):
+      Invalid aggregate initialization
+          <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,54):
+          'initializing': cannot convert from 'const _Ty' to 'float'
+          with
+          [
+              _Ty=std::array<float,3>
+          ]
+              <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,54):
+              No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+
+<repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,63): error C2440: '<function-style-cast>': cannot convert from 'initializer list' to 'horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::Vertex' [<repo>\build\presets\windows-x64-debug\horde_rt_probe_core.vcxproj]
+      <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,63):
+      Invalid aggregate initialization
+          <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,81):
+          'initializing': cannot convert from 'const _Ty' to 'float'
+          with
+          [
+              _Ty=std::array<float,3>
+          ]
+              <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,81):
+              No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+
+<repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,90): error C2440: '<function-style-cast>': cannot convert from 'initializer list' to 'horde::vulkan::raytracing::PresentableTinyRtScene::BuildAccelerationStructures::Vertex' [<repo>\build\presets\windows-x64-debug\horde_rt_probe_core.vcxproj]
+      <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,90):
+      Invalid aggregate initialization
+          <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,108):
+          'initializing': cannot convert from 'const _Ty' to 'float'
+          with
+          [
+              _Ty=std::array<float,3>
+          ]
+              <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,108):
+              No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+
+<repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,13): error C2064: term does not evaluate to a function taking 3 arguments [<repo>\build\presets\windows-x64-debug\horde_rt_probe_core.vcxproj]
+      <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,13):
+      class does not define an 'operator()' or a user defined conversion operator to a pointer-to-function or reference-to-function that takes appropriate number of arguments
+      <repo>\src\vulkan\raytracing\PresentableTinyRtScene.cpp(3256,13):
+      while trying to match the argument list '()'
+
+  SimulationFrameAdapter.cpp
+  Generating Code...

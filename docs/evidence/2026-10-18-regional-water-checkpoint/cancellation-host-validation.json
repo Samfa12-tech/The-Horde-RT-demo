@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "scope": "Android source-only cancellation-to-export race repair; focused host Java checks",
+  "outcome": "PASS",
+  "workingDirectory": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "originalSourceOnlyFinding": "Lifecycle cancellation exported immediately after asynchronous native Stop; failed manifest could still be pending. No physical cancellation acceptance had been claimed.",
+  "fix": "Worker awaits actual native terminal phase 2/3, monotonic maximum 30000ms; timeout remains1/unavailable0. Export rejects nonterminal status before payload and writes only immutable invalid result.json.",
+  "gradleSeconds": 9,
+  "suites": [
+    {
+      "name": "com.samfa12.hordelanternrt.EnvironmentSurveyTerminalAwaitTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.006,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-com.samfa12.hordelanternrt.EnvironmentSurveyTerminalAwaitTest.xml",
+      "sha256": "aaec5a27f0cf3aa65b4897758a5df2350c9bec345bca197481e9a0c714170aae"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.EnvironmentSurveyRequestTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.148,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-com.samfa12.hordelanternrt.EnvironmentSurveyRequestTest.xml",
+      "sha256": "e39d290bc9650d2214c3da0b44e9f574515a4de162923f67925e1b22615eef2f"
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.EnvironmentSurveyExportTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.076,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-com.samfa12.hordelanternrt.EnvironmentSurveyExportTest.xml",
+      "sha256": "5754ddf006209c54561550a1e871e43231c8a3d1794d09c78e084f8eda61521a"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/EnvironmentSurveyTerminalAwait.java",
+      "bytes": 1864,
+      "sha256": "aa759af924bd9da0433cf66863676f8a8cbafb882885e0239f8fccc5aa33185b"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "bytes": 455084,
+      "sha256": "0abd08278df1f4b030f9b8a8b508c134eee5159a1204fd2b6bd7f00e69e84595"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/EnvironmentSurveyTerminalAwaitTest.java",
+      "bytes": 3919,
+      "sha256": "619f9eb74d055a6d06d7b066a0ad5e755ab5cca100febe896fad98b09b60bbdd"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/EnvironmentSurveyRequestTest.java",
+      "bytes": 6759,
+      "sha256": "82eefe909b1ddaaefa76323efb069ba889e876fb4747ee6d96a28b990da659ff"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/EnvironmentSurveyExportTest.java",
+      "bytes": 9630,
+      "sha256": "489ed617aa74ddd3774f3d3d5ca0bc036a35c16ae7cd695ed19c2ded2dfcc121"
+    }
+  ],
+  "log": {
+    "path": "reports/2026-10-19-environment-survey-cancel-java-tests.log",
+    "sha256": "b6c8f9cd45f3e93ffc7abfab6f855719b80d8c86ca948dd433698297268b2b54"
+  },
+  "notRun": [
+    "Android native build",
+    "APK assemble/install",
+    "device or desktop actions",
+    "physical lifecycle cancellation acceptance"
+  ],
+  "remaining": "Final Android candidate must rebuild MainActivity after these source changes; root owns native/application build."
+}

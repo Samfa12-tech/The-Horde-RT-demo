@@ -1,0 +1,131 @@
+{
+  "joinedFrames": 838,
+  "allFrames": {
+    "as": {
+      "n": 838,
+      "medianMs": 0.547708,
+      "p95Ms": 0.560208,
+      "maximumMs": 0.85401
+    },
+    "dispatch": {
+      "n": 838,
+      "medianMs": 33.829348,
+      "p95Ms": 34.697447,
+      "maximumMs": 37.034947
+    },
+    "transfer": {
+      "n": 838,
+      "medianMs": 0.124427,
+      "p95Ms": 0.13474,
+      "maximumMs": 0.144792
+    }
+  },
+  "views": {
+    "lookout-sweep": {
+      "as": {
+        "n": 626,
+        "medianMs": 0.547604,
+        "p95Ms": 0.560052,
+        "maximumMs": 0.85401
+      },
+      "dispatch": {
+        "n": 626,
+        "medianMs": 33.814895,
+        "p95Ms": 34.635937,
+        "maximumMs": 37.034947
+      },
+      "transfer": {
+        "n": 626,
+        "medianMs": 0.124505,
+        "p95Ms": 0.134687,
+        "maximumMs": 0.139479
+      }
+    }
+  },
+  "limits": "GPU stage execution intervals; not additive counters or playable FPS. AS brackets UpdateDynamicInstances; dispatch includes all shader work; transfer brackets the post-barrier transfer/copy path.",
+  "strictTiming": {
+    "eligible": true,
+    "reportSha256": "d3ac1cac2c469045292856d64f8fe2ddccb794b4b0377d771ad856e8738b9ab4",
+    "runId": "stage23-production-33",
+    "workload": "motion-chapter-outdoor-scale-hold-v1",
+    "buildId": "1.6.2",
+    "settings": {
+      "scalePercent": 33,
+      "width": 1440,
+      "height": 2971,
+      "internalWidth": 475,
+      "internalHeight": 980,
+      "nativeWindowWidth": 1440,
+      "nativeWindowHeight": 2971,
+      "surfaceCurrentWidth": 1440,
+      "surfaceCurrentHeight": 2971,
+      "surfaceCurrentTransform": 1,
+      "swapchainPreTransform": 1,
+      "rtPreRotationRequired": false,
+      "rtPresentationTransform": 0,
+      "backend": "RayTracingPipeline",
+      "water": 1,
+      "fire": 0,
+      "cap": 30,
+      "glass": false,
+      "shadow": 1,
+      "mist": false,
+      "dust": 1
+    },
+    "scope": {
+      "surfaceGeneration": 1,
+      "sceneEpoch": 3,
+      "measurementGeneration": 6,
+      "matchedCompletedFrames": 838,
+      "intervalCount": 837,
+      "durationNanoseconds": 40012500974,
+      "setupPresentationRowsExcluded": 0
+    },
+    "intervalsNanoseconds": {
+      "median": 49999948,
+      "p90NearestRank": 50000104,
+      "p95NearestRank": 54166563,
+      "maximum": 54166719,
+      "over33333000Nanoseconds": 837,
+      "over250000000Nanoseconds": 0
+    },
+    "observedPresentedImageRatePerSecond": 20.918462,
+    "simulation": {
+      "stateRows": 838,
+      "eventRows": 0,
+      "ticksThisFrameMaximum": 4,
+      "catchUpOverrunCountFirst": 1,
+      "catchUpOverrunCountLast": 1,
+      "catchUpOverrunDelta": 0
+    },
+    "collector": {
+      "runCounterDelta": {
+        "preparedPresents": 838,
+        "acceptedPresents": 838,
+        "rejectedPresents": 0,
+        "invalidRegistrations": 0,
+        "invalidMetadata": 0,
+        "pendingCapacityExhausted": 0,
+        "queryCalls": 1675,
+        "queryErrors": 0,
+        "incompleteQueries": 0,
+        "zeroPresentTimestamps": 0,
+        "zeroPresentIds": 0,
+        "unknownPresentIds": 0,
+        "duplicateTimings": 0,
+        "rowCapacityExhausted": 0,
+        "missingOnRebind": 0,
+        "missingOnUnbind": 0,
+        "abandonedPreparedPresents": 0
+      },
+      "queryCpuWallNanoseconds": 11462658,
+      "presentMarginAtLeast2Pow63CountIgnored": 838
+    },
+    "limits": [
+      "Bounded diagnostic outdoor hold with zero image readbacks; 20% is not image-quality admission.",
+      "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+      "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+      "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+    ]
+  }
+}

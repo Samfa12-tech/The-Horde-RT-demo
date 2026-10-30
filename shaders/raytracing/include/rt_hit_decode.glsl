@@ -1,14 +1,18 @@
 #include "rt_dielectric_spawn.glsl"
 
+const int kKeeperInstanceMetadataIndex = 25;
+
+#include "rt_regional_water.glsl"
+
 vec3 normalForSurfaceCode(uint code)
 {
     uint normalCode = (code >> 8u) & 0xffu;
-    if (normalCode == 0u) return vec3(0.0, 1.0, 0.0);
-    if (normalCode == 1u) return vec3(0.0, -1.0, 0.0);
-    if (normalCode == 2u) return vec3(1.0, 0.0, 0.0);
-    if (normalCode == 3u) return vec3(-1.0, 0.0, 0.0);
-    if (normalCode == 4u) return vec3(0.0, 0.0, 1.0);
-    if (normalCode == 5u) return vec3(0.0, 0.0, -1.0);
+    if (normalCode < 6u)
+    {
+        uint axis = normalCode / 2u;
+        vec3 unitAxis = vec3(axis == 1u, axis == 0u, axis == 2u);
+        return unitAxis * (1.0 - 2.0 * float(normalCode & 1u));
+    }
     return normalize(vec3(0.46, 0.42, 0.0));
 }
 
@@ -17,18 +21,11 @@ const float kWaterStreamTopY = 2.16;
 const float kWaterStreamBottomScale = 0.70;
 const float kWaterStreamTaperSlope = 0.30 / (kWaterStreamTopY - kWaterStreamBottomY);
 
-float waterStreamScale(float y)
-{
-    return kWaterStreamBottomScale
-        + clamp(y - kWaterStreamBottomY, 0.0,
-                kWaterStreamTopY - kWaterStreamBottomY)
-        * kWaterStreamTaperSlope;
-}
-
 void waterStreamProfile(vec3 p, out float centreZ, out float radiusX,
-                        out float radiusZ)
+                        out float radiusZ, out float scale)
 {
-    float scale = waterStreamScale(p.y);
+    scale = kWaterStreamBottomScale + clamp(p.y - kWaterStreamBottomY,
+        0.0, kWaterStreamTopY - kWaterStreamBottomY) * kWaterStreamTaperSlope;
     float widthScale = controls.waterfallWidthScale;
     centreZ = -15.26;
     radiusX = 0.006;
@@ -67,38 +64,47 @@ vec3 waterBaseNormal(vec3 p, vec3 geometricNormal)
     float centreZ = 0.0;
     float radiusX = 0.0;
     float radiusZ = 0.0;
-    waterStreamProfile(p, centreZ, radiusX, radiusZ);
-    float scale = waterStreamScale(p.y);
+    float scale;
+    waterStreamProfile(p, centreZ, radiusX, radiusZ, scale);
     vec3 radialGradient = vec3((p.x + 2.32) / (radiusX * radiusX),
                                -scale * kWaterStreamTaperSlope,
                                (p.z - centreZ) / (radiusZ * radiusZ));
     return normalize(radialGradient);
 }
 
-vec3 waterSurfaceNormal(vec3 p, vec3 geometricNormal)
+vec3 waterSurfaceNormal(vec3 p, vec3 geometricNormal, int profileIndex)
 {
     vec3 n = waterBaseNormal(p, geometricNormal);
-    bool runoff = abs(n.y) > 0.65;
-    bool catchment = runoff && p.x > -2.88;
-    if (catchment)
+    if (profileIndex >= 0)
     {
-        // The roof stream transfers momentum into concentric capillary waves in
-        // the real catchment geometry. These normals drive the same bounded RT
-        // reflection/refraction paths; no screen-space ring is composited later.
-        vec2 impactOffset = p.xz - vec2(-2.32, -15.26);
-        float impactDistance = length(impactOffset);
-        vec2 radial = impactOffset / max(impactDistance, 0.001);
-        float angularWarp = sin(atan(impactOffset.y, impactOffset.x) * 3.0
-                              + controls.time * 0.37) * 0.28;
-        float ripple = sin(impactDistance * 31.0 - controls.time * 6.2
-                           + angularWarp);
-        float rippleEnvelope = 1.0 - smoothstep(0.07, 0.72, impactDistance);
-        vec3 radialDirection = vec3(radial.x, 0.0, radial.y);
-        return normalize(n + radialDirection * ripple * rippleEnvelope * 0.020
-                           + vec3(0.006 * sin(p.z * 23.0 - controls.time * 3.7),
-                                  0.0,
-                                  0.004 * sin(p.x * 29.0 + controls.time * 4.1)));
+        vec4 coordinate;
+        vec3 alongGradient, bankGradient;
+        waterProfileCoordinates(profileIndex, p, coordinate, alongGradient, bankGradient);
+        vec3 gradient;
+        if (coordinate.w > 0.5)
+        {
+            float phase = coordinate.x - coordinate.z * controls.time;
+            // Two small advected height bands with continuous phase warping.
+            // Analytic chain-rule derivatives avoid rigid cross-channel stripes.
+            float warpA = phase * 0.41 + coordinate.y * 0.77;
+            float warpB = phase * 0.73 - coordinate.y * 1.17;
+            float a = phase * 5.1 + coordinate.y * 0.35 + 0.9 * sin(warpA);
+            float b = phase * 12.7 + coordinate.y * 2.9 + 0.65 * sin(warpB);
+            gradient = alongGradient * (0.004 * (5.1 + 0.369 * cos(warpA)) * cos(a)
+                + 0.0015 * (12.7 + 0.4745 * cos(warpB)) * cos(b)) +
+                bankGradient * (0.004 * (0.35 + 0.693 * cos(warpA)) * cos(a)
+                + 0.0015 * (2.9 - 0.7605 * cos(warpB)) * cos(b));
+        }
+        else
+        {
+            float a = dot(p.xz, vec2(2.2, 1.8)) - controls.time * 0.9;
+            float b = dot(p.xz, vec2(-4.1, 3.2)) - controls.time * 0.7;
+            vec2 slope = vec2(2.2, 1.8) * (0.008 * cos(a)) + vec2(-4.1, 3.2) * (0.003 * cos(b));
+            gradient = vec3(slope.x, 0.0, slope.y);
+        }
+        return normalize(n - gradient);
     }
+    bool runoff = abs(n.y) > 0.65;
     vec3 flow = runoff ? vec3(-1.0, 0.0, 0.0) : vec3(0.0, -1.0, 0.0);
     vec3 across = normalize(cross(flow, n));
     float alongPosition = dot(p, flow);
@@ -108,8 +114,25 @@ vec3 waterSurfaceNormal(vec3 p, vec3 geometricNormal)
     float slopeB = sin(alongPosition * 7.1 - controls.time * 6.8
                      + acrossPosition * 2.9);
     float amplitude = runoff ? 0.008 : 0.018;
-    return normalize(n + flow * slopeA * amplitude
-                       + across * slopeB * amplitude * 0.65);
+    vec3 perturbed = n + flow * slopeA * amplitude
+                       + across * slopeB * amplitude * 0.65;
+    // Water material hits on the horizontal catchment and runoff share this
+    // bounded normal-only contact wave. The underlying admitted surfaces keep
+    // their positions and remain the membership test; no displaced sheet or
+    // coordinate-only overlay is introduced.
+    vec2 offset = p.xz - rtWaterContactRipple.value.xy;
+    float distanceToImpact = length(offset);
+    float age = max(rtWaterContactRipple.value.z, 0.0);
+    float envelope = clamp(rtWaterContactRipple.value.w, 0.0, 1.0)
+                   * (runoff ? 1.0 : 0.0)
+                   * step(0.0005, distanceToImpact)
+                   * (1.0 - smoothstep(0.62, 1.0, distanceToImpact))
+                   * (1.0 - smoothstep(0.35, 0.90, age));
+    float radialSlope = cos(distanceToImpact * 39.0 - age * 7.5)
+                      * envelope * 0.022;
+    perturbed += vec3(offset.x, 0.0, offset.y)
+               * (radialSlope / max(distanceToImpact, 0.0005));
+    return normalize(perturbed);
 }
 
 bool waterStreamExit(vec3 entryPoint, vec3 insideDirection,
@@ -119,7 +142,8 @@ bool waterStreamExit(vec3 entryPoint, vec3 insideDirection,
     float centreZ = 0.0;
     float radiusX = 0.0;
     float radiusZ = 0.0;
-    waterStreamProfile(entryPoint, centreZ, radiusX, radiusZ);
+    float entryScale;
+    waterStreamProfile(entryPoint, centreZ, radiusX, radiusZ, entryScale);
 
     // The stream is the exact implicit surface
     //   dx^2/rx^2 + dz^2/rz^2 - scale(y)^2 = 0.
@@ -131,7 +155,8 @@ bool waterStreamExit(vec3 entryPoint, vec3 insideDirection,
     float localZ = insideStart.z - centreZ;
     float inverseRadiusXSquared = 1.0 / (radiusX * radiusX);
     float inverseRadiusZSquared = 1.0 / (radiusZ * radiusZ);
-    float scale = waterStreamScale(insideStart.y);
+    float scale = kWaterStreamBottomScale + clamp(insideStart.y - kWaterStreamBottomY,
+        0.0, kWaterStreamTopY - kWaterStreamBottomY) * kWaterStreamTaperSlope;
     float scaleRate = kWaterStreamTaperSlope * insideDirection.y;
     float a = insideDirection.x * insideDirection.x * inverseRadiusXSquared
             + insideDirection.z * insideDirection.z * inverseRadiusZSquared
@@ -163,7 +188,8 @@ bool waterStreamExit(vec3 entryPoint, vec3 insideDirection,
     }
 
     exitPoint = insideStart + insideDirection * exitDistance;
-    float exitScale = waterStreamScale(exitPoint.y);
+    float exitScale = kWaterStreamBottomScale + clamp(exitPoint.y - kWaterStreamBottomY,
+        0.0, kWaterStreamTopY - kWaterStreamBottomY) * kWaterStreamTaperSlope;
     exitOutwardNormal = normalize(vec3(
         (exitPoint.x + 2.32) * inverseRadiusXSquared,
         -exitScale * kWaterStreamTaperSlope,
@@ -200,7 +226,9 @@ void materialForPrimitive(int primitive,
     {
         material = kMaterialWater;
         geometricNormal = waterBaseNormal(p, vec3(1.0, 0.0, 0.0));
-        normal = waterSurfaceNormal(p, geometricNormal);
+        // Secondary water hits terminate at the geometric interface. Animated
+        // normals belong to the primary water shader, not every hit decode.
+        normal = geometricNormal;
         base = vec3(1.0);
         metallic = 0.0;
         reflectivity = 0.0204;
@@ -209,7 +237,7 @@ void materialForPrimitive(int primitive,
     }
     if (instance >= 4 && instance <= 16)
     {
-        normal = normalize(vec3(controls.cameraX, 0.75, controls.cameraZ) - p);
+        normal = normalize(vec3(controls.cameraX, 0.75 + rtHeldLight.value.playerTransform.x, controls.cameraZ) - p);
         geometricNormal = normal;
         if (instance == 4)
         {
@@ -237,23 +265,7 @@ void materialForPrimitive(int primitive,
         return;
     }
 
-    if (instance == 17)
-    {
-        int face = (primitive % 12) / 2;
-        normal = face == 0 ? vec3(0.0, 0.0, -1.0) :
-                 (face == 1 ? vec3(0.0, 0.0, 1.0) :
-                 (face == 2 ? vec3(-1.0, 0.0, 0.0) :
-                 (face == 3 ? vec3(1.0, 0.0, 0.0) :
-                 (face == 4 ? vec3(0.0, 1.0, 0.0) : vec3(0.0, -1.0, 0.0)))));
-        geometricNormal = normal;
-        base = vec3(0.115, 0.105, 0.092);
-        metallic = 0.0;
-        reflectivity = 0.06;
-        emissive = 0.0;
-        return;
-    }
-
-    if (instance == 2 || instance == 18)
+    if (instance == 2 || instance == 18 || instance == kKeeperInstanceMetadataIndex)
     {
         normal = vec3(0.0, 1.0, 0.0);
         geometricNormal = normal;
@@ -261,7 +273,7 @@ void materialForPrimitive(int primitive,
         // floor/hash lookup changed colour in hard 10 cm cells and looked like
         // checkerboard lighting across the animated mesh.
         float age = 0.5 + 0.5 * sin(p.y * 3.1 + p.x * 1.7 + p.z * 2.3);
-        bool lichInstance = instance == 2 && controls.enemyKind > 0.5;
+        bool lichInstance = instance == kKeeperInstanceMetadataIndex;
         base = lichInstance ? vec3(0.16, 0.13, 0.19)
                             : mix(vec3(0.34, 0.29, 0.21), vec3(0.48, 0.42, 0.30), age * 0.42);
         metallic = lichInstance ? 0.08 : 0.04;
@@ -270,7 +282,9 @@ void materialForPrimitive(int primitive,
         return;
     }
 
-    uint code = worldSurfaces.codes[primitive];
+    // Non-StaticPbr owners share the procedural surface-code transport. Their
+    // BLAS-local primitive ID is relative to this instance's explicit range.
+    uint code = worldSurfaces.codes[uint(primitive) + rtInstances.values[instance].primitiveBase];
     uint normalCode = (code >> 8u) & 0xffu;
     material = int(code & 0xffu);
     normal = normalForSurfaceCode(code);
@@ -369,8 +383,11 @@ void materialForPrimitive(int primitive,
     else if (material == kMaterialWater)
     {
         base = vec3(1.0);
-        geometricNormal = waterBaseNormal(p, geometricNormal);
-        normal = waterSurfaceNormal(p, geometricNormal);
+        int waterProfile = waterProfileIndex(code);
+        geometricNormal = waterProfile >= 0
+            ? rtWaterContactRipple.surfaces[waterProfile].normalKind.xyz
+            : waterBaseNormal(p, geometricNormal);
+        normal = geometricNormal;
         metallic = 0.0;
         reflectivity = 0.0204;
     }
@@ -625,16 +642,22 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         }
         else
         {
-            materialForPrimitive(h.primitive, h.instance, h.position, h.material,
+            // Explicit procedural owners project in their BLAS coordinates,
+            // so rigid movement carries the texture with the geometry. Ordinary
+            // world/water/player proofs keep their accepted world projection.
+            vec3 materialPosition = h.position;
+            if (rtInstances.values[h.instance].reserved1 != 0u)
+                materialPosition = rayQueryGetIntersectionObjectRayOriginEXT(query, true)
+                    + rayQueryGetIntersectionObjectRayDirectionEXT(query, true) * h.t;
+            materialForPrimitive(h.primitive, h.instance, materialPosition, h.material,
                                  h.normal, h.geometricNormal, h.base, h.metallic,
                                  h.reflectivity, h.occlusion, h.emissive);
-        }
-        if (h.instance == 2 || h.instance == 18)
+        if (h.instance == 2 || h.instance == 18 || h.instance == kKeeperInstanceMetadataIndex)
         {
             const int firstVertex = h.primitive * 3;
             const vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
             const float w0 = 1.0 - bary.x - bary.y;
-            bool lichInstance = h.instance == 2 && controls.enemyKind > 0.5;
+            bool lichInstance = h.instance == kKeeperInstanceMetadataIndex;
             bool secondSkeletonPose = h.instance == 18;
             vec3 localNormal = lichInstance
                 ? normalize(lich.vertices[firstVertex].normal.xyz * w0
@@ -680,6 +703,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                                         : albedo * 0.72;
                 h.emissive = glowMask * (3.8 + controls.staffLightStrength * 2.3);
             }
+        }
         }
     }
     return h;

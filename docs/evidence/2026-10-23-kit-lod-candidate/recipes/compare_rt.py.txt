@@ -1,0 +1,42 @@
+from pathlib import Path
+import hashlib,json,math
+from PIL import Image,ImageChops
+root=Path.cwd();base=root/'reports/kit-lod-candidate-20261023'
+fixtures={k:root/('reports/horde-campaign-fixtures-kit-lod-20261023-'+k) for k in ['control','candidate']}
+reports={k:json.loads((p/'windows-lookout-validation.json').read_text()) for k,p in fixtures.items()}
+record={'scope':'Matched frozen Windows RT inspection, not benchmark or earned route/physical acceptance. No noise-independent silhouette mask or one-pixel contour proof.',
+        'processes':{k:json.loads((base/'rt'/(k+'.process.json')).read_text()) for k in fixtures},'cohorts':{},'frames':[]}
+for k,r in reports.items():
+    assert r['complete'] and r['stagesComplete'] and r['failures']==0 and not r['performanceEvidence']
+    record['cohorts'][k]={x:r[x] for x in ['count','failures','renderCalls','complete','physicalVisibleAcceptance','performanceEvidence','ownerSettingsReadOrWritten','foregroundContinuous','ownerObservedForeground','ownerShown']}
+    record['cohorts'][k]['resources']=r['loadedRtEvidence']['resources']
+    record['cohorts'][k]['pipeline']=r['loadedRtEvidence']['pipeline']
+assert record['cohorts']['control']['pipeline']==record['cohorts']['candidate']['pipeline']
+for group,key,label in [('pose','kitPoseInspection','poses'),('motion','kitMotionInspection','frames')]:
+    left=reports['control'][key][label];right=reports['candidate'][key][label]
+    assert len(left)==len(right)
+    for a,b in zip(left,right):
+        assert {k:v for k,v in a.items() if k!='rtEvidence'}=={k:v for k,v in b.items() if k!='rtEvidence'}
+        e=a['rtEvidence'];f=b['rtEvidence']
+        for field in ['identity','pipeline','dispatch','shadowQuality','fireQuality','actualUploadedDustQuality','actualUploadedMistEnabled','presentation']:
+            assert e[field]==f[field],field
+        assert e['presentation']['presented'] and f['presentation']['presented']
+        name='windows-kit-'+a['pose']+'.png' if group=='pose' else 'windows-kit-motion-'+a['stage']+'.png'
+        paths=[fixtures[k]/name for k in ['control','candidate']]
+        images=[Image.open(p).convert('RGB') for p in paths]
+        assert images[0].size==images[1].size
+        delta=ImageChops.difference(*images);channels=delta.split()
+        largest=ImageChops.lighter(ImageChops.lighter(channels[0],channels[1]),channels[2])
+        histogram=delta.histogram();extent=largest.getextrema()
+        mean=sum((i%256)*n for i,n in enumerate(histogram))/(3*images[0].width*images[0].height)
+        record['frames'].append({'name':name,'poseState':{k:v for k,v in a.items() if k!='rtEvidence'},
+            'width':images[0].width,'height':images[0].height,'sourceImageSha256':hashlib.sha256(paths[0].read_bytes()).hexdigest(),
+            'candidateImageSha256':hashlib.sha256(paths[1].read_bytes()).hexdigest(),'changedPixels':images[0].width*images[0].height-largest.histogram()[0],
+            'changedPixelBoundsExclusive':delta.getbbox(),
+            'meanAbsoluteChannelDifference':mean,'maxChannelDifference':extent[1],
+            'controlStageObservationMs':e['stages'],'candidateStageObservationMs':f['stages'],
+            'controlGpuObservationMs':e['gpu'],'candidateGpuObservationMs':f['gpu']})
+record['profileDegrees']=abs(next(x for x in reports['control']['kitMotionInspection']['frames'] if x['stage']=='turn-30')['yaw']-math.pi/2)*180/math.pi
+record['allMatchedStatesAndRtIdentities']=True
+(base/'rt-comparison.json').write_text(json.dumps(record,indent=2)+'\n')
+print(json.dumps({'cohorts':record['cohorts'],'profileDegrees':record['profileDegrees'],'frames':[{k:v for k,v in f.items() if k not in ['controlStageObservationMs','candidateStageObservationMs','controlGpuObservationMs','candidateGpuObservationMs']} for f in record['frames'] if f['name'] in ['windows-kit-neutral.png','windows-kit-motion-turn-30.png','windows-kit-motion-walk-50.png']]},indent=2))

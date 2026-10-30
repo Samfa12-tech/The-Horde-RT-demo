@@ -1,0 +1,4 @@
+PASS: all 120 RT dispatch/copy/present/completion identities; 12 exact PNG hashes
+PASS: both failed full captures retained; no retry or further full-capture runs
+PASS: source/assets/settings/owner/campaign identities unchanged; all three own processes exited
+Stable resource states across survey: 1

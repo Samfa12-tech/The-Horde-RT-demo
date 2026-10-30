@@ -1,0 +1,94 @@
+{
+  "captures": [
+    {
+      "path": "reports/frozen-mist/captures/midpoint-all",
+      "exit_code": 3221225784,
+      "elapsed_seconds": 2.816490500001237,
+      "exe_sha256": "12802d90028956608e0aaa081631bb5cb36eac35be7131e33f4bb535a8a0cbfb",
+      "run_sha256": "fa01de69f10ca2f7abb13bcc01ec248f5a63d28ca703f637648586e832e436d3",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "current_complete_frame": false
+    },
+    {
+      "path": "reports/frozen-mist/captures/midpoint-all-2",
+      "exit_code": 4294967295,
+      "elapsed_seconds": 133.07963939999172,
+      "exe_sha256": "ff7015e655e348775db24e87262a1038cd7853325a0c203517663d67b0d2c87b",
+      "run_sha256": "b263bbd8bf7944bc04add0abd13536a80e40b567de83f033493985dd3e6b111d",
+      "log_sha256": "e7b39eb343d9dcdaf94d62b501a694c716ec4eabc88ee2c9dc744241404c9bae",
+      "current_complete_frame": false
+    },
+    {
+      "path": "reports/frozen-mist/captures/midpoint-all-3",
+      "exit_code": 1,
+      "elapsed_seconds": 34.24263219999557,
+      "exe_sha256": "ab84d64db7f7448d8bfde942a6929927e20ef9fd3f0197ffa17e58eebefa9c5f",
+      "run_sha256": "fa8fa82f3deb4c3c6902752f52491c1f948b2d22cea9641dbac99b5141a2cb78",
+      "log_sha256": "bf98f081c95732813cb68a4cd1df9bbf6689fdd53e95efd39953ee4d5a462f8e",
+      "current_complete_frame": false
+    },
+    {
+      "path": "reports/frozen-mist/captures/midpoint-all-4",
+      "exit_code": 1,
+      "elapsed_seconds": 6.942725100001553,
+      "exe_sha256": "2be39c1ecf72e6296e501447ea8101cd82656cc7b636f3f04c3403e6e5ccf749",
+      "run_sha256": "a69f9f6f1c3c4772988a4457bbd131385c5019552e54c4a7089006986fbe9b3d",
+      "log_sha256": "da5a3b90f345c6eae167cb4ce757e4898a436f9f8266ff301ba677f897ce43f1",
+      "current_complete_frame": true
+    },
+    {
+      "path": "reports/frozen-mist/captures/midpoint-lantern",
+      "exit_code": 1,
+      "elapsed_seconds": 22.980329800004256,
+      "exe_sha256": "2be39c1ecf72e6296e501447ea8101cd82656cc7b636f3f04c3403e6e5ccf749",
+      "run_sha256": "68d108a0debb383416a9fe4c40a0df14fb0de981a55d01031bf4cffb94a5e8ee",
+      "log_sha256": "29630aa5f803bca4db628b9bc2493781f7f7c4628ae68f29d1bc5969e60068c2",
+      "current_complete_frame": true
+    },
+    {
+      "path": "reports/frozen-mist/captures/midpoint-sky",
+      "exit_code": 1,
+      "elapsed_seconds": 21.907781299989438,
+      "exe_sha256": "2be39c1ecf72e6296e501447ea8101cd82656cc7b636f3f04c3403e6e5ccf749",
+      "run_sha256": "51c84cb2fcbfad5e23bfb4c0c6844bb24a187108bf6ad6ab8ec442c45c026381",
+      "log_sha256": "ce110002debda528001e88b2afd219e918b0d031ec0bdf100a4e101a163f05ac",
+      "current_complete_frame": true
+    },
+    {
+      "path": "reports/frozen-mist/captures/sample-local-all",
+      "exit_code": 1,
+      "elapsed_seconds": 53.341238299995894,
+      "exe_sha256": "2be39c1ecf72e6296e501447ea8101cd82656cc7b636f3f04c3403e6e5ccf749",
+      "run_sha256": "64b6608b06575ebb6f251d0f67eea7d8449fa6bd5e51bae2381c99c8f4e3dbc3",
+      "log_sha256": "0350e5532d5cb5d19eaf9545a137cf00027aa8d073fc915dceda2bb986b00fc8",
+      "current_complete_frame": true
+    },
+    {
+      "path": "reports/frozen-mist/captures/sample-local-lantern",
+      "exit_code": 1,
+      "elapsed_seconds": 30.69831290000002,
+      "exe_sha256": "2be39c1ecf72e6296e501447ea8101cd82656cc7b636f3f04c3403e6e5ccf749",
+      "run_sha256": "3daae1eb595bee83472f07d22e38c926cb5066d5b8daf94662b4339fa99c069e",
+      "log_sha256": "9056c56d0bef98492156198953c00c1212a075fef9a15f4b6b1f8483a6048ad3",
+      "current_complete_frame": true
+    },
+    {
+      "path": "reports/frozen-mist/captures/sample-local-sky",
+      "exit_code": 1,
+      "elapsed_seconds": 29.91815179999685,
+      "exe_sha256": "2be39c1ecf72e6296e501447ea8101cd82656cc7b636f3f04c3403e6e5ccf749",
+      "run_sha256": "3ede836e4ca1f90bb33cb622e59a809687150858346e7144a80a425a7bef1b77",
+      "log_sha256": "3f3c802a3eb3e37c262b89840d5cc4fb411f9a1f500a502604c7b4b2872607ef",
+      "current_complete_frame": true
+    }
+  ],
+  "setup_failures": [
+    "Missing Pocket Audio include path",
+    "Headers accidentally inserted inside anonymous namespace",
+    "MSVC /MDd versus /MTd mismatch",
+    "Missing common-controls-v6 executable manifest: pre-game exit 3221225784",
+    "Diagnostic provider path rejected before scene initialization; own failed harness stopped after 133.08 s",
+    "Rescue geometry enabled after renderer initialization; corrected before primary matrix",
+    "Record-map output directory missing before build; corrected"
+  ]
+}

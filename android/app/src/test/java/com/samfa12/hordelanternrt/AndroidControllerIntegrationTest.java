@@ -28,6 +28,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
 import org.robolectric.shadows.ShadowSystemClock;
+import org.robolectric.shadows.ShadowAlertDialog;
 import java.time.Duration;
 
 @RunWith(RobolectricTestRunner.class)
@@ -35,21 +36,44 @@ import java.time.Duration;
 public class AndroidControllerIntegrationTest {
     @Implements(value=ProbeBridge.class,isInAndroidSdk=false)
     public static class Bridge {
-        static float x,z,yaw,pitch; static int attacks,parries,dodges,interacts,lanterns;
-        static boolean paused; static int context,retries;
+        static float x,z,yaw,pitch; static int attacks,parries,dodges,interacts,lanterns,runToggles,runClears;
+        static long teachingState;static int teachingSkips,teachingReplays;
+        @Implementation protected static long getCombatTeachingState(){return teachingState;}
+        @Implementation protected static void requestCombatTeachingSkip(){teachingSkips++;}
+        @Implementation protected static void requestCombatTeachingReplay(){teachingReplays++;}
+        @Implementation protected static void setCombatTeachingOptions(boolean enabled,boolean slowdown){}
+        static boolean paused,crouchHeld,analogue; static float dodgeX,dodgeZ; static boolean dodgeAnalogue; static int context,retries,crouchToggles,crouchClears;
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static int getSurfaceRuntimeState(long generation){return 1;}
+        @Implementation protected static long[] getEntryMenuState(){return new long[]{31,2,0,0,1};}
         @Implementation protected static int getContextualControlState(){return context;}
-        @Implementation protected static void setViewControls(float y,float p,float light,float strafe,float forward){yaw=y;pitch=p;x=strafe;z=forward;}
+        @Implementation protected static void setViewControls(float y,float p,float light,float strafe,float forward,boolean crouch,boolean analogueMovement){yaw=y;pitch=p;x=strafe;z=forward;crouchHeld=crouch;analogue=analogueMovement;}
+        @Implementation protected static void requestToggleCrouch(){crouchToggles++;}
+        @Implementation protected static void clearCrouchIntent(){crouchClears++;crouchHeld=false;}
         @Implementation protected static void setSimulationPaused(boolean p){paused=p;}
+        @Implementation protected static boolean getConfirmedRetryMode(){return false;}
         @Implementation protected static int retryEncounter(){retries++;return 2;}
+        @Implementation protected static long setGraphicsSettings(int scale,int water,int fire,int cap,boolean glass,int shadow,boolean mist,int dust){return 43;}
+        @Implementation protected static void setGraphicsPreview(boolean enabled,boolean paused,boolean motion,int camera,boolean reset,long generation){}
         @Implementation protected static void beginGraphicsEdit(int scale,int water,int fire,int cap,boolean glass,int shadow,boolean mist,int dust){}
         @Implementation protected static void setEntryMenu(boolean enabled,boolean side,boolean reduced,boolean play,long generation){}
         @Implementation protected static void requestAttack(){attacks++;}
         @Implementation protected static void requestParry(){parries++;}
-        @Implementation protected static void requestDodge(){dodges++;}
+        static long[] flask;static int drinks,rests;
+        @Implementation protected static long[] getHealingFlaskState(){return flask==null?null:flask.clone();}
+        @Implementation protected static void requestDrinkFlask(){drinks++;}
+        @Implementation protected static void requestRest(){rests++;}
+        static boolean guardHeld;
+        @Implementation protected static void setGuardHeld(boolean held) {
+            if (held && !guardHeld) ++parries;
+            guardHeld = held;
+        }
+        @Implementation protected static void requestDodge(){dodges++;dodgeX=x;dodgeZ=z;dodgeAnalogue=analogue;}
         @Implementation protected static void requestInteract(){interacts++;}
         @Implementation protected static void requestToggleHeldLightPose(){lanterns++;}
+        @Implementation protected static void requestToggleRun(){runToggles++;}
+        @Implementation protected static void clearRunIntent(){runClears++;}
+        @Implementation protected static void setRunHeld(boolean held){}
     }
     private MainActivity a;
     static Field field(String name)throws Exception {Field f=MainActivity.class.getDeclaredField(name);f.setAccessible(true);return f;}
@@ -59,21 +83,61 @@ public class AndroidControllerIntegrationTest {
     }
     private Button button(String name)throws Exception{return (Button)field(name).get(a);}
     @Before public void setup()throws Exception {
-        Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=Bridge.context=0;
-        Bridge.x=Bridge.z=Bridge.yaw=Bridge.pitch=0;
+        Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=Bridge.runToggles=Bridge.runClears=Bridge.context=0;
+        Bridge.teachingState=0;Bridge.teachingSkips=Bridge.teachingReplays=0;
+        Bridge.x=Bridge.z=Bridge.yaw=Bridge.pitch=0;Bridge.guardHeld=false;Bridge.flask=null;Bridge.drinks=Bridge.rests=0;
+        Bridge.crouchHeld=Bridge.analogue=Bridge.dodgeAnalogue=false;Bridge.crouchToggles=Bridge.crouchClears=0;
         a=Robolectric.buildActivity(MainActivity.class).get();
         a.setContentView(R.layout.activity_main);
         set("surfaceView",a.findViewById(R.id.scene_surface)); set("menuScrim",a.findViewById(R.id.menu_scrim));
         set("preferences",a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE));
         a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE).edit().clear().apply();
         set("resumed",true);set("menuVisible",false);
-        String[] names={"menuButton","attackButton","parryButton","dodgeButton","interactButton","toggleHeldLightPoseButton"};
-        int[] ids={R.id.menu_button,R.id.attack_button,R.id.parry_button,R.id.dodge_button,R.id.interact_button,R.id.toggle_held_light_pose_button};
+        set("startupAssetsPrepared",true);set("surfaceRequestGeneration",31L);set("surfaceStarted",true);
+        String[] names={"menuButton","attackButton","parryButton","dodgeButton","runButton","interactButton","toggleHeldLightPoseButton"};
+        int[] ids={R.id.menu_button,R.id.attack_button,R.id.parry_button,R.id.dodge_button,R.id.run_button,R.id.interact_button,R.id.toggle_held_light_pose_button};
         for(int i=0;i<names.length;i++)set(names[i],a.findViewById(ids[i]));
         set("diagnosticsPanel",a.findViewById(R.id.diagnostics_panel));set("developerOverlay",a.findViewById(R.id.developer_overlay));
         set("vitalityStatus",a.findViewById(R.id.vitality_status));set("rtStatus",a.findViewById(R.id.rt_status));
         set("controllerPrompt",a.findViewById(R.id.controller_prompt));
+        set("crouchButton",a.findViewById(R.id.crouch_button));
         call("configureGameplayActionButtons",new Class<?>[]{});
+    }
+    @Test public void automaticMovementRetiresManualButtonsWithoutChangingPointersOrPreferences()throws Exception {
+        assertFalse(a.getString(R.string.controls_help).contains("Ctrl"));
+        assertFalse(a.getString(R.string.controller_help).contains("hold L1"));
+        assertFalse(a.getString(R.string.controller_play_prompts).contains("Crouch: L1"));
+        int[] pointers=(int[])field("activePointers").get(a);pointers[0]=4;pointers[1]=7;
+        float[] controls=(float[])field("viewControls").get(a);controls[7]=.4f;controls[8]=.7f;
+        java.util.Map<String,?> saved=a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE).getAll();
+        call("refreshControllerHud",new Class<?>[]{});
+        Bridge.context=(1<<10)|(1<<11);call("updateContextualControls",new Class<?>[]{boolean.class},true);
+        for(String name:new String[]{"runButton","crouchButton"}) {
+            assertEquals(View.GONE,button(name).getVisibility());button(name).performClick();
+        }
+        assertEquals(0,Bridge.runToggles);assertEquals(0,Bridge.crouchToggles);
+        assertArrayEquals(new int[]{4,7},pointers);assertEquals(.4f,controls[7],0);assertEquals(.7f,controls[8],0);
+        assertEquals(saved,a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE).getAll());
+    }
+
+    @Test public void keyboardControlAndShouldersCannotRequestManualStanceOrRun()throws Exception {
+        a.dispatchKeyEvent(new KeyEvent(1,2,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_CTRL_LEFT,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        a.dispatchKeyEvent(new KeyEvent(1,3,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_CTRL_LEFT,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        press(KeyEvent.KEYCODE_BUTTON_L1);press(KeyEvent.KEYCODE_BUTTON_R1);
+        call("pushViewControls",new Class<?>[]{});
+        assertFalse(Bridge.crouchHeld);assertFalse(Bridge.analogue);
+        assertEquals(0,Bridge.runToggles);assertEquals(0,Bridge.crouchToggles);
+        assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.dodges);assertEquals(0,Bridge.parries);
+    }
+
+    @Test public void analogueMagnitudeAndDodgeSharePublicationAndFocusCleanup()throws Exception {
+        motion(0,0,0,0);motion(.35f,-.5f,0,0);
+        assertTrue(Bridge.analogue);assertTrue(Bridge.x>0 && Bridge.x<.5f);assertTrue(Bridge.z>0 && Bridge.z<.6f);
+        final float x=Bridge.x,z=Bridge.z;press(KeyEvent.KEYCODE_BUTTON_B);
+        assertEquals(x,Bridge.dodgeX,0);assertEquals(z,Bridge.dodgeZ,0);assertTrue(Bridge.dodgeAnalogue);
+        a.onWindowFocusChanged(false);
+        assertFalse(Bridge.analogue);assertEquals(0,Bridge.x,0);assertEquals(0,Bridge.z,0);
+        assertEquals(0,Bridge.runToggles);assertEquals(0,Bridge.crouchToggles);
     }
     private KeyEvent key(int action,int code,int repeat) {
         ShadowSystemClock.advanceBy(Duration.ofMillis(2)); long now=SystemClock.uptimeMillis();
@@ -89,6 +153,52 @@ public class AndroidControllerIntegrationTest {
                 new MotionEvent.PointerProperties[]{prop},new MotionEvent.PointerCoords[]{coords},0,0,1,1,9,0,InputDevice.SOURCE_JOYSTICK,0);
         a.dispatchGenericMotionEvent(e);e.recycle();
     }
+    @Test public void controllerGuardHoldReleasesWithoutMeaningfulMotionAndClearsOnFocusLoss() throws Exception {
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L2,0));
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L2,1));
+        press(KeyEvent.KEYCODE_BUTTON_X);
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);assertEquals(1,Bridge.attacks);
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_L2,0));
+        assertFalse(Bridge.guardHeld);
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L2,0));
+        assertEquals(2,Bridge.parries);assertTrue(Bridge.guardHeld);
+        a.onWindowFocusChanged(false);
+        assertFalse(Bridge.guardHeld);
+    }
+    @Test public void keyboardAndControllerGuardReleaseCannotCancelAnotherHeldSource() throws Exception {
+        long now=SystemClock.uptimeMillis();
+        a.dispatchKeyEvent(new KeyEvent(now,now,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_L2,0));
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        a.dispatchKeyEvent(new KeyEvent(now,SystemClock.uptimeMillis(),KeyEvent.ACTION_UP,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        assertTrue("LT remains physically held",Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        a.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_L2,0));
+        assertFalse(Bridge.guardHeld);
+    }
+
+    @Test public void touchGuardAttackAndReleaseRemainIndependent() throws Exception {
+        Button guard=button("parryButton"),attack=button("attackButton");
+        MotionEvent down=MotionEvent.obtain(1,1,MotionEvent.ACTION_DOWN,10,10,0);
+        guard.dispatchTouchEvent(down);down.recycle();
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        down=MotionEvent.obtain(2,2,MotionEvent.ACTION_DOWN,10,10,0);
+        attack.dispatchTouchEvent(down);down.recycle();
+        assertEquals(1,Bridge.attacks);assertTrue(Bridge.guardHeld);
+        MotionEvent up=MotionEvent.obtain(1,3,MotionEvent.ACTION_UP,10,10,0);
+        guard.dispatchTouchEvent(up);up.recycle();
+        assertFalse(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        MotionEvent cancel=MotionEvent.obtain(2,4,MotionEvent.ACTION_CANCEL,10,10,0);
+        attack.dispatchTouchEvent(cancel);cancel.recycle();
+        down=MotionEvent.obtain(5,5,MotionEvent.ACTION_DOWN,10,10,0);
+        guard.dispatchTouchEvent(down);down.recycle();
+        assertEquals(2,Bridge.parries);assertTrue(Bridge.guardHeld);
+        cancel=MotionEvent.obtain(5,6,MotionEvent.ACTION_CANCEL,10,10,0);
+        guard.dispatchTouchEvent(cancel);cancel.recycle();
+        assertFalse(Bridge.guardHeld);
+    }
+
     @Test public void pressDownActionsRemainIndependentWithoutDuplicateReleases()throws Exception {
         for(int code:new int[]{KeyEvent.KEYCODE_BUTTON_R2,KeyEvent.KEYCODE_BUTTON_L2,KeyEvent.KEYCODE_BUTTON_B,KeyEvent.KEYCODE_BUTTON_A,KeyEvent.KEYCODE_BUTTON_Y}){
             a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,code,0));a.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,code,1));a.dispatchKeyEvent(key(KeyEvent.ACTION_UP,code,0));
@@ -96,12 +206,54 @@ public class AndroidControllerIntegrationTest {
         assertEquals(1,Bridge.attacks);assertEquals(1,Bridge.parries);assertEquals(1,Bridge.dodges);assertEquals(1,Bridge.interacts);assertEquals(1,Bridge.lanterns);
         assertTrue(field("controllerMode").getBoolean(a));
     }
+    @Test public void contextualFooterDoesNotRepeatCombatHelpAfterTeaching()throws Exception {
+        set("controllerMode",true);
+        Bridge.context=0;
+        call("updateContextualControls",new Class<?>[]{boolean.class},true);
+        TextView prompt=(TextView)field("controllerPrompt").get(a);
+        assertEquals(View.GONE,prompt.getVisibility());
+        Bridge.context=(1<<9)|(2<<6)|1;
+        call("updateContextualControls",new Class<?>[]{boolean.class},true);
+        assertTrue(prompt.getText().toString().contains("Descend"));
+        assertFalse(prompt.getText().toString().contains("Swing:"));
+    }
+    @Test public void reunionRaisePromptCoexistsWithRopeAndFollowsInputAndCancellation()throws Exception {
+        Bridge.context=(1<<13)|2|(1<<9)|(2<<6)|1;
+        TextView prompt=(TextView)field("controllerPrompt").get(a);
+        for(int orientation:new int[]{Configuration.ORIENTATION_PORTRAIT,Configuration.ORIENTATION_LANDSCAPE}) {
+            a.getResources().getConfiguration().orientation=orientation;
+            set("controllerMode",false);set("latestSubtitleInputMode",0);
+            call("updateContextualControls",new Class<?>[]{boolean.class},true);
+            assertEquals(View.VISIBLE,button("toggleHeldLightPoseButton").getVisibility());
+            assertTrue(prompt.getText().toString().startsWith("Tap the lantern"));
+            FrameLayout.LayoutParams target=(FrameLayout.LayoutParams)button("attackButton").getLayoutParams();
+            assertTrue(((FrameLayout.LayoutParams)prompt.getLayoutParams()).bottomMargin>
+                    target.bottomMargin+target.height);
+            set("latestSubtitleInputMode",1);
+            call("updateContextualControls",new Class<?>[]{boolean.class},true);
+            assertTrue(prompt.getText().toString().startsWith("Select the lantern"));
+            set("controllerMode",true);
+            call("updateContextualControls",new Class<?>[]{boolean.class},true);
+            assertTrue(prompt.getText().toString().contains("Y: Raise"));
+            assertTrue(prompt.getText().toString().contains("A: Descend"));
+            assertEquals(View.GONE,button("toggleHeldLightPoseButton").getVisibility());
+            call("updateContextualControls",new Class<?>[]{boolean.class},false);
+            assertEquals(View.GONE,prompt.getVisibility());
+        }
+        set("controllerMode",true);Bridge.context=(1<<13)|2;
+        call("updateContextualControls",new Class<?>[]{boolean.class},true);
+        assertEquals("Y: Raise your lantern for Kit.",prompt.getText().toString());
+        set("controllerMode",false);Bridge.context=0;
+        call("updateContextualControls",new Class<?>[]{boolean.class},true);
+        assertEquals(View.GONE,prompt.getVisibility());
+        assertEquals(0,Bridge.lanterns);assertEquals(0,Bridge.interacts);
+    }
     @Test public void takeoverRetainsHealthAndContextWhileLeavingPreferencesUntouched()throws Exception {
         Bridge.context=1|(2<<3)|2;
         android.content.SharedPreferences p=a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE);
         p.edit().putBoolean("show_hud",true).putInt("interface_opacity",73).apply();java.util.Map<String,?> before=p.getAll();
         press(KeyEvent.KEYCODE_BUTTON_X);
-        for(String name:new String[]{"attackButton","parryButton","dodgeButton","menuButton","interactButton","toggleHeldLightPoseButton"})assertEquals(name,View.GONE,button(name).getVisibility());
+        for(String name:new String[]{"attackButton","parryButton","dodgeButton","runButton","menuButton","interactButton","toggleHeldLightPoseButton"})assertEquals(name,View.GONE,button(name).getVisibility());
         assertEquals(View.VISIBLE,((TextView)field("vitalityStatus").get(a)).getVisibility());
         TextView prompt=(TextView)field("controllerPrompt").get(a);
         assertEquals(View.VISIBLE,prompt.getVisibility());assertTrue(prompt.getText().toString().contains("A:"));
@@ -198,13 +350,133 @@ public class AndroidControllerIntegrationTest {
         View root=(View)field("menuScrim").get(a);Button b=findButton(root,text);assertNotNull(text,b);
         b.setFocusableInTouchMode(true);assertTrue(b.requestFocus());press(KeyEvent.KEYCODE_BUTTON_A);
     }
+    @Test public void pauseAndActualFocusLossCancelPrivateCryButUnrelatedVoiceSuspensionDoesNot()throws Exception {
+        int[] stopped={0};PrivateLichRevivalAudio cue=new PrivateLichRevivalAudio(new PrivateLichRevivalAudio.Sink(){
+            public int start(float left,float right){return 11;}public void gain(int stream,float left,float right){}
+            public void stop(int stream){stopped[0]++;}
+        });
+        set("privateLichRevivalAudio",cue);
+        android.content.SharedPreferences preferences=a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE);
+        preferences.edit().putInt("sfx_volume",20).putInt("chapter_voice_volume",100).commit();
+        java.util.Map<String,?> before=preferences.getAll();
+        long metadata=36L|(3L<<8)|(1L<<16)|(1L<<32),stereo=(Float.floatToRawIntBits(.8f)&0xffffffffL)|((long)Float.floatToRawIntBits(.3f)<<32);
+        assertTrue(cue.start(metadata,stereo,0,true,.2f,1));
+        call("setGameplayPaused",new Class<?>[]{boolean.class},true);assertEquals(1,stopped[0]);
+        assertTrue(cue.start(metadata+(1L<<32),stereo,0,true,.2f,1));
+        call("pauseChapterVoice",new Class<?>[]{boolean.class},true);assertEquals("caption/voice packet suspension is unrelated",1,stopped[0]);
+        a.onWindowFocusChanged(false);assertEquals("actual focus ownership loss cancels the cue",2,stopped[0]);
+        assertEquals(before,preferences.getAll());assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.interacts);
+    }
+    @Test public void settingsFinishPracticeKeepsExistingExplicitExitAndReplayCommandsWithoutCombatLeak()throws Exception {
+        set("menuVisible",true);call("setGameplayPaused",new Class<?>[]{boolean.class},true);
+        Bridge.teachingState=4L|(1L<<13);call("showSettings",new Class<?>[]{});
+        View root=(View)field("menuScrim").get(a);
+        assertNull(findButton(root,"Finish practice"));Button skip=findButton(root,"Skip practice");assertNotNull(skip);
+        skip.performClick();assertEquals(1,Bridge.teachingSkips);
+        long ready=6L|(1L<<10)|(1L<<11)|(1L<<12)|(1L<<13)|(1L<<15)|(1L<<32);
+        Bridge.teachingState=ready;call("showSettings",new Class<?>[]{});
+        assertNull(findButton(root,"Skip practice"));Button finish=findButton(root,"Finish practice");assertNotNull(finish);
+        finish.performClick();assertEquals(2,Bridge.teachingSkips);assertEquals("UI never forges completed skills or a live exit",ready,Bridge.teachingState);
+        Button replay=findButton(root,"Replay opening practice");assertNotNull(replay);replay.performClick();assertEquals(1,Bridge.teachingReplays);
+        assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.parries);assertEquals(0,Bridge.dodges);assertEquals(0,Bridge.interacts);
+        assertTrue(Bridge.paused);
+    }
+    @Test public void backAtFirstMenuRequiresExplicitExitConfirmation()throws Exception {
+        set("menuVisible",true);set("firstMenu",true);
+        a.onBackPressed();
+        assertFalse("Back must not close the Activity before explicit confirmation",a.isFinishing());
+        AlertDialog dialog=ShadowAlertDialog.getLatestAlertDialog();
+        assertNotNull(dialog);assertTrue(dialog.isShowing());
+        assertEquals("Stay",dialog.getButton(AlertDialog.BUTTON_NEGATIVE).getText().toString());
+        assertTrue(dialog.getButton(AlertDialog.BUTTON_NEGATIVE).hasFocus());
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        assertTrue("only the explicit Exit choice closes the Activity",a.isFinishing());
+    }
+
+    @Test public void entryBackStayCancelAndRepeatedBackPreserveTheCurrentMenuAndPreferences()throws Exception {
+        set("entryMenuEnabled",true);call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        android.content.SharedPreferences prefs=a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE);
+        prefs.edit().putInt("voice_volume",43).commit();java.util.Map<String,?> saved=prefs.getAll();
+        a.onBackPressed();AlertDialog first=ShadowAlertDialog.getLatestAlertDialog();
+        assertNotNull(first);assertTrue(first.isShowing());assertFalse(a.isFinishing());
+        a.onBackPressed();assertFalse(first.isShowing());assertFalse(a.isFinishing());
+        a.onBackPressed();AlertDialog stay=ShadowAlertDialog.getLatestAlertDialog();
+        assertNotSame(first,stay);stay.getButton(AlertDialog.BUTTON_NEGATIVE).performClick();
+        org.robolectric.shadows.ShadowLooper.idleMainLooper(); // Native button dismissal is posted.
+        assertFalse(a.isFinishing());assertFalse(stay.isShowing());
+        a.onBackPressed();AlertDialog cancel=ShadowAlertDialog.getLatestAlertDialog();cancel.cancel();
+        assertFalse(cancel.isShowing());assertFalse(a.isFinishing());
+        // A dismissed view can still receive a queued/accessibility click; it must not close the game.
+        cancel.getButton(AlertDialog.BUTTON_POSITIVE).performClick();assertFalse(a.isFinishing());
+        assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
+        assertFalse(field("entryPlayRequested").getBoolean(a));assertEquals(saved,prefs.getAll());
+    }
+
+    @Test public void exitConfirmationRejectsStaleNavigationAndControllerCancelDoesNotLeakIntoGameplay()throws Exception {
+        set("entryMenuEnabled",true);call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        a.onBackPressed();AlertDialog stale=ShadowAlertDialog.getLatestAlertDialog();
+        call("showSettings",new Class<?>[]{});stale.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        assertFalse(a.isFinishing());assertTrue(field("entryMenuSidePage").getBoolean(a));
+        a.onBackPressed();assertFalse(field("entryMenuSidePage").getBoolean(a));
+        set("controllerMode",true);a.onBackPressed();AlertDialog dialog=ShadowAlertDialog.getLatestAlertDialog();
+        focusDialog(dialog,true);
+        dialog.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_B,0));
+        dialog.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_B,0));
+        assertFalse(dialog.isShowing());assertFalse(a.isFinishing());
+        a.onBackPressed();AlertDialog defaultStay=ShadowAlertDialog.getLatestAlertDialog();
+        focusDialog(defaultStay,true);
+        defaultStay.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_A,0));
+        defaultStay.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_A,0));
+        org.robolectric.shadows.ShadowLooper.idleMainLooper();
+        assertFalse(defaultStay.isShowing());assertFalse(a.isFinishing());
+        assertEquals(0,Bridge.dodges);assertEquals(0,Bridge.interacts);assertEquals(0,Bridge.attacks);
+    }
+
+    @Test public void sidePagePendingPlayAndGameplayBackKeepTheirExistingReturnPaths()throws Exception {
+        set("entryMenuEnabled",true);call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        call("showSettings",new Class<?>[]{});a.onBackPressed();
+        assertFalse(field("entryMenuSidePage").getBoolean(a));assertNull(ShadowAlertDialog.getLatestAlertDialog());
+        set("entryPlayRequested",true);a.onBackPressed();
+        assertFalse(field("entryPlayRequested").getBoolean(a));assertNull(ShadowAlertDialog.getLatestAlertDialog());
+        set("entryMenuEnabled",false);set("firstMenu",false);set("menuVisible",false);
+        a.onBackPressed();assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
+        a.onBackPressed();assertFalse(field("menuVisible").getBoolean(a));assertFalse(Bridge.paused);
+        assertFalse(a.isFinishing());assertNull(ShadowAlertDialog.getLatestAlertDialog());
+    }
+
+    @Test public void pauseRevokesExitConfirmationAndDelayedPositiveTapCannotExit()throws Exception {
+        set("entryMenuEnabled",true);call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        a.onBackPressed();AlertDialog dialog=ShadowAlertDialog.getLatestAlertDialog();
+        assertTrue(dialog.isShowing());a.onPause();
+        assertFalse(dialog.isShowing());assertNull(field("backExitDialog").get(a));
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();assertFalse(a.isFinishing());
+        assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
+    }
+
     @Test public void startPauseSettingsAndGraphicsAreRealNativeControllerRoutes()throws Exception {
         set("firstMenu",false);press(KeyEvent.KEYCODE_BUTTON_START);assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
         confirmLabel(a.getString(R.string.settings));
         confirmLabel(a.getString(R.string.graphics_settings));assertTrue(field("graphicsVisible").getBoolean(a));
-        assertNotNull(findButton((View)field("menuScrim").get(a),"Use"));
-        assertFalse(((Button)field("graphicsConfirm").get(a)).isEnabled());
+        Button apply=findButton((View)field("menuScrim").get(a),"Apply");
+        assertNotNull(apply); assertTrue(apply.getContentDescription().toString().contains("Apply and save"));
+        assertNull(findButton((View)field("menuScrim").get(a),"Keep"));
         assertFalse(a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE).contains("graphics_pending"));
+        assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.interacts);
+    }
+    @Test public void backgroundingGraphicsRevokesPendingApplyAndLateCompletionCannotSave()throws Exception {
+        call("openGraphics",new Class<?>[]{});
+        android.content.SharedPreferences prefs=a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE);
+        GraphicsPreferences.Values saved=GraphicsPreferences.confirmed(prefs);
+        GraphicsPreferences.Values candidate=GraphicsPreviewOptions.withChoice(saved,GraphicsPreviewOptions.MIST,1);
+        assertTrue(GraphicsPreferences.markPending(prefs,candidate));
+        set("graphicsSubmitted",candidate);set("graphicsRequestSerial",42L);set("graphicsSaveSerial",42L);
+        set("graphicsSaveGeneration",7L);set("surfaceRequestGeneration",7L);
+        a.onPause();
+        assertEquals(0L,field("graphicsSaveSerial").getLong(a));assertEquals(0L,field("graphicsSaveGeneration").getLong(a));
+        assertFalse(field("resumed").getBoolean(a));assertFalse(field("graphicsVisible").getBoolean(a));
+        call("confirmGraphicsSelection",new Class<?>[]{});
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(saved));assertTrue(GraphicsPreferences.hasPending(prefs));
+        assertTrue(field("graphicsRecovering").getBoolean(a));
         assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.interacts);
     }
     @Test public void disconnectPausesAndReconnectCannotReplayHeldMotion()throws Exception {
@@ -229,9 +501,11 @@ public class AndroidControllerIntegrationTest {
         press(KeyEvent.KEYCODE_BUTTON_B);assertFalse(field("entryMenuSidePage").getBoolean(a));
         confirmLabel(a.getString(R.string.settings));assertTrue(field("entryMenuSidePage").getBoolean(a));
         press(KeyEvent.KEYCODE_BUTTON_B);assertFalse(field("entryMenuSidePage").getBoolean(a));
-        confirmLabel(a.getString(R.string.entry_play));assertTrue(field("entryPlayRequested").getBoolean(a));
+        confirmLabel(a.getString(R.string.entry_play));assertFalse(field("entryPlayRequested").getBoolean(a));
+        assertTrue(field("campaignMenuVisible").getBoolean(a));
         assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
-        press(KeyEvent.KEYCODE_BUTTON_B);assertFalse(field("entryPlayRequested").getBoolean(a));assertTrue(field("menuVisible").getBoolean(a));
+        press(KeyEvent.KEYCODE_BUTTON_B);assertFalse(field("campaignMenuVisible").getBoolean(a));
+        assertFalse(field("entryPlayRequested").getBoolean(a));assertTrue(field("menuVisible").getBoolean(a));
     }
     @Test public void sidePagesResizeInBothLandscapeDirectionsAndPortraitWithoutRebuild()throws Exception {
         set("menuVisible",true);call("showSettings",new Class<?>[]{});press(KeyEvent.KEYCODE_BUTTON_Y);
@@ -257,6 +531,58 @@ public class AndroidControllerIntegrationTest {
         press(KeyEvent.KEYCODE_BUTTON_R2);assertEquals(0,Bridge.attacks);
         a.onWindowFocusChanged(true);confirmLabel(a.getString(R.string.resume_demo));assertFalse(field("menuVisible").getBoolean(a));
     }
+    @Test public void pauseMenuOpenCloseCancelsHeldGuardMovementAndLookWithoutRearming() throws Exception {
+        set("firstMenu",false);
+        int[] pointers=(int[])field("activePointers").get(a);pointers[0]=3;pointers[1]=7;
+        float[] controls=(float[])field("viewControls").get(a);controls[7]=.4f;controls[8]=.6f;
+        call("pushViewControls",new Class<?>[]{});
+        long now=SystemClock.uptimeMillis();
+        a.dispatchKeyEvent(new KeyEvent(now,now,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        assertTrue(Bridge.guardHeld);assertEquals(1,Bridge.parries);assertTrue(Bridge.analogue);
+        call("showMainMenu",new Class<?>[]{boolean.class},false);
+        assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
+        assertFalse(Bridge.guardHeld);assertArrayEquals(new int[]{-1,-1},pointers);
+        assertEquals(0,Bridge.x,0);assertEquals(0,Bridge.z,0);assertFalse(Bridge.analogue);
+        confirmLabel(a.getString(R.string.resume_demo));
+        assertFalse(field("menuVisible").getBoolean(a));assertFalse(Bridge.paused);
+        assertFalse(Bridge.guardHeld);assertEquals(1,Bridge.parries);
+        a.dispatchKeyEvent(new KeyEvent(now,SystemClock.uptimeMillis(),KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_Q,1,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        assertFalse("held key repeat after Resume cannot restore guard",Bridge.guardHeld);
+        a.dispatchKeyEvent(new KeyEvent(now,SystemClock.uptimeMillis(),KeyEvent.ACTION_UP,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        a.dispatchKeyEvent(new KeyEvent(now,SystemClock.uptimeMillis(),KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_Q,0,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+        assertTrue(Bridge.guardHeld);assertEquals(2,Bridge.parries);
+    }
+
+    private void keyboardFlask(int code,int action,int repeat) {
+        long now=SystemClock.uptimeMillis();
+        a.dispatchKeyEvent(new KeyEvent(now,now,action,code,repeat,0,1,0,0,InputDevice.SOURCE_KEYBOARD));
+    }
+    @Test public void ownerFlaskFlagGatesNamedKeyboardAndDpadWithoutChangingMenuNavigation()throws Exception {
+        set("surfaceRequestGeneration",31L);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,0);assertEquals(0,Bridge.drinks);
+        Bridge.flask=new long[]{1,31,1,1,1,2,2,0};
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,0);assertEquals(1,Bridge.drinks);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,1);assertEquals(1,Bridge.drinks);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_UP,0);
+        keyboardFlask(KeyEvent.KEYCODE_J,KeyEvent.ACTION_DOWN,0);assertEquals(1,Bridge.rests);
+        keyboardFlask(KeyEvent.KEYCODE_J,KeyEvent.ACTION_UP,0);
+        press(KeyEvent.KEYCODE_DPAD_UP);assertEquals(2,Bridge.drinks);assertEquals(1,Bridge.rests);
+        press(KeyEvent.KEYCODE_DPAD_DOWN);assertEquals(2,Bridge.rests);
+        set("menuVisible",true);press(KeyEvent.KEYCODE_DPAD_UP);press(KeyEvent.KEYCODE_DPAD_DOWN);
+        assertEquals(2,Bridge.drinks);assertEquals(2,Bridge.rests);
+        set("menuVisible",false);Bridge.flask[4]=0;press(KeyEvent.KEYCODE_DPAD_DOWN);
+        assertEquals("Down cannot become Drink when Rest is unavailable",2,Bridge.drinks);assertEquals(2,Bridge.rests);
+        Bridge.flask[1]=30;press(KeyEvent.KEYCODE_DPAD_UP);assertEquals(2,Bridge.drinks);
+    }
+    @Test public void flaskHeldKeyboardMustReleaseAfterFocusCancellation()throws Exception {
+        set("surfaceRequestGeneration",31L);Bridge.flask=new long[]{1,31,1,1,1,2,2,0};
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,0);assertEquals(1,Bridge.drinks);
+        a.onWindowFocusChanged(false);a.onWindowFocusChanged(true);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,1);assertEquals(1,Bridge.drinks);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_UP,0);
+        keyboardFlask(KeyEvent.KEYCODE_H,KeyEvent.ACTION_DOWN,0);assertEquals(2,Bridge.drinks);
+    }
+
     @Test public void rapidDpadPressNavigatesBeforeItsRelease()throws Exception {
         set("menuVisible",true);FrameLayout root=(FrameLayout)field("menuScrim").get(a);root.setVisibility(View.VISIBLE);
         LinearLayout panel=new LinearLayout(a);panel.setOrientation(LinearLayout.VERTICAL);root.addView(panel);

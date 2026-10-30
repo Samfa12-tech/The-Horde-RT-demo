@@ -17,6 +17,9 @@ inline constexpr double kGraphicsConfirmationSeconds = 15.0;
 #ifndef HORDE_RT_MIN_RENDER_SCALE_PERCENT
 #define HORDE_RT_MIN_RENDER_SCALE_PERCENT 33
 #endif
+#ifndef HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE
+#define HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE 0
+#endif
 #if HORDE_RT_MIN_RENDER_SCALE_PERCENT != 33 && HORDE_RT_MIN_RENDER_SCALE_PERCENT != 50
 #error "Render scale minimum must be 33 or 50."
 #endif
@@ -24,6 +27,7 @@ inline constexpr int kMinimumGraphicsRenderScalePercent = HORDE_RT_MIN_RENDER_SC
 inline constexpr bool ValidGraphicsRenderScalePercent(const int percent) noexcept
 {
     return (percent >= 50 && percent <= 100) ||
+        (HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE && percent == 20) ||
         (kMinimumGraphicsRenderScalePercent <= 40 && percent == 40) ||
         (kMinimumGraphicsRenderScalePercent == 33 && percent == 33);
 }
@@ -71,7 +75,16 @@ enum class GraphicsPlatform : std::uint8_t { Android, Windows };
 // Values deliberately match the legacy persisted water setting.
 enum class WaterQuality : std::uint8_t { Off = 0u, Mobile = 1u, High = 2u };
 enum class FireDetail : std::uint8_t { Mobile = 0u, High = 1u, Low = 2u };
-enum class ShadowQuality : std::uint8_t { Lower = 0u, Current = 1u, Higher = 2u };
+// Persisted value 0 is retired. Keep Current/Higher numeric identities stable.
+enum class ShadowQuality : std::uint8_t { Current = 1u, Higher = 2u };
+inline constexpr bool ValidShadowQuality(const ShadowQuality quality) noexcept
+{
+    return quality == ShadowQuality::Current || quality == ShadowQuality::Higher;
+}
+inline constexpr ShadowQuality NextShadowQuality(const ShadowQuality quality) noexcept
+{
+    return quality == ShadowQuality::Current ? ShadowQuality::Higher : ShadowQuality::Current;
+}
 enum class OpticalProfile : std::uint8_t { Mobile, High };
 enum class GraphicsBackend : std::uint8_t { Unsupported, RayTracingPipeline, RayQueryCompute };
 enum class GraphicsPreset : std::uint8_t { AcceptedBaseline, ReducedEffects, Custom, PlatformDefault };
@@ -97,7 +110,7 @@ inline bool ValidGraphicsSettings(const GraphicsSettings& settings) noexcept
     return ValidGraphicsRenderScalePercent(settings.renderScalePercent) &&
         static_cast<unsigned>(settings.waterQuality) <= 2u &&
         static_cast<unsigned>(settings.fireDetail) <= 2u &&
-        static_cast<unsigned>(settings.shadowQuality) <= 2u &&
+        ValidShadowQuality(settings.shadowQuality) &&
         ValidDustQuality(settings.dustQuality) &&
         settings.previewFrameCap >= 15 && settings.previewFrameCap <= 60;
 }
@@ -114,7 +127,7 @@ inline GraphicsSettings PlatformDefaultGraphicsSettings(const GraphicsPlatform p
 {
     return platform == GraphicsPlatform::Android ?
         GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false,
-            ShadowQuality::Current, true, DustQuality::Low} :
+            ShadowQuality::Current, false, DustQuality::Low} :
         GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true,
             ShadowQuality::Current, true, DustQuality::Low};
 }
@@ -124,7 +137,7 @@ inline GraphicsSettings ReducedEffectsGraphicsSettings(const GraphicsPlatform pl
     auto result = BaselineGraphicsSettings(platform);
     result.waterQuality = WaterQuality::Mobile;
     result.fireDetail = FireDetail::Low;
-    result.shadowQuality = ShadowQuality::Lower;
+    result.shadowQuality = ShadowQuality::Current;
     return result;
 }
 
@@ -281,7 +294,9 @@ inline GraphicsRecovery RecoverGraphicsSettings(const GraphicsPersistenceRecord&
     const bool beforeMistSchema = oldSchema || record.schema == 3u;
     const bool beforeDustSchema = record.schema >= 1u && record.schema <= 4u;
     auto confirmed = record.confirmed;
-    if (oldSchema) confirmed.shadowQuality = ShadowQuality::Current;
+    // Retired Lower is a storage migration only, never a live render choice.
+    if (oldSchema || static_cast<unsigned>(confirmed.shadowQuality) == 0u)
+        confirmed.shadowQuality = ShadowQuality::Current;
     if (beforeMistSchema) confirmed.mistEnabled = true;
     if (beforeDustSchema) confirmed.dustQuality = DustQuality::Off;
     if ((!beforeDustSchema && record.schema != kGraphicsSettingsSchema) || !ValidGraphicsSettings(confirmed) ||
@@ -299,7 +314,8 @@ inline GraphicsRecovery RecoverGraphicsSettings(const GraphicsPersistenceRecord&
     {
         result.retainedRequested = record.pending;
         if (legacySchema) result.retainedRequested->glassEnabled = true;
-        if (oldSchema) result.retainedRequested->shadowQuality = ShadowQuality::Current;
+        if (oldSchema || static_cast<unsigned>(result.retainedRequested->shadowQuality) == 0u)
+            result.retainedRequested->shadowQuality = ShadowQuality::Current;
         if (beforeMistSchema) result.retainedRequested->mistEnabled = true;
         if (beforeDustSchema) result.retainedRequested->dustQuality = DustQuality::Off;
         if (!ValidGraphicsSettings(*result.retainedRequested) ||

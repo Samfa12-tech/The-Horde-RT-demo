@@ -1,0 +1,240 @@
+[
+  {
+    "path": "android-all-abi-check-retry.log",
+    "raw_private_sha256": "d4b35e0224d2fc8849383d3a6666edc4ae24dac1579735bb6453913a828baf8e",
+    "sanitized_sha256": "81fd6eb4e19ef95ef267a7425686dc9f38861a66e55bc7b8edd788f1d89d4f58",
+    "sanitized_bytes": 61,
+    "raw_private_published": false
+  },
+  {
+    "path": "android-all-abi-check.log",
+    "raw_private_sha256": "0a2a2f1ef9e07f5e00ffca270ac32e762602c3f4c99ae0988aa4651850a39a98",
+    "sanitized_sha256": "3ff843e095312835071e2670b4b7aac42b42d5d1e0f9719acaa7615749300932",
+    "sanitized_bytes": 398,
+    "raw_private_published": false
+  },
+  {
+    "path": "android-debug-arm64-package.log",
+    "raw_private_sha256": "3f85fe752e06b0a4f697ead224922bf363169493e5d4a79516556d510d7156c3",
+    "sanitized_sha256": "13588792a49e99982d785879d7bf12278a438956cbb61c68e6aaec72273663a7",
+    "sanitized_bytes": 3538,
+    "raw_private_published": false
+  },
+  {
+    "path": "android-fresh-java-evidence.log",
+    "raw_private_sha256": "49bb7db6c102db3c3d0ce362ee511e15723391c50938ace3b2034992202c5bb8",
+    "sanitized_sha256": "ad9edba52ebc1d7220946180b1eeef7e6c0e6e62c5112a64d42d9dccde4fab53",
+    "sanitized_bytes": 89,
+    "raw_private_published": false
+  },
+  {
+    "path": "android-fresh-selected-java-tests.log",
+    "raw_private_sha256": "1ee0787edec934f7e6063c59e03358d7e9b47c470e61af337610d424b4c0ca25",
+    "sanitized_sha256": "e3e90689af6b2d1eb54d213324554c33f3e3e83aadd4ca1798a828721bcc297c",
+    "sanitized_bytes": 1595,
+    "raw_private_published": false
+  },
+  {
+    "path": "android-gradle-test-task-help.log",
+    "raw_private_sha256": "3c504e907c7d0a1970988cbf32d0fd5cc2bfd62c00b4886c13fa94a899fd97c6",
+    "sanitized_sha256": "ee826a60677ffe3a867cb38bbfd9162da78198116db8265f3e04789bb473c9ec",
+    "sanitized_bytes": 925,
+    "raw_private_published": false
+  },
+  {
+    "path": "android-gradle.log",
+    "raw_private_sha256": "6c4049f0164b7de2895443674f4c1a6531c37d7ff9653477e776cc910fc91768",
+    "sanitized_sha256": "6b45d10ba1d3d76f36bba1954ffb7101a47567f4f511af4c7238f8742368ff7a",
+    "sanitized_bytes": 6187,
+    "raw_private_published": false
+  },
+  {
+    "path": "android-release-arm64-package.log",
+    "raw_private_sha256": "7350beb5849823121171ea0a8f7da42b5049a2e9ea7b7a69208b8a1ac5706529",
+    "sanitized_sha256": "1ff54cbb2b36c3e25238af8d71eb2f1639f7ebbb5a1ebe7159bd20746a3fc7ac",
+    "sanitized_bytes": 3537,
+    "raw_private_published": false
+  },
+  {
+    "path": "capture-windows-package-identities.log",
+    "raw_private_sha256": "2af1ae3b1a053589d380ceee081d910bfb65b27929e40914a2393fb741b32da2",
+    "sanitized_sha256": "a2daf709785ecf64fb66012b86561ecd96eb4ad884284b3967df5f3052c7bdec",
+    "sanitized_bytes": 134,
+    "raw_private_published": false
+  },
+  {
+    "path": "catalog-check-one-low-rollback.log",
+    "raw_private_sha256": "8b05de53292bad349e2285b6d8a2c940979d8e20761ee0e50f88b602de5c421c",
+    "sanitized_sha256": "f56d60ed790020430df73a3fe4608f57b1189fe0e93227847d26416be9c8b1f4",
+    "sanitized_bytes": 2485,
+    "raw_private_published": false
+  },
+  {
+    "path": "compatibility-generic-corrected.log",
+    "raw_private_sha256": "f70f00c8b7450cedae5a2e0dd364ccdef373775806ac6ed2bdea9e8bae913471",
+    "sanitized_sha256": "170eef05983cffcaa8632aa60366d3d584a2caa6bcd2cc43dd19356761980251",
+    "sanitized_bytes": 1152,
+    "raw_private_published": false
+  },
+  {
+    "path": "compatibility-generic.log",
+    "raw_private_sha256": "39a99ad74ef80d9cddbd16c574fdb33b32e9923b1803145b3ee9661217b8525c",
+    "sanitized_sha256": "931baf5f8ae15cd3091c745448f384f55aab90759e4033368f8fc68d70276f2d",
+    "sanitized_bytes": 254,
+    "raw_private_published": false
+  },
+  {
+    "path": "compatibility-opaque-corrected.log",
+    "raw_private_sha256": "3a4219e033ee17e59b54067661f4a85844db4b8259ca8ca19384174c0df2c3b5",
+    "sanitized_sha256": "b72077e196de53c94315f881aefb92d55c1ffd0077d8a6aa8a9ab4eed2e66ec0",
+    "sanitized_bytes": 583,
+    "raw_private_published": false
+  },
+  {
+    "path": "compatibility-opaque.log",
+    "raw_private_sha256": "39a99ad74ef80d9cddbd16c574fdb33b32e9923b1803145b3ee9661217b8525c",
+    "sanitized_sha256": "931baf5f8ae15cd3091c745448f384f55aab90759e4033368f8fc68d70276f2d",
+    "sanitized_bytes": 254,
+    "raw_private_published": false
+  },
+  {
+    "path": "configure-debug.log",
+    "raw_private_sha256": "42a16d9a21590119806be6b5c71ac42c538f2b671d6cd1c96258d3240d38ca15",
+    "sanitized_sha256": "7538c2b2084ebf2029bb36af72adf8538ac9e6ec4bc6d54c1875689e42327dbd",
+    "sanitized_bytes": 597,
+    "raw_private_published": false
+  },
+  {
+    "path": "configure-release.log",
+    "raw_private_sha256": "5362b029710c30770e14fe8d076c0f7e5ea3dcd2ab2297c6811b7a74d3c8f25f",
+    "sanitized_sha256": "2195c11cae8a8646015d47f3649f77fae1a211ac6fe41c8499b112bd6035617a",
+    "sanitized_bytes": 599,
+    "raw_private_published": false
+  },
+  {
+    "path": "native-debug-build.log",
+    "raw_private_sha256": "2c9a04cc122587ea635dd2a6b10a56b41d965139e7eab6514415a0daa11e7ea7",
+    "sanitized_sha256": "d68b5caf4bbb14d50b48884bd5dfcf10184d951eff65573b8066e817d4c19648",
+    "sanitized_bytes": 20322,
+    "raw_private_published": false
+  },
+  {
+    "path": "native-debug-test.log",
+    "raw_private_sha256": "ec9af5de14e94429f6040c4618621f2abef0bb768338bb536cd70f33f44a58eb",
+    "sanitized_sha256": "d6930c42ef1ced40809a2bffe417584eefc0f8b6d4a5b847a253de2b03e53041",
+    "sanitized_bytes": 8221,
+    "raw_private_published": false
+  },
+  {
+    "path": "native-release-build.log",
+    "raw_private_sha256": "743b55e3f1bf667bc8b6ff07431f59b39f9bc1752173ef1a85a450bfb0ce6fef",
+    "sanitized_sha256": "28e0aa95ccb73e50a7803e735556e9d2994b66dc86c97cf6b38114dd2d896a1e",
+    "sanitized_bytes": 21914,
+    "raw_private_published": false
+  },
+  {
+    "path": "native-release-test.log",
+    "raw_private_sha256": "452e68e48ec1bdcedb797e3137497cfbfc439ade7dbee7b17a5fe91eb4a69163",
+    "sanitized_sha256": "d8bfc3b6daf18c61e2163a2fe242453e1c3b034cb9568810c81d989da8d7ffc9",
+    "sanitized_bytes": 8223,
+    "raw_private_published": false
+  },
+  {
+    "path": "pipeline-adapter-check.log",
+    "raw_private_sha256": "7ad4629a61d1463cefde8a750dcf8a06e758943016b13e879fe398ed4d7548ce",
+    "sanitized_sha256": "359cc7dcf5d4ed04eb4981a4c93826f746f2e506f698e2e1e9c553b9973c4bf9",
+    "sanitized_bytes": 41,
+    "raw_private_published": false
+  },
+  {
+    "path": "pipeline-adapter.log",
+    "raw_private_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sanitized_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sanitized_bytes": 0,
+    "raw_private_published": false
+  },
+  {
+    "path": "pipeline-freeze.log",
+    "raw_private_sha256": "7c35f97ff24af55d6ed6fea73b12f3282210a645388a45453430e3279690e4d5",
+    "sanitized_sha256": "6e77261baae4020133fcb3d68a191088fcf23a210f6fe284b4f48003fb9ec40d",
+    "sanitized_bytes": 2467,
+    "raw_private_published": false
+  },
+  {
+    "path": "prepare-derived-gates.log",
+    "raw_private_sha256": "bce689048b641c1da11ee328f92b652a05de88afa4f03c9854b106aa00ceb02e",
+    "sanitized_sha256": "211088c0a9bd2a87dfb1f1d5c3b6b657cf9d25f6eff43febc3ced90cf8672872",
+    "sanitized_bytes": 141,
+    "raw_private_published": false
+  },
+  {
+    "path": "rayquery-current-check.log",
+    "raw_private_sha256": "9e07a7d7b5a6e65dca1eb352c332739b35f806144df3b9e8689b1ea0fc7755ab",
+    "sanitized_sha256": "e99dd0241ff280c0a52ed30a3fa79fa3651d357f253b56c31e2a002a96abfada",
+    "sanitized_bytes": 1897,
+    "raw_private_published": false
+  },
+  {
+    "path": "reproduce-matrix.log",
+    "raw_private_sha256": "d1dfcb10cf4bfc490f1309d3c178a0d23eb0386a509351d64262e8aa777ef0a5",
+    "sanitized_sha256": "9f77db527069d3eb4cd67ce69bd357c5d6ced5d0de96a56684899918f514dfab",
+    "sanitized_bytes": 2392,
+    "raw_private_published": false
+  },
+  {
+    "path": "shader-contracts.log",
+    "raw_private_sha256": "23ed9329de4f4594685002a067fe5aa0e6063f1f647f4c824f56753050b9f868",
+    "sanitized_sha256": "03bbbffb472e1f40b56c1f3ef142ccb27710c9980933c805ec4a5f92bf4058d5",
+    "sanitized_bytes": 790,
+    "raw_private_published": false
+  },
+  {
+    "path": "torch-debug-full.log",
+    "raw_private_sha256": "0e3cf009eadee155dc351afd5258d23da30a1732f1a779f91524879f14332bb1",
+    "sanitized_sha256": "7daf1af645a23ea6d70f0122d1de7bc4e9b41e694657434c985eb0a9f2921416",
+    "sanitized_bytes": 1654,
+    "raw_private_published": false
+  },
+  {
+    "path": "torch-release-full.log",
+    "raw_private_sha256": "24b1f18e24991f3d1ef9aadc10e4e3ad5c4ddb0984bbbb157817b9d86fe4909b",
+    "sanitized_sha256": "6f5b560474b255ce05e8a14e4c7e320d1f0eac416055a77f6d08d2ab7d3357df",
+    "sanitized_bytes": 1666,
+    "raw_private_published": false
+  },
+  {
+    "path": "verify-and-admit.log",
+    "raw_private_sha256": "18d99ead4b3bad655a8d1c94569a05bdda7e7b2d35238a746698de0b4c5e4308",
+    "sanitized_sha256": "9f4690336dcefd9906c45b3441f36c0488b740b489bb63a585be3de742fe2b4c",
+    "sanitized_bytes": 128,
+    "raw_private_published": false
+  },
+  {
+    "path": "windows-debug-package-detail.log",
+    "raw_private_sha256": "63e71420cdc5689379a9fb322bfa978e676fd191a6fb2963d1d3a9bc0d59d417",
+    "sanitized_sha256": "4cc5e0d2a00baf2b1da416d138e33e041d72dfd9f2875b7c5905c9b83c7696ae",
+    "sanitized_bytes": 58347,
+    "raw_private_published": false
+  },
+  {
+    "path": "windows-debug-policy-package.log",
+    "raw_private_sha256": "7e9e2f537658865d1b133f1eca2953a6356e1c0268beb6c6c41ccff468946d97",
+    "sanitized_sha256": "243897521ecae5d72a03cc97857c50f8bd30895060266a9f1db338251f6844b4",
+    "sanitized_bytes": 909,
+    "raw_private_published": false
+  },
+  {
+    "path": "windows-release-package-detail.log",
+    "raw_private_sha256": "faf25cef165c686bde1aa5b3bd547b2a2ff266cea0907e4ffedede82968783b1",
+    "sanitized_sha256": "ecaabc855b3a47e6d24dd4b040c81c3e091ee5f9338cd546221d5a8e09f03dc4",
+    "sanitized_bytes": 59395,
+    "raw_private_published": false
+  },
+  {
+    "path": "windows-release-package.log",
+    "raw_private_sha256": "59c9abb9a58b1a9a47e9b87b6061f6b04013f7eda6a8290592bf760a47411a63",
+    "sanitized_sha256": "1de1f5517641b58812329f6268f87eaea27bbfe40ba010ec8740ac8f951e180a",
+    "sanitized_bytes": 613,
+    "raw_private_published": false
+  }
+]

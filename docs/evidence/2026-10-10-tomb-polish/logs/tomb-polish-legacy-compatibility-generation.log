@@ -1,0 +1,5 @@
+<repo>\shaders\raytracing\minimal.legacy.rgen.resolved
+Generated <repo>\src\vulkan\raytracing\MinimalLegacyRayGenShader.inc
+Source dependency SHA-256: f614e1f0f82456c41b97142ac89520e4f29ba111d4f0cc07018b0744cf11c1be; embedded include SHA-256 before generation: 35bbb6d0194ef9771fc7a528c871be5cd9350be4d47471bbff3e2c6cc32be6cd
+SPIR-V bytes: 587496; words: 146874; instructions: 32522; branch operations: 4495; loops: 80; selection merges: 1808; SHA-256: a7dba5ec8a4cafb7451106a40395932d05fc9a31b2af15650a37fb269a898173
+Raygen optimizer shape: functions=1; calls=0; ray-query sites=27

@@ -1,0 +1,41 @@
+Source inspection receipt for the two pre-existing Release fixture failures.
+HEAD: b2d548a22cc44a58c92c290018f5bf211f2a8d87
+No clean baseline build/test was run; this records unchanged predicate inputs and the instrumentation-only scene diff.
+tests/CharacterRenderSlotSmoke.cpp HEAD=2f3a3c0e2f83dac92cbf4c93a3ba5cf1f2261da0 working=2f3a3c0e2f83dac92cbf4c93a3ba5cf1f2261da0 equal=True
+tests/RtSceneResourceInventoryTests.cpp HEAD=a85c0827f2e42024eb7a93b8e171b655664621d4 working=a85c0827f2e42024eb7a93b8e171b655664621d4 equal=True
+shaders/raytracing/minimal.rgen HEAD=5bb77363793fc1fee63452b24200825ab48114ee working=5bb77363793fc1fee63452b24200825ab48114ee equal=True
+src/scene/assets/SkinnedMeshAsset.cpp HEAD=d7b2ada3343191d2127be81e1261a7b99975a1d3 working=d7b2ada3343191d2127be81e1261a7b99975a1d3 equal=True
+src/scene/assets/SkinnedPbrActor.h HEAD=c25e371c20d266732bf3e0a3747582e0778b03e9 working=c25e371c20d266732bf3e0a3747582e0778b03e9 equal=True
+src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp HEAD=a94412465e103017e75132047c893b4d128ec618 working=a94412465e103017e75132047c893b4d128ec618 equal=True
+android/app/src/main/cpp/android_probe_bridge.cpp HEAD=8349c616fa5acf2576127708aa42a14a003a7b06 working=8349c616fa5acf2576127708aa42a14a003a7b06 equal=True
+Entire tracked shaders/assets diff exit code (0 means unchanged): 0
+Scene diff follows; only CPU observation scopes changed:
+diff --git a/src/vulkan/raytracing/PresentableTinyRtScene.cpp b/src/vulkan/raytracing/PresentableTinyRtScene.cpp
+index 0f0f447f..542b872c 100644
+--- a/src/vulkan/raytracing/PresentableTinyRtScene.cpp
++++ b/src/vulkan/raytracing/PresentableTinyRtScene.cpp
+@@ -6811,0 +6812 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
++            RtSceneStageScope poseCopyScope(observation, horde::telemetry::RtStage::PoseCopy);
+@@ -6821,0 +6823,2 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
++            poseCopyScope.Complete(1u, skinnedPlayerUpload_.size() *
++                sizeof(horde::scene::assets::StaticRtVertex), 1u);
+@@ -6844,0 +6848 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
++            viewSkinScope.Complete(1u);
+@@ -6852 +6855,0 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
+-                viewSkinScope.Cancel();
+@@ -6854,0 +6858 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
++            RtSceneStageScope poseCopyScope(observation, horde::telemetry::RtStage::PoseCopy);
+@@ -6862 +6866,2 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
+-            viewSkinScope.Complete(1u);
++            poseCopyScope.Complete(1u, viewmodelUpload_.size() *
++                sizeof(horde::scene::assets::StaticRtVertex), 1u);
+@@ -6924 +6929,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
+-        if (!chapterActor_.Pose(clip, time, diagnostic)) return false;
++        // Pose owns clip skinning plus its inseparable floor/bounds/static-PBR
++        // repack. CharacterSkin therefore includes that CPU preparation here.
++        RtSceneStageScope companionSkinScope(observation, horde::telemetry::RtStage::CharacterSkin);
++        if (!chapterActor_.Pose(clip, time, diagnostic)) {
++            companionSkinScope.Cancel();
++            return false;
++        }
++        companionSkinScope.Complete(1u);

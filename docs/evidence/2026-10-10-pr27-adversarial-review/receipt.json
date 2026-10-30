@@ -1,0 +1,282 @@
+{
+  "schema": 1,
+  "prepared_utc": "2026-10-10T05:52:05.659673+00:00",
+  "source_commit": "d5e4b6ae83cec4f3cc4111226a16c34355d1ff87",
+  "starting_checkpoint": "36ce124c819b144cc4c9326cdfa31c7d1033fa7e",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "pr": "https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/27",
+  "review_input": {
+    "filename": "pr27-adversarial-review-36ce124c.md",
+    "sha256": "f2877ad5edf68ac083b4437430da49432e7db5f32462c5caef0f7f80234f6337"
+  },
+  "findings": [
+    {
+      "id": 1,
+      "status": "REPRODUCED_AND_HOST_REGRESSION_FIXED",
+      "before": "Preclaim input position (0,-0.95,0.900001) reconstructed to (-33.7,-0.95,-15.2). Claimed lower and released exterior idle positions also failed retention.",
+      "after": "Idle pose/support/zone retained; readiness generations invalidate stale callbacks. Interrupted first ascent returns lower; return descent exterior.",
+      "scope": "Direct actual simulation reconstruction entry; physical native resize/recreation pending."
+    },
+    {
+      "id": 2,
+      "status": "REPRODUCED_AND_HOST_REGRESSION_FIXED",
+      "before": "Actual ascent then ordinary walk/dodge entered front coping at support2.05.",
+      "after": "Swept retained-box envelope blocks center/end/corner crossings; walking/dodge and clear-side backtracking pass.",
+      "scope": "Development rescue blockout only; no general 3D step/fall or sword occlusion claim."
+    },
+    {
+      "id": 3,
+      "status": "REPRODUCED_AND_HOST_REGRESSION_FIXED",
+      "before": "Corrected direct and actual normal-input production-pair tests:502 checks,3 failures; A-nearest loses B stagger, B-nearest cancels A windup.",
+      "after": "558 checks,0 failures; nonfatal contact preserves owning token, independent stagger completion cannot release another attacker; lethal owner/nonowner/reset cases pass.",
+      "scope": "Forgiving contact and inactive conservative proxy unchanged."
+    },
+    {
+      "id": 4,
+      "status": "REPRODUCED_AND_HOST_REGRESSION_FIXED",
+      "before": "Actual Java runtimePoll with fake JNI clock misses133.3ms DodgeNow at90/105/120ms initial phases.",
+      "after": "Separate32ms prompt-only observation;12 phase offsets cover appearance/removal/fade, pause and surface detach cancellation;180ms telemetry preserved.",
+      "scope": "Cooperative host main-looper scheduling, not physical-device or stalled-thread guarantee."
+    },
+    {
+      "id": 5,
+      "status": "REPRODUCED_AND_HOST_REGRESSION_FIXED",
+      "before": "Native bytes0/64/128/191/255 displayed0/4/6/6/6 marks.",
+      "after": "Displays0/2/3/4/6 via normalized byte conversion.",
+      "scope": "Presentation only; no native packing or gameplay progression change."
+    },
+    {
+      "id": 6,
+      "status": "REPRODUCED_AND_HOST_REGRESSION_FIXED",
+      "before": "Normal input offsets-0.74/+0.74 approach loaded root drift0.581455/0.937096m; actual imported arm admission fails, +offset gives222 additional PreparePose rejections.",
+      "after": "Rebase root and solved grips when approach completes. Offcenter ascents each496 loaded rig poses; drift0.142849/0.138577m; existing reach/grip/clearance assertions pass.",
+      "scope": "Renderer-stop prediction was not physically reproduced; actual rig-admission/root defect reproduced."
+    },
+    {
+      "id": 7,
+      "status": "REPRODUCED_AND_HOST_REGRESSION_FIXED",
+      "before": "Loaded focus synchronization then unpaused1/120s zero-tick frame gives0.932132m hip/body origin mismatch.",
+      "after": "Resolve current equipment then reset pendulum from actual hip/hand authority; zero-tick mismatch0, real rig/socket and adapter checks pass.",
+      "scope": "No sustained ordinary-menu corruption claim; physical frame/audio/lifecycle acceptance pending."
+    }
+  ],
+  "source_change_map": [
+    {
+      "path": "CMakeLists.txt",
+      "baseline_blob": "e44e1eadf94bc1da60ddb00e4968663029963702",
+      "candidate_blob": "b23154a733780335544b914977d3d86c8a8a83de",
+      "sha256": "6fabfdb4eda63fa022c11b182fd87cc166fb8e775c09d92930c300a5faeb04cf"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/CombatTeachingPreferences.java",
+      "baseline_blob": "1a83cebc43767e3437999c7235a6b8b99e55fa99",
+      "candidate_blob": "5e29b747094ce6f05fdfe7dcbeb52261724a8833",
+      "sha256": "753ba83b116c9a6f1c333897650b7fc4eff5f77f67ec89d3dd7bf841e19a5364"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "baseline_blob": "437e8f7cbe2661e443f890f8464f8e33dd52db99",
+      "candidate_blob": "9ffe7626df85b4cf67ca7076cffea183c7752bac",
+      "sha256": "cae85397b337f1bf69e393d7149393166d4c744118edc5e2ed965ea4d0319dd7"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingPreferencesTest.java",
+      "baseline_blob": "d0292bd5f6c03bd16e3a013b802c03faf9491a01",
+      "candidate_blob": "54954d2f4f0705d54eda32ab478a12ff9e1747a8",
+      "sha256": "9a49ecaebc66fcb24fc5f0e67476afa631c14fe2fa0bccaf780fd6b6f4fbb6cf"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingUiSchedulingTest.java",
+      "baseline_blob": null,
+      "candidate_blob": "5ffcfa056907a32b93051acba0fe237b22171060",
+      "sha256": "d01a05c73ab95d5c0b34a6eb3d8bbd4cc2f9d90e0f35a3b056d2e4d925fef47d"
+    },
+    {
+      "path": "src/gameplay/SwordCombat.h",
+      "baseline_blob": "a4c72db3adf5e58907d9ba367bf9e6a99489113a",
+      "candidate_blob": "7d044ace6f59979e870de5cecd4bb236c18be3f1",
+      "sha256": "a71e3b7741b4fd475a11cdf4c24b7b3bf327f9872843ed5b020a008b82d4f40f"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "baseline_blob": "add82700c058400a559306600bc4acb0a82ce937",
+      "candidate_blob": "9d4125b230b10a50235da09a98ca7b52592a3082",
+      "sha256": "b95b530735847d4fbdfc65f0a10ebdf6bb92b1e9ad64f3c7bbea7cf4bd36b2ba"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulationRescue.cpp",
+      "baseline_blob": "10457e3ef1598c0123d68082ce0ea33a74a791f3",
+      "candidate_blob": "2843bd74319a9705df249e9ec23ee1d9709afb29",
+      "sha256": "3ae5a7e9fe024bec0f8ed6d22f4785d0a14c96923c2180cbb24e01f55b93f255"
+    },
+    {
+      "path": "src/gameplay/traversal/DevelopmentRescueJourney.h",
+      "baseline_blob": "8739980803f9e7a431cb8ca27caf70d89911e86d",
+      "candidate_blob": "f1d926333ae2c08a23367c5cd8bad5c6e36b0bb3",
+      "sha256": "7f2a45d3c22ae234cbdc196bc7f445ad03ff45e02f8e0f734fcf255a451bb85c"
+    },
+    {
+      "path": "src/gameplay/traversal/RescueTraversal.cpp",
+      "baseline_blob": "6846100af4ca0b78d942c0745c5b581b9f3b3b5c",
+      "candidate_blob": "3516cc16d62ab840d7cc5d0e348a8a124cf66dcf",
+      "sha256": "f0150ad603bc7d8a6eeddc1a32acdcfbd3eb9cdd90aaac04a2402a064ed09ebb"
+    },
+    {
+      "path": "tests/CombatFoundationTests.cpp",
+      "baseline_blob": "75b3aa759b997591d18e16a92fa102ea9db10111",
+      "candidate_blob": "844baec06df7b777c8602898ff8cf397d7baa6f1",
+      "sha256": "4d054a5e74c4bc2d4ec206f6ad991f8b85c011464fada9c1f2a92e227aac3a29"
+    },
+    {
+      "path": "tests/RescueRigAttachmentTests.cpp",
+      "baseline_blob": "3ee4ac5ba8fe38a40f48441d9eb55e98ca55df60",
+      "candidate_blob": "08fa4170f7319e0b846b2c340b3d08821326a897",
+      "sha256": "3c61a56c1b5a3b5e79e7b43042c1266bb6594d3ecff047edd6247d1bace2050a"
+    }
+  ],
+  "artifacts": [
+    {
+      "configuration": "windows-debug",
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "sha256": "1aae10d210842bd789b5ec8e9d939d68831c04bd5b41d144bea44421a1d2f094",
+      "bytes": 11917312
+    },
+    {
+      "configuration": "windows-release",
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "sha256": "4630d433f05273b1a07066c61b9c097eb4dac0e385f40fd4ce13a7f5109667a5",
+      "bytes": 4175872
+    },
+    {
+      "configuration": "android-debug",
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "aad258e955dc26163991f501352d5caa4e9bcca1df3735ad2cc22953933f031b",
+      "bytes": 133693579
+    },
+    {
+      "configuration": "android-release-unsigned",
+      "path": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "sha256": "101da7323f47892bd6137879a5a77a92d7332d01b3b01d4c6354b2a68b42edaf",
+      "bytes": 121491698
+    }
+  ],
+  "fixture_and_policy_identities": [
+    {
+      "path": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+      "sha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
+      "bytes": 2568508,
+      "unchanged_git_blob": "1e3b6b9e70b0cde462be82cb29e189de8e70a1dc"
+    },
+    {
+      "path": "assets/models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb",
+      "sha256": "75bf4f0d7c64c67848f08f1b2fb5b802527160c79def7f71ca964bdcf72799f5",
+      "bytes": 76716,
+      "unchanged_git_blob": "8986c437f076254a421f659df9ed3c6bba9bcee0"
+    },
+    {
+      "path": "assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb",
+      "sha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+      "bytes": 658308,
+      "unchanged_git_blob": "ed48dce83fee534eebe7b32dab0a57384feb53da"
+    },
+    {
+      "path": "tests/FinalHeldTorchClearanceTests.cpp",
+      "sha256": "4e048f7452a4adcf67f84c84fc762c8cbbd378d486e83b2ac8f4f6128ce9ebae",
+      "bytes": 44737,
+      "unchanged_git_blob": "cc6aefb5884e9307a39e97f33ee809f8053a1174"
+    },
+    {
+      "path": "tools/raygen-variant-budgets.json",
+      "sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+      "bytes": 6425,
+      "unchanged_git_blob": "90d40a313084dca95055ed2ea32a231da9d0b9bb"
+    },
+    {
+      "path": "tools/raygen-variant-catalog.json",
+      "sha256": "388953d0a643a68c8d63753ed5841d0cec02888c9836740f187e37562908494c",
+      "bytes": 35050,
+      "unchanged_git_blob": "6bfa9f24a91189835b05567d4b30cf79b4ddb9ec"
+    },
+    {
+      "path": "tools/rayquery-variant-catalog.json",
+      "sha256": "e1fcee8a2ba55900c0376c738dd4b6abdd7780f6a746c9ae95ca36975f538777",
+      "bytes": 39371,
+      "unchanged_git_blob": "20905500ef148c87870b02f680281d1ee2e200a1"
+    }
+  ],
+  "precommit_provenance": {
+    "tracked_patch_sha256": "bf75c489e1ac7aa02be3e6091734ab5155636bbb2671fb289e90e04b3977cfd4",
+    "new_java_file_sha256": "d01a05c73ab95d5c0b34a6eb3d8bbd4cc2f9d90e0f35a3b056d2e4d925fef47d",
+    "conclusion": "Committed source exactly matches the tracked patch and separately identified new Java input used by precommit native checks. Logs retain any concurrent edit/commit flags."
+  },
+  "statuses": {
+    "host": "HOST/PACKAGE-READY for this bounded correction",
+    "windows_native_debug": "28/28",
+    "windows_native_release": "28/28",
+    "contract_matrix": "15/16 initially; artifact test failed when source checkpoint changed status during read-only guard; isolated unchanged retry1/1 passes92.53s.",
+    "android_build_lint": "Debug/unsignedRelease fourABIs and bothlint passed186.9s",
+    "android_java": "selected28/28; full unit task also passed",
+    "packages": "WindowsDiagnosticHigh/ShippingHigh and AndroidDiagnosticMobile/ShippingMobile ARM64 shader pairs pass externalvalidation; all eight native libraries match APK entries/ELF/16KiB LOAD.",
+    "device_verified": "NO_NEW_PHYSICAL_EVIDENCE",
+    "owner_audio_haptic": "PENDING",
+    "ci": "Pending final pushed evidence commit; verify externally without recursive receipt hash."
+  },
+  "limitations": [
+    "No game/device launch, install, input, capture or owner playtest in this job.",
+    "Prior owner feedback remains scoped to its original artifact.",
+    "Rope/mist shadow investigation, outstanding combat contact calibration and issues23-25 not changed.",
+    "Android shader inspection is ARM64 only; allABI identity/ELF checks do not establish allABI shader scanning.",
+    "No shader, ABI, budget, asset, quality/default, signing, release or later work package changes."
+  ],
+  "fresh_original_torch": [
+    {
+      "configuration": "Debug",
+      "exit_code": 0,
+      "registered_timeout_seconds": 180,
+      "test_seconds": 171.84,
+      "margin_seconds": 8.16,
+      "outer_seconds": 171.89309520000825,
+      "coverage": {
+        "poses": 3287,
+        "roof_entry_skinned_poses": 1812,
+        "plane_samples": 3178,
+        "disk_samples": 57970
+      },
+      "log": "review-debug-original-torch-01.log"
+    },
+    {
+      "configuration": "Release",
+      "exit_code": 0,
+      "registered_timeout_seconds": 180,
+      "test_seconds": 14.74,
+      "margin_seconds": 165.26,
+      "outer_seconds": 14.797654599999078,
+      "coverage": {
+        "poses": 3287,
+        "roof_entry_skinned_poses": 1812,
+        "plane_samples": 3178,
+        "disk_samples": 57970
+      },
+      "log": "review-release-original-torch-01.log"
+    }
+  ],
+  "audio_haptic_manual_revalidation_required": {
+    "required": true,
+    "reason": "Correct attack ownership preserves an incoming enemy attack previously canceled and thus can change player damage/semantic feedback timing. No new sound or haptic assets/routing."
+  },
+  "historical_torch": {
+    "original_wp0_timeout_seconds": 180.03,
+    "unchanged_diagnostic_pass_seconds": 168.85,
+    "prior_roundtrip_debug_seconds": 165.18,
+    "prior_roundtrip_margin_seconds": 14.82,
+    "note": "Historical receipts remain unchanged and are not passes of this candidate. Fresh measured margins are separately listed."
+  },
+  "cases": {
+    "combat_foundation": 558,
+    "rescue_adversarial": 17409,
+    "original_rescue_rig": 16455,
+    "original_rescue_rig_poses": 955,
+    "rescue_journey_integration": 19443,
+    "rescue_traversal": 89973
+  }
+}

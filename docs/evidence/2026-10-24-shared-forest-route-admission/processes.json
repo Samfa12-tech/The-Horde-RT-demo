@@ -1,0 +1,110 @@
+[
+  {
+    "label": "route-control-open",
+    "exitCode": 0,
+    "pending": false,
+    "seconds": 130.46899999999732,
+    "settingsUnchanged": true,
+    "campaignUnchanged": true,
+    "foregroundUnchanged": true,
+    "executableSha256": "307c3849c775241ff6fc1f5b6f426f43281084b2bd6cc85e0f43a036197acf4d",
+    "arguments": [
+      "HordeLanternRT.exe",
+      "--development-rescue-journey",
+      "--capture-showcase",
+      "<output>",
+      "--capture-hidden",
+      "--development-checkpoint",
+      "chapter-kit-reunion",
+      "--validate-chapter-roundtrip",
+      "--capture-chapter-route-stages"
+    ]
+  },
+  {
+    "label": "route-shared",
+    "exitCode": 0,
+    "pending": false,
+    "seconds": 133.23399999999674,
+    "settingsUnchanged": true,
+    "campaignUnchanged": true,
+    "foregroundUnchanged": true,
+    "executableSha256": "307c3849c775241ff6fc1f5b6f426f43281084b2bd6cc85e0f43a036197acf4d",
+    "arguments": [
+      "HordeLanternRT.exe",
+      "--development-rescue-journey",
+      "--capture-showcase",
+      "<output>",
+      "--capture-hidden",
+      "--development-checkpoint",
+      "chapter-kit-reunion",
+      "--validate-chapter-roundtrip",
+      "--capture-chapter-route-stages",
+      "--forest-route-proof",
+      "normal-shared64"
+    ]
+  },
+  {
+    "label": "route-control-close",
+    "exitCode": 0,
+    "pending": false,
+    "seconds": 132.23399999999674,
+    "settingsUnchanged": true,
+    "campaignUnchanged": true,
+    "foregroundUnchanged": true,
+    "executableSha256": "307c3849c775241ff6fc1f5b6f426f43281084b2bd6cc85e0f43a036197acf4d",
+    "arguments": [
+      "HordeLanternRT.exe",
+      "--development-rescue-journey",
+      "--capture-showcase",
+      "<output>",
+      "--capture-hidden",
+      "--development-checkpoint",
+      "chapter-kit-reunion",
+      "--validate-chapter-roundtrip",
+      "--capture-chapter-route-stages"
+    ]
+  },
+  {
+    "label": "recreate-pipeline",
+    "exitCode": 0,
+    "pending": false,
+    "seconds": 18.296999999991385,
+    "settingsUnchanged": true,
+    "campaignUnchanged": true,
+    "foregroundUnchanged": true,
+    "executableSha256": "307c3849c775241ff6fc1f5b6f426f43281084b2bd6cc85e0f43a036197acf4d",
+    "arguments": [
+      "HordeLanternRT.exe",
+      "--development-rescue-journey",
+      "--capture-showcase",
+      "<output>",
+      "--capture-hidden",
+      "--development-checkpoint",
+      "chapter-forest-retention-west",
+      "--forest-route-proof",
+      "normal-shared64"
+    ]
+  },
+  {
+    "label": "recreate-query",
+    "exitCode": 0,
+    "pending": false,
+    "seconds": 27.561999999990803,
+    "settingsUnchanged": true,
+    "campaignUnchanged": true,
+    "foregroundUnchanged": true,
+    "executableSha256": "307c3849c775241ff6fc1f5b6f426f43281084b2bd6cc85e0f43a036197acf4d",
+    "arguments": [
+      "HordeLanternRT.exe",
+      "--development-rescue-journey",
+      "--capture-showcase",
+      "<output>",
+      "--capture-hidden",
+      "--development-checkpoint",
+      "chapter-forest-retention-west",
+      "--forest-route-proof",
+      "normal-shared64",
+      "--require-rayquery-compute"
+    ]
+  }
+]

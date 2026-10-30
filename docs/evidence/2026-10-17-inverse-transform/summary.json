@@ -1,0 +1,2999 @@
+{
+  "nativeBaseHead": "db4c00a05211738d5d3b046c6e5a2dddd1ea59f2",
+  "caseOrder": [
+    "query-candidate",
+    "pipeline-candidate",
+    "pipeline-control",
+    "query-control"
+  ],
+  "runs": {
+    "query-candidate": {
+      "route": {
+        "case": "query-candidate",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "0112a11ef1e1232332782c32e20fa1107e895708413b9af818e531a23ea8b4c0",
+          "runId": "inverse-query-candidate-r01",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayQueryCompute",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 681,
+            "intervalCount": 680,
+            "durationNanoseconds": 68079116798,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 83333386,
+            "p90NearestRank": 154166666,
+            "p95NearestRank": 154166771,
+            "maximum": 158333594,
+            "over33333000Nanoseconds": 680,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 9.988379,
+          "simulation": {
+            "stateRows": 681,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 261,
+            "catchUpOverrunDelta": 261
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 681,
+              "acceptedPresents": 681,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1362,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 9693916,
+            "presentMarginAtLeast2Pow63CountIgnored": 681
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        },
+        "views": {
+          "landing-sweep": {
+            "pose": {
+              "x": -33.6905,
+              "y": 2.05,
+              "z": -12.7867,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 39,
+              "medianMs": 154.166615,
+              "p95Ms": 158.333332,
+              "maximumMs": 158.333594
+            },
+            "gpu": {
+              "n": 39,
+              "medianMs": 136.27984,
+              "p95Ms": 138.406767,
+              "maximumMs": 140.034684
+            },
+            "wholeFrameCpu": {
+              "n": 39,
+              "medianMs": 153.505209,
+              "p95Ms": 156.929062,
+              "maximumMs": 157.295105
+            },
+            "simulationCpu": {
+              "n": 39,
+              "medianMs": 3.665938,
+              "p95Ms": 5.317135,
+              "maximumMs": 5.362761
+            },
+            "detailStepCpu": {
+              "n": 39,
+              "medianMs": 0.01401,
+              "p95Ms": 0.017291,
+              "maximumMs": 0.018489
+            },
+            "deviceLocalBytes": [
+              160830720
+            ]
+          },
+          "lower-sweep": {
+            "pose": {
+              "x": -33.7,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 52,
+              "medianMs": 75.0,
+              "p95Ms": 83.333385,
+              "maximumMs": 83.333386
+            },
+            "gpu": {
+              "n": 52,
+              "medianMs": 66.661691,
+              "p95Ms": 67.607863,
+              "maximumMs": 67.745936
+            },
+            "wholeFrameCpu": {
+              "n": 52,
+              "medianMs": 75.9859895,
+              "p95Ms": 77.471146,
+              "maximumMs": 77.66125
+            },
+            "simulationCpu": {
+              "n": 52,
+              "medianMs": 0.2591405,
+              "p95Ms": 0.328385,
+              "maximumMs": 0.508646
+            },
+            "detailStepCpu": {
+              "n": 52,
+              "medianMs": 0.009427,
+              "p95Ms": 0.0125,
+              "maximumMs": 0.017864
+            },
+            "deviceLocalBytes": [
+              160830720
+            ]
+          },
+          "passage-sweep": {
+            "pose": {
+              "x": -22.0185,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 1.5708,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 53,
+              "medianMs": 74.999948,
+              "p95Ms": 83.333334,
+              "maximumMs": 83.333386
+            },
+            "gpu": {
+              "n": 53,
+              "medianMs": 65.514217,
+              "p95Ms": 67.255467,
+              "maximumMs": 68.399894
+            },
+            "wholeFrameCpu": {
+              "n": 53,
+              "medianMs": 74.600365,
+              "p95Ms": 77.089583,
+              "maximumMs": 77.440052
+            },
+            "simulationCpu": {
+              "n": 53,
+              "medianMs": 0.236093,
+              "p95Ms": 0.337031,
+              "maximumMs": 0.338021
+            },
+            "detailStepCpu": {
+              "n": 53,
+              "medianMs": 0.008177,
+              "p95Ms": 0.012292,
+              "maximumMs": 0.013021
+            },
+            "deviceLocalBytes": [
+              146581056
+            ]
+          },
+          "repeat-ascent": {
+            "pose": {
+              "x": -33.7,
+              "y": 2.05,
+              "z": -12.8,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 40,
+              "medianMs": 154.166666,
+              "p95Ms": 158.333386,
+              "maximumMs": 158.333438
+            },
+            "gpu": {
+              "n": 40,
+              "medianMs": 137.108304,
+              "p95Ms": 139.300674,
+              "maximumMs": 139.813226
+            },
+            "wholeFrameCpu": {
+              "n": 40,
+              "medianMs": 155.074974,
+              "p95Ms": 157.395677,
+              "maximumMs": 158.133802
+            },
+            "simulationCpu": {
+              "n": 40,
+              "medianMs": 4.8877605,
+              "p95Ms": 5.264166,
+              "maximumMs": 5.365677
+            },
+            "detailStepCpu": {
+              "n": 40,
+              "medianMs": 0.0140105,
+              "p95Ms": 0.018906,
+              "maximumMs": 0.031718
+            },
+            "deviceLocalBytes": [
+              160830720
+            ]
+          }
+        },
+        "fullDeviceLocalBytes": 160830720,
+        "minimumDeviceLocalBytes": 146581056,
+        "peakDeviceLocalBytes": 174306880,
+        "restoredDeviceLocalBytes": 160830720,
+        "runUnloads": 1,
+        "runRestores": 1,
+        "detailStepCpuAll": {
+          "n": 681,
+          "medianMs": 0.009636,
+          "p95Ms": 0.031718,
+          "maximumMs": 5.423021
+        },
+        "transitions": [
+          {
+            "serial": 506,
+            "tick": 3296,
+            "phase": "tomb-backtrack",
+            "seconds": 36.599949309,
+            "unloads": 1,
+            "restores": 0,
+            "actualIntervalWindow": {
+              "n": 26,
+              "medianMs": 75.0,
+              "p95Ms": 83.333385,
+              "maximumMs": 83.333385
+            },
+            "detailStepCpuWindow": {
+              "n": 26,
+              "medianMs": 0.009245,
+              "p95Ms": 0.01375,
+              "maximumMs": 0.023698
+            }
+          },
+          {
+            "serial": 640,
+            "tick": 3929,
+            "phase": "rope-return",
+            "seconds": 47.170782899,
+            "unloads": 1,
+            "restores": 1,
+            "actualIntervalWindow": {
+              "n": 23,
+              "medianMs": 87.5,
+              "p95Ms": 95.833281,
+              "maximumMs": 95.833334
+            },
+            "detailStepCpuWindow": {
+              "n": 23,
+              "medianMs": 0.025833,
+              "p95Ms": 0.636615,
+              "maximumMs": 5.423021
+            }
+          }
+        ],
+        "thermalBefore": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 45.2,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 35.3,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 38.4,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "thermalAfter": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 0,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 44.2,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 36.6,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 39.5,
+              "status": 0
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "stages": {
+        "joinedFrames": 681,
+        "allFrames": {
+          "as": {
+            "n": 681,
+            "medianMs": 0.39474,
+            "p95Ms": 0.559427,
+            "maximumMs": 1.559948
+          },
+          "dispatch": {
+            "n": 681,
+            "medianMs": 74.658592,
+            "p95Ms": 136.854528,
+            "maximumMs": 201.153381
+          },
+          "transfer": {
+            "n": 681,
+            "medianMs": 0.124115,
+            "p95Ms": 0.138646,
+            "maximumMs": 0.308437
+          }
+        },
+        "views": {
+          "landing-sweep": {
+            "as": {
+              "n": 39,
+              "medianMs": 0.535833,
+              "p95Ms": 0.54776,
+              "maximumMs": 0.548021
+            },
+            "dispatch": {
+              "n": 39,
+              "medianMs": 135.601768,
+              "p95Ms": 137.74932,
+              "maximumMs": 139.377653
+            },
+            "transfer": {
+              "n": 39,
+              "medianMs": 0.128333,
+              "p95Ms": 0.141302,
+              "maximumMs": 0.151615
+            }
+          },
+          "lower-sweep": {
+            "as": {
+              "n": 52,
+              "medianMs": 0.375599,
+              "p95Ms": 0.393073,
+              "maximumMs": 0.639167
+            },
+            "dispatch": {
+              "n": 52,
+              "medianMs": 66.128592,
+              "p95Ms": 67.105571,
+              "maximumMs": 67.241821
+            },
+            "transfer": {
+              "n": 52,
+              "medianMs": 0.125547,
+              "p95Ms": 0.13901,
+              "maximumMs": 0.308437
+            }
+          },
+          "passage-sweep": {
+            "as": {
+              "n": 53,
+              "medianMs": 0.374479,
+              "p95Ms": 0.387812,
+              "maximumMs": 0.390937
+            },
+            "dispatch": {
+              "n": 53,
+              "medianMs": 65.018071,
+              "p95Ms": 66.7488,
+              "maximumMs": 67.910415
+            },
+            "transfer": {
+              "n": 53,
+              "medianMs": 0.116354,
+              "p95Ms": 0.134687,
+              "maximumMs": 0.285312
+            }
+          },
+          "repeat-ascent": {
+            "as": {
+              "n": 40,
+              "medianMs": 0.5352605,
+              "p95Ms": 0.546458,
+              "maximumMs": 1.559948
+            },
+            "dispatch": {
+              "n": 40,
+              "medianMs": 136.437627,
+              "p95Ms": 138.60109,
+              "maximumMs": 138.907965
+            },
+            "transfer": {
+              "n": 40,
+              "medianMs": 0.128229,
+              "p95Ms": 0.138333,
+              "maximumMs": 0.142656
+            }
+          }
+        },
+        "limits": "GPU stage execution intervals; not additive counters or playable FPS. AS brackets UpdateDynamicInstances; dispatch includes all shader work; transfer brackets the post-barrier transfer/copy path.",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "0112a11ef1e1232332782c32e20fa1107e895708413b9af818e531a23ea8b4c0",
+          "runId": "inverse-query-candidate-r01",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayQueryCompute",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 681,
+            "intervalCount": 680,
+            "durationNanoseconds": 68079116798,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 83333386,
+            "p90NearestRank": 154166666,
+            "p95NearestRank": 154166771,
+            "maximum": 158333594,
+            "over33333000Nanoseconds": 680,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 9.988379,
+          "simulation": {
+            "stateRows": 681,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 261,
+            "catchUpOverrunDelta": 261
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 681,
+              "acceptedPresents": 681,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1362,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 9693916,
+            "presentMarginAtLeast2Pow63CountIgnored": 681
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        }
+      }
+    },
+    "pipeline-candidate": {
+      "route": {
+        "case": "pipeline-candidate",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "dcf45edb8d39d12b8b037a6e8f4f0f1534578e7e410f758794e6f96da5212256",
+          "runId": "inverse-pipeline-candidate-r01",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayTracingPipeline",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 690,
+            "intervalCount": 689,
+            "durationNanoseconds": 68054054246,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 83333333,
+            "p90NearestRank": 154166770,
+            "p95NearestRank": 158333334,
+            "maximum": 170833438,
+            "over33333000Nanoseconds": 689,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 10.124305,
+          "simulation": {
+            "stateRows": 690,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 251,
+            "catchUpOverrunDelta": 251
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 690,
+              "acceptedPresents": 690,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1382,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 10251554,
+            "presentMarginAtLeast2Pow63CountIgnored": 690
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        },
+        "views": {
+          "landing-sweep": {
+            "pose": {
+              "x": -33.6905,
+              "y": 2.05,
+              "z": -12.7867,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 39,
+              "medianMs": 158.33328,
+              "p95Ms": 170.833437,
+              "maximumMs": 170.833438
+            },
+            "gpu": {
+              "n": 39,
+              "medianMs": 138.83432,
+              "p95Ms": 150.883798,
+              "maximumMs": 150.943382
+            },
+            "wholeFrameCpu": {
+              "n": 39,
+              "medianMs": 157.483073,
+              "p95Ms": 169.697396,
+              "maximumMs": 169.742968
+            },
+            "simulationCpu": {
+              "n": 39,
+              "medianMs": 3.282969,
+              "p95Ms": 5.198438,
+              "maximumMs": 5.272292
+            },
+            "detailStepCpu": {
+              "n": 39,
+              "medianMs": 0.014271,
+              "p95Ms": 0.01724,
+              "maximumMs": 0.01776
+            },
+            "deviceLocalBytes": [
+              160831232
+            ]
+          },
+          "lower-sweep": {
+            "pose": {
+              "x": -33.7,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 53,
+              "medianMs": 70.833438,
+              "p95Ms": 83.333333,
+              "maximumMs": 83.333385
+            },
+            "gpu": {
+              "n": 53,
+              "medianMs": 63.046248,
+              "p95Ms": 69.98328,
+              "maximumMs": 70.313227
+            },
+            "wholeFrameCpu": {
+              "n": 53,
+              "medianMs": 72.927969,
+              "p95Ms": 78.757969,
+              "maximumMs": 80.218854
+            },
+            "simulationCpu": {
+              "n": 53,
+              "medianMs": 0.25823,
+              "p95Ms": 0.346042,
+              "maximumMs": 0.390312
+            },
+            "detailStepCpu": {
+              "n": 53,
+              "medianMs": 0.009688,
+              "p95Ms": 0.025052,
+              "maximumMs": 0.025833
+            },
+            "deviceLocalBytes": [
+              160831232
+            ]
+          },
+          "passage-sweep": {
+            "pose": {
+              "x": -22.017,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 1.5708,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 55,
+              "medianMs": 70.833334,
+              "p95Ms": 83.333281,
+              "maximumMs": 83.333386
+            },
+            "gpu": {
+              "n": 55,
+              "medianMs": 62.314582,
+              "p95Ms": 67.469217,
+              "maximumMs": 69.350936
+            },
+            "wholeFrameCpu": {
+              "n": 55,
+              "medianMs": 72.43625,
+              "p95Ms": 77.043125,
+              "maximumMs": 79.378906
+            },
+            "simulationCpu": {
+              "n": 55,
+              "medianMs": 0.267344,
+              "p95Ms": 0.347709,
+              "maximumMs": 0.354635
+            },
+            "detailStepCpu": {
+              "n": 55,
+              "medianMs": 0.00974,
+              "p95Ms": 0.021823,
+              "maximumMs": 0.030156
+            },
+            "deviceLocalBytes": [
+              146581568
+            ]
+          },
+          "repeat-ascent": {
+            "pose": {
+              "x": -33.7,
+              "y": 2.05,
+              "z": -12.8,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 40,
+              "medianMs": 154.166719,
+              "p95Ms": 158.333385,
+              "maximumMs": 162.499947
+            },
+            "gpu": {
+              "n": 40,
+              "medianMs": 138.337497,
+              "p95Ms": 140.156247,
+              "maximumMs": 140.547965
+            },
+            "wholeFrameCpu": {
+              "n": 40,
+              "medianMs": 155.0456255,
+              "p95Ms": 158.790781,
+              "maximumMs": 159.753385
+            },
+            "simulationCpu": {
+              "n": 40,
+              "medianMs": 3.788854,
+              "p95Ms": 5.242448,
+              "maximumMs": 5.401614
+            },
+            "detailStepCpu": {
+              "n": 40,
+              "medianMs": 0.0136455,
+              "p95Ms": 0.017968,
+              "maximumMs": 0.0525
+            },
+            "deviceLocalBytes": [
+              160831232
+            ]
+          }
+        },
+        "fullDeviceLocalBytes": 160831232,
+        "minimumDeviceLocalBytes": 146581568,
+        "peakDeviceLocalBytes": 174307392,
+        "restoredDeviceLocalBytes": 160831232,
+        "runUnloads": 1,
+        "runRestores": 1,
+        "detailStepCpuAll": {
+          "n": 690,
+          "medianMs": 0.010782,
+          "p95Ms": 0.030834,
+          "maximumMs": 4.206928
+        },
+        "transitions": [
+          {
+            "serial": 512,
+            "tick": 3293,
+            "phase": "tomb-backtrack",
+            "seconds": 36.691553476,
+            "unloads": 1,
+            "restores": 0,
+            "actualIntervalWindow": {
+              "n": 28,
+              "medianMs": 70.833334,
+              "p95Ms": 75.000052,
+              "maximumMs": 83.333385
+            },
+            "detailStepCpuWindow": {
+              "n": 28,
+              "medianMs": 0.00987,
+              "p95Ms": 0.013385,
+              "maximumMs": 0.013958
+            }
+          },
+          {
+            "serial": 650,
+            "tick": 3914,
+            "phase": "rope-return",
+            "seconds": 47.054053732,
+            "unloads": 1,
+            "restores": 1,
+            "actualIntervalWindow": {
+              "n": 25,
+              "medianMs": 83.333333,
+              "p95Ms": 87.5,
+              "maximumMs": 91.666667
+            },
+            "detailStepCpuWindow": {
+              "n": 25,
+              "medianMs": 0.022604,
+              "p95Ms": 0.449427,
+              "maximumMs": 3.271823
+            }
+          }
+        ],
+        "thermalBefore": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 1,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 46.9,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 37.6,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 40.3,
+              "status": 1
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "thermalAfter": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 1,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 46.6,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 38.4,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 40.9,
+              "status": 1
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "stages": {
+        "joinedFrames": 690,
+        "allFrames": {
+          "as": {
+            "n": 690,
+            "medianMs": 0.3990625,
+            "p95Ms": 0.558437,
+            "maximumMs": 0.965208
+          },
+          "dispatch": {
+            "n": 690,
+            "medianMs": 68.8763785,
+            "p95Ms": 138.837132,
+            "maximumMs": 201.444058
+          },
+          "transfer": {
+            "n": 690,
+            "medianMs": 0.133047,
+            "p95Ms": 0.145781,
+            "maximumMs": 0.312969
+          }
+        },
+        "views": {
+          "landing-sweep": {
+            "as": {
+              "n": 39,
+              "medianMs": 0.539115,
+              "p95Ms": 0.562604,
+              "maximumMs": 0.563333
+            },
+            "dispatch": {
+              "n": 39,
+              "medianMs": 138.184684,
+              "p95Ms": 150.196298,
+              "maximumMs": 150.240153
+            },
+            "transfer": {
+              "n": 39,
+              "medianMs": 0.138073,
+              "p95Ms": 0.144583,
+              "maximumMs": 0.147135
+            }
+          },
+          "lower-sweep": {
+            "as": {
+              "n": 53,
+              "medianMs": 0.379531,
+              "p95Ms": 0.402135,
+              "maximumMs": 0.42474
+            },
+            "dispatch": {
+              "n": 53,
+              "medianMs": 62.523228,
+              "p95Ms": 69.448644,
+              "maximumMs": 69.74479
+            },
+            "transfer": {
+              "n": 53,
+              "medianMs": 0.137031,
+              "p95Ms": 0.143854,
+              "maximumMs": 0.14651
+            }
+          },
+          "passage-sweep": {
+            "as": {
+              "n": 55,
+              "medianMs": 0.378229,
+              "p95Ms": 0.404062,
+              "maximumMs": 0.648073
+            },
+            "dispatch": {
+              "n": 55,
+              "medianMs": 61.817498,
+              "p95Ms": 66.939165,
+              "maximumMs": 68.813852
+            },
+            "transfer": {
+              "n": 55,
+              "medianMs": 0.131771,
+              "p95Ms": 0.137812,
+              "maximumMs": 0.139219
+            }
+          },
+          "repeat-ascent": {
+            "as": {
+              "n": 40,
+              "medianMs": 0.534896,
+              "p95Ms": 0.545885,
+              "maximumMs": 0.946823
+            },
+            "dispatch": {
+              "n": 40,
+              "medianMs": 137.6676265,
+              "p95Ms": 139.492236,
+              "maximumMs": 139.90182
+            },
+            "transfer": {
+              "n": 40,
+              "medianMs": 0.135443,
+              "p95Ms": 0.14125,
+              "maximumMs": 0.143125
+            }
+          }
+        },
+        "limits": "GPU stage execution intervals; not additive counters or playable FPS. AS brackets UpdateDynamicInstances; dispatch includes all shader work; transfer brackets the post-barrier transfer/copy path.",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "dcf45edb8d39d12b8b037a6e8f4f0f1534578e7e410f758794e6f96da5212256",
+          "runId": "inverse-pipeline-candidate-r01",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayTracingPipeline",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 690,
+            "intervalCount": 689,
+            "durationNanoseconds": 68054054246,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 83333333,
+            "p90NearestRank": 154166770,
+            "p95NearestRank": 158333334,
+            "maximum": 170833438,
+            "over33333000Nanoseconds": 689,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 10.124305,
+          "simulation": {
+            "stateRows": 690,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 251,
+            "catchUpOverrunDelta": 251
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 690,
+              "acceptedPresents": 690,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1382,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 10251554,
+            "presentMarginAtLeast2Pow63CountIgnored": 690
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        }
+      }
+    },
+    "pipeline-control": {
+      "route": {
+        "case": "pipeline-control",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "98e8c395c432d431e4884d335f67017f400767ae729899c1912ad2b83438d24b",
+          "runId": "inverse-pipeline-control-r01",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayTracingPipeline",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 664,
+            "intervalCount": 663,
+            "durationNanoseconds": 69216588412,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 83333386,
+            "p90NearestRank": 162499948,
+            "p95NearestRank": 162500052,
+            "maximum": 175000052,
+            "over33333000Nanoseconds": 663,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 9.578629,
+          "simulation": {
+            "stateRows": 664,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 261,
+            "catchUpOverrunDelta": 261
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 664,
+              "acceptedPresents": 664,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1323,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 9641352,
+            "presentMarginAtLeast2Pow63CountIgnored": 664
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        },
+        "views": {
+          "landing-sweep": {
+            "pose": {
+              "x": -33.6896,
+              "y": 2.05,
+              "z": -12.7854,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 40,
+              "medianMs": 158.333385,
+              "p95Ms": 170.833386,
+              "maximumMs": 175.000052
+            },
+            "gpu": {
+              "n": 40,
+              "medianMs": 142.880882,
+              "p95Ms": 154.27458,
+              "maximumMs": 155.848746
+            },
+            "wholeFrameCpu": {
+              "n": 40,
+              "medianMs": 160.2435155,
+              "p95Ms": 169.657135,
+              "maximumMs": 174.640469
+            },
+            "simulationCpu": {
+              "n": 40,
+              "medianMs": 3.215495,
+              "p95Ms": 5.122604,
+              "maximumMs": 5.263177
+            },
+            "detailStepCpu": {
+              "n": 40,
+              "medianMs": 0.012396,
+              "p95Ms": 0.019218,
+              "maximumMs": 0.04849
+            },
+            "deviceLocalBytes": [
+              160831232
+            ]
+          },
+          "lower-sweep": {
+            "pose": {
+              "x": -33.7,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 51,
+              "medianMs": 75.000052,
+              "p95Ms": 83.333385,
+              "maximumMs": 83.333385
+            },
+            "gpu": {
+              "n": 51,
+              "medianMs": 68.52755,
+              "p95Ms": 69.10979,
+              "maximumMs": 69.347915
+            },
+            "wholeFrameCpu": {
+              "n": 51,
+              "medianMs": 77.865,
+              "p95Ms": 79.253593,
+              "maximumMs": 79.724739
+            },
+            "simulationCpu": {
+              "n": 51,
+              "medianMs": 0.26599,
+              "p95Ms": 0.357448,
+              "maximumMs": 0.664532
+            },
+            "detailStepCpu": {
+              "n": 51,
+              "medianMs": 0.009427,
+              "p95Ms": 0.012916,
+              "maximumMs": 0.02651
+            },
+            "deviceLocalBytes": [
+              160831232
+            ]
+          },
+          "passage-sweep": {
+            "pose": {
+              "x": -22.0198,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 1.5708,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 52,
+              "medianMs": 75.0,
+              "p95Ms": 83.333385,
+              "maximumMs": 83.333385
+            },
+            "gpu": {
+              "n": 52,
+              "medianMs": 66.585467,
+              "p95Ms": 71.828384,
+              "maximumMs": 72.788748
+            },
+            "wholeFrameCpu": {
+              "n": 52,
+              "medianMs": 75.93224,
+              "p95Ms": 81.729323,
+              "maximumMs": 82.812032
+            },
+            "simulationCpu": {
+              "n": 52,
+              "medianMs": 0.2672655,
+              "p95Ms": 0.329323,
+              "maximumMs": 0.345052
+            },
+            "detailStepCpu": {
+              "n": 52,
+              "medianMs": 0.008984,
+              "p95Ms": 0.012604,
+              "maximumMs": 0.025104
+            },
+            "deviceLocalBytes": [
+              146581568
+            ]
+          },
+          "repeat-ascent": {
+            "pose": {
+              "x": -33.7,
+              "y": 2.05,
+              "z": -12.8,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 40,
+              "medianMs": 162.499999,
+              "p95Ms": 170.833386,
+              "maximumMs": 175.0
+            },
+            "gpu": {
+              "n": 40,
+              "medianMs": 142.8159865,
+              "p95Ms": 154.690934,
+              "maximumMs": 156.508277
+            },
+            "wholeFrameCpu": {
+              "n": 40,
+              "medianMs": 161.1155465,
+              "p95Ms": 168.955937,
+              "maximumMs": 174.244635
+            },
+            "simulationCpu": {
+              "n": 40,
+              "medianMs": 4.4322395,
+              "p95Ms": 5.298854,
+              "maximumMs": 5.361719
+            },
+            "detailStepCpu": {
+              "n": 40,
+              "medianMs": 0.013724,
+              "p95Ms": 0.015573,
+              "maximumMs": 0.01948
+            },
+            "deviceLocalBytes": [
+              160831232
+            ]
+          }
+        },
+        "fullDeviceLocalBytes": 160831232,
+        "minimumDeviceLocalBytes": 146581568,
+        "peakDeviceLocalBytes": 174307392,
+        "restoredDeviceLocalBytes": 160831232,
+        "runUnloads": 1,
+        "runRestores": 1,
+        "detailStepCpuAll": {
+          "n": 664,
+          "medianMs": 0.010052,
+          "p95Ms": 0.031302,
+          "maximumMs": 3.314792
+        },
+        "transitions": [
+          {
+            "serial": 492,
+            "tick": 3287,
+            "phase": "tomb-backtrack",
+            "seconds": 37.183254206,
+            "unloads": 1,
+            "restores": 0,
+            "actualIntervalWindow": {
+              "n": 27,
+              "medianMs": 75.0,
+              "p95Ms": 83.333384,
+              "maximumMs": 83.333386
+            },
+            "detailStepCpuWindow": {
+              "n": 27,
+              "medianMs": 0.009271,
+              "p95Ms": 0.012083,
+              "maximumMs": 0.012188
+            }
+          },
+          {
+            "serial": 624,
+            "tick": 3912,
+            "phase": "rope-return",
+            "seconds": 47.6165879,
+            "unloads": 1,
+            "restores": 1,
+            "actualIntervalWindow": {
+              "n": 23,
+              "medianMs": 87.5,
+              "p95Ms": 91.666719,
+              "maximumMs": 91.66672
+            },
+            "detailStepCpuWindow": {
+              "n": 23,
+              "medianMs": 0.013438,
+              "p95Ms": 0.461198,
+              "maximumMs": 3.314792
+            }
+          }
+        ],
+        "thermalBefore": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 1,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 47.3,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 37.9,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 40.2,
+              "status": 1
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "thermalAfter": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 1,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 47.9,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 39.0,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 41.2,
+              "status": 1
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "stages": {
+        "joinedFrames": 664,
+        "allFrames": {
+          "as": {
+            "n": 664,
+            "medianMs": 0.397318,
+            "p95Ms": 0.56,
+            "maximumMs": 0.72
+          },
+          "dispatch": {
+            "n": 664,
+            "medianMs": 73.768436,
+            "p95Ms": 143.394215,
+            "maximumMs": 203.210672
+          },
+          "transfer": {
+            "n": 664,
+            "medianMs": 0.134974,
+            "p95Ms": 0.146875,
+            "maximumMs": 0.349062
+          }
+        },
+        "views": {
+          "landing-sweep": {
+            "as": {
+              "n": 40,
+              "medianMs": 0.529974,
+              "p95Ms": 0.558594,
+              "maximumMs": 0.56125
+            },
+            "dispatch": {
+              "n": 40,
+              "medianMs": 142.2235645,
+              "p95Ms": 153.576975,
+              "maximumMs": 155.172861
+            },
+            "transfer": {
+              "n": 40,
+              "medianMs": 0.139349,
+              "p95Ms": 0.145208,
+              "maximumMs": 0.148333
+            }
+          },
+          "lower-sweep": {
+            "as": {
+              "n": 51,
+              "medianMs": 0.378437,
+              "p95Ms": 0.386771,
+              "maximumMs": 0.390417
+            },
+            "dispatch": {
+              "n": 51,
+              "medianMs": 68.01979,
+              "p95Ms": 68.58479,
+              "maximumMs": 68.849321
+            },
+            "transfer": {
+              "n": 51,
+              "medianMs": 0.139479,
+              "p95Ms": 0.144375,
+              "maximumMs": 0.144635
+            }
+          },
+          "passage-sweep": {
+            "as": {
+              "n": 52,
+              "medianMs": 0.3778905,
+              "p95Ms": 0.398542,
+              "maximumMs": 0.400469
+            },
+            "dispatch": {
+              "n": 52,
+              "medianMs": 66.085103,
+              "p95Ms": 71.299946,
+              "maximumMs": 72.252863
+            },
+            "transfer": {
+              "n": 52,
+              "medianMs": 0.133776,
+              "p95Ms": 0.142344,
+              "maximumMs": 0.292708
+            }
+          },
+          "repeat-ascent": {
+            "as": {
+              "n": 40,
+              "medianMs": 0.5352865,
+              "p95Ms": 0.559844,
+              "maximumMs": 0.617656
+            },
+            "dispatch": {
+              "n": 40,
+              "medianMs": 142.1425485,
+              "p95Ms": 154.00083,
+              "maximumMs": 155.808121
+            },
+            "transfer": {
+              "n": 40,
+              "medianMs": 0.13849,
+              "p95Ms": 0.145156,
+              "maximumMs": 0.154115
+            }
+          }
+        },
+        "limits": "GPU stage execution intervals; not additive counters or playable FPS. AS brackets UpdateDynamicInstances; dispatch includes all shader work; transfer brackets the post-barrier transfer/copy path.",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "98e8c395c432d431e4884d335f67017f400767ae729899c1912ad2b83438d24b",
+          "runId": "inverse-pipeline-control-r01",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayTracingPipeline",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 664,
+            "intervalCount": 663,
+            "durationNanoseconds": 69216588412,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 83333386,
+            "p90NearestRank": 162499948,
+            "p95NearestRank": 162500052,
+            "maximum": 175000052,
+            "over33333000Nanoseconds": 663,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 9.578629,
+          "simulation": {
+            "stateRows": 664,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 261,
+            "catchUpOverrunDelta": 261
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 664,
+              "acceptedPresents": 664,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1323,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 9641352,
+            "presentMarginAtLeast2Pow63CountIgnored": 664
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        }
+      }
+    },
+    "query-control": {
+      "route": {
+        "case": "query-control",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "24e24d5977c52253c88c6ccf783a008dd327d09e9dac6189ed295a628a7a0c30",
+          "runId": "inverse-query-control-r01",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayQueryCompute",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 673,
+            "intervalCount": 672,
+            "durationNanoseconds": 68795280599,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 87499999,
+            "p90NearestRank": 158333281,
+            "p95NearestRank": 162500000,
+            "maximum": 175000001,
+            "over33333000Nanoseconds": 672,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 9.768112,
+          "simulation": {
+            "stateRows": 673,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 263,
+            "catchUpOverrunDelta": 263
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 673,
+              "acceptedPresents": 673,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1344,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 9727309,
+            "presentMarginAtLeast2Pow63CountIgnored": 673
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        },
+        "views": {
+          "landing-sweep": {
+            "pose": {
+              "x": -33.6875,
+              "y": 2.05,
+              "z": -12.7825,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 40,
+              "medianMs": 160.416719,
+              "p95Ms": 170.833281,
+              "maximumMs": 175.000001
+            },
+            "gpu": {
+              "n": 40,
+              "medianMs": 145.8954395,
+              "p95Ms": 150.784007,
+              "maximumMs": 151.468121
+            },
+            "wholeFrameCpu": {
+              "n": 40,
+              "medianMs": 162.040312,
+              "p95Ms": 168.845677,
+              "maximumMs": 169.188958
+            },
+            "simulationCpu": {
+              "n": 40,
+              "medianMs": 4.8966145,
+              "p95Ms": 5.255781,
+              "maximumMs": 5.341823
+            },
+            "detailStepCpu": {
+              "n": 40,
+              "medianMs": 0.0153905,
+              "p95Ms": 0.019635,
+              "maximumMs": 0.039063
+            },
+            "deviceLocalBytes": [
+              160830720
+            ]
+          },
+          "lower-sweep": {
+            "pose": {
+              "x": -33.7,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 53,
+              "medianMs": 75.0,
+              "p95Ms": 83.333334,
+              "maximumMs": 83.333386
+            },
+            "gpu": {
+              "n": 53,
+              "medianMs": 66.459061,
+              "p95Ms": 67.353175,
+              "maximumMs": 67.703488
+            },
+            "wholeFrameCpu": {
+              "n": 53,
+              "medianMs": 75.976823,
+              "p95Ms": 77.285782,
+              "maximumMs": 78.310364
+            },
+            "simulationCpu": {
+              "n": 53,
+              "medianMs": 0.279219,
+              "p95Ms": 0.331302,
+              "maximumMs": 0.435416
+            },
+            "detailStepCpu": {
+              "n": 53,
+              "medianMs": 0.009844,
+              "p95Ms": 0.012813,
+              "maximumMs": 0.017604
+            },
+            "deviceLocalBytes": [
+              160830720
+            ]
+          },
+          "passage-sweep": {
+            "pose": {
+              "x": -22.0192,
+              "y": -0.95,
+              "z": -15.2,
+              "yaw": 1.5708,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 53,
+              "medianMs": 75.0,
+              "p95Ms": 83.333386,
+              "maximumMs": 83.333386
+            },
+            "gpu": {
+              "n": 53,
+              "medianMs": 65.625675,
+              "p95Ms": 72.0138,
+              "maximumMs": 72.335623
+            },
+            "wholeFrameCpu": {
+              "n": 53,
+              "medianMs": 74.921041,
+              "p95Ms": 81.997604,
+              "maximumMs": 82.432136
+            },
+            "simulationCpu": {
+              "n": 53,
+              "medianMs": 0.267604,
+              "p95Ms": 0.3625,
+              "maximumMs": 0.667343
+            },
+            "detailStepCpu": {
+              "n": 53,
+              "medianMs": 0.009271,
+              "p95Ms": 0.012969,
+              "maximumMs": 0.043073
+            },
+            "deviceLocalBytes": [
+              146581056
+            ]
+          },
+          "repeat-ascent": {
+            "pose": {
+              "x": -33.7,
+              "y": 2.05,
+              "z": -12.8,
+              "yaw": 3.14159,
+              "pitch": -0.15
+            },
+            "actualIntervals": {
+              "n": 40,
+              "medianMs": 154.166693,
+              "p95Ms": 162.499999,
+              "maximumMs": 170.833386
+            },
+            "gpu": {
+              "n": 40,
+              "medianMs": 138.097028,
+              "p95Ms": 147.40859,
+              "maximumMs": 150.283538
+            },
+            "wholeFrameCpu": {
+              "n": 40,
+              "medianMs": 154.3217965,
+              "p95Ms": 160.194739,
+              "maximumMs": 168.559375
+            },
+            "simulationCpu": {
+              "n": 40,
+              "medianMs": 2.997786,
+              "p95Ms": 5.36151,
+              "maximumMs": 6.019687
+            },
+            "detailStepCpu": {
+              "n": 40,
+              "medianMs": 0.013073,
+              "p95Ms": 0.017344,
+              "maximumMs": 0.022656
+            },
+            "deviceLocalBytes": [
+              160830720
+            ]
+          }
+        },
+        "fullDeviceLocalBytes": 160830720,
+        "minimumDeviceLocalBytes": 146581056,
+        "peakDeviceLocalBytes": 174306880,
+        "restoredDeviceLocalBytes": 160830720,
+        "runUnloads": 1,
+        "runRestores": 1,
+        "detailStepCpuAll": {
+          "n": 673,
+          "medianMs": 0.010572,
+          "p95Ms": 0.039063,
+          "maximumMs": 3.665104
+        },
+        "transitions": [
+          {
+            "serial": 503,
+            "tick": 3287,
+            "phase": "tomb-backtrack",
+            "seconds": 37.216113164,
+            "unloads": 1,
+            "restores": 0,
+            "actualIntervalWindow": {
+              "n": 25,
+              "medianMs": 75.0,
+              "p95Ms": 83.333386,
+              "maximumMs": 83.33349
+            },
+            "detailStepCpuWindow": {
+              "n": 25,
+              "medianMs": 0.009791,
+              "p95Ms": 0.013385,
+              "maximumMs": 0.02474
+            }
+          },
+          {
+            "serial": 636,
+            "tick": 3924,
+            "phase": "rope-return",
+            "seconds": 47.841113367,
+            "unloads": 1,
+            "restores": 1,
+            "actualIntervalWindow": {
+              "n": 22,
+              "medianMs": 91.6665885,
+              "p95Ms": 99.999948,
+              "maximumMs": 99.999999
+            },
+            "detailStepCpuWindow": {
+              "n": 22,
+              "medianMs": 0.026146,
+              "p95Ms": 0.894844,
+              "maximumMs": 3.551042
+            }
+          }
+        ],
+        "thermalBefore": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 2,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 49.2,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 39.3,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 41.3,
+              "status": 2
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        },
+        "thermalAfter": {
+          "schemaVersion": 1,
+          "temperatureSource": "current HAL",
+          "frameworkStatus": 2,
+          "sensors": {
+            "AP": {
+              "type": 0,
+              "celsius": 48.7,
+              "status": 0
+            },
+            "BAT": {
+              "type": 2,
+              "celsius": 40.1,
+              "status": 0
+            },
+            "SKIN": {
+              "type": 3,
+              "celsius": 42.0,
+              "status": 2
+            }
+          },
+          "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+        }
+      },
+      "stages": {
+        "joinedFrames": 673,
+        "allFrames": {
+          "as": {
+            "n": 673,
+            "medianMs": 0.396094,
+            "p95Ms": 0.564531,
+            "maximumMs": 0.599115
+          },
+          "dispatch": {
+            "n": 673,
+            "medianMs": 75.014321,
+            "p95Ms": 146.706663,
+            "maximumMs": 204.159526
+          },
+          "transfer": {
+            "n": 673,
+            "medianMs": 0.123385,
+            "p95Ms": 0.13651,
+            "maximumMs": 1.974323
+          }
+        },
+        "views": {
+          "landing-sweep": {
+            "as": {
+              "n": 40,
+              "medianMs": 0.54737,
+              "p95Ms": 0.562917,
+              "maximumMs": 0.567344
+            },
+            "dispatch": {
+              "n": 40,
+              "medianMs": 145.2035385,
+              "p95Ms": 150.087653,
+              "maximumMs": 150.77833
+            },
+            "transfer": {
+              "n": 40,
+              "medianMs": 0.128047,
+              "p95Ms": 0.133854,
+              "maximumMs": 0.306198
+            }
+          },
+          "lower-sweep": {
+            "as": {
+              "n": 53,
+              "medianMs": 0.37401,
+              "p95Ms": 0.390052,
+              "maximumMs": 0.398281
+            },
+            "dispatch": {
+              "n": 53,
+              "medianMs": 65.960623,
+              "p95Ms": 66.857498,
+              "maximumMs": 67.19953
+            },
+            "transfer": {
+              "n": 53,
+              "medianMs": 0.123333,
+              "p95Ms": 0.13276,
+              "maximumMs": 0.135781
+            }
+          },
+          "passage-sweep": {
+            "as": {
+              "n": 53,
+              "medianMs": 0.37599,
+              "p95Ms": 0.396719,
+              "maximumMs": 0.400521
+            },
+            "dispatch": {
+              "n": 53,
+              "medianMs": 65.125415,
+              "p95Ms": 71.488123,
+              "maximumMs": 71.825727
+            },
+            "transfer": {
+              "n": 53,
+              "medianMs": 0.117187,
+              "p95Ms": 0.131562,
+              "maximumMs": 0.136875
+            }
+          },
+          "repeat-ascent": {
+            "as": {
+              "n": 40,
+              "medianMs": 0.534219,
+              "p95Ms": 0.554219,
+              "maximumMs": 0.562552
+            },
+            "dispatch": {
+              "n": 40,
+              "medianMs": 137.4446845,
+              "p95Ms": 146.726559,
+              "maximumMs": 149.586976
+            },
+            "transfer": {
+              "n": 40,
+              "medianMs": 0.125547,
+              "p95Ms": 0.136302,
+              "maximumMs": 0.304687
+            }
+          }
+        },
+        "limits": "GPU stage execution intervals; not additive counters or playable FPS. AS brackets UpdateDynamicInstances; dispatch includes all shader work; transfer brackets the post-barrier transfer/copy path.",
+        "strictTiming": {
+          "eligible": true,
+          "reportSha256": "24e24d5977c52253c88c6ccf783a008dd327d09e9dac6189ed295a628a7a0c30",
+          "runId": "inverse-query-control-r01",
+          "workload": "motion-chapter-streamed-comparison-v1",
+          "buildId": "1.6.2",
+          "settings": {
+            "scalePercent": 40,
+            "width": 1440,
+            "height": 2971,
+            "internalWidth": 576,
+            "internalHeight": 1188,
+            "backend": "RayQueryCompute",
+            "water": 1,
+            "fire": 0,
+            "cap": 30,
+            "glass": false,
+            "shadow": 1,
+            "mist": true,
+            "dust": 1
+          },
+          "scope": {
+            "surfaceGeneration": 1,
+            "sceneEpoch": 3,
+            "measurementGeneration": 6,
+            "matchedCompletedFrames": 673,
+            "intervalCount": 672,
+            "durationNanoseconds": 68795280599,
+            "setupPresentationRowsExcluded": 0
+          },
+          "intervalsNanoseconds": {
+            "median": 87499999,
+            "p90NearestRank": 158333281,
+            "p95NearestRank": 162500000,
+            "maximum": 175000001,
+            "over33333000Nanoseconds": 672,
+            "over250000000Nanoseconds": 0
+          },
+          "observedPresentedImageRatePerSecond": 9.768112,
+          "simulation": {
+            "stateRows": 673,
+            "eventRows": 48,
+            "ticksThisFrameMaximum": 6,
+            "catchUpOverrunCountFirst": 0,
+            "catchUpOverrunCountLast": 263,
+            "catchUpOverrunDelta": 263
+          },
+          "collector": {
+            "runCounterDelta": {
+              "preparedPresents": 673,
+              "acceptedPresents": 673,
+              "rejectedPresents": 0,
+              "invalidRegistrations": 0,
+              "invalidMetadata": 0,
+              "pendingCapacityExhausted": 0,
+              "queryCalls": 1344,
+              "queryErrors": 0,
+              "incompleteQueries": 0,
+              "zeroPresentTimestamps": 0,
+              "zeroPresentIds": 0,
+              "unknownPresentIds": 0,
+              "duplicateTimings": 0,
+              "rowCapacityExhausted": 0,
+              "missingOnRebind": 0,
+              "missingOnUnbind": 0,
+              "abandonedPreparedPresents": 0
+            },
+            "queryCpuWallNanoseconds": 9727309,
+            "presentMarginAtLeast2Pow63CountIgnored": 673
+          },
+          "limits": [
+            "Bounded ordinary chapter traversal with zero mid-route image readbacks; recorder overhead remains.",
+            "One continuous resource scope; retry/rotation/lifecycle discontinuities require separate evidence.",
+            "Actual inter-present intervals; not sustained FPS, scanout, photons, GPU reciprocal time, touch latency or owner acceptance.",
+            "Trace extents are native resource observations; this analyzer does not certify appearance, thermals or power."
+          ]
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "pipeline": {
+      "views": {
+        "landing-sweep": {
+          "controlDispatchMedianMs": 142.2235645,
+          "candidateDispatchMedianMs": 138.184684,
+          "observedDeltaPercent": -2.839811049736418
+        },
+        "lower-sweep": {
+          "controlDispatchMedianMs": 68.01979,
+          "candidateDispatchMedianMs": 62.523228,
+          "observedDeltaPercent": -8.080827653246203
+        },
+        "passage-sweep": {
+          "controlDispatchMedianMs": 66.085103,
+          "candidateDispatchMedianMs": 61.817498,
+          "observedDeltaPercent": -6.457741315769761
+        },
+        "repeat-ascent": {
+          "controlDispatchMedianMs": 142.1425485,
+          "candidateDispatchMedianMs": 137.6676265,
+          "observedDeltaPercent": -3.1481931675088726
+        }
+      },
+      "candidateStart": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 1,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 46.9,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 37.6,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 40.3,
+            "status": 1
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "controlStart": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 1,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 47.3,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 37.9,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 40.2,
+            "status": 1
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "candidateEnd": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 1,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 46.6,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 38.4,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 40.9,
+            "status": 1
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "controlEnd": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 1,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 47.9,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 39.0,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 41.2,
+            "status": 1
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "speedupAdmission": "promising descriptive single-pair observation only; starts within0.4C/status1, no clock/power control or repeated sustained proof"
+    },
+    "query": {
+      "views": {
+        "landing-sweep": {
+          "controlDispatchMedianMs": 145.2035385,
+          "candidateDispatchMedianMs": 135.601768,
+          "observedDeltaPercent": -6.612628451888602
+        },
+        "lower-sweep": {
+          "controlDispatchMedianMs": 65.960623,
+          "candidateDispatchMedianMs": 66.128592,
+          "observedDeltaPercent": 0.2546504146875517
+        },
+        "passage-sweep": {
+          "controlDispatchMedianMs": 65.125415,
+          "candidateDispatchMedianMs": 65.018071,
+          "observedDeltaPercent": -0.16482658882096546
+        },
+        "repeat-ascent": {
+          "controlDispatchMedianMs": 137.4446845,
+          "candidateDispatchMedianMs": 136.437627,
+          "observedDeltaPercent": -0.7327002158457496
+        }
+      },
+      "candidateStart": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 45.2,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 35.3,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 38.4,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "controlStart": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 2,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 49.2,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 39.3,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 41.3,
+            "status": 2
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "candidateEnd": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 44.2,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 36.6,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 39.5,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "controlEnd": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 2,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 48.7,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 40.1,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 42.0,
+            "status": 2
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "speedupAdmission": "EXCLUDED: starts thermally mismatched, status0 versus2; no causal gain claim"
+    }
+  },
+  "joinedFrames": 2708,
+  "keeper": [
+    {
+      "case": "pipeline-candidate",
+      "scope": "Existing frozen legacy lich maintaining-range checkpoint; not live combat or lightning; not authored chapter framing",
+      "checkpoint": "lich",
+      "player": {
+        "x": -33.25,
+        "z": -14.25,
+        "yaw": 2.52,
+        "pitch": 0.0,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "phase": {
+        "phase": "maintaining-range",
+        "health": 3,
+        "roofProgress": 0.0,
+        "ending": "inactive",
+        "dawnProgress": 0.0
+      },
+      "animationTime": 0.0,
+      "hostLoopWindowMeansMs": [
+        43.956,
+        43.821,
+        43.819
+      ],
+      "gpuPeriodicAggregateSnapshot": {
+        "status": "GPU RT command-buffer timing is available.",
+        "supported": true,
+        "valid": true,
+        "latestMs": 42.056561,
+        "averageMs": 42.246727,
+        "timestampPeriodNanoseconds": 52.0833,
+        "timestampValidBits": 48,
+        "sampleCount": 390,
+        "unavailableCount": 0,
+        "errorCount": 0
+      },
+      "gpuSnapshotLimit": "Periodic capability aggregate (390 samples), includes warmup; not final or phase-isolated per-frame data, median, actual display time or FPS",
+      "thermalBefore": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 44.8,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 35.7,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 38.8,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAfter": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 1,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 46.8,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 37.2,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 40.2,
+            "status": 1
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "fireLighting": {
+        "count": 2,
+        "emitters": [
+          {
+            "stableId": 3,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -16.3250008,
+              0.879999995
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.879999995
+            ]
+          },
+          {
+            "stableId": 4,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -14.0250006,
+              0.879999995
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.879999995
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "pipeline-control",
+      "scope": "Existing frozen legacy lich maintaining-range checkpoint; not live combat or lightning; not authored chapter framing",
+      "checkpoint": "lich",
+      "player": {
+        "x": -33.25,
+        "z": -14.25,
+        "yaw": 2.52,
+        "pitch": 0.0,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "phase": {
+        "phase": "maintaining-range",
+        "health": 3,
+        "roofProgress": 0.0,
+        "ending": "inactive",
+        "dawnProgress": 0.0
+      },
+      "animationTime": 0.0,
+      "hostLoopWindowMeansMs": [
+        44.292,
+        44.205,
+        44.24
+      ],
+      "gpuPeriodicAggregateSnapshot": {
+        "status": "GPU RT command-buffer timing is available.",
+        "supported": true,
+        "valid": true,
+        "latestMs": 42.491978,
+        "averageMs": 42.613026,
+        "timestampPeriodNanoseconds": 52.0833,
+        "timestampValidBits": 48,
+        "sampleCount": 390,
+        "unavailableCount": 0,
+        "errorCount": 0
+      },
+      "gpuSnapshotLimit": "Periodic capability aggregate (390 samples), includes warmup; not final or phase-isolated per-frame data, median, actual display time or FPS",
+      "thermalBefore": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 40.8,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 35.3,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 37.3,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAfter": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 1,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 46.3,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 37.7,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 40.0,
+            "status": 1
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "fireLighting": {
+        "count": 2,
+        "emitters": [
+          {
+            "stableId": 3,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -16.3250008,
+              0.879999995
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.879999995
+            ]
+          },
+          {
+            "stableId": 4,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -14.0250006,
+              0.879999995
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.879999995
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "query-candidate",
+      "scope": "Existing frozen legacy lich maintaining-range checkpoint; not live combat or lightning; not authored chapter framing",
+      "checkpoint": "lich",
+      "player": {
+        "x": -33.25,
+        "z": -14.25,
+        "yaw": 2.52,
+        "pitch": 0.0,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "phase": {
+        "phase": "maintaining-range",
+        "health": 3,
+        "roofProgress": 0.0,
+        "ending": "inactive",
+        "dawnProgress": 0.0
+      },
+      "animationTime": 0.0,
+      "hostLoopWindowMeansMs": [
+        44.698,
+        44.612,
+        44.627
+      ],
+      "gpuPeriodicAggregateSnapshot": {
+        "status": "GPU RT command-buffer timing is available.",
+        "supported": true,
+        "valid": true,
+        "latestMs": 43.087967,
+        "averageMs": 43.241165,
+        "timestampPeriodNanoseconds": 52.0833,
+        "timestampValidBits": 48,
+        "sampleCount": 390,
+        "unavailableCount": 0,
+        "errorCount": 0
+      },
+      "gpuSnapshotLimit": "Periodic capability aggregate (390 samples), includes warmup; not final or phase-isolated per-frame data, median, actual display time or FPS",
+      "thermalBefore": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 38.2,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 34.2,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 36.0,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAfter": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 44.8,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 35.7,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 38.8,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "fireLighting": {
+        "count": 2,
+        "emitters": [
+          {
+            "stableId": 3,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -16.3250008,
+              0.879999995
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.879999995
+            ]
+          },
+          {
+            "stableId": 4,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -14.0250006,
+              0.879999995
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.879999995
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "query-control",
+      "scope": "Existing frozen legacy lich maintaining-range checkpoint; not live combat or lightning; not authored chapter framing",
+      "checkpoint": "lich",
+      "player": {
+        "x": -33.25,
+        "z": -14.25,
+        "yaw": 2.52,
+        "pitch": 0.0,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "phase": {
+        "phase": "maintaining-range",
+        "health": 3,
+        "roofProgress": 0.0,
+        "ending": "inactive",
+        "dawnProgress": 0.0
+      },
+      "animationTime": 0.0,
+      "hostLoopWindowMeansMs": [
+        63.425,
+        45.913,
+        44.958
+      ],
+      "gpuPeriodicAggregateSnapshot": {
+        "status": "GPU RT command-buffer timing is available.",
+        "supported": true,
+        "valid": true,
+        "latestMs": 43.527657,
+        "averageMs": 60.590218,
+        "timestampPeriodNanoseconds": 52.0833,
+        "timestampValidBits": 48,
+        "sampleCount": 390,
+        "unavailableCount": 0,
+        "errorCount": 0
+      },
+      "gpuSnapshotLimit": "Periodic capability aggregate (390 samples), includes warmup; not final or phase-isolated per-frame data, median, actual display time or FPS",
+      "thermalBefore": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 1,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 47.6,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 39.0,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 41.1,
+            "status": 1
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "thermalAfter": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 2,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 48.0,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 38.9,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 41.1,
+            "status": 2
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "fireLighting": {
+        "count": 2,
+        "emitters": [
+          {
+            "stableId": 3,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -16.3250008,
+              0.879999995
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.879999995
+            ]
+          },
+          {
+            "stableId": 4,
+            "positionStrength": [
+              -35.5,
+              0.99000001,
+              -14.0250006,
+              0.879999995
+            ],
+            "colourIntensity": [
+              1,
+              0.454959989,
+              0.0977689251,
+              0.879999995
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "stableId": 0,
+            "positionStrength": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "colourIntensity": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "productionAdoption": false
+}

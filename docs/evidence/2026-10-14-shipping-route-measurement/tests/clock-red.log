@@ -1,0 +1,15 @@
+fast render frames must not invent a60Hz simulation tick
+wall-clock route must consume every complete authoritative tick
+same time must not repeat an input/step
+slow frame must retain debt behind the four-tick per-render bound
+bounded catch-up must neither skip nor duplicate route actions
+rejected clock samples must leave the valid cadence intact
+new measurement must have no inherited time or input debt
+claim-site position=-34,-17.55 prompt=0 phase=4
+cycle=0 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511613
+unready-edge start=-33.7,-12.8 end=-33.0742,-11.9239 blocked=1
+cycle=1 ascent-end phase=4 root=-33.7,2.05,-12.8
+upper lantern hand depth=0.69 localY=0.0511825
+Combined CPU preparation resident_ns=1144600 staged_ns=1222700 resident_retained_bytes=25344 staged_retained_bytes=25344 resident_peak_capacity_bytes=48096 staged_peak_capacity_bytes=48096 gpu_residency_comparison=NOT_MEASURED
+Rescue journey integration cases=16214 failures=7 retained_triangles=528

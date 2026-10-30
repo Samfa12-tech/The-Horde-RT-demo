@@ -1,0 +1,28 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 45
+    Start 45: horde_rt_player_directional_rig_tests
+
+45: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_player_directional_rig_tests.exe" "<repo>"
+45: Working Directory: <repo>/build/presets/windows-x64-debug
+45: Test timeout computed to be: 1500
+45: FAIL: real-rig route travel must resolve both the 12 cm step and raised slope
+1/1 Test #45: horde_rt_player_directional_rig_tests ...***Failed    4.56 sec
+FAIL: real-rig route travel must resolve both the 12 cm step and raised slope
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   4.57 sec
+
+The following tests FAILED:
+	 45 - horde_rt_player_directional_rig_tests (Failed)
+Errors while running CTest

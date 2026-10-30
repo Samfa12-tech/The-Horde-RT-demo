@@ -1,0 +1,1059 @@
+{
+  "schema": 1,
+  "status": "frozen",
+  "target": {
+    "environment": "vulkan1.2",
+    "stage": "comp",
+    "executionModel": "GLCompute",
+    "executionBackend": "RayQueryCompute",
+    "localSize": [
+      8,
+      8,
+      1
+    ],
+    "hardwareTraversal": "RayQueryKHR"
+  },
+  "generator": {
+    "path": "tools/GenerateRayQueryComputeVariants.ps1",
+    "interface": "freeze-v1",
+    "sha256": "2a84431d3bcd0bc31e247578b001fd76d41d732092298a939418e335b7fece4b"
+  },
+  "toolchain": {
+    "glslangValidator": {
+      "version": "Glslang Version: 11:16.2.0 ESSL Version: OpenGL ES GLSL 3.20 glslang Khronos. 16.2.0 GLSL Version: 4.60 glslang Khronos. 16.2.0 SPIR-V Version 0x00010600, Revision 1 GLSL.std.450 Version 100, Revision 1 Khronos Tool ID 8 SPIR-V Generator Version 11 GL_KHR_vulkan_glsl version 100 ARB_GL_gl_spirv version 100",
+      "preprocessArguments": [
+        "-E",
+        "-S",
+        "comp",
+        "<source>"
+      ]
+    },
+    "spirvOpt": {
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a"
+    },
+    "spirvVal": {
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a Targets: SPIR-V 1.0 SPIR-V 1.1 SPIR-V 1.2 SPIR-V 1.3 SPIR-V 1.4 SPIR-V 1.5 SPIR-V 1.6 SPIR-V 1.2 (under OpenCL 2.2 Full Profile semantics) SPIR-V 1.0 (under Vulkan 1.0 semantics) SPIR-V 1.3 (under Vulkan 1.1 semantics) SPIR-V 1.4 (under Vulkan 1.1 semantics) SPIR-V 1.5 (under Vulkan 1.2 semantics) SPIR-V 1.6 (under Vulkan 1.3 semantics) SPIR-V 1.6 (under Vulkan 1.4 semantics)"
+    },
+    "spirvDis": {
+      "version": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a Target: SPIR-V 1.5"
+    }
+  },
+  "authorities": {
+    "policyManifest": {
+      "path": "tools/raygen-variants.json",
+      "sha256": "39276571a06644307dd36db0cf7265b7ee43e5bfc912932be06bb0503b34e30d"
+    },
+    "source": {
+      "path": "shaders/raytracing/minimal.comp",
+      "sha256": "3e6dbdd9495c074dd40dbb783cc198c51c2e714270eaad291f6480dd449ad5b2"
+    },
+    "dependencies": [
+      {
+        "path": "shaders/raytracing/minimal.comp",
+        "sha256": "3e6dbdd9495c074dd40dbb783cc198c51c2e714270eaad291f6480dd449ad5b2"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_variant_config.glsl",
+        "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_frame.glsl",
+        "sha256": "dfb391706b461d2360d0a3937bc53cbdbcd66a62bebd57a4fc88ff516eecfaf6"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+        "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+        "sha256": "2ab194d0e58f92e962090f711ab2863a78745bac289e2bf3420a239a5c004299"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+        "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_lighting.glsl",
+        "sha256": "c92c79fa1708f599e0c8de3e81fddb6ccd0c59f8d0a12459f1fb3feeaa13f0a2"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_fire.glsl",
+        "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+        "sha256": "2977362ff69105c95af13647b8fbc5d84156270fdeb505962ec8da795a8110c3"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+        "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+        "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+        "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+        "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+        "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+      }
+    ]
+  },
+  "variants": [
+    {
+      "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+      "policyKey": "diagnostic_high_generic_dielectric",
+      "instrumentation": "Diagnostic",
+      "quality": "High",
+      "material": "GenericDielectric",
+      "strategy": "GenericRetained",
+      "shippingAllowed": false,
+      "executionBackend": "RayQueryCompute",
+      "stage": "comp",
+      "executionModel": "GLCompute",
+      "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+      "dependencySha256": "4b9e42a3e8fe074f868fc57986e31bef9f43ade5147d4f57e08ae3bf24026532",
+      "dependencies": [
+        {
+          "path": "shaders/raytracing/minimal.comp",
+          "sha256": "3e6dbdd9495c074dd40dbb783cc198c51c2e714270eaad291f6480dd449ad5b2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_variant_config.glsl",
+          "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_frame.glsl",
+          "sha256": "dfb391706b461d2360d0a3937bc53cbdbcd66a62bebd57a4fc88ff516eecfaf6"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+          "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+          "sha256": "2ab194d0e58f92e962090f711ab2863a78745bac289e2bf3420a239a5c004299"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+          "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_lighting.glsl",
+          "sha256": "c92c79fa1708f599e0c8de3e81fddb6ccd0c59f8d0a12459f1fb3feeaa13f0a2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_fire.glsl",
+          "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+          "sha256": "2977362ff69105c95af13647b8fbc5d84156270fdeb505962ec8da795a8110c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+          "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+          "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+          "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+          "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+        }
+      ],
+      "includeSha256": "aae0f51c88973e0f0d5246bb3c2c6bb4c9c49f04b7df076929a0d46eed9721f1",
+      "spirvSha256": "4f2f2025fc44c3cf56596b63c44e687e74fdddee355300ba2ab6cd0d11fa4267",
+      "bytes": 296208,
+      "words": 74052,
+      "instructions": 17634,
+      "branchOperations": 965,
+      "loops": 21,
+      "selectionMerges": 407,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41,
+      "hasDiagnosticsBinding": true,
+      "compiler": {
+        "glslangCompileArguments": [
+          "-V",
+          "--target-env",
+          "vulkan1.2",
+          "-S",
+          "comp",
+          "-DHORDE_RT_VARIANT_INSTRUMENTATION=1",
+          "-DHORDE_RT_VARIANT_QUALITY=1",
+          "-DHORDE_RT_VARIANT_MATERIAL=1",
+          "-o",
+          "<output>",
+          "<source>"
+        ],
+        "spirvOptArguments": [
+          "--eliminate-dead-functions",
+          "--eliminate-dead-code-aggressive",
+          "--simplify-instructions",
+          "--eliminate-dead-branches",
+          "--cfg-cleanup",
+          "<input>",
+          "-o",
+          "<output>"
+        ],
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
+        ]
+      }
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_opaque_fast",
+      "policyKey": "diagnostic_high_opaque_fast",
+      "instrumentation": "Diagnostic",
+      "quality": "High",
+      "material": "OpaqueFast",
+      "strategy": "LegacyInlined",
+      "shippingAllowed": false,
+      "executionBackend": "RayQueryCompute",
+      "stage": "comp",
+      "executionModel": "GLCompute",
+      "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+      "dependencySha256": "ab729327e8c97d3a1760ac7b616aace0873963bd42d0fa78357b7c18b30bb0f3",
+      "dependencies": [
+        {
+          "path": "shaders/raytracing/minimal.comp",
+          "sha256": "3e6dbdd9495c074dd40dbb783cc198c51c2e714270eaad291f6480dd449ad5b2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_variant_config.glsl",
+          "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_frame.glsl",
+          "sha256": "dfb391706b461d2360d0a3937bc53cbdbcd66a62bebd57a4fc88ff516eecfaf6"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+          "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+          "sha256": "2ab194d0e58f92e962090f711ab2863a78745bac289e2bf3420a239a5c004299"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+          "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_lighting.glsl",
+          "sha256": "c92c79fa1708f599e0c8de3e81fddb6ccd0c59f8d0a12459f1fb3feeaa13f0a2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_fire.glsl",
+          "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+          "sha256": "2977362ff69105c95af13647b8fbc5d84156270fdeb505962ec8da795a8110c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+          "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+          "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+          "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+          "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+        }
+      ],
+      "includeSha256": "cacecb5aadf94ef0aeaee958a45b4c9ddd9d0e620f4e35fbdbd53df47bfc8065",
+      "spirvSha256": "c28c130727f7be64b815843197c84a83e3bd3db21df068d9ec8f2fdb113f8643",
+      "bytes": 587828,
+      "words": 146957,
+      "instructions": 32376,
+      "branchOperations": 4364,
+      "loops": 84,
+      "selectionMerges": 1746,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 29,
+      "atomicInstructions": 5,
+      "hasDiagnosticsBinding": true,
+      "compiler": {
+        "glslangCompileArguments": [
+          "-V",
+          "--target-env",
+          "vulkan1.2",
+          "-S",
+          "comp",
+          "-Os",
+          "-DHORDE_RT_VARIANT_INSTRUMENTATION=1",
+          "-DHORDE_RT_VARIANT_QUALITY=1",
+          "-DHORDE_RT_VARIANT_MATERIAL=0",
+          "-o",
+          "<output>",
+          "<source>"
+        ],
+        "spirvOptArguments": [
+          "-O",
+          "<input>",
+          "-o",
+          "<output>"
+        ],
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
+        ]
+      }
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+      "policyKey": "diagnostic_mobile_generic_dielectric",
+      "instrumentation": "Diagnostic",
+      "quality": "Mobile",
+      "material": "GenericDielectric",
+      "strategy": "GenericRetained",
+      "shippingAllowed": false,
+      "executionBackend": "RayQueryCompute",
+      "stage": "comp",
+      "executionModel": "GLCompute",
+      "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+      "dependencySha256": "147679c55bf73f9c9b3f7cb6da00a4bd12f0374717b93250649b3b9799a32162",
+      "dependencies": [
+        {
+          "path": "shaders/raytracing/minimal.comp",
+          "sha256": "3e6dbdd9495c074dd40dbb783cc198c51c2e714270eaad291f6480dd449ad5b2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_variant_config.glsl",
+          "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_frame.glsl",
+          "sha256": "dfb391706b461d2360d0a3937bc53cbdbcd66a62bebd57a4fc88ff516eecfaf6"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+          "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+          "sha256": "2ab194d0e58f92e962090f711ab2863a78745bac289e2bf3420a239a5c004299"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+          "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_lighting.glsl",
+          "sha256": "c92c79fa1708f599e0c8de3e81fddb6ccd0c59f8d0a12459f1fb3feeaa13f0a2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_fire.glsl",
+          "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+          "sha256": "2977362ff69105c95af13647b8fbc5d84156270fdeb505962ec8da795a8110c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+          "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+          "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+          "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+          "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+        }
+      ],
+      "includeSha256": "c6759d8d38d147174437d36c82acbb289716195db3d3e968a18acecf534e1e0c",
+      "spirvSha256": "f79f00b1f44eece4f709d82c5230a86dd3893db74f63a791a137b2a804e5660e",
+      "bytes": 294708,
+      "words": 73677,
+      "instructions": 17538,
+      "branchOperations": 956,
+      "loops": 20,
+      "selectionMerges": 405,
+      "functions": 83,
+      "functionCalls": 261,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 41,
+      "hasDiagnosticsBinding": true,
+      "compiler": {
+        "glslangCompileArguments": [
+          "-V",
+          "--target-env",
+          "vulkan1.2",
+          "-S",
+          "comp",
+          "-DHORDE_RT_VARIANT_INSTRUMENTATION=1",
+          "-DHORDE_RT_VARIANT_QUALITY=0",
+          "-DHORDE_RT_VARIANT_MATERIAL=1",
+          "-o",
+          "<output>",
+          "<source>"
+        ],
+        "spirvOptArguments": [
+          "--eliminate-dead-functions",
+          "--eliminate-dead-code-aggressive",
+          "--simplify-instructions",
+          "--eliminate-dead-branches",
+          "--cfg-cleanup",
+          "<input>",
+          "-o",
+          "<output>"
+        ],
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
+        ]
+      }
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+      "policyKey": "diagnostic_mobile_opaque_fast",
+      "instrumentation": "Diagnostic",
+      "quality": "Mobile",
+      "material": "OpaqueFast",
+      "strategy": "LegacyInlined",
+      "shippingAllowed": false,
+      "executionBackend": "RayQueryCompute",
+      "stage": "comp",
+      "executionModel": "GLCompute",
+      "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+      "dependencySha256": "91c57a785b48774e7c9164cb7ec051d6c7742d4576e498cd052235258f7e0f3b",
+      "dependencies": [
+        {
+          "path": "shaders/raytracing/minimal.comp",
+          "sha256": "3e6dbdd9495c074dd40dbb783cc198c51c2e714270eaad291f6480dd449ad5b2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_variant_config.glsl",
+          "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_frame.glsl",
+          "sha256": "dfb391706b461d2360d0a3937bc53cbdbcd66a62bebd57a4fc88ff516eecfaf6"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+          "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+          "sha256": "2ab194d0e58f92e962090f711ab2863a78745bac289e2bf3420a239a5c004299"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+          "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_lighting.glsl",
+          "sha256": "c92c79fa1708f599e0c8de3e81fddb6ccd0c59f8d0a12459f1fb3feeaa13f0a2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_fire.glsl",
+          "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+          "sha256": "2977362ff69105c95af13647b8fbc5d84156270fdeb505962ec8da795a8110c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+          "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+          "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+          "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+          "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+        }
+      ],
+      "includeSha256": "9cb56bade0f0623491799101ad02a0faf10a75301245020689d04119b26cdf1e",
+      "spirvSha256": "a9fda7f2776885dcbe872849f1dedcc2cef60df548340ab3163c6f2e04cbfd3a",
+      "bytes": 584880,
+      "words": 146220,
+      "instructions": 32195,
+      "branchOperations": 4332,
+      "loops": 80,
+      "selectionMerges": 1738,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 27,
+      "atomicInstructions": 5,
+      "hasDiagnosticsBinding": true,
+      "compiler": {
+        "glslangCompileArguments": [
+          "-V",
+          "--target-env",
+          "vulkan1.2",
+          "-S",
+          "comp",
+          "-Os",
+          "-DHORDE_RT_VARIANT_INSTRUMENTATION=1",
+          "-DHORDE_RT_VARIANT_QUALITY=0",
+          "-DHORDE_RT_VARIANT_MATERIAL=0",
+          "-o",
+          "<output>",
+          "<source>"
+        ],
+        "spirvOptArguments": [
+          "-O",
+          "<input>",
+          "-o",
+          "<output>"
+        ],
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
+        ]
+      }
+    },
+    {
+      "key": "rayquery_compute_shipping_high_generic_dielectric",
+      "policyKey": "shipping_high_generic_dielectric",
+      "instrumentation": "Shipping",
+      "quality": "High",
+      "material": "GenericDielectric",
+      "strategy": "GenericRetained",
+      "shippingAllowed": true,
+      "executionBackend": "RayQueryCompute",
+      "stage": "comp",
+      "executionModel": "GLCompute",
+      "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+      "dependencySha256": "38eadaab5df4fcfb18ebf930654a97d7f3cdfbbbf2813c939a420873841382bd",
+      "dependencies": [
+        {
+          "path": "shaders/raytracing/minimal.comp",
+          "sha256": "3e6dbdd9495c074dd40dbb783cc198c51c2e714270eaad291f6480dd449ad5b2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_variant_config.glsl",
+          "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_frame.glsl",
+          "sha256": "dfb391706b461d2360d0a3937bc53cbdbcd66a62bebd57a4fc88ff516eecfaf6"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+          "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+          "sha256": "2ab194d0e58f92e962090f711ab2863a78745bac289e2bf3420a239a5c004299"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+          "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_lighting.glsl",
+          "sha256": "c92c79fa1708f599e0c8de3e81fddb6ccd0c59f8d0a12459f1fb3feeaa13f0a2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_fire.glsl",
+          "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+          "sha256": "2977362ff69105c95af13647b8fbc5d84156270fdeb505962ec8da795a8110c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+          "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+          "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+          "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+          "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+        }
+      ],
+      "includeSha256": "d8caf70e387539a2c04355e839c35e92fec97165477938c30382aa6bebc9d36f",
+      "spirvSha256": "23099c2bbb9c90e741dbb6ef31cfadc1917fa115de06f4d4ab9706af711d6ac5",
+      "bytes": 287380,
+      "words": 71845,
+      "instructions": 17210,
+      "branchOperations": 918,
+      "loops": 21,
+      "selectionMerges": 379,
+      "functions": 83,
+      "functionCalls": 264,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false,
+      "compiler": {
+        "glslangCompileArguments": [
+          "-V",
+          "--target-env",
+          "vulkan1.2",
+          "-S",
+          "comp",
+          "-DHORDE_RT_VARIANT_INSTRUMENTATION=0",
+          "-DHORDE_RT_VARIANT_QUALITY=1",
+          "-DHORDE_RT_VARIANT_MATERIAL=1",
+          "-o",
+          "<output>",
+          "<source>"
+        ],
+        "spirvOptArguments": [
+          "--eliminate-dead-functions",
+          "--eliminate-dead-code-aggressive",
+          "--simplify-instructions",
+          "--eliminate-dead-branches",
+          "--cfg-cleanup",
+          "<input>",
+          "-o",
+          "<output>"
+        ],
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
+        ]
+      }
+    },
+    {
+      "key": "rayquery_compute_shipping_high_opaque_fast",
+      "policyKey": "shipping_high_opaque_fast",
+      "instrumentation": "Shipping",
+      "quality": "High",
+      "material": "OpaqueFast",
+      "strategy": "LegacyInlined",
+      "shippingAllowed": true,
+      "executionBackend": "RayQueryCompute",
+      "stage": "comp",
+      "executionModel": "GLCompute",
+      "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+      "dependencySha256": "2c8b6406cbc04d3809362b1ba0e3264b9fe7b472e7db4dafd4af15b069b59faa",
+      "dependencies": [
+        {
+          "path": "shaders/raytracing/minimal.comp",
+          "sha256": "3e6dbdd9495c074dd40dbb783cc198c51c2e714270eaad291f6480dd449ad5b2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_variant_config.glsl",
+          "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_frame.glsl",
+          "sha256": "dfb391706b461d2360d0a3937bc53cbdbcd66a62bebd57a4fc88ff516eecfaf6"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+          "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+          "sha256": "2ab194d0e58f92e962090f711ab2863a78745bac289e2bf3420a239a5c004299"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+          "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_lighting.glsl",
+          "sha256": "c92c79fa1708f599e0c8de3e81fddb6ccd0c59f8d0a12459f1fb3feeaa13f0a2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_fire.glsl",
+          "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+          "sha256": "2977362ff69105c95af13647b8fbc5d84156270fdeb505962ec8da795a8110c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+          "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+          "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+          "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+          "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+        }
+      ],
+      "includeSha256": "1c0163136582d902df71b02611f40666da4ca22a9435b39b0cfe66f70e4a0cf6",
+      "spirvSha256": "14054111d6943b4bd0767c97a8ed05588c4006c9f92ed4682d054d067bfa3350",
+      "bytes": 583592,
+      "words": 145898,
+      "instructions": 32197,
+      "branchOperations": 4342,
+      "loops": 84,
+      "selectionMerges": 1737,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 29,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false,
+      "compiler": {
+        "glslangCompileArguments": [
+          "-V",
+          "--target-env",
+          "vulkan1.2",
+          "-S",
+          "comp",
+          "-Os",
+          "-DHORDE_RT_VARIANT_INSTRUMENTATION=0",
+          "-DHORDE_RT_VARIANT_QUALITY=1",
+          "-DHORDE_RT_VARIANT_MATERIAL=0",
+          "-o",
+          "<output>",
+          "<source>"
+        ],
+        "spirvOptArguments": [
+          "-O",
+          "<input>",
+          "-o",
+          "<output>"
+        ],
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
+        ]
+      }
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "policyKey": "shipping_mobile_generic_dielectric",
+      "instrumentation": "Shipping",
+      "quality": "Mobile",
+      "material": "GenericDielectric",
+      "strategy": "GenericRetained",
+      "shippingAllowed": true,
+      "executionBackend": "RayQueryCompute",
+      "stage": "comp",
+      "executionModel": "GLCompute",
+      "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+      "dependencySha256": "78c0d2beef5e734b09a3062b010023d9b84859df3f044bd88bbd74e340643104",
+      "dependencies": [
+        {
+          "path": "shaders/raytracing/minimal.comp",
+          "sha256": "3e6dbdd9495c074dd40dbb783cc198c51c2e714270eaad291f6480dd449ad5b2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_variant_config.glsl",
+          "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_frame.glsl",
+          "sha256": "dfb391706b461d2360d0a3937bc53cbdbcd66a62bebd57a4fc88ff516eecfaf6"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+          "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+          "sha256": "2ab194d0e58f92e962090f711ab2863a78745bac289e2bf3420a239a5c004299"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+          "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_lighting.glsl",
+          "sha256": "c92c79fa1708f599e0c8de3e81fddb6ccd0c59f8d0a12459f1fb3feeaa13f0a2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_fire.glsl",
+          "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+          "sha256": "2977362ff69105c95af13647b8fbc5d84156270fdeb505962ec8da795a8110c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+          "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+          "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+          "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+          "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+        }
+      ],
+      "includeSha256": "098e4177ea6e44ad353ee021a81c4c153a5b53420b681fa9930b59650ee3fa5b",
+      "spirvSha256": "992e40938323dea3aac8bdf831b5df5240cd128f4ce7a44722faf485845fc4ee",
+      "bytes": 285880,
+      "words": 71470,
+      "instructions": 17114,
+      "branchOperations": 909,
+      "loops": 20,
+      "selectionMerges": 377,
+      "functions": 83,
+      "functionCalls": 261,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false,
+      "compiler": {
+        "glslangCompileArguments": [
+          "-V",
+          "--target-env",
+          "vulkan1.2",
+          "-S",
+          "comp",
+          "-DHORDE_RT_VARIANT_INSTRUMENTATION=0",
+          "-DHORDE_RT_VARIANT_QUALITY=0",
+          "-DHORDE_RT_VARIANT_MATERIAL=1",
+          "-o",
+          "<output>",
+          "<source>"
+        ],
+        "spirvOptArguments": [
+          "--eliminate-dead-functions",
+          "--eliminate-dead-code-aggressive",
+          "--simplify-instructions",
+          "--eliminate-dead-branches",
+          "--cfg-cleanup",
+          "<input>",
+          "-o",
+          "<output>"
+        ],
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
+        ]
+      }
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "policyKey": "shipping_mobile_opaque_fast",
+      "instrumentation": "Shipping",
+      "quality": "Mobile",
+      "material": "OpaqueFast",
+      "strategy": "LegacyInlined",
+      "shippingAllowed": true,
+      "executionBackend": "RayQueryCompute",
+      "stage": "comp",
+      "executionModel": "GLCompute",
+      "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+      "dependencySha256": "cf23eb7764e443ed31ec23f3a65226887da186e6ea040531325af6ae9095a231",
+      "dependencies": [
+        {
+          "path": "shaders/raytracing/minimal.comp",
+          "sha256": "3e6dbdd9495c074dd40dbb783cc198c51c2e714270eaad291f6480dd449ad5b2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_variant_config.glsl",
+          "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_frame.glsl",
+          "sha256": "dfb391706b461d2360d0a3937bc53cbdbcd66a62bebd57a4fc88ff516eecfaf6"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+          "sha256": "b67d926e227b18d51d29f3b25d8ed628b81748b8f925287495baa50acadf8b2a"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+          "sha256": "2ab194d0e58f92e962090f711ab2863a78745bac289e2bf3420a239a5c004299"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+          "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_lighting.glsl",
+          "sha256": "c92c79fa1708f599e0c8de3e81fddb6ccd0c59f8d0a12459f1fb3feeaa13f0a2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_fire.glsl",
+          "sha256": "47228a17f5a450ca533b0cb100b887a1aaf182b9c49691213ab06e37606598ee"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+          "sha256": "2977362ff69105c95af13647b8fbc5d84156270fdeb505962ec8da795a8110c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+          "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+          "sha256": "6c5ac0ebc893d74142d93b660c73730f278b0811ab25db284f93c82300500e77"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+          "sha256": "d58c7a6334f5b23be109863d213053a0cbf2dbcc7132077a248085f347f0e9c2"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+          "sha256": "48f47db9214ad8f085091793f3c4bc7259a2f7788775d6b199792439b6900edc"
+        },
+        {
+          "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+          "sha256": "89cdb898388dfeeff25227c4efde8f4ca9f2e851d4309d949bf3a767b55e3bf5"
+        }
+      ],
+      "includeSha256": "4b9daf1b88a0d19a3380d3e2e4b18d5bc8fff369344767be82df9dfe6717ab7c",
+      "spirvSha256": "01289f6a4c4533e4194cde693cb1eae4b5a5d77b8bbecac663458c28e1ad6001",
+      "bytes": 580644,
+      "words": 145161,
+      "instructions": 32016,
+      "branchOperations": 4310,
+      "loops": 80,
+      "selectionMerges": 1729,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 27,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false,
+      "compiler": {
+        "glslangCompileArguments": [
+          "-V",
+          "--target-env",
+          "vulkan1.2",
+          "-S",
+          "comp",
+          "-Os",
+          "-DHORDE_RT_VARIANT_INSTRUMENTATION=0",
+          "-DHORDE_RT_VARIANT_QUALITY=0",
+          "-DHORDE_RT_VARIANT_MATERIAL=0",
+          "-o",
+          "<output>",
+          "<source>"
+        ],
+        "spirvOptArguments": [
+          "-O",
+          "<input>",
+          "-o",
+          "<output>"
+        ],
+        "spirvValArguments": [
+          "--target-env",
+          "vulkan1.2",
+          "<input>"
+        ],
+        "spirvDisArguments": [
+          "<input>",
+          "-o",
+          "<output>"
+        ]
+      }
+    }
+  ]
+}

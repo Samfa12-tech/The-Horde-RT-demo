@@ -1,0 +1,65 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 152
+    Start 152: horde_rt_rescue_traversal_tests
+
+152: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_traversal_tests.exe"
+152: Working Directory: <repo>/build/presets/windows-x64-debug
+152: Test timeout computed to be: 1500
+152: Lower grip selection indices=6.5,7.25 points=-33.8961,0.836048,-15.3644|-33.9358,0.51199,-15.398
+152: Ascent trace tick=0 root=-33.7,-0.925,-15.2 midpoint=-33.9262,0.699839,-15.3987 root_delta=0,0.025,0 support_error=-0.000820339 bumped=0 grip_radial=0.272539,0.329873 indices=6.48043,7.25
+152: Ascent trace tick=1 root=-33.7,-0.9,-15.2 midpoint=-33.9377,0.726682,-15.4144 root_delta=0,0.025,0 support_error=-0.00266343 bumped=0 grip_radial=0.287557,0.354018 indices=6.42846,7.25
+152: Ascent trace tick=2 root=-33.7,-0.875,-15.2 midpoint=-33.9517,0.752566,-15.4277 root_delta=0,0.025,0 support_error=-0.00354761 bumped=0 grip_radial=0.301973,0.379941 indices=6.35423,7.25
+152: Ascent trace tick=3 root=-33.7,-0.85,-15.2 midpoint=-33.968,0.776538,-15.4387 root_delta=0,0.025,0 support_error=-0.00251913 bumped=0 grip_radial=0.316403,0.407232 indices=6.26784,7.25
+152: First traversal anchor clearance violation tick=102 phase=2 root=-33.63,0.298575,-15.2292 distance=0.279674
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: loaded traversal root entered the cantilever anchor body-clearance radius
+152: Ascent final phase=4 support=2.05 root=-33.7,2.05,-12.8 indices=0.4,0.7 gripsY=3.50281,3.37142
+152: PullUp diagnostic start_indices=0.5,1 max_hand_step=0.0316354 at_indices=0.4,0.85 z=-15.2
+152: Ascent diagnostics max_hand_step=0.0466075 max_root_step=0.0250019 max_tension=400 tick=94 hand=0 previous=-33.8828,2.03646,-15.4924 current=-33.8538,2.07246,-15.4863
+152: Rescue traversal cases=90046 failures=4 max_root_step=0.0250019 max_landing_root_step=0.0238747
+1/2 Test #152: horde_rt_rescue_traversal_tests ........***Failed    3.40 sec
+Lower grip selection indices=6.5,7.25 points=-33.8961,0.836048,-15.3644|-33.9358,0.51199,-15.398
+Ascent trace tick=0 root=-33.7,-0.925,-15.2 midpoint=-33.9262,0.699839,-15.3987 root_delta=0,0.025,0 support_error=-0.000820339 bumped=0 grip_radial=0.272539,0.329873 indices=6.48043,7.25
+Ascent trace tick=1 root=-33.7,-0.9,-15.2 midpoint=-33.9377,0.726682,-15.4144 root_delta=0,0.025,0 support_error=-0.00266343 bumped=0 grip_radial=0.287557,0.354018 indices=6.42846,7.25
+Ascent trace tick=2 root=-33.7,-0.875,-15.2 midpoint=-33.9517,0.752566,-15.4277 root_delta=0,0.025,0 support_error=-0.00354761 bumped=0 grip_radial=0.301973,0.379941 indices=6.35423,7.25
+Ascent trace tick=3 root=-33.7,-0.85,-15.2 midpoint=-33.968,0.776538,-15.4387 root_delta=0,0.025,0 support_error=-0.00251913 bumped=0 grip_radial=0.316403,0.407232 indices=6.26784,7.25
+First traversal anchor clearance violation tick=102 phase=2 root=-33.63,0.298575,-15.2292 distance=0.279674
+loaded traversal root entered the cantilever anchor body-clearance radius
+loaded traversal root entered the cantilever anchor body-clearance radius
+loaded traversal root entered the cantilever anchor body-clearance radius
+loaded traversal root entered the cantilever anchor body-clearance radius
+Ascent final phase=4 support=2.05 root=-33.7,2.05,-12.8 indices=0.4,0.7 gripsY=3.50281,3.37142
+PullUp diagnostic start_indices=0.5,1 max_hand_step=0.0316354 at_indices=0.4,0.85 z=-15.2
+Ascent diagnostics max_hand_step=0.0466075 max_root_step=0.0250019 max_tension=400 tick=94 hand=0 previous=-33.8828,2.03646,-15.4924 current=-33.8538,2.07246,-15.4863
+Rescue traversal cases=90046 failures=4 max_root_step=0.0250019 max_landing_root_step=0.0238747
+
+test 156
+    Start 156: horde_rt_rescue_rig_attachment_tests
+
+156: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_rig_attachment_tests.exe"
+156: Working Directory: <repo>/build/presets/windows-x64-debug
+156: Test timeout computed to be: 180
+156: Rescue rig attachment cases=15919 failures=0 sampled_poses=942 max_left_reach=0.612631@phase=6 max_right_reach=0.619474@phase=6
+2/2 Test #156: horde_rt_rescue_rig_attachment_tests ...   Passed   22.08 sec
+
+The following tests passed:
+	horde_rt_rescue_rig_attachment_tests
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =  25.49 sec
+
+The following tests FAILED:
+	152 - horde_rt_rescue_traversal_tests (Failed)
+Errors while running CTest

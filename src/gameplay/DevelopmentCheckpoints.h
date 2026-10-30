@@ -56,9 +56,162 @@ struct DevelopmentCheckpoint
     // Explicit development capture only; production encounter defaults stay unchanged.
     bool stagesWaterfallGuards = false;
     std::uint32_t waterfallGuardFixedTicks = 0u;
+    bool developmentSupportFixture = false;
+    bool developmentWorldRoute = false;
+    bool stagedWorldPreparation = false;
+    bool stagesRescueExterior = false;
+    std::size_t exteriorRouteStation = 2u;
+    // Chapter-only diagnostic seed: accepted lethal hit, then real fixed ticks.
+    std::uint32_t keeperDeathFixedTicks = 0u;
+    bool raisesLanternForCompanion = false;
+    // Real fixed-step traversal capture: 1 ascent, 2 folded pull-up,
+    // 3 return grip/backoff, 4 second ascent. No authored root teleport.
+    std::uint8_t rescueTraversalCapture = 0u;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 68u> kDevelopmentCheckpoints{{
+// Canonical chapter captures require the same authored scene as the live
+// rescue journey. Names are resolved against this closed registry first.
+inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
+    const DevelopmentCheckpoint& checkpoint) noexcept
+{
+    return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
+}
+
+inline constexpr std::array<DevelopmentCheckpoint, 111u> kDevelopmentCheckpoints{{
+    // Frozen retention witnesses only. Same bounded source pocket, opposite
+    // corridor views; normal cameras, collision and story state are unchanged.
+    {.id=230,.name="chapter-forest-retention-west",.baseShowcaseCheckpointId=11,
+     .cameraX=-22.f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=.014f,
+     .rewardPose=DevelopmentRewardPose::HeldHigh,.keeperDeathFixedTicks=240u},
+    {.id=231,.name="chapter-forest-retention-east",.baseShowcaseCheckpointId=11,
+     .cameraX=-22.f,.cameraZ=-15.2f,.yaw=1.57079632679f,.pitch=.014f,
+     .rewardPose=DevelopmentRewardPose::HeldHigh,.keeperDeathFixedTicks=240u},
+    // F04 vista acceptance: same staged-route fixture and level framing as
+    // centre 203, with a 45-degree look to either side. No release camera change.
+    {.id=228,.name="chapter-forest-lookout-left",.baseShowcaseCheckpointId=11,
+     .cameraX=13.3f,.cameraZ=36.2f,.yaw=1.7246018366f,.pitch=-.15f,
+     .stagesRescueExterior=true,.exteriorRouteStation=7u,.keeperDeathFixedTicks=240u},
+    {.id=229,.name="chapter-forest-lookout-right",.baseShowcaseCheckpointId=11,
+     .cameraX=13.3f,.cameraZ=36.2f,.yaw=3.2953981634f,.pitch=-.15f,
+     .stagesRescueExterior=true,.exteriorRouteStation=7u,.keeperDeathFixedTicks=240u},
+    // F03 inspection only: the existing ascent/walk reaches station 6. Look
+    // along the actual outgoing/incoming trail before authoring its story cue.
+    {.id=226,.name="chapter-forest-clue-forward",.baseShowcaseCheckpointId=11,
+     .cameraX=-3.7f,.cameraZ=20.2f,.yaw=2.32590073027f,.pitch=-0.30f,
+     .stagesRescueExterior=true,.exteriorRouteStation=6u,.keeperDeathFixedTicks=240u},
+    {.id=227,.name="chapter-forest-clue-reverse",.baseShowcaseCheckpointId=11,
+     .cameraX=-3.7f,.cameraZ=20.2f,.yaw=-1.22777238637f,.pitch=-0.30f,
+     .stagesRescueExterior=true,.exteriorRouteStation=6u,.keeperDeathFixedTicks=240u},
+    // Fixed accepted-route positions looking toward one owned pine. Debug
+    // source comparisons only; no automatic distance-LOD or route extension.
+    {.id=223,.name="chapter-pine-near",.baseShowcaseCheckpointId=11,
+     .cameraX=-17.7f,.cameraZ=15.2f,.yaw=-2.068f,.pitch=.28f,
+     .stagesRescueExterior=true,.exteriorRouteStation=5u,.keeperDeathFixedTicks=240u},
+    {.id=224,.name="chapter-pine-mid",.baseShowcaseCheckpointId=11,
+     .cameraX=-15.7f,.cameraZ=.2f,.yaw=-2.781f,.pitch=.18f,
+     .stagesRescueExterior=true,.exteriorRouteStation=4u,.keeperDeathFixedTicks=240u},
+    {.id=225,.name="chapter-pine-far",.baseShowcaseCheckpointId=11,
+     .cameraX=-28.7f,.cameraZ=-5.8f,.yaw=2.876f,.pitch=.14f,
+     .stagesRescueExterior=true,.exteriorRouteStation=3u,.keeperDeathFixedTicks=240u},
+    // Actual fixed-step mist states; body dissolve checkpoints below have
+    // earlier clocks and must not stand in for halfway/zero mist evidence.
+    {.id=221,.name="chapter-keeper-mist-fading",.baseShowcaseCheckpointId=10,
+     .cameraX=-31.9f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.35f,
+     .keeperDeathFixedTicks=268u},
+    {.id=222,.name="chapter-keeper-mist-cleared",.baseShowcaseCheckpointId=10,
+     .cameraX=-31.9f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.35f,
+     .keeperDeathFixedTicks=300u},
+    {.id=218,.name="chapter-niche-rect",.baseShowcaseCheckpointId=11,
+     .cameraX=-0.40f,.cameraZ=-0.70f,.yaw=-1.57079632679f,.pitch=-0.32f,
+     .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldHigh},
+    {.id=219,.name="chapter-niche-arch",.baseShowcaseCheckpointId=11,
+     .cameraX=-0.40f,.cameraZ=-2.60f,.yaw=-1.57079632679f,.pitch=-0.32f,
+     .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldHigh},
+    {.id=220,.name="chapter-niche-east",.baseShowcaseCheckpointId=11,
+     .cameraX=4.55f,.cameraZ=-12.40f,.yaw=1.57079632679f,.pitch=-0.32f,
+     .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldHigh},
+    {.id=216,.name="chapter-lantern-side-wall-high",.baseShowcaseCheckpointId=11,
+     .cameraX=-16.0f,.cameraZ=-13.84f,.yaw=-1.57079632679f,.pitch=-.05f,
+     .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldHigh},
+    {.id=217,.name="chapter-lantern-side-wall-low",.baseShowcaseCheckpointId=11,
+     .cameraX=-16.0f,.cameraZ=-13.84f,.yaw=-1.57079632679f,.pitch=-.05f,
+     .usesProductionRewardProps=true,.rewardPose=DevelopmentRewardPose::HeldLow},
+    {.id=215,.name="chapter-deadwood-bank",.baseShowcaseCheckpointId=11,
+     .cameraX=-28.7f,.cameraZ=-5.8f,.yaw=.55f,.pitch=.18f,
+     .stagesRescueExterior=true,.exteriorRouteStation=3u},
+    {.id=214,.name="chapter-understory-close",.baseShowcaseCheckpointId=11,
+     .cameraX=-17.7f,.cameraZ=15.2f,.yaw=1.15f,.pitch=.10f,
+     .stagesRescueExterior=true,.exteriorRouteStation=5u},
+    {.id=210,.name="chapter-stake-ascent",.baseShowcaseCheckpointId=11,
+     .cameraX=-33.7f,.cameraZ=-15.2f,.yaw=2.35619449f,.pitch=-.32f,
+     .stagesRescueExterior=true,.rescueTraversalCapture=1u},
+    {.id=211,.name="chapter-stake-pullup",.baseShowcaseCheckpointId=11,
+     .cameraX=-33.7f,.cameraZ=-15.2f,.yaw=2.35619449f,.pitch=-.32f,
+     .stagesRescueExterior=true,.rescueTraversalCapture=2u},
+    {.id=212,.name="chapter-stake-descent",.baseShowcaseCheckpointId=11,
+     .cameraX=-33.7f,.cameraZ=-14.6f,.yaw=1.57079632679f,.pitch=-.32f,
+     .stagesRescueExterior=true,.rescueTraversalCapture=3u},
+    {.id=213,.name="chapter-stake-repeat-ascent",.baseShowcaseCheckpointId=11,
+     .cameraX=-33.7f,.cameraZ=-15.2f,.yaw=2.35619449f,.pitch=-.32f,
+     .stagesRescueExterior=true,.rescueTraversalCapture=4u},
+    {.id = 208, .name = "chapter-kit-departure", .baseShowcaseCheckpointId = 11,
+     .cameraX = -28.7f, .cameraZ = -5.8f, .yaw = 1.57079632679f, .pitch = -0.10f,
+     .stagesRescueExterior = true, .exteriorRouteStation = 3u, .keeperDeathFixedTicks = 240u,
+     .raisesLanternForCompanion = true},
+    {.id = 207, .name = "chapter-kit-reunion", .baseShowcaseCheckpointId = 11,
+     .cameraX = -28.7f, .cameraZ = -5.8f, .yaw = 1.57079632679f, .pitch = -0.10f,
+     .stagesRescueExterior = true, .exteriorRouteStation = 3u, .keeperDeathFixedTicks = 240u},
+    {.id = 204, .name = "chapter-keeper-death-held", .baseShowcaseCheckpointId = 10,
+     .cameraX = -31.9f, .cameraZ = -15.2f, .yaw = -1.57079632679f, .pitch = -0.35f,
+     .keeperDeathFixedTicks = 193u},
+    {.id = 205, .name = "chapter-keeper-death-dissolve", .baseShowcaseCheckpointId = 10,
+     .cameraX = -31.9f, .cameraZ = -15.2f, .yaw = -1.57079632679f, .pitch = -0.35f,
+     .keeperDeathFixedTicks = 216u},
+    {.id = 206, .name = "chapter-keeper-death-retired", .baseShowcaseCheckpointId = 10,
+     .cameraX = -31.9f, .cameraZ = -15.2f, .yaw = -1.57079632679f, .pitch = -0.35f,
+     .keeperDeathFixedTicks = 240u},
+    // Current exterior inspections use the same accepted-death seed as the
+    // reunion, so their real walk consumes the current bounded STEP motor.
+    // Historical showcase imports retain their separate legacy movement rules.
+    {.id = 201, .name = "chapter-forest-first-bend", .baseShowcaseCheckpointId = 11,
+     .cameraX = -15.7f, .cameraZ = .2f, .yaw = -3.009f, .pitch = -0.15f,
+     .stagesRescueExterior = true, .exteriorRouteStation = 4u, .keeperDeathFixedTicks = 240u},
+    {.id = 202, .name = "chapter-forest-second-bend", .baseShowcaseCheckpointId = 11,
+     .cameraX = -17.7f, .cameraZ = 15.2f, .yaw = 1.914f, .pitch = -0.15f,
+     .stagesRescueExterior = true, .exteriorRouteStation = 5u, .keeperDeathFixedTicks = 240u},
+    {.id = 203, .name = "chapter-forest-lookout", .baseShowcaseCheckpointId = 11,
+     .cameraX = 13.3f, .cameraZ = 36.2f, .yaw = 2.51f, .pitch = -0.15f,
+     .stagesRescueExterior = true, .exteriorRouteStation = 7u, .keeperDeathFixedTicks = 240u},
+    {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
+    {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.0f, .cameraZ = -7.8f, .yaw = 3.14159265359f, .pitch = -0.15f},
+    {.id = 200, .name = "chapter-stone-wall-corner", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.65f, .cameraZ = -4.9f, .yaw = 0.55f, .pitch = -0.15f},
+    {.id = 190, .name = "world-route", .baseShowcaseCheckpointId = 0,
+     .cameraX = -33.7f, .cameraZ = -20.8f, .yaw = 3.14159265359f, .pitch = -0.05f,
+     .developmentWorldRoute = true},
+    {.id = 191, .name = "world-route-staged", .baseShowcaseCheckpointId = 0,
+     .cameraX = -33.7f, .cameraZ = -20.8f, .yaw = 3.14159265359f, .pitch = -0.05f,
+     .developmentWorldRoute = true, .stagedWorldPreparation = true},
+    {.id = 192, .name = "rescue-journey-start", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.0f, .cameraZ = 1.85f, .yaw = 3.14159265359f, .pitch = -0.05f},
+    {.id = 193, .name = "chapter-landing-north", .baseShowcaseCheckpointId = 11,
+     .cameraX = -33.7f, .cameraZ = -12.8f, .yaw = 0, .pitch = -0.15f, .stagesRescueExterior = true},
+    {.id = 194, .name = "chapter-landing-east", .baseShowcaseCheckpointId = 11,
+     .cameraX = -33.7f, .cameraZ = -12.8f, .yaw = 1.57079632679f, .pitch = -0.15f, .stagesRescueExterior = true},
+    {.id = 195, .name = "chapter-landing-south", .baseShowcaseCheckpointId = 11,
+     .cameraX = -33.7f, .cameraZ = -12.8f, .yaw = 3.14159265359f, .pitch = -0.15f, .stagesRescueExterior = true},
+    {.id = 196, .name = "chapter-landing-west", .baseShowcaseCheckpointId = 11,
+     .cameraX = -33.7f, .cameraZ = -12.8f, .yaw = -1.57079632679f, .pitch = -0.15f, .stagesRescueExterior = true},
+    {.id = 197, .name = "chapter-landing-shaft", .baseShowcaseCheckpointId = 11,
+     .cameraX = -33.7f, .cameraZ = -12.8f, .yaw = 0, .pitch = -0.65f, .stagesRescueExterior = true},
+    {.id = 170, .name = "vertical-proof-ground", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.0f, .cameraZ = 1.85f, .yaw = 0.0f, .pitch = -0.05f,
+     .developmentSupportFixture = true},
+    {.id = 171, .name = "vertical-proof-raised", .baseShowcaseCheckpointId = 0,
+     .cameraX = 0.0f, .cameraZ = 0.0f, .yaw = 0.0f, .pitch = -0.05f,
+     .developmentSupportFixture = true},
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},

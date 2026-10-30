@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "implementationBase": "d6f6dcd87b70ddee2441b2cca6c3a05b1e9cb341",
+  "sourceFiles": [
+    {
+      "path": ".github/workflows/shared-simulation-host.yml",
+      "sha256": "9bb9f81e8245623c895d07cd53a96dab6a91e356b3b912d2d4465b89e64803fa"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "a3c56af673213b71aeb4a8c08e56fa60291adc50899942d8579548ab0b690b8d"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "sha256": "3106e183fbdc7fc20c9045302347294c51428d2698fdcf2ad5b37b8e376bc122"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtGpuResources.cpp",
+      "sha256": "ca97f0efa26e6fe0266aebf5d11707c02cd353cd84994fe5efc11c23774f361f"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtGpuResources.h",
+      "sha256": "d6bf54806bc1ac5643950b974f9914a25bd19cd15d3f898115ef6494776cebc5"
+    },
+    {
+      "path": "tests/RtGpuBufferBatchTests.cpp",
+      "sha256": "e6a317e6adc60a72d87eef37014983af2e9d3a346de6dcb1fb55d53ee9a5b138"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 12604416,
+      "sha256": "16fd3bb33c3b1f2670810d1c4ae8abd8279607ed79b76b4dea239b1c1d05a6b3"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4383232,
+      "sha256": "5db1b7358abf52bdb048dd47880bea3f68a3b1e918d3caf751c5a1d9c81aa193"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 172772715,
+      "sha256": "557f762940a2add49f2d6b23d06ffa907d91f069254c23ce73581bc1b39cd3cc"
+    }
+  ],
+  "debugTests": 7,
+  "releaseTests": 7,
+  "androidNativeAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "androidLint": "passed",
+  "androidJavaTests": "unchanged UP-TO-DATE locally; fresh CI remains separate",
+  "androidPackage": "passed",
+  "heldItemPackage": "passed",
+  "shaderCatalog": "fresh eight-key compilation matches frozen catalog/budgets",
+  "bufferFailureCases": 48,
+  "openedNativeFrames": 10,
+  "pixelComparisons": 38,
+  "unchangedPixelComparisons": 38,
+  "budgetsSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+  "preservedBlendBackupSha256": "0dae1e8fb803336cef2d045f48c5f4c9195a6463f45161cb0b6c7434350769fb",
+  "validationScope": "GPU buffer preparation and normal initialization; not live zone commit/retirement, sustained cost or owner/device acceptance",
+  "limits": {
+    "actorInstances": 3,
+    "torchDeadlineSeconds": 180,
+    "textureLayers": 18
+  }
+}

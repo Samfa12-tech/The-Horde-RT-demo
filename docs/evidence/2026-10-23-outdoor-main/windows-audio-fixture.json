@@ -1,0 +1,20 @@
+{
+  "scope": "audio-only positive admission fixture, not complete Windows distribution",
+  "zipBytes": 23111427,
+  "entries": 19,
+  "uncompressedBytes": 40647007,
+  "outdoorEntries": [
+    {
+      "name": "assets/audio/music/beneath-the-same-moon/asset.manifest.json",
+      "bytes": 1160,
+      "compressedBytes": 654,
+      "method": 8
+    },
+    {
+      "name": "assets/audio/music/beneath-the-same-moon/runtime/outdoor-main.wav",
+      "bytes": 20480044,
+      "compressedBytes": 13546616,
+      "method": 8
+    }
+  ]
+}

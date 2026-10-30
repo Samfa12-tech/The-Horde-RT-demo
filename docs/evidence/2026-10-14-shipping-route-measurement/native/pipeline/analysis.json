@@ -1,0 +1,451 @@
+{
+  "scope": "Debug CPU with actual Shipping High shaders; wall-clock two-way route after staged Keeper death; no owner or phone acceptance",
+  "backend": "RayTracingPipeline",
+  "executableSha256": "213a49a4fbc2f524e9cb03aa465a4b4d87c798ca144d3c3dfe39104f7ab41a09",
+  "hardware": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672
+  },
+  "run": {
+    "schema": 1,
+    "scope": "Debug CPU with actual Shipping High shaders; wall-clock two-way route after staged Keeper death; no owner or phone acceptance",
+    "durationSeconds": 107.835,
+    "renderedFrames": 1246,
+    "completedSamples": 1246,
+    "simulationTicks": 4961,
+    "maximumPendingSimulationTicks": 1615,
+    "simulationHz": 60,
+    "maximumTicksPerRender": 4,
+    "deadlineSeconds": 150,
+    "warmupSeconds": 5,
+    "normalStaticRegionResidencySavingBytes": 0,
+    "complete": true
+  },
+  "settings": [
+    "current",
+    "high",
+    "High",
+    0
+  ],
+  "warmSamples": 1208,
+  "gpuStatusCounts": {
+    "valid": 1208
+  },
+  "shaderIdentities": [
+    "548181588cfbd8fda4e419f6b90aa20e33305c7ae2366202d96dd07e8f46cf6c"
+  ],
+  "resourcePeaks": {
+    "device_local_bytes": 405550288,
+    "host_visible_bytes": 48084816
+  },
+  "cpuMilliseconds": {
+    "simulation_step_cpu_ns": {
+      "count": 1208,
+      "mean": 15.210419370860928,
+      "median": 8.382449999999999,
+      "p95": 74.6004,
+      "p99": 189.1113,
+      "maximum": 203.9419,
+      "minimum": 0.6562
+    },
+    "simulationStepCpuMs_ns": {
+      "count": 1208,
+      "mean": 0.0,
+      "median": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "maximum": 0.0,
+      "minimum": 0.0
+    },
+    "skinCpuMs_ns": {
+      "count": 1208,
+      "mean": 22.757542218543048,
+      "median": 22.59165,
+      "p95": 24.0148,
+      "p99": 25.5336,
+      "maximum": 27.623,
+      "minimum": 21.7783
+    },
+    "playerSkinCpuMs_ns": {
+      "count": 1208,
+      "mean": 22.757542218543048,
+      "median": 22.59165,
+      "p95": 24.0148,
+      "p99": 25.5336,
+      "maximum": 27.623,
+      "minimum": 21.7783
+    },
+    "characterSkinCpuMs_ns": {
+      "count": 1208,
+      "mean": 0.0,
+      "median": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "maximum": 0.0,
+      "minimum": 0.0
+    },
+    "dynamicUploadCpuMs_ns": {
+      "count": 1208,
+      "mean": 1.7964273178807946,
+      "median": 1.5142,
+      "p95": 2.7452,
+      "p99": 2.9346,
+      "maximum": 4.2154,
+      "minimum": 0.1028
+    },
+    "blasRefitRecordCpuMs_ns": {
+      "count": 1208,
+      "mean": 0.07075380794701987,
+      "median": 0.0658,
+      "p95": 0.0913,
+      "p99": 0.188,
+      "maximum": 0.3664,
+      "minimum": 0.0576
+    },
+    "tlasUpdateRecordCpuMs_ns": {
+      "count": 1208,
+      "mean": 0.0074407284768211925,
+      "median": 0.0071,
+      "p95": 0.0094,
+      "p99": 0.0133,
+      "maximum": 0.0463,
+      "minimum": 0.0059
+    },
+    "traceCopyRecordCpuMs_ns": {
+      "count": 1208,
+      "mean": 0.036194122516556286,
+      "median": 0.0345,
+      "p95": 0.0454,
+      "p99": 0.065,
+      "maximum": 0.1388,
+      "minimum": 0.0315
+    },
+    "frameFenceWaitCpuMs_ns": {
+      "count": 1208,
+      "mean": 2.660956870860927,
+      "median": 1.94905,
+      "p95": 8.5134,
+      "p99": 11.7574,
+      "maximum": 14.6026,
+      "minimum": 0.0026
+    },
+    "imageAcquireCpuMs_ns": {
+      "count": 1208,
+      "mean": 16.105011506622517,
+      "median": 0.0065,
+      "p95": 247.6421,
+      "p99": 321.5966,
+      "maximum": 406.8804,
+      "minimum": 0.0035
+    },
+    "queueSubmitCpuMs_ns": {
+      "count": 1208,
+      "mean": 0.08033956953642385,
+      "median": 0.0721,
+      "p95": 0.1177,
+      "p99": 0.2451,
+      "maximum": 0.3845,
+      "minimum": 0.0573
+    },
+    "presentCallCpuMs_ns": {
+      "count": 1208,
+      "mean": 0.1866780629139073,
+      "median": 0.1321,
+      "p95": 0.3277,
+      "p99": 1.9073,
+      "maximum": 8.1132,
+      "minimum": 0.0439
+    },
+    "wholeFrameCycleCpuMs_ns": {
+      "count": 1208,
+      "mean": 69.8292613410596,
+      "median": 54.6226,
+      "p95": 302.6891,
+      "p99": 376.5938,
+      "maximum": 440.7489,
+      "minimum": 30.2599
+    }
+  },
+  "phases": {
+    "landing-sweep": {
+      "samples": 94,
+      "gpuMilliseconds": {
+        "count": 94,
+        "mean": 9.585123063829787,
+        "median": 7.872783999999999,
+        "p95": 14.472384,
+        "p99": 15.27552,
+        "maximum": 15.27552,
+        "minimum": 5.736288
+      },
+      "cpuCycleMilliseconds": {
+        "count": 94,
+        "mean": 65.43632340425532,
+        "median": 55.252250000000004,
+        "p95": 66.6372,
+        "p99": 364.2158,
+        "maximum": 364.2158,
+        "minimum": 51.2381
+      },
+      "simulationStepMilliseconds": {
+        "count": 94,
+        "mean": 28.591459574468086,
+        "median": 8.0045,
+        "p95": 176.6399,
+        "p99": 203.9419,
+        "maximum": 203.9419,
+        "minimum": 7.4065
+      }
+    },
+    "fresh-raise": {
+      "samples": 69,
+      "gpuMilliseconds": {
+        "count": 69,
+        "mean": 9.54279652173913,
+        "median": 7.829344,
+        "p95": 15.378304,
+        "p99": 15.58528,
+        "maximum": 15.58528,
+        "minimum": 3.233792
+      },
+      "cpuCycleMilliseconds": {
+        "count": 69,
+        "mean": 82.22393623188407,
+        "median": 54.9802,
+        "p95": 370.5316,
+        "p99": 387.0385,
+        "maximum": 387.0385,
+        "minimum": 50.7227
+      },
+      "simulationStepMilliseconds": {
+        "count": 69,
+        "mean": 8.786244927536233,
+        "median": 8.486,
+        "p95": 10.4891,
+        "p99": 12.0063,
+        "maximum": 12.0063,
+        "minimum": 7.432
+      }
+    },
+    "outbound": {
+      "samples": 322,
+      "gpuMilliseconds": {
+        "count": 322,
+        "mean": 9.188585838509317,
+        "median": 7.711264,
+        "p95": 12.906336,
+        "p99": 13.70912,
+        "maximum": 14.022304,
+        "minimum": 5.690272
+      },
+      "cpuCycleMilliseconds": {
+        "count": 322,
+        "mean": 75.918199689441,
+        "median": 55.11125,
+        "p95": 315.6744,
+        "p99": 352.4306,
+        "maximum": 386.3513,
+        "minimum": 51.3693
+      },
+      "simulationStepMilliseconds": {
+        "count": 322,
+        "mean": 9.169589751552795,
+        "median": 8.756499999999999,
+        "p95": 11.0171,
+        "p99": 11.6594,
+        "maximum": 12.462,
+        "minimum": 7.6488
+      }
+    },
+    "lookout-sweep": {
+      "samples": 61,
+      "gpuMilliseconds": {
+        "count": 61,
+        "mean": 8.431705704918034,
+        "median": 7.031904,
+        "p95": 13.195776,
+        "p99": 13.827904,
+        "maximum": 13.827904,
+        "minimum": 5.446976
+      },
+      "cpuCycleMilliseconds": {
+        "count": 61,
+        "mean": 54.91712459016393,
+        "median": 53.4804,
+        "p95": 60.9543,
+        "p99": 66.2548,
+        "maximum": 66.2548,
+        "minimum": 51.0583
+      },
+      "simulationStepMilliseconds": {
+        "count": 61,
+        "mean": 8.566039344262295,
+        "median": 8.4782,
+        "p95": 9.4918,
+        "p99": 9.6322,
+        "maximum": 9.6322,
+        "minimum": 7.8422
+      }
+    },
+    "return": {
+      "samples": 363,
+      "gpuMilliseconds": {
+        "count": 363,
+        "mean": 9.739463757575757,
+        "median": 8.754496,
+        "p95": 13.612352,
+        "p99": 13.79728,
+        "maximum": 13.99408,
+        "minimum": 6.10256
+      },
+      "cpuCycleMilliseconds": {
+        "count": 363,
+        "mean": 69.33889834710745,
+        "median": 55.0378,
+        "p95": 84.1143,
+        "p99": 368.6727,
+        "maximum": 384.9582,
+        "minimum": 50.8196
+      },
+      "simulationStepMilliseconds": {
+        "count": 363,
+        "mean": 22.182725895316803,
+        "median": 8.5723,
+        "p95": 182.5243,
+        "p99": 196.8845,
+        "maximum": 201.2177,
+        "minimum": 7.5847
+      }
+    },
+    "descent": {
+      "samples": 149,
+      "gpuMilliseconds": {
+        "count": 149,
+        "mean": 9.061739812080537,
+        "median": 7.880832,
+        "p95": 14.03984,
+        "p99": 14.14896,
+        "maximum": 14.283616,
+        "minimum": 4.671808
+      },
+      "cpuCycleMilliseconds": {
+        "count": 149,
+        "mean": 77.0480610738255,
+        "median": 58.0139,
+        "p95": 322.3674,
+        "p99": 365.7673,
+        "maximum": 371.3888,
+        "minimum": 51.8615
+      },
+      "simulationStepMilliseconds": {
+        "count": 149,
+        "mean": 22.8523322147651,
+        "median": 3.0737,
+        "p95": 108.9035,
+        "p99": 118.0433,
+        "maximum": 119.6048,
+        "minimum": 2.5241
+      }
+    },
+    "lower-sweep": {
+      "samples": 31,
+      "gpuMilliseconds": {
+        "count": 31,
+        "mean": 5.882963612903226,
+        "median": 5.065152,
+        "p95": 9.306176,
+        "p99": 9.384448,
+        "maximum": 9.384448,
+        "minimum": 3.475296
+      },
+      "cpuCycleMilliseconds": {
+        "count": 31,
+        "mean": 60.311319354838716,
+        "median": 35.139,
+        "p95": 415.0542,
+        "p99": 420.3666,
+        "maximum": 420.3666,
+        "minimum": 31.2737
+      },
+      "simulationStepMilliseconds": {
+        "count": 31,
+        "mean": 0.9493290322580645,
+        "median": 0.8761,
+        "p95": 1.3981,
+        "p99": 1.8949,
+        "maximum": 1.8949,
+        "minimum": 0.7646
+      }
+    },
+    "repeat-ascent": {
+      "samples": 118,
+      "gpuMilliseconds": {
+        "count": 118,
+        "mean": 6.311013694915254,
+        "median": 6.650496,
+        "p95": 9.68176,
+        "p99": 12.860064,
+        "maximum": 13.25728,
+        "minimum": 2.849312
+      },
+      "cpuCycleMilliseconds": {
+        "count": 118,
+        "mean": 52.16825169491525,
+        "median": 35.40155,
+        "p95": 60.3672,
+        "p99": 422.1361,
+        "maximum": 440.7489,
+        "minimum": 30.2599
+      },
+      "simulationStepMilliseconds": {
+        "count": 118,
+        "mean": 0.9845220338983051,
+        "median": 0.9646,
+        "p95": 1.3265,
+        "p99": 1.9748,
+        "maximum": 2.1314,
+        "minimum": 0.6562
+      }
+    },
+    "complete": {
+      "samples": 1,
+      "gpuMilliseconds": {
+        "count": 1,
+        "mean": 7.248384,
+        "median": 7.248384,
+        "p95": 7.248384,
+        "p99": 7.248384,
+        "maximum": 7.248384,
+        "minimum": 7.248384
+      },
+      "cpuCycleMilliseconds": {
+        "count": 1,
+        "mean": 57.991,
+        "median": 57.991,
+        "p95": 57.991,
+        "p99": 57.991,
+        "maximum": 57.991,
+        "minimum": 57.991
+      },
+      "simulationStepMilliseconds": {
+        "count": 1,
+        "mean": 2.2724,
+        "median": 2.2724,
+        "p95": 2.2724,
+        "p99": 2.2724,
+        "maximum": 2.2724,
+        "minimum": 2.2724
+      }
+    }
+  },
+  "gpuMilliseconds": {
+    "count": 1208,
+    "mean": 8.983822569536423,
+    "median": 7.488992,
+    "p95": 13.764608,
+    "p99": 14.952384,
+    "maximum": 15.58528,
+    "minimum": 2.849312
+  }
+}

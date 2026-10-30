@@ -1,5 +1,10 @@
 // Included by motion-evidence render owners. No second simulation or submit serial.
 bool CompleteRtEvidenceAfterDeviceIdle(SwapchainContext&, VkResult);
+void FailAndroidMotion(SwapchainContext&, std::string_view);
+#if HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
+bool MotionTimingJoinEligible(const SwapchainContext&, const AndroidMotionRun&, std::size_t&, std::string&);
+bool WriteAndroidMotionValidationReport(SwapchainContext&);
+#endif
 
 horde::platform::android::AndroidMotionEvidenceScope AndroidMotionScope(const SwapchainContext& context)
 {
@@ -11,6 +16,7 @@ horde::platform::android::AndroidMotionEvidenceScope AndroidMotionScope(const Sw
 bool WriteAndroidMotion(SwapchainContext& context)
 {
     auto& run = *context.motion;
+    if(run.chapterCsv.is_open())run.chapterCsv.flush();
     std::ofstream ledger(run.path + "-ledger.tmp", std::ios::binary | std::ios::trunc);
     run.ledger.WriteJson(ledger, run.scenario);
     ledger.flush();
@@ -35,16 +41,60 @@ bool WriteAndroidMotion(SwapchainContext& context)
         << ",\"dust\":" << static_cast<int>(run.settings.dustQuality)
         << ",\"compiledQuality\":" << JsonUtf8String(context.rtScene.SelectedDielectricQualityName())
         << ",\"inputOrigin\":\"harness-generated axes and timestamped edges; not touch latency\""
+        << ",\"outdoorHold\":{\"enabled\":"
+        << (run.selected==horde::gameplay::validation::MotionScenario::ChapterOutdoorScaleHold ? "true" : "false")
+        << ",\"startWallNanoseconds\":" << run.scenario.StartWallNanoseconds()
+        << ",\"warmupWallSeconds\":10,\"sampleWallSeconds\":30,\"normalFixedStep\":true}"
         << ",\"limits\":{\"armingSeconds\":30,\"wallSeconds\":120,\"captures\":64}"
         << ",\"isolation\":{\"secondSimulation\":false,\"fixedDeltaOverride\":false,"
            "\"phaseForced\":false,\"preferencesWritten\":false,\"ownerAcceptance\":false,"
-           "\"timingScope\":\"moving scenario with readbacks; not sustained FPS or scanout\"}"
+           "\"timingScope\":\"named generated-input scenario; capture roster declares readbacks; not sustained FPS or scanout\"}"
         << ",\"captures\":" << run.captures << "]}";
     return WriteTextFile(run.path + "-manifest.tmp", manifest.str()) &&
         std::rename((run.path + "-manifest.tmp").c_str(), (run.path + "-manifest.json").c_str()) == 0;
 }
 
-#if HORDE_RT_ANDROID_MOTION_VALIDATION
+#if HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
+void PollAndroidChapterTerminalTimingDrain(SwapchainContext& context)
+{
+    auto& run=*context.motion;
+    const auto now=GraphicsSteadyNs();
+    if(!gSurfaceSessions.IsCurrent(context.surfaceGeneration) || AndroidMotionScope(context)!=run.scope ||
+       !context.presentTiming || !context.presentTiming->Enabled() || !context.presentTiming->Bound()) {
+        FailAndroidMotion(context,"Chapter terminal presentation collector lost its resource scope.");return;
+    }
+    PollPresentTimingOnOwner(context);
+    if(context.presentTiming->PendingCount()==0) {
+        const auto& s=gGameSimulation.Snapshot();const auto& d=context.rtScene.OrdinaryStaticDetailEvidence();
+        if(!run.scenario.Complete() || run.ledger.HasPendingSubmissions() ||
+           !(run.selected==horde::gameplay::validation::MotionScenario::ChapterPerformanceRoute
+             ? horde::gameplay::validation::ChapterPerformanceCountersValid(
+                 run.chapterBaseline.unloads,run.chapterBaseline.restores,d.unloads,d.restores)
+             : horde::gameplay::validation::ChapterResidencyCountersValid(run.scenario.RetainChapterDetail() ||
+               run.selected==horde::gameplay::validation::MotionScenario::KeeperTorchTransition ||
+               run.selected==horde::gameplay::validation::MotionScenario::ChapterOutdoorScaleHold,
+               run.chapterBaseline.unloads,run.chapterBaseline.restores,d.unloads,d.restores)) ||
+           d.savedOwnerBytes || d.preparationFailures ||
+           !context.rtScene.StaticGeometryHasCompleteContributors() || s.staticDetailLease.resourceGeneration) {
+            FailAndroidMotion(context,"Chapter did not restore complete contributor ownership after its ordinary unload.");return;
+        }
+        run.finished=true;
+        std::size_t matched=0;std::string reason;
+        if(!MotionTimingJoinEligible(context,run,matched,reason)) {
+            run.finished=false;FailAndroidMotion(context,reason);return;
+        }
+        if(!WriteTextFile(run.path+"-present-timing.json",PresentTimingJson(context)) ||
+           !WriteAndroidMotion(context) || !WriteAndroidMotionValidationReport(context)) {
+            run.finished=false;FailAndroidMotion(context,"Chapter terminal evidence write failed.");return;
+        }
+        gMotionStatus.store(3,std::memory_order_release);return;
+    }
+    if(!now || now<run.terminalTimingDrainStartedNs || now-run.terminalTimingDrainStartedNs>=2'000'000'000ull)
+        FailAndroidMotion(context,"Chapter actual presentation tail exceeded the existing two-second drain.");
+}
+#endif
+
+#if HORDE_RT_ANDROID_MOTION_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
 void WritePresentTimingCounters(std::ostream& output,
     const horde::vulkan::PresentTimingEvidence::Counters& counters)
 {
@@ -220,10 +270,22 @@ bool WriteAndroidMotionValidationReport(SwapchainContext& context)
          << ",\"scenario\":" << JsonUtf8String(horde::gameplay::validation::MotionScenarioName(run.selected))
          << ",\"buildId\":" << JsonUtf8String(HORDE_RT_BUILD_ID)
          << ",\"simulationPolicy\":\"shared GameSimulation.AdvanceFrame with raw monotonic input-owner delta and normal fixed-step catch-up; generated motion axes/edges enter through the existing InputMailbox owner; no per-render fixed-delta override\""
+         << ",\"outdoorHold\":{\"enabled\":"
+         << (run.selected==horde::gameplay::validation::MotionScenario::ChapterOutdoorScaleHold ? "true" : "false")
+         << ",\"startWallNanoseconds\":" << run.scenario.StartWallNanoseconds()
+         << ",\"warmupWallSeconds\":10,\"sampleWallSeconds\":30,\"normalFixedStep\":true}"
          << ",\"limits\":{\"wallSeconds\":120,\"presentationDrainMilliseconds\":2000,\"stateRows\":16384,\"eventRows\":1024,\"rtRows\":16384,\"captures\":64,\"presentationRows\":32768,\"presentationPending\":256}"
          << ",\"settings\":{\"scalePercent\":" << static_cast<unsigned>(std::lround(context.renderScale * 100.0f))
          << ",\"width\":" << context.swapchainExtent.width << ",\"height\":" << context.swapchainExtent.height
          << ",\"internalWidth\":" << internalExtent.width << ",\"internalHeight\":" << internalExtent.height
+         << ",\"nativeWindowWidth\":" << context.nativeWindowExtent.width
+         << ",\"nativeWindowHeight\":" << context.nativeWindowExtent.height
+         << ",\"surfaceCurrentWidth\":" << context.surfaceCurrentExtent.width
+         << ",\"surfaceCurrentHeight\":" << context.surfaceCurrentExtent.height
+         << ",\"surfaceCurrentTransform\":" << static_cast<unsigned>(context.surfaceCurrentTransform)
+         << ",\"swapchainPreTransform\":" << static_cast<unsigned>(context.swapchainPreTransform)
+         << ",\"rtPreRotationRequired\":" << (context.rtPreRotationRequired ? "true" : "false")
+         << ",\"rtPresentationTransform\":" << static_cast<unsigned>(context.rtPresentationTransform)
          << ",\"backend\":" << JsonUtf8String(horde::vulkan::ToString(context.executionBackend))
          << ",\"water\":" << static_cast<int>(run.settings.waterQuality)
          << ",\"fire\":" << static_cast<int>(run.settings.fireDetail)
@@ -263,7 +325,7 @@ bool WriteAndroidMotionValidationReport(SwapchainContext& context)
          << ",\"compiledQuality\":" << JsonUtf8String(context.rtScene.SelectedDielectricQualityName())
          << ",\"inputOrigin\":\"harness-generated axes and timestamped edges; not touch latency\""
          << ",\"limits\":{\"armingSeconds\":30,\"wallSeconds\":120,\"presentationDrainMilliseconds\":2000,\"captures\":64}"
-         << ",\"isolation\":{\"secondSimulation\":false,\"fixedDeltaOverride\":false,\"phaseForced\":false,\"preferencesWritten\":false,\"ownerAcceptance\":false,\"timingScope\":\"moving scenario with RT readbacks and actual image presentation timestamps; not sustained, scanout, or photons\"}"
+         << ",\"isolation\":{\"secondSimulation\":false,\"fixedDeltaOverride\":false,\"phaseForced\":false,\"preferencesWritten\":false,\"ownerAcceptance\":false,\"timingScope\":\"named generated-input scenario with actual image presentation timestamps; capture roster declares readbacks; not scanout, photons, or long-duration acceptance\"}"
          << ",\"captures\":" << run.captureCount << '}';
     json << ",\"motionEvidence\":" << evidence.str()
          << ",\"motionImageCaptures\":" << run.captures << ']'
@@ -340,9 +402,14 @@ void FailAndroidMotion(SwapchainContext& context, std::string_view reason)
     if (!context.motion || context.motion->finished) return;
     context.motion->scenario.Fail(reason);
     context.motion->finished = true;
+#if HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
+    if(horde::gameplay::validation::IsTimedMotionScenario(context.motion->selected))
+        (void)WriteTextFile(context.motion->path+"-present-timing.json",PresentTimingJson(context));
+#endif
     (void)WriteAndroidMotion(context);
-#if HORDE_RT_ANDROID_MOTION_VALIDATION
-    if (context.motionValidationRun) (void)WriteAndroidMotionValidationReport(context);
+#if HORDE_RT_ANDROID_MOTION_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
+    if (context.motionValidationRun || horde::gameplay::validation::IsTimedMotionScenario(context.motion->selected))
+        (void)WriteAndroidMotionValidationReport(context);
 #endif
     gMotionStatus.store(4, std::memory_order_release);
     __android_log_print(ANDROID_LOG_ERROR, kTag, "HORDE_MOTION failed %.*s", static_cast<int>(reason.size()), reason.data());
@@ -350,9 +417,10 @@ void FailAndroidMotion(SwapchainContext& context, std::string_view reason)
 
 void RestoreAndroidMotionEquipmentSeed(SwapchainContext& context)
 {
-    if (!context.motion || !context.motion->equipmentSeedActive) return;
+    if (!context.motion || (!context.motion->equipmentSeedActive &&
+        !horde::gameplay::validation::IsTimedMotionScenario(context.motion->selected))) return;
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
-    context.motion->scenario.End(gGameSimulation);
+    if(context.motion->equipmentSeedActive)context.motion->scenario.End(gGameSimulation);
     context.motion->equipmentSeedActive = false;
     const auto& state = gGameSimulation.Snapshot();
     auto& commands = gInputPublisherState.commands;
@@ -363,6 +431,9 @@ void RestoreAndroidMotionEquipmentSeed(SwapchainContext& context)
     commands.routeReset = std::max(commands.routeReset, state.lastConsumedRouteResetSequence);
     commands.interact = std::max(commands.interact, state.lastConsumedInteractSequence);
     commands.toggleHeldLightPose = std::max(commands.toggleHeldLightPose, state.lastConsumedToggleHeldLightPoseSequence);
+    commands.runToggle=std::max(commands.runToggle,state.lastConsumedRunToggleSequence);
+    commands.clearRunIntent=std::max(commands.clearRunIntent,state.lastConsumedClearRunIntentSequence);
+    gInputPublisherState.runHeld=false;
     gInputPublisherState.combatEdgeHistory = {};
     gInputPublisherState.paused = true;
     gInputPublisherState.moveForward = gInputPublisherState.moveStrafe = 0.0f;
@@ -372,9 +443,83 @@ void RestoreAndroidMotionEquipmentSeed(SwapchainContext& context)
 void ObserveAndroidMotionCompletion(SwapchainContext& context, bool completed)
 {
     if (!context.motion || !context.motion->armed || context.motion->finished || !completed) return;
+    const auto published = context.rtFrameEvidence.PublishedStateByValue();
     if (!context.motion->ledger.AppendCompletedFrame(context.surfaceGeneration,
-            context.rtFrameEvidence.PublishedStateByValue()))
+            published))
         FailAndroidMotion(context, context.motion->ledger.Failure());
+    else if(horde::gameplay::validation::IsTimedMotionScenario(context.motion->selected)) {
+        auto& run=*context.motion;const auto frames=run.ledger.Frames();
+        if(frames.empty())return;
+        const auto& frame=frames.back();auto& tag=run.chapterTags[frame.identity.submitted.frame.frameSlot];
+        if(frame.identity.submitted.submissionSerial==run.chapterLastSerial)return;
+        if(tag.serial!=frame.identity.submitted.submissionSerial || !tag.returnNs ||
+           !published.hasCompletedEvidence ||
+           published.completedEvidence.identity.submitted.submissionSerial!=tag.serial ||
+           (run.chapterLastReturnNs && tag.returnNs<=run.chapterLastReturnNs)) {
+            FailAndroidMotion(context,"Chapter completion lost its submitted resource/return timestamp tag.");return;
+        }
+        const auto& d=tag.detail;
+        run.chapterCsv<<tag.returnNs<<','<<(run.chapterLastReturnNs?tag.returnNs-run.chapterLastReturnNs:0)<<','
+            <<frame.identity.submitted.submissionSerial<<','<<frame.identity.submitted.frame.simulationTick<<','
+            <<(run.selected==horde::gameplay::validation::MotionScenario::KeeperTorchTransition
+                ?horde::gameplay::validation::MotionStageName(tag.motionStage)
+                :horde::gameplay::validation::ChapterProbePhaseName(tag.phase))<<','<<tag.x<<','<<tag.y<<','<<tag.z<<','
+            <<frame.resources.deviceLocalBytes<<','<<frame.resources.hostVisibleBytes<<','<<d.omittedTriangles<<','
+            <<d.unloads<<','<<d.restores<<','<<d.savedOwnerBytes<<','<<d.peakOverlapOwnerBytes<<','<<d.waitFrames<<','
+            <<tag.yaw<<','<<tag.pitch<<','<<tag.viewTicks<<','<<tag.detailCpuNs<<','
+            <<(d.unloads-run.chapterBaseline.unloads)<<','<<(d.restores-run.chapterBaseline.restores);
+        run.chapterCsv<<','<<frame.resources.tlasInstanceCount<<','
+            <<frame.resources.bottomLevelAccelerationStructureCount;
+        // The same immutable completed publication admitted by the ledger above.
+        // Never sample mutable current-record work or borrow a previous serial.
+        const auto& cpu = published.completedEvidence.scene.stages;
+        run.chapterCsv<<','<<horde::telemetry::RtSampleStatusName(cpu.status);
+        for (const auto stage : {horde::telemetry::RtStage::SimulationStep,
+                horde::telemetry::RtStage::Skin, horde::telemetry::RtStage::PlayerSkin,
+                horde::telemetry::RtStage::CharacterSkin, horde::telemetry::RtStage::PoseCopy,
+                horde::telemetry::RtStage::DynamicUpload, horde::telemetry::RtStage::FrameFenceWait,
+                horde::telemetry::RtStage::QueueSubmit, horde::telemetry::RtStage::WholeFrameCycle}) {
+            const auto& value = cpu.values[horde::telemetry::RtStageIndex(stage)];
+            run.chapterCsv<<','<<value.durationNanoseconds<<','<<value.workInvocationCount;
+        }
+        for(const auto stage : horde::telemetry::kRtSkinAttributionStages) {
+            const auto& value=cpu.values[horde::telemetry::RtStageIndex(stage)];
+            run.chapterCsv<<','<<value.durationNanoseconds<<','<<value.workInvocationCount<<','<<value.byteCount<<','<<value.operationCount;
+        }
+#if HORDE_RT_FRAME_STAGE_PROBE
+        // This is called only after this exact slot's own successful fence/idle.
+        for(unsigned i=0;i<context.frameStageTimers.size();++i) {
+            const auto stage=context.frameStageTimers[i].CollectCompleted(frame.identity.submitted.frame.frameSlot);
+            const bool matched=tag.stageSubmitted[i] && stage.consumed && stage.hasSample &&
+                stage.status==horde::vulkan::GpuFrameTimingCollectionStatus::Valid &&
+                stage.submissionSequence==tag.serial && stage.frameSlot==frame.identity.submitted.frame.frameSlot;
+            run.chapterCsv<<','<<(matched?"valid":"unavailable-or-mismatched")<<','<<stage.submissionSequence<<',';
+            if(matched)run.chapterCsv<<static_cast<std::uint64_t>(std::llround(stage.sample.milliseconds*1e6));
+        }
+#endif
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+        std::vector<horde::vulkan::raytracing::RtDispatchClockSample> clockSamples;
+        std::array<std::uint64_t,8> clockTotals{};
+        std::string clockError;
+        const bool clocksValid=context.rtScene.CollectDispatchClocks(tag.clockTicket,clockSamples,clockTotals,clockError);
+        run.chapterCsv<<','<<(clocksValid?"valid":"unavailable-or-mismatched")<<','<<tag.clockTicket<<',';
+        if(clocksValid)run.chapterCsv<<clockSamples.size();
+        for(auto ticks:clockTotals){run.chapterCsv<<',';if(clocksValid)run.chapterCsv<<ticks;}
+        // A small raw witness per held view permits independent ticket/pixel/sum checks.
+        constexpr std::array<std::string_view,4> clockViews{"landing-sweep","lower-sweep","passage-sweep","repeat-ascent"};
+        for(unsigned i=0;i<clockViews.size();++i)if(clocksValid && !run.clockRawSaved[i] &&
+            clockViews[i]==horde::gameplay::validation::ChapterProbePhaseName(tag.phase) &&
+            tag.viewTicks>=180 && tag.viewTicks<=240) {
+            std::ofstream raw(run.path+"-clock-"+std::string(clockViews[i])+"-"+std::to_string(tag.serial)+".bin",std::ios::binary);
+            raw.write(reinterpret_cast<const char*>(clockSamples.data()),clockSamples.size()*sizeof(clockSamples.front()));
+            run.clockRawSaved[i]=bool(raw);
+        }
+#endif
+        run.chapterCsv<<'\n';
+        run.chapterLastReturnNs=tag.returnNs;
+        run.chapterLastSerial=tag.serial;
+        if(!run.chapterCsv)FailAndroidMotion(context,"Chapter resource ledger write failed.");
+    }
 }
 
 void ResetAndroidMotionIfRequested(SwapchainContext& context)
@@ -383,7 +528,7 @@ void ResetAndroidMotionIfRequested(SwapchainContext& context)
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
     if (context.motion && context.motion->equipmentSeedActive)
     {
-        context.motion->scenario.End(gGameSimulation);
+        if(context.motion->equipmentSeedActive)context.motion->scenario.End(gGameSimulation);
         context.motion->equipmentSeedActive = false;
     }
     const auto& state = gGameSimulation.Snapshot();
@@ -395,6 +540,9 @@ void ResetAndroidMotionIfRequested(SwapchainContext& context)
     commands.routeReset = std::max(commands.routeReset, state.lastConsumedRouteResetSequence);
     commands.interact = std::max(commands.interact, state.lastConsumedInteractSequence);
     commands.toggleHeldLightPose = std::max(commands.toggleHeldLightPose, state.lastConsumedToggleHeldLightPoseSequence);
+    commands.runToggle=std::max(commands.runToggle,state.lastConsumedRunToggleSequence);
+    commands.clearRunIntent=std::max(commands.clearRunIntent,state.lastConsumedClearRunIntentSequence);
+    gInputPublisherState.runHeld=false;
     gInputPublisherState.combatEdgeHistory = {};
     gInputPublisherState.paused = true;
     gInputPublisherState.moveForward = gInputPublisherState.moveStrafe = 0.0f;
@@ -433,9 +581,45 @@ void BuildAndroidMotionInput(SwapchainContext& context,
         auto& run = *context.motion;
         run.id = gMotionRequestedId;
         run.selected = gMotionRequestedScenario;
+        if(run.selected==validation::MotionScenario::ChapterOutdoorScaleHold && !HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE) {
+            FailAndroidMotion(context,"Outdoor scale hold requires the explicit private Debug probe build.");return;
+        }
+        if(validation::IsTimedMotionScenario(run.selected)) {
+#if HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
+            // Resume an already admitted chapter (reunion, or live lower start
+            // for the torch probe); this does not fabricate destination Ready.
+            context.benchmarkSampling=false;
+#else
+            FailAndroidMotion(context,"Chapter route requires the explicit Shipping/Mobile timing candidate.");return;
+#endif
+        }
         run.path = context.reportDirectory + "/android-motion-" + run.id;
+        if(validation::IsTimedMotionScenario(run.selected)) {
+            if(std::ifstream(run.path+"-resources.csv").good()) {run.finished=true;gMotionStatus.store(4);return;}
+            run.chapterCsv.open(run.path+"-resources.csv");
+            run.chapterCsv<<"present_return_ns,interval_ns,serial,tick,phase,x,y,z,device_local_bytes,host_visible_bytes,omitted_triangles,unloads,restores,saved_owner_bytes,peak_overlap_bytes,wait_frames,yaw,pitch,view_ticks,detail_step_cpu_ns,run_unloads,run_restores"
+                <<",tlas_instances,blas_count"
+                <<",cpu_stage_status,simulation_cpu_ns,simulation_calls,skin_cpu_ns,skin_calls"
+                <<",player_skin_cpu_ns,player_skin_calls,character_skin_cpu_ns,character_skin_calls"
+                <<",pose_copy_cpu_ns,pose_copy_calls,dynamic_upload_cpu_ns,dynamic_upload_calls"
+                <<",fence_wait_cpu_ns,fence_wait_calls,queue_submit_cpu_ns,queue_submit_calls"
+                <<",whole_frame_cpu_ns,whole_frame_calls";
+            for(const auto stage : horde::telemetry::kRtSkinAttributionStages) {
+                const auto* name=horde::telemetry::RtStageMetricName(stage);
+                run.chapterCsv<<','<<name<<"_ns,"<<name<<"_calls,"<<name<<"_bytes,"<<name<<"_operations";
+            }
+            run.chapterCsv
+#if HORDE_RT_FRAME_STAGE_PROBE
+                <<",as_gpu_status,as_gpu_serial,as_gpu_ns,dispatch_gpu_status,dispatch_gpu_serial,dispatch_gpu_ns,transfer_gpu_status,transfer_gpu_serial,transfer_gpu_ns"
+#endif
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+                <<",clock_status,clock_ticket,clock_samples,clock_other,clock_trace,clock_material,clock_shadow,clock_surface,clock_fire,clock_mist,clock_dust"
+#endif
+                <<'\n';
+            if(!run.chapterCsv){FailAndroidMotion(context,"Chapter resource ledger could not open.");return;}
+        }
         run.requestedNs = now;
-#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
         if (context.presentTiming)
         {
             run.timingRowBaseline = context.presentTiming->RowCount();
@@ -458,7 +642,7 @@ void BuildAndroidMotionInput(SwapchainContext& context,
     }
     if (!context.motion) return;
     auto& run = *context.motion;
-    if (run.finished) { input.paused = true; input.moveForward = input.moveStrafe = 0.0f; return; }
+    if (run.finished || run.terminalTimingDrainPending) { input.paused = true; input.moveForward = input.moveStrafe = 0.0f; return; }
     const bool isolated = !context.captureActive && !context.benchmarkSampling && !context.routeReplayActive &&
         !context.inAppBenchmark.IsRunning() && context.graphicsSettings == run.settings &&
         context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
@@ -525,6 +709,7 @@ void BuildAndroidMotionInput(SwapchainContext& context,
         { FailAndroidMotion(context, "Motion seed has no current evidence scope."); input.paused = true; return; }
         gGameSimulation.ResetTiming(); gGameSimulation.ClearEvents();
         context.lastInputOwnerSteadyNs = now;
+        run.chapterBaseline=context.rtScene.OrdinaryStaticDetailEvidence();
         run.armed = true;
         if (context.motionValidationRun) input.paused = false;
         gMotionStatus.store(2, std::memory_order_release);
@@ -552,7 +737,13 @@ void ObserveAndroidMotionAdvance(SwapchainContext& context,
     auto& run = *context.motion;
     const auto& snapshot = gGameSimulation.Snapshot();
     const auto events = gGameSimulation.Events().Events();
+    const auto previousStage=run.scenario.Stage();
     run.scenario.ObserveAdvance(snapshot, events); // before the established semantic drain
+    if(run.selected==horde::gameplay::validation::MotionScenario::KeeperTorchTransition &&
+       previousStage!=run.scenario.Stage())
+        __android_log_print(ANDROID_LOG_INFO,kTag,"HORDE_TORCH_TRANSITION stage=%s tick=%llu",
+            horde::gameplay::validation::MotionStageName(run.scenario.Stage()),
+            static_cast<unsigned long long>(snapshot.tickIndex));
     if (!run.ledger.AppendState(now, snapshot, input, run.scenario, events))
         FailAndroidMotion(context, run.ledger.Failure());
     else if (run.scenario.Failed()) FailAndroidMotion(context, run.scenario.Failure());
@@ -562,6 +753,15 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
 {
     if (!context.motion || !context.motion->armed || context.motion->finished) return;
     auto& run = *context.motion;
+    if(horde::gameplay::validation::IsTimedMotionScenario(run.selected)) {
+        auto& tag=run.chapterTags[context.currentFrame];
+        tag.returnNs=GraphicsSteadyNs();
+        if(!run.scenario.Complete())return; // No mid-route wait-idle or image readback.
+        if(!CompleteRtEvidenceAfterDeviceIdle(context,vkDeviceWaitIdle(context.device)) || run.finished) {
+            FailAndroidMotion(context,"Chapter terminal graphics ownership did not drain.");return;
+        }
+        run.terminalTimingDrainPending=true;run.terminalTimingDrainStartedNs=GraphicsSteadyNs();return;
+    }
     const auto stage = run.scenario.Stage();
     const double seconds = run.scenario.SimulationSeconds();
     const auto states = run.ledger.States();

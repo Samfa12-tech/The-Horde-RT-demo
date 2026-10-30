@@ -1,0 +1,42 @@
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6485701Z native control message timed out; phase=note-only approved Unicode note edit hwnd=00000000000801CC controlId=106 message=0xc error=1460 senderThread=4884 ownerThread=6664 elapsedMs=2003 enabled=1 visible=1 guiInfoAvailable=1 guiInfoError=0 guiFlags=0x0 active=00000000001D01D2 focus=000000000004017E capture=0000000000000000
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6498859Z UI stack 0: win32u!NtGdiGetTextMetricsW+0x14 address=0x7ffaa0492064
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6503022Z UI stack 1: win32u!NtGdiGetTextMetricsW+0x14 address=0x7ffaa0492064
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6505912Z UI stack 2: gdi32full!GetTextMetricsW+0x231 address=0x7ffa9feb9041
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6623184Z UI stack 3: Msftedit!Ordinal15+0xff4ca address=0x7ffa6f75f4ca
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6628024Z UI stack 4: Msftedit!CreateTextServices+0xc5c8 address=0x7ffa6f76c1a8
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6629698Z UI stack 5: Msftedit!RichEditWndProc+0x16a64 address=0x7ffa6f79b8e4
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6632554Z UI stack 6: Msftedit!RichEditWndProc+0x1574a address=0x7ffa6f79a5ca
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6633663Z UI stack 7: Msftedit!Ordinal15+0xef242 address=0x7ffa6f74f242
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6634661Z UI stack 8: Msftedit!Ordinal15+0xef161 address=0x7ffa6f74f161
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6635726Z UI stack 9: Msftedit!Ordinal15+0x402ca address=0x7ffa6f6a02ca
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6636721Z UI stack 10: Msftedit!Ordinal15+0x67909 address=0x7ffa6f6c7909
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6637662Z UI stack 11: Msftedit!Ordinal15+0x658b3 address=0x7ffa6f6c58b3
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6638644Z UI stack 12: Msftedit!CreateTextServices+0x227d3 address=0x7ffa6f7823b3
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6639645Z UI stack 13: Msftedit!RichEditWndProc+0xb22 address=0x7ffa6f7859a2
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6640600Z UI stack 14: USER32!CallWindowProcW+0x6a6 address=0x7ffaa11c7846
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6642125Z UI stack 15: USER32!SendMessageW+0xacc address=0x7ffaa11c70cc
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6643225Z UI stack 16: USER32!User32InitializeImmEntryTable+0x1375 address=0x7ffaa11e5ab5
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6644703Z UI stack 17: ntdll!KiUserCallbackDispatcher+0x24 address=0x7ffaa2c26814
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6645775Z UI stack 18: win32u!NtUserGetMessage+0x14 address=0x7ffaa0491324
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6646730Z UI stack 19: USER32!GetMessageW+0x22 address=0x7ffaa11ef402
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6647861Z UI stack 20: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff7a2d9df73
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6649512Z UI stack 21: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff7a2d991ec
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6650867Z UI stack 22: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff7a2da680f
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6652013Z UI stack 23: KERNEL32!BaseThreadInitThunk+0x17 address=0x7ffaa140e987
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6653087Z UI stack 0: win32u!NtUserGetMessage+0x14 address=0x7ffaa0491324
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6654134Z UI stack 1: win32u!NtUserGetMessage+0x14 address=0x7ffaa0491324
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6655090Z UI stack 2: USER32!GetMessageW+0x22 address=0x7ffaa11ef402
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6656104Z UI stack 3: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff7a2d9df73
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6657161Z UI stack 4: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff7a2d991ec
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6658190Z UI stack 5: horde_rt_windows_playtest_repor!unresolved+0x0 address=0x7ff7a2da680f
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6659202Z UI stack 6: KERNEL32!BaseThreadInitThunk+0x17 address=0x7ffaa140e987
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6660149Z UI stack 7: ntdll!RtlUserThreadStart+0x2c address=0x7ffaa2b4c53c
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6660878Z note EDIT executing=1
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6661757Z UI wait-chain nodes=1 cycle=0
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6662396Z   node=0 type=8 status=3
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6663137Z note EDIT trace; phase=note-only initial note edit returned=1 elapsedMs=0
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6665745Z note EDIT trace; phase=note-only rejected-input note edit returned=1 elapsedMs=0
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6666894Z note EDIT trace; phase=note-only oversized note edit returned=1 elapsedMs=0
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6667967Z note EDIT trace; phase=note-only approved Unicode note edit returned=0 elapsedMs=0
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6668991Z note EDIT trace; phase=note-only frozen retry edit returned=1 elapsedMs=0
+Shared simulation host (MSVC)	Run complete Windows selection with isolated asset-policy overlap	2026-10-22T22:54:01.6669994Z note EDIT trace; phase=explicit-context note edit returned=1 elapsedMs=0

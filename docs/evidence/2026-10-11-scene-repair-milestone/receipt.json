@@ -1,0 +1,333 @@
+{
+  "schema": 1,
+  "sourceBase": "e8ba0586a6495fd9d0ba0c9a69a532a0cf9d6052",
+  "scope": "scene repairs and source intake milestone, not completed woodland chapter",
+  "artifacts": {
+    "windowsDebug": {
+      "sha256": "8504463dfa3ee14c1856c407ded7237eb8fd3c05131ef488029f1a87c8d28aeb",
+      "bytes": 12263424
+    },
+    "windowsRelease": {
+      "sha256": "9b1a0b867fa40cc457bcb37ecdd2a374a09caa3c129da76394d95348d6990404",
+      "bytes": 4282368
+    },
+    "androidDebug": {
+      "sha256": "515a2fcfd2506f37712706c82e325da53b5c397263f42b633acf5fba8ebeb3e1",
+      "bytes": 149524710
+    }
+  },
+  "captures": [
+    {
+      "lane": "pipeline-waterfall",
+      "complete": true,
+      "backend": "RayTracingPipeline",
+      "image": "pipeline-waterfall/154-waterfall-guards-walk-early.png",
+      "imageSha256": "08fc1a6db8f8cd104989a33bd1e326cd908264b2082c7a9afbb0c3ecda94f06c",
+      "selectedBundles": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      }
+    },
+    {
+      "lane": "query-waterfall",
+      "complete": true,
+      "backend": "RayQueryCompute",
+      "image": "query-waterfall/154-waterfall-guards-walk-early.png",
+      "imageSha256": "19d72201a19ee8f84a0ae117a97c2a6343c560e9240e6f9589ea038fec923660",
+      "selectedBundles": {
+        "opaqueFast": {
+          "key": "rayquery_compute_diagnostic_high_opaque_fast",
+          "sha256": "57b7a23d6eaed1885001e488654815cbbc1c1e25cec29db16c77b698aac92f13"
+        },
+        "genericDielectric": {
+          "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+          "sha256": "c329f47673a9ed4bb3287c59c52a6db4d7a29dc39814b78beb78b969d2f527ec"
+        }
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      }
+    }
+  ],
+  "pipelineMetrics": [
+    {
+      "key": "diagnostic_high_generic_dielectric",
+      "before": {
+        "bytes": 295732,
+        "words": 73933,
+        "instructions": 17631,
+        "rayQueryInitializations": 2,
+        "functions": 83,
+        "functionCalls": 264,
+        "loops": 21,
+        "branchOperations": 980,
+        "selectionMerges": 413
+      },
+      "after": {
+        "bytes": 295668,
+        "words": 73917,
+        "instructions": 17626,
+        "rayQueryInitializations": 2,
+        "functions": 83,
+        "functionCalls": 264,
+        "loops": 21,
+        "branchOperations": 978,
+        "selectionMerges": 412
+      },
+      "spirvSha256": "919710743ed0a5957501c2040823650657c77df620445b7c83085cfef72daf1f"
+    },
+    {
+      "key": "diagnostic_high_opaque_fast",
+      "before": {
+        "bytes": 591168,
+        "words": 147792,
+        "instructions": 32742,
+        "rayQueryInitializations": 29,
+        "functions": 1,
+        "functionCalls": 0,
+        "loops": 84,
+        "branchOperations": 4531,
+        "selectionMerges": 1818
+      },
+      "after": {
+        "bytes": 590592,
+        "words": 147648,
+        "instructions": 32700,
+        "rayQueryInitializations": 29,
+        "functions": 1,
+        "functionCalls": 0,
+        "loops": 84,
+        "branchOperations": 4519,
+        "selectionMerges": 1812
+      },
+      "spirvSha256": "5b8eb292cfa45524bb521abad3f7b9153ae93913375d975bcc3ba48b2d09ebf0"
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "before": {
+        "bytes": 294232,
+        "words": 73558,
+        "instructions": 17535,
+        "rayQueryInitializations": 2,
+        "functions": 83,
+        "functionCalls": 261,
+        "loops": 20,
+        "branchOperations": 971,
+        "selectionMerges": 411
+      },
+      "after": {
+        "bytes": 294168,
+        "words": 73542,
+        "instructions": 17530,
+        "rayQueryInitializations": 2,
+        "functions": 83,
+        "functionCalls": 261,
+        "loops": 20,
+        "branchOperations": 969,
+        "selectionMerges": 410
+      },
+      "spirvSha256": "0c3d7a98b2e8268f534cfe9ac8cc7301caa8d472f7ed9873bb122a27700875e2"
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "before": {
+        "bytes": 588068,
+        "words": 147017,
+        "instructions": 32549,
+        "rayQueryInitializations": 27,
+        "functions": 1,
+        "functionCalls": 0,
+        "loops": 80,
+        "branchOperations": 4495,
+        "selectionMerges": 1808
+      },
+      "after": {
+        "bytes": 587492,
+        "words": 146873,
+        "instructions": 32507,
+        "rayQueryInitializations": 27,
+        "functions": 1,
+        "functionCalls": 0,
+        "loops": 80,
+        "branchOperations": 4483,
+        "selectionMerges": 1802
+      },
+      "spirvSha256": "08a3f68e62d249bca1d0d9d1dafaa35e26becb13590746779b12d755681790a7"
+    },
+    {
+      "key": "shipping_high_generic_dielectric",
+      "before": {
+        "bytes": 286904,
+        "words": 71726,
+        "instructions": 17207,
+        "rayQueryInitializations": 2,
+        "functions": 83,
+        "functionCalls": 264,
+        "loops": 21,
+        "branchOperations": 933,
+        "selectionMerges": 385
+      },
+      "after": {
+        "bytes": 286840,
+        "words": 71710,
+        "instructions": 17202,
+        "rayQueryInitializations": 2,
+        "functions": 83,
+        "functionCalls": 264,
+        "loops": 21,
+        "branchOperations": 931,
+        "selectionMerges": 384
+      },
+      "spirvSha256": "94a1e332fb122b26dba4489eb9021e86ce56d95061a58b14666816705dfd516f"
+    },
+    {
+      "key": "shipping_high_opaque_fast",
+      "before": {
+        "bytes": 586932,
+        "words": 146733,
+        "instructions": 32563,
+        "rayQueryInitializations": 29,
+        "functions": 1,
+        "functionCalls": 0,
+        "loops": 84,
+        "branchOperations": 4509,
+        "selectionMerges": 1809
+      },
+      "after": {
+        "bytes": 586356,
+        "words": 146589,
+        "instructions": 32521,
+        "rayQueryInitializations": 29,
+        "functions": 1,
+        "functionCalls": 0,
+        "loops": 84,
+        "branchOperations": 4497,
+        "selectionMerges": 1803
+      },
+      "spirvSha256": "4222d936cde42bc2fd1aaea15bb467d498f9eae8ee948f9f16acf6f7f7cd9a26"
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "before": {
+        "bytes": 285404,
+        "words": 71351,
+        "instructions": 17111,
+        "rayQueryInitializations": 2,
+        "functions": 83,
+        "functionCalls": 261,
+        "loops": 20,
+        "branchOperations": 924,
+        "selectionMerges": 383
+      },
+      "after": {
+        "bytes": 285340,
+        "words": 71335,
+        "instructions": 17106,
+        "rayQueryInitializations": 2,
+        "functions": 83,
+        "functionCalls": 261,
+        "loops": 20,
+        "branchOperations": 922,
+        "selectionMerges": 382
+      },
+      "spirvSha256": "6717f06053b80b49deea9bd46f3e4978369398777e674d14544a76f647ebbd86"
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "before": {
+        "bytes": 583832,
+        "words": 145958,
+        "instructions": 32370,
+        "rayQueryInitializations": 27,
+        "functions": 1,
+        "functionCalls": 0,
+        "loops": 80,
+        "branchOperations": 4473,
+        "selectionMerges": 1799
+      },
+      "after": {
+        "bytes": 583256,
+        "words": 145814,
+        "instructions": 32328,
+        "rayQueryInitializations": 27,
+        "functions": 1,
+        "functionCalls": 0,
+        "loops": 80,
+        "branchOperations": 4461,
+        "selectionMerges": 1793
+      },
+      "spirvSha256": "5784fc3d3e3a79a81c4b4d9bf4f9bc398e22816179b37159e0667b03233e2e5e"
+    }
+  ],
+  "frozenBudgetSha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf",
+  "tests": {
+    "windowsDebugAffected": {
+      "completed": 18,
+      "failed": 0,
+      "qualification": "Torch completed at 185.93 s without explicit CTest timeout; outside the 180 s policy, not an admitted torch gate."
+    },
+    "windowsReleaseFocused": {
+      "passed": 5,
+      "failed": 0
+    },
+    "originalTorchRelease": {
+      "passed": true,
+      "seconds": 17.16,
+      "enforcedTimeoutSeconds": 180,
+      "coverageChanged": false
+    },
+    "androidJava": {
+      "suites": 43,
+      "tests": 283,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "androidDebugBuild": "PASS all four configured ABIs",
+    "androidLintDebug": "PASS",
+    "pipelineFreshEightVariantBudgetCheck": "PASS unchanged limits",
+    "rayqueryShaderCheck": "PASS",
+    "assetPolicy": "PASS",
+    "androidExactWorldAudioAssetPackage": "PASS",
+    "androidDiagnosticMobileShaderPackage": "PASS exact stripped/packaged arm64 bytes and both current RT bundles"
+  },
+  "retainedFailedEvidence": [
+    {
+      "test": "RaygenVariantManifestTests",
+      "reason": "old compatibility include hash witness",
+      "outcome": "refreshed exact witness after unchanged-budget fresh compilation; rerun PASS"
+    },
+    {
+      "test": "RaygenVariantArtifactTests",
+      "reason": "old compatibility include hash witness",
+      "outcome": "refreshed exact words/include witnesses; negative coverage retained; rerun PASS"
+    },
+    {
+      "test": "Debug original torch timing",
+      "seconds": 185.93,
+      "outcome": "outside 180-second policy; Release strict gate passed"
+    }
+  ],
+  "ownerAudioHaptics": "PENDING new candidate",
+  "androidPhysical": "NOT RUN",
+  "chapterComplete": false
+}

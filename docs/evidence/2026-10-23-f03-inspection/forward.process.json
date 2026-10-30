@@ -1,0 +1,28 @@
+{
+  "dirtyFiles": [
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+    "src/gameplay/DevelopmentCheckpoints.h",
+    "tests/DevelopmentStaticAssetTests.cpp",
+    "tests/ForestDressingTests.cpp"
+  ],
+  "arguments": [
+    "--development-rescue-journey",
+    "--capture-showcase",
+    "\"C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\f03-inspection-20261023\\forward\"",
+    "--capture-hidden",
+    "--development-checkpoint",
+    "chapter-forest-clue-forward"
+  ],
+  "exeSha256": "D384499188C0BB4504642F43E50C4D1BFA2370F7743F6CE9DDB06020B394D4EB",
+  "pid": 67080,
+  "ownerCampaignRemainsAbsent": true,
+  "settingsBefore": "ED609B868FD2951698C46BB17B98FFBAD647BF30CA7CFACFA5D64F5342FD57C3",
+  "exitCode": 0,
+  "scope": "Diagnostic seeded accepted-death ascent/walk then frozen RT view; no campaign PlaySession or audio playback; not natural victory, listening, performance or phone acceptance",
+  "completed": true,
+  "settingsAfter": "ED609B868FD2951698C46BB17B98FFBAD647BF30CA7CFACFA5D64F5342FD57C3",
+  "baseCommit": "e954116917c236d2199aee9e38209bd3936c076e",
+  "endedUtc": "2026-10-23T04:08:35.2235419Z",
+  "startedUtc": "2026-10-23T04:08:18.6063365Z",
+  "view": "forward"
+}

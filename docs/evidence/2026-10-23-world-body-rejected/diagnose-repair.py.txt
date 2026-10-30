@@ -1,0 +1,99 @@
+"""Locate prior candidate defects and predeclare ONE original-neighborhood repair."""
+import collections
+import importlib.util
+import json
+import math
+from pathlib import Path
+import sys
+
+sys.dont_write_bytecode = True
+OUT = Path(__file__).resolve().parent
+ROOT = OUT.parents[1]
+PRIOR = ROOT / 'reports/world-body-lod-20261023'
+spec = importlib.util.spec_from_file_location('original_recipe', PRIOR / 'prepare_world_body.py')
+recipe = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(recipe)
+
+def canonical(t):
+    return min(t, t[1:] + t[:1], t[2:] + t[:2])
+
+def facts(glb, p):
+    names = sorted(p['attributes'])
+    records = {n: glb.records(p['attributes'][n]) for n in names}
+    rows = [b''.join(records[n][i] for n in names) for i in range(len(records['POSITION']))]
+    triangles = recipe.triangles([v[0] for v in glb.values(p['indices'])])
+    return rows, triangles
+
+def triangle_metrics(glb, p):
+    pos = glb.values(p['attributes']['POSITION'])
+    normal = glb.values(p['attributes']['NORMAL'])
+    uv = glb.values(p['attributes']['TEXCOORD_0'])
+    _, triangles = facts(glb, p)
+    results = []
+    for tri in triangles:
+        a,b,c = [pos[i] for i in tri]
+        e = [b[k]-a[k] for k in range(3)]
+        f = [c[k]-a[k] for k in range(3)]
+        cross = [e[1]*f[2]-e[2]*f[1], e[2]*f[0]-e[0]*f[2], e[0]*f[1]-e[1]*f[0]]
+        area = math.sqrt(sum(v*v for v in cross)) * .5
+        dot = sum(cross[k]*sum(normal[i][k] for i in tri) for k in range(3))
+        ua,ub,uc = [uv[i] for i in tri]
+        determinant = (ub[0]-ua[0])*(uc[1]-ua[1])-(ub[1]-ua[1])*(uc[0]-ua[0])
+        results.append({'areaSquareMetres':area, 'crossDotSumVertexNormals':dot, 'uvDeterminant':determinant})
+    return results
+
+def diagnose():
+    world, view, plans, grips = recipe.inspect()
+    prior = recipe.Glb(PRIOR / 'world-body-protected-half-eligible.glb')
+    assert recipe.sha(prior.raw) == '1ef3f6f5d8187cb0bf99a5bdfa7b752b10b109e08340b383296fe09dfb573195'
+    details = []
+    for plan,cp in zip(plans,prior.doc['meshes'][0]['primitives']):
+        sp = plan['sourcePrimitive']
+        rows,ts = facts(world,sp)
+        crows,cts = facts(prior,cp)
+        sm = triangle_metrics(world,sp)
+        cm = triangle_metrics(prior,cp)
+        source_triangles = {canonical(tuple(rows[i] for i in t)) for t in ts}
+        minimum_positive = min(m['areaSquareMetres'] for m in sm if m['areaSquareMetres'] > 1e-14)
+        lookup = collections.defaultdict(list)
+        for i,row in enumerate(rows): lookup[row].append(i)
+        witnesses = []
+        seed = set()
+        for ti,(tri,metric) in enumerate(zip(cts,cm)):
+            if canonical(tuple(crows[i] for i in tri)) in source_triangles: continue
+            reasons = []
+            if metric['crossDotSumVertexNormals'] < 0: reasons.append('new_opposed_average_vertex_normal')
+            if metric['areaSquareMetres'] < minimum_positive: reasons.append('new_area_below_source_positive_minimum')
+            if abs(metric['uvDeterminant']) <= 1e-14: reasons.append('new_zero_uv_area')
+            if not reasons: continue
+            identities = [lookup[crows[i]] for i in tri]
+            assert all(identities)
+            for candidates in identities: seed.update(candidates)
+            witnesses.append({'priorTriangleIndex':ti, 'priorRows':list(tri), 'sourceRowsPerCorner':identities, 'reasons':reasons, **metric})
+        # Include positional twins at the existing seam key, so a split normal/UV
+        # fan cannot leave the adjoining original surface outside protection.
+        seed_keys = {recipe.pkey(plan['positions'][i]) for i in seed}
+        welded_seed = {i for i,p in enumerate(plan['positions']) if recipe.pkey(p) in seed_keys}
+        incident = [i for i,t in enumerate(ts) if any(v in welded_seed for v in t)]
+        one_ring = {v for ti in incident for v in ts[ti]}
+        # Protect all positional twins of the full one-ring. The unchanged
+        # generator then retains every original triangle incident to these rows.
+        ring_keys = {recipe.pkey(plan['positions'][i]) for i in one_ring}
+        extra = {i for i,p in enumerate(plan['positions']) if recipe.pkey(p) in ring_keys} - plan['protected']
+        repaired_protected = plan['protected'] | extra
+        repaired_fixed = [i for i,t in enumerate(ts) if any(v in repaired_protected for v in t)]
+        details.append({'material':plan['material'], 'sourceMinimumPositiveAreaSquareMetres':minimum_positive, 'priorNewDefectTriangles':witnesses,
+            'seedSourceRows':sorted(seed), 'weldedSeedSourceRows':sorted(welded_seed), 'sourceOneRingTriangleIndices':incident,
+            'additionalProtectedRows':sorted(extra), 'originalProtectedRows':len(plan['protected']), 'repairProtectedRows':len(repaired_protected),
+            'originalFixedTriangles':len(plan['fixed']), 'repairFixedTriangles':len(repaired_fixed),
+            'additionalFixedTriangleIndices':[i for i in repaired_fixed if not any(v in plan['protected'] for v in ts[i])]})
+    return {'status':'ONE_REPAIR_PREDECLARED_UNADMITTED', 'sourceSha256':recipe.sha(world.raw), 'viewmodelSha256':recipe.sha(view.raw), 'priorCandidateSha256':recipe.sha(prior.raw),
+        'priorReceiptSha256':recipe.sha((PRIOR/'receipt.json').read_bytes()), 'priorStaticInspectionSha256':recipe.sha((PRIOR/'static-inspection.json').read_bytes()),
+        'repairPolicy':'Same gltfpack settings once. Protect source vertex identities of new defects, their welded original one-ring vertices, and every incident original triangle via unchanged fixed-triangle rules. No face flips/deletions, weight changes, gate changes or tuning loop.',
+        'qualityPolicy':'Reject if any non-original triangle is opposed to its average vertex normal, has area below its primitive source minimum positive area (>1e-14 m2), or has UV determinant magnitude <=1e-14; also retain structural/boundary/boot/contact/seam gates. Inherited exact source triangles remain identified separately.',
+        'primitives':details}
+
+if __name__ == '__main__':
+    result = diagnose()
+    with (OUT/'repair-plan.json').open('x',encoding='utf8',newline='\n') as stream: json.dump(result,stream,indent=2,allow_nan=False);stream.write('\n')
+    print(json.dumps({'status':result['status'],'primitives':[{'material':p['material'],'witnesses':p['priorNewDefectTriangles'],'extraRows':len(p['additionalProtectedRows']),'extraFixedTriangles':len(p['additionalFixedTriangleIndices'])} for p in result['primitives']]}))

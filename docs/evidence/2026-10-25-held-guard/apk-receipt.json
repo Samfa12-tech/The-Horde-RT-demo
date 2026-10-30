@@ -1,0 +1,40 @@
+{
+  "artifact": "reports/held-guard-20261025/Horde-guard-20261025-debug.apk",
+  "sha256": "a2c9602d4d01627fd655b3a3b57029e30197a04e2dfc96c1fe34935867c98f9e",
+  "bytes": 206256180,
+  "versionName": "1.6.2-debug",
+  "versionCode": 10,
+  "package": "com.samfa12.hordelanternrt.debug",
+  "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+  "nativeLibraries": {
+    "lib/arm64-v8a/libhorde_rt_probe_android.so": {
+      "bytes": 5298304,
+      "sha256": "eeb7b5a05714148a24f425f474d048039bf0ead1905fca298b30abfb7765bd86",
+      "class": 2,
+      "machine": 183
+    },
+    "lib/armeabi-v7a/libhorde_rt_probe_android.so": {
+      "bytes": 4574576,
+      "sha256": "9a46e2bae5a0a3fc6743d428bfa4646da13f7da9d34078b39dd033b95fffc687",
+      "class": 1,
+      "machine": 40
+    },
+    "lib/x86/libhorde_rt_probe_android.so": {
+      "bytes": 5935532,
+      "sha256": "599c3fcce999a4acd8c2d029451215352c094263fd821cdf31fdc137d97276b5",
+      "class": 1,
+      "machine": 3
+    },
+    "lib/x86_64/libhorde_rt_probe_android.so": {
+      "bytes": 5576128,
+      "sha256": "e2b19883089cd6560bb333ace3e1330e2f8d7a4e1a16cc14149cef639dbb3aa2",
+      "class": 2,
+      "machine": 62
+    }
+  },
+  "buildAndLint": "passed,2minutes;53tasks22executed31uptodate",
+  "phoneInstalled": false,
+  "runtimeSourceRoster": "source-roster.json",
+  "sourceCommit": "this implementation checkpoint; source hashes frozen at build",
+  "profile": "ordinary Diagnostic/Mobile; shared64/worker/private shaders OFF"
+}

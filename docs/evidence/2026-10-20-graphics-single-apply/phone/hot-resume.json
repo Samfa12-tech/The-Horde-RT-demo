@@ -1,0 +1,19 @@
+{
+  "args": [
+    "shell",
+    "am",
+    "start",
+    "-W",
+    "-f",
+    "0x10200000",
+    "-a",
+    "android.intent.action.MAIN",
+    "-c",
+    "android.intent.category.LAUNCHER",
+    "-n",
+    "com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity"
+  ],
+  "returncode": 0,
+  "stdout": "Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity }\r\nWarning: Activity not started, its current task has been brought to the front\r\nStatus: ok\r\nLaunchState: HOT\r\nActivity: com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity\r\nTotalTime: 30\r\nWaitTime: 32\r\nComplete\r\n",
+  "stderr": ""
+}

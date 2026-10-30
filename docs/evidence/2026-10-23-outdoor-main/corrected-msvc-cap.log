@@ -1,0 +1,13 @@
+2026-10-23T04:07:33.8861511Z 107/169 Test #107: horde_rt_static_gltf_asset_tests ...........................   Passed    0.31 sec
+2026-10-23T04:07:33.8866997Z         Start 108: horde_rt_static_gltf_intake_missing_argument_tests
+2026-10-23T04:07:33.8935168Z 108/169 Test #108: horde_rt_static_gltf_intake_missing_argument_tests .........   Passed    0.01 sec
+2026-10-23T04:07:33.8939961Z         Start 109: horde_rt_static_gltf_intake_unknown_argument_tests
+2026-10-23T04:07:33.9007982Z 109/169 Test #109: horde_rt_static_gltf_intake_unknown_argument_tests .........   Passed    0.01 sec
+2026-10-23T04:07:33.9012130Z         Start 110: horde_rt_production_prop_asset_tests
+2026-10-23T04:07:33.9588620Z 110/169 Test #110: horde_rt_production_prop_asset_tests .......................   Passed    0.06 sec
+2026-10-23T04:07:33.9594237Z         Start 111: horde_rt_static_collapse_asset_tests
+2026-10-23T04:07:34.0824690Z 111/169 Test #111: horde_rt_static_collapse_asset_tests .......................   Passed    0.12 sec
+2026-10-23T04:07:34.0829754Z         Start 112: horde_rt_benchmark_scale_policy_tests
+2026-10-23T04:07:35.7595155Z 112/169 Test #112: horde_rt_benchmark_scale_policy_tests ......................   Passed    1.68 sec
+2026-10-23T04:07:35.7599895Z         Start 113: horde_rt_windows_glass_graphics_contract_tests
+2026-10-23T04:07:43.0964593Z ##[error]The operation was canceled.

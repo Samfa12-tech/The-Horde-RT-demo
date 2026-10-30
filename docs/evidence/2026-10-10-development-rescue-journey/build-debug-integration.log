@@ -1,0 +1,226 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  MusicDirector.cpp
+  MusicPcmAssetBank.cpp
+  MusicPcmStream.cpp
+  MusicPlaybackSession.cpp
+  GameSimulation.cpp
+  GameSimulationRescue.cpp
+  Generating Code...
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  WindowsMusicPlayback.cpp
+  CharacterRenderSlot.cpp
+  PresentableTinyRtScene.cpp
+  horde_windows_music.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_windows_music.lib
+  SimulationFrameAdapter.cpp
+  Generating Code...
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  MotionEvidenceScenario.cpp
+  DiagnosticWindow.cpp
+  MotionEvidenceLedger.cpp
+  Generating Code...
+  horde_rt_diagnostic_window.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\HordeLanternRT.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule <repo>/CMakeLists.txt
+  RescueTraversalTests.cpp
+  horde_rt_rescue_traversal_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_rescue_traversal_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  Building Custom Rule <repo>/CMakeLists.txt
+  RescueBlockoutImportTests.cpp
+<repo>\tests\RescueBlockoutImportTests.cpp(133,13): error C2065: 'RescueBlockoutBox': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(133,6): error C2923: 'std::vector': 'RescueBlockoutBox' is not a valid template type argument for parameter '_Ty' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      <repo>\tests\RescueBlockoutImportTests.cpp(133,13):
+      see declaration of 'RescueBlockoutBox'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(133,6): error C2976: 'std::vector': too few template arguments [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(442,7):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(133,32): error C2955: 'std::vector': use of class template requires template argument list [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(442,7):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(133,32): error C2079: '`anonymous-namespace'::AllRecipeBoxes' uses undefined class 'std::vector' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(135,17): error C2065: 'RescueBlockoutBox': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(135,10): error C2923: 'std::vector': 'RescueBlockoutBox' is not a valid template type argument for parameter '_Ty' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      <repo>\tests\RescueBlockoutImportTests.cpp(135,17):
+      see declaration of 'RescueBlockoutBox'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(135,10): error C2976: 'std::vector': too few template arguments [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(442,7):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(136,9): error C2065: 'kRescueBlockoutBoxes': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(136,39): error C2065: 'kRescueBlockoutBoxes': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(135,42): error C2641: cannot deduce template arguments for 'std::vector' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(135,42): error C2783: 'std::vector<_Ty,_Alloc> std::vector(void) noexcept(<expr>)': could not deduce template argument for '_Ty' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(670,5):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(135,42): error C2780: 'std::vector<_Ty,_Alloc> std::vector(std::vector<_Ty,_Alloc>)': expects 1 arguments - 0 provided [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(442,7):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(137,22): error C2065: 'kRescueBlockoutLid': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(138,22): error C2065: 'kRescueBlockoutLanding': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(139,5): error C2440: 'return': cannot convert from 'std::vector' to 'std::vector' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      <repo>\tests\RescueBlockoutImportTests.cpp(139,5):
+      Cannot copy construct class 'std::vector' due to ambiguous copy constructors or no available copy constructor
+
+<repo>\tests\RescueBlockoutImportTests.cpp(143,29): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(143,52): error C2143: syntax error: missing ',' before '&' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(147,54): error C2065: 'plane': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(147,15): error C2737: 'planeMm': const object must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(149,38): error C2065: 'box': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(150,38): error C2065: 'box': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(151,38): error C2065: 'box': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(153,38): error C2065: 'box': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(154,38): error C2065: 'box': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(155,38): error C2065: 'box': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(158,19): error C2065: 'axis': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(160,26): error C2065: 'axis': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(163,34): error C2065: 'axis': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(163,49): error C7732: expected an expression before ']' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(163,66): error C2065: 'axis': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(163,81): error C7732: expected an expression before ']' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(164,34): error C2065: 'axis': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(164,49): error C7732: expected an expression before ']' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(164,66): error C2065: 'axis': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(164,81): error C7732: expected an expression before ']' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(165,34): error C2065: 'axis': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(165,49): error C7732: expected an expression before ']' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(165,66): error C2065: 'axis': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(165,81): error C7732: expected an expression before ']' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(166,34): error C2065: 'axis': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(166,49): error C7732: expected an expression before ']' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(166,66): error C2065: 'axis': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(166,81): error C7732: expected an expression before ']' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(172,22): error C2641: cannot deduce template arguments for 'std::vector' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(172,22): error C2780: 'std::vector<conditional_t<std::_Is_from_primary<std::iterator_traits<remove_cv<remove_reference<_Ty>::type>::type>>,std::indirectly_readable_traits<remove_cv<remove_reference<_Ty>::type>::type>,std::iterator_traits<remove_cv<remove_reference<_Ty>::type>::type>>::value_type,_Alloc> std::vector(_Iter,_Iter,_Alloc)': expects 3 arguments - 1 provided [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(2250,1):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(172,22): error C2780: 'std::vector<_Ty,_Alloc> std::vector(std::vector<_Ty,_Alloc> &&,const _Identity<_Alloc>::type &) noexcept(<expr>)': expects 2 arguments - 1 provided [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(768,5):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(172,22): error C2784: 'std::vector<_Ty,_Alloc> std::vector(std::vector<_Ty,_Alloc> &&) noexcept': could not deduce template argument for 'std::vector<_Ty,_Alloc> &&' from 'std::vector' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(759,5):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(172,22): error C2780: 'std::vector<_Ty,_Alloc> std::vector(const std::vector<_Ty,_Alloc> &,const _Identity<_Alloc>::type &)': expects 2 arguments - 1 provided [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(752,5):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(172,22): error C2784: 'std::vector<_Ty,_Alloc> std::vector(const std::vector<_Ty,_Alloc> &)': could not deduce template argument for 'const std::vector<_Ty,_Alloc> &' from 'std::vector' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(745,5):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(172,22): error C2784: 'std::vector<_Ty,_Alloc> std::vector(std::initializer_list<_Elem>,const _Alloc &)': could not deduce template argument for 'std::initializer_list<_Elem>' from 'std::vector' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(719,5):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(172,22): error C2780: 'std::vector<_Ty,_Alloc> std::vector(_Iter,_Iter,const _Alloc &)': expects 3 arguments - 1 provided [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(692,5):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(172,22): error C2780: 'std::vector<_Ty,_Alloc> std::vector(const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type,const _Ty &,const _Alloc &)': expects 3 arguments - 1 provided [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(686,5):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(172,22): error C2780: 'std::vector<_Ty,_Alloc> std::vector(void) noexcept(<expr>)': expects 0 arguments - 1 provided [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(670,5):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(172,22): error C2784: 'std::vector<_Ty,_Alloc> std::vector(std::vector<_Ty,_Alloc>)': could not deduce template argument for 'std::vector<_Ty,_Alloc>' from 'std::vector' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(442,7):
+      see declaration of 'std::vector'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(188,58): error C2662: 'allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type std::vector<_Ty,_Alloc>::size(void) noexcept const': cannot convert 'this' pointer from 'const std::vector' to 'const std::vector<_Ty,_Alloc> &' [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      <repo>\tests\RescueBlockoutImportTests.cpp(188,52):
+      Reason: cannot convert from 'const std::vector' to 'const std::vector<_Ty,_Alloc>'
+      <repo>\tests\RescueBlockoutImportTests.cpp(188,52):
+      Conversion requires a second user-defined-conversion operator or constructor
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(1913,39):
+      see declaration of 'std::vector<_Ty,_Alloc>::size'
+      <repo>\tests\RescueBlockoutImportTests.cpp(188,58):
+      while trying to match the argument list '()'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(189,17): error C2678: binary '[': no operator found which takes a left-hand operand of type 'const std::vector' (or there is no acceptable conversion) [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(1937,40):
+      could be 'const _Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept const'
+          <repo>\tests\RescueBlockoutImportTests.cpp(189,17):
+          'const _Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept const': cannot convert 'this' pointer from 'const std::vector' to 'const std::vector<_Ty,_Alloc> &'
+              <repo>\tests\RescueBlockoutImportTests.cpp(189,17):
+              Reason: cannot convert from 'const std::vector' to 'const std::vector<_Ty,_Alloc>'
+              <repo>\tests\RescueBlockoutImportTests.cpp(189,17):
+              Conversion requires a second user-defined-conversion operator or constructor
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(1927,34):
+      or       '_Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept'
+          <repo>\tests\RescueBlockoutImportTests.cpp(189,17):
+          '_Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept': cannot convert 'this' pointer from 'const std::vector' to 'std::vector<_Ty,_Alloc> &'
+              <repo>\tests\RescueBlockoutImportTests.cpp(189,17):
+              Reason: cannot convert from 'const std::vector' to 'std::vector<_Ty,_Alloc>'
+              <repo>\tests\RescueBlockoutImportTests.cpp(189,17):
+              Conversion requires a second user-defined-conversion operator or constructor
+      <repo>\tests\RescueBlockoutImportTests.cpp(189,17):
+      while trying to match the argument list '(const std::vector, size_t)'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(193,31): error C2678: binary '[': no operator found which takes a left-hand operand of type 'const std::vector' (or there is no acceptable conversion) [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(1937,40):
+      could be 'const _Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept const'
+          <repo>\tests\RescueBlockoutImportTests.cpp(193,31):
+          'const _Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept const': cannot convert 'this' pointer from 'const std::vector' to 'const std::vector<_Ty,_Alloc> &'
+              <repo>\tests\RescueBlockoutImportTests.cpp(193,31):
+              Reason: cannot convert from 'const std::vector' to 'const std::vector<_Ty,_Alloc>'
+              <repo>\tests\RescueBlockoutImportTests.cpp(193,31):
+              Conversion requires a second user-defined-conversion operator or constructor
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(1927,34):
+      or       '_Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept'
+          <repo>\tests\RescueBlockoutImportTests.cpp(193,31):
+          '_Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept': cannot convert 'this' pointer from 'const std::vector' to 'std::vector<_Ty,_Alloc> &'
+              <repo>\tests\RescueBlockoutImportTests.cpp(193,31):
+              Reason: cannot convert from 'const std::vector' to 'std::vector<_Ty,_Alloc>'
+              <repo>\tests\RescueBlockoutImportTests.cpp(193,31):
+              Conversion requires a second user-defined-conversion operator or constructor
+      <repo>\tests\RescueBlockoutImportTests.cpp(193,31):
+      while trying to match the argument list '(const std::vector, const size_t)'
+
+<repo>\tests\RescueBlockoutImportTests.cpp(193,29): error C2530: 'box': references must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(200,27): error C3536: 'box': cannot be used before it is initialized [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(199,33): error C2737: 'value': const object must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(235,35): error C2678: binary '[': no operator found which takes a left-hand operand of type 'const std::vector' (or there is no acceptable conversion) [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(1937,40):
+      could be 'const _Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept const'
+          <repo>\tests\RescueBlockoutImportTests.cpp(235,35):
+          'const _Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept const': cannot convert 'this' pointer from 'const std::vector' to 'const std::vector<_Ty,_Alloc> &'
+              <repo>\tests\RescueBlockoutImportTests.cpp(235,35):
+              Reason: cannot convert from 'const std::vector' to 'const std::vector<_Ty,_Alloc>'
+              <repo>\tests\RescueBlockoutImportTests.cpp(235,35):
+              Conversion requires a second user-defined-conversion operator or constructor
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vector(1927,34):
+      or       '_Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept'
+          <repo>\tests\RescueBlockoutImportTests.cpp(235,35):
+          '_Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept': cannot convert 'this' pointer from 'const std::vector' to 'std::vector<_Ty,_Alloc> &'
+              <repo>\tests\RescueBlockoutImportTests.cpp(235,35):
+              Reason: cannot convert from 'const std::vector' to 'std::vector<_Ty,_Alloc>'
+              <repo>\tests\RescueBlockoutImportTests.cpp(235,35):
+              Conversion requires a second user-defined-conversion operator or constructor
+      <repo>\tests\RescueBlockoutImportTests.cpp(235,35):
+      while trying to match the argument list '(const std::vector, _Ty)'
+          with
+          [
+              _Ty=size_t
+          ]
+
+<repo>\tests\RescueBlockoutImportTests.cpp(235,33): error C2530: 'box': references must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(241,58): error C3536: 'box': cannot be used before it is initialized [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+<repo>\tests\RescueBlockoutImportTests.cpp(241,37): error C2737: 'plane': const object must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_rescue_blockout_import_tests.vcxproj]
+  AssetManifest.cpp
+  AssetValidation.cpp
+  Generating Code...

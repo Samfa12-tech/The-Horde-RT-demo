@@ -1,0 +1,187 @@
+Start testing: Oct 20 17:57 AUS Eastern Summer Time
+----------------------------------------------------------
+58/216 Testing: horde_rt_benchmark_evidence_report_tests
+58/216 Test: horde_rt_benchmark_evidence_report_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_benchmark_evidence_report_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_benchmark_evidence_report_tests" start time: Oct 20 17:57 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+RT benchmark evidence report tests passed.
+<end of output>
+Test time =   1.25 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_benchmark_evidence_report_tests" end time: Oct 20 17:57 AUS Eastern Summer Time
+"horde_rt_benchmark_evidence_report_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+94/216 Testing: horde_rt_skinned_node_pose_batch_tests
+94/216 Test: horde_rt_skinned_node_pose_batch_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_skinned_node_pose_batch_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_skinned_node_pose_batch_tests" start time: Oct 20 17:57 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+PASS: 763 cached/legacy normal cases including determinant boundaries
+PASS: batched skeleton node-pose sampling and rejection contracts
+<end of output>
+Test time =   1.23 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_skinned_node_pose_batch_tests" end time: Oct 20 17:57 AUS Eastern Summer Time
+"horde_rt_skinned_node_pose_batch_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+179/216 Testing: horde_rt_frame_evidence_coordinator_tests
+179/216 Test: horde_rt_frame_evidence_coordinator_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_frame_evidence_coordinator_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_frame_evidence_coordinator_tests" start time: Oct 20 17:57 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+RT frame evidence coordinator tests passed.
+<end of output>
+Test time =   1.40 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_frame_evidence_coordinator_tests" end time: Oct 20 17:57 AUS Eastern Summer Time
+"horde_rt_frame_evidence_coordinator_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+180/216 Testing: horde_rt_gpu_resources_observation_tests
+180/216 Test: horde_rt_gpu_resources_observation_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_gpu_resources_observation_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_gpu_resources_observation_tests" start time: Oct 20 17:57 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.83 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_gpu_resources_observation_tests" end time: Oct 20 17:57 AUS Eastern Summer Time
+"horde_rt_gpu_resources_observation_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+188/216 Testing: horde_rt_scene_resource_inventory_tests
+188/216 Test: horde_rt_scene_resource_inventory_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_scene_resource_inventory_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_scene_resource_inventory_tests" start time: Oct 20 17:57 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+Resource integration: existing readback/mist/torch contracts
+Actual development static admission materials=30 primitives=31 layers=18,15,15,1
+Native sparse fixture (Mobile) IDs: 75693 91585
+Actual development static admission materials=30 primitives=32 layers=18,15,15,1
+Native sparse fixture (High) IDs: 75693 91585
+FAIL: real dressed tomb/forest production registration exceeds its unchanged resource contracts
+Resource integration: descriptor contracts
+Resource integration: TLAS and water geometry
+Resource integration: actual tomb intake
+Integrated intake invariants: baseline indices=25266 expected=25266; baseline top=12.24; entry top=6 expected=6; chapter indices=1291902 expected=1280514
+Integrated native tomb static roster: 31 primitives, 30 materials
+Matched CPU intake only (baseline first; cache/order bias possible): 64.2938 / 432.181 ms; additional static vertices/indices bytes: 33008832 / 5378016; no GPU allocation, AS build or presentation measurement
+FAIL: actual combined native tomb asset intake retains the frozen primitive/material capacities
+Resource integration: water owner lifetime
+Water lifetime: populate
+Water lifetime: move
+Water lifetime: destroy
+Resource integration: resize contracts
+Resource integration: command/resource observations
+Resource integration: command execution fixtures
+Resource integration: not-ready rejection
+Resource integration: preview inventory
+Resource integration: populated inventory
+<end of output>
+Test time =   3.35 sec
+----------------------------------------------------------
+Test Failed.
+"horde_rt_scene_resource_inventory_tests" end time: Oct 20 17:57 AUS Eastern Summer Time
+"horde_rt_scene_resource_inventory_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+192/216 Testing: horde_rt_skinned_arm_reference_tests
+192/216 Test: horde_rt_skinned_arm_reference_tests
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_skinned_arm_reference_tests.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+"horde_rt_skinned_arm_reference_tests" start time: Oct 20 17:57 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+PASS: unused/used singular joint, restored shared pose and failed reevaluation
+Left target=0.2 elbow=(0.475,1.00953,0) upper=0.3 lower=0.4
+Right target=0.2 elbow=(-0.475,1.00953,0) upper=0.3 lower=0.4
+Left target=0.5 elbow=(0.22,1.06,0) upper=0.3 lower=0.4
+Right target=0.5 elbow=(-0.22,1.06,0) upper=0.3 lower=0.4
+Skinned arm analytic reference passed: bind 0.30/0.40 m, folded 0.20 m, mirrored mounts, grip sockets, LBS and topology
+<end of output>
+Test time =   0.90 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_skinned_arm_reference_tests" end time: Oct 20 17:57 AUS Eastern Summer Time
+"horde_rt_skinned_arm_reference_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+193/216 Testing: horde_rt_skinned_character_smoke
+193/216 Test: horde_rt_skinned_character_smoke
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_skinned_character_smoke.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_skinned_character_smoke" start time: Oct 20 17:57 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+player exact-grounding candidate vertices=5638
+player basic idle/walk skin passed
+player static/skinned stream agreement passed
+Stable final Grip agreement rest=1.0154e-05m/0.000345267rad down=9.92743e-06m/0rad up=1.00263e-05m/0rad
+authored Grip surface left axis/surface/contact/bins/span=0.00971155/7.41892e-06/2539/24/0.0955135 right=0.00973/1.47149e-07/2547/24/0.0954864
+sheathed actual right Grip in view=0.18,-0.339998,0.59999
+ordinary final-skinned clearance triangle/depth/area/side-cross=0.249519/0.0119556/0.170158/0/15855 near-cross=0/0 max-edge bind/skinned=0.0550014/0.0710506 max-triangle-area=0.00125283 normal-dot/reversed=-0.899975/299/0.000576386 sole-y=-0.94975
+grounded boot envelope idle/walk=-0.94975/-0.94975..-0.94975
+ordinary-wall final-skinned clearance/depth/area/near-cross=0.276322/-0.139847/0/214/0
+high wall final-skinned clearance triangle/depth=0.270617/-0.138872 projected-area wall/open=0 (0/0.802972) side-cross=0/15855 open/ordinary-area=4.71898 near-cross=199/0 max-edge open/wall=0.0764185/0.0734252 max-triangle-area open/wall=0.00330326/0
+low wall final-skinned clearance triangle/depth=0.274715/-0.143037 projected-area wall/open=0 (0/0.45415) side-cross=0/15855 open/ordinary-area=2.66899 near-cross=208/0 max-edge open/wall=0.0719549/0.0734252 max-triangle-area open/wall=0.00276535/0
+former z=-9.70 final-skinned clearance=0.270617 depth=-0.138872 projected-area=0 near-cross=199/0 side-cross=0/15855 max-edge/triangle-area=0.0734252/0
+former z=-9.70 final-skinned clearance=0.275184 depth=-0.145455 projected-area=0 near-cross=207/0 side-cross=0/15855 max-edge/triangle-area=0.0734252/0
+high full wall sweep samples=46 worst clearance@z=0.222394@-7.5 depth=-0.138872 area-ratio=1.44222 consecutive-footprint-area-delta=0.0516975@-8.2->-8.25(1.11163->0.882725) side-cross=0
+low full wall sweep samples=46 worst clearance@z=0.234326@-7.5 depth=-0.145455 area-ratio=1.00627 consecutive-footprint-area-delta=0.0239198@-8.4->-8.45(0.395608->0.308938) side-cross=0
+held-lantern wall approach final-skinned clearance=0.27312 finite=1 final-z=-9.735 blocked-ticks=141 max-edge/triangle-area=0.0996301/0.00142628 worst-step/first/centroid/bind/skinned=0/3326/-0.20772,0.528372,-8.58431/0.230297,1.43295,0.0716676/0.211276,1.46717,0.0493764 camera=0,0.7,-8.53167 triangle=-0.21138,0.53098,-8.58099;-0.206322,0.528837,-8.58391;-0.205458,0.525297,-8.58802;
+reward wall-safe movement strafe=0.0316667,-9.7 diagonal=0.0223917,-9.72239 retreat=0,-9.66833 corner-out/in=0.731667/0.668333 rotate-forward=0.0316667,-9.7
+walking-arm-pair-evidence case=walk-fixed-target baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryElbow=0.0242103 productionBoundaryElbow=0.0128193 baselineBoundaryP95=0.0287467 productionBoundaryP95=0.0153792 baselineBoundaryMax=0.0456174 productionBoundaryMax=0.0244856 pairedPoseContract=1 heldTorch=1 grip=1 boundary=1 improved=1
+walking-arm-paired-flexion case=walk-fixed-target samples=137 baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryTransitions=4 productionBoundaryTransitions=4 baselineBoundaryElbowStepMax=0.0242103 productionBoundaryElbowStepMax=0.0128193 baselineBoundaryArmP95Max=0.0287467 productionBoundaryArmP95Max=0.0153792 baselineBoundaryArmMax=0.0456174 productionBoundaryArmMax=0.0244856 baselineGripError=1.02202e-05 productionGripError=3.62561e-07 nonFlexionPoseHistoryIdentical=1
+walking-arm-pair-evidence case=production-torch baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryElbow=0.0339105 productionBoundaryElbow=0.0178584 baselineBoundaryP95=0.0401105 productionBoundaryP95=0.0212512 baselineBoundaryMax=0.0637163 productionBoundaryMax=0.0337062 pairedPoseContract=1 heldTorch=1 grip=1 boundary=1 improved=1
+walking-arm-paired-flexion case=production-torch samples=137 baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryTransitions=4 productionBoundaryTransitions=4 baselineBoundaryElbowStepMax=0.0339105 productionBoundaryElbowStepMax=0.0178584 baselineBoundaryArmP95Max=0.0401105 productionBoundaryArmP95Max=0.0212512 baselineBoundaryArmMax=0.0637163 productionBoundaryArmMax=0.0337062 baselineGripError=1.02569e-05 productionGripError=3.47871e-07 nonFlexionPoseHistoryIdentical=1
+Skinned character model smoke passed: skeleton=28206 player=83445 lich=27564 textured std430 stride=48 emissiveVertices=377 emissiveX=-0.813946..1.00981 outer=40 avg=0.943092,0.789989,0.636973
+<end of output>
+Test time =   4.85 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_skinned_character_smoke" end time: Oct 20 17:57 AUS Eastern Summer Time
+"horde_rt_skinned_character_smoke" time elapsed: 00:00:04
+----------------------------------------------------------
+
+197/216 Testing: horde_rt_character_render_slot_smoke
+197/216 Test: horde_rt_character_render_slot_smoke
+Command: "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/Release/horde_rt_character_render_slot_smoke.exe"
+Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof
+"horde_rt_character_render_slot_smoke" start time: Oct 20 17:57 AUS Eastern Summer Time
+Output:
+----------------------------------------------------------
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: CPU/GLSL world normal codes must retain their signed-axis agreement
+FAIL: secondary water hits must preserve accumulated camera-path distance for fog and distance lighting
+FAIL: Android renderer must consume exactly one mutex-protected RT tuning snapshot and reset it with the route
+Keeper audited staff centroids: neutral=(0.972983, 0.800802, 0.605775) lifted=(0.466067, 1.09768, 1.11467) forward=(0.0265056, 1.30031, 1.17645)
+<end of output>
+Test time =   2.41 sec
+----------------------------------------------------------
+Test Failed.
+"horde_rt_character_render_slot_smoke" end time: Oct 20 17:57 AUS Eastern Summer Time
+"horde_rt_character_render_slot_smoke" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 20 17:57 AUS Eastern Summer Time

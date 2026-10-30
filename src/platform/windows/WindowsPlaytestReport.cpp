@@ -9,6 +9,7 @@
 #include <windows.h>
 #include <commdlg.h>
 #include <commctrl.h>
+#include <richedit.h>
 #include <bcrypt.h>
 
 #include "reporting/PlaytestReport.h"
@@ -167,7 +168,11 @@ void SetStatus(HWND window, const std::wstring& value)
 
 bool ReadUtf8(HWND edit, std::string& result, horde::reporting::PlaytestReportStatus& status)
 {
-    const int count = GetWindowTextLengthW(edit);
+    // Rich Edit stores paragraph separators as CR. Request UTF-16 with CRLF
+    // explicitly so the existing byte-exact JSON/retry contract is preserved.
+    GETTEXTLENGTHEX length{GTL_PRECISE | GTL_NUMCHARS | GTL_USECRLF, 1200};
+    const LRESULT count = SendMessageW(edit, EM_GETTEXTLENGTHEX,
+        reinterpret_cast<WPARAM>(&length), 0);
     status = horde::reporting::PlaytestReportStatus::InvalidUtf8;
     if (count < 0) return false;
     if (count > 16384)
@@ -176,7 +181,12 @@ bool ReadUtf8(HWND edit, std::string& result, horde::reporting::PlaytestReportSt
         return false;
     }
     std::wstring wide(static_cast<std::size_t>(count) + 1u, L'\0');
-    const int copied = GetWindowTextW(edit, wide.data(), count + 1);
+    GETTEXTEX text{};
+    text.cb = static_cast<DWORD>(wide.size() * sizeof(wchar_t));
+    text.flags = GT_USECRLF;
+    text.codepage = 1200;
+    const LRESULT copied = SendMessageW(edit, EM_GETTEXTEX,
+        reinterpret_cast<WPARAM>(&text), reinterpret_cast<LPARAM>(wide.data()));
     if (copied != count) return false;
     wide.resize(static_cast<std::size_t>(count));
     static_assert(sizeof(wchar_t) == sizeof(char16_t));
@@ -328,7 +338,7 @@ void Export(HWND window, DialogState& state)
     SetStatus(window, message);
 }
 
-void CreateControls(HWND window, DialogState& state)
+bool CreateControls(HWND window, DialogState& state)
 {
     AddControl(window, L"STATIC", L"This report stays on your PC until you choose Export local report. Nothing is sent.",
                SS_LEFT | SS_NOPREFIX, kIntro);
@@ -345,8 +355,23 @@ void CreateControls(HWND window, DialogState& state)
     SendMessageW(impacts, CB_SETCURSEL, static_cast<WPARAM>(-1), 0);
     SendMessageW(impacts, CB_SETMINVISIBLE, static_cast<WPARAM>(kImpacts.size()), 0);
     AddControl(window, L"STATIC", L"What happened? Add a short note", SS_LEFT, kNoteLabel);
-    AddControl(window, L"EDIT", L"", ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_TABSTOP,
-               kNoteEdit, WS_EX_CLIENTEDGE);
+    // Native accessible Unicode editing, with formatting, objects and links
+    // disabled. Font fallback remains enabled for all supported scripts.
+    const HWND note = AddControl(window, MSFTEDIT_CLASS, L"",
+        ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_TABSTOP,
+        kNoteEdit, WS_EX_CLIENTEDGE);
+    if (!note || SendMessageW(note, EM_SETTEXTMODE, TM_PLAINTEXT | TM_MULTICODEPAGE, 0) != 0)
+        return false;
+    SendMessageW(note, EM_AUTOURLDETECT, FALSE, 0);
+    // This is a user-interface field rather than a document editor. Preserve
+    // its IME/language policy, but use Windows' UI script-font associations
+    // instead of legacy document-font defaults during automatic font binding.
+    // Keep the selected UI size when binding another script font. RichEdit's
+    // document-oriented Asian/Western size adjustment is unnecessary here;
+    // automatic font fallback and the existing IME policy remain enabled.
+    const LRESULT languageOptions = SendMessageW(note, EM_GETLANGOPTIONS, 0, 0);
+    SendMessageW(note, EM_SETLANGOPTIONS, 0,
+        (languageOptions | IMF_UIFONTS) & ~IMF_AUTOFONTSIZEADJUST);
     AddControl(window, L"BUTTON", L"I consent to export this report as a local JSON file", BS_AUTOCHECKBOX | WS_TABSTOP,
                kConsent);
     AddControl(window, L"BUTTON", L"Include basic device and RT context (optional)", BS_AUTOCHECKBOX | WS_TABSTOP,
@@ -364,6 +389,7 @@ void CreateControls(HWND window, DialogState& state)
     AddControl(window, L"BUTTON", L"Close", BS_PUSHBUTTON | WS_TABSTOP, kCancel);
     ApplyFont(window);
     Layout(window);
+    return true;
 }
 
 LRESULT CALLBACK ReportWindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
@@ -377,8 +403,7 @@ LRESULT CALLBACK ReportWindowProc(HWND window, UINT message, WPARAM wParam, LPAR
     }
     if (message == WM_CREATE && state != nullptr)
     {
-        CreateControls(window, *state);
-        return 0;
+        return CreateControls(window, *state) ? 0 : -1;
     }
     switch (message)
     {
@@ -467,6 +492,16 @@ bool ExportWindowsPlaytestReportJson(HWND owner, const std::string& json, std::w
 void ShowWindowsPlaytestReport(HWND owner, WindowsPlaytestReportContext context,
     const WindowsPlaytestReportExporter exporter)
 {
+    // Load only the Windows copy, and hold it until every child is destroyed.
+    struct NativeEditLibrary {
+        HMODULE module = LoadLibraryExW(L"Msftedit.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+        ~NativeEditLibrary() { if (module) FreeLibrary(module); }
+    } nativeEdit;
+    if (!nativeEdit.module) {
+        MessageBoxW(owner, L"Windows could not load its native Unicode note editor. No report was exported.",
+                    kDialogTitle, MB_OK | MB_ICONERROR);
+        return;
+    }
     if (!RegisterWindowClass()) return;
     DialogState state{std::move(context)};
     state.exporter = exporter;

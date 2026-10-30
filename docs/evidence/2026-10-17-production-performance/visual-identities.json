@@ -1,0 +1,666 @@
+[
+  {
+    "view": "pipeline-chapter-forest-second-bend",
+    "matchedState": {
+      "checkpoint": "chapter-forest-second-bend",
+      "player": {
+        "x": -17.7009,
+        "z": 15.2068,
+        "yaw": 1.914,
+        "pitch": -0.15,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "zone": "outside",
+      "renderScale": 0.4,
+      "outputExposure": 0.92,
+      "waterQuality": 1,
+      "rtLab": {
+        "waterfallWidthScale": 1.0,
+        "roofOverrideEnabled": false,
+        "roofOpen": -1.0,
+        "dawnOverrideEnabled": false,
+        "dawnReveal": -1.0,
+        "fogDensityScale": 1.0,
+        "fireStrengthScale": 1.0,
+        "fireTurbulenceScale": 1.0,
+        "fireSmokeScale": 1.0,
+        "glassVisible": false,
+        "productionRewardPropsVisible": false,
+        "productionLanternGlassOnly": false,
+        "glassTransmission": 0.94,
+        "glassIor": 1.52,
+        "glassRoughness": 0.12,
+        "workloadPreset": 1
+      },
+      "internalExtent": {
+        "width": 576,
+        "height": 1188
+      },
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerMountProfile": "AnatomicalBody",
+      "animationTime": 29.5997,
+      "selectedEnemy": "lich",
+      "lich": {
+        "phase": "dead",
+        "health": 0,
+        "roofProgress": 1.0,
+        "ending": "inactive",
+        "dawnProgress": 0.0
+      }
+    },
+    "baselineModules": {
+      "opaqueFast": {
+        "key": "shipping_mobile_opaque_fast",
+        "sha256": "51972efdf4bbdfeea86b2898daf60dbd3fbaa1dcebed803ec7a57ea31dc1fbf2"
+      },
+      "genericDielectric": {
+        "key": "shipping_mobile_generic_dielectric",
+        "sha256": "d1d7e77e55a5e6e97129b94579d4730eb669c23bf0b5fe1c969722f3a87583ce"
+      }
+    },
+    "candidateModules": {
+      "opaqueFast": {
+        "key": "shipping_mobile_opaque_fast",
+        "sha256": "a385d28653a006b2ca76c0389823f4025a578a247ae6a1538b138243743255d8"
+      },
+      "genericDielectric": {
+        "key": "shipping_mobile_generic_dielectric",
+        "sha256": "d1d7e77e55a5e6e97129b94579d4730eb669c23bf0b5fe1c969722f3a87583ce"
+      }
+    },
+    "baselinePngSha256": "de9b35aee69e56bd372acb48989fb00968e280a448256d8e2537c9475881e067",
+    "candidatePngSha256": "d07377c9fda76d3632b48d104a220dd904d014d77e04c26ef283a81454c7765d"
+  },
+  {
+    "view": "pipeline-chapter-keeper-death-retired",
+    "matchedState": {
+      "checkpoint": "chapter-keeper-death-retired",
+      "player": {
+        "x": -31.9,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.32,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "zone": "finale",
+      "renderScale": 0.4,
+      "outputExposure": 0.92,
+      "waterQuality": 1,
+      "rtLab": {
+        "waterfallWidthScale": 1.0,
+        "roofOverrideEnabled": false,
+        "roofOpen": -1.0,
+        "dawnOverrideEnabled": false,
+        "dawnReveal": -1.0,
+        "fogDensityScale": 1.0,
+        "fireStrengthScale": 1.0,
+        "fireTurbulenceScale": 1.0,
+        "fireSmokeScale": 1.0,
+        "glassVisible": false,
+        "productionRewardPropsVisible": false,
+        "productionLanternGlassOnly": false,
+        "glassTransmission": 0.94,
+        "glassIor": 1.52,
+        "glassRoughness": 0.12,
+        "workloadPreset": 1
+      },
+      "internalExtent": {
+        "width": 576,
+        "height": 1188
+      },
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerMountProfile": "AnatomicalBody",
+      "animationTime": 4.0,
+      "selectedEnemy": "lich",
+      "lich": {
+        "phase": "dead",
+        "health": 0,
+        "roofProgress": 0.0,
+        "ending": "lich-falling",
+        "dawnProgress": 0.0
+      }
+    },
+    "baselineModules": {
+      "opaqueFast": {
+        "key": "shipping_mobile_opaque_fast",
+        "sha256": "51972efdf4bbdfeea86b2898daf60dbd3fbaa1dcebed803ec7a57ea31dc1fbf2"
+      },
+      "genericDielectric": {
+        "key": "shipping_mobile_generic_dielectric",
+        "sha256": "d1d7e77e55a5e6e97129b94579d4730eb669c23bf0b5fe1c969722f3a87583ce"
+      }
+    },
+    "candidateModules": {
+      "opaqueFast": {
+        "key": "shipping_mobile_opaque_fast",
+        "sha256": "a385d28653a006b2ca76c0389823f4025a578a247ae6a1538b138243743255d8"
+      },
+      "genericDielectric": {
+        "key": "shipping_mobile_generic_dielectric",
+        "sha256": "d1d7e77e55a5e6e97129b94579d4730eb669c23bf0b5fe1c969722f3a87583ce"
+      }
+    },
+    "baselinePngSha256": "f3c81faaddc329b1a99d9a656a0bf1d4680300baa23edbe1de764ace3eb61a18",
+    "candidatePngSha256": "f3c81faaddc329b1a99d9a656a0bf1d4680300baa23edbe1de764ace3eb61a18"
+  },
+  {
+    "view": "pipeline-chapter-landing-south",
+    "matchedState": {
+      "checkpoint": "chapter-landing-south",
+      "player": {
+        "x": -33.7,
+        "z": -12.8,
+        "yaw": 3.1416,
+        "pitch": -0.15,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "zone": "finale",
+      "renderScale": 0.4,
+      "outputExposure": 0.92,
+      "waterQuality": 1,
+      "rtLab": {
+        "waterfallWidthScale": 1.0,
+        "roofOverrideEnabled": false,
+        "roofOpen": -1.0,
+        "dawnOverrideEnabled": false,
+        "dawnReveal": -1.0,
+        "fogDensityScale": 1.0,
+        "fireStrengthScale": 1.0,
+        "fireTurbulenceScale": 1.0,
+        "fireSmokeScale": 1.0,
+        "glassVisible": false,
+        "productionRewardPropsVisible": false,
+        "productionLanternGlassOnly": false,
+        "glassTransmission": 0.94,
+        "glassIor": 1.52,
+        "glassRoughness": 0.12,
+        "workloadPreset": 1
+      },
+      "internalExtent": {
+        "width": 576,
+        "height": 1188
+      },
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerMountProfile": "AnatomicalBody",
+      "animationTime": 15.3499,
+      "selectedEnemy": "lich",
+      "lich": {
+        "phase": "dead",
+        "health": 0,
+        "roofProgress": 1.0,
+        "ending": "inactive",
+        "dawnProgress": 0.0
+      }
+    },
+    "baselineModules": {
+      "opaqueFast": {
+        "key": "shipping_mobile_opaque_fast",
+        "sha256": "51972efdf4bbdfeea86b2898daf60dbd3fbaa1dcebed803ec7a57ea31dc1fbf2"
+      },
+      "genericDielectric": {
+        "key": "shipping_mobile_generic_dielectric",
+        "sha256": "d1d7e77e55a5e6e97129b94579d4730eb669c23bf0b5fe1c969722f3a87583ce"
+      }
+    },
+    "candidateModules": {
+      "opaqueFast": {
+        "key": "shipping_mobile_opaque_fast",
+        "sha256": "a385d28653a006b2ca76c0389823f4025a578a247ae6a1538b138243743255d8"
+      },
+      "genericDielectric": {
+        "key": "shipping_mobile_generic_dielectric",
+        "sha256": "d1d7e77e55a5e6e97129b94579d4730eb669c23bf0b5fe1c969722f3a87583ce"
+      }
+    },
+    "baselinePngSha256": "5aad463bca3a0df225d69e68f4479319b4a69c3051a4531f4ad299dc7862b258",
+    "candidatePngSha256": "5aad463bca3a0df225d69e68f4479319b4a69c3051a4531f4ad299dc7862b258"
+  },
+  {
+    "view": "pipeline-lich",
+    "matchedState": {
+      "checkpoint": "lich",
+      "player": {
+        "x": -33.25,
+        "z": -14.25,
+        "yaw": 2.52,
+        "pitch": 0.0,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "zone": "finale",
+      "renderScale": 0.4,
+      "outputExposure": 0.92,
+      "waterQuality": 1,
+      "rtLab": {
+        "waterfallWidthScale": 1.0,
+        "roofOverrideEnabled": false,
+        "roofOpen": -1.0,
+        "dawnOverrideEnabled": false,
+        "dawnReveal": -1.0,
+        "fogDensityScale": 1.0,
+        "fireStrengthScale": 1.0,
+        "fireTurbulenceScale": 1.0,
+        "fireSmokeScale": 1.0,
+        "glassVisible": false,
+        "productionRewardPropsVisible": false,
+        "productionLanternGlassOnly": false,
+        "glassTransmission": 0.94,
+        "glassIor": 1.52,
+        "glassRoughness": 0.12,
+        "workloadPreset": 1
+      },
+      "internalExtent": {
+        "width": 576,
+        "height": 1188
+      },
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerMountProfile": "AnatomicalBody",
+      "animationTime": 0.0,
+      "selectedEnemy": "lich",
+      "lich": {
+        "phase": "maintaining-range",
+        "health": 3,
+        "roofProgress": 0.0,
+        "ending": "inactive",
+        "dawnProgress": 0.0
+      }
+    },
+    "baselineModules": {
+      "opaqueFast": {
+        "key": "shipping_mobile_opaque_fast",
+        "sha256": "51972efdf4bbdfeea86b2898daf60dbd3fbaa1dcebed803ec7a57ea31dc1fbf2"
+      },
+      "genericDielectric": {
+        "key": "shipping_mobile_generic_dielectric",
+        "sha256": "d1d7e77e55a5e6e97129b94579d4730eb669c23bf0b5fe1c969722f3a87583ce"
+      }
+    },
+    "candidateModules": {
+      "opaqueFast": {
+        "key": "shipping_mobile_opaque_fast",
+        "sha256": "a385d28653a006b2ca76c0389823f4025a578a247ae6a1538b138243743255d8"
+      },
+      "genericDielectric": {
+        "key": "shipping_mobile_generic_dielectric",
+        "sha256": "d1d7e77e55a5e6e97129b94579d4730eb669c23bf0b5fe1c969722f3a87583ce"
+      }
+    },
+    "baselinePngSha256": "171d3a061169dfdcf1cdec3d3f78392becb06fb992fe4f7e7d2af3008909125d",
+    "candidatePngSha256": "171d3a061169dfdcf1cdec3d3f78392becb06fb992fe4f7e7d2af3008909125d"
+  },
+  {
+    "view": "query-chapter-forest-second-bend",
+    "matchedState": {
+      "checkpoint": "chapter-forest-second-bend",
+      "player": {
+        "x": -17.7009,
+        "z": 15.2068,
+        "yaw": 1.914,
+        "pitch": -0.15,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "zone": "outside",
+      "renderScale": 0.4,
+      "outputExposure": 0.92,
+      "waterQuality": 1,
+      "rtLab": {
+        "waterfallWidthScale": 1.0,
+        "roofOverrideEnabled": false,
+        "roofOpen": -1.0,
+        "dawnOverrideEnabled": false,
+        "dawnReveal": -1.0,
+        "fogDensityScale": 1.0,
+        "fireStrengthScale": 1.0,
+        "fireTurbulenceScale": 1.0,
+        "fireSmokeScale": 1.0,
+        "glassVisible": false,
+        "productionRewardPropsVisible": false,
+        "productionLanternGlassOnly": false,
+        "glassTransmission": 0.94,
+        "glassIor": 1.52,
+        "glassRoughness": 0.12,
+        "workloadPreset": 1
+      },
+      "internalExtent": {
+        "width": 576,
+        "height": 1188
+      },
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerMountProfile": "AnatomicalBody",
+      "animationTime": 29.5997,
+      "selectedEnemy": "lich",
+      "lich": {
+        "phase": "dead",
+        "health": 0,
+        "roofProgress": 1.0,
+        "ending": "inactive",
+        "dawnProgress": 0.0
+      }
+    },
+    "baselineModules": {
+      "opaqueFast": {
+        "key": "rayquery_compute_shipping_mobile_opaque_fast",
+        "sha256": "0db06582bc0e13db5cd8eca2678801dd659566aaa263de2c80d2a78feb09e632"
+      },
+      "genericDielectric": {
+        "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+        "sha256": "40d49459ff47383fc070f820baaba108e207a09dc1823369ca5d29dbf54958f7"
+      }
+    },
+    "candidateModules": {
+      "opaqueFast": {
+        "key": "rayquery_compute_shipping_mobile_opaque_fast",
+        "sha256": "f4752f617e1d2c4264d5bb0bdb5c5fdeeaf42acef315bed873aa923a7791b588"
+      },
+      "genericDielectric": {
+        "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+        "sha256": "40d49459ff47383fc070f820baaba108e207a09dc1823369ca5d29dbf54958f7"
+      }
+    },
+    "baselinePngSha256": "de9b35aee69e56bd372acb48989fb00968e280a448256d8e2537c9475881e067",
+    "candidatePngSha256": "d07377c9fda76d3632b48d104a220dd904d014d77e04c26ef283a81454c7765d"
+  },
+  {
+    "view": "query-chapter-keeper-death-retired",
+    "matchedState": {
+      "checkpoint": "chapter-keeper-death-retired",
+      "player": {
+        "x": -31.9,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.32,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "zone": "finale",
+      "renderScale": 0.4,
+      "outputExposure": 0.92,
+      "waterQuality": 1,
+      "rtLab": {
+        "waterfallWidthScale": 1.0,
+        "roofOverrideEnabled": false,
+        "roofOpen": -1.0,
+        "dawnOverrideEnabled": false,
+        "dawnReveal": -1.0,
+        "fogDensityScale": 1.0,
+        "fireStrengthScale": 1.0,
+        "fireTurbulenceScale": 1.0,
+        "fireSmokeScale": 1.0,
+        "glassVisible": false,
+        "productionRewardPropsVisible": false,
+        "productionLanternGlassOnly": false,
+        "glassTransmission": 0.94,
+        "glassIor": 1.52,
+        "glassRoughness": 0.12,
+        "workloadPreset": 1
+      },
+      "internalExtent": {
+        "width": 576,
+        "height": 1188
+      },
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerMountProfile": "AnatomicalBody",
+      "animationTime": 4.0,
+      "selectedEnemy": "lich",
+      "lich": {
+        "phase": "dead",
+        "health": 0,
+        "roofProgress": 0.0,
+        "ending": "lich-falling",
+        "dawnProgress": 0.0
+      }
+    },
+    "baselineModules": {
+      "opaqueFast": {
+        "key": "rayquery_compute_shipping_mobile_opaque_fast",
+        "sha256": "0db06582bc0e13db5cd8eca2678801dd659566aaa263de2c80d2a78feb09e632"
+      },
+      "genericDielectric": {
+        "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+        "sha256": "40d49459ff47383fc070f820baaba108e207a09dc1823369ca5d29dbf54958f7"
+      }
+    },
+    "candidateModules": {
+      "opaqueFast": {
+        "key": "rayquery_compute_shipping_mobile_opaque_fast",
+        "sha256": "f4752f617e1d2c4264d5bb0bdb5c5fdeeaf42acef315bed873aa923a7791b588"
+      },
+      "genericDielectric": {
+        "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+        "sha256": "40d49459ff47383fc070f820baaba108e207a09dc1823369ca5d29dbf54958f7"
+      }
+    },
+    "baselinePngSha256": "f3c81faaddc329b1a99d9a656a0bf1d4680300baa23edbe1de764ace3eb61a18",
+    "candidatePngSha256": "f3c81faaddc329b1a99d9a656a0bf1d4680300baa23edbe1de764ace3eb61a18"
+  },
+  {
+    "view": "query-chapter-landing-south",
+    "matchedState": {
+      "checkpoint": "chapter-landing-south",
+      "player": {
+        "x": -33.7,
+        "z": -12.8,
+        "yaw": 3.1416,
+        "pitch": -0.15,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "zone": "finale",
+      "renderScale": 0.4,
+      "outputExposure": 0.92,
+      "waterQuality": 1,
+      "rtLab": {
+        "waterfallWidthScale": 1.0,
+        "roofOverrideEnabled": false,
+        "roofOpen": -1.0,
+        "dawnOverrideEnabled": false,
+        "dawnReveal": -1.0,
+        "fogDensityScale": 1.0,
+        "fireStrengthScale": 1.0,
+        "fireTurbulenceScale": 1.0,
+        "fireSmokeScale": 1.0,
+        "glassVisible": false,
+        "productionRewardPropsVisible": false,
+        "productionLanternGlassOnly": false,
+        "glassTransmission": 0.94,
+        "glassIor": 1.52,
+        "glassRoughness": 0.12,
+        "workloadPreset": 1
+      },
+      "internalExtent": {
+        "width": 576,
+        "height": 1188
+      },
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerMountProfile": "AnatomicalBody",
+      "animationTime": 15.3499,
+      "selectedEnemy": "lich",
+      "lich": {
+        "phase": "dead",
+        "health": 0,
+        "roofProgress": 1.0,
+        "ending": "inactive",
+        "dawnProgress": 0.0
+      }
+    },
+    "baselineModules": {
+      "opaqueFast": {
+        "key": "rayquery_compute_shipping_mobile_opaque_fast",
+        "sha256": "0db06582bc0e13db5cd8eca2678801dd659566aaa263de2c80d2a78feb09e632"
+      },
+      "genericDielectric": {
+        "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+        "sha256": "40d49459ff47383fc070f820baaba108e207a09dc1823369ca5d29dbf54958f7"
+      }
+    },
+    "candidateModules": {
+      "opaqueFast": {
+        "key": "rayquery_compute_shipping_mobile_opaque_fast",
+        "sha256": "f4752f617e1d2c4264d5bb0bdb5c5fdeeaf42acef315bed873aa923a7791b588"
+      },
+      "genericDielectric": {
+        "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+        "sha256": "40d49459ff47383fc070f820baaba108e207a09dc1823369ca5d29dbf54958f7"
+      }
+    },
+    "baselinePngSha256": "5aad463bca3a0df225d69e68f4479319b4a69c3051a4531f4ad299dc7862b258",
+    "candidatePngSha256": "5aad463bca3a0df225d69e68f4479319b4a69c3051a4531f4ad299dc7862b258"
+  },
+  {
+    "view": "query-lich",
+    "matchedState": {
+      "checkpoint": "lich",
+      "player": {
+        "x": -33.25,
+        "z": -14.25,
+        "yaw": 2.52,
+        "pitch": 0.0,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "zone": "finale",
+      "renderScale": 0.4,
+      "outputExposure": 0.92,
+      "waterQuality": 1,
+      "rtLab": {
+        "waterfallWidthScale": 1.0,
+        "roofOverrideEnabled": false,
+        "roofOpen": -1.0,
+        "dawnOverrideEnabled": false,
+        "dawnReveal": -1.0,
+        "fogDensityScale": 1.0,
+        "fireStrengthScale": 1.0,
+        "fireTurbulenceScale": 1.0,
+        "fireSmokeScale": 1.0,
+        "glassVisible": false,
+        "productionRewardPropsVisible": false,
+        "productionLanternGlassOnly": false,
+        "glassTransmission": 0.94,
+        "glassIor": 1.52,
+        "glassRoughness": 0.12,
+        "workloadPreset": 1
+      },
+      "internalExtent": {
+        "width": 576,
+        "height": 1188
+      },
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerMountProfile": "AnatomicalBody",
+      "animationTime": 0.0,
+      "selectedEnemy": "lich",
+      "lich": {
+        "phase": "maintaining-range",
+        "health": 3,
+        "roofProgress": 0.0,
+        "ending": "inactive",
+        "dawnProgress": 0.0
+      }
+    },
+    "baselineModules": {
+      "opaqueFast": {
+        "key": "rayquery_compute_shipping_mobile_opaque_fast",
+        "sha256": "0db06582bc0e13db5cd8eca2678801dd659566aaa263de2c80d2a78feb09e632"
+      },
+      "genericDielectric": {
+        "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+        "sha256": "40d49459ff47383fc070f820baaba108e207a09dc1823369ca5d29dbf54958f7"
+      }
+    },
+    "candidateModules": {
+      "opaqueFast": {
+        "key": "rayquery_compute_shipping_mobile_opaque_fast",
+        "sha256": "f4752f617e1d2c4264d5bb0bdb5c5fdeeaf42acef315bed873aa923a7791b588"
+      },
+      "genericDielectric": {
+        "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+        "sha256": "40d49459ff47383fc070f820baaba108e207a09dc1823369ca5d29dbf54958f7"
+      }
+    },
+    "baselinePngSha256": "171d3a061169dfdcf1cdec3d3f78392becb06fb992fe4f7e7d2af3008909125d",
+    "candidatePngSha256": "171d3a061169dfdcf1cdec3d3f78392becb06fb992fe4f7e7d2af3008909125d"
+  }
+]

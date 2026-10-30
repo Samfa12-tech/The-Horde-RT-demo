@@ -1,0 +1,90 @@
+[
+  {
+    "view": "pipeline-chapter-forest-second-bend",
+    "changedPixels": 50,
+    "pixels": 4492800,
+    "meanAbsChannel": [
+      4.228988603988604e-06,
+      4.674145299145299e-06,
+      3.1160968660968662e-06
+    ],
+    "maxChannel": 1
+  },
+  {
+    "view": "pipeline-chapter-keeper-death-retired",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "meanAbsChannel": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "maxChannel": 0
+  },
+  {
+    "view": "pipeline-chapter-landing-south",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "meanAbsChannel": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "maxChannel": 0
+  },
+  {
+    "view": "pipeline-lich",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "meanAbsChannel": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "maxChannel": 0
+  },
+  {
+    "view": "query-chapter-forest-second-bend",
+    "changedPixels": 50,
+    "pixels": 4492800,
+    "meanAbsChannel": [
+      4.228988603988604e-06,
+      4.674145299145299e-06,
+      3.1160968660968662e-06
+    ],
+    "maxChannel": 1
+  },
+  {
+    "view": "query-chapter-keeper-death-retired",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "meanAbsChannel": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "maxChannel": 0
+  },
+  {
+    "view": "query-chapter-landing-south",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "meanAbsChannel": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "maxChannel": 0
+  },
+  {
+    "view": "query-lich",
+    "changedPixels": 0,
+    "pixels": 4492800,
+    "meanAbsChannel": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "maxChannel": 0
+  }
+]

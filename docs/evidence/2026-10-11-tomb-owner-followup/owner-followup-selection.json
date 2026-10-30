@@ -1,0 +1,19 @@
+{
+  "tests": [
+    "horde_rt_tomb_dressing_tests",
+    "horde_rt_tomb_wall_recess_tests",
+    "horde_rt_static_gltf_asset_tests",
+    "horde_rt_rescue_journey_integration_tests",
+    "horde_rt_rescue_adversarial_regression_tests",
+    "horde_rt_windows_combat_teaching_presentation_tests",
+    "horde_rt_windows_combat_practice_launch_tests",
+    "horde_rt_graphics_preview_frame_adapter_tests",
+    "horde_rt_graphics_settings_tests",
+    "horde_rt_desktop_controller_input_tests",
+    "horde_rt_input_presentation_trace_tests",
+    "horde_rt_simulation_gameplay_tests",
+    "horde_rt_simulation_timing_tests",
+    "horde_rt_fire_emitter_tests"
+  ],
+  "regex": "^(horde_rt_tomb_dressing_tests|horde_rt_tomb_wall_recess_tests|horde_rt_static_gltf_asset_tests|horde_rt_rescue_journey_integration_tests|horde_rt_rescue_adversarial_regression_tests|horde_rt_windows_combat_teaching_presentation_tests|horde_rt_windows_combat_practice_launch_tests|horde_rt_graphics_preview_frame_adapter_tests|horde_rt_graphics_settings_tests|horde_rt_desktop_controller_input_tests|horde_rt_input_presentation_trace_tests|horde_rt_simulation_gameplay_tests|horde_rt_simulation_timing_tests|horde_rt_fire_emitter_tests)$"
+}

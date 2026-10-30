@@ -1,0 +1,82 @@
+{
+  "method": "Pillow RGB exact comparison, no resampling or edited output",
+  "size": [
+    1232,
+    803
+  ],
+  "comparisons": {
+    "speaking": {
+      "changedPixels": 4558,
+      "changedBounds": [
+        459,
+        234,
+        785,
+        696
+      ],
+      "headRegionChangedPixels": 2601,
+      "staticSkyControlChangedPixels": 0
+    },
+    "recognition": {
+      "changedPixels": 6494,
+      "changedBounds": [
+        153,
+        233,
+        785,
+        720
+      ],
+      "headRegionChangedPixels": 3440,
+      "staticSkyControlChangedPixels": 0
+    }
+  },
+  "resourceInventoriesEqualAcrossPoses": true,
+  "gpuFrameIdentities": {
+    "neutral": {
+      "sceneEpoch": 3,
+      "measurementGeneration": 1,
+      "recordAttemptSerial": 3,
+      "recordSerial": 3,
+      "submissionSerial": 3,
+      "completionSerial": 3,
+      "simulationTick": 2,
+      "frameSlot": 0
+    },
+    "speaking": {
+      "sceneEpoch": 3,
+      "measurementGeneration": 1,
+      "recordAttemptSerial": 4,
+      "recordSerial": 4,
+      "submissionSerial": 4,
+      "completionSerial": 4,
+      "simulationTick": 2,
+      "frameSlot": 0
+    },
+    "recognition": {
+      "sceneEpoch": 3,
+      "measurementGeneration": 1,
+      "recordAttemptSerial": 5,
+      "recordSerial": 5,
+      "submissionSerial": 5,
+      "completionSerial": 5,
+      "simulationTick": 2,
+      "frameSlot": 0
+    }
+  },
+  "images": {
+    "windows-loaded-lookout.png": {
+      "bytes": 1403116,
+      "sha256": "1b1ab43226a40b16f4d0547701c83d5e85ec2c324caddc46deef9c78d2ceca8a"
+    },
+    "windows-kit-neutral.png": {
+      "bytes": 1469276,
+      "sha256": "dd627d930ff1375ffbd94c49bcc874196f0db3bc8990221409f81644a4d05052"
+    },
+    "windows-kit-speaking.png": {
+      "bytes": 1469296,
+      "sha256": "d423c5a5853830ef08ef4694ec28a0b0788f64be82ab8cfe72aa94a196bb53dd"
+    },
+    "windows-kit-recognition.png": {
+      "bytes": 1469255,
+      "sha256": "51638c30d607fa9775f0dbd96f1553875196460d602c7405df72a08ca2999f8c"
+    }
+  }
+}

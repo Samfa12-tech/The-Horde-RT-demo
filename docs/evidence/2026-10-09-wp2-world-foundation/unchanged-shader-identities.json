@@ -1,0 +1,257 @@
+[
+  {
+    "path": "docs/evidence/2026-10-01-all-direct-visibility/artifacts/control/RtPipelineVariantCatalog.generated.h",
+    "git_blob": "1e3ac0d9cf819bde9787b6bb92ab2c0632e4c037",
+    "sha256": "98b8924f36238c5c4cdac92428192564a3260d6cf63e4255a4c813c051617f0e"
+  },
+  {
+    "path": "docs/evidence/2026-10-01-all-direct-visibility/artifacts/control/RtRayQueryVariantCatalog.generated.h",
+    "git_blob": "29345d8ae138be6de964d0a9866144a576efbd03",
+    "sha256": "d577af7326b56ea2cdf7fd348770357e9896103a0b5ba2d27feebfc047d6a202"
+  },
+  {
+    "path": "docs/evidence/2026-10-01-all-direct-visibility/artifacts/isolate/RtPipelineVariantCatalog.generated.h",
+    "git_blob": "8f41325c9ab2781f6b80c35a489e82245440b8d9",
+    "sha256": "1abf5cf72834e64517f7d8ed5adb96ad121d568f64f9473691d5ed40489f8981"
+  },
+  {
+    "path": "docs/evidence/2026-10-01-all-direct-visibility/artifacts/isolate/RtRayQueryVariantCatalog.generated.h",
+    "git_blob": "64efbd16c8f3abd805f39bab23e9aa560ba23aa4",
+    "sha256": "3bea701f596e5cf940b331719535a22caa1f418b7351004b1a898755569a2c87"
+  },
+  {
+    "path": "shaders/README.md",
+    "git_blob": "da997f9062a313ae8434e989273849ecbbf62ba8",
+    "sha256": "9b68e260625a9cca7e6f20cf3b3eccad45589c48033ec8bf8dac1dfe2dc98efd"
+  },
+  {
+    "path": "shaders/raytracing/README.md",
+    "git_blob": "bf6af316883891521e252d0c05ee6940a266aca7",
+    "sha256": "edb0fbd2fae39809b6f4806d643d471a1fa243f393051bea59e2159447a4ac2c"
+  },
+  {
+    "path": "shaders/raytracing/experimental/staged_primary_record.glsl",
+    "git_blob": "5f2078259062bd5b448ebe94dc279c4816c4ef8e",
+    "sha256": "caa851350ec1f14845ea3c59e63aa6ac820685dc42ec720cd7695124edecf5bc"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+    "git_blob": "8dbe73e13aadb209aa7712f5cf41fc28fbc82673",
+    "sha256": "36ddb178dcfe0076715d810f77df932ea87bb7dce01e9bba6b3d4bc41475b9c7"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+    "git_blob": "83b07524182e02e47985bae0464969a8e8fcb4d9",
+    "sha256": "50028bb601d18546110ea546de9c9dcee0cfad89a5520ef448756e43206f2bb4"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+    "git_blob": "d058107d7e40e5eefc55536f0c8bc11637f04cd8",
+    "sha256": "54ea2f2b2d1c898fcd93fad561d5dcd53b4e942ba245a1639ad45abcedcf028e"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+    "git_blob": "21037217cfeaec9b1504bfd5b3288172df49daa2",
+    "sha256": "652200988024f3bdb5f61284474f5d6b34d0777743d2989ce342203bc7fbe5c7"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+    "git_blob": "549c245c4373b512af375ee5221a47bedd9b15c7",
+    "sha256": "10b109115a509ef2865e68b463f200f3df6c98d50f5834633435d0dfee7a17ae"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_fire.glsl",
+    "git_blob": "f5cd42000ef2c32a556b871dd6f9ccdf71c119a4",
+    "sha256": "74b5130bc37f2b601fca6181736bcb402a583e2a7c1fcf8a1be8b7c07c7cc57f"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_frame.glsl",
+    "git_blob": "c299a32452da9c24220f2aa13ed925cc43537c0f",
+    "sha256": "6541ff4011f3051ed89752c04de6beb2af90a002011b705f63c96fdf8ab835b2"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+    "git_blob": "3d5d90c4655187fdd5fbf9f058d9e03293d3c8f0",
+    "sha256": "ae27a7b7430da299fad2f94817d7a3033a3a0aa663c0a720474ebf88b0662a66"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_indoor_dust.glsl",
+    "git_blob": "98a07df95604791a91f6509f0f6f57e8fee96451",
+    "sha256": "63f2bdd44c4500926d68b05c834f4916bbfe7f438d9f06c2ba537d39ddc7d865"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_lighting.glsl",
+    "git_blob": "4f2e63b58847e763af27b0a313c96fc830a32028",
+    "sha256": "7a060aa3808e179b21c69ce730173bbdfca18b0a8ff9195109986513ca0d9dd1"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+    "git_blob": "7d3bf2ce830480836f808bc208cfb448ab7b5fcf",
+    "sha256": "a8c1d283245009e72e8478a10baafbf5954b96d76ba57ef3580a645ed354adfb"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+    "git_blob": "9d01430219962609639d82eb3d3a77324af94f40",
+    "sha256": "467b95c024fcee6e0fb2224680f9555c944c705a6984b14afbd8f071e8ae4577"
+  },
+  {
+    "path": "shaders/raytracing/include/rt_variant_config.glsl",
+    "git_blob": "996413d714b87549774ac8e4f5e4393080280bfa",
+    "sha256": "b75a99a9c7789d0dc89c180d0c5918077d64274d08ec86fb523ae092318c3f5c"
+  },
+  {
+    "path": "shaders/raytracing/minimal.comp",
+    "git_blob": "d52ce41c2a5814c4191846af8f218da86b72123e",
+    "sha256": "e7f78df4a5233b0fa4488b80a6f130227a7ee92170f44e5ba75c16dd06a06594"
+  },
+  {
+    "path": "shaders/raytracing/minimal.rchit",
+    "git_blob": "c02daf341235eebfa61f8f2d7fa05c25ec40b0e2",
+    "sha256": "59a374fa105f231f9ade604212d731a475f07f22c723fff6b0e0089dd2cd2a37"
+  },
+  {
+    "path": "shaders/raytracing/minimal.rgen",
+    "git_blob": "5bb77363793fc1fee63452b24200825ab48114ee",
+    "sha256": "bdad62d56ed79e2c4beb9ff3830628ac6d3ad94f9ef8863911228ca059d74ced"
+  },
+  {
+    "path": "shaders/raytracing/minimal.rmiss",
+    "git_blob": "36e5c1d2d2ebcaebf5e25deb424be65fee9dd276",
+    "sha256": "7bcc1b7fbdcf1802ed80ec25ccae50f20e9e7239026d767c0e7ba5f110ada936"
+  },
+  {
+    "path": "src/vulkan/raytracing/MinimalLegacyRayGenShader.inc",
+    "git_blob": "379b7825d5b51c6fce493031b0b6f2e45cffba78",
+    "sha256": "5394aa6748bc8b99d833d7fadbd81b9560ce29b5c69abaf0d6b6b1186142061f"
+  },
+  {
+    "path": "src/vulkan/raytracing/MinimalRayGenShader.inc",
+    "git_blob": "4e10ef11a64c339b13e43f5bdc63301d1005ec0f",
+    "sha256": "48c920b5ed71dca2ca3b000bc25ccf0c77693af0982c553d79e91c892d004713"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+    "git_blob": "1b5a40a37d47b0558781226f35a8fa17cfad2e39",
+    "sha256": "d6910233696db9ad6faf8d1051870e7e99d2dc9fc4497d0e71f1ac2ee79b57eb"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+    "git_blob": "76a12d4eb705475b4a3c913d4c4a705bc93a6aa5",
+    "sha256": "57a342b1132e3d34637104bd194154ee78d9b74a368e1e9bf371e942b8bf7b2a"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtSceneAbi.def",
+    "git_blob": "598563552deac9ebc35072d56689add211c7d212",
+    "sha256": "2fdbed363632b485d8adc6869fbd6285396693a92f30eb90e014e7116cdfd8d4"
+  },
+  {
+    "path": "src/vulkan/raytracing/RtSceneAbi.generated.h",
+    "git_blob": "692ed6fe43ff1bd8c6b3713808ac4efae57a6ad5",
+    "sha256": "a97aa2d124fd1e2a4249c85a4e4fc7851ce96e5c71ffc8306111e5328b735999"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    "git_blob": "a144dab98c85425de5394d6dc4361123a11b2ab3",
+    "sha256": "778669367d81842a01aa6fb7b48166fc696226f07f362b7c93b08ee487a0b3e4"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+    "git_blob": "e07f83f403131c9bd578a078d697eecd734b82f4",
+    "sha256": "53a6c3511119a4cf1ce33da5533367258ca265986c8d2574c43f3e49d2a1e01e"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+    "git_blob": "c6e11ecdf02d9a7631832d49287a9fdb87675d38",
+    "sha256": "fcc9b0d9cb33637b3b091828c95a399ac153e3cafb0f3040c3eb5637c6e0f286"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+    "git_blob": "0aa08db9d49f7c43b68d0cceb5804b3fbf77070d",
+    "sha256": "75305b54681a0252f1a96bca78d2a5cdc877f7958a72e5cceb0f26261933bbfc"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+    "git_blob": "f617add0033e565de305cfdb0adc27eaf2c5734f",
+    "sha256": "e74f636a45c056578f14c9d4bae03a847edf29c1ca2bd36f4ae81d359f1589f9"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+    "git_blob": "e46c92f23663b7f9e5d79146c3a4ca06577e1c46",
+    "sha256": "9e64a6031b4268b846ea22ef537413e52a3da3ea3a214ec73af30d9be180565f"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+    "git_blob": "e47913153c7fd770c3005eecb24f92d15dacfb03",
+    "sha256": "5088dc747ab848d367d8bf0e03d94ef61276afa633aa9a31d535ac1480761049"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+    "git_blob": "76cebfccb8545e6654cf555dc956dfb5c8917084",
+    "sha256": "be92f36ad841ea1719e9db0329449b35d2d331cdd41246a0e0471293ed039df2"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+    "git_blob": "9efd7394b163ad461bb38684b7754fbf82026b36",
+    "sha256": "90f357ff6468df0fbb9495b1eade24970cd9149ae50c54fc4e2abefdb36cd4b8"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+    "git_blob": "e9a431e0a7c02f1a987d32fbdcbea55eac61322a",
+    "sha256": "a84270b21b748619b5a0b1ff3dc5d6d53b0b4d519eccfc72ab3dc40e0fcd5aab"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+    "git_blob": "e42041da0a481bd5747e605641c441855d726564",
+    "sha256": "f3cf561c158dc2c876cfa01badc880363fe3dd04f2c24c4f75e73816c1a68ec1"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+    "git_blob": "aad5fb7369644f2050af406251f762c47bb87a6d",
+    "sha256": "9fe1247043e8e0570d3e85742e1d1e003b921cc6fdb048aaf15eec9c0f0495be"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+    "git_blob": "80f10c0aa70d0c0814c4fffa254c79e356a3cddf",
+    "sha256": "9eb4dbc2a6cbbd9a426e999961d63146ff5fbe3c90b1e01fff7df6bf7189de12"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+    "git_blob": "1a30a1d12e39058014441e22f3717fcd60f63328",
+    "sha256": "68f5832b42542514dfaa6aad186c9e74f91ab691f4f30caba3c9e7fd553fd2a1"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+    "git_blob": "efee7ad1630c4c0abeabc4ab0a734906b94a47e1",
+    "sha256": "3bd3d01cb8da7da2ef72582c23cdccc9363c11c146f9d338140dbff65b157574"
+  },
+  {
+    "path": "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+    "git_blob": "cf95e634dfd42e7c990036feabef69af6e511d08",
+    "sha256": "56936428d14d46800266b22daf11b0629ada77acc1bc3db57413e723f6d1be70"
+  },
+  {
+    "path": "tests/RtSceneAbiGeneratorTests.ps1",
+    "git_blob": "f2e0d91f4cb5e5209c80877a41114df8a40ff96e",
+    "sha256": "2842295242fb191c4f33bb1f191004062a11380acb9e3a31af674bf716248461"
+  },
+  {
+    "path": "tests/RtSceneAbiTests.cpp",
+    "git_blob": "6ef33d8c9fac17535d6591b22d6ce6c219050480",
+    "sha256": "00b6e5e9d707fa9e1b26884b88ecf4498565eab8f8502f63b2319e98258882bb"
+  },
+  {
+    "path": "tools/raygen-variant-budgets.json",
+    "git_blob": "90d40a313084dca95055ed2ea32a231da9d0b9bb",
+    "sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+  },
+  {
+    "path": "tools/raygen-variant-catalog.json",
+    "git_blob": "6bfa9f24a91189835b05567d4b30cf79b4ddb9ec",
+    "sha256": "388953d0a643a68c8d63753ed5841d0cec02888c9836740f187e37562908494c"
+  },
+  {
+    "path": "tools/rayquery-variant-catalog.json",
+    "git_blob": "20905500ef148c87870b02f680281d1ee2e200a1",
+    "sha256": "e1fcee8a2ba55900c0376c738dd4b6abdd7780f6a746c9ae95ca36975f538777"
+  }
+]

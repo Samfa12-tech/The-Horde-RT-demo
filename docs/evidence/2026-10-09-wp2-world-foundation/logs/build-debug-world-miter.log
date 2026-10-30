@@ -1,0 +1,58 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  MusicDirector.cpp
+  MusicPcmAssetBank.cpp
+  MusicPcmStream.cpp
+  MusicPlaybackSession.cpp
+  HeldItemKinematics.cpp
+  GameSimulation.cpp
+  Generating Code...
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  CharacterRenderSlot.cpp
+  PresentableTinyRtScene.cpp
+  SimulationFrameAdapter.cpp
+  Generating Code...
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  WorldRouteFoundationTests.cpp
+  horde_rt_world_route_foundation_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_world_route_foundation_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  DevelopmentStaticAssetTests.cpp
+  horde_rt_development_static_asset_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_development_static_asset_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  Building Custom Rule <repo>/CMakeLists.txt
+  PlayerDirectionalRigTests.cpp
+  horde_rt_player_directional_rig_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_player_directional_rig_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  SimulationGameplayTests.cpp
+  horde_rt_simulation_gameplay_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_simulation_gameplay_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  PlayerRenderSlot.cpp
+  PlayerAnimationTests.cpp
+  Generating Code...
+  horde_rt_player_animation_tests.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_player_animation_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  WindowsMusicPlayback.cpp
+  horde_rt_probe_core.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_rt_probe_core.lib
+  horde_windows_music.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_windows_music.lib
+  MotionEvidenceScenario.cpp
+  DiagnosticWindow.cpp
+  MotionEvidenceLedger.cpp
+  Generating Code...
+  horde_rt_diagnostic_window.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\HordeLanternRT.exe

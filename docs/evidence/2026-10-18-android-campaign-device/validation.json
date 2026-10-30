@@ -1,0 +1,479 @@
+{
+  "outcome": "BLOCKED: upper descent readiness remains unavailable; fresh-process recovery not run",
+  "evidenceClass": "Seeded persistence fixtures, actual physical UI and RT presentation; not normal chapter completion",
+  "sourceCommit": "7d89445030727a9099524c3728c190dfd636e51b",
+  "compiledManifest": {
+    "path": "reports/2026-10-18-campaign-final-compiled-sources.json",
+    "sha256": "2c6903fc45467c3ed9b6b053a37ee19006f3ef3e67ff073d5f285f53ae1c0035",
+    "files": 24
+  },
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "device": {
+    "serial": "R5GL219SZGK",
+    "model": "SM-S948B",
+    "android": 17,
+    "api": 37,
+    "build": "CP2A.260605.016.S948BXXS4BZIG",
+    "user": 0,
+    "initialForeground": "Samsung launcher",
+    "initialHordeActivities": 0,
+    "initialCachedPid": 30596,
+    "priorCrouchPidMatched": true
+  },
+  "package": {
+    "name": "com.samfa12.hordelanternrt.debug",
+    "versionName": "1.6.2-debug",
+    "versionCode": 10,
+    "sha256": "ca08919a8c63aac269b4fc68a02bde706131a25a92d8765acd550297841918a9",
+    "bytes": 183957866,
+    "publicV2CertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "install": "compatible adb install -r",
+    "installedHashMatched": true,
+    "apkCopiedOrPulled": false
+  },
+  "namespace": {
+    "intentExtra": "campaign_test_namespace",
+    "name": "sl-20261018-r1-8b14",
+    "relativePath": "files/campaign-tests/sl-20261018-r1-8b14",
+    "emptyBeforeSeed": true,
+    "fixtureCount": 6,
+    "bytesPerFixture": 162,
+    "totalSeedBytes": 972,
+    "fixtureClass": "seeded persistence fixtures; not campaign completion",
+    "records": [
+      {
+        "name": "slot-1-auto.hrd",
+        "bytes": 162,
+        "sha256": "26fc5a83d0810cee2087ec1a6474d1aa09ff7a84264b22e9dbc054649667d343",
+        "destination": "files/campaign-tests/sl-20261018-r1-8b14/slot-1-auto.hrd",
+        "exitCode": 0,
+        "transport": "adb exec-in run-as dd, raw binary stdin"
+      },
+      {
+        "name": "slot-1-manual.hrd",
+        "bytes": 162,
+        "sha256": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8",
+        "destination": "files/campaign-tests/sl-20261018-r1-8b14/slot-1-manual.hrd",
+        "exitCode": 0,
+        "transport": "adb exec-in run-as dd, raw binary stdin"
+      },
+      {
+        "name": "slot-2-auto.hrd",
+        "bytes": 162,
+        "sha256": "68ddd7cc1af4307696d5f8c8aef66c74ac8d965f5381567b0d0d4828b4ad37ee",
+        "destination": "files/campaign-tests/sl-20261018-r1-8b14/slot-2-auto.hrd",
+        "exitCode": 0,
+        "transport": "adb exec-in run-as dd, raw binary stdin"
+      },
+      {
+        "name": "slot-2-manual.hrd",
+        "bytes": 162,
+        "sha256": "4f8ce6b60c205821e475f21419228dc0461206ea0e13ac4b0e090d9cc4ade70d",
+        "destination": "files/campaign-tests/sl-20261018-r1-8b14/slot-2-manual.hrd",
+        "exitCode": 0,
+        "transport": "adb exec-in run-as dd, raw binary stdin"
+      },
+      {
+        "name": "slot-3-auto.hrd",
+        "bytes": 162,
+        "sha256": "7712e9ffcbd0bbaa48ae2f73216ad4981148bab32fea66c867f792ffbb12f1d0",
+        "destination": "files/campaign-tests/sl-20261018-r1-8b14/slot-3-auto.hrd",
+        "exitCode": 0,
+        "transport": "adb exec-in run-as dd, raw binary stdin"
+      },
+      {
+        "name": "slot-3-manual.hrd",
+        "bytes": 162,
+        "sha256": "31fc5afe9cc616e284cfc534361a2b451e0d70f5a33449257e90ed4476bb1fd5",
+        "destination": "files/campaign-tests/sl-20261018-r1-8b14/slot-3-manual.hrd",
+        "exitCode": 0,
+        "transport": "adb exec-in run-as dd, raw binary stdin"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "case": "Lower manual Load and explicit Resume",
+      "result": "PASS",
+      "request": 2,
+      "surfaceGeneration": 1,
+      "rebaseToken": 1,
+      "phases": [
+        3,
+        5,
+        6,
+        7
+      ],
+      "error": 0,
+      "presented": 1,
+      "hearts": 1,
+      "actualView": "lower rope/lantern anchor",
+      "source": "23-lower-load-logcat.txt;25-lower-loaded-live.png"
+    },
+    {
+      "case": "Keep records cancellation",
+      "result": "PASS",
+      "unchangedRecordCount": 6,
+      "source": "after-cancel-records.sha256"
+    },
+    {
+      "case": "Manual Slot 2 replacement",
+      "result": "PASS",
+      "request": 4,
+      "phases": [
+        2,
+        7
+      ],
+      "error": 0,
+      "durability": 2,
+      "durabilityMeaning": "native FileAndDirectoryFlushed report, not actual power-loss proof",
+      "activeSlotRemains": 1,
+      "targetHashEqualsSlot1LowerFixture": true,
+      "otherTargetsUnchanged": 5,
+      "source": "32-save-logcat.txt;after-manual-save-records.json"
+    },
+    {
+      "case": "Upper autosave Load and explicit Resume",
+      "result": "RESTORE/HEARTS/RT PASS, TRAVERSAL BLOCKED",
+      "request": 6,
+      "surfaceGeneration": 1,
+      "rebaseToken": 2,
+      "phases": [
+        3,
+        5,
+        6,
+        7
+      ],
+      "error": 0,
+      "presented": 1,
+      "hearts": 3,
+      "actualView": "night exterior",
+      "source": "35-upper-load-logcat.txt;37-upper-live.png"
+    },
+    {
+      "case": "Upper Home/resume",
+      "result": "Same-surface suspension/resume observed; descent still blocked",
+      "surfaceGeneration": 1,
+      "idleResult": 0,
+      "waitEndCurrent": 1,
+      "source": "40-upper-final-logcat.txt;39-upper-home-resumed.png"
+    },
+    {
+      "case": "Upper return readiness",
+      "result": "FAIL",
+      "observed": "Preparing rescue route remains disabled before Home, after Home, and final bounded check",
+      "source": "37-upper-live.xml;39-upper-home-resumed.xml;40-upper-readiness-final.xml"
+    },
+    {
+      "case": "Fresh process restart and Slot 2 reload",
+      "result": "NOT RUN",
+      "reason": "Stopped at first material upper-readiness failure"
+    }
+  ],
+  "custody": {
+    "hordeActivityRows": 0,
+    "settingsSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "filePaths": 281,
+    "removedPriorPaths": 0,
+    "addedPaths": 7,
+    "addedPathsOutsideTestNamespace": 0,
+    "ownerCampaignRootExists": false,
+    "fatalLines": 0,
+    "terminal": "Explicit Quit",
+    "stoppedAt": "Upper safe-exit resume: Preparing rescue route remained disabled before/after Home and final bounded check",
+    "freshProcessRestart": "NOT RUN: first potential material integration failure",
+    "recordHashes": "final-record-hashes.json"
+  },
+  "recordChanges": [
+    {
+      "name": "slot-1-auto.hrd",
+      "before": "26fc5a83d0810cee2087ec1a6474d1aa09ff7a84264b22e9dbc054649667d343",
+      "after": "26fc5a83d0810cee2087ec1a6474d1aa09ff7a84264b22e9dbc054649667d343",
+      "unchanged": true
+    },
+    {
+      "name": "slot-1-manual.hrd",
+      "before": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8",
+      "after": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8",
+      "unchanged": true
+    },
+    {
+      "name": "slot-2-auto.hrd",
+      "before": "68ddd7cc1af4307696d5f8c8aef66c74ac8d965f5381567b0d0d4828b4ad37ee",
+      "after": "68ddd7cc1af4307696d5f8c8aef66c74ac8d965f5381567b0d0d4828b4ad37ee",
+      "unchanged": true
+    },
+    {
+      "name": "slot-2-manual.hrd",
+      "before": "4f8ce6b60c205821e475f21419228dc0461206ea0e13ac4b0e090d9cc4ade70d",
+      "after": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8",
+      "unchanged": false
+    },
+    {
+      "name": "slot-3-auto.hrd",
+      "before": "7712e9ffcbd0bbaa48ae2f73216ad4981148bab32fea66c867f792ffbb12f1d0",
+      "after": "7712e9ffcbd0bbaa48ae2f73216ad4981148bab32fea66c867f792ffbb12f1d0",
+      "unchanged": true
+    },
+    {
+      "name": "slot-3-manual.hrd",
+      "before": "31fc5afe9cc616e284cfc534361a2b451e0d70f5a33449257e90ed4476bb1fd5",
+      "after": "31fc5afe9cc616e284cfc534361a2b451e0d70f5a33449257e90ed4476bb1fd5",
+      "unchanged": true
+    }
+  ],
+  "finalRecordHashes": [
+    {
+      "name": "slot-1-auto.hrd",
+      "sha256": "26fc5a83d0810cee2087ec1a6474d1aa09ff7a84264b22e9dbc054649667d343"
+    },
+    {
+      "name": "slot-1-manual.hrd",
+      "sha256": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8"
+    },
+    {
+      "name": "slot-2-auto.hrd",
+      "sha256": "68ddd7cc1af4307696d5f8c8aef66c74ac8d965f5381567b0d0d4828b4ad37ee"
+    },
+    {
+      "name": "slot-2-manual.hrd",
+      "sha256": "72e136f8b3d673aa80fc390659a95e6fc3e960365a07dd460766ea685dbbddf8"
+    },
+    {
+      "name": "slot-3-auto.hrd",
+      "sha256": "7712e9ffcbd0bbaa48ae2f73216ad4981148bab32fea66c867f792ffbb12f1d0"
+    },
+    {
+      "name": "slot-3-manual.hrd",
+      "sha256": "31fc5afe9cc616e284cfc534361a2b451e0d70f5a33449257e90ed4476bb1fd5"
+    }
+  ],
+  "rtPresentation": {
+    "backend": "Vulkan hardware RT-produced swapchain presentation",
+    "surfaceGeneration": 1,
+    "dispatch": "576x1188",
+    "swapchain": "1440x2971",
+    "savedScale": 0.4,
+    "performanceClaim": false,
+    "newSurfaceAfterHomeClaim": false
+  },
+  "priorAttempts": [
+    {
+      "apk": "ddb9869ea339b044f0d8c5f19d2ba304717d142e5440cd954a520c745ff14187",
+      "bytes": 183957882,
+      "result": "NewGame RT/HUD success, wrong rubble-facing opening camera rejected",
+      "seeded": false,
+      "loaded": false,
+      "settingsAnd274PathsPreserved": true
+    },
+    {
+      "apk": "bb4175ffbc40f220d016b6b9ec1d7e44fd0aca1fb6692bf5b1edfdc564f676f9",
+      "bytes": 183957930,
+      "result": "Corrected NewGame doorway camera inspected, empty Slot 3 creates no records; pre-boundary Save unavailable",
+      "seeded": false,
+      "loaded": false,
+      "settingsAnd274PathsPreserved": true
+    }
+  ],
+  "harnessAttempts": [
+    {
+      "action": "Initial ADB sandbox inventory",
+      "result": "Local daemon unavailable before device access; minimal read-only escalation succeeded",
+      "deviceMutation": false
+    },
+    {
+      "action": "Tap helper exact text KEEP RECORDS",
+      "result": "Failed before input because observed text was Keep records; corrected exact-case cancellation succeeded",
+      "applicationFailure": false
+    }
+  ],
+  "openedScreenshots": [
+    {
+      "path": "reports/android-campaign-device-2026-10-18/04-empty-newgame-scroll.png",
+      "bytes": 573077,
+      "sha256": "2eb8fd234998e1047d74fd823230c3fed0e6d95137e3f2b76c2fe170bf8fed72",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/06-newgame-live.png",
+      "bytes": 3556213,
+      "sha256": "11e9822fcda8a3bb7f546325831db18f79c14b38e76e4c88113b99a21c625016",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/16-replacement-newgame-live.png",
+      "bytes": 3217866,
+      "sha256": "2a9f3c48dc85f991dd594f32b3a9401b1f06f3e0f67c1fa33a2cca021634c808",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/22-final-seeded-load-menu.png",
+      "bytes": 646686,
+      "sha256": "10049ac3ce660f3401d4bd5718fb0cbfb478272a507bd61d6857ce3f76e0fc12",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/25-lower-loaded-live.png",
+      "bytes": 3638060,
+      "sha256": "d8c9b6541803d5c93c433a7685b3bf09d3c643fea50475b8f06e7599099cf0b2",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/32-save-result.png",
+      "bytes": 819372,
+      "sha256": "c0b565a044a07547b472cd4dc7242e21b4824cb921e250ced7c2777212f6f501",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/35-upper-loaded.png",
+      "bytes": 738575,
+      "sha256": "58f58ee4f60c48056022736535f6e55a60b1d12161868c7b317ca4c8e8804d12",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/37-upper-live.png",
+      "bytes": 2654231,
+      "sha256": "7ade573fb3fed81c5ed829a23a3f5016e80b0c20bb938de118f99c374a82ab78",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/39-upper-home-resumed.png",
+      "bytes": 2652081,
+      "sha256": "8cca0b0783797bb5e9885c422d4b40268cb4683ab372791f5f14b093d996fec4",
+      "opened": true
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/40-upper-readiness-final.png",
+      "bytes": 2649096,
+      "sha256": "bca0ecda2fcd1fac48767a609540c44b25eb7a7884db5f3a69d22f45bdee06b6",
+      "opened": true
+    }
+  ],
+  "supportingArtifacts": [
+    {
+      "path": "reports/android-campaign-device-2026-10-18/preflight.json",
+      "bytes": 871,
+      "sha256": "26f26d42643255f58b4c4e02f2d76322392e4078147370d31c9632783ef9f94a"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/seed-records.json",
+      "bytes": 1847,
+      "sha256": "cbc2f0db24810f5af38fb9775447df3230441dfedff7d0dcf5a2a175380bc176"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/after-cancel-records.sha256",
+      "bytes": 750,
+      "sha256": "3cf95f965fd546b1731624d698002397519ff9344562e6a659530ea2752eeb8d"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/after-manual-save-records.json",
+      "bytes": 1398,
+      "sha256": "28ba46e096540c1544ae4e36c1d3686ea902103b3d9104cf6e5b6cb9c5bfeb36"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/final-record-hashes.json",
+      "bytes": 761,
+      "sha256": "ef31b1909f78d62873703aa8e22c59fff8fcd03d23d0383db54ae46390b5bd4a"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/final-terminal.json",
+      "bytes": 574,
+      "sha256": "c1fa1e6f718abdeb99cab7e35ab9615fbdf8b3d556955541f1fca25578886721"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/final-terminal-logcat.txt",
+      "bytes": 30926,
+      "sha256": "bc60255f7e7f184c19a66e82bf8e0df17af762b7754d4ea12644832776559589"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/final-signer.txt",
+      "bytes": 315,
+      "sha256": "70d5134e183887600f1ca213d744c5979affb6d1d3ef1d861e8f6928aa25480f"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/final-installed.sha256",
+      "bytes": 171,
+      "sha256": "ddca9d32a1c88f3d7bc37a34eb96db0c698133fd252a7f5b386339dc66bf5ae8"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/final-settings-after-quit.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/final-inventory-after-quit.txt",
+      "bytes": 20162,
+      "sha256": "d329e1956ecb22f1c6e0197f6a20107ac63849163da41504db1dcc990fce8d7d"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/replacement-newgame-terminal.json",
+      "bytes": 490,
+      "sha256": "06670c5851c45b5b0e619242a759e940c1ac36fc285d7d5d408028e829513cdc"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/replacement-newgame-terminal-logcat.txt",
+      "bytes": 16876,
+      "sha256": "3f90788c1d236126695adea8b917fcf2c9fb92663450065bc31edaf6ef53e6bc"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/newgame-terminal.json",
+      "bytes": 382,
+      "sha256": "1ac792c88b9c2dde44f8d144dc2af51d42aaea9d27c03c4a69a0e8167cc588c4"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/newgame-terminal-logcat.txt",
+      "bytes": 20584,
+      "sha256": "b275532a359ec1a300c97fc5f382e4fefe6f6655e6b0dac8bc7c1a86221047bf"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/23-lower-load-pending.xml",
+      "bytes": 8361,
+      "sha256": "563204a38ad01b18977c532c872000b052d3f18f9bef6d145e1c1701a3c2077c"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/29-save-confirm-cancel.xml",
+      "bytes": 6833,
+      "sha256": "19c93af4d19fab50a79bc2282ab367f81a0809056f26dd8db07df7d407454752"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/32-save-result.xml",
+      "bytes": 8038,
+      "sha256": "c6e5d3161967a0d3354183f0d17877fbd1947aaad9debed555b033ac4c322d5a"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/35-upper-loaded.xml",
+      "bytes": 8361,
+      "sha256": "47d4d04fd84fa7df00be63194ce5e1159f563a1560209f9969f585f37c61e566"
+    },
+    {
+      "path": "reports/android-campaign-device-2026-10-18/40-upper-readiness-final.xml",
+      "bytes": 5478,
+      "sha256": "27241b891b590b98aea0e77d8a9be836078770131c30cc96b48cf01266f435ab"
+    }
+  ],
+  "restrictions": {
+    "uninstall": false,
+    "dataClear": false,
+    "saveDelete": false,
+    "settingsRestoration": false,
+    "securityChange": false,
+    "processTermination": false,
+    "releaseTargeted": false,
+    "desktopInput": false,
+    "reefInteraction": false,
+    "publicActions": false
+  },
+  "unaccepted": [
+    "Upper descent/playability",
+    "Fresh-process recovery",
+    "In-flight save/load lifecycle interruption",
+    "Actual power-loss/fault durability",
+    "Normal chapter-earned autosaves",
+    "Full chapter traversal",
+    "Movement/combat/root acceptance",
+    "Sustained performance",
+    "Audio/haptics/comfort"
+  ],
+  "deviceActionsFinished": true,
+  "nextStep": "Fix real zone 0 renderer readiness and revalidate upper descent admission plus fresh-process reload on separately sealed candidate"
+}

@@ -1,0 +1,61 @@
+{
+  "sourceBase": "ad12cdbdf26b0440218182d8dce94d8e27536668",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "milestone": "existing WP2a current contact observation; no combat-rule change",
+  "sourceSha256": {
+    "CMakeLists.txt": "b78ca2d0a62403dbfc8a1178deee02b871be9cba599d74a7f7aa9e9a3e0952ba",
+    "tools/android_keeper_preparation.py": "f8723424e8ce17f9e3d9f4a9db08e884f8f342718d8736b7467ce41cdfacec2f",
+    "tests/test_android_keeper_preparation.py": "7045f64f8672eb415de4f8d90283db6753a98e0051bb794a41d8c5a26f618c58",
+    "src/telemetry/CombatTargetObservation.h": "a3c2f2889e9bc3ce10ec003a790dc3be757eafb3bf15af50d14897352f6cfaa9",
+    "src/ui/DiagnosticOverlay.cpp": "a6f643cb70c3328909fd0cf7654b90b381aa2c5e9b6e236d2b38f3991a485dd5",
+    "src/ui/DiagnosticOverlay.h": "855e93047c2fbffe307ff72ffdabc38eed2f4e8e8ffe34357508dab4ea2eb103",
+    "src/platform/windows/DiagnosticWindow.cpp": "ee0f46d66db9510fc8f24ce03fa98e02b5fff5f56e60fb07e50d85874705f450",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "7c596b6f98f5e07fc06d508d278216cb708b61dd5478419502fc517eaf083a69",
+    "tests/CombatTargetObservationTests.cpp": "7d38f334cf827ea4ae529257306edeb5afdab41dac932d1b3c6c6258ae03c807",
+    "tests/DeveloperOverlaySmoke.cpp": "710695e1c9a35286061a4c14c6a6acfb228e7da881439870349b21735fcb9c05",
+    "tests/KeeperMistFixtureTests.cpp": "4302eb74fbe25e3b0629e09fec51f42be87f0d809ccde15fa575f68ca2867f0b"
+  },
+  "checks": {
+    "hostTests": 3,
+    "hostPass": 3,
+    "armTransportOfflineTests": 14,
+    "androidUnitTests": 361,
+    "androidFailures": 0,
+    "windowsApplicationBuilt": true,
+    "androidAbisBuilt": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "initialBuildFailure": "new observation test omitted link to existing horde_gameplay_simulation; corrected, no assertion relaxed"
+  },
+  "compiledOnly": {
+    "apkSha256": "d2fdfe5e04830ac9d94fe0d11b6a450417b84aa282003918eba2f51a225db061",
+    "apkBytes": 186146629,
+    "assetCount": 175,
+    "assetsIdenticalToInstalledR04": true,
+    "windowsExeSha256": "4f9bd6907b3024b3242ec953a89f8edbc018683cad5715e4a03c0c20c0f45c41",
+    "installed": false,
+    "launched": false,
+    "shaderChanges": false
+  },
+  "physicalState": {
+    "phoneOperationsThisMilestone": 0,
+    "lastInstalledApkSha256": "b7e387d16c2876abf532ce461b9b71bb1e77d60220192a9f5333031098bb819d",
+    "lastVerifiedCustody": "../2026-10-20-keeper-mist/renewed/final-custody.json",
+    "newDeviceOrPerformanceAcceptance": false
+  },
+  "limits": [
+    "centerXZ and bearing are selected active entity observations, not hit eligibility/obstruction/blade gap",
+    "last sword sample has its own target/tick/age and is not a whole-attack hit verdict",
+    "paused age is simulation ticks, not wall time",
+    "existing stale debug JSON/trace rows are not newly current evidence",
+    "offline arm helper uses fake transport only; no physical echo/readback verified",
+    "two older native failures remain independently classified; no whole-suite pass",
+    "existing denied combat action remains stopped; no public push/release/Reef operations"
+  ],
+  "bankedOptimisations": "preserved; no new performance claim",
+  "audioHapticManualRevalidationRequired": false
+}

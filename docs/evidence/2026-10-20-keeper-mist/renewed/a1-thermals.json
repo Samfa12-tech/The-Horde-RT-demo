@@ -1,0 +1,110 @@
+[
+  {
+    "phase": "passive-cooldown",
+    "hostMonotonic": 88406.671,
+    "thermal": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 27.2,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 26.5,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 28.5,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    }
+  },
+  {
+    "phase": "prepared",
+    "hostMonotonic": 88425.281,
+    "thermal": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 39.8,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 27.8,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 32.8,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    }
+  },
+  {
+    "phase": "before-run",
+    "hostMonotonic": 88425.281,
+    "thermal": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 39.8,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 27.8,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 32.8,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    }
+  },
+  {
+    "phase": "after-run",
+    "hostMonotonic": 88426.593,
+    "thermal": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 39.2,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 28.0,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 32.7,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    }
+  }
+]

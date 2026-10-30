@@ -1,0 +1,34 @@
+from pathlib import Path
+import ctypes,hashlib,json,subprocess,sys,time
+root=Path.cwd();base=root/'reports/kit-lod-candidate-20261023/rt';label=sys.argv[1]
+assert label in ['control','candidate']
+package=base/label;exe=package/'HordeLanternRT.exe'
+state=root/('reports/horde-campaign-fixtures-kit-lod-20261023-'+label)
+assert not (base/(label+'.process.json')).exists()
+u=ctypes.WinDLL('user32');u.GetForegroundWindow.restype=ctypes.c_void_p
+identity=lambda p:{'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+kit=package/'assets/models/characters/runtime/kit-warden-v1/kit-warden-lod0.runtime.glb'
+world=root/'assets/models/player/runtime/gothic-traveller-lod0.runtime.glb'
+view=root/'assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb'
+settings=package/'HordeLanternRT.settings.ini'
+sources={'kit':kit,'world':world,'viewmodel':view,'settings':settings,'save':state/'slot-1-auto.hrd','manifest':state/'manifest.json'}
+before={k:identity(p) for k,p in sources.items()}
+args=[str(exe),'--lookout-validate-hidden','--lookout-inspect-kit-motion','--campaign-test-root',str(state)]
+record={'label':label,'arguments':args,'exe':identity(exe),'before':before,'foregroundBefore':u.GetForegroundWindow()}
+start=time.monotonic();seen=[]
+with (base/(label+'.stdout.log')).open('xb') as so,(base/(label+'.stderr.log')).open('xb') as se:
+    p=subprocess.Popen(args,cwd=root,stdout=so,stderr=se,creationflags=subprocess.CREATE_NO_WINDOW)
+    record['pid']=p.pid;print('Owned hidden RT PID',p.pid,flush=True)
+    while p.poll() is None and time.monotonic()-start<110:
+        seen.append(u.GetForegroundWindow());time.sleep(.25)
+    record.update(exitCode=p.poll(),pending=p.poll() is None,seconds=time.monotonic()-start)
+record['after']={k:identity(p) for k,p in sources.items()}
+record['foregroundUnchanged']=all(x==record['foregroundBefore'] for x in seen) and u.GetForegroundWindow()==record['foregroundBefore']
+record['sourceAndCustodyUnchanged']=record['before']==record['after']
+(base/(label+'.process.json')).write_text(json.dumps(record,indent=2)+'\n')
+print(json.dumps(record),flush=True)
+if record['pending']:raise RuntimeError('Owned process pending; inspect without rerunning')
+assert record['exitCode']==0 and record['sourceAndCustodyUnchanged'] and record['foregroundUnchanged']
+r=json.loads((state/'windows-lookout-validation.json').read_text(encoding='utf-8-sig'))
+assert r['failures']==0,r
+print('Native fixture completed; no physical/earned-play/listening or benchmark claim.',flush=True)

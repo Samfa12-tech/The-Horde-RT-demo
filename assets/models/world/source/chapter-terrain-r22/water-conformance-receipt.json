@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "status": "PASS: closed source/native admission; physical visual/performance gates pending",
+  "baseCommit": "5f571d7a",
+  "source": "chapter-terrain-r22",
+  "previousSourceSha256": "fb21e177b8e67fb553d4853a778603a598908812fc1603ca8a16d94d152a4854",
+  "runtimeSha256": "12c0c577a67c5fc8e88fe0528a9eaa5b2ec950ba409bbffe969560b7c54ee060",
+  "runtimeBytes": 18408928,
+  "runtimeByteGrowth": 80880,
+  "triangles": 36746,
+  "exportedVertices": 18936,
+  "unchangedRuntimeMaximumTriangles": 39618,
+  "unchangedRuntimeMaximumVertices": 21134,
+  "unchangedRuntimeManifestSha256": "da0762e1250e9586022c25e1d1600c5e246ca542524cde137185f98f1fe0de13",
+  "exactCoreTriangles": 15472,
+  "exactProtectedTriangles": 15610,
+  "exactRouteStations": true,
+  "exactGridHeights": true,
+  "exactHoles": true,
+  "exactEntryEnvelopes": true,
+  "exactBounds": true,
+  "embeddedMaterialsAndImagesIdentical": true,
+  "conformance": {
+    "originalFaces": 33912,
+    "faces": 36608,
+    "insertedVertices": 1348,
+    "changedOuterFaces": 459,
+    "protectedFaces": 15472
+  },
+  "sourceOnlyTests": 9,
+  "regionalFoundationTests": 5,
+  "riverActualFaceSamples": 1288,
+  "riverActualFaceMinimumDepthMetres": 0.8280593439837984,
+  "riverOrthogonalMinimumDepthMetres": 0.751656108909275,
+  "lakeTwoMetreInnerShoreMinimumDepthMetres": 0.42258296893897196,
+  "shoreLimitation": "Original heightfield at shallowest probed mouth/shore location is only .1813m below datum; no fabricated .5m shoreline depth imposed",
+  "nativeIntake": "reports/2026-10-19-terrain-r22-native-intake.log",
+  "gltfValidator": "2.0.0-dev.3.10: zero errors and warnings",
+  "preservedFailures": [
+    "reports/2026-10-19-water-conformance-prototype.log",
+    "reports/2026-10-19-water-conformance-seams.log",
+    "reports/2026-10-19-water-conformance-shore.log",
+    "reports/2026-10-19-water-conformance-inner-shore.log"
+  ],
+  "sourceRecipes": [
+    {
+      "path": "tools/author-chapter-terrain.py",
+      "sha256": "b1ba792d2720b71c44b54d851d90c3a839288abf4d28892edd7fae098ad98136"
+    },
+    {
+      "path": "tools/chapter_regional_terrain.py",
+      "sha256": "c0c7d86c72460fae04793bf9545c4cbc1f4dad709c23d4b97ee05137fee4c368"
+    },
+    {
+      "path": "tools/chapter_water_conformance.py",
+      "sha256": "90093a71d17cc986e733ad3b0f8fd7966841a2ef515ec54cbb8f8c682a862fef"
+    }
+  ],
+  "largeCandidatePolicy": "Local reproducible r22 blend/glb/surface remain available but excluded from Git duplication; prior tracked r21 master, pinned topo/layout and current recipes reproduce the derivative. Runtime GLB is the admitted distribution copy.",
+  "physicalVisualAcceptance": false,
+  "phoneAcceptance": false,
+  "performanceMeasured": false,
+  "checks": {
+    "sourceConformance": {
+      "passed": 9,
+      "total": 9,
+      "log": "reports/2026-10-19-water-conformance-final.log"
+    },
+    "regionalFoundation": {
+      "passed": 5,
+      "total": 5,
+      "log": "reports/2026-10-19-regional-terrain-foundation.log"
+    },
+    "terrainValidation": "reports/2026-10-19-terrain-r22-validation.log",
+    "nativeSupport": {
+      "queries": 2781,
+      "sweeps": 616,
+      "failures": 0,
+      "retainedBytes": 2703656,
+      "log": "reports/2026-10-19-terrain-r22-native-support.log"
+    },
+    "khronos": "reports/2026-10-19-terrain-r22-khronos-validation.log"
+  },
+  "runtimeManifestHasContentHash": false,
+  "runtimeAdmission": "Unchanged path-agnostic manifest: budgets/material factor preserved; current GLB identity pinned here, source authoring receipt, runtime README and ASSET_LICENSES.md"
+}

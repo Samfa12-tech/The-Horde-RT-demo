@@ -18,7 +18,7 @@ Windows is the secondary/equal hardware target for this phase.
 ## What is implemented
 
 - Shared probe logic from `src/vulkan/*` and `src/ui/DiagnosticOverlay.cpp`.
-- The interactive Win32 path presents the shared RT scene through a Vulkan swapchain with `WASD`, mouse-drag look, right mouse/Space swing, `Q` parry, `Esc` pause, `R` restart, `F1` controls, `F2` diagnostics, and `Alt+Enter` fullscreen. XInput and WinMM controllers are supported; the owner-tested Backbone One uses both sticks, RT attack, LT parry, B/Circle directional dodge, D-pad menus, A select, Menu/Start pause, and controller render-scale adjustment.
+- The interactive Win32 path presents the shared RT scene through a Vulkan swapchain with `WASD`, captured mouse free look, left-click swing/contextual chest interaction, `Space` dodge, `Shift` run, `Q` parry, `E` claimed-lantern raise/lower (right-click reserved), `Esc` pause, `R` restart, `F1` controls, `F2` diagnostics, and `Alt+Enter` fullscreen. XInput and WinMM controllers are supported; the owner-tested Backbone One uses both sticks, RT attack, LT parry, B/Circle directional dodge, D-pad menus, A select, Menu/Start pause, and controller render-scale adjustment.
 - The renderer builds BLAS/TLAS, dispatches `vkCmdTraceRaysKHR`, and preserves clear unsupported-device diagnostics.
 - Branded entry/pause/settings/diagnostics UI, bounded two-skeleton opening combat followed by a singular lich, FilmCow SFX, positional DRAGON-STUDIO/Pixabay waterfall ambience, persisted settings, 50-100% RT render scaling, and an in-app credits/licences dialog are implemented.
 - The executable declares Per-Monitor V2 DPI awareness and rescales its fonts and overlay geometry when the window DPI changes.

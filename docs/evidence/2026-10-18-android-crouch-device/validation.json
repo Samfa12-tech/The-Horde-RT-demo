@@ -1,0 +1,507 @@
+{
+  "scope": "Finite ordinary opening Play, native accepted crouch/stand HUD, qualitative held/camera views, pause/Home stance release, explicit Quit",
+  "sourceCommit": "1906a733b8b401672643c7f22d0327a500bdd211",
+  "compiledSourceParent": "1bf8921a565dd92f40ca2c8b4c6edf651ff0e2c9",
+  "sourceBinding": "Exact frozen working crouch/root diff compiled over sourceParent, then committed unchanged locally as sourceCommit; root verified compiled-source hashes",
+  "implementationReceipt": "../2026-10-18-crouch-playable/validation.json",
+  "recordedUtc": "2026-10-18T01:50:19.7889107Z",
+  "worktree": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof",
+  "device": {
+    "serial": "R5GL219SZGK",
+    "model": "SM-S948B",
+    "android": "17",
+    "api": 37,
+    "build": "CP2A.260605.016.S948BXXS4BZIG",
+    "user": 0,
+    "initialForeground": "Android launcher",
+    "initialHordeActivityCount": 0,
+    "initialProcess": "PID25338, prior test cached/frozen-empty process; no owner-running session",
+    "ownerProcessKilled": false
+  },
+  "package": {
+    "name": "com.samfa12.hordelanternrt.debug",
+    "versionName": "1.6.2-debug",
+    "versionCode": 10,
+    "candidate": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183853322,
+      "sha256": "b1f266f69adf6b92eda2c18fe7c02aa967cbb626d853ef4dd910ab1394f82211"
+    },
+    "installedBeforeSha256": "6d865599c74828bc15165693e7ea23e31454e2909c7ddd0b66123cf0534809d6",
+    "installedAfterSha256": "b1f266f69adf6b92eda2c18fe7c02aa967cbb626d853ef4dd910ab1394f82211",
+    "publicV2CertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "sameSignerBasis": "Known installed artifact hash from prior signer-verified Back receipt; local current public certificate checked independently",
+    "installCommand": "adb -s R5GL219SZGK install -r android/app/build/outputs/apk/debug/app-debug.apk",
+    "installOutcome": "Success",
+    "redundantApkCopyPull": false
+  },
+  "cases": [
+    {
+      "name": "Ordinary PLAY readiness",
+      "result": "PASS after retained pending sample",
+      "pendingProof": "02-standing.xml",
+      "proof": "03-live-standing.xml",
+      "debugExtrasUsed": false,
+      "boundedAdditionalReadinessChecks": 1
+    },
+    {
+      "name": "Crouch accepted",
+      "result": "PASS",
+      "proof": "04-crouched.xml",
+      "nativeControl": "Stand"
+    },
+    {
+      "name": "Standing accepted",
+      "result": "PASS",
+      "proof": "05-restood.xml",
+      "nativeControl": "Crouch"
+    },
+    {
+      "name": "Pause/resume releases crouch",
+      "result": "PASS",
+      "before": "06-before-pause.xml",
+      "paused": "07-paused.xml",
+      "after": "08-after-pause.xml"
+    },
+    {
+      "name": "Home/resume releases crouch",
+      "result": "PASS after retained pending surface sample",
+      "before": "09-before-home.xml",
+      "pendingProof": "10-after-home.xml",
+      "after": "11-home-ready.xml",
+      "boundedAdditionalReadinessChecks": 1,
+      "actualPresentedGeneration": 3
+    },
+    {
+      "name": "Terminal explicit Quit",
+      "result": "PASS",
+      "menu": "12-final-menu.xml",
+      "scrolledQuit": "13-final-quit.xml",
+      "scrollCount": 1,
+      "state": "terminal-state.json",
+      "activityRowsAfter": 0
+    }
+  ],
+  "uiFacts": [
+    {
+      "snapshot": "01-entry",
+      "nativeStanceControl": null,
+      "stanceEnabled": false,
+      "stanceBounds": null,
+      "playPresent": true,
+      "resumePresent": false,
+      "quitPresent": false,
+      "loadingPresent": true
+    },
+    {
+      "snapshot": "02-standing",
+      "nativeStanceControl": null,
+      "stanceEnabled": false,
+      "stanceBounds": null,
+      "playPresent": false,
+      "resumePresent": false,
+      "quitPresent": false,
+      "loadingPresent": true
+    },
+    {
+      "snapshot": "03-live-standing",
+      "nativeStanceControl": "Crouch",
+      "stanceEnabled": true,
+      "stanceBounds": "[84,2294][448,2546]",
+      "playPresent": false,
+      "resumePresent": false,
+      "quitPresent": false,
+      "loadingPresent": false
+    },
+    {
+      "snapshot": "04-crouched",
+      "nativeStanceControl": "Stand",
+      "stanceEnabled": true,
+      "stanceBounds": "[84,2294][448,2546]",
+      "playPresent": false,
+      "resumePresent": false,
+      "quitPresent": false,
+      "loadingPresent": false
+    },
+    {
+      "snapshot": "05-restood",
+      "nativeStanceControl": "Crouch",
+      "stanceEnabled": true,
+      "stanceBounds": "[84,2294][448,2546]",
+      "playPresent": false,
+      "resumePresent": false,
+      "quitPresent": false,
+      "loadingPresent": false
+    },
+    {
+      "snapshot": "06-before-pause",
+      "nativeStanceControl": "Stand",
+      "stanceEnabled": true,
+      "stanceBounds": "[84,2294][448,2546]",
+      "playPresent": false,
+      "resumePresent": false,
+      "quitPresent": false,
+      "loadingPresent": false
+    },
+    {
+      "snapshot": "07-paused",
+      "nativeStanceControl": null,
+      "stanceEnabled": false,
+      "stanceBounds": null,
+      "playPresent": false,
+      "resumePresent": true,
+      "quitPresent": false,
+      "loadingPresent": false
+    },
+    {
+      "snapshot": "08-after-pause",
+      "nativeStanceControl": "Crouch",
+      "stanceEnabled": true,
+      "stanceBounds": "[84,2294][448,2546]",
+      "playPresent": false,
+      "resumePresent": false,
+      "quitPresent": false,
+      "loadingPresent": false
+    },
+    {
+      "snapshot": "09-before-home",
+      "nativeStanceControl": "Stand",
+      "stanceEnabled": true,
+      "stanceBounds": "[84,2294][448,2546]",
+      "playPresent": false,
+      "resumePresent": false,
+      "quitPresent": false,
+      "loadingPresent": false
+    },
+    {
+      "snapshot": "10-after-home",
+      "nativeStanceControl": null,
+      "stanceEnabled": false,
+      "stanceBounds": null,
+      "playPresent": false,
+      "resumePresent": false,
+      "quitPresent": false,
+      "loadingPresent": false
+    },
+    {
+      "snapshot": "11-home-ready",
+      "nativeStanceControl": "Crouch",
+      "stanceEnabled": true,
+      "stanceBounds": "[84,2294][448,2546]",
+      "playPresent": false,
+      "resumePresent": false,
+      "quitPresent": false,
+      "loadingPresent": false
+    },
+    {
+      "snapshot": "12-final-menu",
+      "nativeStanceControl": null,
+      "stanceEnabled": false,
+      "stanceBounds": null,
+      "playPresent": false,
+      "resumePresent": true,
+      "quitPresent": false,
+      "loadingPresent": false
+    },
+    {
+      "snapshot": "13-final-quit",
+      "nativeStanceControl": null,
+      "stanceEnabled": false,
+      "stanceBounds": null,
+      "playPresent": false,
+      "resumePresent": true,
+      "quitPresent": true,
+      "loadingPresent": false
+    }
+  ],
+  "openedScreenshots": [
+    {
+      "artifact": {
+        "path": "reports/android-crouch-device-2026-10-18/03-live-standing.png",
+        "bytes": 2750086,
+        "sha256": "b4a974216f5a327e27d5e4db4695c05786070b6c3c6720f1d43fcc0c8c955bc2"
+      },
+      "opened": true
+    },
+    {
+      "artifact": {
+        "path": "reports/android-crouch-device-2026-10-18/04-crouched.png",
+        "bytes": 2739315,
+        "sha256": "73dc57746cf2bb4a02d2ba78c8f1e0af257418cd8d1cace708e81db46bbdae92"
+      },
+      "opened": true
+    },
+    {
+      "artifact": {
+        "path": "reports/android-crouch-device-2026-10-18/05-restood.png",
+        "bytes": 2788423,
+        "sha256": "d2d77d13558e6fd7fb1b7e86299b14f59761676ec8685ea40c3aa8e765d6b1eb"
+      },
+      "opened": true
+    },
+    {
+      "artifact": {
+        "path": "reports/android-crouch-device-2026-10-18/11-home-ready.png",
+        "bytes": 2791593,
+        "sha256": "d907a66de32f20804f9dbabcbb484a9c91ca031eaf2e24d13443fa660922acb9"
+      },
+      "opened": true
+    }
+  ],
+  "visualObservation": "Crouched view reveals more floor and raises doorway/encounter silhouettes; standing restores view; torch and both hands remain visible without obvious detached/floating prop response in these specific views",
+  "visualLimits": [
+    "Full torso/legs insufficiently visible",
+    "No pixel parity, subjective art/comfort or listening acceptance",
+    "No live input-presentation JSON samples; numeric pose/eye height unavailable"
+  ],
+  "rtPresentation": {
+    "actualMarkers": [
+      "HORDE_SURFACE_PRESENTED generation=1",
+      "HORDE_SURFACE_PRESENTED generation=1",
+      "HORDE_SURFACE_PRESENTED generation=3"
+    ],
+    "afterHomeGeneration3Presented": true,
+    "surfacePresentationLines": [
+      "HORDE_SURFACE_PRESENTATION generation=1 window=1440x2971 current_extent=1440x2971 current_transform=0x00000001 supported_transforms=0x000001ff pre_transform=0x00000001 swapchain=1440x2971 rt_dispatch=576x1188 rt_pre_rotation_required=0",
+      "HORDE_SURFACE_PRESENTATION generation=1 window=1440x2971 current_extent=1440x2971 current_transform=0x00000001 supported_transforms=0x000001ff pre_transform=0x00000001 swapchain=1440x2971 rt_dispatch=576x1188 rt_pre_rotation_required=0",
+      "HORDE_SURFACE_PRESENTATION generation=3 window=1440x2971 current_extent=1440x2971 current_transform=0x00000001 supported_transforms=0x000001ff pre_transform=0x00000001 swapchain=1440x2971 rt_dispatch=576x1188 rt_pre_rotation_required=0"
+    ],
+    "dispatch": "576x1188",
+    "swapchain": "1440x2971",
+    "savedScale": 0.4,
+    "performanceClaim": false
+  },
+  "custody": {
+    "settingsBeforeSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "settingsAfterInstallSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "settingsAfterSha256": "e3966b09cd9c354cb92833496b7f812139178dd7b2a906a4f809dbf9538c3dee",
+    "inventoryBefore": 274,
+    "inventoryAfter": 274,
+    "inventoryDifferenceCount": 0,
+    "saveNamedPaths": 0,
+    "fatalExceptionOrSignalCount": 0,
+    "terminalActivityRows": 0,
+    "wholeAppDataByteIdentityClaim": false,
+    "uninstall": false,
+    "dataClear": false,
+    "securityChange": false,
+    "saveLoadInvoked": false,
+    "releaseTargeted": false,
+    "independentReleaseByteHashClaim": false,
+    "desktopInput": false,
+    "ReefInteraction": false,
+    "processKill": false,
+    "cachedProcessExitClaim": false
+  },
+  "commands": {
+    "launch": "adb -s R5GL219SZGK shell am start --user 0 --activity-single-top -n com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity",
+    "buttonTaps": "ADB input tap at centers derived from the observed UI hierarchy",
+    "back": "ADB KEYCODE_BACK for pause/resume",
+    "home": "ADB KEYCODE_HOME once, then explicit existing Activity resume",
+    "quit": "Observed ScrollView swipe once; tap observed QUIT DEMO",
+    "logcat": "Device-time lower bound plus actual app PID; only HordeRtProbeBridge/HordeLanternAudio/AndroidRuntime/libc tags",
+    "qualityOrGameplayAutomationExtras": "None"
+  },
+  "unaccepted": [
+    "Physical ordinary root walk and low-ceiling blocked standing",
+    "Numeric 0.6m eye drop",
+    "Full-body mesh",
+    "Physical keyboard/controller/gesture variants",
+    "Broader font/orientation matrix",
+    "Sustained performance",
+    "Audio/haptics and comfort",
+    "Gameplay Save/Load, process-death save recovery",
+    "POSIX/power-loss durability"
+  ],
+  "audioHapticManualRevalidation": "YES for implementation event-time listener/held-source posture changes; NOT ACCEPTED by this visual/HUD pass",
+  "remainingExecutionBlocker": null,
+  "deviceActionsFinished": true,
+  "localArtifacts": [
+    {
+      "path": "reports/android-crouch-device-2026-10-18/01-entry.xml",
+      "bytes": 5848,
+      "sha256": "5bd7e26f2b236ae58764b5aa9bd2f345ace071379dceceabe0ab7852c61c0183"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/02-standing.png",
+      "bytes": 50605,
+      "sha256": "817af4795f211650d60ba7aa7609a83bb608979c2d7eaa540857f449fc23fb84"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/02-standing.xml",
+      "bytes": 4749,
+      "sha256": "c67435cb6b3cfec21f28f1e45b78a3d4b9290f1ed8ce7f58708cc2c6b1ab4997"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/03-live-standing.png",
+      "bytes": 2750086,
+      "sha256": "b4a974216f5a327e27d5e4db4695c05786070b6c3c6720f1d43fcc0c8c955bc2"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/03-live-standing.xml",
+      "bytes": 5005,
+      "sha256": "e7a2961ac6ccda14ea8317bd48a02298b73678fe3259afeedac49e830a083ef2"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/04-crouched.png",
+      "bytes": 2739315,
+      "sha256": "73dc57746cf2bb4a02d2ba78c8f1e0af257418cd8d1cace708e81db46bbdae92"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/04-crouched.xml",
+      "bytes": 5003,
+      "sha256": "ae1a32ffa79af866385f2672abe960f758f2d1baea9ad482dfa8befe59acc798"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/05-restood.png",
+      "bytes": 2788423,
+      "sha256": "d2d77d13558e6fd7fb1b7e86299b14f59761676ec8685ea40c3aa8e765d6b1eb"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/05-restood.xml",
+      "bytes": 5005,
+      "sha256": "e7a2961ac6ccda14ea8317bd48a02298b73678fe3259afeedac49e830a083ef2"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/06-before-pause.xml",
+      "bytes": 5003,
+      "sha256": "ae1a32ffa79af866385f2672abe960f758f2d1baea9ad482dfa8befe59acc798"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/07-paused.xml",
+      "bytes": 8141,
+      "sha256": "518b022d82bdd0fbe6d514014237e5f837da61109bceb6d350678c76ab2e07a0"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/08-after-pause.xml",
+      "bytes": 5005,
+      "sha256": "e7a2961ac6ccda14ea8317bd48a02298b73678fe3259afeedac49e830a083ef2"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/09-before-home.xml",
+      "bytes": 5003,
+      "sha256": "ae1a32ffa79af866385f2672abe960f758f2d1baea9ad482dfa8befe59acc798"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/10-after-home.xml",
+      "bytes": 4174,
+      "sha256": "2ce2b151143ace703c91b9979b3cc8eec5bab5e71f417d378e1a9af7ec9d62d7"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/11-home-ready.png",
+      "bytes": 2791593,
+      "sha256": "d907a66de32f20804f9dbabcbb484a9c91ca031eaf2e24d13443fa660922acb9"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/11-home-ready.xml",
+      "bytes": 5005,
+      "sha256": "e7a2961ac6ccda14ea8317bd48a02298b73678fe3259afeedac49e830a083ef2"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/12-final-menu.xml",
+      "bytes": 8141,
+      "sha256": "518b022d82bdd0fbe6d514014237e5f837da61109bceb6d350678c76ab2e07a0"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/13-final-quit.xml",
+      "bytes": 7722,
+      "sha256": "7a4c25028c39738f27a1d521c84db4ff09c11639ebeb3beb201ba5acabf07d02"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/app-pid.txt",
+      "bytes": 7,
+      "sha256": "79e9e8c540b833219033dfc83423bbd276d87c0fc86efe1479ea7b4aeb4127a9"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/candidate-signer.txt",
+      "bytes": 315,
+      "sha256": "70d5134e183887600f1ca213d744c5979affb6d1d3ef1d861e8f6928aa25480f"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/custody-result.json",
+      "bytes": 478,
+      "sha256": "9bcb591b80b84cf614990bea9f529daca7b8d819ea149ac566498ab7c66530a8"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/final-app-logcat.txt",
+      "bytes": 33382,
+      "sha256": "f033c42d0fe2402b75c88dc361453e2daa6c65ec33f384dc6836e15c1b86b236"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/frozen-working-source-files.json",
+      "bytes": 4788,
+      "sha256": "366dd7b15ab2e643e0a2bb747a059695b3b9cf42aeea72bf469c8d3d3f488dc1"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/home-foreground.txt",
+      "bytes": 119,
+      "sha256": "21ade0e2a94b81273754390cbe23b6e23b00ed8bb6e82f8f498e8c6784ade148"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/install.txt",
+      "bytes": 38,
+      "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/installed-after.sha256",
+      "bytes": 171,
+      "sha256": "b3a5d072d627ee0855053af5683af6f866833eb07025e10f2c6a537aa696d8cd"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/installed-before.sha256",
+      "bytes": 171,
+      "sha256": "6aca91fe549f0dea4b90cf0ded5ad47361f5b90febf6d1ebb4f91924b1c8ea51"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/inventory-after.txt",
+      "bytes": 19742,
+      "sha256": "5a95102852739fe9adf60918d91261dc07ea31834e47f42c8bf5b51780955fb9"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/inventory-before.txt",
+      "bytes": 19742,
+      "sha256": "5a95102852739fe9adf60918d91261dc07ea31834e47f42c8bf5b51780955fb9"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/launch.txt",
+      "bytes": 114,
+      "sha256": "4c8263c3039203b16e7af565535c922ff4ebd95fb904675e33bf3f2083381db1"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/opening-wait-logcat.txt",
+      "bytes": 13449,
+      "sha256": "cd78678a27a275ff34c7db3b4901aac39af0d83cd49a321d4b5ff1ca4a9473a0"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/resume-from-home.txt",
+      "bytes": 114,
+      "sha256": "4c8263c3039203b16e7af565535c922ff4ebd95fb904675e33bf3f2083381db1"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/settings-after-install.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/settings-after.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/settings-before.sha256",
+      "bytes": 113,
+      "sha256": "6985584381d326b4a6dba30913ed977ded963f7648e96d6f1527769ad1e0db01"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/start-stamp.txt",
+      "bytes": 22,
+      "sha256": "1f1bc6ff8f69f1e221b287054ea6090187af41816240d2cd51aabda4c72b6ea8"
+    },
+    {
+      "path": "reports/android-crouch-device-2026-10-18/terminal-state.json",
+      "bytes": 82,
+      "sha256": "6e6fbbcd9cf2cf6c960a14da1986cda14572b5f5faf6779b4df8745ee2325e31"
+    }
+  ],
+  "commitCreated": false
+}

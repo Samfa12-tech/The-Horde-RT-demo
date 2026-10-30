@@ -40,17 +40,52 @@ target_include_directories(horde_rt_probe_android PRIVATE
 )
 horde_rt_attach_raygen_artifacts(horde_rt_probe_android)
 horde_rt_apply_raygen_policy(horde_rt_probe_android Android)
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRegionPages.cmake")
+horde_rt_attach_private_region_pages(horde_rt_probe_android)
 horde_rt_attach_staged_primary(horde_rt_probe_android "${HORDE_RT_REPO_ROOT}")
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
 target_compile_definitions(horde_rt_probe_android PRIVATE
     HORDE_RT_MIN_RENDER_SCALE_PERCENT=${HORDE_RT_MIN_RENDER_SCALE_PERCENT}
+    HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE=$<BOOL:${HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE}>
     HORDE_RT_DISPLAY_VERSION="${HORDE_RT_DISPLAY_VERSION}"
     HORDE_RT_PACKAGE_VERSION="${HORDE_RT_PACKAGE_VERSION}"
     HORDE_RT_BUILD_ID="${HORDE_RT_BUILD_ID}"
 )
 target_compile_definitions(horde_rt_probe_android PRIVATE
     HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=$<BOOL:${HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION}>)
+option(HORDE_RT_DISPATCH_CLOCK_PROBE "Private sparse per-invocation dispatch observation" OFF)
+if(NOT "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}" STREQUAL "" AND
+   EXISTS "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}/dispatch-clock-probe.json" AND
+   NOT HORDE_RT_DISPATCH_CLOCK_PROBE)
+    message(FATAL_ERROR "Private clock shader ABI requires its matching native observer.")
+endif()
+if(HORDE_RT_DISPATCH_CLOCK_PROBE AND (NOT HORDE_RT_FRAME_STAGE_PROBE OR
+   NOT EXISTS "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}/dispatch-clock-probe.json"))
+    message(FATAL_ERROR "Dispatch clocks require the explicit private stage/clock shader profile.")
+endif()
+target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_DISPATCH_CLOCK_PROBE=$<BOOL:${HORDE_RT_DISPATCH_CLOCK_PROBE}>)
+option(HORDE_RT_FRAME_STAGE_PROBE "Private chapter GPU AS/dispatch/transfer observation" OFF)
+if(HORDE_RT_FRAME_STAGE_PROBE AND NOT HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING)
+    message(FATAL_ERROR "Frame stage profiling requires private chapter route timing.")
+endif()
+target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_FRAME_STAGE_PROBE=$<BOOL:${HORDE_RT_FRAME_STAGE_PROBE}>)
+if(HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING AND
+   (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug" OR
+    NOT HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION STREQUAL "Shipping" OR
+    NOT HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY STREQUAL "Mobile"))
+    message(FATAL_ERROR "Route timing requires explicit Debug Shipping/Mobile policy.")
+endif()
+if(HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE AND
+   (NOT HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING OR HORDE_RT_ANDROID_BENCHMARK_VALIDATION OR
+    HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE OR NOT "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}" STREQUAL "" OR
+    NOT "${HORDE_RT_STAGED_PRIMARY_SHADER_DIR}" STREQUAL "" OR HORDE_RT_STAGED_PRIMARY_DEFAULT))
+    message(FATAL_ERROR "Outdoor scale probe requires the ordinary private Debug Shipping/Mobile route timing build.")
+endif()
+target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING=$<BOOL:${HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING}>)
 target_compile_definitions(horde_rt_probe_android PRIVATE
     HORDE_RT_ANDROID_MOTION_VALIDATION=$<BOOL:${HORDE_RT_ANDROID_MOTION_VALIDATION}>)
 if(HORDE_RT_ANDROID_BENCHMARK_VALIDATION AND HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "33")
@@ -110,3 +145,18 @@ target_link_libraries(horde_rt_probe_android
     ${ANDROID_LOG_LIBRARY}
     ${ANDROID_LIBRARY}
 )
+include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtReportingIdentityInputs.cmake")
+horde_rt_attach_reporting_identity(horde_rt_probe_android "${HORDE_RT_REPO_ROOT}" Android "${ANDROID_ABI}")
+
+# Explicit experiment only: both modes live in one production-shader Debug APK.
+option(HORDE_RT_ACTOR_WORKER_EXPERIMENT "Private CPU actor serial/worker comparison" OFF)
+if(HORDE_RT_ACTOR_WORKER_EXPERIMENT AND
+   (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug" OR
+    NOT HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING OR
+    NOT HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION STREQUAL "Shipping" OR
+    NOT HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY STREQUAL "Mobile" OR
+    NOT "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}" STREQUAL "" OR HORDE_RT_STAGED_PRIMARY_DEFAULT))
+    message(FATAL_ERROR "Actor worker requires isolated Debug production Shipping/Mobile route timing.")
+endif()
+target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_ACTOR_WORKER_EXPERIMENT=$<BOOL:${HORDE_RT_ACTOR_WORKER_EXPERIMENT}>)

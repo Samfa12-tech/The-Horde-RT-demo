@@ -1,0 +1,167 @@
+{
+  "basis": "09c629cf0b120fe61b9144f0d3e29cd53f3458e0",
+  "sourceSha256": {
+    "src/platform/windows/DiagnosticWindow.cpp": "9c4797da9f9640dc11c68ebc6aafcb49e68b8cfcd3dc202d86594b5ad3ad9b27",
+    "src/platform/windows/WindowsPreviewMeshPairCapture.h": "1b7732083fb5cebb5bad20450cddc367c0ed45566ba2f8bf3b40c9803c189360",
+    "src/platform/windows/WindowsPreviewMeshPairCapture.inl": "ebf30a3e690dc254d51447ef3530c4730fe9cd9f5918c265da387a986c910b9a",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "db51d4aeb9f238d4c5f17e5736fbc32160fa0712c30f5b428d5769fd31fb6fe5",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "d121dc45116bb4ecbcc50e2d0c94cae7c51a39210c23271b4ff5026b3800d22f",
+    "src/vulkan/raytracing/RtStaticTextureSelection.h": "00164e8ee048105c2d8dba99c466047b2dda5b0e357484dd92fe751ae06082e5",
+    "tests/GraphicsPreviewTests.cpp": "31118879909e0e628460d90180dbdd419f62c90947c60b5523f86633de92c981",
+    "tests/RtTextureLayerSubsetTests.cpp": "f75548b567eec5afd7f041a728735040898ee043df236df1f60e168f027443a9"
+  },
+  "executableSha256": "50ae51278b65db5c9e4fdbd85bb95b5752885ec9f3a9847c05633c66b98baf55",
+  "shaderBundleIdentity": "opaqueFast:diagnostic_high_opaque_fast@990b40385601979da7642a9b87e11df85dc0aefe5636ae1dc0962a75b8e14bf3|genericDielectric:diagnostic_high_generic_dielectric@938dd5dbe910340e907827eeaf49dd06fdda577dc1b7bf0b03776145bfe6775a",
+  "masterSha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+  "cohortOrder": [
+    "control-r4",
+    "candidate-r4",
+    "closing-control-r4"
+  ],
+  "allOwnedProcessesExitCode": 0,
+  "images": [
+    {
+      "name": "direct",
+      "changedPixels": 109,
+      "totalPixels": 518400,
+      "meanAbsRgb8": [
+        0.00016589506172839507,
+        0.00013117283950617284,
+        0.0001099537037037037
+      ],
+      "maximumChannelDifference": 4,
+      "pixelsWithChannelDifferenceAbove2": 12,
+      "pixelsWithChannelDifferenceAbove8": 0,
+      "closingControlImageIdentical": true,
+      "wallCallMedianMs": [
+        6.0371,
+        6.29075,
+        6.0982
+      ],
+      "lastCompletedGpuMs": [
+        1.961696,
+        2.153152,
+        2.170464
+      ]
+    },
+    {
+      "name": "basis",
+      "changedPixels": 162,
+      "totalPixels": 518400,
+      "meanAbsRgb8": [
+        0.00022376543209876544,
+        0.0001890432098765432,
+        0.00012924382716049382
+      ],
+      "maximumChannelDifference": 4,
+      "pixelsWithChannelDifferenceAbove2": 11,
+      "pixelsWithChannelDifferenceAbove8": 0,
+      "closingControlImageIdentical": true,
+      "wallCallMedianMs": [
+        6.0443,
+        6.04325,
+        6.0428
+      ],
+      "lastCompletedGpuMs": [
+        1.770912,
+        1.900832,
+        2.152992
+      ]
+    },
+    {
+      "name": "mirror",
+      "changedPixels": 521,
+      "totalPixels": 518400,
+      "meanAbsRgb8": [
+        0.0006134259259259259,
+        0.0003915895061728395,
+        0.0002199074074074074
+      ],
+      "maximumChannelDifference": 16,
+      "pixelsWithChannelDifferenceAbove2": 6,
+      "pixelsWithChannelDifferenceAbove8": 2,
+      "closingControlImageIdentical": true,
+      "wallCallMedianMs": [
+        6.05075,
+        6.048,
+        6.0454
+      ],
+      "lastCompletedGpuMs": [
+        1.885664,
+        2.2808,
+        2.047104
+      ]
+    },
+    {
+      "name": "paused-direct",
+      "changedPixels": 109,
+      "totalPixels": 518400,
+      "meanAbsRgb8": [
+        0.00016589506172839507,
+        0.00013117283950617284,
+        0.0001099537037037037
+      ],
+      "maximumChannelDifference": 4,
+      "pixelsWithChannelDifferenceAbove2": 12,
+      "pixelsWithChannelDifferenceAbove8": 0,
+      "closingControlImageIdentical": true,
+      "wallCallMedianMs": [
+        6.04875,
+        6.0454,
+        6.0443
+      ],
+      "lastCompletedGpuMs": [
+        2.073824,
+        2.103424,
+        2.409856
+      ]
+    },
+    {
+      "name": "reset-direct",
+      "changedPixels": 109,
+      "totalPixels": 518400,
+      "meanAbsRgb8": [
+        0.00016589506172839507,
+        0.00013117283950617284,
+        0.0001099537037037037
+      ],
+      "maximumChannelDifference": 4,
+      "pixelsWithChannelDifferenceAbove2": 12,
+      "pixelsWithChannelDifferenceAbove8": 0,
+      "closingControlImageIdentical": true,
+      "wallCallMedianMs": [
+        6.054,
+        6.07065,
+        6.9157
+      ],
+      "lastCompletedGpuMs": [
+        1.964864,
+        2.149632,
+        3.741664
+      ]
+    }
+  ],
+  "admission": "Debug resource-sharing and direct-view equivalence proof only; normal forest unchanged",
+  "reflectionGate": "mirror-context image is not a clear isolated tree-reflection witness; leave secondary appearance acceptance open",
+  "performanceGate": "no speed gain established; wall-call timings include presentation/driver waits, single last-completed GPU durations are not per-view distributions",
+  "unitScaleAndPhoneAcceptance": false,
+  "fullLogsAndAllRawFrames": "reports/forest-shared-blas-20261024 (ignored local evidence)",
+  "device": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672,
+    "driverVersion": 2559295488,
+    "driverVersionText": "raw 2559295488 (vendor-specific)",
+    "vulkanApiVersionText": "1.4.341"
+  },
+  "validation": {
+    "debugBuild": true,
+    "targetedCtests": {
+      "passed": 4,
+      "seconds": 38.14
+    },
+    "windowsReleaseCompile": true,
+    "normalInteractiveReleaseRuntime": false,
+    "phone": false
+  }
+}

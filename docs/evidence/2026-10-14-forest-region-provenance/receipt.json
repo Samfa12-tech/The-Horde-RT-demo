@@ -1,0 +1,240 @@
+{
+  "schema": 1,
+  "sourceParent": "b9f2e942f7bdf111eac09d01140d0f64cc59a179",
+  "sourceState": "parent plus exactly the five listed source/test edits; documentation added after validation",
+  "sources": [
+    {
+      "path": "src/scene/ForestDressing.cpp",
+      "bytes": 22076,
+      "sha256": "846f4ce1d2b6f423d6ce5ee3260316118af13d108f79cec85b752f93889678ae"
+    },
+    {
+      "path": "src/scene/ForestUnderstory.cpp",
+      "bytes": 7414,
+      "sha256": "e21c1eec9d8f90f88438c4b62d93c6fc2a058f8d0519b75a93726c9b8e268ee3"
+    },
+    {
+      "path": "src/scene/ForestRockDressing.cpp",
+      "bytes": 8324,
+      "sha256": "d4c0cf5ad925a14ce382b2842c915178d2cd50c4cb2b099674bfd8c2ec89ed3d"
+    },
+    {
+      "path": "src/scene/ForestDeadwood.cpp",
+      "bytes": 9041,
+      "sha256": "e4b0d48c9b77023117f01e895432e63a53421f0a10ae8cc5e143d8a673a73720"
+    },
+    {
+      "path": "tests/ForestDressingTests.cpp",
+      "bytes": 50154,
+      "sha256": "92a0371cfebe3c65a63610fad546675e6aa8af0986631f8543fd493f48718ecd"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "bytes": 13150720,
+      "sha256": "b26db1f447e1afbff41910aa5f1f1eb118b167b4dd00b833d1ad72ef4dd3b0a4"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4470784,
+      "sha256": "1e7240a43d30763e98e44ade8dd558767a980da00ffaa00916e89bc89cabc077"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 183171290,
+      "sha256": "3a3b53f96d77392026ef66221af60f27615fefe45fd1975c889da0e1a253b997"
+    }
+  ],
+  "apkNativeLibraries": [
+    {
+      "path": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "bytes": 4991320,
+      "sha256": "14a63d78e40934344bd4e0bcf01f5395bf3d1433ff3af9fc8ac17f0bb2dc8331"
+    },
+    {
+      "path": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "bytes": 4349848,
+      "sha256": "dada3d2fff82fd276235319c5f035881a4783da5c1b1f0d7d2ba5a6af472a7fb"
+    },
+    {
+      "path": "lib/x86/libhorde_rt_probe_android.so",
+      "bytes": 5506772,
+      "sha256": "a2e3aa3e518323176490a830870d87e7cec8dfb2c2a38d7789393abcadf51cda"
+    },
+    {
+      "path": "lib/x86_64/libhorde_rt_probe_android.so",
+      "bytes": 5217792,
+      "sha256": "5155b7291e6d742bd3ce89fc29a729d4e902e378a39fbd70917780e014d35e4d"
+    }
+  ],
+  "unchangedShaderInputs": [
+    {
+      "path": "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "bytes": 4575,
+      "sha256": "48869270c0b774f64a639472286ae8913b751745ea2d41274a91e6991a712ed5"
+    },
+    {
+      "path": "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+      "bytes": 4820,
+      "sha256": "76ec3daf3eb23b73093bc4e42781f4ed17e2853a537f95b2272fa7a1ca288ec9"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+      "bytes": 995092,
+      "sha256": "cd575e79002edb8835ea7fd33fcfbcd3d99e026c2254bbf714870fbd628c1471"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+      "bytes": 1971202,
+      "sha256": "c7df0b6717395cc6685b3040a0e4e4f233f28d24f97acd704419a4c5e80b5f85"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+      "bytes": 990031,
+      "sha256": "fdbad8e4f84df515d8c21488340ab2ef3ca54e0560780af47b1ae588874a0381"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+      "bytes": 1961255,
+      "sha256": "c0120e647b04d3e3b344ce5788b543897370de9e0f2edc1df1d6c3fb17a8e474"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+      "bytes": 995967,
+      "sha256": "5108016d48aaff9e5df0e4eb024da26fc8e02f639a2826411115cb5dd908259a"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+      "bytes": 1975304,
+      "sha256": "00dee4b12ff7a1b378e19dde88ba76fe470cc159261017ea32812b9cb19dfefc"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+      "bytes": 990906,
+      "sha256": "b7058e914c0b0a4a9f7a52661ceef8d6013ad76d5da7af675a2917675b0fdff5"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+      "bytes": 1965353,
+      "sha256": "5a9c342bba329b36a8b330518fa88519fccb3243b2cc327d051698e8fdcc5c59"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+      "bytes": 966170,
+      "sha256": "9ed01bb619a53474e5b1e314a49263e9f7e665ccb7955323b1838a9f25afc864"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+      "bytes": 1961003,
+      "sha256": "abacd2f7cfc33fd3ed6ebf6f0f69d16173f645fa27ea9b1dd18bcadbdc111d99"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+      "bytes": 961109,
+      "sha256": "075db86986db92947e58194dab172aea89631b194a8c8919438ffa30dfca4615"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+      "bytes": 1951056,
+      "sha256": "c966205cf9bd0973335b51edc6334127ca9487d609a08bdd10300c746fd59be3"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+      "bytes": 965295,
+      "sha256": "4de12bcc2496ca643bbfd26d9b130f98d54386870532ea02864cb95ee35c124f"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+      "bytes": 1956905,
+      "sha256": "79e551496e1de7ce76485b4e7d7b53d1385b275cad08ece2046e3443c60b9fa7"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+      "bytes": 960234,
+      "sha256": "75f93a4b0d054c9c78ab7df9de7ce50a99751fb5f5e09f9817c0ba36bcec71b0"
+    },
+    {
+      "path": "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+      "bytes": 1946954,
+      "sha256": "127099da96d074893476b0b0b9c14613d87fedb42b78ee186e721bfb00d1a856"
+    },
+    {
+      "path": "tools/raygen-variant-budgets.json",
+      "bytes": 6425,
+      "sha256": "56936479b2d202dbdb9393ba94b66a1b0bc12d490b700d8af4c63de3460e53bf"
+    },
+    {
+      "path": "tools/raygen-variant-catalog.json",
+      "bytes": 35050,
+      "sha256": "e3b43b8f8ab01279f2d1c09cb9d4290b6e7a431b2e4101bdeccfc76b890fcb25"
+    },
+    {
+      "path": "tools/rayquery-variant-catalog.json",
+      "bytes": 39371,
+      "sha256": "ca4e47e19aecf81354b9047a36d04269eb03f81e1ef1894ab9aa0479b493bf22"
+    }
+  ],
+  "logs": [
+    {
+      "path": "docs/evidence/2026-10-14-forest-region-provenance/logs/forest-provenance-red-tests.log",
+      "bytes": 2238,
+      "sha256": "c90ada2e270ab84c7b8b3f6e75cdaf12a643cd89f60b5c8fd75eb5335ef8bbab"
+    },
+    {
+      "path": "docs/evidence/2026-10-14-forest-region-provenance/logs/forest-provenance-debug-build.log",
+      "bytes": 4228,
+      "sha256": "5d1ab62696b34fa4126a72d87a3c5d92290c470521e2f29eccaf13f350d70fbb"
+    },
+    {
+      "path": "docs/evidence/2026-10-14-forest-region-provenance/logs/forest-provenance-debug-tests.log",
+      "bytes": 918,
+      "sha256": "5ef78f997773e66e428870335bb4d8c296f72f229bfd518635b558aa37813e6e"
+    },
+    {
+      "path": "docs/evidence/2026-10-14-forest-region-provenance/logs/forest-provenance-release-build.log",
+      "bytes": 4048,
+      "sha256": "dc5e828049488e95bc02b37caf217705bc6d7f1352570231a63d098ecefa8f66"
+    },
+    {
+      "path": "docs/evidence/2026-10-14-forest-region-provenance/logs/forest-provenance-release-tests.log",
+      "bytes": 922,
+      "sha256": "000bfd1d86ee727dc2ccd51c8c40177620299044783ccc61d4473b4a71a988cc"
+    },
+    {
+      "path": "docs/evidence/2026-10-14-forest-region-provenance/logs/forest-provenance-android-build.log",
+      "bytes": 3616,
+      "sha256": "194ae37186b01e2accaeb6eb55fb8ca386a49f22e60e66b51d6cfd733a1206a6"
+    },
+    {
+      "path": "docs/evidence/2026-10-14-forest-region-provenance/logs/forest-provenance-android-package.log",
+      "bytes": 183,
+      "sha256": "6567fb23239b71777fe6b7debfbcb0077ab0df3cc5761c33ebfe80a827e8dcf0"
+    }
+  ],
+  "normalStaticResidencySavingBytes": 0,
+  "runtimeSubsetAdmission": false,
+  "deviceInstallOrExecution": false,
+  "windowsChecks": {
+    "Debug": {
+      "passed": 4,
+      "seconds": 167.48
+    },
+    "Release": {
+      "passed": 4,
+      "seconds": 15.73
+    }
+  },
+  "androidBuild": {
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "assembleDebug": "passed",
+    "lintDebug": "passed with cached analysis",
+    "packageExactBytes": "passed"
+  },
+  "audioHapticManualRevalidationRequired": false
+}
