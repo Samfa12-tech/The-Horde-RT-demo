@@ -1,5 +1,11 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-30 19:20 UTC - current readiness correction, bounded natural start/lifecycle
+
+**SM-S948B / Android17**, Codex Debug APK SHA256 `e27e37f944730ed461954d2b0fb18fa74bf8f70e4d359e390e0cdfa933dd8ee2`, code10 / `1.6.2-debug`. Matching-certificate in-place update; `201e2d60` readiness runtime inputs unchanged by integrated `8291d269`. Real RT main menu and a fresh empty-slot New game reached the starting corridor without staged progress. The block lesson remained absent while stowed, appeared after sword draw, and portrait/landscape plus injected held-guard background/rotation cancellation were inspected. This is bounded RT presentation/input/lifecycle evidence, **not full natural chapter, human multi-touch/controller, authoritative combat mitigation or performance acceptance**.
+
+Debug stopped/Home restored at19:20:56UTC; original `lock 0` rotation/font1.5, default Debug campaign records and production/actor-worker APK hashes unchanged. Latest tested Debug remains installed as approved. [Exact artifact, scope and remaining checks](evidence/2026-10-30-interactive-acceptance/README.md).
+
 ## 2026-10-30 UTC - three-slot current debug candidate accepted in isolation
 
 **SM-S948B / Android 17**, debug APK SHA256

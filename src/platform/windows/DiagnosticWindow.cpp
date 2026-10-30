@@ -560,6 +560,10 @@ struct OpeningBenchmarkTransfer
     bool hasPersonal = false, fullscreen = false, closeRequested = false, cancelPending = false;
     std::filesystem::path reports;
     std::string status, statusTitle;
+    // Completed CPU values only; no renderer, campaign or mutable UI ownership
+    // survives the benchmark-to-Entry retirement boundary.
+    std::string completedReport;
+    std::optional<horde::telemetry::FrozenBenchmarkSummary> completedSummary;
 };
 
 struct VulkanSurfaceContext
@@ -9826,12 +9830,25 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         openingBenchmark->cancelPending=false;
         std::cerr<<"HORDE_OPENING_BENCHMARK entry-presented campaignAttached="<<(context.campaign?1:0)<<'\n';
         context.entryMoreVisible=true;
+        // Publish the frozen result only after the successor actually presents.
+        // The old renderer has already retired; cancellation/failure has no result.
+        if(!openingBenchmark->completedReport.empty()) {
+            context.benchmarkReport=std::move(openingBenchmark->completedReport);
+            context.benchmarkSummary=std::move(openingBenchmark->completedSummary);
+            openingBenchmark->completedReport.clear();
+            openingBenchmark->completedSummary.reset();
+            context.pauseMenuVisible=false;
+            context.benchmarkReportVisible=true;
+            SetWindowTextA(GetDlgItem(hWnd,kEditControlId),WindowSafeText(context.benchmarkReport).c_str());
+        }
         ApplyOverlayState(context);
         RECT client{};GetClientRect(hWnd,&client);LayoutOverlayControls(hWnd,client.right,client.bottom);
-        FocusGameControl(GetDlgItem(hWnd,kRunBenchmarkButtonId));
+        FocusGameControl(GetDlgItem(hWnd,context.benchmarkReportVisible?kEditControlId:kRunBenchmarkButtonId));
         if(openingBenchmark->closeRequested) PostMessageA(hWnd,WM_CLOSE,0,0);
     }
     if(context.openingBenchmarkOwner) {
+        openingBenchmark->completedReport.clear();
+        openingBenchmark->completedSummary.reset();
         context.benchmarkProfileCancelRequested=context.benchmarkProfileCancelRequested || openingBenchmark->cancelPending;
         context.benchmarkProfileCloseRequested=context.benchmarkProfileCloseRequested || openingBenchmark->closeRequested;
     }
@@ -9886,7 +9903,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 if(context.openingBenchmarkOwner) {
                     openingBenchmark->status=context.benchmarkProfileCancelRequested ?
                         "Benchmark cancelled. Personal graphics restored." : "Benchmark could not start. No result admitted.";
-                    openingBenchmark->statusTitle=context.benchmarkProfileCancelRequested ? "BENCHMARK CANCELLED" : "NO BENCHMARK RESULT";
+                    openingBenchmark->statusTitle=context.benchmarkProfileCancelRequested ? "CANCELLED" : "NO RESULT";
                     openingBenchmark->closeRequested=openingBenchmark->closeRequested || context.benchmarkProfileCloseRequested;
                     const bool seedsKept=CarryOpeningBenchmarkSeeds(*openingBenchmark,context);
                     const bool retired=renderOwner.Retire();
@@ -10278,7 +10295,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 GetClientRect(hWnd, &hudClient);
                 LayoutOverlayControls(hWnd, hudClient.right, hudClient.bottom);
             }
-            if (HWND edit = GetDlgItem(hWnd, kEditControlId))
+            if (HWND edit = context.benchmarkReportVisible ? nullptr : GetDlgItem(hWnd, kEditControlId))
             {
                 const std::string updatedText = WindowSafeText(BuildDisplayText(capabilities, evidencePublication));
                 SetWindowTextA(edit, updatedText.c_str());
@@ -10301,14 +10318,21 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     }
     if(context.openingBenchmarkOwner) {
         openingBenchmark->closeRequested=openingBenchmark->closeRequested || context.benchmarkProfileCloseRequested;
-        openingBenchmark->statusTitle=benchmarkSucceeded && !renderFailed ? "BENCHMARK COMPLETE" :
-            context.benchmarkProfileCancelRequested ? "BENCHMARK CANCELLED" : "NO BENCHMARK RESULT";
+        openingBenchmark->statusTitle=benchmarkSucceeded && !renderFailed ? "RUN COMPLETE" :
+            context.benchmarkProfileCancelRequested ? "CANCELLED" : "NO RESULT";
         openingBenchmark->status=benchmarkSucceeded && !renderFailed ? "Benchmark complete. Local reports saved." :
             context.benchmarkProfileCancelRequested ? "Benchmark cancelled. Personal graphics restored." :
             "Benchmark did not complete. Personal graphics restored; no result admitted.";
         const bool seedsKept=CarryOpeningBenchmarkSeeds(*openingBenchmark,context);
+        auto completedReport=benchmarkSucceeded && !renderFailed ? std::move(context.benchmarkReport) : std::string{};
+        auto completedSummary=benchmarkSucceeded && !renderFailed ? std::move(context.benchmarkSummary) :
+            std::optional<horde::telemetry::FrozenBenchmarkSummary>{};
         const bool retired=renderOwner.Retire();
         const bool admitted=openingBenchmark->owner.BenchmarkRetired(restorationPassed && seedsKept,retired);
+        if(admitted) {
+            openingBenchmark->completedReport=std::move(completedReport);
+            openingBenchmark->completedSummary=std::move(completedSummary);
+        }
         std::cerr<<"HORDE_OPENING_BENCHMARK benchmark-retired="<<retired<<" restored="<<restorationPassed
                  <<" successorAdmitted="<<admitted<<'\n';
         return admitted?0:1;

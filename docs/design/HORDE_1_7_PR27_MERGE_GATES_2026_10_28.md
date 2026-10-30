@@ -15,7 +15,7 @@ on exact R9 SHA256 `9308472aebdd6a569fbf668670b3f0deb7403789d15649fe28c1bccb314f
 then closed it. These are scoped owner observations; his general positive
 play feedback does not invent separately recorded death/retry, individual Kit
 route, controller or Android checks. Current phone three-slot evidence still
-uses injected input/staged checkpoints. Its later replacement is uninstalled.
+uses injected input/staged checkpoints. Its later replacement was installed for the bounded natural-start/lifecycle check below; full natural chapter acceptance is still open.
 
 Remaining source-merge gates are combined-tree CI/review, explicit approval to
 merge PR27, and the named exposed-core journey/input/benchmark gaps below.
@@ -24,6 +24,12 @@ candidate. The draft description must track current scope/evidence rather than
 the old checkpoint. Asset/runtime admissions and reporting/world completion
 remain additional 1.7 publication requirements. Sustained mobile performance
 is ongoing optimisation, not a fixed-FPS veto or reason to reduce scope.
+
+## Subsequent interactive checkpoint - 30 October 2026 UTC
+
+Both integrated `8291d269` CI runs passed all6 jobs. The [interactive follow-up](../evidence/2026-10-30-interactive-acceptance/README.md) records the updated Debug APK's fresh natural start, sword-ready teaching and bounded injected-input orientation/background checks. It does not supply natural chapter completion or human simultaneous-input acceptance.
+
+Real Windows Entry -> Showcase -> Entry, setup cancellation, running cancellation, full benchmark completion and distinct personal-settings restoration were exercised. That acceptance found and corrected dropped report/immutable-summary ownership, a first-present text overwrite and clipped status headings. The final artifact displays completed benchmark text and returns to the menu correctly. The actual OS picker opens/cancels; writing remains unverified because the tool could not establish reliable modal filename focus. Remaining targeted human/device checks are that picker write, simultaneous/held physical input and the specifically unrecorded earned recovery/death/retry and Kit route cases. Existing R8/R9 owner passes remain valid at their exact artifacts. PR27-to-main approval and publication remain separate.
 
 ## Historical 28 October assessment
 

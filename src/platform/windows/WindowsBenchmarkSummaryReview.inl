@@ -5,7 +5,9 @@ bool MakeWindowsBenchmarkUuid(std::string& id);
 
 bool WindowsBenchmarkSummaryInteractive(const VulkanSurfaceContext& context) noexcept
 {
-    return !context.unattendedBenchmark && !context.graphicsPreviewCapture &&
+    // The opening-menu owner runs the scripted course without gameplay input,
+    // but is still a human-requested interactive result, unlike CLI automation.
+    return (!context.unattendedBenchmark || context.openingBenchmarkOwner) && !context.graphicsPreviewCapture &&
         !context.outputResizeValidation && !context.nativeMotionValidation;
 }
 
