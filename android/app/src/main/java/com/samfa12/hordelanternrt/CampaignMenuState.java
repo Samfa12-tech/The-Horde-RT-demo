@@ -123,9 +123,9 @@ final class CampaignMenuState {
             case REBASE:return "Getting ready…";
             case PRESENTING:return "Getting ready…";
             case SUCCESS:
-                if(lastOperation==0)return "Autosave saved.";
+                if(lastOperation==0)return "Saved.";
                 if(lastOperation==LOAD)return presented ? "Ready." : "Getting ready…";
-                if(lastOperation==SAVE_MANUAL)return "Manual save saved.";
+                if(lastOperation==SAVE_MANUAL)return "Saved.";
                 if(lastOperation==NEW_GAME)return "Ready to begin.";
                 return "Saves checked.";
             case FAILED:return "Could not finish. Check your saves before trying again.";

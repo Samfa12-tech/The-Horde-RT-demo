@@ -39,6 +39,7 @@ void RefreshOpeningBenchmarkChooser(VulkanSurfaceContext& c)
         "Standard: provisional 1920 x 1080 internal and output, High RT, DRS off. "
         "High water/fire, Current shadows, glass/mist on, Low dust.\r\n"
         "Custom: your current graphics and window size. Both remain unranked.\r\n"
+        "The scripted course speeds up or slows down with rendering speed. Normal gameplay does not.\r\n"
         "Your settings are restored afterwards. Esc cancels a run.";
     if(c.fullscreen)text+="\r\nStandard currently requires windowed mode; Custom keeps fullscreen.";
     if(c.openingBenchmark && !c.openingBenchmark->status.empty())

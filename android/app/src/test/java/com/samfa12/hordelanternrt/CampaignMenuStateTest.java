@@ -66,10 +66,10 @@ public final class CampaignMenuStateTest {
         assertNull(CampaignMenuState.testNamespace(false,"trial"));
         assertNull(CampaignMenuState.testNamespace(true,null));
     }
-    @Test public void autosaveAndManualTerminalReceiptsHaveDistinctMessages() {
+    @Test public void terminalReceiptsKeepOperationIdentityBehindPlainSaveMessage() {
         long[] v=ready();v[4]=7;v[30]=0;
-        assertEquals("Autosave saved.",CampaignMenuState.decode(v).message());
-        v[30]=2;assertEquals("Manual save saved.",CampaignMenuState.decode(v).message());
+        assertEquals(0,CampaignMenuState.decode(v).lastOperation);assertEquals("Saved.",CampaignMenuState.decode(v).message());
+        v[30]=2;assertEquals(CampaignMenuState.SAVE_MANUAL,CampaignMenuState.decode(v).lastOperation);assertEquals("Saved.",CampaignMenuState.decode(v).message());
         v[30]=0;v[5]=10;assertTrue(CampaignMenuState.decode(v).message().contains("could not confirm"));
         assertFalse(CampaignMenuState.decode(v).message().contains("saved"));
     }

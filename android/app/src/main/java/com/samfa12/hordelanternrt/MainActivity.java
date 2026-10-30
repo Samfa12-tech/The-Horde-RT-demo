@@ -1778,6 +1778,7 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel("HORDE LANTERN", getString(R.string.entry_more_eyebrow));
         addBody(panel, getString(R.string.entry_more_description));
+        addBody(panel,"The benchmark course speeds up or slows down with rendering speed. Normal gameplay does not.");
         openingBenchmarkButton=addEntryMenuButton(panel,"Custom benchmark (unranked)",this::requestOpeningCustomBenchmark,false);
         openingBenchmarkButton.setEnabled(canRequestOpeningBenchmark());
         openingBenchmarkProvisionalButton=addEntryMenuButton(panel,"Mobile provisional benchmark (unranked)",this::requestOpeningProvisionalBenchmark,false);
