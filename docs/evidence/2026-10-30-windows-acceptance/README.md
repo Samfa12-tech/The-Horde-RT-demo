@@ -63,8 +63,10 @@ the actual campaign chooser refresh path.
 
 Three before and three after snapshots were inspected. Corrected captures show
 unclipped, steady text, but this low-rate sequence cannot prove absence of
-high-frequency flicker. Sam's perceived flicker confirmation remains pending;
-no high-frame-rate video or claim of universal flicker resolution is supplied.
+high-frequency flicker. Sam subsequently reported that the instruction looked
+steady when he last saw it. This is owner observation for that view, not every
+text surface/window size. No high-frame-rate video or universal resolution claim
+is supplied.
 
 ## Exact artifact and validation
 
@@ -97,7 +99,7 @@ atomicity and fail-closed recovery. No public legacy migration layer is needed;
 preserve local test fixtures and owner files. Mouse/controller/touch navigation,
 timestamp selection and local formatting need their own checks.
 
-Still open: natural chapter/campaign completion, physical input feel, perceived
-flicker review, new three-slot UI, ring/flask visual/lifecycle admission and other
+Still open: natural chapter/campaign completion, physical input feel, broader
+text/window-size review, new three-slot UI, ring/flask visual/lifecycle admission and other
 documented1.7 scope. Normal experimental gates remain OFF. Hosted CI for the
 new source checkpoint is separate from these local/interactive results.
