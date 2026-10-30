@@ -1,0 +1,72 @@
+{
+  "sourceCommit": "7e0b166110bf0be40e75989779894be7e69cd67f",
+  "priorCi": {
+    "run": 41017548876,
+    "result": "success, all six jobs"
+  },
+  "windows": {
+    "sha256": "412dd0367164995fed53249e2bb3dd92166e80957077c2fbdbd3abec8e0fcbdc",
+    "bytes": 4905472,
+    "labels": [
+      "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:f1cbb8df66d52343cd5795d07bc42e7acf43252599e5f93e450788b3ebd7c353;c:R;s:D"
+    ],
+    "assets": 184,
+    "source": "9d7df2cc plus current bounded three-slot/date/readiness diff; commit binding follows",
+    "liveSend": "OFF/unavailable",
+    "experimentalGates": "unchanged OFF",
+    "profile": "own state child; four copied synthetic records, slot3 empty",
+    "launched": true,
+    "uiAcceptance": "BLOCKED: first Computer Use activation failed to activate captured window",
+    "presented": false,
+    "ownedProcessStopped": true,
+    "fixtureChanges": [],
+    "sourceCommitBackedUp": "7e0b166110bf0be40e75989779894be7e69cd67f"
+  },
+  "android": {
+    "path": "android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "sha256": "88988a12f4f2642e5fb3e379d816f497624a0a955f0d3cbed03ea269a3e683b5",
+    "bytes": 201720323,
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "labels": {
+      "arm64-v8a": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:55dd4f4d74ff959de0d5401d44cf8d819176368cd8f79c059143eebed73dbcc5;c:D;s:D"
+      ],
+      "armeabi-v7a": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:43881e26c8c31e763b63c2efd05d8c7a17d353bfac6029f80809df61e35411a5;c:D;s:D"
+      ],
+      "x86": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:8aad0c3a1f869ca12fa52c5ed86445d9fbb85a58090a222ac104e6e80b5e1e99;c:D;s:D"
+      ],
+      "x86_64": [
+        "g:9d7df2ccb9ccc8ff3a651e572553f498ff61c9cc;i:495b2db089210a4cf95a720756b61d3e4c0b05abbcdc920ddf957de45605496c;c:D;s:D"
+      ]
+    },
+    "installed": false,
+    "sourceCommitBackedUp": "7e0b166110bf0be40e75989779894be7e69cd67f",
+    "frozenPath": "reports\\three-slot-ui-20261030\\horde-three-slots-debug.apk"
+  },
+  "validation": {
+    "nativeRelevantCTest": "13/13 passed; final menu delta rerun passed, 53 HWND checks",
+    "androidUnit": {
+      "registered": 535,
+      "passed": 529,
+      "skipped": 6,
+      "failed": 0,
+      "errors": 0
+    },
+    "androidLint": "0 errors, 92 warnings",
+    "androidBuild": "assembleDebug all four ABIs passed"
+  },
+  "custody": {
+    "parkedOwnerFiles": 151,
+    "changed": 0,
+    "phone": "not acquired or accessed",
+    "ownedProcess5440": "stopped after CUA activation failure; synthetic saves unchanged",
+    "foreground": "released"
+  }
+}

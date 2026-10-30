@@ -103,3 +103,6 @@ Still open: natural chapter/campaign completion, physical input feel, broader
 text/window-size review, new three-slot UI, ring/flask visual/lifecycle admission and other
 documented1.7 scope. Normal experimental gates remain OFF. Hosted CI for the
 new source checkpoint is separate from these local/interactive results.
+
+
+Three-slot/date source follow-up: [2026-10-30 receipt](../2026-10-30-three-slot-saves/README.md). Its new Windows UI interaction is blocked on Computer Use activation; the earlier gameplay evidence above is not reused as a pass for that changed UI.
