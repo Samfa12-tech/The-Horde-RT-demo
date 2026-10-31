@@ -1981,3 +1981,5 @@ gates remain open; the full-owner diagnostic does not establish eviction.
 - [31 October enemy-hit particle source candidate](../evidence/2026-10-31-enemy-hit-particles/README.md): bounded successful-contact bone/dark-drop fans on the shared mote path; native visual/phone cost unaccepted, no forest change.
 
 - [31 October F01 north68 prototype](../evidence/2026-10-31-f01-north68/README.md): exclusive four-tree baked stand, same-terrain native bark collision and fresh CPU retention-source proof; normal64 unchanged, actual RT/motion/device cost acceptance pending.
+
+- [31 October whole-route woodland source candidate](../evidence/2026-10-31-forest-surroundings-source/README.md): map-grounded480-tree composition, original64 intact,96 middle/320 far, original timber module and visible boundary plan. Off-corridor trees need no collision only after actual boundaries constrain access. Source/native asset intake is separate from scene/retention/RT/lifecycle/cost acceptance; no production activation or runtime LOD/capacity change.

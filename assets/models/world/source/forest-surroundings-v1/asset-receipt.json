@@ -1,0 +1,168 @@
+{
+  "schema": 1,
+  "status": "UNADMITTED SOURCE CANDIDATES",
+  "rights": "Original project-authored geometry, derived from the owned Horde tree centreline records and original PBR maps. No provider, purchase or third-party geometry. Existing rights remain; no blanket MIT/CC0 grant.",
+  "provider": "none",
+  "originalModels": {
+    "pine": {
+      "path": "assets/models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb",
+      "sha256": "db2d45547ad2f629c48ab8c994db845eb5d097a7db5bed6192b837e29f7a1b3f",
+      "centrelineSha256": "f18a52c778aa752fc32bc369cb78847b77aa5cbb7c75ec600f457986564ad6a0"
+    },
+    "alder": {
+      "path": "assets/models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb",
+      "sha256": "f545d7e08370b5e451597c3fd903d8d93b6703d11c75039181a04f7f5312e0bb",
+      "centrelineSha256": "02d6c82dd13e34f120a760a8070be03e649aeb327496351e76bfe522e7ea4de3"
+    }
+  },
+  "assets": {
+    "pine-middle.glb": {
+      "triangles": 1474,
+      "vertices": 1071,
+      "bounds": [
+        [
+          -1.9741495847702026,
+          0.0008615080150775611,
+          -2.153156280517578
+        ],
+        [
+          2.094656467437744,
+          8.680365562438965,
+          1.5326018333435059
+        ]
+      ],
+      "bytes": 1172276,
+      "sha256": "1d7da5124b876a85b800f97fbc3ebb9b7d807e79d3870f5ae422da57346d7ca5",
+      "opaque": true,
+      "uv0NormalsTangents": true,
+      "closedOrientedComponents": true,
+      "rawNativeBytes": 86232,
+      "embeddedImageSha256": [
+        "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822",
+        "6fdeb17cd4ff08e25396926b42827dcd9ab88945d03a604da0a74d762ecd28b7",
+        "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+        "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+        "bab9da5a1d72edcb5949fafeb1be5963fc73b457230fbb1f055cb09e52fcd66e"
+      ]
+    },
+    "pine-far.glb": {
+      "triangles": 164,
+      "vertices": 102,
+      "bounds": [
+        [
+          -1.535428762435913,
+          0.020556023344397545,
+          -1.256860375404358
+        ],
+        [
+          1.8050487041473389,
+          8.68033504486084,
+          1.1168591976165771
+        ]
+      ],
+      "bytes": 1110020,
+      "sha256": "4885783e2d3e60055c8fd881c770c74a1546f1dea864657b749806bcc7082e11",
+      "opaque": true,
+      "uv0NormalsTangents": true,
+      "closedOrientedComponents": true,
+      "rawNativeBytes": 8496,
+      "embeddedImageSha256": [
+        "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822",
+        "6fdeb17cd4ff08e25396926b42827dcd9ab88945d03a604da0a74d762ecd28b7",
+        "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+        "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+        "bab9da5a1d72edcb5949fafeb1be5963fc73b457230fbb1f055cb09e52fcd66e"
+      ]
+    },
+    "alder-middle.glb": {
+      "triangles": 1390,
+      "vertices": 1017,
+      "bounds": [
+        [
+          -1.2756893634796143,
+          0.0009224599925801158,
+          -1.84296715259552
+        ],
+        [
+          1.9161593914031982,
+          7.88518762588501,
+          1.7257561683654785
+        ]
+      ],
+      "bytes": 1200292,
+      "sha256": "bf1edf10fd4c55aa9b83e44d2ae57c04e2a967907286092a9d13e519bc5c9212",
+      "opaque": true,
+      "uv0NormalsTangents": true,
+      "closedOrientedComponents": true,
+      "rawNativeBytes": 81768,
+      "embeddedImageSha256": [
+        "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822",
+        "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+        "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+        "bab9da5a1d72edcb5949fafeb1be5963fc73b457230fbb1f055cb09e52fcd66e",
+        "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44"
+      ]
+    },
+    "alder-far.glb": {
+      "triangles": 180,
+      "vertices": 124,
+      "bounds": [
+        [
+          -1.4803194999694824,
+          0.02961084060370922,
+          -1.2011572122573853
+        ],
+        [
+          1.5399999618530273,
+          7.850464344024658,
+          1.239394187927246
+        ]
+      ],
+      "bytes": 1142884,
+      "sha256": "66e921d0cf9ee23bd718a12f5743a49751e3e09d40acef6f645bc4077c61f989",
+      "opaque": true,
+      "uv0NormalsTangents": true,
+      "closedOrientedComponents": true,
+      "rawNativeBytes": 10096,
+      "embeddedImageSha256": [
+        "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822",
+        "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+        "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+        "bab9da5a1d72edcb5949fafeb1be5963fc73b457230fbb1f055cb09e52fcd66e",
+        "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44"
+      ]
+    },
+    "boundary-panel.glb": {
+      "triangles": 60,
+      "vertices": 40,
+      "bounds": [
+        [
+          -0.06499999761581421,
+          -0.07999999821186066,
+          -0.06499999761581421
+        ],
+        [
+          2.4649999141693115,
+          1.4199999570846558,
+          0.06499999761581421
+        ]
+      ],
+      "bytes": 1104816,
+      "sha256": "a8a7cc53cc4d4277ebd8ff6d43deeffc5ba5b039de9ead781d1ac033ef86df82",
+      "opaque": true,
+      "uv0NormalsTangents": true,
+      "closedOrientedComponents": true,
+      "rawNativeBytes": 3280,
+      "embeddedImageSha256": [
+        "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822",
+        "6fdeb17cd4ff08e25396926b42827dcd9ab88945d03a604da0a74d762ecd28b7",
+        "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+        "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+        "bab9da5a1d72edcb5949fafeb1be5963fc73b457230fbb1f055cb09e52fcd66e"
+      ]
+    }
+  },
+  "nativeImporter": "external exact-file receipt required; not implied by authoring",
+  "gpuPresentation": "not run",
+  "normalActivation": false
+}

@@ -1,0 +1,44 @@
+{
+  "scope": "source/CPU only; no native forest scene or GPU acceptance",
+  "gltf": [
+    {
+      "asset": "alder-far.glb",
+      "sha256": "66e921d0cf9ee23bd718a12f5743a49751e3e09d40acef6f645bc4077c61f989",
+      "validator": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "asset": "alder-middle.glb",
+      "sha256": "bf1edf10fd4c55aa9b83e44d2ae57c04e2a967907286092a9d13e519bc5c9212",
+      "validator": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "asset": "boundary-panel.glb",
+      "sha256": "a8a7cc53cc4d4277ebd8ff6d43deeffc5ba5b039de9ead781d1ac033ef86df82",
+      "validator": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "asset": "pine-far.glb",
+      "sha256": "4885783e2d3e60055c8fd881c770c74a1546f1dea864657b749806bcc7082e11",
+      "validator": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "asset": "pine-middle.glb",
+      "sha256": "1d7da5124b876a85b800f97fbc3ebb9b7d807e79d3870f5ae422da57346d7ca5",
+      "validator": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0
+    }
+  ],
+  "nativeImporter": "five exact final files imported; raw native-import-final.log retained privately",
+  "sourceCTest": "five affected source CTests pass; final new source CTest rerun after authored precision change passes",
+  "windowsRelease": "diagnostic application and native loader targets build; application not launched",
+  "normalActivation": false
+}
