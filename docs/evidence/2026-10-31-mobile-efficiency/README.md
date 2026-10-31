@@ -119,3 +119,36 @@ unchanged. System brightness/rotation settings were never changed. Production
 and actor-worker packages were untouched. No owned phone monitor, transfer or
 Windows game process remains. No merge, publication, report submission, LFS
 download or security change occurred.
+
+
+## Follow-up: history and existing Fire Low comparison
+
+The [historical investigation](../../ENGINEERING_1_7_MOBILE_COST_TIMELINE_2026_10_31.md)
+recovered July phone timing bytes and traced later water, mist, fire/visibility,
+Keeper-light and world additions. Historical CPU window averages are not present
+rates and cannot be compared directly to the current chapter.
+
+A same-APK Mobile / Low / Mobile sequence produced **19.319 / 18.203 / 17.125
+actual presented images/s** over approximately 43 seconds per run. Native budget
+witnesses confirm Mobile four versus Low two volume steps, both one reflection
+sample; direct fire-light visibility is unchanged. The closing control drifted.
+**No reliable Low-fire gain or regression is established**, and no runtime change
+is admitted. [Receipt and raw hashes](fire-quality-receipt.json).
+
+All fresh-cohort thermal samples were framework status 0 and admitted starting
+AP/BAT/SKIN readings were within 1.5 C. That is insufficient control: clocks and
+power are unknown, and prewarm differed (45 / 10 / 10 seconds). Source review
+confirms the Keeper motion arm resumes the live world rather than resetting it.
+Cross-run world equivalence must be established before another comparison. The
+next quality hypothesis is bounded distant fire-light contribution, preserving
+near RT occlusion, visible flames and the existing full-quality option; it is
+not yet implemented or accepted.
+
+This follow-up ended **22:39:34 UTC**, before the owner's reported Reef use at
+22:43-22:45. Baseline APK identity was reread, the owned Debug app stopped, all
+15 original campaign files and original preferences verified unchanged. Fixed
+brightness 72 was temporary during each case; each prior brightness value and
+automatic mode were restored. Subsequent automatic brightness may vary normally.
+Rotation, production and actor-worker packages were untouched. No owned phone
+monitor or transfer remains. Earlier 22:07 custody statements above describe the
+first released block, not the later temporary brightness adjustment.

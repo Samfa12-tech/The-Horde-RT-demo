@@ -1,0 +1,214 @@
+{
+  "schema": 1,
+  "dateUtc": "2026-10-31",
+  "sourceCommit": "a89362dcea2e394f2ce78ac1f2622ab7eb9c8d8c",
+  "apkSha256": "a9a2930a64c58c83de3e0399ee2dc31ee6f0e55c813746cfaaca83ce62496307",
+  "profileReference": "receipt.json",
+  "comparison": "Same APK/settings except Fire Mobile0/Low2. Actual native budget verified. Manual display brightness72 during each case; prior value and automatic mode restored afterward. No timed readbacks.",
+  "decision": "No useful repeatable Low-fire gain established. Control drift prevents causal inference. Existing option/defaults unchanged.",
+  "runs": {
+    "fire2-control-a": {
+      "fire": 0,
+      "actualNativeBudget": {
+        "quality": "Mobile",
+        "volumeSteps": 4,
+        "reflectionSamples": 1,
+        "reflectedVolumeSteps": 4
+      },
+      "matchedFrames": 833,
+      "intervals": 832,
+      "durationSeconds": 43.066667796,
+      "actualPresentedImagesPerSecond": 19.318885,
+      "intervalMedianMs": 50.0,
+      "intervalP95Ms": 75.0,
+      "thermalStartCelsius": {
+        "AP": 41.6,
+        "BAT": 32.9,
+        "SKIN": 36.2
+      },
+      "thermalEndCelsius": {
+        "AP": 42.2,
+        "BAT": 34.0,
+        "SKIN": 36.9
+      },
+      "heldViews": {
+        "unlit": {
+          "displayMedianMs": 50.0,
+          "dispatchMedianMs": 37.9631765,
+          "asMedianMs": 0.365052,
+          "viewAnchor": {
+            "x": -30.4397,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": -1.5708,
+            "pitch": 0.0
+          }
+        },
+        "lit": {
+          "displayMedianMs": 70.833281,
+          "dispatchMedianMs": 56.5475245,
+          "asMedianMs": 0.4445315,
+          "viewAnchor": {
+            "x": -30.5031,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": -1.5708,
+            "pitch": 0.0
+          }
+        }
+      }
+    },
+    "fire2-low-b2": {
+      "fire": 2,
+      "actualNativeBudget": {
+        "quality": "Low",
+        "volumeSteps": 2,
+        "reflectionSamples": 1,
+        "reflectedVolumeSteps": 2
+      },
+      "matchedFrames": 785,
+      "intervals": 784,
+      "durationSeconds": 43.070834411,
+      "actualPresentedImagesPerSecond": 18.202573,
+      "intervalMedianMs": 50.000001,
+      "intervalP95Ms": 83.333333,
+      "thermalStartCelsius": {
+        "AP": 42.2,
+        "BAT": 33.5,
+        "SKIN": 37.0
+      },
+      "thermalEndCelsius": {
+        "AP": 41.3,
+        "BAT": 34.4,
+        "SKIN": 37.0
+      },
+      "heldViews": {
+        "unlit": {
+          "displayMedianMs": 50.0,
+          "dispatchMedianMs": 39.8797385,
+          "asMedianMs": 0.3897395,
+          "viewAnchor": {
+            "x": -30.4429,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": -1.5708,
+            "pitch": 0.0
+          }
+        },
+        "lit": {
+          "displayMedianMs": 70.833334,
+          "dispatchMedianMs": 60.9547125,
+          "asMedianMs": 0.458724,
+          "viewAnchor": {
+            "x": -30.5062,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": -1.5708,
+            "pitch": 0.0
+          }
+        }
+      }
+    },
+    "fire2-control-c": {
+      "fire": 0,
+      "actualNativeBudget": {
+        "quality": "Mobile",
+        "volumeSteps": 4,
+        "reflectionSamples": 1,
+        "reflectedVolumeSteps": 4
+      },
+      "matchedFrames": 741,
+      "intervals": 740,
+      "durationSeconds": 43.212501077,
+      "actualPresentedImagesPerSecond": 17.124674,
+      "intervalMedianMs": 54.166666,
+      "intervalP95Ms": 83.333334,
+      "thermalStartCelsius": {
+        "AP": 42.3,
+        "BAT": 33.7,
+        "SKIN": 37.1
+      },
+      "thermalEndCelsius": {
+        "AP": 41.6,
+        "BAT": 34.6,
+        "SKIN": 37.1
+      },
+      "heldViews": {
+        "unlit": {
+          "displayMedianMs": 50.000052,
+          "dispatchMedianMs": 41.378957,
+          "asMedianMs": 0.395365,
+          "viewAnchor": {
+            "x": -30.4472,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": -1.5708,
+            "pitch": 0.0
+          }
+        },
+        "lit": {
+          "displayMedianMs": 70.833334,
+          "dispatchMedianMs": 65.155571,
+          "asMedianMs": 0.468698,
+          "viewAnchor": {
+            "x": -30.5105,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": -1.5708,
+            "pitch": 0.0
+          }
+        }
+      }
+    }
+  },
+  "privateRawHashes": {
+    "fire2-control-a/HordeLanternRT-benchmark-latest.json": "0d78a386fa8438cf3ff9955b5b84456eaba5037a1124e22d079998988d85e188",
+    "fire2-control-a/android-motion-perf31-fire2-control-a-resources.csv": "f574e0fb0f2ba815838c9321e468b6ae9204dbafc9056611b67ea92b5d6a2bdf",
+    "fire2-control-a/strict-analysis.json": "0d564061537d9d9cf15dac0dd156213b84b1abd24713aa251a49e0bdfefe66d2",
+    "fire2-control-a/torch-analysis.json": "13d6df9f633fc0cc83c2a849f6d82e807af1e329b0dac78bd8f2df5930b23d0b",
+    "fire2-control-a/thermals.json": "01a07a8a00080926c0344c39e8a769a3c76ff635c5e897ca3c70e79e1ab196b3",
+    "fire2-control-a/vulkan_capability_report.json": "9f74f652cf0ee8521e9de15a2d76e805017f2bb064014c0f45032dd19d193b4a",
+    "fire2-low-b2/HordeLanternRT-benchmark-latest.json": "65aaa380b9d89fd52accacb162e7ba5bc7a755efb295c06171643625c51c7791",
+    "fire2-low-b2/android-motion-perf31-fire2-low-b2-resources.csv": "59196b3b16239bfa1ba1beb70cb8b1c8a884005ba0cc95081329f1a8682ac378",
+    "fire2-low-b2/strict-analysis.json": "80959f4484c17db421c3f762b94186b1bc68f19a472160e885dcf5820cbf7412",
+    "fire2-low-b2/torch-analysis.json": "6268745f48ccca2dabd7bf280852f48aed616acd9e5bdc6af13010e0d8ef2619",
+    "fire2-low-b2/thermals.json": "c9b6f5bf61b64fd987255aa6c4316dca039ba61981169f22ba522d7b44b1e23d",
+    "fire2-low-b2/vulkan_capability_report.json": "c6fef4784fe907b85c6b14278168dbeeec966941ed0ac593a1723bf1f76da584",
+    "fire2-control-c/HordeLanternRT-benchmark-latest.json": "7aedef7101fa0d35e6f2d40bef569bf8415f8a4c62e6a622b28fbdab5714e064",
+    "fire2-control-c/android-motion-perf31-fire2-control-c-resources.csv": "174f57ff8644bb4e3702e97c22c3b8aee7dc10d01ecd64fb6b7f7f342ea7e2ec",
+    "fire2-control-c/strict-analysis.json": "0d6f44337dddf3ea6b2bf954d44764c08ddf45f9c1e00578571977921270ac8d",
+    "fire2-control-c/torch-analysis.json": "b81688162fb7f9e6930e764372a06348772524bbbd8cc040ac154bfaec7929ea",
+    "fire2-control-c/thermals.json": "fdd92126f2e04a5cf349e2d9885cc33b1634f633e5c44890655d0c31bc85c020",
+    "fire2-control-c/vulkan_capability_report.json": "55ee55887db1a2af06f55914460512c2115d2847eab1909f270888ae82cb1e17"
+  },
+  "invalidSetup": [
+    "fire-control-a: transport setup stopped before rename; later control cooler than old AP reference; no motion timing.",
+    "First fire2 attempt: local name parser rejected before game launch; display settings restored.",
+    "fire2-low-b: transient hot-start AP rejected before timing. Added a10s settle; no wider temperature delta."
+  ],
+  "limits": [
+    "Starts within1.5C AP/BAT/SKIN; all admitted fresh-cohort framework samples status0. GPU clocks/power unavailable.",
+    "Initial control45s prewarm; later cases10s settle. Small route position differences remain.",
+    "Opening/Keeper generated-input scenario only; not outdoor gain, active combat or natural chapter acceptance.",
+    "Do not average drifting controls into a gain.",
+    "Source review: Keeper motion Begin resumes the live world; ResetTiming/ClearEvents do not reset world/actor state. Equal preparation and fresh acknowledged checkpoint required before another comparison."
+  ],
+  "finalRelease": {
+    "utc": "2026-10-31T22:39:34.346106+00:00",
+    "appStopped": true,
+    "preferencesRestored": true,
+    "automaticBrightnessRestored": true,
+    "campaignFilesPreserved": 15
+  },
+  "historicalRaw": {
+    "fastBaselineApkSha256": "a9fe35932548f38e067c39ef604739aaa7eacd12005d119a88c0b77e2d7fa81e",
+    "retainedRawFilesVerified": {
+      "summary.json": "2b027846f6862eca3554b433069109e15eb2f36d6a8b0924e97d6ef57ad1cc1f",
+      "timing.csv": "9af7c8034813d614156f8e67e5fd72940ebb275562f10b2db4f5f22638358cee",
+      "opening-75-state.json": "c22850a8b9980bd3cba209f3f86e20d4e84ff8a6f1946203e5fdfe222e3e66a7",
+      "lich-75-state.json": "41e1b70dd225b542dc841598c2268320ee223310c0c54204782982dc2e8a758d",
+      "vulkan_capability_report.json": "1e8bd34a51d6fe282ace9a2fc64c72cbec061cff5f1613040b41c37251095757"
+    },
+    "sourceQualification": "Measured pre-release feature APK labels0.1.2-alpha.1 DEBUG; July31 released feature commit5bc64ef9 is an ancestry reference, not asserted identical APK provenance. No old APK installed or rebuilt."
+  }
+}

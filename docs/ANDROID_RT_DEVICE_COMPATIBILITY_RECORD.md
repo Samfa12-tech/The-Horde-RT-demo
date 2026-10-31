@@ -1,5 +1,20 @@
 # Android RT Device Compatibility Record
 
+
+## 2026-10-31 22:39 UTC - same-artifact Fire Low comparison, inconclusive
+
+The SM-S948B / Android 17 / Adreno 840 baseline artifact identified below was
+unchanged. Mobile / Low / closing Mobile runs passed strict actual-presentation
+joins and native fire-budget checks: 19.319 / 18.203 / 17.125 images/s. Closing
+control drift and unequal live-world prewarm prevent causal attribution; no new
+option/default or performance gain is admitted. This is generated-input timing,
+not natural gameplay acceptance. [Exact receipt](evidence/2026-10-31-mobile-efficiency/fire-quality-receipt.json).
+
+Released at 22:39:34 UTC: installed baseline hash verified, Debug stopped,
+original preferences and 15 campaign files unchanged. Temporary fixed brightness
+was restored to each case's prior value and automatic mode; rotation unchanged.
+Production/actor-worker packages untouched, no owned device activity remains.
+
 ## 2026-10-31 UTC - current S26 RT presentation and bounded performance baseline
 
 **SM-S948B / Android17 API37**, OS `S948BXXS4BZIG`, Adreno840,
