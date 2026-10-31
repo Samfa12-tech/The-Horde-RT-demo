@@ -65,10 +65,17 @@ vec4 dustCandidate(uint index,vec3 origin,vec3 direction,float depth,float pixel
     if(separation>=radius) return vec4(0.0,0.0,0.0,1.0);
     float footprint=radius/max(t*pixelAngle,0.00001);
     // Fade subpixel specks instead of expanding/brightening them at reduced scale.
-    float alpha=mote.response.x*(1.0-smoothstep(radius*0.15,radius,separation))*
+    float contact=step(0.5,mote.response.z), goo=step(1.5,mote.response.z);
+    vec3 local=(origin+direction*t-p)/radius;
+    float chip=1.0-smoothstep(0.80,1.0,dot(abs(local),vec3(0.85,1.15,0.85)));
+    float drop=1.0-smoothstep(radius*0.70,radius,separation);
+    float silhouette=mix(1.0-smoothstep(radius*0.15,radius,separation),mix(chip,drop,goo),contact);
+    float alpha=mote.response.x*silhouette*
         smoothstep(0.25,0.8,footprint)*smoothstep(0.0,radius,depth-t);
     if(alpha<=0.00001) return vec4(0.0,0.0,0.0,1.0);
-    return vec4(dustIncidentLight(p,quality)*alpha*0.82,1.0-alpha);
+    vec3 reflectance=mix(vec3(0.82),mix(vec3(0.82,0.78,0.66),vec3(0.024,0.018,0.028),goo),contact);
+    // Existing RT-visible incident sources; no glow, extra light or ray site.
+    return vec4(dustIncidentLight(p,quality)*reflectance*alpha,1.0-alpha);
 }
 void dustSort(inout uint a,inout uint b,vec3 origin,vec3 direction)
 {

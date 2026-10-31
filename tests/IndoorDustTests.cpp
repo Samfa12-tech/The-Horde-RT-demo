@@ -1,4 +1,5 @@
 #include "scene/ShowcaseIndoorDust.h"
+#include "scene/atmosphere/HitParticleDust.h"
 #include <iostream>
 #include <limits>
 #include <cstring>
@@ -57,5 +58,40 @@ int main(){
     check(cache.Build(zones,DustQuality::Low,camera,1,frame,work)==DustUploadDecision::Changed,"re-enable repopulates safely");
     cache.Commit(zones,DustQuality::Low,camera,1);cache.Invalidate();
     check(cache.Build(zones,DustQuality::Low,camera,1,frame,work)==DustUploadDecision::Changed,"lifecycle reset never reuses stale storage");
+    using namespace horde::gameplay::effects;
+    using horde::gameplay::simulation::EntityId;
+    EnemyHitParticles hits;
+    check(!hits.Active() && !hits.Add(0,EntityId::SkeletonA,{0,1,-2},{1,0,0}),"no anonymous or preparation burst");
+    check(!hits.Add(1,EntityId::Player,{0,1,-2},{1,0,0}) &&
+        !hits.Add(1,EntityId::SkeletonA,{NAN,1,-2},{1,0,0}) &&
+        !hits.Add(1,EntityId::SkeletonA,{0,1,-2},{0,0,0}),"bad identity or contact tuple fails closed");
+    check(hits.Add(1,EntityId::SkeletonA,{0,1,-2},{1,0,0}) &&
+        !hits.Add(1,EntityId::SkeletonA,{0,1,-2},{1,0,0}),"one burst per accepted semantic contact");
+    hits.Step(.1f); auto frozen=hits;
+    check(HitParticlePosition(hits.bursts[0],0)[0]>0 &&
+        HitParticlePosition(hits.bursts[0],0)==HitParticlePosition(frozen.bursts[0],0),"fan follows frozen cut direction independent of render cadence");
+    auto negative=hits.bursts[0];negative.direction={-1,0,0};
+    check(HitParticlePosition(negative,0)[0]<0,"opposite cut reverses travel");
+    check(hits.Add(2,EntityId::Lich,{.1f,1,-2},{0,0,-1}),"Keeper uses second bounded burst");
+    BuildDustFrame(zones,DustQuality::Standard,camera,1,frame,work);
+    const auto bytesBefore=frame;
+    OverlayHitParticles(hits,DustQuality::Off,camera,frame,work);
+    check(std::memcmp(&frame,&bytesBefore,sizeof(frame))==0,"Off adds no contact upload or work");
+    OverlayHitParticles(hits,DustQuality::Low,camera,frame,work);
+    check(work.combatMotes==8 && frame.motes[56].response[2]==1 && frame.motes[60].response[2]==2,"Low keeps four chips/drops per real contact with distinct material tags");
+    BuildDustFrame(overlaps,DustQuality::Standard,camera,1,frame,work);
+    OverlayHitParticles(hits,DustQuality::Standard,camera,frame,work);
+    check(work.combatMotes==16 && work.combatReplacedMotes==16,"Standard shares 64 slots with explicit ambient displacement accounting");
+    unsigned references=0;
+    for(auto tile:frame.tiles)for(auto id:tile)if(id!=kDustEmptyCandidate){++references;check(id<64,"combat never creates fifth tile candidate or invalid upload index");}
+    check(references==work.tileReferences,"tile accounting remains exact after displacement");
+    const auto anchor=hits.bursts[0].origin;
+    auto rotated=camera;rotated.yaw=.6f;rotated.aspect=.6f;
+    BuildDustFrame(zones,DustQuality::Low,rotated,1,repeat,again);
+    OverlayHitParticles(hits,DustQuality::Low,rotated,repeat,again);
+    check(repeat.motes[56].positionRadius==frame.motes[48].positionRadius && hits.bursts[0].origin==anchor,"camera/portrait projection never moves world burst");
+    auto copy=hits;hits.Step(kHitBurstLifetime);
+    check(!hits.Active() && copy.Active(),"all bursts expire bounded; immutable snapshot copy remains owned");
+    copy.Clear();check(!copy.Active() && !copy.Add(1,EntityId::SkeletonA,{0,1,-2},{1,0,0}),"pause/reset cancels particles and cannot replay an old semantic contact");
     std::cout<<"IndoorDust failures="<<failures<<'\n'; return failures?1:0;
 }

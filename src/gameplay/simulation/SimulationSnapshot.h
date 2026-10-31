@@ -29,6 +29,7 @@
 #include "gameplay/simulation/AttackWarningPresentation.h"
 #include "gameplay/simulation/SkeletonRevivalBridge.h"
 #include "gameplay/simulation/CombatContactTrace.h"
+#include "gameplay/effects/EnemyHitParticles.h"
 #include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
@@ -72,6 +73,7 @@ struct SimulationSnapshot
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     std::uint64_t tickIndex = 0;
     CombatContactTraceSnapshot combatContactTrace{};
+    horde::gameplay::effects::EnemyHitParticles enemyHitParticles{};
     std::uint64_t inputPublicationSequence = 0;
     // Diagnostic observation of the coherent publication consumed by this
     // snapshot, including zero-tick and pause synchronization frames.

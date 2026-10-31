@@ -2951,7 +2951,7 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
     if (HWND mist = GetDlgItem(context.windowHandle, kGraphicsMistButtonId))
         SetWindowTextA(mist, graphicsDraft.mistEnabled ? "MIST: ON" : "MIST: OFF");
     if (HWND dust = GetDlgItem(context.windowHandle, kGraphicsDustButtonId))
-        SetWindowTextA(dust, (std::string("INDOOR DUST: ") + GraphicsDustName(graphicsDraft.dustQuality)).c_str());
+        SetWindowTextA(dust, (std::string("PARTICLES: ") + (graphicsDraft.dustQuality == horde::graphics::DustQuality::Standard ? "STD" : GraphicsDustName(graphicsDraft.dustQuality))).c_str());
     if (context.graphicsVisible)
     {
         const auto state = context.graphicsEdit->State();
@@ -2975,14 +2975,14 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
             << "\r\nUploaded fire: " << GraphicsFireName(UploadedGraphicsFireDetail(context))
             << "  |  shadows: " << GraphicsShadowName(UploadedGraphicsShadowQuality(context))
             << "  |  mist: " << (context.rtScene.UploadedMistEnabled().has_value() ? (*context.rtScene.UploadedMistEnabled() ? "On" : "Off") : "unavailable")
-            << "  |  indoor dust: " << (context.rtScene.UploadedDustQuality().has_value() ? GraphicsDustName(*context.rtScene.UploadedDustQuality()) : "unavailable")
+            << "  |  particles: " << (context.rtScene.UploadedDustQuality().has_value() ? GraphicsDustName(*context.rtScene.UploadedDustQuality()) : "unavailable")
             << "\r\n" << (mobileOptics ?
                  "Mobile optical build remains fixed; Glass Off removes all pane geometry." :
                  "High optical build: physical panes retained; profile is fixed by this build.")
              << "\r\nWater: Off omits water, Mobile refracts, High adds scene reflections."
              << "\r\nFire: Low/Mobile/High use2/4/10 steps; light strength unchanged."
              << "\r\nShadows: Current area1; Higher area2/4. Cost unmeasured."
-             << "\r\nIndoor dust: Off/Low/Standard controls bounded visible motes; cost not yet measured."
+             << "\r\nParticles: Off/Low/Standard controls room motes and hit fragments; cost unmeasured."
              << "\r\nApply needs an RT frame. Keep confirms within 15 foreground seconds."
              << "\r\n" << context.graphicsStatus;
         SetWindowTextA(GetDlgItem(context.windowHandle, kGraphicsInfoId), info.str().c_str());
@@ -13111,7 +13111,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kGraphicsShadowButtonId, "SHADOW: CURRENT");
     createButton(kGraphicsGlassButtonId, "GLASS: ON");
     createButton(kGraphicsMistButtonId, "MIST: ON");
-    createButton(kGraphicsDustButtonId, "INDOOR DUST: OFF");
+    createButton(kGraphicsDustButtonId, "PARTICLES: OFF");
     createButton(kGraphicsApplyButtonId, "APPLY");
     createButton(kGraphicsConfirmButtonId, "KEEP (15 SECONDS)");
     createButton(kGraphicsRevertButtonId, "REVERT");

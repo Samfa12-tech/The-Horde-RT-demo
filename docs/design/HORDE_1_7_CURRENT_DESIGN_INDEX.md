@@ -1977,3 +1977,5 @@ all sixteen fresh shader artifacts are checked locally, with retained sandbox
 and readiness failures. Exact CI belongs to its new pushed SHA. Ordinary
 incremental zone streaming and the remaining chapter presentation/physical
 gates remain open; the full-owner diagnostic does not establish eviction.
+
+- [31 October enemy-hit particle source candidate](../evidence/2026-10-31-enemy-hit-particles/README.md): bounded successful-contact bone/dark-drop fans on the shared mote path; native visual/phone cost unaccepted, no forest change.

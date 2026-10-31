@@ -305,7 +305,7 @@ $captionFixtures = @(
     @{ row = 'shadow'; text = 'SHADOW: HIGHER' },
     @{ row = 'glass'; text = 'GLASS: OFF' },
     @{ row = 'mist'; text = 'MIST: OFF' },
-    @{ row = 'dust'; text = 'INDOOR DUST: HIGH' },
+    @{ row = 'dust'; text = 'PARTICLES: STD' },
     @{ row = 'water'; text = 'RT WATER: HIGH' },
     @{ row = 'apply'; text = 'APPLY' },
     @{ row = 'confirm'; text = 'KEEP (15 SECONDS)' },
@@ -365,12 +365,12 @@ foreach ($dpi in @(96, 120, 144, 192)) {
 
 $worstGraphicsInfo = @'
 Effective: 100%  |  internal 1920x1080  |  output 1920x1080  |  glass On
-Uploaded fire: High  |  shadows: Current  |  mist: On  |  indoor dust: Standard
+Uploaded fire: High  |  shadows: Current  |  mist: On  |  particles: Standard
 High optical build: physical panes retained; profile is fixed by this build.
 Water: Off omits water, Mobile refracts, High adds scene reflections.
 Fire: Low/Mobile/High use 2/4/10 steps; light strength unchanged.
 Shadows: Current area1; Higher area2/4. Cost unmeasured.
-Indoor dust: Off/Low/Standard controls bounded visible motes; cost not yet measured.
+Particles: Off/Low/Standard controls room motes and hit fragments; cost unmeasured.
 Apply needs an RT frame. Keep confirms within 15 foreground seconds.
 Requested scene could not load. Previous graphics and scene restored; saved settings and pending recovery remain unchanged.
 '@.Trim()

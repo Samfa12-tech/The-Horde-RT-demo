@@ -24,6 +24,13 @@ bool Near(float a,float b,float epsilon=.0001f) { return std::abs(a-b)<=epsilon;
 GameSimulationConfig Rules() {
     auto c=ProductionGameSimulationConfig(); c.swordStartsStowed=false; return c;
 }
+void CheckContactBurst(const SimulationSnapshot& state,const GameplayEvent& event) {
+    bool matched=false;
+    for(const auto& b:state.enemyHitParticles.bursts)
+        matched|=b.eventSequence==event.sequence && b.target==event.target && b.age==0 &&
+            b.origin[1]>kRouteFloorWorldY+.3f;
+    Check(matched,"actual successful skeleton/Keeper contact owns a matching target/sequence surface-proxy burst");
+}
 void PracticePromptWaitsForSword() {
     GameSimulation sim(ProductionGameSimulationConfig());
     InputSnapshot input; input.tutorialEnabled=true;
@@ -1228,7 +1235,9 @@ void FourSkillPracticeAndExit() {
     ++input.commands.attack; bool actualHit=false;
     for(int tick=0;tick<100 && !sim.Snapshot().combatTeaching.attackFromGuardLearned;++tick) {
         sim.StepFixed(input);
-        for(const auto& event:sim.Events().Events()) actualHit=actualHit || event.type==GameplayEventType::EnemyHit;
+        for(const auto& event:sim.Events().Events()) if(event.type==GameplayEventType::EnemyHit) {
+            actualHit=true;CheckContactBurst(sim.Snapshot(),event);
+        }
         sim.ClearEvents();
     }
     const auto ready=sim.Snapshot().combatTeaching;
@@ -1566,7 +1575,9 @@ void IntegratedKeeperRepelAndReward() {
     int hits=0, defeated=0, unlocked=0;
     auto collect=[&] {
         for(const auto& event:sim.Events().Events()) {
-            if(event.type==GameplayEventType::EnemyHit && event.target==EntityId::Lich) ++hits;
+            if(event.type==GameplayEventType::EnemyHit && event.target==EntityId::Lich) {
+                ++hits;CheckContactBurst(sim.Snapshot(),event);
+            }
             if(event.type==GameplayEventType::LichDefeated && event.target==EntityId::Lich) {
                 ++defeated; defeatedSequence=event.sequence;
             }
@@ -1600,6 +1611,27 @@ void IntegratedKeeperRepelAndReward() {
           "integrated retry restores full mist with the living Keeper");
 }
 }
+void SuccessfulHitParticleLifecycle() {
+    auto config=ProductionGameSimulationConfig();config.swordStartsStowed=false;
+    config.playerStartX=-4.5f;config.playerStartZ=-15.3f;config.playerStartYawRadians=-2.275290391f;
+    GameSimulation sim(config);InputSnapshot input;input.tutorialEnabled=false;input.damageEnabled=false;
+    input.yawRadians=config.playerStartYawRadians;
+    sim.StepFixed(input);sim.ClearEvents();
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"idle enemy proximity cannot create particles");
+    ++input.commands.attack;bool hit=false;
+    for(int n=0;n<45 && !hit;++n) {
+        sim.StepFixed(input);
+        for(const auto& e:sim.Events().Events())if(e.type==GameplayEventType::EnemyHit) {
+            CheckContactBurst(sim.Snapshot(),e);hit=true;
+        }
+        sim.ClearEvents();
+    }
+    Check(hit && sim.Snapshot().enemyHitParticles.Active(),"real production-pair accepted sword contact creates a burst");
+    sim.SynchronizePausedInput(input,1,PausedInputPolicy::DiscardAllCommands);
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"pause before expiry clears actual emitted burst");
+    sim.RetryEncounter();
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"retry restores gameplay without old contact particles");
+}
 void OutgoingTraceContract() {
     GameSimulation sim(Rules()); InputSnapshot input; input.damageEnabled=false;
     sim.BeginCombatPractice(EnemyKind::Skeleton);
@@ -1614,6 +1646,12 @@ void OutgoingTraceContract() {
         if(sample.tick!=state.tickIndex || sample.cut==PlayerAttackCut::None) continue;
         Check(sample.hasSwordTransform && sample.worldFromSword==state.heldItems[1].worldFromItem,
               "contact trace samples the actual published sword attachment on its owning fixed tick");
+        if(sample.outcome==CombatContactOutcome::AcceptedSwordContact) {
+            bool matched=false;
+            for(const auto& b:state.enemyHitParticles.bursts)
+                matched|=b.eventSequence==sample.semanticEventSequence && b.target==sample.target && b.age==0;
+            Check(matched,"actual accepted damage publishes exactly its matching target/sequence burst on the contact tick");
+        }
         Check(!sample.hasBlade&&!sample.hasSeparation,
               "forgiving contact policy cannot fabricate physical blade/triangle measurements");
         if(sample.cut==PlayerAttackCut::DownwardCut) {
@@ -1629,6 +1667,9 @@ void OutgoingTraceContract() {
     Check(sawDown&&sawUp&&downId!=0&&upId!=downId,
           "each cut has a distinct identity across a buffered continuation");
     sim.SynchronizePausedInput(input,2,PausedInputPolicy::DiscardAllCommands);
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"lifecycle pause cancels published particles without delayed replay");
+    sim.RetryEncounter();
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"retry begins with no old hit burst");
     Check(sim.Snapshot().combatContactTrace.count==0,
           "lifecycle cancellation cannot replay old contact observations");
 }
@@ -2553,6 +2594,7 @@ int main(int argc,char** argv) {
     HeldGuardDamageContract(); GuardAttackAndReleaseAtContact(); GuardInterruptionRearm();
     YellowGuardBreakAndDefences(); FourSkillPracticeAndExit();
     IntegratedKeeperRepelAndReward();
+    SuccessfulHitParticleLifecycle();
     OutgoingTraceContract();
     EnemyAttackKindAuthority();
     NonfatalPairHitPreservesIndependentActions();

@@ -114,7 +114,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                     assertEquals(HordeUiTokens.BRASS,((ColorDrawable)row.getHorizontalScrollbarThumbDrawable()).getColor());
                     assertEquals(HordeUiTokens.IRON,((ColorDrawable)row.getHorizontalScrollbarTrackDrawable()).getColor());
                 }
-                String[] labels={"Resolution: 75%","Water: Mobile","Fire: Mobile","Cap: 30 Hz","Glass: On","Shadows: Current","Mist: On","Indoor dust: Off","View","Image","Details","Apply","Restore","Back"};
+                String[] labels={"Resolution: 75%","Water: Mobile","Fire: Mobile","Cap: 30 Hz","Glass: On","Shadows: Current","Mist: On","Particles: Off","View","Image","Details","Apply","Restore","Back"};
                 int minimum=HordeUiTokens.dp(activity,48);
                 for(int i=0;i<buttons.size();++i) {
                     Button button=buttons.get(i); assertEquals(labels[i],button.getText().toString());
@@ -167,7 +167,7 @@ public final class GraphicsPreviewCompactLayoutTest {
         Method optionLabel=MainActivity.class.getDeclaredMethod("graphicsOptionLabel",int.class);optionLabel.setAccessible(true);
         assertEquals("Fire: Low",optionLabel.invoke(activity,GraphicsPreviewOptions.FIRE));
         assertEquals("Shadows: Higher",optionLabel.invoke(activity,GraphicsPreviewOptions.SHADOW));
-        assertEquals("Indoor dust: Off",optionLabel.invoke(activity,GraphicsPreviewOptions.DUST));
+        assertEquals("Particles: Off",optionLabel.invoke(activity,GraphicsPreviewOptions.DUST));
         TextView summary=new TextView(activity);setField(activity,"graphicsSelectionSummary",summary);
         Method selection=MainActivity.class.getDeclaredMethod("updateGraphicsSelectionSummary",boolean.class);selection.setAccessible(true);
         selection.invoke(activity,false);assertEquals("Requested 50% / Saved 75%",summary.getText().toString());
@@ -212,7 +212,7 @@ public final class GraphicsPreviewCompactLayoutTest {
             int height=568,gap=48;
             ScrollView strip=new GraphicsPreviewControlsScrollView(context,GraphicsPreviewOptions.maximumOverlayHeight(height,gap));
             TextView text=new TextView(context); text.setTextSize(24);
-            text.setText("Resolution\nWater\nFire\nCap\nGlass\nShadows\nMist\nIndoor dust\nView\nDetails\nApply and save\nRestore saved\nBack"); strip.addView(text);
+            text.setText("Resolution\nWater\nFire\nCap\nGlass\nShadows\nMist\nParticles\nView\nDetails\nApply and save\nRestore saved\nBack"); strip.addView(text);
             strip.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.AT_MOST));
             strip.layout(0,0,strip.getMeasuredWidth(),strip.getMeasuredHeight());

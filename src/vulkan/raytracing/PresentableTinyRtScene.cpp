@@ -18,6 +18,7 @@
 #include "vulkan/raytracing/RescuePlayerRig.h"
 #include "scene/RescueJourneyGeometry.h"
 #include "scene/ShowcaseIndoorDust.h"
+#include "scene/atmosphere/HitParticleDust.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "scene/CorridorStaticDetailFaces.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
@@ -8879,9 +8880,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
 bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& quality,
     const RtSceneFrameInputs& frame, std::string& diagnostic, RtSceneRecordObservation* observation)
 {
+    dustWork_ = {};
     if (dustQuality_ == horde::graphics::DustQuality::Off)
         return WriteBuffer(qualityControlsBuffer_, &quality, sizeof(quality), "quality controls", diagnostic, observation);
-    dustWork_ = {};
     QualityDustUpload upload{quality,{}};
     using namespace horde::scene::atmosphere;
     const float step=frame.walkTime*6.2f;
@@ -8896,16 +8897,21 @@ bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& qualit
     const auto zones=sceneProfile_==RtSceneProfile::Showcase ? std::span<const IndoorDustZone>(horde::scene::kShowcaseIndoorDust) :
         sceneProfile_==RtSceneProfile::GraphicsPreview ? std::span<const IndoorDustZone>(horde::scene::kPreviewIndoorDust) : std::span<const IndoorDustZone>{};
     const double seconds=std::max(double(frame.walkTime),0.0);
+    const bool combatParticles=sceneProfile_==RtSceneProfile::Showcase && frame.enemyHitParticles.Active();
+    // Do not cache a contact overlay as ambient. Active bursts invalidate before
+    // build and skip commit, so the first expired/cancelled frame clears it too.
+    if(combatParticles)dustCache_.Invalidate();
     const auto decision=dustCache_.Build(zones,dustQuality_,camera,seconds,upload.dust,dustWork_);
     if(decision==DustUploadDecision::Unchanged)
         return WriteBuffer(qualityControlsBuffer_, &quality, sizeof(quality), "quality controls", diagnostic, observation);
     if(decision==DustUploadDecision::Invalid) {
         diagnostic="Indoor dust zone/camera admission failed."; return false;
     }
+    if(combatParticles)OverlayHitParticles(frame.enemyHitParticles,dustQuality_,camera,upload.dust,dustWork_);
     if(!WriteBuffer(qualityControlsBuffer_, &upload, sizeof(upload), "quality and bounded indoor dust", diagnostic, observation)) {
         dustCache_.Invalidate(); return false;
     }
-    dustCache_.Commit(zones,dustQuality_,camera,seconds);
+    if(!combatParticles)dustCache_.Commit(zones,dustQuality_,camera,seconds);
     return true;
 }
 

@@ -4648,7 +4648,7 @@ public class MainActivity extends Activity {
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.MIST, graphicsDraft.mistEnabled ? 0 : 1);
             showGraphicsPage();
         });
-        addGraphicsButton(panel, "Indoor dust: " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust), () -> {
+        addGraphicsButton(panel, "Particles: " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust), () -> {
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.DUST,
                     (graphicsDraft.dust + 1) % 3);
             showGraphicsPage();
@@ -4786,7 +4786,7 @@ public class MainActivity extends Activity {
                 "Fire detail changes volume steps while preserving emitters, lights and gameplay. Menu / preview cap controls their frame cap. " +
                 "Glass enables only glass supported by this build; mobile lantern panes remain absent. Shadows select Current or Higher RT sampling. " +
                 "Mist toggles keeper-room ground mist; fire, smoke and electricity stay enabled. The compact authored preview has no ground mist.\n" +
-                "Indoor dust controls the bounded room effect; the preview reports uploaded quality even where no motes are visible.\n\n" +
+                "Particles controls room motes and brief enemy-hit fragments. Off disables both; Low uses fewer particles.\n\n" +
                 "Changing a choice edits the draft. Apply saves it automatically only after the exact requested settings appear in a successful RT presentation. " +
                 "Back, Restore or backgrounding cancels an outstanding Apply. Interrupted or failed changes restore Saved settings. Preview measurements are not full-game performance guarantees." +
                 (graphicsDetailedStatus.isEmpty() ? "" : "\n\nCurrent status\n" + graphicsDetailedStatus));
@@ -4886,7 +4886,7 @@ public class MainActivity extends Activity {
             case GraphicsPreviewOptions.GLASS: return "Glass: " + (graphicsDraft.glassEnabled ? "On" : "Off");
             case GraphicsPreviewOptions.SHADOW: return "Shadows: " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow);
             case GraphicsPreviewOptions.MIST: return "Mist: " + (graphicsDraft.mistEnabled ? "On" : "Off");
-            case GraphicsPreviewOptions.DUST: return "Indoor dust: " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust);
+            case GraphicsPreviewOptions.DUST: return "Particles: " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust);
             default: return "Cap: " + graphicsDraft.cap + " Hz";
         }
     }
@@ -5778,19 +5778,19 @@ public class MainActivity extends Activity {
                         waterName(graphicsDraft.water) + " / fire " + GraphicsPreviewOptions.fireLabel(graphicsDraft.fire) +
                         " / glass " + (graphicsDraft.glassEnabled ? "On" : "Off") +
                         " / shadows " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow) + " / mist " + (graphicsDraft.mistEnabled ? "On" : "Off") +
-                        " / indoor dust " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust) +
+                        " / particles " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust) +
                         (presented ? " / planned " + ((a[9] * graphicsDraft.scale + 50) / 100) + " x " +
                         ((a[10] * graphicsDraft.scale + 50) / 100) : " / planned extent unavailable") +
                         "\nSaved: " + (graphicsConfirmed == null ? "unavailable" : graphicsConfirmed.scale + "% / water " + waterName(graphicsConfirmed.water) +
                         " / fire " + GraphicsPreviewOptions.fireLabel(graphicsConfirmed.fire) + " / glass " + (graphicsConfirmed.glassEnabled ? "On" : "Off") +
                         " / shadows " + GraphicsPreviewOptions.shadowLabel(graphicsConfirmed.shadow) + " / mist " + (graphicsConfirmed.mistEnabled ? "On" : "Off") +
-                        " / indoor dust " + GraphicsPreviewOptions.dustLabel(graphicsConfirmed.dust) +
+                        " / particles " + GraphicsPreviewOptions.dustLabel(graphicsConfirmed.dust) +
                         " / cap " + graphicsConfirmed.cap + " Hz") +
                         "\nEffective: " + (presented ? a[3] + "% / " + a[7] + " x " + a[8] + " internal / " +
                         a[9] + " x " + a[10] + " output / water " + waterName((int)a[4]) + " / fire " +
                         GraphicsPreviewOptions.fireLabel((int)a[5]) + " / glass " + (a[20] == 1 ? "On" : "Off") +
                         " / shadows " + GraphicsPreviewOptions.shadowLabel((int)a[22]) + " / mist " + (a[24] == 1 ? "On" : "Off") +
-                        " / indoor dust " + GraphicsPreviewOptions.dustLabel((int)a[26]) : "not yet presented") + "\n" +
+                        " / particles " + GraphicsPreviewOptions.dustLabel((int)a[26]) : "not yet presented") + "\n" +
                         (presented ? (a[11] == 1 ? getString(R.string.graphics_optics_high) : getString(R.string.graphics_optics_mobile)) :
                         "Optical profile: unavailable until an RT frame presents.") + "\nBackend: " +
                         (presented ? (a[12] == 2 ? "RayQueryCompute" : "RayTracingPipeline") : "not yet presented");

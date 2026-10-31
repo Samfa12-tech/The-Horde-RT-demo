@@ -289,6 +289,8 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     RtSceneFrameInputs frame;
     frame.playerRenderRoute = kProductionPlayerRenderRoute;
     frame.tickIndex = simulation.tickIndex;
+    if (!simulation.paused && simulation.playerAlive)
+        frame.enemyHitParticles = simulation.enemyHitParticles;
     frame.developmentRescueJourney = simulation.developmentRescueJourney;
     frame.rescue = simulation.rescue;
     frame.chapterCompanion = simulation.chapterCompanion;
