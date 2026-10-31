@@ -4752,6 +4752,44 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
     }
 }
 
+bool AcquireDesktopMouseLook(VulkanSurfaceContext& context)
+{
+    const HWND window = context.windowHandle;
+    if (!IsDesktopGameplayAvailable(context) || GetForegroundWindow() != window ||
+        gCampaignHiddenValidation || gOpeningBenchmarkMenuValidation || gShowcaseCaptureHidden)
+        return false;
+    FocusGameControl(window);
+    SetCapture(window);
+    if (GetCapture() != window || GetFocus() != window)
+    {
+        ClearDesktopInput(context);
+        return false;
+    }
+    if (!context.mouseCursorHidden)
+    {
+        GetCursorPos(&context.mouseRestorePosition);
+        ShowCursor(FALSE);
+        context.mouseCursorHidden = true;
+    }
+    context.mouseLookActive = true;
+    RECT clientRect{};
+    GetClientRect(window, &clientRect);
+    POINT centre{(clientRect.right-clientRect.left)/2,(clientRect.bottom-clientRect.top)/2};
+    context.lastMousePosition = centre; // The centering warp is not a look delta.
+    ClientToScreen(window, &centre);
+    RECT screenRect{clientRect};
+    ClientToScreen(window, reinterpret_cast<POINT*>(&screenRect.left));
+    ClientToScreen(window, reinterpret_cast<POINT*>(&screenRect.right));
+    ClipCursor(&screenRect);
+    SetCursorPos(centre.x, centre.y);
+    if (GetCapture() != window || GetFocus() != window || GetForegroundWindow() != window)
+    {
+        ClearDesktopInput(context);
+        return false;
+    }
+    return true;
+}
+
 void DiscardDesktopPendingCommands(VulkanSurfaceContext& context)
 {
     auto input = context.simulationInput;
@@ -12242,6 +12280,21 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             }
             using horde::platform::windows::DesktopKeyAction;
+            const bool keyboardGameplayHasFocus = IsDesktopGameplayAvailable(*sceneContext) &&
+                GetFocus() == hWnd && GetForegroundWindow() == hWnd;
+            if (horde::platform::windows::ShouldAcquireDesktopMouseLookForKey(
+                    static_cast<unsigned>(wParam), keyboardGameplayHasFocus,
+                    sceneContext->mouseLookActive && GetCapture() == hWnd,
+                    (lParam & (1ll << 30)) != 0,
+                    (GetKeyState(VK_MENU) & 0x8000) != 0 || (GetKeyState(VK_CONTROL) & 0x8000) != 0,
+                    sceneContext->simulation.Snapshot().chestReward.phase ==
+                        horde::gameplay::interactions::ChestRewardPhase::LanternClaimed,
+                    sceneContext->simulation.Snapshot().healingFlaskEnabled))
+            {
+                // Losing capture/focus during handoff consumes this key. Do
+                // not republish a movement/defense hold after cancellation.
+                if (!AcquireDesktopMouseLook(*sceneContext)) return 0;
+            }
             const DesktopKeyAction keyAction = horde::platform::windows::ResolveDesktopGameplayKey(
                 static_cast<unsigned>(wParam),
                 IsDesktopGameplayAvailable(*sceneContext) && GetFocus() == hWnd && GetForegroundWindow() == hWnd &&
@@ -12330,26 +12383,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             if (clickAction == DesktopClickAction::AcquireCapture)
             {
-                FocusGameControl(hWnd);
-                SetCapture(hWnd);
-                GetCursorPos(&sceneContext->mouseRestorePosition);
-                ShowCursor(FALSE);
-                sceneContext->mouseCursorHidden = true;
-                sceneContext->mouseLookActive = true;
-                RECT clientRect{};
-                GetClientRect(hWnd, &clientRect);
-                POINT centre{(clientRect.right - clientRect.left) / 2, (clientRect.bottom - clientRect.top) / 2};
-                sceneContext->lastMousePosition = centre;
-                POINT screenCentre = centre;
-                ClientToScreen(hWnd, &screenCentre);
-                RECT screenRect{clientRect};
-                ClientToScreen(hWnd, reinterpret_cast<POINT*>(&screenRect.left));
-                ClientToScreen(hWnd, reinterpret_cast<POINT*>(&screenRect.right));
-                ClipCursor(&screenRect);
-                SetCursorPos(screenCentre.x, screenCentre.y);
                 // The capture/focus click is consumed even if acquisition fails.
-                if (GetCapture() != hWnd || GetFocus() != hWnd || GetForegroundWindow() != hWnd)
-                    ClearDesktopInput(*sceneContext);
+                (void)AcquireDesktopMouseLook(*sceneContext);
             }
             else if (clickAction == DesktopClickAction::Interact)
             {
