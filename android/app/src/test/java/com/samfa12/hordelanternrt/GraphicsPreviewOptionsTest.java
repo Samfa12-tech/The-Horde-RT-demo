@@ -143,7 +143,7 @@ public final class GraphicsPreviewOptionsTest {
         assertArrayEquals(new int[]{0,1},GraphicsPreviewOptions.choices(confirmed,GraphicsPreviewOptions.GLASS));
         assertEquals(0,GraphicsPreviewOptions.value(draft,GraphicsPreviewOptions.GLASS));
         assertArrayEquals(new int[]{0,1,2},GraphicsPreviewOptions.choices(confirmed,GraphicsPreviewOptions.DUST));
-        assertEquals("Indoor dust",GraphicsPreviewOptions.name(GraphicsPreviewOptions.DUST));
+        assertEquals("Particles",GraphicsPreviewOptions.name(GraphicsPreviewOptions.DUST));
         assertEquals("Standard",GraphicsPreviewOptions.dustLabel(2));
         GraphicsPreferences.Values standardDust=GraphicsPreviewOptions.withChoice(confirmed,GraphicsPreviewOptions.DUST,2);
         assertEquals(2,standardDust.dust); assertEquals(0,confirmed.dust);

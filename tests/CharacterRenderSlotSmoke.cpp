@@ -126,6 +126,23 @@ int main()
     using namespace horde::gameplay;
     using namespace horde::vulkan::raytracing;
 
+#if defined(_DEBUG)
+    {
+        PresentableTinyRtScene scene;std::string error;
+        using Mode=PresentableTinyRtScene::ForestRouteProofMode;
+        if(!Require(scene.SetForestRouteProofMode(Mode::BakedF01North68,error) && !scene.SetSharedForestGeometryEnabled(true),
+            "prototype-first selection forbids simultaneous shared/older rosters"))return 1;
+        PresentableTinyRtScene full;
+        if(!Require(full.SetForestRouteProofMode(Mode::BakedSurroundings480,error) && !full.SetSharedForestGeometryEnabled(true),
+            "full-route480 is exclusively baked without shared master duplication"))return 1;
+        PresentableTinyRtScene shared;
+        if(!Require(shared.SetSharedForestGeometryEnabled(true) && !shared.SetForestRouteProofMode(Mode::BakedSurroundings480,error),
+            "shared-first cannot combine full-route480 and original64 instances"))return 1;
+        PresentableTinyRtScene other;
+        if(!Require(other.SetSharedForestGeometryEnabled(true) && !other.SetForestRouteProofMode(Mode::BakedF01North68,error),
+            "shared-first selection cannot silently activate overlapping68 prototype"))return 1;
+    }
+#endif
     static_assert(CharacterRenderSlot::kTlasInstanceIndex == 2u);
     static_assert(CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex == 18u);
     static_assert(CharacterRenderSlot::kMaximumSkeletonPoseBuckets == 2u);
@@ -255,7 +272,7 @@ int main()
     ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 23u &&
                       PresentableTinyRtScene::kBlasCount == 25u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 31u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 107u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 111u &&
                       kRtInstanceMetadataCapacity == 30u &&
                       kRtStaticAssetCapacity == 15u &&
                       kRtPrimitiveMetadataCapacity == 38u && kRtMaterialCapacity == 34u &&
@@ -278,7 +295,8 @@ int main()
                       PresentableTinyRtScene::kHealingFlaskUpgradeInstanceIndex == 30u,
                   "joint ring28/flask29 plus physical pickup30 preserve Keeper27 and every previous metadata/TLAS owner");
     ok &= Require(PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 64u == 95u &&
-                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 76u == 107u,
+                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 76u == 107u &&
+                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 80u == 111u,
                   "forest placement definitions follow the thirty-one-role physical prefix and fit both bounded populations");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});

@@ -8,6 +8,13 @@ docs/evidence/2026-10-24-kit-natural-corner/*.log -text whitespace=cr-at-eol
 docs/evidence/2026-10-24-kit-route-admission-review/*.log -text whitespace=cr-at-eol
 docs/evidence/2026-10-24-kit-turn-admission/*.log -text whitespace=cr-at-eol
 # Keep high-resolution source art out of normal Git history.
+# Byte-reproducible source-only woodland draft; binary LFS rules stay unchanged.
+assets/models/world/source/forest-surroundings-v1/*.py text eol=lf
+assets/models/world/source/forest-surroundings-v1/*.json text eol=lf
+assets/models/world/source/forest-surroundings-v1/*.h text eol=lf
+assets/models/world/source/forest-surroundings-v1/*.md text eol=lf
+assets/models/world/source/forest-surroundings-v1/candidates/*.json text eol=lf
+tests/ForestSurroundingsSourceTests.py text eol=lf
 # Deterministic joint-prop recipes pin exact UTF-8/LF source and manifest bytes.
 tools/author-joint-presentation-assets.py text eol=lf
 assets/models/player/source/flask-native-binding-r1/*.py text eol=lf

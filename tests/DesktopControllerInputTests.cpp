@@ -672,6 +672,27 @@ int main()
     using horde::platform::windows::DesktopKeyAction;
     using horde::platform::windows::ResolveDesktopLeftClick;
     using horde::platform::windows::ResolveDesktopGameplayKey;
+    using horde::platform::windows::ShouldAcquireDesktopMouseLookForKey;
+    for (unsigned key : {unsigned('W'),unsigned('A'),unsigned('S'),unsigned('D'),
+                         unsigned('Q'),unsigned('E'),0x20u,0x14u})
+    {
+        Require(ShouldAcquireDesktopMouseLookForKey(key,true,false,false,false,true),
+                "fresh movement/action intent reacquires mouse look after controller or menu use");
+        Require(!ShouldAcquireDesktopMouseLookForKey(key,false,false,false,false,true) &&
+                !ShouldAcquireDesktopMouseLookForKey(key,true,true,false,false,true) &&
+                !ShouldAcquireDesktopMouseLookForKey(key,true,false,true,false,true) &&
+                !ShouldAcquireDesktopMouseLookForKey(key,true,false,false,true,true),
+                "inactive focus, existing capture, held repeat and shortcuts cannot recapture the pointer");
+    }
+    for (unsigned key : {0x1bu,0x09u,0x12u,0x11u,unsigned('C'),unsigned('F')})
+        Require(!ShouldAcquireDesktopMouseLookForKey(key,true,false,false,false,true),
+                "menu/modifier and retired keys do not steal mouse capture");
+    Require(!ShouldAcquireDesktopMouseLookForKey('E',true,false,false,false,false) &&
+            !ShouldAcquireDesktopMouseLookForKey('H',true,false,false,false,true) &&
+            ShouldAcquireDesktopMouseLookForKey('H',true,false,false,false,true,true),
+            "unavailable lantern/flask actions cannot capture input; enabled bindings can");
+    Require(windowsSource.find("ShouldAcquireDesktopMouseLookForKey(") != std::string::npos,
+            "the native keyboard handler must wire the tested capture handoff policy");
     Require(ResolveDesktopLeftClick(true, false, ChestRewardPrompt::OpenChest) == DesktopClickAction::AcquireCapture &&
             ResolveDesktopLeftClick(true, false, ChestRewardPrompt::None) == DesktopClickAction::AcquireCapture,
             "initial focus/capture click never publishes interaction or attack");

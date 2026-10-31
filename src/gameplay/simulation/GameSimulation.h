@@ -280,6 +280,7 @@ private:
     void RestoreRescueEquipment();
     void PublishRescueSnapshot();
     horde::gameplay::items::HeldItemTransform RescueLanternHinge() const;
+    void RecordSuccessfulHitParticles();
     void RecordSwordContactTrace();
     bool SwordDefenseReady() const;
     bool SwordDrawBlocksDefense() const;
@@ -334,6 +335,7 @@ private:
     bool skeletonRevivalWorkshopBypass_ = false;
     bool revivedIdlePhaseZero_ = false;
     CombatContactTraceSnapshot combatContactTrace_{};
+    horde::gameplay::effects::EnemyHitParticles enemyHitParticles_{};
     std::uint64_t currentCutCommandSequence_ = 0, currentCutConsumedTick_ = 0;
     std::uint64_t queuedUpCutCommandSequence_ = 0, queuedUpCutConsumedTick_ = 0;
     EntityId swordHitTargetThisTick_ = EntityId::Invalid;

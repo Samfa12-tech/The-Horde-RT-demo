@@ -52,6 +52,23 @@ bool FramesWater(const horde::graphics::GraphicsPreviewDescription& scene,
 }
 
 template <typename Check>
+void HitParticleAdapterContracts(const Check& check) {
+    using namespace horde::gameplay::simulation;
+    using namespace horde::vulkan::raytracing;
+    SimulationSnapshot source{};
+    source.enemyHitParticles.Add(17,EntityId::SkeletonB,{1,.3f,-3},{1,-.2f,0});
+    auto frame=BuildRtSceneFrameInputs(source,1.f);
+    check(frame.enemyHitParticles.Active() && frame.enemyHitParticles.bursts[0].eventSequence==17,
+        "immutable accepted burst crosses shared frame adapter without event-drain ownership");
+    source.enemyHitParticles.Step(.2f);
+    check(frame.enemyHitParticles.bursts[0].age==0,"later simulation changes cannot mutate a prepared frame");
+    source.paused=true;
+    check(!BuildRtSceneFrameInputs(source,1.f).enemyHitParticles.Active(),"paused frames exclude transient hit effects");
+    source.paused=false;source.playerAlive=false;
+    check(!BuildRtSceneFrameInputs(source,1.f).enemyHitParticles.Active(),"death frames exclude hit effects");
+}
+
+template <typename Check>
 void AttackWarningAdapterContracts(const Check& check)
 {
     using namespace horde::gameplay;
@@ -263,6 +280,7 @@ int main()
     const auto check = [&passed](bool condition, const char* label) {
         if (!condition) { std::cerr << label << "\n"; passed = false; }
     };
+    HitParticleAdapterContracts(check);
     AttackWarningAdapterContracts(check);
     {
         using namespace horde::gameplay::items;

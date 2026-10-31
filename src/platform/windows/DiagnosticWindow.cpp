@@ -110,6 +110,7 @@
 #include "gameplay/dialogue/SubtitleLayout.h"
 #include "platform/windows/WindowsSubtitleBitmap.h"
 #include "gameplay/SwordCombat.h"
+#include "gameplay/CombatFeedback.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "platform/windows/DesktopControllerInput.h"
 #include "platform/windows/WindowsCaptureContracts.h"
@@ -941,6 +942,7 @@ bool SaveGraphicsRecord(const VulkanSurfaceContext& context,
                         const horde::graphics::GraphicsPersistenceRecord& record);
 bool ObserveWindowsBenchmarkProfileMeasurement(VulkanSurfaceContext& context, bool requireCompleted);
 void ClearDesktopInput(VulkanSurfaceContext& context);
+bool IsDesktopGameplayAvailable(const VulkanSurfaceContext& context);
 void DiscardDesktopPendingCommands(VulkanSurfaceContext& context);
 void UpdateVitalityHud(VulkanSurfaceContext& context);
 void UpdateChestPrompt(VulkanSurfaceContext& context);
@@ -2715,15 +2717,18 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             PlayPositionalSoundEffect(context, "sword_hit_1.wav", 0.22f, event);
             break;
         case GameplayEventType::EnemyHit:
-            if (event.target == EntityId::Lich)
+        case GameplayEventType::PlayerGuardBlocked:
+        {
+            const auto cue = horde::gameplay::CombatCueForEvent(event,
+                IsDesktopGameplayAvailable(context));
+            if (const char* clip = horde::gameplay::CombatAudioClip(cue))
             {
-                PlayPositionalSoundEffect(context, "lich_hurt.wav", 0.95f, event);
-            }
-            else
-            {
-                PlayPositionalSoundEffect(context, "sword_hit_1.wav", 1.0f, event);
+                const float gain = cue == horde::gameplay::CombatAudioCue::GuardBlock ? 0.65f :
+                    cue == horde::gameplay::CombatAudioCue::KeeperHit ? 0.95f : 1.0f;
+                PlayPositionalSoundEffect(context, clip, gain, event);
             }
             break;
+        }
         case GameplayEventType::EnemyDefeated:
             if (!context.delayedFeedback.Enqueue(
                     event,
@@ -2946,7 +2951,7 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
     if (HWND mist = GetDlgItem(context.windowHandle, kGraphicsMistButtonId))
         SetWindowTextA(mist, graphicsDraft.mistEnabled ? "MIST: ON" : "MIST: OFF");
     if (HWND dust = GetDlgItem(context.windowHandle, kGraphicsDustButtonId))
-        SetWindowTextA(dust, (std::string("INDOOR DUST: ") + GraphicsDustName(graphicsDraft.dustQuality)).c_str());
+        SetWindowTextA(dust, (std::string("PARTICLES: ") + (graphicsDraft.dustQuality == horde::graphics::DustQuality::Standard ? "STD" : GraphicsDustName(graphicsDraft.dustQuality))).c_str());
     if (context.graphicsVisible)
     {
         const auto state = context.graphicsEdit->State();
@@ -2970,14 +2975,14 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
             << "\r\nUploaded fire: " << GraphicsFireName(UploadedGraphicsFireDetail(context))
             << "  |  shadows: " << GraphicsShadowName(UploadedGraphicsShadowQuality(context))
             << "  |  mist: " << (context.rtScene.UploadedMistEnabled().has_value() ? (*context.rtScene.UploadedMistEnabled() ? "On" : "Off") : "unavailable")
-            << "  |  indoor dust: " << (context.rtScene.UploadedDustQuality().has_value() ? GraphicsDustName(*context.rtScene.UploadedDustQuality()) : "unavailable")
+            << "  |  particles: " << (context.rtScene.UploadedDustQuality().has_value() ? GraphicsDustName(*context.rtScene.UploadedDustQuality()) : "unavailable")
             << "\r\n" << (mobileOptics ?
                  "Mobile optical build remains fixed; Glass Off removes all pane geometry." :
                  "High optical build: physical panes retained; profile is fixed by this build.")
              << "\r\nWater: Off omits water, Mobile refracts, High adds scene reflections."
              << "\r\nFire: Low/Mobile/High use2/4/10 steps; light strength unchanged."
              << "\r\nShadows: Current area1; Higher area2/4. Cost unmeasured."
-             << "\r\nIndoor dust: Off/Low/Standard controls bounded visible motes; cost not yet measured."
+             << "\r\nParticles: Off/Low/Standard controls room motes and hit fragments; cost unmeasured."
              << "\r\nApply needs an RT frame. Keep confirms within 15 foreground seconds."
              << "\r\n" << context.graphicsStatus;
         SetWindowTextA(GetDlgItem(context.windowHandle, kGraphicsInfoId), info.str().c_str());
@@ -4752,6 +4757,44 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
     }
 }
 
+bool AcquireDesktopMouseLook(VulkanSurfaceContext& context)
+{
+    const HWND window = context.windowHandle;
+    if (!IsDesktopGameplayAvailable(context) || GetForegroundWindow() != window ||
+        gCampaignHiddenValidation || gOpeningBenchmarkMenuValidation || gShowcaseCaptureHidden)
+        return false;
+    FocusGameControl(window);
+    SetCapture(window);
+    if (GetCapture() != window || GetFocus() != window)
+    {
+        ClearDesktopInput(context);
+        return false;
+    }
+    if (!context.mouseCursorHidden)
+    {
+        GetCursorPos(&context.mouseRestorePosition);
+        ShowCursor(FALSE);
+        context.mouseCursorHidden = true;
+    }
+    context.mouseLookActive = true;
+    RECT clientRect{};
+    GetClientRect(window, &clientRect);
+    POINT centre{(clientRect.right-clientRect.left)/2,(clientRect.bottom-clientRect.top)/2};
+    context.lastMousePosition = centre; // The centering warp is not a look delta.
+    ClientToScreen(window, &centre);
+    RECT screenRect{clientRect};
+    ClientToScreen(window, reinterpret_cast<POINT*>(&screenRect.left));
+    ClientToScreen(window, reinterpret_cast<POINT*>(&screenRect.right));
+    ClipCursor(&screenRect);
+    SetCursorPos(centre.x, centre.y);
+    if (GetCapture() != window || GetFocus() != window || GetForegroundWindow() != window)
+    {
+        ClearDesktopInput(context);
+        return false;
+    }
+    return true;
+}
+
 void DiscardDesktopPendingCommands(VulkanSurfaceContext& context)
 {
     auto input = context.simulationInput;
@@ -6471,6 +6514,10 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
             ctx.lastRtFrameError="Normal shared forest must be selected before scene creation.";return false;
         }
         const auto mode=normalShared?Mode::Disabled:
+            ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::BakedSurroundings480?
+            Mode::BakedSurroundings480:
+            ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::BakedF01North68?
+            Mode::BakedF01North68:
             ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedExisting64?
             Mode::SharedExisting64:
             ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedRetention64?
@@ -12242,6 +12289,21 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             }
             using horde::platform::windows::DesktopKeyAction;
+            const bool keyboardGameplayHasFocus = IsDesktopGameplayAvailable(*sceneContext) &&
+                GetFocus() == hWnd && GetForegroundWindow() == hWnd;
+            if (horde::platform::windows::ShouldAcquireDesktopMouseLookForKey(
+                    static_cast<unsigned>(wParam), keyboardGameplayHasFocus,
+                    sceneContext->mouseLookActive && GetCapture() == hWnd,
+                    (lParam & (1ll << 30)) != 0,
+                    (GetKeyState(VK_MENU) & 0x8000) != 0 || (GetKeyState(VK_CONTROL) & 0x8000) != 0,
+                    sceneContext->simulation.Snapshot().chestReward.phase ==
+                        horde::gameplay::interactions::ChestRewardPhase::LanternClaimed,
+                    sceneContext->simulation.Snapshot().healingFlaskEnabled))
+            {
+                // Losing capture/focus during handoff consumes this key. Do
+                // not republish a movement/defense hold after cancellation.
+                if (!AcquireDesktopMouseLook(*sceneContext)) return 0;
+            }
             const DesktopKeyAction keyAction = horde::platform::windows::ResolveDesktopGameplayKey(
                 static_cast<unsigned>(wParam),
                 IsDesktopGameplayAvailable(*sceneContext) && GetFocus() == hWnd && GetForegroundWindow() == hWnd &&
@@ -12330,26 +12392,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             if (clickAction == DesktopClickAction::AcquireCapture)
             {
-                FocusGameControl(hWnd);
-                SetCapture(hWnd);
-                GetCursorPos(&sceneContext->mouseRestorePosition);
-                ShowCursor(FALSE);
-                sceneContext->mouseCursorHidden = true;
-                sceneContext->mouseLookActive = true;
-                RECT clientRect{};
-                GetClientRect(hWnd, &clientRect);
-                POINT centre{(clientRect.right - clientRect.left) / 2, (clientRect.bottom - clientRect.top) / 2};
-                sceneContext->lastMousePosition = centre;
-                POINT screenCentre = centre;
-                ClientToScreen(hWnd, &screenCentre);
-                RECT screenRect{clientRect};
-                ClientToScreen(hWnd, reinterpret_cast<POINT*>(&screenRect.left));
-                ClientToScreen(hWnd, reinterpret_cast<POINT*>(&screenRect.right));
-                ClipCursor(&screenRect);
-                SetCursorPos(screenCentre.x, screenCentre.y);
                 // The capture/focus click is consumed even if acquisition fails.
-                if (GetCapture() != hWnd || GetFocus() != hWnd || GetForegroundWindow() != hWnd)
-                    ClearDesktopInput(*sceneContext);
+                (void)AcquireDesktopMouseLook(*sceneContext);
             }
             else if (clickAction == DesktopClickAction::Interact)
             {
@@ -13071,7 +13115,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kGraphicsShadowButtonId, "SHADOW: CURRENT");
     createButton(kGraphicsGlassButtonId, "GLASS: ON");
     createButton(kGraphicsMistButtonId, "MIST: ON");
-    createButton(kGraphicsDustButtonId, "INDOOR DUST: OFF");
+    createButton(kGraphicsDustButtonId, "PARTICLES: OFF");
     createButton(kGraphicsApplyButtonId, "APPLY");
     createButton(kGraphicsConfirmButtonId, "KEEP (15 SECONDS)");
     createButton(kGraphicsRevertButtonId, "REVERT");

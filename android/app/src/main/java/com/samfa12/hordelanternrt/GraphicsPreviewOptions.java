@@ -13,7 +13,7 @@ final class GraphicsPreviewOptions {
             case GLASS: return "Glass";
             case SHADOW: return "Shadows";
             case MIST: return "Mist";
-            case DUST: return "Indoor dust";
+            case DUST: return "Particles";
             default: return "Resolution";
         }
     }
@@ -55,7 +55,7 @@ final class GraphicsPreviewOptions {
                 result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap,
                         current.glassEnabled, current.shadow, value == 1, current.dust); break;
             case DUST:
-                if (value < 0 || value > 2) throw new IllegalArgumentException("Invalid indoor dust choice");
+                if (value < 0 || value > 2) throw new IllegalArgumentException("Invalid particles choice");
                 result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap,
                         current.glassEnabled, current.shadow, current.mistEnabled, value); break;
             default: throw new IllegalArgumentException("Unknown live graphics choice");
@@ -111,7 +111,7 @@ final class GraphicsPreviewOptions {
             case 0: return "Off";
             case 1: return "Low";
             case 2: return "Standard";
-            default: throw new IllegalArgumentException("Unknown indoor dust quality");
+            default: throw new IllegalArgumentException("Unknown particles quality");
         }
     }
     static boolean presented(long[] snapshot, long generation, long serial, GraphicsPreferences.Values selected) {

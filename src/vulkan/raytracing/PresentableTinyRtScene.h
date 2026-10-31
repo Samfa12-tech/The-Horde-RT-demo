@@ -22,9 +22,11 @@
 #endif
 #include "vulkan/raytracing/RtGpuWorkLease.h"
 #include "scene/atmosphere/IndoorDust.h"
+#include "gameplay/effects/EnemyHitParticles.h"
 #include "scene/DevelopmentWorldGeometry.h"
 #include "scene/ChapterRegionalWater.h"
 #include "scene/ForestDressing.h"
+#include "scene/ForestSurroundings.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
 #include "gameplay/traversal/RescueTraversal.h"
 
@@ -146,6 +148,7 @@ struct RtSceneFrameInputs
     horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
+    horde::gameplay::effects::EnemyHitParticles enemyHitParticles{};
     float playerCrouchDropMetres=0;
     std::uint64_t tickIndex = 0u;
     float cameraYaw = 0.0f;
@@ -314,7 +317,7 @@ public:
     static_assert(kOrdinaryTlasInstanceCount == 31u);
     static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskUpgradeInstanceIndex + 1u);
     static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
-                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 12u);
+                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -347,7 +350,7 @@ public:
 
     void Destroy();
 #if defined(_DEBUG)
-    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64, SharedF01Grouped76 };
+    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64, SharedF01Grouped76, BakedF01North68, BakedSurroundings480 };
     bool SetForestRouteProofMode(ForestRouteProofMode mode, std::string& diagnostic);
     [[nodiscard]] std::string ForestRouteProofJson() const;
 #endif
@@ -396,6 +399,7 @@ public:
     // Explicit representation fallback; select before initialisation. This does
     // not change settings, geometry quality, placement, collision or save state.
     bool SetSharedForestGeometryEnabled(bool enabled) {
+        if(enabled && (SelectF01NorthGrovePrototype() || SelectForestSurroundingsPrototype()))return false;
         if((ready_ || device_!=VK_NULL_HANDLE) && enabled!=sharedForestGeometryEnabled_)return false;
         sharedForestGeometryEnabled_=enabled;return true;
     }
@@ -1405,6 +1409,8 @@ private:
     bool sharedForestGeometryEnabled_=kDefaultSharedForestGeometryEnabled;
     bool sharedForestGeometryActive_=false;
     bool SelectSharedForestGeometry() const noexcept;
+    bool SelectF01NorthGrovePrototype() const noexcept;
+    bool SelectForestSurroundingsPrototype() const noexcept;
     bool UsesSharedForestGeometry() const noexcept { return sharedForestGeometryActive_; }
     bool UsesSharedForestRetention() const noexcept;
     bool UsesSupplementalForestProof() const noexcept;
@@ -1426,6 +1432,8 @@ private:
     std::uint64_t forestRetentionFrameGeneration_=0;
     std::uint32_t forestRetentionOmittedCount_=0;
     horde::scene::ForestDressingSharedLayout forestSharedLayout_{};
+    std::shared_ptr<const horde::scene::F01NorthGrovePrototype> forestF01NorthPrototype_;
+    std::shared_ptr<const horde::scene::PreparedForestSurroundings> forestSurroundingsPrototype_;
     std::array<AccelerationStructure, 2u> forestMasterBlas_{};
     Buffer forestMasterBuildScratch_{};
     RtGpuWorkLease forestMasterBuildWork_{};

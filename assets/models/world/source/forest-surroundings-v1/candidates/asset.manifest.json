@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "asset": "forest-surroundings-v1-source-candidates",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "budgets": {
+    "maxVertices": 1500,
+    "maxIndices": 4500,
+    "maxPrimitives": 2,
+    "maxMaterials": 3,
+    "maxTextureLayersPerKind": 3
+  },
+  "lods": [
+    {
+      "name": "middle",
+      "maxTriangles": 1500
+    },
+    {
+      "name": "far",
+      "maxTriangles": 250
+    },
+    {
+      "name": "boundary-panel",
+      "maxTriangles": 100
+    }
+  ],
+  "requiredSockets": [],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true,
+    "resolution": 1024
+  },
+  "materialOverrides": [],
+  "distribution": "source-only-unadmitted",
+  "licenceStatus": "Original project-authored geometry, derived from the owned Horde tree centreline records and original PBR maps. No provider, purchase or third-party geometry. Existing rights remain; no blanket MIT/CC0 grant."
+}

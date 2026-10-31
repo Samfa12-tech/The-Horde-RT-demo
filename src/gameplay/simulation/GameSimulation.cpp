@@ -308,6 +308,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     }
     if (!input.paused && playerAlive)
     {
+        enemyHitParticles_.Step(fixedDeltaSeconds);
         walkTime_ += fixedDeltaSeconds;
         const float previousWalkCycleTime = walkCycleTime_;
         walkCycleTime_ += fixedDeltaSeconds;
@@ -335,6 +336,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         UpdateEncounters(input, fixedDeltaSeconds);
         UpdateRewardSequence(fixedDeltaSeconds, true);
         ResolveHeldItems();
+        RecordSuccessfulHitParticles();
         RecordSwordContactTrace();
         if (interactionState_.heldLightKind ==
             horde::gameplay::interactions::HeldLightKind::RewardLantern)
@@ -774,6 +776,7 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 
 void GameSimulation::ResetRoute()
 {
+    enemyHitParticles_.Clear();
     forestBird_.Reset();localAmbience_.Reset();
     ClearCampaignBoundary();
     CancelCampaignRestore();
@@ -1523,6 +1526,7 @@ bool GameSimulation::ConsumeWorldCommand()
 
 bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
 {
+    enemyHitParticles_.Clear();
     if(staticDetailLease_.resourceGeneration) { staticDetailLease_.restoreRequested=true;RefreshSnapshot(lastInput_);return false; }
     const ShowcaseCheckpoint* checkpoint = FindShowcaseCheckpoint(checkpointId);
     if (checkpoint == nullptr)
@@ -1718,6 +1722,30 @@ void GameSimulation::ResolveHeldItems()
     heldItems_[1].worldFromDetach = resolvedItems[1].worldFromDetach;
     heldItems_[1].detachTick = resolvedItems[1].detachTick;
     ApplyRescuePresentation();
+}
+
+void GameSimulation::RecordSuccessfulHitParticles()
+{
+    if (swordHitEventThisTick_ != 0 && swordHitTargetThisTick_ != EntityId::Invalid)
+    {
+        const bool keeper=swordHitTargetThisTick_==EntityId::Lich;
+        const auto index=swordHitTargetThisTick_==EntityId::SkeletonB ? 1u : 0u;
+        const float x=keeper?lichEncounter_.Snapshot().x:combatSnapshot_.combatants[index].x;
+        const float z=keeper?lichEncounter_.Snapshot().z:combatSnapshot_.combatants[index].z;
+        const float root=keeper?lichEncounter_.Snapshot().y:kRouteFloorWorldY;
+        const float dx=x-playerX_, dz=z-playerZ_, distance=std::hypot(dx,dz);
+        if(distance>.001f) {
+            const float forwardX=dx/distance,forwardZ=dz/distance;
+            const bool upward=combatSnapshot_.player.action==PlayerCombatAction::UpwardSliceActive;
+            // The authoritative range/cone hit has no measured mesh intersection.
+            // Use a named torso surface proxy on its player-facing side, not the
+            // actor's feet or the live camera. Cut direction follows its latched
+            // sword action; this does not claim skinned-triangle contact.
+            enemyHitParticles_.Add(swordHitEventThisTick_,swordHitTargetThisTick_,
+                {x-forwardX*.22f,root+1.05f,z-forwardZ*.22f},
+                {forwardX*.55f+forwardZ*.75f,upward?.7f:-.35f,forwardZ*.55f-forwardX*.75f});
+        }
+    }
 }
 
 void GameSimulation::RecordSwordContactTrace()
@@ -2349,6 +2377,7 @@ void GameSimulation::UpdateSkeletonRevival(const InputSnapshot& input, float del
 
 void GameSimulation::CancelCombatTransients()
 {
+    enemyHitParticles_.Clear();
     guardReleaseRequired_ = guardReleaseRequired_ || lastInput_.guardHeld;
     swordCombat_.SetGuardHeld(false);
     combatSnapshot_.player = swordCombat_.Snapshot().player;
@@ -2860,6 +2889,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             // An actual eligible ordinary contact is blocked, not reduced damage
             // or a practice-suppressed miss. It consumes no health/invulnerability.
             damageSample.outcome = CombatContactOutcome::GuardBlocked;
+            damageSample.semanticEventSequence = Emit(GameplayEventType::PlayerGuardBlocked,
+                EntityId::Player, damageSample.target, playerX_, playerZ_, 1.0f, 0,
+                PlayerEyeWorldY(playerSupport_.worldY) - posture_.drop);
             if (playerVitals_.Snapshot().invulnerabilityRemaining <= 0.00001f)
                 combatTeaching_.BlockSucceeded();
         }
@@ -3271,6 +3303,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.chapterCompanion=chapterCompanion_.State();
     snapshot_.tickIndex = tickIndex_;
     snapshot_.combatContactTrace = combatContactTrace_;
+    snapshot_.enemyHitParticles = enemyHitParticles_;
     snapshot_.inputPublicationSequence = inputPublicationSequence_;
     snapshot_.inputMoveForward = input.moveForward;
     snapshot_.inputMoveStrafe = input.moveStrafe;

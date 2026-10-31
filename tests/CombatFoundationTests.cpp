@@ -24,6 +24,13 @@ bool Near(float a,float b,float epsilon=.0001f) { return std::abs(a-b)<=epsilon;
 GameSimulationConfig Rules() {
     auto c=ProductionGameSimulationConfig(); c.swordStartsStowed=false; return c;
 }
+void CheckContactBurst(const SimulationSnapshot& state,const GameplayEvent& event) {
+    bool matched=false;
+    for(const auto& b:state.enemyHitParticles.bursts)
+        matched|=b.eventSequence==event.sequence && b.target==event.target && b.age==0 &&
+            b.origin[1]>kRouteFloorWorldY+.3f;
+    Check(matched,"actual successful skeleton/Keeper contact owns a matching target/sequence surface-proxy burst");
+}
 void PracticePromptWaitsForSword() {
     GameSimulation sim(ProductionGameSimulationConfig());
     InputSnapshot input; input.tutorialEnabled=true;
@@ -1004,7 +1011,7 @@ void HeldGuardDamageContract() {
         GameSimulation sim(config); InputSnapshot input;
         input.tutorialEnabled=false; input.yawRadians=config.playerStartYawRadians;
         input.guardHeld=true; input.commands.parry=1;
-        int contacts=0, damageEvents=0, successfulParries=0; bool sawGuard=false;
+        int contacts=0, damageEvents=0, successfulParries=0, guardEvents=0; bool sawGuard=false;
         const int desiredHits=frontal?2:1;
         for(int tick=0;tick<900 && contacts<desiredHits;++tick) {
             // A malicious/repeated command stream must not turn a held input
@@ -1013,9 +1020,19 @@ void HeldGuardDamageContract() {
             sim.StepFixed(input);
             const auto& state=sim.Snapshot();
             sawGuard=sawGuard || state.playerCombat.action==PlayerCombatAction::Guard;
+            std::uint64_t guardSequence=0;
             for(const auto& event:sim.Events().Events()) {
                 if(event.type==GameplayEventType::PlayerParrySucceeded) ++successfulParries;
                 if(event.type==GameplayEventType::PlayerDamaged) ++damageEvents;
+                if(event.type==GameplayEventType::PlayerGuardBlocked) {
+                    ++guardEvents; guardSequence=event.sequence;
+                    Check(event.source==EntityId::Player &&
+                          (event.target==EntityId::SkeletonA || event.target==EntityId::SkeletonB) &&
+                          event.tickIndex==state.tickIndex && Near(event.worldX,state.playerX) &&
+                          Near(event.worldZ,state.playerZ) && Near(event.listenerX,state.playerX) &&
+                          Near(event.listenerZ,state.playerZ) && Near(event.worldY,event.listenerY),
+                          "guard feedback freezes the actual guarding player, attacker and fixed-tick spatial tuple");
+                }
             }
             if(state.swordCombat.playerHitPulse) {
                 ++contacts;
@@ -1024,7 +1041,8 @@ void HeldGuardDamageContract() {
                 if(frontal)
                     Check(state.playerVitals.vitality==3 && !state.playerVitals.halfHeart &&
                           state.playerVitals.invulnerabilityRemaining==0.f &&
-                          sample.outcome==CombatContactOutcome::GuardBlocked,
+                          sample.outcome==CombatContactOutcome::GuardBlocked &&
+                          guardSequence!=0 && sample.semanticEventSequence==guardSequence,
                           "each actual normal frontal guard contact fully blocks without granting post-hit immunity");
                 else
                     Check(state.playerVitals.vitality==2 && !state.playerVitals.halfHeart &&
@@ -1035,8 +1053,10 @@ void HeldGuardDamageContract() {
             sim.ClearEvents();
         }
         Check(sawGuard && contacts==desiredHits && successfulParries==0 &&
-              damageEvents==(frontal?0:1),
+              damageEvents==(frontal?0:1) && guardEvents==(frontal?contacts:0),
               "held guard blocks real normal contacts without edge-spam parries or fake damage feedback");
+        input.paused=true;sim.AdvanceFrame(input,.5);
+        Check(sim.Events().Events().empty(),"pause cannot manufacture another held-guard contact cue");
     }
 
     GameSimulation red(Rules()); InputSnapshot redInput; redInput.tutorialEnabled=false;
@@ -1047,13 +1067,15 @@ void HeldGuardDamageContract() {
     }
     Check(ticks<600,"held-guard red-attack fixture completes real Keeper recognition");
     redInput.guardHeld=true; redInput.commands.parry=1;
-    bool sawGuard=false, sawRedHit=false; int redParries=0;
+    bool sawGuard=false, sawRedHit=false; int redParries=0, redBlocks=0;
     for(int tick=0;tick<600 && !sawRedHit;++tick) {
         red.StepFixed(redInput);
         const auto& state=red.Snapshot();
         sawGuard=sawGuard || state.playerCombat.action==PlayerCombatAction::Guard;
-        for(const auto& event:red.Events().Events())
+        for(const auto& event:red.Events().Events()) {
             if(event.type==GameplayEventType::PlayerParrySucceeded) ++redParries;
+            if(event.type==GameplayEventType::PlayerGuardBlocked) ++redBlocks;
+        }
         if(state.lich.damagePulse) {
             sawRedHit=true;
             Check(state.playerVitals.vitality==2 && !state.playerVitals.halfHeart,
@@ -1061,7 +1083,7 @@ void HeldGuardDamageContract() {
         }
         red.ClearEvents();
     }
-    Check(sawGuard && sawRedHit && redParries==0,
+    Check(sawGuard && sawRedHit && redParries==0 && redBlocks==0,
           "red-attack rejection is witnessed while guard has actually been active");
 
     auto legacyConfig=Rules(); legacyConfig.combatFoundation1_7=false;
@@ -1107,6 +1129,9 @@ void YellowGuardBreakAndDefences() {
             const auto& sample=trace.samples[(trace.nextIndex+trace.kCapacity-1)%trace.kCapacity];
             broke=sample.guardBroken && sample.incomingAttackKind==EnemyAttackKind::GuardBreak &&
                 sample.outcome==CombatContactOutcome::DamageAccepted;
+            for(const auto& event:held.Events().Events())
+                Check(event.type!=GameplayEventType::PlayerGuardBlocked,
+                      "an actual yellow guard break cannot play a successful block cue");
         }
         held.ClearEvents();
     }
@@ -1210,7 +1235,9 @@ void FourSkillPracticeAndExit() {
     ++input.commands.attack; bool actualHit=false;
     for(int tick=0;tick<100 && !sim.Snapshot().combatTeaching.attackFromGuardLearned;++tick) {
         sim.StepFixed(input);
-        for(const auto& event:sim.Events().Events()) actualHit=actualHit || event.type==GameplayEventType::EnemyHit;
+        for(const auto& event:sim.Events().Events()) if(event.type==GameplayEventType::EnemyHit) {
+            actualHit=true;CheckContactBurst(sim.Snapshot(),event);
+        }
         sim.ClearEvents();
     }
     const auto ready=sim.Snapshot().combatTeaching;
@@ -1548,7 +1575,9 @@ void IntegratedKeeperRepelAndReward() {
     int hits=0, defeated=0, unlocked=0;
     auto collect=[&] {
         for(const auto& event:sim.Events().Events()) {
-            if(event.type==GameplayEventType::EnemyHit && event.target==EntityId::Lich) ++hits;
+            if(event.type==GameplayEventType::EnemyHit && event.target==EntityId::Lich) {
+                ++hits;CheckContactBurst(sim.Snapshot(),event);
+            }
             if(event.type==GameplayEventType::LichDefeated && event.target==EntityId::Lich) {
                 ++defeated; defeatedSequence=event.sequence;
             }
@@ -1582,6 +1611,27 @@ void IntegratedKeeperRepelAndReward() {
           "integrated retry restores full mist with the living Keeper");
 }
 }
+void SuccessfulHitParticleLifecycle() {
+    auto config=ProductionGameSimulationConfig();config.swordStartsStowed=false;
+    config.playerStartX=-4.5f;config.playerStartZ=-15.3f;config.playerStartYawRadians=-2.275290391f;
+    GameSimulation sim(config);InputSnapshot input;input.tutorialEnabled=false;input.damageEnabled=false;
+    input.yawRadians=config.playerStartYawRadians;
+    sim.StepFixed(input);sim.ClearEvents();
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"idle enemy proximity cannot create particles");
+    ++input.commands.attack;bool hit=false;
+    for(int n=0;n<45 && !hit;++n) {
+        sim.StepFixed(input);
+        for(const auto& e:sim.Events().Events())if(e.type==GameplayEventType::EnemyHit) {
+            CheckContactBurst(sim.Snapshot(),e);hit=true;
+        }
+        sim.ClearEvents();
+    }
+    Check(hit && sim.Snapshot().enemyHitParticles.Active(),"real production-pair accepted sword contact creates a burst");
+    sim.SynchronizePausedInput(input,1,PausedInputPolicy::DiscardAllCommands);
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"pause before expiry clears actual emitted burst");
+    sim.RetryEncounter();
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"retry restores gameplay without old contact particles");
+}
 void OutgoingTraceContract() {
     GameSimulation sim(Rules()); InputSnapshot input; input.damageEnabled=false;
     sim.BeginCombatPractice(EnemyKind::Skeleton);
@@ -1596,6 +1646,12 @@ void OutgoingTraceContract() {
         if(sample.tick!=state.tickIndex || sample.cut==PlayerAttackCut::None) continue;
         Check(sample.hasSwordTransform && sample.worldFromSword==state.heldItems[1].worldFromItem,
               "contact trace samples the actual published sword attachment on its owning fixed tick");
+        if(sample.outcome==CombatContactOutcome::AcceptedSwordContact) {
+            bool matched=false;
+            for(const auto& b:state.enemyHitParticles.bursts)
+                matched|=b.eventSequence==sample.semanticEventSequence && b.target==sample.target && b.age==0;
+            Check(matched,"actual accepted damage publishes exactly its matching target/sequence burst on the contact tick");
+        }
         Check(!sample.hasBlade&&!sample.hasSeparation,
               "forgiving contact policy cannot fabricate physical blade/triangle measurements");
         if(sample.cut==PlayerAttackCut::DownwardCut) {
@@ -1611,6 +1667,9 @@ void OutgoingTraceContract() {
     Check(sawDown&&sawUp&&downId!=0&&upId!=downId,
           "each cut has a distinct identity across a buffered continuation");
     sim.SynchronizePausedInput(input,2,PausedInputPolicy::DiscardAllCommands);
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"lifecycle pause cancels published particles without delayed replay");
+    sim.RetryEncounter();
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"retry begins with no old hit burst");
     Check(sim.Snapshot().combatContactTrace.count==0,
           "lifecycle cancellation cannot replay old contact observations");
 }
@@ -2535,6 +2594,7 @@ int main(int argc,char** argv) {
     HeldGuardDamageContract(); GuardAttackAndReleaseAtContact(); GuardInterruptionRearm();
     YellowGuardBreakAndDefences(); FourSkillPracticeAndExit();
     IntegratedKeeperRepelAndReward();
+    SuccessfulHitParticleLifecycle();
     OutgoingTraceContract();
     EnemyAttackKindAuthority();
     NonfatalPairHitPreservesIndependentActions();

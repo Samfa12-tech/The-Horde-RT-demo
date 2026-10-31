@@ -18,6 +18,7 @@
 #include "vulkan/raytracing/RescuePlayerRig.h"
 #include "scene/RescueJourneyGeometry.h"
 #include "scene/ShowcaseIndoorDust.h"
+#include "scene/atmosphere/HitParticleDust.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "scene/CorridorStaticDetailFaces.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
@@ -860,6 +861,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     sharedForestGeometryEnabled_=std::exchange(other.sharedForestGeometryEnabled_,kDefaultSharedForestGeometryEnabled);
     sharedForestGeometryActive_=std::exchange(other.sharedForestGeometryActive_,false);
     forestSharedLayout_=std::move(other.forestSharedLayout_);other.forestSharedLayout_={};
+    forestF01NorthPrototype_=std::move(other.forestF01NorthPrototype_);
+    forestSurroundingsPrototype_=std::move(other.forestSurroundingsPrototype_);
     forestMasterBlas_=std::exchange(other.forestMasterBlas_,{});
     forestMasterBuildScratch_=std::exchange(other.forestMasterBuildScratch_,{});
     forestMasterBuildWork_=std::exchange(other.forestMasterBuildWork_,{});
@@ -911,9 +914,29 @@ bool PresentableTinyRtScene::SelectSharedForestGeometry() const noexcept
     if(sceneProfile_!=RtSceneProfile::Showcase || !developmentRescueJourney_)return false;
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled)
-        return forestRouteProofMode_!=ForestRouteProofMode::BakedResident;
+        return forestRouteProofMode_!=ForestRouteProofMode::BakedResident &&
+            forestRouteProofMode_!=ForestRouteProofMode::BakedF01North68 &&
+            forestRouteProofMode_!=ForestRouteProofMode::BakedSurroundings480;
 #endif
     return sharedForestGeometryEnabled_;
+}
+
+bool PresentableTinyRtScene::SelectF01NorthGrovePrototype() const noexcept
+{
+#if defined(_DEBUG)
+    return forestRouteProofMode_==ForestRouteProofMode::BakedF01North68;
+#else
+    return false;
+#endif
+}
+
+bool PresentableTinyRtScene::SelectForestSurroundingsPrototype() const noexcept
+{
+#if defined(_DEBUG)
+    return forestRouteProofMode_==ForestRouteProofMode::BakedSurroundings480;
+#else
+    return false;
+#endif
 }
 
 bool PresentableTinyRtScene::UsesSharedForestRetention() const noexcept
@@ -941,8 +964,12 @@ bool PresentableTinyRtScene::SetForestRouteProofMode(ForestRouteProofMode mode,s
 {
     if(mode!=ForestRouteProofMode::Disabled && mode!=ForestRouteProofMode::BakedResident &&
        mode!=ForestRouteProofMode::SharedExisting64 && mode!=ForestRouteProofMode::SharedF01Sector76 &&
-       mode!=ForestRouteProofMode::SharedRetention64 && mode!=ForestRouteProofMode::SharedF01Grouped76) {
+       mode!=ForestRouteProofMode::SharedRetention64 && mode!=ForestRouteProofMode::SharedF01Grouped76 &&
+       mode!=ForestRouteProofMode::BakedF01North68 && mode!=ForestRouteProofMode::BakedSurroundings480) {
         diagnostic="Unknown forest route proof mode.";return false;
+    }
+    if((mode==ForestRouteProofMode::BakedF01North68 || mode==ForestRouteProofMode::BakedSurroundings480) && sharedForestGeometryEnabled_) {
+        diagnostic="F01 north baked prototype cannot combine shared/older F01 rosters.";return false;
     }
     if((ready_ || device_!=VK_NULL_HANDLE) && mode!=forestRouteProofMode_) {
         diagnostic="Forest representation must be selected before scene initialization.";return false;
@@ -959,6 +986,7 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
     const bool shared=UsesSharedForestGeometry();
     const bool sector=UsesSupplementalForestProof();
     const bool grouped=forestRouteProofMode_==ForestRouteProofMode::SharedF01Grouped76;
+    const bool north=SelectF01NorthGrovePrototype();
     const bool retention=UsesSharedForestRetention();
     std::ostringstream out;out.imbue(std::locale::classic());out<<std::fixed<<std::setprecision(8);
     const auto resources=ResourceInventory();
@@ -969,10 +997,17 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
         ++registrations;if(row.assetIndex>=assetUsed.size())fits=false;else assetUsed[row.assetIndex]=true;
     }
     const auto assetCount=std::count(assetUsed.begin(),assetUsed.end(),true);
-    out<<"{\"mode\":\""<<(forestRouteProofMode_==ForestRouteProofMode::Disabled?"normal-shared64":retention?"shared-retention64":grouped?"shared-f01-grouped-r4-76":sector?"shared-f01-sector76":shared?"shared-existing64":"baked-resident")
+    out<<"{\"mode\":\""<<(forestRouteProofMode_==ForestRouteProofMode::Disabled?"normal-shared64":retention?"shared-retention64":grouped?"shared-f01-grouped-r4-76":sector?"shared-f01-sector76":shared?"shared-existing64":SelectForestSurroundingsPrototype()?"baked-surroundings480":north?"baked-f01-north68":"baked-resident")
        <<"\",\"defaultEnabled\":"<<(kDefaultSharedForestGeometryEnabled?"true":"false")
        <<",\"requestedSharedGeometry\":"<<(sharedForestGeometryEnabled_?"true":"false")
        <<",\"activeSharedGeometry\":"<<(sharedForestGeometryActive_?"true":"false")
+       <<",\"totalTreePlacements\":"<<(64u+(forestSurroundingsPrototype_?416u:forestF01NorthPrototype_?4u:sector?12u:0u))
+       <<",\"northPrototypeExtraRoots\":"<<(forestF01NorthPrototype_?4u:0u)
+       <<",\"northPrototypeCollisionTriangles\":"<<(forestF01NorthPrototype_?forestF01NorthPrototype_->CollisionTriangles():0u)
+       <<",\"surroundingsExtraRoots\":"<<(forestSurroundingsPrototype_?416u:0u)
+       <<",\"surroundingsFenceRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.fenceRuns:0u)
+       <<",\"surroundingsNaturalBankRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.naturalBankRuns:0u)
+       <<",\"surroundingsBoundaryContained\":"<<(forestSurroundingsPrototype_&&forestSurroundingsPrototype_->report.boundaryContained?"true":"false")
        <<",\"proofOverride\":"<<(forestRouteProofMode_!=ForestRouteProofMode::Disabled?"true":"false")<<",\"fullyResident\":"<<(!ordinaryStaticOmissions_ && !ordinaryStaticReduced_?"true":"false")
        <<",\"ordinaryOmissionCertificateReused\":false,\"forestOrPerformanceAdmitted\":false"
        <<",\"physicalDefinitions\":"<<tlasInstanceCount_<<",\"physicalStorageCapacity\":"<<kTlasInstanceCount
@@ -1093,12 +1128,28 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
     const std::size_t supplementalCount=sector?12u:0u;
     bool bakedProof=false;
 #if defined(_DEBUG)
-    bakedProof=forestRouteProofMode_==ForestRouteProofMode::BakedResident;
+    bakedProof=forestRouteProofMode_==ForestRouteProofMode::BakedResident || SelectF01NorthGrovePrototype() || SelectForestSurroundingsPrototype();
 #endif
     if((!shared && !bakedProof) || !ready_ || !tlasInstanceDefinitionsValid_ ||
        !forestSharedLayout_.prepared || forestSharedLayout_.prepared->placements.size()!=64u ||
        sceneProfile_!=RtSceneProfile::Showcase || !developmentRescueJourney_ || ordinaryStaticOmissions_ ||
        ordinaryStaticReduced_ || preparedStaticGeometry_)return fail("Forest proof lacks its complete fully resident owner.");
+    if(SelectF01NorthGrovePrototype()) {
+        if(shared || sector || !forestF01NorthPrototype_ || &forestF01NorthPrototype_->Prepared()!=forestSharedLayout_.prepared.get() ||
+           !forestF01NorthPrototype_->CollisionTriangles() ||
+           !chapterTerrainSurface_ || chapterTerrainSurface_->NonWalkableTriangleCount()<forestF01NorthPrototype_->Terrain()->NonWalkableTriangleCount())
+            return fail("F01 north prototype lacks its exclusive baked population/collision owner.");
+        for(const auto& p:forestF01NorthPrototype_->Placements()) {
+            const auto ground=chapterTerrainSurface_->Query(p.placement.origin[0],p.placement.origin[2]);
+            if(!ground.found || std::abs(ground.worldY-p.placement.supportY)>.0001f)
+                return fail("F01 north collision/render roots do not share actual imported terrain.");
+        }
+    }else if(forestF01NorthPrototype_) return fail("F01 north collision leaked into another forest profile.");
+    if(SelectForestSurroundingsPrototype()) {
+        if(shared || sector || !forestSurroundingsPrototype_ || !forestSurroundingsPrototype_->report.boundaryContained ||
+           forestSurroundingsPrototype_->report.extraTrees!=416 || forestSurroundingsPrototype_->terrain!=chapterTerrainSurface_)
+            return fail("Full-route forest lacks its exclusive fully resident boundary/geometry owner.");
+    }else if(forestSurroundingsPrototype_)return fail("Full-route forest leaked into another profile.");
     if(forestSharedLayout_.supplementalPlacements.size()!=supplementalCount ||
        tlasInstanceCount_!=kOrdinaryTlasInstanceCount+(shared?64u:0u)+(sector?12u:0u) ||
        staticMeshSlot_.PrimitiveMetadata().size()>kRtPrimitiveMetadataCapacity ||
@@ -1615,7 +1666,7 @@ void PresentableTinyRtScene::Destroy()
     else forestMasterBuildWork_={};
     forestRetentionProof_={};forestRetentionLastOmitted_={};forestRetentionFrameEligible_=false;
     forestRetentionFrameGeneration_=0;forestRetentionOmittedCount_=0;
-    forestSharedLayout_={};sharedForestGeometryActive_=false;
+    forestSharedLayout_={};forestF01NorthPrototype_.reset();forestSurroundingsPrototype_.reset();sharedForestGeometryActive_=false;
     DestroyBuffer(keeperTextureUploadRecovery_.staging);
     for (auto& texture : keeperTextureRestoreQuarantine_) DestroyTextureArray(texture);
     keeperTextureLifetime_ = {};
@@ -3268,11 +3319,15 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             if(!horde::scene::SeedPreparedForestMaterialFamilies(*forestSharedLayout_.prepared,collapseStaticAsset_,diagnostic))return false;
         }else {
 #if defined(_DEBUG)
-            if(forestRouteProofMode_==ForestRouteProofMode::BakedResident) {
+            if(forestRouteProofMode_==ForestRouteProofMode::BakedResident || SelectF01NorthGrovePrototype() || SelectForestSurroundingsPrototype()) {
                 std::shared_ptr<const horde::scene::PreparedForestDressing> prepared;
                 if(!horde::scene::PrepareForestDressing(root,prepared,diagnostic,chapterTerrainSurface_.get()))return false;
                 forestSharedLayout_.prepared=std::move(prepared);
-                if(!horde::scene::AppendPreparedForestDressing(*forestSharedLayout_.prepared,collapseStaticAsset_,forest,diagnostic))return false;
+                if(SelectF01NorthGrovePrototype()) {
+                    if(!horde::scene::PrepareF01NorthGrovePrototype(forestSharedLayout_.prepared,chapterTerrainSurface_,forestF01NorthPrototype_,diagnostic) ||
+                       !horde::scene::AppendPreparedF01NorthGrove(*forestF01NorthPrototype_,collapseStaticAsset_,forest,diagnostic))return false;
+                    chapterTerrainSurface_=forestF01NorthPrototype_->Terrain();
+                }else if(!horde::scene::AppendPreparedForestDressing(*forestSharedLayout_.prepared,collapseStaticAsset_,forest,diagnostic))return false;
             }else
 #endif
             if(!horde::scene::AppendPreparedForestDressing(root,collapseStaticAsset_,forest,diagnostic,chapterTerrainSurface_.get()))return false;
@@ -3294,6 +3349,11 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             if(!horde::scene::PrepareForestFlaskUpgrade(roadClue,healingFlaskAsset_,*chapterTerrainSurface_,placement,diagnostic))return false;
             healingFlaskUpgradeSite_=static_cast<const horde::gameplay::healing::FlaskUpgradeSite&>(placement);
         }
+#if defined(_DEBUG)
+        if(SelectForestSurroundingsPrototype() &&
+           !horde::scene::AppendPreparedForestSurroundings(root,*forestSharedLayout_.prepared,collapseStaticAsset_,
+               chapterTerrainSurface_,forestSurroundingsPrototype_,diagnostic))return false;
+#endif
         // The collapse's final masonry range and the first dressing range use
         // the same material. Keep every triangle while sharing one metadata row;
         // High's physical lantern panes must fit alongside this resident scene.
@@ -3316,7 +3376,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             sharedForestGeometryActive_=true;
         }
 #if defined(_DEBUG)
-        else if(forestRouteProofMode_==ForestRouteProofMode::BakedResident)
+        else if(forestRouteProofMode_==ForestRouteProofMode::BakedResident || SelectF01NorthGrovePrototype() || SelectForestSurroundingsPrototype())
             forestSharedLayout_.commonPrimitiveCount=collapseStaticAsset_.primitives.size();
 #endif
     }
@@ -8879,9 +8939,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
 bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& quality,
     const RtSceneFrameInputs& frame, std::string& diagnostic, RtSceneRecordObservation* observation)
 {
+    dustWork_ = {};
     if (dustQuality_ == horde::graphics::DustQuality::Off)
         return WriteBuffer(qualityControlsBuffer_, &quality, sizeof(quality), "quality controls", diagnostic, observation);
-    dustWork_ = {};
     QualityDustUpload upload{quality,{}};
     using namespace horde::scene::atmosphere;
     const float step=frame.walkTime*6.2f;
@@ -8896,16 +8956,21 @@ bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& qualit
     const auto zones=sceneProfile_==RtSceneProfile::Showcase ? std::span<const IndoorDustZone>(horde::scene::kShowcaseIndoorDust) :
         sceneProfile_==RtSceneProfile::GraphicsPreview ? std::span<const IndoorDustZone>(horde::scene::kPreviewIndoorDust) : std::span<const IndoorDustZone>{};
     const double seconds=std::max(double(frame.walkTime),0.0);
+    const bool combatParticles=sceneProfile_==RtSceneProfile::Showcase && frame.enemyHitParticles.Active();
+    // Do not cache a contact overlay as ambient. Active bursts invalidate before
+    // build and skip commit, so the first expired/cancelled frame clears it too.
+    if(combatParticles)dustCache_.Invalidate();
     const auto decision=dustCache_.Build(zones,dustQuality_,camera,seconds,upload.dust,dustWork_);
     if(decision==DustUploadDecision::Unchanged)
         return WriteBuffer(qualityControlsBuffer_, &quality, sizeof(quality), "quality controls", diagnostic, observation);
     if(decision==DustUploadDecision::Invalid) {
         diagnostic="Indoor dust zone/camera admission failed."; return false;
     }
+    if(combatParticles)OverlayHitParticles(frame.enemyHitParticles,dustQuality_,camera,upload.dust,dustWork_);
     if(!WriteBuffer(qualityControlsBuffer_, &upload, sizeof(upload), "quality and bounded indoor dust", diagnostic, observation)) {
         dustCache_.Invalidate(); return false;
     }
-    dustCache_.Commit(zones,dustQuality_,camera,seconds);
+    if(!combatParticles)dustCache_.Commit(zones,dustQuality_,camera,seconds);
     return true;
 }
 
