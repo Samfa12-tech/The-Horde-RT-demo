@@ -1,0 +1,709 @@
+{
+  "schema": 1,
+  "dateUtc": "2026-10-31",
+  "decision": "No runtime optimization admitted; scratch initialization trial closed without repeatable whole-frame gain.",
+  "sourceCommit": "a89362dcea2e394f2ce78ac1f2622ab7eb9c8d8c",
+  "baselineCi": {
+    "run": 41188188172,
+    "conclusion": "success",
+    "jobsPassed": 6
+  },
+  "baseline": {
+    "source": "a89362dcea2e394f2ce78ac1f2622ab7eb9c8d8c",
+    "buildId": "g:a89362dcea2e394f2ce78ac1f2622ab7eb9c8d8c;i:eeb2268f3db6d932ab1e48f71d60483230d9f92b6892553d5435261334880879;c:D;s:C",
+    "apkSha256": "a9a2930a64c58c83de3e0399ee2dc31ee6f0e55c813746cfaaca83ce62496307",
+    "bytes": 179294590,
+    "nativeSha256": "5b6ac7a769ed8ae776db99c9f48cd7c103bfdca81ef66a437ef7fd7ce14b2887",
+    "nativeBytes": 5464288,
+    "abis": [
+      "lib/arm64-v8a/libhorde_rt_probe_android.so"
+    ],
+    "profile": "-O2 Debug; Shipping/Mobile production shaders; route timing and GPU frame-stage queries ON; actor worker, forest candidate OFF"
+  },
+  "candidate": {
+    "sourceParent": "a89362dcea2e394f2ce78ac1f2622ab7eb9c8d8c",
+    "buildId": "g:a89362dcea2e394f2ce78ac1f2622ab7eb9c8d8c;i:f87ed04152f971a8738d8eb65564d2f32ea455eb44a542f2c48c38da1c2290ea;c:D;s:D",
+    "apkSha256": "7626721c360c67a624cd3e9eef656611b64a419a812bbb378df0685db0248da6",
+    "nativeSha256": "f9a4002d5138fdd5d841098fc20228ccf086d3857e32b0bf48a0ef0299815a7a",
+    "bytes": 179294590,
+    "assetsIdenticalToBaseline": true,
+    "change": "Scratch interval initialization only; no shader, quality, collision policy or worker change",
+    "patchSha256": "1359effcdbf3b6fa4c57266ef1df03b2f59725cd6ecd7a50dd0e6a1e329a8094"
+  },
+  "device": {
+    "model": "SM-S948B",
+    "marketedModel": "Galaxy S26 Ultra",
+    "androidVersion": 17,
+    "apiLevel": 37,
+    "osIncremental": "S948BXXS4BZIG",
+    "gpu": "Adreno (TM) 840",
+    "driverRaw": 2150932499,
+    "vulkanVersion": "1.4.295",
+    "driverProperties": {
+      "available": true,
+      "driverId": 8,
+      "driverName": "Qualcomm Technologies Inc. Adreno Vulkan Driver",
+      "driverInfo": "Driver Build: 089d643e2a, Icecd8f0534, 1782882597\nDate: 07/01/26\nCompiler Version: E031.50.19.27\nDriver Branch: \n",
+      "conformanceVersion": "1.4.1.0"
+    }
+  },
+  "pipeline": {
+    "executionBackend": "RayTracingPipeline",
+    "instrumentation": "shipping",
+    "dielectricQuality": "mobile",
+    "bundleKey": "shipping_mobile_pair",
+    "opaqueFast": {
+      "key": "shipping_mobile_opaque_fast",
+      "sha256": "9b879fe1822c768486007295d62db5013e9c9e61d35814ef96a0b0baf239f1cc"
+    },
+    "genericDielectric": {
+      "key": "shipping_mobile_generic_dielectric",
+      "sha256": "8b4b2149ee60035befaacd4a7ec63def8ee79f401397fa6d74dfecc81d0004b9"
+    },
+    "activeStrategy": "opaque-fast",
+    "activeKey": "shipping_mobile_opaque_fast",
+    "activeSha256": "9b879fe1822c768486007295d62db5013e9c9e61d35814ef96a0b0baf239f1cc",
+    "waterQuality": "mobile"
+  },
+  "runs": {
+    "opening-a2": {
+      "artifact": "baseline",
+      "runId": "perf31-opening-a2",
+      "reportSha256": "6470490bc088925ed5949c232beff1ec744d3f5b9c695c35005796bee55fcb44",
+      "scope": {
+        "surfaceGeneration": 1,
+        "sceneEpoch": 3,
+        "measurementGeneration": 4,
+        "matchedCompletedFrames": 777,
+        "intervalCount": 776,
+        "durationNanoseconds": 43312501077,
+        "setupPresentationRowsExcluded": 0
+      },
+      "observedPresentedImagesPerSecond": 17.916305,
+      "intervalsMs": {
+        "median": 50.000001,
+        "p90NearestRank": 75.0,
+        "p95NearestRank": 87.500053,
+        "maximum": 204.166615
+      },
+      "simulation": {
+        "stateRows": 777,
+        "eventRows": 93,
+        "ticksThisFrameMaximum": 6,
+        "catchUpOverrunCountFirst": 1,
+        "catchUpOverrunCountLast": 26,
+        "catchUpOverrunDelta": 25
+      },
+      "thermalStart": {
+        "frameworkStatus": 0,
+        "celsius": {
+          "AP": 44.2,
+          "BAT": 33.2,
+          "SKIN": 36.8
+        }
+      },
+      "thermalEnd": {
+        "frameworkStatus": 0,
+        "celsius": {
+          "AP": 40.9,
+          "BAT": 33.8,
+          "SKIN": 36.5
+        }
+      },
+      "heldTorchViews": {
+        "unlit": {
+          "viewAnchor": {
+            "x": -30.4399,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": -1.5708,
+            "pitch": 0.0
+          },
+          "deviceLocalBytes": [
+            165960320
+          ],
+          "hostVisibleBytes": [
+            49644352
+          ],
+          "tlasInstances": [
+            31
+          ],
+          "blasCount": [
+            22
+          ],
+          "gpuStageMedianMs": {
+            "as": 0.386771,
+            "dispatch": 40.839322,
+            "transfer": 0.110365
+          },
+          "actualPresentIntervalMedianMs": 50.0
+        },
+        "lit": {
+          "viewAnchor": {
+            "x": -30.5033,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": -1.5708,
+            "pitch": 0.0
+          },
+          "deviceLocalBytes": [
+            165960320
+          ],
+          "hostVisibleBytes": [
+            49644352
+          ],
+          "tlasInstances": [
+            31
+          ],
+          "blasCount": [
+            22
+          ],
+          "gpuStageMedianMs": {
+            "as": 0.4572915,
+            "dispatch": 60.937212,
+            "transfer": 0.126771
+          },
+          "actualPresentIntervalMedianMs": 70.833334
+        }
+      }
+    },
+    "outdoor-a2": {
+      "artifact": "baseline",
+      "runId": "perf31-outdoor-a2",
+      "reportSha256": "032c794a42d6950d125cb7425339ee3a44485c9516f5d60930f9f8ba117a9e87",
+      "scope": {
+        "surfaceGeneration": 1,
+        "sceneEpoch": 3,
+        "measurementGeneration": 5,
+        "matchedCompletedFrames": 902,
+        "intervalCount": 901,
+        "durationNanoseconds": 60616642425,
+        "setupPresentationRowsExcluded": 0
+      },
+      "observedPresentedImagesPerSecond": 14.863905,
+      "intervalsMs": {
+        "median": 58.333281,
+        "p90NearestRank": 116.666666,
+        "p95NearestRank": 116.666719,
+        "maximum": 120.833386
+      },
+      "simulation": {
+        "stateRows": 902,
+        "eventRows": 56,
+        "ticksThisFrameMaximum": 6,
+        "catchUpOverrunCountFirst": 0,
+        "catchUpOverrunCountLast": 152,
+        "catchUpOverrunDelta": 152
+      },
+      "thermalStart": {
+        "frameworkStatus": 0,
+        "celsius": {
+          "AP": 44.3,
+          "BAT": 34.7,
+          "SKIN": 38.0
+        }
+      },
+      "thermalEnd": {
+        "frameworkStatus": 1,
+        "celsius": {
+          "AP": 45.2,
+          "BAT": 37.3,
+          "SKIN": 39.8
+        }
+      },
+      "heldViews": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6859,
+            "y": 2.05,
+            "z": -12.7802,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 3.101406,
+          "skinCpuMedianMs": 9.4575,
+          "cycleMedianMs": 115.218958,
+          "actualPresentIntervalMedianMs": 116.666667,
+          "gpuMedianMs": 100.151664,
+          "gpuStageMedianMs": {
+            "as": 0.547812,
+            "dispatch": 99.479789,
+            "transfer": 0.119167
+          }
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 0.2166665,
+          "skinCpuMedianMs": 6.599792,
+          "cycleMedianMs": 48.762474,
+          "actualPresentIntervalMedianMs": 50.0,
+          "gpuMedianMs": 39.4221605,
+          "gpuStageMedianMs": {
+            "as": 0.396172,
+            "dispatch": 38.904504,
+            "transfer": 0.119036
+          }
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0213,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 0.209375,
+          "skinCpuMedianMs": 6.392813,
+          "cycleMedianMs": 56.882917,
+          "actualPresentIntervalMedianMs": 58.333229,
+          "gpuMedianMs": 47.656718,
+          "gpuStageMedianMs": {
+            "as": 0.395417,
+            "dispatch": 47.146145,
+            "transfer": 0.114323
+          }
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 5.13224,
+          "skinCpuMedianMs": 9.687526,
+          "cycleMedianMs": 118.049635,
+          "actualPresentIntervalMedianMs": 116.6667185,
+          "gpuMedianMs": 100.9293465,
+          "gpuStageMedianMs": {
+            "as": 0.553359,
+            "dispatch": 100.2599975,
+            "transfer": 0.118516
+          }
+        }
+      },
+      "recordedResourceRanges": {
+        "device_local_bytes": {
+          "min": 152659776,
+          "max": 263839424
+        },
+        "host_visible_bytes": {
+          "min": 47315776,
+          "max": 53710080
+        },
+        "saved_owner_bytes": {
+          "min": 0,
+          "max": 8012544
+        },
+        "peak_overlap_bytes": {
+          "min": 0,
+          "max": 182201920
+        },
+        "tlas_instances": {
+          "min": 31,
+          "max": 31
+        },
+        "blas_count": {
+          "min": 22,
+          "max": 23
+        }
+      }
+    },
+    "outdoor-b1": {
+      "artifact": "candidate",
+      "runId": "perf31-outdoor-b1",
+      "reportSha256": "7e7127830b196838c589c9899b3fefd0e659563fb4995a3f11320b7950e38d38",
+      "scope": {
+        "surfaceGeneration": 1,
+        "sceneEpoch": 3,
+        "measurementGeneration": 6,
+        "matchedCompletedFrames": 904,
+        "intervalCount": 903,
+        "durationNanoseconds": 60745795601,
+        "setupPresentationRowsExcluded": 0
+      },
+      "observedPresentedImagesPerSecond": 14.865226,
+      "intervalsMs": {
+        "median": 58.333333,
+        "p90NearestRank": 116.666615,
+        "p95NearestRank": 116.666718,
+        "maximum": 125.000052
+      },
+      "simulation": {
+        "stateRows": 904,
+        "eventRows": 56,
+        "ticksThisFrameMaximum": 6,
+        "catchUpOverrunCountFirst": 0,
+        "catchUpOverrunCountLast": 153,
+        "catchUpOverrunDelta": 153
+      },
+      "thermalStart": {
+        "frameworkStatus": 0,
+        "celsius": {
+          "AP": 43.0,
+          "BAT": 34.0,
+          "SKIN": 37.2
+        }
+      },
+      "thermalEnd": {
+        "frameworkStatus": 0,
+        "celsius": {
+          "AP": 44.2,
+          "BAT": 36.2,
+          "SKIN": 38.7
+        }
+      },
+      "heldViews": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6879,
+            "y": 2.05,
+            "z": -12.783,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 2.729271,
+          "skinCpuMedianMs": 8.139583,
+          "cycleMedianMs": 114.083333,
+          "actualPresentIntervalMedianMs": 116.666666,
+          "gpuMedianMs": 100.712133,
+          "gpuStageMedianMs": {
+            "as": 0.54474,
+            "dispatch": 100.023279,
+            "transfer": 0.118333
+          }
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 0.197969,
+          "skinCpuMedianMs": 6.480234,
+          "cycleMedianMs": 48.4828385,
+          "actualPresentIntervalMedianMs": 50.0,
+          "gpuMedianMs": 39.4121085,
+          "gpuStageMedianMs": {
+            "as": 0.3897135,
+            "dispatch": 38.90328,
+            "transfer": 0.11901
+          }
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0179,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 0.227916,
+          "skinCpuMedianMs": 6.48026,
+          "cycleMedianMs": 57.180521,
+          "actualPresentIntervalMedianMs": 58.333282,
+          "gpuMedianMs": 47.562603,
+          "gpuStageMedianMs": {
+            "as": 0.390469,
+            "dispatch": 47.061405,
+            "transfer": 0.114427
+          }
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 2.9198955,
+          "skinCpuMedianMs": 8.9409635,
+          "cycleMedianMs": 116.496693,
+          "actualPresentIntervalMedianMs": 116.666667,
+          "gpuMedianMs": 100.9208565,
+          "gpuStageMedianMs": {
+            "as": 0.5479165,
+            "dispatch": 100.249529,
+            "transfer": 0.117943
+          }
+        }
+      },
+      "recordedResourceRanges": {
+        "device_local_bytes": {
+          "min": 152659776,
+          "max": 263839424
+        },
+        "host_visible_bytes": {
+          "min": 47315776,
+          "max": 53710080
+        },
+        "saved_owner_bytes": {
+          "min": 0,
+          "max": 8012544
+        },
+        "peak_overlap_bytes": {
+          "min": 0,
+          "max": 182201920
+        },
+        "tlas_instances": {
+          "min": 31,
+          "max": 31
+        },
+        "blas_count": {
+          "min": 22,
+          "max": 23
+        }
+      }
+    },
+    "outdoor-a3": {
+      "artifact": "baseline",
+      "runId": "perf31-outdoor-a3",
+      "reportSha256": "2f2345b664f2ebea8a2d34b25d39cfa8f6b8e6088be54d23a1f8c5972e70b858",
+      "scope": {
+        "surfaceGeneration": 1,
+        "sceneEpoch": 3,
+        "measurementGeneration": 5,
+        "matchedCompletedFrames": 786,
+        "intervalCount": 785,
+        "durationNanoseconds": 67320835183,
+        "setupPresentationRowsExcluded": 0
+      },
+      "observedPresentedImagesPerSecond": 11.66058,
+      "intervalsMs": {
+        "median": 70.833333,
+        "p90NearestRank": 137.499948,
+        "p95NearestRank": 149.999948,
+        "maximum": 250.000001
+      },
+      "simulation": {
+        "stateRows": 786,
+        "eventRows": 56,
+        "ticksThisFrameMaximum": 6,
+        "catchUpOverrunCountFirst": 0,
+        "catchUpOverrunCountLast": 220,
+        "catchUpOverrunDelta": 220
+      },
+      "thermalStart": {
+        "frameworkStatus": 0,
+        "celsius": {
+          "AP": 44.4,
+          "BAT": 34.2,
+          "SKIN": 37.5
+        }
+      },
+      "thermalEnd": {
+        "frameworkStatus": 0,
+        "celsius": {
+          "AP": 40.7,
+          "BAT": 34.9,
+          "SKIN": 37.0
+        }
+      },
+      "heldViews": {
+        "landing-sweep": {
+          "pose": {
+            "x": -33.6879,
+            "y": 2.05,
+            "z": -12.783,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 2.919062,
+          "skinCpuMedianMs": 8.293022,
+          "cycleMedianMs": 115.59,
+          "actualPresentIntervalMedianMs": 116.666667,
+          "gpuMedianMs": 100.973695,
+          "gpuStageMedianMs": {
+            "as": 0.550937,
+            "dispatch": 100.311612,
+            "transfer": 0.118281
+          }
+        },
+        "lower-sweep": {
+          "pose": {
+            "x": -33.7,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 0.234115,
+          "skinCpuMedianMs": 6.556562,
+          "cycleMedianMs": 60.820365,
+          "actualPresentIntervalMedianMs": 62.499895,
+          "gpuMedianMs": 51.461978,
+          "gpuStageMedianMs": {
+            "as": 0.509375,
+            "dispatch": 50.822655,
+            "transfer": 0.152031
+          }
+        },
+        "passage-sweep": {
+          "pose": {
+            "x": -22.0215,
+            "y": -0.95,
+            "z": -15.2,
+            "yaw": 1.5708,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 0.285573,
+          "skinCpuMedianMs": 6.617475,
+          "cycleMedianMs": 71.140547,
+          "actualPresentIntervalMedianMs": 70.8333335,
+          "gpuMedianMs": 61.6696075,
+          "gpuStageMedianMs": {
+            "as": 0.5027605,
+            "dispatch": 60.992967,
+            "transfer": 0.146224
+          }
+        },
+        "repeat-ascent": {
+          "pose": {
+            "x": -33.7,
+            "y": 2.05,
+            "z": -12.8,
+            "yaw": 3.14159,
+            "pitch": -0.15
+          },
+          "simulationCpuMedianMs": 5.081198,
+          "skinCpuMedianMs": 9.918724,
+          "cycleMedianMs": 135.2277865,
+          "actualPresentIntervalMedianMs": 133.333385,
+          "gpuMedianMs": 118.0070545,
+          "gpuStageMedianMs": {
+            "as": 0.5890885,
+            "dispatch": 117.3006745,
+            "transfer": 0.1248175
+          }
+        }
+      },
+      "recordedResourceRanges": {
+        "device_local_bytes": {
+          "min": 152659776,
+          "max": 263839424
+        },
+        "host_visible_bytes": {
+          "min": 47315776,
+          "max": 53710080
+        },
+        "saved_owner_bytes": {
+          "min": 0,
+          "max": 8012544
+        },
+        "peak_overlap_bytes": {
+          "min": 0,
+          "max": 182201920
+        },
+        "tlas_instances": {
+          "min": 31,
+          "max": 31
+        },
+        "blas_count": {
+          "min": 22,
+          "max": 23
+        }
+      }
+    }
+  },
+  "measurementLimits": [
+    "Generated-input chapter motion from isolated staged progression, not natural chapter or active combat acceptance.",
+    "Actual completed RT/display timestamp joins; rates are not reciprocal GPU timings or sustained playability.",
+    "Closing control drift and different thermal trajectories prevent causal whole-route speedup inference; clocks/power were not captured.",
+    "No Windows foreground/performance test; no dense forest cost acceptance."
+  ],
+  "validation": {
+    "androidBuilds": "Both offline arm64 Debug builds passed; -O2 native, Shipping/Mobile shader pair, route and GPU stage queries enabled.",
+    "host": "Control and candidate repeated-capacity terrain contracts passed; candidate selected terrain/step CTests 2/2 passed.",
+    "wrongTarget": "A third selected chapter-journey target was absent from the portable Release preset; that build command exited 1 before CTest. Two available affected tests were run separately and passed.",
+    "setupOnly": [
+      "opening-a1: stale completion sentinel; no motion timing.",
+      "outdoor-a1: waited benchmark windows despite valid ready ACK; no motion timing."
+    ],
+    "restoredProductionHost": "Two selected terrain/step Release CTests passed after restoring both source files, 3.55 s total."
+  },
+  "custody": {
+    "utc": "2026-10-31T22:07:40.642096+00:00",
+    "released": true,
+    "package": "com.samfa12.hordelanternrt.debug",
+    "installedApkSha256": "a9a2930a64c58c83de3e0399ee2dc31ee6f0e55c813746cfaaca83ce62496307",
+    "sourceCommit": "a89362dcea2e394f2ce78ac1f2622ab7eb9c8d8c",
+    "ownedAppStopped": true,
+    "preferencesByteIdentical": true,
+    "originalCampaignFilesUnchanged": 15,
+    "otherPackagesModified": false
+  },
+  "privateEvidence": {
+    "relativeRoot": "reports/mobile-efficiency-20261031",
+    "availability": "Raw bytes were locally read and checked during this pass; they remain ignored/private, not uploaded in this checkpoint.",
+    "sha256": {
+      "opening-a2/HordeLanternRT-benchmark-latest.json": "6470490bc088925ed5949c232beff1ec744d3f5b9c695c35005796bee55fcb44",
+      "opening-a2/thermals.json": "919a95c36c161acf3c4f606a85b9b97064defcb8ec693d93585d06b065a69d06",
+      "opening-a2/torch-analysis.json": "9ce48b429d33eccdf79b58db1e7c0b899c588a5ad0e9f6a37cf27062a15ddb21",
+      "opening-a2/android-motion-perf31-opening-a2-resources.csv": "bc0db2060a63a1325a7a3549838fbfa5f93bda5e8fe92d96a15019eb2ffe017a",
+      "outdoor-a2/HordeLanternRT-benchmark-latest.json": "032c794a42d6950d125cb7425339ee3a44485c9516f5d60930f9f8ba117a9e87",
+      "outdoor-a2/thermals.json": "34f7017b266b6dbbc939d524b166d6f712eb4b506777e3609306761929026627",
+      "outdoor-a2/cpu-analysis.json": "682cb43b251644055953a18148557dc092fca9b7845970f3ae5d4d224c4f2bf8",
+      "outdoor-a2/gpu-analysis.json": "3aebafd303f0f5092649812abafc6d7786135808fc66a1ecee7467c68220397d",
+      "outdoor-a2/android-motion-perf31-outdoor-a2-resources.csv": "2443cb20fe4e1dc1b9da83ef80d1012666c344f31acb21c6d917a71ee97868a2",
+      "outdoor-b1/HordeLanternRT-benchmark-latest.json": "7e7127830b196838c589c9899b3fefd0e659563fb4995a3f11320b7950e38d38",
+      "outdoor-b1/thermals.json": "0a9cf9662bd766622e5bf045a43479c8807585f8d0157cb3b3fccdb6e44b3472",
+      "outdoor-b1/cpu-analysis.json": "ef46ccd94544c0eeb042e6142753523b93b1b6e086aed0abf757bc6ef443a315",
+      "outdoor-b1/gpu-analysis.json": "b7181ba15c587e9000015c3991f12118f0d1eb186a8387ba0b404298eb84baa8",
+      "outdoor-b1/android-motion-perf31-outdoor-b1-resources.csv": "441bddf3532ddf4b7e437a1c4af879695f1883743f9234227877f462ab5893f7",
+      "outdoor-a3/HordeLanternRT-benchmark-latest.json": "2f2345b664f2ebea8a2d34b25d39cfa8f6b8e6088be54d23a1f8c5972e70b858",
+      "outdoor-a3/thermals.json": "b187ed9cdf6158e8423fa73f454bd447713989a1f8b09f7a62b7ba0538b23ce1",
+      "outdoor-a3/cpu-analysis.json": "e0baa6ce3bd48d76121086bc74a86ec751b058fd933e6370b29d71a857fe1abf",
+      "outdoor-a3/gpu-analysis.json": "0a0f8ba1f4344b56ff44cb4db6351204e1cf32113a8199b44cf981e69641d1d7",
+      "outdoor-a3/android-motion-perf31-outdoor-a3-resources.csv": "0b9c95b5ab87770627f117d4afdb59f5a113aaaad5e8766e0e443a8bc25a3123",
+      "baseline-package.json": "da50056885a4cbd80d580b9c58526acfae362884c5afa1904c8ad2e04c5dce67",
+      "candidate-package.json": "b3c170f7de32c6ccb858c203de828c1b6ae97f59293af7bc38f127d264927b2e",
+      "candidate.patch": "1359effcdbf3b6fa4c57266ef1df03b2f59725cd6ecd7a50dd0e6a1e329a8094",
+      "rejected-candidate-final.patch": "1359effcdbf3b6fa4c57266ef1df03b2f59725cd6ecd7a50dd0e6a1e329a8094",
+      "owner-preservation.json": "1f85c986db788484c441f37e082daa0b507216babb6b336260df58c939548707",
+      "custody-release.json": "26d3ab1c52f1bb57d72b38f469fb48a2611186eb5efe58041b97b960773b6a99",
+      "restored-host-tests.log": "6ad2aa7806e4475a0a3ab0df2a12b925755542e05285811fb474b83f9fd732f0"
+    }
+  },
+  "unchanged": [
+    "Saved settings byte-identical",
+    "15 original debug campaign files unchanged",
+    "151 parked owner files unchanged",
+    "Production and actor-worker packages untouched",
+    "Actor worker and failed full480 forest OFF",
+    "Original production renderer and collision code restored"
+  ],
+  "nextScope": "Owner explicitly requests historical fast-phone feature/regression attribution and measured selectable lower-cost effect options while retaining full-quality modes; not yet completed by this receipt.",
+  "effectiveSettings": {
+    "scalePercent": 33,
+    "width": 1440,
+    "height": 2971,
+    "internalWidth": 475,
+    "internalHeight": 980,
+    "nativeWindowWidth": 1440,
+    "nativeWindowHeight": 2971,
+    "surfaceCurrentWidth": 1440,
+    "surfaceCurrentHeight": 2971,
+    "surfaceCurrentTransform": 1,
+    "swapchainPreTransform": 1,
+    "rtPreRotationRequired": false,
+    "rtPresentationTransform": 0,
+    "backend": "RayTracingPipeline",
+    "water": 1,
+    "fire": 0,
+    "cap": 30,
+    "glass": false,
+    "shadow": 1,
+    "mist": false,
+    "dust": 1
+  }
+}

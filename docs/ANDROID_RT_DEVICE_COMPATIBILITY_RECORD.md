@@ -1,5 +1,22 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-31 UTC - current S26 RT presentation and bounded performance baseline
+
+**SM-S948B / Android17 API37**, OS `S948BXXS4BZIG`, Adreno840,
+Vulkan1.4.295, driver raw2150932499. Source
+`a89362dcea2e394f2ce78ac1f2622ab7eb9c8d8c`; dedicated Debug APK SHA256
+`a9a2930a64c58c83de3e0399ee2dc31ee6f0e55c813746cfaaca83ce62496307`.
+Shipping/Mobile RT Pipeline presented at475x980 /1440x2971 (unchanged saved33%).
+Opening-to-Keeper and ordinary chapter generated-input runs passed strict
+completed-frame/presentation timestamp joins. Actual rates17.916 and14.864
+images/s describe those bounded runs, not sustained performance or natural
+chapter/combat acceptance. A source-only scratch candidate provided no admitted
+whole-frame gain; the closing baseline drifted. Worker/full480 forest stayed OFF.
+
+Released22:07:40UTC with baseline Debug installed/stopped, saved settings and15
+original campaign files unchanged; no production/actor-worker package or system
+settings changes. [Exact identities, thermal limits and closed trial](evidence/2026-10-31-mobile-efficiency/README.md).
+
 ## 2026-10-30 19:20 UTC - current readiness correction, bounded natural start/lifecycle
 
 **SM-S948B / Android17**, Codex Debug APK SHA256 `e27e37f944730ed461954d2b0fb18fa74bf8f70e4d359e390e0cdfa933dd8ee2`, code10 / `1.6.2-debug`. Matching-certificate in-place update; `201e2d60` readiness runtime inputs unchanged by integrated `8291d269`. Real RT main menu and a fresh empty-slot New game reached the starting corridor without staged progress. The block lesson remained absent while stowed, appeared after sword draw, and portrait/landscape plus injected held-guard background/rotation cancellation were inspected. This is bounded RT presentation/input/lifecycle evidence, **not full natural chapter, human multi-touch/controller, authoritative combat mitigation or performance acceptance**.

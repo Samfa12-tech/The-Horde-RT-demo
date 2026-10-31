@@ -13,6 +13,10 @@
 
 ## Closed or retained rendering experiments
 
+**31 October current-device checkpoint:** [S26 current baseline and scratch trial](evidence/2026-10-31-mobile-efficiency/README.md), source `a89362dc`, 33% / Shipping-Mobile / Pipeline, actual presentation timestamps. Opening-to-Keeper17.916 images/s; ordinary chapter A2/B1/A3 controls14.864 /14.865 /11.661. Closing-control drift prevents a causal gain claim. Scratch initialization runtime candidate **CLOSED, NOT ADMITTED**; source restored. GPU dispatch dominates held exterior views (~100 ms versus ~0.55 ms AS). Worker and failed480-tree candidate remain OFF; no future dense-forest or sustained-playability acceptance. Exact artifact/shader/device identities and limitations are in the linked receipt.
+
+**Previously closed first-confirmed-blocker flags:** the [30 September decision](evidence/2026-09-30-first-blocker/DECISION.md) rejected admission after7,352 owning rows with changing thermal/power state and no demonstrated gain. Production flags were restored. Do not retry the unchanged flag variant; it is separate from selective primary opacity below.
+
 | Experiment / hypothesis | Exact cohort and observed result | Decision and reopening condition | Evidence / raw availability |
 | --- | --- | --- | --- |
 | **Selective primary opacity:** let hardware accept ordinary opaque hits while retaining body/water filtering. | Control source `8c65afa6`; Shipping APK prefixes `3cb84efb` / `b9d69ff4`. SM-S948B, Pipeline, Shipping/Mobile, 75%, 1080×2235 → 1440×2980; eight interleaved route/held-high runs, 9,752 joined frames. Image equivalence passed. Route mean-of-run cycle medians was +4.19%; held-high −3.54% was thermally qualified. No repeatable net saving. | **REJECT / NO-GO.** No unchanged rebuild/tuning/repeat. Reconsider only a materially different mechanism or new contrary matched evidence with review. | [Full decision and hashes](ENGINEERING_1_6_1_PRIMARY_OPACITY_2026-10-01.md). Report in Git; binaries, images and raw logs recorded in a local private experiment directory. |
