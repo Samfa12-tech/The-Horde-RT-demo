@@ -152,3 +152,19 @@ automatic mode were restored. Subsequent automatic brightness may vary normally.
 Rotation, production and actor-worker packages were untouched. No owned phone
 monitor or transfer remains. Earlier 22:07 custody statements above describe the
 first released block, not the later temporary brightness adjustment.
+
+## Follow-up: light-range stop and waterfall attribution
+
+The [23:11 checkpoint](WATERFALL_AND_LIGHT_RANGE.md) records a compiled private
+light-range probe with **no admissible candidate timing**, two valid baseline
+runs using corrected equal preparation/fresh-start acknowledgement, and the
+explicit thermal stop rules. Production source and the installed baseline were
+restored; the phone was released with saves/preferences unchanged.
+
+Separately, all three retained baseline routes reach their maximum GPU dispatch
+on the first approach switch to GenericDielectric near the waterfall. The
+2,396-frame analysis and source trace identify splash transmission as a useful
+next controlled comparison. They do not establish an isolated cost, a causal
+gain, or that resident water slows every frame. [Compact receipt and private
+artifact hashes](reach-waterfall-receipt.json). No runtime optimisation is
+admitted; full-quality options and the existing renderer contracts remain.

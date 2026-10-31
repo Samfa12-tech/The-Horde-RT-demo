@@ -79,3 +79,21 @@ has a weak case in the measured sub-millisecond stage. Existing rejected opacity
 player lookup, inverse-transform, mirror-removal and first-blocker trials are
 not queued for unchanged repeats. Texture LOD and reconstruction remain unproven
 mechanisms with their own appearance and ownership requirements.
+
+## Later checkpoint: water-contact strategy selection
+
+The [light-range and waterfall follow-up](evidence/2026-10-31-mobile-efficiency/WATERFALL_AND_LIGHT_RANGE.md)
+corrected preparation and compiled the private range candidate, but thermal
+admission stopped both candidate timing attempts. Source is restored and there
+is no light-range gain claim. The same pass found a more specific historical
+lead: commit `e18f17b4` (10 October) introduced shared water-contact droplets
+whose transmissive material can select GenericDielectric for the whole frame.
+That is later than the original August waterfall, so those two additions should
+not be treated as one historical feature cost.
+
+All three retained current baseline routes hit their maximum dispatch on the
+first approach GenericDielectric frame beside the waterfall. Later wet footsteps
+can continue generating droplets. Neither the exact active contributor count nor
+water pixel coverage is recorded, and torch/camera state changes alongside the
+strategy. Next isolate splash treatment with full water/lighting retained before
+inferring a causal regression or choosing a lower-cost selectable presentation.

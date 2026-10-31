@@ -1,5 +1,25 @@
 # Android RT Device Compatibility Record
 
+## 2026-10-31 23:11 UTC - light-range probe unmeasured; waterfall attribution
+
+Same SM-S948B / Android 17 / Adreno 840 baseline identity and saved 33% settings
+as below. Corrected equal-warmup/fresh-checkpoint baseline routes joined 847 and
+772 frames at 19.619 and 17.799 actual presented images/s; they are separate
+thermal cohorts, not comparable optimisation results. The private light-range
+APK passed compatible installation/start, but candidate timing was refused at
+declared thermal gates. No new quality/default/runtime change is admitted.
+
+Analysis of three existing baseline traces (2,396 frames) associates the largest
+waterfall-area dispatch spikes with the first general-transmission shader frame.
+This is observational profiling and source attribution, not isolated water cost,
+natural play acceptance or a proven fix. [Evidence and exact candidate identity](evidence/2026-10-31-mobile-efficiency/WATERFALL_AND_LIGHT_RANGE.md).
+
+Released **23:11:42 UTC**: baseline APK SHA-256
+`a9a2930a64c58c83de3e0399ee2dc31ee6f0e55c813746cfaaca83ce62496307`
+installed/stopped, original preferences and all 15 campaign files verified.
+Temporary display brightness restored to automatic mode; rotation unchanged.
+Production/actor-worker packages untouched, no owned device operations remain.
+
 
 ## 2026-10-31 22:39 UTC - same-artifact Fire Low comparison, inconclusive
 
