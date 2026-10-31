@@ -9,6 +9,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <vector>
 
 namespace
 {
@@ -44,6 +45,13 @@ int main()
     auto bakedForest=forestArgs;bakedForest[1]=L"baked-resident";
     Check(ParseForestRouteProofLaunch(bakedForest,true).mode==ForestRouteCaptureMode::BakedResident &&
           ParseForestRouteProofLaunch(bakedForest,true).error.empty(),"existing baked control remains independently selectable");
+    auto northArgs=forestArgs;northArgs[1]=L"baked-f01-north68";
+    Check(ParseForestRouteProofLaunch(northArgs,true).mode==ForestRouteCaptureMode::BakedF01North68 &&
+        ParseForestRouteProofLaunch(northArgs,true).error.empty(),"baked68 prototype requires explicit hidden selection");
+    Check(!ParseForestRouteProofLaunch(northArgs,false).error.empty(),"normal Release rejects prototype68");
+    std::vector<std::wstring_view> duplicateNorth(northArgs.begin(),northArgs.end());
+    duplicateNorth.push_back(L"--forest-route-proof");duplicateNorth.push_back(L"f01-grouped-r4");
+    Check(!ParseForestRouteProofLaunch(duplicateNorth,true).error.empty(),"overlapping68 and old76 rosters cannot combine");
     auto sectorArgs=forestArgs;sectorArgs[1]=L"f01-sector";
     Check(ParseForestRouteProofLaunch(sectorArgs,true).mode==ForestRouteCaptureMode::SharedF01Sector76 &&
           ParseForestRouteProofLaunch(sectorArgs,true).error.empty(),"F01 sector is a separate explicit hidden composition proof");

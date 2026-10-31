@@ -1,5 +1,5 @@
 // RayQuery compute variant key: rayquery_compute_diagnostic_high_opaque_fast
-// RayQuery compute dependency SHA-256: 3fededc1e2b4defe1b6ec23af5944ae2f023d59ae9ddd72f03e8efcf3aed53e9
+// RayQuery compute dependency SHA-256: 5f0db763ec26867b2d689aab472ee5bea4e2f5fc891fb77e38e4a0ce01b81628
     0x07230203u, 0x00010500u, 0x0008000bu, 0x0001f7b6u, 0x00000000u, 0x00020011u, 0x00000001u, 0x00020011u,
     0x00000032u, 0x00020011u, 0x00001178u, 0x0006000au, 0x5f565053u, 0x5f52484bu, 0x5f796172u, 0x72657571u,
     0x00000079u, 0x0006000bu, 0x00000001u, 0x4c534c47u, 0x6474732eu, 0x3035342eu, 0x00000000u, 0x0003000eu,

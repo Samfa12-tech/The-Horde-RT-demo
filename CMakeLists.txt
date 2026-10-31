@@ -1071,6 +1071,8 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_forest_dressing_tests PRIVATE horde_gameplay_simulation)
     target_compile_definitions(horde_rt_forest_dressing_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     add_test(NAME horde_rt_forest_dressing_tests COMMAND horde_rt_forest_dressing_tests)
+    add_test(NAME horde_rt_f01_north_grove_tests COMMAND horde_rt_forest_dressing_tests --f01-north68)
+    set_tests_properties(horde_rt_f01_north_grove_tests PROPERTIES TIMEOUT 30)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
     add_test(NAME horde_rt_forest_runtime_roster_tests COMMAND ${Python3_EXECUTABLE}
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/ForestRuntimeRosterTests.py)

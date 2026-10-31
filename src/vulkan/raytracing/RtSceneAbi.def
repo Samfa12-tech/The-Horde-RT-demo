@@ -3,7 +3,7 @@
   "sceneCounts": { "ordinaryShowcaseTlasInstances": 31 },
   "capacities": {
     "instanceMetadata": 30,
-    "tlasInstances": 107,
+    "tlasInstances": 111,
     "staticAssets": 15,
     "primitives": 38,
     "materials": 34,

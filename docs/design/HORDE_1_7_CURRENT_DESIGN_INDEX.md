@@ -1979,3 +1979,5 @@ incremental zone streaming and the remaining chapter presentation/physical
 gates remain open; the full-owner diagnostic does not establish eviction.
 
 - [31 October enemy-hit particle source candidate](../evidence/2026-10-31-enemy-hit-particles/README.md): bounded successful-contact bone/dark-drop fans on the shared mote path; native visual/phone cost unaccepted, no forest change.
+
+- [31 October F01 north68 prototype](../evidence/2026-10-31-f01-north68/README.md): exclusive four-tree baked stand, same-terrain native bark collision and fresh CPU retention-source proof; normal64 unchanged, actual RT/motion/device cost acceptance pending.
