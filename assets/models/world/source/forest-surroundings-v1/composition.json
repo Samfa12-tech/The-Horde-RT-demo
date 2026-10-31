@@ -6,6 +6,7 @@
   "mapSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
   "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
   "originalPlacementsSha256": "fd57843aa4b87671dd107627c8b586a67ddbe1a8c08b62705a920dbb11ea106b",
+  "editableTextIdentity": "originalPlacementsSha256 and existingRockSourceSha256 hash UTF-8 LF-normalized text; all binary/frozen-archive inputs and generated outputs retain exact-byte checks",
   "route": [
   [
     -33.7,

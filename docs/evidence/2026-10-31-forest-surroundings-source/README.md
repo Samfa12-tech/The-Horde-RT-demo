@@ -72,7 +72,7 @@ admitted. Source-only data cannot activate the prototype in either platform.
   manifest, with actual counts/bounds; no Vulkan device or app starts.
 - Installed glTF Validator2.0.0-dev.3.10 reports zero errors/warnings on all five
   final files. [Compact exact-file receipt](validation.json). No dependency install.
-- Nine Python source contracts cover exact regeneration,480 unique roots,
+- Ten Python source contracts cover exact regeneration,480 unique roots,
   unchanged originals/textures, topology/UV/normals/tangents/budgets, grouped stand
   populations, closed non-crossing boundaries, protected path/graves/shaft,
   conservative detail/grounding and rejection of changed originals, duplicate
@@ -91,6 +91,15 @@ admitted. Source-only data cannot activate the prototype in either platform.
   the frozen source bytes and rejects empty buffer views. The failed GLBs/test log
   stay private under ignored `reports/forest-surroundings-v1-20261031/` alongside
   initial sparse previews and final validation. No failed candidate was admitted.
+- Exact-head run41183933350 at18c8d57b passed five jobs but MSVC failed two
+  source-identity assertions within the new Python contract (169/170 CTests passed).
+  Its reported placement/rock hashes exactly equal CRLF checkouts of the same
+  versioned text. The correction explicitly hashes these two editable inputs in
+  canonical UTF-8/LF form; binary/frozen-archive and generated output checks stay
+  exact. A new temp-only CRLF fixture regenerates every output byte and changed
+  text/bare-CR negative probes remain. No original input or existing assertion,
+  deadline, runtime quality or coverage was discarded. Corrected-head CI must be
+  read separately; the original failure log is retained privately.
 - Optional game-dev CLI is absent; no install/provider substitution. Blender5.2
   CPU studio previews and the source map are authoring evidence only. Large editable
   preview scenes/raw logs remain ignored; only representative images are retained.

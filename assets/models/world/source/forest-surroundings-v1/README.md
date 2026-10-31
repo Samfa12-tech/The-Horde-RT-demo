@@ -21,6 +21,10 @@ points and the 76.264 m path. Tree circles on the original map are massing inten
 not locked counts. Terrain support comes from the exact imported r23 GLB, not
 planning heights or route-ribbon extrapolation. The frozen original64 roster and
 all original model/image bytes remain unchanged.
+The two editable placement-JSON/native-rock-C++ text input identities use explicit
+UTF-8 LF-normalized SHA256, so Git's normal CRLF checkout does not change their
+identity. Frozen reference/archive inputs and all GLB/PNG/generated output checks
+remain byte-exact. Existing input files are never rewritten to enforce this.
 
 ## Authored outputs
 

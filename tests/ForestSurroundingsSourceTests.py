@@ -4,7 +4,9 @@ import importlib.util
 import json
 import math
 from pathlib import Path
+import tempfile
 import unittest
+from unittest import mock
 
 ROOT=Path(__file__).resolve().parents[1]
 HERE=ROOT/'assets/models/world/source/forest-surroundings-v1'
@@ -108,8 +110,22 @@ class SourceTests(unittest.TestCase):
         rocks=self.layout['existingRockReferences']
         self.assertEqual([r['nativePlacementIndex'] for r in rocks],list(range(12)))
         self.assertTrue(all(r['referenceOnly'] for r in rocks))
-        self.assertEqual(self.layout['existingRockSourceSha256'],author.sha((ROOT/'src/scene/ForestRockDressing.cpp').read_bytes()))
+        self.assertEqual(self.layout['existingRockSourceSha256'],author.source_text_sha((ROOT/'src/scene/ForestRockDressing.cpp').read_bytes()))
         self.assertTrue(all(r['nearestBoundaryRun'] in {e['id'] for e in self.layout['boundary']} for r in rocks))
+
+    def test_crlf_editable_inputs_reproduce_exact_outputs_without_owner_writes(self):
+        original=author.PLACEMENTS.read_bytes().replace(b'\r\n',b'\n')
+        # Test only a new owned temp fixture; existing source/assets are read-only.
+        with tempfile.TemporaryDirectory(prefix='horde-forest-source-eol-') as tmp:
+            target=Path(tmp).resolve()
+            self.assertTrue(target.is_relative_to(Path(tempfile.gettempdir()).resolve()))
+            fixture=target/'placements-crlf.json';fixture.write_bytes(original.replace(b'\n',b'\r\n'))
+            with mock.patch.object(author,'PLACEMENTS',fixture):
+                for name,data in author.produce().items():self.assertEqual((HERE/name).read_bytes(),data,name)
+        rock=(ROOT/'src/scene/ForestRockDressing.cpp').read_bytes().replace(b'\r\n',b'\n')
+        self.assertEqual(author.source_text_sha(rock),author.source_text_sha(rock.replace(b'\n',b'\r\n')))
+        self.assertNotEqual(author.source_text_sha(rock),author.source_text_sha(rock+b'// changed input\n'))
+        with self.assertRaisesRegex(ValueError,'bare CR'):author.source_text_sha(b'invalid\rsource')
 
     def test_duplicate_changed_original_and_fake_admission_rejected(self):
         d=copy.deepcopy(self.layout);d['placements'][-1].update(x=d['placements'][0]['x'],z=d['placements'][0]['z'])

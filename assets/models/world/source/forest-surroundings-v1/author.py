@@ -40,6 +40,16 @@ def require(ok, message):
 
 
 def sha(data): return hashlib.sha256(data).hexdigest()
+def source_text_sha(data):
+    """Git's editable text identity, independent of checkout LF/CRLF policy.
+
+    Only explicitly named editable JSON/C++ inputs use this. Frozen archives,
+    binary geometry/images and all generated outputs keep exact-byte identity.
+    """
+    data.decode('utf-8')
+    canonical=data.replace(b'\r\n',b'\n')
+    require(b'\r' not in canonical,'Unsupported bare CR in editable source text')
+    return sha(canonical)
 def encoded(d): return (json.dumps(d, indent=2, allow_nan=False) + '\n').encode()
 def encoded_layout(layout):
     # Keep each generated placement/panel as one reviewable stable-ID row.
@@ -398,7 +408,7 @@ def composition(assets,tips):
         nearest=min(boundary,key=lambda e:project(point,[(e['a'][0],e['a'][2]),(e['b'][0],e['b'][2])])[0])
         rocks.append({'nativePlacementIndex':i,'sourceIndex':int(source),'x':round(point[0],6),'z':round(point[1],6),'terrainY':round(ground(*point),6),'yaw':yaw,'scale':scale,'nearestBoundaryRun':nearest['id'],'referenceOnly':True})
     require(len(rocks)==12,'Existing rock roster changed')
-    return {'schema':1,'status':'SOURCE-ONLY, NOT RUNTIME BOUNDARY/COLLISION/FOREST ADMISSION','seed':SEED,'coordinates':'native X east, Y up, Z south; R2 X=E+78.3, Z=126.2-N','mapSha256':sha(MAP.read_bytes()),'terrainSha256':sha(TERRAIN.read_bytes()),'originalPlacementsSha256':sha(PLACEMENTS.read_bytes()),'route':route,'clearTrailWidth':2.4,'corridorHalfWidth':2.4,'pockets':pockets,'originalTrunkClearancePockets':trunkPockets,'windows':windows,'townKeepout':townKeepout,'riverClearance':14,'standAnchors':stands,'boundary':boundary,'existingRockReferences':rocks,'existingRockSourceSha256':sha(rock_source),'placements':rows,'counts':dict(counts),'candidateTreeTriangles':323264+trees,'addedTreeRawUpperBytes':trees*140,'boundaryGeometryPolicy':'Closed conservative source contour; fences close every unproven bank/rock gap. Endpoint-height conformance keeps posts vertical. Replace fallback runs with grounded rocks/existing banks only after actual-mesh/capsule validation. No invisible barrier or old collision removal.','retention':'No old ordinary/shared certificate applies automatically; candidate full-source retention/recreation proof required at integration.','admission':{'normalDefault':False,'boundary':False,'collisionExemption':False,'nativeImporter':False,'rtVisuals':False,'gpuCost':False}}
+    return {'schema':1,'status':'SOURCE-ONLY, NOT RUNTIME BOUNDARY/COLLISION/FOREST ADMISSION','seed':SEED,'coordinates':'native X east, Y up, Z south; R2 X=E+78.3, Z=126.2-N','mapSha256':sha(MAP.read_bytes()),'terrainSha256':sha(TERRAIN.read_bytes()),'originalPlacementsSha256':source_text_sha(PLACEMENTS.read_bytes()),'editableTextIdentity':'originalPlacementsSha256 and existingRockSourceSha256 hash UTF-8 LF-normalized text; all binary/frozen-archive inputs and generated outputs retain exact-byte checks','route':route,'clearTrailWidth':2.4,'corridorHalfWidth':2.4,'pockets':pockets,'originalTrunkClearancePockets':trunkPockets,'windows':windows,'townKeepout':townKeepout,'riverClearance':14,'standAnchors':stands,'boundary':boundary,'existingRockReferences':rocks,'existingRockSourceSha256':source_text_sha(rock_source),'placements':rows,'counts':dict(counts),'candidateTreeTriangles':323264+trees,'addedTreeRawUpperBytes':trees*140,'boundaryGeometryPolicy':'Closed conservative source contour; fences close every unproven bank/rock gap. Endpoint-height conformance keeps posts vertical. Replace fallback runs with grounded rocks/existing banks only after actual-mesh/capsule validation. No invisible barrier or old collision removal.','retention':'No old ordinary/shared certificate applies automatically; candidate full-source retention/recreation proof required at integration.','admission':{'normalDefault':False,'boundary':False,'collisionExemption':False,'nativeImporter':False,'rtVisuals':False,'gpuCost':False}}
 
 
 def inspect(data):
