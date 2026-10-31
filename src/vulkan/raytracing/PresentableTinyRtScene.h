@@ -26,6 +26,7 @@
 #include "scene/DevelopmentWorldGeometry.h"
 #include "scene/ChapterRegionalWater.h"
 #include "scene/ForestDressing.h"
+#include "scene/ForestSurroundings.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
 #include "gameplay/traversal/RescueTraversal.h"
 
@@ -349,7 +350,7 @@ public:
 
     void Destroy();
 #if defined(_DEBUG)
-    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64, SharedF01Grouped76, BakedF01North68 };
+    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64, SharedF01Grouped76, BakedF01North68, BakedSurroundings480 };
     bool SetForestRouteProofMode(ForestRouteProofMode mode, std::string& diagnostic);
     [[nodiscard]] std::string ForestRouteProofJson() const;
 #endif
@@ -398,7 +399,7 @@ public:
     // Explicit representation fallback; select before initialisation. This does
     // not change settings, geometry quality, placement, collision or save state.
     bool SetSharedForestGeometryEnabled(bool enabled) {
-        if(enabled && SelectF01NorthGrovePrototype())return false;
+        if(enabled && (SelectF01NorthGrovePrototype() || SelectForestSurroundingsPrototype()))return false;
         if((ready_ || device_!=VK_NULL_HANDLE) && enabled!=sharedForestGeometryEnabled_)return false;
         sharedForestGeometryEnabled_=enabled;return true;
     }
@@ -1409,6 +1410,7 @@ private:
     bool sharedForestGeometryActive_=false;
     bool SelectSharedForestGeometry() const noexcept;
     bool SelectF01NorthGrovePrototype() const noexcept;
+    bool SelectForestSurroundingsPrototype() const noexcept;
     bool UsesSharedForestGeometry() const noexcept { return sharedForestGeometryActive_; }
     bool UsesSharedForestRetention() const noexcept;
     bool UsesSupplementalForestProof() const noexcept;
@@ -1431,6 +1433,7 @@ private:
     std::uint32_t forestRetentionOmittedCount_=0;
     horde::scene::ForestDressingSharedLayout forestSharedLayout_{};
     std::shared_ptr<const horde::scene::F01NorthGrovePrototype> forestF01NorthPrototype_;
+    std::shared_ptr<const horde::scene::PreparedForestSurroundings> forestSurroundingsPrototype_;
     std::array<AccelerationStructure, 2u> forestMasterBlas_{};
     Buffer forestMasterBuildScratch_{};
     RtGpuWorkLease forestMasterBuildWork_{};

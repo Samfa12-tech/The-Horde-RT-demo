@@ -1063,7 +1063,7 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_bellwether_shell_tests COMMAND horde_rt_bellwether_shell_tests)
 
     add_executable(horde_rt_forest_dressing_tests
-        tests/ForestDressingTests.cpp src/scene/ForestDressing.cpp src/scene/ForestUnderstory.cpp src/scene/ForestRockDressing.cpp src/scene/ForestDeadwood.cpp src/scene/ForestRoadClue.cpp src/scene/BellwetherShell.cpp src/scene/TombDressing.cpp src/scene/GraveyardDressing.cpp
+        tests/ForestDressingTests.cpp src/scene/ForestDressing.cpp src/scene/ForestSurroundings.cpp src/scene/ForestUnderstory.cpp src/scene/ForestRockDressing.cpp src/scene/ForestDeadwood.cpp src/scene/ForestRoadClue.cpp src/scene/BellwetherShell.cpp src/scene/TombDressing.cpp src/scene/GraveyardDressing.cpp
         src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp
         src/vulkan/raytracing/RtStaticMeshSlot.cpp)
@@ -1073,6 +1073,8 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_forest_dressing_tests COMMAND horde_rt_forest_dressing_tests)
     add_test(NAME horde_rt_f01_north_grove_tests COMMAND horde_rt_forest_dressing_tests --f01-north68)
     set_tests_properties(horde_rt_f01_north_grove_tests PROPERTIES TIMEOUT 30)
+    add_test(NAME horde_rt_forest_surroundings_native_tests COMMAND horde_rt_forest_dressing_tests --surroundings480)
+    set_tests_properties(horde_rt_forest_surroundings_native_tests PROPERTIES TIMEOUT 60)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
     add_test(NAME horde_rt_forest_surroundings_source_tests COMMAND ${Python3_EXECUTABLE}
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/ForestSurroundingsSourceTests.py)

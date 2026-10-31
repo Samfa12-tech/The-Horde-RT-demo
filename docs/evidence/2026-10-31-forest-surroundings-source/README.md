@@ -117,3 +117,12 @@ frame work, followed by coordinated Android correctness/cost. Original4-tree
 proofs remain controls, not completion. Sustained phone optimisation is ongoing,
 not a fixed-FPS release veto. Audio/haptic revalidation for this source-only slice:
 **NO**. Prior input/contact-audio/particle acceptance remains separately open.
+
+
+## Subsequent bounded native checkpoint
+
+The separately approved opt-in integration and native checks are now recorded in
+[the native receipt](../2026-10-31-forest-surroundings-native/README.md).
+This supersedes the source-only next-step status above, without turning the
+source maps/studio images into gameplay evidence. Actual RT views fail the
+surrounding-forest goal; normal play remains unchanged.

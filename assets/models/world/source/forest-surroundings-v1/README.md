@@ -103,7 +103,7 @@ python assets/models/world/source/forest-surroundings-v1/author.py --check
 python tests/ForestSurroundingsSourceTests.py
 ```
 
-`--write` deliberately regenerates only this draft package's fixed eight outputs.
+`--write` deliberately regenerates only this draft package's fixed nine outputs.
 It never writes original sources, shipping rosters, capacities or gameplay state.
 The native static-GLB test's `--inspect-candidate GLB MANIFEST` option supplies
 separate actual native importer evidence; it starts no Vulkan device or game.
@@ -119,3 +119,12 @@ upward/side/reverse views, landmark preservation, lifecycle/recreation and resou
 measurements. Follow with coordinated Android correctness/cost evidence. This
 package does not close the owner's surrounding-forest goal. Performance remains
 ongoing optimisation rather than a fixed-FPS release veto.
+
+
+Native checkpoint (31 October): the Debug-only `baked-surroundings480` hidden
+capture now consumes the generated typed roster and native GLBs. Normal/default
+and packaged Release content remain unchanged. See
+[actual RT evidence](../../../../../docs/evidence/2026-10-31-forest-surroundings-native/README.md).
+Native preparation/recreation passed, but F01 remains scattered and F04 is
+visually dominated by a fence across the onward trail. The candidate is **not
+visually admitted** and does not complete the forest requirement.

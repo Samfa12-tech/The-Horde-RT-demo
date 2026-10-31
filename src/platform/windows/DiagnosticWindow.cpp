@@ -6514,6 +6514,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
             ctx.lastRtFrameError="Normal shared forest must be selected before scene creation.";return false;
         }
         const auto mode=normalShared?Mode::Disabled:
+            ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::BakedSurroundings480?
+            Mode::BakedSurroundings480:
             ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::BakedF01North68?
             Mode::BakedF01North68:
             ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::SharedExisting64?

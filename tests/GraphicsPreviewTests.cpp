@@ -49,6 +49,13 @@ int main()
     Check(ParseForestRouteProofLaunch(northArgs,true).mode==ForestRouteCaptureMode::BakedF01North68 &&
         ParseForestRouteProofLaunch(northArgs,true).error.empty(),"baked68 prototype requires explicit hidden selection");
     Check(!ParseForestRouteProofLaunch(northArgs,false).error.empty(),"normal Release rejects prototype68");
+    auto surroundings=forestArgs;surroundings[1]=L"baked-surroundings480";
+    Check(ParseForestRouteProofLaunch(surroundings,true).mode==ForestRouteCaptureMode::BakedSurroundings480 &&
+          ParseForestRouteProofLaunch(surroundings,true).error.empty(),"full-route480 requires explicit hidden Debug capture");
+    Check(!ParseForestRouteProofLaunch(surroundings,false).error.empty(),"Release cannot activate source-only480 forest");
+    auto visibleSurroundings=surroundings;visibleSurroundings[2]=L"--unrelated";
+    Check(!ParseForestRouteProofLaunch(visibleSurroundings,true).error.empty(),"full-route480 cannot expose unaccepted interactive route");
+
     std::vector<std::wstring_view> duplicateNorth(northArgs.begin(),northArgs.end());
     duplicateNorth.push_back(L"--forest-route-proof");duplicateNorth.push_back(L"f01-grouped-r4");
     Check(!ParseForestRouteProofLaunch(duplicateNorth,true).error.empty(),"overlapping68 and old76 rosters cannot combine");

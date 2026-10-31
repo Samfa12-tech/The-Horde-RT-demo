@@ -3,6 +3,7 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
+#include "scene/ForestSurroundings.h"
 #include "scene/CorridorRegionalWaterClosure.h"
 #include "scene/ForestUnderstory.h"
 #include "scene/ForestRockDressing.h"
@@ -1054,6 +1055,107 @@ void TestF01NorthPrototype()
     std::cout<<"F01 north68: extraTriangles=20102 extraVertices=22438 collisionTriangles="<<grove->CollisionTriangles()<<" rootTips="<<tips<<"; actual-source CPU proof, not GPU/visual acceptance\n";
 }
 
+void TestFullSurroundings()
+{
+    std::string diagnostic;
+    auto owner=LoadCollapse(diagnostic);
+    std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain;
+    std::shared_ptr<const PreparedForestDressing> original;
+    TombDressingBuildReport tomb; GraveyardDressingReport graves; ForestDressingBuildReport forest;
+    ForestUnderstoryReport understory; ForestRockReport rocks; ForestDeadwoodReport wood; ForestRoadClueReport clue;
+    const bool ready=AppendPreparedTombDressing(kRoot/"assets",owner,tomb,diagnostic) &&
+        AppendChapterTerrain(kRoot/"assets",owner,terrain,diagnostic) &&
+        AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graves,diagnostic) &&
+        AppendBellwetherShell(kRoot/"assets",owner,diagnostic) &&
+        PrepareForestDressing(kRoot/"assets",original,diagnostic,terrain.get()) &&
+        AppendPreparedForestDressing(*original,owner,forest,diagnostic) &&
+        AppendPreparedForestUnderstory(kRoot/"assets",owner,*terrain,understory,diagnostic) &&
+        AppendPreparedForestRocks(kRoot/"assets",owner,terrain,rocks,diagnostic) &&
+        AppendPreparedForestDeadwood(kRoot/"assets",owner,terrain,wood,diagnostic) &&
+        AppendForestRoadClue(kRoot/"assets",owner,terrain,clue,diagnostic) &&
+        ConsolidateWorldBakedMaterialFamilies(owner,diagnostic);
+    Check(ready,diagnostic);if(!ready)return;
+    const auto baseline=owner;const auto baselineTerrain=terrain;
+    const auto originalPlacements=original->placements;
+    std::shared_ptr<const PreparedForestSurroundings> result;
+    const bool accepted=AppendPreparedForestSurroundings(kRoot/"assets",*original,owner,terrain,result,diagnostic);
+    Check(accepted,diagnostic);if(!accepted)return;
+    const auto& r=result->report;
+    Check(r.extraTrees==416 && r.addedTreeTriangles==191776 && r.boundaryContained &&
+          r.fenceRuns+r.naturalBankRuns==196 && r.fenceTriangles==r.fenceRuns*48 && r.boundaryCollisionTriangles==r.fenceRuns*20,
+          "full study owns exact additional trees and only rendered closed-loop boundary solids");
+    Check(owner.materials.size()==baseline.materials.size() && owner.primitives.size()==baseline.primitives.size() &&
+          owner.indices.size()==baseline.indices.size()+r.addedIndices && owner.HasValidTriangleProvenance(),
+          "full study reuses all existing material/primitive/asset roles without capacity growth");
+    Check(terrain!=baselineTerrain && terrain->TriangleCount()==baselineTerrain->TriangleCount() &&
+          terrain->NonWalkableTriangleCount()==baselineTerrain->NonWalkableTriangleCount()+r.boundaryCollisionTriangles &&
+          result->terrain==terrain && original->placements.size()==originalPlacements.size(),
+          "immutable boundary publication retains original ground and existing nonwalkable geometry");
+    // Compare the playable corridor to the original support, rather than
+    // declaring every pre-existing obstruction a new fence regression.
+    constexpr std::array<std::array<float,2>,6> route{{{-33.7f,-12.8f},{-28.7f,-5.8f},{-15.7f,.2f},
+        {-17.7f,15.2f},{-3.7f,20.2f},{13.3f,36.2f}}};
+    bool clearance=true;std::size_t clearanceProbes=0;
+    for(std::size_t segment=1;segment<route.size();++segment) {
+        const auto a=route[segment-1],b=route[segment];const float dx=b[0]-a[0],dz=b[1]-a[1],len=std::hypot(dx,dz);
+        const int steps=int(std::ceil(len/.15f));
+        for(int i=0;i<=steps;++i)for(float lateral:{-.95f,0.f,.95f}) {
+            const float x=a[0]+dx*float(i)/steps-dz/len*lateral,z=a[1]+dz*float(i)/steps+dx/len*lateral;
+            const auto ground=baselineTerrain->Query(x,z);if(!ground.found)continue;
+            for(float height:{.75f,1.8f}) {
+                const bool oldClear=baselineTerrain->NonWalkableVolumeClear(x,z,x,z,ground.worldY+.05f,ground.worldY+height,.22f);
+                const bool newClear=terrain->NonWalkableVolumeClear(x,z,x,z,ground.worldY+.05f,ground.worldY+height,.22f);
+                clearance=clearance && (!oldClear || newClear);++clearanceProbes;
+            }
+        }
+    }
+    Check(clearance,"actual new boundary solids retain standing/crouched route width wherever the original scene was clear");
+    using namespace horde::vulkan::raytracing;
+    const auto flags=static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    RtStaticMeshSlot packed;
+    Check(packed.Initialize(std::array{StaticRtAssetRegistration{0,100,flags,0,&owner}},diagnostic),diagnostic);
+    const auto source=std::make_shared<const RtStaticMeshSlot>(packed);
+    // Exercise source-specific removal/restore plumbing with a fresh exact set.
+    // This is deliberately NOT an admitted ray-contributor/visibility proof.
+    std::vector<std::uint32_t> omissions;
+    for(const auto& primitive:source->PrimitiveMetadata())for(std::size_t i=primitive.indexOffset;i<primitive.indexOffset+primitive.indexCount;i+=3) {
+        bool far=source->TriangleRegions()[i/3]==StaticTriangleRegion::ExteriorDressing;
+        for(unsigned c=0;c<3;++c)far=far && source->Vertices()[primitive.vertexOffset+source->Indices()[i+c]].position[2]>60.f;
+        if(far)omissions.push_back(static_cast<std::uint32_t>(i/3));
+    }
+    auto proof=RtStaticTriangleOmissions::Create(source,0,omissions,diagnostic);
+    Check(proof && !omissions.empty(),"fresh480 exact-source subset passes CPU structural admission only");
+    auto copy=[&](bool reduced) {
+        RtStaticMeshCopy op;
+        bool good=op.Begin(source,diagnostic,reduced?0u:UINT32_MAX,kAllStaticTriangleRegions,reduced?proof:nullptr,true);
+        for(unsigned turn=0;good&&!op.Ready()&&turn<512;++turn)good=op.Advance(1024*1024,diagnostic);
+        Check(good && op.Ready(),"bounded candidate source copy reaches complete publication");return op.Take();
+    };
+    auto reduced=copy(true);auto restored=copy(false);
+    Check(reduced && reduced->Indices().size()+omissions.size()*3==source->Indices().size() &&
+          restored && restored->Indices()==source->Indices() && restored->SharesVertexPayloadWith(*source),
+          "fresh480 source removal and full restoration preserve exact index/immutable vertex ownership");
+    RtStaticMeshSlot foreign;Check(foreign.Initialize(std::array{StaticRtAssetRegistration{0,100,flags,0,&baseline}},diagnostic),diagnostic);
+    RtStaticMeshCopy rejectForeign;
+    Check(!rejectForeign.Begin(std::make_shared<const RtStaticMeshSlot>(foreign),diagnostic,0,kAllStaticTriangleRegions,proof,true),
+          "candidate480 subset cannot be reused for original64 geometry");
+    auto recreatedOwner=baseline;auto recreatedTerrain=baselineTerrain;std::shared_ptr<const PreparedForestSurroundings> recreated;
+    Check(AppendPreparedForestSurroundings(kRoot/"assets",*original,recreatedOwner,recreatedTerrain,recreated,diagnostic) &&
+          ForestRepresentationDigest(recreatedOwner,{})==ForestRepresentationDigest(owner,{}),
+          "independent native recreation rebuilds identical full candidate geometry/material/provenance");
+    const auto digest=ForestRepresentationDigest(owner,{});const auto retained=terrain;const auto prior=result;
+    Check(!AppendPreparedForestSurroundings(kRoot/"assets",*original,owner,terrain,result,diagnostic) &&
+          ForestRepresentationDigest(owner,{})==digest && terrain==retained && result==prior,
+          "repeated append cannot combine two populations or duplicate boundary colliders");
+
+    Check(!AppendPreparedForestSurroundings(kRoot/"missing-assets",*original,owner,terrain,result,diagnostic) &&
+          ForestRepresentationDigest(owner,{})==digest && terrain==retained && result==prior,
+          "failed candidate preparation preserves all already published geometry/support/receipts");
+    std::cout<<"Surroundings native: trees="<<64+r.extraTrees<<" fences="<<r.fenceRuns<<" natural="<<r.naturalBankRuns
+             <<" fenceTriangles="<<r.fenceTriangles<<" boundaryCollision="<<r.boundaryCollisionTriangles<<" crossingProbes="<<r.boundaryProbes
+             <<" routeClearanceProbes="<<clearanceProbes<<" cpuSubsetTriangles="<<omissions.size()<<" addedRawBytes="<<r.addedVertices*sizeof(StaticRtVertex)+r.addedIndices*4<<" sourceWitness="<<digest<<'\n';
+}
+
 void TestNativeChapterPrimitiveOwnership(bool f01North=false)
 {
     using namespace horde::vulkan::raytracing;
@@ -1719,6 +1821,7 @@ void TestTriangleRegionFailures()
 
 int main(int argc,char** argv)
 {
+    if(argc==2 && std::string_view(argv[1])=="--surroundings480") { TestFullSurroundings();return failures?1:0; }
     if(argc==2 && std::string_view(argv[1])=="--f01-north68") {
         TestF01NorthPrototype();TestNativeChapterPrimitiveOwnership(true);
         std::cout<<"F01 prototype failures="<<failures<<'\n';return failures?1:0;

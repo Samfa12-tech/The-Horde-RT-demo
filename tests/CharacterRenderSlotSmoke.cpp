@@ -132,6 +132,12 @@ int main()
         using Mode=PresentableTinyRtScene::ForestRouteProofMode;
         if(!Require(scene.SetForestRouteProofMode(Mode::BakedF01North68,error) && !scene.SetSharedForestGeometryEnabled(true),
             "prototype-first selection forbids simultaneous shared/older rosters"))return 1;
+        PresentableTinyRtScene full;
+        if(!Require(full.SetForestRouteProofMode(Mode::BakedSurroundings480,error) && !full.SetSharedForestGeometryEnabled(true),
+            "full-route480 is exclusively baked without shared master duplication"))return 1;
+        PresentableTinyRtScene shared;
+        if(!Require(shared.SetSharedForestGeometryEnabled(true) && !shared.SetForestRouteProofMode(Mode::BakedSurroundings480,error),
+            "shared-first cannot combine full-route480 and original64 instances"))return 1;
         PresentableTinyRtScene other;
         if(!Require(other.SetSharedForestGeometryEnabled(true) && !other.SetForestRouteProofMode(Mode::BakedF01North68,error),
             "shared-first selection cannot silently activate overlapping68 prototype"))return 1;

@@ -11,6 +11,7 @@ docs/evidence/2026-10-24-kit-turn-admission/*.log -text whitespace=cr-at-eol
 # Byte-reproducible source-only woodland draft; binary LFS rules stay unchanged.
 assets/models/world/source/forest-surroundings-v1/*.py text eol=lf
 assets/models/world/source/forest-surroundings-v1/*.json text eol=lf
+assets/models/world/source/forest-surroundings-v1/*.h text eol=lf
 assets/models/world/source/forest-surroundings-v1/*.md text eol=lf
 assets/models/world/source/forest-surroundings-v1/candidates/*.json text eol=lf
 tests/ForestSurroundingsSourceTests.py text eol=lf
