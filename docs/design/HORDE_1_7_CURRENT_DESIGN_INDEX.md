@@ -1,5 +1,7 @@
 # Horde 1.7 current design index
 
+**31 October contact-feedback checkpoint:** [ordinary guard-contact audio and deterministic enemy-hit cues](../evidence/2026-10-31-combat-contact-feedback/README.md) have source/host/build evidence, with manual listening pending. Directional particles and material-strike feedback remain unfinished; no visual acceptance or phone-performance result follows from the audio slice.
+
 **31 October bounded follow-up:** the [roadmap owner refinement](../ROADMAP.md#17---beyond-the-tomb) records combat feedback, 360-degree woodland and input switching priorities. The first [Windows keyboard-to-mouse-look handoff candidate](../evidence/2026-10-31-windows-input-handoff/README.md) has source/host/build evidence only; native controller-to-keyboard/mouse acceptance remains pending. No new renderer experiment or normal feature gate is enabled.
 
 **30 October integration:** [PR27](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/27) merged to main at `f0cea47b`; it is no longer an open/conflicted draft. Full 1.7 remains unfinished and unreleased; normal experimental gates remain OFF. The merge receipt records the targeted R15 torch-drop/death/Retry owner pass; it does not certify universal crash freedom or the whole chapter. Earlier conflict/pending statements below are dated history. The [current experiment ledger](../PERFORMANCE_EXPERIMENT_LEDGER.md) includes the later [28 October actor-worker phone result](../evidence/2026-10-28-actor-worker-phone/README.md): no causal gain and no normal worker admission.

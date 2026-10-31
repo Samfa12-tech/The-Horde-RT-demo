@@ -6801,16 +6801,19 @@ public class MainActivity extends Activity {
                             }
                             break;
                         case PLATFORM_EVENT_ENEMY_HIT:
-                            if (targetEntity == ENTITY_LICH) {
-                                // The hurt source includes its own impact; layering the
-                                // fencing hit masks the short vocal reaction.
-                                playSpatialSound("lich_hurt", 0.82f, stereoGains, verticalMetadata);
-                            } else {
-                                playSpatialSound((swingVariant & 1) == 0 ?
-                                        "sword_hit_1" : "sword_hit_2", 0.32f,
+                        case CombatAudioFeedback.GUARD_BLOCK_EVENT: {
+                            final String combatKey = CombatAudioFeedback.soundKey(eventType, eventAudioCue,
+                                    !menuVisible && !diagnosticsVisible && !graphicsVisible &&
+                                    !rtLabVisible && !playtestReportVisible && !benchmarkRunning &&
+                                    !deathOverlayVisible && !endingOverlayVisible);
+                            if (combatKey != null) {
+                                // The Keeper cue contains its own impact; no fencing
+                                // layer. A held block never claims the parry haptic.
+                                playSpatialSound(combatKey, CombatAudioFeedback.gain(eventType,eventAudioCue),
                                         stereoGains, verticalMetadata);
                             }
                             break;
+                        }
                         case PLATFORM_EVENT_ENEMY_DEFEATED:
                             // Preserve the authored separation between the sword impact
                             // and the fall cue while retaining the event's spatial gains.

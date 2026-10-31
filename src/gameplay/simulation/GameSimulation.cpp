@@ -2860,6 +2860,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             // An actual eligible ordinary contact is blocked, not reduced damage
             // or a practice-suppressed miss. It consumes no health/invulnerability.
             damageSample.outcome = CombatContactOutcome::GuardBlocked;
+            damageSample.semanticEventSequence = Emit(GameplayEventType::PlayerGuardBlocked,
+                EntityId::Player, damageSample.target, playerX_, playerZ_, 1.0f, 0,
+                PlayerEyeWorldY(playerSupport_.worldY) - posture_.drop);
             if (playerVitals_.Snapshot().invulnerabilityRemaining <= 0.00001f)
                 combatTeaching_.BlockSucceeded();
         }

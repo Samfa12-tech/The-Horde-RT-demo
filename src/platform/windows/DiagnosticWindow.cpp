@@ -110,6 +110,7 @@
 #include "gameplay/dialogue/SubtitleLayout.h"
 #include "platform/windows/WindowsSubtitleBitmap.h"
 #include "gameplay/SwordCombat.h"
+#include "gameplay/CombatFeedback.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "platform/windows/DesktopControllerInput.h"
 #include "platform/windows/WindowsCaptureContracts.h"
@@ -941,6 +942,7 @@ bool SaveGraphicsRecord(const VulkanSurfaceContext& context,
                         const horde::graphics::GraphicsPersistenceRecord& record);
 bool ObserveWindowsBenchmarkProfileMeasurement(VulkanSurfaceContext& context, bool requireCompleted);
 void ClearDesktopInput(VulkanSurfaceContext& context);
+bool IsDesktopGameplayAvailable(const VulkanSurfaceContext& context);
 void DiscardDesktopPendingCommands(VulkanSurfaceContext& context);
 void UpdateVitalityHud(VulkanSurfaceContext& context);
 void UpdateChestPrompt(VulkanSurfaceContext& context);
@@ -2715,15 +2717,18 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             PlayPositionalSoundEffect(context, "sword_hit_1.wav", 0.22f, event);
             break;
         case GameplayEventType::EnemyHit:
-            if (event.target == EntityId::Lich)
+        case GameplayEventType::PlayerGuardBlocked:
+        {
+            const auto cue = horde::gameplay::CombatCueForEvent(event,
+                IsDesktopGameplayAvailable(context));
+            if (const char* clip = horde::gameplay::CombatAudioClip(cue))
             {
-                PlayPositionalSoundEffect(context, "lich_hurt.wav", 0.95f, event);
-            }
-            else
-            {
-                PlayPositionalSoundEffect(context, "sword_hit_1.wav", 1.0f, event);
+                const float gain = cue == horde::gameplay::CombatAudioCue::GuardBlock ? 0.65f :
+                    cue == horde::gameplay::CombatAudioCue::KeeperHit ? 0.95f : 1.0f;
+                PlayPositionalSoundEffect(context, clip, gain, event);
             }
             break;
+        }
         case GameplayEventType::EnemyDefeated:
             if (!context.delayedFeedback.Enqueue(
                     event,

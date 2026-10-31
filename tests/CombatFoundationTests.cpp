@@ -1004,7 +1004,7 @@ void HeldGuardDamageContract() {
         GameSimulation sim(config); InputSnapshot input;
         input.tutorialEnabled=false; input.yawRadians=config.playerStartYawRadians;
         input.guardHeld=true; input.commands.parry=1;
-        int contacts=0, damageEvents=0, successfulParries=0; bool sawGuard=false;
+        int contacts=0, damageEvents=0, successfulParries=0, guardEvents=0; bool sawGuard=false;
         const int desiredHits=frontal?2:1;
         for(int tick=0;tick<900 && contacts<desiredHits;++tick) {
             // A malicious/repeated command stream must not turn a held input
@@ -1013,9 +1013,19 @@ void HeldGuardDamageContract() {
             sim.StepFixed(input);
             const auto& state=sim.Snapshot();
             sawGuard=sawGuard || state.playerCombat.action==PlayerCombatAction::Guard;
+            std::uint64_t guardSequence=0;
             for(const auto& event:sim.Events().Events()) {
                 if(event.type==GameplayEventType::PlayerParrySucceeded) ++successfulParries;
                 if(event.type==GameplayEventType::PlayerDamaged) ++damageEvents;
+                if(event.type==GameplayEventType::PlayerGuardBlocked) {
+                    ++guardEvents; guardSequence=event.sequence;
+                    Check(event.source==EntityId::Player &&
+                          (event.target==EntityId::SkeletonA || event.target==EntityId::SkeletonB) &&
+                          event.tickIndex==state.tickIndex && Near(event.worldX,state.playerX) &&
+                          Near(event.worldZ,state.playerZ) && Near(event.listenerX,state.playerX) &&
+                          Near(event.listenerZ,state.playerZ) && Near(event.worldY,event.listenerY),
+                          "guard feedback freezes the actual guarding player, attacker and fixed-tick spatial tuple");
+                }
             }
             if(state.swordCombat.playerHitPulse) {
                 ++contacts;
@@ -1024,7 +1034,8 @@ void HeldGuardDamageContract() {
                 if(frontal)
                     Check(state.playerVitals.vitality==3 && !state.playerVitals.halfHeart &&
                           state.playerVitals.invulnerabilityRemaining==0.f &&
-                          sample.outcome==CombatContactOutcome::GuardBlocked,
+                          sample.outcome==CombatContactOutcome::GuardBlocked &&
+                          guardSequence!=0 && sample.semanticEventSequence==guardSequence,
                           "each actual normal frontal guard contact fully blocks without granting post-hit immunity");
                 else
                     Check(state.playerVitals.vitality==2 && !state.playerVitals.halfHeart &&
@@ -1035,8 +1046,10 @@ void HeldGuardDamageContract() {
             sim.ClearEvents();
         }
         Check(sawGuard && contacts==desiredHits && successfulParries==0 &&
-              damageEvents==(frontal?0:1),
+              damageEvents==(frontal?0:1) && guardEvents==(frontal?contacts:0),
               "held guard blocks real normal contacts without edge-spam parries or fake damage feedback");
+        input.paused=true;sim.AdvanceFrame(input,.5);
+        Check(sim.Events().Events().empty(),"pause cannot manufacture another held-guard contact cue");
     }
 
     GameSimulation red(Rules()); InputSnapshot redInput; redInput.tutorialEnabled=false;
@@ -1047,13 +1060,15 @@ void HeldGuardDamageContract() {
     }
     Check(ticks<600,"held-guard red-attack fixture completes real Keeper recognition");
     redInput.guardHeld=true; redInput.commands.parry=1;
-    bool sawGuard=false, sawRedHit=false; int redParries=0;
+    bool sawGuard=false, sawRedHit=false; int redParries=0, redBlocks=0;
     for(int tick=0;tick<600 && !sawRedHit;++tick) {
         red.StepFixed(redInput);
         const auto& state=red.Snapshot();
         sawGuard=sawGuard || state.playerCombat.action==PlayerCombatAction::Guard;
-        for(const auto& event:red.Events().Events())
+        for(const auto& event:red.Events().Events()) {
             if(event.type==GameplayEventType::PlayerParrySucceeded) ++redParries;
+            if(event.type==GameplayEventType::PlayerGuardBlocked) ++redBlocks;
+        }
         if(state.lich.damagePulse) {
             sawRedHit=true;
             Check(state.playerVitals.vitality==2 && !state.playerVitals.halfHeart,
@@ -1061,7 +1076,7 @@ void HeldGuardDamageContract() {
         }
         red.ClearEvents();
     }
-    Check(sawGuard && sawRedHit && redParries==0,
+    Check(sawGuard && sawRedHit && redParries==0 && redBlocks==0,
           "red-attack rejection is witnessed while guard has actually been active");
 
     auto legacyConfig=Rules(); legacyConfig.combatFoundation1_7=false;
@@ -1107,6 +1122,9 @@ void YellowGuardBreakAndDefences() {
             const auto& sample=trace.samples[(trace.nextIndex+trace.kCapacity-1)%trace.kCapacity];
             broke=sample.guardBroken && sample.incomingAttackKind==EnemyAttackKind::GuardBreak &&
                 sample.outcome==CombatContactOutcome::DamageAccepted;
+            for(const auto& event:held.Events().Events())
+                Check(event.type!=GameplayEventType::PlayerGuardBlocked,
+                      "an actual yellow guard break cannot play a successful block cue");
         }
         held.ClearEvents();
     }

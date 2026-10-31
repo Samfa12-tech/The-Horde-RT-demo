@@ -75,6 +75,37 @@ int main()
     using horde::gameplay::simulation::GameplayEvent;
     using horde::gameplay::simulation::GameplayEventType;
     using horde::gameplay::simulation::EntityId;
+    {
+        GameplayEvent contact;
+        contact.type=GameplayEventType::PlayerGuardBlocked;
+        contact.source=EntityId::Player;contact.target=EntityId::SkeletonB;
+        contact.sequence=0x12345678u;contact.worldY=.41f;contact.listenerY=.76f;
+        auto packed=horde::platform::android::PackGameplayEventMetadata(contact);
+        check(static_cast<unsigned>(contact.type)==37 && (packed&255)==37 &&
+              ((packed>>24)&255)==static_cast<unsigned>(CombatAudioCue::GuardBlock) &&
+              (packed>>32)==contact.sequence,
+              "guard contact appends one ID and preserves the semantic cue/sequence words");
+        check(CombatCueForEvent(contact)==CombatAudioCue::GuardBlock &&
+              CombatCueForEvent(contact,false)==CombatAudioCue::None &&
+              std::string(CombatAudioClip(CombatCueForEvent(contact)))=="sword_hit_1.wav",
+              "an actual guard contact selects the admitted non-parry impact cue");
+        contact.type=GameplayEventType::EnemyHit;
+        check(CombatCueForEvent(contact)==CombatAudioCue::SkeletonHit,
+              "either skeleton selects its hit cue from target identity");
+        contact.target=EntityId::Lich;
+        check(CombatCueForEvent(contact)==CombatAudioCue::KeeperHit,
+              "Keeper hits retain their own hurt/impact rather than a fencing layer");
+        contact.source=EntityId::SkeletonA;
+        check(CombatCueForEvent(contact)==CombatAudioCue::None,
+              "incoming damage cannot masquerade as a successful outgoing hit");
+        contact.source=EntityId::Player;
+        for(auto type:{GameplayEventType::PlayerParrySucceeded,GameplayEventType::PlayerSwing,
+                       GameplayEventType::ParryPrepareCue,GameplayEventType::EnemyDefeated}) {
+            contact.type=type;
+            check(CombatCueForEvent(contact)==CombatAudioCue::None,
+                  "preparation, swing, parry and delayed fall retain separate cue ownership");
+        }
+    }
     for (const auto [type, expectedId] : {
              std::pair{GameplayEventType::ParryPrepareCue, 24u},
              std::pair{GameplayEventType::LichDischargeWarning, 25u}})
@@ -439,6 +470,21 @@ int main()
             return start == std::string::npos || stop == std::string::npos
                 ? std::string{} : source.substr(start, stop - start);
         };
+        const auto androidCombat = section(androidSource,
+            "case PLATFORM_EVENT_ENEMY_HIT:", "case PLATFORM_EVENT_ENEMY_DEFEATED:");
+        check(androidCombat.find("CombatAudioFeedback.soundKey(")!=std::string::npos &&
+              androidCombat.find("case CombatAudioFeedback.GUARD_BLOCK_EVENT:")!=std::string::npos &&
+              androidCombat.find("!menuVisible")!=std::string::npos &&
+              androidCombat.find("swingVariant")==std::string::npos &&
+              androidCombat.find("performHaptic")==std::string::npos,
+              "Android consumes native contact cues with active-owner gating and no free parry haptic");
+        const auto windowsCombat = section(windowsSource,
+            "case GameplayEventType::EnemyHit:", "case GameplayEventType::EnemyDefeated:");
+        check(windowsCombat.find("PlayerGuardBlocked")!=std::string::npos &&
+              windowsCombat.find("CombatCueForEvent(event,")!=std::string::npos &&
+              windowsCombat.find("IsDesktopGameplayAvailable(context)")!=std::string::npos &&
+              windowsCombat.find("CombatAudioClip(cue)")!=std::string::npos,
+              "Windows routes the same contact identity through the existing positional/SFX owner");
         const auto chapterPublish = section(androidBridgeSource,
             "void PublishSimulationUiState()", "gKeeperTitleOpacity.store(");
         const auto lockedChapterPublish = section(chapterPublish,
@@ -680,7 +726,7 @@ int main()
         using namespace horde::gameplay::simulation;
         GameplayEvent cry;cry.type=GameplayEventType::LichRevivalCry;cry.source=EntityId::Lich;cry.target=EntityId::Player;
         cry.worldX=-32.2f;cry.worldZ=-13.1f;cry.listenerX=-5.5f;cry.listenerZ=-15.2f;
-        check(static_cast<unsigned>(cry.type)==36u && kGameplayEventTypeCount==37u && horde::audio::IsLichRevivalCry(cry),
+        check(static_cast<unsigned>(cry.type)==36u && kGameplayEventTypeCount==38u && horde::audio::IsLichRevivalCry(cry),
               "revival appends ID36/count37 without reusing damage or reveal IDs");
         const auto emitted=horde::audio::LichRevivalEmitter(cry);
         const auto routed=CalculateSpatialAudio(emitted,{cry.listenerX,cry.listenerZ,0.f,cry.listenerY});
