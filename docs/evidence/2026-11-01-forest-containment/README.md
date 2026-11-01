@@ -110,3 +110,27 @@ and reproduces the same storage-image SHA256. Both owned processes exit zero.
 The final Android debug APK builds offline, passes the closed runtime roster
 check and the lookout menu unit test; it was not installed. The existing 202-case
 asset policy suite passes. The exact stopped-position objective test also passes.
+
+## Reverse-view classification (same-executable control)
+
+A bounded follow-up removes the added scenery/boundary content using the
+existing original64 `baked-resident` override. This is the **same current Debug
+executable**, not a historical executable baseline. It reaches the same endpoint
+through real movement, turns to the same reverse camera and settles 120 fixed
+ticks. The gate fails identically: player/ring/body pixels `4687/1164/0`, identical
+hinge/body positions and grip/authority errors. The actual control image shows
+open ground where the candidate has the rock edge, with the same clipped hand and
+missing primary lantern body. The added containment geometry is therefore not
+the cause of this failure.
+
+Classify this as an existing carried-lantern framing limitation exposed by the new
+reverse diagnostic. The comparison does not prove that the visibility expectation
+is invalid, nor identify whether the abrupt reverse-turn history contributes.
+The unchanged default gate still requires visible body pixels. Its printed
+`wall-retraction=0` means no policy exemption, not a measured absence of physical
+carry retraction. No gate, production pose or renderer change was made.
+
+`reverse-control-classification.json` records exact binary/image identities and
+metrics. The raw control PNG remains in the ignored local report path listed
+there. A bounded future held-item investigation can compare gradual turn input
+and carry-pose state at this exact point; this is separate from forest containment.

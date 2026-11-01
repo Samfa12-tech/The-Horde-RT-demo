@@ -1035,5 +1035,6 @@
     "closedRuntimeRoster": true,
     "apkSha256": "99159def3f7047e2ece15b7ee2ed44bdce8c145768a626f4ccdf2508ab73125c"
   },
-  "ownedCaptureProcessesClosed": true
+  "ownedCaptureProcessesClosed": true,
+  "reverseVisibilityClassification": "See reverse-control-classification.json: original64 override in same executable reproduces exact failure; added boundary geometry ruled out, existing carried-lantern framing limitation retained, gate unchanged."
 }
