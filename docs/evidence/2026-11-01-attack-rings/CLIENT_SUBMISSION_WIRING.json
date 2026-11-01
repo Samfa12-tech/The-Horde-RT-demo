@@ -11,7 +11,7 @@
       "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\benchmark-send-ready-20261101.apk",
       "bytes": 251538250,
       "sha256": "6397363c9b1d1f6bf51147fed1999d68c55fd3828d6010d014125691c6906f76",
-      "launched": false
+      "launched": true
     },
     "sourceCommit": "7234bdad37ffeca9fd997cbca9f9e39b24074360",
     "reportSent": false
@@ -55,11 +55,53 @@
     "reportTransmitted": false,
     "ownedAppClosed": true
   },
-  "androidFinalCapture": false,
-  "androidPending": "ADB device absent; no phone changes",
+  "androidFinalCapture": true,
   "liveTokensAcquired": false,
   "reportsTransmitted": false,
   "ownedWindowsAppClosed": true,
   "ownerParkedFiles": 151,
-  "ownerParkedChanged": []
+  "ownerParkedChanged": [],
+  "androidCapture": {
+    "platform": "Android",
+    "artifactPath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\benchmark-send-ready-20261101.apk",
+    "artifactBytes": 251538250,
+    "artifactSha256": "6397363c9b1d1f6bf51147fed1999d68c55fd3828d6010d014125691c6906f76",
+    "sourceCommit": "7234bdad37ffeca9fd997cbca9f9e39b24074360",
+    "nativeBuildIdentity": "g:7234bdad37ffeca9fd997cbca9f9e39b24074360;i:d22c2681cad8c95e56f6013b593a0cee6d5139bf14914eef9e488033edcd1836;c:D;s:C",
+    "nativeSerializerFile": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\client-send-20261101\\android-final\\android-native-public.json",
+    "nativeSerializerBytes": 9305,
+    "nativeSerializerSha256": "935e234819ed5a1527ab0513697c4b6cc60581c5050141fc4a087457b8f6a9d9",
+    "tuplePath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\client-send-20261101\\android-final\\android-catalog-tuple.json",
+    "tupleSha256": "7be6040607bc6145e376bde75b24ace53032d11474eff106c19925f29785c7e8",
+    "normalBenchmark": {
+      "warmupLaps": 1,
+      "measuredLaps": 1,
+      "completedLaps": 2,
+      "rtPresentedEveryMeasuredFrame": true,
+      "waypointsReached": 26,
+      "measuredFrames": 1838,
+      "owningCounts": {
+        "expected": 1838,
+        "completed": 1838,
+        "rejected": 0,
+        "cancelled": 0,
+        "cpuAccepted": 1838,
+        "cpuRejected": 0,
+        "outstanding": 0
+      }
+    },
+    "localPrepareOnly": true,
+    "sendOrPublicationApproved": false,
+    "reportTransmitted": false,
+    "originalPhoneFilesRestored": 27,
+    "allOriginalPhoneHashesMatch": true,
+    "debugStopped": true,
+    "homeConfirmed": true,
+    "productionUntouched": true
+  },
+  "phoneFreeAtHome": true,
+  "originalPhoneFilesRestored": 27,
+  "allOriginalPhoneHashesMatch": true,
+  "ownedAppsStopped": true,
+  "ownerAcceptancePassed": false
 }
