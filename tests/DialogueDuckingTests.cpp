@@ -1,3 +1,4 @@
+#include "audio/ChapterDialogueSpatial.h"
 #include "audio/DialogueDucking.h"
 #include "audio/MusicPlaybackSession.h"
 #include "gameplay/dialogue/ChapterDialogue.h"
@@ -34,6 +35,21 @@ void Check(bool value, const char* message) {
 bool Near(double a, double b, double tolerance=.00001) { return std::abs(a-b) <= tolerance; }
 void Ticks(DialogueDucking& duck, bool speaking, unsigned count) {
     for (unsigned i=0; i<count; ++i) duck.Step(speaking,kTick);
+}
+void RescueSpeechSpatial() {
+    dlg::Snapshot s; s.line=dlg::Line::RescueRope; s.source={0,2.8f,-8}; s.listener={0,0,0};
+    const auto rescue=ChapterDialogueSpatial(s,SpatialAudioDomain::ExteriorRoute);
+    const auto previous=CalculateSpatialAudio({0,-8,.36f,1.f,14.f,2.8f},{0,0,0,0},SpatialAudioDomain::ExteriorRoute);
+    Check(Near(rescue.left/previous.left,5.f) && Near(rescue.right/previous.right,5.f),
+          "rescue speech compensates distance falloff by 14dB without changing pan");
+    s.source={0,2.8f,-.1f};const auto near=ChapterDialogueSpatial(s,SpatialAudioDomain::ExteriorRoute);
+    Check(std::hypot(near.left,near.right)<=.60001f && .939606f*std::hypot(near.left,near.right)<1.f,
+          "original near-full-scale PCM retains source headroom at 100 percent dialogue");
+    s.source={0,2.8f,-14}; const auto far=ChapterDialogueSpatial(s,SpatialAudioDomain::ExteriorRoute);
+    Check(far.left==0 && far.right==0,"rescue speech preserves maximum distance cutoff");
+    s.line=dlg::Line::ForestClue;s.source={0,2.8f,-8};
+    const auto unchanged=ChapterDialogueSpatial(s,SpatialAudioDomain::ExteriorRoute);
+    Check(Near(unchanged.left,previous.left)&&Near(unchanged.right,previous.right),"other speech mix unchanged");
 }
 void Envelope() {
     DialogueDucking duck;
@@ -352,7 +368,7 @@ void OutputWiring(const std::filesystem::path& root) {
 } // namespace
 int main(int argc,char** argv) {
     if (argc!=2) { std::cerr<<"usage: DialogueDuckingTests <source-root>\n"; return 2; }
-    Envelope(); SnapshotGuard(); SharedDialogueChain(); SharedGrateFinalization(); RealGrateAndLifecycle(); MusicOutputOnly();
+    RescueSpeechSpatial(); Envelope(); SnapshotGuard(); SharedDialogueChain(); SharedGrateFinalization(); RealGrateAndLifecycle(); MusicOutputOnly();
     const auto directory=std::filesystem::path(argv[1])/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest; horde::scene::assets::StaticMeshAsset mesh; std::string diagnostic;
     if (!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json",manifest,diagnostic) ||

@@ -169,7 +169,7 @@ public final class CombatTeachingPreferencesTest {
         long practice=(1L<<10)|(1L<<13)|(0xffL<<40);
         for(int stage:new int[]{4,0,1,5,6}) {
             String text=CombatTeachingPreferences.prompt(practice|stage);
-            assertTrue(text.startsWith("Practice: no damage\n"));
+            assertTrue(text.startsWith("Practice: no damage \u2014 learn each step\n"));
             assertEquals(stage==6?"Finish practice":"Skip practice",RuntimeEnvironment.getApplication().getString(CombatTeachingPreferences.practiceActionLabelResource(practice|stage)));
             assertFalse(CombatTeachingPreferences.blockLearned(practice|stage));
             assertFalse(CombatTeachingPreferences.attackFromGuardLearned(practice|stage));
@@ -183,12 +183,12 @@ public final class CombatTeachingPreferencesTest {
         assertTrue(CombatTeachingPreferences.attackFromGuardLearned(practice|(1L<<32)));
         assertFalse(CombatTeachingPreferences.attackFromGuardLearned(practice|(1L<<15)));
         assertTrue(CombatTeachingPreferences.exitPending(practice|(1L<<33)));
-        assertTrue(CombatTeachingPreferences.prompt(practice|(1L<<33)).contains("Leaving practice safely"));
+        assertTrue(CombatTeachingPreferences.prompt(practice|(1L<<33)).contains("Practice ending: enemies can hurt you next"));
     }
     @Test public void actualParrySuccessPrecedesCurrentSkillWithoutInventingSuccessFromAnOrdinaryHit() {
         long blockPractice=4L|(1L<<10)|(1L<<13)|(0xffL<<40);
         String parried=CombatTeachingPreferences.prompt(blockPractice|(7L<<3));
-        assertTrue(parried.startsWith("Practice: no damage\n"));
+        assertTrue(parried.startsWith("Practice: no damage \u2014 learn each step\n"));
         assertTrue(parried.contains("Well parried"));assertFalse(parried.contains("block normal hits"));
         assertFalse(CombatTeachingPreferences.prompt(blockPractice|(9L<<3)).contains("Well parried"));
     }
@@ -196,7 +196,7 @@ public final class CombatTeachingPreferencesTest {
         for(int stage:new int[]{4,0,1,5,6})for(int attack:new int[]{0,1,2}) {
             long state=(1L<<13)|stage|((long)attack<<48); // Protection publication is authoritative.
             String text=CombatTeachingPreferences.prompt(state);
-            assertTrue(text.startsWith("Practice: no damage\n"));
+            assertTrue(text.startsWith("Practice: no damage \u2014 learn each step\n"));
             assertTrue(text.split("\n").length>=2);
             if(attack==1) {
                 assertTrue(text.contains("YELLOW guard-break: parry/dodge"));

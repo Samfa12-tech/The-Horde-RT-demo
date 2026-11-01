@@ -46,7 +46,7 @@ final class CombatTeachingPreferences {
         final boolean protectedPractice=safePractice(state) && !lessonSuppressed(state);
         final boolean enabled=(state & (1L << 10)) != 0;
         final int opacity=(int)((state >>> 40) & 0xffL);
-        String text=protectedPractice ? "Practice: no damage" : "";
+        String text=protectedPractice ? "Practice: no damage — learn each step" : "";
         if(!lessonSuppressed(state) && (protectedPractice || enabled && opacity>0)) {
             String lesson=lessonText(state,controller);
             if(!lesson.isEmpty())text+=(text.isEmpty()?"":"\n")+lesson;
@@ -91,13 +91,13 @@ final class CombatTeachingPreferences {
         final int stage=stage(state),cue=(int)((state >>> 3) & 0xfL),source=(int)((state >>> 7) & 0x7L);
         final String guard=controller?"[LT]":"[Parry]",swing=controller?"[RT]":"[Swing]";
         final String dodge=controller?"[B] + stick":"[Dodge] + move";
-        if(exitPending(state) || cue==13)return "Leaving practice safely...";
+        if(exitPending(state) || cue==13)return "Practice ending: enemies can hurt you next.";
         if(cue==12)return "Settings: Replay opening practice or Skip to continue";
         if(stage==2 || stage==3)return "";
         if(stage==6 || cue==11)return "Settings: Finish practice - enemies can hurt you";
         if(cue==7)return "Well parried - strike back";
-        if(stage==4 || cue==9)return "Hold "+guard+": block normal hits";
-        if(stage==5 || cue==10)return "Hold "+guard+" + "+swing+"; keep held";
+        if(stage==4 || cue==9)return "1/4 Hold "+guard+": block normal hits";
+        if(stage==5 || cue==10)return "4/4 Hold "+guard+" + "+swing+"; keep held";
         if(stage==1) {
             if(cue==5)return "DODGE NOW - "+dodge;
             return (source==3?"Keeper lightning":source==2 || source==4?"Skeleton attack":"Attacker")+" - "+dodge;

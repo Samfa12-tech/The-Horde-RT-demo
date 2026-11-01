@@ -198,12 +198,17 @@ public:
         attackerIndex_ = -1;
         waterfallRoomEngaged_ = false;
         specialAttacksEnabled_ = false;
+        practiceEnabled_ = false;
         PublishSnapshot();
     }
 
     // Owner-thread policy. A change is sampled at the next actual windup only,
     // so an already visible warning and its eventual contact cannot disagree.
     void SetSpecialAttacksEnabled(bool enabled) { specialAttacksEnabled_ = enabled; }
+    void SetPracticeLesson(bool enabled, EnemyAttackKind kind) {
+        practiceEnabled_=enabled; practiceAttackKind_=kind;
+    }
+
 
     // Validated campaign restore only: settled corpses, no combat/input debt.
     void RestoreCampaignDefeated(const std::array<SkeletonSpawnPose, kSkeletonCombatantCapacity>& poses)
@@ -476,7 +481,7 @@ public:
                             playerX,
                             playerZ,
                             distances[index],
-                            combatArenaActive,
+                            combatArenaActive && (!practiceEnabled_ || index==0u),
                             playerYaw,
                             waterfallNav);
         }
@@ -752,6 +757,10 @@ private:
             return;
         }
 
+        if(practiceEnabled_) {
+            attackerIndex_=combatantCount_ && combatants_[0].health>0 ? 0 : -1;
+            return;
+        }
         if (attackerIndex_ >= 0)
         {
             const Combatant& holder = combatants_[static_cast<std::size_t>(attackerIndex_)];
@@ -787,8 +796,14 @@ private:
             return;
         }
         Combatant& target = combatants_[static_cast<std::size_t>(targetIndex)];
-        if (target.health > 1)
+        if (practiceEnabled_ || target.health > 1)
         {
+            if(practiceEnabled_) {
+                snapshot_.playerContactPulse=true;
+                snapshot_.playerContactTargetId=targetIndex;
+                snapshot_.playerContactAttackId=activePlayerAttackId_;
+                snapshot_.playerContactCut=ActivePlayerAttackCut();
+            }
             ApplyPlayerSwordContact(targetIndex);
             return;
         }
@@ -821,7 +836,7 @@ private:
         Combatant& target = combatants_[static_cast<std::size_t>(targetIndex)];
         if (target.health <= 0 || target.action == EnemyCombatAction::Dead)
             return;
-        target.health = std::max(0, target.health - 1);
+        target.health = std::max(practiceEnabled_ ? 1 : 0, target.health - 1);
         target.damageFlash = 1.0f;
         target.reaction = CombatReaction::Hit;
         target.reactionTime = 1.0f;
@@ -898,7 +913,7 @@ private:
                 // toggles. A bounded modulo avoids overflow and random state.
                 combatant.attackCyclePhase = static_cast<std::uint8_t>(
                     (combatant.attackCyclePhase + 1u) % 3u);
-                combatant.attackKind = specialAttacksEnabled_ && combatant.attackCyclePhase == 0u
+                combatant.attackKind = practiceEnabled_ ? practiceAttackKind_ : specialAttacksEnabled_ && combatant.attackCyclePhase == 0u
                     ? EnemyAttackKind::GuardBreak : EnemyAttackKind::Normal;
                 combatant.walkAnimationHold = 0.0f;
                 combatant.action = EnemyCombatAction::AttackWindup;
@@ -1241,6 +1256,8 @@ private:
     std::int32_t attackerIndex_ = -1;
     bool waterfallRoomEngaged_ = false;
     bool specialAttacksEnabled_ = false;
+    bool practiceEnabled_ = false;
+    EnemyAttackKind practiceAttackKind_=EnemyAttackKind::Normal;
 };
 
 } // namespace horde::gameplay

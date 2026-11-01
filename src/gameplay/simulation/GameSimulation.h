@@ -76,6 +76,7 @@ struct GameSimulationConfig
     bool combatFoundation1_7 = false;
     // Historical fixtures remain explicit; the live profile pairs specials with RT warnings.
     bool specialSkeletonAttacks1_7 = false;
+    bool sequentialPractice1_7 = false; // Explicit historical fixtures retain their lesson rules.
     // Remains explicit until the authored clip/private cue package is admitted.
     bool skeletonRevival1_7 = false;
     // Shared chapter presentation; historical constructor fixtures stay explicit.
@@ -97,6 +98,7 @@ inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
     config.swordStartsStowed = true;
     config.combatFoundation1_7 = true;
     config.specialSkeletonAttacks1_7 = true;
+    config.sequentialPractice1_7 = true;
     // Authored stationary departures; routine bends retain legacy walking.
     config.companionTurnStart = true;
     return config;

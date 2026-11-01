@@ -264,6 +264,14 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         return;
     }
 
+    if(config_.sequentialPractice1_7 && config_.developmentRescueJourney && rescueTraversal_.Snapshot().exteriorSide)
+        combatTeaching_.LeaveOpeningEncounter();
+    // The opening lesson must not grant immunity throughout the Keeper fight.
+    // Existing explicit Keeper practice is retained by the lesson owner.
+    if(config_.sequentialPractice1_7 && activeEnemyKind_==EnemyKind::Lich)
+        combatTeaching_.LeaveOpeningEncounter();
+    combatTeaching_.SetSequentialPractice(config_.sequentialPractice1_7);
+    combatTeaching_.AdvanceOpeningExit(fixedDeltaSeconds,input.paused);
     combatTeaching_.Update(input.tutorialEnabled,
         input.tutorialSlowdownEnabled, input.paused ||
             playerVitals_.Snapshot().phase != PlayerLifePhase::Alive ||
@@ -2615,6 +2623,12 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     swordHitTargetThisTick_ = EntityId::Invalid;
     swordHitEventThisTick_ = 0;
     swordCombat_.SetSpecialAttacksEnabled(CurrentCombatRules() && config_.specialSkeletonAttacks1_7);
+    const auto& lesson=combatTeaching_.Snapshot();
+    const bool practice=config_.sequentialPractice1_7 && CurrentCombatRules() && lesson.safePractice && activeEnemyKind_==EnemyKind::Skeleton;
+    swordCombat_.SetPracticeLesson(practice,
+        lesson.stage==TutorialStage::Parry ? EnemyAttackKind::GuardBreak :
+        lesson.stage==TutorialStage::Dodge ? EnemyAttackKind::Unblockable : EnemyAttackKind::Normal);
+
     combatSnapshot_ = swordCombat_.Update(deltaSeconds,
                                            playerX_,
                                            playerZ_,
@@ -2651,7 +2665,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                  current.x,
                  current.z);
         }
-        if (activeEnemyKind_ == EnemyKind::Skeleton && current.health < previous.health)
+        if (activeEnemyKind_ == EnemyKind::Skeleton && (current.health < previous.health ||
+            (practice && combatSnapshot_.playerContactPulse &&
+             combatSnapshot_.playerContactTargetId==static_cast<std::int32_t>(index))))
         {
             swordHitTargetThisTick_ = entity;
             swordHitEventThisTick_ = Emit(GameplayEventType::EnemyHit,

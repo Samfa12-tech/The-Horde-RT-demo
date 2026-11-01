@@ -22,7 +22,9 @@ void Check(bool value,const char* message) {
 }
 bool Near(float a,float b,float epsilon=.0001f) { return std::abs(a-b)<=epsilon; }
 GameSimulationConfig Rules() {
-    auto c=ProductionGameSimulationConfig(); c.swordStartsStowed=false; return c;
+    // Historical free-practice combat fixtures exercise kills and out-of-order skills.
+    // FourSkillPracticeAndExit explicitly enables the current novice policy.
+    auto c=ProductionGameSimulationConfig(); c.swordStartsStowed=false; c.sequentialPractice1_7=false; return c;
 }
 void CheckContactBurst(const SimulationSnapshot& state,const GameplayEvent& event) {
     bool matched=false;
@@ -378,6 +380,37 @@ void WindowAndLifecycle() {
     sim.ApplyShowcaseCheckpoint(0); input.commands.dodge=22;
     sim.StepFixed(input); sim.StepFixed(input);
     Check(!sim.Snapshot().dodgeInvulnerable,"historical capture imports preserve their legacy rule identity");
+}
+void BoundedOpeningPractice() {
+    Check(ProductionGameSimulationConfig().sequentialPractice1_7 && !GameSimulationConfig{}.sequentialPractice1_7,
+          "live application selects novice practice while historical fixtures remain explicit");
+    CombatTeaching lesson; CombatSnapshot combat; LichSnapshot keeper;
+    lesson.SetSequentialPractice(true);lesson.Reset(true);lesson.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+    lesson.ParrySucceeded();lesson.DodgeSucceeded();
+    Check(lesson.Snapshot().stage==TutorialStage::Block && !lesson.Snapshot().parryLearned && !lesson.Snapshot().dodgeLearned,
+          "future skills cannot skip the current novice step");
+    lesson.LeaveOpeningEncounter();
+    lesson.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+    Check(lesson.Snapshot().safePractice && lesson.Snapshot().exitPending,
+          "leaving opening warns before removing actual damage protection");
+    for(int i=0;i<190;++i) {lesson.AdvanceOpeningExit(1.f/60.f,false);lesson.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);}
+    Check(!lesson.Snapshot().safePractice && lesson.Snapshot().stage==TutorialStage::Skipped,
+          "opening protection and practice prompt end together after bounded warning");
+    SwordCombat sword;sword.Reset(2,{0,-4.65f},nullptr,1);sword.SetPracticeLesson(true,EnemyAttackKind::GuardBreak);
+    bool attackSeen=false;int practiceContacts=0;
+    for(int i=0;i<360;++i) {
+        if(i%60==0)sword.RequestAttack();
+        const auto& state=sword.Update(1.f/60.f,-.75f,-3.5f,0.f);
+        if(state.playerContactPulse)++practiceContacts;
+        Check(state.aliveCount==2,"practice strikes cannot kill either lesson actor");
+        Check(state.combatants[1].action!=EnemyCombatAction::AttackWindup && state.combatants[1].action!=EnemyCombatAction::AttackActive,
+              "second skeleton waits during one-actor lesson");
+        if(state.combatants[0].action==EnemyCombatAction::AttackWindup) {
+            attackSeen=true;Check(state.combatants[0].attackKind==EnemyAttackKind::GuardBreak,"lesson owns a single attack kind");
+        }
+    }
+    Check(attackSeen,"bounded lesson test observed actual warning phase");
+    Check(practiceContacts>=3,"accepted practice contacts survive the health floor for guard lesson and hit feedback");
 }
 void TeachingContract() {
     CombatTeaching teaching; CombatSnapshot combat; LichSnapshot keeper;
@@ -1192,7 +1225,7 @@ void YellowGuardBreakAndDefences() {
 }
 
 void FourSkillPracticeAndExit() {
-    auto config=Rules(); config.waterfallSkeletonEncounter=false;
+    auto config=Rules(); config.waterfallSkeletonEncounter=false; config.sequentialPractice1_7=true;
     config.playerStartX=0; config.playerStartZ=-3.75f;
     GameSimulation sim(config); InputSnapshot input;
     Check(LearnBlockFromRealContact(sim,input) && sim.Snapshot().combatTeaching.stage==TutorialStage::Parry,
@@ -2587,6 +2620,7 @@ int main(int argc,char** argv) {
     }
     if(argc!=1) { std::cerr<<"unknown combat foundation profile\n"; return 2; }
     SkeletonRevivalBridgeContract();
+    BoundedOpeningPractice();
     PracticePromptWaitsForSword();
     InPlacePairRevivalContract();
     RulesEligibilityDoesNotChoosePracticeExit();

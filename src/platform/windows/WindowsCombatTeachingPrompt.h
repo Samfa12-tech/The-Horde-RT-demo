@@ -57,14 +57,14 @@ inline std::string CombatTeachingLessonText(
     using gameplay::simulation::TutorialStage;
     const std::string guard=controller?"[LT]":"[Q]", swing=controller?"[RT]":"[LMB]";
     const std::string dodge=controller?"[B] + stick":"[Space] + move";
-    if(teaching.exitPending || teaching.cue==CombatTeachingCue::ExitPending)return "Leaving practice safely...";
+    if(teaching.exitPending || teaching.cue==CombatTeachingCue::ExitPending)return "Practice ending: enemies can hurt you next.";
     if(teaching.cue==CombatTeachingCue::Replay)return "Menu: Replay opening practice or Skip to continue";
     if(teaching.stage==TutorialStage::Complete || teaching.stage==TutorialStage::Skipped)return {};
     if(teaching.stage==TutorialStage::Ready || teaching.cue==CombatTeachingCue::Ready)
         return "Menu: Finish practice - enemies can hurt you";
     if(teaching.cue==CombatTeachingCue::Learned)return "Well parried - strike back";
-    if(teaching.stage==TutorialStage::Block || teaching.cue==CombatTeachingCue::Block)return "Hold "+guard+": block normal hits";
-    if(teaching.stage==TutorialStage::AttackFromGuard || teaching.cue==CombatTeachingCue::AttackFromGuard)return "Hold "+guard+" + "+swing+"; keep held";
+    if(teaching.stage==TutorialStage::Block || teaching.cue==CombatTeachingCue::Block)return "1/4 Hold "+guard+": block normal hits";
+    if(teaching.stage==TutorialStage::AttackFromGuard || teaching.cue==CombatTeachingCue::AttackFromGuard)return "4/4 Hold "+guard+" + "+swing+"; keep held";
     if(teaching.stage==TutorialStage::Dodge)
     {
         if(teaching.cue==CombatTeachingCue::DodgeNow)return "DODGE NOW - "+dodge;
@@ -87,7 +87,7 @@ inline std::string CombatTeachingPromptText(
     const bool waitingForRevivalClearance = false)
 {
     using gameplay::simulation::AttackReadability;
-    std::string text=teaching.safePractice && !teaching.lessonSuppressed?"Practice: no damage":"";
+    std::string text=teaching.safePractice && !teaching.lessonSuppressed?"Practice: no damage — learn each step":"";
     if(!teaching.lessonSuppressed && (teaching.safePractice || (teaching.enabled && std::isfinite(teaching.promptOpacity) && teaching.promptOpacity>0.0f)))
     {
         const auto lesson=CombatTeachingLessonText(teaching,controller);

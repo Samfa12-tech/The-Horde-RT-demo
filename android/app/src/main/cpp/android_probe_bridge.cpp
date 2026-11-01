@@ -1,3 +1,4 @@
+#include "audio/ChapterDialogueSpatial.h"
 #include <android/log.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
@@ -7118,9 +7119,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueStereoGains(JNIEnv
     }
     if (snapshot.line == horde::gameplay::dialogue::Line::None ||
         static_cast<jlong>(snapshot.generation) != generation) return 0;
-    const auto gains = horde::gameplay::CalculateSpatialAudio(
-        {snapshot.source.x, snapshot.source.z, 0.36f, 1.0f, 14.0f, snapshot.source.y},
-        {snapshot.listener.x, snapshot.listener.z, snapshot.listenerYaw, snapshot.listener.y}, domain);
+    const auto gains = horde::audio::ChapterDialogueSpatial(snapshot, domain);
     return static_cast<jlong>(PackStereoGains(gains.left, gains.right));
 }
 

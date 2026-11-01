@@ -1,3 +1,4 @@
+#include "audio/ChapterDialogueSpatial.h"
 #include "platform/windows/DiagnosticWindow.h"
 #include "platform/windows/WindowsAcceptanceProfile.h"
 #ifndef HORDE_RT_WINDOWS_ACCEPTANCE
@@ -2298,9 +2299,7 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
         context.playingDialogueGeneration = 0u;
         return;
     }
-    const auto gains = horde::gameplay::CalculateSpatialAudio(
-        {dialogue.source.x, dialogue.source.z, .36f, 1.0f, 14.0f, dialogue.source.y},
-        {dialogue.listener.x, dialogue.listener.z, dialogue.listenerYaw, dialogue.listener.y},
+    const auto gains = horde::audio::ChapterDialogueSpatial(dialogue,
         horde::gameplay::ResolveSpatialAudioDomain(
             simulation.developmentRescueJourney, simulation.worldRoute.current));
     const bool sameVoice = context.playingDialogueLine == lineId &&

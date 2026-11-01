@@ -96,11 +96,12 @@ struct CombatTeachingSnapshot
 class CombatTeaching
 {
 public:
+    void SetSequentialPractice(bool enabled) { sequential_=enabled; }
     void Reset(bool enabled)
     {
         const auto generation = snapshot_.generation + 1u;
         snapshot_ = {}; snapshot_.enabled = enabled; snapshot_.generation = generation;
-        ClearGuardAttack(); dodgeOnly_=false; requestedEnabled_=enabled; exitProtection_=false;
+        ClearGuardAttack(); dodgeOnly_=false; requestedEnabled_=enabled; exitProtection_=false; openingExitSeconds_=0; openingExitRequested_=false;
     }
     void ResetForKeeperPractice(bool enabled) { Reset(enabled); dodgeOnly_=true; snapshot_.stage=TutorialStage::Dodge; }
     // The existing explicit Skip/Finish command requests an exit. Damage may
@@ -114,14 +115,25 @@ public:
     }
     // Validated earned records are already past this encounter. Do not invent
     // learned flags or show practice protection while their first frame is paused.
+    // Leaving the opening encounter ends both its protection and its prompt.
+    // Explicit Keeper practice retains its separate dodge-only lesson.
+    void LeaveOpeningEncounter() {
+        if(!dodgeOnly_ && LearningStage() && !openingExitRequested_) {
+            openingExitRequested_=true; openingExitSeconds_=3.f; Skip();
+        }
+    }
+    void AdvanceOpeningExit(float seconds,bool paused) {
+        if(!paused && std::isfinite(seconds) && seconds>0)
+            openingExitSeconds_=std::max(0.f,openingExitSeconds_-std::min(seconds,.05f));
+    }
     void RestoreEnded() { snapshot_.stage=TutorialStage::Skipped; snapshot_.exitPending=false; exitProtection_=false; CancelTransient(); }
-    void BlockSucceeded() { if (Learning()) { snapshot_.blockLearned=true; SelectStage(); } }
-    void ParrySucceeded() { if (Learning()) { snapshot_.parryLearned=true; SelectStage(); } }
-    void DodgeSucceeded() { if (Learning()) { snapshot_.dodgeLearned=true; SelectStage(); } }
+    void BlockSucceeded() { if (Learning() && (!sequential_ || snapshot_.stage==TutorialStage::Block)) { snapshot_.blockLearned=true; SelectStage(); } }
+    void ParrySucceeded() { if (Learning() && (!sequential_ || snapshot_.stage==TutorialStage::Parry)) { snapshot_.parryLearned=true; SelectStage(); } }
+    void DodgeSucceeded() { if (Learning() && (!sequential_ || snapshot_.stage==TutorialStage::Dodge)) { snapshot_.dodgeLearned=true; SelectStage(); } }
     void BeginGuardAttack()
     {
         ClearGuardAttack();
-        guardAttackPending_ = Learning() && !dodgeOnly_;
+        guardAttackPending_ = Learning() && !dodgeOnly_ && (!sequential_ || snapshot_.stage==TutorialStage::AttackFromGuard);
     }
     void ObserveGuardAttack(const CombatSnapshot& combat, bool held, bool interrupted, bool actualHit)
     {
@@ -162,7 +174,7 @@ public:
         { snapshot_.exitPending = true; exitProtection_=true; }
         requestedEnabled_=enabled;
         snapshot_.enabled = enabled || (snapshot_.exitPending && exitProtection_);
-        if (snapshot_.exitPending && !suspended && SafeExit(combat, keeper, selectedEnemy))
+        if (snapshot_.exitPending && openingExitSeconds_<=0.f && !suspended && SafeExit(combat, keeper, selectedEnemy))
         {
             snapshot_.stage = snapshot_.stage == TutorialStage::Ready ? TutorialStage::Complete : TutorialStage::Skipped;
             snapshot_.exitPending = false; exitProtection_=false;
@@ -270,6 +282,9 @@ private:
     void ClearGuardAttack() { guardAttackPending_=guardAttackHit_=false; guardAttackId_=0; }
     // User intent and a protected pending exit survive inactive rule profiles;
     // neither is the published active-teaching flag used by frozen captures.
+    float openingExitSeconds_=0.f;
+    bool openingExitRequested_=false;
+    bool sequential_=false;
     bool requestedEnabled_=false, exitProtection_=false;
     bool dodgeOnly_=false; // Existing explicit Keeper practice, not story progress.
     bool guardAttackPending_=false, guardAttackHit_=false;

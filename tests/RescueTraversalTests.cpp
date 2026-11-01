@@ -120,6 +120,13 @@ int main()
     check(CanApproachRopeEndpoint({kLowerLanding.x+0.30f,kLowerSupportWorldY,kLowerLanding.z+0.20f},
                                   kLowerSupportWorldY,false),
         "safe support-aligned lower approach was rejected");
+    check(near(kRescueApproachRadius,1.125f), "rope reach must increase by 50 percent");
+    check(CanApproachRopeEndpoint({kLowerLanding.x,kLowerSupportWorldY,kLowerLanding.z+.90f},
+                                  kLowerSupportWorldY,false), "new lower approach band rejected");
+    check(!CanApproachRopeEndpoint({kLowerLanding.x,kLowerSupportWorldY,kLowerLanding.z+1.13f},
+                                   kLowerSupportWorldY,false), "outside enlarged rope radius accepted");
+    check(!RescueTraversal{}.CanInteractAt(kLowerLanding,kLowerSupportWorldY),
+          "unready rope became interactable at the enlarged radius");
     check(!CanApproachRopeEndpoint({kLowerLanding.x,kLowerSupportWorldY+.25f,kLowerLanding.z},
                                    kLowerSupportWorldY+.25f,false),
         "lower approach accepted an unsupported height");
@@ -329,7 +336,7 @@ int main()
     check(invalidApproachTraversal.Step(invalidApproach) && !invalidApproachTraversal.CanInteract() &&
           !invalidApproachTraversal.Request(),
         "wrong-height player received a climb prompt or started traversal");
-    invalidApproach.playerPosition = {kLowerLanding.x + 0.76f, kLowerSupportWorldY, kLowerLanding.z};
+    invalidApproach.playerPosition = {kLowerLanding.x + kRescueApproachRadius + .01f, kLowerSupportWorldY, kLowerLanding.z};
     invalidApproach.supportWorldY = kLowerSupportWorldY;
     check(invalidApproachTraversal.Step(invalidApproach) && !invalidApproachTraversal.CanInteract() &&
           !invalidApproachTraversal.Request(),
@@ -348,7 +355,7 @@ int main()
         return traversal.Step(input);
     };
 
-    input.playerPosition.x += 0.80f;
+    input.playerPosition.x += kRescueApproachRadius + .05f;
     check(traversal.Step(input) && !traversal.CanInteract(), "approach radius allowed a distant player to attach by teleport");
     input.playerPosition = kLowerLanding;
     input.supportWorldY = kLowerSupportWorldY;
