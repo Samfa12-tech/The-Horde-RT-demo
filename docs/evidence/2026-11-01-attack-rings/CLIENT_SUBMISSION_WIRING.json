@@ -1,0 +1,65 @@
+{
+  "sourceCommit": "7234bdad37ffeca9fd997cbca9f9e39b24074360",
+  "artifacts": {
+    "windows": {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-windows-acceptance-20261101-send\\HordeLanternRT.exe",
+      "bytes": 5009408,
+      "sha256": "4dc30753ede5f549d371ad5b9ec260d905d6d13241f7f6306dc2944ca412d012",
+      "launched": true
+    },
+    "android": {
+      "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\benchmark-send-ready-20261101.apk",
+      "bytes": 251538250,
+      "sha256": "6397363c9b1d1f6bf51147fed1999d68c55fd3828d6010d014125691c6906f76",
+      "launched": false
+    },
+    "sourceCommit": "7234bdad37ffeca9fd997cbca9f9e39b24074360",
+    "reportSent": false
+  },
+  "androidFocusedTests": 49,
+  "androidFailures": 0,
+  "nativeSummarySubmissionVerifierTests": "PASS",
+  "windowsBuild": "PASS",
+  "androidAllFourAbiBuild": "PASS",
+  "windowsCapture": {
+    "platform": "Windows",
+    "artifactPath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-windows-acceptance-20261101-send\\HordeLanternRT.exe",
+    "artifactBytes": 5009408,
+    "artifactSha256": "4dc30753ede5f549d371ad5b9ec260d905d6d13241f7f6306dc2944ca412d012",
+    "sourceCommit": "7234bdad37ffeca9fd997cbca9f9e39b24074360",
+    "nativeBuildIdentity": "g:7234bdad37ffeca9fd997cbca9f9e39b24074360;i:e51a56b4fce91e527f80b899509f295f183069f745421ae6d8aeb25771228542;c:R;s:C",
+    "nativeSerializerFile": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\client-send-20261101\\windows-native-public.json",
+    "nativeSerializerBytes": 9068,
+    "nativeSerializerSha256": "b80a8f025c13f100b3eede33a304ab1628efdbbc9d51505434aff9b101770c8a",
+    "tuplePath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\client-send-20261101\\windows-catalog-tuple.json",
+    "tupleSha256": "d085adbe6b205b4149a175610e63b6a575d1fb017763dc7f4e04f9a8a97e3470",
+    "normalBenchmark": {
+      "warmupLaps": 1,
+      "measuredLaps": 1,
+      "completedLaps": 2,
+      "rtPresentedEveryMeasuredFrame": true,
+      "waypointsReached": 26,
+      "measuredFrames": 1838,
+      "owningCounts": {
+        "expected": 1838,
+        "completed": 1838,
+        "rejected": 0,
+        "cancelled": 0,
+        "cpuAccepted": 1838,
+        "cpuRejected": 0,
+        "outstanding": 0
+      }
+    },
+    "localPrepareOnly": true,
+    "sendOrPublicationApproved": false,
+    "reportTransmitted": false,
+    "ownedAppClosed": true
+  },
+  "androidFinalCapture": false,
+  "androidPending": "ADB device absent; no phone changes",
+  "liveTokensAcquired": false,
+  "reportsTransmitted": false,
+  "ownedWindowsAppClosed": true,
+  "ownerParkedFiles": 151,
+  "ownerParkedChanged": []
+}
