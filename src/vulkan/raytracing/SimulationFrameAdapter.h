@@ -8,12 +8,17 @@
 
 namespace horde::vulkan::raytracing
 {
-// Explicit presentation trial only; existing callers preserve normal OFF.
+// Historical/inspection callers remain explicit. Live platforms use the shared policy below.
 struct RtAttackWarningOptions
 {
     bool enabled = false;
     bool reducedMotion = false;
 };
+
+inline constexpr RtAttackWarningOptions ProductionAttackWarningOptions(bool reducedMotion = false)
+{
+    return {true, reducedMotion};
+}
 
 // Opt-in source/native trial on an already adapted frame. Validation is atomic;
 // it grants no gameplay action and leaves normal platform callers unchanged.

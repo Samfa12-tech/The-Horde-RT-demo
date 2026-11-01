@@ -122,6 +122,9 @@ void AttackWarningAdapterContracts(const Check& check)
               FireEmitterQuality::High,horde::graphics::ShadowQuality::Higher).attackWarningRingVisible &&
           !build(source,{false,true}).attackWarningRingVisible,
           "every established gameplay overload and disabled reduced-motion option keeps the warning OFF");
+    check(build(source,ProductionAttackWarningOptions()).attackWarningRingVisible &&
+          ProductionAttackWarningOptions(true).reducedMotion,
+          "live shared policy enables authoritative special warnings and preserves reduced motion");
     const auto open=build(source);
     const auto tuningFirst=BuildRtSceneFrameInputs(source,1.f,RtSceneTuning{},WaterQuality::High,
         std::nullopt,std::nullopt,enabled);

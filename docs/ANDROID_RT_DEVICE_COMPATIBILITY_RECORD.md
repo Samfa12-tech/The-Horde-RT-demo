@@ -1,5 +1,9 @@
 # Android RT Device Compatibility Record
 
+## 2026-11-01 - Private attack rings and forest endpoint
+
+SM-S948B / Android 17 / Adreno 840, RayTracingPipeline, saved 25%. Debug APK `7c0e118d663dfe94cdaf251ce40531baa179055688ba884ec5f4120f31e6ec84` installed in place with matching debug signer and exact installed hash readback. Fresh staged yellow/red warning captures and cold forest endpoint each presented 12 stable RT frames. Yellow is close-range cropped in portrait; moving readability and hit-fragment visibility remain owner checks. Live practice recording faced a wall after skip and is not positive combat acceptance. Six original preferences/career files restored exactly; debug stopped and phone released. No performance claim. [Evidence, failed attempts and remaining gates](evidence/2026-11-01-attack-rings/README.md).
+
 ## 2026-11-01 - Normal 25% slider apply and cold reload
 
 SM-S948B / Android 17 / Adreno 840, RayTracingPipeline. Debug APK

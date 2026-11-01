@@ -20,7 +20,7 @@ public final class ChapterDebugCheckpointTest {
         Path root = Paths.get("../../src/gameplay/DevelopmentCheckpoints.h");
         if (!Files.exists(root)) root = Paths.get("src/gameplay/DevelopmentCheckpoints.h");
         final String registry = new String(Files.readAllBytes(root), StandardCharsets.UTF_8);
-        final Matcher rows = Pattern.compile("\\{\\.id\\s*=\\s*(\\d+)\\s*,\\s*\\.name\\s*=\\s*\"(chapter-[^\"]+)\"([^}]+)\\}")
+        final Matcher rows = Pattern.compile("\\{\\.id\\s*=\\s*(\\d+)\\s*,\\s*\\.name\\s*=\\s*\"((?:chapter-|attack-ring-|enemy-hit-)[^\"]+)\"([^}]+)\\}")
                 .matcher(registry);
         int count = 0;
         while (rows.find()) {

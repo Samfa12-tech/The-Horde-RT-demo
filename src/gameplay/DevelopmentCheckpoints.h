@@ -68,6 +68,8 @@ struct DevelopmentCheckpoint
     // 3 return grip/backoff, 4 second ascent. No authored root teleport.
     std::uint8_t rescueTraversalCapture = 0u;
     bool walksBeyondExteriorStation = false;
+    // Real attack-phase staging: yellow windup/contact, red windup/contact, accepted hit.
+    std::uint8_t combatFeedbackCapture = 0u;
 };
 
 // Canonical chapter captures require the same authored scene as the live
@@ -78,7 +80,17 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 113u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 118u> kDevelopmentCheckpoints{{
+    {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
+     .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
+    {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
+     .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=2u},
+    {.id=236,.name="attack-ring-red-windup",.baseShowcaseCheckpointId=9,
+     .cameraX=-31.2f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=3u},
+    {.id=237,.name="attack-ring-red-contact",.baseShowcaseCheckpointId=9,
+     .cameraX=-31.2f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=4u},
+    {.id=238,.name="enemy-hit-fragments",.baseShowcaseCheckpointId=12,
+     .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=5u},
     // Frozen retention witnesses only. Same bounded source pocket, opposite
     // corridor views; normal cameras, collision and story state are unchanged.
     {.id=230,.name="chapter-forest-retention-west",.baseShowcaseCheckpointId=11,

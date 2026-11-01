@@ -516,8 +516,8 @@ void AttackWarningPresentationContract() {
           empty.phase==AttackWarningPhase::None && empty.phaseElapsedSeconds==0.f &&
           empty.phaseDurationSeconds==0.f && empty.contactBoundarySeconds==0.f,
           "absent warning clears source kind phase and all clock data together");
-    Check(!ProductionGameSimulationConfig().specialSkeletonAttacks1_7,
-          "warning description does not enable the normal yellow attack policy");
+    Check(ProductionGameSimulationConfig().specialSkeletonAttacks1_7 && !GameSimulationConfig{}.specialSkeletonAttacks1_7,
+          "live special attacks pair with RT warnings while historical fixtures remain explicit");
     CombatSnapshot combat; LichSnapshot keeper;
     combat.attackerIndex=0;
     auto& first=combat.combatants[0];

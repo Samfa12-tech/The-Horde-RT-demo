@@ -456,6 +456,8 @@ struct SwapchainContext
     std::uint32_t capturePresentedFrames = 0u;
     bool environmentSurvey=false,environmentSurveyWaterDisabled=false,keeperMistRequested=false;
     std::optional<horde::gameplay::simulation::SimulationSnapshot> keeperMistSnapshot;
+    // New feedback captures retain the admitted pre-pause state; live pause still clears effects.
+    std::optional<horde::gameplay::simulation::SimulationSnapshot> combatFeedbackCaptureSnapshot;
     unsigned keeperMistSetupTicks=0;
     std::uint64_t environmentSurveySerial=0;
     std::string environmentSurveyId;
@@ -2166,7 +2168,9 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
     (void)horde::telemetry::SerializeRtEvidencePublication(
         publication, context.rtFrameEvidenceInitialised && context.rtFrameEvidence.ObserverAvailable(),
         frameEvidenceJson, frameEvidenceText, frameEvidenceError);
-    const horde::gameplay::simulation::SimulationSnapshot& simulation = gGameSimulation.Snapshot();
+    const horde::gameplay::simulation::SimulationSnapshot& simulation =
+        context.captureActive && context.combatFeedbackCaptureSnapshot
+            ? *context.combatFeedbackCaptureSnapshot : gGameSimulation.Snapshot();
     const horde::gameplay::ShowcaseZone zone = simulation.zone;
     const horde::gameplay::LichSnapshot& lich = simulation.lich;
     const horde::gameplay::EnemyRosterSnapshot& roster = simulation.enemyRoster;
@@ -2353,6 +2357,11 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
                  ? simulation.activeSkeletonCount
                  : roster.renderedEnemyCount) << ",\n"
          << "  \"attackerEntityId\": " << static_cast<std::uint32_t>(simulation.skeletonAttackerId) << ",\n"
+         << "  \"attackWarning\": {\"source\": " << static_cast<unsigned>(simulation.attackWarning.source)
+         << ", \"kind\": " << static_cast<unsigned>(simulation.attackWarning.kind)
+         << ", \"phase\": " << static_cast<unsigned>(simulation.attackWarning.phase)
+         << ", \"elapsed\": " << simulation.attackWarning.phaseElapsedSeconds
+         << ", \"duration\": " << simulation.attackWarning.phaseDurationSeconds << "},\n"
          << "  \"skeletonPoseBuckets\": " << context.rtScene.SkeletonPoseBucketCount() << ",\n"
          << "  \"gpuTimingMode\": \"" << (context.gpuFrameTimingEnabled ? "enabled" : "disabled") << "\",\n"
          << "  \"lich\": {\"phase\": \"" << horde::gameplay::LichPhaseName(lich.phase)
@@ -2481,6 +2490,7 @@ bool ApplyCaptureCheckpoint(
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const auto& checkpoint = selection.checkpoint;
+    context.combatFeedbackCaptureSnapshot.reset();
     if (!ApplyDebugCheckpointSimulation(context, selection, observation))
     {
         WriteShowcaseDebugState(context, "capture-failed");
@@ -2518,6 +2528,8 @@ bool ApplyCaptureCheckpoint(
     context.routeReplayActive = false;
     context.benchmarkSampling = false;
     context.captureActive = true;
+    if(selection.development && selection.development->combatFeedbackCapture)
+        context.combatFeedbackCaptureSnapshot=gGameSimulation.Snapshot();
     gDebugCaptureActive.store(true, std::memory_order_release);
     context.capturePresentedFrames = 0u;
     ++context.benchmarkGeneration;
@@ -4785,14 +4797,17 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         else
         {
             const horde::gameplay::simulation::SimulationSnapshot& renderedSimulation =
-                context.keeperMistSnapshot ? *context.keeperMistSnapshot : gGameSimulation.Snapshot();
+                context.keeperMistSnapshot ? *context.keeperMistSnapshot :
+                context.captureActive && context.combatFeedbackCaptureSnapshot
+                    ? *context.combatFeedbackCaptureSnapshot : gGameSimulation.Snapshot();
             frameInputs =
                 horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                     renderedSimulation,
                     context.outputExposure,
                     static_cast<horde::vulkan::raytracing::WaterQuality>(
                         static_cast<int>(context.graphicsSettings.waterQuality)),
-                    rtLabTuning);
+                    rtLabTuning, std::nullopt, std::nullopt,
+                    horde::vulkan::raytracing::ProductionAttackWarningOptions(ReadEntryControls().reducedMotion));
             submittedDialogueTick = renderedSimulation.tickIndex;
             if(!context.environmentSurvey){gCampaignFrameTick=renderedSimulation.tickIndex;
                 gCampaignFrameWorld=renderedSimulation.worldRoute.generation;}

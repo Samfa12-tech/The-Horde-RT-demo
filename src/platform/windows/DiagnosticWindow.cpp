@@ -7343,7 +7343,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning,
-                horde::vulkan::raytracing::ResolveFireEmitterQuality(ctx.fireDetail));
+                horde::vulkan::raytracing::ResolveFireEmitterQuality(ctx.fireDetail), std::nullopt,
+                horde::vulkan::raytracing::ProductionAttackWarningOptions(ctx.reducedMotionEnabled));
 #if defined(_DEBUG)
         if (ctx.inspectionSkeletonBlends) {
             if (!ctx.playerDodgeInspectionSnapshot || !frozenDevelopmentCheckpoint ||

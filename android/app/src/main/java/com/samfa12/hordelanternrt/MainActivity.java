@@ -7018,6 +7018,13 @@ public class MainActivity extends Activity {
             case "chapter-stone-wall-corner": return 200;
             case "chapter-forest-first-bend": return 201;
             case "chapter-forest-second-bend": return 202;
+            case "chapter-demo-endpoint": return 232;
+            case "chapter-demo-endpoint-return": return 233;
+            case "attack-ring-yellow-windup": return 234;
+            case "attack-ring-yellow-contact": return 235;
+            case "attack-ring-red-windup": return 236;
+            case "attack-ring-red-contact": return 237;
+            case "enemy-hit-fragments": return 238;
             case "chapter-forest-lookout": return 203;
             case "chapter-forest-lookout-left": return 228;
             case "chapter-forest-lookout-right": return 229;
@@ -7362,6 +7369,10 @@ public class MainActivity extends Activity {
             case 229: return new float[]{3.2953981634f, -0.15f};
             case 230: return new float[]{-1.57079632679f, .014f};
             case 231: return new float[]{1.57079632679f, .014f};
+            case 232: return new float[]{2.57f, -.10f};
+            case 233: return new float[]{-.57f, -.30f};
+            case 234: case 235: case 236: case 237: case 238:
+                return new float[]{-1.57079632679f, -.05f};
             case 204: return new float[]{-1.57079632679f, -0.35f};
             case 205: return new float[]{-1.57079632679f, -0.35f};
             case 206: return new float[]{-1.57079632679f, -0.35f};

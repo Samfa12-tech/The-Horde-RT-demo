@@ -74,7 +74,7 @@ struct GameSimulationConfig
     // Current development gameplay; legacy constructor/capture fixtures retain
     // their authored rules unless the live application profile selects this.
     bool combatFoundation1_7 = false;
-    // Isolated validation only until the enemy-anchored RT warning is admitted.
+    // Historical fixtures remain explicit; the live profile pairs specials with RT warnings.
     bool specialSkeletonAttacks1_7 = false;
     // Remains explicit until the authored clip/private cue package is admitted.
     bool skeletonRevival1_7 = false;
@@ -96,6 +96,7 @@ inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
     config.waterfallSkeletonEncounter = true;
     config.swordStartsStowed = true;
     config.combatFoundation1_7 = true;
+    config.specialSkeletonAttacks1_7 = true;
     // Authored stationary departures; routine bends retain legacy walking.
     config.companionTurnStart = true;
     return config;

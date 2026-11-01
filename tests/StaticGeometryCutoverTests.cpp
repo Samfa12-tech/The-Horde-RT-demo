@@ -669,7 +669,7 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
             failures+=!Check(bool(RtStaticTriangleOmissions::Create(source,21u,triangles,error)),
                 "synthetic common-triangle selection is structurally valid before scene-policy rejection");
             failures+=!Check(!s.CreateStaticGeometryTriangleOmissions(41u,triangles,error) &&
-                error.find("Shared forest")!=std::string::npos,
+                error.find("Shared or complete woodland")!=std::string::npos,
                 "normal shared ownership refuses legacy world-triangle certificates");
             RtStaticMeshSlot unchanged=*source;
             failures+=!Check(!s.PackLoadedStaticAssets(unchanged,families,error) &&
