@@ -39,8 +39,8 @@
       "x86",
       "x86_64"
     ],
-    "installed": false,
-    "launched": false
+    "installed": true,
+    "launched": true
   },
   "windowsNativePublicCapture": {
     "platform": "Windows",
@@ -63,7 +63,7 @@
     "sendOrPublicationApproved": false
   },
   "windowsNativePublicTupleAvailable": true,
-  "androidNativePublicTupleAvailable": false,
+  "androidNativePublicTupleAvailable": true,
   "focusedHostSummaryTests": "PASS",
   "existingNativeOpeningOwnerChecks": 77,
   "focusedAndroidTests": 41,
@@ -76,10 +76,49 @@
   "phoneOriginalFilesRestored": 27,
   "allOriginalPhoneHashesMatch": true,
   "phoneReleased": true,
-  "phonePending": "NotificationShade foreground after release; input stopped awaiting handoff",
   "ownerParkedFiles": 151,
   "ownerParkedChanged": [],
   "sendOrPublicationApproved": false,
   "reportTransmitted": false,
-  "standardWindowsApplyFailure": "actual prior gate rejected; exact failed Win32 call not recorded; no retry"
+  "standardWindowsApplyFailure": "actual prior gate rejected; exact failed Win32 call not recorded; no retry",
+  "androidNativePublicCapture": {
+    "platform": "Android",
+    "artifactPath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\benchmark-opening-summary-20261101.apk",
+    "artifactBytes": 251538250,
+    "artifactSha256": "9511fed946b1a9498efe7f424fc904932f0f5e637e006cb27ad6dc52c6899b9d",
+    "sourceCommit": "71e68fa52de1159f4f86533cbb4e56061df1d185",
+    "nativeBuildIdentity": "g:71e68fa52de1159f4f86533cbb4e56061df1d185;i:34aba11c0c183e31dbce78aae68fcefd0e9b61feee04afc6ad5532d528256ad0;c:D;s:C",
+    "nativeSerializerFile": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\catalog-native-fixed-20261101\\android-final\\android-native-public.json",
+    "nativeSerializerBytes": 9296,
+    "nativeSerializerSha256": "63cb9ebb2845fc23b489e7356615ac4cff53f760b2b29becdcdcec33459ff752",
+    "tuplePath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\catalog-native-fixed-20261101\\android-final\\android-catalog-tuple.json",
+    "tupleSha256": "83a689ff408eab3ea7e9ef73e3c6010b4e942f9717d4791362271cae0fa68670",
+    "normalBenchmark": {
+      "warmupLaps": 1,
+      "measuredLaps": 1,
+      "completedLaps": 2,
+      "rtPresentedEveryMeasuredFrame": true,
+      "waypointsReached": 26,
+      "measuredFrames": 1838,
+      "owningCounts": {
+        "expected": 1838,
+        "completed": 1838,
+        "rejected": 0,
+        "cancelled": 0,
+        "cpuAccepted": 1838,
+        "cpuRejected": 0,
+        "outstanding": 0
+      }
+    },
+    "inputReceipt": "Actual normal More > Custom UI; Public Preview; separate local prepare consent/basic hardware; exact native Prepare; Save reviewed JSON through local Downloads picker. Saved bytes equal exact UI preview.",
+    "originalPhoneFilesRestored": 27,
+    "allOriginalPhoneHashesMatch": true,
+    "debugStopped": true,
+    "homeConfirmed": true,
+    "productionUntouched": true,
+    "localPrepareOnly": true,
+    "sendOrPublicationApproved": false,
+    "reportTransmitted": false
+  },
+  "phoneHomeConfirmed": true
 }
