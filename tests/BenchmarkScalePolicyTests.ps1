@@ -30,7 +30,7 @@ try {
         '-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile', '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF',
         '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF', '-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=',
         '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF', '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF')
-    Assert-Case 'ordinary-default' (Invoke-Case $CmakeExecutable @('-P',$script) $temporaryRoot) $true 'scale-min=33'
+    Assert-Case 'ordinary-default' (Invoke-Case $CmakeExecutable @('-P',$script) $temporaryRoot) $true 'scale-min=25'
     Assert-Case 'ordinary-compatibility50' (Invoke-Case $CmakeExecutable @('-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=50','-P',$script) $temporaryRoot) $true 'scale-min=50'
     Assert-Case 'ordinary-manual33-debug' (Invoke-Case $CmakeExecutable @('-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=33',
         '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=OFF','-DCMAKE_BUILD_TYPE=Debug','-P',$script) $temporaryRoot) $true 'scale-min=33'
@@ -73,7 +73,7 @@ try {
             return Invoke-Case $GradleExecutable (@('--no-daemon','--console=plain','-q',
                 ':app:printHordeRtPolicyForTest') + $neutral + $properties) $android
         }
-        Assert-Case 'gradle-benchmark33' (Gradle-Case @('-PhordeBenchmarkValidation=true','-PhordeBenchmarkMinRenderScale=33')) $true 'debugMinRenderScale=33|releaseMinRenderScale=33|benchmarkMinRenderScale=33'
+        Assert-Case 'gradle-benchmark33' (Gradle-Case @('-PhordeBenchmarkValidation=true','-PhordeBenchmarkMinRenderScale=33')) $true 'debugMinRenderScale=25|releaseMinRenderScale=25|benchmarkMinRenderScale=33'
         Assert-Case 'gradle-timing-benchmark' (Gradle-Case @('-PhordeBenchmarkValidation=true','-PhordePresentTimingValidation=true')) $true 'ordinaryPresentTiming=OFF|benchmarkPresentTiming=ON'
         Assert-Case 'gradle-timing-outside' (Gradle-Case @('-PhordePresentTimingValidation=true')) $false 'requires the isolated Shipping/Mobile'
         Assert-Case 'gradle-timing-invalid' (Gradle-Case @('-PhordePresentTimingValidation=yes')) $false 'must be true or false'

@@ -1,0 +1,29 @@
+{
+  "model": "SM-S948B",
+  "android": "17",
+  "apkSha256": "2b38d60394e5278f7ef40345236b824d4d70466e60376df7e6a1a62217d08a2a",
+  "backend": "RayTracingPipeline",
+  "evidenceClass": "actual Android settings UI apply/save/cold-reload; not performance or natural chapter acceptance",
+  "steps": [
+    "Compatible in-place update of dedicated debug package; installed APK hash verified.",
+    "Opened Settings > Graphics; saved 33% retained on first launch.",
+    "Normal slider selected 25%; Draft 25% / Saved 33% before Apply.",
+    "Apply confirmed Saved 25% and Effective 25% at 360 x 743 internal, 1440 x 2971 output.",
+    "Force-stop and relaunch; reopened Graphics, Saved 25% and Effective 25% at the same extent.",
+    "Inspected actual screenshot: plain 25% label, one slider, no experimental 33%/40% buttons."
+  ],
+  "releaseUtc": "2026-11-01T03:26:36.082051+00:00",
+  "cleanup": "Debug stopped; Home restored; original graphics preferences and Android app internal preference restored from pre-test backup. All six original preference/career hashes match. Latest APK remains installed. Production/actor-worker packages untouched; no device settings changed.",
+  "limitations": [
+    "Scripted taps, not human touch/controller feel.",
+    "Windows built and host-tested; no fresh Windows foreground acceptance.",
+    "No performance improvement claimed."
+  ],
+  "rawArtifactHashes": {
+    "graphics.xml": "97dd1499c131d0a53e95313b1df8825bec95190264f740a8c54440fd7d5f6dd0",
+    "draft25.xml": "39e752531bbaae11f2a866a7907a634cfb2a2aad0bddf4e89ac52aec2393a646",
+    "applied25.xml": "54cc882acf3482237044a0f15f234cffd50d6acf3a11c040ac51c502bd94f632",
+    "cold-graphics25.xml": "7a0da6951e6dfe9bbb913572d7e7fef801db9e02e6abd82db511b1dfece4f558",
+    "applied25.png": "1d5481f40fd55e297fac27621ddd6d28597a96066695d6c4a5b2fc9f821c5471"
+  }
+}

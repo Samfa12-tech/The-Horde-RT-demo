@@ -24,7 +24,7 @@ final class GraphicsPreferences {
     static final String UNSTORED_MOBILE_DEFAULTS = "graphics_unstored_mobile_defaults";
     static final int MIN_RENDER_SCALE_PERCENT = BuildConfig.MIN_RENDER_SCALE_PERCENT;
     static boolean validScale(int scale, int minimum) {
-        return (minimum == 50 || minimum == 33) && ((scale >= 50 && scale <= 100) ||
+        return (minimum == 25 && scale >= 25 && scale <= 100) || (minimum == 50 || minimum == 33) && ((scale >= 50 && scale <= 100) ||
                 (minimum == 33 && (scale == 33 || scale == 40)));
     }
     static final class Values {
@@ -57,7 +57,7 @@ final class GraphicsPreferences {
     static Values baseline() { return new Values(75, 1, 0, 30); }
     // Historical accepted appearance remains separate from the mobile startup/reset policy.
     static Values mobileDefaults() { return mobileDefaults(MIN_RENDER_SCALE_PERCENT); }
-    static Values mobileDefaults(int minimum) { return new Values(minimum == 33 ? 33 : 50, 1, FIRE_MOBILE, 30, false, SHADOW_CURRENT, false, 1); }
+    static Values mobileDefaults(int minimum) { return new Values(minimum <= 33 ? 33 : 50, 1, FIRE_MOBILE, 30, false, SHADOW_CURRENT, false, 1); }
     static boolean hasGraphicsSettings(SharedPreferences prefs) {
         for (String key : prefs.getAll().keySet()) {
             if (key.equals("render_scale") || key.equals("water_quality") || key.equals(FIRE) ||
@@ -146,9 +146,9 @@ final class GraphicsPreferences {
         final Values values = new Values(integer(prefs, "graphics_pending_scale", 75), integer(prefs, "graphics_pending_water", 1),
                 integer(prefs, "graphics_pending_fire", 0), integer(prefs, "graphics_pending_cap", 30), glass,
                 shadow, mist, dust);
-        // Retain explicit experimental intent even when recovering in a constrained50
+        // Retain explicit resolution intent even when recovering in a constrained 50%
         // build. It never becomes effective without owner recovery.
-        return values.valid(33) && (pendingSchema >= 3 || values.fire <= FIRE_HIGH) ? values : baseline();
+        return values.valid(25) && (pendingSchema >= 3 || values.fire <= FIRE_HIGH) ? values : baseline();
     }
     static boolean presented(long[] snapshot, long generation) {
         return snapshot != null && snapshot.length == 28 && generation > 0 && snapshot[1] == generation &&

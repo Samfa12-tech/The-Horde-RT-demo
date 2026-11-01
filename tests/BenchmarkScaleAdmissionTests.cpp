@@ -9,8 +9,8 @@ int main()
         if (!ok) { ++failures; std::cerr << message << '\n'; }
     };
     check(BaselineGraphicsSettings(GraphicsPlatform::Android).renderScalePercent == 75,
-          "historical Android75 baseline is separate from fresh/reset50 defaults");
-    for (int scale : {33, 40, 50, 68, 100})
+          "historical Android 75% baseline is separate from fresh/reset 33% defaults");
+    for (int scale : {25, 26, 33, 40, 49, 50, 68, 100})
     {
         auto requested = BaselineGraphicsSettings(GraphicsPlatform::Android);
         requested.renderScalePercent = scale;
@@ -33,10 +33,10 @@ int main()
                 static_cast<std::uint32_t>(GraphicsReason::InvalidStoredSettings)) != 0u) == !admitted,
               "invalid interrupted experiments must remain explicitly diagnosed without becoming a draft");
         check(MigrateLegacyGraphicsSettings({scale, 1}, GraphicsPlatform::Android).renderScalePercent ==
-              (admitted ? scale : 50), "legacy values must share explicit floor admission");
+              ClampGraphicsRenderScalePercent(scale), "legacy values must share explicit floor admission");
     }
     auto invalidConfirmed = BaselineGraphicsSettings(GraphicsPlatform::Android);
-    invalidConfirmed.renderScalePercent = 32;
+    invalidConfirmed.renderScalePercent = 24;
     auto validPending = BaselineGraphicsSettings(GraphicsPlatform::Android);
     validPending.renderScalePercent = 50;
     const auto independentRecovery = RecoverGraphicsSettings(
@@ -47,12 +47,13 @@ int main()
     for (int scale : {-1, 0, 32, 34, 39, 41, 49, 101})
     {
         auto requested = GraphicsSettings{}; requested.renderScalePercent = scale;
+        if (ValidGraphicsRenderScalePercent(scale)) continue;
         check(!ValidGraphicsSettings(requested) && ScaledGraphicsExtent({1440, 2980}, scale) == GraphicsExtent{},
               "unrequested sub50 tiers and malformed extents must remain rejected");
-        check(ClampGraphicsRenderScalePercent(scale) == (scale > 100 ? 100 : 50),
-              "corrupt saved values preserve the established50 floor and100 upper clamp");
+        check(ClampGraphicsRenderScalePercent(scale) == (scale > 100 ? 100 : (kMinimumGraphicsRenderScalePercent == 25 ? 25 : 50)),
+              "corrupt saved values preserve the established 50% floor and100 upper clamp");
     }
-    const int experimentalScale = ValidGraphicsRenderScalePercent(33) ? 33 : 40;
+    const int experimentalScale = ValidGraphicsRenderScalePercent(25) ? 25 : 33;
     if (ValidGraphicsRenderScalePercent(experimentalScale))
     {
         check((!ValidGraphicsRenderScalePercent(33) || ScaledGraphicsExtent({1440, 2980}, 33) == GraphicsExtent{475, 983}) &&
@@ -73,7 +74,7 @@ int main()
             a.lifecycleGeneration = 7; a.rtPresented = false;
             check(!edit.Acknowledge(a, true), "allocation without actual RT presentation cannot confirm");
             a.rtPresented = true; a.effective.renderScalePercent = 50;
-            check(!edit.Acknowledge(a, true), "clamped50 cannot acknowledge a requested experimental tier");
+            check(!edit.Acknowledge(a, true), "clamped 50% cannot acknowledge a requested experimental tier");
             a.effective = candidate;
             check(edit.Acknowledge(a, true), "actual matching experimental tuple can enter confirmation");
             check(!edit.Acknowledge(a, true), "duplicate acknowledgement cannot restart confirmation");

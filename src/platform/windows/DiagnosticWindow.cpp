@@ -2901,8 +2901,7 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
     }
     if (HWND label = GetDlgItem(context.windowHandle, kRenderScaleLabelId))
     {
-        const std::string text = "Resolution: " + std::to_string(graphicsDraft.renderScalePercent) + "%" +
-            (horde::graphics::ExperimentalGraphicsRenderScalePercent(graphicsDraft.renderScalePercent) ? " (Experimental)" : "");
+        const std::string text = "Resolution: " + std::to_string(graphicsDraft.renderScalePercent) + "%";
         SetWindowTextA(label, text.c_str());
     }
     if (HWND slider = GetDlgItem(context.windowHandle, kRenderScaleSliderId))
@@ -13136,9 +13135,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                                               0, 0, 100, 38, hWnd,
                                               reinterpret_cast<HMENU>(static_cast<INT_PTR>(kRenderScaleSliderId)), instance, nullptr);
     InstallControllerFocusOutline(renderScaleSlider);
-    SendMessageA(renderScaleSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 52));
+    SendMessageA(renderScaleSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, horde::graphics::GraphicsRenderScaleSliderMaximum()));
     SendMessageA(renderScaleSlider, TBM_SETTICFREQ, 10, 0);
-    SendMessageA(renderScaleSlider, TBM_SETPOS, TRUE, 52);
+    SendMessageA(renderScaleSlider, TBM_SETPOS, TRUE, horde::graphics::GraphicsRenderScaleSliderMaximum());
     createStatic(kSfxVolumeLabelId, "SFX VOLUME: 100%", SS_CENTER | SS_CENTERIMAGE);
     HWND sfxVolumeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
                                             WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,

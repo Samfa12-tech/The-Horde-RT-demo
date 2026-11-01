@@ -69,7 +69,7 @@ final class GraphicsPreviewOptions {
     static int[] choices(GraphicsPreferences.Values current, int choice, int minimum) {
         int[] presets;
         switch (choice) {
-            case RESOLUTION: presets = minimum == 33 ? new int[]{33,40,50,63,75,100} : new int[]{50,63,75,100}; break;
+            case RESOLUTION: presets = minimum == 25 ? new int[]{25,50,63,75,100} : minimum == 33 ? new int[]{33,40,50,63,75,100} : new int[]{50,63,75,100}; break;
             case WATER: return new int[]{0,1,2};
             case FIRE: return new int[]{GraphicsPreferences.FIRE_LOW,GraphicsPreferences.FIRE_MOBILE,GraphicsPreferences.FIRE_HIGH};
             case SHADOW: return new int[]{GraphicsPreferences.SHADOW_CURRENT,GraphicsPreferences.SHADOW_HIGHER};
@@ -85,11 +85,20 @@ final class GraphicsPreviewOptions {
         int[] values = Arrays.copyOf(presets,presets.length+1); values[presets.length]=selected;
         Arrays.sort(values); return values;
     }
+    static int resolutionSliderMaximum(int minimum) { return minimum == 33 ? 52 : 100 - minimum; }
+    static int resolutionFromSlider(int position, int minimum) {
+        int bounded = Math.max(0, Math.min(position, resolutionSliderMaximum(minimum)));
+        return minimum == 33 ? (bounded == 0 ? 33 : bounded == 1 ? 40 : bounded + 48) : minimum + bounded;
+    }
+    static int resolutionSliderPosition(int percent, int minimum) {
+        if (minimum == 33) return percent == 33 ? 0 : percent == 40 ? 1 : Math.max(2, Math.min(52, percent - 48));
+        return Math.max(0, Math.min(resolutionSliderMaximum(minimum), percent - minimum));
+    }
     static String resolutionLabel(int percent) {
         return resolutionLabel(percent, GraphicsPreferences.MIN_RENDER_SCALE_PERCENT);
     }
     static String resolutionLabel(int percent, int minimum) {
-        return percent + "%" + (minimum == 33 && (percent == 33 || percent == 40) ? " (Experimental)" : "");
+        return percent + "%";
     }
     static String fireLabel(int value) {
         switch (value) {

@@ -1,13 +1,14 @@
-# Ordinary Graphics admits discrete33/40 experiments; defaults remain50/100.
+# Ordinary Graphics admits continuous25..100; fresh defaults remain33/100.
 # Isolated measurement features retain their independent Shipping/Mobile admission.
-set(HORDE_RT_MIN_RENDER_SCALE_PERCENT "33" CACHE STRING "Discrete33/40 graphics experiments or explicit constrained50 policy")
+set(HORDE_RT_MIN_RENDER_SCALE_PERCENT "25" CACHE STRING "Normal25 floor or isolated historical33/50 policy")
 option(HORDE_RT_ANDROID_BENCHMARK_VALIDATION "Isolated development benchmark package admission" OFF)
 option(HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION "Isolated benchmark actual image presentation evidence" OFF)
 option(HORDE_RT_ANDROID_MOTION_VALIDATION "Isolated benchmark shared-simulation motion evidence" OFF)
 option(HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE "Private Debug transient exact20 outdoor measurement; normal/UI minimum unchanged" OFF)
-if(NOT HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "50" AND
+if(NOT HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "25" AND
+   NOT HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "50" AND
    NOT HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "33")
-    message(FATAL_ERROR "Render scale minimum must be exactly 50 or 33.")
+    message(FATAL_ERROR "Render scale minimum must be exactly 25, 50 or 33.")
 endif()
 if(HORDE_RT_ANDROID_MOTION_VALIDATION AND
    (NOT HORDE_RT_ANDROID_BENCHMARK_VALIDATION OR

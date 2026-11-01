@@ -4606,25 +4606,11 @@ public class MainActivity extends Activity {
         graphicsTelemetry.setText("Checking RT settings");
         graphicsTelemetry.setPadding(dp(6), dp(2), dp(6), dp(2));
         addGraphicsSectionLabel(panel, "Resolution and scene");
-        if (graphicsDraft.scale >= 50) {
-            addSlider(panel, getString(R.string.render_scale), graphicsDraft.scale, 50, 100, value -> {
-                graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.RESOLUTION, value);
-            });
-        } else {
-            addBody(panel, "Resolution: " + GraphicsPreviewOptions.resolutionLabel(graphicsDraft.scale));
-            addGraphicsButton(panel, "Return to 50% resolution", () -> {
-                graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.RESOLUTION, 50);
-                showGraphicsPage();
-            });
-        }
-        if (GraphicsPreferences.MIN_RENDER_SCALE_PERCENT == 33) {
-            for (int scale : new int[]{33,40}) {
-                addGraphicsButton(panel, "Resolution: " + GraphicsPreviewOptions.resolutionLabel(scale), () -> {
-                    graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.RESOLUTION, scale);
-                    showGraphicsPage();
-                });
-            }
-        }
+        addSlider(panel, getString(R.string.render_scale),
+                GraphicsPreviewOptions.resolutionSliderPosition(graphicsDraft.scale, GraphicsPreferences.MIN_RENDER_SCALE_PERCENT),
+                0, GraphicsPreviewOptions.resolutionSliderMaximum(GraphicsPreferences.MIN_RENDER_SCALE_PERCENT), value -> {
+            graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.RESOLUTION, value);
+        }, position -> GraphicsPreviewOptions.resolutionFromSlider(position, GraphicsPreferences.MIN_RENDER_SCALE_PERCENT));
         addGraphicsButton(panel, "Water: " + waterName(graphicsDraft.water), () -> {
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.WATER, (graphicsDraft.water + 1) % 3);
             showGraphicsPage();
@@ -7856,8 +7842,12 @@ public class MainActivity extends Activity {
     private interface IntSettingListener { void onChanged(int value); }
 
     private void addSlider(final LinearLayout panel, final String title, final int value, final int min, final int max, final IntSettingListener listener) {
+        addSlider(panel, title, value, min, max, listener, number -> number);
+    }
+    private void addSlider(final LinearLayout panel, final String title, final int value, final int min, final int max,
+                           final IntSettingListener listener, final java.util.function.IntUnaryOperator displayValue) {
         final TextView label = new TextView(this);
-        label.setText(title + "  " + value + "%");
+        label.setText(title + "  " + displayValue.applyAsInt(value) + "%");
         label.setTextColor(0xFFFFE5BA);
         label.setTextSize(15);
         label.setPadding(0, dp(8), 0, 0);
@@ -7867,10 +7857,10 @@ public class MainActivity extends Activity {
         slider.setMax(max - min);
         slider.setProgress(value - min);
         slider.setMinimumHeight(dp(48));
-        slider.setContentDescription(title+", "+value+"%");
+        slider.setContentDescription(title+", "+displayValue.applyAsInt(value)+"%");
         slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(final SeekBar seekBar, final int progress, final boolean fromUser) {
-                final int current = progress + min;
+                final int current = displayValue.applyAsInt(progress + min);
                 label.setText(title + "  " + current + "%");
                 slider.setContentDescription(title+", "+current+"%");
                 listener.onChanged(current);

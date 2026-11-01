@@ -86,12 +86,23 @@ public final class GraphicsPreviewOptionsTest {
                 GraphicsPreviewOptions.choices(confirmed,GraphicsPreviewOptions.RESOLUTION,50));
         assertArrayEquals(new int[]{50,63,75,100},GraphicsPreviewOptions.choices(
                 new GraphicsPreferences.Values(33,1,0,30),GraphicsPreviewOptions.RESOLUTION,50));
-        assertEquals("33% (Experimental)",GraphicsPreviewOptions.resolutionLabel(33,33));
-        assertEquals("40% (Experimental)",GraphicsPreviewOptions.resolutionLabel(40,33));
+        assertEquals("33%",GraphicsPreviewOptions.resolutionLabel(33,33));
+        assertEquals("40%",GraphicsPreviewOptions.resolutionLabel(40,33));
         assertEquals("50%",GraphicsPreviewOptions.resolutionLabel(50,33));
         assertEquals("75%",GraphicsPreviewOptions.resolutionLabel(75,50));
     }
 
+    @Test public void resolutionSliderPreservesContinuousNormalAndLegacyDiscretePolicy() {
+        for(int minimum : new int[]{25,33,50}) {
+            for(int position=0; position<=GraphicsPreviewOptions.resolutionSliderMaximum(minimum); ++position) {
+                int percent=GraphicsPreviewOptions.resolutionFromSlider(position,minimum);
+                assertTrue(GraphicsPreferences.validScale(percent,minimum));
+                assertEquals(position,GraphicsPreviewOptions.resolutionSliderPosition(percent,minimum));
+            }
+        }
+        assertEquals(25,GraphicsPreviewOptions.resolutionFromSlider(-1,25));
+        assertEquals(100,GraphicsPreviewOptions.resolutionFromSlider(1000,25));
+    }
     @Test public void choicesRetainOtherCurrentFieldsAndNeverMutateConfirmedOrOriginalDraft() {
         int[][] expected = {{100,0,1,15}, {68,2,1,15}, {68,0,0,15}, {68,0,1,60}};
         for (int choice = 0; choice < 4; ++choice) {
@@ -131,8 +142,8 @@ public final class GraphicsPreviewOptionsTest {
     }
 
     @Test public void boundedMenusIncludeCurrentCustomValuesAndUseProductionCameras() {
-        assertArrayEquals(BuildConfig.MIN_RENDER_SCALE_PERCENT == 33 ? new int[]{33,40,50,63,68,75,100} : new int[]{50,63,68,75,100},GraphicsPreviewOptions.choices(confirmed,0));
-        assertArrayEquals(BuildConfig.MIN_RENDER_SCALE_PERCENT == 33 ? new int[]{33,40,50,63,75,100} : new int[]{50,63,75,100},GraphicsPreviewOptions.choices(draft,0));
+        assertArrayEquals(new int[]{25,50,63,68,75,100},GraphicsPreviewOptions.choices(confirmed,0));
+        assertArrayEquals(new int[]{25,50,63,75,100},GraphicsPreviewOptions.choices(draft,0));
         assertArrayEquals(new int[]{0,1,2},GraphicsPreviewOptions.choices(confirmed,1));
         assertArrayEquals(new int[]{2,0,1},GraphicsPreviewOptions.choices(confirmed,2));
         assertArrayEquals(new int[]{15,30,42,60},GraphicsPreviewOptions.choices(new GraphicsPreferences.Values(75,1,0,42),3));
@@ -157,7 +168,7 @@ public final class GraphicsPreviewOptionsTest {
     }
 
     @Test public void invalidChoicesAndValuesCannotProduceLiveTuple() {
-        for (int[] input : new int[][]{{8,0},{6,-1},{6,2},{0,49},{0,101},{1,-1},{1,3},{2,-1},{2,3},{3,14},{3,61},{4,-1},{4,2},{5,-1},{5,0},{5,3},{7,-1},{7,3}}) {
+        for (int[] input : new int[][]{{8,0},{6,-1},{6,2},{0,24},{0,101},{1,-1},{1,3},{2,-1},{2,3},{3,14},{3,61},{4,-1},{4,2},{5,-1},{5,0},{5,3},{7,-1},{7,3}}) {
             try { GraphicsPreviewOptions.withChoice(confirmed,input[0],input[1]); fail("invalid choice/value accepted"); }
             catch (IllegalArgumentException expected) { }
         }
@@ -551,32 +562,44 @@ public final class GraphicsPreviewOptionsTest {
         assertEquals(0,GraphicsBridgeShadow.applyCalls); assertEquals(0,GraphicsBridgeShadow.compareCalls);
     }
 
-    @Test public void ordinaryGraphicsPageStagesClearlyLabelledExperimentsWithoutSaving() throws Exception {
-        assertEquals(33,BuildConfig.MIN_RENDER_SCALE_PERCENT);
+    private android.widget.SeekBar findScaleSlider(android.view.View view) {
+        if (view instanceof android.widget.SeekBar) return (android.widget.SeekBar)view;
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group=(android.view.ViewGroup)view;
+            for(int i=0;i<group.getChildCount();++i) {
+                android.widget.SeekBar slider=findScaleSlider(group.getChildAt(i));
+                if(slider!=null) return slider;
+            }
+        }
+        return null;
+    }
+    @Test public void ordinaryGraphicsPageHasContinuous25SliderWithoutExtraButtons() throws Exception {
         MainActivity activity=livePreviewFixture(); set(activity,"graphicsPreviewWanted",false);
         SharedPreferences prefs=(SharedPreferences)get(activity,"preferences");
         Method show=MainActivity.class.getDeclaredMethod("showGraphicsPage"); show.setAccessible(true);
-        for (int scale : new int[]{33,40}) {
-            show.invoke(activity);
-            Button choice=findButton((android.view.View)get(activity,"menuScrim"),"Resolution: "+scale+"% (Experimental)");
-            assertNotNull("ordinary Graphics exposes the named experiment",choice); choice.performClick();
-            assertEquals(scale,((GraphicsPreferences.Values)get(activity,"graphicsDraft")).scale);
-            assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
-            assertFalse(GraphicsPreferences.hasPending(prefs)); assertEquals(0,GraphicsBridgeShadow.applyCalls);
-        }
-        assertNotNull(findButton((android.view.View)get(activity,"menuScrim"),"Return to 50% resolution"));
+        show.invoke(activity);
+        android.view.View root=(android.view.View)get(activity,"menuScrim");
+        android.widget.SeekBar slider=findScaleSlider(root); assertNotNull(slider);
+        assertEquals(75,slider.getMax());
+        slider.setProgress(0);
+        assertEquals(25,((GraphicsPreferences.Values)get(activity,"graphicsDraft")).scale);
+        assertNull(findButton(root,"Resolution: 33%")); assertNull(findButton(root,"Resolution: 40%"));
+        assertNull(findButton(root,"Return to 50% resolution"));
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
+        assertFalse(GraphicsPreferences.hasPending(prefs)); assertEquals(0,GraphicsBridgeShadow.applyCalls);
     }
 
-    @Test public void experimentalResolutionRequiresApplyAndExactAckBeforeSaving() throws Exception {
-        assertEquals(33,BuildConfig.MIN_RENDER_SCALE_PERCENT);
-        for (int scale : new int[]{33,40}) {
-            MainActivity activity=livePreviewFixture(); GraphicsBridgeShadow.epoch=10;
+    @Test public void resolutionRequiresApplyAndExactAckBeforeSaving() throws Exception {
+        assertEquals(25,BuildConfig.MIN_RENDER_SCALE_PERCENT);
+        for (int scale : new int[]{25,50}) {
+            MainActivity activity=livePreviewFixture();
+            GraphicsBridgeShadow.epoch=10;
             Runnable poll=(Runnable)get(activity,"refreshGraphics"); poll.run();
             Button resolution=((Button[])get(activity,"graphicsOptionButtons"))[GraphicsPreviewOptions.RESOLUTION];
             Method menu=MainActivity.class.getDeclaredMethod("showGraphicsPreviewOptionMenu",Button.class,int.class);
             menu.setAccessible(true); menu.invoke(activity,resolution,GraphicsPreviewOptions.RESOLUTION);
             PopupMenu popup=(PopupMenu)get(activity,"graphicsOptionsPopup");
-            assertEquals(scale+"% (Experimental)",popup.getMenu().findItem(scale).getTitle().toString());
+            assertEquals(scale+"%",popup.getMenu().findItem(scale).getTitle().toString());
             assertTrue(popup.getMenu().performIdentifierAction(scale,0));
             SharedPreferences prefs=(SharedPreferences)get(activity,"preferences");
             GraphicsPreferences.Values choice=GraphicsPreviewOptions.withChoice(confirmed,GraphicsPreviewOptions.RESOLUTION,scale);

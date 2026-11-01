@@ -43,9 +43,8 @@ bool ValidConfiguration(const BenchmarkSummaryConfiguration& c)
     const auto expectedScope = c.platform == BenchmarkSummaryPlatform::Windows ?
         "windows-render-plus-rtlab-telemetry" : "android-render-entry-through-present";
     // Neutral positive percentage rounding, independent of a consuming build's
-    // ordinary50/isolated33 scale admission macro.
-    const bool scale = (m.renderScalePercent >= 50u && m.renderScalePercent <= 100u) ||
-        m.renderScalePercent == 33u || m.renderScalePercent == 40u;
+    // ordinary25/isolated33/50 scale admission macro.
+    const bool scale = m.renderScalePercent >= 25u && m.renderScalePercent <= 100u;
     const auto scaled = [&m](const std::uint32_t dimension) {
         return std::max(1u, static_cast<std::uint32_t>((std::uint64_t{dimension} * m.renderScalePercent + 50u) / 100u));
     };

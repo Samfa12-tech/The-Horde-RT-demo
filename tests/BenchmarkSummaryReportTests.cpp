@@ -104,10 +104,17 @@ void TestInvalidOwnersScopeAndIdentity()
     changed.metadata.presentationWidth = 961u; changed.metadata.presentationHeight = 541u;
     changed.metadata.internalWidth = 317u; changed.metadata.internalHeight = 179u;
     Check(CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
-        "isolated declared33 percentage accepts exact rounded odd extents independent of ordinary build admission");
+        "isolated declared 33% percentage accepts exact rounded odd extents independent of ordinary build admission");
     changed.metadata.internalHeight = 178u;
     Check(!CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
         "one-pixel incorrect scaled extent rejected");
+    changed.metadata.renderScalePercent = 25u;
+    changed.metadata.internalWidth = 240u; changed.metadata.internalHeight = 135u;
+    Check(CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
+          "normal 25% percent report accepts exact rounded native-output-derived extent");
+    changed.metadata.renderScalePercent = 24u;
+    Check(!CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
+          "report cannot silently admit scales below the normal 25% floor");
     auto summary = CaptureBenchmarkSummary(owners.benchmark, owners.evidence, c, c, kRunUuid);
     auto a = Approval(); a.reportUuid = "22222222-2222-1222-9222-222222222222";
     Check(PrepareBenchmarkSummaryReport(summary, a).Status() == BenchmarkSummaryReportStatus::InvalidIdentity, "time UUID/nonrandom-version report identity rejected");

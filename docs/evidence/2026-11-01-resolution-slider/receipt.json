@@ -1,0 +1,27 @@
+{
+  "baseCommit": "da10ff7d85cfe499203cdab0d98548526c411f5a",
+  "sourceHashes": {
+    "CMakeLists.txt": "a587c9674a32e3890a086756b0a82200ba61d3e8165f146b62147f628a098104",
+    "android/app/build.gradle": "23c5dcb7b58f42f1d82f5fe330d11da901b0c950db5e3883377aebca1e3882c8",
+    "android/app/src/main/cpp/benchmark_scale_policy.cmake": "76a1b63c340e018015329c529fcdb7fa068dd1b75de473bf919b25e59167162e",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/GraphicsPreferences.java": "9867d69199125c92d01691b4224d766d5827568c3881fba58feb254829b0cef0",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/GraphicsPreviewOptions.java": "e2c92ad3bfc26eb6f6da1f702d5023cdfc8f3ecb2f76a7d914dbafbba700a0d1",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "89249f27142354cfa118741a80bf98b8b5b722f32f725de7d950f84c2253daa8",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/GraphicsPreferencesTest.java": "0b1fa2ed2f2ea5d0568cbe17a60827c82a5b65c9a5cc8519046bb2b995698f42",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/GraphicsPreviewCompactLayoutTest.java": "2beb54dc47037257da7a02ba2d1427a0d981a6a2f85dadaa844039121b75b622",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/GraphicsPreviewOptionsTest.java": "88d6a680b89369af4316dcd3996acd39beb78c498ea3f33593eaa367bf8b0ed2",
+    "src/graphics/GraphicsSettings.h": "6ce43ec3a71e8b257a9437a4821e48c8cf167960f1cd1bc7da0d184aac418e22",
+    "src/platform/windows/DiagnosticWindow.cpp": "48a321af4ec279ddd00f670d69e662245911810c5aa0911cee9f9ba0951d3432",
+    "src/telemetry/BenchmarkSummary.cpp": "36eb70b6041a27665612c65bb3775080e085e58884bfecc03c63a6d8fc97a3be",
+    "tests/BenchmarkScaleAdmissionTests.cpp": "72a6b1602b1f40cf874ea0c0ce5c68009a85a6223c8f115734981e7ad9ccfa62",
+    "tests/BenchmarkScalePolicyTests.ps1": "5ede2727fac3977a45368cef7d8d337f21fc7c4f17b15b64a2a2aabaf25e67a4",
+    "tests/BenchmarkSummaryReportTests.cpp": "70b280b793b5d466c71c54e45bdfb1f15e2f53325d5d6ac35831bd6116e6b02c",
+    "tests/GraphicsSettingsTests.cpp": "67befcd7d622015a7985f850fd56d0f3e88fbac98d3b198dbdbabdd1e05aa2c4"
+  },
+  "apkSha256": "2b38d60394e5278f7ef40345236b824d4d70466e60376df7e6a1a62217d08a2a",
+  "windowsExeSha256": "320f5d8dc57ec5e17fbdd7170e1f13434c4dc34d222d58de40d600a90bca4aac",
+  "nativeSelectedTests": 6,
+  "androidFocusedTests": 54,
+  "hostedCI": "not run by this agent",
+  "deviceAcceptance": "separate lead-agent record"
+}

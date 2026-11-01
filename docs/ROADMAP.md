@@ -21,6 +21,16 @@ The [linked world-map atlas](design/world/atlas/README.md) locates the preserved
 | Proposal | Reviewable implementation, count, verse, layout or optional idea; no commitment. |
 | Unresolved decision | Explicit choice or evidence gap that must be settled before the affected work is accepted. |
 
+## 1 November 2026 - normal resolution control
+
+Owner-approved 1.7 settings simplification: one continuous 25–100% resolution
+slider, no separate 33%/40% experimental buttons or labels. Existing saved
+percentages and fresh Android 33% / Windows 100% defaults remain unchanged.
+Implementation and focused host checks are recorded in
+[evidence/2026-11-01-resolution-slider/README.md](evidence/2026-11-01-resolution-slider/README.md).
+This is an explicit user quality option, not a mobile performance claim or a
+resumption of the paused optimisation investigation.
+
 ## Update overview
 
 | Update | Purpose and current status |

@@ -15,49 +15,53 @@ inline constexpr std::uint32_t kGraphicsSettingsSchema = 5u;
 inline constexpr double kGraphicsConfirmationSeconds = 15.0;
 
 #ifndef HORDE_RT_MIN_RENDER_SCALE_PERCENT
-#define HORDE_RT_MIN_RENDER_SCALE_PERCENT 33
+#define HORDE_RT_MIN_RENDER_SCALE_PERCENT 25
 #endif
 #ifndef HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE
 #define HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE 0
 #endif
-#if HORDE_RT_MIN_RENDER_SCALE_PERCENT != 33 && HORDE_RT_MIN_RENDER_SCALE_PERCENT != 50
-#error "Render scale minimum must be 33 or 50."
+#if HORDE_RT_MIN_RENDER_SCALE_PERCENT != 25 && HORDE_RT_MIN_RENDER_SCALE_PERCENT != 33 && HORDE_RT_MIN_RENDER_SCALE_PERCENT != 50
+#error "Render scale minimum must be 25, 33 or 50."
 #endif
 inline constexpr int kMinimumGraphicsRenderScalePercent = HORDE_RT_MIN_RENDER_SCALE_PERCENT;
 inline constexpr bool ValidGraphicsRenderScalePercent(const int percent) noexcept
 {
-    return (percent >= 50 && percent <= 100) ||
+    return (percent >= (kMinimumGraphicsRenderScalePercent == 25 ? 25 : 50) && percent <= 100) ||
         (HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE && percent == 20) ||
         (kMinimumGraphicsRenderScalePercent <= 40 && percent == 40) ||
         (kMinimumGraphicsRenderScalePercent == 33 && percent == 33);
 }
 inline constexpr int ClampGraphicsRenderScalePercent(const int percent) noexcept
 {
+    if (HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE && percent == 20) return 20;
+    if (kMinimumGraphicsRenderScalePercent == 25) return std::clamp(percent, 25, 100);
     if (percent >= 50) return std::min(percent, 100);
     return ValidGraphicsRenderScalePercent(percent) ? percent : 50;
 }
-inline constexpr bool ExperimentalGraphicsRenderScalePercent(const int percent) noexcept
-{
-    return percent == 33 || percent == 40;
-}
-// Windows trackbar positions keep the two experimental tiers selectable while
-// leaving every unapproved 34..49 value unreachable: 0=33, 1=40, 2..52=50..100.
+// Normal UI positions are contiguous, including saved 33/40 values. Legacy
+// isolated benchmark policies retain their historical admission separately.
+inline constexpr int GraphicsRenderScaleSliderMaximum() noexcept
+{ return kMinimumGraphicsRenderScalePercent == 33 ? 52 : 100 - kMinimumGraphicsRenderScalePercent; }
 inline constexpr int GraphicsRenderScalePercentFromSliderPosition(const int position) noexcept
 {
-    const int bounded = std::clamp(position, 0, 52);
-    return bounded == 0 ? 33 : (bounded == 1 ? 40 : bounded + 48);
+    const int bounded = std::clamp(position, 0, GraphicsRenderScaleSliderMaximum());
+    if (kMinimumGraphicsRenderScalePercent == 33)
+        return bounded == 0 ? 33 : (bounded == 1 ? 40 : bounded + 48);
+    return kMinimumGraphicsRenderScalePercent + bounded;
 }
 inline constexpr int GraphicsRenderScaleSliderPositionFromPercent(const int percent) noexcept
 {
     const int admitted = ClampGraphicsRenderScalePercent(percent);
-    return admitted == 33 ? 0 : (admitted == 40 ? 1 : admitted - 48);
+    if (kMinimumGraphicsRenderScalePercent == 33)
+        return admitted == 33 ? 0 : (admitted == 40 ? 1 : admitted - 48);
+    return admitted - kMinimumGraphicsRenderScalePercent;
 }
 inline constexpr int StepGraphicsRenderScalePercent(const int percent, const bool increase) noexcept
 {
     const int target = ClampGraphicsRenderScalePercent(percent) + (increase ? 5 : -5);
     int best = ClampGraphicsRenderScalePercent(percent);
     int bestDistance = std::numeric_limits<int>::max();
-    for (int candidate = 33; candidate <= 100; ++candidate)
+    for (int candidate = kMinimumGraphicsRenderScalePercent; candidate <= 100; ++candidate)
     {
         if (!ValidGraphicsRenderScalePercent(candidate)) continue;
         const int distance = candidate > target ? candidate - target : target - candidate;
@@ -126,7 +130,7 @@ inline GraphicsSettings BaselineGraphicsSettings(const GraphicsPlatform platform
 inline GraphicsSettings PlatformDefaultGraphicsSettings(const GraphicsPlatform platform) noexcept
 {
     return platform == GraphicsPlatform::Android ?
-        GraphicsSettings{kMinimumGraphicsRenderScalePercent == 33 ? 33 : 50,
+        GraphicsSettings{kMinimumGraphicsRenderScalePercent <= 33 ? 33 : 50,
             WaterQuality::Mobile, FireDetail::Mobile, 30, false,
             ShadowQuality::Current, false, DustQuality::Low} :
         GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true,

@@ -1,5 +1,17 @@
 # Android RT Device Compatibility Record
 
+## 2026-11-01 - Normal 25% slider apply and cold reload
+
+SM-S948B / Android 17 / Adreno 840, RayTracingPipeline. Debug APK
+`2b38d60394e5278f7ef40345236b824d4d70466e60376df7e6a1a62217d08a2a`
+installed hash verified. Actual Settings UI retained saved 33%, selected/applied
+25%, and confirmed effective 360 x 743 inside 1440 x 2971 output. Cold relaunch
+retained saved/effective 25%. No separate experimental controls remained.
+Original preferences/career hashes restored exactly; latest debug stopped,
+phone released. This is scripted settings/presentation evidence, not FPS,
+natural gameplay or physical controller acceptance.
+[Exact receipt and limits](evidence/2026-11-01-resolution-slider/ANDROID.json).
+
 ## 2026-11-01 03:10 UTC - Integrated forest device capture
 
 SM-S948B / Android 17 / Adreno 840, RayTracingPipeline, saved 33% scale.
