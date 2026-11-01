@@ -77,6 +77,9 @@ receipt provides hashes; it is not a claim that raw artifacts are in Git.
 
 ## Next phone-default decision
 
+The subsequent Off comparison is now complete: [1 November result](MOBILE_WATER.md).
+The failed opaque-spray experiment above retains its original decision.
+
 The owner reports never noticing the spray. Treat that as owner observation,
 not visual parity proof. Under the approved phone-preset scope, next consider
 **contact droplets Off** while retaining water and the full-quality option.

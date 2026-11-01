@@ -1,6 +1,9 @@
 # Current S26 baseline and closed scratch-initialization trial
 
-**Decision: no runtime optimization admitted.** The source-only scratch candidate
+Latest follow-up: [1 November Mobile-water reduction and pause handoff](MOBILE_WATER.md).
+That scoped quality change is retained; the scratch trial below remains closed.
+
+**Decision for the scratch trial: no runtime optimization admitted.** The source-only scratch candidate
 passed its collision checks but did not establish a repeatable useful whole-frame
 gain. Its runtime and temporary test edits were restored to `a89362dc`. No renderer,
 quality, resolution, gameplay or forest default changed. This is a first bounded

@@ -1,5 +1,26 @@
 # Android RT Device Compatibility Record
 
+## 2026-11-01 00:49 UTC - Mobile water contact-spray reduction validated in scope
+
+SM-S948B / Android 17 / Adreno 840 / Vulkan 1.4.295 / driver 2150932499.
+A same-APK warm comparison produced 2,844 strict RT frame/presentation joins.
+Droplets Off reduced the waterfall interval; it did not establish a whole-game
+FPS improvement or playable default. Six active-contact native stills inspected;
+not pixel parity or physical-input acceptance.
+
+Final normal-policy APK
+`277a41f2a30c3b69ad92f43c4530a95c294388e38c011ffd1c75054f6703ab17`
+(base `77cfc160` plus recorded source hashes) completed 793 RT frames at saved
+33%, Shipping/Mobile/Pipeline. All 28 active-contact frames used OpaqueFast with
+Mobile water enabled and no private comparison switch. High retains droplets.
+This is generated-route correctness evidence, not sustained/natural play.
+[Exact builds, controls, measurements and limitations](evidence/2026-10-31-mobile-efficiency/MOBILE_WATER.md).
+
+At 00:49:29 UTC, baseline Debug APK restored/stopped, preferences and 15 original
+campaign files unchanged; automatic brightness and rotation restored. Production
+and actor-worker packages untouched; no owned process or transfer remains.
+Horde is paused after the completed session; no further device lease is held.
+
 ## 2026-11-01 00:00 UTC - splash comparison completed, no preset admission
 
 SM-S948B / Android17 / Adreno840, same saved33% Pipeline/Shipping-Mobile profile.

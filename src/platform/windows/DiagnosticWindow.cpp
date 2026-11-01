@@ -2979,7 +2979,7 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
             << "\r\n" << (mobileOptics ?
                  "Mobile optical build remains fixed; Glass Off removes all pane geometry." :
                  "High optical build: physical panes retained; profile is fixed by this build.")
-             << "\r\nWater: Off omits water, Mobile refracts, High adds scene reflections."
+             << "\r\nWater: Mobile omits droplets; High adds reflections/droplets; Off hides water."
              << "\r\nFire: Low/Mobile/High use2/4/10 steps; light strength unchanged."
              << "\r\nShadows: Current area1; Higher area2/4. Cost unmeasured."
              << "\r\nParticles: Off/Low/Standard controls room motes and hit fragments; cost unmeasured."

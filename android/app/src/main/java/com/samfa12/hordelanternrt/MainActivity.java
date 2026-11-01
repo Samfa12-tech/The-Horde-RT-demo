@@ -4782,7 +4782,7 @@ public class MainActivity extends Activity {
     private void showGraphicsSettingsDetails() {
         dismissGraphicsPreviewDetails();
         final TextView details = new TextView(this);
-        details.setText("Resolution controls RT render scale. Water Off omits water appearance; Mobile uses reduced reflected detail; High adds a reflected scene query. " +
+        details.setText("Resolution controls RT render scale. Water Off hides water. Mobile keeps water and ripples with reduced reflections and no splash droplets. High adds scene reflections and splash droplets. " +
                 "Fire detail changes volume steps while preserving emitters, lights and gameplay. Menu / preview cap controls their frame cap. " +
                 "Glass enables only glass supported by this build; mobile lantern panes remain absent. Shadows select Current or Higher RT sampling. " +
                 "Mist toggles keeper-room ground mist; fire, smoke and electricity stay enabled. The compact authored preview has no ground mist.\n" +

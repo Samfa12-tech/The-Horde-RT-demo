@@ -228,10 +228,15 @@ bool CheckBoundedWaterDropletGeometry()
                           std::isfinite(vertex.position[2]),
                       "all fixed refit vertices must remain finite, including inactive slots");
     std::array<horde::scene::assets::StaticRtVertex, kWaterDropletVertexCount> hiddenVertices{};
-    ok &= Require(UpdateWaterDropletVertices(snapshot, hiddenVertices, false) &&
+    ok &= Require(!WaterContactSprayEnabled(WaterQuality::Off) &&
+                      !WaterContactSprayEnabled(WaterQuality::Mobile) &&
+                      WaterContactSprayEnabled(WaterQuality::High),
+                  "only High water enables optional transmissive contact spray");
+    ok &= Require(UpdateWaterDropletVertices(snapshot, hiddenVertices,
+                          WaterContactSprayEnabled(WaterQuality::Mobile)) &&
                       hiddenVertices[0].position[0] > 9999.0f &&
                       hiddenVertices[0].position[1] > 9999.0f,
-                  "disabled water quality must refit droplet geometry outside the playable scene");
+                  "Mobile water must hide droplet geometry without changing its fixed allocation");
     for (std::size_t slot = 0u; slot < horde::gameplay::effects::kWaterDropletCapacity; ++slot)
     {
         const auto& first = hiddenVertices[slot * kWaterDropletVerticesPerSlot].position;
@@ -243,6 +248,16 @@ bool CheckBoundedWaterDropletGeometry()
                           "quality-hidden droplets must use degenerate, finite off-scene geometry");
         }
     }
+    ok &= Require(UpdateWaterDropletVertices(snapshot, hiddenVertices,
+                          WaterContactSprayEnabled(WaterQuality::High)),
+                  "returning to High restores live spray using the existing topology");
+    bool restoredSpray = true;
+    for (std::size_t index = 0; index < frameVertices.size(); ++index)
+        restoredSpray = restoredSpray &&
+            hiddenVertices[index].position == frameVertices[index].position &&
+            hiddenVertices[index].normal == frameVertices[index].normal;
+    ok &= Require(restoredSpray,
+                  "High to Mobile to High restores identical droplet geometry from the same snapshot");
     snapshot.ripples[0] = {{{-2.0f, -0.925f, -15.0f}}, 0.6f, 0.45f, true};
     snapshot.ripples[1] = {{{-3.0f, -0.925f, -15.3f}}, 0.2f, 0.75f, true};
     const auto gpuRipple = MakeWaterContactRippleGpu(snapshot);

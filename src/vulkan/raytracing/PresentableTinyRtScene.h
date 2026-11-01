@@ -108,6 +108,13 @@ enum class WaterQuality : std::uint32_t
     High = 2u,
 };
 
+// Mobile retains water surfaces and contact ripples. The optional transmissive
+// droplets belong to High: even tiny droplets can select the generic RT strategy.
+inline constexpr bool WaterContactSprayEnabled(const WaterQuality quality) noexcept
+{
+    return quality == WaterQuality::High;
+}
+
 struct PlayerWeaponRenderPose
 {
     std::array<float, 3u> rightHandLocal{};

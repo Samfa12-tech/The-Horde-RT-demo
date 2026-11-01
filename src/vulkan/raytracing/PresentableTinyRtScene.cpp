@@ -7343,7 +7343,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         return false;
     }
     const bool waterDropletsVisible = genericStaticAssetEnabled_ &&
-        frame.waterQuality != WaterQuality::Off &&
+        WaterContactSprayEnabled(frame.waterQuality) &&
         std::any_of(frame.waterContact.droplets.begin(), frame.waterContact.droplets.end(),
                     [](const auto& droplet) { return droplet.active; });
 #if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT

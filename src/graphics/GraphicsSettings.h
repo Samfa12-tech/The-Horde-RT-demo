@@ -126,7 +126,8 @@ inline GraphicsSettings BaselineGraphicsSettings(const GraphicsPlatform platform
 inline GraphicsSettings PlatformDefaultGraphicsSettings(const GraphicsPlatform platform) noexcept
 {
     return platform == GraphicsPlatform::Android ?
-        GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false,
+        GraphicsSettings{kMinimumGraphicsRenderScalePercent == 33 ? 33 : 50,
+            WaterQuality::Mobile, FireDetail::Mobile, 30, false,
             ShadowQuality::Current, false, DustQuality::Low} :
         GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true,
             ShadowQuality::Current, true, DustQuality::Low};

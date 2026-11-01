@@ -45,11 +45,11 @@ void TestMigrationAndProfiles()
           ClampGraphicsRenderScalePercent(-1) == 50 && ClampGraphicsRenderScalePercent(40) ==
               (ValidGraphicsRenderScalePercent(40) ? 40 : 50),
           "only explicit low tiers survive loading; malformed gaps and negatives recover at50");
-    Check(PlatformDefaultGraphicsSettings(GraphicsPlatform::Android).renderScalePercent == 50 &&
+    Check(PlatformDefaultGraphicsSettings(GraphicsPlatform::Android).renderScalePercent == 33 &&
           PlatformDefaultGraphicsSettings(GraphicsPlatform::Android).waterQuality == WaterQuality::Mobile &&
           !PlatformDefaultGraphicsSettings(GraphicsPlatform::Android).glassEnabled &&
           PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows).renderScalePercent == 100,
-          "experimental choices do not change fresh/reset platform defaults");
+          "approved mobile33 fresh/reset policy matches Android without changing desktop defaults");
     Check(GraphicsRenderScalePercentFromSliderPosition(0) == 33 &&
           GraphicsRenderScalePercentFromSliderPosition(1) == 40 &&
           GraphicsRenderScalePercentFromSliderPosition(2) == 50 &&
@@ -337,8 +337,8 @@ void TestPlatformDefaultsAndMist()
 {
     const auto mobile = PlatformDefaultGraphicsSettings(GraphicsPlatform::Android);
     const auto desktop = PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows);
-    Check(mobile == GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false, ShadowQuality::Current, false, DustQuality::Low},
-          "fresh mobile defaults keep50/Mobile/Mobile/30/GlassOff/Current/MistOff with owner-approved DustLow");
+    Check(mobile == GraphicsSettings{33, WaterQuality::Mobile, FireDetail::Mobile, 30, false, ShadowQuality::Current, false, DustQuality::Low},
+          "fresh mobile defaults keep approved33/Mobile/Mobile/30/GlassOff/Current/MistOff/DustLow");
     Check(desktop == GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true, ShadowQuality::Current, true, DustQuality::Low},
           "fresh desktop defaults preserve High appearance and MistOn with owner-approved DustLow");
     Check(MatchGraphicsPreset(mobile, GraphicsPlatform::Android) == GraphicsPreset::PlatformDefault &&
