@@ -1,0 +1,898 @@
+{
+  "schema": 1,
+  "cohortDateUtc": "2026-10-31",
+  "sourceBase": "c961f4940337ca4f4205aa3ab97d60e75147cce9",
+  "decision": "NOT ADMITTED. Closing-control drift and failed whole-route keep gate; visual route had no active droplets. Runtime probe archived and removed; immutable contact telemetry retained.",
+  "candidate": {
+    "sourceBase": "c961f4940337ca4f4205aa3ab97d60e75147cce9",
+    "buildId": "g:c961f4940337ca4f4205aa3ab97d60e75147cce9;i:7ec67656d7f06caa1a70a6eb7feba72570bd7dcd5fc008eb4f3db410b30a9ab6;c:D;s:D",
+    "apkSha256": "5754b6d580ed7a6907c67170a2613cb652cf1dc92b6240943eaef68b9218f51a",
+    "bytes": 184765030,
+    "nativeSha256": "2d68462809275331ec9de1bc82167b3a89d1ee6c0b7098b435dca87dda7717c9",
+    "nativeBytes": 5465808,
+    "assetsIdentical": 189,
+    "comparison": "Same APK, explicit debug isolated splash_refraction true/false; normal defaults unchanged; shaders identical to baseline",
+    "abis": [
+      "lib/arm64-v8a/libhorde_rt_probe_android.so"
+    ],
+    "raygenShaderHashes": {
+      "diagnostic_high_generic_dielectric": "560aa773ea08869a7867dc12b1f561a8c88e2f89d8f9546151ea8c17381a5911",
+      "diagnostic_high_opaque_fast": "42b80e2e754fd2501c8b91d1ca41ce4f8f0de1b19e2ed05117541cf5e9d4ffff",
+      "diagnostic_mobile_generic_dielectric": "88ac87b5079449d352c74b44d65f5fa331a58a7b3225739d26327c59732e76f7",
+      "diagnostic_mobile_opaque_fast": "ced3e0f10ccf065031ff5699d7709f599911979672dd8739a3cb20ce1ee0aeef",
+      "shipping_high_generic_dielectric": "bf68332eed083c2edc2a18d2f2892603ea31ce13b33280cb207943e466a40153",
+      "shipping_high_opaque_fast": "f2c24b0ac15d915937f48ae2508723fa1791370e8385efe2626b5048c05c4738",
+      "shipping_mobile_generic_dielectric": "8b4b2149ee60035befaacd4a7ec63def8ee79f401397fa6d74dfecc81d0004b9",
+      "shipping_mobile_opaque_fast": "9b879fe1822c768486007295d62db5013e9c9e61d35814ef96a0b0baf239f1cc"
+    },
+    "rayqueryShaderHashes": {
+      "rayquery_compute_diagnostic_high_generic_dielectric": "cc52b0009930221952c1536b68c800000f52c095f1a41d0649f25743588cc07e",
+      "rayquery_compute_diagnostic_high_opaque_fast": "16ce74d922b2ce5e24421ce5688113edcb508d8cbff1927ba2d7cfe63d5fb22e",
+      "rayquery_compute_diagnostic_mobile_generic_dielectric": "476e45e0f1a607a26cb21a8f395bf80fd1a1d500fd0fd32a2e7ddbe620d42684",
+      "rayquery_compute_diagnostic_mobile_opaque_fast": "cb15601d3ffaca049fb8e3cac6bfd22c309d2870caac81416ca739e466650c9e",
+      "rayquery_compute_shipping_high_generic_dielectric": "dcd484650399cfb8d3a0ec5648a1979611c28046fd039a48760dd51ad930f57e",
+      "rayquery_compute_shipping_high_opaque_fast": "b2c9f44c59196f63e0474c6310e93b79fdff5915a746f61950403b9851521278",
+      "rayquery_compute_shipping_mobile_generic_dielectric": "8b6b66f10152971cb5e67b720cb66a6e62c4171b1ab2889b9f9e4c3461262131",
+      "rayquery_compute_shipping_mobile_opaque_fast": "2a3432c1f46397f8c85e27c5e6732ee77eecf90fe6916bd9cdbfb43ead05ed5a"
+    },
+    "javaFocusedTests": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736"
+  },
+  "device": {
+    "model": "SM-S948B",
+    "os": "Android17 API37 S948BXXS4BZIG",
+    "gpu": "Adreno840",
+    "vulkan": "1.4.295",
+    "rawDriverVersion": 2150932499
+  },
+  "profile": {
+    "backend": "RayTracingPipeline",
+    "instrumentation": "Shipping",
+    "dielectric": "Mobile",
+    "renderScalePercent": 33,
+    "internalExtent": [
+      475,
+      980
+    ],
+    "outputExtent": [
+      1440,
+      2971
+    ],
+    "water": "Mobile",
+    "fire": "Mobile",
+    "glass": false,
+    "shadow": "Current",
+    "mist": false,
+    "dust": "Low",
+    "actorWorker": false,
+    "forest480": false
+  },
+  "predeclaredPlan": {
+    "order": [
+      [
+        "splash-a1",
+        true
+      ],
+      [
+        "splash-b1",
+        false
+      ],
+      [
+        "splash-b2",
+        false
+      ],
+      [
+        "splash-a2",
+        true
+      ]
+    ],
+    "sameApk": "5754b6d580ed7a6907c67170a2613cb652cf1dc92b6240943eaef68b9218f51a",
+    "preparation": "Initial bounded warm conditioning, then every case cools to AP<=35/BAT<=31.2/SKIN<=33.8 C before equal45-second preparation and acknowledged fresh checkpoint.",
+    "maximumConditioningSeconds": 120,
+    "maximumCooldownPerCaseSeconds": 180,
+    "startMaximumDifferenceCelsius": 1.5,
+    "requiredFrameworkThermalStatus": 0,
+    "closingControlMaximumWholeRouteRateDriftPercent": 5,
+    "usefulGainPercentAgainstBothControls": 3,
+    "allowedWholeRouteP95RegressionPercent": 15,
+    "maximumBlockSeconds": 1500,
+    "regionalAnalysis": "Approach simulationSeconds15.0 through18.0, equal0.25m X bins in waterfall lane; compare actual inter-present intervals plus stages and recorded contact/pipeline state. Report regional and whole-route separately; no causal attribution from raw sample populations alone.",
+    "visuals": "No timed readbacks. Separate visual inspection still required.",
+    "stop": "One failed readiness/thermal/ownership case stops this cohort, restores temporary settings and verified baseline APK; no threshold relaxation."
+  },
+  "strictFrameCount": 3140,
+  "runs": {
+    "splash-a1": {
+      "reportSha256": "a7fa204c4f6c5c6ac6a3e1ac93ba0713270f0b91fcec238c11f8894651c54da5",
+      "requestedSplashRefraction": true,
+      "allThermalStatusZero": true,
+      "thermal": {
+        "before-preparation": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 34.7,
+            "BAT": 30.6,
+            "SKIN": 33.0
+          }
+        },
+        "fresh-before-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 42.3,
+            "BAT": 33.5,
+            "SKIN": 36.8
+          }
+        },
+        "after-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 42.0,
+            "BAT": 34.5,
+            "SKIN": 37.1
+          }
+        }
+      },
+      "wholeRoute": {
+        "frames": 823,
+        "actualIntervalMs": {
+          "n": 822,
+          "median": 50.0,
+          "p95": 75.0,
+          "maximum": 150.0
+        },
+        "actualImagesPerSecond": 19.099621874668987,
+        "dispatchMs": {
+          "n": 823,
+          "median": 38.906457,
+          "p95": 67.652707,
+          "maximum": 138.681767
+        },
+        "asMs": {
+          "n": 823,
+          "median": 0.416458,
+          "p95": 0.531302,
+          "maximum": 1.590937
+        },
+        "genericFrames": 20,
+        "activeDropletFrames": 20
+      },
+      "waterWindow15to18": {
+        "frames": 44,
+        "actualIntervalMs": {
+          "n": 43,
+          "median": 75.0,
+          "p95": 104.166666,
+          "maximum": 150.0
+        },
+        "actualImagesPerSecond": 14.195322766661448,
+        "dispatchMs": {
+          "n": 44,
+          "median": 67.645207,
+          "p95": 92.747758,
+          "maximum": 138.681767
+        },
+        "asMs": {
+          "n": 44,
+          "median": 0.5104949999999999,
+          "p95": 0.549531,
+          "maximum": 0.552917
+        },
+        "genericFrames": 20,
+        "activeDropletFrames": 20
+      },
+      "descriptivePreWater0to14": {
+        "frames": 257,
+        "actualIntervalMs": {
+          "n": 256,
+          "median": 54.166666,
+          "p95": 70.833333,
+          "maximum": 99.999999
+        },
+        "actualImagesPerSecond": 18.3567368348833,
+        "dispatchMs": {
+          "n": 257,
+          "median": 44.980416,
+          "p95": 68.480207,
+          "maximum": 92.51505
+        },
+        "asMs": {
+          "n": 257,
+          "median": 0.420781,
+          "p95": 0.444687,
+          "maximum": 1.406719
+        },
+        "genericFrames": 0,
+        "activeDropletFrames": 0
+      },
+      "peakDispatch": {
+        "tick": 3814,
+        "submission": 839,
+        "seconds": 15.7166667,
+        "phase": "approach",
+        "x": -2.10748,
+        "z": -15.1999,
+        "presentNs": 889581202210902,
+        "dispatchMs": 138.681767,
+        "asMs": 0.394635,
+        "strategy": "shipping_mobile_generic_dielectric",
+        "droplets": 8,
+        "inStream": true,
+        "wetGround": true,
+        "fireCount": 1
+      },
+      "firstDroplet": {
+        "tick": 3814,
+        "submission": 839,
+        "seconds": 15.7166667,
+        "phase": "approach",
+        "x": -2.10748,
+        "z": -15.1999,
+        "presentNs": 889581202210902,
+        "dispatchMs": 138.681767,
+        "asMs": 0.394635,
+        "strategy": "shipping_mobile_generic_dielectric",
+        "droplets": 8,
+        "inStream": true,
+        "wetGround": true,
+        "fireCount": 1
+      },
+      "firstGeneric": {
+        "tick": 3814,
+        "submission": 839,
+        "seconds": 15.7166667,
+        "phase": "approach",
+        "x": -2.10748,
+        "z": -15.1999,
+        "presentNs": 889581202210902,
+        "dispatchMs": 138.681767,
+        "asMs": 0.394635,
+        "strategy": "shipping_mobile_generic_dielectric",
+        "droplets": 8,
+        "inStream": true,
+        "wetGround": true,
+        "fireCount": 1
+      },
+      "genericWithNoActiveDropletFrames": 0,
+      "activeDropletsWithOpaqueFrames": 0,
+      "catchUpOverrunDelta": 4
+    },
+    "splash-b1": {
+      "reportSha256": "49dbb8631db814080ed0947d5646bd51f7b68c32f6cff41559bf879d0c2170a7",
+      "requestedSplashRefraction": false,
+      "allThermalStatusZero": true,
+      "thermal": {
+        "before-preparation": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 34.0,
+            "BAT": 31.2,
+            "SKIN": 33.3
+          }
+        },
+        "fresh-before-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 41.5,
+            "BAT": 34.2,
+            "SKIN": 37.0
+          }
+        },
+        "after-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 41.6,
+            "BAT": 34.8,
+            "SKIN": 37.3
+          }
+        }
+      },
+      "wholeRoute": {
+        "frames": 789,
+        "actualIntervalMs": {
+          "n": 788,
+          "median": 50.000052,
+          "p95": 75.0,
+          "maximum": 104.166667
+        },
+        "actualImagesPerSecond": 18.29544311660963,
+        "dispatchMs": {
+          "n": 789,
+          "median": 41.077291,
+          "p95": 62.527707,
+          "maximum": 93.934737
+        },
+        "asMs": {
+          "n": 789,
+          "median": 0.429219,
+          "p95": 0.541354,
+          "maximum": 1.85776
+        },
+        "genericFrames": 0,
+        "activeDropletFrames": 29
+      },
+      "waterWindow15to18": {
+        "frames": 55,
+        "actualIntervalMs": {
+          "n": 54,
+          "median": 50.0,
+          "p95": 83.333333,
+          "maximum": 83.333386
+        },
+        "actualImagesPerSecond": 18.409090917458677,
+        "dispatchMs": {
+          "n": 55,
+          "median": 35.555468,
+          "p95": 74.634425,
+          "maximum": 75.960415
+        },
+        "asMs": {
+          "n": 55,
+          "median": 0.535,
+          "p95": 0.567656,
+          "maximum": 1.471875
+        },
+        "genericFrames": 0,
+        "activeDropletFrames": 29
+      },
+      "descriptivePreWater0to14": {
+        "frames": 237,
+        "actualIntervalMs": {
+          "n": 236,
+          "median": 58.3333335,
+          "p95": 83.333333,
+          "maximum": 104.166667
+        },
+        "actualImagesPerSecond": 16.92261683275761,
+        "dispatchMs": {
+          "n": 237,
+          "median": 49.735051,
+          "p95": 75.973227,
+          "maximum": 93.934737
+        },
+        "asMs": {
+          "n": 237,
+          "median": 0.436094,
+          "p95": 0.505573,
+          "maximum": 1.85776
+        },
+        "genericFrames": 0,
+        "activeDropletFrames": 0
+      },
+      "peakDispatch": {
+        "tick": 3043,
+        "submission": 574,
+        "seconds": 2.55,
+        "phase": "approach",
+        "x": 2.81256e-15,
+        "z": -2.905,
+        "presentNs": 889782830961814,
+        "dispatchMs": 93.934737,
+        "asMs": 0.480052,
+        "strategy": "shipping_mobile_opaque_fast",
+        "droplets": 0,
+        "inStream": false,
+        "wetGround": false,
+        "fireCount": 1
+      },
+      "firstDroplet": {
+        "tick": 3837,
+        "submission": 794,
+        "seconds": 15.7833333,
+        "phase": "approach",
+        "x": -2.14618,
+        "z": -15.2,
+        "presentNs": 889796039295455,
+        "dispatchMs": 63.339894,
+        "asMs": 0.424219,
+        "strategy": "shipping_mobile_opaque_fast",
+        "droplets": 8,
+        "inStream": true,
+        "wetGround": true,
+        "fireCount": 1
+      },
+      "firstGeneric": null,
+      "genericWithNoActiveDropletFrames": 0,
+      "activeDropletsWithOpaqueFrames": 29,
+      "catchUpOverrunDelta": 4
+    },
+    "splash-b2": {
+      "reportSha256": "3b727b5ac803400b1c303c3abfd64e50cb0af0de653fad08a6e12dad844d7064",
+      "requestedSplashRefraction": false,
+      "allThermalStatusZero": true,
+      "thermal": {
+        "before-preparation": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 33.5,
+            "BAT": 31.2,
+            "SKIN": 33.2
+          }
+        },
+        "fresh-before-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 41.5,
+            "BAT": 34.5,
+            "SKIN": 37.0
+          }
+        },
+        "after-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 41.6,
+            "BAT": 35.1,
+            "SKIN": 37.4
+          }
+        }
+      },
+      "wholeRoute": {
+        "frames": 774,
+        "actualIntervalMs": {
+          "n": 773,
+          "median": 50.000052,
+          "p95": 83.333282,
+          "maximum": 104.166667
+        },
+        "actualImagesPerSecond": 17.957602880626794,
+        "dispatchMs": {
+          "n": 774,
+          "median": 41.188046,
+          "p95": 66.713071,
+          "maximum": 96.412862
+        },
+        "asMs": {
+          "n": 774,
+          "median": 0.434687,
+          "p95": 0.563333,
+          "maximum": 2.123125
+        },
+        "genericFrames": 0,
+        "activeDropletFrames": 28
+      },
+      "waterWindow15to18": {
+        "frames": 51,
+        "actualIntervalMs": {
+          "n": 50,
+          "median": 50.000053,
+          "p95": 91.666667,
+          "maximum": 95.833281
+        },
+        "actualImagesPerSecond": 17.341040157706576,
+        "dispatchMs": {
+          "n": 51,
+          "median": 37.671509,
+          "p95": 80.116977,
+          "maximum": 83.26255
+        },
+        "asMs": {
+          "n": 51,
+          "median": 0.563125,
+          "p95": 0.579479,
+          "maximum": 0.591354
+        },
+        "genericFrames": 0,
+        "activeDropletFrames": 28
+      },
+      "descriptivePreWater0to14": {
+        "frames": 236,
+        "actualIntervalMs": {
+          "n": 235,
+          "median": 58.333334,
+          "p95": 83.333333,
+          "maximum": 104.166667
+        },
+        "actualImagesPerSecond": 16.82577522463703,
+        "dispatchMs": {
+          "n": 236,
+          "median": 49.86484299999999,
+          "p95": 70.254946,
+          "maximum": 96.412862
+        },
+        "asMs": {
+          "n": 236,
+          "median": 0.437318,
+          "p95": 0.50724,
+          "maximum": 1.331458
+        },
+        "genericFrames": 0,
+        "activeDropletFrames": 0
+      },
+      "peakDispatch": {
+        "tick": 3041,
+        "submission": 567,
+        "seconds": 2.26666667,
+        "phase": "approach",
+        "x": -3.37508e-16,
+        "z": -2.45667,
+        "presentNs": 890048238805046,
+        "dispatchMs": 96.412862,
+        "asMs": 0.433385,
+        "strategy": "shipping_mobile_opaque_fast",
+        "droplets": 0,
+        "inStream": false,
+        "wetGround": false,
+        "fireCount": 1
+      },
+      "firstDroplet": {
+        "tick": 3850,
+        "submission": 788,
+        "seconds": 15.75,
+        "phase": "approach",
+        "x": -2.14778,
+        "z": -15.2,
+        "presentNs": 890061717972177,
+        "dispatchMs": 67.382863,
+        "asMs": 0.422812,
+        "strategy": "shipping_mobile_opaque_fast",
+        "droplets": 8,
+        "inStream": true,
+        "wetGround": true,
+        "fireCount": 1
+      },
+      "firstGeneric": null,
+      "genericWithNoActiveDropletFrames": 0,
+      "activeDropletsWithOpaqueFrames": 28,
+      "catchUpOverrunDelta": 2
+    },
+    "splash-a2": {
+      "reportSha256": "2cae49379be1b9faf5e9cee1f410172d780257cb41fccca8b84a0c900ac36a0c",
+      "requestedSplashRefraction": true,
+      "allThermalStatusZero": true,
+      "thermal": {
+        "before-preparation": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 33.3,
+            "BAT": 31.2,
+            "SKIN": 33.0
+          }
+        },
+        "fresh-before-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 41.4,
+            "BAT": 34.4,
+            "SKIN": 37.0
+          }
+        },
+        "after-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 41.2,
+            "BAT": 35.1,
+            "SKIN": 37.2
+          }
+        }
+      },
+      "wholeRoute": {
+        "frames": 754,
+        "actualIntervalMs": {
+          "n": 753,
+          "median": 54.166615,
+          "p95": 87.499947,
+          "maximum": 170.833333
+        },
+        "actualImagesPerSecond": 17.526912566156884,
+        "dispatchMs": {
+          "n": 754,
+          "median": 43.35453,
+          "p95": 76.141821,
+          "maximum": 158.440673
+        },
+        "asMs": {
+          "n": 754,
+          "median": 0.43377600000000005,
+          "p95": 0.547083,
+          "maximum": 1.893802
+        },
+        "genericFrames": 18,
+        "activeDropletFrames": 18
+      },
+      "waterWindow15to18": {
+        "frames": 41,
+        "actualIntervalMs": {
+          "n": 40,
+          "median": 87.49997400000001,
+          "p95": 116.666615,
+          "maximum": 170.833333
+        },
+        "actualImagesPerSecond": 13.061223828738058,
+        "dispatchMs": {
+          "n": 41,
+          "median": 78.114529,
+          "p95": 104.949997,
+          "maximum": 158.440673
+        },
+        "asMs": {
+          "n": 41,
+          "median": 0.547083,
+          "p95": 0.570208,
+          "maximum": 0.57849
+        },
+        "genericFrames": 18,
+        "activeDropletFrames": 18
+      },
+      "descriptivePreWater0to14": {
+        "frames": 237,
+        "actualIntervalMs": {
+          "n": 236,
+          "median": 58.333334,
+          "p95": 83.333387,
+          "maximum": 108.333385
+        },
+        "actualImagesPerSecond": 16.87220689493317,
+        "dispatchMs": {
+          "n": 237,
+          "median": 49.573176,
+          "p95": 76.141821,
+          "maximum": 97.585414
+        },
+        "asMs": {
+          "n": 237,
+          "median": 0.436927,
+          "p95": 0.503646,
+          "maximum": 1.893802
+        },
+        "genericFrames": 0,
+        "activeDropletFrames": 0
+      },
+      "peakDispatch": {
+        "tick": 3768,
+        "submission": 772,
+        "seconds": 15.6333333,
+        "phase": "approach",
+        "x": -2.14778,
+        "z": -15.2,
+        "presentNs": 890355861216960,
+        "dispatchMs": 158.440673,
+        "asMs": 0.443854,
+        "strategy": "shipping_mobile_generic_dielectric",
+        "droplets": 11,
+        "inStream": true,
+        "wetGround": true,
+        "fireCount": 1
+      },
+      "firstDroplet": {
+        "tick": 3768,
+        "submission": 772,
+        "seconds": 15.6333333,
+        "phase": "approach",
+        "x": -2.14778,
+        "z": -15.2,
+        "presentNs": 890355861216960,
+        "dispatchMs": 158.440673,
+        "asMs": 0.443854,
+        "strategy": "shipping_mobile_generic_dielectric",
+        "droplets": 11,
+        "inStream": true,
+        "wetGround": true,
+        "fireCount": 1
+      },
+      "firstGeneric": {
+        "tick": 3768,
+        "submission": 772,
+        "seconds": 15.6333333,
+        "phase": "approach",
+        "x": -2.14778,
+        "z": -15.2,
+        "presentNs": 890355861216960,
+        "dispatchMs": 158.440673,
+        "asMs": 0.443854,
+        "strategy": "shipping_mobile_generic_dielectric",
+        "droplets": 11,
+        "inStream": true,
+        "wetGround": true,
+        "fireCount": 1
+      },
+      "genericWithNoActiveDropletFrames": 0,
+      "activeDropletsWithOpaqueFrames": 0,
+      "catchUpOverrunDelta": 10
+    }
+  },
+  "gates": {
+    "closingControlRateDriftPercent": -8.234243163724198,
+    "closingWithin5Percent": false,
+    "allStartingFingerprintsEqual": true,
+    "allFrameworkStatusZero": true,
+    "allFreshStartThermalsWithin1_5C": true,
+    "bothCandidatesAtLeast3PercentAgainstBothControls": false,
+    "wholeRouteP95Within15Percent": true,
+    "visualAcceptance": "not established by timing"
+  },
+  "comparisons": {
+    "splash-b1": {
+      "splash-a1": {
+        "wholeRoute": {
+          "actualImageRateChangePercent": -4.21044334456645,
+          "medianIntervalChangePercent": 0.00010399999998966791,
+          "p95IntervalChangePercent": 0.0
+        },
+        "waterWindow15to18": {
+          "actualImageRateChangePercent": 29.684201057361737,
+          "medianIntervalChangePercent": -33.333333333333336,
+          "p95IntervalChangePercent": -19.999999808000013
+        }
+      },
+      "splash-a2": {
+        "wholeRoute": {
+          "actualImageRateChangePercent": 4.384859840841093,
+          "medianIntervalChangePercent": -7.692123644794869,
+          "p95IntervalChangePercent": -14.2856623673155
+        },
+        "waterWindow15to18": {
+          "actualImageRateChangePercent": 40.944609470315754,
+          "medianIntervalChangePercent": -42.857125877545975,
+          "p95IntervalChangePercent": -28.571397224475913
+        }
+      }
+    },
+    "splash-b2": {
+      "splash-a1": {
+        "wholeRoute": {
+          "actualImageRateChangePercent": -5.979275409409047,
+          "medianIntervalChangePercent": 0.00010399999998966791,
+          "p95IntervalChangePercent": 11.11104266666667
+        },
+        "waterWindow15to18": {
+          "actualImageRateChangePercent": 22.160238571207636,
+          "medianIntervalChangePercent": -33.33326266666666,
+          "p95IntervalChangePercent": -11.999999116799998
+        }
+      },
+      "splash-a2": {
+        "wholeRoute": {
+          "actualImageRateChangePercent": 2.457308512518863,
+          "medianIntervalChangePercent": -7.692123644794869,
+          "p95IntervalChangePercent": -4.761905741497197
+        },
+        "waterWindow15to18": {
+          "actualImageRateChangePercent": 32.76734542709405,
+          "medianIntervalChangePercent": -42.85706530609941,
+          "p95IntervalChangePercent": -21.42853634692323
+        }
+      }
+    }
+  },
+  "visual": {
+    "route": "torch-drench",
+    "complete": true,
+    "fullReferenceCaptures": 16,
+    "activeDropletCaptureCount": 0,
+    "inspectedRecoveredCaptures": 2,
+    "bVisualRun": false,
+    "admitted": false,
+    "hostScriptError": "Compared legacy native buildId1.6.2 with distinct provenance ID. Actual installed APK hash verified; no wrong-build launch detected."
+  },
+  "checks": {
+    "candidateHostTestsPassed": 2,
+    "candidateJavaTests": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    "candidateOfflineAndroidBuild": "passed",
+    "postRestorationHostTestsPassed": 2,
+    "postRestorationOfflineAndroidBuild": "passed",
+    "preservedParkedOwnerFiles": 151,
+    "hostedCI": "not run; no new LFS download authorized"
+  },
+  "sourceRestoration": {
+    "restored": {
+      "src/vulkan/raytracing/PresentableTinyRtScene.h": "41ce26173ac3af17ea16120a718762aad24d454177abcb864397b5f335f750c9",
+      "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "de63f22553de6612298a14ddf19eb3c65b15a8d63adc7e3064ec7a836ebed8a4",
+      "android/app/src/main/cpp/android_probe_bridge.cpp": "f70aecff48035bb598da3e5fd0df20b6efcac4614620923d76501a12b844e8d0",
+      "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "176e88faa077735a3479b8f1f8ce802d815eca28185a451fe73e9f651d5a29f9",
+      "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java": "57194e967fc10126346cbbf24fc6554246a9143082481928973da04c1d4a7bcb",
+      "tests/WaterContactTests.cpp": "e44a05c6808c709499a5b1e2fe8a9c063046c329c5065b2c14bcd39d3d015465"
+    },
+    "removedOnlyOwnNewFiles": [
+      "src/vulkan/raytracing/WaterContactMaterialPolicy.h",
+      "android/app/src/main/java/com/samfa12/hordelanternrt/WaterContactExperimentIntent.java",
+      "android/app/src/test/java/com/samfa12/hordelanternrt/WaterContactExperimentIntentTest.java"
+    ],
+    "keptMeasurementSupport": [
+      "src/telemetry/MotionEvidenceLedger.cpp",
+      "src/telemetry/MotionEvidenceLedger.h",
+      "tests/MotionEvidenceScenarioTests.cpp"
+    ],
+    "normalQualityDefaults": "unchanged"
+  },
+  "candidateSourceHashes": {
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "70fa0bcaceed0b46b0929feaf35a057b0c632564ef381cba555e26846ecf3ed9",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "edf4a1d404be15817bb04c92822c2f423b02ba91087f8f2b01f0b486f70933a4",
+    "src/telemetry/MotionEvidenceLedger.h": "67822d6e9c4110ecdacfb5c3f84d30041ecc35d6f44e53a753192f5971be90fb",
+    "src/telemetry/MotionEvidenceLedger.cpp": "3aec408d3fcab1c157a1f7ff73e045df891b8528f14fd8ee8e381dcc1f40c8e2",
+    "android/app/src/main/cpp/android_probe_bridge.cpp": "064298cb32bcea57442624065402b75f486a4d1b29bfa8e7ec317a35f9d28105",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "96d18474f1ec332104c2770207e2ca63bc7afe2809fc4e41057f11f3a0e7ea8d",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java": "3efa9504df4692d7af3d9e0e38edc7d55495137c9ae6996f707e72bedd9fea84",
+    "tests/WaterContactTests.cpp": "00387fa05f35fa542e3ccb496af08f2284945c68527c178823e28e2e8d28be60",
+    "tests/MotionEvidenceScenarioTests.cpp": "e0bfa92b7de0f4e7b8049010b260117e2efde13f1ecb3991512f902780db47bd",
+    "src/vulkan/raytracing/WaterContactMaterialPolicy.h": "e1384643215bd0b75ce0fe53466583f2d48de14d800dad9523e93648f2495f09",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/WaterContactExperimentIntent.java": "52afe73618394ec04df92f0d8f04a7fb9fd4f4b96d36847384fa6c0967191d38",
+    "android/app/src/test/java/com/samfa12/hordelanternrt/WaterContactExperimentIntentTest.java": "69e4613918a3d99f5514d0543d3e00a8886ec94bea8bbdd525caf421892ddeaa"
+  },
+  "release": {
+    "utc": "2026-11-01T00:00:00.874729+00:00",
+    "released": true,
+    "ownedProcesses": [],
+    "installedApkSha256": "a9a2930a64c58c83de3e0399ee2dc31ee6f0e55c813746cfaaca83ce62496307",
+    "preferencesUnchanged": true,
+    "originalCampaignsUnchanged": 15,
+    "systemSettings": {
+      "screen_brightness": "249",
+      "screen_brightness_mode": "1",
+      "accelerometer_rotation": "1",
+      "user_rotation": "0"
+    },
+    "productionAndWorkerPackages": "untouched",
+    "visualOutcome": "Full-reference torch-drench route completed,16captures had0active droplets; two existing RT captures recovered and inspected. No B visual launch. Appearance gate remains open.",
+    "captureScriptError": "Legacy native buildId1.6.2 was incorrectly compared with the separate detailed provenance ID. Verified installed APK remained the authority; no wrong-build launch detected."
+  },
+  "limits": [
+    "No GPU clock/power trace during measurements; one post-run idle thermal_pwrlevel read is0.",
+    "Thermal status0 and matching start temperatures did not prevent8.234% control drift.",
+    "Generated-input43-second route is not sustained ordinary gameplay or physical input acceptance.",
+    "Counts are not a memory/GPU speed prediction; no new mesh, instance, BLAS, material or shader asset added by probe.",
+    "High appearance, saved choices and normal defaults unchanged. No future dense-forest performance claim."
+  ],
+  "next": "Approved playable phone-default investigation; consider invisible-to-owner contact droplets Off, appropriate active-contact native captures and clock/power observations before another preset cohort. Preserve full water/high quality and explicit saved choices.",
+  "rawAvailability": "Ignored local reports/mobile-efficiency-20261031 only; hashes are not raw-artifact delivery. No private serial, career bytes or account data included.",
+  "privateInputsSha256": {
+    "splash-a1\\HordeLanternRT-benchmark-latest.json": "a7fa204c4f6c5c6ac6a3e1ac93ba0713270f0b91fcec238c11f8894651c54da5",
+    "splash-a1\\android-motion-perf31-splash-a1-resources.csv": "ad33f9444a8daa443fd6c713acd7ecc84333e906e201fe159a785a07c4debdf9",
+    "splash-a1\\thermals.json": "9e753debd28d7800427bf463110f10705b77c05cfde7b1be5777913691e40992",
+    "splash-a1\\fresh-checkpoint-state.json": "49846a5f3c8af49cece494dea1c2398a87808a9dd637e4e7aa8007d5e3320772",
+    "splash-a1\\fresh-checkpoint-fingerprint.json": "fb046d71f9c1d63ce52bfbbd58c327b0f82001e8cf898dc2b3762f43dbf44598",
+    "splash-a1\\fresh-checkpoint-ack.json": "b1ac927c86e38f8b2a365c9a0b51b292dbc2c0545ac9ed244cb5d32aff0277dd",
+    "splash-b1\\HordeLanternRT-benchmark-latest.json": "49dbb8631db814080ed0947d5646bd51f7b68c32f6cff41559bf879d0c2170a7",
+    "splash-b1\\android-motion-perf31-splash-b1-resources.csv": "5c494b3e6bb4e6a3c63de881c4b603f867bb8f891956392056fd2e806a032dfb",
+    "splash-b1\\thermals.json": "a169fe493bafa537f40caa89e69257ce2c8a44c5454a0fe3a5dc2561f6314606",
+    "splash-b1\\fresh-checkpoint-state.json": "61f858729e7ef5921db8724faab32251e0ab45132232b7589fcfedade144d44e",
+    "splash-b1\\fresh-checkpoint-fingerprint.json": "fb046d71f9c1d63ce52bfbbd58c327b0f82001e8cf898dc2b3762f43dbf44598",
+    "splash-b1\\fresh-checkpoint-ack.json": "da2a8994083fec6c78b8c2c51e1250fa39e960553e834bf43a5fbab6432f3abb",
+    "splash-b2\\HordeLanternRT-benchmark-latest.json": "3b727b5ac803400b1c303c3abfd64e50cb0af0de653fad08a6e12dad844d7064",
+    "splash-b2\\android-motion-perf31-splash-b2-resources.csv": "7e193577fa3ec1df1918d8db42ed74646955580953cc9160bc9812dde8cd45d3",
+    "splash-b2\\thermals.json": "5c7d5a1793d896f5875b9542984d6e632c711a712a2b0d4ad64a7b5d38ae9b0c",
+    "splash-b2\\fresh-checkpoint-state.json": "2864403c167c8a6e75ee39295fe42e49886cfb70577480924168e736daead4bc",
+    "splash-b2\\fresh-checkpoint-fingerprint.json": "fb046d71f9c1d63ce52bfbbd58c327b0f82001e8cf898dc2b3762f43dbf44598",
+    "splash-b2\\fresh-checkpoint-ack.json": "53c5985906ca0db01d5fb599e1bc6ef329db4727f660a6cf2f1733086e536936",
+    "splash-a2\\HordeLanternRT-benchmark-latest.json": "2cae49379be1b9faf5e9cee1f410172d780257cb41fccca8b84a0c900ac36a0c",
+    "splash-a2\\android-motion-perf31-splash-a2-resources.csv": "6ce072388a2a62a171e42e15e4d703a48966508248d4fec71f95c209c45cc2ac",
+    "splash-a2\\thermals.json": "202882bc08eccce6d676d3de397bc63dd1b9e4a0ed591b4f5fe3c0971172b7bc",
+    "splash-a2\\fresh-checkpoint-state.json": "818cb2998a0e97de7de035af256bf8870ff5a3920d3d18ac9058e2f72b2e4c14",
+    "splash-a2\\fresh-checkpoint-fingerprint.json": "fb046d71f9c1d63ce52bfbbd58c327b0f82001e8cf898dc2b3762f43dbf44598",
+    "splash-a2\\fresh-checkpoint-ack.json": "915d81410d9d4991a14dc6951c37e99f03d3c54ab0bbfba8504d0b9228692638",
+    "splash-package.json": "2fa20047f9dbb6539d7d758131c166ad92d563116f3b73f4147c4455e92b35c1",
+    "splash-comparison-plan.json": "395303cda828941028950b08afa4ac836176b166c78a517396d397f7cf6c8b77",
+    "splash-result.json": "f25f88d228b46eeed1357c658201cd1dbada95a344f3e7d1fd1f85fa30092ab8",
+    "splash-release.json": "11c4b79c8a8f9ea304512347442bdc29242af02fd17df64b5b979e5c77140612",
+    "splash-final-release.json": "74556100d9bf164bd2993f66ea023385300e9e759227ce99fc74563ffdd3fb9b",
+    "splash-analysis.json": "3ee48ec4c5b9ec1d57fdd01c2e5ea712e5a4028faa06039de70feb6657f2afef",
+    "splash-cohort.log": "e3cccc22e9171a506040ed981b59d8faafccf9ee264f4b4e79f14051fdb42727",
+    "analyze_splash.py": "008842934e22ce33b7ed3261247a35abcaf9fa2224bb04b0f78a4080dceebb49",
+    "splash_cohort.py": "4e68f01f8101a874ebdad2b1781f14e0f91b6b9bd89be4146ff3afad320281b1",
+    "run_splash_route.py": "2dc8c5d4b90173a57bd8613ae141ada3ac998d5a788a064a3ac2134f158f23a4",
+    "capture_splash.py": "9f0ba8b36f135611623cafedf95d54ae222645237e417f866913e12a67a261c2",
+    "splash-visual.log": "464877d4b98556347e672c71f263ae9c7654f5ec180a775e5da0d2f56494165e",
+    "splash-visual-release.json": "4000b4c5e0e03f613646366f18bb08b2e8e8848a3109435da54935b6d8033a96",
+    "splash-visual-full/manifest.json": "8ddabd1ba048fb0eaf029674b01e98b2d80eb8811abe3e9df7c19e0ff2611f64",
+    "splash-visual-full/ledger.json": "b2ec5a5f50ada268629e1d3c20fd06961451bd830d65e39636b68307c4904101",
+    "splash-visual-full/recovered-captures.json": "5320a193d56b10e076b0c90a82dfa009a960dbd736caa3d306cff2397ae4654d",
+    "splash-power-availability.json": "75cbe01e05f5e601fe4608cd58c7f6eed5c56383dea07042c094ef818320eae8",
+    "splash-source-restoration.json": "cf5f6525bc9ce79e271b31f48e40f97eef59aec6147efa19cb8f23c8b8b25f56",
+    "candidate-splash-source/manifest.json": "3b8ca7dc46aff718e3129a92136e53ea142ee71b1b50e1d7156ed93377c514cd",
+    "splash-final-source.patch": "5d0b1b3dff2e8860b0e1ac49eee5cc392d7b6fae8ed15edce8502e4f3f6a4b00",
+    "splash-host-build.log": "653e34a20ce699c7ff70925df82abc0cf536ae014aaea557e6b24458709c5ac6",
+    "splash-host-tests.log": "a64b504da139cb8192dad1639cdab5cce8fc2a4ab2cc1ff4b4d9eea63e28d919",
+    "splash-android-build.log": "9532cc811119f55ef69cbe5a439670955431fa8f0b949f9790dabc88ed6bd0c9",
+    "splash-final-host-build.log": "5fe5c7e39fe52367ed715da6ffe29a4245504dfb0ea9f8a8f017acf8f226b5c4",
+    "splash-final-host-tests.log": "5cf9787cbecf76a26c7c56e1bd3fc0b7600267b223e754d6a894f2cd20a5910a",
+    "splash-final-android-build.log": "c15eb7cf9fcb14ad47da3b25596a173e105d6b8b375588661779dc429d349448",
+    "splash-visual-full/android-motion-perf31-splash-visual-full-3.rgba.png": "3077b51f88274410189c6fe013782d0de8d2a35adf2208682f100eb53f9edb05",
+    "splash-visual-full/android-motion-perf31-splash-visual-full-14.rgba.png": "b9eb59102d55eb786d52f2a6e8c158d83e0c8f944b70f910d47c19c92f2c2276"
+  }
+}

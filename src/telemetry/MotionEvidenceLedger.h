@@ -72,6 +72,8 @@ struct MotionStateRow
     // the completed upload's packed active selection below.
     std::optional<std::uint32_t> simulationFireEmitterCount{};
     std::array<SimulationFireSource, 4u> simulationFireSources{};
+    std::uint32_t activeWaterDroplets = 0u;
+    bool waterInStream = false, waterWetGround = false;
     horde::gameplay::simulation::SimulationCommandSequences consumed{};
     std::uint64_t overrunCount = 0u;
     std::uint32_t ticksThisFrame = 0u;

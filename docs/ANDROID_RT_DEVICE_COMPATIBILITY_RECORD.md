@@ -1,5 +1,22 @@
 # Android RT Device Compatibility Record
 
+## 2026-11-01 00:00 UTC - splash comparison completed, no preset admission
+
+SM-S948B / Android17 / Adreno840, same saved33% Pipeline/Shipping-Mobile profile.
+Private APK `5754b6d580ed7a6907c67170a2613cb652cf1dc92b6240943eaef68b9218f51a`
+completed A/B/B/A generated-input routes and3,140 strict actual-presentation joins.
+Local waterfall intervals improved with opaque contact spray, but the closing
+control drifted8.234% and whole-route adoption failed. This is current-device
+RT measurement evidence, not sustained playability, physical-input or visual
+acceptance. The separate full-reference capture route had no active droplets.
+[Exact identities, numbers and limits](evidence/2026-10-31-mobile-efficiency/SPLASH_REFRACTION.md).
+
+Final release00:00:00UTC: baseline APK
+`a9a2930a64c58c83de3e0399ee2dc31ee6f0e55c813746cfaaca83ce62496307`
+restored/stopped, original preferences and15campaign files verified unchanged.
+Automatic brightness/rotation restored; production/worker packages untouched.
+No owned phone process, monitor or transfer remains. No new default is admitted.
+
 ## 2026-10-31 23:11 UTC - light-range probe unmeasured; waterfall attribution
 
 Same SM-S948B / Android 17 / Adreno 840 baseline identity and saved 33% settings

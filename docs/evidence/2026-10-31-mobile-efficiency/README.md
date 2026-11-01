@@ -168,3 +168,14 @@ next controlled comparison. They do not establish an isolated cost, a causal
 gain, or that resident water slows every frame. [Compact receipt and private
 artifact hashes](reach-waterfall-receipt.json). No runtime optimisation is
 admitted; full-quality options and the existing renderer contracts remain.
+
+## Follow-up: splash material comparison
+
+The [same-APK A/B/B/A comparison](SPLASH_REFRACTION.md) completed3,140 joined
+frames. Simpler spray avoided the generic strategy and improved the selected
+waterfall interval, but the closing control drifted8.234%; it did not pass the
+whole-route keep gate. An unsuitable visual route produced no active droplets.
+The material probe was archived and removed; tested contact telemetry remains.
+No phone preset/default gain is claimed. The owner now identifies a playable
+phone preset, including measured OFF options, as the deliverable and reports
+never noticing spray. Full quality and explicit saved choices remain protected.

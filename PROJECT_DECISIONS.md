@@ -55,6 +55,22 @@ waive correctness, save integrity, crash handling, asset readiness, existing
 unapproved capacity changes or explicit publication approval. It does not claim
 performance solved or authorise a release.
 
+### Phone-default scalability clarification - 2026-11-01
+
+The mobile investigation must work toward a genuinely playable phone default,
+including measured reductions or OFF options for costly, less essential effects.
+It is not limited to efficiency changes that preserve every current effect.
+Keep genuine hardware RT, the authored core direction and the full-quality
+Windows/user options. Never replace an existing explicit saved choice with a
+new default. Representative actual presentation/tails and controls evidence are
+required before calling a preset playable; no particular sustained FPS is
+promised. This does not reinstate a fixed-FPS release veto.
+
+Sam reports never noticing contact spray. That supports testing droplets Off
+within this scope, not removing the waterfall or claiming visual parity. The
+[first isolated splash comparison](docs/evidence/2026-10-31-mobile-efficiency/SPLASH_REFRACTION.md)
+identified a strategy-selection cost but did not pass its admission gates.
+
 ## Forest endpoint and completed return recovery - 2026-10-20
 
 The approved forest endpoint now uses stable checkpoint ID 3 (Forest lookout),

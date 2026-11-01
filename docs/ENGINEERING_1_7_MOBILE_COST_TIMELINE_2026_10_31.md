@@ -97,3 +97,10 @@ can continue generating droplets. Neither the exact active contributor count nor
 water pixel coverage is recorded, and torch/camera state changes alongside the
 strategy. Next isolate splash treatment with full water/lighting retained before
 inferring a causal regression or choosing a lower-cost selectable presentation.
+
+That proposed comparison has now completed: [splash refraction](evidence/2026-10-31-mobile-efficiency/SPLASH_REFRACTION.md).
+Active contact counts confirm the strategy trigger. Simpler spray improves the
+selected crossing, but closing-control drift and missing active-contact visual
+coverage prevent admission. The owner now explicitly prioritizes a playable
+phone default using measured reduced/OFF choices, while retaining full quality
+and existing saved preferences; this remains unfinished.

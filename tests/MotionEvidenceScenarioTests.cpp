@@ -259,16 +259,25 @@ void TestSwordTransitionLedgerIsolation()
     state.heldItems[1].transition.active = true;
     state.heldItems[1].transition.kind = items::HeldItemTransitionKind::Draw;
     state.heldItems[1].transition.progress = 0.5f;
+    state.waterContact.droplets[0].active = true;
+    state.waterContact.droplets[7].active = true;
+    state.waterContact.inStream = true;
+    state.waterContact.wetGround = true;
     MotionEvidenceLedger ledger;
     Check(ledger.Begin("sword_metadata_fixture", MotionScenario::TorchLowOpening) &&
           ledger.AppendState(2u, state, {}, scenario, {}), "valid equipment metadata row admitted");
     state.heldItems[1].transition.progress = 0.75f;
+    state.waterContact = {};
     std::ostringstream json;
     ledger.WriteJson(json, scenario);
     Check(ledger.States().size() == 1u && ledger.States()[0].sword.active &&
           ledger.States()[0].sword.progress == 0.5f &&
           json.str().find("\"progress\":0.5") != std::string::npos,
           "later mutable poses cannot rewrite the captured state row's draw progress");
+    Check(ledger.States()[0].activeWaterDroplets == 2u &&
+          ledger.States()[0].waterInStream && ledger.States()[0].waterWetGround &&
+          json.str().find("\"waterContact\":{\"activeDroplets\":2,\"inStream\":true,\"wetGround\":true}") != std::string::npos,
+          "water-contact evidence belongs to the recorded snapshot, not later mutable state");
     for (float invalid : {-0.1f, 1.1f, std::numeric_limits<float>::quiet_NaN()})
     {
         MotionEvidenceLedger rejected;
