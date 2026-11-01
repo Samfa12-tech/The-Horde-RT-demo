@@ -27,3 +27,10 @@ The observed Android benchmark/nativeRT label flicker is a separate UI ownership
 - 151 parked owner file hashes unchanged.
 - Fixed Windows Release and private Android Debug/all-four-ABI application builds passed. Fresh candidates are reports/horde-windows-acceptance-20261101-summary/HordeLanternRT.exe and reports/benchmark-summary-fixed-20261101.apk; exact hashes/bytes are in BENCHMARK_NATIVE_PREVIEW.json. All192 Windows base runtime files match the previous package, plus pinned private revival assets. Neither fixed candidate was launched/installed. Coordinated actual normal benchmark/public-preview exports on these exact artifacts are still required before catalog admission. Older artifacts/completions cannot certify the fix.
 - Standard Windows apply rejection remains open. Other prior gameplay/visual/startup/owner acceptance gates remain unchanged.
+
+
+## Normal Android opening summary identity handoff
+
+The fixed9508 APK completed the normal Custom course but its end screen had no review buttons. Source inspection found the normal opening queue cleared summary UUID/model; only the older benchmark request path supplied them. Added an optional-summary JNI entry point while preserving both existing opening APIs. MainActivity supplies a fresh Java UUIDv4 and Build.MODEL for each accepted/rejected/retried request. Native validates the same bounded UUID/model syntax as the existing summary API. The existing opening owner and its metadata publish under one scoped opening/report lock, and the ordinary render owner consumes them at benchmark start. No data is attached directly to gameplay or inferred from a private report. Cancellation, restoration, return and public consent remain with existing owners.
+
+The focused Android lifecycle/summary/public suites pass41 tests, including fresh identity on rejected-request retry and no new identity on cancellation. Existing native opening-menu owner tests pass. New exact Android build/device export is still required after this additive fix;9508 is not claimed to contain it. Windows ad05 remains independent of this Android-only handoff.

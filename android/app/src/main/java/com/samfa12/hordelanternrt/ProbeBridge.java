@@ -167,6 +167,9 @@ public final class ProbeBridge {
     // Custom/unranked opening-menu owner. Course completion alone is not Entry restoration.
     public static native long requestOpeningBenchmark(long surfaceGeneration);
     public static native long requestOpeningProvisionalBenchmark(long surfaceGeneration);
+    // Fresh per-run summary identity is queued atomically with the normal owner.
+    public static native long requestOpeningBenchmarkWithSummaryId(long surfaceGeneration,
+            boolean provisional, String summaryRunUuid, String rawModel);
     public static native void cancelOpeningBenchmark(long requestSerial, long requestSurfaceGeneration);
     // request, current generation, phase(0..6), result(0/2/3/4 unavailable), Entry presented, origin generation.
     public static native long[] getOpeningBenchmarkState();

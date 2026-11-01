@@ -2437,7 +2437,8 @@ public class MainActivity extends Activity {
             Toast.makeText(this,"Provisional unavailable; choose Custom.",Toast.LENGTH_LONG).show(); return;
         }
         final long origin=surfaceRequestGeneration,request;
-        try { request=provisional?ProbeBridge.requestOpeningProvisionalBenchmark(origin):ProbeBridge.requestOpeningBenchmark(origin); }
+        try { request=ProbeBridge.requestOpeningBenchmarkWithSummaryId(origin,provisional,
+                UUID.randomUUID().toString(),Build.MODEL); }
         catch(RuntimeException | LinkageError unavailable) {
             Toast.makeText(this,provisional?"Provisional unavailable; choose Custom.":getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return;
         }

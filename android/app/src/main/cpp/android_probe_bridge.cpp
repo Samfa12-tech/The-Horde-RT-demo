@@ -7980,7 +7980,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugRouteReplay(JNIEnv*, jcl
 #endif
 }
 
-static jlong QueueOpeningBenchmark(jlong generation,bool provisional)
+static jlong QueueOpeningBenchmark(jlong generation,bool provisional,
+    std::string summaryUuid = {},std::string summaryModel = {})
 {
     if(generation<=0 || !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)) ||
        gSurfaceSessions.State()!=1)return 0;
@@ -7988,7 +7989,9 @@ static jlong QueueOpeningBenchmark(jlong generation,bool provisional)
     {std::lock_guard campaignLock(gCampaignMutex);if(gCampaignCommand)return 0;}
     std::uint64_t serial=0;
     {
-        std::lock_guard lock(gOpeningBenchmarkMutex);
+        // Publish owner and optional per-run summary metadata together. A render
+        // owner cannot consume the accepted request before its fresh identity.
+        std::scoped_lock lock(gOpeningBenchmarkMutex,gReportMutex);
         if(gOpeningBenchmarkSerial==static_cast<std::uint64_t>(INT64_MAX) ||
            !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)))return 0;
         serial=gOpeningBenchmarkSerial+1;
@@ -7997,9 +8000,9 @@ static jlong QueueOpeningBenchmark(jlong generation,bool provisional)
         gOpeningBenchmarkOriginalRoute=gRtLabBenchmarkRoute.load(std::memory_order_acquire);
         gOpeningBenchmarkProvisional=provisional;gOpeningBenchmarkOutput={};gOpeningBenchmarkOutputFrameAttempts=0;
         gOpeningBenchmarkProfileJson.clear();gOpeningBenchmarkAppliedFrameJson.clear();gOpeningBenchmarkRestoredFrameJson.clear();
-    }
-    {
-        std::lock_guard lock(gReportMutex);InvalidateBenchmarkSummaryLocked();
+        InvalidateBenchmarkSummaryLocked();
+        gRequestedBenchmarkSummaryRunId=std::move(summaryUuid);
+        gRequestedBenchmarkSummaryRawModel=std::move(summaryModel);
         gRequestedBenchmarkRunId.clear();gRequestedBenchmarkWorkload=horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
         gLatestBenchmarkReport.clear();gLatestBenchmarkProgress=provisional?"PROVISIONAL BENCHMARK QUEUED":"CUSTOM BENCHMARK QUEUED";
     }
@@ -8327,6 +8330,19 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_prepareCompatibilityReport(
         return env->ExceptionCheck()?nullptr:reply(CompatibilityReportStatus::InvalidEvidence,
             "Compatibility report preparation is unavailable.");
     }
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestOpeningBenchmarkWithSummaryId(
+    JNIEnv* env,jclass,jlong generation,jboolean provisional,jstring summaryRunUuid,jstring rawModel)
+{
+    try {
+        std::string uuid,model;
+        if (!ReadBenchmarkSummaryText(env,summaryRunUuid,36u,uuid) ||
+            !horde::telemetry::IsBenchmarkSummaryUuid(uuid) ||
+            !ReadBenchmarkSummaryText(env,rawModel,128u,model)) return 0;
+        return QueueOpeningBenchmark(generation,provisional==JNI_TRUE,std::move(uuid),std::move(model));
+    } catch (...) { return 0; }
 }
 
 extern "C" JNIEXPORT jboolean JNICALL

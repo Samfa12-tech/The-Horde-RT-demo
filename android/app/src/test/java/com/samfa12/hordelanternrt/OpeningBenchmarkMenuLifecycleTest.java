@@ -37,10 +37,16 @@ public final class OpeningBenchmarkMenuLifecycleTest {
         static int requests,provisionalRequests,legacyCancels,plays,settingsWrites,starts;
         static boolean paused,accept;
         static final List<String> cancels=new ArrayList<>();
+        static final List<String> summaryIds=new ArrayList<>();
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static long[] getEntryMenuState(){return entry;}
         @Implementation protected static long requestOpeningBenchmark(long generation){++requests;return accept?7:0;}
         @Implementation protected static long requestOpeningProvisionalBenchmark(long generation){++provisionalRequests;return accept?7:0;}
+        @Implementation protected static long requestOpeningBenchmarkWithSummaryId(long generation,boolean provisional,String uuid,String model){
+            assertTrue(BenchmarkSummaryReview.validUuid(uuid));assertEquals(android.os.Build.MODEL,model);
+            summaryIds.add(uuid);
+            return provisional?requestOpeningProvisionalBenchmark(generation):requestOpeningBenchmark(generation);
+        }
         @Implementation protected static void cancelOpeningBenchmark(long request,long origin){cancels.add(request+":"+origin);}
         @Implementation protected static long[] getOpeningBenchmarkState(){return opening;}
         @Implementation protected static long[] getOpeningBenchmarkOutputState(){return output;}
@@ -69,7 +75,7 @@ public final class OpeningBenchmarkMenuLifecycleTest {
     private Object callBundle(String name,Bundle value)throws Exception {Method m=MainActivity.class.getDeclaredMethod(name,Bundle.class);m.setAccessible(true);return m.invoke(activity,value);}
     @Before public void prepare()throws Exception {
         Bridge.entry=new long[]{31,2,0,0,1}; Bridge.opening=new long[]{7,31,1,0,0,31};Bridge.output=new long[0];
-        Bridge.requests=Bridge.provisionalRequests=Bridge.legacyCancels=Bridge.plays=0;Bridge.paused=false;Bridge.accept=true;Bridge.cancels.clear();
+        Bridge.requests=Bridge.provisionalRequests=Bridge.legacyCancels=Bridge.plays=0;Bridge.paused=false;Bridge.accept=true;Bridge.cancels.clear();Bridge.summaryIds.clear();
         Bridge.settingsWrites=Bridge.starts=0;field("openingBenchmarkClientFallback").set(null,null);
         prepareViews();
     }
@@ -108,6 +114,14 @@ public final class OpeningBenchmarkMenuLifecycleTest {
         }
         set("benchmarkRunning",false);call("updateReadyRtLabel");
         assertEquals(activity.getString(R.string.rt_active_compact),label.getText().toString());
+    }
+    @Test public void rejectedOpeningRequestCannotReuseSummaryIdentityOnRetry()throws Exception {
+        Bridge.accept=false;call("requestOpeningCustomBenchmark");
+        assertEquals(0L,field("openingBenchmarkRequest").getLong(activity));
+        Bridge.accept=true;start();
+        assertEquals(2,Bridge.summaryIds.size());assertNotEquals(Bridge.summaryIds.get(0),Bridge.summaryIds.get(1));
+        call("cancelOpeningBenchmarkRequest");
+        assertTrue(Bridge.cancels.contains("7:31"));assertEquals(2,Bridge.summaryIds.size());
     }
     private void start()throws Exception {call("requestOpeningCustomBenchmark");assertEquals(7L,field("openingBenchmarkRequest").getLong(activity));}
     private boolean hasBenchmarkButton(View view) {
