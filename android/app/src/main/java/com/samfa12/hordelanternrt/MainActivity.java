@@ -5811,6 +5811,15 @@ public class MainActivity extends Activity {
         return Math.max(0, Math.min(100, preferences.getInt(PREF_MUSIC_VOLUME, 70)));
     }
 
+    private void updateReadyRtLabel() {
+        // Benchmark progress/return handling owns this shared label for its
+        // entire lifetime. The periodic generic RT poll must not flash over it.
+        if (benchmarkRunning) return;
+        layoutRtStatus(true);
+        rtStatus.setText(R.string.rt_active_compact);
+        rtStatus.setContentDescription(getString(R.string.rt_active)+"; opens diagnostics");
+    }
+
     private void setBenchmarkStatusExpanded(boolean expanded) {
         if (rtStatus == null) return;
         layoutRtStatus(false);
@@ -6535,9 +6544,7 @@ public class MainActivity extends Activity {
                 if (musicPlayback != null) musicPlayback.setSuspended(!resumed || !surfaceStarted ||
                         state != 1 || menuVisible || diagnosticsVisible || debugMotionActive || pendingDebugMotion != null);
                 if (state == 1) {
-                    if(!benchmarkRunning) layoutRtStatus(true);
-                    rtStatus.setText(benchmarkRunning?R.string.rt_active:R.string.rt_active_compact);
-                    rtStatus.setContentDescription(getString(R.string.rt_active)+"; opens diagnostics");
+                    updateReadyRtLabel();
                     rtStatus.setTextColor(0xFFFFD07A);
                     // Both values come from one immutable simulation publication.
                     final long vitalityState = ProbeBridge.getPlayerVitalityState();

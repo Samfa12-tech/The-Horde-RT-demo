@@ -97,6 +97,18 @@ public final class OpeningBenchmarkMenuLifecycleTest {
         ((ExecutorService)field("updateExecutor").get(activity)).shutdownNow();
         field("openingBenchmarkClientFallback").set(null,null);
     }
+    @Test public void genericReadyPollPreservesBenchmarkProgressAndReturnLabel()throws Exception {
+        TextView label=(TextView)field("rtStatus").get(activity);
+        set("benchmarkRunning",true);
+        for(String owned:new String[]{"Custom benchmark (unranked)\n1 / 2","Returning to opening menu..."}) {
+            label.setText(owned);label.setContentDescription(owned);
+            call("updateReadyRtLabel");
+            assertEquals(owned,label.getText().toString());
+            assertEquals(owned,label.getContentDescription().toString());
+        }
+        set("benchmarkRunning",false);call("updateReadyRtLabel");
+        assertEquals(activity.getString(R.string.rt_active_compact),label.getText().toString());
+    }
     private void start()throws Exception {call("requestOpeningCustomBenchmark");assertEquals(7L,field("openingBenchmarkRequest").getLong(activity));}
     private boolean hasBenchmarkButton(View view) {
         if(view instanceof Button && ((Button)view).getText().toString().toLowerCase(java.util.Locale.ROOT).contains("benchmark")) return true;
