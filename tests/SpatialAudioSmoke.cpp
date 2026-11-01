@@ -13,6 +13,7 @@
 #include "platform/android/GameplayEventMetadata.h"
 #include "gameplay/SpatialAudio.h"
 #include "audio/LichRevivalAudio.h"
+#include "audio/ChapterDialogueSpatial.h"
 #include <limits>
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameplayEvent.h"
@@ -485,6 +486,17 @@ int main()
               windowsCombat.find("IsDesktopGameplayAvailable(context)")!=std::string::npos &&
               windowsCombat.find("CombatAudioClip(cue)")!=std::string::npos,
               "Windows routes the same contact identity through the existing positional/SFX owner");
+        horde::gameplay::dialogue::Snapshot speech{};
+        speech.source={2.f,0.f,0.f};speech.listener={0.f,0.f,0.f};
+        speech.line=horde::gameplay::dialogue::Line::RescueFound;
+        const auto rescueSpeech=horde::audio::ChapterDialogueSpatial(speech,SpatialAudioDomain::DungeonRoute);
+        speech.line=horde::gameplay::dialogue::Line::Grate;
+        const auto ordinarySpeech=horde::audio::ChapterDialogueSpatial(speech,SpatialAudioDomain::DungeonRoute);
+        check(StereoPower(rescueSpeech)>StereoPower(ordinarySpeech) && rescueSpeech.right>rescueSpeech.left,
+              "shared rescue speech increases near-shaft audibility while retaining world panning");
+        speech.source.x=20.f;
+        const auto beyondSpeech=horde::audio::ChapterDialogueSpatial(speech,SpatialAudioDomain::DungeonRoute);
+        check(StereoPower(beyondSpeech)==0.f,"shared dialogue retains bounded world range");
         const auto chapterPublish = section(androidBridgeSource,
             "void PublishSimulationUiState()", "gKeeperTitleOpacity.store(");
         const auto lockedChapterPublish = section(chapterPublish,
@@ -500,7 +512,7 @@ int main()
               lockedChapterRead.find("snapshot = gChapterDialogueUiSnapshot;") != std::string::npos &&
               lockedChapterRead.find("domain = gChapterDialogueUiAudioDomain;") != std::string::npos &&
               chapterRead.find("static_cast<jlong>(snapshot.generation) != generation) return 0;") != std::string::npos &&
-              chapterRead.find("snapshot.listenerYaw, snapshot.listener.y}, domain)") != std::string::npos,
+              chapterRead.find("horde::audio::ChapterDialogueSpatial(snapshot, domain)") != std::string::npos,
               "Android dialogue domain and frozen tuple cross the same mutex publication and retain the line-generation guard");
         const auto windowsChapter = section(windowsSource,
             "void UpdateChapterDialogueAudio(", "void RefreshChapterSubtitle(");
@@ -508,9 +520,9 @@ int main()
               windowsChapter.find("const auto& dialogue = simulation.chapterDialogue;") != std::string::npos &&
               windowsChapter.find("horde::gameplay::ResolveSpatialAudioDomain(") != std::string::npos &&
               windowsChapter.find("simulation.developmentRescueJourney, simulation.worldRoute.current") != std::string::npos &&
-              windowsChapter.find(".36f, 1.0f, 14.0f, dialogue.source.y}") != std::string::npos &&
-              chapterRead.find("0.36f, 1.0f, 14.0f, snapshot.source.y}") != std::string::npos,
-              "both dialogue consumers opt into the same authoritative domain without changing speech gain or frozen positions");
+              windowsChapter.find("horde::audio::ChapterDialogueSpatial(dialogue,") != std::string::npos &&
+              chapterRead.find("horde::audio::ChapterDialogueSpatial(snapshot, domain)") != std::string::npos,
+              "both dialogue consumers use the shared speech policy with the authoritative domain and frozen snapshot");
         const auto updateDialogueMatrix = section(windowsSource,
             "void UpdateDialogueSpatial(", "void UpdateOwnedGain(");
         check(updateDialogueMatrix.find("if (line == 0u || generation == 0u) return;") != std::string::npos &&
@@ -527,7 +539,7 @@ int main()
         const auto sameVoiceReturn = windowsChapter.find("if (sameVoice) return;");
         check(windowsChapter.find("const bool sameVoice = context.playingDialogueLine == lineId &&") != std::string::npos &&
               windowsChapter.find("context.playingDialogueGeneration == dialogue.generation;") != std::string::npos &&
-              windowsChapter.find("CalculateSpatialAudio(") < windowsChapter.find("UpdateDialogueSpatial(") &&
+              windowsChapter.find("ChapterDialogueSpatial(") < windowsChapter.find("UpdateDialogueSpatial(") &&
               windowsChapter.find("UpdateDialogueSpatial(lineId, dialogue.generation, gains.left, gains.right)") <
                   windowsChapter.find("PauseDialogue(paused)") &&
               windowsChapter.find("if (paused) return;") < sameVoiceReturn &&

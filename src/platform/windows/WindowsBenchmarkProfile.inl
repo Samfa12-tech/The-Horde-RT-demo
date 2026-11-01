@@ -152,39 +152,39 @@ bool CaptureBenchmarkProfileImage(VulkanSurfaceContext& c, const std::filesystem
 }
 bool ResizeBenchmarkProfileClient(VulkanSurfaceContext& c, const int width, const int height)
 {
+    horde::platform::windows::BenchmarkWindowApiTrace api;
     MONITORINFO monitor{sizeof(MONITORINFO)};
-    const bool monitorKnown = GetMonitorInfoA(MonitorFromWindow(c.windowHandle, MONITOR_DEFAULTTONEAREST), &monitor) != FALSE;
+    const auto monitorHandle=MonitorFromWindow(c.windowHandle, MONITOR_DEFAULTTONEAREST);
+    const bool monitorKnown = api.Observe("GetMonitorInfo",[&]{return GetMonitorInfoA(monitorHandle, &monitor);}).first != FALSE;
     c.benchmarkProfileMonitorRect = monitor.rcMonitor;
     const auto monitorWidth = monitor.rcMonitor.right - monitor.rcMonitor.left;
     const auto monitorHeight = monitor.rcMonitor.bottom - monitor.rcMonitor.top;
     if (!monitorKnown || width <= 0 || height <= 0 || width > monitorWidth || height > monitorHeight) {
         c.benchmarkProfileError = "Fixed client target " + std::to_string(width) + "x" + std::to_string(height) +
-            " does not fit the actual monitor " + std::to_string(monitorWidth) + "x" + std::to_string(monitorHeight) + ".";
+            " does not fit the actual monitor " + std::to_string(monitorWidth) + "x" + std::to_string(monitorHeight) + ". " + api.text;
         return false;
     }
     const LONG left = monitor.rcMonitor.left + (monitorWidth - width) / 2;
     const LONG top = monitor.rcMonitor.top + (monitorHeight - height) / 2;
     c.benchmarkProfileTargetRect = {left, top, left + width, top + height};
-    const auto setStyle = [&](const int index, const LONG_PTR value) {
-        SetLastError(ERROR_SUCCESS);
-        const auto previous = SetWindowLongPtrA(c.windowHandle, index, value);
-        return previous != 0 || GetLastError() == ERROR_SUCCESS;
-    };
+
     // Same borderless Win32 pattern as ToggleFullscreen, with an explicit fixed
     // client and preserved original style/menu rather than a display-mode change.
     c.benchmarkProfileInternalResize = true;
-    const bool styleSet = setStyle(GWL_STYLE, WS_POPUP | WS_VISIBLE | WS_CLIPCHILDREN);
-    const bool exStyleSet = setStyle(GWL_EXSTYLE, c.benchmarkProfileOriginalExStyle &
+    const bool styleSet = api.SetStyle(c.windowHandle, GWL_STYLE, WS_POPUP | WS_VISIBLE | WS_CLIPCHILDREN);
+    const bool exStyleSet = api.SetStyle(c.windowHandle, GWL_EXSTYLE, c.benchmarkProfileOriginalExStyle &
         ~static_cast<LONG_PTR>(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE | WS_EX_WINDOWEDGE));
-    const bool menuSet = SetMenu(c.windowHandle, nullptr) != FALSE;
-    const bool positioned = SetWindowPos(c.windowHandle, nullptr, left, top, width, height,
-        SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED) != FALSE;
+    const bool menuSet = api.SetWindowMenu(c.windowHandle, nullptr);
+    const bool positioned = api.Observe("SetWindowPos",[&]{return SetWindowPos(c.windowHandle, nullptr, left, top, width, height,
+        SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);}).first != FALSE;
     c.fullscreen = true;
     c.benchmarkProfileAppliedStyle = GetWindowLongPtrA(c.windowHandle, GWL_STYLE);
     c.benchmarkProfileAppliedExStyle = GetWindowLongPtrA(c.windowHandle, GWL_EXSTYLE);
     c.benchmarkProfileTemporaryMenuDetached = GetMenu(c.windowHandle) == nullptr;
-    const bool observed = GetClientRect(c.windowHandle, &c.benchmarkProfileObservedClient) &&
-        GetWindowRect(c.windowHandle, &c.benchmarkProfileAppliedRect);
+    const bool clientObserved = api.Observe("GetClientRect",[&]{return GetClientRect(c.windowHandle, &c.benchmarkProfileObservedClient);}).first != FALSE;
+    const bool outerObserved = api.Observe("GetWindowRect",[&]{return GetWindowRect(c.windowHandle, &c.benchmarkProfileAppliedRect);}).first != FALSE;
+    const bool observed = clientObserved && outerObserved;
+    OutputDebugStringA(("HORDE_BENCHMARK_WINDOW apply " + api.text + "\n").c_str());
     const bool okay = styleSet && exStyleSet && menuSet && positioned && observed &&
         c.benchmarkProfileTemporaryMenuDetached &&
         c.benchmarkProfileObservedClient.right == width && c.benchmarkProfileObservedClient.bottom == height &&
@@ -193,7 +193,7 @@ bool ResizeBenchmarkProfileClient(VulkanSurfaceContext& c, const int width, cons
     if (!okay) c.benchmarkProfileError = "Borderless fixed client target " + std::to_string(width) + "x" + std::to_string(height) +
         " observed " + std::to_string(c.benchmarkProfileObservedClient.right) + "x" +
         std::to_string(c.benchmarkProfileObservedClient.bottom) + " on monitor " +
-        std::to_string(monitorWidth) + "x" + std::to_string(monitorHeight) + ".";
+        std::to_string(monitorWidth) + "x" + std::to_string(monitorHeight) + ". " + api.text;
     return okay;
 }
 bool BenchmarkProfilePlacementEquals(const WINDOWPLACEMENT& a, const WINDOWPLACEMENT& b)
@@ -213,18 +213,25 @@ bool ApplyWindowsBenchmarkProfile(VulkanSurfaceContext& c, const VkClearColorVal
     c.benchmarkProfileOriginalFullscreen = c.fullscreen;
     c.benchmarkProfileOriginalWindowedPlacement = c.windowedPlacement;
     c.benchmarkProfileOriginalMenu = GetMenu(c.windowHandle);
-    SetLastError(ERROR_SUCCESS);
-    c.benchmarkProfileOriginalStyle = GetWindowLongPtrA(c.windowHandle, GWL_STYLE);
-    const bool styleKnown = c.benchmarkProfileOriginalStyle != 0 || GetLastError() == ERROR_SUCCESS;
-    SetLastError(ERROR_SUCCESS);
-    c.benchmarkProfileOriginalExStyle = GetWindowLongPtrA(c.windowHandle, GWL_EXSTYLE);
-    const bool exStyleKnown = c.benchmarkProfileOriginalExStyle != 0 || GetLastError() == ERROR_SUCCESS;
-    if (!styleKnown || !exStyleKnown || (!c.benchmarkProfileCustom && c.fullscreen) || c.graphicsEdit || c.graphicsCommand || c.sceneProfileDirty || c.renderScaleDirty ||
-        c.glassGeometryDirty || !GetWindowPlacement(c.windowHandle, &c.benchmarkProfileOriginalPlacement) ||
-        !GetWindowRect(c.windowHandle, &c.benchmarkProfileOriginalRect) ||
-        !GetClientRect(c.windowHandle, &c.benchmarkProfileOriginalClient) ||
+    horde::platform::windows::BenchmarkWindowApiTrace api;
+    const auto style=api.Observe("GetWindowLongPtr(style)",[&]{return GetWindowLongPtrA(c.windowHandle,GWL_STYLE);});
+    c.benchmarkProfileOriginalStyle=style.first;
+    const bool styleKnown=style.first!=0 || style.second==ERROR_SUCCESS;
+    const auto exStyle=api.Observe("GetWindowLongPtr(exstyle)",[&]{return GetWindowLongPtrA(c.windowHandle,GWL_EXSTYLE);});
+    c.benchmarkProfileOriginalExStyle=exStyle.first;
+    const bool exStyleKnown=exStyle.first!=0 || exStyle.second==ERROR_SUCCESS;
+    const bool placementKnown=api.Observe("GetWindowPlacement",[&]{return GetWindowPlacement(c.windowHandle,&c.benchmarkProfileOriginalPlacement);}).first!=FALSE;
+    const bool outerKnown=api.Observe("GetWindowRect",[&]{return GetWindowRect(c.windowHandle,&c.benchmarkProfileOriginalRect);}).first!=FALSE;
+    const bool clientKnown=api.Observe("GetClientRect",[&]{return GetClientRect(c.windowHandle,&c.benchmarkProfileOriginalClient);}).first!=FALSE;
+    OutputDebugStringA(("HORDE_BENCHMARK_WINDOW original " + api.text + "\n").c_str());
+    if(!c.benchmarkProfileCustom && c.fullscreen) {
+        c.benchmarkProfileError="Standard benchmark requires windowed entry. Leave fullscreen and try again.";
+        c.benchmarkProfileActive=false;return false;
+    }
+    if (!styleKnown || !exStyleKnown || c.graphicsEdit || c.graphicsCommand || c.sceneProfileDirty || c.renderScaleDirty ||
+        c.glassGeometryDirty || !placementKnown || !outerKnown || !clientKnown ||
         !CaptureBenchmarkProfileCompletion(c, clear, false, false)) {
-        c.benchmarkProfileError = "Original owning RT configuration/window state unavailable; profile not applied.";
+        c.benchmarkProfileError = "Original owning RT configuration/window state unavailable; profile not applied. " + api.text;
         c.benchmarkProfileActive = false; return false;
     }
     c.benchmarkProfileBefore = c.rtFrameEvidence.PublishedStateByValue();
@@ -261,20 +268,18 @@ bool RestoreWindowsBenchmarkProfile(VulkanSurfaceContext& c, const VkClearColorV
     c.benchmarkProfileInternalResize = true;
     bool windowRestored = false;
     if (IsWindow(c.windowHandle)) {
-        const auto setStyle = [&](const int index, const LONG_PTR value) {
-            SetLastError(ERROR_SUCCESS);
-            const auto previous = SetWindowLongPtrA(c.windowHandle, index, value);
-            return previous != 0 || GetLastError() == ERROR_SUCCESS;
-        };
+        horde::platform::windows::BenchmarkWindowApiTrace api;
         // Attempt all original window-state restores even if an earlier API fails.
-        const bool styleSet = setStyle(GWL_STYLE, c.benchmarkProfileOriginalStyle);
-        const bool exStyleSet = setStyle(GWL_EXSTYLE, c.benchmarkProfileOriginalExStyle);
-        const bool menuSet = SetMenu(c.windowHandle, c.benchmarkProfileOriginalMenu) != FALSE;
-        const bool placementSet = SetWindowPlacement(c.windowHandle, &c.benchmarkProfileOriginalPlacement) != FALSE;
-        const bool positioned = SetWindowPos(c.windowHandle, nullptr, c.benchmarkProfileOriginalRect.left, c.benchmarkProfileOriginalRect.top,
+        const bool styleSet = api.SetStyle(c.windowHandle, GWL_STYLE, c.benchmarkProfileOriginalStyle);
+        const bool exStyleSet = api.SetStyle(c.windowHandle, GWL_EXSTYLE, c.benchmarkProfileOriginalExStyle);
+        const bool menuSet = api.SetWindowMenu(c.windowHandle, c.benchmarkProfileOriginalMenu);
+        const bool placementSet = api.Observe("SetWindowPlacement",[&]{return SetWindowPlacement(c.windowHandle, &c.benchmarkProfileOriginalPlacement);}).first != FALSE;
+        const bool positioned = api.Observe("SetWindowPos",[&]{return SetWindowPos(c.windowHandle, nullptr, c.benchmarkProfileOriginalRect.left, c.benchmarkProfileOriginalRect.top,
             c.benchmarkProfileOriginalRect.right - c.benchmarkProfileOriginalRect.left,
             c.benchmarkProfileOriginalRect.bottom - c.benchmarkProfileOriginalRect.top,
-            SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED) != FALSE;
+            SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);}).first != FALSE;
+        OutputDebugStringA(("HORDE_BENCHMARK_WINDOW restore " + api.text + "\n").c_str());
+        if(!(styleSet && exStyleSet && menuSet && placementSet && positioned)) c.benchmarkProfileError += " Restore APIs: " + api.text;
         windowRestored = styleSet && exStyleSet && menuSet && placementSet && positioned;
     }
     c.fullscreen = c.benchmarkProfileOriginalFullscreen;

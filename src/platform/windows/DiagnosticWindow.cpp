@@ -142,6 +142,7 @@
 #endif
 #include "platform/windows/WindowsBenchmarkLaunch.h"
 #include "platform/windows/WindowsBenchmarkProfile.h"
+#include "platform/windows/WindowsBenchmarkWindowApi.h"
 #include "platform/windows/WindowsBenchmarkMenuOwner.h"
 #include "platform/windows/WindowsChapterShippingLaunch.h"
 #include "gameplay/validation/ChapterRouteHostPhases.h"
