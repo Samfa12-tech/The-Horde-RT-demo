@@ -63,14 +63,16 @@ inline std::string CombatTeachingLessonText(
     if(teaching.stage==TutorialStage::Ready || teaching.cue==CombatTeachingCue::Ready)
         return "Menu: Finish practice - enemies can hurt you";
     if(teaching.cue==CombatTeachingCue::Learned)return "Well parried - strike back";
-    if(teaching.stage==TutorialStage::Block || teaching.cue==CombatTeachingCue::Block)return "1/4 Hold "+guard+": block normal hits";
-    if(teaching.stage==TutorialStage::AttackFromGuard || teaching.cue==CombatTeachingCue::AttackFromGuard)return "4/4 Hold "+guard+" + "+swing+"; keep held";
+    const std::string accepted=teaching.cue==CombatTeachingCue::Accepted?"Good! Next: ":
+        teaching.cue==CombatTeachingCue::Retry?"Try again: ":"";
+    if(teaching.stage==TutorialStage::Block || teaching.cue==CombatTeachingCue::Block)return accepted+"1/4 Hold "+guard+": block normal hits";
+    if(teaching.stage==TutorialStage::AttackFromGuard || teaching.cue==CombatTeachingCue::AttackFromGuard)return accepted+"4/4 Hold "+guard+" + "+swing+"; keep held";
     if(teaching.stage==TutorialStage::Dodge)
     {
         if(teaching.cue==CombatTeachingCue::DodgeNow)return "DODGE NOW - "+dodge;
-        return (teaching.source==gameplay::simulation::EntityId::Lich?"Keeper lightning - ":
+        return accepted+(teaching.source==gameplay::simulation::EntityId::Lich?"Keeper lightning - ":
             teaching.source==gameplay::simulation::EntityId::SkeletonA || teaching.source==gameplay::simulation::EntityId::SkeletonB?
-                "Skeleton attack - ":"Attacker - ")+dodge;
+                "Skeleton attack - ":"Attacker - ")+dodge+" away as it swings; clear its reach";
     }
     switch(teaching.cue)
     {
@@ -78,7 +80,7 @@ inline std::string CombatTeachingLessonText(
     case CombatTeachingCue::ParryNow:return "PARRY NOW - fresh "+guard+" press";
     case CombatTeachingCue::ParryActive:return "Timed parry active - face attacker";
     case CombatTeachingCue::ParryRecovery:return "Release, then press "+guard+" to parry";
-    default:return "Fresh "+guard+" press: timed parry";
+    default:return accepted+"Fresh "+guard+" press: timed parry";
     }
 }
 
@@ -87,7 +89,7 @@ inline std::string CombatTeachingPromptText(
     const bool waitingForRevivalClearance = false)
 {
     using gameplay::simulation::AttackReadability;
-    std::string text=teaching.safePractice && !teaching.lessonSuppressed?"Practice: no damage — learn each step":"";
+    std::string text=teaching.safePractice && !teaching.lessonSuppressed?"Practice: no damage - learn each step":"";
     if(!teaching.lessonSuppressed && (teaching.safePractice || (teaching.enabled && std::isfinite(teaching.promptOpacity) && teaching.promptOpacity>0.0f)))
     {
         const auto lesson=CombatTeachingLessonText(teaching,controller);

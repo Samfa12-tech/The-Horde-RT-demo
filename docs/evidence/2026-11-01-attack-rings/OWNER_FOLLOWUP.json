@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "baseCommit": "b592c38a95e797d1d89f0988434c2247c4edd476",
+  "windows": {
+    "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+    "bytes": 4981248,
+    "sha256": "c52d3a785ba527072a6bb368dd001409104583353e6f4aefef27f631875bb477"
+  },
+  "android": {
+    "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 214583316,
+    "sha256": "b01b454274de078daccedf6b979c92320f31d6a125f3a7dd8d3b49de22bd97eb",
+    "nativeAbis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ]
+  },
+  "hostFocusedSuites": "6/6 pass",
+  "combatFoundationChecks": 1843,
+  "androidUiTests": {
+    "preferences": 18,
+    "scheduling": 6,
+    "failures": 0
+  },
+  "ownerParkedFiles": 151,
+  "ownerParkedFilesUnchanged": true,
+  "candidateLaunched": false,
+  "candidateInstalled": false,
+  "normalRevivalEnabled": false,
+  "naturalTutorialComplete": false,
+  "manualAudioHapticRevalidationRequired": true,
+  "sources": [
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/CombatTeachingPreferences.java",
+      "bytes": 6912,
+      "sha256": "22cba82e4f5b5700798e45e9b90c878f0d57c25cf34fa80e65069bc44835d3e8"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "bytes": 530272,
+      "sha256": "363a74510cb92c5498bdbca94fc01da34daa69549134d5635c97c1926a88f74d"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingPreferencesTest.java",
+      "bytes": 17297,
+      "sha256": "138cf85b8d1ef798973fee967a53b6295d30d363851fffac5f4c81c915861017"
+    },
+    {
+      "path": "src/gameplay/simulation/CombatTeaching.h",
+      "bytes": 20745,
+      "sha256": "1f73a95c342376bb90a084b7a7258816e0a099907c2ccbf4f2e051393b5ae001"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "bytes": 178512,
+      "sha256": "8be16474b1b07eb40733112ea3a9d5a2f5074221f09195ddeaa02953c5f3e040"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 706969,
+      "sha256": "1763a29813d2ec8a07c883b1788d995c42415d784958fdeae9e43ccc17a495b6"
+    },
+    {
+      "path": "src/platform/windows/README.md",
+      "bytes": 2710,
+      "sha256": "7de53930791a9e771dfb3421c319f4ae163d869dc74196bb47372bb4ac13c2c0"
+    },
+    {
+      "path": "src/platform/windows/WindowsCombatTeachingPrompt.h",
+      "bytes": 5633,
+      "sha256": "7eff09ad265e3ec92527aabb0047355ee739dc22bb6e755d7b14ab9519a5c29c"
+    },
+    {
+      "path": "src/platform/windows/WindowsGraphicsPersistence.h",
+      "bytes": 8342,
+      "sha256": "e7f0eab52f62a8aaa54f4645f28bd587233357439979934ffb76a858daeb56d2"
+    },
+    {
+      "path": "tests/CombatFoundationTests.cpp",
+      "bytes": 180519,
+      "sha256": "9298afac517e78befa4688f2db03d2c103387e7ecbd1a38ef6263d786b6e6226"
+    },
+    {
+      "path": "tests/GraphicsWindowsPersistenceTests.cpp",
+      "bytes": 14869,
+      "sha256": "01f769733ee91b301785054457e33a8aee2f8c1654e91098128285d43f7edf9a"
+    },
+    {
+      "path": "tests/WindowsCombatPracticeLaunchTests.cpp",
+      "bytes": 13636,
+      "sha256": "c508b87f3ff5e6a3f6839464ae1c8abca748acf0005d06d6fe2da3f0b2c7503a"
+    }
+  ]
+}

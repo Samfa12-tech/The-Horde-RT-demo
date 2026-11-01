@@ -248,6 +248,17 @@ public final class CombatTeachingPreferencesTest {
         assertEquals(-1, MainActivity.combatPracticeKind(null));
     }
 
+    @Test public void acceptedAndRetryCuesKeepCurrentControllerLessonAndClearReachHint() {
+        long practice=1L|(1L<<10)|(1L<<13)|(2L<<7);
+        String accepted=CombatTeachingPreferences.prompt(practice|(14L<<3),true);
+        assertTrue(accepted.contains("Good! Next:"));
+        assertTrue(accepted.contains("[B] + stick"));
+        assertFalse(accepted.contains("[Dodge]"));
+        String retry=CombatTeachingPreferences.prompt(practice|(15L<<3),false);
+        assertTrue(retry.contains("Try again:"));
+        assertTrue(retry.contains("clear its reach"));
+        assertTrue(retry.contains("[Dodge] + move"));
+    }
     @Test public void reducedMotionRemovesOpacityAnimationButKeepsVisibleState() {
         assertEquals(0.5f, CombatTeachingPreferences.alpha(128, false), 0.01f);
         assertEquals(1.0f, CombatTeachingPreferences.alpha(128, true), 0.0f);

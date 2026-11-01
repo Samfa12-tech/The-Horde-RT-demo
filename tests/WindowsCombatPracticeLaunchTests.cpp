@@ -169,7 +169,7 @@ int main()
           "Keeper is named only from its published source");
     teaching.exitPending=true;
     check(CombatTeachingPromptText(teaching).find("Practice: no damage") == 0 &&
-          CombatTeachingPromptText(teaching).find("Leaving practice safely")!=std::string::npos,
+          CombatTeachingPromptText(teaching).find("Practice ending: enemies can hurt you next.")!=std::string::npos,
           "pending safe exit retains actual protection status");
     teaching.exitPending=false;teaching.safePractice=false;teaching.stage=TutorialStage::Skipped;
     check(CombatTeachingPromptText(teaching).empty(),"completed safe exit has no stale protected caption");

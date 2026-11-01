@@ -749,7 +749,7 @@ struct VulkanSurfaceContext
 #endif
     int sfxVolumePercent = 100;
     int musicVolumePercent = 70;
-    int voiceVolumePercent = 70;
+    int voiceVolumePercent = 100;
     int subtitleSizePercent = 100;
     int appliedSubtitleFontPixels = 0;
     horde::gameplay::dialogue::SubtitlePosition subtitlePosition =
@@ -1573,7 +1573,7 @@ void LoadSettings(VulkanSurfaceContext& context)
     context.musicVolumePercent = std::clamp(
         static_cast<int>(GetPrivateProfileIntA("audio", "musicVolume", 70, path.c_str())), 0, 100);
     context.voiceVolumePercent = std::clamp(
-        static_cast<int>(GetPrivateProfileIntA("audio", "voiceVolume", 70, path.c_str())), 0, 100);
+        static_cast<int>(GetPrivateProfileIntA("audio", "voiceVolume", 100, path.c_str())), 0, 100);
     context.subtitlesEnabled = GetPrivateProfileIntA("subtitles", "enabled", 1, path.c_str()) != 0;
     context.subtitleSizePercent = std::clamp(
         static_cast<int>(GetPrivateProfileIntA("subtitles", "size", 100, path.c_str())), 80, 160);
@@ -1588,8 +1588,7 @@ void LoadSettings(VulkanSurfaceContext& context)
     context.renderScale = static_cast<float>(renderScale) / 100.0f;
     const int waterQuality = std::clamp(static_cast<int>(GetPrivateProfileIntA("display", "waterQuality", 2, path.c_str())), 0, 2);
     context.waterQuality = static_cast<horde::vulkan::raytracing::WaterQuality>(waterQuality);
-    context.savedGraphics = horde::graphics::MigrateLegacyGraphicsSettings(
-        {renderScale, waterQuality}, horde::graphics::GraphicsPlatform::Windows);
+    context.savedGraphics = horde::platform::windows::WindowsGraphicsStartupFallback(path,{renderScale,waterQuality});
     if (const auto record = horde::platform::windows::LoadGraphicsPersistenceRecord(path, context.savedGraphics))
     {
         const auto recovered = horde::graphics::RecoverGraphicsSettings(*record, horde::graphics::GraphicsPlatform::Windows);
@@ -11159,7 +11158,6 @@ void ShowControlsHelp(HWND window)
                 "D-pad  Navigate menus    A  Select    B / Circle  Back\n"
                 "Menu / Start  Pause / resume\n"
                 "Esc  Pause / resume\n"
-                 "R  Restart route\n"
                  "F1  Controls\n"
                  "F2  RT diagnostics\n"
 #if defined(_DEBUG)
@@ -12281,13 +12279,6 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             }
 #endif
-            if (wParam == 'R' && !sceneContext->simulationPaused &&
-                (!sceneContext->lookoutMovementNeedsFreshKeyDown || (lParam & (1ll<<30))==0))
-            {
-                ResetRoute(*sceneContext);
-                PlaySoundEffect(*sceneContext, "ui_select.wav");
-                return 0;
-            }
             if (wParam == VK_RETURN && (GetKeyState(VK_MENU) & 0x8000) != 0)
             {
                 ToggleFullscreen(*sceneContext);
@@ -12819,7 +12810,7 @@ HMENU CreateApplicationMenu()
     HMENU bar = CreateMenu();
     HMENU demo = CreatePopupMenu();
     AppendMenuA(demo, MF_STRING, kMenuPauseId, "&Pause\tEsc");
-    AppendMenuA(demo, MF_STRING, kMenuRestartId, "&Restart route\tR");
+    AppendMenuA(demo, MF_STRING, kMenuRestartId, "&Restart route");
     HMENU teaching = CreatePopupMenu();
     AppendMenuA(teaching, MF_STRING | MF_CHECKED, kMenuTeachingEnabledId, "Optional combat lesson");
     AppendMenuA(teaching, MF_STRING, kMenuTeachingSlowdownId, "Ease time during lesson");
@@ -13162,14 +13153,14 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     SendMessageA(musicVolumeSlider, TBM_SETTICFREQ, 10, 0);
     SendMessageA(musicVolumeSlider, TBM_SETPOS, TRUE, 70);
     createButton(kSettingsMoreId, "AUDIO & SUBTITLES...");
-    createStatic(kVoiceVolumeLabelId, "DIALOGUE / SPEECH: 70%", SS_CENTER | SS_CENTERIMAGE);
+    createStatic(kVoiceVolumeLabelId, "DIALOGUE / SPEECH: 100%", SS_CENTER | SS_CENTERIMAGE);
     HWND voiceVolumeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
         WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS, 0, 0, 100, 38, hWnd,
         reinterpret_cast<HMENU>(static_cast<INT_PTR>(kVoiceVolumeSliderId)), instance, nullptr);
     InstallControllerFocusOutline(voiceVolumeSlider);
     SendMessageA(voiceVolumeSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 100));
     SendMessageA(voiceVolumeSlider, TBM_SETTICFREQ, 10, 0);
-    SendMessageA(voiceVolumeSlider, TBM_SETPOS, TRUE, 70);
+    SendMessageA(voiceVolumeSlider, TBM_SETPOS, TRUE, 100);
     createButton(kSubtitlesButtonId, "SUBTITLES: ON");
     createStatic(kSubtitleSizeLabelId, "SUBTITLE TEXT SIZE: 100%", SS_CENTER | SS_CENTERIMAGE);
     HWND subtitleSizeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",

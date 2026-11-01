@@ -66,7 +66,7 @@ inline AttackReadability EvaluateAttackReadability(const CombatSnapshot& combat,
 enum class CombatTeachingCue : std::uint8_t
 {
     None, ParryWindup, ParryNow, ParryRecovery, DodgeWindup, DodgeNow, Recovery, Learned,
-    ParryActive, Block, AttackFromGuard, Ready, Replay, ExitPending
+    ParryActive, Block, AttackFromGuard, Ready, Replay, ExitPending, Accepted, Retry
 };
 struct CombatTeachingSnapshot
 {
@@ -101,7 +101,7 @@ public:
     {
         const auto generation = snapshot_.generation + 1u;
         snapshot_ = {}; snapshot_.enabled = enabled; snapshot_.generation = generation;
-        ClearGuardAttack(); dodgeOnly_=false; requestedEnabled_=enabled; exitProtection_=false; openingExitSeconds_=0; openingExitRequested_=false;
+        ClearGuardAttack(); ClearDodge(); observedDodgeSequence_=0; successSeconds_=retrySeconds_=0.f; dodgeOnly_=false; requestedEnabled_=enabled; exitProtection_=false; openingExitSeconds_=0; openingExitRequested_=false;
     }
     void ResetForKeeperPractice(bool enabled) { Reset(enabled); dodgeOnly_=true; snapshot_.stage=TutorialStage::Dodge; }
     // The existing explicit Skip/Finish command requests an exit. Damage may
@@ -124,12 +124,50 @@ public:
     }
     void AdvanceOpeningExit(float seconds,bool paused) {
         if(!paused && std::isfinite(seconds) && seconds>0)
+            {
             openingExitSeconds_=std::max(0.f,openingExitSeconds_-std::min(seconds,.05f));
+            successSeconds_=std::max(0.f,successSeconds_-std::min(seconds,.05f));
+            retrySeconds_=std::max(0.f,retrySeconds_-std::min(seconds,.05f));
+        }
     }
     void RestoreEnded() { snapshot_.stage=TutorialStage::Skipped; snapshot_.exitPending=false; exitProtection_=false; CancelTransient(); }
-    void BlockSucceeded() { if (Learning() && (!sequential_ || snapshot_.stage==TutorialStage::Block)) { snapshot_.blockLearned=true; SelectStage(); } }
-    void ParrySucceeded() { if (Learning() && (!sequential_ || snapshot_.stage==TutorialStage::Parry)) { snapshot_.parryLearned=true; SelectStage(); } }
-    void DodgeSucceeded() { if (Learning() && (!sequential_ || snapshot_.stage==TutorialStage::Dodge)) { snapshot_.dodgeLearned=true; SelectStage(); } }
+    void BlockSucceeded() { if (Learning() && (!sequential_ || snapshot_.stage==TutorialStage::Block)) { snapshot_.blockLearned=true; successSeconds_=1.2f; SelectStage(); } }
+    void ParrySucceeded() { if (Learning() && (!sequential_ || snapshot_.stage==TutorialStage::Parry)) { snapshot_.parryLearned=true; successSeconds_=1.2f; SelectStage(); } }
+    void DodgeSucceeded() { if (Learning() && (!sequential_ || snapshot_.stage==TutorialStage::Dodge)) { snapshot_.dodgeLearned=true; successSeconds_=1.2f; SelectStage(); } }
+    // A real dodge away from a nearby committed red attack also demonstrates
+    // evasion. This does not widen damage invulnerability or accept remote rolls.
+    void ObserveDodge(const CombatSnapshot& combat, float x, float z,
+                      std::uint64_t sequence, bool movingDodge)
+    {
+        if (!Learning() || snapshot_.stage != TutorialStage::Dodge || snapshot_.exitPending)
+        { ClearDodge(); return; }
+        if (sequence != observedDodgeSequence_) {
+            ClearDodge(); observedDodgeSequence_=sequence;
+            if (!sequence || !movingDodge || combat.attackerIndex<0 ||
+                static_cast<std::size_t>(combat.attackerIndex)>=combat.combatants.size()) return;
+            const auto& actor=combat.combatants[combat.attackerIndex];
+            const float remaining=CombatTimeline::kSkeletonAttackWindupSeconds-actor.actionTime;
+            const bool threat=actor.action==EnemyCombatAction::AttackActive ||
+                (actor.action==EnemyCombatAction::AttackWindup && remaining<=.55f);
+            if (!threat || actor.health<=0 || actor.attackKind!=EnemyAttackKind::Unblockable ||
+                std::hypot(x-actor.x,z-actor.z)>1.7f ||
+                IsRouteAudioObstructed(x,z,actor.x,actor.z)) return;
+            dodgeActor_=combat.attackerIndex; dodgeStartX_=x; dodgeStartZ_=z;
+            dodgeThreatX_=actor.x; dodgeThreatZ_=actor.z;
+        }
+        if (dodgeActor_<0) return;
+        const auto& actor=combat.combatants[dodgeActor_];
+        if (actor.health<=0 || (actor.action!=EnemyCombatAction::AttackWindup &&
+            actor.action!=EnemyCombatAction::AttackActive && actor.action!=EnemyCombatAction::AttackRecovery))
+        { ClearDodge(); return; }
+        if (movingDodge && std::hypot(x-dodgeStartX_,z-dodgeStartZ_)>=.25f &&
+            std::hypot(x-dodgeThreatX_,z-dodgeThreatZ_)>1.55f)
+            dodgeEscaped_=true;
+        if (actor.action!=EnemyCombatAction::AttackWindup) {
+            if (dodgeEscaped_ && std::hypot(x-actor.x,z-actor.z)>1.55f) DodgeSucceeded();
+            ClearDodge();
+        }
+    }
     void BeginGuardAttack()
     {
         ClearGuardAttack();
@@ -148,18 +186,18 @@ public:
         if (guardAttackId_ != 0u && combat.activePlayerAttackId == 0u)
         {
             if (combat.player.action == PlayerCombatAction::Guard && guardAttackHit_ && Learning())
-            { snapshot_.attackFromGuardLearned = true; SelectStage(); }
+            { snapshot_.attackFromGuardLearned = true; successSeconds_=1.2f; SelectStage(); }
             ClearGuardAttack();
         }
     }
-    void PracticeMiss() { if (snapshot_.practiceMisses != UINT32_MAX) ++snapshot_.practiceMisses; }
+    void PracticeMiss() { if (snapshot_.practiceMisses != UINT32_MAX) ++snapshot_.practiceMisses; retrySeconds_=1.2f; }
     void CancelTransient()
     {
         snapshot_.cue = CombatTeachingCue::None; snapshot_.source = EntityId::Invalid;
         snapshot_.attackReadability = AttackReadability::Neutral;
         snapshot_.slowdownActive = false; snapshot_.simulationTimeScale = 1.0f;
         snapshot_.safePractice = false; snapshot_.promptOpacity = 0.0f;
-        ClearGuardAttack();
+        ClearGuardAttack(); ClearDodge(); successSeconds_=retrySeconds_=0.f;
     }
     void Update(bool enabled, bool optionalSlowdown, bool suspended,
                 const CombatSnapshot& combat, const LichSnapshot& keeper,
@@ -247,6 +285,12 @@ public:
                 }
             }
         }
+        if (practicing && sequential_ && retrySeconds_>0.f && !snapshot_.exitPending &&
+            snapshot_.stage!=TutorialStage::Ready && snapshot_.cue!=CombatTeachingCue::Learned &&
+            snapshot_.cue!=CombatTeachingCue::ParryNow && snapshot_.cue!=CombatTeachingCue::DodgeNow) snapshot_.cue=CombatTeachingCue::Retry;
+        if (practicing && sequential_ && successSeconds_>0.f && !snapshot_.exitPending &&
+            snapshot_.stage!=TutorialStage::Ready && snapshot_.cue!=CombatTeachingCue::Learned &&
+            snapshot_.cue!=CombatTeachingCue::ParryNow && snapshot_.cue!=CombatTeachingCue::DodgeNow) snapshot_.cue=CombatTeachingCue::Accepted;
         snapshot_.slowdownActive = practicing && optionalSlowdown &&
             ((snapshot_.stage == TutorialStage::Parry && snapshot_.cue == CombatTeachingCue::ParryNow && !snapshot_.parryLearned) ||
              (snapshot_.stage == TutorialStage::Dodge && snapshot_.cue == CombatTeachingCue::DodgeNow && !snapshot_.dodgeLearned));
@@ -279,6 +323,11 @@ private:
             !(keeper.phase == LichPhase::Recovering && keeper.readableCastPresentation &&
               effects::KeeperShaderPresentationKind(true, keeper) == 2.0f));
     }
+    void ClearDodge() { dodgeActor_=-1; dodgeEscaped_=false; }
+    int dodgeActor_=-1;
+    std::uint64_t observedDodgeSequence_=0;
+    bool dodgeEscaped_=false;
+    float dodgeStartX_=0,dodgeStartZ_=0,dodgeThreatX_=0,dodgeThreatZ_=0,successSeconds_=0,retrySeconds_=0;
     void ClearGuardAttack() { guardAttackPending_=guardAttackHit_=false; guardAttackId_=0; }
     // User intent and a protected pending exit survive inactive rule profiles;
     // neither is the published active-teaching flag used by frozen captures.

@@ -33,6 +33,36 @@ void CheckContactBurst(const SimulationSnapshot& state,const GameplayEvent& even
             b.origin[1]>kRouteFloorWorldY+.3f;
     Check(matched,"actual successful skeleton/Keeper contact owns a matching target/sequence surface-proxy burst");
 }
+void ThreatBoundedDodgeLesson() {
+    for(int scenario=0;scenario<7;++scenario) {
+        CombatTeaching teaching; CombatSnapshot combat; LichSnapshot keeper;
+        teaching.SetSequentialPractice(true); teaching.Reset(true);
+        combat.aliveCount=1; combat.combatantCount=1; combat.attackerIndex=0;
+        auto& actor=combat.combatants[0]; actor.health=2; actor.x=0; actor.z=-4.65f;
+        actor.action=EnemyCombatAction::AttackWindup; actor.actionTime=CombatTimeline::kSkeletonAttackWindupSeconds-.3f;
+        actor.attackKind=EnemyAttackKind::Unblockable;
+        teaching.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+        teaching.BlockSucceeded(); teaching.ParrySucceeded();
+        if(scenario==3) actor.attackKind=EnemyAttackKind::Normal;
+        if(scenario==4) actor.actionTime=0;
+        const float startZ=scenario==1 ? -1.f : -3.4f;
+        teaching.ObserveDodge(combat,0,startZ,1,true);
+        if(scenario==5) teaching.CancelTransient();
+        if(scenario==6) teaching.Skip();
+        const float escapedZ=scenario==2 ? startZ : startZ+.6f;
+        teaching.ObserveDodge(combat,0,escapedZ,1,true);
+        actor.action=EnemyCombatAction::AttackActive;
+        teaching.ObserveDodge(combat,0,escapedZ,1,false);
+        Check(teaching.Snapshot().dodgeLearned==(scenario==0),
+              "only moving evasion of a nearby committed red threat earns dodge; remote/blocked/early/non-red/cancel/Skip reject");
+        if(scenario==0) {
+            teaching.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+            Check(teaching.Snapshot().cue==CombatTeachingCue::Accepted &&
+                horde::platform::windows::CombatTeachingPromptText(teaching.Snapshot(),true).find("Good! Next:")!=std::string::npos,
+                "earned dodge immediately acknowledges success with the next controller lesson");
+        }
+    }
+}
 void PracticePromptWaitsForSword() {
     GameSimulation sim(ProductionGameSimulationConfig());
     InputSnapshot input; input.tutorialEnabled=true;
@@ -1247,6 +1277,44 @@ void FourSkillPracticeAndExit() {
     }
     Check(sim.Snapshot().combatTeaching.parryLearned && sim.Snapshot().combatTeaching.stage==TutorialStage::Dodge,
           "real successful parry advances the protected lesson to dodge");
+    // Both keyboard axes and controller axes use the same owner and accepted edge.
+    for(bool analogue:{false,true}) {
+        auto liveConfig=Rules(); liveConfig.sequentialPractice1_7=true;
+        liveConfig.playerStartX=-7.6f; liveConfig.playerStartZ=-15.2f; liveConfig.playerStartYawRadians=1.57079632679f;
+        GameSimulation evasion(liveConfig); InputSnapshot control; control.yawRadians=liveConfig.playerStartYawRadians;
+        Check(LearnBlockFromRealContact(evasion,control),"normal waterfall practice learns actual block before evasion probe");
+        for(int tick=0;tick<600;++tick) {
+            const auto& state=evasion.Snapshot(); const auto index=state.swordCombat.attackerIndex;
+            if(index>=0 && state.swordCombat.combatants[index].action==EnemyCombatAction::AttackWindup &&
+                state.swordCombat.combatants[index].actionTime>=CombatTimeline::kSkeletonAttackWindupSeconds-.1f)break;
+            evasion.StepFixed(control);
+        }
+        ++control.commands.parry;
+        for(int tick=0;tick<20 && !evasion.Snapshot().combatTeaching.parryLearned;++tick)evasion.StepFixed(control);
+        Check(evasion.Snapshot().combatTeaching.parryLearned,"normal waterfall practice learns actual parry before evasion probe");
+        control.guardHeld=false; control.analogueMovement=analogue;
+        bool red=false;
+        for(int tick=0;tick<600 && !red;++tick) {
+            const auto& state=evasion.Snapshot(); const auto index=state.swordCombat.attackerIndex;
+            red=index>=0 && state.swordCombat.combatants[index].attackKind==EnemyAttackKind::Unblockable &&
+                state.swordCombat.combatants[index].action==EnemyCombatAction::AttackWindup &&
+                state.swordCombat.combatants[index].actionTime>=CombatTimeline::kSkeletonAttackWindupSeconds-.3f;
+            if(!red)evasion.StepFixed(control);
+        }
+        Check(red,"evasion test reaches a real nearby red attack without staging actor state");
+        const auto protectedBefore=evasion.Snapshot().dodgeProtectedHitCount;
+        control.moveForward=-1; ++control.commands.dodge;
+        for(int tick=0;tick<35;++tick) {
+            if(tick==12)control.moveForward=0;
+            evasion.StepFixed(control);
+        }
+        std::cout<<"Evasion analogue="<<analogue<<" learned="<<evasion.Snapshot().combatTeaching.dodgeLearned
+            <<" protected="<<evasion.Snapshot().dodgeProtectedHitCount-protectedBefore<<" player="<<evasion.Snapshot().playerX<<","<<evasion.Snapshot().playerZ
+            <<" accepted="<<evasion.Snapshot().acceptedDodgeSequence<<" actor="<<evasion.Snapshot().swordCombat.combatants[0].x<<","<<evasion.Snapshot().swordCombat.combatants[0].z<<"\n";
+        Check(evasion.Snapshot().combatTeaching.dodgeLearned &&
+              evasion.Snapshot().dodgeProtectedHitCount==protectedBefore,
+              "keyboard/controller outward dodge learns through real spatial evasion without any invulnerability contact");
+    }
     Check(reachTell(5.f/60),"four-skill practice waits for the next real attack before its outward dodge");
     input.moveStrafe=1; ++input.commands.dodge;
     for(int tick=0;tick<30;++tick) {
@@ -2621,6 +2689,7 @@ int main(int argc,char** argv) {
     if(argc!=1) { std::cerr<<"unknown combat foundation profile\n"; return 2; }
     SkeletonRevivalBridgeContract();
     BoundedOpeningPractice();
+    ThreatBoundedDodgeLesson();
     PracticePromptWaitsForSword();
     InPlacePairRevivalContract();
     RulesEligibilityDoesNotChoosePracticeExit();

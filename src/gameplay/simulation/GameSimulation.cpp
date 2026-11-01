@@ -2637,6 +2637,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                                            config_.waterfallSkeletonEncounter &&
                                                IsWaterfallSkeletonArena(playerX_, playerZ_),
                                            config_.waterfallSkeletonEncounter);
+    if (CurrentCombatRules() && activeEnemyKind_==EnemyKind::Skeleton)
+        combatTeaching_.ObserveDodge(combatSnapshot_,playerX_,playerZ_,acceptedDodgeSequence_,
+            dodgeProtectionAccepted_ && dodgeRemainingSeconds_>0.f);
     EntityId skeletonDamageSource = EntityId::Invalid;
     EnemyAttackKind incomingAttackKind = EnemyAttackKind::Unblockable;
     if (queuedUpCutCommandSequence_ != 0 &&

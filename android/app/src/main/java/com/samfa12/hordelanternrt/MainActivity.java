@@ -4137,7 +4137,7 @@ public class MainActivity extends Activity {
             if (soundId == null) return;
             synchronized (loadedSounds) { if (!loadedSounds.contains(soundId)) return; }
             final long gains = ProbeBridge.getChapterDialogueStereoGains(generation);
-            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70) / 100.0f;
+            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 100) / 100.0f;
             final float left = clamp(Float.intBitsToFloat((int) gains), 0.0f, 1.0f);
             final float right = clamp(Float.intBitsToFloat((int) (gains >>> 32)), 0.0f, 1.0f);
             chapterVoiceStream = soundPool.play(soundId, voiceGain * left, voiceGain * right,
@@ -4152,7 +4152,7 @@ public class MainActivity extends Activity {
         }
         if (chapterVoiceStream != 0 && !paused) {
             final long gains = ProbeBridge.getChapterDialogueStereoGains(generation);
-            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70) / 100.0f;
+            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 100) / 100.0f;
             final float left = clamp(Float.intBitsToFloat((int) gains), 0.0f, 1.0f);
             final float right = clamp(Float.intBitsToFloat((int) (gains >>> 32)), 0.0f, 1.0f);
             soundPool.setVolume(chapterVoiceStream, voiceGain * left, voiceGain * right);
@@ -4352,7 +4352,7 @@ public class MainActivity extends Activity {
 
         addSlider(panel, getString(R.string.sfx_volume), preferences.getInt("sfx_volume", 70), 0, 100,
                 value -> preferences.edit().putInt("sfx_volume", value).apply());
-        addSlider(panel, getString(R.string.dialogue_volume), preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70), 0, 100,
+        addSlider(panel, getString(R.string.dialogue_volume), preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 100), 0, 100,
                 value -> preferences.edit().putInt(PREF_CHAPTER_VOICE_VOLUME, value).apply());
         addBody(panel, "Chapter subtitles");
         final CheckBox subtitlesEnabled = new CheckBox(this);
@@ -4498,7 +4498,7 @@ public class MainActivity extends Activity {
                             .putBoolean(PREF_CHAPTER_SUBTITLES, true)
                             .putInt(PREF_CHAPTER_SUBTITLE_SIZE, 100)
                             .putInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO)
-                            .putInt(PREF_CHAPTER_VOICE_VOLUME, 70)
+                            .putInt(PREF_CHAPTER_VOICE_VOLUME, 100)
                             .putInt(PREF_MUSIC_VOLUME, 70).putInt("look_sensitivity", 100)
                             .putBoolean("haptics_enabled", true).putBoolean("show_hud", true)
                             .putBoolean(CombatTeachingPreferences.ENABLED, true)

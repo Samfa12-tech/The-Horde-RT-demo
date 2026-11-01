@@ -96,18 +96,19 @@ final class CombatTeachingPreferences {
         if(stage==2 || stage==3)return "";
         if(stage==6 || cue==11)return "Settings: Finish practice - enemies can hurt you";
         if(cue==7)return "Well parried - strike back";
-        if(stage==4 || cue==9)return "1/4 Hold "+guard+": block normal hits";
-        if(stage==5 || cue==10)return "4/4 Hold "+guard+" + "+swing+"; keep held";
+        final String accepted=cue==14?"Good! Next: ":cue==15?"Try again: ":"";
+        if(stage==4 || cue==9)return accepted+"1/4 Hold "+guard+": block normal hits";
+        if(stage==5 || cue==10)return accepted+"4/4 Hold "+guard+" + "+swing+"; keep held";
         if(stage==1) {
             if(cue==5)return "DODGE NOW - "+dodge;
-            return (source==3?"Keeper lightning":source==2 || source==4?"Skeleton attack":"Attacker")+" - "+dodge;
+            return accepted+(source==3?"Keeper lightning":source==2 || source==4?"Skeleton attack":"Attacker")+" - "+dodge+" away as it swings; clear its reach";
         }
         switch(cue) {
             case 1: return "Watch the raised arm - fresh "+guard+" press";
             case 2: return "PARRY NOW - fresh "+guard+" press";
             case 8: return "Timed parry active - face the attacker";
             case 3: return "Release, then press "+guard+" to parry";
-            default:return "Fresh "+guard+" press: timed parry";
+            default:return accepted+"Fresh "+guard+" press: timed parry";
         }
     }
 
