@@ -1,3 +1,10 @@
+# Superseded candidate checkpoint
+
+The later [private chapter integration](../2026-11-01-forest-integration/README.md)
+preserves this owner-approved tree direction, adds selective fences/ground cover
+and actual tree contact, and enables the admitted normal chapter roster. The
+disabled/default-off statements below describe this earlier immutable checkpoint.
+
 # Forest composition revision — 1 November 2026
 
 **Improved native Debug candidate; not admitted for normal 1.7 play.** F01 now has
@@ -92,9 +99,3 @@ assets or timing changed; this candidate remains outside ordinary gameplay.
 Raw logs, OBJ exports and interim images remain ignored under
 `reports/forest-surroundings-revision2-20261101/`. The previous failed native
 checkpoint remains in [its original record](../2026-10-31-forest-surroundings-native/README.md).
-# Superseded candidate checkpoint
-
-The later [private chapter integration](../2026-11-01-forest-integration/README.md)
-preserves this owner-approved tree direction, adds selective fences/ground cover
-and actual tree contact, and enables the admitted normal chapter roster. The
-disabled/default-off statements below describe this earlier immutable checkpoint.

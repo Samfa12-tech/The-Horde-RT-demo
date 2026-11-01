@@ -1,0 +1,26 @@
+{
+  "evidenceClass": "device RT checkpoint capture; not natural gameplay or performance acceptance",
+  "model": "SM-S948B",
+  "android": "17",
+  "sourceCheckpoint": "e56f60e4a1b0ef99e436bee70b633ce90547186b",
+  "sourceIdentityNote": "APK built before commit from the source/runtime bytes sealed in the forest integration receipt; app display remains 1.6.2 DEBUG.",
+  "shaderIdentity": "8cd3f4c9+87e92ced",
+  "backend": "RayTracingPipeline",
+  "savedRenderScale": 0.33,
+  "checkpointResults": {
+    "chapter-landing-north": "Standard particles, generation 1, 12 stable presented RT frames",
+    "chapter-forest-lookout": "Low particles, generation 2, 12 stable presented RT frames"
+  },
+  "resume": "inconclusive: retained capture-ready state did not establish fresh post-resume presentation",
+  "releaseUtc": "2026-11-01T03:10:57.847465+00:00",
+  "preservation": "All 6 original preferences/career files byte-identical; production and actor-worker packages untouched; debug stopped and Home restored; no device settings changed.",
+  "artifacts": {
+    "candidate.apk": "6813bbd508a7530fa60e58d8aeb6c048de7020b805097b33f81f6b7070756b2b",
+    "f01-standard-state.json": "fe69e491a2895103dc81fa7d2f25ccb500d807bf17edf611af5225173f43b5d0",
+    "f04-low-state.json": "fc14dd0416cec46fbbdcc189101b13e0071daa04d6edec5df285095a49ab1d6c",
+    "resumed-state.json": "fc14dd0416cec46fbbdcc189101b13e0071daa04d6edec5df285095a49ab1d6c",
+    "f01-standard.png": "c603b064474a29912eff1ed205cc0c47a4f7d39e70d3e234df044c0c7b00e703",
+    "f04-low.png": "42f2d4c1f7260d7b7da3e7ecd3ce043d9888b3fb5312b06dba1f8a0bc15b7075",
+    "f01-startup-log.txt": "df2915235228d9eca4e72d2d5b063e9df5147be9ed14038bf60497c8638af40e"
+  }
+}

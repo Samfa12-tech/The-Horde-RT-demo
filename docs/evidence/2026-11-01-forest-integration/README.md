@@ -50,6 +50,16 @@ recorded in `receipt.json`. All captured frames have matching completed Vulkan
 RT presentation. Captures never took foreground; unrelated foreground changes
 were permitted. Windows settings and campaign files were preserved.
 
+The normal moving route completed 1,483 frames with 1,484 resident-woodland
+validations, including outbound/lookout sweep, return, rope descent, passage,
+repeat ascent and reset. Omitted triangles, unloads and restores remained zero.
+
+The same APK was installed in-place on the owner-offered SM-S948B. F01 Standard
+and F04 Low each reached 12 stable presented RT frames at its saved 33% scale.
+The phone was released with its six original preference/career files unchanged.
+Resume was inconclusive; no natural-play, firefly-visibility or performance pass
+is inferred. See [the Android evidence](ANDROID.json).
+
 ## Fireflies and limits
 
 F01 Standard shows four restrained yellow-green fireflies; matched Low and Off

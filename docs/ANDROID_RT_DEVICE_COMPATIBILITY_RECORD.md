@@ -1,5 +1,21 @@
 # Android RT Device Compatibility Record
 
+## 2026-11-01 03:10 UTC - Integrated forest device capture
+
+SM-S948B / Android 17 / Adreno 840, RayTracingPipeline, saved 33% scale.
+Installed debug APK SHA256 `6813bbd508a7530fa60e58d8aeb6c048de7020b805097b33f81f6b7070756b2b`
+was read back identically from the device. F01 Standard and F04 Low each reached
+12 stable presented RT frames on separate capture generations. Actual portrait
+images were inspected: forest at F01 and unobstructed town-facing lookout at F04.
+This is checkpoint rendering evidence, not natural traversal, physical input,
+phone firefly visibility or performance acceptance. Background/resume remains
+inconclusive because the retained ready snapshot did not prove fresh presentation.
+
+The latest debug remains installed and stopped. Home restored; all six original
+preferences/career files unchanged, no device settings changed, production and
+actor-worker packages untouched. Phone released at 03:10:57 UTC.
+[Exact source/artifact identities and evidence limits](evidence/2026-11-01-forest-integration/ANDROID.json).
+
 ## 2026-11-01 00:49 UTC - Mobile water contact-spray reduction validated in scope
 
 SM-S948B / Android 17 / Adreno 840 / Vulkan 1.4.295 / driver 2150932499.

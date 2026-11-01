@@ -954,5 +954,15 @@
     "sourceWitness": 14147300745973390660,
     "cpuSubsetTriangles": 17389,
     "subsetNote": "Plumbing-only exact triangle removal/restoration test; no normal omission admission."
+  },
+  "movingRouteEvidence": {
+    "reports\\forest-integration-20261101\\normal-roundtrip\\roundtrip\\gallery.json": {
+      "bytes": 139103,
+      "sha256": "7780197f067cabdaf6bc8461853e693ec0f7324c63d894439f3b817d2b495c43"
+    },
+    "reports\\forest-integration-20261101\\normal-roundtrip\\roundtrip\\frames.csv": {
+      "bytes": 271671,
+      "sha256": "9fd9b6c47c9f95c2e9585cae76d6ca5c6115213495de9a88dcbacfb30804120c"
+    }
   }
 }
