@@ -1081,9 +1081,9 @@ void TestFullSurroundings()
     const bool accepted=AppendPreparedForestSurroundings(kRoot/"assets",*original,owner,terrain,result,diagnostic);
     Check(accepted,diagnostic);if(!accepted)return;
     const auto& r=result->report;
-    Check(r.extraTrees==416 && r.addedTreeTriangles==191776 && r.boundaryContained &&
-          r.fenceRuns+r.naturalBankRuns==196 && r.fenceTriangles==r.fenceRuns*48 && r.boundaryCollisionTriangles==r.fenceRuns*20,
-          "full study owns exact additional trees and only rendered closed-loop boundary solids");
+    Check(r.extraTrees==416 && r.addedTreeTriangles==190784 && r.boundarySectionsContained && !r.boundaryContained && r.arrivalPortalRuns==6 &&
+          r.fenceRuns+r.naturalBankRuns+r.arrivalPortalRuns==196 && r.terminalFencePosts>0 && r.fenceTriangles==r.fenceRuns*48+r.terminalFencePosts*12 && r.boundaryCollisionTriangles==r.fenceRuns*20+r.terminalFencePosts*8,
+          "full study owns exact additional trees and only rendered boundary sections with explicit open arrival");
     Check(owner.materials.size()==baseline.materials.size() && owner.primitives.size()==baseline.primitives.size() &&
           owner.indices.size()==baseline.indices.size()+r.addedIndices && owner.HasValidTriangleProvenance(),
           "full study reuses all existing material/primitive/asset roles without capacity growth");
@@ -1093,13 +1093,13 @@ void TestFullSurroundings()
           "immutable boundary publication retains original ground and existing nonwalkable geometry");
     // Compare the playable corridor to the original support, rather than
     // declaring every pre-existing obstruction a new fence regression.
-    constexpr std::array<std::array<float,2>,6> route{{{-33.7f,-12.8f},{-28.7f,-5.8f},{-15.7f,.2f},
-        {-17.7f,15.2f},{-3.7f,20.2f},{13.3f,36.2f}}};
+    constexpr std::array<std::array<float,2>,7> route{{{-33.7f,-12.8f},{-28.7f,-5.8f},{-15.7f,.2f},
+        {-17.7f,15.2f},{-3.7f,20.2f},{13.3f,36.2f},{22.3f,50.2f}}};
     bool clearance=true;std::size_t clearanceProbes=0;
     for(std::size_t segment=1;segment<route.size();++segment) {
         const auto a=route[segment-1],b=route[segment];const float dx=b[0]-a[0],dz=b[1]-a[1],len=std::hypot(dx,dz);
         const int steps=int(std::ceil(len/.15f));
-        for(int i=0;i<=steps;++i)for(float lateral:{-.95f,0.f,.95f}) {
+        for(int i=0;i<=steps;++i)for(float lateral:{-1.2f,0.f,1.2f}) {
             const float x=a[0]+dx*float(i)/steps-dz/len*lateral,z=a[1]+dz*float(i)/steps+dx/len*lateral;
             const auto ground=baselineTerrain->Query(x,z);if(!ground.found)continue;
             for(float height:{.75f,1.8f}) {

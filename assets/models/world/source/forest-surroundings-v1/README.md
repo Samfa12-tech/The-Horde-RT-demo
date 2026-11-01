@@ -1,5 +1,32 @@
 # Whole-route forest: source candidate v1
 
+## 1 November composition revision (current candidate)
+
+The revised opt-in native candidate and exact evidence are recorded in
+[the revision checkpoint](../../../../../docs/evidence/2026-11-01-forest-composition/README.md).
+It preserves 64 originals, 96 middle and 320 far trees, with broader/taller
+branch-supported silhouettes, small individual sprays, lower living branches,
+and middle stands behind F01 as well as beside the route. No texture, shader,
+renderer capacity, default, quality setting or shipping roster changes.
+
+Current tree cost is 514,048 triangles (+190,784), with 10,897,408 bytes of added
+raw native tree vertices/indices. The native candidate adds 109 fence modules and
+11 terminal posts (5,364 rendered / 2,268 collision triangles); 81 sections are
+blocked by the actual existing terrain/solid sweeps. Six spans are an explicit
+open portal onto the mapped arrival route. Section containment is not global
+containment: off-corridor collision exemption and normal activation remain false.
+The source contour is closed only as a layout reference; its portal is deliberately
+open in geometry and collision. The earlier closed-boundary description below
+records the original study and is superseded on these points.
+
+F01 has a fuller woodland horizon and the F04 onward fence obstruction is fixed.
+The F01 enclosure, repeated trunks and thin lower vegetation still fall short of
+convincing whole-route woodland; no normal-play acceptance is claimed. Further
+ordinary authoring should replace conspicuous enclosing rails with visible,
+traversal-tested bank/rock sections and add varied lower vegetation/ground mass.
+The original 31 October source description follows for derivation context.
+
+
 Parent-authorized offline continuation after the four-tree grounding prototype.
 This package is **not integrated scenery, a runtime LOD system, admitted collision,
 or a performance result**. Production keeps its exact original 64 trees. This

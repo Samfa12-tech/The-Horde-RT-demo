@@ -37,7 +37,9 @@ def validate(layout):
         if edge['b']!=edges[(i+1)%len(edges)]['a']:raise ValueError('Boundary gap')
         a,b=poly[i],poly[(i+1)%len(poly)]
         if not 0<math.dist(a,b)<=2.40001:raise ValueError('Panel span')
-        if edge['default']!='visible-fence' or edge['collisionAdmitted']:raise ValueError('Unproved bank gap')
+        expected=any(author.project(author.add(a,author.mul(author.sub(b,a),t/20)),layout['arrivalRoute'][:2])[0]<layout['arrivalPortalHalfWidth'] for t in range(21))
+        if edge.get('arrivalPortal')!=expected:raise ValueError('Unproved portal')
+        if edge['default']!=('open-mapped-arrival' if expected else 'visible-fence') or edge['collisionAdmitted']:raise ValueError('Unproved bank gap')
         for t in range(11):
             if not -.00001<=clearance(author.add(a,author.mul(author.sub(b,a),t/10)))<=1.50001:raise ValueError('Protected pocket clipped/detail allowance exceeded')
     for a,b in zip(route,route[1:]):
@@ -95,6 +97,18 @@ class SourceTests(unittest.TestCase):
             rows=[r for r in self.layout['placements'] if r['band']==band]
             self.assertEqual(set(r['stand'] for r in rows),set(range(n)))
             for i in range(n):self.assertGreaterEqual(sum(r['stand']==i for r in rows),12)
+
+    def test_arrival_portal_matches_map_and_cannot_admit_global_exemption(self):
+        mapping=json.loads(author.MAP.read_text())
+        expected=[[round(x+78.3,6),round(126.2-y,6)] for x,y,z in mapping['arrival']]
+        self.assertEqual(self.layout['arrivalRoute'],expected)
+        self.assertEqual(sum(e['arrivalPortal'] for e in self.layout['boundary']),6)
+        self.assertEqual(self.layout['arrivalPortalHalfWidth'],2.0)
+        self.assertFalse(self.layout['admission']['collisionExemption'])
+        d=copy.deepcopy(self.layout)
+        edge=next(e for e in d['boundary'] if not e['arrivalPortal'])
+        edge.update(arrivalPortal=True,default='open-mapped-arrival')
+        with self.assertRaisesRegex(ValueError,'Unproved portal'):validate(d)
 
     def test_boundary_has_no_proper_self_crossings(self):
         points=[(v['a'][0],v['a'][2]) for v in self.layout['boundary']]

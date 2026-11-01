@@ -167,7 +167,7 @@ def asset(species, level):
         count=20 if species=='pine' else 14
         for i in range(count):
             angle=i*2.399963+.2*math.sin(i*1.7)
-            height=(2.8+i*.26) if species=='pine' else (2.95+i*.26)
+            height=(1.65+i*.32) if species=='pine' else (2.1+i*.31)
             length=(2.1-i*.06) if species=='pine' else (1.25+.5*math.sin(i*.8)**2)
             trunk=tubes[0]['points'];trunk=[yup(p) for p in trunk]
             a,b=next((a,b) for a,b in zip(trunk,trunk[1:]) if a[1]<=height<=b[1])
@@ -196,6 +196,22 @@ def asset(species, level):
                 wood.tube([(.2,3.6,0),c],[.08,.015],3)
                 foliage.crown(c,.82,1.8,i*.91,6)
     else: raise ValueError('Unknown distance band')
+    # Broader, taller woodland silhouettes; preserve root footprint and budgets.
+    # This is authored geometry, shared by every placement in the detail band.
+    def silhouette(p):
+        x,y,z=p
+        return (x*(1+.65*min(1,max(0,y-1))), y if y<1 else 1+(y-1)*1.55, z*(1+.65*min(1,max(0,y-1))))
+    wood.positions=[silhouette(p) for p in wood.positions]
+    if level=='middle':
+        # Spread branch-supported spray centres, not the individual leaves.
+        # Preserve small foliage detail and lower living branches to interrupt
+        # the former bare-trunk horizon without adding opaque canopy slabs.
+        for start in range(0,len(foliage.positions),6):
+            group=foliage.positions[start:start+6]
+            center=tuple(sum(p[k] for p in group)/6 for k in range(3))
+            placed=silhouette(center)
+            foliage.positions[start:start+6]=[add(placed,sub(p,center)) for p in group]
+    else:foliage.positions=[silhouette(p) for p in foliage.positions]
     return make_glb(j,source_binary,[(wood,next(i for i,m in enumerate(j['materials']) if 'bark' in m['name'])),(foliage,next(i for i,m in enumerate(j['materials']) if ('needle' if species=='pine' else 'alder leaves') in m['name']))],f'{species}-{level}'), trace
 
 
@@ -302,14 +318,15 @@ def composition(assets,tips):
                 direction=unit(sub(route[i+1],route[i]));return add(route[i],mul(direction,d)),direction
             d-=length
     stands={}
-    for band,n,offset in [('middle',4,24),('far',6,63)]:
+    for band,n,offset in [('middle',3,25),('far',6,56)]:
         stands[band]=[]
         for i in range(n):
             point,direction=station(i/(n-1));normal=(-direction[1],direction[0])
             for side in (-1,1):stands[band].append(add(point,mul(normal,offset*side)))
-        if band=='far':
-            point,direction=station(0);back=mul(direction,-1);angle=math.atan2(back[1],back[0])
-            stands[band].extend(add(point,(math.cos(angle+a)*65,math.sin(angle+a)*65)) for a in (-.7,0,.7))
+        point,direction=station(0);back=mul(direction,-1);angle=math.atan2(back[1],back[0])
+        distance=36 if band=='middle' else 65
+        angles=(-.55,.55) if band=='middle' else (-.7,0,.7)
+        stands[band].extend(add(point,(math.cos(angle+a)*distance,math.sin(angle+a)*distance)) for a in angles)
         # Bounded composition adjustment, not a changed keepout: move a stand
         # centre to the nearest valid map/clearance cell before filling it.
         target=(20,28) if band=='middle' else (53,90)
@@ -322,7 +339,7 @@ def composition(assets,tips):
     for band,count,lo,hi in [('middle',96,12,36),('far',320,38,115)]:
         accepted=0
         for attempt in range(150000):
-            stand=accepted%len(stands[band]);anchor=stands[band][stand];radius=10 if band=='middle' else 20
+            stand=accepted%len(stands[band]);anchor=stands[band][stand];radius=17 if band=='middle' else 27
             angle=rng.random()*math.tau;r=radius*math.sqrt(rng.random());p=add(anchor,(math.cos(angle)*r,math.sin(angle)*r));c=clearance(p)
             if not lo<=c<=hi or excludes(p): continue
             if any(math.hypot(p[0]-v['x'],p[1]-v['z'])<(3.1 if band=='middle' else 3.7) for v in rows): continue
@@ -394,6 +411,13 @@ def composition(assets,tips):
         outer,inner=ground(*add(center,mul(outward,1.2))),ground(*add(center,mul(outward,-1.2)))
         rise=None if outer is None or inner is None else round(outer-inner,6)
         boundary.append({'id':f'edge-{i:03}','a':[round(p[0],6),round(a,6),round(p[1],6)],'b':[round(q[0],6),round(b,6),round(q[1],6)],'default':'visible-fence','asset':'boundary-panel.glb','widthScale':round(math.dist(p,q)/2.4,6),'endpointHeightDelta':round(b-a,6),'existingTerrainOutwardRise':rise,'preferredTreatment':'inspect-existing-bank' if rise is not None and rise>.65 else 'short-fence-or-grounded-rock-run','naturalAlternative':'bank-or-rock-ONLY-after-solid-mesh-and-capsule-proof','collisionAdmitted':False})
+    # The forest joins the mapped arrival route: this is a deliberate open portal,
+    # not an omitted containment failure or a permission to remove tree collision.
+    arrival=[(round(x+78.3,6),round(126.2-y,6)) for x,y,z in mapping['arrival']]
+    for edge in boundary:
+        a,b=(edge['a'][0],edge['a'][2]),(edge['b'][0],edge['b'][2])
+        edge['arrivalPortal']=any(project(add(a,mul(sub(b,a),t/20)),arrival[:2])[0]<2.0 for t in range(21))
+        if edge['arrivalPortal']:edge['default']='open-mapped-arrival'
     counts=Counter(v['band'] for v in rows)
     trees=sum(assets[v['asset']]['triangles'] for v in rows if 'asset' in v)
     # Preserve and locate the existing twelve rock authoring records. These are
@@ -408,7 +432,7 @@ def composition(assets,tips):
         nearest=min(boundary,key=lambda e:project(point,[(e['a'][0],e['a'][2]),(e['b'][0],e['b'][2])])[0])
         rocks.append({'nativePlacementIndex':i,'sourceIndex':int(source),'x':round(point[0],6),'z':round(point[1],6),'terrainY':round(ground(*point),6),'yaw':yaw,'scale':scale,'nearestBoundaryRun':nearest['id'],'referenceOnly':True})
     require(len(rocks)==12,'Existing rock roster changed')
-    return {'schema':1,'status':'SOURCE-ONLY, NOT RUNTIME BOUNDARY/COLLISION/FOREST ADMISSION','seed':SEED,'coordinates':'native X east, Y up, Z south; R2 X=E+78.3, Z=126.2-N','mapSha256':sha(MAP.read_bytes()),'terrainSha256':sha(TERRAIN.read_bytes()),'originalPlacementsSha256':source_text_sha(PLACEMENTS.read_bytes()),'editableTextIdentity':'originalPlacementsSha256 and existingRockSourceSha256 hash UTF-8 LF-normalized text; all binary/frozen-archive inputs and generated outputs retain exact-byte checks','route':route,'clearTrailWidth':2.4,'corridorHalfWidth':2.4,'pockets':pockets,'originalTrunkClearancePockets':trunkPockets,'windows':windows,'townKeepout':townKeepout,'riverClearance':14,'standAnchors':stands,'boundary':boundary,'existingRockReferences':rocks,'existingRockSourceSha256':source_text_sha(rock_source),'placements':rows,'counts':dict(counts),'candidateTreeTriangles':323264+trees,'addedTreeRawUpperBytes':trees*140,'boundaryGeometryPolicy':'Closed conservative source contour; fences close every unproven bank/rock gap. Endpoint-height conformance keeps posts vertical. Replace fallback runs with grounded rocks/existing banks only after actual-mesh/capsule validation. No invisible barrier or old collision removal.','retention':'No old ordinary/shared certificate applies automatically; candidate full-source retention/recreation proof required at integration.','admission':{'normalDefault':False,'boundary':False,'collisionExemption':False,'nativeImporter':False,'rtVisuals':False,'gpuCost':False}}
+    return {'schema':1,'status':'SOURCE-ONLY, NOT RUNTIME BOUNDARY/COLLISION/FOREST ADMISSION','seed':SEED,'coordinates':'native X east, Y up, Z south; R2 X=E+78.3, Z=126.2-N','mapSha256':sha(MAP.read_bytes()),'terrainSha256':sha(TERRAIN.read_bytes()),'originalPlacementsSha256':source_text_sha(PLACEMENTS.read_bytes()),'editableTextIdentity':'originalPlacementsSha256 and existingRockSourceSha256 hash UTF-8 LF-normalized text; all binary/frozen-archive inputs and generated outputs retain exact-byte checks','route':route,'arrivalRoute':arrival,'arrivalPortalHalfWidth':2.0,'clearTrailWidth':2.4,'corridorHalfWidth':2.4,'pockets':pockets,'originalTrunkClearancePockets':trunkPockets,'windows':windows,'townKeepout':townKeepout,'riverClearance':14,'standAnchors':stands,'boundary':boundary,'existingRockReferences':rocks,'existingRockSourceSha256':source_text_sha(rock_source),'placements':rows,'counts':dict(counts),'candidateTreeTriangles':323264+trees,'addedTreeRawUpperBytes':trees*140,'boundaryGeometryPolicy':'Conservative section contour with an explicit mapped arrival portal; fences close unproven bank/rock gaps outside that portal. Global containment and off-corridor collision exemption are NOT admitted. Endpoint-height conformance keeps posts vertical; actual solid-mesh/body sweeps alone admit natural bank sections. No invisible barrier or old collision removal.','retention':'No old ordinary/shared certificate applies automatically; candidate full-source retention/recreation proof required at integration.','admission':{'normalDefault':False,'boundary':False,'collisionExemption':False,'nativeImporter':False,'rtVisuals':False,'gpuCost':False}}
 
 
 def inspect(data):
@@ -454,14 +478,14 @@ def produce():
     lines=['// Generated by author.py; source-only opt-in candidate, never normal defaults.',
            '#pragma once', '#include <array>', 'namespace horde::scene::surroundings_layout {',
            'struct Tree { unsigned asset; float x,y,z,yaw; };',
-           'struct Edge { std::array<float,3> a,b; bool inspectBank; };',
+           'struct Edge { std::array<float,3> a,b; bool inspectBank, arrivalPortal; };',
            'inline constexpr std::array<Tree,416> trees{{']
     names=['pine-middle.glb','alder-middle.glb','pine-far.glb','alder-far.glb']
     for p in layout['placements'][64:]:
         lines.append('    {'+str(names.index(p['asset']))+','+','.join(f(p[k]) for k in ('x','originY','z','yawRadians'))+'},')
     lines+=['}};', 'inline constexpr std::array<Edge,196> edges{{']
     for e in layout['boundary']:
-        lines.append('    {{{'+','.join(map(f,e['a']))+'}},{{'+','.join(map(f,e['b']))+'}},'+str(e['preferredTreatment']=='inspect-existing-bank').lower()+'},')
+        lines.append('    {{{'+','.join(map(f,e['a']))+'}},{{'+','.join(map(f,e['b']))+'}},'+str(e['preferredTreatment']=='inspect-existing-bank').lower()+','+str(e['arrivalPortal']).lower()+'},')
     lines+=['}};', '}']
     files['native-layout.generated.h']=('\n'.join(lines)+'\n').encode()
     manifest=json.loads((TREE/'asset.manifest.json').read_text());manifest.update(asset='forest-surroundings-v1-source-candidates',distribution='source-only-unadmitted',licenceStatus=RIGHTS)

@@ -1007,6 +1007,9 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
        <<",\"surroundingsExtraRoots\":"<<(forestSurroundingsPrototype_?416u:0u)
        <<",\"surroundingsFenceRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.fenceRuns:0u)
        <<",\"surroundingsNaturalBankRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.naturalBankRuns:0u)
+       <<",\"surroundingsTerminalFencePosts\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.terminalFencePosts:0u)
+       <<",\"surroundingsArrivalPortalRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.arrivalPortalRuns:0u)
+       <<",\"surroundingsBoundarySectionsContained\":"<<(forestSurroundingsPrototype_&&forestSurroundingsPrototype_->report.boundarySectionsContained?"true":"false")
        <<",\"surroundingsBoundaryContained\":"<<(forestSurroundingsPrototype_&&forestSurroundingsPrototype_->report.boundaryContained?"true":"false")
        <<",\"proofOverride\":"<<(forestRouteProofMode_!=ForestRouteProofMode::Disabled?"true":"false")<<",\"fullyResident\":"<<(!ordinaryStaticOmissions_ && !ordinaryStaticReduced_?"true":"false")
        <<",\"ordinaryOmissionCertificateReused\":false,\"forestOrPerformanceAdmitted\":false"
@@ -1146,7 +1149,7 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
         }
     }else if(forestF01NorthPrototype_) return fail("F01 north collision leaked into another forest profile.");
     if(SelectForestSurroundingsPrototype()) {
-        if(shared || sector || !forestSurroundingsPrototype_ || !forestSurroundingsPrototype_->report.boundaryContained ||
+        if(shared || sector || !forestSurroundingsPrototype_ || !forestSurroundingsPrototype_->report.boundarySectionsContained ||
            forestSurroundingsPrototype_->report.extraTrees!=416 || forestSurroundingsPrototype_->terrain!=chapterTerrainSurface_)
             return fail("Full-route forest lacks its exclusive fully resident boundary/geometry owner.");
     }else if(forestSurroundingsPrototype_)return fail("Full-route forest leaked into another profile.");

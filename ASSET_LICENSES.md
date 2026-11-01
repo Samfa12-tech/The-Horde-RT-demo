@@ -412,6 +412,10 @@ data are original Horde scene-authoring derivatives of the preserved approved
 world reference. These are source-only/unadmitted candidates, excluded from normal
 runtime/shipping selection; no distribution or renderer acceptance is implied.
 
+The 1 November forest composition revision retains those same rights and exact
+embedded images; its broader silhouettes and lower branch/spray arrangement are
+original authoring derivatives. No new external asset or texture was introduced.
+
 ### 1.7 development tomb native candidates (2026-10-10)
 
 - **T02 skull/jaw, femur and humerus**: recovered from the public immutable source archive at `93bdbd54016de6c4c7381a29b909d4049e4bf528`, `assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1`. Gord Goodwin's Simple Rigged Skeleton is **CC0-1.0**; retained source credit, licence notice, source-page check and checksum rosters accompany the recovered kit. Three selected GLBs have a runtime-only UV0 addition for the native importer; positions, topology, authored normals and source masters remain unchanged. The exact recipe and source/runtime hashes are in `models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/derivation-receipt.json`. Coarse alternatives remain source candidates, not runtime LOD admission. This is static burial dressing, not reuse of the animated enemy mesh.

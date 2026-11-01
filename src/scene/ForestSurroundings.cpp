@@ -93,7 +93,7 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
     auto& report=prepared->report;
     // One source primitive at a time, preserving local indices and every basis
     // attribute. All temporary geometry stays CPU-side until final validation.
-    const auto append=[&](const Asset& a,auto transform,bool fence) {
+    const auto append=[&](const Asset& a,auto transform,bool fence,bool keepEndingPost=false) {
         for(const auto& p:a.primitives) {
             const auto family=std::find(kSourceFamilies.begin(),kSourceFamilies.end(),a.materials[p.materialIndex].name)-kSourceFamilies.begin();
             auto& v=vertices[family];auto& ix=indices[family];
@@ -103,7 +103,7 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
             for(std::size_t t=0;t<p.indexCount;t+=3) {
                 // A closed loop uses exactly one starting post per edge. Never
                 // overlap the next edge's post with this module's end post.
-                bool endingPost=fence;
+                bool endingPost=fence && !keepEndingPost;
                 for(unsigned c=0;c<3;++c) {
                     const auto local=a.indices[p.indexOffset+t+c];
                     endingPost=endingPost && local>=8 && local<16;
@@ -114,7 +114,7 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
                     const auto local=a.indices[p.indexOffset+t+c];
                     if(local>=remap.size())return false;
                     if(remap[local]==UINT32_MAX) {
-                        auto out=transform(a.vertices[p.vertexOffset+local],fence && local<8);
+                        auto out=transform(a.vertices[p.vertexOffset+local],fence && local<16);
                         for(unsigned axis=0;axis<3;++axis)if(!std::isfinite(out.position[axis])||!std::isfinite(out.normal[axis])||!std::isfinite(out.tangent[axis]))return false;
                         remap[local]=static_cast<std::uint32_t>(v.size());v.push_back(out);
                     }
@@ -131,7 +131,7 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
                     // join posts; rail caps do not block horizontal crossing.
                     // This is not a general complete prop-contact certificate.
                     const bool horizontal=std::abs(a0[1]-a1[1])<1e-6f && std::abs(a0[1]-a2[1])<1e-6f;
-                    if((a.indices[p.indexOffset+t]<8 && a.indices[p.indexOffset+t+1]<8 && a.indices[p.indexOffset+t+2]<8 && !horizontal) ||
+                    if((a.indices[p.indexOffset+t]<16 && a.indices[p.indexOffset+t+1]<16 && a.indices[p.indexOffset+t+2]<16 && !horizontal) ||
                        (std::abs(a0[2]-a1[2])<1e-6f && std::abs(a0[2]-a2[2])<1e-6f))collision.push_back(tri);
                 }
             }
@@ -159,14 +159,26 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
         },false))return fail("invalid transformed tree basis.");
         ++report.extraTrees;report.addedTreeTriangles+=kTriangles[p.asset];
     }
-    for(const auto& e:surroundings_layout::edges) {
+    // Resolve visible natural boundaries before assembling runs. A short fence
+    // ending at a bank or the arrival portal owns its terminal post; joined
+    // modules still share exactly one upright post.
+    std::array<bool,surroundings_layout::edges.size()> fences{};
+    for(std::size_t i=0;i<fences.size();++i) {
+        const auto& e=surroundings_layout::edges[i];
+        if(e.arrivalPortal) {++report.arrivalPortalRuns;continue;}
         std::size_t probes=0;
-        if(e.inspectBank && EdgeBlocked(*terrain,e,probes)) {++report.naturalBankRuns;continue;}
+        if(EdgeBlocked(*terrain,e,probes)) {++report.naturalBankRuns;continue;}
+        fences[i]=true;
+    }
+    for(std::size_t i=0;i<fences.size();++i) {
+        if(!fences[i])continue;
+        const auto& e=surroundings_layout::edges[i];
+        const bool terminal=!fences[(i+1)%fences.size()];
         const float dx=e.b[0]-e.a[0],dz=e.b[2]-e.a[2],length=std::hypot(dx,dz);
         if(!(length>.05f && length<2.5f))return fail("invalid boundary span.");
         const float ux=dx/length,uz=dz/length,slope=(e.b[1]-e.a[1])/length;
         if(!append(sources[4],[&](auto v,bool post){
-            const float x=post?v.position[0]:v.position[0]*length/2.4f,z=v.position[2];
+            const float x=post?(v.position[0]>1.2f?length+v.position[0]-2.4f:v.position[0]):v.position[0]*length/2.4f,z=v.position[2];
             v.position[0]=e.a[0]+ux*x-uz*z;v.position[1]+=e.a[1]+slope*x;v.position[2]=e.a[2]+uz*x+ux*z;
             // Inverse transpose for the sheared rail span, forward derivative
             // for tangents. Post widths remain physical, not length-scaled.
@@ -175,10 +187,10 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
             Point t{v.tangent[0]*scale,v.tangent[1]+slope*v.tangent[0]*scale,v.tangent[2]};t=Normalize(t);
             v.normal[0]=ux*n[0]-uz*n[2];v.normal[1]=n[1];v.normal[2]=uz*n[0]+ux*n[2];
             v.tangent[0]=ux*t[0]-uz*t[2];v.tangent[1]=t[1];v.tangent[2]=uz*t[0]+ux*t[2];return v;
-        },true))return fail("invalid boundary geometry.");
-        ++report.fenceRuns;
+        },true,terminal))return fail("invalid boundary geometry.");
+        ++report.fenceRuns;if(terminal)++report.terminalFencePosts;
     }
-    report.fenceTriangles=report.fenceRuns*48;
+    report.fenceTriangles=report.fenceRuns*48+report.terminalFencePosts*12;
     report.boundaryCollisionTriangles=collision.size();
     if(terrain->TriangleCount()+terrain->NonWalkableTriangleCount()+terrain->StepTriangleCount()+collision.size()>Surface::kMaximumTriangles)
         return fail("boundary exceeds immutable support intake: ground="+std::to_string(terrain->TriangleCount())+
@@ -186,9 +198,10 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
             " newFence="+std::to_string(collision.size())+" limit="+std::to_string(Surface::kMaximumTriangles)+".");
     auto combined=Surface::WithAdditionalNonWalkableGeometry(*terrain,collision,diagnostic);
     if(!combined)return false;
-    for(const auto& e:surroundings_layout::edges)if(!EdgeBlocked(*combined,e,report.boundaryProbes))
+    for(const auto& e:surroundings_layout::edges)if(!e.arrivalPortal && !EdgeBlocked(*combined,e,report.boundaryProbes))
         return fail("actual rendered boundary leaves a crouch/dodge crossing at "+std::to_string(&e-surroundings_layout::edges.data())+".");
-    report.boundaryContained=true;
+    report.boundarySectionsContained=true;
+    report.boundaryContained=report.arrivalPortalRuns==0;
     Asset staged=owner;
     staged.triangleRegions.resize(staged.indices.size()/3,assets::StaticTriangleRegion::Shared);
     for(std::size_t f=0;f<4;++f)if(!indices[f].empty()) {
