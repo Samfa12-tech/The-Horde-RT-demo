@@ -1,16 +1,30 @@
 #pragma once
 #include "platform/windows/WindowsPlaytestSubmission.h"
+#include "platform/windows/WindowsPlaytestVerification.h"
 
 namespace horde::platform::windows
 {
-// Only local/staged fixtures supply these dependencies today. An empty service
-// is the production default. Verification receives purpose, never payload bytes.
-// Enabling live endpoints requires separate deployment/E2E admission.
+// Verification receives purpose, never payload bytes. Ordinary application owners
+// explicitly install fixed production routes; fixtures keep injected services.
 struct WindowsStatisticsSendServices
 {
     WindowsPlaytestExchange privateExchange, publicExchange;
+    bool synthetic = true;
     std::function<std::string(HWND, bool publicBoard)> verify;
 };
+
+inline WindowsStatisticsSendServices ProductionWindowsStatisticsSendServices()
+{
+    WindowsStatisticsSendServices services;
+    services.synthetic=false;
+    services.privateExchange=ExchangeWindowsPlaytestReport;
+    services.publicExchange=ExchangeWindowsPublicBenchmarkReport;
+    services.verify=[](HWND owner,bool publicBoard) {
+        auto result=ShowWindowsPlaytestVerification(owner,publicBoard);
+        return result.status==WindowsPlaytestVerificationStatus::Verified ? std::move(result.token) : std::string{};
+    };
+    return services;
+}
 
 class WindowsStatisticsSubmission final
 {
@@ -57,8 +71,20 @@ public:
     { return owner_ ? owner_->LastResult() : WindowsPlaytestSubmissionResult::None; }
     [[nodiscard]] const wchar_t* StatusText() const noexcept
     {
-        // These services are local mocks only. Never present their receipt as
-        // production delivery, an inbox acknowledgement, or a published score.
+        // Injected synthetic receipts must remain visibly distinct from live receipts.
+        if (!services.synthetic) {
+            switch(Result()) {
+            case WindowsPlaytestSubmissionResult::Queued: return publicBoard_ ? L"Accepted for review; not published. Check publication explicitly later." : L"Private report accepted; developer delivery is not confirmed. Do not send a new copy.";
+            case WindowsPlaytestSubmissionResult::Sent: return L"Email provider accepted the private report. Inbox delivery is not confirmed.";
+            case WindowsPlaytestSubmissionResult::Published: return L"Matching published receipt received.";
+            case WindowsPlaytestSubmissionResult::VerificationExpired: return L"Verify again, then retry the same reviewed payload explicitly.";
+            case WindowsPlaytestSubmissionResult::RateLimited: return L"Rate limited. Wait before an explicit same-ID retry.";
+            case WindowsPlaytestSubmissionResult::Conflict: return L"ID/content conflict. No successful receipt.";
+            case WindowsPlaytestSubmissionResult::Rejected: return L"Rejected. No successful delivery or publication receipt.";
+            case WindowsPlaytestSubmissionResult::Uncertain: return L"Outcome unknown. Retry explicitly with the same payload and fresh verification.";
+            default: return Busy() ? L"Request in progress. Cancellation cannot prove it was not accepted." : L"Review this separate submission. Send starts a fresh anti-spam check.";
+            }
+        }
         switch (Result())
         {
         case WindowsPlaytestSubmissionResult::Queued: return publicBoard_ ?

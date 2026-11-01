@@ -11382,7 +11382,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         if(!owner || owner->reviewOpen || (sceneContext && sceneContext->benchmark.IsRunning()))return 0;
         if(sceneContext) {ShowPauseMenu(*sceneContext,true);ClearDesktopInput(*sceneContext);DiscardDesktopPendingCommands(*sceneContext);}
         owner->reviewOpen=true;
-        horde::platform::windows::ShowWindowsCompatibilityReport(hWnd,owner->snapshot);
+        horde::platform::windows::ShowWindowsCompatibilityReport(hWnd,owner->snapshot,{nullptr,nullptr,horde::platform::windows::ProductionWindowsStatisticsSendServices()});
         owner->reviewOpen=false;
         if(IsWindow(hWnd) && reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd,GWLP_USERDATA))==sceneContext && sceneContext)
             ClearDesktopInput(*sceneContext);
@@ -12103,7 +12103,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             case kBenchmarkReviewStatsButtonId:
                 if (!sceneContext->benchmark.IsRunning() && sceneContext->benchmarkSummary &&
                     sceneContext->benchmarkSummary->IsReady())
-                    ShowWindowsBenchmarkSummaryReview(hWnd, *sceneContext->benchmarkSummary);
+                    ShowWindowsBenchmarkSummaryReview(hWnd, *sceneContext->benchmarkSummary, horde::platform::windows::ProductionWindowsStatisticsSendServices());
                 return 0;
             case kBenchmarkCopyButtonId:
                 if (!CopyTextToClipboard(hWnd, sceneContext->benchmarkReport))
@@ -13509,7 +13509,7 @@ int RunDiagnosticWindow(const int showCommand)
         !gCampaignHiddenValidation && !gOpeningBenchmarkMenuValidation && !gShowcaseCaptureHidden;
     const auto failure=[&](horde::reporting::CompatibilityStage stage){
         compatibility.stage=stage;CompatibilityFailure(compatibility);
-        if(reportInteractive)ShowWindowsCompatibilityReport(nullptr,compatibility.snapshot,{},true);
+        if(reportInteractive)ShowWindowsCompatibilityReport(nullptr,compatibility.snapshot,{nullptr,nullptr,horde::platform::windows::ProductionWindowsStatisticsSendServices()},true);
         return 1;
     };
 
@@ -13566,7 +13566,7 @@ int RunDiagnosticWindow(const int showCommand)
                                launchOptions.anatomicalPlayerMount, launchOptions.graphicsPreview, launchOptions.outputResizeValidation,
                                launchOptions.nativeMotionScenario, launchOptions.nativeMotionRtWorkloadPreset,
                                launchOptions.captureDustQuality);
-    if(result!=0 && reportInteractive){CompatibilityFailure(compatibility);ShowWindowsCompatibilityReport(nullptr,compatibility.snapshot,{},true);}
+    if(result!=0 && reportInteractive){CompatibilityFailure(compatibility);ShowWindowsCompatibilityReport(nullptr,compatibility.snapshot,{nullptr,nullptr,horde::platform::windows::ProductionWindowsStatisticsSendServices()},true);}
     return result;
 }
 

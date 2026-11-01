@@ -29,6 +29,20 @@ public final class StatisticsReportSendControlsTest {
     }
     static void idle(){Shadows.shadowOf(Looper.getMainLooper()).idle();}
     static LinearLayout panel(Activity activity){LinearLayout panel=new LinearLayout(activity);panel.setOrientation(LinearLayout.VERTICAL);activity.setContentView(panel);return panel;}
+    @Test public void liveServicesStillRequireSeparateConsentReviewAndExplicitSend() {
+        Activity activity=Robolectric.buildActivity(Activity.class).setup().get();
+        StatisticsReportSendControls.Services services=StatisticsReportSendControls.Services.production(activity);
+        assertFalse(services.synthetic);assertNotNull(services.verification);
+        assertTrue(services.transport.admitsPrivateDeveloperReports());assertTrue(services.transport.admitsPublicBenchmarkReports());
+        StatisticsReportSendControls controls=StatisticsReportSendControls.benchmark(activity,panel(activity),Runnable::run,
+            PublicBenchmarkReportFlowTest.review(),services);
+        assertFalse(controls.send.isEnabled());assertFalse(controls.consent.isChecked());
+        controls.consent.setChecked(true);assertFalse(controls.send.isEnabled());
+        controls.review.performClick();assertTrue(controls.send.isEnabled());
+        assertEquals(activity.getString(R.string.statistics_live_ready),controls.status.getText().toString());
+        controls.close();activity.finish(); // Never requests a real token or opens the network.
+    }
+
     private void publicUiRoundTrip(){
         Activity activity=Robolectric.buildActivity(Activity.class).setup().get();
         PublicBenchmarkReportFlowTest.Worker worker=new PublicBenchmarkReportFlowTest.Worker();

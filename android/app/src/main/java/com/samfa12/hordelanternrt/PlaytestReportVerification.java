@@ -51,6 +51,7 @@ import java.util.function.LongPredicate;
  */
 final class PlaytestReportVerification {
     static final String PAGE_URL = "https://briarhold-signal.samfa12.com/horde-report/verify";
+    static final String PUBLIC_PAGE_URL = "https://briarhold-signal.samfa12.com/horde-benchmark/verify";
     static final String PAGE_ORIGIN = "https://briarhold-signal.samfa12.com";
     static final String CHALLENGE_HOST = "challenges.cloudflare.com";
     static final int MAX_BRIDGE_MESSAGE_BYTES = 4 * 1024;
@@ -76,11 +77,16 @@ final class PlaytestReportVerification {
      */
     static Handle show(Activity activity, long ownerGeneration, LongPredicate isOwnerGenerationCurrent,
             Callback callback) {
+        return show(activity, ownerGeneration, isOwnerGenerationCurrent, callback, false);
+    }
+
+    static Handle show(Activity activity, long ownerGeneration, LongPredicate isOwnerGenerationCurrent,
+            Callback callback, boolean publicBenchmark) {
         if (activity == null || isOwnerGenerationCurrent == null || callback == null)
             throw new IllegalArgumentException("verification dependencies required");
         if (Looper.myLooper() != Looper.getMainLooper())
             throw new IllegalStateException("verification dialog must start on the UI thread");
-        Session session = new Session(activity, ownerGeneration, isOwnerGenerationCurrent, callback);
+        Session session = new Session(activity, ownerGeneration, isOwnerGenerationCurrent, callback, publicBenchmark);
         session.start();
         return session;
     }
@@ -92,7 +98,10 @@ final class PlaytestReportVerification {
     }
 
     static boolean isAllowedTopLevelUrl(String url) {
-        return PAGE_URL.equals(url);
+        return isAllowedTopLevelUrl(url, false);
+    }
+    static boolean isAllowedTopLevelUrl(String url, boolean publicBenchmark) {
+        return (publicBenchmark ? PUBLIC_PAGE_URL : PAGE_URL).equals(url);
     }
 
     static boolean isAllowedChallengeUrl(String value) {
@@ -111,7 +120,10 @@ final class PlaytestReportVerification {
     }
 
     static boolean isAllowedWebViewRequest(boolean mainFrame, String value) {
-        return mainFrame ? isAllowedTopLevelUrl(value)
+        return isAllowedWebViewRequest(mainFrame, value, false);
+    }
+    static boolean isAllowedWebViewRequest(boolean mainFrame, String value, boolean publicBenchmark) {
+        return mainFrame ? isAllowedTopLevelUrl(value, publicBenchmark)
                 : isAllowedChildDocumentUrl(value) || isAllowedChallengeUrl(value);
     }
 
@@ -182,6 +194,7 @@ final class PlaytestReportVerification {
 
     private static final class Session implements Handle {
         private final Activity activity;
+        private final boolean publicBenchmark;
         private final long ownerGeneration;
         private final LongPredicate generationIsCurrent;
         private final Callback callback;
@@ -195,8 +208,9 @@ final class PlaytestReportVerification {
         private boolean handshakeStarted;
         private final Runnable deadline = () -> finish(null, Failure.DEADLINE, false, false);
 
-        Session(Activity activity, long ownerGeneration, LongPredicate generationIsCurrent, Callback callback) {
+        Session(Activity activity, long ownerGeneration, LongPredicate generationIsCurrent, Callback callback, boolean publicBenchmark) {
             this.activity = activity;
+            this.publicBenchmark = publicBenchmark;
             this.ownerGeneration = ownerGeneration;
             this.generationIsCurrent = generationIsCurrent;
             this.callback = callback;
@@ -212,7 +226,7 @@ final class PlaytestReportVerification {
                 dialog.show();
                 dialog.getWindow().setLayout(dialogWidth(), dialogHeight());
                 main.postDelayed(deadline, DEADLINE_MILLIS);
-                webView.loadUrl(PAGE_URL);
+                webView.loadUrl(publicBenchmark ? PUBLIC_PAGE_URL : PAGE_URL);
             } catch (RuntimeException unavailable) {
                 finish(null, Failure.UNAVAILABLE, false, false);
             }
@@ -315,12 +329,12 @@ final class PlaytestReportVerification {
             view.setWebViewClient(new WebViewClient() {
                 @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                     String url = request.getUrl().toString();
-                    return !isAllowedWebViewRequest(request.isForMainFrame(), url);
+                    return !isAllowedWebViewRequest(request.isForMainFrame(), url, publicBenchmark);
                 }
 
                 @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     String url = request.getUrl().toString();
-                    boolean allowed = isAllowedWebViewRequest(request.isForMainFrame(), url);
+                    boolean allowed = isAllowedWebViewRequest(request.isForMainFrame(), url, publicBenchmark);
                     // A null response lets WebView handle an allowed request. For the exact about: child
                     // documents this is local frame content, not an outbound network request.
                     return allowed ? null : blockedResponse();
@@ -328,7 +342,7 @@ final class PlaytestReportVerification {
 
                 @Override public void onPageFinished(WebView view, String url) {
                     if (!ownerIsCurrent()) { finish(null, null, false, true); return; }
-                    if (!isAllowedTopLevelUrl(url) || !isAllowedTopLevelUrl(view.getUrl())) {
+                    if (!isAllowedTopLevelUrl(url, publicBenchmark) || !isAllowedTopLevelUrl(view.getUrl(), publicBenchmark)) {
                         finish(null, Failure.PAGE_LOAD_FAILED, false, false);
                         return;
                     }

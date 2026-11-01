@@ -110,7 +110,7 @@ LRESULT CALLBACK Proc(HWND w,UINT message,WPARAM wp,LPARAM lp)
            !add(L"STATIC",kCompatibilityStatus,L"Review consent before preparing. Nothing has been sent.",SS_LEFT|SS_NOPREFIX) ||
            !add(L"BUTTON",kCompatibilitySendConsent,L"Separately approve private developer delivery (Send payload below; never public)",BS_AUTOCHECKBOX|BS_MULTILINE|WS_TABSTOP) ||
            !add(L"EDIT",kCompatibilitySendPreview,L"",ES_MULTILINE|ES_READONLY|WS_VSCROLL|WS_HSCROLL|WS_TABSTOP) ||
-           !add(L"BUTTON",kCompatibilitySend,state->submission.Available(false)?L"Send / retry (local test only)":L"Sending unavailable",BS_PUSHBUTTON|WS_TABSTOP) ||
+           !add(L"BUTTON",kCompatibilitySend,state->submission.Available(false)?(state->submission.services.synthetic?L"Send / retry (local test only)":L"Send to developer / check receipt"):L"Sending unavailable",BS_PUSHBUTTON|WS_TABSTOP) ||
            !add(L"BUTTON",kCompatibilityCancelSend,L"Cancel send attempt",BS_PUSHBUTTON|WS_TABSTOP) ||
            !add(L"BUTTON",kCompatibilityCopy,L"Copy report",BS_PUSHBUTTON|WS_TABSTOP) ||
            !add(L"BUTTON",kCompatibilitySave,L"Save report…",BS_PUSHBUTTON|WS_TABSTOP) ||
@@ -137,7 +137,7 @@ LRESULT CALLBACK Proc(HWND w,UINT message,WPARAM wp,LPARAM lp)
             SetWindowTextW(GetDlgItem(w,kCompatibilitySendPreview),remote.c_str());RefreshSend(w,*state);return 0;
         }
         if(id==kCompatibilitySend) {
-            if(SendDlgItemMessageW(w,kCompatibilitySendConsent,BM_GETCHECK,0,0)==BST_CHECKED && state->submission.Send(w))Status(w,L"Local test request started. No real report is being sent.");
+            if(SendDlgItemMessageW(w,kCompatibilitySendConsent,BM_GETCHECK,0,0)==BST_CHECKED && state->submission.Send(w))Status(w,state->submission.services.synthetic?L"Local test request started. No real report is being sent.":L"Sending the reviewed payload. Cancellation cannot prove it was not accepted.");
             RefreshSend(w,*state);return 0;
         }
         if(id==kCompatibilityCancelSend) {state->submission.CancelAttempt();RefreshSend(w,*state);Status(w,L"Attempt cancelled; acceptance may be unknown. Retry the same payload explicitly.");return 0;}

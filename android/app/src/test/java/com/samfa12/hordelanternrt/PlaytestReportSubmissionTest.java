@@ -363,6 +363,18 @@ public final class PlaytestReportSubmissionTest {
         @Override public void disconnect() { disconnected = true; if (onDisconnect != null) onDisconnect.run(); }
     }
 
+    @Test public void admittedStatisticsTransportKeepsPublicAndPrivateFixedRoutesSeparate() throws Exception {
+        java.util.List<String> urls = new java.util.ArrayList<>();
+        PlaytestReportSubmission.HttpsTransport transport = new PlaytestReportSubmission.HttpsTransport(url -> {
+            urls.add(url.toString()); return new FakeConnection();
+        }, true);
+        assertTrue(transport.admitsPrivateDeveloperReports());
+        assertTrue(transport.admitsPublicBenchmarkReports());
+        transport.open(new byte[]{1}).execute();
+        transport.openPublicBenchmark(new byte[]{2}).execute();
+        assertEquals(java.util.Arrays.asList(PlaytestReportSubmission.ENDPOINT, PlaytestReportSubmission.PUBLIC_ENDPOINT), urls);
+    }
+
     @Test public void fixedHttpsRequestDoesNotFollowRedirectsOrSendCredentialsAndClosesStreams() throws Exception {
         FakeConnection connection = new FakeConnection();
         connection.status = 302;

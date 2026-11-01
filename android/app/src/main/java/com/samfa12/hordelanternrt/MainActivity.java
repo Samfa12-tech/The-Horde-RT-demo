@@ -2898,7 +2898,7 @@ public class MainActivity extends Activity {
             panel.addView(button, menuButtonLayoutParams());
         }
         benchmarkSummarySendControls = StatisticsReportSendControls.benchmark(this, panel, reportExecutor,
-                owner, StatisticsReportSendControls.Services.unavailable());
+                owner, StatisticsReportSendControls.Services.production(this));
         addMenuButton(panel, getString(R.string.back),
                 benchmarkSummaryAction(owner, generation, () -> showBenchmarkReport(true)));
         attachPanel(panel);

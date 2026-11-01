@@ -98,7 +98,8 @@ void RefreshWindowsSummarySend(HWND window, WindowsBenchmarkSummaryReviewState& 
 {
     const bool available = state.submission.Available(state.prepared.IsPublicPreview());
     SetWindowTextW(SummaryReviewControl(window, kSummarySend), available ?
-        L"Send / check receipt (local test only)" : L"Sending unavailable");
+        (state.submission.services.synthetic ? L"Send / check receipt (local test only)" :
+            state.prepared.IsPublicPreview() ? L"Publish / check receipt" : L"Send to developer / check receipt") : L"Sending unavailable");
     EnableWindow(SummaryReviewControl(window, kSummarySendConsent), available && state.prepared.IsReady() && !state.submission.Busy());
     EnableWindow(SummaryReviewControl(window, kSummarySend), state.submission.CanSend());
     EnableWindow(SummaryReviewControl(window, kSummaryCancelSend), state.submission.Busy());
@@ -246,7 +247,8 @@ bool CreateWindowsSummaryReviewControls(HWND window, WindowsBenchmarkSummaryRevi
         SendMessageW(cooling, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(choice));
     SendMessageW(cooling, CB_SETCURSEL, 0, 0);
     for (const int id : {kSummaryPrepare, kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), FALSE);
-    if (state.submission.Available(false)) SetWindowTextW(SummaryReviewControl(window, kSummarySend), L"Send / check receipt (local test only)");
+    if (state.submission.Available(false)) SetWindowTextW(SummaryReviewControl(window, kSummarySend),
+        state.submission.services.synthetic ? L"Send / check receipt (local test only)" : L"Send to developer / check receipt");
     RefreshWindowsSummarySend(window, state);
     ApplyWindowsSummaryReviewFont(window, state); LayoutWindowsSummaryReview(window); return true;
 }
@@ -357,8 +359,11 @@ LRESULT CALLBACK WindowsSummaryReviewWindowProc(HWND window, UINT message, WPARA
                 RefreshWindowsSummarySend(window, *state); return 0;
             }
             case kSummarySend:
-                if (SendMessageW(SummaryReviewControl(window, kSummarySendConsent), BM_GETCHECK, 0, 0) == BST_CHECKED && state->submission.Send(window))
-                    SetSummaryReviewStatus(window, L"Local test request started. No real report is being sent.");
+                if (SendMessageW(SummaryReviewControl(window, kSummarySendConsent), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+                    if (state->submission.Send(window))
+                        SetSummaryReviewStatus(window, state->submission.services.synthetic ? L"Local test request started. No real report is being sent." : L"Sending the reviewed payload. Cancellation cannot prove it was not accepted.");
+                    else SetSummaryReviewStatus(window, L"Verification cancelled or unavailable. Choose Send to try again; no new request started.");
+                }
                 RefreshWindowsSummarySend(window, *state); return 0;
             case kSummaryCancelSend:
                 state->submission.CancelAttempt(); RefreshWindowsSummarySend(window, *state);
@@ -401,7 +406,8 @@ LRESULT CALLBACK WindowsSummaryReviewWindowProc(HWND window, UINT message, WPARA
     return DefWindowProcW(window, message, wParam, lParam);
 }
 
-void ShowWindowsBenchmarkSummaryReview(HWND owner, const horde::telemetry::FrozenBenchmarkSummary& frozen) noexcept
+void ShowWindowsBenchmarkSummaryReview(HWND owner, const horde::telemetry::FrozenBenchmarkSummary& frozen,
+    horde::platform::windows::WindowsStatisticsSendServices services = {}) noexcept
 {
     if (!frozen.IsReady() || !IsWindow(owner)) return;
     HWND window = nullptr;
@@ -411,6 +417,7 @@ void ShowWindowsBenchmarkSummaryReview(HWND owner, const horde::telemetry::Froze
     {
         state = std::make_unique<WindowsBenchmarkSummaryReviewState>();
         state->frozen = frozen;
+        state->submission.services=std::move(services);
         WNDCLASSEXW cls{}; cls.cbSize = sizeof(cls); cls.lpfnWndProc = WindowsSummaryReviewWindowProc;
         cls.hInstance = GetModuleHandleW(nullptr); cls.hCursor = LoadCursorW(nullptr, MAKEINTRESOURCEW(32512));
         cls.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_BTNFACE + 1); cls.lpszClassName = kSummaryReviewWindowClass;

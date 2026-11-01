@@ -28,6 +28,26 @@ final class StatisticsReportSendControls {
             this.transport = transport; this.verification = verification; this.synthetic = synthetic;
         }
         static Services unavailable() { return new Services(new PlaytestReportSubmission.HttpsTransport(), null, false); }
+        static Services production(Activity activity) {
+            Verification verifier = new Verification() {
+                PlaytestReportVerification.Handle handle;
+                long generation;
+                public void request(String purpose, long attempt, TokenCallback callback) {
+                    cancel();
+                    if (!"horde_report".equals(purpose) && !"horde_benchmark_publish".equals(purpose))
+                        throw new IllegalArgumentException("Unsupported verification purpose");
+                    final long current = ++generation;
+                    handle = PlaytestReportVerification.show(activity, current, value -> value == generation,
+                        new PlaytestReportVerification.Callback() {
+                            public void onVerified(long owner, String token) { if (owner == generation) callback.completed(token); }
+                            public void onFailure(long owner, PlaytestReportVerification.Failure failure) { if (owner == generation) callback.completed(null); }
+                            public void onCancelled(long owner) { if (owner == generation) callback.completed(null); }
+                        }, "horde_benchmark_publish".equals(purpose));
+                }
+                public void cancel() { ++generation; if (handle != null) { handle.cancel(); handle = null; } }
+            };
+            return new Services(PlaytestReportSubmission.HttpsTransport.statistics(), verifier, false);
+        }
         static Services localValidation(PlaytestReportSubmission.Transport transport, Verification verification) {
             if (transport == null || verification == null) throw new IllegalArgumentException("Local test dependencies required");
             return new Services(transport, verification, true);
@@ -69,7 +89,7 @@ final class StatisticsReportSendControls {
         text(panel, R.string.statistics_submission_preview);
         preview = text(panel, 0); preview.setTypeface(Typeface.MONOSPACE); preview.setTextIsSelectable(true);
         send = button(panel, publicResult ? R.string.statistics_publish_send : R.string.statistics_private_send);
-        status = text(panel, R.string.statistics_send_unavailable);
+        status = text(panel, this.services.verification == null ? R.string.statistics_send_unavailable : R.string.statistics_live_available);
         status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         consent.setOnCheckedChangeListener((view, checked) -> refresh());
         review.setOnClickListener(view -> prepareSubmission()); send.setOnClickListener(view -> verifyAndSend());
@@ -94,17 +114,18 @@ final class StatisticsReportSendControls {
                 publicResult ? R.string.statistics_publish_send : R.string.statistics_private_send);
         send.setEnabled(foreground && !verifying && services.verification != null && submission.statisticsSendAvailable() &&
                 (state == PlaytestReportSubmission.State.READY || retry || pendingPublic));
-        if (services.synthetic && !verifying) renderReceiptState(state);
+        if (!verifying) renderReceiptState(state);
     }
     private void renderReceiptState(PlaytestReportSubmission.State state) {
         // Receipt ownership can complete before its main-loop notification.
         // Lifecycle cancellation revokes callbacks, not an already verified receipt.
         switch (state) {
-            case QUEUED: status.setText(publicResult ? R.string.statistics_mock_pending : R.string.statistics_mock_private_queued); break;
-            case SENT: status.setText(R.string.statistics_mock_sent); break;
-            case PUBLISHED: status.setText(R.string.statistics_mock_published); break;
-            case REJECTED: case CONFLICT: status.setText(R.string.statistics_mock_rejected); break;
-            case RETRYABLE: status.setText(R.string.statistics_mock_uncertain); break;
+            case IN_FLIGHT: if (!services.synthetic) status.setText(R.string.statistics_live_sending); break;
+            case QUEUED: status.setText(publicResult ? (services.synthetic ? R.string.statistics_mock_pending : R.string.statistics_live_pending) : (services.synthetic ? R.string.statistics_mock_private_queued : R.string.statistics_live_private_queued)); break;
+            case SENT: status.setText((services.synthetic ? R.string.statistics_mock_sent : R.string.statistics_live_sent)); break;
+            case PUBLISHED: status.setText((services.synthetic ? R.string.statistics_mock_published : R.string.statistics_live_published)); break;
+            case REJECTED: case CONFLICT: status.setText((services.synthetic ? R.string.statistics_mock_rejected : R.string.statistics_live_rejected)); break;
+            case RETRYABLE: status.setText((services.synthetic ? R.string.statistics_mock_uncertain : R.string.statistics_live_uncertain)); break;
             default: break;
         }
     }
@@ -113,7 +134,7 @@ final class StatisticsReportSendControls {
                 !admission.begin(submission, true)) return;
         final byte[] envelope = submission.statisticsJsonForReview();
         preview.setText(envelope == null ? "" : new String(envelope, StandardCharsets.UTF_8));
-        status.setText(services.synthetic ? R.string.statistics_mock_ready : R.string.statistics_send_unavailable);
+        status.setText(services.synthetic ? R.string.statistics_mock_ready : services.verification == null ? R.string.statistics_send_unavailable : R.string.statistics_live_ready);
         refresh();
     }
     private void verifyAndSend() {
@@ -122,12 +143,12 @@ final class StatisticsReportSendControls {
         if ((state == PlaytestReportSubmission.State.RETRYABLE ||
                 (publicResult && state == PlaytestReportSubmission.State.QUEUED)) && submission.retry() < 0) return;
         final long attempt = submission.attempt(), current = ++generation;
-        verifying = true; status.setText(R.string.statistics_mock_verifying); refresh();
+        verifying = true; status.setText((services.synthetic ? R.string.statistics_mock_verifying : R.string.statistics_live_verifying)); refresh();
         try {
             services.verification.request(publicResult ? "horde_benchmark_publish" : "horde_report", attempt, token -> ui.post(() -> {
                 if (closed || !foreground || generation != current || submission.attempt() != attempt || !verifying) return;
                 verifying = false;
-                if (token == null || token.isEmpty()) { status.setText(R.string.statistics_mock_verification_cancelled); refresh(); return; }
+                if (token == null || token.isEmpty()) { status.setText((services.synthetic ? R.string.statistics_mock_verification_cancelled : R.string.statistics_live_verification_cancelled)); refresh(); return; }
                 final boolean started = submission.submit(attempt, token, (completed, result) -> ui.post(() -> {
                     if (closed || generation != current || submission.attempt() != completed) return;
                     refresh();
@@ -135,7 +156,7 @@ final class StatisticsReportSendControls {
                 if (!started) status.setText(R.string.statistics_send_unavailable);
                 refresh();
             }));
-        } catch (RuntimeException failure) { verifying = false; status.setText(R.string.statistics_mock_verification_cancelled); refresh(); }
+        } catch (RuntimeException failure) { verifying = false; status.setText((services.synthetic ? R.string.statistics_mock_verification_cancelled : R.string.statistics_live_verification_cancelled)); refresh(); }
     }
     void interrupt() {
         if (closed) return;
@@ -143,7 +164,7 @@ final class StatisticsReportSendControls {
         foreground = false; ++generation; verifying = false;
         final boolean revokedAttempt = submission.interruptInFlight();
         cancelVerification();
-        if (services.synthetic && (revokedVerification || revokedAttempt)) status.setText(R.string.statistics_mock_interrupted);
+        if (revokedVerification || revokedAttempt) status.setText(services.synthetic ? R.string.statistics_mock_interrupted : R.string.statistics_live_interrupted);
         refresh();
     }
     void resume() { if (!closed) { foreground = true; refresh(); } }

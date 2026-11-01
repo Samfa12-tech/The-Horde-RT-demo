@@ -377,8 +377,8 @@ WindowsPlaytestSubmissionResult ClassifyWindowsPlaytestResponse(const int status
     return WindowsPlaytestSubmissionResult::Uncertain;
 }
 
-WindowsPlaytestHttpResponse ExchangeWindowsPlaytestReport(const std::string_view requestBody,
-    const std::chrono::steady_clock::time_point deadline, const HANDLE cancellationEvent)
+static WindowsPlaytestHttpResponse ExchangeWindowsReportAt(const std::string_view requestBody,
+    const std::chrono::steady_clock::time_point deadline, const HANDLE cancellationEvent, const wchar_t* path)
 {
     WindowsPlaytestHttpResponse response;
     if (requestBody.empty() || requestBody.size() > kMaxRequestBytes ||
@@ -403,7 +403,7 @@ WindowsPlaytestHttpResponse ExchangeWindowsPlaytestReport(const std::string_view
     if (!context->lifetime.IsLeased() || context->operationComplete == nullptr) return response;
     try { context->requestBody.assign(requestBody); }
     catch (...) { return response; }
-    const HINTERNET rawRequest = WinHttpOpenRequest(connection.Get(), L"POST", L"/api/horde-reports",
+    const HINTERNET rawRequest = WinHttpOpenRequest(connection.Get(), L"POST", path,
         nullptr, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE);
     if (rawRequest == nullptr) return response;
     if (!context->lifetime.AcquireHandleReference())
@@ -632,6 +632,13 @@ WindowsPlaytestSubmission::~WindowsPlaytestSubmission()
 {
     Reset();
 }
+
+WindowsPlaytestHttpResponse ExchangeWindowsPlaytestReport(std::string_view body,
+    std::chrono::steady_clock::time_point deadline,HANDLE cancellation)
+{ return ExchangeWindowsReportAt(body,deadline,cancellation,L"/api/horde-reports"); }
+WindowsPlaytestHttpResponse ExchangeWindowsPublicBenchmarkReport(std::string_view body,
+    std::chrono::steady_clock::time_point deadline,HANDLE cancellation)
+{ return ExchangeWindowsReportAt(body,deadline,cancellation,L"/api/horde-benchmark-results"); }
 
 bool WindowsPlaytestSubmission::Begin(const HWND window,
     const reporting::PreparedPlaytestSubmission& submission, const std::string_view turnstileToken)

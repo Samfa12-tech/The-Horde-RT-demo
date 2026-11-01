@@ -27,6 +27,14 @@ import org.robolectric.annotation.Config;
 public final class PlaytestReportVerificationTest {
     private static final String NONCE = "0123456789abcdefghijklmnopqrstuv";
 
+    @Test public void publicVerificationIsExactAndCannotUsePrivatePurposePage() {
+        assertTrue(PlaytestReportVerification.isAllowedTopLevelUrl(PlaytestReportVerification.PUBLIC_PAGE_URL, true));
+        assertFalse(PlaytestReportVerification.isAllowedTopLevelUrl(PlaytestReportVerification.PAGE_URL, true));
+        assertFalse(PlaytestReportVerification.isAllowedTopLevelUrl(PlaytestReportVerification.PUBLIC_PAGE_URL, false));
+        assertFalse(PlaytestReportVerification.isAllowedWebViewRequest(true, PlaytestReportVerification.PUBLIC_PAGE_URL + "?token=x", true));
+        assertFalse(PlaytestReportVerification.isAllowedWebViewRequest(true, PlaytestReportVerification.PUBLIC_PAGE_URL + "/", true));
+    }
+
     @Test public void createsHighEntropyUrlSafeNonce() {
         String first = PlaytestReportVerification.newNonce(new SecureRandom());
         String second = PlaytestReportVerification.newNonce(new SecureRandom());
