@@ -1,0 +1,40 @@
+{
+  "sourceCommit": "50df3f1ab9982e552f49ffadc011e33b7c2b18a9",
+  "windows": {
+    "sourceCommit": "50df3f1ab9982e552f49ffadc011e33b7c2b18a9",
+    "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-windows-acceptance-20261101-summary\\HordeLanternRT.exe",
+    "bytes": 5003264,
+    "sha256": "ad05c6148ed475e8cf18dcf5d55ea14c0721366b539a16eefbd9665c3f60f036",
+    "baseRuntimeFiles": 192,
+    "baseRuntimeIdentical": true,
+    "privateRevival": true,
+    "unlaunched": true
+  },
+  "android": {
+    "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\benchmark-summary-fixed-20261101.apk",
+    "bytes": 251536730,
+    "sha256": "9508cec5c7e8da8c221692305e61deb8b2bc783e53379950ef021dede57cc85f",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "privateRevival": true,
+    "installed": false,
+    "launched": false
+  },
+  "hostSummaryTests": "PASS",
+  "androidFocusedTests": 40,
+  "androidFocusedFailures": 0,
+  "syntheticNormalCourseBytes": {
+    "privateLocal": 10617,
+    "publicPreview": 8163
+  },
+  "unchangedReportCaps": 16384,
+  "fixedArtifactPublicTupleCaptured": false,
+  "noSendOrNetwork": true,
+  "priorPhoneStateRestored": true,
+  "ownerParkedFiles": 151,
+  "ownerParkedChanged": []
+}
