@@ -228,7 +228,8 @@ void PumpCampaign(VulkanSurfaceContext& ctx)
                         ctx.campaignPhase=CampaignMenu::Phase::Reading;ctx.campaignStarted=std::chrono::steady_clock::now();ctx.campaignMessage.clear();
                     } else fail("Load could not start. Current game retained.");
                 } else if(command.action==CampaignMenu::Action::BeginNewGame){
-                    if(ctx.simulation.Snapshot().staticDetailLease.resourceGeneration){fail("World detail is restoring. Retry after it has completed.");}
+                    if(!horde::gameplay::campaign::CanStartNewGame(ctx.campaign->Catalogue(),command.slot)){fail("This slot cannot store new progress. Your files have been kept; choose another slot.");}
+                    else if(ctx.simulation.Snapshot().staticDetailLease.resourceGeneration){fail("World detail is restoring. Retry after it has completed.");}
                     else if(!ctx.campaignBarrier.Begin(++ctx.campaignSerial,ctx.campaignSurfaceGeneration)) {
                         CampaignPreparationFailure(ctx,"new-game-barrier","Request not admitted.");
                         fail("New game resources could not prepare. Current game retained.");

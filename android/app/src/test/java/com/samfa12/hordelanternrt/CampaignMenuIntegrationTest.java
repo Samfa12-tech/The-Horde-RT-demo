@@ -689,6 +689,18 @@ public final class CampaignMenuIntegrationTest {
         assertTrue(field("deathOverlayVisible").getBoolean(a));assertTrue(Bridge.paused);assertEquals(0,Bridge.resets);
     }
 
+    @Test public void corruptNewGameDestinationCannotConfirmOrDispatchAndKeepsOtherSlotUsable()throws Exception {
+        Bridge.state[12]=CampaignMenuState.INVALID;
+        Bridge.state[15]=CampaignMenuState.VALID;Bridge.state[16]=1;Bridge.state[17]=3;
+        open(CampaignMenuState.NEW_GAME);
+        assertFalse(find("New game").isEnabled());
+        assertTrue(menuText(a.findViewById(R.id.menu_scrim)).contains("choose another slot"));
+        int requests=Bridge.actions.size();choose(CampaignMenuState.NEW_GAME,0,0);
+        assertEquals(requests,Bridge.actions.size());assertNull(field("campaignConfirmation").get(a));
+        choose(CampaignMenuState.NEW_GAME,1,0);
+        assertEquals(CampaignMenuState.NEW_GAME,(int)Bridge.actions.get(Bridge.actions.size()-1));
+    }
+
     @Test public void emptyNewGameSlotsAreSimpleAndContinueNeverGuessesASave()throws Exception {
         open(CampaignMenuState.NEW_GAME);
         String text=menuText(a.findViewById(R.id.menu_scrim));
@@ -719,6 +731,8 @@ public final class CampaignMenuIntegrationTest {
         assertTrue(text.contains("Checking saves"));assertFalse(text.contains("Empty\nSlot 1"));
         assertFalse(find("New game").isEnabled());
         Bridge.state[12]=CampaignMenuState.VALID;Bridge.state[13]=1;Bridge.state[14]=1;
+        Bridge.state[2]++;call("pollCampaignMenu");assertFalse(find("New game").isEnabled());
+        Bridge.state[15]=CampaignMenuState.EMPTY;
         Bridge.state[2]++;call("pollCampaignMenu");find("New game").performClick();
         AlertDialog dialog=(AlertDialog)field("campaignConfirmation").get(a);assertNotNull(dialog);
         TextView message=dialog.findViewById(android.R.id.message);assertNotNull(message);

@@ -647,8 +647,8 @@ void InvalidateBenchmarkSummaryLocked()
 }
 horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
     horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
-horde::gameplay::simulation::GameSimulation gGameSimulation(
-    horde::gameplay::simulation::PrivateRevivalApplicationConfig());
+horde::gameplay::simulation::GameSimulation gGameSimulation =
+    horde::gameplay::simulation::CreateApplicationGameSimulation();
 horde::gameplay::simulation::InputMailbox gInputMailbox;
 std::uint64_t gPrivateRevivalResourceGeneration=1;
 std::mutex gInputPublisherMutex;
@@ -1554,8 +1554,7 @@ void ResetShowcaseSimulation()
     const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile !=
         horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
     if (replacedQueue)
-        gGameSimulation = horde::gameplay::simulation::GameSimulation(
-            horde::gameplay::simulation::PrivateRevivalApplicationConfig());
+        gGameSimulation = horde::gameplay::simulation::CreateApplicationGameSimulation();
     else
         gGameSimulation.ResetRoute();
     horde::platform::android::ResetMusicSession(replacedQueue);

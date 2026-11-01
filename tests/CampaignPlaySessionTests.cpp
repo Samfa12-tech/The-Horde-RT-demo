@@ -948,6 +948,10 @@ int main(int argc,char** argv){
           "catalogue distinguishes six fixed records with actual checkpoint/hearts");
     Check(!play.State().activeSlot && game.Snapshot().tickIndex==0 && Raw(Path(directory,1,cp::SaveKind::Manual))==corrupt,
           "catalogue is read-only and does not select a game, apply a load or repair corrupt data");
+    Check(cp::CanStartNewGame(play.Catalogue(),0) && !cp::CanStartNewGame(play.Catalogue(),1) &&
+          cp::CanStartNewGame(play.Catalogue(),2), "new-game admission rejects corrupt/read-error destinations while valid slots remain usable");
+    Check(Raw(Path(directory,1,cp::SaveKind::Manual))==corrupt && Raw(Path(directory,0,cp::SaveKind::Manual))==firstManual &&
+          !play.State().activeSlot, "rejected destination admission preserves invalid bytes, valid progress and active selection");
     faults.failRead=true;play.RefreshCatalogue();
     Check(Until(play,[&]{return CatalogueDone(play);}) && play.Catalogue()[0].status==cp::CatalogueStatus::ReadError &&
           Raw(Path(directory,0,cp::SaveKind::Manual))==firstManual,"read failure is visible and preserves valid bytes");

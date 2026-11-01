@@ -10,5 +10,8 @@ inline GameSimulationConfig PrivateRevivalApplicationConfig() {
     config.naturalPracticeRevival1_7=HORDE_RT_PRIVATE_REVIVAL!=0;
     return config;
 }
+inline GameSimulation CreateApplicationGameSimulation() {
+    return GameSimulation(PrivateRevivalApplicationConfig());
+}
 inline constexpr const char* kPrivateStandSha256="800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259";
 }

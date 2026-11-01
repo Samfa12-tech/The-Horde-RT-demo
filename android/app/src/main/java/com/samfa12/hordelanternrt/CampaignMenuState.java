@@ -80,6 +80,11 @@ final class CampaignMenuState {
         return (entries[p+1]==1?"Lower chamber":entries[p+1]==2?"Safe exit":"Forest lookout")+
                 " | "+entries[p+2]+" / 3 hearts\n"+formatSavedTime(savedTime(slot,kind),java.util.Locale.getDefault(),java.util.TimeZone.getDefault());
     }
+    boolean canStartNewGame(int slot) {
+        if(slot<0 || slot>=3)return false;
+        for(int kind=0;kind<2;kind++)if(status(slot,kind)!=EMPTY && status(slot,kind)!=VALID)return false;
+        return true;
+    }
     boolean occupied(int slot) { return status(slot,MANUAL)!=EMPTY || status(slot,AUTO)!=EMPTY; }
     boolean hasUnreadable() {
         for(int slot=0;slot<3;slot++)for(int kind=0;kind<2;kind++)
@@ -113,6 +118,7 @@ final class CampaignMenuState {
                 case 9:return "This save could not be restored. Your game is still paused.";
                 case 10:return "We could not confirm the save. Check your saves before saving again.";
                 case 11:return "Your saves could not be opened.";
+                case 12:return "This slot cannot store new progress. Your files have been kept; choose another slot.";
                 default:return "Could not finish. Check your saves before trying again.";
             }
         }

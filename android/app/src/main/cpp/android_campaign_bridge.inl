@@ -193,7 +193,10 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
             } else FailCampaignOnOwner(2);
         } else if(command->action==5) {
             gCampaignLastAction=5;gCampaignError=0;
-            if(gGameSimulation.Snapshot().staticDetailLease.resourceGeneration) {
+            if(!campaign::CanStartNewGame(gCampaignSession->Catalogue(),command->slot)) {
+                gCampaignPhase=8;gCampaignError=12;
+                gCampaignPauseGate.store(false,std::memory_order_release);
+            } else if(gGameSimulation.Snapshot().staticDetailLease.resourceGeneration) {
                 std::lock_guard lock(gCampaignMutex);
                 if(!gCampaignCommand)gCampaignCommand=command;
                 gCampaignPhase=4;gCampaignPauseGate.store(true,std::memory_order_release);
@@ -207,8 +210,7 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
                    (gCampaignCommand && gCampaignCommand->action==4)) {
                     gCampaignPhase=8;gCampaignError=8;gCampaignPauseGate.store(false,std::memory_order_release);
                 } else if(gCampaignSession->BeginNewGame(command->slot)) {
-                gGameSimulation= horde::gameplay::simulation::GameSimulation(
-                    horde::gameplay::simulation::ProductionGameSimulationConfig());
+                gGameSimulation=horde::gameplay::simulation::CreateApplicationGameSimulation();
                 gGameSimulation.StartLiveDevelopmentRescueJourney(true);
                 gGameSimulation.SynchronizePausedInput(gInputPublisherState,gInputMailbox.PublishedSequence());
                 gCampaignNewGameYaw=gGameSimulation.Snapshot().playerYawRadians;

@@ -9,6 +9,16 @@ public final class CampaignMenuStateTest {
         for(int i=0;i<6;i++) v[12+3*i]=CampaignMenuState.EMPTY;
         return v;
     }
+    @Test public void newGameRequiresBothWritableRecordsAndKeepsLoadFallbackIndependent() {
+        for(int bad:new int[]{CampaignMenuState.UNKNOWN,CampaignMenuState.CHECKING,CampaignMenuState.INVALID,CampaignMenuState.READ_ERROR}) {
+            long[] v=ready();v[12]=bad;v[15]=CampaignMenuState.VALID;v[16]=1;v[17]=3;
+            CampaignMenuState state=CampaignMenuState.decode(v);assertNotNull(state);
+            assertFalse(state.canStartNewGame(0));
+            if(bad>CampaignMenuState.CHECKING)assertEquals(CampaignMenuState.AUTO,state.selectedKind(0));
+            assertTrue(state.canStartNewGame(1));
+        }
+    }
+
     @Test public void rejectsUnsupportedMalformedAndNonfinitePublications() {
         assertNull(CampaignMenuState.decode(null));
         assertNull(CampaignMenuState.decode(new long[32]));

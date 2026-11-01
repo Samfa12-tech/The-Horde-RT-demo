@@ -1908,6 +1908,8 @@ public class MainActivity extends Activity {
             slotPanel.addView(slotTitle,matchWrap());
             addBody(slotPanel,shown==null ? "Checking saves..." : shown.slotDescription(slot));
             if(wideSlots)slotPanel.getChildAt(slotPanel.getChildCount()-1).setMinimumHeight(dp(64));
+            if(campaignMenuAction==CampaignMenuState.NEW_GAME && shown!=null && shown.hasUnreadable() && !shown.canStartNewGame(slot))
+                addBody(slotPanel,"This slot cannot store new progress. Your files have been kept; choose another slot.");
             final int selectedKind=shown==null ? -1 : shown.selectedKind(slot);
             final int chosenAction=campaignMenuAction;
             final String action=chosenAction==CampaignMenuState.LOAD ? "Continue" :
@@ -1919,7 +1921,7 @@ public class MainActivity extends Activity {
             boolean checked=shown!=null && shown.status(slot,0)>=CampaignMenuState.EMPTY && shown.status(slot,1)>=CampaignMenuState.EMPTY;
             boolean writable=shown!=null && (shown.status(slot,0)==CampaignMenuState.EMPTY || shown.status(slot,0)==CampaignMenuState.VALID);
             choose.setEnabled(ready && checked && (chosenAction==CampaignMenuState.LOAD ? selectedKind>=0 :
-                    chosenAction==CampaignMenuState.NEW_GAME || (shown.canSaveLatest && writable)));
+                    chosenAction==CampaignMenuState.NEW_GAME ? shown.canStartNewGame(slot) : (shown.canSaveLatest && writable)));
         }
         if(campaignLocalMessage!=null || (shown!=null && (shown.error!=0 || shown.phase==CampaignMenuState.FAILED || shown.hasUnreadable()))) {
             Button refresh=addEntryMenuButton(panel,"Try again",
@@ -1938,6 +1940,7 @@ public class MainActivity extends Activity {
         if(action==CampaignMenuState.LOAD && (shown.status(slot,kind)!=CampaignMenuState.VALID || shown.selectedKind(slot)!=kind)) return;
         if(action==CampaignMenuState.SAVE_MANUAL && (!shown.canSaveLatest ||
                 (shown.status(slot,0)!=CampaignMenuState.EMPTY && shown.status(slot,0)!=CampaignMenuState.VALID))) return;
+        if(action==CampaignMenuState.NEW_GAME && !shown.canStartNewGame(slot))return;
         boolean confirm=action==CampaignMenuState.NEW_GAME ? shown.occupied(slot) :
                 action==CampaignMenuState.SAVE_MANUAL && shown.occupied(slot);
         if(!confirm) { sendCampaignRequest(action,slot,kind); return; }
