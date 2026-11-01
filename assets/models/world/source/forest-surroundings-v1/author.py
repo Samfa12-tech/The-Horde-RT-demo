@@ -25,6 +25,9 @@ MAP = ROOT / 'docs/references/horde-1.7/d37f1638/docs/design/world/connected/sha
 PLACEMENTS = ROOT / 'assets/models/world/source/forest-placement-v1/woodland-placements-v3.json'
 TERRAIN = ROOT / 'assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb'
 SEED = 20261031
+# Frozen native-ground/contact classification, reverified by the independent
+# production-geometry flood and movement tests. No per-startup movement audit.
+NATURAL_BOUNDARY_SECTIONS = (64, 65, 66, 67, 70, 71, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 99, 143, 144, 145, 146, 147, 148, 149, 150, 151, 154, 155, 156, 170, 171, 175, 176, 177, 187, 209)
 RIGHTS = ('Original project-authored geometry, derived from the owned Horde tree '
           'centreline records and original PBR maps. No provider, purchase or '
           'third-party geometry. Existing rights remain; no blanket MIT/CC0 grant.')
@@ -380,9 +383,17 @@ def composition(assets,tips):
         require(accepted==count,f'Unable to fit {band} population: {accepted}/{count}, next stand {accepted%len(stands[band])}; constraints unchanged')
     # Boundary source plan: a continuous visible fallback fence around the union.
     # Replacement bank/rock runs are proposals only, never assumed impassable.
-    step=.4; occupied=set(); disks=pockets+trunkPockets
-    limits=[(math.floor(min([p[k]-2.4 for p in route]+[v['center'][k]-v['radius'] for v in disks])/step)-5,
-             math.ceil(max([p[k]+2.4 for p in route]+[v['center'][k]+v['radius'] for v in disks])/step)+5) for k in (0,1)]
+    # The temporary playable endpoint is the first mapped arrival waypoint.
+    # Preserve tree authoring against its original envelope; extend only the
+    # actual boundary around this short approach and turnaround.
+    arrival=[(round(x+78.3,6),round(126.2-y,6)) for x,y,z in mapping['arrival']]
+    boundaryRoute=route+[arrival[1]]
+    endpointPocket={'id':'temporary-demo-turnaround','center':list(arrival[1]),'radius':3.2}
+    treeClearance=clearance
+    def clearance(p):return min([project(p,boundaryRoute)[0]-2.4]+[math.dist(p,k['center'])-k['radius'] for k in pockets+trunkPockets+[endpointPocket]])
+    step=.4; occupied=set(); disks=pockets+trunkPockets+[endpointPocket]
+    limits=[(math.floor(min([p[k]-2.4 for p in boundaryRoute]+[v['center'][k]-v['radius'] for v in disks])/step)-5,
+             math.ceil(max([p[k]+2.4 for p in boundaryRoute]+[v['center'][k]+v['radius'] for v in disks])/step)+5) for k in (0,1)]
     for ix in range(*limits[0]):
         for iz in range(*limits[1]):
             if clearance(((ix+.5)*step,(iz+.5)*step))<.7: occupied.add((ix,iz))
@@ -428,18 +439,16 @@ def composition(assets,tips):
         outer,inner=ground(*add(center,mul(outward,1.2))),ground(*add(center,mul(outward,-1.2)))
         rise=None if outer is None or inner is None else round(outer-inner,6)
         boundary.append({'id':f'edge-{i:03}','a':[round(p[0],6),round(a,6),round(p[1],6)],'b':[round(q[0],6),round(b,6),round(q[1],6)],'default':'visible-fence','asset':'boundary-panel.glb','widthScale':round(math.dist(p,q)/2.4,6),'endpointHeightDelta':round(b-a,6),'existingTerrainOutwardRise':rise,'preferredTreatment':'inspect-existing-bank' if rise is not None and rise>.65 else 'short-fence-or-grounded-rock-run','naturalAlternative':'bank-or-rock-ONLY-after-solid-mesh-and-capsule-proof','collisionAdmitted':False})
-    # The forest joins the mapped arrival route: this is a deliberate open portal,
-    # not an omitted containment failure or a permission to remove tree collision.
-    arrival=[(round(x+78.3,6),round(126.2-y,6)) for x,y,z in mapping['arrival']]
-    for edge in boundary:
-        a,b=(edge['a'][0],edge['a'][2]),(edge['b'][0],edge['b'][2])
-        edge['arrivalPortal']=any(project(add(a,mul(sub(b,a),t/20)),arrival[:2])[0]<2.0 for t in range(21))
-        if edge['arrivalPortal']:edge['default']='open-mapped-arrival'
-    for edge in boundary:
+    # The mapped arrival remains visible. This finite demo boundary closes
+    # beyond its first waypoint, with a visible short timber endpoint.
+    for i,edge in enumerate(boundary):
+        edge['terrainBoundaryApproved']=i in NATURAL_BOUNDARY_SECTIONS
         x,z=(edge['a'][0]+edge['b'][0])*.5,(edge['a'][2]+edge['b'][2])*.5
-        # Short burial-ground western rail and a separated F03 approach rail.
-        edge['fenceRequested']=not edge['arrivalPortal'] and ((x<-42 and -24<z<-10) or (-23<x<-19 and 7<z<15))
-        if not edge['arrivalPortal'] and not edge['fenceRequested']:edge['default']='open-woodland'
+        edge['arrivalPortal']=False
+        edge['demoEndpoint']=z>50.0
+        edge['fenceRequested']=edge['demoEndpoint'] or ((x<-42 and -24<z<-10) or (-23<x<-19 and 7<z<15))
+        edge['default']='visible-fence' if edge['fenceRequested'] else 'tested-bank-or-rock'
+    clearance=treeClearance
     foliage=[];rng=random.Random(SEED+17)
     for attempt in range(20000):
         point,direction=station(rng.random());side=(-direction[1],direction[0])
@@ -466,7 +475,7 @@ def composition(assets,tips):
         nearest=min(boundary,key=lambda e:project(point,[(e['a'][0],e['a'][2]),(e['b'][0],e['b'][2])])[0])
         rocks.append({'nativePlacementIndex':i,'sourceIndex':int(source),'x':round(point[0],6),'z':round(point[1],6),'terrainY':round(ground(*point),6),'yaw':yaw,'scale':scale,'nearestBoundaryRun':nearest['id'],'referenceOnly':True})
     require(len(rocks)==12,'Existing rock roster changed')
-    return {'schema':1,'status':'SOURCE-ONLY, NOT RUNTIME BOUNDARY/COLLISION/FOREST ADMISSION','seed':SEED,'coordinates':'native X east, Y up, Z south; R2 X=E+78.3, Z=126.2-N','mapSha256':sha(MAP.read_bytes()),'terrainSha256':sha(TERRAIN.read_bytes()),'originalPlacementsSha256':source_text_sha(PLACEMENTS.read_bytes()),'editableTextIdentity':'originalPlacementsSha256 and existingRockSourceSha256 hash UTF-8 LF-normalized text; all binary/frozen-archive inputs and generated outputs retain exact-byte checks','route':route,'understory':foliage,'arrivalRoute':arrival,'arrivalPortalHalfWidth':2.0,'clearTrailWidth':2.4,'corridorHalfWidth':2.4,'pockets':pockets,'originalTrunkClearancePockets':trunkPockets,'windows':windows,'townKeepout':townKeepout,'riverClearance':14,'standAnchors':stands,'boundary':boundary,'existingRockReferences':rocks,'existingRockSourceSha256':source_text_sha(rock_source),'placements':rows,'counts':dict(counts),'candidateTreeTriangles':323264+trees,'addedTreeRawUpperBytes':trees*140,'boundaryGeometryPolicy':'Open woodland with selective short fence sections and an explicit mapped arrival route. Every added tree owns exact rendered lower wood contact; no unreachable-tree collision exemption is used. Endpoint-height conformance keeps posts vertical; actual solid-mesh/body sweeps alone admit natural bank sections. No invisible barrier or old collision removal.','retention':'No old ordinary/shared certificate applies automatically; candidate full-source retention/recreation proof required at integration.','admission':{'normalDefault':False,'boundary':False,'collisionExemption':False,'nativeImporter':False,'rtVisuals':False,'gpuCost':False}}
+    return {'schema':1,'status':'SOURCE-ONLY, NOT RUNTIME BOUNDARY/COLLISION/FOREST ADMISSION','seed':SEED,'coordinates':'native X east, Y up, Z south; R2 X=E+78.3, Z=126.2-N','mapSha256':sha(MAP.read_bytes()),'terrainSha256':sha(TERRAIN.read_bytes()),'originalPlacementsSha256':source_text_sha(PLACEMENTS.read_bytes()),'editableTextIdentity':'originalPlacementsSha256 and existingRockSourceSha256 hash UTF-8 LF-normalized text; all binary/frozen-archive inputs and generated outputs retain exact-byte checks','route':route,'boundaryRoute':boundaryRoute,'demoEndpoint':endpointPocket,'understory':foliage,'arrivalRoute':arrival,'arrivalPortalHalfWidth':2.0,'clearTrailWidth':2.4,'corridorHalfWidth':2.4,'pockets':pockets,'originalTrunkClearancePockets':trunkPockets,'windows':windows,'townKeepout':townKeepout,'riverClearance':14,'standAnchors':stands,'boundary':boundary,'existingRockReferences':rocks,'existingRockSourceSha256':source_text_sha(rock_source),'placements':rows,'counts':dict(counts),'candidateTreeTriangles':323264+trees,'addedTreeRawUpperBytes':trees*140,'boundaryGeometryPolicy':'Closed forest corridor with visible natural rock/bank sections and selective timber rails; the mapped arrival approach ends at a temporary demo closure beyond its first waypoint. Every added tree owns exact rendered lower wood contact; no unreachable-tree collision exemption is used. Endpoint-height conformance keeps posts vertical; actual solid-mesh/body sweeps alone admit natural bank sections. No invisible barrier or old collision removal.','retention':'No old ordinary/shared certificate applies automatically; candidate full-source retention/recreation proof required at integration.','admission':{'normalDefault':False,'boundary':False,'collisionExemption':False,'nativeImporter':False,'rtVisuals':False,'gpuCost':False}}
 
 
 def inspect(data):
@@ -513,14 +522,14 @@ def produce():
     lines=['// Generated by author.py; source-only opt-in candidate, never normal defaults.',
            '#pragma once', '#include <array>', 'namespace horde::scene::surroundings_layout {',
            'struct Tree { unsigned asset; float x,y,z,yaw; };',
-           'struct Edge { std::array<float,3> a,b; bool inspectBank, arrivalPortal, fenceRequested; };',
+           'struct Edge { std::array<float,3> a,b; bool terrainBoundaryApproved, arrivalPortal, fenceRequested; };',
            'inline constexpr std::array<Tree,416> trees{{']
     names=['pine-middle.glb','alder-middle.glb','pine-far.glb','alder-far.glb']
     for p in layout['placements'][64:]:
         lines.append('    {'+str(names.index(p['asset']))+','+','.join(f(p[k]) for k in ('x','originY','z','yawRadians'))+'},')
-    lines+=['}};', 'inline constexpr std::array<Edge,196> edges{{']
+    lines+=['}};', 'inline constexpr std::array<Edge,'+str(len(layout['boundary']))+'> edges{{']
     for e in layout['boundary']:
-        lines.append('    {{{'+','.join(map(f,e['a']))+'}},{{'+','.join(map(f,e['b']))+'}},'+str(e['preferredTreatment']=='inspect-existing-bank').lower()+','+str(e['arrivalPortal']).lower()+','+str(e['fenceRequested']).lower()+'},')
+        lines.append('    {{{'+','.join(map(f,e['a']))+'}},{{'+','.join(map(f,e['b']))+'}},'+str(e['terrainBoundaryApproved']).lower()+','+str(e['arrivalPortal']).lower()+','+str(e['fenceRequested']).lower()+'},')
     lines+=['}};', 'inline constexpr std::array<Tree,120> understory{{']
     for p in layout['understory']:lines.append('    {5,'+','.join(f(p[k]) for k in ('x','y','z','yaw'))+'},')
     lines+=['}};', '}']

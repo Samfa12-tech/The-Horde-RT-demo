@@ -1010,6 +1010,7 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
        <<",\"northPrototypeExtraRoots\":"<<(forestF01NorthPrototype_?4u:0u)
        <<",\"northPrototypeCollisionTriangles\":"<<(forestF01NorthPrototype_?forestF01NorthPrototype_->CollisionTriangles():0u)
        <<",\"surroundingsExtraRoots\":"<<(forestSurroundingsPrototype_?416u:0u)
+       <<",\"surroundingsRockRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.rockRuns:0u)
        <<",\"surroundingsFenceRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.fenceRuns:0u)
        <<",\"surroundingsNaturalBankRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.naturalBankRuns:0u)
        <<",\"surroundingsTerminalFencePosts\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.terminalFencePosts:0u)

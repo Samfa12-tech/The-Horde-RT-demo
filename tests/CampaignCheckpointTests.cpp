@@ -657,6 +657,16 @@ int main(int argc,char** argv) {
         const auto loaded=sim.Snapshot();CheckClean(loaded);
         Check(cp::LookoutObjectiveAvailable(loaded,sim.LatestCampaignBoundary()),
             "completed grounded lookout restore permits an explicit objective request");
+        auto approach=loaded;approach.playerX=kPrivateChapterDemoEndpoint.x;approach.playerZ=kPrivateChapterDemoEndpoint.z;
+        approach.worldRoute.current=WorldZoneId::TombExterior;
+        Check(cp::LookoutObjectiveAvailable(approach,sim.LatestCampaignBoundary()),
+              "completed objective remains available at temporary approach closure after restore");
+        approach.playerX=24.1964f;approach.playerZ=53.1504f;
+        Check(cp::LookoutObjectiveAvailable(approach,sim.LatestCampaignBoundary()),
+              "temporary endpoint explanation remains reopenable at actual timber stopped position");
+        approach.playerX=28.f;approach.playerZ=58.f;
+        Check(!cp::LookoutObjectiveAvailable(approach,sim.LatestCampaignBoundary()),
+              "endpoint objective does not extend into the unfinished village");
         auto unavailable=loaded;unavailable.playerAlive=false;
         Check(!cp::LookoutObjectiveAvailable(unavailable,sim.LatestCampaignBoundary()) &&
             !cp::LookoutObjectiveAvailable(loaded,std::nullopt),

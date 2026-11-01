@@ -1,0 +1,1039 @@
+{
+  "schema": 1,
+  "dateUtc": "2026-11-01T05:05:38.434643+00:00",
+  "baseCommit": "a7a76fe56ecb2b6a6623e90e9b7ba9ca68dfde51",
+  "scope": "Private1.7 bounded forest corridor and temporary demo endpoint before unwalled unfinished Bellwether",
+  "notRelease": true,
+  "endpointXZ": [
+    22.3,
+    50.2
+  ],
+  "boundary": {
+    "sections": 226,
+    "natural": 47,
+    "rockRuns": 155,
+    "fenceRuns": 24,
+    "terminalPosts": 3,
+    "openSections": 0,
+    "rockTriangles": 58486,
+    "fenceTriangles": 1188,
+    "boundaryContactTriangles": 58990,
+    "totalSupportTriangles": 131884,
+    "supportCeiling": 147456,
+    "retainedSupportBytes": 9351784,
+    "original64SupportBytes": 4469016,
+    "deltaVsPrevious480SupportBytes": 4071952,
+    "addedRawGeometryBytes": 26535992,
+    "previousAddedRawGeometryBytes": 15001872,
+    "rawGeometryDeltaBytes": 11534120,
+    "nativeGeometryWitness": "8980520670790461166",
+    "unchangedTreeAndFernPlacements": true
+  },
+  "containment": {
+    "negativeOriginal64Escapes": true,
+    "candidateEscapes": 0,
+    "approaches": 16668,
+    "floodCells": 5319,
+    "reachableSentinels": 7,
+    "movementSteps": 277613,
+    "simulationCycles": 3,
+    "runMaxMetresPerSecond": 3.2,
+    "dodgeMetres": 0.9,
+    "dodgeSeconds": 0.2,
+    "standingRadius": 0.24,
+    "standingHeight": 1.8,
+    "crouchHeight": 1.2,
+    "floodRadius": 0.22,
+    "floodHeight": 0.75,
+    "jumpMantle": "not implemented; inapplicable",
+    "recovery": "canonical saved lookout restores and repeated return; arbitrary offtrail persisted position rejected"
+  },
+  "roundtrip": {
+    "schema": 2,
+    "scope": "moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance",
+    "maximumSimulationTicksPerRender": 4,
+    "simulationHz": 60,
+    "frames": 1483,
+    "warmupFrames": 64,
+    "fullRouteValidated": true,
+    "recreationTestRequiredSeparately": true,
+    "residentWoodland": true,
+    "residentWoodlandValidatedFrames": 1484,
+    "sharedForestResident": false,
+    "sharedForestValidatedFrames": 0,
+    "maximumSharedForestMaskedInstances": 0,
+    "maximumNormalStaticOwnerSavingBytes": 0,
+    "staticDetailUnloads": 0,
+    "staticDetailRestores": 0,
+    "keeperVertexLifetime": {
+      "retiredAllocationBytes": 1323264,
+      "retiredMemoryFlags": 6,
+      "retirements": 1,
+      "restorations": 1,
+      "resetRestored": true
+    },
+    "keeperTextureLifetime": {
+      "retiredDeviceLocalBytes": 33554432,
+      "retiredHostVisibleBytes": 0,
+      "baseMemoryFlags": 1,
+      "emissiveMemoryFlags": 1,
+      "retirements": 1,
+      "restorations": 1,
+      "resetRestored": true
+    },
+    "complete": true
+  },
+  "captures": [
+    {
+      "label": "final-f01",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-containment-20261101\\final-f01",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-landing-north",
+          "--capture-dust",
+          "standard"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 15496192,
+          "sha256": "4704b3680f7f9ecc59700a675b1f620b980b6f5bb3ce87e7d152d225831c6472"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignBefore": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundBefore": null,
+        "pid": 57592,
+        "exitCode": 0,
+        "seconds": 32.78100000001723,
+        "pending": false,
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignAfter": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundChanges": [],
+        "captureNeverForeground": true,
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "manifest": {
+        "path": "reports/forest-containment-20261101/final-f01/capture-manifest.json",
+        "bytes": 24880,
+        "sha256": "f50745397342e61df42ed428e0e85d77776f3e82e2833413d4f32792a7d2744a"
+      },
+      "complete": true,
+      "error": null,
+      "forest": {
+        "mode": "normal-woodland480",
+        "defaultEnabled": true,
+        "requestedSharedGeometry": false,
+        "activeSharedGeometry": false,
+        "totalTreePlacements": 480,
+        "northPrototypeExtraRoots": 0,
+        "northPrototypeCollisionTriangles": 0,
+        "surroundingsExtraRoots": 416,
+        "surroundingsRockRuns": 155,
+        "surroundingsFenceRuns": 24,
+        "surroundingsNaturalBankRuns": 47,
+        "surroundingsTerminalFencePosts": 3,
+        "surroundingsOpenWoodlandRuns": 0,
+        "surroundingsTreeContactTriangles": 10648,
+        "surroundingsUnderstoryClumps": 120,
+        "surroundingsArrivalPortalRuns": 0,
+        "surroundingsBoundarySectionsContained": true,
+        "surroundingsBoundaryContained": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "performanceAdmitted": false,
+        "forestContentAdmitted": true,
+        "physicalDefinitions": 31,
+        "physicalStorageCapacity": 111,
+        "primitiveRows": 34,
+        "primitiveCapacity": 38,
+        "packedMaterialRows": 32,
+        "finalMaterialRows": 34,
+        "materialCapacity": 34,
+        "metadataCapacity": 30,
+        "staticRegistrations": 15,
+        "uniqueStaticAssets": 15,
+        "staticAssetCapacity": 15,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 11,
+        "blasCount": 22,
+        "legacyDefinitionCount": 31
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "images": [
+        {
+          "file": "193-chapter-landing-north.png",
+          "honestlyPresentedRtFrame": true,
+          "camera": {
+            "x": -33.700001,
+            "z": -12.8,
+            "yaw": 0.0,
+            "pitch": -0.15
+          },
+          "pngSha256": "c48cbf22cc456e033b398c6ef730223bd0c6f801311ac9c3e19c17af509ca47e"
+        }
+      ]
+    },
+    {
+      "label": "final-endpoint-staged",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-containment-20261101\\final-endpoint-staged",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-demo-endpoint",
+          "--capture-dust",
+          "low"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 15493632,
+          "sha256": "4ab7b0d62146277f4242d6341189939540781a67b779326bb68f8120682f129e"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignBefore": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundBefore": null,
+        "pid": 21640,
+        "exitCode": 0,
+        "seconds": 29.26500000001397,
+        "pending": false,
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignAfter": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundChanges": [],
+        "captureNeverForeground": true,
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "manifest": {
+        "path": "reports/forest-containment-20261101/final-endpoint-staged/capture-manifest.json",
+        "bytes": 24904,
+        "sha256": "8f1ca0d6d6cc519e7227a957f8dc2c63c13221c76010d4cacb80bdd038bb2d06"
+      },
+      "complete": true,
+      "error": null,
+      "forest": {
+        "mode": "normal-woodland480",
+        "defaultEnabled": true,
+        "requestedSharedGeometry": false,
+        "activeSharedGeometry": false,
+        "totalTreePlacements": 480,
+        "northPrototypeExtraRoots": 0,
+        "northPrototypeCollisionTriangles": 0,
+        "surroundingsExtraRoots": 416,
+        "surroundingsRockRuns": 155,
+        "surroundingsFenceRuns": 24,
+        "surroundingsNaturalBankRuns": 47,
+        "surroundingsTerminalFencePosts": 3,
+        "surroundingsOpenWoodlandRuns": 0,
+        "surroundingsTreeContactTriangles": 10648,
+        "surroundingsUnderstoryClumps": 120,
+        "surroundingsArrivalPortalRuns": 0,
+        "surroundingsBoundarySectionsContained": true,
+        "surroundingsBoundaryContained": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "performanceAdmitted": false,
+        "forestContentAdmitted": true,
+        "physicalDefinitions": 31,
+        "physicalStorageCapacity": 111,
+        "primitiveRows": 34,
+        "primitiveCapacity": 38,
+        "packedMaterialRows": 32,
+        "finalMaterialRows": 34,
+        "materialCapacity": 34,
+        "metadataCapacity": 30,
+        "staticRegistrations": 15,
+        "uniqueStaticAssets": 15,
+        "staticAssetCapacity": 15,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 11,
+        "blasCount": 22,
+        "legacyDefinitionCount": 31
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "images": [
+        {
+          "file": "232-chapter-demo-endpoint.png",
+          "honestlyPresentedRtFrame": true,
+          "camera": {
+            "x": 22.298124,
+            "z": 50.197083,
+            "yaw": 2.57,
+            "pitch": -0.1
+          },
+          "pngSha256": "8f669565fa0a13c7aacc9065b30af23d7762a338a25fe2c98c33920e1d5f16a5"
+        }
+      ]
+    },
+    {
+      "label": "final-f04",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-containment-20261101\\final-f04",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-forest-lookout",
+          "--capture-dust",
+          "standard"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 15493632,
+          "sha256": "0ce46f7e332487d95b3645e2694b314121f6fb4c10bbbc337cfa8145a7affce0"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignBefore": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundBefore": null,
+        "pid": 61752,
+        "exitCode": 0,
+        "seconds": 28.82799999997951,
+        "pending": false,
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignAfter": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundChanges": [],
+        "captureNeverForeground": true,
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "manifest": {
+        "path": "reports/forest-containment-20261101/final-f04/capture-manifest.json",
+        "bytes": 24913,
+        "sha256": "6ad4b7c5807c08fca7e76d6491f37b4d7a1e9ce68b2f2bba7717c24ae80ba504"
+      },
+      "complete": true,
+      "error": null,
+      "forest": {
+        "mode": "normal-woodland480",
+        "defaultEnabled": true,
+        "requestedSharedGeometry": false,
+        "activeSharedGeometry": false,
+        "totalTreePlacements": 480,
+        "northPrototypeExtraRoots": 0,
+        "northPrototypeCollisionTriangles": 0,
+        "surroundingsExtraRoots": 416,
+        "surroundingsRockRuns": 155,
+        "surroundingsFenceRuns": 24,
+        "surroundingsNaturalBankRuns": 47,
+        "surroundingsTerminalFencePosts": 3,
+        "surroundingsOpenWoodlandRuns": 0,
+        "surroundingsTreeContactTriangles": 10648,
+        "surroundingsUnderstoryClumps": 120,
+        "surroundingsArrivalPortalRuns": 0,
+        "surroundingsBoundarySectionsContained": true,
+        "surroundingsBoundaryContained": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "performanceAdmitted": false,
+        "forestContentAdmitted": true,
+        "physicalDefinitions": 31,
+        "physicalStorageCapacity": 111,
+        "primitiveRows": 34,
+        "primitiveCapacity": 38,
+        "packedMaterialRows": 32,
+        "finalMaterialRows": 34,
+        "materialCapacity": 34,
+        "metadataCapacity": 30,
+        "staticRegistrations": 15,
+        "uniqueStaticAssets": 15,
+        "staticAssetCapacity": 15,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 11,
+        "blasCount": 22,
+        "legacyDefinitionCount": 31
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "images": [
+        {
+          "file": "203-chapter-forest-lookout.png",
+          "honestlyPresentedRtFrame": true,
+          "camera": {
+            "x": 13.304916,
+            "z": 36.204624,
+            "yaw": 2.51,
+            "pitch": -0.15
+          },
+          "pngSha256": "a11b45d3cd1cd74a34c68f27a2ff2509a170b4c2c6350c5cf4c5c588c90aeb8e"
+        }
+      ]
+    },
+    {
+      "label": "final-roundtrip",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-containment-20261101\\final-roundtrip",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-kit-reunion",
+          "--capture-dust",
+          "standard",
+          "--validate-chapter-roundtrip"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 15493632,
+          "sha256": "0ce46f7e332487d95b3645e2694b314121f6fb4c10bbbc337cfa8145a7affce0"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignBefore": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundBefore": null,
+        "pid": 58516,
+        "exitCode": 0,
+        "seconds": 143.5,
+        "pending": false,
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignAfter": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundChanges": [],
+        "captureNeverForeground": true,
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "manifest": {
+        "path": "reports/forest-containment-20261101/final-roundtrip/capture-manifest.json",
+        "bytes": 24910,
+        "sha256": "185772801d5b8ac4564d901fa5310ffea41e424e45c390175b26309255eb7f88"
+      },
+      "complete": true,
+      "error": null,
+      "forest": {
+        "mode": "normal-woodland480",
+        "defaultEnabled": true,
+        "requestedSharedGeometry": false,
+        "activeSharedGeometry": false,
+        "totalTreePlacements": 480,
+        "northPrototypeExtraRoots": 0,
+        "northPrototypeCollisionTriangles": 0,
+        "surroundingsExtraRoots": 416,
+        "surroundingsRockRuns": 155,
+        "surroundingsFenceRuns": 24,
+        "surroundingsNaturalBankRuns": 47,
+        "surroundingsTerminalFencePosts": 3,
+        "surroundingsOpenWoodlandRuns": 0,
+        "surroundingsTreeContactTriangles": 10648,
+        "surroundingsUnderstoryClumps": 120,
+        "surroundingsArrivalPortalRuns": 0,
+        "surroundingsBoundarySectionsContained": true,
+        "surroundingsBoundaryContained": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "performanceAdmitted": false,
+        "forestContentAdmitted": true,
+        "physicalDefinitions": 31,
+        "physicalStorageCapacity": 111,
+        "primitiveRows": 34,
+        "primitiveCapacity": 38,
+        "packedMaterialRows": 32,
+        "finalMaterialRows": 34,
+        "materialCapacity": 34,
+        "metadataCapacity": 30,
+        "staticRegistrations": 15,
+        "uniqueStaticAssets": 15,
+        "staticAssetCapacity": 15,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 11,
+        "blasCount": 22,
+        "legacyDefinitionCount": 31
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "images": [
+        {
+          "file": "207-chapter-kit-reunion.png",
+          "honestlyPresentedRtFrame": true,
+          "camera": {
+            "x": -28.702318,
+            "z": -5.80325,
+            "yaw": 1.570796,
+            "pitch": -0.1
+          },
+          "pngSha256": "991759c3b3d67aaad1ff84765d9ffe562148f0f59db1a953dc36b0e7b9edef97"
+        }
+      ]
+    },
+    {
+      "label": "final-endpoint-return",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-containment-20261101\\final-endpoint-return",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-demo-endpoint-return",
+          "--capture-dust",
+          "low"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 15493632,
+          "sha256": "4ab7b0d62146277f4242d6341189939540781a67b779326bb68f8120682f129e"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignBefore": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundBefore": null,
+        "pid": 57188,
+        "exitCode": 1,
+        "seconds": 30.296999999991385,
+        "pending": false,
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignAfter": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundChanges": [],
+        "captureNeverForeground": true,
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "manifest": {
+        "path": "reports/forest-containment-20261101/final-endpoint-return/capture-manifest.json",
+        "bytes": 17258,
+        "sha256": "a615767927e982cb1350209279f79f435a8e9ecef178276f430179be8ae52a94"
+      },
+      "complete": false,
+      "error": "Checkpoint 'chapter-demo-endpoint-return' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=4686/1165/0 sword/torch=0/0 wall-retraction=0 grip=0/0.000488281 authority=5.96046e-08/0 finalGrip=21.7945,-0.921069,50.2021 body=21.7979,-0.963277,50.2074.",
+      "forest": {
+        "mode": "normal-woodland480",
+        "defaultEnabled": true,
+        "requestedSharedGeometry": false,
+        "activeSharedGeometry": false,
+        "totalTreePlacements": 480,
+        "northPrototypeExtraRoots": 0,
+        "northPrototypeCollisionTriangles": 0,
+        "surroundingsExtraRoots": 416,
+        "surroundingsRockRuns": 155,
+        "surroundingsFenceRuns": 24,
+        "surroundingsNaturalBankRuns": 47,
+        "surroundingsTerminalFencePosts": 3,
+        "surroundingsOpenWoodlandRuns": 0,
+        "surroundingsTreeContactTriangles": 10648,
+        "surroundingsUnderstoryClumps": 120,
+        "surroundingsArrivalPortalRuns": 0,
+        "surroundingsBoundarySectionsContained": true,
+        "surroundingsBoundaryContained": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "performanceAdmitted": false,
+        "forestContentAdmitted": true,
+        "physicalDefinitions": 31,
+        "physicalStorageCapacity": 111,
+        "primitiveRows": 34,
+        "primitiveCapacity": 38,
+        "packedMaterialRows": 32,
+        "finalMaterialRows": 34,
+        "materialCapacity": 34,
+        "metadataCapacity": 30,
+        "staticRegistrations": 15,
+        "uniqueStaticAssets": 15,
+        "staticAssetCapacity": 15,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 11,
+        "blasCount": 22,
+        "legacyDefinitionCount": 31
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "images": []
+    },
+    {
+      "label": "final-return-framed",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-containment-20261101\\final-return-framed",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-demo-endpoint-return",
+          "--capture-dust",
+          "low"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 15493632,
+          "sha256": "0ce46f7e332487d95b3645e2694b314121f6fb4c10bbbc337cfa8145a7affce0"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignBefore": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundBefore": null,
+        "pid": 52448,
+        "exitCode": 1,
+        "seconds": 38.07799999997951,
+        "pending": false,
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignAfter": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundChanges": [],
+        "captureNeverForeground": true,
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "manifest": {
+        "path": "reports/forest-containment-20261101/final-return-framed/capture-manifest.json",
+        "bytes": 17257,
+        "sha256": "034a2046f16a222943715b914572f1b279e5ef2e47ae12146d15f3e40f4d2450"
+      },
+      "complete": false,
+      "error": "Checkpoint 'chapter-demo-endpoint-return' failed claimed reward player/lantern primary visibility or final GripRing contact: pixels=4687/1164/0 sword/torch=0/0 wall-retraction=0 grip=5.96046e-08/0 authority=5.96046e-08/0 finalGrip=21.8174,-0.967456,50.2379 body=21.825,-1.00774,50.2498.",
+      "forest": {
+        "mode": "normal-woodland480",
+        "defaultEnabled": true,
+        "requestedSharedGeometry": false,
+        "activeSharedGeometry": false,
+        "totalTreePlacements": 480,
+        "northPrototypeExtraRoots": 0,
+        "northPrototypeCollisionTriangles": 0,
+        "surroundingsExtraRoots": 416,
+        "surroundingsRockRuns": 155,
+        "surroundingsFenceRuns": 24,
+        "surroundingsNaturalBankRuns": 47,
+        "surroundingsTerminalFencePosts": 3,
+        "surroundingsOpenWoodlandRuns": 0,
+        "surroundingsTreeContactTriangles": 10648,
+        "surroundingsUnderstoryClumps": 120,
+        "surroundingsArrivalPortalRuns": 0,
+        "surroundingsBoundarySectionsContained": true,
+        "surroundingsBoundaryContained": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "ordinaryOmissionCertificateReused": false,
+        "performanceAdmitted": false,
+        "forestContentAdmitted": true,
+        "physicalDefinitions": 31,
+        "physicalStorageCapacity": 111,
+        "primitiveRows": 34,
+        "primitiveCapacity": 38,
+        "packedMaterialRows": 32,
+        "finalMaterialRows": 34,
+        "materialCapacity": 34,
+        "metadataCapacity": 30,
+        "staticRegistrations": 15,
+        "uniqueStaticAssets": 15,
+        "staticAssetCapacity": 15,
+        "fitsCapacities": true,
+        "definitionsPublished": true,
+        "commonPrimitiveCount": 11,
+        "blasCount": 22,
+        "legacyDefinitionCount": 31
+      },
+      "presentation": {
+        "renderScale": 1.0,
+        "dispatchWidth": 960,
+        "dispatchHeight": 540,
+        "swapchainWidth": 960,
+        "swapchainHeight": 540,
+        "swapchainFormat": 44
+      },
+      "images": []
+    }
+  ],
+  "binaries": [
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "bytes": 4976640,
+      "sha256": "1b4a873d484751970aa5827d9e9554f679960563751cf87b303c6990bc5caf0a"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 208844080,
+      "sha256": "99159def3f7047e2ece15b7ee2ed44bdce8c145768a626f4ccdf2508ab73125c"
+    }
+  ],
+  "tests": [
+    {
+      "path": "reports/forest-containment-20261101/final-tests2.log",
+      "bytes": 1238,
+      "sha256": "59613642f68a197ed076d06b955634e219c6fd2403b2139e05412c152d679eed"
+    },
+    {
+      "path": "reports/forest-containment-20261101/final-staging-tests.log",
+      "bytes": 4785,
+      "sha256": "5644b7418b4b1e0284ddaabed5a96a3973c130b8d5459f8a2224e8516215fe94"
+    },
+    {
+      "path": "reports/forest-containment-20261101/final-registry-test.log",
+      "bytes": 511,
+      "sha256": "5e2e0d1c6a9f2bead0ef74c305f0c821a67bd41320328e6a38bb12141bfac432"
+    },
+    {
+      "path": "reports/forest-containment-20261101/final-objective-tests.log",
+      "bytes": 660,
+      "sha256": "c04e10dff1cd704b2dfa1d7121154e76eaf7a77d2d2eb1625faa8e1f88ccc6f9"
+    },
+    {
+      "path": "reports/forest-containment-20261101/asset-policy-tests.log",
+      "bytes": 281,
+      "sha256": "8746685deb561c3c197e07c241603b01d2e61a5e6d386deefce4ffd947979430"
+    },
+    {
+      "path": "reports/forest-containment-20261101/android-objective-build-test.log",
+      "bytes": 2702,
+      "sha256": "f81dd8dd84a6e11c87e0d8a7e81c1efc27ef8e6cd78bfe52eedf5f1fd65c76f0"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 131392,
+      "sha256": "ca0f85ea5ec6ca14247ecee44431cb7884c2e7680062c179afd0c274f78a9ded"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "bytes": 529628,
+      "sha256": "371764728c2e715e980e24433818ef869bb864f0656affa359f40b5499a4ae09"
+    },
+    {
+      "path": "assets/models/world/runtime/forest-surroundings-v1/runtime-roster.json",
+      "bytes": 1667,
+      "sha256": "a84554a71e8f51a3eb67eba2186c90ceb2da6425020f68bef6ecbf389264d6d5"
+    },
+    {
+      "path": "assets/models/world/source/forest-surroundings-v1/README.md",
+      "bytes": 11316,
+      "sha256": "b4a79b6f1ec0d2657c48d2b60e034d95cd2a771c101e675ad1e359c2b43256fc"
+    },
+    {
+      "path": "assets/models/world/source/forest-surroundings-v1/author.py",
+      "bytes": 39991,
+      "sha256": "ec8ce59cd63941fbbfd97df95aa64363a20a0f2a6ad09900c36a481675ba2a05"
+    },
+    {
+      "path": "assets/models/world/source/forest-surroundings-v1/composition.json",
+      "bytes": 279423,
+      "sha256": "fb05a3b1549d7da72e7ab91722a78dd20592295e13e9850c79adeb921c3c71ab"
+    },
+    {
+      "path": "assets/models/world/source/forest-surroundings-v1/native-layout.generated.h",
+      "bytes": 46080,
+      "sha256": "f45751e67b03e3fb6ce2c9ebe1b49f4bdd29348e4a819b779b218a5c9fee341e"
+    },
+    {
+      "path": "src/gameplay/DevelopmentCheckpointSimulation.h",
+      "bytes": 27921,
+      "sha256": "182704a0f3248a8f64f962648a83cebab003254ca10b9af9460fcbe2096b6f73"
+    },
+    {
+      "path": "src/gameplay/DevelopmentCheckpoints.h",
+      "bytes": 27115,
+      "sha256": "b9d03546022933348e7ce075e13172da96b3e4a4ac9839ef564aebf1a772dbfb"
+    },
+    {
+      "path": "src/gameplay/campaign/LookoutObjective.h",
+      "bytes": 1654,
+      "sha256": "3288cd3ff891f1baca207d9ace167c974086459226a0d38fbf90aa1bdc2ba601"
+    },
+    {
+      "path": "src/gameplay/simulation/DevelopmentWorldRoute.h",
+      "bytes": 17204,
+      "sha256": "2028105ce25e8ffdbed1e8df4ad561f41e63dbc96f27c7533763bf1262a6ac20"
+    },
+    {
+      "path": "src/gameplay/simulation/TriangleSupportSurface.h",
+      "bytes": 27246,
+      "sha256": "b33e6db14d15f51c7a5f281cdf4935446fc2cf493e89c44926e822622fd7bd17"
+    },
+    {
+      "path": "src/platform/windows/WindowsLookoutObjectivePanel.h",
+      "bytes": 5027,
+      "sha256": "c5fbc901f2cc519af622dd4306f142dfe57a45e1243c74b017d91f9608e96502"
+    },
+    {
+      "path": "src/scene/ForestSurroundings.cpp",
+      "bytes": 20818,
+      "sha256": "7464af06ae9c8abca0c968deb3cf144e886502167bc32823c18bc72de2d0a6a9"
+    },
+    {
+      "path": "src/scene/ForestSurroundings.h",
+      "bytes": 1651,
+      "sha256": "6934fbabbff56e4f8c72b939da9d18720494f70fecf88bf9bb10a1b1cfe3eea6"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "bytes": 570841,
+      "sha256": "f99106be799e4ab412f5901039e3d4ad62f393440e4b7f3aa0bd08a40ed14dda"
+    },
+    {
+      "path": "tests/CampaignCheckpointTests.cpp",
+      "bytes": 63771,
+      "sha256": "7c362421786376c52fe7f0b66e44b4687c8432b805d89907773f409dd9a83997"
+    },
+    {
+      "path": "tests/DevelopmentStaticAssetTests.cpp",
+      "bytes": 80575,
+      "sha256": "3e441659718a322bf73aaf3de08afc0d871d798fdfaa8f3802aea4d27acab702"
+    },
+    {
+      "path": "tests/ForestDressingTests.cpp",
+      "bytes": 148024,
+      "sha256": "2cfcb2510b71472edede387524e71eef1dacbab9c364b3e9188253ff902fc91f"
+    },
+    {
+      "path": "tests/ForestSurroundingsSourceTests.py",
+      "bytes": 11721,
+      "sha256": "5b25cf4d7d390f4053d312e817f5828466651a7205c8a6091b2d63f509793efc"
+    },
+    {
+      "path": "tools/horde-1.6.2-asset-policy.ps1",
+      "bytes": 30161,
+      "sha256": "00dbc71441f2bab331719d03adec0a64af11873f62e146bf30e8558b9294d24b"
+    }
+  ],
+  "images": [
+    {
+      "path": "docs/evidence/2026-11-01-forest-containment/18-return-4.png",
+      "bytes": 583129,
+      "sha256": "5edaa720614a4922848da5bc3271ab0ae4d7777d96fc0297d1b3a1620a015566"
+    },
+    {
+      "path": "docs/evidence/2026-11-01-forest-containment/193-chapter-landing-north.png",
+      "bytes": 676655,
+      "sha256": "c48cbf22cc456e033b398c6ef730223bd0c6f801311ac9c3e19c17af509ca47e"
+    },
+    {
+      "path": "docs/evidence/2026-11-01-forest-containment/203-chapter-forest-lookout.png",
+      "bytes": 701069,
+      "sha256": "a11b45d3cd1cd74a34c68f27a2ff2509a170b4c2c6350c5cf4c5c588c90aeb8e"
+    },
+    {
+      "path": "docs/evidence/2026-11-01-forest-containment/232-chapter-demo-endpoint.png",
+      "bytes": 679769,
+      "sha256": "8f669565fa0a13c7aacc9065b30af23d7762a338a25fe2c98c33920e1d5f16a5"
+    },
+    {
+      "path": "docs/evidence/2026-11-01-forest-containment/233-chapter-demo-endpoint-return.png",
+      "bytes": 899322,
+      "sha256": "918fb8aeef5c476762c42467c1b9375bb2c3d52b01eac6bc4e63185e9185f9b4"
+    },
+    {
+      "path": "docs/evidence/2026-11-01-forest-containment/9-outbound-5.png",
+      "bytes": 884548,
+      "sha256": "adcf5772f40b875b7604dfc557dcb201e7598c263464be8bcbfe353157765bb6"
+    }
+  ],
+  "ownerFiles": {
+    "checked": 151,
+    "mismatches": []
+  },
+  "limitations": [
+    "No owner phone used; prior phone evidence does not validate this later geometry.",
+    "No performance or thermal acceptance claimed.",
+    "Reverse endpoint image is real RT but failed existing zero-lantern-body-pixel gate; no gate relaxed.",
+    "Tall stone-cut sides on sloped approach remain a private-playtest visual tradeoff.",
+    "F01 and endpoint forward binaries predate only diagnostic framing/UI eligibility corrections; geometry witness is unchanged."
+  ],
+  "libraryEndpoint": {
+    "libraryId": "libfile_02e809986f408191adf60b7fd9ffb959",
+    "fileId": "file_00000000a07481fd9e83aaa66e93bdde"
+  },
+  "backupPolicy": "Non-force existing development branch [skip ci]; no hosted CI or LFS downloads.",
+  "recreation": {
+    "complete": true,
+    "sameRendererObject": true,
+    "initialPausedInputBarrier": true,
+    "sceneEpochBefore": 2,
+    "sceneEpochAfter": 3,
+    "resourcesMatch": true,
+    "simulationTickBefore": 2757,
+    "simulationTickAfter": 2757,
+    "storageImageSha256Matches": true,
+    "process": {
+      "arguments": [
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+        "--development-rescue-journey",
+        "--capture-showcase",
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-containment-20261101\\final-recreation",
+        "--capture-hidden",
+        "--development-checkpoint",
+        "chapter-forest-lookout",
+        "--forest-route-proof",
+        "baked-surroundings480",
+        "--capture-dust",
+        "low"
+      ],
+      "executable": {
+        "exists": true,
+        "bytes": 15493632,
+        "sha256": "0ce46f7e332487d95b3645e2694b314121f6fb4c10bbbc337cfa8145a7affce0"
+      },
+      "settingsBefore": {
+        "exists": true,
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "campaignBefore": {
+        "exists": true,
+        "files": {}
+      },
+      "foregroundBefore": null,
+      "pid": 22780,
+      "exitCode": 0,
+      "seconds": 32.812000000005355,
+      "pending": false,
+      "settingsAfter": {
+        "exists": true,
+        "bytes": 471,
+        "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+      },
+      "campaignAfter": {
+        "exists": true,
+        "files": {}
+      },
+      "foregroundChanges": [],
+      "captureNeverForeground": true,
+      "foregroundUnchanged": true,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true
+    },
+    "proofOverride": true,
+    "normalDefaultEvidence": "Separate normal F01/F04/endpoint/roundtrip captures above"
+  },
+  "packageCheck": {
+    "platform": "Android",
+    "closedRuntimeRoster": true,
+    "apkSha256": "99159def3f7047e2ece15b7ee2ed44bdce8c145768a626f4ccdf2508ab73125c"
+  },
+  "ownedCaptureProcessesClosed": true
+}

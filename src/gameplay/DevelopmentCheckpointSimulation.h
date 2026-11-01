@@ -258,6 +258,22 @@ inline bool StageDevelopmentCheckpointSimulation(
             }
             if(!reached)return finalize(false);
         }
+        // A mapped approach capture continues from F04 using the same motor;
+        // the camera target is never used as an authoritative teleport.
+        if(checkpoint.walksBeyondExteriorStation) {
+            bool reached=false;
+            for(int tick=0;tick<2600;++tick) {
+                const auto& state=gameSimulation.Snapshot();
+                const float dx=checkpoint.cameraX-state.playerX,dz=checkpoint.cameraZ-state.playerZ;
+                const float distance=std::hypot(dx,dz);
+                if(distance<.008f) {reached=true;break;}
+                routeInput.yawRadians=std::atan2(dx,-dz);
+                routeInput.moveForward=std::min(1.0f,distance/.055f);
+                routeInput.runHeld=distance>.3f;
+                advance();
+            }
+            if(!reached)return finalize(false);
+        }
         routeInput.moveForward=0;routeInput.runHeld=false;
         // The native replay really ascends before freezing. Never seed a
         // camera-only exterior or invent ready resources for a missing scene.

@@ -1,6 +1,17 @@
 # Whole-route forest: authored source v1
 
-## Current private 1.7 integration
+## Current containment correction
+
+The owner-reported side gaps are closed by a 226-span authored contour extending
+to the temporary demo turnaround at native `(22.3,50.2)`: 47 verified existing
+terrain/solid sections, 155 existing mixed boulders/crags and 24 timber modules.
+The 47 terrain-section decisions are frozen in `author.py`, bound to the pinned
+terrain; the independent native movement/flood gate rechecks production geometry.
+All original tree/fern placements are unchanged. See the
+[containment evidence](../../../../../docs/evidence/2026-11-01-forest-containment/README.md).
+The initial integration and candidate notes below are historical.
+
+## Initial private 1.7 integration
 
 The normal private rescue chapter now uses the admitted runtime copy of these
 assets: 64 unchanged originals, 96 middle and 320 far trees, 120 low fern clumps,

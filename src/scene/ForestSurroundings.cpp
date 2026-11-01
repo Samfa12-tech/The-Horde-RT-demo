@@ -24,27 +24,27 @@ Point Normalize(Point p) {
     if(!(n>1e-8f))return {};
     for(auto& c:p)c/=n;return p;
 }
-bool Blocks(const Surface& ground, float x,float z,float nx,float nz) {
-    const auto a=ground.Query(x-nx*.75f,z-nz*.75f);
-    const auto b=ground.Query(x+nx*.75f,z+nz*.75f);
-    if(!a.found || !b.found)return false; // absent support is not a solid-bank certificate
-    // Crouched/dodging height is the conservative boundary witness. Terrain
-    // and attached rendered solids must stop both crossing directions.
-    auto blocked=[&](float sign,const Surface::Sample& s) {
-        const float ax=x-sign*nx*.75f,az=z-sign*nz*.75f,bx=x+sign*nx*.75f,bz=z+sign*nz*.75f;
-        return !ground.GroundSweep(ax,az,bx,bz,s.worldY,.22f,.18f) ||
-            !ground.HorizontalBodyVolumeClear(ax,az,bx,bz,s.worldY,.75f,.22f) ||
-            !ground.NonWalkableVolumeClear(ax,az,bx,bz,s.worldY+.05f,s.worldY+.75f,.22f);
-    };
-    return blocked(1,a)&&blocked(-1,b);
-}
-bool EdgeBlocked(const Surface& terrain,const surroundings_layout::Edge& e,std::size_t& probes) {
+// Lightweight identity/ground/contact guard only. Expensive actual movement,
+// seam and flood admission lives in the host tests against this exact geometry.
+// Natural section choices are immutable authored data bound to the terrain.
+bool EdgeHasContact(const Surface& ground,const surroundings_layout::Edge& e,
+                    std::size_t& probes,bool naturalOnly) {
     const float dx=e.b[0]-e.a[0],dz=e.b[2]-e.a[2],length=std::hypot(dx,dz);
     if(!(length>.05f && length<2.5f))return false;
-    const auto n=static_cast<unsigned>(std::ceil(length/.10f));
-    for(unsigned i=0;i<=n;++i) {
-        const float t=float(i)/float(n);++probes;
-        if(!Blocks(terrain,e.a[0]+dx*t,e.a[2]+dz*t,-dz/length,dx/length))return false;
+    const float nx=-dz/length,nz=dx/length;
+    const auto count=static_cast<unsigned>(std::ceil(length/.10f));
+    for(unsigned i=0;i<=count;++i) {
+        ++probes;const float t=float(i)/count,x=e.a[0]+dx*t,z=e.a[2]+dz*t;
+        const auto middle=ground.Query(x,z);if(!middle.found)return false;
+        if(!middle.walkable)continue;
+        if(naturalOnly) {
+            if(ground.NonWalkableVolumeClear(x,z,x,z,middle.worldY+.001f,middle.worldY+.75f,.22f))return false;
+        } else {
+            const auto a=ground.Query(x-nx*3,z-nz*3),b=ground.Query(x+nx*3,z+nz*3);
+            if(!a.found||!b.found)return false;
+            const float low=std::min({middle.worldY,a.worldY,b.worldY}),high=std::max({middle.worldY,a.worldY,b.worldY});
+            if(ground.NonWalkableVolumeClear(x-nx*3,z-nz*3,x+nx*3,z+nz*3,low+.001f,high+.75f,.22f))return false;
+        }
     }
     return true;
 }
@@ -60,10 +60,10 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
         return fail("requires complete original scene and immutable imported ground.");
     if(std::any_of(owner.nodeTransforms.begin(),owner.nodeTransforms.end(),[](const auto& n){return n.name=="forest-surroundings-world-baked";}))
         return fail("candidate was already appended; overlapping populations are forbidden.");
-    std::array<std::uint32_t,4> destination{};
+    std::array<std::uint32_t,5> destination{};
     for(std::size_t f=0;f<destination.size();++f) {
         const auto found=std::find_if(owner.materials.begin(),owner.materials.end(),[&](const auto& m){
-            return m.name==original.materialFamilies[f].name && m.textureGroup==int(f) && m.deferTextureAllocation;
+            return f==4 ? m.name=="Boulder01Rock" : m.name==original.materialFamilies[f].name && m.textureGroup==int(f) && m.deferTextureAllocation;
         });
         if(found==owner.materials.end())return fail("missing existing canonical material family.");
         destination[f]=static_cast<std::uint32_t>(found-owner.materials.begin());
@@ -87,16 +87,16 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
                 return fail("boundary endpoint-post component order changed.");
         }
     }
-    std::array<std::vector<assets::StaticRtVertex>,4> vertices;
-    std::array<std::vector<std::uint32_t>,4> indices;
+    std::array<std::vector<assets::StaticRtVertex>,5> vertices;
+    std::array<std::vector<std::uint32_t>,5> indices;
     std::vector<Surface::Triangle> collision;
     auto prepared=std::make_shared<PreparedForestSurroundings>();
     auto& report=prepared->report;
     // One source primitive at a time, preserving local indices and every basis
     // attribute. All temporary geometry stays CPU-side until final validation.
-    const auto append=[&](const Asset& a,auto transform,bool fence,bool keepEndingPost=false,bool treeContact=false) {
+    const auto append=[&](const Asset& a,auto transform,bool fence,bool keepEndingPost=false,bool treeContact=false,bool rockContact=false) {
         for(const auto& p:a.primitives) {
-            const auto family=std::find(kSourceFamilies.begin(),kSourceFamilies.end(),a.materials[p.materialIndex].name)-kSourceFamilies.begin();
+            const auto family=rockContact?4:std::find(kSourceFamilies.begin(),kSourceFamilies.end(),a.materials[p.materialIndex].name)-kSourceFamilies.begin();
             auto& v=vertices[family];auto& ix=indices[family];
             std::size_t end=a.vertices.size();
             for(const auto& next:a.primitives)if(next.vertexOffset>p.vertexOffset)end=std::min(end,std::size_t(next.vertexOffset));
@@ -110,7 +110,7 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
                     endingPost=endingPost && local>=8 && local<16;
                 }
                 if(endingPost)continue;
-                Surface::Triangle tri;tri.surface=gameplay::simulation::SupportSurface::Wood;
+                Surface::Triangle tri;tri.surface=rockContact?gameplay::simulation::SupportSurface::Stone:gameplay::simulation::SupportSurface::Wood;
                 for(unsigned c=0;c<3;++c) {
                     const auto local=a.indices[p.indexOffset+t+c];
                     if(local>=remap.size())return false;
@@ -122,6 +122,7 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
                     ix.push_back(remap[local]);
                     const auto& out=v[remap[local]];tri.points[c]={out.position[0],out.position[1],out.position[2]};
                 }
+                if(rockContact)collision.push_back(tri);
                 if(treeContact && family==0) {
                     float low=std::numeric_limits<float>::max();
                     for(unsigned c=0;c<3;++c)low=std::min(low,a.vertices[p.vertexOffset+a.indices[p.indexOffset+t+c]].position[1]);
@@ -191,14 +192,54 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
     // Resolve visible natural boundaries before assembling runs. A short fence
     // ending at a bank or the arrival portal owns its terminal post; joined
     // modules still share exactly one upright post.
+    assets::AssetManifest rockManifest;std::array<Asset,2> rockSources;
+    const auto rockFolder=root/"models/world/runtime/forest-rocks-v1";
+    if(!assets::AssetManifest::Load(rockFolder/"asset.manifest.json",rockManifest,diagnostic))return false;
+    constexpr std::array<const char*,2> rockFiles{"horde-rock-upright_crag.glb","horde-rock-low_boulder.glb"};
+    for(unsigned i=0;i<2;++i) {
+        if(!Asset::Load(rockFolder/rockFiles[i],rockManifest,rockSources[i],diagnostic))return false;
+        if(rockSources[i].indices.size()!=(i?378:376)*3 || rockSources[i].primitives.size()!=1)return fail("boundary rock identity changed");
+    }
     std::array<bool,surroundings_layout::edges.size()> fences{};
+    std::array<bool,surroundings_layout::edges.size()> crags{};
     for(std::size_t i=0;i<fences.size();++i) {
         const auto& e=surroundings_layout::edges[i];
         if(e.arrivalPortal) {++report.arrivalPortalRuns;continue;}
         std::size_t probes=0;
-        if(EdgeBlocked(*terrain,e,probes)) {++report.naturalBankRuns;continue;}
-        if(!e.fenceRequested) {++report.openWoodlandRuns;continue;}
+        if(e.terrainBoundaryApproved) {
+            if(!EdgeHasContact(*terrain,e,probes,true))return fail("authored natural boundary lost its terrain/contact identity");
+            ++report.naturalBankRuns;continue;
+        }
+        if(!e.fenceRequested) {crags[i]=true;continue;}
         fences[i]=true;
+    }
+    for(std::size_t i=0;i<crags.size();++i)if(crags[i]) {
+        const auto& rock=rockSources[i%3==0?0:1];
+        const float flip=i%2?-1.f:1.f;
+        const auto& e=surroundings_layout::edges[i];
+        const float dx=e.b[0]-e.a[0],dz=e.b[2]-e.a[2],len=std::hypot(dx,dz),ux=dx/len,uz=dz/len;
+        // Overlap the tapered ends of neighbouring existing crag meshes. Each
+        // shape is visibly grounded; the exact rendered faces own all contact.
+        const float sx=(len+2.0f)/(rock.bounds.maximum[0]-rock.bounds.minimum[0]);
+        const float sz=(1.4f+.15f*float(i%3))/(rock.bounds.maximum[2]-rock.bounds.minimum[2]);
+        float sy=(1.0f+.14f*float(i%4))/(rock.bounds.maximum[1]-rock.bounds.minimum[1]);
+        const float x=(e.a[0]+e.b[0])*.5f,z=(e.a[2]+e.b[2])*.5f;
+        float base=std::numeric_limits<float>::max(),highest=std::numeric_limits<float>::lowest();
+        for(const auto& v:rock.vertices) {
+            const auto g=terrain->Query(x+flip*(ux*v.position[0]*sx-uz*v.position[2]*sz),z+flip*(uz*v.position[0]*sx+ux*v.position[2]*sz));
+            if(!g.found)return fail("boundary crag footprint lacks ground");
+            base=std::min(base,g.worldY-.30f);highest=std::max(highest,g.worldY);
+        }
+        sy+=(highest-base-.30f)/(rock.bounds.maximum[1]-rock.bounds.minimum[1]);
+        if(!append(rock,[&](auto v,bool){
+            const float px=v.position[0]*sx*flip,pz=v.position[2]*sz*flip;
+            v.position[0]=x+ux*px-uz*pz;v.position[1]=base+v.position[1]*sy;v.position[2]=z+uz*px+ux*pz;
+            auto n=Normalize({v.normal[0]/sx*flip,v.normal[1]/sy,v.normal[2]/sz*flip});
+            auto t=Normalize({v.tangent[0]*sx*flip,v.tangent[1]*sy,v.tangent[2]*sz*flip});
+            v.normal[0]=ux*n[0]-uz*n[2];v.normal[1]=n[1];v.normal[2]=uz*n[0]+ux*n[2];
+            v.tangent[0]=ux*t[0]-uz*t[2];v.tangent[1]=t[1];v.tangent[2]=uz*t[0]+ux*t[2];return v;
+        },false,false,false,true))return fail("boundary crag transform invalid");
+        ++report.rockRuns;report.rockTriangles+=rock.indices.size()/3;
     }
     for(std::size_t i=0;i<fences.size();++i) {
         if(!fences[i])continue;
@@ -228,13 +269,13 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
             " newFence="+std::to_string(collision.size())+" limit="+std::to_string(Surface::kMaximumTriangles)+".");
     auto combined=Surface::WithAdditionalNonWalkableGeometry(*terrain,collision,diagnostic);
     if(!combined)return false;
-    for(const auto& e:surroundings_layout::edges)if(e.fenceRequested && !e.arrivalPortal && !EdgeBlocked(*combined,e,report.boundaryProbes))
-        return fail("actual rendered boundary leaves a crouch/dodge crossing at "+std::to_string(&e-surroundings_layout::edges.data())+".");
+    for(const auto& e:surroundings_layout::edges)if(!e.arrivalPortal && !EdgeHasContact(*combined,e,report.boundaryProbes,false))
+        return fail("actual rendered boundary lacks authored contact at "+std::to_string(&e-surroundings_layout::edges.data())+".");
     report.boundarySectionsContained=true;
     report.boundaryContained=report.arrivalPortalRuns==0 && report.openWoodlandRuns==0;
     Asset staged=owner;
     staged.triangleRegions.resize(staged.indices.size()/3,assets::StaticTriangleRegion::Shared);
-    for(std::size_t f=0;f<4;++f)if(!indices[f].empty()) {
+    for(std::size_t f=0;f<5;++f)if(!indices[f].empty()) {
         if(staged.vertices.size()+vertices[f].size()>UINT32_MAX || staged.indices.size()+indices[f].size()>UINT32_MAX)return fail("geometry address overflow.");
         assets::StaticPrimitiveRecord p;
         p.vertexOffset=static_cast<std::uint32_t>(staged.vertices.size());p.indexOffset=static_cast<std::uint32_t>(staged.indices.size());

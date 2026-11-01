@@ -31,19 +31,21 @@ def validate(layout):
         if any(rows[i].get(k)!=v for k,v in p.items()) or rows[i]['sourceIndex']!=i:raise ValueError('Original roster changed')
     def clearance(p):return min([author.project(p,route)[0]-layout['corridorHalfWidth']]+[math.dist(p,q['center'])-q['radius'] for q in layout['pockets']+layout['originalTrunkClearancePockets']])
     if layout['clearTrailWidth']!=2.4:raise ValueError('Clear path changed')
+    def boundaryClearance(p):return min([author.project(p,layout['boundaryRoute'])[0]-layout['corridorHalfWidth']]+[math.dist(p,q['center'])-q['radius'] for q in layout['pockets']+layout['originalTrunkClearancePockets']+[layout['demoEndpoint']]])
     poly=[(v['a'][0],v['a'][2]) for v in edges]
     if not 50<=len(poly)<=250:raise ValueError('Unbounded boundary')
     for i,edge in enumerate(edges):
         if edge['b']!=edges[(i+1)%len(edges)]['a']:raise ValueError('Boundary gap')
         a,b=poly[i],poly[(i+1)%len(poly)]
         if not 0<math.dist(a,b)<=2.40001:raise ValueError('Panel span')
-        expected=any(author.project(author.add(a,author.mul(author.sub(b,a),t/20)),layout['arrivalRoute'][:2])[0]<layout['arrivalPortalHalfWidth'] for t in range(21))
-        if edge.get('arrivalPortal')!=expected:raise ValueError('Unproved portal')
-        fenceExpected=not expected and ((sum(v[0] for v in (edge['a'],edge['b']))*.5<-42 and -24<sum(v[2] for v in (edge['a'],edge['b']))*.5<-10) or (-23<sum(v[0] for v in (edge['a'],edge['b']))*.5<-19 and 7<sum(v[2] for v in (edge['a'],edge['b']))*.5<15))
+        if edge.get('terrainBoundaryApproved')!=(i in author.NATURAL_BOUNDARY_SECTIONS):raise ValueError('Unproved natural section')
+        if edge.get('arrivalPortal'):raise ValueError('Unproved portal')
+        x,z=(edge['a'][0]+edge['b'][0])*.5,(edge['a'][2]+edge['b'][2])*.5
+        fenceExpected=z>50.0 or ((x<-42 and -24<z<-10) or (-23<x<-19 and 7<z<15))
         if edge['fenceRequested']!=fenceExpected:raise ValueError('Unproved fence selection')
-        if edge['default']!=('open-mapped-arrival' if expected else 'visible-fence' if fenceExpected else 'open-woodland') or edge['collisionAdmitted']:raise ValueError('Unproved bank gap')
+        if edge['default']!=('visible-fence' if fenceExpected else 'tested-bank-or-rock') or edge['collisionAdmitted']:raise ValueError('Unproved bank gap')
         for t in range(11):
-            if not -.00001<=clearance(author.add(a,author.mul(author.sub(b,a),t/10)))<=1.50001:raise ValueError('Protected pocket clipped/detail allowance exceeded')
+            if not -.00001<=boundaryClearance(author.add(a,author.mul(author.sub(b,a),t/10)))<=1.50001:raise ValueError('Protected pocket clipped/detail allowance exceeded')
     for a,b in zip(route,route[1:]):
         for t in range(21):
             if not inside(author.add(a,author.mul(author.sub(b,a),t/20)),poly):raise ValueError('Route outside boundary')
@@ -112,8 +114,9 @@ class SourceTests(unittest.TestCase):
         mapping=json.loads(author.MAP.read_text())
         expected=[[round(x+78.3,6),round(126.2-y,6)] for x,y,z in mapping['arrival']]
         self.assertEqual(self.layout['arrivalRoute'],expected)
-        self.assertEqual(sum(e['arrivalPortal'] for e in self.layout['boundary']),6)
-        self.assertEqual(self.layout['arrivalPortalHalfWidth'],2.0)
+        self.assertEqual(sum(e['arrivalPortal'] for e in self.layout['boundary']),0)
+        self.assertEqual(self.layout['demoEndpoint']['center'],expected[1])
+        self.assertEqual(self.layout['boundaryRoute'],self.layout['route']+[expected[1]])
         self.assertFalse(self.layout['admission']['collisionExemption'])
         d=copy.deepcopy(self.layout)
         edge=next(e for e in d['boundary'] if not e['arrivalPortal'])

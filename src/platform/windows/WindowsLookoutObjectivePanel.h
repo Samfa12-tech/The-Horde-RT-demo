@@ -22,9 +22,9 @@ public:
     static constexpr int TitleId=4320,BodyId=4321,ContinueId=4322,MenuId=4323,BackId=4324;
     static constexpr const char* Title="THE ROAD AHEAD";
     static constexpr const char* Body=
-        "The village ahead may hold answers about the lantern.\r\n\r\n"
-        "You can keep exploring the woodland and return to the tomb. "
-        "Onward travel belongs to a future chapter.";
+        "The 1.7 demo ends at the timber road closure ahead.\r\n\r\n"
+        "You can keep exploring the lookout and forest trail and return to the tomb. "
+        "Bellwether opens in a future chapter; this is a temporary endpoint.";
     ~WindowsLookoutObjectivePanel() { Close(); }
     WindowsLookoutObjectivePanel()=default;
     WindowsLookoutObjectivePanel(const WindowsLookoutObjectivePanel&)=delete;

@@ -1472,8 +1472,7 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel=createPanel("The road ahead","FOREST LOOKOUT");
         lookoutObjectivePanel=panel;
-        addBody(panel,"The village lies beyond the trees. Continue exploring the lookout with Kit.");
-        addBody(panel,"The onward journey to the village belongs to a future chapter.");
+        addBody(panel,"The 1.7 demo ends at the timber road closure ahead. Bellwether opens in a future chapter; this is a temporary endpoint. You can explore the lookout with Kit or return to the tomb.");
         final Button exploring=createMenuButton("Continue exploring",() -> finishLookoutObjective(epoch,expected,false));
         panel.addView(exploring,menuButtonLayoutParams());
         addMenuButton(panel,"Return to menu",() -> finishLookoutObjective(epoch,expected,true));

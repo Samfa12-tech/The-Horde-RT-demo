@@ -3,7 +3,7 @@
   "policy": "closed-roster",
   "asset": "forest-surroundings-v1",
   "source": "assets/models/world/source/forest-surroundings-v1",
-  "sourceLayoutSha256": "0d18400b99176b7df39955e6fd70e40bc4ace981a9d665988ae89f551fa1a98b",
+  "sourceLayoutSha256": "f45751e67b03e3fb6ce2c9ebe1b49f4bdd29348e4a819b779b218a5c9fee341e",
   "files": [
     {
       "path": "pine-middle.glb",

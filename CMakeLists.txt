@@ -1077,6 +1077,8 @@ if(BUILD_TESTING)
     set_tests_properties(horde_rt_f01_north_grove_tests PROPERTIES TIMEOUT 30)
     add_test(NAME horde_rt_forest_surroundings_native_tests COMMAND horde_rt_forest_dressing_tests --surroundings480)
     set_tests_properties(horde_rt_forest_surroundings_native_tests PROPERTIES TIMEOUT 60)
+    add_test(NAME horde_rt_forest_containment_tests COMMAND horde_rt_forest_dressing_tests --containment)
+    set_tests_properties(horde_rt_forest_containment_tests PROPERTIES TIMEOUT 180)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
     add_test(NAME horde_rt_forest_surroundings_source_tests COMMAND ${Python3_EXECUTABLE}
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/ForestSurroundingsSourceTests.py)

@@ -1,5 +1,10 @@
 # Private 1.7 woodland integration — 1 November 2026
 
+The later [containment correction](../2026-11-01-forest-containment/README.md) closes
+the owner-reported side gaps and adds an approved temporary demo endpoint. Open
+woodland counts and the unconfined-route limitation below describe this earlier
+checkpoint.
+
 The ordinary shared private rescue chapter now loads the admitted forest runtime
 roster on Windows and Android. This supersedes the disabled candidate checkpoint
 in [the earlier composition evidence](../2026-11-01-forest-composition/README.md).

@@ -69,8 +69,16 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 111u,
-          "development registry retains prior views and adds two bounded retention views");
+    Check(kDevelopmentCheckpoints.size() == 113u,
+          "development registry retains prior views and adds two mapped endpoint views");
+    for(const auto name : {"chapter-demo-endpoint", "chapter-demo-endpoint-return"}) {
+        const auto* view=FindDevelopmentCheckpoint(name);
+        Check(view && view->stagesRescueExterior && view->exteriorRouteStation==7u &&
+              view->walksBeyondExteriorStation &&
+              std::abs(view->cameraX-simulation::kPrivateChapterDemoEndpoint.x)<.00001f &&
+              std::abs(view->cameraZ-simulation::kPrivateChapterDemoEndpoint.z)<.00001f,
+              "endpoint views walk from F04 to the mapped turnaround through simulation");
+    }
     for(const auto name : {"chapter-forest-retention-west", "chapter-forest-retention-east"}) {
         const auto* view=FindDevelopmentCheckpoint(name);
         Check(view && view->id>=230 && view->id<=231 &&

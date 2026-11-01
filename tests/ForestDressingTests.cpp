@@ -33,6 +33,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <set>
+#include <deque>
 
 namespace
 {
@@ -1056,6 +1058,140 @@ void TestF01NorthPrototype()
     std::cout<<"F01 north68: extraTriangles=20102 extraVertices=22438 collisionTriangles="<<grove->CollisionTriangles()<<" rootTips="<<tips<<"; actual-source CPU proof, not GPU/visual acceptance\n";
 }
 
+bool auditContainment=false;
+void AuditBoundary(const gameplay::simulation::TriangleSupportSurface& terrain,bool expectContained=true) {
+    using namespace gameplay::traversal;
+    const auto inside=[](float x,float z) {
+        bool hit=false;
+        for(const auto& e:surroundings_layout::edges)if((e.a[2]>z)!=(e.b[2]>z) &&
+            x<(e.b[0]-e.a[0])*(z-e.a[2])/(e.b[2]-e.a[2])+e.a[0])hit=!hit;
+        return hit;
+    };
+    std::size_t moves=0;
+    const auto traverse=[&](float ax,float az,float bx,float bz,float height,float stride,float radius=.22f) {
+        auto start=ChapterExteriorStepSupport(terrain,ax,az,radius,height);
+        if(!start.grounded)return false;
+        const auto steps=std::max(1,int(std::ceil(std::hypot(bx-ax,bz-az)/stride)));
+        float x=ax,z=az,y=start.worldY;
+        for(int step=1;step<=steps;++step) {
+            const float nx=ax+(bx-ax)*float(step)/steps,nz=az+(bz-az)*float(step)/steps;
+            ++moves;
+            if(OnRescueLanding(x,z)||OnRescueLanding(nx,nz)) {
+                const auto support=ChapterExteriorSupport(&terrain,nx,nz);
+                if(!support.grounded || !ChapterExteriorMovementClear(terrain,x,z,nx,nz,y,radius))return false;
+                y=support.worldY;
+            } else {
+                const auto next=ResolveChapterStepMovement(terrain,x,z,nx,nz,y,radius,height);
+                if(!next.accepted)return false;
+                y=next.support.worldY;
+            }
+            x=nx;z=nz;
+        }
+        return true;
+    };
+    // Real 60Hz displacement ceilings: run3.2m/s; dodge.9m/.2s;
+    // crouched movement1m/s. Test oblique crossings and endpoint seams.
+    std::size_t attempted=0,leaks=0;
+    if(expectContained)for(std::size_t edge=0;edge<surroundings_layout::edges.size();++edge) {
+        const auto& e=surroundings_layout::edges[edge];
+        const float dx=e.b[0]-e.a[0],dz=e.b[2]-e.a[2],len=std::hypot(dx,dz);
+        for(int i=0;i<=int(std::ceil(len/.2f));++i) {
+            const float t=std::min(1.f,float(i)*.2f/len),x=e.a[0]+dx*t,z=e.a[2]+dz*t;
+            for(float oblique:{-.7f,0.f,.7f})for(int mode=0;mode<3;++mode) {
+                const float nx=(dz+oblique*dx)/len,nz=(-dx+oblique*dz)/len;
+                const float height=mode==2?1.2f:1.8f,stride=mode==0?3.2f/60:mode==1?4.5f/60:1.f/60;
+                ++attempted;
+                if(traverse(x-nx*1.5f,z-nz*1.5f,x+nx*1.5f,z+nz*1.5f,height,stride,gameplay::kPlayerCollisionRadius)) {
+                    if(leaks++<8)std::cerr<<"Boundary movement leak edge="<<edge<<" t="<<t<<" mode="<<mode<<" angle="<<oblique<<'\n';
+                }
+            }
+        }
+    }
+    Check(leaks==0,"all normal/diagonal/seam approaches reject actual run, dodge and crouch movement");
+    // Independent flood of actual collision movement, not inferred from section
+    // counts. Eight directions include corner cuts; gradual .05m substeps allow
+    // traversable banks to be climbed instead of assuming a long sweep stops them.
+    std::set<std::pair<int,int>> seen{{0,0}};
+    std::deque<std::pair<int,int>> queue{{0,0}};
+    bool escaped=false;std::size_t visited=0;
+    constexpr std::array<std::array<float,2>,7> sentinels{{{-33.7f,-12.8f},{-28.7f,-5.8f},{-15.7f,.2f},{-17.7f,15.2f},{-3.7f,20.2f},{13.3f,36.2f},{22.3f,50.2f}}};
+    std::array<bool,7> reached{};
+    while(!queue.empty() && visited<20000 && !escaped) {
+        const auto [ix,iz]=queue.front();queue.pop_front();++visited;
+        const float x=-33.7f+ix*.35f,z=-12.8f+iz*.35f;
+        for(std::size_t i=0;i<sentinels.size();++i)if(std::hypot(x-sentinels[i][0],z-sentinels[i][1])<.7f)reached[i]=true;
+        for(int dx=-1;dx<=1;++dx)for(int dz=-1;dz<=1;++dz) {
+            if((!dx&&!dz)||seen.contains({ix+dx,iz+dz}))continue;
+            const float nx=x+dx*.35f,nz=z+dz*.35f;
+            if(!traverse(x,z,nx,nz,.75f,.05f))continue;
+            seen.insert({ix+dx,iz+dz});queue.emplace_back(ix+dx,iz+dz);
+            if(!inside(nx,nz)) {std::cerr<<"Flood escaped at "<<nx<<","<<nz<<" from "<<x<<","<<z<<'\n';escaped=true;}
+        }
+    }
+    Check(expectContained?(!escaped && queue.empty() && visited>20):escaped,expectContained?"crouched reachable flood cannot leave closed forest/arrival endpoint, including wraparound":"independent flood must detect an escape on the uncontained original scene");
+    if(expectContained)for(std::size_t i=0;i<reached.size();++i)Check(reached[i],("flood reaches connected route sentinel "+std::to_string(i)).c_str());
+    std::cout<<"Containment audit: sentinels="<<std::count(reached.begin(),reached.end(),true)<<" approaches="<<attempted<<" leaks="<<leaks<<" floodCells="<<visited<<" movementSteps="<<moves<<'\n';
+}
+
+void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {
+    namespace sim=gameplay::simulation;namespace cp=gameplay::campaign;
+    cp::Checkpoint record;record.contentRevision=2;record.id=cp::CheckpointId::ForestEndpoint;
+    record.zone=sim::WorldZoneId::Lookout;record.firstAscentCompleted=true;
+    record.guards={cp::GuardPose{-4.f,-15.2f,.3f},cp::GuardPose{-6.f,-16.f,-.7f}};
+    const auto anchor=sim::kWorldRoutePoints.back();const auto ground=terrain->Query(anchor.x,anchor.z);
+    record.position={anchor.x,ground.worldY,anchor.z};record.yaw=2.57f;
+    record.dialogue.grateConsumed=record.dialogue.rescueConsumed=record.dialogue.reunionStarted=true;
+    record.dialogue.proofAccepted=record.dialogue.forestNightConsumed=record.dialogue.forestWaystoneConsumed=true;
+    record.dialogue.forestClueConsumed=record.dialogue.forestVillageConsumed=true;
+    Check(cp::Validate(record),"canonical old forest save remains valid with new demo endpoint");
+    auto outside=record;outside.position.x=40;outside.position.z=60;
+    Check(!cp::Validate(outside),"old arbitrary off-trail position cannot be a valid persistent checkpoint");
+    sim::GameSimulation simulation(sim::ProductionGameSimulationConfig());std::uint64_t sequence=100;
+    const auto inside=[](float x,float z){bool hit=false;for(const auto& e:surroundings_layout::edges)
+        if((e.a[2]>z)!=(e.b[2]>z)&&x<(e.b[0]-e.a[0])*(z-e.a[2])/(e.b[2]-e.a[2])+e.a[0])hit=!hit;return hit;};
+    for(unsigned cycle=0;cycle<3;++cycle) {
+        const auto token=simulation.BeginCampaignRestore(record);
+        Check(token && simulation.CommitCampaignRestore(*token,{token->worldGeneration,record.zone},terrain,{},sequence),
+              "repeat load/retry commits canonical lookout on actual final support");
+        if(!token)return;
+        // Match PublishDevelopmentWorldReadiness: the final native fixture owns
+        // the whole scene, not only the restored destination zone.
+        for(std::size_t zone=0;zone<sim::kWorldZones.size();++zone) {
+            const sim::WorldZoneToken ready{token->worldGeneration,static_cast<sim::WorldZoneId>(zone)};
+            if(zone==0)simulation.PublishWorldZoneReadiness(ready,sim::ZoneReadiness::Ready);
+            else simulation.PublishChapterTerrain(ready,terrain);
+        }
+        gameplay::simulation::InputSnapshot neutral;neutral.damageEnabled=false;neutral.yawRadians=record.yaw;
+        simulation.StepFixed(neutral,1.f/60.f,++sequence);
+        bool contained=true,sawDodge=false,sawCrouch=false;float maxSpeed=0;
+        gameplay::simulation::InputSnapshot input;input.damageEnabled=false;input.moveForward=1;input.runHeld=true;input.yawRadians=2.570255f;
+        for(unsigned tick=0;tick<600;++tick) {
+            if(cycle==1 && tick>=420){input.runHeld=false;input.crouchHeld=true;}
+            if(cycle==2 && tick%40==0) {++input.commands.dodge;}
+            simulation.StepFixed(input,1.f/60.f,++sequence);
+            const auto& snap=simulation.Snapshot();contained=contained&&inside(snap.playerX,snap.playerZ)&&snap.playerGrounded;
+            maxSpeed=std::max(maxSpeed,snap.playerMovementSpeedMetresPerSecond);sawDodge|=snap.dodgeActive;sawCrouch|=snap.crouchActive;
+        }
+        Check(contained,"actual held-run/crouch/repeated-dodge simulation cannot cross temporary closure");
+        Check(std::hypot(simulation.Snapshot().playerX-anchor.x,simulation.Snapshot().playerZ-anchor.z)>17.5f,
+              "movement reaches the temporary barrier beyond arrival waypoint");
+        std::cout<<"Endpoint cycle="<<cycle<<" position="<<simulation.Snapshot().playerX<<","<<simulation.Snapshot().playerZ<<" maxSpeed="<<maxSpeed<<'\n';
+        if(cycle==1)Check(sawCrouch,"crouch input reaches authoritative lowered posture");
+        if(cycle==2)Check(sawDodge,"dodge input reaches authoritative dodge motion");
+        if(cycle==0)Check(maxSpeed>3.19f,"endpoint approach exercises actual maximum run speed");
+        input={};input.damageEnabled=false;input.moveForward=1;input.runHeld=true;
+        for(unsigned tick=0;tick<700;++tick) {
+            const auto& snap=simulation.Snapshot();const float dx=anchor.x-snap.playerX,dz=anchor.z-snap.playerZ;
+            if(std::hypot(dx,dz)<.4f)break;
+            input.yawRadians=std::atan2(dx,-dz);simulation.StepFixed(input,1.f/60.f,++sequence);
+        }
+        Check(std::hypot(simulation.Snapshot().playerX-anchor.x,simulation.Snapshot().playerZ-anchor.z)<.5f,
+              "temporary endpoint permits return/backtracking to persistent lookout anchor");
+        Check(simulation.LatestCampaignBoundary() && cp::Validate(*simulation.LatestCampaignBoundary()),
+              "movement does not replace the canonical safe checkpoint with a blocked/off-trail position");
+    }
+}
+
 void TestFullSurroundings()
 {
     std::string diagnostic;
@@ -1082,9 +1218,10 @@ void TestFullSurroundings()
     const bool accepted=AppendPreparedForestSurroundings(kRoot/"assets",*original,owner,terrain,result,diagnostic);
     Check(accepted,diagnostic);if(!accepted)return;
     const auto& r=result->report;
-    Check(r.extraTrees==416 && r.addedTreeTriangles==190784 && r.boundarySectionsContained && !r.boundaryContained && r.arrivalPortalRuns==6 &&
-          r.fenceRuns+r.naturalBankRuns+r.arrivalPortalRuns+r.openWoodlandRuns==196 && r.terminalFencePosts>0 && r.fenceTriangles==r.fenceRuns*48+r.terminalFencePosts*12 && r.boundaryCollisionTriangles==r.fenceRuns*20+r.terminalFencePosts*8,
-          "full study owns exact additional trees and only rendered boundary sections with explicit open arrival");
+    if(auditContainment) {AuditBoundary(*baselineTerrain,false);AuditBoundary(*terrain);TestEndpointRecovery(terrain);}
+    Check(r.extraTrees==416 && r.addedTreeTriangles==190784 && r.boundarySectionsContained && r.boundaryContained && r.arrivalPortalRuns==0 &&
+          r.fenceRuns+r.naturalBankRuns+r.rockRuns==surroundings_layout::edges.size() && r.openWoodlandRuns==0 && r.terminalFencePosts>0 && r.fenceTriangles==r.fenceRuns*48+r.terminalFencePosts*12 && r.boundaryCollisionTriangles==r.fenceRuns*20+r.terminalFencePosts*8+r.rockTriangles,
+          "full study owns exact additional trees and closed rendered boundary and temporary endpoint after mapped arrival approach");
     Check(r.treeContactTriangles==10648 && r.understoryClumps==120 && r.understoryTriangles==70560,"every candidate includes real lower tree contact and bounded understory");
     Check(owner.materials.size()==baseline.materials.size() && owner.primitives.size()==baseline.primitives.size() &&
           owner.indices.size()==baseline.indices.size()+r.addedIndices && owner.HasValidTriangleProvenance(),
@@ -1107,6 +1244,7 @@ void TestFullSurroundings()
             for(float height:{.75f,1.8f}) {
                 const bool oldClear=baselineTerrain->NonWalkableVolumeClear(x,z,x,z,ground.worldY+.05f,ground.worldY+height,.22f);
                 const bool newClear=terrain->NonWalkableVolumeClear(x,z,x,z,ground.worldY+.05f,ground.worldY+height,.22f);
+                if(oldClear && !newClear && clearance)std::cerr<<"New route obstruction at "<<x<<","<<z<<" height="<<height<<'\n';
                 clearance=clearance && (!oldClear || newClear);++clearanceProbes;
             }
         }
@@ -1166,7 +1304,7 @@ void TestFullSurroundings()
           ForestRepresentationDigest(owner,{})==digest && terrain==retained && result==prior,
           "failed candidate preparation preserves all already published geometry/support/receipts");
     std::cout<<"Surroundings native: trees="<<64+r.extraTrees<<" fences="<<r.fenceRuns<<" natural="<<r.naturalBankRuns
-             <<" treeContact="<<r.treeContactTriangles<<" openWoodland="<<r.openWoodlandRuns<<" understoryTriangles="<<r.understoryTriangles<<" fenceTriangles="<<r.fenceTriangles<<" boundaryCollision="<<r.boundaryCollisionTriangles<<" crossingProbes="<<r.boundaryProbes
+             <<" retainedSupportBytes="<<terrain->RetainedBytes()<<" baseline64SupportBytes="<<baselineTerrain->RetainedBytes()<<" rocks="<<r.rockRuns<<" rockTriangles="<<r.rockTriangles<<" totalSupport="<<terrain->TriangleCount()+terrain->NonWalkableTriangleCount()+terrain->StepTriangleCount()<<" treeContact="<<r.treeContactTriangles<<" openWoodland="<<r.openWoodlandRuns<<" understoryTriangles="<<r.understoryTriangles<<" fenceTriangles="<<r.fenceTriangles<<" boundaryCollision="<<r.boundaryCollisionTriangles<<" crossingProbes="<<r.boundaryProbes
              <<" routeClearanceProbes="<<clearanceProbes<<" cpuSubsetTriangles="<<omissions.size()<<" addedRawBytes="<<r.addedVertices*sizeof(StaticRtVertex)+r.addedIndices*4<<" sourceWitness="<<digest<<'\n';
 }
 
@@ -1835,6 +1973,7 @@ void TestTriangleRegionFailures()
 
 int main(int argc,char** argv)
 {
+    if(argc==2 && std::string_view(argv[1])=="--containment") {auditContainment=true;TestFullSurroundings();return failures?1:0;}
     if(argc==2 && std::string_view(argv[1])=="--surroundings480") { TestFullSurroundings();return failures?1:0; }
     if(argc==2 && std::string_view(argv[1])=="--f01-north68") {
         TestF01NorthPrototype();TestNativeChapterPrimitiveOwnership(true);
