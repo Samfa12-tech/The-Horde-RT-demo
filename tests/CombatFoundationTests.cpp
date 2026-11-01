@@ -2379,7 +2379,9 @@ struct RevivalIntegrationFixture {
     GameSimulation sim{Config()};
     InputSnapshot input{};
     int cries=0, defeats=0;
-    RevivalIntegrationFixture() {
+    bool naturalPath=false;
+    RevivalIntegrationFixture(bool natural=false) : sim([&]{auto cfg=Config();cfg.naturalPracticeRevival1_7=natural;
+        if(natural)cfg.sequentialPractice1_7=true;return cfg;}()), naturalPath(natural) {
         input.yawRadians=1.57079632679f; input.tutorialSlowdownEnabled=false;
         Check(sim.ConfigureSkeletonRevivalPresentation(1,kRevivalDeadSeconds,kRevivalStandSeconds),
               "revival integration admits the exact Dead89/30 and Stand1.5 owner receipt");
@@ -2445,6 +2447,7 @@ struct RevivalIntegrationFixture {
         Check(learned.blockLearned && learned.parryLearned && learned.dodgeLearned &&
               learned.attackFromGuardLearned && learned.stage==TutorialStage::Ready && learned.safePractice,
               "revival integration earns all four lessons through actual contacts and guard-attack recovery");
+        if(naturalPath)return true;
         if(!Tell(.30f)) return false;
         ++input.commands.tutorialSkip; Step();
         Check(sim.Snapshot().combatTeaching.exitPending && sim.Snapshot().combatTeaching.safePractice,
@@ -2674,9 +2677,61 @@ void RevivalIntegrationReplayAndOptOut() {
           !disabled.ConfigureSkeletonRevivalPresentation(1,kRevivalDeadSeconds,kRevivalStandSeconds),
           "the normal default remains revival-OFF even if a presentation receipt is offered");
 }
+void NaturalRevivalIntegration() {
+    using Phase=SkeletonRevivalPhase;
+    RevivalIntegrationFixture f(true);
+    Check(f.LearnAndFinish(),"natural private path earns all four actual outcomes without Finish");
+    Check(f.input.commands.tutorialSkip==0 && f.sim.Snapshot().combatTeaching.safePractice &&
+        f.sim.Snapshot().combatTeaching.stage==TutorialStage::Ready,
+        "four skills retain protection and proceed directly to real practice kills");
+    f.sim.ConfigureSkeletonRevivalPresentation(2,kRevivalDeadSeconds,kRevivalStandSeconds,false);
+    if(!f.KillPair())return;
+    f.Step(240);
+    Check(f.cries==0 && f.sim.Snapshot().skeletonRevival.phase==Phase::FirstFight &&
+        f.sim.Snapshot().combatTeaching.safePractice && f.sim.Snapshot().playerVitals.vitality==3,
+        "actual protected practice kills cannot consume a cry before aggregate resource/audio readiness");
+    f.sim.ConfigureSkeletonRevivalPresentation(3,kRevivalDeadSeconds,kRevivalStandSeconds);
+    Check(f.Until([&]{return f.sim.Snapshot().skeletonRevival.phase==Phase::Signal;},10) && f.cries==1,
+        "settled real practice corpses automatically emit one authoritative lich cue without a menu command");
+    auto signalRetry=f;signalRetry.sim.RetryEncounter();
+    Check(signalRetry.sim.Snapshot().skeletonRevival.phase==Phase::Live &&
+        signalRetry.sim.Snapshot().combatTeaching.stage==TutorialStage::Complete &&
+        !signalRetry.sim.Snapshot().combatTeaching.safePractice && signalRetry.cries==1,
+        "retry after consuming the cry immediately restores the live fight without stale practice protection");
+    f.input.paused=true; const auto phaseTime=f.sim.Snapshot().skeletonRevival.phaseSeconds; f.Step(20);
+    Check(f.sim.Snapshot().skeletonRevival.phaseSeconds==phaseTime && f.cries==1,
+        "pause preserves the consumed signal without advancing or repeating it");
+    f.input.paused=false;
+    Check(f.Until([&]{return f.sim.Snapshot().skeletonRevival.phase==Phase::Rising;},60),"natural rise follows the single cry lead");
+    f.sim.ConfigureSkeletonRevivalPresentation(4,kRevivalDeadSeconds,kRevivalStandSeconds,false,true);
+    const auto frozenRise=f.sim.Snapshot().skeletonRevival.phaseSeconds;f.Step(60);
+    Check(f.sim.Snapshot().skeletonRevival.phaseSeconds==frozenRise && !f.sim.Snapshot().skeletonRevivalPresentationReady &&
+        f.sim.Snapshot().skeletonRevivalVisualReady && f.cries==1,
+        "audio reload freezes the authoritative rise while current visual clips can present its frozen pose");
+    f.sim.ConfigureSkeletonRevivalPresentation(5,kRevivalDeadSeconds,kRevivalStandSeconds);
+    Check(f.Until([&]{return f.sim.Snapshot().skeletonRevival.phase==Phase::Live;},600) && f.cries==1 &&
+        f.sim.Snapshot().swordCombat.aliveCount==2 && !f.sim.Snapshot().combatTeaching.safePractice &&
+        f.sim.Snapshot().combatTeaching.stage==TutorialStage::Complete,
+        "visible reverse/stand/rearm clocks precede atomic revival and automatic protection exit");
+    Check(horde::platform::windows::CombatTeachingPromptText(f.sim.Snapshot().combatTeaching,true).find("LIVE FIGHT:")!=std::string::npos,
+        "the exact shared live publication explicitly announces damage eligibility");
+    auto retry=f; retry.sim.RetryEncounter();retry.Step();
+    Check(retry.sim.Snapshot().skeletonRevival.consumed && retry.sim.Snapshot().skeletonRevival.phase==Phase::Live && retry.cries==1,
+        "retry retains one-time consumption and learned completion without a repeated revival");
+    f.NearActor(0); const auto health=f.sim.Snapshot().playerVitals.vitality;
+    Check(f.Until([&]{return f.sim.Snapshot().playerVitals.vitality<health || f.sim.Snapshot().playerVitals.halfHeart;},600),
+        "the actual revived attacker deals live damage after the protected-to-live HUD handoff");
+    f.input.damageEnabled=false;
+    if(f.KillPair()) {f.Step();Check(f.sim.Snapshot().openingEncounterComplete && f.cries==1,
+        "only final pair defeat completes the natural opening and never replays the cue");}
+    RevivalIntegrationFixture skip(true); ++skip.input.commands.tutorialSkip;
+    Check(skip.Until([&]{return skip.sim.Snapshot().skeletonRevival.phase==Phase::Live;},300) && skip.cries==0 &&
+        skip.sim.Snapshot().combatTeaching.stage==TutorialStage::Skipped,
+        "natural private candidate retains the explicit Skip opt-out without a forced revival");
+}
 void RevivalIntegrationProfile() {
     std::cout<<"revival integration: actual outcomes with unit-staged player poses; not a natural playthrough\n";
-    RevivalIntegrationEarnedPath(); RevivalIntegrationReplayAndOptOut();
+    RevivalIntegrationEarnedPath(); RevivalIntegrationReplayAndOptOut(); NaturalRevivalIntegration();
 }
 } // namespace
 

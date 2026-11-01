@@ -88,6 +88,8 @@ struct InputSnapshot
     bool guardHeld = false;
     // Retained for deterministic posture fixtures. Ordinary controls use head clearance.
     bool crouchHeld = false;
+    std::uint64_t revivalAudioGeneration = 0;
+    bool revivalAudioReady = false; // Coherent decoded SoundPool ownership, independent of mute.
     bool tutorialEnabled = true;
     bool tutorialSlowdownEnabled = false;
     std::uint32_t dialogueCompletionLine = 0;

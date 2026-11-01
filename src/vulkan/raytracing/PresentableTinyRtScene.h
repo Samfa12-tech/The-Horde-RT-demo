@@ -597,6 +597,8 @@ public:
     }
     std::uint32_t TlasCount() const { return ready_ ? kTlasCount : 0u; }
     std::uint32_t TlasInstanceCount() const { return ready_ ? tlasInstanceCount_ : 0u; }
+    float SkeletonRevivalDeadDuration() const { return ready_ ? characterSlot_.SkeletonDeadClipDuration() : 0.f; }
+    float SkeletonRevivalStandDuration() const { return ready_ ? characterSlot_.SkeletonStandClipDuration() : 0.f; }
     std::size_t SkeletonPoseBucketCount() const { return characterSlot_.SkeletonPoseBucketCount(); }
     std::uint32_t PlayerSkinCadenceHz() const { return 60u; }
     std::uint64_t PlayerSkinUpdateCount() const { return playerSkinUpdateCount_; }

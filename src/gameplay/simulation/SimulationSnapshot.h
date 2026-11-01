@@ -125,6 +125,7 @@ struct SimulationSnapshot
     AttackWarningPresentation attackWarning{};
     SkeletonRevivalSnapshot skeletonRevival{};
     bool skeletonRevivalPresentationReady = false;
+    bool skeletonRevivalVisualReady = false; // Current clip can render a frozen rise while audio reloads.
     float skeletonRevivalDeadDurationSeconds = 0.0f;
     float skeletonRevivalStandDurationSeconds = 0.0f;
     float keeperRepelRemainingSeconds = 0.0f;

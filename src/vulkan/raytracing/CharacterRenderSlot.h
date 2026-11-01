@@ -143,6 +143,7 @@ public:
     const std::vector<horde::scene::TexturedSkinnedRtVertex>& LichVertices() const { return lichSkinnedVertices_; }
     const std::array<float, 3u>& LichStaffLocalSample() const { return lichStaffLocalSample_; }
     float SkeletonDeadClipDuration() const { return skeletonDeadClipDuration_; }
+    float SkeletonStandClipDuration() const { return skeletonStandClipDuration_; }
     std::size_t SkeletonPoseBucketCount() const { return skeletonPoseBucketCount_; }
 
     void AccumulateResourceInventory(
@@ -175,7 +176,7 @@ private:
     int lastLichClip_ = -1;
     CharacterBlasRefit pendingRefit_ = CharacterBlasRefit::None;
     std::size_t skeletonPoseBucketCount_ = 0u;
-    float skeletonDeadClipDuration_ = 0.0f;
+    float skeletonDeadClipDuration_ = 0.0f, skeletonStandClipDuration_ = 0.0f;
     CharacterFramePlan cachedFramePlan_{};
     bool skeletonOnly_ = false;
 };

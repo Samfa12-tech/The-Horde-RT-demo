@@ -698,7 +698,7 @@ A private full-duration mono 48 kHz PCM16 draft is 175,104 frames / 3.648 second
 Its conversion is an equal L/2+R/2 downmix, without amplification, trimming,
 pitch or timing change. Conversion alone does not grant standalone redistribution.
 
-Neither source nor draft is in public assets, runtime manifests, or packages.
+At the 25 October audition checkpoint, neither source nor draft was in public assets, runtime manifests, or packages. The explicit private game candidate admission below supersedes only that private-package boundary.
 Only an explicit Debug local-file audition can load the exact pinned draft from
 `debug_audio/lich_revival.wav` within the isolated Windows application directory
 or Android app-private files directory. Missing or changed files are diagnosed;
@@ -707,6 +707,26 @@ Actual listening, mix, encounter admission and any game-distribution decision ar
 still pending. Current terms (checked 2026-10-25) distinguish an integrated new
 creative work from standalone content distribution; this note does not admit the
 standalone audio to the public repository.
+
+## Private owner revival game integration (1 November 2026)
+
+The exact full-duration revival WAV above is admitted only to the explicit private
+owner game candidate, integrated with the one-time lich event and shared encounter.
+The source MP3 and original recordings remain external. No audio bytes or standalone
+sound download are added to public Git/LFS. The local Android Debug property and
+isolated Windows acceptance option verify the pinned WAV and stand derivative;
+ordinary/public build defaults remain unchanged. This is game-integration admission
+for the authorised private test, not public asset redistribution, listening approval,
+a release decision or a change to the existing owner-controlled skeleton rights.
+
+The private stand derivative SHA-256 is
+`800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259`.
+Its original geometry/static data and eleven clips are unchanged; the appended
+`SkeletonProof|StandDead0ToIdle` is original project authoring. Existing skeleton
+Hotstrike/Meshy provenance and restrictions remain. The accepted native and RT
+proof is recorded in `docs/evidence/2026-10-25-skeleton-stand-native/README.md`.
+No rejected generic blend is admitted. Private package source/runtime identities,
+checks and remaining physical acceptance are recorded in the current revival receipt.
 
 ## Healing flask r1 - original source-only study, 26 October 2026
 

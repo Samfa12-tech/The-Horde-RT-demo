@@ -259,6 +259,18 @@ public final class CombatTeachingPreferencesTest {
         assertTrue(retry.contains("clear its reach"));
         assertTrue(retry.contains("[Dodge] + move"));
     }
+    @Test public void naturalPrivateContinuationExplainsKillsRiseAndLiveWithoutFinish() {
+        long ready=6L|(1L<<13)|(1L<<39)|(2L<<36);
+        assertTrue(CombatTeachingPreferences.prompt(ready,true).contains("Defeat both skeletons"));
+        assertFalse(CombatTeachingPreferences.prompt(ready,true).contains("Finish"));
+        assertEquals(R.string.combat_teaching_skip,CombatTeachingPreferences.practiceActionLabelResource(ready));
+        long rising=6L|(1L<<13)|(1L<<39)|(4L<<36);
+        assertTrue(CombatTeachingPreferences.prompt(rising).contains("still protected"));
+        long live=2L|(1L<<39)|(6L<<36);
+        assertTrue(CombatTeachingPreferences.prompt(live).contains("enemies now deal damage"));
+        assertFalse(CombatTeachingPreferences.safePractice(live));
+        assertEquals(255,CombatTeachingPreferences.promptOpacity(live));
+    }
     @Test public void reducedMotionRemovesOpacityAnimationButKeepsVisibleState() {
         assertEquals(0.5f, CombatTeachingPreferences.alpha(128, false), 0.01f);
         assertEquals(1.0f, CombatTeachingPreferences.alpha(128, true), 0.0f);

@@ -235,7 +235,7 @@ void PumpCampaign(VulkanSurfaceContext& ctx)
                     }
                     else if(!PrepareCampaignResources(ctx))fail("New game resources could not prepare. Current game retained.");
                     else {
-                        auto candidate=std::make_unique<horde::gameplay::simulation::GameSimulation>(horde::gameplay::simulation::ProductionGameSimulationConfig());
+                        auto candidate=std::make_unique<horde::gameplay::simulation::GameSimulation>(horde::gameplay::simulation::PrivateRevivalApplicationConfig());
                         candidate->StartLiveDevelopmentRescueJourney(true);
                         if(!DrainCampaignResources(ctx) || !ctx.campaign->BeginNewGame(command.slot))fail("New game could not start. Current game retained.");
                         else {ctx.simulation=std::move(*candidate);ctx.campaignNewGame=true;FinishCampaignCommit(ctx);}

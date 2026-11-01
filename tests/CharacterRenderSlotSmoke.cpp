@@ -115,7 +115,7 @@ bool HasCoherentAndroidTuning(const std::string& renderFrame,const std::string& 
         CountOccurrences(renderFrame,"gRtLabState.Snapshot()") == 1u &&
         renderFrame.find("simulationInput.waterfallWidthScale = rtLabTuning.waterfallWidthScale;") != std::string::npos &&
         renderFrame.find("rtLabTuning, context.graphicsSettings.shadowQuality);") != std::string::npos &&
-        renderFrame.find("                    rtLabTuning);") != std::string::npos &&
+        renderFrame.find("                    rtLabTuning, std::nullopt, std::nullopt,") != std::string::npos &&
         CountOccurrences(routeReset,"gRtLabState.Reset();") == 1u;
 }
 
@@ -2047,8 +2047,8 @@ int main()
                       androidBridgeSource.find(
                           "kProductionPlayerRenderRoute") !=
                           std::string::npos &&
-                      androidBridgeSource.find("ProductionGameSimulationConfig()") !=
-                          std::string::npos,
+                      androidBridgeSource.find("PrivateRevivalApplicationConfig()") != std::string::npos &&
+                      ReadTextFile(root / "src/gameplay/simulation/PrivateRevivalApplication.h").find("auto config=ProductionGameSimulationConfig();") != std::string::npos,
                       "Android gameplay/reward/glass must use the accepted production route and shared anatomical profile");
         const auto androidRouteReset=androidFunctionSource(
             "Java_com_samfa12_hordelanternrt_ProbeBridge_requestRouteReset(");

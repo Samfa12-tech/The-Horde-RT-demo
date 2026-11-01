@@ -9,6 +9,22 @@ import java.nio.charset.CodingErrorAction
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 
+// Explicit private owner candidate; binaries stay outside Git and public runtime assets.
+def privateRevivalDirectory = providers.gradleProperty('hordePrivateRevivalDir').orNull
+if(privateRevivalDirectory) {
+    def privateRoot=file(privateRevivalDirectory)
+    def privateFiles=[]
+    privateRoot.eachFileRecurse(groovy.io.FileType.FILES) { privateFiles.add(privateRoot.toPath().relativize(it.toPath()).toString().replace('\\','/')) }
+    if(privateFiles.sort()!=['private_revival/lich_revival.wav','private_revival/skeleton.glb'])
+        throw new GradleException('Private revival directory must contain only the two pinned runtime derivatives; no source audio/models.')
+    ['skeleton.glb':'800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259',
+     'lich_revival.wav':'1e1891010f4c89e6f20ec5fba90191aa0f0999c0bd95a4df3fe36659beb9e521'].each { name,expected ->
+        def asset=new File(privateRoot,'private_revival/'+name)
+        if(!asset.isFile() || java.security.MessageDigest.getInstance('SHA-256').digest(asset.bytes).encodeHex().toString()!=expected)
+            throw new GradleException('Private revival requires the exact admitted local '+name)
+    }
+}
+
 def hordeVersionFile = rootProject.file('../VERSION')
 def hordeVersionCodeMapFile = rootProject.file('../version-code-map.json')
 def readHordeUtf8Authority = { File authorityFile, String authorityName ->
@@ -644,6 +660,7 @@ android {
         targetSdk 34
         versionCode hordeVersionCode.intValue()
         versionName hordeVersionName
+        buildConfigField 'boolean', 'PRIVATE_REVIVAL', 'false'
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
         buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', 'false'
@@ -682,6 +699,7 @@ android {
 
     buildTypes {
         debug {
+            buildConfigField 'boolean', 'PRIVATE_REVIVAL', privateRevivalDirectory ? 'true' : 'false'
             applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
             buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', outdoorScaleProbe ? 'true' : 'false'
@@ -693,7 +711,7 @@ android {
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
+                    arguments "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}", '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
@@ -752,6 +770,7 @@ android {
     sourceSets {
         main.assets.srcDirs = [runtimeAssetsDir.get().asFile]
         if (viewmodelCandidate) debug.assets.srcDir(viewmodelOverlayDir)
+        if (privateRevivalDirectory) debug.assets.srcDir(file(privateRevivalDirectory))
     }
 }
 

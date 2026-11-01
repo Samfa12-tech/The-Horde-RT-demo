@@ -193,5 +193,6 @@ public final class ProbeBridge {
     public static native String getBenchmarkReport();
     public static native int getRuntimeState();
     public static native long getWaterfallStereoGains();
+    public static native void setRevivalAudioReady(long generation, boolean ready);
     public static native long[] drainPlatformEvents();
 }

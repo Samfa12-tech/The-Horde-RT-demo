@@ -47,7 +47,7 @@ inline constexpr std::uint32_t AttackReadabilityColourRgb(
 
 inline const char* CombatPracticeActionLabel(const gameplay::simulation::CombatTeachingSnapshot& teaching)
 {
-    return teaching.stage == gameplay::simulation::TutorialStage::Ready ? "Finish practice" : "Skip practice";
+    return !teaching.naturalContinuation && teaching.stage == gameplay::simulation::TutorialStage::Ready ? "Finish practice" : "Skip practice";
 }
 
 inline std::string CombatTeachingLessonText(
@@ -60,6 +60,11 @@ inline std::string CombatTeachingLessonText(
     if(teaching.exitPending || teaching.cue==CombatTeachingCue::ExitPending)return "Practice ending: enemies can hurt you next.";
     if(teaching.cue==CombatTeachingCue::Replay)return "Menu: Replay opening practice or Skip to continue";
     if(teaching.stage==TutorialStage::Complete || teaching.stage==TutorialStage::Skipped)return {};
+    if(teaching.stage==TutorialStage::Ready && teaching.naturalContinuation) {
+        if(teaching.continuationPhase>=3 && teaching.continuationPhase<=5)
+            return "The lich calls them back. Stay clear; you are still protected.";
+        return "Skills learned! Defeat both skeletons. You are still protected.";
+    }
     if(teaching.stage==TutorialStage::Ready || teaching.cue==CombatTeachingCue::Ready)
         return "Menu: Finish practice - enemies can hurt you";
     if(teaching.cue==CombatTeachingCue::Learned)return "Well parried - strike back";
@@ -95,6 +100,8 @@ inline std::string CombatTeachingPromptText(
         const auto lesson=CombatTeachingLessonText(teaching,controller);
         if(!lesson.empty())text+=(text.empty()?"":"\r\n")+lesson;
     }
+    if(teaching.naturalContinuation && teaching.continuationPhase==6)
+        text+=(text.empty()?"":"\r\n")+std::string("LIVE FIGHT: protection ended - enemies now deal damage.");
     if(waitingForRevivalClearance)
         text+=(text.empty()?"":"\r\n")+std::string("Step back from the skeletons.");
     if(teaching.attackReadability==AttackReadability::Parryable)

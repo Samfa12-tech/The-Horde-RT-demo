@@ -70,6 +70,8 @@ enum class CombatTeachingCue : std::uint8_t
 };
 struct CombatTeachingSnapshot
 {
+    bool naturalContinuation = false;
+    std::uint8_t continuationPhase = 0;
     bool enabled = false;
     bool parryLearned = false;
     bool dodgeLearned = false;
@@ -96,6 +98,12 @@ struct CombatTeachingSnapshot
 class CombatTeaching
 {
 public:
+    void CompleteNaturalPractice() {
+        if(snapshot_.stage==TutorialStage::Ready && !snapshot_.exitPending) {
+            snapshot_.stage=TutorialStage::Complete; CancelTransient();
+        }
+    }
+    void SetNaturalContinuation(bool enabled) { natural_=enabled; }
     void SetSequentialPractice(bool enabled) { sequential_=enabled; }
     void Reset(bool enabled)
     {
@@ -214,7 +222,7 @@ public:
         snapshot_.enabled = enabled || (snapshot_.exitPending && exitProtection_);
         if (snapshot_.exitPending && openingExitSeconds_<=0.f && !suspended && SafeExit(combat, keeper, selectedEnemy))
         {
-            snapshot_.stage = snapshot_.stage == TutorialStage::Ready ? TutorialStage::Complete : TutorialStage::Skipped;
+            snapshot_.stage = snapshot_.stage == TutorialStage::Ready && !natural_ ? TutorialStage::Complete : TutorialStage::Skipped;
             snapshot_.exitPending = false; exitProtection_=false;
             snapshot_.enabled = enabled;
         }
@@ -333,7 +341,7 @@ private:
     // neither is the published active-teaching flag used by frozen captures.
     float openingExitSeconds_=0.f;
     bool openingExitRequested_=false;
-    bool sequential_=false;
+    bool sequential_=false, natural_=false;
     bool requestedEnabled_=false, exitProtection_=false;
     bool dodgeOnly_=false; // Existing explicit Keeper practice, not story progress.
     bool guardAttackPending_=false, guardAttackHit_=false;

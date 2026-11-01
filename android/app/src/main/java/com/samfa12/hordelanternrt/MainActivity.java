@@ -294,6 +294,8 @@ public class MainActivity extends Activity {
     private long chapterVoiceGeneration = Long.MIN_VALUE;
     private int chapterVoiceStream;
     private PrivateLichRevivalAudio privateLichRevivalAudio;
+    private int privateRevivalSoundId;
+    private long privateRevivalAudioGeneration;
     private int chapterAmbienceStream;
     private boolean chapterAmbienceDialogueActive;
     private boolean chapterVoicePaused;
@@ -923,6 +925,12 @@ public class MainActivity extends Activity {
     /** Only the existing closed runtime cache roster; no reports, settings or save storage. */
     private boolean[] stageRuntimeAssetCache() {
             final boolean skeletonStaged = stageAsset(SKELETON_ASSET, SKELETON_FILE);
+            if(BuildConfig.PRIVATE_REVIVAL && (!stageAsset("private_revival/skeleton.glb","private_revival/skeleton.glb") ||
+                !stageAsset("private_revival/lich_revival.wav","debug_audio/lich_revival.wav") ||
+                PrivateLichRevivalAudio.validatePinnedFile(new File(getFilesDir(),"private_revival/skeleton.glb"),31672176L,
+                    "800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259")!=null ||
+                PrivateLichRevivalAudio.validate(getFilesDir())!=null))
+                throw new IllegalStateException("Pinned private revival assets failed staging or identity verification.");
             final boolean lichStaged = stageAsset(LICH_ASSET, LICH_FILE);
             final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2", "diff-array-512-astc6x6.ktx2")
                     && stageAsset("textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2", "normal-array-512-astc4x4.ktx2")
@@ -7452,8 +7460,10 @@ public class MainActivity extends Activity {
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build();
+        synchronized(loadedSounds){loadedSounds.clear();}
         soundPool = new SoundPool.Builder().setMaxStreams(5).setAudioAttributes(attributes).build();
         soundPool.setOnLoadCompleteListener((pool, soundId, status) -> {
+            if(pool!=soundPool)return;
             if (status == 0) {
                 synchronized (loadedSounds) {
                     loadedSounds.add(soundId);
@@ -7602,11 +7612,14 @@ public class MainActivity extends Activity {
     }
 
     private void initialisePrivateLichRevivalAudio() {
-        if(!PrivateLichRevivalAudio.enabled(BuildConfig.DEBUG,getIntent()!=null &&
+        if(!BuildConfig.PRIVATE_REVIVAL && !PrivateLichRevivalAudio.enabled(BuildConfig.DEBUG,getIntent()!=null &&
                 getIntent().getBooleanExtra(PrivateLichRevivalAudio.INTENT_OPT_IN,false)))return;
         String error=PrivateLichRevivalAudio.validate(getFilesDir());
         if(error!=null){Log.e(TAG,error);return;}
+        privateRevivalAudioGeneration=android.os.SystemClock.elapsedRealtimeNanos();
+        ProbeBridge.setRevivalAudioReady(privateRevivalAudioGeneration,false);
         final int id=soundPool.load(PrivateLichRevivalAudio.file(getFilesDir()).getAbsolutePath(),1);
+        privateRevivalSoundId=id;
         if(id==0){Log.e(TAG,"SoundPool rejected the verified private revival WAV.");return;}
         privateLichRevivalAudio=new PrivateLichRevivalAudio(new PrivateLichRevivalAudio.Sink() {
             public int start(float left,float right) {
@@ -7628,6 +7641,10 @@ public class MainActivity extends Activity {
         catch(RuntimeException | LinkageError unavailable){return 0.f;}
     }
     private void updatePrivateLichRevivalAudio(int state) {
+        if(BuildConfig.PRIVATE_REVIVAL && privateRevivalAudioGeneration>0) {
+            boolean ready; synchronized(loadedSounds){ready=soundPool!=null && privateRevivalSoundId!=0 && loadedSounds.contains(privateRevivalSoundId);}
+            ProbeBridge.setRevivalAudioReady(privateRevivalAudioGeneration,ready);
+        }
         if(privateLichRevivalAudio!=null)privateLichRevivalAudio.update(delayedGameplayFeedbackGeneration,
             privateRevivalAudible(state),preferences.getInt("sfx_volume",70)/100.f,privateRevivalDuck());
     }

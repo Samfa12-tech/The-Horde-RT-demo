@@ -120,7 +120,7 @@ void ApplySkeletonRevivalPresentation(
     constexpr auto standClip = static_cast<horde::scene::SkinnedClip>(4u);
     const float deadDuration = simulation.skeletonRevivalDeadDurationSeconds;
     const float standDuration = simulation.skeletonRevivalStandDurationSeconds;
-    if (!simulation.skeletonRevivalPresentationReady ||
+    if ((!simulation.skeletonRevivalPresentationReady && !simulation.skeletonRevivalVisualReady) ||
         !std::isfinite(deadDuration) || deadDuration <= 0.0f ||
         !std::isfinite(standDuration) || standDuration <= 0.0f ||
         !std::isfinite(revival.phaseSeconds) || revival.phaseSeconds < 0.0f)

@@ -271,6 +271,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     if(config_.sequentialPractice1_7 && activeEnemyKind_==EnemyKind::Lich)
         combatTeaching_.LeaveOpeningEncounter();
     combatTeaching_.SetSequentialPractice(config_.sequentialPractice1_7);
+    combatTeaching_.SetNaturalContinuation(config_.naturalPracticeRevival1_7 && UsesSkeletonRevival());
     combatTeaching_.AdvanceOpeningExit(fixedDeltaSeconds,input.paused);
     combatTeaching_.Update(input.tutorialEnabled,
         input.tutorialSlowdownEnabled, input.paused ||
@@ -898,6 +899,8 @@ void GameSimulation::RetryEncounter()
             skeletonRevival_.Retry(lesson.stage == TutorialStage::Complete, skipped);
             (void)skeletonRevival_.AcknowledgeLivePair(skeletonRevival_.Snapshot().generation,
                 combatSnapshot_.aliveCount == kSkeletonEnemyCapacity, combatSnapshot_.encounterComplete);
+            if (config_.naturalPracticeRevival1_7 && skeletonRevival_.Snapshot().phase == SkeletonRevivalPhase::Live)
+                combatTeaching_.CompleteNaturalPractice();
         }
         RefreshSnapshot(lastInput_);
     }
@@ -2318,21 +2321,23 @@ bool GameSimulation::OpeningEncounterComplete() const
 }
 
 bool GameSimulation::ConfigureSkeletonRevivalPresentation(std::uint64_t generation,
-    float deadSeconds, float standSeconds, bool ready)
+    float deadSeconds, float standSeconds, bool ready, bool visualReady)
 {
     if (!config_.skeletonRevival1_7 || !generation || generation < skeletonRevivalResourceGeneration_)
         return false;
-    if (ready && (!std::isfinite(deadSeconds) || deadSeconds <= 0.f ||
+    if ((ready || visualReady) && (!std::isfinite(deadSeconds) || deadSeconds <= 0.f ||
                   !std::isfinite(standSeconds) || standSeconds <= 0.f)) return false;
-    if (ready && skeletonRevival_.Snapshot().SuppressesActors() &&
+    if ((ready || visualReady) && skeletonRevival_.Snapshot().SuppressesActors() &&
         (deadSeconds != skeletonRevivalDeadDurationSeconds_ || standSeconds != skeletonRevivalStandDurationSeconds_))
         return false;
     skeletonRevivalResourceGeneration_ = generation;
     skeletonRevivalPresentationReady_ = ready;
-    if (ready) {
+    skeletonRevivalVisualReady_ = ready || visualReady;
+    if (ready || visualReady) {
         skeletonRevivalDeadDurationSeconds_ = deadSeconds;
         skeletonRevivalStandDurationSeconds_ = standSeconds;
-    } else skeletonRevival_.CancelTransient();
+    }
+    if(!ready) skeletonRevival_.CancelTransient();
     RefreshSnapshot(lastInput_);
     return true;
 }
@@ -2342,7 +2347,8 @@ void GameSimulation::UpdateSkeletonRevival(const InputSnapshot& input, float del
     if (!UsesSkeletonRevival()) { skeletonRevival_.CancelTransient(); return; }
     const auto& teaching = combatTeaching_.Snapshot();
     SkeletonRevivalInput bridge;
-    bridge.practiceFinished = teaching.stage == TutorialStage::Complete;
+    bridge.practiceFinished = teaching.stage == TutorialStage::Complete ||
+        (config_.naturalPracticeRevival1_7 && teaching.stage==TutorialStage::Ready && !teaching.exitPending);
     // Initial tutorial OFF is an actual opt-out too. Eligibility/pause alone is
     // never Skip, and a deliberate disable must finish its protected safe exit.
     bridge.practiceSkipped = teaching.stage == TutorialStage::Skipped ||
@@ -2369,6 +2375,7 @@ void GameSimulation::UpdateSkeletonRevival(const InputSnapshot& input, float del
     }
     if (state.revivePulse) {
         if (swordCombat_.ReviveDefeatedPairInPlace(skeletonRevivalDeadDurationSeconds_)) {
+            if(config_.naturalPracticeRevival1_7) combatTeaching_.CompleteNaturalPractice();
             combatSnapshot_ = swordCombat_.Snapshot();
             revivedIdlePhaseZero_ = true; // Both new-life clocks start at the admitted Idle0 join.
             (void)skeletonRevival_.AcknowledgeLivePair(state.generation,
@@ -2624,7 +2631,8 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     swordHitEventThisTick_ = 0;
     swordCombat_.SetSpecialAttacksEnabled(CurrentCombatRules() && config_.specialSkeletonAttacks1_7);
     const auto& lesson=combatTeaching_.Snapshot();
-    const bool practice=config_.sequentialPractice1_7 && CurrentCombatRules() && lesson.safePractice && activeEnemyKind_==EnemyKind::Skeleton;
+    const bool practice=config_.sequentialPractice1_7 && CurrentCombatRules() && lesson.safePractice && activeEnemyKind_==EnemyKind::Skeleton &&
+        !(config_.naturalPracticeRevival1_7 && UsesSkeletonRevival() && lesson.stage==TutorialStage::Ready);
     swordCombat_.SetPracticeLesson(practice,
         lesson.stage==TutorialStage::Parry ? EnemyAttackKind::GuardBreak :
         lesson.stage==TutorialStage::Dodge ? EnemyAttackKind::Unblockable : EnemyAttackKind::Normal);
@@ -3367,8 +3375,11 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.dodgeProtectedHitCount = dodgeProtectedHitCount_;
     snapshot_.combatTeaching = combatTeaching_.Snapshot();
     snapshot_.combatTeaching.lessonSuppressed = !SwordDefenseReady();
+    snapshot_.combatTeaching.naturalContinuation = config_.naturalPracticeRevival1_7 && UsesSkeletonRevival();
+    snapshot_.combatTeaching.continuationPhase = static_cast<std::uint8_t>(skeletonRevival_.Snapshot().phase);
     snapshot_.skeletonRevival = UsesSkeletonRevival() ? skeletonRevival_.Snapshot() : SkeletonRevivalSnapshot{};
     snapshot_.skeletonRevivalPresentationReady = UsesSkeletonRevival() && skeletonRevivalPresentationReady_;
+    snapshot_.skeletonRevivalVisualReady = UsesSkeletonRevival() && skeletonRevivalVisualReady_;
     snapshot_.skeletonRevivalDeadDurationSeconds = UsesSkeletonRevival() ? skeletonRevivalDeadDurationSeconds_ : 0.f;
     snapshot_.skeletonRevivalStandDurationSeconds = UsesSkeletonRevival() ? skeletonRevivalStandDurationSeconds_ : 0.f;
     const auto recovery=FlaskContextFor(input,false,false);

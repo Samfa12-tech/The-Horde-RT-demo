@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "baseCommit": "21930989989fc2add035c6288d71edf5f9ba2a53",
+  "evidenceClass": "Private integrated application build, CPU/adapter and package evidence; not launched, RT-presented, listened to or installed",
+  "privateWindowsRevival": true,
+  "privateAndroidDebugRevival": true,
+  "publicDefaultRevival": false,
+  "windows": {
+    "path": "reports/horde-windows-acceptance-20261101-natural-revival/HordeLanternRT.exe",
+    "bytes": 4993024,
+    "sha256": "75acbd3924b027fa660fdc5669103d13b4478473feb8154619b0f211c8980eb3"
+  },
+  "android": {
+    "path": "reports/natural-revival-20261101.apk",
+    "bytes": 251534074,
+    "sha256": "c9c713e6f9185c0d1b71f42fc07114f03d9555c20dd5ee106b3ca1b262edf699",
+    "nativeAbis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "privateEntries": [
+      {
+        "path": "assets/private_revival/lich_revival.wav",
+        "sha256": "1e1891010f4c89e6f20ec5fba90191aa0f0999c0bd95a4df3fe36659beb9e521"
+      },
+      {
+        "path": "assets/private_revival/skeleton.glb",
+        "sha256": "800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259"
+      }
+    ],
+    "sourceAudioOrBlendFiles": []
+  },
+  "privateRuntimeAssets": [
+    {
+      "path": "reports/private-revival-runtime/private_revival/skeleton.glb",
+      "bytes": 31672176,
+      "sha256": "800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259"
+    },
+    {
+      "path": "reports/private-revival-runtime/private_revival/lich_revival.wav",
+      "bytes": 350252,
+      "sha256": "1e1891010f4c89e6f20ec5fba90191aa0f0999c0bd95a4df3fe36659beb9e521"
+    }
+  ],
+  "hostFocusedSuites": {
+    "combatFoundation": "PASS",
+    "gatedAndNaturalRevivalIntegration": "PASS 265 checks",
+    "campaignCheckpoint": "PASS",
+    "windowsCombatPrompt": "PASS",
+    "characterRenderSlotAdapter": "PASS"
+  },
+  "androidFocusedTests": {
+    "combatTeachingPreferences": 19,
+    "combatTeachingUiScheduling": 6,
+    "privateRevivalAudio": 4,
+    "failures": 0
+  },
+  "windowsBaseRuntimeRoster": "PASS current policy; complete assets tree byte-identical to prior verified owner-fixes package",
+  "ownerParkedFiles": 151,
+  "ownerParkedFilesUnchanged": true,
+  "candidateLaunched": false,
+  "candidateInstalled": false,
+  "currentCandidateRtPresentation": false,
+  "currentCandidateListeningAcceptance": false,
+  "manualAudioHapticRevalidationRequired": true,
+  "sources": [
+    {
+      "path": "ASSET_LICENSES.md",
+      "bytes": 86164,
+      "sha256": "7e2ec276f4b95ecdee6ce4d4754e342128b3cf2516cc3084ed566ead9c194315"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 131844,
+      "sha256": "92a780a87d7c1f635d2ea1f949dee5fcdc59bef85082f5fcab6618627150e733"
+    },
+    {
+      "path": "android/app/build.gradle",
+      "bytes": 51779,
+      "sha256": "3033011cd6e1a7ace8a01f0efa9cd15d451f5648a625acac8c1e656d53ae2778"
+    },
+    {
+      "path": "android/app/src/main/cpp/CMakeLists.txt",
+      "bytes": 8748,
+      "sha256": "c8c4843818b147f3a59b30cfce99ba136d5227c213bce5b13134954148d14b7d"
+    },
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "bytes": 432070,
+      "sha256": "e04002280a50def35fea6649a2e5e78d584e7ccafbfc4ebed3e2f20848dc6935"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/CombatTeachingPreferences.java",
+      "bytes": 7488,
+      "sha256": "8e0892138d42bb86dbec8e038fe12f4e086fedf004ca1473495d255877d4524a"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "bytes": 531667,
+      "sha256": "249911e5807f5c4afca4c48f9cedcfd8a806f8b389f629f80333c96cab664e6c"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/PrivateLichRevivalAudio.java",
+      "bytes": 4071,
+      "sha256": "cc8f1e278e63b7e4518ba865360893137c6f954bb5e14d5143151ddac25438b0"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java",
+      "bytes": 14981,
+      "sha256": "9ee71d16ae37cd934637cdd0ec1ad70a8913e01b7953c4cd704b5f7db85f5b06"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingPreferencesTest.java",
+      "bytes": 18172,
+      "sha256": "d434cdb39ba5efef4dcbf898010df7d00bebc940f6fd55432a5a91f9474aa211"
+    },
+    {
+      "path": "src/gameplay/simulation/CombatTeaching.h",
+      "bytes": 21131,
+      "sha256": "476e9a884bfc8a4e615b265740b10fe2d6877dd53c548474cf99755fb339e302"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "bytes": 179572,
+      "sha256": "9866a41d68bc79d942dd4157e501fe92f170ae649716aed17be9fb372954c8fa"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.h",
+      "bytes": 26314,
+      "sha256": "173c10572f6f4310ca257fff0761547f885c638fe281892569bce06d84cdde0a"
+    },
+    {
+      "path": "src/gameplay/simulation/InputSnapshot.h",
+      "bytes": 5273,
+      "sha256": "9b849c2e02d1c9da3af2b5228e637e0e9349211ef2810d095a616e50f039468d"
+    },
+    {
+      "path": "src/gameplay/simulation/SimulationSnapshot.h",
+      "bytes": 10247,
+      "sha256": "2f1368cca7563478f07d60572fb0e6f3d023e58e0a6ef0e0463d8c362ed0b9e5"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 708511,
+      "sha256": "fd8c81323c7ccda1cd6ba889ded3c440a523263d5489af3e335f12dafe07b298"
+    },
+    {
+      "path": "src/platform/windows/WindowsCombatTeachingPrompt.h",
+      "bytes": 6181,
+      "sha256": "2f6dd3dc0f41c7a28f41402cf6af4edbe75339b9af3a2d2fd2c517509795e88e"
+    },
+    {
+      "path": "src/platform/windows/WindowsPrivateLichRevivalAudio.h",
+      "bytes": 379,
+      "sha256": "406ba78d8470535421cbbb5ccd593e3bc990e53b6540ef3f3b04177d1c1f0388"
+    },
+    {
+      "path": "src/platform/windows/windows_campaign_owner.inl",
+      "bytes": 21818,
+      "sha256": "343140b68fac706834ad496224267f1a85046ec8e0485a703d1a9eb004e7a31d"
+    },
+    {
+      "path": "src/platform/windows/windows_private_lich_revival_audio.inl",
+      "bytes": 4597,
+      "sha256": "8a5197eb7402342acfa8551987575feeb42ed38fb21e8dbfebca5512a51746c0"
+    },
+    {
+      "path": "src/vulkan/raytracing/CharacterRenderSlot.cpp",
+      "bytes": 23490,
+      "sha256": "b78197f4e1c2b81ff41ea57cba504c3277db3070fbe284c235ed47bee02a7794"
+    },
+    {
+      "path": "src/vulkan/raytracing/CharacterRenderSlot.h",
+      "bytes": 8511,
+      "sha256": "3e86781932ea711c113b75d548bda237cb2cb0aa0a9e91592f92bd457401fb75"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+      "bytes": 85334,
+      "sha256": "9f7857c4b3993c89fbf6b2254156514039ad67edda130afbf633fa2ae3560a30"
+    },
+    {
+      "path": "src/vulkan/raytracing/SimulationFrameAdapter.cpp",
+      "bytes": 20012,
+      "sha256": "082f53b5e736cb581ebd24fc88372bd869042c797e85685f0dc22822257fff14"
+    },
+    {
+      "path": "tests/CharacterRenderSlotSmoke.cpp",
+      "bytes": 214320,
+      "sha256": "398891473c44f3a07c5374abc6ec6338797f71c178f49ff3401d7eef13a7c771"
+    },
+    {
+      "path": "tests/CombatFoundationTests.cpp",
+      "bytes": 185252,
+      "sha256": "652496f3658032f701963a6f46aca8219e37491c4ce40e39f609a4c4f6c33f9a"
+    },
+    {
+      "path": "src/gameplay/simulation/PrivateRevivalApplication.h",
+      "bytes": 569,
+      "sha256": "04e2800439d334006ebed2ea63f082e4764f00134850e9b14917be16308e5b6c"
+    }
+  ]
+}

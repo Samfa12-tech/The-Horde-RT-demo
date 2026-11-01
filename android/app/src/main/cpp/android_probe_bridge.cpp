@@ -1,3 +1,4 @@
+#include "gameplay/simulation/PrivateRevivalApplication.h"
 #include "audio/ChapterDialogueSpatial.h"
 #include <android/log.h>
 #include <android/native_window.h>
@@ -647,8 +648,9 @@ void InvalidateBenchmarkSummaryLocked()
 horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
     horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
 horde::gameplay::simulation::GameSimulation gGameSimulation(
-    horde::gameplay::simulation::ProductionGameSimulationConfig());
+    horde::gameplay::simulation::PrivateRevivalApplicationConfig());
 horde::gameplay::simulation::InputMailbox gInputMailbox;
+std::uint64_t gPrivateRevivalResourceGeneration=1;
 std::mutex gInputPublisherMutex;
 horde::gameplay::simulation::InputSnapshot gInputPublisherState = []
 {
@@ -1164,6 +1166,8 @@ void PublishSimulationUiState()
         (static_cast<std::uint64_t>(teaching.exitPending) << 33u) |
         (static_cast<std::uint64_t>(revivalClearance) << 34u) |
         (static_cast<std::uint64_t>(teaching.lessonSuppressed) << 35u) |
+        ((static_cast<std::uint64_t>(teaching.continuationPhase)&7u) << 36u) |
+        (static_cast<std::uint64_t>(teaching.naturalContinuation) << 39u) |
         (clampByte(teaching.promptOpacity) << 40u) |
         ((static_cast<std::uint64_t>(teaching.attackReadability) & 0x3u) << 48u);
     gCombatTeachingUiState.store(teachingState, std::memory_order_release);
@@ -1549,7 +1553,7 @@ void ResetShowcaseSimulation()
         horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
     if (replacedQueue)
         gGameSimulation = horde::gameplay::simulation::GameSimulation(
-            horde::gameplay::simulation::ProductionGameSimulationConfig());
+            horde::gameplay::simulation::PrivateRevivalApplicationConfig());
     else
         gGameSimulation.ResetRoute();
     horde::platform::android::ResetMusicSession(replacedQueue);
@@ -2015,7 +2019,7 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
     if (const auto* showcase = horde::gameplay::FindShowcaseCheckpoint(id))
     {
         selection = {horde::gameplay::ShowcaseCheckpointForEncounter(*showcase,
-                         horde::gameplay::simulation::ProductionGameSimulationConfig().waterfallSkeletonEncounter),
+                         horde::gameplay::simulation::PrivateRevivalApplicationConfig().waterfallSkeletonEncounter),
                      showcase->id, kDefaultPlayerPresentationRoute};
         return true;
     }
@@ -2043,7 +2047,7 @@ bool ApplyDebugCheckpointSimulation(
 {
     // Owning-thread, explicit full checkpoint import; not JNI or a fallback.
     const auto config = selection.playerRoute == kDefaultPlayerPresentationRoute
-        ? horde::gameplay::simulation::ProductionGameSimulationConfig()
+        ? horde::gameplay::simulation::PrivateRevivalApplicationConfig()
         : horde::gameplay::simulation::GameSimulationConfig{};
     const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile != config.playerMountProfile;
     if (replacedQueue)
@@ -3321,6 +3325,7 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
     context.gpuFrameTimingTotalMs = 0.0;
     context.gpuFrameTimingSampleCount = 0u;
     gGameSimulation.InvalidateWorldZoneReadiness();
+    (void)gGameSimulation.ConfigureSkeletonRevivalPresentation(++gPrivateRevivalResourceGeneration,0,0,false);
     context.rtScene.Destroy();
 
     if (context.commandPool != VK_NULL_HANDLE)
@@ -3616,6 +3621,12 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
     if(context.environmentSurvey && !context.keeperMistSnapshot && !context.rtScene.SetRegionalWaterDiagnosticEnabled(
             !context.environmentSurveyWaterDisabled))return false;
 #endif
+    std::vector<horde::scene::SkinnedClipBinding> revivalBindings;
+#if HORDE_RT_PRIVATE_REVIVAL
+    const auto& ordinary=horde::scene::SkeletonCombatClipSet().clips;
+    revivalBindings.assign(ordinary.begin(),ordinary.end());
+    revivalBindings.push_back({"SkeletonProof|StandDead0ToIdle",false,true});
+#endif
     const bool initialised = context.rtScene.Initialise(context.instance,
                                     context.physicalDevice,
                                     context.device,
@@ -3623,7 +3634,12 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     context.commandPool,
                                     renderExtent,
                                     context.swapchainFormat,
-                                    context.reportDirectory + "/../skeleton_biped_merged_animations_v01.glb",
+                                    context.reportDirectory +
+#if HORDE_RT_PRIVATE_REVIVAL
+                                    "/../private_revival/skeleton.glb",
+#else
+                                    "/../skeleton_biped_merged_animations_v01.glb",
+#endif
                                     context.reportDirectory + "/../lich_placeholder_merged_animations_v01.glb",
                                     context.reportDirectory + "/..",
                                     context.reportDirectory + "/..",
@@ -3633,7 +3649,7 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     context.executionBackend, context.sceneProfile, context.graphicsSettings.glassEnabled,
                                     context.pipelineCache,
                                     context.compiledPipelineCache != nullptr
-                                        ? &context.compiledPipelineCache->cache : nullptr);
+                                        ? &context.compiledPipelineCache->cache : nullptr, revivalBindings);
     // Bounded per-attempt CPU evidence; never emit frame-by-frame timings.
     // Log each attempt here so a subsequent rollback cannot overwrite it.
     const auto& measurements = context.rtScene.InitialiseMeasurements();
@@ -3829,6 +3845,7 @@ bool RebuildDevelopmentSupportFixtureOnOwner(
     }
 
     gGameSimulation.InvalidateWorldZoneReadiness();
+    (void)gGameSimulation.ConfigureSkeletonRevivalPresentation(++gPrivateRevivalResourceGeneration,0,0,false);
     context.rtScene.Destroy();
     context.developmentSupportFixtureOverride = requestedFixture;
     context.developmentWorldRouteOverride=requestedWorld;
@@ -3844,7 +3861,8 @@ bool RebuildDevelopmentSupportFixtureOnOwner(
             vkResetCommandPool(context.device, context.commandPool, 0) == VK_SUCCESS)
         {
             gGameSimulation.InvalidateWorldZoneReadiness();
-            context.rtScene.Destroy();
+            (void)gGameSimulation.ConfigureSkeletonRevivalPresentation(++gPrivateRevivalResourceGeneration,0,0,false);
+    context.rtScene.Destroy();
         }
         context.entryHandoff.FailLoad();
         PublishEntryState(context, false);
@@ -4050,6 +4068,7 @@ bool DestroySwapchainContext(SwapchainContext& context)
     if(!context.environmentSurvey)CancelActiveInAppBenchmark(context);
     DestroyRtEvidenceOnOwnerThread(context);
     if(!context.environmentSurvey)gGameSimulation.InvalidateWorldZoneReadiness();
+    (void)gGameSimulation.ConfigureSkeletonRevivalPresentation(++gPrivateRevivalResourceGeneration,0,0,false);
     context.rtScene.Destroy();
     if (context.compiledPipelineCache != nullptr)
     {
@@ -4454,6 +4473,13 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             // One owner-thread tuning publication drives contact and the actual
             // stream transform in this frame. JNI still only publishes controls.
             simulationInput.waterfallWidthScale = rtLabTuning.waterfallWidthScale;
+#if HORDE_RT_PRIVATE_REVIVAL
+            (void)gGameSimulation.ConfigureSkeletonRevivalPresentation(gPrivateRevivalResourceGeneration,
+                context.rtScene.SkeletonRevivalDeadDuration(),context.rtScene.SkeletonRevivalStandDuration(),
+                context.rtScene.IsReady() && simulationInput.revivalAudioGeneration>0 && simulationInput.revivalAudioReady &&
+                context.rtScene.SkeletonRevivalStandDuration()>0.f,
+                context.rtScene.IsReady() && context.rtScene.SkeletonRevivalStandDuration()>0.f);
+#endif
             gGameSimulation.SetPresentationAspect(
                 horde::graphics::RtViewAspectFromImageExtent(
                     context.swapchainExtent.width, context.swapchainExtent.height,
@@ -5446,6 +5472,7 @@ GlassGeometryApplyResult ApplyGlassGeometryOnOwner(
     // actual admitted geometry; a combined scale uses this one new extent.
     const auto destroyStart = GraphicsSteadyNs();
     gGameSimulation.InvalidateWorldZoneReadiness();
+    (void)gGameSimulation.ConfigureSkeletonRevivalPresentation(++gPrivateRevivalResourceGeneration,0,0,false);
     context.rtScene.Destroy();
     context.graphicsLatency.destroyMilliseconds += GraphicsElapsedMs(destroyStart, GraphicsSteadyNs());
     context.graphicsSettings = requested;
@@ -5461,7 +5488,8 @@ GlassGeometryApplyResult ApplyGlassGeometryOnOwner(
         if (!drainAndReset()) return GlassGeometryApplyResult::Fatal;
         const auto rollbackDestroyStart = GraphicsSteadyNs();
         gGameSimulation.InvalidateWorldZoneReadiness();
-        context.rtScene.Destroy();
+        (void)gGameSimulation.ConfigureSkeletonRevivalPresentation(++gPrivateRevivalResourceGeneration,0,0,false);
+    context.rtScene.Destroy();
         context.graphicsLatency.destroyMilliseconds += GraphicsElapsedMs(rollbackDestroyStart, GraphicsSteadyNs());
         context.graphicsSettings = previous;
         context.renderScale = previousScale;
@@ -5523,6 +5551,7 @@ bool ApplySceneProfileOnOwner(SwapchainContext& context, const PreviewControls c
         context.rtFrameEvidenceInitialised = false;
     }
     gGameSimulation.InvalidateWorldZoneReadiness();
+    (void)gGameSimulation.ConfigureSkeletonRevivalPresentation(++gPrivateRevivalResourceGeneration,0,0,false);
     context.rtScene.Destroy(); // One active GPU scene; no simulation/reset constructor.
     context.sceneProfile = desired;
     if (!InitialiseRtSceneForSwapchain(context))
@@ -5534,7 +5563,8 @@ bool ApplySceneProfileOnOwner(SwapchainContext& context, const PreviewControls c
             vkResetCommandPool(context.device, context.commandPool, 0) != VK_SUCCESS)
             return false;
         gGameSimulation.InvalidateWorldZoneReadiness();
-        context.rtScene.Destroy();
+        (void)gGameSimulation.ConfigureSkeletonRevivalPresentation(++gPrivateRevivalResourceGeneration,0,0,false);
+    context.rtScene.Destroy();
         context.sceneProfile = previous;
         if (!InitialiseRtSceneForSwapchain(context)) return false;
         {
@@ -6903,6 +6933,18 @@ extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getSurfaceRuntimeState(JNIEnv*, jclass, jlong generation)
 {
     return static_cast<jint>(gSurfaceSessions.State(static_cast<std::uint64_t>(generation)));
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setRevivalAudioReady(JNIEnv*,jclass,jlong generation,jboolean ready)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if(generation<=0 || static_cast<std::uint64_t>(generation)<gInputPublisherState.revivalAudioGeneration)return;
+    if(static_cast<std::uint64_t>(generation)==gInputPublisherState.revivalAudioGeneration &&
+        (ready==JNI_TRUE)==gInputPublisherState.revivalAudioReady)return;
+    gInputPublisherState.revivalAudioGeneration=static_cast<std::uint64_t>(generation);
+    gInputPublisherState.revivalAudioReady=ready==JNI_TRUE;
+    PublishInputLocked();
 }
 
 extern "C" JNIEXPORT void JNICALL

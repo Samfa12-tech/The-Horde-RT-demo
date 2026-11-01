@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.22.1)
 
 project(horde_rt_probe_android)
 
+option(HORDE_RT_PRIVATE_REVIVAL "Private pinned owner revival candidate" OFF)
 option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and replay commands" OFF)
 option(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE "Use the explicitly packaged viewmodel candidate for live Debug play" OFF)
 if(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE AND (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug"))
@@ -46,6 +47,7 @@ horde_rt_attach_staged_primary(horde_rt_probe_android "${HORDE_RT_REPO_ROOT}")
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
 target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_PRIVATE_REVIVAL=$<BOOL:${HORDE_RT_PRIVATE_REVIVAL}>
     HORDE_RT_MIN_RENDER_SCALE_PERCENT=${HORDE_RT_MIN_RENDER_SCALE_PERCENT}
     HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE=$<BOOL:${HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE}>
     HORDE_RT_DISPLAY_VERSION="${HORDE_RT_DISPLAY_VERSION}"

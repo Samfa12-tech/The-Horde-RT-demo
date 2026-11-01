@@ -79,6 +79,7 @@ struct GameSimulationConfig
     bool sequentialPractice1_7 = false; // Explicit historical fixtures retain their lesson rules.
     // Remains explicit until the authored clip/private cue package is admitted.
     bool skeletonRevival1_7 = false;
+    bool naturalPracticeRevival1_7 = false; // Private admitted application: protected kills, automatic revival handoff.
     // Shared chapter presentation; historical constructor fixtures stay explicit.
     bool companionTurnStart = false;
     // Diagnostic owner slice only. UI/hand/save admission is still separate.
@@ -121,7 +122,7 @@ public:
     // Owner-thread asset receipt; missing/recreated presentation freezes a rise.
     // It does not enable the feature or award gameplay/checkpoint progress.
     bool ConfigureSkeletonRevivalPresentation(std::uint64_t resourceGeneration,
-        float deadDurationSeconds, float standDurationSeconds, bool ready = true);
+        float deadDurationSeconds, float standDurationSeconds, bool ready = true, bool visualReady = false);
 
     std::uint32_t AdvanceFrame(const InputSnapshot& input,
                                double frameDeltaSeconds,
@@ -334,7 +335,7 @@ private:
     std::uint64_t skeletonRevivalResourceGeneration_ = 0;
     float skeletonRevivalDeadDurationSeconds_ = 0.0f;
     float skeletonRevivalStandDurationSeconds_ = 0.0f;
-    bool skeletonRevivalPresentationReady_ = false;
+    bool skeletonRevivalPresentationReady_ = false, skeletonRevivalVisualReady_ = false;
     bool skeletonRevivalWorkshopBypass_ = false;
     bool revivedIdlePhaseZero_ = false;
     CombatContactTraceSnapshot combatContactTrace_{};

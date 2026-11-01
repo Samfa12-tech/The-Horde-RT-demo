@@ -1,3 +1,4 @@
+#include "gameplay/simulation/PrivateRevivalApplication.h"
 #include "audio/ChapterDialogueSpatial.h"
 #include "platform/windows/DiagnosticWindow.h"
 #include "platform/windows/WindowsAcceptanceProfile.h"
@@ -1995,7 +1996,7 @@ public:
 
     bool PreloadMonoPcm48k16(const std::filesystem::path& path) {
         const auto wave=Load(path);
-        return wave && wave->format.nChannels==1u && wave->format.nSamplesPerSec==48000u && wave->format.wBitsPerSample==16u;
+        return engine_ && masteringVoice_ && wave && wave->format.nChannels==1u && wave->format.nSamplesPerSec==48000u && wave->format.wBitsPerSample==16u;
     }
     void SetOwnedVolume(const std::string_view key,float gain) {
         for(auto& voice:activeVoices_)if(voice.loopKey==key)
@@ -6357,6 +6358,7 @@ bool ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
     }
     ctx.campaignPreparedScene.reset();
     ctx.simulation.InvalidateWorldZoneReadiness();
+    (void)ctx.simulation.ConfigureSkeletonRevivalPresentation(++ctx.privateRevivalAudio.resourceGeneration,0,0,false);
     ctx.rtScene.Destroy();
 
     if (ctx.commandPool != VK_NULL_HANDLE)
@@ -6555,6 +6557,24 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     std::string selectedSkeletonAssetPath =
         (assetRoot / "models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();
     std::vector<horde::scene::SkinnedClipBinding> selectedSkeletonBindings;
+#if HORDE_RT_PRIVATE_REVIVAL
+    selectedSkeletonAssetPath=(ExecutableDirectory()/"private_revival/skeleton.glb").string();
+    std::string privateStandHash;
+    if(!Sha256File(selectedSkeletonAssetPath,privateStandHash,diagnostic) ||
+        privateStandHash!=horde::gameplay::simulation::kPrivateStandSha256) {
+        ctx.lastRtFrameError="Private revival stand is missing or differs from the accepted append-only export.";
+        return false;
+    }
+    const auto& privateOrdinary=horde::scene::SkeletonCombatClipSet().clips;
+    selectedSkeletonBindings.assign(privateOrdinary.begin(),privateOrdinary.end());
+    selectedSkeletonBindings.push_back({"SkeletonProof|StandDead0ToIdle",false,true});
+    UpdatePrivateLichRevivalAudio(ctx);
+    if(!ctx.privateRevivalAudio.available) {
+        ctx.lastRtFrameError="Private revival requires the pinned decoded cry and an available XAudio2 output.";
+        return false;
+    }
+#endif
+
 #if defined(_DEBUG)
     if (const char* standPath = std::getenv("HORDE_SKELETON_STAND_CAPTURE_ASSET"))
     {
@@ -6781,6 +6801,7 @@ bool DestroyRenderContext(VulkanSurfaceContext& ctx)
     }
     ctx.campaignPreparedScene.reset();
     ctx.simulation.InvalidateWorldZoneReadiness();
+    (void)ctx.simulation.ConfigureSkeletonRevivalPresentation(++ctx.privateRevivalAudio.resourceGeneration,0,0,false);
     ctx.rtScene.Destroy();
     if (ctx.pipelineCache != VK_NULL_HANDLE)
     {
@@ -6898,6 +6919,7 @@ bool ApplyPendingSceneReplacement(VulkanSurfaceContext& context,
     context.benchmarkEvidence.Cancel();
     if (!retireSceneReferences()) return false;
     context.simulation.InvalidateWorldZoneReadiness();
+    (void)context.simulation.ConfigureSkeletonRevivalPresentation(++context.privateRevivalAudio.resourceGeneration,0,0,false);
     context.rtScene.Destroy(); // Exactly one scene; shared simulation remains paused and CPU-owned.
     if (!InitialiseRtSceneForSwapchain(context, false))
     {
@@ -6906,7 +6928,8 @@ bool ApplyPendingSceneReplacement(VulkanSurfaceContext& context,
         // before its cleanup and before recreating the prior complete configuration.
         if (!retireSceneReferences()) return false;
         context.simulation.InvalidateWorldZoneReadiness();
-        context.rtScene.Destroy();
+        (void)context.simulation.ConfigureSkeletonRevivalPresentation(++context.privateRevivalAudio.resourceGeneration,0,0,false);
+    context.rtScene.Destroy();
         context.sceneProfile = previousProfile;
         context.executionBackend = previousBackend;
         context.renderScale = previousSettings.renderScalePercent / 100.0f;
@@ -9500,7 +9523,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             horde::vulkan::raytracing::kProductionPlayerRenderRoute;
     if (!graphicsPreviewCapture) {
         auto simulationConfig=explicitComparison?horde::gameplay::simulation::GameSimulationConfig{}:
-            horde::gameplay::simulation::ProductionGameSimulationConfig();
+            horde::gameplay::simulation::PrivateRevivalApplicationConfig();
 #if defined(_DEBUG)
         // Only the strictly isolated existing route validator may opt in.
         // Normal application configuration, settings and save schema stay OFF.
