@@ -406,11 +406,16 @@ public:
     // Explicit representation fallback; select before initialisation. This does
     // not change settings, geometry quality, placement, collision or save state.
     bool SetSharedForestGeometryEnabled(bool enabled) {
-        if(enabled && (SelectF01NorthGrovePrototype() || SelectForestSurroundingsPrototype()))return false;
+        if(enabled && SelectF01NorthGrovePrototype())return false;
+#if defined(_DEBUG)
+        if(enabled && forestRouteProofMode_==ForestRouteProofMode::BakedSurroundings480)return false;
+#endif
         if((ready_ || device_!=VK_NULL_HANDLE) && enabled!=sharedForestGeometryEnabled_)return false;
         sharedForestGeometryEnabled_=enabled;return true;
     }
     [[nodiscard]] bool SharedForestGeometryActive() const noexcept { return sharedForestGeometryActive_; }
+    [[nodiscard]] bool ForestSurroundingsSelected() const noexcept { return SelectForestSurroundingsPrototype(); }
+    [[nodiscard]] bool ForestSurroundingsActive() const noexcept { return static_cast<bool>(forestSurroundingsPrototype_); }
 #ifndef NDEBUG
     // Survey A/B only; call before initialization. Does not change settings.
     bool SetRegionalWaterDiagnosticEnabled(bool enabled) {

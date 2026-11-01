@@ -513,3 +513,6 @@ assets/models/world/runtime/forest-road-clue-v1/*.json text eol=lf
 docs/evidence/2026-10-24-campaign-journey-partition/*.log -text whitespace=cr-at-eol
 
 docs/evidence/2026-10-24-kit-context-timing/*.log -text whitespace=cr-at-eol
+
+# Exact private1.7 woodland runtime manifests and receipt identity.
+assets/models/world/runtime/forest-surroundings-v1/*.json text eol=lf

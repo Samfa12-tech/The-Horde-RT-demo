@@ -245,6 +245,23 @@ def make_glb(source, binary, meshes, name):
     return struct.pack('<III',0x46546c67,2,28+len(js)+len(payload))+struct.pack('<II',len(js),0x4e4f534a)+js+struct.pack('<II',len(payload),0x004e4942)+payload
 
 
+def understory():
+    j,b=unpack((TREE/(SOURCES['alder'][0]+'.glb')).read_bytes())
+    leaves,stems=Mesh(),Mesh()
+    for frond in range(7):
+        angle=frond*2.399963
+        direction=(math.cos(angle),0,math.sin(angle))
+        side=(-direction[2],0,direction[0])
+        stems.tube([(0,0,0)]+[add(mul(direction,t),(0,.18+.40*math.sin(t*2.4),0)) for t in (.18,.5,.85)],[.018,.014,.009,.003],3)
+        for pair in range(4):
+            t=.18+pair*.19
+            anchor=add(mul(direction,t), (0,.18+.40*math.sin(t*2.4),0))
+            for sign in (-1,1):
+                axis=unit(add(mul(direction,.65),mul(side,sign)))
+                leaves.lens(add(anchor,mul(side,sign*.10)),axis,.36*(1-.45*t),.085,.025,angle)
+    return make_glb(j,b,[(stems,next(i for i,m in enumerate(j['materials']) if 'bark' in m['name'])),(leaves,next(i for i,m in enumerate(j['materials']) if 'alder leaves' in m['name']))],'woodland-low-fern')
+
+
 def fence():
     j,b=unpack((TREE/(SOURCES['pine'][0]+'.glb')).read_bytes());m=Mesh()
     for x in (0,2.4): m.box((x-.065,-.08,-.065),(x+.065,1.42,.065))
@@ -357,7 +374,7 @@ def composition(assets,tips):
             if any(v is None for v in support):continue
             fitted=min(g-ly-.02 for (_,ly,_),g in zip(local,support));burial=y-low-fitted
             if not 0<=burial<=.65:continue
-            rows.append({'id':f'{band}-{accepted:03}','band':band,'stand':stand,'asset':name,'species':species.title(),'x':round(p[0],6),'z':round(p[1],6),'originY':round(fitted,6),'yawRadians':yaw,'scale':1.0,'rootPlayableClearance':round(c,6),'nearestPlayableClearance':round(c-radius-1.5,6),'collision':'none-ONLY-after-boundary-admission','supportSamples':len(local),'fittedBurial':round(burial,6)})
+            rows.append({'id':f'{band}-{accepted:03}','band':band,'stand':stand,'asset':name,'species':species.title(),'x':round(p[0],6),'z':round(p[1],6),'originY':round(fitted,6),'yawRadians':yaw,'scale':1.0,'rootRouteEnvelopeClearance':round(c,6),'nearestRouteEnvelopeClearance':round(c-radius-1.5,6),'collision':'exact-rendered-lower-wood','supportSamples':len(local),'fittedBurial':round(burial,6)})
             accepted+=1
             if accepted==count: break
         require(accepted==count,f'Unable to fit {band} population: {accepted}/{count}, next stand {accepted%len(stands[band])}; constraints unchanged')
@@ -418,6 +435,23 @@ def composition(assets,tips):
         a,b=(edge['a'][0],edge['a'][2]),(edge['b'][0],edge['b'][2])
         edge['arrivalPortal']=any(project(add(a,mul(sub(b,a),t/20)),arrival[:2])[0]<2.0 for t in range(21))
         if edge['arrivalPortal']:edge['default']='open-mapped-arrival'
+    for edge in boundary:
+        x,z=(edge['a'][0]+edge['b'][0])*.5,(edge['a'][2]+edge['b'][2])*.5
+        # Short burial-ground western rail and a separated F03 approach rail.
+        edge['fenceRequested']=not edge['arrivalPortal'] and ((x<-42 and -24<z<-10) or (-23<x<-19 and 7<z<15))
+        if not edge['arrivalPortal'] and not edge['fenceRequested']:edge['default']='open-woodland'
+    foliage=[];rng=random.Random(SEED+17)
+    for attempt in range(20000):
+        point,direction=station(rng.random());side=(-direction[1],direction[0])
+        p=add(point,mul(side,rng.choice((-1,1))*rng.uniform(3,17)))
+        if project(p,route)[0]<2.8 or math.dist(p,(-33.7,-17))<5.5 or math.dist(p,route[1])<4.1 or math.dist(p,route[-1])<4.4:continue
+        if any(math.dist(p,(r['x'],r['z']))<1.45 for r in foliage):continue
+        if any(math.dist(p,(r['x'],r['z']))<1.3 for r in rows):continue
+        y=ground(*p)
+        if y is None:continue
+        foliage.append({'x':round(p[0],6),'z':round(p[1],6),'y':round(y-.03,6),'yaw':round(rng.random()*math.tau,6)})
+        if len(foliage)==120:break
+    require(len(foliage)==120,'Incomplete restrained understory composition')
     counts=Counter(v['band'] for v in rows)
     trees=sum(assets[v['asset']]['triangles'] for v in rows if 'asset' in v)
     # Preserve and locate the existing twelve rock authoring records. These are
@@ -432,7 +466,7 @@ def composition(assets,tips):
         nearest=min(boundary,key=lambda e:project(point,[(e['a'][0],e['a'][2]),(e['b'][0],e['b'][2])])[0])
         rocks.append({'nativePlacementIndex':i,'sourceIndex':int(source),'x':round(point[0],6),'z':round(point[1],6),'terrainY':round(ground(*point),6),'yaw':yaw,'scale':scale,'nearestBoundaryRun':nearest['id'],'referenceOnly':True})
     require(len(rocks)==12,'Existing rock roster changed')
-    return {'schema':1,'status':'SOURCE-ONLY, NOT RUNTIME BOUNDARY/COLLISION/FOREST ADMISSION','seed':SEED,'coordinates':'native X east, Y up, Z south; R2 X=E+78.3, Z=126.2-N','mapSha256':sha(MAP.read_bytes()),'terrainSha256':sha(TERRAIN.read_bytes()),'originalPlacementsSha256':source_text_sha(PLACEMENTS.read_bytes()),'editableTextIdentity':'originalPlacementsSha256 and existingRockSourceSha256 hash UTF-8 LF-normalized text; all binary/frozen-archive inputs and generated outputs retain exact-byte checks','route':route,'arrivalRoute':arrival,'arrivalPortalHalfWidth':2.0,'clearTrailWidth':2.4,'corridorHalfWidth':2.4,'pockets':pockets,'originalTrunkClearancePockets':trunkPockets,'windows':windows,'townKeepout':townKeepout,'riverClearance':14,'standAnchors':stands,'boundary':boundary,'existingRockReferences':rocks,'existingRockSourceSha256':source_text_sha(rock_source),'placements':rows,'counts':dict(counts),'candidateTreeTriangles':323264+trees,'addedTreeRawUpperBytes':trees*140,'boundaryGeometryPolicy':'Conservative section contour with an explicit mapped arrival portal; fences close unproven bank/rock gaps outside that portal. Global containment and off-corridor collision exemption are NOT admitted. Endpoint-height conformance keeps posts vertical; actual solid-mesh/body sweeps alone admit natural bank sections. No invisible barrier or old collision removal.','retention':'No old ordinary/shared certificate applies automatically; candidate full-source retention/recreation proof required at integration.','admission':{'normalDefault':False,'boundary':False,'collisionExemption':False,'nativeImporter':False,'rtVisuals':False,'gpuCost':False}}
+    return {'schema':1,'status':'SOURCE-ONLY, NOT RUNTIME BOUNDARY/COLLISION/FOREST ADMISSION','seed':SEED,'coordinates':'native X east, Y up, Z south; R2 X=E+78.3, Z=126.2-N','mapSha256':sha(MAP.read_bytes()),'terrainSha256':sha(TERRAIN.read_bytes()),'originalPlacementsSha256':source_text_sha(PLACEMENTS.read_bytes()),'editableTextIdentity':'originalPlacementsSha256 and existingRockSourceSha256 hash UTF-8 LF-normalized text; all binary/frozen-archive inputs and generated outputs retain exact-byte checks','route':route,'understory':foliage,'arrivalRoute':arrival,'arrivalPortalHalfWidth':2.0,'clearTrailWidth':2.4,'corridorHalfWidth':2.4,'pockets':pockets,'originalTrunkClearancePockets':trunkPockets,'windows':windows,'townKeepout':townKeepout,'riverClearance':14,'standAnchors':stands,'boundary':boundary,'existingRockReferences':rocks,'existingRockSourceSha256':source_text_sha(rock_source),'placements':rows,'counts':dict(counts),'candidateTreeTriangles':323264+trees,'addedTreeRawUpperBytes':trees*140,'boundaryGeometryPolicy':'Open woodland with selective short fence sections and an explicit mapped arrival route. Every added tree owns exact rendered lower wood contact; no unreachable-tree collision exemption is used. Endpoint-height conformance keeps posts vertical; actual solid-mesh/body sweeps alone admit natural bank sections. No invisible barrier or old collision removal.','retention':'No old ordinary/shared certificate applies automatically; candidate full-source retention/recreation proof required at integration.','admission':{'normalDefault':False,'boundary':False,'collisionExemption':False,'nativeImporter':False,'rtVisuals':False,'gpuCost':False}}
 
 
 def inspect(data):
@@ -468,6 +502,7 @@ def produce():
             require(stats[name]['triangles']<=(1500 if level=='middle' else 250),'Authored tree budget exceeded')
             files['candidates/'+name]=data
             tips[name]=root_tips(data)
+    data=understory();stats['woodland-low-fern.glb']=inspect(data);files['candidates/woodland-low-fern.glb']=data
     data=fence();stats['boundary-panel.glb']=inspect(data);files['candidates/boundary-panel.glb']=data
     require(stats['boundary-panel.glb']['triangles']<=100,'Fence budget exceeded')
     layout=composition(stats,tips);require(layout['candidateTreeTriangles']<=547264,'Whole tree budget exceeded')
@@ -478,19 +513,21 @@ def produce():
     lines=['// Generated by author.py; source-only opt-in candidate, never normal defaults.',
            '#pragma once', '#include <array>', 'namespace horde::scene::surroundings_layout {',
            'struct Tree { unsigned asset; float x,y,z,yaw; };',
-           'struct Edge { std::array<float,3> a,b; bool inspectBank, arrivalPortal; };',
+           'struct Edge { std::array<float,3> a,b; bool inspectBank, arrivalPortal, fenceRequested; };',
            'inline constexpr std::array<Tree,416> trees{{']
     names=['pine-middle.glb','alder-middle.glb','pine-far.glb','alder-far.glb']
     for p in layout['placements'][64:]:
         lines.append('    {'+str(names.index(p['asset']))+','+','.join(f(p[k]) for k in ('x','originY','z','yawRadians'))+'},')
     lines+=['}};', 'inline constexpr std::array<Edge,196> edges{{']
     for e in layout['boundary']:
-        lines.append('    {{{'+','.join(map(f,e['a']))+'}},{{'+','.join(map(f,e['b']))+'}},'+str(e['preferredTreatment']=='inspect-existing-bank').lower()+','+str(e['arrivalPortal']).lower()+'},')
+        lines.append('    {{{'+','.join(map(f,e['a']))+'}},{{'+','.join(map(f,e['b']))+'}},'+str(e['preferredTreatment']=='inspect-existing-bank').lower()+','+str(e['arrivalPortal']).lower()+','+str(e['fenceRequested']).lower()+'},')
+    lines+=['}};', 'inline constexpr std::array<Tree,120> understory{{']
+    for p in layout['understory']:lines.append('    {5,'+','.join(f(p[k]) for k in ('x','y','z','yaw'))+'},')
     lines+=['}};', '}']
     files['native-layout.generated.h']=('\n'.join(lines)+'\n').encode()
     manifest=json.loads((TREE/'asset.manifest.json').read_text());manifest.update(asset='forest-surroundings-v1-source-candidates',distribution='source-only-unadmitted',licenceStatus=RIGHTS)
     manifest['budgets'].update(maxVertices=1500,maxIndices=4500,maxPrimitives=2)
-    manifest['lods']=[{'name':'middle','maxTriangles':1500},{'name':'far','maxTriangles':250},{'name':'boundary-panel','maxTriangles':100}]
+    manifest['lods']=[{'name':'middle','maxTriangles':1500},{'name':'far','maxTriangles':250},{'name':'boundary-panel','maxTriangles':100},{'name':'woodland-low-fern','maxTriangles':600}]
     files['candidates/asset.manifest.json']=encoded(manifest)
     files['asset-receipt.json']=encoded({'schema':1,'status':'UNADMITTED SOURCE CANDIDATES','rights':RIGHTS,'provider':'none','originalModels':{s:{'path':str((TREE/(v[0]+'.glb')).relative_to(ROOT)).replace('\\','/'),'sha256':v[1],'centrelineSha256':TRACE_SHA[s]} for s,v in SOURCES.items()},'assets':stats,'nativeImporter':'external exact-file receipt required; not implied by authoring','gpuPresentation':'not run','normalActivation':False})
     return files

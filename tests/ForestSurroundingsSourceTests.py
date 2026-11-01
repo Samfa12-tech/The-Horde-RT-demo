@@ -39,7 +39,9 @@ def validate(layout):
         if not 0<math.dist(a,b)<=2.40001:raise ValueError('Panel span')
         expected=any(author.project(author.add(a,author.mul(author.sub(b,a),t/20)),layout['arrivalRoute'][:2])[0]<layout['arrivalPortalHalfWidth'] for t in range(21))
         if edge.get('arrivalPortal')!=expected:raise ValueError('Unproved portal')
-        if edge['default']!=('open-mapped-arrival' if expected else 'visible-fence') or edge['collisionAdmitted']:raise ValueError('Unproved bank gap')
+        fenceExpected=not expected and ((sum(v[0] for v in (edge['a'],edge['b']))*.5<-42 and -24<sum(v[2] for v in (edge['a'],edge['b']))*.5<-10) or (-23<sum(v[0] for v in (edge['a'],edge['b']))*.5<-19 and 7<sum(v[2] for v in (edge['a'],edge['b']))*.5<15))
+        if edge['fenceRequested']!=fenceExpected:raise ValueError('Unproved fence selection')
+        if edge['default']!=('open-mapped-arrival' if expected else 'visible-fence' if fenceExpected else 'open-woodland') or edge['collisionAdmitted']:raise ValueError('Unproved bank gap')
         for t in range(11):
             if not -.00001<=clearance(author.add(a,author.mul(author.sub(b,a),t/10)))<=1.50001:raise ValueError('Protected pocket clipped/detail allowance exceeded')
     for a,b in zip(route,route[1:]):
@@ -52,7 +54,7 @@ def validate(layout):
         bounds=json.loads((HERE/'asset-receipt.json').read_text())['assets'][row['asset']]['bounds']
         radius=max(math.hypot(x,z) for x in (bounds[0][0],bounds[1][0]) for z in (bounds[0][2],bounds[1][2]))
         if not lo-.00001<=c-radius-1.5 or c>hi+.00001 or inside(p,poly):raise ValueError('Detail/reachability band')
-        if abs(row['nearestPlayableClearance']-(c-radius-1.5))>.00001:raise ValueError('Geometry clearance receipt')
+        if abs(row['nearestRouteEnvelopeClearance']-(c-radius-1.5))>.00001:raise ValueError('Geometry clearance receipt')
         if not 0<=row['fittedBurial']<=.65 or row['supportSamples']<3:raise ValueError('Ground contact')
         keep=layout['townKeepout']
         if all(keep['min'][k]<p[k]<keep['max'][k] for k in (0,1)):raise ValueError('Town reserve invaded')
@@ -66,6 +68,14 @@ class SourceTests(unittest.TestCase):
     def setUpClass(cls):
         cls.layout=json.loads((HERE/'composition.json').read_text())
         cls.receipt=json.loads((HERE/'asset-receipt.json').read_text())
+
+    def test_private_runtime_derivation_and_closed_roster(self):
+        spec=importlib.util.spec_from_file_location('admit_forest',ROOT/'tools/admit-forest-surroundings.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        expected=module.outputs()
+        self.assertEqual(len(expected),8)
+        self.assertEqual({p.name for p in module.RUNTIME.iterdir() if p.is_file()},set(expected))
+        for name,data in expected.items():self.assertEqual((module.RUNTIME/name).read_bytes(),data,name)
 
     def test_real_composition_constraints(self):validate(self.layout)
 
@@ -84,7 +94,7 @@ class SourceTests(unittest.TestCase):
     def test_actual_geometry_closed_attributes_and_cost(self):
         for name,row in self.receipt['assets'].items():
             self.assertEqual(author.inspect((HERE/'candidates'/name).read_bytes()),row)
-            limit=100 if name=='boundary-panel.glb' else 1500 if 'middle' in name else 250
+            limit=100 if name=='boundary-panel.glb' else 600 if name=='woodland-low-fern.glb' else 1500 if 'middle' in name else 250
             self.assertLessEqual(row['triangles'],limit)
             self.assertLessEqual(row['vertices'],2*row['triangles'])
         extra=sum(self.receipt['assets'][r['asset']]['triangles'] for r in self.layout['placements'][64:])

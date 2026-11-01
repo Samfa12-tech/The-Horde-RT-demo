@@ -1,5 +1,6 @@
 #include "scene/ShowcaseIndoorDust.h"
 #include "scene/atmosphere/HitParticleDust.h"
+#include "scene/atmosphere/ForestFireflies.h"
 #include <iostream>
 #include <limits>
 #include <cstring>
@@ -93,5 +94,50 @@ int main(){
     auto copy=hits;hits.Step(kHitBurstLifetime);
     check(!hits.Active() && copy.Active(),"all bursts expire bounded; immutable snapshot copy remains owned");
     copy.Clear();check(!copy.Active() && !copy.Add(1,EntityId::SkeletonA,{0,1,-2},{1,0,0}),"pause/reset cancels particles and cannot replay an old semantic contact");
+    DustCamera forestCamera{{-29.f,1.3f,-14.f},0,0,16.f/9};
+    unsigned groundCalls=0;
+    const auto ground=[&](float,float)->std::optional<float>{++groundCalls;return 0.f;};
+    BuildDustFrame({},DustQuality::Standard,forestCamera,2,frame,work);
+    const auto emptyFrame=frame;
+    for(auto q:{DustQuality::Off,DustQuality::Low}) {
+        check(OverlayForestFireflies(q,forestCamera,2,ground,frame,work)==0 && groundCalls==0 &&
+            std::memcmp(&frame,&emptyFrame,sizeof(frame))==0,"Low/Off fireflies do no ground queries or uploads");
+    }
+    const auto flies=OverlayForestFireflies(DustQuality::Standard,forestCamera,2,ground,frame,work);
+    check(flies==4 && work.generatedMotes==4 && work.projectedMotes>0,"nearby forest pocket produces only four bounded fireflies");
+    const auto firstFlies=frame;
+    for(unsigned i=0;i<flies;++i)check(frame.motes[i].response[2]==3 && frame.motes[i].positionRadius[1]>.5f &&
+        frame.motes[i].positionRadius[1]<1.6f,"fireflies follow real ground and carry emissive type");
+    BuildDustFrame({},DustQuality::Standard,forestCamera,2,repeat,again);
+    auto nearbyCamera=forestCamera;nearbyCamera.origin[0]+=.1f;
+    OverlayForestFireflies(DustQuality::Standard,nearbyCamera,2,ground,repeat,again);
+    check(repeat.motes[0].positionRadius==firstFlies.motes[0].positionRadius,"fireflies are world anchored, not camera following");
+    BuildDustFrame({},DustQuality::Standard,forestCamera,2.01,repeat,again);
+    OverlayForestFireflies(DustQuality::Standard,forestCamera,2.01,ground,repeat,again);
+    const auto p0=firstFlies.motes[0].positionRadius,p1=repeat.motes[0].positionRadius;
+    check(p0!=p1 && std::abs(p0[0]-p1[0])<.002f && std::abs(p0[1]-p1[1])<.002f &&
+        std::abs(p0[2]-p1[2])<.002f,"firefly motion is gentle and simulation-time driven");
+    BuildDustFrame({},DustQuality::Standard,forestCamera,2,repeat,again);
+    check(OverlayForestFireflies(DustQuality::Standard,forestCamera,2,
+        [](float,float)->std::optional<float>{return std::nullopt;},repeat,again)==0 && again.generatedMotes==0,
+        "missing ground produces no invented firefly height");
+    DustCamera distant=forestCamera;distant.origin[0]+=100;
+    groundCalls=0;
+    check(OverlayForestFireflies(DustQuality::Standard,distant,2,ground,repeat,again)==0 && groundCalls==0,
+        "distant forest skips ground work entirely");
+    // Dense ambient input plus contact feedback must retain the64-slot contract.
+    BuildDustFrame(overlaps,DustQuality::Standard,camera,2,frame,work);
+    OverlayForestFireflies(DustQuality::Standard,forestCamera,2,ground,frame,work);
+    EnemyHitParticles mixed;
+    mixed.Add(1,EntityId::SkeletonA,{-29,1,-17},{1,0,0});
+    mixed.Add(2,EntityId::Lich,{-29,1,-17},{1,0,0});
+    OverlayHitParticles(mixed,DustQuality::Standard,forestCamera,frame,work);
+    check(work.generatedMotes<=64 && work.combatMotes==16 && frame.motes[48].response[2]==1 &&
+        frame.motes[56].response[2]==2,"fireflies preserve contact priority and fixed upload capacity");
+    references=0;
+    for(auto tile:frame.tiles)for(auto id:tile)if(id!=kDustEmptyCandidate){++references;check(id<64,"firefly tile indices bounded");}
+    check(references==work.tileReferences,"firefly/contact tile references remain exactly accounted");
+    BuildDustFrame({},DustQuality::Low,forestCamera,2,repeat,again);
+    check(again.generatedMotes==0,"Standard to Low rebuild clears fireflies");
     std::cout<<"IndoorDust failures="<<failures<<'\n'; return failures?1:0;
 }

@@ -1036,6 +1036,14 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb", "models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb") &&
                     stageAsset("models/world/runtime/bellwether-shell-v4/asset.manifest.json", "models/world/runtime/bellwether-shell-v4/asset.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb", "models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/alder-far.glb", "models/world/runtime/forest-surroundings-v1/alder-far.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/alder-middle.glb", "models/world/runtime/forest-surroundings-v1/alder-middle.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/asset.manifest.json", "models/world/runtime/forest-surroundings-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/boundary-panel.glb", "models/world/runtime/forest-surroundings-v1/boundary-panel.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/pine-far.glb", "models/world/runtime/forest-surroundings-v1/pine-far.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/pine-middle.glb", "models/world/runtime/forest-surroundings-v1/pine-middle.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/runtime-roster.json", "models/world/runtime/forest-surroundings-v1/runtime-roster.json") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/woodland-low-fern.glb", "models/world/runtime/forest-surroundings-v1/woodland-low-fern.glb") &&
                     stageAsset("models/world/runtime/forest-understory-v1/asset.manifest.json", "models/world/runtime/forest-understory-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb", "models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb") &&
                     stageAsset("models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb", "models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb");
@@ -4786,7 +4794,7 @@ public class MainActivity extends Activity {
                 "Fire detail changes volume steps while preserving emitters, lights and gameplay. Menu / preview cap controls their frame cap. " +
                 "Glass enables only glass supported by this build; mobile lantern panes remain absent. Shadows select Current or Higher RT sampling. " +
                 "Mist toggles keeper-room ground mist; fire, smoke and electricity stay enabled. The compact authored preview has no ground mist.\n" +
-                "Particles controls room motes and brief enemy-hit fragments. Off disables both; Low uses fewer particles.\n\n" +
+                "Particles controls room motes and brief enemy-hit fragments. Standard adds forest fireflies. Low uses fewer particles and no fireflies; Off disables all.\n\n" +
                 "Changing a choice edits the draft. Apply saves it automatically only after the exact requested settings appear in a successful RT presentation. " +
                 "Back, Restore or backgrounding cancels an outstanding Apply. Interrupted or failed changes restore Saved settings. Preview measurements are not full-game performance guarantees." +
                 (graphicsDetailedStatus.isEmpty() ? "" : "\n\nCurrent status\n" + graphicsDetailedStatus));

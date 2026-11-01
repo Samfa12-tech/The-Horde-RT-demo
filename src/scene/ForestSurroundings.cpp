@@ -1,5 +1,6 @@
 #include "scene/ForestSurroundings.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
+#include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "../../assets/models/world/source/forest-surroundings-v1/native-layout.generated.h"
 #include <algorithm>
 #include <cmath>
@@ -11,9 +12,9 @@ namespace {
 using Asset=assets::StaticMeshAsset;
 using Surface=gameplay::simulation::TriangleSupportSurface;
 using Point=Surface::Point;
-constexpr std::array<const char*,5> kNames{
-    "pine-middle.glb","alder-middle.glb","pine-far.glb","alder-far.glb","boundary-panel.glb"};
-constexpr std::array<std::size_t,5> kTriangles{1474,1390,164,180,60};
+constexpr std::array<const char*,6> kNames{
+    "pine-middle.glb","alder-middle.glb","pine-far.glb","alder-far.glb","boundary-panel.glb","woodland-low-fern.glb"};
+constexpr std::array<std::size_t,6> kTriangles{1474,1390,164,180,60,588};
 constexpr std::array<std::string_view,4> kSourceFamilies{
     "Original charcoal-gray ridged bark","Original opaque pine needle sprays",
     "Original opaque hanging woodland moss","Original opaque alder leaves"};
@@ -68,9 +69,9 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
         destination[f]=static_cast<std::uint32_t>(found-owner.materials.begin());
     }
     assets::AssetManifest manifest;
-    const auto folder=root/"models/world/source/forest-surroundings-v1/candidates";
+    const auto folder=root/"models/world/runtime/forest-surroundings-v1";
     if(!assets::AssetManifest::Load(folder/"asset.manifest.json",manifest,diagnostic))return false;
-    std::array<Asset,5> sources;
+    std::array<Asset,6> sources;
     for(std::size_t i=0;i<sources.size();++i) {
         if(!Asset::Load(folder/kNames[i],manifest,sources[i],diagnostic))return false;
         const auto& a=sources[i];
@@ -93,7 +94,7 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
     auto& report=prepared->report;
     // One source primitive at a time, preserving local indices and every basis
     // attribute. All temporary geometry stays CPU-side until final validation.
-    const auto append=[&](const Asset& a,auto transform,bool fence,bool keepEndingPost=false) {
+    const auto append=[&](const Asset& a,auto transform,bool fence,bool keepEndingPost=false,bool treeContact=false) {
         for(const auto& p:a.primitives) {
             const auto family=std::find(kSourceFamilies.begin(),kSourceFamilies.end(),a.materials[p.materialIndex].name)-kSourceFamilies.begin();
             auto& v=vertices[family];auto& ix=indices[family];
@@ -120,6 +121,13 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
                     }
                     ix.push_back(remap[local]);
                     const auto& out=v[remap[local]];tri.points[c]={out.position[0],out.position[1],out.position[2]};
+                }
+                if(treeContact && family==0) {
+                    float low=std::numeric_limits<float>::max();
+                    for(unsigned c=0;c<3;++c)low=std::min(low,a.vertices[p.vertexOffset+a.indices[p.indexOffset+t+c]].position[1]);
+                    // Exact rendered wood faces intersecting the lower 3m:
+                    // roots/trunk/low branches, no proxy box or invisible sheet.
+                    if(low<3.f) {collision.push_back(tri);++report.treeContactTriangles;}
                 }
                 if(fence) {
                     const auto& a0=a.vertices[p.vertexOffset+a.indices[p.indexOffset+t]].position;
@@ -156,8 +164,29 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
             const auto rotate=[&](auto& f){const float x=f[0],z=f[2];f[0]=co*x+si*z;f[2]=-si*x+co*z;};
             rotate(v.position);rotate(v.normal);rotate(v.tangent);
             v.position[0]+=p.x;v.position[1]+=fitted;v.position[2]+=p.z;return v;
-        },false))return fail("invalid transformed tree basis.");
+        },false,false,true))return fail("invalid transformed tree basis.");
         ++report.extraTrees;report.addedTreeTriangles+=kTriangles[p.asset];
+    }
+    for(const auto& p:surroundings_layout::understory) {
+        const auto& a=sources[5];const auto centre=terrain->Query(p.x,p.z);
+        if(!centre.found)return fail("understory lacks ground");
+        const float co=std::cos(p.yaw),si=std::sin(p.yaw);
+        float fitted=centre.worldY-a.bounds.minimum[1]-.03f;
+        for(const auto& v:a.vertices) {
+            const float x=p.x+co*v.position[0]+si*v.position[2],z=p.z-si*v.position[0]+co*v.position[2];
+            const auto under=terrain->Query(x,z);
+            if(!under.found)return fail("understory full footprint leaves imported ground");
+            if(v.position[1]<=a.bounds.minimum[1]+.03f)fitted=std::min(fitted,under.worldY-v.position[1]-.03f);
+            if(gameplay::simulation::ProjectWorldRoute(x,z).distance<1.35f ||
+               std::hypot(x+33.7f,z+17.f)<4.1f || std::hypot(x+28.7f,z+5.8f)<3.f || std::hypot(x-13.3f,z-36.2f)<3.2f)
+                return fail("actual understory footprint obstructs route or protected pocket");
+        }
+        if(!append(a,[&](auto v,bool){
+            auto rotate=[&](auto& f){const float x=f[0],z=f[2];f[0]=co*x+si*z;f[2]=-si*x+co*z;};
+            rotate(v.position);rotate(v.normal);rotate(v.tangent);
+            v.position[0]+=p.x;v.position[1]+=fitted;v.position[2]+=p.z;return v;
+        },false))return fail("invalid understory basis");
+        ++report.understoryClumps;report.understoryTriangles+=kTriangles[5];
     }
     // Resolve visible natural boundaries before assembling runs. A short fence
     // ending at a bank or the arrival portal owns its terminal post; joined
@@ -168,6 +197,7 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
         if(e.arrivalPortal) {++report.arrivalPortalRuns;continue;}
         std::size_t probes=0;
         if(EdgeBlocked(*terrain,e,probes)) {++report.naturalBankRuns;continue;}
+        if(!e.fenceRequested) {++report.openWoodlandRuns;continue;}
         fences[i]=true;
     }
     for(std::size_t i=0;i<fences.size();++i) {
@@ -191,17 +221,17 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
         ++report.fenceRuns;if(terminal)++report.terminalFencePosts;
     }
     report.fenceTriangles=report.fenceRuns*48+report.terminalFencePosts*12;
-    report.boundaryCollisionTriangles=collision.size();
+    report.boundaryCollisionTriangles=collision.size()-report.treeContactTriangles;
     if(terrain->TriangleCount()+terrain->NonWalkableTriangleCount()+terrain->StepTriangleCount()+collision.size()>Surface::kMaximumTriangles)
         return fail("boundary exceeds immutable support intake: ground="+std::to_string(terrain->TriangleCount())+
             " existingSolid="+std::to_string(terrain->NonWalkableTriangleCount())+" step="+std::to_string(terrain->StepTriangleCount())+
             " newFence="+std::to_string(collision.size())+" limit="+std::to_string(Surface::kMaximumTriangles)+".");
     auto combined=Surface::WithAdditionalNonWalkableGeometry(*terrain,collision,diagnostic);
     if(!combined)return false;
-    for(const auto& e:surroundings_layout::edges)if(!e.arrivalPortal && !EdgeBlocked(*combined,e,report.boundaryProbes))
+    for(const auto& e:surroundings_layout::edges)if(e.fenceRequested && !e.arrivalPortal && !EdgeBlocked(*combined,e,report.boundaryProbes))
         return fail("actual rendered boundary leaves a crouch/dodge crossing at "+std::to_string(&e-surroundings_layout::edges.data())+".");
     report.boundarySectionsContained=true;
-    report.boundaryContained=report.arrivalPortalRuns==0;
+    report.boundaryContained=report.arrivalPortalRuns==0 && report.openWoodlandRuns==0;
     Asset staged=owner;
     staged.triangleRegions.resize(staged.indices.size()/3,assets::StaticTriangleRegion::Shared);
     for(std::size_t f=0;f<4;++f)if(!indices[f].empty()) {

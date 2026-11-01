@@ -409,8 +409,11 @@ centreline and output SHA256 values. No bought/provider/third-party geometry or
 new texture is introduced; existing owner asset rights remain, with no blanket
 MIT, CC0 or other asset licence assigned. The 480-tree composition and boundary
 data are original Horde scene-authoring derivatives of the preserved approved
-world reference. These are source-only/unadmitted candidates, excluded from normal
-runtime/shipping selection; no distribution or renderer acceptance is implied.
+world reference. The 1 November integration copies the six exact authored GLBs
+into `assets/models/world/runtime/forest-surroundings-v1/` with a pinned runtime
+manifest/roster for the private 1.7 chapter on Windows and Android. This includes
+an original 588-triangle low fern, using the same owned material/image bytes.
+This private content admission is not release or device-performance acceptance.
 
 The 1 November forest composition revision retains those same rights and exact
 embedded images; its broader silhouettes and lower branch/spray arrangement are

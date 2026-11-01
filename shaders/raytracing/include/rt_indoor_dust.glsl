@@ -65,7 +65,8 @@ vec4 dustCandidate(uint index,vec3 origin,vec3 direction,float depth,float pixel
     if(separation>=radius) return vec4(0.0,0.0,0.0,1.0);
     float footprint=radius/max(t*pixelAngle,0.00001);
     // Fade subpixel specks instead of expanding/brightening them at reduced scale.
-    float contact=step(0.5,mote.response.z), goo=step(1.5,mote.response.z);
+    float firefly=step(2.5,mote.response.z);
+    float contact=step(0.5,mote.response.z)*(1.0-firefly), goo=step(1.5,mote.response.z)*(1.0-firefly);
     vec3 local=(origin+direction*t-p)/radius;
     float chip=1.0-smoothstep(0.80,1.0,dot(abs(local),vec3(0.85,1.15,0.85)));
     float drop=1.0-smoothstep(radius*0.70,radius,separation);
@@ -73,6 +74,10 @@ vec4 dustCandidate(uint index,vec3 origin,vec3 direction,float depth,float pixel
     float alpha=mote.response.x*silhouette*
         smoothstep(0.25,0.8,footprint)*smoothstep(0.0,radius,depth-t);
     if(alpha<=0.00001) return vec4(0.0,0.0,0.0,1.0);
+    // Tiny self-emissive bodies in the existing world-space particle path.
+    // No bloom, dynamic light, visibility ray or acceleration-structure update.
+    // Primary RT depth still occludes them; secondary reflections exclude motes.
+    if(firefly>0.5) return vec4(vec3(1.6,2.2,0.18)*alpha,1.0-alpha);
     vec3 reflectance=mix(vec3(0.82),mix(vec3(0.82,0.78,0.66),vec3(0.024,0.018,0.028),goo),contact);
     // Existing RT-visible incident sources; no glow, extra light or ray site.
     return vec4(dustIncidentLight(p,quality)*reflectance*alpha,1.0-alpha);

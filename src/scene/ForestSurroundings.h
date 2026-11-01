@@ -6,7 +6,8 @@ namespace horde::scene {
 // Geometry is world-baked into the existing owner/material families. No new
 // texture/instance/BLAS role, ordinary omission certificate or normal activation.
 struct ForestSurroundingsReport {
-    std::size_t extraTrees=0, addedTreeTriangles=0, fenceRuns=0, naturalBankRuns=0, arrivalPortalRuns=0, terminalFencePosts=0;
+    std::size_t extraTrees=0, addedTreeTriangles=0, fenceRuns=0, naturalBankRuns=0, arrivalPortalRuns=0, terminalFencePosts=0, openWoodlandRuns=0;
+    std::size_t treeContactTriangles=0, understoryClumps=0, understoryTriangles=0;
     std::size_t fenceTriangles=0, boundaryCollisionTriangles=0, boundaryProbes=0, addedVertices=0, addedIndices=0;
     float maximumRootBurial=0;
     // Only closed sections are certified; mapped arrival remains open.

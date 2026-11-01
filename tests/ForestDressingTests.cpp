@@ -4,6 +4,7 @@
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
 #include "scene/ForestSurroundings.h"
+#include "../assets/models/world/source/forest-surroundings-v1/native-layout.generated.h"
 #include "scene/CorridorRegionalWaterClosure.h"
 #include "scene/ForestUnderstory.h"
 #include "scene/ForestRockDressing.h"
@@ -1082,13 +1083,14 @@ void TestFullSurroundings()
     Check(accepted,diagnostic);if(!accepted)return;
     const auto& r=result->report;
     Check(r.extraTrees==416 && r.addedTreeTriangles==190784 && r.boundarySectionsContained && !r.boundaryContained && r.arrivalPortalRuns==6 &&
-          r.fenceRuns+r.naturalBankRuns+r.arrivalPortalRuns==196 && r.terminalFencePosts>0 && r.fenceTriangles==r.fenceRuns*48+r.terminalFencePosts*12 && r.boundaryCollisionTriangles==r.fenceRuns*20+r.terminalFencePosts*8,
+          r.fenceRuns+r.naturalBankRuns+r.arrivalPortalRuns+r.openWoodlandRuns==196 && r.terminalFencePosts>0 && r.fenceTriangles==r.fenceRuns*48+r.terminalFencePosts*12 && r.boundaryCollisionTriangles==r.fenceRuns*20+r.terminalFencePosts*8,
           "full study owns exact additional trees and only rendered boundary sections with explicit open arrival");
+    Check(r.treeContactTriangles==10648 && r.understoryClumps==120 && r.understoryTriangles==70560,"every candidate includes real lower tree contact and bounded understory");
     Check(owner.materials.size()==baseline.materials.size() && owner.primitives.size()==baseline.primitives.size() &&
           owner.indices.size()==baseline.indices.size()+r.addedIndices && owner.HasValidTriangleProvenance(),
           "full study reuses all existing material/primitive/asset roles without capacity growth");
     Check(terrain!=baselineTerrain && terrain->TriangleCount()==baselineTerrain->TriangleCount() &&
-          terrain->NonWalkableTriangleCount()==baselineTerrain->NonWalkableTriangleCount()+r.boundaryCollisionTriangles &&
+          terrain->NonWalkableTriangleCount()==baselineTerrain->NonWalkableTriangleCount()+r.boundaryCollisionTriangles+r.treeContactTriangles &&
           result->terrain==terrain && original->placements.size()==originalPlacements.size(),
           "immutable boundary publication retains original ground and existing nonwalkable geometry");
     // Compare the playable corridor to the original support, rather than
@@ -1110,6 +1112,18 @@ void TestFullSurroundings()
         }
     }
     Check(clearance,"actual new boundary solids retain standing/crouched route width wherever the original scene was clear");
+    std::size_t treeApproachProbes=0;
+    for(const auto& tree:horde::scene::surroundings_layout::trees) {
+        const auto ground=baselineTerrain->Query(tree.x,tree.z);
+        for(unsigned angle=0;angle<16;++angle)for(float height:{.75f,1.8f}) {
+            const float theta=float(angle)*6.28318530718f/16;
+            const bool clear=terrain->NonWalkableVolumeClear(tree.x+std::cos(theta)*1.5f,tree.z+std::sin(theta)*1.5f,
+                tree.x,tree.z,ground.worldY+.05f,ground.worldY+height,.22f);
+            Check(!clear,"every added root/trunk blocks standing and crouched radial approach, including open-arrival-accessible trees");
+            ++treeApproachProbes;
+        }
+    }
+    Check(treeApproachProbes==13312,"all416 added tree contacts receive32 approach probes");
     using namespace horde::vulkan::raytracing;
     const auto flags=static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
     RtStaticMeshSlot packed;
@@ -1152,7 +1166,7 @@ void TestFullSurroundings()
           ForestRepresentationDigest(owner,{})==digest && terrain==retained && result==prior,
           "failed candidate preparation preserves all already published geometry/support/receipts");
     std::cout<<"Surroundings native: trees="<<64+r.extraTrees<<" fences="<<r.fenceRuns<<" natural="<<r.naturalBankRuns
-             <<" fenceTriangles="<<r.fenceTriangles<<" boundaryCollision="<<r.boundaryCollisionTriangles<<" crossingProbes="<<r.boundaryProbes
+             <<" treeContact="<<r.treeContactTriangles<<" openWoodland="<<r.openWoodlandRuns<<" understoryTriangles="<<r.understoryTriangles<<" fenceTriangles="<<r.fenceTriangles<<" boundaryCollision="<<r.boundaryCollisionTriangles<<" crossingProbes="<<r.boundaryProbes
              <<" routeClearanceProbes="<<clearanceProbes<<" cpuSubsetTriangles="<<omissions.size()<<" addedRawBytes="<<r.addedVertices*sizeof(StaticRtVertex)+r.addedIndices*4<<" sourceWitness="<<digest<<'\n';
 }
 

@@ -126,6 +126,16 @@ int main()
     using namespace horde::gameplay;
     using namespace horde::vulkan::raytracing;
 
+    {
+        PresentableTinyRtScene normal;
+        if(!Require(!normal.ForestSurroundingsSelected(),"woodland is scoped to the authored chapter"))return 1;
+        normal.SetDevelopmentRescueJourney(true);
+        if(!Require(normal.ForestSurroundingsSelected(),"normal private chapter selects immutable woodland"))return 1;
+        if(!Require(normal.SetSharedForestGeometryEnabled(true) && !normal.ForestSurroundingsSelected(),
+            "explicit shared64 control excludes480 rather than combining rosters"))return 1;
+        if(!Require(normal.SetSharedForestGeometryEnabled(false) && normal.ForestSurroundingsSelected(),
+            "returning to normal content restores480 selection before resource creation"))return 1;
+    }
 #if defined(_DEBUG)
     {
         PresentableTinyRtScene scene;std::string error;

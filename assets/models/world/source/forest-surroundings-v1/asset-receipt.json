@@ -132,6 +132,35 @@
         "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44"
       ]
     },
+    "woodland-low-fern.glb": {
+      "triangles": 588,
+      "vertices": 420,
+      "bounds": [
+        [
+          -0.8373849987983704,
+          -0.007170225027948618,
+          -0.8469950556755066
+        ],
+        [
+          0.8501189947128296,
+          0.6544312238693237,
+          0.8389648199081421
+        ]
+      ],
+      "bytes": 1161988,
+      "sha256": "1e5509f5b28a44565a394e4686b21e1b9076462dd6eb2496b99bcefde5cc95b6",
+      "opaque": true,
+      "uv0NormalsTangents": true,
+      "closedOrientedComponents": true,
+      "rawNativeBytes": 33936,
+      "embeddedImageSha256": [
+        "e9140e672e54a4b073351b4f17b76f15238ff8cc70e8c16158a54e0ddc092822",
+        "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+        "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+        "bab9da5a1d72edcb5949fafeb1be5963fc73b457230fbb1f055cb09e52fcd66e",
+        "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44"
+      ]
+    },
     "boundary-panel.glb": {
       "triangles": 60,
       "vertices": 40,

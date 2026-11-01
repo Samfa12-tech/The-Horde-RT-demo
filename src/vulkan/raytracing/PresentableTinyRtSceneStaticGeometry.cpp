@@ -73,7 +73,7 @@ bool PresentableTinyRtScene::DebugAdmitOrdinaryForestCandidate(std::uint64_t exp
 {
     const auto reject=[&](const char* reason){diagnostic=reason;return false;};
     if(!ready_ || !developmentRescueJourney_ || sceneProfile_!=RtSceneProfile::Showcase ||
-       UsesSharedForestGeometry() || forestRouteProofMode_!=ForestRouteProofMode::Disabled ||
+       UsesSharedForestGeometry() || SelectForestSurroundingsPrototype() || forestRouteProofMode_!=ForestRouteProofMode::Disabled ||
        !expectedGeneration || expectedGeneration!=staticGeometryGeneration_ ||
        !expectedSource || expectedSource!=fullStaticGeometrySource_ ||
        !StaticGeometryHasCompleteContributors() || ordinaryStaticReduced_ || ordinaryStaticCandidate_ ||
@@ -643,7 +643,7 @@ std::shared_ptr<const RtStaticTriangleOmissions> PresentableTinyRtScene::CreateS
     std::uint64_t expectedGeneration, std::span<const std::uint32_t> triangles,
     std::string& diagnostic) const
 {
-    if(UsesSharedForestGeometry()){diagnostic="Shared forest cannot create baked world-triangle omissions.";return {};}
+    if(UsesSharedForestGeometry() || SelectForestSurroundingsPrototype()){diagnostic="Shared or complete woodland content cannot reuse baked world-triangle omissions.";return {};}
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled) {
         diagnostic="Forest route proof cannot reuse or create the ordinary world-triangle omission certificate.";return {};

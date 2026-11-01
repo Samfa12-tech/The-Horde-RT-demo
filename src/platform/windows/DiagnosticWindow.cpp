@@ -2982,7 +2982,7 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
              << "\r\nWater: Mobile omits droplets; High adds reflections/droplets; Off hides water."
              << "\r\nFire: Low/Mobile/High use2/4/10 steps; light strength unchanged."
              << "\r\nShadows: Current area1; Higher area2/4. Cost unmeasured."
-             << "\r\nParticles: Off/Low/Standard controls room motes and hit fragments; cost unmeasured."
+             << "\r\nParticles: Low keeps fewer motes/fragments. Standard adds forest fireflies. Off disables all; cost unmeasured."
              << "\r\nApply needs an RT frame. Keep confirms within 15 foreground seconds."
              << "\r\n" << context.graphicsStatus;
         SetWindowTextA(GetDlgItem(context.windowHandle, kGraphicsInfoId), info.str().c_str());
@@ -8147,6 +8147,7 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                   << static_cast<unsigned>(capture.actualUploadedDustQuality)
                   << ", \"cpuWork\": {\"admittedZones\": " << capture.dustWork.admittedZones
                   << ", \"generatedMotes\": " << capture.dustWork.generatedMotes
+                  << ", \"fireflyMotes\": " << capture.dustWork.fireflyMotes
                   << ", \"projectedMotes\": " << capture.dustWork.projectedMotes
                   << ", \"tileReferences\": " << capture.dustWork.tileReferences
                   << ", \"overflowReferences\": " << capture.dustWork.overflowReferences << "}},\n"

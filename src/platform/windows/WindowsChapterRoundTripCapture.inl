@@ -4,8 +4,14 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
 {
     using namespace horde::gameplay::validation;
     const bool sharedForest=context.rtScene.SharedForestGeometryActive();
+    const bool residentWoodland=context.rtScene.ForestSurroundingsActive();
+    unsigned residentValidatedFrames=0;
     unsigned sharedValidatedFrames=0,maximumSharedMasked=0;
     const auto validateShared=[&] {
+        if(residentWoodland) {
+            if(!context.rtScene.ForestSurroundingsActive() || !context.rtScene.ValidateForestRouteProof(error))return false;
+            ++residentValidatedFrames;return true;
+        }
         if(!sharedForest)return true;
         if(!context.rtScene.SharedForestGeometryActive() || !context.rtScene.ValidateForestRouteProof(error))return false;
         ++sharedValidatedFrames;
@@ -208,7 +214,13 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
         error="Ordinary reset left stale companion or retired Keeper storage.";return false;
     }
     const auto detail=context.rtScene.OrdinaryStaticDetailEvidence();
-    if(sharedForest) {
+    if(residentWoodland) {
+        if(!residentValidatedFrames || !context.rtScene.ValidateForestRouteProof(error) ||
+           !context.rtScene.StaticGeometryHasCompleteContributors() || detail.unloads || detail.restores ||
+           detail.savedOwnerBytes || context.simulation.Snapshot().staticDetailLease.resourceGeneration) {
+            error="Resident woodland route lost complete contributors or reused an old omission lease.";return false;
+        }
+    }else if(sharedForest) {
         // Resident shared masters use whole-instance decisions, not the baked
         // owner's eviction transaction. Keep the legacy assertion below intact.
         // Every route frame and reset above validates exact submitted owners and
@@ -222,6 +234,8 @@ bool RunChapterRoundTripCapture(VulkanSurfaceContext& context,const std::filesys
     }
     manifest<<"\n],\"frames\":"<<frames-1
         <<",\"warmupFrames\":64,\"fullRouteValidated\":true,\"recreationTestRequiredSeparately\":true"
+        <<",\"residentWoodland\":"<<(residentWoodland?"true":"false")
+        <<",\"residentWoodlandValidatedFrames\":"<<residentValidatedFrames
         <<",\"sharedForestResident\":"<<(sharedForest?"true":"false")
         <<",\"sharedForestValidatedFrames\":"<<sharedValidatedFrames
         <<",\"maximumSharedForestMaskedInstances\":"<<maximumSharedMasked

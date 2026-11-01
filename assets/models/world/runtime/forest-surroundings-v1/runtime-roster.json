@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "policy": "closed-roster",
+  "asset": "forest-surroundings-v1",
+  "source": "assets/models/world/source/forest-surroundings-v1",
+  "sourceLayoutSha256": "0d18400b99176b7df39955e6fd70e40bc4ace981a9d665988ae89f551fa1a98b",
+  "files": [
+    {
+      "path": "pine-middle.glb",
+      "bytes": 1172280,
+      "sha256": "74b83325e9a80bdf2fcc8f7a413a08f430ee6e2f8965d0afeb4587f49742008f"
+    },
+    {
+      "path": "alder-middle.glb",
+      "bytes": 1200292,
+      "sha256": "1d79ab1901272a0633f50f9da60eddabd7685d9b957e1a3dcc97175faaf8bba3"
+    },
+    {
+      "path": "pine-far.glb",
+      "bytes": 1110020,
+      "sha256": "e12ba8af5855a8c33a88057611708e74dc20c03bf5dcbb9ef974933ce9c2b4b4"
+    },
+    {
+      "path": "alder-far.glb",
+      "bytes": 1142888,
+      "sha256": "c3ad6a0c0d0fddb3cc936d530cae2d7a345e851a7f80edd702147d2d15a1eb23"
+    },
+    {
+      "path": "boundary-panel.glb",
+      "bytes": 1104816,
+      "sha256": "a8a7cc53cc4d4277ebd8ff6d43deeffc5ba5b039de9ead781d1ac033ef86df82"
+    },
+    {
+      "path": "woodland-low-fern.glb",
+      "bytes": 1161988,
+      "sha256": "1e5509f5b28a44565a394e4686b21e1b9076462dd6eb2496b99bcefde5cc95b6"
+    },
+    {
+      "path": "asset.manifest.json",
+      "bytes": 1037,
+      "sha256": "40d688bf4813ec6ae465ed10d24aa00e46758dc89467107eca68c224a072ba61"
+    }
+  ],
+  "rights": "Original project-authored geometry, derived from the owned Horde tree centreline records and original PBR maps. No provider, purchase or third-party geometry. Existing rights remain; no blanket MIT/CC0 grant.",
+  "contact": "Every additional tree has exact rendered lower wood contact; no unreachable-tree exemption."
+}

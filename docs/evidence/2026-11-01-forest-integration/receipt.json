@@ -1,0 +1,958 @@
+{
+  "schema": 1,
+  "sourceBaseCommit": "f156a69c58d8631e06bc89ab0cf5469ea4b2ec93",
+  "normalPrivateChapterEnabled": true,
+  "releaseOrPerformanceAdmission": false,
+  "sourceState": "Exact working source bytes captured before development commit; no code changes after builds/captures.",
+  "windowsExecutable": {
+    "bytes": 15471616,
+    "sha256": "e88bfd75916fa38e043f64810611d38f8b5004b25cf2fef1941053a83e6ea76f"
+  },
+  "androidApk": {
+    "bytes": 208457188,
+    "sha256": "6813bbd508a7530fa60e58d8aeb6c048de7020b805097b33f81f6b7070756b2b"
+  },
+  "androidValidation": "Offline configured-ABI debug build plus exact APK asset roster passed. Parent owns separately recorded device evidence.",
+  "captures": [
+    {
+      "label": "f01-standard",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-integration-20261101\\f01-standard",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-landing-north",
+          "--capture-dust",
+          "standard"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 15471616,
+          "sha256": "e88bfd75916fa38e043f64810611d38f8b5004b25cf2fef1941053a83e6ea76f"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignBefore": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundBefore": null,
+        "pid": 4944,
+        "exitCode": 0,
+        "seconds": 64.43799999999464,
+        "pending": false,
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignAfter": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundChanges": [],
+        "captureNeverForeground": true,
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "forestProof": {
+        "mode": "normal-woodland480",
+        "defaultEnabled": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "forestContentAdmitted": true,
+        "performanceAdmitted": false,
+        "totalTreePlacements": 480,
+        "surroundingsExtraRoots": 416,
+        "surroundingsFenceRuns": 12,
+        "surroundingsNaturalBankRuns": 81,
+        "surroundingsTerminalFencePosts": 1,
+        "surroundingsOpenWoodlandRuns": 97,
+        "surroundingsTreeContactTriangles": 10648,
+        "surroundingsUnderstoryClumps": 120,
+        "surroundingsArrivalPortalRuns": 6,
+        "surroundingsBoundaryContained": false,
+        "fitsCapacities": true
+      },
+      "manifest": {
+        "bytes": 24852,
+        "sha256": "a332e78f2395bcade9a594302e4458565582724de586977b537218ebf80ab155"
+      },
+      "frames": [
+        {
+          "checkpoint": "chapter-landing-north",
+          "file": "193-chapter-landing-north.png",
+          "pngSha256": "554ad4487ab49bf6512842c7b898d26ea488a7555ba2371e644bf1755a2db8b5",
+          "indoorDust": {
+            "requestedQuality": 2,
+            "actualUploadedQuality": 2,
+            "cpuWork": {
+              "admittedZones": 0,
+              "generatedMotes": 4,
+              "fireflyMotes": 4,
+              "projectedMotes": 4,
+              "tileReferences": 5,
+              "overflowReferences": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "f01-low",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-integration-20261101\\f01-low",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-landing-north",
+          "--capture-dust",
+          "low"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 15471616,
+          "sha256": "e88bfd75916fa38e043f64810611d38f8b5004b25cf2fef1941053a83e6ea76f"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignBefore": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundBefore": null,
+        "pid": 29508,
+        "exitCode": 0,
+        "seconds": 26.296999999991385,
+        "pending": false,
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignAfter": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundChanges": [],
+        "captureNeverForeground": true,
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "forestProof": {
+        "mode": "normal-woodland480",
+        "defaultEnabled": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "forestContentAdmitted": true,
+        "performanceAdmitted": false,
+        "totalTreePlacements": 480,
+        "surroundingsExtraRoots": 416,
+        "surroundingsFenceRuns": 12,
+        "surroundingsNaturalBankRuns": 81,
+        "surroundingsTerminalFencePosts": 1,
+        "surroundingsOpenWoodlandRuns": 97,
+        "surroundingsTreeContactTriangles": 10648,
+        "surroundingsUnderstoryClumps": 120,
+        "surroundingsArrivalPortalRuns": 6,
+        "surroundingsBoundaryContained": false,
+        "fitsCapacities": true
+      },
+      "manifest": {
+        "bytes": 24850,
+        "sha256": "a17a911bd6dacde76bfb84446b3d159ac386ec8febf3afe8d91e156e76aa3a5f"
+      },
+      "frames": [
+        {
+          "checkpoint": "chapter-landing-north",
+          "file": "193-chapter-landing-north.png",
+          "pngSha256": "cd91be193ec12cfe92a52b71d0aec98c29b9dd36a05578040f86384f227c9c08",
+          "indoorDust": {
+            "requestedQuality": 1,
+            "actualUploadedQuality": 1,
+            "cpuWork": {
+              "admittedZones": 0,
+              "generatedMotes": 0,
+              "fireflyMotes": 0,
+              "projectedMotes": 0,
+              "tileReferences": 0,
+              "overflowReferences": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "f01-off",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-integration-20261101\\f01-off",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-landing-north",
+          "--capture-dust",
+          "off"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 15471616,
+          "sha256": "e88bfd75916fa38e043f64810611d38f8b5004b25cf2fef1941053a83e6ea76f"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignBefore": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundBefore": null,
+        "pid": 23076,
+        "exitCode": 0,
+        "seconds": 26.062999999994645,
+        "pending": false,
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignAfter": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundChanges": [],
+        "captureNeverForeground": true,
+        "foregroundUnchanged": true,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "forestProof": {
+        "mode": "normal-woodland480",
+        "defaultEnabled": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "forestContentAdmitted": true,
+        "performanceAdmitted": false,
+        "totalTreePlacements": 480,
+        "surroundingsExtraRoots": 416,
+        "surroundingsFenceRuns": 12,
+        "surroundingsNaturalBankRuns": 81,
+        "surroundingsTerminalFencePosts": 1,
+        "surroundingsOpenWoodlandRuns": 97,
+        "surroundingsTreeContactTriangles": 10648,
+        "surroundingsUnderstoryClumps": 120,
+        "surroundingsArrivalPortalRuns": 6,
+        "surroundingsBoundaryContained": false,
+        "fitsCapacities": true
+      },
+      "manifest": {
+        "bytes": 24848,
+        "sha256": "b1dbdbbc9f1150263c6dc14934576c56cc4ebca53a717d304342dee4b3accfb6"
+      },
+      "frames": [
+        {
+          "checkpoint": "chapter-landing-north",
+          "file": "193-chapter-landing-north.png",
+          "pngSha256": "cd91be193ec12cfe92a52b71d0aec98c29b9dd36a05578040f86384f227c9c08",
+          "indoorDust": {
+            "requestedQuality": 0,
+            "actualUploadedQuality": 0,
+            "cpuWork": {
+              "admittedZones": 0,
+              "generatedMotes": 0,
+              "fireflyMotes": 0,
+              "projectedMotes": 0,
+              "tileReferences": 0,
+              "overflowReferences": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "f04-standard",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-integration-20261101\\f04-standard",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-forest-lookout",
+          "--forest-route-proof",
+          "baked-surroundings480",
+          "--capture-dust",
+          "standard"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 15471616,
+          "sha256": "e88bfd75916fa38e043f64810611d38f8b5004b25cf2fef1941053a83e6ea76f"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignBefore": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundBefore": null,
+        "pid": 60036,
+        "exitCode": 0,
+        "seconds": 47.484000000025844,
+        "pending": false,
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignAfter": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundChanges": [
+          {
+            "hwnd": 198980,
+            "pid": 1308,
+            "seconds": 1.7650000000139698
+          },
+          {
+            "hwnd": 21040030,
+            "pid": 4716,
+            "seconds": 3.01500000001397
+          },
+          {
+            "hwnd": 132086,
+            "pid": 19112,
+            "seconds": 3.26500000001397
+          },
+          {
+            "hwnd": 17500414,
+            "pid": 4716,
+            "seconds": 45.234000000025844
+          }
+        ],
+        "captureNeverForeground": true,
+        "foregroundUnchanged": false,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "forestProof": {
+        "mode": "baked-surroundings480",
+        "defaultEnabled": false,
+        "proofOverride": true,
+        "fullyResident": true,
+        "forestContentAdmitted": true,
+        "performanceAdmitted": false,
+        "totalTreePlacements": 480,
+        "surroundingsExtraRoots": 416,
+        "surroundingsFenceRuns": 12,
+        "surroundingsNaturalBankRuns": 81,
+        "surroundingsTerminalFencePosts": 1,
+        "surroundingsOpenWoodlandRuns": 97,
+        "surroundingsTreeContactTriangles": 10648,
+        "surroundingsUnderstoryClumps": 120,
+        "surroundingsArrivalPortalRuns": 6,
+        "surroundingsBoundaryContained": false,
+        "fitsCapacities": true
+      },
+      "manifest": {
+        "bytes": 32809,
+        "sha256": "0dde9955d742ec9dba8af0d73f380764aefd038ed8e9692203162ace9559f396"
+      },
+      "frames": [
+        {
+          "checkpoint": "chapter-forest-lookout",
+          "file": "203-chapter-forest-lookout.png",
+          "pngSha256": "9b435ff5fe736b5ce57e77587cb95b9c0d4275edd7948bc15f4fbc008e191cc5",
+          "indoorDust": {
+            "requestedQuality": 2,
+            "actualUploadedQuality": 2,
+            "cpuWork": {
+              "admittedZones": 0,
+              "generatedMotes": 0,
+              "fireflyMotes": 0,
+              "projectedMotes": 0,
+              "tileReferences": 0,
+              "overflowReferences": 0
+            }
+          }
+        },
+        {
+          "checkpoint": "chapter-forest-lookout",
+          "file": "203-chapter-forest-lookout-recreated.png",
+          "pngSha256": "9b435ff5fe736b5ce57e77587cb95b9c0d4275edd7948bc15f4fbc008e191cc5",
+          "indoorDust": {
+            "requestedQuality": 2,
+            "actualUploadedQuality": 2,
+            "cpuWork": {
+              "admittedZones": 0,
+              "generatedMotes": 0,
+              "fireflyMotes": 0,
+              "projectedMotes": 0,
+              "tileReferences": 0,
+              "overflowReferences": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "normal-roundtrip",
+      "process": {
+        "arguments": [
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe",
+          "--development-rescue-journey",
+          "--capture-showcase",
+          "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\forest-integration-20261101\\normal-roundtrip",
+          "--capture-hidden",
+          "--development-checkpoint",
+          "chapter-kit-reunion",
+          "--capture-dust",
+          "standard",
+          "--validate-chapter-roundtrip"
+        ],
+        "executable": {
+          "exists": true,
+          "bytes": 15471616,
+          "sha256": "e88bfd75916fa38e043f64810611d38f8b5004b25cf2fef1941053a83e6ea76f"
+        },
+        "settingsBefore": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignBefore": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundBefore": 17500414,
+        "pid": 47992,
+        "exitCode": 0,
+        "seconds": 116.46899999998277,
+        "pending": false,
+        "settingsAfter": {
+          "exists": true,
+          "bytes": 471,
+          "sha256": "ed609b868fd2951698c46bb17b98ffbad647bf30ca7cfacfa5d64f5342fd57c3"
+        },
+        "campaignAfter": {
+          "exists": true,
+          "files": {}
+        },
+        "foregroundChanges": [
+          {
+            "hwnd": 5246012,
+            "pid": 49884,
+            "seconds": 1.0159999999741558
+          },
+          {
+            "hwnd": 1248282,
+            "pid": 4716,
+            "seconds": 44.84399999998277
+          },
+          {
+            "hwnd": 132086,
+            "pid": 19112,
+            "seconds": 45.84399999998277
+          },
+          {
+            "hwnd": 5246012,
+            "pid": 49884,
+            "seconds": 110.95299999997951
+          }
+        ],
+        "captureNeverForeground": true,
+        "foregroundUnchanged": false,
+        "settingsUnchanged": true,
+        "campaignUnchanged": true
+      },
+      "forestProof": {
+        "mode": "normal-woodland480",
+        "defaultEnabled": true,
+        "proofOverride": false,
+        "fullyResident": true,
+        "forestContentAdmitted": true,
+        "performanceAdmitted": false,
+        "totalTreePlacements": 480,
+        "surroundingsExtraRoots": 416,
+        "surroundingsFenceRuns": 12,
+        "surroundingsNaturalBankRuns": 81,
+        "surroundingsTerminalFencePosts": 1,
+        "surroundingsOpenWoodlandRuns": 97,
+        "surroundingsTreeContactTriangles": 10648,
+        "surroundingsUnderstoryClumps": 120,
+        "surroundingsArrivalPortalRuns": 6,
+        "surroundingsBoundaryContained": false,
+        "fitsCapacities": true
+      },
+      "manifest": {
+        "bytes": 24884,
+        "sha256": "5723a16c202116b363d1d6e4aae80af147b372eb8e9fe9e9566a00e5dcf409db"
+      },
+      "frames": [
+        {
+          "checkpoint": "chapter-kit-reunion",
+          "file": "207-chapter-kit-reunion.png",
+          "pngSha256": "35e64bf85ebc6b7b5ea1f5524adeccbca1f34ab6e8c7536c01c6834d928525e0",
+          "indoorDust": {
+            "requestedQuality": 2,
+            "actualUploadedQuality": 2,
+            "cpuWork": {
+              "admittedZones": 0,
+              "generatedMotes": 1,
+              "fireflyMotes": 1,
+              "projectedMotes": 0,
+              "tileReferences": 0,
+              "overflowReferences": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "movingRoute": {
+    "schema": 2,
+    "scope": "moving fixed-step validation after staged Keeper death and first ascent; Diagnostic, automatic static detail and Keeper lifetimes; not owner or Shipping performance acceptance",
+    "maximumSimulationTicksPerRender": 4,
+    "simulationHz": 60,
+    "frames": 1483,
+    "warmupFrames": 64,
+    "fullRouteValidated": true,
+    "recreationTestRequiredSeparately": true,
+    "residentWoodland": true,
+    "residentWoodlandValidatedFrames": 1484,
+    "sharedForestResident": false,
+    "sharedForestValidatedFrames": 0,
+    "maximumSharedForestMaskedInstances": 0,
+    "maximumNormalStaticOwnerSavingBytes": 0,
+    "staticDetailUnloads": 0,
+    "staticDetailRestores": 0,
+    "keeperVertexLifetime": {
+      "retiredAllocationBytes": 1323264,
+      "retiredMemoryFlags": 6,
+      "retirements": 1,
+      "restorations": 1,
+      "resetRestored": true
+    },
+    "keeperTextureLifetime": {
+      "retiredDeviceLocalBytes": 33554432,
+      "retiredHostVisibleBytes": 0,
+      "baseMemoryFlags": 1,
+      "emissiveMemoryFlags": 1,
+      "retirements": 1,
+      "restorations": 1,
+      "resetRestored": true
+    },
+    "complete": true,
+    "allGalleryFramesPresented": true
+  },
+  "geometry": {
+    "trees": 480,
+    "originalTrees": 64,
+    "middleTrees": 96,
+    "farTrees": 320,
+    "totalTreeTriangles": 514048,
+    "addedTreeTriangles": 190784,
+    "addedTreeContactTriangles": 10648,
+    "understoryClumps": 120,
+    "understoryTriangles": 70560,
+    "fenceModules": 12,
+    "terminalPosts": 1,
+    "fenceTriangles": 588,
+    "fenceContactTriangles": 248,
+    "addedRawVertexIndexBytes": 15001872,
+    "cpuSupportCapacityBefore": 65536,
+    "cpuSupportCapacityAfter": 98304,
+    "globalContainmentClaim": false
+  },
+  "checks": {
+    "releaseNativeCtest": "9/9 passed",
+    "debugSelectionParticleCtest": "3/3 passed",
+    "assetPolicy": "202/202 passed",
+    "sourcePython": "12/12 passed",
+    "androidOfflineBuild": "passed",
+    "actualApkRoster": "passed",
+    "sourceRuntimeIdentity": "8/8 exact files",
+    "radialTrunkContactProbes": 13312
+  },
+  "logs": {
+    "reports/forest-integration-20261101/android-build.log": {
+      "bytes": 2235,
+      "sha256": "c3854feb6516df43a88b1a98819159bec4e077d8113f4fe9121de63a4f156549"
+    },
+    "reports/forest-integration-20261101/debug-build.log": {
+      "bytes": 3159,
+      "sha256": "7424dbdd1ad75349a9477750bfef0f852167a53b90e4eb5cb984e36b5a727b06"
+    },
+    "reports/forest-integration-20261101/f01-low.stderr.log": {
+      "bytes": 416,
+      "sha256": "6a3c049d4d32661ed877e317c16844edbe48e281c0432ba3926717bb8924c910"
+    },
+    "reports/forest-integration-20261101/f01-low.stdout.log": {
+      "bytes": 2837,
+      "sha256": "de3c9abc458c522782658b4e8ae488bd60508fe1baee5e178a5c0b35c3546ea6"
+    },
+    "reports/forest-integration-20261101/f01-off.stderr.log": {
+      "bytes": 416,
+      "sha256": "6a3c049d4d32661ed877e317c16844edbe48e281c0432ba3926717bb8924c910"
+    },
+    "reports/forest-integration-20261101/f01-off.stdout.log": {
+      "bytes": 2836,
+      "sha256": "9ddafed9f840978e81760d3ba6bfbe76be518f71735865db597e5c46e975c1ee"
+    },
+    "reports/forest-integration-20261101/f01-standard.stderr.log": {
+      "bytes": 416,
+      "sha256": "6a3c049d4d32661ed877e317c16844edbe48e281c0432ba3926717bb8924c910"
+    },
+    "reports/forest-integration-20261101/f01-standard.stdout.log": {
+      "bytes": 2846,
+      "sha256": "ec544f9fbb7b7523aba1efd1a4392e3cecda4da5077db7933bb96cc33d85456f"
+    },
+    "reports/forest-integration-20261101/f04-standard.stderr.log": {
+      "bytes": 557,
+      "sha256": "e955fdc88229b565f8acb512c6634f14ef0416e39353c472a8ff4892ed68da2f"
+    },
+    "reports/forest-integration-20261101/f04-standard.stdout.log": {
+      "bytes": 3568,
+      "sha256": "81c3c9f9d9f467dd45e7234b09eb419639fc984eeffbea319600a525372d76de"
+    },
+    "reports/forest-integration-20261101/final-debug-build.log": {
+      "bytes": 1906,
+      "sha256": "2fd3ea66716d19b0ab56dfcdcdf41d947fe48915acebd4af86331a464f75b6a6"
+    },
+    "reports/forest-integration-20261101/final-release-build.log": {
+      "bytes": 1942,
+      "sha256": "a6b1e94a8b4055037d6ca9d1db9d65f6047243ed573719b53944379246fbef3d"
+    },
+    "reports/forest-integration-20261101/native-ctest.log": {
+      "bytes": 1443,
+      "sha256": "3537a13e8d8b33e75abbef09318fc33a42afe301584c285834f2610af7ea910b"
+    },
+    "reports/forest-integration-20261101/normal-roundtrip.stderr.log": {
+      "bytes": 410,
+      "sha256": "a60eb0b2dce2ce256cb57f52e6c2cc78fc8e09dabfe5c9cfbddbfb6765a48175"
+    },
+    "reports/forest-integration-20261101/normal-roundtrip.stdout.log": {
+      "bytes": 2851,
+      "sha256": "23191ac565edbf3c36c680a7836de58956342ec99f72ce530d225ccda8168e1b"
+    },
+    "reports/forest-integration-20261101/release-build.log": {
+      "bytes": 3130,
+      "sha256": "b8279af0f0df0a902902e9ae9fb9f334554eac813cf20bbaa1ef23439bbd6294"
+    },
+    "reports/forest-integration-20261101/selection-particle-ctest.log": {
+      "bytes": 592,
+      "sha256": "bd23a02dc327e0f4cbc8d014d1288b9680107647546ffc2c68be9d03bd63b912"
+    }
+  },
+  "sourceIdentity": {
+    "assets/models/world/runtime/forest-surroundings-v1/alder-far.glb": {
+      "bytes": 1142888,
+      "sha256": "c3ad6a0c0d0fddb3cc936d530cae2d7a345e851a7f80edd702147d2d15a1eb23"
+    },
+    "assets/models/world/runtime/forest-surroundings-v1/alder-middle.glb": {
+      "bytes": 1200292,
+      "sha256": "1d79ab1901272a0633f50f9da60eddabd7685d9b957e1a3dcc97175faaf8bba3"
+    },
+    "assets/models/world/runtime/forest-surroundings-v1/asset.manifest.json": {
+      "bytes": 1037,
+      "sha256": "40d688bf4813ec6ae465ed10d24aa00e46758dc89467107eca68c224a072ba61"
+    },
+    "assets/models/world/runtime/forest-surroundings-v1/boundary-panel.glb": {
+      "bytes": 1104816,
+      "sha256": "a8a7cc53cc4d4277ebd8ff6d43deeffc5ba5b039de9ead781d1ac033ef86df82"
+    },
+    "assets/models/world/runtime/forest-surroundings-v1/pine-far.glb": {
+      "bytes": 1110020,
+      "sha256": "e12ba8af5855a8c33a88057611708e74dc20c03bf5dcbb9ef974933ce9c2b4b4"
+    },
+    "assets/models/world/runtime/forest-surroundings-v1/pine-middle.glb": {
+      "bytes": 1172280,
+      "sha256": "74b83325e9a80bdf2fcc8f7a413a08f430ee6e2f8965d0afeb4587f49742008f"
+    },
+    "assets/models/world/runtime/forest-surroundings-v1/runtime-roster.json": {
+      "bytes": 1667,
+      "sha256": "17876827a5ce9a1e39147b188eef4220bf09f429390896e22c56db531ff716ec"
+    },
+    "assets/models/world/runtime/forest-surroundings-v1/woodland-low-fern.glb": {
+      "bytes": 1161988,
+      "sha256": "1e5509f5b28a44565a394e4686b21e1b9076462dd6eb2496b99bcefde5cc95b6"
+    },
+    "android/app/build.gradle": {
+      "bytes": 49463,
+      "sha256": "77fd85b1d6c21643aa374195ed473857146db7c8e7507be66bdc96cd4981bd49"
+    },
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": {
+      "bytes": 520725,
+      "sha256": "5269b368e24954227c2b596d6feeed387c83ac5b05ee8aca2adf212a35716081"
+    },
+    "assets/models/world/source/forest-surroundings-v1/README.md": {
+      "bytes": 10649,
+      "sha256": "2f6d6ff69aee2fc794e1a16e1d798929f574dd592636f6f0611255dab1292a4c"
+    },
+    "assets/models/world/source/forest-surroundings-v1/asset-receipt.json": {
+      "bytes": 6988,
+      "sha256": "b2e87b555a3e5d6d56c839ecd2fee45436080e3d49bd5f4083fd5e5fe077d1a3"
+    },
+    "assets/models/world/source/forest-surroundings-v1/author.py": {
+      "bytes": 38508,
+      "sha256": "164076e76cf3f5ed619d573c09532093ad85e1a2ea9ae957a1c99fde38e205d4"
+    },
+    "assets/models/world/source/forest-surroundings-v1/candidates/asset.manifest.json": {
+      "bytes": 1050,
+      "sha256": "32c8ff9162b40f12a19844fd1001fab1cac1d5ab1b5583b6c5b410d897097a3b"
+    },
+    "assets/models/world/source/forest-surroundings-v1/composition.json": {
+      "bytes": 253321,
+      "sha256": "f7d3d952ced04fc5830ff75a976a6c4ecd8ed489478e572a5cb72abcb5962a69"
+    },
+    "assets/models/world/source/forest-surroundings-v1/native-layout.generated.h": {
+      "bytes": 43676,
+      "sha256": "0d18400b99176b7df39955e6fd70e40bc4ace981a9d665988ae89f551fa1a98b"
+    },
+    "shaders/raytracing/include/rt_indoor_dust.glsl": {
+      "bytes": 6422,
+      "sha256": "61e61f6d570c19a42bba0df1968a1f889c532a04601996eba6eeeed9fa4bf479"
+    },
+    "src/gameplay/simulation/TriangleSupportSurface.h": {
+      "bytes": 26783,
+      "sha256": "1e06d2997cdfa5b0eb6ed98cc38edf4f67370ed91750e55206b2b425476a4533"
+    },
+    "src/platform/windows/DiagnosticWindow.cpp": {
+      "bytes": 707300,
+      "sha256": "4bbf22ee7e0046babe179614e561dec47e128ca6f91fa78da9fe25c31ce54bbe"
+    },
+    "src/platform/windows/WindowsChapterRoundTripCapture.inl": {
+      "bytes": 18777,
+      "sha256": "e3a89b48f57fa1968c2df8f8c6cb9d9a1ff8067dd96193716462c0c8acc64c69"
+    },
+    "src/scene/ForestSurroundings.cpp": {
+      "bytes": 17399,
+      "sha256": "aa8af60cc628a53b53c3fa029bcf007dd3070b76808ce630f096b4a14a17e320"
+    },
+    "src/scene/ForestSurroundings.h": {
+      "bytes": 1592,
+      "sha256": "c1b72821e6991d81e14ed6e0d4dc97852c87e10cba98edd49fd4f20e3c389a5b"
+    },
+    "src/scene/atmosphere/IndoorDust.h": {
+      "bytes": 9868,
+      "sha256": "84359da762330f767f017d32bd5629f692960e28ab71d85fd6c00e59c5ed585b"
+    },
+    "src/vulkan/raytracing/MinimalLegacyRayGenShader.inc": {
+      "bytes": 1896143,
+      "sha256": "27d478608993c65e61cc327119f5afc93e25ea8546ba53ba94e990b03c81f7c0"
+    },
+    "src/vulkan/raytracing/MinimalRayGenShader.inc": {
+      "bytes": 845968,
+      "sha256": "4b30c614df30342c64b741a30f11d62c5de2698315142592433037c7ce139d28"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": {
+      "bytes": 560740,
+      "sha256": "3947507cc869d2b45bbc544e80fe991974416ee81726edd85fb5c3fee7fa8d06"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": {
+      "bytes": 83482,
+      "sha256": "7bde32bdd7d90744a1b8dc7fa63cffd90e91a1e234fc95dfaa328a42426cce4f"
+    },
+    "src/vulkan/raytracing/PresentableTinyRtSceneStaticGeometry.cpp": {
+      "bytes": 80333,
+      "sha256": "31fcf1e535df49d7dd6061b11d4d4b1660d63a3dec6998ca14ab3de3794e4ae0"
+    },
+    "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h": {
+      "bytes": 4575,
+      "sha256": "e3c15db676ec6f314146673cb6d85ade55e6c3cfdf5d62a50269809e6ce4b730"
+    },
+    "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h": {
+      "bytes": 4820,
+      "sha256": "9d5f753892087bc304a4287f167d4f4d906c40980ab6f9269687f3b1ed45398f"
+    },
+    "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc": {
+      "bytes": 848899,
+      "sha256": "980bd1b1d2208bb651b33fe8116982dade9ebc0caec0590e1ae9c3820f5e59df"
+    },
+    "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc": {
+      "bytes": 1906147,
+      "sha256": "3b768d655de887b31cfd53c12c03c79f4bf497ce300a5ba2a6510cdf1106b172"
+    },
+    "src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc": {
+      "bytes": 845216,
+      "sha256": "63fe8e5438f2a697c254cb959aa2bb2ee73847d3a758c9519ab6faa64efe9e2e"
+    },
+    "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc": {
+      "bytes": 1896196,
+      "sha256": "0536db144ae4e26e95321ad85db24b477f92d24e813a27904e7b0a7337c3b38a"
+    },
+    "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc": {
+      "bytes": 849774,
+      "sha256": "c9564a619c15ace539895cf09f555308d43747c9368f9b1690ecbef93dcc2353"
+    },
+    "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc": {
+      "bytes": 1910245,
+      "sha256": "dbe259b822714c75a4b326fc162c398861fad9e2e800cc76ab3f10d786a42b57"
+    },
+    "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc": {
+      "bytes": 846091,
+      "sha256": "fd74f77845f4541c79bd8cc46a9f47b2f871beac1a0c4367f6799e5d16aed7f4"
+    },
+    "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc": {
+      "bytes": 1900298,
+      "sha256": "4a02b291167463492eab1e3d0b9d96e1a0e1bb7d4e0f3adf26d1cdec933908dd"
+    },
+    "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc": {
+      "bytes": 818992,
+      "sha256": "599a4fbe229fda170f8409ab43445bad47235662dd101536546272fcf621e18f"
+    },
+    "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc": {
+      "bytes": 1895948,
+      "sha256": "d55f47baf3c44039826a00d715c2e2eceae44e7466d8720f030d60627bd8593d"
+    },
+    "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc": {
+      "bytes": 815309,
+      "sha256": "bbd4f0dee5616527824f08671399ecb688297d33c821d8d8e6c4c4f3c4cbf24b"
+    },
+    "src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc": {
+      "bytes": 1886001,
+      "sha256": "e1bea52842bffe644deb9d62441dd4633f548d2e88b966da14e1e5dad3519cdd"
+    },
+    "src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc": {
+      "bytes": 818117,
+      "sha256": "fdea3dd4bdff941dca84a41a10bea8b5b119cf78d698e508f83ea4baec1c39de"
+    },
+    "src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc": {
+      "bytes": 1891846,
+      "sha256": "ba8e0ad916b2ea4baa2d6bb1b9820b4c7314cfc54acab10038c0cfc332798f45"
+    },
+    "src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc": {
+      "bytes": 814434,
+      "sha256": "8294b4dc7936868549f4802ba942da8607849f4bf2b55ed56964dbb88ce49f29"
+    },
+    "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc": {
+      "bytes": 1881899,
+      "sha256": "171051a0a893a282dc1d405ab3ca51cc4fdc74f817a2e12c938b69f29cae30e1"
+    },
+    "tests/CharacterRenderSlotSmoke.cpp": {
+      "bytes": 211337,
+      "sha256": "bb9c97d826b8eccc158e513192d083a9ed91dc8fd7965446cbf1cd6260e90c91"
+    },
+    "tests/ForestDressingTests.cpp": {
+      "bytes": 135761,
+      "sha256": "7fd2487184de267e4db4b4ee232bdb878f797697fb5be7415851b59137754bc0"
+    },
+    "tests/ForestSurroundingsSourceTests.py": {
+      "bytes": 11372,
+      "sha256": "5dcd771a82af3efaa7d15eef7c3c73c4ff97e00da1277c7cdc6f0f2ee6563861"
+    },
+    "tests/Horde162AssetPolicyTests.ps1": {
+      "bytes": 52529,
+      "sha256": "f46e0ed039b6245ebd8543e0ada3f67278bb8ce3b365e045e00993f974c38fb1"
+    },
+    "tests/IndoorDustTests.cpp": {
+      "bytes": 11890,
+      "sha256": "93aaca3bc583d7090d75c7e0fb7adf10c9e27d5ee039c796f85a2af6cb53393a"
+    },
+    "tools/horde-1.6.2-asset-policy.ps1": {
+      "bytes": 29885,
+      "sha256": "35d7b6bcb6707d1bfb1bfe684a8af7d899e9379e292fa09a65f269a54b3cde9e"
+    },
+    "tools/package-alpha.ps1": {
+      "bytes": 39346,
+      "sha256": "0cd07e05bd40c64e3c185d2d36eb15614fcc6a5c828f78422d34003cf8d781b7"
+    },
+    "tools/raygen-variant-budgets.json": {
+      "bytes": 6425,
+      "sha256": "5c28b50c17b5717b01aed6a8030305d718a7f481274b3564ab66cd8c9ddbcf14"
+    },
+    "tools/raygen-variant-catalog.json": {
+      "bytes": 39062,
+      "sha256": "d21f3336e8e37d2aef71e8ca385eecdbd3aa9ca8428c128d33f659d7323ca1c3"
+    },
+    "tools/rayquery-variant-catalog.json": {
+      "bytes": 43742,
+      "sha256": "fd53e8d2fa8ae8a0b23420670ef12c2059c6a7aefa6e34ad9b8f09b963c068ed"
+    },
+    "src/scene/atmosphere/ForestFireflies.h": {
+      "bytes": 4265,
+      "sha256": "f2272cebc81099049e64ef3160f98aa7cda6d1051d95b92631654fbecb21fdd2"
+    },
+    "tools/admit-forest-surroundings.py": {
+      "bytes": 2656,
+      "sha256": "b5f6ba17b8dda13589c9693f3d051df76d33fa22fd3585b463068f33d6c9c2f9"
+    },
+    "assets/models/world/source/forest-surroundings-v1/candidates/woodland-low-fern.glb": {
+      "bytes": 1161988,
+      "sha256": "1e5509f5b28a44565a394e4686b21e1b9076462dd6eb2496b99bcefde5cc95b6"
+    }
+  },
+  "ownerUntrackedCustody": {
+    "files": 151,
+    "changed": 0
+  },
+  "ownedCaptureProcesses": "All five completed exit0; none pending.",
+  "images": {
+    "15-lookout-sweep-7.png": {
+      "bytes": 840505,
+      "sha256": "230158b3d23560ec26e0c12beb919865cd98ac522123c8d69491536ac6e1968a"
+    },
+    "17-return-5.png": {
+      "bytes": 899323,
+      "sha256": "65c919ee57004ca5bffc51c4cb1ecac8122fb7e90beaa3127c80a55ed09848d4"
+    },
+    "9-outbound-5.png": {
+      "bytes": 897417,
+      "sha256": "97add1b41e5dcfee2855bd879665b4a1aeb4df8c14a4708fb2655b363dd4a6b5"
+    },
+    "f01-low-193-chapter-landing-north.png": {
+      "bytes": 693017,
+      "sha256": "cd91be193ec12cfe92a52b71d0aec98c29b9dd36a05578040f86384f227c9c08"
+    },
+    "f01-off-193-chapter-landing-north.png": {
+      "bytes": 693017,
+      "sha256": "cd91be193ec12cfe92a52b71d0aec98c29b9dd36a05578040f86384f227c9c08"
+    },
+    "f01-standard-193-chapter-landing-north.png": {
+      "bytes": 693158,
+      "sha256": "554ad4487ab49bf6512842c7b898d26ea488a7555ba2371e644bf1755a2db8b5"
+    },
+    "f04-standard-203-chapter-forest-lookout-recreated.png": {
+      "bytes": 805889,
+      "sha256": "9b435ff5fe736b5ce57e77587cb95b9c0d4275edd7948bc15f4fbc008e191cc5"
+    },
+    "f04-standard-203-chapter-forest-lookout.png": {
+      "bytes": 805889,
+      "sha256": "9b435ff5fe736b5ce57e77587cb95b9c0d4275edd7948bc15f4fbc008e191cc5"
+    },
+    "normal-roundtrip-207-chapter-kit-reunion.png": {
+      "bytes": 765455,
+      "sha256": "35e64bf85ebc6b7b5ea1f5524adeccbca1f34ab6e8c7536c01c6834d928525e0"
+    }
+  },
+  "nativeGeometryWitness": {
+    "crossingProbes": 259,
+    "routeClearanceProbes": 3768,
+    "sourceWitness": 14147300745973390660,
+    "cpuSubsetTriangles": 17389,
+    "subsetNote": "Plumbing-only exact triangle removal/restoration test; no normal omission admission."
+  }
+}

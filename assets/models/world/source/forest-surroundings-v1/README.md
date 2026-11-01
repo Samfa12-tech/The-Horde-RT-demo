@@ -1,4 +1,22 @@
-# Whole-route forest: source candidate v1
+# Whole-route forest: authored source v1
+
+## Current private 1.7 integration
+
+The normal private rescue chapter now uses the admitted runtime copy of these
+assets: 64 unchanged originals, 96 middle and 320 far trees, 120 low fern clumps,
+and 12 selective fence modules. All 416 added trees have actual lower-wood
+contact. The existing terrain and original colliders remain unchanged; the
+world is not claimed globally enclosed. Six arrival spans stay open.
+
+	ools/admit-forest-surroundings.py --check verifies the exact eight-file runtime
+roster. Source and runtime remain separate. The original64/shared64 diagnostic
+controls are exclusive with this content. See the current
+[integration evidence](../../../../../docs/evidence/2026-11-01-forest-integration/README.md).
+
+The dated candidate descriptions below are historical, including their earlier
+disabled status, fence counts and distance assumptions; route-envelope distance
+is not proof of global inaccessibility. No collision exemption is admitted.
+
 
 ## 1 November composition revision (current candidate)
 

@@ -25,6 +25,10 @@
     {
       "name": "boundary-panel",
       "maxTriangles": 100
+    },
+    {
+      "name": "woodland-low-fern",
+      "maxTriangles": 600
     }
   ],
   "requiredSockets": [],

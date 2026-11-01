@@ -27,6 +27,14 @@ function Assert-CollapseGradleInventory([string]$Text) {
         'models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb',
         'models/world/runtime/bellwether-shell-v4/asset.manifest.json',
         'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb',
+        'models/world/runtime/forest-surroundings-v1/alder-far.glb',
+        'models/world/runtime/forest-surroundings-v1/alder-middle.glb',
+        'models/world/runtime/forest-surroundings-v1/asset.manifest.json',
+        'models/world/runtime/forest-surroundings-v1/boundary-panel.glb',
+        'models/world/runtime/forest-surroundings-v1/pine-far.glb',
+        'models/world/runtime/forest-surroundings-v1/pine-middle.glb',
+        'models/world/runtime/forest-surroundings-v1/runtime-roster.json',
+        'models/world/runtime/forest-surroundings-v1/woodland-low-fern.glb',
         'models/world/runtime/forest-understory-v1/asset.manifest.json',
         'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb',
         'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb',
@@ -298,9 +306,16 @@ try {
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
-    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 50 -and
-             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 51) 'Current shared asset roster includes five exact prepared deadwood and three exact road-clue payloads.'
-    Require ($windows.Count -eq 107 -and $android.Count -eq 108) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory, town, deadwood and road-clue runtime assets; no editable sources.'
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 58 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 59) 'Current shared asset roster includes five exact prepared deadwood and three exact road-clue payloads.'
+    Require ($windows.Count -eq 115 -and $android.Count -eq 116) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory, town, deadwood and road-clue runtime assets; no editable sources.'
+    $woodland=@('asset.manifest.json','runtime-roster.json','pine-middle.glb','alder-middle.glb','pine-far.glb','alder-far.glb','boundary-panel.glb','woodland-low-fern.glb')
+    foreach($name in $woodland) {
+        $path='models/world/runtime/forest-surroundings-v1/'+$name
+        Require (@($windows | Where-Object {$_ -ceq $path}).Count -eq 1 -and @($android | Where-Object {$_ -ceq $path}).Count -eq 1) 'Both platforms require each exact private woodland payload once.'
+    }
+    $woodlandArchive=New-FixtureArchive 'woodland-missing-fern.zip' Android -Omit 'assets/models/world/runtime/forest-surroundings-v1/woodland-low-fern.glb'
+    Expect-Failure {Assert-Horde162Package $repo $woodlandArchive Android} 'closed runtime roster'
     $deadwoodFiles=@('models/world/runtime/forest-deadwood-v1/asset.manifest.json',
         'models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb',
         'models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb',
