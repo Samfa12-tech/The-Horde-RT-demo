@@ -159,7 +159,7 @@ inline std::string_view GraphicsPresetName(const GraphicsPreset preset) noexcept
 {
     switch (preset)
     {
-    case GraphicsPreset::AcceptedBaseline: return "Accepted 1.6.1 baseline";
+    case GraphicsPreset::AcceptedBaseline: return "Legacy preset (1.6.1)";
     case GraphicsPreset::ReducedEffects: return "Reduced effects";
     case GraphicsPreset::PlatformDefault: return "Platform defaults";
     default: return "Custom";

@@ -203,7 +203,7 @@
     <string name="graphics_help">Edit a draft, then Apply. Keep confirms only after an RT frame presents. Unconfirmed settings restore after 15 visible seconds or when backgrounded. Cost: not yet measured for this candidate.</string>
     <string name="graphics_water_help">Off hides water. Mobile keeps water and ripples with reduced reflections and no splash droplets. High adds scene reflections and splash droplets.</string>
     <string name="graphics_fire_help">Mobile: 4 main volume steps and 4 reflected steps. High: 10 main and 8 reflected steps. Authoritative lights and gameplay remain unchanged. Cost: not yet measured.</string>
-    <string name="graphics_baseline">Reset draft to accepted 1.6.1 baseline</string>
+    <string name="graphics_baseline">Use legacy preset (1.6.1)</string>
     <string name="graphics_apply">Apply draft</string>
     <string name="graphics_keep">Keep and save settings</string>
     <string name="graphics_revert">Revert to confirmed settings</string>

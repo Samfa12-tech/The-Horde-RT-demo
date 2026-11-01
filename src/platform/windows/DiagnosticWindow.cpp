@@ -172,6 +172,11 @@
 #ifndef HORDE_RT_DISPLAY_VERSION
 #define HORDE_RT_DISPLAY_VERSION "development"
 #endif
+#if HORDE_RT_WINDOWS_ACCEPTANCE
+#define HORDE_RT_UI_VERSION "1.7 development"
+#else
+#define HORDE_RT_UI_VERSION HORDE_RT_DISPLAY_VERSION
+#endif
 namespace
 {
 
@@ -212,15 +217,15 @@ void InstallControllerFocusOutline(HWND control);
 void FocusGameControl(HWND control) {
     if(!gCampaignHiddenValidation && !gOpeningBenchmarkMenuValidation && !gShowcaseCaptureHidden && control) ::SetFocus(control);
 }
-constexpr char kWindowTitle[] = "Horde Lantern RT - Showcase Alpha " HORDE_RT_DISPLAY_VERSION
+constexpr char kWindowTitle[] = "Horde Lantern RT - Showcase Alpha " HORDE_RT_UI_VERSION
 #if HORDE_RT_WINDOWS_ACCEPTANCE
     " [isolated acceptance]"
 #endif
     ;
-constexpr char kHudStartingText[] = "ALPHA " HORDE_RT_DISPLAY_VERSION "  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU";
+constexpr char kHudStartingText[] = "ALPHA " HORDE_RT_UI_VERSION "  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU";
 constexpr char kHudActiveText[] = "RT ACTIVE | DIAGNOSTICS";
-constexpr char kHudApplyingScaleText[] = "ALPHA " HORDE_RT_DISPLAY_VERSION "  |  APPLYING RT RENDER SCALE...";
-constexpr char kAboutText[] = "Horde Lantern RT\nShowcase Alpha " HORDE_RT_DISPLAY_VERSION "\n\nNative Vulkan hardware ray tracing. RT or nothing.\nA Samfa12 technology demo.";
+constexpr char kHudApplyingScaleText[] = "ALPHA " HORDE_RT_UI_VERSION "  |  APPLYING RT RENDER SCALE...";
+constexpr char kAboutText[] = "Horde Lantern RT\nShowcase Alpha " HORDE_RT_UI_VERSION "\n\nNative Vulkan hardware ray tracing. RT or nothing.\nA Samfa12 technology demo.";
 constexpr char kReportDirectory[] = "reports";
 constexpr char kTextReportFilename[] = "vulkan_capability_report.txt";
 constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
