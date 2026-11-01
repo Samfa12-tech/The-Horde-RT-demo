@@ -53,6 +53,9 @@ final class CombatTeachingPreferences {
         }
         if((state&(1L<<39))!=0 && ((state>>>36)&7)==6)
             text+=(text.isEmpty()?"":"\n")+"LIVE FIGHT: protection ended - enemies now deal damage.";
+        int sheathProgress=(int)((state>>>50)&127);
+        if((state&(1L<<57))!=0)text+=(text.isEmpty()?"":"\n")+"Sword sheathed. Attack or Parry to draw.";
+        else if(sheathProgress>0)text+=(text.isEmpty()?"":"\n")+"Hold Attack to sheathe: "+Math.min(100,sheathProgress)+"%";
         if(waitingForRevivalClearance(state))
             text+=(text.isEmpty()?"":"\n")+"Step back from the skeletons.";
         final int attack=attackReadability(state);
@@ -70,7 +73,7 @@ final class CombatTeachingPreferences {
         return attack == 1 ? 0xFFFFD266 : attack == 2 ? 0xFFFF6B6B : HordeUiTokens.PARCHMENT;
     }
     static int promptOpacity(long state) {
-        return safePractice(state) || ((state&(1L<<39))!=0 && ((state>>>36)&7)==6) || waitingForRevivalClearance(state) || attackReadability(state) != 0
+        return ((state>>>50)&255)!=0 || safePractice(state) || ((state&(1L<<39))!=0 && ((state>>>36)&7)==6) || waitingForRevivalClearance(state) || attackReadability(state) != 0
                 ? 255 : (int) ((state >>> 40) & 0xffL);
     }
     static String description(long state, String visibleText) {
@@ -82,7 +85,7 @@ final class CombatTeachingPreferences {
     }
 
     static boolean needsTimelyRefresh(long state) {
-        if (safePractice(state) || ((state&(1L<<39))!=0 && ((state>>>36)&7)==6) || waitingForRevivalClearance(state) || attackReadability(state) != 0) return true;
+        if (((state>>>50)&255)!=0 || safePractice(state) || ((state&(1L<<39))!=0 && ((state>>>36)&7)==6) || waitingForRevivalClearance(state) || attackReadability(state) != 0) return true;
         final boolean enabled = (state & (1L << 10)) != 0;
         final int opacity = (int) ((state >>> 40) & 0xffL);
         final int cue = (int) ((state >>> 3) & 0xfL);

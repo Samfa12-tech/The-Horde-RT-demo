@@ -66,6 +66,7 @@ public final class ProbeBridge {
     public static native void requestAttack();
     public static native void requestParry();
     /** Coherent hold publication; only false-to-true opens a fresh parry window. */
+    public static native void setAttackHeld(boolean held,int source);
     public static native void setGuardHeld(boolean held);
     public static native void requestDodge();
     public static native void setCombatTeachingOptions(boolean enabled, boolean slowdown);

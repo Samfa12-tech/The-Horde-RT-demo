@@ -6,7 +6,8 @@ namespace horde::scene::atmosphere {
 // Sparse authored world-space pockets. No lights, meshes, AS updates or new
 // upload slots. Standard enables these; Low/Off leave the phone path unchanged.
 inline constexpr std::array<std::array<float,2>,3> kForestFireflyPockets{{
-    {{-29.f,-19.f}}, {{-12.f,1.f}}, {{-7.f,22.f}}
+    // Current translated F02/F04/F06 approach, not the old tomb-side pocket.
+    {{-28.7f,-5.8f}}, {{-17.7f,15.2f}}, {{13.3f,36.2f}}
 }};
 inline constexpr unsigned kForestFirefliesPerPocket=4;
 inline constexpr float kForestFireflyDistance=12.f;

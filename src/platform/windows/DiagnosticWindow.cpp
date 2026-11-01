@@ -811,6 +811,7 @@ struct VulkanSurfaceContext
     float controllerLookHorizontal = 0.0f;
     float controllerLookVertical = 0.0f;
     bool teachingControllerGlyphs = false;
+    bool mouseAttackHeld=false,controllerAttackHeld=false,controllerAttackHoldArmed=false;
     bool keyboardGuardHeld = false;
     bool guardHeld = false;
     horde::platform::windows::GuardHoldLatch controllerGuardHold;
@@ -3329,7 +3330,13 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     }
     context.combatAttackCueVisible = attackCue;
     context.combatPracticeCueVisible = practiceCue;
-    const std::string text = horde::platform::windows::CombatTeachingPromptText(teaching, context.teachingControllerGlyphs, revivalClearance);
+    std::string text = horde::platform::windows::CombatTeachingPromptText(teaching, context.teachingControllerGlyphs, revivalClearance);
+    const bool sheathCue=snapshot.swordSheathHoldProgress>0.f || snapshot.swordIntentionallyStowed;
+    if(sheathCue) {
+        if(!text.empty())text+="\r\n";
+        text+=snapshot.swordIntentionallyStowed ? "Sword sheathed. Attack or Parry to draw." :
+            "Hold Attack to sheathe: "+std::to_string(static_cast<int>(snapshot.swordSheathHoldProgress*100.f))+"%";
+    }
     const bool eligible = context.controlsEnabled && !MeasurementPausedByUi(context) &&
         !context.benchmarkReportVisible && !context.benchmark.IsRunning() &&
         !context.deathOverlayVisible && !context.endingOverlayVisible && !context.rtLabVisible;
@@ -3347,7 +3354,7 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     if (!text.empty())
     {
         context.combatTeachingFadeText = text;
-        context.combatTeachingFadeOpacity = attackCue || teaching.safePractice || revivalClearance ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
+        context.combatTeachingFadeOpacity = attackCue || teaching.safePractice || revivalClearance || sheathCue ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
             teaching.promptOpacity, context.reducedMotionEnabled);
         context.combatTeachingFadeStartedAtMs = 0u;
         horde::platform::windows::SetNativeTextIfChanged(prompt, text);
@@ -4727,7 +4734,10 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
     context.runHeld = false;
     context.controllerRunHeld = false;
     context.runToggleKeyDown = false;
+    context.mouseAttackHeld=context.controllerAttackHeld=context.controllerAttackHoldArmed=false;
+    context.simulationInput.attackHeld=false;
     context.keyboardGuardHeld = context.guardHeld = false;
+    context.controllerAttackHoldArmed=context.controllerAttackHeld=false;
     context.controllerGuardHold.Cancel();
     context.simulationInput.guardHeld = false;
     context.forwardHeld = false;
@@ -5256,7 +5266,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
         context.controllerCrouchHeld = false;
         context.controllerCrouchBlockedUntilRelease = true;
         context.controllerRunHeld = false;
-        context.controllerGuardHold.Cancel();
+        context.controllerAttackHoldArmed=context.controllerAttackHeld=false;
+    context.controllerGuardHold.Cancel();
         PublishDesktopGuardHold(context);
         context.controllerForward = 0.0f;
         context.controllerStrafe = 0.0f;
@@ -5330,7 +5341,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
         }
         if (!joystick.has_value())
         {
-            context.controllerGuardHold.Cancel();
+            context.controllerAttackHoldArmed=context.controllerAttackHeld=false;
+    context.controllerGuardHold.Cancel();
             PublishDesktopGuardHold(context);
             context.controllerStrafe = 0.0f;
             context.controllerForward = 0.0f;
@@ -5346,7 +5358,8 @@ void PollDesktopController(VulkanSurfaceContext& context)
         JOYCAPSA caps{};
         if (joyGetDevCapsA(*joystick, &caps, sizeof(caps)) != JOYERR_NOERROR)
         {
-            context.controllerGuardHold.Cancel();
+            context.controllerAttackHoldArmed=context.controllerAttackHeld=false;
+    context.controllerGuardHold.Cancel();
             PublishDesktopGuardHold(context);
             return;
         }
@@ -5385,6 +5398,7 @@ void PollDesktopController(VulkanSurfaceContext& context)
             context.previousLegacyControllerButtons = legacy.dwButtons;
             context.previousLegacyUiButtons = legacy.dwButtons;
             context.previousLegacyPov = legacy.dwPOV;
+            context.controllerAttackHoldArmed=context.controllerAttackHeld=false;
             context.controllerGuardHold.Reseed(horde::platform::windows::LegacyGuardHeld(legacy.dwButtons, identity));
             PublishDesktopGuardHold(context);
             context.controllerStrafe = 0.0f;
@@ -5410,6 +5424,7 @@ void PollDesktopController(VulkanSurfaceContext& context)
             context.previousLegacyUiButtons = legacy.dwButtons;
             context.previousLegacyPov = legacy.dwPOV;
             context.controllerTriggerLatch = {};
+            context.controllerAttackHoldArmed=context.controllerAttackHeld=false;
             context.controllerGuardHold.Reseed(horde::platform::windows::LegacyGuardHeld(legacy.dwButtons, identity));
             PublishDesktopGuardHold(context);
             std::ostringstream controllerDiagnostic;
@@ -5431,6 +5446,10 @@ void PollDesktopController(VulkanSurfaceContext& context)
         const horde::platform::windows::ControllerActionEdges edges =
             horde::platform::windows::MapLegacyControllerEdges(
                 legacy.dwButtons, context.previousLegacyControllerButtons, identity);
+        const bool rawAttack=(legacy.dwButtons & (horde::platform::windows::IsCapturedBackboneOne(identity)?0x200u:0x004u))!=0;
+        if(!rawAttack)context.controllerAttackHoldArmed=false;
+        if(!context.simulationPaused && edges.attackPressed)context.controllerAttackHoldArmed=true;
+        context.controllerAttackHeld=context.controllerAttackHoldArmed && rawAttack && !context.simulationPaused;
         if (legacy.dwButtons != context.previousLegacyControllerButtons ||
             std::abs(context.controllerForward) > 0.0f || std::abs(context.controllerStrafe) > 0.0f ||
             std::abs(context.controllerLookHorizontal) > 0.0f || std::abs(context.controllerLookVertical) > 0.0f)
@@ -5471,6 +5490,7 @@ void PollDesktopController(VulkanSurfaceContext& context)
         horde::platform::windows::SeedXInputTriggerLatch(
             state.Gamepad.bLeftTrigger, state.Gamepad.bRightTrigger,
             context.controllerTriggerLatch);
+        context.controllerAttackHoldArmed=context.controllerAttackHeld=false;
         context.controllerGuardHold.Reseed(context.controllerTriggerLatch.leftHeld);
         PublishDesktopGuardHold(context);
     }
@@ -5487,6 +5507,7 @@ void PollDesktopController(VulkanSurfaceContext& context)
         horde::platform::windows::SeedXInputTriggerLatch(
             state.Gamepad.bLeftTrigger, state.Gamepad.bRightTrigger,
             context.controllerTriggerLatch);
+        context.controllerAttackHoldArmed=context.controllerAttackHeld=false;
         context.controllerGuardHold.Reseed(context.controllerTriggerLatch.leftHeld);
         PublishDesktopGuardHold(context);
         context.controllerStrafe = 0.0f;
@@ -5511,6 +5532,9 @@ void PollDesktopController(VulkanSurfaceContext& context)
             state.Gamepad.bLeftTrigger,
             state.Gamepad.bRightTrigger,
             context.controllerTriggerLatch);
+    if(!context.controllerTriggerLatch.rightHeld)context.controllerAttackHoldArmed=false;
+    if(!context.simulationPaused && triggerEdges.attackPressed)context.controllerAttackHoldArmed=true;
+    context.controllerAttackHeld=context.controllerAttackHoldArmed && context.controllerTriggerLatch.rightHeld && !context.simulationPaused;
     if (pressed != 0u || triggerEdges.attackPressed || triggerEdges.parryPressed ||
         std::abs(context.controllerForward) > 0.0f || std::abs(context.controllerStrafe) > 0.0f ||
         std::abs(context.controllerLookHorizontal) > 0.0f || std::abs(context.controllerLookVertical) > 0.0f)
@@ -5628,6 +5652,9 @@ void UpdateDesktopSceneControls(
     input.runHeld = context.runHeld;
     input.crouchHeld = false;
     input.guardHeld = context.guardHeld && !context.simulationPaused;
+    if((GetAsyncKeyState(VK_LBUTTON)&0x8000)==0)context.mouseAttackHeld=false;
+    input.attackInputSource=context.teachingControllerGlyphs?2u:1u;
+    input.attackHeld=!context.simulationPaused && (context.teachingControllerGlyphs?context.controllerAttackHeld:context.mouseAttackHeld);
     input.waterfallWidthScale = horde::vulkan::raytracing::ClampRtSceneTuning(
         context.rtSceneTuning).waterfallWidthScale;
     input.hasAuthoritativePlayerPose = false;
@@ -11181,6 +11208,7 @@ void ShowControlsHelp(HWND window)
                 "D-pad  Navigate menus    A  Select    B / Circle  Back\n"
                 "Menu / Start  Pause / resume\n"
                 "Esc  Pause / resume\n"
+                 "Hold Attack  Sheathe sword (release to rearm); Attack / Parry draws\n"
                  "F1  Controls\n"
                  "F2  RT diagnostics\n"
 #if defined(_DEBUG)
@@ -12420,11 +12448,15 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             else if (clickAction == DesktopClickAction::Attack)
             {
+                sceneContext->mouseAttackHeld=true;
                 PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
             }
             return 0;
         }
         break;
+    case WM_LBUTTONUP:
+        if(sceneContext)sceneContext->mouseAttackHeld=false;
+        return 0;
     case WM_RBUTTONDOWN:
         // Reserved: no capture, interaction or attack.
         return 0;

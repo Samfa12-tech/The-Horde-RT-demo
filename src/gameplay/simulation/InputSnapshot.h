@@ -86,6 +86,8 @@ struct InputSnapshot
     // Continuous guard ownership accompanies the fresh commands.parry edge.
     // A held value never synthesizes another timed parry window.
     bool guardHeld = false;
+    bool attackHeld = false;
+    std::uint8_t attackInputSource = 0; // 1 mouse/keyboard, 2 controller, 3 touch.
     // Retained for deterministic posture fixtures. Ordinary controls use head clearance.
     bool crouchHeld = false;
     std::uint64_t revivalAudioGeneration = 0;

@@ -19,6 +19,20 @@ public final class AndroidControllerInputTest {
     private static final int KEY_SOURCE = InputDevice.SOURCE_GAMEPAD;
     private static final int MOTION_SOURCE = InputDevice.SOURCE_JOYSTICK;
 
+    @Test public void attackHoldUsesTriggerHysteresisAndRequiresReleaseAfterCancellation() {
+        AndroidControllerInput input=new AndroidControllerInput();
+        input.motion(motion(4,1,0,0,0,0,0,0),1);
+        input.motion(motion(4,2,0,0,0,0,0,.8f),2);assertTrue(input.attackHeld());
+        input.motion(motion(4,3,0,0,0,0,0,.4f),3);assertTrue(input.attackHeld());
+        input.clearAttackHold();assertFalse(input.attackHeld());
+        input.motion(motion(4,4,0,0,0,0,0,.8f),4);assertFalse(input.attackHeld());
+        input.motion(motion(4,5,0,0,0,0,0,0),5);
+        assertEquals(AndroidControllerInput.SWING,input.motion(motion(4,6,0,0,0,0,0,.8f),6).actions);
+        assertTrue(input.attackHeld());input.suspend(7);assertFalse(input.attackHeld());
+        AndroidControllerInput digital=new AndroidControllerInput();
+        digital.key(key(1,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_X,0,10),10);assertTrue(digital.attackHeld());
+        digital.key(key(1,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_X,0,11),11);assertFalse(digital.attackHeld());
+    }
     @Test public void mapsFreshButtonEdgesAndLeavesNonControllerEventsUntouched() {
         AndroidControllerInput input = new AndroidControllerInput();
         AndroidControllerInput.Result a = input.key(key(1, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BUTTON_A, 0, 10), 10);

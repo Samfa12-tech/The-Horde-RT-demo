@@ -115,6 +115,15 @@ final class AndroidControllerInput {
     float lookY() { return lookY; }
     boolean runHeld() { return runHeld; }
     boolean crouchHeld() { return crouchHeld; }
+    boolean attackHeld() {
+        return !suspended && (rightTriggerKeyDown || (rightTriggerArmed && rightTriggerAnalogDown) ||
+            (keyDown[2] && !blockedUntilUp[2]));
+    }
+    void clearAttackHold() {
+        blockedUntilUp[2]|=keyDown[2];blockedUntilUp[5]|=keyDown[5];
+        rightTriggerKeyDown=rightTriggerAnalogDown=false;
+        rightTriggerSeeded=rightTriggerArmed=false;
+    }
     boolean guardHeld() {
         return !suspended && (leftTriggerKeyDown || (leftTriggerArmed && leftTriggerAnalogDown));
     }

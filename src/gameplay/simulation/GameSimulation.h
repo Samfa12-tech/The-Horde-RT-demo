@@ -21,6 +21,7 @@
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "gameplay/simulation/CombatPresentation.h"
+#include "gameplay/simulation/AttackHoldToSheath.h"
 #include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/FixedStepRunner.h"
 #include "gameplay/simulation/CharacterPosture.h"
@@ -292,6 +293,9 @@ private:
     void ResetSwordEquipment();
     void ClearQueuedDrawAttack();
     void AdvanceSwordEquipment(float fixedDeltaSeconds);
+    void UpdateSwordSheathHold(const InputSnapshot& input,float seconds);
+    AttackHoldToSheath swordSheathHold_{};
+    bool swordIntentionallyStowed_=false;
     void EmitSwordAttachmentChange();
     void ResolvePlayerAnimation(float fixedDeltaSeconds);
     void ResolveFireEmitters(float fixedDeltaSeconds);

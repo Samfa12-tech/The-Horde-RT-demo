@@ -63,6 +63,54 @@ void ThreatBoundedDodgeLesson() {
         }
     }
 }
+void AttackHoldSheathContract() {
+    AttackHoldToSheath hold;
+    for(int i=0;i<44;++i)Check(!hold.Step(true,1,true,true,1.f/60),"hold cannot stow before .75 seconds");
+    Check(hold.Step(true,1,true,true,1.f/60),"deliberate .75 second hold requests exactly one stow");
+    for(int i=0;i<100;++i)Check(!hold.Step(true,1,true,true,1.f/60),"continued hold cannot repeat a consumed request");
+    hold.Step(false,1,true,true,1.f/60);
+    for(int i=0;i<60;++i)Check(!hold.Step(true,1,true,false,1.f/60),"guard/recovery cannot admit a stow request");
+    Check(hold.Step(true,1,true,true,1.f/60),"completed gesture waits for a real safe boundary");
+    hold.Reset();hold.Step(true,1,true,true,.3f);hold.Cancel();
+    for(int i=0;i<60;++i)Check(!hold.Step(true,1,true,true,1.f/60),"cancel requires a physical release before another hold");
+    hold.Step(false,1,true,true,1.f/60);hold.Step(true,1,true,true,.05f);
+    for(int i=0;i<60;++i)Check(!hold.Step(true,2,true,true,1.f/60),"input source switching cannot inherit a held gesture");
+    hold.Step(false,2,true,true,1.f/60);
+    for(int i=0;i<44;++i)hold.Step(true,2,true,true,1.f/60);
+    Check(hold.Step(true,2,true,true,1.f/60),"fresh release rearms controller hold independently");
+
+    auto cfg=ProductionGameSimulationConfig();cfg.playerStartX=-7.6f;cfg.playerStartZ=-15.2f;cfg.playerStartYawRadians=1.57079632679f;
+    GameSimulation game(cfg);InputSnapshot input;input.yawRadians=cfg.playerStartYawRadians;input.damageEnabled=false;input.tutorialEnabled=false;
+    auto step=[&](int n){for(int i=0;i<n;++i){game.StepFixed(input);game.ClearEvents();}};
+    step(60);
+    Check(game.Snapshot().heldItems[1].parentMode==items::HeldItemParentMode::HandSocket && !game.Snapshot().heldItems[1].transition.active,
+        "real waterfall encounter draws the sword before manual hold testing");
+    input.attackInputSource=1;input.attackHeld=true;++input.commands.attack;step(1);
+    Check(game.Snapshot().playerCombat.action!=PlayerCombatAction::Idle,"tap still starts its immediate ordinary attack");
+    step(4);input.attackHeld=false;step(100);
+    Check(!game.Snapshot().swordIntentionallyStowed && game.Snapshot().heldItems[1].parentMode==items::HeldItemParentMode::HandSocket,
+        "a normal attack tap never requests a sheath");
+    input.attackHeld=true;++input.commands.attack;step(20);
+    Check(game.Snapshot().swordSheathHoldProgress>0 && !game.Snapshot().swordIntentionallyStowed,"immutable snapshot publishes in-progress hold feedback");
+    step(100);
+    Check(game.Snapshot().swordIntentionallyStowed && game.Snapshot().heldItems[1].parentMode==items::HeldItemParentMode::BodyStow,
+        "actual held attack completes the existing sheath after recovery and suppresses proximity redraw");
+    const auto sequence=game.Snapshot().heldItems[1].transition.semanticEdgeSequence;step(100);
+    Check(game.Snapshot().heldItems[1].transition.semanticEdgeSequence==sequence && game.Snapshot().swordIntentionallyStowed,
+        "held input and the active encounter cannot repeatedly stow or redraw");
+    input.attackHeld=false;step(1);input.guardHeld=true;++input.commands.parry;step(40);
+    Check(game.Snapshot().heldItems[1].parentMode==items::HeldItemParentMode::HandSocket && !game.Snapshot().swordIntentionallyStowed,
+        "explicit parry redraws an intentionally sheathed sword");
+    input.guardHeld=false;input.attackHeld=false;step(30);input.attackHeld=true;++input.commands.attack;step(15);
+    input.paused=true;step(1);input.paused=false;step(100);
+    Check(!game.Snapshot().swordIntentionallyStowed && game.Snapshot().swordSheathHoldProgress==0,
+        "menu/focus pause cannot resume a partially held sheath without release");
+    input.attackHeld=false;step(1);input.attackHeld=true;++input.commands.attack;step(100);
+    Check(game.Snapshot().swordIntentionallyStowed,"release and a fresh hold recover after cancellation");
+    input.attackHeld=false;step(1);++input.commands.attack;step(60);
+    Check(game.Snapshot().heldItems[1].parentMode==items::HeldItemParentMode::HandSocket && !game.Snapshot().swordIntentionallyStowed,
+        "explicit attack redraws and preserves the queued first cut");
+}
 void PracticePromptWaitsForSword() {
     GameSimulation sim(ProductionGameSimulationConfig());
     InputSnapshot input; input.tutorialEnabled=true;
@@ -2745,6 +2793,7 @@ int main(int argc,char** argv) {
     SkeletonRevivalBridgeContract();
     BoundedOpeningPractice();
     ThreatBoundedDodgeLesson();
+    AttackHoldSheathContract();
     PracticePromptWaitsForSword();
     InPlacePairRevivalContract();
     RulesEligibilityDoesNotChoosePracticeExit();

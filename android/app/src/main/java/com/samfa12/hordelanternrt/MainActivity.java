@@ -352,7 +352,8 @@ public class MainActivity extends Activity {
     private boolean parryRequestedOnTouchDown;
     private boolean parryTouchActive;
     private int parryTouchPointerId = -1;
-    private boolean publishedGuardHeld;
+    private boolean publishedGuardHeld,publishedAttackHeld;
+    private int publishedAttackSource;
     private boolean keyboardGuardHeld;
     private SoundPool soundPool;
     private HordeAmbiencePlayback waterfallPlayback;
@@ -7951,7 +7952,18 @@ public class MainActivity extends Activity {
         pushGuardHold();
     }
 
+    private void pushAttackHold() {
+        final boolean allowed=canSendGameplayAction() && resumed && controllerHasFocusedWindow();
+        if(!allowed)controllerInput.clearAttackHold();
+        if(!allowed && !publishedAttackHeld)return;
+        final int source=controllerMode?2:3;
+        final boolean held=allowed && (controllerMode?controllerInput.attackHeld():swingTouch!=null && swingTouch.held());
+        if(held==publishedAttackHeld && source==publishedAttackSource)return;
+        ProbeBridge.setAttackHeld(held,source);publishedAttackHeld=held;publishedAttackSource=source;
+    }
+
     private void pushGuardHold() {
+        pushAttackHold();
         final boolean allowed = canSendGameplayAction() && resumed && controllerHasFocusedWindow();
         if (!allowed) {
             keyboardGuardHeld = false;
@@ -7970,7 +7982,7 @@ public class MainActivity extends Activity {
         swingTouch = new PressActionButton(attackButton, this::canSendGameplayAction, () -> {
             clearRunIntent();
             ProbeBridge.requestAttack();
-        });
+        },this::pushAttackHold);
         dodgeTouch = new PressActionButton(dodgeButton, this::canSendGameplayAction, () -> {
             clearRunIntent();
             ProbeBridge.requestDodge();

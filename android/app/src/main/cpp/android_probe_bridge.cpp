@@ -1168,6 +1168,8 @@ void PublishSimulationUiState()
         (static_cast<std::uint64_t>(teaching.lessonSuppressed) << 35u) |
         ((static_cast<std::uint64_t>(teaching.continuationPhase)&7u) << 36u) |
         (static_cast<std::uint64_t>(teaching.naturalContinuation) << 39u) |
+        ((static_cast<std::uint64_t>(std::clamp(simulation.swordSheathHoldProgress,0.f,1.f)*100.f)&0x7fu) << 50u) |
+        (static_cast<std::uint64_t>(simulation.swordIntentionallyStowed) << 57u) |
         (clampByte(teaching.promptOpacity) << 40u) |
         ((static_cast<std::uint64_t>(teaching.attackReadability) & 0x3u) << 48u);
     gCombatTeachingUiState.store(teachingState, std::memory_order_release);
@@ -7020,6 +7022,15 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestAttack(JNIEnv*, jclass)
             horde::gameplay::simulation::CombatInputEdgeKind::Attack,
             horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr));
     }
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setAttackHeld(JNIEnv*,jclass,jboolean held,jint source)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    gInputPublisherState.attackHeld=held==JNI_TRUE;
+    gInputPublisherState.attackInputSource=source>=1 && source<=3?static_cast<std::uint8_t>(source):0;
     PublishInputLocked();
 }
 

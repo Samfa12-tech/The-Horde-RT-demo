@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "baseCommit": "d27f6cdab1b16a5a40215ba8d3c154b0b5e149b0",
+  "evidenceClass": "Unlaunched private application build/package plus focused CPU/UI checks; not current RT presentation or feel evidence",
+  "windows": {
+    "path": "reports/horde-windows-acceptance-20261101-hold-sheath/HordeLanternRT.exe",
+    "bytes": 4996096,
+    "sha256": "dfaa3be867baeab3b4430a61b0a8a9e0f459cb43b2c501fded4bb82eb94504e7"
+  },
+  "android": {
+    "path": "reports/hold-sheath-20261101.apk",
+    "bytes": 251536026,
+    "sha256": "07dec70f6a8bca8aba8e9e90431276689d325dda2623bdfc6a87ace706b27d66",
+    "nativeAbis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "privateRuntime": [
+      {
+        "path": "assets/private_revival/lich_revival.wav",
+        "sha256": "1e1891010f4c89e6f20ec5fba90191aa0f0999c0bd95a4df3fe36659beb9e521"
+      },
+      {
+        "path": "assets/private_revival/skeleton.glb",
+        "sha256": "800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259"
+      }
+    ],
+    "sourceAudioOrBlendFiles": []
+  },
+  "hostSuites": {
+    "combatFoundation": "PASS including real hold/stow/redraw and cancellation",
+    "desktopControllerInput": "PASS",
+    "indoorDust": "PASS current-route projection and unchanged budgets"
+  },
+  "androidFocusedTests": {
+    "controllerInput": 14,
+    "controllerIntegration": 44,
+    "combatTeachingPreferences": 20,
+    "touchButton": 1,
+    "total": 79,
+    "failures": 0,
+    "finalInitiatingPointerGuardAffectedTouchRetest": "PASS 1/1"
+  },
+  "windowsRuntimeFiles": 192,
+  "windowsRuntimeMatchesPriorPackage": true,
+  "privateRevivalEnabled": true,
+  "publicDefaultRevivalEnabled": false,
+  "candidateLaunched": false,
+  "candidateInstalled": false,
+  "ownerParkedFiles": 151,
+  "ownerParkedFilesUnchanged": true,
+  "rendererShaderChanged": false,
+  "effectBudgetIncreased": false,
+  "backendChanged": false,
+  "sources": [
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "bytes": 432660,
+      "sha256": "e7cf5a3e9ab3760a76cccebdfe41f23b1f1b6aac9a497f9417a51b7a1ee11426"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/AndroidControllerInput.java",
+      "bytes": 29747,
+      "sha256": "6e769af81cbbf4cd261e3e940e03c5692fdca8dca16b4d3c42cf1e7175a27122"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/CombatTeachingPreferences.java",
+      "bytes": 7824,
+      "sha256": "bb898f8d1da202de20bdf92963b00fea4b8ef4a2d9f60b122b8ca77c1cf637e6"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java",
+      "bytes": 532381,
+      "sha256": "a8f1be530586e2461b28fd84710590529a85a7090f4d1fc8437294c39935715f"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/PressActionButton.java",
+      "bytes": 2395,
+      "sha256": "2a6e9bde9934d5a6ecb25215dc775cc4a2d793f2c042a4bdac1bdf0b461d562b"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/ProbeBridge.java",
+      "bytes": 15052,
+      "sha256": "4faed820af7c9a6f9583bd1fca94986a3cd95a8b3f696922ce93f4df103ba971"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/AndroidControllerInputTest.java",
+      "bytes": 19202,
+      "sha256": "47b2c4d9386cedd3dde18abccd8a771f2893d462f283a37d5d77977468384c72"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingPreferencesTest.java",
+      "bytes": 18817,
+      "sha256": "82c026eed8dada3e514ff413fb568f04d8cd55e3e51a9e3071d048714adb02d1"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "bytes": 181313,
+      "sha256": "b721e71912f1f9a2d9456448480547b349fea71423941a749e94c9413d4e2ec4"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.h",
+      "bytes": 26529,
+      "sha256": "0576c92d6f582007d6bae235233e6a4b0e3b3afe0a6b9e7dfbc04098e06cc999"
+    },
+    {
+      "path": "src/gameplay/simulation/InputSnapshot.h",
+      "bytes": 5388,
+      "sha256": "ae4736e7256162a5d8eb9282aba0840d44cdc25188f554bd27df7d7a7ba77ad2"
+    },
+    {
+      "path": "src/gameplay/simulation/SimulationSnapshot.h",
+      "bytes": 10327,
+      "sha256": "1c6e902f4428b8c12ca7357fc0a91a8c4157db8a6e399a80856e4bd0ddecee26"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 711046,
+      "sha256": "5e30dfd93e0846b56ec8fd9c73660c8a1fb76438339d6f8b8eec98bb020a59f0"
+    },
+    {
+      "path": "src/scene/atmosphere/ForestFireflies.h",
+      "bytes": 4423,
+      "sha256": "0f596b78060fd742ac76a35514dbebaa7e7bfc6ffa885ee8b313cf9f15390f1b"
+    },
+    {
+      "path": "tests/CombatFoundationTests.cpp",
+      "bytes": 189520,
+      "sha256": "65dc657ba9f9c5562d2c8af210f844f1c1d6c68be194f3171ac71f51ff43e53b"
+    },
+    {
+      "path": "tests/IndoorDustTests.cpp",
+      "bytes": 12590,
+      "sha256": "925d7a1d51fb537e0ea2c51dd8edfd2c59e059fd6f50b2b8cfa3854801b09870"
+    },
+    {
+      "path": "src/gameplay/simulation/AttackHoldToSheath.h",
+      "bytes": 1172,
+      "sha256": "37e07fceed345bfcbeda6d5af98cb9d8a89580c2306a66c38b17edca668e0a57"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/PressActionButtonHoldTest.java",
+      "bytes": 1326,
+      "sha256": "b4d94d8e9924e000d6592082262daafc3002387cd1240ff510acd5e04cefa89b"
+    }
+  ]
+}

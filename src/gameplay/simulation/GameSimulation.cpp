@@ -279,6 +279,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
             IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase),
         combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_, CurrentCombatRules());
     gameplayTimeScale_ = combatTeaching_.Snapshot().simulationTimeScale;
+    const float gestureSeconds=fixedDeltaSeconds; // Input hold duration is not dilated combat time.
     fixedDeltaSeconds *= gameplayTimeScale_;
     const bool wasAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     playerVitals_.Update(fixedDeltaSeconds);
@@ -343,6 +344,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
                  torchFailureSnapshot_.droppedZ);
         }
         UpdateEncounters(input, fixedDeltaSeconds);
+        UpdateSwordSheathHold(input,gestureSeconds);
         UpdateRewardSequence(fixedDeltaSeconds, true);
         ResolveHeldItems();
         RecordSuccessfulHitParticles();
@@ -1816,6 +1818,7 @@ bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
                                      const bool blocksDefenseDuringDraw)
 {
     using namespace horde::gameplay::items;
+    if (reasonPayload==3 && swordIntentionallyStowed_)return false;
     if (FlaskUtilityBusy() || !config_.swordStartsStowed || SwordDefenseReady())
         return false;
 
@@ -1827,6 +1830,7 @@ bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
     {
         return false;
     }
+    swordIntentionallyStowed_=false;
     automaticSwordDrawBlocksDefense_ = blocksDefenseDuringDraw;
     Emit(GameplayEventType::PlayerSwordDrawStarted,
          EntityId::Player,
@@ -1840,6 +1844,7 @@ bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
 
 void GameSimulation::ResetSwordEquipment()
 {
+    swordSheathHold_.Reset();swordIntentionallyStowed_=false;
     ResetFlaskUtility();
     using namespace horde::gameplay::items;
     HeldItemState& sword = heldItems_[1];
@@ -1868,6 +1873,22 @@ void GameSimulation::AdvanceSwordEquipment(const float fixedDeltaSeconds)
         EmitSwordAttachmentChange();
     if (!heldItems_[1].transition.active)
         automaticSwordDrawBlocksDefense_ = false;
+}
+
+void GameSimulation::UpdateSwordSheathHold(const InputSnapshot& input,float seconds)
+{
+    const bool eligible=CurrentCombatRules() && config_.swordStartsStowed && !input.paused &&
+        playerVitals_.Snapshot().phase==PlayerLifePhase::Alive && !input.guardHeld &&
+        !FlaskUtilityBusy() && !rescueTraversal_.IsActive() && !rescueMovementSuppressedThisTick_ &&
+        !IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase) && dodgeRemainingSeconds_<=0 &&
+        heldItems_[1].parentMode==items::HeldItemParentMode::HandSocket && !heldItems_[1].transition.active;
+    const bool safe=combatSnapshot_.player.action==PlayerCombatAction::Idle && !pendingAttackCommands_ &&
+        !pendingParryCommands_ && !queuedDrawAttack_;
+    if(!swordSheathHold_.Step(input.attackHeld,input.attackInputSource,eligible,safe,seconds))return;
+    const auto request=items::RequestHeldItemTransition(heldItems_[1],items::HeldItemTransitionKind::Sheath,tickIndex_);
+    if(request.status==items::HeldItemTransitionRequestStatus::Started) {
+        swordIntentionallyStowed_=true;ClearRunIntent();ClearQueuedDrawAttack();
+    }
 }
 
 void GameSimulation::EmitSwordAttachmentChange()
@@ -2392,6 +2413,7 @@ void GameSimulation::UpdateSkeletonRevival(const InputSnapshot& input, float del
 
 void GameSimulation::CancelCombatTransients()
 {
+    swordSheathHold_.Cancel();
     enemyHitParticles_.Clear();
     guardReleaseRequired_ = guardReleaseRequired_ || lastInput_.guardHeld;
     swordCombat_.SetGuardHeld(false);
@@ -3466,6 +3488,9 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.torchFailure = torchFailureSnapshot_;
     snapshot_.waterContact = waterContact_.Snapshot();
     snapshot_.heldItems = heldItems_;
+    snapshot_.swordSheathHoldProgress=swordSheathHold_.Progress();
+    snapshot_.swordIntentionallyStowed=swordIntentionallyStowed_ && !heldItems_[1].transition.active &&
+        heldItems_[1].parentMode==items::HeldItemParentMode::BodyStow;
     snapshot_.automaticSwordDrawBlocksDefense = SwordDrawBlocksDefense();
     snapshot_.heldItemKinematics = heldItemFixedStepState_.kinematics;
     snapshot_.playerAnimation = playerAnimationState_.Snapshot();

@@ -161,6 +161,8 @@ struct SimulationSnapshot
 
     TorchFailureSnapshot torchFailure{};
     horde::gameplay::effects::WaterContactSnapshot waterContact{};
+    float swordSheathHoldProgress=0;
+    bool swordIntentionallyStowed=false;
     horde::gameplay::items::HeldItemStates heldItems =
         horde::gameplay::items::MakeDefaultHeldItemStates();
     horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};

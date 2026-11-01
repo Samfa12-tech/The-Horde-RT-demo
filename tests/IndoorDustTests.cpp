@@ -94,7 +94,7 @@ int main(){
     auto copy=hits;hits.Step(kHitBurstLifetime);
     check(!hits.Active() && copy.Active(),"all bursts expire bounded; immutable snapshot copy remains owned");
     copy.Clear();check(!copy.Active() && !copy.Add(1,EntityId::SkeletonA,{0,1,-2},{1,0,0}),"pause/reset cancels particles and cannot replay an old semantic contact");
-    DustCamera forestCamera{{-29.f,1.3f,-14.f},0,0,16.f/9};
+    DustCamera forestCamera{{kForestFireflyPockets[0][0],1.3f,kForestFireflyPockets[0][1]+5.f},0,0,16.f/9};
     unsigned groundCalls=0;
     const auto ground=[&](float,float)->std::optional<float>{++groundCalls;return 0.f;};
     BuildDustFrame({},DustQuality::Standard,forestCamera,2,frame,work);
@@ -105,6 +105,13 @@ int main(){
     }
     const auto flies=OverlayForestFireflies(DustQuality::Standard,forestCamera,2,ground,frame,work);
     check(flies==4 && work.generatedMotes==4 && work.projectedMotes>0,"nearby forest pocket produces only four bounded fireflies");
+    for(const auto& pocket:kForestFireflyPockets) {
+        auto approach=forestCamera;approach.origin={pocket[0],1.3f,pocket[1]-5.f};approach.yaw=3.14159265359f;
+        DustFrame routeFrame;DustWork routeWork;
+        BuildDustFrame({},DustQuality::Standard,approach,2,routeFrame,routeWork);
+        check(OverlayForestFireflies(DustQuality::Standard,approach,2,ground,routeFrame,routeWork)==4 && routeWork.projectedMotes>0,
+            "each current forest-route pocket projects its existing four motes from the forward approach");
+    }
     const auto firstFlies=frame;
     for(unsigned i=0;i<flies;++i)check(frame.motes[i].response[2]==3 && frame.motes[i].positionRadius[1]>.5f &&
         frame.motes[i].positionRadius[1]<1.6f,"fireflies follow real ground and carry emissive type");
@@ -129,8 +136,8 @@ int main(){
     BuildDustFrame(overlaps,DustQuality::Standard,camera,2,frame,work);
     OverlayForestFireflies(DustQuality::Standard,forestCamera,2,ground,frame,work);
     EnemyHitParticles mixed;
-    mixed.Add(1,EntityId::SkeletonA,{-29,1,-17},{1,0,0});
-    mixed.Add(2,EntityId::Lich,{-29,1,-17},{1,0,0});
+    mixed.Add(1,EntityId::SkeletonA,{kForestFireflyPockets[0][0],1,kForestFireflyPockets[0][1]+2.f},{1,0,0});
+    mixed.Add(2,EntityId::Lich,{kForestFireflyPockets[0][0],1,kForestFireflyPockets[0][1]+2.f},{1,0,0});
     OverlayHitParticles(mixed,DustQuality::Standard,forestCamera,frame,work);
     check(work.generatedMotes<=64 && work.combatMotes==16 && frame.motes[48].response[2]==1 &&
         frame.motes[56].response[2]==2,"fireflies preserve contact priority and fixed upload capacity");
