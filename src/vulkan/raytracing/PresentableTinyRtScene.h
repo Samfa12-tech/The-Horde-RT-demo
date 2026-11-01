@@ -434,6 +434,12 @@ public:
     const horde::scene::DevelopmentWorldGeometry& WorldRouteGeometry() const { return worldRouteGeometry_; }
     std::shared_ptr<const horde::gameplay::simulation::TriangleSupportSurface> ChapterTerrainSurface() const { return chapterTerrainSurface_; }
     horde::gameplay::healing::FlaskUpgradeReadiness FlaskUpgradeReadiness() const;
+    struct InitialisationBoundary {
+        void* user=nullptr;
+        bool (*visit)(void*,std::string_view)=nullptr;
+    };
+    // Synchronous owner-thread callback before each existing measured init stage.
+    void SetInitialisationBoundary(InitialisationBoundary boundary){initialisationBoundary_=boundary;}
     bool IsReady() const { return ready_; }
 #if defined(_DEBUG)
     struct ForestDetailClosureObservation {
@@ -975,6 +981,9 @@ public:
 #endif
 
 private:
+    template<typename Action> bool MeasureInitialisationStage(InitialisationMeasurements& measurements,
+        std::string_view name,Action&& action);
+    InitialisationBoundary initialisationBoundary_{};
     friend struct PresentableTinyRtScenePreflightTestAccess;
     friend struct PresentableTinyRtSceneObservationTestAccess;
     friend struct PresentableTinyRtSceneOutputResizeTestAccess;

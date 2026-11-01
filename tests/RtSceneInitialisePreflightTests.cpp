@@ -234,6 +234,21 @@ int main()
     ok &= Require(RejectsBeforeOwnership(provider.request(), missingGeneric, genericKey),
                   "production initialise must reject a missing strategy before ownership");
 
+    {
+        PresentableTinyRtScene cancelled;PresentableTinyRtScenePreflightTestAccess::Ledger ledger;std::string diagnostic;
+        unsigned visits=0;
+        cancelled.SetInitialisationBoundary({&visits,+[](void* user,std::string_view stage){
+            ++*static_cast<unsigned*>(user);return stage!="preflight";
+        }});
+        const bool accepted=PresentableTinyRtScenePreflightTestAccess::Initialise(cancelled,provider.request(),genuinePair,ledger,diagnostic);
+        ok &= Require(!accepted && visits==1 && ledger.resolverCalls==0 && ledger.ownershipCalls==0 && !cancelled.IsReady(),
+            "optional owner boundary cancels before preflight/resource ownership without reporting a ready scene");
+        cancelled.SetInitialisationBoundary({});
+        PresentableTinyRtScenePreflightTestAccess::Ledger retryLedger;
+        (void)PresentableTinyRtScenePreflightTestAccess::Initialise(cancelled,provider.request(),genuinePair,retryLedger,diagnostic);
+        ok &= Require(retryLedger.resolverCalls==1 && retryLedger.ownershipCalls==1,
+            "cleared startup cancellation permits the unchanged owner initialization path on retry");
+    }
     const std::array duplicateOpaque{*opaque, *opaque};
     ok &= Require(RejectsBeforeOwnership(provider.request(), duplicateOpaque, opaqueKey),
                   "production initialise must reject a duplicate strategy before ownership");

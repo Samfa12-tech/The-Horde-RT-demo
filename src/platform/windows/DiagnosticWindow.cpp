@@ -1,3 +1,4 @@
+#include "platform/windows/WindowsStartupGate.h"
 #include "gameplay/simulation/PrivateRevivalApplication.h"
 #include "audio/ChapterDialogueSpatial.h"
 #include "platform/windows/DiagnosticWindow.h"
@@ -6622,7 +6623,13 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         selectedSkeletonBindings.push_back({"SkeletonProof|StandDead0ToIdle", false, true});
     }
 #endif
-    if (!ctx.rtScene.Initialise(ctx.instance,
+    auto* startup=horde::platform::windows::WindowsStartupGate::Current(ctx.windowHandle);
+    ctx.rtScene.SetInitialisationBoundary({startup,startup?+[](void* user,std::string_view stage){
+        const auto label=stage.find("assets")!=std::string_view::npos?"Loading scene assets...":
+            stage.find("pipeline")!=std::string_view::npos?"Preparing ray-tracing pipelines...":"Preparing scene resources...";
+        return static_cast<horde::platform::windows::WindowsStartupGate*>(user)->Boundary(label);
+    }:nullptr});
+    const bool sceneInitialised=ctx.rtScene.Initialise(ctx.instance,
                                 ctx.physicalDevice,
                                 ctx.device,
                                 ctx.graphicsQueue,
@@ -6637,8 +6644,11 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
                                 developmentStaticAssetDirectory,
                                 assetRoot.string(),
                                 ctx.executionBackend, ctx.sceneProfile, ctx.requestedGlassEnabled,
-                                ctx.pipelineCache, nullptr, selectedSkeletonBindings))
+                                ctx.pipelineCache, nullptr, selectedSkeletonBindings);
+    ctx.rtScene.SetInitialisationBoundary({});
+    if(!sceneInitialised)
     {
+        if(startup && startup->Cancelled())return false;
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
         ctx.lastRtFrameError = diagnostic;
         if (startupFailureDialog && !ctx.unattendedBenchmark) GameMessageBoxA(ctx.windowHandle,
@@ -9654,12 +9664,18 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         // user focus arms the run. Native evidence starts no audio at any point.
     }
 #endif
+    if(!horde::platform::windows::WindowsStartupGate::AtBoundary(hWnd,"Checking Vulkan support...")) {
+        (void)renderOwner.Retire();return horde::platform::windows::WindowsStartupGate::kCancelledResult;
+    }
     SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::VulkanInstance);
     if (!CreateInstance(context.instance, context.presentSurfaceSupport))
     {
         return 1;
     }
 
+    if(!horde::platform::windows::WindowsStartupGate::AtBoundary(hWnd,"Preparing the game window...")) {
+        (void)renderOwner.Retire();return horde::platform::windows::WindowsStartupGate::kCancelledResult;
+    }
     SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::Surface);
     if (!CreateSurface(context.instance, hWnd, context.surface))
     {
@@ -9667,6 +9683,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         return 1;
     }
 
+    if(!horde::platform::windows::WindowsStartupGate::AtBoundary(hWnd,"Selecting hardware ray tracing...")) {
+        (void)renderOwner.Retire();return horde::platform::windows::WindowsStartupGate::kCancelledResult;
+    }
     SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::BackendSelection);
     uint32_t physicalDeviceCount = 0u;
     if (vkEnumeratePhysicalDevices(context.instance, &physicalDeviceCount, nullptr) != VK_SUCCESS || physicalDeviceCount == 0u)
@@ -9734,6 +9753,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         return 2;
     }
     context.useRtPath = context.executionBackend != horde::vulkan::RtExecutionBackend::Unsupported;
+    if(!horde::platform::windows::WindowsStartupGate::AtBoundary(hWnd,"Preparing the graphics device...")) {
+        (void)renderOwner.Retire();return horde::platform::windows::WindowsStartupGate::kCancelledResult;
+    }
     SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::LogicalDevice);
     if (!CreateLogicalDevice(context.physicalDevice, context.instance, context.graphicsQueueFamilyIndex, context.executionBackend,
         context.device, context.graphicsQueue, context.presentSurfaceSupport, context.presentCompletionMode))
@@ -9751,6 +9773,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
               << " available=" << (context.pipelineCache != VK_NULL_HANDLE ? 1 : 0) << '\n';
     capabilities.diagnostics.push_back(horde::vulkan::PresentCompletionDiagnostic(context.presentCompletionMode));
 
+    if(!horde::platform::windows::WindowsStartupGate::AtBoundary(hWnd,"Preparing display output...")) {
+        (void)renderOwner.Retire();return horde::platform::windows::WindowsStartupGate::kCancelledResult;
+    }
     SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::Swapchain);
     if (!CreateSwapchain(context, hWnd))
     {
@@ -9763,12 +9788,20 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             !context.environmentSurveyWaterDisabled)))
     {std::cerr<<"Environment survey geometry selection was not admitted before scene initialization.\n";(void)renderOwner.Retire();return 1;}
     #endif
+    if(!horde::platform::windows::WindowsStartupGate::AtBoundary(hWnd,"Loading the ray-traced scene...")) {
+        (void)renderOwner.Retire();return horde::platform::windows::WindowsStartupGate::kCancelledResult;
+    }
     SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::RtScene);
     if (!InitialiseRtSceneForSwapchain(context))
     {
+        const bool cancelled=horde::platform::windows::WindowsStartupGate::IsCancelled(hWnd);
         (void)renderOwner.Retire();
-        return 1;
+        return cancelled?horde::platform::windows::WindowsStartupGate::kCancelledResult:1;
     }
+    if(!horde::platform::windows::WindowsStartupGate::AtBoundary(hWnd,"Graphics ready")) {
+        (void)renderOwner.Retire();return horde::platform::windows::WindowsStartupGate::kCancelledResult;
+    }
+    horde::platform::windows::WindowsStartupGate::Complete(hWnd);
 
     context.controlsEnabled = context.useRtPath && context.rtScene.IsReady();
 #if defined(_DEBUG)
@@ -11341,6 +11374,8 @@ bool NativeUiUsesHighContrast()
 
 LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    LRESULT startupResult=0;
+    if(horde::platform::windows::WindowsStartupGate::Handle(hWnd,message,wParam,startupResult))return startupResult;
     auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
     if(message==WM_COMMAND && LOWORD(wParam)==kMenuCompatibilityReportId) {
         auto* owner=CompatibilityFor(hWnd);
@@ -13325,6 +13360,10 @@ int CreateAndShowWindow(const std::string& diagnosticText,
             return TRUE;
         }, 0);
     }
+    horde::platform::windows::WindowsStartupGate startup;
+    const bool startupInteractive=captureDirectory==nullptr && !gCampaignHiddenValidation && !gShowcaseCaptureHidden &&
+        !unattendedBenchmark && !graphicsPreviewCapture && !outputResizeValidation && nativeMotionScenario.empty() && !gOpeningBenchmarkMenuValidation;
+    if(startupInteractive && !startup.Begin(hWnd)){DestroyWindow(hWnd);return 1;}
     int showMode=gShowcaseCaptureHidden ? SW_HIDE :
         (captureDirectory != nullptr ? SW_SHOWNOACTIVATE : SW_SHOW);
     if(gOpeningBenchmarkMenuValidation)showMode=SW_SHOWNOACTIVATE;
@@ -13382,6 +13421,11 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     } while(openingBenchmark.owner.Phase()==OpeningBenchmarkOwnerPhase::Benchmark ||
             openingBenchmark.owner.Phase()==OpeningBenchmarkOwnerPhase::ReturningEntry);
     if(openingEligible && IsWindow(hWnd))RemovePropA(hWnd,kOpeningBenchmarkTransferProperty);
+    if(result==horde::platform::windows::WindowsStartupGate::kCancelledResult) {
+        startup.Finish();compatibility.failureCleanup=true;
+        if(IsWindow(hWnd))DestroyWindow(hWnd);
+        return 0; // Deliberate startup cancellation is not a compatibility failure.
+    }
     if(result!=0 && IsWindow(hWnd)){compatibility.failureCleanup=true;DestroyWindow(hWnd);}
     if ((gCampaignHiddenValidation || captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {

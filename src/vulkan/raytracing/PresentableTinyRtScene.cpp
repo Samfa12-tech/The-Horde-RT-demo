@@ -93,7 +93,7 @@ namespace
 using InitialiseClock = std::chrono::steady_clock;
 
 template <typename Action>
-bool MeasureInitialisationStage(
+bool MeasureInitialisationStageWork(
     PresentableTinyRtScene::InitialisationMeasurements& measurements,
     const std::string_view name,
     Action&& action)
@@ -1296,6 +1296,14 @@ PresentableTinyRtScene::DiagnosticPreviewMeshPairEvidence PresentableTinyRtScene
     return out;
 }
 #endif
+
+template<typename Action>
+bool PresentableTinyRtScene::MeasureInitialisationStage(InitialisationMeasurements& measurements,
+    std::string_view name,Action&& action)
+{
+    if(initialisationBoundary_.visit && !initialisationBoundary_.visit(initialisationBoundary_.user,name))return false;
+    return MeasureInitialisationStageWork(measurements,name,std::forward<Action>(action));
+}
 
 bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         VkPhysicalDevice physicalDevice,

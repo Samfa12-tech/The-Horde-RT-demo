@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "baseCommit": "0349c856f842a752847abfecb48531f125333d8f",
+  "evidenceClass": "Native hidden HWND/message-queue fixtures and renderer initialization-owner tests; application build/package only",
+  "windows": {
+    "path": "reports/horde-windows-acceptance-20261101-startup/HordeLanternRT.exe",
+    "bytes": 5003264,
+    "sha256": "a3a7212ea60b8f72000a9cc7eb5e5f4be1bd743098998ff568a9cab2b1a6a343"
+  },
+  "hostTests": {
+    "windowsStartupGate": "PASS",
+    "sceneInitialisePreflight": "PASS"
+  },
+  "privateRevivalEnabled": true,
+  "candidateLaunched": false,
+  "currentCandidateRtPresentation": false,
+  "foregroundTaken": false,
+  "androidRebuilt": false,
+  "windowsRuntimeFiles": 192,
+  "windowsRuntimeIdentical": true,
+  "ownerParkedFiles": 151,
+  "ownerParkedFilesChanged": [],
+  "sources": [
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 132334,
+      "sha256": "fb56108f8047a719920179361cd592b861cb2704d3fe57048071ea35aa46fff3"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 714406,
+      "sha256": "ce8190de80fda04a9bca3ad4c21f2429243e8495ca1097245c4cf4df58c809a8"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "bytes": 571236,
+      "sha256": "ec3d6466fb5f8409c64d9682b15f778a2f4c72490ccd57133a4ed7b008c08f41"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+      "bytes": 85861,
+      "sha256": "6da1feaf766b154789f4984fe6f4bf693d240df8a2be72d1f9fe3dc4993b250f"
+    },
+    {
+      "path": "tests/RtSceneInitialisePreflightTests.cpp",
+      "bytes": 15915,
+      "sha256": "b84a81243c9486c4e9f995eb98eea54324217e6a9f3a2bd6838594d98f0dbdc6"
+    },
+    {
+      "path": "src/platform/windows/WindowsStartupGate.h",
+      "bytes": 5684,
+      "sha256": "850c580f98472db201fdade82841c405b449284c5d9ff2433f04a02c36cc0c43"
+    },
+    {
+      "path": "tests/WindowsStartupGateTests.cpp",
+      "bytes": 3968,
+      "sha256": "ea4339a4a2ce018642eb7a1c6c5c8d6a9685cbf140d509d326c6f709bccdba93"
+    }
+  ],
+  "remaining": [
+    "Blocking driver or long single initialization action cannot be interrupted by boundary pumping",
+    "Initial capability probe still precedes HWND creation",
+    "Actual prior Not Responding root cause unproven",
+    "Current application startup cold timing and real RT/owner journey acceptance not measured"
+  ]
+}
