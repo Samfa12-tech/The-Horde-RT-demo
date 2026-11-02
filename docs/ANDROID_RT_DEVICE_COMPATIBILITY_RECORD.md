@@ -1,5 +1,19 @@
 # Android RT Device Compatibility Record
 
+## 2026-11-02 - Compact benchmark UI, bounded physical acceptance
+
+SM-S948B, arm64 Debug APK
+`f76d049c23564a9317ffd0eb7340ae94940cd860202d3b1e11ff4904ada9a484`.
+One normal Custom course reached two-pass completion. Compact portrait progress
+was readable at200% font; private local-summary collapse/expand and unchanged
+12,001-character displayed JSON were checked in portrait/landscape. Export and
+unchecked sharing actions precede the raw area. This is UI/workflow evidence,
+not performance, public-preview, screen-reader speech, running-expansion,
+gameplay, catalog or shipping acceptance. Original font/rotation settings and
+all593 file/all27 mutable hashes restored exactly; debug stopped/Home confirmed,
+phone released, production/actor apps untouched. No Send or token request.
+[Actual passes, gaps and private evidence custody](evidence/2026-11-01-attack-rings/COMPACT_BENCHMARK_UI.md).
+
 ## 2026-11-02 - Corrected normal New Game and bounded phone retry
 
 SM-S948B / Adreno840 / RayTracingPipeline. Source `41abc115`, arm64-only Debug

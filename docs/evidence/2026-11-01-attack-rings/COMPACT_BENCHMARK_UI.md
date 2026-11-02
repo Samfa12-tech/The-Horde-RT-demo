@@ -1,5 +1,37 @@
 # Compact Android benchmark UI - 2 November 2026
 
+## Bounded physical phone check completed
+
+Physical SM-S948B, exact f76d APK below. Fresh backup verified all593 files and
+all27 preference/career files before isolation. One normal Custom course showed
+two-pass completion. At temporary200% system font in portrait, compact running
+identity/lap/waypoint/cancel guidance was captured and readable. A live status
+click lookup timed out before input was delivered; expanded running diagnostics
+and uninterrupted whole-run flicker observation remain unverified. No second
+benchmark was run.
+
+The completed **private local review** passed default collapse and explicit
+expand/collapse in portrait and landscape at200% font. Raw JSON disappeared from
+the UI hierarchy when collapsed; export/sharing controls preceded the raw area.
+Normal form scrolling is still needed at large text; this is not an all-controls-
+above-the-fold claim. The displayed12,001-character JSON retained SHA256
+`a4f18c5c75c97acb3460f33b86e5f6996de8f6fb00f4d837ed57d3ccc27ef3d8`
+across both orientations/toggles. Separate sharing consent stayed unchecked and
+Review/Send disabled. No sharing preparation, verification token or Send occurred.
+Public-preview physical flow, clipboard/file export and actual screen-reader
+speech were not exercised; their host checks are not relabelled device passes.
+
+No app-only font override exists. Original system settings were recorded and
+restored exactly: font1.5, auto-rotation1, user-rotation0. All593 original hashes,
+including27 mutable hashes, matched after restoration. Debug stopped, Home
+confirmed and phone released; latest f76d Debug APK retained under the standing
+policy. Production/actor apps unchanged. Private XML/screenshots/hash/cleanup
+receipts remain in `reports/android-compact-ui-qa-20261102-r1/`; no raw personal
+capture is committed or published. No further device/build process is active.
+
+The source/build snapshot below predates this physical check; remaining gameplay,
+ordinary-release and final catalog/Send gates are still unverified.
+
 Based on `5399e88d`. Native local JSON and the separate sharing-wire preview now sit below Copy/Save/Edit and sharing controls in one default-collapsed **Technical details** section. Its button exposes heading and expanded/collapsed accessibility state; stale controls cannot expand a replacement form. Copy/Save still use the exact immutable native bytes. Consent, IDs, payload construction, verification, transport and receipt ownership are unchanged. Explanatory text now distinguishes local preparation from separately consented sharing rather than claiming all sharing is unavailable.
 
 Running benchmarks use available safe width and wrapping height instead of the compact RT pill's fixed height/width. The default shows benchmark identity, lap/waypoint progress and cancellation guidance; tap reveals the unchanged native timing diagnostics, including the distinction from display Hz. Returning/blocked states do not promise cancellation. The existing generic-poll ownership guard remains; no duplicate flicker workaround, native measurement change or new polling loop was introduced.
