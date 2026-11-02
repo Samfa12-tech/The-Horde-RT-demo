@@ -71,20 +71,54 @@ public final class HealingFlaskHudTest {
         assertTrue(((TextView)a.findViewById(R.id.flask_hint)).getText().toString().contains("No charge spent"));
         assertEquals(0,Bridge.drinks);assertEquals(0,Bridge.rests);
     }
-    private void largeFont(int width,int height)throws Exception {
+    @Test public void flaskIconKeepsNamedActionAndFixedComfortableTarget()throws Exception {
+        MainActivity a=activity();Bridge.flask=new long[]{2,31,1,1,0,1,2,0,0,0};update();
+        Button drink=a.findViewById(R.id.drink_flask_button);
+        assertTrue(drink.getContentDescription().toString().startsWith("Drink"));
+        assertTrue(drink.getContentDescription().toString().contains("Flask"));
+        update();assertTrue(drink.getContentDescription().toString().startsWith("Drink"));
+        assertTrue(drink.getContentDescription().toString().contains("Flask"));
+        assertEquals("",drink.getText().toString());
+        assertNotNull(drink.getCompoundDrawables()[0]);
+        assertEquals(HordeUiTokens.dp(a,32),drink.getCompoundDrawables()[0].getBounds().width());
+        assertEquals(HordeUiTokens.dp(a,56),drink.getLayoutParams().width);
+        assertEquals(HordeUiTokens.dp(a,56),drink.getLayoutParams().height);
+        assertEquals(0f,((LinearLayout.LayoutParams)drink.getLayoutParams()).weight,0f);
+        assertEquals(View.GONE,a.findViewById(R.id.rest_button).getVisibility());
+        drink.performClick();assertEquals(1,Bridge.drinks);
+        Bridge.flask[3]=0;update();drink.performClick();assertEquals(1,Bridge.drinks);
+    }
+    private void largeFont(int widthDp,int heightDp)throws Exception {
         MainActivity a=activity();Configuration config=new Configuration(a.getResources().getConfiguration());config.fontScale=2f;
         a.getResources().updateConfiguration(config,a.getResources().getDisplayMetrics());
+        final int width=HordeUiTokens.dp(a,widthDp),height=HordeUiTokens.dp(a,heightDp);
         View root=a.findViewById(R.id.root);root.layout(0,0,width,height);
+        for(int id:new int[]{R.id.attack_button,R.id.parry_button,R.id.dodge_button})
+            a.findViewById(id).setVisibility(View.VISIBLE);
         Bridge.flask=new long[]{2,31,1,1,2,1,2,0,2,0};update();
         root.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.EXACTLY));
         root.layout(0,0,width,height);
         LinearLayout actions=a.findViewById(R.id.flask_touch_actions);assertEquals(LinearLayout.VERTICAL,actions.getOrientation());
         View plate=a.findViewById(R.id.flask_panel),drink=a.findViewById(R.id.drink_flask_button),rest=a.findViewById(R.id.rest_button);
-        assertTrue(drink.getHeight()>=48);assertTrue(rest.getHeight()>=48);assertTrue(plate.getBottom()<=height);
+        assertEquals(HordeUiTokens.dp(a,56),drink.getHeight());
+        assertEquals(HordeUiTokens.dp(a,56),drink.getWidth());
+        assertTrue(rest.getHeight()>=HordeUiTokens.dp(a,48));assertTrue(plate.getBottom()<=height);
+        for(View control:new View[]{drink,rest}) {
+            android.graphics.Rect controlRect=new android.graphics.Rect();control.getDrawingRect(controlRect);
+            ((ViewGroup)root).offsetDescendantRectToMyCoords(control,controlRect);
+            assertTrue(controlRect.left>=0 && controlRect.top>=0 && controlRect.bottom<=height);
+            assertTrue("Flask actions stay outside right-half look region",controlRect.right<=width/2);
+            for(int id:new int[]{R.id.attack_button,R.id.parry_button,R.id.dodge_button}) {
+                View action=a.findViewById(id);assertEquals(View.VISIBLE,action.getVisibility());
+                android.graphics.Rect actionRect=new android.graphics.Rect();action.getDrawingRect(actionRect);
+                ((ViewGroup)root).offsetDescendantRectToMyCoords(action,actionRect);
+                assertFalse("Flask action cannot overlap visible combat action",android.graphics.Rect.intersects(controlRect,actionRect));
+            }
+        }
         assertTrue(rest.getTop()>=drink.getBottom());
         update();ViewGroup.LayoutParams before=plate.getLayoutParams();update();
         assertSame("Unchanged publication keeps layout parameters",before,plate.getLayoutParams());
     }
     @Test public void largeFontPortraitKeepsWholeTargets()throws Exception {largeFont(480,900);}
-    @Test @Config(qualifiers="land") public void largeFontLandscapeKeepsWholeTargets()throws Exception {largeFont(900,480);}
+    @Test @Config(qualifiers="land-hdpi") public void largeFontLandscapeKeepsWholeTargets()throws Exception {largeFont(640,360);}
 }

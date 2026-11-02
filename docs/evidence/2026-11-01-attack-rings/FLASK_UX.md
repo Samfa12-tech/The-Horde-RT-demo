@@ -74,3 +74,33 @@ F03's waystone capacity pickup. At an earned basin verify refill, then earned
 Save/Load/Retry. Full natural-route, footsteps on all surfaces, fireflies, bone
 particles, lich goo, sheath, ring, treasury context and Standard benchmark
 apply/measure/cancel/restore acceptance are not established by this checkpoint.
+
+
+## Touch flask icon follow-up
+
+From `a0042016`, replaced the text-only Drink presentation with an original
+corked, round-bodied flask vector. The existing Button/listener/native guards
+remain. The icon uses the existing centered compound-drawable control pattern:
+32dp glyph in a fixed56dp target, accessible Drink name with current charge/reason
+context retained after first and stable updates. Charges stay alongside it.
+Drink no longer owns a weighted full-row hit target; contextual Rest remains
+absent away from nearby earned basins. Rest is separately sized/spaced and stacks
+at enlarged fonts. No C++ source or native binary was changed/rebuilt.
+
+Focused checks passed53/53: HUD6, immutable publication3, controller integration44,
+zero skipped/failures/errors. Density-aware200% portrait and640x360dp hdpi
+landscape tests check both actions stay fully in bounds, outside the right-half
+look region and clear of explicitly visible attack/parry/dodge controls. The
+icon/name and unchanged disabled/focus/menu/session guards are covered. These
+are host layout/input checks, not physical touch, TalkBack or screenshot proof.
+
+New private arm64 APK: `reports/flask-icon-20261102-arm64.apk`,219116823 bytes,
+SHA256 `e7567fbddfcb7967cc9852a198ceec4cc0904a1a2a2262e83fbc2a8058bee62c`.
+Receipt `reports/flask-icon-20261102-receipt.json`, SHA256
+`7e2a7990d44e8616e8bd018bdbe32a3abae16352354eaaef13ef3998fb20abe9`.
+Java/resources/package pass; every native library is byte-identical to the
+6142694 flask UX APK. Its200 asset entries differ only in the updated licence
+record. Prior APK/Windows package preserved; Windows candidate is unchanged.
+All151 parked owner-file hashes remain unchanged. No device/foreground use,
+report submission, hosted workflow, external asset or publication occurred.
+Physical acceptance and ordinary/public admission remain pending/OFF.

@@ -5667,11 +5667,17 @@ public class MainActivity extends Activity {
         // Stack rather than truncate either action at enlarged system fonts.
         flaskTouchActions.setOrientation(orientation);
         for(Button b:new Button[]{drinkFlaskButton,restButton}) {
+            final boolean drink=b==drinkFlaskButton;
             LinearLayout.LayoutParams action=new LinearLayout.LayoutParams(
-                    flaskTouchActions.getOrientation()==LinearLayout.VERTICAL?ViewGroup.LayoutParams.MATCH_PARENT:0,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,flaskTouchActions.getOrientation()==LinearLayout.VERTICAL?0:1);
-            b.setLayoutParams(action);b.setMinHeight(dp(48));b.setMinWidth(dp(48));b.setAllCaps(false);
+                    drink?dp(56):ViewGroup.LayoutParams.WRAP_CONTENT,
+                    drink?dp(56):ViewGroup.LayoutParams.WRAP_CONTENT);
+            if(!drink) {
+                if(orientation==LinearLayout.VERTICAL)action.topMargin=dp(8);
+                else action.setMarginStart(dp(8));
+            }
+            b.setLayoutParams(action);b.setMinHeight(dp(drink?56:48));b.setMinWidth(dp(drink?56:48));b.setAllCaps(false);
             styleGameplayActionButton(b,interfaceBacking(values,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,false);
+            if(drink)FlaskDrinkControl.apply(b);
         }
     }
 
@@ -8505,7 +8511,10 @@ public class MainActivity extends Activity {
         flaskStatus=findViewById(R.id.flask_status);flaskHint=findViewById(R.id.flask_hint);
         flaskTouchActions=findViewById(R.id.flask_touch_actions);
         drinkFlaskButton=findViewById(R.id.drink_flask_button);restButton=findViewById(R.id.rest_button);
-        if(drinkFlaskButton!=null)drinkFlaskButton.setOnClickListener(view -> requestHealingFlaskAction(false));
+        if(drinkFlaskButton!=null) {
+            FlaskDrinkControl.apply(drinkFlaskButton);
+            drinkFlaskButton.setOnClickListener(view -> requestHealingFlaskAction(false));
+        }
         if(restButton!=null)restButton.setOnClickListener(view -> requestHealingFlaskAction(true));
         if(flaskPanel!=null && !flaskLayoutListenerInstalled) {
             flaskLayoutListenerInstalled=true;

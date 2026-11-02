@@ -119,13 +119,15 @@
             android:orientation="horizontal">
             <Button
                 android:id="@+id/drink_flask_button"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:minWidth="48dp"
-                android:padding="6dp"
-                android:text="@string/flask_drink"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:minHeight="56dp"
+                android:minWidth="56dp"
+                android:padding="12dp"
+                android:gravity="center"
+                android:drawableLeft="@drawable/ic_flask_drink"
+                android:contentDescription="@string/flask_drink"
+                android:text=""
                 android:textSize="12sp" />
             <Button
                 android:id="@+id/rest_button"

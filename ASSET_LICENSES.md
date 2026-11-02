@@ -841,3 +841,12 @@ supply nonwalkable contact; no new light, water shader, BLAS or material owner i
 introduced. Furniture is selected only by the explicit native flask candidate.
 Source/CPU integration and build checks do not admit ordinary shipping or prove
 native visual, touch, audio or lifecycle acceptance.
+
+
+## Original Android flask control icon - 2 November 2026
+
+`android/app/src/main/res/drawable/ic_flask_drink.xml` is original project-authored
+vector artwork: cork, narrow neck, rounded bottle and a small liquid band. It
+introduces no imported image, font glyph, provider asset, paid input or new
+third-party rights. Existing application attribution and rights remain; no
+blanket external licence or exclusive copyright warranty is assigned.
