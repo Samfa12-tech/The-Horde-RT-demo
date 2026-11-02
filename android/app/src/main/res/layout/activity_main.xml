@@ -95,27 +95,12 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="72dp"
         android:orientation="vertical"
-        android:background="#D9151719"
-        android:padding="8dp"
         android:visibility="gone">
-        <TextView
-            android:id="@+id/flask_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F2E9D8"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:accessibilityLiveRegion="polite" />
-        <TextView
-            android:id="@+id/flask_hint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#F2E9D8"
-            android:textSize="11sp" />
         <LinearLayout
             android:id="@+id/flask_touch_actions"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
             <Button
                 android:id="@+id/drink_flask_button"
@@ -123,24 +108,39 @@
                 android:layout_height="56dp"
                 android:minHeight="56dp"
                 android:minWidth="56dp"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:gravity="center"
-                android:drawableLeft="@drawable/ic_flask_drink"
                 android:contentDescription="@string/flask_drink"
-                android:text=""
-                android:textSize="12sp" />
-            <Button
-                android:id="@+id/rest_button"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:text="" />
+            <TextView
+                android:id="@+id/flask_status"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:minWidth="48dp"
-                android:padding="6dp"
-                android:text="@string/flask_rest"
+                android:layout_marginStart="4dp"
+                android:textColor="#F2E9D8"
                 android:textSize="12sp"
-                android:visibility="gone" />
+                android:gravity="center_vertical"
+                android:textStyle="bold"
+                android:accessibilityLiveRegion="polite" />
         </LinearLayout>
+        <Button
+            android:id="@+id/rest_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:minWidth="48dp"
+            android:padding="6dp"
+            android:text="@string/flask_rest"
+            android:textSize="12sp"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/flask_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#F2E9D8"
+            android:textSize="11sp"
+            android:accessibilityLiveRegion="polite"
+            android:visibility="gone" />
     </LinearLayout>
 
     <TextView

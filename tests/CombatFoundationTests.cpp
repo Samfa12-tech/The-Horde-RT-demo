@@ -432,7 +432,7 @@ void InPlacePairRevivalContract() {
 }
 void WindowAndLifecycle() {
     for (int tick=0;tick<=13;++tick)
-        Check(DodgeProtectionWindow::Contains(tick/60.0f,true)==(tick>=2&&tick<10),
+        Check(DodgeProtectionWindow::Contains(tick/60.0f,true)==(tick>=2&&tick<11),
               "half-open protection boundaries match the documented gameplay ticks");
     Check(!DodgeProtectionWindow::Contains(.1f,false)&&
           !DodgeProtectionWindow::Contains(NAN,true),"rejected/nonfinite dodge cannot protect");
@@ -441,7 +441,7 @@ void WindowAndLifecycle() {
     for(int tick=1;tick<=13;++tick) {
         if(tick==4) input.commands.dodge=20; // spam cannot restart duration
         sim.StepFixed(input);
-        Check(sim.Snapshot().dodgeInvulnerable==(tick>=2&&tick<10),
+        Check(sim.Snapshot().dodgeInvulnerable==(tick>=2&&tick<11),
               "accepted dodge publishes protection once; spam never extends it");
         Check(sim.Snapshot().acceptedDodgeSequence==1,"spam does not replace accepted identity");
     }

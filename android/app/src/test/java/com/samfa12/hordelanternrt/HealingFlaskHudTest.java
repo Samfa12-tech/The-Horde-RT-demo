@@ -37,11 +37,15 @@ public final class HealingFlaskHudTest {
         MainActivity a=activity();Bridge.flask=new long[]{2,31,1,0,0,2,2,0,0,1};update();
         View panel=a.findViewById(R.id.flask_panel);TextView status=a.findViewById(R.id.flask_status);
         Button drink=a.findViewById(R.id.drink_flask_button),rest=a.findViewById(R.id.rest_button);
-        assertEquals(View.VISIBLE,panel.getVisibility());assertTrue(status.getText().toString().contains("full"));
-        assertFalse(drink.isEnabled());drink.performClick();assertEquals(0,Bridge.drinks);
+        assertEquals(View.VISIBLE,panel.getVisibility());assertEquals("2/2",status.getText().toString());
+        assertTrue(drink.getContentDescription().toString().contains("full"));
+        assertNull(panel.getBackground());assertNull(status.getCompoundDrawables()[0]);
         assertTrue(((TextView)a.findViewById(R.id.flask_hint)).getText().toString().contains("one heart"));
+        assertFalse(drink.isEnabled());drink.performClick();assertEquals(0,Bridge.drinks);
+        assertEquals(a.getString(R.string.flask_health_full_hint),((TextView)a.findViewById(R.id.flask_hint)).getText().toString());
         Bridge.flask=new long[]{2,31,1,0,0,0,2,0,2,2};update();
-        assertTrue(status.getText().toString().contains("empty"));assertEquals(View.VISIBLE,rest.getVisibility());
+        assertEquals("0/2",status.getText().toString());
+        assertTrue(drink.getContentDescription().toString().contains("empty"));assertEquals(View.VISIBLE,rest.getVisibility());
         assertFalse(rest.isEnabled());rest.performClick();assertEquals(0,Bridge.rests);
         Bridge.flask[4]=2;update();assertTrue(rest.isEnabled());rest.performClick();assertEquals(1,Bridge.rests);
         Bridge.flask[4]=0;Bridge.flask[8]=0;Bridge.flask[5]=1;Bridge.flask[3]=1;Bridge.flask[9]=0;update();
@@ -51,12 +55,14 @@ public final class HealingFlaskHudTest {
     }
     @Test public void activeInputGuidanceAndSessionLessonSurviveSurfaceRecreation()throws Exception {
         MainActivity a=activity();Bridge.flask=new long[]{2,31,1,1,2,1,2,0,2,0};update();
-        TextView status=a.findViewById(R.id.flask_status);assertTrue(status.getText().toString().contains("tap Drink"));
-        setHud("controllerMode",true);update();assertTrue(status.getText().toString().contains("D-pad Up"));
-        assertEquals(View.GONE,a.findViewById(R.id.flask_touch_actions).getVisibility());
+        TextView status=a.findViewById(R.id.flask_status);assertEquals("1/2",status.getText().toString());assertNull(status.getCompoundDrawables()[0]);
+        setHud("controllerMode",true);update();assertTrue(status.getText().toString().contains("D-pad \u2191"));
+        assertEquals(View.GONE,a.findViewById(R.id.drink_flask_button).getVisibility());
+        assertTrue(status.getCompoundDrawables()[0] instanceof FlaskGaugeDrawable);
+        assertFalse(status.isClickable());assertFalse(status.isFocusable());
         setHud("controllerMode",false);setHud("latestSubtitleInputMode",MainActivity.SUBTITLE_INPUT_KEYBOARD_MOUSE_CONTROLLER);update();
-        assertTrue(status.getText().toString().contains("H: Drink"));
-        assertTrue(((TextView)a.findViewById(R.id.flask_hint)).getText().toString().contains("J: Rest"));
+        assertTrue(status.getText().toString().contains("H"));
+        assertTrue(status.getText().toString().contains("J Rest"));
         setHud("flaskLessonUntil",1L);setHud("surfaceRequestGeneration",32L);Bridge.flask[1]=32;update();
         assertEquals(1L,field("flaskLessonUntil").getLong(a));
         setHud("controllerWindowFocused",false);invoke("requestHealingFlaskAction",new Class<?>[]{boolean.class},false);
@@ -68,7 +74,7 @@ public final class HealingFlaskHudTest {
         assertFalse(field("flaskFirstLessonShown").getBoolean(a));
         teaching.setVisibility(View.GONE);update();assertTrue(field("flaskFirstLessonShown").getBoolean(a));
         Bridge.flask[9]=5;update();
-        assertTrue(((TextView)a.findViewById(R.id.flask_hint)).getText().toString().contains("No charge spent"));
+        assertTrue(((TextView)a.findViewById(R.id.flask_hint)).getText().toString().contains("charge kept"));
         assertEquals(0,Bridge.drinks);assertEquals(0,Bridge.rests);
     }
     @Test public void flaskIconKeepsNamedActionAndFixedComfortableTarget()throws Exception {
@@ -79,7 +85,7 @@ public final class HealingFlaskHudTest {
         update();assertTrue(drink.getContentDescription().toString().startsWith("Drink"));
         assertTrue(drink.getContentDescription().toString().contains("Flask"));
         assertEquals("",drink.getText().toString());
-        assertNotNull(drink.getCompoundDrawables()[0]);
+        assertTrue(drink.getCompoundDrawables()[0] instanceof FlaskGaugeDrawable);
         assertEquals(HordeUiTokens.dp(a,32),drink.getCompoundDrawables()[0].getBounds().width());
         assertEquals(HordeUiTokens.dp(a,56),drink.getLayoutParams().width);
         assertEquals(HordeUiTokens.dp(a,56),drink.getLayoutParams().height);
@@ -88,6 +94,21 @@ public final class HealingFlaskHudTest {
         drink.performClick();assertEquals(1,Bridge.drinks);
         Bridge.flask[3]=0;update();drink.performClick();assertEquals(1,Bridge.drinks);
     }
+    @Test public void settledHudHasOnlyCountAndNoticesExpireWithoutChangingInputGuards()throws Exception {
+        MainActivity a=activity();setHud("flaskFirstLessonShown",true);
+        Bridge.flask=new long[]{2,31,1,0,0,2,2,0,0,1};update();
+        TextView hint=a.findViewById(R.id.flask_hint);assertEquals(View.GONE,hint.getVisibility());
+        assertEquals("2/2",((TextView)a.findViewById(R.id.flask_status)).getText().toString());
+        Bridge.flask[5]=0;Bridge.flask[9]=2;update();assertEquals(View.VISIBLE,hint.getVisibility());
+        setHud("flaskLessonUntil",1L);update();assertEquals(View.GONE,hint.getVisibility());
+        Bridge.flask[7]=2;Bridge.flask[9]=7;update();
+        Bridge.flask[7]=0;Bridge.flask[9]=1;Bridge.flask[5]=2;update();
+        assertEquals(a.getString(R.string.flask_refilled_hint),hint.getText().toString());
+        setHud("flaskLessonUntil",1L);update();assertEquals(View.GONE,hint.getVisibility());
+        setHud("menuVisible",true);invoke("requestHealingFlaskAction",new Class<?>[]{boolean.class},false);
+        assertEquals(0,Bridge.drinks);assertEquals(0,Bridge.rests);
+    }
+
     private void largeFont(int widthDp,int heightDp)throws Exception {
         MainActivity a=activity();Configuration config=new Configuration(a.getResources().getConfiguration());config.fontScale=2f;
         a.getResources().updateConfiguration(config,a.getResources().getDisplayMetrics());
@@ -98,7 +119,7 @@ public final class HealingFlaskHudTest {
         Bridge.flask=new long[]{2,31,1,1,2,1,2,0,2,0};update();
         root.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.EXACTLY));
         root.layout(0,0,width,height);
-        LinearLayout actions=a.findViewById(R.id.flask_touch_actions);assertEquals(LinearLayout.VERTICAL,actions.getOrientation());
+        LinearLayout actions=a.findViewById(R.id.flask_touch_actions);assertEquals(LinearLayout.HORIZONTAL,actions.getOrientation());
         View plate=a.findViewById(R.id.flask_panel),drink=a.findViewById(R.id.drink_flask_button),rest=a.findViewById(R.id.rest_button);
         assertEquals(HordeUiTokens.dp(a,56),drink.getHeight());
         assertEquals(HordeUiTokens.dp(a,56),drink.getWidth());
@@ -115,7 +136,7 @@ public final class HealingFlaskHudTest {
                 assertFalse("Flask action cannot overlap visible combat action",android.graphics.Rect.intersects(controlRect,actionRect));
             }
         }
-        assertTrue(rest.getTop()>=drink.getBottom());
+        assertTrue(rest.getTop()>=actions.getBottom());
         update();ViewGroup.LayoutParams before=plate.getLayoutParams();update();
         assertSame("Unchanged publication keeps layout parameters",before,plate.getLayoutParams());
     }

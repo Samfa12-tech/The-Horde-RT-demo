@@ -618,3 +618,16 @@ gameplay rules. Both features stay gated/OFF in normal play until asset, visual,
 lifecycle and gameplay checks pass. Resource counts are not measured GPU
 allocation or FPS evidence. No wider capacity increase, paid signing, security
 change, publication, merge or release follows from this approval.
+
+
+## Compact recovery HUD and modest dodge tolerance - 2 November 2026
+
+Owner playtest feedback rejected persistent large flask prose and asked for a
+compact graphic showing actual charge fill. Use a recognizable outlined flask,
+capacity divisions/tiny count, short input binding and accessible textual state;
+only brief relevant hints and contextual earned Rest. On the existing200ms dodge,
+keep startup2/60 and extend the half-open end10/60 to11/60 (+one16.7ms tick),
+leaving the first accepted published tick and landing exposed. No cooldown,
+distance, lesson/evasion proof, encounter health/reward or save change. See
+`docs/evidence/2026-11-01-attack-rings/COMPACT_FLASK_DODGE.md` for checks and the
+private candidate; physical acceptance and ordinary admission remain pending.

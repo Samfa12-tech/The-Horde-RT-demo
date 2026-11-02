@@ -79,4 +79,3 @@ bool ApplyPlayerRetryCheckpoint(VulkanSurfaceContext& context, const std::int32_
     FocusGameControl(context.windowHandle);
     return true;
 }
-

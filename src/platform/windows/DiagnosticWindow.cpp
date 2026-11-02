@@ -1,4 +1,5 @@
 #include "platform/windows/WindowsStartupGate.h"
+#include "platform/windows/WindowsFlaskGauge.h"
 #include "gameplay/simulation/PrivateRevivalApplication.h"
 #include "audio/ChapterDialogueSpatial.h"
 #include "platform/windows/DiagnosticWindow.h"
@@ -800,6 +801,9 @@ struct VulkanSurfaceContext
     bool flaskLessonSeen=false,flaskUpgradeLessonSeen=false;
     ULONGLONG flaskLessonUntil=0;
     int flaskHudWidth=0,flaskHudDpi=0;
+    int flaskPreviousCharges=-1;
+    ULONGLONG flaskEmptyHintUntil=0,flaskAttemptHintUntil=0;
+    std::string flaskGaugeHint;
     bool mouseCursorHidden = false;
     bool environmentSurveyActive=false,environmentSurveyWaterDisabled=false,environmentSurveyDebrisDisabled=false;
     std::string environmentSurveyProfile;
@@ -3150,51 +3154,47 @@ void UpdateFlaskHud(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle,kFlaskHudControlId,visible);
     if(!visible)return;
     const auto& flask=s.healingFlask;const bool controller=context.teachingControllerGlyphs;
-    std::string text="FLASK "+std::to_string(flask.resources.charges)+" / "+
-        std::to_string(flask.resources.Capacity());
-    text+=flask.resources.charges==0?" EMPTY":flask.resources.charges==flask.resources.Capacity()?" FULL":"";
-    text+=controller?" | D-pad Up: Drink":" | H: Drink";
     using horde::gameplay::healing::FlaskHint;
-    switch(s.flaskHint) {
-    case FlaskHint::FullHealth:text+="\nHealth full. Keep your charges.";break;
-    case FlaskHint::Empty:text+="\nRefill at an earned stone basin.";break;
-    case FlaskHint::StandStill:text+="\nStand still and lower your guard to drink.";break;
-    case FlaskHint::Returning:text+="\nReturning flask. Wait for your hand.";break;
-    case FlaskHint::Interrupted:text+="\nInterrupted. No charge used; try again when still.";break;
-    case FlaskHint::Drinking:text+="\nDrinking... Movement or a hit interrupts.";break;
-    case FlaskHint::Resting:text+="\nResting... Stay still for 2 seconds.";break;
-    default:text+="\nDrink restores one heart. Stay still.";break;
-    }
-    if(s.flaskNearbyRestAnchor && s.healingFlask.action==horde::gameplay::healing::FlaskAction::Idle &&
-       s.flaskHint!=FlaskHint::Returning && s.flaskHint!=FlaskHint::Interrupted) {text.resize(text.find("\n"));text+=s.flaskRestAnchor?
-        (controller?"\nD-pad Down: Rest / refill":"\nJ: Rest / refill"):
-        "\nStone basin nearby. Move closer, then stand still.";}
-    // Presentation-only teaching: no modal, quest flag or gameplay mutation.
+    const auto now=GetTickCount64();
+    if(flask.resources.charges==0 && context.flaskPreviousCharges!=0)context.flaskEmptyHintUntil=now+3000;
+    context.flaskPreviousCharges=static_cast<int>(flask.resources.charges);
     const bool quiet=(!s.combatTeaching.enabled || s.combatTeaching.promptOpacity<=0.f) &&
         s.playerCombat.action==horde::gameplay::PlayerCombatAction::Idle &&
         s.chapterDialogue.line==horde::gameplay::dialogue::Line::None;
-    const auto now=GetTickCount64();
     if(quiet && (!context.flaskLessonSeen || (flask.resources.upgraded && !context.flaskUpgradeLessonSeen))) {
         context.flaskLessonSeen=true;context.flaskUpgradeLessonSeen=flask.resources.upgraded;
-        context.flaskLessonUntil=now+8000;
+        context.flaskLessonUntil=now+3500;
     }
-    if(quiet && now<context.flaskLessonUntil && !s.flaskNearbyRestAnchor &&
-       (s.flaskHint==FlaskHint::FullHealth || s.flaskHint==FlaskHint::Ready)) {
-        text.resize(text.find("\n"));text+=flask.resources.upgraded?
-        "\nCapacity increased to 3. Rest fills the new slot.":
-        "\nHolds two charges. Drink heals one heart; earned basins refill.";}
+    std::string hint;
+    switch(s.flaskHint) {
+    case FlaskHint::Returning:hint="Returning flask...";break;
+    case FlaskHint::Interrupted:hint="Interrupted. No charge used.";break;
+    case FlaskHint::Drinking:hint="Drinking... stay still.";break;
+    case FlaskHint::Resting:hint="Resting... stay still.";break;
+    case FlaskHint::Empty:if(quiet && (now<context.flaskEmptyHintUntil || now<context.flaskAttemptHintUntil))
+        hint="Empty. Rest at a basin.";break;
+    case FlaskHint::FullHealth:if(now<context.flaskAttemptHintUntil)hint="Health full.";break;
+    case FlaskHint::StandStill:if(now<context.flaskAttemptHintUntil)hint="Stand still; lower guard.";break;
+    default:break;
+    }
+    if(hint.empty() && s.flaskNearbyRestAnchor)hint=s.flaskRestAnchor?
+        (controller?"D-pad Down: Rest":"J: Rest"):"Basin nearby";
+    if(hint.empty() && quiet && now<context.flaskLessonUntil &&
+       (s.flaskHint==FlaskHint::Ready || s.flaskHint==FlaskHint::FullHealth))hint=flask.resources.upgraded?
+        "Capacity 3. Rest refills.":"Drink heals one heart. Stay still.";
+    context.flaskGaugeHint=hint;
+    const auto text=horde::platform::windows::FlaskGaugeAccessibleText(flask.resources.charges,
+        flask.resources.Capacity(),controller,hint);
     const bool changed=horde::platform::windows::SetNativeTextIfChanged(hud,text);
     RECT client{};GetClientRect(context.windowHandle,&client);
-    const int width=std::max(1,std::min<int>(client.right-ScaleForDpi(context.windowHandle,28),ScaleForDpi(context.windowHandle,430)));
+    const int width=std::max(1,std::min<int>(client.right-ScaleForDpi(context.windowHandle,28),
+        ScaleForDpi(context.windowHandle,hint.empty()?(controller?110:84):240)));
     const int dpi=GetDpiForWindow(context.windowHandle);
     if(!changed && context.flaskHudWidth==width && context.flaskHudDpi==dpi)return;
     context.flaskHudWidth=width;context.flaskHudDpi=dpi;
-    HDC dc=GetDC(hud);HFONT font=reinterpret_cast<HFONT>(SendMessageA(hud,WM_GETFONT,0,0));
-    HGDIOBJ old=dc&&font?SelectObject(dc,font):nullptr;RECT measured{0,0,width,0};
-    if(dc)DrawTextA(dc,text.c_str(),-1,&measured,DT_CALCRECT|DT_WORDBREAK|DT_NOPREFIX);
-    if(dc&&old&&old!=HGDI_ERROR)SelectObject(dc,old);if(dc)ReleaseDC(hud,dc);
     MoveWindow(hud,ScaleForDpi(context.windowHandle,14),ScaleForDpi(context.windowHandle,92),
-        width,std::max<int>(ScaleForDpi(context.windowHandle,56),measured.bottom+ScaleForDpi(context.windowHandle,8)),TRUE);
+        width,ScaleForDpi(context.windowHandle,hint.empty()?36:76),TRUE);
+    InvalidateRect(hud,nullptr,FALSE);
 }
 
 void UpdateVitalityHud(VulkanSurfaceContext& context)
@@ -5252,8 +5252,11 @@ void PublishDesktopHealingFlaskAction(VulkanSurfaceContext& context,bool rest)
     const auto& state=context.simulation.Snapshot();
     if(!IsDesktopGameplayAvailable(context) || GetForegroundWindow()!=context.windowHandle ||
        GetFocus()!=context.windowHandle || !state.healingFlaskEnabled ||
-       state.healingFlask.action!=horde::gameplay::healing::FlaskAction::Idle ||
-       !(rest?state.flaskRestAnchor!=0:state.flaskDrinkEligible))return;
+       state.healingFlask.action!=horde::gameplay::healing::FlaskAction::Idle)return;
+    if(!(rest?state.flaskRestAnchor!=0:state.flaskDrinkEligible)) {
+        context.flaskAttemptHintUntil=GetTickCount64()+2500;
+        UpdateFlaskHud(context);return;
+    }
     auto& sequence=rest?context.restSequence:context.drinkFlaskSequence;
     if(sequence!=UINT64_MAX)++sequence; // Named command; simulation owns time and eligibility.
 }
@@ -12701,6 +12704,13 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             SelectObject(item->hDC, oldBrush);
             return TRUE;
         }
+        if(item && item->CtlID==kFlaskHudControlId && sceneContext) {
+            const auto& flask=sceneContext->simulation.Snapshot().healingFlask.resources;
+            horde::platform::windows::PaintWindowsFlaskGauge(item->hDC,item->rcItem,flask.charges,
+                flask.Capacity(),sceneContext->teachingControllerGlyphs,sceneContext->flaskGaugeHint,
+                static_cast<int>(GetDpiForWindow(hWnd)),NativeUiUsesHighContrast());
+            return TRUE;
+        }
         if (item && item->CtlID == kVitalityHudControlId && sceneContext)
         {
             const bool highContrast = NativeUiUsesHighContrast();
@@ -13160,7 +13170,10 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     createStatic(kHudControlId, kHudStartingText, SS_LEFT | SS_CENTERIMAGE | SS_NOTIFY);
     createStatic(kVitalityHudControlId, "Vitality 3 of 3", SS_OWNERDRAW);
-    createStatic(kFlaskHudControlId, "", SS_LEFT);
+    if(HWND flask=createStatic(kFlaskHudControlId,"",SS_OWNERDRAW)) {
+        SetWindowLongPtrA(flask,GWL_EXSTYLE,GetWindowLongPtrA(flask,GWL_EXSTYLE)|WS_EX_LAYERED);
+        SetLayeredWindowAttributes(flask,horde::platform::windows::kFlaskGaugeTransparent,255,LWA_COLORKEY);
+    }
     if (HWND prompt = createStatic(kCombatTeachingPromptId, "", SS_OWNERDRAW))
     {
         SetWindowLongPtrA(prompt, GWL_EXSTYLE,

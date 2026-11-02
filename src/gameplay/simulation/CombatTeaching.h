@@ -11,12 +11,13 @@
 
 namespace horde::gameplay::simulation
 {
-// Provisional gameplay seconds, independent of animation and wall-frame count.
-// Half-open [2/60,10/60) leaves both start and landing exposed.
+// Gameplay seconds, independent of animation and wall-frame count.
+// Half-open [2/60,11/60): one extra landing-side tick, with the first
+// accepted motor tick and the final landing still exposed at60Hz.
 struct DodgeProtectionWindow
 {
     static constexpr float kBeginSeconds = 2.0f / 60.0f;
-    static constexpr float kEndSeconds = 10.0f / 60.0f;
+    static constexpr float kEndSeconds = 11.0f / 60.0f;
     static bool Contains(float elapsedSeconds, bool acceptedAndMoving)
     {
         constexpr float epsilon = 0.000001f;

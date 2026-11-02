@@ -850,3 +850,10 @@ vector artwork: cork, narrow neck, rounded bottle and a small liquid band. It
 introduces no imported image, font glyph, provider asset, paid input or new
 third-party rights. Existing application attribution and rights remain; no
 blanket external licence or exclusive copyright warranty is assigned.
+
+
+The compact dynamic gauge follow-up uses original code-authored bottle paths in
+`FlaskGaugeDrawable.java` and `WindowsFlaskGauge.h`, with liquid clipped to the
+actual owned charge fraction and persistent outline/divisions. The static icon
+above remains source artwork, not the current charge indicator. No imported
+asset, new rights claim or rendering-material ownership is introduced.

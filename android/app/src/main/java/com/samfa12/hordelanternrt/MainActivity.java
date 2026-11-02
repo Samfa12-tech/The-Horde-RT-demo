@@ -342,10 +342,10 @@ public class MainActivity extends Activity {
     private TextView flaskStatus, flaskHint;
     private Button drinkFlaskButton, restButton;
     private long flaskLessonUntil;
-    private int flaskPreviousCapacity, flaskLessonResource;
+    private int flaskPreviousCapacity, flaskLessonResource, flaskPreviousCharges=-1,
+            flaskPreviousAction,flaskPreviousHint=-1;
     private boolean flaskFirstLessonShown, flaskPickupLessonShown, flaskLayoutListenerInstalled;
-    private int flaskLayoutWidth=-1,flaskLayoutTop=-1,flaskLayoutStart=-1,flaskLayoutBacking,
-            flaskLayoutOrientation=-1;
+    private int flaskLayoutWidth=-1,flaskLayoutTop=-1,flaskLayoutStart=-1,flaskLayoutBacking;
     private TextView keeperRevealTitle;
     private Button attackButton;
     private Button parryButton;
@@ -5653,32 +5653,20 @@ public class MainActivity extends Activity {
         FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)flaskPanel.getLayoutParams();
         final int vitalityHeight=vitalityStatus!=null && vitalityStatus.getHeight()>0?vitalityStatus.getHeight():dp(44);
         final int top=dp(24)+safe.top+vitalityHeight,start=dp(16)+safe.left;
-        final int plateWidth=Math.max(dp(96),Math.min(dp(280),width-safe.left-safe.right-dp(96)));
-        final int backing=interfaceBacking(values,HordeUiTokens.CHARCOAL);
-        final int orientation=getResources().getConfiguration().fontScale>=1.5f?LinearLayout.VERTICAL:LinearLayout.HORIZONTAL;
-        if(flaskLayoutWidth==plateWidth && flaskLayoutTop==top && flaskLayoutStart==start &&
-                flaskLayoutBacking==backing && flaskLayoutOrientation==orientation)return;
-        flaskLayoutWidth=plateWidth;flaskLayoutTop=top;flaskLayoutStart=start;
-        flaskLayoutBacking=backing;flaskLayoutOrientation=orientation;
+        final int plateWidth=Math.max(dp(80),Math.min(dp(168),width/2-safe.left-dp(24)));
+        final int backing=interfaceBacking(values,HordeUiTokens.SLATE);
+        if(flaskLayoutWidth==plateWidth && flaskLayoutTop==top && flaskLayoutStart==start && flaskLayoutBacking==backing)return;
+        flaskLayoutWidth=plateWidth;flaskLayoutTop=top;flaskLayoutStart=start;flaskLayoutBacking=backing;
         p.gravity=Gravity.TOP|Gravity.START;p.setMarginStart(start);p.topMargin=top;p.width=plateWidth;
         p.height=FrameLayout.LayoutParams.WRAP_CONTENT;flaskPanel.setLayoutParams(p);
-        flaskPanel.setPadding(dp(8),dp(6),dp(8),dp(6));
-        flaskPanel.setBackground(HordeUiTokens.plate(this,interfaceBacking(values,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
-        // Stack rather than truncate either action at enlarged system fonts.
-        flaskTouchActions.setOrientation(orientation);
-        for(Button b:new Button[]{drinkFlaskButton,restButton}) {
-            final boolean drink=b==drinkFlaskButton;
-            LinearLayout.LayoutParams action=new LinearLayout.LayoutParams(
-                    drink?dp(56):ViewGroup.LayoutParams.WRAP_CONTENT,
-                    drink?dp(56):ViewGroup.LayoutParams.WRAP_CONTENT);
-            if(!drink) {
-                if(orientation==LinearLayout.VERTICAL)action.topMargin=dp(8);
-                else action.setMarginStart(dp(8));
-            }
-            b.setLayoutParams(action);b.setMinHeight(dp(drink?56:48));b.setMinWidth(dp(drink?56:48));b.setAllCaps(false);
-            styleGameplayActionButton(b,interfaceBacking(values,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,false);
-            if(drink)FlaskDrinkControl.apply(b);
-        }
+        // Only the touch target has a backing; the gauge/count never becomes a prose plate.
+        flaskPanel.setPadding(0,0,0,0);flaskPanel.setBackground(null);
+        flaskTouchActions.setOrientation(LinearLayout.HORIZONTAL);
+        drinkFlaskButton.setLayoutParams(new LinearLayout.LayoutParams(dp(56),dp(56)));
+        restButton.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+        restButton.setMinHeight(dp(48));restButton.setMinWidth(dp(48));restButton.setAllCaps(false);
+        for(Button b:new Button[]{drinkFlaskButton,restButton})
+            styleGameplayActionButton(b,backing,HordeUiTokens.PARCHMENT,false);
     }
 
     private void layoutRtStatus(boolean compact) {
@@ -8067,8 +8055,9 @@ public class MainActivity extends Activity {
         if(combat)CombatActionControl.apply(button,button.getId()==R.id.attack_button);
         button.setStateListAnimator(null);
         button.setTextColor(HordeUiTokens.label(text));
-        button.setMinHeight(dp(48));
-        if(!circular && !combat && button.getId()!=R.id.interact_button)button.setPadding(dp(6),0,dp(6),0);
+        button.setMinHeight(dp(button.getId()==R.id.drink_flask_button?56:48));
+        if(!circular && !combat && button.getId()!=R.id.interact_button && button.getId()!=R.id.drink_flask_button)
+            button.setPadding(dp(6),0,dp(6),0);
     }
     private LinearLayout.LayoutParams matchWrap() {
         return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8544,46 +8533,61 @@ public class MainActivity extends Activity {
         final boolean quiet=(combatTeachingPrompt==null || combatTeachingPrompt.getVisibility()!=View.VISIBLE) &&
                 (chapterSubtitlePanel==null || chapterSubtitlePanel.getVisibility()!=View.VISIBLE) &&
                 (keeperRevealTitle==null || keeperRevealTitle.getVisibility()!=View.VISIBLE);
-        // Presentation-only session latch: surface recreation does not replay the first lesson.
-        if(flaskPreviousCapacity>0 && flask.capacity>flaskPreviousCapacity) {
-            flaskLessonResource=R.string.flask_upgrade_lesson;flaskLessonUntil=0;
-        }
-        flaskPreviousCapacity=flask.capacity;
+        // Lessons/notices are transient presentation, never resource ownership or a saved entitlement.
+        if(flaskPreviousCapacity>0 && flask.capacity>flaskPreviousCapacity)
+            showBriefFlaskHint(R.string.flask_upgrade_lesson,now);
+        else if(flaskPreviousAction==2 && flask.action==0 && flask.charges>flaskPreviousCharges)
+            showBriefFlaskHint(R.string.flask_refilled_hint,now);
+        else if(flask.hint!=flaskPreviousHint && (flask.hint==2 || flask.hint==5))
+            showBriefFlaskHint(flaskHintResource(flask),now);
+        flaskPreviousCapacity=flask.capacity;flaskPreviousCharges=flask.charges;
+        flaskPreviousAction=flask.action;flaskPreviousHint=flask.hint;
         if(quiet && !flaskPickupLessonShown && (ProbeBridge.getContextualControlState()&CONTEXTUAL_FLASK_UPGRADE)!=0) {
-            flaskPickupLessonShown=true;flaskLessonResource=R.string.flask_pickup_lesson;flaskLessonUntil=0;
+            flaskPickupLessonShown=true;showBriefFlaskHint(R.string.flask_pickup_lesson,now);
+        } else if(quiet && now>=flaskLessonUntil && !flaskFirstLessonShown) {
+            flaskFirstLessonShown=true;showBriefFlaskHint(R.string.flask_first_lesson,now);
         }
-        if(quiet && flaskLessonResource==0 && !flaskFirstLessonShown) {
-            flaskFirstLessonShown=true;flaskLessonResource=R.string.flask_first_lesson;flaskLessonUntil=0;
-        }
-        if(quiet && flaskLessonResource!=0 && flaskLessonUntil==0)flaskLessonUntil=now+8000;
-        String status=flask.empty()?getString(R.string.flask_empty,flask.capacity):
-                getString(flask.full()?R.string.flask_full:R.string.flask_charges,flask.charges,flask.capacity);
-        status+="\n"+getString(controllerMode?R.string.flask_controller_guidance:
-                touch?R.string.flask_touch_guidance:R.string.flask_keyboard_guidance);
+        final String charges=flask.charges+"/"+flask.capacity;
+        String status=charges;
+        if(!touch)status+=controllerMode?"\nD-pad \u2191":" H";
+        if(!touch && flask.nearbyRestAnchor!=0)status+=controllerMode?"\nD-pad \u2193 Rest":"\nJ Rest";
         if(!android.text.TextUtils.equals(flaskStatus.getText(),status))flaskStatus.setText(status);
-        flaskStatus.setContentDescription(status);
-        int reason=flaskHintResource(flask);
-        String hint=reason==0?"":getString(reason);
-        if(flask.action==0 && flask.hint!=4 && flask.hint!=5 && flask.nearbyRestAnchor!=0) {
-            hint=getString(flask.restAnchor==0?R.string.flask_rest_wait_hint:
-                    controllerMode?R.string.flask_rest_controller_guidance:
-                    touch?R.string.flask_rest_touch_guidance:R.string.flask_rest_keyboard_guidance);
-        } else if(quiet && now<flaskLessonUntil && flask.action==0 && (flask.hint==0 || flask.hint==1)) {
-            hint=getString(flaskLessonResource);
+        final String resourceDescription=flask.empty()?getString(R.string.flask_empty,flask.capacity):
+                getString(flask.full()?R.string.flask_full:R.string.flask_charges,flask.charges,flask.capacity);
+        final int reason=flaskHintResource(flask);
+        final String actionDescription=getString(R.string.flask_drink)+". "+resourceDescription+
+                (reason==0?"":". "+getString(reason));
+        if(touch) {
+            // One bottle only: the Drink target is also its charge gauge.
+            FlaskDrinkControl.apply(drinkFlaskButton,flask.charges,flask.capacity);
+            if(flaskStatus.getCompoundDrawables()[0]!=null)flaskStatus.setCompoundDrawables(null,null,null,null);
+            flaskStatus.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            flaskStatus.setContentDescription(null);
+        } else {
+            FlaskDrinkControl.applyGauge(flaskStatus,flask.charges,flask.capacity,24);
+            flaskStatus.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+            flaskStatus.setContentDescription(actionDescription+". "+getString(controllerMode?
+                    R.string.flask_controller_guidance:R.string.flask_keyboard_guidance)+
+                    (flask.nearbyRestAnchor==0?"":". "+getString(controllerMode?
+                            R.string.flask_rest_controller_guidance:R.string.flask_rest_keyboard_guidance)));
         }
-        // Keep the existing lesson/subtitle lane clear; urgent in-progress/cancellation feedback remains.
-        if(!quiet && flask.action==0 && flask.hint!=4 && flask.hint!=5)hint="";
+        String hint="";
+        if(flask.hint==4 || flask.action!=0)hint=reason==0?"":getString(reason);
+        else if(now<flaskLessonUntil && (quiet || flask.hint==5))hint=getString(flaskLessonResource);
         if(!android.text.TextUtils.equals(flaskHint.getText(),hint))flaskHint.setText(hint);
-        flaskHint.setContentDescription(hint);
-        flaskHint.setVisibility(hint.isEmpty()?View.GONE:View.VISIBLE);
-        flaskTouchActions.setVisibility(touch?View.VISIBLE:View.GONE);
-        drinkFlaskButton.setEnabled(flask.allows(false));
-        drinkFlaskButton.setContentDescription(getString(R.string.flask_drink)+". "+status+". "+hint);
-        restButton.setVisibility(flask.nearbyRestAnchor!=0?View.VISIBLE:View.GONE);
+        flaskHint.setContentDescription(hint);flaskHint.setVisibility(hint.isEmpty()?View.GONE:View.VISIBLE);
+        flaskTouchActions.setVisibility(View.VISIBLE);
+        drinkFlaskButton.setVisibility(touch?View.VISIBLE:View.GONE);
+        drinkFlaskButton.setEnabled(flask.allows(false));drinkFlaskButton.setContentDescription(actionDescription);
+        restButton.setVisibility(touch && flask.nearbyRestAnchor!=0?View.VISIBLE:View.GONE);
         restButton.setEnabled(flask.allows(true));
-        restButton.setContentDescription(getString(R.string.flask_rest)+". "+hint);
-        flaskPanel.setVisibility(View.VISIBLE);
-        layoutHealingFlaskHud();positionFlaskTeachingPrompt();
+        restButton.setContentDescription(getString(R.string.flask_rest)+". "+getString(flask.restAnchor!=0?
+                R.string.flask_rest_touch_guidance:R.string.flask_rest_wait_hint));
+        flaskPanel.setVisibility(View.VISIBLE);layoutHealingFlaskHud();positionFlaskTeachingPrompt();
+    }
+
+    private void showBriefFlaskHint(int resource,long now) {
+        flaskLessonResource=resource;flaskLessonUntil=now+4500;
     }
 
     private static int flaskHintResource(HealingFlaskUiState state) {
@@ -8606,7 +8610,12 @@ public class MainActivity extends Activity {
     private void requestHealingFlaskAction(boolean rest) {
         if(!resumed || !controllerHasFocusedWindow() || !canSendGameplayAction())return;
         final HealingFlaskUiState state=readHealingFlaskState();
-        if(state==null || !state.allows(rest))return;
+        if(state==null)return;
+        if(!state.allows(rest)) {
+            int reason=rest?R.string.flask_rest_wait_hint:flaskHintResource(state);
+            if(reason!=0) {showBriefFlaskHint(reason,SystemClock.uptimeMillis());updateHealingFlaskHud(true);}
+            return;
+        }
         if(rest)ProbeBridge.requestRest();else ProbeBridge.requestDrinkFlask();
     }
 

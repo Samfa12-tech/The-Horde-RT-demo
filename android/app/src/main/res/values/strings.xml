@@ -300,15 +300,16 @@
     <string name="flask_rest_touch_guidance">Rest here to heal and refill (2 sec).</string>
     <string name="flask_rest_keyboard_guidance">J: Rest here to heal and refill (2 sec).</string>
     <string name="flask_rest_controller_guidance">D-pad Down: Rest here to heal and refill (2 sec).</string>
-    <string name="flask_health_full_hint">Health full. Drink when injured.</string>
-    <string name="flask_empty_hint">Empty. Refill at an earned stone basin.</string>
-    <string name="flask_still_hint">Stand still and free your hands.</string>
-    <string name="flask_returning_hint">Returning flask. Wait for your hand.</string>
-    <string name="flask_interrupted_hint">Interrupted. No charge spent. Stand still to try again.</string>
-    <string name="flask_drinking_hint">Drinking. Stay still; moving or combat interrupts.</string>
-    <string name="flask_resting_hint">Resting. Stay still; moving or combat interrupts.</string>
-    <string name="flask_first_lesson">Drink when injured: one heart per charge. Stay still; moving or damage interrupts.</string>
-    <string name="flask_upgrade_lesson">Capacity increased. Rest at an earned stone basin to refill the new charge.</string>
-    <string name="flask_pickup_lesson">Upgrade flask nearby: adds capacity. Rest to fill the new charge.</string>
+    <string name="flask_health_full_hint">Health full.</string>
+    <string name="flask_empty_hint">Empty: rest at a stone basin.</string>
+    <string name="flask_still_hint">Stand still; free your hands.</string>
+    <string name="flask_returning_hint">Returning flask...</string>
+    <string name="flask_interrupted_hint">Interrupted: charge kept.</string>
+    <string name="flask_drinking_hint">Drinking. Stay still.</string>
+    <string name="flask_resting_hint">Resting. Stay still.</string>
+    <string name="flask_first_lesson">One charge heals one heart.</string>
+    <string name="flask_upgrade_lesson">Capacity added. Rest to fill it.</string>
+    <string name="flask_pickup_lesson">Flask upgrade nearby.</string>
     <string name="flask_rest_wait_hint">Stone basin nearby. Move closer, stand still and free your hands after dialogue.</string>
+    <string name="flask_refilled_hint">Flask refilled.</string>
 </resources>
