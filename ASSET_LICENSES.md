@@ -744,6 +744,15 @@ proof is recorded in `docs/evidence/2026-10-25-skeleton-stand-native/README.md`.
 No rejected generic blend is admitted. Private package source/runtime identities,
 checks and remaining physical acceptance are recorded in the current revival receipt.
 
+On 2 November 2026 the owner separately approved including the exact pinned
+revival WAV and appended skeleton stand derivative **inside the public 1.7 game
+packages**. This supersedes the private-package-only distribution decision for
+those two runtime derivatives, not the provenance or terms above. It does not
+approve publishing the source MP3, editable Blend, source models or standalone
+asset downloads in the public repository. The ordinary package must pin their
+hashes, retain the integrated-game use and existing skeleton/Pixabay notices,
+and pass final Windows/Android asset and gameplay acceptance before release.
+
 ## Healing flask r1 - original source-only study, 26 October 2026
 
 `assets/models/props/source/healing-flask-study-r1/` contains original
@@ -842,6 +851,14 @@ This extends the prior CPU-only boundary to an executable validation candidate.
 It does not certify RT hand/contact/reflection/shadow joins, touch/controller
 feel, lifecycle or normal-play/release admission. Ordinary packaging explicitly
 disables this trial and the private revival trial, including cached build options.
+
+The owner subsequently approved the exact pinned runtime derivative for
+integrated public 1.7 game packages, alongside the pinned revival derivatives
+above. The original source study, editable Blend, recipes and previews remain
+outside those packages and public Git. Ordinary 1.7 packaging now requires
+explicit local input and exact-hash validation for all three derivatives;
+the private Debug acceptance path remains separate. Source admission does not
+replace final signed-package, animation/RT or device acceptance.
 
 
 ## Original earned flask rest basins - 2 November 2026

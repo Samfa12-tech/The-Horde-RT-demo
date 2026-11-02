@@ -4,6 +4,8 @@ A native Vulkan hardware-ray-tracing game/tech demo for **Android and Windows**,
 
 ## Play and current development
 
+- **Unreleased candidate source: 1.7.0 / proposed Android code 11.** These identities are staged for ordinary-package validation; external Play-code availability, owner-only signing safeguards, final packages and publication are still pending. The public download remains 1.6.2.
+
 - **Public release: 1.6.2.** Download from [itch.io](https://samfa12.itch.io/the-horde) or [GitHub v1.6.2](https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.2). Android versionCode 10; frozen release source `db62032d`. [Package hashes, verified downloads and release limits](docs/evidence/2026-10-09-release-publication/README.md).
 - **Main contains unfinished 1.7 development.** [PR27](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/27) merged on 30 October 2026 at `f0cea47b`; it is no longer a draft. This is source integration, **not a 1.7 release**. World/assets, reporting and full-platform acceptance remain unfinished; experimental feature gates remain OFF. See the [current design and acceptance index](docs/design/HORDE_1_7_CURRENT_DESIGN_INDEX.md).
 - **Defaults depend on the version.** Published 1.6.2 starts/reset at 50% mobile scale with Mist On; 1.7 development starts/reset at 33% with Mist Off. Explicit saved choices are preserved. Older 75% recommendations are historical, not current defaults.

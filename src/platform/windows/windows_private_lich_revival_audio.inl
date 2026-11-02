@@ -7,17 +7,17 @@ void StopPrivateLichRevivalAudio(VulkanSurfaceContext& context)
 }
 void UpdatePrivateLichRevivalAudio(VulkanSurfaceContext& context)
 {
-#if defined(_DEBUG) || HORDE_RT_PRIVATE_REVIVAL
+#if defined(_DEBUG) || HORDE_RT_REVIVAL_ADMITTED
     auto& state=context.privateRevivalAudio;
     if(!state.checked) {
         state.checked=true;wchar_t requested[2]{};
-#if HORDE_RT_PRIVATE_REVIVAL
+#if HORDE_RT_REVIVAL_ADMITTED
         state.opted=true;
 #else
         state.opted=GetEnvironmentVariableW(L"HORDE_DEBUG_LICH_REVIVAL_AUDIO",requested,2)==1 && requested[0]==L'1';
 #endif
         if(!state.opted)return;
-#if HORDE_RT_PRIVATE_REVIVAL
+#if HORDE_RT_REVIVAL_ADMITTED
         state.file=ExecutableDirectory()/"private_revival/lich_revival.wav";
 #else
         state.file=ExecutableDirectory()/"debug_audio/lich_revival.wav";
@@ -32,7 +32,7 @@ void UpdatePrivateLichRevivalAudio(VulkanSurfaceContext& context)
         if(!state.available)LogWindowsAudio("verified private revival WAV failed existing XAudio2 preload");
     }
     if(!state.opted || !state.available)return;
-#if HORDE_RT_PRIVATE_REVIVAL
+#if HORDE_RT_REVIVAL_ADMITTED
     (void)context.simulation.ConfigureSkeletonRevivalPresentation(state.resourceGeneration,
         context.rtScene.SkeletonRevivalDeadDuration(),context.rtScene.SkeletonRevivalStandDuration(),
         context.rtScene.IsReady() && context.rtScene.SkeletonRevivalStandDuration()>0.f,
@@ -54,7 +54,7 @@ void UpdatePrivateLichRevivalAudio(VulkanSurfaceContext& context)
 }
 void PlayPrivateLichRevivalAudio(VulkanSurfaceContext& context,const horde::gameplay::simulation::GameplayEvent& event)
 {
-#if defined(_DEBUG) || HORDE_RT_PRIVATE_REVIVAL
+#if defined(_DEBUG) || HORDE_RT_REVIVAL_ADMITTED
     UpdatePrivateLichRevivalAudio(context);
     auto& state=context.privateRevivalAudio;
     if(!state.opted || !state.available || !horde::audio::IsLichRevivalCry(event))return;

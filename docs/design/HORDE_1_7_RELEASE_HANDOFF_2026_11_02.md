@@ -179,3 +179,32 @@ and asset/licence checks are a separate release gate.
 - Publication copy is staged for review in
   `release/HORDE_1_7_DRAFT_COPY.md`, with gated features clearly held. Itch and
   website content remains unchanged.
+
+## Ordinary 1.7 admission candidate after owner asset permission
+
+The owner approved including the exact pinned skeleton stand derivative and
+revival WAV **inside public game packages**, without standalone/source asset
+publication. The owned flask native derivative is likewise included as a
+pinned runtime input. The previous private-only distribution gate above is
+superseded for these three integrated runtime bytes, but final signed-package
+and physical acceptance remain open. `ASSET_LICENSES.md` records the scope.
+
+Source now stages candidate identity `1.7.0`/Android code11, which passed the
+local version contract. GitHub releases show no 1.7 tag; external Play-code
+availability remains unverified. Normal Windows CMake and Android Release have
+an explicit shipping17 admission separate from the private Debug/acceptance
+flags. The Gradle Release task fails without an exact three-file local input;
+the pinned input policy rejects extra files and wrong hashes. The ordinary
+Windows Release executable and application-config test built, and the latter
+passed. An unsigned Android Release APK built all four ABIs from a short
+temporary drive path; its package name is the production identity,
+versionName1.7.0/code11, and the exact three pinned assets passed archive hash
+verification. The normal debug, benchmark and actor-worker variants are not
+admitted by this shipping property.
+
+The first Android attempt from the long nested worktree failed in Ninja's
+object-directory creation before source compilation; the short drive mapping
+resolved that host path-length limit. The compiled APK was **unsigned** and
+was not installed. Neither this source/build receipt nor the local pinned
+files establishes a signed ordinary package, owner-save update, actual RT
+scene presentation, sound/animation balance or reporting catalog admission.

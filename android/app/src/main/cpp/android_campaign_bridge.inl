@@ -89,12 +89,12 @@ bool PrepareCampaignResources(SwapchainContext& context)
     std::string diagnostic;
     auto skeletonPath=root+"/skeleton_biped_merged_animations_v01.glb";
     std::vector<horde::scene::SkinnedClipBinding> bindings;
-#if HORDE_RT_PRIVATE_REVIVAL
+#if HORDE_RT_REVIVAL_ADMITTED
     skeletonPath=root+"/private_revival/skeleton.glb";
     const auto& ordinary=horde::scene::SkeletonCombatClipSet().clips;
     bindings.assign(ordinary.begin(),ordinary.end());bindings.push_back({"SkeletonProof|StandDead0ToIdle",false,true});
 #endif
-#if HORDE_RT_FLASK_CANDIDATE
+#if HORDE_RT_FLASK_ADMITTED
     if(!scene.SetPlayerUtilityCandidateAsset(root+"/private_flask/player.glb"))return false;
 #endif
     const bool ready=scene.Initialise(context.instance,context.physicalDevice,context.device,

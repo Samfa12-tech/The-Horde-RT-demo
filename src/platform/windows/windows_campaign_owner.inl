@@ -65,7 +65,7 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     std::string diagnostic;
     auto skeletonPath=(root/"models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();
     std::vector<horde::scene::SkinnedClipBinding> bindings;
-#if HORDE_RT_PRIVATE_REVIVAL
+#if HORDE_RT_REVIVAL_ADMITTED
     skeletonPath=(ExecutableDirectory()/"private_revival/skeleton.glb").string();
     std::string standHash;
     if(!Sha256File(skeletonPath,standHash,diagnostic) || standHash!=horde::gameplay::simulation::kPrivateStandSha256)
@@ -73,7 +73,7 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     const auto& ordinary=horde::scene::SkeletonCombatClipSet().clips;
     bindings.assign(ordinary.begin(),ordinary.end());bindings.push_back({"SkeletonProof|StandDead0ToIdle",false,true});
 #endif
-#if HORDE_RT_FLASK_CANDIDATE
+#if HORDE_RT_FLASK_ADMITTED
     const auto utilityPath=(ExecutableDirectory()/"private_flask/player.glb").string();
     std::string utilityHash;
     if(!Sha256File(utilityPath,utilityHash,diagnostic) || utilityHash!=horde::gameplay::simulation::kFlaskCandidateSha256 ||

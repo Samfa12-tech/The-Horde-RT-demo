@@ -942,13 +942,13 @@ public class MainActivity extends Activity {
     /** Only the existing closed runtime cache roster; no reports, settings or save storage. */
     private boolean[] stageRuntimeAssetCache() {
             final boolean skeletonStaged = stageAsset(SKELETON_ASSET, SKELETON_FILE);
-            if(BuildConfig.PRIVATE_REVIVAL && (!stageAsset("private_revival/skeleton.glb","private_revival/skeleton.glb") ||
+            if((BuildConfig.PRIVATE_REVIVAL || BuildConfig.SHIPPING17_CONTENT) && (!stageAsset("private_revival/skeleton.glb","private_revival/skeleton.glb") ||
                 !stageAsset("private_revival/lich_revival.wav","debug_audio/lich_revival.wav") ||
                 PrivateLichRevivalAudio.validatePinnedFile(new File(getFilesDir(),"private_revival/skeleton.glb"),31672176L,
                     "800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259")!=null ||
                 PrivateLichRevivalAudio.validate(getFilesDir())!=null))
                 throw new IllegalStateException("Pinned private revival assets failed staging or identity verification.");
-            if(BuildConfig.FLASK_CANDIDATE && (!stageAsset("private_flask/player.glb","private_flask/player.glb") ||
+            if((BuildConfig.FLASK_CANDIDATE || BuildConfig.SHIPPING17_CONTENT) && (!stageAsset("private_flask/player.glb","private_flask/player.glb") ||
                 PrivateLichRevivalAudio.validatePinnedFile(new File(getFilesDir(),"private_flask/player.glb"),2719368L,
                     "56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014")!=null))
                 throw new IllegalStateException("Pinned flask native binding failed staging or identity verification.");
@@ -7732,7 +7732,7 @@ public class MainActivity extends Activity {
     }
 
     private void initialisePrivateLichRevivalAudio() {
-        if(!BuildConfig.PRIVATE_REVIVAL && !PrivateLichRevivalAudio.enabled(BuildConfig.DEBUG,getIntent()!=null &&
+        if(!(BuildConfig.PRIVATE_REVIVAL || BuildConfig.SHIPPING17_CONTENT) && !PrivateLichRevivalAudio.enabled(BuildConfig.DEBUG,getIntent()!=null &&
                 getIntent().getBooleanExtra(PrivateLichRevivalAudio.INTENT_OPT_IN,false)))return;
         String error=PrivateLichRevivalAudio.validate(getFilesDir());
         if(error!=null){Log.e(TAG,error);return;}
@@ -7761,7 +7761,7 @@ public class MainActivity extends Activity {
         catch(RuntimeException | LinkageError unavailable){return 0.f;}
     }
     private void updatePrivateLichRevivalAudio(int state) {
-        if(BuildConfig.PRIVATE_REVIVAL && privateRevivalAudioGeneration>0) {
+        if((BuildConfig.PRIVATE_REVIVAL || BuildConfig.SHIPPING17_CONTENT) && privateRevivalAudioGeneration>0) {
             boolean ready; synchronized(loadedSounds){ready=soundPool!=null && privateRevivalSoundId!=0 && loadedSounds.contains(privateRevivalSoundId);}
             ProbeBridge.setRevivalAudioReady(privateRevivalAudioGeneration,ready);
         }

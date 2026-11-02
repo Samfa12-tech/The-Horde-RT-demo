@@ -3,11 +3,12 @@
 using namespace horde::gameplay::simulation;
 namespace cp=horde::gameplay::campaign;
 int main() {
-    bool passed=true;const bool admitted=HORDE_RT_PRIVATE_REVIVAL!=0;
+    bool passed=true;const bool admitted=HORDE_RT_REVIVAL_ADMITTED!=0;
+    const bool flaskAdmitted=HORDE_RT_FLASK_ADMITTED!=0;
     auto check=[&](bool value,const char* message){if(!value){passed=false;std::cerr<<message<<'\n';}};
     const auto config=PrivateRevivalApplicationConfig();
     check(config.skeletonRevival1_7==admitted && config.naturalPracticeRevival1_7==admitted,"application flags respect private/public admission");
-    check(config.healingFlask1_7==(HORDE_RT_FLASK_CANDIDATE!=0) && config.flaskUtilityCandidate==(HORDE_RT_FLASK_CANDIDATE!=0),
+    check(config.healingFlask1_7==flaskAdmitted && config.flaskUtilityCandidate==flaskAdmitted,
           "flask application admission is explicit and shared");
     auto game=CreateApplicationGameSimulation();
     auto readiness=[&]{return game.ConfigureSkeletonRevivalPresentation(1,89.f/30.f,1.5f,true,true);};
@@ -15,8 +16,8 @@ int main() {
     for(int newGame=0;newGame<2;++newGame) {
         game=CreateApplicationGameSimulation();game.StartLiveDevelopmentRescueJourney(true);
         check(readiness()==admitted,"first/second New Game retains admitted configuration");
-        check(game.Snapshot().healingFlaskEnabled==(HORDE_RT_FLASK_CANDIDATE!=0) &&
-              game.Snapshot().flaskUtilityCandidate==(HORDE_RT_FLASK_CANDIDATE!=0),"first/second New Game retains native flask ownership");
+        check(game.Snapshot().healingFlaskEnabled==flaskAdmitted &&
+              game.Snapshot().flaskUtilityCandidate==flaskAdmitted,"first/second New Game retains native flask ownership");
         game.RetryEncounter();check(readiness()==admitted,"Retry preserves application configuration");
         game.ResetRoute();check(readiness()==admitted,"route reset preserves application configuration");
     }

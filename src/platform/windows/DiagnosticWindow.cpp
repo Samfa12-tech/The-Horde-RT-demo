@@ -6590,7 +6590,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         }
     }
 #endif
-#if HORDE_RT_FLASK_CANDIDATE
+#if HORDE_RT_FLASK_ADMITTED
     const auto utilityPath=(ExecutableDirectory()/"private_flask/player.glb").string();
     std::string utilityHash;
     if(!Sha256File(utilityPath,utilityHash,diagnostic) ||
@@ -6603,7 +6603,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     std::string selectedSkeletonAssetPath =
         (assetRoot / "models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();
     std::vector<horde::scene::SkinnedClipBinding> selectedSkeletonBindings;
-#if HORDE_RT_PRIVATE_REVIVAL
+#if HORDE_RT_REVIVAL_ADMITTED
     selectedSkeletonAssetPath=(ExecutableDirectory()/"private_revival/skeleton.glb").string();
     std::string privateStandHash;
     if(!Sha256File(selectedSkeletonAssetPath,privateStandHash,diagnostic) ||

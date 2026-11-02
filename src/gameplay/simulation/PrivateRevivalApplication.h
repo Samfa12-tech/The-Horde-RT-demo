@@ -6,13 +6,18 @@
 #ifndef HORDE_RT_FLASK_CANDIDATE
 #define HORDE_RT_FLASK_CANDIDATE 0
 #endif
+#ifndef HORDE_RT_SHIPPING17_CONTENT
+#define HORDE_RT_SHIPPING17_CONTENT 0
+#endif
+#define HORDE_RT_REVIVAL_ADMITTED (HORDE_RT_PRIVATE_REVIVAL || HORDE_RT_SHIPPING17_CONTENT)
+#define HORDE_RT_FLASK_ADMITTED (HORDE_RT_FLASK_CANDIDATE || HORDE_RT_SHIPPING17_CONTENT)
 namespace horde::gameplay::simulation {
 inline GameSimulationConfig PrivateRevivalApplicationConfig() {
     auto config=ProductionGameSimulationConfig();
-    config.skeletonRevival1_7=HORDE_RT_PRIVATE_REVIVAL!=0;
-    config.naturalPracticeRevival1_7=HORDE_RT_PRIVATE_REVIVAL!=0;
-    config.healingFlask1_7=HORDE_RT_FLASK_CANDIDATE!=0;
-    config.flaskUtilityCandidate=HORDE_RT_FLASK_CANDIDATE!=0;
+    config.skeletonRevival1_7=HORDE_RT_REVIVAL_ADMITTED!=0;
+    config.naturalPracticeRevival1_7=HORDE_RT_REVIVAL_ADMITTED!=0;
+    config.healingFlask1_7=HORDE_RT_FLASK_ADMITTED!=0;
+    config.flaskUtilityCandidate=HORDE_RT_FLASK_ADMITTED!=0;
     return config;
 }
 inline GameSimulation CreateApplicationGameSimulation() {

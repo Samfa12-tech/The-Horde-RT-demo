@@ -5,13 +5,21 @@ param(
     [int]$VersionCode,
     [ValidateSet("Release", "Debug")]
     [string]$WindowsConfiguration = "Release",
+    [string]$Horde17AssetRoot,
     [string]$OutputRoot = (Join-Path $PSScriptRoot "..\releases\candidates")
 )
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "release-version-policy.ps1")
 . (Join-Path $PSScriptRoot "horde-night-audio-policy.ps1")
+. (Join-Path $PSScriptRoot "horde-1.7-release-asset-policy.ps1")
 Assert-HordeReleaseVersionIsMutable -Version $Version -VersionCode $VersionCode
+if($Version -eq '1.7.0') {
+    if([string]::IsNullOrWhiteSpace($Horde17AssetRoot)) { throw 'Ordinary 1.7 packaging requires the pinned local Horde17AssetRoot.' }
+    $Horde17AssetRoot=Assert-Horde17ReleaseAssets -AssetRoot $Horde17AssetRoot
+} elseif(-not [string]::IsNullOrWhiteSpace($Horde17AssetRoot)) {
+    throw 'Pinned 1.7 assets may only enter the 1.7.0 package.'
+}
 
 function Find-LatestVersionedTool {
     param(
@@ -91,7 +99,7 @@ foreach ($candidateFile in $candidateFiles) {
 }
 New-Item -ItemType Directory -Force -Path $windowsStage | Out-Null
 
-& $cmake -S $repoRoot -B (Join-Path $repoRoot "build") -G "Visual Studio 17 2022" -A x64 -DHORDE_RT_PRIVATE_REVIVAL=OFF -DHORDE_RT_FLASK_CANDIDATE=OFF -DHORDE_RT_WINDOWS_ACCEPTANCE=OFF
+& $cmake -S $repoRoot -B (Join-Path $repoRoot "build") -G "Visual Studio 17 2022" -A x64 -DHORDE_RT_PRIVATE_REVIVAL=OFF -DHORDE_RT_FLASK_CANDIDATE=OFF -DHORDE_RT_WINDOWS_ACCEPTANCE=OFF "-DHORDE_RT_SHIPPING17_CONTENT=$(if($Version -eq '1.7.0'){'ON'}else{'OFF'})"
 if ($LASTEXITCODE -ne 0) { throw "CMake configure failed." }
 & $cmake --build (Join-Path $repoRoot "build") --config $WindowsConfiguration
 if ($LASTEXITCODE -ne 0) { throw "Windows build failed." }
@@ -207,6 +215,7 @@ Copy-Item -LiteralPath (Join-Path $repoRoot "assets\audio\filmcow\forest-distant
 Copy-HordeNightAudioRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage 'assets')
 $null = Copy-Horde162RuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets") -Platform Windows
 $null = Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets")
+if($Version -eq '1.7.0') { Copy-Horde17ReleaseAssets -AssetRoot $Horde17AssetRoot -DestinationRoot $windowsStage }
 
 $windowsZip = Join-Path $outputFull "$baseName-Windows-x64.zip"
 if (Test-Path -LiteralPath $windowsZip) { Remove-Item -LiteralPath $windowsZip -Force }
@@ -214,10 +223,11 @@ Compress-Archive -Path (Join-Path $windowsStage "*") -DestinationPath $windowsZi
 $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip
 Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
 Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
+if($Version -eq '1.7.0') { Assert-Horde17ReleasePackage -ArchivePath $windowsZip -Platform Windows }
 
 Push-Location (Join-Path $repoRoot "android")
 try {
-    .\gradlew.bat assembleDebug assembleRelease lintRelease -PhordePrivateRevivalDir= -PhordeFlaskCandidateDir= --console=plain
+    .\gradlew.bat assembleDebug assembleRelease lintRelease -PhordePrivateRevivalDir= -PhordeFlaskCandidateDir= "-PhordeShipping17AssetDir=$Horde17AssetRoot" --console=plain
     if ($LASTEXITCODE -ne 0) { throw "Android build or lint failed." }
 } finally {
     Pop-Location
@@ -248,6 +258,7 @@ if ($releaseSigningConfigured -and (Test-Path -LiteralPath $signedRelease)) {
 $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $androidCandidate
 Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $androidCandidate -Platform Android
 Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $androidCandidate -Platform Android
+if($Version -eq '1.7.0') { Assert-Horde17ReleasePackage -ArchivePath $androidCandidate -Platform Android }
 
 $androidSdkRoot = if (-not [string]::IsNullOrWhiteSpace($env:ANDROID_HOME)) {
     $env:ANDROID_HOME

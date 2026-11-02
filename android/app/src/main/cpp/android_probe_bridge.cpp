@@ -3624,13 +3624,13 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
     if(context.environmentSurvey && !context.keeperMistSnapshot && !context.rtScene.SetRegionalWaterDiagnosticEnabled(
             !context.environmentSurveyWaterDisabled))return false;
 #endif
-#if HORDE_RT_FLASK_CANDIDATE
+#if HORDE_RT_FLASK_ADMITTED
     if(!context.rtScene.SetPlayerUtilityCandidateAsset(context.reportDirectory+"/../private_flask/player.glb")) {
         diagnostic="Flask candidate native binding was not selected before scene creation.";return false;
     }
 #endif
     std::vector<horde::scene::SkinnedClipBinding> revivalBindings;
-#if HORDE_RT_PRIVATE_REVIVAL
+#if HORDE_RT_REVIVAL_ADMITTED
     const auto& ordinary=horde::scene::SkeletonCombatClipSet().clips;
     revivalBindings.assign(ordinary.begin(),ordinary.end());
     revivalBindings.push_back({"SkeletonProof|StandDead0ToIdle",false,true});
@@ -3643,7 +3643,7 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     renderExtent,
                                     context.swapchainFormat,
                                     context.reportDirectory +
-#if HORDE_RT_PRIVATE_REVIVAL
+#if HORDE_RT_REVIVAL_ADMITTED
                                     "/../private_revival/skeleton.glb",
 #else
                                     "/../skeleton_biped_merged_animations_v01.glb",
@@ -4481,7 +4481,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             // One owner-thread tuning publication drives contact and the actual
             // stream transform in this frame. JNI still only publishes controls.
             simulationInput.waterfallWidthScale = rtLabTuning.waterfallWidthScale;
-#if HORDE_RT_PRIVATE_REVIVAL
+#if HORDE_RT_REVIVAL_ADMITTED
             (void)gGameSimulation.ConfigureSkeletonRevivalPresentation(gPrivateRevivalResourceGeneration,
                 context.rtScene.SkeletonRevivalDeadDuration(),context.rtScene.SkeletonRevivalStandDuration(),
                 context.rtScene.IsReady() && simulationInput.revivalAudioGeneration>0 && simulationInput.revivalAudioReady &&

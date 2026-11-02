@@ -38,6 +38,10 @@ if(flaskCandidateDirectory) {
         throw new GradleException('Flask candidate requires only the exact pinned runtime derivative, no source files.')
 }
 
+// Public game-package permission covers only these three pinned derivatives.
+// The source MP3, editable Blender files and previews never enter an APK.
+def hordeShipping17AssetDirectory=providers.gradleProperty('hordeShipping17AssetDir').orNull
+
 def hordeVersionFile = rootProject.file('../VERSION')
 def hordeVersionCodeMapFile = rootProject.file('../version-code-map.json')
 def readHordeUtf8Authority = { File authorityFile, String authorityName ->
@@ -80,6 +84,23 @@ if (hordeActiveAssignmentCount != 1) {
 def hordeVersionCode = hordeVersionCodeMap?.androidVersionCodes?[(hordeVersionName)]
 if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
     throw new GradleException("Android version-code map has no positive integer for ${hordeVersionName}.")
+}
+if (hordeShipping17AssetDirectory) {
+    if (hordeVersionName != '1.7.0' || privateRevivalDirectory || flaskCandidateDirectory)
+        throw new GradleException('Ordinary 1.7 assets cannot share a private Debug admission or another version.')
+    def assetRoot=file(hordeShipping17AssetDirectory)
+    if (!assetRoot.isDirectory()) throw new GradleException('Ordinary 1.7 asset root is missing.')
+    def actual=[]
+    assetRoot.eachFileRecurse(groovy.io.FileType.FILES) { actual.add(assetRoot.toPath().relativize(it.toPath()).toString().replace('\\','/')) }
+    def pinned=['private_flask/player.glb':'56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014',
+                'private_revival/skeleton.glb':'800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259',
+                'private_revival/lich_revival.wav':'1e1891010f4c89e6f20ec5fba90191aa0f0999c0bd95a4df3fe36659beb9e521']
+    if (actual.sort()!=pinned.keySet().toList().sort()) throw new GradleException('Ordinary 1.7 assets require exactly three pinned runtime derivatives.')
+    pinned.each { relative,expected ->
+        def asset=new File(assetRoot,relative)
+        if (!asset.isFile() || MessageDigest.getInstance('SHA-256').digest(asset.bytes).encodeHex().toString()!=expected)
+            throw new GradleException("Ordinary 1.7 asset differs: ${relative}")
+    }
 }
 
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
@@ -678,6 +699,7 @@ android {
         versionName hordeVersionName
         buildConfigField 'boolean', 'PRIVATE_REVIVAL', 'false'
         buildConfigField 'boolean', 'FLASK_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'SHIPPING17_CONTENT', 'false'
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
         buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', 'false'
@@ -729,7 +751,7 @@ android {
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments "-DHORDE_RT_FLASK_CANDIDATE=${flaskCandidateDirectory ? 'ON' : 'OFF'}", "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}", '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
+                    arguments "-DHORDE_RT_FLASK_CANDIDATE=${flaskCandidateDirectory ? 'ON' : 'OFF'}", "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}", '-DHORDE_RT_SHIPPING17_CONTENT=OFF', '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
@@ -740,9 +762,11 @@ android {
         }
         release {
             minifyEnabled false
+            buildConfigField 'boolean', 'SHIPPING17_CONTENT', hordeShipping17AssetDirectory ? 'true' : 'false'
             externalNativeBuild {
                 cmake {
                     arguments '-DHORDE_RT_PRIVATE_REVIVAL=OFF', '-DHORDE_RT_FLASK_CANDIDATE=OFF',
+                        "-DHORDE_RT_SHIPPING17_CONTENT=${hordeShipping17AssetDirectory ? 'ON' : 'OFF'}",
                         '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF',
                         '-DHORDE_RT_ACTOR_WORKER_EXPERIMENT=OFF',
                         *hordeRtNativePolicyArguments('Shipping')
@@ -791,12 +815,20 @@ android {
         if (viewmodelCandidate) debug.assets.srcDir(viewmodelOverlayDir)
         if (privateRevivalDirectory) debug.assets.srcDir(file(privateRevivalDirectory))
         if (flaskCandidateDirectory) debug.assets.srcDir(file(flaskCandidateDirectory))
+        if (hordeShipping17AssetDirectory) release.assets.srcDir(file(hordeShipping17AssetDirectory))
     }
 }
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.14.1'
+}
+
+gradle.taskGraph.whenReady { graph ->
+    if (hordeVersionName == '1.7.0' && !hordeShipping17AssetDirectory &&
+        graph.allTasks.any { it.project == project && it.name in ['assembleRelease','bundleRelease','packageRelease','assemble','bundle'] }) {
+        throw new GradleException('Ordinary 1.7 Android release requires the pinned hordeShipping17AssetDir; refusing an incomplete package.')
+    }
 }
 
 tasks.named('preBuild').configure {
