@@ -279,7 +279,11 @@ public:
             const auto next=continuations_[0];
             if((next!=Line::FlaskEmpty && next!=Line::FlaskTopup) ||
                (c.companionAtBasin && c.playerNearBasin)) {
-                const auto line=PopContinuation();
+                auto line=PopContinuation();
+                // Charges may change while Kit walks and waits. Choose the
+                // spoken variant at delivery, before its identity is fixed.
+                if(line==Line::FlaskEmpty || line==Line::FlaskTopup)
+                    line=c.flaskCharges==0?Line::FlaskEmpty:Line::FlaskTopup;
                 Start(line,SourceFor(line),c);
             }
         }

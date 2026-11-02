@@ -127,6 +127,20 @@ int main() {
         Check(restored.State().line==Line::None && restored.ExportProgress().continuationCount==0,
             "completed basin cue does not repeat on a nearby tick");
     }
+    {
+        Director changed;Context gc;gc.claimed=true;gc.flaskGuideEnabled=true;gc.flaskCharges=2;
+        changed.Step(.016f,gc);changed.Skip();changed.Step(.016f,gc);changed.Skip();
+        gc.exterior=true;gc.lanternLow=true;changed.Step(.016f,gc);
+        gc.lanternLow=false;gc.lanternHigh=true;gc.manualRaiseSequence=1;gc.visibleRaiseSequence=1;
+        changed.Step(.016f,gc);
+        for(unsigned n=0;n<3;++n) {changed.Skip();changed.Step(.016f,gc);}
+        Check(changed.BasinGuidePending() && changed.State().line==Line::None,
+            "Kit keeps a pending basin lesson while walking");
+        gc.flaskCharges=0;gc.companionAtBasin=gc.playerNearBasin=true;
+        changed.Step(.016f,gc);
+        Check(changed.State().line==Line::FlaskEmpty,
+            "spoken basin line uses charges at delivery, not the old proof-time count");
+    }
     CompanionRouteFixture basinGuide(true);
     basinGuide.Step(1.f/60.f,basinGuide.State().x,basinGuide.State().z,
         true,true,false,nullptr,false,true,true);
