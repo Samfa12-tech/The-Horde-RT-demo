@@ -110,3 +110,22 @@ Release communication scope: itch devlog, itch main-page update and the
 samfa12.com Horde page should accompany the final verified1.7 publication.
 Post-release owner playthrough video and multi-device benchmarks are future
 follow-up, not gates for this source checkpoint.
+
+## Issue 38 private Windows staging guard
+
+The failed `66b707b8` isolated Windows package lacked three acceptance-only
+files beside the executable: `private_flask/player.glb`,
+`private_revival/skeleton.glb`, and `private_revival/lich_revival.wav`. The
+runtime rejected scene creation as designed. Restaging those three pinned
+files without changing the executable produced a rendered RT game/menu on the
+same laptop. This explains that manually staged package failure; it does not
+certify an ordinary shipping package or unrelated field startup reports.
+
+Before launching a manually staged **private revival/flask** Windows package,
+run `tools/test-horde-1.7-private-windows-stage.ps1 -StageRoot <stage>`.
+It requires the executable and compares all three files against the source
+hash pins. The `e969f72e` isolated package passed; an unstaged build output
+failed with the expected missing-flask diagnostic. This guard is for the
+explicit private acceptance profile. The ordinary `package-alpha.ps1` still
+builds with both private feature flags OFF; its eventual 1.7 shipping admission
+and asset/licence checks are a separate release gate.
