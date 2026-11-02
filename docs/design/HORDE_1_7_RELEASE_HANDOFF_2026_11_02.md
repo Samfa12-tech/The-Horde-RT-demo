@@ -129,3 +129,53 @@ failed with the expected missing-flask diagnostic. This guard is for the
 explicit private acceptance profile. The ordinary `package-alpha.ps1` still
 builds with both private feature flags OFF; its eventual 1.7 shipping admission
 and asset/licence checks are a separate release gate.
+
+## 2 November ordinary-release preflight at 8a9dbc61
+
+- PR37 is a clean, mergeable **draft**, 61 commits ahead of current main
+  `1b119d52`. All six exact-head jobs passed in run `41521394499`. This is
+  source readiness, not ordinary-package acceptance; no merge was performed.
+- `ProductionGameSimulationConfig()` admits combat foundation, special warnings,
+  sequential practice and the route, but leaves skeleton revival, natural
+  practice revival, healing flask and its native utility binding OFF. Windows
+  CMake gates both trials OFF by default. `tools/package-alpha.ps1` forces them
+  OFF even if a cached build selected them. Android Release forces both OFF and
+  includes the pinned derivatives only in the Debug asset source set. A normal
+  1.7 package therefore cannot be described as shipping the private flask or
+  revival owner-accepted in development builds. Admission requires explicit
+  release asset inputs, verified package presence and updated contracts on
+  both platforms; do not merely remove the OFF guards.
+- `ASSET_LICENSES.md` records the flask derivative as an owned source study and
+  the revival WAV as a Pixabay-derived private game candidate. It explicitly
+  withholds public repository redistribution and a final game-distribution
+  decision for the revival clip/stand derivative. Confirm the exact integrated
+  public-game permission and distribution method before vending these bytes;
+  source MP3/Blend/previews should stay out of runtime packages. Existing Kit
+  cuts have separate owner-approved public distribution permission.
+- `VERSION` and the Android code map still identify 1.6.2/code10. Local policy
+  requires a mutable version and code greater than10; 1.7.0/code11 is a
+  proposal only. No external Play-console availability or owner signing-backup
+  result was established. The external signing folder exists, but no key or
+  password was read. The owner-only safety checklist remains unchecked.
+- Eight focused Windows Release host tests passed for save menu, play session,
+  save worker/coordinator, codec, storage, checkpoint and version policy.
+  Literal legacy schema1/2 codec fixtures and normal dated restore are covered;
+  an actual published1.6.2-to-final1.7 package update and owner career
+  preservation are **not** covered by those fixtures.
+- Current Windows/Android client sources route public benchmark and private
+  report requests to distinct HTTPS endpoints and verification purposes.
+  Windows classifies a public 202 exact `accepted` receipt as queued and a
+  public 200 exact `published` receipt as published; wrong IDs/kinds or malformed
+  responses remain uncertain. Android has separate live pending/published UI
+  states and tests for separate consent and immutable retries. These are source
+  and mock/fixture contracts, not proof of the live service's retention or
+  delivery. The
+  live public stats read returned zero rows. The private backend handoff's
+  prepared catalog v3 documents earlier `7234bdad` Send-capable artifacts;
+  it is not a catalog receipt for the newer `e969f72e` Windows candidate or an
+  eventual ordinary release. Final exact binary tuples, backend activation,
+  strict client receipts and one owner-authorized end-to-end send per platform
+  remain coordinated release work. No report was sent in this audit.
+- Publication copy is staged for review in
+  `release/HORDE_1_7_DRAFT_COPY.md`, with gated features clearly held. Itch and
+  website content remains unchanged.
