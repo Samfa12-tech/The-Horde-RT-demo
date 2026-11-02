@@ -165,7 +165,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     # Windows retains MSVC native/platform coverage; compiler-independent
     # source and asset checks remain in both complete Linux lanes.
-    timeout-minutes: 15
+    # The Windows lane passed 165/181 native tests before the former 15-minute
+    # cap cancelled the runner; leave the complete selection intact.
+    timeout-minutes: ${{ matrix.compiler == 'MSVC' && 18 || 15 }}
     strategy:
       fail-fast: false
       matrix:
