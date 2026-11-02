@@ -1,6 +1,7 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/FlaskRestBasins.h"
+#include "gameplay/dialogue/CompanionRouteFixture.h"
 #include "scene/assets/AssetManifest.h"
 #include <filesystem>
 #include <iostream>
@@ -219,6 +220,31 @@ int main(int argc,char** argv) {
         if(!appended)std::cerr<<error<<'\n';
         Check(appended,"both exterior rest basins fit actual anchor support");
         if(appended) {
+            horde::gameplay::dialogue::CompanionRouteFixture guide(true);
+            unsigned ticks=0;
+            for(;ticks<1000 && !guide.State().basinArrived;++ticks) {
+                const auto old=guide.State();
+                guide.Step(1.f/60.f,old.x,old.z,true,true,false,support.get(),true,true,true);
+            }
+            Check(ticks<1000 && guide.State().grounded &&
+                std::hypot(guide.State().x-basins[0].centre.x,
+                           guide.State().z-basins[0].centre.z)<2.f,
+                "Kit reaches the upper-rope basin alongside its actual solid furniture");
+            ticks=0;
+            for(;ticks<1200 && guide.State().waypoint<4;++ticks) {
+                const auto old=guide.State();
+                guide.Step(1.f/60.f,old.x,old.z,true,true,false,support.get(),true,true,false);
+            }
+            Check(ticks<1200 && guide.State().grounded && guide.State().waypoint>=4,
+                "after the basin cue Kit can return to the existing forest route past its solid furniture");
+            horde::gameplay::dialogue::CompanionRouteFixture restored(true);
+            restored.RestoreCampaignBasin(basins[0].anchor.x,basins[0].anchor.z,
+                support.get(),guide.State().generation);
+            Check(restored.State().grounded && restored.State().basinGuide &&
+                restored.State().basinArrived &&
+                std::hypot(restored.State().x-basins[0].centre.x,
+                           restored.State().z-basins[0].centre.z)<2.f,
+                "an interrupted spoken basin cue restores Kit beside the same solid basin");
             Check(basins[0].anchor.x==tr::kExteriorLanding.x &&
                 basins[0].anchor.z==tr::kExteriorLanding.z &&
                 basins[1].anchor.x==kWorldRoutePoints.back().x &&

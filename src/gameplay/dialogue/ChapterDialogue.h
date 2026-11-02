@@ -60,6 +60,7 @@ struct Context {
     bool paused=false,alive=true,combat=false,claimed=false,exterior=false,traversing=false;
     bool lanternLow=false,lanternHigh=false;
     bool flaskGuideEnabled=false; unsigned flaskCharges=0;
+    bool companionAtBasin=false,playerNearBasin=false;
     std::uint64_t manualRaiseSequence=0,visibleRaiseSequence=0;
 };
 // Logical story recovery only: active speech restarts, with no audio clock,
@@ -76,6 +77,12 @@ struct Progress {
 class Director {
 public:
     const Snapshot& State() const { return state_; }
+    bool BasinGuidePending() const {
+        if(state_.line==Line::FlaskEmpty || state_.line==Line::FlaskTopup)return true;
+        for(std::size_t i=0;i<continuationCount_;++i)
+            if(continuations_[i]==Line::FlaskEmpty || continuations_[i]==Line::FlaskTopup)return true;
+        return false;
+    }
     // Continuous Kit speech follows the same actor/listener snapshot as the
     // renderer. Event-time Keeper and unseen tomb/shaft calls stay unchanged.
     // Spatial refresh never advances the line, cursor, queue or callback ID.
@@ -269,8 +276,12 @@ public:
             if(state_.elapsed>=state_.duration) Finish();
         }
         if(state_.line==Line::None && continuationCount_!=0) {
-            const auto line=PopContinuation();
-            Start(line,SourceFor(line),c);
+            const auto next=continuations_[0];
+            if((next!=Line::FlaskEmpty && next!=Line::FlaskTopup) ||
+               (c.companionAtBasin && c.playerNearBasin)) {
+                const auto line=PopContinuation();
+                Start(line,SourceFor(line),c);
+            }
         }
         RefreshCompanionSpatial(c);
     }
@@ -310,7 +321,10 @@ private:
         return line;
     }
     void StepForestFixture(const Context& c) {
-        if(!state_.proofAccepted || !c.exterior || c.traversing) return;
+        // Keep the refill introduction ahead of forest commentary even if the
+        // player runs on before following Kit. It remains one ordered story
+        // chain and can be resumed from a campaign save.
+        if(!state_.proofAccepted || !c.exterior || c.traversing || BasinGuidePending()) return;
         if(!simulation::ResolveWorldRouteSupport(c.player.x,c.player.z).grounded) return;
         const auto& route=simulation::kWorldRoutePoints;
         const auto distance=[&](std::size_t index) {

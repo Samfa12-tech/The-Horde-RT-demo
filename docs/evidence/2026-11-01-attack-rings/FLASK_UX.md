@@ -86,12 +86,16 @@ authored exterior collision. The complete-chapter geometry count is now 216
 triangles across two basins. The owner passed two consecutive death/Retry
 cycles in the separate compact-flask Windows candidate, not in this revision.
 
-Kit's one-time spoken introduction to the upper-rope basin is a separate
-pending integration. Two conditional cuts were generated on the existing
-Mureka website Kit voice for 40 of the authorised 100 Gold; Chrome blocked the
-download with `ERR_BLOCKED_BY_CLIENT`, so no audio has been admitted or shipped.
-No new line is yet wired to gameplay, and no extra generation or credit purchase
-is implied by this note.
+Kit's two conditional upper-rope basin cuts were downloaded by the owner and
+integrated on development commit `7698ca89` under the owner's confirmed public
+distribution permission. The original MP3s remain outside the repository;
+the manifest pins hashes and the runtime WAV conversion. A later bounded
+source candidate has Kit lead the player back along the mapped approach, wait
+beside the solid basin, give the charge-appropriate line only when the player
+follows, and resume the forest route. Host tests cover terrain collision and
+saved interrupted speech. Actual rendered staging, voice balance and physical
+Windows/Android listening still require acceptance; this is not a public
+shipping admission or release.
 
 
 ## Touch flask icon follow-up

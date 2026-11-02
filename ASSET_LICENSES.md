@@ -462,8 +462,9 @@ derived mono PCM16 24 kHz WAVs are included at
 MP3 and runtime SHA-256 hashes, exact words, sample counts and conversion
 method are pinned in `flask-guidance.manifest.json`. The generation used 40
 existing Mureka Gold credits under the owner's 100-credit cap; no top-up or
-subscription change occurred. Runtime voice balance, actor/basin staging and
-physical Windows/Android listening remain acceptance gates.
+subscription change occurred. The bounded Kit-to-basin route now has native
+terrain/collision and save-restore tests; rendered staging, runtime voice
+balance and physical Windows/Android listening remain acceptance gates.
 
 
 ### Kit visual source intake (11 October 2026)
@@ -846,11 +847,12 @@ disables this trial and the private revival trial, including cached build option
 ## Original earned flask rest basins - 2 November 2026
 
 `src/scene/FlaskRestBasins.h` is original code-authored hollow stone basin and
-carved bottle geometry, repeated only at the existing lower-rope, upper-rope and
-forest-lookout earned anchors. No imported mesh, provider generation, new audio,
+carved bottle geometry, repeated only at the upper-rope and forest-lookout
+earned anchors. The boss-room basin was removed to keep combat space clear.
+No imported mesh, provider generation, new audio,
 texture bytes, paid input or standalone source asset is used. The existing
 `MedievalWall02` masonry material and its recorded texture rights remain in force.
-No new blanket licence or exclusive copyright claim is assigned. The324 new
+No new blanket licence or exclusive copyright claim is assigned. The 216 new
 triangles share the existing static PBR owner and their exact render triangles
 supply nonwalkable contact; no new light, water shader, BLAS or material owner is
 introduced. Furniture is selected only by the explicit native flask candidate.

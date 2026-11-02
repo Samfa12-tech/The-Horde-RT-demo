@@ -256,6 +256,11 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.config_.swordStartsStowed=config_.swordStartsStowed;
     if(completedForest)next.chapterCompanion_.RestoreCampaignLookout(c.position.x,c.position.z,
         next.chapterTerrain_.get(),chapterCompanion_.State().generation);
+    else if(upper && config_.healingFlask1_7 &&
+            (c.dialogue.activeLine==dialogue::Line::FlaskEmpty ||
+             c.dialogue.activeLine==dialogue::Line::FlaskTopup))
+        next.chapterCompanion_.RestoreCampaignBasin(c.position.x,c.position.z,
+            next.chapterTerrain_.get(),chapterCompanion_.State().generation);
     else next.chapterCompanion_.RestoreCampaignReunion(upper,c.position.x,c.position.z,
         next.chapterTerrain_.get(),chapterCompanion_.State().generation);
     if((upper || completedForest) && !next.chapterCompanion_.State().grounded) return false;
