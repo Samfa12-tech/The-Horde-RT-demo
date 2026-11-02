@@ -103,6 +103,31 @@ public final class OpeningBenchmarkMenuLifecycleTest {
         ((ExecutorService)field("updateExecutor").get(activity)).shutdownNow();
         field("openingBenchmarkClientFallback").set(null,null);
     }
+    @Test public void compactProgressWrapsAndDetailsRetainNativeDiagnosticsWithoutPollFlicker()throws Exception {
+        Method update=MainActivity.class.getDeclaredMethod("updateBenchmarkProgress",String.class,String.class);update.setAccessible(true);
+        String raw="RT loop 42.0 FPS | mean 23.8ms\nlast 120 frames; not display Hz\nBENCHMARK 1/2  |  WAYPOINT 3/13  |  Shadow corridor";
+        TextView label=(TextView)field("rtStatus").get(activity);View root=activity.findViewById(R.id.root);
+        set("benchmarkRunning",true);
+        for(float scale:new float[]{1f,2f})for(int[] size:new int[][]{{1080,1800},{1800,1080}}) {
+            android.content.res.Configuration config=new android.content.res.Configuration(activity.getResources().getConfiguration());config.fontScale=scale;
+            activity.getResources().updateConfiguration(config,activity.getResources().getDisplayMetrics());
+            set("benchmarkStatusExpanded",false);update.invoke(activity,"Custom benchmark (unranked)",raw);
+            root.measure(View.MeasureSpec.makeMeasureSpec(size[0],View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(size[1],View.MeasureSpec.EXACTLY));root.layout(0,0,size[0],size[1]);
+            assertTrue(label.getText().toString().contains("Lap 1/2 / Waypoint 3/13"));assertFalse(label.getText().toString().contains("42.0 FPS"));
+            assertTrue(label.getMeasuredWidth()<=size[0]);assertTrue(label.getMeasuredHeight()<size[1]);
+            assertTrue(label.getMeasuredHeight()>=label.getLayout().getHeight()+label.getCompoundPaddingTop()+label.getCompoundPaddingBottom());
+            assertTrue(label.getContentDescription().toString().contains("not display Hz"));
+            call("toggleBenchmarkProgressDetails");assertTrue(label.getText().toString().contains(raw));
+            String owned=label.getText().toString();call("updateReadyRtLabel");assertEquals(owned,label.getText().toString());
+            call("toggleBenchmarkProgressDetails");assertFalse(label.getText().toString().contains("42.0 FPS"));
+        }
+        set("openingBenchmarkBlocked",true);update.invoke(activity,"Custom benchmark (unranked)","Could not return");
+        assertFalse(label.getText().toString().contains("Back cancels"));
+        assertFalse(label.getContentDescription().toString().contains("Back cancels"));
+        call("toggleBenchmarkProgressDetails");assertTrue(label.getText().toString().contains("Tap to hide details."));
+        assertEquals(0,Bridge.starts);assertEquals(0,Bridge.requests);assertTrue(Bridge.cancels.isEmpty());
+    }
+
     @Test public void genericReadyPollPreservesBenchmarkProgressAndReturnLabel()throws Exception {
         TextView label=(TextView)field("rtStatus").get(activity);
         set("benchmarkRunning",true);

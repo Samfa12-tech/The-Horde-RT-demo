@@ -174,6 +174,8 @@ public class MainActivity extends Activity {
     private CheckBox benchmarkSummaryConsent, benchmarkSummaryHardware;
     private Spinner benchmarkSummaryCooling;
     private TextView benchmarkSummaryStatus, benchmarkSummaryJson;
+    private LinearLayout benchmarkSummaryTechnical;
+    private Button benchmarkSummaryDetails;
     private Button benchmarkSummaryPrepare, benchmarkSummaryCopy, benchmarkSummarySave, benchmarkSummaryEdit;
     private final ThreadPoolExecutor reportExecutor = new ThreadPoolExecutor(1, 1, 0L,
             TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2), runnable -> {
@@ -413,6 +415,7 @@ public class MainActivity extends Activity {
     private boolean openingBenchmarkRecovered, openingBenchmarkRecoveredComplete;
     private boolean openingBenchmarkRecoveryRejected, openingBenchmarkRecoveryLaunch, openingBenchmarkRecoveryStoragePending;
     private boolean benchmarkStatusExpanded;
+    private String benchmarkProgressLabel="", benchmarkProgressRaw="";
     private boolean benchmarkReportVisible;
     private View.OnLayoutChangeListener configurationLayoutListener;
     private String latestBenchmarkReport = "";
@@ -713,7 +716,11 @@ public class MainActivity extends Activity {
         interactButton.setContentDescription(getString(R.string.interact));
         toggleHeldLightPoseButton.setContentDescription(getString(R.string.lower_lantern));
         updateVitalityHud(3, 3);
-        rtStatus.setOnClickListener(view -> { if(!benchmarkRunning) showDiagnostics(false); });
+        rtStatus.setOnClickListener(view -> {
+            if(benchmarkRunning || openingBenchmarkPending()) {
+                toggleBenchmarkProgressDetails();
+            } else showDiagnostics(false);
+        });
         if (isDebuggableApp()) {
             rtStatus.setOnLongClickListener(view -> {
                 developerOverlayVisible = !developerOverlayVisible;
@@ -2547,8 +2554,9 @@ public class MainActivity extends Activity {
         if(diagnosticsPanel!=null) diagnosticsPanel.setVisibility(View.GONE);
         if(rtStatus!=null) {
             rtStatus.setVisibility(View.VISIBLE);
-            rtStatus.setText(openingBenchmarkBlocked ? "Benchmark stopped. Could not return to the opening menu. Close and reopen The Horde." :
-                openingBenchmarkCancelRequested ? "Returning to opening menu..." : openingBenchmarkLabel()+". Back cancels.");
+            updateBenchmarkProgress(openingBenchmarkLabel(),openingBenchmarkBlocked ?
+                "Benchmark stopped. Could not return to the opening menu. Close and reopen The Horde." :
+                openingBenchmarkCancelRequested ? "Returning to opening menu..." : getString(R.string.benchmark_starting));
         }
         // This leaves campaign Play disabled. The native benchmark owner alone
         // advances Showcase and requires a fresh Entry frame before releasing UI.
@@ -2584,10 +2592,10 @@ public class MainActivity extends Activity {
         }
         if(!returned) {
             if(rtStatus!=null && state.phase==OpeningBenchmarkState.RETURNING)
-                rtStatus.setText("Returning to opening menu...");
+                updateBenchmarkProgress(openingBenchmarkLabel(),"Returning to opening menu...");
             if(rtStatus!=null && !openingBenchmarkCancelRequested && state.phase==OpeningBenchmarkState.RUNNING) {
                 final String progress=ProbeBridge.getBenchmarkProgress();
-                if(!progress.isEmpty()) rtStatus.setText(openingBenchmarkLabel()+"\n"+progress);
+                if(!progress.isEmpty()) updateBenchmarkProgress(openingBenchmarkLabel(),progress);
             }
             return;
         }
@@ -2598,7 +2606,7 @@ public class MainActivity extends Activity {
         openingBenchmarkCancelRequested=openingBenchmarkBlocked=false;
         openingBenchmarkOutput=null; openingBenchmarkProvisional=false;
         clearOpeningBenchmarkClient();openingBenchmarkRecovered=openingBenchmarkRecoveredComplete=false;
-        benchmarkRunning=false; entryMenuEnabled=true; entryMenuSidePage=false; entryPlayRequested=false;
+        benchmarkRunning=false; setBenchmarkStatusExpanded(false); entryMenuEnabled=true; entryMenuSidePage=false; entryPlayRequested=false;
         handler.removeCallbacks(refreshOpeningBenchmark);
         if(openingBenchmarkRecoveryStoragePending){openingBenchmarkRecoveryStoragePending=false;configureCampaignStorage();}
         if(completed) {
@@ -2643,8 +2651,9 @@ public class MainActivity extends Activity {
         latestBenchmarkReport = "";
         firstMenu = false;
         hideMenu();
-        setBenchmarkStatusExpanded(benchmarkAutomationId == null);
+        setBenchmarkStatusExpanded(false);
         menuButton.setVisibility(View.GONE);
+        updateBenchmarkProgress(getString(R.string.benchmark_running_label),getString(R.string.benchmark_starting));
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
@@ -2892,7 +2901,10 @@ public class MainActivity extends Activity {
         benchmarkSummaryJson.setTextSize(14);
         benchmarkSummaryJson.setTypeface(Typeface.MONOSPACE);
         benchmarkSummaryJson.setTextIsSelectable(true);
-        panel.addView(benchmarkSummaryJson, matchWrap());
+        benchmarkSummaryTechnical=new LinearLayout(this);
+        benchmarkSummaryTechnical.setOrientation(LinearLayout.VERTICAL);
+        benchmarkSummaryTechnical.setVisibility(View.GONE);
+        benchmarkSummaryTechnical.addView(benchmarkSummaryJson, matchWrap());
         benchmarkSummaryCopy = createMenuButton(getString(R.string.benchmark_summary_copy),
                 benchmarkSummaryAction(owner, generation, this::copyBenchmarkSummary));
         benchmarkSummarySave = createMenuButton(getString(R.string.benchmark_summary_save),
@@ -2905,10 +2917,26 @@ public class MainActivity extends Activity {
             panel.addView(button, menuButtonLayoutParams());
         }
         benchmarkSummarySendControls = StatisticsReportSendControls.benchmark(this, panel, reportExecutor,
-                owner, StatisticsReportSendControls.Services.production(this));
+                owner, StatisticsReportSendControls.Services.production(this), benchmarkSummaryTechnical);
+        benchmarkSummaryDetails=createMenuButton(getString(R.string.benchmark_technical_details),
+                benchmarkSummaryAction(owner,generation,() -> {
+                    setBenchmarkTechnicalExpanded(benchmarkSummaryTechnical.getVisibility()!=View.VISIBLE);
+                }));
+        benchmarkSummaryDetails.setMinHeight(dp(48));benchmarkSummaryDetails.setVisibility(View.GONE);
+        if(android.os.Build.VERSION.SDK_INT>=28)benchmarkSummaryDetails.setAccessibilityHeading(true);
+        setBenchmarkTechnicalExpanded(false);
+        panel.addView(benchmarkSummaryDetails,menuButtonLayoutParams());
+        panel.addView(benchmarkSummaryTechnical,matchWrap());
         addMenuButton(panel, getString(R.string.back),
                 benchmarkSummaryAction(owner, generation, () -> showBenchmarkReport(true)));
         attachPanel(panel);
+    }
+
+    private void setBenchmarkTechnicalExpanded(boolean expanded) {
+        benchmarkSummaryTechnical.setVisibility(expanded?View.VISIBLE:View.GONE);
+        benchmarkSummaryDetails.setText(expanded?R.string.benchmark_technical_hide:R.string.benchmark_technical_details);
+        if(android.os.Build.VERSION.SDK_INT>=30)benchmarkSummaryDetails.setStateDescription(
+            getString(expanded?R.string.benchmark_technical_expanded:R.string.benchmark_technical_collapsed));
     }
 
     private boolean isCurrentBenchmarkSummaryForm(BenchmarkSummaryReview owner, long generation) {
@@ -2938,6 +2966,7 @@ public class MainActivity extends Activity {
         benchmarkSummaryPrepare.setEnabled(false);
         benchmarkSummaryStatus.setText(R.string.benchmark_summary_prepared);
         benchmarkSummaryJson.setText(owner.json()); // Literal exact native UTF-8 JSON; never reserialized.
+        benchmarkSummaryDetails.setVisibility(View.VISIBLE);
         benchmarkSummaryCopy.setVisibility(View.VISIBLE);
         benchmarkSummarySave.setVisibility(View.VISIBLE);
         benchmarkSummaryEdit.setVisibility(View.VISIBLE);
@@ -3049,6 +3078,8 @@ public class MainActivity extends Activity {
         benchmarkSummaryCooling = null;
         benchmarkSummaryStatus = null;
         benchmarkSummaryJson = null;
+        benchmarkSummaryTechnical = null;
+        benchmarkSummaryDetails = null;
         benchmarkSummaryPrepare = null;
         benchmarkSummaryCopy = null;
         benchmarkSummarySave = null;
@@ -5828,14 +5859,40 @@ public class MainActivity extends Activity {
         rtStatus.setContentDescription(getString(R.string.rt_active)+"; opens diagnostics");
     }
 
+    private void toggleBenchmarkProgressDetails() {
+        if(!benchmarkRunning && !openingBenchmarkPending())return;
+        benchmarkStatusExpanded=!benchmarkStatusExpanded;
+        updateBenchmarkProgress(benchmarkProgressLabel,benchmarkProgressRaw);
+    }
+
+    private void updateBenchmarkProgress(String label,String progress) {
+        if(rtStatus==null)return;
+        benchmarkProgressLabel=label;benchmarkProgressRaw=progress;
+        final boolean returning=openingBenchmarkBlocked || openingBenchmarkCancelRequested;
+        final int hint=returning?(benchmarkStatusExpanded?R.string.benchmark_progress_hide_only:R.string.benchmark_progress_details_only):
+            benchmarkStatusExpanded?R.string.benchmark_progress_hide:R.string.benchmark_progress_details;
+        final String visible=label+"\n"+(benchmarkStatusExpanded?progress:BenchmarkProgressText.compact(progress))+"\n"+getString(hint);
+        if(!android.text.TextUtils.equals(rtStatus.getText(),visible))rtStatus.setText(visible);
+        rtStatus.setContentDescription(label+". "+progress+". "+getString(hint));
+        setBenchmarkStatusExpanded(benchmarkStatusExpanded);
+    }
+
     private void setBenchmarkStatusExpanded(boolean expanded) {
         if (rtStatus == null) return;
-        layoutRtStatus(false);
         benchmarkStatusExpanded = expanded;
-        rtStatus.setMaxLines(expanded ? 3 : 1);
-        final ViewGroup.LayoutParams layout = rtStatus.getLayoutParams();
-        layout.height = expanded ? ViewGroup.LayoutParams.WRAP_CONTENT : dp(40);
-        rtStatus.setLayoutParams(layout);
+        if(benchmarkRunning || openingBenchmarkPending()) {
+            android.graphics.Rect safe=HudSafeArea.read(findViewById(R.id.root));
+            FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)rtStatus.getLayoutParams();
+            p.gravity=Gravity.TOP|Gravity.CENTER_HORIZONTAL;p.width=ViewGroup.LayoutParams.MATCH_PARENT;
+            p.height=ViewGroup.LayoutParams.WRAP_CONTENT;p.topMargin=safe.top+dp(16);
+            p.leftMargin=safe.left+dp(16);p.rightMargin=safe.right+dp(16);p.setMarginEnd(p.rightMargin);
+            rtStatus.setLayoutParams(p);rtStatus.setMinWidth(0);rtStatus.setMaxWidth(Integer.MAX_VALUE);
+            rtStatus.setMaxLines(Integer.MAX_VALUE);rtStatus.setTextSize(13);
+        } else {
+            layoutRtStatus(false);rtStatus.setMaxLines(1);
+            FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)rtStatus.getLayoutParams();
+            p.height=dp(40);p.leftMargin=p.rightMargin=0;rtStatus.setLayoutParams(p);
+        }
     }
 
     private void setGameplayPaused(boolean paused) {
@@ -6694,7 +6751,8 @@ public class MainActivity extends Activity {
                     final int benchmarkStatus = ProbeBridge.getBenchmarkStatus();
                     if (benchmarkStatus == 1) {
                         final String progress = ProbeBridge.getBenchmarkProgress();
-                        rtStatus.setText(progress.isEmpty() ? getString(R.string.benchmark_starting) : progress);
+                        updateBenchmarkProgress(getString(R.string.benchmark_running_label),
+                            progress.isEmpty()?getString(R.string.benchmark_starting):progress);
                         rtStatus.setVisibility(View.VISIBLE);
                         menuButton.setVisibility(View.GONE);
                         attackButton.setVisibility(View.GONE);

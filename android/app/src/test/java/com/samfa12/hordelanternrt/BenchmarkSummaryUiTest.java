@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import java.lang.reflect.Field;
@@ -34,6 +35,11 @@ public final class BenchmarkSummaryUiTest {
         static String runId;
         static int calls, legacyCalls;
         static int publicCalls;
+        static int padding;
+        static byte[] padded(byte[] bytes) {
+            byte[] out=java.util.Arrays.copyOf(bytes,bytes.length+padding);
+            java.util.Arrays.fill(out,bytes.length,out.length,(byte)'\n');return out;
+        }
         static boolean summaryRequestReady;
         static byte[] lastPrepared;
         @Implementation protected static void __staticInitializer__() { }
@@ -42,7 +48,7 @@ public final class BenchmarkSummaryUiTest {
                 boolean consent,boolean hardware,int cooling) {
             ++calls;
             if(!run.equals(runId)) return new byte[]{2};
-            lastPrepared=BenchmarkSummaryReviewTest.prepared(run,report,hardware,cooling);
+            lastPrepared=padded(BenchmarkSummaryReviewTest.prepared(run,report,hardware,cooling));
             return lastPrepared;
         }
         @Implementation protected static boolean requestBenchmarkWithSummaryId(String run,String model) {
@@ -52,7 +58,7 @@ public final class BenchmarkSummaryUiTest {
                 boolean consent,boolean hardware,int cooling) {
             ++publicCalls;
             if(!run.equals(runId))return new byte[]{2};
-            return lastPrepared=BenchmarkSummaryReviewTest.publicPrepared(id,hardware);
+            return lastPrepared=padded(BenchmarkSummaryReviewTest.publicPrepared(id,hardware));
         }
         @Implementation protected static boolean requestBenchmark() { ++legacyCalls; return true; }
     }
@@ -67,7 +73,7 @@ public final class BenchmarkSummaryUiTest {
         set("menuScrim",scrim);
         SummaryBridgeShadow.runId=BenchmarkSummaryReviewTest.RUN;
         SummaryBridgeShadow.calls=0; SummaryBridgeShadow.legacyCalls=0;
-        SummaryBridgeShadow.publicCalls=0;
+        SummaryBridgeShadow.padding=0; SummaryBridgeShadow.publicCalls=0;
         SummaryBridgeShadow.summaryRequestReady=true; SummaryBridgeShadow.lastPrepared=null;
     }
     @After public void tearDown() throws Exception {
@@ -160,6 +166,39 @@ public final class BenchmarkSummaryUiTest {
             assertTrue(remote.consent.getMeasuredHeight()>=minimum);
             assertTrue(remote.review.getMeasuredHeight()>=minimum);
             assertTrue(remote.send.getMeasuredHeight()>=minimum);
+        }
+    }
+
+    @Test public void rawDetailsStayCollapsedBelowActionsAcrossSizesAndFreshForms() throws Exception {
+        Method open=MainActivity.class.getDeclaredMethod("showBenchmarkSummaryReview",boolean.class);open.setAccessible(true);
+        SummaryBridgeShadow.padding=9000; // Valid trailing JSON whitespace simulates a full native report.
+        for(boolean publicPreview:new boolean[]{false,true})for(float font:new float[]{1f,2f})
+        for(int[] size:new int[][]{{1080,1800},{1800,1080}}) {
+            Configuration config=new Configuration(activity.getResources().getConfiguration());config.fontScale=font;
+            activity.getResources().updateConfiguration(config,activity.getResources().getDisplayMetrics());
+            open.invoke(activity,publicPreview);prepare();
+            BenchmarkSummaryReview owner=get("benchmarkSummaryReview",BenchmarkSummaryReview.class);
+            byte[] exact=owner.exactJsonBytes();assertTrue(exact.length>9000);
+            LinearLayout raw=get("benchmarkSummaryTechnical",LinearLayout.class);
+            Button details=get("benchmarkSummaryDetails",Button.class);
+            StatisticsReportSendControls remote=get("benchmarkSummarySendControls",StatisticsReportSendControls.class);
+            assertEquals(View.GONE,raw.getVisibility());assertTrue(details.isAccessibilityHeading());
+            assertEquals(activity.getString(R.string.benchmark_technical_collapsed),details.getStateDescription());
+            LinearLayout panel=(LinearLayout)details.getParent();
+            assertTrue(panel.indexOfChild(remote.send)<panel.indexOfChild(details));
+            assertTrue(panel.indexOfChild(get("benchmarkSummarySave",Button.class))<panel.indexOfChild(details));
+            assertSame(raw,remote.preview.getParent());
+            scrim.measure(View.MeasureSpec.makeMeasureSpec(size[0],View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(size[1],View.MeasureSpec.EXACTLY));
+            scrim.layout(0,0,size[0],size[1]);
+            assertEquals(0,raw.getMeasuredHeight());assertTrue(details.getMeasuredHeight()>=Math.round(48*activity.getResources().getDisplayMetrics().density));
+            assertTrue(remote.send.getMeasuredWidth()<=size[0]);assertFalse(remote.consent.isChecked());
+            details.performClick();assertEquals(View.VISIBLE,raw.getVisibility());
+            assertEquals(activity.getString(R.string.benchmark_technical_expanded),details.getStateDescription());
+            assertEquals(owner.json(),get("benchmarkSummaryJson",TextView.class).getText().toString());
+            details.performClick();assertEquals(View.GONE,raw.getVisibility());assertArrayEquals(exact,owner.exactJsonBytes());
+            get("benchmarkSummaryEdit",Button.class).performClick();details.performClick(); // Detached heading cannot expand a replacement.
+            assertEquals(View.GONE,get("benchmarkSummaryTechnical",LinearLayout.class).getVisibility());
+            assertFalse(get("benchmarkSummaryConsent",CheckBox.class).isChecked());
         }
     }
 

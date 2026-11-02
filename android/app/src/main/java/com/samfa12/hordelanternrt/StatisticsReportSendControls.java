@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 
-/** Foreground statistics submission seam. Production remains unavailable. */
+/** Foreground submission controls; consent, transport and verification retain their owners. */
 final class StatisticsReportSendControls {
     interface TokenCallback { void completed(String token); }
     interface Verification {
@@ -69,25 +69,30 @@ final class StatisticsReportSendControls {
 
     static StatisticsReportSendControls benchmark(Activity activity, LinearLayout panel, Executor worker,
             BenchmarkSummaryReview local, Services services) {
+        return benchmark(activity,panel,worker,local,services,null);
+    }
+    static StatisticsReportSendControls benchmark(Activity activity, LinearLayout panel, Executor worker,
+            BenchmarkSummaryReview local, Services services, LinearLayout technicalDetails) {
         return new StatisticsReportSendControls(activity, panel, worker, local::isPrepared,
                 (owner, consent) -> local.isPublicPreview() ? owner.beginPublicBenchmarkSummary(local, consent) :
-                    owner.beginPrivateBenchmarkSummary(local, consent), local.isPublicPreview(), services);
+                    owner.beginPrivateBenchmarkSummary(local, consent), local.isPublicPreview(), services, technicalDetails);
     }
     static StatisticsReportSendControls compatibility(Activity activity, LinearLayout panel, Executor worker,
             CompatibilityReportReview local, Services services) {
         return new StatisticsReportSendControls(activity, panel, worker, local::isPrepared,
-                (owner, consent) -> owner.beginPrivateCompatibility(local, consent), false, services);
+                (owner, consent) -> owner.beginPrivateCompatibility(local, consent), false, services, null);
     }
     private StatisticsReportSendControls(Activity activity, LinearLayout panel, Executor worker,
-            BooleanSupplier prepared, Admission admission, boolean publicResult, Services services) {
+            BooleanSupplier prepared, Admission admission, boolean publicResult, Services services, LinearLayout technicalDetails) {
         this.activity = activity; this.prepared = prepared; this.admission = admission;
         this.publicResult = publicResult; this.services = services == null ? Services.unavailable() : services;
         submission = new PlaytestReportSubmission(worker::execute, this.services.transport);
         consent = new CheckBox(activity); consent.setText(publicResult ? R.string.statistics_publish_consent : R.string.statistics_private_send_consent);
         consent.setTextColor(HordeUiTokens.PARCHMENT); consent.setMinHeight(dp(48)); panel.addView(consent);
         review = button(panel, publicResult ? R.string.statistics_review_public_submission : R.string.statistics_review_private_submission);
-        text(panel, R.string.statistics_submission_preview);
-        preview = text(panel, 0); preview.setTypeface(Typeface.MONOSPACE); preview.setTextIsSelectable(true);
+        final LinearLayout raw=technicalDetails==null?panel:technicalDetails;
+        text(raw, R.string.statistics_submission_preview);
+        preview = text(raw, 0); preview.setTypeface(Typeface.MONOSPACE); preview.setTextIsSelectable(true);
         send = button(panel, publicResult ? R.string.statistics_publish_send : R.string.statistics_private_send);
         status = text(panel, this.services.verification == null ? R.string.statistics_send_unavailable : R.string.statistics_live_available);
         status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
