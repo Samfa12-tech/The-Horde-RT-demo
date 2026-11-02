@@ -15,7 +15,7 @@ int main()
         if (!condition) { std::cerr << message << '\n'; passed = false; }
     };
     const auto fallback=horde::platform::windows::WindowsGraphicsStartupFallback(path,{100,2});
-    check(fallback==PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows) && fallback.dustQuality==DustQuality::Low,
+    check(fallback==PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows) && fallback.dustQuality==DustQuality::Standard,
           "absent graphics/display preferences select Reset-equivalent LOW particles");
     WritePrivateProfileStringA("display","renderScale","75",filename.c_str());
     check(horde::platform::windows::WindowsGraphicsStartupFallback(path,{75,2}).dustQuality==DustQuality::Off,

@@ -134,7 +134,7 @@ inline GraphicsSettings PlatformDefaultGraphicsSettings(const GraphicsPlatform p
             WaterQuality::Mobile, FireDetail::Mobile, 30, false,
             ShadowQuality::Current, false, DustQuality::Low} :
         GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true,
-            ShadowQuality::Current, true, DustQuality::Low};
+            ShadowQuality::Current, true, DustQuality::Standard};
 }
 
 inline GraphicsSettings ReducedEffectsGraphicsSettings(const GraphicsPlatform platform) noexcept

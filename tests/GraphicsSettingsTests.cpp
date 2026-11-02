@@ -333,7 +333,7 @@ void TestPlatformDefaultsAndMist()
     const auto desktop = PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows);
     Check(mobile == GraphicsSettings{33, WaterQuality::Mobile, FireDetail::Mobile, 30, false, ShadowQuality::Current, false, DustQuality::Low},
           "fresh mobile defaults keep approved33/Mobile/Mobile/30/GlassOff/Current/MistOff/DustLow");
-    Check(desktop == GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true, ShadowQuality::Current, true, DustQuality::Low},
+    Check(desktop == GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true, ShadowQuality::Current, true, DustQuality::Standard},
           "fresh desktop defaults preserve High appearance and MistOn with owner-approved DustLow");
     Check(MatchGraphicsPreset(mobile, GraphicsPlatform::Android) == GraphicsPreset::PlatformDefault &&
           GraphicsPresetName(GraphicsPreset::PlatformDefault) == "Platform defaults" &&
@@ -390,7 +390,7 @@ void TestDustMigrationAndAcknowledgement()
     using namespace horde::graphics;
     Check(GraphicsSettings{}.dustQuality == DustQuality::Off &&
           PlatformDefaultGraphicsSettings(GraphicsPlatform::Android).dustQuality == DustQuality::Low &&
-          PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows).dustQuality == DustQuality::Low,
+          PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows).dustQuality == DustQuality::Standard,
           "fresh/reset defaults use Low while historical/migration structs keep Off");
     for (const auto platform : {GraphicsPlatform::Android, GraphicsPlatform::Windows})
     {
