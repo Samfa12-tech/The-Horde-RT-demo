@@ -400,6 +400,9 @@ public:
     // Candidate source binding only, chosen before resource creation. Empty
     // retains the original runtime asset; no platform selects this normally.
     bool SetPlayerUtilityCandidateAsset(std::string path) {
+        // Destroy retains the device and immutable binding for scene/profile
+        // recreation. Reasserting that exact selection changes no resources.
+        if(path==playerUtilityCandidateAsset_)return true;
         if(ready_ || device_!=VK_NULL_HANDLE)return false;
         playerUtilityCandidateAsset_=std::move(path);return true;
     }

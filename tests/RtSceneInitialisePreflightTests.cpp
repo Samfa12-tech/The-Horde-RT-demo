@@ -18,8 +18,18 @@ struct PresentableTinyRtScenePreflightTestAccess {
             "/assets/models/player/source/flask-native-binding-r1/gothic-traveller-flask-candidate.runtime.glb";
         if(!source.playerUtilityCandidateAsset_.empty() || !source.SetPlayerUtilityCandidateAsset(path))return false;
         source.ready_=true;
+        const bool sameWhileReady=source.SetPlayerUtilityCandidateAsset(path);
         const bool rejected=!source.SetPlayerUtilityCandidateAsset({});source.ready_=false;
-        if(!rejected)return false;
+        if(!rejected || !sameWhileReady)return false;
+        // Model the retained device identity after Destroy without creating or
+        // invoking a Vulkan device. Clear the sentinel before any destruction.
+        source.device_=reinterpret_cast<VkDevice>(std::uintptr_t{1});
+        const bool sameAfterRetirement=source.SetPlayerUtilityCandidateAsset(path);
+        const bool changedAfterRetirement=source.SetPlayerUtilityCandidateAsset(path+".different");
+        const bool clearedAfterRetirement=source.SetPlayerUtilityCandidateAsset({});
+        source.device_=VK_NULL_HANDLE;
+        if(!sameAfterRetirement || changedAfterRetirement || clearedAfterRetirement ||
+           source.playerUtilityCandidateAsset_!=path)return false;
         PresentableTinyRtScene moved(std::move(source));
         if(moved.playerUtilityCandidateAsset_!=path || !source.playerUtilityCandidateAsset_.empty())return false;
         moved.Destroy();

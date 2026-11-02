@@ -1,5 +1,19 @@
 # Android RT Device Compatibility Record
 
+## 2026-11-02 - Isolated flask application Entry, normal New Game failure
+
+Physical SM-S948B / Adreno 840, RayTracingPipeline. Arm64-only Debug candidate
+APK `f55e105d017cc3f4a0d1e81c6a561a3f40bfc8a27c11272934cc6166af1670d4`
+reached a presented normal RT Entry and the empty-slot chooser. One normal New
+Game failed during Entry-to-Showcase replacement before a new initialization
+receipt. This is Entry/UI plus failure-diagnosis evidence, not a gameplay,
+revival/flask, full-device compatibility or performance pass. The exact-path
+utility-binding retention fix and new CPU regression await the coordinated
+build/runtime check. All 593 original files, including 27 preference/career
+files, were restored with matching hashes; latest debug stopped, Home restored
+and phone released. Production/actor packages unchanged. No Send or publication.
+[Artifact, cause, pending checks and cleanup](evidence/2026-11-01-attack-rings/ANDROID_APPLICATION_QA.md).
+
 ## 2026-11-01 - Private attack rings and forest endpoint
 
 SM-S948B / Android 17 / Adreno 840, RayTracingPipeline, saved 25%. Debug APK `7c0e118d663dfe94cdaf251ce40531baa179055688ba884ec5f4120f31e6ec84` installed in place with matching debug signer and exact installed hash readback. Fresh staged yellow/red warning captures and cold forest endpoint each presented 12 stable RT frames. Yellow is close-range cropped in portrait; moving readability and hit-fragment visibility remain owner checks. Live practice recording faced a wall after skip and is not positive combat acceptance. Six original preferences/career files restored exactly; debug stopped and phone released. No performance claim. [Evidence, failed attempts and remaining gates](evidence/2026-11-01-attack-rings/README.md).
