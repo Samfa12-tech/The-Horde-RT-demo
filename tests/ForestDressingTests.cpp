@@ -1477,17 +1477,25 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
     if(auditRestBasins) {
         const auto prior=terrain;auto baseline=owner;
         const auto materials=owner.materials.size(),indices=owner.indices.size();
-        std::array<FlaskRestBasinPlacement,3> basins;
+        std::array<FlaskRestBasinPlacement,2> basins;
         const bool appended=AppendFlaskRestBasins(owner,terrain,basins,diagnostic);
         Check(appended,diagnostic);if(!appended)return;
         Check(ConsolidateWorldBakedMaterialFamilies(owner,diagnostic) &&
             owner.materials.size()==materials && owner.primitives.size()==baseline.primitives.size() &&
-            owner.indices.size()==indices+972 && owner.HasValidTriangleProvenance(),
+            owner.indices.size()==indices+648 && owner.HasValidTriangleProvenance(),
             "actual complete chapter merges basins into its same masonry rows and retains all contributors");
         const horde::vulkan::raytracing::StaticRtAssetRegistration registration{0u,1u,
             static_cast<std::uint32_t>(horde::vulkan::raytracing::RtInstanceFlag::StaticPbr),0u,&owner};
         horde::vulkan::raytracing::RtStaticMeshSlot packed;
         Check(packed.Initialize(std::span(&registration,1),diagnostic),diagnostic);
+        const auto lower=gameplay::traversal::kLowerLanding;
+        for(float offset:{-.5f,0.f,.5f}) {
+            const bool before=prior->NonWalkableVolumeClear(lower.x+offset,lower.z,
+                lower.x+offset,lower.z,lower.y+.001f,lower.y+1.8f,gameplay::kPlayerCollisionRadius);
+            const bool after=terrain->NonWalkableVolumeClear(lower.x+offset,lower.z,
+                lower.x+offset,lower.z,lower.y+.001f,lower.y+1.8f,gameplay::kPlayerCollisionRadius);
+            Check(before==after,"removing the boss-room basin leaves lower combat contact unchanged");
+        }
         for(std::size_t i=0;i<basins.size();++i) {
             const auto p=basins[i].anchor;
             for(float from:{-1.25f,-.5f,0.f,.5f,1.25f}) {
@@ -1498,7 +1506,7 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
                 Check(before==after,"basins preserve swept canonical rope/arrival approach contact");
             }
         }
-        std::cout<<"Rest basin full chapter packing: triangles=324 materials="<<materials
+        std::cout<<"Rest basin full chapter packing: triangles=216 materials="<<materials
             <<" primitives="<<owner.primitives.size()<<" no GPU/image claim\n";
         return;
     }

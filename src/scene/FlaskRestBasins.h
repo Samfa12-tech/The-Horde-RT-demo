@@ -7,13 +7,14 @@
 namespace horde::scene {
 // Original code-authored stone furniture. One repeatable hollow basin with a
 // carved flask on its back teaches refill; no imported source, light or water
-// shader. All three share the existing masonry family and static RT owner.
+// shader. The two exterior basins share masonry and static RT ownership. The
+// boss room stays clear for combat and has no refill furniture.
 struct FlaskRestBasinPlacement {
     gameplay::traversal::Vec3 anchor{}, centre{};
 };
 inline bool AppendFlaskRestBasins(assets::StaticMeshAsset& owner,
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain,
-    std::array<FlaskRestBasinPlacement,3>& placements,std::string& diagnostic)
+    std::array<FlaskRestBasinPlacement,2>& placements,std::string& diagnostic)
 {
     namespace sim=gameplay::simulation;namespace tr=gameplay::traversal;
     using Surface=sim::TriangleSupportSurface;
@@ -28,28 +29,20 @@ inline bool AppendFlaskRestBasins(assets::StaticMeshAsset& owner,
     }
     const auto end=sim::kWorldRoutePoints.back();const auto ground=terrain->Query(end.x,end.z);
     if(!ground.found || !ground.walkable) {diagnostic="Lookout basin lacks canonical support.";return false;}
-    placements={{{tr::kLowerLanding,tr::kLowerLanding},
-        {tr::kExteriorLanding,tr::kExteriorLanding},
+    placements={{{tr::kExteriorLanding,tr::kExteriorLanding},
         {{end.x,ground.worldY,end.z},{end.x,ground.worldY,end.z}}}};
     std::vector<assets::StaticRtVertex> vertices;std::vector<std::uint32_t> indices;
     std::vector<Surface::Triangle> contact;
     for(std::size_t site=0;site<placements.size();++site) {
-        auto& p=placements[site];p.centre.x+=site==2?-.78f:.78f;
+        auto& p=placements[site];p.centre.x+=site==1?-.78f:.78f;
         float bottom=-INFINITY;
         for(float dx:{-.23f,.23f})for(float dz:{-.23f,.23f}) {
             const float x=p.centre.x+dx,z=p.centre.z+dz;
-            if(site==0) {
-                if(!gameplay::IsShowcasePlayerPositionWalkable(x,z)) {
-                    diagnostic="Lower basin footprint leaves its authored stone floor.";return false;
-                }
-                bottom=tr::kLowerSupportWorldY;
-            } else {
-                const auto under=tr::ChapterExteriorSupport(terrain.get(),x,z);
-                if(!under.grounded || std::abs(under.worldY-p.anchor.y)>.08f) {
-                    diagnostic="Basin footprint leaves its earned landing or terrain support.";return false;
-                }
-                bottom=std::max(bottom,under.worldY);
+            const auto under=tr::ChapterExteriorSupport(terrain.get(),x,z);
+            if(!under.grounded || std::abs(under.worldY-p.anchor.y)>.08f) {
+                diagnostic="Basin footprint leaves its earned landing or terrain support.";return false;
             }
+            bottom=std::max(bottom,under.worldY);
         }
         p.centre.y=bottom;
         // Square stepped foot, slender stem, hollow bowl with four thick rims,

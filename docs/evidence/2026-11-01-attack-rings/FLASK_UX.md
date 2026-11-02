@@ -75,6 +75,24 @@ Save/Load/Retry. Full natural-route, footsteps on all surfaces, fireflies, bone
 particles, lich goo, sheath, ring, treasury context and Standard benchmark
 apply/measure/cancel/restore acceptance are not established by this checkpoint.
 
+## Owner correction after Windows playtest (2 November)
+
+The original three-basin placement above describes the earlier candidate, not
+the current intended scene. The lower/boss-room basin and its refill action are
+removed because the furniture sits in combat space. The earned lower checkpoint
+remains a valid save/Retry boundary; it simply cannot refill there. The
+upper-rope and forest-lookout basins remain, sharing the original masonry and
+authored exterior collision. The complete-chapter geometry count is now 216
+triangles across two basins. The owner passed two consecutive death/Retry
+cycles in the separate compact-flask Windows candidate, not in this revision.
+
+Kit's one-time spoken introduction to the upper-rope basin is a separate
+pending integration. Two conditional cuts were generated on the existing
+Mureka website Kit voice for 40 of the authorised 100 Gold; Chrome blocked the
+download with `ERR_BLOCKED_BY_CLIENT`, so no audio has been admitted or shipped.
+No new line is yet wired to gameplay, and no extra generation or credit purchase
+is implied by this note.
+
 
 ## Touch flask icon follow-up
 

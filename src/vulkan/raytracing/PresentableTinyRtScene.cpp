@@ -3379,7 +3379,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         // Only the explicitly selected native flask application adds furniture.
         // Ordinary public/default packages retain their previous geometry.
         if(!playerUtilityCandidateAsset_.empty()) {
-            std::array<horde::scene::FlaskRestBasinPlacement,3> basins;
+            std::array<horde::scene::FlaskRestBasinPlacement,2> basins;
             if(!horde::scene::AppendFlaskRestBasins(collapseStaticAsset_,chapterTerrainSurface_,basins,diagnostic))return false;
         }
         // The collapse's final masonry range and the first dressing range use

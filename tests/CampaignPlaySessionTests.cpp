@@ -748,7 +748,7 @@ int FlaskConfirmedRetry(const std::shared_ptr<const sim::TriangleSupportSurface>
     auto config=sim::ProductionGameSimulationConfig();config.healingFlask1_7=true;
     sim::GameSimulation game(config);cp::PlaySession play(game,directory.path,&faults);
     Check(play.BeginNewGame(0),"flask recovery selects only the first independent slot");
-    auto saved=Record(1);saved.schema=3;saved.halfHeart=true;saved.flask={true,1};
+    auto saved=Record(1,true);saved.schema=3;saved.halfHeart=true;saved.flask={true,1};
     if(!Seed(game,saved,terrain)){Check(false,"exact half-heart flask record restores on actual support");return 1;}
     Check(play.ObserveSafeBoundary() && Until(play,[&]{return play.State().outcome==cp::PlayOutcome::Succeeded;}),
         "actual first checkpoint publication is acknowledged before retry admission");
@@ -792,7 +792,7 @@ int FlaskConfirmedRetry(const std::shared_ptr<const sim::TriangleSupportSurface>
     // Publication identities belong to the owner, not elapsed test ticks.
     for(int i=0;i<600 && !game.Snapshot().flaskRestAnchor;++i)step();
     Check(game.Snapshot().flaskRestAnchor==static_cast<unsigned>(saved.id),
-        "restored lower checkpoint has an actual eligible recovery point");
+        "restored upper-rope checkpoint has an actual eligible recovery point");
     const auto revision=game.CampaignBoundaryRevision(),rest=game.Snapshot().completedRestGeneration;
     ++input.commands.rest;for(int i=0;i<130;++i)step();
     Check(game.Snapshot().completedRestGeneration==rest+1 &&

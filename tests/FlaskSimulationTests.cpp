@@ -214,14 +214,20 @@ int main(int argc,char** argv) {
         auto owner=mesh;owner.materials[0].name="MedievalWall02";
         const auto beforeVertices=owner.vertices.size(),beforeIndices=owner.indices.size();
         const auto beforeMaterials=owner.materials.size();auto support=terrain;
-        std::array<horde::scene::FlaskRestBasinPlacement,3> basins;
+        std::array<horde::scene::FlaskRestBasinPlacement,2> basins;
         const bool appended=horde::scene::AppendFlaskRestBasins(owner,support,basins,error);
         if(!appended)std::cerr<<error<<'\n';
-        Check(appended,"all three original rest basins fit actual anchor support");
+        Check(appended,"both exterior rest basins fit actual anchor support");
         if(appended) {
-            Check(owner.materials.size()==beforeMaterials && owner.indices.size()==beforeIndices+3*9*12*3 &&
-                owner.vertices.size()==beforeVertices+3*9*24 && owner.HasValidTriangleProvenance(),
-                "three bounded324-triangle basins share existing material/address/provenance ownership");
+            Check(basins[0].anchor.x==tr::kExteriorLanding.x &&
+                basins[0].anchor.z==tr::kExteriorLanding.z &&
+                basins[1].anchor.x==kWorldRoutePoints.back().x &&
+                std::hypot(basins[0].centre.x-tr::kLowerLanding.x,
+                    basins[0].centre.z-tr::kLowerLanding.z)>1.f,
+                "first furniture belongs above the rope, with no boss-room basin");
+            Check(owner.materials.size()==beforeMaterials && owner.indices.size()==beforeIndices+2*9*12*3 &&
+                owner.vertices.size()==beforeVertices+2*9*24 && owner.HasValidTriangleProvenance(),
+                "two bounded324-triangle basins share existing material/address/provenance ownership");
             for(const auto& basin:basins) {
                 Check(std::hypot(basin.anchor.x-basin.centre.x,basin.anchor.z-basin.centre.z)<1.f,
                     "basin is reachable inside unchanged1m earned action radius");
@@ -237,7 +243,7 @@ int main(int argc,char** argv) {
         }
     }
     Check(!ProductionGameSimulationConfig().healingFlask1_7,"normal gameplay does not admit the diagnostic flask");
-    for(auto id:{cp::CheckpointId::LowerClaimed,cp::CheckpointId::SafeExit,cp::CheckpointId::ForestEndpoint}) {
+    for(auto id:{cp::CheckpointId::SafeExit,cp::CheckpointId::ForestEndpoint}) {
         GameSimulation game(Config());const auto old=Record(id,*terrain);
         Check(Restore(game,old,terrain),"each old safe boundary restores on actual terrain");
         auto input=Neutral(game);Tick(game,input);
@@ -279,6 +285,16 @@ int main(int argc,char** argv) {
         }
     }
     {
+        auto lower=Record(cp::CheckpointId::LowerClaimed,*terrain);lower.schema=3;lower.flask={false,0};
+        GameSimulation game(Config());Check(Restore(game,lower,terrain),"boss-room checkpoint remains loadable");
+        auto input=Neutral(game);Tick(game,input,3);
+        Check(!game.Snapshot().flaskRestAnchor && !game.Snapshot().flaskNearbyRestAnchor,
+            "boss room has no refill point or basin interaction during combat");
+        ++input.commands.rest;Tick(game,input,130);
+        Check(Health(game)==2 && game.Snapshot().healingFlask.resources.charges==0,
+            "rest command cannot heal or refill at the removed boss-room basin");
+    }
+    {
         cp::Checkpoint legacy;legacy.vitality=1;
         legacy.torchDropX=-2.48f;legacy.torchDropZ=-16.4f; // old accepted trigger edge, not a player spawn
         GameSimulation game(Config());Check(Restore(game,legacy,terrain),"legacy trigger-edge record restores without moving progress");
@@ -293,13 +309,13 @@ int main(int argc,char** argv) {
         }
         input.dialogueCompletionLine=0;input.dialogueCompletionGeneration=0;
         Check(game.Snapshot().chapterDialogue.line==dialogue::Line::None &&
-              game.Snapshot().flaskRestAnchor==static_cast<unsigned>(cp::CheckpointId::LowerClaimed),
-              "ordinary matching dialogue completions expose recovery without new story flags");
+              !game.Snapshot().flaskRestAnchor,
+              "dialogue completion cannot expose the removed boss-room refill point");
         ++input.commands.rest;Tick(game,input,120);
-        Check(Health(game)==6 && game.Snapshot().healingFlask.resources.charges==2 &&
+        Check(Health(game)==2 && game.Snapshot().healingFlask.resources.charges==0 &&
               game.Snapshot().torchFailure.droppedX==legacy.torchDropX &&
               game.Snapshot().torchFailure.droppedZ==legacy.torchDropZ,
-              "legacy edge data retains the same earned reachable Rest route");
+              "legacy edge data remains intact without a boss-room refill");
     }
     {
         auto c=Record(cp::CheckpointId::LowerClaimed,*terrain);c.schema=3;c.halfHeart=true;c.flask={true,1};
@@ -419,7 +435,7 @@ int main(int argc,char** argv) {
               "active blocked dodge rejects a drink request without healing or consuming");
     }
     {
-        for(const auto id:{cp::CheckpointId::LowerClaimed,cp::CheckpointId::SafeExit,cp::CheckpointId::ForestEndpoint}) {
+        for(const auto id:{cp::CheckpointId::SafeExit,cp::CheckpointId::ForestEndpoint}) {
             auto c=Record(id,*terrain);c.schema=3;c.flask={false,0};
             GameSimulation game(Config());Check(Restore(game,c,terrain),"discovery restores actual earned anchor");
             auto input=Neutral(game);Tick(game,input,2);

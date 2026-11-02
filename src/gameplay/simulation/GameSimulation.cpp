@@ -3232,13 +3232,11 @@ std::optional<campaign::CheckpointId> GameSimulation::EligibleFlaskRestAnchor() 
 {
     if(!config_.healingFlask1_7 || !config_.developmentRescueJourney || !chapterTerrain_)return std::nullopt;
     const auto endpoint=kWorldRoutePoints.back();
-    const auto id=!rescueTraversal_.Snapshot().exteriorSide?campaign::CheckpointId::LowerClaimed:
-        (std::hypot(playerX_-traversal::kExteriorLanding.x,playerZ_-traversal::kExteriorLanding.z)<=1.f?
-         campaign::CheckpointId::SafeExit:campaign::CheckpointId::ForestEndpoint);
-    const auto x=id==campaign::CheckpointId::LowerClaimed?traversal::kLowerLanding.x:
-        id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.x:endpoint.x;
-    const auto z=id==campaign::CheckpointId::LowerClaimed?traversal::kLowerLanding.z:
-        id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.z:endpoint.z;
+    if(!rescueTraversal_.Snapshot().exteriorSide)return std::nullopt;
+    const auto id=std::hypot(playerX_-traversal::kExteriorLanding.x,playerZ_-traversal::kExteriorLanding.z)<=1.f?
+         campaign::CheckpointId::SafeExit:campaign::CheckpointId::ForestEndpoint;
+    const auto x=id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.x:endpoint.x;
+    const auto z=id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.z:endpoint.z;
     if(std::hypot(playerX_-x,playerZ_-z)>1.f)return std::nullopt;
     // Reuse the earned boundary's actual terrain/story/contact predicates;
     // only our own transient recovery action is excluded from serialization.
@@ -3258,14 +3256,12 @@ std::uint32_t GameSimulation::NearbyFlaskRestAnchor() const
     // A latched campaign record proves the story was actually earned. Do not
     // rerun usable-now checks here: walking/guarding must not erase discovery.
     const bool exterior=rescueTraversal_.Snapshot().exteriorSide;
-    for(const auto id:{campaign::CheckpointId::LowerClaimed,campaign::CheckpointId::SafeExit,
-                       campaign::CheckpointId::ForestEndpoint}) {
-        if((id!=campaign::CheckpointId::LowerClaimed)!=exterior ||
-           (exterior && !rescueTraversal_.Snapshot().firstAscentCompleted) ||
+    for(const auto id:{campaign::CheckpointId::SafeExit,campaign::CheckpointId::ForestEndpoint}) {
+        if(!exterior || !rescueTraversal_.Snapshot().firstAscentCompleted ||
            (id==campaign::CheckpointId::ForestEndpoint &&
             (campaignBoundary_->contentRevision<2 || !campaign::CompletedForestProgress(chapterDialogue_.ExportProgress()))) ||
            worldRoute_.readiness[static_cast<std::size_t>(campaign::Destination(id))]!=ZoneReadiness::Ready)continue;
-        auto p=id==campaign::CheckpointId::LowerClaimed?traversal::kLowerLanding:traversal::kExteriorLanding;
+        auto p=traversal::kExteriorLanding;
         if(id==campaign::CheckpointId::ForestEndpoint) {
             const auto end=kWorldRoutePoints.back();const auto ground=chapterTerrain_->Query(end.x,end.z);
             if(!ground.found || !ground.walkable)continue;
