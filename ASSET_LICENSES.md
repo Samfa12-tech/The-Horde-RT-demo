@@ -826,3 +826,18 @@ This extends the prior CPU-only boundary to an executable validation candidate.
 It does not certify RT hand/contact/reflection/shadow joins, touch/controller
 feel, lifecycle or normal-play/release admission. Ordinary packaging explicitly
 disables this trial and the private revival trial, including cached build options.
+
+
+## Original earned flask rest basins - 2 November 2026
+
+`src/scene/FlaskRestBasins.h` is original code-authored hollow stone basin and
+carved bottle geometry, repeated only at the existing lower-rope, upper-rope and
+forest-lookout earned anchors. No imported mesh, provider generation, new audio,
+texture bytes, paid input or standalone source asset is used. The existing
+`MedievalWall02` masonry material and its recorded texture rights remain in force.
+No new blanket licence or exclusive copyright claim is assigned. The324 new
+triangles share the existing static PBR owner and their exact render triangles
+supply nonwalkable contact; no new light, water shader, BLAS or material owner is
+introduced. Furniture is selected only by the explicit native flask candidate.
+Source/CPU integration and build checks do not admit ordinary shipping or prove
+native visual, touch, audio or lifecycle acceptance.

@@ -917,7 +917,7 @@ std::atomic<int> gPlayerLifePhase{static_cast<int>(horde::gameplay::PlayerLifePh
 std::atomic<std::int32_t> gPlayerRetryCheckpoint{0};
 std::atomic<bool> gPlayerConfirmedRetryMode{false};
 std::mutex gHealingFlaskUiMutex;
-std::array<jlong,8> gHealingFlaskUiState{1,0,0,0,0,0,2,0};
+std::array<jlong,10> gHealingFlaskUiState{2,0,0,0,0,0,2,0,0,0};
 std::atomic<float> gKeeperTitleOpacity{0.0f};
 std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndingPhase::Inactive)};
 // Bit 0: INTERACT, bit 1: RAISE, bit 2: LOWER. Bits 3..5 carry the shared
@@ -1204,12 +1204,14 @@ void PublishSimulationUiState()
     gPlayerRetryCheckpoint.store(simulation.retryCheckpoint, std::memory_order_release);
     {
         std::lock_guard lock(gHealingFlaskUiMutex);
-        gHealingFlaskUiState={1,static_cast<jlong>(gSwapchainContext.surfaceGeneration),
+        gHealingFlaskUiState={2,static_cast<jlong>(gSwapchainContext.surfaceGeneration),
             simulation.healingFlaskEnabled?1:0,simulation.flaskDrinkEligible?1:0,
             static_cast<jlong>(simulation.flaskRestAnchor),
             static_cast<jlong>(simulation.healingFlask.resources.charges),
             static_cast<jlong>(simulation.healingFlask.resources.Capacity()),
-            static_cast<jlong>(simulation.healingFlask.action)};
+            static_cast<jlong>(simulation.healingFlask.action),
+            static_cast<jlong>(simulation.flaskNearbyRestAnchor),
+            static_cast<jlong>(simulation.flaskHint)};
     }
     gPlayerLifePhase.store(static_cast<int>(vitals.phase), std::memory_order_release);
     gFinaleEndingPhase.store(
@@ -7283,7 +7285,7 @@ void RequestHealingFlaskSemantic(bool rest)
 extern "C" JNIEXPORT jlongArray JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getHealingFlaskState(JNIEnv* env,jclass)
 {
-    std::array<jlong,8> state;
+    std::array<jlong,10> state;
     {std::lock_guard lock(gHealingFlaskUiMutex);state=gHealingFlaskUiState;}
     auto result=env->NewLongArray(static_cast<jsize>(state.size()));
     if(result)env->SetLongArrayRegion(result,0,static_cast<jsize>(state.size()),state.data());

@@ -317,6 +317,8 @@ private:
     void DiscardUtilityCombatCommands();
     bool FlaskCompetingIntent(const InputSnapshot& input) const;
     std::optional<campaign::CheckpointId> EligibleFlaskRestAnchor() const;
+    std::uint32_t NearbyFlaskRestAnchor() const;
+    void RefreshFlaskGuidance(const InputSnapshot& input);
     healing::FlaskContext FlaskContextFor(const InputSnapshot&, bool cancel, bool acceptedDamage) const;
     void StepHealingFlask(const InputSnapshot& input, float gameplaySeconds,
                           bool competingIntent, int healthBeforeEncounter);
@@ -386,6 +388,7 @@ private:
     items::UtilityEquipmentLease flaskEquipmentLease_{};
     items::UtilityHandReturn flaskHandReturn_{};
     std::uint64_t flaskCompletionTick_=0;
+    std::uint64_t flaskInterruptedUntilTick_=0;
     std::uint64_t campaignRetryRequestGeneration_=0,completedRestGeneration_=0;
     TravelFootstepCadence playerFootsteps_{};
     DryFootstepSequence dryFootstepCues_{};

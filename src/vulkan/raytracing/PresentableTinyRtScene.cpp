@@ -5,6 +5,7 @@
 #include "scene/ForestRockDressing.h"
 #include "scene/ForestDeadwood.h"
 #include "scene/ForestRoadClue.h"
+#include "scene/FlaskRestBasins.h"
 #include "scene/BellwetherShell.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/RescueLidFinish.h"
@@ -3375,6 +3376,12 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         if(SelectForestSurroundingsPrototype() &&
            !horde::scene::AppendPreparedForestSurroundings(root,*forestSharedLayout_.prepared,collapseStaticAsset_,
                chapterTerrainSurface_,forestSurroundingsPrototype_,diagnostic))return false;
+        // Only the explicitly selected native flask application adds furniture.
+        // Ordinary public/default packages retain their previous geometry.
+        if(!playerUtilityCandidateAsset_.empty()) {
+            std::array<horde::scene::FlaskRestBasinPlacement,3> basins;
+            if(!horde::scene::AppendFlaskRestBasins(collapseStaticAsset_,chapterTerrainSurface_,basins,diagnostic))return false;
+        }
         // The collapse's final masonry range and the first dressing range use
         // the same material. Keep every triangle while sharing one metadata row;
         // High's physical lantern panes must fit alongside this resident scene.

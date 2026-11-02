@@ -262,6 +262,7 @@ constexpr int kBenchmarkSaveButtonId = 122;
 constexpr int kBenchmarkBackButtonId = 123;
 constexpr int kBenchmarkReviewStatsButtonId = 205;
 constexpr int kVitalityHudControlId = 124;
+constexpr int kFlaskHudControlId = 7000;
 constexpr int kEndingBodyId = 125;
 constexpr int kWaterQualityButtonId = 126;
 constexpr int kGraphicsOpenButtonId = 190;
@@ -796,6 +797,9 @@ struct VulkanSurfaceContext
     bool chestInteractionPromptPresented = false;
     bool rescueInteractionPromptPresented = false;
     bool flaskUpgradeInteractionPromptPresented = false;
+    bool flaskLessonSeen=false,flaskUpgradeLessonSeen=false;
+    ULONGLONG flaskLessonUntil=0;
+    int flaskHudWidth=0,flaskHudDpi=0;
     bool mouseCursorHidden = false;
     bool environmentSurveyActive=false,environmentSurveyWaterDisabled=false,environmentSurveyDebrisDisabled=false;
     std::string environmentSurveyProfile;
@@ -2430,7 +2434,7 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
             const RECT subtitleRect{candidate.x, candidate.y,
                 candidate.x + candidate.width, candidate.y + candidate.height};
             int collisions = 0;
-            for (const int controlId : {kHudControlId, kVitalityHudControlId,
+            for (const int controlId : {kHudControlId, kVitalityHudControlId, kFlaskHudControlId,
                                         kCombatTeachingPromptId, kChestPromptControlId})
             {
                 HWND control = GetDlgItem(context.windowHandle, controlId);
@@ -3134,8 +3138,68 @@ void LayoutVitalityHud(HWND window, int clientWidth, int maximum)
     }
 }
 
+void UpdateFlaskHud(VulkanSurfaceContext& context)
+{
+    const auto& s=context.simulation.Snapshot();
+    HWND hud=GetDlgItem(context.windowHandle,kFlaskHudControlId);if(!hud)return;
+    const bool visible=s.healingFlaskEnabled && s.playerAlive && !context.entryMenuVisible &&
+        !context.simulationPaused && !context.pauseMenuVisible && !context.settingsVisible &&
+        !context.diagnosticsVisible && !context.benchmarkReportVisible && !context.rtLabVisible &&
+        !context.deathOverlayVisible && !context.endingOverlayVisible && !context.benchmark.IsRunning() &&
+        GetPropA(context.windowHandle,kCaptureModeProperty)==nullptr;
+    SetControlVisible(context.windowHandle,kFlaskHudControlId,visible);
+    if(!visible)return;
+    const auto& flask=s.healingFlask;const bool controller=context.teachingControllerGlyphs;
+    std::string text="FLASK "+std::to_string(flask.resources.charges)+" / "+
+        std::to_string(flask.resources.Capacity());
+    text+=flask.resources.charges==0?" EMPTY":flask.resources.charges==flask.resources.Capacity()?" FULL":"";
+    text+=controller?" | D-pad Up: Drink":" | H: Drink";
+    using horde::gameplay::healing::FlaskHint;
+    switch(s.flaskHint) {
+    case FlaskHint::FullHealth:text+="\nHealth full. Keep your charges.";break;
+    case FlaskHint::Empty:text+="\nRefill at an earned stone basin.";break;
+    case FlaskHint::StandStill:text+="\nStand still and lower your guard to drink.";break;
+    case FlaskHint::Returning:text+="\nReturning flask. Wait for your hand.";break;
+    case FlaskHint::Interrupted:text+="\nInterrupted. No charge used; try again when still.";break;
+    case FlaskHint::Drinking:text+="\nDrinking... Movement or a hit interrupts.";break;
+    case FlaskHint::Resting:text+="\nResting... Stay still for 2 seconds.";break;
+    default:text+="\nDrink restores one heart. Stay still.";break;
+    }
+    if(s.flaskNearbyRestAnchor && s.healingFlask.action==horde::gameplay::healing::FlaskAction::Idle &&
+       s.flaskHint!=FlaskHint::Returning && s.flaskHint!=FlaskHint::Interrupted) {text.resize(text.find("\n"));text+=s.flaskRestAnchor?
+        (controller?"\nD-pad Down: Rest / refill":"\nJ: Rest / refill"):
+        "\nStone basin nearby. Move closer, then stand still.";}
+    // Presentation-only teaching: no modal, quest flag or gameplay mutation.
+    const bool quiet=(!s.combatTeaching.enabled || s.combatTeaching.promptOpacity<=0.f) &&
+        s.playerCombat.action==horde::gameplay::PlayerCombatAction::Idle &&
+        s.chapterDialogue.line==horde::gameplay::dialogue::Line::None;
+    const auto now=GetTickCount64();
+    if(quiet && (!context.flaskLessonSeen || (flask.resources.upgraded && !context.flaskUpgradeLessonSeen))) {
+        context.flaskLessonSeen=true;context.flaskUpgradeLessonSeen=flask.resources.upgraded;
+        context.flaskLessonUntil=now+8000;
+    }
+    if(quiet && now<context.flaskLessonUntil && !s.flaskNearbyRestAnchor &&
+       (s.flaskHint==FlaskHint::FullHealth || s.flaskHint==FlaskHint::Ready)) {
+        text.resize(text.find("\n"));text+=flask.resources.upgraded?
+        "\nCapacity increased to 3. Rest fills the new slot.":
+        "\nHolds two charges. Drink heals one heart; earned basins refill.";}
+    const bool changed=horde::platform::windows::SetNativeTextIfChanged(hud,text);
+    RECT client{};GetClientRect(context.windowHandle,&client);
+    const int width=std::max(1,std::min<int>(client.right-ScaleForDpi(context.windowHandle,28),ScaleForDpi(context.windowHandle,430)));
+    const int dpi=GetDpiForWindow(context.windowHandle);
+    if(!changed && context.flaskHudWidth==width && context.flaskHudDpi==dpi)return;
+    context.flaskHudWidth=width;context.flaskHudDpi=dpi;
+    HDC dc=GetDC(hud);HFONT font=reinterpret_cast<HFONT>(SendMessageA(hud,WM_GETFONT,0,0));
+    HGDIOBJ old=dc&&font?SelectObject(dc,font):nullptr;RECT measured{0,0,width,0};
+    if(dc)DrawTextA(dc,text.c_str(),-1,&measured,DT_CALCRECT|DT_WORDBREAK|DT_NOPREFIX);
+    if(dc&&old&&old!=HGDI_ERROR)SelectObject(dc,old);if(dc)ReleaseDC(hud,dc);
+    MoveWindow(hud,ScaleForDpi(context.windowHandle,14),ScaleForDpi(context.windowHandle,92),
+        width,std::max<int>(ScaleForDpi(context.windowHandle,56),measured.bottom+ScaleForDpi(context.windowHandle,8)),TRUE);
+}
+
 void UpdateVitalityHud(VulkanSurfaceContext& context)
 {
+    UpdateFlaskHud(context);
     const horde::gameplay::PlayerVitalsSnapshot& vitals = context.simulation.Snapshot().playerVitals;
     // Native accessible name is retained; the owner-drawn HUD only paints hearts.
     const std::string current = vitals.halfHeart
@@ -3554,6 +3618,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
         ClearDesktopInput(context);
         DiscardDesktopPendingCommands(context);
     }
+    UpdateFlaskHud(context); // Synchronous UI suspension cannot leave a stale gameplay plate.
     // Overlay transitions are synchronous. Re-evaluate here so a chest prompt
     // cannot survive for one rendered frame beneath pause, death, finale, lab,
     // diagnostics, benchmark, settings, or capture UI.
@@ -5803,6 +5868,7 @@ void UpdateDesktopSceneControls(
     // snapshot back here would erase right-stick and mouse look accumulated
     // between ticks. Reset/checkpoint paths still request a full view mirror.
     MirrorSimulationSnapshot(context, false);
+    UpdateFlaskHud(context); // Charges, action and input-source cues can change without a health change.
     if (context.simulation.Snapshot().playerVitals.vitality != previousVitality ||
         context.simulation.Snapshot().playerVitals.halfHeart != previousHalfHeart ||
         context.simulation.Snapshot().playerVitals.phase != previousLifePhase)
@@ -10678,7 +10744,7 @@ void ApplyDpiScaledFonts(HWND window)
     }
 #endif
     for (const int id : {kHudControlId,
-                         kVitalityHudControlId,
+                         kVitalityHudControlId, kFlaskHudControlId,
                          kChestPromptControlId,
                          kCombatTeachingPromptId,
                          kPauseTitleId,
@@ -13160,6 +13226,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     createStatic(kHudControlId, kHudStartingText, SS_LEFT | SS_CENTERIMAGE | SS_NOTIFY);
     createStatic(kVitalityHudControlId, "Vitality 3 of 3", SS_OWNERDRAW);
+    createStatic(kFlaskHudControlId, "", SS_LEFT);
     if (HWND prompt = createStatic(kCombatTeachingPromptId, "", SS_OWNERDRAW))
     {
         SetWindowLongPtrA(prompt, GWL_EXSTYLE,

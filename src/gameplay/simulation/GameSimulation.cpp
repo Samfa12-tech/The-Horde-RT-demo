@@ -252,6 +252,8 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         ActivateScheduledCombatEdges();
     const bool flaskCompeting=FlaskCompetingIntent(input);
     if(config_.healingFlask1_7 && flaskCompeting) {
+        if(!input.paused && healingFlask_.Snapshot().action!=healing::FlaskAction::Idle)
+            flaskInterruptedUntilTick_=tickIndex_+180;
         CancelFlaskUtility();
         healingFlask_.Cancel();
     }
@@ -796,7 +798,7 @@ void GameSimulation::ResetRoute()
     }
     skeletonRevivalWorkshopBypass_ = false; revivedIdlePhaseZero_ = false;
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 && config_.waterfallSkeletonEncounter);
-    if(config_.healingFlask1_7){healingFlask_.ResetNewGame();flaskCompletionTick_=0;}
+    if(config_.healingFlask1_7){healingFlask_.ResetNewGame();flaskCompletionTick_=0;flaskInterruptedUntilTick_=0;}
     DiscardFlaskRequests();
     campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
@@ -3247,6 +3249,50 @@ std::optional<campaign::CheckpointId> GameSimulation::EligibleFlaskRestAnchor() 
     return id;
 }
 
+std::uint32_t GameSimulation::NearbyFlaskRestAnchor() const
+{
+    if(!config_.healingFlask1_7 || !chapterTerrain_ || !campaignBoundary_ ||
+       chapterTerrainGeneration_!=worldRoute_.generation || !playerSupport_.grounded ||
+       rescueTraversal_.IsActive() || pendingCampaignRestore_ ||
+       playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive)return 0;
+    // A latched campaign record proves the story was actually earned. Do not
+    // rerun usable-now checks here: walking/guarding must not erase discovery.
+    const bool exterior=rescueTraversal_.Snapshot().exteriorSide;
+    for(const auto id:{campaign::CheckpointId::LowerClaimed,campaign::CheckpointId::SafeExit,
+                       campaign::CheckpointId::ForestEndpoint}) {
+        if((id!=campaign::CheckpointId::LowerClaimed)!=exterior ||
+           (exterior && !rescueTraversal_.Snapshot().firstAscentCompleted) ||
+           (id==campaign::CheckpointId::ForestEndpoint &&
+            (campaignBoundary_->contentRevision<2 || !campaign::CompletedForestProgress(chapterDialogue_.ExportProgress()))) ||
+           worldRoute_.readiness[static_cast<std::size_t>(campaign::Destination(id))]!=ZoneReadiness::Ready)continue;
+        auto p=id==campaign::CheckpointId::LowerClaimed?traversal::kLowerLanding:traversal::kExteriorLanding;
+        if(id==campaign::CheckpointId::ForestEndpoint) {
+            const auto end=kWorldRoutePoints.back();const auto ground=chapterTerrain_->Query(end.x,end.z);
+            if(!ground.found || !ground.walkable)continue;
+            p={end.x,ground.worldY,end.z};
+        }
+        if(std::hypot(playerX_-p.x,playerZ_-p.z)<=3.f &&
+           std::abs(playerSupport_.worldY-p.y)<=.35f)return static_cast<std::uint32_t>(id);
+    }
+    return 0;
+}
+
+void GameSimulation::RefreshFlaskGuidance(const InputSnapshot& input)
+{
+    snapshot_.flaskNearbyRestAnchor=NearbyFlaskRestAnchor();
+    if(snapshot_.flaskRestAnchor)snapshot_.flaskNearbyRestAnchor=snapshot_.flaskRestAnchor;
+    using healing::FlaskHint;
+    const auto& flask=healingFlask_.Snapshot();
+    const auto context=FlaskContextFor(input,false,false);
+    snapshot_.flaskHint=flask.action==healing::FlaskAction::Drinking?FlaskHint::Drinking:
+        flask.action==healing::FlaskAction::Resting?FlaskHint::Resting:
+        FlaskUtilityBusy()?FlaskHint::Returning:
+        tickIndex_<flaskInterruptedUntilTick_?FlaskHint::Interrupted:
+        flask.resources.charges==0?FlaskHint::Empty:
+        context.healthHalfUnits>=6?FlaskHint::FullHealth:
+        !context.drinkEligible?FlaskHint::StandStill:FlaskHint::Ready;
+}
+
 healing::FlaskContext GameSimulation::FlaskContextFor(const InputSnapshot& input,
                                                     bool cancel,bool acceptedDamage) const
 {
@@ -3313,6 +3359,9 @@ void GameSimulation::StepHealingFlask(const InputSnapshot& input,float gameplayS
         else (void)healingFlask_.BeginRest(context);
     }
     const auto completion=healingFlask_.Step(gameplaySeconds,context);
+    if(before.action!=healing::FlaskAction::Idle && !completion.completed &&
+       healingFlask_.Snapshot().action==healing::FlaskAction::Idle)
+        flaskInterruptedUntilTick_=tickIndex_+180;
     if(utilityDrink) {
         if(completion.completed) {
             flaskHandReturn_=proposedHand;
@@ -3342,6 +3391,7 @@ void GameSimulation::StepHealingFlask(const InputSnapshot& input,float gameplayS
         snapshot_.healingFlask.resources.charges>0;
     const auto anchor=context.restEligible?EligibleFlaskRestAnchor():std::nullopt;
     snapshot_.flaskRestAnchor=anchor?static_cast<std::uint32_t>(*anchor):0u;
+    RefreshFlaskGuidance(input);
 }
 
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
@@ -3409,6 +3459,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         healingFlask_.Snapshot().resources.charges>0;
     const auto rest=recovery.restEligible?EligibleFlaskRestAnchor():std::nullopt;
     snapshot_.flaskRestAnchor=rest?static_cast<std::uint32_t>(*rest):0u;
+    RefreshFlaskGuidance(input);
     // Recompute from the phases just advanced on this authoritative tick, not
     // the pre-step teaching cue. Readability survives disabled/completed lessons.
     snapshot_.combatTeaching.attackReadability = EvaluateAttackReadability(

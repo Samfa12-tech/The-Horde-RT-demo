@@ -10,6 +10,7 @@
 #include "scene/ForestRockDressing.h"
 #include "scene/ForestDeadwood.h"
 #include "scene/ForestRoadClue.h"
+#include "scene/FlaskRestBasins.h"
 #include "scene/BellwetherShell.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/ChapterTerrainSurface.h"
@@ -43,6 +44,7 @@ using namespace horde::scene;
 using namespace horde::scene::assets;
 namespace gameplay = horde::gameplay;
 int failures = 0;
+bool auditRestBasins=false;
 const std::filesystem::path kRoot{HORDE_RT_SOURCE_DIR};
 
 void Check(bool condition, std::string_view message)
@@ -1472,6 +1474,34 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
         ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);
     Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);
     if (!prepared) return;
+    if(auditRestBasins) {
+        const auto prior=terrain;auto baseline=owner;
+        const auto materials=owner.materials.size(),indices=owner.indices.size();
+        std::array<FlaskRestBasinPlacement,3> basins;
+        const bool appended=AppendFlaskRestBasins(owner,terrain,basins,diagnostic);
+        Check(appended,diagnostic);if(!appended)return;
+        Check(ConsolidateWorldBakedMaterialFamilies(owner,diagnostic) &&
+            owner.materials.size()==materials && owner.primitives.size()==baseline.primitives.size() &&
+            owner.indices.size()==indices+972 && owner.HasValidTriangleProvenance(),
+            "actual complete chapter merges basins into its same masonry rows and retains all contributors");
+        const horde::vulkan::raytracing::StaticRtAssetRegistration registration{0u,1u,
+            static_cast<std::uint32_t>(horde::vulkan::raytracing::RtInstanceFlag::StaticPbr),0u,&owner};
+        horde::vulkan::raytracing::RtStaticMeshSlot packed;
+        Check(packed.Initialize(std::span(&registration,1),diagnostic),diagnostic);
+        for(std::size_t i=0;i<basins.size();++i) {
+            const auto p=basins[i].anchor;
+            for(float from:{-1.25f,-.5f,0.f,.5f,1.25f}) {
+                const bool before=prior->NonWalkableVolumeClear(p.x,p.z+from,p.x,p.z,
+                    p.y+.001f,p.y+1.8f,gameplay::kPlayerCollisionRadius);
+                const bool after=terrain->NonWalkableVolumeClear(p.x,p.z+from,p.x,p.z,
+                    p.y+.001f,p.y+1.8f,gameplay::kPlayerCollisionRadius);
+                Check(before==after,"basins preserve swept canonical rope/arrival approach contact");
+            }
+        }
+        std::cout<<"Rest basin full chapter packing: triangles=324 materials="<<materials
+            <<" primitives="<<owner.primitives.size()<<" no GPU/image claim\n";
+        return;
+    }
     Check(understory.placements.size()==18 && understory.triangles==17712,
           "real exported terrain supports all bounded understory clumps before native owner packing");
     Check(deadwood.placements.size()==10 && deadwood.triangles==11904 && deadwood.nonWalkableTriangles==11884 && deadwood.stepTriangles==20,
@@ -1973,6 +2003,7 @@ void TestTriangleRegionFailures()
 
 int main(int argc,char** argv)
 {
+    if(argc==2 && std::string_view(argv[1])=="--flask-basins") {auditRestBasins=true;TestNativeChapterPrimitiveOwnership();return failures?1:0;}
     if(argc==2 && std::string_view(argv[1])=="--containment") {auditContainment=true;TestFullSurroundings();return failures?1:0;}
     if(argc==2 && std::string_view(argv[1])=="--surroundings480") { TestFullSurroundings();return failures?1:0; }
     if(argc==2 && std::string_view(argv[1])=="--f01-north68") {

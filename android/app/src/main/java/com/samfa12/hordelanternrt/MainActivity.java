@@ -338,6 +338,14 @@ public class MainActivity extends Activity {
     private TextView developerOverlay;
     private Button menuButton;
     private TextView vitalityStatus;
+    private LinearLayout flaskPanel, flaskTouchActions;
+    private TextView flaskStatus, flaskHint;
+    private Button drinkFlaskButton, restButton;
+    private long flaskLessonUntil;
+    private int flaskPreviousCapacity, flaskLessonResource;
+    private boolean flaskFirstLessonShown, flaskPickupLessonShown, flaskLayoutListenerInstalled;
+    private int flaskLayoutWidth=-1,flaskLayoutTop=-1,flaskLayoutStart=-1,flaskLayoutBacking,
+            flaskLayoutOrientation=-1;
     private TextView keeperRevealTitle;
     private Button attackButton;
     private Button parryButton;
@@ -684,6 +692,7 @@ public class MainActivity extends Activity {
         interactButton = findViewById(R.id.interact_button);
         toggleHeldLightPoseButton = findViewById(R.id.toggle_held_light_pose_button);
         vitalityStatus = findViewById(R.id.vitality_status);
+        bindHealingFlaskHud();
         controllerPrompt = findViewById(R.id.controller_prompt);
         combatTeachingPrompt = findViewById(R.id.combat_teaching_prompt);
         appRoot = findViewById(R.id.root);
@@ -1173,7 +1182,7 @@ public class MainActivity extends Activity {
         menuScrim.setBackgroundColor(0xFF050403);
         diagnosticsPanel.setVisibility(View.GONE);
         for(View control:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,
-                interactButton,toggleHeldLightPoseButton,rtStatus,vitalityStatus,developerOverlay})
+                interactButton,toggleHeldLightPoseButton,rtStatus,vitalityStatus,flaskPanel,developerOverlay})
             if(control!=null)control.setVisibility(View.GONE);
         int runtime=0;
         try {if(surfaceRequestGeneration>0)runtime=ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);}
@@ -1423,6 +1432,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
         menuScrim.removeAllViews();
@@ -1571,6 +1581,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
@@ -2418,7 +2429,7 @@ public class MainActivity extends Activity {
         menuVisible=true;entryPlayRequested=false;
         if(menuScrim!=null){menuScrim.removeAllViews();menuScrim.setVisibility(View.GONE);}
         for(View view:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,interactButton,
-                toggleHeldLightPoseButton,vitalityStatus,developerOverlay,diagnosticsPanel})if(view!=null)view.setVisibility(View.GONE);
+                toggleHeldLightPoseButton,vitalityStatus,flaskPanel,developerOverlay,diagnosticsPanel})if(view!=null)view.setVisibility(View.GONE);
         if(rtStatus!=null){rtStatus.setVisibility(View.VISIBLE);rtStatus.setText(
             "Benchmark recovery could not identify its renderer owner. No surface or other run was changed. Close this screen and reopen after that run ends.");}
     }
@@ -2549,7 +2560,7 @@ public class MainActivity extends Activity {
         menuVisible=false; benchmarkReportVisible=false; diagnosticsVisible=false;
         entryPlayRequested=false;
         if(menuScrim!=null) { menuScrim.removeAllViews(); menuScrim.setVisibility(View.GONE); }
-        for(View action:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,vitalityStatus,developerOverlay})
+        for(View action:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,vitalityStatus,flaskPanel,developerOverlay})
             if(action!=null) action.setVisibility(View.GONE);
         if(diagnosticsPanel!=null) diagnosticsPanel.setVisibility(View.GONE);
         if(rtStatus!=null) {
@@ -2661,6 +2672,7 @@ public class MainActivity extends Activity {
         if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.VISIBLE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         rtStatus.setText(R.string.benchmark_starting);
     }
 
@@ -2814,6 +2826,7 @@ public class MainActivity extends Activity {
         developerOverlay.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
         menuScrim.removeAllViews();
@@ -4238,7 +4251,7 @@ public class MainActivity extends Activity {
         int left = insetLeft + dp(18), right = width - insetRight - dp(18);
         int topStart = insetTop + dp(8), bottomEnd = height - insetBottom - dp(8);
         final int divider = topStart + Math.max(0, bottomEnd - topStart) * 55 / 100;
-        final View[] topObstacles = {rtStatus, vitalityStatus, keeperRevealTitle,
+        final View[] topObstacles = {rtStatus, vitalityStatus, flaskPanel, keeperRevealTitle,
                 developerOverlay, menuButton};
         final View[] bottomObstacles = {controllerPrompt, attackButton, parryButton,
                 dodgeButton, interactButton, runButton, crouchButton};
@@ -5628,6 +5641,38 @@ public class MainActivity extends Activity {
             updateVitalityHud(lastPlayerVitality, lastPlayerMaxVitality, lastPlayerHalfHeart);
             vitalityStatus.setBackground(HordeUiTokens.plate(this,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
         }
+        layoutHealingFlaskHud();
+    }
+
+    private void layoutHealingFlaskHud() {
+        if(flaskPanel==null || preferences==null)return;
+        final View root=findViewById(R.id.root);
+        final android.graphics.Rect safe=HudSafeArea.read(root);
+        final int width=root!=null && root.getWidth()>0?root.getWidth():getResources().getDisplayMetrics().widthPixels;
+        final InterfacePreferences.Values values=InterfacePreferences.read(preferences);
+        FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)flaskPanel.getLayoutParams();
+        final int vitalityHeight=vitalityStatus!=null && vitalityStatus.getHeight()>0?vitalityStatus.getHeight():dp(44);
+        final int top=dp(24)+safe.top+vitalityHeight,start=dp(16)+safe.left;
+        final int plateWidth=Math.max(dp(96),Math.min(dp(280),width-safe.left-safe.right-dp(96)));
+        final int backing=interfaceBacking(values,HordeUiTokens.CHARCOAL);
+        final int orientation=getResources().getConfiguration().fontScale>=1.5f?LinearLayout.VERTICAL:LinearLayout.HORIZONTAL;
+        if(flaskLayoutWidth==plateWidth && flaskLayoutTop==top && flaskLayoutStart==start &&
+                flaskLayoutBacking==backing && flaskLayoutOrientation==orientation)return;
+        flaskLayoutWidth=plateWidth;flaskLayoutTop=top;flaskLayoutStart=start;
+        flaskLayoutBacking=backing;flaskLayoutOrientation=orientation;
+        p.gravity=Gravity.TOP|Gravity.START;p.setMarginStart(start);p.topMargin=top;p.width=plateWidth;
+        p.height=FrameLayout.LayoutParams.WRAP_CONTENT;flaskPanel.setLayoutParams(p);
+        flaskPanel.setPadding(dp(8),dp(6),dp(8),dp(6));
+        flaskPanel.setBackground(HordeUiTokens.plate(this,interfaceBacking(values,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
+        // Stack rather than truncate either action at enlarged system fonts.
+        flaskTouchActions.setOrientation(orientation);
+        for(Button b:new Button[]{drinkFlaskButton,restButton}) {
+            LinearLayout.LayoutParams action=new LinearLayout.LayoutParams(
+                    flaskTouchActions.getOrientation()==LinearLayout.VERTICAL?ViewGroup.LayoutParams.MATCH_PARENT:0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,flaskTouchActions.getOrientation()==LinearLayout.VERTICAL?0:1);
+            b.setLayoutParams(action);b.setMinHeight(dp(48));b.setMinWidth(dp(48));b.setAllCaps(false);
+            styleGameplayActionButton(b,interfaceBacking(values,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT,false);
+        }
     }
 
     private void layoutRtStatus(boolean compact) {
@@ -5944,6 +5989,7 @@ public class MainActivity extends Activity {
         if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         refreshDiagnosticsText();
         diagnosticsPanel.setVisibility(View.VISIBLE);
@@ -6022,6 +6068,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
@@ -6052,6 +6099,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
@@ -6100,6 +6148,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
@@ -6762,6 +6811,7 @@ public class MainActivity extends Activity {
                         if (crouchButton != null) crouchButton.setVisibility(View.GONE);
                         updateContextualControls(false);
                         vitalityStatus.setVisibility(View.GONE);
+                        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
                     } else if (benchmarkStatus == 2 || benchmarkStatus == 3) {
                         latestBenchmarkReport = ProbeBridge.getBenchmarkReport();
                         if (latestBenchmarkReport.isEmpty()) {
@@ -7427,6 +7477,7 @@ public class MainActivity extends Activity {
         if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         clearTouchState();
     }
@@ -8052,6 +8103,7 @@ public class MainActivity extends Activity {
     }
 
     private void configureGameplayActionButtons() {
+        bindHealingFlaskHud();
         swingTouch = new PressActionButton(attackButton, this::canSendGameplayAction, () -> {
             clearRunIntent();
             ProbeBridge.requestAttack();
@@ -8407,11 +8459,6 @@ public class MainActivity extends Activity {
         String prompt="";
         if(interactLabel!=0)prompt+=(interactEnabled?"A: ":"")+getString(interactLabel);
         if(raise || lower)prompt+="\nY: "+getString(raise?R.string.raise_lantern:R.string.lower_lantern);
-        HealingFlaskUiState flask=readHealingFlaskState();
-        if(flask!=null && flask.enabled) {
-            prompt+="\n"+getString(R.string.controller_flask_drink,flask.charges,flask.capacity);
-            if(flask.restAnchor!=0)prompt+="\n"+getString(R.string.controller_flask_rest);
-        }
         prompt=prompt.trim();
         controllerPrompt.setText(prompt); controllerPrompt.setContentDescription(prompt);
         controllerPrompt.setVisibility(prompt.isEmpty()?View.GONE:View.VISIBLE);
@@ -8451,6 +8498,96 @@ public class MainActivity extends Activity {
         LanternPoseControl.apply(toggleHeldLightPoseButton, lower,
                 getString(raise ? R.string.raise_lantern : R.string.lower_lantern));
         toggleHeldLightPoseButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
+    }
+
+    private void bindHealingFlaskHud() {
+        flaskPanel=findViewById(R.id.flask_panel);
+        flaskStatus=findViewById(R.id.flask_status);flaskHint=findViewById(R.id.flask_hint);
+        flaskTouchActions=findViewById(R.id.flask_touch_actions);
+        drinkFlaskButton=findViewById(R.id.drink_flask_button);restButton=findViewById(R.id.rest_button);
+        if(drinkFlaskButton!=null)drinkFlaskButton.setOnClickListener(view -> requestHealingFlaskAction(false));
+        if(restButton!=null)restButton.setOnClickListener(view -> requestHealingFlaskAction(true));
+        if(flaskPanel!=null && !flaskLayoutListenerInstalled) {
+            flaskLayoutListenerInstalled=true;
+            flaskPanel.addOnLayoutChangeListener((view,l,t,r,b,oldL,oldT,oldR,oldB) -> {
+                positionFlaskTeachingPrompt();reflowChapterDialoguePlacement();
+            });
+        }
+    }
+
+    private void positionFlaskTeachingPrompt() {
+        if(combatTeachingPrompt==null)return;
+        FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)combatTeachingPrompt.getLayoutParams();
+        int top=dp(148);
+        if(flaskPanel!=null && flaskPanel.getVisibility()==View.VISIBLE)
+            top=Math.max(top,flaskPanel.getBottom()+dp(8));
+        if(p.topMargin!=top) {p.topMargin=top;combatTeachingPrompt.setLayoutParams(p);}
+    }
+
+    private void updateHealingFlaskHud(boolean controlsAllowed) {
+        if(flaskPanel==null)return;
+        final HealingFlaskUiState flask=controlsAllowed?readHealingFlaskState():null;
+        if(flask==null || !flask.enabled) {
+            flaskPanel.setVisibility(View.GONE);positionFlaskTeachingPrompt();return;
+        }
+        final boolean touch=!controllerMode && latestSubtitleInputMode==SUBTITLE_INPUT_TOUCH;
+        final long now=SystemClock.uptimeMillis();
+        final boolean quiet=(combatTeachingPrompt==null || combatTeachingPrompt.getVisibility()!=View.VISIBLE) &&
+                (chapterSubtitlePanel==null || chapterSubtitlePanel.getVisibility()!=View.VISIBLE) &&
+                (keeperRevealTitle==null || keeperRevealTitle.getVisibility()!=View.VISIBLE);
+        // Presentation-only session latch: surface recreation does not replay the first lesson.
+        if(flaskPreviousCapacity>0 && flask.capacity>flaskPreviousCapacity) {
+            flaskLessonResource=R.string.flask_upgrade_lesson;flaskLessonUntil=0;
+        }
+        flaskPreviousCapacity=flask.capacity;
+        if(quiet && !flaskPickupLessonShown && (ProbeBridge.getContextualControlState()&CONTEXTUAL_FLASK_UPGRADE)!=0) {
+            flaskPickupLessonShown=true;flaskLessonResource=R.string.flask_pickup_lesson;flaskLessonUntil=0;
+        }
+        if(quiet && flaskLessonResource==0 && !flaskFirstLessonShown) {
+            flaskFirstLessonShown=true;flaskLessonResource=R.string.flask_first_lesson;flaskLessonUntil=0;
+        }
+        if(quiet && flaskLessonResource!=0 && flaskLessonUntil==0)flaskLessonUntil=now+8000;
+        String status=flask.empty()?getString(R.string.flask_empty,flask.capacity):
+                getString(flask.full()?R.string.flask_full:R.string.flask_charges,flask.charges,flask.capacity);
+        status+="\n"+getString(controllerMode?R.string.flask_controller_guidance:
+                touch?R.string.flask_touch_guidance:R.string.flask_keyboard_guidance);
+        if(!android.text.TextUtils.equals(flaskStatus.getText(),status))flaskStatus.setText(status);
+        flaskStatus.setContentDescription(status);
+        int reason=flaskHintResource(flask);
+        String hint=reason==0?"":getString(reason);
+        if(flask.action==0 && flask.hint!=4 && flask.hint!=5 && flask.nearbyRestAnchor!=0) {
+            hint=getString(flask.restAnchor==0?R.string.flask_rest_wait_hint:
+                    controllerMode?R.string.flask_rest_controller_guidance:
+                    touch?R.string.flask_rest_touch_guidance:R.string.flask_rest_keyboard_guidance);
+        } else if(quiet && now<flaskLessonUntil && flask.action==0 && (flask.hint==0 || flask.hint==1)) {
+            hint=getString(flaskLessonResource);
+        }
+        // Keep the existing lesson/subtitle lane clear; urgent in-progress/cancellation feedback remains.
+        if(!quiet && flask.action==0 && flask.hint!=4 && flask.hint!=5)hint="";
+        if(!android.text.TextUtils.equals(flaskHint.getText(),hint))flaskHint.setText(hint);
+        flaskHint.setContentDescription(hint);
+        flaskHint.setVisibility(hint.isEmpty()?View.GONE:View.VISIBLE);
+        flaskTouchActions.setVisibility(touch?View.VISIBLE:View.GONE);
+        drinkFlaskButton.setEnabled(flask.allows(false));
+        drinkFlaskButton.setContentDescription(getString(R.string.flask_drink)+". "+status+". "+hint);
+        restButton.setVisibility(flask.nearbyRestAnchor!=0?View.VISIBLE:View.GONE);
+        restButton.setEnabled(flask.allows(true));
+        restButton.setContentDescription(getString(R.string.flask_rest)+". "+hint);
+        flaskPanel.setVisibility(View.VISIBLE);
+        layoutHealingFlaskHud();positionFlaskTeachingPrompt();
+    }
+
+    private static int flaskHintResource(HealingFlaskUiState state) {
+        switch(state.hint) {
+            case 1:return R.string.flask_health_full_hint;
+            case 2:return R.string.flask_empty_hint;
+            case 3:return R.string.flask_still_hint;
+            case 4:return R.string.flask_returning_hint;
+            case 5:return R.string.flask_interrupted_hint;
+            case 6:return R.string.flask_drinking_hint;
+            case 7:return R.string.flask_resting_hint;
+            default:return state.empty()?R.string.flask_empty_hint:0;
+        }
     }
 
     private HealingFlaskUiState readHealingFlaskState() {
@@ -8525,6 +8662,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateContextualControls(final boolean controlsAllowed) {
+        updateHealingFlaskHud(controlsAllowed);
         if (controllerPrompt != null) controllerPrompt.setVisibility(View.GONE);
         if (!controlsAllowed) {
             positionContextualPrompt(false);

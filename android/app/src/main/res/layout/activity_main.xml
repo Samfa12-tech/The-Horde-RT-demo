@@ -87,6 +87,60 @@
         android:textSize="12sp"
         android:textStyle="bold" />
 
+    <LinearLayout
+        android:id="@+id/flask_panel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="72dp"
+        android:orientation="vertical"
+        android:background="#D9151719"
+        android:padding="8dp"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/flask_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#F2E9D8"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:accessibilityLiveRegion="polite" />
+        <TextView
+            android:id="@+id/flask_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#F2E9D8"
+            android:textSize="11sp" />
+        <LinearLayout
+            android:id="@+id/flask_touch_actions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/drink_flask_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:padding="6dp"
+                android:text="@string/flask_drink"
+                android:textSize="12sp" />
+            <Button
+                android:id="@+id/rest_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:padding="6dp"
+                android:text="@string/flask_rest"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
     <TextView
         android:id="@+id/keeper_reveal_title"
         android:layout_width="wrap_content"

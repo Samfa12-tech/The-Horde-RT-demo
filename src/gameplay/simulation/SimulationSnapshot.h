@@ -183,6 +183,10 @@ struct SimulationSnapshot
     bool flaskDrinkEligible = false;
     // Zero means unavailable; otherwise the existing earned checkpoint ID.
     std::uint32_t flaskRestAnchor = 0;
+    // Discovery is independent of usable-now. Only a previously earned, nearby
+    // boundary on this side/height can advertise its basin while moving.
+    std::uint32_t flaskNearbyRestAnchor = 0;
+    healing::FlaskHint flaskHint = healing::FlaskHint::Ready;
     std::uint64_t lastConsumedDrinkFlaskSequence = 0,lastConsumedRestSequence = 0;
     std::uint64_t flaskCompletionTick = 0;
     // Owner handoffs, not persisted progress or filesystem acknowledgements.
