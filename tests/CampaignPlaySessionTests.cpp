@@ -108,8 +108,18 @@ bool PlainFile(const fs::path& path){std::error_code ec;const auto s=fs::symlink
 bool FixtureLocation() {
     if(FixtureToken().empty())return false;
     std::error_code ec;const auto base=fs::path(HORDE_RT_PLAY_SESSION_FIXTURE_BASE);
-    return fs::weakly_canonical(base,ec)==base.lexically_normal() && !ec &&
-        !fs::is_symlink(fs::symlink_status(FixtureRoot(),ec));
+    const auto canonical=fs::weakly_canonical(base,ec);
+    if(ec || !fs::equivalent(base,canonical,ec) || ec)return false;
+    // A substituted short build drive resolves to its physical path during
+    // canonicalization. Reject real filesystem links component by component
+    // without rejecting that benign drive alias.
+    for(auto component=base; !component.empty(); component=component.parent_path()) {
+        if(fs::is_symlink(fs::symlink_status(component,ec)) || ec)return false;
+        if(component==component.root_path())break;
+    }
+    const auto fixtureStatus=fs::symlink_status(FixtureRoot(),ec);
+    return !fs::is_symlink(fixtureStatus) &&
+        (!ec || ec==std::errc::no_such_file_or_directory);
 }
 bool OwnedFixture(){return FixtureLocation() && PlainFile(FixtureRoot()/"owner.txt") &&
     Text(FixtureRoot()/"owner.txt")==FixtureOwner();}

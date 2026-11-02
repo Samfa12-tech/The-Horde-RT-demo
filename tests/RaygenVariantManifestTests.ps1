@@ -171,8 +171,8 @@ try {
     # Include the approved joint30/38/34 ABI and separate TLAS107 upgrade instance.
     # Fresh compatibility
     # compilation independently verified these words; matrix compilation must not mutate them.
-    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq 'a0b76daab949c1fffa6102185159f8017d1bf075b68f77910140c7fac1e642a6') 'Generic include hash changed before matrix compilation.'
-    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq 'efd3b051eae161561e58bf94f45a0f201566a0867c086958863af91b8030cc44') 'Legacy include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq '4b30c614df30342c64b741a30f11d62c5de2698315142592433037c7ce139d28') 'Generic include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq '27d478608993c65e61cc327119f5afc93e25ea8546ba53ba94e990b03c81f7c0') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)

@@ -145,7 +145,18 @@ function Expect-Failure([scriptblock]$Action,[string]$Message) {
     Require ($observed -like "*$Message*") "Negative fixture failed for an unrelated reason: $observed"
     ++$script:checks
 }
+$script:previousFixtureArchive=$null
 function New-FixtureArchive([string]$Name,[string]$Platform,[string]$Omit='', [string]$Extra='', [string]$Duplicate='', [string]$Corrupt='', [string[]]$Directories=@(), [string]$EmptyFile='') {
+    # Each caller validates its archive before requesting the next fixture.
+    # Keep peak disk use bounded rather than retaining dozens of full packages.
+    if ($script:previousFixtureArchive) {
+        $prior=[IO.Path]::GetFullPath($script:previousFixtureArchive)
+        if ([IO.Path]::GetDirectoryName($prior) -ne [IO.Path]::GetFullPath($scratch)) {
+            throw 'Fixture archive cleanup target escaped its verified scratch root.'
+        }
+        if (Test-Path -LiteralPath $prior) { Remove-Item -LiteralPath $prior -Force }
+        $script:previousFixtureArchive=$null
+    }
     $path=Join-Path $scratch $Name
     # Compress the large canonical native atlases once per platform. ZIP Update
     # retains unchanged compressed entries; each negative mutates only its target.
@@ -180,6 +191,7 @@ function New-FixtureArchive([string]$Name,[string]$Platform,[string]$Omit='', [s
         $entry=$zip.CreateEntry('META-INF/debug-fixture.txt');$stream=$entry.Open()
         try{$stream.WriteByte(1)}finally{$stream.Dispose()}
     }finally{$zip.Dispose()}
+    $script:previousFixtureArchive=$path
     return $path
 }
 function New-HeldFixtureArchive([string]$Name,[string[]]$Omit=@(), [string]$Duplicate='', [string]$Corrupt='') {

@@ -16,9 +16,15 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
-$sourcePath = [IO.Path]::GetFullPath((Join-Path $repoRoot $SourceGlb))
-$manifestPath = [IO.Path]::GetFullPath((Join-Path $repoRoot $Manifest))
-$outputRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot $OutputDirectory))
+function Resolve-AssetPath([string]$path) {
+    # GetRelativePath returns an absolute path when a temporary fixture lives
+    # on another drive. Keep that path rooted instead of producing R:\C:\...
+    $candidate = if ([IO.Path]::IsPathRooted($path)) { $path } else { Join-Path $repoRoot $path }
+    return [IO.Path]::GetFullPath($candidate)
+}
+$sourcePath = Resolve-AssetPath $SourceGlb
+$manifestPath = Resolve-AssetPath $Manifest
+$outputRoot = Resolve-AssetPath $OutputDirectory
 if (-not (Test-Path -LiteralPath $sourcePath)) { throw "Static RT source GLB is missing: $sourcePath" }
 if (-not (Test-Path -LiteralPath $manifestPath)) { throw "Static RT asset manifest is missing: $manifestPath" }
 if ($TextureResolution -lt 1) { throw "TextureResolution must be greater than zero." }
@@ -125,7 +131,7 @@ function Resolve-TextureInputs([string[]]$values, [int]$requiredCount, [string]$
     if ($provided.Count -ne $requiredCount) {
         throw "Static RT $category texture input count $($provided.Count) does not match required array layer count $requiredCount."
     }
-    $resolved = @($provided | ForEach-Object { [IO.Path]::GetFullPath((Join-Path $repoRoot $_)) })
+    $resolved = @($provided | ForEach-Object { Resolve-AssetPath $_ })
     foreach ($path in $resolved) {
         if (-not (Test-Path -LiteralPath $path)) { throw "Static RT texture source is missing: $path" }
     }
