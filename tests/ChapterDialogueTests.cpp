@@ -128,6 +128,14 @@ int main() {
             "completed basin cue does not repeat on a nearby tick");
     }
     CompanionRouteFixture basinGuide(true);
+    basinGuide.Step(1.f/60.f,basinGuide.State().x,basinGuide.State().z,
+        true,true,false,nullptr,false,true,true);
+    const auto interruptedGuide=basinGuide.State();
+    basinGuide.Step(1.f/60.f,interruptedGuide.x,interruptedGuide.z,
+        true,true,false,nullptr,false,false,true);
+    Check(basinGuide.State().basinGuide &&
+        basinGuide.State().x==interruptedGuide.x && basinGuide.State().z==interruptedGuide.z,
+        "temporary death or traversal interruption retains the unfinished basin guide");
     bool reachedBasin=false;
     for(unsigned tick=0;tick<1000;++tick) {
         const auto before=basinGuide.State();

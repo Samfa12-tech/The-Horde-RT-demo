@@ -69,7 +69,7 @@ public:
         if(guideBasin && active && exterior && proof) {
             StepBasinGuide(dt,playerX,playerZ,paused,terrain,requireTerrain);return;
         }
-        if(state_.basinGuide) {
+        if(state_.basinGuide && !guideBasin) {
             // Resume the ordinary mapped route from the rope approach after
             // Kit has shown the earned basin. No new route or teleport.
             state_.basinGuide=false;state_.waypoint=3;
