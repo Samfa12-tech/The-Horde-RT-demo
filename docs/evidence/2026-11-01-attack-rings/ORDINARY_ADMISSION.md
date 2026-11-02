@@ -1,5 +1,7 @@
 # Application integration and ordinary shipping gates - 2 November
 
+Current provenance/version/hosted-state reconciliation and the single coordinated developer session are in [RELEASE_PREP_SESSION.md](RELEASE_PREP_SESSION.md).
+
 Base source: `b68a0d4135a046f82c2cce297e3a85d0f2bde033`. This checkpoint creates an isolated executable flask/revival validation candidate. It does not enable ordinary shipping or claim native visual, listening, touch or release acceptance.
 
 ## Provenance and distribution boundaries
