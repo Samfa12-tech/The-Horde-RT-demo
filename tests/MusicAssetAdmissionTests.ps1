@@ -157,8 +157,23 @@ try {
         $apkPath = Join-Path (Join-Path $scratchRoot 'archive-positive') 'android.apk'
         New-MusicTestArchive -Path $zipPath -AssetRoot $assets
         New-MusicTestArchive -Path $apkPath -AssetRoot $assets
+        # Compress-Archive retains this one empty parent directory in the
+        # official Windows ZIP; it is not an additional music asset.
+        $zip = [IO.Compression.ZipFile]::Open($zipPath, [IO.Compression.ZipArchiveMode]::Update)
+        try { $null = $zip.CreateEntry('assets/audio/music/') }
+        finally { $zip.Dispose() }
         Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $zipPath | Out-Null
         Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $apkPath | Out-Null
+    }
+    Test-AssetPolicy -Label 'unknown music directory remains rejected' -Action {
+        $path = Join-Path (Join-Path $scratchRoot 'archive-positive') 'foreign-directory.zip'
+        New-MusicTestArchive -Path $path -AssetRoot (Join-Path (Join-Path $scratchRoot 'archive-positive') 'assets')
+        $zip = [IO.Compression.ZipFile]::Open($path, [IO.Compression.ZipArchiveMode]::Update)
+        try { $null = $zip.CreateEntry('assets/audio/music/foreign/') }
+        finally { $zip.Dispose() }
+        Expect-Failure -Label 'foreign music directory' -ExpectedText 'unapproved music/source content' -Action {
+            Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $path
+        }
     }
 
     $fixture = Copy-MusicFixture -Name 'source-corrupt'

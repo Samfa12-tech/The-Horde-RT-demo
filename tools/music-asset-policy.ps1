@@ -425,8 +425,9 @@ function Assert-HordeMusicPackage {
         $allowedMusicNames = $expectedNames + $outdoorNames
         $sourceNames = @('What_the_Dark_Keeps_Pocket_Chordsmith.json', 'What_the_Dark_Keeps_PCS1.txt')
         foreach ($entry in $zip.Entries) {
+            $emptyMusicRoot = $entry.FullName -ceq 'assets/audio/music/' -and $entry.Length -eq 0
             if (($entry.FullName.StartsWith('assets/audio/music/', [StringComparison]::OrdinalIgnoreCase) -and
-                 $entry.FullName -cnotin $allowedMusicNames) -or
+                 $entry.FullName -cnotin $allowedMusicNames -and -not $emptyMusicRoot) -or
                 $entry.FullName.StartsWith('assets/source/beyond_the_tomb/music/', [StringComparison]::OrdinalIgnoreCase) -or
                 $entry.FullName.IndexOf('beneath-the-same-moon-outdoor-r2', [StringComparison]::OrdinalIgnoreCase) -ge 0) {
                 throw "Horde music package contains unapproved music/source content: $($entry.FullName)"
