@@ -11278,6 +11278,10 @@ void ShowCredits(HWND window)
                 "Sound effects: FilmCow Royalty Free Sound Effects Library.\n"
                 "Menu lantern creak: Irhouen via Pixabay (Pixabay Content License).\n"
                 "Water Dripping by DRAGON-STUDIO via Pixabay (Pixabay Content License).\n"
+                "Tawny owl calling at night in Tuntorp, Brastad, Sweden by W.carter (CC BY 4.0); eight-second mono/resampled/faded excerpt.\n"
+                "https://commons.wikimedia.org/wiki/File:Tawny_owl_calling_at_night_in_Tuntorp,_Brastad,_Sweden.ogg\n"
+                "Oecanthus pellucens song 23C by Gunther Tschuch (adapted audio CC BY-SA 4.0); eight-second mono/resampled/faded excerpt.\n"
+                "https://commons.wikimedia.org/wiki/File:Oecanthus_pellucens_song_23C.wav\n"
                 "Skeleton derivative: original by Hotstrike Studio; texture, rig, and animation processing created with Meshy (CC BY 4.0).\n"
                 "Placeholder lich character created and animated with Meshy (CC0).\n"
                 "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
@@ -11288,7 +11292,7 @@ void ShowCredits(HWND window)
                 "Application icon created for this project with OpenAI image generation.\n\n"
                 "glTF loading: cgltf by Johannes Kuhlmann (MIT).\n"
                 "Full notice: THIRD_PARTY_NOTICES/cgltf-LICENSE.txt beside the demo.\n\n"
-                "See ASSET_LICENSES.md beside the demo for source links and full licence details.",
+                "See ASSET_LICENSES.md and audio/night-ambience/NOTICE.md beside the demo for licence links and full changes.",
                 "Horde Lantern RT - credits and licences",
                 MB_OK | MB_ICONINFORMATION);
 }

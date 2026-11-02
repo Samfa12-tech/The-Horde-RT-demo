@@ -1,6 +1,8 @@
-# Horde Lantern RT - Showcase Alpha 1.6.0
+# Historical Horde Lantern RT - Showcase Alpha 1.6.0 site copy
 
-Public package version: `1.6.0`
+This is retained copy for the earlier 1.6.0 release, not the current public page or a 1.7 publication draft. The current published package is 1.6.2; the in-progress 1.7 development branch has not been released. Reconcile gameplay, controls, credits and exact packages afresh before using site copy for 1.7.
+
+Historical package version described below: `1.6.0`
 Canonical downloads: https://samfa12.itch.io/the-horde
 
 Horde Lantern RT is a short native Vulkan hardware-ray-tracing action showcase for compatible Android phones and Windows RT GPUs. Carry a true world-space fire through a wet gothic ruin, fight two skeletons with timed sword contact and parries, then cross a clear roof-water curtain that extinguishes the flame. Defeat a staff-lit lich, follow the audible chest unlock to claim a physical Gothic reward lantern, and carry its refractive amber light into the returning dawn.

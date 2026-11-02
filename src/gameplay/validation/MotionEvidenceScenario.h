@@ -140,6 +140,8 @@ private:
     bool lowSent_ = false;
     bool highSent_ = false;
     bool retrySent_ = false;
+    bool fightDodgeSentForCharge_ = false;
+    bool fightDodgeAccepted_ = false;
     bool terminalExitSeen_ = false;
     bool terminalReturnSeen_ = false;
     bool nearPortalSeen_ = false;

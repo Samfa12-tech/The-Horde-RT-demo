@@ -31,7 +31,7 @@ int main(int argc,char** argv) {
      !(terrain=horde::scene::PrepareChapterTerrainSurface(mesh,error))) {std::cerr<<error<<'\n';return 1;}
  }
  int cases=0,failures=0;
- auto check=[&](bool b,const char* m){++cases;if(!b){++failures;std::cerr<<m<<'\n';}};
+ auto check=[&](bool b,const char* m){++cases;if(!b){++failures;std::cout<<"FAIL: "<<m<<'\n';}};
  {
   auto config=ProductionGameSimulationConfig();
   config.developmentRescueJourney=true;config.playerStartX=-22;config.playerStartZ=-15.2f;
@@ -105,12 +105,13 @@ int main(int argc,char** argv) {
          "canonical chapter selections must request their actual authored GPU scene");
    chapterSelections+=expected;
   }
-  check(chapterSelections==39,"live journey and all38 chapter views, including both F03 directions, F04 sides and retention views, retain authored-scene admission");
+  check(chapterSelections==41,"live journey and all40 chapter views, including F03/F04 directions, both demo-endpoint views and retention views, retain authored-scene admission");
   for(const auto name:{"chapter-forest-clue-forward","chapter-forest-clue-reverse",
-                       "chapter-forest-lookout-left","chapter-forest-lookout-right"}) {
+                       "chapter-forest-lookout-left","chapter-forest-lookout-right",
+                       "chapter-demo-endpoint","chapter-demo-endpoint-return"}) {
    const auto* clue=FindDevelopmentCheckpoint(name);
    check(clue && DevelopmentCheckpointRequiresAuthoredChapter(*clue),
-         "direct F03 and F04 views must retain actual authored-scene admission");
+         "F03, F04 and both demo-endpoint views must retain actual authored-scene admission");
   }
   const auto* landing=FindDevelopmentCheckpoint("chapter-landing-north");
   GameSimulation fresh(ProductionGameSimulationConfig());

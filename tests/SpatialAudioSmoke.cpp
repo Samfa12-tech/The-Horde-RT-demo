@@ -455,6 +455,10 @@ int main()
     {
         const std::string windowsSource =
             ReadTextFile(root / "src/platform/windows/DiagnosticWindow.cpp");
+        const std::string windowsRetrySource =
+            ReadTextFile(root / "src/platform/windows/windows_player_retry.inl");
+        const std::string combatFeedbackSource =
+            ReadTextFile(root / "src/gameplay/CombatFeedback.h");
         const std::string androidSource = ReadTextFile(
             root / "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java");
         const std::string androidBuildSource = ReadTextFile(root / "android/app/build.gradle");
@@ -593,11 +597,13 @@ int main()
               windowsSource.find("context.delayedFeedback.DrainDue(GetTickCount64()") != std::string::npos &&
               windowsSource.find("PlayPositionalSoundEffect(context, \"skeleton_falling_bones.wav\", 0.36f, event, \"pixabay\")") != std::string::npos &&
               windowsSource.find("GetTickCount64() + horde::gameplay::kEnemyImpactFallDelayMilliseconds") != std::string::npos &&
-              section(windowsSource, "void ResetRoute(", "bool ApplyPlayerRetryCheckpoint(")
+              section(windowsSource, "void ResetRoute(", "void TryGrantRtLabUnlock(")
                   .find("context.delayedFeedback.Clear();") != std::string::npos &&
-              section(windowsSource, "bool ApplyPlayerRetryCheckpoint(", "const char* PresentModeName(")
-                  .find("context.delayedFeedback.Clear();") != std::string::npos &&
-              windowsSource.find("PlayPositionalSoundEffect(context, \"sword_hit_1.wav\"") != std::string::npos,
+              windowsRetrySource.find("bool ApplyPlayerRetryCheckpoint(") != std::string::npos &&
+              windowsRetrySource.find("context.delayedFeedback.Clear();") != std::string::npos &&
+              windowsSource.find("CombatCueForEvent(event,") != std::string::npos &&
+              windowsSource.find("PlayPositionalSoundEffect(context, clip, gain, event);") != std::string::npos &&
+              combatFeedbackSource.find("return \"sword_hit_1.wav\";") != std::string::npos,
               "Windows must retain positional sword impact, ordered licensed bones fall, 140 ms scheduling and reset/retry cancellation");
         check(androidSource.find("case PLATFORM_EVENT_ENEMY_DEFEATED:") != std::string::npos &&
               androidSource.find("ENEMY_IMPACT_FALL_DELAY_MILLISECONDS") != std::string::npos &&

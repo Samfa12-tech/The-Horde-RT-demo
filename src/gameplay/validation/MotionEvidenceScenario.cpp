@@ -391,11 +391,24 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
             if (state.lich.phase == LichPhase::Dead) break;
             AimAt(input, state, state.lich.x, state.lich.z);
             input.pitchRadians = 0.0f;
+            if (state.lich.phase != LichPhase::Charging) fightDodgeSentForCharge_ = false;
+            // The measured route must survive the modern unblockable cast by
+            // exercising an actual dodge, rather than relying on old cast
+            // timing or disabling damage after the required death/retry.
+            const bool dodgeNow = state.lich.phase == LichPhase::Charging && !fightDodgeSentForCharge_ &&
+                state.lich.phaseTime >= LichEncounter::kChargeDuration - 0.15f &&
+                commands_.dodge == state.lastConsumedDodgeSequence;
             const float distance = Distance(state, state.lich.x, state.lich.z);
-            if (distance > 1.3f) MoveTowards(input, state, state.lich.x, state.lich.z);
-            if (distance < 1.8f && state.lich.hitCooldownRemaining <= 0.0f &&
+            if (!dodgeNow && distance > 1.3f) MoveTowards(input, state, state.lich.x, state.lich.z);
+            if (!dodgeNow && distance < 1.8f && state.lich.hitCooldownRemaining <= 0.0f &&
                 state.playerCombat.action == PlayerCombatAction::Idle && commands_.attack == state.lastConsumedAttackSequence)
                 PublishEdge(commands_.attack);
+            if (dodgeNow) {
+                input.moveForward = 0.0f;
+                input.moveStrafe = 1.0f;
+                PublishEdge(commands_.dodge);
+                fightDodgeSentForCharge_ = true;
+            }
             break;
         }
         case MotionStage::Reward:
@@ -832,10 +845,12 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
         }
         break;
     case MotionStage::Fight:
+        fightDodgeAccepted_ = fightDodgeAccepted_ || state.acceptedDodgeSequence != 0u;
         if (state.lich.health > previousKeeperHealth_) Fail("Keeper health increased during actual combat.");
         if (state.lich.phase == LichPhase::Dead && state.lich.deathAnimationComplete)
         {
-            if (eventCounts_[10] != 1u || eventCounts_[6] != 3u) Fail("Real keeper defeat or its three accepted hits were absent or duplicated.");
+            if (!fightDodgeAccepted_ || eventCounts_[10] != 1u || eventCounts_[6] != 3u)
+                Fail("Real keeper fight missed an accepted dodge, defeat, or its three ordered hits.");
             else Enter(MotionStage::Reward);
         }
         break;

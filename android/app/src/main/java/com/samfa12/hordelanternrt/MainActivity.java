@@ -3888,6 +3888,7 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel(getString(R.string.credits), "ASSET PROVENANCE");
         addLinkedBody(panel, getString(R.string.credits_body));
+        addLinkedBody(panel, getString(R.string.credits_night_audio));
         addMenuButton(panel, getString(R.string.back), () -> showMainMenu(false));
         attachPanel(panel);
     }

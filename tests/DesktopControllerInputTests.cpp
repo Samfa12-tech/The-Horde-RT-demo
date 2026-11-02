@@ -546,7 +546,7 @@ int main()
             windowsSource.find("lastRtLabTelemetryTick < 250u") != std::string::npos,
             "Windows RT Lab must expose completion actions, authored reset, and four-Hz live telemetry");
     const std::size_t endingMenuBegin = windowsSource.find("void ShowEndingMenu(");
-    const std::size_t endingMenuEnd = windowsSource.find("bool ApplyPlayerRetryCheckpoint(", endingMenuBegin);
+    const std::size_t endingMenuEnd = windowsSource.find("const char* PresentModeName(", endingMenuBegin);
     Require(endingMenuBegin != std::string::npos && endingMenuEnd != std::string::npos &&
             windowsSource.substr(endingMenuBegin, endingMenuEnd - endingMenuBegin)
                     .find("context.rtLabVisible") != std::string::npos,
