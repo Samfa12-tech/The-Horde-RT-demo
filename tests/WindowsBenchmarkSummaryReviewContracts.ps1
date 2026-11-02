@@ -135,7 +135,7 @@ foreach ($forbidden in @('WinHttp', 'SendPlaytest', 'ShowWindowsRemote', 'Window
 }
 $button = Section $owner 'case kBenchmarkReviewStatsButtonId:' 'case kBenchmarkCopyButtonId:'
 Check ($button.Contains('!sceneContext->benchmark.IsRunning()') -and $button.Contains('benchmarkSummary->IsReady()') -and
-    $button.Contains('ShowWindowsBenchmarkSummaryReview(hWnd, *sceneContext->benchmarkSummary)')) 'Only explicit enabled completed-summary button opens the modal form.'
+    $button.Contains('ShowWindowsBenchmarkSummaryReview(hWnd, *sceneContext->benchmarkSummary, horde::platform::windows::ProductionWindowsStatisticsSendServices())')) 'Only explicit enabled completed-summary button opens the modal form with its production service boundary.'
 $roster = Section $owner 'std::vector<HWND> VisibleControllerMenuControls(' 'void NavigateControllerMenu('
 Check ($roster.Contains('std::to_array<int>') -and $roster.Contains('kBenchmarkReviewStatsButtonId')) 'New native review action participates in deduced-size controller navigation without a manual roster-capacity regression.'
 Write-Output "PASS: Windows benchmark summary review source contracts; $script:checks checks. No GUI, clipboard, picker, GPU or device execution."
