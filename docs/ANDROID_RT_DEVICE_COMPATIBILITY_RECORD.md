@@ -1,5 +1,20 @@
 # Android RT Device Compatibility Record
 
+## 2026-11-02 - Corrected normal New Game and bounded phone retry
+
+SM-S948B / Adreno840 / RayTracingPipeline. Source `41abc115`, arm64-only Debug
+APK `ca91d875be6a2404e35d81d0303205f77ea76591e84854d99e757e7f21b7df04`:
+normal Entry, empty-slot choice and New Game reached a presented full Showcase,
+reported 475x980 internal. Actual touch movement, pause, Home/resume and the
+correctly disabled pre-checkpoint Save chooser were observed. This closes the
+previous utility-binding reassertion failure in this Android boundary; it does
+not establish lessons/cry/revival/flask/persisted save-load/full lifecycle,
+physical controller, performance or ordinary shipping acceptance. The focused
+native lifecycle test and arm64 build passed. All593 original file hashes,
+including27 preference/career hashes, restored exactly; latest debug stopped,
+Home confirmed and phone released. Production/actor apps unchanged; no Send.
+[Exact artifact, actual passes, limits and retained failure](evidence/2026-11-01-attack-rings/ANDROID_APPLICATION_QA.md).
+
 ## 2026-11-02 - Isolated flask application Entry, normal New Game failure
 
 Physical SM-S948B / Adreno 840, RayTracingPipeline. Arm64-only Debug candidate

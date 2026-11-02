@@ -1,5 +1,7 @@
 # Release preparation and one developer validation session
 
+Subsequent bounded Android execution is in [ANDROID_APPLICATION_QA.md](ANDROID_APPLICATION_QA.md). Corrected Entry/New Game passed; the entire proposed session below did not pass.
+
 Read-only reconciliation on 2 November 2026, following source checkpoint `57be6735b7c984b45fe8ac6d8a020d4e2ac38f5d`. No build, launch, install, report, workflow, account or publication action was performed in this preparation slice.
 
 ## Exact provenance and admission

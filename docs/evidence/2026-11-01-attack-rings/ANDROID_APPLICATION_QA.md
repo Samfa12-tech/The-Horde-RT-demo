@@ -1,5 +1,55 @@
 # Android application candidate: Entry pass, New Game blocked
 
+## Corrected-source retry completed
+
+Source `41abc1150fc8a156a9b77a9730aa7398680eb05e` passed the rebuilt focused
+native lifecycle/preflight test (3.76 seconds). Arm64 native rebuild/link passed
+with explicit Ninja `-j2`; Gradle APK packaging then passed with two workers and
+the already-completed native task excluded to avoid duplicate compilation.
+CPU was released to the parallel laptop task before phone QA resumed.
+
+The new arm64-only Debug APK is 219,083,026 bytes, SHA256
+`ca91d875be6a2404e35d81d0303205f77ea76591e84854d99e757e7f21b7df04`, at
+`reports/flask-application-20261102-idempotent-arm64.apk`. All three staged
+runtime pins were rechecked. This remains an explicit private application
+candidate with 1.6.2/code10 identity, not ordinary shipping or final catalog
+admission. The older Windows interactive candidate was not rebuilt by this
+focused host-test/Android window and must not be assumed to contain the fix.
+
+Fresh backup again captured all 593 original files and all 27 preference/career
+files, with every device hash matched before isolation. Standard `-r -t` update
+and the normal resolved launcher were used. Actual results:
+
+- **Passed:** normal presented Entry, empty-slot chooser, Slot1 New Game to a
+  presented full Showcase (reported 475x980 internal), real touch-axis movement,
+  pause menu and one Home/resume while the save chooser was open. The previous
+  Entry-to-Showcase failure did not recur.
+- **Passed in its limited scope:** Save chooser disabled all three save actions
+  and explained `Reach a safe checkpoint before saving.` No earned checkpoint
+  was reached, so no persisted save/load success is inferred.
+- Bounded route gestures reached the `LIVE FIGHT: protection ended` HUD without
+  earned lesson actions. This was not a natural practice-kill/cry/revival pass.
+  Further automated wayfinding was stopped instead of inventing an outcome.
+- **Unverified:** second New Game, encounter Retry, persisted save/load, earned
+  sequential lessons, both kills, audible cry, visible moving revival, eligible
+  damaged-flask use/return/cancellation, F03 pickup/Rest, physical simultaneous
+  touch/controller feel and full recreation. These remain targeted checks; earning lessons/F03 progress needs a controlled
+  gameplay route. A menu before an earned checkpoint cannot certify
+  those behaviors. Compact benchmark UI and benchmark flicker verification also
+  remain pending; no benchmark or Send was run in this bounded retry.
+
+Cleanup restored **all 593 original hashes**, including **all 27 mutable state
+hashes**. The ca91 Debug app is stopped, phone Home confirmed and custody
+released; production/actor apps were untouched. No further device action or
+build remains active. Private screenshots, XML, app-only logs, capability
+publications, backup manifests and cleanup receipt are under
+`reports/android-gameplay-qa-20261102-r2/`. Artifact/build receipt is
+`reports/flask-application-20261102-idempotent-receipt.json`. These raw private
+records are retained locally and are not committed or sent externally.
+
+The first-attempt evidence below is retained as the failure that motivated the
+fix, not the current status of the corrected Android New Game boundary.
+
 2 November 2026. Physical **SM-S948B / Adreno 840**, RayTracingPipeline. The verified arm64-only Debug APK is `f55e105d017cc3f4a0d1e81c6a561a3f40bfc8a27c11272934cc6166af1670d4`, 219,047,290 bytes: the working-patch validation candidate documented in ORDINARY_ADMISSION.md, not an ordinary shipping identity.
 
 ## Actual result
@@ -26,3 +76,9 @@ The existing native preflight regression now covers unchanged selection while re
 Debug app stopped; all original **593 file hashes**, including the **27 mutable state hashes**, restored exactly. Phone returned Home and released. The latest f55 Debug APK remains installed under the standing owner policy; production/actor apps were untouched. The known failed candidate must not be presented as ready for an owner combined test.
 
 Ignored private evidence lives under `reports/android-gameplay-qa-20261102-r1/`: backup APK/archive/hash manifests, Entry/slot/error XML and PNG, app-only logcat, stopped diagnostic JSON and `cleanup.json`. The 547,787,776-byte full backup archive SHA256 is `4276cf73df61e361869af7537a57e726f87b073c9e94c11064bf55e2ca81bc3e`. No private raw data, audio/model asset, report or device identifier is committed or transmitted. No app process or device operation remains owned.
+
+## Remaining human route (authored-source guidance, not a passed playthrough)
+
+From fresh New Game, pass the opening doorway/first room and follow the shadow corridor around its right-hand bend toward the waterfall/skylight chamber. Stop at the two guards instead of continuing through the torch bays. Follow the HUD in order: block, parry the yellow attack, evade the red attack during its threat, then guard-attack. After all four are earned, kill both practice skeletons, let deaths settle, and observe directional cry, visible revival and the live-damage HUD transition without a Finish menu action. An early protection-ended cue without those actions is not that proof.
+
+Flask use needs an eligible injured/live state; the full-health opening UI did not offer a drink. The later capacity pickup is at the F03 waystone toward its existing dry approach (source placement 0.85m from the waystone). Look at it and use contextual Upgrade flask when eligible; it is not automatic. Capacity increases without changing health/current charges until a later eligible Rest. Actual visibility, pickup, drink/cancel/return joins and save/load remain unverified.
