@@ -23,6 +23,8 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     }
     c.lanternLow=interactionState_.heldLightPose==interactions::HeldLightPose::Low;
     c.lanternHigh=interactionState_.heldLightPose==interactions::HeldLightPose::High;
+    c.flaskGuideEnabled=config_.healingFlask1_7;
+    c.flaskCharges=healingFlask_.Snapshot().resources.charges;
     c.manualRaiseSequence=lastConsumedToggleHeldLightPoseSequence_;
     // Platform feedback can only match a consumed manual edge. The internal
     // acknowledgement is the preferred path and never trusts a stale sequence.

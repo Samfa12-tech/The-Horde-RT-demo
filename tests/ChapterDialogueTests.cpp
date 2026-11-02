@@ -88,6 +88,34 @@ int main() {
     d.Skip();d.Step(.016f,c);Check(d.State().line==Line::ReunionFirstPiece,"proof response continues to first piece");
     d.Skip();d.Step(.016f,c);Check(d.State().line==Line::ReunionDepart,"first piece continues to departure");
     d.Skip();d.Step(.016f,c);Check(d.State().line==Line::None,"departure continuation is bounded");
+    for(unsigned charges:{0u,1u,2u}) {
+        Director guided;Context gc;gc.claimed=true;
+        gc.flaskGuideEnabled=true;gc.flaskCharges=charges;
+        guided.Step(.016f,gc);guided.Skip();guided.Step(.016f,gc);guided.Skip();
+        gc.exterior=true;gc.lanternLow=true;guided.Step(.016f,gc);
+        gc.manualRaiseSequence=1;gc.visibleRaiseSequence=1;gc.lanternLow=false;gc.lanternHigh=true;
+        guided.Step(.016f,gc);
+        Check(guided.State().proofAccepted,"fresh reunion proof admits basin guidance");
+        guided.Skip();guided.Step(.016f,gc);guided.Skip();guided.Step(.016f,gc);
+        Check(guided.State().line==Line::ReunionDepart,"basin cue follows existing Kit story");
+        const auto waiting=guided.ExportProgress();
+        Check(waiting.continuationCount==1 && waiting.continuations[0]==
+            (charges==0?Line::FlaskEmpty:Line::FlaskTopup),
+            "one conditional basin cue survives a campaign save before delivery");
+        auto duplicated=waiting;
+        duplicated.continuations[1]=Line::FlaskTopup;
+        duplicated.continuationCount=2;
+        Check(!Director::ValidateProgress(duplicated),
+            "corrupt progress cannot queue both conditional basin cues");
+        Director restored;
+        Check(restored.RestoreProgress(waiting,gc,100,1),"queued basin cue restores safely");
+        restored.Skip();restored.Step(.016f,gc);
+        Check(restored.State().line==(charges==0?Line::FlaskEmpty:Line::FlaskTopup),
+            "restored Kit delivers the charge-appropriate guidance once");
+        restored.Skip();restored.Step(.016f,gc);
+        Check(restored.State().line==Line::None && restored.ExportProgress().continuationCount==0,
+            "completed basin cue does not repeat on a nearby tick");
+    }
     old=d.State();c.paused=true;d.Step(.05f,c);Check(d.State().elapsed==old.elapsed,"pause freezes fallback");
     d.Reset(true);Check(d.State().grateConsumed&&d.State().proofAccepted,"reconstruction preserves logical once flags");
     Check(!d.Complete(old.line,old.generation),"reset callback cannot finish a new generation");
@@ -95,7 +123,7 @@ int main() {
     c={};d.Request(Line::KeeperSense,{1,2,3},c);old=d.State();c.listener={8,9,10};d.Step(.05f,c);
     Check(d.State().listener.x==old.listener.x&&d.State().source.y==2,"source/listener tuple freezes at emission");
     // Continuous visible-companion speech is distinct from event-time calls.
-    for(unsigned n=static_cast<unsigned>(Line::ReunionQuestion);n<=static_cast<unsigned>(Line::ForestVillage);++n) {
+    for(unsigned n=static_cast<unsigned>(Line::ReunionQuestion);n<=static_cast<unsigned>(Line::FlaskTopup);++n) {
         Director live;Context lc;lc.companionSource=Tuple{4,3,2};lc.listener={1,2,3};
         live.Request(static_cast<Line>(n),{-32,3.6f,-10},lc);
         const auto started=live.State();const auto progress=live.ExportProgress();

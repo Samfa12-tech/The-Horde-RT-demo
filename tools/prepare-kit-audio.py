@@ -31,6 +31,13 @@ PINNED_CUTS = {
     "forest.wait": "8fb4e10dc2a596eba85a4c9ec07e111e42a336f018e824f6e942839883bdf950",
     "forest.village": "33b6b9d34dea2f6eda32ac44ceeddacfd51e3ab98dbdddafde3b65cee57d047d",
 }
+ADDITIONAL_RUNTIME = {
+    # Separately approved flask guidance is intentionally not part of the
+    # original thirteen-cut source package, but must survive its rerun intact.
+    "flask.empty.wav": "e4ddbf8cb72eb0375635379f6e3c6f8222148c7030dec30be284bf23bce8b6d2",
+    "flask.topup.wav": "7e367cebb77329cd490e2f48b6bd09e782c50c3d7de4e2376d841d286981a71b",
+    "flask-guidance.manifest.json": "4b5c75caae7be9ec3fc9456980cb881ffd925ca1cd77bd8dfe62d50b670fb972",
+}
 
 
 def linked(path):
@@ -100,8 +107,14 @@ def admit(outputs, destination):
     for parent in destination.parents:
         if linked(parent):
             raise ValueError("destination ancestor cannot be a linked/reparse directory")
-    if destination.exists() and {p.name for p in destination.iterdir()} - outputs.keys():
-        raise ValueError("destination contains entries outside the closed runtime roster")
+    if destination.exists():
+        extras = {p.name for p in destination.iterdir()} - outputs.keys()
+        if extras - ADDITIONAL_RUNTIME.keys():
+            raise ValueError("destination contains entries outside the closed runtime roster")
+        for name in extras:
+            path = destination / name
+            if linked(path) or not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != ADDITIONAL_RUNTIME[name]:
+                raise ValueError("refusing to overwrite a different destination: " + name)
     for name, payload in outputs.items():
         path = destination / name
         if path.exists() and (linked(path) or not path.is_file() or path.read_bytes() != payload):

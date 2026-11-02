@@ -36,7 +36,9 @@ final class ChapterVoiceAssets {
             kit(12, "forest.waystone"),
             kit(13, "forest.clue"),
             kit(14, "forest.wait"),
-            kit(15, "forest.village")
+            kit(15, "forest.village"),
+            kit(16, "flask.empty"),
+            kit(17, "flask.topup")
     };
     private static final List<Asset> ALL = Collections.unmodifiableList(Arrays.asList(ASSETS));
 

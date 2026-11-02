@@ -14,7 +14,10 @@ function Get-Horde17KitAssetSpecification {
         [pscustomobject]@{ Path='audio/kit/runtime/forest.clue.wav'; Bytes=202438; Sha256='cc783ba0141f6b47f67d77e197e2b60a38c69c50b79ac5b2db0d00657c47970b'; Platform='Both'; Kind='KitWave'; Channels=1; Frames=101197 },
         [pscustomobject]@{ Path='audio/kit/runtime/forest.wait.wav'; Bytes=76326; Sha256='8fb4e10dc2a596eba85a4c9ec07e111e42a336f018e824f6e942839883bdf950'; Platform='Both'; Kind='KitWave'; Channels=1; Frames=38141 },
         [pscustomobject]@{ Path='audio/kit/runtime/forest.village.wav'; Bytes=104386; Sha256='33b6b9d34dea2f6eda32ac44ceeddacfd51e3ab98dbdddafde3b65cee57d047d'; Platform='Both'; Kind='KitWave'; Channels=1; Frames=52171 },
+        [pscustomobject]@{ Path='audio/kit/runtime/flask.empty.wav'; Bytes=116172; Sha256='e4ddbf8cb72eb0375635379f6e3c6f8222148c7030dec30be284bf23bce8b6d2'; Platform='Both'; Kind='KitWave'; Channels=1; Frames=58064 },
+        [pscustomobject]@{ Path='audio/kit/runtime/flask.topup.wav'; Bytes=141132; Sha256='7e367cebb77329cd490e2f48b6bd09e782c50c3d7de4e2376d841d286981a71b'; Platform='Both'; Kind='KitWave'; Channels=1; Frames=70544 },
         [pscustomobject]@{ Path='audio/kit/runtime/asset.manifest.json'; Bytes=8006; Sha256='eca3594ea3cea9821f511a256a37ca61d53ca6623bff3154affb85583b988f69'; Platform='Both'; Kind='Json' }
+        [pscustomobject]@{ Path='audio/kit/runtime/flask-guidance.manifest.json'; Bytes=1658; Sha256='4b5c75caae7be9ec3fc9456980cb881ffd925ca1cd77bd8dfe62d50b670fb972'; Platform='Both'; Kind='Json' }
     )
 }
 

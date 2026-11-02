@@ -213,6 +213,10 @@ int main() {
         c.dialogue.activeLine=dlg::Line::ReunionProof;c.dialogue.continuationCount=2;
         c.dialogue.continuations[0]=dlg::Line::ReunionFirstPiece;c.dialogue.continuations[1]=dlg::Line::ReunionDepart;RoundTrip(c);
         c.dialogue.activeLine=dlg::Line::None;c.dialogue.continuationCount=0;c.dialogue.continuations={};RoundTrip(c);
+        c.dialogue.activeLine=dlg::Line::ReunionDepart;
+        c.dialogue.continuationCount=1;c.dialogue.continuations[0]=dlg::Line::FlaskEmpty;RoundTrip(c);
+        c.dialogue.activeLine=dlg::Line::FlaskTopup;
+        c.dialogue.continuationCount=0;c.dialogue.continuations={};RoundTrip(c);
         c.dialogue.activeLine=dlg::Line::ForestNight;c.dialogue.forestNightConsumed=true;
         c.dialogue.continuationCount=2;c.dialogue.continuations[0]=dlg::Line::ForestWaystone;
         c.dialogue.continuations[1]=dlg::Line::ForestClue;RoundTrip(c);

@@ -308,7 +308,7 @@ try {
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
     Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 58 -and
              $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 59) 'Current shared asset roster includes five exact prepared deadwood and three exact road-clue payloads.'
-    Require ($windows.Count -eq 115 -and $android.Count -eq 116) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory, town, deadwood and road-clue runtime assets; no editable sources.'
+    Require ($windows.Count -eq 118 -and $android.Count -eq 119) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory, town, deadwood and road-clue runtime assets; no editable sources.'
     $woodland=@('asset.manifest.json','runtime-roster.json','pine-middle.glb','alder-middle.glb','pine-far.glb','alder-far.glb','boundary-panel.glb','woodland-low-fern.glb')
     foreach($name in $woodland) {
         $path='models/world/runtime/forest-surroundings-v1/'+$name
@@ -364,7 +364,7 @@ try {
         Require (@($windows | Where-Object {$_ -ceq $marker}).Count -eq 1 -and
                  @($android | Where-Object {$_ -ceq $marker}).Count -eq 1) 'Each exact grave-marker path must be admitted once on both platforms.'
     }
-    Require (@(Get-Horde17KitAssetSpecification).Count -eq 14) 'Kit admission must retain its exact thirteen-cut/one-manifest roster.'
+    Require (@(Get-Horde17KitAssetSpecification).Count -eq 17) 'Kit admission must retain thirteen original cuts plus two flask cuts and both manifests.'
     foreach ($kit in Get-Horde17KitAssetSpecification) {
         Require ($windows -ccontains $kit.Path -and $android -ccontains $kit.Path) 'Both platforms must admit every approved Kit runtime entry.'
         Require (@($packageStrings | Where-Object { $_ -ceq ('assets/'+$kit.Path) }).Count -eq 2) 'Both package inventories must explicitly require every Kit runtime entry.'

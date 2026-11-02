@@ -378,6 +378,7 @@ docs/evidence/2026-10-10-tomb-playtest-corrections/logs/*.log whitespace=-traili
 # Approved public Kit runtime cuts; masters/provider records remain private.
 assets/audio/kit/runtime/*.wav filter=lfs diff=lfs merge=lfs -text
 assets/audio/kit/runtime/asset.manifest.json text eol=lf
+assets/audio/kit/runtime/flask-guidance.manifest.json text eol=lf
 
 # Recovered forest packages and runtime manifests have exact-byte receipts.
 # Preserve original package line endings; generated runtime JSON is canonical LF.

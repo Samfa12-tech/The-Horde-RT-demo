@@ -450,6 +450,21 @@ No new generation, acquisition or spending occurred. Exact-candidate positional
 listening, Voice/SFX balance and Android playback/lifecycle acceptance remain
 pending. The visible Kit model remains unadmitted.
 
+### Kit flask guidance cuts (2 November 2026)
+
+The owner separately confirmed public game and repository distribution rights
+for the two newly generated Mureka Kit cuts, `flask.empty` and `flask.topup`,
+under the same scope as the original thirteen. This is owner-confirmed
+permission, not blanket MIT relicensing or a provider legal opinion. The
+owner-provided MP3 masters remain outside this repository, unmodified. Only
+derived mono PCM16 24 kHz WAVs are included at
+`assets/audio/kit/runtime/flask.empty.wav` and `flask.topup.wav`; their source
+MP3 and runtime SHA-256 hashes, exact words, sample counts and conversion
+method are pinned in `flask-guidance.manifest.json`. The generation used 40
+existing Mureka Gold credits under the owner's 100-credit cap; no top-up or
+subscription change occurred. Runtime voice balance, actor/basin staging and
+physical Windows/Android listening remain acceptance gates.
+
 
 ### Kit visual source intake (11 October 2026)
 

@@ -15,7 +15,7 @@ public final class ChapterVoiceAssetsTest {
             "keeper.sense", "keeper.closer", "prologue.kit_grate", "rescue.found",
             "rescue.rope", "reunion.question", "reunion.hint", "reunion.proof",
             "reunion.first_piece", "reunion.depart", "forest.night", "forest.waystone",
-            "forest.clue", "forest.wait", "forest.village"
+            "forest.clue", "forest.wait", "forest.village", "flask.empty", "flask.topup"
     };
 
     @Test public void everyAdmittedSpeechLineHasOneUniqueKeyAndExpectedRuntimePath() {
@@ -42,12 +42,12 @@ public final class ChapterVoiceAssetsTest {
     @Test public void unknownAndBoundaryLinesHaveNoAssetAndMissingSoundDoesNotInventOne() {
         assertNull(ChapterVoiceAssets.forLine(Integer.MIN_VALUE));
         assertNull(ChapterVoiceAssets.forLine(0));
-        assertNull(ChapterVoiceAssets.forLine(16));
+        assertNull(ChapterVoiceAssets.forLine(18));
         assertNull(ChapterVoiceAssets.forLine(Integer.MAX_VALUE));
         assertNull(ChapterVoiceAssets.soundIdForLine(3, new java.util.HashMap<String, Integer>()));
         final java.util.Map<String, Integer> sounds = new java.util.HashMap<>();
         sounds.put(ChapterVoiceAssets.forLine(3).soundKey, 27);
         assertEquals(Integer.valueOf(27), ChapterVoiceAssets.soundIdForLine(3, sounds));
-        assertNull(ChapterVoiceAssets.soundIdForLine(16, sounds));
+        assertNull(ChapterVoiceAssets.soundIdForLine(18, sounds));
     }
 }
