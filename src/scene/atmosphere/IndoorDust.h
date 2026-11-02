@@ -80,7 +80,7 @@ struct alignas(16) DustFrame {
 };
 struct DustWork {
     unsigned admittedZones=0, generatedMotes=0, projectedMotes=0, tileReferences=0, overflowReferences=0;
-    unsigned combatMotes=0, combatReplacedMotes=0, fireflyMotes=0;
+    unsigned combatMotes=0, combatReplacedMotes=0, fireflyMotes=0, smokeMotes=0;
 };
 struct DustProjection { float left=0,right=0,top=0,bottom=0; };
 inline bool ProjectDustSphere(Vec3 p,float radius,const DustCamera& c,DustProjection& r) noexcept {

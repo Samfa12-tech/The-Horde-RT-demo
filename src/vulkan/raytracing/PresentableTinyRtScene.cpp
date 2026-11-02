@@ -21,6 +21,7 @@
 #include "scene/ShowcaseIndoorDust.h"
 #include "scene/atmosphere/HitParticleDust.h"
 #include "scene/atmosphere/ForestFireflies.h"
+#include "scene/atmosphere/ChimneySmoke.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "scene/CorridorStaticDetailFaces.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
@@ -8987,9 +8988,11 @@ bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& qualit
     const bool combatParticles=sceneProfile_==RtSceneProfile::Showcase && frame.enemyHitParticles.Active();
     const bool fireflies=sceneProfile_==RtSceneProfile::Showcase && frame.developmentRescueJourney &&
         chapterTerrainSurface_ && dustQuality_==horde::graphics::DustQuality::Standard && ForestFirefliesNearby(camera);
+    const bool chimneySmoke=sceneProfile_==RtSceneProfile::Showcase && frame.developmentRescueJourney &&
+        chapterTerrainSurface_ && ChimneySmokeNearby(camera);
     // Do not cache a contact overlay as ambient. Active bursts invalidate before
     // build and skip commit, so the first expired/cancelled frame clears it too.
-    if(combatParticles || fireflies)dustCache_.Invalidate();
+    if(combatParticles || fireflies || chimneySmoke)dustCache_.Invalidate();
     const auto decision=dustCache_.Build(zones,dustQuality_,camera,seconds,upload.dust,dustWork_);
     if(decision==DustUploadDecision::Unchanged)
         return WriteBuffer(qualityControlsBuffer_, &quality, sizeof(quality), "quality controls", diagnostic, observation);
@@ -9000,11 +9003,12 @@ bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& qualit
         const auto support=chapterTerrainSurface_->Query(x,z);
         return support.found ? std::optional<float>{support.worldY} : std::nullopt;
     },upload.dust,dustWork_);
+    if(chimneySmoke)OverlayChimneySmoke(dustQuality_,camera,seconds,upload.dust,dustWork_);
     if(combatParticles)OverlayHitParticles(frame.enemyHitParticles,dustQuality_,camera,upload.dust,dustWork_);
     if(!WriteBuffer(qualityControlsBuffer_, &upload, sizeof(upload), "quality and bounded indoor dust", diagnostic, observation)) {
         dustCache_.Invalidate(); return false;
     }
-    if(!combatParticles && !fireflies)dustCache_.Commit(zones,dustQuality_,camera,seconds);
+    if(!combatParticles && !fireflies && !chimneySmoke)dustCache_.Commit(zones,dustQuality_,camera,seconds);
     return true;
 }
 

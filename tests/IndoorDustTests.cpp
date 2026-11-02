@@ -1,6 +1,7 @@
 #include "scene/ShowcaseIndoorDust.h"
 #include "scene/atmosphere/HitParticleDust.h"
 #include "scene/atmosphere/ForestFireflies.h"
+#include "scene/atmosphere/ChimneySmoke.h"
 #include <iostream>
 #include <limits>
 #include <cstring>
@@ -146,5 +147,35 @@ int main(){
     check(references==work.tileReferences,"firefly/contact tile references remain exactly accounted");
     BuildDustFrame({},DustQuality::Low,forestCamera,2,repeat,again);
     check(again.generatedMotes==0,"Standard to Low rebuild clears fireflies");
+    const DustCamera townCamera{{80.f,8.f,80.f},2.8f,-.10f,16.f/9.f};
+    for(auto q:{DustQuality::Off,DustQuality::Low,DustQuality::Standard}) {
+        frame={};for(auto& tile:frame.tiles)tile.fill(kDustEmptyCandidate);
+        BuildDustFrame({},q,townCamera,4,frame,work);
+        const auto untouched=frame;
+        const auto emitted=OverlayChimneySmoke(q,townCamera,4,frame,work);
+        check(q==DustQuality::Off ? emitted==0 && std::memcmp(&untouched,&frame,sizeof(frame))==0 :
+            emitted>0 && emitted<=(q==DustQuality::Low?9u:15u),"smoke has bounded quality counts and a byte-neutral Off path");
+        check(work.smokeMotes==emitted && work.generatedMotes<48,"smoke reserves combat slots");
+        references=0;
+        for(auto tile:frame.tiles)for(auto id:tile)if(id!=kDustEmptyCandidate){
+            ++references;check(id<work.generatedMotes,"smoke projection indices belong to live slots");}
+        check(references==work.tileReferences,"smoke tile references accounted exactly");
+        for(unsigned i=0;i<emitted;++i)check(frame.motes[i].response[2]==0 && frame.motes[i].response[0]<=.28f,
+            "smoke reuses lit particles, not emissive fireflies");
+        const auto frozen=frame;
+        repeat={};for(auto& tile:repeat.tiles)tile.fill(kDustEmptyCandidate);
+        BuildDustFrame({},q,townCamera,4,repeat,again);
+        OverlayChimneySmoke(q,townCamera,4,repeat,again);
+        check(std::memcmp(&frozen,&repeat,sizeof(frame))==0,"recreation at fixed simulation time is deterministic");
+    }
+    BuildDustFrame({},DustQuality::Standard,townCamera,4,frame,work);
+    check(OverlayChimneySmoke(DustQuality::Standard,townCamera,std::numeric_limits<double>::quiet_NaN(),frame,work)==0,
+        "nonfinite smoke time fails closed");
+    auto farTown=townCamera;farTown.origin[0]=-1000;
+    check(!ChimneySmokeNearby(farTown) && OverlayChimneySmoke(DustQuality::Standard,farTown,4,frame,work)==0,
+        "distant smoke has no projection/upload work");
+    work.generatedMotes=48;
+    check(OverlayChimneySmoke(DustQuality::Standard,townCamera,4,frame,work)==0 && work.generatedMotes==48,
+        "smoke never overwrites full ambient or contact reservations");
     std::cout<<"IndoorDust failures="<<failures<<'\n'; return failures?1:0;
 }

@@ -784,6 +784,21 @@ int main()
             windowsSource.find("(wParam == VK_RETURN || wParam == VK_SPACE)")!=std::string::npos,
             "native owner wires tested admission, reserved right mouse, cancellation and menu Space");
 
+    const auto moreBegin=windowsSource.find("case kEntryMoreButtonId:");
+    const auto moreEnd=windowsSource.find("case kEntryBackButtonId:",moreBegin);
+    const auto more=windowsSource.substr(moreBegin,moreEnd-moreBegin);
+    Require(more.find("entryMoreVisible = true")!=std::string::npos &&
+        more.find("kRunBenchmarkButtonId : kControlsButtonId")!=std::string::npos &&
+        windowsSource.find("{kRunBenchmarkButtonId,kCampaignLoadButtonId,kControlsButtonId")!=std::string::npos &&
+        windowsSource.find("createButton(kEntryMoreButtonId, \"MORE / BENCHMARK\")")!=std::string::npos,
+        "More names Benchmark, places it first and focuses it when eligible");
+    const auto chooserBack=windowsSource.find("case kBenchmarkChoiceBackId:");
+    const auto chooserRun=windowsSource.find("case kBenchmarkChoiceRunId:",chooserBack);
+    const auto back=windowsSource.substr(chooserBack,chooserRun-chooserBack);
+    Require(back.find("benchmarkChooserVisible=false")!=std::string::npos &&
+        back.find("kRunBenchmarkButtonId")!=std::string::npos && back.find("owner.Queue")==std::string::npos,
+        "Benchmark Back returns focus without queuing a run or resetting gameplay");
+
     horde::platform::windows::GuardHoldLatch guardHold;
     guardHold.Reseed(true);
     Require(!guardHold.Observe(true,true), "connecting with LT held must wait for release");

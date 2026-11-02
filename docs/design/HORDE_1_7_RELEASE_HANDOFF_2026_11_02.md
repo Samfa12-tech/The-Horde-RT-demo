@@ -6,7 +6,12 @@ bounded route to the upper-rope basin. Exact-head CI run `41439913167` passed
 all six jobs. Focused Windows tests covered the guide on actual basin collision
 geometry, ordered conditional dialogue, interrupted guidance, save restoration
 and resuming the original forest route. The Windows candidate was built at this
-head; it was not played or listened to by the owner. The phone was unavailable.
+head. The owner subsequently played the isolated Windows package built from
+`7292802b` (documentation head `bf4307df`) and confirmed Kit walks to the
+basin and explains it correctly for the flask state. That is owner-observed
+Windows guide/conditional-speech acceptance, not final ordinary-package or
+Android acceptance. The earlier `6054581e` owner test also passed two consecutive
+death/Retry cycles.
 
 ## Remaining ordinary-build admission
 

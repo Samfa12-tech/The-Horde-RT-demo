@@ -2996,7 +2996,7 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
              << "\r\nWater: Mobile omits droplets; High adds reflections/droplets; Off hides water."
              << "\r\nFire: Low/Mobile/High use2/4/10 steps; light strength unchanged."
              << "\r\nShadows: Current area1; Higher area2/4. Cost unmeasured."
-             << "\r\nParticles: Low keeps fewer motes/fragments. Standard adds forest fireflies. Off disables all; cost unmeasured."
+             << "\r\nParticles: Low keeps fewer motes/fragments. Standard adds forest fireflies and fuller chimney smoke. Off disables all; cost unmeasured."
              << "\r\nApply needs an RT frame. Keep confirms within 15 foreground seconds."
              << "\r\n" << context.graphicsStatus;
         SetWindowTextA(GetDlgItem(context.windowHandle, kGraphicsInfoId), info.str().c_str());
@@ -3515,7 +3515,8 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
         SetControlVisible(context.windowHandle, kSettingsButtonId, entryFront);
     }
     SetControlVisible(context.windowHandle, kRunBenchmarkButtonId,
-        context.entryMenuVisible && context.entryMoreVisible && pauseVisible &&
+        context.entryMenuVisible && context.entryMoreVisible && pauseVisible);
+    EnableWindow(GetDlgItem(context.windowHandle,kRunBenchmarkButtonId),
         OpeningBenchmarkEligibilityFor(context).Eligible());
     for (int id : {kBenchmarkStandardChoiceId,kBenchmarkCustomChoiceId,kBenchmarkChoiceRunId,
                    kBenchmarkChoiceBackId,kBenchmarkChoiceInfoId})
@@ -11001,7 +11002,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     else if (layoutContext && layoutContext->entryMenuVisible && layoutContext->entryMoreVisible)
     {
         const int moreHeight = ScaleForDpi(window, 48);
-        for (const int id : {kCampaignLoadButtonId,kRunBenchmarkButtonId,kControlsButtonId, kReportProblemButtonId, kDiagnosticsButtonId,
+        for (const int id : {kRunBenchmarkButtonId,kCampaignLoadButtonId,kControlsButtonId, kReportProblemButtonId, kDiagnosticsButtonId,
                              kMoreBySamfa12ButtonId, kExitButtonId, kEntryBackButtonId})
         {
             MoveWindow(GetDlgItem(window, id), pauseX, y, buttonWidth, moreHeight, TRUE);
@@ -11762,7 +11763,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     GetClientRect(hWnd, &client);
                     LayoutOverlayControls(hWnd, client.right, client.bottom);
                 }
-                FocusGameControl(GetDlgItem(hWnd, kControlsButtonId));
+                FocusGameControl(GetDlgItem(hWnd, OpeningBenchmarkEligibilityFor(*sceneContext).Eligible() ?
+                    kRunBenchmarkButtonId : kControlsButtonId));
                 return 0;
             case kEntryBackButtonId:
                 sceneContext->entryMoreVisible = false;
@@ -13203,7 +13205,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                  "The old guard bound the lich beneath this ruin and left one lantern to guide whoever came after.\r\n\r\n"
                  "Its flame died when the final seal opened. Now the staff is silent, the roof gives way, and stolen morning returns to the halls.",
                  SS_CENTER | SS_NOPREFIX);
-    createButton(kEntryMoreButtonId, "MORE");
+    createButton(kEntryMoreButtonId, "MORE / BENCHMARK");
     createButton(kEntryBackButtonId, "BACK");
     createButton(kResumeButtonId, "ENTER THE RUIN / RESUME");
     createButton(kLookoutObjectiveButtonId,"LOOKOUT OBJECTIVE");
