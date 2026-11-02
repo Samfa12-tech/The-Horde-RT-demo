@@ -1,0 +1,41 @@
+{
+  "sourceCommit": "43d5886df9a4141d8898a30a32624b8bbd7bbb9d",
+  "windowsExeSha256": "d21189cfcffe81f5c0181983008d7052c072c6a89e38c40d0a0391eda706403a",
+  "windowsStandard": {
+    "requestedProfile": "windows-rt-provisional-v1",
+    "classification": "custom-unranked",
+    "ranked": false,
+    "actualApplyAcknowledged": true,
+    "actualRestorationAcknowledged": true,
+    "measurementAndRestorationPassed": true,
+    "confirmedTupleUnchanged": true,
+    "error": ""
+  },
+  "windowsWindowRestoration": {
+    "observedAppliedClientRect": [
+      0,
+      0,
+      1920,
+      1080
+    ],
+    "originalClientRect": [
+      0,
+      0,
+      1920,
+      966
+    ],
+    "exactWindowStateRestored": true,
+    "menuRestored": true
+  },
+  "androidApkSha256": "11f7050a4d060b9cfef494894b1c684f711d5d220e5c7c9e4e020a4bb638efde",
+  "androidModel": "SM-S948B",
+  "androidNativeBuild": "g:43d5886df9a4141d8898a30a32624b8bbd7bbb9d;i:731e95c142c71d12726a6f4ba1ea6c2efa10b3d7c3d74ed4934e353077f7d85d;c:D;s:C",
+  "androidPrivateAcceptance": true,
+  "androidNormalNewGameRendered": true,
+  "androidPortraitLandscapeFlaskVisible": true,
+  "androidHomeResumeRendered": true,
+  "androidNaturalChapterCompleted": false,
+  "androidOriginalStateHashesVerified": 593,
+  "androidProductionUntouched": true,
+  "androidPhoneReleased": true
+}

@@ -82,3 +82,63 @@ submission, client-receipt verification or public-board acceptance.
 Release communications retained: coordinate the itch devlog, itch main-page copy
 and samfa12.com Horde page with the final verified1.7 release. Do not claim live
 publication from this development checkpoint; parent owns website coordination.
+
+
+## Corrected runtime checkpoint43d5886d
+
+The separately staged Windows executable completed Standard through the actual
+application:2/2laps,26/26waypoints,1838/1838validCPU/GPUrows, no recorded failures.
+Its lifecycle receipt confirms exact1920x1080 apply, restoration to1920x966,
+restored menu/window state and unchanged confirmed settings. It remains
+custom-unranked; do not infer leaderboard admission. The agent observed the
+running benchmark and completed report without injecting input; the subsequent
+review dialog was left under owner control. Cancellation has host coverage but
+was not physically repeated in this session. No report was sent by the agent.
+
+Android debug APK identity and native build are in corrected-runtime-receipt.json.
+The actual Gradle output was intermediates/apk/debug/app-debug.apk; the legacy
+outputs/apk/debug file was stale and failed the private-payload check before
+installation. Matching signing certificate and all three pinned private payload
+hashes were verified. The test-only APK was installed in place using Android's
+explicit test-package switch. No production/actor-worker package was changed.
+
+On SM-S948B, normal Play/New game selected a fresh isolated test slot and reached
+RT gameplay. Portrait and landscape show the compact flask icon,2/2charges and
+separate comfortable attack/guard/dodge controls. The disabled drink action
+correctly explains full health. Before earning a checkpoint, all Save actions
+were disabled with clear guidance. Home/resume returned to rendered gameplay.
+These are device checks, not a natural full chapter, earned save/reload, injured
+healing or controller-feel pass.
+
+A separate staged chapter-kit-reunion capture reached the forest but showed a
+LIVE FIGHT transition overlay overlapping the raise-lantern hint. UIAutomator
+reported no idle state. Preserve this diagnostic-fixture limitation; it does not
+prove the same overlap occurs on the natural route. No Kit movement/refill/audio
+acceptance is claimed from this staged attempt. Prior owner Windows Kit pass
+remains valid for its own artifact.
+
+The original debug APK and593state-file hashes were backed up before updating.
+After testing, all593original files matched, newly generated test data was
+archived privately, rotation settings were restored and the app stopped/Home
+restored. Latest debug APK remains installed by owner permission. Private logs,
+saves, reports and screenshots remain in ignored reports/android-final-window-20261102.
+No new phone operation is required by this checkpoint.
+
+Footstep investigation remains scoped to cadence: current sound contacts use
+0.24m initial/0.72m subsequent travel, independently from the imported Walking
+clip's1.0416667s loop and the simulation locomotion clock. Surface routing is
+owner-confirmed working. A future correction must align grounded contacts to
+actual gait and preserve reverse/run/dodge/airborne behavior, not merely reduce
+sample volume or arbitrarily slow a loop. No cadence code was changed here.
+
+
+All six hosted jobs passed for runtime43d5886d: run41513565737.
+The owner subsequently confirmed this corrected Windows benchmark completed and
+attempted public submission, recalling a published tick. A read-only live public
+API query afterwards returned reportCount0/rows[]. No client receipt was retained
+locally and the form was closed, so public delivery/publication remains
+unconfirmed and needs backend reconciliation. Do not send a duplicate. Owner
+requested a much clearer direct public/private results flow; that is a separate
+following UI correction, preserving explicit destination consent and strict
+receipt interpretation. NVIDIA overlay utilization up to77% is an owner
+observation, not evidence of spare capacity or a proven CPU bottleneck.

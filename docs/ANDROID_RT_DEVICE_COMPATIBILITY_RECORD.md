@@ -4063,3 +4063,17 @@ force-stop, input, capture, save/settings write or forwarding was performed.
 The sandboxed ADB client initially could not connect to its daemon; the normal
 host-access read-only check succeeded. No security setting changed. Device
 access was released after preflight, with no owned device operation remaining.
+
+
+### 2 November2026: SM-S948B isolated current-development entry/layout check
+
+APK SHA256`11f7050a4d060b9cfef494894b1c684f711d5d220e5c7c9e4e020a4bb638efde`,
+source`43d5886df9a4141d8898a30a32624b8bbd7bbb9d`, private revival/flask Debug
+candidate. Actual normal New Game RT gameplay, portrait/landscape compact flask
+controls and Home/resume were observed. This does not certify ordinary Shipping
+admission, full natural progression, performance or final reporting acceptance.
+A staged reunion produced overlapping transition hints and no UI idle; retain
+that limitation separately from natural-play evidence. Original593debug-state
+files and rotation settings were restored and verified, latest debug retained,
+production untouched and phone released. Sanitized artifact details and evidence
+limits: [runtime receipt](evidence/2026-11-02-chimney-smoke-menu/corrected-runtime-receipt.json).
