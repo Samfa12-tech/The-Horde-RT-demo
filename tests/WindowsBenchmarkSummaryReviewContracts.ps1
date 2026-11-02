@@ -77,17 +77,17 @@ Check ($review.Contains('BCryptGenRandom(nullptr') -and $review.Contains('BCRYPT
     $review.Contains('IsBenchmarkSummaryUuid(id)')) 'Run and report identity helper emits CSPRNG UUIDv4 with required version/variant, independently of existing schema1 hex IDs.'
 Check ($prepare.Contains('MakeWindowsBenchmarkUuid(reportUuid)') -and
     $prepare.Contains('reportUuid == state.frozen.Data().runUuid')) 'Prepared report identity is separate from the completed run identity.'
-Check ($controls.Contains('kSummaryConsent), BM_SETCHECK, BST_UNCHECKED') -and
+Check ($audience.Contains('kSummarySendConsent), BM_SETCHECK, BST_UNCHECKED') -and
     $controls.Contains('kSummaryHardware), BM_SETCHECK, BST_UNCHECKED') -and
-    $controls.Contains('SendMessageW(cooling, CB_SETCURSEL, 0, 0)')) 'Every new form starts prepare consent OFF, hardware OFF, cooling Unknown.'
-Check ($controls.Contains('for (const int id : {kSummaryPrepare, kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), FALSE)') -and
-    $controls.Contains('ES_READONLY | ES_MULTILINE')) 'Before consent/preparation, local actions are disabled and the exact preview is read-only.'
+    $controls.Contains('SendMessageW(cooling, CB_SETCURSEL, 0, 0)')) 'Every new form starts remote consent OFF, hardware OFF, cooling Unknown.'
+Check ($controls.Contains('for (const int id : {kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), FALSE)') -and
+    $controls.Contains('ES_READONLY | ES_MULTILINE')) 'Before explicit review, exports are disabled and exact preview is read-only.'
 Check ($prepare.Contains('state.prepared.IsReady() || !state.frozen.IsReady()') -and
-    $prepare.Contains('BM_GETCHECK, 0, 0) != BST_CHECKED') -and
+    $windowProc.Contains('case kSummaryPrepare: PrepareWindowsSummaryReview(window, *state);') -and
     $prepare.Contains('PrepareBenchmarkSummaryReport(state.frozen,') -and
-    $prepare.Contains('WindowsSummaryUtf8Preview(prepared.Json(), preview)')) 'Prepare requires explicit consent and the immutable typed owner, then validates exact UTF-8 before enabling actions.'
+    $prepare.Contains('WindowsSummaryUtf8Preview(prepared.Json(), preview)')) 'Explicit Review authorizes local preparation using the immutable typed owner; exact UTF-8 is validated before exports, never remote Send.'
 Check ($prepare.Contains('!state.prepared.Admit(std::move(prepared))') -and $prepare.Contains('state.preview = std::move(preview)') -and
-    $prepare.Contains('{kSummaryConsent, kSummaryHardware, kSummaryCooling, kSummaryPrepare}') -and
+    $prepare.Contains('{kSummaryHardware, kSummaryCooling, kSummaryPrepare}') -and
     -not $prepare.Contains('ExportWindowsPlaytestReportJson') -and -not $prepare.Contains('CopyWindowsSummaryJson')) 'Preparation freezes choices without copying or saving.'
 Check ($utf8.Contains('kBenchmarkSummaryReportMaxBytes') -and $utf8.Contains('CP_UTF8, MB_ERR_INVALID_CHARS') -and
     $utf8.Contains('if (count <= 0) return false')) 'Preview rejects oversized or invalid UTF-8 rather than replacing characters.'
@@ -114,14 +114,14 @@ Check ($review.Contains('WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLIN
 Check ($review.Contains('RevealWindowsSummaryReviewFocus(') -and $review.Contains('GetParent(control) != body') -and
     $windowProc.Contains('if (notification != BN_CLICKED) return 0')) 'Keyboard focus reveals offscreen body fields and cannot implicitly Prepare/Copy/Save.'
 Check ($audience.Contains('state.prepared.SelectPublic(publicPreview)') -and $audience.Contains('state.preview.clear(); state.saved = false') -and
-    $audience.Contains('kSummaryConsent), BM_SETCHECK, BST_UNCHECKED') -and
+    $audience.Contains('kSummarySendConsent), BM_SETCHECK, BST_UNCHECKED') -and
     $audience.Contains('kSummaryHardware), BM_SETCHECK, BST_UNCHECKED') -and
     $audience.Contains('kSummaryCooling), CB_SETCURSEL, 0, 0') -and
-    $audience.Contains('{kSummaryPrepare, kSummaryCopy, kSummarySave}') -and
+    $audience.Contains('{kSummaryCopy, kSummarySave}') -and
     $windowProc.Contains('case kSummaryAudience:') -and $windowProc.Contains('!state->prepared.IsPublicPreview()')) 'Explicit audience selection clears prior bytes, consent/hardware/cooling and disables exports until a new review.'
 Check ($prepare.Contains('state.prepared.IsPublicPreview()') -and $prepare.Contains('PreparePublicBenchmarkReport(state.frozen,') -and
     $review.Contains('WindowsBenchmarkReviewPayload prepared;') -and
-    $audience.Contains('does not publish') -and $audience.Contains('unverified and unranked')) 'Public review uses the typed sanitized builder and discloses local-only, unverified status.'
+    $audience.Contains('does not publish or send anything') -and $audience.Contains('unverified and unranked')) 'Public review uses the typed sanitized builder and discloses local-only, unverified status.'
 Check ($utf8.Contains('const bool submission = false') -and $utf8.Contains('kDeveloperReportSubmissionMaxBytes') -and
     $windowProc.Contains('WindowsSummaryUtf8Preview(state->submission.Json(), remote, true)')) 'Only the explicitly separate Send preview opts into the 20KiB bound; ordinary local previews retain 16KiB.'
 Check ($review.Contains('WindowsStatisticsSubmission submission;') -and
@@ -135,7 +135,7 @@ foreach ($forbidden in @('WinHttp', 'SendPlaytest', 'ShowWindowsRemote', 'Window
 }
 $button = Section $owner 'case kBenchmarkReviewStatsButtonId:' 'case kBenchmarkCopyButtonId:'
 Check ($button.Contains('!sceneContext->benchmark.IsRunning()') -and $button.Contains('benchmarkSummary->IsReady()') -and
-    $button.Contains('ShowWindowsBenchmarkSummaryReview(hWnd, *sceneContext->benchmarkSummary, horde::platform::windows::ProductionWindowsStatisticsSendServices())')) 'Only explicit enabled completed-summary button opens the modal form with its production service boundary.'
+    $button.Contains('ShowWindowsBenchmarkSummaryReview(hWnd, *sceneContext->benchmarkSummary, horde::platform::windows::ProductionWindowsStatisticsSendServices(), LOWORD(wParam) == kBenchmarkReviewStatsButtonId)')) 'Only explicit enabled completed-summary button opens the modal form with its production service boundary.'
 $roster = Section $owner 'std::vector<HWND> VisibleControllerMenuControls(' 'void NavigateControllerMenu('
 Check ($roster.Contains('std::to_array<int>') -and $roster.Contains('kBenchmarkReviewStatsButtonId')) 'New native review action participates in deduced-size controller navigation without a manual roster-capacity regression.'
 Write-Output "PASS: Windows benchmark summary review source contracts; $script:checks checks. No GUI, clipboard, picker, GPU or device execution."

@@ -262,6 +262,7 @@ constexpr int kBenchmarkCopyButtonId = 121;
 constexpr int kBenchmarkSaveButtonId = 122;
 constexpr int kBenchmarkBackButtonId = 123;
 constexpr int kBenchmarkReviewStatsButtonId = 205;
+constexpr int kBenchmarkPrivateStatsButtonId = 222;
 constexpr int kVitalityHudControlId = 124;
 constexpr int kFlaskHudControlId = 7000;
 constexpr int kEndingBodyId = 125;
@@ -3550,11 +3551,12 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle, kEditControlId,
                       context.diagnosticsVisible || context.benchmarkReportVisible);
     for (const int id : {kBenchmarkTitleId, kBenchmarkCopyButtonId,
-                         kBenchmarkSaveButtonId, kBenchmarkReviewStatsButtonId, kBenchmarkBackButtonId})
+                         kBenchmarkSaveButtonId, kBenchmarkReviewStatsButtonId, kBenchmarkPrivateStatsButtonId, kBenchmarkBackButtonId})
     {
         SetControlVisible(context.windowHandle, id, context.benchmarkReportVisible);
     }
-    EnableWindow(GetDlgItem(context.windowHandle, kBenchmarkReviewStatsButtonId),
+    for (const int id : {kBenchmarkReviewStatsButtonId, kBenchmarkPrivateStatsButtonId})
+        EnableWindow(GetDlgItem(context.windowHandle, id),
         context.benchmarkSummary && context.benchmarkSummary->IsReady() && !context.benchmark.IsRunning());
     for (const int id : {kRtLabPanelId, kRtLabTitleId, kRtLabTelemetryId,
                          kRtLabWaterfallLabelId, kRtLabWaterfallSliderId,
@@ -4891,6 +4893,7 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
         kBenchmarkCopyButtonId,
         kBenchmarkSaveButtonId,
         kBenchmarkReviewStatsButtonId,
+        kBenchmarkPrivateStatsButtonId,
         kBenchmarkBackButtonId,
         kRtLabWaterfallSliderId,
         kRtLabRoofSliderId,
@@ -10704,6 +10707,7 @@ void ApplyDpiScaledFonts(HWND window)
                          kBenchmarkCopyButtonId,
                          kBenchmarkSaveButtonId,
                          kBenchmarkReviewStatsButtonId,
+        kBenchmarkPrivateStatsButtonId,
                          kBenchmarkBackButtonId,
                          kSettingsTitleId,
                          kSettingsMoreId,
@@ -10877,7 +10881,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         const int reportTitleHeight = ScaleForDpi(window, 42);
         const int reportButtonHeight = ScaleForDpi(window, 40);
         const int reportGap = ScaleForDpi(window, 8);
-        const int reportButtonY = height - inset - reportButtonHeight;
+        const int reportButtonY = height - inset - 2 * reportButtonHeight - reportGap;
         if (HWND title = GetDlgItem(window, kBenchmarkTitleId))
         {
             MoveWindow(title, inset, inset, width - inset * 2, reportTitleHeight, TRUE);
@@ -10888,16 +10892,19 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
             MoveWindow(edit, inset, editY, width - inset * 2,
                        std::max(ScaleForDpi(window, 100), reportButtonY - reportGap - editY), TRUE);
         }
-        const int availableWidth = width - inset * 2 - reportGap * 3;
-        const int reportButtonWidth = availableWidth / 4;
+        const int contentWidth = width - inset * 2;
+        const int shareWidth = (contentWidth - reportGap) / 2;
         int reportX = inset;
-        for (const int id : {kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkReviewStatsButtonId, kBenchmarkBackButtonId})
-        {
-            if (HWND control = GetDlgItem(window, id))
-            {
-                MoveWindow(control, reportX, reportButtonY, reportButtonWidth, reportButtonHeight, TRUE);
-            }
-            reportX += reportButtonWidth + reportGap;
+        for (const int id : {kBenchmarkReviewStatsButtonId, kBenchmarkPrivateStatsButtonId}) {
+            MoveWindow(GetDlgItem(window, id), reportX, reportButtonY, shareWidth, reportButtonHeight, TRUE);
+            reportX += shareWidth + reportGap;
+        }
+        const int localWidth = (contentWidth - 2 * reportGap) / 3;
+        reportX = inset;
+        for (const int id : {kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId}) {
+            MoveWindow(GetDlgItem(window, id), reportX, reportButtonY + reportButtonHeight + reportGap,
+                localWidth, reportButtonHeight, TRUE);
+            reportX += localWidth + reportGap;
         }
     }
     if(sceneContext && sceneContext->benchmarkChooserVisible) LayoutOpeningBenchmarkChooser(window,width,height);
@@ -12126,9 +12133,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 OpenSamfa12Website(hWnd);
                 return 0;
             case kBenchmarkReviewStatsButtonId:
+            case kBenchmarkPrivateStatsButtonId:
                 if (!sceneContext->benchmark.IsRunning() && sceneContext->benchmarkSummary &&
                     sceneContext->benchmarkSummary->IsReady())
-                    ShowWindowsBenchmarkSummaryReview(hWnd, *sceneContext->benchmarkSummary, horde::platform::windows::ProductionWindowsStatisticsSendServices());
+                    ShowWindowsBenchmarkSummaryReview(hWnd, *sceneContext->benchmarkSummary, horde::platform::windows::ProductionWindowsStatisticsSendServices(), LOWORD(wParam) == kBenchmarkReviewStatsButtonId);
                 return 0;
             case kBenchmarkCopyButtonId:
                 if (!CopyTextToClipboard(hWnd, sceneContext->benchmarkReport))
@@ -13225,10 +13233,11 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createStatic(kBenchmarkChoiceInfoId,"",SS_LEFT);
     createButton(kMoreBySamfa12ButtonId, "MORE BY SAMFA12");
     createButton(kExitButtonId, "QUIT DEMO");
-    createStatic(kBenchmarkTitleId, "BENCHMARK REPORT  |  SELECTABLE TEXT", SS_CENTER | SS_CENTERIMAGE);
+    createStatic(kBenchmarkTitleId, "BENCHMARK RESULTS  |  SHARE OR SAVE", SS_CENTER | SS_CENTERIMAGE);
+    createButton(kBenchmarkReviewStatsButtonId, "PUBLISH TO WEBSITE...");
+    createButton(kBenchmarkPrivateStatsButtonId, "SEND TO DEVELOPER...");
     createButton(kBenchmarkCopyButtonId, "COPY REPORT");
     createButton(kBenchmarkSaveButtonId, "SAVE AS...");
-    createButton(kBenchmarkReviewStatsButtonId, "REVIEW STATS...");
     createButton(kBenchmarkBackButtonId, "BACK TO MENU");
     createStatic(kSettingsTitleId, "SETTINGS  |  SAVED BESIDE THE DEMO", SS_CENTER | SS_CENTERIMAGE);
     createButton(kGraphicsOpenButtonId, "GRAPHICS...");

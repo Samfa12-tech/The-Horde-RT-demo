@@ -74,13 +74,13 @@ public:
         // Injected synthetic receipts must remain visibly distinct from live receipts.
         if (!services.synthetic) {
             switch(Result()) {
-            case WindowsPlaytestSubmissionResult::Queued: return publicBoard_ ? L"Accepted for review; not published. Check publication explicitly later." : L"Private report accepted; developer delivery is not confirmed. Do not send a new copy.";
+            case WindowsPlaytestSubmissionResult::Queued: return publicBoard_ ? L"AWAITING REVIEW - received, but NOT published. Use Check publication to retry this same report safely." : L"Private report accepted; developer delivery is not confirmed. Do not send a new copy.";
             case WindowsPlaytestSubmissionResult::Sent: return L"Email provider accepted the private report. Inbox delivery is not confirmed.";
-            case WindowsPlaytestSubmissionResult::Published: return L"Matching published receipt received.";
+            case WindowsPlaytestSubmissionResult::Published: return L"PUBLISHED - the server confirmed this report is on the public results board.";
             case WindowsPlaytestSubmissionResult::VerificationExpired: return L"Verify again, then retry the same reviewed payload explicitly.";
             case WindowsPlaytestSubmissionResult::RateLimited: return L"Rate limited. Wait before an explicit same-ID retry.";
             case WindowsPlaytestSubmissionResult::Conflict: return L"ID/content conflict. No successful receipt.";
-            case WindowsPlaytestSubmissionResult::Rejected: return L"Rejected. No successful delivery or publication receipt.";
+            case WindowsPlaytestSubmissionResult::Rejected: return L"FAILED - the server rejected this report. Nothing is confirmed delivered or published.";
             case WindowsPlaytestSubmissionResult::Uncertain: return L"Outcome unknown. Retry explicitly with the same payload and fresh verification.";
             default: return Busy() ? L"Request in progress. Cancellation cannot prove it was not accepted." : L"Review this separate submission. Send starts a fresh anti-spam check.";
             }

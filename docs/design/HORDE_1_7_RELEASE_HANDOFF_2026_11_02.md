@@ -68,3 +68,45 @@ owner's screen and saves were not touched overnight.
 In-app Windows and Android credits now include the tawny owl and cricket
 attributions and link to the packaged notice. `release/SAMFA12_SITE_COPY.md`
 is explicitly labelled historical 1.6.0 copy, not current release text.
+
+
+## 2 November evening, sharing and footstep checkpoint
+
+Development runtime43d5886d passed all six hosted CI jobs (run41513565737).
+The fixed Windows Standard benchmark completed a real2-lap/26-waypoint run with
+1838valid CPU/GPU rows, an acknowledged1920x1080 apply and restored1920x966
+window/settings. The owner then recalls a publication tick, but live public GET
+showed zero rows and the closed client retained no matching receipt. Public
+publication is unconfirmed. Do not resend this report or close the reporting
+gate from the local benchmark alone. The private compatibility email for the
+earlier missing-assets startup was independently delivered; it has a different
+purpose and payload. Issue38 links that manually mis-staged package failure.
+
+The revised Windows results UI gives direct Publish to website and Send to
+developer entries, a single local Review step, explicit separate remote
+consent and a Verify/Send action. Technical JSON is collapsed by default.
+Published, awaiting review and failure statuses are distinct. The exact
+payload builders, verification service and immutable retry owner remain in
+place. Source/fixture validation is recorded separately; final ordinary
+package and owner clarity check remain ahead. Android result UI is a separate
+surface and its compact disclosure had earlier private device coverage, not
+this Windows flow.
+
+Grounded dry/wet player contacts now use the authored Walking clip's half-cycle
+spacing at the production1.9m/s movement reference,0.989583m after the existing
+initial0.24m weight shift. This addresses the owner-observed overly frequent
+sound cadence while retaining actual-travel and support gating, surface family
+routing and wet-step priority. Host checks cover those contracts. Physical
+foot-to-sound perception across walk, run, reverse and terrain still needs owner
+acceptance on a package built from this commit.
+
+The phone was restored before owner departure: original debug APK SHA and all
+593 original files matched backup, rotation and Home restored, production
+untouched. No phone evidence from the later Windows sharing/cadence edits.
+The owner supplied a local signing-key folder; key material was not read and
+independent backup/recovery remains owner-only confirmation.
+
+Release communication scope: itch devlog, itch main-page update and the
+samfa12.com Horde page should accompany the final verified1.7 publication.
+Post-release owner playthrough video and multi-device benchmarks are future
+follow-up, not gates for this source checkpoint.

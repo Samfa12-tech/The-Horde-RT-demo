@@ -134,10 +134,12 @@ void CueAndTransportContracts() {
 
 void GroundedDistanceCadence() {
     TravelFootstepCadence cadence;
+    Check(Near(TravelFootstepCadence::kStepIntervalMetres, 0.9895833f, .00001f),
+          "sound contacts follow half of the 1.0416667 second Walking clip at 1.9m/s");
     Check(!cadence.Update(.239f, true, true) && cadence.Update(.001f, true, true),
           "first contact requires the existing 0.24 metres of actual travel");
-    Check(!cadence.Update(.719f, true, true) && cadence.Update(.001f, true, true),
-          "subsequent contact retains existing 0.72 metre spacing");
+    Check(!cadence.Update(TravelFootstepCadence::kStepIntervalMetres - .001f, true, true) && cadence.Update(.001f, true, true),
+          "subsequent contact follows half of the authored walking cycle");
     bool stationarySilent = true;
     for (int tick = 0; tick < 120; ++tick) stationarySilent &= !cadence.Update(0, true, true);
     Check(stationarySilent, "stationary intent cannot manufacture a contact");
@@ -161,7 +163,8 @@ TravelResult Travel(InputSnapshot input, unsigned ticks) {
         const auto& now = sim.Snapshot();
         const float travel = std::hypot(now.playerX - previous.playerX, now.playerZ - previous.playerZ);
         result.distance += travel;
-        if (result.distance + .00001f >= .24f + .72f * expected) ++expected;
+        if (result.distance + .00001f >= TravelFootstepCadence::kInitialStepDistanceMetres +
+            TravelFootstepCadence::kStepIntervalMetres * expected) ++expected;
         unsigned thisTick = 0;
         for (const auto& event : sim.Events().Events()) if (IsStep(event.type)) {
             ++result.contacts; ++thisTick;
@@ -292,7 +295,8 @@ void ActualTerrainAndBoundary(const std::shared_ptr<const TriangleSupportSurface
         sim.ClearEvents(); sim.StepFixed(input, kTick, ++publication);
         const auto& now = sim.Snapshot();
         distance += std::hypot(now.playerX - previous.playerX, now.playerZ - previous.playerZ);
-        if (distance + .00001f >= .24f + .72f * expected) ++expected;
+        if (distance + .00001f >= TravelFootstepCadence::kInitialStepDistanceMetres +
+            TravelFootstepCadence::kStepIntervalMetres * expected) ++expected;
         sawBoundary |= now.playerSupportSurface != previousSurface;
         previousSurface = now.playerSupportSurface;
         for (const auto& event : sim.Events().Events()) if (event.type == GameplayEventType::PlayerFootstep) {

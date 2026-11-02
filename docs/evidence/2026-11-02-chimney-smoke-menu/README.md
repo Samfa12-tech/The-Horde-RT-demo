@@ -142,3 +142,17 @@ requested a much clearer direct public/private results flow; that is a separate
 following UI correction, preserving explicit destination consent and strict
 receipt interpretation. NVIDIA overlay utilization up to77% is an owner
 observation, not evidence of spare capacity or a proven CPU bottleneck.
+
+
+Final phone handoff supersedes the earlier retained-debug note: at the parent's
+explicit departure request, the original debug APK was restored in place.
+Its installed SHA256 exactly matched the pre-test backup; all 593 original state
+file hashes still matched. Rotation was restored, app stopped and phone released.
+No further device operations are authorized by this handoff.
+
+
+Owner public-send recollection remains uncertain: the live API returned zero
+rows and no retained client receipt identifies a published result. The new
+Windows sharing path was created because the previous nested private-first
+form was hard to discover. It is fixture-tested only until a final binary
+gets owner acceptance and the backend reviewed catalog admits that identity.
