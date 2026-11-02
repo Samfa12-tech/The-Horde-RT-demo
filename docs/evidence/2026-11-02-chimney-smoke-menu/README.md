@@ -53,3 +53,32 @@ visual-order navigation and native benchmark cancellation tests pass. No owner
 window was closed, no foreground input sent and no phone accessed during this slice.
 Final hosted checks are reported by exact development commit at closeout.
 
+## Subsequent owner test and corrections
+
+The owner accepted chimney smoke and confirmed surface-dependent footstep samples
+on the isolated `66b707b8` Windows build. Cadence/footfall synchronization is a
+separate new finding, pending investigation. The owner closed that session.
+
+The first package launch failed before RT presentation (issue #38): the manual
+staging copied `assets/` but omitted the separately required `private_flask/` and
+`private_revival/` directories. Adding all three hash-verified files from the
+previous accepted package, with the executable unchanged, restored normal RT
+entry rendering. Preserve that failed-launch report; this is not a GPU-support
+failure or evidence that ordinary release packaging failed. Private candidate
+staging must verify both the main assets and these enabled-feature roots.
+
+Standard benchmark then independently failed its style apply guard. Its receipt
+showed exact1920x1080 output and successful restoration, but extended-style setter
+returned zero with LastError2. A native hidden-window regression reproduces a
+successful zero-old-style mutation whose synchronous WM_STYLECHANGED callback
+clobbers LastError. Admission now verifies the actual desired32-bit style, allowing
+only Win32's observed addition of WS_CLIPSIBLINGS for top-level popup style.
+Invalid HWNDs and callback-rejected changes still fail. The native fixture passes;
+a corrected full application benchmark run remains to be checked. No result is
+admitted from the aborted run. Private compatibility email delivery for its
+separate startup report was independently confirmed by the parent, not benchmark
+submission, client-receipt verification or public-board acceptance.
+
+Release communications retained: coordinate the itch devlog, itch main-page copy
+and samfa12.com Horde page with the final verified1.7 release. Do not claim live
+publication from this development checkpoint; parent owns website coordination.
