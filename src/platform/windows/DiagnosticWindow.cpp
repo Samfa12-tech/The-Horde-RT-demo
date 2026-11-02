@@ -6583,6 +6583,16 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         }
     }
 #endif
+#if HORDE_RT_FLASK_CANDIDATE
+    const auto utilityPath=(ExecutableDirectory()/"private_flask/player.glb").string();
+    std::string utilityHash;
+    if(!Sha256File(utilityPath,utilityHash,diagnostic) ||
+       utilityHash!=horde::gameplay::simulation::kFlaskCandidateSha256 ||
+       !ctx.rtScene.SetPlayerUtilityCandidateAsset(utilityPath)) {
+        ctx.lastRtFrameError="Flask candidate requires its pinned native utility binding before scene creation.";
+        return false;
+    }
+#endif
     std::string selectedSkeletonAssetPath =
         (assetRoot / "models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();
     std::vector<horde::scene::SkinnedClipBinding> selectedSkeletonBindings;
@@ -7409,6 +7419,11 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning,
                 horde::vulkan::raytracing::ResolveFireEmitterQuality(ctx.fireDetail), std::nullopt,
                 horde::vulkan::raytracing::ProductionAttackWarningOptions(ctx.reducedMotionEnabled));
+        if(simulation.flaskUtilityCandidate && !entryFrame && !previewFrame &&
+           !horde::vulkan::raytracing::ApplyFlaskUtilityCandidateFrame(simulation,frameInputs,ctx.lastRtFrameError)) {
+            if(evidenceFrame)ctx.rtFrameEvidence.FailRecord(observation);
+            return false;
+        }
 #if defined(_DEBUG)
         if (ctx.inspectionSkeletonBlends) {
             if (!ctx.playerDodgeInspectionSnapshot || !frozenDevelopmentCheckpoint ||

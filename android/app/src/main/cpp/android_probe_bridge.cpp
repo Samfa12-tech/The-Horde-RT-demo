@@ -3622,6 +3622,11 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
     if(context.environmentSurvey && !context.keeperMistSnapshot && !context.rtScene.SetRegionalWaterDiagnosticEnabled(
             !context.environmentSurveyWaterDisabled))return false;
 #endif
+#if HORDE_RT_FLASK_CANDIDATE
+    if(!context.rtScene.SetPlayerUtilityCandidateAsset(context.reportDirectory+"/../private_flask/player.glb")) {
+        diagnostic="Flask candidate native binding was not selected before scene creation.";return false;
+    }
+#endif
     std::vector<horde::scene::SkinnedClipBinding> revivalBindings;
 #if HORDE_RT_PRIVATE_REVIVAL
     const auto& ordinary=horde::scene::SkeletonCombatClipSet().clips;
@@ -4836,6 +4841,15 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                         static_cast<int>(context.graphicsSettings.waterQuality)),
                     rtLabTuning, std::nullopt, std::nullopt,
                     horde::vulkan::raytracing::ProductionAttackWarningOptions(ReadEntryControls().reducedMotion));
+            if(renderedSimulation.flaskUtilityCandidate &&
+               context.sceneProfile==horde::vulkan::raytracing::RtSceneProfile::Showcase) {
+                std::string flaskDiagnostic;
+                if(!horde::vulkan::raytracing::ApplyFlaskUtilityCandidateFrame(renderedSimulation,frameInputs,flaskDiagnostic)) {
+                    __android_log_print(ANDROID_LOG_ERROR,kTag,"Flask frame rejected: %s",flaskDiagnostic.c_str());
+                    if(evidenceFrame)context.rtFrameEvidence.FailRecord(observation);
+                    return false;
+                }
+            }
             submittedDialogueTick = renderedSimulation.tickIndex;
             if(!context.environmentSurvey){gCampaignFrameTick=renderedSimulation.tickIndex;
                 gCampaignFrameWorld=renderedSimulation.worldRoute.generation;}

@@ -87,12 +87,22 @@ bool PrepareCampaignResources(SwapchainContext& context)
     const auto extent=ScaledRenderExtent(context.swapchainExtent,context.renderScale);
     const auto root=context.reportDirectory+"/..";
     std::string diagnostic;
+    auto skeletonPath=root+"/skeleton_biped_merged_animations_v01.glb";
+    std::vector<horde::scene::SkinnedClipBinding> bindings;
+#if HORDE_RT_PRIVATE_REVIVAL
+    skeletonPath=root+"/private_revival/skeleton.glb";
+    const auto& ordinary=horde::scene::SkeletonCombatClipSet().clips;
+    bindings.assign(ordinary.begin(),ordinary.end());bindings.push_back({"SkeletonProof|StandDead0ToIdle",false,true});
+#endif
+#if HORDE_RT_FLASK_CANDIDATE
+    if(!scene.SetPlayerUtilityCandidateAsset(root+"/private_flask/player.glb"))return false;
+#endif
     const bool ready=scene.Initialise(context.instance,context.physicalDevice,context.device,
         context.graphicsQueue,context.commandPool,extent,context.swapchainFormat,
-        root+"/skeleton_biped_merged_animations_v01.glb",root+"/lich_placeholder_merged_animations_v01.glb",
+        skeletonPath,root+"/lich_placeholder_merged_animations_v01.glb",
         root,root,diagnostic,{},root,context.executionBackend,
         horde::vulkan::raytracing::RtSceneProfile::Showcase,context.graphicsSettings.glassEnabled,
-        context.pipelineCache,context.compiledPipelineCache?&context.compiledPipelineCache->cache:nullptr);
+        context.pipelineCache,context.compiledPipelineCache?&context.compiledPipelineCache->cache:nullptr,bindings);
     __android_log_print(ready?ANDROID_LOG_INFO:ANDROID_LOG_ERROR,kTag,
         "HORDE_CAMPAIGN_RESOURCE_PREP request=%llu ready=%d previous_scene_retained=1 diagnostic=%s",
         static_cast<unsigned long long>(gCampaignOwnerRequest),ready?1:0,diagnostic.c_str());

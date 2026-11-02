@@ -25,6 +25,19 @@ if(privateRevivalDirectory) {
     }
 }
 
+// Explicit application integration trial; source folders remain excluded.
+def flaskCandidateDirectory=providers.gradleProperty('hordeFlaskCandidateDir').orNull
+if(flaskCandidateDirectory) {
+    def flaskRoot=file(flaskCandidateDirectory)
+    def flaskFiles=[]
+    flaskRoot.eachFileRecurse(groovy.io.FileType.FILES) { flaskFiles.add(flaskRoot.toPath().relativize(it.toPath()).toString().replace('\\','/')) }
+    def flaskFile=new File(flaskRoot,'private_flask/player.glb')
+    if(flaskFiles!=['private_flask/player.glb'] || !flaskFile.isFile() ||
+       MessageDigest.getInstance('SHA-256').digest(flaskFile.bytes).encodeHex().toString()!=
+       '56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014')
+        throw new GradleException('Flask candidate requires only the exact pinned runtime derivative, no source files.')
+}
+
 def hordeVersionFile = rootProject.file('../VERSION')
 def hordeVersionCodeMapFile = rootProject.file('../version-code-map.json')
 def readHordeUtf8Authority = { File authorityFile, String authorityName ->
@@ -661,6 +674,7 @@ android {
         versionCode hordeVersionCode.intValue()
         versionName hordeVersionName
         buildConfigField 'boolean', 'PRIVATE_REVIVAL', 'false'
+        buildConfigField 'boolean', 'FLASK_CANDIDATE', 'false'
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
         buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', 'false'
@@ -700,6 +714,7 @@ android {
     buildTypes {
         debug {
             buildConfigField 'boolean', 'PRIVATE_REVIVAL', privateRevivalDirectory ? 'true' : 'false'
+            buildConfigField 'boolean', 'FLASK_CANDIDATE', flaskCandidateDirectory ? 'true' : 'false'
             applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
             buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', outdoorScaleProbe ? 'true' : 'false'
@@ -711,7 +726,7 @@ android {
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}", '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
+                    arguments "-DHORDE_RT_FLASK_CANDIDATE=${flaskCandidateDirectory ? 'ON' : 'OFF'}", "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}", '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
@@ -724,7 +739,8 @@ android {
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF',
+                    arguments '-DHORDE_RT_PRIVATE_REVIVAL=OFF', '-DHORDE_RT_FLASK_CANDIDATE=OFF',
+                        '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF',
                         '-DHORDE_RT_ACTOR_WORKER_EXPERIMENT=OFF',
                         *hordeRtNativePolicyArguments('Shipping')
                 }
@@ -771,6 +787,7 @@ android {
         main.assets.srcDirs = [runtimeAssetsDir.get().asFile]
         if (viewmodelCandidate) debug.assets.srcDir(viewmodelOverlayDir)
         if (privateRevivalDirectory) debug.assets.srcDir(file(privateRevivalDirectory))
+        if (flaskCandidateDirectory) debug.assets.srcDir(file(flaskCandidateDirectory))
     }
 }
 

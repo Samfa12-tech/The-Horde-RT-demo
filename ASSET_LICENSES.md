@@ -810,3 +810,19 @@ This source-folder candidate is excluded from Android/runtime packages and is
 not normal-play or release admission. Its explicit native CPU binding, exact
 receipt and remaining cancellation/RT gates are recorded in
 `docs/evidence/2026-10-26-flask-native-binding/README.md`.
+
+## Explicit flask application candidate - 2 November 2026
+
+The owner-authorised 1.7 application integration trial may stage the exact
+`56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014`
+native player derivative above as `private_flask/player.glb` in an isolated
+Windows acceptance package or explicit Android Debug candidate. Only that
+runtime derivative is copied from the retained source study; Blend files,
+recipes and previews remain excluded. Existing player/gauntlet/sword rights
+and attribution remain unchanged. No new provider input or blanket licence is
+introduced. The owned runtime flask prop retains the provenance recorded above.
+
+This extends the prior CPU-only boundary to an executable validation candidate.
+It does not certify RT hand/contact/reflection/shadow joins, touch/controller
+feel, lifecycle or normal-play/release admission. Ordinary packaging explicitly
+disables this trial and the private revival trial, including cached build options.

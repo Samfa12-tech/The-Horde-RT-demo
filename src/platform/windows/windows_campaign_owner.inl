@@ -63,13 +63,30 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     scene.SetDevelopmentSupportFixture(false);
     const auto root=ResolveAssetRoot();
     std::string diagnostic;
+    auto skeletonPath=(root/"models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();
+    std::vector<horde::scene::SkinnedClipBinding> bindings;
+#if HORDE_RT_PRIVATE_REVIVAL
+    skeletonPath=(ExecutableDirectory()/"private_revival/skeleton.glb").string();
+    std::string standHash;
+    if(!Sha256File(skeletonPath,standHash,diagnostic) || standHash!=horde::gameplay::simulation::kPrivateStandSha256)
+        return CampaignPreparationFailure(ctx,"stand-binding","Pinned revival stand unavailable for campaign scene.");
+    const auto& ordinary=horde::scene::SkeletonCombatClipSet().clips;
+    bindings.assign(ordinary.begin(),ordinary.end());bindings.push_back({"SkeletonProof|StandDead0ToIdle",false,true});
+#endif
+#if HORDE_RT_FLASK_CANDIDATE
+    const auto utilityPath=(ExecutableDirectory()/"private_flask/player.glb").string();
+    std::string utilityHash;
+    if(!Sha256File(utilityPath,utilityHash,diagnostic) || utilityHash!=horde::gameplay::simulation::kFlaskCandidateSha256 ||
+       !scene.SetPlayerUtilityCandidateAsset(utilityPath))
+        return CampaignPreparationFailure(ctx,"flask-binding","Pinned flask binding unavailable for campaign scene.");
+#endif
     const bool ready=scene.Initialise(ctx.instance,ctx.physicalDevice,ctx.device,ctx.graphicsQueue,
         ctx.commandPool,ScaledRenderExtent(ctx.swapchainExtent,ctx.renderScale),ctx.swapchainFormat,
-        (root/"models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
+        skeletonPath,
         (root/"models/enemies/meshy/lich_placeholder_merged_animations_v01.glb").string(),
         (root/"textures/polyhaven/mobile_1k").string(),(root/"textures/meshy/lich_placeholder_v01").string(),
         diagnostic,{},root.string(),ctx.executionBackend,
-        horde::vulkan::raytracing::RtSceneProfile::Showcase,ctx.requestedGlassEnabled,ctx.pipelineCache);
+        horde::vulkan::raytracing::RtSceneProfile::Showcase,ctx.requestedGlassEnabled,ctx.pipelineCache,nullptr,bindings);
     std::cerr<<"HORDE_WINDOWS_CAMPAIGN prepare ready="<<ready<<" previous_scene_retained=1 diagnostic="<<diagnostic<<'\n';
     if(!DrainCampaignResources(ctx))return false;
     if(!ready){ctx.campaignPreparedScene.reset();ctx.campaignMessage=diagnostic;return CampaignPreparationFailure(ctx,"scene-initialise",diagnostic);}

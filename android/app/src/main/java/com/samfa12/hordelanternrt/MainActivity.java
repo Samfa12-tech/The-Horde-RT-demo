@@ -932,6 +932,10 @@ public class MainActivity extends Activity {
                     "800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259")!=null ||
                 PrivateLichRevivalAudio.validate(getFilesDir())!=null))
                 throw new IllegalStateException("Pinned private revival assets failed staging or identity verification.");
+            if(BuildConfig.FLASK_CANDIDATE && (!stageAsset("private_flask/player.glb","private_flask/player.glb") ||
+                PrivateLichRevivalAudio.validatePinnedFile(new File(getFilesDir(),"private_flask/player.glb"),2719368L,
+                    "56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014")!=null))
+                throw new IllegalStateException("Pinned flask native binding failed staging or identity verification.");
             final boolean lichStaged = stageAsset(LICH_ASSET, LICH_FILE);
             final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2", "diff-array-512-astc6x6.ktx2")
                     && stageAsset("textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2", "normal-array-512-astc4x4.ktx2")
