@@ -1,0 +1,2 @@
+# Original Pixabay downloads are local-only source assets, not standalone distributions.
+/originals/*.mp3

@@ -19,6 +19,32 @@ The running RT scene uses the five Poly Haven material sets, the Hotstrike Studi
 - Do not import untextured Meshy models and call them complete.
 - When the Meshy account plan is unknown, do not claim paid-plan terms. Ship only when the underlying asset permits distribution and apply the conservative Meshy Free-plan CC BY 4.0 attribution path.
 
+## Staged 1.6.2 skeleton and lich audio (not integrated)
+
+The user supplied these four MP3s on 2026-10-01 for future 1.6.2 sound effects.
+Originals are retained locally under `assets/audio/source/pixabay-1.6.2/originals/`
+and ignored by Git; they are outside existing Windows/Android runtime package
+selections. No runtime derivative or playback mapping has been added.
+Exact filenames, hashes, sizes, and media details are recorded in
+`assets/audio/source/pixabay-1.6.2/manifest.json`; the intake and future integration
+notes are in `assets/audio/source/pixabay-1.6.2/README.md`.
+
+| Source title | Artist / uploader | Source page | Licence / intended use |
+|---|---|---|---|
+| Falling Bones | spookymodem (Freesound) / freesound_community | https://pixabay.com/sound-effects/film-special-effects-falling-bones-87568/ | Pixabay Content License; staged skeleton cue |
+| Rattling Bones | spookymodem (Freesound) / freesound_community | https://pixabay.com/sound-effects/film-special-effects-rattling-bones-105394/ | Pixabay Content License; staged skeleton cue |
+| Lich Demonic Voice - I Sense You! | PhatPhrogStudio | https://pixabay.com/sound-effects/people-lich-demonic-voice-i-sense-you-490452/ | Pixabay Content License; staged lich voice |
+| Lich Demonic Voice - Come Closer! | PhatPhrogStudio | https://pixabay.com/sound-effects/horror-lich-demonic-voice-come-closer-502312/ | Pixabay Content License; staged lich voice |
+
+Each source page identifies the Pixabay Content License (checked 2026-10-01).
+Licence summary: https://pixabay.com/service/license-summary/; full terms:
+https://pixabay.com/service/terms/ (page last updated 2024-11-18).
+Use/adaptation for commercial or non-commercial works is permitted subject to
+the terms, with optional attribution; standalone distribution is prohibited.
+Voluntary credits use the source title and artist above, followed by "via Pixabay".
+Original Freesound licences for these two bone clips have not been independently
+verified; no CC0 claim is made. No download certificates were supplied.
+
 ## Asset manifest
 
 | Asset | Type | Source | License | Imported by | Notes |

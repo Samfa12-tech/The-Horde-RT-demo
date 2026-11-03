@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "target_update": "1.6.2",
+  "status": "source-staged-not-integrated",
+  "organised_on": "2026-10-01",
+  "source_acquisition": "User-supplied local MP3 downloads; download date not established.",
+  "source_pages_checked_on": "2026-10-01",
+  "license": {
+    "name": "Pixabay Content License",
+    "summary_url": "https://pixabay.com/service/license-summary/",
+    "terms_url": "https://pixabay.com/service/terms/",
+    "terms_page_updated_on": "2024-11-18",
+    "record": "Source pages identify these clips as available under the Pixabay Content License. Commercial/non-commercial use and adaptation permitted subject to terms; attribution optional; standalone distribution prohibited.",
+    "original_freesound_license": "Not independently verified for these two bone clips; no CC0 claim.",
+    "certificate": "No download certificate supplied."
+  },
+  "processing": "None. Original bytes retained. No trim, resampling, gain adjustment, looping or runtime conversion.",
+  "validation": {
+    "probe": "ffprobe: MP3 format, duration, sample rate, channels, bitrate and size",
+    "decode": "All four originals decoded to null with FFmpeg without reported errors.",
+    "listening_review": "Not performed; decode validation is not artistic or in-game acceptance."
+  },
+  "assets": [
+    {
+      "id": "skeleton_falling_bones",
+      "original_file": "originals/freesound_community-falling-bones-87568.mp3",
+      "title": "Falling Bones",
+      "artist": "spookymodem (Freesound)",
+      "pixabay_uploader": "freesound_community",
+      "pixabay_item": 87568,
+      "source_url": "https://pixabay.com/sound-effects/film-special-effects-falling-bones-87568/",
+      "source_publication_date": "2022-08-17",
+      "voluntary_credit": "Falling Bones by spookymodem (Freesound), via Pixabay",
+      "media": {
+        "codec": "mp3",
+        "container_duration_seconds": 2.928,
+        "sample_rate_hz": 24000,
+        "channels": 2,
+        "channel_layout": "stereo",
+        "audio_bitrate_bps": 160000,
+        "size_bytes": 58560,
+        "sha256": "F00C6F4EFC3D6C66A236812EB140225415E7573D18FC97DD3A1F6CD071FECCA7"
+      },
+      "runtime_asset": null,
+      "trigger_mapping": "Pending 1.6.2 integration design."
+    },
+    {
+      "id": "skeleton_rattling_bones",
+      "original_file": "originals/freesound_community-rattling-bones-105394.mp3",
+      "title": "Rattling Bones",
+      "artist": "spookymodem (Freesound)",
+      "pixabay_uploader": "freesound_community",
+      "pixabay_item": 105394,
+      "source_url": "https://pixabay.com/sound-effects/film-special-effects-rattling-bones-105394/",
+      "source_publication_date": "2022-09-07",
+      "voluntary_credit": "Rattling Bones by spookymodem (Freesound), via Pixabay",
+      "media": {
+        "codec": "mp3",
+        "container_duration_seconds": 5.52,
+        "sample_rate_hz": 24000,
+        "channels": 2,
+        "channel_layout": "stereo",
+        "audio_bitrate_bps": 160000,
+        "size_bytes": 110400,
+        "sha256": "68262EDA1E18233F606EE140557F2009BD1CA3A26F76BFC0B49A421F2EC28D70"
+      },
+      "runtime_asset": null,
+      "trigger_mapping": "Pending 1.6.2 integration design."
+    },
+    {
+      "id": "lich_i_sense_you",
+      "original_file": "originals/phatphrogstudio-lich-demonic-voice-i-sense-you-490452.mp3",
+      "title": "Lich Demonic Voice - I Sense You!",
+      "artist": "PhatPhrogStudio",
+      "pixabay_uploader": "PhatPhrogStudio",
+      "pixabay_item": 490452,
+      "source_url": "https://pixabay.com/sound-effects/people-lich-demonic-voice-i-sense-you-490452/",
+      "source_publication_date": "2026-02-27",
+      "voluntary_credit": "Lich Demonic Voice - I Sense You! by PhatPhrogStudio, via Pixabay",
+      "media": {
+        "codec": "mp3",
+        "container_duration_seconds": 2.716719,
+        "sample_rate_hz": 44100,
+        "channels": 1,
+        "channel_layout": "mono",
+        "audio_bitrate_bps": 256000,
+        "size_bytes": 86935,
+        "sha256": "09708962B7EB56DE215B8B585AEB7793082C58F1FA07924CD9D4B5E1012A19F0"
+      },
+      "runtime_asset": null,
+      "trigger_mapping": "Pending 1.6.2 integration design."
+    },
+    {
+      "id": "lich_come_closer",
+      "original_file": "originals/phatphrogstudio-lich-demonic-voice-come-closer-502312.mp3",
+      "title": "Lich Demonic Voice - Come Closer!",
+      "artist": "PhatPhrogStudio",
+      "pixabay_uploader": "PhatPhrogStudio",
+      "pixabay_item": 502312,
+      "source_url": "https://pixabay.com/sound-effects/horror-lich-demonic-voice-come-closer-502312/",
+      "source_publication_date": "2026-03-19",
+      "voluntary_credit": "Lich Demonic Voice - Come Closer! by PhatPhrogStudio, via Pixabay",
+      "media": {
+        "codec": "mp3",
+        "container_duration_seconds": 2.873469,
+        "sample_rate_hz": 44100,
+        "channels": 1,
+        "channel_layout": "mono",
+        "audio_bitrate_bps": 256000,
+        "size_bytes": 91951,
+        "sha256": "BEE57EDCC14830E0A4771C9525E19238F2DFC5FF7BE153C7B5AC1F1375A0C5E3"
+      },
+      "runtime_asset": null,
+      "trigger_mapping": "Pending 1.6.2 integration design."
+    }
+  ]
+}

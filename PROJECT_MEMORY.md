@@ -44,6 +44,12 @@ are future investigation, not passing. Do not restart accepted player/audio work
 - Showcase Alpha 1.5.2 publishes the bounded two-skeleton/parry loop, directional dodge, clear roof-water drench/catchment/drain, lich ground mist, positional waterfall ambience, cross-platform RT Lab, corrected general RT water lighting, and Windows controller path. Do not add a third enemy, held guard, broad AI, or fluid simulation without a later phone-measured plan.
 - The authored coloured-light route is complete and published in Showcase Alpha 0.1.1; its design history is `docs/COLOURED_LIGHT_ROUTE_PLAN_2026-07-15.md` and its final evidence is in the Windows/Android/release validation records.
 
+## Planned 1.6.2 audio intake
+
+- On 2026-10-01 the user selected Pixabay Falling Bones / Rattling Bones (spookymodem via freesound_community) and the lich voice lines I Sense You / Come Closer (PhatPhrogStudio) for 1.6.2. Source organisation only is complete; update implementation has not started.
+- Originals and their source/licence/hash manifest are organised under `assets/audio/source/pixabay-1.6.2/`; MP3 originals are local-only and ignored by Git. See its `README.md` and `ASSET_LICENSES.md`. Trigger mappings, cue windows, and mixing remain pending; the release/runtime state is unchanged.
+- Audio/haptic manual revalidation required: **NO** for this source-only intake, because active playback and feedback semantics are unchanged. Future integration requires **YES** because audible cue assets will change.
+
 ## Current renderer
 
 - The preferred Android/Windows backend builds BLAS/TLAS and RT pipeline/SBT, dispatches `vkCmdTraceRaysKHR`, writes an RT storage image and presents through the swapchain. The authorised real RayQueryCompute backend uses the same hardware acceleration structures/shading and RT-produced presentation without pipeline/SBT requirements; it is not a software/fake-RT fallback.
