@@ -38,6 +38,7 @@
     <string name="update_open_failed">The GitHub release page could not be opened.</string>
     <string name="credits">CREDITS &amp; LICENCES</string>
     <string name="quit">QUIT DEMO</string>
+    <string name="quit_to_main_menu">QUIT TO MAIN MENU</string>
     <string name="back">BACK</string>
     <string name="swing">SWING</string>
     <string name="vitality_half_accessibility">Vitality %1$d and a half of %2$d</string>

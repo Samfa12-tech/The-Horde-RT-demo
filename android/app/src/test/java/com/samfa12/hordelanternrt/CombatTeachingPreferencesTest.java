@@ -271,15 +271,13 @@ public final class CombatTeachingPreferencesTest {
         assertFalse(CombatTeachingPreferences.safePractice(live));
         assertEquals(255,CombatTeachingPreferences.promptOpacity(live));
     }
-    @Test public void sheathHoldFeedbackUsesOnlyTheNewSnapshotFields() {
-        long holding=2L|(50L<<50);
-        assertTrue(CombatTeachingPreferences.prompt(holding).contains("sheathe: 50%"));
-        assertEquals(255,CombatTeachingPreferences.promptOpacity(holding));
-        assertTrue(CombatTeachingPreferences.needsTimelyRefresh(holding));
-        long stowed=2L|(1L<<57);
-        assertTrue(CombatTeachingPreferences.prompt(stowed,true).contains("Attack or Parry to draw"));
-        assertFalse(CombatTeachingPreferences.safePractice(stowed));
-        assertEquals(0,CombatTeachingPreferences.attackReadability(stowed));
+    @Test public void sheathGestureDoesNotAddPersistentTeachingOverlay() {
+        for(long state : new long[]{2L|(50L<<50),2L|(1L<<57)}) {
+            assertEquals("",CombatTeachingPreferences.prompt(state));
+            assertEquals("",CombatTeachingPreferences.prompt(state,true));
+            assertEquals(0,CombatTeachingPreferences.promptOpacity(state));
+            assertFalse(CombatTeachingPreferences.needsTimelyRefresh(state));
+        }
     }
     @Test public void reducedMotionRemovesOpacityAnimationButKeepsVisibleState() {
         assertEquals(0.5f, CombatTeachingPreferences.alpha(128, false), 0.01f);

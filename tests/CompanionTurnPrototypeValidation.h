@@ -33,6 +33,13 @@ template<class Check> void Validate(const std::shared_ptr<const Terrain>& terrai
     for(;guideTicks<1000 && !basinGuide.State().basinArrived;++guideTicks) {
         const auto old=basinGuide.State();
         basinGuide.Step(dt,old.x,old.z,true,true,false,terrain.get(),true,true,true);
+        const auto& guided=basinGuide.State();
+        if(std::hypot(guided.x-old.x,guided.z-old.z)>0) {
+            const auto recipe=horde::scene::CompanionAnimation(guided,1.f);
+            check(guided.motion.mode==CompanionMotionMode::Walking &&
+                  recipe.blend.clip==horde::scene::SkinnedClip::Walking && recipe.blend.weight>0,
+                  "Accepted basin travel publishes a walking pose rather than a retained turn/idle recipe");
+        }
     }
     check(guideTicks<1000 && basinGuide.State().grounded &&
           std::hypot(basinGuide.State().x-(simulation::kWorldRoutePoints[2].x+1.45f),

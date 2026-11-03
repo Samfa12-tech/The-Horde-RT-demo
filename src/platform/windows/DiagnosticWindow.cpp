@@ -3398,12 +3398,6 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     context.combatAttackCueVisible = attackCue;
     context.combatPracticeCueVisible = practiceCue;
     std::string text = horde::platform::windows::CombatTeachingPromptText(teaching, context.teachingControllerGlyphs, revivalClearance);
-    const bool sheathCue=snapshot.swordSheathHoldProgress>0.f || snapshot.swordIntentionallyStowed;
-    if(sheathCue) {
-        if(!text.empty())text+="\r\n";
-        text+=snapshot.swordIntentionallyStowed ? "Sword sheathed. Attack or Parry to draw." :
-            "Hold Attack to sheathe: "+std::to_string(static_cast<int>(snapshot.swordSheathHoldProgress*100.f))+"%";
-    }
     const bool eligible = context.controlsEnabled && !MeasurementPausedByUi(context) &&
         !context.benchmarkReportVisible && !context.benchmark.IsRunning() &&
         !context.deathOverlayVisible && !context.endingOverlayVisible && !context.rtLabVisible;
@@ -3421,7 +3415,7 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     if (!text.empty())
     {
         context.combatTeachingFadeText = text;
-        context.combatTeachingFadeOpacity = attackCue || teaching.safePractice || revivalClearance || sheathCue ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
+        context.combatTeachingFadeOpacity = attackCue || teaching.safePractice || revivalClearance ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
             teaching.promptOpacity, context.reducedMotionEnabled);
         context.combatTeachingFadeStartedAtMs = 0u;
         horde::platform::windows::SetNativeTextIfChanged(prompt, text);
@@ -3476,6 +3470,8 @@ LookoutPanel::View CurrentLookoutObjectiveView(const VulkanSurfaceContext& conte
 
 void ApplyOverlayState(VulkanSurfaceContext& context)
 {
+    horde::platform::windows::SetNativeTextIfChanged(GetDlgItem(context.windowHandle,kExitButtonId),
+        context.entryMenuVisible ? "QUIT" : "QUIT TO MAIN MENU");
     if(context.lookoutObjective)context.lookoutObjective->Refresh(CurrentLookoutObjectiveView(context));
     const bool lookoutVisible=context.lookoutObjective && context.lookoutObjective->Visible();
     const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible &&
@@ -3982,6 +3978,7 @@ void FinishLookoutObjective(VulkanSurfaceContext& context,LookoutPanel::Action a
     // Reuse the branded RT entry profile. Its existing retirement path retains
     // the paused logical simulation and latest boundary; no reset/save/write.
     context.entryMenu.Reset();context.entryMenu.SetReducedMotion(context.reducedMotionEnabled);
+    context.deathOverlayVisible=context.endingOverlayVisible=false;
     context.entryMenuVisible=true;context.entryMoreVisible=false;
     context.entryPlayQueued=context.entryPlayHandoffPending=false;
     SetEntryLoadingVisible(context,false);
@@ -7406,11 +7403,11 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             RefreshChapterSubtitle(ctx);
             UpdateChestPrompt(ctx);
         }
-        if (!ctx.environmentSurveyActive && !previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation && simulation.playerVitals.phase == horde::gameplay::PlayerLifePhase::Dead)
+        if (!ctx.entryMenuVisible && !ctx.environmentSurveyActive && !previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation && simulation.playerVitals.phase == horde::gameplay::PlayerLifePhase::Dead)
         {
             ShowDeathMenu(ctx);
         }
-        if (!ctx.environmentSurveyActive && !previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation && !ctx.graphicsVisible && simulation.finaleComplete &&
+        if (!ctx.entryMenuVisible && !ctx.environmentSurveyActive && !previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation && !ctx.graphicsVisible && simulation.finaleComplete &&
             (!ctx.benchmark.HasStarted() || ctx.benchmarkCompletionHandled))
         {
             TryGrantRtLabUnlock(ctx, true);
@@ -12160,6 +12157,12 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 FocusGameControl(GetDlgItem(hWnd, kRunBenchmarkButtonId));
                 return 0;
             case kExitButtonId:
+                if(!sceneContext->entryMenuVisible) {
+                    FinishLookoutObjective(*sceneContext,LookoutPanel::Action::ReturnToMenu);
+                    return 0;
+                }
+                DestroyWindow(hWnd);
+                return 0;
             case kMenuExitId:
                 DestroyWindow(hWnd);
                 return 0;
@@ -13232,7 +13235,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kBenchmarkChoiceBackId,"BACK");
     createStatic(kBenchmarkChoiceInfoId,"",SS_LEFT);
     createButton(kMoreBySamfa12ButtonId, "MORE BY SAMFA12");
-    createButton(kExitButtonId, "QUIT DEMO");
+    createButton(kExitButtonId, "QUIT");
     createStatic(kBenchmarkTitleId, "BENCHMARK RESULTS  |  SHARE OR SAVE", SS_CENTER | SS_CENTERIMAGE);
     createButton(kBenchmarkReviewStatsButtonId, "PUBLISH TO WEBSITE...");
     createButton(kBenchmarkPrivateStatsButtonId, "SEND TO DEVELOPER...");

@@ -72,7 +72,7 @@ public:
         if(state_.basinGuide && !guideBasin) {
             // Resume the ordinary mapped route from the rope approach after
             // Kit has shown the earned basin. No new route or teleport.
-            state_.basinGuide=false;state_.waypoint=3;
+            state_.basinGuide=false;state_.waypoint=3;ClearMotion();
         }
         if(turnStartEnabled_) {StepTurnStart(dt,playerX,playerZ,exterior,proof,paused,terrain,requireTerrain,active);return;}
         if(paused) {state_.wait=CompanionWait::Paused;return;}
@@ -112,6 +112,9 @@ private:
         state_.grounded=under.grounded;
         if(!state_.grounded) {state_.wait=CompanionWait::Obstacle;return;}
         state_.y=under.worldY;
+        // This guide uses the distance-driven walk recipe, never a retained
+        // stationary turn/start pose from the ordinary route.
+        ClearMotion();
         if(state_.basinArrived) {
             state_.wait=CompanionWait::Reunion;
             locomotion_.Step(std::min(dt,.05f),0,false);state_.locomotion=locomotion_.State();
@@ -144,6 +147,7 @@ private:
         }
         const float oldX=state_.x,oldZ=state_.z;
         state_.walking=travel>0;state_.grounded=true;state_.x=x;state_.z=z;state_.y=support.worldY;
+        state_.motion.mode=CompanionMotionMode::Walking;state_.motion.speed=travel/std::min(dt,.05f);
         state_.yaw=std::atan2(dx,-dz);state_.wait=CompanionWait::Reunion;
         state_.animationSeconds+=std::min(dt,.05f);
         locomotion_.Step(std::min(dt,.05f),std::hypot(x-oldX,z-oldZ),state_.walking);
@@ -184,6 +188,7 @@ private:
             state_.wait=CompanionWait::Obstacle;return;
         }
         state_.walking=travel>0;state_.grounded=true;state_.x=x;state_.z=z;state_.y=support.worldY;
+        state_.motion.mode=CompanionMotionMode::Walking;state_.motion.speed=travel/std::min(dt,.05f);
         state_.yaw=std::atan2(dx,-dz);
     }
     CompanionSnapshot state_{};

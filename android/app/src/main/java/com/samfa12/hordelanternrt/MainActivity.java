@@ -1474,7 +1474,7 @@ public class MainActivity extends Activity {
                 getString(R.string.check_for_updates), () -> checkForUpdates(true));
         addMenuButtonRow(panel,
                 getString(R.string.credits), this::showCredits,
-                getString(R.string.quit), this::finishAndRemoveTask);
+                getString(R.string.quit_to_main_menu), this::returnGameplayToMainMenu);
         attachPanel(panel);
     }
 
@@ -1520,12 +1520,31 @@ public class MainActivity extends Activity {
             showMainMenu(false);return; // A replaced world remains paused; old UI cannot resume it.
         }
         invalidateLookoutObjective();clearTouchState();
-        if(returnToMenu) {
-            entryMenuAdmittedGeneration=0; // Showcase output cannot certify a newly requested Entry scene.
-            entryMenuEnabled=true;entryMenuSidePage=false;entryPlayRequested=false;entryMenuFailed=false;
-            publishEntryMenuState(); // Native synchronously invalidates the prior scene's presented flag.
-            showEntryMenu(false);
-        } else hideMenu();
+        if(returnToMenu) returnGameplayToMainMenu();
+        else hideMenu();
+    }
+
+    private void returnGameplayToMainMenu() {
+        // Complete storage transactions before changing scene ownership. This
+        // navigation neither resets the route nor creates/overwrites a save.
+        if(openingBenchmarkPending() || openingBenchmarkRecoveryRejected || campaignBusy()) return;
+        setGameplayPaused(true);
+        clearTouchState();pauseChapterVoice(true);
+        ++delayedGameplayFeedbackGeneration;
+        cancelCombatTeachingPromptPoll();clearCombatTeachingPrompt();
+        invalidateLookoutObjective();closeBenchmarkSummaryReview();
+        deathOverlayVisible=false;endingOverlayVisible=false;
+        retryPending=false;confirmedRetryPending=false;
+        campaignMenuVisible=false;campaignRequest=0;campaignLoadedReady=false;
+        campaignFromDeath=false;campaignDeathLoadCommitted=false;campaignDeathMessage=null;
+        handler.removeCallbacks(refreshCampaignMenu);
+        rtLabVisible=false;rtLabTelemetry=null;handler.removeCallbacks(refreshRtLabTelemetry);
+        graphicsVisible=false;diagnosticsVisible=false;benchmarkReportVisible=false;
+        setBenchmarkStatusExpanded(false);
+        entryMenuAdmittedGeneration=0; // Showcase cannot certify the new Entry scene.
+        entryMenuEnabled=true;entryMenuSidePage=false;entryPlayRequested=false;entryMenuFailed=false;
+        publishEntryMenuState(); // Existing native retirement and fresh-presentation gate.
+        showEntryMenu(false);
     }
 
     private boolean isReducedMotionEnabled() {
@@ -6045,7 +6064,7 @@ public class MainActivity extends Activity {
     }
 
     private void showDeathOverlay() {
-        if (deathOverlayVisible || graphicsVisible || playtestReportVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
+        if (entryMenuEnabled || deathOverlayVisible || graphicsVisible || playtestReportVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
         renderDeathOverlay();
     }
 
@@ -6075,12 +6094,12 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.retry_encounter), this::retryEncounter,
                 getString(R.string.restart_route), this::restartAfterDeath);
-        addMenuButton(panel, getString(R.string.quit), this::finishAndRemoveTask);
+        addMenuButton(panel, getString(R.string.quit_to_main_menu), this::returnGameplayToMainMenu);
         attachPanel(panel);
     }
 
     private void showEndingOverlay() {
-        if (endingOverlayVisible || endingOverlayDismissed || deathOverlayVisible ||
+        if (entryMenuEnabled || endingOverlayVisible || endingOverlayDismissed || deathOverlayVisible ||
                 menuVisible || graphicsVisible || playtestReportVisible || rtLabVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
         endingOverlayVisible = true;
         menuVisible = true;
@@ -6111,7 +6130,7 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.continue_label), this::continueAfterEnding,
                 getString(R.string.begin_again), this::restartAfterEnding);
-        addMenuButton(panel, getString(R.string.quit), this::finishAndRemoveTask);
+        addMenuButton(panel, getString(R.string.quit_to_main_menu), this::returnGameplayToMainMenu);
         attachPanel(panel);
     }
 
