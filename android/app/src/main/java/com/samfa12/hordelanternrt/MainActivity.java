@@ -9363,7 +9363,6 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        if(campaignEndFailureDialog!=null)campaignEndFailureDialog.dismiss();
         if(compatibilityReportDialog!=null)compatibilityReportDialog.close();
         if (environmentSurveyMode) {
             finishEnvironmentSurvey(3);
@@ -9373,6 +9372,7 @@ public class MainActivity extends Activity {
             super.onDestroy();
             return;
         }
+        if(campaignEndFailureDialog!=null)campaignEndFailureDialog.dismiss();
         retainOpeningBenchmarkClient(); // Includes finish/swipe paths with no Bundle callback.
         if(openingBenchmarkRecoveryRejected) {
             handler.removeCallbacksAndMessages(null);
