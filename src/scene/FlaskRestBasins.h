@@ -1,6 +1,7 @@
 #pragma once
 #include "scene/assets/StaticMeshAsset.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/healing/FlaskRestSites.h"
 #include <algorithm>
 #include <memory>
 
@@ -34,7 +35,7 @@ inline bool AppendFlaskRestBasins(assets::StaticMeshAsset& owner,
     std::vector<assets::StaticRtVertex> vertices;std::vector<std::uint32_t> indices;
     std::vector<Surface::Triangle> contact;
     for(std::size_t site=0;site<placements.size();++site) {
-        auto& p=placements[site];p.centre.x+=site==1?-.78f:.78f;
+        auto& p=placements[site];p.centre=gameplay::healing::FlaskRestBasinCentre(p.anchor,site==1);
         float bottom=-INFINITY;
         for(float dx:{-.23f,.23f})for(float dz:{-.23f,.23f}) {
             const float x=p.centre.x+dx,z=p.centre.z+dz;
@@ -83,7 +84,7 @@ inline bool AppendFlaskRestBasins(assets::StaticMeshAsset& owner,
     auto support=Surface::WithAdditionalNonWalkableGeometry(*terrain,contact,diagnostic);
     if(!support)return false;
     // The same triangles govern physical contact; canonical centres and the
-    // rope approach remain clear, and a player there can reach the1m action.
+    // rope approach remain clear; the1m interaction follows the visible basin.
     for(const auto& p:placements)if(!support->NonWalkableVolumeClear(p.anchor.x,p.anchor.z,
         p.anchor.x,p.anchor.z,p.anchor.y+.001f,p.anchor.y+1.8f,gameplay::kPlayerCollisionRadius)) {
         diagnostic="Rest basin obstructs the existing earned player anchor.";return false;

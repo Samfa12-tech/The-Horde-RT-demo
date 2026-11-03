@@ -36,6 +36,7 @@ final class CombatTeachingPreferences {
     static boolean lessonSuppressed(long state) { return (state & (1L << 35)) != 0; }
     static boolean exitPending(long state) { return (state & (1L << 33)) != 0; }
     static boolean waitingForRevivalClearance(long state) { return (state & (1L << 34)) != 0; }
+    static boolean liveFightNotice(long state) { return (state & (1L << 58)) != 0; }
     static boolean blockLearned(long state) { return (state & (1L << 15)) != 0; }
     static boolean attackFromGuardLearned(long state) { return (state & (1L << 32)) != 0; }
     static int practiceActionLabelResource(long state) { return stage(state)==6 && (state&(1L<<39))==0 ? R.string.combat_teaching_finish : R.string.combat_teaching_skip; }
@@ -51,7 +52,7 @@ final class CombatTeachingPreferences {
             String lesson=lessonText(state,controller);
             if(!lesson.isEmpty())text+=(text.isEmpty()?"":"\n")+lesson;
         }
-        if((state&(1L<<39))!=0 && ((state>>>36)&7)==6)
+        if(liveFightNotice(state))
             text+=(text.isEmpty()?"":"\n")+"LIVE FIGHT: protection ended - enemies now deal damage.";
         if(waitingForRevivalClearance(state))
             text+=(text.isEmpty()?"":"\n")+"Step back from the skeletons.";
@@ -70,7 +71,7 @@ final class CombatTeachingPreferences {
         return attack == 1 ? 0xFFFFD266 : attack == 2 ? 0xFFFF6B6B : HordeUiTokens.PARCHMENT;
     }
     static int promptOpacity(long state) {
-        return safePractice(state) || ((state&(1L<<39))!=0 && ((state>>>36)&7)==6) || waitingForRevivalClearance(state) || attackReadability(state) != 0
+        return safePractice(state) || liveFightNotice(state) || waitingForRevivalClearance(state) || attackReadability(state) != 0
                 ? 255 : (int) ((state >>> 40) & 0xffL);
     }
     static String description(long state, String visibleText) {
@@ -82,7 +83,7 @@ final class CombatTeachingPreferences {
     }
 
     static boolean needsTimelyRefresh(long state) {
-        if (safePractice(state) || ((state&(1L<<39))!=0 && ((state>>>36)&7)==6) || waitingForRevivalClearance(state) || attackReadability(state) != 0) return true;
+        if (safePractice(state) || liveFightNotice(state) || waitingForRevivalClearance(state) || attackReadability(state) != 0) return true;
         final boolean enabled = (state & (1L << 10)) != 0;
         final int opacity = (int) ((state >>> 40) & 0xffL);
         final int cue = (int) ((state >>> 3) & 0xfL);

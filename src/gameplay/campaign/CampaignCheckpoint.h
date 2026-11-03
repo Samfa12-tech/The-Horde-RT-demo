@@ -32,6 +32,9 @@ struct Checkpoint {
     std::uint64_t savedAtUnixSeconds = 0;
     bool flaskRecorded = false; // schema4 preserves the original resource-admission boundary.
     std::uint32_t defeatedGuards = 3;
+    // Schema5: exterior saves may retain bypassed tomb guards. Zero belongs to
+    // a defeated actor; positive health is preserved, never converted to a kill.
+    std::array<std::int32_t,2> guardHealth{};
     bool keeperDefeated = true, lanternClaimed = true, lidOpen = true;
     bool ropeReady = true, night = true, firstAscentCompleted = false;
     bool swordStowed = false, lanternHigh = false;
@@ -41,7 +44,7 @@ struct Checkpoint {
     dialogue::Progress dialogue{};
 };
 inline bool HasFlaskResources(const Checkpoint& c) {
-    return c.schema==3 || (c.schema==4 && c.flaskRecorded);
+    return c.schema==3 || (c.schema>=4 && c.flaskRecorded);
 }
 inline simulation::WorldZoneId Destination(CheckpointId id) {
     if (id == CheckpointId::ForestEndpoint) return simulation::WorldZoneId::Lookout;
@@ -59,19 +62,27 @@ inline bool Validate(const Checkpoint& c) {
     // retains completed forest progress at the lookout and later safe-side
     // returns, with the same logical payload. Old executables reject revision 2.
     const bool completedForest = c.contentRevision == 2;
-    if ((c.schema != 1 && c.schema != 2 && c.schema != 3 && c.schema != 4) ||
+    if ((c.schema != 1 && c.schema != 2 && c.schema != 3 && c.schema != 4 && c.schema != 5) ||
         c.savedAtUnixSeconds > 253402300799ULL || (c.schema < 4 && c.savedAtUnixSeconds != 0) ||
         (c.schema < 4 && c.flaskRecorded) ||
-        (c.schema == 4 && !c.flaskRecorded && c.flask != healing::FlaskResources{false,0}) ||
+        (c.schema >= 4 && !c.flaskRecorded && c.flask != healing::FlaskResources{false,0}) ||
         (c.schema == 1 && c.halfHeart) || !c.flask.Valid() ||
         (c.schema < 3 && c.flask != healing::FlaskResources{false,0}) ||
         (c.contentRevision != 1 && !completedForest) ||
         (forest && !completedForest) ||
         (c.id != CheckpointId::LowerClaimed && c.id != CheckpointId::SafeExit && !forest) ||
         c.zone != Destination(c.id) || c.vitality < 1 || c.vitality > 3 ||
-        c.defeatedGuards != 3 || !c.keeperDefeated || !c.lanternClaimed ||
+        c.defeatedGuards > 3 || (c.schema<5 && c.defeatedGuards!=3) || !c.keeperDefeated || !c.lanternClaimed ||
         !c.lidOpen || !c.ropeReady || !c.night || !dialogue::Director::ValidateProgress(c.dialogue)) return false;
     const bool upper = c.id != CheckpointId::LowerClaimed;
+    // Live guards remain confined to the tomb. Never create a lower-room
+    // recovery point among them, or allow legacy records to gain new semantics.
+    if(c.schema==5 && !upper && c.defeatedGuards!=3)return false;
+    for(std::size_t i=0;i<c.guardHealth.size();++i) {
+        const auto health=c.guardHealth[i];
+        if(c.schema<5 ? health!=0 :
+           (health<0 || health>2 || ((c.defeatedGuards&(1u<<i))!=0)!=(health==0)))return false;
+    }
     if ((upper || completedForest) && !c.firstAscentCompleted) return false;
     if (!upper && !completedForest && (c.dialogue.reunionStarted || c.dialogue.proofAccepted)) return false;
     if (completedForest && !CompletedForestProgress(c.dialogue)) return false;

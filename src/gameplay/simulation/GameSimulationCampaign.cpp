@@ -27,7 +27,7 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
     const auto facts=[](const campaign::Checkpoint& c){return std::tie(c.schema,c.contentRevision,c.id,c.zone,
         c.position.x,c.position.y,c.position.z,c.yaw,c.pitch,c.vitality,c.halfHeart,c.flask.upgraded,c.flask.charges,c.defeatedGuards,c.keeperDefeated,
         c.lanternClaimed,c.lidOpen,c.ropeReady,c.night,c.firstAscentCompleted,c.swordStowed,c.lanternHigh,
-        c.torchDropX,c.torchDropZ,c.torchDropYaw,c.torchDropPitch,c.guards,
+        c.torchDropX,c.torchDropZ,c.torchDropYaw,c.torchDropPitch,c.guards,c.guardHealth,
         c.dialogue.activeLine,c.dialogue.continuations,c.dialogue.continuationCount,
         c.dialogue.grateConsumed,c.dialogue.rescueConsumed,c.dialogue.reunionStarted,c.dialogue.waitingForRaise,
         c.dialogue.proofAccepted,c.dialogue.reminderConsumed,c.dialogue.forestNightConsumed,
@@ -45,7 +45,15 @@ std::optional<campaign::Checkpoint> GameSimulation::CaptureAuthoredCampaignBound
 std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(campaign::CheckpointId id,bool canonical,bool allowFlaskAction) const {
     using namespace interactions;
     const auto& s=snapshot_;
-    if (UsesSkeletonRevival() && !OpeningEncounterComplete()) return std::nullopt;
+    // The Keeper can legitimately be defeated after leaving the optional
+    // guard lesson. Preserve surviving actors instead of denying all exterior
+    // saves/refills or forging an opening victory. Lower-room recovery remains
+    // unavailable until both guards are defeated.
+    const bool bypassedGuards=s.rescue.exteriorSide &&
+        combatTeaching_.Snapshot().stage==TutorialStage::Skipped &&
+        !combatTeaching_.Snapshot().safePractice && !combatTeaching_.Snapshot().exitPending &&
+        !skeletonRevival_.Snapshot().SuppressesActors();
+    if (UsesSkeletonRevival() && !OpeningEncounterComplete() && !bypassedGuards) return std::nullopt;
     if(config_.healingFlask1_7 && !allowFlaskAction &&
         (healingFlask_.Snapshot().action!=healing::FlaskAction::Idle || FlaskUtilityBusy() ||
         pendingDrinkFlaskCommands_ || pendingRestCommands_))return std::nullopt;
@@ -121,10 +129,17 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     c.torchDropX=s.torchFailure.droppedX;c.torchDropZ=s.torchFailure.droppedZ;
     c.torchDropYaw=s.torchFailure.droppedYawRadians;c.torchDropPitch=s.torchFailure.droppedViewPitchRadians;
     c.dialogue=progress;
+    c.defeatedGuards=0;
     for(std::size_t i=0;i<c.guards.size();++i) {
-        if(!s.skeletonEnemies[i].dead || s.skeletonEnemies[i].health!=0) return std::nullopt;
-        c.guards[i]={s.skeletonEnemies[i].x,s.skeletonEnemies[i].z,s.skeletonEnemies[i].facingRadians};
+        const auto& actor=s.skeletonEnemies[i];
+        if(actor.dead!=(actor.health==0) || actor.health<0 || actor.health>2 ||
+           (!actor.dead && !bypassedGuards))return std::nullopt;
+        if(actor.dead)c.defeatedGuards|=1u<<i;
+        c.guardHealth[i]=actor.health;
+        c.guards[i]={actor.x,actor.z,actor.facingRadians};
     }
+    if(c.defeatedGuards!=3) {c.schema=5;c.flaskRecorded=config_.healingFlask1_7;}
+    else c.guardHealth={};
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
 }
@@ -223,7 +238,8 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.chapterFirstExterior_=upper || completedForest;
     next.lichEncounter_.RestoreCampaignDefeated();
     next.combatTeaching_.RestoreEnded();
-    next.skeletonRevival_.RestoreCompleted();
+    if(c.defeatedGuards==3)next.skeletonRevival_.RestoreCompleted();
+    else next.skeletonRevival_.RestoreSkippedLive();
     next.skeletonRevivalResourceGeneration_ = skeletonRevivalResourceGeneration_;
     next.skeletonRevivalDeadDurationSeconds_ = skeletonRevivalDeadDurationSeconds_;
     next.skeletonRevivalStandDurationSeconds_ = skeletonRevivalStandDurationSeconds_;
@@ -233,8 +249,10 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.waterfallWarningEmitted_=true;
     std::array<SkeletonSpawnPose,kSkeletonCombatantCapacity> guards{};
     for(std::size_t i=0;i<guards.size();++i) guards[i]={{c.guards[i].x,c.guards[i].z},c.guards[i].yaw,0};
-    next.swordCombat_.RestoreCampaignDefeated(guards);next.combatSnapshot_=next.swordCombat_.Snapshot();
-    next.enemyDirector_.MarkSelectedDead();
+    if(c.defeatedGuards==3)next.swordCombat_.RestoreCampaignDefeated(guards);
+    else next.swordCombat_.RestoreCampaignActors(guards,c.guardHealth);
+    next.combatSnapshot_=next.swordCombat_.Snapshot();
+    if(c.defeatedGuards==3)next.enemyDirector_.MarkSelectedDead();
     next.enemyDirector_.Update(c.position.x,c.position.z,EnemyKind::Lich);next.enemyDirector_.MarkSelectedDead();
     next.activeEnemyKind_=EnemyKind::Lich;
     next.playerVitals_.RestoreCampaignVitality(c.vitality,c.halfHeart);

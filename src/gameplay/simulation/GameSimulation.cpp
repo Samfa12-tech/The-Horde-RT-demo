@@ -1,6 +1,7 @@
 #include "scene/TombDressingContact.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/healing/FlaskRestSites.h"
 
 #include <algorithm>
 #include <cmath>
@@ -2347,7 +2348,8 @@ bool GameSimulation::KeeperOpeningAdmission() const
 {
     const auto& lesson = combatTeaching_.Snapshot();
     // Leaving the optional opening lesson admits the Keeper, not a skeleton
-    // victory. Live guards, opening Retry and earned-save requirements remain.
+    // victory. Guards and opening Retry remain live; a later earned exterior
+    // checkpoint can preserve their actual surviving state after the Keeper.
     return !UsesSkeletonRevival() || OpeningEncounterComplete() ||
         (config_.sequentialPractice1_7 && lesson.stage == TutorialStage::Skipped &&
          !lesson.exitPending && !lesson.safePractice);
@@ -3243,18 +3245,20 @@ std::optional<campaign::CheckpointId> GameSimulation::EligibleFlaskRestAnchor() 
     if(!config_.healingFlask1_7 || !config_.developmentRescueJourney || !chapterTerrain_)return std::nullopt;
     const auto endpoint=kWorldRoutePoints.back();
     if(!rescueTraversal_.Snapshot().exteriorSide)return std::nullopt;
-    const auto id=std::hypot(playerX_-traversal::kExteriorLanding.x,playerZ_-traversal::kExteriorLanding.z)<=1.f?
-         campaign::CheckpointId::SafeExit:campaign::CheckpointId::ForestEndpoint;
-    const auto x=id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.x:endpoint.x;
-    const auto z=id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.z:endpoint.z;
-    if(std::hypot(playerX_-x,playerZ_-z)>1.f)return std::nullopt;
-    // Reuse the earned boundary's actual terrain/story/contact predicates;
-    // only our own transient recovery action is excluded from serialization.
-    const auto earned=BuildCampaignCheckpoint(id,true,true);
-    if(!earned)return std::nullopt;
-    const double dy=double(playerSupport_.worldY)-earned->position.y;
-    if(std::hypot(std::hypot(double(playerX_)-x,double(playerZ_)-z),dy)>1.0)return std::nullopt;
-    return id;
+    for(const auto id:{campaign::CheckpointId::SafeExit,campaign::CheckpointId::ForestEndpoint}) {
+        auto anchor=traversal::kExteriorLanding;
+        if(id==campaign::CheckpointId::ForestEndpoint) {
+            const auto support=traversal::ChapterExteriorSupport(chapterTerrain_.get(),endpoint.x,endpoint.z);
+            if(!support.grounded)continue;
+            anchor={endpoint.x,support.worldY,endpoint.z};
+        }
+        const auto centre=healing::FlaskRestBasinCentre(anchor,id==campaign::CheckpointId::ForestEndpoint);
+        if(!healing::FlaskRestReachClear(*chapterTerrain_,{playerX_,playerSupport_.worldY,playerZ_},centre))continue;
+        // Keep all earned story/contact predicates and canonical saved spawn;
+        // only the action's physical reach follows the visible furniture.
+        if(BuildCampaignCheckpoint(id,true,true))return id;
+    }
+    return std::nullopt;
 }
 
 std::uint32_t GameSimulation::NearbyFlaskRestAnchor() const
@@ -3277,6 +3281,7 @@ std::uint32_t GameSimulation::NearbyFlaskRestAnchor() const
             if(!ground.found || !ground.walkable)continue;
             p={end.x,ground.worldY,end.z};
         }
+        p=healing::FlaskRestBasinCentre(p,id==campaign::CheckpointId::ForestEndpoint);
         if(std::hypot(playerX_-p.x,playerZ_-p.z)<=3.f &&
            std::abs(playerSupport_.worldY-p.y)<=.35f)return static_cast<std::uint32_t>(id);
     }
@@ -3455,6 +3460,11 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.combatTeaching.lessonSuppressed = !SwordDefenseReady();
     snapshot_.combatTeaching.naturalContinuation = config_.naturalPracticeRevival1_7 && UsesSkeletonRevival();
     snapshot_.combatTeaching.continuationPhase = static_cast<std::uint8_t>(skeletonRevival_.Snapshot().phase);
+    snapshot_.combatTeaching.liveFightNotice = snapshot_.combatTeaching.naturalContinuation &&
+        skeletonRevival_.Snapshot().phase == SkeletonRevivalPhase::Live &&
+        skeletonRevival_.Snapshot().phaseSeconds < 6.f && activeEnemyKind_ == EnemyKind::Skeleton &&
+        !rescueTraversal_.Snapshot().exteriorSide &&
+        playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     snapshot_.skeletonRevival = UsesSkeletonRevival() ? skeletonRevival_.Snapshot() : SkeletonRevivalSnapshot{};
     snapshot_.skeletonRevivalPresentationReady = UsesSkeletonRevival() && skeletonRevivalPresentationReady_;
     snapshot_.skeletonRevivalVisualReady = UsesSkeletonRevival() && skeletonRevivalVisualReady_;

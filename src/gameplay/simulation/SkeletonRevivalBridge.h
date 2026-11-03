@@ -82,6 +82,14 @@ public:
         riseDurationSeconds_ = 0.0f; livePairSeen_ = false; restoredCompleted_ = true;
         Enter(SkeletonRevivalPhase::Complete);
     }
+    // A saved exterior escape preserves living tomb actors without replaying
+    // the optional revival or pretending those actors were defeated.
+    void RestoreSkippedLive()
+    {
+        snapshot_.generation=NextGeneration();CancelTransient();snapshot_.consumed=true;
+        riseDurationSeconds_=0.f;livePairSeen_=true;restoredCompleted_=false;
+        Enter(SkeletonRevivalPhase::Live);
+    }
     void CancelTransient() { snapshot_.signalPulse = snapshot_.revivePulse = false; }
 
     // The owner acknowledges the actual atomic revive/retry publication before
@@ -126,6 +134,10 @@ public:
         }
         if (snapshot_.phase == SkeletonRevivalPhase::Live)
         {
+            // Presentation notice has a finite gameplay-time lifetime. Pause and
+            // death do not advance this clock; it never changes damage eligibility.
+            snapshot_.phaseSeconds = std::min(6.0f, snapshot_.phaseSeconds +
+                std::min(deltaSeconds, kMaximumStepSeconds));
             if (input.bothAlive && !input.bothDead) livePairSeen_ = true;
             else if (input.bothDead && !input.bothAlive && livePairSeen_) Enter(SkeletonRevivalPhase::Complete);
             return snapshot_;

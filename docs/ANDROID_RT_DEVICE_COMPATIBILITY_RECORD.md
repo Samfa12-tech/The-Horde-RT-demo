@@ -4100,3 +4100,36 @@ that limitation separately from natural-play evidence. Original593debug-state
 files and rotation settings were restored and verified, latest debug retained,
 production untouched and phone released. Sanitized artifact details and evidence
 limits: [runtime receipt](evidence/2026-11-02-chimney-smoke-menu/corrected-runtime-receipt.json).
+
+
+### 3 November 2026: ordinary signed 1.7 Android reporting and owner route findings
+
+SM-S948B / Android 17 / Adreno 840, ordinary package
+`com.samfa12.hordelanternrt`, version 1.7.0 / code 11. Corrected source
+`b169400a25bce1f257a70c54aff66999e4a35c49`; signed APK SHA-256
+`117058c6ec06041b3c62ba4f3cc458e34134bc75abc6303a67a2425d10859134`.
+This is actual-device scripted touch/UI evidence, followed by owner gameplay
+feedback; it is not full journey acceptance.
+
+The first 1.6.2-to-1.7 update retained signing identity, first-install time and
+observed saved graphics/audio preferences. The owner subsequently uninstalled
+that app; installation of this corrected APK was fresh, not a second upgrade or
+proof of retained production saves. The non-debuggable production sandbox did
+not permit direct data backup; no access workaround or agent data clear occurred.
+
+Normal New Game, pause, Quit to Main Menu and More enabled both benchmark buttons.
+A normal Custom run at the fresh 33% setting completed two laps / 26 waypoints,
+with 1,838 valid CPU/GPU samples. Whole-frame median / p95 were 60.692214 /
+85.706667 ms; these are client-reported durations, not measured presentation FPS
+or a new performance comparison. One explicitly authorised public Send produced
+a matching published native receipt, public API record and rendered website row.
+Two previously pending Windows submissions were also automatically published
+without resubmission. No developer-private duplicate was sent.
+
+The owner's subsequent natural route exposed three still-unaccepted behaviors:
+no eligible save after bypassing guards and escaping, no successful touch refill,
+and a live-fight notice persisting after the Keeper and exterior ascent. These
+are retained release blockers for the follow-up correction, not erased by the
+benchmark/reporting pass. No earned phone checkpoint/save/cold-load or complete
+natural lesson/revival acceptance is claimed here. Private captures and receipts
+remain local; device serials, saved state and verification tokens are not bundled.

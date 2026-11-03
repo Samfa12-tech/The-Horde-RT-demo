@@ -2793,6 +2793,17 @@ void NaturalRevivalIntegration() {
         "visible reverse/stand/rearm clocks precede atomic revival and automatic protection exit");
     Check(horde::platform::windows::CombatTeachingPromptText(f.sim.Snapshot().combatTeaching,true).find("LIVE FIGHT:")!=std::string::npos,
         "the exact shared live publication explicitly announces damage eligibility");
+    auto notice=f;
+    notice.input.damageEnabled=false; notice.input.paused=true;
+    const auto noticeTime=notice.sim.Snapshot().skeletonRevival.phaseSeconds;
+    notice.Step(420);
+    Check(notice.sim.Snapshot().skeletonRevival.phaseSeconds==noticeTime,
+        "paused live handoff does not consume the short damage notice");
+    notice.input.paused=false; notice.Step(420);
+    Check(notice.sim.Snapshot().skeletonRevival.phase==Phase::Live &&
+        !notice.sim.Snapshot().combatTeaching.liveFightNotice &&
+        horde::platform::windows::CombatTeachingPromptText(notice.sim.Snapshot().combatTeaching,true).find("LIVE FIGHT:")==std::string::npos,
+        "live damage continues but the transition notice expires without killing guards or leaving the room");
     auto retry=f; retry.sim.RetryEncounter();retry.Step();
     Check(retry.sim.Snapshot().skeletonRevival.consumed && retry.sim.Snapshot().skeletonRevival.phase==Phase::Live && retry.cries==1,
         "retry retains one-time consumption and learned completion without a repeated revival");

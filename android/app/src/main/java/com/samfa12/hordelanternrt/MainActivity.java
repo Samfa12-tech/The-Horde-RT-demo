@@ -8691,6 +8691,8 @@ public class MainActivity extends Activity {
         }
         String hint="";
         if(flask.hint==4 || flask.action!=0)hint=reason==0?"":getString(reason);
+        else if(flask.hint==5 && now<flaskLessonUntil)hint=getString(flaskLessonResource);
+        else if(flask.nearbyRestAnchor!=0 && !flask.allows(true))hint=getString(R.string.flask_rest_wait_hint);
         else if(now<flaskLessonUntil && (quiet || flask.hint==5))hint=getString(flaskLessonResource);
         if(!android.text.TextUtils.equals(flaskHint.getText(),hint))flaskHint.setText(hint);
         flaskHint.setContentDescription(hint);flaskHint.setVisibility(hint.isEmpty()?View.GONE:View.VISIBLE);

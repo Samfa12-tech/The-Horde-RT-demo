@@ -46,6 +46,9 @@ public final class HealingFlaskHudTest {
         Bridge.flask=new long[]{2,31,1,0,0,0,2,0,2,2};update();
         assertEquals("0/2",status.getText().toString());
         assertTrue(drink.getContentDescription().toString().contains("empty"));assertEquals(View.VISIBLE,rest.getVisibility());
+        assertEquals("Refill flask",rest.getText().toString());
+        assertEquals(a.getString(R.string.flask_rest_wait_hint),((TextView)a.findViewById(R.id.flask_hint)).getText().toString());
+        assertEquals(View.VISIBLE,a.findViewById(R.id.flask_hint).getVisibility());
         assertFalse(rest.isEnabled());rest.performClick();assertEquals(0,Bridge.rests);
         Bridge.flask[4]=2;update();assertTrue(rest.isEnabled());rest.performClick();assertEquals(1,Bridge.rests);
         Bridge.flask[4]=0;Bridge.flask[8]=0;Bridge.flask[5]=1;Bridge.flask[3]=1;Bridge.flask[9]=0;update();

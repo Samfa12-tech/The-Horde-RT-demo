@@ -292,7 +292,7 @@
     <string name="statistics_live_available">Choose separate submission consent, then review the exact payload before Send.</string>
     <string name="statistics_live_sending">Sending the reviewed payload. Cancellation cannot prove it was not accepted.</string>
     <string name="flask_drink">Drink</string>
-    <string name="flask_rest">Rest</string>
+    <string name="flask_rest">Refill flask</string>
     <string name="flask_charges">Flask %1$d / %2$d</string>
     <string name="flask_full">Flask %1$d / %2$d — full</string>
     <string name="flask_empty">Flask 0 / %1$d — empty</string>
@@ -312,6 +312,6 @@
     <string name="flask_first_lesson">One charge heals one heart.</string>
     <string name="flask_upgrade_lesson">Capacity added. Rest to fill it.</string>
     <string name="flask_pickup_lesson">Flask upgrade nearby.</string>
-    <string name="flask_rest_wait_hint">Stone basin nearby. Move closer, stand still and free your hands after dialogue.</string>
+    <string name="flask_rest_wait_hint">At the basin: stand close and still, release guard and wait for dialogue to finish.</string>
     <string name="flask_refilled_hint">Flask refilled.</string>
 </resources>

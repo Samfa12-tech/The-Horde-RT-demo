@@ -100,7 +100,7 @@ inline std::string CombatTeachingPromptText(
         const auto lesson=CombatTeachingLessonText(teaching,controller);
         if(!lesson.empty())text+=(text.empty()?"":"\r\n")+lesson;
     }
-    if(teaching.naturalContinuation && teaching.continuationPhase==6)
+    if(teaching.liveFightNotice)
         text+=(text.empty()?"":"\r\n")+std::string("LIVE FIGHT: protection ended - enemies now deal damage.");
     if(waitingForRevivalClearance)
         text+=(text.empty()?"":"\r\n")+std::string("Step back from the skeletons.");

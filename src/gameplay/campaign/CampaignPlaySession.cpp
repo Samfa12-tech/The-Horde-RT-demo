@@ -79,7 +79,7 @@ bool PlaySession::ObserveSafeBoundary() {
 bool PlaySession::StartSave(unsigned slot,SaveKind kind,const Checkpoint& checkpoint,std::uint64_t revision) {
     if(Busy() || slot>=3 || state_.operationRevision==UINT64_MAX)return false;
     SuspendCatalogue();
-    auto dated=checkpoint;dated.flaskRecorded=HasFlaskResources(checkpoint);dated.schema=4;
+    auto dated=checkpoint;dated.flaskRecorded=HasFlaskResources(checkpoint);dated.schema=checkpoint.schema==5?5u:4u;
     const auto seconds=std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     dated.savedAtUnixSeconds=seconds>0 && seconds<=253402300799LL?static_cast<std::uint64_t>(seconds):0;
     if(!Select(slot) || !session_.SaveCheckpoint(kind,dated))return false;

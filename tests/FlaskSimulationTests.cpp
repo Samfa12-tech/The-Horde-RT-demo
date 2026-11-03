@@ -256,13 +256,38 @@ int main(int argc,char** argv) {
                 "two bounded324-triangle basins share existing material/address/provenance ownership");
             for(const auto& basin:basins) {
                 Check(std::hypot(basin.anchor.x-basin.centre.x,basin.anchor.z-basin.centre.z)<1.f,
-                    "basin is reachable inside unchanged1m earned action radius");
+                    "canonical saved anchor remains within reach of its visible basin");
                 Check(support->NonWalkableVolumeClear(basin.anchor.x,basin.anchor.z,basin.anchor.x,
                     basin.anchor.z,basin.anchor.y+.001f,basin.anchor.y+1.8f,kPlayerCollisionRadius),
                     "rest furniture never occupies canonical spawn/rope landing body column");
                 Check(!support->NonWalkableVolumeClear(basin.centre.x,basin.centre.z,basin.centre.x,
                     basin.centre.z,basin.centre.y+.001f,basin.centre.y+.8f,.05f),
                     "visible basin contributes real solid contact");
+                const float side=basin.centre.x>basin.anchor.x?1.f:-1.f;
+                // A real capsule fits around this outer corner; a .45m axial
+                // offset would still overlap the .23m rim + .24m player radius.
+                tr::Vec3 outer{basin.centre.x+side*.4f,basin.centre.y,basin.centre.z+.45f};
+                const auto outerSupport=tr::ChapterExteriorSupport(support.get(),outer.x,outer.z);
+                outer.y=outerSupport.worldY;
+                Check(std::hypot(outer.x-basin.anchor.x,outer.z-basin.anchor.z)>1.f &&
+                    outerSupport.grounded &&
+                    support->NonWalkableVolumeClear(outer.x,outer.z,outer.x,outer.z,
+                        outer.y+.001f,outer.y+1.8f,kPlayerCollisionRadius) &&
+                    heal::FlaskRestReachClear(*support,outer,basin.centre),
+                    "outer solid-basin approach is reachable even outside the invisible checkpoint-centred metre");
+                Check(!heal::FlaskRestReachClear(*support,
+                    {basin.centre.x+side*1.01f,basin.centre.y,basin.centre.z},basin.centre) &&
+                    !heal::FlaskRestReachClear(*support,
+                    {outer.x,basin.centre.y+.36f,outer.z},basin.centre),
+                    "basin interaction rejects remote and wrong-height positions");
+                using Surface=TriangleSupportSurface;
+                const float wallX=(outer.x+basin.centre.x)*.5f,y=basin.anchor.y,z=basin.centre.z;
+                std::array<Surface::Triangle,2> wall;
+                wall[0].points={{{wallX,y+.8f,z-.4f},{wallX,y+1.1f,z-.4f},{wallX,y+1.1f,z+.4f}}};
+                wall[1].points={{{wallX,y+.8f,z-.4f},{wallX,y+1.1f,z+.4f},{wallX,y+.8f,z+.4f}}};
+                const auto occluded=Surface::WithAdditionalNonWalkableGeometry(*support,wall,error);
+                Check(occluded && !heal::FlaskRestReachClear(*occluded,outer,basin.centre),
+                    "a physical intervening barrier blocks refill even inside basin interaction reach");
             }
             Check(!horde::scene::AppendFlaskRestBasins(owner,support,basins,error),
                 "repeat preparation rejects duplicate furniture transactionally");

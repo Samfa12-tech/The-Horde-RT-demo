@@ -72,6 +72,7 @@ enum class CombatTeachingCue : std::uint8_t
 struct CombatTeachingSnapshot
 {
     bool naturalContinuation = false;
+    bool liveFightNotice = false; // Short shared transition notice, not permanent encounter status.
     std::uint8_t continuationPhase = 0;
     bool enabled = false;
     bool parryLearned = false;

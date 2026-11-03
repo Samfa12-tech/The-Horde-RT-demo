@@ -934,6 +934,68 @@ int main(int argc,char** argv){
         return failures?1:0;
     }
     {
+        // Persistence regression for an honestly recorded exterior escape.
+        // This seeded logical record tests IO, not natural victory acceptance.
+        Directory bypassDirectory;auto config=sim::ProductionGameSimulationConfig();
+        config.healingFlask1_7=true;config.skeletonRevival1_7=true;config.sequentialPractice1_7=true;
+        sim::GameSimulation bypass(config);cp::PlaySession bypassPlay(bypass,bypassDirectory.path);
+        auto escaped=Record(2,true);escaped.schema=5;escaped.flaskRecorded=true;escaped.flask={false,1};
+        escaped.defeatedGuards=1;escaped.guardHealth={0,1};
+        Check(bypassPlay.BeginNewGame(2) && Seed(bypass,escaped,terrain) && bypassPlay.ObserveSafeBoundary(),
+              "valid exterior escape with one surviving injured guard becomes latest checkpoint");
+        Check(Until(bypassPlay,[&]{return bypassPlay.State().operation==cp::PlayOperation::Autosave &&
+              bypassPlay.State().outcome==cp::PlayOutcome::Succeeded;}),"exterior escape writes real selected-slot autosave");
+        Check(bypassPlay.SaveManual(2) && Done(bypassPlay) && bypassPlay.State().outcome==cp::PlayOutcome::Succeeded,
+              "exterior escape can be manually saved without returning to kill optional guards");
+        const auto saved=Read(bypassDirectory,2,cp::SaveKind::Manual);
+        Check(saved.checkpoint.schema==5 && saved.checkpoint.savedAtUnixSeconds>0 &&
+              saved.checkpoint.defeatedGuards==1 && saved.checkpoint.guardHealth==escaped.guardHealth &&
+              saved.checkpoint.flask==escaped.flask,"dated save preserves exact living health, death mask and flask resources");
+        Check(!fs::exists(Path(bypassDirectory,0,cp::SaveKind::Manual)) &&
+              !fs::exists(Path(bypassDirectory,1,cp::SaveKind::Manual)),"bypass regression never touches other manual slots");
+        sim::GameSimulation cold(config);cp::PlaySession coldPlay(cold,bypassDirectory.path);
+        Check(coldPlay.Load(2,cp::SaveKind::Manual) && Until(coldPlay,[&]{return coldPlay.State().phase==cp::SessionPhase::LoadReady;}),
+              "fresh owner reads the real stored exterior escape");
+        const auto prepared=coldPlay.PrepareLoad();sim::InputSnapshot neutral;
+        Check(prepared && coldPlay.CommitLoad(*prepared,prepared->destination,terrain,neutral,1),
+              "fresh owner commits survivor record through actual terrain/readiness gate");
+        Check(cold.Snapshot().skeletonEnemies[0].dead && !cold.Snapshot().skeletonEnemies[1].dead &&
+              cold.Snapshot().skeletonEnemies[1].health==1 && cold.Snapshot().healingFlask.resources==escaped.flask &&
+              cold.Snapshot().rescue.exteriorSide && !cold.Snapshot().openingEncounterComplete,
+              "cold load returns safely outside without granting kills, revival, healing or flask charges");
+        const auto retained=Raw(Path(bypassDirectory,2,cp::SaveKind::Manual));
+        for(int tick=0;tick<20;++tick)coldPlay.Poll();
+        Check(retained==saved.encoded && Raw(Path(bypassDirectory,2,cp::SaveKind::Manual))==retained,
+              "reading survivor record performs no write-on-read migration");
+        // Retry must use the confirmed schema5 record, not newer unconfirmed
+        // logical actor/resource state or the old all-defeated restore policy.
+        auto unconfirmed=escaped;unconfirmed.vitality=3;unconfirmed.flask.charges=2;
+        unconfirmed.defeatedGuards=0;unconfirmed.guardHealth={2,2};
+        Check(Seed(cold,unconfirmed,terrain),"unconfirmed live actor/resources may differ from acknowledged exterior record");
+        Check(coldPlay.RetryConfirmedCheckpoint() && coldPlay.State().fromConfirmedRecord &&
+              coldPlay.State().operationSlot==2,"schema5 retry retains the adopted slot's confirmed record ownership");
+        const auto retry=coldPlay.PrepareLoad();
+        Check(retry && retry->fromConfirmedRecord &&
+              coldPlay.CommitLoad(*retry,retry->destination,terrain,neutral,10),
+              "schema5 confirmed Retry passes normal terrain and apply gates");
+        Check(cold.Snapshot().playerVitals.vitality==escaped.vitality &&
+              cold.Snapshot().healingFlask.resources==escaped.flask &&
+              cold.Snapshot().skeletonEnemies[0].dead && cold.Snapshot().skeletonEnemies[0].health==0 &&
+              !cold.Snapshot().skeletonEnemies[1].dead && cold.Snapshot().skeletonEnemies[1].health==1 &&
+              !cold.Snapshot().openingEncounterComplete,
+              "Retry restores confirmed health/charges and individual guard deaths without new healing or kills");
+        neutral.damageEnabled=false;neutral.tutorialEnabled=false;
+        neutral.yawRadians=cold.Snapshot().playerYawRadians;neutral.pitchRadians=cold.Snapshot().playerPitchRadians;
+        for(std::uint64_t publication=11;publication<31;++publication)cold.StepFixed(neutral,1.f/60.f,publication);
+        bool retryCry=false;
+        for(const auto& event:cold.Events().Events())retryCry|=event.type==sim::GameplayEventType::LichRevivalCry;
+        Check(!retryCry && cold.Snapshot().skeletonEnemies[1].health==1 &&
+              !cold.Snapshot().skeletonEnemies[1].dead && !cold.Snapshot().openingEncounterComplete &&
+              cold.Snapshot().healingFlask.resources==escaped.flask &&
+              Raw(Path(bypassDirectory,2,cp::SaveKind::Manual))==retained,
+              "post-Retry ticks preserve surviving guard ownership with no revival cry, refill or record rewrite");
+    }
+    {
         Directory ending;
         sim::GameSimulation endingGame(sim::ProductionGameSimulationConfig());
         cp::PlaySession endingPlay(endingGame,ending.path);

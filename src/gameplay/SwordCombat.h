@@ -225,6 +225,22 @@ public:
         PublishSnapshot();
     }
 
+    // Validated schema5 exterior checkpoint: exact logical health/pose, with
+    // transient attacks and timers cleared just as for the legacy corpse path.
+    void RestoreCampaignActors(const std::array<SkeletonSpawnPose,kSkeletonCombatantCapacity>& poses,
+                               const std::array<std::int32_t,kSkeletonCombatantCapacity>& health)
+    {
+        Reset(kSkeletonCombatantCapacity,{},&poses,2);
+        for(std::size_t i=0;i<combatants_.size();++i) {
+            auto& actor=combatants_[i];actor.health=health[i];
+            if(actor.health==0) {
+                actor.action=EnemyCombatAction::Dead;actor.animation=EnemyAnimation::Dead;
+                actor.animationTime=10.f;actor.walkAnimationHold=0.f;
+            }
+        }
+        PublishSnapshot();
+    }
+
     // The owner supplies the admitted, non-looping death clip duration. Both
     // records must have reached its terminal pose; health zero alone can still
     // describe a falling actor. This predicate never changes combat state.

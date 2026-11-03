@@ -1168,6 +1168,7 @@ void PublishSimulationUiState()
         (static_cast<std::uint64_t>(teaching.lessonSuppressed) << 35u) |
         ((static_cast<std::uint64_t>(teaching.continuationPhase)&7u) << 36u) |
         (static_cast<std::uint64_t>(teaching.naturalContinuation) << 39u) |
+        (static_cast<std::uint64_t>(teaching.liveFightNotice) << 58u) |
         ((static_cast<std::uint64_t>(std::clamp(simulation.swordSheathHoldProgress,0.f,1.f)*100.f)&0x7fu) << 50u) |
         (static_cast<std::uint64_t>(simulation.swordIntentionallyStowed) << 57u) |
         (clampByte(teaching.promptOpacity) << 40u) |

@@ -3415,7 +3415,7 @@ void RefreshCombatTeachingPrompt(VulkanSurfaceContext& context)
     if (!text.empty())
     {
         context.combatTeachingFadeText = text;
-        context.combatTeachingFadeOpacity = attackCue || teaching.safePractice || revivalClearance ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
+        context.combatTeachingFadeOpacity = attackCue || teaching.safePractice || teaching.liveFightNotice || revivalClearance ? static_cast<unsigned char>(255u) : horde::platform::windows::CombatTeachingPromptAlpha(
             teaching.promptOpacity, context.reducedMotionEnabled);
         context.combatTeachingFadeStartedAtMs = 0u;
         horde::platform::windows::SetNativeTextIfChanged(prompt, text);

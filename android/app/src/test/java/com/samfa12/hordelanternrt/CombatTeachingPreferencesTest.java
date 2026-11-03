@@ -41,6 +41,17 @@ public final class CombatTeachingPreferencesTest {
         assertFalse(warning.contains("Hold"));
     }
 
+    @Test public void liveFightNoticeUsesItsFiniteSharedPublicationNotPermanentRevivalPhase() {
+        long live=3L|(1L<<39)|(6L<<36);
+        assertFalse(CombatTeachingPreferences.prompt(live).contains("LIVE FIGHT"));
+        assertFalse(CombatTeachingPreferences.needsTimelyRefresh(live));
+        long notice=live|(1L<<58);
+        assertTrue(CombatTeachingPreferences.prompt(notice).contains("LIVE FIGHT"));
+        assertEquals(255,CombatTeachingPreferences.promptOpacity(notice));
+        assertTrue(CombatTeachingPreferences.needsTimelyRefresh(notice));
+        assertEquals("",CombatTeachingPreferences.prompt(live));
+    }
+
     @Test public void savedSettingsRoundTripAndMalformedTypesUseSafeDefaults() {
         CombatTeachingPreferences.save(preferences, new CombatTeachingPreferences.Values(false, true));
         CombatTeachingPreferences.Values values = CombatTeachingPreferences.read(preferences);
@@ -266,7 +277,7 @@ public final class CombatTeachingPreferencesTest {
         assertEquals(R.string.combat_teaching_skip,CombatTeachingPreferences.practiceActionLabelResource(ready));
         long rising=6L|(1L<<13)|(1L<<39)|(4L<<36);
         assertTrue(CombatTeachingPreferences.prompt(rising).contains("still protected"));
-        long live=2L|(1L<<39)|(6L<<36);
+        long live=2L|(1L<<39)|(6L<<36)|(1L<<58);
         assertTrue(CombatTeachingPreferences.prompt(live).contains("enemies now deal damage"));
         assertFalse(CombatTeachingPreferences.safePractice(live));
         assertEquals(255,CombatTeachingPreferences.promptOpacity(live));
