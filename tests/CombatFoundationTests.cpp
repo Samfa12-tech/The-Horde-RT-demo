@@ -2698,10 +2698,13 @@ void RevivalIntegrationEarnedPath() {
     Check(abandoned.Until([&]{return !abandoned.sim.Snapshot().playerAlive;},1800),
           "Keeper admitted after abandoned lessons has real lethal damage authority");
     abandoned.sim.RetryEncounter();
-    Check(abandoned.sim.Snapshot().playerAlive && abandoned.sim.Snapshot().zone==ShowcaseZone::Opening &&
+    Check(abandoned.sim.Snapshot().playerAlive && abandoned.sim.Snapshot().zone==ShowcaseZone::Finale &&
+          abandoned.sim.Snapshot().retryCheckpoint==9 &&
+          std::abs(abandoned.sim.Snapshot().playerX-kKeeperRetryPosition.x)<.001f &&
+          std::abs(abandoned.sim.Snapshot().playerZ-kKeeperRetryPosition.z)<.001f &&
           abandoned.sim.Snapshot().swordCombat.aliveCount==2 &&
           !abandoned.sim.Snapshot().openingEncounterComplete && abandoned.cries==0,
-          "abandoned-lesson death Retry preserves the opening checkpoint and live-guard contract");
+          "abandoned-lesson Keeper death Retry returns to the Keeper checkpoint without fabricating guard defeat");
     auto keeperBefore=f;
     keeperArrival(keeperBefore); keeperBefore.Step(720); printKeeperGate(keeperBefore);
     Check(!keeperBefore.sim.Snapshot().lich.revealStarted && !keeperBefore.sim.Snapshot().openingEncounterComplete,
