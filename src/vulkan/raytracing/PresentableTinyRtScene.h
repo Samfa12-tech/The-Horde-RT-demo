@@ -398,6 +398,11 @@ public:
         std::string& diagnostic);
     void PublishCompletedDiagnostic(
         const RtDiagnosticCounterPayload& payload) noexcept;
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+    // Latest owning-fence readback only; Debug isolation, never benchmark data.
+    [[nodiscard]] std::string CompletedPrimaryHitProbeJson() const;
+    bool CapturePrimaryHitProbeCpuUploads(const std::string& path, std::string& diagnostic) const;
+#endif
 
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,
@@ -752,6 +757,14 @@ private:
     HeldItemBlasMeasurements heldItemBlasMeasurements_{};
 
     RtPipelineBundle pipelineBundle_;
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+    std::vector<std::uint32_t> completedPrimaryHitProbe_;
+    std::array<std::uint32_t, 32u> recordedPrimaryProbePushWords_{};
+    std::array<std::uint32_t, 32u> completedPrimaryProbePushWords_{};
+    std::vector<std::uint32_t> recordedPrimaryProbeSceneWords_;
+    std::vector<std::uint32_t> completedPrimaryProbeSceneWords_;
+    bool completedPrimaryProbeStaged_ = false;
+#endif
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
     std::unique_ptr<experimental::StagedPrimaryPass> stagedPrimary_;
 #endif

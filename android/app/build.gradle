@@ -61,6 +61,19 @@ if (hordeStagedPrimaryDebugValidationProperty != null && !(hordeStagedPrimaryDeb
     throw new GradleException('hordeStagedPrimaryDebugValidation must be true or false.')
 }
 def hordeStagedPrimaryDebugValidation = hordeStagedPrimaryDebugValidationProperty == 'true'
+def hordePrimaryHitProbeProperty = providers.gradleProperty('hordePrimaryHitProbe').orNull
+def hordePrimaryHitProbeNormalProperty = providers.gradleProperty('hordePrimaryHitProbeNormal').orNull
+for (def probeProperty in [hordePrimaryHitProbeProperty, hordePrimaryHitProbeNormalProperty]) {
+    if (probeProperty != null && !(probeProperty in ['true', 'false'])) {
+        throw new GradleException('Primary-hit probe selections must be true or false.')
+    }
+}
+def hordePrimaryHitProbe = hordePrimaryHitProbeProperty == 'true'
+def hordePrimaryHitProbeNormal = hordePrimaryHitProbeNormalProperty == 'true'
+if ((hordePrimaryHitProbe && !hordeStagedPrimaryDebugValidation) ||
+    (hordePrimaryHitProbeNormal && !hordePrimaryHitProbe)) {
+    throw new GradleException('Primary-hit isolation requires explicit staged Diagnostic Debug validation; normal control requires probe opt-in.')
+}
 if (hordeStagedPrimaryDebugValidation && hordeBenchmarkValidation) {
     throw new GradleException('Staged diagnostic Debug and Shipping benchmark investigations must be separate configurations.')
 }
@@ -106,12 +119,26 @@ if (hordeStagedPrimaryShaderDirProperty != null) {
     def expectedInstrumentation = hordeStagedPrimaryDebugValidation ? 'Diagnostic' : 'Shipping'
     def expectedPasses = ['GenericDielectric:primary', 'GenericDielectric:shade', 'OpaqueFast:primary', 'OpaqueFast:shade']
     if (stagedPrimaryManifest.schema != 1 ||
-        stagedPrimaryManifest.classification != 'investigation-only-staged-primary' ||
+        stagedPrimaryManifest.classification != (hordePrimaryHitProbe ? 'investigation-only-primary-hit-probe' : 'investigation-only-staged-primary') ||
         stagedPrimaryManifest.instrumentation != expectedInstrumentation || stagedPrimaryManifest.quality != 'Mobile' ||
         stagedPrimaryManifest.stage != 'rgen' || !(stagedPrimaryManifest.modules instanceof List) ||
         stagedPrimaryManifest.modules.size() != 4 ||
         stagedPrimaryManifest.modules.collect { "${it.material}:${it.pass}".toString() }.sort() != expectedPasses) {
         throw new GradleException("Staged investigation requires the exact ${expectedInstrumentation}/Mobile four-pass manifest.")
+    }
+    if (hordePrimaryHitProbe &&
+        (!new File(stagedPrimaryDirectory, 'PrimaryHitProbeShaders.generated.h').isFile() ||
+         stagedPrimaryManifest.primaryHitProbe?.schema != 1 ||
+         stagedPrimaryManifest.primaryHitProbe?.prefixBytes != 176 ||
+         stagedPrimaryManifest.primaryHitProbe?.bufferBytes != 57776 ||
+         stagedPrimaryManifest.primaryHitProbe?.recordWords != 96 ||
+         stagedPrimaryManifest.primaryHitProbe?.recordCount != 75 ||
+         stagedPrimaryManifest.primaryHitProbe?.phases != 2 ||
+         stagedPrimaryManifest.primaryHitProbe?.extent != [1080, 2235])) {
+        throw new GradleException('Primary-hit isolation requires its exact bounded compiler manifest/header.')
+    }
+    if (!hordePrimaryHitProbe && stagedPrimaryManifest.primaryHitProbe != null) {
+        throw new GradleException('Instrumented primary-hit artifacts require probe opt-in; they are not ordinary image or performance candidates.')
     }
     hordeStagedPrimaryShaderDir = stagedPrimaryDirectory.absolutePath
 }
@@ -148,7 +175,8 @@ def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
             "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=${quality}",
             '-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=',
             '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF',
-            '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF']
+            '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF',
+            '-DHORDE_RT_PRIMARY_HIT_PROBE=OFF']
 }
 def hordeRtBenchmarkStagedPrimaryArguments = [
     "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
@@ -157,8 +185,9 @@ def hordeRtBenchmarkStagedPrimaryArguments = [
 ]
 def hordeRtDebugStagedPrimaryArguments = hordeStagedPrimaryDebugValidation ? [
     "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir}",
-    '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=ON',
-    '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF'
+    "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordePrimaryHitProbeNormal ? 'OFF' : 'ON'}",
+    '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF',
+    "-DHORDE_RT_PRIMARY_HIT_PROBE=${hordePrimaryHitProbe ? 'ON' : 'OFF'}"
 ] : []
 
 // Explicit local-only asset experiment. Release and ordinary Debug never consume
@@ -387,6 +416,7 @@ android {
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
             if (viewmodelCandidate) resValue 'string', 'app_name', 'Horde RT Viewmodel Candidate'
             if (hordeStagedPrimaryDebugValidation) resValue 'string', 'app_name', 'Horde RT Staged Investigation'
+            if (hordePrimaryHitProbe) resValue 'string', 'app_name', hordePrimaryHitProbeNormal ? 'Horde RT Primary Probe Control' : 'Horde RT Primary Probe Staged'
             versionNameSuffix '-debug'
             minifyEnabled false
             externalNativeBuild {

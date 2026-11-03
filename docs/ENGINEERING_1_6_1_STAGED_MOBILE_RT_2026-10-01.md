@@ -333,6 +333,27 @@ telemetry or scheduling framework.
 
 ### Next unfinished step
 
+Bounded layer-isolation implementation is underway at base02fed662 (normal
+production modules/assets unchanged). Diagnostic/Mobile Debug only, explicit
+opt-in; three5x5 regions at1080x2235 capture raw GPU ray, pre-shade HitInfo,
+all32 push words, staged post-load HitInfo and final output words. A57,600B
+sideband is appended **after** the unchanged176B Diagnostic allocation prefix;
+no counter/padding reuse, new descriptor, transport or tolerance change. Explicit
+GPU-write/host-read visibility and the existing owning-fence collection are
+required. It is not a performance artifact and cannot unlock Shipping admission.
+Existing CPU-upload/transform OBJ evidence is reused, clearly not GPU geometry
+readback. Instrumentation could perturb compiler behaviour: compare probe PNGs
+to retained uninstrumented captures before interpreting any localisation.
+Finite next run: normal/staged opening, skeleton, blue only; no20-image/A/A
+repeat. If divergence disappears under instrumentation, retain that limitation
+and do not claim a root cause. Separately, S24SM-S928B normal-path admission
+run20261001-145042 is complete using retained581ea466 Debug APK, not this probe:
+three captures/strict ASTC/honest hardware RayQueryCompute presentation and
+Home/resume pass. Production panes appear black (owner and screenshot);8681
+primary recoveries/reason1 are a clue, not a proven cause. Physical-glass and
+warm Shipping performance remain unaccepted, S25 unknown. See the device record;
+do not repeat this completed admission or call it prototype validation.
+
 Capture-preflight/exact-phone failure3499eea pushed; fresh push/PR CI is green.
 A/A complete; do not repeat. Next is bounded Diagnostic-only primary-input/hit
 layer isolation at existing divergent pixels with frozen geometry/input identity,

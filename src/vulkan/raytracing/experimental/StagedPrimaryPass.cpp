@@ -10,6 +10,10 @@
 namespace horde::vulkan::raytracing::experimental {
 static_assert(kInstrumentation == HORDE_RT_SELECTED_INSTRUMENTATION);
 static_assert(kQuality == HORDE_RT_SELECTED_DIELECTRIC_QUALITY);
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+static_assert(kPrimaryHitProbeEnabled && kPrimaryHitProbeBufferBytes == 57776u,
+              "Primary-hit isolation cannot use uninstrumented staged modules.");
+#endif
 
 StagedPrimaryPass::~StagedPrimaryPass() { Reset(); }
 

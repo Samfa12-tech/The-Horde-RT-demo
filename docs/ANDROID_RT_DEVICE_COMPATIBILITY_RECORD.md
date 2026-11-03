@@ -1069,6 +1069,51 @@ Candidate admission remains NO-GO, cause unproven. Normal Shipping benchmark
 retained, phone Home. Restoration only: no new Shipping RT/performance/music
 acceptance. Matched timing/RAM remain held by image gate.
 
+## October 1, 2026 - owner-connected S24 Ultra identity
+
+- Evidence type: owner device availability plus local, read-only ADB identity.
+  Serial `[redacted]` reports exact model **SM-S928B**, Android16/API36.
+  It is connected alongside the independently scoped SM-S948B. All commands
+  must select an explicit serial; neither device's results certify the other.
+- This is **not** Vulkan capability, native RT presentation, image, sustained
+  performance, music, lifecycle or release acceptance. No app was installed or
+  launched for this identity check. Finish the current diagnostic integration
+  checkpoint before a bounded normal-path S24 admission run. S25 remains
+  unavailable/unverified; do not infer it from either Ultra.
+- Owner subsequently reports that the test app **loads**, but glass appears
+  **black / incorrectly rendered**. This is exact-device owner-observation
+  evidence, not physical-glass acceptance or sustained-performance evidence.
+  Preserve the planned normal-path screenshots, shader/backend/driver identity
+  and physical counters; investigate without changing materials, budgets or
+  tolerances. S26 glass results cannot certify this SM-S928B.
+
+## October 1, 2026 - S24 normal-path capture admission; glass not accepted
+
+Exact **SM-S928B**, Android16/API36, Adreno750, driver512.762.41 / Vulkan1.3.128.
+Retained normal Diagnostic/Mobile APK581ea466…cc066a installs and pulls back
+byte-exactly. Its own build receipt identifies dirty build base59cb057, not the
+later02fed662 harness checkout or the unfinished primary-hit probe.
+Run20261001-145042 completes opening, glass-millimetre-closed and
+lantern-glass-production at75% /810x1682 internal extent, twelve stable presented
+frames each, strict ASTC and Home/resume. Selected **RayQueryCompute** is native
+hardware ray-query RT: rayQuery is available, RT-pipeline extension is not.
+Actual loaded opaque/generic module hashes are c1e4622a…6ff58 /e1817159…e302.
+
+The production screenshot corroborates the owner's black-pane observation;
+capture automation passing is **not** physical-glass or visual acceptance.
+Its completed Diagnostic frame records8681 primary certified-volume recoveries,
+reason mask1, with transport/interface-budget/shadow-overflow counters zero.
+This is a localisation clue, not a demonstrated cause; zero failure counters do
+not certify correct radiance. Backend, driver and extent differ from S26, so do
+not compare cross-device pixels as an unchanged image-equivalence gate.
+No matched warm Shipping performance, music/listening or release acceptance.
+S25 remains untested. Audio/haptic manual revalidation required: **NO** for this
+unchanged renderer capture. Test package stopped and phone returned Home;
+stable apps/data and system settings untouched. Private receipt and raw evidence:
+`C:/Dev/tmp/horde-s24-admission-20261001/s24-capture-admission.json` and
+`run-20261001-145042/`. Receipt SHA256
+9643e50657c39433e10b24efcdc89fb6c377228abcfe9451b57fc863781540eb.
+
 ## October 1, 2026 - S26 whistle-bank listening and music sink correction
 
 Exact **SM-S948B**, serialR5GL219SZGK. Fresh identity, actual Debug package

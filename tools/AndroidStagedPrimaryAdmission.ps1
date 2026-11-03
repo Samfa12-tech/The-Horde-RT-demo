@@ -28,6 +28,9 @@ function Resolve-AndroidShowcaseValidationTarget {
         throw 'A bounded staged manifest file is required.'
     }
     $manifest = Get-Content -Raw -LiteralPath $manifestFile.FullName | ConvertFrom-Json
+    if ($null -ne $manifest.primaryHitProbe) {
+        throw 'Diagnostic primary-hit probes are layer-isolation evidence, not ordinary image/performance candidates.'
+    }
     $roles = @($manifest.modules | ForEach-Object { "$($_.material):$($_.pass)" } | Sort-Object)
     if ($manifest.schema -ne 1 -or $manifest.classification -cne 'investigation-only-staged-primary' -or
         $manifest.instrumentation -cne 'Diagnostic' -or $manifest.quality -cne 'Mobile' -or

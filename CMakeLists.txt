@@ -189,6 +189,9 @@ if(BUILD_TESTING)
     add_executable(horde_rt_staged_primary_contract_tests tests/StagedPrimaryContractTests.cpp)
     target_include_directories(horde_rt_staged_primary_contract_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_staged_primary_contract_tests COMMAND horde_rt_staged_primary_contract_tests)
+    add_executable(horde_rt_primary_hit_probe_contract_tests tests/PrimaryHitProbeContractTests.cpp)
+    target_include_directories(horde_rt_primary_hit_probe_contract_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_primary_hit_probe_contract_tests COMMAND horde_rt_primary_hit_probe_contract_tests)
     add_executable(horde_rt_lantern_benchmark_tests
         tests/LanternBenchmarkTests.cpp
         src/gameplay/ShowcaseBenchmark.cpp

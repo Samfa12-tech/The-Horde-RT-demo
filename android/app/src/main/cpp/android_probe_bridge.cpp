@@ -217,6 +217,9 @@ struct SwapchainContext
     bool useRtPath = false;
     horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
     uint32_t currentFrame = 0u;
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+    std::string primaryProbeGeometryJson = "null";
+#endif
 };
 
 SwapchainContext gSwapchainContext{};
@@ -1292,6 +1295,10 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"replayComplete\": " << (replay.complete ? "true" : "false") << ",\n"
          << "  \"replayFailed\": " << (replay.failed ? "true" : "false") << ",\n"
          << "  \"rtFrameEvidence\": " << frameEvidenceJson
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+         << ",\n  \"primaryHitProbe\": " << context.rtScene.CompletedPrimaryHitProbeJson()
+         << ",\n  \"primaryProbeCpuGeometry\": " << context.primaryProbeGeometryJson
+#endif
          << "}\n";
     WriteTextFile(context.reportDirectory + '/' + kShowcaseDebugStateFilename, json.str());
 }
@@ -3171,6 +3178,32 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         ++context.capturePresentedFrames;
         if (context.capturePresentedFrames == 12u)
         {
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+            // Copy the existing exact CPU-upload evidence, not a new pose solve
+            // or GPU readback. The corresponding GPU sample is from the owning
+            // prior fence; this join is valid only for the frozen checkpoint.
+            const auto stamp = std::chrono::steady_clock::now().time_since_epoch().count();
+            const std::string prefix = "primary-probe-" + std::to_string(stamp);
+            const std::string viewName = prefix + "-viewmodel.obj";
+            const std::string bodyName = prefix + "-world-body.obj";
+            const std::string wordsName = prefix + "-cpu-upload-words.bin";
+            std::string geometryDiagnostic;
+            const bool viewSaved = context.rtScene.CaptureViewmodelMesh(
+                context.reportDirectory + '/' + viewName, geometryDiagnostic);
+            const bool bodySaved = context.rtScene.CapturePlayerWorldBodyMesh(
+                context.reportDirectory + '/' + bodyName, geometryDiagnostic);
+            const bool wordsSaved = context.rtScene.CapturePrimaryHitProbeCpuUploads(
+                context.reportDirectory + '/' + wordsName, geometryDiagnostic);
+            context.primaryProbeGeometryJson =
+                "{\"classification\":\"current-frozen-CPU-uploads-not-GPU-readback\",\"viewmodelSaved\":" +
+                std::string(viewSaved ? "true" : "false") + ",\"worldBodySaved\":" +
+                (bodySaved ? "true" : "false") + ",\"viewmodelFile\":\"" + viewName +
+                "\",\"worldBodyFile\":\"" + bodyName +
+                "\",\"uploadWordsSaved\":" + (wordsSaved ? "true" : "false") +
+                ",\"uploadWordsFile\":\"" + wordsName + "\"}";
+            if (!viewSaved || !bodySaved || !wordsSaved)
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Primary-probe CPU geometry export failed: %s", geometryDiagnostic.c_str());
+#endif
             WriteShowcaseDebugState(context, "capture-ready");
             __android_log_print(ANDROID_LOG_INFO,
                                 kTag,

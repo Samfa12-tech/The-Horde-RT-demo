@@ -57,7 +57,7 @@ try {
     Reject { Resolve-AndroidShowcaseValidationTarget -StagedPrimary $true -SkipBuild $true -ApkPath $apk -ManifestPath $manifestPath -ViewmodelDirectory 'overlay' } 'Asset overlay accepted'
     Reject { Resolve-AndroidShowcaseValidationTarget -StagedPrimary $true -SkipBuild $true -ApkPath $apk -ManifestPath $manifestPath -AnatomicalMount $true } 'Mount change accepted'
     Reject { Resolve-AndroidShowcaseValidationTarget -StagedPrimary $true -SkipBuild $true -ApkPath "$apk-missing" -ManifestPath $manifestPath } 'Missing APK accepted'
-    foreach($change in @('Shipping','High','duplicate','path','pairHash','moduleHash')) {
+    foreach($change in @('Shipping','High','duplicate','path','pairHash','moduleHash','primaryHitProbe')) {
         switch($change) {
             Shipping { $manifest.instrumentation='Shipping' }
             High { $manifest.quality='High' }
@@ -65,6 +65,7 @@ try {
             path { $manifest.modules[0].spirv='../escape.spv' }
             pairHash { $manifest.pairs[0].sha256='0'*64 }
             moduleHash { $manifest.modules[0].spirvSha256='0'*64 }
+            primaryHitProbe { $manifest | Add-Member NoteProperty primaryHitProbe ([pscustomobject]@{schema=1}) -Force }
         }
         SaveFixture; Reject { Target } "Invalid $change fixture admitted"
         # Each negative must start from, and restore, an independently valid

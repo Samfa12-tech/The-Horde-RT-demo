@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cmath>
 #include <chrono>
 #include <cstddef>
@@ -24,6 +25,12 @@
 #include <span>
 #include <utility>
 #include <vector>
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+#include "PrimaryHitProbeShaders.generated.h"
+#include "vulkan/raytracing/experimental/PrimaryHitProbeContracts.h"
+static_assert(horde::vulkan::raytracing::experimental::kProbeBufferBytes ==
+              horde::vulkan::raytracing::experimental::kPrimaryProbeBufferBytes);
+#endif
 
 #include "gameplay/CorridorCollision.h"
 #include "scene/assets/AssetManifest.h"
@@ -857,6 +864,14 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
 
 void PresentableTinyRtScene::Destroy()
 {
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+    completedPrimaryHitProbe_.clear();
+    recordedPrimaryProbePushWords_ = {};
+    completedPrimaryProbePushWords_ = {};
+    recordedPrimaryProbeSceneWords_.clear();
+    completedPrimaryProbeSceneWords_.clear();
+    completedPrimaryProbeStaged_ = false;
+#endif
     executionPolicy_ = {};
     computeDispatchGroups_ = {};
     if (device_ == VK_NULL_HANDLE)
@@ -1077,6 +1092,11 @@ bool PresentableTinyRtScene::CollectCompletedDiagnostic(
     std::string& diagnostic)
 {
     payload = {};
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+    completedPrimaryHitProbe_.clear();
+    completedPrimaryProbePushWords_ = {};
+    completedPrimaryProbeSceneWords_.clear();
+#endif
     static_assert(kRtDielectricDiagnosticsSchema1FieldCount ==
                   horde::telemetry::kRtDielectricCounterCount);
     static_assert(offsetof(RtDielectricDiagnostics, primaryRewardBodyPixelCount) +
@@ -1102,9 +1122,73 @@ bool PresentableTinyRtScene::CollectCompletedDiagnostic(
     }
     std::memcpy(payload.counters.data(), &completed,
                 payload.counters.size() * sizeof(payload.counters[0]));
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+    completedPrimaryHitProbe_.resize(experimental::kPrimaryProbeWordCount);
+    if (!ReadBuffer(pipelineBundle_.diagnosticBuffer,
+                    experimental::kPrimaryProbePrefixBytes,
+                    completedPrimaryHitProbe_.data(),
+                    completedPrimaryHitProbe_.size() * sizeof(std::uint32_t),
+                    "owning-fence primary-hit probe", diagnostic)) {
+        completedPrimaryHitProbe_.clear();
+        return false;
+    }
+    completedPrimaryProbePushWords_ = recordedPrimaryProbePushWords_;
+    completedPrimaryProbeSceneWords_ = recordedPrimaryProbeSceneWords_;
+    completedPrimaryProbeStaged_ = stagedPrimary_ != nullptr;
+#endif
     diagnostic.clear();
     return true;
 }
+
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+std::string PresentableTinyRtScene::CompletedPrimaryHitProbeJson() const
+{
+    return experimental::PrimaryHitProbeJson(completedPrimaryHitProbe_,
+        completedPrimaryProbeStaged_, completedPrimaryProbePushWords_,
+        completedPrimaryProbeSceneWords_);
+}
+
+bool PresentableTinyRtScene::CapturePrimaryHitProbeCpuUploads(
+    const std::string& path, std::string& diagnostic) const
+{
+    if (!ready_ || !viewmodelPoseCurrent_ || !playerWorldBodyPoseCurrent_ ||
+        viewmodelUpload_.empty() || skinnedPlayerUpload_.empty()) {
+        diagnostic = "No current CPU world/viewmodel uploads for primary isolation.";
+        return false;
+    }
+    std::error_code pathError;
+    if (std::filesystem::exists(path, pathError) || pathError) {
+        diagnostic = "Primary-probe CPU upload path exists or cannot be inspected.";
+        return false;
+    }
+    std::ofstream output(path, std::ios::binary);
+    const auto word = [&](std::uint32_t value) {
+        const std::array<std::uint8_t, 4u> bytes{static_cast<std::uint8_t>(value),
+            static_cast<std::uint8_t>(value >> 8u), static_cast<std::uint8_t>(value >> 16u),
+            static_cast<std::uint8_t>(value >> 24u)};
+        output.write(reinterpret_cast<const char*>(bytes.data()), bytes.size());
+    };
+    // Explicit LE words, no struct padding. HPU1 / world count / view count /
+    // 16 FP32 words per vertex, including tangent sign, UV and all four lanes.
+    // CPU upload evidence only: not GPU geometry/BLAS readback.
+    word(0x48505531u);
+    word(static_cast<std::uint32_t>(skinnedPlayerUpload_.size()));
+    word(static_cast<std::uint32_t>(viewmodelUpload_.size()));
+    word(16u);
+    for (const auto* vertices : {&skinnedPlayerUpload_, &viewmodelUpload_})
+        for (const auto& vertex : *vertices) {
+            const auto words = std::bit_cast<std::array<std::uint32_t, 16u>>(vertex);
+            for (const auto value : words) word(value);
+        }
+    output.close();
+    if (!output) {
+        diagnostic = "Failed to write primary-probe CPU upload evidence.";
+        return false;
+    }
+    diagnostic.clear();
+    return true;
+}
+#endif
 
 void PresentableTinyRtScene::PublishCompletedDiagnostic(
     const RtDiagnosticCounterPayload& payload) noexcept
@@ -4121,13 +4205,23 @@ bool PresentableTinyRtScene::CreateBundleDiagnosticBuffer(
 {
     static_assert(sizeof(RtDielectricDiagnostics) == 176u);
     static_assert(alignof(RtDielectricDiagnostics) == 16u);
-    const RtDielectricDiagnostics zeros{};
-    if (!CreateBuffer(sizeof(zeros), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+    VkDeviceSize allocationBytes = sizeof(RtDielectricDiagnostics);
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+    allocationBytes = experimental::kPrimaryProbeBufferBytes;
+#endif
+    if (!CreateBuffer(allocationBytes, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                           VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                       false, out, diagnostic))
         return false;
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+    const std::vector<std::uint32_t> probeZeros(allocationBytes / sizeof(std::uint32_t));
+    return WriteBuffer(out, probeZeros.data(), allocationBytes,
+                       "Diagnostic-only primary-hit probe allocation", diagnostic);
+#else
+    const RtDielectricDiagnostics zeros{};
     return WriteBuffer(out, &zeros, sizeof(zeros), "dielectric diagnostics", diagnostic);
+#endif
 }
 
 bool PresentableTinyRtScene::WriteBundleDescriptors(RtPipelineBundle& bundle,
@@ -5263,7 +5357,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
     const bool diagnosticsAvailable =
         pipelineBundle_.DiagnosticAvailability() == RtDiagnosticAvailability::Available;
+#if !defined(HORDE_RT_PRIMARY_HIT_PROBE)
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
+#endif
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
     if (effectivePlayerRenderRoute == PlayerRenderRoute::ModelledViewmodel &&
         playerBodyRemainderAvailable_)
@@ -5313,6 +5409,34 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     fixtureMaterial.attenuationColor[2] = clampedTuning.glassAttenuationColor[2];
     genericTransmissionActive_ = HasActiveGenericTransmission(frameInstanceMetadata,
         staticMeshSlot_.PrimitiveMetadata(), frameMaterials);
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+    // Canonical CPU input identity; never hash Vk structs, padding or device
+    // addresses. The GPU sample and this table are paired at the owning fence.
+    // Header: schema, instanceCount, instanceStrideWords, materialCount,
+    // materialStrideWords. Each instance: customIndex/mask/flags/SBT offset/
+    // geometryRole/semanticFlags, then the12 row-major transform float bits.
+    static_assert(sizeof(RtMaterialGpu) == 28u * sizeof(std::uint32_t));
+    recordedPrimaryProbeSceneWords_ = {1u, static_cast<std::uint32_t>(instances.size()),
+        18u, static_cast<std::uint32_t>(frameMaterials.size()), 28u};
+    for (const auto& instance : instances) {
+        if (instance.instanceCustomIndex >= frameInstanceMetadata.size()) {
+            diagnostic = "Primary-probe CPU instance identity is outside the semantic table.";
+            return false;
+        }
+        const auto& semantic = frameInstanceMetadata[instance.instanceCustomIndex];
+        auto& words = recordedPrimaryProbeSceneWords_;
+        words.insert(words.end(), {instance.instanceCustomIndex, instance.mask,
+            instance.flags, instance.instanceShaderBindingTableRecordOffset,
+            semantic.geometryRole, semantic.flags});
+        for (const auto& row : instance.transform.matrix)
+            for (const float value : row) words.push_back(std::bit_cast<std::uint32_t>(value));
+    }
+    for (const auto& material : frameMaterials) {
+        const auto words = std::bit_cast<std::array<std::uint32_t, 28u>>(material);
+        recordedPrimaryProbeSceneWords_.insert(recordedPrimaryProbeSceneWords_.end(),
+                                               words.begin(), words.end());
+    }
+#endif
     framePipelineEvidence_ = pipelineEvidenceIdentity_;
     framePipelineEvidenceValid_ = pipelineEvidenceIdentityValid_;
     framePipelineEvidence_.activeStrategy = genericTransmissionActive_
@@ -5354,10 +5478,17 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
     if (diagnosticsAvailable)
     {
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+        const std::vector<std::uint32_t> probeZeros(experimental::kPrimaryProbeBufferBytes / sizeof(std::uint32_t));
+        if (!WriteBuffer(pipelineBundle_.diagnosticBuffer, probeZeros.data(),
+                         experimental::kPrimaryProbeBufferBytes,
+                         "dielectric diagnostics reset", diagnostic))
+#else
         if (!WriteBuffer(pipelineBundle_.diagnosticBuffer,
                          &clearedDielectricDiagnostics,
                          sizeof(clearedDielectricDiagnostics),
                          "dielectric diagnostics reset", diagnostic))
+#endif
         {
             if (observation != nullptr)
             {
@@ -5723,6 +5854,9 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                              genericTransmissionActive_ ? 1.0f : 0.0f,
                                              guidanceLight.strength};
     lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+    std::memcpy(recordedPrimaryProbePushWords_.data(), &pushConstants, sizeof(pushConstants));
+#endif
     vkCmdPushConstants(commandBuffer,
                        pipelineBundle_.pipelineLayout,
                        executionPolicy_.pushConstantStages,
@@ -5841,6 +5975,16 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                     VK_ACCESS_SHADER_WRITE_BIT);
     storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
 
+#if defined(HORDE_RT_PRIMARY_HIT_PROBE)
+    // A sideband in the existing Diagnostic allocation, beyond its unchanged
+    // 176-byte prefix. Fence ownership alone must not stand in for visibility.
+    VkMemoryBarrier probeHostRead{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
+    probeHostRead.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+    probeHostRead.dstAccessMask = VK_ACCESS_HOST_READ_BIT;
+    vkCmdPipelineBarrier(commandBuffer, executionPolicy_.shaderPipelineStage,
+                         VK_PIPELINE_STAGE_HOST_BIT, 0u, 1u, &probeHostRead,
+                         0u, nullptr, 0u, nullptr);
+#endif
     storageImageFrameRecorded_ = true;
     traceCopyScope.Complete(1u);
     if (observation != nullptr && observation->recordedScene != nullptr)
