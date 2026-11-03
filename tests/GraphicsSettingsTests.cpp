@@ -1,4 +1,5 @@
 #include "graphics/GraphicsSettings.h"
+#include "platform/android/AndroidOpeningBenchmarkOwner.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 
 #include <atomic>
@@ -449,6 +450,69 @@ void TestDustMigrationAndAcknowledgement()
           "schema5 preserves independently confirmed and pending dust qualities");
 }
 
+void TestSettledEditorBenchmarkAdmission()
+{
+    const auto saved=PlatformDefaultGraphicsSettings(GraphicsPlatform::Android);
+    const auto canQueue=[](const GraphicsEditSession& edit) {
+        OpeningBenchmarkEligibility eligibility{true,true};
+        eligibility.graphicsTransition=edit.HasUnresolvedChanges();
+        horde::platform::android::AndroidOpeningBenchmarkOwner owner;
+        return owner.Queue(1,9,eligibility);
+    };
+    GraphicsEditSession inspected(saved);
+    Check(!inspected.HasUnresolvedChanges() && canQueue(inspected),
+        "read-only graphics inspection does not block either opening benchmark choice");
+    Check(inspected.Stage(saved) && !inspected.HasUnresolvedChanges() && canQueue(inspected),
+        "unchanged draft remains settled even though the editor state is Editing");
+    auto changed=saved;changed.renderScalePercent=50;changed.waterQuality=WaterQuality::High;
+    Check(inspected.Stage(changed) && inspected.HasUnresolvedChanges() && !canQueue(inspected),
+        "a genuinely different unapplied draft still blocks benchmark ownership");
+    const auto apply=inspected.RequestApply(9);
+    Check(apply && inspected.HasUnresolvedChanges() && !canQueue(inspected),
+        "pending Apply and persistence marker block a benchmark");
+    if(!apply)return;
+    auto unpresented=Presented(*apply);unpresented.rtPresented=false;
+    Check(!inspected.Acknowledge(unpresented,true) && !canQueue(inspected),
+        "allocation without actual presentation cannot resolve graphics admission");
+    Check(inspected.Acknowledge(Presented(*apply),true) &&
+        inspected.State()==GraphicsEditState::AwaitingConfirmation && !canQueue(inspected),
+        "a presented but unconfirmed Apply still blocks a benchmark");
+    Check(inspected.Confirm() && !inspected.HasUnresolvedChanges() && canQueue(inspected),
+        "confirmed settings resolve the editor without discarding it");
+    changed.renderScalePercent=75;
+    Check(inspected.Stage(changed),"a later graphics preview stages a real change");
+    const auto second=inspected.RequestApply(9);
+    Check(second && inspected.Acknowledge(Presented(*second),true),"later preview is presented but unconfirmed");
+    const auto revert=inspected.RequestRevert(9);
+    Check(revert && inspected.HasUnresolvedChanges() && !canQueue(inspected),
+        "Back/Revert remains blocked until its actual resource acknowledgement");
+    if(!revert)return;
+    auto stale=Presented(*revert);++stale.lifecycleGeneration;
+    Check(!inspected.Acknowledge(stale,true) && !canQueue(inspected),"stale restore cannot admit a benchmark");
+    Check(inspected.Acknowledge(Presented(*revert),false) &&
+        inspected.State()==GraphicsEditState::Failed && !canQueue(inspected),
+        "failed restoration remains blocked rather than relabelling the old output settled");
+    const auto retry=inspected.RequestRevert(10);
+    Check(retry && inspected.Acknowledge(Presented(*retry),true) &&
+        inspected.State()==GraphicsEditState::Editing && !inspected.HasUnresolvedChanges() && canQueue(inspected),
+        "successful restoration leaves a settled Editing session and re-enables benchmark ownership");
+    GraphicsEditSession unchanged(saved);
+    const auto back=unchanged.RequestRevert(11);
+    Check(back && !canQueue(unchanged) && unchanged.Acknowledge(Presented(*back),true) &&
+        unchanged.State()==GraphicsEditState::Editing && canQueue(unchanged),
+        "opening graphics then Back without changes reproduces the physical settled-Editing regression");
+    GraphicsEditSession failedReadOnly(saved);
+    const auto failedBack=failedReadOnly.RequestRevert(12);
+    Check(failedBack && failedReadOnly.Acknowledge(Presented(*failedBack),false) &&
+        !failedReadOnly.Persistence().pending && !canQueue(failedReadOnly),
+        "even a failed no-change restore without a pending persistence marker stays blocked");
+    Check(failedReadOnly.Stage(saved) && !canQueue(failedReadOnly),
+        "staging the original tuple cannot erase an unproved restore failure");
+    const auto recover=failedReadOnly.RequestRevert(13);
+    Check(recover && failedReadOnly.Acknowledge(Presented(*recover),true) && canQueue(failedReadOnly),
+        "only successful restore proof resolves the failed no-change transaction");
+}
+
 void TestCoherentPublication()
 {
     GraphicsMailbox<GraphicsAppliedSnapshot> mailbox;
@@ -507,7 +571,7 @@ void TestResolutionApplyAndRecovery()
 }
 int main()
 {
-    TestMigrationAndProfiles(); TestResolutionAndEffectiveValues(); TestApplyConfirmAndCancel();
+    TestMigrationAndProfiles(); TestResolutionAndEffectiveValues(); TestApplyConfirmAndCancel(); TestSettledEditorBenchmarkAdmission();
     TestFailureDeadlineAndRecovery(); TestResolutionApplyAndRecovery(); TestEffectiveAcknowledgement(); TestGlassMigrationAndTransactions(); TestIndependentShadowAndLowFire(); TestPlatformDefaultsAndMist(); TestDustMigrationAndAcknowledgement(); TestCoherentPublication();
     return passed ? 0 : 1;
 }

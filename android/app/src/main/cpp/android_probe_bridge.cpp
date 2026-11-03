@@ -87,6 +87,7 @@
 #include "platform/android/AndroidDebugRequestAdmission.h"
 #include "platform/android/AndroidOpeningBenchmarkOwner.h"
 #include "platform/android/AndroidBenchmarkOutputTransaction.h"
+#include "platform/android/AcknowledgedSurfaceResize.h"
 #include "telemetry/RtFrameDimensionsEvidence.h"
 #include "update/GitHubReleaseUpdater.h"
 #include "vulkan/GpuFrameTimer.h"
@@ -710,6 +711,8 @@ std::optional<horde::graphics::GraphicsSettings> gOpeningBenchmarkOriginalSettin
 bool gOpeningBenchmarkProvisional=false;
 horde::platform::android::AndroidBenchmarkOutputTransaction gOpeningBenchmarkOutput;
 unsigned gOpeningBenchmarkOutputFrameAttempts=0;
+// Accessed only by the render owner, never the JNI/UI ACK publisher.
+horde::platform::android::AcknowledgedSurfaceResize gOpeningBenchmarkSurfaceResize;
 std::string gOpeningBenchmarkProfileJson,gOpeningBenchmarkAppliedFrameJson,gOpeningBenchmarkRestoredFrameJson;
 bool OpeningBenchmarkResetAllowedOnOwner();
 void AnnotateOpeningBenchmarkReport(std::string& text,std::string& json);
@@ -3755,6 +3758,16 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
     return true;
 }
 
+bool FinishRetiredSwapchainRecreation(SwapchainContext& context)
+{
+    const bool restored = CreateSwapchain(context) && InitialiseRtSceneForSwapchain(context);
+    if (restored) context.entryHandoff.EndLoad();
+    else context.entryHandoff.FailLoad();
+    context.entryWarmFrames = kMaxFramesInFlight;
+    PublishEntryState(context, false);
+    return restored;
+}
+
 bool RecreateSwapchain(SwapchainContext& context)
 {
     context.entryHandoff.BeginLoad();
@@ -3765,12 +3778,25 @@ bool RecreateSwapchain(SwapchainContext& context)
         PublishEntryState(context, false);
         return false;
     }
-    const bool restored = CreateSwapchain(context) && InitialiseRtSceneForSwapchain(context);
-    if (restored) context.entryHandoff.EndLoad();
-    else context.entryHandoff.FailLoad();
-    context.entryWarmFrames = kMaxFramesInFlight;
-    PublishEntryState(context, false);
-    return restored;
+    return FinishRetiredSwapchainRecreation(context);
+}
+
+// Fixed-buffer benchmark apply/restore only; ordinary resize keeps its existing
+// path. Android WSI can cache the former buffer's default extent on its Surface
+// connection. Recreate that supported VkSurface after swapchain/present retirement,
+// using the same ANW, instance, device and queue, before querying fresh caps.
+bool RefreshAcknowledgedBenchmarkSurface(SwapchainContext& context)
+{
+    if(context.swapchain!=VK_NULL_HANDLE || !gSurfaceSessions.IsCurrent(context.surfaceGeneration))return false;
+    return horde::platform::android::RefreshRetiredPresentationSurface(context.surface,
+        [&](VkSurfaceKHR surface) {vkDestroySurfaceKHR(context.instance,surface,nullptr);},
+        [&](VkSurfaceKHR& surface) {return CreateSurface(context.instance,context.window,surface);},
+        [&](VkSurfaceKHR surface) {
+            VkBool32 supported=VK_FALSE;
+            return vkGetPhysicalDeviceSurfaceSupportKHR(context.physicalDevice,context.graphicsQueueFamilyIndex,
+                surface,&supported)==VK_SUCCESS && supported==VK_TRUE &&
+                gSurfaceSessions.IsCurrent(context.surfaceGeneration);
+        });
 }
 
 bool InitialiseRtSceneForSwapchain(SwapchainContext& context);
@@ -8018,7 +8044,14 @@ static jlong QueueOpeningBenchmark(jlong generation,bool provisional,
         if(gOpeningBenchmarkSerial==static_cast<std::uint64_t>(INT64_MAX) ||
            !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)))return 0;
         serial=gOpeningBenchmarkSerial+1;
-        if(!gOpeningBenchmarkOwner.Queue(serial,static_cast<std::uint64_t>(generation),gOpeningBenchmarkEligibility))return 0;
+        if(!gOpeningBenchmarkOwner.Queue(serial,static_cast<std::uint64_t>(generation),gOpeningBenchmarkEligibility)) {
+            const auto& e=gOpeningBenchmarkEligibility;
+            __android_log_print(ANDROID_LOG_WARN,kTag,
+                "HORDE_BENCHMARK_QUEUE_REJECTED phase=%u entry_visible=%d entry_scene=%d active_campaign=%d pending_campaign=%d graphics_transition=%d play_handoff=%d benchmark_busy=%d",
+                static_cast<unsigned>(gOpeningBenchmarkOwner.State()),e.entryVisible,e.entryScene,
+                e.activeCampaign,e.pendingCampaign,e.graphicsTransition,e.playHandoff,e.benchmarkBusy);
+            return 0;
+        }
         gOpeningBenchmarkSerial=serial;gOpeningBenchmarkOriginalSettings.reset();
         gOpeningBenchmarkOriginalRoute=gRtLabBenchmarkRoute.load(std::memory_order_acquire);
         gOpeningBenchmarkProvisional=provisional;gOpeningBenchmarkOutput={};gOpeningBenchmarkOutputFrameAttempts=0;

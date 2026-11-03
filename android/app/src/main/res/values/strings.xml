@@ -231,7 +231,7 @@
     <string name="benchmark_switch_private">Send privately to developer instead</string>
     <string name="benchmark_switch_public">Share on the website instead</string>
     <string name="benchmark_standard">Standard benchmark (fixed settings)</string>
-    <string name="benchmark_standard_scope">Standard temporarily uses 1280 × 720 output and 640 × 360 RT, Mobile water, Low fire, Current shadows, and glass, mist, particles and dynamic resolution off. Your previous settings and layout return afterward. Custom uses your current settings. Community results are unverified.</string>
+    <string name="benchmark_standard_scope">Standard temporarily uses a fixed graphics preset and restores your saved choices afterward. Custom uses your current settings. Results are unranked.</string>
     <string name="benchmark_standard_unavailable">Standard benchmark unavailable. You can still choose Custom.</string>
     <string name="benchmark_public_scope">Publish this run on the Horde results website. First prepare a local preview, then choose publication consent and Publish. Only aggregate timings and graphics settings are shared; no private report IDs or raw frame rows. Hardware labels are optional. Results are unverified and unranked. Nothing uploads before Publish and anti-spam verification succeed.</string>
     <string name="benchmark_public_consent">Prepare a local public preview (does not publish)</string>

@@ -1,6 +1,9 @@
 #include "platform/windows/WindowsBenchmarkMenuOwner.h"
 #include "platform/android/AndroidOpeningBenchmarkOwner.h"
 #include "platform/android/AndroidBenchmarkOutputTransaction.h"
+#include "platform/android/AcknowledgedSurfaceResize.h"
+#include <vector>
+#include <limits>
 
 #include <cstdlib>
 #include <iostream>
@@ -303,6 +306,97 @@ void TestAndroidFixedOutputTransaction()
     Check(!unsafe.Drained(false) && unsafe.State()==P::Failed && unsafe.Snapshot()[4]==0,
           "unproved GPU drain cannot issue any buffer mutation command");
 }
+
+void TestAcknowledgedSurfaceResize()
+{
+    using Resize=horde::platform::android::AcknowledgedSurfaceResize;
+    using Result=Resize::Result;
+    const Resize::Key apply{11,22,22,1,false,1280,720};
+    const Resize::Key restore{11,22,22,2,true,1440,2971};
+    const Resize::Geometry applied{1280,720,1280,720,1,1,8192,8192};
+    const Resize::Geometry restored{1440,2971,1440,2971,1,1,8192,8192};
+    Resize resize;
+    std::vector<int> calls;
+    auto retire=[&] {calls.push_back(1);return true;};
+    auto refresh=[&] {calls.push_back(2);return true;};
+    Check(resize.Prepare(apply,retire,refresh) && calls==std::vector<int>{1,2},
+        "exact acknowledged command retires GPU/present resources before refreshing surface");
+    Check(resize.Prepare(apply,retire,refresh) && calls.size()==2,
+        "polling an acknowledged command never repeats surface refresh");
+    auto lag=applied;lag.currentWidth=1440;lag.currentHeight=2971;
+    Check(resize.Observe(lag,100)==Result::Waiting,
+        "new ANW dimensions with stale Vulkan extent cannot recreate or submit");
+    auto holderLag=applied;holderLag.windowWidth=1440;holderLag.windowHeight=2971;
+    Check(resize.Observe(holderLag,101)==Result::Waiting && resize.Observe(applied,102)==Result::Ready,
+        "Vulkan and ANW must both agree with actual UI ACK before creation");
+    Check(resize.Prepare(restore,retire,refresh) && calls.size()==4,
+        "restore sequence has independent retirement and exactly one refresh");
+    auto reverseLag=restored;reverseLag.currentWidth=1280;reverseLag.currentHeight=720;
+    Check(resize.Observe(reverseLag,500)==Result::Waiting && resize.Observe(restored,501)==Result::Ready,
+        "reverse restoration lag cannot certify old preset size as original layout");
+    for(unsigned field=0;field<5;++field) {
+        auto key=apply;
+        switch(field) {case 0:++key.request;break;case 1:++key.origin;break;case 2:++key.generation;break;
+            case 3:++key.sequence;break;default:key.restoring=true;break;}
+        calls.clear();resize.Reset();resize.Prepare(apply,retire,refresh);resize.Observe(lag,1);
+        Check(resize.Prepare(key,retire,refresh) && calls.size()==4 &&
+            resize.Observe(applied,Resize::TimeoutNs+50)==Result::Ready,
+            "new request/origin/surface generation/sequence/phase starts an independent bounded rendezvous");
+    }
+    resize.Reset();calls.clear();
+    Check(!resize.Prepare(apply,[&] {calls.push_back(1);return false;},refresh) &&
+        calls==std::vector<int>{1} && !resize.Prepare(apply,retire,refresh) && calls.size()==1,
+        "failed resource retirement prevents refresh and latches until reset/new command");
+    resize.Reset();calls.clear();
+    Check(!resize.Prepare(apply,retire,[&] {calls.push_back(2);return false;}) &&
+        resize.Observe(applied,0)==Result::Failed && calls==std::vector<int>{1,2},
+        "failed surface refresh cannot admit creation or submission");
+    resize.Reset();resize.Prepare(apply,retire,refresh);
+    Check(resize.Observe(lag,100)==Result::Waiting &&
+        resize.Observe(lag,100+Resize::TimeoutNs-1)==Result::Waiting &&
+        resize.Observe(applied,100+Resize::TimeoutNs)==Result::Failed &&
+        resize.Observe(applied,101+Resize::TimeoutNs)==Result::Failed,
+        "extent deadline is finite, polling cannot extend it and late agreement cannot erase failure");
+    resize.Reset();resize.Prepare(apply,retire,refresh);resize.Observe(lag,100);
+    Check(resize.Observe(applied,99)==Result::Failed,
+        "monotonic clock regression fails closed instead of extending wait");
+    auto variable=applied;variable.currentWidth=variable.currentHeight=std::numeric_limits<std::uint32_t>::max();
+    resize.Reset();resize.Prepare(apply,retire,refresh);
+    Check(resize.Observe(variable,1)==Result::Ready,"variable surface accepts exact ACK inside actual caps");
+    for(unsigned invalid=0;invalid<4;++invalid) {
+        auto geometry=variable;
+        switch(invalid) {case 0:geometry.maxWidth=1279;break;case 1:geometry.minHeight=721;break;
+            case 2:geometry.currentHeight=720;break;default:geometry.minWidth=9000;break;}
+        resize.Reset();resize.Prepare(apply,retire,refresh);
+        Check(resize.Observe(geometry,1)==Result::Failed,
+            "out-of-bounds or malformed Vulkan caps never justify clamping preset dimensions");
+    }
+    auto staleFixedBounds=applied;staleFixedBounds.minWidth=staleFixedBounds.maxWidth=1440;
+    resize.Reset();resize.Prepare(apply,retire,refresh);
+    Check(resize.Observe(staleFixedBounds,1)==Result::Waiting && resize.Observe(applied,2)==Result::Ready,
+        "transient fixed-cap bounds must converge too, without clamping or premature creation");
+    auto zero=applied;zero.windowWidth=zero.windowHeight=0;
+    resize.Reset();resize.Prepare(apply,retire,refresh);
+    Check(resize.Observe(zero,1)==Result::Waiting,"zero native window waits quiescently without submitting");
+    resize.Reset();
+    Check(resize.Observe(applied,2)==Result::Failed && resize.Prepare(restore,retire,refresh) &&
+        resize.Observe(restored,3)==Result::Ready,"cancel/reset discards former command proof before independent restoration");
+
+    // The production bridge invokes this exact ownership helper only after the
+    // retirement above; no raw/private ANW connection API is needed.
+    for(unsigned failure=0;failure<4;++failure) {
+        int surface=7;std::vector<int> operations;
+        const bool success=horde::platform::android::RefreshRetiredPresentationSurface(surface,
+            [&](int h) {operations.push_back(-h);},
+            [&](int& h) {operations.push_back(1);h=failure==1?0:8;return failure!=1 && failure!=2;},
+            [&](int h) {operations.push_back(h);return failure!=3;});
+        Check(success==(failure==0) && surface==(failure==0?8:0),
+            "surface create/present-support failures clear handle instead of exposing stale or unsupported surface");
+        const std::vector<int> expected=failure==0?std::vector<int>{-7,1,8}:
+            failure==1?std::vector<int>{-7,1}:failure==2?std::vector<int>{-7,1,-8}:std::vector<int>{-7,1,8,-8};
+        Check(operations==expected,"surface replacement destroys each owned handle once and checks same queue before publish");
+    }
+}
 } // namespace
 
 int main()
@@ -312,6 +406,7 @@ int main()
     TestFailedProofs();
     TestAndroidOpeningOwner();
     TestAndroidFixedOutputTransaction();
+    TestAcknowledgedSurfaceResize();
     std::cout << checks << " opening benchmark ownership checks, " << failures << " failures\n";
     return failures == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }

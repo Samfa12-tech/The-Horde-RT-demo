@@ -133,7 +133,7 @@ horde::graphics::OpeningBenchmarkEligibility OpeningBenchmarkEligibilityOnOwner(
         e.playHandoff=gEntryControls.play || context.entryHandoff.PlayRequested();
         e.graphicsTransition=gPreviewControls.enabled || context.previewTransitionFailed ||
             gRequestedGraphics.serial!=context.graphicsSerial ||
-            (gGraphicsEdit && gGraphicsEdit->State()!=horde::graphics::GraphicsEditState::Committed);
+            (gGraphicsEdit && gGraphicsEdit->HasUnresolvedChanges());
     }
     {
         std::lock_guard lock(gCampaignMutex);e.pendingCampaign=gCampaignCommand.has_value();
@@ -203,12 +203,13 @@ bool ProcessOpeningBenchmarkOutputOnOwner(SwapchainContext& context)
     T::Phase phase;
     {
         std::lock_guard lock(gOpeningBenchmarkMutex);
-        if(!gOpeningBenchmarkProvisional)return true;
+        if(!gOpeningBenchmarkProvisional) {gOpeningBenchmarkSurfaceResize.Reset();return true;}
         if(gOpeningBenchmarkOwner.Returning())gOpeningBenchmarkOutput.Restore(gOpeningBenchmarkOwner.Cancelled());
         phase=gOpeningBenchmarkOutput.State();
-        if(phase==T::Phase::Idle || phase==T::Phase::Restored)return true;
+        if(phase==T::Phase::Idle || phase==T::Phase::Restored) {gOpeningBenchmarkSurfaceResize.Reset();return true;}
         if(phase==T::Phase::Failed) {gOpeningBenchmarkOwner.Block();return false;}
     }
+    if(phase!=T::Phase::RecreateApply && phase!=T::Phase::RecreateRestore)gOpeningBenchmarkSurfaceResize.Reset();
     if(phase==T::Phase::DrainApply || phase==T::Phase::DrainRestore) {
         const bool acquireDrained=ConsumePendingImageAcquire(context);
         const auto idle=acquireDrained?vkDeviceWaitIdle(context.device):VK_ERROR_DEVICE_LOST;
@@ -220,24 +221,68 @@ bool ProcessOpeningBenchmarkOutputOnOwner(SwapchainContext& context)
     }
     if(phase==T::Phase::AwaitApply || phase==T::Phase::AwaitRestore)return false;
     if(phase==T::Phase::RecreateApply || phase==T::Phase::RecreateRestore) {
-        bool applying=false;std::uint32_t width=0,height=0;
+        using Resize=horde::platform::android::AcknowledgedSurfaceResize;
+        Resize::Key key;
+        bool applying=false;
         {
             std::lock_guard lock(gOpeningBenchmarkMutex);
             applying=gOpeningBenchmarkOutput.Applying();
+            const auto command=gOpeningBenchmarkOutput.Snapshot();
+            key={static_cast<std::uint64_t>(command[0]),static_cast<std::uint64_t>(command[1]),
+                static_cast<std::uint64_t>(command[2]),static_cast<std::uint64_t>(command[3]),!applying,
+                gOpeningBenchmarkOutput.Width(),gOpeningBenchmarkOutput.Height()};
             context.graphicsSettings=applying?gOpeningBenchmarkOutput.Requested():gOpeningBenchmarkOutput.Original();
-            width=gOpeningBenchmarkOutput.Width();height=gOpeningBenchmarkOutput.Height();
         }
         context.renderScale=context.graphicsSettings.renderScalePercent/100.0f;
-        const bool holderMatches=ANativeWindow_getWidth(context.window)==static_cast<int>(width) &&
-            ANativeWindow_getHeight(context.window)==static_cast<int>(height);
-        if(!holderMatches && applying) {
-            // A structural callback raced the owner. Old work was already
-            // drained; cancel and request restoration rather than rebuild a
-            // different size under this provisional request.
+        const bool prepared=gOpeningBenchmarkSurfaceResize.Prepare(key,[&] {
+            context.entryHandoff.BeginLoad();
+            context.capabilities.rtScene.presented=false;
+            gSurfaceSessions.Publish(context.surfaceGeneration,0);
+            PublishEntryState(context,false);
+            return ReleaseSwapchainResources(context);
+        },[&] {
+            const bool refreshed=RefreshAcknowledgedBenchmarkSurface(context);
+            __android_log_print(refreshed?ANDROID_LOG_INFO:ANDROID_LOG_ERROR,kTag,
+                "HORDE_BENCHMARK_SURFACE_REFRESH generation=%llu sequence=%llu restoring=%d ack=%ux%u success=%d",
+                static_cast<unsigned long long>(key.generation),static_cast<unsigned long long>(key.sequence),
+                key.restoring?1:0,key.width,key.height,refreshed?1:0);
+            return refreshed;
+        });
+        if(!prepared) {
+            context.entryHandoff.FailLoad();PublishEntryState(context,false);
             std::lock_guard lock(gOpeningBenchmarkMutex);
-            gOpeningBenchmarkOwner.BeginReturn(4);gOpeningBenchmarkOutput.Restore();return false;
+            gOpeningBenchmarkOutput.Fail();gOpeningBenchmarkOwner.Block();return false;
         }
-        const bool recreated=holderMatches && RecreateSwapchain(context);
+        // No acquire/submission while ANW and fresh Vulkan caps rendezvous with
+        // this exact ACK. The outer owner loop sleeps and handles cancellation.
+        VkSurfaceCapabilitiesKHR caps{};
+        const bool queried=vkGetPhysicalDeviceSurfaceCapabilitiesKHR(context.physicalDevice,context.surface,&caps)==VK_SUCCESS;
+        const auto nativeWidth=ANativeWindow_getWidth(context.window),nativeHeight=ANativeWindow_getHeight(context.window);
+        const Resize::Geometry geometry{nativeWidth>0?static_cast<std::uint32_t>(nativeWidth):0u,
+            nativeHeight>0?static_cast<std::uint32_t>(nativeHeight):0u,caps.currentExtent.width,caps.currentExtent.height,
+            caps.minImageExtent.width,caps.minImageExtent.height,caps.maxImageExtent.width,caps.maxImageExtent.height};
+        const auto ready=queried?gOpeningBenchmarkSurfaceResize.Observe(geometry,GraphicsSteadyNs()):Resize::Result::Failed;
+        {
+            std::lock_guard lock(gOpeningBenchmarkMutex);
+            const auto current=gOpeningBenchmarkOutput.Snapshot();
+            if(gOpeningBenchmarkOutput.State()!=phase || static_cast<std::uint64_t>(current[2])!=key.generation ||
+               !gSurfaceSessions.IsCurrent(key.generation))return false;
+            if(applying && gOpeningBenchmarkOwner.Cancelled()) {
+                gOpeningBenchmarkOwner.BeginReturn(3);gOpeningBenchmarkOutput.Restore(true);return false;
+            }
+            if(gSurfaceSessions.IsSuspended(key.generation))return false;
+            if(ready==Resize::Result::Waiting)return false;
+            if(ready==Resize::Result::Failed) {
+                __android_log_print(ANDROID_LOG_ERROR,kTag,
+                    "HORDE_BENCHMARK_SURFACE_RENDEZVOUS_FAILED generation=%llu restoring=%d queried=%d ack=%ux%u window=%ux%u current_extent=%ux%u",
+                    static_cast<unsigned long long>(key.generation),key.restoring?1:0,queried?1:0,
+                    key.width,key.height,geometry.windowWidth,geometry.windowHeight,geometry.currentWidth,geometry.currentHeight);
+                if(queried && applying) {gOpeningBenchmarkOwner.BeginReturn(4);gOpeningBenchmarkOutput.Restore();}
+                else {gOpeningBenchmarkOutput.Fail();gOpeningBenchmarkOwner.Block();}
+                return false;
+            }
+        }
+        const bool recreated=FinishRetiredSwapchainRecreation(context);
         const auto p=context.rtFrameEvidence.PublishedStateByValue();
         {
             std::lock_guard lock(gOpeningBenchmarkMutex);

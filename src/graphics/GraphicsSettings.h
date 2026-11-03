@@ -402,6 +402,7 @@ public:
         {
             failureReason_ = snapshot.reasons | GraphicsReason::ResourceFailure;
             state_ = GraphicsEditState::Failed;
+            restoreProofRequired_ = true;
             // Keep pending persistence until successful restore or explicit
             // confirmation; a failed revert must never look like restored.
             pending_.reset();
@@ -434,6 +435,7 @@ public:
             persistencePending_.reset();
             pending_.reset();
             state_ = GraphicsEditState::Editing;
+            restoreProofRequired_ = false;
         }
         else
         {
@@ -450,6 +452,7 @@ public:
         pending_.reset();
         persistencePending_.reset();
         state_ = GraphicsEditState::Committed;
+        restoreProofRequired_ = false;
         return true;
     }
     std::optional<GraphicsCommand> AdvanceConfirmation(const double seconds,
@@ -471,6 +474,15 @@ public:
     const GraphicsSettings& Draft() const noexcept { return draft_; }
     const std::optional<GraphicsAppliedSnapshot>& Effective() const noexcept { return effective_; }
     GraphicsEditState State() const noexcept { return state_; }
+    // An editor can exist after read-only inspection or successful Back/Revert.
+    // Those settled Editing states are not pending graphics transactions. The
+    // render owner must still prove its actual serial/resources/presentation.
+    [[nodiscard]] bool HasUnresolvedChanges() const noexcept
+    {
+        return state_ == GraphicsEditState::Applying || state_ == GraphicsEditState::AwaitingConfirmation ||
+            state_ == GraphicsEditState::Reverting || state_ == GraphicsEditState::Failed ||
+            restoreProofRequired_ || pending_.has_value() || persistencePending_.has_value() || draft_ != committed_;
+    }
     GraphicsReason FailureReason() const noexcept { return failureReason_; }
     std::uint64_t LastSerial() const noexcept { return lastSerial_; }
 
@@ -494,6 +506,8 @@ private:
     std::optional<GraphicsSettings> persistencePending_;
     std::optional<GraphicsAppliedSnapshot> effective_;
     GraphicsReason failureReason_ = GraphicsReason::None;
+    // Merely staging a corrected draft cannot erase an unproved failed restore.
+    bool restoreProofRequired_ = false;
     double foregroundSeconds_ = 0.0;
 };
 
