@@ -90,17 +90,17 @@ function Assert-PolicyFailure {
     }
 }
 
-foreach ($publishedVersion in @('1.6.0', '1.6.1', '1.6.1-alpha.1', '1.6.1+rebuild', '1.6.1.preview', '1.6.2', '1.6.2-alpha.1', '1.6.2+rebuild', '1.6.2.preview')) {
+foreach ($publishedVersion in @('1.6.0', '1.6.1', '1.6.1-alpha.1', '1.6.1+rebuild', '1.6.1.preview', '1.6.2', '1.6.2-alpha.1', '1.6.2+rebuild', '1.6.2.preview', '1.7.0', '1.7.0-alpha.1', '1.7.0+rebuild', '1.7.0.preview')) {
     if (-not (Test-HordeReleaseVersionIsPublished -Version $publishedVersion)) {
         throw "Published line was not classified as immutable: $publishedVersion"
     }
     Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version $publishedVersion -VersionCode 10 } 'immutable'
 }
-if (Test-HordeReleaseVersionIsPublished -Version '1.6.3') { throw 'An unpublished version was classified as published.' }
-Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version '1.6.3' -VersionCode 10 } 'greater than'
+if (Test-HordeReleaseVersionIsPublished -Version '1.7.1') { throw 'An unpublished version was classified as published.' }
+Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version '1.7.1' -VersionCode 11 } 'greater than'
 $activeIdentity = Get-HordeSourceIdentity -RepoRoot (Join-Path $PSScriptRoot '..')
-$unmatchedVersion = if ($activeIdentity.Version -eq '1.6.3') { '1.6.4' } else { '1.6.3' }
-Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version $unmatchedVersion -VersionCode 11 } 'active root contract'
+$unmatchedVersion = if ($activeIdentity.Version -eq '1.7.1') { '1.7.2' } else { '1.7.1' }
+Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version $unmatchedVersion -VersionCode 12 } 'active root contract'
 # A current unpublished identity is a policy query, without packaging or signing.
 if (-not (Test-HordeReleaseVersionIsPublished -Version $activeIdentity.Version)) {
     Assert-HordeReleaseVersionIsMutable -Version $activeIdentity.Version -VersionCode $activeIdentity.VersionCode
@@ -115,4 +115,11 @@ Assert-PolicyFailure { & (Join-Path $PSScriptRoot '..\tools\push-alpha-to-itch.p
 Assert-PolicyFailure { & (Join-Path $PSScriptRoot '..\tools\package-alpha.ps1') -Version '1.6.2' -VersionCode 10 } 'immutable'
 Assert-PolicyFailure { & (Join-Path $PSScriptRoot '..\tools\package-signed-alpha.ps1') -Version '1.6.2' -VersionCode 10 -KeyStorePath (Join-Path $fixtureRoot 'missing.jks') } 'immutable'
 Assert-PolicyFailure { & (Join-Path $PSScriptRoot '..\tools\push-alpha-to-itch.ps1') -Version '1.6.2' -VersionCode 10 -ButlerPath (Join-Path $fixtureRoot 'missing-butler.exe') } 'immutable'
+# 1.7.0/code11 is live: all production entry points must reject before build,
+# signing prompts/key access or Butler lookup, while newer codes still require
+# an explicitly changed source contract. No shipping artifact is rebuilt here.
+Assert-PolicyFailure { & (Join-Path $PSScriptRoot '..\tools\package-alpha.ps1') -Version '1.7.0' -VersionCode 11 } 'immutable'
+Assert-PolicyFailure { & (Join-Path $PSScriptRoot '..\tools\package-signed-alpha.ps1') -Version '1.7.0' -VersionCode 11 -KeyStorePath (Join-Path $fixtureRoot 'missing.jks') } 'immutable'
+Assert-PolicyFailure { & (Join-Path $PSScriptRoot '..\tools\push-alpha-to-itch.ps1') -Version '1.7.0' -VersionCode 11 -ButlerPath (Join-Path $fixtureRoot 'missing-butler.exe') } 'immutable'
+Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version '1.7.1' -VersionCode 10 } 'greater than'
 Write-Output "PowerShell version-contract and published-release policy tests passed."

@@ -4157,3 +4157,49 @@ in-place-update distinction remain as recorded above.
 Later Standard benchmark and private-send failures are separate follow-up
 release checks. Their subsequent fixes require new exact-artifact/device
 receipts; this owner pass must not be silently attached to a later binary.
+
+
+### 3 November 2026: final published 1.7.0 Standard and public sharing acceptance
+
+**Evidence class: actual-device scripted UI/RT evidence on SM-S948B**, Android 17,
+using the ordinary signed production package `com.samfa12.hordelanternrt`,
+version 1.7.0 / code 11, runtime source
+`d1c6d152d18c7002c41638d51dc9d9bcceea1bd4`. APK SHA-256:
+`2767704fac89d6670099a4ff5ff396dc7206910a092148a3c8708193dca226be`.
+This is the Android artifact subsequently published in GitHub v1.7.0 and itch,
+not a private acceptance build or a new vendor-wide compatibility certificate.
+
+An in-place update with the established Horde certificate preserved the
+first-install identity and the owner's existing Slot 3 checkpoint. Its enabled
+Load entry was checked without loading, replacing or staging that progress.
+Saved settings were checked before and afterward: 25% render scale, Mobile
+water/fire, 30 Hz preview cap, Glass Off, Current shadows, Mist Off and particles
+Low. No uninstall, data clear, sandbox access workaround, device rotation or
+accessibility-setting change occurred.
+
+After actually entering Graphics and returning, Standard admitted successfully,
+completed two laps / 26 waypoints / 1,838 measured RT frames, with genuine
+RT-produced presentation throughout. Native evidence matched the fixed preset:
+1280x720 ANW, Vulkan current extent and swapchain, with 640x360 RT dispatch.
+Completion restored the original 1440x2971 output and 360x743 dispatch at 25%.
+A second run cancelled with Back during its first running lap also returned to
+Entry and restored those original dimensions and settings. The fixed widescreen
+viewport fitted inside portrait was observed and accepted by the owner for this
+published build; fullscreen landscape is a conditional next-build request,
+not a claim about this artifact. Cancellation precisely inside resource retirement
+or surface creation was not physically injected in this session.
+
+Custom then completed at the retained settings, with 1,838 measured RT frames.
+One new explicitly consented public submission received a **matching published
+native receipt**, and the exact same result/build/configuration was independently
+matched once in the live public API. Optional detailed hardware labels remained
+unchecked; earlier pending reports were not retried or duplicated. This proves
+the tested normal publishing route, not anti-cheat, every configuration, unique
+device counts or sustained gameplay FPS. Raw logs, saved state, device serials
+and verification tokens remain private and are not included here.
+
+The phone was returned to Home, the task-owned Horde process stopped, and the
+latest signed package retained. This complements the earlier scoped owner route
+acceptance at `627c6485`; it does not silently transfer every earlier gameplay
+observation to the final binary. See the [published artifact and validation
+receipt](SHOWCASE_ALPHA_1_7_0_RELEASE_VALIDATION_2026-11-03.md).
